@@ -1,88 +1,155 @@
-Return-Path: <netdev+bounces-151927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E989F1A3A
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 00:38:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0098B9F1B22
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 01:08:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4976818880BA
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 23:38:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC75E1880351
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 00:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278761BE871;
-	Fri, 13 Dec 2024 23:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13851EC012;
+	Fri, 13 Dec 2024 23:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c/Op9mKR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7881B86CC
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 23:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33571E0DB0
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 23:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734133026; cv=none; b=s/3/mTwT8bkh9ZUQKVupZD1p6zd+KoVLoLjTh0TwlFmR+fZjrzjZsQT2nSI0hFOW0ugn849LRsfMQOnLgz7agkWvg46Upg3bfxwz0TmhzN3kOJPlS5Bx3BPerA1gkEl9HwklYp+xw0KP20Y9PNoqyvzJdrSndnsPk4gxsSNgGSk=
+	t=1734134148; cv=none; b=hiRyBuieiFtaHrXdrzBEliKpt7B66ebJlt8pRiXyz6VUOV0ERZnGdAz5cJcQbcjFg3MI8FdVv+7JLGauSxC9mUJpOrNvt6CtGSlTv2mZHO3s2kuB2S1ZcPlR972EwQTsbg4pedGaGgsXQ1EoBgHoNwnq9VWGt3pG+aLLxbKALOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734133026; c=relaxed/simple;
-	bh=tMo9z0KMvVLPZIk8gJBJFYqrwSB+a0gupKMzd0Lb4sY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=YSLR4xZoAZjEdwftp+CYSE4Jmwreh89VEfrg2IpAAvQJk4fDh8RYTmewGm9RGHWQE0BB+RqqffajQyHqs2SxQ+jERPWuVBrnlyQjjh57r53iCplXdt6Z2TzaJZ7vX2JQtIHilz6Q3DFJHaUEJDtl7DNNjaEK1eJSo8n29yRF3+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a78c40fa96so18471845ab.3
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 15:37:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734133023; x=1734737823;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2yun2ZwFdy6SoRPdNnMAcn2qkYLCbCofrCyTIGF8v5g=;
-        b=S4dtUKUZIC27LAprb5uikcx/QhVbM087xu9/603I/yqZTs7ff7+ycgz0K2tTi0mP4l
-         c3G2yAt2gSN8I6+DoIDxkB6NHxJMlhCoJsQvjMk4nrJdB44FW6QiCedQnSDNz5qTPzi8
-         10e9hmnmF6EQdo4hasn9Hs8Wbi6Re0P7MFGljtYxWOmIb1BIOwslAnEQdzyY+Nv3d44j
-         BdlPFagKYdsqI4WWoAJkB0wOEFIyo0caIh+YdMGO3OR8Y8xQDpv045Z53VApuAu6cF/W
-         wMLdnR4exVramxmFuAViY7AmY58ow/qI0Lju64kpPDV4k+56phjgHEo4L55FMBkeXxDv
-         8H/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXbPMSn5IM0i1qvcEgcPedFg+J3U7Gc/qSnrDzZLltmWGlWrEPnxOHeU1ar+CqccuVouzNUgRU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcTTwt9Bl6rm9FxdZtdlYKCach18lxBRXdD3jdzzznb0F0xUL6
-	7NxDGkYVnX48VVmxdEefzRgkMuYCVEEjhFIh1C6vF+loztH/orHOC90zi8ZUy2qdTNTAObWv+g+
-	Qz8SzvzR9bJy2BMjEFTUr6wHqKzB7XQACkAhsOlnEKGv/dowFzclh8H8=
-X-Google-Smtp-Source: AGHT+IG+W6ImB9SjfMRf7eoERjHcXQJViE8cx5y5WtFAXU3eHvoGO5IPYzYQIPGTjtM8onQDXB7p+BGkR7j9vKs331EekEgNvBLS
+	s=arc-20240116; t=1734134148; c=relaxed/simple;
+	bh=XqG2JijYRpxL2/j3DukylYuY6FOBReLBkzB2NTjm1OM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IM4I9N/WkbU9xGG/w2y4h+h8m4xaYK2rEoca7l+YdYujFzF2zzRcbXMT3CH7oc84SvWspnVgckXvPVPKJU/O6hK3t0njcWNxcett4Uhro/oS27+ggIJGjHWS0PpwNScuC8akyV4ju49iTw2Vlk+UuJSQOxnpgDABmEzG0183m9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c/Op9mKR; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <55384b37-005d-48e9-894b-8bbe4f7a6b24@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734134143;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7Wx0ubisvuXuYNQ0Vjor9tnJWsgXG5tKeIY4c7YfW0I=;
+	b=c/Op9mKR5nKAnru1LNVAA0LkoQNk8blbd8PtEgJ22dGt1HlBaR/S774tkeh8sCkpXkgqXZ
+	XV4bAC5TNVMC5VoaX1toJx9ndFTAC/GxGD0Df0zapA/MCwGtYixfB7FZu09C2n043gvMQ6
+	LhVzK6dYN06cIUVrOLkcrzyxvXXOwzU=
+Date: Fri, 13 Dec 2024 15:55:33 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2169:b0:3a7:e86a:e80f with SMTP id
- e9e14a558f8ab-3aff4616efdmr64163395ab.3.1734133023743; Fri, 13 Dec 2024
- 15:37:03 -0800 (PST)
-Date: Fri, 13 Dec 2024 15:37:03 -0800
-In-Reply-To: <20241213230820.1957-1-hdanton@sina.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <675cc51f.050a0220.37aaf.00b9.GAE@google.com>
-Subject: Re: [syzbot] [tipc?] kernel BUG in __pskb_pull_tail
-From: syzbot <syzbot+4f66250f6663c0c1d67e@syzkaller.appspotmail.com>
-To: edumazet@google.com, hdanton@sina.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH net-next v4 10/11] net-timestamp: export the tskey for TCP
+ bpf extension
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-11-kerneljasonxing@gmail.com>
+ <9f5081bb-ed66-4171-acef-786ae02cf69c@linux.dev>
+ <CAL+tcoCCvKapSQ8N48iKh83YxYskDkPyM+bpT5=m8cE_YrCovg@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <CAL+tcoCCvKapSQ8N48iKh83YxYskDkPyM+bpT5=m8cE_YrCovg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello,
+On 12/13/24 7:44 AM, Jason Xing wrote:
+>>> @@ -5569,7 +5569,10 @@ static void __skb_tstamp_tx_bpf(struct sock *sk, struct sk_buff *skb,
+>>>                return;
+>>>        }
+>>>
+>>> -     bpf_skops_tx_timestamping(sk, skb, op, 2, args);
+>>> +     if (sk_is_tcp(sk))
+>>> +             args[2] = skb_shinfo(skb)->tskey;
+>> Instead of only passing one info "skb_shinfo(skb)->tskey" of a skb, pass the
+>> whole skb ptr to the bpf prog. Take a look at bpf_skops_init_skb. Lets start
+>> with end_offset = 0 for now so that the bpf prog won't use it to read the
+>> skb->data. It can be revisited later.
+>>
+>>          bpf_skops_init_skb(&sock_ops, skb, 0);
+>>
+>> The bpf prog can use bpf_cast_to_kern_ctx() and bpf_core_cast() to get to the
+>> skb_shinfo(skb). Take a look at the md_skb example in type_cast.c.
+> Sorry, I didn't give it much thought on getting to the shinfo. That's
+> why I quickly gave up using bpf_skops_init_skb() after I noticed the
+> seq of skb is always zero 🙁
+> 
+> I will test it tomorrow. Thanks.
+> 
+>> Then it needs to add a bpf_sock->op check to the existing
+>> bpf_sock_ops_{load,store}_hdr_opt() helpers to ensure these helpers can only be
+>> used by the BPF_SOCK_OPS_PARSE_HDR_OPT_CB, BPF_SOCK_OPS_HDR_OPT_LEN_CB, and
+>> BPF_SOCK_OPS_WRITE_HDR_OPT_CB callback.
+> Forgive me. I cannot see how the bpf_sock_ops_load_hdr_opt helper has
+> something to do with the current thread? Could you enlighten me?
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Sure. This is the same discussion as in patch 2, so may be worth to highlight 
+something that I guess may be missing:
 
-Reported-by: syzbot+4f66250f6663c0c1d67e@syzkaller.appspotmail.com
-Tested-by: syzbot+4f66250f6663c0c1d67e@syzkaller.appspotmail.com
+a bpf prog does not need to use a helper does not mean:
+a bpf prog is not allowed to call a helper because it is not safe.
 
-Tested on:
+The sockops prog running at the new timestamp hook does not need to call 
+bpf_setsockopt() but it does not mean the bpf prog is not allowed to call 
+bpf_setsockopt() without holding the sk_lock which is then broken.
 
-commit:         2c27c766 Merge branch 'devmem-tcp-fixes'
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=121ac730580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fee25f93665c89ac
-dashboard link: https://syzkaller.appspot.com/bug?extid=4f66250f6663c0c1d67e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=1042a4f8580000
+The sockops timestamp prog does not need to use the 
+bpf_sock_ops_{load,store}_hdr_opt but it does not mean the bpf prog is not 
+allowed to call bpf_sock_ops_{load,store}_hdr_opt to change the skb which is 
+then also broken.
 
-Note: testing is done by a robot and is best-effort only.
+Now, skops->skb is not NULL only when the sockops prog is allowed to read/write 
+the skb.
+
+With bpf_skops_init_skb(), skops->skb will not be NULL in the new timestamp 
+callback hook. bpf_sock_ops_{load,store}_hdr_opt() will be able to use the 
+skops->skb and it will be broken.
+
+> 
+>> btw, how is the ack_skb used for the SCM_TSTAMP_ACK by the user space now?
+> To be honest, I hardly use the ack_skb[1] under this circumstance... I
+> think if someone offers a suggestion to use it, then we can support
+> it?
+
+Thanks for the pointer.
+
+Yep, supporting it later is fine. I am curious because the ack_skb is used in 
+the user space time stamping now but not in your patch. I was asking to ensure 
+that we should be able to support it in the future if there is a need.  We 
+should be able to reuse the skops->syn_skb to support that in the future.
+
+> 
+> [1]
+> commit e7ed11ee945438b737e2ae2370e35591e16ec371
+> Author: Yousuk Seung<ysseung@google.com>
+> Date:   Wed Jan 20 12:41:55 2021 -0800
+> 
+>      tcp: add TTL to SCM_TIMESTAMPING_OPT_STATS
+> 
+>      This patch adds TCP_NLA_TTL to SCM_TIMESTAMPING_OPT_STATS that exports
+>      the time-to-live or hop limit of the latest incoming packet with
+>      SCM_TSTAMP_ACK. The value exported may not be from the packet that acks
+>      the sequence when incoming packets are aggregated. Exporting the
+>      time-to-live or hop limit value of incoming packets helps to estimate
+>      the hop count of the path of the flow that may change over time.
+
+
 
