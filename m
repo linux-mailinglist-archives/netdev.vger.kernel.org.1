@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-151596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C974A9F02C5
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 03:50:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A39E9F02C6
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 03:50:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D989316AAA7
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 02:50:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1805016AC28
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 02:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6389D22071;
-	Fri, 13 Dec 2024 02:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB157DA62;
+	Fri, 13 Dec 2024 02:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XGLk+ELX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RfXjMGvL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D64E182D9
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 02:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4BC6BFC0;
+	Fri, 13 Dec 2024 02:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734058217; cv=none; b=Ayk7Y+ypqdidihYwC4xCU6a9iFoe8LRmhKe/pIMBWfGLFDyNPFUVxB0Ozm32dyg3ifNh6zsVVJl5PSl11IJJKUoyGOwmId2HHc8wHIjmqlU0ZX5mpZhv3kSOTjkvMONPE1O7lGVy9NjBsna8IblQ4SyRRS2BiD8xaMFV0QPeAkI=
+	t=1734058218; cv=none; b=fJ6NA+yYHT6uwUra1usH2CIx0rnz+IgnLlrVwK0mwiS+Poh1ANtPtKbENrf+a1a8vLrIO3XWNEm6l7IImk9nuNyiX0nGTPx1e0Ok06MWnmb4oudJEp2/WL9QzC9TUGFMjVJYYyZIbKr1Cdj+6Dt7UxFnhn2s9XRay3M2DqnrHPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734058217; c=relaxed/simple;
-	bh=uF8gD77/oBBSt1MgUvW46lb83D/2Yj1ts134dEabqbU=;
+	s=arc-20240116; t=1734058218; c=relaxed/simple;
+	bh=USF7+U0trWyA2gN7isJIs25+Ht1uQL9/zoEzOJkdHpM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JQtouPgQW0CuAUVoln4BHnx6TlQtFNOQ16e+bNIAIaTfRdJOv4cOD/OY6rKojFu25hyacoD3jQdnxAsHfgv6oeJMcd1jsx7rn5ztYgPWfXOMNh+VfJH2sBRcOSM3JcWlZOwLndkToL5rqJoT9P4ql2Z/WE/SvFWp8MduEp5Yjcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XGLk+ELX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4B6BC4CED3;
-	Fri, 13 Dec 2024 02:50:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BVzpL6kSUyLDjg87IbgC9wPFP4StPeSpo4BdICI8LJPTHoBzPwrVjybXCVIqzNQ3JrfcwRzFb0jGEoUFbaGrDSdLrkYSY0KoG6QDHuq+QlIFAMkeU/BETgkMppE2aApMVi+ewYCLEfVkMFJ5gddV8Jo4hpnJerrpbPRIoa8QFFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RfXjMGvL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CD84C4CED7;
+	Fri, 13 Dec 2024 02:50:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734058216;
-	bh=uF8gD77/oBBSt1MgUvW46lb83D/2Yj1ts134dEabqbU=;
+	s=k20201202; t=1734058218;
+	bh=USF7+U0trWyA2gN7isJIs25+Ht1uQL9/zoEzOJkdHpM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XGLk+ELXdFAeSP5NDi5iFSzBT62/HEeRvgGJ0YRBZ9yAYUZ+ldFN6wA8N1OVriokO
-	 stsDJCkx2JTwDFgqsFB+8rXcK0ZVgChsDeFrUBwsSSPvkI9tnWijLT/MRW+GhNtYr5
-	 rXhfLDRvKFXAYJFAP3e6Ed52uuwJFo0PUmqI+TlaMofzt/999ZAY19kIcxarNTWkMS
-	 rNw01B8rvvD9PzJN0cP7/PCIN+o0YQrCM3MjMkXaDe2LmHWg5l47k7RXJ+Z3S6URUe
-	 d0/oyP30tUo57lxeumTVZUWogXZiD5ivv0rHxeOtjEMCcWMZmutZzzb+x/qYdYA2Ue
-	 k5tsNZ3x6oZFQ==
+	b=RfXjMGvLvKMDlsT/HSmcGiUfMwwsr/bp2jimZA5vI9dXiDtM63tN/WyHH836oYSkV
+	 z2ormscre21QF8zHKCuBMrE8vLN629H2hDAMHvzKQNHCcegMxfTOgfl1dRatPdjqgx
+	 /BvUPOubtv+awKMxbZsDdsW49g9W02lxoJ7Od5dPz0johqBgEGv6i0XyOcvJX/m3Jv
+	 4FTLbONj8Lwz55C9DJCxriWUYivzXK/VMeslOYJv+/pjkwAXcFL9jmRVQJwPfyOfvp
+	 hk5YLVkQV5ySR2gJ1ehJ7uh2FS6f9WqA/eYRqy4xf46q/mhkAytcLxbtsN6Z6wS2XZ
+	 IkD3lnh/XvkRw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E6A380A959;
-	Fri, 13 Dec 2024 02:50:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEF6380A959;
+	Fri, 13 Dec 2024 02:50:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net_sched: sch_cake: Add drop reasons
+Subject: Re: [PATCH net-next 00/12] xdp: a fistful of generic changes pt. II
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173405823301.2517381.3836983297088707226.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Dec 2024 02:50:33 +0000
-References: <20241211-cake-drop-reason-v2-1-920afadf4d1b@redhat.com>
-In-Reply-To: <20241211-cake-drop-reason-v2-1-920afadf4d1b@redhat.com>
-To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2VuIDx0b2tlQHJlZGhhdC5jb20+?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, toke@toke.dk, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, netdev@vger.kernel.org,
- cake@lists.bufferbloat.net, dave.taht@gmail.com
+ <173405823427.2517381.8533114389826490675.git-patchwork-notify@kernel.org>
+Date: Fri, 13 Dec 2024 02:50:34 +0000
+References: <20241211172649.761483-1-aleksander.lobakin@intel.com>
+In-Reply-To: <20241211172649.761483-1-aleksander.lobakin@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ john.fastabend@gmail.com, andrii@kernel.org, peterz@infradead.org,
+ jpoimboe@kernel.org, jose.marchesi@oracle.com, toke@redhat.com,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ przemyslaw.kitszel@intel.com, jbaron@akamai.com, casey@schaufler-ca.com,
+ nathan@kernel.org, nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 11 Dec 2024 11:17:09 +0100 you wrote:
-> Add three qdisc-specific drop reasons and use them in sch_cake:
-> 
->  1) SKB_DROP_REASON_QDISC_OVERLIMIT
->     Whenever the total queue limit for a qdisc instance is exceeded
->     and a packet is dropped to make room.
-> 
->  2) SKB_DROP_REASON_QDISC_CONGESTED
->     Whenever a packet is dropped by the qdisc AQM algorithm because
->     congestion is detected.
+On Wed, 11 Dec 2024 18:26:37 +0100 you wrote:
+> XDP for idpf is currently 5.5 chapters:
+> * convert Rx to libeth;
+> * convert Tx and stats to libeth;
+> * generic XDP and XSk code changes;
+> * generic XDP and XSk code additions (you are here);
+> * actual XDP for idpf via new libeth_xdp;
+> * XSk for idpf (via ^).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net_sched: sch_cake: Add drop reasons
-    https://git.kernel.org/netdev/net-next/c/a42d71e322a8
+  - [net-next,01/12] page_pool: allow mixing PPs within one bulk
+    https://git.kernel.org/netdev/net-next/c/fcc680a647ba
+  - [net-next,02/12] xdp: get rid of xdp_frame::mem.id
+    (no matching commit)
+  - [net-next,03/12] xdp: make __xdp_return() MP-agnostic
+    https://git.kernel.org/netdev/net-next/c/207ff83cecae
+  - [net-next,04/12] xdp: add generic xdp_buff_add_frag()
+    (no matching commit)
+  - [net-next,05/12] xdp: add generic xdp_build_skb_from_buff()
+    (no matching commit)
+  - [net-next,06/12] xsk: make xsk_buff_add_frag really add the frag via __xdp_buff_add_frag()
+    (no matching commit)
+  - [net-next,07/12] xsk: add generic XSk &xdp_buff -> skb conversion
+    (no matching commit)
+  - [net-next,08/12] xsk: add helper to get &xdp_desc's DMA and meta pointer in one go
+    (no matching commit)
+  - [net-next,09/12] page_pool: add a couple of netmem counterparts
+    (no matching commit)
+  - [net-next,10/12] skbuff: allow 2-4-argument skb_frag_dma_map()
+    https://git.kernel.org/netdev/net-next/c/0dffdb3b3366
+  - [net-next,11/12] jump_label: export static_key_slow_{inc,dec}_cpuslocked()
+    (no matching commit)
+  - [net-next,12/12] unroll: add generic loop unroll helpers
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
