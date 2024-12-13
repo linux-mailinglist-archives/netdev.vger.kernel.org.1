@@ -1,247 +1,124 @@
-Return-Path: <netdev+bounces-151627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B87879F0507
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 07:48:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E1899F0544
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 08:13:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D987F164605
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 06:48:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7C90188AC12
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 07:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91E218D621;
-	Fri, 13 Dec 2024 06:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341EA18DF7C;
+	Fri, 13 Dec 2024 07:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b="mjSylSkd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dXNsevQ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023105.outbound.protection.outlook.com [40.107.44.105])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FA218F2DD;
-	Fri, 13 Dec 2024 06:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.105
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734072481; cv=fail; b=fksEGA1Jirbx30yhWIkAAMFX7Ri+g76N/RoCCwQtN+091h4sN5IuY2PTeDbLnzqdczeowaea6Rn5XeYrvKuLEtHjaEq4H7/mCwBMZHocIibOJwnici9iBsCNkbK1FXirX0043Mjo22RJ/Pp32QYZ6HCo20W4V3e993DyJf7tJI8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734072481; c=relaxed/simple;
-	bh=i3uuwM8uZtPpEfNjuQI5Eaep744uRXrLXmGLsdjcfRI=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Zshe3Sd8UL4+WIbeH7c4T3h5437xBPntWMMDu/p3erAKbfdzha6ROEcSzesjTnv3ib553rTrBjWG5rw0VDgBzRUira4U5mDo/sHYoVUzmtE4gsWrp3bwnPJWp1gJX0eKOPsigVQlAjuAMHDoSePjGDhNqMrjBfqvoimNm+ask0E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com; spf=pass smtp.mailfrom=fibocom.com; dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b=mjSylSkd; arc=fail smtp.client-ip=40.107.44.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fibocom.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=knVRDr/XavlFjasymwmSqOjy9Es/eKjw1qBA0MkLtTAxDrYI6t4gF+8+NTlAp5WWGBoGRGWxFJ2NZbcU6vEJQEpg6RUbnx3odai8JVSfJmx8zHCpX91lQR7DICz5Y/Gfz3ocpW9htWDgP+EqkV6tiv81Y7jHDwlLlbnKZWpB+Qt2Cr2BR0loYbgBm9rdnUcaNL2dbDv8d4vVYv/CV5lKhKPmRYDae9bQmk6tqOC44+RbYHgJS9ZFLFSpyI4FwE/BDMExls3Hg+JoB0RDejf5Q/3izy4I66Tr+9pIm4m0HDQ1wJmVVCT3u1mUM3VBMJa7wij39GY+6GZKuhL+dLjBjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S+skzNz6Btvb7D8VparQSNjLaWWiBQRZ39toxKxtipw=;
- b=Mey+13i/o3x7TqnIPA6+7P/BvzFUCMkGfRmeFwg+qMiMmOnIs2myAvYOFUXpYoLHotaWxOGWW+1Bs8b4vL71XdTVGQ22yg7Xb8rM9jhwn3owP0SvdQzaiHIfaTa9UeweokqbZ6RlMnvqAi28xFU657mj2/z+YXZmsY6sSjVbh/FyU7wOW3oqxlP7RcbBOYtNUm7q0MTekEZV0qBL7tEhtZY2ewTUikc8E5QItdQ18Win/kzwuzErTQ+S8nGDYBgmwL9YNTxepHwidzl6+iKEpZ+GViktx9itAzNDrMjboA4j7J23asdgVRV0B9lP7cWVvURzry58KjrgRy2mSoXOxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fibocom.com; dmarc=pass action=none header.from=fibocom.com;
- dkim=pass header.d=fibocom.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0A8187325
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 07:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734074024; cv=none; b=Wc09h2+QFXz2MU0qBvsVwlBOeg/omilBUC7Z2TOyEX3onv4nbPCpcVv/3kuolMG+vmImOkXS0eoAXdN1Ak19CRMbyDO7JpT6E4TOxqHgiUMfQHPj5xH3s92Pkq8POEfemvLxk1B5Z6+gaqE/LuO5mp5C4c9oh2ie9yB+umw/rSQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734074024; c=relaxed/simple;
+	bh=CcfoH39Ga3NCTNrM36chxRO9HsWzuEWi2LHHGfTWpR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=igG0iYVJKLnq45i+QszM3gTAaCoVUlEZq9ttJDB9kLebgV3d2ySO9tR4HB6WHNe4VQv1yA4WPm031GbNb8ealARE5hxq0EN0fWcphX4M2l8+k5Ja6cFN4Ba2SZokWA2I1oe13yezPvwE0yu6wPDFTvqj63vM7QWDiCYT7DZOdLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dXNsevQ8; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa662795ca3so493068566b.1
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 23:13:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=fibocomcorp.onmicrosoft.com; s=selector1-fibocomcorp-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S+skzNz6Btvb7D8VparQSNjLaWWiBQRZ39toxKxtipw=;
- b=mjSylSkd8A4OuFnHYxQcejuID3si56WGBXO+lQFQhaIqfVALqUAZDMEZxYF71FhZNsFOVsu6MIa9R10TG8ZGuJdLuZ6yD2z1rR/5Z5vd85M8EexxmyDEDQO5ZiMwQDFLX5Vf3yqwmpYYYe73kDlHJuBRhxEtq7eslXkAYOZk3UA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=fibocom.com;
-Received: from TY0PR02MB5766.apcprd02.prod.outlook.com (2603:1096:400:1b5::6)
- by SEZPR02MB6987.apcprd02.prod.outlook.com (2603:1096:101:19b::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Fri, 13 Dec
- 2024 06:47:52 +0000
-Received: from TY0PR02MB5766.apcprd02.prod.outlook.com
- ([fe80::f53d:47b:3b04:9a8b]) by TY0PR02MB5766.apcprd02.prod.outlook.com
- ([fe80::f53d:47b:3b04:9a8b%5]) with mapi id 15.20.8230.016; Fri, 13 Dec 2024
- 06:47:51 +0000
-From: Jinjian Song <jinjian.song@fibocom.com>
-To: chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com,
-	ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-arm-kernel@lists.infradead.org,
-	matthias.bgg@gmail.com,
-	corbet@lwn.net,
-	linux-mediatek@lists.infradead.org,
-	helgaas@kernel.org,
-	danielwinkler@google.com,
-	korneld@google.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jinjian Song <jinjian.song@fibocom.com>
-Subject: [net v2] net: wwan: t7xx: Fix FSM command timeout issue
-Date: Fri, 13 Dec 2024 14:47:20 +0800
-Message-Id: <20241213064720.122615-1-jinjian.song@fibocom.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR0P281CA0243.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:af::10) To TY0PR02MB5766.apcprd02.prod.outlook.com
- (2603:1096:400:1b5::6)
+        d=linaro.org; s=google; t=1734074021; x=1734678821; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ogEEtJXzNxHENgLOd4mF7OzCwBKh2LN69UQcTsNeWTU=;
+        b=dXNsevQ8Hv+y882nhkY7LoD3l09ZhrUbTQXnnWBYJxQvVMVqoZ7eHvr9cV5s6GXbvD
+         rTlV8AwAyzhICZrvfMyMlD8d0ZJ5hfZ9R4A1slaOdLOk/8mJC10P58pC0cLIJuRt4fB5
+         xUP7jQ/A6WsrM8TCXWy5zUw90L6KZ33Zio0Q8hmB2bYTuXpDC7AyL8aOUY55xZajpvsD
+         BPGwzA2kbzRJep9uc1D3dULdvzILnkjP7dhLeId/2huRbIjiteFMIb4mlTtpkShBJQPa
+         RHrDag5D7kD7rEg+U91z/tNBuoCJsozCjBV4B+T91MD5GpR/3v18d7spECrb5PYo0ORZ
+         Ii+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734074021; x=1734678821;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ogEEtJXzNxHENgLOd4mF7OzCwBKh2LN69UQcTsNeWTU=;
+        b=jXSfCmbpbGEqkeZWPUp71e6BQmWOSG6R27STKHh2/GmlpiHXu0Vz3vvzwajYBJzAz6
+         WbuN4g/Nb3cO5V50eUX55lpVyPA8aclv5D3PM3L1/Yq7KmlHSVaRAHPQPxKL6v2AuboF
+         ohcnEmfTd74BG11MOXee9kFAqkLC2D0JhrQlETCz+0LmjGjIjLkJRoNio+0i6omAwrOX
+         8bC3mIGWUAOh5M5f6qZRA8NsMt3uyj1QNdGZzCkh5jJrph8E8L198qvo+0i1FkT9aUzY
+         r9mPMtsmj6yIV3ReBMX0jziYJRjiXQwa2Mj37mab4bMjH0hXUtXnUdMhOxFiBoyrdzad
+         /2mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbTlKxkK7Rs8JpkTVeAKl4uNFRwrG1bvJ7jMIYfD8qYT5GvdpoK59XUJpVfHPqTWNzx+96SvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTiVI8KXfZYIITvdRQJKbIHYZSvJc31lNHDDq6Aj88F73RrpVx
+	qvfNvMOJsfrfj4WcxXlRjF3m5dJiDDiOYNlKy9P/CqCqBI+T3jvJs9aWQA8m2S0=
+X-Gm-Gg: ASbGnctOnBuXXrz+n/xiU9r9+uwAaiekgS82t+cHTa8gb26rQ1JZv/auMSlHAhnkFHU
+	D2jzDhC0atvKSADwiN8oEstJRT7JT8kRY0Z1bEJ+4ti0oFw1Dok3ha/Zw1xCBJuXez2IhidJp9c
+	6/gIe1n5urqs/A6m0jS1S+epeA7gtFCCXHV2eY4Y91panJvVmwl1kEsk+Lk9/iFykzv+ARYTJus
+	maKNyISUYUqb3Xcd0rcXk2pEIlRr/VNhX+7Lj9IQRibWiAX5GucBikqQ/INKA==
+X-Google-Smtp-Source: AGHT+IFbfXZCVIZ+/YV4BpaGAU/Xibo0YqHjTTlEMxiGHE+JH3CnJWYkryBurN4Ott2o2NVLHBmH2Q==
+X-Received: by 2002:a17:906:dc8f:b0:aa6:8b4a:4695 with SMTP id a640c23a62f3a-aab7bb644d9mr128549866b.31.1734074020805;
+        Thu, 12 Dec 2024 23:13:40 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa6b9a94c32sm268653866b.55.2024.12.12.23.13.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2024 23:13:40 -0800 (PST)
+Date: Fri, 13 Dec 2024 10:13:37 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Uros Bizjak <ubizjak@gmail.com>, x86@kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+	linux-arch@vger.kernel.org, netdev@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Christoph Lameter <cl@linux.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>,
+	Nadav Amit <nadav.amit@gmail.com>, Brian Gerst <brgerst@gmail.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v3 0/6] Enable strict percpu address space checks
+Message-ID: <e9c4006a-ca1f-404b-bcb2-8b16ae2a9231@stanley.mountain>
+References: <20241208204708.3742696-1-ubizjak@gmail.com>
+ <20241212193541.fa3dcac867421a971c38135c@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TY0PR02MB5766:EE_|SEZPR02MB6987:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ccf319b-9ea2-4ede-0e8b-08dd1b421056
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|52116014|366016|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?v+97HsVOdXWtGUxLaExDXfVDHjsxf8k7reIa+TCdNCff1HBNe4AqcQmiBnf+?=
- =?us-ascii?Q?5QyHJfVYvrOPmJih7zg9EozNOu36vqk9kCAYRpPr8hGuflBWl2+usrFm2aZp?=
- =?us-ascii?Q?urdrkjhrWX0yByNGc8kfeN1fYDWVISo277LRbj8LFuz8RalwEskhW0BI+TzY?=
- =?us-ascii?Q?UVCryptDuyRIPsf7SckaBv9S7sFu885Bc4vqzshpnlnD68Kjf7r5Cp6ywO3D?=
- =?us-ascii?Q?eKYPBsPJzHv2ZlHtdTjnK78vhG0HPXMGi4NJID/M6N73iq2lAsnod+d5JpLN?=
- =?us-ascii?Q?Dh3KeDOViwbGflpU3dUxdPIsM7Rw/jDtP8jgTApC/pK1XCxHjJSw4hBsaIDK?=
- =?us-ascii?Q?SgiT0Dt8t3PLeCO+dXbiDgfd6E9i3FIcTNiZ1ohhZcnRkOYEmRdY3L/s5wAq?=
- =?us-ascii?Q?MM8q9+/NrMyTzAfj3MzF6rTf34DXguq08tJ7Ggo5G41Qq5RwxPgPEKOSzxSA?=
- =?us-ascii?Q?R2Kw0e7Baw8PJyuUBStTSIiJLeOyPhwWaDj7dA9HEsftfpXyqpx/jeyyRM8j?=
- =?us-ascii?Q?SC9j9yRQe9XtakhxTETH+GaI6rFnEDRNJifLAQX1Pyzore8SQjNarTb/d8i2?=
- =?us-ascii?Q?ChLth8Dx7mUv+ElZ8BTc++zUrPOs79L0AOMNiO1NQ+ROEx8/+BMsOS6wxph3?=
- =?us-ascii?Q?gfHVvpqdDSaGte7WE/sIda7xdgYX9hag1i+XlrsoBk/azv5hWk1+7Ds00ey+?=
- =?us-ascii?Q?R++18k2oPmmlFMBi5khiyPQDrFQ9bHaG9Q5uENEKAwWZyABPIqyr2YDd2NW8?=
- =?us-ascii?Q?4s5EiQWWw+vjkxoqF6N2i5AQWzmqUxLRmElmEcqtkMPVxYRublA9Uy5swlKh?=
- =?us-ascii?Q?8/LDN2/skzgQd4qBP/7iDAuTarzGWlZEandziTaEs3cc4j52zJuGGRd46vpF?=
- =?us-ascii?Q?6BL6Oda9PMr1ljE4aefik+/8u8BB6mCnkYrcvf0tXr3VUNK8TdkogOI+/jpz?=
- =?us-ascii?Q?snkwz5eGH1A5fqpNC/Hx9skMhng8nmstCsq5RIZn6vITT7AJa9ryTLfoVfLb?=
- =?us-ascii?Q?oXBkH/GrzrPURxucStaqxCXyo775QQU9JkZ8LDbVyyftgMlm4Ti+Qe27ddq8?=
- =?us-ascii?Q?qVGobGA3kthBuc/kHJBd0SG4JtVru1EfbxGRyvTo9J6hiCXcmlRGPRAcKisl?=
- =?us-ascii?Q?Xy8Cg0HySICeGOV7m2BBaPxGLlzErkUrbbghP/3Jd23atNNThQca67qiwo1t?=
- =?us-ascii?Q?/P0FwyTPheZ7KgyJOL8qmeFTwVCyCrG0P6CTqU13asAQTaKPvZxG/9PJCdCJ?=
- =?us-ascii?Q?hYqEtojSpAFcVE7a0KXa/REvIrmTy4y6CTCcC6jH8WqKdmYiTXgdFjc4DVNZ?=
- =?us-ascii?Q?YUE3oXiKlHPfuZxPBGKDdYGULuZmHvQAO16b47rd2dPkatahblvVPOqOqtw8?=
- =?us-ascii?Q?dkDt2mu67K+1XHU6gjRTgYPzmf+3o8v3YXE52gXNE783CgldNXVoDZ/VGkws?=
- =?us-ascii?Q?VgI2mb6GfMMkYsXQw7cCf+66ILmenabS/WMUbPhcZYUKD0WVhNlTUA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY0PR02MB5766.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(52116014)(366016)(38350700014)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?51rQUquBPJx+DqL+hWWRIu3ewcyju21QeZCWuwqY6gs26/E1y0Y/ALA3O5/H?=
- =?us-ascii?Q?oW5ZYvXDYgZaYVVa0Ae1/5kJehUEEoNWdZgC0eW2VhoHH/3sQGHhQjrjDsH5?=
- =?us-ascii?Q?uQ+nsrokSeDrO1A9/lxV/ctj+2xJahi3nGBkQwylWuINTSnOi7jmJPROoFHL?=
- =?us-ascii?Q?K2mx0NAE59OU5YfkBjZNL+ggoR80wFNRBqwv8Y35kfqJQFZ4o12BOwClvjuu?=
- =?us-ascii?Q?gOcK1ucsSp3v8ZF7ih9cGq1+IVmFzciZjE2h32iciNIpoLd4MyC4BVF1orMe?=
- =?us-ascii?Q?+/M5nZilhwGptKGaNTfbwruGr21mBaTaLZt7p51DfITwW91vCzIwA/fpaJWo?=
- =?us-ascii?Q?pilRJD7LH5pX8H5t6f3jW+PBOJbUuKITIl9XRa+UTfrUnnD7B/MWExZisv+7?=
- =?us-ascii?Q?KpGodT5LyAdn5Nur4A/AOvskd5zfiBTNmfNfkR+4UEujkAwRExD2r21Pv+C8?=
- =?us-ascii?Q?pDHmyIXNZs2hmNVA138cDlyM8OzAkHZlQEA8aUWbeQLReOBe5cDqSrcMEesp?=
- =?us-ascii?Q?LmQSvYsGiQUCPzfMiG6RROZAhKhJZMslkSgXeEUnY0HpoaosKlB+RKQ0gH2S?=
- =?us-ascii?Q?sosbkoGlpkSeQH9qSUX0nJO2Pk1QT4qljfTqlWlu4/gFumm8WPCiHJ4aag/k?=
- =?us-ascii?Q?SJ+FsvfdgkPEPCE1xAbRzUgOTeSUp6mC5NiPsghv6DVsi4vJVfIFGnW4iaNu?=
- =?us-ascii?Q?V5GpqdtaDRFjBlGrmkMQ3NmSznQLINP1KpMW2003ED4z9Boe7F2y5r2Sff4T?=
- =?us-ascii?Q?DDkZaJV7HEsHXP89ZR7REj3V7Nk8n2nsXpzGSiX4HkHleKkc6HHoQ0Z+LDHy?=
- =?us-ascii?Q?s6qNgN7R0qk05e0VKkBPE+ySservvh0bu+svTDSCfVaHKLVzOzb2lpIoOipQ?=
- =?us-ascii?Q?L0gM+5xC+z6nFEfjM3rX575rhSLkvAGRAUyy0638AlDrd7C07YXzZlwsPtyP?=
- =?us-ascii?Q?O6py9q5mWg4ZKUUPVqA397z+Z0reVavRcM+LDrjKS8oFaH7DMJZSClI5dAdb?=
- =?us-ascii?Q?azA4eqRI2AmgLdq1yzkff/GBUdjGONERFe02i5SOHJH0WlATSae4xxzCdUeK?=
- =?us-ascii?Q?gm0JxfvGNj2UYg+rI9KqqjYlupujmcPPCmILQBF1s7zG01af7p0tCrJzSCvl?=
- =?us-ascii?Q?/SbhWZxbXYlg1hGbHc3zREurSvD4kYW4WgSFSnsOJi1EiqW1caSy8rBXz3+T?=
- =?us-ascii?Q?KbZJPgA4aZgfA7QzI1Qc08qCXG3mSKa/T4bdUyiWZc8IaIEx8CswZLQROmqH?=
- =?us-ascii?Q?YyPXaRqmV5qQeWKa+tJMc0ohU9mItr+JbayLvTvTt48qiMdHLr1jIAUkQRY/?=
- =?us-ascii?Q?Y2adqyd3txRkbBNgN/mqn/tnPX24ukr7kHdLv//MBOcNsFn0gMH2sLQMpYCN?=
- =?us-ascii?Q?7IiE2QTCo6U1EMBJOhXSIEj2m0Ma+zl8ZFcCPNlb/t20iUHXj9K906N8MKDy?=
- =?us-ascii?Q?FJAFeUDzKkhBapnCP6gH/u2q0h9SUMmrMW2cZy4IqF1y8gJ3GdAAZ8qXUlZx?=
- =?us-ascii?Q?TZaqdu70Zb4e91RCc/HnYbPtXQCoK2wBfW9eBnFRJCFf29fAvM7FGgmWJKrg?=
- =?us-ascii?Q?sxdLFjArX+L5IyinBG4ZI9WPRNs4NPPCy674Bt2+VYA4ZxbyxOZBzltgBqVF?=
- =?us-ascii?Q?UQ=3D=3D?=
-X-OriginatorOrg: fibocom.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ccf319b-9ea2-4ede-0e8b-08dd1b421056
-X-MS-Exchange-CrossTenant-AuthSource: TY0PR02MB5766.apcprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2024 06:47:51.6148
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 889bfe61-8c21-436b-bc07-3908050c8236
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h5RCbCU7Bo8T1jfWO9bsRAHCciuapyjGqgZ1DaNa0XjHnsgqiRaGx0DtNdxZdsS8N8bcBdIHt5TpqNLZXFcbGwEYh+PSRYdVZWFcPhzIT+k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR02MB6987
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241212193541.fa3dcac867421a971c38135c@linux-foundation.org>
 
-When driver processes the internal state change command, it use an
-asynchronous thread to process the command operation. If the main
-thread detects that the task has timed out, the asynchronous thread
-will panic when executing the completion notification because the
-main thread completion object has been released.
+On Thu, Dec 12, 2024 at 07:35:41PM -0800, Andrew Morton wrote:
+> On Sun,  8 Dec 2024 21:45:15 +0100 Uros Bizjak <ubizjak@gmail.com> wrote:
+> 
+> > Enable strict percpu address space checks via x86 named address space
+> > qualifiers. Percpu variables are declared in __seg_gs/__seg_fs named
+> > AS and kept named AS qualified until they are dereferenced via percpu
+> > accessor. This approach enables various compiler checks for
+> > cross-namespace variable assignments.
+> > 
+> > Please note that current version of sparse doesn't know anything about
+> > __typeof_unqual__() operator. Avoid the usage of __typeof_unqual__()
+> > when sparse checking is active to prevent sparse errors with unknowing
+> > keyword. The proposed patch by Dan Carpenter to implement
+> > __typeof_unqual__() handling in sparse is located at:
+> 
+> google("what the hell is typeof_unequal") failed me.
 
-BUG: unable to handle page fault for address: fffffffffffffff8
-PGD 1f283a067 P4D 1f283a067 PUD 1f283c067 PMD 0
-Oops: 0000 [#1] PREEMPT SMP NOPTI
-RIP: 0010:complete_all+0x3e/0xa0
-[...]
-Call Trace:
- <TASK>
- ? __die_body+0x68/0xb0
- ? page_fault_oops+0x379/0x3e0
- ? exc_page_fault+0x69/0xa0
- ? asm_exc_page_fault+0x22/0x30
- ? complete_all+0x3e/0xa0
- fsm_main_thread+0xa3/0x9c0 [mtk_t7xx (HASH:1400 5)]
- ? __pfx_autoremove_wake_function+0x10/0x10
- kthread+0xd8/0x110
- ? __pfx_fsm_main_thread+0x10/0x10 [mtk_t7xx (HASH:1400 5)]
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x38/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1b/0x30
- </TASK>
-[...]
-CR2: fffffffffffffff8
----[ end trace 0000000000000000 ]---
+I'm glad I'm not the only person who read that as "equal" instead of
+"qualified".
 
-After the main thread determines that the task has timed out, mark
-the completion invalid, and add judgment in the asynchronous task.
-
-Fixes: d785ed945de6 ("net: wwan: t7xx: PCIe reset rescan")
-Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
----
- drivers/net/wwan/t7xx/t7xx_state_monitor.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/wwan/t7xx/t7xx_state_monitor.c b/drivers/net/wwan/t7xx/t7xx_state_monitor.c
-index 3931c7a13f5a..57f1a7730fff 100644
---- a/drivers/net/wwan/t7xx/t7xx_state_monitor.c
-+++ b/drivers/net/wwan/t7xx/t7xx_state_monitor.c
-@@ -108,7 +108,8 @@ static void fsm_finish_command(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_command
- {
- 	if (cmd->flag & FSM_CMD_FLAG_WAIT_FOR_COMPLETION) {
- 		*cmd->ret = result;
--		complete_all(cmd->done);
-+		if (cmd->done)
-+			complete_all(cmd->done);
- 	}
- 
- 	kfree(cmd);
-@@ -503,8 +504,10 @@ int t7xx_fsm_append_cmd(struct t7xx_fsm_ctl *ctl, enum t7xx_fsm_cmd_state cmd_id
- 
- 		wait_ret = wait_for_completion_timeout(&done,
- 						       msecs_to_jiffies(FSM_CMD_TIMEOUT_MS));
--		if (!wait_ret)
-+		if (!wait_ret) {
-+			cmd->done = NULL;
- 			return -ETIMEDOUT;
-+		}
- 
- 		return ret;
- 	}
--- 
-2.34.1
+regards,
+dan carpenter
 
 
