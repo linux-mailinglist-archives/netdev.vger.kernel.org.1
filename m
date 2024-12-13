@@ -1,124 +1,267 @@
-Return-Path: <netdev+bounces-151578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A63D89F0134
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 01:42:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA1309F0145
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 01:52:02 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 643C128603A
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 00:42:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F133E188A37D
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 00:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93BC383;
-	Fri, 13 Dec 2024 00:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93489610C;
+	Fri, 13 Dec 2024 00:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ltpQ4DrN"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="DskBrXLi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099B217D2
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 00:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0251D10F7
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 00:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734050543; cv=none; b=IH7+WRxOLQF+/JB6yW7ptQer8Oev5dlmetDxrmAJ3T/1NfjKNTSL9ha4rC8DRItp2qOjfBRo/TCanfDwQibcIvOvscvBicolbuEi0tkBtaJjMl5cPIJhscv8D7Rm5O/L53KbWkj4ZQWnBTj2D4FU20p2ViMFWra7znmigBj8+0o=
+	t=1734051118; cv=none; b=Ac36i2+ro6VPtC/0xtoCVpOTrhgyhGfUUAPAPXlTUeeNwan0f3Bo5fabMy9zy1SUDZtQAvBNwe3EV54cWuSGyam2c/JvBdTtJ4d2CPpE+fYOFx+RBTQ3ZT6H+V/jpk6PrkhtI11cfeepAzoJwnTIz1ARZEvNFISJfqE/GUhWbGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734050543; c=relaxed/simple;
-	bh=Yp7UGQxcclEWhZ0+p5Yo6dN+XGf+KdKUUMocALofWbc=;
+	s=arc-20240116; t=1734051118; c=relaxed/simple;
+	bh=iFK9zQnpu6ftwjP/G/D6vMn2aMsIdos6kgQPzfkf7dk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c6to3VVSDPo+lcaOOUrdzSUg3T70T0xgvtVydYTb+jshG7maVIZYRaK0rjF6tW9Y3x3vKA2FZOt9bQ6bP6y37xPsuCgD8V1CWmUH0ZHyKm0VQo4+CE3B9Avtv3XcZmfJKXVdiMCfL1Ez8xw+uAFed/hGvmSwlBm9WGE5jtSZCF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ltpQ4DrN; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tLtl0-005ckK-34
-	for netdev@vger.kernel.org; Fri, 13 Dec 2024 01:42:14 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=90lAd4Ub90Y3lwR0xrHqn4Mn/GoxQ9voexWYlptAWvY=; b=ltpQ4DrNv5uQqO7Cn+qZig+qun
-	cXVJgte+GPBQJNZCURp7B5apx/yqnSHPUXb0Kgwyej942R3HzmyNstJBHeaIBwg/TdI0g+4sdtzfV
-	99SKnldRPeuPcKXAC8S6bm9uorZQc7eJ++scFyKY8z3FaXQnbdU9+RG3T9J2IEzxH9ic/vVwzVySB
-	3n1NHSG/BJp6QN+3/vOecuSQDwgSwJmyeX2owo651Hg46VHjXwPanJREdctbLDi5bWNvfTdo7I7VP
-	uoU5xJCCqSePR6s/+HsYwZuMcllLC/TQQ4GeuU6Vn6ZQqSrTyPj7yFh8g6ENmk2k7KB5ulXqU3s6r
-	HxIT3LaA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tLtkz-0003fr-Np; Fri, 13 Dec 2024 01:42:13 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tLtkj-009S1a-Il; Fri, 13 Dec 2024 01:41:57 +0100
-Message-ID: <f3bce5dd-1cfb-4094-b80d-584bd00333d5@rbox.co>
-Date: Fri, 13 Dec 2024 01:41:56 +0100
+	 In-Reply-To:Content-Type; b=FEV/4Me30ZR8/z9VCvfnKKlbb+yFuHWrL1R7ClDd0t+IGw5oBWQIsNa7uJE9ul0Hald5GqlbW0NCMRqVhqPnozDG1fz9hHzcTDciJj/JhBXUyiEM4TWBaI3Jf/0V6hYavqM2GlNrLTyI6L8OZbdRwvQyTOeyHf7wIrocH3xxtkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=DskBrXLi; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 01BD12C02A5;
+	Fri, 13 Dec 2024 13:51:48 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1734051108;
+	bh=GxzUAEXAkhjtp42vA7TWZCbw4NxpvcuOU0R6+v4w44w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DskBrXLimYwcT0camdDAg/BJMuNSuZsRlPLh4+NlS52gpZgZXXx0uIreTe+fkbvGn
+	 QnykWI4qGEiIdD4czWCAhisXluFIRvqmG+cvqm9Y7lK/P0cd36Z8Hl+isA9qKZeV/U
+	 XcPzhaxF2T2YdZ4kiinfqZ+0taKjItlBJaMCpc++OS8VSZmvpFoLNu7b68UyJfkLND
+	 WXlPQXcSwokp2nY2JoOB1KnunvN0MmtfLO3QayS5Nk7g8wilV6odvdzT3SLE/VIG2e
+	 8XQbsxoNnTwOwMvwISV7LJPFotn3X9SgEgycy4cSyZHrG8mfoVplXJj5BsRQP6m4sZ
+	 XJYON5ZnKfyWA==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B675b85230000>; Fri, 13 Dec 2024 13:51:47 +1300
+Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
+	by pat.atlnz.lc (Postfix) with ESMTP id A4DAD13EE00;
+	Fri, 13 Dec 2024 13:51:47 +1300 (NZDT)
+Message-ID: <6124c7a2-e949-452e-a88d-2d747cc0f776@alliedtelesis.co.nz>
+Date: Fri, 13 Dec 2024 13:51:47 +1300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/4] vsock/test: Tests for memory leaks
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org
-References: <20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co>
- <gm7qmwewqroqjyengpluw5xdr2mkv5u4fgjrwvly24pc5k2fl7@qelrw3hzq33h>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <gm7qmwewqroqjyengpluw5xdr2mkv5u4fgjrwvly24pc5k2fl7@qelrw3hzq33h>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH 4/4] net: mdio: Add RTL9300 MDIO driver
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
+ hkallweit1@gmail.com, markus.stockhausen@gmx.de, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-mips@vger.kernel.org
+References: <20241211235342.1573926-1-chris.packham@alliedtelesis.co.nz>
+ <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
+ <Z1q0CuDXe8VFuBfZ@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Chris Packham <chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <Z1q0CuDXe8VFuBfZ@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=675b8523 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=RZcAm9yDv7YA:10 a=iDlK1bvE_E-H61UyTd4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-On 12/10/24 17:25, Stefano Garzarella wrote:
->> [...]
->> I initially considered triggering (and parsing) a kmemleak scan after each
->> test, but ultimately concluded that the slowdown and the required
->> privileges would be too much.
-> 
-> Yeah, what about adding something in the README to suggest using
-> kmemleak and how to check that everything is okay after a run?
+Hi Russell,
 
-Something like this?
+On 12/12/2024 22:59, Russell King (Oracle) wrote:
+> On Thu, Dec 12, 2024 at 12:53:42PM +1300, Chris Packham wrote:
+>> +#define SMI_GLB_CTRL			0x000
+>> +#define   GLB_CTRL_INTF_SEL(intf)	BIT(16 + (intf))
+>> +#define SMI_PORT0_15_POLLING_SEL	0x008
+>> +#define SMI_ACCESS_PHY_CTRL_0		0x170
+>> +#define SMI_ACCESS_PHY_CTRL_1		0x174
+>> +#define   PHY_CTRL_RWOP			BIT(2)
+> Presumably, reading the code, this bit is set when writing?
+Correct. I've tried to use the bit field names from the datasheet. RWOP 
+0=read, 1=write.
+>> +#define   PHY_CTRL_TYPE			BIT(1)
+> Presumably, reading the code, this bit indicates we want to use clause
+> 45?
 
-diff --git a/tools/testing/vsock/README b/tools/testing/vsock/README
-index 84ee217ba8ee..0d6e73ecbf4d 100644
---- a/tools/testing/vsock/README
-+++ b/tools/testing/vsock/README
-@@ -36,6 +36,21 @@ Invoke test binaries in both directions as follows:
-                        --control-port=1234 \
-                        --peer-cid=3
- 
-+Some tests are designed to produce kernel memory leaks. Leaks detection,
-+however, is deferred to Kernel Memory Leak Detector. It is recommended to enable
-+kmemleak (CONFIG_DEBUG_KMEMLEAK=y) and explicitly trigger a scan after each test
-+run, e.g.
-+
-+  # echo clear > /sys/kernel/debug/kmemleak
-+  # $TEST_BINARY ...
-+  # echo "wait for any grace periods" && sleep 2
-+  # echo scan > /sys/kernel/debug/kmemleak
-+  # echo "wait for kmemleak" && sleep 5
-+  # echo scan > /sys/kernel/debug/kmemleak
-+  # cat /sys/kernel/debug/kmemleak
-+
-+For more information see Documentation/dev-tools/kmemleak.rst.
-+
- vsock_perf utility
- -------------------
- 'vsock_perf' is a simple tool to measure vsock performance. It works in
+Yes. Technically the datasheet says 0=normal register, 1=MMD register.
 
-> I'd suggest also to add something about that in each patch that
-> introduce tests where we expects the user to check kmemleak,
-> at least with a comment on top of the test functions, and maybe
-> also in the commit description.
+>> +#define   PHY_CTRL_CMD			BIT(0)
+>> +#define   PHY_CTRL_FAIL			BIT(25)
+>> +#define SMI_ACCESS_PHY_CTRL_2		0x178
+>> +#define SMI_ACCESS_PHY_CTRL_3		0x17c
+>> +#define SMI_PORT0_5_ADDR_CTRL		0x180
+>> +
+>> +#define MAX_PORTS       32
+>> +#define MAX_SMI_BUSSES  4
+>> +
+>> +struct realtek_mdio_priv {
+>> +	struct regmap *regmap;
+>> +	u8 smi_bus[MAX_PORTS];
+>> +	u8 smi_addr[MAX_PORTS];
+>> +	bool smi_bus_isc45[MAX_SMI_BUSSES];
+> Not sure about the support for !C45 - you appear to set this if you
+> find a PHY as a child of this device which has the PHY C45 compatible,
+> but as you don't populate the C22 MDIO bus operations, I'm not sure
+> how a C22 PHY can work.
 
-Sure, will do.
+Oops, yes I forgot to come back to C22. Most of the hardware I have 
+access to uses C45 so that's been my main test setup. I'll include C22 
+support in v2.
 
-Thanks,
-Michal
+>> +	u32 reg_base;
+>> +};
+>> +
+>> +static int realtek_mdio_wait_ready(struct realtek_mdio_priv *priv)
+>> +{
+>> +	u32 val;
+>> +
+>> +	return regmap_read_poll_timeout(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
+>> +					val, !(val & PHY_CTRL_CMD), 10, 500);
+>> +}
+>> +
+>> +static int realtek_mdio_read_c45(struct mii_bus *bus, int phy_id, int dev_addr, int regnum)
+>> +{
+>> +	struct realtek_mdio_priv *priv = bus->priv;
+>> +	u32 val;
+>> +	int err;
+>> +
+>> +	err = realtek_mdio_wait_ready(priv);
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_2, phy_id << 16);
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_3,
+>> +			   dev_addr << 16 | (regnum & 0xffff));
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
+>> +			   PHY_CTRL_TYPE | PHY_CTRL_CMD);
+>> +	if (err)
+>> +		return err;
+> Maybe consider using a local variable for "regmap" and "reg_base" to
+> reduce the line length/wrapping?
+Ok
+>> +static int realtek_mdiobus_init(struct realtek_mdio_priv *priv)
+>> +{
+>> +	u32 port_addr[5] = { };
+>> +	u32 poll_sel[2] = { 0, 0 };
+>> +	u32 glb_ctrl_mask = 0, glb_ctrl_val = 0;
+> Please use reverse Christmas tree order.
+Ok.
+>> +	int i, err;
+>> +
+>> +	for (i = 0; i < MAX_PORTS; i++) {
+>> +		int pos;
+>> +
+>> +		if (priv->smi_bus[i] > 3)
+>> +			continue;
+>> +
+>> +		pos = (i % 6) * 5;
+>> +		port_addr[i / 6] |=  priv->smi_addr[i] << pos;
+> s/  / /
+Ok.
+>> +
+>> +		pos = (i % 16) * 2;
+>> +		poll_sel[i / 16] |= priv->smi_bus[i] << pos;
+>> +	}
+>> +
+>> +	for (i = 0; i < MAX_SMI_BUSSES; i++) {
+>> +		if (priv->smi_bus_isc45[i]) {
+>> +			glb_ctrl_mask |= GLB_CTRL_INTF_SEL(i);
+>> +			glb_ctrl_val |= GLB_CTRL_INTF_SEL(i);
+>> +		}
+>> +	}
+>> +
+>> +	err = regmap_bulk_write(priv->regmap, priv->reg_base + SMI_PORT0_5_ADDR_CTRL,
+>> +				port_addr, 5);
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	err = regmap_bulk_write(priv->regmap, priv->reg_base + SMI_PORT0_15_POLLING_SEL,
+>> +				poll_sel, 2);
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	err = regmap_update_bits(priv->regmap, priv->reg_base + SMI_GLB_CTRL,
+>> +				 glb_ctrl_mask, glb_ctrl_val);
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int realtek_mdiobus_probe(struct platform_device *pdev)
+>> +{
+>> +	struct device *dev = &pdev->dev;
+>> +	struct realtek_mdio_priv *priv;
+>> +	struct fwnode_handle *child;
+>> +	struct mii_bus *bus;
+>> +	int err;
+>> +
+>> +	bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
+>> +	if (!bus)
+>> +		return -ENOMEM;
+>> +
+>> +	bus->name = "Reaktek Switch MDIO Bus";
+>> +	bus->read_c45 = realtek_mdio_read_c45;
+>> +	bus->write_c45 =  realtek_mdio_write_c45;
+>> +	bus->parent = dev;
+>> +	priv = bus->priv;
+>> +
+>> +	priv->regmap = syscon_node_to_regmap(dev->parent->of_node);
+>> +	if (IS_ERR(priv->regmap))
+>> +		return PTR_ERR(priv->regmap);
+>> +
+>> +	err = device_property_read_u32(dev, "reg", &priv->reg_base);
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
+>> +
+>> +	device_for_each_child_node(dev, child) {
+>> +		u32 pn, smi_addr[2];
+>> +
+>> +		err = fwnode_property_read_u32(child, "reg", &pn);
+>> +		if (err)
+>> +			return err;
+>> +
+>> +		if (pn > MAX_PORTS)
+>> +			return dev_err_probe(dev, -EINVAL, "illegal port number %d\n", pn);
+> You validate the port number.
+>
+>> +
+>> +		err = fwnode_property_read_u32_array(child, "realtek,smi-address", smi_addr, 2);
+>> +		if (err) {
+>> +			smi_addr[0] = 0;
+>> +			smi_addr[1] = pn;
+>> +		}
+> You don't validate the "smi_addr", so:
+>
+> 	realtek,smi-address = <4, ...>;
+>
+> would silently overflow priv->smi_bus_isc45. However, I haven't checked
+> whether the binding would warn about this.
+
+I'll make sure the smi bus and phy address are within an appropriate range.
+
 
 
