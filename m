@@ -1,111 +1,135 @@
-Return-Path: <netdev+bounces-151801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69F2B9F0F15
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:28:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D999F0F17
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:28:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1C1B18840FD
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:28:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D002618806D3
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0471E1A33;
-	Fri, 13 Dec 2024 14:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7331E105B;
+	Fri, 13 Dec 2024 14:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="PECn86gG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GykInT51"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F31AAC9
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 14:28:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3651E0E01
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 14:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734100089; cv=none; b=HoADKz7KfyONj96f6wZ39aikgNBVVt1VeuJdHKAXMT9cq+pqPcy0lbS6dF8E1PP5z8EabPrAfGXT2Jfxj+7Q/mIms+MBMZIUwe2u1No/2cJPBs55XhZOnOK5iCKb+OsbQX3oWon4HtgJrHzMA+OJ0ztFBGxkQFavKJXHQqkJFtA=
+	t=1734100098; cv=none; b=N5f2aOZUwJtBDkonBe1ZHrGc3f+TodVdYrpG8tNuSRkFmntQ9U7Xfmwpr0mtFN0tas2UrQKpkTJ/YJBQU02MJTko1orP6o11gmzzUU7LTtr5vR2+adfORyyjLQQJBG3c4Tn8yNzK6J25/1IfPaTM7SFXxuowDigOp0oStCX4yyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734100089; c=relaxed/simple;
-	bh=c4F15RG2d0j9QeZacEl5svIgURF7DXTWdHgj+hwj2Ss=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uiSmQCQgrb/A9/SV81u989scUd5JSr8ABTXX6GB2ts//riSNqOI8DX3l8/Ck2pGOJBaJx8b8C6L40YN5EsNrSHpRxWJ0uqS9Aqttkk1BqHexliGuGZBU3chSoIqtgQmxCtQHe935LAsaj4ThMa6orV0dGy89BrlBhZLSd2O2OrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=PECn86gG; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tM6e6-007Qkm-Bh
-	for netdev@vger.kernel.org; Fri, 13 Dec 2024 15:27:58 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=KjC3Gut4LxlqzDuEl3SWFc4rKnvzybsZ7ql36yugD3E=; b=PECn86gGiSmCDHatmLBeXFnY1w
-	m5v4Exhw+bA3uCKrT4yRWrd2fYZQgc+b2ejVZsS7g44tFTde5MAzgkZLtyBTc/y9N9o6jVIjBysea
-	zU0wtkcqj+22NMPG+RRbMy3ZU5gel172v28NKHTu1N1yihDfG2YR4NClmwDk2MNgIK8dGz0KkWx6a
-	TZz9X1KEL+/sPACLfaqX87412FfnD3DVyOiAYYA+GaTod9cOqjqP/W3SU+JxbJZlDfpQHLDSR3k/y
-	xoejEqs776/w7ILs6AaJltT+WIFiahNl2GCnSBfNDSZiNdkZNF9O7H92F2iyr6p/qdhiGiM9VhpWu
-	h2Kl5uqw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tM6e5-0001TN-QI; Fri, 13 Dec 2024 15:27:58 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tM6e2-00Czns-JF; Fri, 13 Dec 2024 15:27:54 +0100
-Message-ID: <0bf61281-b82c-4699-9209-bf88ea9fdec5@rbox.co>
-Date: Fri, 13 Dec 2024 15:27:53 +0100
+	s=arc-20240116; t=1734100098; c=relaxed/simple;
+	bh=ycSL9pobM2GhQ8mh8TcgkFJoZAB71btUIwZlSI8OBQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=n9g+zqFCghDw5BlpP7djV1kU/BRY/YgmETD7Z0WFwWZOeyptWn6PxmB7XIbZJE0dO508ugUZn8vgU7GpnFa+OnDWU7StrqJyP5w9mdKD4lfhcIrypw6N5HMnZ1wpgVpelz67lU/k5Ro44eTbnkiCQCxUarXq5gLX5kMcCNZ5Lz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GykInT51; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aa6aad76beeso273481966b.2
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 06:28:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1734100095; x=1734704895; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7HgAV16YkdRGlFfEMnvEaWjST0Bhl3h+Wb8WzngoB54=;
+        b=GykInT51SChvGiDEfeYGzIpfxjxZnSLyHN6saQXW62tSB3pMMm2Y2Xhc7LGknP+bzC
+         BiBTo5GyCes6qwTWuBbzekG1bi8FWoAGKd7gGL564zQh2QMU16FTlQ5ROWLPlLh1Vi9u
+         pdcO1rnWcxJ8Lk8CHe+/2m8PXgaJI1nqvNix/EEKiuGLugc+yFC/3WIH+84G6hleQkfh
+         /Zcc5wH1X3FjPr23RVnt559R6Jd22E6oe+d2NlobGQBVC23HKgGtubwkNA/cM28ShEYI
+         w3pOScruyWraGjM2xnhQQOK4DqQY6R9f5ybfuWjaGoSDJQb2Zqk8SfTPgxFrdttq031Z
+         5NMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734100095; x=1734704895;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7HgAV16YkdRGlFfEMnvEaWjST0Bhl3h+Wb8WzngoB54=;
+        b=hzt9rkOX7hLQS//4sXaAKmWnKSb4Jk/PRvy7qOfRFpvG8JEelToqeIXAaMqUDIiLME
+         Hcod78LXmg+hUiZK8CQ+/7sg7Entrg3PUQkVD3PFWxrddKSmcWTKRst1gEIroq2HKYP/
+         be8lG54SKUsg5kEvSZST4oeI9Wi99wR7DDg1R2mJYPwGsQ/Mu2JNqtD3vo0TsB9Nv94I
+         176iU/n2E2pMxwJ+i8sUyjUKeMTOCvgY+dLIDDZEWuPGzAB+1MD1LzH+kWUYiII4R8o8
+         3bA8cTA6SJZpfuAi6kgCJ04RBMoHT55InI1PQ2ExibQN3tppav/mv6NINZNnynaYaPt1
+         Nz+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXOLRBgsoPHD3WnuoBUIii5/wW0rGSIhRsGnMwH+HScNe2xj7fkG9JFpvYHj8Qd8XBXmCecf+o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcgyJdVCQHL/Mei4HMUhNpIpjSSnTSFezClPAeAlMF7ppdkbYO
+	EbTJX5eXBa9pSJFFMPXZVifONuPR5JuyeqHws/EJXVeOHq+QpiFOFxc//nYTMhE=
+X-Gm-Gg: ASbGncvdGGfq/o+s+27euWljC1fDJRX8WCxIbqw6UQi8va1JG5r2uX6WwooWK5ic2oo
+	Ep4d/ZlLHPWn4CnhZtq9xesYgObG7NaSjD84X23qDHzqNjYsHEFQQdYswj+0iVm10mgnBnS9VaD
+	zxnwE8WFZGyQggFnN9DjNbbaaOHp+nml0yD+HG+SKx0OP7knAa/IrAB51HjUBzjoHoFk5Tu7gfV
+	TXsg2KCX64fOO4VTypuXW6oulmPtKMSYvLj1dWRur8ZVgNBaj6VrYdfM2wUng==
+X-Google-Smtp-Source: AGHT+IGJkag4RDJORMNjsRd1byODIzZaljb10SMvh4Y3I8u2YSlY83WcCmGpoYoRVmZz3xf2h0z1zQ==
+X-Received: by 2002:a17:906:7944:b0:aa6:6e04:eef6 with SMTP id a640c23a62f3a-aab77f07a24mr319003966b.61.1734100095261;
+        Fri, 13 Dec 2024 06:28:15 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa6773936c8sm808925466b.85.2024.12.13.06.28.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Dec 2024 06:28:14 -0800 (PST)
+Date: Fri, 13 Dec 2024 17:28:11 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Aviad Krawczyk <aviad.krawczyk@huawei.com>
+Cc: Cai Huoqing <cai.huoqing@linux.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Zhao Chen <zhaochen6@huawei.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] net: hinic: Fix cleanup in create_rxqs/txqs()
+Message-ID: <0cc98faf-a0ed-4565-a55b-0fa2734bc205@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/4] vsock/test: Add test for accept_queue memory
- leak
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org
-References: <20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co>
- <20241206-test-vsock-leaks-v1-2-c31e8c875797@rbox.co>
- <uyzzicjukysdqzf5ls5s5qp26hfqgrwjz4ahbnb6jp36lzazck@67p3eejksk56>
- <a8fa27ad-b1f5-4565-a3db-672f5b8a119a@rbox.co>
- <jep457tawmephttltjbohtqx57z63auoshgeolzhacz7j7rwra@z2uqfegja6dm>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <jep457tawmephttltjbohtqx57z63auoshgeolzhacz7j7rwra@z2uqfegja6dm>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On 12/13/24 12:55, Stefano Garzarella wrote:
-> On Thu, Dec 12, 2024 at 11:12:19PM +0100, Michal Luczaj wrote:
->> On 12/10/24 17:18, Stefano Garzarella wrote:
->>> [...]
->>> What about using `vsock_stream_connect` so you can remove a lot of
->>> code from this function (e.g. sockaddr_vm, socket(), etc.)
->>>
->>> We only need to add `control_expectln("LISTENING")` in the server which
->>> should also fix my previous comment.
->>
->> Sure, I followed your suggestion with
->>
->> 	tout = current_nsec() + ACCEPTQ_LEAK_RACE_TIMEOUT * NSEC_PER_SEC;
->> 	do {
->> 		control_writeulong(RACE_CONTINUE);
->> 		fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
->> 		if (fd >= 0)
->> 			close(fd);
-> 
-> I'd do
-> 		if (fd < 0) {
-> 			perror("connect");
-> 			exit(EXIT_FAILURE);
-> 		}
-> 		close(fd);
+There is a check for NULL at the start of create_txqs() and
+create_rxqs() which tess if "nic_dev->txqs" is non-NULL.  The
+intention is that if the device is already open and the queues
+are already created then we don't create them a second time.
 
-I think that won't fly. We're racing here with close(listener), so a
-failing connect() is expected.
+However, the bug is that if we have an error in the create_txqs()
+then the pointer doesn't get set back to NULL.  The NULL check
+at the start of the function will say that it's already open when
+it's not and the device can't be used.
 
-Michal
+Set ->txqs back to NULL on cleanup on error.
+
+Fixes: c3e79baf1b03 ("net-next/hinic: Add logical Txq and Rxq")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/huawei/hinic/hinic_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/huawei/hinic/hinic_main.c b/drivers/net/ethernet/huawei/hinic/hinic_main.c
+index 890f213da8d1..ae1f523d6841 100644
+--- a/drivers/net/ethernet/huawei/hinic/hinic_main.c
++++ b/drivers/net/ethernet/huawei/hinic/hinic_main.c
+@@ -172,6 +172,7 @@ static int create_txqs(struct hinic_dev *nic_dev)
+ 	hinic_sq_dbgfs_uninit(nic_dev);
+ 
+ 	devm_kfree(&netdev->dev, nic_dev->txqs);
++	nic_dev->txqs = NULL;
+ 	return err;
+ }
+ 
+@@ -268,6 +269,7 @@ static int create_rxqs(struct hinic_dev *nic_dev)
+ 	hinic_rq_dbgfs_uninit(nic_dev);
+ 
+ 	devm_kfree(&netdev->dev, nic_dev->rxqs);
++	nic_dev->rxqs = NULL;
+ 	return err;
+ }
+ 
+-- 
+2.45.2
 
 
