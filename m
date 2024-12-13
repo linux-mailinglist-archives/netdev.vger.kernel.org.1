@@ -1,116 +1,74 @@
-Return-Path: <netdev+bounces-151644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDE59F06D0
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 09:46:06 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD0179F06DB
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 09:46:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75B27188B541
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 08:46:27 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E0C1AD3E1;
+	Fri, 13 Dec 2024 08:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="URCMUdDR"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E701282A38
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 08:46:05 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F71E1AF0B7;
-	Fri, 13 Dec 2024 08:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ejl8/pF7"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8307F1AF0AE;
-	Fri, 13 Dec 2024 08:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB0618FC8C;
+	Fri, 13 Dec 2024 08:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734079546; cv=none; b=r9qlGafH8zFHgRMROJbH4t+mIW8Z51SSJz8gdCXJE1B2YxwKhJ1bnLLZYXMDupR6CwqYiZ0pyxx3B61togQUWyChTF2BBK8cJtGD+xPTtdWUvWFdOfR9gazvJD1X+jHUdIzxZP0z4DltJfjMFU8p1DzQXFNsYo0ss/gzzQlqGLk=
+	t=1734079559; cv=none; b=TAZBHQNrjf3f0ZHv9GLP9K9zR7zLYAxbhYO0HAVDfQ7NYpBEFMDvyNujPM0/lp0JyfKzlTI5pnLJTZLCwFaCbp6r6r2uzb3HpYf/TuX/bN4RRQ67CVXn0n9lY1a9YlrsbpZsMclIbBdmyLBVrWz2UYQzb22yoUyaPoYAdcvL6mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734079546; c=relaxed/simple;
-	bh=bKHfseLrLFam+t0l4K7cSgf5MpnHwyP6kMNZLJ8EnQU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NxgQfHkBYSEg54wvmEkJpwXTK1yL766YFqdo/5GWsRokc4TB+3L9Di8L9SWs6IgRbphAjp18RuTIo00i1WZemZiMnVcLtvTxlkDBOb8tXP2L9eSF7Sy4jQUD7ZfomJkxo2qi0zskV9UzzUNYD28yQnJTJBEB+gZIenT0VnyaJlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ejl8/pF7; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-436281c8a38so7570525e9.3;
-        Fri, 13 Dec 2024 00:45:44 -0800 (PST)
+	s=arc-20240116; t=1734079559; c=relaxed/simple;
+	bh=7tOsFkhegUXi46ykiN36/Nom6dJDvLgVB3l+A8GE1rI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dINuL404WHyxNawVNUPuAt/d2gcLi5Vfv715fjV0VulhKI4VMjZG1y4HKakPHwlL6cl//ObiWFwWzNsj5jWcpLJ0oNM2VKkZUFwmaziCQW394W/952JqDPtdiiWpZL6vKQU+XX+8kNGKs5Mgo/ur9vf6sLJJY+Vf1dGIZX14tUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=URCMUdDR; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734079542; x=1734684342; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Wy+YHf2E614t23hlQRqaAuPuP0RfmetGDSjCxDtFm8=;
-        b=ejl8/pF7Gegjk72RzgxkSdBbtaM+1Wp6tEXVdZfD9Ma/LEGNOrdClQ9BgiSrqx6ztU
-         OeKL1JMSg8HbY1My3RICis7ltJZxCMdt1CzEz8EcMtfxnGeJshA6EECYHtZgkD4D9AFw
-         tNrYtPKCXu+Keva43VDFYE1w0aWra2qSigf3+BhBL/NGTiUIi84hMxroznBLJSxS4WLK
-         laNdJ55nB9rdU1qm3uzBYDnJMAa47nP0LUYH5IGDb5RqVcHwYOKTS+0F66x6RjQI6LA/
-         zHzdJDAq+0s/ckhYVbRnxW2AIJrMrYlLBAn4j2JqQfzbb44cHiui3u/fcncIb3UpvJ6l
-         nrMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734079542; x=1734684342;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Wy+YHf2E614t23hlQRqaAuPuP0RfmetGDSjCxDtFm8=;
-        b=HLGU6Z6TRNIDKcVd4JF2bXaQJBmCmlRwV61BLdff2GROfKAryA/ocilwtv9EL1E+y1
-         LtdXLECGI4/6twXbX9NATYB8LWO2bOqF0ox6cIXk7p1YWVJbnCC6N3vlGyNk2p4LI2uh
-         Bk1BNc7FFOcbs1isJlo+mqeu/gX4kUvvzFV1TaEeRZ9rQr5upEosOAS5bHOoZuEJ9O73
-         PyUh5F7kk8R6Vn4t+cB5CpDVn8QrJt7zcU0wWlmrvexni4tc/L5sR4jbHMtV0nJHyck5
-         twH9+OCuqSK7EyDlbMAyzDftvc9x5GUIyJaQ3fSt4J0bHrYAGHfbstuGzzhQksfBXxpo
-         VdOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ+fCzbpm3xlsmZGIYvmaAdGVgvQRj7iQvtJz+0E+MHDOb2/dElixqq1pw9qY2t1khiBJzf8O2se6smR1T@vger.kernel.org, AJvYcCUT45oj2kTrxIIm7jCUG7AL5ZuHBqoL5ozOaLn5bDloNFAnCSlqPJs/K60tvkbr0n4EpSfKE2Md5QNcjg==@vger.kernel.org, AJvYcCUd0vPpirqF/JTNBIBMcNsPsSKVMoMruN2/HUZHai6bsB4TYgyJZlms+K7mo5aFItv0ZIX0dkUXLqPD@vger.kernel.org, AJvYcCUxTKUU9Zp6hTjSvelblLMBmEe5o3paBlQrRfxyzdTUEo3UeztdostNXHJQl7Es9TFQjPZHHmlnjKGReA==@vger.kernel.org, AJvYcCVCVBIED9z/68mpHuoA4p60a+y+dzsQM8wW43AX7HwfqqDYvhrS9w0VQcLKO4SeBnpG0QJcDIQ2faNFOw==@vger.kernel.org, AJvYcCXctg1UrifCnXGu49FEmzeEcQlZBeccoB3EeQm68znGHGZnvOUEXDLt0fKsEpBeOH58QkC4yl1caXPNorURMms6@vger.kernel.org, AJvYcCXejwd42gPiB+joTt6OEZpPk7gAGFgz/AhbZE8Y+lobvxUFK9O84TN81W2J/GIxovUBj+nH6HdB7MOfiQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZH4dUM3sjb0/M54wvw1HqlPWW+nVvw7MCc/dh29Kc+aLeyDp3
-	0Ty9mgnrmc897Rhz8RRnC5HF+DMt4Ng5xOV/+McTyT+bJpzzQEBpwrxZ/oorIio=
-X-Gm-Gg: ASbGncs8398qdHKWr4sL6A8KOPfvVYqo+uSAOcPfdx36req4obmLFIQpsMCpzoIftXU
-	P/L8s5WPURqSkWM61Zln5IlP7dBncCH3d6o56i3menxHUMigvbV/xtopAU8hD5GbnucOvIj3Ns3
-	nO+mthzegGPbxr0eYSjnkcmFuaYZaKwwzVuRVI2ypGGOtn8iqFJS+BCTIC+buNepwq/4zUoiU79
-	1Z3LaeQpZvG+edm8BM82STObWgZbMyxiSKP8sLOzvkyKeApPeeFjjs2GZ9rEtTpJOTbkHpZpj7G
-	sSp1U4okno3Yv5QcUIwsdk5nGkuRT/QIciQ709sIraqRUkWNMEJOBZLcdU3sYvQ=
-X-Google-Smtp-Source: AGHT+IGTU+lhc2lWa5575ClokcDUoOVQuXcljdePkNZ8VtH/nBtJO1u/jxwEfj0Q47P8NpjHVdg9Xw==
-X-Received: by 2002:a05:600c:a10:b0:434:a59c:43c6 with SMTP id 5b1f17b1804b1-4362aaa4c0cmr10082605e9.26.1734079542232;
-        Fri, 13 Dec 2024 00:45:42 -0800 (PST)
-Received: from localhost.localdomain (20014C4E1E9B09007B50BC12F2E5C1B6.dsl.pool.telekom.hu. [2001:4c4e:1e9b:900:7b50:bc12:f2e5:c1b6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4362559eaf6sm42487645e9.20.2024.12.13.00.45.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 00:45:41 -0800 (PST)
-From: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-To: netdev@vger.kernel.org
-Cc: fejes@inf.elte.hu,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	willemb@google.com,
-	idosch@idosch.org,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	linux-can@vger.kernel.org,
-	socketcan@hartkopp.net,
-	mkl@pengutronix.de,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org,
-	tsbogend@alpha.franken.de,
-	kaiyuanz@google.com,
-	James.Bottomley@HansenPartnership.com,
-	richard.henderson@linaro.org,
-	arnd@arndb.de,
-	almasrymina@google.com,
-	asml.silence@gmail.com,
-	linux-mips@vger.kernel.org,
-	andreas@gaisler.com,
-	mattst88@gmail.com,
-	kerneljasonxing@gmail.com,
-	sparclinux@vger.kernel.org,
-	linux-alpha@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	deller@gmx.de,
-	vadim.fedorenko@linux.dev,
-	linux-parisc@vger.kernel.org,
-	Anna Emese Nyiri <annaemesenyiri@gmail.com>
-Subject: [PATCH net-next v7 4/4] sock: Introduce SO_RCVPRIORITY socket option
-Date: Fri, 13 Dec 2024 09:44:57 +0100
-Message-ID: <20241213084457.45120-5-annaemesenyiri@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241213084457.45120-1-annaemesenyiri@gmail.com>
-References: <20241213084457.45120-1-annaemesenyiri@gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1734079560; x=1765615560;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FTLQQ3ciLT+wfJ7M5N5AU0bTlDD2VxYKtx/rr7kHNjo=;
+  b=URCMUdDRl8lJT88EpfAv0yP3NuloqapTW1F+9yUx82VLS1hqDsWWfjtK
+   fyJG0joRusKu51Cz2bG7MSxvX4M29RhPo0M6/tkZ72k8XGmtMpwksi872
+   pS6mE3CFubNN90pvMvw9Ow4bkMk5yFLlgE61bqD2k6UI3uIdnAy1gIUOp
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.12,230,1728950400"; 
+   d="scan'208";a="783108223"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 08:45:56 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:46046]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.69:2525] with esmtp (Farcaster)
+ id f3d5d3de-f273-46d6-997e-d54eceaa6d55; Fri, 13 Dec 2024 08:45:54 +0000 (UTC)
+X-Farcaster-Flow-ID: f3d5d3de-f273-46d6-997e-d54eceaa6d55
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 13 Dec 2024 08:45:53 +0000
+Received: from 6c7e67c6786f.amazon.com (10.119.14.208) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 13 Dec 2024 08:45:50 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <johannes@sipsolutions.net>
+CC: <jv@jvosburgh.net>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<syzbot+3647b9259b77c1bb8e94@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [wireless?] BUG: sleeping function called from invalid context in wext_netdev_notifier_call
+Date: Fri, 13 Dec 2024 17:45:47 +0900
+Message-ID: <20241213084547.9791-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <104be155826cbf9ba3b3e65fa5186b39dbcf4906.camel@sipsolutions.net>
+References: <104be155826cbf9ba3b3e65fa5186b39dbcf4906.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -118,184 +76,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWB001.ant.amazon.com (10.13.139.171) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Add new socket option, SO_RCVPRIORITY, to include SO_PRIORITY in the
-ancillary data returned by recvmsg().
-This is analogous to the existing support for SO_RCVMARK, 
-as implemented in commit <6fd1d51cfa253>
-("net: SO_RCVMARK socket option for SO_MARK with recvmsg()").
+From: Johannes Berg <johannes@sipsolutions.net>
+Date: Fri, 13 Dec 2024 09:39:04 +0100
+> On Fri, 2024-12-13 at 17:36 +0900, Kuniyuki Iwashima wrote:
+> > From: Johannes Berg <johannes@sipsolutions.net>
+> > Date: Thu, 12 Dec 2024 09:52:44 +0100
+> > > On Wed, 2024-12-11 at 20:41 -0800, syzbot wrote:
+> > > > CPU: 1 UID: 0 PID: 12894 Comm: kworker/u8:18 Not tainted 6.13.0-rc1-syzkaller-00183-g4c49f38e20a5 #0
+> > > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+> > > > Workqueue: bond0 bond_mii_monitor
+> > > > Call Trace:
+> > > >  <TASK>
+> > > >  __dump_stack lib/dump_stack.c:94 [inline]
+> > > >  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+> > > >  __might_resched+0x5d4/0x780 kernel/sched/core.c:8758
+> > > >  down_read+0x8e/0xa40 kernel/locking/rwsem.c:1523
+> > > >  wireless_nlevent_flush net/wireless/wext-core.c:351 [inline]
+> > > >  wext_netdev_notifier_call+0x1f/0x120 net/wireless/wext-core.c:371
+> > > >  notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
+> > > >  netdev_state_change+0x11f/0x1a0 net/core/dev.c:1378
+> > > >  linkwatch_do_dev+0x112/0x170 net/core/link_watch.c:182
+> > > >  ethtool_op_get_link+0x15/0x60 net/ethtool/ioctl.c:62
+> > > >  bond_check_dev_link+0x1f1/0x3f0 drivers/net/bonding/bond_main.c:873
+> > > >  bond_miimon_inspect drivers/net/bonding/bond_main.c:2740 [inline]
+> > > >  bond_mii_monitor+0x49a/0x3170 drivers/net/bonding/bond_main.c:2962
+> > > 
+> > > Yeah this isn't new. I thought we were going to just squash this with
+> > > 
+> > > https://lore.kernel.org/netdev/2730097.1721581672@famine/
+> > > 
+> > > Whatever came of that?
+> > 
+> > Now I remember I forgot to respin this patch.
+> > https://lore.kernel.org/linux-wireless/20241014205543.94787-4-kuniyu@amazon.com/
+> > 
+> > If the issue above is still not fixed, I will respin it on
+> > wireless.git with Fixes tag.
+> 
+> Wait, that's not related at all? The bonding issue still is that it
+> calls ethtool ops under RCU but ethtool ops can sleep. That issue has
+> nothing to do with the wext nlevent namespace-ification?
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Ah okay, I thought removing the mutex there was another option
+to silence it, but I didn't check other places.
 
-Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
-Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
----
- arch/alpha/include/uapi/asm/socket.h    |  2 ++
- arch/mips/include/uapi/asm/socket.h     |  2 ++
- arch/parisc/include/uapi/asm/socket.h   |  2 ++
- arch/sparc/include/uapi/asm/socket.h    |  2 ++
- include/net/sock.h                      |  4 +++-
- include/uapi/asm-generic/socket.h       |  2 ++
- net/core/sock.c                         |  8 ++++++++
- net/socket.c                            | 11 +++++++++++
- tools/include/uapi/asm-generic/socket.h |  2 ++
- 9 files changed, 34 insertions(+), 1 deletion(-)
+> 
+> 
+> We can still do the namespace thing for wext nlevent, but it's not going
+> to fix this issue, and I don't think we need to on wireless (rather than
+> wireless-next)
 
-diff --git a/arch/alpha/include/uapi/asm/socket.h b/arch/alpha/include/uapi/asm/socket.h
-index 302507bf9b5d..3df5f2dd4c0f 100644
---- a/arch/alpha/include/uapi/asm/socket.h
-+++ b/arch/alpha/include/uapi/asm/socket.h
-@@ -148,6 +148,8 @@
- 
- #define SCM_TS_OPT_ID		81
- 
-+#define SO_RCVPRIORITY		82
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64
-diff --git a/arch/mips/include/uapi/asm/socket.h b/arch/mips/include/uapi/asm/socket.h
-index d118d4731580..22fa8f19924a 100644
---- a/arch/mips/include/uapi/asm/socket.h
-+++ b/arch/mips/include/uapi/asm/socket.h
-@@ -159,6 +159,8 @@
- 
- #define SCM_TS_OPT_ID		81
- 
-+#define SO_RCVPRIORITY		82
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64
-diff --git a/arch/parisc/include/uapi/asm/socket.h b/arch/parisc/include/uapi/asm/socket.h
-index d268d69bfcd2..aa9cd4b951fe 100644
---- a/arch/parisc/include/uapi/asm/socket.h
-+++ b/arch/parisc/include/uapi/asm/socket.h
-@@ -140,6 +140,8 @@
- 
- #define SCM_TS_OPT_ID		0x404C
- 
-+#define SO_RCVPRIORITY		0x404D
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64
-diff --git a/arch/sparc/include/uapi/asm/socket.h b/arch/sparc/include/uapi/asm/socket.h
-index 113cd9f353e3..5b464a568664 100644
---- a/arch/sparc/include/uapi/asm/socket.h
-+++ b/arch/sparc/include/uapi/asm/socket.h
-@@ -141,6 +141,8 @@
- 
- #define SCM_TS_OPT_ID            0x005a
- 
-+#define SO_RCVPRIORITY           0x005b
-+
- #if !defined(__KERNEL__)
- 
- 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 316a34d6c48b..d4bdd3286e03 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -953,6 +953,7 @@ enum sock_flags {
- 	SOCK_XDP, /* XDP is attached */
- 	SOCK_TSTAMP_NEW, /* Indicates 64 bit timestamps always */
- 	SOCK_RCVMARK, /* Receive SO_MARK  ancillary data with packet */
-+	SOCK_RCVPRIORITY, /* Receive SO_PRIORITY ancillary data with packet */
- };
- 
- #define SK_FLAGS_TIMESTAMP ((1UL << SOCK_TIMESTAMP) | (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE))
-@@ -2660,7 +2661,8 @@ static inline void sock_recv_cmsgs(struct msghdr *msg, struct sock *sk,
- {
- #define FLAGS_RECV_CMSGS ((1UL << SOCK_RXQ_OVFL)			| \
- 			   (1UL << SOCK_RCVTSTAMP)			| \
--			   (1UL << SOCK_RCVMARK))
-+			   (1UL << SOCK_RCVMARK)			|\
-+			   (1UL << SOCK_RCVPRIORITY))
- #define TSFLAGS_ANY	  (SOF_TIMESTAMPING_SOFTWARE			| \
- 			   SOF_TIMESTAMPING_RAW_HARDWARE)
- 
-diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic/socket.h
-index deacfd6dd197..aa5016ff3d91 100644
---- a/include/uapi/asm-generic/socket.h
-+++ b/include/uapi/asm-generic/socket.h
-@@ -143,6 +143,8 @@
- 
- #define SCM_TS_OPT_ID		81
- 
-+#define SO_RCVPRIORITY		82
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
-diff --git a/net/core/sock.c b/net/core/sock.c
-index a3d9941c1d32..f9f4d976141e 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1518,6 +1518,10 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 	case SO_RCVMARK:
- 		sock_valbool_flag(sk, SOCK_RCVMARK, valbool);
- 		break;
-+
-+	case SO_RCVPRIORITY:
-+		sock_valbool_flag(sk, SOCK_RCVPRIORITY, valbool);
-+		break;
- 
- 	case SO_RXQ_OVFL:
- 		sock_valbool_flag(sk, SOCK_RXQ_OVFL, valbool);
-@@ -1947,6 +1951,10 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 		v.val = sock_flag(sk, SOCK_RCVMARK);
- 		break;
- 
-+	case SO_RCVPRIORITY:
-+		v.val = sock_flag(sk, SOCK_RCVPRIORITY);
-+		break;
-+
- 	case SO_RXQ_OVFL:
- 		v.val = sock_flag(sk, SOCK_RXQ_OVFL);
- 		break;
-diff --git a/net/socket.c b/net/socket.c
-index 9a117248f18f..79d08b734f7c 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1008,12 +1008,23 @@ static void sock_recv_mark(struct msghdr *msg, struct sock *sk,
- 	}
- }
- 
-+static void sock_recv_priority(struct msghdr *msg, struct sock *sk,
-+			       struct sk_buff *skb)
-+{
-+	if (sock_flag(sk, SOCK_RCVPRIORITY) && skb) {
-+		__u32 priority = skb->priority;
-+
-+		put_cmsg(msg, SOL_SOCKET, SO_PRIORITY, sizeof(__u32), &priority);
-+	}
-+}
-+
- void __sock_recv_cmsgs(struct msghdr *msg, struct sock *sk,
- 		       struct sk_buff *skb)
- {
- 	sock_recv_timestamp(msg, sk, skb);
- 	sock_recv_drops(msg, sk, skb);
- 	sock_recv_mark(msg, sk, skb);
-+	sock_recv_priority(msg, sk, skb);
- }
- EXPORT_SYMBOL_GPL(__sock_recv_cmsgs);
- 
-diff --git a/tools/include/uapi/asm-generic/socket.h b/tools/include/uapi/asm-generic/socket.h
-index 281df9139d2b..ffff554a5230 100644
---- a/tools/include/uapi/asm-generic/socket.h
-+++ b/tools/include/uapi/asm-generic/socket.h
-@@ -126,6 +126,8 @@
- 
- #define SCM_TS_OPT_ID		78
- 
-+#define SO_RCVPRIORITY		79
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
--- 
-2.43.0
+I see, will post to -next.
 
+Thanks!
 
