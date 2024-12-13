@@ -1,112 +1,105 @@
-Return-Path: <netdev+bounces-151733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C24BF9F0BF8
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:13:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CAC49F0BFD
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:14:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0088167E15
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:13:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A9F518893A8
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952B51DF242;
-	Fri, 13 Dec 2024 12:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4E61DF737;
+	Fri, 13 Dec 2024 12:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="toIvpomR"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="r8iiTZkB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B16364D6
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 12:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB641DF263;
+	Fri, 13 Dec 2024 12:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734092032; cv=none; b=XYMEWcY9CpEsKZMdOvF7pNG6KUjuVqiVQ/dfHnlMopK4BsmSs0E3HVEgykfh0WIpX8D9tVavVDLvqFhv4SI0heNxp3VpcUJo8k+AbUwMKgIy57qiPa69P2ukhvFi4asCm7M8/yrIUOeB4kuif7/a47CdMlj73zMUkRtU2PuFZx8=
+	t=1734092076; cv=none; b=mBzkt97TTkuW7pSOFpU2tYxQUNoNyV11Yt9sMJLdblzTHtTv20InQ59p9r2YSZqj23u9OyfAckDx6cKCZYGSJEsmwlRv2TDuXiRo7AyVSFm3fIO+xbfLXubHkeRil4qp5WLzkF9r+bgycC1Zb23aD4pZiJPx7VBhYt7p25/iwuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734092032; c=relaxed/simple;
-	bh=7t+kkzJExkS19We2Fk9Jcotmw6QznUhuyVG2TQQ0ojM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Re2SvaPTbP4P880sN1e2t72nFDAya7KmfwgOcyb0QEdLmp/iCurJQsKQpsyp9FCQR/QnPQza2WvAjjyJx3n35D9fsD9k4gXm6lCtYaLcOHUDw7qK3VmOluaQ9xN5EHPhEspc72iXvOmY3jbHcoL8ZdYH3072U9KBI7GcpTAgIj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=toIvpomR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E217CC4CED0;
-	Fri, 13 Dec 2024 12:13:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734092032;
-	bh=7t+kkzJExkS19We2Fk9Jcotmw6QznUhuyVG2TQQ0ojM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=toIvpomRmqcfYndqHTqOzdHRKHR2iwvdjIicrnImKgGV788dM5OipDqSdsaD/JurX
-	 rBorhB+VEISkg2l9BF1eWlukNX3RcLsSzPR//iig+WLA3gf4dfw/9/Irx6tCZIkA44
-	 uaZaIz2ALyGuoyZZ1wr3u2EiN4ZdZtF7m2d0bYP+wXLD6He7oW6UalOCWTF2Ple5Hu
-	 nrTVmwabfw1qpbm7U2mbsQZeWFdZdVjRpmFzaBA1oAZZjZEXsOuNxUzQs7bpmka3xC
-	 5Z8hSUdec+RUQQvIhc5jsQfAjaUOpmDnnnEXcyMotJZGPez1uNrDbxehXxg89jDrP1
-	 KRmQn8sgCHQTA==
-Date: Fri, 13 Dec 2024 12:13:47 +0000
-From: Simon Horman <horms@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net] net: mscc: ocelot: fix incorrect IFH SRC_PORT field
- in ocelot_ifh_set_basic()
-Message-ID: <20241213121347.GT2110@kernel.org>
-References: <20241212165546.879567-1-vladimir.oltean@nxp.com>
+	s=arc-20240116; t=1734092076; c=relaxed/simple;
+	bh=1CKMkx0fC44nPsnDb1lIyJp1DaL/yOamtTXLo8446nE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IjaEcPhEu3+BagQaASaXYuWctjQ6D6d5yrecrhOa/cxPDM+EgY6yz6T7Fvpo3YheFc2/2xs11gWcR5PcVcxMYbMzXLywyF1uhxiDDTF9S+DcYxGqItpCC2p3NIyXLkvISddfh9dhuCoNde0WGpUuJG8q3DmpMp3OIO+S3X41NRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=r8iiTZkB; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1734092074; x=1765628074;
+  h=from:to:subject:date:message-id:mime-version;
+  bh=1CKMkx0fC44nPsnDb1lIyJp1DaL/yOamtTXLo8446nE=;
+  b=r8iiTZkBMqD6JTuHu556HQRfowOJTlSuBeBrPKrsRoa99LALGgHKI9kH
+   xkkigg+tdRfCnhzvesbW2GeoB06MXaaxm09zcsUthwYPCjJzH5Ip+ijuI
+   FK8Q4L52h+Rq/ne1Vs0Bg8IJotatCdzMHfppuJVd62Z7cc/xWw8kg2aEZ
+   6p2POnn5BpBY/2gp12IYJi0LzVukZRbaPdB84ZZZt3SX9oClX/O6PrLot
+   M7rzqAWRg46iJbHFVrsGPzWoUBh9W+5U9V6eCWDRRBy2RSELmjQdh/CZG
+   aYze0PTPE/KuFaCfP1c/jVy+UQBwb+UP6aq7Mxmvw3NXsZz0X1XRTstS6
+   g==;
+X-CSE-ConnectionGUID: R6LocSygTBu1rZt5XxoMKA==
+X-CSE-MsgGUID: BY4Qr75FRku3XENcJpWhQw==
+X-IronPort-AV: E=Sophos;i="6.12,231,1728975600"; 
+   d="scan'208";a="35182255"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Dec 2024 05:14:27 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 13 Dec 2024 05:14:11 -0700
+Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 13 Dec 2024 05:14:06 -0700
+From: Divya Koppera <divya.koppera@microchip.com>
+To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
+	<vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v7 0/5] Add rds ptp library for Microchip phys
+Date: Fri, 13 Dec 2024 17:43:58 +0530
+Message-ID: <20241213121403.29687-1-divya.koppera@microchip.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212165546.879567-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain
 
-On Thu, Dec 12, 2024 at 06:55:45PM +0200, Vladimir Oltean wrote:
-> Packets injected by the CPU should have a SRC_PORT field equal to the
-> CPU port module index in the Analyzer block (ocelot->num_phys_ports).
-> 
-> The blamed commit copied the ocelot_ifh_set_basic() call incorrectly
-> from ocelot_xmit_common() in net/dsa/tag_ocelot.c. Instead of calling
-> with "x", it calls with BIT_ULL(x), but the field is not a port mask,
-> but rather a single port index.
-> 
-> [ side note: this is the technical debt of code duplication :( ]
-> 
-> The error used to be silent and doesn't appear to have other
-> user-visible manifestations, but with new changes in the packing
-> library, it now fails loudly as follows:
-> 
-> ------------[ cut here ]------------
-> Cannot store 0x40 inside bits 46-43 - will truncate
-> sja1105 spi2.0: xmit timed out
-> WARNING: CPU: 1 PID: 102 at lib/packing.c:98 __pack+0x90/0x198
-> sja1105 spi2.0: timed out polling for tstamp
-> CPU: 1 UID: 0 PID: 102 Comm: felix_xmit
-> Tainted: G        W        N 6.13.0-rc1-00372-gf706b85d972d-dirty #2605
-> Call trace:
->  __pack+0x90/0x198 (P)
->  __pack+0x90/0x198 (L)
->  packing+0x78/0x98
->  ocelot_ifh_set_basic+0x260/0x368
->  ocelot_port_inject_frame+0xa8/0x250
->  felix_port_deferred_xmit+0x14c/0x258
->  kthread_worker_fn+0x134/0x350
->  kthread+0x114/0x138
-> 
-> The code path pertains to the ocelot switchdev driver and to the felix
-> secondary DSA tag protocol, ocelot-8021q. Here seen with ocelot-8021q.
-> 
-> The messenger (packing) is not really to blame, so fix the original
-> commit instead.
-> 
-> Fixes: e1b9e80236c5 ("net: mscc: ocelot: fix QoS class for injected packets with "ocelot-8021q"")
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Adds support for rds ptp library in Microchip phys, where rds is internal
+code name for ptp IP or hardware. This library will be re-used in
+Microchip phys where same ptp hardware is used. Register base addresses
+and mmd may changes, due to which base addresses and mmd is made variable
+in this library.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Divya Koppera (5):
+  net: phy: microchip_rds_ptp: Add header file for Microchip rds ptp
+    library
+  net: phy: microchip_rds_ptp : Add rds ptp library for Microchip phys
+  net: phy: Kconfig: Add rds ptp library support and 1588 optional flag
+    in Microchip phys
+  net: phy: Makefile: Add makefile support for rds ptp in Microchip phys
+  net: phy: microchip_t1 : Add initialization of ptp for lan887x
+
+ drivers/net/phy/Kconfig             |    9 +-
+ drivers/net/phy/Makefile            |    1 +
+ drivers/net/phy/microchip_rds_ptp.c | 1008 +++++++++++++++++++++++++++
+ drivers/net/phy/microchip_rds_ptp.h |  219 ++++++
+ drivers/net/phy/microchip_t1.c      |   41 +-
+ 5 files changed, 1274 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/net/phy/microchip_rds_ptp.c
+ create mode 100644 drivers/net/phy/microchip_rds_ptp.h
+
+-- 
+2.17.1
 
 
