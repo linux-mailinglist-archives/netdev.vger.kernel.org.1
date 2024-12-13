@@ -1,273 +1,145 @@
-Return-Path: <netdev+bounces-151848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E189F149F
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:01:49 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5434B16B5CF
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 18:01:27 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9A091E570E;
-	Fri, 13 Dec 2024 18:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="qlCO3LtR";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="W9IeDx6+"
-X-Original-To: netdev@vger.kernel.org
-Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6DBC9F14CB
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:18:47 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A93B53804;
-	Fri, 13 Dec 2024 18:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9661C28287F
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 18:18:46 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D979A1E25F6;
+	Fri, 13 Dec 2024 18:18:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IV92xMl3"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3C4184523
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 18:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734112877; cv=none; b=saE1/K6eFhnR3lWOj8jtQL+sn91XC6kUztoIhLa0QnwQ7lUzL3vt2KqdvNAf2ksmtcEchby3lPEwgQspSnMXTCxcKkjsfgG6HHBqAo31WbSxwBOZnIZ28+ABVP8kqm8o7LdJy9CEaHI7LQHqJ+3+kQ0kRYVTM3k5Kle6lDTBsDs=
+	t=1734113923; cv=none; b=MHBFlM/Hcz4ikBJIWKrRI/W/tuCwbvl5+oawea1YJc3tvZuoUHK67qA7icPxkcVGGAGTjtWMruu68buJQG3whI8NyahtcEB+pzH5yB74h2Pf1IyYfHzrqFe4mIPByUJeuuAS6lQWXBOOhj538Xa2jJxS5l2TNRLlxW3/NEh7+8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734112877; c=relaxed/simple;
-	bh=C1yCEIwt6l7ZvZTwD4u/ellvTelA5hZEluzmzVmSScA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H6LapZkzK5KAm/w8JElS6v4PanrKlp1ldAMJXcMEGdyPDHP6DN/yl3G4KTG8KGaCMSvSh820f3b+8Tscluo+Z7IYE7RM5Ln5yDeVHjrOz/nvGGsBbnKrRXNXNV53KcDAkeC3CVQHbFR10xF98N6t/ZwQ2SM17dx9DAnD68e+SCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=qlCO3LtR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=W9IeDx6+; arc=none smtp.client-ip=103.168.172.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailflow.phl.internal (Postfix) with ESMTP id 61EA5200B16;
-	Fri, 13 Dec 2024 13:01:14 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Fri, 13 Dec 2024 13:01:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1734112874; x=1734120074; bh=Dmvw0rCsRR
-	ueJvfdxfPSx1zC7SxhbRa0dqGAjjP6/Y0=; b=qlCO3LtR3dovJ+gjjYX5qVcBjB
-	Xr2WAiDUN3GZUeePFZdbtkNJtRvnKggLKeQxAf8fz+N2uhNgW7QxJpTZrueWQiAS
-	XJi/4VmYTFpqVEWcppKiSFzUOVATPcyqwOS3SpU1Rx40kqFHF9ON0mnivIc7JzEp
-	pt4nAGdJANVih2eOhHDUUy3S2AcDJIzVmFudCvdor/n8KQtB99I062W08MRjFFJz
-	us8zutv4RPMqrkZq0hJ9cIRaY7OwFstFIYTs7nnRNecaj6xmzeIKKVkWUQ2lcuE/
-	QAfEmcuNEZ2SJh2mHzJ7w7ayi9vD+/jIMpdiih+dQ2hKf1UGaYv5M0/CYWdg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1734112874; x=1734120074; bh=Dmvw0rCsRRueJvfdxfPSx1zC7SxhbRa0dqG
-	AjjP6/Y0=; b=W9IeDx6+d2Xzc4knja20KviN4c7A5Ak+W0xINAdfQwB6u8GOjDI
-	gVDeTZmGVXAl5yEY6nAeskFrXn/whjJE9/YZ9uA3ACfeZA6lF+BCn345ktmHkKKe
-	reiDPzw7lPy5anKD5X+Nu4b/T6B9YGwMqnfnw/AJvabtKbKeFW4CpsRLG5bV1Rxx
-	7q/tBG2+FeuSO3uV599ZFyuqONHGlnxF8374bcMHpEM954juEtYRWKoQ4DsKywmY
-	IX4Y0kDM7h7muDPG7ndyLlg/MuO237Wb73yUDb8c+uATcutKOrsVYG1t9YL/0Xmy
-	Ui+T4UTaTvfpmKJgoz5+Qp2C7IXeVYikGEQ==
-X-ME-Sender: <xms:aXZcZ2ylgbbwzrZTAz6ZyhIK__1jZSddyZJwetaqF6fq1iSJS-Vcaw>
-    <xme:aXZcZySTWJ_jpWoDQVpOPT1Iam_3dSEqrGCD4AEVRYj_ULCd83eF1F4j2gF9XNjBV
-    4SWkvVAXMiR_qEnhQ>
-X-ME-Received: <xmr:aXZcZ4VWeUFt2lSrAwSDQVIwoJVEnuxcq9aYUIZescuODJCZsn7i3Z6BkBDeFuEvV_Gby_eRULTJj1u6i1Y2M46Li8lrTZnvfkkhmX1etBWpaw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeejgddutdeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnegfrhhlucfvnfffucdlfeehmdenucfjughrpeffhffvvefukfhf
-    gggtuggjsehttdfstddttddvnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesug
-    iguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnheptdejkeduleeitedvfeegvdegjeeh
-    hfdvgffgjeduuedtgeevieevtdfhheefleeknecuffhomhgrihhnpehgihhthhhusgdrtg
-    homhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegu
-    gihusegugihuuhhurdighiiipdhnsggprhgtphhtthhopedvvddpmhhouggvpehsmhhtph
-    houhhtpdhrtghpthhtohepqhhmoheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhgr
-    fihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehj
-    ohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopegrshhtse
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidr
-    nhgvthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
-    htohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghv
-X-ME-Proxy: <xmx:aXZcZ8jA5EFI3DuDP4YHH7Nn5wTwm3D0TKE9VxZUM9ZE9a8TQTe1gA>
-    <xmx:aXZcZ4CJPfj55ggbMDuP9tElhqGASk1S-khhbJz8QImGO1EourG24Q>
-    <xmx:aXZcZ9Inoz6UVWbPWOiWtYknRU1NIvPvhkH_IGCxG33_5TEnC-mEww>
-    <xmx:aXZcZ_AxdIVFopb-IeVUmhzGD8FJiPJ9qJkrlhjltGUvAHpS7PPw8Q>
-    <xmx:anZcZ7U04C5LRMkZ5HeW6UvPxGdAFeIQAohaZVtkKlDYrxX4WDJMEwJp>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 13 Dec 2024 13:01:10 -0500 (EST)
-Date: Fri, 13 Dec 2024 11:01:09 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Quentin Monnet <qmo@kernel.org>
-Cc: hawk@kernel.org, kuba@kernel.org, andrii@kernel.org, 
-	john.fastabend@gmail.com, ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	andrii.nakryiko@gmail.com, antony@phenome.org, toke@kernel.org
-Subject: Re: [PATCH bpf-next v4 3/4] bpftool: btf: Support dumping a specific
- types from file
-Message-ID: <jhsgk2wajtebpwiivam5zdv7wr5rzmqjcdey6ad3gbvgiyjcpe@ff6xmxvadnkc>
-References: <cover.1734052995.git.dxu@dxuuu.xyz>
- <5ec7617fd9c28ff721947aceb80937dc10fca770.1734052995.git.dxu@dxuuu.xyz>
- <7fa902e5-0916-4bc9-b1e0-2729903d3de0@kernel.org>
- <fojqbtlpjh3jrpzzctgllxtnyncbtbzw6q7qfrezrigpc2qqek@6m7cppwvgwb5>
- <0a8b9448-7e1c-4a30-8011-1505e2133263@kernel.org>
+	s=arc-20240116; t=1734113923; c=relaxed/simple;
+	bh=QoJ9wIT0tNSk422O5280znHoGwGjmCOoIxPRadNja2U=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=iB5waDHhvIKRY2NjVt+HatKYWRWWbF7/aQfNbW2EEVDRsOqpmWczmmMVVsRd7e1eFl3qT+z8j5+Uw9rPgGCCBBx5ByKhzQkNuObT9gSVafNk40PBKjeck6zhEU5vcL2MHFuCq3mt4lzitP9dhcwHytJCLcE+nPx9SAfCr/wqJQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IV92xMl3; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-725eff44ba5so157531b3a.2
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 10:18:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1734113921; x=1734718721; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QoJ9wIT0tNSk422O5280znHoGwGjmCOoIxPRadNja2U=;
+        b=IV92xMl30p6RGUGPAEGCNC0rxriN/rhL6rJVTX60i+BsYigQhqS0MXGcFHBfCeEu9l
+         ULzYs53eL3oaGSDhGy0le6Sb19+5uBht1GNG3GNnKOW6aBQyNhFh8EsD8jkIh4Ghoo3H
+         fHNEvEX2o3aBmrtahWQznGiulLijqkxRY+QQ+ZA8Z7FJoYxxI5duR7CcDKcvJNYxQVWO
+         H5e7fl0VtzqMCJTgru959840/QfOYCdBu8YZgDslUmEi59zpeXgO1CVjmj2ihuDUW7RI
+         dO9Q2gjN0PjqkHHzQjpeBoDO9lRvqncyNkdYAYKcv352fVw3O9dgRxwc+R30ADt+XsUa
+         WUvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734113921; x=1734718721;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QoJ9wIT0tNSk422O5280znHoGwGjmCOoIxPRadNja2U=;
+        b=c08YNfrtdfsJWPxnWyMIJNNg/PKlyU6mQpjyETgqCPpwWov7HTeSBk8zgSQsH5Su6U
+         2mq7yrFO2nSzZwH3cDSncCv4jz2S5+ORZLrUSkoMPdLD3xVoNQ50ZWpT7stvSDLUAV7K
+         pLNkLcIXlpV0sxM3jlvnoF7acxhOvoHARkvhCjvGMckc+TTSWHUjDLpxXUpzUPUz9Q3Q
+         7/kjLxTiAns5tHMLSUxLNKpyNC/DiE+vZrghB+Q9nXo7SilvjKD9Xcu/rKCWxWobpvYZ
+         5LdYj+Rd/6lXgPzOdvcF4QSD7CTUNj6PAOv13bLRFSGcPhY2ghS+CR49e3kXvVNfdVJY
+         a1BQ==
+X-Gm-Message-State: AOJu0Yz2e3x6K9UPN9DjQnHbes/2X3p4Bnjm9mPOOBaz04F9zi/VIHB8
+	LSSIiYMfCjl0tM0nPEQEv8i5cN1vwN7Rf+a/ptegM5NAAiZqhZ9bTR6ZxG8llrK3vXZEiqXgMi8
+	n38GPlxx2yDUrccAvkOD3R2ZkMOlsYYq2CN7a0g==
+X-Gm-Gg: ASbGncsfsJ9vFGapASCS4eaM67hDtvex9K6MvGBnYkHpsgtXUlJfzQOTvEkAgNvyHVx
+	8TNIOIpLM8Z4q65Jbn2Ex8BlCeANtkLz99kgUAA==
+X-Google-Smtp-Source: AGHT+IEDENRWkWaHA4dEUSjEVRyRrWfcUmiuJJNTHexoh5D/osvBWi3qb63Ace4xyAH0nPQH+O2iUSMAqU1y5jREJYY=
+X-Received: by 2002:a17:90b:4d08:b0:2ee:f64b:9aab with SMTP id
+ 98e67ed59e1d1-2f2901a8b82mr1988210a91.6.1734113921292; Fri, 13 Dec 2024
+ 10:18:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0a8b9448-7e1c-4a30-8011-1505e2133263@kernel.org>
+From: Caleb Sander <csander@purestorage.com>
+Date: Fri, 13 Dec 2024 10:18:30 -0800
+Message-ID: <CADUfDZpUFmBCJPX+u3GYeyFUbQ3RgqevvCpL=ZE48E4_p_BpPA@mail.gmail.com>
+Subject: cpu_rmap maps CPUs to wrong interrupts after reprogramming affinities
+To: David Miller <davem@davemloft.net>, Tom Herbert <therbert@google.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Eli Cohen <elic@nvidia.com>, 
+	Ben Hutchings <ben@decadent.org.uk>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Dec 13, 2024 at 04:55:34PM GMT, Quentin Monnet wrote:
-> 2024-12-13 09:45 UTC-0700 ~ Daniel Xu <dxu@dxuuu.xyz>
-> > Hi Quentin,
-> > 
-> > On Fri, Dec 13, 2024 at 03:17:36PM GMT, Quentin Monnet wrote:
-> >> 2024-12-12 18:24 UTC-0700 ~ Daniel Xu <dxu@dxuuu.xyz>
-> >>> Some projects, for example xdp-tools [0], prefer to check in a minimized
-> >>> vmlinux.h rather than the complete file which can get rather large.
-> >>>
-> >>> However, when you try to add a minimized version of a complex struct (eg
-> >>> struct xfrm_state), things can get quite complex if you're trying to
-> >>> manually untangle and deduplicate the dependencies.
-> >>>
-> >>> This commit teaches bpftool to do a minimized dump of a specific types by
-> >>> providing a optional root_id argument(s).
-> >>>
-> >>> Example usage:
-> >>>
-> >>>     $ ./bpftool btf dump file ~/dev/linux/vmlinux | rg "STRUCT 'xfrm_state'"
-> >>>     [12643] STRUCT 'xfrm_state' size=912 vlen=58
-> >>>
-> >>>     $ ./bpftool btf dump file ~/dev/linux/vmlinux root_id 12643 format c
-> >>>     #ifndef __VMLINUX_H__
-> >>>     #define __VMLINUX_H__
-> >>>
-> >>>     [..]
-> >>>
-> >>>     struct xfrm_type_offload;
-> >>>
-> >>>     struct xfrm_sec_ctx;
-> >>>
-> >>>     struct xfrm_state {
-> >>>             possible_net_t xs_net;
-> >>>             union {
-> >>>                     struct hlist_node gclist;
-> >>>                     struct hlist_node bydst;
-> >>>             };
-> >>>             union {
-> >>>                     struct hlist_node dev_gclist;
-> >>>                     struct hlist_node bysrc;
-> >>>             };
-> >>>             struct hlist_node byspi;
-> >>>     [..]
-> >>>
-> >>> [0]: https://github.com/xdp-project/xdp-tools/blob/master/headers/bpf/vmlinux.h
-> >>>
-> >>> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> >>> ---
-> >>>  .../bpf/bpftool/Documentation/bpftool-btf.rst |  8 +++-
-> >>>  tools/bpf/bpftool/btf.c                       | 39 ++++++++++++++++++-
-> >>>  2 files changed, 43 insertions(+), 4 deletions(-)
-> >>>
-> >>> diff --git a/tools/bpf/bpftool/Documentation/bpftool-btf.rst b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-> >>> index 245569f43035..dbe6d6d94e4c 100644
-> >>> --- a/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-> >>> +++ b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-> >>> @@ -24,7 +24,7 @@ BTF COMMANDS
-> >>>  =============
-> >>>  
-> >>>  | **bpftool** **btf** { **show** | **list** } [**id** *BTF_ID*]
-> >>> -| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*]
-> >>> +| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*] [**root_id** *ROOT_ID*]
-> >>>  | **bpftool** **btf help**
-> >>>  |
-> >>>  | *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* }
-> >>> @@ -43,7 +43,7 @@ bpftool btf { show | list } [id *BTF_ID*]
-> >>>      that hold open file descriptors (FDs) against BTF objects. On such kernels
-> >>>      bpftool will automatically emit this information as well.
-> >>>  
-> >>> -bpftool btf dump *BTF_SRC* [format *FORMAT*]
-> >>> +bpftool btf dump *BTF_SRC* [format *FORMAT*] [root_id *ROOT_ID*]
-> >>>      Dump BTF entries from a given *BTF_SRC*.
-> >>>  
-> >>>      When **id** is specified, BTF object with that ID will be loaded and all
-> >>> @@ -67,6 +67,10 @@ bpftool btf dump *BTF_SRC* [format *FORMAT*]
-> >>>      formatting, the output is sorted by default. Use the **unsorted** option
-> >>>      to avoid sorting the output.
-> >>>  
-> >>> +    **root_id** option can be used to filter a dump to a single type and all
-> >>> +    its dependent types. It cannot be used with any other types of filtering.
-> >>> +    It can be passed multiple times to dump multiple types.
-> >>> +
-> >>>  bpftool btf help
-> >>>      Print short help message.
-> >>>  
-> >>> diff --git a/tools/bpf/bpftool/btf.c b/tools/bpf/bpftool/btf.c
-> >>> index 3e995faf9efa..2636655ac180 100644
-> >>> --- a/tools/bpf/bpftool/btf.c
-> >>> +++ b/tools/bpf/bpftool/btf.c
-> >>> @@ -27,6 +27,8 @@
-> >>>  #define KFUNC_DECL_TAG		"bpf_kfunc"
-> >>>  #define FASTCALL_DECL_TAG	"bpf_fastcall"
-> >>>  
-> >>> +#define MAX_ROOT_IDS		16
-> >>> +
-> >>>  static const char * const btf_kind_str[NR_BTF_KINDS] = {
-> >>>  	[BTF_KIND_UNKN]		= "UNKNOWN",
-> >>>  	[BTF_KIND_INT]		= "INT",
-> >>> @@ -880,7 +882,8 @@ static int do_dump(int argc, char **argv)
-> >>>  {
-> >>>  	bool dump_c = false, sort_dump_c = true;
-> >>>  	struct btf *btf = NULL, *base = NULL;
-> >>> -	__u32 root_type_ids[2];
-> >>> +	__u32 root_type_ids[MAX_ROOT_IDS];
-> >>> +	bool have_id_filtering;
-> >>>  	int root_type_cnt = 0;
-> >>>  	__u32 btf_id = -1;
-> >>>  	const char *src;
-> >>> @@ -974,6 +977,8 @@ static int do_dump(int argc, char **argv)
-> >>>  		goto done;
-> >>>  	}
-> >>>  
-> >>> +	have_id_filtering = !!root_type_cnt;
-> >>> +
-> >>>  	while (argc) {
-> >>>  		if (is_prefix(*argv, "format")) {
-> >>>  			NEXT_ARG();
-> >>> @@ -993,6 +998,36 @@ static int do_dump(int argc, char **argv)
-> >>>  				goto done;
-> >>>  			}
-> >>>  			NEXT_ARG();
-> >>> +		} else if (is_prefix(*argv, "root_id")) {
-> >>> +			__u32 root_id;
-> >>> +			char *end;
-> >>> +
-> >>> +			if (have_id_filtering) {
-> >>> +				p_err("cannot use root_id with other type filtering");
-> >>> +				err = -EINVAL;
-> >>> +				goto done;
-> >>> +			} else if (root_type_cnt == MAX_ROOT_IDS) {
-> >>> +				p_err("only %d root_id are supported", MAX_ROOT_IDS);
-> >>
-> >>
-> >> I doubt users will often reach this limit, but if they do, the message
-> >> can be confusing, because MAX_ROOT_IDS also accounts for root_type_ids[]
-> >> cells used when we pass map arguments ("key" or "value" or "kv"), so you
-> >> could pass 15 "root_id" on the command line and get a message telling
-> >> only 16 are supported.
-> >>
-> >> Maybe add a counter to tell how many were defined from the rest of the
-> >> command line, and adjust the value in the error message?
-> > 
-> > The above `if (have_id_filtering)` check prevents mixing key/value/kv
-> > map args with root_id. That ought to prevent overcounting, right?
-> 
-> Ah, you're right, you even mentioned it in the docs, sorry. All good on
-> that side, then.
-> 
-> Regarding the restriction, would you mind making the mention from the
-> man page a bit more explicit, please? Something along:
-> 
->     [...] It cannot be used with any other types of filtering, such as
->     the "key", "value", or "kv" arguments when dumping BTF for a map.
->     **root_id** can be passed multiple times...
+Hi netdev,
+While testing ARFS, we found set_rps_cpu() was calling
+ndo_rx_flow_steer() with an RX queue that was not affinitized to the
+desired CPU. The issue occurred only after modifying interrupt
+affinities. It looks to be a bug in cpu_rmap, where cpu_rmap_update()
+can leave CPUs mapped to interrupts which are no longer the most
+closely affinitized to them.
 
-Ack, will do.
+Here is the simplest scenario:
+1. A network device has 2 IRQs, 1 and 2. Initially only CPU A is
+available to process the network device. So both IRQs 1 and 2 are
+affinitized to CPU A.
+rx_cpu_rmap maps CPU A to IRQ 2 (assuming the affinity of IRQ 2 was
+set after IRQ 1)
+2. CPU B becomes available to process the network device. So IRQ 2's
+affinity is changed from CPU A to CPU B.
+cpu_rmap_update() is called for IRQ 2 with its new affinity (CPU B).
+It maps CPU B to IRQ 2. CPU A remains mapped to IRQ 2, though with a
+higher distance.
+rx_cpu_rmap now maps both CPUs A and B to IRQ 2. Any traffic meant to
+be steered to CPU A will end up being processed in IRQ 2 on CPU B
+instead, even though there is still an IRQ (1) affinitized to CPU A.
+
+If IRQ 1 had been affinitized to CPU A and IRQ 2 to CPU B initially,
+the cpu_rmap would have correctly mapped CPU A to IRQ 1 and CPU B to
+IRQ 2. So the state of the cpu_rmap depends on the history of the IRQ
+affinities, not just the current IRQ affinities.
+
+This behavior was surprising to me, but perhaps it's working as
+intended. It seems to be a limitation of struct cpu_rmap: it stores
+only one IRQ with the lowest "distance" for each CPU, even if there
+are other IRQs of equivalent or higher distance. When an IRQ's
+affinity changes, each CPU currently affinitized to it has its
+distance invalidated, but its new closest IRQ is selected based on
+other CPUs' closest IRQs, ignoring existing IRQs that may be
+affinitized to that CPU.
+
+I can see a few possible ways to address this:
+- Store the current affinity masks for all the IRQs in struct cpu_rmap
+so the next closest IRQ can be computed when a CPU's closest IRQ is
+invalidated. This would significantly increase the size of struct
+cpu_rmap.
+- Store all candidate IRQs and their distances for each CPU in struct
+cpu_rmap so the next closest IRQ can be computed when a CPU's closest
+IRQ is invalidated. Again, this would significantly increase the size
+of struct cpu_rmap.
+- Re-fetch the affinity masks of all the IRQs from the irq layer
+whenever one IRQ's affinity changes so the next closest IRQ can be
+computed for each invalidated CPU. This would avoid using any
+additional memory, but would add a lot of calls into the irq layer.
+- Work around the cpu_rmap behavior by having userspace always write
+to all IRQs' affinity masks when changing the affinity of any one.
+This is probably the simplest solution, but I worry that other
+userspace applications would hit the same unexpected behavior.
+
+Let me know whether you see this behavior as a bug in cpu_rmap or
+something that userspace should work around. If you do think it's a
+cpu_rmap bug, how would you like to fix it?
+
+Thanks,
+Caleb
 
