@@ -1,121 +1,118 @@
-Return-Path: <netdev+bounces-151631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50E4F9F0577
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 08:27:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCEDF9F058E
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 08:32:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BF22169930
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 07:27:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E7481884DD9
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 07:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F30818BC3D;
-	Fri, 13 Dec 2024 07:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EBA1990DB;
+	Fri, 13 Dec 2024 07:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fe/qjYbH"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YXws51p4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309FE18F2DF
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 07:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46AE93207;
+	Fri, 13 Dec 2024 07:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734074839; cv=none; b=F+Ih65MdrnLnYmcsQ/qTYRsiXF2ImurorGygR/XYhrRR5bHFQ3Bp69pRHx4xFTVnseBQg7Sj3MxEKVZL+5SSS4ZD0DlvDhszdgbJOOaBJTjfWi7hhn3w6SnIVCWYoLx50Bly/er2te2lW/ZFVe4d7ek/62LvwOifeX5IhgwFXHY=
+	t=1734075145; cv=none; b=HUihgheNum5cHsn6k2mbti28rtc/z3Ug4R0dl2Q8+8slhUKeS755Fp+s7+bYS8t457ukzuF875VgpFZlpMLq1+pWMiG+u3PNHwyzV7tM3Za3Qr++Hse0+ThJsml6UfMCK9LeVgU9ll1L/T0h6bcOZ5IOlugMwDc7RKMoposy5eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734074839; c=relaxed/simple;
-	bh=Yl9FtTWfm5AJnHEzx+o37iffwW8fKKulQ7FYGqNq9CA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=E9sNjS9JfpQxS40Vdh0Fb02+T8ZwcNSTfW+N2Ayby89kcE4VQb5teXND8lgKeXjo3jJQZEq7lMousX/7soe2wtmf7qml17AobN1Rj6fJEHiwQywGHmvaudmn6UduDRHtKHV8nxQjjfzOH4Tf/8iGHe919NLts1VFZ6QHNrgn8O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fe/qjYbH; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <b82f5caf-09d7-49be-aa4a-8a402d6b89a2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734074825;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nANURs/9bFtfWppkan0ral+I/xL33sd1BSNCKM+vm0A=;
-	b=Fe/qjYbHRIaCLni0Cg1MmAfesKD64Gc9dk106a0J+CwgwIWGpCgoOaqg+KAp9G0zVNSPUb
-	rmoVkChvBHWjSyqH22crQf2UmGtJISvHkIAHGd2ttx3AWMasYw3UuKMQvPP8oVHY+FU8er
-	X6F3tdk8Inx+0t/5G53EXDMZ7iQc8xM=
-Date: Fri, 13 Dec 2024 08:26:58 +0100
+	s=arc-20240116; t=1734075145; c=relaxed/simple;
+	bh=KF2u61fFy2MhhhXHsq56NzRxS4bNBSmPrcwIzbiCk28=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LTt9bQ078C30Ko6QS3MosAWp1BX+ai+GNzNu16u5XMyrwBWgbR5YoXF6Wp2dOvWorYpefw3drqtiEsK/J18QX+fwziYfe7zQxXP04BFSCHS76P6hwiYGGvLRWBpr5hjjYFT0P6V5Ta1QLsaNsES3CUpP/r6z28ZqBgo1FGGx7+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YXws51p4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74C47C4CED0;
+	Fri, 13 Dec 2024 07:32:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1734075144;
+	bh=KF2u61fFy2MhhhXHsq56NzRxS4bNBSmPrcwIzbiCk28=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YXws51p4OlwPq738uGlipsQN5HV9ZVc0qBQtIDFJ/RVNPLGvtjmm8j7Lruy9AroPG
+	 fwsqluHpE8hKxixfh9G9UkxLnr46YSpthgtDfA9vQaZk5drkqBVz90PEiil9zPChQB
+	 04xHlVOMH3ZIXzCGOFptOxKKf9WCynUw3GeIuYZg=
+Date: Fri, 13 Dec 2024 08:31:45 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Philipp Stanner <pstanner@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Alex Dubov <oakad@yahoo.com>, amien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Basavaraj Natikar <basavaraj.natikar@amd.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+	Igor Mitsyanko <imitsyanko@quantenna.com>,
+	Sergey Matyukevich <geomatsi@gmail.com>,
+	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Yi Liu <yi.l.liu@intel.com>, Kunwu Chan <chentao@kylinos.cn>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
+	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-input@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v3 05/11] misc: Use never-managed version of pci_intx()
+Message-ID: <2024121335-blooper-cognitive-04ec@gregkh>
+References: <20241209130632.132074-7-pstanner@redhat.com>
+ <20241212192637.GA3359920@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH][net-next] net/mlx5: Pick the first matched node of
- priv.free_list in alloc_4k
-To: Li RongQing <lirongqing@baidu.com>, saeedm@nvidia.com, leon@kernel.org,
- tariqt@nvidia.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org
-References: <20240823061648.17862-1-lirongqing@baidu.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20240823061648.17862-1-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241212192637.GA3359920@bhelgaas>
 
-在 2024/8/23 8:16, Li RongQing 写道:
-> Pick the first node instead of last, to avoid unnecessary iterating
-> over whole free list
+On Thu, Dec 12, 2024 at 01:26:37PM -0600, Bjorn Helgaas wrote:
+> [cc->to: Arnd, Greg, Alex]
 > 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-
-Your commit is to fix the problem from the following commit?
-So the following should be needed.
-
-Fixes: 2726cd4a2928 ("net/mlx5: Dedicate fw page to the requesting function"
-
-commit 2726cd4a29280c20ea983be285a6aefe75b205a4
-Author: Eran Ben Elisha <eranbe@mellanox.com>
-Date:   Sun May 3 10:15:58 2020 +0300
-
-     net/mlx5: Dedicate fw page to the requesting function
-
-     The cited patch assumes that all chuncks in a fw page belong to the 
-same
-     function, thus the driver must dedicate fw page to the requesting
-     function, which is actually what was intedned in the original fw pages
-     allocator design, hence the fwp->func_id !
-
-     Up until the cited patch everything worked ok, but now "relase all 
-pages"
-     is broken on systems with page_size > 4k.
-
-     Fix this by dedicating fw page to the requesting function id via 
-adding a
-     func_id parameter to alloc_4k() function.
-
-     Fixes: c6168161f693 ("net/mlx5: Add support for release all pages 
-event")
-     Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
-     Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
-
-Zhu Yanjun
-
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 1 +
->   1 file changed, 1 insertion(+)
+> On Mon, Dec 09, 2024 at 02:06:27PM +0100, Philipp Stanner wrote:
+> > pci_intx() is a hybrid function which can sometimes be managed through
+> > devres. To remove this hybrid nature from pci_intx(), it is necessary to
+> > port users to either an always-managed or a never-managed version.
+> > 
+> > cardreader/rtsx_pcr.c and tifm_7xx1.c enable their PCI-Device with
+> > pci_enable_device(). Thus, they need the never-managed version.
+> > 
+> > Replace pci_intx() with pci_intx_unmanaged().
+> > 
+> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> index 972e8e9..cd20f11 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> @@ -228,6 +228,7 @@ static int alloc_4k(struct mlx5_core_dev *dev, u64 *addr, u32 function)
->   		if (iter->function != function)
->   			continue;
->   		fp = iter;
-> +		break;
->   	}
->   
->   	if (list_empty(&dev->priv.free_list) || !fp)
+> Looking for ack from Arnd, Greg, Alex.
 
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
