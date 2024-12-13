@@ -1,103 +1,122 @@
-Return-Path: <netdev+bounces-151685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DFB59F095C
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:25:17 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 737D89F097E
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:31:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A74E188B690
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:31:05 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5011BB6BA;
+	Fri, 13 Dec 2024 10:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KwAmFDLe"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3F64282F6E
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:25:15 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D351B86CC;
-	Fri, 13 Dec 2024 10:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mvista.com header.i=@mvista.com header.b="hQpJn3os"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE85018A6D4
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 10:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861481B6CFD;
+	Fri, 13 Dec 2024 10:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734085513; cv=none; b=nrVXq9BamsFz54rDvMDjlzosSXj5GW+VpGn5V90vKfg/xcCqZnWWLxYkfqHPizMy7WmmnZjCUBL9/dD2CswlJq+0kfKhCdOAouNFDwrSMVtHn+PKo3TTC5ynHzoRAmZ4faxhWOaHlFqHZ5yJ4vtGn9GXZVYK5ewAKOR32tkqwdc=
+	t=1734085856; cv=none; b=ExWiUu+qloeSOTopfgIQ9bPgCOOylAEjCHTZrBRaZpNeLCL4dnSX2ydekr6qxtmiZkMZnaEakQhRa1z2Cma+cCgVmK+aNVFtVA/CPkIpNL/SDJomq/gJUJFPZSmQiTPzwAEtWoMC1yMsFSg6/aq863ygOIvMH9+ArmeNWzMJE3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734085513; c=relaxed/simple;
-	bh=xxemndcgGBgHvy4pUq2pCRoPdfELtkEIGMFehs3zHFk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mpDaKNCud4Ic9Y5xAI/ma10EoemX14gvK7TE8HQPNIXH39JA3wg4UCGzDjI4639rTxlDYhQmuT4lUaL/mhWZUKlFOOZi7giYPFlFUgcmkWc4WgMJTeFX+TDb+2v8ElMCGh8jKi38kxew21Z6mvxH87z+5yU5cF9TruZPLWqTMOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mvista.com; spf=pass smtp.mailfrom=mvista.com; dkim=pass (1024-bit key) header.d=mvista.com header.i=@mvista.com header.b=hQpJn3os; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mvista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mvista.com
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-27d0e994ae3so667968fac.3
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 02:25:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mvista.com; s=google; t=1734085510; x=1734690310; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xxemndcgGBgHvy4pUq2pCRoPdfELtkEIGMFehs3zHFk=;
-        b=hQpJn3osqN0K1oOxjUy4TmM9KFFnde/LbmCcdBPSMPPUdtodaosp/KE7HH6qLDG1o3
-         ritlzG+cA4KHfbVAHVrP1kpeHJpt6s/BQGA4sBcc/DC8KLEHubwtKhEka7ibTUvXIzaN
-         v5lr1zUvRvYsYyvwCCpCEvBctC9mKlNVOwsxk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734085510; x=1734690310;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xxemndcgGBgHvy4pUq2pCRoPdfELtkEIGMFehs3zHFk=;
-        b=wRmk4JyIZOQt31fJd31jaujsQL8q5f9GHDWXCrrP5SR8BAZUqK6xYTQ/lSJYe/Qe9X
-         ALQV1IJ0a+NFTU7ZyPRXQqIVKSRhzSgLT7dPFudaa4YRo1IWvGEmfskZr2RXq72uhaT5
-         M0X7lFuBBBF0N32zf5DM9c1+WhCcYil7u5kD94rkNI2pf2tLJGKAWtqMhwIG8XmQ4WOl
-         vJKk25Zxb0OBWgcP+3i95is5Ic0gt+LDYCPvw5u80xe1c2pVO2G9G7yuWI5RDajnmj4K
-         kM3Xy/YDS+aPrVGIGS0kPkUpHz+UcRy5ggShvu/xoewtoZRcQp8usFev75GOMJkZZoJg
-         /Tqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXyFjI2lfpVtLtxAhvkv63RHwaNI7i+oNr818QWSrGgX7+IZ3gBxIvpN2g8oJmQozX7fPB370Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1clUmRXCwfruwJYiMUL1GCmqhFTl4fyDq+mhxD/MDblaHOvEp
-	gB1ltwuaJq4Z3giscQhiS+iyANxkQ5WQZAgXzZBuSOr14cNQB5B74EA5h9aQRLiWi7ye+RD1TcD
-	UVAB6pd56IycrdDbV7K1+pO9PfHquSoME8oOxeg==
-X-Gm-Gg: ASbGncuANu+Ec2pkTzQPw4iZeRhrMSCki4eDZv5OVxAiqJ8dWmNMTb9ThbtddJiBE7A
-	xGkdXrVk9R4i7eq88eNaYjedn5EOrz66mvg/Vg2DdjBKCNg6SoiFm6tZF2ar7fQjTHVjBdA==
-X-Google-Smtp-Source: AGHT+IEdT/A/pmiS2ym+9RC5WzDSjkjUMBatBt8gNsmX6iOQyltgrvwe461J4dlxyPDv7Ks2W1Btk2iEGxVCCFVfE2U=
-X-Received: by 2002:a05:6870:7011:b0:29e:3d0b:834 with SMTP id
- 586e51a60fabf-2a3ac614135mr1216192fac.5.1734085509982; Fri, 13 Dec 2024
- 02:25:09 -0800 (PST)
+	s=arc-20240116; t=1734085856; c=relaxed/simple;
+	bh=BTQhG+pcPpVWdFU7M6WGNSEHiOAWlPk9OMovbRGe8jk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=dnKbCgMEx1TUk/UVLXfkPV6OB9XV2Fse775L3/C86brW6n5/9Ax5EqtJDZ7F9AxqcmUF1IwI9wRjUcktS2q+fO2FtqFG2HaoHwFDqlDlRq6Yv+yKAoetO4sb16Z8KJQqxCGiND+c9GM/a1SvPK1W0UfXn8jxQ9lBz8mTmQ5H6kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KwAmFDLe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65922C4CED0;
+	Fri, 13 Dec 2024 10:30:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734085855;
+	bh=BTQhG+pcPpVWdFU7M6WGNSEHiOAWlPk9OMovbRGe8jk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=KwAmFDLewAK8qtG2JcgTDln5oAPvX7T6s21n+sVrQK/zovEQltlKTZMfOOydVCYBZ
+	 wexQmXSVYI3h7TBHmpxxuKJCAtIKDA3xJNa8/Im/UBR7LXeWQh180GN2AD0v8T0VFC
+	 xau4jIIld3rUWglJe0O5Ly1c3n+LVRPKkn4Ap2bFPikm9rfX1t0FvFxCEdhmOO7GmQ
+	 T1Kv1o7hm5xTuEGg8jC3v4laVOub2r/1lqEAAYkD9VqHdQWO6/vYMu4tQswLjScRFC
+	 qcBNgWj6+WXQRdmWrvKriaNXsmUfp6QHYu1lvvdq1sD36YHJ/Kyex37L0CjkCkv8o5
+	 SYIrwECkF64TQ==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Philipp Stanner <pstanner@redhat.com>,  Igor Mitsyanko
+ <imitsyanko@quantenna.com>,  amien Le Moal <dlemoal@kernel.org>,  Niklas
+ Cassel <cassel@kernel.org>,  Basavaraj Natikar
+ <basavaraj.natikar@amd.com>,  Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>,  Arnd Bergmann <arnd@arndb.de>,  Sergey
+ Matyukevich <geomatsi@gmail.com>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,  Alex Dubov <oakad@yahoo.com>,  Sudarsana
+ Kalluru <skalluru@marvell.com>,  Manish Chopra <manishc@marvell.com>,
+  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rasesh Mody
+ <rmody@marvell.com>,  GR-Linux-NIC-Dev@marvell.com,  Sanjay R Mehta
+ <sanju.mehta@amd.com>,  Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,  Jon
+ Mason <jdmason@kudzu.us>,  Dave Jiang <dave.jiang@intel.com>,  Allen Hubbe
+ <allenbh@gmail.com>,  Bjorn Helgaas <bhelgaas@google.com>,  Alex
+ Williamson <alex.williamson@redhat.com>,  Juergen Gross <jgross@suse.com>,
+  Stefano Stabellini <sstabellini@kernel.org>,  Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>,  Mario Limonciello
+ <mario.limonciello@amd.com>,  Chen Ni <nichen@iscas.ac.cn>,  Ricky Wu
+ <ricky_wu@realtek.com>,  Al Viro <viro@zeniv.linux.org.uk>,  Breno Leitao
+ <leitao@debian.org>,  Thomas Gleixner <tglx@linutronix.de>,  Kevin Tian
+ <kevin.tian@intel.com>,  Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>,  Mostafa Saleh <smostafa@google.com>,
+  Jason Gunthorpe <jgg@ziepe.ca>,  Yi Liu <yi.l.liu@intel.com>,  Kunwu Chan
+ <chentao@kylinos.cn>,  Dan Carpenter <dan.carpenter@linaro.org>,  "Dr.
+ David Alan Gilbert" <linux@treblig.org>,  Ankit Agrawal
+ <ankita@nvidia.com>,  Reinette Chatre <reinette.chatre@intel.com>,  Eric
+ Auger <eric.auger@redhat.com>,  Ye Bin <yebin10@huawei.com>,
+  linux-ide@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-input@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-wireless@vger.kernel.org,  ntb@lists.linux.dev,
+  linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
+  xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v3 09/11] wifi: qtnfmac: use always-managed version of
+ pcim_intx()
+References: <20241212192935.GA3360239@bhelgaas>
+Date: Fri, 13 Dec 2024 12:30:42 +0200
+In-Reply-To: <20241212192935.GA3360239@bhelgaas> (Bjorn Helgaas's message of
+	"Thu, 12 Dec 2024 13:29:35 -0600")
+Message-ID: <87cyhvoox9.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1729316200-15234-1-git-send-email-hgohil@mvista.com>
- <2024102147-paralyses-roast-0cec@gregkh> <CAH+zgeGXXQOqg5aZnvCXfBhd4ONG25oGoukYJL5-uHYJAo11gQ@mail.gmail.com>
- <2024110634-reformed-frightful-990d@gregkh> <CAH+zgeGs7Tk+3sP=Bn4=11i5pH3xjZquy-x1ykTXMBE8HcOtew@mail.gmail.com>
- <2024121233-washing-sputter-11f4@gregkh>
-In-Reply-To: <2024121233-washing-sputter-11f4@gregkh>
-From: Hardik Gohil <hgohil@mvista.com>
-Date: Fri, 13 Dec 2024 15:54:58 +0530
-Message-ID: <CAH+zgeEhb2+SmB7ru8uGuNs+QX==QAWxeDgOHUQ_G3stWbMBWg@mail.gmail.com>
-Subject: Re: [PATCH v5.10.y v5.4.y] wifi: mac80211: Avoid address calculations
- via out of bounds array indexing
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org, 
-	Kenton Groombridge <concord@gentoo.org>, Kees Cook <kees@kernel.org>, 
-	Johannes Berg <johannes.berg@intel.com>, Xiangyu Chen <xiangyu.chen@windriver.com>, 
-	Sasha Levin <sashal@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
->
-> What did you do to change this patch?
->
-> Also, what about 5.15.y, you can't "skip" a stable tree :(
->
-> thanks,
->
-> greg k-h
+Bjorn Helgaas <helgaas@kernel.org> writes:
 
-I have not done any changes to patch but tested the patch from 6.6.y
-by applying to 5.10.y and 5.4.y versions
+> [cc->to: Igor]
+>
+> On Mon, Dec 09, 2024 at 02:06:31PM +0100, Philipp Stanner wrote:
+>> pci_intx() is a hybrid function which can sometimes be managed through
+>> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+>> port users to either an always-managed or a never-managed version.
+>> 
+>> qtnfmac enables its PCI-Device with pcim_enable_device(). Thus, it needs
+>> the always-managed version.
+>> 
+>> Replace pci_intx() with pcim_intx().
+>> 
+>> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+>> Acked-by: Kalle Valo <kvalo@kernel.org>
+>
+> Hoping for an ack from Igor, too.
 
-ref:
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.6.65&id=26b177ecdd311f20de4c379f0630858a675dfc0c
+Igor hasn't been around for a while so I'm not expecting see an ack from
+him, I think the whole qtnfmac driver should be removed in the future.
+Feel free to take the patch as is.
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
