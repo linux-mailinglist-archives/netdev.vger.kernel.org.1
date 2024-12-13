@@ -1,155 +1,156 @@
-Return-Path: <netdev+bounces-151928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0098B9F1B22
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 01:08:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C72019F1B2A
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 01:09:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC75E1880351
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 00:08:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B79BB162736
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 00:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13851EC012;
-	Fri, 13 Dec 2024 23:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7AB1F03FD;
+	Fri, 13 Dec 2024 23:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c/Op9mKR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihbfMvsT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33571E0DB0
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 23:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F911F03CE;
+	Fri, 13 Dec 2024 23:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734134148; cv=none; b=hiRyBuieiFtaHrXdrzBEliKpt7B66ebJlt8pRiXyz6VUOV0ERZnGdAz5cJcQbcjFg3MI8FdVv+7JLGauSxC9mUJpOrNvt6CtGSlTv2mZHO3s2kuB2S1ZcPlR972EwQTsbg4pedGaGgsXQ1EoBgHoNwnq9VWGt3pG+aLLxbKALOo=
+	t=1734134245; cv=none; b=elJu0mtEzM6Mjw8IzjCR5JKlpQxzuhp8EgCkoL1uKx0lwbOR9JBo+JDnVSVY/OrERaa78m5cuGUGDdhXd8Fj7bfC8FWe7re7iZ+cGZSjgQPXWi0FYDpxGRw29GIEb0RNdlIYZYkR+EZ6wVrUglW6liPYogY562sfAUiPNYVeWGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734134148; c=relaxed/simple;
-	bh=XqG2JijYRpxL2/j3DukylYuY6FOBReLBkzB2NTjm1OM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IM4I9N/WkbU9xGG/w2y4h+h8m4xaYK2rEoca7l+YdYujFzF2zzRcbXMT3CH7oc84SvWspnVgckXvPVPKJU/O6hK3t0njcWNxcett4Uhro/oS27+ggIJGjHWS0PpwNScuC8akyV4ju49iTw2Vlk+UuJSQOxnpgDABmEzG0183m9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c/Op9mKR; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <55384b37-005d-48e9-894b-8bbe4f7a6b24@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734134143;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7Wx0ubisvuXuYNQ0Vjor9tnJWsgXG5tKeIY4c7YfW0I=;
-	b=c/Op9mKR5nKAnru1LNVAA0LkoQNk8blbd8PtEgJ22dGt1HlBaR/S774tkeh8sCkpXkgqXZ
-	XV4bAC5TNVMC5VoaX1toJx9ndFTAC/GxGD0Df0zapA/MCwGtYixfB7FZu09C2n043gvMQ6
-	LhVzK6dYN06cIUVrOLkcrzyxvXXOwzU=
-Date: Fri, 13 Dec 2024 15:55:33 -0800
+	s=arc-20240116; t=1734134245; c=relaxed/simple;
+	bh=+cYwKDRd1fNSYotDWngbQ+3V+4w8Bafou8uCHEvJfKQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uZDUAY40bOMsCfWYeujRs6wY+kcHRrT8BUhfyrvhJ+ki2DoFDPu9pL2m4DO7WGWPhMP4Qv717EKuUoIBP+Zq/yKMq30pAhSqVSZriqHT9JG0wZPGf4iYNi4JR2sbxFOh4p9d7w7Ok7ThN3AbrEIk5ScXA8mCzQHGMt1dShmqae4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihbfMvsT; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-844e9b8b0b9so98761939f.0;
+        Fri, 13 Dec 2024 15:57:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734134243; x=1734739043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+cYwKDRd1fNSYotDWngbQ+3V+4w8Bafou8uCHEvJfKQ=;
+        b=ihbfMvsT50cZy9umfqfc7nkG9a3iKU75DEDwzsVp5rbNOSKpTBbqXILr99uU19VxtD
+         V9xTSf2nIHU5IvUhj2YFiGVIfzJPz0oBB2I01t3ILX/kEdHOVB8wXPyKQmeTAqUFJWK6
+         1g4cY2kgSarrrBjJxn/6DcwVHuC7XjcWcK48e/oBR8OVlcnQC3k/c+dS2w33RX5GH60E
+         yX4s6jH63TnNbl77OuOCvWt2J3J/RVz+Y2w2CKhkAbNMMdYo+Vs0ZGwLj9urjWoBTNc4
+         cChwapSTGViKjnsbuatHqe4ip49ORiA6Boz5lJI/J+//c6fUK/EjnxRzw3S30dcYaetR
+         2nIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734134243; x=1734739043;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+cYwKDRd1fNSYotDWngbQ+3V+4w8Bafou8uCHEvJfKQ=;
+        b=LhPEPyQocMT3BAq1NNAryPmNwYEpbTWHV7LSw9cw+JHv+icCHNpT0J1iM5OuXkfLoK
+         jVV2TioxBZvM1NmvSbqI0E+HBf4UzwbCn2vk2BOMkix8u6BV+A9psohDUgxVGqItz4Dd
+         MZpUqJ+W3Lg4bHU122lN++9jQ+n9hNBxOTLSQjXNUrbj425SYKQjCwEnb3Rs2si6wV0H
+         NflE6pA/w1zwV5/oCFdfa22hZZu8bQNhqXSROt0DzCf4+KvP4aLnlqRfW0MQX+ZFHmhR
+         A3MZliu2WwL3Jjy069rutzuPOFm+PV02V+1fB6RhMCvcqpgXHBuOQywNnF3kEbifcO3G
+         bD1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVNpQxDSailXBFKRm+L1ZQIUozhPRqHbLnqjDOsRhIKEqoJEtDjeVbqo9DTQuum5+LwadI=@vger.kernel.org, AJvYcCXbrLxwH6vEPX95HcLkbSy7CVj7sQrVBtmJnyl9Xj4tKz6VSaMbO+x5/d5Pqd9/KKVqDATtIqFx@vger.kernel.org
+X-Gm-Message-State: AOJu0YxV3pGnPFHm76AzsaLGJ7Q4ZZW0sZkb2nAflXXVzyfxB5eoZ4H2
+	dKiHz3AL0aF3IEAVeoYQeZ3rsbER+v+hWfbLfGdmpDBSLGisuGy2yYxHV33tL/Gg48Yx7/F73kR
+	Gpj+QEYwcMm9jFBmFmpvMSIDBrenUIP57
+X-Gm-Gg: ASbGncuFAriXboDG1C6RsdFcEL1VvuZIsL4klO9V8gPfE/qSY0xGWNPZbsBstjGjsWk
+	O60shXc9I8cf4XKoVtCYwmLBiiaMe9jQuoFx3
+X-Google-Smtp-Source: AGHT+IEgefJlfBI5ZIYnLn4EZ3LxcRmFlqOreLcDE1TCcJ3KIjGh9lEUw7ZdJD5491xKgHICfktUqsfQYkLzGGmrb+s=
+X-Received: by 2002:a05:6e02:1846:b0:3a3:4175:79da with SMTP id
+ e9e14a558f8ab-3afeee7924emr59617705ab.13.1734134243128; Fri, 13 Dec 2024
+ 15:57:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 10/11] net-timestamp: export the tskey for TCP
- bpf extension
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
 References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
- <20241207173803.90744-11-kerneljasonxing@gmail.com>
- <9f5081bb-ed66-4171-acef-786ae02cf69c@linux.dev>
- <CAL+tcoCCvKapSQ8N48iKh83YxYskDkPyM+bpT5=m8cE_YrCovg@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <CAL+tcoCCvKapSQ8N48iKh83YxYskDkPyM+bpT5=m8cE_YrCovg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+ <20241207173803.90744-3-kerneljasonxing@gmail.com> <f8e9ab4a-38b9-43a5-aaf4-15f95a3463d0@linux.dev>
+ <CAL+tcoDGq8Jih9vwsz=-O8byC1S0R1uojShMvUiTZKQvMDnfTQ@mail.gmail.com>
+ <996cbe46-e2cd-44b6-a53a-13fd6ebfc4c0@linux.dev> <CAL+tcoAxmHj9_d5PUqvSHswavKFspd_D5tOt81fon-UtEf_OMA@mail.gmail.com>
+ <c1701350-236d-4a9e-9c53-4badc0738309@linux.dev>
+In-Reply-To: <c1701350-236d-4a9e-9c53-4badc0738309@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 14 Dec 2024 07:56:46 +0800
+Message-ID: <CAL+tcoC+cw9MdU089C-dt=E6gLuv720DS3mCcp2RNWH45RjfWA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 02/11] net-timestamp: prepare for bpf prog use
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/13/24 7:44 AM, Jason Xing wrote:
->>> @@ -5569,7 +5569,10 @@ static void __skb_tstamp_tx_bpf(struct sock *sk, struct sk_buff *skb,
->>>                return;
->>>        }
->>>
->>> -     bpf_skops_tx_timestamping(sk, skb, op, 2, args);
->>> +     if (sk_is_tcp(sk))
->>> +             args[2] = skb_shinfo(skb)->tskey;
->> Instead of only passing one info "skb_shinfo(skb)->tskey" of a skb, pass the
->> whole skb ptr to the bpf prog. Take a look at bpf_skops_init_skb. Lets start
->> with end_offset = 0 for now so that the bpf prog won't use it to read the
->> skb->data. It can be revisited later.
->>
->>          bpf_skops_init_skb(&sock_ops, skb, 0);
->>
->> The bpf prog can use bpf_cast_to_kern_ctx() and bpf_core_cast() to get to the
->> skb_shinfo(skb). Take a look at the md_skb example in type_cast.c.
-> Sorry, I didn't give it much thought on getting to the shinfo. That's
-> why I quickly gave up using bpf_skops_init_skb() after I noticed the
-> seq of skb is always zero 🙁
-> 
-> I will test it tomorrow. Thanks.
-> 
->> Then it needs to add a bpf_sock->op check to the existing
->> bpf_sock_ops_{load,store}_hdr_opt() helpers to ensure these helpers can only be
->> used by the BPF_SOCK_OPS_PARSE_HDR_OPT_CB, BPF_SOCK_OPS_HDR_OPT_LEN_CB, and
->> BPF_SOCK_OPS_WRITE_HDR_OPT_CB callback.
-> Forgive me. I cannot see how the bpf_sock_ops_load_hdr_opt helper has
-> something to do with the current thread? Could you enlighten me?
+On Sat, Dec 14, 2024 at 6:26=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 12/13/24 6:42 AM, Jason Xing wrote:
+> >>>> I just noticed a trickier one, sockops bpf prog can write to sk->sk_=
+txhash. The
+> >>>> same should go for reading from sk. Also, sockops prog assumes a ful=
+lsock sk is
+> >>>> a tcp_sock which also won't work for the udp case. A quick thought i=
+s to do
+> >>>> something similar to is_fullsock. May be repurpose the is_fullsock s=
+omehow or a
+> >>>> new u8 is needed. Take a look at SOCK_OPS_{GET,SET}_FIELD. It avoids
+> >>>> writing/reading the sk when is_fullsock is false.
+>
+> May be this message buried in the earlier reply or some piece was not cle=
+ar, so
+> worth to highlight here.
+>
+> Take a look at how is_fullsock is used in SOCK_OPS_{GET,SET}_FIELD. I thi=
+nk a
+> similar idea can be borrowed here.
+>
+> >>>
+> >>> Do you mean that if we introduce a new field, then bpf prog can
+> >>> read/write the socket?
+> >>
+> >> The same goes for writing the sk, e.g. writing the sk->sk_txhash. It n=
+eeds the
+> >> sk_lock held. Reading may be ok-ish. The bpf prog can read it anyway b=
+y
+> >> bpf_probe_read...etc.
+> >>
+> >> When adding udp timestamp callback later, it needs to stop reading the=
+ tcp_sock
+> >> through skops from the udp callback for sure. Do take a look at
+> >> SOCK_OPS_GET_TCP_SOCK_FIELD. I think we need to ensure the udp timesta=
+mp
+> >> callback won't break here before moving forward.
+> >
+> > Agreed. Removing the "sock_ops.sk =3D sk;" is simple, but I still want
+> > the bpf prog to be able to read some fields from the socket under
+> > those new callbacks.
+>
+> No need to remove "sock_ops.sk =3D sk;". Try to borrow the is_fullsock id=
+ea.
+>
+> Overall, the new timestamp callback breaks assumptions like, sk_lock is h=
+eld and
+> is_fullsock must be a tcp_sock. This needs to be audited. In particular, =
+please
+> check sock_ops_func_proto() for all accessible bpf helpers. Also check th=
+e
+> sock_ops_is_valid_access() and sock_ops_convert_ctx_access() for directly
+> accessible fields without the helpers. In particular, the BPF_WRITE (able=
+)
+> fields and the tcp_sock fields.
 
-Sure. This is the same discussion as in patch 2, so may be worth to highlight 
-something that I guess may be missing:
-
-a bpf prog does not need to use a helper does not mean:
-a bpf prog is not allowed to call a helper because it is not safe.
-
-The sockops prog running at the new timestamp hook does not need to call 
-bpf_setsockopt() but it does not mean the bpf prog is not allowed to call 
-bpf_setsockopt() without holding the sk_lock which is then broken.
-
-The sockops timestamp prog does not need to use the 
-bpf_sock_ops_{load,store}_hdr_opt but it does not mean the bpf prog is not 
-allowed to call bpf_sock_ops_{load,store}_hdr_opt to change the skb which is 
-then also broken.
-
-Now, skops->skb is not NULL only when the sockops prog is allowed to read/write 
-the skb.
-
-With bpf_skops_init_skb(), skops->skb will not be NULL in the new timestamp 
-callback hook. bpf_sock_ops_{load,store}_hdr_opt() will be able to use the 
-skops->skb and it will be broken.
-
-> 
->> btw, how is the ack_skb used for the SCM_TSTAMP_ACK by the user space now?
-> To be honest, I hardly use the ack_skb[1] under this circumstance... I
-> think if someone offers a suggestion to use it, then we can support
-> it?
-
-Thanks for the pointer.
-
-Yep, supporting it later is fine. I am curious because the ack_skb is used in 
-the user space time stamping now but not in your patch. I was asking to ensure 
-that we should be able to support it in the future if there is a need.  We 
-should be able to reuse the skops->syn_skb to support that in the future.
-
-> 
-> [1]
-> commit e7ed11ee945438b737e2ae2370e35591e16ec371
-> Author: Yousuk Seung<ysseung@google.com>
-> Date:   Wed Jan 20 12:41:55 2021 -0800
-> 
->      tcp: add TTL to SCM_TIMESTAMPING_OPT_STATS
-> 
->      This patch adds TCP_NLA_TTL to SCM_TIMESTAMPING_OPT_STATS that exports
->      the time-to-live or hop limit of the latest incoming packet with
->      SCM_TSTAMP_ACK. The value exported may not be from the packet that acks
->      the sequence when incoming packets are aggregated. Exporting the
->      time-to-live or hop limit value of incoming packets helps to estimate
->      the hop count of the path of the flow that may change over time.
-
-
+Thanks for the valuable information. I will dig into them.
 
