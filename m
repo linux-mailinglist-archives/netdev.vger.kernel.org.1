@@ -1,115 +1,144 @@
-Return-Path: <netdev+bounces-151677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 826C59F08F7
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:02:56 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4533F9F0906
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:04:24 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFCF618821CD
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:02:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0638A2831F0
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:04:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C3A1ADFF1;
-	Fri, 13 Dec 2024 10:02:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9AE91ADFFB;
+	Fri, 13 Dec 2024 10:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YA7FrNLM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PP7W7/Jo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBD018BBAC;
-	Fri, 13 Dec 2024 10:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F7C1420A8
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 10:04:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734084172; cv=none; b=EoL4Lh2AlUJ50UMwOErUrqSyNyVnmg3xbLkzSaACNEOTWSiyLKB0/6ALn/aPa4lPEx3zpUEBhPQpirOzwNpXcfwn4OWe6Y8oJTo16/hyJkBvdXVjuKDx8gQsTR3/Wf8/oS5EZW3QDVQ1nNxLB+BvBzFcWLOqdtYhNGJEJ+y8cIM=
+	t=1734084260; cv=none; b=VQICaIhB1gThlWpDVsrn8Rj+1iVlaxtJegN+g+L+UDfvBTZkfxPhf+6Qc0zjqKdD9tGYtkjs24Y+kN7CaNe3E7REhNWB1GRQ+Tzjzu9fFURndw9ZhV8OtJQqYEBPT9XLMItQr2pS7hRlj1dDi3p3nA2mtHqeCcqmKFo5bmIn5sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734084172; c=relaxed/simple;
-	bh=g75VeR7xnQsOy14UaWCDhMykR3nk0TYaGgOoL7QGfTk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qdtUzN1UN0f94fTVRRwLr+0jmmMgvd74fqoMl+0QZIYhMK+NOTib6N/x3THndndrnzLgcAXVvPDpYv2jDTnOOX5xvdPjAeIAo6yTSMSK55vCoznbwW4IPfU5uZUe//Hd6G62+41BX2Gg4pFXv95AMDdLs8TkOVWzYaNqLRCEwEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YA7FrNLM; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-385e0e224cbso814829f8f.2;
-        Fri, 13 Dec 2024 02:02:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734084169; x=1734688969; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=g75VeR7xnQsOy14UaWCDhMykR3nk0TYaGgOoL7QGfTk=;
-        b=YA7FrNLMqXc9NUBrPt/U1mI260UwUOEyaWo2ju2Z/3E0tATfxDuHliT7bwEOM+wKoD
-         ixKYlzLFd1c4Gd7opKqVKMGFxqixdcqN9munFb/GYoJtfMSM+FbRdMa9S0BpDVn+bEU3
-         m4TvRtqYU+qyMMTkqG9HKYFBKHf27KobV4QlD0j92nXnqXP10CcGDpUrVX1FHSxmOM2w
-         6WGbQNqw5LKZQs3bCCZnNXlcxJuj3sZJozQbaNkxiGOGkYFDwEvPr568zz+YYlVpCSyT
-         x0X9GrHMFMG13AGxTSvq0ZG7qV3g5LHSKQkn5FsBBusBcJc78zfGyncebPdSAmpVQ2lr
-         Zm4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734084169; x=1734688969;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g75VeR7xnQsOy14UaWCDhMykR3nk0TYaGgOoL7QGfTk=;
-        b=hQDnImWEMAgfLSbzGLAACsRKQNioYQb0GoROfaSbJMPZR73OcGVGuMfb9QIXVwDAkx
-         uBchivW/IFWznuk3tvmk4/dhDKmLqo3+55Q36ZRm6iMdRF04qYeRa4M/UjtAOKFU2wau
-         p7et6Y/1JHGPrRb0Kp2erfOgQ5zIiclMMbF1yjVUXcASIkcpRuqig+RFEcan3d+4w6vV
-         LpyCjiBhrx0f15h2RtkNqVcn2ZrOacpQR65+9PJUZX3d22XFUU25u8qnSSyW8WiVqm8M
-         xN8s57JX+nDWdvqQqNXoZdB2hngfsIWhTAyPGJT5+sEmyrEaWiLsEiXzuKOE/FqhFr7v
-         5u1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW0p1YSk8mSz3WMW/KEfu+nh3D6GmufTJtSlJDiHT/CPmR95vp7/qSyl/owYaG+htan3oLeSbcD@vger.kernel.org, AJvYcCWpZUdumqyN8MOME1ouo5Y8ERLCmAL89by6UDJ8AChbasIvTTZWMdUz3muQY3LgLUZJZEEL+qgc3wuH@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvxNyMji2S9S/PiFiXCRp7qzQAfhhMarM3AIyMiSRSpGJTbwBr
-	k6vep75Kdoybefg/RXPX+JYbb7TiiEzoEHArI8+0Qr7wmF20HmvaM9ZkqGZQsWBdQAbEyezRG+c
-	16PwAd4YhRHfNiodQb8VdLbFVFdU=
-X-Gm-Gg: ASbGncsZddwJuuuZCjI1XmC5YDST1kTXFXZ48CPSsgpF+R9Odch5pGsGyGESrTCKYzw
-	+YWZxgcZ4Wwc/D1oA+f6dy7C3Yfjdo+HkEP//Q9g=
-X-Google-Smtp-Source: AGHT+IG8+Zvp5mBol3e+mWVdgRf+P5IxgzboLnubz8ra6Ud3QEf4CIcFcYQCF+wQS8Z/LyVWNDuu7o2nEw9p4VPoERg=
-X-Received: by 2002:a05:6000:4616:b0:385:ed16:c91 with SMTP id
- ffacd0b85a97d-38880ad91e6mr1232213f8f.24.1734084168831; Fri, 13 Dec 2024
- 02:02:48 -0800 (PST)
+	s=arc-20240116; t=1734084260; c=relaxed/simple;
+	bh=Y0skDPJ1ZlCP2BH0lnu8m48vD9FGe3eWAVO8gdY0mVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Brmo7IJbtkEo6l8AIQmhlHpLGSH5C+2q/VV74vyCI5X5av5/UkR6Kzm5KqhiBOP1C7wxPsvyEdhUmO+jF6y7NexHBM7XT7OxCWCJfg6s/wFIrWGhJCaoZDj+Q2k5okpnQmNmZchlsitzLrdj9aF7dGAxuDyw//Cc4NiPIUyYp5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PP7W7/Jo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC3C7C4CED0;
+	Fri, 13 Dec 2024 10:04:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734084260;
+	bh=Y0skDPJ1ZlCP2BH0lnu8m48vD9FGe3eWAVO8gdY0mVg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PP7W7/JoSSH5CrEqI6MgPCqZ9h0QyWPn6xaOt2KVSsMvx32CKxqP6bMVMS+8C2mAS
+	 sINK2t8c9TedEdluC4uL0U4pw9mrxAZTAgbs3OJQ1ytZHMlwiKvhOTJvxt0MWPEwQU
+	 FO98XToIc0URdwUNXgvHnPiNkmkvxq5blNq+TcHI0N99gABbWqVI+M95B5K9fyLW/4
+	 7TX6O2yB25yCm5SQqcgRoN1y5eEHi9s7SEhQnpXX+nSQR7Iue0RS9tCOYZP2M7bc1z
+	 w6fYv6kL7AHVeOxUxMIcL8jFTL5xMZLxW7nyUHWwzD5tf6JpxH7DoyQHPPAKDUdstl
+	 TNcymQkVSNBSA==
+Date: Fri, 13 Dec 2024 10:04:15 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next 07/10] net: mvneta: convert to phylink EEE
+ implementation
+Message-ID: <20241213100415.GF2110@kernel.org>
+References: <Z1b9J-FihzJ4A6aQ@shell.armlinux.org.uk>
+ <E1tKefs-006SN1-PG@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210120443.1813-1-jesse.vangavere@scioteq.com>
- <dfb09395-78ce-477f-bbbc-747b0a234d4f@lunn.ch> <CAMdwsN_Kgb23Rw0q041fFr9T70twx2vAX2J+MvJz+585ZyyanQ@mail.gmail.com>
- <sugh74o4cevws4lkrsweqzejaciu2dcjt4rlzuncp4ceddwgra@lhgbx3lmkqyk>
-In-Reply-To: <sugh74o4cevws4lkrsweqzejaciu2dcjt4rlzuncp4ceddwgra@lhgbx3lmkqyk>
-From: Jesse Van Gavere <jesseevg@gmail.com>
-Date: Fri, 13 Dec 2024 11:02:37 +0100
-Message-ID: <CAMdwsN9Jau47fhnQ8+DXsURQUgDUnDjpB98HHS_MNS4wvfOTMQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] dt-bindings: net: dsa: microchip,ksz: Improve
- example to a working one
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org, netdev@vger.kernel.org, 
-	Marek Vasut <marex@denx.de>, Conor Dooley <conor+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, Vladimir Oltean <olteanv@gmail.com>, UNGLinuxDriver@microchip.com, 
-	Woojung Huh <woojung.huh@microchip.com>, Jesse Van Gavere <jesse.vangavere@scioteq.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tKefs-006SN1-PG@rmk-PC.armlinux.org.uk>
 
-Hello Krystof,
+On Mon, Dec 09, 2024 at 02:23:48PM +0000, Russell King (Oracle) wrote:
+> Convert mvneta to use phylink's EEE implementation, which means we just
+> need to implement the two methods for LPI control, and adding the
+> initial configuration.
+> 
+> Disabling LPI requires clearing a single bit. Enabling LPI needs a full
+> configuration of several values, as the timer values are dependent on
+> the MAC operating speed.
+> 
+> As Armada 388 states that EEE is only supported in "SGMII" modes, mark
+> this in lpi_interfaces. Testing with RGMII on the Clearfog platform
+> indicates that the receive path fails to detect LPI over RGMII.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/ethernet/marvell/mvneta.c | 127 ++++++++++++++++----------
+>  1 file changed, 79 insertions(+), 48 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
 
-I can understand that from a code maintenance point of view, in that
-case I will not continue with this patch, thank you for the feedback.
+...
 
-Best regards,
-Jesse
+> +static void mvneta_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
+> +				     bool tx_clk_stop)
+> +{
+> +	struct mvneta_port *pp = netdev_priv(to_net_dev(config->dev));
+> +	u32 ts, tw, lpi0, lpi1, status;
+> +
+> +	status = mvreg_read(pp, MVNETA_GMAC_STATUS);
+> +	if (status & MVNETA_GMAC_SPEED_1000) {
+> +		/* At 1G speeds, the timer resolution are 1us, and
+> +		 * 802.3 says tw is 16.5us. Round up to 17us.
+> +		 */
+> +		tw = 17;
+> +		ts = timer;
+> +	} else {
+> +		/* At 100M speeds, the timer resolutions are 10us, and
+> +		 * 802.3 says tw is 30us.
+> +		 */
+> +		tw = 3;
+> +		ts = DIV_ROUND_UP(timer, 10);
+>  	}
+> +
+> +	if (ts > 255)
+> +		ts = 255;
+> +
+> +	/* Configure ts */
+> +	lpi0 = mvreg_read(pp, MVNETA_LPI_CTRL_0);
+> +	lpi0 = u32_replace_bits(lpi0, MVNETA_LPI_CTRL_0_TS, ts);
 
-Op vr 13 dec 2024 om 10:50 schreef Krzysztof Kozlowski <krzk@kernel.org>:
->
-> The point of the example is to show this device, not everything, so
-> adding there nodes which are not covered by the binding is usually not
-> what we expect.
->
-> For example what ethernet ports are might be pretty obvious, considering
-> they are already defined by child schema which is supposed to bring you
-> full example and full description, thus parent schema does not have to
-> be detailed.
->
-> Best regards,
-> Krzysztof
->
+Hi Russell,
+
+I think that the val and field arguments to u32_replace_bits() are
+inverted here and this should be:
+
+	lpi0 = u32_replace_bits(lpi0, ts, MVNETA_LPI_CTRL_0_TS);
+
+> +	mvreg_write(pp, MVNETA_LPI_CTRL_0, lpi0);
+> +
+> +	/* Configure tw and enable LPI generation */
+> +	lpi1 = mvreg_read(pp, MVNETA_LPI_CTRL_1);
+> +	lpi1 = u32_replace_bits(lpi1, MVNETA_LPI_CTRL_1_TW, tw);
+
+Ditto.
+
+> +	lpi1 |= MVNETA_LPI_CTRL_1_REQUEST_ENABLE;
+> +	mvreg_write(pp, MVNETA_LPI_CTRL_1, lpi1);
+>  }
+>  
+>  static const struct phylink_mac_ops mvneta_phylink_ops = {
+
+Flagged by clang-19 and gcc-14 W=1 builds.
+
+...
 
