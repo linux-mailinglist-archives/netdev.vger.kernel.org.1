@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-151878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD309F1711
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:06:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12EA29F171A
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:07:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CECE8161B02
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:06:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CB3D1881A3D
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACFE1190051;
-	Fri, 13 Dec 2024 19:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3811198E96;
+	Fri, 13 Dec 2024 20:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="amplVAJi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOPPvpbT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD9A18FC65;
-	Fri, 13 Dec 2024 19:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824361990C4;
+	Fri, 13 Dec 2024 20:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734119957; cv=none; b=mVklPVAsg4V0vv5yQDeAaHeVIkJROMywK+2tfBJtqdzKL3W4+xggLKX3JT1SbBhxNuJ3noBY16zEcCAz7QqGbxlkIt9ctrXypA1Ajqzxqha+xvAtRMYkmWXKXI9jacAXTFeDDhvv6H0EADIzeRZHZXYZRh8/+rU7P6JV3xJ8Scs=
+	t=1734120041; cv=none; b=eheL6oPwoBj2Gvmhoesj6kQldklHdsKcZruqjqXssEcM8ywmfHE1h1n0ZPrDMmw/VCdeTdKEHm7i4ciqYxqRLyzyed+okSGbp3Pni5tN6YGJQwCkzir6t11Up6zccmPTXrj9NKGXhYyGG3UCYZFth/eGX8xpRtAqiq5lAbW9odo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734119957; c=relaxed/simple;
-	bh=VIi/j6GUtGfCv8VCvRaxNh+DXnQvQw/j1YDTFZRluuQ=;
+	s=arc-20240116; t=1734120041; c=relaxed/simple;
+	bh=xhtS6wcQI01sWh/2YXkLeK90U0JZniriHzDuVNitY8k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VNuDndxbBp8n+V3FEAYE0rFsdZ6pY1AZJBIFlzvg1qjE5ArHOIq60GUXpaG35CNIKd7CwaEgRaVjbWSAFcrGW8nYRdnJCnYr66GuNNeiczd2L2OmAjbUSeaNLsmUOYXOuz1CkfI4UsdFC2KwElOcwdvwfVUEPyfE1fo2lJ2elCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=amplVAJi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C18D4C4CED4;
-	Fri, 13 Dec 2024 19:59:13 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=l9uH8PdB4m/3IWG32OJB5RWEMGggw85G4Yu0qZzDfaNIKXVxlSE1wb71DThRLKfYuYCX7gRrB8P+V3Qn26HyzpIA04Qq7pHX+NEILOroYa0Wsey6dngWTpUoh2osxCcJu+UnOSoAUbkAYAHvCHX2cGpdDd24+bql9CmZbVxGP1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YOPPvpbT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19A35C4CED0;
+	Fri, 13 Dec 2024 20:00:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734119957;
-	bh=VIi/j6GUtGfCv8VCvRaxNh+DXnQvQw/j1YDTFZRluuQ=;
+	s=k20201202; t=1734120041;
+	bh=xhtS6wcQI01sWh/2YXkLeK90U0JZniriHzDuVNitY8k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=amplVAJidGsl6ZQn8iikswx5HJHFLjw9zu2Kt49AU/IVO9rFj2y6atykobSmRx0Xu
-	 8cIy1bmiftOigTonulLTKByCfvOKlpXIyZr/Mnqszc7UqT2k9VneP6pnjbobGjafll
-	 gd4Cj1WWR+JUqaBiOZGuvC89/D7psJCN5H9fpkNv4ZqsfqBEoxAkZDfzV/s7BAIIdU
-	 x6Ea6lUM56XxQhbPn1ndEPdfRPYBPqqbgnQiJzpb0VmgPZEwcfNV47B9KYrWhwFRMz
-	 jBrBoqcKJ1NH5+3F+pIghjEvBMmV/EITZ4vmKu304X0OCFuUy+dmPAdVFchvQGUtqV
-	 QMMbOoW5GTzYA==
-Date: Fri, 13 Dec 2024 19:59:11 +0000
+	b=YOPPvpbTuYkJJSMmdr48hzkYCupGrgyvYpaB9b7Z/+H5B+jeTHPYCEInC6/6bMH4U
+	 xplvR2gbdbFjg3wro/JToT+WP/gaGzkkAa2Io7N80yikxQ/6fAxO7s+U7W1niPYYJp
+	 Zgf3C8czMKKRGoi12XePzqXTobfwLydxxDrx2VsZUa9cAule0DaJKbMb8b8EK8P/kB
+	 Q1gsHwSFbnpsU9mVsZVCrAamdJeVathhsal2LVC85L8ycSt37IDM60Rv5FPNrDCZqa
+	 u+RaF7Bw/YAZN+fsdGpgRDfOVxTU80VMiF/yjsMpc3rXQtLwp94PMDqV2HYDDaTyfE
+	 lOp1LZPK9lZhQ==
+Date: Fri, 13 Dec 2024 20:00:36 +0000
 From: Simon Horman <horms@kernel.org>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	tsbogend@alpha.franken.de, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, markus.stockhausen@gmx.de,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-mips@vger.kernel.org
-Subject: Re: [PATCH 4/4] net: mdio: Add RTL9300 MDIO driver
-Message-ID: <20241213195911.GF561418@kernel.org>
-References: <20241211235342.1573926-1-chris.packham@alliedtelesis.co.nz>
- <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Zijun Hu <quic_zijuhu@quicinc.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH net-next v2] net: wan: framer: Simplify API
+ framer_provider_simple_of_xlate() implementation
+Message-ID: <20241213200036.GG561418@kernel.org>
+References: <20241213-net_fix-v2-1-6d06130d630f@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,151 +63,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <20241213-net_fix-v2-1-6d06130d630f@quicinc.com>
 
-On Thu, Dec 12, 2024 at 12:53:42PM +1300, Chris Packham wrote:
-> Add a driver for the MDIO controller on the RTL9300 family of Ethernet
-> switches with integrated SoC. There are 4 physical SMI interfaces on the
-> RTL9300 but access is done using the switch ports so a single MDIO bus
-> is presented to the rest of the system.
+On Fri, Dec 13, 2024 at 08:09:11PM +0800, Zijun Hu wrote:
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
 > 
-> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+> Simplify framer_provider_simple_of_xlate() implementation by API
+> class_find_device_by_of_node().
+> 
+> Also correct comments to mark its parameter @dev as unused instead of
+> @args in passing.
+> 
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+> Changes in v2:
+> - Use non-error path solution suggested by Simon Horman
+> - Link to v1: https://lore.kernel.org/r/20241211-framer-core-fix-v1-1-0688c6905a0b@quicinc.com
 
-...
+Thanks for the update.
 
-> diff --git a/drivers/net/mdio/mdio-realtek-rtl.c b/drivers/net/mdio/mdio-realtek-rtl.c
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
-
-> +static int realtek_mdiobus_init(struct realtek_mdio_priv *priv)
-> +{
-> +	u32 port_addr[5] = { };
-> +	u32 poll_sel[2] = { 0, 0 };
-> +	u32 glb_ctrl_mask = 0, glb_ctrl_val = 0;
-> +	int i, err;
-> +
-> +	for (i = 0; i < MAX_PORTS; i++) {
-> +		int pos;
-> +
-> +		if (priv->smi_bus[i] > 3)
-> +			continue;
-> +
-> +		pos = (i % 6) * 5;
-> +		port_addr[i / 6] |=  priv->smi_addr[i] << pos;
-
-Hi Chris,
-
-The maximum index of port_addr accessed above is
-(MAX_PORTS - 1) / 6 = (32 - 1) / 6 = 5.
-But port_addr only has five elements (maximum index of 4).
-So this will overflow.
-
-Flagged by Smatch.
-
-> +
-> +		pos = (i % 16) * 2;
-> +		poll_sel[i / 16] |= priv->smi_bus[i] << pos;
-> +	}
-> +
-> +	for (i = 0; i < MAX_SMI_BUSSES; i++) {
-> +		if (priv->smi_bus_isc45[i]) {
-> +			glb_ctrl_mask |= GLB_CTRL_INTF_SEL(i);
-> +			glb_ctrl_val |= GLB_CTRL_INTF_SEL(i);
-> +		}
-> +	}
-> +
-> +	err = regmap_bulk_write(priv->regmap, priv->reg_base + SMI_PORT0_5_ADDR_CTRL,
-> +				port_addr, 5);
-> +	if (err)
-> +		return err;
-> +
-> +	err = regmap_bulk_write(priv->regmap, priv->reg_base + SMI_PORT0_15_POLLING_SEL,
-> +				poll_sel, 2);
-> +	if (err)
-> +		return err;
-> +
-> +	err = regmap_update_bits(priv->regmap, priv->reg_base + SMI_GLB_CTRL,
-> +				 glb_ctrl_mask, glb_ctrl_val);
-> +	if (err)
-> +		return err;
-> +
-> +	return 0;
-> +}
-> +
-> +static int realtek_mdiobus_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct realtek_mdio_priv *priv;
-> +	struct fwnode_handle *child;
-> +	struct mii_bus *bus;
-> +	int err;
-> +
-> +	bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
-> +	if (!bus)
-> +		return -ENOMEM;
-> +
-> +	bus->name = "Reaktek Switch MDIO Bus";
-> +	bus->read_c45 = realtek_mdio_read_c45;
-> +	bus->write_c45 =  realtek_mdio_write_c45;
-> +	bus->parent = dev;
-> +	priv = bus->priv;
-> +
-> +	priv->regmap = syscon_node_to_regmap(dev->parent->of_node);
-> +	if (IS_ERR(priv->regmap))
-> +		return PTR_ERR(priv->regmap);
-> +
-> +	err = device_property_read_u32(dev, "reg", &priv->reg_base);
-> +	if (err)
-> +		return err;
-> +
-> +	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
-> +
-> +	device_for_each_child_node(dev, child) {
-> +		u32 pn, smi_addr[2];
-> +
-> +		err = fwnode_property_read_u32(child, "reg", &pn);
-> +		if (err)
-> +			return err;
-> +
-> +		if (pn > MAX_PORTS)
-> +			return dev_err_probe(dev, -EINVAL, "illegal port number %d\n", pn);
-> +
-> +		err = fwnode_property_read_u32_array(child, "realtek,smi-address", smi_addr, 2);
-> +		if (err) {
-> +			smi_addr[0] = 0;
-> +			smi_addr[1] = pn;
-> +		}
-> +
-> +		if (fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45"))
-> +			priv->smi_bus_isc45[smi_addr[0]] = true;
-> +
-> +		priv->smi_bus[pn] = smi_addr[0];
-> +		priv->smi_addr[pn] = smi_addr[1];
-
-The condition about 15 lines above ensures that the maximum value of pn
-is MAX_PORTS. But if this is the case then the above will overflow
-both smi_bus and smi_addr as they each have MAX_PORTS elements
-(maximum index of MAX_PORTS - 1).
-
-I suspect the condition above should be updated to:
-
-	if (pn >= MAX_PORTS)
-		return ...
-
-Also flagged by Smatch.
-
-> +	}
-> +
-> +	err = realtek_mdiobus_init(priv);
-> +	if (err)
-> +		return dev_err_probe(dev, err, "failed to initialise MDIO bus controller\n");
-> +
-> +	err = devm_of_mdiobus_register(dev, bus, dev->of_node);
-> +	if (err)
-> +		return dev_err_probe(dev, err, "cannot register MDIO bus\n");
-> +
-> +	return 0;
-> +}
-
-...
 
