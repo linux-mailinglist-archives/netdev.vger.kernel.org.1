@@ -1,112 +1,94 @@
-Return-Path: <netdev+bounces-151947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00EB69F1C66
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 04:31:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4736C9F1C69
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 04:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70583188D44C
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 03:31:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A718A188D73B
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 03:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3595518AFC;
-	Sat, 14 Dec 2024 03:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB88C208A0;
+	Sat, 14 Dec 2024 03:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F3PawN9Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IaLAIVOw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D0017579;
-	Sat, 14 Dec 2024 03:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00531B59A;
+	Sat, 14 Dec 2024 03:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734147089; cv=none; b=LNVIA6kK60FKlk+jg6ycZHYJJtQY0DJHugivH1vliIVKXmJIocN5y67ccPORogJQ/2FIaaGBJxnzQJqEmUAphpxl2MFiBYZI5D8SyFt3CW092AY3jBTPVA1MjelC9OhVSnPUAjUS0DkqPQzP5B/dzv9eF7ncsNXx/FY8IyelSR0=
+	t=1734147612; cv=none; b=kRBQpd1KLYfv+GCdBUYxsFuBaRI3DifsOM6n9kIGhlMP0ZpcXdDwbPXsFz+ZPaLvUrH9j9JbWHqJW6KiEe2GvISxcO7+YBukzAkIaiv5ws1EuNGANf7PupwOgutcfD8bHQTWoUYvq+6aGIgLjOxo239azz41dyZ4yQzCg8F5Yg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734147089; c=relaxed/simple;
-	bh=OqHWtTWBs6sriZ4OxwBTxJdDw3GeyRWWqwRxGJKmth4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cHyXAOZQl5vKcjJJDUromU7Gbff8ysou5SuB9ts1v3OKvzgew0rHLveRmJyfpegQQLjbDjS9J5D8BFvw/EFmOXioAC+Vh4Z6whhdxtuSWEICiAW4ezYh0bin1MvBFLD7VOIyLezpEcEKN4KwM5oOiwcbZeUEgBx0vjwonBZsDY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F3PawN9Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F00C9C4CED1;
-	Sat, 14 Dec 2024 03:31:27 +0000 (UTC)
+	s=arc-20240116; t=1734147612; c=relaxed/simple;
+	bh=z2nr/broosVXgQiDTmlElLkXP9jNgl2eOogiAPn9JkE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=f2aGh7unPcVN/tW2pSBiN+dAqMJGG+6G6vxavfeybnFNAXuV3FLA44wTP0eZOvIEaYCKmsotYU2ysIqT/aFf+MxUNtLD7XyBWmS1V1RfwIUeSfbxkH9w/KRykSlza/3wkUC+1opR6RG7xvV5Odf0u8Lma6UevyaxKRtz6XZpWSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IaLAIVOw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77426C4CED7;
+	Sat, 14 Dec 2024 03:40:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734147088;
-	bh=OqHWtTWBs6sriZ4OxwBTxJdDw3GeyRWWqwRxGJKmth4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F3PawN9Zac03Ke+1WvQxNrHvKCLp9VoQL20cinoAserMrdH+tMCjnP6CNLPJHGOGJ
-	 IOV85DQGbOjAkpSXpBhxlCMtf0hzzCu28VUsnXlc+Vd+rTEowDhf4IusO/AYs+9mWY
-	 G3FPbd82kHXU8biq+hifDjpR2rMTK4G0CMCCZunetnpYxfMw+ToFlxWuB/SdhoNGDw
-	 cGmLxlz15kYvBta9XyCP9znNkni5r6IsHcr1c1DQpkhCc5Zx4klrAk4Pt+so4Vniwd
-	 7U9L+Q+uJGcRBO2F55P1HWtZQg7HwJBNmOHL+tqPztRh/4azDvt46D9QgM4QKijZVu
-	 iUF4OP7nnbFpA==
-Date: Fri, 13 Dec 2024 19:31:27 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek
- <andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Nikolay Aleksandrov
- <razor@blackwall.org>, Simon Horman <horms@kernel.org>, Jianbo Liu
- <jianbol@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
-Message-ID: <20241213193127.4c31ef80@kernel.org>
-In-Reply-To: <Z1vfsAyuxcohT7th@fedora>
-References: <20241211071127.38452-1-liuhangbin@gmail.com>
-	<20241212062734.182a0164@kernel.org>
-	<Z1vfsAyuxcohT7th@fedora>
+	s=k20201202; t=1734147612;
+	bh=z2nr/broosVXgQiDTmlElLkXP9jNgl2eOogiAPn9JkE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IaLAIVOwQN5/PMSoVEzQh4UhkkKhq+O53DXaGhuT1NFTV1rBc/2TAMlf2KBquJDBu
+	 q/bgJeKCd5CCJY4iSGh/zlMMGPti9pnzl756kiRbJl+Yeh2j+RvJcjyLVLrGYxkb2k
+	 Nl6OAvA4nZA9nSOT5KgtR8LhqZrqIDERw4VBhbSXBqOB/iPZcATiYvqwYFx26szxSA
+	 dD++qCb2gw8ORf0NG8Lq99MefffaiEMY5mMiPFzChgJGNm0OSVfTMCgcbpXaD3egES
+	 mUnIXgrsde5CWlAGK9N8yqf66u9aqcVn4QLviiM8ucZSH2MMWzAQQu0X9GLfmzOm9Z
+	 4z7rYiZlqBSdg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C69380A959;
+	Sat, 14 Dec 2024 03:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: tun: fix tun_napi_alloc_frags()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173414762902.3237238.14285592138612964595.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Dec 2024 03:40:29 +0000
+References: <20241212222247.724674-1-edumazet@google.com>
+In-Reply-To: <20241212222247.724674-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, horms@kernel.org, eric.dumazet@gmail.com,
+ syzbot+4f66250f6663c0c1d67e@syzkaller.appspotmail.com,
+ stable@vger.kernel.org, axboe@kernel.dk
 
-On Fri, 13 Dec 2024 07:18:08 +0000 Hangbin Liu wrote:
-> On Thu, Dec 12, 2024 at 06:27:34AM -0800, Jakub Kicinski wrote:
-> > On Wed, 11 Dec 2024 07:11:25 +0000 Hangbin Liu wrote:  
-> > > The first patch fixes the xfrm offload feature during setup active-backup
-> > > mode. The second patch add a ipsec offload testing.  
-> > 
-> > Looks like the test is too good, is there a fix pending somewhere for
-> > the BUG below? We can't merge the test before that:  
-> 
-> This should be a regression of 2aeeef906d5a ("bonding: change ipsec_lock from
-> spin lock to mutex"). As in xfrm_state_delete we called spin_lock_bh(&x->lock)
-> for the xfrm state delete.
-> 
-> But I'm not sure if it's proper to release the spin lock in bond code.
-> This seems too specific.
-> 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 7daeab67e7b5..69563bc958ca 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -592,6 +592,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
->  	real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
->  out:
->  	netdev_put(real_dev, &tracker);
-> +	spin_unlock_bh(&xs->lock);
->  	mutex_lock(&bond->ipsec_lock);
->  	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
->  		if (ipsec->xs == xs) {
-> @@ -601,6 +602,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
->  		}
->  	}
->  	mutex_unlock(&bond->ipsec_lock);
-> +	spin_lock_bh(&xs->lock);
->  }
->  
-> 
-> What do you think?
+Hello:
 
-Re-locking doesn't look great, glancing at the code I don't see any
-obvious better workarounds. Easiest fix would be to don't let the
-drivers sleep in the callbacks and then we can go back to a spin lock.
-Maybe nvidia people have better ideas, I'm not familiar with this
-offload.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 12 Dec 2024 22:22:47 +0000 you wrote:
+> syzbot reported the following crash [1]
+> 
+> Issue came with the blamed commit. Instead of going through
+> all the iov components, we keep using the first one
+> and end up with a malformed skb.
+> 
+> [1]
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: tun: fix tun_napi_alloc_frags()
+    https://git.kernel.org/netdev/net/c/429fde2d81bc
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
