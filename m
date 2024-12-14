@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-151950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBDEE9F1C99
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 05:51:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8485B9F1C9D
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 06:14:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B08D188D6F8
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 04:51:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB37718879B4
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 05:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEA95028C;
-	Sat, 14 Dec 2024 04:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1615854782;
+	Sat, 14 Dec 2024 05:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dp4m+iRx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLYntEaZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3B718622;
-	Sat, 14 Dec 2024 04:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB6926AC3
+	for <netdev@vger.kernel.org>; Sat, 14 Dec 2024 05:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734151876; cv=none; b=Wnd3aVz25f4hcf6SZGRv8h+DnrRS9gxQtcioHqUz1Xm3QFb+2q+x5CtLvow+CQ2QrTV5xs5IU1wbNfMZpcTchQ+5qqN9PqZbaCklA360PhcjGEsKll38v7y6VFENC4Bz336XjATFa5qALkDh8yfnaLhneUqc+7SGTWMB+B1AszM=
+	t=1734153248; cv=none; b=ZEpOsfXLSQY/bkJamOy0KY27/TfnQTRbLECxo+i4yMT5Q9Eibpe8M2d+PIkIQihJENnffmbV8o8LFvUOxrV4z+HHLFWbOYU0CJa4ro7K3eZy0o4MakqvWUxx87VIr1BHzdbhizTCqGI8y0pliE8Lumh8oKtCAxNhcbPoNrxj5TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734151876; c=relaxed/simple;
-	bh=Cbdl76/0CAlwb95ux1AtI9RUbOj2IELwzkslvMHs1cY=;
+	s=arc-20240116; t=1734153248; c=relaxed/simple;
+	bh=uhvKlY2B3aYGbFq88uUcTnaCwQ5g8MUH8ABiEOujb80=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TCNsdfawjark7wHCymkw0zGFEKYNvtuMLwvga3yklM7X0BqsRebIzAPM81AOQB0VzC98P7V3sZFBeJ+JVJyzYZrTOQuZVa9UcgJuDsxxkbl2F07OhQas2NsvdhDK6x5s5NINpW5taH29MtC+efqMp6mbwOt21O10VjCf/iWmHD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dp4m+iRx; arc=none smtp.client-ip=209.85.214.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=njfvt5APhE8ZHn8YNA3mDt9WEc0JBcfw8neOC30Ezh6kMgyTpTxxvYHTHnKeLOFP78USa8FOYjYixTyG3QuhE5u3FtZVSr8KckH+y0g/sOui59mFxZO/tA9gdrWa3xssu4qfPO8mrv1jlR7wzxqJI1LufmVwzP64NoIjuUx3GuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QLYntEaZ; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2167141dfa1so20852535ad.1;
-        Fri, 13 Dec 2024 20:51:15 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2166f1e589cso25998175ad.3
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 21:14:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734151875; x=1734756675; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1734153246; x=1734758046; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VsPxLy75RjSRhwiVrC80G6MBE9thvtOk6W3+q+v/8VY=;
-        b=Dp4m+iRxhokimR2A4HAwGfQNiyW9dJ5CGUMEHj/FKxUKNLyo/wMnmnUDsFoiEGPM9Z
-         WN4AZ0f7u5EDh8NQ1o5ffOjCedQDrvnULqXwrW48FHltRNsFw5adhxf6JArzkgbIA59g
-         3a2tRsi5uWH+XOSK7c4bG0HLNovUoEKI0x8hanOXyMkrzh7ouuA/FABMx+er/P3CJp8B
-         V6/gI/ebo1okmyNujDucdnNqB4lkREskSkOxDVRlzUuEr9PtvDO2dfHn2OZI4W8rHEvF
-         vxTnCdYvgUtvWCT2FNG5SOzsEZkRJuNQ04Zut3Ta+LpnSJI4oaaIEq1LJAGYz6/JHnFq
-         ScTw==
+        bh=3OL6S1ZSCA0kkPSvW2fTimWqff1iO82uQdBWgyGJjq4=;
+        b=QLYntEaZMNzBiUCGLYOyeE6rCRkwjZwano4tsTJfePefPi5gnULg6HF8tGkIbdM0cA
+         c2gTf/zYfBQl8FfoorEqQgegEtlS8KA5maSzRfUIs7OZ/sxtaIlCUWzBuEZIwh/0LaK6
+         HCF6lg0cMBTLdMUt6deCYCTYo1fyzg+GftBAtZCGaZXy0humQClOkd5BUYF1Jx6Ena+O
+         Zqr1VT0JUnHEdsoAcTH/wy5ZJ7zuAmB44EwilLovBUiZ5K+Suus64aPNzOmh5xqpIqab
+         /btc9uYm2d7pNG8qR79SpohSuB92rFk1fDXgFcAW9kKd8XXat8z5VgPkcKDzaFkoSeNX
+         JRdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734151875; x=1734756675;
+        d=1e100.net; s=20230601; t=1734153246; x=1734758046;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VsPxLy75RjSRhwiVrC80G6MBE9thvtOk6W3+q+v/8VY=;
-        b=IeSFcroaSXbTUMNU0FR8KqdWFn/W2PQINfkRatmyvB8zmlqmS18VYotSFSArtVu+4g
-         fSm2w48BCxbCqp4YxWyqCBDIOQm4qMXWW5F9yxQ3s1GjDWz4OLZnE7iqcG8sZFpelrfF
-         XNSJ0X5z+/iti7Je3QeIzI/GrJaUdnFNe2sEXhE9cZIZ0H7V7TuwCi2mdnHll+x0XAL3
-         iCKJWYTlTKyYFPZSvKf5yxbxZQEbgwL0D32eKrqyiF5wn97+JWfEi2etKgJ/bbKtZSbq
-         DALSLIMA3CD8XF2VJx9JvvJaUKHe5BgmYdWu29HQFVAVi7Qg/64iyDDRIzGd5+8Cbw2n
-         4HRg==
-X-Forwarded-Encrypted: i=1; AJvYcCWaC6pg64UVZIf63etTTLz4/EDhCfd/APQuxKxa/egrAi+wW5GC7fkYqtAf8rl2GlPAOtM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxjp44LG0iiSm1HGyeU+8RD+OPlcbMzqxjmNb28CFTrKkrqKblY
-	6AigvVVhAKHh/R8pilgj2gasxJa0N8z5xG3FH4myTb+B3vgc2b8e
-X-Gm-Gg: ASbGncufQ2uRkyG3k6zgh2CVkxOvNnnfrWPOWoOr9MSu03xUbYz5iIL637JIgVMb1Sr
-	MvQDuWhUZvfiewRXjnzfUoFs3VYecW91GJZPHbJFHxDfpVmaFoHLNgD4kgEW6TaJ0ZYDM95ztvL
-	aC7EboayG7u9rf5alPcPEtnWwdELDutQp7St3h1tjTi9JclXUBLNZkKGwFFzEfihCQW3P51KlTc
-	r/GxVnWgzX/h4oFYTRumKHWSX2TKInb3W+j48o889vx0lDIM0CxKZFrh4sYh6g=
-X-Google-Smtp-Source: AGHT+IEJp9RdfXzuHqG9bMzpEvPNju21ExCDajs6Jqep/zQAJj9+QsgS7dtTx62/cUcXApgIV309MQ==
-X-Received: by 2002:a17:902:d507:b0:215:7287:67bb with SMTP id d9443c01a7336-218939daad8mr80017695ad.0.1734151874663;
-        Fri, 13 Dec 2024 20:51:14 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:ede9:5cb0:814a:63a6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1dcb35esm5637215ad.62.2024.12.13.20.51.13
+        bh=3OL6S1ZSCA0kkPSvW2fTimWqff1iO82uQdBWgyGJjq4=;
+        b=AemeAuifWT96AiyX/dGpR2fnbda+MnunxEpHn7Lk+NoimVnQ59yVlSqaz1DRUYmsA8
+         ekNaeVpaIBG5lYiWRXtIW86hAaTD3bJe309w1EBYocbHnRIQfaIADumxxNCgnlfh+lde
+         8kAt95VBHLU24APHz0ee5MVZJtkYkB7Q3OaXEadMFc1a5X7GHdLyoKMUywUmd7XdwTQu
+         Pi6ETc85gK6D5LgwPg3qO7yee9WwlU95c2cZjhi5hGH9XqjVGz0QbNEYIaFdn97VCxg1
+         Thp2hY+b1bWvAAfOl+k6MkqwGlEv3A621v82bUCgFvMQur91FOP/ozNRg30h4RlIiiqi
+         m6mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVygfAJnz4rKlvImK5TE0k9QLqeylULxubDvGSOZdJZa09MIu4GLc8uygAscQH+jUHGvk2U31w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynMHBXGzuYNUo+9GNWiEygMBPKBgUfqiGQWvA3MuJFRLxJbVok
+	6Ba5KoyEHugwnjO2Mj4r3p66VYEhERmEaCrn6Cn9qyY0xFzoT0HB
+X-Gm-Gg: ASbGnctsAbHWK91+hVS6hRfvovwvlgG5G+Uz1XqNmS2H1XyOOZvmLzr3x5bHcK9GQBN
+	g2SvtDEhBstbRJHzU4CniAw4YMdJwItvTBbhuK0OXfVlKX7Zcv0aj1/xi5NgRqkxmIplWaE/Kzw
+	NQtvsH8CdSqJ8Ek3+UP701kZSaTQJsULlGcXSkLgWK4SREez1gwRY2Zk7AxPsa1EXQbHSKcrqEK
+	rEVSVcDWzjGQBYpVsvh4fWwJh6CeloVzo7CPbUIHQDOLmvPHBUEEvDbPQ6yFNAc9+fw/bCEvwn/
+X-Google-Smtp-Source: AGHT+IHreO8hREPHaesKW8h+P2SNEpKQGEQ35pHBXJrQzE19P8g4egaZJ/UFa4T91/hoojgK4AAh5Q==
+X-Received: by 2002:a17:902:dacd:b0:216:7ee9:21ff with SMTP id d9443c01a7336-21892aea39cmr76148835ad.49.1734153245822;
+        Fri, 13 Dec 2024 21:14:05 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e6c110sm5801285ad.257.2024.12.13.21.14.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 20:51:14 -0800 (PST)
-Date: Fri, 13 Dec 2024 20:51:13 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Amery Hung <amery.hung@bytedance.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, alexei.starovoitov@gmail.com,
-	martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com,
-	jhs@mojatatu.com, jiri@resnulli.us, stfomichev@gmail.com,
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn,
-	yepeilin.cs@gmail.com, ameryhung@gmail.com
-Subject: Re: [PATCH bpf-next v1 05/13] bpf: net_sched: Support implementation
- of Qdisc_ops in bpf
-Message-ID: <Z10OwXiU/RTx3Qbe@pop-os.localdomain>
-References: <20241213232958.2388301-1-amery.hung@bytedance.com>
- <20241213232958.2388301-6-amery.hung@bytedance.com>
+        Fri, 13 Dec 2024 21:14:05 -0800 (PST)
+Date: Fri, 13 Dec 2024 21:14:02 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: mvpp2: tai: warn once if we fail to
+ update our timestamp
+Message-ID: <Z10UGg_osMZ6TZrc@hoboy.vegasvil.org>
+References: <E1tM8cA-006t1i-KF@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,133 +92,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241213232958.2388301-6-amery.hung@bytedance.com>
+In-Reply-To: <E1tM8cA-006t1i-KF@rmk-PC.armlinux.org.uk>
 
-On Fri, Dec 13, 2024 at 11:29:50PM +0000, Amery Hung wrote:
-> diff --git a/include/linux/btf.h b/include/linux/btf.h
-> index 4214e76c9168..eb16218fdf52 100644
-> --- a/include/linux/btf.h
-> +++ b/include/linux/btf.h
-> @@ -563,6 +563,7 @@ const char *btf_name_by_offset(const struct btf *btf, u32 offset);
->  const char *btf_str_by_offset(const struct btf *btf, u32 offset);
->  struct btf *btf_parse_vmlinux(void);
->  struct btf *bpf_prog_get_target_btf(const struct bpf_prog *prog);
-> +u32 get_ctx_arg_idx(struct btf *btf, const struct btf_type *func_proto, int off);
->  u32 *btf_kfunc_id_set_contains(const struct btf *btf, u32 kfunc_btf_id,
->  			       const struct bpf_prog *prog);
->  u32 *btf_kfunc_is_modify_return(const struct btf *btf, u32 kfunc_btf_id,
-> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> index a05ccf9ee032..f733dbf24261 100644
-> --- a/kernel/bpf/btf.c
-> +++ b/kernel/bpf/btf.c
-> @@ -6375,8 +6375,8 @@ static bool is_int_ptr(struct btf *btf, const struct btf_type *t)
->  	return btf_type_is_int(t);
->  }
->  
-> -static u32 get_ctx_arg_idx(struct btf *btf, const struct btf_type *func_proto,
-> -			   int off)
-> +u32 get_ctx_arg_idx(struct btf *btf, const struct btf_type *func_proto,
-> +		    int off)
->  {
->  	const struct btf_param *args;
->  	const struct btf_type *t;
+On Fri, Dec 13, 2024 at 04:34:06PM +0000, Russell King wrote:
+> The hardware timestamps for packets contain a truncated seconds field,
+> only containing two bits of seconds. In order to provide the full
+> number of seconds, we need to keep track of the full hardware clock by
+> reading it every two seconds.
+> 
+> However, if we fail to read the clock, we silently ignore the error.
+> Print a warning indicating that the PP2 TAI clock timestamps have
+> become unreliable.
 
-Maybe separate this piece out as a separate patch?
+Rather than printing a warning that user space might not read, why not
+set a flag and stop delivering time stamps until the upper bits are
+available once again?
 
-
-> diff --git a/net/sched/Kconfig b/net/sched/Kconfig
-> index 8180d0c12fce..ccd0255da5a5 100644
-> --- a/net/sched/Kconfig
-> +++ b/net/sched/Kconfig
-> @@ -403,6 +403,18 @@ config NET_SCH_ETS
->  
->  	  If unsure, say N.
->  
-> +config NET_SCH_BPF
-> +	bool "BPF-based Qdisc"
-> +	depends on BPF_SYSCALL && BPF_JIT && DEBUG_INFO_BTF
-
-I think new features should be default to n, unless you have reasons not
-to do so.
-
-> +	help
-> +	  This option allows BPF-based queueing disiplines. With BPF struct_ops,
-> +	  users can implement supported operators in Qdisc_ops using BPF programs.
-> +	  The queue holding skb can be built with BPF maps or graphs.
-> +
-> +	  Say Y here if you want to use BPF-based Qdisc.
-> +
-> +	  If unsure, say N.
-> +
->  menuconfig NET_SCH_DEFAULT
->  	bool "Allow override default queue discipline"
->  	help
-
-[...]
-
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index 2eefa4783879..f074053c4232 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -25,6 +25,7 @@
->  #include <linux/hrtimer.h>
->  #include <linux/slab.h>
->  #include <linux/hashtable.h>
-> +#include <linux/bpf.h>
->  
->  #include <net/net_namespace.h>
->  #include <net/sock.h>
-> @@ -358,7 +359,7 @@ static struct Qdisc_ops *qdisc_lookup_ops(struct nlattr *kind)
->  		read_lock(&qdisc_mod_lock);
->  		for (q = qdisc_base; q; q = q->next) {
->  			if (nla_strcmp(kind, q->id) == 0) {
-> -				if (!try_module_get(q->owner))
-> +				if (!bpf_try_module_get(q, q->owner))
->  					q = NULL;
->  				break;
->  			}
-> @@ -1287,7 +1288,7 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
->  				/* We will try again qdisc_lookup_ops,
->  				 * so don't keep a reference.
->  				 */
-> -				module_put(ops->owner);
-> +				bpf_module_put(ops, ops->owner);
->  				err = -EAGAIN;
->  				goto err_out;
->  			}
-> @@ -1398,7 +1399,7 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
->  	netdev_put(dev, &sch->dev_tracker);
->  	qdisc_free(sch);
->  err_out2:
-> -	module_put(ops->owner);
-> +	bpf_module_put(ops, ops->owner);
->  err_out:
->  	*errp = err;
->  	return NULL;
-> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-> index 38ec18f73de4..1e770ec251a0 100644
-> --- a/net/sched/sch_generic.c
-> +++ b/net/sched/sch_generic.c
-> @@ -24,6 +24,7 @@
->  #include <linux/if_vlan.h>
->  #include <linux/skb_array.h>
->  #include <linux/if_macvlan.h>
-> +#include <linux/bpf.h>
->  #include <net/sch_generic.h>
->  #include <net/pkt_sched.h>
->  #include <net/dst.h>
-> @@ -1083,7 +1084,7 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
->  		ops->destroy(qdisc);
->  
->  	lockdep_unregister_key(&qdisc->root_lock_key);
-> -	module_put(ops->owner);
-> +	bpf_module_put(ops, ops->owner);
->  	netdev_put(dev, &qdisc->dev_tracker);
->  
->  	trace_qdisc_destroy(qdisc);
-
-Maybe this piece should be separated out too? Ideally this patch should
-only have bpf_qdisc.c and its Makefile and Kconfig changes.
-
-Regards.
+Thanks,
+Richard
 
