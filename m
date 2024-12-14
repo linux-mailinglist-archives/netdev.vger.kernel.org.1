@@ -1,306 +1,145 @@
-Return-Path: <netdev+bounces-151959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C87789F1FED
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 17:51:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A39E9F201D
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 18:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27A551887D0F
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 16:51:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C90FE1881F09
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 17:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5692C194ACA;
-	Sat, 14 Dec 2024 16:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKPFwpfl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629C3194AF3;
+	Sat, 14 Dec 2024 17:32:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B5326AFF
-	for <netdev@vger.kernel.org>; Sat, 14 Dec 2024 16:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F10D18FC8F
+	for <netdev@vger.kernel.org>; Sat, 14 Dec 2024 17:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734195072; cv=none; b=FOGRGb3VIbck6JAKgiHRgXd5/mv5KXg2PvrsvqRpiQcuFtdhHhTYba74R47fCmgbhwbe2fX+sgSyXcOoZ7+r915KiXBzfFugtiRL8qklZFilJdHcfcJVYrpcVntVYoJs//o72BNcOSTzRte+687fS712KwDmJ7Tv+mgge/tkXfI=
+	t=1734197520; cv=none; b=NGFVGqaqc4WVtncYSh3LdpOd41dm+2i/c+HQWksxvU2y2B6H+QL6VLL0HCh6WNxxrlZed0k1g1ZRpGQ0FDt70A8AO3LM96LqVB8IKrAnX6xsPfHERO6q5specgRMrh2YRXYU8/Md9zN02YPx19w3JBbvTNDvfrz3Qn4oVRq0EPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734195072; c=relaxed/simple;
-	bh=GqwNr5Qx/BusN03aNgrXdPEF+nq2bWmqf4Aoq602EIw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=EEh2CoCbrU/AQOlmEQ0R6iczXjgJ7PRuwdliPmCZSj6a4fAjPmFzfg1KbzXRBhLhrrqGrrBjAXmcbjxyoLvJYY3TnGVb0ixNKxM1wJNe773zla8ABaPy4gL25v70nwDJRz1qlFfQjcKvCi1nps4CKTCRfj8szMrwtcRQXpqlLA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NKPFwpfl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734195068;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RVlWdKCOQ6DeLuyGiOQjvrzYUdtBv49oGjdWIYwMtNo=;
-	b=NKPFwpflmmUWJezEadXqsUhRKOhTZEA8uTZDwzNI74Y1ZESYj22W1CdSAdIahAQOS98ZGd
-	DF23WYzKc/FguEkjUltEdcvhdRaQwAuPwgmUenjbsuzcjZmx9wxQbrkUwymyC1XOuRhvfG
-	Tpn8/wWJjZYeDG9JeCSx1NCLdbg9rLY=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-76-IIuvXM78P8CImEdj0I6Hiw-1; Sat, 14 Dec 2024 11:51:07 -0500
-X-MC-Unique: IIuvXM78P8CImEdj0I6Hiw-1
-X-Mimecast-MFC-AGG-ID: IIuvXM78P8CImEdj0I6Hiw
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-53e3a872209so1001839e87.2
-        for <netdev@vger.kernel.org>; Sat, 14 Dec 2024 08:51:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734195066; x=1734799866;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RVlWdKCOQ6DeLuyGiOQjvrzYUdtBv49oGjdWIYwMtNo=;
-        b=P4f3UGAqVopiZIvm7arDIt45QhLq27ltVD9C+wayxoMC/4CRgT6emxTwI/s0B+bumr
-         UC+R71rFWj7tZZEx4Kt6VCARSW/6uAFpK5wq1oC7T7G9IyEMJpiB95hqV+QAJiOCSeiX
-         x0ogjwNzl6bU/1ryxXGliJ/IeeI5RPh/iWyo8MlM2SDh80tfagbte+5gB48UV96cEe4p
-         G+wGI3TC2YS3RFUrsh40SZ/7Hhk+BzExWhJd3X3/0qHN5Ppl49FFxOoA/zyaGjkS7Wjx
-         hiAnw9/OLUZOa5q0TjvHNgLCELFJ6gAl0LBuOnEFYrLOmXz/AY9Gu4TePdCMp8xMDb/+
-         v8Gw==
-X-Gm-Message-State: AOJu0YybuP4eCtrpkfuCTdkXP4smrlisPglz5wNiUW3JmvIza0oTAeKA
-	x1A5riPTPlvp4p3LdxHvJmLdpwtDwSY3saPS8YS3l9ln5H44Imj8P3H6GPfmY2Tz3Z/j4RfHOwI
-	M/7/FnLRml4XAY7Vkb0yNrMvwXGFoPxA5RnkN0dvsObbgdhvWI3iOyw==
-X-Gm-Gg: ASbGncuKOyrmiy/R2EJpnZ9gWqvWgmVRl/xesduYmQeJ/YEKnApblWMUibflopmJFdL
-	OtyqhlUvdezFJGlcatQv4zETCIADRut9xVls9NbO2ub1wdO4/Szkv9n15ULzHxWwiUEwtbptgoN
-	iC22CWakrhzlqexaxMZCRHW5cpNiHKZATO/gJLJhC1KhFGJQQC2KIwiUHYEJd+vmbzhj8uSViF/
-	QqDQNmG2OdSZ6TIBAQ3U2zAEPTQOQYxefker0MiGkc2cfWFUs3twseXs1torAsHQGx2XCUiA4lz
-	h9YeVQ==
-X-Received: by 2002:a05:6512:3b23:b0:53e:389d:8ce4 with SMTP id 2adb3069b0e04-54090563fc7mr2172362e87.34.1734195065829;
-        Sat, 14 Dec 2024 08:51:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGstJdmlcN6C5hWslWNy31W+hyyNBA7o56+oy2e7zTdVXbUOLiWOCVYUGTocGrCSxR/N/48tg==
-X-Received: by 2002:a05:6512:3b23:b0:53e:389d:8ce4 with SMTP id 2adb3069b0e04-54090563fc7mr2172352e87.34.1734195065407;
-        Sat, 14 Dec 2024 08:51:05 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54120b9f269sm266297e87.42.2024.12.14.08.51.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Dec 2024 08:51:04 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 57BF216F9775; Sat, 14 Dec 2024 17:51:03 +0100 (CET)
-From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Date: Sat, 14 Dec 2024 17:50:59 +0100
-Subject: [PATCH net-next] net/sched: Add drop reasons for AQM-based qdiscs
+	s=arc-20240116; t=1734197520; c=relaxed/simple;
+	bh=GdcIoMV9rDgh/h7XI/XexxU3pMPlgPu8UDf7JNbHBG0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Bfv4QHR4b6/sj0mS60OeL+5DMNEqyNDYz/3sZ/9Y83dajDzhbwXk0QntCpm8OFe81YRsUNVc6798MiroPsT44QGWif/ZacDWrdCSgXMRQLuf3XfNMcJ+i1hl7JgD6Wx/8u39nWrOnvv9FkiGdrZuhTbCFReAlFT5L28XmTf/01E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-312-61ot2vfuOIOCZzeUwr6qww-1; Sat, 14 Dec 2024 17:31:50 +0000
+X-MC-Unique: 61ot2vfuOIOCZzeUwr6qww-1
+X-Mimecast-MFC-AGG-ID: 61ot2vfuOIOCZzeUwr6qww
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 14 Dec
+ 2024 17:30:53 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Sat, 14 Dec 2024 17:30:53 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: "'netdev@vger.kernel.org'" <netdev@vger.kernel.org>, 'Naresh Kamboju'
+	<naresh.kamboju@linaro.org>, 'Dan Carpenter' <dan.carpenter@linaro.org>,
+	'Julian Anastasov' <ja@ssi.bg>, "'pablo@netfilter.org'"
+	<pablo@netfilter.org>, Andrew Morton <akpm@linux-foundation.org>
+CC: 'open list' <linux-kernel@vger.kernel.org>,
+	"'lkft-triage@lists.linaro.org'" <lkft-triage@lists.linaro.org>, "'Linux
+ Regressions'" <regressions@lists.linux.dev>, 'Linux ARM'
+	<linux-arm-kernel@lists.infradead.org>, "'netfilter-devel@vger.kernel.org'"
+	<netfilter-devel@vger.kernel.org>, 'Arnd Bergmann' <arnd@arndb.de>, "'Anders
+ Roxell'" <anders.roxell@linaro.org>, 'Johannes Berg'
+	<johannes.berg@intel.com>, "'toke@kernel.org'" <toke@kernel.org>, 'Al Viro'
+	<viro@zeniv.linux.org.uk>, "'kernel@jfarr.cc'" <kernel@jfarr.cc>,
+	"'kees@kernel.org'" <kees@kernel.org>
+Subject: [PATCH net-next] Fix clamp() of ip_vs_conn_tab on small memory
+ systems.
+Thread-Topic: [PATCH net-next] Fix clamp() of ip_vs_conn_tab on small memory
+ systems.
+Thread-Index: AdtOTfU+VQ/Jz9m3Sa6gMqrna34atA==
+Date: Sat, 14 Dec 2024 17:30:53 +0000
+Message-ID: <24a6bfd0811b4931b6ef40098b33c9ee@AcuMS.aculab.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20241214-fq-codel-drop-reasons-v1-1-2a814e884c37@redhat.com>
-X-B4-Tracking: v=1; b=H4sIAHK3XWcC/x3MMQrDMAxG4asEzRXUiofSq5QOJv6dCoqcyqEEQ
- u4ek/Eb3tupwRWNnsNOjr82rdYRbgNNn2QzWHM3yV1ikDBy+fFUM76cvS7sSK1aY5RRSop4IAr
- 1dnEU3a7viwwrG7aV3sdxAubfEsBxAAAA
-X-Change-ID: 20241213-fq-codel-drop-reasons-ef32fa4e8e42
-To: Jamal Hadi Salim <jhs@mojatatu.com>, 
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-X-Mailer: b4 0.14.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: -d_piBN_gVH0cObc8QiRXmfKuJX7zCQDOZqFIzcatXM_1734197509
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Now that we have generic QDISC_CONGESTED and QDISC_OVERLIMIT drop
-reasons, let's have all the qdiscs that contain an AQM apply them
-consistently when dropping packets.
+The 'max_avail' value is calculated from the system memory
+size using order_base_2().
+order_base_2(x) is defined as '(x) ? fn(x) : 0'.
+The compiler generates two copies of the code that follows
+and then expands clamp(max, min, PAGE_SHIFT - 12) (11 on 32bit).
+This triggers a compile-time assert since min is 5.
 
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+In reality a system would have to have less than 512MB memory
+for the bounds passed to clamp to be reversed.
+
+Swap the order of the arguments to clamp() to avoid the warning.
+
+Replace the clamp_val() on the line below with clamp().
+clamp_val() is just 'an accident waiting to happen' and not needed here.
+
+Detected by compile time checks added to clamp(), specifically:
+minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi test in clamp()
+
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Closes: https://lore.kernel.org/all/CA+G9fYsT34UkGFKxus63H6UVpYi5GRZkezT9MR=
+LfAbM3f6ke0g@mail.gmail.com/
+Fixes: 4f325e26277b ("ipvs: dynamically limit the connection hash table")
+Tested-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Signed-off-by: David Laight <david.laight@aculab.com>
 ---
- net/sched/sch_codel.c    | 5 +++--
- net/sched/sch_fq_codel.c | 3 ++-
- net/sched/sch_fq_pie.c   | 6 ++++--
- net/sched/sch_gred.c     | 4 ++--
- net/sched/sch_pie.c      | 5 ++++-
- net/sched/sch_red.c      | 4 +++-
- net/sched/sch_sfb.c      | 4 +++-
- 7 files changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/net/sched/sch_codel.c b/net/sched/sch_codel.c
-index 3e8d4fe4d91e3ef2b7715640f6675aa5e8e2a326..81189d02fee761ad21142a205c347f33ef9a3edf 100644
---- a/net/sched/sch_codel.c
-+++ b/net/sched/sch_codel.c
-@@ -52,7 +52,7 @@ static void drop_func(struct sk_buff *skb, void *ctx)
- {
- 	struct Qdisc *sch = ctx;
- 
--	kfree_skb(skb);
-+	kfree_skb_reason(skb, SKB_DROP_REASON_QDISC_CONGESTED);
- 	qdisc_qstats_drop(sch);
- }
- 
-@@ -89,7 +89,8 @@ static int codel_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	}
- 	q = qdisc_priv(sch);
- 	q->drop_overlimit++;
--	return qdisc_drop(skb, sch, to_free);
-+	return qdisc_drop_reason(skb, sch, to_free,
-+				 SKB_DROP_REASON_QDISC_OVERLIMIT);
- }
- 
- static const struct nla_policy codel_policy[TCA_CODEL_MAX + 1] = {
-diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
-index 4f908c11ba9528f8f9f3af6752ff10005d6f6511..799f5397ad4c17ba69ad64ea7abb058f6da3da9b 100644
---- a/net/sched/sch_fq_codel.c
-+++ b/net/sched/sch_fq_codel.c
-@@ -168,6 +168,7 @@ static unsigned int fq_codel_drop(struct Qdisc *sch, unsigned int max_packets,
- 		skb = dequeue_head(flow);
- 		len += qdisc_pkt_len(skb);
- 		mem += get_codel_cb(skb)->mem_usage;
-+		tcf_set_drop_reason(skb, SKB_DROP_REASON_QDISC_OVERLIMIT);
- 		__qdisc_drop(skb, to_free);
- 	} while (++i < max_packets && len < threshold);
- 
-@@ -274,7 +275,7 @@ static void drop_func(struct sk_buff *skb, void *ctx)
- {
- 	struct Qdisc *sch = ctx;
- 
--	kfree_skb(skb);
-+	kfree_skb_reason(skb, SKB_DROP_REASON_QDISC_CONGESTED);
- 	qdisc_qstats_drop(sch);
- }
- 
-diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
-index c38f33ff80bde74cfe33de7558f66e5962ffe56b..93c36afbf576246fc696dc2787121d54e4850331 100644
---- a/net/sched/sch_fq_pie.c
-+++ b/net/sched/sch_fq_pie.c
-@@ -130,6 +130,7 @@ static inline void flow_queue_add(struct fq_pie_flow *flow,
- static int fq_pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 				struct sk_buff **to_free)
- {
-+	enum skb_drop_reason reason = SKB_DROP_REASON_QDISC_OVERLIMIT;
- 	struct fq_pie_sched_data *q = qdisc_priv(sch);
- 	struct fq_pie_flow *sel_flow;
- 	int ret;
-@@ -161,6 +162,8 @@ static int fq_pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		q->overmemory++;
- 	}
- 
-+	reason = SKB_DROP_REASON_QDISC_CONGESTED;
-+
- 	if (!pie_drop_early(sch, &q->p_params, &sel_flow->vars,
- 			    sel_flow->backlog, skb->len)) {
- 		enqueue = true;
-@@ -198,8 +201,7 @@ static int fq_pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- out:
- 	q->stats.dropped++;
- 	sel_flow->vars.accu_prob = 0;
--	__qdisc_drop(skb, to_free);
--	qdisc_qstats_drop(sch);
-+	qdisc_drop_reason(skb, sch, to_free, reason);
- 	return NET_XMIT_CN;
- }
- 
-diff --git a/net/sched/sch_gred.c b/net/sched/sch_gred.c
-index 7d2151c62c4a1452ec4914f0d25a2648f886af49..ab6234b4fcd541956ce0bdb0773de448df4c9e51 100644
---- a/net/sched/sch_gred.c
-+++ b/net/sched/sch_gred.c
-@@ -251,10 +251,10 @@ static int gred_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 
- 	q->stats.pdrop++;
- drop:
--	return qdisc_drop(skb, sch, to_free);
-+	return qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
- 
- congestion_drop:
--	qdisc_drop(skb, sch, to_free);
-+	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_CONGESTED);
- 	return NET_XMIT_CN;
- }
- 
-diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
-index b3dcb845b32759357f4db1980a7cb4db531bfad5..bb1fa9aa530b2737d901a7a76c481398cb1b75a2 100644
---- a/net/sched/sch_pie.c
-+++ b/net/sched/sch_pie.c
-@@ -85,6 +85,7 @@ EXPORT_SYMBOL_GPL(pie_drop_early);
- static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			     struct sk_buff **to_free)
- {
-+	enum skb_drop_reason reason = SKB_DROP_REASON_QDISC_OVERLIMIT;
- 	struct pie_sched_data *q = qdisc_priv(sch);
- 	bool enqueue = false;
- 
-@@ -93,6 +94,8 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		goto out;
- 	}
- 
-+	reason = SKB_DROP_REASON_QDISC_CONGESTED;
-+
- 	if (!pie_drop_early(sch, &q->params, &q->vars, sch->qstats.backlog,
- 			    skb->len)) {
- 		enqueue = true;
-@@ -121,7 +124,7 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- out:
- 	q->stats.dropped++;
- 	q->vars.accu_prob = 0;
--	return qdisc_drop(skb, sch, to_free);
-+	return qdisc_drop_reason(skb, sch, to_free, reason);
- }
- 
- static const struct nla_policy pie_policy[TCA_PIE_MAX + 1] = {
-diff --git a/net/sched/sch_red.c b/net/sched/sch_red.c
-index 6029bc29b51e5d5adfa12c68225691b68648b2dc..ef8a2afed26bd6e8205592389907bf4986e1aea6 100644
---- a/net/sched/sch_red.c
-+++ b/net/sched/sch_red.c
-@@ -70,6 +70,7 @@ static int red_use_nodrop(struct red_sched_data *q)
- static int red_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		       struct sk_buff **to_free)
- {
-+	enum skb_drop_reason reason = SKB_DROP_REASON_QDISC_CONGESTED;
- 	struct red_sched_data *q = qdisc_priv(sch);
- 	struct Qdisc *child = q->qdisc;
- 	unsigned int len;
-@@ -107,6 +108,7 @@ static int red_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		break;
- 
- 	case RED_HARD_MARK:
-+		reason = SKB_DROP_REASON_QDISC_OVERLIMIT;
- 		qdisc_qstats_overlimit(sch);
- 		if (red_use_harddrop(q) || !red_use_ecn(q)) {
- 			q->stats.forced_drop++;
-@@ -143,7 +145,7 @@ static int red_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	if (!skb)
- 		return NET_XMIT_CN | ret;
- 
--	qdisc_drop(skb, sch, to_free);
-+	qdisc_drop_reason(skb, sch, to_free, reason);
- 	return NET_XMIT_CN;
- }
- 
-diff --git a/net/sched/sch_sfb.c b/net/sched/sch_sfb.c
-index b717e15a3a17bc2e166308a74dbfc4a75c0bb2a2..d2835f1168e1dcef44044df8c4505bfc03a5d0cb 100644
---- a/net/sched/sch_sfb.c
-+++ b/net/sched/sch_sfb.c
-@@ -280,6 +280,7 @@ static int sfb_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		       struct sk_buff **to_free)
- {
- 
-+	enum skb_drop_reason reason = SKB_DROP_REASON_QDISC_OVERLIMIT;
- 	struct sfb_sched_data *q = qdisc_priv(sch);
- 	unsigned int len = qdisc_pkt_len(skb);
- 	struct Qdisc *child = q->qdisc;
-@@ -380,6 +381,7 @@ static int sfb_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	}
- 
- 	r = get_random_u16() & SFB_MAX_PROB;
-+	reason = SKB_DROP_REASON_QDISC_CONGESTED;
- 
- 	if (unlikely(r < p_min)) {
- 		if (unlikely(p_min > SFB_MAX_PROB / 2)) {
-@@ -414,7 +416,7 @@ static int sfb_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	return ret;
- 
- drop:
--	qdisc_drop(skb, sch, to_free);
-+	qdisc_drop_reason(skb, sch, to_free, reason);
- 	return NET_XMIT_CN;
- other_drop:
- 	if (ret & __NET_XMIT_BYPASS)
+Julian seems to be waiting for a 'v2' from me.
+Changed target tree to 'net-next'.
+I've re-written the commit message.
+Copied Andrew Morton - he might want to take the change through the 'mm' tr=
+ee.
+Plausibly the 'fixes' tag should refer to the minmax.h change?
+This will need back-porting if the minmax set get back-ported.
 
----
-base-commit: 9bc5c9515b4817e994579b21c32c033cbb3b0e6c
-change-id: 20241213-fq-codel-drop-reasons-ef32fa4e8e42
+I'm not sure whether there ought to be an attribution to Dan Carpenter <dan=
+.carpenter@linaro.org>
+
+ net/netfilter/ipvs/ip_vs_conn.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_con=
+n.c
+index 98d7dbe3d787..c0289f83f96d 100644
+--- a/net/netfilter/ipvs/ip_vs_conn.c
++++ b/net/netfilter/ipvs/ip_vs_conn.c
+@@ -1495,8 +1495,8 @@ int __init ip_vs_conn_init(void)
+ =09max_avail -=3D 2;=09=09/* ~4 in hash row */
+ =09max_avail -=3D 1;=09=09/* IPVS up to 1/2 of mem */
+ =09max_avail -=3D order_base_2(sizeof(struct ip_vs_conn));
+-=09max =3D clamp(max, min, max_avail);
+-=09ip_vs_conn_tab_bits =3D clamp_val(ip_vs_conn_tab_bits, min, max);
++=09max =3D clamp(max_avail, min, max);
++=09ip_vs_conn_tab_bits =3D clamp(ip_vs_conn_tab_bits, min, max);
+ =09ip_vs_conn_tab_size =3D 1 << ip_vs_conn_tab_bits;
+ =09ip_vs_conn_tab_mask =3D ip_vs_conn_tab_size - 1;
+=20
+--=20
+2.17.1
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
