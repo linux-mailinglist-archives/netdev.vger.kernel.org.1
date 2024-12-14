@@ -1,113 +1,115 @@
-Return-Path: <netdev+bounces-151951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8485B9F1C9D
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 06:14:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1C899F1CFF
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 07:18:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB37718879B4
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 05:14:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBDA7188E02A
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 06:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1615854782;
-	Sat, 14 Dec 2024 05:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E6580BEC;
+	Sat, 14 Dec 2024 06:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLYntEaZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mvO9T7e7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB6926AC3
-	for <netdev@vger.kernel.org>; Sat, 14 Dec 2024 05:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F3A19BA6;
+	Sat, 14 Dec 2024 06:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734153248; cv=none; b=ZEpOsfXLSQY/bkJamOy0KY27/TfnQTRbLECxo+i4yMT5Q9Eibpe8M2d+PIkIQihJENnffmbV8o8LFvUOxrV4z+HHLFWbOYU0CJa4ro7K3eZy0o4MakqvWUxx87VIr1BHzdbhizTCqGI8y0pliE8Lumh8oKtCAxNhcbPoNrxj5TE=
+	t=1734157085; cv=none; b=L3655UUxhMUW03V8l32QQMrzOtRNRdx4BmfYYaXA0jrh3SwRS5Cu2uVeVrwp917lnzuI4dNv4Evylqi7oylLvJfEvabDbindXJM20v1D8wagnfliYSaKA0zl4r8Np1st1M1C1OgUOME1Ygsd3kOjZ2sFcKL7DuNbg5XAY8fRRB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734153248; c=relaxed/simple;
-	bh=uhvKlY2B3aYGbFq88uUcTnaCwQ5g8MUH8ABiEOujb80=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=njfvt5APhE8ZHn8YNA3mDt9WEc0JBcfw8neOC30Ezh6kMgyTpTxxvYHTHnKeLOFP78USa8FOYjYixTyG3QuhE5u3FtZVSr8KckH+y0g/sOui59mFxZO/tA9gdrWa3xssu4qfPO8mrv1jlR7wzxqJI1LufmVwzP64NoIjuUx3GuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QLYntEaZ; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1734157085; c=relaxed/simple;
+	bh=fHcDC9/3fjxqA23UY0rgQz3K5BSqWz9mQZQLiNiCkOI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mzyXvOqeetaXLLzI7sYpF+dDEbgNkIcurbxWXHqHSGbbMQelZUJH4CvbfPFFRyKSSSyKyFOM/qX2i/9wtmq6uRRn+IF+3ge5aTfCofgHuBD7apmLrA9xpbj2e6Z/qGt8alHqLHccw7ZZ3aDV6M1qDSuJiNMYGVaJoZDz+ez2xqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mvO9T7e7; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2166f1e589cso25998175ad.3
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 21:14:06 -0800 (PST)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-728eedfca37so2642105b3a.2;
+        Fri, 13 Dec 2024 22:18:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734153246; x=1734758046; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3OL6S1ZSCA0kkPSvW2fTimWqff1iO82uQdBWgyGJjq4=;
-        b=QLYntEaZMNzBiUCGLYOyeE6rCRkwjZwano4tsTJfePefPi5gnULg6HF8tGkIbdM0cA
-         c2gTf/zYfBQl8FfoorEqQgegEtlS8KA5maSzRfUIs7OZ/sxtaIlCUWzBuEZIwh/0LaK6
-         HCF6lg0cMBTLdMUt6deCYCTYo1fyzg+GftBAtZCGaZXy0humQClOkd5BUYF1Jx6Ena+O
-         Zqr1VT0JUnHEdsoAcTH/wy5ZJ7zuAmB44EwilLovBUiZ5K+Suus64aPNzOmh5xqpIqab
-         /btc9uYm2d7pNG8qR79SpohSuB92rFk1fDXgFcAW9kKd8XXat8z5VgPkcKDzaFkoSeNX
-         JRdQ==
+        d=gmail.com; s=20230601; t=1734157083; x=1734761883; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fHcDC9/3fjxqA23UY0rgQz3K5BSqWz9mQZQLiNiCkOI=;
+        b=mvO9T7e7xp7YEDWKl8o+JDvmsOBMs2sifaSfY8+pyy2u8O+TFX7psnHfmDHaggErXg
+         Z972CUa3oWq8QHDrFwBZe8Jpz+iiyT1Ioz6kf042dBUnDV0RSnvKZtaucn+8s9H37FBb
+         RL0YioNko4lXKfz2g21lQFFP20dc4GH8fYfO4mkoQn5zEoOcCYuE7VgQXVadI2U3yclf
+         IO+xK43SOChPIZipMbPai9prd6vUxhLmLgV9Yj5VuRfWWRslQ4tsvru2AXzlPG4yda9G
+         kNw5lIDz2lm3ot4VliwyFiJrptt4Do2OPerx9pmQXnPQTWlD4cMREWAEO6gvvi7Oi8WZ
+         +VLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734153246; x=1734758046;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3OL6S1ZSCA0kkPSvW2fTimWqff1iO82uQdBWgyGJjq4=;
-        b=AemeAuifWT96AiyX/dGpR2fnbda+MnunxEpHn7Lk+NoimVnQ59yVlSqaz1DRUYmsA8
-         ekNaeVpaIBG5lYiWRXtIW86hAaTD3bJe309w1EBYocbHnRIQfaIADumxxNCgnlfh+lde
-         8kAt95VBHLU24APHz0ee5MVZJtkYkB7Q3OaXEadMFc1a5X7GHdLyoKMUywUmd7XdwTQu
-         Pi6ETc85gK6D5LgwPg3qO7yee9WwlU95c2cZjhi5hGH9XqjVGz0QbNEYIaFdn97VCxg1
-         Thp2hY+b1bWvAAfOl+k6MkqwGlEv3A621v82bUCgFvMQur91FOP/ozNRg30h4RlIiiqi
-         m6mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVygfAJnz4rKlvImK5TE0k9QLqeylULxubDvGSOZdJZa09MIu4GLc8uygAscQH+jUHGvk2U31w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynMHBXGzuYNUo+9GNWiEygMBPKBgUfqiGQWvA3MuJFRLxJbVok
-	6Ba5KoyEHugwnjO2Mj4r3p66VYEhERmEaCrn6Cn9qyY0xFzoT0HB
-X-Gm-Gg: ASbGnctsAbHWK91+hVS6hRfvovwvlgG5G+Uz1XqNmS2H1XyOOZvmLzr3x5bHcK9GQBN
-	g2SvtDEhBstbRJHzU4CniAw4YMdJwItvTBbhuK0OXfVlKX7Zcv0aj1/xi5NgRqkxmIplWaE/Kzw
-	NQtvsH8CdSqJ8Ek3+UP701kZSaTQJsULlGcXSkLgWK4SREez1gwRY2Zk7AxPsa1EXQbHSKcrqEK
-	rEVSVcDWzjGQBYpVsvh4fWwJh6CeloVzo7CPbUIHQDOLmvPHBUEEvDbPQ6yFNAc9+fw/bCEvwn/
-X-Google-Smtp-Source: AGHT+IHreO8hREPHaesKW8h+P2SNEpKQGEQ35pHBXJrQzE19P8g4egaZJ/UFa4T91/hoojgK4AAh5Q==
-X-Received: by 2002:a17:902:dacd:b0:216:7ee9:21ff with SMTP id d9443c01a7336-21892aea39cmr76148835ad.49.1734153245822;
-        Fri, 13 Dec 2024 21:14:05 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e6c110sm5801285ad.257.2024.12.13.21.14.04
+        d=1e100.net; s=20230601; t=1734157083; x=1734761883;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fHcDC9/3fjxqA23UY0rgQz3K5BSqWz9mQZQLiNiCkOI=;
+        b=XX6bHmzFtv21gak4HA627e4P9nPIm64outPThj7ZSGUGcW+y6UWqYZafJeAX96QeAV
+         G/2MMFcRikPoDYTQcixxf2gcnX5ppghfi1yuJOT+Dv3iGWLhWxMO5/H9qY36rbo7pAuS
+         pvpkcp1F4e4TliWuS+gbKZZt9oTIiqPUA+w/1cLnNNFt9Z2neiYDrJvHA9+VK6m54V84
+         2ZZTrmVR466P3eyUD3/vwRGKfVyV3BLNBHaqEm6o+Yyc8iG0c1Qgt6rc5cBV2zcsY3bb
+         f6hH6Tz8kmNv95yUPpNGvk8H8kVYEYZLHVK4wuKwVM6L2HsAe3chbrStRjDLayIuAqYa
+         rvrg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+uKbmowzSiHdlYcPszIDesUvIOV/BAiF0GoCPlGsJFkYRNWlMLGvCHP04mcSnndg00IeHd2LZ12l2h0fq@vger.kernel.org, AJvYcCUfqzsRcF9yYbXAg6deMM5HfzxEVuZR6mxN8Ad4mN+nIGRVAvzxt+DwPlDlqJRH9XYSU+uv73aZ@vger.kernel.org, AJvYcCV6e/vNHZNYfoeglu309z8Mz01Pr0cbNiUVThmb0kJgjYK20mQ7WD9ayYm2vT1Mokgx/N4=@vger.kernel.org, AJvYcCVEKT7HFSCfvh7QMlMPtWPpXEzGJeWycgcuibs8CDngbYbJMGvMJ642hkWaBNLcD39bcIB50koYJZVsVYhcwb8c@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzq0tmEsV2Xw4UCEOuhVZci5l9DRA6j/1c6cCz8FSTW35RFEttc
+	80OSDOz/M2hfnHP8vTGkzaxEQ6oozF/gP4Y2qLrFKRTkIoYphnYu
+X-Gm-Gg: ASbGnctEg73KFzL+KHKK/jkw9yO1MmjHb5ngPEE3arhtomLrWliyGV9dCF36dWqBx7S
+	vhnozK02F0+OAjs+yaXVPe9eycbp2fawuvczLDvVwhgYj565MIN4XRn+NKfnIghm6R+YGZVzcCN
+	mD9zY/+aBP2dcy3Z/xH5pGOJErSWzL/uZxKq54kcOt6Di8xVaoK+xU+VubpX6SrHfCkSes8zvCG
+	D/IIUso8oUnk52jF3YA7ulVrS9FHowRhKOfReafQvIPyvyLkUFVEQ==
+X-Google-Smtp-Source: AGHT+IGWJW1+Pwpvx67EW8U4m0L0clqnU493+l3wbL2x0EMI3Oje+f6Aw9Q0/lrCQB/2hhJyEiBupA==
+X-Received: by 2002:a05:6a21:6da3:b0:1e1:a9dd:5a58 with SMTP id adf61e73a8af0-1e1dfdee4d9mr7575951637.30.1734157082400;
+        Fri, 13 Dec 2024 22:18:02 -0800 (PST)
+Received: from [192.168.0.235] ([38.34.87.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918bce8d9sm763149b3a.200.2024.12.13.22.18.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 21:14:05 -0800 (PST)
-Date: Fri, 13 Dec 2024 21:14:02 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Russell King <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Fri, 13 Dec 2024 22:18:01 -0800 (PST)
+Message-ID: <00d01559793cb22a323ff8e800e1ed6e79163e57.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v5 5/5] bpf: selftests: verifier: Add nullness
+ elision tests
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Daniel Xu <dxu@dxuuu.xyz>, andrii@kernel.org, ast@kernel.org, 
+	shuah@kernel.org, daniel@iogearbox.net
+Cc: mykolal@fb.com, martin.lau@linux.dev, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: mvpp2: tai: warn once if we fail to
- update our timestamp
-Message-ID: <Z10UGg_osMZ6TZrc@hoboy.vegasvil.org>
-References: <E1tM8cA-006t1i-KF@rmk-PC.armlinux.org.uk>
+Date: Fri, 13 Dec 2024 22:17:56 -0800
+In-Reply-To: <c97b9ffd2042790ae6eb55ba01eae94282014006.1734045451.git.dxu@dxuuu.xyz>
+References: <cover.1734045451.git.dxu@dxuuu.xyz>
+	 <c97b9ffd2042790ae6eb55ba01eae94282014006.1734045451.git.dxu@dxuuu.xyz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.1 (3.54.1-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tM8cA-006t1i-KF@rmk-PC.armlinux.org.uk>
 
-On Fri, Dec 13, 2024 at 04:34:06PM +0000, Russell King wrote:
-> The hardware timestamps for packets contain a truncated seconds field,
-> only containing two bits of seconds. In order to provide the full
-> number of seconds, we need to keep track of the full hardware clock by
-> reading it every two seconds.
-> 
-> However, if we fail to read the clock, we silently ignore the error.
-> Print a warning indicating that the PP2 TAI clock timestamps have
-> become unreliable.
+On Thu, 2024-12-12 at 16:22 -0700, Daniel Xu wrote:
+> Test that nullness elision works for common use cases. For example, we
+> want to check that both full and subreg stack slots are recognized. As
+> well as when there's both const and non-const values of R2 leading up to
+> a lookup. And obviously some bound checks.
+>=20
+> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> ---
 
-Rather than printing a warning that user space might not read, why not
-set a flag and stop delivering time stamps until the upper bits are
-available once again?
+Daniel,
 
-Thanks,
-Richard
+since there would be a respin of this patch-set,
+maybe consider using plain C for some of the tests?
+
+[...]
+
 
