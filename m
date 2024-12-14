@@ -1,92 +1,239 @@
-Return-Path: <netdev+bounces-151943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 161DB9F1C24
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 03:43:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F6A29F1C28
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 03:45:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DEA1188C5C5
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 02:43:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C635188CC01
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 02:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F3F11712;
-	Sat, 14 Dec 2024 02:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685721CFBC;
+	Sat, 14 Dec 2024 02:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6nassFL"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="aK4LgnTZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="X2TTGGoi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D1810A1E;
-	Sat, 14 Dec 2024 02:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E34DF49;
+	Sat, 14 Dec 2024 02:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734144175; cv=none; b=nQUryuGr0OYKvGRufWLIjUWg+jHEZ0W0M7ulvNbkgPLY/sfcQldkJYNgWaoMIu81K3CTaOzKkolI2I/2h3TWE/T5hNzB2sPrgSXeY/59jBK6RPeu88E0Tj+fVBDhw45oxxjoNx8KmfdjOQYEI+Lcp7Tf8xMbbQw9L2va9dYy6V8=
+	t=1734144305; cv=none; b=la/wwr7j3rWsx8VvNq7PxpgjTZHzC0F/ZhANtc5wwxowTbJMsaH/lPeJDZj4gNJEOFyVphq82sLqZY1yiRQ8embcVqx7gStX9b8lWsfa4BiaLSne+rH6v+TAdb6QGi9HiTrpmYyf9j+UvS/+MVkTGa1EMesfgxz804BYFRGfDYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734144175; c=relaxed/simple;
-	bh=ztEhXcSAyyqNq3L4FS9I/YkZ86zRTO0AYWpbeD09Kgw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fpVbC116n7LR9+63nc7XFi80HVE3DrCJvFLMeZFCNbL/DVCiyQ+LVD+8/Ir/4bokMswhjlU/3i8OD3V5uKcccZEsKncceTuxN9treR2BCwvSVwVsdhmaQUf0ou5qUrB16rGunYy+nFgmzYJxgz1K7imJSkvaEtqz7/+ia3yqUYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6nassFL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5037DC4CED0;
-	Sat, 14 Dec 2024 02:42:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734144174;
-	bh=ztEhXcSAyyqNq3L4FS9I/YkZ86zRTO0AYWpbeD09Kgw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V6nassFLbvy+EOuEChJi9YzsJTKmj4kDtoSvCSpUwwx1pedXE/Th+VCvPHlO4r6TJ
-	 b7Dp7bU24wP+5BfBvIAiYVXuiovwRDNAj0xVf6Qpvanj7amEWoBOt+vXusapd+i50L
-	 RgsslmqoLeR/ZXIcNyiyWmW+4UJFuUIb5/S1EepctlExLFh9wVp2yhB1kql1S3x0BS
-	 1jcTaikDNAtKn6aJJPd9tYrmA/h0MVHYQRDkPuZ7jUuzTzG89BfoVxDfcW1nxU3Xpi
-	 fWZBwHq/+8lsv0MAzmWvQKNCwvPTYqx8c9ID4zITZJGGxbiqqGBocMmRRuU9o/Zene
-	 1NXGCSJkLNIEA==
-Date: Fri, 13 Dec 2024 18:42:53 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: <Parthiban.Veerasooran@microchip.com>
-Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>,
- <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net v3 2/2] net: ethernet: oa_tc6: fix tx skb race
- condition between reference pointers
-Message-ID: <20241213184253.7c8203ce@kernel.org>
-In-Reply-To: <b7a48bbf-d783-4636-8f75-35c9904ffe05@microchip.com>
-References: <20241204133518.581207-1-parthiban.veerasooran@microchip.com>
-	<20241204133518.581207-3-parthiban.veerasooran@microchip.com>
-	<20241209161140.3b8b5c7b@kernel.org>
-	<5670b4c0-9345-4b11-be7d-1c6426d8db86@microchip.com>
-	<b7a48bbf-d783-4636-8f75-35c9904ffe05@microchip.com>
+	s=arc-20240116; t=1734144305; c=relaxed/simple;
+	bh=9qyDgkeCX1tal18Hf/Ny/eaU0q+9ST+DwYCRWojmXUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ew4nemQn4+0EDvjoEPNl5xXLdqDwwkg38E6WcnzpwDUKVvDB4BIXZyYt5BFjJzQ/86XzPAyta4zslbFP1FqhqD4JKYXjnUuGEyyqvNZvKrJPBFQMhpHK8QdGXyIZYpxa2FzQFYDjXOBnEYn2Eub9fQo57LslEwkXl+BggnnvCto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=aK4LgnTZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=X2TTGGoi; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id A661513841EB;
+	Fri, 13 Dec 2024 21:45:01 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Fri, 13 Dec 2024 21:45:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1734144301;
+	 x=1734230701; bh=JzF+XelSXj4HAebN6G10rWGrSfReZwqnUK4DNzdHLvE=; b=
+	aK4LgnTZIQr2LvYmqh+sdZAcp6mZBlTwVcXtY7l2/IaeCDCPEf4oKyvBpMR0Y3h8
+	8lsF7+N7lcGsQ2Ix6YrtO5hDawNVr7myi3Y2YOM+efGOxQuZGYU77KcSt42xli3b
+	kn7wdbz+9fobWlMOgMalmMNFwzAdJq2Ur2HJu1NpwhBDbL2Vn/B+1IrwDGB2ZoSB
+	qFdf9kq+Hp2pm6UWC8PLR/xth1Hbkrb9gjk67mURZsyMotSgO5UiugYiA6WJ2Hy8
+	6kiDARd869JpTua8uq8DECTY98SZISNsNpqPRQy/GIDhMsl+5IEGr5W7ZAkoTTF2
+	rKpbR+OQv+WHFz3UWzlCaQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1734144301; x=
+	1734230701; bh=JzF+XelSXj4HAebN6G10rWGrSfReZwqnUK4DNzdHLvE=; b=X
+	2TTGGoiGHB61jbOt3JIO+2DXRt+TnyMdRiQjkywVO1Hm5GoE406bhgpCSOClYWM6
+	yD/Pgb84I3bkx7U3oXXJ3iqv2FswmQZoXAp0VNS1QNVcrlOrRkcBZoxIab6zIryR
+	KhA7p0rJtoa0NUzJdc26390d8Mp+yn1T1P+hVwBhbJkukVVVm4aJHCjuWpadPb+M
+	/rAGVUDfBYJVEmehxn3PxkBywOaXPAX+cNldUB8imX5WnUUlwG1DVGqvaibFfBpf
+	8jF+AQhyltwCvMfmqBh468w4JnZiLCZZDzZgv75fWc3e78CCs0jT8C4CL+9ihz6T
+	klQbKM7eJP4wz/ieqCakg==
+X-ME-Sender: <xms:LPFcZ4wJZddKBDuYpgpEVJh6Kd5_PvzT5pbkHZ0_YpHzjWCEX-RMsg>
+    <xme:LPFcZ8T0nvmXN9AWaMo9_EApz9rsAUotFWr6n5AoE2rNJHlipBGOahgdkNOR1telj
+    CNzaqupYOQxDtXNLw>
+X-ME-Received: <xmr:LPFcZ6WnpqztuP9BJS1aDML29exPp0xFn0mCsLPA5VAOceR_jGrPu1ViNNn-FOd_BFRlYR_QmFQ-HH5mRzWvjtc9x6P6pq8QBph8Ig6fRK-o9Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeekgdeglecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhgg
+    tggugfgjsehtkefstddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesug
+    iguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnheptdfgueeuueekieekgfeiueekffel
+    teekkeekgeegffevtddvjeeuheeuueelfeetnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghp
+    thhtohepudelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhgurhhiihdrnh
+    grkhhrhihikhhosehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrihhisehkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopegrshhtsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopegvugguhiiikeejsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvg
+    htpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhmpdhr
+    tghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghvpdhrtghpthhtohepsh
+    honhhgsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:LPFcZ2gLkySSqTMO_YhbArEZesnigQoXjcf8K_aOYKlgAjZ1ndhOTA>
+    <xmx:LPFcZ6AP_57R1QgUv69a5iI_LwvZYRbs-Vr2QCFFGwnhor3CIYtGCw>
+    <xmx:LPFcZ3IDCoN-MfP5bHzlqq5u-1i6ZF5Oc_U26usG9-mRJrG7CTFc7Q>
+    <xmx:LPFcZxB1EUYMwDohZcDaygtKvP0j_ivo0b2UWSasplQ7wB9F1EoDvQ>
+    <xmx:LfFcZ1UMNp2tLaZxTNMh6fNG75fQe5whelrusP6SR-6Ir6QEGBNgLO3e>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 13 Dec 2024 21:44:57 -0500 (EST)
+Date: Fri, 13 Dec 2024 19:44:55 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, eddyz87@gmail.com, shuah@kernel.org, 
+	daniel@iogearbox.net, john.fastabend@gmail.com, martin.lau@linux.dev, song@kernel.org, 
+	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, 
+	jolsa@kernel.org, mykolal@fb.com, bpf@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v5 4/5] bpf: verifier: Support eliding map
+ lookup nullness
+Message-ID: <zow3q3nhlz6vedbni3upag5yr7zzrhyiqysl5nwyubebmbwojk@th7kbm62x36g>
+References: <cover.1734045451.git.dxu@dxuuu.xyz>
+ <92065ca054beccd6d0f35efe9715ef965e8d379f.1734045451.git.dxu@dxuuu.xyz>
+ <CAEf4BzaqCgW9keiT+tJUBQWT6Q+jMwuvn4O2ZghO0c+ZvACNrw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4BzaqCgW9keiT+tJUBQWT6Q+jMwuvn4O2ZghO0c+ZvACNrw@mail.gmail.com>
 
-On Fri, 13 Dec 2024 10:35:03 +0000 Parthiban.Veerasooran@microchip.com
-wrote:
-> >> start_xmit runs in BH / softirq context. You can't take sleeping locks.
-> >> The lock has to be a spin lock. You could possibly try to use the
-> >> existing spin lock of the tx queue (__netif_tx_lock()) but that may be
-> >> more challenging to do cleanly from within a library..  
-> > Thanks for the input. Yes, it looks like implementing a spin lock would
-> > be a right choice. I will implement it and do the testing as you
-> > suggested below and share the feedback.  
-> I tried using spin_lock_bh() variants (as the softirq involved) on both 
-> start_xmit() and spi_thread() where the critical regions need to be 
-> protected and tested by enabling the Kconfigs in the 
-> kernel/configs/debug.config. Didn't notice any warnings in the dmesg log.
+On Fri, Dec 13, 2024 at 03:02:11PM GMT, Andrii Nakryiko wrote:
+> On Thu, Dec 12, 2024 at 3:23 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
+> >
+> > This commit allows progs to elide a null check on statically known map
+> > lookup keys. In other words, if the verifier can statically prove that
+> > the lookup will be in-bounds, allow the prog to drop the null check.
+> >
+> > This is useful for two reasons:
+> >
+> > 1. Large numbers of nullness checks (especially when they cannot fail)
+> >    unnecessarily pushes prog towards BPF_COMPLEXITY_LIMIT_JMP_SEQ.
+> > 2. It forms a tighter contract between programmer and verifier.
+> >
+> > For (1), bpftrace is starting to make heavier use of percpu scratch
+> > maps. As a result, for user scripts with large number of unrolled loops,
+> > we are starting to hit jump complexity verification errors.  These
+> > percpu lookups cannot fail anyways, as we only use static key values.
+> > Eliding nullness probably results in less work for verifier as well.
+> >
+> > For (2), percpu scratch maps are often used as a larger stack, as the
+> > currrent stack is limited to 512 bytes. In these situations, it is
+> > desirable for the programmer to express: "this lookup should never fail,
+> > and if it does, it means I messed up the code". By omitting the null
+> > check, the programmer can "ask" the verifier to double check the logic.
+> >
+> > Tests also have to be updated in sync with these changes, as the
+> > verifier is more efficient with this change. Notable, iters.c tests had
+> > to be changed to use a map type that still requires null checks, as it's
+> > exercising verifier tracking logic w.r.t iterators.
+> >
+> > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> > ---
+> >  kernel/bpf/verifier.c                         | 80 ++++++++++++++++++-
+> >  tools/testing/selftests/bpf/progs/iters.c     | 14 ++--
+> >  .../selftests/bpf/progs/map_kptr_fail.c       |  2 +-
+> >  .../selftests/bpf/progs/verifier_map_in_map.c |  2 +-
+> >  .../testing/selftests/bpf/verifier/map_kptr.c |  2 +-
+> >  5 files changed, 87 insertions(+), 13 deletions(-)
+> >
 > 
-> Note: Prior to the above test, purposefully I tried with spin_lock() 
-> variants on both the sides to check/simulate for the warnings using 
-> Kconfigs kernel/configs/debug.config. Got some warnings in the dmesg 
-> regarding deadlock which clarified the expected behavior. And then I 
-> proceeded with the above fix and it worked as expected.
+> Eduard has great points. I've added a few more comments below.
 > 
-> If you agree, I will prepare the next version with this fix and post.
+> pw-bot: cr
+> 
+> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > index 58b36cc96bd5..4947ef884a18 100644
+> > --- a/kernel/bpf/verifier.c
+> > +++ b/kernel/bpf/verifier.c
+> > @@ -287,6 +287,7 @@ struct bpf_call_arg_meta {
+> >         u32 ret_btf_id;
+> >         u32 subprogno;
+> >         struct btf_field *kptr_field;
+> > +       s64 const_map_key;
+> >  };
+> >
+> >  struct bpf_kfunc_call_arg_meta {
+> > @@ -9163,6 +9164,53 @@ static int check_reg_const_str(struct bpf_verifier_env *env,
+> >         return 0;
+> >  }
+> >
+> > +/* Returns constant key value if possible, else -1 */
+> > +static s64 get_constant_map_key(struct bpf_verifier_env *env,
+> > +                               struct bpf_reg_state *key,
+> > +                               u32 key_size)
+> > +{
+> > +       struct bpf_func_state *state = func(env, key);
+> > +       struct bpf_reg_state *reg;
+> > +       int zero_size = 0;
+> > +       int stack_off;
+> > +       u8 *stype;
+> > +       int slot;
+> > +       int spi;
+> > +       int i;
+> > +
+> > +       if (!env->bpf_capable)
+> > +               return -1;
+> > +       if (key->type != PTR_TO_STACK)
+> > +               return -1;
+> > +       if (!tnum_is_const(key->var_off))
+> > +               return -1;
+> > +
+> > +       stack_off = key->off + key->var_off.value;
+> > +       slot = -stack_off - 1;
+> > +       spi = slot / BPF_REG_SIZE;
+> > +
+> > +       /* First handle precisely tracked STACK_ZERO, up to BPF_REG_SIZE */
+> > +       stype = state->stack[spi].slot_type;
+> > +       for (i = 0; i < BPF_REG_SIZE && stype[i] == STACK_ZERO; i++)
+> 
+> it's Friday and I'm lazy, but please double-check that this works for
+> both big-endian and little-endian :)
 
-Go ahead.
+Any tips? Are the existing tests running thru s390x hosts in CI
+sufficient or should I add some tests writen in C (and not BPF
+assembler)? I can never think about endianness correctly...
+
+> 
+> with Eduard's suggestion this also becomes interesting when you have
+> 000mmm mix (as one example), because that gives you a small range, and
+> all values might be valid keys for arrays
+
+Can you define what "small range" means? What range is there with 0's?
+Any pointers would be helpful.
+
+
+> 
+> > +               zero_size++;
+> > +       if (zero_size == key_size)
+> > +               return 0;
+> > +
+> > +       if (!is_spilled_reg(&state->stack[spi]))
+> > +               /* Not pointer to stack */
+> 
+> !is_spilled_reg and "Not pointer to stack" seem to be not exactly the
+> same things?
+
+You're right - comment is not helpful. I'll make the change to
+use is_spilled_scalar_reg() which is probably as clear as it gets.
+
+[..]
+
+
 
