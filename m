@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-151963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 124C99F2062
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 19:47:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA37A9F2060
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 19:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 752DF167F73
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 18:47:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44BDA1888EA6
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 18:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3083A193094;
-	Sat, 14 Dec 2024 18:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32B2194C61;
+	Sat, 14 Dec 2024 18:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b="cRpj9Gxl"
+	dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b="deuaMG/P"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.buffet.re (mx1.buffet.re [51.83.41.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B5A194C67;
-	Sat, 14 Dec 2024 18:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6964C70;
+	Sat, 14 Dec 2024 18:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.83.41.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734202022; cv=none; b=VgmMrWI5dH9n88geR5IsbHcObQaZ/npI5SxS8n8zs5kfdaUsUg+F+RRad9kJeG8xTRVUWiRsGUBjubeCPSeDOkByZm7B8KdWZjgeDvGP60kNx86wzwLNR/1+eggiFce1sGFd15oyZvPxRwtW5H3McgGObDTXJUPZIWT/ovMjBds=
+	t=1734202032; cv=none; b=qOGPbC0sgkTjSLM7IvFv4RnhfVxoqVAXn65Wjr9Ve1wBZoSnLV2fnNRCs9L0pPO4fBl3EK3Ha+0qkasZbDlIjUwaVNeleEv6Oi3x2YXLBQuD0gFUg9E0O9gfCCwpMkI9WIzIgHjNr8pJhif4b7I32JO7picJGPX1j4XVF1aCmFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734202022; c=relaxed/simple;
-	bh=9wfpgLvCykLDojzmjtn/oAwFupg3MkK6nNo6+mrviIk=;
+	s=arc-20240116; t=1734202032; c=relaxed/simple;
+	bh=MuGh5wpI3vhx5OaaXFQyST1d+tnPJJ9ZpRs0BzfQUBA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Yhy88YNhVPPjeSefRZlGDH64Pn2AzyAQNBRho4t/wStYT8UAr6/WSTuJYUdjOglN79BVLWF6UhD1VXiMmLIslOBw1boBBV988nsxEDBcoSLh7ZS8iXTWmMV3JeYukH08RCUgadqHro4VyWxE+HMcsAv17QC1TbygNafV8incRTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=cRpj9Gxl; arc=none smtp.client-ip=51.83.41.69
+	 MIME-Version; b=CmCBiaKf0jt8i37tFqTD2XPCTt3tzaB97U2ZPy1yN1/rseAYnCLInzSAN51LgSbZ7AQ2bGgh4D3jrHh+Gu4yKI0vIF1r0z0oNA4bi/bQliSasG7khHyuHHflt7PUtYaZUYgBMOr9ds9X0iDr8xUzbodVAAkzn3BvCdCluSEvALk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=deuaMG/P; arc=none smtp.client-ip=51.83.41.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buffet.re
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=buffet.re; s=mx1;
-	t=1734202017; bh=9wfpgLvCykLDojzmjtn/oAwFupg3MkK6nNo6+mrviIk=;
+	t=1734202028; bh=MuGh5wpI3vhx5OaaXFQyST1d+tnPJJ9ZpRs0BzfQUBA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cRpj9Gxlwc/46SIw3BlVB31i6aRUUg3fWwXv2S7DEIj1E8ooOL3CVhac/ZacMM8rD
-	 6rUm73qZIHbiExcyP4Wr0wKpPoKPbHMCf2UxarC9+vL+OfvTbT2R4y7LvqISEDB9tz
-	 aqrWfKsIZV57CFGzZfRvhetWX3tbSFvAtAppj8nWdJqm+QBw2QL/Atr3DOgjIR8nEI
-	 ejb/WZxpe+cX/GC6sD8LCLuhhw8MUKEEl1l0W6hstjc3Cs4tztB7e3ogUQFnizkUsf
-	 6mOlkLUMwaShoF1Z8pdDE45o5oiSke6L8k73jLFCRmp1O+jw7Tk5DNCLsCDvlNOUvR
-	 yqt08SPO5SdNg==
+	b=deuaMG/PwYWxtcLCTnB1bzNbnDc2l48sxzZjK7DaRNbWL2yZ/RV35pRfklbVx0sE9
+	 Dng6JZyW7txb5O+sLjebqs5DU+ADfwHxsz1Z89m6N5SPu51WFqg+ABu/2s8lVJXfJ7
+	 6aumdTAfFrG1goX67D3m5kS3kkHO+mXho7IKnHYVgvrGvo3CQlgfcvj7tINmNfYZH4
+	 HvRzQJc1NR2PLcJsiT1WJqDe65Bm6eeBSBKCW9nUzkOTy7V7hDHeVB1/J/yi1Z3WqD
+	 a6tcte9Ln/c19lfRfnY/yTLnvgPZ22DpTK5a9tBFIkakgOK8T/dTT8ym2ghJOxHSMg
+	 /yoVkw4tFU36Q==
 Received: from localhost.localdomain (unknown [10.0.1.3])
-	by mx1.buffet.re (Postfix) with ESMTPSA id 26AA31252E6;
-	Sat, 14 Dec 2024 19:46:57 +0100 (CET)
+	by mx1.buffet.re (Postfix) with ESMTPSA id 50D751252E0;
+	Sat, 14 Dec 2024 19:47:08 +0100 (CET)
 From: Matthieu Buffet <matthieu@buffet.re>
 To: Mickael Salaun <mic@digikod.net>
 Cc: Gunther Noack <gnoack@google.com>,
@@ -54,9 +54,9 @@ Cc: Gunther Noack <gnoack@google.com>,
 	linux-security-module@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Matthieu Buffet <matthieu@buffet.re>
-Subject: [PATCH v2 3/6] landlock: Add UDP sendmsg access control
-Date: Sat, 14 Dec 2024 19:45:37 +0100
-Message-Id: <20241214184540.3835222-4-matthieu@buffet.re>
+Subject: [PATCH v2 4/6] selftests/landlock: Add ACCESS_NET_SENDTO_UDP
+Date: Sat, 14 Dec 2024 19:45:38 +0100
+Message-Id: <20241214184540.3835222-5-matthieu@buffet.re>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241214184540.3835222-1-matthieu@buffet.re>
 References: <20241214184540.3835222-1-matthieu@buffet.re>
@@ -68,187 +68,340 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for a LANDLOCK_ACCESS_NET_SENDTO_UDP access right,
-complementing the two previous LANDLOCK_ACCESS_NET_CONNECT_UDP and
-LANDLOCK_ACCESS_NET_BIND_UDP.
-It allows denying and delegating the right to sendto() datagrams with an
-explicit destination address and port, without requiring to connect() the
-socket first.
-
-Performance is of course worse if you send many datagrams this way,
-compared to just connect() then sending without an address (except if you
-use sendmmsg() which caches LSM results). This may still be desired by
-applications which send few enough datagrams to different clients that
-opening and connecting a socket for each one of them is not worth it.
+Add tests specific to UDP sendmsg(), orthogonal to whether the process
+is allowed to bind()/connect(). Make these tests part of the protocol_*
+variants, to ensure behaviour is consistent across AF_INET, AF_INET6
+and AF_UNIX.
 
 Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
 ---
- include/uapi/linux/landlock.h | 14 ++++++
- security/landlock/limits.h    |  2 +-
- security/landlock/net.c       | 88 +++++++++++++++++++++++++++++++++++
- 3 files changed, 103 insertions(+), 1 deletion(-)
+ tools/testing/selftests/landlock/net_test.c | 285 +++++++++++++++++++-
+ 1 file changed, 282 insertions(+), 3 deletions(-)
 
-diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-index 3f7b8e85822d..8b355891e986 100644
---- a/include/uapi/linux/landlock.h
-+++ b/include/uapi/linux/landlock.h
-@@ -295,6 +295,19 @@ struct landlock_net_port_attr {
-  *   every time), or for servers that want to filter which client address
-  *   they want to receive datagrams from (e.g. creating a client-specific
-  *   socket)
-+ * - %LANDLOCK_ACCESS_NET_SENDTO_UDP: send datagrams with an explicit
-+ *   destination address set to the given remote port. This access right
-+ *   is checked in sendto(), sendmsg() and sendmmsg() when the destination
-+ *   address passed is not NULL. This access right is not required when
-+ *   sending datagrams without an explicit destination (via a connected
-+ *   socket, e.g. with send()). Sending datagrams with explicit addresses
-+ *   induces a non-negligible overhead, so calling connect() once and for
-+ *   all should be preferred. When not possible and sending many datagrams,
-+ *   using sendmmsg() may reduce the access control overhead.
-+ *
-+ * Blocking an application from sending UDP traffic requires adding both
-+ * %LANDLOCK_ACCESS_NET_SENDTO_UDP and %LANDLOCK_ACCESS_NET_CONNECT_UDP
-+ * to the handled access rights list.
-  *
-  * Note that binding on port 0 means binding to an ephemeral
-  * kernel-assigned port, in the range configured in
-@@ -306,6 +319,7 @@ struct landlock_net_port_attr {
- #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
- #define LANDLOCK_ACCESS_NET_BIND_UDP			(1ULL << 2)
- #define LANDLOCK_ACCESS_NET_CONNECT_UDP			(1ULL << 3)
-+#define LANDLOCK_ACCESS_NET_SENDTO_UDP			(1ULL << 4)
- /* clang-format on */
- 
- /**
-diff --git a/security/landlock/limits.h b/security/landlock/limits.h
-index ca90c1c56458..8d12ca39cf2e 100644
---- a/security/landlock/limits.h
-+++ b/security/landlock/limits.h
-@@ -22,7 +22,7 @@
- #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
- #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
- 
--#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_UDP
-+#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_SENDTO_UDP
- #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
- #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
- 
-diff --git a/security/landlock/net.c b/security/landlock/net.c
-index 1c5cf2ddb7c1..0556d8a21d0b 100644
---- a/security/landlock/net.c
-+++ b/security/landlock/net.c
-@@ -10,6 +10,8 @@
- #include <linux/net.h>
- #include <linux/socket.h>
- #include <net/ipv6.h>
-+#include <net/transp_v6.h>
-+#include <net/ip.h>
- 
- #include "common.h"
- #include "cred.h"
-@@ -155,6 +157,27 @@ static int current_check_access_socket(struct socket *const sock,
- 	return -EACCES;
+diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+index 40f66cccce69..05304e6b4d8f 100644
+--- a/tools/testing/selftests/landlock/net_test.c
++++ b/tools/testing/selftests/landlock/net_test.c
+@@ -256,9 +256,34 @@ static int connect_variant(const int sock_fd,
+ 	return connect_variant_addrlen(sock_fd, srv, get_addrlen(srv, false));
  }
  
-+static int check_access_port(const struct landlock_ruleset *const dom,
-+			     access_mask_t access_request, __be16 port)
++static int set_msg_dest(struct msghdr *msg,
++			const struct service_fixture *const srv,
++			const bool minimal_addrlen)
 +{
-+	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_NET] = {};
-+	const struct landlock_rule *rule;
-+	const struct landlock_id id = {
-+		.key.data = (__force uintptr_t)port,
-+		.type = LANDLOCK_KEY_NET_PORT,
-+	};
-+	BUILD_BUG_ON(sizeof(port) > sizeof(id.key.data));
-+
-+	rule = landlock_find_rule(dom, id);
-+	access_request = landlock_init_layer_masks(
-+		dom, access_request, &layer_masks, LANDLOCK_KEY_NET_PORT);
-+	if (landlock_unmask_layers(rule, access_request, &layer_masks,
-+				   ARRAY_SIZE(layer_masks)))
-+		return 0;
-+
-+	return -EACCES;
-+}
-+
- static int hook_socket_bind(struct socket *const sock,
- 			    struct sockaddr *const address, const int addrlen)
- {
-@@ -190,9 +213,74 @@ static int hook_socket_connect(struct socket *const sock,
- 					   access_request);
- }
- 
-+static int hook_socket_sendmsg(struct socket *const sock,
-+			       struct msghdr *const msg, const int size)
-+{
-+	const struct landlock_ruleset *const dom =
-+		landlock_get_applicable_domain(landlock_get_current_domain(),
-+					       any_net);
-+	const struct sockaddr *address = (const struct sockaddr *)msg->msg_name;
-+	const int addrlen = msg->msg_namelen;
-+	__be16 port;
-+
-+	if (!dom)
-+		return 0;
-+	if (WARN_ON_ONCE(dom->num_layers < 1))
-+		return -EACCES;
-+	/*
-+	 * If there is no explicit address in the message, we have no
-+	 * policy to enforce here because either:
-+	 * - the socket was previously connect()ed, so the appropriate
-+	 *   access check has already been done back then;
-+	 * - the socket is unconnected, so we can let the networking stack
-+	 *   reply -EDESTADDRREQ
-+	 */
-+	if (!address)
-+		return 0;
-+
-+	if (!sk_is_udp(sock->sk))
-+		return 0;
-+
-+	/* Checks for minimal header length to safely read sa_family. */
-+	if (addrlen < offsetofend(typeof(*address), sa_family))
-+		return -EINVAL;
-+
-+	switch (address->sa_family) {
++	switch (srv->protocol.domain) {
 +	case AF_UNSPEC:
-+		/*
-+		 * Parsed as "no address" in udpv6_sendmsg(), which means
-+		 * we fall back into the case checked earlier: policy was
-+		 * enforced at connect() time, nothing to enforce here.
-+		 */
-+		if (sock->sk->sk_prot == &udpv6_prot)
-+			return 0;
-+		/* Parsed as "AF_INET" in udp_sendmsg() */
-+		fallthrough;
 +	case AF_INET:
-+		if (addrlen < sizeof(struct sockaddr_in))
-+			return -EINVAL;
-+		port = ((struct sockaddr_in *)address)->sin_port;
++		msg->msg_name = (void *)&srv->ipv4_addr;
 +		break;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
 +	case AF_INET6:
-+		if (addrlen < SIN6_LEN_RFC2133)
-+			return -EINVAL;
-+		port = ((struct sockaddr_in6 *)address)->sin6_port;
++		msg->msg_name = (void *)&srv->ipv6_addr;
 +		break;
-+#endif /* IS_ENABLED(CONFIG_IPV6) */
-+
++	case AF_UNIX:
++		msg->msg_name = (void *)&srv->unix_addr;
++		break;
 +	default:
-+		return -EAFNOSUPPORT;
++		errno = -EAFNOSUPPORT;
++		return -errno;
 +	}
 +
-+	return check_access_port(dom, LANDLOCK_ACCESS_NET_SENDTO_UDP, port);
++	msg->msg_namelen = get_addrlen(srv, minimal_addrlen);
++	return 0;
 +}
 +
- static struct security_hook_list landlock_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
- 	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
-+	LSM_HOOK_INIT(socket_sendmsg, hook_socket_sendmsg),
+ FIXTURE(protocol)
+ {
+-	struct service_fixture srv0, srv1, srv2, unspec_any0, unspec_srv0;
++	struct service_fixture srv0, srv1, srv2;
++	struct service_fixture unspec_any0, unspec_srv0, unspec_srv1;
  };
  
- __init void landlock_add_net_hooks(void)
+ FIXTURE_VARIANT(protocol)
+@@ -281,6 +306,7 @@ FIXTURE_SETUP(protocol)
+ 	ASSERT_EQ(0, set_service(&self->srv2, variant->prot, 2));
+ 
+ 	ASSERT_EQ(0, set_service(&self->unspec_srv0, prot_unspec, 0));
++	ASSERT_EQ(0, set_service(&self->unspec_srv1, prot_unspec, 1));
+ 
+ 	ASSERT_EQ(0, set_service(&self->unspec_any0, prot_unspec, 0));
+ 	self->unspec_any0.ipv4_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+@@ -919,6 +945,258 @@ TEST_F(protocol, connect_unspec)
+ 	EXPECT_EQ(0, close(bind_fd));
+ }
+ 
++TEST_F(protocol, sendmsg)
++{
++	const struct timeval read_timeout = {
++		.tv_sec = 0,
++		.tv_usec = 100000,
++	};
++	const bool sandboxed = variant->sandbox == UDP_SANDBOX &&
++			       variant->prot.type == SOCK_DGRAM &&
++			       (variant->prot.domain == AF_INET ||
++				variant->prot.domain == AF_INET6);
++	int srv1_fd, srv0_fd, client_fd;
++	char read_buf[1] = { 0 };
++	struct iovec testmsg_contents = { 0 };
++	struct msghdr testmsg = { 0 };
++
++	if (variant->prot.type != SOCK_DGRAM)
++		return;
++
++	disable_caps(_metadata);
++
++	/* Prepare one server socket to be denied */
++	ASSERT_EQ(0, set_service(&self->srv0, variant->prot, 0));
++	srv0_fd = socket_variant(&self->srv0);
++	ASSERT_LE(0, srv0_fd);
++	ASSERT_EQ(0, bind_variant(srv0_fd, &self->srv0));
++
++	/* Prepare one server socket on specific port to be allowed */
++	ASSERT_EQ(0, set_service(&self->srv1, variant->prot, 1));
++	srv1_fd = socket_variant(&self->srv1);
++	ASSERT_LE(0, srv1_fd);
++	ASSERT_EQ(0, bind_variant(srv1_fd, &self->srv1));
++
++	/* Arbitrary value just to not block other tests indefinitely */
++	EXPECT_EQ(0, setsockopt(srv1_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout,
++				sizeof(read_timeout)));
++	EXPECT_EQ(0, setsockopt(srv0_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout,
++				sizeof(read_timeout)));
++
++	client_fd = socket_variant(&self->srv0);
++	ASSERT_LE(0, client_fd);
++
++	if (sandboxed) {
++		const struct landlock_ruleset_attr ruleset_attr = {
++			.handled_access_net = LANDLOCK_ACCESS_NET_SENDTO_UDP |
++					      LANDLOCK_ACCESS_NET_BIND_UDP,
++		};
++		const struct landlock_net_port_attr allow_one_server = {
++			.allowed_access = LANDLOCK_ACCESS_NET_SENDTO_UDP,
++			.port = self->srv1.port,
++		};
++		const int ruleset_fd = landlock_create_ruleset(
++			&ruleset_attr, sizeof(ruleset_attr), 0);
++		ASSERT_LE(0, ruleset_fd);
++		ASSERT_EQ(0,
++			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
++					    &allow_one_server, 0));
++		enforce_ruleset(_metadata, ruleset_fd);
++		EXPECT_EQ(0, close(ruleset_fd));
++	}
++
++	testmsg_contents.iov_len = 1;
++	testmsg.msg_iov = &testmsg_contents;
++	testmsg.msg_iovlen = 1;
++
++	/* Without bind nor explicit address+port */
++	EXPECT_EQ(-1, write(client_fd, "A", 1));
++	if (variant->prot.domain == AF_UNIX) {
++		EXPECT_EQ(ENOTCONN, errno);
++	} else {
++		EXPECT_EQ(EDESTADDRREQ, errno);
++	}
++
++	/* With non-NULL but too small explicit address */
++	testmsg_contents.iov_base = "B";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->srv0, false));
++	testmsg.msg_namelen = get_addrlen(&self->srv0, true) - 1;
++	EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++	EXPECT_EQ(EINVAL, errno);
++
++	/* With minimal explicit address length and denied port */
++	testmsg_contents.iov_base = "C";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->srv0, true));
++	if (self->srv0.protocol.domain == AF_UNIX) {
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(EINVAL, errno);
++	} else if (sandboxed) {
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(EACCES, errno);
++	} else {
++		EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(1, read(srv0_fd, read_buf, 1));
++		EXPECT_EQ(read_buf[0], 'C');
++	}
++
++	/* With minimal explicit address length and allowed port */
++	testmsg_contents.iov_base = "D";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->srv1, true));
++	if (self->srv0.protocol.domain == AF_UNIX) {
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(EINVAL, errno);
++	} else {
++		EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(1, read(srv1_fd, read_buf, 1));
++		EXPECT_EQ(read_buf[0], 'D');
++	}
++
++	/* With explicit denied port */
++	testmsg_contents.iov_base = "E";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->srv0, false));
++	if (sandboxed) {
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(EACCES, errno);
++		EXPECT_EQ(-1, read(srv0_fd, read_buf, 1));
++		EXPECT_EQ(EAGAIN, errno);
++	} else {
++		EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0))
++		{
++			TH_LOG("sendmsg failed: %s", strerror(errno));
++		}
++		EXPECT_EQ(1, read(srv0_fd, read_buf, 1));
++		EXPECT_EQ(read_buf[0], 'E');
++	}
++
++	/* With explicit allowed port */
++	testmsg_contents.iov_base = "F";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->srv1, false));
++	EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0))
++	{
++		TH_LOG("sendmsg failed: %s", strerror(errno));
++	}
++	EXPECT_EQ(1, read(srv1_fd, read_buf, 1));
++	EXPECT_EQ(read_buf[0], 'F');
++
++	/*
++	 * With an explicit (AF_UNSPEC, port), should be equivalent to
++	 * (AF_INET, port) in IPv4, and to not specifying a destination
++	 * in IPv6 (which fails since the socket is not connected).
++	 */
++	testmsg_contents.iov_base = "G";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->unspec_srv0, false));
++	if (sandboxed || variant->prot.domain != AF_INET) {
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		if (variant->prot.domain == AF_INET) {
++			EXPECT_EQ(EACCES, errno);
++		} else if (variant->prot.domain == AF_UNIX) {
++			EXPECT_EQ(EINVAL, errno);
++		} else {
++			EXPECT_EQ(EDESTADDRREQ, errno);
++		}
++	} else {
++		EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0))
++		{
++			TH_LOG("sendmsg failed: %s", strerror(errno));
++		}
++		EXPECT_EQ(1, read(srv0_fd, read_buf, 1));
++		EXPECT_EQ(read_buf[0], 'G');
++	}
++	testmsg_contents.iov_base = "H";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->unspec_srv1, false));
++	if (variant->prot.domain == AF_INET) {
++		EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0))
++		{
++			TH_LOG("sendmsg failed: %s", strerror(errno));
++		}
++		EXPECT_EQ(1, read(srv1_fd, read_buf, 1));
++		EXPECT_EQ(read_buf[0], 'H');
++	} else {
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		if (variant->prot.domain == AF_INET6) {
++			EXPECT_EQ(EDESTADDRREQ, errno);
++		} else {
++			EXPECT_EQ(EINVAL, errno);
++		}
++	}
++
++	/* Without address, connect()ed to an allowed address+port */
++	testmsg.msg_name = NULL;
++	testmsg.msg_namelen = 0;
++	testmsg_contents.iov_base = "I";
++	ASSERT_EQ(0, connect_variant(client_fd, &self->srv1));
++	EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0))
++	{
++		TH_LOG("sendmsg failed: %s", strerror(errno));
++	}
++	EXPECT_EQ(1, read(srv1_fd, read_buf, 1));
++	EXPECT_EQ(read_buf[0], 'I');
++
++	/* Without address, connect()ed to a denied address+port */
++	testmsg.msg_name = NULL;
++	testmsg.msg_namelen = 0;
++	testmsg_contents.iov_base = "J";
++	ASSERT_EQ(0, connect_variant(client_fd, &self->srv0));
++	EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0))
++	{
++		TH_LOG("sendmsg failed: %s", strerror(errno));
++	}
++	EXPECT_EQ(1, read(srv0_fd, read_buf, 1));
++	EXPECT_EQ(read_buf[0], 'J');
++
++	/*
++	 * Sending to AF_UNSPEC should be equivalent to not specifying an
++	 * address (in IPv6 only) and falling back to the connected address
++	 */
++	testmsg_contents.iov_base = "K";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->unspec_srv0, false));
++	if (sandboxed && variant->prot.domain == AF_INET) {
++		/* IPv4 -> parsed as srv0 which is denied */
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(EACCES, errno);
++	} else if (variant->prot.domain == AF_UNIX) {
++		/* Unix socket don't accept AF_UNSPEC */
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(EINVAL, errno);
++	} else {
++		/*
++		 * IPv6 -> parsed as "no address" so it uses the connected
++		 * one srv1 which is allowed
++		 */
++		EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0))
++		{
++			TH_LOG("sendmsg failed: %s", strerror(errno));
++		}
++		EXPECT_EQ(1, read(srv0_fd, read_buf, 1));
++		EXPECT_EQ(read_buf[0], 'K');
++	}
++
++	testmsg_contents.iov_base = "L";
++	EXPECT_EQ(0, set_msg_dest(&testmsg, &self->unspec_srv1, false));
++	if (variant->prot.domain == AF_UNIX) {
++		EXPECT_EQ(-1, sendmsg(client_fd, &testmsg, 0));
++		EXPECT_EQ(EINVAL, errno);
++	} else {
++		EXPECT_EQ(1, sendmsg(client_fd, &testmsg, 0))
++		{
++			TH_LOG("sendmsg failed: %s", strerror(errno));
++		}
++
++		if (variant->prot.domain == AF_INET) {
++			/* IPv4 -> parsed as srv1 */
++			EXPECT_EQ(1, read(srv1_fd, read_buf, 1));
++		} else {
++			/*
++			 * IPv6 -> parsed as "no address" so it uses the
++			 * connected one, srv0
++			 */
++			EXPECT_EQ(1, read(srv0_fd, read_buf, 1));
++		}
++
++		EXPECT_EQ(read_buf[0], 'L');
++	}
++}
++
+ FIXTURE(ipv4)
+ {
+ 	struct service_fixture srv0, srv1;
+@@ -1295,13 +1573,14 @@ FIXTURE_TEARDOWN(mini)
+ 
+ /* clang-format off */
+ 
+-#define ACCESS_LAST LANDLOCK_ACCESS_NET_CONNECT_UDP
++#define ACCESS_LAST LANDLOCK_ACCESS_NET_SENDTO_UDP
+ 
+ #define ACCESS_ALL ( \
+ 	LANDLOCK_ACCESS_NET_BIND_TCP | \
+ 	LANDLOCK_ACCESS_NET_CONNECT_TCP | \
+ 	LANDLOCK_ACCESS_NET_BIND_UDP | \
+-	LANDLOCK_ACCESS_NET_CONNECT_UDP)
++	LANDLOCK_ACCESS_NET_CONNECT_UDP | \
++	LANDLOCK_ACCESS_NET_SENDTO_UDP)
+ 
+ /* clang-format on */
+ 
 -- 
 2.39.5
 
