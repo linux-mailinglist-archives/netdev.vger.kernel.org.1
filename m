@@ -1,262 +1,203 @@
-Return-Path: <netdev+bounces-151956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761999F1F87
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 16:03:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D8CB9F1F95
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 16:12:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91E25166998
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 15:03:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE9A1886289
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 15:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B36193408;
-	Sat, 14 Dec 2024 15:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8C419580F;
+	Sat, 14 Dec 2024 15:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBn5msUl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F62C18FDDC
-	for <netdev@vger.kernel.org>; Sat, 14 Dec 2024 15:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427DE1E502;
+	Sat, 14 Dec 2024 15:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734188603; cv=none; b=aJcJghxLO/rQrsp3Eq/eoZKk4tsVIxgvErowO0+r+96b2MHGicuvtN/Dd38oJ60A6hfZSitQqGbhlwHqu5O6poh5ZkNbcTnKtRH4Nx4YftsIdoPf6F7f6piluXWsaNdRbB09ySwqxd9OnG9aCLXffYKKSRyG9i/fDh7M9JMDurM=
+	t=1734189125; cv=none; b=Q5YxKJeyrJc1VRs+HaRZqiIq4zo2VVCF03mc8qT1ZsFeOeqlzXPfk6QjuNG56TPRFq3nwcfTZYlU1d3YcSlhvmUDI0BUwjvchXffAuDLm5BNoSLUSQ1uN2+2XW4c3mh2CvGBPg2rJPLgI64+muC0ytb4VamP56KueRz7f1HQNp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734188603; c=relaxed/simple;
-	bh=DdLOM1qHzPfeoVfGflR2fskNrH89lMWL9H6iCSrftbY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uyY2qAdNi95Of6AheyTn1bKl4UfxsW3jAfmpLAnJUpa02r6JZJ+hN+aKeoMV4of8FaGhm6WUl77IWZHBza5KxhB9Ppy6sgezCMXGjNAGZVkT2NyfJCRd0XWxlGOaCWVOO5Wozk/N7dWddMAVitGUEp6uH326+psSeQBQReTNJzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ac98b49e4dso26309765ab.1
-        for <netdev@vger.kernel.org>; Sat, 14 Dec 2024 07:03:21 -0800 (PST)
+	s=arc-20240116; t=1734189125; c=relaxed/simple;
+	bh=OV2E90rAwYOhQnvtMiuQ1tWY/nSbw11TrYTbYk+0hFY=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SNEMmYL89laxVyVbcuvV9X2UDWQqU/whmez6M790UpnldjsDEf4mbwTr8Nvv66zok5DBw8a+lqjLvPlUQHzu0zmFaE/bWbFhv/i4aX3l3EydQXt/OjLf0vhcLmi9wDrsUS1lUfCn5cDcviT7VeLTcOgGdKy8+nqMrp95ag46t/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBn5msUl; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4361fe642ddso28060865e9.2;
+        Sat, 14 Dec 2024 07:12:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734189122; x=1734793922; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kSxXgL0V1UHwaghXfPnwj6ZyebGhbcff5eVA8hQElAg=;
+        b=IBn5msUl/hdN0EZln3Q8h91N09zMNVA98sEW2tucR+JYfCfHbI0nvSe+AWtijq+m2y
+         Ppw3fcKFSimlepxJddxJJ3P6RnTzqTSoIBJg1frmAYLGDeXWxbDQSBdGdaTydb/m2cxl
+         THOrL7dzDYTy5cN6y7iZXRzpW5F2HNGEeKQ/i3CejL3Ml2o9GPT3vG6ASvDlOV2hhd11
+         CNoL8dwoiR6nWEd1uJuKjjVsNe/++YucswoZNj7UQT48w6NSHRZr9A1Otzulr2oFWDsp
+         DJyBfuSzyEnJZgXOnXuGY4xaWgL8rH/Fa88CrY0dgVJVufEXQ9GgwhdBNv4OEP+bJtyE
+         qGiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734188600; x=1734793400;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Cp9X4RABKxUCFpngYxzOhWEwmB3ji+aITki0Zr2D5es=;
-        b=V9BWC6iox4WTItgkXXG0ey02JAtegVZ3sSLdLBKBDITyoAqRuKS5xT0QyCbqYbX7kY
-         I0H142SaykpKdWU2Cmf/r2B2H1pimLc2pw40O6SaG4FKiUsp8mRDMnivmZubqBzgGpF5
-         T7b9L1jAd2YY85bDC1NgBoeTlCFtK0EMcYr6l63eeSr66Hd5zneei0pZTphKfon03O1M
-         Hz4WDCaVf7aSAc2RFNxxOm+83mfVif56UkGE3TsWwACYQ/93NoiZwaj6vsoMafn2k0jl
-         BODaxR76WLQ+LmCid9J91CvChTLqYaAptq0bYeh5ZQjQfIP9v8govpc6uVxEZI6wT5+0
-         17Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6UBsvLFrOJgQ/cKYRE8znpe7455sSmwNtg/9QaOBWY4ljD0e4fa+fjOqRv397MuXuXNbzPbc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpM9s2Dz4Udc26KDGOzF/YM/fg9PAjYl6Kgz3T8XL6iWSQchJF
-	HNzBvFBXl3ogrDCh+L6iNHDLKSDJHvso9ZU8+43v7kgm4bWfs23goqZETj1WPZyLTOsLLeesEq0
-	hfh3o+hDr5XcOYH+4f9NIiILw7aRN38AkwOfzWmnzvtrMEjXugzoIjxE=
-X-Google-Smtp-Source: AGHT+IF9oifGX1EiocYuP6wsmB2qjMZL1qVQ4UWxVJyddk8bmy+bacAicmXcnsdY8cojK3p3VwfR+/hG/GpjO55mWyt4J7iIva2V
+        d=1e100.net; s=20230601; t=1734189122; x=1734793922;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kSxXgL0V1UHwaghXfPnwj6ZyebGhbcff5eVA8hQElAg=;
+        b=VKcPvY7h6UoOMVT8zUItiqbtZPJe2D5XZ99YOwYtbSIQ1LArdhZapGLfTsonpwBcSd
+         78ClRQLkvEujWaxqW6PT3DSKa/KKmzL0UPU/KkxxMXxRjVjgsO+ECsOU+d/ZoKUDaKXv
+         DE4uD/kJ2Wx6dKgCQXUquE0FTvfiDxVqzjH1k7//Ut9y+xFh0ok3DU3jRure8k0Ntrh+
+         M6598mU0zTlvX+VGFhtkx3lsg6DgyqxpiqLKE39U1QKea2WSG+x5R2CUnjYLizQco40R
+         1wEf3lcufTQnIKRTr4oAzYw6AMmkfKytJfE+VCDRIx1rcqtLve0Kw1PyUs8BH5pNMHcC
+         dGQA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+/ck95mnvkmIhAAo0xQfPI38guiIE71+2Axdpd9iSAnYLxJbqLAFKknBgrDPzPS+x/99zN9uYHtoF@vger.kernel.org, AJvYcCXNrFwWr6F6RA/JhemOrf6N4o+WMglye4qamlkNCornH+4/3WimFxdMHOCpAgxdnXM8roCDb/vR@vger.kernel.org, AJvYcCXkbirf5tJ5Kbez3MzHFdjEGIC7/tVGwD7rwiqfT5k1Zxa+cmla/aXaOir/Kk75bA9A1gi2mnY/81J/NY7B@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDsLS6z4Y14S2heACxglzmTur+8mRth6cL9WRHAtKB0Cv8UtLx
+	0CseNnDSD3K8teYLDjihfcvpimPaUw7nzh9Qjqj5PrBFjLH6Hal6
+X-Gm-Gg: ASbGncshUmY/OcmvDoysA+GAowW+GOSiVT+eHjPEHU11drylgct5+2GcK/sxx0vqjzf
+	XGBZmgMZ1c9zQLN3Sx++LhaeSPyWsNeUwS5ZUCyFNKGMUWotDRAWnxlGJBf6Et6onw6QPGv5pq9
+	6yr3iVecSUdaU/HW2li+Amvez3OJrhrYw9mSCsU+n1xJdBFflvWq9Ee4B0CVNqygy6fGCHeaU+N
+	r0S0qtXog0isnKg4etAzuPHDd9foiD8Z+ndHpMDM9V5t0VBQpZoz0ep3fDlLrLvMBN8OfG1J5/V
+	pLcnC5yp7RgP
+X-Google-Smtp-Source: AGHT+IHviim7NbVtUOIT+HnieV8oHcaBrBqk3Euy0/kRPqRbIEFM5mW2+1jwbLENz44EIQcBecLugg==
+X-Received: by 2002:a05:6000:2a3:b0:385:e4a7:df07 with SMTP id ffacd0b85a97d-3888e0b9ea9mr4497177f8f.42.1734189122114;
+        Sat, 14 Dec 2024 07:12:02 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4362571776asm80794525e9.40.2024.12.14.07.12.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Dec 2024 07:12:01 -0800 (PST)
+Message-ID: <675da041.050a0220.a8e65.af0e@mx.google.com>
+X-Google-Original-Message-ID: <Z12gOtM4EWWMgLnI@Ansuel-XPS.>
+Date: Sat, 14 Dec 2024 16:11:54 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v11 5/9] mfd: an8855: Add support for Airoha
+ AN8855 Switch MFD
+References: <20241209134459.27110-1-ansuelsmth@gmail.com>
+ <20241209134459.27110-1-ansuelsmth@gmail.com>
+ <20241209134459.27110-6-ansuelsmth@gmail.com>
+ <20241209134459.27110-6-ansuelsmth@gmail.com>
+ <20241210211529.osgzd54flq646bcr@skbuf>
+ <6758c174.050a0220.52a35.06bc@mx.google.com>
+ <20241210234803.pzm7fxrve4dastth@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a25:b0:3a7:e528:6ee6 with SMTP id
- e9e14a558f8ab-3aff039a554mr77439225ab.13.1734188600419; Sat, 14 Dec 2024
- 07:03:20 -0800 (PST)
-Date: Sat, 14 Dec 2024 07:03:20 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <675d9e38.050a0220.37aaf.00ca.GAE@google.com>
-Subject: [syzbot] [sctp?] possible deadlock in sctp_sock_migrate
-From: syzbot <syzbot+95ba71e75926e4a97806@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241210234803.pzm7fxrve4dastth@skbuf>
 
-Hello,
+On Wed, Dec 11, 2024 at 01:48:03AM +0200, Vladimir Oltean wrote:
+> On Tue, Dec 10, 2024 at 11:32:17PM +0100, Christian Marangi wrote:
+> > Doesn't regmap add lots of overhead tho? Maybe I should really change
+> > the switch regmap to apply a save/restore logic?
+> > 
+> > With an implementation like that current_page is not needed anymore.
+> > And I feel additional read/write are ok for switch OP.
+> > 
+> > On mdio I can use the parent-mdio-bus property to get the bus directly
+> > without using MFD priv.
+> > 
+> > What do you think?
+> 
+> If performance is a relevant factor at all, it will be hard to measure it, other
+> than with synthetic tests (various mixes of switch and PHY register access).
+> Though since you mention it, it would be interesting to see a comparison of the
+> 3 arbitration methods. This could probably be all done from the an8855_mfd_probe()
+> calling context: read a switch register and a PHY register 100K times and see how
+> long it took, then read 2 switch registers and a PHY register 100K times, then
+> 3 switch registers.... At some point, we should start seeing the penalty of the
+> page restoration in Andrew's proposal, because that will be done after each switch
+> register read. Just curious to put it into perspective and see how soon it starts
+> to make a difference. And this test will also answer the regmap overhead issue.
 
-syzbot found the following issue on:
+Ok sorry for the delay as I had to tackle an annoying crypto driver...
 
-HEAD commit:    7cb1b4663150 Merge tag 'locking_urgent_for_v6.13_rc3' of g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1617eb30580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=99a5586995ec03b2
-dashboard link: https://syzkaller.appspot.com/bug?extid=95ba71e75926e4a97806
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+I was also curious about this and I hope I tested this correctly...
 
-Unfortunately, I don't have any reproducer for this issue yet.
+The testing code is this. Following Vladimir testing and simple time
+comparision before and after. I used 100 times as 100k was very big.
+From the results we can derive our conclusions.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1d137a327f35/disk-7cb1b466.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/14581a57cb27/vmlinux-7cb1b466.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/22586b0e9bbc/bzImage-7cb1b466.xz
+static void test(struct an8855_mfd_priv *priv, struct regmap *regmap, struct regmap *regmap_phy)
+{
+	ktime_t start_time, end_time;
+	// struct mii_bus *bus = priv->bus;
+    	s64 elapsed_ns;
+	u32 val;
+	int times = 1;
+	int i, j;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+95ba71e75926e4a97806@syzkaller.appspotmail.com
+	start_time = ktime_get();
+	for (i = 0; i < 100; i++) {
+		for (j = 0; j < times; j++) {
+			regmap_read(regmap, 0x10005000, &val);
+		}
+		// mutex_lock_nested(&bus->mdio_lock, MDIO_MUTEX_NESTED);
+		// // an8855_mii_set_page(priv, priv->switch_addr, 0);
+		// __mdiobus_read(bus, priv->switch_addr, 0x1);
+		// mutex_unlock(&bus->mdio_lock);
+		regmap_read(regmap_phy,
+			   FIELD_PREP(GENMASK(20, 16), priv->switch_addr) |
+			   FIELD_PREP(GENMASK(15, 0), 0x1),
+			   &val);
+		times++;
+	}
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.13.0-rc2-syzkaller-00018-g7cb1b4663150 #0 Not tainted
-------------------------------------------------------
-syz.5.1757/14440 is trying to acquire lock:
-ffff88807f80c658 (sk_lock-AF_INET/1){+.+.}-{0:0}, at: sctp_sock_migrate+0x987/0x1270 net/sctp/socket.c:9655
+	end_time = ktime_get();
 
-but task is already holding lock:
-ffff88807f80dfd8 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1617 [inline]
-ffff88807f80dfd8 (sk_lock-AF_INET){+.+.}-{0:0}, at: sctp_accept+0x90/0x800 net/sctp/socket.c:4863
+	elapsed_ns = ktime_to_ns(ktime_sub(end_time, start_time));
 
-which lock already depends on the new lock.
+	pr_info("Time spent in the code block: %lld ns\n", elapsed_ns);
+}
 
+With the code changed accordingly.
 
-the existing dependency chain (in reverse order) is:
+switch regmap + page (proposed implementation)
+Time spent in the code block:  866179846 ns
 
--> #3 (sk_lock-AF_INET){+.+.}-{0:0}:
-       lock_sock_nested+0x3a/0xf0 net/core/sock.c:3622
-       lock_sock include/net/sock.h:1617 [inline]
-       sockopt_lock_sock net/core/sock.c:1126 [inline]
-       sockopt_lock_sock+0x54/0x70 net/core/sock.c:1117
-       do_ip_getsockopt+0x115c/0x2bf0 net/ipv4/ip_sockglue.c:1703
-       ip_getsockopt+0x9c/0x1e0 net/ipv4/ip_sockglue.c:1765
-       raw_getsockopt+0x4d/0x1e0 net/ipv4/raw.c:865
-       do_sock_getsockopt+0x3fe/0x870 net/socket.c:2374
-       __sys_getsockopt+0x12f/0x260 net/socket.c:2403
-       __do_sys_getsockopt net/socket.c:2410 [inline]
-       __se_sys_getsockopt net/socket.c:2407 [inline]
-       __x64_sys_getsockopt+0xbd/0x160 net/socket.c:2407
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+switch regmap + phy regmap (proposed implementation + PHY regmap)
+Time spent in the code block:  861326846 ns
 
--> #2 (rtnl_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x19b/0xa60 kernel/locking/mutex.c:735
-       smc_vlan_by_tcpsk+0x251/0x620 net/smc/smc_core.c:1898
-       __smc_connect+0x466/0x4890 net/smc/af_smc.c:1517
-       smc_connect+0x2fc/0x760 net/smc/af_smc.c:1693
-       __sys_connect_file+0x13e/0x1a0 net/socket.c:2055
-       __sys_connect+0x14f/0x170 net/socket.c:2074
-       __do_sys_connect net/socket.c:2080 [inline]
-       __se_sys_connect net/socket.c:2077 [inline]
-       __x64_sys_connect+0x72/0xb0 net/socket.c:2077
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+switch regmap restore (switch regmap read/set/restore page)
+Time spent in the code block: 1151011308 ns
 
--> #1 (sk_lock-AF_SMC){+.+.}-{0:0}:
-       lock_sock_nested+0x3a/0xf0 net/core/sock.c:3622
-       lock_sock include/net/sock.h:1617 [inline]
-       smc_close_non_accepted+0x80/0x200 net/smc/af_smc.c:1832
-       smc_close_cleanup_listen net/smc/smc_close.c:45 [inline]
-       smc_close_active+0xc3c/0x1070 net/smc/smc_close.c:225
-       __smc_release+0x634/0x880 net/smc/af_smc.c:277
-       smc_release+0x1fc/0x5f0 net/smc/af_smc.c:344
-       __sock_release+0xb0/0x270 net/socket.c:640
-       sock_close+0x1c/0x30 net/socket.c:1408
-       __fput+0x3f8/0xb60 fs/file_table.c:450
-       task_work_run+0x14e/0x250 kernel/task_work.c:239
-       exit_task_work include/linux/task_work.h:43 [inline]
-       do_exit+0xadd/0x2d70 kernel/exit.c:938
-       do_group_exit+0xd3/0x2a0 kernel/exit.c:1087
-       get_signal+0x2576/0x2610 kernel/signal.c:3017
-       arch_do_signal_or_restart+0x90/0x7e0 arch/x86/kernel/signal.c:337
-       exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
-       exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
-       syscall_exit_to_user_mode+0x150/0x2a0 kernel/entry/common.c:218
-       do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+switch regmap restore + phy regmap (switch regmap read/set/restore pgae
++ PHY regmap)
+Time spent in the code block: 1147400462 ns
 
--> #0 (sk_lock-AF_INET/1){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3161 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3280 [inline]
-       validate_chain kernel/locking/lockdep.c:3904 [inline]
-       __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5226
-       lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
-       lock_sock_nested+0x3a/0xf0 net/core/sock.c:3622
-       sctp_sock_migrate+0x987/0x1270 net/sctp/socket.c:9655
-       sctp_accept+0x654/0x800 net/sctp/socket.c:4899
-       inet_accept+0xc4/0x180 net/ipv4/af_inet.c:781
-       do_accept+0x337/0x530 net/socket.c:1941
-       __sys_accept4_file net/socket.c:1981 [inline]
-       __sys_accept4+0xfe/0x1b0 net/socket.c:2010
-       __do_sys_accept net/socket.c:2023 [inline]
-       __se_sys_accept net/socket.c:2020 [inline]
-       __x64_sys_accept+0x74/0xb0 net/socket.c:2020
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+We can see that:
+- as suggested regmap doesn't cause any performance penality. It does
+  even produce better result.
+- the read/set/restore implementation gives worse performance.
 
-other info that might help us debug this:
+So I guess I will follow the path of regmap + cache page. What do you
+think?
 
-Chain exists of:
-  sk_lock-AF_INET/1 --> rtnl_mutex --> sk_lock-AF_INET
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(sk_lock-AF_INET);
-                               lock(rtnl_mutex);
-                               lock(sk_lock-AF_INET);
-  lock(sk_lock-AF_INET/1);
-
- *** DEADLOCK ***
-
-1 lock held by syz.5.1757/14440:
- #0: ffff88807f80dfd8 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1617 [inline]
- #0: ffff88807f80dfd8 (sk_lock-AF_INET){+.+.}-{0:0}, at: sctp_accept+0x90/0x800 net/sctp/socket.c:4863
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 14440 Comm: syz.5.1757 Not tainted 6.13.0-rc2-syzkaller-00018-g7cb1b4663150 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_circular_bug+0x41c/0x610 kernel/locking/lockdep.c:2074
- check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2206
- check_prev_add kernel/locking/lockdep.c:3161 [inline]
- check_prevs_add kernel/locking/lockdep.c:3280 [inline]
- validate_chain kernel/locking/lockdep.c:3904 [inline]
- __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5226
- lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
- lock_sock_nested+0x3a/0xf0 net/core/sock.c:3622
- sctp_sock_migrate+0x987/0x1270 net/sctp/socket.c:9655
- sctp_accept+0x654/0x800 net/sctp/socket.c:4899
- inet_accept+0xc4/0x180 net/ipv4/af_inet.c:781
- do_accept+0x337/0x530 net/socket.c:1941
- __sys_accept4_file net/socket.c:1981 [inline]
- __sys_accept4+0xfe/0x1b0 net/socket.c:2010
- __do_sys_accept net/socket.c:2023 [inline]
- __se_sys_accept net/socket.c:2020 [inline]
- __x64_sys_accept+0x74/0xb0 net/socket.c:2020
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f530297ff19
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f530381f058 EFLAGS: 00000246 ORIG_RAX: 000000000000002b
-RAX: ffffffffffffffda RBX: 00007f5302b46080 RCX: 00007f530297ff19
-RDX: 0000000020000140 RSI: 0000000020000100 RDI: 0000000000000003
-RBP: 00007f53029f3cc8 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f5302b46080 R15: 00007fff22fccd28
- </TASK>
-can: request_module (can-proto-4) failed.
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+	Ansuel
 
