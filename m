@@ -1,65 +1,69 @@
-Return-Path: <netdev+bounces-151966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FDED9F2063
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 19:47:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCAD29F20A8
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 21:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6DF57A11A1
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 18:47:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E5E21642E0
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 20:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3420194C61;
-	Sat, 14 Dec 2024 18:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F14F1922D4;
+	Sat, 14 Dec 2024 20:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b="eoJN7Q50"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="D4uzkZPh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.buffet.re (mx1.buffet.re [51.83.41.69])
+Received: from mx23lb.world4you.com (mx23lb.world4you.com [81.19.149.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DEB170A13;
-	Sat, 14 Dec 2024 18:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.83.41.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5657AEC0;
+	Sat, 14 Dec 2024 20:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734202049; cv=none; b=IDVNx7TlPqPBb/zdomaZX+xnnOa12rLsOpekA5mkGlhxAuex2CdEtSWnTEkkftHzqhlxsCelinN2MB7uBLsTM9oqXVzmLJqwvcf7Q2TrIC4qLTav/Y9mcHqeTYF3ygzG2PGggfcwUHrrF8f8176nx0Ec40bF/b09CZqSQZhuRJg=
+	t=1734206522; cv=none; b=JfxNTuGbf4fRj4NwZcvWGnsk51yPxC3AoC7+44CU/nYi+E8D2ns+eR7zTPnzQZWzlwWpvJj9iG31L721rFWIzPdmfZ9bEYsAMogNdDPGF5zpiL7Om86MMIsEQetcOeA9WK4LgGDiyjdbWjXZtLDkBK++GAMQZfuyL5P9b2pybg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734202049; c=relaxed/simple;
-	bh=XEQp1OcuB4+I0Fh+eWQThAsoSIRNC02YQBYnzl4D8PI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KzH/aSAMa/ApMfozkAD+vpF+6j8FYia59u4rJ6LEHd00ZBOnYBdLt2sOe+oyYVukRsaacWRkYIbljzilqNVNpqiYezcZPXzGuXQkCfX4r2n+XpoVilnWxbBMT1P2AIIDWBca6hLbW/lFDc5r731TfkmHW0g+XxKqEJe+bcAboG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=eoJN7Q50; arc=none smtp.client-ip=51.83.41.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buffet.re
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=buffet.re; s=mx1;
-	t=1734202045; bh=XEQp1OcuB4+I0Fh+eWQThAsoSIRNC02YQBYnzl4D8PI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eoJN7Q50bn5D5rd/Yp+pTEcG8Um+17+nP+884LaR6yozBIghkBzj/w/OiXcOMCVWM
-	 f1Yz6Y3Izx1Wi7zv/sT0Grs9JTsK0UryHCO2YFi4fYn8lxtvuv8Aj7TFNLamLKmIeP
-	 2TBKcIGlEsheq2/mgbMhEvU/NlqIoFfYCbitTh4WwPHlV4GtrEA0JW+GVkP/A6l3jw
-	 Mic/7/2fMjDedkO+0nlGAvxsYVhvoYVrHfEvTvGHjHZRLerO1yG0p4W5eUyRg56K53
-	 kx7TafvRp/0pzhVHflq34XRXaTCtEF5GJSSg57f6e4kVFYo16XaSM62FgzOXfGe4QF
-	 9eo9PkxbjJfiA==
-Received: from localhost.localdomain (unknown [10.0.1.3])
-	by mx1.buffet.re (Postfix) with ESMTPSA id 7A2651252E2;
-	Sat, 14 Dec 2024 19:47:25 +0100 (CET)
-From: Matthieu Buffet <matthieu@buffet.re>
-To: Mickael Salaun <mic@digikod.net>
-Cc: Gunther Noack <gnoack@google.com>,
-	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
-	konstantin.meskhidze@huawei.com,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E . Hallyn" <serge@hallyn.com>,
-	linux-security-module@vger.kernel.org,
+	s=arc-20240116; t=1734206522; c=relaxed/simple;
+	bh=WkisfuZbrcE7YJEzTY+MTEcQ99F0Jx6Wwv6I6tE/tQk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AdCAp2bW9GyIPT/fdvEn2N1BQ6ycIzoDJ3FSkUqWpXevyyN7pFG6E9on8UvpdygFYrJiU3xe24vrg6AF1EodAFM1Y/rOsW12xNoOaqxox+BLdgN2zQsQMMHpZhZqTbqQajFKAI0c9jmCczjIbFnn8KxADsGAeENUjDwuRMj3ut4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=D4uzkZPh; arc=none smtp.client-ip=81.19.149.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=CbNvvOuIDSSAEC+SeiGuDXyQPJHTngc0I8oZ/GkCqsw=; b=D4uzkZPhzpQ+KsbSnj003Zzv+g
+	xRY5gD0MZElcwDCc2Q4sP7REH6kYvccz0ZnyFVq1U0RaUeS3wCoIMOu8paX0tyEsyfvEBdmDsYCZR
+	YlceGdIHzhM7Rjdfj7QMXnd6c/WfzXi6ma3aaSoAws+PbDZD7haeBcNWHVtdfEBT+KYU=;
+Received: from [88.117.62.55] (helo=hornet.engleder.at)
+	by mx23lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tMXd0-000000003Nx-2xaL;
+	Sat, 14 Dec 2024 20:16:38 +0100
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+To: intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
-	Matthieu Buffet <matthieu@buffet.re>
-Subject: [PATCH v2 6/6] doc: Add landlock UDP support
-Date: Sat, 14 Dec 2024 19:45:40 +0100
-Message-Id: <20241214184540.3835222-7-matthieu@buffet.re>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241214184540.3835222-1-matthieu@buffet.re>
-References: <20241214184540.3835222-1-matthieu@buffet.re>
+	linux-pci@vger.kernel.org
+Cc: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	bhelgaas@google.com,
+	pmenzel@molgen.mpg.de,
+	Gerhard Engleder <eg@keba.com>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>
+Subject: [PATCH iwl-next v3] e1000e: Fix real-time violations on link up
+Date: Sat, 14 Dec 2024 20:16:23 +0100
+Message-Id: <20241214191623.7256-1-gerhard@engleder-embedded.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,162 +71,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-AV-Do-Run: Yes
 
-Add example of UDP usage, without detailing each access right, but with
-an explicit note about the need to handle both SENDTO and CONNECT to
-completely block sending (which could otherwise be overlooked).
+From: Gerhard Engleder <eg@keba.com>
 
-Slightly change the example used in code blocks: build a ruleset for a
-DNS client, so that it uses both TCP and UDP. Also consider an opaque
-implementation so that we get to introduce both the right to connect()
-and sendmsg(addr != NULL) within the same example.
+Link down and up triggers update of MTA table. This update executes many
+PCIe writes and a final flush. Thus, PCIe will be blocked until all
+writes are flushed. As a result, DMA transfers of other targets suffer
+from delay in the range of 50us. This results in timing violations on
+real-time systems during link down and up of e1000e in combination with
+an Intel i3-2310E Sandy Bridge CPU.
 
-Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
+The i3-2310E is quite old. Launched 2011 by Intel but still in use as
+robot controller. The exact root cause of the problem is unclear and
+this situation won't change as Intel support for this CPU has ended
+years ago. Our experience is that the number of posted PCIe writes needs
+to be limited at least for real-time systems. With posted PCIe writes a
+much higher throughput can be generated than with PCIe reads which
+cannot be posted. Thus, the load on the interconnect is much higher.
+Additionally, a PCIe read waits until all posted PCIe writes are done.
+Therefore, the PCIe read can block the CPU for much more than 10us if a
+lot of PCIe writes were posted before. Both issues are the reason why we
+are limiting the number of posted PCIe writes in row in general for our
+real-time systems, not only for this driver.
+
+A flush after a low enough number of posted PCIe writes eliminates the
+delay but also increases the time needed for MTA table update. The
+following measurements were done on i3-2310E with e1000e for 128 MTA
+table entries:
+
+Single flush after all writes: 106us
+Flush after every write:       429us
+Flush after every 2nd write:   266us
+Flush after every 4th write:   180us
+Flush after every 8th write:   141us
+Flush after every 16th write:  121us
+
+A flush after every 8th write delays the link up by 35us and the
+negative impact to DMA transfers of other targets is still tolerable.
+
+Execute a flush after every 8th write. This prevents overloading the
+interconnect with posted writes.
+
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+CC: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Link: https://lore.kernel.org/netdev/f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch/T/
+Signed-off-by: Gerhard Engleder <eg@keba.com>
 ---
- Documentation/userspace-api/landlock.rst | 84 +++++++++++++++++++-----
- 1 file changed, 66 insertions(+), 18 deletions(-)
+v3:
+- mention problematic platform explicitly (Bjorn Helgaas)
+- improve comment (Paul Menzel)
 
-diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
-index d639c61cb472..7018a03096e2 100644
---- a/Documentation/userspace-api/landlock.rst
-+++ b/Documentation/userspace-api/landlock.rst
-@@ -40,8 +40,8 @@ Filesystem rules
-     and the related filesystem actions are defined with
-     `filesystem access rights`.
+v2:
+- remove PREEMPT_RT dependency (Andrew Lunn, Przemek Kitszel)
+---
+ drivers/net/ethernet/intel/e1000e/mac.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
+index d7df2a0ed629..0174c16bbb43 100644
+--- a/drivers/net/ethernet/intel/e1000e/mac.c
++++ b/drivers/net/ethernet/intel/e1000e/mac.c
+@@ -331,8 +331,15 @@ void e1000e_update_mc_addr_list_generic(struct e1000_hw *hw,
+ 	}
  
--Network rules (since ABI v4)
--    For these rules, the object is a TCP port,
-+Network rules (since ABI v4 for TCP and v7 for UDP)
-+    For these rules, the object is a TCP or UDP port,
-     and the related actions are defined with `network access rights`.
- 
- Defining and enforcing a security policy
-@@ -49,11 +49,11 @@ Defining and enforcing a security policy
- 
- We first need to define the ruleset that will contain our rules.
- 
--For this example, the ruleset will contain rules that only allow filesystem
--read actions and establish a specific TCP connection. Filesystem write
--actions and other TCP actions will be denied.
-+For this example, the ruleset will contain rules that only allow some
-+filesystem read actions and some specific UDP and TCP accesses. Filesystem
-+write actions and other TCP/UDP actions will be denied.
- 
--The ruleset then needs to handle both these kinds of actions.  This is
-+The ruleset then needs to handle all these kinds of actions.  This is
- required for backward and forward compatibility (i.e. the kernel and user
- space may not know each other's supported restrictions), hence the need
- to be explicit about the denied-by-default access rights.
-@@ -80,7 +80,10 @@ to be explicit about the denied-by-default access rights.
-             LANDLOCK_ACCESS_FS_IOCTL_DEV,
-         .handled_access_net =
-             LANDLOCK_ACCESS_NET_BIND_TCP |
--            LANDLOCK_ACCESS_NET_CONNECT_TCP,
-+            LANDLOCK_ACCESS_NET_CONNECT_TCP |
-+            LANDLOCK_ACCESS_NET_BIND_UDP |
-+            LANDLOCK_ACCESS_NET_CONNECT_UDP |
-+            LANDLOCK_ACCESS_NET_SENDTO_UDP,
-         .scoped =
-             LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET |
-             LANDLOCK_SCOPE_SIGNAL,
-@@ -127,6 +130,12 @@ version, and only use the available subset of access rights:
-         /* Removes LANDLOCK_SCOPE_* for ABI < 6 */
-         ruleset_attr.scoped &= ~(LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET |
-                                  LANDLOCK_SCOPE_SIGNAL);
-+        __attribute__((fallthrough));
-+    case 6:
-+        /* Removes UDP support for ABI < 7 */
-+        ruleset_attr.handled_access_net &= ~(LANDLOCK_ACCESS_NET_BIND_UDP |
-+                                             LANDLOCK_ACCESS_NET_CONNECT_UDP |
-+                                             LANDLOCK_ACCESS_NET_SENDTO_UDP);
-     }
- 
- This enables the creation of an inclusive ruleset that will contain our rules.
-@@ -175,26 +184,53 @@ descriptor.
- 
- It may also be required to create rules following the same logic as explained
- for the ruleset creation, by filtering access rights according to the Landlock
--ABI version.  In this example, this is not required because all of the requested
--``allowed_access`` rights are already available in ABI 1.
-+ABI version.  So far, this was not required because all of the requested
-+``allowed_access`` rights have always been available, from ABI 1.
- 
--For network access-control, we can add a set of rules that allow to use a port
--number for a specific action: HTTPS connections.
-+For network access-control, we will add a set of rules to allow DNS
-+queries, which requires both UDP and TCP. For TCP, we need to allow
-+outbound connections to port 53, which can be handled and granted starting
-+with ABI 4:
- 
- .. code-block:: c
- 
--    struct landlock_net_port_attr net_port = {
--        .allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
--        .port = 443,
--    };
-+    if (ruleset_attr.handled_access_net & LANDLOCK_ACCESS_NET_CONNECT_TCP) {
-+        struct landlock_net_port_attr net_port = {
-+            .allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
-+            .port = 53,
-+        };
+ 	/* replace the entire MTA table */
+-	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--)
++	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--) {
+ 		E1000_WRITE_REG_ARRAY(hw, E1000_MTA, i, hw->mac.mta_shadow[i]);
 +
-+        err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-+                                &net_port, 0);
-+
-+We also need to be able to send UDP datagrams to port 53: we don't know if
-+the client will call :manpage:`sendto(2)` with an explicit destination
-+address, or :manpage:`connect(2)` then :manpage:`send(2)`, so we allow
-+both. Note that granting ``LANDLOCK_ACCESS_NET_BIND_UDP`` is not necessary
-+here because the client's socket will be automatically bound to an
-+ephemeral port by the kernel. Also note that we need to handle both
-+``LANDLOCK_ACCESS_NET_CONNECT_UDP`` and ``LANDLOCK_ACCESS_NET_SENDTO_UDP``
-+to effectively block sending UDP datagrams to arbitrary ports.
-+
-+.. code-block:: c
-+
-+    if ((ruleset_attr.handled_access_net & (LANDLOCK_ACCESS_NET_CONNECT_UDP |
-+                                            LANDLOCK_ACCESS_NET_SENDTO_UDP)) ==
-+                                           (LANDLOCK_ACCESS_NET_CONNECT_UDP |
-+                                            LANDLOCK_ACCESS_NET_SENDTO_UDP)) {
-+        struct landlock_net_port_attr net_port = {
-+            .allowed_access = LANDLOCK_ACCESS_NET_CONNECT_UDP |
-+                              LANDLOCK_ACCESS_NET_SENDTO_UDP,
-+            .port = 53,
-+        };
++		/* do not queue up too many posted writes to prevent increased
++		 * latency for other devices on the interconnect
++		 */
++		if ((i % 8) == 0 && i != 0)
++			e1e_flush();
++	}
+ 	e1e_flush();
+ }
  
--    err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
--                            &net_port, 0);
-+        err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-+                                &net_port, 0);
- 
- The next step is to restrict the current thread from gaining more privileges
- (e.g. through a SUID binary).  We now have a ruleset with the first rule
- allowing read access to ``/usr`` while denying all other handled accesses for
--the filesystem, and a second rule allowing HTTPS connections.
-+the filesystem, and two more rules allowing DNS queries.
- 
- .. code-block:: c
- 
-@@ -595,6 +631,18 @@ Starting with the Landlock ABI version 6, it is possible to restrict
- :manpage:`signal(7)` sending by setting ``LANDLOCK_SCOPE_SIGNAL`` to the
- ``scoped`` ruleset attribute.
- 
-+UDP networking (ABI < 7)
-+------------------------
-+
-+Starting with the Landlock ABI version 7, it is possible to restrict
-+sending and receiving UDP datagrams to/from specific ports. Restrictions
-+are now enforced at :manpage:`bind(2)` time with the new
-+``LANDLOCK_ACCESS_NET_BIND_UDP`` access right, and at :manpage:`connect(2)`
-+time with ``LANDLOCK_ACCESS_NET_CONNECT_UDP``. Finally,
-+``LANDLOCK_ACCESS_NET_SENDTO_UDP`` also restricts the destination port
-+when sending datagrams with an explicit address, orthogonal to whether
-+the socket is connected or not.
-+
- .. _kernel_support:
- 
- Kernel support
 -- 
-2.39.5
+2.39.2
 
 
