@@ -1,127 +1,190 @@
-Return-Path: <netdev+bounces-151968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DE539F20A0
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 20:43:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E97E9F20B2
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 21:36:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68129166943
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 19:43:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BAC2166FCF
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 20:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9C81A8F79;
-	Sat, 14 Dec 2024 19:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D571ABECD;
+	Sat, 14 Dec 2024 20:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="qu8Bfyvo"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="kr+71RBv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10629.protonmail.ch (mail-10629.protonmail.ch [79.135.106.29])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8151119A;
-	Sat, 14 Dec 2024 19:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8F9946C;
+	Sat, 14 Dec 2024 20:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734205395; cv=none; b=WmtEFWNKGQ+8h6C9PPEO/6HrYJISFoEhJeuEiKNsYT4ogbjLR+vcKFLJ/sRgqWWrcLkFYB3/8fQP3KBdkSiflixXPsivK9uw3aLe4oKbJf1fVqx+/8OuI39mIpqBkCdXy9Y6yFVWz1Fy1S/tIq7NlANncOOaUBt8vfkzSSYsg0E=
+	t=1734208573; cv=none; b=bXqULuak1LK29nOwTohxLiuF8uWwc8jEkZQjg7exGfXoUV+djFvm5ybbs35OaWlM70zSdY3fJrv8bpay93YMWyA8ldChJ29gdSnFc72WV+WukKiTbmyGuDGAwUlINfrCpkL3F7+hGNS2phHQ9lFAvFNUiVK+QOy6Y6bELX0LX00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734205395; c=relaxed/simple;
-	bh=tXqciZ4bi16lw4tGIOlIHwU2qwiOiHAdCX1Cma++6LQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=rADVA5whkHqlWCd+6vTauS+ycEuLP+GhGv9gmdjZc1ii4axVq938u5Q9gAUe3PBUwegOeDa+a63HsFiBzmCxgMN+pfybhm1Qq7eFVdji6Rw+Nkjzs23q/XIOGL1333UJWAZwJEIkhDVv2+9+3lklxOOO2MuXP31H36lM1A8gnXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=qu8Bfyvo; arc=none smtp.client-ip=79.135.106.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1734205391; x=1734464591;
-	bh=djRhhUH3mgerGdQ1ZA/d9QHoyZN0+WSjWLmBCwL3nhs=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
-	 List-Unsubscribe:List-Unsubscribe-Post;
-	b=qu8BfyvoDw0wDK/ggOhvkWyvkNqVmOTzGnu4M0LU/oyljt7vHz7PHMWdPAsUbpyuu
-	 czyYh2Tk62SyQek/JTYmD9CQzqKdmZuuAkgUPx4QwTR2hHedZr5yVMBe24tTKV252f
-	 8s/fbrcKKYK4Ru0XgcNEThKawYFSxojESBFi7ia7Y1NMvIJ5FMHOT2v9JSxjdvUIeq
-	 G4F5ir+PIRLqOXcjxPdCxvm4WGSh28WSOLZQ1PB/mWSYiwRWpZnF7GGuP/DYg4h7z9
-	 T28y8iwJiedWKJn0w328e3uPx8Qr9WMIFGI5L4u0+c7K7tYN1l3OK5IPR03qllC3Wa
-	 JgSD4yC4NIB9g==
-Date: Sat, 14 Dec 2024 19:43:06 +0000
-To: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org
-From: Rahul Rameshbabu <sergeantsagara@protonmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, Rahul Rameshbabu <sergeantsagara@protonmail.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, Alice Ryhl <aliceryhl@google.com>
-Subject: [PATCH net-next v2] rust: net::phy scope ThisModule usage in the module_phy_driver macro
-Message-ID: <20241214194242.19505-1-sergeantsagara@protonmail.com>
-Feedback-ID: 26003777:user:proton
-X-Pm-Message-ID: 343454d894d86e60e952ec0404fc15c470e70326
+	s=arc-20240116; t=1734208573; c=relaxed/simple;
+	bh=Fw6QJcH3L2doFqLAFp2Ouu5NGImvw2n4Y/vk6uGnWqA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ReCIaoJPF7DPaF9LxoVl6uIpPk+hZTplYraOR/OoCTcwDmZqnm9mVur/mdNvDhAthU/BncDT0tfnsICv3q269h5kbMdWC+KnzYZZjDoW/vtAcyPL0coz2CPth271M8GG2EH757F9nzb+WJUDRD4Osu+mdefyrMgsbup6bo1TeLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=kr+71RBv; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=rR+Yrouj1+O5b7xyhmVd9wGORsufXEKccs2LOnaW6DQ=; b=kr+71RBvrAGsgW0flniyjj348i
+	rKqcBSnfHtgtUEFg/S2iBQ9ZHYhML83CQ7GNzU/JLqZi9Zdt1ElB36KDY1REwl9R97ShXwN89xu1O
+	NLnIgU8iapVUXub1ZdsPHFGAETJwCwoXbf73MByJu/wag4Z+hc9ybmnvPeQdGT+ZsuCjjLayB7INZ
+	hgvOqwgqqsqqbXzaO+YImDDZHyxdrUH5Jkhch6C1VfsrKe4o8nswNorWlkTOsfH8iMfKft9dBfBDG
+	+qYQxgGhhPRlZPN47IhdjGePPDsPVZBNWBUqNcMY/Mlthl2H0NPfGvTSkUp5sdFTcUCpsLJw83pP3
+	W634JFVA==;
+Received: from mob-194-230-148-237.cgn.sunrise.net ([194.230.148.237] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1tMYrp-000Ais-Hk; Sat, 14 Dec 2024 21:36:01 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: torvalds@linux-foundation.org
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	martin.lau@kernel.org
+Subject: [GIT PULL] bpf for v6.13-rc3
+Date: Sat, 14 Dec 2024 21:36:00 +0100
+Message-ID: <20241214203600.423120-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27487/Sat Dec 14 10:38:46 2024)
 
-Similar to the use of $crate::Module, ThisModule should be referred to as
-$crate::ThisModule in the macro evaluation. The reason the macro previously
-did not cause any errors is because all the users of the macro would use
-kernel::prelude::*, bringing ThisModule into scope.
+Hi Linus,
 
-Signed-off-by: Rahul Rameshbabu <sergeantsagara@protonmail.com>
-Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
----
+The following changes since commit fac04efc5c793dccbd07e2d59af9f90b7fc0dca4:
 
-Notes:
-    Notes:
-        v1->v2:
-            Dropped the Fixes: tag and target net-next.
-   =20
-        How I came up with this change:
-   =20
-            I was working on my own rust bindings and rust driver when I co=
-mpared my
-            macro_rule to the one used for module_phy_driver. I noticed, if=
- I made a
-            driver that does not use kernel::prelude::*, that the ThisModul=
-e type
-            identifier used in the macro would cause an error without being=
- scoped in
-            the macro_rule. I believe the correct implementation for the ma=
-cro is one
-            where the types used are correctly expanded with needed scopes.
+  Linux 6.13-rc2 (2024-12-08 14:03:39 -0800)
 
- rust/kernel/net/phy.rs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+are available in the Git repository at:
 
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index b89c681d97c0..00c3100f5ebd 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -837,7 +837,7 @@ const fn as_int(&self) -> u32 {
- ///         [::kernel::net::phy::create_phy_driver::<PhySample>()];
- ///
- ///     impl ::kernel::Module for Module {
--///         fn init(module: &'static ThisModule) -> Result<Self> {
-+///         fn init(module: &'static ::kernel::ThisModule) -> Result<Self>=
- {
- ///             let drivers =3D unsafe { &mut DRIVERS };
- ///             let mut reg =3D ::kernel::net::phy::Registration::register=
-(
- ///                 module,
-@@ -903,7 +903,7 @@ struct Module {
-                 [$($crate::net::phy::create_phy_driver::<$driver>()),+];
-=20
-             impl $crate::Module for Module {
--                fn init(module: &'static ThisModule) -> Result<Self> {
-+                fn init(module: &'static $crate::ThisModule) -> Result<Sel=
-f> {
-                     // SAFETY: The anonymous constant guarantees that nobo=
-dy else can access
-                     // the `DRIVERS` static. The array is used only in the=
- C side.
-                     let drivers =3D unsafe { &mut DRIVERS };
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
 
-base-commit: 9bc5c9515b4817e994579b21c32c033cbb3b0e6c
---=20
-2.44.1
+for you to fetch changes up to c83508da5620ef89232cb614fb9e02dfdfef2b8f:
 
+  bpf: Avoid deadlock caused by nested kprobe and fentry bpf programs (2024-12-14 09:49:27 -0800)
 
+----------------------------------------------------------------
+BPF fixes:
+
+- Fix a bug in the BPF verifier to track changes to packet data
+  property for global functions (Eduard Zingerman)
+
+- Fix a theoretical BPF prog_array use-after-free in RCU handling
+  of __uprobe_perf_func (Jann Horn)
+
+- Fix BPF tracing to have an explicit list of tracepoints and
+  their arguments which need to be annotated as PTR_MAYBE_NULL
+  (Kumar Kartikeya Dwivedi)
+
+- Fix a logic bug in the bpf_remove_insns code where a potential
+  error would have been wrongly propagated (Anton Protopopov)
+
+- Avoid deadlock scenarios caused by nested kprobe and fentry
+  BPF programs (Priya Bala Govindasamy)
+
+- Fix a bug in BPF verifier which was missing a size check for
+  BTF-based context access (Kumar Kartikeya Dwivedi)
+
+- Fix a crash found by syzbot through an invalid BPF prog_array
+  access in perf_event_detach_bpf_prog (Jiri Olsa)
+
+- Fix several BPF sockmap bugs including a race causing a
+  refcount imbalance upon element replace (Michal Luczaj)
+
+- Fix a use-after-free from mismatching BPF program/attachment
+  RCU flavors (Jann Horn)
+
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+
+----------------------------------------------------------------
+Alexei Starovoitov (3):
+      Merge branch 'bpf-track-changes_pkt_data-property-for-global-functions'
+      Merge branch 'add-missing-size-check-for-btf-based-ctx-access'
+      Merge branch 'explicit-raw_tp-null-arguments'
+
+Anton Protopopov (1):
+      bpf: fix potential error return
+
+Eduard Zingerman (10):
+      bpf: add find_containing_subprog() utility function
+      bpf: refactor bpf_helper_changes_pkt_data to use helper number
+      bpf: track changes_pkt_data property for global functions
+      selftests/bpf: test for changing packet data from global functions
+      bpf: check changes_pkt_data property for extension programs
+      selftests/bpf: freplace tests for tracking of changes_packet_data
+      bpf: consider that tail calls invalidate packet pointers
+      selftests/bpf: validate that tail call invalidates packet pointers
+      bpf: fix null dereference when computing changes_pkt_data of prog w/o subprogs
+      selftests/bpf: extend changes_pkt_data with cases w/o subprograms
+
+Jann Horn (2):
+      bpf: Fix UAF via mismatching bpf_prog/attachment RCU flavors
+      bpf: Fix theoretical prog_array UAF in __uprobe_perf_func()
+
+Jiri Olsa (1):
+      bpf,perf: Fix invalid prog_array access in perf_event_detach_bpf_prog
+
+Kumar Kartikeya Dwivedi (5):
+      bpf: Check size for BTF-based ctx access of pointer members
+      selftests/bpf: Add test for narrow ctx load for pointer args
+      bpf: Revert "bpf: Mark raw_tp arguments with PTR_MAYBE_NULL"
+      bpf: Augment raw_tp arguments with PTR_MAYBE_NULL
+      selftests/bpf: Add tests for raw_tp NULL args
+
+Michal Luczaj (3):
+      bpf, sockmap: Fix update element with same
+      bpf, sockmap: Fix race between element replace and close()
+      selftests/bpf: Extend test for sockmap update with same
+
+Priya Bala Govindasamy (1):
+      bpf: Avoid deadlock caused by nested kprobe and fentry bpf programs
+
+ include/linux/bpf.h                                |  20 +--
+ include/linux/bpf_verifier.h                       |   1 +
+ include/linux/filter.h                             |   2 +-
+ kernel/bpf/Makefile                                |   6 +
+ kernel/bpf/btf.c                                   | 149 ++++++++++++++++++-
+ kernel/bpf/core.c                                  |   8 +-
+ kernel/bpf/verifier.c                              | 160 ++++++++++-----------
+ kernel/trace/bpf_trace.c                           |  11 ++
+ kernel/trace/trace_uprobe.c                        |   6 +-
+ net/core/filter.c                                  |  65 ++++-----
+ net/core/sock_map.c                                |   6 +-
+ .../selftests/bpf/prog_tests/changes_pkt_data.c    | 107 ++++++++++++++
+ .../testing/selftests/bpf/prog_tests/raw_tp_null.c |   3 +
+ .../selftests/bpf/prog_tests/sockmap_basic.c       |   8 +-
+ .../testing/selftests/bpf/progs/changes_pkt_data.c |  39 +++++
+ .../bpf/progs/changes_pkt_data_freplace.c          |  18 +++
+ tools/testing/selftests/bpf/progs/raw_tp_null.c    |  19 ++-
+ .../testing/selftests/bpf/progs/raw_tp_null_fail.c |  24 ++++
+ tools/testing/selftests/bpf/progs/tc_bpf2bpf.c     |   2 +
+ .../selftests/bpf/progs/test_tp_btf_nullable.c     |   6 +-
+ .../selftests/bpf/progs/verifier_btf_ctx_access.c  |  40 +++++-
+ .../testing/selftests/bpf/progs/verifier_d_path.c  |   4 +-
+ tools/testing/selftests/bpf/progs/verifier_sock.c  |  56 ++++++++
+ 23 files changed, 596 insertions(+), 164 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/changes_pkt_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/changes_pkt_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/changes_pkt_data_freplace.c
+ create mode 100644 tools/testing/selftests/bpf/progs/raw_tp_null_fail.c
 
