@@ -1,116 +1,103 @@
-Return-Path: <netdev+bounces-152019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 100D99F2628
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 22:01:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AA09F262F
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 22:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2DB0188628D
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 21:01:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE84E7A13A4
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 21:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E831C548D;
-	Sun, 15 Dec 2024 21:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B39C1BE86E;
+	Sun, 15 Dec 2024 21:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Q+kz8pGu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xya9Vtk5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426981991DD
-	for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 21:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F7F189F20;
+	Sun, 15 Dec 2024 21:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734296435; cv=none; b=Dp22uMo9BebF7J2fDcx8EeBWGP3GTtJW/OLZwgzjqov1hD74Jeh/xtnQ4lgQXCQtgyUpaCsWQNSNo9ltwDeNsxXsUg7ACa6tG/W3UfTtph1rIu/2n5gg7yxMVWKw3VtJja+Yqvfe18YVISkh9k0LmURkPEHJU1zne1VKzodT3Tc=
+	t=1734297141; cv=none; b=t+NvEz8AaoV5sR/Znv6lbFGu29SBurdvc+1KjpaidfwKYbG2h6pqLPY0ueG1zVXdopaKXUwiCJ1UdLzDx/rD3Usuiu0OgYEwH22c3fpuG3IZ5jO42iaGi0Gq1YlEIDYgmDWwazETPJ4w+GDAarGpzlf+rHVCTeZ4VsNxaEhTOb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734296435; c=relaxed/simple;
-	bh=3CBZBlfh+56QfJJs99uRlQZjombPvTGum3x0MjVt7pY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U0a1karKCp/xZTDWiKEqsGyXW2Da+wu12qh5NwRnfJN0710oX0797uMqCuzEs/PyKpXQDvz1pDmgo2tCVa+EioLipxQVR0lhIWymsFfowPQs7I1uIqTPvPuCMiFCbvHQ6G9b05x48fPN3cdoiTXRAROf6CbqTtrAH+Ha0cCOgTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Q+kz8pGu; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7fd2ff40782so3051861a12.2
-        for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 13:00:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1734296433; x=1734901233; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P0XQDitWKVq4eNGE0XYTq4nsJajScvFqTYG5pnFykTI=;
-        b=Q+kz8pGuv/3ULs1UCOZS0OUWLXGxgHDNF0viwaXUDI+G2o4ibiistIAUTa60qKxaam
-         oDEV7n0dG1kcGmVcxIhol1DTkRackejLtJfknyfzcgD8a7eLPo8W3KC4Gj957EPKUw80
-         IP/4NNj5iSSM4v4qP25hULEoBhDQRbZWd0z3o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734296433; x=1734901233;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P0XQDitWKVq4eNGE0XYTq4nsJajScvFqTYG5pnFykTI=;
-        b=OEC+dyQZjkJ9bdw7hNfx3kBtljN4pLdI/WWi43Kwy2uYG8Ud/APzpfIpWS+eVTa0V8
-         YMBypJduM18l8ry7tMeV3ZQiE2KYXnFGyUKkMgQ0qN4o3BqZotlV+hKijNsT3fSY8dXh
-         q5Rw2deZ+nZhrR32vJ6J22uKsGgfTdaXEgZreBI8uRO/Rs+d35rhuO85BYKwz5mYkLWb
-         wNytLIOWQS1q24/ZdT8dv+wM/7ojjDz7zfIMTqXDR8jgFvpMCpj54RGyWX3bGU8QWy2Q
-         W+jy23DtGxAe0RDrwORV3XXkPmsb9A4BL3MDDBPHEvoWSK1iYE+vHuqT/e5X96d48RYr
-         tGhg==
-X-Gm-Message-State: AOJu0Yyy6kBkzgqrjWNXeqHPClqmYIdA0bqEmikHDdpM0SaEYd4gQ/Rb
-	LoT+eSR2fzOe9Dm0o2ScfrKandH3/L27vyZACHUDW61VIMDVcbF2PXQnWgGnO79+0NuPDOlt3Ew
-	=
-X-Gm-Gg: ASbGncsVFGK85GCAhw9kGnIeKmnx6Wpx2jQr7Do04wPMkmvs9pcTpxW4s8Ph5uq72Lk
-	pcEHwQ+2RdugRftADe4UxF9IgDcOgHkETQJgQJ0Dn1oOuxlwSmzqmq13J56TUxF7DkCEMuSYesn
-	/GF4QJtSfwOhWYKeg3Q/Ypj2NjBz1yPi20qBXUnNgITqsaeAHUpbH+Gv3jIG65oQrk909fHtVEZ
-	b+21ybfcOXJ/IaUsCtM9O3Ql5JHdU74fbTbym9h/QknegrJbfoT4dazBJqW/xqBlkHxi0XpYfAr
-	qYpES+eh+mlRM6GGapVe9Ke54Gvaf7EF
-X-Google-Smtp-Source: AGHT+IG+frHYYaCsgN3JwArBgAN3KkRVTrDzzLt0/d2kze6ZjRhYQ6+2ApllcPw65dULG3tYKIKi3A==
-X-Received: by 2002:a17:902:d50c:b0:215:b74c:d7ad with SMTP id d9443c01a7336-21892ab8264mr160964315ad.36.1734296433460;
-        Sun, 15 Dec 2024 13:00:33 -0800 (PST)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f142fc308csm6682717a91.50.2024.12.15.13.00.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Dec 2024 13:00:33 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 6/6] MAINTAINERS: bnxt_en: Add Pavan Chebbi as co-maintainer
-Date: Sun, 15 Dec 2024 12:59:43 -0800
-Message-ID: <20241215205943.2341612-7-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
-In-Reply-To: <20241215205943.2341612-1-michael.chan@broadcom.com>
-References: <20241215205943.2341612-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1734297141; c=relaxed/simple;
+	bh=D31U1yjezZQ8gufsOjmvl7a6VTecr6RWAsPZT3BNrRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iH92H6yLbcAV1U4lNbwt7P7TmtblqoY+e+/yFSl08hJxnrVVJ2+OL95QikrX/Y/kl7t9HaQXXnXJBnGIHyIql0EBu8MnGpA1RJot657t348RCBy2s5OYel4yBlBZ717zv4wvFA66QO+90N5BVIBhLlmrlpvAO0uY2tFVWfKhnvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xya9Vtk5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC67CC4CECE;
+	Sun, 15 Dec 2024 21:12:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734297140;
+	bh=D31U1yjezZQ8gufsOjmvl7a6VTecr6RWAsPZT3BNrRg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Xya9Vtk5BtfCTyKKDlGYZTw88/7v/anzy2IoLNBBa8vtQoEDumHp+8Mvd8C+BOq8j
+	 ojERMqjs2BeJW4W/GcNflNys6kNUgBTb9/OUWINeu4joZVeC/G8glhnuZ83AiDLRcG
+	 /jY2PhJghmwDpuGzG4nA9gCqK5rpnnhrCQm07EwL/g0akag6Z0kfhG/Lfg8i2z3JEM
+	 5bUoUcxYy+q+2g2jisCC+eGeQeYlMZHj1kFvRWEfOhj06K8B6c2qEeVgLdP+omCbT6
+	 1hcHYuN8feeRr6G4O7CJVhB2XHdJPSXfl1KhMDO5jyLGSMeg3l38P5wPX8gTWbTUSh
+	 NzcdGTlxpiYzQ==
+Date: Sun, 15 Dec 2024 13:12:18 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Leon Romanovsky <leonro@nvidia.com>, netdev@vger.kernel.org, Saeed Mahameed
+ <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ linux-rdma@vger.kernel.org, Itamar Gozlan <igozlan@nvidia.com>, Yevgeny
+ Kliteynik <kliteyn@nvidia.com>
+Subject: Re: [PATCH net-next 10/12] net/mlx5: DR, add support for ConnectX-8
+ steering
+Message-ID: <20241215131218.3d040ad8@kernel.org>
+In-Reply-To: <1e8c075c-2fd0-4d10-887d-04a5fb15baa2@gmail.com>
+References: <20241211134223.389616-1-tariqt@nvidia.com>
+	<20241211134223.389616-11-tariqt@nvidia.com>
+	<20241212173113.GF73795@kernel.org>
+	<5b6c8feb-c779-428a-bcca-2febdae5bb0f@gmail.com>
+	<20241212171134.52017f1e@kernel.org>
+	<1e8c075c-2fd0-4d10-887d-04a5fb15baa2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+On Sun, 15 Dec 2024 08:25:44 +0200 Tariq Toukan wrote:
+> > What do you expect we'll do with this series?
+> > 
+> > If you expect it to be set to Awaiting Upstream - could you make sure
+> > that the cover letter has "mlx5-next" in the subject? That will makes
+> > it easier to automate in patchwork.
+> 
+> The relevant patches have mlx5-next in their topic.
+> Should the cover letter as well?
+> What about other non-IFC patches, keep them with net-next?
+> 
+> > If you expect the series to be applied / merged - LMK, I can try
+> > to explain why that's impossible..  
+> 
+> The motivation is to avoid potential conflicts with rdma trees.
+> AFAIK this is the agreed practice and is being followed for some time...
+> 
+> If not, what's the suggested procedure then?
+> How do you suggest getting these IFC changes to both net and rdma trees?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6cced90772fc..2c73a3aacafb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4611,6 +4611,7 @@ F:	drivers/net/ethernet/broadcom/bnx2x/
- 
- BROADCOM BNXT_EN 50 GIGABIT ETHERNET DRIVER
- M:	Michael Chan <michael.chan@broadcom.com>
-+M:	Pavan Chebbi <pavan.chebbi@broadcom.com>
- L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/firmware/broadcom/tee_bnxt_fw.c
--- 
-2.30.1
+You can post just the mlx5-next patches (preferably) or the combined
+set (with mlx5-next in the cover letter tag). Wait a day or two (normal
+review period, like netdev maintainers would when applying to
+net-next). Apply the mlx5-next patches to mlx5-next. Send us a pull
+request with just the mlx5-next stuff.
 
+Post the net-next patches which depend on mlx5-next interface changes.
+
+We can count this as the posting, so feel free to apply patch 1 to
+mlx5-next and send the PR.
 
