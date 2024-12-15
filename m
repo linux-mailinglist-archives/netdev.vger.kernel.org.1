@@ -1,95 +1,87 @@
-Return-Path: <netdev+bounces-152036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F376F9F268C
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 23:20:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE409F2692
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 23:27:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83CC11886AF9
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 22:20:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF8E11882C2C
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 22:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96981C4A2C;
-	Sun, 15 Dec 2024 22:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 830141BC07A;
+	Sun, 15 Dec 2024 22:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sj8F0gIF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DjTJFEkc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6961C4616;
-	Sun, 15 Dec 2024 22:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B2FA41;
+	Sun, 15 Dec 2024 22:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734301212; cv=none; b=Qg44vaoRsY2PhBEucY2I09dcquH72xTLI+9daOgOsLDY7E+biAoTF6O05exoxKH1hGdCoEQBoTSYBFJrvi7MbXhqMnpakoxtJ813AZVgdI4u4vekK+lrrAFmC3kB/fr7CCPEDxMW4bLSMGbmzyBbyRRE5oCgJknLpOiZlyvlXQE=
+	t=1734301645; cv=none; b=qmifvTeDNHmCn/WSqUvKUZtGFDNXPVfDpn9tL7TRtFsXZ2xJh+1bV3v+NfNXJSUHX1TMudBlmOvA5ZilX8lPQzHoOYx8qX/cCTSUAJB/Km7K0uWC/i4hU/XniidD+pNfoC0ZVOPqsxsr6k/h+gufDIB4KZ2xKUH4tCbYzD8Klv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734301212; c=relaxed/simple;
-	bh=pgFcx4vATfkUzjcy2OHq1Ngq4be/TjLTKjUapAC3DXQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aN2//qoPyqFFe9AjKN3xpYCgKNkCu/p0Q4Uw6UBsyUd0T81HkUkYmp0NqNHL0X4hb6/17ECTck/dB63uoUzk1XNFURIgJ/XD5Qh7E+yAJ+ofCdlLLLKgM4qulFhDcwhH1a3aTjsRx95j1Vlcu05i1jkgL/7OCsiECCpjZvSdpl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sj8F0gIF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E887C4CECE;
-	Sun, 15 Dec 2024 22:20:12 +0000 (UTC)
+	s=arc-20240116; t=1734301645; c=relaxed/simple;
+	bh=AIYO0Bd9h0cqYoCI56IydpYXiY5Nd9sFqMFDJhSXh4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VcI1jsGtUakYnIZeZs8lqGgQhADnxVr8sYP6ela0RCUTNFcRNHkJ9fk0pMF0Z3/NwCTh84GYGZtYy/ltTWTfi3YwpCL+ea33UfnddL06vNPO3+8dVRr7z+2RlSjptSDBut5PZdz5L+82FwwrZfQSL51IyVN9jR4wCP87BXGqPuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DjTJFEkc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1497C4CECE;
+	Sun, 15 Dec 2024 22:27:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734301212;
-	bh=pgFcx4vATfkUzjcy2OHq1Ngq4be/TjLTKjUapAC3DXQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sj8F0gIFyvoW8EIMZnAn5koZKvIEUjwbTTm+KfcG5s9aFJ5lj8+fhnyZ6FM/JDP1g
-	 W3NLJR2y3X2PGDppNjBQNe7Kyd+qt3AWrc8dIDC0apJ1jlmW3ucHD2XyPFuK56fnLt
-	 O+jbYyoB7sDZlVDbAcQLp9yDMtN6TiyeVXvzMykG7d8Ny6DbSE9uZin3VI80LMVqi+
-	 kC8G/8n/MDSUTdophfLnGFPS1bZ3682T1QMTOYFGGceXC0jDjVFUyd8R/dILI7rkgR
-	 O6sRJTGQIHyQa1jWM+BmHe9c+JGCxke8a1Zq5R8EgSX+zrOX+xIM3B0RXkuBsq2hnp
-	 7Z14rZsRZ94SA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 449203806656;
-	Sun, 15 Dec 2024 22:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1734301644;
+	bh=AIYO0Bd9h0cqYoCI56IydpYXiY5Nd9sFqMFDJhSXh4s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DjTJFEkcVg3Gh5C6z/Rl0ZRE9qXLEprET2G7FcWqS/f0xmQ2C3OhRwxB+06lLGQE+
+	 zrxvC0sW9hhMys5teHD5raAKrB7blNaK7yzbCRCdsX1DTmivLIzb9WGKKoLQIzXXIu
+	 ijDFO3iX2f5G8O9rlQMAZHSvOht9RUKfV+j91xt8mwrb9YALNAE55uNjy38GH0s1jG
+	 pZQDM6TyZaVhCEb7FESrtJ4byX90QnrC55fbWBCLkaj5SFNa+Q6ulEVHg0YI/2eiGK
+	 xSFM7ov6oWjYvxcxYYcx38VtueAYe7Ybp9Pv440kbKyXzXZWxwFAVo3JEcZjsTzhVp
+	 H6BYu1X6BQgOQ==
+Date: Sun, 15 Dec 2024 14:27:23 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Li Li <dualli@chromium.org>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, donald.hunter@gmail.com,
+ gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
+ maco@android.com, joel@joelfernandes.org, brauner@kernel.org,
+ cmllamas@google.com, surenb@google.com, arnd@arndb.de,
+ masahiroy@kernel.org, bagasdotme@gmail.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, hridya@google.com, smoreland@google.com,
+ kernel-team@android.com
+Subject: Re: [PATCH net-next v10 1/2] binderfs: add new binder devices to
+ binder_devices
+Message-ID: <20241215142723.3e7d22e7@kernel.org>
+In-Reply-To: <20241212224114.888373-2-dualli@chromium.org>
+References: <20241212224114.888373-1-dualli@chromium.org>
+	<20241212224114.888373-2-dualli@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: wan: framer: Simplify API
- framer_provider_simple_of_xlate() implementation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173430122900.3593151.18358965146513672110.git-patchwork-notify@kernel.org>
-Date: Sun, 15 Dec 2024 22:20:29 +0000
-References: <20241213-net_fix-v2-1-6d06130d630f@quicinc.com>
-In-Reply-To: <20241213-net_fix-v2-1-6d06130d630f@quicinc.com>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, quic_zijuhu@quicinc.com,
- gregkh@linuxfoundation.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 12 Dec 2024 14:41:13 -0800 Li Li wrote:
+> +/**
+> + * Add a binder device to binder_devices
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+nit: kdoc is missing function name
 
-On Fri, 13 Dec 2024 20:09:11 +0800 you wrote:
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> Simplify framer_provider_simple_of_xlate() implementation by API
-> class_find_device_by_of_node().
-> 
-> Also correct comments to mark its parameter @dev as unused instead of
-> @args in passing.
-> 
-> [...]
+> + * @device: the new binder device to add to the global list
+> + *
+> + * Not reentrant as the list is not protected by any locks
+> + */
+> +void binder_add_device(struct binder_device *device);
 
-Here is the summary with links:
-  - [net-next,v2] net: wan: framer: Simplify API framer_provider_simple_of_xlate() implementation
-    https://git.kernel.org/netdev/net-next/c/dcacb364772e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To be clear we do not intend to apply these patches to net-next,
+looks like binder patches are mostly handled by Greg KH. Please
+drop the net-next from the subject on future revisions to avoid
+confusion.
 
