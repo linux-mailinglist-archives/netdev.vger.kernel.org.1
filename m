@@ -1,150 +1,218 @@
-Return-Path: <netdev+bounces-151983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0AE19F2378
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 12:27:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D83609F23BC
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 13:33:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2603E164730
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 11:27:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4594D1885628
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 12:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD8814901B;
-	Sun, 15 Dec 2024 11:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E082161320;
+	Sun, 15 Dec 2024 12:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="DEnUdyJy"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="act5TLKY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C73335C7
-	for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 11:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A46D160884
+	for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 12:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734262048; cv=none; b=Nb/Aq+Wo+LIfdTgt2BIqOPUNaZJ8EbTc5/YtyaGr29DmA8L5VDyL/7eC36IRlGB9vD9jDCZ1yxUenM8fiz2jikQZDabUEFBSTGtxc8Kyt8QViS8ltkXcvr8S+tC6n3jc+gmvIsWsDMYLsrFiLaQmkhW2MHV1QorKveNEr38VSo8=
+	t=1734266027; cv=none; b=FtroKJy5lMeC10Cr/nho63m/6LC9go8YGMYPoPACWSiUzYPwBL8dSRKmPqPgZMM588Fy83pu4g7HzWfPGodcb8BFpE+IBM/nbXpgN6Z88AGZi1B0TRTA8uGJjexgUIBTnv58O/IR5ulM/+ENSXLXltbuS097/n5RLqp/eV+i5xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734262048; c=relaxed/simple;
-	bh=5lOdxjwV+N9Vb2eMD4ZIjhF3lI6PUgZUnrUVu5wnnRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e9LwchZRMPDMBwYdR/UyZEUOyJsnYWwvWVsX7bzkyeL7quBXasx0ntVB3tBkDjIlfbwr4YNe6cUA9nVH41WD+c/t9ytAZA948oImS0dFVtLul5VD5nXH9k2FzNa2upvkWWLdL02vAXZcDKX402GA7H1P8Heu5M1vMPUWdhPCHA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=DEnUdyJy; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2163dc5155fso27196595ad.0
-        for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 03:27:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734262046; x=1734866846; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P/a9Tfxy/Xq7V00h/JooH2DpdLFQxJY3+yj7aYYIlco=;
-        b=DEnUdyJygvGSF5LMd2P7SaX7IEfAg5Ju2alekMQvdYSKftBRaf3sxZv7vEHeaeeXvI
-         68g5hw1jefnS3gD+feDMdbLEqigER9KxLed3HdRaAPwsv1U7OWaZadNS7GzCMHuyEPIY
-         TR7qwB6jf3r5BJTw50L1g1g301MjTz8T/sCuJCKJ1dhmn3DMiiyny1OyHfkRUu2Uv37T
-         3QEky7CrB49V1eW3lcA5sxSHiztytz0KPqHtg0RyuKjxAJz8iRynpPcAWAm2ByWGSkXO
-         Txp9/YrXfzy5euxXjhFUbXkoo0W1+PvYhQZxuQdLZhgo+2EKaIIU85WRncxqpCIHGvcH
-         QveQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734262046; x=1734866846;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P/a9Tfxy/Xq7V00h/JooH2DpdLFQxJY3+yj7aYYIlco=;
-        b=hKi7HnbGs3ItCtGtNeLSXWYT2S9YEFVGtUsLJT49M9jfUqz6IIkMnRYi7zIQDhZ1uE
-         HAqHtf/NnMN/fk6I0wmYVN3wZqlxa8o7NO+BDbOCA3ce9EeJU8BFIcbJxeLhXOG48aZ+
-         vsWG0VKOlna0ZTpwWfIi/rzt43y8UPosa1//yoqXGq7IQ4g9xpp9+NMDo3is4bO4Sk1a
-         Zr4XVATqBEJfvmlseYiZIjCYZkWPn7Z4DrRpHZFAvfQI3KeB9ZlXho/hD/qOC8e+NSZO
-         VgtCijUboiJZICE2CaaSZKDz2DO96n/waUQpKsf1QqVEItIkSxYvNzsZGmylIsegBcR6
-         BM6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWBeC8+9llR0vfs3IFzom3pVgxjc/8jIf176DeQTz/yUEFbDCwCNj4tWLfXnE8ovR0XJ6jYyz0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1Ls77LC5Ki25zXXXwVWga7vElSFufsREUr1Dxt6gacrifCZU8
-	2RWMPLiSDHz7Ft4Rs9iQni+bWBk3XHZS3WdT2qLx1e4SCCt3jiC4eBzks4VBBcY2+HRRdlIW9bd
-	1PsHU4g==
-X-Gm-Gg: ASbGncttSmw8WTstmitgbRlzAbS0OAjDJcDKaPaIhvmgk7NePu/sYU2KLhzwi3luHsm
-	hI58cpPUBJ1G5K6Te+9xRVlg0rKdLMoK5JOGqo0vU31KjCN7k1ccIVF3zxE+rElG9LHeiBZvXfn
-	X9bHvB1BZki+sD4H0PMFcAjKzI09RkgLTt3eNJimz/A6w9DVr58jhT8LwuolwBaFQ1Tc1gHj3+3
-	Jgnjs3Au9I3b4oXln0UkOKyBJO/nfUPd/ZIyXuhAt06w3cJvHQ855DTiFUXLvP3PUidwv2A8bhh
-	hOcqDFYh3Klo253QnHTlLhF0nriIAu/UjQ==
-X-Google-Smtp-Source: AGHT+IFkYpop3ZGokw5KkWoFiHRw/ip2w9tkufnO3O6JpM/TIqGUo99wp93dueP9ms43x8i/t9Wr6g==
-X-Received: by 2002:a17:902:e886:b0:216:59ed:1aa3 with SMTP id d9443c01a7336-218929d8431mr99725215ad.27.1734262046247;
-        Sun, 15 Dec 2024 03:27:26 -0800 (PST)
-Received: from [192.168.0.78] (133-32-227-190.east.xps.vectant.ne.jp. [133.32.227.190])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1db531bsm25027135ad.56.2024.12.15.03.27.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 15 Dec 2024 03:27:25 -0800 (PST)
-Message-ID: <e188b451-5f74-4b37-b7a5-0027284f4c48@pf.is.s.u-tokyo.ac.jp>
-Date: Sun, 15 Dec 2024 20:27:22 +0900
+	s=arc-20240116; t=1734266027; c=relaxed/simple;
+	bh=zlNIAH1vOoF5TgVyc/IxBA+tuFz9FIjxEualz/XzgWY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pAMs53xWpi3pnr4qQZl2cpQ351yZdtk4s82HKk8SK1B+UaGm7v9jSIbxcdCM/2Zle+0ysq1Qdm0HmZUmgLomgHlPC7VVbUgutqZu7hSdHW7ACB3RfolpDLYMFuQic1F91VIfLumg/0hDiJ01CAvoMdgN4d3gdyqFxVEerS8XYFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=act5TLKY; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 545AD2540073;
+	Sun, 15 Dec 2024 07:33:44 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-07.internal (MEProxy); Sun, 15 Dec 2024 07:33:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1734266024; x=
+	1734352424; bh=Jl0v0XhcapACQOaaZSTntj4zbNZ+NcuJ80tAfZHkifk=; b=a
+	ct5TLKY54kU0KCY2YdyZVMCPKa173yfCUvfWQWAdisncNlnFxre1rQTXZ/ph8jgm
+	8+yaW+Ad+SGQLgWgdS5ZsVKTX/1BtGdj3BF6QrP6aOVsjL1HmL5MUO4llNoDP4Kp
+	HVYwChbZ4L+HBzRm2sH+5URSKp7S9Au/8B7FkBKS1m57BV1zmLBdxItvvucSu9Q5
+	8vvhv639lSUuJq6blHmofvCX4iz6BTud8WMwiisZgbuVT6GUmSUT5xLleNSg0QgZ
+	tDbe04QnADaTzrzPxVi8BKTZ1PE5YCyLi/XHxwIZuU0EQcLy4VeN4+UOYxProYAI
+	aycezt/Yyt5LJDF81HCOg==
+X-ME-Sender: <xms:p8xeZ5lEZuCfrSSQ_nOOViezZADjdpMa5SLloL4Y5XEdwLRuUj37vA>
+    <xme:p8xeZ03HLqDZxLXDNsuPCFR8SUeyXz7TyMy7D1gDe2_jsbyeiRoS2TIRF1-c2lOEI
+    AQ1MgMNwJssXNs>
+X-ME-Received: <xmr:p8xeZ_phVrNEn3vpHHXypuJss7hjbM3EqRgzkDOwSkZ5dXjwgZKZK-iobfIv>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrledugdegtdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtuden
+    ucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdroh
+    hrgheqnecuggftrfgrthhtvghrnhepleetgeeggeeivdegjeelffdufeegjeeugeduudei
+    vdevueefieefteeufeelvdeknecuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlh
+    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhes
+    ihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouh
+    htpdhrtghpthhtoheprhhrvghnuggvtgesrhgvughhrghtrdgtohhmpdhrtghpthhtohep
+    rhgriihorhessghlrggtkhifrghllhdrohhrghdprhgtphhtthhopehrohhophgrsehnvh
+    hiughirgdrtghomhdprhgtphhtthhopegsrhhiughgvgeslhhishhtshdrlhhinhhugidr
+    uggvvhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghn
+    ihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
+X-ME-Proxy: <xmx:p8xeZ5m_KVsgrFVRVoHvAxLSkdeg0FoyGGcfw1gn15o4kDbsdDAZbg>
+    <xmx:p8xeZ33OOd4a4AlA8rI4lH9btDHMb0AOViQuHcgzxOFuBR1HgUNpzw>
+    <xmx:p8xeZ4vVQ9DDR0yaC1L4coR7yrKU2YPH8BBGocqB68mawnlcqkT0Yg>
+    <xmx:p8xeZ7VffnctL-MpftU-6O3UPtJjS8zYhutDXYPzWBtOMmmSRgj-rg>
+    <xmx:qMxeZ5z4gcew3Fqdv0I6bd2vhubvAjwdnnzYAHA-Xp4LywUFgDfz3nDA>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 15 Dec 2024 07:33:42 -0500 (EST)
+Date: Sun, 15 Dec 2024 14:33:40 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Radu Rendec <rrendec@redhat.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>,
+	Roopa Prabhu <roopa@nvidia.com>, bridge@lists.linux.dev,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next] net/bridge: Add skb drop reasons to the most
+ common drop points
+Message-ID: <Z17MpOdRsUjBt4Hi@shredder>
+References: <20241208221805.1543107-1-rrendec@redhat.com>
+ <Z1sLyqZQCjbcCOde@shredder>
+ <84e3d3e998f1a02dd742727c2e18b7c364c36389.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: mdiobus: fix an OF node reference leak
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20241214081546.183159-1-joe@pf.is.s.u-tokyo.ac.jp>
- <1e1c4c67-3e18-4364-9311-c9ba36a5e2b9@lunn.ch>
-Content-Language: en-US
-From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-In-Reply-To: <1e1c4c67-3e18-4364-9311-c9ba36a5e2b9@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <84e3d3e998f1a02dd742727c2e18b7c364c36389.camel@redhat.com>
 
-Hi Andrew,
-
-Thank you for your review.
-
-On 12/15/24 20:03, Andrew Lunn wrote:
-> On Sat, Dec 14, 2024 at 05:15:46PM +0900, Joe Hattori wrote:
->> fwnode_find_mii_timestamper() calls of_parse_phandle_with_fixed_args()
->> but does not decrement the refcount of the obtained OF node. Add an
->> of_node_put() call before returning from the function.
->>
->> This bug was detected by an experimental static analysis tool that I am
->> developing.
->>
->> Fixes: bc1bee3b87ee ("net: mdiobus: Introduce fwnode_mdiobus_register_phy()")
->> Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
->> ---
->>   drivers/net/mdio/fwnode_mdio.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
->> index b156493d7084..83c8bd333117 100644
->> --- a/drivers/net/mdio/fwnode_mdio.c
->> +++ b/drivers/net/mdio/fwnode_mdio.c
->> @@ -56,6 +56,7 @@ fwnode_find_mii_timestamper(struct fwnode_handle *fwnode)
->>   	if (arg.args_count != 1)
->>   		return ERR_PTR(-EINVAL);
->>   
->> +	of_node_put(arg.np);
->>   	return register_mii_timestamper(arg.np, arg.args[0]);
+On Fri, Dec 13, 2024 at 03:44:49PM -0500, Radu Rendec wrote:
+> On Thu, 2024-12-12 at 18:14 +0200, Ido Schimmel wrote:
+> > On Sun, Dec 08, 2024 at 05:18:05PM -0500, Radu Rendec wrote:
+> > > The bridge input code may drop frames for various reasons and at various
+> > > points in the ingress handling logic. Currently kfree_skb() is used
+> > > everywhere, and therefore no drop reason is specified. Add drop reasons
+> > > to the most common drop points.
+> > > 
+> > > The purpose of this patch is to address the most common drop points on
+> > > the bridge ingress path. It does not exhaustively add drop reasons to
+> > > the entire bridge code. The intention here is to incrementally add drop
+> > > reasons to the rest of the bridge code in follow up patches.
+> > > 
+> > > Most of the skb drop points that are addressed in this patch can be
+> > > easily tested by sending crafted packets. The diagram below shows a
+> > > simple test configuration, and some examples using `packit`(*) are
+> > > also included. The bridge is set up with STP disabled.
+> > > (*) https://github.com/resurrecting-open-source-projects/packit
+> > > 
+> > > The following changes were *not* tested:
+> > > * SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT in br_multicast_flood(). I could
+> > >   not find an easy way to make a crafted packet get there.
+> > > * SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD in br_handle_frame_finish()
+> > >   when the port state is BR_STATE_DISABLED, because in that case the
+> > >   frame is already dropped in the switch/case block at the end of
+> > >   br_handle_frame().
+> > > 
+> > >     +---+---+
+> > >     |  br0  |
+> > >     +---+---+
+> > >         |
+> > >     +---+---+  veth pair  +-------+
+> > >     | veth0 +-------------+ xeth0 |
+> > >     +-------+             +-------+
+> > > 
+> > > SKB_DROP_REASON_MAC_INVALID_SOURCE - br_handle_frame()
+> > > packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+> > >   -e 01:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+> > >   -p '0x de ad be ef' -i xeth0
+> > > 
+> > > SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL - br_handle_frame()
+> > > packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+> > >   -e 02:22:33:44:55:66 -E 01:80:c2:00:00:01 -c 1 \
+> > >   -p '0x de ad be ef' -i xeth0
+> > > 
+> > > SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD - br_handle_frame()
+> > > bridge link set dev veth0 state 0 # disabled
+> > > packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+> > >   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+> > >   -p '0x de ad be ef' -i xeth0
+> > > 
+> > > SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD - br_handle_frame_finish()
+> > > bridge link set dev veth0 state 2 # learning
+> > > packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+> > >   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+> > >   -p '0x de ad be ef' -i xeth0
+> > > 
+> > > SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT - br_flood()
+> > > packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+> > >   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+> > >   -p '0x de ad be ef' -i xeth0
+> > > 
+> > > Signed-off-by: Radu Rendec <rrendec@redhat.com>
+> > > ---
+> > >  include/net/dropreason-core.h | 18 ++++++++++++++++++
+> > >  net/bridge/br_forward.c       |  4 ++--
+> > >  net/bridge/br_input.c         | 24 +++++++++++++++---------
+> > >  3 files changed, 35 insertions(+), 11 deletions(-)
+> > > 
+> > > diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+> > > index c29282fabae6..1f2ae5b387c1 100644
+> > > --- a/include/net/dropreason-core.h
+> > > +++ b/include/net/dropreason-core.h
+> > > @@ -108,6 +108,9 @@
+> > >  	FN(TUNNEL_TXINFO)		\
+> > >  	FN(LOCAL_MAC)			\
+> > >  	FN(ARP_PVLAN_DISABLE)		\
+> > > +	FN(MAC_IEEE_MAC_CONTROL)	\
+> > > +	FN(BRIDGE_INGRESS_PORT_NFWD)	\
+> > > +	FN(BRIDGE_NO_EGRESS_PORT)	\
+> > >  	FNe(MAX)
+> > >  
+> > >  /**
+> > > @@ -502,6 +505,21 @@ enum skb_drop_reason {
+> > >  	 * enabled.
+> > >  	 */
+> > >  	SKB_DROP_REASON_ARP_PVLAN_DISABLE,
+> > > +	/**
+> > > +	 * @SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL: the destination MAC address
+> > > +	 * is an IEEE MAC Control address.
+> > > +	 */
+> > 
+> > IMO, dropping pause frames is not among "the most common drop points".
+> > Are you planning on reusing this reason in other modules? If not, then I
+> > prefer removing it. My understanding is that we should not try to
+> > document every obscure drop with these reasons.
 > 
-> This looks wrong to me. If you do a put on an object, it can
-> disappear, because it is not being used. You then pass it to
-> register_mii_timestamper() and it gets to use something which no
-> longer exists.
+> Fair enough. I don't have an immediate plan to reuse this reason, and
+> to be honest, I'm not that familiar with the networking stack to be
+> able to tell off hand if it's likely to be useful elsewhere.
+> 
+> Would you prefer to stick to not specifying a drop reason at all at
+> that particular drop point, or to reuse an existing reason? Two
+> existing reasons that could be used (although they are not entirely
+> accurate) are:
+> SKB_DROP_REASON_UNHANDLED_PROTO
+> SKB_DROP_REASON_MAC_INVALID_SOURCE
 
-Totally. Should have realized that. It is fixed in the v2 patch as I 
-moved the of_node_put() call to the very end of the function.
-
-> 
-> Please think about what get/put are used for, and what that means for
-> ordering.
-> 
-> Maybe you can extend your tool to look for potential use after free
-> bugs.
-> 
->      Andrew
-> 
-> ---
-> pw-bot: cr
-
-Best,
-Joe
+Both aren't really applicable in this case and I doubt users are hitting
+this drop point in practice, but I feel like I don't have a good
+argument against adding 'SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL', so maybe
+just keep it ^o^
 
