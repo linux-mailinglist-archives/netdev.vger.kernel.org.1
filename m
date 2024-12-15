@@ -1,143 +1,129 @@
-Return-Path: <netdev+bounces-152005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B859F251D
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 18:44:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 949A89F2527
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 18:56:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD57A1648AB
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 17:44:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30F8F18860FC
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 17:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191AC1B4124;
-	Sun, 15 Dec 2024 17:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9913C1B3926;
+	Sun, 15 Dec 2024 17:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KB+/Gwvr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="19KkyEXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E951922FB;
-	Sun, 15 Dec 2024 17:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0992F1922D4
+	for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 17:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734284651; cv=none; b=WvJVUFtXx9Mj+QutsoUa0W5wkNWIwxQeyWKKAscC7UqcATi8RPuSgMjW9B5HCEoU651XuZDcA+BHXrzcaweLipjtEd+DSnGzW8YhC1JBDeqFgJrDhbLRIYvTwKhUeP42l4DN1dfdzv0nO0cw+9vaK4Rmx4ByZX7Y+JW5pEvsr04=
+	t=1734285412; cv=none; b=SskIrdKFcBEp8Y+LX73LCsl3FEnGBQVojjNei57I52wtkZbYiqbk3quJVC0rJuLODr6h7amFSy11GbVSl3F1DA5BLS3NMOA1wR66H98oVc/n3WIkU+o9yrykctPXMkdM13I4NAxHlTWMJo5T/AFFIIQraViQZwb7MFdmBeQjeBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734284651; c=relaxed/simple;
-	bh=m4coHam65CQzfvGK+uXCW8H3x23IFG1j7jYWoe7Nzrw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WKmW4lgy+m3+pT0ZOoFdBD0CvNoL96/e7Rr7JJkVOpe5GU0aksYZxVWJTC9K9bGz4fTrsrqJOJbX8eysJrDdmKZZ9bWxfmxA1tNiEGsQNQnf/n/Q4xbYMoskbzv9yh9B13L7+umWeY382TDAeYD1nUQnwlpOtBxRZ7vUEU4Apek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KB+/Gwvr; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From:From:Sender:Reply-To:Subject:Date:Message-ID:
-	To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=P+CYKBqglvyd/Mbd1yBF10OWGj9J10FWUydtXlErGv0=; b=KB+/Gwvr94b75nZiqLxOn7dcPs
-	2yjvMI+VX2UytsB7G2MEuVQiJsh4i7OQJ3ceZKU7ZugC4Y89zEBcBsTpfr8gVX1N82kYUt2xzvibb
-	2ISm/hCm3WucqoCweiR9ZHTvK60FV0eKdceA3sHHIcKzjnaZhjNeFKbNZChumh9KfDmc=;
-Received: from [94.14.176.234] (helo=thinkpad.home.lunn.ch)
-	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tMsey-000WMH-72; Sun, 15 Dec 2024 18:44:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-Date: Sun, 15 Dec 2024 17:43:55 +0000
-Subject: [PATCH net-next] net: dsa: qca8k: Fix inconsistent use of jiffies
- vs milliseconds
+	s=arc-20240116; t=1734285412; c=relaxed/simple;
+	bh=E/XN4RrrV257sD/ZdAV+QOeUXSMb8jKKdwuF0Re3rso=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RsDTbV/4/vAUNQo7BjLKEGWFxw/xznFS3Xp6L0FeVdbRegqPndBAzSsylzQ0H3Ao3dTaBxKsW3KSkLi79D2Knw9pEmjlWrE3qSX2ZYbvXAuWIDDfxgtVApN4KIWTUxoxnNMnohxqrF5WC0M7ylioAUj/KBT9PGG1d1kudwTEFhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=19KkyEXl; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b6ef2163d9so727022385a.0
+        for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 09:56:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734285410; x=1734890210; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Y8DV8PYOVs0Rz4aCkkB/Pp4z24yZPj5L7wSkPLQt3fI=;
+        b=19KkyEXlurSGfIFFCcR037odRWFEcU0La//oi+V5AQM1FwOGqiHU7zU4nYqLxYePMf
+         tT1nBQN4zzOwvQxwOL939wUt+0DVKZ5ke2W2s+/EuAFq5S92AxjIQnU/xaI9IYgmrynv
+         JKIf3vKKH/DbfLxua6zxUeeRciA4+torzvJsqa5B8Djd+Un5Xka/4UdXtMP1y5a3Lril
+         4BzShf95+E7ks8TkgQKzhvvfgWHfzoAHKteUDPJL7klbElscnOeN9B4VrR8rHnmnSZjr
+         z9w4VgQBRbPFBqyhDdUpbJXOhDCeiJlfOkyAgD00bXUHrZxKHvQlQPlGi50x38A1ZpCf
+         /IDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734285410; x=1734890210;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y8DV8PYOVs0Rz4aCkkB/Pp4z24yZPj5L7wSkPLQt3fI=;
+        b=tnLAXsPXYSLOcKaHZBGvK5zcmHt8hgXeTemb41Q7RGV4Q/V02TmtoopP/rnDpe8UVm
+         dPRWPljcm/u8K+xkyjhBVchvr6+bZ1KXnrdBB6MUyJAbaAPqXFJWBairnji2eCP9O2yw
+         HJ1oDmRJwHfg9UIMXazrvn1Qy5F4kfhcGuhAwmBbRvJCgH6mlFtc0JelJB/ewiMTMm0K
+         h9zVW70ONPd4ttrSZ991T45/IR9N1a9RZ8mY5c3G7S9+fG6i4Jw1cO0dtduCUfQxwCWQ
+         lnvof6Kz4YGmhkWiYqSuFqRYZyjlq2wBLpecUkpSsjTja4aTpzI1XRqQgbhuU6PLN4Ye
+         /hzQ==
+X-Gm-Message-State: AOJu0YxsnfeX998oJYwHRY3kEisofcNrhMAhPoJEJNQImYN9BBGf6QgV
+	azB/oQVUej0qNFpdOkgvHap8QIdqBt82VRJ+yeJ/iGhDCHPDFTk0Awfr1X3NsPXAvcI+Vh4TmjK
+	csouHAYkZKg==
+X-Google-Smtp-Source: AGHT+IHQKtYjybr9XSKs2o9FOIa3m1JxIvtcm34yOKZiGh3biCJh0la0CdQfTnKonXzt8SJWGbPJUPQh0O9tsA==
+X-Received: from qtbay16.prod.google.com ([2002:a05:622a:2290:b0:467:7214:12b3])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4555:b0:7b1:462f:46f7 with SMTP id af79cd13be357-7b6fbf158cfmr1661563185a.30.1734285409944;
+ Sun, 15 Dec 2024 09:56:49 -0800 (PST)
+Date: Sun, 15 Dec 2024 17:56:25 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241215-qca8k-jiffies-v1-1-5a4d313c76ea@lunn.ch>
-X-B4-Tracking: v=1; b=H4sIAFoVX2cC/x3MQQqAIBBA0avErBtQSciuEi1Cx5oCK40QpLsnL
- f/i/QKJIlOCoSkQ6eHER6gh2wbsOoeFkF1tUEJ1UkmNl537HTf2vjIUknqrndPCGKjmjOQ5/78
- RAt0YKN8wve8HB0ZWlWkAAAA=
-X-Change-ID: 20241215-qca8k-jiffies-01e8c5dd5099
-To: Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Christian Marangi <ansuelsmth@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2074; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=m4coHam65CQzfvGK+uXCW8H3x23IFG1j7jYWoe7Nzrw=;
- b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBnXxVjcEj9ppNgUW1rrj3cSRr15n0rWWOe/uMMa
- kQ46UWwtIKJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZ18VYwAKCRDmvw3LpmlM
- hGHZD/9visKEj8/ePwCp1C3pguAn3WIHAcoUbFxa2jdbYd30XInwvTp5O4maX+8GuNJBuSmSayN
- ofHmPCSbe6aD8PSDxlSa/42d6835ubam2qZIJ2spTzRgn49ElFzxLUL0yGkEy2f+WTSKeaPPLME
- PV7hrjxbG5ovKY4O6X1DoyayG5Qh3DZKIvM3cThZ7M/nmvypaKHq6n7mxgl2mMg1uOcDbGFqbBx
- kQ7JAHOC7xe+vcNl1dWO156FcFfcTmLFgKYdDfFBzgpTY9HlV1xmvoAyxbCmS947gqCPykw1MMF
- COyRFRBNQ3TOJQjow2M/xWOtwsaSc0avr6xJUVBit4NNivgNBt6wMRi9yBsSY0mwJFhO0PaWfRm
- c09r3QvjdXUkG50gycsxPEbD2Rpw/c2fk12wGHlXrXgwneSqa59B8+9jIvUb2csGWZx1X5EDH7B
- XkZeYL8dHcRAfvykm6Q+kCTPHPgfwNSJqwaGR5s5vN0T6wl8bzXRXRPvWuG5y/FjZlljVr5MOd1
- YyS4ngB9VneyS/opPh+R28Lw41IgFsloKblEJ3Cqe0sECB2AQsOxd+VWF726bJmeHbwLYRN6N0q
- hetC3SG6t9U6HudGV5Ir7rJ8HfY7WRy6ZWxgKJ4FjQVUfG3g2xaJMOLsadNY5JzZwpiMDtxb8lr
- /6ja2Q27LdYqquw==
-X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
- fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241215175629.1248773-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/4] inetpeer: reduce false sharing and atomic operations
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-wait_for_complete_timeout() expects a timeout in jiffies. With the
-driver, some call sites converted QCA8K_ETHERNET_TIMEOUT to jiffies,
-others did not. Make the code consistent by changes the #define to
-include a call to msecs_to_jiffies, and remove all other calls to
-msecs_to_jiffies.
+After commit 8c2bd38b95f7 ("icmp: change the order of rate limits"),
+there is a risk that a host receiving packets from an unique
+source targeting closed ports is using a common inet_peer structure
+from many cpus.
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/dsa/qca/qca8k-8xxx.c | 4 ++--
- drivers/net/dsa/qca/qca8k.h      | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+All these cpus have to acquire/release a refcount and update
+the inet_peer timestamp (p->dtime)
 
-diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-index ec74e3c2b0e9b90b29de4442f056783043fac69f..90e24bc00b99cca1f65ed1df8b06713d7002e029 100644
---- a/drivers/net/dsa/qca/qca8k-8xxx.c
-+++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-@@ -342,7 +342,7 @@ static int qca8k_read_eth(struct qca8k_priv *priv, u32 reg, u32 *val, int len)
- 	dev_queue_xmit(skb);
- 
- 	ret = wait_for_completion_timeout(&mgmt_eth_data->rw_done,
--					  msecs_to_jiffies(QCA8K_ETHERNET_TIMEOUT));
-+					  QCA8K_ETHERNET_TIMEOUT);
- 
- 	*val = mgmt_eth_data->data[0];
- 	if (len > QCA_HDR_MGMT_DATA1_LEN)
-@@ -394,7 +394,7 @@ static int qca8k_write_eth(struct qca8k_priv *priv, u32 reg, u32 *val, int len)
- 	dev_queue_xmit(skb);
- 
- 	ret = wait_for_completion_timeout(&mgmt_eth_data->rw_done,
--					  msecs_to_jiffies(QCA8K_ETHERNET_TIMEOUT));
-+					  QCA8K_ETHERNET_TIMEOUT);
- 
- 	ack = mgmt_eth_data->ack;
- 
-diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
-index 3664a2e2f1f641d2d5533b767f709bf34eec3753..24962a395754c1f12de58d11cdc97e5fe5f0d046 100644
---- a/drivers/net/dsa/qca/qca8k.h
-+++ b/drivers/net/dsa/qca/qca8k.h
-@@ -16,7 +16,7 @@
- 
- #define QCA8K_ETHERNET_MDIO_PRIORITY			7
- #define QCA8K_ETHERNET_PHY_PRIORITY			6
--#define QCA8K_ETHERNET_TIMEOUT				5
-+#define QCA8K_ETHERNET_TIMEOUT				msecs_to_jiffies(5)
- 
- #define QCA8K_NUM_PORTS					7
- #define QCA8K_NUM_CPU_PORTS				2
+Switch to pure RCU to avoid changing the refcount, and update
+p->dtime only once per jiffy.
 
----
-base-commit: 2c2b61d2138f472e50b5531ec0cb4a1485837e21
-change-id: 20241215-qca8k-jiffies-01e8c5dd5099
+Tested:
+  DUT : 128 cores, 32 hw rx queues.
+  receiving 8,400,000 UDP packets per second, targeting closed ports.
 
-Best regards,
+Before the series:
+- napi poll can not keep up, NIC drops 1,200,000 packets
+  per second. 
+- We use 20 % of cpu cycles
+
+After this series:
+- All packets are received (no more hw drops)
+- We use 12 % of cpu cycles.
+
+v2: addded Simon and Ido feedback from v1
+v1: https://lore.kernel.org/netdev/20241213130212.1783302-1-edumazet@google.com/T/#mc6b32422714235f8608580a7dbf464c203300578
+
+Eric Dumazet (4):
+  inetpeer: remove create argument of inet_getpeer_v[46]()
+  inetpeer: remove create argument of inet_getpeer()
+  inetpeer: update inetpeer timestamp in inet_getpeer()
+  inetpeer: do not get a refcount in inet_getpeer()
+
+ include/net/inetpeer.h | 12 +++++-------
+ net/ipv4/icmp.c        |  9 ++++-----
+ net/ipv4/inetpeer.c    | 31 ++++++++-----------------------
+ net/ipv4/ip_fragment.c | 15 ++++++++++-----
+ net/ipv4/route.c       | 17 +++++++++--------
+ net/ipv6/icmp.c        |  6 +++---
+ net/ipv6/ip6_output.c  |  6 +++---
+ net/ipv6/ndisc.c       |  8 +++++---
+ 8 files changed, 47 insertions(+), 57 deletions(-)
+
 -- 
-Andrew Lunn <andrew@lunn.ch>
+2.47.1.613.gc27f4b7a9f-goog
 
 
