@@ -1,127 +1,140 @@
-Return-Path: <netdev+bounces-151976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAFC19F21BF
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 03:26:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 531239F21C1
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 03:28:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 415FC1886F10
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 02:26:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82340164511
+	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 02:28:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187846FBF;
-	Sun, 15 Dec 2024 02:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127D079DC;
+	Sun, 15 Dec 2024 02:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Nc9GBSvF"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="UGwPKOjZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B5F79CF;
-	Sun, 15 Dec 2024 02:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539F6653;
+	Sun, 15 Dec 2024 02:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734229590; cv=none; b=ZZM+me/vQWTgduZWP51S2C9QFN8blbJNJxEpUGE/2Sq5F4A4UOofrz2Ly2Ed/mjyKh0QS22jVsN8XoZre0hT8PyHQM2MNiYPBu3SIzQrnVa/uNUP+aR5UIKd2JpTznRJ5faf7m2sEiq/W6na8OTaff69UjfCU2jOQXAeEAIWsKI=
+	t=1734229688; cv=none; b=ukVgkfViLqs3gknNkoKwniXbEUPo/AxId5P1hIhgWgjab9NB6fiRPNL0akH0yiAPQj6zNkOhsAdbOkR2gXOBhL+2CVIjur1o/SwUuSbpmVL5JvD5M4F1JVeucUPNqhCSvTdXRRhbFj1UVDTxzo0qXVCq3THSX2F9hdMaaBCpKTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734229590; c=relaxed/simple;
-	bh=Ldn6CTUjryaD3q08oP5hnRDfoH4SLjS9R2cQ6xQPXZI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MubMCYpL/E7CUsvLFf+rU7s8aKTBSlZxsZZptMtVMAXD6rgn3IpPyllB1+Xq4tCG+/jGFbRDidto5spLo735qAuPGcMHwgblSj+MZZS14LNSsmMLBV5cc19BvTF9j2fm4Qq3tErVFGSgyOJacNoKWjtQ+ZD9uUqAceMi2VQa7vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Nc9GBSvF; arc=none smtp.client-ip=46.235.229.95
+	s=arc-20240116; t=1734229688; c=relaxed/simple;
+	bh=MLlumoZHmHbqBzRfHsVCxREyHXeeCl7mYEijMYxIc1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RD0uq4zEIE4PJdB10rQBXU0H5uVFUbqPxdlebrR4Qzxfg064WFEduZFpNcEiItqlNKRPqp5BfuGJJdpGCEJMHDVaNiGv3BRAd+xt2lgDYOqJzFtcetsdBhJyzkyvU+srVlJzG0cW3KgWhhJst25FvBFlwJUG7FRC0Rtju9sVupI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=UGwPKOjZ; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=xWgFc3JYDQAwYvHwwdvWJleePGeQwga9IFxSxRCkdV0=; b=Nc9GBSvF6qPDGEhI
-	ie+SdI5lOOoXJQPP/4p69cMXKGh9XTCBPUJ4SgXRXzK2MpSmcEHy5VIa3inXcLTe9KAlGzfWUv4sO
-	n9grQ7gqTF1HXFG1AIPAZkQmGWaWVB+qTpVILEAZe4e+auLKq3O/PHptroq0bw5euyeP8Zc3duvjh
-	YV8Rl3hSSdnvIakYTh++WGYmMv9RkZo/N7FKAOozqljHrpxml58azShgIBLb3Q46rpgXocF6+fm7v
-	vMOJUcmAG53WmiooQI1CKoFy3Ym1/KU6nXM+qM7qSkOlATi2P11SntsU1e4ioaZXsxtoAW0UbdLoa
-	Dqe+Hpt/1zf02bpvIg==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tMeKq-005RGe-1F;
-	Sun, 15 Dec 2024 02:26:20 +0000
-From: linux@treblig.org
-To: jes@trained-monkey.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=MM7ieqR2fvWCB6DaMUqnBY6opWO9vzebBQbjF3iD90Y=; b=UGwPKOjZ5HlH8kPU
+	fW8Dd08ndpIFS5EWhMCgvYqQHVI6duCZzYoJ7V1SrBgiG6ZepFOyxn35iSgEt2VkXH+9/woSdUi6X
+	HE6HdD+5WIxvkZitfkZpw8mQ4eJW74/tnNpUWwSJOgOSUO1oobKJgic56zDw7znwpyyZ78B8/7sSX
+	weRsKF9yDJQLuPsGoC7F2EFyc0NlaCYBmdpmfED8iXSV4YuXqvYXwxbVTBsNKqgaMR/D/Nr2eJtZ3
+	OQZmSkcSRTYwrFxAGw5vNCDXzGRzrN1rN2kI4Nu948u5iyX4B0FpQlL1p3L6S1xj9R/L123+YxdDh
+	ZvZ5OIG+SyyxXCY9vQ==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1tMeMT-005RIK-1A;
+	Sun, 15 Dec 2024 02:28:01 +0000
+Date: Sun, 15 Dec 2024 02:28:01 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: jes@trained-monkey.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
 	horms@kernel.org
-Cc: linux-hippi@sunsite.dk,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next] hippi: Remove unused hippi_neigh_setup_dev
-Date: Sun, 15 Dec 2024 02:26:18 +0000
-Message-ID: <20241215022618.181756-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] hippi: Remove unused hippi_neigh_setup_dev
+Message-ID: <Z14-sYvgzEPZSTyR@gallifrey>
+References: <20241215022618.181756-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20241215022618.181756-1-linux@treblig.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 02:27:26 up 220 days, 13:41,  1 user,  load average: 0.05, 0.05,
+ 0.01
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+Note the hippi list address bounces:
 
-hippi_neigh_setup_dev() has been unused since
-commit e3804cbebb67 ("net: remove COMPAT_NET_DEV_OPS")
+<linux-hippi@sunsite.dk>:
+Sorry, no mailbox here by that name. (#5.1.1)
 
-Remove it.
+Dave
 
-(I'm a little suspicious it's the only setup call removed
-by that previous commit?)
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- include/linux/hippidevice.h |  1 -
- net/802/hippi.c             | 15 ---------------
- 2 files changed, 16 deletions(-)
-
-diff --git a/include/linux/hippidevice.h b/include/linux/hippidevice.h
-index 07414c241e65..404bd5b2b4fc 100644
---- a/include/linux/hippidevice.h
-+++ b/include/linux/hippidevice.h
-@@ -33,7 +33,6 @@ struct hippi_cb {
- 
- __be16 hippi_type_trans(struct sk_buff *skb, struct net_device *dev);
- int hippi_mac_addr(struct net_device *dev, void *p);
--int hippi_neigh_setup_dev(struct net_device *dev, struct neigh_parms *p);
- struct net_device *alloc_hippi_dev(int sizeof_priv);
- #endif
- 
-diff --git a/net/802/hippi.c b/net/802/hippi.c
-index 1997b7dd265e..5e02ec1274a1 100644
---- a/net/802/hippi.c
-+++ b/net/802/hippi.c
-@@ -126,21 +126,6 @@ int hippi_mac_addr(struct net_device *dev, void *p)
- }
- EXPORT_SYMBOL(hippi_mac_addr);
- 
--int hippi_neigh_setup_dev(struct net_device *dev, struct neigh_parms *p)
--{
--	/* Never send broadcast/multicast ARP messages */
--	NEIGH_VAR_INIT(p, MCAST_PROBES, 0);
--
--	/* In IPv6 unicast probes are valid even on NBMA,
--	* because they are encapsulated in normal IPv6 protocol.
--	* Should be a generic flag.
--	*/
--	if (p->tbl->family != AF_INET6)
--		NEIGH_VAR_INIT(p, UCAST_PROBES, 0);
--	return 0;
--}
--EXPORT_SYMBOL(hippi_neigh_setup_dev);
--
- static const struct header_ops hippi_header_ops = {
- 	.create		= hippi_header,
- };
+* linux@treblig.org (linux@treblig.org) wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> hippi_neigh_setup_dev() has been unused since
+> commit e3804cbebb67 ("net: remove COMPAT_NET_DEV_OPS")
+> 
+> Remove it.
+> 
+> (I'm a little suspicious it's the only setup call removed
+> by that previous commit?)
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> ---
+>  include/linux/hippidevice.h |  1 -
+>  net/802/hippi.c             | 15 ---------------
+>  2 files changed, 16 deletions(-)
+> 
+> diff --git a/include/linux/hippidevice.h b/include/linux/hippidevice.h
+> index 07414c241e65..404bd5b2b4fc 100644
+> --- a/include/linux/hippidevice.h
+> +++ b/include/linux/hippidevice.h
+> @@ -33,7 +33,6 @@ struct hippi_cb {
+>  
+>  __be16 hippi_type_trans(struct sk_buff *skb, struct net_device *dev);
+>  int hippi_mac_addr(struct net_device *dev, void *p);
+> -int hippi_neigh_setup_dev(struct net_device *dev, struct neigh_parms *p);
+>  struct net_device *alloc_hippi_dev(int sizeof_priv);
+>  #endif
+>  
+> diff --git a/net/802/hippi.c b/net/802/hippi.c
+> index 1997b7dd265e..5e02ec1274a1 100644
+> --- a/net/802/hippi.c
+> +++ b/net/802/hippi.c
+> @@ -126,21 +126,6 @@ int hippi_mac_addr(struct net_device *dev, void *p)
+>  }
+>  EXPORT_SYMBOL(hippi_mac_addr);
+>  
+> -int hippi_neigh_setup_dev(struct net_device *dev, struct neigh_parms *p)
+> -{
+> -	/* Never send broadcast/multicast ARP messages */
+> -	NEIGH_VAR_INIT(p, MCAST_PROBES, 0);
+> -
+> -	/* In IPv6 unicast probes are valid even on NBMA,
+> -	* because they are encapsulated in normal IPv6 protocol.
+> -	* Should be a generic flag.
+> -	*/
+> -	if (p->tbl->family != AF_INET6)
+> -		NEIGH_VAR_INIT(p, UCAST_PROBES, 0);
+> -	return 0;
+> -}
+> -EXPORT_SYMBOL(hippi_neigh_setup_dev);
+> -
+>  static const struct header_ops hippi_header_ops = {
+>  	.create		= hippi_header,
+>  };
+> -- 
+> 2.47.1
+> 
 -- 
-2.47.1
-
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
