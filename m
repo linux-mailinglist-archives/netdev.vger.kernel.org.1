@@ -1,111 +1,98 @@
-Return-Path: <netdev+bounces-152316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 732459F36AF
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 17:54:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 020E59F36E9
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:03:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12FA1168075
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 16:54:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5C621893A36
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 17:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E972063F2;
-	Mon, 16 Dec 2024 16:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101132066E1;
+	Mon, 16 Dec 2024 16:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="dYpx4nsS"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="DRqUxdag"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD952063DD;
-	Mon, 16 Dec 2024 16:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC721CEAD8;
+	Mon, 16 Dec 2024 16:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734367739; cv=none; b=sOesCBJoSy1pvcaPeEsmHrarCzkrkeu8kkuLSstDjl9N2Cay7pOjnhccmbQYWryMj+KCONRvnqLhOzV5nFe9UpLuBsO7EQdUGxP/gQ4Vi1UxVrwnTfNSoOYRSjbJRJ//orTkic0StjZ0LMi1eQkht3eFE114vi8dOU3rm3MJW9k=
+	t=1734368178; cv=none; b=ef0f/1m5zTvs+sdyJFeKlZ37us4eJqlilAJMeh6qQFwa/thPaCBkI85qPULqnvtfWe6VXiS5JTUf+onDva02l6BdJHCn6rrJG9Qk40ArBZynLui2Rd5BvrCVERmUUcY61xNO09sLILIyCLiC+yCHd1NDBfZr4FXz59H4oaB4aME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734367739; c=relaxed/simple;
-	bh=JuLN6r70JiEFAqbOYMC6cXE9GSddTbtWFdm/gA6bkXM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o4Kq976FW2Gc7oEEOlvNbcXNGi1B4YZuiZ8MdkAfdEccHnfXrGAIQT/a+KWYki6cQSYrVp6WWZY05+4OdospVOTLMQ+9PHE7p/slV6lrDn9sde5aV/yDm6CBMZeVrcU00QVX5fSOpMm+2AN/Uft6UrUWrezF+qpE3dZhNer9PNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=dYpx4nsS; arc=none smtp.client-ip=46.235.229.95
+	s=arc-20240116; t=1734368178; c=relaxed/simple;
+	bh=JnopqHGGrYK5dFH/NuYM6LzKLjX7Z02kN7/Zi/iatOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mRepouyN39aPqciBTjKqT70chN+iUTpiaJ7/Avhk+ZhjVIQm98lfNADJ49vN8NMDMHQ10EXjTZJYWSKgPm0FkiKUW2I+x/Fm4T3Gh/qhSFJVWt/S66Y/znOo5wxXLTmnX09XMVNm1kqZEHMX1M1CwHoAe9AJKI3Gf6Icob7oANk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=DRqUxdag; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=bSCpO2J76JpQcMi6ZUQidX2mD5O4Q7+CsZhw9kcFsOw=; b=dYpx4nsS/DcXIfU7
-	hWBIW0F1crt6qsIcnU6LstHcOKJwEEAbD0ohqo9MQ7HtXnfZDNIuEWnM/aLBLLRmgrUFwm4P/ikzF
-	1m8jfqlhXGkyrIDaT3LBrL+S6GjEDoMOfKbmsdWOYKB/xesABuyCRnajRNs+o3OkckIAQpgAkww2u
-	f/1+tRwbhgpQgnCXy8HePWq0gTfMFAxE9fEHBfKHmjnHzdYVJELV8aYCRfoM6gowOCpC/sx2kd5dO
-	na72ZXa926LcNfEM6IytjCRZBaUsYrh5mUAy8aMBPoi2sndMLDV/nv7v7wo1h/VSdyTxUJy4JGazI
-	RrBZ5KwAeZHjYGubMg==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1tNEGz-005fBa-1v;
-	Mon, 16 Dec 2024 16:48:45 +0000
-Date: Mon, 16 Dec 2024 16:48:45 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Simon Horman <horms@kernel.org>
-Cc: jes@trained-monkey.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-hippi@sunsite.dk, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] hippi: Remove unused hippi_neigh_setup_dev
-Message-ID: <Z2BZ7d1ojV5Gbdu1@gallifrey>
-References: <20241215022618.181756-1-linux@treblig.org>
- <20241216161206.GF780307@kernel.org>
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=Vbno3uxFXL5LLP12h6Tb9cL3wlf6uGvwZcC++Ip5T3Q=; b=DRqUxdaglpX20yYH
+	enn4OR8qpbdTZJFb5+eHyDk4p96LkkrzWsLq8qM/dmoACkIBGLAMA0i/unDjGrFxV/+2pGQnHJsWL
+	1G3oaBE4wtynWRyQcSgZb54v8Iy0FqmR59T0iYagypwg2njImTf/Mw58hTTpJ6xzRqBLBagNgStCU
+	gIBmgE8G4Xhqnem5eYYQSUQCbRYgMRyTd4AGZcGgyllxvK+EYQ6C1t6DNmSoiLYdPplK1IcpRPg8e
+	skIESb7XwaRqcTEvW/pWwNXylglWzy38Xfy70TedbFnsndiivqJ+fWeGLtD0piuH4m2/xt33PLu1R
+	NbAz1Ppsk3/4o52OWQ==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tNEO6-005fLl-0W;
+	Mon, 16 Dec 2024 16:56:06 +0000
+From: linux@treblig.org
+To: jes@trained-monkey.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] net: Remove bouncing hippi list
+Date: Mon, 16 Dec 2024 16:56:05 +0000
+Message-ID: <20241216165605.63700-1-linux@treblig.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20241216161206.GF780307@kernel.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 16:44:11 up 222 days,  3:58,  1 user,  load average: 0.04, 0.01,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Content-Transfer-Encoding: 8bit
 
-* Simon Horman (horms@kernel.org) wrote:
-> On Sun, Dec 15, 2024 at 02:26:18AM +0000, linux@treblig.org wrote:
-> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> > 
-> > hippi_neigh_setup_dev() has been unused since
-> > commit e3804cbebb67 ("net: remove COMPAT_NET_DEV_OPS")
-> > 
-> > Remove it.
-> > 
-> > (I'm a little suspicious it's the only setup call removed
-> > by that previous commit?)
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> 
-> Hi David,
-> 
-> There is a dangling comment referring to hippi_neigh_setup_dev
-> in hippi_setup().
-> 
-> 	/*
-> 	 * HIPPI doesn't support broadcast+multicast and we only use
-> 	 * static ARP tables. ARP is disabled by hippi_neigh_setup_dev.
-> 	 */
-> 
-> Could you fix that up too?
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-I saw that, and it raised the suspicion that I mentioned in the
-commit message; is that code relying on the uncalled, removed
-function to disable ARPs?
+linux-hippi is bouncing with:
 
-Dave
+ <linux-hippi@sunsite.dk>:
+ Sorry, no mailbox here by that name. (#5.1.1)
 
-> pw-bot: changes-requested
-> 
+Remove it.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e6e71b05710b..26b9ff7da90d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10280,7 +10280,6 @@ F:	drivers/input/touchscreen/himax_hx83112b.c
+ 
+ HIPPI
+ M:	Jes Sorensen <jes@trained-monkey.org>
+-L:	linux-hippi@sunsite.dk
+ S:	Maintained
+ F:	drivers/net/hippi/
+ F:	include/linux/hippidevice.h
 -- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+2.47.1
+
 
