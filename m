@@ -1,73 +1,67 @@
-Return-Path: <netdev+bounces-152154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 768569F2E7C
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 11:47:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5C119F2E7F
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 11:49:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21FC01881155
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 10:47:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE26E7A0465
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 10:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E999203707;
-	Mon, 16 Dec 2024 10:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6763F203D56;
+	Mon, 16 Dec 2024 10:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="smaTKDxB"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="O+pY6u1Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150D82AF03
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 10:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BEB11FF7CA;
+	Mon, 16 Dec 2024 10:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734346057; cv=none; b=YuxofTSH5+k3nwdHebtqmfSF3XshXhSjtSV7Seu5pvJiAOvi4aBIGZD+6LIlqwNWheVmAy4CEyaMEsa8q9b3S0kRoIUfU/xUVyxgMZMSMUQJ0EsZjwzH0/jUu3iz5CpSOuHH8fFUHZoWW9M+n8Rwu+6kbohf3xQRI6oaA4oMKLg=
+	t=1734346133; cv=none; b=q3ipzMzdRv+eBd/9lP4g9vbPxKs8PXATNj0h5lv7aOOjTe6u2tWBCboIc+G5w5BDrN9TPCoigCHCwqK/7zkZwANL1Wy3TqQt7i4x/BBJi9WlrODFc5Eq2+1VTzZRlOFUHsyvpTJh5uWTejXgkpUeO1MC8aTCuPrQk2RYNldR2sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734346057; c=relaxed/simple;
-	bh=25INFod25r02Tb2AINb07dTD48hmsD99r7N6PcxFaF8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vBYDar8I8zVMk/BiW15AsT7q5HCRdgBmPVAIYdb2tvUVYdgYgASt6trfR9zO1iITHPVjJNjv33eNq3pWchptpBZtltPbphtAQDdM5WtZvaUCPq2t2YD0yIXO+z0nHzELOKDCj6kujrZ4AJO18Ikmoe2hnZv/7Mt4ZrjS29Hr0ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=smaTKDxB; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1734346056; x=1765882056;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6JpF6UDjgEI2WVejsLaf5w9glffWhp3LOCnUv8XJGus=;
-  b=smaTKDxBAV0HJ5bR15QvQA6xxqzjc6u5vQewS6IQT73ZygINvuPz/Tnn
-   vjMwlJ9QXDQ2IG2PcMG/yeZbgEs1C535vsqXuvgFmy4uQssvnIY2+3VFw
-   rFN5+QrkEWQ+aspjNYwmtUBH/CFyhPFLQINzP0JD0KkL3hvGNx1T3sHcH
-   k=;
-X-IronPort-AV: E=Sophos;i="6.12,238,1728950400"; 
-   d="scan'208";a="456363540"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2024 10:47:33 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:65415]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.211:2525] with esmtp (Farcaster)
- id e1c41078-400a-4384-b560-00125e7f1260; Mon, 16 Dec 2024 10:47:31 +0000 (UTC)
-X-Farcaster-Flow-ID: e1c41078-400a-4384-b560-00125e7f1260
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Mon, 16 Dec 2024 10:47:30 +0000
-Received: from 6c7e67c6786f.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Mon, 16 Dec 2024 10:47:27 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <shaw.leon@gmail.com>
-CC: <cong.wang@bytedance.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<syzbot+21ba4d5adff0b6a7cfc6@syzkaller.appspotmail.com>,
-	<xiyou.wangcong@gmail.com>
-Subject: Re: [Patch net v2] rtnetlink: fix double call of rtnl_link_get_net_ifla()
-Date: Mon, 16 Dec 2024 19:47:24 +0900
-Message-ID: <20241216104724.49813-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <CABAhCORBVVU8P6AHcEkENMj+gD2d3ce9t=A_o48E0yOQp8_wUQ@mail.gmail.com>
-References: <CABAhCORBVVU8P6AHcEkENMj+gD2d3ce9t=A_o48E0yOQp8_wUQ@mail.gmail.com>
+	s=arc-20240116; t=1734346133; c=relaxed/simple;
+	bh=FeE9uoz1XlundDdxH0bo5LNmwkRiK6g82p3uZWZ85T8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OYi/eHuSEiUaV5FY2OqjMds6q+eCtnoRwCWNp7GNzpqLzWjUhV/m8/n3Oxslz4f1ic+hGFNdNblmyg1gTxBLD6itrly1k++Q+Oe17zwX9fiF4eiIWYTNXJ1AHGI5M4ePyBjBmFmEfdxYDAjajoWD7sTIPKT+CtsqaF22CEQynKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=O+pY6u1Q; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3CD2210485583;
+	Mon, 16 Dec 2024 11:48:40 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1734346125;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Za1qix9JUC09ToDEoUUTr8e+BFUBM5V10zVNxMXFSIA=;
+	b=O+pY6u1Q+ijtVw3tzhJCjRyROFg7PkpQszT0yM/rcH+hd4qsAIVLdq+xpC9RQgSTZS6gAr
+	SVNkk8yHprfW4Urq+IO5xEZxdCAfB/jFanMP/D6vaDR0hJLEcIb6NXblxrsR81af8V+z2y
+	FKT1+GPJCUoEotD+Ep5woz1b4FtL2KpFY9pEASkpc4ADmeLWxIvxQSORe6Dk/Bn4aumKx2
+	eQxOy0DpTxjs7vv0OZYfODR1r+KwUkKO69l/1IL9lTOEw0zh7zG6akB+VMKIqP7sJ+lrAA
+	An1CA7zDts5vP1rlGug1RJv0b27WsvRL5t2fpeJJJthTy0s1AVrcqXIrthgXPw==
+From: Marek Vasut <marex@denx.de>
+To: linux-leds@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Lee Jones <lee@kernel.org>,
+	Lukasz Majewski <lukma@denx.de>,
+	Pavel Machek <pavel@ucw.cz>,
+	kernel@dh-electronics.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	netdev@vger.kernel.org
+Subject: [PATCH v2] leds: trigger: netdev: Check offload ability on interface up
+Date: Mon, 16 Dec 2024 11:48:22 +0100
+Message-ID: <20241216104826.6946-1-marex@denx.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,73 +69,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWA002.ant.amazon.com (10.13.139.32) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Last-TLS-Session-Version: TLSv1.3
 
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Mon, 16 Dec 2024 18:24:39 +0800
-> > @@ -3812,40 +3818,33 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
-> >         goto out;
-> >  }
-> >
-> > -static int rtnl_add_peer_net(struct rtnl_nets *rtnl_nets,
-> > -                            const struct rtnl_link_ops *ops,
-> > -                            struct nlattr *data[],
-> > -                            struct netlink_ext_ack *extack)
-> > +static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
-> > +                                    struct nlattr *data[],
-> > +                                    struct netlink_ext_ack *extack)
-> >  {
-> >         struct nlattr *tb[IFLA_MAX + 1];
-> > -       struct net *net;
-> >         int err;
-> >
-> >         if (!data || !data[ops->peer_type])
-> > -               return 0;
-> > +               return NULL;
-> 
-> I was adding some tests about the link netns stuff, and found
-> a behavior change. Prior to this patch, veth, vxcan and netkit
-> were trying the outer tb if peer info was not set. But returning
-> NULL here skips this part of logic. Say if we have:
-> 
->     ip link add netns ns1 foo type veth
-> 
-> The peer link is changed from ns1 to current netns.
+The trigger_data->hw_control indicates whether the LED is controlled by HW
+offload, i.e. the PHY. The trigger_data->hw_control = can_hw_control() is
+currently called only from netdev_led_attr_store(), i.e. when writing any
+sysfs attribute of the netdev trigger instance associated with a PHY LED.
 
-Good catch, we need the following diff.
+The can_hw_control() calls validate_net_dev() which internally calls
+led_cdev->hw_control_get_device(), which is phy_led_hw_control_get_device()
+for PHY LEDs. The phy_led_hw_control_get_device() returns NULL if the PHY
+is not attached.
 
----8<---
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index ebcfc2debf1a..d9f959c619d9 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3819,6 +3819,7 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- }
- 
- static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
-+				     struct nlattr *tbp[],
- 				     struct nlattr *data[],
- 				     struct netlink_ext_ack *extack)
- {
-@@ -3826,7 +3827,7 @@ static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
- 	int err;
- 
- 	if (!data || !data[ops->peer_type])
--		return NULL;
-+		return rtnl_link_get_net_ifla(tbp);
- 
- 	err = rtnl_nla_parse_ifinfomsg(tb, data[ops->peer_type], extack);
- 	if (err < 0)
-@@ -3971,7 +3972,7 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		}
- 
- 		if (ops->peer_type) {
--			peer_net = rtnl_get_peer_net(ops, data, extack);
-+			peer_net = rtnl_get_peer_net(ops, tb, data, extack);
- 			if (IS_ERR(peer_net)) {
- 				ret = PTR_ERR(peer_net);
- 				goto put_ops;
----8<---
+At least in case of DWMAC (STM32MP, iMX8M, ...), the PHY device is attached
+only when the interface is brought up and is detached again when the
+interface is brought down. In case e.g. udev rules configure the netdev
+LED trigger sysfs attributes before the interface is brought up, then when
+the interface is brought up, the LEDs are not blinking.
+
+This is because trigger_data->hw_control = can_hw_control() was called
+when udev wrote the sysfs attribute files, before the interface was up,
+so can_hw_control() resp. validate_net_dev() returned false, and the
+trigger_data->hw_control = can_hw_control() was never called again to
+update the trigger_data->hw_control content and let the offload take
+over the LED blinking.
+
+Call data->hw_control = can_hw_control() from netdev_trig_notify() to
+update the offload capability of the LED when the UP notification arrives.
+This makes the LEDs blink after the interface is brought up.
+
+On STM32MP13xx with RTL8211F, it is enough to have the following udev rule
+in place, boot the machine with cable plugged in, and the LEDs won't work
+without this patch once the interface is brought up, even if they should:
+"
+ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:green:wan", ATTR{trigger}="netdev", ATTR{link_10}="1", ATTR{link_100}="1", ATTR{link_1000}="1", ATTR{device_name}="end0"
+ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:yellow:wan", ATTR{trigger}="netdev", ATTR{rx}="1", ATTR{tx}="1", ATTR{device_name}="end0"
+"
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Christophe Roullier <christophe.roullier@foss.st.com>
+Cc: Daniel Golle <daniel@makrotopia.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Lee Jones <lee@kernel.org>
+Cc: Lukasz Majewski <lukma@denx.de>
+Cc: Pavel Machek <pavel@ucw.cz>
+Cc: kernel@dh-electronics.com
+Cc: linux-leds@vger.kernel.org
+Cc: linux-stm32@st-md-mailman.stormreply.com
+Cc: netdev@vger.kernel.org
+---
+V2: Add RB from Andrew
+---
+ drivers/leds/trigger/ledtrig-netdev.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
+index 4b0863db901a9..c15efe3e50780 100644
+--- a/drivers/leds/trigger/ledtrig-netdev.c
++++ b/drivers/leds/trigger/ledtrig-netdev.c
+@@ -605,6 +605,8 @@ static int netdev_trig_notify(struct notifier_block *nb,
+ 		trigger_data->net_dev = NULL;
+ 		break;
+ 	case NETDEV_UP:
++		trigger_data->hw_control = can_hw_control(trigger_data);
++		fallthrough;
+ 	case NETDEV_CHANGE:
+ 		get_device_state(trigger_data);
+ 		/* Refresh link_speed visibility */
+-- 
+2.45.2
+
 
