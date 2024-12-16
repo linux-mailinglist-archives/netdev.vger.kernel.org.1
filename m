@@ -1,112 +1,148 @@
-Return-Path: <netdev+bounces-152194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4DEE9F30DB
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:50:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7ED19F30E5
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:50:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FA04165FC3
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:50:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20AAE167045
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBD7204C2B;
-	Mon, 16 Dec 2024 12:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C03F204F7D;
+	Mon, 16 Dec 2024 12:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NTPK4Igr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YAc9WZMy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16A9201253;
-	Mon, 16 Dec 2024 12:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D99204C2C;
+	Mon, 16 Dec 2024 12:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734353414; cv=none; b=ALhjptn/K836KCvtz/NbueBAyWB5c14zGE+w/eaaIk6yUOVUhIvYZ9oTHavoFk5D1nziZeviReeTnv8nO91s+jetvZHYt3Jb2uJps+JGKGzclbZjW4Z8Y1rzcj8DC2BBCI8FXsyM9RP0WiJnlmS8WLp7IaW1yERqRgILju00ppg=
+	t=1734353448; cv=none; b=dn4AC+QG/ewjdodGMWkDMwrHrPRjoaLwmhwkK5msTFU+Ug1wiRtSlM01bRWJXJgr1juXHe9ndDOqQom0iY66pn0EdtpX9UVmuogsUKQL9hHxhZWMedEm2ZzPNvKsrFlyy2EPf3uhcWRvIfYljRr2nr8Hcog9JLYXOVI/nR5pkcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734353414; c=relaxed/simple;
-	bh=gXQavCKWulSt/Iu+B0u/gE0WYEvXCSe9B1LvGgWUj4s=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UDefwvnJkEDmc4OahSOuP8XMEcc2H/153DIm38aqnWValjgqi5gODIEhLsP/UisC362xKggm/qZzmQ3zDUnBiUTTBvDhz6KOSfa3mAs1t/B9Qu6qLMPB1ou8k6Qt4exQXIPFluXD110f97Xk2epglG1KjSh5fVStYqxt0vXsNQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NTPK4Igr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D9BDC4CED0;
-	Mon, 16 Dec 2024 12:50:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734353414;
-	bh=gXQavCKWulSt/Iu+B0u/gE0WYEvXCSe9B1LvGgWUj4s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NTPK4IgrWbMv26zqxKEfCu8xOvkl7swM26qA3ohtQpr4lRFITTxRMK9RnSMKAeWQc
-	 7vOO8FSh8l/jt3ucvFOwRUcsYe/cieP/c2juwc/Kt5DkmR01MWNOo6Z8AC0qwhCHTc
-	 /3CCtjVF2WnEI1GHhIHYLpo+xEkM1ZRLDmdEAI9DL4fkiFnmmsMs9ZZeLW8B9YXnhI
-	 Kqjmnfy4Bqy8fa7KlBj3QLxetapaNogtQkKCbT8ozHTc81xSM02Lz7t2ZmCrvgOgcM
-	 ekZxjU63Nh4ljlXnINiFMJ7RG6z+V9/UpT/6neAlDuBTJ5W4ee7N6VVRwywmW7Oadv
-	 cSNR2fawPWpUw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 6202B3806656;
-	Mon, 16 Dec 2024 12:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1734353448; c=relaxed/simple;
+	bh=FP1RQUFT30Y48osYV5GpsXLGPmcKPbZTf0DgsnftIkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=taZCizLmCC0uhFCksT95cgLxJA+ZTQ147I+sw2AIMidQqsdBNf7rpQ93bMHGheBmBQECZykjopZZ2FCOxZd2pH9tN8VQGh1m0E8f4sX5xWlz7MC/pzSFvpIrheK4oOCaMDQXj7qSjfKkd/pHiMrU+HJdEVjn0vrcEoC3aCG9nMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YAc9WZMy; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-436341f575fso26359195e9.1;
+        Mon, 16 Dec 2024 04:50:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734353445; x=1734958245; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D78KVqFVG0ACpGF7l0OwybNIa2oNhxCk6SeYnQ/G6Jk=;
+        b=YAc9WZMycW8NvT7750k7O4NhUk+AtKohhJK3QctusTAuxIgP/m6bpLDT4G2D6d52QF
+         4VZo4LovEadQMB0zs9szrlYMN62o7/xOmvwGAX4qluMVo4GTVdebcvaE8Ec8E2uk6tJ2
+         68jgMxL9P2Ugu7vsfY8/sGgx+0h+MuGVGF1KONQZnnj48KbcsG9IN3CbnhtqWyvIT5tl
+         geIYxn5rxT6awJ1KwgCpj3fHo6RUWlxsXGchJFTiMZcBp1T3ZkuwwEC37RqZlqn0i1Op
+         ZsQ7rO0O2576ulOfHrdcn1A2il6rOBT1vG8/FdI84RBd1xwfOIsOXuNTHJw5/dPqqmAY
+         1QdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734353445; x=1734958245;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D78KVqFVG0ACpGF7l0OwybNIa2oNhxCk6SeYnQ/G6Jk=;
+        b=DBF+McKfKci+o/VvwIkQAA7YzACrFv3qyu4/+N8TYVS694FIcRPO09yHH0jzta2k8l
+         fxw0+yNAGjunzVFR7DHTRLqI1VqbdIV6wvJa5bTU/YohuUbQMmr3BPImDBcOkxo2WIGM
+         Fd5+MKweCL85EkoO1rB8MfKJIrQbJeRVoBS8x+QFof5pftt8jLmkoi92qRlp2OxX0eVL
+         /GnJgbtYmjTtW/QZ8+Q9443A+zhcj6SyE0DYAk1UTFoVg/VlExBKpQzu5gcmE+RYwpac
+         D8KkIiXNgl1OH60Nbza1pGPW1fjpdvDZp2jY6S7t01Bn8IxktxA00KLpg2rAIydr/qN/
+         c8RA==
+X-Forwarded-Encrypted: i=1; AJvYcCUayaJdjMvjv9iKPrAJujR6QB2mO0dgkv/EVSqEU/Nmbn9E4MmuVF/8x73MmDn+SKc7nPJ4Zis/zPNg@vger.kernel.org, AJvYcCUbtSGwaG8c3isBtx8wZBFzmfRHjnWzdBvXWB+4yGsk4cQDLadJ25Mluir1lKxk8aP278MbTpQx@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUWiSlyXQSBQ6SFFLALsVkFn4t4v+RkI8Kll/DGZ81SFlUtWwH
+	vDbhHC8CiZUv1nMgXE9KsWrEU1w/QYQ+ZDVvfF9ten6K92nD7jUg
+X-Gm-Gg: ASbGnctfqzr8pZjGVN5e1coofS2jtiJ5+MjGs9tTb1TBz6/YF3lpayiRG/k1ycvEXzf
+	zzHVV+/QIckBGaqHZJ5QHWYcWr0xH0t5OMBDzW0rFhcON3zgbVGAkbdBzLarmEPa499vzgTrWYw
+	81xz2bfsborI+7GNFnrThndlozFkTq5LbLUHBFgtbualZ8KEuH7Svke76/7r/fWOAO4Vzdax0MG
+	aVRy9DqqPX5J63pTNCj0JWXICMp3d1mee2sJyYEzVyYh+EylM2mehWOSZhgBpc8K7KyowZuMTw3
+X-Google-Smtp-Source: AGHT+IHMkIcQSUB9r1JV3AbEYokMEYxGraelxBDikdrMFLIvQqJViL1l2t6dQEOAQiwKVNzl7WLOyQ==
+X-Received: by 2002:a05:600c:1c07:b0:434:f131:1e71 with SMTP id 5b1f17b1804b1-4362aa36366mr102865405e9.8.1734353444118;
+        Mon, 16 Dec 2024 04:50:44 -0800 (PST)
+Received: from [10.158.37.53] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4362557c57dsm138466865e9.12.2024.12.16.04.50.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Dec 2024 04:50:43 -0800 (PST)
+Message-ID: <08e9146a-7970-40fc-9eee-158bdb4b1938@gmail.com>
+Date: Mon, 16 Dec 2024 14:50:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/6] tls: implement key updates for TLS1.3
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173435343108.197327.447831770899898017.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Dec 2024 12:50:31 +0000
-References: <cover.1734013874.git.sd@queasysnail.net>
-In-Reply-To: <cover.1734013874.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, vfedorenko@novek.ru, fkrenzel@redhat.com,
- kuba@kernel.org, kuniyu@amazon.com, apoorvko@amazon.com, borisp@nvidia.com,
- john.fastabend@gmail.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- gal@nvidia.com, marcel@holtmann.org, horms@kernel.org,
- Parthiban.Veerasooran@microchip.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 10/12] net/mlx5: DR, add support for ConnectX-8
+ steering
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Leon Romanovsky <leonro@nvidia.com>, netdev@vger.kernel.org,
+ Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ linux-rdma@vger.kernel.org, Itamar Gozlan <igozlan@nvidia.com>,
+ Yevgeny Kliteynik <kliteyn@nvidia.com>
+References: <20241211134223.389616-1-tariqt@nvidia.com>
+ <20241211134223.389616-11-tariqt@nvidia.com>
+ <20241212173113.GF73795@kernel.org>
+ <5b6c8feb-c779-428a-bcca-2febdae5bb0f@gmail.com>
+ <20241212171134.52017f1e@kernel.org>
+ <1e8c075c-2fd0-4d10-887d-04a5fb15baa2@gmail.com>
+ <20241215131218.3d040ad8@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20241215131218.3d040ad8@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
 
-On Thu, 12 Dec 2024 16:36:03 +0100 you wrote:
-> This adds support for receiving KeyUpdate messages (RFC 8446, 4.6.3
-> [1]). A sender transmits a KeyUpdate message and then changes its TX
-> key. The receiver should react by updating its RX key before
-> processing the next message.
+On 15/12/2024 23:12, Jakub Kicinski wrote:
+> On Sun, 15 Dec 2024 08:25:44 +0200 Tariq Toukan wrote:
+>>> What do you expect we'll do with this series?
+>>>
+>>> If you expect it to be set to Awaiting Upstream - could you make sure
+>>> that the cover letter has "mlx5-next" in the subject? That will makes
+>>> it easier to automate in patchwork.
+>>
+>> The relevant patches have mlx5-next in their topic.
+>> Should the cover letter as well?
+>> What about other non-IFC patches, keep them with net-next?
+>>
+>>> If you expect the series to be applied / merged - LMK, I can try
+>>> to explain why that's impossible..
+>>
+>> The motivation is to avoid potential conflicts with rdma trees.
+>> AFAIK this is the agreed practice and is being followed for some time...
+>>
+>> If not, what's the suggested procedure then?
+>> How do you suggest getting these IFC changes to both net and rdma trees?
 > 
-> This patchset implements key updates by:
->  1. pausing decryption when a KeyUpdate message is received, to avoid
->     attempting to use the old key to decrypt a record encrypted with
->     the new key
->  2. returning -EKEYEXPIRED to syscalls that cannot receive the
->     KeyUpdate message, until the rekey has been performed by userspace
->  3. passing the KeyUpdate message to userspace as a control message
->  4. allowing updates of the crypto_info via the TLS_TX/TLS_RX
->     setsockopts
+> You can post just the mlx5-next patches (preferably) or the combined
+> set (with mlx5-next in the cover letter tag). Wait a day or two (normal
+> review period, like netdev maintainers would when applying to
+> net-next). Apply the mlx5-next patches to mlx5-next. Send us a pull
+> request with just the mlx5-next stuff.
 > 
-> [...]
 
-Here is the summary with links:
-  - [net-next,v5,1/6] tls: block decryption when a rekey is pending
-    https://git.kernel.org/netdev/net-next/c/0471b1093e3a
-  - [net-next,v5,2/6] tls: implement rekey for TLS1.3
-    https://git.kernel.org/netdev/net-next/c/47069594e67e
-  - [net-next,v5,3/6] tls: add counters for rekey
-    https://git.kernel.org/netdev/net-next/c/510128b30f2d
-  - [net-next,v5,4/6] docs: tls: document TLS1.3 key updates
-    https://git.kernel.org/netdev/net-next/c/5aa97a43d042
-  - [net-next,v5,5/6] selftests: tls: add key_generation argument to tls_crypto_info_init
-    https://git.kernel.org/netdev/net-next/c/b2e584aa3c71
-  - [net-next,v5,6/6] selftests: tls: add rekey tests
-    https://git.kernel.org/netdev/net-next/c/555f0edb9ff0
+Done.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> Post the net-next patches which depend on mlx5-next interface changes.
+> 
+> We can count this as the posting, so feel free to apply patch 1 to
+> mlx5-next and send the PR.
 
+Done.
+
+Let me know of any issue.
+Thanks for your help.
 
 
