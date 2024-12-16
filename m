@@ -1,141 +1,236 @@
-Return-Path: <netdev+bounces-152171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED829F2FD7
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:53:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 493AF9F2FC8
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 553DA167D01
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 11:52:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 789AD163A74
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 11:50:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C519C204563;
-	Mon, 16 Dec 2024 11:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D445D204563;
+	Mon, 16 Dec 2024 11:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Ysr3X+cq"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="c9vwyuZ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FC3204088
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 11:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DF0203D55
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 11:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734349875; cv=none; b=XE1tNAmqxRLNhqUXHfKDqPcA0N5e51uem5sPY0SWFTOjx+MHnvYNx1oiB7/GJooBdoCFa1qRaG6QFLsD62osJJlWDRxKIz6qwdS12ziDtjtfmMZucqbNdvQvVe0Hp7n6+5dMgnuKMCGkmTDpH1z5l1re+uwhS9EU0gP+73ZjICc=
+	t=1734349808; cv=none; b=LQmYmO545WkIo1KoTIqC55s+IYFkud+q47z1R6yehykQpkMfLUcZ2E3NOKzgjFbbgBWYMZmJFdZcgpuHcFkZEZVLdUh5TqZKX/ALv1s+qn3kRiNIL0eOkbYkH/3czJSyJLofPbQr9W+Sjrwx3ld3LbRSue00/hvffwAe8eR/Ik0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734349875; c=relaxed/simple;
-	bh=lx/rrADmvlBXY7JFBmZBgDhQUvIECeUf7nHCpfcOw+c=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rnFgM/d3M0Z+vYyFNlWcCX6uZI/BipWkRjxohwel1QYzL8lu+sEn+bGlI8t+jIzkZAv6GBtRDgpNTQ7NeFomCSu3tcpmBdM37H8Yi4aPj4WHnb1S6o9C9DJIO8GpkPIFyuzcl7UXJ7snQQfNQ5UPjsU/0vmknmjQGE4VymRIdqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Ysr3X+cq; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tN9cp-00FkJC-O9; Mon, 16 Dec 2024 12:50:59 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From;
-	bh=StyMjQR4o6IWRrkYThdMVu1OMi637Dwbzw0Efl1DqXk=; b=Ysr3X+cqh3pzU0RQTw76zAoXT7
-	MDz603RaEJcGuwL6i+WwfAwgBqUDHAhInpKtFFCjB7GH5TJd16T2jrsbVSMihHHkM6t3XqVeRCoe6
-	Nu8QIyOppntgoEM9JaNcW1pYNWo/nHSHBH9fUIrQevM5DmcDuXHhb7tVn59KdM8reaq/lV1RphSbd
-	6kTri3kvSwyGjqN0RO5RhfY9pCIWTnd61umwio8ehS1capOQLam0bwrQJc57JDDDQfUa6Pj8dHhoq
-	BpYER8K1wzUouZLh1vKKhDURGED539/WPwBLtMwm/k3DpVg/pckAk6+zUcwKOGJDyzaVU3kSCKtXz
-	Sx5b9jAg==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tN9co-0000X3-TE; Mon, 16 Dec 2024 12:50:59 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tN9cc-00DACF-Ir; Mon, 16 Dec 2024 12:50:46 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Mon, 16 Dec 2024 12:50:19 +0100
-Subject: [PATCH net] net: Check for oversized requests in sock_kmalloc()
+	s=arc-20240116; t=1734349808; c=relaxed/simple;
+	bh=LjoNpo99IS9TQ2tcnB3Fb50v0g/in8V7E04lFrHtrcg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bSpZdgJOAGvz02glZ7fhN0wNhklQe+aTsHl50jcf9eP3TOS1AiqtwTuO/ILlZfQP6Jc6wVMLQFJ8mKiMUze8IGMhR2EE+IofSVkOsrjvJtn7aZWEOy3tJG2YFhxHK9ij3h0brPGV9Aip8bT9yQu1L2aA22jVVnTTeBduc2VJ3Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=c9vwyuZ8; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aa692211331so768756766b.1
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 03:50:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1734349805; x=1734954605; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=n4Fnqt3+wn3Jqih2/E06bFWlfYBOS+/nVME6Ot/StK8=;
+        b=c9vwyuZ89rAz7fOyhoTxkT4XTjxhvSfi8DfiW/OjpFNMUsA6v8hG/0DMPbvXC/rz/l
+         mEs7ru+VNaN8SR2XoIjkmkvTCMcWxveJ221IG5428MABbHm2OCcgfwF8MsRA47LsDijz
+         jI5zrkCHtawtSvKKMW8ZdPV6ugWaD45Qfr8WmV07MyZ/uCGM0kl7n5KVYLs+Ct4EMw1n
+         Nlye7HkWVhOLvd6ZSY3O74dwKvlgj/U7iOKklH0TOIGBaVMLFZ4b6wjhYJhbuCmkO7tD
+         WmRYq51FMQ03kdB1nFYWNXaBa+f8fCsp4mt1EULh09x+A5fRqfkkrVMJqmVdNqufzKQe
+         JQ/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734349805; x=1734954605;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n4Fnqt3+wn3Jqih2/E06bFWlfYBOS+/nVME6Ot/StK8=;
+        b=sMCp6mkCAmoPiG1swOnRukWjrwRl7ESP5Vdkxj/0miG50BXAj/ebsqhcj7pv++tl36
+         iCo+VDRipGtBln8A8QGonlN4IwIb/XWtHj+GU7miWg/x418HZ11olZFGxE+FxzYQyYMZ
+         X6WYS9bB/Tn0pEDSAQz/eooyZPd/fZjUisZDcwNQD/I6rKSzxljy4t93LrF4U1sLYRJF
+         ebbdQ8dTPJn78JdbQFPgQjQxcE32xoV6DR6C7umMyowgn4k3amZtdcL0ZAGgCBoLBmCl
+         Gsoa38Z9eJnnkbOe0zom5pBBLVFtrx1Ks5t5sg0Bj6JxaZKaqW5PYYXNxEbQfL7zo5fG
+         LPeg==
+X-Gm-Message-State: AOJu0Yy4U2/wmnnIlX362qRkMwVH4iOktvSpe1zMEWqxRJPRomvzKKbS
+	gNvRDSs+SfLqmvwttiF3FGUl3UwPBeT+ZQg0M+51hrqrLFNhxpSe5vFH5al2GRinZ9yj0ohl0yk
+	h
+X-Gm-Gg: ASbGnctih/ro55g7ogk5jvrbqUWGaN3J+9DJKa4TEdr9pTjoHxBLlBPzcQCpNb2wFYc
+	2w//ZAP5ZNtYQAsKyRZnG5ToopYLlx2YoCfWAgeVwFBNPSB8S2eRXExIqYUWuWGRdkqmGF0b1Bc
+	OeeZkf7v8k0Cx3FVhXZQK5OBR3Z5gpESIjmKsSXsteuc1xIOK+pUiknHgs6IL3/kjGTmQIQRAtF
+	gepEV+AiTzfw5jgBxTrsWSBHgPynymCyK+vSr0VpqI7ffWCtqfb7iaoPQsGi94l14xh6agWSsjE
+	anknLX22u1F2L8iYqqI=
+X-Google-Smtp-Source: AGHT+IEnfewEiJGs3lq7FqGj7ad6Ew/gCcV3xnhPzkvANe07z2h/NIw9ORmy8DNUwq06lbUogwLfZA==
+X-Received: by 2002:a17:907:7e92:b0:aa6:a9fe:46de with SMTP id a640c23a62f3a-aab7b777564mr1235220266b.19.1734349804846;
+        Mon, 16 Dec 2024 03:50:04 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:f3f5:d43f:11fb:5f45? ([2001:67c:2fbc:1:f3f5:d43f:11fb:5f45])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aab96089f88sm321885466b.91.2024.12.16.03.50.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Dec 2024 03:50:04 -0800 (PST)
+Message-ID: <a1137cc2-6985-44bc-a802-e070da7208dc@openvpn.net>
+Date: Mon, 16 Dec 2024 12:50:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v15 06/22] ovpn: introduce the ovpn_socket object
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+ willemdebruijn.kernel@gmail.com
+References: <20241211-b4-ovpn-v15-0-314e2cad0618@openvpn.net>
+ <20241211-b4-ovpn-v15-6-314e2cad0618@openvpn.net> <Z1sNEgQLMzZua3mS@hog>
+ <fa19f3a8-c273-4d2c-a10e-e9bda2375365@openvpn.net> <Z2AKg6ntLd94anHv@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z2AKg6ntLd94anHv@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241216-sock-kmalloc-warn-v1-1-9cb7fdee5b32@rbox.co>
-X-B4-Tracking: v=1; b=H4sIAPoTYGcC/x3MTQ5AMBBA4avIrE3Sjp+Fq4hF1WCCVlpBIu6us
- fwW7z0QOQhHaLIHAp8SxbsEnWdgZ+MmRhmSgRSVmnSB0dsFl82sq7d4meBQ6bomVVmqeoLU7YF
- Huf9nC44P6N73A5CkUW9oAAAA
-X-Change-ID: 20241213-sock-kmalloc-warn-0166205c25b2
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
 
-Allocator explicitly rejects requests of order > MAX_PAGE_ORDER, triggering
-a WARN_ON_ONCE_GFP().
+On 16/12/2024 12:09, Sabrina Dubroca wrote:
+[...]
+>> Maybe we should call cancel_sync_work(&ovpn_sock->work) inside
+>> ovpn_socket_get()?
+>> So the latter will return NULL only when it is sure that the socket has been
+>> detached.
+>>
+>> At that point we can skip the following return and continue along the "new
+>> socket" path.
+>>
+>> What do you think?
+> 
+> The work may not have been scheduled yet? (small window between the
+> last kref_put and schedule_work)
+> 
+> Maybe a completion [Documentation/scheduler/completion.rst] would
+> solve it (but it makes things even more complex, unfortunately):
+> 
+>   - at the end of ovpn_socket_detach: complete(&ovpn_sock->detached);
+>   - in ovpn_socket_new when handling EALREADY: wait_for_completion(&ovpn_sock->detached);
+>   - in ovpn_socket_new for the new socket: init_completion(&ovpn_sock->detached);
+> 
+> but ovpn_sock could be gone immediately after complete(). Maybe
+> something with completion_done() before the kfree_rcu in
+> ovpn_socket_detach? I'm not that familiar with the completion API.
+> 
 
-Put a size limit in sock_kmalloc().
+It seems the solution we are aiming for is more complex than the concept 
+of ovpn_socket per se :-D
 
-WARNING: CPU: 6 PID: 1676 at mm/page_alloc.c:4727 __alloc_pages_noprof+0x32e/0x3a0
-Call Trace:
- ___kmalloc_large_node+0x71/0xf0
- __kmalloc_large_node_noprof+0x1b/0xf0
- __kmalloc_noprof+0x436/0x560
- sock_kmalloc+0x44/0x60
- ____sys_sendmsg+0x208/0x3a0
- ___sys_sendmsg+0x84/0xd0
- __sys_sendmsg+0x56/0xa0
- do_syscall_64+0x93/0x180
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+I'll think a bit more about this..maybe we can avoid entering this 
+situation at all..
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
-$ cat test.py
-from socket import *
-import os
+> 
+>> However, this makes we wonder: what happens if we have two racing PEER_NEW
+>> with the same non-yet-attached UDP socket?
+> 
+> mhmm, I remember noticing that, but it seems I never mentioned it in
+> my reviews. Sorry.
+> 
+>> Maybe we should lock the socket in ovpn_udp_socket_attach() when checking
+>> its user-data and setting it (in order to make the test-and-set atomic)?
+> 
+> I'd use the lock to protect all of ovpn_socket_new.
+> ovpn_tcp_socket_attach locks the socket but after doing the initial
+> checks, so 2 callers could both see sock->sk->sk_user_data == NULL and
+> do the full attach. And I don't think unlocking before
+> rcu_assign_sk_user_data is safe for either UDP or TCP.
 
-n = 4096 << 10	# PAGE_SIZE << MAX_PAGE_ORDER
-n += 1
-data = bytes([0] * n)
-os.system("sudo sysctl net.core.optmem_max=%d" % (n + 100))
+I tend to agree here. Guarding the whole ovpn_socket_new with 
+lock_sock() seems the right thing to do.
 
-s = socket(AF_INET, SOCK_STREAM)
-cm = [(0, 0, data)]
-s.sendmsg([b'x'], cm)
+> 
+>> I am specifically talking about this in udp.c:
+>>
+>> 345         /* make sure no pre-existing encapsulation handler exists */
+>> 346         rcu_read_lock();
+>> 347         old_data = rcu_dereference_sk_user_data(sock->sk);
+>> 348         if (!old_data) {
+>> 349                 /* socket is currently unused - we can take it */
+>> 350                 rcu_read_unlock();
+>> 351                 setup_udp_tunnel_sock(sock_net(sock->sk), sock, &cfg);
+>> 352                 return 0;
+>> 353         }
+>>
+>> We will end up returning 0 in both contexts and thus allocate two
+>> ovpn_sockets instead of re-using the first one we allocated.
+>>
+>> Does it make sense?
+> 
+> Yes.
+> 
+> [...]
+>>> [I have some more nits/typos here and there but I worry the
+>>> maintainers will get "slightly" annoyed if I make you repost 22
+>>> patches once again :) -- if that's all I find in the next few days,
+>>> everyone might be happier if I stash them and we get them fixed after
+>>> merging?]
+>>
+>> If we have to rework this socket attaching part, it may be worth throwing in
+>> those typ0 fixes too :)
+> 
+> ACK, I'll send them out.
 
-'''
-s = socket(AF_ALG, SOCK_SEQPACKET)
-s.bind(('hash', 'sha256'))
-s.setsockopt(SOL_ALG, ALG_SET_KEY, data)
-'''
----
- net/core/sock.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Thanks.
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 74729d20cd0099e748f4c4fe0be42a2d2d47e77a..1a81c5c09c9f8eb6f8a47624fe08b678b2ab19b0 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2773,7 +2773,8 @@ void *sock_kmalloc(struct sock *sk, int size, gfp_t priority)
- 	int optmem_max = READ_ONCE(sock_net(sk)->core.sysctl_optmem_max);
- 
- 	if ((unsigned int)size <= optmem_max &&
--	    atomic_read(&sk->sk_omem_alloc) + size < optmem_max) {
-+	    atomic_read(&sk->sk_omem_alloc) + size < optmem_max &&
-+	    size <= PAGE_SIZE << MAX_PAGE_ORDER) {
- 		void *mem;
- 		/* First do the add, to avoid the race if kmalloc
- 		 * might sleep.
+Regards,
 
----
-base-commit: 922b4b955a03d19fea98938f33ef0e62d01f5159
-change-id: 20241213-sock-kmalloc-warn-0166205c25b2
 
-Best regards,
 -- 
-Michal Luczaj <mhal@rbox.co>
+Antonio Quartulli
+OpenVPN Inc.
 
 
