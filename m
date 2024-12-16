@@ -1,81 +1,79 @@
-Return-Path: <netdev+bounces-152403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C20A19F3CDC
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 22:33:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E77829F3CE5
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 22:41:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0346E16B284
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 21:33:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 259C116983C
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 21:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F13F1D5161;
-	Mon, 16 Dec 2024 21:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957881D5161;
+	Mon, 16 Dec 2024 21:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+vSgEKw"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Pt2QWpzk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8169313211A;
-	Mon, 16 Dec 2024 21:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6E313211A
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 21:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734384807; cv=none; b=EEfa4m/e/gJQwRcPRmcXe/neU8l4Vsed7WuMfGGPN0zoNi5Fk1dcWwIboV4bJenA2KpDwd5tHxRAt0c/KqAbW0g1yhGEHIRZ4p6TEQmUQel5C1QqZKDVB0eMKyroLttSMMyr+vcgwqVPR2u0woCk0SjyDAVy0gbIHtya7ohh15E=
+	t=1734385311; cv=none; b=kf2gGbBMDMNJQ1iHc17uv0UYnp6/8onQJgtEWQSAuvyn3X5yd61TdGk9tCod8NcOXVN1xaNejWs+XIJUa0OxfJo+EGZEgpWprRRr8yEKMVcQ0XpvGydalN/TYIiWmrPX4WrtfcQu9aVePdlr8VuBgS5YA546/txaGTiLnOw5S1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734384807; c=relaxed/simple;
-	bh=WeSJYYEJamXFZuAp5NptMjVCmKp6AIv7xjF54IzOwbI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=uPilhiTVwTtpb2HAni3PL2V8fhXjO5D1RuDbLSbNXHU1tHQYGCey8u1LVLzXpS5O9fVg6tGIKwwK/WggGB9wVhC0sdORfIUgH/KkYPf6lI7wpF0bDEIo8zbt0g19T8Ytbu4KV4kgN4eZtsXGILkOntjbKVTl2aDqKteo9jTlKKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+vSgEKw; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa66c1345caso175085466b.3;
-        Mon, 16 Dec 2024 13:33:25 -0800 (PST)
+	s=arc-20240116; t=1734385311; c=relaxed/simple;
+	bh=H+DEkopHyUZ8fjMMbFdqeVE72ZzQvogJyT/DWZ9NiWw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HvfCxuPKOXbtUXG2OhZzpGCdIloQBQil1TJFu72BNV/wIbAp/iOQvmxVY5n+yyzhrTDHZSBMqHx0nr5zRx22mUe/a/LQ7jBbu/loy6TydzwCk1OeZeUkzzL34ov9KBoLyW9HyKp57IcNthBNRBQtpiifuR8i90U7ulD682YrRz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Pt2QWpzk; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21649a7bcdcso43188015ad.1
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 13:41:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734384804; x=1734989604; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=U7e10MhhpCSq1BTGXAoLHau/IyiGxwYN2adRjiojyEc=;
-        b=h+vSgEKwpb8Fi0uUYccHCzr0jd0UKhT7S9+ruocgFuFhA1gGUBwIupKI6K22d1oZb4
-         UG2KUS+j5TItQnJmNQgl6Q5NWx6ArTlFTpTAtumPdyDAd3rxyn10IVciM5h4aY5WctAQ
-         uTm8FT5tMEMZab2FKu4Pw7+yHHCL1THKh04py1wW5DDA8jm3b4gEeXQwkGEjh4ER4PZo
-         GApt8cyLM5DfLoRoX5jg5XTRDqX+lnW/Ei1Ueafkks2z4vRc6YmMSl/dJD14aFg+HW00
-         0aaAzo2zSVhGRwxbQDk0i+nGjlRo7psRrN29Ne7fzlq+Q1x8aQnwrC48Yuwu6NwlqBBZ
-         6yZQ==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1734385309; x=1734990109; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g0z9sMKz4Z9a9d8p9fuZ4J8mSK4NVP4AwfgAs6izk00=;
+        b=Pt2QWpzkEM0SwkOXRU4psk1TOyPe8q5GqoqMKkLWFaZ8LoQO9Xo+tKh68l7n0o85d0
+         7x8nlHu6xhJMgjNfQpQIQItoJzJWtGnJK7qUD1LhSODpFnD4I5vMz3OuoTaLRkeryIqU
+         nAu9hxsHUFxOEawbpKN2gDd2WRKL9IQtTgquVsfPJsf260SJk5nq8YvBqU9cjSuUBJKc
+         3aqtTxxwazc1rT3MUCWvd+pDpJQ9+MUR7ty07SZUCv3MaE897dulzudEp0vv7J0sRSRY
+         FcWfsfs4+Dnl6jM3bBwrPkDQiOq7CxPEetCczYBoDjL29ZRQqV3L4qNoiCt8/rYkwIID
+         k0Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734384804; x=1734989604;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U7e10MhhpCSq1BTGXAoLHau/IyiGxwYN2adRjiojyEc=;
-        b=e8Un98OavdN+7CtseOusxptvw9NGbSgZ/k+6dkZTqlZDiYN8SOFpYE4BNKDeWmi6Oi
-         3m8uKvXhVTkq5WMO83vznAO4YRd51JGYagS+gloj7SjBfJj+KiPq6mVmulwllxIwWinD
-         1GhJ3J7P/mcmgTtYB3Y7UcOCs91RZkXdZ9sBs99hH2Uz8hciAYIh9Vw394Q3+jyjqg6k
-         f9xbIkWLbppZfQEqx/dTCnndUjqn80TS0ri+rabj2iAEEDyw/perZecCx96gkITBV1bP
-         is0k8Igi7cHXJDHMlZ3qjcTPiZHNwwybAvAIEJb7XWynJGrpYvbe8T0u03bFQUx25/N5
-         kbyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjAzMQ0e4rBaKYlopxZDFFSEEUc21QjoN0YWhBJ5r2UXL+Rph+LfnJpASKIdHAhBinjysnYUmv@vger.kernel.org, AJvYcCX6Nv2NPOY+7EFQeViyd6NM+Fv+O0w9kZ/4Sa/evQyE4q+2OmVsP0xHIiSwaSBKTD9GBFsvYgMprYOk@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOEVHz2/z6aRIJulj72IdW3I6zLy/8zRqkGFVGZPfCeK3zqeEL
-	5mzQXlDXKOhlNT1Oo0H2auOW2UWhQ7CaqI6F9q6fIOgqJcrolf89
-X-Gm-Gg: ASbGncva069AJvU6Go5EF6+DO2ovyqMz+G74SDvammEutUITVhZLNzWu8IwVFDiOOvb
-	WYMOTqQBK6SSxHGid+DTVSkvW1z7nt3UXRKHgk980N2mlFOBurknkbeB0EhYtpJ37PotYd15TNq
-	tPgzlynU2Q/cagWkThq/A4I0jBDWNIrrTNzUvTuwgd0aqVKbPiUThmMda1MzCeoF/0I3VRK15vh
-	iBRZ7chWo2xzdT4GQXvmMDoDDH9ZGLoGKGSMjCKD0z89Gwyj5ko3rHTEPerFu9zuQ6on0vmHd7l
-	LbBt7Y1ZhnR6hNsQpm4Tq5uXjzPdBsF2RjsCJG83VljHqNdxfYTiM7KaahQj8LIIPPdbHPT1eO2
-	82JjJJAS1Szs2+RPaQa3uvNHrCxvbEZ+9Oqnq7xq+HCCzCDvG
-X-Google-Smtp-Source: AGHT+IHFu+toXmaFZ5AkIdQ/2qGfvYOWXKiO1658/O4ok9zvAvIeRqr7Z8J9NCYGc6e6ZeQWmudOhg==
-X-Received: by 2002:a17:907:3d8f:b0:aa6:3223:19e6 with SMTP id a640c23a62f3a-aab77eda8e7mr1468655266b.60.1734384803708;
-        Mon, 16 Dec 2024 13:33:23 -0800 (PST)
-Received: from ?IPV6:2a02:3100:a874:3500:f430:df67:6714:d87b? (dynamic-2a02-3100-a874-3500-f430-df67-6714-d87b.310.pool.telefonica.de. [2a02:3100:a874:3500:f430:df67:6714:d87b])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aab9608834fsm370708766b.86.2024.12.16.13.33.22
+        d=1e100.net; s=20230601; t=1734385309; x=1734990109;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g0z9sMKz4Z9a9d8p9fuZ4J8mSK4NVP4AwfgAs6izk00=;
+        b=WMHI2MjYZF3MR7Goch/pMFZCbIYhLfv76pVCOWGO+Ztwsk/Eooqvvadw2BYHHbcsq4
+         02CM7eershviEExMzKRZt8wCSGC6RWTHSyktZsXmr+njXAutqX8Hu1jWJfmPg3qFXvs0
+         OzXL2Io2Ppxy+2UYg8CRd1/785466XYxOAIEbC2d70s5mitebpd2X/V3UV9LpKGAUw2J
+         PyuoiSLYk38/jk6w4lTuwWNGdKVgFwhdCjKAoWDVyzWSSGRFspyXGRdb710uK/8jhJpT
+         Ri/8YejOfcrkOlIQZIs1txxHuRHH5xpbzjpkoGtvlFcz9AQbUNjGU/6MqDAtVcxHMkLz
+         Ub4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWUPGSdsbdrZdJQyFojHZN2Ix7eqXXI7yGtTABLH/Esys8XXzni8YKbRzHCbH3ipyEeHjLiK3U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+L30Hu1zhV96EVocE2NV1DC9peoD5huw1c5o/pzEecEU2+AgK
+	92Pd+Y9H60zUJbRGCLvaSDX+ETNmUZk9tkbgx/M7Qb8GGpZqa1o7KvTnGVcgCXU=
+X-Gm-Gg: ASbGncv0kp5nvpGrLJVB8G+E7XpFUP5cLXsMc/+u1VH7yxY8f/4OOoQddtLxxii0k4i
+	5d05lku32IBI2jSPjMMhCy9LpzlLDKexFVWydAQFLy91wQmbdFCiH2WxCkU7b2UYe85j3JI6jZZ
+	uNioWdgqbHhWmOajgMWn/zSIO6WL49HeM/lNI48xEyXIYy1mmqHlyZufHSx4jEvkFs5q7FwD0mc
+	dSspijvthCUmEH2dM91hI4a4HJnkMPjfhGujuwkUsjHTQ1GZiPB/oXApPC4Nrcgc87jDWCQD4v9
+	KFFt6F1JQ28vqu0X0w==
+X-Google-Smtp-Source: AGHT+IHD9UZ3FTOoLro4bjK5fttlC+QHPR8wTlevsSeUa2OPGYJvb8swbvvH8QvWqiuQenNpzCbIPw==
+X-Received: by 2002:a17:902:d50c:b0:215:bc30:c952 with SMTP id d9443c01a7336-2189298a144mr201629635ad.6.1734385309132;
+        Mon, 16 Dec 2024 13:41:49 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1256:1:80c:c984:f4f1:951f? ([2620:10d:c090:500::5:e499])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e72870sm47197355ad.279.2024.12.16.13.41.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Dec 2024 13:33:22 -0800 (PST)
-Message-ID: <4a3f337e-cb76-46cc-bacb-c2ed8160619c@gmail.com>
-Date: Mon, 16 Dec 2024 22:33:21 +0100
+        Mon, 16 Dec 2024 13:41:48 -0800 (PST)
+Message-ID: <2d7f6fe0-9205-4eaf-bc43-dc36b14925a4@davidwei.uk>
+Date: Mon, 16 Dec 2024 13:41:46 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,117 +81,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 3/3] ARM: dts: ti/omap: remove eee-broken properties
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Tony Lindgren <tony@atomide.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Russell King - ARM Linux <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>
-Cc: linux-omap@vger.kernel.org,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <5139374e-7151-4d0d-8ba9-9ec3d9b52f67@gmail.com>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <5139374e-7151-4d0d-8ba9-9ec3d9b52f67@gmail.com>
+Subject: Re: [PATCH net v3 3/3] bnxt_en: handle tpa_info in queue API
+ implementation
+Content-Language: en-GB
+To: Michael Chan <michael.chan@broadcom.com>,
+ Somnath Kotur <somnath.kotur@broadcom.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, netdev@vger.kernel.org,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20241204041022.56512-1-dw@davidwei.uk>
+ <20241204041022.56512-4-dw@davidwei.uk>
+ <9ca8506d-c42d-40a0-9532-7a95c06fed39@huawei.com>
+ <0bc60b9d-fbf7-4421-ab6a-5854355d68f4@davidwei.uk>
+ <a1d5ffda-1e6c-4730-8b36-6ba644bb0118@huawei.com>
+ <fedc8606-b3bc-4fb1-8803-a004cb24216e@davidwei.uk>
+ <CACKFLik1-rQB2QHY1pZ3eF0GYGUCgXFHvhh50DNboXV+A7MCuA@mail.gmail.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <CACKFLik1-rQB2QHY1pZ3eF0GYGUCgXFHvhh50DNboXV+A7MCuA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Now that the cpsw(-new) MAC driver disables PHY EEE advertisement,
-we can remove the eee-broken-xxx workaround.
+On 2024-12-11 09:11, Michael Chan wrote:
+> On Wed, Dec 11, 2024 at 8:10 AM David Wei <dw@davidwei.uk> wrote:
+>>
+>> On 2024-12-11 04:32, Yunsheng Lin wrote:
+>>> On 2024/12/11 2:14, David Wei wrote:
+>>>> On 2024-12-10 04:25, Yunsheng Lin wrote:
+>>>>> On 2024/12/4 12:10, David Wei wrote:
+>>>>>
+>>>>>>    bnxt_copy_rx_ring(bp, rxr, clone);
+>>>>>> @@ -15563,6 +15580,8 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+>>>>>>    bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+>>>>>>    rxr->rx_next_cons = 0;
+>>>>>>    page_pool_disable_direct_recycling(rxr->page_pool);
+>>>>>> +  if (bnxt_separate_head_pool())
+>>>>>> +          page_pool_disable_direct_recycling(rxr->head_pool);
+>>>>>
+>>>>> Hi, David
+>>>>> As mentioned in [1], is the above page_pool_disable_direct_recycling()
+>>>>> really needed?
+>>>>>
+>>>>> Is there any NAPI API called in the implementation of netdev_queue_mgmt_ops?
+>>>>> It doesn't seem obvious there is any NAPI API like napi_enable() &
+>>>>> ____napi_schedule() that is called in bnxt_queue_start()/bnxt_queue_stop()/
+>>>>> bnxt_queue_mem_alloc()/bnxt_queue_mem_free() through code reading.
+>>>>>
+>>>>> 1. https://lore.kernel.org/all/c2b306af-4817-4169-814b-adbf25803919@huawei.com/
+>>>>
+>>>> Hi Yunsheng, there are explicitly no napi_enable/disable() calls in the
+>>>> bnxt implementation of netdev_queue_mgmt_ops due to ... let's say HW/FW
+>>>> quirks. I looked back at my discussions w/ Broadcom, and IIU/RC
+>>>> bnxt_hwrm_vnic_update() will prevent any work from coming into the rxq
+>>>> that I'm trying to stop. Calling napi_disable() has unintended side
+>>>> effects on the Tx side.
+>>>
+>>> It seems that bnxt_hwrm_vnic_update() sends a VNIC_UPDATE cmd to disable
+>>> a VNIC? and a napi_disable() is not needed?
+>>
+>> Correct.
+>>
+>>> Is it possible that there may
+>>> be some pending NAPI work is still being processed after bnxt_hwrm_vnic_update()
+>>> is called?
+>>
+>> Possibly, I don't know the details of how the HW works.
+>>
+> 
+> bnxt_hwrm_vnic_update() only stops the HW from receiving more packets.
+> The completion may already have lots of RX entries and TPA entries.
+> NAPI may be behind and it can take a while to process a batch of 64
+> entries at a time to go through all the remaining entries.
+> 
+>> At the time I just wanted something to work, and not having
+>> napi_enable/disable() made it work. :) Looking back though it does seem
+>> odd, so I'll try putting it back.
+> 
+> Yeah, I think it makes sense to add napi_disable().  Thanks.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- arch/arm/boot/dts/ti/omap/am335x-baltos.dtsi      | 2 --
- arch/arm/boot/dts/ti/omap/am335x-myirtech-myd.dts | 1 -
- arch/arm/boot/dts/ti/omap/am5729-beagleboneai.dts | 2 --
- 3 files changed, 5 deletions(-)
+Michael, Som. I can't add napi_disable()/enable() because the NAPI
+instance is shared between the Rx and Tx queues. If I disable a NAPI
+instance, then it affects the corresponding Tx queue because it is not
+quiesced. Only the Rx queue is quiesced indirectly by preventhing the HW
+from receiving packets via the call to bnxt_hwrm_vnic_update().
 
-diff --git a/arch/arm/boot/dts/ti/omap/am335x-baltos.dtsi b/arch/arm/boot/dts/ti/omap/am335x-baltos.dtsi
-index ae2e8dffb..e69e5e817 100644
---- a/arch/arm/boot/dts/ti/omap/am335x-baltos.dtsi
-+++ b/arch/arm/boot/dts/ti/omap/am335x-baltos.dtsi
-@@ -354,8 +354,6 @@ &davinci_mdio_sw {
- 
- 	phy1: ethernet-phy@1 {
- 		reg = <7>;
--		eee-broken-100tx;
--		eee-broken-1000t;
- 	};
- };
- 
-diff --git a/arch/arm/boot/dts/ti/omap/am335x-myirtech-myd.dts b/arch/arm/boot/dts/ti/omap/am335x-myirtech-myd.dts
-index fd91a3c01..8b86918bd 100644
---- a/arch/arm/boot/dts/ti/omap/am335x-myirtech-myd.dts
-+++ b/arch/arm/boot/dts/ti/omap/am335x-myirtech-myd.dts
-@@ -96,7 +96,6 @@ &cpsw_port2 {
- &davinci_mdio_sw {
- 	phy1: ethernet-phy@6 {
- 		reg = <6>;
--		eee-broken-1000t;
- 	};
- };
- 
-diff --git a/arch/arm/boot/dts/ti/omap/am5729-beagleboneai.dts b/arch/arm/boot/dts/ti/omap/am5729-beagleboneai.dts
-index e6a18954e..e8007a8fd 100644
---- a/arch/arm/boot/dts/ti/omap/am5729-beagleboneai.dts
-+++ b/arch/arm/boot/dts/ti/omap/am5729-beagleboneai.dts
-@@ -492,8 +492,6 @@ &davinci_mdio_sw {
- 
- 	phy0: ethernet-phy@4 {
- 		reg = <4>;
--		eee-broken-100tx;
--		eee-broken-1000t;
- 	};
- };
- 
--- 
-2.47.1
-
-
+The other implementation of queue API (gve) will quiesce all queues for
+an individual queue stop/start operation. To call
+napi_disable()/enable() I believe we will need the same thing for bnxt.
 
