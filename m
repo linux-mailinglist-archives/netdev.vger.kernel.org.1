@@ -1,153 +1,98 @@
-Return-Path: <netdev+bounces-152267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF7599F34F8
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 16:51:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C209F34FC
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 16:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47A87162450
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 15:51:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81D7E1884CA7
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 15:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32CF14D2A2;
-	Mon, 16 Dec 2024 15:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E598B148FF0;
+	Mon, 16 Dec 2024 15:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tMgyEsFk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GvCiA1bj"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E563D1369AE
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 15:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11BC53E23
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 15:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734364293; cv=none; b=G+xQ3cTkDtsAto2hEgyoYu1RhzzWb7u5XJLcH9Ejfi95p8fp8Awix6y0MtizCsVq9aljPOMdZum7LSH6uTpzKCUVhdqjIGH9H1+ehkpcLyl58fsTSQysO3VpDe3tGM0D/cDwre0c9oP+OuCqoM112LLspRYWvU1nNmbsmdRkK2g=
+	t=1734364385; cv=none; b=rjQurcZ5xaRjGDsNSyQ7LA849T9WqwQT6jvcbtYS9ca/yMNlxwLmCMBGjfLt94sbKidciZiDqk3/tieGEi/1mRSVNmKo/kfi3g99EV2KmI5fjcs8l8cYwPWajQ+xA1g5sBA1oQnFzBSLuq+PWT28f0r+OGzGcQGbljZC8bzJ3q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734364293; c=relaxed/simple;
-	bh=JWyMlJ42sfYfy6j/XdGv0H+1tzW7mHPoYNqB0He1ijI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OaqGm0anU1RzbH1jm2UZ3smzEWKNg7VJcVImxklQdeTHCByNvhfaQl4wLkYJiRuS0ME/JhyCfSvmP5heqzas2sJc+z+qtH5vYXtr8rA0JVt/RCbD1BDVB8l+qZwkjFNZHt2kxs78pBbiewm+VMSH7ak0R7ErcoadwBP/3Dl9T68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tMgyEsFk; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=uErsYTN3fuqgzH3wySCa9nVJafSXiODQbBwQOglZQGA=; b=tMgyEsFkw0A24FaJ1CHiKtL7qX
-	Oussf5AD1yKgduMJDSjhvvbvbPdOY+SZOFPGN5Jf2o+G4ZqaB5xVMm8SPzlNDgd+bOeKg3Ru7NaLQ
-	vuFwV/lCbz1UzRcm/VkAdsU+JQlZdSDzQc9to/bw08W3cE3fJF56zap4bU0dlwV+Os80CB7k0NQ7A
-	iFIErl6FLuKsi8A9xZOt8jgLWfWYs/JreeDiWqyYlRYdxWqiAU2gnixaGd0lw6nLY41yiy925njr9
-	huWCJ76ZwoRIvfQoUW8rccSFDaOHdKJi9m1ABWHbIydiZ3ej7Lvqw9GqyX28MapR7BYbSiI4q7WVp
-	Gw0JVmHg==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tNDNW-000000000oy-3cOc;
-	Mon, 16 Dec 2024 15:51:26 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH] niu: Use page->private instead of page->index
-Date: Mon, 16 Dec 2024 15:51:22 +0000
-Message-ID: <20241216155124.3114-1-willy@infradead.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1734364385; c=relaxed/simple;
+	bh=RxQ5nfW10d9HJJNLnfBJcNktaH03+dvNMHOBKk4AhkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=krJ7Oug4WotzoZ0Vg2pLCsbR92KKjo9QdMlJrFEBJWAI3/UT1b/DWwFvcsXtf3NLp2h5dlmvNZvluCIkiW0R4CAHhO7cKn48B/ZauTRVn4a9bLxSRKyVpNRnDTs9pMwOoltuUQu3KDdpXVT0i0+tsCH6SKHYjGMLNA14tzROeFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GvCiA1bj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9308C4CED0;
+	Mon, 16 Dec 2024 15:53:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734364385;
+	bh=RxQ5nfW10d9HJJNLnfBJcNktaH03+dvNMHOBKk4AhkQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GvCiA1bjVl0Kkn8m6XL3MOqUPh/5P/UOdcd1ie3DWV+Tz5WBk2uN0Hx4OdPb/YAqo
+	 3MVla1rknCU6x6liFpx60F5PzgMRFqBSS9EkzWD2iMvD/fomL+MISB1acpPEN9fFON
+	 eJWhKsy9a71L2XDPE+SvtiOY4quFltD87Uw97U2vbuYVgnmIzHlZKaYrxHjsbhMBn6
+	 ZBUOgmHAyHhXN1rLo9EfzI7jzO1pDrDwFFPvca3/RwYsadbciaLA1BTJUl1Is8aVuu
+	 /BPB36SMxhCwIhYfBTW50pikXnPfKYfOGnubAGHfJRcx3qMN4M5jbqobDMI5cG7qfN
+	 XI1hBvpmvXT2g==
+Date: Mon, 16 Dec 2024 07:53:03 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>,
+ <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>, <horms@kernel.org>,
+ <jiri@resnulli.us>, <stephen@networkplumber.org>,
+ <anthony.l.nguyen@intel.com>, <jacob.e.keller@intel.com>,
+ <intel-wired-lan@lists.osuosl.org>
+Subject: Re: [RFC 0/1] Proposal for new devlink command to enforce firmware
+ security
+Message-ID: <20241216075303.7667c1a1@kernel.org>
+In-Reply-To: <30e3c7e7-c621-40b9-844c-d218fb3e9f2c@intel.com>
+References: <20241209131450.137317-2-martyna.szapar-mudlaw@linux.intel.com>
+	<20241209153600.27bd07e1@kernel.org>
+	<b3b23f47-96d0-4cdc-a6fd-f7dd58a5d3c6@linux.intel.com>
+	<20241211181147.09b4f8f3@kernel.org>
+	<30e3c7e7-c621-40b9-844c-d218fb3e9f2c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-We are close to removing page->index.  Use page->private instead, which
-is least likely to be removed.
+On Mon, 16 Dec 2024 16:09:12 +0100 Przemek Kitszel wrote:
+> > Please point me to relevant standard that supports locking in security
+> > revision as an action separate from FW update, and over an insecure
+> > channel.
+> > 
+> > If you can't find one, please let's not revisit this conversation.  
+> 
+> It's not standard, just the design for our e810 (e82x?) FW, but we could 
+> achieve the goal in one step, while preserving the opt-out mechanism for
+> those unwilling customers. I think that this will allow at least some
+> customers to prevent possibility of running a known-to-be-bad FW
+> (prior to opening given server to the world).
+> 
+> We could simply add DEVLINK_FLASH_OVERWRITE_MIN_VERSION (*) flag for the
+> single-step flash update [1], and do the update AND bump our "minsrev"
+> in one step.
+> The worst that could happen, is that customer will get some newer
+> version of the firmware (but a one released by Intel).
+> We preserve the simplicity of one .bin file with that too.
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- drivers/net/ethernet/sun/niu.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+Please explain to me how this will all fit into the existing standards
+like SPDM. Please take security seriously.. this is not just another
+knob. How will attestation of the fact that someone flipped the knob
+work?
 
-diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
-index df6d35d41b97..d7459866d24c 100644
---- a/drivers/net/ethernet/sun/niu.c
-+++ b/drivers/net/ethernet/sun/niu.c
-@@ -3303,7 +3303,7 @@ static struct page *niu_find_rxpage(struct rx_ring_info *rp, u64 addr,
- 	addr &= PAGE_MASK;
- 	pp = &rp->rxhash[h];
- 	for (; (p = *pp) != NULL; pp = &niu_next_page(p)) {
--		if (p->index == addr) {
-+		if (p->private == addr) {
- 			*link = pp;
- 			goto found;
- 		}
-@@ -3318,7 +3318,7 @@ static void niu_hash_page(struct rx_ring_info *rp, struct page *page, u64 base)
- {
- 	unsigned int h = niu_hash_rxaddr(rp, base);
- 
--	page->index = base;
-+	page->private = base;
- 	niu_next_page(page) = rp->rxhash[h];
- 	rp->rxhash[h] = page;
- }
-@@ -3400,11 +3400,11 @@ static int niu_rx_pkt_ignore(struct niu *np, struct rx_ring_info *rp)
- 
- 		rcr_size = rp->rbr_sizes[(val & RCR_ENTRY_PKTBUFSZ) >>
- 					 RCR_ENTRY_PKTBUFSZ_SHIFT];
--		if ((page->index + PAGE_SIZE) - rcr_size == addr) {
-+		if ((page->private + PAGE_SIZE) - rcr_size == addr) {
- 			*link = niu_next_page(page);
--			np->ops->unmap_page(np->device, page->index,
-+			np->ops->unmap_page(np->device, page->private,
- 					    PAGE_SIZE, DMA_FROM_DEVICE);
--			page->index = 0;
-+			page->private = 0;
- 			niu_next_page(page) = NULL;
- 			__free_page(page);
- 			rp->rbr_refill_pending++;
-@@ -3469,11 +3469,11 @@ static int niu_process_rx_pkt(struct napi_struct *napi, struct niu *np,
- 			append_size = append_size - skb->len;
- 
- 		niu_rx_skb_append(skb, page, off, append_size, rcr_size);
--		if ((page->index + rp->rbr_block_size) - rcr_size == addr) {
-+		if ((page->private + rp->rbr_block_size) - rcr_size == addr) {
- 			*link = niu_next_page(page);
--			np->ops->unmap_page(np->device, page->index,
-+			np->ops->unmap_page(np->device, page->private,
- 					    PAGE_SIZE, DMA_FROM_DEVICE);
--			page->index = 0;
-+			page->private = 0;
- 			niu_next_page(page) = NULL;
- 			rp->rbr_refill_pending++;
- 		} else
-@@ -3538,11 +3538,11 @@ static void niu_rbr_free(struct niu *np, struct rx_ring_info *rp)
- 		page = rp->rxhash[i];
- 		while (page) {
- 			struct page *next = niu_next_page(page);
--			u64 base = page->index;
-+			u64 base = page->private;
- 
- 			np->ops->unmap_page(np->device, base, PAGE_SIZE,
- 					    DMA_FROM_DEVICE);
--			page->index = 0;
-+			page->private = 0;
- 			niu_next_page(page) = NULL;
- 
- 			__free_page(page);
-@@ -6460,7 +6460,7 @@ static void niu_reset_buffers(struct niu *np)
- 				page = rp->rxhash[j];
- 				while (page) {
- 					struct page *next = niu_next_page(page);
--					u64 base = page->index;
-+					u64 base = page->private;
- 					base = base >> RBR_DESCR_ADDR_SHIFT;
- 					rp->rbr[k++] = cpu_to_le32(base);
- 					page = next;
--- 
-2.45.2
-
+A much better workaround would be for you to build multiple FW images
+and give customers an image which locks in the min version and one
+which doesn't.
 
