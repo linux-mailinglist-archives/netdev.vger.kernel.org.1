@@ -1,247 +1,212 @@
-Return-Path: <netdev+bounces-152226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F7E9F321A
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 14:59:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2FB9F3266
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 15:11:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9100F1887994
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:59:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 504717A224B
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 14:11:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B645205AC4;
-	Mon, 16 Dec 2024 13:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903862066DC;
+	Mon, 16 Dec 2024 14:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="GkJwlyRb";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wpTdVEW3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TSRUP7dc"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB26420551E;
-	Mon, 16 Dec 2024 13:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC6A206284;
+	Mon, 16 Dec 2024 14:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734357557; cv=none; b=KdzsSKmUylnpsdHeNmyaDzV+9cBgi3GuSxKq/hsad+DwJUe6p9G8cLWS5v9yrgGpMPs63fhXkmLsI8T0NG7ZZi0Xy62QFSpHkfkRB9/jj4cuR4lW06848vrdCNaxaYjptIttHmZM3UD3n3xjFv+RWwdR+e+1DvfoCNQwWVFyoU4=
+	t=1734358234; cv=none; b=ijPa7oEWWpKUWZ+hPx2JUxY2We0surQPwa0JfTaQCk0E2JfhT87evLqHqhxYOcEdINIdOJFFa2ee6saDH97TGP471BbNN0kuSdlqCgyIclhy76yjfZXNmuWYDxSLmzMi/Eunst7GMkeKxQHfV4YZP947aNY2gbc//RNT9mRgU8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734357557; c=relaxed/simple;
-	bh=8cnDpAmdmw7q0pujChBmKz1JpTyYIp7Gr+aiiHZKWSY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ko6SmVRSwKaYWi5Tgfp9iu6SxgVgt45F2AN20EnYqqXx9PzdjVi48gczi9Zrx5c+VUz+BHvu0DnUexGmbBQ7xgrTmvHtr3DRV22lc3M3QbJPGaPQ3OZ28cz4yX1VnDetl6pur1r9J8/v9wsaIIcgRTYbA2pS7C+uiAHxLb1i0Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=GkJwlyRb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wpTdVEW3; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id 60F511140183;
-	Mon, 16 Dec 2024 08:59:12 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Mon, 16 Dec 2024 08:59:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1734357552; x=
-	1734443952; bh=/v6226Ro8TC4Mj/uCUF5W/7DJNZ8K0LPbNR7dvkO4bM=; b=G
-	kJwlyRbN9YNvQVCdFjvXtdA/pgbCABZpYBYUoKVeBl4RCn7UFRbi4iQx4VeEhCcy
-	GLOR+DCEKQDYjMtq2cjQ1iWGzOuReTCFRNs9nMhrRZhK13MF+wGbvxweQk8KoSai
-	l+sbRiZcbHpcvZp92MZrzgMz6/ZiWTJ+TGIPV5/AfL4Sd6StkNyt2IjNJrmc54oQ
-	1isSNd8iCMruQimb53/gqAbDAE5YHlqwA5bzngQYfNvUhmro46lTc99rmQSG8oS1
-	ILldTPChANkQvuhsrX0tmNr8/40SOYQFbYgDWuda/xJq8S3xWp4dVyw+19PXiBSo
-	l3AZG5yEftgm42o7adKLg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1734357552; x=1734443952; bh=/v6226Ro8TC4Mj/uCUF5W/7DJNZ8K0LPbNR
-	7dvkO4bM=; b=wpTdVEW3BJSeU27h+Vr201d9ZNZ6JltAPd6l0xv0WHROOALqFaz
-	vellAr61+0gAKS6eDdrFYAhCZpfr+AiRGDZ3j2liOBdKRZWWhJ9FzfXzvng/r/59
-	GPTQb7aCaCZfnPhIwsupkWtFa5vHzOosVVYX/Z9xOicgXM1osU+mNVIjYQEI/LJl
-	JZjENc4TaMubcwhW6ZOOBxUORmzYXX8dvxYwn+y29XTgM9myIZJh6CaNvAuQHNJx
-	4UHzv4ncRjO5/W2fVImUj7xNy0NtQLejpRZZytmPQfta91t8tAPaG0UEMSCxSQ57
-	fHe+1I9l86jMpo6bZ99TI9wm3atCwD5bBKA==
-X-ME-Sender: <xms:LzJgZ5juurNgpowQiQQ6yhQLibhpRrMNZ_m98wGK90vtpObdanO6RA>
-    <xme:LzJgZ-BCCoUJuVSKcUXfTzegkm66e20BkgdrRfWkq6CsJpMC4PGmzi_rwiSGCq2rv
-    QAVdlYtq8OZ6QV56ew>
-X-ME-Received: <xmr:LzJgZ5ERVLvtgmjH7iO5rhB4PtwcCNA46QoGFkdm8g-sUCzyd1PFCdJ8oGGq>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrleefgdehkecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpthhtoh
-    eprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-X-ME-Proxy: <xmx:LzJgZ-QsI3_NDRA9Vy5erYDIYrx9-YefC95BcIRnl-eIjN0gUhWLkw>
-    <xmx:LzJgZ2y5whIofRlqyx9AZVXmbWyyaGOY1oFZg1UBlTjvrKXSwEpS9g>
-    <xmx:LzJgZ06X9ge0V8HO1KSTzSKF6XovdRLuhaVVzJuUHnIrHa0SN7yPOg>
-    <xmx:LzJgZ7wRdIJZXUGij9gCrJJ_xa0UuLCVH81l_TbujuoNoYbANW-60w>
-    <xmx:MDJgZ7ITFA9mJfEFcYsytzTsAG-3DYHBdDE83KWCcKie1pVPMcBuDxLu>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 16 Dec 2024 08:59:10 -0500 (EST)
-Date: Mon, 16 Dec 2024 14:59:08 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
-	dsahern@kernel.org
-Subject: Re: [PATCH net-next v15 11/22] ovpn: implement TCP transport
-Message-ID: <Z2AyLOMazyOCDopc@hog>
-References: <20241211-b4-ovpn-v15-0-314e2cad0618@openvpn.net>
- <20241211-b4-ovpn-v15-11-314e2cad0618@openvpn.net>
+	s=arc-20240116; t=1734358234; c=relaxed/simple;
+	bh=IDxhcv0YrqyvrNkAnxSC+WSCaccxp8oEIkrJ4llFEAg=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=aZyVMSpmLvqfu1NPVebUAMaZd2ACVrnIgCbzqXW0NxGe/WPQa+aPDC2iV/L/B/+G2Bk2B6OyCChVl+at2UNlN5tqT8rcyZHoRScy05Ovr4/9xknD/z07a+DcrGRqhdLcBRoFgEkPBuTxgw++Go59rwe4madOEBPz5vmvQbxlH6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TSRUP7dc; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-38789e5b6a7so2147848f8f.1;
+        Mon, 16 Dec 2024 06:10:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734358230; x=1734963030; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kHGUggi4KWk7b9dNu2KvnRj9xlQayHW6VmghHC4yAKQ=;
+        b=TSRUP7dcykZQFdJ/hxU36nubZnH1A6Mxy5DUOgX0yijp9d9QRQB8WsI0Mku3RYBa5o
+         y02kpPOFxqj5A2buYPISqAfr8Bz/OXzRL9Nb108GiBenqSPRmkc/N6Uq4y6FmdTZf2XZ
+         Nz+im13BptvnVwMx85Km4L3lPTy93rY1TwPMUYF0ZLkxGPko58MvOtkH7SiHuEi+kj5z
+         KR8IEjBiv/dFQ+4bYjGuIJK1C2NETy7++LtSnfj+KbCUoQzvC/7Gn/OmifoJswszIOvb
+         ceGKQWd/DSmWV911fi1P33zcGDuDhKxfMgsfLHKfaWD1h77qNY+srxD8msZLNpmmQO5G
+         m/Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734358230; x=1734963030;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kHGUggi4KWk7b9dNu2KvnRj9xlQayHW6VmghHC4yAKQ=;
+        b=qSCuZ0QhZzmG5OPtlQKuCH18AHLZXZu4c3AFle2LfKvysrh31rC/anhSFinbZC7Y6f
+         0LRet0MFzS11AxKn+NNPoBxjviG0hjWHHUWetMtsDU88MiGETF+ycC9ppqJbYjlmWiz8
+         5ZvYhhBkI7602lHWPfhNF6bWYTi9uC6cIf7gz+rk6y4yT55/YAXxP/DddYoCaq3cHztn
+         RvuuAJ8doPJLZeGV+ywU1hKqyamVC/LLu7ycgrCYO6h89AmnDhG43irVBVFlWSvlIrrt
+         aRwIK575rUU3XvvV4TYdGWqu7v3uo0R5ci/Be9i3tB/rz6g3tE+z8xtlzVknBpUQWjvB
+         QObw==
+X-Forwarded-Encrypted: i=1; AJvYcCX8FhNr3DYLNrB9jtHCVshTVR4WjGyyGONbAJkqeiR5AUsP2NcsNXlDMJIezhkKE3DYg/fS7/nW@vger.kernel.org, AJvYcCXlxCHfSfzx1piyevkjmsY9BM1cUT0Gd3WxgFQIRjABzUuEAcCjvsiU2+rgxUt/as8sshPfHIdDRgzvQt8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypcIdS21Zz2cE8d2LWjdaRb9ffhbdoB8fEqD5/zSIeSwJYEpJf
+	pN1/1vbd5lsrOe+88FqWBPkv168ERarg+TgZaJlAs428qveODMx+bJVUqA==
+X-Gm-Gg: ASbGnct1DIEzfob7gVVdOEx5MJpjxxYmeI8LsZmWhbLLYxfXqNasobMmujQRWK5z0JG
+	FuQM6VpsqwT0rb6FIn3g7T+uvUne0ka4/oJkTR4vohqgDUscDbJOJa705oHN1DzPMjpy0obwaRe
+	2iMO+B123613Rhzet4G4rvB7rlrKuNOE/XtbtpostnwvPKS2773jj43h4UV7QBsKjTEAJbVsY/P
+	Gr61N+vER1/fAI71idBEwmhnAsFgNaii9YETfFr+2JFap4+foR1U0keS5/R3C2Jd34O6g==
+X-Google-Smtp-Source: AGHT+IGtJ4fxS2nw2pH+7WL2/DgrrFUnSjqVji7IeZa5963Kda96Q5zkGx7RLV7LUDhgMfLKtnSI3g==
+X-Received: by 2002:a05:6000:1864:b0:385:df73:2f24 with SMTP id ffacd0b85a97d-3888e0f2d5bmr11187182f8f.39.1734358230282;
+        Mon, 16 Dec 2024 06:10:30 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:3011:496e:7793:8f4c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4362559eb20sm143381465e9.21.2024.12.16.06.10.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Dec 2024 06:10:29 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jan Stancek <jstancek@redhat.com>
+Cc: stfomichev@gmail.com,  kuba@kernel.org,  jdamato@fastly.com,
+  pabeni@redhat.com,  davem@davemloft.net,  edumazet@google.com,
+  horms@kernel.org,  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] tools: ynl: add install target for generated
+ content
+In-Reply-To: <a2e4ffb9cbd4a9c2fd0d7944b603794bff66e593.1734345017.git.jstancek@redhat.com>
+	(Jan Stancek's message of "Mon, 16 Dec 2024 11:41:43 +0100")
+Date: Mon, 16 Dec 2024 14:01:06 +0000
+Message-ID: <m2a5cv917h.fsf@gmail.com>
+References: <cover.1734345017.git.jstancek@redhat.com>
+	<a2e4ffb9cbd4a9c2fd0d7944b603794bff66e593.1734345017.git.jstancek@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241211-b4-ovpn-v15-11-314e2cad0618@openvpn.net>
+Content-Type: text/plain
 
-2024-12-11, 22:15:15 +0100, Antonio Quartulli wrote:
-> @@ -42,6 +56,31 @@ struct ovpn_peer {
->  		struct in6_addr ipv6;
->  	} vpn_addrs;
->  	struct ovpn_socket *sock;
+Jan Stancek <jstancek@redhat.com> writes:
+
+> Generate docs using ynl_gen_rst and add install target for
+> headers, specs and generates rst files.
+>
+> Signed-off-by: Jan Stancek <jstancek@redhat.com>
+> ---
+>  tools/net/ynl/generated/.gitignore |  1 +
+>  tools/net/ynl/generated/Makefile   | 40 +++++++++++++++++++++++++++---
+>  2 files changed, 38 insertions(+), 3 deletions(-)
+>
+> diff --git a/tools/net/ynl/generated/.gitignore b/tools/net/ynl/generated/.gitignore
+> index ade488626d26..859a6fb446e1 100644
+> --- a/tools/net/ynl/generated/.gitignore
+> +++ b/tools/net/ynl/generated/.gitignore
+> @@ -1,2 +1,3 @@
+>  *-user.c
+>  *-user.h
+> +*.rst
+> diff --git a/tools/net/ynl/generated/Makefile b/tools/net/ynl/generated/Makefile
+> index 00af721b1571..208f7fead784 100644
+> --- a/tools/net/ynl/generated/Makefile
+> +++ b/tools/net/ynl/generated/Makefile
+> @@ -7,12 +7,19 @@ ifeq ("$(DEBUG)","1")
+>    CFLAGS += -g -fsanitize=address -fsanitize=leak -static-libasan
+>  endif
+>  
+> +INSTALL	    ?= install
+
+nit: mix of tabs and spaces here
+
+> +prefix      ?= /usr
+> +datarootdir ?= $(prefix)/share
+> +docdir      ?= $(datarootdir)/doc
+> +includedir  ?= $(prefix)/include
 > +
-> +	/* state of the TCP reading. Needed to keep track of how much of a
-> +	 * single packet has already been read from the stream and how much is
-> +	 * missing
-> +	 */
+>  include ../Makefile.deps
+>  
+>  YNL_GEN_ARG_ethtool:=--user-header linux/ethtool_netlink.h \
+>  	--exclude-op stats-get
+>  
+>  TOOL:=../pyynl/ynl_gen_c.py
+> +TOOL_RST:=../pyynl/ynl_gen_rst.py
+>  
+>  GENS_PATHS=$(shell grep -nrI --files-without-match \
+>  		'protocol: netlink' \
+> @@ -22,7 +29,11 @@ SRCS=$(patsubst %,%-user.c,${GENS})
+>  HDRS=$(patsubst %,%-user.h,${GENS})
+>  OBJS=$(patsubst %,%-user.o,${GENS})
+>  
+> -all: protos.a $(HDRS) $(SRCS) $(KHDRS) $(KSRCS) $(UAPI)
+> +SPECS_PATHS=$(wildcard ../../../../Documentation/netlink/specs/*.yaml)
 
-nit: not so accurate since the switch to strp, can probably be dropped
-since @tcp has a kdoc entry
+You missed Jakub's request to factor out SPECS_DIR:
 
-> +	struct {
-> +		struct strparser strp;
-> +		struct work_struct tx_work;
-> +		struct sk_buff_head user_queue;
-> +		struct sk_buff_head out_queue;
-> +		bool tx_in_progress;
+  Maybe factor out:
+
+  SPECS_DIR := ../../../../Documentation/netlink/specs
+
+  ? It's pretty long and we repeat it all over the place.
+
+> +SPECS=$(patsubst ../../../../Documentation/netlink/specs/%.yaml,%,${SPECS_PATHS})
+> +RSTS=$(patsubst %,%.rst,${SPECS})
 > +
-> +		struct {
-> +			struct sk_buff *skb;
-> +			int offset;
-> +			int len;
-> +		} out_msg;
+> +all: protos.a $(HDRS) $(SRCS) $(KHDRS) $(KSRCS) $(UAPI) $(RSTS)
+>  
+>  protos.a: $(OBJS)
+>  	@echo -e "\tAR $@"
+> @@ -40,8 +51,12 @@ protos.a: $(OBJS)
+>  	@echo -e "\tCC $@"
+>  	@$(COMPILE.c) $(CFLAGS_$*) -o $@ $<
+>  
+> +%.rst: ../../../../Documentation/netlink/specs/%.yaml $(TOOL2)
+
+Did you miss Jakub's review comment: TOOL2 -> TOOL_RST ?
+
+> +	@echo -e "\tGEN_RST $@"
+> +	@$(TOOL_RST) -o $@ -i $<
 > +
-> +		struct {
-> +			void (*sk_data_ready)(struct sock *sk);
-> +			void (*sk_write_space)(struct sock *sk);
-> +			struct proto *prot;
-> +			const struct proto_ops *ops;
-> +		} sk_cb;
-> +	} tcp;
+>  clean:
+> -	rm -f *.o
+> +	rm -f *.o *.rst
 
-[...]
-> +static void ovpn_tcp_send_sock_skb(struct ovpn_peer *peer, struct sk_buff *skb)
-> +{
-> +	if (peer->tcp.out_msg.skb)
-> +		ovpn_tcp_send_sock(peer);
+Also Jakub's comment:
+
+  No strong preference but I'd count .rst as final artifacts so I'd clean
+  them up in distclean target only, not the clean target. The distinction
+  itself may be a local custom..
+
+>  distclean: clean
+>  	rm -f *.c *.h *.a
+> @@ -49,5 +64,24 @@ distclean: clean
+>  regen:
+>  	@../ynl-regen.sh
+>  
+> -.PHONY: all clean distclean regen
+> +install-headers: $(HDRS)
+> +	@echo -e "\tINSTALL generated headers"
+> +	@$(INSTALL) -d $(DESTDIR)$(includedir)/ynl
+> +	@$(INSTALL) -m 0644 *.h $(DESTDIR)$(includedir)/ynl/
 > +
-> +	if (peer->tcp.out_msg.skb) {
-> +		dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
-
-tx_dropped?
-
-> +		kfree_skb(skb);
-> +		return;
-> +	}
+> +install-rsts: $(RSTS)
+> +	@echo -e "\tINSTALL generated docs"
+> +	@$(INSTALL) -d $(DESTDIR)$(docdir)/ynl
+> +	@$(INSTALL) -m 0644 $(RSTS) $(DESTDIR)$(docdir)/ynl/
 > +
-> +	peer->tcp.out_msg.skb = skb;
-> +	peer->tcp.out_msg.len = skb->len;
-> +	peer->tcp.out_msg.offset = 0;
-> +	ovpn_tcp_send_sock(peer);
-> +}
+> +install-specs:
+> +	@echo -e "\tINSTALL specs"
+> +	@$(INSTALL) -d $(DESTDIR)$(datarootdir)/ynl
+> +	@$(INSTALL) -m 0644 ../../../../Documentation/netlink/*.yaml $(DESTDIR)$(datarootdir)/ynl/
+> +	@$(INSTALL) -d $(DESTDIR)$(datarootdir)/ynl/specs
+> +	@$(INSTALL) -m 0644 ../../../../Documentation/netlink/specs/*.yaml $(DESTDIR)$(datarootdir)/ynl/specs/
 > +
-> +void ovpn_tcp_send_skb(struct ovpn_peer *peer, struct sk_buff *skb)
-> +{
-> +	u16 len = skb->len;
+> +install: install-headers install-rsts install-specs
 > +
-> +	*(__be16 *)__skb_push(skb, sizeof(u16)) = htons(len);
-> +
-> +	bh_lock_sock(peer->sock->sock->sk);
-> +	if (sock_owned_by_user(peer->sock->sock->sk)) {
-> +		if (skb_queue_len(&peer->tcp.out_queue) >=
-> +		    READ_ONCE(net_hotdata.max_backlog)) {
-> +			dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
-
-tx_dropped?
-
-> +			kfree_skb(skb);
-> +			goto unlock;
-> +		}
-> +		__skb_queue_tail(&peer->tcp.out_queue, skb);
-> +	} else {
-> +		ovpn_tcp_send_sock_skb(peer, skb);
-> +	}
-> +unlock:
-> +	bh_unlock_sock(peer->sock->sock->sk);
-> +}
-
-[...]
-> +static void ovpn_tcp_close(struct sock *sk, long timeout)
-> +{
-> +	struct ovpn_socket *sock;
-> +
-> +	rcu_read_lock();
-
-[can't sleep until unlock]
-
-> +	sock = rcu_dereference_sk_user_data(sk);
-> +
-> +	strp_stop(&sock->peer->tcp.strp);
-> +
-> +	tcp_close(sk, timeout);
-
-
-    void tcp_close(struct sock *sk, long timeout)
-    {
-    	lock_sock(sk);
-
-but this can sleep.
-
-Is there anything that prevents delaying tcp_close until after
-ovpn_peer_del and rcu_read_unlock?
-
-> +	ovpn_peer_del(sock->peer, OVPN_DEL_PEER_REASON_TRANSPORT_ERROR);
-> +	rcu_read_unlock();
-> +}
-
-[...]
-> +void __init ovpn_tcp_init(void)
-> +{
-> +	ovpn_tcp_build_protos(&ovpn_tcp_prot, &ovpn_tcp_ops, &tcp_prot,
-> +			      &inet_stream_ops);
-> +
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	ovpn_tcp_build_protos(&ovpn_tcp6_prot, &ovpn_tcp6_ops, &tcpv6_prot,
-> +			      &inet6_stream_ops);
-
-I don't think that works for CONFIG_OVPN=y and CONFIG_IPV6=m. You can
-either go back to the ugly thing espintcp and tls do, or use the
-traditional Kconfig hack:
-
-	depends on IPV6 || !IPV6
-
-(you can find it sprinkled in various places of drivers/net/Kconfig
-and net/)
-
--- 
-Sabrina
+> +.PHONY: all clean distclean regen install install-headers install-rsts install-specs
+>  .DEFAULT_GOAL: all
 
