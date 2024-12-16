@@ -1,124 +1,123 @@
-Return-Path: <netdev+bounces-152362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E56FC9F3A57
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 20:55:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5035A9F3A5B
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 20:57:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 329C01639DF
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:55:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924611653DE
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621D420CCD0;
-	Mon, 16 Dec 2024 19:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CE620CCE1;
+	Mon, 16 Dec 2024 19:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TRueQ+P2"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="cUD11b9N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC36C20C481;
-	Mon, 16 Dec 2024 19:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FD7205AA8
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 19:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734378924; cv=none; b=Ag5rAfCDA0HHlW7ZL4+oADNwrzKL8v6Ihj1xwBAGFcE/WDIksXZ5RObHOJBKYzwpZidJ1qqcIrdSLw/G4qHIHFMMr8l/6lbGXe6jEucHjtQq/XaL+jhV1vg0xkty7+RlpOnO4wdsbKo6D/JxoaozlEr8AR2eFEiFgVjK0aIzSoA=
+	t=1734379059; cv=none; b=fadyZhJGxAhqpY0i15/LZN0+cCohv0aQb4gPCHLf8p+3TaPra5HEq6eZQwGDYX/bJRKWdieINzFFSsebe8OYyldNSpKwco4PMCiotgrGVkUjzPztixjrPg5CHb1dVjCvKwRYqnme46WOQNdkqF0XvHh5WDoWGKk0Lxn3gYhROtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734378924; c=relaxed/simple;
-	bh=Ix+OStVvszHNAz69L80aX5rSRrohehl4XpnZY9rnZY4=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dw1EL/F1Cm9NGrZg4mgBcMXokJmr0wNf04mg6YQfwEpDtNCaE6p1rh9YDEDnCI0/1PlEBXDBfipYjyJ1YPnGBzRL6zQ6pg7XcjnxPIr7z8gwAQNX1dqdViMGjJWCILEnWIW5eUFRxNkkk8fECpZuqHUKI2vmkHzzTpa98YdY3Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TRueQ+P2; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4361b0ec57aso44376235e9.0;
-        Mon, 16 Dec 2024 11:55:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734378921; x=1734983721; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=W98OVW28vlCYxfnu1q41kdPB6ICNjulMnB1+GiRL7VU=;
-        b=TRueQ+P2VHq4nHR6kCq2mJzXgHDigVeRAzxosCMNNTxoY2oZ33dmFXtTfURbHbxseE
-         8/gB3hI+lH466G2Nrzg0en2iFII/YeaLHqXcvfvMt0PQdNy4bFslh5pL44j4zdt6NW2p
-         tQ1fKSnt9sWw+hV4eTqG7KYH8vxBFFILVpkyJAGMei8uZWWYfYlxW75Ni/cCfWCadK6M
-         Pjf+0jzMP3z1+FS04rJnczW7Ri7dXqdMtwY3NS1QMTAU8RDpomN4m6gstZ5PrmA8GjFT
-         TNGPNcmCVj6dzL04m3N6Ju6RZJY/3lRTRd5sdCOS33EEw1Qdpka0tjt10/A0apVho0xU
-         8lfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734378921; x=1734983721;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W98OVW28vlCYxfnu1q41kdPB6ICNjulMnB1+GiRL7VU=;
-        b=d30o47uQofK7ZXW3pR84fDYou5C3LMQvFkygMcmxzRul63XJNywcn98pQ1Y05/thE7
-         7ILm9c4izbpdot+I95v2gABwaamFAdZQg6H0+d502YRhjTsduaYloHDs1KMNBEQa8Ov/
-         AZpQnJGK07Y0H7UeiOrKSJzrEe2mIsUq5hjAaI4TPYV3/6Pj1cIt6NDPEvffTi5fKIAS
-         OtknkUv4k/qD3W91WJSTkfoPn+ntBmMCAHXac7ITBLor9YE/v7SiG3M+7ifmzV4GlvWr
-         CluyapgHgcC6m1eOdg72lHSDmy6W7kTQJhjW79aBpiRulPVOAR/FpYwQRl8SbMsdFf3E
-         krxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbr8yxBg7WVZ5Fb+HEAP3shp0aMO/s/wUXnC+haESymksdUJZylMhZydicL810LiW+wy66Lyen@vger.kernel.org, AJvYcCWCyvW3gyvWwB94MV41k4NV5OpnzYMq0opAvaj7LNYq/U3puiD2AWR3wfpnP7U00UT8NtziEWUaJFSN//c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFLYpUzrHoEDevPogtQPLgtHQ0fC30iv0caMu2u7+EZTCdH7IA
-	8RR9eptWUCW73oY8yCupci/+Ww7Hm9xdjvvk6L1MR7inpSC8RtzS
-X-Gm-Gg: ASbGnctMumbe5gkS3ZkcWJHB2rzaibzv4MascoW4vttFKcLpELdFXJPXECW0nUCvAdj
-	fXCav8tO9cEpa1EronKqJYszq4ErFcatRoacriUJ1EOQJEgV+/SwVp13uuhV/OxT88yew99KFUZ
-	oS9pFV9natLuITtNca1bha0o0AfC+dBJ9xBWyWG98jk9wd3ynMnnJn3H+VAG+5wPe0jgIXN5Hic
-	RJ53kslOZrKgWKp6Mz2wtJ+NU2WfDO5iM/QB3YeNLfKbs/l1i6Rv1XXEBsfEIH2i3H0mC76gkPp
-	n32/fINzLG6o
-X-Google-Smtp-Source: AGHT+IELnzR0viSji2/pIpUSmP64URG2MdrjxLFfFnvniU2WwXuHh4pwu5JvQWBZe7h7C9cHgcqbEw==
-X-Received: by 2002:a05:600c:a4f:b0:435:21a1:b109 with SMTP id 5b1f17b1804b1-4362aa26d8dmr141570455e9.2.1734378920660;
-        Mon, 16 Dec 2024 11:55:20 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43625706cc6sm149972175e9.30.2024.12.16.11.55.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2024 11:55:19 -0800 (PST)
-Message-ID: <676085a7.050a0220.1e6031.2193@mx.google.com>
-X-Google-Original-Message-ID: <Z2CFoZPnnSztWnzc@Ansuel-XPS.>
-Date: Mon, 16 Dec 2024 20:55:13 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: qca8k: Fix inconsistent use of
- jiffies vs milliseconds
-References: <20241215-qca8k-jiffies-v1-1-5a4d313c76ea@lunn.ch>
- <20241215231334.imva5oorpyq7lavl@skbuf>
- <87195b12-6dfa-4778-b0c0-39f3a64a399e@lunn.ch>
+	s=arc-20240116; t=1734379059; c=relaxed/simple;
+	bh=3EUxTz6N2CO54MtyJBQDvZ+FZVSDjNgSHibKEihsynI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nbl3LRpQWZfvpYYBxdok/6FgQCQ1wBorcm+EMr9BV/7Bb7LQ2ZtA1ANmffrskbe0jbQlNyE6ITQtw8wV12bNzTJKz7aEE4DN8+l4SwRwUHAx0D90KVq8/VC2Ay/aCnnFwJugpXqNVhFPBMzlJBaEoSG4/KNRgWXkzZrYLtrJMC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=cUD11b9N; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 2D34F2C07FD;
+	Tue, 17 Dec 2024 08:57:29 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1734379049;
+	bh=p1T4X+B77uk/xLqLY88anJOJiIa7QMOSTIyM0a4pqko=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cUD11b9NIu/vdxuzVNr2m8txlDwfGoQ5XL7e3YYtLfMTqJmmj7swhWleXYh9bjKIz
+	 gfidl6XoVUQEw+q1pqcjEojG65sQzOynOjwGhjb32Cgy3JehlWTYoSsIZ6YKvAFCHF
+	 miR+aukZdYJXUkgVeryR73SLimnknPT9tDOoxAb7i0tjy0PiPaO1NY3iOY2kyvMlDA
+	 3Ul13RTvGI8YDkxF23ag2VUVLrVF8Di+8LIRsPAjlyUFSQUOcfPUT9cbYTRfesiLhL
+	 6dZcdWPQfxcD+FfvF00wP0VZj946lHB1HXrPzUtFGaIVH11P2eA2Wb3fCfppEYNVHa
+	 +Dw+Z/y8QfufQ==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B676086290000>; Tue, 17 Dec 2024 08:57:29 +1300
+Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
+	by pat.atlnz.lc (Postfix) with ESMTP id 046D413ED95;
+	Tue, 17 Dec 2024 08:57:29 +1300 (NZDT)
+Message-ID: <f916444e-3f79-4b08-8830-846aaba06d18@alliedtelesis.co.nz>
+Date: Tue, 17 Dec 2024 08:57:28 +1300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87195b12-6dfa-4778-b0c0-39f3a64a399e@lunn.ch>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v2 1/4] dt-bindings: net: Add Realtek MDIO controller
+To: Conor Dooley <conor@kernel.org>
+Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, markus.stockhausen@gmx.de,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mips@vger.kernel.org
+References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
+ <20241216031346.2626805-2-chris.packham@alliedtelesis.co.nz>
+ <20241216-native-velvet-1d2b765c8b48@spud>
+Content-Language: en-US
+From: Chris Packham <chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <20241216-native-velvet-1d2b765c8b48@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=67608629 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=RZcAm9yDv7YA:10 a=XYAwZIGsAAAA:8 a=aDH4CMtCcT_BCErJpHcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=E8ToXWR_bxluHZ7gmE-Z:22
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-On Mon, Dec 16, 2024 at 10:21:12AM +0100, Andrew Lunn wrote:
-> On Mon, Dec 16, 2024 at 01:13:34AM +0200, Vladimir Oltean wrote:
-> > On Sun, Dec 15, 2024 at 05:43:55PM +0000, Andrew Lunn wrote:
-> > > wait_for_complete_timeout() expects a timeout in jiffies. With the
-> > > driver, some call sites converted QCA8K_ETHERNET_TIMEOUT to jiffies,
-> > > others did not. Make the code consistent by changes the #define to
-> > > include a call to msecs_to_jiffies, and remove all other calls to
-> > > msecs_to_jiffies.
-> > > 
-> > > Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> > > ---
-> > 
-> > If my calculations are correct, for CONFIG_HZ=100, 5 jiffies last 50 ms.
-> > So, assuming that configuration, the patch would be _decreasing_ the timeout
-> > from 50 ms to 5 ms. The change should be tested to confirm it's enough.
-> > Christian, could you do that?
-> 
-> I've have an qca8k system now, and have tested this patch. However, a
-> Tested-by: from Christian would be very welcome.
+
+On 17/12/2024 07:52, Conor Dooley wrote:
+> On Mon, Dec 16, 2024 at 04:13:43PM +1300, Chris Packham wrote:
+>> Add dtschema for the MDIO controller found in the RTL9300 SoCs. The
+>> controller is slightly unusual in that direct MDIO communication is not
+>> possible. Instead, the SMI bus and PHY address are associated with a
+>> switch port and the port number is used when talking to the PHY.
+>>
+>> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+>> +      realtek,smi-address:
+>> +        $ref: /schemas/types.yaml#/definitions/uint32-array
+>> +        description: SMI interface and address for the connected PHY
+>> +        items:
+>> +          - description: SMI interface number associated with the port.
+>> +          - description: SMI address of the PHY for the port.
 >
+> I don't really understand this property, but I also don't understand the
+> MDIO bus, so with that caveat
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-Hi need 1-2 days to test this, hope that is O.K.
+I'll try to clarify here as it may be of relevance to other reviewers, 
+if any of this should go in the commit message or the binding let me know.
 
--- 
-	Ansuel
+The MDIO bus is used to manage one or more network PHYs. Sometimes there 
+is an MDIO interface as part of a NIC controller but it's become 
+increasingly common to have a the MDIO controller separated from the 
+Ethernet controller, particularly when there are multiple Ethernet 
+controllers in a SoC. In the device trees there is a usually a node for 
+the MDIO controller and the attached PHYs are child nodes. The Ethernet 
+interface has phandle property which references the attached PHY.
+
+The RTL9300 (and similar Realtek Ethernet switches) don't directly 
+expose the MDIO interface to us. There seems to be an internal PHY 
+polling mechanism and the user access to the PHYs works in conjunction 
+with that. So rather than being able to reference PHYs and MDIO 
+interfaces directly we need to work with switch port numbers instead. 
+The actual hardware MDIO bus and PHY address is captured in the 
+"realtek,smi-address" property.
+
 
