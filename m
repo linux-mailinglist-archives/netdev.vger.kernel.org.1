@@ -1,121 +1,111 @@
-Return-Path: <netdev+bounces-152189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C98759F303F
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:13:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804CE9F3062
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:21:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6ADE7A366E
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:13:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1137166B61
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121DF205AB6;
-	Mon, 16 Dec 2024 12:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="AvEz7mgn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9BB2054FE;
+	Mon, 16 Dec 2024 12:20:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393F22046BA;
-	Mon, 16 Dec 2024 12:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD1F204C3F
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 12:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734351108; cv=none; b=pj4P5w3M3lvVy1wU8J88DdH7zbwbUvbZt/118EoMfXuU+LJlK2BTrQK27gLhgEW4rfId9u41OWEkd5xqBu2P19+7aYkaM2Y6dwsvFprokA8bzVmsE6c6d/xmsWFqLf0QWmS4EtkmFEU/Xy9tDmRppxs5gpIOo4YPkiD8trqEdLg=
+	t=1734351637; cv=none; b=iAeZR/3V/rxgD0WK8eXMvSo5LVwRv3tMTfNApnhRB4vh1DMYljod1JOHfo9UUHGp72vl3qyQiU+LwxxxdvyyWj1J4VEbDDpEvTbhYrAc7RRNi1p6SR5CLYyio8RwjoLeP34/GD7UqfMsDyHF9J/xoVUu+Kni1/k2xXOHpHfUhSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734351108; c=relaxed/simple;
-	bh=/uPilcPPSkM0vFf7CZp7ih66ufLi2xO3rEUxtf1Dzh8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eL1OCaJAeWJBNtdgde+HvQJrhMFQOHccyam4h0gEchk0QgMrS7Wws85zjVMbgM3KXeCPSmQ+/tgevq2oZ/ZM3atxoKOz6aaBvBN8adzPcDPK1tKLUKds71uWtv31mFoUq4VGrkFJjIM9/zsK6S0ZexP0oZcfPGoJsUPMXzRX4yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=AvEz7mgn; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1734351107; x=1765887107;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/uPilcPPSkM0vFf7CZp7ih66ufLi2xO3rEUxtf1Dzh8=;
-  b=AvEz7mgnA8QDnTyvXhbj1cgm6Q5mMzmXV9oVNBYa/sswpoxsZYQ3KL2h
-   SoyeFFrqaTMsxhgvmY8uiqWwaALZ5Sp/UO9dDMDYaKDTlVoyBtv/U3ikP
-   LYii1QTG4orh3IPOwKWxY8ITcbuu8iTQ2H4o/RdAMUd1TvRo+QOGlKdrt
-   b39bFs3wX/D+bsnPLEw/uvyRP9v6XT5gfaDmsfbclsUyLX7Fqbxt5a3T8
-   p0vUJULK3bzp1nvQT2bE9jW+SIHKFUMYqnd4EMIkgfMyxUYbIqt2UkyGQ
-   Rbapm9WxOjQO1k1q2QQWc4nfmFRL+4dTl6bIKaTxm3JF8Kge1EffKxYIz
-   Q==;
-X-CSE-ConnectionGUID: pK+G4L7kQ0aeZKZcimCaNA==
-X-CSE-MsgGUID: AxFEMPyOT+abSUdbeMU9OQ==
-X-IronPort-AV: E=Sophos;i="6.12,238,1728975600"; 
-   d="scan'208";a="35580346"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Dec 2024 05:11:46 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 16 Dec 2024 05:10:44 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 16 Dec 2024 05:10:41 -0700
-Date: Mon, 16 Dec 2024 12:10:40 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Lars
- Povlsen" <lars.povlsen@microchip.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, <jacob.e.keller@intel.com>,
-	<robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
-	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<robert.marko@sartura.hr>
-Subject: Re: [PATCH net-next v4 6/9] net: sparx5: verify RGMII speeds
-Message-ID: <20241216121040.2dpxb7mv6h3u3r42@DEN-DL-M70577>
-References: <20241213-sparx5-lan969x-switch-driver-4-v4-0-d1a72c9c4714@microchip.com>
- <20241213-sparx5-lan969x-switch-driver-4-v4-6-d1a72c9c4714@microchip.com>
- <Z1yPq6OEziTNjWHK@shell.armlinux.org.uk>
+	s=arc-20240116; t=1734351637; c=relaxed/simple;
+	bh=+1mE4Amh1vSqq4XSBGGaKD1SEheJUziTYiTujI51/T4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KH4u86V0nenJBg4iH3WHB+lk6h3CbNX2dkaFFraWFJm9zI7jFhmfIXgksVLbLhqAvRU6HW93h3eLjBF3OJBCz/pZEoxoTbA1Poq0TdrgV4bgroDPGmD8QQ6gWMbrV1Zmd++6Mqm2O1Qd8EiCIpcESfCdTXTTucqjHqpAwylZOUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNA5H-0003o0-03; Mon, 16 Dec 2024 13:20:23 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNA5F-003h3M-1D;
+	Mon, 16 Dec 2024 13:20:22 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNA5G-002ars-07;
+	Mon, 16 Dec 2024 13:20:22 +0100
+Date: Mon, 16 Dec 2024 13:20:22 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] net: phy: Move callback comments from
+ struct to kernel-doc section
+Message-ID: <Z2AbBilPf2JRXNzH@pengutronix.de>
+References: <20241206113952.406311-1-o.rempel@pengutronix.de>
+ <e6a812ba-b7ea-4f8a-8bdd-1306921c318f@redhat.com>
+ <Z1hJ4Wopr_4BJzan@shell.armlinux.org.uk>
+ <20241210063704.09c0ac8a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z1yPq6OEziTNjWHK@shell.armlinux.org.uk>
+In-Reply-To: <20241210063704.09c0ac8a@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> On Fri, Dec 13, 2024 at 02:41:05PM +0100, Daniel Machon wrote:
-> > When doing a port config, we verify the port speed against the PHY mode
-> > and supported speeds of that PHY mode. Add checks for the four RGMII phy
-> > modes: RGMII, RGMII_ID, RGMII_TXID and RGMII_RXID.
-> >
-> > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> > Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+Hi Jakub,
+
+On Tue, Dec 10, 2024 at 06:37:04AM -0800, Jakub Kicinski wrote:
+> > I certainly can't help but write the "returns" statement in natural
+> > English, rather than kernel-doc "Returns:" style as can be seen from
+> > my recent patches that have been merged. "Returns" without a colon is
+> > just way more natural when writing documentation.
+> > 
+> > IMHO, kernel-doc has made a wrong decision by requiring the colon.
 > 
-> You do realise that phylink knows what speeds each interface supports
-> (see phylink_get_capabilities()) and restricts the media advertisement
-> to ensure that ethtool link modes that can't be supported by the MAC
-> capabilities and set of interfaces that would be used are not
-> advertised.
-> 
-> This should mean none of your verification ever triggers. If it does,
-> then I'd like to know about it.
+> For the patch under consideration, however, I think _some_ attempt 
+> to make fully documenting callbacks inline possible needs to be made :(
 
-Yes, I agree. Having an extra look at phylink, these checks should not trigger
-at all.
+Please rephrase, I do not understand.
 
-As it is, the default switch case is to throw an error, so without this
-addition, the sparx5_port_verify_speed() function will fail when the PHY mode
-is any of RGMII{_ID,_TXID,_RXID}. This patch just follows the established
-pattern of adding the new PHY mode and checking the speed. TBH, I think that
-all the checks in this function can be removed entirely, but that is something
-I would like to verify and follow up on in a separate series, if that is OK? 
+Should I resend this patch with corrected "Return:" description, or
+continue with inlined comments withing the struct and drop this patch?
 
-Thanks.
-
-/Daniel
-
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
