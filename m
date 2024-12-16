@@ -1,101 +1,114 @@
-Return-Path: <netdev+bounces-152135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761739F2D3B
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 10:45:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E4B69F2D5A
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 10:51:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3F23166924
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 09:45:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE76F168531
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 09:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0255202F64;
-	Mon, 16 Dec 2024 09:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4414420101F;
+	Mon, 16 Dec 2024 09:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XF2GKj6k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B09202C2A
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 09:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D39F1FFC60;
+	Mon, 16 Dec 2024 09:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734342326; cv=none; b=cvQMog0A9S49vAWF8842SjRvRQd/EuwUL1JZ4mtYDuFRkVuntRL3+n/LVNfGH6aP5I4LOdD6TGqz5/7cCG44Kie08FyD0r8H4+2yxvCPIgdqvzDtMOlJTsirlglRtvSmSpGbqLhyIu+IRlRwJQwBFMUS5D+pNydZ2QkyRVO2fZ4=
+	t=1734342657; cv=none; b=fosu7kn7grmOax/7fUo0BH7ynsOkIi5cLNUdSGK91zVGu4k8ZiqJVcDFlBtiZnYCj7kW/jqaCBjijNNlGR/uR7WadGGVID7m+PVC3SeU6YApvJJ4rAnHO8GWZkQddtNgfj7aNcyOTuCy6SJaWo7S6mnhFdZnKU0kuro7JaSn7WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734342326; c=relaxed/simple;
-	bh=Q6h/nO8TuVO7jzDEwFHGTDo66cCKemGOAtYAERJc79k=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=vCYQ1s2ni5IbnFKVZQ88cm9ip9567lSpftO0F9t8u4IH+0kTMhiPwAkLduWKYKym4MPzjmDWx3aLjW+dGUoazCrzQ3vlfCVgM8/qizLEB7fDuqdmVW4HU57u4T5LPpIIqMnH2nL4VoNxrrV/rZT7Xr9FBw6sqxaS01coOlcfvTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a7e0d7b804so39418375ab.0
-        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 01:45:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734342324; x=1734947124;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5ubWKXdrA/E68ihQoeoxqOPqTUE0dKIAj5I7TAzTO6Q=;
-        b=NkUjdA152Z/W+WYqVNbUyXTTNNY9DHZNPO18riIdS8MEmRKgjtSbhWgH7zzYpuSJ6Q
-         nK54Ftfam2CtQ5rFwBRQqXki0GBp5k7TffIXPEYp4qvAyhkWl5jPLFqRaiwLIlP8I+2y
-         ealtdrQNsJPZXHcrygHpZexA0r1Lk8fUSwpUGB/hWsY9fjwzgPaLetcdIg9BCqJpT4Z9
-         +GySrekJrXhOEy556PGxsbvwcawmKY8vwMZnK4aQQIwPGwpbGnymlp8en7MxTIiR7reT
-         AZnVpLMOactxNGkfF13SGjhGnI2/hRG+4c8p9Ch5rezyy75/TrnaTw89Cb21LNlkiP/v
-         ie4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVBQyTi8Kc8eVNSbePZJq77qJU9SJhLhQ6QU5DvWEXCbkdGn4ebFlOUQN3FLo8EdFciW5NPUHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAGoZVU+46DO4Xs9kGdZMSelkeknnzIwP5Z2JvbSzlQ6iEEoB5
-	ZgbBHXtahFXiUxpxP487D6KW1MPiHc8g64NNOzpSey5kfHQFMtKTWum/YwcMJcjx6duOMxuXFdH
-	PhEXV9S+dgr8+ZOlBd7p4zGWr6ZEqsWWxo7mpQdOphRwoTyi+WU+TnNc=
-X-Google-Smtp-Source: AGHT+IGsz6VRN5TlLoO2HiHFgqVGp7Yd54JUrPjF7PyBaU8jZarOsl5vZLipEtYxf2dUNO7xDg7cwQ4MC+qwTuibeJ/cJKhj7l1g
+	s=arc-20240116; t=1734342657; c=relaxed/simple;
+	bh=OXH3vzFbTKiksm17WzE85cZSQvrh0pzJ0BYKopvv0Qs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZvRW5PLixehAqqMfbFXP74CbhVBm/xCPg+C8otMsw2nac/dZMZTDUBqXGxaf+0E8jyT5qSrxMkow4TB+SLkmqp4RsW7ZqfFKW8oQlTpQn3CMBqEJcfX440TXV50oHuFQekTK9wGna8qFdkvfuVBQ6eQohV41p17LeSoV2sV/M4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XF2GKj6k; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iD1FEhJZlGeiVYsnMDwAlowtkHpoTLbshiukFYl2KaM=; b=XF2GKj6kJU5FS/X7QTlAiTDM3w
+	HegibULLdFbidcbNg5A5MXK/3sOhmGXp1XP55C5to6NonW7yLtrVwZYYe5kTbvsRvijURfDITzRzy
+	zH/5g4Pq9oH2K59QGmikgaqokEUQUibDPFgoggiKo/ttkp+Ka+fOpQal4IBdxyHYh+tE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tN7kV-000ZuS-3W; Mon, 16 Dec 2024 10:50:47 +0100
+Date: Mon, 16 Dec 2024 10:50:47 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mattias Forsblad <mattias.forsblad@gmail.com>
+Subject: Re: [PATCH 0/3] dsa: mv88e6xxx: Add RMU enable/disable ops
+Message-ID: <289fa600-c722-48d7-bfb9-80ff31256cb5@lunn.ch>
+References: <20241215-v6-13-rc1-net-next-mv88e6xxx-rmu-ops-v1-0-87671db17a65@lunn.ch>
+ <20241215225910.sbiav4umxiymafj2@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:188d:b0:3a7:e286:a56b with SMTP id
- e9e14a558f8ab-3aff6213bf9mr125576895ab.5.1734342323845; Mon, 16 Dec 2024
- 01:45:23 -0800 (PST)
-Date: Mon, 16 Dec 2024 01:45:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <675ff6b3.050a0220.37aaf.0127.GAE@google.com>
-Subject: [syzbot] Monthly hams report (Dec 2024)
-From: syzbot <syzbot+lista1101e5680fc7c361c62@syzkaller.appspotmail.com>
-To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241215225910.sbiav4umxiymafj2@skbuf>
 
-Hello hams maintainers/developers,
+On Mon, Dec 16, 2024 at 12:59:10AM +0200, Vladimir Oltean wrote:
+> Hi Andrew,
+> 
+> On Sun, Dec 15, 2024 at 05:30:02PM +0000, Andrew Lunn wrote:
+> > Add internal APIs for enabling the Remote Management Unit, and
+> > extending the existing implementation to other families. Actually
+> > making use of the RMU is not included here, that will be part of a
+> > later big patch set, which without this preliminary patchset would be
+> > too big.
+> > 
+> > Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> > ---
+> 
+> How big is the later patch set? Too big to accept even one more patch?
 
-This is a 31-day syzbot report for the hams subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/hams
+The patchset is 21 patches, if i only support one switch family.
 
-During the period, 1 new issues were detected and 1 were fixed.
-In total, 7 issues are still open and 36 have already been fixed.
+I can remove a couple of patches, getting statistics via RMU, and
+timing the RMU vs MDIO and disabling RMU if it is slower.
 
-Some of the still happening issues:
+The other way i can slice it is split it into two patchsets:
 
-Ref Crashes Repro Title
-<1> 2218    Yes   WARNING: refcount bug in ax25_release (3)
-                  https://syzkaller.appspot.com/bug?extid=33841dc6aa3e1d86b78a
-<2> 453     Yes   KMSAN: uninit-value in ax25cmp (3)
-                  https://syzkaller.appspot.com/bug?extid=74161d266475935e9c5d
-<3> 44      No    possible deadlock in serial8250_handle_irq
-                  https://syzkaller.appspot.com/bug?extid=5fd749c74105b0e1b302
-<4> 44      No    KASAN: slab-use-after-free Read in rose_get_neigh
-                  https://syzkaller.appspot.com/bug?extid=e04e2c007ba2c80476cb
+1) incremental modifications to qca8k to centralise code
+2) implement the mv88e6xxx changes to add RMU to it.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+I did not really want to slice it like this, because the central API
+is designed around what both QCA8K and Marvell needs, and hopefully is
+generic enough for other devices. But there might be questions asked
+when you can only see the qca8k refactor without the Marvell parts.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+I can maybe squash some of the QCA patches together. Previously i was
+doing lots of simple changes because i did not have hardware to test
+on. I do have a QCA8K test system now.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+> There is a risk that the RMU effort gets abandoned before it becomes
+> functional. And in that case, we will have a newly introduced rmu_enable()
+> operation which does nothing.
 
-You may send multiple commands in a single email message.
+True, but i'm more motivated this time, i'm getting paid for the work :-)
+
+And there is one other interested party as well that i know of.
+
+This patch series is fully self contained, so it easy to revert, if
+this ends up going nowhere.
+
+	Andrew
 
