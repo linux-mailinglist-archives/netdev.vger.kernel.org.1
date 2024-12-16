@@ -1,142 +1,141 @@
-Return-Path: <netdev+bounces-152082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1BF9F2A43
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:43:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AC419F2A4C
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:48:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 417B318808FB
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 06:43:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AC25166B97
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 06:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E7E1CCB4A;
-	Mon, 16 Dec 2024 06:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339061C82E2;
+	Mon, 16 Dec 2024 06:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DJhfPsGB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="axzr4p6y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35AE19258E
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 06:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BACFA48;
+	Mon, 16 Dec 2024 06:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734331421; cv=none; b=R61aIWAvG3tu3s1toETS5l2YIhYQ+7z1M/umFUihLwqOQtCzw8SvnGXtxRDfJJzaEkIzNYUKoi3xvxB5WSKlbDJ+VU0j/b7RxPKrrGHm23DfUfgfHbY800dt9f22SiHDr2OKcYPMiFC4hU9JibHK/GsVGkTsyRFXu+Nlcm9WaFc=
+	t=1734331727; cv=none; b=dwss8QWZuYdf42qpKmeZPjS3pFAJz0lZe5FKfjpOU5kRLcMvBZtebcSioeSXOZc5h//19PnjZAuWIsLNZBJWsIfaVsctHOPkqcYcpqSD3P6GIp3peva3gBUBJKk/s9+a9bgyYylaD51GorMOqbA95H3CWuAT9Vs27xV/TrflPsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734331421; c=relaxed/simple;
-	bh=ChfLP4zPu919XKwzljMZw3LmmcV3xj7gqkrVOcXQJz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s+hBZzyeRwNwiEFcGfy++QBYT27eOazi2WY/JrF7fHlgAkqS3ZCH6nszxAY49mACHX+1rcitEq+svSEEjZpTsUKTGoH1SLh3bEA1z1mODjq7xpF7hMc2ItXQHzbSyOq3lr9a60eWSjD3gyyLaX3E/2B/Q4S+fkILUAnc6PzaHo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DJhfPsGB; arc=none smtp.client-ip=198.175.65.19
+	s=arc-20240116; t=1734331727; c=relaxed/simple;
+	bh=f6imVHIwBO5y+VNI+OBSEm0607sjuDvEWjjMWJjz7Jo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LQUcQjzpNVYE1HWqdnIlC1Crh0pNjSeVTgsOE1X/OjuG6io07Rv1jTUZFffqn7FsCSe4r6qEiopkP4vUj6nnbn3Ne7m4UUIk5AQghmcZyVDytwq/TId2BqeJb5MJh4VLfQoZ0mjbQUctvEgm2acWXHO9R3+9X1s/bOvihN53lWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=axzr4p6y; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734331420; x=1765867420;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ChfLP4zPu919XKwzljMZw3LmmcV3xj7gqkrVOcXQJz4=;
-  b=DJhfPsGBAsyK/YjPpLi2HP9Of8gMgYFCkxcEd8dPKO8sHvLe0vpL8wax
-   BtmwnbNbLKR0nwHqDKmtV2YAuEFxjA10FVVIVn90Rgp7rkF+WhWz63Tke
-   puNsn6i7ufriyHVoh0am2k/PGFaTmml8oKi68YgLXoTu9RbPhligqW+rN
-   FiukK+k3RQHJB9QC/Lw6gno017YRVACOdDXsweEKLdg8wcsOR2GZf2clD
-   MHWqADbyhn/YkarNm83Z2qk2dfUu61bOe4jgAk9WyZNhbF3R/eLKN+yut
-   X1Gl0fMDFzws8vBUsp1Fs7XCPInMNsscJkRsc79k5pQI4zZRrDRfs1mmP
-   Q==;
-X-CSE-ConnectionGUID: mlwHJsFHT9Se8mRqUBTnHg==
-X-CSE-MsgGUID: dJ7dG4ilR+O5pyKdy5E4pw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11287"; a="34582666"
+  t=1734331726; x=1765867726;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=f6imVHIwBO5y+VNI+OBSEm0607sjuDvEWjjMWJjz7Jo=;
+  b=axzr4p6yAP+9nMzGJ69RuIT0i95RSIaRTYalP34zXqdvci0XbevwKu7j
+   Yt0rn28tmBQNL5QJlyHe9XiaPamc4axHuAx3ZUAJXCKontlvjzZXjbKlT
+   GUvrqCqwmPFtYAZtHDXQgyCmz711ZliRXBGJOvkMrBepNLNMkb45Q9p8Y
+   rApP/dNnc8wu4GCIxlNSB9yOgphQneDzwFkV8MJXPo/xiCHR0yKENHDX2
+   ZbzmPFwyVleVmcwm4Yhvk6lxyuj+f7yuruULeuwx1dsR1aFcCcIQIZGvA
+   TKdTNzfvJscOHU1xETZHYY0MCyp+q1Ce359aAhqXllsF9HhDJVm7mdAHT
+   A==;
+X-CSE-ConnectionGUID: ODhR4mkWTdW53j3l7VaA/g==
+X-CSE-MsgGUID: kMKFXXGVRI+QnOOnVRFB4w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11287"; a="34848179"
 X-IronPort-AV: E=Sophos;i="6.12,237,1728975600"; 
-   d="scan'208";a="34582666"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 22:43:39 -0800
-X-CSE-ConnectionGUID: GZUokINAQWehMNC9uAAw6Q==
-X-CSE-MsgGUID: 4cExk9YjQAeRNty/dsfTKQ==
+   d="scan'208";a="34848179"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 22:48:45 -0800
+X-CSE-ConnectionGUID: 0ZYhOhqLRF2QZFp/LSt1ow==
+X-CSE-MsgGUID: H+0+CYdpREuAj9JqRrXIKw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,237,1728975600"; 
-   d="scan'208";a="97658437"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 22:43:37 -0800
-Date: Mon, 16 Dec 2024 07:40:33 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-Cc: sebastian.hesselbarth@gmail.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2] net: mv643xx_eth: fix an OF node reference leak
-Message-ID: <Z1/LYQJrO73BaDKS@mev-dev.igk.intel.com>
-References: <20241216042247.492287-1-joe@pf.is.s.u-tokyo.ac.jp>
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="128101836"
+Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
+  by fmviesa001.fm.intel.com with ESMTP; 15 Dec 2024 22:48:41 -0800
+From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH iwl-next 0/9] igc: Add support for Frame Preemption feature in IGC
+Date: Mon, 16 Dec 2024 01:47:11 -0500
+Message-Id: <20241216064720.931522-1-faizal.abdul.rahim@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241216042247.492287-1-joe@pf.is.s.u-tokyo.ac.jp>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 16, 2024 at 01:22:47PM +0900, Joe Hattori wrote:
-> Current implementation of mv643xx_eth_shared_of_add_port() calls
-> of_parse_phandle(), but does not release the refcount on error. Call
-> of_node_put() in the error path and in mv643xx_eth_shared_of_remove().
-> 
-> This bug was found by an experimental static analysis tool that I am
-> developing.
-> 
-> Fixes: 76723bca2802 ("net: mv643xx_eth: add DT parsing support")
-> Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-> ---
-> Changes in v2:
-> - Insert a null check before accessing the platform data.
-> ---
->  drivers/net/ethernet/marvell/mv643xx_eth.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/mv643xx_eth.c b/drivers/net/ethernet/marvell/mv643xx_eth.c
-> index a06048719e84..917ff7bd43d4 100644
-> --- a/drivers/net/ethernet/marvell/mv643xx_eth.c
-> +++ b/drivers/net/ethernet/marvell/mv643xx_eth.c
-> @@ -2705,8 +2705,12 @@ static struct platform_device *port_platdev[3];
->  static void mv643xx_eth_shared_of_remove(void)
->  {
->  	int n;
-> +	struct mv643xx_eth_platform_data *pd;
->  
->  	for (n = 0; n < 3; n++) {
-> +		pd = dev_get_platdata(&port_platdev[n]->dev);
-> +		if (pd)
-> +			of_node_put(pd->phy_node);
->  		platform_device_del(port_platdev[n]);
->  		port_platdev[n] = NULL;
->  	}
-> @@ -2769,8 +2773,10 @@ static int mv643xx_eth_shared_of_add_port(struct platform_device *pdev,
->  	}
->  
->  	ppdev = platform_device_alloc(MV643XX_ETH_NAME, dev_num);
-> -	if (!ppdev)
-> -		return -ENOMEM;
-> +	if (!ppdev) {
-> +		ret = -ENOMEM;
-> +		goto put_err;
-> +	}
->  	ppdev->dev.coherent_dma_mask = DMA_BIT_MASK(32);
->  	ppdev->dev.of_node = pnp;
->  
-> @@ -2792,6 +2798,8 @@ static int mv643xx_eth_shared_of_add_port(struct platform_device *pdev,
->  
->  port_err:
->  	platform_device_put(ppdev);
-> +put_err:
-> +	of_node_put(ppd.phy_node);
->  	return ret;
->  }
->
-Looks good
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Introduces support for the FPE feature in the IGC driver.
 
-Thanks
-> -- 
-> 2.34.1
+The patches aligns with the upstream FPE API:
+https://patchwork.kernel.org/project/netdevbpf/cover/20230220122343.1156614-1-vladimir.oltean@nxp.com/
+https://patchwork.kernel.org/project/netdevbpf/cover/20230119122705.73054-1-vladimir.oltean@nxp.com/
+
+It builds upon earlier work:
+https://patchwork.kernel.org/project/netdevbpf/cover/20220520011538.1098888-1-vinicius.gomes@intel.com/
+
+The first four patches in this series are preparation work for the subsequent patches.
+
+The patch series adds the following functionalities to the IGC driver:
+a) Configure FPE using `ethtool --set-mm`.
+b) Display FPE settings via `ethtool --show-mm`.
+c) View FPE statistics using `ethtool --include-statistics --show-mm'.
+e) Enable preemptible/express queue with `fp`:
+   tc qdisc add ... root taprio \
+   fp E E P P
+
+Note:
+1. preemption can occur with or without the verification handshake,
+   depending on the value of the verify_enabled field, which can be
+   configured using ethtool --set-mm.
+2. Enabling FPE with mqprio offload is not covered in this series, but
+   existing code prevents user from configuring FPE alongside mqprio offload.
+
+Faizal Rahim (6):
+  igc: Rename xdp_get_tx_ring() for non-xdp usage
+  igc: Add support to set MAC Merge data via ethtool
+  igc: Add support for frame preemption verification
+  igc: Add support for preemptible traffic class in taprio
+  igc: Add support to get MAC Merge data via ethtool
+  igc: Add support to get frame preemption statistics via ethtool
+
+Vinicius Costa Gomes (3):
+  igc: Optimize the TX packet buffer utilization
+  igc: Set the RX packet buffer size for TSN mode
+  igc: Add support for receiving frames with all zeroes address
+
+ drivers/net/ethernet/intel/igc/igc.h         |  45 ++-
+ drivers/net/ethernet/intel/igc/igc_defines.h |  15 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c |  96 ++++++
+ drivers/net/ethernet/intel/igc/igc_main.c    |  80 ++++-
+ drivers/net/ethernet/intel/igc/igc_regs.h    |  19 ++
+ drivers/net/ethernet/intel/igc/igc_tsn.c     | 330 ++++++++++++++++++-
+ drivers/net/ethernet/intel/igc/igc_tsn.h     |  15 +
+ 7 files changed, 586 insertions(+), 14 deletions(-)
+
+--
+2.25.1
+
 
