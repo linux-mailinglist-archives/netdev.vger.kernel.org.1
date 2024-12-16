@@ -1,147 +1,278 @@
-Return-Path: <netdev+bounces-152405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD3EE9F3CE7
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 22:42:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A88A9F3CF8
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 22:45:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EED1416A553
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 21:42:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EE4216B8A7
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 21:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1B61D516A;
-	Mon, 16 Dec 2024 21:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED0F1D61A7;
+	Mon, 16 Dec 2024 21:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="D+FVO7hR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQKdIwfW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173F41D5160
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 21:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8BC1D5CFD
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 21:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734385351; cv=none; b=mNR+dpeEgrk9v/im/d2IpCMNjDhIh0neZmZ8Kafno1p4HCf9ntl8Nf7OhF/RhqP7fvF/W5Objj/JIwsKfpcTiwy4LbkeGM1pCUG1elS75LMe73caSKfq4B/pKjtwB7PluuvWJkDJZoHzKRw1c5Vd4eU+Mm9uxuZ4S78e5gdORZQ=
+	t=1734385498; cv=none; b=h0ONpjbzCz2UcbHqYi5DF/CvhW+k2zGIJs+j1kOr8ShYEVALF8A8/4P04yG0gTJlv9eNCsZ2SWc+xSq9tJrUawZSAzew+6SSmOYheyq/wxitkServwBFazD0LeZeTF40CrRHAZrqKkN+ejP85++sDXkOzINC1WhIuKs6KYAxBfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734385351; c=relaxed/simple;
-	bh=+MpZJ0I5B5VyhXmdaLF6gto5vEzMLJwPD1JLKdj2sTo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NOZxkLfKScPF0q7RAU1Subk5PCoTQHBLiI0/5057/Mh3zKxsbGEILgTzKB40+XzisnSre/BfD77pjEvJINA6tCI8R+21Ye5xq8Jw9ITXeG+zuW1ccYqCD9BsCYPsGDgRGIVFC4W6UCl8ypJyEiwrCsM64fcT5nzNgA6nYDMnJrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=D+FVO7hR; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tNIr6-00HIa4-VH; Mon, 16 Dec 2024 22:42:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=oPDhluwLNnAHisIoq5Bewnr+QVh50mQONVLfuBkKbss=; b=D+FVO7hR3RBkYmlHJkrM7qTDoH
-	3kVRFjw2jR+05AuIKoH6KkAaBoxyh3YCevNeWs3kEXgcxRCcnKg+l5wOduvJW2q22dKjC3WilMMVx
-	oCp2SYWG35fcRlIRABLgmTFxQyRcvUDE1NMgkHMhOxtCmm0kH/folI8cM/D4q7KZqSszsnKyqrgED
-	Ye0SLpODGmWg1s17hEYatdq7sNncDkw39FAOlWr+OwvImIfolEfWAXY3s4hXQSDJG/0fbi7kvep5/
-	vQLd90reg6RRPI1nHSEkRXqgSNj8ttHaCps8zyDRl/b7ekN5jxfmaCemqqFKFKgMxE7wpH/wPdBw6
-	brc6VzoQ==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tNIr5-0001HN-9a; Mon, 16 Dec 2024 22:42:19 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tNIqo-00FeT0-Pm; Mon, 16 Dec 2024 22:42:02 +0100
-Message-ID: <2251fed2-418e-417c-ba27-b2a177f26384@rbox.co>
-Date: Mon, 16 Dec 2024 22:42:01 +0100
+	s=arc-20240116; t=1734385498; c=relaxed/simple;
+	bh=nP/i3H9N13bGLmo/L+MKF938O7RUON3jWLJWCZnrwA8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nml942fAdeJyhNnoonHlePmHyvmXiuxMd8319Oy/Btr2mCcAHOxyoufYp0IAZerRELrb9ASc9m2ljfJgf/F2e4fQFQfErUlX2hWtnpXng74rrPcq8D1lc+AX/BHTasxzVsDMhniCoTvka9jfJKadF2JmL9T+wHLrHg29QEH5pg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lQKdIwfW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E19B5C4CED0;
+	Mon, 16 Dec 2024 21:44:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734385497;
+	bh=nP/i3H9N13bGLmo/L+MKF938O7RUON3jWLJWCZnrwA8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lQKdIwfWOrEK39/GzpcXPOIB+Dt5w2iWPsD2+U1hfisxOCzXNaUKP2nHHmf0RG77f
+	 Ze3UnKUHIqZnQGyDfkvlekeXMzKpZjWiwtEgrqJFMDXBHJFKCfWXhZuU0aApWU8MMZ
+	 +mi2HPX5ztv1s92CJAb4vXkpaWaAqpGietXZpcYyHQzSJRugFTknBIXJdebsUyZV51
+	 l/7QKRMOOWKtZV/XYzH8txZITOpoH9aHE97+pqneKwqxULEP5Rdu+9mwXwB0URZjiN
+	 5fvDjWhku5wQCq2svglWVhtyXf/RSGRv3Fp6VLhkGVE6zzQ+5bMVnOu9ZBcHOeKV0u
+	 oWpNmuADNaQoA==
+Date: Mon, 16 Dec 2024 22:44:54 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
+	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	lorenzo.bianconi83@gmail.com
+Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
+ EN7581 SoC
+Message-ID: <Z2CfVnhNGYMRv4cN@lore-desk>
+References: <cover.1733930558.git.lorenzo@kernel.org>
+ <20241211154109.dvkihluzdouhtamr@skbuf>
+ <Z1qqrVWV84DBZuCn@lore-desk>
+ <20241212150613.zhi3vbxuwsc3blui@skbuf>
+ <Z1sXTPeekJ5See_u@lore-desk>
+ <20241212184647.t5n7t2yynh6ro2mz@skbuf>
+ <Z2AYXRy-LjohbxfL@lore-desk>
+ <20241216154947.fms254oqcjj72jmx@skbuf>
+ <Z2B5DW70Wq1tOIhM@lore-desk>
+ <Z2B-S7nQO3HK8BGl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: Check for oversized requests in sock_kmalloc()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- herbert@gondor.apana.org.au
-References: <20241216-sock-kmalloc-warn-v1-1-9cb7fdee5b32@rbox.co>
- <CANn89i+oL+qoPmbbGvE_RT3_3OWgeck7cCPcTafeehKrQZ8kyw@mail.gmail.com>
-From: Michal Luczaj <mhal@rbox.co>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <CANn89i+oL+qoPmbbGvE_RT3_3OWgeck7cCPcTafeehKrQZ8kyw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="G46z46ek6CcqYjSd"
+Content-Disposition: inline
+In-Reply-To: <Z2B-S7nQO3HK8BGl@pengutronix.de>
 
-+cc Herbert. Allocator warning due to sock_kmalloc() in
-crypto/af_alg.c:alg_setkey(). Please see the cover letter for a repro:
-https://lore.kernel.org/netdev/20241216-sock-kmalloc-warn-v1-1-9cb7fdee5b32@rbox.co/
 
-More comments below:
+--G46z46ek6CcqYjSd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 12/16/24 13:43, Eric Dumazet wrote:
-> On Mon, Dec 16, 2024 at 12:51 PM Michal Luczaj <mhal@rbox.co> wrote:
->>
->> Allocator explicitly rejects requests of order > MAX_PAGE_ORDER, triggering
->> a WARN_ON_ONCE_GFP().
->>
->> Put a size limit in sock_kmalloc().
->>
->> WARNING: CPU: 6 PID: 1676 at mm/page_alloc.c:4727 __alloc_pages_noprof+0x32e/0x3a0
->> Call Trace:
->>  ___kmalloc_large_node+0x71/0xf0
->>  __kmalloc_large_node_noprof+0x1b/0xf0
->>  __kmalloc_noprof+0x436/0x560
->>  sock_kmalloc+0x44/0x60
->>  ____sys_sendmsg+0x208/0x3a0
->>  ___sys_sendmsg+0x84/0xd0
->>  __sys_sendmsg+0x56/0xa0
->>  do_syscall_64+0x93/0x180
->>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>
->> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> 
-> I would rather change ____sys_sendmsg() to use something different
-> than sock_kmalloc().
-> 
-> This would avoid false sharing (on sk->sk_omem_alloc) for a short-lived buffer,
-> and could help UDP senders sharing a socket...
-> 
-> sock_kmalloc() was really meant for small and long lived allocations
-> (corroborated by net.core.optmem_max small default value)
-> 
-> diff --git a/net/socket.c b/net/socket.c
-> index 9a117248f18f13d574d099c80128986c744fa97f..c23d8e20c5c626c54b9a04a416b82f696fa2310c
-> 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -2552,7 +2552,8 @@ static int ____sys_sendmsg(struct socket *sock,
-> struct msghdr *msg_sys,
->                 BUILD_BUG_ON(sizeof(struct cmsghdr) !=
->                              CMSG_ALIGN(sizeof(struct cmsghdr)));
->                 if (ctl_len > sizeof(ctl)) {
-> -                       ctl_buf = sock_kmalloc(sock->sk, ctl_len, GFP_KERNEL);
-> +                       ctl_buf = kvmalloc(ctl_len, GFP_KERNEL_ACCOUNT |
-> +                                                   __GFP_NOWARN);
->                         if (ctl_buf == NULL)
->                                 goto out;
->                 }
-> @@ -2594,7 +2595,7 @@ static int ____sys_sendmsg(struct socket *sock,
-> struct msghdr *msg_sys,
-> 
->  out_freectl:
->         if (ctl_buf != ctl)
-> -               sock_kfree_s(sock->sk, ctl_buf, ctl_len);
-> +               kvfree(ctl_buf);
->  out:
->         return err;
->  }
+> On Mon, Dec 16, 2024 at 08:01:33PM +0100, Lorenzo Bianconi wrote:
+> > > On Mon, Dec 16, 2024 at 01:09:01PM +0100, Lorenzo Bianconi wrote:
+> > > > I guess what I did not make clear here is that we are discussing ab=
+out
+> > > > 'routed' traffic (sorry for that). The traffic is received from the=
+ WAN
+> > > > interface and routed to a DSA port (or the other way around).
+> > > > In this scenario the 3-way handshake will be received by the CPU vi=
+a the
+> > > > WAN port (or the conduit port) while the subsequent packets will be=
+ hw
+> > > > forwarded from WAN to LAN (or LAN to WAN). For EN7581 [0], the traf=
+fic
+> > > > will be received by the system from GDM2 (WAN) and the PSE/PPE bloc=
+ks
+> > > > will forward it to the GDM1 port that is connected to the DSA cpu p=
+ort.
+> > > >=20
+> > > > The proposed series is about adding the control path to apply a giv=
+en Qdisc
+> > > > (ETS or TBF for EN7581) to the traffic that is following the descri=
+bed path
+> > > > without creating it directly on the DSA switch port (for the reason=
+s described
+> > > > before). E.g. the user would want to apply an ETS Qdisc just for tr=
+affic
+> > > > egressing via lan0.
+> > > >=20
+> > > > This series is not strictly related to the airoha_eth flowtable off=
+load
+> > > > implementation but the latter is required to have a full pictures o=
+f the
+> > > > possible use case (this is why I was saying it is better to post it=
+ first).
+> > >=20
+> > > It's good to know this does not depend on flowtable.
+> > >=20
+> > > When you add an offloaded Qdisc to the egress of a net device, you do=
+n't
+> > > affect just the traffic L3 routed to that device, but all traffic (al=
+so
+> > > includes the packets sent to it using L2 forwarding). As such, I simp=
+ly
+> > > don't believe that the way in which the UAPI is interpreted here (root
+> > > egress qdisc matches only routed traffic) is proper.
+> > >=20
+> > > Ack?
+> >=20
+> > Considering patch [0], we are still offloading the Qdisc on the provided
+> > DSA switch port (e.g. LANx) via the port_setup_tc() callback available =
+in
+> > dsa_user_setup_qdisc(), but we are introducing even the ndo_setup_tc_co=
+nduit()
+> > callback in order to use the hw Qdisc capabilities available on the mac=
+ chip
+> > (e.g. EN7581) for the routed traffic from WAN to LANx. We will still ap=
+ply
+> > the Qdisc defined on LANx for L2 traffic from LANy to LANx. Agree?
+> >=20
+> > >=20
+> > > > > I'm trying to look at the big picture and abstract away the flowt=
+able a
+> > > > > bit. I don't think the tc rule should be on the user port. Can the
+> > > > > redirection of packets destined towards a particular switch port =
+be
+> > > > > accomplished with a tc u32 filter on the conduit interface instea=
+d?
+> > > > > If the tc primitives for either the filter or the action don't ex=
+ist,
+> > > > > maybe those could be added instead? Like DSA keys in "flower" whi=
+ch gain
+> > > > > introspection into the encapsulated packet headers?
+> > > >=20
+> > > > The issue with the current DSA infrastructure is there is no way to=
+ use
+> > > > the conduit port to offload a Qdisc policy to a given lan port sinc=
+e we
+> > > > are missing in the APIs the information about what user port we are
+> > > > interested in (this is why I added the new netdev callback).
+> > >=20
+> > > How does the introduction of ndo_setup_tc_conduit() help, since the p=
+roblem
+> > > is elsewhere? You are not making "tc qdisc add lanN root ets" work co=
+rrectly.
+> > > It is simply not comparable to the way in which it is offloaded by
+> > > drivers/net/dsa/microchip/ksz_common.c, even though the user space
+> > > syntax is the same. Unless you're suggesting that for ksz it is not
+> > > offloaded correctly?
+> >=20
+> > nope, I am not saying the current Qdisc DSA infrastructure is wrong, it=
+ just
+> > does not allow to exploit all hw capabilities available on EN7581 when =
+the
+> > traffic is routed from the WAN port to a given DSA switch port. If we d=
+o:
+> >=20
+> > $tc qdisc add dev lan0 root handle 1: ets strict 8 priomap ...
+> >=20
+> > in the current upstream implementation we do:
+> >   dsa_user_setup_tc():
+> >      ...
+> >        -> ds->ops->port_setup_tc(ds, dp->index, type, type_data)
+> >           (it applies the Qdisc on lan0 configuring the hw switch)
+> >=20
+> > adding the ndo_setup_tc_conduit() callback we have:
+> >=20
+> >   dsa_user_setup_qdisc()
+> >     ...
+> >       -> conduit->netdev_ops->ndo_setup_tc_conduit(conduit, dp->index, =
+type, type_data)
+> >          (it applies the Qdisc on EN7581 mac chip for the routed traffi=
+c destinated to lan0)
+> >=20
+> >       -> ds->ops->port_setup_tc(ds, dp->index, type, type_data)
+> >          (it applies the Qdisc on lan0 configuring the hw switch)
+> >=20
+> > >=20
+> > > Oleksij, am I missing something?
+> > >=20
+> > > > Please consider here we are discussing about Qdisc policies and not=
+ flower
+> > > > rules to mangle the traffic.
+> > >=20
+> > > What's a Qdisc policy?
+> >=20
+> > I mean a queue scheduler algorithm (e.g. TBF, ETS, HTB, ...)
+> >=20
+> > >=20
+> > > Also, flower is a classifier, not an action. It doesn't mangle packets
+> > > by the very definition of what a classifier is.
+> >=20
+> > yes, but goal of the series is the Queue scheduler offloading, not
+> > classifier/action. Agree?
+> >=20
+> > >=20
+> > > > The hw needs to be configured in advance to apply the requested pol=
+icy
+> > > > (e.g TBF for traffic shaping).
+> > >=20
+> > > What are you missing exactly to make DSA packets go to a particular
+> > > channel on the conduit?
+> > >=20
+> > > For Qdisc offloading you want to configure the NIC in advance, of cou=
+rse.
+> > >=20
+> > > Can't you do something like this to guide packets to the correct chan=
+nels?
+> > >=20
+> > > tc qdisc add dev eth0 clsact
+> > > tc qdisc add dev eth0 root handle 1: ets strict 8 priomap ...
+> > > tc filter add dev eth0 egress ${u32 or flower filter to match on DSA =
+tagged packets} \
+> > > 	flowid 1:1
+> >=20
+> > If we apply the Qdisc directly on the conduit port (eth0) we can just a=
+pply the
+> > queue scheduler on all the traffic egressing via the DSA switch while I=
+ would
+> > like to apply it on per DSA port basis (but using the mac chip hw capab=
+ilities),
+> > got my point?
+>=20
+> Hm, I guess I have similar use case in one of my projects. In my case, th=
+e CPU
+> interface is 1Gbit the switch ports are 100Mbit each. It is still
+> possible to keep the CPU interface busy by sending 1Gbit UDP stream, so
+> 900Mbit is dropped by the switch. I would like to have traffic limiter
+> per virtual DSA port on the SoC site to reduce the load on DSA conduit.
+> Currently it was not possible.
 
-Got it. I guess the same treatment for cmsghdr_from_user_compat_to_kern()?
+Does the mac chip in your setup support TX shaping (e.g. via HTB or TBF)?
+If so, I guess you could do it via the ndo_setup_tc_conduit() callback.
 
-Similar problem is with compat_ip_set_mcast_msfilter() and
-compat_ipv6_set_mcast_msfilter(), direct kmalloc() this time.
+Regards,
+Lorenzo
 
+>=20
+> --=20
+> Pengutronix e.K.                           |                             |
+> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
+--G46z46ek6CcqYjSd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ2CfVgAKCRA6cBh0uS2t
+rNwwAQCeMWEiLiC+pddOg1tg3YKpxzc6RPOfdJdGxpyyORyrLgEA9UndP7qxWUCJ
+TfgEmTJrBAOx8LJtOzAVgySVBhg2DAQ=
+=hC2G
+-----END PGP SIGNATURE-----
+
+--G46z46ek6CcqYjSd--
 
