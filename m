@@ -1,107 +1,184 @@
-Return-Path: <netdev+bounces-152180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A20D59F300A
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:04:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0499F3019
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:09:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C20AC7A1EA2
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:03:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42986188316F
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EE0204578;
-	Mon, 16 Dec 2024 12:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14D920459A;
+	Mon, 16 Dec 2024 12:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="hgKRsPOm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JUAjRbRI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04958204563
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 12:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A99E38FA6
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 12:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734350636; cv=none; b=IPy8U4f+CPGPoQI6YY3Qz8Y2hyKpaZapXkR8xSKi4JLHmUk8650+XBJv8RIdJiFc9BPsS1Kv02FoOqSOvTSaSgCSNb9bTXTgn3cGKyaU4vFP87wvdta+GAgKBY2Aszz4RftBO7J+bxUBc001RYXuNQStTtLXNHQ/PG757BG4Efo=
+	t=1734350944; cv=none; b=egEzuCcbB0FC09cQ1JQooqbCcQrriN/F3upGPgKfPwpW0TIRJ4l2WyJCkU8hIdcJxciAB0/VElBlV4mQrnav9yrzk1mWo+ctpOHSs10Sl1nyYP0DXO/BOmgYJuYQ94v+hA7Kji535gkLZ8GgnBs8HQwfwU/ORpWHML3yUK8db9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734350636; c=relaxed/simple;
-	bh=nrxnbN5PDzbUvYeuKcEbs8Br2ZyTI0SbeHnWHZaYSY8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gfSd5ctELWKCC0vLuOlz/mGbYJ0nYRAdJWlcbfrya8TLq7+ckE/iChQQA+3F8JDy/OAS+OSHxvmiCGco53p9s2a7jVxmCeNvsPKkTVrB/Li2LzAWZxd+dwEGzUWB5IwVAuQba7q0S7IWNJyFP8J0t4Gw+K4RirtDqQjY3odx5F8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=hgKRsPOm; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tN9pH-00Flyd-Lp; Mon, 16 Dec 2024 13:03:51 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=TnGgdpx03WB4fRZN61EvjatXt6028532DMgEBOXB15Y=; b=hgKRsPOmBuV4B5Ci7AY7kWDQen
-	BMuFveyx95I19g72ava+v9ypHmY7ejelvlsr9olHsYppOii/rV1tVzwqaPJJ8X+Cj2qBFuc6jV5dc
-	uYkvJKL0lo+5BMWQaOJgm31LcwSrJiUtSX2nOsxYMyH6loo3bzlZVbHWfbFmBhLA+tlOM8eecn1eh
-	bvanZsInWujIErphJtyjGXwqUQuYhd56JVFJ8OHy0WNP1eqXVtCxwaHodq8JEnkrEtAGdFdSeZV14
-	ohcBYWhGoIoZyhiMwsNMSNT4kCSDocsMb7x5GJCY0oZosv1Rr8JLRmrjJh7P+qQdYl/wPql/QpFDd
-	5PCk9SzQ==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tN9pH-00080b-97; Mon, 16 Dec 2024 13:03:51 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tN9p2-00BT0J-Uo; Mon, 16 Dec 2024 13:03:37 +0100
-Message-ID: <dd08257d-6110-43ee-9949-2c879575cbef@rbox.co>
-Date: Mon, 16 Dec 2024 13:03:36 +0100
+	s=arc-20240116; t=1734350944; c=relaxed/simple;
+	bh=NvT9qeS8rdRRygfFMeVcBLUhj9fFyA9StbpSggcgn4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VbfRFcI2cl0+SayhcxCFG0oUzNTWPKxae4+6f9j+LCeqzLV/ZC9ymqZQoOqoK0UdAaUvk7xPC6vwi3jsXH5OBAtVcEzuf8tpC9mJIA8I7ha2eYdmfrp4fd7RP9iV5nLfe3p3SpGuY9SeZW9DA4wpHJvv/BDUbSBpiEJVByu2vzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JUAjRbRI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87C2BC4CED0;
+	Mon, 16 Dec 2024 12:09:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734350944;
+	bh=NvT9qeS8rdRRygfFMeVcBLUhj9fFyA9StbpSggcgn4E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JUAjRbRIlS8wVKc6SP0LW23hTE7pDnYqceFYUEDBd38ebSAZ0gWl0ilTuvS6Afg8L
+	 N2ZwOEnVWwIfDW102jUyhF2GN5v1zZfTm482lXcdfntq7sYG9WWQU9fBmQf5QxKT2X
+	 k3qn4X7vo4LvRAW5pu7hV4WAlycm30pGWrmzaDciP/BSayeDDoHxbivHg7mPzxtN2y
+	 UBC61rz04qmQ6KvFt4r9705WhXBXZR1h/aMY+L0IwfENTghF1Evx5az/oxiHc5A6PY
+	 kl0L7XGLy6DtXbxzK7h7q+ml60BEbbt/ZT4HiINsM2mrn5xouzJfnjkhwhCAwYfV3w
+	 YtP5CKknd2mvg==
+Date: Mon, 16 Dec 2024 13:09:01 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, nbd@nbd.name, sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com, lorenzo.bianconi83@gmail.com
+Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
+ EN7581 SoC
+Message-ID: <Z2AYXRy-LjohbxfL@lore-desk>
+References: <cover.1733930558.git.lorenzo@kernel.org>
+ <20241211154109.dvkihluzdouhtamr@skbuf>
+ <Z1qqrVWV84DBZuCn@lore-desk>
+ <20241212150613.zhi3vbxuwsc3blui@skbuf>
+ <Z1sXTPeekJ5See_u@lore-desk>
+ <20241212184647.t5n7t2yynh6ro2mz@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/4] vsock/test: Add test for MSG_ZEROCOPY
- completion memory leak
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org
-References: <20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co>
- <20241206-test-vsock-leaks-v1-4-c31e8c875797@rbox.co>
- <oipmjpvmvbksopq6ugfmad2bd6k6mkj34q3jef5fvz72f3xfow@ve7lrp5gx37c>
- <aecfafb8-f556-4d7e-941d-2975f3f30396@rbox.co>
- <z4b2cbflkvo6nqrcw4wx5usoisqkha4scszftfshceo5bkd3nj@34u53ajpaltf>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <z4b2cbflkvo6nqrcw4wx5usoisqkha4scszftfshceo5bkd3nj@34u53ajpaltf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="9z+PDC61Tt4YZqkq"
+Content-Disposition: inline
+In-Reply-To: <20241212184647.t5n7t2yynh6ro2mz@skbuf>
 
-On 12/13/24 15:33, Stefano Garzarella wrote:
-> On Thu, Dec 12, 2024 at 07:26:39PM +0100, Michal Luczaj wrote:
->> [...]
->> That said, I really think this test should be scrapped. I'm afraid it will
->> break sooner or later. And since kmemleak needs root anyway, perhaps it's
->> better to use failslab fault injection for this?
-> 
-> As you prefer!
-> 
-> I'd be for merging this new version, but I would ask you to put a
-> comment above the function with your concerns about possible failures
-> in the future and possibly how to implement it with more privileges.
-> If they happen we always have time to remove the test or extend it to
-> use more privileged things.
 
-All right, here's v2: https://lore.kernel.org/netdev/20241216-test-vsock-leaks-v2-0-55e1405742fc@rbox.co/
+--9z+PDC61Tt4YZqkq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> [*] It's the only caller. Should @size be dropped from sock_omalloc()?
-> 
-> Oh, I see, more a question for net maintainer, but I'd agree with you.
-> So I think you can try sending a patch to net-next for that.
+> On Thu, Dec 12, 2024 at 06:03:08PM +0100, Lorenzo Bianconi wrote:
+> > > Explain "the mac chip forwards (in hw) the WAN traffic to the DSA swi=
+tch
+> > > via the CPU port". How many packets does airoha_dev_select_queue() se=
+e?
+> > > All of them, or only the first of a flow? What operations does the
+> > > offload consist of?
+> >=20
+> > I am referring to the netfilter flowtable offload where the kernel rece=
+ives
+> > just the 3-way handshake of a TCP connection and then the traffic is fu=
+lly
+> > offloaded (the hw receives a flower rule to route the traffic between
+> > interfaces applying NAT mangling if requested).
 
-I digged more and it seems this (i.e. sock_omalloc() only being called
-with @size=0) was the case from the very beginning[*]. I understand it was
-deliberate and just awaits for some other users of ancillary sbks.
+Hi Vladimir,
 
-[*] https://lore.kernel.org/netdev/20170803202945.70750-1-willemdebruijn.kernel@gmail.com/
+Sorry for the late reply.
 
+>=20
+> And how do the follow-up packets know to go to the same conduit queue as
+> the initial packets of the flow?
+>=20
+> As mentioned, my trouble with your current proposal is that I don't
+> think it reacts adequately to the user space request. Given your command,
+> packets forwarded from lan1 to lan0 should also go through lan0's ETS
+> scheduler, but my understanding is that they won't, because they bypass
+> the conduit. I don't encourage adding new net_device_ops infrastructure
+> to implement unexpected behavior.
+
+I guess what I did not make clear here is that we are discussing about
+'routed' traffic (sorry for that). The traffic is received from the WAN
+interface and routed to a DSA port (or the other way around).
+In this scenario the 3-way handshake will be received by the CPU via the
+WAN port (or the conduit port) while the subsequent packets will be hw
+forwarded from WAN to LAN (or LAN to WAN). For EN7581 [0], the traffic
+will be received by the system from GDM2 (WAN) and the PSE/PPE blocks
+will forward it to the GDM1 port that is connected to the DSA cpu port.
+
+The proposed series is about adding the control path to apply a given Qdisc
+(ETS or TBF for EN7581) to the traffic that is following the described path
+without creating it directly on the DSA switch port (for the reasons descri=
+bed
+before). E.g. the user would want to apply an ETS Qdisc just for traffic
+egressing via lan0.
+
+This series is not strictly related to the airoha_eth flowtable offload
+implementation but the latter is required to have a full pictures of the
+possible use case (this is why I was saying it is better to post it first).
+
+>=20
+> I'm trying to look at the big picture and abstract away the flowtable a
+> bit. I don't think the tc rule should be on the user port. Can the
+> redirection of packets destined towards a particular switch port be
+> accomplished with a tc u32 filter on the conduit interface instead?
+> If the tc primitives for either the filter or the action don't exist,
+> maybe those could be added instead? Like DSA keys in "flower" which gain
+> introspection into the encapsulated packet headers?
+
+The issue with the current DSA infrastructure is there is no way to use
+the conduit port to offload a Qdisc policy to a given lan port since we
+are missing in the APIs the information about what user port we are
+interested in (this is why I added the new netdev callback).
+Please consider here we are discussing about Qdisc policies and not flower
+rules to mangle the traffic. The hw needs to be configured in advance to ap=
+ply
+the requested policy (e.g TBF for traffic shaping).
+
+>=20
+> > Re-thinking about it, I guess it is better to post flowtable support
+> > first and then continue the discussion about QoS offloading, what do
+> > you think?
+>=20
+> I don't know about Andrew, but I'm really not familiar with the
+> netfilter flowtable (and there's another series from Eric Woudstra
+> waiting for me to know everything about it).
+>=20
+> Though, I don't think this can continue for long, we need to find a
+> common starting place for discussions, since the development for chips
+> with flowtable offload is starting to put pressure on DSA. What to read
+> as a starting point for a basic understanding?
+
+I do not think there is much documentation about it (except the source code=
+).
+I guess you can take a look to [1],[2].
+
+Regards,
+Lorenzo
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D23020f04932701d5c8363e60756f12b43b8ed752
+[1] https://docs.kernel.org/networking/nf_flowtable.html
+[2] https://thermalcircle.de/doku.php?id=3Dblog:linux:flowtables_1_a_netfil=
+ter_nftables_fastpath
+
+--9z+PDC61Tt4YZqkq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ2AYXQAKCRA6cBh0uS2t
+rI2fAQC/7oYH2QeBJJIN/hte6cB0S7mGFi9AAfOMqOFticUhQwD+PE9flU17rfEv
+muUdtkVXcXrNmSTBIthSi4oOfNN60AM=
+=YmdI
+-----END PGP SIGNATURE-----
+
+--9z+PDC61Tt4YZqkq--
 
