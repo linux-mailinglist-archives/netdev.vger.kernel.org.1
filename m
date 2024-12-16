@@ -1,96 +1,85 @@
-Return-Path: <netdev+bounces-152105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37F0E9F2ADC
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:22:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31DB9F2B0B
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:39:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8133C1888D93
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:22:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5D8118811E6
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:39:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0BD1D5AB6;
-	Mon, 16 Dec 2024 07:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF661F7557;
+	Mon, 16 Dec 2024 07:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="lp2QMC9C"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OUXQpUct"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E0C51B87EF
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 07:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A5E1F754D;
+	Mon, 16 Dec 2024 07:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734333622; cv=none; b=fs3T5tHp+UoooIbHMcsEo5UzxE8U0bXXt0CRlEumltzTchFo6Z4vkqam0W7GdQCSzypfP2AzDTR91x8psAXxkRk1+UIT0u71HKN73zodmIIq88gqIDPWug17BqfgDh37K5pn04RL39c8XJxAOgOBYk8MxqwbwZES1CdgP/vsMNY=
+	t=1734334765; cv=none; b=Gni8kgDURNrhsr21F3W2+qJfsLQ29qTHbpRs9EGqnKHkA660RnYJuLZLgkgAAoK8DsMWlOXzdGyrLx80WKRzYMLZA8GxGuaTKMlOLwxyD3mCJXhz1Hit+yuZl0Czy02mjMZXpxuj3k2tQJcUQu0TWTI+pHQFxHTcnzjfRobd7rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734333622; c=relaxed/simple;
-	bh=PPu77jqSXBAgupPgYnoSOAHUAmL6TvEmfGQvFsLGMGU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tzG4JafMBHl1B6IHQIpyBvPqGdkZsiDrWD10ckK87g9XepAs8qtjAMlDDguPTC0gpR8xcRJqsZQlQooNDDOzSYhVDBAdM+Uw4W6r3zm2oJ6nDDxecVbGOLkvNWkciYJIcarthpL8qZT+U8rgWBI7ZQkTYPvfZHumCqAI3Q/lCfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=lp2QMC9C; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-540201cfedbso3874635e87.3
-        for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 23:20:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1734333619; x=1734938419; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2bRm8i06V7UAQJx4SsgcbkPUCzwQb13lEnvW91v/XN8=;
-        b=lp2QMC9CI3ikyuAy2Tt9MtnsgHTh/Weq/TNHrCzoGhFjpSqj4i8hVoFa/H4ntMR3zd
-         AG/vIuyn2m4gJyTClbQnI480tmeJt4eOsthR0NBvtXbBYSALivYD/k3wk1iH28mRcmv1
-         58AZAMhi1F1qBENhYGKpkveJZYs/1KOwDyCAp1CuTff/TH/+Jt3HY4nCYJcebVH2V4AK
-         99anuJvKzysRb7SK6WXSxlIaGRfnH2fl85X1lFdSi/M+MzMoqovJmfSWhaeBlStPuXMj
-         V+JUzYSqRbwbHLMe65qZb4zYO9vpvynX7r3AYZKm0mNNr/vh7A7nxMcC0mM36mh4BKav
-         DpMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734333619; x=1734938419;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2bRm8i06V7UAQJx4SsgcbkPUCzwQb13lEnvW91v/XN8=;
-        b=SGBjVOSdbKhTJqAhG/haPs+cOtNt1aqIW7hC1AgMnpHVXLNeNvDhzfZzLCh2QTQBkZ
-         d/vTZQ0fDJrCy1bbZ5CMQpXiYlJaCZkTMtFRvRL2KD1FS3s6yZ037ZsVh/6mSV0Gz/hm
-         gQX39RxaDb3YqGzHEeoTvPNFrP7xdeMQLnonpy6jVOeCeLr/dEH2hdSndj4pkoi/VgTs
-         idKMkZuMw5unmWDgHJAxu4sshG806AdiSWZgshITI8XiJE5YgyO1Tn1uj16Y7cQ42ylW
-         c0qLQsRULwMapbBv4oTiqeJrk2Jfpd/gxRjPOTFQAnoZV9dsobMSY/VcjObfT3JX/T2s
-         T5Ig==
-X-Gm-Message-State: AOJu0YzAOMe41BOPgWnKgLrf3aUwrAKz01plOYVITANywWw1TlW6v3T4
-	cR1bvSqEHKPBLUcpuz0YlwDzkmouZ1013wnAZuy4umttKW5+IjY+zIiOgsg8H3c=
-X-Gm-Gg: ASbGncuSLucQk1VAwdLh/DtE3hb+xrDwZt3daNr+Qbz2zRLUIX3iLn+AX/0E+nxiZ9y
-	q0VmjgGnYBXQ1AZzsNareXVGq09Cg5riQ02DgsV2/ZtIZwaZnnkLJy2830QjBcRMKY/v3TTFtvg
-	gNKKo2FtEWwtGngmUeSkvmQq+mbfG61eQHfACFJiwfPdavhqjyLFSlR++HDBP43WUqGRmh5hFGZ
-	m0XMErSaTbXMCVmTSkNkXzNUJmgv+jt8qgcdPnLAuliwAKnnokPID1IfU8BA4BxnDXykFs=
-X-Google-Smtp-Source: AGHT+IFowAXgGjOedfuT8nJJtjG23yp3KyVX22HWiWvy1vf9kaEvbhBVhV1xHsfmSOlU8xeDwiDt1Q==
-X-Received: by 2002:a05:6512:401b:b0:540:c349:a81b with SMTP id 2adb3069b0e04-540c349a962mr3449085e87.48.1734333619267;
-        Sun, 15 Dec 2024 23:20:19 -0800 (PST)
-Received: from cobook.home ([91.198.101.25])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54120ba9b2bsm748930e87.94.2024.12.15.23.20.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Dec 2024 23:20:19 -0800 (PST)
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1734334765; c=relaxed/simple;
+	bh=/1pRwMyhAu53D4zyYWPWDy+g1KgzaQejdNtkuChrOf0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IF89Iir0S5zaAPN5aQKnoSv8WRmIx7EAc/yiZSSwcdbY2m4qv8PcIfYHZW4eiUNa8R85VfpYrCVIDbeKF/SZJhY5xBYdrBdtD8tJVhNGCjxTjNb0icXNOTaBzXSYUOKGUYBl5MZAx/j3XK5XmE4BkKuKkZXACLdnJeEnG4eLsUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OUXQpUct; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734334763; x=1765870763;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/1pRwMyhAu53D4zyYWPWDy+g1KgzaQejdNtkuChrOf0=;
+  b=OUXQpUctrmRZD2QwYwNnQnYVO9Ze29jpPsy8OsB2nsjVaOqnbwWvONk/
+   zLXpM4W25RMo04zxugmLszx2S+IaRKK5c4QC3F4sIsS4UDai7HoNgKs94
+   Tf1FbCy6NlibP7gt+bFffqlKI3jjjm5O7xPSeoMbdg6foGHFOjLNpslWn
+   e/UlFzhNzu+zTs/443D8uIqbjhtTTfIqRb7nn4w0deCn93QudRZRnYZ0E
+   CLb3ZN4HqkpxpKSaNFFoxA8ZEBSVEFjRkIS5r7xOpS6vxsXUAwnAmB4zs
+   0q0yBfk527Qe9DkvVQEJsqVw8Rno6PMe+Yk8RRLL2ZuxDoc6cyt4fobN/
+   w==;
+X-CSE-ConnectionGUID: sAkfE1tETUKZxNrz/Dp2Ww==
+X-CSE-MsgGUID: +hK5ka+oR4CFWorS+Hbq4g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11287"; a="34031550"
+X-IronPort-AV: E=Sophos;i="6.12,237,1728975600"; 
+   d="scan'208";a="34031550"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 23:39:21 -0800
+X-CSE-ConnectionGUID: NIAxqjGWQx2PdsAJhtchiA==
+X-CSE-MsgGUID: 89X1mMOdQOa0bGLXvb7B9g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="134447920"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
+  by orviesa001.jf.intel.com with ESMTP; 15 Dec 2024 23:39:18 -0800
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: [PATCH net-next v2 5/5] net: renesas: rswitch: add mdio C22 support
-Date: Mon, 16 Dec 2024 12:19:57 +0500
-Message-Id: <20241216071957.2587354-6-nikita.yoush@cogentembedded.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241216071957.2587354-1-nikita.yoush@cogentembedded.com>
-References: <20241216071957.2587354-1-nikita.yoush@cogentembedded.com>
+	bpf@vger.kernel.org
+Subject: [PATCH iwl-next v3 1/1] igc: Avoid unnecessary link down event in XDP_SETUP_PROG process
+Date: Mon, 16 Dec 2024 15:38:49 +0800
+Message-Id: <20241216073849.3555825-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,54 +88,141 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The generic MPSM operation added by the previous patch can be used both
-for C45 and C22.
+The igc_close()/igc_open() functions are too drastic for installing a new
+XDP prog because they cause undesirable link down event and device reset.
 
-Add handlers for C22 operations.
+To avoid delays in Ethernet traffic, improve the XDP_SETUP_PROG process by
+using the same sequence as igc_xdp_setup_pool(), which performs only the
+necessary steps, as follows:
+ 1. stop the traffic and clean buffer
+ 2. stop NAPI
+ 3. install the XDP program
+ 4. resume NAPI
+ 5. allocate buffer and resume the traffic
 
-Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+This patch has been tested using the 'ip link set xdpdrv' command to attach
+a simple XDP prog that always returns XDP_PASS.
+
+Before this patch, attaching xdp program will cause ptp4l to lose sync for
+few seconds, as shown in ptp4l log below:
+  ptp4l[198.082]: rms    4 max    8 freq   +906 +/-   2 delay    12 +/-   0
+  ptp4l[199.082]: rms    3 max    4 freq   +906 +/-   3 delay    12 +/-   0
+  ptp4l[199.536]: port 1 (enp2s0): link down
+  ptp4l[199.536]: port 1 (enp2s0): SLAVE to FAULTY on FAULT_DETECTED (FT_UNSPECIFIED)
+  ptp4l[199.600]: selected local clock 22abbc.fffe.bb1234 as best master
+  ptp4l[199.600]: port 1 (enp2s0): assuming the grand master role
+  ptp4l[199.600]: port 1 (enp2s0): master state recommended in slave only mode
+  ptp4l[199.600]: port 1 (enp2s0): defaultDS.priority1 probably misconfigured
+  ptp4l[202.266]: port 1 (enp2s0): link up
+  ptp4l[202.300]: port 1 (enp2s0): FAULTY to LISTENING on INIT_COMPLETE
+  ptp4l[205.558]: port 1 (enp2s0): new foreign master 44abbc.fffe.bb2144-1
+  ptp4l[207.558]: selected best master clock 44abbc.fffe.bb2144
+  ptp4l[207.559]: port 1 (enp2s0): LISTENING to UNCALIBRATED on RS_SLAVE
+  ptp4l[208.308]: port 1 (enp2s0): UNCALIBRATED to SLAVE on MASTER_CLOCK_SELECTED
+  ptp4l[208.933]: rms  742 max 1303 freq   -195 +/- 682 delay    12 +/-   0
+  ptp4l[209.933]: rms  178 max  274 freq   +387 +/- 243 delay    12 +/-   0
+
+After this patch, attaching xdp program no longer cause ptp4l to lose sync,
+as shown in ptp4l log below:
+  ptp4l[201.183]: rms    1 max    3 freq   +959 +/-   1 delay     8 +/-   0
+  ptp4l[202.183]: rms    1 max    3 freq   +961 +/-   2 delay     8 +/-   0
+  ptp4l[203.183]: rms    2 max    3 freq   +958 +/-   2 delay     8 +/-   0
+  ptp4l[204.183]: rms    3 max    5 freq   +961 +/-   3 delay     8 +/-   0
+  ptp4l[205.183]: rms    2 max    4 freq   +964 +/-   3 delay     8 +/-   0
+
+Besides, before this patch, attaching xdp program will causes flood ping to
+lose 10 packets, as shown in ping statistics below:
+  --- 169.254.1.2 ping statistics ---
+  100000 packets transmitted, 99990 received, +6 errors, 0.01% packet loss, time 34001ms
+  rtt min/avg/max/mdev = 0.028/0.301/3104.360/13.838 ms, pipe 10, ipg/ewma 0.340/0.243 ms
+
+After this patch, attaching xdp program no longer cause flood ping to loss
+any packets, as shown in ping statistics below:
+  --- 169.254.1.2 ping statistics ---
+  100000 packets transmitted, 100000 received, 0% packet loss, time 32326ms
+  rtt min/avg/max/mdev = 0.027/0.231/19.589/0.155 ms, pipe 2, ipg/ewma 0.323/0.322 ms
+
+On the other hand, this patch has been tested with tools/testing/selftests/
+bpf/xdp_hw_metadata app to make sure AF_XDP zero-copy is working fine with
+XDP Tx and Rx metadata. Below is the result of last packet after received
+10000 UDP packets with interval 1 ms:
+  poll: 1 (0) skip=0 fail=0 redir=10000
+  xsk_ring_cons__peek: 1
+  0x55881c7ef7a8: rx_desc[9999]->addr=8f110 addr=8f110 comp_addr=8f110 EoP
+  rx_hash: 0xFB9BB6A3 with RSS type:0x1
+  HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (43.280 usec)
+  XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (31.664 usec)
+  No rx_vlan_tci or rx_vlan_proto, err=-95
+  0x55881c7ef7a8: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
+  0x55881c7ef7a8: complete tx idx=9999 addr=f010
+  HW TX-complete-time:   1733923136269591637 (sec:1733923136.2696) delta to User TX-complete-time sec:0.0001 (108.571 usec)
+  XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User TX-complete-time sec:0.0002 (217.726 usec)
+  HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to HW TX-complete-time sec:0.0001 (120.771 usec)
+  0x55881c7ef7a8: complete rx idx=10127 addr=8f110
+
+Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
 ---
- drivers/net/ethernet/renesas/rswitch.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+V2: https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20241211134532.3489335-1-yoong.siang.song@intel.com/
+V1: https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20241204120233.3148482-1-yoong.siang.song@intel.com/
 
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index a3ba2a91c0ab..aae26098bc0c 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -1253,6 +1253,23 @@ static int rswitch_etha_mii_write_c45(struct mii_bus *bus, int addr, int devad,
- 				    MPSM_POP_WRITE, val);
+V3 changelog:
+ - Change commit title to be more specific. (Paul)
+ - Use unsigned int, instead of int, for array elements. (Paul)
+ - Fix grammar mistakes on commit message. (Paul)
+ - Explain why igc_close()/igc_open() are not needed in commit message. (Paul)
+V2 changelog:
+ - shows some examples of problem in commit message. (Vinicius)
+ - igc_close()/igc_open() are too big a hammer for installing a new XDP
+   program. Only do we we really need. (Vinicius)
+---
+ drivers/net/ethernet/intel/igc/igc_xdp.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
+index 869815f48ac1..9eb47b4beb06 100644
+--- a/drivers/net/ethernet/intel/igc/igc_xdp.c
++++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
+@@ -14,6 +14,7 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+ 	bool if_running = netif_running(dev);
+ 	struct bpf_prog *old_prog;
+ 	bool need_update;
++	unsigned int i;
+ 
+ 	if (dev->mtu > ETH_DATA_LEN) {
+ 		/* For now, the driver doesn't support XDP functionality with
+@@ -24,8 +25,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+ 	}
+ 
+ 	need_update = !!adapter->xdp_prog != !!prog;
+-	if (if_running && need_update)
+-		igc_close(dev);
++	if (if_running && need_update) {
++		for (i = 0; i < adapter->num_rx_queues; i++) {
++			igc_disable_rx_ring(adapter->rx_ring[i]);
++			igc_disable_tx_ring(adapter->tx_ring[i]);
++			napi_disable(&adapter->rx_ring[i]->q_vector->napi);
++		}
++	}
+ 
+ 	old_prog = xchg(&adapter->xdp_prog, prog);
+ 	if (old_prog)
+@@ -36,8 +42,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+ 	else
+ 		xdp_features_clear_redirect_target(dev);
+ 
+-	if (if_running && need_update)
+-		igc_open(dev);
++	if (if_running && need_update) {
++		for (i = 0; i < adapter->num_rx_queues; i++) {
++			napi_enable(&adapter->rx_ring[i]->q_vector->napi);
++			igc_enable_tx_ring(adapter->tx_ring[i]);
++			igc_enable_rx_ring(adapter->rx_ring[i]);
++		}
++	}
+ 
+ 	return 0;
  }
- 
-+static int rswitch_etha_mii_read_c22(struct mii_bus *bus, int phyad, int regad)
-+{
-+	struct rswitch_etha *etha = bus->priv;
-+
-+	return rswitch_etha_mpsm_op(etha, true, MPSM_MMF_C22, phyad, regad,
-+				    MPSM_POP_READ_C22, 0);
-+}
-+
-+static int rswitch_etha_mii_write_c22(struct mii_bus *bus, int phyad,
-+				      int regad, u16 val)
-+{
-+	struct rswitch_etha *etha = bus->priv;
-+
-+	return rswitch_etha_mpsm_op(etha, false, MPSM_MMF_C22, phyad, regad,
-+				    MPSM_POP_WRITE, val);
-+}
-+
- /* Call of_node_put(port) after done */
- static struct device_node *rswitch_get_port_node(struct rswitch_device *rdev)
- {
-@@ -1335,6 +1352,8 @@ static int rswitch_mii_register(struct rswitch_device *rdev)
- 	mii_bus->priv = rdev->etha;
- 	mii_bus->read_c45 = rswitch_etha_mii_read_c45;
- 	mii_bus->write_c45 = rswitch_etha_mii_write_c45;
-+	mii_bus->read = rswitch_etha_mii_read_c22;
-+	mii_bus->write = rswitch_etha_mii_write_c22;
- 	mii_bus->parent = &rdev->priv->pdev->dev;
- 
- 	mdio_np = of_get_child_by_name(rdev->np_port, "mdio");
 -- 
-2.39.5
+2.34.1
 
 
