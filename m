@@ -1,215 +1,122 @@
-Return-Path: <netdev+bounces-152172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EE19F2FDA
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:54:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D809F2FF9
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:01:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9054162277
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 11:54:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44C151884943
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 12:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FD7204577;
-	Mon, 16 Dec 2024 11:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD82320468A;
+	Mon, 16 Dec 2024 12:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="hKZ4RkXE"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="j+dbecKp"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011049.outbound.protection.outlook.com [52.101.125.49])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE20B20012C;
-	Mon, 16 Dec 2024 11:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734350073; cv=fail; b=ZAJ2udAdjVLsMCnsCjgABKDLdsNoRU5p2CsOz8svCn6/MydNlKCxB1i8t6D4LXyd7BEtlafjSNKgaEfidJymrlue1ijI4giW0skwPc0UuNJaq2aRO1Awk1dZqnyMaCzZw+3UUURucbUXlL/WULJ0T9/ov/5VvmsrXAjcFEsiyjs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734350073; c=relaxed/simple;
-	bh=9nSSpFwc/jgpvNjS/5NuJ+htczUwrcSRnggsM1O/Pmk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZX3ZH+lRF/CpisBLWI0LlqO3xfuvGL9am2PMSdKwJ18PRhw8pZk2sLumHZAGF7Z+1fiCUJ03gTRUevEMWJ4fzcvUpxDpHBW5Ku8S0BFGodTufMlAhmpfaF1zb9GzuKyrSv2EAVBEOHck/S+My91GQcoKDvvfv+E3+sPvisp6STM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=hKZ4RkXE; arc=fail smtp.client-ip=52.101.125.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jKyiKDeQQZp0pYDM+WEzyt5lXjPzns6IToy5jXZlLF4LaEn34YDGG76rmZjIF0QyW5fKiQdi+PpYfkjgS/3XKNDs/25aOhnxR8/IIO/5hsygjeSvwqyZy9Ef6uwgPHJj1zcGPay7pB5F32EDiXblJt09BRbxSAVaUhlVzJp0V96a1rPI5IYJqWA/TmSHfrUSnM925rRJsT1H1Lg9kRUUJbstkN5pZMhnd/KIsvDvKxbBj2wtgqLYwRc+4P+43oCZh7Ncmr64nzZW3esK1dOySnfwoFYNDkWmmS/fmblf8tciszKwAxxyMGycvnrIqtV6CYDX/m3NROSKlYV5J4xWaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+m2M8MdO0004lksXzeL3XpoiA5cnuGumZhJAES/Srdk=;
- b=UApW3w1+Hj4Lu7hlPzm9zNeLRsXKPq7wAUR/OePawPcPKssO68/TPedtryUNpEUiFoZqmaPTc6k2QvjbFzR76kgJY+yTCvTb9GmsofAEhOSZDRryimz0tYtFdHwHALnv3GJynE0XGWny1mnarrONWOIl5X9pjMdWzRX3K7lNm7ZV8+ndjmfZGTLdPqpCpkGvOdtLdDVhOd+S7PEXFOdlzpTl7GqDR1DjE9gA/vIhGsV+RcLlF7QAGZmtlRd+A913KCPJ0F2alnNZJQUIW3r1sSnaGXfAOctEK7k4SN2aRTEyAS3UCEXFeyZGYsX7mVCqzShf9iO4HdO2C92XjNTqWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+m2M8MdO0004lksXzeL3XpoiA5cnuGumZhJAES/Srdk=;
- b=hKZ4RkXECwFPTS/1jpv7BaGdWOavyvaZ9ATCR8AYn2xxK4HjsBl2FUSMbAL90GvlPRUvQI768Dg5W1t2+cb1PVYpULLnpKMXY52YQY2WsGuWEneCzi0Oz/gfKrVlfObzCB0okpVQQOGLVrPP6QYkIK5/v7SN+C5oeOwiXYX5VE0=
-Received: from TYCPR01MB11040.jpnprd01.prod.outlook.com (2603:1096:400:3a7::6)
- by TYAPR01MB5785.jpnprd01.prod.outlook.com (2603:1096:404:8052::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.21; Mon, 16 Dec
- 2024 11:54:26 +0000
-Received: from TYCPR01MB11040.jpnprd01.prod.outlook.com
- ([fe80::b183:a30f:c95f:a155]) by TYCPR01MB11040.jpnprd01.prod.outlook.com
- ([fe80::b183:a30f:c95f:a155%4]) with mapi id 15.20.8251.015; Mon, 16 Dec 2024
- 11:54:26 +0000
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: nikita.yoush <nikita.yoush@cogentembedded.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michael Dege
-	<michael.dege@renesas.com>, Christian Mardmoeller
-	<christian.mardmoeller@renesas.com>, Dennis Ostermann
-	<dennis.ostermann@renesas.com>, nikita.yoush
-	<nikita.yoush@cogentembedded.com>
-Subject: RE: [PATCH net-next v2 0/5] mdio support updates
-Thread-Topic: [PATCH net-next v2 0/5] mdio support updates
-Thread-Index: AQHbT4rv4wDaxpNFok24j9ZGFrEo8rLowJ6w
-Date: Mon, 16 Dec 2024 11:54:26 +0000
-Message-ID:
- <TYCPR01MB110403F3DA55EB4C832BBA55FD83B2@TYCPR01MB11040.jpnprd01.prod.outlook.com>
-References: <20241216071957.2587354-1-nikita.yoush@cogentembedded.com>
-In-Reply-To: <20241216071957.2587354-1-nikita.yoush@cogentembedded.com>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYCPR01MB11040:EE_|TYAPR01MB5785:EE_
-x-ms-office365-filtering-correlation-id: c9f8a375-8a3e-48a3-4c73-08dd1dc86439
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|1800799024|7416014|366016|10070799003|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?96RR9feGTx7uD875DUCs6CvMf5X2omf54Yw9oR1Mw1zRGGQ2juPQnYwcz7Uf?=
- =?us-ascii?Q?0lrpG9L89cYbqYUVQKK+z5nEfwgM/7TewDY1rDPIwibgQfzUDnI9Cs7kseDx?=
- =?us-ascii?Q?EOh/QJk2Hh1G9i1bS4kOLAovfHgFTUjBx9l4qVr+I6S5L7EpY7oOs7F+3XUW?=
- =?us-ascii?Q?1dNBwsq8vHqaRrf8D9gLz8dvd7X6wFsMJKVv1rbv0oWlatKw9uuW2/ehVjWO?=
- =?us-ascii?Q?ST2M6GXBNQ2CZFCFuKDrXoV12zxfCoTOhiV848Tfn0mLHlVR+UNFCmVDB9gw?=
- =?us-ascii?Q?Mkk2OuMsm35ruIoXz/9dhBPsO8q674rJ0Fip5BPLfSoH7FGw94f9qpZ5ncYN?=
- =?us-ascii?Q?yZRX0rWf0uRmPwPMLhr7AuSoe+VDA5yEl9MeK3JB81C5CqYFndtq8ILKZpUR?=
- =?us-ascii?Q?JeJNKT8HPsTz+yM4AMBSZxK1QtRjM8kwN6Lk1ruYhKOeQk4rbkkR8NvfVpya?=
- =?us-ascii?Q?/44Mf6HeSuWpzmbP6dvfeGVdFThK5gi+bgcGw+dSZVo5rjY/dqpzdeUYF87h?=
- =?us-ascii?Q?LE5V3/p36aMuX24B8EKoeNHJe4H3MhgcyLwGXct/S//q9JAz5qEkBnccYiZ3?=
- =?us-ascii?Q?J5h0OvLD1uT3kVwqr8pL7B7ycAs8qk8aTcZBF62QwGazFwd61O6vP6d/EfhR?=
- =?us-ascii?Q?Oyefg+CTGNGwpIj6Vh2txhEJfdo6CYSikr54S5yVL8dPOxSqtft/C3IMIuuO?=
- =?us-ascii?Q?D0XVkoh6dRahYbGQYadEfeY0IEO5cTh/wCfy2ZkvyTGFpJqgNqNhINdaMl59?=
- =?us-ascii?Q?orc5bgiZEdYp9suIeI8fKBl/NQXgfKXsFf5xY2OiZqW3t04seDO2JmoRGE3i?=
- =?us-ascii?Q?pvIMOWFj2X+ug2fxXcbmxzcdKnrvNz/sX8nzeKxmjHHBY3/5EcGkSyMKnhj0?=
- =?us-ascii?Q?bdonIk7K4wOwHfT1dX49dw/YLAl/yh2MQUj92I4qk8RF8byPDoRDhuNy6DN0?=
- =?us-ascii?Q?ssg8OLaEyvgvLbPlNqwIWyoC9VSGPgVkkAwItzB6U83TefF5X6RP7ZjDfpSZ?=
- =?us-ascii?Q?ZedUw555jZC/4LldFG/3w6RvR8fU/lBAHcOXyeDHV2rhO0auzQJFuEhjz0a+?=
- =?us-ascii?Q?gO5liv0nukfd5BLGXE6zjz8EcAQUG0tEAdvf2rfB2XCN8CnSbuIGC1kz2UQ6?=
- =?us-ascii?Q?lY5YB3Mci0l9cuwPWwJkq3zB3THlNNMNDDkezDxML54dHNSQORhBwv6v6+69?=
- =?us-ascii?Q?RhBUpO5Ynau1As5jfp3BOhz2ATMcHQ38M+jVgCpCtbVFpcd/BWV5cnvXe4gt?=
- =?us-ascii?Q?/z7f7OF+M5eokr4T6frjHDFh7YNcLbbqylDf4y6O0wfaxZD6/ghbgh12ywaY?=
- =?us-ascii?Q?Sj+ZO54jL8w5+saywzyEu7CjAafuUz3wBRfxMIL9Xtpw+npS+4gZpGTLyXYz?=
- =?us-ascii?Q?A130v53S2S/v1/yFai4W2sKSeyugluxrP7jS5D+XrKWX5uRDlc18hZS5vL/c?=
- =?us-ascii?Q?kNtoh7yu+m96HQ2K9dHDJ7NPuBHm6SGT?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCPR01MB11040.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(10070799003)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?3W1fOV7shdxbSBhWvozmVhTdIY7vTXYfTpAT/qgdrgXVUb8MbOypSMUVEcDK?=
- =?us-ascii?Q?dCLF+pQyxgzrl+rvRSq1XdaYLSKtZf0T5NG93J52LSCdB3eswXbiDL1gEwN/?=
- =?us-ascii?Q?FVJz5BDsnZRJZm1G9Arb0UY7n51EE566sIGpmjTMQbCAKIMqYuHf7ZFjuhJJ?=
- =?us-ascii?Q?9X26HDrNmF+Bpq84c+/GPh7Q5C1U2763JFUNkZip+VoW4jmPLcc2g3MtRSxq?=
- =?us-ascii?Q?rYbpIK96tFmKW5rNvEwb5R6+ti7ml7upMyDRMJ5mdqSXv0R4WmblPWSrVJ16?=
- =?us-ascii?Q?mOhmLg3clRF14ZP4n/6jd57Oc/cECAVpiu7mGgGQn3PtKBOhW4unCDamnJyH?=
- =?us-ascii?Q?DDnpjLS/fIHHoWZmJCHO1uTaadE5IpqMySuJj4e5B95pOsnT7x82njEWEve0?=
- =?us-ascii?Q?EmTPZi3TjirG05XiulP5fOjbiBqJGTARNk0l3L2HCiXEhV603o9Dj3R1FFiq?=
- =?us-ascii?Q?XQ70siyMmbVU637S30mkj4cSGxuDPY4WZaq6iBn3SmpIqhlpxuwAjbypVUc+?=
- =?us-ascii?Q?6AnEXvaz7d2XZjrRIl9bHUikos23ue5zWHtLUipv6NkQLMvSGDsSzbWqE8iE?=
- =?us-ascii?Q?NBNI6qvRjlNiEN5XybbfVzo3Pc63dIfKwG+7fSBopKdYwlh1lnLBpB6w+MAs?=
- =?us-ascii?Q?wAg6slohFwJJ3qgcw2rguRy1fp7my+gf9Yg9o44oM+EyJSLpXYWqonfjU/O/?=
- =?us-ascii?Q?O+iyUk1OpEQEpCqYXORssbiw8xCekXx6fSAPcaTsUkvXaZw0GDYzqlNtxJi5?=
- =?us-ascii?Q?8nfAnKJDkW31TCDc3X2E9vxQXI/N72hUhWO0A1+jiOhic/u+gHBiH4Q+Tyq7?=
- =?us-ascii?Q?5fmDDI8HQeIeZETjUIF3t5Z1ZzHOpMQ3kLtPOwS5vl6ed/lh7pavtloCXuGy?=
- =?us-ascii?Q?VFL11ICu6oEjo6elZc0vQNdwyFvOPwLe21czb4OPYv+RTyB4W5sM+W33Auei?=
- =?us-ascii?Q?eS1nWg5BfN0NPUWltF28mBMHsq5C0H6em46P1k0RyCHs7OM4PDKLS3AwzBv3?=
- =?us-ascii?Q?txSdN4A+k4EelteZUr5mlHJv0hmRH8JIBuLcAUfb7iNpCMPAkrLPXLVZIyBx?=
- =?us-ascii?Q?q2PPIpFkRVDkhMzsNPFj+W2uYaKvAcwbyZnFc6CMR0P6TcXVYrNBp6xC16UH?=
- =?us-ascii?Q?Puzqcpf7p/hnkbztzjiwt0hm5hR0ubq1do7MVdkZpBXTA88q/B7BX9mTS2Ya?=
- =?us-ascii?Q?87LhZ9EUjD8T2uxhDfk6tS/KHFUK4cyeQ30vRrn6bb8Lkx++mP9DQkGVT136?=
- =?us-ascii?Q?+id0IX1HComwjH4QQwKtvB3+ai4nBglqWfJthb+0BXbh9QGwhxkg17KO0f00?=
- =?us-ascii?Q?LVeMLJQuOhFPv2mQR6JmF8J4zaemJpCJDj0oENNwS2blCs8eZFeTk4c2WkyQ?=
- =?us-ascii?Q?fpR4zZ4bKMgxXNNPM7dC24if7Sy5s6npulUHYNwQQpicTiVbGHbCCBIPehaI?=
- =?us-ascii?Q?u7gZbwrtJ8zXJRAPM7yLAxSCKB2mpr0mIbO0n0L9djesgPlZYTSUYlLQHk8O?=
- =?us-ascii?Q?ILgTgcd2kJibGfHAw0wqXVW9QGbVisJAw397c/zHHmOdXicMlYWjZiolXjTv?=
- =?us-ascii?Q?rNt9yrp+bpmCHiJEHtEjFmH535j9iH1ujjy5aNjwlszEWmd49bpuxPTlRKUc?=
- =?us-ascii?Q?1NgDXDOEFkLxbT0Fyj1aLn+yMQoQDfW/mcOsMgr8CeKojEYS8gyFCM8eXI1A?=
- =?us-ascii?Q?P1v/yg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD90145A11
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 12:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734350486; cv=none; b=fg1KACWqJqCbkpcavfnhMOz31vXu+Ou5zPUqZrxbj9L6APokZ+u7m3t75Lv/Jj6TOXwGfTejQqpoVAzllHFmrOYiWXf5bbgjgDjlpY/fipnxv5m/jSmOJt4G95UNSBA2B+jvRucMdgOPwM5bK32/hIbFlMOl/zzid5NsaLs+Spo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734350486; c=relaxed/simple;
+	bh=sNV9Y3VGeVgFDgfIlWqqehwU0YXoyxqjgso3GkkCEGs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JCMeksYIeF+HHqiL7aPAJUi4y2rfbXTJHKjMm66O/PVGw/QwVic4lH8aUFwmraPjBkiM5zLt7QQcs8SxDZYJDnJAp49rbzGZ12P1sAjBs2nxDer0Xfi00nUYX/qBvFLEv14pv733HVNmuHIeKGikneoIzw6J3F58+mzqveCFFbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=j+dbecKp; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tN9mp-00Fljj-8V; Mon, 16 Dec 2024 13:01:19 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=kHwI018f2tp0JKSQ7BtXODdqIZnKVYb9OOshWYhwUCs=
+	; b=j+dbecKpfD3pdRIdWwaGHwsggGMSCZXevr72eFP6d0DcZ5XRfJ7Fyhy3hSpUV9QaC79tU14l7
+	WpGrB2WegruiHZL3Fz69XXeO5fR9f1XfXolVHoVA6acEAVbqY9jquZLRAEJQz6vA+TlR69WsKqhRs
+	qg5u9ROj4rD4gIrSMcSzZrpg2Pa3WLxWn5q1CKfjQqf4McpHgFEnW+EvSeMuKFgYOCe01MqjZkeCz
+	z3CYFl092V6VSAL0GXN+E5T3F/GAaNbI4hPXxU/niCK3z7tigOV2lHLyVvfzXJ9Z1q8Q4F28yjELk
+	yEXr71vDF7w5AEf2NDRNCpdhpdKUKq7C5HUEiQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tN9mo-0007oN-SS; Mon, 16 Dec 2024 13:01:19 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tN9mj-00DDDe-7C; Mon, 16 Dec 2024 13:01:13 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net-next v2 0/6] vsock/test: Tests for memory leaks
+Date: Mon, 16 Dec 2024 13:00:56 +0100
+Message-Id: <20241216-test-vsock-leaks-v2-0-55e1405742fc@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYCPR01MB11040.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9f8a375-8a3e-48a3-4c73-08dd1dc86439
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Dec 2024 11:54:26.8261
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: G3VCOjllWW7GH0gX661kS+aqTq97IhoSRiJzaW2mVYcG0QD8TtOPR9cggrIFsum9moUe2OR+GMC4TN4Qno797/Bu5oa6Ul4IVr5iTYVJ+6V8pNGJZBP92s5Vwxs3MUHq
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYAPR01MB5785
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHgWYGcC/2WNywrCMBBFf6XM2pEmMX248j+kixqnNlSSkgmhU
+ vLvhuLO5eFwz92BKVhiuFY7BEqWrXcF5KkCM4/uRWifhUHW8iJkrTASR0zszYJvGhdG1U291v2
+ kG9VAma2BJrsdyTs4iuhoizAUM1uOPnyOryQO/8s2/9kksEajBHWma3Xbt7fw8NvZeBhyzl8+3
+ VJRuAAAAA==
+X-Change-ID: 20241203-test-vsock-leaks-38f9559f5636
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>, 
+ Luigi Leonardi <leonardi@redhat.com>
+X-Mailer: b4 0.14.2
 
-Hello Nikita-san,
+Series adds tests for recently fixed memory leaks[1]:
 
-> From: Nikita Yushchenko, Sent: Monday, December 16, 2024 4:20 PM
->=20
-> This series cleans up rswitch mdio support, and adds C22 operations.
->=20
-> Nikita Yushchenko (5):
->   net: renesas: rswitch: do not write to MPSM register at init time
->   net: renesas: rswitch: use FIELD_PREP for remaining MPIC register
->     fields
->   net: renesas: rswitch: align mdio C45 operations with datasheet
->   net: renesas: rswitch: use generic MPSM operation for mdio C45
->   net: renesas: rswitch: add mdio C22 support
+commit d7b0ff5a8667 ("virtio/vsock: Fix accept_queue memory leak")
+commit fbf7085b3ad1 ("vsock: Fix sk_error_queue memory leak")
+commit 60cf6206a1f5 ("virtio/vsock: Improve MSG_ZEROCOPY error handling")
 
-Thank you for the patches. The patches look good to me. So,
+Patch 1/6 is a non-functional preparatory cleanup.
+Patch 2/6 is a test suite extension that I try to smuggle in, but is
+unrelated to the tests and can be safely dropped.
+Patch 3/6 explains the need of kmemleak scans.
+Patches 4-5-6 add the tests.
 
-Reviewed-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+[1]: https://lore.kernel.org/netdev/20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co/
 
-And, I tested the patches on my environment (R-Car S4 Spider), and
-it worked without any regression. So,
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v2:
+- Introduce a vsock_test option to run a single test
+- ZC completion test: rewrite, comment, describe failslab approach (Stefano)
+- accept_queue test: rewrite, comment (Stefano)
+- Annotate functions and commits about the need of kmemleak (Stefano)
+- Add README section about kmemleak (Stefano)
+- Collect R-b (Luigi, Stefano)
+- Link to v1: https://lore.kernel.org/r/20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co
 
-Tested-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+---
+Michal Luczaj (6):
+      vsock/test: Use NSEC_PER_SEC
+      vsock/test: Introduce option to run a single test
+      vsock/test: Add README blurb about kmemleak usage
+      vsock/test: Add test for accept_queue memory leak
+      vsock/test: Add test for sk_error_queue memory leak
+      vsock/test: Add test for MSG_ZEROCOPY completion memory leak
+
+ tools/testing/vsock/README       |  15 +++
+ tools/testing/vsock/util.c       |  20 ++-
+ tools/testing/vsock/util.h       |   2 +
+ tools/testing/vsock/vsock_test.c | 263 ++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 296 insertions(+), 4 deletions(-)
+---
+base-commit: 2c2b61d2138f472e50b5531ec0cb4a1485837e21
+change-id: 20241203-test-vsock-leaks-38f9559f5636
 
 Best regards,
-Yoshihiro Shimoda
-
-> ---
-> v1:
-<snip URL>
->=20
-> changes since v1:
-> - rebase against net-next/main as of commit 92c932b9946c ("Merge branch
->   'mptcp-pm-userspace-misc-cleanups'"),
-> - remove no longer used definitions for MMIS1 register bits,
-> - add patch to use FIELD_PREP for MPIC register fields, to keep the same
->   style as in already merged patch.
-> ---
->  drivers/net/ethernet/renesas/rswitch.c | 84 ++++++++++++++++----------
->  drivers/net/ethernet/renesas/rswitch.h | 33 ++++------
->  2 files changed, 65 insertions(+), 52 deletions(-)
->=20
-> --
-> 2.39.5
+-- 
+Michal Luczaj <mhal@rbox.co>
 
 
