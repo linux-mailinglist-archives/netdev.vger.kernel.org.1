@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-152061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59AEF9F292F
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 05:13:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D677A9F293D
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 05:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C52CF1886012
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 04:13:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A22E188881F
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 04:16:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0CE17A5BD;
-	Mon, 16 Dec 2024 04:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4A11D1F6B;
+	Mon, 16 Dec 2024 04:13:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08012AD18;
-	Mon, 16 Dec 2024 04:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03B21C8FD6;
+	Mon, 16 Dec 2024 04:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734322425; cv=none; b=vAlg91FTSc2ZkAIfBR/RRn9xU/tdVRS+cmU+JoRomcWCc0+6X4NcuVkaA9sFi2yHlZqHEIvjEgb+Ri9j79pAVDUp8Ptj9qodXPOabMqRUZa95d78lSrKAiaOAb8Jo+1n0J0/B2hFl4hshCxGCW6rix1MOE7JR7vi2DOf4W9xFGo=
+	t=1734322431; cv=none; b=amCzd8uT+5pqN1ChyjZYyqJtcT0tokIXkR4go0F0gawx4FPKZ615CjOmuVfsswdcwPQx1Y0vhNKe1stwjPr/cVlZeC9zsvKVYmEbV8OGIn83Zn0aKlrSo5WGd6c/BgHJpNL8JyOVCua6ngrpTmvF2rvdLDOzqBdZOz3JXyVYadw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734322425; c=relaxed/simple;
-	bh=7airDTSTaEgRguni6+UaCNnuNTq5+I5LbGXHXAK2oYU=;
+	s=arc-20240116; t=1734322431; c=relaxed/simple;
+	bh=TrG+nbzjqtDpBwexNZK6rdsspldjf/5J6+6anR2CbOs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c281q92NDT64GAlMNUC1AZUZkukse5O6DqZ6GWh7HD9HmbwquABnvFTRADWeO7TpXtx/Bs9GHNPmOMLmGgSj9ssD6ohUnFzMNqo1vbuhDLQl1H6mgRPnjDz+CRda1l15vHL3m00hUp9N2zWAQfT+PwLwjOd6BpLtAt0Zqse9oko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+	 MIME-Version:Content-Type; b=gsFEOFWbhkz1ipRjOxgjjHWbRN3E8fc34IWt5lOirMVGduEWPKmWqkWszDKtbpsxN39JLtOJqfX6QzhZtXJStH2Z0/xIYpKXPSewUJiYpIM/1tzDxq5d+9wh5Luby4xHkyAK4QGFOpxF+ToPKJklfDcAfvWskbTMYH4613fl6Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4YBRMJ08JBz1T7Bt;
-	Mon, 16 Dec 2024 12:11:08 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4YBRPr61p3z1JFMn;
+	Mon, 16 Dec 2024 12:13:20 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6659B1400D5;
-	Mon, 16 Dec 2024 12:13:40 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 15B841A0188;
+	Mon, 16 Dec 2024 12:13:41 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 16 Dec 2024 12:13:39 +0800
+ 15.2.1544.11; Mon, 16 Dec 2024 12:13:40 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
@@ -49,9 +49,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>, <hkelam@marvell.com>
-Subject: [PATCH V8 net-next 5/7] net: hibmcge: Add pauseparam supported in this module
-Date: Mon, 16 Dec 2024 12:05:30 +0800
-Message-ID: <20241216040532.1566229-6-shaojijie@huawei.com>
+Subject: [PATCH V8 net-next 6/7] net: hibmcge: Add reset supported in this module
+Date: Mon, 16 Dec 2024 12:05:31 +0800
+Message-ID: <20241216040532.1566229-7-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20241216040532.1566229-1-shaojijie@huawei.com>
 References: <20241216040532.1566229-1-shaojijie@huawei.com>
@@ -66,186 +66,476 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-The MAC can automatically send or respond to pause frames.
-This patch supports the function of enabling pause frames
-by using ethtool.
+Sometimes, if the port doesn't work, we can try to fix it by resetting it.
+
+This patch supports reset triggered by ethtool or FLR of PCIe, For example:
+ ethtool --reset eth0 dedicated
+ echo 1 > /sys/bus/pci/devices/0000\:83\:00.1/reset
+
+We hope that the reset can be performed only when the port is down,
+and the port cannot be up during the reset.
+Therefore, the entire reset process is protected by the rtnl lock.
+
+After the reset is complete, the hardware registers are restored
+to their default values. Therefore, some rebuild operations are
+required to rewrite the user configuration to the registers.
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- .../ethernet/hisilicon/hibmcge/hbg_common.h   |  1 +
- .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  | 25 +++++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 21 ++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |  3 +++
- .../net/ethernet/hisilicon/hibmcge/hbg_main.c |  1 +
- .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c | 15 +++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  2 ++
- 7 files changed, 68 insertions(+)
+ChangeLog:
+v4 -> v5:
+  - Simplify reset logic by optimizing rtnl lock, suggested by Jakub.
+  v4: https://lore.kernel.org/all/20241203150131.3139399-1-shaojijie@huawei.com/
+---
+ .../net/ethernet/hisilicon/hibmcge/Makefile   |   2 +-
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   |  16 +++
+ .../ethernet/hisilicon/hibmcge/hbg_debugfs.c  |  22 +++
+ .../net/ethernet/hisilicon/hibmcge/hbg_err.c  | 134 ++++++++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_err.h  |  13 ++
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  |  15 ++
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |  10 +-
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.c |  35 +++--
+ 8 files changed, 226 insertions(+), 21 deletions(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_err.h
 
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/Makefile b/drivers/net/ethernet/hisilicon/hibmcge/Makefile
+index 1a0ec2fb8c24..7ea15f9ef849 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/Makefile
++++ b/drivers/net/ethernet/hisilicon/hibmcge/Makefile
+@@ -6,4 +6,4 @@
+ obj-$(CONFIG_HIBMCGE) += hibmcge.o
+ 
+ hibmcge-objs = hbg_main.o hbg_hw.o hbg_mdio.o hbg_irq.o hbg_txrx.o hbg_ethtool.o \
+-		hbg_debugfs.o
++		hbg_debugfs.o hbg_err.o
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-index 9bb3abe88377..cc143a536713 100644
+index cc143a536713..b4300d8ea4ad 100644
 --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-@@ -115,6 +115,7 @@ struct hbg_mac {
- 	u32 duplex;
- 	u32 autoneg;
- 	u32 link_status;
-+	u32 pause_autoneg;
+@@ -4,6 +4,7 @@
+ #ifndef __HBG_COMMON_H
+ #define __HBG_COMMON_H
+ 
++#include <linux/ethtool.h>
+ #include <linux/netdevice.h>
+ #include <linux/pci.h>
+ #include "hbg_reg.h"
+@@ -33,6 +34,14 @@ enum hbg_tx_state {
+ 
+ enum hbg_nic_state {
+ 	HBG_NIC_STATE_EVENT_HANDLING = 0,
++	HBG_NIC_STATE_RESETTING,
++	HBG_NIC_STATE_RESET_FAIL,
++};
++
++enum hbg_reset_type {
++	HBG_RESET_TYPE_NONE = 0,
++	HBG_RESET_TYPE_FLR,
++	HBG_RESET_TYPE_FUNCTION,
  };
  
- struct hbg_mac_table_entry {
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-index e7f169d2abb7..a821a92db43d 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-@@ -143,12 +143,37 @@ static void hbg_ethtool_get_regs(struct net_device *netdev,
- 	}
+ struct hbg_buffer {
+@@ -128,6 +137,11 @@ struct hbg_mac_filter {
+ 	bool enabled;
+ };
+ 
++/* saved for restore after rest */
++struct hbg_user_def {
++	struct ethtool_pauseparam pause_param;
++};
++
+ struct hbg_priv {
+ 	struct net_device *netdev;
+ 	struct pci_dev *pdev;
+@@ -139,6 +153,8 @@ struct hbg_priv {
+ 	struct hbg_ring tx_ring;
+ 	struct hbg_ring rx_ring;
+ 	struct hbg_mac_filter filter;
++	enum hbg_reset_type reset_type;
++	struct hbg_user_def user_def;
+ };
+ 
+ #endif
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
+index 616b86333eec..8473c43d171a 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
+@@ -19,6 +19,8 @@ struct hbg_dbg_info {
+ 	int (*read)(struct seq_file *seq, void *data);
+ };
+ 
++#define state_str_true_false(p, s) str_true_false(test_bit(s, &(p)->state))
++
+ static void hbg_dbg_ring(struct hbg_priv *priv, struct hbg_ring *ring,
+ 			 struct seq_file *s)
+ {
+@@ -97,11 +99,31 @@ static int hbg_dbg_mac_table(struct seq_file *s, void *unused)
+ 	return 0;
  }
  
-+static void hbg_ethtool_get_pauseparam(struct net_device *net_dev,
-+				       struct ethtool_pauseparam *param)
++static const char * const reset_type_str[] = {"None", "FLR", "Function"};
++
++static int hbg_dbg_nic_state(struct seq_file *s, void *unused)
 +{
-+	struct hbg_priv *priv = netdev_priv(net_dev);
++	struct net_device *netdev = dev_get_drvdata(s->private);
++	struct hbg_priv *priv = netdev_priv(netdev);
 +
-+	param->autoneg = priv->mac.pause_autoneg;
-+	hbg_hw_get_pause_enable(priv, &param->tx_pause, &param->rx_pause);
-+}
-+
-+static int hbg_ethtool_set_pauseparam(struct net_device *net_dev,
-+				      struct ethtool_pauseparam *param)
-+{
-+	struct hbg_priv *priv = netdev_priv(net_dev);
-+
-+	priv->mac.pause_autoneg = param->autoneg;
-+	phy_set_asym_pause(priv->mac.phydev, param->rx_pause, param->tx_pause);
-+
-+	if (!param->autoneg)
-+		hbg_hw_set_pause_enable(priv, param->tx_pause, param->rx_pause);
++	seq_printf(s, "event handling state: %s\n",
++		   state_str_true_false(priv, HBG_NIC_STATE_EVENT_HANDLING));
++	seq_printf(s, "resetting state: %s\n",
++		   state_str_true_false(priv, HBG_NIC_STATE_RESETTING));
++	seq_printf(s, "reset fail state: %s\n",
++		   state_str_true_false(priv, HBG_NIC_STATE_RESET_FAIL));
++	seq_printf(s, "last reset type: %s\n",
++		   reset_type_str[priv->reset_type]);
 +
 +	return 0;
++}
++
+ static const struct hbg_dbg_info hbg_dbg_infos[] = {
+ 	{ "tx_ring", hbg_dbg_tx_ring },
+ 	{ "rx_ring", hbg_dbg_rx_ring },
+ 	{ "irq_info", hbg_dbg_irq_info },
+ 	{ "mac_table", hbg_dbg_mac_table },
++	{ "nic_state", hbg_dbg_nic_state },
+ };
+ 
+ static void hbg_debugfs_uninit(void *data)
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+new file mode 100644
+index 000000000000..4d1f4a33391a
+--- /dev/null
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+@@ -0,0 +1,134 @@
++// SPDX-License-Identifier: GPL-2.0+
++// Copyright (c) 2024 Hisilicon Limited.
++
++#include <linux/etherdevice.h>
++#include <linux/netdevice.h>
++#include <linux/phy.h>
++#include <linux/rtnetlink.h>
++#include "hbg_common.h"
++#include "hbg_err.h"
++#include "hbg_hw.h"
++
++static void hbg_restore_mac_table(struct hbg_priv *priv)
++{
++	struct hbg_mac_filter *filter = &priv->filter;
++	u64 addr;
++	u32 i;
++
++	for (i = 0; i < filter->table_max_len; i++)
++		if (!is_zero_ether_addr(filter->mac_table[i].addr)) {
++			addr = ether_addr_to_u64(filter->mac_table[i].addr);
++			hbg_hw_set_uc_addr(priv, addr, i);
++		}
++
++	hbg_hw_set_mac_filter_enable(priv, priv->filter.enabled);
++}
++
++static void hbg_restore_user_def_settings(struct hbg_priv *priv)
++{
++	struct ethtool_pauseparam *pause_param = &priv->user_def.pause_param;
++
++	hbg_restore_mac_table(priv);
++	hbg_hw_set_mtu(priv, priv->netdev->mtu);
++	hbg_hw_set_pause_enable(priv, pause_param->tx_pause,
++				pause_param->rx_pause);
++}
++
++int hbg_rebuild(struct hbg_priv *priv)
++{
++	int ret;
++
++	ret = hbg_hw_init(priv);
++	if (ret)
++		return ret;
++
++	hbg_restore_user_def_settings(priv);
++	return 0;
++}
++
++static int hbg_reset_prepare(struct hbg_priv *priv, enum hbg_reset_type type)
++{
++	int ret;
++
++	ASSERT_RTNL();
++
++	if (netif_running(priv->netdev)) {
++		dev_warn(&priv->pdev->dev,
++			 "failed to reset because port is up\n");
++		return -EBUSY;
++	}
++
++	priv->reset_type = type;
++	set_bit(HBG_NIC_STATE_RESETTING, &priv->state);
++	clear_bit(HBG_NIC_STATE_RESET_FAIL, &priv->state);
++	ret = hbg_hw_event_notify(priv, HBG_HW_EVENT_RESET);
++	if (ret) {
++		set_bit(HBG_NIC_STATE_RESET_FAIL, &priv->state);
++		clear_bit(HBG_NIC_STATE_RESETTING, &priv->state);
++	}
++
++	return ret;
++}
++
++static int hbg_reset_done(struct hbg_priv *priv, enum hbg_reset_type type)
++{
++	int ret;
++
++	if (!test_bit(HBG_NIC_STATE_RESETTING, &priv->state) ||
++	    type != priv->reset_type)
++		return 0;
++
++	ASSERT_RTNL();
++
++	clear_bit(HBG_NIC_STATE_RESETTING, &priv->state);
++	ret = hbg_rebuild(priv);
++	if (ret) {
++		set_bit(HBG_NIC_STATE_RESET_FAIL, &priv->state);
++		dev_err(&priv->pdev->dev, "failed to rebuild after reset\n");
++		return ret;
++	}
++
++	dev_info(&priv->pdev->dev, "reset done\n");
++	return ret;
++}
++
++/* must be protected by rtnl lock */
++int hbg_reset(struct hbg_priv *priv)
++{
++	int ret;
++
++	ASSERT_RTNL();
++	ret = hbg_reset_prepare(priv, HBG_RESET_TYPE_FUNCTION);
++	if (ret)
++		return ret;
++
++	return hbg_reset_done(priv, HBG_RESET_TYPE_FUNCTION);
++}
++
++static void hbg_pci_err_reset_prepare(struct pci_dev *pdev)
++{
++	struct net_device *netdev = pci_get_drvdata(pdev);
++	struct hbg_priv *priv = netdev_priv(netdev);
++
++	rtnl_lock();
++	hbg_reset_prepare(priv, HBG_RESET_TYPE_FLR);
++}
++
++static void hbg_pci_err_reset_done(struct pci_dev *pdev)
++{
++	struct net_device *netdev = pci_get_drvdata(pdev);
++	struct hbg_priv *priv = netdev_priv(netdev);
++
++	hbg_reset_done(priv, HBG_RESET_TYPE_FLR);
++	rtnl_unlock();
++}
++
++static const struct pci_error_handlers hbg_pci_err_handler = {
++	.reset_prepare = hbg_pci_err_reset_prepare,
++	.reset_done = hbg_pci_err_reset_done,
++};
++
++void hbg_set_pci_err_handler(struct pci_driver *pdrv)
++{
++	pdrv->err_handler = &hbg_pci_err_handler;
++}
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.h
+new file mode 100644
+index 000000000000..d7828e446308
+--- /dev/null
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/* Copyright (c) 2024 Hisilicon Limited. */
++
++#ifndef __HBG_ERR_H
++#define __HBG_ERR_H
++
++#include <linux/pci.h>
++
++void hbg_set_pci_err_handler(struct pci_driver *pdrv);
++int hbg_reset(struct hbg_priv *priv);
++int hbg_rebuild(struct hbg_priv *priv);
++
++#endif
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+index a821a92db43d..326228b7b801 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+@@ -3,7 +3,9 @@
+ 
+ #include <linux/ethtool.h>
+ #include <linux/phy.h>
++#include <linux/rtnetlink.h>
+ #include "hbg_common.h"
++#include "hbg_err.h"
+ #include "hbg_ethtool.h"
+ #include "hbg_hw.h"
+ 
+@@ -163,9 +165,21 @@ static int hbg_ethtool_set_pauseparam(struct net_device *net_dev,
+ 	if (!param->autoneg)
+ 		hbg_hw_set_pause_enable(priv, param->tx_pause, param->rx_pause);
+ 
++	priv->user_def.pause_param = *param;
+ 	return 0;
+ }
+ 
++static int hbg_ethtool_reset(struct net_device *netdev, u32 *flags)
++{
++	struct hbg_priv *priv = netdev_priv(netdev);
++
++	if (*flags != ETH_RESET_DEDICATED)
++		return -EOPNOTSUPP;
++
++	*flags = 0;
++	return hbg_reset(priv);
 +}
 +
  static const struct ethtool_ops hbg_ethtool_ops = {
  	.get_link		= ethtool_op_get_link,
  	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
- 	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
- 	.get_regs_len		= hbg_ethtool_get_regs_len,
+@@ -174,6 +188,7 @@ static const struct ethtool_ops hbg_ethtool_ops = {
  	.get_regs		= hbg_ethtool_get_regs,
-+	.get_pauseparam         = hbg_ethtool_get_pauseparam,
-+	.set_pauseparam         = hbg_ethtool_set_pauseparam,
+ 	.get_pauseparam         = hbg_ethtool_get_pauseparam,
+ 	.set_pauseparam         = hbg_ethtool_set_pauseparam,
++	.reset			= hbg_ethtool_reset,
  };
  
  void hbg_ethtool_set_ops(struct net_device *netdev)
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-index 29d66a0ea0a6..0cbe9f7229b3 100644
+index 0cbe9f7229b3..e7798f213645 100644
 --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-@@ -220,6 +220,27 @@ void hbg_hw_set_mac_filter_enable(struct hbg_priv *priv, u32 enable)
- 			    HBG_REG_REC_FILT_CTRL_UC_MATCH_EN_B, enable);
+@@ -3,6 +3,7 @@
+ 
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
++#include <linux/if_vlan.h>
+ #include <linux/iopoll.h>
+ #include <linux/minmax.h>
+ #include "hbg_common.h"
+@@ -167,8 +168,13 @@ static void hbg_hw_set_mac_max_frame_len(struct hbg_priv *priv,
+ 
+ void hbg_hw_set_mtu(struct hbg_priv *priv, u16 mtu)
+ {
+-	hbg_hw_set_pcu_max_frame_len(priv, mtu);
+-	hbg_hw_set_mac_max_frame_len(priv, mtu);
++	u32 frame_len;
++
++	frame_len = mtu + VLAN_HLEN * priv->dev_specs.vlan_layers +
++		    ETH_HLEN + ETH_FCS_LEN;
++
++	hbg_hw_set_pcu_max_frame_len(priv, frame_len);
++	hbg_hw_set_mac_max_frame_len(priv, frame_len);
  }
  
-+void hbg_hw_set_pause_enable(struct hbg_priv *priv, u32 tx_en, u32 rx_en)
-+{
-+	hbg_reg_write_field(priv, HBG_REG_PAUSE_ENABLE_ADDR,
-+			    HBG_REG_PAUSE_ENABLE_TX_B, tx_en);
-+	hbg_reg_write_field(priv, HBG_REG_PAUSE_ENABLE_ADDR,
-+			    HBG_REG_PAUSE_ENABLE_RX_B, rx_en);
-+}
-+
-+void hbg_hw_get_pause_enable(struct hbg_priv *priv, u32 *tx_en, u32 *rx_en)
-+{
-+	*tx_en = hbg_reg_read_field(priv, HBG_REG_PAUSE_ENABLE_ADDR,
-+				    HBG_REG_PAUSE_ENABLE_TX_B);
-+	*rx_en = hbg_reg_read_field(priv, HBG_REG_PAUSE_ENABLE_ADDR,
-+				    HBG_REG_PAUSE_ENABLE_RX_B);
-+}
-+
-+void hbg_hw_set_rx_pause_mac_addr(struct hbg_priv *priv, u64 mac_addr)
-+{
-+	hbg_reg_write64(priv, HBG_REG_FD_FC_ADDR_LOW_ADDR, mac_addr);
-+}
-+
- static void hbg_hw_init_transmit_ctrl(struct hbg_priv *priv)
- {
- 	u32 ctrl = 0;
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
-index 6eb4b7d2cba8..a4a049b5121d 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
-@@ -56,5 +56,8 @@ u32 hbg_hw_get_fifo_used_num(struct hbg_priv *priv, enum hbg_dir dir);
- void hbg_hw_set_tx_desc(struct hbg_priv *priv, struct hbg_tx_desc *tx_desc);
- void hbg_hw_fill_buffer(struct hbg_priv *priv, u32 buffer_dma_addr);
- void hbg_hw_set_mac_filter_enable(struct hbg_priv *priv, u32 enable);
-+void hbg_hw_set_pause_enable(struct hbg_priv *priv, u32 tx_en, u32 rx_en);
-+void hbg_hw_get_pause_enable(struct hbg_priv *priv, u32 *tx_en, u32 *rx_en);
-+void hbg_hw_set_rx_pause_mac_addr(struct hbg_priv *priv, u64 mac_addr);
- 
- #endif
+ void hbg_hw_mac_enable(struct hbg_priv *priv, u32 enable)
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-index 578ba8ee409b..8a2d63c0c196 100644
+index 8a2d63c0c196..bb0f25ac9760 100644
 --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-@@ -191,6 +191,7 @@ static int hbg_net_set_mac_address(struct net_device *netdev, void *addr)
- 	if (exists)
- 		hbg_set_mac_to_mac_table(priv, index, NULL);
+@@ -6,6 +6,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/pci.h>
+ #include "hbg_common.h"
++#include "hbg_err.h"
+ #include "hbg_ethtool.h"
+ #include "hbg_hw.h"
+ #include "hbg_irq.h"
+@@ -13,8 +14,6 @@
+ #include "hbg_txrx.h"
+ #include "hbg_debugfs.h"
  
-+	hbg_hw_set_rx_pause_mac_addr(priv, ether_addr_to_u64(mac_addr));
- 	dev_addr_set(netdev, mac_addr);
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
-index a3479fba8501..db6bc4cfb971 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
-@@ -114,6 +114,19 @@ static void hbg_mdio_init_hw(struct hbg_priv *priv)
- 	hbg_mdio_set_command(mac, cmd);
- }
- 
-+static void hbg_flowctrl_cfg(struct hbg_priv *priv)
-+{
-+	struct phy_device *phydev = priv->mac.phydev;
-+	bool rx_pause;
-+	bool tx_pause;
-+
-+	if (!priv->mac.pause_autoneg)
-+		return;
-+
-+	phy_get_pause(phydev, &tx_pause, &rx_pause);
-+	hbg_hw_set_pause_enable(priv, tx_pause, rx_pause);
-+}
-+
- static void hbg_phy_adjust_link(struct net_device *netdev)
+-static void hbg_change_mtu(struct hbg_priv *priv, int new_mtu);
+-
+ static void hbg_all_irq_enable(struct hbg_priv *priv, bool enabled)
  {
- 	struct hbg_priv *priv = netdev_priv(netdev);
-@@ -140,6 +153,7 @@ static void hbg_phy_adjust_link(struct net_device *netdev)
- 			priv->mac.duplex = phydev->duplex;
- 			priv->mac.autoneg = phydev->autoneg;
- 			hbg_hw_adjust_link(priv, speed, phydev->duplex);
-+			hbg_flowctrl_cfg(priv);
- 		}
- 
- 		priv->mac.link_status = phydev->link;
-@@ -168,6 +182,7 @@ static int hbg_phy_connect(struct hbg_priv *priv)
+ 	struct hbg_irq_info *info;
+@@ -56,11 +55,7 @@ static int hbg_hw_txrx_clear(struct hbg_priv *priv)
  		return ret;
  
- 	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
-+	phy_support_asym_pause(phydev);
- 	phy_attached_info(phydev);
+ 	/* After reset, regs need to be reconfigured */
+-	hbg_hw_init(priv);
+-	hbg_hw_set_uc_addr(priv, ether_addr_to_u64(priv->netdev->dev_addr), 0);
+-	hbg_change_mtu(priv, priv->netdev->mtu);
+-
+-	return 0;
++	return hbg_rebuild(priv);
+ }
  
+ static int hbg_net_stop(struct net_device *netdev)
+@@ -196,15 +191,6 @@ static int hbg_net_set_mac_address(struct net_device *netdev, void *addr)
  	return 0;
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-index 665666712c7c..f12efc12f3c5 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-@@ -51,6 +51,8 @@
- #define HBG_REG_PORT_ENABLE_RX_B		BIT(1)
- #define HBG_REG_PORT_ENABLE_TX_B		BIT(2)
- #define HBG_REG_PAUSE_ENABLE_ADDR		(HBG_REG_SGMII_BASE + 0x0048)
-+#define HBG_REG_PAUSE_ENABLE_RX_B		BIT(0)
-+#define HBG_REG_PAUSE_ENABLE_TX_B		BIT(1)
- #define HBG_REG_AN_NEG_STATE_ADDR		(HBG_REG_SGMII_BASE + 0x0058)
- #define HBG_REG_TRANSMIT_CTRL_ADDR		(HBG_REG_SGMII_BASE + 0x0060)
- #define HBG_REG_TRANSMIT_CTRL_PAD_EN_B		BIT(7)
+ }
+ 
+-static void hbg_change_mtu(struct hbg_priv *priv, int new_mtu)
+-{
+-	u32 frame_len;
+-
+-	frame_len = new_mtu + VLAN_HLEN * priv->dev_specs.vlan_layers +
+-		    ETH_HLEN + ETH_FCS_LEN;
+-	hbg_hw_set_mtu(priv, frame_len);
+-}
+-
+ static int hbg_net_change_mtu(struct net_device *netdev, int new_mtu)
+ {
+ 	struct hbg_priv *priv = netdev_priv(netdev);
+@@ -212,7 +198,7 @@ static int hbg_net_change_mtu(struct net_device *netdev, int new_mtu)
+ 	if (netif_running(netdev))
+ 		return -EBUSY;
+ 
+-	hbg_change_mtu(priv, new_mtu);
++	hbg_hw_set_mtu(priv, new_mtu);
+ 	WRITE_ONCE(netdev->mtu, new_mtu);
+ 
+ 	dev_dbg(&priv->pdev->dev,
+@@ -270,6 +256,17 @@ static int hbg_mac_filter_init(struct hbg_priv *priv)
+ 	return 0;
+ }
+ 
++static void hbg_init_user_def(struct hbg_priv *priv)
++{
++	struct ethtool_pauseparam *pause_param = &priv->user_def.pause_param;
++
++	priv->mac.pause_autoneg = HBG_STATUS_ENABLE;
++
++	pause_param->autoneg = priv->mac.pause_autoneg;
++	hbg_hw_get_pause_enable(priv, &pause_param->tx_pause,
++				&pause_param->rx_pause);
++}
++
+ static int hbg_init(struct hbg_priv *priv)
+ {
+ 	int ret;
+@@ -295,6 +292,7 @@ static int hbg_init(struct hbg_priv *priv)
+ 		return ret;
+ 
+ 	hbg_debugfs_init(priv);
++	hbg_init_user_def(priv);
+ 	return 0;
+ }
+ 
+@@ -359,7 +357,7 @@ static int hbg_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	netdev->netdev_ops = &hbg_netdev_ops;
+ 	netdev->watchdog_timeo = 5 * HZ;
+ 
+-	hbg_change_mtu(priv, ETH_DATA_LEN);
++	hbg_hw_set_mtu(priv, ETH_DATA_LEN);
+ 	hbg_net_set_mac_address(priv->netdev, &priv->dev_specs.mac_addr);
+ 	hbg_ethtool_set_ops(netdev);
+ 
+@@ -388,6 +386,7 @@ static int __init hbg_module_init(void)
+ 	int ret;
+ 
+ 	hbg_debugfs_register();
++	hbg_set_pci_err_handler(&hbg_driver);
+ 	ret = pci_register_driver(&hbg_driver);
+ 	if (ret)
+ 		hbg_debugfs_unregister();
 -- 
 2.33.0
 
