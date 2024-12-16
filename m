@@ -1,114 +1,80 @@
-Return-Path: <netdev+bounces-152332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F3AA9F3743
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:17:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F1079F3748
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:18:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDF8D18856F4
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 17:16:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53A1418918F0
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 17:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AE5204F75;
-	Mon, 16 Dec 2024 17:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE2B14884F;
+	Mon, 16 Dec 2024 17:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nHLdDIaC"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ay1F25cM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2065.outbound.protection.outlook.com [40.107.220.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3CF204573;
-	Mon, 16 Dec 2024 17:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9E9839F4
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 17:17:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734369371; cv=fail; b=NHUQMngqtKrHtcDIWEmojOrG1grCl9fVeycpOJ8BV3o7hWJVe/36pf7eeTmSVyydt9rQMIw0ADW/I4xB0DQIFgjwNbMpGv1aBcRXvK+r9zAK42aCCTAsxGKVX/pwkZwwgnkmhrvHYHtm6NqZmy06eDkL+wtnOwX/LnNF0b6tRJU=
+	t=1734369430; cv=fail; b=bXTbn75q4i/e78uoPTqtBC7aoY88Z9QCnlpq3cGrCbPQhbI31EgiwiqzXAtLRHcg4g2h3VJVmkPneW00wIaIXSScyIkPebhCziA7uHcPqwRgdYyRKKsY99ttFLft58Wk0Xtzc4VW1sjaDWsvh6ju/SOoYwdWMTOWWlXqsKE5YrI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734369371; c=relaxed/simple;
-	bh=9mper91XNT6NA9I2tskFrvFInOhwuFhcLoSb8cyy9XM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AEL2sb7IZ6CItAz5UAfCKUnj8cl4dzLJW/7GPeKenbfjGXoWW6H4TPb/JXsICPF4lMvBiSqiuy8NCiWCLoZpflYxanbRY3tNXNDJElNcm+CtX9+jHU1//EtJJa1uRKurL6sarX0KGQjCKor+W56nuBf84HMJNOUEGz3T4cN+acw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nHLdDIaC; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734369369; x=1765905369;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=9mper91XNT6NA9I2tskFrvFInOhwuFhcLoSb8cyy9XM=;
-  b=nHLdDIaCm81Fi+xP1cIJNAl+sCM1MIZFxleT/yTKwBTlkd3h357OrXXj
-   Y+UBBCWqI7wykF+yR7rWMzsj3xiWLlCnHQYbiJNpGaZgOy+l7ebnZlZGb
-   Jq1JH00LKc7Qg1YoOLW9AwjvWbBXtPsmeeecpm211f9+auEbbmmdngxvQ
-   ajMe81bPE7IqSDgp6Vj8SI+7e7Z4OEeqJPF6BOtsJ/Eb01f3RpXyvQxn/
-   gnKxYezn6GLHsZZuZXFYpR6UP/mPSaABzT3dRoPmS82scKpIEvsVS7HdY
-   vRIhuxdXjS/UiKz69SgRuXJ+a3qDXyEstSi5FtpEJXtZkc8qu+qouw4Yf
-   A==;
-X-CSE-ConnectionGUID: zPj/7VO/QQip4Hp49JxPyw==
-X-CSE-MsgGUID: 7w0brI3eTw6X2nf0Yhu/rw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11288"; a="57247114"
-X-IronPort-AV: E=Sophos;i="6.12,239,1728975600"; 
-   d="scan'208";a="57247114"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2024 09:16:08 -0800
-X-CSE-ConnectionGUID: ZKGHDQwYQyS9hhI9NVJKvw==
-X-CSE-MsgGUID: EggsXpbHSXCTOVDfcYWmbg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="102346485"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Dec 2024 09:16:08 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 16 Dec 2024 09:16:06 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Mon, 16 Dec 2024 09:16:06 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 16 Dec 2024 09:16:06 -0800
+	s=arc-20240116; t=1734369430; c=relaxed/simple;
+	bh=REk05iWLBpbPdtNMSczl2OBcTULdRNZY2J45cymAB1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ow5i8uqtTZOSyTtA14jzvli0rk3sPzOpTXuZWZQ0GQA2dMhAh9j7q9OfE37RWgOtBNM8hknO66p3oTmM7rqJt7F6+JNmU6y92IC7AQVszmByiWLbb18NM7ShqKIq0mBOMlk7GWPTAj8XzsDHSsq71eygvA84Af/A82BglGYjx74=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ay1F25cM; arc=fail smtp.client-ip=40.107.220.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rM/jqyppab5bYOJknozLe9PFG/az3EfA+ABwv8lfri2jlKLAm7BbkjIjCmmN+1/yPZQRReUX9obl+fryps5NeilRpJ/w5z5VVZ89GTpHsatXUmeBDmcfLHQ+g3VcEtuLelgevx6VkUiznZuqskCZoAccxw7Pj3cnqwvME3/jf+8ZBSgiHX/a49vc2ck9RfG6fwygPW6uLuJu/dW0nqJSXX0BHpx+meaR5/UxxAPMQhZQ0k5MMOuOpVjXQG2RbZ/NS0HH2Kb4wvMaihBXAMJOY03Dz2htgFla2cAwNIZkOIQmm3lLTr/b3fR72wtzvf6DCo6Vjj3WbS9UP4n/gG9Tjw==
+ b=TNjW9fWXZQieOARvNJvp8aXSjCtHiD7jGZ41M1eb98VK7xZS6ERTks7Nv/XexRJ0xrTu2bsabQvy6Q25yudRj2+ExCvLYx2oDR5HF098Ffrbo3bEd+7Cv3QYDX/QfuhtbQh/1/aoO1Ci2tGqxirC21yY2Kcm2gQpvkpWiCm3OpomV+kmDo0nCzPD2Ceo6j9wqfGaTzBj1QXrGIihNkZz9dQS4Rfhz9XdN3HWuGHraer3tlHtcw9dGtu0ubNxvlDhtwLhC9ikb95ZuTOgko6srfEbx/J/0f4vAqJ5Hp+FMkFNwChhVcahO7zd3qY37A6yFIGTkdnjBGwdbPNdB0e27Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=95DyQ0WO7KuZ7Mbuc1TAzDgAuAWe1zTuD8pi38ojrOY=;
- b=X8oO77F/HGv+epfu9ytU97WrM8EaYmVeCQRd3WKM2BtOEjlzxdYqWljNwH/BfTDR3WFoLac8gPqpilxcYXOBh2/EfB9lxQTzihlAWj/J0tFez0dlPh+7y6pZtTYt6p7UTU8NsXVXQpAmwuuHshF38cOHqGaDcrm21vP/bFVwkDbbOZ0XcY8H7J3nQTjyKsEcE5MiW+df3EcZ3rbQLY7EsFrqXmihOQ7pO6AWgE48ssNSRKzI5oyL3pw8y1ORmX0C92IZIcU92WYd85msnzhC8k4WdUmSZANX3mNefWRvtMpReEskZNAcutQRiD3uo3Hz6NJxl55NdJhMNp25D9c4+A==
+ bh=6kSi5jxN70ELCKoJ2xsYuINqbfantT4tmhyLd1uVzlk=;
+ b=pJlZlLEtgksrkquvSDVLm5qEDldXRVhvbjrxR+APaEpvOeXWmgR/JltYQ/RYLio9GrB1/XirDEO3MwUDsjSWNHryVIWybH+s1MNUqTGa5MoK7NkwaFWW/GE9NoSYfGVW3LGsQ7LqzU+6i31VTYhZfRJj3HBlkmWomgsLk+35nWis9wHzFLy0Nnzf+4EjGIjMU1Br8kUJ2napsk6lHp/wG9MG/8srEW8SA19Z7Ep87AlJDf2dbifbDWP+/Xo3RLzmdPQ3DgG1gNcdl39O+JIVC3IkGaGwXIyerJBids8ZOJdbgD/PovzNFlxXJrvxhS9prX0+uUhihYyAOzOrePTENg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6kSi5jxN70ELCKoJ2xsYuINqbfantT4tmhyLd1uVzlk=;
+ b=Ay1F25cMekjLLfGf9XmTIMeojnGBTPr1Ip8vZrodzNUM9Hmayz2vYM0GNMdqmzbdrUHsAa6DCBJIwEJZ+EF5BE+Ij3KPelFzIHZxIL8ltwxrXllytXoclHq72p31p6izVO8xBTRj67Kv52eAqc9ptD1gy0449u2zENK/qEgjiJw7aOuwZ4zgtvYPPbiMzhR9rmdTRYqkl0VSwSQooXOZ1O8YfdTUBbBF6k+Ug1qKfiQzIG9ttfbFsrffE/JXxcD0VCNCSuuVD9Kw8qlIbRwBGqUJ4ReWnYF3OfI8hKx8Ji6Q9HkGO1Un5DcurGGJRz8h3HzvFFLPtpSrv86conuVPA==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by SJ0PR11MB6623.namprd11.prod.outlook.com (2603:10b6:a03:479::11) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
+ by PH7PR12MB6859.namprd12.prod.outlook.com (2603:10b6:510:1b5::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.21; Mon, 16 Dec
- 2024 17:16:04 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29%5]) with mapi id 15.20.8251.015; Mon, 16 Dec 2024
- 17:16:02 +0000
-Date: Mon, 16 Dec 2024 18:15:47 +0100
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>,
-	<jacob.e.keller@intel.com>
-Subject: Re: [PATCH net v4 2/2] net: ethernet: oa_tc6: fix tx skb race
- condition between reference pointers
-Message-ID: <Z2BgQ54+QOOib/Fe@lzaremba-mobl.ger.corp.intel.com>
-References: <20241213123159.439739-1-parthiban.veerasooran@microchip.com>
- <20241213123159.439739-3-parthiban.veerasooran@microchip.com>
-Content-Type: text/plain; charset="us-ascii"
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Mon, 16 Dec
+ 2024 17:17:06 +0000
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3a32:fdf9:cf10:e695]) by DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3a32:fdf9:cf10:e695%5]) with mapi id 15.20.8251.015; Mon, 16 Dec 2024
+ 17:17:06 +0000
+Date: Mon, 16 Dec 2024 19:16:55 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, dsahern@kernel.org, donald.hunter@gmail.com,
+	horms@kernel.org, gnault@redhat.com, rostedt@goodmis.org,
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+	petrm@nvidia.com
+Subject: Re: [PATCH net-next 0/9] net: fib_rules: Add flow label selector
+ support
+Message-ID: <Z2Bgh94m31sC7SIX@shredder>
+References: <20241216171201.274644-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241213123159.439739-3-parthiban.veerasooran@microchip.com>
-X-ClientProxiedBy: MI0P293CA0014.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:44::14) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+In-Reply-To: <20241216171201.274644-1-idosch@nvidia.com>
+X-ClientProxiedBy: FR5P281CA0051.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f0::20) To DS0PR12MB7900.namprd12.prod.outlook.com
+ (2603:10b6:8:14e::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,195 +82,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|SJ0PR11MB6623:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3ff6ad55-0a77-4561-304d-08dd1df55135
+X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|PH7PR12MB6859:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d847dff-05aa-4c32-fe3e-08dd1df5770e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?vUj/LPZVOmh8NVyrlTqTbLXbBg8eHxpQmtLQRvu47Ht6wZKgXMdaPtfK4JFj?=
- =?us-ascii?Q?4Bb2+Pq7XP+yx2VFSgx8dZUbwIi5soGnMJqHo7SOT1gcwfLruKoDSPFdc00f?=
- =?us-ascii?Q?KmkQ8S6dK8XnuuIHFM8OD3GSRCBr5mEpMTSCD4/Mq/IHFFaPcM/q/l7d+JYM?=
- =?us-ascii?Q?QgIGjHTPs5VsuvaHeEzfGNhWqx8NPl/YpCi+TUB8LFxauXYXSjUwJGCXuYvF?=
- =?us-ascii?Q?3a7zMW0KPrXnJhuJFQx1E2yB6c1P0EVHXA75Cx7PbHEomxrbozuhKmiw4z2H?=
- =?us-ascii?Q?y+d1RhXNHfV7HwVRW0igfiL/wAYsyu9chqOTzqGZLbhSZn2nHVx8XWHtQlIq?=
- =?us-ascii?Q?r+3iM0aZwe5tWf6Gzfz7rV1fN6MwvRJLyntyqxYTA3arPjzflvn9VLbaG172?=
- =?us-ascii?Q?KtK99KwniGQ9pvqKvIzUS36J6lfiGCx91gWekc1gCNHuiYp6RHv5u1+AA4j6?=
- =?us-ascii?Q?tFGCVqG3n1M15Zhyrw+JCDD/Wa4zlTcUddOr7FS06cGAVN+4K3DSJvlmNzI5?=
- =?us-ascii?Q?zzG8OI2TKv+JHrv+0s1+sGKfv17KC1jxCbLjrm+cijZDHilDn9c+XJEagYwF?=
- =?us-ascii?Q?h5pAihA7K8o4EsNhBc4gBMR2Moml0UNS90uOe7heBnHQ7VqSIr7n3vJRKQkg?=
- =?us-ascii?Q?AdlBGpbjxEo4QsOMRNpZvto4IoSbb5EbGyp5aj3W8n2WdO56OlVChwDE9sa3?=
- =?us-ascii?Q?+RssaydJRl4PN7N0UP/UTXPJtS2k3/ERtvP/BJoA9mBFa8rHyMqi5FmYXxa2?=
- =?us-ascii?Q?/8hfwHUxqlAVay6OX46JdwQGi0HKB9EK4r3tOhWDqZnvuJuiw4Genlj/35v3?=
- =?us-ascii?Q?rvn5vay0qfmSOlM74zXCWEjTqne5cEj+832tiyuusff8+CCGb5wzGvfxzbNh?=
- =?us-ascii?Q?wAaRxhRhUIjgy29kepAGxXiVF6GslPYA934gsDXDbfV1c9TxBGa/IKbMEthe?=
- =?us-ascii?Q?uzYsvh/LIpOpBybQrqmzNm67z+d2a5YEfvmpT7ln429HZlP2gqH+5Zf6VILg?=
- =?us-ascii?Q?+8COX65XK9LFJxNcDzec2eB+SsSBORoU1nsP4bPC5p/KJdUKSaVt/y5B3hHW?=
- =?us-ascii?Q?WYdzwFvkgKTcJQINhCoY4ImpqM3eIJYz8YJlivsYofrwICJwF4r6tGxE7LYp?=
- =?us-ascii?Q?gaTSqT5x0UEE6yGiUTyG5/yfMw0bl0kX06I6FZJUaeA7Vs0reLbh4ENLGBPA?=
- =?us-ascii?Q?zt4Yk/Edk42KmwQ7mRoVK0YbewfkLMReZMVmKoLevh1tfjRaT2crCjXv3gCr?=
- =?us-ascii?Q?akE1YOm+UdE4/9mTGNyDRNb43SI/P12e5er3/tH9zDW6RnwnUlT+vaJYaG0q?=
- =?us-ascii?Q?Km2F8U2dAMXNJ9goHR99Hgwa9U3p/ku/QO7oPVFlMTfZjLNCOxBqubHnT1hM?=
- =?us-ascii?Q?EE519wRCdiDJGvJsMi/u31OnFO/j?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xM02tkneFqkRwAWkh3CYKzA6HI+cZjAIepdnMQW4fxdi50W59+/DGvaTjcDA?=
+ =?us-ascii?Q?FHd9+m4D0mRnxPimSSkPY8PoSx0h4vxWVHPb7ktrDTvOMMnRES2VPL/B7nOx?=
+ =?us-ascii?Q?McAArvYwFMjKafwYjA8Qod/VBJsd7uzaGwLXWvk5IdOsEF493VJhWV6chUh+?=
+ =?us-ascii?Q?izw2SomnpMNLjMtSPUQFinCtDQZfdhGBUoJ0Y0MgcRo5pveFBKB9lcL3x3ro?=
+ =?us-ascii?Q?R+tBq3YD7k7z6SA8Oa0C2e0yXIVwdfpeIrnbhfs+pG21jrcj01vPLu8/2ByG?=
+ =?us-ascii?Q?74T/AAwj329e07Z4kX6f/mwjr5nv33hU37Hat2shbDKAfZ/06w398bC0eHBu?=
+ =?us-ascii?Q?MgDeAoq0NKhccJNU9mWVU/iA/auDYnij4ewwL99YO010QGLWKty5k4cVK325?=
+ =?us-ascii?Q?JbQsH7IlmXb1FoEOzJtZxzd6vdWgFutd+9QiaYhDGPxfbYrNjH4Sg+lsusRh?=
+ =?us-ascii?Q?hlat4k9xqoNMuQENrrcwLTrbZlpKvt2NuPnuItQmT0x66ZES/n2Xgaj9ctyX?=
+ =?us-ascii?Q?W14fPt1kc9CHrMtX0t9fB0epF9wEa8PKZYh3/QlKd9V75evTIDssUbkFN+pB?=
+ =?us-ascii?Q?3yypmlWS4OOGhbaQpuGsx1mK2lHxC2MbL+z+g35WTDpgC1LkN/PyLx/1+Rjs?=
+ =?us-ascii?Q?soLQACR1lk03VHrrKpO677+HCFCxfR9WR3cYV39Y1Fmc+5a0RcUCVTG0KSfO?=
+ =?us-ascii?Q?TM+mDwpWhzv07QCa0ESLrDZKIR1/aoahtDY1RCKVnz/wOY35wbpsL+xx9Fs6?=
+ =?us-ascii?Q?Eq9HZXsEqi0KWqHCMiMq9Q2nf77cj9lLloQFrQl3xhD/fa73P+S0KSgRpLHM?=
+ =?us-ascii?Q?DNbPmuX0LCAkbLVvlQc2LYgzBzhhqhUKTASS9F2L3A2ckbVmbw+mFQSza8U8?=
+ =?us-ascii?Q?4VAHA7W2TWWZhfY5bn6NDOC1PltSh/m4u9d/SeFZAETYgXBZsaHMaZTLnzWG?=
+ =?us-ascii?Q?uxltp9ZLeWX31PC2zwA0ii1t/PaolaXpEPOZl+7d/orvM9TcwK2ugmWEXsp3?=
+ =?us-ascii?Q?ajM55vQjlp2hRBFv2bSKQtPQ7zrOG5dp647s5wNPLANZKFX+zVPwc5Y/bOeX?=
+ =?us-ascii?Q?ZqG8l+wRfqD1C7AE6Z82iVnwNgTpSOS17sQml/gPUTrNeVTv9vqsYko7Dmir?=
+ =?us-ascii?Q?0gM37kw+T649BQzsLT2qLC9+rofAWx2tcReSViIX9Tlo3c3uE+n2H22wwpLd?=
+ =?us-ascii?Q?Wf5u181NVXf6VkUX7qv9zwBPChm1dfEl2RJJiNTOh4rZorjzZzproC9vd1QQ?=
+ =?us-ascii?Q?0JjzV7bZxDlzpTrN5SgG2cAZO3BT3Sl1gFq6ktR2RpgVtsbFBlY1dw99CouV?=
+ =?us-ascii?Q?P5L4XlFQK5N/cYGiwZ9Sz1w3gMFvaSbf01fTG/7tR95DdhXL5ONUiEBYrYMV?=
+ =?us-ascii?Q?AA5OlFPfswOTm8zxi4rzYIiTmmbD?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FRTt24cJE8BperY5Y8j2wG2JPdO35jHdAo70x8h3nVAdzfVFfzBh09Zh1FO+?=
- =?us-ascii?Q?M+uH44kmhX9TCXL86YH2+ygpxTWosiMSsDku9Izxe1Jv+F52zVISzanrigA8?=
- =?us-ascii?Q?aN803sPBBvRDxdTlDbMhvRP2A5QbOIF33Lb3BUB9Og8KB8xdKwhsRx0rC1aQ?=
- =?us-ascii?Q?vm+9EFX/frkf9+9wvdmA9DFEZdVMpYOTvZYwowII79390DvieAKTZuml155B?=
- =?us-ascii?Q?srfSn9pcsiCEs1RVA7LfLrpUHrDpRc33l5qbyN0UfT8jrJn/kxQRRsbC98Ai?=
- =?us-ascii?Q?kbKo+BIrNJqotZaf9tCnhZVxrMj3hiEYgjMOL8jNoSoEG0PN3Rvhnp46HkAZ?=
- =?us-ascii?Q?TYlcTGLBuuJc+W3IKKCCjo+dBXFhtHLphE4G+82o/ZT5L6YdfGbkuq/vDddy?=
- =?us-ascii?Q?MphI8pdHlhVtBfGWdW+yAwGZUD7eoRfG0CMQ5A4JxRSrlVQ/c3JzY90lYe3j?=
- =?us-ascii?Q?TlY/GU9D543MaDxCDf1ZPDnoMw236dTs41htXMaNVDnihtGkc/dNDaYNlYFx?=
- =?us-ascii?Q?e4CweiF8OOb+4g6emys17Cd6SodycBE07qKEijyHU3P2GSbzivI1RzyB3gcR?=
- =?us-ascii?Q?UPfkI6kbhVslOfAyHKvsXIDKrOt+Tbshkw+NItbW4UIfcPu8/F6xtLCDu0hX?=
- =?us-ascii?Q?WDlyTBBuQNeWy0g9g3rToG4zA99slnVOsSecGicu7n5lnS88EqwRTZWrm7de?=
- =?us-ascii?Q?7O7xeBqKe/PO5vQeA57ZF557Zd097LA8GJfILiOg+08kl+j1kF1bP2F51ZON?=
- =?us-ascii?Q?ISHPlJ/2+4Ixva9SaBKbrk+LvrOdnttluP+0DUnm3XMILb0WfoQ9GLQsj6td?=
- =?us-ascii?Q?f9lRpuuOj+0DjLySvztPxQufdZQCC6RlaaivDn1thN19VN+Ys1oXvKsYo7zr?=
- =?us-ascii?Q?rVDyFYJq4yEc4+Ea2IxtWvNvzbSM5D1e2wKZhJQkfUh0fPzNXTlSS5tDnv4N?=
- =?us-ascii?Q?fTrr30rrhd3N4vMlsX3WrEQxW/pKlxkFZ+ZdfzJQ5NKlCLYQYYQCj7bIuwvr?=
- =?us-ascii?Q?303AzudjNs2X4WRVmqhBOMdtnXgHC661347UIMbCWybI0NGw0oYhUeFvReec?=
- =?us-ascii?Q?jgCgBlSiR63FecsWTlEWStErFzDjOJUSmIqBS+vMCLTHiHSeYsdcJNL7/Na9?=
- =?us-ascii?Q?ioaNTWN86u6waHL+nUiYVO26NcYEIm+hC99X0+T9zSU+bf0bnO7KxOnz8hn3?=
- =?us-ascii?Q?D6ie459+kW/ae7ULcxK+YNBKbMpM/zRalIndo1/Y20oFC6YV30yZBLW1wA+O?=
- =?us-ascii?Q?vOAYpEaJmPIt349+6767Y6Rh+Ryhwat4K+DMWI7Mlz3JzRvz8GbuUFRCQrNV?=
- =?us-ascii?Q?OL/F6kcwmMOPptkWISXBX2a+BjT0I1idxobNC+Hk77UgZiyqNZGwqlanVv0y?=
- =?us-ascii?Q?rwbrbTReTAURBbNjZ+3DBve8E2LrkA6hrX4YPtXyWe60Tzn7i3yiZ9HaZLJr?=
- =?us-ascii?Q?OS4l9++aeD0wGYm8ShHLu0kuX1VyQ888joCsWAGn22UvQYMpwqpUtAMkiX4s?=
- =?us-ascii?Q?5KZTIa6GFiAKXhahuEYVlDE7rUxwsE9FE7uNLgWccjP+hnVjy/1oMgsRAe0/?=
- =?us-ascii?Q?EbJrRpQDO1lak/TnDipPs06TIPHI/rL375BCUzX3jHs2ozxEZhfrwUBjpcB/?=
- =?us-ascii?Q?Rg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ff6ad55-0a77-4561-304d-08dd1df55135
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?XR9rWDeThpszsHpuqtsGi10g6OjNwpkFZ4uNuXNWhGVR0Y7ptnBWOzLCzgEG?=
+ =?us-ascii?Q?0skBhyeP2OwKhiF3FpdsKhPyUtLb/5lRIPsSIVBr4YQ8E7Wo4HSx6in0mWww?=
+ =?us-ascii?Q?9jeHn4dhURY8pFsCMjalOCOtu1pDsHdGD2Ki+p1xSQBbt1BG6xkRvjTEEH+J?=
+ =?us-ascii?Q?vV1nlNXL3juwvqKBff7FwFkiE04/Pu8Lga0XKrMqEIlyt3f1q5oP3ydGztA1?=
+ =?us-ascii?Q?R0h7PXp9KuqDSaiqNiU0qQ3J8meXstoaE3kB0NQp8TeSJ7Q4YIzncm0cohr0?=
+ =?us-ascii?Q?W5lHkVvfpyc2k5kX/mL5NjFM56e9toBZCh+DEsSIrSzOlQQnEdzQ8ffCMbpB?=
+ =?us-ascii?Q?4qLGlajT/DwFtS7GXmk4fKBIvP8TbtEYJyiywnGp5w1n2IACN5WZJBvUpCCc?=
+ =?us-ascii?Q?93J4ti5bUyTyieRVq43QyIU5QlMNKbYAD2Ux6TB5CWQrpxv1Qy0yPcFQVot7?=
+ =?us-ascii?Q?MfrhOGROY6T6fy6iwSRkm5fIqZuINMW/9mexQQ9FEG6X6QsgB+4tOG2tbgsr?=
+ =?us-ascii?Q?oypg5uBK4W2VWw525gpEaBxEhwJREoAAaNKT4nS4WBAR+hvvt/MYA+Oz39lr?=
+ =?us-ascii?Q?Vvl2pSx5Ox1sSGlP3uZNRMIMJs8HIgdDLbWr4y3oW/tyGGdNvCH/a3v1mj6F?=
+ =?us-ascii?Q?Ruv8lhZPyVLplat/AVf9puUu7N0yjJBeGo+jN46McAGN1Vf91UGgd3ZMZRGu?=
+ =?us-ascii?Q?ylhlLSxJxf+75kmLZN4/HvfMePQklkLzT/Gjn8AoN+dq0jtA3ZD+c11NHzVv?=
+ =?us-ascii?Q?jxGrMTABiTIKfP8dZZBeUsKlt4fEEKbcAlOZ3C+yM8PRK7eu148PRDO8RCId?=
+ =?us-ascii?Q?Jsiuu5fkDvWao+2ocftKOU8PjwV9nuTy2jkSpCXNWcYc1tE9ZTbhfKEsI7ti?=
+ =?us-ascii?Q?7gRc6ElWCDe/fY4tozLj8iIHkCL3n9xaNqg/KasvF1YXWsCscmD5UXOmwN//?=
+ =?us-ascii?Q?HibZs5w6GCYeAFimtLR3xlnE0UQ926peV+AJn7yLrh2hceVkDsTCzvdJolob?=
+ =?us-ascii?Q?uRBoCatc+XQbIJx7bsMg0bbPC5Mb9vi7JIaaBOQG+0TWj5khtnLR4wHJgR+V?=
+ =?us-ascii?Q?Vl1cNzfm8uPCgxOySQWp/IfiNI6MNNKySHmueMrmEQqHHDNMG1L+5/TpPkEY?=
+ =?us-ascii?Q?YBQiM1Wj8WIkwcPv4kHFYU0VCUvYZeTczBxseCJ6ZmmCh0swwG2NrOuzlji7?=
+ =?us-ascii?Q?P1zRBp3/RDLllGQ5MtHcl65mcodFYkeCGDsY2hWAuU0JWzMqfwgNArTW0GFq?=
+ =?us-ascii?Q?IgYqDjyWuJRd4CdDY6VkdnsKr3PZL82/NiCL976ms+arXwNdI3cU2/qYEJ72?=
+ =?us-ascii?Q?JvGsfNr0F1Qk81EsQYRqJXACRpCK5WTK7s6xoHKA5KoFFtqovK9pYqWViZhj?=
+ =?us-ascii?Q?OwhmuNzjpIpP+e7Pnbtq9/vtSPqXp7c7rBerRWUeO9z1/vxouSjmlOkj/DcG?=
+ =?us-ascii?Q?9FcCqAg7MFcxYwUtZqhs+PVQlz0U9geATilIHTom2CIn0Oyj1HrxAtYyTWhn?=
+ =?us-ascii?Q?d4QQR40fM81mCOTSHvZ/5xoSlJd4oreKLK+f2Q+4UtV5JY5VmA9Bd/W39Hdg?=
+ =?us-ascii?Q?wpF55AhCBUWGb6wwILT/dWtqkaVYS5tbm3JcekQh?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d847dff-05aa-4c32-fe3e-08dd1df5770e
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7900.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2024 17:16:02.4603
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2024 17:17:05.9515
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: X6FKNUYigEhUu74XrDFy5LmuVH9+7oEapln80BafgiinXZVrqDrFvTGjmNVdbtfi2GW7YYmXG1Xkiv5UsaEBBzFXEKRoQuWJXJWX6noutxs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB6623
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: s0CZKfBnjgpERS9H4qjM0IFb7Ad/+0XtAG7S59uyGvYwv39Ot2wSqTTwU5p2Iul7cULLGtzPiHJUsZDwJayTNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6859
 
-On Fri, Dec 13, 2024 at 06:01:59PM +0530, Parthiban Veerasooran wrote:
-> There are two skb pointers to manage tx skb's enqueued from n/w stack.
-> waiting_tx_skb pointer points to the tx skb which needs to be processed
-> and ongoing_tx_skb pointer points to the tx skb which is being processed.
+On Mon, Dec 16, 2024 at 07:11:52PM +0200, Ido Schimmel wrote:
+> In some deployments users would like to encode path information into
+> certain bits of the IPv6 flow label, the UDP source port and the DSCP
+> and use this information to route packets accordingly.
 > 
-> SPI thread prepares the tx data chunks from the tx skb pointed by the
-> ongoing_tx_skb pointer. When the tx skb pointed by the ongoing_tx_skb is
-> processed, the tx skb pointed by the waiting_tx_skb is assigned to
-> ongoing_tx_skb and the waiting_tx_skb pointer is assigned with NULL.
-> Whenever there is a new tx skb from n/w stack, it will be assigned to
-> waiting_tx_skb pointer if it is NULL. Enqueuing and processing of a tx skb
-> handled in two different threads.
+> Redirecting traffic to a routing table based on the flow label is not
+> currently possible with Linux as FIB rules cannot match on it despite
+> the flow label being available in the IPv6 flow key.
 > 
-> Consider a scenario where the SPI thread processed an ongoing_tx_skb and
-> it moves next tx skb from waiting_tx_skb pointer to ongoing_tx_skb pointer
-> without doing any NULL check. At this time, if the waiting_tx_skb pointer
-> is NULL then ongoing_tx_skb pointer is also assigned with NULL. After
-> that, if a new tx skb is assigned to waiting_tx_skb pointer by the n/w
-> stack and there is a chance to overwrite the tx skb pointer with NULL in
-> the SPI thread. Finally one of the tx skb will be left as unhandled,
-> resulting packet missing and memory leak.
+> This patchset extends FIB rules to match on the flow label with a mask.
+> Future patches will add mask attributes to L4 ports and DSCP matches.
 > 
-> - Consider the below scenario where the TXC reported from the previous
-> transfer is 10 and ongoing_tx_skb holds an tx ethernet frame which can be
-> transported in 20 TXCs and waiting_tx_skb is still NULL.
-> 	tx_credits = 10; /* 21 are filled in the previous transfer */
-> 	ongoing_tx_skb = 20;
-> 	waiting_tx_skb = NULL; /* Still NULL */
-> - So, (tc6->ongoing_tx_skb || tc6->waiting_tx_skb) becomes true.
-> - After oa_tc6_prepare_spi_tx_buf_for_tx_skbs()
-> 	ongoing_tx_skb = 10;
-> 	waiting_tx_skb = NULL; /* Still NULL */
-> - Perform SPI transfer.
-> - Process SPI rx buffer to get the TXC from footers.
-> - Now let's assume previously filled 21 TXCs are freed so we are good to
-> transport the next remaining 10 tx chunks from ongoing_tx_skb.
-> 	tx_credits = 21;
-> 	ongoing_tx_skb = 10;
-> 	waiting_tx_skb = NULL;
-> - So, (tc6->ongoing_tx_skb || tc6->waiting_tx_skb) becomes true again.
-> - In the oa_tc6_prepare_spi_tx_buf_for_tx_skbs()
-> 	ongoing_tx_skb = NULL;
-> 	waiting_tx_skb = NULL;
+> Patches #1-#5 gradually extend FIB rules to match on the flow label.
 > 
-> - Now the below bad case might happen,
+> Patches #6-#7 allow user space to specify a flow label in route get
+> requests. This is useful for both debugging and testing.
 > 
-> Thread1 (oa_tc6_start_xmit)	Thread2 (oa_tc6_spi_thread_handler)
-> ---------------------------	-----------------------------------
-> - if waiting_tx_skb is NULL
-> 				- if ongoing_tx_skb is NULL
-> 				- ongoing_tx_skb = waiting_tx_skb
-> - waiting_tx_skb = skb
-> 				- waiting_tx_skb = NULL
-> 				...
-> 				- ongoing_tx_skb = NULL
-> - if waiting_tx_skb is NULL
-> - waiting_tx_skb = skb
+> Patch #8 adjusts the fib6_table_lookup tracepoint to print the flow
+> label to the trace buffer for better observability.
 > 
-> To overcome the above issue, protect the moving of tx skb reference from
-> waiting_tx_skb pointer to ongoing_tx_skb pointer and assigning new tx skb
-> to waiting_tx_skb pointer, so that the other thread can't access the
-> waiting_tx_skb pointer until the current thread completes moving the tx
-> skb reference safely.
->
+> Patch #9 extends the FIB rule selftest with flow label test cases while
+> utilizing the route get functionality from patch #6.
 
-This fixes the above race condition and spin_lock_bh() is appropriate.
-
-Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
- 
-> Fixes: 53fbde8ab21e ("net: ethernet: oa_tc6: implement transmit path to transfer tx ethernet frames")
-> Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-> ---
->  drivers/net/ethernet/oa_tc6.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-> index 4c8b0ca922b7..db200e4ec284 100644
-> --- a/drivers/net/ethernet/oa_tc6.c
-> +++ b/drivers/net/ethernet/oa_tc6.c
-> @@ -113,6 +113,7 @@ struct oa_tc6 {
->  	struct mii_bus *mdiobus;
->  	struct spi_device *spi;
->  	struct mutex spi_ctrl_lock; /* Protects spi control transfer */
-> +	spinlock_t tx_skb_lock; /* Protects tx skb handling */
->  	void *spi_ctrl_tx_buf;
->  	void *spi_ctrl_rx_buf;
->  	void *spi_data_tx_buf;
-> @@ -1004,8 +1005,10 @@ static u16 oa_tc6_prepare_spi_tx_buf_for_tx_skbs(struct oa_tc6 *tc6)
->  	for (used_tx_credits = 0; used_tx_credits < tc6->tx_credits;
->  	     used_tx_credits++) {
->  		if (!tc6->ongoing_tx_skb) {
-> +			spin_lock_bh(&tc6->tx_skb_lock);
->  			tc6->ongoing_tx_skb = tc6->waiting_tx_skb;
->  			tc6->waiting_tx_skb = NULL;
-> +			spin_unlock_bh(&tc6->tx_skb_lock);
->  		}
->  		if (!tc6->ongoing_tx_skb)
->  			break;
-> @@ -1210,7 +1213,9 @@ netdev_tx_t oa_tc6_start_xmit(struct oa_tc6 *tc6, struct sk_buff *skb)
->  		return NETDEV_TX_OK;
->  	}
->  
-> +	spin_lock_bh(&tc6->tx_skb_lock);
->  	tc6->waiting_tx_skb = skb;
-> +	spin_unlock_bh(&tc6->tx_skb_lock);
->  
->  	/* Wake spi kthread to perform spi transfer */
->  	wake_up_interruptible(&tc6->spi_wq);
-> @@ -1240,6 +1245,7 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
->  	tc6->netdev = netdev;
->  	SET_NETDEV_DEV(netdev, &spi->dev);
->  	mutex_init(&tc6->spi_ctrl_lock);
-> +	spin_lock_init(&tc6->tx_skb_lock);
->  
->  	/* Set the SPI controller to pump at realtime priority */
->  	tc6->spi->rt = true;
-> -- 
-> 2.34.1
-> 
-> 
+Forgot to mention, iproute2 patches can be found here:
+https://github.com/idosch/iproute2/tree/submit/flowlabel_rule_v1
 
