@@ -1,228 +1,249 @@
-Return-Path: <netdev+bounces-152106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31DB9F2B0B
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:39:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5379F2B2E
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:52:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5D8118811E6
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:39:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AAB91667E6
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF661F7557;
-	Mon, 16 Dec 2024 07:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C601FF60C;
+	Mon, 16 Dec 2024 07:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OUXQpUct"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SnTIOmBG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A5E1F754D;
-	Mon, 16 Dec 2024 07:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF5B1AAA24
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 07:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734334765; cv=none; b=Gni8kgDURNrhsr21F3W2+qJfsLQ29qTHbpRs9EGqnKHkA660RnYJuLZLgkgAAoK8DsMWlOXzdGyrLx80WKRzYMLZA8GxGuaTKMlOLwxyD3mCJXhz1Hit+yuZl0Czy02mjMZXpxuj3k2tQJcUQu0TWTI+pHQFxHTcnzjfRobd7rI=
+	t=1734335534; cv=none; b=ora2x+RTWlR/LsqBTQUdwsPudTh4cHFOBbl4lf22cn/OLJgh68tO8GAKZ1ng1p15Uis6bu1oaa2geRqlDtbk6SKyd57JTo5dFSlVKw7pqQPEsQ5Zi3EEEVrHLLKgeMWfTIz9WNpkOOO3+16fSlLywfwcjSWJto0d+9iP+jzkuls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734334765; c=relaxed/simple;
-	bh=/1pRwMyhAu53D4zyYWPWDy+g1KgzaQejdNtkuChrOf0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IF89Iir0S5zaAPN5aQKnoSv8WRmIx7EAc/yiZSSwcdbY2m4qv8PcIfYHZW4eiUNa8R85VfpYrCVIDbeKF/SZJhY5xBYdrBdtD8tJVhNGCjxTjNb0icXNOTaBzXSYUOKGUYBl5MZAx/j3XK5XmE4BkKuKkZXACLdnJeEnG4eLsUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OUXQpUct; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734334763; x=1765870763;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=/1pRwMyhAu53D4zyYWPWDy+g1KgzaQejdNtkuChrOf0=;
-  b=OUXQpUctrmRZD2QwYwNnQnYVO9Ze29jpPsy8OsB2nsjVaOqnbwWvONk/
-   zLXpM4W25RMo04zxugmLszx2S+IaRKK5c4QC3F4sIsS4UDai7HoNgKs94
-   Tf1FbCy6NlibP7gt+bFffqlKI3jjjm5O7xPSeoMbdg6foGHFOjLNpslWn
-   e/UlFzhNzu+zTs/443D8uIqbjhtTTfIqRb7nn4w0deCn93QudRZRnYZ0E
-   CLb3ZN4HqkpxpKSaNFFoxA8ZEBSVEFjRkIS5r7xOpS6vxsXUAwnAmB4zs
-   0q0yBfk527Qe9DkvVQEJsqVw8Rno6PMe+Yk8RRLL2ZuxDoc6cyt4fobN/
-   w==;
-X-CSE-ConnectionGUID: sAkfE1tETUKZxNrz/Dp2Ww==
-X-CSE-MsgGUID: +hK5ka+oR4CFWorS+Hbq4g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11287"; a="34031550"
-X-IronPort-AV: E=Sophos;i="6.12,237,1728975600"; 
-   d="scan'208";a="34031550"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 23:39:21 -0800
-X-CSE-ConnectionGUID: NIAxqjGWQx2PdsAJhtchiA==
-X-CSE-MsgGUID: 89X1mMOdQOa0bGLXvb7B9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="134447920"
-Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
-  by orviesa001.jf.intel.com with ESMTP; 15 Dec 2024 23:39:18 -0800
-From: Song Yoong Siang <yoong.siang.song@intel.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH iwl-next v3 1/1] igc: Avoid unnecessary link down event in XDP_SETUP_PROG process
-Date: Mon, 16 Dec 2024 15:38:49 +0800
-Message-Id: <20241216073849.3555825-1-yoong.siang.song@intel.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1734335534; c=relaxed/simple;
+	bh=jXtHX0K+WBhaAW13qHP9sa2099pV0xSBgLH8GRDYvAI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ni3Z8ibI9ILhDh1SdUDh6rsHErDabPO3BZuKW3HcI5h0KqrbCIp8wb6Tkcw2dP8TaDgnpn3fPXvu8Z6Qeqx8dE5b7638/nfGgmWnzDMzwTsJhJkeKO7fKEpl5loNK9t+vTQdBNWpH9qAF0HjYhzjzFp1+u0rfLQFxJBrrKUPhck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SnTIOmBG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734335531;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4Nu5fgGyhYkkZxJNjC8ytGWLfkwN3EPSX/6bR0OUdlU=;
+	b=SnTIOmBG/3o2CNj7Gls710T64AAwTsY2Pxs0XT/cQbyjho1ErCVeMsbHFeIpHTYvHX1e57
+	xJZwNgCUO7ejONVoxN8avV23/xDgX37Kxbq2Fp7ucvykktzdfOiGHXbEh9ktDE0GVP82PA
+	9eEKDX6row/d88chmRg9MJBiFAQ9QC0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-176-GNXpQtgQPOSEa579BcfErg-1; Mon, 16 Dec 2024 02:52:09 -0500
+X-MC-Unique: GNXpQtgQPOSEa579BcfErg-1
+X-Mimecast-MFC-AGG-ID: GNXpQtgQPOSEa579BcfErg
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3862be3bfc9so1973541f8f.3
+        for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 23:52:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734335528; x=1734940328;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Nu5fgGyhYkkZxJNjC8ytGWLfkwN3EPSX/6bR0OUdlU=;
+        b=s2MpsSpotj+wS3jf8iXURTV9wVVU1kkAqMxby1ZyYhIdI6GbdpqrlkW35wu7D916Gy
+         4NX0dLXDk7O7Da/gyBI2iKPMeN6qBAwYpHqzONy9gdds3pB1K+CGn9kBYPt1SYONJcSA
+         qqazVSRVE+RJCaYGaGjvDrfMuSxqzrAZIuFv9N/Rn9FlC0Mq2XH2QNxygeyXGPrSoh4n
+         LRIfBRskQOJw9Nb+tr6LoMFvBnP3XIzshvrFoUCuSa4lng1zEFA4cpd4ZPQXLzt0qawZ
+         BqRGnal0Wjc5gSiIR9tTTDF0ZHmN7FRStbdgKQ76iIbFT08LXQt/FhO8oCIYkd6VJLdF
+         GccQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWuex26AGKdOefUmTakppZ3Rpwaohw583eOqWddOehfVF0ATQfLdYhzFKOW3awapPgLB/BJmA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0z0Qy4qWpORMC5885VpzUhFYz61y3Q/vM9VpljN8PYY86suVq
+	+TASIII31KbDNAp4pBOSKKNuG1Zr3CwsKZi8HPp7oojT502rrYElwlCOsz80zQyZejJrv2gQ9Gb
+	EC63OMQidTKGsYiZJk9j89Ro5cfYC55QFutvkORKP4NN6FB5qUOyhEQ==
+X-Gm-Gg: ASbGncumcb12SenZfTCx0apEXoDAXXyJiwOlnf8QXDtWCrzCeuJbIvgAvgJwueONym7
+	ixVgkBppfOh1ZvqUXj0pouHUP0cMpbN2iYg9MvWyW0f01nFaQa27ORklt/yvJN1hc0R4JVUWY1L
+	wf0CKTJR0O5quWj7fVY2Q4Bb7HhNOBNvwt032vSpCsHLxyzVGqq14vfdBKsBDu7aaAbXcRttJF0
+	c0KXPPzua3lfzGg2pslz1RtqRJnIsfaAVh4JJ1QjoNU7FCPjhhzTnS5I0sFFYM01dO29CxzpI7c
+	GDK1qLU=
+X-Received: by 2002:a5d:47a1:0:b0:385:f220:f779 with SMTP id ffacd0b85a97d-3888e0ba99amr7855952f8f.49.1734335528565;
+        Sun, 15 Dec 2024 23:52:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGNLtr68gE9l/spEXZHtOBvGQm96ADNXXuE5VgQ4ierUcuP5yQ3mfm71Gd4OTftNnxYaJ5lqg==
+X-Received: by 2002:a5d:47a1:0:b0:385:f220:f779 with SMTP id ffacd0b85a97d-3888e0ba99amr7855930f8f.49.1734335528136;
+        Sun, 15 Dec 2024 23:52:08 -0800 (PST)
+Received: from [192.168.88.24] (146-241-48-67.dyn.eolo.it. [146.241.48.67])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c8060592sm7227772f8f.98.2024.12.15.23.52.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 15 Dec 2024 23:52:07 -0800 (PST)
+Message-ID: <bdf0eec2-e168-48f7-9fdf-178cce4ee18b@redhat.com>
+Date: Mon, 16 Dec 2024 08:52:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] Do not invoke addrconf_verify_rtnl
+ unnecessarily
+To: Gilad Naaman <gnaaman@drivenets.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ horms@kernel.org, kuba@kernel.org, netdev@vger.kernel.org
+References: <c67e10cf-ae33-4974-93c6-aaa111171635@redhat.com>
+ <20241213151342.3614753-1-gnaaman@drivenets.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241213151342.3614753-1-gnaaman@drivenets.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The igc_close()/igc_open() functions are too drastic for installing a new
-XDP prog because they cause undesirable link down event and device reset.
+On 12/13/24 16:13, Gilad Naaman wrote:
+>>> If the address IS perishable, and IS the soonest-to-be-expired address,
+>>> calling or not-calling "verify" for a single address deletion is
+>>> equivalent in cost.
+>>
+>> This last statement is not obvious to me, could you please expand the
+>> reasoning?
+> 
+> Sorry, it does seem a bit vague when I am re-reading it now.
+> 
+> What I meant is that calling addrconf_verify_rtnl when no upkeep needs to be
+> done has some cost K (in seconds) which is roughly a function of the
+> total amount of addresses.
+> 
+> Let's say you've configured some addresses, 4 of which are perishable:
+> 
+> 	   |                
+> 	T0-+- <---We are here
+> 	   |                
+> 	   |                
+> 	T1-+- A <---Timer      
+> 	   |                
+> 	   |                
+> 	   |                
+> 	T2-+- B              
+> 	   |                
+> 	   |                
+> 	   |                
+> 	T3-+- C              
+> 	   |                
+> 	   |                
+> 	   |                
+> 	T4-+- D              
+> 	   |                
+> 	   |                
+> 	   |                
+> 	   v                
+> 
+> The timer is scheduled to expire in T1, because this is when address A
+> perishes.
+> 
+> If you delete a non-perishable address, running addrconf_verify_rtnl is
+> redundant, since it won't change the fact that the timer expires in T1.
+> 
+> If you delete A specifically, which is the cause of scheduling the timer
+> to T1, you have 2 options:
+> 
+>  1. Pay K now, in T0, to reschedule the timer to T2
+>  2. Pay nothing now, let the timer expire, pay the K in T1, and then reschedule
 
-To avoid delays in Ethernet traffic, improve the XDP_SETUP_PROG process by
-using the same sequence as igc_xdp_setup_pool(), which performs only the
-necessary steps, as follows:
- 1. stop the traffic and clean buffer
- 2. stop NAPI
- 3. install the XDP program
- 4. resume NAPI
- 5. allocate buffer and resume the traffic
+It looks like in this specific case option 1 will be cheaper, as it will
+avoid an unneeded timer expiration.
 
-This patch has been tested using the 'ip link set xdpdrv' command to attach
-a simple XDP prog that always returns XDP_PASS.
+> If we're talking about a deleting A, it seems equivalent in cost and result.
+> Either way, exactly one K is paid, and the time eventually gets rescheduled to T2.
+> 
+> If we're talking about deleting an arbitrary address, using option 2 is
+> better, since you do not lose functionaility, but you might be saving some
+> Ks. (If you deleted B, the timer won't be rescheduled anyway)
+> 
+> If we're talking about deleting multiple/many address in a short time,
+> option 2 is greatly preferable, since paying K for each address can get
+> costly as the hash-table grows.
 
-Before this patch, attaching xdp program will cause ptp4l to lose sync for
-few seconds, as shown in ptp4l log below:
-  ptp4l[198.082]: rms    4 max    8 freq   +906 +/-   2 delay    12 +/-   0
-  ptp4l[199.082]: rms    3 max    4 freq   +906 +/-   3 delay    12 +/-   0
-  ptp4l[199.536]: port 1 (enp2s0): link down
-  ptp4l[199.536]: port 1 (enp2s0): SLAVE to FAULTY on FAULT_DETECTED (FT_UNSPECIFIED)
-  ptp4l[199.600]: selected local clock 22abbc.fffe.bb1234 as best master
-  ptp4l[199.600]: port 1 (enp2s0): assuming the grand master role
-  ptp4l[199.600]: port 1 (enp2s0): master state recommended in slave only mode
-  ptp4l[199.600]: port 1 (enp2s0): defaultDS.priority1 probably misconfigured
-  ptp4l[202.266]: port 1 (enp2s0): link up
-  ptp4l[202.300]: port 1 (enp2s0): FAULTY to LISTENING on INIT_COMPLETE
-  ptp4l[205.558]: port 1 (enp2s0): new foreign master 44abbc.fffe.bb2144-1
-  ptp4l[207.558]: selected best master clock 44abbc.fffe.bb2144
-  ptp4l[207.559]: port 1 (enp2s0): LISTENING to UNCALIBRATED on RS_SLAVE
-  ptp4l[208.308]: port 1 (enp2s0): UNCALIBRATED to SLAVE on MASTER_CLOCK_SELECTED
-  ptp4l[208.933]: rms  742 max 1303 freq   -195 +/- 682 delay    12 +/-   0
-  ptp4l[209.933]: rms  178 max  274 freq   +387 +/- 243 delay    12 +/-   0
+Makes sense to me.
 
-After this patch, attaching xdp program no longer cause ptp4l to lose sync,
-as shown in ptp4l log below:
-  ptp4l[201.183]: rms    1 max    3 freq   +959 +/-   1 delay     8 +/-   0
-  ptp4l[202.183]: rms    1 max    3 freq   +961 +/-   2 delay     8 +/-   0
-  ptp4l[203.183]: rms    2 max    3 freq   +958 +/-   2 delay     8 +/-   0
-  ptp4l[204.183]: rms    3 max    5 freq   +961 +/-   3 delay     8 +/-   0
-  ptp4l[205.183]: rms    2 max    4 freq   +964 +/-   3 delay     8 +/-   0
+>>> But calling "verify" immediately will result in a performance hit when
+>>> deleting many addresses.
+>>
+>> Since this is about (control plane) performances, please include the
+>> relevant test details (or even better, please add a small/fast self-test
+>> covering the use-case).
+> 
+> Is it common to add scale-test to selftests?
 
-Besides, before this patch, attaching xdp program will causes flood ping to
-lose 10 packets, as shown in ping statistics below:
-  --- 169.254.1.2 ping statistics ---
-  100000 packets transmitted, 99990 received, +6 errors, 0.01% packet loss, time 34001ms
-  rtt min/avg/max/mdev = 0.028/0.301/3104.360/13.838 ms, pipe 10, ipg/ewma 0.340/0.243 ms
+AFAIK, not common at all. Note that the argument "so self-test for this
+kind of thing" is actually a very good argument to add a self-tests.
 
-After this patch, attaching xdp program no longer cause flood ping to loss
-any packets, as shown in ping statistics below:
-  --- 169.254.1.2 ping statistics ---
-  100000 packets transmitted, 100000 received, 0% packet loss, time 32326ms
-  rtt min/avg/max/mdev = 0.027/0.231/19.589/0.155 ms, pipe 2, ipg/ewma 0.323/0.322 ms
+> From my limited experience these tend to fail in automation for no good reason,
+> though I feel I may have misunderstood the text in parens.
+> I've added a link to the benchmark below.
+> 
+> Regarding the original test case:
+> 
+> We're developing a core-router and trying to scale-up to around 12K VLANs.
+> Considering GUA+LLA this means 24K address in this table.
+> In practice it's a bit more than that, due to other interfaces in the same
+> namespace.
+> 
+> This makes addrconf_verify_rtnl very very very expensive for us.
+> When initially setting the system up after boot, or when applying big
+> configuration changes,
+> adding addresses quickly slows down, as each added address has to pay
+> for its predecesors. (all of our addresses are static)
+> 
+> On the reverse, when the VLANs' parent link goes down, the VLANs
+> go down with it, causing us to pay for a lot of addrconf_verify_rtnl calls,
+> during which rtnl_lock is held for a single long stretch of time.
+> 
+> I've ran some perf on an upatched kernel to demonstrate it:
+> 
+> 	https://github.com/gnaaman-dn/perf-addrconf-verify-rtnl
+> 
+> Turned out to be 13% of time when creating static addresses, and 18%
+> when flushing them.
+> 
+> (In our original bug the VLANs were deleted, it is just easier to perf
+> one iproute command if it's a flush)
 
-On the other hand, this patch has been tested with tools/testing/selftests/
-bpf/xdp_hw_metadata app to make sure AF_XDP zero-copy is working fine with
-XDP Tx and Rx metadata. Below is the result of last packet after received
-10000 UDP packets with interval 1 ms:
-  poll: 1 (0) skip=0 fail=0 redir=10000
-  xsk_ring_cons__peek: 1
-  0x55881c7ef7a8: rx_desc[9999]->addr=8f110 addr=8f110 comp_addr=8f110 EoP
-  rx_hash: 0xFB9BB6A3 with RSS type:0x1
-  HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (43.280 usec)
-  XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (31.664 usec)
-  No rx_vlan_tci or rx_vlan_proto, err=-95
-  0x55881c7ef7a8: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
-  0x55881c7ef7a8: complete tx idx=9999 addr=f010
-  HW TX-complete-time:   1733923136269591637 (sec:1733923136.2696) delta to User TX-complete-time sec:0.0001 (108.571 usec)
-  XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User TX-complete-time sec:0.0002 (217.726 usec)
-  HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to HW TX-complete-time sec:0.0001 (120.771 usec)
-  0x55881c7ef7a8: complete rx idx=10127 addr=8f110
+Nice, so you already have the test infra ready :)
 
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
----
-V2: https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20241211134532.3489335-1-yoong.siang.song@intel.com/
-V1: https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20241204120233.3148482-1-yoong.siang.song@intel.com/
+>>> @@ -3148,7 +3164,6 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+>>>  			    (ifp->flags & IFA_F_MANAGETEMPADDR))
+>>>  				delete_tempaddrs(idev, ifp);
+>>>  
+>>> -			addrconf_verify_rtnl(net);
+>>
+>> With an additional 'addrconf_perishable' check here protecting the (here
+>> removed) addrconf_verify_rtnl(), the patch will be IMHO much less prone
+>> to unintended side-effects.
+> 
+> I hope my explanation will be convincing that that is not needed.
+> (or just coherent enough to point out a mistake in my understanding)
+> 
+> If not, I will send V3 with this condition added, as in practice most
+> of our addresses are static.
 
-V3 changelog:
- - Change commit title to be more specific. (Paul)
- - Use unsigned int, instead of int, for array elements. (Paul)
- - Fix grammar mistakes on commit message. (Paul)
- - Explain why igc_close()/igc_open() are not needed in commit message. (Paul)
-V2 changelog:
- - shows some examples of problem in commit message. (Vinicius)
- - igc_close()/igc_open() are too big a hammer for installing a new XDP
-   program. Only do we we really need. (Vinicius)
----
- drivers/net/ethernet/intel/igc/igc_xdp.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+From my PoV, the main trouble is that this kind of change has the
+potential of breaking things in subtle way. Your explanation above makes
+sense to me, but I have the gut feeling I'm missing something.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
-index 869815f48ac1..9eb47b4beb06 100644
---- a/drivers/net/ethernet/intel/igc/igc_xdp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
-@@ -14,6 +14,7 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
- 	bool if_running = netif_running(dev);
- 	struct bpf_prog *old_prog;
- 	bool need_update;
-+	unsigned int i;
- 
- 	if (dev->mtu > ETH_DATA_LEN) {
- 		/* For now, the driver doesn't support XDP functionality with
-@@ -24,8 +25,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
- 	}
- 
- 	need_update = !!adapter->xdp_prog != !!prog;
--	if (if_running && need_update)
--		igc_close(dev);
-+	if (if_running && need_update) {
-+		for (i = 0; i < adapter->num_rx_queues; i++) {
-+			igc_disable_rx_ring(adapter->rx_ring[i]);
-+			igc_disable_tx_ring(adapter->tx_ring[i]);
-+			napi_disable(&adapter->rx_ring[i]->q_vector->napi);
-+		}
-+	}
- 
- 	old_prog = xchg(&adapter->xdp_prog, prog);
- 	if (old_prog)
-@@ -36,8 +42,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
- 	else
- 		xdp_features_clear_redirect_target(dev);
- 
--	if (if_running && need_update)
--		igc_open(dev);
-+	if (if_running && need_update) {
-+		for (i = 0; i < adapter->num_rx_queues; i++) {
-+			napi_enable(&adapter->rx_ring[i]->q_vector->napi);
-+			igc_enable_tx_ring(adapter->tx_ring[i]);
-+			igc_enable_rx_ring(adapter->rx_ring[i]);
-+		}
-+	}
- 
- 	return 0;
- }
--- 
-2.34.1
+A more verbose description will help for future memory.
+
+Making the patch more straight-forward will give IMHO additional assurances.
+
+A self-test could help tracking/detecting side-effects introduced here.
+
+I think at least one of the above is needed, the more the better ;) Note
+that the more verbose description could come in a form of a Link tag
+pointing to this conversation.
+
+Thanks,
+
+Paolo
 
 
