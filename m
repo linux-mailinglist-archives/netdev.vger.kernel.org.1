@@ -1,124 +1,150 @@
-Return-Path: <netdev+bounces-152098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E31A9F2AAE
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:06:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1824F9F2AC8
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:19:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F2B21884707
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:06:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6373F1613EC
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C5F1D318F;
-	Mon, 16 Dec 2024 07:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE6918DF62;
+	Mon, 16 Dec 2024 07:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="io9goq7D"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="biRcPi1V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57601BB6BC;
-	Mon, 16 Dec 2024 07:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BDA1487F6
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 07:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734332758; cv=none; b=HFQd3tUZUj4TDGqZAubFG9MQO5kfqgIbAzkmctyzVCr/1qcF++iGTFHRnx2wYDSKwtB1jVg5s/qQDtxQRMTlFc6kBEdyNWbTVVUAHGtIKmH/LWiNrlMUBDQL1E3QhEK/v9bFzTQPXn5gKeJjbaG1VQc46f58FNaaNBQXA+gDmJc=
+	t=1734333535; cv=none; b=MaaUw1APkip67TZ/biOC1fGYyLXR+gwAHU2tMk4mSLrBophmOrV/jSMwI0Vu6dV/xIXnBAbtR5SFeKQVRSH/8VB2LTXaK40+cv0C+hnnOfpmwSPKSxoJkwzoRa9FSQRc4784J0+YmSzOcnxe5cWVJ5ZSU3Gue5teoajRoGJ7Evo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734332758; c=relaxed/simple;
-	bh=issfuf4wRr6bIR63SXq9Ky2iM2b3TrVkX+UiX0Z9ezU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oKB3mZ7mpQF/LQdN0eictcBymZYssgbuRNGvY7zWmnLCBzqOw6y32jvU6wsClinBi3EOOQG3sDIGUbN5NoX0OLTNYJpUe84dSUWnH7OBXTCFN9cXW7O4C4ef3joDhGzZSodxsWNo2ILSIJ59Sx1UAOHrjlsFg0AHQHpRM7/kTT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=io9goq7D; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG6asDe024861;
-	Mon, 16 Dec 2024 07:05:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2023-11-20; bh=hthKk
-	6JFJyBVcNcGhKJGzXok2nU3dn0y9po0Og2V9X8=; b=io9goq7DzD0h81mQlrCHO
-	63wz15BVETnrK3aKOwkT5ty/TFowaW2K1JjHIt+etEofMLfSZhIhEOFUbdENmdCo
-	kgVmV+cpnVS5yVw4F2nLgzW40YWAOIJ6zRmvBAZBJv7guFHnXVb6up5i9mgHu071
-	JhgYyp2mq5wyNcy4QMJgimAvsQKUkxSYbkz5sTjiqvO62S6YvAMpNGp1nvbz1Pdk
-	aCOUSy/yD3+AEdyg4416oD4rmy7TZDoDLaeJLmPhkp9I2WX33dwRFEHpU0515MTa
-	s2hlK0OxqXoPI8j/AD4vzm/RjkodEiFi9ihY6g2+vy8m7o9NEuts57KbHNtrDRJt
-	w==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 43h2jt2g7p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 16 Dec 2024 07:05:39 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG66hBK034862;
-	Mon, 16 Dec 2024 07:05:38 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 43h0f6pnmw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 16 Dec 2024 07:05:38 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4BG75Nut002855;
-	Mon, 16 Dec 2024 07:05:37 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 43h0f6pnc5-2;
-	Mon, 16 Dec 2024 07:05:37 +0000
-From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-To: Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        hariprasad <hkelam@marvell.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org,
-        error27@gmail.com, harshit.m.mogalapalli@oracle.com
-Subject: [PATCH next 2/2] octeontx2-pf: fix error handling of devlink port in rvu_rep_create()
-Date: Sun, 15 Dec 2024 23:05:15 -0800
-Message-ID: <20241216070516.4036749-2-harshit.m.mogalapalli@oracle.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241216070516.4036749-1-harshit.m.mogalapalli@oracle.com>
-References: <20241216070516.4036749-1-harshit.m.mogalapalli@oracle.com>
+	s=arc-20240116; t=1734333535; c=relaxed/simple;
+	bh=B/tur1yDRhI3VM5DW8SthX7SrdrUxSR+1BZUyF4vNVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ql9GimBZMYopYV7cpLRuxc750b5gOXZAYwdSCjTjymmKa6+B20mgZUaEwgKf2CySG0utnkScJeCBqrLUzK9omAcwp7jvrf4zFqEw5mrng+xryZELFt4y6UFXjvFRmbAawN4Kp1wWJ7F1pEMOPh8PyeYLdO3SAbQFdx0kEWCbHlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=biRcPi1V; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734333533; x=1765869533;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=B/tur1yDRhI3VM5DW8SthX7SrdrUxSR+1BZUyF4vNVo=;
+  b=biRcPi1VjwrxTnbfnbS/5iPX8FUllojVDA12iWZG8Ke/f+gt6qlkAqiV
+   S79D9/2fdo2lGpJkNkOAbfpqjQMAVqI2nlrF+w/jFeS26afhIJgr7jirc
+   CpFcrboyNsiAYEUDacImphMHuhldubIZRAuFHwiedg14RWY8xC9vb3wWe
+   llJFXJIjhLtvnVASb42nl12wWSznkY8sTh2tZ61YH2S3Hs0FV4SVDQzCy
+   ytpE2l7PJNr5l2z/K/y8VlzDtzmq0bKyJB892SlTMfgm0Kr6q/W7jJzyl
+   DOil9jzfoWPx5j7bAyCD07I8diaVVopIBNHbvS7i6Za9kfYjlibouye/2
+   Q==;
+X-CSE-ConnectionGUID: 22sOqj2DT5Wz2335IiTeoQ==
+X-CSE-MsgGUID: qoHP/TnlT/KCuH65TKc+og==
+X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="38634189"
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="38634189"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 23:18:50 -0800
+X-CSE-ConnectionGUID: ilnka3aKQXKw1mue8TxNVg==
+X-CSE-MsgGUID: 5zZfyqJdQ2WJrAy7tOosFg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,237,1728975600"; 
+   d="scan'208";a="97543225"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 23:18:48 -0800
+Date: Mon, 16 Dec 2024 08:15:42 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Fix error patch in airoha_probe()
+Message-ID: <Z1/Tng80hii4dBQU@mev-dev.igk.intel.com>
+References: <20241215-airoha_probe-error-path-fix-v1-1-dd299122d343@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-16_02,2024-12-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 spamscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=999 phishscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2411120000
- definitions=main-2412160057
-X-Proofpoint-GUID: S6sY--PTTWxkQ-poxcwApZwQKpUzyU6g
-X-Proofpoint-ORIG-GUID: S6sY--PTTWxkQ-poxcwApZwQKpUzyU6g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241215-airoha_probe-error-path-fix-v1-1-dd299122d343@kernel.org>
 
-Unregister the devlink port when register_netdev() fails.
+On Sun, Dec 15, 2024 at 06:36:35PM +0100, Lorenzo Bianconi wrote:
+> Do not run napi_disable if airoha_hw_init() fails since Tx/Rx napi
+> has not been started yet. In order to fix the issue, introduce
+> airoha_qdma_disable_napi routine and remove napi_disable in
+> airoha_hw_cleanup().
+> 
+> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/mediatek/airoha_eth.c | 33 ++++++++++++++++++++++--------
+>  1 file changed, 25 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
+> index 6c683a12d5aa52dd9d966df123509075a989c0b3..5bbf5fee2802135ff6083233d0bda78f2ba5606a 100644
+> --- a/drivers/net/ethernet/mediatek/airoha_eth.c
+> +++ b/drivers/net/ethernet/mediatek/airoha_eth.c
+> @@ -2138,17 +2138,14 @@ static void airoha_hw_cleanup(struct airoha_qdma *qdma)
+>  		if (!qdma->q_rx[i].ndesc)
+>  			continue;
+>  
+> -		napi_disable(&qdma->q_rx[i].napi);
+>  		netif_napi_del(&qdma->q_rx[i].napi);
+>  		airoha_qdma_cleanup_rx_queue(&qdma->q_rx[i]);
+>  		if (qdma->q_rx[i].page_pool)
+>  			page_pool_destroy(qdma->q_rx[i].page_pool);
+>  	}
+>  
+> -	for (i = 0; i < ARRAY_SIZE(qdma->q_tx_irq); i++) {
+> -		napi_disable(&qdma->q_tx_irq[i].napi);
+> +	for (i = 0; i < ARRAY_SIZE(qdma->q_tx_irq); i++)
+>  		netif_napi_del(&qdma->q_tx_irq[i].napi);
+> -	}
+>  
+>  	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
+>  		if (!qdma->q_tx[i].ndesc)
+> @@ -2173,6 +2170,21 @@ static void airoha_qdma_start_napi(struct airoha_qdma *qdma)
+>  	}
+>  }
+>  
+> +static void airoha_qdma_disable_napi(struct airoha_qdma *qdma)
+Nit: similar function for enabling napi is named airoha_qdma_start_napi()
+maybe stop here or enable there to be consistent.
 
-Fixes: 9ed0343f561e ("octeontx2-pf: Add devlink port support")
-Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
----
-This is from static analysis, only compile tested.
----
- drivers/net/ethernet/marvell/octeontx2/nic/rep.c | 1 +
- 1 file changed, 1 insertion(+)
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-index 9e3fcbae5dee..04e08e06f30f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-@@ -690,6 +690,7 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
- 		if (err) {
- 			NL_SET_ERR_MSG_MOD(extack,
- 					   "PFVF representor registration failed");
-+			rvu_rep_devlink_port_unregister(rep);
- 			free_netdev(ndev);
- 			goto exit;
- 		}
--- 
-2.39.3
+Thanks
 
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(qdma->q_tx_irq); i++)
+> +		napi_disable(&qdma->q_tx_irq[i].napi);
+> +
+> +	for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
+> +		if (!qdma->q_rx[i].ndesc)
+> +			continue;
+> +
+> +		napi_disable(&qdma->q_rx[i].napi);
+> +	}
+> +}
+> +
+
+[...]
 
