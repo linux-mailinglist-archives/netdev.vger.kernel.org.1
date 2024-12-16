@@ -1,123 +1,139 @@
-Return-Path: <netdev+bounces-152363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5035A9F3A5B
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 20:57:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E647A9F3A9F
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 21:17:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924611653DE
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:57:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6A621888E29
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 20:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CE620CCE1;
-	Mon, 16 Dec 2024 19:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7649D1D47A2;
+	Mon, 16 Dec 2024 20:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="cUD11b9N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cC5a8b5B"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FD7205AA8
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 19:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E091D4618
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 20:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734379059; cv=none; b=fadyZhJGxAhqpY0i15/LZN0+cCohv0aQb4gPCHLf8p+3TaPra5HEq6eZQwGDYX/bJRKWdieINzFFSsebe8OYyldNSpKwco4PMCiotgrGVkUjzPztixjrPg5CHb1dVjCvKwRYqnme46WOQNdkqF0XvHh5WDoWGKk0Lxn3gYhROtg=
+	t=1734380010; cv=none; b=WC/0lZm4EAwIhle8j5YkWubvjWHRZ2zCNiK09VElVAFq+kKyhrjUnxdll6Ih4SxIt+yWmTKdmGcF7l9KvmKteicW/OY7quobXoWkM9/9ctwnDWdvPRhPfVZGGDB5jcHlg3UzXSLY6Rqe+Z/0JAk7DtY0lZ3I6xJulkkZBxsWVDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734379059; c=relaxed/simple;
-	bh=3EUxTz6N2CO54MtyJBQDvZ+FZVSDjNgSHibKEihsynI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nbl3LRpQWZfvpYYBxdok/6FgQCQ1wBorcm+EMr9BV/7Bb7LQ2ZtA1ANmffrskbe0jbQlNyE6ITQtw8wV12bNzTJKz7aEE4DN8+l4SwRwUHAx0D90KVq8/VC2Ay/aCnnFwJugpXqNVhFPBMzlJBaEoSG4/KNRgWXkzZrYLtrJMC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=cUD11b9N; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 2D34F2C07FD;
-	Tue, 17 Dec 2024 08:57:29 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1734379049;
-	bh=p1T4X+B77uk/xLqLY88anJOJiIa7QMOSTIyM0a4pqko=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cUD11b9NIu/vdxuzVNr2m8txlDwfGoQ5XL7e3YYtLfMTqJmmj7swhWleXYh9bjKIz
-	 gfidl6XoVUQEw+q1pqcjEojG65sQzOynOjwGhjb32Cgy3JehlWTYoSsIZ6YKvAFCHF
-	 miR+aukZdYJXUkgVeryR73SLimnknPT9tDOoxAb7i0tjy0PiPaO1NY3iOY2kyvMlDA
-	 3Ul13RTvGI8YDkxF23ag2VUVLrVF8Di+8LIRsPAjlyUFSQUOcfPUT9cbYTRfesiLhL
-	 6dZcdWPQfxcD+FfvF00wP0VZj946lHB1HXrPzUtFGaIVH11P2eA2Wb3fCfppEYNVHa
-	 +Dw+Z/y8QfufQ==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B676086290000>; Tue, 17 Dec 2024 08:57:29 +1300
-Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id 046D413ED95;
-	Tue, 17 Dec 2024 08:57:29 +1300 (NZDT)
-Message-ID: <f916444e-3f79-4b08-8830-846aaba06d18@alliedtelesis.co.nz>
-Date: Tue, 17 Dec 2024 08:57:28 +1300
+	s=arc-20240116; t=1734380010; c=relaxed/simple;
+	bh=61HxeimFlMEVl2KwPvPCcTKNZsDGn+ecl4uR0p2ZsAI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uWFkWLwE4RbZVQB/toe0a12zTzKDbPYgvI9aoEeWSd9KXU0FokxkKvXhOHoZPx2ylbpw2B8vmi1OCkErfduNcZwqL8t1SXIRuhsxCtd3XLsF7zDvMAJMLye1Y9PLO2CDPPI+hoQ0L+QACyxA8rmaXyfPb+n4783EFLT/GuxYFGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cC5a8b5B; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-385f07cd1a4so3163651f8f.1
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 12:13:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734380007; x=1734984807; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=61HxeimFlMEVl2KwPvPCcTKNZsDGn+ecl4uR0p2ZsAI=;
+        b=cC5a8b5Bgkw8scPEtgTdHc+HV93FtXmz1T6Ke2wXXnMVdyqwnQFx3S4k4VCLC3/MOr
+         mbGk1DdN5EPPaAGcWX9JNtB2dN8twbe5ZJB+ocKBSGNY+Q5hKTRsbKvpNz5VyJXpU4VH
+         JfRBKLkW7chc2Pro4r91nZwlUHcdhr2Z0drbnWbPaB1AAx+B6H5UokdxUUv7ebsT/0b2
+         8n2iaABNLG5RzDQ/XI4HgXyA9mmYc0advSq3iX4M5Jhg0CPqK5Ulu2PuWVObg9lTNCqe
+         wR/wXPod/jghCfechR1rF+oAwzaFGlfmjxI/Y1BP/fQ+dsi036GN9JJgWvtObE70NyIo
+         YVTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734380007; x=1734984807;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=61HxeimFlMEVl2KwPvPCcTKNZsDGn+ecl4uR0p2ZsAI=;
+        b=odjS24bJNATrbeOpJAMFFQTNDDJ24rwKPCFGrx+9ED2AndAmsjBSpONWi3IMUD5yn1
+         QRf1W9BgdSE6Q1OUQK+kaGWUvogRhwb1NFCc2629HSZn10neHkrs70oGbFoclnCviVcW
+         t8YscDRjaQ9Q/4YNbxrWBWeLz0+l4xkZnSQBfBlghuAbZxH59CvDkzi3yAx2GDL6x4NP
+         IRaaGLaqRg3k4xFD88fyDvdkyEg1TuNl5VRq+g/Y+y3nWEcL07c1VXbHkzXfw3IRnwoo
+         RozJ5iobbTlu2jQS0j2iMsyNLSab4dQE+5b7IxB+cT7Q/YN6xaQdjf9qKRH6N3oCtuWa
+         gW8w==
+X-Forwarded-Encrypted: i=1; AJvYcCX5lEtgGEFFkNcdA4N8XfZesbvFnv/0C9uzQOw/3CtPwNLUkl/gBqaMJPEzoIYn0gtpMqBeJWk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1Mn/tLwn4llCvpJir3LNaUWHaExH6UhIx6U+gcHnhwsFxpBYZ
+	xPCBjHaispEmLGxETfHk4RJTJzh+KleJdhBOTWpUOqu7yF6ikuRlCP93kPDduAY2ZJh5pFCK4z/
+	sXkv7tC089bJoHpL2sDGGo1wcRrf2be5odWmq
+X-Gm-Gg: ASbGncuV3oG2ZSBHl570i0AZKPYjr1XzX5+/Ycl8sd1f6F2bxEBqewh23fW1AP/lk7a
+	bdYBLV35vy93dbBkXNvZHDvMwL7ta4HN2eY7PiJ5kZMn0e9TTWFll7zwLtH4ZQ4U8eC/rCg==
+X-Google-Smtp-Source: AGHT+IFmlbX9xhNR1EJspR2ERQUcqblea1plJilcBHpQ2o55rePDoziJMVFfeClQNZNy/tF+ey1XIElWbRaT+lI6g58=
+X-Received: by 2002:a05:6000:4616:b0:385:dedb:a148 with SMTP id
+ ffacd0b85a97d-3888e0ac4f4mr11412043f8f.46.1734380006716; Mon, 16 Dec 2024
+ 12:13:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 1/4] dt-bindings: net: Add Realtek MDIO controller
-To: Conor Dooley <conor@kernel.org>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
- hkallweit1@gmail.com, linux@armlinux.org.uk, markus.stockhausen@gmx.de,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-mips@vger.kernel.org
-References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
- <20241216031346.2626805-2-chris.packham@alliedtelesis.co.nz>
- <20241216-native-velvet-1d2b765c8b48@spud>
-Content-Language: en-US
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-In-Reply-To: <20241216-native-velvet-1d2b765c8b48@spud>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=67608629 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=RZcAm9yDv7YA:10 a=XYAwZIGsAAAA:8 a=aDH4CMtCcT_BCErJpHcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=E8ToXWR_bxluHZ7gmE-Z:22
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+References: <20241216162735.2047544-1-brianvv@google.com> <20241216162735.2047544-3-brianvv@google.com>
+ <b81501de-7dd3-4808-920e-14b2cc817038@intel.com>
+In-Reply-To: <b81501de-7dd3-4808-920e-14b2cc817038@intel.com>
+From: Brian Vazquez <brianvv@google.com>
+Date: Mon, 16 Dec 2024 15:13:15 -0500
+Message-ID: <CAMzD94QR-+408wf+dindhaw+NMJ1GK9W-4xuiJpY2FkhtMVLig@mail.gmail.com>
+Subject: Re: [iwl-next PATCH v4 2/3] idpf: convert workqueues to unbound
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Brian Vazquez <brianvv.kernel@gmail.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	intel-wired-lan@lists.osuosl.org, David Decotigny <decot@google.com>, 
+	Vivek Kumar <vivekmr@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, emil.s.tantilov@intel.com, 
+	Marco Leogrande <leogrande@google.com>, Manoj Vishwanathan <manojvishy@google.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>, Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On 17/12/2024 07:52, Conor Dooley wrote:
-> On Mon, Dec 16, 2024 at 04:13:43PM +1300, Chris Packham wrote:
->> Add dtschema for the MDIO controller found in the RTL9300 SoCs. The
->> controller is slightly unusual in that direct MDIO communication is not
->> possible. Instead, the SMI bus and PHY address are associated with a
->> switch port and the port number is used when talking to the PHY.
->>
->> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
->> +      realtek,smi-address:
->> +        $ref: /schemas/types.yaml#/definitions/uint32-array
->> +        description: SMI interface and address for the connected PHY
->> +        items:
->> +          - description: SMI interface number associated with the port.
->> +          - description: SMI address of the PHY for the port.
+On Mon, Dec 16, 2024 at 1:11=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
 >
-> I don't really understand this property, but I also don't understand the
-> MDIO bus, so with that caveat
-> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> From: Brian Vazquez <brianvv@google.com>
+> Date: Mon, 16 Dec 2024 16:27:34 +0000
+>
+> > From: Marco Leogrande <leogrande@google.com>
+> >
+> > When a workqueue is created with `WQ_UNBOUND`, its work items are
+> > served by special worker-pools, whose host workers are not bound to
+> > any specific CPU. In the default configuration (i.e. when
+> > `queue_delayed_work` and friends do not specify which CPU to run the
+> > work item on), `WQ_UNBOUND` allows the work item to be executed on any
+> > CPU in the same node of the CPU it was enqueued on. While this
+> > solution potentially sacrifices locality, it avoids contention with
+> > other processes that might dominate the CPU time of the processor the
+> > work item was scheduled on.
+> >
+> > This is not just a theoretical problem: in a particular scenario
+> > misconfigured process was hogging most of the time from CPU0, leaving
+> > less than 0.5% of its CPU time to the kworker. The IDPF workqueues
+> > that were using the kworker on CPU0 suffered large completion delays
+> > as a result, causing performance degradation, timeouts and eventual
+> > system crash.
+>
+> Wasn't this inspired by [0]?
+>
+> [0]
+> https://lore.kernel.org/netdev/20241126035849.6441-11-milena.olech@intel.=
+com
 
-I'll try to clarify here as it may be of relevance to other reviewers, 
-if any of this should go in the commit message or the binding let me know.
+The root cause is exactly the same so I do see the similarity and I'm
+not surprised that both were addressed with a similar patch, we hit
+this problem some time ago and the first attempt to have this was in
+August [0].
 
-The MDIO bus is used to manage one or more network PHYs. Sometimes there 
-is an MDIO interface as part of a NIC controller but it's become 
-increasingly common to have a the MDIO controller separated from the 
-Ethernet controller, particularly when there are multiple Ethernet 
-controllers in a SoC. In the device trees there is a usually a node for 
-the MDIO controller and the attached PHYs are child nodes. The Ethernet 
-interface has phandle property which references the attached PHY.
+[0]
+https://lore.kernel.org/netdev/20240813182747.1770032-4-manojvishy@google.c=
+om/
 
-The RTL9300 (and similar Realtek Ethernet switches) don't directly 
-expose the MDIO interface to us. There seems to be an internal PHY 
-polling mechanism and the user access to the PHYs works in conjunction 
-with that. So rather than being able to reference PHYs and MDIO 
-interfaces directly we need to work with switch port numbers instead. 
-The actual hardware MDIO bus and PHY address is captured in the 
-"realtek,smi-address" property.
-
+>
+> Thanks,
+> Olek
 
