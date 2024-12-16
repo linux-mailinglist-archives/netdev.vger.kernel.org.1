@@ -1,94 +1,98 @@
-Return-Path: <netdev+bounces-152340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B36D9F3771
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:23:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF16B9F378B
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:28:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B31651883693
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 17:23:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5476D7A7E34
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 17:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326962066E6;
-	Mon, 16 Dec 2024 17:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B20C205E01;
+	Mon, 16 Dec 2024 17:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="USmtJiTG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUB5ADDX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E008207A06
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 17:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657B381ACA;
+	Mon, 16 Dec 2024 17:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734369722; cv=none; b=r6NGS/LvRJZCJbPc6dMk/4yxaDgvR2ilwekCzJ05W845eKsE+RPGNfjvfhytb0VlrD/1fDiE14eCxhYUUzMlBQj+EvHIFFN28wKWuCsY4WpIbL7ruh2+S6BMJ56EdFdpIR1WIo3NouqmK4Vp3ltDBQIrDX0hVXrt9hXONVKHBbw=
+	t=1734370016; cv=none; b=qt0+AKut8oRvzJrjlZt5fqVM4wP6OY0fM9Sf6d8Z1FSawhO8Ga4ZnCxfw2+c8TAx3ZN3TptP9XDaqfLw487Fj/4ugIhk97nml1fAVp4J80Vknr3RDxAZKhkAFU5wtwtZzNzFSlD2ycYDX6xA1r3wxJpJ3zbqn9M3naQsuqbsPQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734369722; c=relaxed/simple;
-	bh=XDP3jNGk4IlqPce1sZpdzKDCFB9RnX198fmPU9Uz2rU=;
+	s=arc-20240116; t=1734370016; c=relaxed/simple;
+	bh=/t1NRYv4/Q5pN1JG7idM3iLXiuadUz5zwHnKIJiHGNs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N1pH/5/wGpikjFz14XoeEwYagDvBVshYhMn+UyBSTvWpPedQ/rxaqrz5JcGI/g7TTM7csVAXVCNMZXiyuXgtSfNNLBKgBlD0UYrqsWUSWEvnUjBrllWSOySAwBk2a8QafrT+cRFMKmme7JqgUz2V4lyp1mLJsOkHrb92XRojNI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=USmtJiTG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734369719;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6bSLiIp/vbLDm7mgursV5kX1ogUS6QQZu/74jt6OZY=;
-	b=USmtJiTGG3scAu5cTEXGNwJuEA9DavebPnWLK4+j6evHAtmIIC0W/wvkWWXxmR8wv8ldGO
-	nXwCCs7QfWjpCzXqwfJJgeCyC9SfMbih7b8uExy4Is5NTTW0fo949AgThKdyOjR30mw4oQ
-	EvNf1MooV77+Dhv/b2C4fj/rxgRK4Wc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-HkhMpShEMvCkjxgAgFck6g-1; Mon, 16 Dec 2024 12:21:58 -0500
-X-MC-Unique: HkhMpShEMvCkjxgAgFck6g-1
-X-Mimecast-MFC-AGG-ID: HkhMpShEMvCkjxgAgFck6g
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-385d52591d6so2214342f8f.1
-        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 09:21:58 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=GamhLwvS1KKfuRe68YaulXARoReucVnOORd2FNgSJeJ8lf7CS+UmCwdaWkhH5KY26SxTmHYAB+/h+k/avb6p8YpmynGJmIVd6QwFZ5MGu3UI2kMFmHmGRZk2wDBIXJh+xZn3kDTcNq4IMyMYrqvavlpcFdR/FPlQbRgxvqtphq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUB5ADDX; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-436203f1203so3782405e9.2;
+        Mon, 16 Dec 2024 09:26:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734370013; x=1734974813; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ws62IqXxwOmIXvue6QqDBdu01bZQNbrgvdYcyFWCQ+g=;
+        b=KUB5ADDXZH/M5py/ZL53ZgqaeU4U1trfICITuqIw0j+TNNt586cSB3+Sl7/cdV2zDt
+         iy8tC2eXjgSjiwC+E12JldkFeLUg2zT5qjEtzXMUsH9bS086gWGXqRng/bEHA/UkXa1I
+         KZMWpNibw3gv3hL4mZXurdoLEa7ocW2qCxOxEi7EJ8SaBlJPORJn0voDt9eyiwmiQeHK
+         SGoo671aKqlNT/Nhf19PDGW8H4vUoT8EpRtlbb4FGyih/I2VyKLVWEgM2dEJTip0C9QR
+         SVZR6/ly9hn5nTqaQZnfsbkt30he667HHxfLALKxmZZtyKP4ij9kyCGKQnTDGfqVCtsl
+         eIPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734369717; x=1734974517;
+        d=1e100.net; s=20230601; t=1734370013; x=1734974813;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S6bSLiIp/vbLDm7mgursV5kX1ogUS6QQZu/74jt6OZY=;
-        b=HBxJdQq/BFXIdFKSCGQlWfgzZWN8xCPjXMuxgqNatdT0RL1l1RfU4tSOxS8Kj68gz7
-         dHkFpOyFHAyB/qochcalQOXB33b7uveKdmxVlo5RELYh/MKa/KTm4Te0L3p/vA1GvlDq
-         aIoGFOjq2K2CTsQwawgnxNeu6mfhbyP2yvAb6Ra8j+Uda7UsqhY8PONIsOWU2Pr3E/RC
-         Wri5MgVBI+NKEYS0YIpUuilPamSA1as1ndBvAIO7+01i64cJ4A/puEoHjDT2Jc8Pp96G
-         BZZNRuwzQ53u0LaOrf+wgiVlqUH7X6ti8T0pxiPtSnrRJeqnMSgofsluPdtXfZC63Zyd
-         yozQ==
-X-Gm-Message-State: AOJu0Yxu+zboi+MidYmIhULL+NRp4RtyzLem2nQOFf+KIGSARVI+kGvY
-	ym3zbEIwTCggV2T4EIYojyIpT1RNlMIQ8MjIHEqDoJr7+QmFDCMFpgjBQPjF5hjoMlhWMVpWCqN
-	/rmZtg9Qs+kiXTCjmy2UeGMt9/8Kk+LeytMYkYNTfTXHzOvRn0gnh/Q==
-X-Gm-Gg: ASbGncvDK8arpXRSyF3m8TJ2d/D9gPu9DCefk1RmvDPbC2fgU9p4sVG8i2Cnqoil7ht
-	pACzz8SzqjKe6GGlVr5QZMLqrFu5hUHz9jb8m1cdP+gLalsMw32BQvdNzhtDoyduMmVQ5OuIMxD
-	QKr/kVAXT8gCAVVhiRk7hHqC+MTKR7eKMIpf2AXw4oSgxrshdFWgaju3eMZroDdI4wamQoBFaUn
-	NqiyVUGGCuTruIWCyjEOS34r3gqybu74+HENll06s3NggVu4D4QNKew46b1Oxzaml638nYQm93W
-	fpsw6XsYNFgw/YK2mPud8Ez1D/D7sOJRyFLy
-X-Received: by 2002:a05:6000:4023:b0:385:ea40:b46b with SMTP id ffacd0b85a97d-388db2267b4mr162112f8f.4.1734369717210;
-        Mon, 16 Dec 2024 09:21:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE7T2hOhSkRKpZXQFy4BxA9gOjhvTh0GbDcbXVeqLcVwuXZnsGRyjCJCXTwm60dbXUW47fahg==
-X-Received: by 2002:a05:6000:4023:b0:385:ea40:b46b with SMTP id ffacd0b85a97d-388db2267b4mr162090f8f.4.1734369716882;
-        Mon, 16 Dec 2024 09:21:56 -0800 (PST)
-Received: from debian (2a01cb058d23d600c2f0ae4aed6d33eb.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:c2f0:ae4a:ed6d:33eb])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c801223dsm8841875f8f.3.2024.12.16.09.21.55
+        bh=ws62IqXxwOmIXvue6QqDBdu01bZQNbrgvdYcyFWCQ+g=;
+        b=EqbZCGkVKhputa3JsxSdBCwqSRxozQTtDsyL3ztOXaW0c9pbpGFFHgU6M7eWCFFxSD
+         JV+b694tjbF0IUpKrSWfbtLjFYhjsyfEicJ7CYdczuwEkn9fDa6AtsiD4TffEFWJsFmt
+         Q0+lQN65PkokDlarBudG6f9A0CITl5J9+1pb7L5RIsuvuxWN9bfsMCsskyjSIlzfQgY1
+         QjQ2FZVq/8C2+fn4XIDj0ToJGO6e48yU1cKf2apeKsx544q4E3EfUDizHEK1+R1UZB/U
+         r1q6ytMoOI/9tFYQUiwlT81hMNj5g+GBE1hbzMBIm3b/Lal+owYk+AzGTqCbDlUsZiah
+         QUdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVFGjTEWrLsAQIWCVKaAXmp2YAs36WyjvAmBYIIvkTiZdCz08GJDa6c0ElDcNeapxhNAX8=@vger.kernel.org, AJvYcCWD6D3vhRGqwcSDCes82pR+bRf+9+iJJXsmylVLR72GC4YKl4YZyoL9RtrFt76pi2X8TSZc6+Xm@vger.kernel.org, AJvYcCXlnP58leo1oSCBEC/1fA7dTvN2oDgKwRR8e2Z+UX/Hq3WQcB+6DcaMjTw64f6YeYBWkNvzxS0pNISsdj7Q@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfM7T42+1dMIaBSy5/c5w+dQ1Y8FKsS7ii5OoK92iqZ8NAsGiI
+	CSIag8Y2TPBX6WMXj+4qc+W3dTpm0zYDA80Nk2HmIYJ7FwjBe+5W
+X-Gm-Gg: ASbGncvNh74mEYIB9AZJzdpTrjJaHagTpH3tw6EbRzto7H8Rr1ApJ3/ByaVKKB0gv+w
+	7X3v+vC5cHtlyg4gq0TYrgzY2iTAsK3+MyI6CGwtL6C184MpEEWbMfoG2P1ehKzvr6xkQGtn4wG
+	1SNbVwsObAOItPDkECypsj/m/2UfWZmUum6NhyAi0Fvn/4fdOw/iLRScWLOcdd1vaiw68nzrekt
+	+HKdu3OfwZKB5hXOY0C+7erdlh/SG0WPRWt/0V/5ljw
+X-Google-Smtp-Source: AGHT+IHJMEc5NsNfUNm/SdMJ561r1AUdBtJzRijqI4fw/BK5BRf5cPDJKOpc00nhQoFK0zD4hEpV4Q==
+X-Received: by 2002:a05:600c:1c14:b0:42c:b55f:f4f with SMTP id 5b1f17b1804b1-4362aaa97e7mr44822235e9.6.1734370012348;
+        Mon, 16 Dec 2024 09:26:52 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c801a487sm8902263f8f.45.2024.12.16.09.26.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2024 09:21:56 -0800 (PST)
-Date: Mon, 16 Dec 2024 18:21:54 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	James Chapman <jchapman@katalix.com>,
-	Tom Parkin <tparkin@katalix.com>
-Subject: [PATCH net-next 5/5] l2tp: Use inet_sk_init_flowi4() in
- l2tp_ip_sendmsg().
-Message-ID: <2ff22a3560c5050228928456662b80b9c84a8fe4.1734357769.git.gnault@redhat.com>
-References: <cover.1734357769.git.gnault@redhat.com>
+        Mon, 16 Dec 2024 09:26:51 -0800 (PST)
+Date: Mon, 16 Dec 2024 19:26:48 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH iwl-next 4/9] igc: Add support for receiving frames with
+ all zeroes address
+Message-ID: <20241216172648.q3fxwaxdkvtjqrfn@skbuf>
+References: <20241216064720.931522-1-faizal.abdul.rahim@linux.intel.com>
+ <20241216064720.931522-1-faizal.abdul.rahim@linux.intel.com>
+ <20241216064720.931522-5-faizal.abdul.rahim@linux.intel.com>
+ <20241216064720.931522-5-faizal.abdul.rahim@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,77 +101,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1734357769.git.gnault@redhat.com>
+In-Reply-To: <20241216064720.931522-5-faizal.abdul.rahim@linux.intel.com>
+ <20241216064720.931522-5-faizal.abdul.rahim@linux.intel.com>
 
-Use inet_sk_init_flowi4() to automatically initialise the flowi4
-structure in l2tp_ip_sendmsg() instead of passing parameters manually
-to ip_route_output_ports().
+On Mon, Dec 16, 2024 at 01:47:15AM -0500, Faizal Rahim wrote:
+> From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> 
+> The frame preemption verification (as defined by IEEE 802.3-2018
+> Section 99.4.3) handshake is done by the driver, the default
+> configuration of the driver is to only receive frames with the driver
+> address.
+> 
+> So, in preparation for that add a second address to the list of
+> acceptable addresses.
+> 
+> Because the frame preemption "verify_enable" toggle only affects the
+> transmission of verification frames, this needs to always be enabled.
+> As that address is invalid, the impact in practical scenarios should
+> be minimal. But still a bummer that we have to do this.
 
-Override ->daddr with the value passed in the msghdr structure if
-provided.
-
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
----
- net/l2tp/l2tp_ip.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
-
-diff --git a/net/l2tp/l2tp_ip.c b/net/l2tp/l2tp_ip.c
-index 4bc24fddfd52..29795d2839e8 100644
---- a/net/l2tp/l2tp_ip.c
-+++ b/net/l2tp/l2tp_ip.c
-@@ -425,7 +425,6 @@ static int l2tp_ip_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	int rc;
- 	struct inet_sock *inet = inet_sk(sk);
- 	struct rtable *rt = NULL;
--	struct flowi4 *fl4;
- 	int connected = 0;
- 	__be32 daddr;
- 
-@@ -455,7 +454,6 @@ static int l2tp_ip_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 		if (sk->sk_state != TCP_ESTABLISHED)
- 			goto out;
- 
--		daddr = inet->inet_daddr;
- 		connected = 1;
- 	}
- 
-@@ -482,29 +480,24 @@ static int l2tp_ip_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 		goto error;
- 	}
- 
--	fl4 = &inet->cork.fl.u.ip4;
- 	if (connected)
- 		rt = dst_rtable(__sk_dst_check(sk, 0));
- 
- 	rcu_read_lock();
- 	if (!rt) {
--		const struct ip_options_rcu *inet_opt;
-+		struct flowi4 *fl4 = &inet->cork.fl.u.ip4;
- 
--		inet_opt = rcu_dereference(inet->inet_opt);
-+		inet_sk_init_flowi4(inet, fl4);
- 
--		/* Use correct destination address if we have options. */
--		if (inet_opt && inet_opt->opt.srr)
--			daddr = inet_opt->opt.faddr;
-+		/* Overwrite ->daddr if msg->msg_name was provided */
-+		if (!connected)
-+			fl4->daddr = daddr;
- 
- 		/* If this fails, retransmit mechanism of transport layer will
- 		 * keep trying until route appears or the connection times
- 		 * itself out.
- 		 */
--		rt = ip_route_output_ports(sock_net(sk), fl4, sk,
--					   daddr, inet->inet_saddr,
--					   inet->inet_dport, inet->inet_sport,
--					   sk->sk_protocol, ip_sock_rt_tos(sk),
--					   sk->sk_bound_dev_if);
-+		rt = ip_route_output_flow(sock_net(sk), fl4, sk);
- 		if (IS_ERR(rt))
- 			goto no_route;
- 		if (connected) {
--- 
-2.39.2
-
+Stuff that happened since this patch was written: "ethtool --set-mm
+pmac-enabled on" exists. You don't have to accept verification frames if
+the pMAC is disabled. You can enable the reception of 00:00:00:00:00:00
+using that, and keep it off by default.
 
