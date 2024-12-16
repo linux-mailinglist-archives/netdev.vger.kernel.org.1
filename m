@@ -1,172 +1,249 @@
-Return-Path: <netdev+bounces-152409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08919F3D52
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 23:18:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C35749F3D77
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 23:28:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0967169B8E
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 22:18:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03950169162
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 22:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3581D5CEE;
-	Mon, 16 Dec 2024 22:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BF61D89F0;
+	Mon, 16 Dec 2024 22:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="EAFMYX0A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nf5Zuh7C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B71BA49;
-	Mon, 16 Dec 2024 22:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848801D89EF
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 22:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734387518; cv=none; b=fcWp4rGedw9CaXao/wUUyXj861EJPnAcvmTjtkBxu2GdgqsYdppAeSnMSNAE+KBurqTcTS2QoJ+yszzUdpffN6A6llyyc7l8XFhMmB2w71eflYycIYGyQso6INfabkHa/kbgV8/lO6j0SjKBnPQZOwH3vHYxDeHlv0yvroU3cA4=
+	t=1734388101; cv=none; b=ilqSgz0ZFr4LPQJWs8PWpbeZa9EQmXtS2QQxU0UCzlXhjRd7rDcxpKIfTwIedPKjf0v+amJeeMEDkXJXMEuY2u/BkPkGJs0VffKAWQJdKwvTdP0JFE2xh3H9Ps1LwdC76frM+gCo1Lp+D62DggUA/Sn+SCJLekhW8Ct8GnG+S50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734387518; c=relaxed/simple;
-	bh=RroWU3dXYsEIKnrRQq/sEb58UjG+0rdx0yuK4kzjM0E=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=c8/f/aqCtCnRg2oMlP9jou5xsEPROKYGzwnFNXD9A7hi7BJlsOIKbwyiw9jSeyzPL/Ts39KAXEl6dNNy57XCMoQFGvS+uYRg/Zj6SpZLQ01T+ubDtBs/tpTGAosOXo1QaP8DCPhWtbf3F3jaSwTyiV66KeHlRbyk+z4sLg2+JGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=EAFMYX0A; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 02A5123564;
-	Tue, 17 Dec 2024 00:18:27 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=P2PH9pRT7HgCd5Xu5gne/9j211rCmiQ1rBQxoRa7c10=; b=EAFMYX0AKai2
-	D20CVrb/14WbDKGX+4Q+YEnPsoql+Pxb9dWa/9uorwtILHq6mZn/nlX565nuA5E4
-	LoVjiPn8M/BYWYXyem2aWq+QsSDaSmjwrN2UV8mMDnjhMC5xTwCXOXuOzlseSn/i
-	HixG8qAnxx4oZQLODB7y5QXGMRSiGoCojjhYq7cNX1z6XCoFVMGPepnLBNjt+iyZ
-	wJ1en+WwEIBsrtuad5oz+ZqmtDFdpCqWPfNrheC0eELpfKmG8+LVa9Ej+y4Bo8wM
-	8SdlsCCoXEU6Yb4NUBzzaisEsNK8DO6RFJGTj6KkQXBqltnQqNiWkq2JaReBoStV
-	rSFlKq2n8vt40N3tvrb012csM/4UN2Uk06nIXglHrwp/tI4+QDy22rqV91ilhWdN
-	TTponn6SuCaPKDT7/Rimiuo+zdBu+cenWwCIR7ALERNmbbCtK6E+msDIodCFcpKH
-	0RdCodgxRAt1V+d3fWyk4b7uUK05LFKaISfT9My7y4mRcs2YKJ76uw0/OIc2e9Sx
-	+Es5dtIwUlMQcd2aAi6rQGVAnRK1f7nIkFummQi0fJjUc/LQeHGsVwVaHOYuRt9I
-	7f3CfM/jzMG+iL2tYI1/Ba1MoslmCu/FF3Dgv1n32xvaspyl/QOua40eJPhcdotU
-	6MIbwEW40TfTASMOhrT9Ecpxtaf86Xc=
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Tue, 17 Dec 2024 00:18:26 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 1122F15D48;
-	Tue, 17 Dec 2024 00:18:11 +0200 (EET)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4BGMI5p7081391;
-	Tue, 17 Dec 2024 00:18:07 +0200
-Date: Tue, 17 Dec 2024 00:18:05 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: David Laight <David.Laight@ACULAB.COM>
-cc: "'netdev@vger.kernel.org'" <netdev@vger.kernel.org>,
-        "'Naresh Kamboju'" <naresh.kamboju@linaro.org>,
-        "'Dan Carpenter'" <dan.carpenter@linaro.org>,
-        "'pablo@netfilter.org'" <pablo@netfilter.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "'open list'" <linux-kernel@vger.kernel.org>,
-        "'lkft-triage@lists.linaro.org'" <lkft-triage@lists.linaro.org>,
-        "'Linux Regressions'" <regressions@lists.linux.dev>,
-        "'Linux ARM'" <linux-arm-kernel@lists.infradead.org>,
-        "'netfilter-devel@vger.kernel.org'" <netfilter-devel@vger.kernel.org>,
-        "'Arnd Bergmann'" <arnd@arndb.de>,
-        "'Anders Roxell'" <anders.roxell@linaro.org>,
-        "'Johannes Berg'" <johannes.berg@intel.com>,
-        "'toke@kernel.org'" <toke@kernel.org>,
-        "'Al Viro'" <viro@zeniv.linux.org.uk>,
-        "'kernel@jfarr.cc'" <kernel@jfarr.cc>,
-        "'kees@kernel.org'" <kees@kernel.org>,
-        Simon Horman <horms@verge.net.au>, lvs-devel@vger.kernel.org
-Subject: Re: [PATCH net-next] Fix clamp() of ip_vs_conn_tab on small memory
- systems.
-In-Reply-To: <24a6bfd0811b4931b6ef40098b33c9ee@AcuMS.aculab.com>
-Message-ID: <5e288aa5-5374-5542-b730-f3b923ba5a36@ssi.bg>
-References: <24a6bfd0811b4931b6ef40098b33c9ee@AcuMS.aculab.com>
+	s=arc-20240116; t=1734388101; c=relaxed/simple;
+	bh=UiN9+z/4H7nASajFbWTnAtoNnt/mEsWJ9abwG3/H4JQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TrTJjCfjwMNaHxROp6o6BdS3NUqLWnkzob76HGDlDQwSNClweKrPMdy2Y0hTIBio5t3TxzUy1pF6Ec0gZ0sPj5yKuz1VbXd7ZxHtKK/kVWv9HV17Jz7H5qEYD8Jk5O6vf/NdRAVwD45xQOg9/5XSJYBJy3FBnry3k5AxYAk3lec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nf5Zuh7C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9575DC4CED3;
+	Mon, 16 Dec 2024 22:28:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734388100;
+	bh=UiN9+z/4H7nASajFbWTnAtoNnt/mEsWJ9abwG3/H4JQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Nf5Zuh7CfxleXEdtT5GoC2qnmZ0BzSCvB48q9SEkr/gHKQ+MDzgDpheGy63WbNzJH
+	 ppMJqrgj14wA38AiZ/pWPoifagDvmdL2UUWYokQWcrosRVj1fCJfRlPgxeAtDSI5Al
+	 zX3E2kqQArkbeHqBEXgAFTJN0uwUyd21CkC0Z/fvl5q7kxKEn9t8EE+KRzeC/d0hgb
+	 wjvo0I6y0W/wylVW6PoZvXrVSmNLaa8OirDU9pywN4NDRcl1cYfjRFbPghrJIp6Cyo
+	 uTAC53DOEjKgQBwqiNrbTrjrhA9uqoaKbhrAPzDZNbirdlt42HUD7w22AJ2/Mc4iqZ
+	 /7FP/SNXwZrlw==
+Date: Mon, 16 Dec 2024 23:28:18 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
+	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	lorenzo.bianconi83@gmail.com
+Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
+ EN7581 SoC
+Message-ID: <Z2CpgqpIR5_MXTO7@lore-desk>
+References: <cover.1733930558.git.lorenzo@kernel.org>
+ <20241211154109.dvkihluzdouhtamr@skbuf>
+ <Z1qqrVWV84DBZuCn@lore-desk>
+ <20241212150613.zhi3vbxuwsc3blui@skbuf>
+ <Z1sXTPeekJ5See_u@lore-desk>
+ <20241212184647.t5n7t2yynh6ro2mz@skbuf>
+ <Z2AYXRy-LjohbxfL@lore-desk>
+ <20241216154947.fms254oqcjj72jmx@skbuf>
+ <Z2B5DW70Wq1tOIhM@lore-desk>
+ <20241216194641.b7altsgtjjuloslx@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="CJbmCgRntwAP0sFC"
+Content-Disposition: inline
+In-Reply-To: <20241216194641.b7altsgtjjuloslx@skbuf>
 
 
-	Hello,
+--CJbmCgRntwAP0sFC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 14 Dec 2024, David Laight wrote:
+> On Mon, Dec 16, 2024 at 08:01:33PM +0100, Lorenzo Bianconi wrote:
+> > Considering patch [0], we are still offloading the Qdisc on the provided
+> > DSA switch port (e.g. LANx) via the port_setup_tc() callback available =
+in
+> > dsa_user_setup_qdisc(), but we are introducing even the ndo_setup_tc_co=
+nduit()
+> > callback in order to use the hw Qdisc capabilities available on the mac=
+ chip
+> > (e.g. EN7581) for the routed traffic from WAN to LANx. We will still ap=
+ply
+> > the Qdisc defined on LANx for L2 traffic from LANy to LANx. Agree?
+>=20
+> Not quite, no.
+>=20
+> ndo_setup_tc_conduit() does not have the same instruments to offload
+> what port_setup_tc() can offload. It is not involved in all data paths
+> that port_setup_tc() has to handle. Please ack this. So if port_setup_tc()
 
-> The 'max_avail' value is calculated from the system memory
-> size using order_base_2().
-> order_base_2(x) is defined as '(x) ? fn(x) : 0'.
-> The compiler generates two copies of the code that follows
-> and then expands clamp(max, min, PAGE_SHIFT - 12) (11 on 32bit).
-> This triggers a compile-time assert since min is 5.
+Can you please elaborate on this? Both (->ndo_setup_tc_conduit() and
+->port_setup_tc()) refer to the same DSA user port (please take a look the
+callback signature).
 
-	8 ?
+> returns -EOPNOTSUPP, the entire dsa_user_setup_qdisc() should return
+> -EOPNOTSUPP, UNLESS you install packet traps on all other offloaded data
+> paths in the switch, such that all packets that egress the DSA user port
+> are handled by ndo_setup_tc_conduit()'s instruments.
 
-> 
-> In reality a system would have to have less than 512MB memory
-> for the bounds passed to clamp to be reversed.
-> 
-> Swap the order of the arguments to clamp() to avoid the warning.
-> 
-> Replace the clamp_val() on the line below with clamp().
-> clamp_val() is just 'an accident waiting to happen' and not needed here.
-> 
-> Detected by compile time checks added to clamp(), specifically:
-> minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi test in clamp()
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> Closes: https://lore.kernel.org/all/CA+G9fYsT34UkGFKxus63H6UVpYi5GRZkezT9MRLfAbM3f6ke0g@mail.gmail.com/
-> Fixes: 4f325e26277b ("ipvs: dynamically limit the connection hash table")
-> Tested-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Signed-off-by: David Laight <david.laight@aculab.com>
+Uhm, do you mean we are changing the user expected result in this way?
+It seems to me the only case we are actually changing is if port_setup_tc()
+callback is not supported by the DSA switch driver while ndo_setup_tc_condu=
+it()
+one is supported by the mac chip. In this case the previous implementation
+returns -EOPNOTSUPP while the proposed one does not report any error.
+Do we really care about this case? If so, I guess we can rework
+dsa_user_setup_qdisc().
 
-	Looks good to me, thanks to everyone!
+>=20
+> > > How does the introduction of ndo_setup_tc_conduit() help, since the p=
+roblem
+> > > is elsewhere? You are not making "tc qdisc add lanN root ets" work co=
+rrectly.
+> > > It is simply not comparable to the way in which it is offloaded by
+> > > drivers/net/dsa/microchip/ksz_common.c, even though the user space
+> > > syntax is the same. Unless you're suggesting that for ksz it is not
+> > > offloaded correctly?
+> >=20
+> > nope, I am not saying the current Qdisc DSA infrastructure is wrong, it=
+ just
+> > does not allow to exploit all hw capabilities available on EN7581 when =
+the
+> > traffic is routed from the WAN port to a given DSA switch port.
+>=20
+> And I don't believe it should, in this way.
 
-Acked-by: Julian Anastasov <ja@ssi.bg>
+Can you please elaborate on this? IIUC it seems even Oleksij has a use-case
+for this.
 
-	Pablo, Simon, probably, this should be applied
-to the 'nf' tree as it fixes a build failure...
+>=20
+> > If we do:
+> >=20
+> > $tc qdisc add dev lan0 root handle 1: ets strict 8 priomap ...
+> >=20
+> > in the current upstream implementation we do:
+> >   dsa_user_setup_tc():
+> >      ...
+> >        -> ds->ops->port_setup_tc(ds, dp->index, type, type_data)
+> >           (it applies the Qdisc on lan0 configuring the hw switch)
+> >=20
+> > adding the ndo_setup_tc_conduit() callback we have:
+> >=20
+> >   dsa_user_setup_qdisc()
+> >     ...
+> >       -> conduit->netdev_ops->ndo_setup_tc_conduit(conduit, dp->index, =
+type, type_data)
+> >          (it applies the Qdisc on EN7581 mac chip for the routed traffi=
+c destinated to lan0)
+> >=20
+> >       -> ds->ops->port_setup_tc(ds, dp->index, type, type_data)
+> >          (it applies the Qdisc on lan0 configuring the hw switch)
+> >=20
+> > > Also, flower is a classifier, not an action. It doesn't mangle packets
+> > > by the very definition of what a classifier is.
+> >=20
+> > yes, but goal of the series is the Queue scheduler offloading, not
+> > classifier/action. Agree?
+>=20
+> Classifiers + flowid are an instrument to direct packets to classes of a
+> classful egress Qdisc. They seem perfectly relevant to the discussion,
+> given the information I currently have.
 
-> ---
-> 
-> Julian seems to be waiting for a 'v2' from me.
-> Changed target tree to 'net-next'.
-> I've re-written the commit message.
-> Copied Andrew Morton - he might want to take the change through the 'mm' tree.
-> Plausibly the 'fixes' tag should refer to the minmax.h change?
-> This will need back-porting if the minmax set get back-ported.
-> 
-> I'm not sure whether there ought to be an attribution to Dan Carpenter <dan.carpenter@linaro.org>
-> 
->  net/netfilter/ipvs/ip_vs_conn.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-> index 98d7dbe3d787..c0289f83f96d 100644
-> --- a/net/netfilter/ipvs/ip_vs_conn.c
-> +++ b/net/netfilter/ipvs/ip_vs_conn.c
-> @@ -1495,8 +1495,8 @@ int __init ip_vs_conn_init(void)
->  	max_avail -= 2;		/* ~4 in hash row */
->  	max_avail -= 1;		/* IPVS up to 1/2 of mem */
->  	max_avail -= order_base_2(sizeof(struct ip_vs_conn));
-> -	max = clamp(max, min, max_avail);
-> -	ip_vs_conn_tab_bits = clamp_val(ip_vs_conn_tab_bits, min, max);
-> +	max = clamp(max_avail, min, max);
-> +	ip_vs_conn_tab_bits = clamp(ip_vs_conn_tab_bits, min, max);
->  	ip_vs_conn_tab_size = 1 << ip_vs_conn_tab_bits;
->  	ip_vs_conn_tab_mask = ip_vs_conn_tab_size - 1;
->  
-> -- 
-> 2.17.1
+yep, sure. We will need a tc classifier to set the flow-id (I used flower d=
+uring
+development). What I mean is the series is taking care just of Qdisc offloa=
+ding.
 
-Regards
+>=20
+> > > Can't you do something like this to guide packets to the correct chan=
+nels?
+> > >=20
+> > > tc qdisc add dev eth0 clsact
+> > > tc qdisc add dev eth0 root handle 1: ets strict 8 priomap ...
+> > > tc filter add dev eth0 egress ${u32 or flower filter to match on DSA =
+tagged packets} \
+> > > 	flowid 1:1
+> >=20
+> > If we apply the Qdisc directly on the conduit port (eth0) we can just a=
+pply the
+> > queue scheduler on all the traffic egressing via the DSA switch while I=
+ would
+> > like to apply it on per DSA port basis (but using the mac chip hw capab=
+ilities),
+> > got my point?
+>=20
+> We need something as the root Qdisc of the conduit which exposes its
+> hardware capabilities. I just assumed that would be a simple (and single)
+> ETS, you can correct me if I am wrong.
+>=20
+> On conduit egress, what is the arbitration scheme between the traffic
+> destined towards each DSA user port (channel, as the driver calls them)?
+> How can this be best represented?
 
---
-Julian Anastasov <ja@ssi.bg>
+The EN7581 supports up to 32 different 'channels' (each of them support 8
+different hw queues). You can define an ETS and/or TBF Qdisc for each chann=
+el.
+My idea is to associate a channel to each DSA switch port, so the user can
+define independent QoS policies for each DSA ports (e.g. shape at 100Mbps l=
+an0,
+apply ETS on lan1, ...) configuring the mac chip instead of the hw switch.
+The kernel (if the traffic is not offloaded) or the PPE block (if the traff=
+ic
+is offloaded) updates the channel and queue information in the DMA descript=
+or
+(please take a look to [0] for the first case).
 
+>=20
+> IIUC, in your patch set, you expose the conduit hardware QoS capabilities
+> as if they can be perfectly virtualized among DSA user ports, and as if
+> each DSA user port can have its own ETS root Qdisc, completely independent
+> of each other, as if the packets do not serialize on the conduit <-> CPU
+> port link, and as if that is not a bottleneck. Is that really the case?
+
+correct
+
+> If so (but please explain how), maybe you really need your own root Qdisc
+> driver, with one class per DSA user port, and those classes have ETS
+> attached to them.
+
+Can you please clarify what do you mean with 'root Qdisc driver'?
+
+Regards,
+Lorenzo
+
+[0] https://patchwork.kernel.org/project/netdevbpf/patch/a7d8ec3d70d7a0e220=
+8909189e46a63e769f8f9d.1733930558.git.lorenzo@kernel.org/
+
+--CJbmCgRntwAP0sFC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ2CpggAKCRA6cBh0uS2t
+rBbmAP0SGeXSlGqydCGPjaqgLcNPBHC+FyAu0qh6B2nnkWwwIQD+NHcnATDDWaHW
+DVu2BFeG81/GtE5ilCdDfpyj/YscCgM=
+=09KQ
+-----END PGP SIGNATURE-----
+
+--CJbmCgRntwAP0sFC--
 
