@@ -1,93 +1,159 @@
-Return-Path: <netdev+bounces-152318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 734159F36E6
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:03:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E8ED9F36F7
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F54616EB88
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 17:02:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34D3C16C0AE
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 17:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746B1207641;
-	Mon, 16 Dec 2024 16:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61EA81BD51B;
+	Mon, 16 Dec 2024 17:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="ey42xlTe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fYTbq1Ft"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B801CEAD8;
-	Mon, 16 Dec 2024 16:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB4E14A0A8
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 17:05:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734368213; cv=none; b=M0IBoJ/IDwll4l8QJGDbVKYFhRXBt7LXVVNarbziAtRgLeM/PEbL6q+KQQOUXTOVhes3Nq1Ey51r9TfxNth+3PkiJterP0XA9yPiuor2GW2e/n3WGfCj7HCkeP+BqBAYs9C/yC4MqhMxWTq65FGbu3Gf/YgUoO1q+F0F6uQww2Y=
+	t=1734368752; cv=none; b=rT5tcRYJLCsDFIG2XzbjmuSEpGYsURP5jJrASnopPKuWSOfoDsn2Xaqf3bf32581TpF2Lj/KSvGkXswc9CKE/5x79/+t76BQ/kyiJygkUphswjkejtjBpA9lDzdsyV4ISEzG0Agdk/62NtLQ/JGc/8NTYWx6vPvhD2xsEg2JO5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734368213; c=relaxed/simple;
-	bh=99jUtqNZPFlgP9O2E9iIbyQppB2GC16vKTnn7VuC9qk=;
+	s=arc-20240116; t=1734368752; c=relaxed/simple;
+	bh=o7V9eLY9EflcOwMEm3JOIuftFONI4Cv7WKHRUJrVVBU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=av35zfs7OUzu3SKpG66EObjEz2GEwHzSzR0aEGjMc4IQUeH3gfWuwW5R63cud1XWeDLjYGBDZtrEv5P6mKF3lm0ygZgtcv7cMqwf9Vr5Jb+vb567Za+IIuS1TbhkpR1sHLxWvlmgq/KL7S+2tpUiOwbgvlW6YXK1uLUEakP2Z1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=ey42xlTe; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=m1Sgsvg30lO0ZBuoFRCva6n5RXpXVTLhOLjnkVbtOmc=; b=ey42xlTewX0tcnAy
-	V6Ou37XbQyU0/rnWSkdVSfsSLJxKuKouYDFNXrPT5+KTUMkpTftANI4ylrBEVb7GqaXQTnwQNMxm2
-	xLs1VuMUEsU/d4ray9VtiJ6KFJ2daSDr0bKzArHfa5kIq/ClCoVHUYICAp0azS5+L8ceDBC8OoSp0
-	9m8gqRWcO3esckBlwgdBRhQc1/694+V3VfwKV/8DziAceOsNRqaj0bYq5Vc90Wa/4bwwb619yxJdD
-	IiZWQ+5sCUhfqNKcewtleSB6PmfB20w1qV/Py9GhIKewad7WQhtABHgz8xufSahbXcDsiXjd2fwGn
-	9frrdUQnDdfMRlBohA==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1tNEOk-005fN9-0w;
-	Mon, 16 Dec 2024 16:56:46 +0000
-Date: Mon, 16 Dec 2024 16:56:46 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Simon Horman <horms@kernel.org>
-Cc: jes@trained-monkey.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] hippi: Remove unused hippi_neigh_setup_dev
-Message-ID: <Z2Bbzm7rATuaMypf@gallifrey>
-References: <20241215022618.181756-1-linux@treblig.org>
- <Z14-sYvgzEPZSTyR@gallifrey>
- <20241216161401.GG780307@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kXGCfkUGMPne+/arRF7ZW25EKWmLzd1nwHgAsAgYzqad1DOGAjWQfgrVFnPCs8TCooBcRbP2d9PpP3IA3AtHUSnfydLprmA0Pefyn+cT7f1oLA1XciwQo/AdT6jiLa4+2fINCw5Wg85MHuP0ayr2xCE0YVCuSEvBmrhpcufyrz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYTbq1Ft; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93F6DC4CED0;
+	Mon, 16 Dec 2024 17:05:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734368752;
+	bh=o7V9eLY9EflcOwMEm3JOIuftFONI4Cv7WKHRUJrVVBU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fYTbq1Ftud10zREkEN0d1t9a+C9QD7pKRMxZQ8c9HfODl5JK1++u7cq2TWGMAeaqM
+	 InRBE9XJ4qoMzAGOUF6bspup5iLrbwhBjjij97CUnKIu0/RBON7bkb7ZuHlm5RDjWl
+	 FxtPPT+/3/kXO20t9BeXhdjE3uz9Z+pky0Ogm9EY/P/TiLs/ClHGlGEnxasxvKL3s8
+	 iUo8XF1Dy+78vg0m7SvPAtm1SQ8VnRZJg1iSWCDpw7J6GuKvoMvoDmYp8IiLZkWVAS
+	 px8Rj6WItDbopfMQTAWkJsmt50HjZsP5ekt9YQGWM9j0sUfGorduSYUU65pkiFsYNi
+	 sqEzSaNRf0wAw==
+Date: Mon, 16 Dec 2024 17:05:48 +0000
+From: Simon Horman <horms@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>
+Subject: Re: [PATCH iwl-net] ice: fix ice_parser_rt::bst_key array size
+Message-ID: <20241216170548.GI780307@kernel.org>
+References: <20241211132745.112536-2-przemyslaw.kitszel@intel.com>
+ <20241212163047.GA73795@kernel.org>
+ <7367ea55-1607-4fd2-a392-13a9fe84167f@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241216161401.GG780307@kernel.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 16:56:16 up 222 days,  4:10,  1 user,  load average: 0.04, 0.02,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+In-Reply-To: <7367ea55-1607-4fd2-a392-13a9fe84167f@intel.com>
 
-* Simon Horman (horms@kernel.org) wrote:
-> On Sun, Dec 15, 2024 at 02:28:01AM +0000, Dr. David Alan Gilbert wrote:
-> > Note the hippi list address bounces:
+On Mon, Dec 16, 2024 at 06:58:35AM +0100, Przemek Kitszel wrote:
+> On 12/12/24 17:30, Simon Horman wrote:
+> > On Wed, Dec 11, 2024 at 02:26:36PM +0100, Przemek Kitszel wrote:
+> > > Fix &ice_parser_rt::bst_key size. It was wrongly set to 10 instead of 20
+> > > in the initial impl commit (see Fixes tag). All usage code assumed it was
+> > > of size 20. That was also the initial size present up to v2 of the intro
+> > > series [2], but halved by v3 [3] refactor described as "Replace magic
+> > > hardcoded values with macros." The introducing series was so big that
+> > > some ugliness was unnoticed, same for bugs :/
+> > > 
+> > > ICE_BST_KEY_TCAM_SIZE and ICE_BST_TCAM_KEY_SIZE were differing by one.
+> > > There was tmp variable @j in the scope of edited function, but was not
+> > > used in all places. This ugliness is now gone.
+> > > I'm moving ice_parser_rt::pg_prio a few positions up, to fill up one of
+> > > the holes in order to compensate for the added 10 bytes to the ::bst_key,
+> > > resulting in the same size of the whole as prior to the fix, and miminal
+> > > changes in the offsets of the fields.
+> > > 
+> > > This fix obsoletes Ahmed's attempt at [1].
+> > > 
+> > > [1] https://lore.kernel.org/intel-wired-lan/20240823230847.172295-1-ahmed.zaki@intel.com
+> > > [2] https://lore.kernel.org/intel-wired-lan/20230605054641.2865142-13-junfeng.guo@intel.com
+> > > [3] https://lore.kernel.org/intel-wired-lan/20230817093442.2576997-13-junfeng.guo@intel.com
+> > > 
+> > > Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > > Closes: https://lore.kernel.org/intel-wired-lan/b1fb6ff9-b69e-4026-9988-3c783d86c2e0@stanley.mountain
+> > > Fixes: 9a4c07aaa0f5 ("ice: add parser execution main loop")
+> > > CC: Ahmed Zaki <ahmed.zaki@intel.com>
+> > > Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 > > 
-> > <linux-hippi@sunsite.dk>:
-> > Sorry, no mailbox here by that name. (#5.1.1)
+> > Hi Przemek,
+> > 
+> > I agree that these changes are good.  But I wonder if it would be best to
+> > only treat the update size of bst_key as a fix.
 > 
-> I suggest submitting a patch to MAINTAINERS to drop the that ML from there.
-> In general, patches for MAINTAINERS can be targeted at net.
+> I was also wondering, to the point that my first version was with
+> all 20 key bytes debug-printed in the exact way as it was prior to the
+> patch. Would be fine to just drop the printing part?
 
-Thanks,
+Sorry, I didn't notice that the printing is updated to accommodate
+the larger key. So on a second review, I think the patch is fine,
+as long as a delimiter is added as noted in my previous email.
 
-Just sent, see 20241216165605.63700-1-linux@treblig.org
-
-Dave
-
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+> 
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/net/ethernet/intel/ice/ice_parser_rt.c b/drivers/net/ethernet/intel/ice/ice_parser_rt.c
+> > > index dedf5e854e4b..d9c38ce27e4f 100644
+> > > --- a/drivers/net/ethernet/intel/ice/ice_parser_rt.c
+> > > +++ b/drivers/net/ethernet/intel/ice/ice_parser_rt.c
+> > > @@ -125,22 +125,20 @@ static void ice_bst_key_init(struct ice_parser_rt *rt,
+> > >   	else
+> > >   		key[idd] = imem->b_kb.prio;
+> > > -	idd = ICE_BST_KEY_TCAM_SIZE - 1;
+> > > +	idd = ICE_BST_TCAM_KEY_SIZE - 2;
+> > >   	for (i = idd; i >= 0; i--) {
+> > >   		int j;
+> > >   		j = ho + idd - i;
+> > >   		if (j < ICE_PARSER_MAX_PKT_LEN)
+> > > -			key[i] = rt->pkt_buf[ho + idd - i];
+> > > +			key[i] = rt->pkt_buf[j];
+> > >   		else
+> > >   			key[i] = 0;
+> > >   	}
+> > > -	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "Generated Boost TCAM Key:\n");
+> > > -	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
+> > > -		  key[0], key[1], key[2], key[3], key[4],
+> > > -		  key[5], key[6], key[7], key[8], key[9]);
+> > > -	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "\n");
+> > > +	ice_debug_array_w_prefix(rt->psr->hw, ICE_DBG_PARSER,
+> > > +				 KBUILD_MODNAME "Generated Boost TCAM Key",
+> > 
+> > Should there be a delimeter between KBUILD_MODNAME and "Generated ..." ?
+> > e.g.:
+> 
+> thank you :)
+> 
+> > 
+> > 				 KBUILD_MODNAME ": Generated Boost TCAM Key",
+> > 
+> > > +				 key, ICE_BST_TCAM_KEY_SIZE);
+> > >   }
+> > >   static u16 ice_bit_rev_u16(u16 v, int len)
+> > > 
+> > > base-commit: 51a00be6a0994da2ba6b4ace3b7a0d9373b4b25e
+> > > -- 
+> > > 2.46.0
+> > > 
+> > > 
+> 
 
