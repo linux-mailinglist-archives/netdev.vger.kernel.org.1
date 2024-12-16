@@ -1,259 +1,250 @@
-Return-Path: <netdev+bounces-152200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90DE99F314F
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 14:13:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE21E9F3160
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 14:19:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C16F2163C18
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:13:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEE9C163A77
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 13:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4655204C02;
-	Mon, 16 Dec 2024 13:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A7A202F64;
+	Mon, 16 Dec 2024 13:19:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d8LURqDe"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="H7+qyC7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2061.outbound.protection.outlook.com [40.107.220.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0645B1119A;
-	Mon, 16 Dec 2024 13:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501DF29CA
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 13:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734354801; cv=fail; b=hqA39/Fg+jYmRobQ3dvevlivqkair3q/YRM46Tw1kFfx6Abqk9TyJRVCtVE7c+b4LsooCz4zZkCPdd5/JXynYs6F4x8C81DAhTMAp+KvfovGx8j7KoTFp5z9S4lNcbrhCGCHws+hj6O6LY8P7NZxIft/o54c75jU551J/39059I=
+	t=1734355170; cv=fail; b=h0bgppbGkbzx6kVcGY2z+SXCLugK6jblLKeJe3dGmWLvDsRxa1m64A0ZuiFYritg5Mh82PQGevUET9ImC4cjW6J2ziJevgY+A4VPg8G859wumrKISOkPn0TXBw41CVMkiNSH5Wi3DKMXRjJOgCoXbq2z5xLVeUAeU1A8FQya4z8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734354801; c=relaxed/simple;
-	bh=Ev6usaArfPjNE8L0Sk8x0jJkESwp6BuwoxD5U0THkD4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=r6v7D8M5gjO7xB8w2mlpFH78J5UcP6eIUXJAS+3vkg3/EnNHmJO8LdGuLY6ejhTKsypkvsQiQEJXhtRE+82BOu0LQIoPGnAo3SBXhpUX1/Sw2rW1/DCu4xhhb443nvNJyZj7GEzWeLvNZGTgqxHEgDtOJn7sJs673QWIPIwrn+g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d8LURqDe; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734354800; x=1765890800;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Ev6usaArfPjNE8L0Sk8x0jJkESwp6BuwoxD5U0THkD4=;
-  b=d8LURqDe3P3K5E+2G6DxGvmDYPa0k8HcTAAspq85RHxxpJ2OKYixjJqG
-   RVc2Ya9Hvp86g4DOPAJWQlVjqBsbeO9bo4YdRgEoNZAkIEIRGC9LftgB/
-   4KQc4Hv4MYvoljX2/0IlZRavepLzDhmfUTH5tiwO1ILSNlirimBuri8vb
-   ASZfaMWqMpJgq1y1NarWb0jpKdpXqMue05Jd+XPAv56zZ1QPINQ6KHNEe
-   +MceQRb/06o8lKs57mMHArTAg4wyhFe9Kdd3zu6kSLUiuOJbVRbtMsOMc
-   pVnv2u67bJ8QRJZGKREYlKCqNykD9eiYXetC+puhkkq+4PatCAksElIvz
-   A==;
-X-CSE-ConnectionGUID: hAgo+QZuSpaahpX60s9liw==
-X-CSE-MsgGUID: CxwhxFAYTeWD+g2lytiqGQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11288"; a="22322022"
-X-IronPort-AV: E=Sophos;i="6.12,238,1728975600"; 
-   d="scan'208";a="22322022"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2024 05:13:15 -0800
-X-CSE-ConnectionGUID: wckDO/YcQYiZHFjEQ4pLjQ==
-X-CSE-MsgGUID: y4N/JGP3QfezHT3oSp0QBA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,238,1728975600"; 
-   d="scan'208";a="97102232"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Dec 2024 05:13:13 -0800
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 16 Dec 2024 05:13:12 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Mon, 16 Dec 2024 05:13:12 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.46) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 16 Dec 2024 05:13:12 -0800
+	s=arc-20240116; t=1734355170; c=relaxed/simple;
+	bh=okzWzc+gP2m9RpfnPFqBtAmHTfr6yd02yajB3gcK4Cc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=knrNtrB1dESsDp4jhNIv6pbISA7z8U9BqUIfQXNJ6qUkfjXm3EmLtQ8P0YKoqrwiQ0GUD1qDUfPmZsdDiYuV9R20FFJ1WG5CZxb3l2Zf9Pvu/wIGNcc+PcB54M2nJL09bdOVK4D3qH8kcxMQpjMzJ1BD7dmrMnRpVEZBNWyeYT0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=H7+qyC7f; arc=fail smtp.client-ip=40.107.220.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rTkrEMAMpFd3iHKJqcsM5MT2/JLh3/lMnHlsAX98UQsHrppWZgxrx2mDuaZplTu5MFfbfOyTJ1DzL05Ko9WjJ6nmVCgLqTC21NolZ+9PAcQofgAC5AHxH7cJFSr8uqjzHqVq9zX6W+BD88BSWy5CMIi2qm4GQMDUwFxmwPh71cyMNqFCGDKTMicjDjIE/MVZ7KC/O6X3x/OFK0Yoo62aUN76orTaOfJj/9oe7dxdjL10JqKVa/l2DICvVITVgwmt4SwwjD9mAoXyxDn8VxOoiRjmdwKDVfZGkvDgvyk7/XEIiXvI5anZVfF4vQIym6JexO/XnSIdcVPXXwe7WZVNdw==
+ b=oq+tw3FOOWxYfswUpnG0ldUe2xgPSlpSRIFxbRDN5a6MKcbGgDYBv+PzH0xY0i9rYOQwJQoZyAGtrj2K5sZuBgsbhp6RVRyjf7TWf/24/zHiHU+0t6ykIm76Zi9ZCUIhnleYwZC/dAJuxI+1dj1UrOtbGYdAGcuqW9U2+rE9it1qSZ9g99OsqVwg+07CmoehoWkA0sEdnbq0XC5BudkaqWgZs0JP5BmC8L0Jr+7trbNyeoeKvyAF7aynBaeJZGPCFONm90Y+sa+ZE2i+DtrYkxrEGzuQTrs85bMS9Zs1KfUQDfWfalkV3PU53IN+Zvr4dXKvJjkmfmJsK5d4Dd6+1w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Eny8d7MQa0glps53YrIjGpgs0fO+OLIc50Eld/D+X38=;
- b=GpE13snc1OembG5y91I/GLemBgQNn8r1Ld7LJIEbBqDg/mjAayKFZ8GADYeG96URO6QLm9ST55ZWo4Y41BD4LuPxlIdtEcvFu0fMRj0oDGOend4sILgxM/z83ZpU6MU+BoyVujwBqlseQiYE8unOGZf0DTJjZo/7egrAu1BSwMXCXgXblmFib+benEM0dDX+BlZSXL+cEpCwXi0zw9cptGnlqgGe1VZHcw343CAjlmGM1ncQ2FTVmhS99ei/2ZsBTf3vTRvxzNlVrj85r+8XeSfS1oHqoO94CSW+w2I1U/Yyku8D/zhhFrk2CX6CN06C1xEZjNh3H3EXac4nLZLkkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
- by SA2PR11MB4906.namprd11.prod.outlook.com (2603:10b6:806:fa::7) with
+ bh=H8xxRuRfGuNQy0E9OeWA5olA/Vo50UEDYI6btKCP3i0=;
+ b=CKr33IrNUVOVTlGpxHWVrgADpVIPNv1m8MY+iBu3LWXYmatEgCCaaDuCp0cB1dhemkgts1ujSci5nec51KmOr1zCkIQatFeAXk46zLpuLqf6Ny1uV1zstWRiYfTUsp5fkbr2GXTHHZXX4oUMmeHOlNc0SlEZVwsQFU7jo6A+2lFk4WRAdq6m9L1x/bVvN4npt32+jgyFMNYrKSWXfDFJoD5G9bZGZKG1vCScHbpjI5NmkkHm76IQy5W+yV/Erd/40g8INaee+XD+abac2DQQPmxxAJE99Z0RPmJuCRwRSH9ZxfN5MzsaibTaNAvUkilv4XLA+7whbxZwBezv+ufkrA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H8xxRuRfGuNQy0E9OeWA5olA/Vo50UEDYI6btKCP3i0=;
+ b=H7+qyC7f+tNsnVId2CzjOi20GWtZtjUbfHu7ChifQJS/TFeTc9YUpBSJtp+yBSFFoaJ8cVqZfTuSsHDmKnBZtekBlWYBZLKVsQN5+6RlogpAxAvnfebtzbHbDfrFQKDdf5YgftsrU4UdB7NwEtSDjJxX3Qq6rgyLVRk4zrrc8CHDdiBVSN4AoX2GlimAFZYaSPYQCkJRgAdl+6IGh8wuswlDPuevnrsGpeD4D2soOrWutT1ChvQk+ZK6aM8v2DaKKBZa5HqogqOtnl4swqmGSgJ6yW2nRvPHMa1RKuSDCBcyOO+hFYa7feSpnjD+SXcUXFvHmSz9WEQIkEXg3AE9Pg==
+Received: from MN2PR03CA0027.namprd03.prod.outlook.com (2603:10b6:208:23a::32)
+ by MW4PR12MB7119.namprd12.prod.outlook.com (2603:10b6:303:220::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.16; Mon, 16 Dec
- 2024 13:13:10 +0000
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::b8f1:4502:e77d:e2dc]) by BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::b8f1:4502:e77d:e2dc%5]) with mapi id 15.20.8251.015; Mon, 16 Dec 2024
- 13:13:10 +0000
-Message-ID: <7d777a2b-f7f0-49c5-86d2-9ac36a351ab9@intel.com>
-Date: Mon, 16 Dec 2024 14:13:03 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 3/6] net: usb: lan78xx: Use action-specific
- label in lan78xx_mac_reset
-To: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Woojung Huh
-	<woojung.huh@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>
-CC: Andrew Lunn <andrew@lunn.ch>, <kernel@pengutronix.de>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, Phil Elwell <phil@raspberrypi.org>
-References: <20241216120941.1690908-1-o.rempel@pengutronix.de>
- <20241216120941.1690908-4-o.rempel@pengutronix.de>
-Content-Language: pl
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Organization: Intel
-In-Reply-To: <20241216120941.1690908-4-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0033.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:1c::20) To BL1PR11MB5399.namprd11.prod.outlook.com
- (2603:10b6:208:318::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.20; Mon, 16 Dec
+ 2024 13:19:23 +0000
+Received: from BL6PEPF0001AB4D.namprd04.prod.outlook.com
+ (2603:10b6:208:23a:cafe::af) by MN2PR03CA0027.outlook.office365.com
+ (2603:10b6:208:23a::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.21 via Frontend Transport; Mon,
+ 16 Dec 2024 13:19:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL6PEPF0001AB4D.mail.protection.outlook.com (10.167.242.71) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8251.15 via Frontend Transport; Mon, 16 Dec 2024 13:19:22 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 16 Dec
+ 2024 05:19:10 -0800
+Received: from fedora.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 16 Dec
+ 2024 05:19:03 -0800
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	<mlxsw@nvidia.com>, Amit Cohen <amcohen@nvidia.com>
+Subject: [PATCH net-next] mlxsw: Switch to napi_gro_receive()
+Date: Mon, 16 Dec 2024 14:18:44 +0100
+Message-ID: <21258fe55f608ccf1ee2783a5a4534220af28903.1734354812.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|SA2PR11MB4906:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1ee823a-05c7-4779-26e8-08dd1dd36399
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB4D:EE_|MW4PR12MB7119:EE_
+X-MS-Office365-Filtering-Correlation-Id: 645bb086-4c3e-4534-82f1-08dd1dd4419e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?M0JDZW42WTRRcGpkcnZaTW54azh1aEN5TXRaaUV2ZUh5YXN3QzBmTUdaZTFD?=
- =?utf-8?B?SlBpdjRTeXhobk1IUVcwSjlxWW4zdFhlRzA3OVBoN29OQzFhd2NhL2FFcUYy?=
- =?utf-8?B?M29wb1VWR1FnRk01K0tNUkdObTkwL0hQRDRzdWpKa2FCNVFlUG1OSFFRdC8y?=
- =?utf-8?B?b21LSnBGNXdCQ1hZWWhEaEVLMU5peHFPeGc3cWtiSFJxZnNaS29QWXZGNm9L?=
- =?utf-8?B?MFdNYW5rNDRaSWNQRmpzb2dvWWZhUkhObmttQ01CVlZFSW5XNkdFcDkvT2V4?=
- =?utf-8?B?cElWTVBDeXl5cHhBNmNEZ1ZlbTFyRUhqMFpnNmhaME4rdGwzOWxMVk1JZ3li?=
- =?utf-8?B?eUwzSm9tNzhKc3ZML2ZoRllLMVFqc3JsaytwNGZVekhqODBzT04xNVdsanQr?=
- =?utf-8?B?VzJwSHo1RE9rTVVPbXlzSTBEelJucmlGK25hR3Q5bDZjVkJ5Vk1tL2Nuc2ox?=
- =?utf-8?B?cm1GSlFITklYb3ZMV1dvU2V0ZDA1Q2plV2VhOGRoSW04enlWdnhZUFVUQTJN?=
- =?utf-8?B?RGhoaVJvTGNSeDVlT0JSbmdkYys1VlJKdWJjdVpNM0wyZHN5L01mY3lWUVZC?=
- =?utf-8?B?c0ZkMkxDdWUyWFk5eTRDMDZRZGZpODJ3RERFYVpDdXN5WlZ2SURkdlp4QUlU?=
- =?utf-8?B?SmxUSE55bk9mR2lzTDVWR2VVL0tOeU9FL0NFWVVoeFF2TmRNQ1BhaW03Zllp?=
- =?utf-8?B?TFJVR3Y5SEowMmlEdjJtMlh5bzZtMmFFeDZzeXBLS1BMNlpsRFc1TmNkZXlk?=
- =?utf-8?B?V0FtaEIrMDBJVFN1elRsZTFJa3lBNHBYTTNleC8yS2Yxc3lDWHluQzkvV0VO?=
- =?utf-8?B?WEUvUEZBOURGTjdZajRUYUp2RGpHbXk5cXZhQmczc0k2L2hwZ2pzVCs4OG1D?=
- =?utf-8?B?TFN1UkNLM0Y3Z3VOS2pjdERaYzd4c09UWlNnU3BBUkp0UDg5Qml6eHI3K0xZ?=
- =?utf-8?B?UXhIcENhbmRKYWNzWkNjcTRibFM3VUgxYkRNUm02aXdncTd2K08yWXhVOFVh?=
- =?utf-8?B?amxRRnp4VnRqczFEZWNPOU1lRk9xemJkN2VHa2lIdW1BU3grQ0ZkaW9NL1JD?=
- =?utf-8?B?emtPUlZRbUIvTHkrM0xmckRIcTFubXUxWXRKKytHalNLazdiaWpIdGlSVm9O?=
- =?utf-8?B?L01aZTZHekJURkYyaytsQkpuTEZ1OExqRWsydm8wV3pVZDZ2bnFObzNjd1Ix?=
- =?utf-8?B?cS9OS2RMcGxJVERHc2J1QkYyeDhwUjFyRkxmSGRBR1F2ZGp3d1hPa3laVDJH?=
- =?utf-8?B?U2NJN0JEdDJmaHNlenFoNEgrK21pTFNqSEx0ZUFUZWQvRTNJSWJFdzZmc0ZB?=
- =?utf-8?B?L210NTlHclpUTVNMWjVNaHc3dUk4c1VaRlRVdWdxdW11bDdrQVlHVHJuMURu?=
- =?utf-8?B?RjZENTR1a2habXo5VGpPZFV6bzVNclE2Z1d1b3lsKzlHQVhmalA4OHgwaHQr?=
- =?utf-8?B?T1V6MUhmT0NuVkN0NXAxTDlXVjl1V0pmUFdySDBtR095cHBPcEVhSEhlUC9O?=
- =?utf-8?B?b293T2x6Q3YwdFNsU0FDQlJKUWZFVzF1R0VaVkUvam0wWVI4dUYzZlNJeFRn?=
- =?utf-8?B?TU5EdDd0NytZbE9BUXpwc3NDWVNrZVBUM1Zkb3V5VDYxcFdHRDVGdUtGeFUw?=
- =?utf-8?B?d0V6TUxTSFhKVHMrOWRTQXY1TUpqYkdrVTAvNlMrUS9IamNVRUZFeDBWWDRs?=
- =?utf-8?B?WUMwMXk3cVhCSEtVOUh0Qmh2WGZFS0pySmRmdlhVKzQ0cU5VbjB5VWxHZVdG?=
- =?utf-8?B?dHQwaldyN1VnakJ0ODB2RnNVdFRFSC9rMDJ3MFpnSXBJNzlyc2t2MnRWTXNU?=
- =?utf-8?B?WG1YM1AxOGM0aGkzTlVaWVNVQW85ZnBsOEZUWEVrQnQxREkvM0k3N3BjeEpX?=
- =?utf-8?Q?thkYoGxMCDNxZ?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eTBEV1BtY3FNRE9BcVlWa01iSEVJZVVzSTFJU0hKZEIvNGxBVDBwRlMvT29n?=
- =?utf-8?B?SmJkdVpqaUtkc1VNaGh1dnlhc05pRHNReE1aS0RyRG1FdXpkZHJ1VFdaRVQ5?=
- =?utf-8?B?ZU1CdzFOM2Y2bkY3SlhDcFlORDNOSXJmMGp5SFF1WVowbjhjY2d1WWtuNEtj?=
- =?utf-8?B?VnE5QjRLQ0NBakh5VXJZczNvUXRMcVhxK0ZhQlRXQ3V0ZGtJbzRQanR2UUJT?=
- =?utf-8?B?ZEJTaE5HUmJKMnRWR3RoN3BrQXYrK1ZvTHJCZkxSUUMxWTlqdk94RDVUKy9X?=
- =?utf-8?B?bEY0ODlTQ1VyNXd5eENuL1d2NWIzeHlYaXFXeUNiaGFJdzl1N0pONkJDcHRP?=
- =?utf-8?B?TXZ2OS85YnBZRXlTVGtZZHJ2cVVmWjkyUzhzazFiUThNMTNjbDBQdEhOeXBv?=
- =?utf-8?B?clQvb2V2UW9DMXNSUzJ2Qm5uckRMMGZ4a1NEcVFGWXloNmdmYm1HUW1zTThQ?=
- =?utf-8?B?Ni95Yno4YlhBdURtNnFHWXBIVVB6eFlJeXBXYXhMcUNHMVRMQ0V2WFZOb2dO?=
- =?utf-8?B?VTdtK0VuVTZRQm03QURHNzVPb0F2QU9PRFc4R2xkWHRtUm9BakFZMFQyNHV1?=
- =?utf-8?B?bS9LOU05RVpuK296bWM5MlJqMWFRRmM3V2xiZ3hVcFZVRzFvN3FpcExJK1Yw?=
- =?utf-8?B?N3hrYlJhNU1PalZEVEVXSnowQjIrWXFZemczVkgrSjVMcVlUa0kyMEt5LzNE?=
- =?utf-8?B?YVNhRXIwTGE4ZmprdVBaR20yWHgzNE5Md3IxUElyYU1OWTU0dnRSNk1tbDJm?=
- =?utf-8?B?SnJiVG0ra0FVdnlMTWNjTFBSeCtNdzFFZzJkYkFTMWlKUVM5VmR4VE1nRXpz?=
- =?utf-8?B?M09DN0tNUURWZ2I3dnMwZExrQU5KeWVOdWVkQlFmTmtjdmhaVm4zOFEzeWdN?=
- =?utf-8?B?eEQxd1BYNkNveVpoZXVhNDBod2FGSVF4NFNrYkdEM3BVR3FXcXRRUjVjSVlR?=
- =?utf-8?B?Nlc4TDRZNDFFendoWGxSOXBGb1BhZHhZaTRmYkxqbzJQRkF0S3lMNjByem91?=
- =?utf-8?B?cFdKVUNndUJCTmNzT2hlQnB6Z0Z1MmFHc0dOQUc1Ylo5Y3dwQUFobGV1QmMx?=
- =?utf-8?B?RDBpYzFMbjhUb3A5aTMyaFNrc0tqdUk1TjNIYmJtYlpBMnhRSkZ0UnpZOEtK?=
- =?utf-8?B?V2tydnRpdFZiZGN0VkRBczg2VUFZbHdIM2haRThqT0xwQVFiUEhuaW5LdnFH?=
- =?utf-8?B?NzB0NlY1NERPby96eS9FcjJpalpJNVkyd0VuZjc5cWpMTE1lNlh2WkxoMDUy?=
- =?utf-8?B?VjJRcjFVUForaEp5eEhlMVo0Q0VFUVNoZVZEMUorWGdqSW9yWHQ1aitIQ2lZ?=
- =?utf-8?B?dUo4cVNCdm9NcWhvNjdnU1V4NVBtVmFDOERDRlBOemVoNjFGYThSSHp1b1Ra?=
- =?utf-8?B?NHcwWnF3YUFOYzM0bGJnVFhIYWpsZml2Um9meHd6Y2gvelNJSmhKQUdJbGxl?=
- =?utf-8?B?dGYwQW52dTJLdFkxek1PMlNKYnNLR3FtaitxQmJOSkFUbVl1RW1CWE12Z0tw?=
- =?utf-8?B?OHJyUk8zRnFDcnc4Vnl4dERpZXI1cnVoOGZtb0RNNEVDZDMzT2YrSXRKeE94?=
- =?utf-8?B?NHB2NVBpS1E3QnVvUWpkUFVpQkJaQmxuVUhPbXdKa2RIMmF4Ym5URzhteXVM?=
- =?utf-8?B?cFdHWGptemtYaW01WXRtOUtmc0xqUE1jQWFnWmJRZklUV2M5ZWdVYzVrS2Nm?=
- =?utf-8?B?R0RUMlZ3b0lhTWI5U1NNTW9jQUhxNWp6aHQ4bDgxQVFDUXJ2MW1tQ2xRTmVE?=
- =?utf-8?B?TUx3MEYxM250dTFyVE52VUh3bVpac0NUQW54Z2JFdTVwb3FPQ0RiQlNSVlpK?=
- =?utf-8?B?NjdQM1Uxd3dVQWF2MG5LdVVyc01YWVMrbDFqUnFNTlY4MXdKRmtZNXpBMEwz?=
- =?utf-8?B?SFI1Z3VYQUxhb05CUmpRNzNtZktTcm84azZGc05uSndhdjNIdHUxc1d1a2ZH?=
- =?utf-8?B?QzBIOElZQWNSQkNOdTQ2UEU4RHc1Z1h6alhmcHJTUjNPRUpyRXJDZU1oeGg4?=
- =?utf-8?B?dzBQQXRVWVR1eCtzYzBSUEhRYytvQm5ZQVhZQXRsdTIxMEpFdEsvZ1lZQml4?=
- =?utf-8?B?MmZ1cWtJelhuM3VNTFJqM2tacENneURiVjlKSmViYTBkVlgzQkFycVBKUnc0?=
- =?utf-8?B?WmZ0cTJtYW1hcjNwRFJ4TU9mV3JSUGJva1Frc0g4Y1ltQU9Kb2w0S1o0d0pX?=
- =?utf-8?B?UXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1ee823a-05c7-4779-26e8-08dd1dd36399
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2024 13:13:10.4595
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?/BMjdocHGbgu6HrB6Ah+8qVl3Fiw6qRL5TZGn+qvd079VwahCxdY0jzdmNbr?=
+ =?us-ascii?Q?PUocJe4rBVPrJoxFUt4ZgAHyPlsAlTDMNp/xOBMu9Dzr8IJS3pOjf5u8wsGn?=
+ =?us-ascii?Q?XRrlcHA3+rV9eeTlmvpIL4dnYH4p5Y+NIzkbBOrS7Le3hje+zK4z3n0uXyMw?=
+ =?us-ascii?Q?HrOEA0Gz2WQopS9f3DySQHhV6kurmDwndoLNOkak5gygHPrufU24R+v3WwNE?=
+ =?us-ascii?Q?o3cU+PlIXiE+XUzWEZyb2MBzqP+neqTNoQuIfuzZIBVc5luFiM4EumK0q2kP?=
+ =?us-ascii?Q?3qfYMhimn6oIvT4D31aFDhQZwKlVsLuq/aqJ5VGu1iBEaL9J+Bga8Q8YBNgK?=
+ =?us-ascii?Q?kGBOOy/nX06vfvluNutU3XcRkBnSwhJtVHh+1X7YWv1B/5exiF9g2dajU5IM?=
+ =?us-ascii?Q?4+yk5Pvq7yjldquMW5UGi7GAj3I9kUmTRIANArhgcd7CYpkvYtOUjWSTiiw2?=
+ =?us-ascii?Q?RdJ23mtayKnwtPnsPO2d2Uf82X+ZA1BlLqArqXZoajhLV3xLXM7slu643Lcm?=
+ =?us-ascii?Q?c4Qq9qT/oAJjkocxyg2i0Wk+gJKO6ML/kxlnHEPrgJlOyoUJuCnxqStsv8HQ?=
+ =?us-ascii?Q?VVBTmClhxMCH92cH6bPB7tXqIrvtDgahwd8kAgsF/Cas8x88/Na80sdBCGMw?=
+ =?us-ascii?Q?HoGjP9Uq6+hhP4HvoiWYzErMHsThFuvPMKpaJCYJhcikT9BSljKaSZVrGe9r?=
+ =?us-ascii?Q?xxCmXTN/Udc8hsscsPdY53fT3HUeE5xYefN1Xj+yPyUxZzR9u5bFeSiN8r8Z?=
+ =?us-ascii?Q?4jQNR4OqyttKi0zRYpHMIxZP2eivRN63emPQmR62ybqzL8Bo5pbNjWlbnU+f?=
+ =?us-ascii?Q?UokN6RM0uvNTVDKkZEF3mFl6v6JcwuZDSxAxLKPdie686ciO5RYv8jOV+sfq?=
+ =?us-ascii?Q?in3LXcBZjcIjP+jJcp2lH8Gb/ifY1EuKAcaBhSzGWKDKrfM4AD0WVBDcPhdN?=
+ =?us-ascii?Q?rd7wyMbA8ZfsrdFFSMS6C0zc2YlwFvQAAsPQ93jxT3WPHuUSgNLBm9FY05ay?=
+ =?us-ascii?Q?DOf218TILs4bRW0Gd4BUifTWFZjQ05+pGvwuPKBC1wb4wHxws29Uv/E4d7OX?=
+ =?us-ascii?Q?o8bjtelhkDBCBfi5DZT96vkvj7obHCmjviMwlYAjd1mJlZyp62xT1fv+vnG4?=
+ =?us-ascii?Q?btS+GOHYAQHVIDtQRAc3PQgeCVIkiTE48BRuNIDPlT+SaXK8RGAeCEP+2qMO?=
+ =?us-ascii?Q?utTcXwR49q+A6BhyqYxNUCY55u9ogFRlSmlWdEPOI8NnDaUnRkPzK69luK22?=
+ =?us-ascii?Q?rnN6Z7A1286yNIiBVT/BFT/LdKwObQO1KKBixeYpC9dFSf2gptH25D530u1C?=
+ =?us-ascii?Q?5Sp/3+KqtBOoK5DopTtyyiEKdvuxLlvIUTmeZXvHWCOBBc2aVtSSPp0fn98m?=
+ =?us-ascii?Q?aOIrnCrEpyr01NHK4It9CzHISTWSNZPzAlDQcDoQVujV05ac5z72jBhfiDOH?=
+ =?us-ascii?Q?nSM2wwJrABuYU018s1lqJKeiQZ0hD2TPcsTpDtoZAgjAZHLKywI/xGvN2L/F?=
+ =?us-ascii?Q?mtaOmXoR7IG2xQI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2024 13:19:22.5626
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 83NpNsg4ZfWrBWbtoXVcbAixwvOa4zRn349AXHGCQ55t8f6cnjmviO7dVJCPgeLjmJrgrAj14rkcGUUy3+glBCYBMSiYH+/RbRQcifJt5x0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4906
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 645bb086-4c3e-4534-82f1-08dd1dd4419e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB4D.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7119
 
+From: Ido Schimmel <idosch@nvidia.com>
 
+Benefit from the recent conversion of the driver to NAPI and enable GRO
+support through the use of napi_gro_receive(). Pass the NAPI pointer
+from the bus driver (mlxsw_pci) to the switch driver (mlxsw_spectrum)
+through the skb control block where various packet metadata is already
+encoded.
 
-On 12/16/2024 1:09 PM, Oleksij Rempel wrote:
+The main motivation is to improve forwarding performance through the use
+of GRO fraglist [1]. In my testing, when the forwarding data path is
+simple (routing between two ports) there is not much difference in
+forwarding performance between GRO disabled and GRO enabled with
+fraglist.
 
-[...]
+The improvement becomes more noticeable as the data path becomes more
+complex since it is traversed less times with GRO enabled. For example,
+with 10 ingress and 10 egress flower filters with different priorities
+on the two ports between which routing is performed, there is an
+improvement of about 140% in forwarded bandwidth.
 
->   	if (ret < 0)
-> -		goto done;
-> +		goto exit_unlock;
->   
->   	ret = lan78xx_read_reg(dev, MAC_CR, &val);
->   	if (ret < 0)
-> -		goto done;
-> +		goto exit_unlock;
->   
->   	val |= MAC_CR_RST_;
->   	ret = lan78xx_write_reg(dev, MAC_CR, val);
->   	if (ret < 0)
-> -		goto done;
-> +		goto exit_unlock;
->   
->   	/* Wait for the reset to complete before allowing any further
->   	 * MAC register accesses otherwise the MAC may lock up.
-> @@ -1621,16 +1621,16 @@ static int lan78xx_mac_reset(struct lan78xx_net *dev)
->   	do {
->   		ret = lan78xx_read_reg(dev, MAC_CR, &val);
->   		if (ret < 0)
-> -			goto done;
-> +			goto exit_unlock;
->   
->   		if (!(val & MAC_CR_RST_)) {
->   			ret = 0;
-> -			goto done;
-> +			goto exit_unlock;
->   		}
->   	} while (!time_after(jiffies, start_time + HZ));
->   
->   	ret = -ETIMEDOUT;
-> -done:
-> +exit_unlock:
->   	mutex_unlock(&dev->phy_mutex);
->   
->   	return ret;
+[1] https://lore.kernel.org/netdev/20200125102645.4782-1-steffen.klassert@secunet.com/
 
-Nice cleanup, now the label indicates what it does.
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Amit Cohen <amcohen@nvidia.com>
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlxsw/core.h          | 1 +
+ drivers/net/ethernet/mellanox/mlxsw/pci.c           | 4 +++-
+ drivers/net/ethernet/mellanox/mlxsw/spectrum.c      | 2 +-
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_trap.c | 2 +-
+ 4 files changed, 6 insertions(+), 3 deletions(-)
 
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core.h b/drivers/net/ethernet/mellanox/mlxsw/core.h
+index 8150d20cc5dc..59b4d26b4931 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/core.h
+@@ -84,6 +84,7 @@ struct mlxsw_txhdr_info {
+ };
+ 
+ struct mlxsw_rx_md_info {
++	struct napi_struct *napi;
+ 	u32 cookie_index;
+ 	u32 latency;
+ 	u32 tx_congestion;
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+index 0e4711804198..38e7bd3d365b 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+@@ -945,6 +945,7 @@ mlxsw_pci_xdp_handle(struct mlxsw_pci *mlxsw_pci, struct mlxsw_pci_queue *q,
+ }
+ 
+ static void mlxsw_pci_cqe_rdq_handle(struct mlxsw_pci *mlxsw_pci,
++				     struct napi_struct *napi,
+ 				     struct mlxsw_pci_queue *q,
+ 				     u16 consumer_counter_limit,
+ 				     enum mlxsw_pci_cqe_v cqe_v, char *cqe)
+@@ -1032,6 +1033,7 @@ static void mlxsw_pci_cqe_rdq_handle(struct mlxsw_pci *mlxsw_pci,
+ 	}
+ 
+ 	mlxsw_pci_skb_cb_ts_set(mlxsw_pci, skb, cqe_v, cqe);
++	mlxsw_skb_cb(skb)->rx_md_info.napi = napi;
+ 
+ 	mlxsw_core_skb_receive(mlxsw_pci->core, skb, &rx_info);
+ 
+@@ -1120,7 +1122,7 @@ static int mlxsw_pci_napi_poll_cq_rx(struct napi_struct *napi, int budget)
+ 			continue;
+ 		}
+ 
+-		mlxsw_pci_cqe_rdq_handle(mlxsw_pci, rdq,
++		mlxsw_pci_cqe_rdq_handle(mlxsw_pci, napi, rdq,
+ 					 wqe_counter, q->u.cq.v, cqe);
+ 
+ 		if (++work_done == budget)
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+index 146acb5f0092..78a519149fa4 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+@@ -2412,7 +2412,7 @@ void mlxsw_sp_rx_listener_no_mark_func(struct sk_buff *skb,
+ 	u64_stats_update_end(&pcpu_stats->syncp);
+ 
+ 	skb->protocol = eth_type_trans(skb, skb->dev);
+-	netif_receive_skb(skb);
++	napi_gro_receive(mlxsw_skb_cb(skb)->rx_md_info.napi, skb);
+ }
+ 
+ static void mlxsw_sp_rx_listener_mark_func(struct sk_buff *skb, u16 local_port,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_trap.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_trap.c
+index 899c954e0e5f..1f9c1c86839f 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_trap.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_trap.c
+@@ -173,7 +173,7 @@ static void mlxsw_sp_rx_no_mark_listener(struct sk_buff *skb, u16 local_port,
+ 	if (err)
+ 		return;
+ 
+-	netif_receive_skb(skb);
++	napi_gro_receive(mlxsw_skb_cb(skb)->rx_md_info.napi, skb);
+ }
+ 
+ static void mlxsw_sp_rx_mark_listener(struct sk_buff *skb, u16 local_port,
+-- 
+2.47.0
+
 
