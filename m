@@ -1,189 +1,244 @@
-Return-Path: <netdev+bounces-152345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27BA9F3872
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:10:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B06209F38A6
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:16:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4D416DEE4
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:09:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A258618995F8
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CC7206F27;
-	Mon, 16 Dec 2024 18:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A53185B62;
+	Mon, 16 Dec 2024 18:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c0/1MESJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iMaV8wvc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C51820767A
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 18:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734372093; cv=none; b=YSxOPHRSOACy/Fn2TI+0CU6ic1CuuQ61fxuOWk3wRKw9FWKwbbMAo5ixK7GFFSpACLy4bKK9D1+BxwOgkxL7rgQ0+fvaaScYp2rU/qFmmweR11In4Wb/RyT3pRBvAsNTuELjN/j/kXu/1k/QJlDchf0YoCdR1RK5v4wbAE34mV4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734372093; c=relaxed/simple;
-	bh=TNfva8Q6ky3jlZGdUL9mgkSi6s0mbMUSjYqQPTb44Vc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OxCpRriuociaYVygm3zJTomi7oZVxg/cPDbIvgOm2WkQVLqIVMrul8Y0b7iEQBYjDaLmFT02he1xpE2wVqEoDnH5zq5oe8dtm2tJwLegmmV8TGfz/Qx6iG21HSzx80+jSVjYwuFJbl1awUpyErckynfIimzS+93qBoJDks32SUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c0/1MESJ; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-21625b4f978so6005ad.0
-        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 10:01:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734372091; x=1734976891; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iPQIIei43g7kqpTU4ih+SdwtTSlvo9YRppIwW8lHav4=;
-        b=c0/1MESJ3NsGsL/fzy/xuxkxSU6G+3YdheqhAiPu5YNGqpxIb1dKePPN8/jQCkSSAt
-         /otMdqMsdjXuEMGrRs7FKRTYCPMFQk1/clGbU/1a5kUgMldTp2WvuFmKDb3e3UkC7LiQ
-         2xkvP4ddt/lpJ0Gi7f6sLv4Dw4sel6YURXrNqk9aHlCdlKuG1TsDc/aywVh0kj6374gM
-         RIWPk3ELKukwJjBfqVklMW18IlaxuKlOEkKczwqLz8S3Nd/cMcVR6uPHqbL29QR4dYk+
-         ObIjHgRWDuXYRMX/gOy1FYqic9VlKyC7wT5Trt5AX9wZBxsjs49uc7DHFbGJjd2ZW3O9
-         RNGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734372091; x=1734976891;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iPQIIei43g7kqpTU4ih+SdwtTSlvo9YRppIwW8lHav4=;
-        b=MTvXf8XfbeZ74zib+0WSe1oh0ldeAz+DZbhNowkPiJqIzCGBrLThM+Zgkl5rdeg45i
-         ZWMRS9fhJRpQWbj8Da3qW+aqbY16fwStacUi/8/jbxhMBSsQKP3xcY/RbQRBFag2bIMr
-         Wrf+4l7gWI3odw+TSnNFclHhNUW+GZXbKYIIHD3ZTODioFnO5XaCK4ZFzOv2jpe+nQXY
-         bfpsMVPXbkiAI8JJ9BZ0JMXpFi7lstvIjX/lyM5og7six+nT66yJV00fJoZx8oQah6zd
-         srC6mw5wodTYLljKVDER9n4NtFzz/8Cb/Z0O/te2G5NFy03CRK9gwl+SZICnZ4O6jtdz
-         9w4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVglwizjKonQ3qnWFUZ12hoUrnoOOjw7jOP9NxjeEI+ygGpq+RZVV2rXSWjb6sRifRkdcpm8js=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2EgAJMr+yfKxWbkloHAWzACaCHpdjxb2RMWWAGNrH5fjWaW6s
-	Chb8KMrjgzVdd9eYYTy1w8jBF+yDrv1KvyZwQZ9HSwiwFUzF72H2u32nyCMtBg==
-X-Gm-Gg: ASbGnctljFh58Xs9d465pvVbNYrAJQuEHD0x8Y0fsWU2KnzFsqtY81oS2VzWEI2DiQU
-	fB865cyghWrWM40jLeA1YX4TcYyk1CvrWB0XXWaErB+St8QkNNj6ldUgyfScPrBFpxKRb+U33Gl
-	zyKmPK6LelBzxu6ySMll6ORl5VbN0Q8bSMzKN6e7pAt/d3vqfnlNtCjNwXP/kghNHD3zSAdK9a0
-	qU96o3nAJHBWvUg4XafGPV9DFg6Nh4Gxj2oLnL41QhcNtHrXPA+xEJsTfi/npwUvC9zQrnRXmjJ
-	vtkMFxKyRyr9da1aogA=
-X-Google-Smtp-Source: AGHT+IHHEXazswLI1ZC1yYlfJKsVFipOtHWE0V0uoBs6pGbMlIW0+1tuLPmPdqqn8TQk9Mo751rpqQ==
-X-Received: by 2002:a17:903:1252:b0:216:6ecd:8950 with SMTP id d9443c01a7336-218a4539480mr4010465ad.19.1734372091319;
-        Mon, 16 Dec 2024 10:01:31 -0800 (PST)
-Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1db87c9sm45727125ad.8.2024.12.16.10.01.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2024 10:01:30 -0800 (PST)
-Date: Mon, 16 Dec 2024 18:01:24 +0000
-From: Carlos Llamas <cmllamas@google.com>
-To: Li Li <dualli@chromium.org>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	donald.hunter@gmail.com, gregkh@linuxfoundation.org,
-	arve@android.com, tkjos@android.com, maco@android.com,
-	joel@joelfernandes.org, brauner@kernel.org, surenb@google.com,
-	arnd@arndb.de, masahiroy@kernel.org, bagasdotme@gmail.com,
-	horms@kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	hridya@google.com, smoreland@google.com, kernel-team@android.com
-Subject: Re: [PATCH net-next v10 1/2] binderfs: add new binder devices to
- binder_devices
-Message-ID: <Z2Bq9CjXO6FXIFjl@google.com>
-References: <20241212224114.888373-1-dualli@chromium.org>
- <20241212224114.888373-2-dualli@chromium.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125C614375D;
+	Mon, 16 Dec 2024 18:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734372680; cv=fail; b=hVcrSIMU9TczgJP9VZTd7+a+azHKOFcXvlWytIfDPeRP8SuAnVNfqE7bSnXlRXLD3DBhViRQ/XTgqE/Mo5D4+mPVmBQup3wuyxkLcCxvRIOAvFtyJSNTNx+qL6A2s0WlgLjqST7KkUZzq9g3LPGXu44laeYtpUC9eyxkY4ucJ1M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734372680; c=relaxed/simple;
+	bh=IUmTpvOhP2dHTLSduyLntuS7Wc71tVVIsRo/V5zpQpE=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=EDKCEXgLHrcQfxrNisJJetMNvgv/GQr0yT2wiob1ZU1WIMDSSJxv8iota+e/OXyF+xW2JFadPxo02DbKbJRl7zRxh6Sct0JiAauTxQgAgZajdiqqX6JYGt8GBx6btAsOYugZ14VaaEDM9OvcTa6qjYotHBa1T0zXszL36M6TuQQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iMaV8wvc; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734372679; x=1765908679;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=IUmTpvOhP2dHTLSduyLntuS7Wc71tVVIsRo/V5zpQpE=;
+  b=iMaV8wvcX2Qdwhtb2ntXyq6BJHmwKhG5OjLct6Lh7Y9iVLD2THkfDLfn
+   M1X0PuurV8BM9L4y2NdG/Ie2pvtzKEcr9hWQdBkJod3BzxAYhHujXF7QM
+   nHQwjHwVauQ7nV/wWVyVZ7MiociHUf5b+6YKV67IsIgkIi8hoSvMGXIk8
+   tkQU/4/suDwqZPgyw2vu4YzqgceNOlFdBwDQ/lBwKjJXia91RU/YFgnYN
+   aAcIdmNEep+L6l/XeCOCG2DmG/WNR8uKCaNnf3gEMX3DK4SFQkuV6A4aI
+   yR/kAY5ABu9Z90bruGC2SZRbYvGOd5T9YxPIK/+5iicnyaLsJadt4PCCt
+   Q==;
+X-CSE-ConnectionGUID: 3ZJKFf1hRp6lXNrcaifoXw==
+X-CSE-MsgGUID: WGHGVrUbT8mHaacHvndEZA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11288"; a="34928695"
+X-IronPort-AV: E=Sophos;i="6.12,239,1728975600"; 
+   d="scan'208";a="34928695"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2024 10:11:18 -0800
+X-CSE-ConnectionGUID: x8qOKcr+ShO8hU55+hNxnA==
+X-CSE-MsgGUID: 5fAoq3SmSAWYYanB1/oiAA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,239,1728975600"; 
+   d="scan'208";a="97178596"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Dec 2024 10:11:18 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 16 Dec 2024 10:11:17 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Mon, 16 Dec 2024 10:11:17 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.42) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 16 Dec 2024 10:11:17 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X5AjLTIq9n3O54rT1SV6mS8e56JBphChilvr6ftvHDqMxAibY+1lmtYagb2sF9JdjhT4OKLhoI6+U4H4DPPYCT4BQN6q1iWqdAOOrPi0Kgp91/2sfDr58RMkOyJ4dP9CfYyb4MjkWzOH7XucKOLdL6x5gwyBfbyzJbebpdE348xg2qCAek8E3j2QiHOsukg57iaT8py02Uf3EDjl4t+xd+u/kUTyi42N8z3yqRcccvdejDpScxzm1036PqPuUOqrYfoqr3PQP+SGUMCSJ04asawFZwdu/XJ6egVo+9KjrRJoHozEdVPVhtgVxmxyHrEkQF72XQw2JtBt9ZFSekauJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=McHbLMoFx/mWEr53cg7kgJ0M3fZedGtEMppPYBkXS/4=;
+ b=niJZlipgP/baIJoAKyjZbvFz866P4KXID40AAXIZMmQNtq7QrgKpt/4rigt9mf27kuD+dWLbC7pMMopw/RVR/pU7OT1siJs2HbUOavX4+4Mce/gyhKjuz3yMNL2oEut29P/v1pE2d+JA+RvLPMdegk2B8Z6KIVI0o4rmuQfp0mM84YnbYOpxNSn4qRxwZbfotNPN+RJZQPehSgnlThpvz1h+WCaUxsCuf4I96g67qiSAeg++JdRUsUCWj76stEa5eJ69uMuu/MvAANARKkTAfwc5GXIHG7DPc8ornDBYai6IWWPz73D6WQxUw+Tv9IWBMa+xPn6S8wAeTLXbOAfm0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by CH3PR11MB8384.namprd11.prod.outlook.com (2603:10b6:610:176::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.20; Mon, 16 Dec
+ 2024 18:11:09 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.8251.015; Mon, 16 Dec 2024
+ 18:11:09 +0000
+Message-ID: <b81501de-7dd3-4808-920e-14b2cc817038@intel.com>
+Date: Mon, 16 Dec 2024 19:10:44 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [iwl-next PATCH v4 2/3] idpf: convert workqueues to unbound
+To: Brian Vazquez <brianvv@google.com>
+CC: Brian Vazquez <brianvv.kernel@gmail.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<intel-wired-lan@lists.osuosl.org>, David Decotigny <decot@google.com>,
+	"Vivek Kumar" <vivekmr@google.com>, Anjali Singhai
+	<anjali.singhai@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<emil.s.tantilov@intel.com>, Marco Leogrande <leogrande@google.com>, "Manoj
+ Vishwanathan" <manojvishy@google.com>, Jacob Keller
+	<jacob.e.keller@intel.com>, Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+References: <20241216162735.2047544-1-brianvv@google.com>
+ <20241216162735.2047544-3-brianvv@google.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20241216162735.2047544-3-brianvv@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR03CA0049.eurprd03.prod.outlook.com
+ (2603:10a6:803:50::20) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212224114.888373-2-dualli@chromium.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CH3PR11MB8384:EE_
+X-MS-Office365-Filtering-Correlation-Id: b76c1ebc-16fb-41a1-17ca-08dd1dfd03f5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?M0ZhT09XRmhTTXY4aG1iOVNiaXdTTXpSbUM4ajM2V0xDNWtXWmgwcUIya29N?=
+ =?utf-8?B?NmlFblM2T2VIQ1hlcDBQY0U1eEp5ZkRJeG1YYXBwSFA5RHR4ZWlMZHU1RWs5?=
+ =?utf-8?B?NXZ1VDBiY2RKaVhPM2VkZUM0ZCtOUjZuMkVYVUw2c25OR3k2YS9VRXIwUUZk?=
+ =?utf-8?B?STh6Tk80Mk9nZWJKV1pMNmZqa3NuL2Z5RkhWKy9QR0V3a0k1QVNxbmVoTG40?=
+ =?utf-8?B?Um9tRkJUQlBSWFQzMTl4UE5jNUtsL0FaS2hBZDhRMVg5YTBKVmFzcXdoT3Zw?=
+ =?utf-8?B?VjFqejA1UmhrRjhDMUV1ZXlXb3FHUm5DMEM2ZDVsZVZpOXNZcmlXZ1RoNUVh?=
+ =?utf-8?B?ZGpITTlIam1mQ3MyWFhXanlrZTBBNGh4NjNsZnpveHlKdlhqR3hGclN0YnNn?=
+ =?utf-8?B?U3hzKzJ4aHJlNVhnWDZCQU5aYjB6NmtXOGZTVzhsL053MHVIQWpncytXUlg2?=
+ =?utf-8?B?dUtaYzRhMHRjNitSZlhmS2owOVdEM2VxaFBqTEFvVGxxSGVDRFI0Y2RvQisv?=
+ =?utf-8?B?OCtSclVPUmViSXQ1ZG5oY0VDNkIwcWhFUkVBeXJ1SWRYNWJJaFlRb3lFWmM0?=
+ =?utf-8?B?VmZHTWloczZEOUZSRGJraWIzMDY1SXhweEN2MFdxVXJVdWpxYTRNb1N5SkRk?=
+ =?utf-8?B?cXFSN09UQUw4WXVUWGdxTWFXdVNLUG5VUWdkVEZDV3dkYkdSclJEVGxwcU51?=
+ =?utf-8?B?SS8wTEJnL0NFTUNiaytNR0QrTWk0aGZyMU5DMU9YSmQ0RGZvV29xSkNLZXBP?=
+ =?utf-8?B?QUxJWDQ1bVowSm9NOWVQQzZSUm8zRGM5T0JyaVpqZml1b3BaNnJkckhEa09F?=
+ =?utf-8?B?VENuYkkrREJycmxPdnNmVWYrL0gzckNXdy9DTXlUUytidFdTeS82MzBLYmVn?=
+ =?utf-8?B?VDI5bExmdjJKUlVPSlpWZWpqMEhiSjJ3SWM4MHdXaFFGYXZYd2JKM08yK3VH?=
+ =?utf-8?B?Rk1hV2tiRjlMa2JyZWo5VHVMUDlsTzRQRlh2NjhjVVJnTTFkRTFRWkNTZ2pG?=
+ =?utf-8?B?VWVWL2N5bVlrd3pGY1hnL1NhTlBUZWsrN01TVzBGVi8xbVJwT1gvMUVQNnU0?=
+ =?utf-8?B?TllrUythUEFRSEk1bUtZa3NiNmliZkRhYXNNNEFzSjgxN244cDdGbFRERlgw?=
+ =?utf-8?B?QTNhZG5sUkVqKzQ2UzR5MDhYZnpPcGsvaUt5SWs2M28wTFlWbU0xWGdJTzgz?=
+ =?utf-8?B?ZEFnNkZYUk1BaTUwREcyUDlaekVSekorNzRnYmFKQlpBOE9LYTQwemxnKzEx?=
+ =?utf-8?B?NkMzQU51UDFOTFRSc0hhTW1QWWZKZzM0YmxuWVpkYnNIUU93NnZPSXFVTGZK?=
+ =?utf-8?B?R1hTMktUTHo1NzRaekM3ZSs4UzhZRHVvdldFdjY3RVVTZ2JlYitEZU1Manky?=
+ =?utf-8?B?T1BrWDArbWh2YkNMcCtmZ2pGZkUrR1kzYUlzeENYWjJKREE2YlRXbWt2aHFZ?=
+ =?utf-8?B?YmtOYUhVWm5RdVVaejZzVmFoNUNBTDR4MzA2TDBoUDdodGdJTkNlaUgyU29N?=
+ =?utf-8?B?L0RCTkdnWkUycnZZaW8xb3J4ZXh0Um9HZ1VXVDBZbVk1VDR1eWtyZzQvQjRs?=
+ =?utf-8?B?cnNjMGJPRW84akNZT3ZwdjZYeDJmMnlrVDFJNnRlNWxwaENYSlNyZ3ptYm9m?=
+ =?utf-8?B?K2ZXRmJUclBGMStkcDZiV2F3d1JGR0IwM2tQVGI2N0VVdmJEVms3d1BEM3Zr?=
+ =?utf-8?B?THhSYzdJMDNodFhOSUR0K1hYTTFwQTB2ZTFhMUgvRkRhQWQ2TXdLRGpjUmNy?=
+ =?utf-8?B?QnFFcXZ3ZTd4MzI0Q3NWVnZTWmZOZEVzOTJWTCtpeTRHSThLVUFGZWtOcmJN?=
+ =?utf-8?B?ZUYxSHR5dUpLRmd6d2IzdDZiYWhvYU0rVnpjVEx5RXhVMXNOTkVVWkt1aGFT?=
+ =?utf-8?Q?KyHJk03S8lb0h?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K2Z4aSsvVlRrbFZuRWtIc1dHVEh3MVo4R1FxWEtlMXBUWFUrdyt6bWVtbWFk?=
+ =?utf-8?B?Y1NGRW1mckpXWFBJV2o4RGtBUHFmbDk4MUZoM1dzSEd0R3BnVE0xUkZab3RQ?=
+ =?utf-8?B?VmNVcEZZT2gwSjlwTGkxVjgzZVNwWlA3TlFzWTFXL0w3VzdjMDIwWTYzNGt5?=
+ =?utf-8?B?MjRMQjY1bHJzQTRZOUtBVitTSnp4eUpYWHB6OU1NVjlIc3daMVhTWkZyZTlZ?=
+ =?utf-8?B?TjFBT040MUNOaUlSWmJDaE9Mb3JNaDVyM0lIQWNZNGwwbHN5WG5GS3o2YXRY?=
+ =?utf-8?B?aGhuZU9rZ1F1ZnV5Z2FSa0hveUhDNVVzQ3Q2S2ZJMGlLVm9yNWk0SWNMNDZY?=
+ =?utf-8?B?cVdTN01vRDJUS0lYZ01qazFrTUZiQ3BRTFcybW1ReW9GS2RhaDJRY1RJdkJn?=
+ =?utf-8?B?M0t0OU1TYmZTVkZsMjRVd01ZK1lPNU9aUnhjR2l5eHhOb28yb2R2bWxMVUhk?=
+ =?utf-8?B?aW5FMzhuTWZtWXFWRWNJM1VKYWp3eGlaN3RmUXRxem45b21uWlVlK2V6YkQ5?=
+ =?utf-8?B?V2hEdjA2NGF2VXRHQ1Qvbks3UWora1VnamNBSW1qZFJFMlA3K1NYOWp3Wklo?=
+ =?utf-8?B?U1h6d3VwWHQ4aHRsTzNOSUJYZHQrTEladTM2ZllBR1htK3Q2d2JKUWJxZ0VI?=
+ =?utf-8?B?QUgvaXNGWVcxaWp0amlHTlNlRWpkUUljdktQVStURjFNeVlwdnVJb2VacTl6?=
+ =?utf-8?B?Z1A4V2FacUVZRERBeWhuVS9ZYjJ4OC8xVVBRZUp6clB0YmREVndkb3JXZVQx?=
+ =?utf-8?B?UC9vd05HYlM5cnNNaU9QOXhhdjVwbmxhbUJmMFpWMzJXUkVQNVN1VW5ZdUdx?=
+ =?utf-8?B?V3lyN01sS1dGZXAyOFFkcVhXUUFmZlJDNU1JKzRYRTJEUWdRUEZlQXhZTG16?=
+ =?utf-8?B?MGwwNjhJQVBZUHQ5M3V4dkI3SFMzWU1LQkRLd2UyMmpZL0NGL0luWEtwZDlQ?=
+ =?utf-8?B?UFE5UjNocTRxSUM3VFlhSzF2NWp2RUVTN1hmVHhseHFiUTBnYUd2N3hwWElC?=
+ =?utf-8?B?Z0RCaWc5NFhpbnZyTTFaRUFndmxwaE1PeDY3NnBMcVM5bUR3VnI5OWd0WThn?=
+ =?utf-8?B?Y21qYk9icVdkVnVNeWxaOFdPbEgyTmhmT25Ic0tBZVBhUlAzWGNwd0doUTBO?=
+ =?utf-8?B?SXR1MFg4d0ZPRzVoOXNFcUlveFIxOWthZlZMNVByTVZ6T2ZXWjE2MzVMdzVN?=
+ =?utf-8?B?RUE3eUNUTmM1ajVJQ1ZkKzhVNCtRT2hQKzh2NWVoUm1Uc0NZVXJyRmJzZ1Zt?=
+ =?utf-8?B?SDFMWUROaVgwMjZFbDBLSGF0NWVoK1k0UkVpQVc1bUsyTDFPSE1qejg5RG5t?=
+ =?utf-8?B?UVBsaUU1Vk03bW9UQ0JXa2Y5cWZJMnhYSDNQb1l3YU9EdDhUSmpYa2w0QTVC?=
+ =?utf-8?B?aDVoNkxRUkRKR0RLajFhUERMSitKYXpHMU9EU2dQSTFzNnk1eVFmSmpXQXpF?=
+ =?utf-8?B?OGZuV0pZb1dzT01pejNFK2lYSDhNTlRRQzR6enBwbW9RdnVFRVpvaHM0bU1y?=
+ =?utf-8?B?YnVsVldvb1JMUGpoRmZtaTVoQmRjaGJzeHhWVE1JdkxVSVA2VFpmRGxoYU5E?=
+ =?utf-8?B?VjJLeUxzYTRWaWxkY01VTGlNREduaHMwZjZHN2lIQ3A3NWp4NXN5UWZUa21x?=
+ =?utf-8?B?VVl3SytGU3Z3ajRkNHJUNkJQZ0xIcjlZZmg3NWFwcFdaN01NdDVwMFBHZ2ZR?=
+ =?utf-8?B?V1dEd0x3TmdqSXdjcDJQSlFtVHl4dzV5T3hCSXlaakNtZDJ2MGJyKzNHRG5k?=
+ =?utf-8?B?VGpScm5pU05VbDFQUy9PQXhzOHRQdE5SMVFBdEpBaW1kS3M3bVd6ckJOa3Iy?=
+ =?utf-8?B?dHZOd0tIcWdtZ0NsMXNPNkZIOUkxOEk0MVFnVUlJU2J0NjIwc2JTTXdkUkZH?=
+ =?utf-8?B?NVZTbGtDaXdGdWVHMXdsN2JxTS9UZ1dRNDBYWmlLUEQxR2EyajFZL2RoeXFu?=
+ =?utf-8?B?aGZmR3hrT1FZRFFqQUhnYWxuOGx0TVRGT0FPVGdYR2QxT0dhVFErbjdxVjJz?=
+ =?utf-8?B?YnhpZjdlbk5PWWNrWllHNUNyTmZFK0p2dld5VUVkY25xOGhzMXZJdUxuelE1?=
+ =?utf-8?B?Wkl4TVYzUlNiK1RlNW5oN0hWQnY3Nmt2MDZnaE9mV2hhR2NrNEo2L1NGTVVo?=
+ =?utf-8?B?U3JwRVJISzFaQXgycGhzcEFGVE9pVFo3T3NWUVJwWkZKeW1kSXZ2WnlzbWtY?=
+ =?utf-8?B?WWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b76c1ebc-16fb-41a1-17ca-08dd1dfd03f5
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2024 18:11:08.9546
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8WotC8I1bHxuyoYW2+83VAXSCfC8mj7DuyCX7Lm0slDb10RI12ixiomZegAn6fgXj1SqF317OhkXBFiZSMmCg5rk2NrDzRjYQt+SQd59QAY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8384
+X-OriginatorOrg: intel.com
 
-On Thu, Dec 12, 2024 at 02:41:13PM -0800, Li Li wrote:
-> From: Li Li <dualli@google.com>
+From: Brian Vazquez <brianvv@google.com>
+Date: Mon, 16 Dec 2024 16:27:34 +0000
+
+> From: Marco Leogrande <leogrande@google.com>
 > 
-> When binderfs is not enabled, the binder driver parses the kernel
-> config to create all binder devices. All of the new binder devices
-> are stored in the list binder_devices.
+> When a workqueue is created with `WQ_UNBOUND`, its work items are
+> served by special worker-pools, whose host workers are not bound to
+> any specific CPU. In the default configuration (i.e. when
+> `queue_delayed_work` and friends do not specify which CPU to run the
+> work item on), `WQ_UNBOUND` allows the work item to be executed on any
+> CPU in the same node of the CPU it was enqueued on. While this
+> solution potentially sacrifices locality, it avoids contention with
+> other processes that might dominate the CPU time of the processor the
+> work item was scheduled on.
 > 
-> When binderfs is enabled, the binder driver creates new binder devices
-> dynamically when userspace applications call BINDER_CTL_ADD ioctl. But
-> the devices created in this way are not stored in the same list.
-> 
-> This patch fixes that.
-> 
-> Signed-off-by: Li Li <dualli@google.com>
-> ---
->  drivers/android/binder.c          | 5 +++++
->  drivers/android/binder_internal.h | 8 ++++++++
->  drivers/android/binderfs.c        | 2 ++
->  3 files changed, 15 insertions(+)
-> 
-> diff --git a/drivers/android/binder.c b/drivers/android/binder.c
-> index ef353ca13c35..0a16acd29653 100644
-> --- a/drivers/android/binder.c
-> +++ b/drivers/android/binder.c
-> @@ -6928,6 +6928,11 @@ const struct binder_debugfs_entry binder_debugfs_entries[] = {
->  	{} /* terminator */
->  };
->  
-> +void binder_add_device(struct binder_device *device)
-> +{
-> +	hlist_add_head(&device->hlist, &binder_devices);
-> +}
-> +
->  static int __init init_binder_device(const char *name)
->  {
->  	int ret;
-> diff --git a/drivers/android/binder_internal.h b/drivers/android/binder_internal.h
+> This is not just a theoretical problem: in a particular scenario
+> misconfigured process was hogging most of the time from CPU0, leaving
+> less than 0.5% of its CPU time to the kworker. The IDPF workqueues
+> that were using the kworker on CPU0 suffered large completion delays
+> as a result, causing performance degradation, timeouts and eventual
+> system crash.
 
-nit: I believe you the following hunk should be in this patch no?
+Wasn't this inspired by [0]?
 
- /**
-  * struct binder_device - information about a binder device node
-- * @hlist:          list of binder devices (only used for devices requested via
-- *                  CONFIG_ANDROID_BINDER_DEVICES)
-+ * @hlist:          list of binder devices
-  * @miscdev:        information about a binder character device node
-  * @context:        binder context information
-  * @binderfs_inode: This is the inode of the root dentry of the super block
+[0]
+https://lore.kernel.org/netdev/20241126035849.6441-11-milena.olech@intel.com
 
-
-> index f8d6be682f23..1f21ad3963b1 100644
-> --- a/drivers/android/binder_internal.h
-> +++ b/drivers/android/binder_internal.h
-> @@ -582,4 +582,12 @@ struct binder_object {
->  	};
->  };
->  
-> +/**
-> + * Add a binder device to binder_devices
-> + * @device: the new binder device to add to the global list
-> + *
-> + * Not reentrant as the list is not protected by any locks
-> + */
-> +void binder_add_device(struct binder_device *device);
-> +
->  #endif /* _LINUX_BINDER_INTERNAL_H */
-> diff --git a/drivers/android/binderfs.c b/drivers/android/binderfs.c
-> index ad1fa7abc323..bc6bae76ccaf 100644
-> --- a/drivers/android/binderfs.c
-> +++ b/drivers/android/binderfs.c
-> @@ -207,6 +207,8 @@ static int binderfs_binder_device_create(struct inode *ref_inode,
->  	fsnotify_create(root->d_inode, dentry);
->  	inode_unlock(d_inode(root));
->  
-> +	binder_add_device(device);
-> +
->  	return 0;
->  
->  err:
-> -- 
-> 2.47.1.613.gc27f4b7a9f-goog
-> 
-
-
-Other than the comment above it LGTM. Feel free to add:
-
-Acked-by: Carlos Llamas <cmllamas@google.com>
-
+Thanks,
+Olek
 
