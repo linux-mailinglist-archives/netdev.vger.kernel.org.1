@@ -1,129 +1,113 @@
-Return-Path: <netdev+bounces-152133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 681C89F2D17
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 10:35:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 250F99F2D30
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 10:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D021D18835E7
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 09:35:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62495166177
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 09:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB26202C38;
-	Mon, 16 Dec 2024 09:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CqcqrCu4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28CC202C27;
+	Mon, 16 Dec 2024 09:44:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CED2AF03;
-	Mon, 16 Dec 2024 09:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350F3201253
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 09:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734341732; cv=none; b=HUt7kHKPhGA/22vfLNCLJn+Q1Iei1c6z3oZ5m/mLN9SPLDyRfsgbLNt9de1gNSMCtL+FTtTfp3FKO5ludqyDLMWybw+wBzYkomf55GyoyBrcDGn9y0nJKGg/Okw58CGWXSCBT92MV+OX5GOEQyQd8XePnT/UKQz38QJWk7ENkN8=
+	t=1734342263; cv=none; b=en8asREO35v8VyYcwdjozHPiNsuUuUg00IEY9Yt6YxOSaDmoA4Z/HZgVZvB6ljGVLILUnKTRZWmSb9ab3+Te+Ybdt4BwNNzVLC8+9TXtV4UTM+ExE6RchvV93RbfU+C8YGEJjr5HAyRI796tnBvP5mBT7sTT+3bLqGoNE2gNuHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734341732; c=relaxed/simple;
-	bh=MJAI/S1eHdraNTqHVjewdE9v94dBXIYQiOVlxPlvNrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r91qCB+UKYHDzER7aFv8e3sefnRA0by1pmYzjynKHjEBF/oP3MkMZ7QsPOW7fzTWVAiS1DkQ92OqrMA3uVyOKmKknxPq8ss9XNG/FCQ0H1J4IepRHiU04XQS3m5R63BdjgOY33lcHx+5w7fo6GqmbEvkZXdtKSuGzNjNOCjQV/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CqcqrCu4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F62DC4CED3;
-	Mon, 16 Dec 2024 09:35:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734341730;
-	bh=MJAI/S1eHdraNTqHVjewdE9v94dBXIYQiOVlxPlvNrs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CqcqrCu4hKubVHrP5OFmAQeSv5jXAjEVkgLWRNxM1HyH8n4lXGrkEwQ/qd8YU1neZ
-	 MOByLXyEzw8WoCKYmse+m43YN080jJbWoOpO89l+krT+QIwYKa2XYrJoPjD62YtpOC
-	 4BWDbWIxAZWJ+ZGoUCnHP9dl14leMa9Aj2pjz2dYZRJQ9HCfFRP8OtlAT/rvXOWKh8
-	 L284uiICX4cxf/zTLr77F5fZeTGB8LBOV1JohATH4MKwlx8WLXBQ7XP5eWHWkkPZTv
-	 qMhMN65zPHMjTn1V/1GxK6jP//1OUPrfz58yrDMUSa8WsQk+yJPrmScGHD0NgaJ7Rs
-	 p4fGlGKsDjkLQ==
-Date: Mon, 16 Dec 2024 09:35:25 +0000
-From: Lee Jones <lee@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Marek Vasut <marex@denx.de>, linux-leds@vger.kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Lukasz Majewski <lukma@denx.de>, Pavel Machek <pavel@ucw.cz>,
-	kernel@dh-electronics.com, linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] leds: trigger: netdev: Check offload ability on
- interface up
-Message-ID: <20241216093525.GG2418536@google.com>
-References: <20241001024731.140069-1-marex@denx.de>
- <6f848ef7-c921-4694-9fd5-4a777d5271d0@lunn.ch>
- <72383917-4bbe-4b95-9e2f-4e364f5288bd@denx.de>
- <5c15ea24-8ca1-4b44-b6d6-fa6adac50334@lunn.ch>
+	s=arc-20240116; t=1734342263; c=relaxed/simple;
+	bh=N+i6koqxsa9OsolxCDCw/9LqETbhTH2+AbyTZQ2MAuE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=i37JNBN0lVIEj3abojc4OpFWuNGa7eKJGjfZQRkCMrWP05v+aA7JTg8Q8Lr9Dla47MmBc2lxLgbDu3sU40h6cau60YMNTOmfk7zXogjTrXzg5/PJK87OykNdU1uoeWOG3yJ45wK9WUrf22T2AhAGk28AefuBZJfDdfmVfLHBvEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a814406be9so71553805ab.1
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 01:44:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734342261; x=1734947061;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=J6ybKlMfc9DGIqtIcKjpUrlCF2YX0mHvs0j+RXlXccU=;
+        b=u9V5uQk03e63Ltjd1wiHmD3P7xftRrsVUREYas6D2shE6gCWPyYUHJ8G0215KL0bU9
+         3wmmgdybYH9Q5I5EmFd6NeBpPVLzvn8b1Ybp9oBkXit20TaaDtTW9c608MsmelLMDCpq
+         nscfp1zJuN2GlHqSPXT1FLcm3JAaJ7yJCVipuUbo69ib0Kd2ML94EO+IHOpWPECrFXM0
+         B/Z+V1xzfJZ3+o6zmgCrkT/IqdihgCRP4MivzHYwPev5LnjWqpJXpt/T0n+ZGAkLBK8g
+         HW5Sc//h9Ty2o/la067U+lBS3FnumfNWin4oipCfvc/qaifHEjAD3hoHNDmHCpJtixQy
+         yUfA==
+X-Forwarded-Encrypted: i=1; AJvYcCX/2rxhPCMr1/Icc5FKkrDdwXd3bxPES3ESBKtyHcbOiDXCuP2JPVo7ICwQV2PL/WqF29W4nBk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1x9vxYZhZHN9ccmRbsgWTmyGV9wZTOdY7uEcAbadkWRXfWkMk
+	GZ9rqTyvjvhJnd9kLofGXBXK/BRDBMhPaJ8nHO5onRi1iir/egDeklu9KWhRu5E4v78OjFByiPk
+	V5jE4e400d+qJMuIJz1o+PoCSOd3jlGlMjkz4K2jDEoqIhvgU1wFYMJg=
+X-Google-Smtp-Source: AGHT+IH2j7VQawNDcHbQxaCpP6l4rDtxF+LFPAcZJTSsEyVFPJ4hXJGAn0fC+KrzBb/O8Rp3F+ihMCHORvJ4XiZJI/tyane9eto+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5c15ea24-8ca1-4b44-b6d6-fa6adac50334@lunn.ch>
+X-Received: by 2002:a05:6e02:12c9:b0:3ab:1b7a:5932 with SMTP id
+ e9e14a558f8ab-3aff0682c2cmr113845555ab.18.1734342261451; Mon, 16 Dec 2024
+ 01:44:21 -0800 (PST)
+Date: Mon, 16 Dec 2024 01:44:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <675ff675.050a0220.37aaf.0124.GAE@google.com>
+Subject: [syzbot] Monthly wireless report (Dec 2024)
+From: syzbot <syzbot+list7655e841c85eeae9d270@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 14 Dec 2024, Andrew Lunn wrote:
+Hello wireless maintainers/developers,
 
-> On Fri, Dec 13, 2024 at 11:15:09PM +0100, Marek Vasut wrote:
-> > On 10/3/24 2:06 PM, Andrew Lunn wrote:
-> > > On Tue, Oct 01, 2024 at 04:45:23AM +0200, Marek Vasut wrote:
-> > > > The trigger_data->hw_control indicates whether the LED is controlled by HW
-> > > > offload, i.e. the PHY. The trigger_data->hw_control = can_hw_control() is
-> > > > currently called only from netdev_led_attr_store(), i.e. when writing any
-> > > > sysfs attribute of the netdev trigger instance associated with a PHY LED.
-> > > > 
-> > > > The can_hw_control() calls validate_net_dev() which internally calls
-> > > > led_cdev->hw_control_get_device(), which is phy_led_hw_control_get_device()
-> > > > for PHY LEDs. The phy_led_hw_control_get_device() returns NULL if the PHY
-> > > > is not attached.
-> > > > 
-> > > > At least in case of DWMAC (STM32MP, iMX8M, ...), the PHY device is attached
-> > > > only when the interface is brought up and is detached again when the
-> > > > interface is brought down. In case e.g. udev rules configure the netdev
-> > > > LED trigger sysfs attributes before the interface is brought up, then when
-> > > > the interface is brought up, the LEDs are not blinking.
-> > > > 
-> > > > This is because trigger_data->hw_control = can_hw_control() was called
-> > > > when udev wrote the sysfs attribute files, before the interface was up,
-> > > > so can_hw_control() resp. validate_net_dev() returned false, and the
-> > > > trigger_data->hw_control = can_hw_control() was never called again to
-> > > > update the trigger_data->hw_control content and let the offload take
-> > > > over the LED blinking.
-> > > > 
-> > > > Call data->hw_control = can_hw_control() from netdev_trig_notify() to
-> > > > update the offload capability of the LED when the UP notification arrives.
-> > > > This makes the LEDs blink after the interface is brought up.
-> > > > 
-> > > > On STM32MP13xx with RTL8211F, it is enough to have the following udev rule
-> > > > in place, boot the machine with cable plugged in, and the LEDs won't work
-> > > > without this patch once the interface is brought up, even if they should:
-> > > > "
-> > > > ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:green:wan", ATTR{trigger}="netdev", ATTR{link_10}="1", ATTR{link_100}="1", ATTR{link_1000}="1", ATTR{device_name}="end0"
-> > > > ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:yellow:wan", ATTR{trigger}="netdev", ATTR{rx}="1", ATTR{tx}="1", ATTR{device_name}="end0"
-> > > > "
-> > > > 
-> > > > Signed-off-by: Marek Vasut <marex@denx.de>
-> > > 
-> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> > Is there anything blocking this patch from being picked up ?
-> 
-> I think this should be going via the LED Maintainer. Please check with
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-It looked like the conversation was continuing.
+During the period, 5 new issues were detected and 1 were fixed.
+In total, 52 issues are still open and 146 have already been fixed.
 
-If you have everything tied up, rather than relying on maintainers to
-keep up with the branching conversations of 100's of patch-sets, it's
-best to collect the tags you have and submit a [RESEND].
+Some of the still happening issues:
 
--- 
-Lee Jones [李琼斯]
+Ref  Crashes Repro Title
+<1>  56849   Yes   WARNING in __ieee80211_beacon_get
+                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
+<2>  6078    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<3>  4865    Yes   WARNING in ath6kl_bmi_get_target_info (2)
+                   https://syzkaller.appspot.com/bug?extid=92c6dd14aaa230be6855
+<4>  3910    Yes   WARNING in rate_control_rate_init (3)
+                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
+<5>  2200    Yes   WARNING in __rate_control_send_low (3)
+                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
+<6>  1844    Yes   WARNING in plfxlc_mac_release
+                   https://syzkaller.appspot.com/bug?extid=51a42f7c2e399392ea82
+<7>  1183    Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<8>  629     Yes   INFO: task hung in rfkill_global_led_trigger_worker (3)
+                   https://syzkaller.appspot.com/bug?extid=50499e163bfa302dfe7b
+<9>  387     Yes   INFO: task hung in crda_timeout_work (8)
+                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
+<10> 315     Yes   INFO: task hung in reg_check_chans_work (7)
+                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
