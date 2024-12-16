@@ -1,98 +1,257 @@
-Return-Path: <netdev+bounces-152415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 995EF9F3E0A
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 00:10:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29ED59F3E12
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 00:13:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBCC416BCB5
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 23:10:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABCA718839B1
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 23:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1088C1D5CDE;
-	Mon, 16 Dec 2024 23:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2D01D5CF2;
+	Mon, 16 Dec 2024 23:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Tij3HmyY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDIEpBSx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507C5653;
-	Mon, 16 Dec 2024 23:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577601D5ADB
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 23:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734390610; cv=none; b=WPPZUvYtfTyAnpQvl9wP3SU15eGl+WeK2Ra5iVFc55UOnPM/BQ6KXpRn3RvdVCHro2TG0LZRnWkXAdkR49SxcHLRBqxbdq357vx+6TDfwb1HL7S1J75TS4kToaAKPs4zT/gHHflp7LafNPOUCjRMesbrJMF6iRh2CleX+iGdT7I=
+	t=1734390799; cv=none; b=mwh4tA+a1guL7i2dDvE/UBeB81L2cLb3vbEXIcRPbdnODc+LMUU8CsRZ0NvoxZW3luAPylUY9DhjWj4ucMXWjpIsHbxCtn6wFdQyRWTI8ajmtaKdmARCEH/yrA7tBl5JW5CnIPrf7D01++sltGgeGauGM9KVxoC8f+Wbi+6+NN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734390610; c=relaxed/simple;
-	bh=QlBcCsa9rqJa3IlOgPtbSnLtN0HKwL8f0kCn9NHOeGo=;
+	s=arc-20240116; t=1734390799; c=relaxed/simple;
+	bh=oOH2KyIRjm64Z/I+MYirMj8ITm4djt7zGL3X1xebpeU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kq/DHg/qQdL8YNLCqLscqEEEFn6LH9216UpCvn37Kd4/BZMwqcUmVOmWQPP90J40nZniW/ED/WM0wAj16RUY0DW4R4CyJgiaWIZ3F2UAWJ77fCy7JpRqTLBy16yy5B87JIU1j5WtqKQqR3yWzE33QSfvGOojGcLDXm2+pxzsBI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Tij3HmyY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=O7ayzBDb1owGXw4wlr8s6CWivxZSkqrBGT0EtZZfKbY=; b=Tij3HmyYrJ9F5EYjUB0Rw8xTiQ
-	OlpXytZy26ZrPaiQAL398NSbmHY7KZRmBTzcxJkP/pERsD1upSaJ0hAznPtaYpdL++eezJgcBgsNO
-	iJbj+C7J+lvcWgzSWJR0lLekmBI83eSb5Ol2fwufUsF+x+uqohVyVroCbebpgkaXMXao=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tNKCp-000ljk-HK; Tue, 17 Dec 2024 00:08:51 +0100
-Date: Tue, 17 Dec 2024 00:08:51 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: qca8k: Fix inconsistent use of
- jiffies vs milliseconds
-Message-ID: <6f1c3d1f-8059-4038-bc2c-5729254a5b38@lunn.ch>
-References: <20241215-qca8k-jiffies-v1-1-5a4d313c76ea@lunn.ch>
- <20241215231334.imva5oorpyq7lavl@skbuf>
- <87195b12-6dfa-4778-b0c0-39f3a64a399e@lunn.ch>
- <676085a7.050a0220.1e6031.2193@mx.google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HUBT+s53KQd0fxnbKhe4goDg00Znd6CkwGTVcZGGS0P/SC7RQHI7CzbZXA0rYAqEQH6eVxl2id700sJ3+Tm1aE0/14K/N5k+Mbmpl41A/mjbvMbJxxJcyWlU9i5YjEfSS/z3sEEKe0b+iw7Dr0VmmUxE4nFzOIj2MgH+p2lWcnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BDIEpBSx; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aa680fafb3eso74152366b.3
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 15:13:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734390796; x=1734995596; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Vh6DaEXjnTn3l8gKn1It6UFgb6Qxo42X4kiCDFO7Zo8=;
+        b=BDIEpBSxZqzalnpnnOlzUxTn3vfN7EtbYeQf1ZDw5+1wYu0gcx3oGBrMvkOSlZk+YP
+         Y2GnVqpX/SxsfJRhlasDVXmfl93XLFROAmYjAvSJw8rgT6CtrjxMGGnBlBhs+/1bKIzX
+         CYIzyBmRYK5/dxqOHSmuEp47Unz8Rlj3bpZoGI4EExpkaZH/szkM7t2tYm23K0wM/TCJ
+         JOgLMew6QFFNh5m6hEr/fKdCi1jsNiOxgchsYG5YzbLZetiG3oYcGryZIYuSNih4uNIL
+         CvVihZBqEHUPr2aU9Xuw1xvcglhWt88hCtGAW2u6tIutIj4290kNZ4CGECj9iTjobJE8
+         +yNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734390796; x=1734995596;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vh6DaEXjnTn3l8gKn1It6UFgb6Qxo42X4kiCDFO7Zo8=;
+        b=qJl07G687Qq7e7qx3odph46s/xyhwQN9k/aAVqr7JHjeTkJlz/uvx74NU9HUa9S5wl
+         4/P9GxJKh5P3sorzgnQHVWX16reY1ws1wnBl5Nu3T038+PxfL51G5f9mMR4elHXCLUy+
+         mFajUNMLJakSD2X4GAdPUByzOrUtpMjRzg331qcSPTdAQfMntQEe3Vj6b3w18N5+TF1K
+         sZhlCiOrKQHcKRw1u/grkFxLBbl9+jv2Rq/2tlbvtJGfChZg+/G6xCzbfC/k1QxErlyR
+         7QX0YecgY55QAcImVJmzWW0GEZH0DCjcTG7BZm3DYNUgGRiFgg4y+iLuD9gjVcbdJ+WF
+         QTQg==
+X-Forwarded-Encrypted: i=1; AJvYcCW53tJq0Bo0CXb3VFdwD9qTcDtxFbAt/ZLhBl+YLbJD+RSP+25dFLNi6KoeVXX8O5CcFeXBfmY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq6gk3tKFqIdGCxyv9tBHaUtz/OwwHCcT3061PCsVZKMO/9YN4
+	UC3Dz8zeQwgRpnrtx3ucBP1az1N6szFegs8R0ncE/O1SvFeANlIEwAbijyfO
+X-Gm-Gg: ASbGncv/LvKysTqh2e8ckRzqcwsU5fvvo8pqIRlrB63sIRSYDwzM1E6T5Qq3aEzuVDj
+	3WKLXybmf2hetfbhnRi1LtqjKJQOlZ7okBKEvmWq5T1Atak7pZdKiGq7OccNODKbx4AUKG09hae
+	YrKUQV6g8PDjGJR/zCCXsiJ1/tD8JwcuP/aDJx/DeSLxUA9cEPXASqCvjQGdrNujo8rpClJx1x/
+	bOjsR8TfRRP/iFreILwVsGk86EUBVTUR8uKu5fAP/Ud
+X-Google-Smtp-Source: AGHT+IHqG6jafQJ54W4A+yXdR0VQhT67YmemEDKqVRQauVjzqpCIBRPWoUCDucAF6uWatI1faUZTOQ==
+X-Received: by 2002:a17:907:c28:b0:aa6:9407:34e3 with SMTP id a640c23a62f3a-aab77e89c1emr508203466b.9.1734390795274;
+        Mon, 16 Dec 2024 15:13:15 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aab963b33b0sm380460966b.184.2024.12.16.15.13.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Dec 2024 15:13:14 -0800 (PST)
+Date: Tue, 17 Dec 2024 01:13:11 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
+	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	lorenzo.bianconi83@gmail.com
+Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
+ EN7581 SoC
+Message-ID: <20241216231311.odozs4eki7bbagwp@skbuf>
+References: <20241211154109.dvkihluzdouhtamr@skbuf>
+ <Z1qqrVWV84DBZuCn@lore-desk>
+ <20241212150613.zhi3vbxuwsc3blui@skbuf>
+ <Z1sXTPeekJ5See_u@lore-desk>
+ <20241212184647.t5n7t2yynh6ro2mz@skbuf>
+ <Z2AYXRy-LjohbxfL@lore-desk>
+ <20241216154947.fms254oqcjj72jmx@skbuf>
+ <Z2B5DW70Wq1tOIhM@lore-desk>
+ <20241216194641.b7altsgtjjuloslx@skbuf>
+ <Z2CpgqpIR5_MXTO7@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <676085a7.050a0220.1e6031.2193@mx.google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z2CpgqpIR5_MXTO7@lore-desk>
 
-On Mon, Dec 16, 2024 at 08:55:13PM +0100, Christian Marangi wrote:
-> On Mon, Dec 16, 2024 at 10:21:12AM +0100, Andrew Lunn wrote:
-> > On Mon, Dec 16, 2024 at 01:13:34AM +0200, Vladimir Oltean wrote:
-> > > On Sun, Dec 15, 2024 at 05:43:55PM +0000, Andrew Lunn wrote:
-> > > > wait_for_complete_timeout() expects a timeout in jiffies. With the
-> > > > driver, some call sites converted QCA8K_ETHERNET_TIMEOUT to jiffies,
-> > > > others did not. Make the code consistent by changes the #define to
-> > > > include a call to msecs_to_jiffies, and remove all other calls to
-> > > > msecs_to_jiffies.
-> > > > 
-> > > > Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> > > > ---
-> > > 
-> > > If my calculations are correct, for CONFIG_HZ=100, 5 jiffies last 50 ms.
-> > > So, assuming that configuration, the patch would be _decreasing_ the timeout
-> > > from 50 ms to 5 ms. The change should be tested to confirm it's enough.
-> > > Christian, could you do that?
-> > 
-> > I've have an qca8k system now, and have tested this patch. However, a
-> > Tested-by: from Christian would be very welcome.
-> >
+On Mon, Dec 16, 2024 at 11:28:18PM +0100, Lorenzo Bianconi wrote:
+> > ndo_setup_tc_conduit() does not have the same instruments to offload
+> > what port_setup_tc() can offload. It is not involved in all data paths
+> > that port_setup_tc() has to handle. Please ack this. So if port_setup_tc()
 > 
-> Hi need 1-2 days to test this, hope that is O.K.
+> Can you please elaborate on this? Both (->ndo_setup_tc_conduit() and
+> ->port_setup_tc()) refer to the same DSA user port (please take a look the
+> callback signature).
 
-That is fine, I don't really expect the remaining patches will go
-anywhere until next year, with net-next closing soon.
+I'd be just repeating what I've said a few times before. Your proposed
+ndo_setup_tc_conduit() appears to be configuring conduit resources
+(QDMA, GDM) for mt7530 user port tc offload, as if it is in complete and
+exclusive control of the user port data path. But as long as there are
+packets in the user port data path that bypass those conduit QoS resources
+(like for example mt7530 switch forwards packet from one port to another,
+bypassing the GDM1 in your drawing[1]), it isn't a good model. Forget
+about ndo_setup_tc_conduit(), it isn't a good tc command to run in the
+first place. The tc command you're trying to make to do what you want is
+supposed to _also_ include the mt7530 packets forwarded from one port to
+another in its QoS mix. It applies at the _egress_ of the mt7530 port.
 
-	Andrew
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=23020f04932701d5c8363e60756f12b43b8ed752
+
+Let me try to add some squiggles based on your diagram, to clarify what
+is my understanding and complaint.
+
+               ┌───────┐                                   ┌───────┐
+               │ QDMA2 │                                   │ QDMA1 │
+               └───┬───┘                                   └───┬───┘
+                   │                                           │
+           ┌───────▼───────────────────────────────────────────▼────────┐
+           │                                                            │
+           │       P5                                          P0       │
+           │                                                            │
+           │                                                            │
+           │                                                            │    ┌──────┐
+           │                                                         P3 ├────► GDM3 │
+           │                                                            │
+┌─────┐    │                                                            │
+│ PPE ◄────┤ P4                        PSE                              │
+└─────┘    │                                                            │
+           │                                                            │    ┌──────┐
+           │                                                         P9 ├────► GDM4 │
+           │                                                            │    └──────┘
+           │                                                            │
+           │        P2                                         P1       │
+           └─────────┬─────────────────────────────────────────┬────────┘
+                     │                                         │
+                 ┌───▼──┐                                   ┌──▼───┐
+                 │ GDM2 │                                   │ GDM1 │
+                 └──────┘                                   └──┬───┘
+                                                               │
+                                                ┌──────────────▼───────────────┐
+                                                │            CPU port          │
+                                                │   ┌─────────┘                │
+                                                │   │         MT7530           │
+                                                │   │                          │
+                                                │   ▼         x                │
+                                                │   ┌─────┐ ┌─┘                │
+                                                │  lan1  lan2  lan3  lan4      │
+                                                └───│──────────────────────────┘
+                                                    ▼
+
+When you add an offloaded Qdisc to the egress of lan1, the expectation
+is that packets from lan2 obey it too (offloaded tc goes hand in hand
+with offloaded bridge). Whereas, by using GDM1/QDMA resources, you are
+breaking that expectation, because packets from lan2 bridged by MT7530
+don't go to GDM1 (the "x").
+
+> > returns -EOPNOTSUPP, the entire dsa_user_setup_qdisc() should return
+> > -EOPNOTSUPP, UNLESS you install packet traps on all other offloaded data
+> > paths in the switch, such that all packets that egress the DSA user port
+> > are handled by ndo_setup_tc_conduit()'s instruments.
+> 
+> Uhm, do you mean we are changing the user expected result in this way?
+> It seems to me the only case we are actually changing is if port_setup_tc()
+> callback is not supported by the DSA switch driver while ndo_setup_tc_conduit()
+> one is supported by the mac chip. In this case the previous implementation
+> returns -EOPNOTSUPP while the proposed one does not report any error.
+> Do we really care about this case? If so, I guess we can rework
+> dsa_user_setup_qdisc().
+
+See above, there's nothing to rework.
+
+> > > nope, I am not saying the current Qdisc DSA infrastructure is wrong, it just
+> > > does not allow to exploit all hw capabilities available on EN7581 when the
+> > > traffic is routed from the WAN port to a given DSA switch port.
+> > 
+> > And I don't believe it should, in this way.
+> 
+> Can you please elaborate on this? IIUC it seems even Oleksij has a use-case
+> for this.
+
+See above, I'm also waiting for Oleksij's answer but I don't expect you
+2 to be talking about the same thing. If there's some common infrastructure
+to be shared, my understanding is it has nothing to do with ndo_setup_tc_conduit().
+
+> > We need something as the root Qdisc of the conduit which exposes its
+> > hardware capabilities. I just assumed that would be a simple (and single)
+> > ETS, you can correct me if I am wrong.
+> > 
+> > On conduit egress, what is the arbitration scheme between the traffic
+> > destined towards each DSA user port (channel, as the driver calls them)?
+> > How can this be best represented?
+> 
+> The EN7581 supports up to 32 different 'channels' (each of them support 8
+> different hw queues). You can define an ETS and/or TBF Qdisc for each channel.
+> My idea is to associate a channel to each DSA switch port, so the user can
+> define independent QoS policies for each DSA ports (e.g. shape at 100Mbps lan0,
+> apply ETS on lan1, ...) configuring the mac chip instead of the hw switch.
+> The kernel (if the traffic is not offloaded) or the PPE block (if the traffic
+> is offloaded) updates the channel and queue information in the DMA descriptor
+> (please take a look to [0] for the first case).
+
+But you call it a MAC chip because between the GDM1 and the MT7530 there's
+an in-chip Ethernet MAC (GMII netlist), with a fixed packet rate, right?
+I'm asking again, are the channels completely independent of one another,
+or are they consuming shared bandwidth in a way that with your proposal
+is just not visible? If there is a GMII between the GDM1 and the MT7530,
+how come the bandwidth between the channels is not shared in any way?
+And if there is no GMII or similar MAC interface, we need to take 100
+steps back and discuss why was the DSA model chosen for this switch, and
+not a freeform switchdev driver where the conduit is not discrete?
+
+I'm not sure what to associate these channels with. Would it be wrong to
+think of each channel as a separate DSA conduit? Because for example there
+is API to customize the user port <-> conduit assignment.
+
+> > IIUC, in your patch set, you expose the conduit hardware QoS capabilities
+> > as if they can be perfectly virtualized among DSA user ports, and as if
+> > each DSA user port can have its own ETS root Qdisc, completely independent
+> > of each other, as if the packets do not serialize on the conduit <-> CPU
+> > port link, and as if that is not a bottleneck. Is that really the case?
+> 
+> correct
+
+Very interesting but will need more than one word for an explanation :)
+
+> > If so (but please explain how), maybe you really need your own root Qdisc
+> > driver, with one class per DSA user port, and those classes have ETS
+> > attached to them.
+> 
+> Can you please clarify what do you mean with 'root Qdisc driver'?
+
+Quite literally, an implementer of struct Qdisc_ops whose parent can
+only be TC_H_ROOT. I was implying you'd have to create an abstract
+software model of the QoS capabilities of the QDMA and the GDM port such
+that we all understand them, a netlink attribute scheme for configuring
+those QoS parameters, and then a QoS offload mechanism through which
+they are communicated to compatible hardware. But let's leave that aside
+until it becomes more clear what you have.
 
