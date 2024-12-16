@@ -1,115 +1,115 @@
-Return-Path: <netdev+bounces-152118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 260D29F2C0B
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 09:37:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC739F2BA4
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 09:18:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CC947A2A4A
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:37:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B889C1884ED3
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D64E1FFC41;
-	Mon, 16 Dec 2024 08:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2177A1FF7A1;
+	Mon, 16 Dec 2024 08:18:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yHTz31hz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="L6g0QXKd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE791CB51B
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 08:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D671D318F;
+	Mon, 16 Dec 2024 08:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734338229; cv=none; b=IQ3oN3lw3WgZeo12Jw7aSXLEqHoedm7xa6TNYI2NOv0gsMypo+0VhYqIQwVX/tk5O7K/XWeEd+ayUsKCCyYm4q1I3W35/VW7BI5vpGeuARACltwyFYX8FnvrjqDXM7vHIvkLNieQpcoKyU+qzQSMfisFMPuM8y2F4HcnDrBRRqA=
+	t=1734337122; cv=none; b=thMupvA3Shl6u88Nkdlwk0LCrDHwao/QCvJC7J8CYZrQiL2mbq9DRCaRcm7Ow5hMAWA8Fly5yI1TvDivO8LlHsmP6zUd3mU/YWQ7u16OJzuRmtVOBIcEyFDa3fGFBJ8fhJmAGrexlyJzYc/lmMzwP1QLwa5a+UaFuCxQhlMdPqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734338229; c=relaxed/simple;
-	bh=dtVWKlkbhPkFNpfftBtq15xbnTnw+4JX29ve0YxSxY0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=vD27p6ApWb5AY8qrLQoaoT2dho1/oJHlAaiLypfnoi1YVkyGORpTsJdJ/LXmNbrLrCfz4v8t/omZUDoSS2Gl0DsOm96gcTaAGiOOa75eHihWyqxHpWR+1XF7dgdYlvm3PppiQpUo9goN2hBGfXGmkJhwDnU/EPT4tuAzTS9m8eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yHTz31hz; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6d8f0b1023bso43748616d6.0
-        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 00:37:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734338226; x=1734943026; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ZVLUko23C4TFbn681BzNmzT441se9W69wg074YvkRqk=;
-        b=yHTz31hzhRsAJdw2lN3ulVXVpHR5DYzJS+UQvgdLHrLBl8fklRURY7Re3eaLl9gwAa
-         12KypIXxSOV7+tndqHc+o2ZUsNYUQZIyKO9TDBr/7q/5iKXXkNOg8eoiyzSi0xD1+gNC
-         A8f+2KbVHJkqHZX6UH2c7YIpqalbA2+z4rAEmc3fEISen+mqHeH3VK0JK4BRAjqRvj7n
-         cV+wyIAZwrWEai1y5X717imbkM/KhC8nDXkfmVEXtwL36NLl0Nl0W03f//M6abQ+1Ekw
-         lIkgSJyLcAO+E3nldsK/sm2RodB5AkoZmYDu4ypsC0bSerq7BIFfHCOtFPmbWQgb8oGK
-         EJFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734338226; x=1734943026;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZVLUko23C4TFbn681BzNmzT441se9W69wg074YvkRqk=;
-        b=YsAlrbwn81MGIyXxie4lrKGUJxAVtfh++Co/u/5rdoiVT7l8rjRiUyxvDk0/ewlw19
-         cGXCWMbmlQrNJXRH6rJKdjRV2v+3uV/0tcCNU+xXqGNm9ORYaRh79B1Sav8/ew34h6j0
-         +IALAISDtQbf7mGwZIysenXW1Uht0qpkflDiqA11qKZHnl4atkhkuxdh+D8PVdF1O6SY
-         NHhuNCYMycKhWSln8ObbzgqlUoGhbImmz2/WWOngLqVanQO01B+G/hsIEACv+nlVa2x3
-         I1aUQW9WxsWsPt3ujT706aYyxl3wt3A3t+Mq03L15crP6BvlLG4vABM2LadCdhTMnjyE
-         DcKg==
-X-Gm-Message-State: AOJu0YzZX0el1wahvtbHyczNGgi70ONLZfdHCgHz1S0CMB+NXyfssTXl
-	0oqXik+fL2KbYKJ9fZH8vm2ZHLhiXslxhl/2pjYNlr/16tW+GgXxsCgW8l8Q4+/AlQlUy8JdxkD
-	dXbXUYC/eyA==
-X-Google-Smtp-Source: AGHT+IGBmF8HeJX/kpYS+xHvxoqZEV98UqYj6VJLPYT3j8kJ9wbrRcNQA/K4heccRfRjPFA/YWBmNIlqpWdMKg==
-X-Received: from qvrk2.prod.google.com ([2002:a05:6214:1022:b0:6d9:122d:a689])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:ac1:b0:6d8:9815:92e2 with SMTP id 6a1803df08f44-6dc8ca5a4e5mr232872586d6.15.1734338226382;
- Mon, 16 Dec 2024 00:37:06 -0800 (PST)
-Date: Mon, 16 Dec 2024 08:37:03 +0000
+	s=arc-20240116; t=1734337122; c=relaxed/simple;
+	bh=4hMASgrX5XYa0CN5ZYALS+fZVUW8fHCtSqfFrH0xFOY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZCvnynivMolS6uCA5dtkXICjV1sp8uR2l+C5+8YrDbam7iwC6nrB2Rr2sB7P00UhefeD+R5eL4mNTpffd2LfkoVfTiFpbx3sEy9CsYn16p+tLPSJKDsVvpoPZowsdSroGj8X/3AwzkEIZtaFQnolm02fsA9q2A0sBg+dTd/A/E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=L6g0QXKd; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 52484FF802;
+	Mon, 16 Dec 2024 08:18:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1734337111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bxS4ncPpbKlMnJQoKFd8UWkTSQivyZ8RY8LCYQtrmNo=;
+	b=L6g0QXKdxrWm0q1CYYnXC6J2ukMS3d5pJImPPr7qQ8cAMergObjjMlyk2MwqGMnTc8SCGH
+	yyGyr79Fb8aXS207hHSHxL726xEHZTIC5Z8XMPbHzK0SuSLkghGPD3DJj0QgBm5Vj4w6Ls
+	jKgPjmvahPDAHsoRhdwxP56NAR6njisU6iY+EUK9WRpxgASltWnc3m4E3YJYyKqR+OO/FD
+	bSECcVFfm++Hv018s7qg4qJ25q7YlhhUle5G9sVksvlJ3zC0Nv40gl5yT83MJ4ZXMboV2S
+	m9e6sMIKILAFiAEweWN7L0Dtmlzf4qqVHs5iTgcFgk1M9+J9JSTSdQycndxAkA==
+Date: Mon, 16 Dec 2024 09:42:24 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
+ <alexis.lothore@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: stmmac: dwmac-socfpga: Set interface
+ modes from Lynx PCS as supported
+Message-ID: <20241216094224.199e8df7@fedora.home>
+In-Reply-To: <Z1yJQikqneoFNJT4@shell.armlinux.org.uk>
+References: <20241213090526.71516-1-maxime.chevallier@bootlin.com>
+	<20241213090526.71516-3-maxime.chevallier@bootlin.com>
+	<Z1wnFXlgEU84VX8F@shell.armlinux.org.uk>
+	<20241213182904.55eb2504@fedora.home>
+	<Z1yJQikqneoFNJT4@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241216083703.1859921-1-edumazet@google.com>
-Subject: [PATCH net] net: netdevsim: fix nsim_pp_hold_write()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-nsim_pp_hold_write() has two problems:
+Hello Russell,
 
-1) It may return with rtnl held, as found by syzbot.
+On Fri, 13 Dec 2024 19:21:38 +0000
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-2) Its return value does not propagate an error if any.
+> > > However, maybe at this point we need to introduce an interface bitmap
+> > > into struct phylink_pcs so that these kinds of checks can be done in
+> > > phylink itself when it has the PCS, and it would also mean that stmmac
+> > > could do something like:
 
-Fixes: 1580cbcbfe77 ("net: netdevsim: add some fake page pool use")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/net/netdevsim/netdev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[...]
 
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index 0be47fed4efc5664c436c91669de5d7c13ef3411..e068a9761c094e91c584d0b29a46166ec31f42d5 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -635,10 +635,10 @@ nsim_pp_hold_write(struct file *file, const char __user *data,
- 		page_pool_put_full_page(ns->page->pp, ns->page, false);
- 		ns->page = NULL;
- 	}
--	rtnl_unlock();
- 
- exit:
--	return count;
-+	rtnl_unlock();
-+	return ret;
- }
- 
- static const struct file_operations nsim_pp_hold_fops = {
--- 
-2.47.1.613.gc27f4b7a9f-goog
+> > > and not have to worry about this from individual PCS or platform code.  
+> > 
+> > I like the idea, I will give it a go and send a series for that if
+> > that's ok :)  
+> 
+> I've actually already created that series!
 
+Woaw that was fast ! I'll review and give it a test on my setup then.
+
+Maybe one thing to clarify with the net maintainers is that this work
+you've done doesn't replace the series this thread is replying to,
+which still makes sense (we need the
+stmmac_priv->phylink_config.supported_interfaces to be correctly
+populated on socfpga).
+
+Thanks a lot for that work Russell,
+
+Maxime
+
+Thanks a lot,
+
+Maxime
 
