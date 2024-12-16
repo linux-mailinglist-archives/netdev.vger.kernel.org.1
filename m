@@ -1,244 +1,234 @@
-Return-Path: <netdev+bounces-152241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C8E09F3345
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 15:32:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 391DF9F3346
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 15:33:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3E4F1883D02
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 14:32:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 618FF16219B
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 14:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB51F202C2A;
-	Mon, 16 Dec 2024 14:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED57204092;
+	Mon, 16 Dec 2024 14:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cl3E9yjW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aEbQl3ps"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABAD1DDEA
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 14:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68321DDE9;
+	Mon, 16 Dec 2024 14:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734359551; cv=none; b=WJ/CxSyAQxy/QxM1MmzWZMVo3GfZkW9cH1nc2UVJdQNq0BAFzp198DXbZLYdkJnxyslvhpOamW0Ms7oA8YlzK3kAOJEBVjfw2A3Oh75YgadN5R+FAM5UgMKcfP6TOBDIlNHpRz3KkQDr2js4AgWQQNTzwLLdpId8v5+y04sqe+E=
+	t=1734359590; cv=none; b=Njml/R0d+Cz3U2gdR5VVUXOjOKvxGla8lvBPW6avRDMer2hA+J/E0wKbMU8Z40w/b4EccdSD+MBBg/h1wVw81EL0U9QqJf1b3aX5D3NYn+b73BBsdyOKcM+CanIg7gVEPwjL57KTQSOSNkfbOTOvxGyYLwJAloG+WCSXDutEjxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734359551; c=relaxed/simple;
-	bh=my8dWBTFG0ulc98l3huT3hnch3RduOfXO67XktfWhhk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EUCMMLFKodQ8hb5VG6zDGglj0VpdQwgbUR4cfEhnWLMP+HGtcOs2n8MReTdhy1PACUdJDXeSWU4mfyShchxkpvm6mL7aB1GogsM7MSt/I89tjuD2+P9PqtPM0zHOvmzhIN0i6+kSmuJEOc6rWcFq64CAMQzPWkuJvmTcu/FaICg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cl3E9yjW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734359548;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AM8yKmG5IScW1+yl0nTgCeRcUqrgRKK9NmYSaqMfnts=;
-	b=Cl3E9yjWkDeWbfYMG6vaSVhzPzxgYZbtheWDjhekGRhGx4Jv1FLtPd81xm8IjsnixDLeBj
-	jUKraVeqBMzOVPX4yGAk9U2bk70v69TMgU/wl2Umnx4H6oVTr0mQ/zTzByIVDrEoS5BkeO
-	KjjfiuakhCmffHv9MgKImUvsKi6A0U8=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-630-ErKa4-hcNNK0hZIB8d634w-1; Mon, 16 Dec 2024 09:32:26 -0500
-X-MC-Unique: ErKa4-hcNNK0hZIB8d634w-1
-X-Mimecast-MFC-AGG-ID: ErKa4-hcNNK0hZIB8d634w
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-467b645935fso38400601cf.3
-        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 06:32:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734359545; x=1734964345;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1734359590; c=relaxed/simple;
+	bh=8xMQSMajVdEloFdHjNjiGT8ocden+NeG4pG+oObPpxE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Se5FoGjCNfaZxiePeQmzXyqZPzkEKpgR1F09EhIO6SCZtpnixuYzStocbQrJODetwGKRnK7JNwg0FyqV8ArXUiDA7ILLArRXQIAPkeukzmB19L3Niw0LpwhEofr4+L2fLLqYZ/LxdTSSMVgLsm6XKsu2e2gUSWb/z6hOhB1AkcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aEbQl3ps; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53e3778bffdso4412754e87.0;
+        Mon, 16 Dec 2024 06:33:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734359587; x=1734964387; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AM8yKmG5IScW1+yl0nTgCeRcUqrgRKK9NmYSaqMfnts=;
-        b=u6hOnS5VMbi3D4AQTzk/rU1FoH9ANooqeCkvI3LHYXOnn7zNTr1Mw6qlvjSvOSqDif
-         F78kvmkUXw6RA8wLe0OepkoC73cwc6a5w7PAlGnCFxxEE7/mk0R9Uq+0TlToEZyp+qgE
-         2m6ieNwlIRcb0JKqBQKMfhOcoP7rNyz7lK+RC8ayHo/+UUv+ux8S+AFnnOnLtxeUQNAx
-         esQxnLeUi8ZJ8AaXD04FLWLbewzF81MrzUthg0Csr0CIh3CdhKVYrRFhgjabNPgadH/K
-         X0517YERwEE6ZxyYRTT3WcVJr5mFlyxoCzOQ6nL2LJ717SoJJwPDGgaphwzLGJZysSH0
-         Qfsw==
-X-Gm-Message-State: AOJu0YxaIJliHskoh/9MdUwi1dl6YA+MmdQH+LdJQyf1lQ0yxfINzhsO
-	A3q/h/6Aqz2h1hspmvKbcTICH/7IKjZrRbjIiyFs7P6KGL49uTUFiul5mriOmWoYc+a47tmpt6O
-	ACeoPgBddmLNFv3ZxkTlVfzvN9EUTjU/IB+9nuPscL03lrkAdC9dGArgASRBYkvOg
-X-Gm-Gg: ASbGncvBxFQorwv3NDFvFfooKacJK9RogZPHlesGgKVu5HgIfV5xzXC3fAznv88Z6Ss
-	tyYFFH3JfYLimp6pWfmTwXmTH04hsXZ+ZDP1i9SLp6+AGP5KjnBf6wCBNE7/v/D9tVMUWtTvg3v
-	faXdOT10L1YXD6SOynQJGqK2flJrJLtWeIcC28JbeXdmn95CVRyzY/+0ZI2PZma1OnXxoMPemu4
-	DgQAusCYE4ZTrjoI7YFbPqGLAUKgxRi4V2cDY4oik/iU/WQX/0o2cNIbHDrhvEOo5VGnRjddcdx
-	asomLYT5oQmVVyRzB3lhm+ijNA0QLUXT
-X-Received: by 2002:ac8:5910:0:b0:466:9197:b503 with SMTP id d75a77b69052e-467a5841f01mr257195331cf.46.1734359545104;
-        Mon, 16 Dec 2024 06:32:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG8ikWy2U5MrBr55xGTVF0n64wlHuV1Y1gdAIJP3/f1I6p9izP56L2Jr44iinziRqJ5AE1f+Q==
-X-Received: by 2002:ac8:5910:0:b0:466:9197:b503 with SMTP id d75a77b69052e-467a5841f01mr257194861cf.46.1734359544690;
-        Mon, 16 Dec 2024 06:32:24 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-185-21.business.telecomitalia.it. [87.12.185.21])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-467b2eca6a8sm28134391cf.77.2024.12.16.06.32.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2024 06:32:24 -0800 (PST)
-Date: Mon, 16 Dec 2024 15:32:19 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/6] vsock/test: Introduce option to run a
- single test
-Message-ID: <ybwa5wswrwbfmqyttvqljxelmczko5ds2ln5lvyv2z5rcf75us@22lzbskdiv3d>
-References: <20241216-test-vsock-leaks-v2-0-55e1405742fc@rbox.co>
- <20241216-test-vsock-leaks-v2-2-55e1405742fc@rbox.co>
+        bh=UcGJusMROs1d9U6OcF/dUgFih+81cOor/KxZG4XJKuc=;
+        b=aEbQl3psbb8Tp2lwTDGB7rEoDiwmoHQrIFjMuTzxBaksj8/oG/OyZV/j6NiSDvgpfN
+         OpoBh1ShtoTs+3gRMN3w4eX3HN9CFaZjg4BimsLK1WR9nQTtIO70BtbWts6p0rzUa+li
+         KIq6FhOfqUbicGn6e/QvvIfEUubexDfQ9Go0GDLRBOqy7cM65RmDmS8kkHnqJS4wjzPV
+         QEFN2aQLvNQumxOooFyyndb2IBxkhd65BpD/ZQdDyeeGEmjpRd7rVFDs023NZDOuU++7
+         hONgmEhUqUkK9FCvTiuUZ/u6q1+p6HHEc4VjrHytk5PzVf6LMHgL8u4uwTIWDLqjRmPk
+         KNXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734359587; x=1734964387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UcGJusMROs1d9U6OcF/dUgFih+81cOor/KxZG4XJKuc=;
+        b=H60btENafmSO4TIDaHiJUS4FGYSCYJiovgtmUEb9Yp1bXsyID7ltIyREpPUNCMMs6H
+         UrlF6GnsTWEvI2W1PCF3Oq3ZrRNvsgJsz+j7p98BGZFK8NlHpnstEUmnQiIrhJTokUUN
+         +N4My77Ssd+BlPjDQqnKXKG+VJz/Cd270kZMyoV/pxPESbmd17YtavRMoUxxs5UxQihg
+         JrfUh00m1PEQmCiR0ulb3k2HGlEnv3J+PCTk0YvTE4cyvSEhygFcGMtHYA2e1MrDX5Ay
+         kge9QjvgZGu54cxdLMz33EPAj7/dWGjjPaus0764AUesHeyldi88ttn51SWkLGgvQT7x
+         8zlg==
+X-Forwarded-Encrypted: i=1; AJvYcCU16G9GXMkeEiNwe7EwlMHltibJSXoAGdRflYVxeHFQiFtzrQIkBDh0f+rcXlHJWCOciKHJs4OI@vger.kernel.org, AJvYcCW9yMtJGIg4KZ7duIW8s6nKhZ06JRvCsUqF7eUnpub9lOIVIP1mp5DqLVY1/fv/Pm3d7ADOwrn9W8iomJ2cX9s=@vger.kernel.org, AJvYcCWAqlUlGxfXVuxIAgfCdYng8SjFk9tTXRrzmsTEk+nP3sXKIqfyk1OzhrxqO098BluIYsu+cCpkXUPM4CJb@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7gbypabxdszfYiZCzeQeluuJglDRwKpanpHIvjQKpuMCEZq5N
+	5nRu3Wda/kVsg0WYLwyeWS/OYzXDQeDsJUAyrEe/kuzt0elEyxOzJCGDEvPJtMlgb52P1d4D1v8
+	31hHUqWpL7R+R1H5HCreYb6F9Lm3wnmdy
+X-Gm-Gg: ASbGncujnBcp+vYl0RaI/rSKNZBFyAh2sBxXl22wdyhvb9UFqLzSr4OphyHBnx27B9M
+	INit/8zV4naWEecSMKWxbH/iXI5zjrQKtMNwi
+X-Google-Smtp-Source: AGHT+IELpcpoOMr0HZIYsbPkHXhRImQ+VIsxUYWZmevTZLApJPoAOQq0DMX0ucJCu/DDTc7ZaIih4Z12yiHzp+r6PE8=
+X-Received: by 2002:a05:6512:39c8:b0:540:1b7e:7b4a with SMTP id
+ 2adb3069b0e04-540905955d7mr4268744e87.36.1734359586622; Mon, 16 Dec 2024
+ 06:33:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241216-test-vsock-leaks-v2-2-55e1405742fc@rbox.co>
+References: <20241216080758.3450976-1-quic_chejiang@quicinc.com>
+In-Reply-To: <20241216080758.3450976-1-quic_chejiang@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 16 Dec 2024 09:32:53 -0500
+Message-ID: <CABBYNZLRdu_f9eNEapPp5mNqgcUE0jby5VPpaMaArY_FjyjB8Q@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix disconnect complete event
+ timeout issue
+To: Cheng Jiang <quic_chejiang@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, quic_jiaymao@quicinc.com, 
+	quic_shuaz@quicinc.com, quic_zijuhu@quicinc.com, quic_mohamull@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 16, 2024 at 01:00:58PM +0100, Michal Luczaj wrote:
->Allow for singling out a specific test ID to be executed.
+Hi Cheng,
+
+On Mon, Dec 16, 2024 at 3:08=E2=80=AFAM Cheng Jiang <quic_chejiang@quicinc.=
+com> wrote:
 >
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> tools/testing/vsock/util.c       | 20 ++++++++++++++++++--
-> tools/testing/vsock/util.h       |  2 ++
-> tools/testing/vsock/vsock_test.c | 10 ++++++++++
-> 3 files changed, 30 insertions(+), 2 deletions(-)
+> Sometimes, the remote device doesn't acknowledge the LL_TERMINATE_IND
+> in time, requiring the controller to wait for the supervision timeout,
+> which may exceed 2 seconds. In the current implementation, the
+> HCI_EV_DISCONN_COMPLETE event is ignored if it arrives late, since
+> the hci_abort_conn_sync has cleaned up the connection after 2 seconds.
+> This causes the mgmt to get stuck, resulting in bluetoothd waiting
+> indefinitely for the mgmt response to the disconnect. To recover,
+> restarting bluetoothd is necessary.
 >
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 34e9dac0a105f8aeb8c9af379b080d5ce8cb2782..5a3b5908ba88e5011906d67fb82342d2a6a6ba74 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -486,8 +486,7 @@ void list_tests(const struct test_case *test_cases)
-> 	exit(EXIT_FAILURE);
-> }
+> bluetoothctl log like this:
+> [Designer Mouse]# disconnect D9:B5:6C:F2:51:91
+> Attempting to disconnect from D9:B5:6C:F2:51:91
+> [Designer Mouse]#
+> [Designer Mouse]# power off
+> [Designer Mouse]#
+> Failed to set power off: org.freedesktop.DBus.Error.NoReply.
 >
->-void skip_test(struct test_case *test_cases, size_t test_cases_len,
->-	       const char *test_id_str)
->+static unsigned long parse_test_id(const char *test_id_str, size_t test_cases_len)
-> {
-> 	unsigned long test_id;
-> 	char *endptr = NULL;
->@@ -505,9 +504,26 @@ void skip_test(struct test_case *test_cases, size_t test_cases_len,
-> 		exit(EXIT_FAILURE);
-> 	}
+> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+> ---
+>  include/net/bluetooth/hci_core.h |  2 ++
+>  net/bluetooth/hci_conn.c         |  9 +++++++++
+>  net/bluetooth/hci_event.c        |  9 +++++++++
+>  net/bluetooth/hci_sync.c         | 18 ++++++++++++++++++
+>  4 files changed, 38 insertions(+)
 >
->+	return test_id;
->+}
->+
->+void skip_test(struct test_case *test_cases, size_t test_cases_len,
->+	       const char *test_id_str)
->+{
->+	unsigned long test_id = parse_test_id(test_id_str, test_cases_len);
-> 	test_cases[test_id].skip = true;
-> }
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index 734cd50cd..2ab079dcf 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -753,6 +753,8 @@ struct hci_conn {
 >
->+void pick_test(struct test_case *test_cases, size_t test_cases_len,
->+	       const char *test_id_str)
->+{
->+	unsigned long i, test_id;
->+
->+	test_id = parse_test_id(test_id_str, test_cases_len);
->+	for (i = 0; i < test_cases_len; ++i)
->+		test_cases[i].skip = (i != test_id);
->+}
->+
-> unsigned long hash_djb2(const void *data, size_t len)
-> {
-> 	unsigned long hash = 5381;
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index ba84d296d8b71e1bcba2abdad337e07aac45e75e..e62f46b2b92a7916e83e1e623b43c811b077db3e 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -62,6 +62,8 @@ void run_tests(const struct test_case *test_cases,
-> void list_tests(const struct test_case *test_cases);
-> void skip_test(struct test_case *test_cases, size_t test_cases_len,
-> 	       const char *test_id_str);
->+void pick_test(struct test_case *test_cases, size_t test_cases_len,
->+	       const char *test_id_str);
-> unsigned long hash_djb2(const void *data, size_t len);
-> size_t iovec_bytes(const struct iovec *iov, size_t iovnum);
-> unsigned long iovec_hash_djb2(const struct iovec *iov, size_t iovnum);
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 38fd8d96eb83ef1bd45728cfaac6adb3c1e07cfe..1ad1fbba10307c515e31816a2529befd547f7fd7 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -1644,6 +1644,11 @@ static const struct option longopts[] = {
-> 		.has_arg = required_argument,
-> 		.val = 's',
-> 	},
->+	{
->+		.name = "test",
->+		.has_arg = required_argument,
->+		.val = 't',
->+	},
-> 	{
-> 		.name = "help",
-> 		.has_arg = no_argument,
->@@ -1681,6 +1686,7 @@ static void usage(void)
-> 		"  --peer-cid <cid>       CID of the other side\n"
-> 		"  --peer-port <port>     AF_VSOCK port used for the test [default: %d]\n"
-> 		"  --list                 List of tests that will be executed\n"
->+		"  --test <test_id>       Single test ID to be executed\n"
-> 		"  --skip <test_id>       Test ID to skip;\n"
-> 		"                         use multiple --skip options to skip more tests\n",
-> 		DEFAULT_PEER_PORT
->@@ -1737,6 +1743,10 @@ int main(int argc, char **argv)
-> 			skip_test(test_cases, ARRAY_SIZE(test_cases) - 1,
-> 				  optarg);
-> 			break;
->+		case 't':
->+			pick_test(test_cases, ARRAY_SIZE(test_cases) - 1,
->+				  optarg);
->+			break;
+>         struct bt_codec codec;
+>
+> +       struct completion disc_ev_comp;
+> +
+>         void (*connect_cfm_cb)  (struct hci_conn *conn, u8 status);
+>         void (*security_cfm_cb) (struct hci_conn *conn, u8 status);
+>         void (*disconn_cfm_cb)  (struct hci_conn *conn, u8 reason);
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index d097e308a..e0244e191 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -1028,6 +1028,15 @@ static struct hci_conn *__hci_conn_add(struct hci_=
+dev *hdev, int type, bdaddr_t
+>
+>         hci_conn_init_sysfs(conn);
+>
+> +       /* This disc_ev_comp is inited when we send a disconnect request =
+to
+> +        * the remote device but fail to receive the disconnect complete
+> +        * event within the expected time (2 seconds). This occurs becaus=
+e
+> +        * the remote device doesn't ack the terminate indication, forcin=
+g
+> +        * the controller to wait for the supervision timeout.
+> +        */
+> +       init_completion(&conn->disc_ev_comp);
+> +       complete(&conn->disc_ev_comp);
+> +
+>         return conn;
+>  }
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 2cc7a9306..60ecb2b18 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3366,6 +3366,15 @@ static void hci_disconn_complete_evt(struct hci_de=
+v *hdev, void *data,
+>         if (!conn)
+>                 goto unlock;
+>
+> +       /* Wake up disc_ev_comp here is ok. Since we hold the hdev lock
+> +        * hci_abort_conn_sync will wait hdev lock release to continue.
+> +        */
+> +       if (!completion_done(&conn->disc_ev_comp)) {
+> +               complete(&conn->disc_ev_comp);
+> +               /* Add some delay for hci_abort_conn_sync to handle the c=
+omplete */
+> +               usleep_range(100, 1000);
+> +       }
+> +
+>         if (ev->status) {
+>                 mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+>                                        conn->dst_type, ev->status);
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 0badec712..783d04b57 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -5590,6 +5590,24 @@ int hci_abort_conn_sync(struct hci_dev *hdev, stru=
+ct hci_conn *conn, u8 reason)
+>                 break;
+>         }
+>
+> +       /* Check whether the connection is successfully disconnected.
+> +        * Sometimes the remote device doesn't acknowledge the
+> +        * LL_TERMINATE_IND in time, requiring the controller to wait
+> +        * for the supervision timeout, which may exceed 2 seconds. In
+> +        * this case, we need to wait for the HCI_EV_DISCONN_COMPLETE
+> +        * event before cleaning up the connection.
+> +        */
+> +       if (err =3D=3D -ETIMEDOUT) {
+> +               u32 idle_delay =3D msecs_to_jiffies(10 * conn->le_supv_ti=
+meout);
+> +
+> +               reinit_completion(&conn->disc_ev_comp);
+> +               if (!wait_for_completion_timeout(&conn->disc_ev_comp, idl=
+e_delay)) {
+> +                       bt_dev_warn(hdev, "Failed to get complete");
+> +                       mgmt_disconnect_failed(hdev, &conn->dst, conn->ty=
+pe,
+> +                                              conn->dst_type, conn->abor=
+t_reason);
+> +               }
+> +       }
 
-Cool, thanks for adding it!
-Currently, if we use multiple times `--test X`, only the last one is 
-executed.
+Why don't we just set the supervision timeout as timeout then? If we
+will have to wait for it anyway just change hci_disconnect_sync to use
+10 * conn->le_supv_timeout as timeout instead.
 
-If we want that behaviour, we should document in the help, or just error 
-on second time.
+That said, we really need to fix bluetoothd if it is not able to be
+cleaned up if SET_POWERED command fails, but it looks like it is
+handling errors correctly so it sounds like something else is at play.
 
-But it would be cool to support multiple --test, so maybe we could do 
-the following:
-- the first time we call pick_test, set skip to true in all tests
-- from that point on go, set skip to false for each specified test
-
-I mean this patch applied on top of your patch (feel free to change it, 
-it's just an example to explain better the idea):
-
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index 5a3b5908ba88..81b9a31059d8 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -517,11 +517,20 @@ void skip_test(struct test_case *test_cases, size_t test_cases_len,
-  void pick_test(struct test_case *test_cases, size_t test_cases_len,
-                const char *test_id_str)
-  {
--       unsigned long i, test_id;
-+       static bool skip_all = true;
-+       unsigned long test_id;
-+
-+       if (skip_all) {
-+               unsigned long i;
-+
-+               for (i = 0; i < test_cases_len; ++i)
-+                       test_cases[i].skip = true;
-+
-+               skip_all = false;
-+       }
-
-         test_id = parse_test_id(test_id_str, test_cases_len);
--       for (i = 0; i < test_cases_len; ++i)
--               test_cases[i].skip = (i != test_id);
-+       test_cases[test_id].skip = false;
-  }
-
-  unsigned long hash_djb2(const void *data, size_t len)
+>         hci_dev_lock(hdev);
+>
+>         /* Check if the connection has been cleaned up concurrently */
+>
+> base-commit: e25c8d66f6786300b680866c0e0139981273feba
+> --
+> 2.34.1
+>
 
 
-The rest LTGM!
-Stefano
-
+--=20
+Luiz Augusto von Dentz
 
