@@ -1,78 +1,50 @@
-Return-Path: <netdev+bounces-152054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6C759F2897
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 04:11:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEFBA9F2896
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 04:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA09F165195
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 03:11:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BDDD7A02D7
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 03:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9476145A11;
-	Mon, 16 Dec 2024 03:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EB52F852;
+	Mon, 16 Dec 2024 03:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="pHWEo56G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YW4RpTnX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-242.mail.qq.com (out203-205-221-242.mail.qq.com [203.205.221.242])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551F4847B;
-	Mon, 16 Dec 2024 03:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.242
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C9A847B
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 03:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734318709; cv=none; b=RdvGLxsLHB7nmZ9FF/qxOiJWw9vTCxXVKhcW+VjpEDBgwtnGlRYOCLzTPcY1E1+b5sUHzcC9W31U0aOMi1JVIW7+mvAN5t9+JqdiGjdRXh3IjVe3/6MM6rhkns0LHVyf+JTjMYBbu6uq23zIhuZz3UiPA3j9dEF5J7CoDb+vDd4=
+	t=1734318613; cv=none; b=lWY/FZH4dz/NGSDDKPIA2wwHCM5PAYR5VPMz2Aqou/ewNixR/dCBwSnOL68FiVf9hCF6AYnAB1EdAsJ0l8GgP/4zMBvQUe4FriACwvJ4F5MYBtWBqv0DdegIWTA/ityAAkKRYj20MGCwNuUyRYTBlzlLWVuPhF7yx914AypxxMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734318709; c=relaxed/simple;
-	bh=feZqFl3Z2fXoahyyv8inhP0iVemVBJb+Irhr0KxoyL0=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=ZCYTKMn3IDXPZnQ3BlcGsYzPBzFd31poQ+ixhDYI0nhE7H6J8xBjM0VrURu7/e2hh0rhs5nkCS8K8rajqVQ0LXtzoeA8GPREnIux/YzFVBWteEweeqF39gA0t5656XwlXFELaCGXc8I9HXqD8DQB3+shrSIjUgwYf5b1WXLXUWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=pHWEo56G; arc=none smtp.client-ip=203.205.221.242
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1734318394;
-	bh=Kc3CUwedDdXj45/Mbsftuq+CcH5kq+gS1YhoUSKMdBM=;
-	h=From:To:Cc:Subject:Date;
-	b=pHWEo56GJg+6nw3W+PmlYkkY8Ui8qw2NViHQ2vjsS995K8mM5almzngj8MNpARBP0
-	 x4lKP8icXcqQ0ueDjLhN9VzdiprdgYqcoEaYdAqVFZPz9j+KMeyxIU7LZirUTU0xjK
-	 wF80mSWNmc3kMrYtd4aAiB57R4mH5RDdlYMUxJ08=
-Received: from q-OptiPlex-7000.QUECTEL.COM ([203.93.254.82])
-	by newxmesmtplogicsvrsza36-0.qq.com (NewEsmtp) with SMTP
-	id 19427482; Mon, 16 Dec 2024 11:06:20 +0800
-X-QQ-mid: xmsmtpt1734318380tkxxbae7w
-Message-ID: <tencent_17DDD787B48E8A5AB8379ED69E23A0CD9309@qq.com>
-X-QQ-XMAILINFO: OATpkVjS499uQq0ifGKy4F7GQl3t+SPov80Pn6eQHF7hnugAjnJ8XcWvLZ2dsw
-	 1qLPBOs1OpNvtaD2Yhc7HP0xYIZnv5EyfLVbuPt19Y11q20ZkcxFBa7+9CwIYDZiqKnzp0FpbF9W
-	 pwdpRix+RH53j0HwXs9qJ8wFHT2OBHabxuY3hy1yimMoaB58VVdSVI6dFejocs/iNf1GDSCFoZE2
-	 mVbDTLIzFdtFaXnDtg95HEqowum1ANVR6vPjkqJ+JCCJu3gv0Rfp4QsWxvg9eGejI+6tnQR+8l7z
-	 5TC/MI+I9DowAKhe2YgQxbp+UuXBnHPkgRWamxPY3YlfMh5cVo8B6InBOBe72U0g5ySzgIz5Sr1q
-	 f+f+rJkbqIBZcLYajj0B/iQkhPRvRqsEWkgLrgQuyOj/N72yv2OlzUmKO86c2+acW3/Lodd0FqVU
-	 cqgLDw6MxPgqF80LpAQmZoU8xRgN33qeq/DGwQ35UctHNJ3xvAhBtAr3XkLy0N384Q1vYs77xwpW
-	 7f/cL9/kd5glNDFvUJiRXHZ5llSvKD3AXE3cthYjDJz1ERKTXXcAieHKP9E63JetjLdMkFN77nqw
-	 vRwyEhAVTCoIpIhc7I82XK+VqCheoeO0PtUMoCJAZSNmIwlM8YPsK/gq2R4b84c3nKwnaoXcgawp
-	 L79GoSm+cqhUedmLpvFHBCDcThWjWtSdvhAesj3V5CLXFLKBmw0vmy60fUQcBOAIo7zMy+sxQ3Hx
-	 hDEXD1tcX1jp9tbYgCkJRzXDbFJfFJOXfqsrutqdmyOQc+esb9STp83tMPmi/40X6JmneIZPCgOG
-	 fKsaoldFxYSoNVBbV5F3Aut059HzH+InEhOqYwAKDLAy9mmVt1Wa03xXTOrqYaq1fIHytDMMuLeR
-	 prBS1kV4jWPtMk3FJCBxHtdqWkcwHMwPTQAsOQZB0/QBeb92h/zLYIWJglvpQiIh20F7jcg8FVPI
-	 azmJGnsfUk2ivD9eduNt9Wyhqk7cjDjna54T6hUYRIt8BV1q8KDAIAm74rfR2SH8hlizRhnpjf0i
-	 yYt6dzA1SuI1p05bRYdfN8tZXi5elK7RtRG0DVEWbi2MQGsFadf7kuWtzoEL0=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-From: Martin Hou <martin.hou@foxmail.com>
-To: bjorn@mork.no,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Martin Hou <martin.hou@foxmail.com>
-Subject: [PATCH] net: usb: qmi_wwan: add Quectel RG255C
-Date: Mon, 16 Dec 2024 11:06:18 +0800
-X-OQ-MSGID: <20241216030618.70729-1-martin.hou@foxmail.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1734318613; c=relaxed/simple;
+	bh=k9JuNsjHVT9dqJ6aMZI7XQkpbfprDrYAezd8vDfsLMs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VY9od/jUe4U33xkvPvhPlHgDhonIvvK1mpXR1VSKDGyRaeTYUD3CLy+74yvJaX+eSjV/36a55zWiAeVNcMYSp1p+QR5xrNxnp/YYtn/TnqKLZnLJL6clZ3UL/1KkUewQF/mA3ol1pS9V0jKT22Y13IiTvbIfkNolBSQ+tSwXXHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YW4RpTnX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FED1C4CECE;
+	Mon, 16 Dec 2024 03:10:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734318612;
+	bh=k9JuNsjHVT9dqJ6aMZI7XQkpbfprDrYAezd8vDfsLMs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YW4RpTnXhtg2X/adwzyE28jZqr5w4A8M/fVZAjbVSg+7dASi6kkeAx3Yfl5vmbtt2
+	 Y6sF043y/pek6Q29Od1Mj7qfutde9nCLql3c7AmXy3NKYy0f+URSBaTunf5l3jmEl5
+	 YKjgDoqYlob3N9RbYuGjLXJMuW/WRU1A1coPPO3XAAb7I7m8N/KS0TT6zoFfisR0YG
+	 ApT43Ssw1KTZ7AkYIFNFy7HwYomnlWO6/wnDrKvwDKfGVCwcYlDrl8jnjyJe93chlp
+	 O3psVsIfpsv5JbLlXDg/3632SWbkvr6i91+4/ZDruSA3utiuxXIWcVkx7lUZzNKFqS
+	 pnYnRcr9ZxyTA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F443806656;
+	Mon, 16 Dec 2024 03:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,50 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [iproute2-next v3] ip: link: rmnet: add support for flag handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173431862926.3948460.526594663739240781.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Dec 2024 03:10:29 +0000
+References: <20241213125139.733201-1-robert.marko@sartura.hr>
+In-Reply-To: <20241213125139.733201-1-robert.marko@sartura.hr>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, dsahern@kernel.org, iri@resnulli.us,
+ andrew@lunn.ch, luka.perkov@sartura.hr
 
-Add support for Quectel RG255C which is based on Qualcomm SDX35 chip.
-The composition is DM / NMEA / AT / QMI.
+Hello:
 
-T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=2c7c ProdID=0316 Rev= 5.15
-S:  Manufacturer=Quectel
-S:  Product=RG255C-CN
-S:  SerialNumber=c68192c1
-C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=86(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-Signed-off-by: Martin Hou <martin.hou@foxmail.com>
----
- drivers/net/usb/qmi_wwan.c | 1 +
- 1 file changed, 1 insertion(+)
+On Fri, 13 Dec 2024 13:51:00 +0100 you wrote:
+> Extend the current rmnet support to allow enabling or disabling
+> IFLA_RMNET_FLAGS via ip link as well as printing the current settings.
+> 
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> ---
+> Changes in v3:
+> * Use parse_on_off() instead of hand-coding
+> * Drop on_off() error message printing
+> 
+> [...]
 
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index 9fe7f704a2f7..e9208a8d2bfa 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1429,6 +1429,7 @@ static const struct usb_device_id products[] = {
- 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0195, 4)},	/* Quectel EG95 */
- 	{QMI_FIXED_INTF(0x2c7c, 0x0296, 4)},	/* Quectel BG96 */
- 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x030e, 4)},	/* Quectel EM05GV2 */
-+	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0316, 3)},	/* Quectel RG255C */
- 	{QMI_QUIRK_SET_DTR(0x2cb7, 0x0104, 4)},	/* Fibocom NL678 series */
- 	{QMI_QUIRK_SET_DTR(0x2cb7, 0x0112, 0)},	/* Fibocom FG132 */
- 	{QMI_FIXED_INTF(0x0489, 0xe0b4, 0)},	/* Foxconn T77W968 LTE */
+Here is the summary with links:
+  - [iproute2-next,v3] ip: link: rmnet: add support for flag handling
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=1f0f9deb55fd
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
