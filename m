@@ -1,133 +1,125 @@
-Return-Path: <netdev+bounces-152096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3FA09F2AA5
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:05:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB899F2AAB
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:06:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C61A1885931
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:05:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87AA17A32F9
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB211CF5DF;
-	Mon, 16 Dec 2024 07:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EAF1CEAB4;
+	Mon, 16 Dec 2024 07:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WevJQVgb"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KQ/5qs/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D1129CA;
-	Mon, 16 Dec 2024 07:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C821BB6BC;
+	Mon, 16 Dec 2024 07:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734332653; cv=none; b=GMZNyLX9bQyVoFNPaY5uF04v+4WJBTcoMrWUSgBEJlnX731vOfPTSIekcIzx112N/BV7KcdGyMKOnLeelYQOGO4kCxl7sqigd2kAh8SsD3LJ3qCdfEdyxQgoRLWYQFfskBS8JROND7CU8+QpySZwfrUtlvJyITGDBh8WKPegl7Y=
+	t=1734332752; cv=none; b=BePoPwK7TtK0vzVUFA1hdcEne4jJRcr8f01Sx3Pmp7xC9hpcGl+40e8otkRX3UsuYDPtSwGxIy0L692zrTes64biGKRtmgktv1oovKUyuKirS8qaGirrAw4L3YdmWVCedr6jItxfulIG5CwmcO5IfnwkHQJwbVYU1yjSfmsr6bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734332653; c=relaxed/simple;
-	bh=KeSpEDkKtZpQhSch1YgBwfAeYb9z/c43PHmS5zAo9i0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fFZrmEbiXsdri2EF6dNOXy/qBqdn0fhJmUNIWBDWgsDZvdxEr5lxS3nyhKUhqR3GJtUbQDRA5fa6BIfYqXSLCJ7CUtwn+wUC5QWTnmCMV73Y0GK1qHmWco7dAoFk+DX+cuwJQPk2RRLvSmshC8ZIxbGWWd9q4roKo39wt/BHxbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WevJQVgb; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e3a0d2d15adso2453106276.0;
-        Sun, 15 Dec 2024 23:04:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734332651; x=1734937451; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tsU5wmh2P4K8mF9Ggmz3hxOZU+54LH8riOqnst6ceWc=;
-        b=WevJQVgbmXC1pclM8jpkZfyO8o9H4dSFa6ABjrT/c+AxQKnewTsDhp/j2p281yhSrY
-         B8oMI2Law1CM7NYLVAm2I0NLqyM0PGNSZX41Unn7qVUb8kF+YACMvYHqAGOMYuewpK9l
-         6tnnfATxDLsG0mA1LifEWm6tZtkey/MiaayomMBcje/nsSdF6C8Y/bC7WWl+DGht76to
-         luEcr9I2qT/UzcUonSXKBClAFAmUMEoj+H+mDxr1IktlR2XQwiAQY6BMxvN1XfP1sW4h
-         /9ykvBcM9bdvXxtMeSuFKkPa4Bg/isOPYImcjWrR+MddJct8MlIoHeH6p39Uk+wXi1Ki
-         Hg/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734332651; x=1734937451;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tsU5wmh2P4K8mF9Ggmz3hxOZU+54LH8riOqnst6ceWc=;
-        b=C3rHQvOYzv54LmzyuMhBHrdZcVuYkEndznqxOO34/2frpXDPyUlzF782TOMZId+G5b
-         7sLUIF5JOvgWS3Xy6CaMY9ouNFx1MDI8LLElp0IFy5Rvbcel3tjectbpIS2zPA405Z/Q
-         dCbf5RRV130LoMQfMCYDfIq4DisgrOE+S36r7AVuTTWYzGJ6im0UJQjmSL6IplKtJOwW
-         KJj4O/vJNU3T9fFIwYdz/Qv2usY7pOCdNKVt6K9u3c7NvECYReCJs+G1JxxVX4H4nXMq
-         R6rFsuqWg9YuspTbCOCsBVJLfuq4UL/iJS8ykpYYuBNIuxSVJKHIFNisv6I8fcilnycQ
-         Vt1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUw/Uar9vBZrZMC4NwBlmFfYUC8b1pdpgagOO+6J1bKEeMhpXo21Y5P3C53inatx2i3bZp7ZYRn9LSRxA==@vger.kernel.org, AJvYcCVLP2Sj64uMbAh3nhkjpyJEFK5fbQ3OhXnbbxfI11mRS7WYGj/VPmAWAEQsMvAzn6kE4WzvPheOOYYVAmY=@vger.kernel.org, AJvYcCVUnD2BN+6ofahDPqhklkTYEwFLYWVqWoIesUKRlXxojCCH5LlVWvnJuUUWwq/5k2xThLpqRyeJky0=@vger.kernel.org, AJvYcCVY4SHocZ7gMqjJ3OlfGI9wg2EZddo2OfSFG/FOQoJb2xYvD14CSzbfSVOoRfiKf/4UFy/dmplQ2B7f3xWYees=@vger.kernel.org, AJvYcCWE+3MhRmV/3D7WwzPFN1iSAjDdhNl0CgzIteV1Mxp9Wj+BoCuldaTzAZIzsdfwxL0oz74T/ebLRICX@vger.kernel.org, AJvYcCWSU1P6s1hO1hkSw06UUGwITro85/4EsOTD95KN09fx83pxcZcDbRMZ8SjeZMhSesA9LW1mO1FTHhwYtG1J@vger.kernel.org, AJvYcCWf9PrTyIV9ZZ2DDCceFJ9dXFPO3UOej1iESsY+elW7Q7M1Ku0kO6FkaMsFY5VQnxj6EG3jUReC@vger.kernel.org, AJvYcCX5k9u8xsoJov1/CFrKNCqyyhIaSC/htrzcQdFoo/zdBA8uLHXnn9q/YYgG69/Cn2r/HKSh9yjk9a9T@vger.kernel.org
-X-Gm-Message-State: AOJu0YwW2oR3tCX0RXx8Qa+fioDHhtdxd72CR5RGIP4/B6znPwiJXXD6
-	Yob6rX6dCGXDQhcnkZLytJAiSgqnrcQ9yWAKQIY7JU3/H04JVwArCk5/nPlr57MAlUhVe9yKIas
-	CJBo2r07vtZfxZX0sUyRRJgI2UQM=
-X-Gm-Gg: ASbGnctqYft5gHoREbzjO/BcdUZf7GFMDymiBj7+0Mp7UGMz4WBAD9ch5mcyDLBTcgS
-	lf86GBvrtj6pz6iVyG1M+H/r5yaYgsnt3AjTgRtxdl7IAYaCi48tt3COmKUE68tqeVkv0XPs=
-X-Google-Smtp-Source: AGHT+IHLFDXpcf4og2XrYkLAxxhOSZA2+BQlHOzPM0PO9nHe4iVqax2MnRn2XR8QWV2Gsxx89csWs78ajaevICvrWAc=
-X-Received: by 2002:a05:6902:11ce:b0:e39:92ec:b5f6 with SMTP id
- 3f1490d57ef6-e434f084c2amr8834964276.41.1734332651424; Sun, 15 Dec 2024
- 23:04:11 -0800 (PST)
+	s=arc-20240116; t=1734332752; c=relaxed/simple;
+	bh=4y3B6aMFn1eoenrkXnU3k2Tv5oBr5Nb8HQ53NLrFcW0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LHAfsCo1Cl3qKztN2a/13RLliGk9LUbHsfUiEK0vrvJrrAXsStzlnwq2nNB5pWGaSOvohcoE5eK3BuNyWo9ECP21RGRzMv/u4oJesJpsRASOQJBxdghqgF8ItKO7wBy3i492yW2lKyB669r1+DtNewzRfcHb2CP5i77IPK58uSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=KQ/5qs/6; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG6awKM010745;
+	Mon, 16 Dec 2024 07:05:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=5Qrb2beLEr5QULPbn/VFzdqtBRamu
+	KI5HzqWRZ6+Yg0=; b=KQ/5qs/6Eou2HegllwJ4jikwp51NhaiL2XCa4krRZl2Nv
+	hHraoZC33gy4fSUfN1uYmFry4Q5EduWibhINkWxj0NpGKtlmydCYUXAeCqPZDT3E
+	e06H1Th9mlz7EKJdINOg8ZULHseYcsRuXLFCZrrXhzDbeRm0TWdvTN/nYxz9jwNR
+	qJtfDcXSZOjWmyiv8W7GqJLwvnePDdEo6xaJR+Sz2wZbbOpuEc2hNqxtOOfBUHQl
+	jgvNgkClWeAv8y2HMIA/Sh8ZlPnol549PU0lxZyBLccMG2z+lcRJFSR3HVpN+rfa
+	8aXZHaa6GFak5eupVG+Rb7u58x89jrmSMKvxNZvPQ==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 43jaj58cr1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 16 Dec 2024 07:05:25 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG51O6e035464;
+	Mon, 16 Dec 2024 07:05:24 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 43h0f6pnd0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 16 Dec 2024 07:05:24 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4BG75Nur002855;
+	Mon, 16 Dec 2024 07:05:23 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 43h0f6pnc5-1;
+	Mon, 16 Dec 2024 07:05:23 +0000
+From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+To: Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        hariprasad <hkelam@marvell.com>,
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org,
+        error27@gmail.com, harshit.m.mogalapalli@oracle.com
+Subject: [PATCH next 1/2] octeontx2-pf: fix netdev memory leak in rvu_rep_create()
+Date: Sun, 15 Dec 2024 23:05:14 -0800
+Message-ID: <20241216070516.4036749-1-harshit.m.mogalapalli@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-7-tmyu0@nuvoton.com>
- <CAMZ6RqK+B3nc9bLWR49vwDJX3=pbjOKKoa=e=Pnc7wJNQx7JPQ@mail.gmail.com>
-In-Reply-To: <CAMZ6RqK+B3nc9bLWR49vwDJX3=pbjOKKoa=e=Pnc7wJNQx7JPQ@mail.gmail.com>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Mon, 16 Dec 2024 15:04:00 +0800
-Message-ID: <CAOoeyxXNvnsdbrhjaKq13x=27-nK0U73+6yvRfTjJLAY+v_OcA@mail.gmail.com>
-Subject: Re: [PATCH v3 6/7] hwmon: Add Nuvoton NCT6694 HWMON support
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-16_02,2024-12-13_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 spamscore=0
+ suspectscore=0 malwarescore=0 mlxlogscore=999 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2411120000
+ definitions=main-2412160057
+X-Proofpoint-GUID: 31o0SqpWJa3fVTuYHxnlauMSj94BYFdc
+X-Proofpoint-ORIG-GUID: 31o0SqpWJa3fVTuYHxnlauMSj94BYFdc
 
-Dear Vincent,
+When rvu_rep_devlink_port_register() fails, free_netdev(ndev) for this
+incomplete iteration before going to "exit:" label.
 
-Thank you for your comments,
-I understand, I will make the modifications for these drivers,
+Fixes: 3937b7308d4f ("octeontx2-pf: Create representor netdev")
+Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+---
+This is found by Smatch, based on static analysis, only compile tested.
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/rep.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks,
-Ming
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+index 232b10740c13..9e3fcbae5dee 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+@@ -680,8 +680,10 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
+ 		ndev->features |= ndev->hw_features;
+ 		eth_hw_addr_random(ndev);
+ 		err = rvu_rep_devlink_port_register(rep);
+-		if (err)
++		if (err) {
++			free_netdev(ndev);
+ 			goto exit;
++		}
+ 
+ 		SET_NETDEV_DEVLINK_PORT(ndev, &rep->dl_port);
+ 		err = register_netdev(ndev);
+-- 
+2.39.3
 
-Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2024=E5=B9=B412=E6=
-=9C=8813=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8A=E5=8D=8812:10=E5=AF=AB=E9=81=
-=93=EF=BC=9A
->
-...
-> > +struct nct6694_hwmon_data {
-> > +       struct nct6694 *nct6694;
-> > +       struct mutex lock;
-> > +       unsigned char *xmit_buf;
-> > +       unsigned char hwmon_en[NCT6694_HWMON_CMD0_LEN];
-> > +};
->
-> A global comment on this series: do not declare your buffers as some
-> opaque unsigned char arrays. Instead, make it a structure (or an array
-> of structures if needed) using the little endian types for the
-> different fields.
->
-> You already applied this change to the CAN driver after I made a
-> comment, please do the same throughout the series.
->
-> The same applies with any other comments made by anyone else: do not
-> only apply to the patch where the comment is made, but apply it
-> broadly to the series.
->
-> Thank you.
->
->
-> Yours sincerely,
-> Vincent Mailhol
 
