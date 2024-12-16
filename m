@@ -1,143 +1,205 @@
-Return-Path: <netdev+bounces-152355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 550279F3955
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:53:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5329F396C
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:58:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88B7E1660AB
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:53:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 979321881B22
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 18:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2054207679;
-	Mon, 16 Dec 2024 18:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46057207A19;
+	Mon, 16 Dec 2024 18:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8otgIh2"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ry4SSsp/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83EF41E493;
-	Mon, 16 Dec 2024 18:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A49207A03
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 18:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734375230; cv=none; b=s6w9UDOll7P+dpTp7HllVPKlK6cgEZ1UOArvZNSgHxTbw9RDNSy/Y21GxtAxmwWYmlsPZGDaN0biMb3zFTEFj/93YUrGGHqJoYGzwVa9YBg9r6SwkFa7tBEM3yZmFK+53z51ZUHcDcAi13/B45Yawfd6uoVTCyCA/o+tJ2xAnk8=
+	t=1734375505; cv=none; b=H9VWUdXTharZzvrQYVfQGEFl+vXtHRGV6I+ZVIF8hsIq3U3qsmaLDeM66neNtyUdxOMNDHYBCkAwkkkce3X+oKyeHLivEvTY1u48cBIH0SNJsrHwdla7tfzuBxTyOeN7lg2Fu5Wu+Ep46IiQCY/xQilGkjM86JLOrfsAsSIpP1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734375230; c=relaxed/simple;
-	bh=ZaQG536UeJ963kq03tgE2h6T+EowUyXzuNs7SMRaKlI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y2h+E/dWVBEfT8VkqFJKyqSJdUi4OZ/z2vZM6wVX+sGRLC22jVK27Wljxs6Vk+BoleKD+qQelZBKrvhrrib66tbiAadoRCYidxCYtfY+PzrgFtgNPnzjJYmjYCQ59WI26QiTrEc4gKpBo1cw5X/RWyELyeYDgwbEobfLCtOOmXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8otgIh2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 044E5C4CED0;
-	Mon, 16 Dec 2024 18:53:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734375230;
-	bh=ZaQG536UeJ963kq03tgE2h6T+EowUyXzuNs7SMRaKlI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R8otgIh2jgktQNerxOEt0HNVjEC7a6nGp4BMqW1POaHQCyjmtN0WuRy6ulaRvqIzF
-	 jisL8eYolS0n2FoDXyATRZFr+62UPu8qqklHXiS4JFF8eWZdseHWJ9RDJpLFLLF4LW
-	 aeqawx4q5SbltF7TMfmX+NqnA4zPHrTUCTDlyj44B38S7cvfRf2Ly5rZ1f74Su5GT6
-	 hW7tfbmJLgujW0MDvf/ezyvXskkAJUVMS1ea2rp1z/58K7GjaATS4S0CviY/won6QA
-	 d7TUcrxvWbtDu6IvGFS1w0QIWlC9S68Cu8yke9aJe7419m2LuxI/mtc1kV/rp8rFVe
-	 2iUA7vjeov33g==
-Date: Mon, 16 Dec 2024 18:53:44 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	tsbogend@alpha.franken.de, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, markus.stockhausen@gmx.de,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-mips@vger.kernel.org
-Subject: Re: [PATCH v2 2/4] dt-bindings: mfd: Add MDIO interface to
- rtl9301-switch
-Message-ID: <20241216-neurosis-untagged-86622f8e2163@spud>
-References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
- <20241216031346.2626805-3-chris.packham@alliedtelesis.co.nz>
+	s=arc-20240116; t=1734375505; c=relaxed/simple;
+	bh=SV3LQEGL/hN47W8AIErH56BEHP30IF73FmJb8pNKbK0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XLAmFFh22WJqdZ/gqBoKxDUzJ1fkUqj3853EYA3CyVc51qF7RanOFzKyqAL9FKX6EtxrzHZWa6bvKJBJrZ+c9HQgVd8MIy7qxegm59PGKT1PAgDHQDX3TruTprtO9H4ZqUMTaCaHw1R846byouQf+Fq5BN0DCPhsEWtbImBi1Ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Ry4SSsp/; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5401fb9fa03so4592287e87.1
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 10:58:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1734375502; x=1734980302; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dzLRRgSYQAZ/LGhu2QHm86mP47vUyI0NVq1+fminqCk=;
+        b=Ry4SSsp/7VBMUsRMouTGw/UurnFk8Lxo893/GXTbrbDY15AzlicWBWcTnSKw8yysb3
+         vQmFJKuLzSZXGhfN5HRzl5FnkQKr5kqCuneX5FQPB4hHhlruDIkF2NDP4g007vj5QDr8
+         qLkPrR/x8TXyExoSva4XyBJjeDHBtDWv3pHUc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734375502; x=1734980302;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dzLRRgSYQAZ/LGhu2QHm86mP47vUyI0NVq1+fminqCk=;
+        b=w/y+CdjtfJrETu6R4VTaKPzo5zI97d/HuUheXPgoH/Hamt+BTgdeov7DR+5Bs+13zM
+         msP1GZvAREFzYvjQwmcf4r72UmFTUabxHYkDSNf68KDtgnMxRLS5Vz9hrfWpGC2JjpqQ
+         n2Lj2AHeVeIZwktjYQfCZvh9XNb2howSCTh9zvpxGdhH9JnmP1VfeMvBVcT0UG0JJryS
+         NjvWUFxgdKneEQIfx3JF88Ikr/eVBkkXCXEy40mRgbM3AME/FMgmmJ7tOep8HstdQdLa
+         M4GviGJq1jTjt83c8qjWBu5yeCDRkkK2dm1CzqU79T+fYJOj9rBN4qnkUiqG9JxEOWGv
+         /BtA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/whM+oemRGtSxxp+uP02PIrHFXu2Q7Tyv35eFgsW5hkEnxvF56fdWg6hkkdMy4vk0LAgSyyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwO5EXQFoAlZcsrQwfUi91tWFK6HO1G4wtDUcIDKF6dWdJfHM1I
+	vfWLlozsaG2oBSbwREQ1ZBYr5YaW3uEsyvx/0wdEUm0ileo81/HX4GcbQ+FCttLDMpoPn/11EHV
+	Xt6zbtTDMtjaowOQBoIuslu7WRsiwgyRYrcpr
+X-Gm-Gg: ASbGncv2XKOQwjLawYqUmzey5fDv0iyJCTfrA3HCsy7GEJjNHS1d+gnaCdzGRX2jw8R
+	xHWMkAZk9qhDawrLtzpFuY5KbJq1q5v+BgovRiw==
+X-Google-Smtp-Source: AGHT+IGMcETnavPEQXH8jvNLA+aG8u1ChCxl9+noimfdpLvWFaGfKMRKYUnalnnaiR2BYuqbdP6Hwsq/S3/avpzeJSk=
+X-Received: by 2002:a05:6512:b11:b0:541:3175:1bc8 with SMTP id
+ 2adb3069b0e04-54131751e17mr71296e87.20.1734375501655; Mon, 16 Dec 2024
+ 10:58:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jgYBn6OpsX/kWRIj"
-Content-Disposition: inline
-In-Reply-To: <20241216031346.2626805-3-chris.packham@alliedtelesis.co.nz>
-
-
---jgYBn6OpsX/kWRIj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20241212224114.888373-1-dualli@chromium.org> <20241212224114.888373-3-dualli@chromium.org>
+ <Z2BtgqkPUZxE8B83@google.com>
+In-Reply-To: <Z2BtgqkPUZxE8B83@google.com>
+From: Li Li <dualli@chromium.org>
+Date: Mon, 16 Dec 2024 10:58:10 -0800
+Message-ID: <CANBPYPhZ-_5=VMRoBxbfVb+AFb_qu49QH_hKOiSjX93E1GQA8A@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 2/2] binder: report txn errors via generic netlink
+To: Carlos Llamas <cmllamas@google.com>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com, 
+	tkjos@android.com, maco@android.com, joel@joelfernandes.org, 
+	brauner@kernel.org, surenb@google.com, arnd@arndb.de, masahiroy@kernel.org, 
+	bagasdotme@gmail.com, horms@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org, hridya@google.com, 
+	smoreland@google.com, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 16, 2024 at 04:13:44PM +1300, Chris Packham wrote:
-> The MDIO controller is part of the switch on the RTL9300 family of
-> devices. Add a $ref to the mfd binding for these devices.
->=20
-> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
-> ---
->=20
-> Notes:
->     Changes in v2:
->     - None
->=20
->  .../bindings/mfd/realtek,rtl9301-switch.yaml      | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch=
-=2Eyaml b/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
-> index f053303ab1e6..eeb08e7435fa 100644
-> --- a/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
-> +++ b/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
-> @@ -41,6 +41,9 @@ patternProperties:
->    'i2c@[0-9a-f]+$':
->      $ref: /schemas/i2c/realtek,rtl9301-i2c.yaml#
-> =20
-> +  'mdio@[0-9a-f]+$':
-> +    $ref: /schemas/net/realtek,rtl9301-mdio.yaml#
-> +
->  required:
->    - compatible
->    - reg
-> @@ -110,5 +113,17 @@ examples:
->            };
->          };
->        };
-> +
-> +      mdio0: mdio@ca00 {
+On Mon, Dec 16, 2024 at 10:12=E2=80=AFAM Carlos Llamas <cmllamas@google.com=
+> wrote:
+>
+> On Thu, Dec 12, 2024 at 02:41:14PM -0800, Li Li wrote:
+> > ---
+> >  Documentation/admin-guide/binder_genl.rst     | 110 ++++++++
+>
+> Thanks for renaming to "Binder Netlink" this seems much better IMO.
+> Also, I belive the documentation should also be binder_netlink.rst in
+> such case?
+>
 
-Label here is unused, but that alone isn't worth a respin.
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Will also change it.
 
-> +        compatible =3D "realtek,rtl9301-mdio";
-> +        reg =3D <0xca00 0x200>;
-> +        #address-cells =3D <1>;
-> +        #size-cells =3D <0>;
-> +
-> +        ethernet-phy@0 {
-> +          reg =3D <0>;
-> +          realtek,smi-address =3D <0 1>;
-> +        };
-> +      };
->      };
-> =20
-> --=20
-> 2.47.1
->=20
+> > +++ b/Documentation/netlink/specs/binder_netlink.yaml
+> > @@ -0,0 +1,108 @@
+> > +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3=
+-Clause)
+>
+> I think you need a Copyright for this. I'm not sure if it would also be
+> needed for the Documentation though.
+>
 
---jgYBn6OpsX/kWRIj
-Content-Type: application/pgp-signature; name="signature.asc"
+Hmm, all other yaml files follow the same code style.
 
------BEGIN PGP SIGNATURE-----
+Netlink experts, can you please clarify this?
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ2B3OAAKCRB4tDGHoIJi
-0tNPAP9kLXGhnp5Mms+dsDfuxqUIandWEUoKt4Ixh5bi+dYrSwEA1ue1MsPeWWjB
-34QeWYTeZ9kMn6H8lNlm5SrnR34bNw4=
-=19cX
------END PGP SIGNATURE-----
+> > +/**
+> > + * binder_find_proc() - set binder report flags
+>
+> the description of "binder report flags" is no longer accurate here.
 
---jgYBn6OpsX/kWRIj--
+Good catch! Will fix that.
+
+>
+> > + * @pid:     the target process
+> > + */
+> > +static struct binder_proc *binder_find_proc(int pid)
+> > +{
+> > +     struct binder_proc *proc;
+> > +
+> > +     mutex_lock(&binder_procs_lock);
+> > +     hlist_for_each_entry(proc, &binder_procs, proc_node) {
+> > +             if (proc->pid =3D=3D pid) {
+> > +                     mutex_unlock(&binder_procs_lock);
+> > +                     return proc;
+>
+> fwiw, the for_each stops when proc is NULL, so you can just break and
+> return proc everytime. e.g.:
+>
+>         mutex_lock(&binder_procs_lock);
+>         hlist_for_each_entry(proc, &binder_procs, proc_node) {
+>                 if (proc->pid =3D=3D pid)
+>                         break;
+>         }
+>         mutex_unlock(&binder_procs_lock);
+>
+>         return proc;
+>
+
+Got it. Thx
+
+> >  /**
+> >   * struct binder_device - information about a binder device node
+> > - * @hlist:          list of binder devices (only used for devices requ=
+ested via
+> > - *                  CONFIG_ANDROID_BINDER_DEVICES)
+> > + * @hlist:          list of binder devices
+>
+> This is the hunk that needs to go on the first 1/2 patch.
+
+Sure.
+
+> >  /**
+> > diff --git a/drivers/android/binder_netlink.c b/drivers/android/binder_=
+netlink.c
+> > new file mode 100644
+> > index 000000000000..2081b4319268
+> > --- /dev/null
+> > +++ b/drivers/android/binder_netlink.c
+> > @@ -0,0 +1,39 @@
+> > +// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-=
+3-Clause)
+> > +/* Do not edit directly, auto-generated from: */
+> > +/*   Documentation/netlink/specs/binder_netlink.yaml */
+> > +/* YNL-GEN kernel source */
+> > +
+> > +#include <net/netlink.h>
+> > +#include <net/genetlink.h>
+> > +
+> > +#include "binder_netlink.h"
+> > +
+> > +#include <uapi/linux/android/binder_netlink.h>
+> > +
+> > +/* BINDER_NETLINK_CMD_REPORT_SETUP - do */
+> > +static const struct nla_policy binder_netlink_report_setup_nl_policy[B=
+INDER_NETLINK_A_CMD_FLAGS + 1] =3D {
+> > +     [BINDER_NETLINK_A_CMD_CONTEXT] =3D { .type =3D NLA_NUL_STRING, },
+> > +     [BINDER_NETLINK_A_CMD_PID] =3D { .type =3D NLA_U32, },
+> > +     [BINDER_NETLINK_A_CMD_FLAGS] =3D NLA_POLICY_MASK(NLA_U32, 0xf),
+> > +};
+> > +
+> > +/* Ops table for binder_netlink */
+> > +static const struct genl_split_ops binder_netlink_nl_ops[] =3D {
+>
+> not: There are several places where you have "netlink_nl" which seems
+> kind of redundant to me. wdyt? IMO you should drop the "nl" in all of
+> these cases.
+>
+
+These are automatically generated from the yaml file. So let's just
+keep them as is.
+But it's a good suggestion to the owner of yaml parser.
 
