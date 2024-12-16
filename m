@@ -1,233 +1,244 @@
-Return-Path: <netdev+bounces-152240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AB609F333E
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 15:30:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8E09F3345
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 15:32:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2D6818838CF
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 14:30:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3E4F1883D02
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 14:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB88318E25;
-	Mon, 16 Dec 2024 14:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB51F202C2A;
+	Mon, 16 Dec 2024 14:32:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OXbbY9KM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cl3E9yjW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1621117557;
-	Mon, 16 Dec 2024 14:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734359446; cv=fail; b=Av14bHAOIIhBKDqbCSMxydJ+oPK6uKGLl9j/PvnleAJ52SXbBZcD/yTYjFdkmafWibTRvHVMtMWkJmv0X9qopANHhaZd9qiM/mcAIYcy0KejVr7yE4K8XMoUCliCd4tFyXd8AgwbF1rRcEkrZA9SU+5rIRMI/PvE0AAa19zzL4g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734359446; c=relaxed/simple;
-	bh=3WJ+s5bbysbgiYLxKmin/GLmSbuRxfLy0f5IfULcGVg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=C2X9A7h7q2S2h7gPxOsJoJZGc2Lx5l52HwpWB3dbjboqOmQCJUCXbx7Of/U6jkomQFCfoWNr3uEP0cvxnZkM8gGMddg4frGkfUeA6G0i/knuJbJgQyl9k0GwT6TsmKCEUWRTyMbPkchR2CQq/HQwhf8iWi0HXO0w7mlvKgyYT8A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OXbbY9KM; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734359442; x=1765895442;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=3WJ+s5bbysbgiYLxKmin/GLmSbuRxfLy0f5IfULcGVg=;
-  b=OXbbY9KM5t6Xs+vX66SUrXfj2esK4TxgtbZLKpFnWLwm90oIF5j/uqFl
-   ccqLKjU/+3sjjcYM85iZhXKExF4nroH16QbhK2BkhuPC1cGLsqfd9DxVl
-   5egHnJHwyYrPYzNg/fvJE4Lv6fiPQ2QkQkBjIJ+UrImugsWC2gTMeCub/
-   p+pDuUydzJJ5CZtV9KR2pXj5oF1d14zZl4kEQ0CFuT6at1jvAiYYR8IHg
-   6myqMK8wM5ijTc5lPWLXNo8rD2APfI6czm87WqAFk3Iob2sx+qC9HQf+l
-   ZZewi6Pi2kSzrdwEDG89ApWiE1ddZRwy2QH1K7mxq9So4aX8oJGjTow5a
-   g==;
-X-CSE-ConnectionGUID: emDHuPxRSVu9wCoxFPyXlA==
-X-CSE-MsgGUID: vEwxdbc0Rem57DWvEo4mTA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11288"; a="38518144"
-X-IronPort-AV: E=Sophos;i="6.12,238,1728975600"; 
-   d="scan'208";a="38518144"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2024 06:30:41 -0800
-X-CSE-ConnectionGUID: 9iNzqR94SOekAfXQMpIjkQ==
-X-CSE-MsgGUID: sq1fDmRnQsy6MVwHeiX4CA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,238,1728975600"; 
-   d="scan'208";a="128015492"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Dec 2024 06:30:40 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 16 Dec 2024 06:30:39 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Mon, 16 Dec 2024 06:30:39 -0800
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 16 Dec 2024 06:30:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dLZ7Ge97FmH2G4y6/aHI1aEhepYHiBKHtN2okhnR4783B0OZMWkM5KsvTgobrl6EKk1V9WsZqKfgSjDIRlbx+/bhmoQvLHet5h7JOssLGLLjoe/H8M+sB8urJd1tFNrafKWU+bO3yMNzxy/JkV3X8+SwvYfjbewilA7Nvj0brb6AZk1iIfrpenXTnQGfYiU6E8xSs8FAKVSGtTmao0T85UN37FDRSyOIe+AhQ9wCcqGGzXOheDXlkp7IVMIuXdKoqKqW4UZJmiSeyxKvyaczytbWM72cYmoxhzEnF9q4RwDFa0xc38QqKoVUGNhygKT4uV1TYQpLHGyzJU5eeZPXnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0Kl4qG2eSEqeWRO06KkdrcUqvTvrgzMKSKPpg3ZFtyI=;
- b=cNm90OKwo1lKPMzq6qI5l4l46ugJjoCpCu/blHw9NgbnQ+jHILP0zKNXRgbY8y8bo46dsCLKhxZN/TQqLIlL7Hi87cJrR6Yd/4+b2jlXNPxAuDeSLHX5HRG103LxDZwH9oBb8NY77W7bWDI6yShDiL21ZLyzAnN/ILmFOegwkrcURTfskkw2L4hbtRjvsitOVloweUVIm/vf0F5x5XJMMH+sgvG6ezH2kNxdIDVELF0Vco8a8UrhOxH5yXAdAqN3IyCTbnnVMktTcK4zu23gzH8zFq6rNdEvrF9+aYSaLnuslu1mXEp68dngXHwGqiVCdnRkgEgCpzAJB1MBzetWpQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by PH7PR11MB7552.namprd11.prod.outlook.com (2603:10b6:510:26a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.21; Mon, 16 Dec
- 2024 14:30:23 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29%5]) with mapi id 15.20.8251.015; Mon, 16 Dec 2024
- 14:30:23 +0000
-Date: Mon, 16 Dec 2024 15:30:12 +0100
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Shinas Rasheed <srasheed@marvell.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
-	<thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
-	<konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
-	Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Abhijit Ayarekar <aayarekar@marvell.com>, "Satananda
- Burla" <sburla@marvell.com>
-Subject: Re: [PATCH net v2 1/4] octeon_ep: fix race conditions in
- ndo_get_stats64
-Message-ID: <Z2A5dHOGhwCQ1KBI@lzaremba-mobl.ger.corp.intel.com>
-References: <20241216075842.2394606-1-srasheed@marvell.com>
- <20241216075842.2394606-2-srasheed@marvell.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241216075842.2394606-2-srasheed@marvell.com>
-X-ClientProxiedBy: VI1PR08CA0247.eurprd08.prod.outlook.com
- (2603:10a6:803:dc::20) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABAD1DDEA
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 14:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734359551; cv=none; b=WJ/CxSyAQxy/QxM1MmzWZMVo3GfZkW9cH1nc2UVJdQNq0BAFzp198DXbZLYdkJnxyslvhpOamW0Ms7oA8YlzK3kAOJEBVjfw2A3Oh75YgadN5R+FAM5UgMKcfP6TOBDIlNHpRz3KkQDr2js4AgWQQNTzwLLdpId8v5+y04sqe+E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734359551; c=relaxed/simple;
+	bh=my8dWBTFG0ulc98l3huT3hnch3RduOfXO67XktfWhhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EUCMMLFKodQ8hb5VG6zDGglj0VpdQwgbUR4cfEhnWLMP+HGtcOs2n8MReTdhy1PACUdJDXeSWU4mfyShchxkpvm6mL7aB1GogsM7MSt/I89tjuD2+P9PqtPM0zHOvmzhIN0i6+kSmuJEOc6rWcFq64CAMQzPWkuJvmTcu/FaICg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cl3E9yjW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734359548;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AM8yKmG5IScW1+yl0nTgCeRcUqrgRKK9NmYSaqMfnts=;
+	b=Cl3E9yjWkDeWbfYMG6vaSVhzPzxgYZbtheWDjhekGRhGx4Jv1FLtPd81xm8IjsnixDLeBj
+	jUKraVeqBMzOVPX4yGAk9U2bk70v69TMgU/wl2Umnx4H6oVTr0mQ/zTzByIVDrEoS5BkeO
+	KjjfiuakhCmffHv9MgKImUvsKi6A0U8=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-630-ErKa4-hcNNK0hZIB8d634w-1; Mon, 16 Dec 2024 09:32:26 -0500
+X-MC-Unique: ErKa4-hcNNK0hZIB8d634w-1
+X-Mimecast-MFC-AGG-ID: ErKa4-hcNNK0hZIB8d634w
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-467b645935fso38400601cf.3
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 06:32:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734359545; x=1734964345;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AM8yKmG5IScW1+yl0nTgCeRcUqrgRKK9NmYSaqMfnts=;
+        b=u6hOnS5VMbi3D4AQTzk/rU1FoH9ANooqeCkvI3LHYXOnn7zNTr1Mw6qlvjSvOSqDif
+         F78kvmkUXw6RA8wLe0OepkoC73cwc6a5w7PAlGnCFxxEE7/mk0R9Uq+0TlToEZyp+qgE
+         2m6ieNwlIRcb0JKqBQKMfhOcoP7rNyz7lK+RC8ayHo/+UUv+ux8S+AFnnOnLtxeUQNAx
+         esQxnLeUi8ZJ8AaXD04FLWLbewzF81MrzUthg0Csr0CIh3CdhKVYrRFhgjabNPgadH/K
+         X0517YERwEE6ZxyYRTT3WcVJr5mFlyxoCzOQ6nL2LJ717SoJJwPDGgaphwzLGJZysSH0
+         Qfsw==
+X-Gm-Message-State: AOJu0YxaIJliHskoh/9MdUwi1dl6YA+MmdQH+LdJQyf1lQ0yxfINzhsO
+	A3q/h/6Aqz2h1hspmvKbcTICH/7IKjZrRbjIiyFs7P6KGL49uTUFiul5mriOmWoYc+a47tmpt6O
+	ACeoPgBddmLNFv3ZxkTlVfzvN9EUTjU/IB+9nuPscL03lrkAdC9dGArgASRBYkvOg
+X-Gm-Gg: ASbGncvBxFQorwv3NDFvFfooKacJK9RogZPHlesGgKVu5HgIfV5xzXC3fAznv88Z6Ss
+	tyYFFH3JfYLimp6pWfmTwXmTH04hsXZ+ZDP1i9SLp6+AGP5KjnBf6wCBNE7/v/D9tVMUWtTvg3v
+	faXdOT10L1YXD6SOynQJGqK2flJrJLtWeIcC28JbeXdmn95CVRyzY/+0ZI2PZma1OnXxoMPemu4
+	DgQAusCYE4ZTrjoI7YFbPqGLAUKgxRi4V2cDY4oik/iU/WQX/0o2cNIbHDrhvEOo5VGnRjddcdx
+	asomLYT5oQmVVyRzB3lhm+ijNA0QLUXT
+X-Received: by 2002:ac8:5910:0:b0:466:9197:b503 with SMTP id d75a77b69052e-467a5841f01mr257195331cf.46.1734359545104;
+        Mon, 16 Dec 2024 06:32:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG8ikWy2U5MrBr55xGTVF0n64wlHuV1Y1gdAIJP3/f1I6p9izP56L2Jr44iinziRqJ5AE1f+Q==
+X-Received: by 2002:ac8:5910:0:b0:466:9197:b503 with SMTP id d75a77b69052e-467a5841f01mr257194861cf.46.1734359544690;
+        Mon, 16 Dec 2024 06:32:24 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-185-21.business.telecomitalia.it. [87.12.185.21])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-467b2eca6a8sm28134391cf.77.2024.12.16.06.32.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Dec 2024 06:32:24 -0800 (PST)
+Date: Mon, 16 Dec 2024 15:32:19 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/6] vsock/test: Introduce option to run a
+ single test
+Message-ID: <ybwa5wswrwbfmqyttvqljxelmczko5ds2ln5lvyv2z5rcf75us@22lzbskdiv3d>
+References: <20241216-test-vsock-leaks-v2-0-55e1405742fc@rbox.co>
+ <20241216-test-vsock-leaks-v2-2-55e1405742fc@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|PH7PR11MB7552:EE_
-X-MS-Office365-Filtering-Correlation-Id: 763d658c-f600-4031-3e65-08dd1dde2d14
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Otw+26b0QQWmeyH4JpAspCZvRaYivv48u5tSANalkttg/CaD27JyyuZLbvW8?=
- =?us-ascii?Q?D+137uPql/tX2O0z3r8BfePPV0+S4ni+kbntJ1AWHdvI8RKcpemwz5dQm1L7?=
- =?us-ascii?Q?6NWU5eyFWuE429TNtZi9SLjcujvuZxRNkhozyN8RrkDjBuZVFoVbqtwZmPSa?=
- =?us-ascii?Q?LrONn8xwFFbRKjD2D+OXpi1TJeebj7Ss+qnFvl2sJM+YZkvZgw/NGaq77kQL?=
- =?us-ascii?Q?xI7AM1C6EH7k7JHiY4/ZITXF04lpk1ZYedqWfgGKGjOgkD1zQ5OsTNpXQci2?=
- =?us-ascii?Q?sNGqxa1/1VedBzOsIO76wnTdqD4ijgvtqp+PvacVJ3/2UCkeMysArFB32Emz?=
- =?us-ascii?Q?NdHv3hznqDYOE7/7trfmjdTfsHQKL5wLUFISogbyk27/2bauAtYcGDudUdzV?=
- =?us-ascii?Q?RzxJIVFms11g9l8AbXjZkecTDU344NEBDtJufpnaWCWZ9VZ81DPdBPg0yetD?=
- =?us-ascii?Q?eVrHminOIg+r1UN+hOk8+0/WUEyNt9nZPOsE+hcNQu4KWbEs0HScJLr7LNmC?=
- =?us-ascii?Q?ap3w1P87fNY6RgX5nvispUC/Jqa9CiHxspChzI8dHFvTAny7QWT76MY/My3n?=
- =?us-ascii?Q?GuyCNLSvLFbp6QVw4x2cC8LbkwIw46QG2FrB62UYLC2U/43utXGWqCr5ykmA?=
- =?us-ascii?Q?Jk7PQ+PM4/OAf28wUCRiox+VXYx2akkskgE0sDUeJxMlFCu5cihmbIdpDHXv?=
- =?us-ascii?Q?LZoEnhC/hvDR+3kWqKgD9jL5bQ/nFm7E8EKzblPoz3c30CTY+miPEsJhnf8u?=
- =?us-ascii?Q?8JqMu6Cs46bggbNlIkuiOEAlVDap0ULgkFW+/R1p48TMf9QHSPmSKEzot2+h?=
- =?us-ascii?Q?KVUt5HfaUi1AQV/48zz1ZoUt8wVsflirkji3ZYMWPq7yjrYL8rwP0bRJ+Iw8?=
- =?us-ascii?Q?IOK3tlkhOo3I0+LZ+8S2N0L2vuXrRso0ATAAaAUUf3GvEkCup/0mchX66cHb?=
- =?us-ascii?Q?dxPH8MnW5lQ7aIUfEYNVaIbs7qt14p8VRwQ+Xi9fZkwcVkTDrwZSPHamJsT6?=
- =?us-ascii?Q?YNZZ16pWm+jEktsfKK+eNH5uf67UwcJ1dki1zKmkcj0IofAzmRktft3Gy0oH?=
- =?us-ascii?Q?A/BKK7XRrOS+4ptRKCj6v4uuagn5fk5Y3S3bUJzYEpWPMSbyYZvXaDqGv/Pw?=
- =?us-ascii?Q?Oqn2fVDrHW8UkB4O+WSpUbFFa/RV0GP5wDbt0uFPA/O9tjq/VUw/LbjlKzaE?=
- =?us-ascii?Q?gMKcFf+mwIZg5jUV0HEBlBf+i7LWX7DBM7Raujyha3ZuZQcMg69/FMFIJXJ9?=
- =?us-ascii?Q?A3831Qj8OFg2AYcGW1rUPkoeQF/NumIOMN6ErjyB+mhwelIG8/QTSo6LtYJ0?=
- =?us-ascii?Q?j+MMQeQzSJbM5RWAupaeKXMs1uHbi0Qi+Ha7f6l18m2M1K2Lar3YcBAGssOp?=
- =?us-ascii?Q?Gp2HIwi1YUQORMqiuScJzClogBCq?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bZQ8qLpiJLjPaPUkoqaeEiND7MA+lV4ADvzLpkLXMahQxWE4gRGOKfWv3fd0?=
- =?us-ascii?Q?up4aAoWvC59e/mW8XDFUNZqKKhwwFtjbFBdsPGV2AVtxg31oBz05RlDcy2Je?=
- =?us-ascii?Q?iAGpTaxKmVOBVMtkiXprZ/vdKG1UB2knBhPUwHcdu0kGpG0BqbulT5osj4O7?=
- =?us-ascii?Q?/aIFFOZ2WAFWk1L1NsluhwYBDJdBgVcBymvb1qef/gNmmsJmO2YY/hzLBpzu?=
- =?us-ascii?Q?t6WpEy3HWOgN9G6z5Fv4SZTt9oWhCMXld7niwWc2MvkEsomORyU6Ukuvp0bh?=
- =?us-ascii?Q?UURlvUwnjOyKjsmg9tDcJyXM6DHcI/XOgeeQ+abfuwhD5gsMIMMaIGV5xuep?=
- =?us-ascii?Q?RaIwYnYKDUaqSeXewCFXXE9AV2LtEcZikqhW1SLpbcfPIydtcfUrb+5PDQgU?=
- =?us-ascii?Q?NXF1ZLeWmMkvV78Oe4t/PebnV7aX1E0CGQQMZdTo7f4AIt574VkL7WoRcA54?=
- =?us-ascii?Q?pImU0ZwR+FdWgb5nB4WJ33uq7g2zYFhQFlJ6b9pn3jhJZHHuUE58Jq4oQNVN?=
- =?us-ascii?Q?q1RZlCouVd544NT9LTXA9LmxEb+PIVUtjUZU1fQtXJM2HgGqotqb48rgUpI5?=
- =?us-ascii?Q?oZA30dXUDcdBpCpBTWnpCdM8MuRn41IFD8NJAPTIVCX3iSRT6dwuH3ltktil?=
- =?us-ascii?Q?jtrNs+SsfnSqrz2eQST8LTJ0ajQD9xag3vkjqMikUB+gLFWHcEF1U21Qovfl?=
- =?us-ascii?Q?Q6pMEsoT6GyTE70uGF3Ro0SZg1AuDP/tghEn/+hd7+7SBC4Czyq2x07v8QE/?=
- =?us-ascii?Q?UCXSpzzQD5bATs7NFXXJOZ0ONVYwCmPV4ZXOR3iTCsr8I3HyabqsyaVYhwME?=
- =?us-ascii?Q?aMP0svD60kNTHSFyn7zxB4uaOJrspaWOC86VnIhy48Wmrl5nban3jGW0p5bH?=
- =?us-ascii?Q?yHriURyFjtFGyVLdlQCCrW8jN6w3stZehh79HoWZfZoxYM1bnGnDaxvcvcyv?=
- =?us-ascii?Q?iLCTNgLusOKlEjEGUq8OYxZcq5tYB3QqwBBQjywjBSUa+x9prMl5N82tTJM8?=
- =?us-ascii?Q?qVY+y3gcqMr9bwerdoZFYY+fyXqmblr0iKgBsxDBxkioQuNQ7mOqY/ubRUQl?=
- =?us-ascii?Q?go7QYOIT5itGmbAbRs7g0Y2PyMY2oUOXjLTN26H3BWOmeF5yy0A7mhM/PG04?=
- =?us-ascii?Q?6M0pOfeKlTzwTjN/QFboV9nahUV9UlHX7kf30PHwuzxZz3YCLG3wP7BdCrf6?=
- =?us-ascii?Q?RfrDE7+VJB3n361fpJeNaL/kMeG4LqhZUpLH0Zc3ig5hhR1bnVnujkL6A9bn?=
- =?us-ascii?Q?phVgT3aQzOvtXoYQg56+7C0P9TA/JGGjuijfZcAMyGvSTG610fsVuL4o5WxC?=
- =?us-ascii?Q?OOqhkfagsUnQGuWu2kJ8H1qMhIf6Jdv3keloAzddkPA9KyVLXX49wAI7nVFH?=
- =?us-ascii?Q?iN9kvdk6l+4S10vEc5YMP7wgRqnX8ZuygLp82wXVrcDYPAFhOA2xQRmzVlun?=
- =?us-ascii?Q?WEqOQ0kK44LNSb0DEztNwdFN0O2viym4vLQaOwX97pEzChT7a625hLwk++//?=
- =?us-ascii?Q?Tnk+hAHlpIQcXqRY+j0a9qSemgYV3g0jet41tFxAfWzZeNcwsuYCnSGvOMg4?=
- =?us-ascii?Q?0l7eVyHEmA3S4D0/oSlXjzO/hMO1dAqPaqd5LtpOJW8atSNlXt3ZjVT7EBEK?=
- =?us-ascii?Q?zg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 763d658c-f600-4031-3e65-08dd1dde2d14
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2024 14:30:23.4577
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 85CUXOtJ+KMHMG0g+wgeuBqgjraZm+1067+cC3knHICHXUBSLukWjF0bVMPVsKfADAja8WhPmLKw71czfnW5yML7OQQCq5UIfvHH+Q2q5dA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7552
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241216-test-vsock-leaks-v2-2-55e1405742fc@rbox.co>
 
-On Sun, Dec 15, 2024 at 11:58:39PM -0800, Shinas Rasheed wrote:
-> ndo_get_stats64() can race with ndo_stop(), which frees input and
-> output queue resources. Call synchronize_net() to avoid such races.
-> 
-> Fixes: 6a610a46bad1 ("octeon_ep: add support for ndo ops")
-> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-> ---
-> V2:
->   - Changed sync mechanism to fix race conditions from using an atomic
->     set_bit ops to a much simpler synchronize_net()
-> 
-> V1: https://lore.kernel.org/all/20241203072130.2316913-2-srasheed@marvell.com/
-> 
->  drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> index 549436efc204..941bbaaa67b5 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> @@ -757,6 +757,7 @@ static int octep_stop(struct net_device *netdev)
->  {
->  	struct octep_device *oct = netdev_priv(netdev);
->  
-> +	synchronize_net();
+On Mon, Dec 16, 2024 at 01:00:58PM +0100, Michal Luczaj wrote:
+>Allow for singling out a specific test ID to be executed.
+>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> tools/testing/vsock/util.c       | 20 ++++++++++++++++++--
+> tools/testing/vsock/util.h       |  2 ++
+> tools/testing/vsock/vsock_test.c | 10 ++++++++++
+> 3 files changed, 30 insertions(+), 2 deletions(-)
+>
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index 34e9dac0a105f8aeb8c9af379b080d5ce8cb2782..5a3b5908ba88e5011906d67fb82342d2a6a6ba74 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -486,8 +486,7 @@ void list_tests(const struct test_case *test_cases)
+> 	exit(EXIT_FAILURE);
+> }
+>
+>-void skip_test(struct test_case *test_cases, size_t test_cases_len,
+>-	       const char *test_id_str)
+>+static unsigned long parse_test_id(const char *test_id_str, size_t test_cases_len)
+> {
+> 	unsigned long test_id;
+> 	char *endptr = NULL;
+>@@ -505,9 +504,26 @@ void skip_test(struct test_case *test_cases, size_t test_cases_len,
+> 		exit(EXIT_FAILURE);
+> 	}
+>
+>+	return test_id;
+>+}
+>+
+>+void skip_test(struct test_case *test_cases, size_t test_cases_len,
+>+	       const char *test_id_str)
+>+{
+>+	unsigned long test_id = parse_test_id(test_id_str, test_cases_len);
+> 	test_cases[test_id].skip = true;
+> }
+>
+>+void pick_test(struct test_case *test_cases, size_t test_cases_len,
+>+	       const char *test_id_str)
+>+{
+>+	unsigned long i, test_id;
+>+
+>+	test_id = parse_test_id(test_id_str, test_cases_len);
+>+	for (i = 0; i < test_cases_len; ++i)
+>+		test_cases[i].skip = (i != test_id);
+>+}
+>+
+> unsigned long hash_djb2(const void *data, size_t len)
+> {
+> 	unsigned long hash = 5381;
+>diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+>index ba84d296d8b71e1bcba2abdad337e07aac45e75e..e62f46b2b92a7916e83e1e623b43c811b077db3e 100644
+>--- a/tools/testing/vsock/util.h
+>+++ b/tools/testing/vsock/util.h
+>@@ -62,6 +62,8 @@ void run_tests(const struct test_case *test_cases,
+> void list_tests(const struct test_case *test_cases);
+> void skip_test(struct test_case *test_cases, size_t test_cases_len,
+> 	       const char *test_id_str);
+>+void pick_test(struct test_case *test_cases, size_t test_cases_len,
+>+	       const char *test_id_str);
+> unsigned long hash_djb2(const void *data, size_t len);
+> size_t iovec_bytes(const struct iovec *iov, size_t iovnum);
+> unsigned long iovec_hash_djb2(const struct iovec *iov, size_t iovnum);
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 38fd8d96eb83ef1bd45728cfaac6adb3c1e07cfe..1ad1fbba10307c515e31816a2529befd547f7fd7 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1644,6 +1644,11 @@ static const struct option longopts[] = {
+> 		.has_arg = required_argument,
+> 		.val = 's',
+> 	},
+>+	{
+>+		.name = "test",
+>+		.has_arg = required_argument,
+>+		.val = 't',
+>+	},
+> 	{
+> 		.name = "help",
+> 		.has_arg = no_argument,
+>@@ -1681,6 +1686,7 @@ static void usage(void)
+> 		"  --peer-cid <cid>       CID of the other side\n"
+> 		"  --peer-port <port>     AF_VSOCK port used for the test [default: %d]\n"
+> 		"  --list                 List of tests that will be executed\n"
+>+		"  --test <test_id>       Single test ID to be executed\n"
+> 		"  --skip <test_id>       Test ID to skip;\n"
+> 		"                         use multiple --skip options to skip more tests\n",
+> 		DEFAULT_PEER_PORT
+>@@ -1737,6 +1743,10 @@ int main(int argc, char **argv)
+> 			skip_test(test_cases, ARRAY_SIZE(test_cases) - 1,
+> 				  optarg);
+> 			break;
+>+		case 't':
+>+			pick_test(test_cases, ARRAY_SIZE(test_cases) - 1,
+>+				  optarg);
+>+			break;
 
-You should have elaborated on the fact that this synchronize_net() is for 
-__LINK_STATE_START flag in the commit message, this is not obvious. Also, is 
-octep_get_stats64() called from RCU-safe context?
+Cool, thanks for adding it!
+Currently, if we use multiple times `--test X`, only the last one is 
+executed.
 
->  	netdev_info(netdev, "Stopping the device ...\n");
->  
->  	octep_ctrl_net_set_link_status(oct, OCTEP_CTRL_NET_INVALID_VFID, false,
-> -- 
-> 2.25.1
-> 
-> 
+If we want that behaviour, we should document in the help, or just error 
+on second time.
+
+But it would be cool to support multiple --test, so maybe we could do 
+the following:
+- the first time we call pick_test, set skip to true in all tests
+- from that point on go, set skip to false for each specified test
+
+I mean this patch applied on top of your patch (feel free to change it, 
+it's just an example to explain better the idea):
+
+diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+index 5a3b5908ba88..81b9a31059d8 100644
+--- a/tools/testing/vsock/util.c
++++ b/tools/testing/vsock/util.c
+@@ -517,11 +517,20 @@ void skip_test(struct test_case *test_cases, size_t test_cases_len,
+  void pick_test(struct test_case *test_cases, size_t test_cases_len,
+                const char *test_id_str)
+  {
+-       unsigned long i, test_id;
++       static bool skip_all = true;
++       unsigned long test_id;
++
++       if (skip_all) {
++               unsigned long i;
++
++               for (i = 0; i < test_cases_len; ++i)
++                       test_cases[i].skip = true;
++
++               skip_all = false;
++       }
+
+         test_id = parse_test_id(test_id_str, test_cases_len);
+-       for (i = 0; i < test_cases_len; ++i)
+-               test_cases[i].skip = (i != test_id);
++       test_cases[test_id].skip = false;
+  }
+
+  unsigned long hash_djb2(const void *data, size_t len)
+
+
+The rest LTGM!
+Stefano
+
 
