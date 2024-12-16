@@ -1,109 +1,105 @@
-Return-Path: <netdev+bounces-152046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 840E29F2761
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 00:13:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36C1B9F27BE
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 02:23:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 261AE188465B
-	for <lists+netdev@lfdr.de>; Sun, 15 Dec 2024 23:13:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 708B0165690
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 01:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B5A1BDA89;
-	Sun, 15 Dec 2024 23:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6EF68825;
+	Mon, 16 Dec 2024 01:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ufg3v24X"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="DNscYzg1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126101885A5;
-	Sun, 15 Dec 2024 23:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9698917557;
+	Mon, 16 Dec 2024 01:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734304420; cv=none; b=YUCewpO6KA49U2mbQYD2TePKpMl0foOIAa6mFM5n1qRHlD45i86h+gQ/NMhy2Q8GpvGwX/wAW85SbAZhc86f/o5TN0co4FQZHy57p7VLxgsD4oQMLXn7xq0nJ3Zn0fM4wf0rG4q/Qwc6vhiRXY9zh/1RXhJvMH2DYNvXYZbElRM=
+	t=1734312222; cv=none; b=gJYbcH3kT4Qg+MDJuhNXj16txsIYrBHRttQxzE75Z263wWhBKBJzPXUs8nrRRKm6CllaCKO+huj0UoCfn1812m2SS0zQCVbBORbbgWHOu1gTsJQB8u5g4LgamjsBho7ybrQwDjueiQz0NfF5O0gOkRSGn/+2IU9p3XLL42syqXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734304420; c=relaxed/simple;
-	bh=rjY1BfZS2hcFy9ioshTwl5SCCfIdJY0PvIXzYF6EoWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pt6Va5kzGrYBulXLu4Hwf2qD8dF7UdMlkd5EU9S4iNjm6XYnm6Q9XOM1Ab0mKtgjpyV2h9Wb3raEO7Zcd94NVIRMH+8N3GyZF8gcokSTamANMsi2PcFvjWMByQNqiQXPoCJqN+CT37crp7yvH4MeqdWr2yMor5w8zxKX4wj4osw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ufg3v24X; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43637977fa4so1064165e9.3;
-        Sun, 15 Dec 2024 15:13:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734304417; x=1734909217; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=20p+ETg747maiNgD/3eH/GlhvstWZXWIVpbyOW7bH5I=;
-        b=Ufg3v24Xf6sFmQLXLbKACOwHepe0/qjdm7aWVrduNpADj+OLHw4hGSntWkCENj+Whq
-         ffQURfnuU+5ZlHtEsI11AbTDLT5KHTG7CsDJr8fD+oSxgqnUPbrlU3j6/OKapmruQpna
-         Xt4iBAx3yI5+n58fEhcbxFtInd+4400j0oPVFInIpxBoGhRq+kjIHfbiB7sVik1R3XYd
-         XXm/qnXO5zL6kPRyoKixNRJvirEUQ71HfLT0rYKkIjXJkv/txNhBy8wRQ14RkuvA+MiO
-         FVwGXEEsXwHBA0YTIQGZy86zyXL54kvjoW08+Dhb1aH/8fUhRZ1QqBI+KzVBqVEpVNIC
-         dTPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734304417; x=1734909217;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=20p+ETg747maiNgD/3eH/GlhvstWZXWIVpbyOW7bH5I=;
-        b=I8V2T4cFvvTYJb+vWKZ3DYkEbCrad9eGQCsCrl/OdwShTrMi+fQtV28X27w2w9/Kid
-         IdO8P1F1RDtSIZ0lX6yb20sD0J2K04afQFJnj+wCB6tEc0WltM/zf+56c//aF7ANlStU
-         85mLSFHSAWkZXDUBRTTRbI2Pr6Vn0ICsVGa1Fs9AJB3oWcSSa91tjorn+fW35Ua3uXmW
-         8PujMX/9j/PyYBnrwOQq+U53yhHHN4GXcuwSWsYLeCXAFzlys1ZCxoAQEBph4VqVt3UA
-         ecITyNHcfauVUY2Vgfd/w7OZ122LdmjZs+QcTo/O6+r8om7UHvSkM5Us/Jma4N5VZqUY
-         AhFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVRFPHS1o+Rba0fjaCrbMVv7yiOzo81v7PKqYcMfugjc+wV7AMruS4e3LBbJSvFAL0RJDltR4joceU/QI8=@vger.kernel.org, AJvYcCWvrdVndfI0uUB3y+sZDaZ3Cqo5Uqk9lmwXVbX5g4hsss/wrSU4SqQQFJSyjuG+x9D7FEAybvrD@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5tC0RUEnss7fWc+wZvDe8VVUKDNjWyGAWI5ytCEMYHsbXfvz5
-	5frYfecuPL9dfX/eKLbxPEnvty1zoTt+xH303c6gTPlicSXyiBJe
-X-Gm-Gg: ASbGncttW3OzYw+v10eUeRYf1SUzXk4mlC1uCdbuT4rG+ldS/RBEGHsYOu5bTA6i8SE
-	jEUaBU0FEcRBaCAYuwj/DXu6cDUTf2VWdiBdsq0ZlMEZcSTuRO+/TvhT94qdKHe/p/ORQOHwSeQ
-	D/gDtX40B4WbzSsklofAkr7cs2sPIe23MBsOk9ItLFWVl28N3lUfFvJk0IzsC0t9W+3QRRyQebS
-	KkFyVJ639ZZwHId7VpEC9rLxs3xYsBelrmYEX2DBibB
-X-Google-Smtp-Source: AGHT+IGaZL3Yyiu4Cqg7rrGRXHgRBwFOQjoXwcnrTBfZSr3TgPZDtcxMJWNU8UJ4mCStRRMor7SZTA==
-X-Received: by 2002:a5d:6da6:0:b0:385:e10a:4d98 with SMTP id ffacd0b85a97d-38880ada7c6mr3833899f8f.8.1734304417111;
-        Sun, 15 Dec 2024 15:13:37 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c804a297sm6363333f8f.67.2024.12.15.15.13.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Dec 2024 15:13:36 -0800 (PST)
-Date: Mon, 16 Dec 2024 01:13:34 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: qca8k: Fix inconsistent use of
- jiffies vs milliseconds
-Message-ID: <20241215231334.imva5oorpyq7lavl@skbuf>
-References: <20241215-qca8k-jiffies-v1-1-5a4d313c76ea@lunn.ch>
+	s=arc-20240116; t=1734312222; c=relaxed/simple;
+	bh=DRBiqKujMjsImQzADrzzrxTE+MHAlU1W+/Cogt2GG9E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=chLWmmchvh+0ZCrMNfJpIv6JehWrQ8ejBr3N0vGFkTUdy4z6O5FBFWqnyZU7EHG91NExOrgv+8RBQM6WF5w48kVwj9H4TMvMGqPJIH1MZVJk0EVjCzjfUmucCZRiQbUhYlN9/Y/9EyI5erakCtZBc5nZkoiz3i2hC/P/Xjpc7x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=DNscYzg1; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1734312212;
+	bh=9ir2YZ16xVLJ6GdB90uT3f1RahHszCW3tYf7WecHK9A=;
+	h=Date:From:To:Cc:Subject:From;
+	b=DNscYzg1zBLvwT67pS7N4ro1ULBe5YxRHtGWYg2Sh3vBT/lNlHL08zMZ/vTl+ZTtS
+	 MGNJqLDh1HpBrmOz1855xr3Qlvlv5B5lf2QTzHCYLw10NQ5894unBiEAmMt2+Zx7hx
+	 XLPtHlqRzWdlju4yWQi7NhOnRCPnlVzk9ucAhem9Vot/TNvH+pEQGEH1mZ7SMomzlm
+	 1pwk7L9owGJhrgytLWKmz5rd3hgd8FwvDlWcQbYW7uuBRcbDTaakTxDkpQ0yCfjmxN
+	 C5se0b0n64FGSC9b+Xf9R8WB+gjQEDeGS/4EKkwTeQegXLfcqPmUESgln+KXtGm9yY
+	 X3y4jWXK1QPGw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4YBMdw3G1Zz4wj1;
+	Mon, 16 Dec 2024 12:23:30 +1100 (AEDT)
+Date: Mon, 16 Dec 2024 12:23:35 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patch in the net-next tree
+Message-ID: <20241216122335.17c4ad5f@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241215-qca8k-jiffies-v1-1-5a4d313c76ea@lunn.ch>
+Content-Type: multipart/signed; boundary="Sig_/=HZ.yOK3ioZWpvaW4YiLve4";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Sun, Dec 15, 2024 at 05:43:55PM +0000, Andrew Lunn wrote:
-> wait_for_complete_timeout() expects a timeout in jiffies. With the
-> driver, some call sites converted QCA8K_ETHERNET_TIMEOUT to jiffies,
-> others did not. Make the code consistent by changes the #define to
-> include a call to msecs_to_jiffies, and remove all other calls to
-> msecs_to_jiffies.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
+--Sig_/=HZ.yOK3ioZWpvaW4YiLve4
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-If my calculations are correct, for CONFIG_HZ=100, 5 jiffies last 50 ms.
-So, assuming that configuration, the patch would be _decreasing_ the timeout
-from 50 ms to 5 ms. The change should be tested to confirm it's enough.
-Christian, could you do that?
+Hi all,
+
+The following commit is also in the mm tree as a different commit (but
+the same patch):
+
+  734ff310d38c ("gve: Convert timeouts to secs_to_jiffies()")
+
+This is commit
+
+  3a7185048326 ("gve: convert timeouts to secs_to_jiffies()")
+
+in the mm-nonmm-unstable branch of the mm tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/=HZ.yOK3ioZWpvaW4YiLve4
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmdfgRcACgkQAVBC80lX
+0Gzkvwf+NCPBzCdw+ry0Mb1ACD9+50Szw8zVX9DyPIKst6y48LiqukmaBrQcLB8k
+dXhsTsvOf9fsJUXFJ3TXpw1Wowhagi6JE+H2CQ0owznz1si0RSNP1ogIRt55p34x
+64JznXBAF0ycqCK3vXIKxq+yhqqlNz1g5mkd1cJ0f2U1NwFWrCKdbEr070sBsvyx
+6qsWUehHr+2BCTFxlGrJXEOARDXqoj+Oyy9ETKD7sU2G7GvhnyE3xJLZ9nHPb6fi
+SKgMjQbJ8Nt4HazMdfkZDzZoWsYX7hFer1IKNf3xtqFQ7/lC+frE/EiA/YrfscS+
+8EQPcO91ltKSXYiJdbExAmkev76LFw==
+=/6/j
+-----END PGP SIGNATURE-----
+
+--Sig_/=HZ.yOK3ioZWpvaW4YiLve4--
 
