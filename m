@@ -1,217 +1,143 @@
-Return-Path: <netdev+bounces-152358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D819F39AB
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 20:24:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E17A29F39F6
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 20:36:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E20616CBFC
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:24:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7957167287
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 19:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32FB206F35;
-	Mon, 16 Dec 2024 19:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5176B2080FD;
+	Mon, 16 Dec 2024 19:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="PWHDhwcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753EE207DFD
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 19:24:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBA92080D7
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 19:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734377044; cv=none; b=pa1Oq8kwsuDUrmF6kQ7g6G0Itxek3WQDpUoG/Dsru/U3ypz8DYIdyJz92vSfoP3Z3FdfWCnluqk7Nuau9Mha/KmnKXj9JWCvZ/7bXn+dslpie/CTMtRHT/UOYvQ+TSS6sg+L6YOXBMD2aHHmEHrb83vKGhKX61SkaHZ6YCX70cM=
+	t=1734377794; cv=none; b=nLG/+tPbC+wvNJc7cXNcLnSWhF5Z07JkURkS9PEN2UUQn6EDxzHgg8HdQc3826Zo9FBWhpy3lCQ8nIxkngYa8abomLxvpbIL+5NixX0xsr+h8TvS4PIJPTot6e5YTAkSQ1IzDIchY+ceL7nBXCnuJnCWxmYDQ4PDanmUGN/BI5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734377044; c=relaxed/simple;
-	bh=xai5KKONf7eQ4zGNPg6lztiXUo2vK04ydKmOdAM9eUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T/Cp8ODBPfhD6c8PVGE8A3iX/9TDWmxd/qmcyLWvSRF/3a/695shByQeIqBHtfDVeD648Vz5RkXpVm7C6/Q8SnUSE7j8YaS8nw/haBFVeDQTnkHh5sGgyzuhDS2FCZY5l03PxypwXE3jUVM+Le9Un3SDNpSt1SxgevNHWKcfNno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tNGhC-0005c9-1I; Mon, 16 Dec 2024 20:23:58 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tNGh8-003kF9-2l;
-	Mon, 16 Dec 2024 20:23:55 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tNGh9-002fsg-1g;
-	Mon, 16 Dec 2024 20:23:55 +0100
-Date: Mon, 16 Dec 2024 20:23:55 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
-	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
-	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	lorenzo.bianconi83@gmail.com
-Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
- EN7581 SoC
-Message-ID: <Z2B-S7nQO3HK8BGl@pengutronix.de>
-References: <cover.1733930558.git.lorenzo@kernel.org>
- <20241211154109.dvkihluzdouhtamr@skbuf>
- <Z1qqrVWV84DBZuCn@lore-desk>
- <20241212150613.zhi3vbxuwsc3blui@skbuf>
- <Z1sXTPeekJ5See_u@lore-desk>
- <20241212184647.t5n7t2yynh6ro2mz@skbuf>
- <Z2AYXRy-LjohbxfL@lore-desk>
- <20241216154947.fms254oqcjj72jmx@skbuf>
- <Z2B5DW70Wq1tOIhM@lore-desk>
+	s=arc-20240116; t=1734377794; c=relaxed/simple;
+	bh=YZLMeNgthh1VNnTReIeJy7kxf/ahYTPcT/OdYESyZqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y0yXT4fMs/M4+EuMeYZctCk2+NcngYagtqIygZQyZ+s57lLkURGbrNIt/SBjSHlOEAY/LzIZbzL2yyCjdN0z80hqyP4VPGtgAl9Cl//w140ZOWkSyaFENjU2zXJ/rnGSZDQMGWfKxy68gQX6dZvrE9XmHxOQZpBduEcrWn2y0Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=PWHDhwcC; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id B09D02C04F5;
+	Tue, 17 Dec 2024 08:36:26 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1734377786;
+	bh=oGHd2e5loy7aLsZGhGhSVFEKNjGf7W5e8Wj2P+Hklcw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PWHDhwcC9JRgpFtMicBDx1w8jJ5ZOyXKvSUG0MuGEWbFe0EfiLPjNOiQ6hjUS58Yz
+	 7ER4xNBfkBkHy5a0n43RBQ4sCsjP85ijGNHN/47EqC6xBpdi5kYOCsv/ApzI4dcJym
+	 mOPBbu8w+aK693OK8aM6cDUtQy4M5L2UUPPSM9/0tpi1JMvBd4kt8PL3yrTlFgLo8+
+	 4qBNoY+drkfTQsd/YQVJDkYp2i7ngNHdyQ2UkLAIWzJ9v2mmr7GUVw/px5KxGvWER/
+	 gJa76ddOrt0TPbjV98U3QkNB08G1jIJ0hkdT7ImLaZo3TZYh1kE8aTXKF3VZ0G4JFA
+	 ak216dxV1NaaQ==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B6760813a0000>; Tue, 17 Dec 2024 08:36:26 +1300
+Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
+	by pat.atlnz.lc (Postfix) with ESMTP id 8F9FD13ED95;
+	Tue, 17 Dec 2024 08:36:26 +1300 (NZDT)
+Message-ID: <596c86d8-1cb3-434b-88d6-17ffe0fc9df2@alliedtelesis.co.nz>
+Date: Tue, 17 Dec 2024 08:36:26 +1300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z2B5DW70Wq1tOIhM@lore-desk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v2 2/4] dt-bindings: mfd: Add MDIO interface to
+ rtl9301-switch
+To: Conor Dooley <conor@kernel.org>
+Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, markus.stockhausen@gmx.de,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mips@vger.kernel.org
+References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
+ <20241216031346.2626805-3-chris.packham@alliedtelesis.co.nz>
+ <20241216-neurosis-untagged-86622f8e2163@spud>
+Content-Language: en-US
+From: Chris Packham <chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <20241216-neurosis-untagged-86622f8e2163@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=6760813a a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=RZcAm9yDv7YA:10 a=XYAwZIGsAAAA:8 a=1OZ0I8y61a4uFxY9wqQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=GbR9vSjRXMx6H1Y7X1w4:22 a=E8ToXWR_bxluHZ7gmE-Z:22
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-On Mon, Dec 16, 2024 at 08:01:33PM +0100, Lorenzo Bianconi wrote:
-> > On Mon, Dec 16, 2024 at 01:09:01PM +0100, Lorenzo Bianconi wrote:
-> > > I guess what I did not make clear here is that we are discussing about
-> > > 'routed' traffic (sorry for that). The traffic is received from the WAN
-> > > interface and routed to a DSA port (or the other way around).
-> > > In this scenario the 3-way handshake will be received by the CPU via the
-> > > WAN port (or the conduit port) while the subsequent packets will be hw
-> > > forwarded from WAN to LAN (or LAN to WAN). For EN7581 [0], the traffic
-> > > will be received by the system from GDM2 (WAN) and the PSE/PPE blocks
-> > > will forward it to the GDM1 port that is connected to the DSA cpu port.
-> > > 
-> > > The proposed series is about adding the control path to apply a given Qdisc
-> > > (ETS or TBF for EN7581) to the traffic that is following the described path
-> > > without creating it directly on the DSA switch port (for the reasons described
-> > > before). E.g. the user would want to apply an ETS Qdisc just for traffic
-> > > egressing via lan0.
-> > > 
-> > > This series is not strictly related to the airoha_eth flowtable offload
-> > > implementation but the latter is required to have a full pictures of the
-> > > possible use case (this is why I was saying it is better to post it first).
-> > 
-> > It's good to know this does not depend on flowtable.
-> > 
-> > When you add an offloaded Qdisc to the egress of a net device, you don't
-> > affect just the traffic L3 routed to that device, but all traffic (also
-> > includes the packets sent to it using L2 forwarding). As such, I simply
-> > don't believe that the way in which the UAPI is interpreted here (root
-> > egress qdisc matches only routed traffic) is proper.
-> > 
-> > Ack?
-> 
-> Considering patch [0], we are still offloading the Qdisc on the provided
-> DSA switch port (e.g. LANx) via the port_setup_tc() callback available in
-> dsa_user_setup_qdisc(), but we are introducing even the ndo_setup_tc_conduit()
-> callback in order to use the hw Qdisc capabilities available on the mac chip
-> (e.g. EN7581) for the routed traffic from WAN to LANx. We will still apply
-> the Qdisc defined on LANx for L2 traffic from LANy to LANx. Agree?
-> 
-> > 
-> > > > I'm trying to look at the big picture and abstract away the flowtable a
-> > > > bit. I don't think the tc rule should be on the user port. Can the
-> > > > redirection of packets destined towards a particular switch port be
-> > > > accomplished with a tc u32 filter on the conduit interface instead?
-> > > > If the tc primitives for either the filter or the action don't exist,
-> > > > maybe those could be added instead? Like DSA keys in "flower" which gain
-> > > > introspection into the encapsulated packet headers?
-> > > 
-> > > The issue with the current DSA infrastructure is there is no way to use
-> > > the conduit port to offload a Qdisc policy to a given lan port since we
-> > > are missing in the APIs the information about what user port we are
-> > > interested in (this is why I added the new netdev callback).
-> > 
-> > How does the introduction of ndo_setup_tc_conduit() help, since the problem
-> > is elsewhere? You are not making "tc qdisc add lanN root ets" work correctly.
-> > It is simply not comparable to the way in which it is offloaded by
-> > drivers/net/dsa/microchip/ksz_common.c, even though the user space
-> > syntax is the same. Unless you're suggesting that for ksz it is not
-> > offloaded correctly?
-> 
-> nope, I am not saying the current Qdisc DSA infrastructure is wrong, it just
-> does not allow to exploit all hw capabilities available on EN7581 when the
-> traffic is routed from the WAN port to a given DSA switch port. If we do:
-> 
-> $tc qdisc add dev lan0 root handle 1: ets strict 8 priomap ...
-> 
-> in the current upstream implementation we do:
->   dsa_user_setup_tc():
->      ...
->        -> ds->ops->port_setup_tc(ds, dp->index, type, type_data)
->           (it applies the Qdisc on lan0 configuring the hw switch)
-> 
-> adding the ndo_setup_tc_conduit() callback we have:
-> 
->   dsa_user_setup_qdisc()
->     ...
->       -> conduit->netdev_ops->ndo_setup_tc_conduit(conduit, dp->index, type, type_data)
->          (it applies the Qdisc on EN7581 mac chip for the routed traffic destinated to lan0)
-> 
->       -> ds->ops->port_setup_tc(ds, dp->index, type, type_data)
->          (it applies the Qdisc on lan0 configuring the hw switch)
-> 
-> > 
-> > Oleksij, am I missing something?
-> > 
-> > > Please consider here we are discussing about Qdisc policies and not flower
-> > > rules to mangle the traffic.
-> > 
-> > What's a Qdisc policy?
-> 
-> I mean a queue scheduler algorithm (e.g. TBF, ETS, HTB, ...)
-> 
-> > 
-> > Also, flower is a classifier, not an action. It doesn't mangle packets
-> > by the very definition of what a classifier is.
-> 
-> yes, but goal of the series is the Queue scheduler offloading, not
-> classifier/action. Agree?
-> 
-> > 
-> > > The hw needs to be configured in advance to apply the requested policy
-> > > (e.g TBF for traffic shaping).
-> > 
-> > What are you missing exactly to make DSA packets go to a particular
-> > channel on the conduit?
-> > 
-> > For Qdisc offloading you want to configure the NIC in advance, of course.
-> > 
-> > Can't you do something like this to guide packets to the correct channels?
-> > 
-> > tc qdisc add dev eth0 clsact
-> > tc qdisc add dev eth0 root handle 1: ets strict 8 priomap ...
-> > tc filter add dev eth0 egress ${u32 or flower filter to match on DSA tagged packets} \
-> > 	flowid 1:1
-> 
-> If we apply the Qdisc directly on the conduit port (eth0) we can just apply the
-> queue scheduler on all the traffic egressing via the DSA switch while I would
-> like to apply it on per DSA port basis (but using the mac chip hw capabilities),
-> got my point?
 
-Hm, I guess I have similar use case in one of my projects. In my case, the CPU
-interface is 1Gbit the switch ports are 100Mbit each. It is still
-possible to keep the CPU interface busy by sending 1Gbit UDP stream, so
-900Mbit is dropped by the switch. I would like to have traffic limiter
-per virtual DSA port on the SoC site to reduce the load on DSA conduit.
-Currently it was not possible.
+On 17/12/2024 07:53, Conor Dooley wrote:
+> On Mon, Dec 16, 2024 at 04:13:44PM +1300, Chris Packham wrote:
+>> The MDIO controller is part of the switch on the RTL9300 family of
+>> devices. Add a $ref to the mfd binding for these devices.
+>>
+>> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+>> ---
+>>
+>> Notes:
+>>      Changes in v2:
+>>      - None
+>>
+>>   .../bindings/mfd/realtek,rtl9301-switch.yaml      | 15 +++++++++++++++
+>>   1 file changed, 15 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml b/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
+>> index f053303ab1e6..eeb08e7435fa 100644
+>> --- a/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
+>> +++ b/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
+>> @@ -41,6 +41,9 @@ patternProperties:
+>>     'i2c@[0-9a-f]+$':
+>>       $ref: /schemas/i2c/realtek,rtl9301-i2c.yaml#
+>>   
+>> +  'mdio@[0-9a-f]+$':
+>> +    $ref: /schemas/net/realtek,rtl9301-mdio.yaml#
+>> +
+>>   required:
+>>     - compatible
+>>     - reg
+>> @@ -110,5 +113,17 @@ examples:
+>>             };
+>>           };
+>>         };
+>> +
+>> +      mdio0: mdio@ca00 {
+> Label here is unused, but that alone isn't worth a respin.
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I'll be re-spinning the series for other reasons so I'll fix this up and 
+add your ack while I'm at it.
+
+>
+>> +        compatible = "realtek,rtl9301-mdio";
+>> +        reg = <0xca00 0x200>;
+>> +        #address-cells = <1>;
+>> +        #size-cells = <0>;
+>> +
+>> +        ethernet-phy@0 {
+>> +          reg = <0>;
+>> +          realtek,smi-address = <0 1>;
+>> +        };
+>> +      };
+>>       };
+>>   
+>> -- 
+>> 2.47.1
+>>
 
