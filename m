@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-152064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6970C9F2936
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 05:14:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B349F2935
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 05:14:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 873787A152E
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 04:14:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDF0D1888075
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 04:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37741C9B7A;
-	Mon, 16 Dec 2024 04:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352C41CBEA4;
+	Mon, 16 Dec 2024 04:13:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAD1154C0F;
-	Mon, 16 Dec 2024 04:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2355A1C3C18;
+	Mon, 16 Dec 2024 04:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734322428; cv=none; b=nHH+E2Ttohf7hfDn1Xfxh6+9eu2fU6AuTwbs9D3vSh86Ucsw7710lyH0SJ/8M5vgxzHpLCNI29WffmfwdC3sldJ7SEqOuLMF9gtMbNgQfT1Tl9oEPP3dLr7rAYbp4zs6l6rA7WOFuTsKLUfJwz35PbedIgmIQmLltf84bg0K9Ps=
+	t=1734322429; cv=none; b=PziATaOIAxh46CBqM6iqAi5g1LjE9nZAKGmIREZS6PZSEFSLZ0vmfnyehbxiWCgXOuxihQI/xGCjnCKv5nth6aU1isSD5UbebpQmxuynvH5UTaG09724GMjRy+5TZjKPvlFR73lw0UBzdIm0QQ7/Qz9ctsauR6lkqaSMbUOnRDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734322428; c=relaxed/simple;
-	bh=Dzi59jj1sUriXluZBxp8fdBWFVTBYhGcmZBKJ72caUw=;
+	s=arc-20240116; t=1734322429; c=relaxed/simple;
+	bh=2urIXQ5l2+fcRXGgzVAlnCT58QgDYHlk1hwadoBNabE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rYpedagaaCAMAJZU9jOZiCni8BunHAl8EkT7/9RjbHly2kh4j4tcilLVMQpOXfvX2IN7cniYdC8VYSbMBZ4ZI49P1uVRgiRXHrSpLSxO0phVNaF+4aKWKGY7Upzvv0O9INrCSlt9/YqP5DGfL7hfAQFmH/6LXeqYPZUqffNsK8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=hzClMLcuCeP2K5eJgtQjNootWWxvv9EMJud7SekZZrAMeY9lhGRj+YvhmB8aiFuN+N++OodAY5OZi0o26IUUDl2XZe/0uabauIEYA/PbZhankYhuwUyV5TIRtic5UUwF+bGuqsdgR6jrNSMPrYcUFJv+dTlyO4FdLHHmJgy0lfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4YBRN32p4LzRjNV;
-	Mon, 16 Dec 2024 12:11:47 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YBRLq0L9DzgZ9k;
+	Mon, 16 Dec 2024 12:10:43 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8F0581402E2;
-	Mon, 16 Dec 2024 12:13:37 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 461521800CB;
+	Mon, 16 Dec 2024 12:13:38 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 16 Dec 2024 12:13:36 +0800
+ 15.2.1544.11; Mon, 16 Dec 2024 12:13:37 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
@@ -49,9 +49,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>, <hkelam@marvell.com>
-Subject: [PATCH V8 net-next 1/7] net: hibmcge: Add debugfs supported in this module
-Date: Mon, 16 Dec 2024 12:05:26 +0800
-Message-ID: <20241216040532.1566229-2-shaojijie@huawei.com>
+Subject: [PATCH V8 net-next 2/7] net: hibmcge: Add irq_info file to debugfs
+Date: Mon, 16 Dec 2024 12:05:27 +0800
+Message-ID: <20241216040532.1566229-3-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20241216040532.1566229-1-shaojijie@huawei.com>
 References: <20241216040532.1566229-1-shaojijie@huawei.com>
@@ -66,226 +66,80 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-This patch initializes debugfs and creates root directory
-for each device. The tx_ring and rx_ring debugfs files
-are implemented together.
+the driver requested three interrupts: "tx", "rx", "err".
+The err interrupt is a summary interrupt. We distinguish
+different errors based on the status register and mask.
+
+With "cat /proc/interrupts | grep hibmcge",
+we can't distinguish the detailed cause of the error,
+so we added this file to debugfs.
+
+the following effects are achieved:
+[root@localhost sjj]# cat /sys/kernel/debug/hibmcge/0000\:83\:00.1/irq_info
+RX                  : enabled: true , logged: false, count: 0
+TX                  : enabled: true , logged: false, count: 0
+MAC_MII_FIFO_ERR    : enabled: false, logged: true , count: 0
+MAC_PCS_RX_FIFO_ERR : enabled: false, logged: true , count: 0
+MAC_PCS_TX_FIFO_ERR : enabled: false, logged: true , count: 0
+MAC_APP_RX_FIFO_ERR : enabled: false, logged: true , count: 0
+MAC_APP_TX_FIFO_ERR : enabled: false, logged: true , count: 0
+SRAM_PARITY_ERR     : enabled: true , logged: true , count: 0
+TX_AHB_ERR          : enabled: true , logged: true , count: 0
+RX_BUF_AVL          : enabled: true , logged: false, count: 0
+REL_BUF_ERR         : enabled: true , logged: true , count: 0
+TXCFG_AVL           : enabled: true , logged: false, count: 0
+TX_DROP             : enabled: true , logged: false, count: 0
+RX_DROP             : enabled: true , logged: false, count: 0
+RX_AHB_ERR          : enabled: true , logged: true , count: 0
+MAC_FIFO_ERR        : enabled: true , logged: false, count: 0
+RBREQ_ERR           : enabled: true , logged: false, count: 0
+WE_ERR              : enabled: true , logged: false, count: 0
+
+The irq framework of hibmcge driver also includes tx/rx interrupts.
+Therefore, TX and RX are not moved separately form this file.
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
-ChangeLog:
-v7 -> v8:
-  - Use kernel public helper "str_true_false" instead of self-defined,
-    suggested by Jakub.
-  v7: https://lore.kernel.org/all/20241212142334.1024136-1-shaojijie@huawei.com/
-v6 -> v7:
-  - Optimize the wrapper name, suggested by Jakub.
-  v6: https://lore.kernel.org/all/20241210134855.2864577-1-shaojijie@huawei.com/
-v5 -> v6:
-  - Drop debugfs_create_devm_dir() helper, suggested by Greg KH.
-  v5: https://lore.kernel.org/all/20241206111629.3521865-1-shaojijie@huawei.com/
-v4 -> v5:
-  - Use debugfs_create_devm_dir() helper, suggested by Jakub.
-  v4: https://lore.kernel.org/all/20241203150131.3139399-2-shaojijie@huawei.com/
-v1 -> v2:
-  - Remove debugfs file 'dev_specs' because the dump register
-    does the same thing, suggested by Andrew.
-  - Move 'tx timeout cnt' from debugfs to ethtool -S, suggested by Andrew.
-  - Add a new patch for debugfs file 'irq_info', suggested by Andrew.
-  - Ignore the error code of the debugfs initialization failure, suggested by Andrew.
-  v1: https://lore.kernel.org/all/20241023134213.3359092-3-shaojijie@huawei.com/
----
- .../net/ethernet/hisilicon/hibmcge/Makefile   |  3 +-
- .../ethernet/hisilicon/hibmcge/hbg_debugfs.c  | 94 +++++++++++++++++++
- .../ethernet/hisilicon/hibmcge/hbg_debugfs.h  | 12 +++
- .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 29 +++++-
- 4 files changed, 135 insertions(+), 3 deletions(-)
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.h
+ .../ethernet/hisilicon/hibmcge/hbg_debugfs.c  | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/Makefile b/drivers/net/ethernet/hisilicon/hibmcge/Makefile
-index ae58ac38c206..1a0ec2fb8c24 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/Makefile
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/Makefile
-@@ -5,4 +5,5 @@
- 
- obj-$(CONFIG_HIBMCGE) += hibmcge.o
- 
--hibmcge-objs = hbg_main.o hbg_hw.o hbg_mdio.o hbg_irq.o hbg_txrx.o hbg_ethtool.o
-+hibmcge-objs = hbg_main.o hbg_hw.o hbg_mdio.o hbg_irq.o hbg_txrx.o hbg_ethtool.o \
-+		hbg_debugfs.o
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
-new file mode 100644
-index 000000000000..773a6434b114
---- /dev/null
+index 773a6434b114..56d8599563c0 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
-@@ -0,0 +1,94 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+// Copyright (c) 2024 Hisilicon Limited.
-+
-+#include <linux/debugfs.h>
-+#include <linux/device.h>
-+#include <linux/etherdevice.h>
-+#include <linux/seq_file.h>
-+#include <linux/string_choices.h>
-+#include "hbg_common.h"
-+#include "hbg_debugfs.h"
-+#include "hbg_hw.h"
-+#include "hbg_irq.h"
-+#include "hbg_txrx.h"
-+
-+static struct dentry *hbg_dbgfs_root;
-+
-+struct hbg_dbg_info {
-+	const char *name;
-+	int (*read)(struct seq_file *seq, void *data);
-+};
-+
-+static void hbg_dbg_ring(struct hbg_priv *priv, struct hbg_ring *ring,
-+			 struct seq_file *s)
-+{
-+	u32 irq_mask = ring->dir == HBG_DIR_TX ? HBG_INT_MSK_TX_B :
-+						 HBG_INT_MSK_RX_B;
-+
-+	seq_printf(s, "ring used num: %u\n",
-+		   hbg_get_queue_used_num(ring));
-+	seq_printf(s, "ring max num: %u\n", ring->len);
-+	seq_printf(s, "ring head: %u, tail: %u\n", ring->head, ring->tail);
-+	seq_printf(s, "fifo used num: %u\n",
-+		   hbg_hw_get_fifo_used_num(priv, ring->dir));
-+	seq_printf(s, "fifo max num: %u\n",
-+		   hbg_get_spec_fifo_max_num(priv, ring->dir));
-+	seq_printf(s, "irq enabled: %s\n",
-+		   str_true_false(hbg_hw_irq_is_enabled(priv, irq_mask)));
-+}
-+
-+static int hbg_dbg_tx_ring(struct seq_file *s, void *unused)
-+{
-+	struct net_device *netdev = dev_get_drvdata(s->private);
-+	struct hbg_priv *priv = netdev_priv(netdev);
-+
-+	hbg_dbg_ring(priv, &priv->tx_ring, s);
-+	return 0;
-+}
-+
-+static int hbg_dbg_rx_ring(struct seq_file *s, void *unused)
-+{
-+	struct net_device *netdev = dev_get_drvdata(s->private);
-+	struct hbg_priv *priv = netdev_priv(netdev);
-+
-+	hbg_dbg_ring(priv, &priv->rx_ring, s);
-+	return 0;
-+}
-+
-+static const struct hbg_dbg_info hbg_dbg_infos[] = {
-+	{ "tx_ring", hbg_dbg_tx_ring },
-+	{ "rx_ring", hbg_dbg_rx_ring },
-+};
-+
-+static void hbg_debugfs_uninit(void *data)
-+{
-+	debugfs_remove_recursive((struct dentry *)data);
-+}
-+
-+void hbg_debugfs_init(struct hbg_priv *priv)
-+{
-+	const char *name = pci_name(priv->pdev);
-+	struct device *dev = &priv->pdev->dev;
-+	struct dentry *root;
-+	u32 i;
-+
-+	root = debugfs_create_dir(name, hbg_dbgfs_root);
-+
-+	for (i = 0; i < ARRAY_SIZE(hbg_dbg_infos); i++)
-+		debugfs_create_devm_seqfile(dev, hbg_dbg_infos[i].name,
-+					    root, hbg_dbg_infos[i].read);
-+
-+	/* Ignore the failure because debugfs is not a key feature. */
-+	devm_add_action_or_reset(dev, hbg_debugfs_uninit, root);
-+}
-+
-+void hbg_debugfs_register(void)
-+{
-+	hbg_dbgfs_root = debugfs_create_dir("hibmcge", NULL);
-+}
-+
-+void hbg_debugfs_unregister(void)
-+{
-+	debugfs_remove_recursive(hbg_dbgfs_root);
-+	hbg_dbgfs_root = NULL;
-+}
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.h
-new file mode 100644
-index 000000000000..80670d66bbeb
---- /dev/null
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+/* Copyright (c) 2024 Hisilicon Limited. */
-+
-+#ifndef __HBG_DEBUGFS_H
-+#define __HBG_DEBUGFS_H
-+
-+void hbg_debugfs_register(void);
-+void hbg_debugfs_unregister(void);
-+
-+void hbg_debugfs_init(struct hbg_priv *priv);
-+
-+#endif
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-index 75505fb5cc4a..7a03fdfa32a7 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-@@ -11,6 +11,7 @@
- #include "hbg_irq.h"
- #include "hbg_mdio.h"
- #include "hbg_txrx.h"
-+#include "hbg_debugfs.h"
- 
- static void hbg_change_mtu(struct hbg_priv *priv, int new_mtu);
- 
-@@ -160,7 +161,12 @@ static int hbg_init(struct hbg_priv *priv)
- 	if (ret)
- 		return ret;
- 
--	return hbg_mdio_init(priv);
-+	ret = hbg_mdio_init(priv);
-+	if (ret)
-+		return ret;
-+
-+	hbg_debugfs_init(priv);
-+	return 0;
+@@ -55,9 +55,31 @@ static int hbg_dbg_rx_ring(struct seq_file *s, void *unused)
+ 	return 0;
  }
  
- static int hbg_pci_init(struct pci_dev *pdev)
-@@ -245,7 +251,26 @@ static struct pci_driver hbg_driver = {
- 	.id_table	= hbg_pci_tbl,
- 	.probe		= hbg_probe,
++static int hbg_dbg_irq_info(struct seq_file *s, void *unused)
++{
++	struct net_device *netdev = dev_get_drvdata(s->private);
++	struct hbg_priv *priv = netdev_priv(netdev);
++	struct hbg_irq_info *info;
++	u32 i;
++
++	for (i = 0; i < priv->vectors.info_array_len; i++) {
++		info = &priv->vectors.info_array[i];
++		seq_printf(s,
++			   "%-20s: enabled: %-5s, logged: %-5s, count: %llu\n",
++			   info->name,
++			   str_true_false(hbg_hw_irq_is_enabled(priv,
++								info->mask)),
++			   str_true_false(info->need_print),
++			   info->count);
++	}
++
++	return 0;
++}
++
+ static const struct hbg_dbg_info hbg_dbg_infos[] = {
+ 	{ "tx_ring", hbg_dbg_tx_ring },
+ 	{ "rx_ring", hbg_dbg_rx_ring },
++	{ "irq_info", hbg_dbg_irq_info },
  };
--module_pci_driver(hbg_driver);
-+
-+static int __init hbg_module_init(void)
-+{
-+	int ret;
-+
-+	hbg_debugfs_register();
-+	ret = pci_register_driver(&hbg_driver);
-+	if (ret)
-+		hbg_debugfs_unregister();
-+
-+	return ret;
-+}
-+module_init(hbg_module_init);
-+
-+static void __exit hbg_module_exit(void)
-+{
-+	pci_unregister_driver(&hbg_driver);
-+	hbg_debugfs_unregister();
-+}
-+module_exit(hbg_module_exit);
  
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Huawei Tech. Co., Ltd.");
+ static void hbg_debugfs_uninit(void *data)
 -- 
 2.33.0
 
