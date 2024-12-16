@@ -1,150 +1,125 @@
-Return-Path: <netdev+bounces-152099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1824F9F2AC8
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:19:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8582D9F2ACE
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 08:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6373F1613EC
-	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:18:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C24C0161753
+	for <lists+netdev@lfdr.de>; Mon, 16 Dec 2024 07:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE6918DF62;
-	Mon, 16 Dec 2024 07:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184481B87EF;
+	Mon, 16 Dec 2024 07:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="biRcPi1V"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="lulfp9QZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BDA1487F6
-	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 07:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCCF1B4159
+	for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 07:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734333535; cv=none; b=MaaUw1APkip67TZ/biOC1fGYyLXR+gwAHU2tMk4mSLrBophmOrV/jSMwI0Vu6dV/xIXnBAbtR5SFeKQVRSH/8VB2LTXaK40+cv0C+hnnOfpmwSPKSxoJkwzoRa9FSQRc4784J0+YmSzOcnxe5cWVJ5ZSU3Gue5teoajRoGJ7Evo=
+	t=1734333609; cv=none; b=OdG7Kf0guO0zYRJwx0oNMKG/dweL4/gxFAiF4C9Tngz599FR7FGzMAJ39Q74NXhI3cAakX9Oey8/KWJRdwZNh6EuJEZl/ZZcFnNs1PB2FMM4GXjTNFgKOhMGliyleQBDPYJMO37hIDnpuV+cP5ryTrbTliHj0+lUI5RH2jpGOKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734333535; c=relaxed/simple;
-	bh=B/tur1yDRhI3VM5DW8SthX7SrdrUxSR+1BZUyF4vNVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ql9GimBZMYopYV7cpLRuxc750b5gOXZAYwdSCjTjymmKa6+B20mgZUaEwgKf2CySG0utnkScJeCBqrLUzK9omAcwp7jvrf4zFqEw5mrng+xryZELFt4y6UFXjvFRmbAawN4Kp1wWJ7F1pEMOPh8PyeYLdO3SAbQFdx0kEWCbHlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=biRcPi1V; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734333533; x=1765869533;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=B/tur1yDRhI3VM5DW8SthX7SrdrUxSR+1BZUyF4vNVo=;
-  b=biRcPi1VjwrxTnbfnbS/5iPX8FUllojVDA12iWZG8Ke/f+gt6qlkAqiV
-   S79D9/2fdo2lGpJkNkOAbfpqjQMAVqI2nlrF+w/jFeS26afhIJgr7jirc
-   CpFcrboyNsiAYEUDacImphMHuhldubIZRAuFHwiedg14RWY8xC9vb3wWe
-   llJFXJIjhLtvnVASb42nl12wWSznkY8sTh2tZ61YH2S3Hs0FV4SVDQzCy
-   ytpE2l7PJNr5l2z/K/y8VlzDtzmq0bKyJB892SlTMfgm0Kr6q/W7jJzyl
-   DOil9jzfoWPx5j7bAyCD07I8diaVVopIBNHbvS7i6Za9kfYjlibouye/2
-   Q==;
-X-CSE-ConnectionGUID: 22sOqj2DT5Wz2335IiTeoQ==
-X-CSE-MsgGUID: qoHP/TnlT/KCuH65TKc+og==
-X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="38634189"
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="38634189"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 23:18:50 -0800
-X-CSE-ConnectionGUID: ilnka3aKQXKw1mue8TxNVg==
-X-CSE-MsgGUID: 5zZfyqJdQ2WJrAy7tOosFg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,237,1728975600"; 
-   d="scan'208";a="97543225"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 23:18:48 -0800
-Date: Mon, 16 Dec 2024 08:15:42 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	s=arc-20240116; t=1734333609; c=relaxed/simple;
+	bh=M0m6mS0qvuOgK4pqKWi4YcPmsudiy3imB1/B4ess3Lg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mscEiVbyQYITogi0rdZr9g9OxDl08E7SNbduqg6Y18Y4Fq6eW9bc0788yha+h1dOxkbtdYz/hOEcokd0p0+WhmZlU5JDIAOQ8n0/7q55FuG2PiIsHviMBUS6mkfv6Ax4wj2LoPieZPbmzBKI4PRuAMbm4BvWcxxp9W2HlQqFwmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=lulfp9QZ; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5401e6efffcso4427997e87.3
+        for <netdev@vger.kernel.org>; Sun, 15 Dec 2024 23:20:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1734333604; x=1734938404; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=saNfM3LJ/gXWUseFK7OkXZwpRXxJnebLh8Q4+xjWzoU=;
+        b=lulfp9QZ5gsZQUCFTbmmzaAmRD0jU5ABrhB82MXxf7GSwH9w3XUeC5ZaP1zpWeA2h0
+         34zmDPb7totrsm1Skihz4Mtjs2UMebq+xJn15xi+mIKJ9os5fVHccj/mFr/zzLtgdgkE
+         NC6J1Acs6mAxHmXBAER7EgjO/Xb/aZQDy7vr/OtyVQYUC8zZZgpjPnZkl52ywgwQbhzB
+         qLAhNW2Fs6PKXQb/zbnB0je4cvAs4FfdEq6T56kQH22sYw5zFsEcxaEtMXOyfSIeZuIC
+         RP7zC1Gw4x79L5fOMubSXptnyCEGbGYZy5ObturcY7FckfrIJOzs9g5nFyZIxkM3tpS+
+         BVhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734333604; x=1734938404;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=saNfM3LJ/gXWUseFK7OkXZwpRXxJnebLh8Q4+xjWzoU=;
+        b=u3CrWbdARvYSWVkR7OK5kQRAcPqSy0puhOnqV6ueCGuFVg+3/8RqckHF1lX9IkoUra
+         s2FG7tZ2ZqfcvDw8xzozD+bcRGPTFFBQCgzKKSsXT6I2AgV09qiv/cHB22VFVTDUtwoD
+         +E8OYAp3ZoEbwqo24YxKOZzYo/TOyBKGr6fWTEJa8p3myhcP5jPnMhwaUZ8KlDtKGa15
+         Zkim1viKziTC2ZSlb462FKT5XNrmxye7PZEssnO1azyY70UDTFdzUJ8QmlLqOflfeBET
+         ekDgP4fGomA2HYlnAl/7n/FOczPywE2YTqIcxoQ1A3/RVDPYE94xeqHWrwrdiJN2KvQM
+         uecA==
+X-Gm-Message-State: AOJu0YwmXc7XYw9bTO/qt+qdJ2fAWu9s9rUMdZj1PZR1MTN7lMsU9Qq7
+	fKZFMAxA8BFbBNzPXUBIqMDUeRz6PyMg87hTBw1A/tsETcX8o1lHb3FaB8Fd9mqBQhSo+AhEwJV
+	DJVk=
+X-Gm-Gg: ASbGncv5h5/naN+RXpk+L5LnZ2BzMMwlb5Ivr5z+fveSSDTonJOZdr0tQDT1D/u9OKM
+	HU/ZcrI8zfaVEBOE1/ron826fzXor/YaOPVOrK0OciwRsafzU3b3cko7qrQXK8LXl09K8DnDlrF
+	KgOuBUsxYWKsIK6ine9FWQ1KzJWRf1c1XGwk2mgSToR8o4D/tIDwPoxhj89oFTmBDBfVqKvSSkL
+	bI53xg5P5Q2MQ0jUx3GzzmpE0HOfs5eLisbcjMdjcTRFDSFbvZRQsQJPntHOK9ZU1kRXkE=
+X-Google-Smtp-Source: AGHT+IGDnuBu4pD61786Xbqg5/sZ4XzdhAFZbPTySRoKaH33YM2xTlfYrZazJwFQUY+JIVDFd/RY+Q==
+X-Received: by 2002:a05:6512:238b:b0:53e:350a:7294 with SMTP id 2adb3069b0e04-54090595736mr4004062e87.37.1734333603800;
+        Sun, 15 Dec 2024 23:20:03 -0800 (PST)
+Received: from cobook.home ([91.198.101.25])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54120ba9b2bsm748930e87.94.2024.12.15.23.20.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Dec 2024 23:20:03 -0800 (PST)
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Fix error patch in airoha_probe()
-Message-ID: <Z1/Tng80hii4dBQU@mev-dev.igk.intel.com>
-References: <20241215-airoha_probe-error-path-fix-v1-1-dd299122d343@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>,
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Subject: [PATCH net-next v2 0/5] mdio support updates
+Date: Mon, 16 Dec 2024 12:19:52 +0500
+Message-Id: <20241216071957.2587354-1-nikita.yoush@cogentembedded.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241215-airoha_probe-error-path-fix-v1-1-dd299122d343@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Dec 15, 2024 at 06:36:35PM +0100, Lorenzo Bianconi wrote:
-> Do not run napi_disable if airoha_hw_init() fails since Tx/Rx napi
-> has not been started yet. In order to fix the issue, introduce
-> airoha_qdma_disable_napi routine and remove napi_disable in
-> airoha_hw_cleanup().
-> 
-> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  drivers/net/ethernet/mediatek/airoha_eth.c | 33 ++++++++++++++++++++++--------
->  1 file changed, 25 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-> index 6c683a12d5aa52dd9d966df123509075a989c0b3..5bbf5fee2802135ff6083233d0bda78f2ba5606a 100644
-> --- a/drivers/net/ethernet/mediatek/airoha_eth.c
-> +++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-> @@ -2138,17 +2138,14 @@ static void airoha_hw_cleanup(struct airoha_qdma *qdma)
->  		if (!qdma->q_rx[i].ndesc)
->  			continue;
->  
-> -		napi_disable(&qdma->q_rx[i].napi);
->  		netif_napi_del(&qdma->q_rx[i].napi);
->  		airoha_qdma_cleanup_rx_queue(&qdma->q_rx[i]);
->  		if (qdma->q_rx[i].page_pool)
->  			page_pool_destroy(qdma->q_rx[i].page_pool);
->  	}
->  
-> -	for (i = 0; i < ARRAY_SIZE(qdma->q_tx_irq); i++) {
-> -		napi_disable(&qdma->q_tx_irq[i].napi);
-> +	for (i = 0; i < ARRAY_SIZE(qdma->q_tx_irq); i++)
->  		netif_napi_del(&qdma->q_tx_irq[i].napi);
-> -	}
->  
->  	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
->  		if (!qdma->q_tx[i].ndesc)
-> @@ -2173,6 +2170,21 @@ static void airoha_qdma_start_napi(struct airoha_qdma *qdma)
->  	}
->  }
->  
-> +static void airoha_qdma_disable_napi(struct airoha_qdma *qdma)
-Nit: similar function for enabling napi is named airoha_qdma_start_napi()
-maybe stop here or enable there to be consistent.
+This series cleans up rswitch mdio support, and adds C22 operations.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Nikita Yushchenko (5):
+  net: renesas: rswitch: do not write to MPSM register at init time
+  net: renesas: rswitch: use FIELD_PREP for remaining MPIC register
+    fields
+  net: renesas: rswitch: align mdio C45 operations with datasheet
+  net: renesas: rswitch: use generic MPSM operation for mdio C45
+  net: renesas: rswitch: add mdio C22 support
+---
+v1: https://lore.kernel.org/netdev/20241208155236.108582-1-nikita.yoush@cogentembedded.com/
 
-Thanks
+changes since v1:
+- rebase against net-next/main as of commit 92c932b9946c ("Merge branch
+  'mptcp-pm-userspace-misc-cleanups'"),
+- remove no longer used definitions for MMIS1 register bits,
+- add patch to use FIELD_PREP for MPIC register fields, to keep the same
+  style as in already merged patch.
+---
+ drivers/net/ethernet/renesas/rswitch.c | 84 ++++++++++++++++----------
+ drivers/net/ethernet/renesas/rswitch.h | 33 ++++------
+ 2 files changed, 65 insertions(+), 52 deletions(-)
 
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(qdma->q_tx_irq); i++)
-> +		napi_disable(&qdma->q_tx_irq[i].napi);
-> +
-> +	for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
-> +		if (!qdma->q_rx[i].ndesc)
-> +			continue;
-> +
-> +		napi_disable(&qdma->q_rx[i].napi);
-> +	}
-> +}
-> +
+-- 
+2.39.5
 
-[...]
 
