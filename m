@@ -1,68 +1,63 @@
-Return-Path: <netdev+bounces-152705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 421D89F5795
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 21:25:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C639F9F57CD
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 21:31:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DE4216E1B4
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 20:25:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6DBB16F3DA
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 20:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 123381F9416;
-	Tue, 17 Dec 2024 20:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704751F8EE4;
+	Tue, 17 Dec 2024 20:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NiO/Pjvu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPpreQ3O"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31DC14885B;
-	Tue, 17 Dec 2024 20:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433911607AC;
+	Tue, 17 Dec 2024 20:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734467104; cv=none; b=Ci4ysOPb4kaLk928w+O4OhVG+AB3eBpRLB7L/9DRSTBJsHE9iLfqjDXuFJAGxhpLUkvAT7kEUQtvbbnbJtUH1isgeVzoBp+Rbk3/jvj/x8ICE0CiG45Pfdyml2q/kdx6rZD5hbxisFu3DmbyLSfKZrPmW1wLeqsAVZUFNqTVQ/w=
+	t=1734467440; cv=none; b=t9JBTCvvO8qgYjMU0NrJLjNWm1dHrsxBgXSkoIKE47pW9djxE6OGtiYYd2B3CowQTIkLUH/RGUUYftPm4ZgSZ7GLqRupIsOBaqZ5gLRmlFpHUHpzbBQIrH/SLBjA6wWmYaMxSlAh+jjLlVYrUB8n17dcwXdWudtKS13a40lhP14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734467104; c=relaxed/simple;
-	bh=Maiyc6QF7xPjVR/GvWmkIlFnB5azzCmzgzErzNX0Odk=;
+	s=arc-20240116; t=1734467440; c=relaxed/simple;
+	bh=+Z8MagIxxUoKw0hroBmcul2wy1Et9DFwaw4LuCwEjyA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XAiblktS+mBygjwT8+Ho9gnqCNpMDB83bJQFkcvMCy+HyfzlUmsDsKUVpBp9CxwDsLP7vMOfPBA2/7cWXKmvCjk95F6KDZx6+Q8znmLUv3Yv3ZcUHRnRRLbQMjsoF7yruUC1R3kv/nClk+TaQw4O/h18SoAQmR4RvLCUpIfzejQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NiO/Pjvu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C3D4C4CED3;
-	Tue, 17 Dec 2024 20:25:04 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=S5c5d3aAy0jwtENKgL0brbITw1xVc0fvCJq7yFoY7n13xvBFjnGlfk9vs0oMrwrX5/Fqx8q68/TCiVGkyT6zNPXqsVGywd7bE1nJWzXdEzokXLVLgamva6kA/EcAOX0+7/qgS/CtUQqNoNF3iT9NHRGHpTVtTFLrP7JaAQqYMk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPpreQ3O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D989C4CED3;
+	Tue, 17 Dec 2024 20:30:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734467104;
-	bh=Maiyc6QF7xPjVR/GvWmkIlFnB5azzCmzgzErzNX0Odk=;
+	s=k20201202; t=1734467439;
+	bh=+Z8MagIxxUoKw0hroBmcul2wy1Et9DFwaw4LuCwEjyA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NiO/PjvuLZCXCjT+n+Jwff8N7u2Dp9GcRYMMAkR5oopgvUny7vHFlSUcxqLc3RW+P
-	 C5fU8PFL+aUuONctTnIFM1Nhsc7Lc36Ssg7NGIIvdnr2Dpi8rnZ03k/yVGHgb87zqz
-	 RB/pzUXmv7C3mFIL/yFyxszLHf6bc5RrrvNbKkFxB9TIWxOw9hN8pcoxt92hHIsB1w
-	 gBdiAT3EVlI3QVWecR89bLA1qmJVmJudSucSLnIn72JLILBRWMpJbYnjiP0JxWbtx/
-	 Wsqa2a0rtGCQH9d+reLDT01FtqZ1hFVSwh44EdUI88p1abKjsy5k0Fo2TMdiCIE6cs
-	 uMwx/4k6G8gww==
-Date: Tue, 17 Dec 2024 12:25:00 -0800
+	b=JPpreQ3Of8vylmIe3GUXtSyIXeFQ+qLUqRAkxpNW8toZjK1Qbrj7ahgK3ZMABBv8i
+	 lOvFXkf1qIWarnc2k4PRkUOvcXa/zivIZ4WTXyhnbGLwugM5Ku0rVfHpxzlRgkFTuR
+	 hPgbGtNMo4Bk5Gee0gok9OiYVr1sQhNqWThVu6euX+mU5SxfEG1DHLP2uHRNdqsfaF
+	 oRXyAFlWImNCjt69XyIX4cQTwHHSf60gFDZyDAOJyYYKKo41/J3oYwr7ql0n9Fjcb1
+	 hVyTAGcS/PrFHmx8OmHgoFDYQtFHQCKBYRwZw8z8NMpPa/05AsCFRcUJ9SUCo9IWCk
+	 yHo9D7zD7iMuQ==
+Date: Tue, 17 Dec 2024 12:30:36 -0800
 From: Kees Cook <kees@kernel.org>
-To: Christopher Ferris <cferris@google.com>
-Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Joe Damato <jdamato@fastly.com>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
 	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] UAPI: net/sched: Open-code __struct_group() in flex
- struct tc_u32_sel
-Message-ID: <202412171223.FDDEA0A2@keescook>
-References: <20241217025950.work.601-kees@kernel.org>
- <f4947447-aa66-470c-a48d-06ed77be58da@intel.com>
- <bbed49c7-56c0-4642-afec-e47b14425f76@embeddedor.com>
- <c49d316d-ce8f-43d4-8116-80c760e38a6b@intel.com>
- <ff680866-b81f-48c1-8a59-1107b4ce14ff@embeddedor.com>
- <b9a20b9e-c871-451d-8b16-0704eec27329@intel.com>
- <49add42f-42d9-4f34-b4ad-cff31e473f40@embeddedor.com>
- <CANtHk4nhH9XJi5+9BAu3kFoL14+4YAZTH7t6QApEvEAeMxdXgw@mail.gmail.com>
+Subject: Re: [PATCH] net: core: dev.c confirmed to use classic sockaddr
+Message-ID: <202412171230.824B83D@keescook>
+References: <20241217012445.work.979-kees@kernel.org>
+ <67619a5029d2c_a046929426@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,18 +66,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANtHk4nhH9XJi5+9BAu3kFoL14+4YAZTH7t6QApEvEAeMxdXgw@mail.gmail.com>
+In-Reply-To: <67619a5029d2c_a046929426@willemb.c.googlers.com.notmuch>
 
-On Tue, Dec 17, 2024 at 11:10:41AM -0800, Christopher Ferris wrote:
-> I verified that this does fix the compilation problem on Android. Thanks
-> for working on this.
+On Tue, Dec 17, 2024 at 10:35:44AM -0500, Willem de Bruijn wrote:
+> Kees Cook wrote:
+> > As part of trying to clean up struct sock_addr, add comments about the
+> > sockaddr arguments of dev_[gs]et_mac_address() being actual classic "max
+> > 14 bytes in sa_data" sockaddr instances and not struct sockaddr_storage.
+> 
+> What is this assertion based on?
+> 
+> I see various non-Ethernet .ndo_set_mac_address implementations, which
+> dev_set_mac_address calls. And dev_set_mac_addr_user is called from
+> rtnetlink do_setlink. Which kmalloc's sa based on dev->addr_len.
 
-Thanks! Yeah, let's use Alexander's solution instead of my proposed patch.
-
-> > [0]
-> > https://github.com/alobakin/linux/commit/2a065c7bae821f5fa85fff6f97fbbd460f4aa0f3
-
--Kees
+Yeah, I was clearly missing several cases. Please ignore this patch. I
+will re-examine this.
 
 -- 
 Kees Cook
