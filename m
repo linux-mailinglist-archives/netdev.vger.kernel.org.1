@@ -1,63 +1,73 @@
-Return-Path: <netdev+bounces-152450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 041E99F3FEF
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:25:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5876A9F3FF2
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:26:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 132AF7A20FD
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 01:24:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6964D7A2EB0
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 01:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB08338DD1;
-	Tue, 17 Dec 2024 01:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81A1942A9B;
+	Tue, 17 Dec 2024 01:26:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d5rR89w9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCO97kLo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2F7171A7;
-	Tue, 17 Dec 2024 01:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4670A8C0B;
+	Tue, 17 Dec 2024 01:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734398695; cv=none; b=LLhnavoDu5GC0Z1Vb/FS5JQLMZF7o6UxH9pDt5JyFzmM0hLmjvAWTCM1B2go2iaIX3qYrCXCUt7OjcGEURQYHaXuPUnQi/smg8KlRb8RzTOi1GdyAz76V9VNI7ibqFGxJRWv0jgS4F6kbJHjfpgqJcyIcDVUfBLJNEHfPfCgQiQ=
+	t=1734398784; cv=none; b=LTtHDray72KxFN4QpBmtkH06+d520wURRkRCK0qaUg2uTS7gGaE9DZqJ+Zf4cg68obqS7/XpG65KxrA+wsC3g3++3+PFQgcD5aKX0CFtpLrQBWChGS+QhlQWcBAlEqA+X2qGmJ0MtbJkbEsAJcmHF4lLpAgj/hS9wC5wjBwmS0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734398695; c=relaxed/simple;
-	bh=/8pQZsrhe/NRtSDNL1A34UI9DFxsHWPVy1QhOc2qgsA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=McUwxOdQPYrIFYLdGJ1ff/vr8HWJkIomfi2wlkYlUM5+8vqQegZGxxMdes0n0vP0S+iYp7H5c0sBFkUfCBBOdBuXG7WbPwqW7c145ryIZ3llLov0vLCGeYPhPj2RLO6AqSXuOwTrjj/3FRc6PIwIBWX0zLNV2V+rr3lx5rGRuI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d5rR89w9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E67C4CED0;
-	Tue, 17 Dec 2024 01:24:54 +0000 (UTC)
+	s=arc-20240116; t=1734398784; c=relaxed/simple;
+	bh=jPMVy57mHm6HKV6eKPIKzjx9a3gPyLdgyiEDrTKE6fg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jZZRcQhyKnswdOlKRJ4HGcoll7k9I9Ai9OFa/fXld/Oiq/h4JSA0U+E4qTIIGdTd/xRHiWSPVahAo01q4FK7ExgKzA8h4JeEg855xa/Cyz0VY5rsw+nqkWWiRND9fWmM6udIdUMpJwERVCbAycLmNAB9aHBpih+Zy20wM9qqY50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCO97kLo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE606C4CED0;
+	Tue, 17 Dec 2024 01:26:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734398694;
-	bh=/8pQZsrhe/NRtSDNL1A34UI9DFxsHWPVy1QhOc2qgsA=;
+	s=k20201202; t=1734398783;
+	bh=jPMVy57mHm6HKV6eKPIKzjx9a3gPyLdgyiEDrTKE6fg=;
 	h=From:To:Cc:Subject:Date:From;
-	b=d5rR89w9B+iZ8E+JVC76hYE/CJnkt1GMcnaHCX9RjCuoNrtCKTekwzVI2ARqFnpHI
-	 e31WDaJYRSNNlSNVV6AP+iH3Za7KPo9RKow338wXbBHwC30bSaWt/lUYxZnuhia5m9
-	 iFeGJs3dCf8EzhmE5AVwc0qyyERXxEcISkjFatJa/Hxy3Un0Mr2hOlWqL8lu1BXonn
-	 HFxvkEEbPIv7UwqeZ/eDrL6a7GUlsl3zriTJn3ibluVS5mNCTAEVGAA3o7oiKoDcSt
-	 jBvGRtK4chWHNlcOJ3PiKbrCfbuAaTicZU37UZMZPSVvrEgcZx11TgJkxswTiBxdAj
-	 fMVqfl4gbbNXA==
+	b=eCO97kLoEpaQGYckHacHEbID7cJA7ZPZBAhhEMbDWKY/Wb5bs5BBh8bmdqHRiBFlu
+	 3gQ42ehcDlJVOiTE7T6V8h5tnvl9+CvpuDWxmhOspQRyJBazaldHfAJIzE78ZIO5cD
+	 IOK1s4OJBO+Q8mM/6wO3Nr9MmJpncXxAKQA94SFWv5f+pQB5WNiWslGT+Tbu/sNhPd
+	 ynaQ5KBZVrdRmRG8UVK8QIwlV5YpGNOEJvgNOBAuSPaVYvEvPrd2NKCOmgfrtN3BS9
+	 bwXAKE/D26yZc3iAS/wsC4Ilk8UVeeMolD3MqgIPP2zywyc6ybp43oXpDeJxlfE7yv
+	 ZGV4HpKxCaZjw==
 From: Kees Cook <kees@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>
+To: Christoph Hellwig <hch@lst.de>
 Cc: Kees Cook <kees@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
+	Mike Christie <michael.christie@oracle.com>,
+	Max Gurtovoy <mgurtovoy@nvidia.com>,
+	Maurizio Lombardi <mlombard@redhat.com>,
+	Dmitry Bogdanov <d.bogdanov@yadro.com>,
+	Mingzhe Zou <mingzhe.zou@easystack.cn>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
 	Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Joe Damato <jdamato@fastly.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Al Viro <viro@zeniv.linux.org.uk>,
 	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH] net: core: dev.c confirmed to use classic sockaddr
-Date: Mon, 16 Dec 2024 17:24:49 -0800
-Message-Id: <20241217012445.work.979-kees@kernel.org>
+Subject: [PATCH] net: core: Convert inet_addr_is_any() to sockaddr_storage
+Date: Mon, 16 Dec 2024 17:26:19 -0800
+Message-Id: <20241217012618.work.323-kees@kernel.org>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -65,55 +75,128 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1727; i=kees@kernel.org; h=from:subject:message-id; bh=/8pQZsrhe/NRtSDNL1A34UI9DFxsHWPVy1QhOc2qgsA=; b=owGbwMvMwCVmps19z/KJym7G02pJDOkJlx7euhF+cQr7FcfpHUXblH6+P3o85VGKorjOFKn5s u8z9BLCO0pZGMS4GGTFFFmC7NzjXDzetoe7z1WEmcPKBDKEgYtTACai7szIcDW6d5NVw83i+tKW 2H17HcWesS13ya662v0o48auc/qGRQw/GZu+fP52wSTF3oRxlyPLvmvTfmo+e6fMfyNw3YSGL6d kuAE=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4768; i=kees@kernel.org; h=from:subject:message-id; bh=jPMVy57mHm6HKV6eKPIKzjx9a3gPyLdgyiEDrTKE6fg=; b=owGbwMvMwCVmps19z/KJym7G02pJDOkJl63YC9TnyR/XsI7Y9+LbEttJaorcEe+5Tl++ZpQZa fzu51XBjlIWBjEuBlkxRZYgO/c4F4+37eHucxVh5rAygQxh4OIUgIlw9TAy/Im/PmNL6vbfizcf 65ZsT+cJq2FKTHW5pMcgfOTI7Lv/TjH8r99yqu88v5F4yuuzCq/r2ds/u1w+eEhiWtAmlpS/BkK KjAA=
 X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-As part of trying to clean up struct sock_addr, add comments about the
-sockaddr arguments of dev_[gs]et_mac_address() being actual classic "max
-14 bytes in sa_data" sockaddr instances and not struct sockaddr_storage.
+All the callers of inet_addr_is_any() have a sockaddr_storage-backed
+sockaddr. Avoid casts and switch prototype to the actual object being
+used, as part of the work to move away from internal use of struct
+sockaddr.
 
 Signed-off-by: Kees Cook <kees@kernel.org>
 ---
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Chaitanya Kulkarni <kch@nvidia.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Mike Christie <michael.christie@oracle.com>
+Cc: Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc: Maurizio Lombardi <mlombard@redhat.com>
+Cc: Dmitry Bogdanov <d.bogdanov@yadro.com>
+Cc: Mingzhe Zou <mingzhe.zou@easystack.cn>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Simon Horman <horms@kernel.org>
+Cc: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: linux-nvme@lists.infradead.org
+Cc: linux-scsi@vger.kernel.org
+Cc: target-devel@vger.kernel.org
 Cc: netdev@vger.kernel.org
 ---
- net/core/dev.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/nvme/target/rdma.c          | 2 +-
+ drivers/nvme/target/tcp.c           | 2 +-
+ drivers/target/iscsi/iscsi_target.c | 2 +-
+ include/linux/inet.h                | 2 +-
+ net/core/utils.c                    | 8 ++++----
+ 5 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 45a8c3dd4a64..5abfd29a35bf 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9183,7 +9183,8 @@ EXPORT_SYMBOL(dev_pre_changeaddr_notify);
- /**
-  *	dev_set_mac_address - Change Media Access Control Address
-  *	@dev: device
-- *	@sa: new address
-+ *	@sa: new address in a classic "struct sockaddr", which will never
-+ *	     have more than 14 bytes in @sa::sa_data
-  *	@extack: netlink extended ack
-  *
-  *	Change the hardware (MAC) address of the device
-@@ -9217,6 +9218,7 @@ EXPORT_SYMBOL(dev_set_mac_address);
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index 1afd93026f9b..18ea11342af1 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -1986,7 +1986,7 @@ static void nvmet_rdma_disc_port_addr(struct nvmet_req *req,
+ 	struct nvmet_rdma_port *port = nport->priv;
+ 	struct rdma_cm_id *cm_id = port->cm_id;
  
- DECLARE_RWSEM(dev_addr_sem);
- 
-+/* "sa" is a classic sockaddr: it will only ever use 14 bytes from sa_data. */
- int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
- 			     struct netlink_ext_ack *extack)
+-	if (inet_addr_is_any((struct sockaddr *)&cm_id->route.addr.src_addr)) {
++	if (inet_addr_is_any(&cm_id->route.addr.src_addr)) {
+ 		struct nvmet_rdma_rsp *rsp =
+ 			container_of(req, struct nvmet_rdma_rsp, req);
+ 		struct rdma_cm_id *req_cm_id = rsp->queue->cm_id;
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index 7c51c2a8c109..df24244fb820 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -2158,7 +2158,7 @@ static void nvmet_tcp_disc_port_addr(struct nvmet_req *req,
  {
-@@ -9229,6 +9231,7 @@ int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
+ 	struct nvmet_tcp_port *port = nport->priv;
+ 
+-	if (inet_addr_is_any((struct sockaddr *)&port->addr)) {
++	if (inet_addr_is_any(&port->addr)) {
+ 		struct nvmet_tcp_cmd *cmd =
+ 			container_of(req, struct nvmet_tcp_cmd, req);
+ 		struct nvmet_tcp_queue *queue = cmd->queue;
+diff --git a/drivers/target/iscsi/iscsi_target.c b/drivers/target/iscsi/iscsi_target.c
+index 6002283cbeba..1ce68eda0090 100644
+--- a/drivers/target/iscsi/iscsi_target.c
++++ b/drivers/target/iscsi/iscsi_target.c
+@@ -3471,7 +3471,7 @@ iscsit_build_sendtargets_response(struct iscsit_cmd *cmd,
+ 					}
+ 				}
+ 
+-				if (inet_addr_is_any((struct sockaddr *)&np->np_sockaddr))
++				if (inet_addr_is_any(&np->np_sockaddr))
+ 					sockaddr = &conn->local_sockaddr;
+ 				else
+ 					sockaddr = &np->np_sockaddr;
+diff --git a/include/linux/inet.h b/include/linux/inet.h
+index bd8276e96e60..d59e3013b0e2 100644
+--- a/include/linux/inet.h
++++ b/include/linux/inet.h
+@@ -55,6 +55,6 @@ extern int in6_pton(const char *src, int srclen, u8 *dst, int delim, const char
+ 
+ extern int inet_pton_with_scope(struct net *net, unsigned short af,
+ 		const char *src, const char *port, struct sockaddr_storage *addr);
+-extern bool inet_addr_is_any(struct sockaddr *addr);
++extern bool inet_addr_is_any(struct sockaddr_storage *addr);
+ 
+ #endif	/* _LINUX_INET_H */
+diff --git a/net/core/utils.c b/net/core/utils.c
+index 27f4cffaae05..e47feeaa5a49 100644
+--- a/net/core/utils.c
++++ b/net/core/utils.c
+@@ -399,9 +399,9 @@ int inet_pton_with_scope(struct net *net, __kernel_sa_family_t af,
  }
- EXPORT_SYMBOL(dev_set_mac_address_user);
+ EXPORT_SYMBOL(inet_pton_with_scope);
  
-+/* "sa" is a classic sockaddr: it will only ever use 14 bytes from sa_data. */
- int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
+-bool inet_addr_is_any(struct sockaddr *addr)
++bool inet_addr_is_any(struct sockaddr_storage *addr)
  {
- 	size_t size = sizeof(sa->sa_data_min);
+-	if (addr->sa_family == AF_INET6) {
++	if (addr->ss_family == AF_INET6) {
+ 		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)addr;
+ 		const struct sockaddr_in6 in6_any =
+ 			{ .sin6_addr = IN6ADDR_ANY_INIT };
+@@ -409,13 +409,13 @@ bool inet_addr_is_any(struct sockaddr *addr)
+ 		if (!memcmp(in6->sin6_addr.s6_addr,
+ 			    in6_any.sin6_addr.s6_addr, 16))
+ 			return true;
+-	} else if (addr->sa_family == AF_INET) {
++	} else if (addr->ss_family == AF_INET) {
+ 		struct sockaddr_in *in = (struct sockaddr_in *)addr;
+ 
+ 		if (in->sin_addr.s_addr == htonl(INADDR_ANY))
+ 			return true;
+ 	} else {
+-		pr_warn("unexpected address family %u\n", addr->sa_family);
++		pr_warn("unexpected address family %u\n", addr->ss_family);
+ 	}
+ 
+ 	return false;
 -- 
 2.34.1
 
