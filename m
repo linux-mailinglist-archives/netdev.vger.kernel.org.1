@@ -1,91 +1,93 @@
-Return-Path: <netdev+bounces-152596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0490F9F4C14
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:26:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F13369F4C27
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:28:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE8F27A66CC
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:21:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 127AD173BCC
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D61F1F4E24;
-	Tue, 17 Dec 2024 13:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570281F7088;
+	Tue, 17 Dec 2024 13:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="al8BK7E2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWEmcPew"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9061D1730;
-	Tue, 17 Dec 2024 13:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299761F7081;
+	Tue, 17 Dec 2024 13:18:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734441493; cv=none; b=JfnrfqlxXmrfuTrJcJ9mZkSXNA2yK//L09Lz2HMd2UFnTzeiMyhmldtbe83x6efLMUwLK1L1TxXSNsQbZJ6QaKJQNVIGNEBD+kMW2a9ZP7wGPMm8RWX+dkxpt4th6MYSC7F5kLDIYS2Rw3hlJ4R6RH0DeTSlm/g9v3VF3KjNqUU=
+	t=1734441496; cv=none; b=hH2fVmh8sZ11NZ0u6CELE7S6opT3LrDfL6SEWI3DLI+Js9GmMQInsYuJjjA07+bUtr9ZTiGEnPi9t2ST1PeTTGR2QzFV203v0ZTJj6FJkMWn3OtGvsskNUFhIugPuGWUwatrKvjd+G9X9kKWLfRwImJk6wsi8voxCOVOxLrM3Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734441493; c=relaxed/simple;
-	bh=D2JaLFEKc+GbNoonDD2I5Rzfe/D1YqHtUmoEG90PrBY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vBCwaOV3ioeE8B0bwS6tbDKN86Q+icetmomIr/LoWDlCu7sNqPHBeyVJbbNdqxyy/cy7JD9Nsa2nqY0EMkLZvhitEUY1XhTflrlefUNiT9gmzdQh0K+eAR1gS0Vrikc2UlwxsPhMU+R0+H4LLtGG5+z5JpXxMRuCkFf4ctgUwH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=al8BK7E2; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E0091C0003;
-	Tue, 17 Dec 2024 13:18:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1734441488;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kd3IGr2V/i3QibsHAOuhQzdc631DeRvaF4HW0sqEduU=;
-	b=al8BK7E2vHr/Dm3yUxFxnfQiHaN4/I5+qErruTpojlLNU/xCWEWsK4wytoRPFVK9ShwuwW
-	+VACykAtQfs51b0Cl5BpikGyuUusr+0ckSEsOOI21yss47v9txcQnFnsYTvV6dwC0Hy85a
-	rySjiIKZnB1BtIx9U4Z/a9JMQP/h9yAyLMBHvU5c2uQzrFshkLlyx3pnTHZglaryyHZZn+
-	bC+qXNlMGuJoRaT15SxaSWC/cePRHTFfHv0goQX4roXaDMfUhJygC3RqQC4zu+s3Qs6f0L
-	07RHH9lHZf4GFYjJY5DDEPzn1VCxPKmgvoDyPTRbp/XIO6AH/SfV7+xNRJv4sQ==
-Date: Tue, 17 Dec 2024 14:18:07 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
- <alexis.lothore@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/5] net: pcs: lynx: fill in PCS
- supported_interfaces
-Message-ID: <20241217141807.6b1ed05a@fedora.home>
-In-Reply-To: <E1tMBRL-006van-3c@rmk-PC.armlinux.org.uk>
-References: <Z1yJQikqneoFNJT4@shell.armlinux.org.uk>
-	<E1tMBRL-006van-3c@rmk-PC.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1734441496; c=relaxed/simple;
+	bh=LgYSlCVhxva3zcs7YV247UvMnT+OkZcHDucG48hT898=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kFqIAL06VF+X2eHNb6Dul0SALJxd/BXRmmQtnQKNRVDWO6kOR87pw4R/RNFqTdbknKrUNfFmGHECSfVYk35ttDjVX9uG0RKTFTSKXeWgaNjI1846q7J7kyTP8ctQbk4qsmouBJUsKyDUJ5vTJ5gxPx/a/azE/bPsphA/Ta7aOCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWEmcPew; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C2C0C4CED4;
+	Tue, 17 Dec 2024 13:18:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734441495;
+	bh=LgYSlCVhxva3zcs7YV247UvMnT+OkZcHDucG48hT898=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IWEmcPewXktwLgiuhox8ozlQsK/lIgxiVOtV807N931COsH5Lq9S3PcN28jLvTtVW
+	 RCNJfFqw+IiDt7NFzOM1ewhDwAwi+S6rD8g2mz1xw58FG4h/FCic+TSvlaZrxqZly6
+	 f1OniB/T5YSWbnaaJGaTNhV2TJArmrqN2pYE4mj+M5UPo20Ce45LH+s7KHoj68msog
+	 ZSK2g/ic+yoKlkMA6kQxPvtCuq/SLG8B4MT/KS0919fVbGx2W9hVHa4enD8dCeZtWn
+	 nK5G+EkJkQj3SgxKmvTmIMtzDyB2DNMIQ1n2iIOXOMdgA+AqRsADm9SjJw0Q3nrp/q
+	 L1pBQa4IlX7ng==
+Date: Tue, 17 Dec 2024 07:18:13 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Lee Jones <lee@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-mediatek@lists.infradead.org,
+	Eric Dumazet <edumazet@google.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, upstream@airoha.com,
+	Matthias Brugger <matthias.bgg@gmail.com>
+Subject: Re: [net-next PATCH v11 1/9] dt-bindings: nvmem: Document support
+ for Airoha AN8855 Switch EFUSE
+Message-ID: <173444149293.1330948.15339441958855664724.robh@kernel.org>
+References: <20241209134459.27110-1-ansuelsmth@gmail.com>
+ <20241209134459.27110-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209134459.27110-2-ansuelsmth@gmail.com>
 
-On Fri, 13 Dec 2024 19:35:07 +0000
-"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
 
-> Fill in the new PCS supported_interfaces member with the interfaces
-> that Lynx supports.
+On Mon, 09 Dec 2024 14:44:18 +0100, Christian Marangi wrote:
+> Document support for Airoha AN8855 Switch EFUSE used to calibrate
+> internal PHYs and store additional configuration info.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  .../bindings/nvmem/airoha,an8855-efuse.yaml   | 123 ++++++++++++++++++
+>  MAINTAINERS                                   |   8 ++
+>  2 files changed, 131 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml
+> 
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-Thanks,
-
-Maxime
 
