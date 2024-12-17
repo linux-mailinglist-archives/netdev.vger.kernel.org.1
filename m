@@ -1,221 +1,123 @@
-Return-Path: <netdev+bounces-152481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 939709F413B
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 04:32:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33AE19F4154
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 04:54:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 187EA188927C
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 03:32:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 687DA168300
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 03:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8312BCF5;
-	Tue, 17 Dec 2024 03:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BCAD13B590;
+	Tue, 17 Dec 2024 03:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="CLds1278"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JfvNvpEd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DB93FD4
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 03:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CB686252
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 03:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734406373; cv=none; b=o/23aYnsM98ZQ7q2G7ePc6X5BHaALyvnJKZ6bpZy15+rmhMWePwS0hRQ+DsON7kpauslvfHxpS69l6TbDBXahpiCUttRb3AKnjvUKWTSQtyF7/WH5P8NM+v3t8AdxtHIY1vS7VvTiudL3XbKULT7G0RagHmZ1WsbvGPi+Hgvqko=
+	t=1734407635; cv=none; b=QDyqXjBfi7YP3op1GI73mSBeu91YKHWwUnxR3zTpxgisd19rkWy9aVjOiVsmEtYcEHPElXizzSO8hCrI73PlJhPXLAMBqk7N7X4JLrs6L4jc8ZiGd8qONZwf2VsN3jFYbjhA8OI6mdV6nAcbvTmR/h8Nz2WnbLdLuXHF3TWp7GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734406373; c=relaxed/simple;
-	bh=SNtoa0pDAOzUprFo9FlL6xr6DBu2/gDMCWq5EAxdEZc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VxjlD7bv0MdzP2CakJKDuSKnlJvR0FGrl7bu00i7NnYSrBY5fa5+tTuebkwUMeiXBm8RDcMlZAjcGy8w+yhRvLhOXwxKKE0qXRPqmaEwGX6HhvWSaxlZ3B/rLkqz+h1akKlHu3Uzb8KKtMQ83JIVONZuYte3YUWRzJPZvL178xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=CLds1278; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7ee11ff7210so3582835a12.1
-        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 19:32:50 -0800 (PST)
+	s=arc-20240116; t=1734407635; c=relaxed/simple;
+	bh=JjvSUlb0s668mPGWJCN5daNkwa+E19w4qhP7lmASwqw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q5K4TXH13iNjI6dSca1hEK/fS7wJpgZFQJfZBS3ruwBDd5UEGXkXKceGQJ6rr8mJYeJmFPL2t1ROJ/G0sKgSrlC9WWYqzjb/tXFEn2/7w1QD7utlAgNHCFs7wuGeY+tgQbGkO4sPDFQDSPtLZT//NWVV65x7o6664gzNtCbtJYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JfvNvpEd; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5401ab97206so5056901e87.3
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 19:53:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734406370; x=1735011170; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=myVN/9GCj+EmMAD6BspesgmygYT45vKeG7/Zqor3VFE=;
-        b=CLds12783o5nnPlN4vwVVsLpVnmqhWpDjdit5qiGXPeNhL5Zc/vV4PorzfCbsuqG2h
-         srv+4stWHonBTn0r9Vyw/6pi3D0+FBlNT0KusZB1XLSSp8hWhTCCC1dyfD9Wi6yPUi/K
-         Qs7KDxYDbREOg4uBfqVfIyLzwkuqCH2qqC1WSrPI8sm5oH89ouBDDpEU6I7FvX3NBmbg
-         JY0qdoKqg6k74jn937MEuQgu6iICv1XKT0abfbXDMU5yhbhD8+5aQozKgfpNiixqU47G
-         GaDHkgYuYyrMj/L4ZPMcepoe0gp263vIuUDRo/pMEkWyVr7gJeqReW6lpf9FDppO7LYS
-         ivXQ==
+        d=google.com; s=20230601; t=1734407631; x=1735012431; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JjvSUlb0s668mPGWJCN5daNkwa+E19w4qhP7lmASwqw=;
+        b=JfvNvpEdPpWIdJa3d7+8og9fI37U6k2QsgcOXmXKDzaVq2nA+pxPcYqXqpy0gJkel6
+         ckvHiF7fP9nuXAigThRQpfLUWRnz89oGF/PBBtbfKmZQ7ZT3UWW+fJDOE12h1kTqGyK3
+         M/VLcSu602PDMe8O9ksJpKvpSJwM91kbgPL7m8T6Rh3muyoBxzmxKBGLVeIbEHNwuv4p
+         rO6TiLoVElS6l+soOTPlnq281Ky1W0fBMymrnPAMvqfA7tJAQitn9I84Ib9Lk+wvy3uG
+         T/dspzVI0zvp3aQhj8Huny5CLL/OEDYTyurZGD2v8VGYLU06cjPrCzaDbIKK/wytI4QN
+         QNJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734406370; x=1735011170;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=myVN/9GCj+EmMAD6BspesgmygYT45vKeG7/Zqor3VFE=;
-        b=W8GyLZfBnRtoS8StmHevroEOIM3olOgCuxtQ0XnLiNcTk2blp6+0Ud1eUjt228gbDn
-         KFh1tgZC2eOTE6p4KLc5KtsLV9C88u6VPhfzcecNRZ1odjmLsDhJryUKxWG7pAaYbFMB
-         aykBuvxXBqPUIbhMNfZ72SpmwWU+UJf46M+oeFBRtsrAsTXpuo3Ci5mfma96DytO8snN
-         uE+jQU4zXR3zr+4l4YSlwrbgv12OEFieyuROKbWU3aC0TSitEMLClFV/i2DvAb1COFRO
-         tL7cWzedb9BZhgN3mzCc3FCDe+5bgCqJzCpEAo6/WLELHR/Z1MfXFKavnlA3PYKycSFV
-         9GcQ==
-X-Gm-Message-State: AOJu0Yyr8oO7Z/OUVkTyCfdGk1T3RiGoTgAshyi3qhRLZucurEWkH5oB
-	tXhGKSVdeUwtPudyDtFsLPcl4P/V4Ra5PBA/vvX0nNtNoR9bkQ50zOfFRnL6bNc=
-X-Gm-Gg: ASbGncsmEoGljTTmf0Xv94ndBzBkNLCqae6sb2xRj66d7vqYlyopYgVk72DijEDX7vE
-	yjHJL8s0qrYiT42MTfLQcvF8o1wCOYunYN5W4fzGvcN4QE0k1UHhrKYTb2ZlG/w+xSJyAD0v1sc
-	JzuN8YDEICBkJv/q4NqrZnKth4jHlbn+G4WKLBTEj4YHon4Sxf9vbRMxUemdBZIciGKgZNZ2GzB
-	Mn1O/w+X3FBKuXMv8hPnc6z7EP9vIyk9h6phvhJyE1+JZYwcknZcuQY/lnBpJazRLV4QUGyXmyx
-	axB2ejNXqVgeELonB1qh9zm6h7hzm8CObiFmJZgUkgU=
-X-Google-Smtp-Source: AGHT+IFs58B+k6lMPpaCdheVW5S9Rl7Kana0ZhmZ7Jxy01AyEzIQdJxut+BvfMUFwi1BT+GAf0OMGA==
-X-Received: by 2002:a17:90b:1fc3:b0:2ee:b0f1:ba17 with SMTP id 98e67ed59e1d1-2f2903a2ddemr21300287a91.37.1734406370115;
-        Mon, 16 Dec 2024 19:32:50 -0800 (PST)
-Received: from localhost.localdomain (133-32-227-190.east.xps.vectant.ne.jp. [133.32.227.190])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2a2434a17sm6210837a91.37.2024.12.16.19.32.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2024 19:32:49 -0800 (PST)
-From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-To: alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com
-Cc: netdev@vger.kernel.org,
-	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-Subject: [PATCH] net: stmmac: call stmmac_remove_config_dt() in error paths in stmmac_probe_config_dt()
-Date: Tue, 17 Dec 2024 12:32:43 +0900
-Message-Id: <20241217033243.3144184-1-joe@pf.is.s.u-tokyo.ac.jp>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1734407631; x=1735012431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JjvSUlb0s668mPGWJCN5daNkwa+E19w4qhP7lmASwqw=;
+        b=I2SBaH6gxUjUtNZuLtrGyetFbc4zOs78zoobksrvJkVVPDDtETPoYSuU4Azoq69ihF
+         atdokmmXJSGMZjpx45iTJojyF6NgCy7q8gm4EjrjmktH0t6AgPsuPqtydf0kpJtb3B2e
+         679uk3Ld9wZkubGTZ5Mx9AoJ32v8X1sUKW9c0JBh2Q4H/EH8PZxSm5OwGj/MHxQvnZq9
+         VN3ECu1lpssgGDknRX7DIxQwAtTaqP+2RkL/QEfp6QdzVsoWSE58/WQunQiTVEq1fXnT
+         JQWIeX83k9Ke8iETdm4ok8Ww+aPM8wkSC1MnqdcwPJH6WA6NEzKs+Wjss8+sSpSZjO1X
+         +PSA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3oMQ7iNVAGddXmb4sGP3pdShzceSz5X69N3O0i7nOygyoddAEd0OTzxsDsXUpaspZvVdlcms=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhGOTptX0TIXSrZ3F217tsMygZoL6V0gwQCfyUECW3SRloinAl
+	FtpS4nD/mhmqxUZOAJ0F4k4FgALEeU1XxaIFqn4E5sUXdDF3AHTngKTin6y6IYCp2vYqsJVwJcH
+	anQtZrzXYoaJMhtopKwgmUzpvpdRnLDPPr47M
+X-Gm-Gg: ASbGnct8J1kK+dxN8Je1cjda8gNVmY+7D44wnYj5I/Dro3vA3bjY8s5YPgkXt0fQgsa
+	CQXTu+xsUodlyap/hXCWH8+rLvFCokTLqTv6gWw==
+X-Google-Smtp-Source: AGHT+IEaU+0Dd9AvGqqW/gw3nElxtLBX5cPHOWjS/rZC4WRXjtt2rbtyzHwmhZDGDsLUxRYrcn3n+1g/30SrxJzWcCw=
+X-Received: by 2002:a05:6512:2255:b0:540:1e17:10d2 with SMTP id
+ 2adb3069b0e04-54099b696c9mr4317280e87.49.1734407631461; Mon, 16 Dec 2024
+ 19:53:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241212224114.888373-1-dualli@chromium.org> <20241212224114.888373-3-dualli@chromium.org>
+ <Z2BtgqkPUZxE8B83@google.com> <CANBPYPhZ-_5=VMRoBxbfVb+AFb_qu49QH_hKOiSjX93E1GQA8A@mail.gmail.com>
+ <20241216174111.3fdce872@kernel.org>
+In-Reply-To: <20241216174111.3fdce872@kernel.org>
+From: Li Li <dualli@google.com>
+Date: Mon, 16 Dec 2024 19:53:40 -0800
+Message-ID: <CA+xfxX6-cbTyyyTf1UL_A7DzagfrV+y0367MdO21+JdjW870ZA@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 2/2] binder: report txn errors via generic netlink
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Carlos Llamas <cmllamas@google.com>, corbet@lwn.net, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, pabeni@redhat.com, donald.hunter@gmail.com, 
+	Greg KH <gregkh@linuxfoundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
+	tkjos@android.com, maco@android.com, 
+	"Joel Fernandes (Google)" <joel@joelfernandes.org>, brauner@kernel.org, 
+	Suren Baghdasaryan <surenb@google.com>, arnd@arndb.de, masahiroy@kernel.org, 
+	bagasdotme@gmail.com, horms@kernel.org, LKML <linux-kernel@vger.kernel.org>, 
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
+	Hridya Valsaraju <hridya@google.com>, Steven Moreland <smoreland@google.com>, 
+	Android Kernel Team <kernel-team@android.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Current implementation of stmmac_probe_config_dt() does not release the
-OF node reference obtained by of_parse_phandle() when stmmac_dt_phy()
-fails, thus call stmmac_remove_config_dt(). The error_hw_init and
-error_pclk_get labels can be removed as just calling
-stmmac_remove_config_dt() suffices. Also, remove the first argument of
-stmmac_remove_config_dt() as it is not used.
+On Mon, Dec 16, 2024, 5:41=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wrot=
+e:
+>
+> On Mon, 16 Dec 2024 10:58:10 -0800 Li Li wrote:
+> > > not: There are several places where you have "netlink_nl" which seems
+> > > kind of redundant to me. wdyt? IMO you should drop the "nl" in all of
+> > > these cases.
+> > >
+> >
+> > These are automatically generated from the yaml file. So let's just
+> > keep them as is.
+> > But it's a good suggestion to the owner of yaml parser.
+>
+> I think the unusual naming comes from fact that you call your netlink
+> family binder_netlink. It's sort of like adding the word sysfs to the
+> name of a sysfs file. I mean the user visible name, not code
+> references...
+>
+> s/binder_netlink/binder/ will clean this up..
 
-This bug was found by an experimental static analysis tool that I am
-developing.
 
-Fixes: 4838a5405028 ("net: stmmac: Fix wrapper drivers not detecting PHY")
-Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
----
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 37 +++++++------------
- 1 file changed, 13 insertions(+), 24 deletions(-)
+I did consider that but unfortunately that would result in a
+conflicting binder.h in uapi header.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 3ac32444e492..4f1a9f7aae6e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -407,13 +407,11 @@ static int stmmac_of_get_mac_mode(struct device_node *np)
- 
- /**
-  * stmmac_remove_config_dt - undo the effects of stmmac_probe_config_dt()
-- * @pdev: platform_device structure
-  * @plat: driver data platform structure
-  *
-  * Release resources claimed by stmmac_probe_config_dt().
-  */
--static void stmmac_remove_config_dt(struct platform_device *pdev,
--				    struct plat_stmmacenet_data *plat)
-+static void stmmac_remove_config_dt(struct plat_stmmacenet_data *plat)
- {
- 	clk_disable_unprepare(plat->stmmac_clk);
- 	clk_disable_unprepare(plat->pclk);
-@@ -436,7 +434,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	struct plat_stmmacenet_data *plat;
- 	struct stmmac_dma_cfg *dma_cfg;
- 	int phy_mode;
--	void *ret;
- 	int rc;
- 
- 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
-@@ -490,8 +487,10 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 		dev_warn(&pdev->dev, "snps,phy-addr property is deprecated\n");
- 
- 	rc = stmmac_mdio_setup(plat, np, &pdev->dev);
--	if (rc)
-+	if (rc) {
-+		stmmac_remove_config_dt(plat);
- 		return ERR_PTR(rc);
-+	}
- 
- 	of_property_read_u32(np, "tx-fifo-depth", &plat->tx_fifo_size);
- 
-@@ -581,7 +580,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*dma_cfg),
- 			       GFP_KERNEL);
- 	if (!dma_cfg) {
--		stmmac_remove_config_dt(pdev, plat);
-+		stmmac_remove_config_dt(plat);
- 		return ERR_PTR(-ENOMEM);
- 	}
- 	plat->dma_cfg = dma_cfg;
-@@ -610,7 +609,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 
- 	rc = stmmac_mtl_setup(pdev, plat);
- 	if (rc) {
--		stmmac_remove_config_dt(pdev, plat);
-+		stmmac_remove_config_dt(plat);
- 		return ERR_PTR(rc);
- 	}
- 
-@@ -627,8 +626,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 
- 	plat->pclk = devm_clk_get_optional(&pdev->dev, "pclk");
- 	if (IS_ERR(plat->pclk)) {
--		ret = plat->pclk;
--		goto error_pclk_get;
-+		stmmac_remove_config_dt(plat);
-+		return ERR_CAST(plat->pclk);
- 	}
- 	clk_prepare_enable(plat->pclk);
- 
-@@ -646,33 +645,23 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	plat->stmmac_rst = devm_reset_control_get_optional(&pdev->dev,
- 							   STMMAC_RESOURCE_NAME);
- 	if (IS_ERR(plat->stmmac_rst)) {
--		ret = plat->stmmac_rst;
--		goto error_hw_init;
-+		stmmac_remove_config_dt(plat);
-+		return ERR_CAST(plat->stmmac_rst);
- 	}
- 
- 	plat->stmmac_ahb_rst = devm_reset_control_get_optional_shared(
- 							&pdev->dev, "ahb");
- 	if (IS_ERR(plat->stmmac_ahb_rst)) {
--		ret = plat->stmmac_ahb_rst;
--		goto error_hw_init;
-+		stmmac_remove_config_dt(plat);
-+		return ERR_CAST(plat->stmmac_ahb_rst);
- 	}
- 
- 	return plat;
--
--error_hw_init:
--	clk_disable_unprepare(plat->pclk);
--error_pclk_get:
--	clk_disable_unprepare(plat->stmmac_clk);
--
--	return ret;
- }
- 
- static void devm_stmmac_remove_config_dt(void *data)
- {
--	struct plat_stmmacenet_data *plat = data;
--
--	/* Platform data argument is unused */
--	stmmac_remove_config_dt(NULL, plat);
-+	stmmac_remove_config_dt(data);
- }
- 
- /**
--- 
-2.34.1
-
+Probably "binder_report" or "bindererr"?
 
