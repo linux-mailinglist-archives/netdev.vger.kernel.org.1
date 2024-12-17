@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-152732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503B59F59B9
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 23:45:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71B509F59C2
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 23:45:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C95016BB4F
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:45:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8327E189158F
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6ED1FA16E;
-	Tue, 17 Dec 2024 22:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577931FA257;
+	Tue, 17 Dec 2024 22:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="KtPu9wWe"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="obeNKy80"
 X-Original-To: netdev@vger.kernel.org
 Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF2C1F9F60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815D51F9F63
 	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 22:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734475508; cv=none; b=MZW3HZW9MBbJtZKT72LLZVnBMr/mmkrlxDfU0WfwYH7SQJnAjYxJK9rNGHsk94UNAB1N8wteep1xZg/6oQiYLYf/+Cq5PnN6gAxhbr30WNIhlXJ5YezFUdnVR1B5bxh5KepTGrQzX8dV6v681jttwy3y8OHf31lDmtSlSMEC090=
+	t=1734475509; cv=none; b=IW/34/oqcTn/TH2WC/NhpKRNyAK2xZiWue/uVOsdaZ4CT/WXbBmkNibrFiHViBe7ZN75zV2WgqBBVorHuUdb6eLD/yUboTrhtJrOexFmADCbZtOdLg14LlTU1omTip1pLPcQTo5mlBZ/A6rJzaZrf247ZDttCLeNR6a6vD4MaEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734475508; c=relaxed/simple;
-	bh=8lT1ahxONqOGJZ2W/7meo3rIE0R6SKGMTP0GkGMmi70=;
+	s=arc-20240116; t=1734475509; c=relaxed/simple;
+	bh=L2zNWXxJ5UxK6fgydo86+GbBNyq6p2zYWOTn3TzzAas=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D8e+4wNbnBQqv1Ja6aXrYogcKMrUex/0LI86RikgmEe5JewaVNbr7Vwb9RXs+Lc4wX6hvZfnxifUcKLczWFiMctJObexMGSBoRcnginlF4F6vJn8ivlHBJzdVijwpa5PEBkujvlgfCMMYW0b3SA3yX44586glrHpZRr/8iv1ywc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=KtPu9wWe; arc=none smtp.client-ip=202.36.163.20
+	 MIME-Version; b=XFT7XXOEjuuNF4jf5R4mNT3uvYVBeryqw+ac5g6AVWUIqoXpim4f1daxU1tqt2yYA7Vr0ma/5RyXn6nSal8jlgObtDkb2XlQTsovn6fa/CeaKNkSpjIndzWzIoDHjBxURUWR3oHp9EzmUt+Lraf5GrrnWtOiqHwiIke7rKCTQq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=obeNKy80; arc=none smtp.client-ip=202.36.163.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
 Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 6B5F42C0BEC;
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 740A82C0C2E;
 	Wed, 18 Dec 2024 11:45:03 +1300 (NZDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
 	s=mail181024; t=1734475503;
-	bh=re4odSfMbmvsC6H+xv5AIf+hkSUf3b+E22ZdTYieO0s=;
+	bh=EIPwlfXRlaNYaXnu7Vurx8xTCXNMz21zUxxNVkjv+hQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KtPu9wWeVAS2Bqq5OLql0QLo0ZfjHvUZ4INsiIltv1gbvcI+kHizs+H9sgUYtHjPm
-	 J4FE8JlOnCbk+0ie5t7TSiB6yUxN4c0Yhi7GWDc8j2b0USdIGzmzkJ7flUxpIkBEPH
-	 lgPVHRSvU55YLlTx5SWNzrjK8BrvyFQXTX0ggg2RcYfVCkyqkXHyWX6VaiaJYTMz9E
-	 oPOW7SYFihLY7YXgwtJIKAlEiKYSG0NsB/FKJPpmx/V0ESGFRe/j3IjJ+BwCu22HoX
-	 YFF27lhpn/CLa/ML13SjbZkL3CpNc68+8f78ffkqdPgK5PXfQZ9IseMigOcON6Q55W
-	 Hdsii2OooCpKQ==
+	b=obeNKy80iMnYM63b1tfxp1RtVkiOyJ4fgI6dTUbfvOpj4fWBaoJKsdWADpeqnFZsd
+	 XOLoGoU1CnyJ6VDierlpRRpcrZe4QUMfOMAM3DqorJOVQEtGfsJMom6A4mO47S8SUX
+	 Mw6dsRwzYUParhZ+Z/Zn5qGIlViMRAgXe1M2sAqbdbEHBgiCGobBFw9BAXFri5rUYr
+	 Ljv/6MxfPiKubgSnf+lAByrWunj28Ru7GnUrVIYi1+228ILv9f/HzTA80jguwX6Czv
+	 b/vX9yTC5smFxclWcUkIxIbqc/h7/3PEVsEsEd3CngNpLsXlf3QRWZVfVl2fj8ed/u
+	 w9D1ptfeF070Q==
 Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B6761feef0001>; Wed, 18 Dec 2024 11:45:03 +1300
+	id <B6761feef0002>; Wed, 18 Dec 2024 11:45:03 +1300
 Received: from chrisp-dl.ws.atlnz.lc (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id 0ADA213EE56;
+	by pat.atlnz.lc (Postfix) with ESMTP id 0CCE913EE8E;
 	Wed, 18 Dec 2024 11:45:03 +1300 (NZDT)
 Received: by chrisp-dl.ws.atlnz.lc (Postfix, from userid 1030)
-	id 059C72803EA; Wed, 18 Dec 2024 11:45:03 +1300 (NZDT)
+	id 078F528093B; Wed, 18 Dec 2024 11:45:03 +1300 (NZDT)
 From: Chris Packham <chris.packham@alliedtelesis.co.nz>
 To: lee@kernel.org,
 	robh@kernel.org,
@@ -73,9 +73,9 @@ Cc: devicetree@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-mips@vger.kernel.org,
 	Chris Packham <chris.packham@alliedtelesis.co.nz>
-Subject: [PATCH v3 1/3] dt-bindings: net: Add Realtek MDIO controller
-Date: Wed, 18 Dec 2024 11:44:59 +1300
-Message-ID: <20241217224501.398039-2-chris.packham@alliedtelesis.co.nz>
+Subject: [PATCH v3 2/3] mips: dts: realtek: Add MDIO controller
+Date: Wed, 18 Dec 2024 11:45:00 +1300
+Message-ID: <20241217224501.398039-3-chris.packham@alliedtelesis.co.nz>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241217224501.398039-1-chris.packham@alliedtelesis.co.nz>
 References: <20241217224501.398039-1-chris.packham@alliedtelesis.co.nz>
@@ -86,122 +86,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=6761feef a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=RZcAm9yDv7YA:10 a=gEfo2CItAAAA:8 a=XYAwZIGsAAAA:8 a=5T6DpigFOSMmFzbSVwsA:9 a=3ZKOabzyN94A:10 a=sptkURWiP4Gy88Gu7hUp:22 a=E8ToXWR_bxluHZ7gmE-Z:22
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=6761feef a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=RZcAm9yDv7YA:10 a=k4-7ynMye8UXlDNHH0IA:9 a=3ZKOabzyN94A:10
 X-SEG-SpamProfiler-Score: 0
 x-atlnz-ls: pat
 
-Add dtschema for the MDIO controller found in the RTL9300 SoCs. The
-controller is slightly unusual in that direct MDIO communication is not
-possible. Instead, the SMI bus and PHY address are associated with a
-switch port and the port number is used when talking to the PHY.
+Add a device tree node for the MDIO controller on the RTL9300 chips.
 
 Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 ---
 
 Notes:
     Changes in v3:
-    - Add r-by from Connor
+    - None
     Changes in v2:
     - None
 
- .../bindings/net/realtek,rtl9301-mdio.yaml    | 82 +++++++++++++++++++
- 1 file changed, 82 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/realtek,rtl9301=
--mdio.yaml
+ arch/mips/boot/dts/realtek/rtl930x.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.y=
-aml b/Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.yaml
-new file mode 100644
-index 000000000000..95ed77ff8dcc
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.yaml
-@@ -0,0 +1,82 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/realtek,rtl9301-mdio.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/arch/mips/boot/dts/realtek/rtl930x.dtsi b/arch/mips/boot/dts=
+/realtek/rtl930x.dtsi
+index 17577457d159..5f74d121ce84 100644
+--- a/arch/mips/boot/dts/realtek/rtl930x.dtsi
++++ b/arch/mips/boot/dts/realtek/rtl930x.dtsi
+@@ -57,6 +57,14 @@ i2c1: i2c@388 {
+ 			#size-cells =3D <0>;
+ 			status =3D "disabled";
+ 		};
 +
-+title: Realtek RTL9300 MDIO Controller
-+
-+maintainers:
-+  - Chris Packham <chris.packham@alliedtelesis.co.nz>
-+
-+allOf:
-+  - $ref: mdio.yaml#
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - items:
-+          - enum:
-+              - realtek,rtl9302b-mdio
-+              - realtek,rtl9302c-mdio
-+              - realtek,rtl9303-mdio
-+          - const: realtek,rtl9301-mdio
-+      - const: realtek,rtl9301-mdio
-+
-+  '#address-cells':
-+    const: 1
-+
-+  '#size-cells':
-+    const: 0
-+
-+  reg:
-+    maxItems: 1
-+
-+patternProperties:
-+  '^ethernet-phy(@[a-f0-9]+)?':
-+    type: object
-+    $ref: ethernet-phy.yaml#
-+
-+    properties:
-+      reg:
-+        description:
-+          The MDIO communication on the RTL9300 is abstracted by the swi=
-tch. At
-+          the software level communication uses the switch port to addre=
-ss the
-+          PHY with the actual MDIO bus and address having been setup via=
- the
-+          realtek,smi-address property.
-+
-+      realtek,smi-address:
-+        $ref: /schemas/types.yaml#/definitions/uint32-array
-+        description: SMI interface and address for the connected PHY
-+        items:
-+          - description: SMI interface number associated with the port.
-+          - description: SMI address of the PHY for the port.
-+
-+    unevaluatedProperties: false
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    mdio@ca00 {
-+        compatible =3D "realtek,rtl9301-mdio";
-+        reg =3D <0xca00 0x200>;
-+        #address-cells =3D <1>;
-+        #size-cells =3D <0>;
-+
-+        ethernet-phy@0 {
-+            compatible =3D "ethernet-phy-ieee802.3-c45";
-+            reg =3D <0>;
-+            realtek,smi-address =3D <0 1>;
-+        };
-+
-+        ethernet-phy@8 {
-+            compatible =3D "ethernet-phy-ieee802.3-c45";
-+            reg =3D <8>;
-+            realtek,smi-address =3D <1 1>;
-+        };
-+    };
++		mdio0: mdio@ca00 {
++			compatible =3D "realtek,rtl9301-mdio";
++			reg =3D <0xca00 0x200>;
++			#address-cells =3D <1>;
++			#size-cells =3D <0>;
++			status =3D "disabled";
++		};
+ 	};
+ };
+=20
 --=20
 2.47.1
 
