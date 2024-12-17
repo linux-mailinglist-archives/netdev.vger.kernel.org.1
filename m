@@ -1,172 +1,234 @@
-Return-Path: <netdev+bounces-152528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 887829F479F
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:33:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 827929F47B8
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:39:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE35A16104B
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:33:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41ACB1882816
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D6D1D45EF;
-	Tue, 17 Dec 2024 09:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kWOL8Oxb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B181DD55A;
+	Tue, 17 Dec 2024 09:38:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520592E628;
-	Tue, 17 Dec 2024 09:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67371D5ACD
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 09:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734428017; cv=none; b=Hj2lpGmNdTvfsg1MpfPT+yehEu+fjWK3Nhp2hwNu7SesLYJEJV2IXy1Pao2Pb2BPudVeFh0Z9LNV3PZMo8W9vazNf17DRnWjwXD0aexX3wkW+CrEhbkAvs1+QCFPvoonZk4wE5O5lfVymlJuzw+ilFJ/WpPoLI+0DSgDfq2rzNk=
+	t=1734428306; cv=none; b=Jli9aSWAf7EJRSX45L8qQbzN2F9DXzU8STMOhhV/y/VS1gFaM8T37fUOW1j0hsRH9AyN1ies+TDlPDM+PrjpPlK62ngYdm/pQAx9vT/rWGOwBFVgw6sLROafjNb0c9PD9naJ6AND0wDJy7Kd+gwxkbYGfQ1HIVM+xEMZZquiiB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734428017; c=relaxed/simple;
-	bh=AMWNPcIppmlMgqthtCqMphIBrnk4GeQh0Fku2n6+edY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=iXO3rLwnf+NaR5lET5dbHv2xHjFPOVKULqN/BAiykWKvDxXW9LHFCloPoKEXZE27kr760q/8xc4Pp7xk+nh7KHbji15ks5uraYhQC2B4/fNH4UiEHJAMaOKoVOjuU5bOmcH4ahhUm+Qz/8ZLlbwDj3+LYvqBsmRh6UDDRFNC/i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kWOL8Oxb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C49A3C4CED3;
-	Tue, 17 Dec 2024 09:33:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734428016;
-	bh=AMWNPcIppmlMgqthtCqMphIBrnk4GeQh0Fku2n6+edY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=kWOL8OxbztGzBa9aSTv2r4iX1AJd8gPeYodWZ4PXD+KEv27fga3ffI69hulyPTvTr
-	 E92yIhr/kZCZMtpyx6ceL57WT69HnDxW9djHXCaFWtod/k8v4jXaGVTlhPXKdg+a3M
-	 inyvT/vsVANzWmB89O6E2PuaQIGogQurcibM3Uw9LB1X6/i1ci2Mi8+Vmdh6dpBO88
-	 Pu5v20siRitLbBcEpEEqWxCIZF6EHgKeI1cSGVXq7Cs3L3PYizSBcmMG7GazmsBJCv
-	 Xora8iSCTSGbM993A288UPqdDJRySwAfvorC2P+Dk9F22dB3JeO6YCcSq0NTLx+rkw
-	 sHQqB6LOxIHZQ==
-Date: Tue, 17 Dec 2024 01:33:33 -0800
-From: Kees Cook <kees@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: davem@davemloft.net, edumazet@google.com, horms@kernel.org, idosch@nvidia.com,
- kuba@kernel.org, kuniyu@amazon.com, linux-hardening@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- petrm@nvidia.com
-Subject: Re: [PATCH] rtnetlink: do_setlink: Use true struct sockaddr
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20241217080335.85554-1-kuniyu@amazon.com>
-References: <36C08CAB-1D3A-46CE-BCE2-820605E222CF@kernel.org> <20241217080335.85554-1-kuniyu@amazon.com>
-Message-ID: <980CE89E-0E8A-4A0D-A1E4-D03DB8F86A21@kernel.org>
+	s=arc-20240116; t=1734428306; c=relaxed/simple;
+	bh=DSYqypXNdmM+KHwzpyTPv0EPrH2E07uPN4gp6XAZ5dQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rjYl9V/ULHppjlYG2sdVFWOIL3aP/THPRFhpGboZVwU0VfNMTbbSQ1xA8zYJhketJ+KyJjqmQv/6W/0rHyNb2djnrjGwPY8sUr/OkGo2PlCcCM7DbWbhc98rQkE4rA1ztyRYBnU3R0Q0vUqjvFGEHm6sH9W2mAjmtxHuChAMdjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNU22-0006wG-Mz; Tue, 17 Dec 2024 10:38:22 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNU20-003qHW-2f;
+	Tue, 17 Dec 2024 10:38:21 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNU21-004UUM-1b;
+	Tue, 17 Dec 2024 10:38:21 +0100
+Date: Tue, 17 Dec 2024 10:38:21 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
+	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	lorenzo.bianconi83@gmail.com
+Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
+ EN7581 SoC
+Message-ID: <Z2FGjeyawnhABnRb@pengutronix.de>
+References: <cover.1733930558.git.lorenzo@kernel.org>
+ <20241211154109.dvkihluzdouhtamr@skbuf>
+ <Z1qqrVWV84DBZuCn@lore-desk>
+ <20241212150613.zhi3vbxuwsc3blui@skbuf>
+ <Z1sXTPeekJ5See_u@lore-desk>
+ <20241212184647.t5n7t2yynh6ro2mz@skbuf>
+ <Z2AYXRy-LjohbxfL@lore-desk>
+ <20241216154947.fms254oqcjj72jmx@skbuf>
+ <Z2B5DW70Wq1tOIhM@lore-desk>
+ <f8e74e29-f4b0-4e38-8701-a4364d68230f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f8e74e29-f4b0-4e38-8701-a4364d68230f@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+On Tue, Dec 17, 2024 at 12:24:13AM +0100, Andrew Lunn wrote:
+> > Considering patch [0], we are still offloading the Qdisc on the provided
+> > DSA switch port (e.g. LANx) via the port_setup_tc() callback available in
+> > dsa_user_setup_qdisc(), but we are introducing even the ndo_setup_tc_conduit()
+> > callback in order to use the hw Qdisc capabilities available on the mac chip
+> > (e.g. EN7581) for the routed traffic from WAN to LANx. We will still apply
+> > the Qdisc defined on LANx for L2 traffic from LANy to LANx. Agree?
+> 
+> I've not read all the details, so i could be getting something
+> wrong. But let me point out the basics. Offloading is used to
+> accelerate what Linux already supports in software. So forget about
+> your hardware. How would i configure a bunch of e1000e cards connected
+> to a software bridge to do what you want?
+> 
+> There is no conduit interface in this, so i would not expect to
+> explicitly configure a conduit interface. Maybe the offloading needs
+> to implicitly configure the conduit, but that should be all hidden
+> away from the user. But given the software bridge has no concept of a
+> conduit, i doubt it.
+> 
+> It could well be our model does not map to the hardware too well,
+> leaving some bits unusable, but there is not much you can do about
+> that, that is the Linux model, accelerate what Linux supports in
+> software.
+
+Hi,
+
+You are absolutely correct that offloading should accelerate what Linux already
+supports in software, and we need to respect this model. However, I’d like to
+step back for a moment to clarify the underlying problem before focusing too
+much on solutions.
+
+### The Core Problem: Flow Control Limitations
+
+1. **QoS and Flow Control:** 
+
+   At the heart of proper QoS implementation lies flow control. Flow control
+   mechanisms exist at various levels:
+
+   - MAC-level signaling (e.g., pause frames)
+
+   - Queue management (e.g., stopping queues when the hardware is congested)
+
+   The typical Linux driver uses flow control signaling from the MAC (e.g.,
+   stopping queues) to coordinate traffic, and depending on the Qdisc, this
+   flow control can propagate up to user space applications.
+
+2. **Challenges with DSA:**
+   In DSA, we lose direct **flow control communication** between:
+
+   - The host MAC
+
+   - The MAC of a DSA user port.
+
+   While internal flow control within the switch may still work, it does not
+   extend to the host. Specifically:
+
+   - Pause frames often affect **all priorities** and are not granular enough
+     for low-latency applications.
+
+   - The signaling from the MAC of the DSA user port to the host is either
+     **not supported** or is **disabled** (often through device tree
+     configuration).
+
+### Why This Matters for QoS
+
+For traffic flowing **from the host** to DSA user ports:
+
+- Without proper flow control, congestion cannot be communicated back to the
+  host, leading to buffer overruns and degraded QoS.  
+
+- To address this, we need to compensate for the lack of flow control signaling
+  by applying traffic limits (or shaping).
+
+### Approach: Applying Limits on the Conduit Interface
+
+One way to solve this is by applying traffic shaping or limits directly on the
+**conduit MAC**. However, this approach has significant complexity:
+
+1. **Hardware-Specific Details:**
+
+   We would need deep hardware knowledge to set up traffic filters or disectors
+   at the conduit level. This includes:
+
+   - Parsing **CPU tags** specific to the switch in use.  
+
+   - Applying port-specific rules, some of which depend on **user port link
+     speed**.
+
+2. **Admin Burden:**
+
+   Forcing network administrators to configure conduit-specific filters
+   manually increases complexity and goes against the existing DSA abstractions,
+   which are already well-integrated into the kernel.
 
 
+### How Things Can Be Implemented
 
-On December 17, 2024 12:03:35 AM PST, Kuniyuki Iwashima <kuniyu@amazon=2Ec=
-om> wrote:
->From: Kees Cook <kees@kernel=2Eorg>
->Date: Mon, 16 Dec 2024 23:53:46 -0800
->> On December 16, 2024 6:41:56 PM PST, Kuniyuki Iwashima <kuniyu@amazon=
-=2Ecom> wrote:
->> >From: Kees Cook <kees@kernel=2Eorg>
->> >Date: Mon, 16 Dec 2024 18:04:45 -0800
->> >> Instead of a heap allocation use a stack allocated struct sockaddr, =
-as
->> >> dev_set_mac_address_user() is the consumer (which uses a classic
->> >> struct sockaddr)=2E
->> >
->> >I remember Eric's feedback was to keep using heap instead of stack
->> >because rtnl_newlink() path already uses too much on stack=2E
->>=20
->> See below=2E=2E=2E
->>=20
->> >
->> >
->> >> Cap the copy to the minimum address size between
->> >> the incoming address and the traditional sa_data field itself=2E
->> >>=20
->> >> Putting "sa" on the stack means it will get a reused stack slot sinc=
-e
->> >> it is smaller than other existing single-scope stack variables (like
->> >> the vfinfo array)=2E
->>=20
->> That's why I included the rationale above=2E (I=2Ee=2E stack usage does=
- not grow with this patch=2E)
->
->Ah okay, but I think we can't cap the address size to 14
->bytes=2E  MAX_ADDR_LEN is 32=2E
->
->Also, dev_set_mac_address_user() still uses dev->addr_len=2E
+To address QoS for host-to-user port traffic in DSA, I see two possible
+approaches:
 
-Oh, hrm, yes, that's true=2E I had audited callers of dev_set_mac_address(=
-), but I think I must have missed callers of dev_set_mac_address_user()=2E =
-Ugh=2E :( Let me take another look at this=2E=2E=2E
+#### 1. Apply Rules on the Conduit Port (Using `dst_port`)
 
--Kees
+In this approach, rules are applied to the **conduit interface**, and specific
+user ports are matched using **port indices**.
 
->
->
->>=20
->> -Kees
->>=20
->> >>=20
->> >> Signed-off-by: Kees Cook <kees@kernel=2Eorg>
->> >> ---
->> >> Cc: Eric Dumazet <edumazet@google=2Ecom>
->> >> Cc: "David S=2E Miller" <davem@davemloft=2Enet>
->> >> Cc: Jakub Kicinski <kuba@kernel=2Eorg>
->> >> Cc: Paolo Abeni <pabeni@redhat=2Ecom>
->> >> Cc: Ido Schimmel <idosch@nvidia=2Ecom>
->> >> Cc: Petr Machata <petrm@nvidia=2Ecom>
->> >> Cc: netdev@vger=2Ekernel=2Eorg
->> >> ---
->> >>  net/core/rtnetlink=2Ec | 22 +++++++---------------
->> >>  1 file changed, 7 insertions(+), 15 deletions(-)
->> >>=20
->> >> diff --git a/net/core/rtnetlink=2Ec b/net/core/rtnetlink=2Ec
->> >> index ab5f201bf0ab=2E=2E6da0edc0870d 100644
->> >> --- a/net/core/rtnetlink=2Ec
->> >> +++ b/net/core/rtnetlink=2Ec
->> >> @@ -3048,21 +3048,13 @@ static int do_setlink(const struct sk_buff *=
-skb, struct net_device *dev,
->> >>  	}
->> >> =20
->> >>  	if (tb[IFLA_ADDRESS]) {
->> >> -		struct sockaddr *sa;
->> >> -		int len;
->> >> -
->> >> -		len =3D sizeof(sa_family_t) + max_t(size_t, dev->addr_len,
->> >> -						  sizeof(*sa));
->> >> -		sa =3D kmalloc(len, GFP_KERNEL);
->> >> -		if (!sa) {
->> >> -			err =3D -ENOMEM;
->> >> -			goto errout;
->> >> -		}
->> >> -		sa->sa_family =3D dev->type;
->> >> -		memcpy(sa->sa_data, nla_data(tb[IFLA_ADDRESS]),
->> >> -		       dev->addr_len);
->> >> -		err =3D dev_set_mac_address_user(dev, sa, extack);
->> >> -		kfree(sa);
->> >> +		struct sockaddr sa =3D { };
->> >> +
->> >> +		/* dev_set_mac_address_user() uses a true struct sockaddr=2E */
->> >> +		sa=2Esa_family =3D dev->type;
->> >> +		memcpy(sa=2Esa_data, nla_data(tb[IFLA_ADDRESS]),
->> >> +		       min(dev->addr_len, sizeof(sa=2Esa_data_min)));
->> >> +		err =3D dev_set_mac_address_user(dev, &sa, extack);
->> >>  		if (err)
->> >>  			goto errout;
->> >>  		status |=3D DO_SETLINK_MODIFIED;
->> >> --=20
->> >> 2=2E34=2E1
->> >
->>=20
->> --=20
->> Kees Cook
+# Conduit interface  
+tc qdisc add dev conduit0 clsact  
 
---=20
-Kees Cook
+# Match traffic for user port 1 (e.g., lan0)  
+tc filter add dev conduit0 egress flower dst_port 1 \  
+    action police rate 50mbit burst 5k drop  
+
+# Match traffic for user port 2 (e.g., lan1)  
+tc filter add dev conduit0 egress flower dst_port 2 \  
+    action police rate 30mbit burst 3k drop  
+
+#### 2. Apply Rules Directly on the User Ports (With Conduit Marker)
+
+In this approach, rules are applied **directly to the user-facing DSA ports**
+(e.g., `lan0`, `lan1`) with a **conduit-specific marker**. The kernel resolves
+the mapping internally.
+
+# Apply rules with conduit marker for user ports  
+tc qdisc add dev lan0 root tbf rate 50mbit burst 5k conduit-only  
+tc qdisc add dev lan1 root tbf rate 30mbit burst 3k conduit-only  
+
+Here:  
+- **`conduit-only`**: A marker (flag) indicating that the rule applies
+specifically to **host-to-port traffic** and not to L2-forwarded traffic within
+the switch.  
+
+### Recommendation
+
+The second approach (**user port-based with `conduit-only` marker**) is cleaner
+and more intuitive. It avoids exposing hardware details like port indices while
+letting the kernel handle conduit-specific behavior transparently.
+
+Best regards,  
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
