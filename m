@@ -1,234 +1,112 @@
-Return-Path: <netdev+bounces-152577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A399F4A97
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:04:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4F59F4AA8
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:09:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6A5F161AA6
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:04:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A36D418905BF
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450801F2C3B;
-	Tue, 17 Dec 2024 12:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C30C1F12E4;
+	Tue, 17 Dec 2024 12:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bJfgQ1ze"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="pNQCeYb8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAAB1F131C
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 12:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9CE1E5708;
+	Tue, 17 Dec 2024 12:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734437058; cv=none; b=S2+8IlIuOus8f+930Qw1STLgBEy7B5N99keY37iaAeZbf+alQhwESHLxnmbfJrLmgFc4OI1rB6nakqmdeMbY8ZGuUgj7QTjsD4otA2/0kJ61G+aMxBiRmcQHou5Bo/V6NqBtcxCxKr8lwzYgyhFNb4m5y1Eugbl2DFj4eR0zipo=
+	t=1734437389; cv=none; b=tH1PJN/QySpnb5NrVjfqwK09fLwc1is2qr50BwBzXdomctDqwpnO8R988yvtiyv1aOG7IV0nLOxXVmrkbtL27o2MN0BVChGooaOytxtkPa5cPuEH78lj7VaX9p81gJtG3vbTK7rC1n/y2IXV+Iq3iyuQFv56ROu0HcgdsBEJrME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734437058; c=relaxed/simple;
-	bh=jid2e4YmMaFzHs+grDlyZFItzWXJGa2FaJHW2QFcSfQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GRz8mXGcakhk/kAcl2bNQmBUce5k+SnYwqTeQBFWB6/a7+BnWSJiJ4izKVCNPmcoqxwong19w6ICsnWp9e6Lrc/jTGpzzDIqqoz0HZGvowcFmuKlAeK8DzP6DMmyiiTOQr6wAR4paJnO+OVvT2RkhjxvZFlNjMsONWbawfLWdyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bJfgQ1ze; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5d3d0205bd5so7410557a12.3
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 04:04:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734437053; x=1735041853; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6TYo1PX1btnj1ji1OnQmEZ7gYkMFV+lnpTQs66ixtVM=;
-        b=bJfgQ1zeUqrVICy48d64YbIYig2l22VakWt45sZWKv4u/lJjf4ncQEepV6tArx77SF
-         uI0+N5MZtFoh9LA7RoGdS/C5PlqoszkEbsde9ygq8xsfZNSKC8fVjGh6wjhgpcXq+XGC
-         N5lx6jwvDp9TNEPmVY3NsbrEP6a79FV6sO9BiLHUaw0wzxdFJ5lGFVJMbfyMiErf/yE/
-         juCpM/uWWduMmBEVzIQU/UwJ95Q51s3vchQyqRbQQRozt0IdG8QM5HWZx7yN3nLB2fAd
-         fZWYCwtwcqWlOIBxtqadJz8NQDw9IzBBWkKV9NsW9WqcfS9Gnly1RDGVSFj2I6zfKz0f
-         wGWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734437053; x=1735041853;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6TYo1PX1btnj1ji1OnQmEZ7gYkMFV+lnpTQs66ixtVM=;
-        b=TOo/XxBH09iyVP9EzA5+tsr4hAD9PmeGAFCzFWS2za4BIGL/vd/I0nFMKpXZA/GIHA
-         t/+b0HHHTSe0WwRRo32OsEAtX9znmpDw49WaRMbkHghvVlef71QAxAlWQ0aByga39Gd2
-         /T3MztD74myDoOBx22tpx/bkUS+9mM6Pyq9EbYPbWmxOrq/lDMZPAronsMKfeqBuz+y4
-         f9wHIAK8/0B3Y2rTOhkSKkJYIUccRavUiydamydXKSm9rxjHtlEDyys86ly0RuuvEbHD
-         OeKlDk7H5e0UW4PluOsuzac5CHrxa8ocTeOUsrEDegKsu9OoBIVMpR4sGFweMw9dB4cG
-         8Ltw==
-X-Forwarded-Encrypted: i=1; AJvYcCUe1+D2O3rsXARx0N7R+15DwXQPq3YXpWBxuODSFqx8sBxZ4ptMWbVda8gwNL1ehp+BQ0xGr3Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVwAukCQsHgXqrcTTLPAZ8TSpYALg5kyVHGW8AMk1REWPYwqy6
-	2UyPLGqMJ3Aup8uK0q9DBMSUJ9HuqyQwstPRLf1qms9L1jpruvFvmAbrP9hxw1YD83UfPMjgBX8
-	P1d5PeAEYTvl/Sdprl3wpvisWQMdS6IMjVALb
-X-Gm-Gg: ASbGncvoidLJ1XIJW/ezxIXz1lQuAQf6UO5ujifgZ8N/pPqd5hwxFxhaFJF+sNLAeYE
-	s17lwKJHLSZEUnQVKnnU/pM8Y15o2+fBr5t0eJb1Se5hCetM6dxZpgw+TnPuJQ8Bguu+60Tc2
-X-Google-Smtp-Source: AGHT+IFF4svj3Uh3ESqZWoBR+uJQcQQFjsw2mf1H9d0JNIXlhoZbfP8H/stBFIU2BQsjfFgtDSM3eTvQCCn5BILfxno=
-X-Received: by 2002:a05:6402:528f:b0:5d2:7456:9812 with SMTP id
- 4fb4d7f45d1cf-5d63c39fba0mr14010471a12.22.1734437053063; Tue, 17 Dec 2024
- 04:04:13 -0800 (PST)
+	s=arc-20240116; t=1734437389; c=relaxed/simple;
+	bh=/SG3AzAHOff+hccD3OcucAh5OThZTC7Mgq9xZD7ruxo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HVVGndGlEZKrMpJv9OjjYWzZUmrkJ6sAU5oMhNNeep/KyRqtKm/jPzm6vJPTljrIDYXK7Qkqal975O15Zo2nTZ+gU7IMhP7+HKtTABdmCOXoDUoyMIDJtJIky0g9Tu2sc9WrVJtkvsOlRBkXWIQnpCwXl2DdaHk6Xw+dwDe39X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=pNQCeYb8; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=/SG3AzAHOff+hccD3OcucAh5OThZTC7Mgq9xZD7ruxo=;
+	t=1734437387; x=1735646987; b=pNQCeYb83bndxl855f4uqARs9WCSwk/EO1DiZMYjKFFCzkh
+	/yFNBKAw/VBS84dA5tpLBMsmQeQBmSA4iC5CxV9hVsP0ylxLG4scE4pa7/Bk9K9jXRWJnWw0lVpR1
+	wVrO/9lzw/n0LLJujUghScnQY1xBq64E6EQyPCFPnDPvO3mVs+fDQjRkweps+ACOqWncOEeOIeDOp
+	wWidTDmDJuV74Rq+QhG2vYwQbMXDmqKgy4BCJQUfI3zvv8YkCHMITbzLsx6PLWVXl5mdu5o73LYOk
+	8PFylKxK5pJ4PxAN3Sicxs2tBg9XnUzJcK/m2aMZLG4izNQ74BHXQXpBuYuQX8rA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1tNWOW-000000027FC-06Rs;
+	Tue, 17 Dec 2024 13:09:44 +0100
+Message-ID: <70f796f623a67b283c4fe3a1b56e59647a39ce6c.camel@sipsolutions.net>
+Subject: Re: [Bug] Deadlock between rfkill_fop_write() and
+ nfc_unregister_device()
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Sam Sun <samsun1006219@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, pabeni@redhat.com,
+ 	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, davem@davemloft.net, 
+	krzk@kernel.org
+Date: Tue, 17 Dec 2024 13:09:42 +0100
+In-Reply-To: <CAEkJfYP297P=RjvZ9-ctpYHXu7bDhVN0+ZBoMNz2xjzyqOakLQ@mail.gmail.com>
+References: 
+	<CAEkJfYOyWgJW-WAd+GhT07zd2Y3vUWz81+pjbZT9nUAsCc7FGQ@mail.gmail.com>
+	 <b27dc4d0c3456c6796437b26b887b931d9871977.camel@sipsolutions.net>
+	 <de5d98be99086a7182ba2bd0676b261349a145c4.camel@sipsolutions.net>
+	 <CAEkJfYP297P=RjvZ9-ctpYHXu7bDhVN0+ZBoMNz2xjzyqOakLQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <d416a14ec38c7ba463341b83a7a9ec6ccc435246.1734419614.git.christophe.leroy@csgroup.eu>
- <CANn89iK1+oLktXjHXs0U3Wo4zRZEqimoSgfPVzGGycH7R_HxnA@mail.gmail.com>
- <49a43774-bf97-4b20-8382-4fb921f34c66@csgroup.eu> <CANn89iLKPx+=gHaM_V77iwUwzqQe_zyUc0Dm1KkPo3GuE40SRw@mail.gmail.com>
- <8e3c9ebc-e047-4dfd-ad1d-6bbe918aa98b@csgroup.eu> <CANn89iLTGLe2uWz+yCu5ewnDBW2hubqGm8=aRbZVTeXN1Trdaw@mail.gmail.com>
- <49844fde-9424-4c81-85a0-c5c26a77321d@csgroup.eu>
-In-Reply-To: <49844fde-9424-4c81-85a0-c5c26a77321d@csgroup.eu>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 17 Dec 2024 13:04:02 +0100
-Message-ID: <CANn89i+m5fBZZYRYXHZswpZNt8J-VCmGFOeSH1hiK965p9R1yQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: sysfs: Fix deadlock situation in sysfs accesses
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"Eric W. Biederman" <ebiederm@xmission.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	TRINH THAI Florent <florent.trinh-thai@cs-soprasteria.com>, 
-	CASAUBON Jean Michel <jean-michel.casaubon@cs-soprasteria.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-malware-bazaar: not-scanned
 
-On Tue, Dec 17, 2024 at 12:56=E2=80=AFPM Christophe Leroy
-<christophe.leroy@csgroup.eu> wrote:
->
->
->
-> Le 17/12/2024 =C3=A0 10:52, Eric Dumazet a =C3=A9crit :
-> > On Tue, Dec 17, 2024 at 10:41=E2=80=AFAM Christophe Leroy
-> > <christophe.leroy@csgroup.eu> wrote:
-> >>
-> >>
-> >>
-> >> Le 17/12/2024 =C3=A0 10:20, Eric Dumazet a =C3=A9crit :
-> >>> On Tue, Dec 17, 2024 at 9:59=E2=80=AFAM Christophe Leroy
-> >>> <christophe.leroy@csgroup.eu> wrote:
-> >>>>
-> >>>>
-> >>>>
-> >>>> Le 17/12/2024 =C3=A0 09:16, Eric Dumazet a =C3=A9crit :
-> >>>>> On Tue, Dec 17, 2024 at 8:18=E2=80=AFAM Christophe Leroy
-> >>>>> <christophe.leroy@csgroup.eu> wrote:
-> >>>>>>
-> >>>>>> The following problem is encountered on kernel built with
-> >>>>>> CONFIG_PREEMPT. An snmp daemon running with normal priority is
-> >>>>>> regularly calling ioctl(SIOCGMIIPHY). Another process running with
-> >>>>>> SCHED_FIFO policy is regularly reading /sys/class/net/eth0/carrier=
-.
-> >>>>>>
-> >>>>>> After some random time, the snmp daemon gets preempted while holdi=
-ng
-> >>>>>> the RTNL mutex then the high priority process is busy looping into
-> >>>>>> carrier_show which bails out early due to a non-successfull
-> >>>>>> rtnl_trylock() which implies restart_syscall(). Because the snmp
-> >>>>>> daemon has a lower priority, it never gets the chances to release
-> >>>>>> the RTNL mutex and the high-priority task continues to loop foreve=
-r.
-> >>>>>>
-> >>>>>> Replace the trylock by lock_interruptible. This will increase the
-> >>>>>> priority of the task holding the lock so that it can release it an=
-d
-> >>>>>> allow the reader of /sys/class/net/eth0/carrier to actually perfor=
-m
-> >>>>>> its read.
-> >>>>>>
-> >>>>
-> >>>> ...
-> >>>>
-> >>>>>>
-> >>>>>> Fixes: 336ca57c3b4e ("net-sysfs: Use rtnl_trylock in sysfs methods=
-.")
-> >>>>>> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> >>>>>> ---
-> >>>>>
-> >>>>> At a first glance, this might resurface the deadlock issue Eric W. =
-Biederman
-> >>>>> was trying to fix in 336ca57c3b4e ("net-sysfs: Use rtnl_trylock in
-> >>>>> sysfs methods.")
-> >>>>
-> >>>> Are you talking about the deadlock fixed (incompletely) by 5a5990d30=
-90b
-> >>>> ("net: Avoid race between network down and sysfs"), or the complemen=
-t
-> >>>> provided by 336ca57c3b4e ?
-> >>>>
-> >>>> My understanding is that mutex_lock() will return EINTR only if a si=
-gnal
-> >>>> is pending so there is no need to set signal_pending like it was whe=
-n
-> >>>> using mutex_trylock() which does nothing when the mutex is already l=
-ocked.
-> >>>>
-> >>>> And an EINTR return is expected and documented for a read() or a
-> >>>> write(), I can't see why we want ERESTARTNOINTR instead of ERSTARTSY=
-S.
-> >>>> Isn't it the responsibility of the user app to call again read or wr=
-ite
-> >>>> if it has decided to not install the necessary sigaction for an
-> >>>> automatic restart ?
-> >>>>
-> >>>> Do you think I should instead use rtnl_lock_killable() and return
-> >>>> ERESTARTNOINTR in case of failure ? In that case, is it still possib=
-le
-> >>>> to interrupt a blocked 'cat /sys/class/net/eth0/carrier' which CTRL+=
-C ?
-> >>>
-> >>> Issue is when no signal is pending, we have a typical deadlock situat=
-ion :
-> >>>
-> >>> One process A is :
-> >>>
-> >>> Holding sysfs lock, then attempts to grab rtnl.
-> >>>
-> >>> Another one (B) is :
-> >>>
-> >>> Holding rtnl, then attempts to grab sysfs lock.
-> >>
-> >> Ok, I see.
-> >>
-> >> But then what can be the solution to avoid busy looping with
-> >> mutex_trylock , not giving any chance to the task holding the rtnl to
-> >> run and unlock it ?
-> >
-> > One idea would be to add a usleep(500, 1000) if the sysfs read/write ha=
-ndler in
-> > returns -ERESTARTNOINTR;
-> >
-> > Totally untested idea :
-> >
-> > diff --git a/fs/seq_file.c b/fs/seq_file.c
-> > index 8bbb1ad46335c3b8f50dd35d552f86767e62ead1..276c6d594129a18a7a4c2b1=
-df447b34993398ab4
-> > 100644
-> > --- a/fs/seq_file.c
-> > +++ b/fs/seq_file.c
-> > @@ -290,6 +290,8 @@ ssize_t seq_read_iter(struct kiocb *iocb, struct
-> > iov_iter *iter)
-> >                  m->read_pos +=3D copied;
-> >          }
-> >          mutex_unlock(&m->lock);
-> > +       if (copied =3D=3D -ERESTARTNOINTR)
-> > +               usleep_range(500, 1000);
-> >          return copied;
-> >   Enomem:
-> >          err =3D -ENOMEM;
->
-> Ok, that may solve the issue, but it looks more like a hack than a real
-> solution, doesn't it ?
-> It doesn't guarantee that the task holding the RTNL lock will be given
-> the floor to run and free the lock.
+On Tue, 2024-12-17 at 20:01 +0800, Sam Sun wrote:
+> On Tue, Dec 17, 2024 at 7:33=E2=80=AFPM Johannes Berg <johannes@sipsoluti=
+ons.net> wrote:
+> >=20
+> > On Tue, 2024-12-17 at 11:46 +0100, Johannes Berg wrote:
+> > > On Tue, 2024-12-17 at 17:33 +0800, Sam Sun wrote:
+> > > > Dear developers and maintainers,
+> > > >=20
+> > > > We originally encountered a task hung while using our modified
+> > > > syzkaller. It was tested against the latest upstream kernel. We
+> > > > analyzed the root cause and pinpoint the kernel crash log to the
+> > > > following two tasks.
+> > > >=20
+> > >=20
+> > > This issue has been known a very long time and should be fixed in NFC=
+,
+> > > but I guess nobody is around to do it.
+> > >=20
+> > > https://syzkaller.appspot.com/bug?extid=3Dbb540a4bbfb4ae3b425d
+> > >=20
+> >=20
+> > I think this one is also the same:
+> >=20
+> > https://syzkaller.appspot.com/bug?extid=3D9ef743bba3a17c756174
+> >=20
+> > and that's much older still.
+> >=20
+>=20
+> Thanks for your quick reply! I am sorry that I didn't double-check the
+> call stack of historical bugs reported by Syzbot. I will be careful
+> next time.
+>=20
 
-I am sure all for a real solution, what do you suggest ?
+No worries. Maybe someone who feels responsible for NFC will wake up ;-)
 
->
-> The real issue is the nest between sysfs lock and RTNL lock. Can't we
-> ensure that they are always held in the same order ?
-
-Problem : adding/removing netdevices may add/remove sysfs files.
-
-Adding/removing netdevices is done under rtnl.
+johannes
 
