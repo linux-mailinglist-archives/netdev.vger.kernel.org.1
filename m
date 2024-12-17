@@ -1,157 +1,283 @@
-Return-Path: <netdev+bounces-152604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB6B99F4C93
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:42:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7BF9F4CCC
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:51:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DD7A1883836
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:40:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6056162810
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B608E1F3D5A;
-	Tue, 17 Dec 2024 13:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6A01EBA02;
+	Tue, 17 Dec 2024 13:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="Ly3P/Dqf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LSeB+avZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04olkn2025.outbound.protection.outlook.com [40.92.46.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D281F3D57;
-	Tue, 17 Dec 2024 13:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.46.25
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734442816; cv=fail; b=b44R5bPklDNWv/6Hi/XukiHNIKE2vrBJ0+Ec2fyOdOtc4/w4Jt9PkWQ1ZkNLz7Sftyd7aqLLKh22xjQGGrneGWZ2zjNj5Ds21NPNr8xAvGAWY2wIf7r1dqKr9t4bVXIfTpzLC9oX740CvuwAcWYsT6AevF+FZ0f+7+VfJxH6jzM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734442816; c=relaxed/simple;
-	bh=T0uSoL/AGORnR7BBYpibEcGKujPoejHlnQb3sKQ49zA=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=TPDzkNpqX+MrCE1EJXxPvtGzQdhzN9aNl7eQx+SECCLH6js4KlI1H+kMLOuYCvqjhaiz/14An6+LIun6GPzRMAINe1ehTyKCk4R3y13jVosjBURs0fvUA5qj2xyLjgC/SdkkwP6GP64ePPGBSgs5hGUt6Lfs+zOP+Lkt+erJnuo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=Ly3P/Dqf; arc=fail smtp.client-ip=40.92.46.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Fe2t9H0hcgype1tlcQI7MMs7L7Lcj2hLqEhD/ALsi8nPNtgvnw7W13AhGYaoQJMrq2F6LG9oQYQDOwSUVTa7bo3SsVC5OXXd0LI2eYQzETHbeJ9r4AU9Uvp4dqDnNoO0jeeEC7jwhUDVj+HkWUJnIuqt4GRIwpBIUsX8IqCirKNDfY/ys27UXlrQv4HdmnnaEfGVFoD7jbU/5KtS8pu3GMj0B+HTHZdjT10ZtjZ2brkmVXKXjmkrdjyFlYeQ7xrBRNKq0tC9o3ocS7I31GTQDk4up6/vy/JELAi1DortelQjCm4qvpbwOcqQM23b8rGW2YOzgjOuQM9Ycm8XyIwE8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nkRwVNTe7AEQcR2AFj9hF6StfnuR+OViEMHJNZ45zUA=;
- b=d0ms/LId9BSXzKqC3cNyAXSkE8JO7V4jQxgCNEbhBMo3UEx5kiWqiadwD8URiqTRCZUaglfRU5z3+h/ifpzDOJiyCl40USELTIKAAwo9WZD8LpCymscnl1IQJIZf0UOT2v/erPrqhNdzWW248/0SmzWGhWcSV9KN430vQxxWlHQQkk5qFJuB1x7O1lzCvhRwvb/SAFliNMGqkokPIO5/7vTqwSCbzrn5SIq9ThgWnTe/mazynDtN4HYm5dPSbjSkSK3UENpncC/Hi6Ko8M2KqUH7h2AcNQHknx47OiKK1q/+HsWz0UnmGrfRyqbu4au4vTNUHWYaNhLY1ponKJW1OQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nkRwVNTe7AEQcR2AFj9hF6StfnuR+OViEMHJNZ45zUA=;
- b=Ly3P/DqfL0AYpdjTWMVzH8BxrqNkJLC5ginuIhSLQKhlGLQSZ2JrIBJ2DXHZ0uwaCJbUvLMZ3jmbXpdFLqxLsbM3yRUJcLjldYE6lpNlQt7ASs4uwZqpM3v94wW8zH6CGTAG1t7M3VHXQgZMw83UBUOES0B1sfOdZF7Cz/d4ilgEdZAWjz2t0A4eHLTxeGwK2ZeXsU5sfNhOQ8DwwmRBpwLxhju0n6eB//0knPWWuPQX/h65PICv1noFHgdSB1pNu+DR+ujgSCWORs+W4YshFG26VGkD3IRElzpKJQpcu4MbOk8dTiArmuIcqmHtw+gLSifZFsBnH1Ix5cBIN3th3g==
-Received: from CY5PR10MB5988.namprd10.prod.outlook.com (2603:10b6:930:28::9)
- by MN2PR10MB4221.namprd10.prod.outlook.com (2603:10b6:208:1d7::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.22; Tue, 17 Dec
- 2024 13:40:12 +0000
-Received: from CY5PR10MB5988.namprd10.prod.outlook.com
- ([fe80::40b0:91eb:984a:1c11]) by CY5PR10MB5988.namprd10.prod.outlook.com
- ([fe80::40b0:91eb:984a:1c11%6]) with mapi id 15.20.8251.015; Tue, 17 Dec 2024
- 13:40:12 +0000
-From: Da Shi Cao <dscao999@hotmail.com>
-To: "stable@vger.kernel.org" <stable@vger.kernel.org>
-CC: "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: TI Ethernet Driver TI_K3_AM65_CPSW_NUSS
-Thread-Topic: TI Ethernet Driver TI_K3_AM65_CPSW_NUSS
-Thread-Index: AQHbUIcZhyVIDHAvZkWvGpkWBtlq2Q==
-Date: Tue, 17 Dec 2024 13:40:12 +0000
-Message-ID:
- <CY5PR10MB59880DDECD5D282B7665085B8C042@CY5PR10MB5988.namprd10.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY5PR10MB5988:EE_|MN2PR10MB4221:EE_
-x-ms-office365-filtering-correlation-id: dfcfc5b8-36b0-47a4-5705-08dd1ea05502
-x-microsoft-antispam:
- BCL:0;ARA:14566002|15030799003|19110799003|15080799006|8060799006|7092599003|461199028|8062599003|3412199025|440099028|102099032;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?83TTAGk5UMVa5OXDUVzSSuOhv56SNhqOx+UUf3Kd8vvpSBF8jgtzb9kpf3?=
- =?iso-8859-1?Q?zX4sjDfKZ2T5RwaiwnQXqhcAxrRgKzgjtiea0tHcG+JbL1FYE67VlUuLYr?=
- =?iso-8859-1?Q?ZpFgkFAK2RtRsYgOfVieB+0DU8M6PeTeazqqzAJQgyRsWxuCpCRyQs5ZZb?=
- =?iso-8859-1?Q?jwK7muIf0jaIr9bnYfzKHiISEuHfwoJa5XcYBaBmJaztPM9RJFBD/Y+Zkf?=
- =?iso-8859-1?Q?ICaLzTlbdN120YfvM7cEiY346sKNgW5hd0eJDjjkl5h59sbBkYgtATvpeY?=
- =?iso-8859-1?Q?AOfGYmePdaq4cGI/M9JbW3hCwD0IBOaFaiO74r4Irs1QyjJKKKWUtczGSK?=
- =?iso-8859-1?Q?L4NFY3zbph58IUN4s7wUzpoNOkONC7wnkdWZ48sBbj0vXGZMP0Nv2Lb8ft?=
- =?iso-8859-1?Q?9ln5P/IWuOA55d+MNJTSQ0Uk/4jEGHQ1iotDHBCbhejU4slU4s+lRGyKZ1?=
- =?iso-8859-1?Q?s6MhJNV5ph6x/P9/HEl/w4Pw0b4fwkDorWpauYaPoW9ROz8JiMLvc/u1qQ?=
- =?iso-8859-1?Q?kYZCRH3I8BwMSBq173LgUi0NfHmDFaKZ6YEv5KqKA/7FAjF6+7qqgwchp9?=
- =?iso-8859-1?Q?oDr0X0cTnJRug19RHcJtebEvqh8nor5SyqJadknsiz4LQvpzkF5meWKMYN?=
- =?iso-8859-1?Q?KdyN1ZxJ40SUiAl56rftUF96btzKhbZcArkW1YFqdM9kPXlQUs+ZMFoMVr?=
- =?iso-8859-1?Q?gHi1XHdHohDO4NnnR6Kq5bGdVN2EOgm9pR++UuvDW4Uf2JV/Iid9QpCWau?=
- =?iso-8859-1?Q?qfXlyWvIL5lAbXAr6zrZWy/NnTiB7FRXNhLVTH47DyhMgUEN0bJ2He5/4D?=
- =?iso-8859-1?Q?mzPhowkk5eoW+hYVkbJkjX0nhhWVZDqjsUxw+HaczlgJ4T8STOM7J0Ya00?=
- =?iso-8859-1?Q?yjJndOitCU+WX/qlRs3/1ngB69+94si/JVUDJd99hqq+RjrtkN68Bil1xb?=
- =?iso-8859-1?Q?rZoK21ZLo1wlyd+4XDZ3/CPALYzzUe+eyru3BrtCYS8MHIcB7BxOaqaxyE?=
- =?iso-8859-1?Q?VDNFz8SMtwY9ZYYUDWcHW8Ry3FOxf0Xot7n2VQwZAXzebVipSoXZ1MIOQz?=
- =?iso-8859-1?Q?SrSs472TETQu4xSmJnDMtG6qA9RS/RlsxhuiI3uxLVJD?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?bIJd++dz8cvdqcr+tXWcT/uhjX3shYeZ9Owr/aIAihJKpLJXP25ZM7Y1NO?=
- =?iso-8859-1?Q?or1MJB1za/bG3giBIFsDEjfW++gKduvBBLQ9VHbwv0rxeHeUaxhOWm9EF6?=
- =?iso-8859-1?Q?NzL/w2toZsHu2I9FHweIMlS0F4ZDiOAdIg2V8DeCmM21D6vqS9mKlWss2V?=
- =?iso-8859-1?Q?a7mKz4LuJX2nu6ZLYY50ioUrR+TkxuyyN5fjec9RV+XK4+NSfpPcI49lhy?=
- =?iso-8859-1?Q?GQqo46/6fqfTr+JAC74ikBXJFW6yGC3QOeIzv+QJgKI/znwsGVzRvWJuwC?=
- =?iso-8859-1?Q?gUgDFnqHx5NZNubMANzQXlCkATtXpDfOtoyafF5I7NhFLFJGL+msx+5i2D?=
- =?iso-8859-1?Q?W4Z0b9NAhkdXAoHSFJrCVMyL2HxUsLOLgeujQpljMOFguImuJMQw48IaNg?=
- =?iso-8859-1?Q?KhJ3aVnOIny4qATWavf8JaIehRG8mlLY68FdSQga0DJonvruWu+a7tD2DV?=
- =?iso-8859-1?Q?ED2oq9c/Sf3TURpcUKr0Po0RRvnrhYkLyRozy+j+RP3KYVZCRRGXHde715?=
- =?iso-8859-1?Q?X52uSxztM5W+Qu8psvPHAay9f0kApKm8DdBSZxMSQ7Jr8Ud4IMyvXIseB8?=
- =?iso-8859-1?Q?eqH4/zSQf5yelsfYe+t/kc9P8k+9RDwao4KZHoLRKH7vr5FTpKTwbXZ9nt?=
- =?iso-8859-1?Q?/tcVOpxniiwHU2vLah37MrGYsikbNMt1NYWgx1C+QhfDv75wuayyLSO6RQ?=
- =?iso-8859-1?Q?bW0R/rgg4aKi671V0AsjLjdhbcc3IsqPKe18X+pqr0gUdezdg+hIxBaT0j?=
- =?iso-8859-1?Q?DDynL+3OlUgCrNzllzIT76RdhIkzFF4H7sNOpYB3vvwQQfpaEBTDoVVnDU?=
- =?iso-8859-1?Q?kSI8k3gzg492pNmpkRaIAgPcgLK9FT65pxwKOkw04+apri41Kg4Ap/YRHB?=
- =?iso-8859-1?Q?OZO4O3vCua16e/BxW5yH7owUbYk9biOl/LMSFScRGDjUfd6qOyUJVGgUdJ?=
- =?iso-8859-1?Q?TBRzos8iRh9KxjQq6J1cht9RqXH7VDPVv2DQNH3AMdCdqKzXW8Uz9Iq17Y?=
- =?iso-8859-1?Q?HqYHt6rxmYvw16zRJCkztjGru8n7sGlzfC1FT1K7Uy+vFbnoIRXmihvQGd?=
- =?iso-8859-1?Q?UWYD2jT+ZesYXQsHYh7F8+rWdQ3Y0MHepRw/q0ttyb7F4c3QzRDgfD96bS?=
- =?iso-8859-1?Q?97Apr/D+7xKhDD0+uOc6LnkWLVaMT8oe65y8lQaf74uJCKRxQunN4d++Fu?=
- =?iso-8859-1?Q?NwygOSY2o3xyCANgmo6apfRFX0hAnekDyn4nXPJlfLOH+FwlqwbMTx11Y1?=
- =?iso-8859-1?Q?zD5AtAZ1lutcXzHnu97g=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6991EF1D
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 13:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734443487; cv=none; b=d+jC6y6G+D8ZW+mcmZYCyRuLHcmPD541dkXFr8u9Dua8FhIea/3Ov5XJcjfTQl3lP0StCPIteE1F/Hb8xpdl0wpT4NW4o8j+uoPW5T8qyCSKWWmwbF5wkNHSWj6isZca1xUI8oWI3JLW0tt+PrvwzpW329kNTOaemHJqQlbTvYE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734443487; c=relaxed/simple;
+	bh=lBRXwpkWLeE1RLmLVARpc36+37La47SraS1AnFBNUPk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QCv6XcGqMOBynrOlCLJh8etQZB9R2tiAVpFfwLl9JonGResgtgkbR0AmCx0UdLPwz6pwQsTWv64XcRrPncCrFJFhY5xDQQ1+1MPbAopr4iHZIVZSJQOxblA4oSiHsNAULisaaUsO6Trudzell8F7BQ/TMTIGXzTcHdIXc2tvM9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LSeB+avZ; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b6e9fb0436so29190885a.0
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 05:51:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734443484; x=1735048284; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=E5QtgPZELSLDmD36CV1+ESqanJXxgk9EjYyo4jMAuUI=;
+        b=LSeB+avZ3Pmo0HwfxQol878uvUZsakuVlTRyiVJLtcyc4BFHvJtEh7bXO+6oH949eg
+         lsgtkvP3q9YpWxRyNmUm0JdRZ/ACbXYNAC4Aj7Z8FHG1RjlDYdXRDdWGEGNde47jAEQ+
+         TSIzGfnSR8tc3h51/w0KLYCSCb3txjZ7yKc8F8kTvz1MSBaFuQ+HJnXUDRkGy8LXySAg
+         aYzDwLijnGPw4JMwizpyu0k9odBe32gWLj6jPr8znk4RGer81efiQT5SXPKhlWxLzkdb
+         vQvQU2dGt2wza/s5OSBCSUBfqyRDJ3PT/MCNzWscChPPShzzsNzxWYoGXAVhkcWdaP3T
+         VbVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734443484; x=1735048284;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=E5QtgPZELSLDmD36CV1+ESqanJXxgk9EjYyo4jMAuUI=;
+        b=Xb2Vgdr/Bcipvh8PM116K+FYakZnZzvenIREw/64tO53LZEPKSwp0bvlNPNX3LCteB
+         /AJc2WPRV5VStyeZoXVAEvdC6OLGrMt01gIr12m4n4fHGWygIJ12Y1BglBAwMRhWTfCa
+         2Xa9D6mZaZCrlQM1eOKSOpX417fsIB01Fs/rtFmFNgVE50andF23AznCv7ohd7KhAPDc
+         OPiFarCRozPSXaCW0VvBeL6iOB/WJfCPnr+0uTYb9ZYhtvHCEm0dn6UiTXfkGe07eaX5
+         kQvYtETX1aUckwO0kYycOJ4AhdeRzCzDQu4rdqi2ARyAjGuUKwTKqdi7Hf4H+FN889sT
+         ddYQ==
+X-Gm-Message-State: AOJu0YyY5pleSkLL0qpvisJyMSOdCtti6Ni8/C2eMLTwB7f5bBzQ53YR
+	QdShwxzIugzRnAvl0C1hh1lySdaS9bTlPcqLUPjs72T6zr87VKC0Uo4s9iPOpJKzb6uhElLkeZn
+	tlQ6BXOJ1wg==
+X-Google-Smtp-Source: AGHT+IHZqiKykTQFCy+Ipy7gEHGeTGG0/D5Enb22yI4ZWimS+wHwLCZhilWddyD8JQkzYkUJvN+YA+aRw0MOuw==
+X-Received: from qke16.prod.google.com ([2002:a05:620a:a110:b0:7b6:6c43:27ce])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:198c:b0:7b6:c6f8:1d29 with SMTP id af79cd13be357-7b6fbf3a770mr2905377285a.47.1734443484647;
+ Tue, 17 Dec 2024 05:51:24 -0800 (PST)
+Date: Tue, 17 Dec 2024 13:51:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-28291.templateTenant
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR10MB5988.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: dfcfc5b8-36b0-47a4-5705-08dd1ea05502
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Dec 2024 13:40:12.6214
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4221
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241217135121.326370-1-edumazet@google.com>
+Subject: [PATCH net-next] ptr_ring: do not block hard interrupts in ptr_ring_resize_multiple()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+f56a5c5eac2b28439810@syzkaller.appspotmail.com, 
+	Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The driver of TI K3 ethernet port depends on PAGE_POOL configuration option=
-. There should be a select PAGE_POOL under it configuration.=0A=
-=0A=
---- a/drivers/net/ethernet/ti/Kconfig=0A=
-+++ b/drivers/net/ethernet/ti/Kconfig=0A=
-@@ -114,6 +114,7 @@ config TI_K3_AM65_CPSW_NUSS=0A=
-        select TI_DAVINCI_MDIO=0A=
-        select PHYLINK=0A=
-        select TI_K3_CPPI_DESC_POOL=0A=
-+       select PAGE_POOL=0A=
-        imply PHY_TI_GMII_SEL=0A=
-        depends on TI_K3_AM65_CPTS || !TI_K3_AM65_CPTS=0A=
-        help=0A=
-=0A=
-Dashi Cao=
+Jakub added a lockdep_assert_no_hardirq() check in __page_pool_put_page()
+to increase test coverage.
+
+syzbot found a splat caused by hard irq blocking in
+ptr_ring_resize_multiple() [1]
+
+As current users of ptr_ring_resize_multiple() do not require
+hard irqs being masked, replace it to only block BH.
+
+Rename helpers to better reflect they are safe against BH only.
+
+- ptr_ring_resize_multiple() to ptr_ring_resize_multiple_bh()
+- skb_array_resize_multiple() to skb_array_resize_multiple_bh()
+
+[1]
+
+WARNING: CPU: 1 PID: 9150 at net/core/page_pool.c:709 __page_pool_put_page net/core/page_pool.c:709 [inline]
+WARNING: CPU: 1 PID: 9150 at net/core/page_pool.c:709 page_pool_put_unrefed_netmem+0x157/0xa40 net/core/page_pool.c:780
+Modules linked in:
+CPU: 1 UID: 0 PID: 9150 Comm: syz.1.1052 Not tainted 6.11.0-rc3-syzkaller-00202-gf8669d7b5f5d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+RIP: 0010:__page_pool_put_page net/core/page_pool.c:709 [inline]
+RIP: 0010:page_pool_put_unrefed_netmem+0x157/0xa40 net/core/page_pool.c:780
+Code: 74 0e e8 7c aa fb f7 eb 43 e8 75 aa fb f7 eb 3c 65 8b 1d 38 a8 6a 76 31 ff 89 de e8 a3 ae fb f7 85 db 74 0b e8 5a aa fb f7 90 <0f> 0b 90 eb 1d 65 8b 1d 15 a8 6a 76 31 ff 89 de e8 84 ae fb f7 85
+RSP: 0018:ffffc9000bda6b58 EFLAGS: 00010083
+RAX: ffffffff8997e523 RBX: 0000000000000000 RCX: 0000000000040000
+RDX: ffffc9000fbd0000 RSI: 0000000000001842 RDI: 0000000000001843
+RBP: 0000000000000000 R08: ffffffff8997df2c R09: 1ffffd40003a000d
+R10: dffffc0000000000 R11: fffff940003a000e R12: ffffea0001d00040
+R13: ffff88802e8a4000 R14: dffffc0000000000 R15: 00000000ffffffff
+FS:  00007fb7aaf716c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fa15a0d4b72 CR3: 00000000561b0000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ tun_ptr_free drivers/net/tun.c:617 [inline]
+ __ptr_ring_swap_queue include/linux/ptr_ring.h:571 [inline]
+ ptr_ring_resize_multiple_noprof include/linux/ptr_ring.h:643 [inline]
+ tun_queue_resize drivers/net/tun.c:3694 [inline]
+ tun_device_event+0xaaf/0x1080 drivers/net/tun.c:3714
+ notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
+ call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
+ call_netdevice_notifiers net/core/dev.c:2046 [inline]
+ dev_change_tx_queue_len+0x158/0x2a0 net/core/dev.c:9024
+ do_setlink+0xff6/0x41f0 net/core/rtnetlink.c:2923
+ rtnl_setlink+0x40d/0x5a0 net/core/rtnetlink.c:3201
+ rtnetlink_rcv_msg+0x73f/0xcf0 net/core/rtnetlink.c:6647
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
+
+Fixes: ff4e538c8c3e ("page_pool: add a lockdep check for recycling in hardirq")
+Reported-by: syzbot+f56a5c5eac2b28439810@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/671e10df.050a0220.2b8c0f.01cf.GAE@google.com/T/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/net/tap.c         |  6 +++---
+ drivers/net/tun.c         |  6 +++---
+ include/linux/ptr_ring.h  | 21 ++++++++++-----------
+ include/linux/skb_array.h | 17 +++++++++--------
+ net/sched/sch_generic.c   |  4 ++--
+ 5 files changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+index 5aa41d5f7765a6dcf185bccd3cba2299bad89398..5ca6ecf0ce5fbce6777b47d9906586b07f1b690a 100644
+--- a/drivers/net/tap.c
++++ b/drivers/net/tap.c
+@@ -1329,9 +1329,9 @@ int tap_queue_resize(struct tap_dev *tap)
+ 	list_for_each_entry(q, &tap->queue_list, next)
+ 		rings[i++] = &q->ring;
+ 
+-	ret = ptr_ring_resize_multiple(rings, n,
+-				       dev->tx_queue_len, GFP_KERNEL,
+-				       __skb_array_destroy_skb);
++	ret = ptr_ring_resize_multiple_bh(rings, n,
++					  dev->tx_queue_len, GFP_KERNEL,
++					  __skb_array_destroy_skb);
+ 
+ 	kfree(rings);
+ 	return ret;
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 8e94df88392c68c0585c26dd7d4fc6928062ec2b..41e3eeac06fdc7d4b7cd029a60dc2acc7e447c4a 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -3701,9 +3701,9 @@ static int tun_queue_resize(struct tun_struct *tun)
+ 	list_for_each_entry(tfile, &tun->disabled, next)
+ 		rings[i++] = &tfile->tx_ring;
+ 
+-	ret = ptr_ring_resize_multiple(rings, n,
+-				       dev->tx_queue_len, GFP_KERNEL,
+-				       tun_ptr_free);
++	ret = ptr_ring_resize_multiple_bh(rings, n,
++					  dev->tx_queue_len, GFP_KERNEL,
++					  tun_ptr_free);
+ 
+ 	kfree(rings);
+ 	return ret;
+diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+index fd037c127bb0713bdccbb0698738e42ef8017641..551329220e4f34c9cc1def216ed91eff8b041a7b 100644
+--- a/include/linux/ptr_ring.h
++++ b/include/linux/ptr_ring.h
+@@ -615,15 +615,14 @@ static inline int ptr_ring_resize_noprof(struct ptr_ring *r, int size, gfp_t gfp
+ /*
+  * Note: producer lock is nested within consumer lock, so if you
+  * resize you must make sure all uses nest correctly.
+- * In particular if you consume ring in interrupt or BH context, you must
+- * disable interrupts/BH when doing so.
++ * In particular if you consume ring in BH context, you must
++ * disable BH when doing so.
+  */
+-static inline int ptr_ring_resize_multiple_noprof(struct ptr_ring **rings,
+-						  unsigned int nrings,
+-						  int size,
+-						  gfp_t gfp, void (*destroy)(void *))
++static inline int ptr_ring_resize_multiple_bh_noprof(struct ptr_ring **rings,
++						     unsigned int nrings,
++						     int size, gfp_t gfp,
++						     void (*destroy)(void *))
+ {
+-	unsigned long flags;
+ 	void ***queues;
+ 	int i;
+ 
+@@ -638,12 +637,12 @@ static inline int ptr_ring_resize_multiple_noprof(struct ptr_ring **rings,
+ 	}
+ 
+ 	for (i = 0; i < nrings; ++i) {
+-		spin_lock_irqsave(&(rings[i])->consumer_lock, flags);
++		spin_lock_bh(&(rings[i])->consumer_lock);
+ 		spin_lock(&(rings[i])->producer_lock);
+ 		queues[i] = __ptr_ring_swap_queue(rings[i], queues[i],
+ 						  size, gfp, destroy);
+ 		spin_unlock(&(rings[i])->producer_lock);
+-		spin_unlock_irqrestore(&(rings[i])->consumer_lock, flags);
++		spin_unlock_bh(&(rings[i])->consumer_lock);
+ 	}
+ 
+ 	for (i = 0; i < nrings; ++i)
+@@ -662,8 +661,8 @@ static inline int ptr_ring_resize_multiple_noprof(struct ptr_ring **rings,
+ noqueues:
+ 	return -ENOMEM;
+ }
+-#define ptr_ring_resize_multiple(...) \
+-		alloc_hooks(ptr_ring_resize_multiple_noprof(__VA_ARGS__))
++#define ptr_ring_resize_multiple_bh(...) \
++		alloc_hooks(ptr_ring_resize_multiple_bh_noprof(__VA_ARGS__))
+ 
+ static inline void ptr_ring_cleanup(struct ptr_ring *r, void (*destroy)(void *))
+ {
+diff --git a/include/linux/skb_array.h b/include/linux/skb_array.h
+index 926496c9cc9c3b64c6b2d942524d91192e423da2..bf178238a3083d4f56b7386d12e06bc2f0b929fa 100644
+--- a/include/linux/skb_array.h
++++ b/include/linux/skb_array.h
+@@ -199,17 +199,18 @@ static inline int skb_array_resize(struct skb_array *a, int size, gfp_t gfp)
+ 	return ptr_ring_resize(&a->ring, size, gfp, __skb_array_destroy_skb);
+ }
+ 
+-static inline int skb_array_resize_multiple_noprof(struct skb_array **rings,
+-						   int nrings, unsigned int size,
+-						   gfp_t gfp)
++static inline int skb_array_resize_multiple_bh_noprof(struct skb_array **rings,
++						      int nrings,
++						      unsigned int size,
++						      gfp_t gfp)
+ {
+ 	BUILD_BUG_ON(offsetof(struct skb_array, ring));
+-	return ptr_ring_resize_multiple_noprof((struct ptr_ring **)rings,
+-					       nrings, size, gfp,
+-					       __skb_array_destroy_skb);
++	return ptr_ring_resize_multiple_bh_noprof((struct ptr_ring **)rings,
++					          nrings, size, gfp,
++					          __skb_array_destroy_skb);
+ }
+-#define skb_array_resize_multiple(...)	\
+-		alloc_hooks(skb_array_resize_multiple_noprof(__VA_ARGS__))
++#define skb_array_resize_multiple_bh(...)	\
++		alloc_hooks(skb_array_resize_multiple_bh_noprof(__VA_ARGS__))
+ 
+ static inline void skb_array_cleanup(struct skb_array *a)
+ {
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 38ec18f73de43aed565c653fffb838f54e7c824b..8874ae6680952a0531cc5175e1de8510e55914ea 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -911,8 +911,8 @@ static int pfifo_fast_change_tx_queue_len(struct Qdisc *sch,
+ 		bands[prio] = q;
+ 	}
+ 
+-	return skb_array_resize_multiple(bands, PFIFO_FAST_BANDS, new_len,
+-					 GFP_KERNEL);
++	return skb_array_resize_multiple_bh(bands, PFIFO_FAST_BANDS, new_len,
++					    GFP_KERNEL);
+ }
+ 
+ struct Qdisc_ops pfifo_fast_ops __read_mostly = {
+-- 
+2.47.1.613.gc27f4b7a9f-goog
+
 
