@@ -1,155 +1,190 @@
-Return-Path: <netdev+bounces-152448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 324AC9F3FE2
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:18:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D1919F3FE6
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 157EA1891DC0
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 01:18:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F3147A1AB1
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 01:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33BD1531D5;
-	Tue, 17 Dec 2024 01:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE83D38DD1;
+	Tue, 17 Dec 2024 01:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="WmG2Exwe"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6788313AA31;
-	Tue, 17 Dec 2024 01:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19463F9D9
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 01:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734398158; cv=none; b=p2ZngO71hG9EUkvsF+Wh2eCyFNSPwApcubMXU2ELijdgxi/qF6GqJeLr6c44tHFnAkuFu4+adJAh6u3RZ81eFFJZO2ZUSPPGk147cPxdCF+KgYUK8T0JL71kKHpf3d/Q41VqoRt5HpC/eYjMGnrv77Ikfa7ltHMAEl9ZIl/WDnI=
+	t=1734398600; cv=none; b=BFB1DLFsFEd+zCMz+v48A5jOTFkcTzEKoYEsjFUxFgnOWfT+9mQqXf7ojkpO4ZatcjTmsa2LiV/QwWqP5IqPoSe7VCUgFSezqGlUuO291nHfkCXI+xBpu3n7fxnNnTFxRAVXTt9wPw93Bh1OlzesAF2xuVvWRhfLrhUY9GLnpG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734398158; c=relaxed/simple;
-	bh=/FKUNwlWL1WGvcVYL2yNYLeoSAN3ms20kJ7TRd3Uo94=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SdCXvcrHeNGdLcP8XKM9lovlk3e55Qjqt7Vx3tOQnCC5VGYNNw345gyXFzbwzY7ElCXVkSlDWWJNQSkEVn1Kyd2/aeCEsMUWnBI6Nx0Buru77ZTkAXdifIDagdzUTlDcHJQgLa+Wuh7RPSZXJWhMk6MH3QzCBvWvZ37VkZpE9tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4YBzNW0G6tzRjMw;
-	Tue, 17 Dec 2024 09:14:03 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2A7191802D4;
-	Tue, 17 Dec 2024 09:15:54 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 17 Dec 2024 09:15:53 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH RESEND V2 net 7/7] net: hns3: fix kernel crash when 1588 is sent on HIP08 devices
-Date: Tue, 17 Dec 2024 09:08:39 +0800
-Message-ID: <20241217010839.1742227-8-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20241217010839.1742227-1-shaojijie@huawei.com>
-References: <20241217010839.1742227-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1734398600; c=relaxed/simple;
+	bh=ANwxoYOx6LaHFFptWf3DC5ruCF6lhH1vDaf1fvdE1e4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XAuZFaKXvRRIbSZz1suIBZhsJ7Xw3FvQa+7B1/4bWIwKDbFtFtJ7T3b3s94s3xK7XPHVNWo286y/SWV/sF5ARhUyrir5O05W+HQfd8hASxPl2zJ+GJ7nQppQ2uX6vHnrgoyaWQXBbBv8o4Y7txtGrRJ6FRfnIcisUH5RioDP49k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=WmG2Exwe; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 9EB003F7FE
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 01:23:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1734398595;
+	bh=e4oykdNzqp3U/ysHZwf9sZj7W3/zqo027MCN1jhVxxc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:In-Reply-To;
+	b=WmG2ExweBeYc9j4q8ntu/6PTbphV0nK5EgQsO2fvMBX7u8E0fiyvTDOFsJtGAVon9
+	 3pY15wlPq2wcmLwm2uTzxtM3zngF2DNZXujFc3+ceP/eqpQqHaEnE6v5lJL4JILNrU
+	 DKeEJIFzb145enIaXV3v38bBf3m3cw/tkR2jHTTAXcRnmJRUUvRabrn54VXZasmhjL
+	 5x5rttLxctNPxKMym08B9xQU7NCBd17Tw2E84JILTDtC3ZBbN5IRaZo6+WWPambvBA
+	 nE9zjDe6dVcclIqbvhszejXlSVwslCIxV53NK3wtlH2Bsud/PoJxh8oYueoO8OGMpy
+	 e0xBVxOas8CDg==
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b35758d690so852418085a.1
+        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 17:23:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734398594; x=1735003394;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e4oykdNzqp3U/ysHZwf9sZj7W3/zqo027MCN1jhVxxc=;
+        b=PYjRcNgQOS7HeJyNNhhimh5elHU77xm1zwk+HKzewkMBpJWVUGxgKyFS1bQgFVi7re
+         SJPtCQ1yTXBQOv/9tyzREZEX2VwHyaeSXJTHDEo7hoJ6GjGgRuiupHHwxUUEcVXU4Eru
+         vvCmNTd4AobFMopL8z8q5O2vG4F5PuNjuggU6kWflfjpcqLSV+5nBCtswAOabaiHAfYt
+         AvgHA48hrzSW3Qg7c4oosHQsx+iTuKq4AdT0OfZPE/ar9JyaSV7tLglJVXlJgpSrJ38T
+         BY1gMVzGHbUVJoTid2vn09WJ/JcqrhNTxFCVVQo+tCT/2qrfeC3iOJ3n9z+krVHSBwNl
+         tTQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWU+j97PplwmUFI4yx4UQfPfeuqZ0e6rnHk3YTMudB4GEXy5wt5qiVWCInxvodpyRqB1VEBY9s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywak568d0sG0si2a3hyn0vqXz9tR4A0x8nUkK0ye2e8GnftC1Wk
+	bqUHM8CP+w1dhknzSfjTE7euitbOiKftbtw30tPmuY6hzosonRVflk3YyQasilw9HvpgFE6RnIV
+	z5U+baKT2V1yj3z6iep0HKikzG6V/2DyXYeMaljaFTzy2YpfEohcDZ+9d8CP8eKfGCs+w6A==
+X-Gm-Gg: ASbGncsuBy2EdLDY+xdhEHIKW1ukJn7QrhUZWZZx4Nzmp6LV0muKn3KCDsVySIoRk4a
+	HzqS38HT5VOomIGB4tzBhpVmCvOQBEfovnEs25dALbwAh1NH+s02vM5wMVDb8NDLWuf5imWB7eP
+	x0BrCseddccsJXrj6MhnohlHOuOtvnUuN08srI3FqyT/WUjW76YUiSWrWyb2n+aKDaDObePZKHF
+	Z74bTJAakufysQaxGRHYa46gv4lcPDOxF0ZZj7mox8pgwFZmJHIsSVu8OGOXiOF9eLxN6QGG2/L
+	OZFl24h6zlUljzf8pH8MowLszU/WCtz1hjs=
+X-Received: by 2002:a05:620a:2945:b0:7b6:cc37:cbf1 with SMTP id af79cd13be357-7b8594a4703mr224591185a.23.1734398594460;
+        Mon, 16 Dec 2024 17:23:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJTAJ9XJb5Czh3X9+Wfy9QchOyDmnenuxFZ///v6qAtwPn/ytbeNIDSbXJAtA5rR8LFoKaYQ==
+X-Received: by 2002:a05:620a:2945:b0:7b6:cc37:cbf1 with SMTP id af79cd13be357-7b8594a4703mr224588485a.23.1734398594162;
+        Mon, 16 Dec 2024 17:23:14 -0800 (PST)
+Received: from acelan-precision5470 (211-75-139-220.hinet-ip.hinet.net. [211.75.139.220])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b7048c9f62sm274358485a.111.2024.12.16.17.23.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Dec 2024 17:23:12 -0800 (PST)
+Date: Tue, 17 Dec 2024 09:23:05 +0800
+From: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Vitaly Lifshits <vitaly.lifshits@intel.com>
+Subject: Re: [PATCH] igc: Return early when failing to read EECD register
+Message-ID: <o6u6fr4znqfcznzq47jlqojdf34vdhardfypw3kl5y76pxjk6n@cxcp2mlsv62k>
+Mail-Followup-To: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Vitaly Lifshits <vitaly.lifshits@intel.com>
+References: <20241216051430.1606770-1-acelan.kao@canonical.com>
+ <a1c44976-9e88-4d58-bad8-34fd397ba626@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a1c44976-9e88-4d58-bad8-34fd397ba626@intel.com>
 
-From: Jie Wang <wangjie125@huawei.com>
+On Mon, Dec 16, 2024 at 06:53:10AM +0100, Przemek Kitszel wrote:
+> On 12/16/24 06:14, Chia-Lin Kao (AceLan) wrote:
+> > When booting with a dock connected, the igc driver can get stuck for ~40
+> > seconds if PCIe link is lost during initialization.
+> > 
+> > This happens because the driver access device after EECD register reads
+> > return all F's, indicating failed reads. Consequently, hw->hw_addr is set
+> > to NULL, which impacts subsequent rd32() reads. This leads to the driver
+> > hanging in igc_get_hw_semaphore_i225(), as the invalid hw->hw_addr
+> > prevents retrieving the expected value.
+> 
+> Than you very much for the patch and the analysis!
+> 
+> > 
+> > To address this, a validation check is added for the EECD register read
+> > result. If all F's are returned, indicating PCIe link loss, the driver
+> > will return -ENXIO immediately. This avoids the 40-second hang and
+> 
+> It is not clear from the patch what part of the driver will return
+> -ENXIO, you have put -ENODEV in the patch, but it's ignored anyway.
+I was thinking of using -ENODEV or -ENXIO, and I forgot to generate
+the patch again after I changed it to -ENXIO in the commit message.
+I'll fix this in v2.
+> 
+> > significantly improves boot time when using a dock with an igc NIC.
+> > 
+> > [    0.911913] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> > [    0.912386] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> > [    1.571098] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCIe link lost, device now detached
+> > [   43.449095] igc_get_hw_semaphore_i225: igc 0000:70:00.0 (unnamed net_device) (uninitialized): Driver can't access device - SMBI bit is set.
+> > [   43.449186] igc 0000:70:00.0: probe with driver igc failed with error -13
+> > [   46.345701] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> > [   46.345777] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> > 
+> 
+> Would be best if you could also attach the sequence after your fix.
+Sure
 
-Currently, HIP08 devices does not register the ptp devices, so the
-hdev->ptp is NULL. But the tx process would still try to set hardware time
-stamp info with SKBTX_HW_TSTAMP flag and cause a kernel crash.
+> Please add a Fixes: tag.
+I'm not sure which commit should I add Fixes to.
 
-[  128.087798] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000018
-...
-[  128.280251] pc : hclge_ptp_set_tx_info+0x2c/0x140 [hclge]
-[  128.286600] lr : hclge_ptp_set_tx_info+0x20/0x140 [hclge]
-[  128.292938] sp : ffff800059b93140
-[  128.297200] x29: ffff800059b93140 x28: 0000000000003280
-[  128.303455] x27: ffff800020d48280 x26: ffff0cb9dc814080
-[  128.309715] x25: ffff0cb9cde93fa0 x24: 0000000000000001
-[  128.315969] x23: 0000000000000000 x22: 0000000000000194
-[  128.322219] x21: ffff0cd94f986000 x20: 0000000000000000
-[  128.328462] x19: ffff0cb9d2a166c0 x18: 0000000000000000
-[  128.334698] x17: 0000000000000000 x16: ffffcf1fc523ed24
-[  128.340934] x15: 0000ffffd530a518 x14: 0000000000000000
-[  128.347162] x13: ffff0cd6bdb31310 x12: 0000000000000368
-[  128.353388] x11: ffff0cb9cfbc7070 x10: ffff2cf55dd11e02
-[  128.359606] x9 : ffffcf1f85a212b4 x8 : ffff0cd7cf27dab0
-[  128.365831] x7 : 0000000000000a20 x6 : ffff0cd7cf27d000
-[  128.372040] x5 : 0000000000000000 x4 : 000000000000ffff
-[  128.378243] x3 : 0000000000000400 x2 : ffffcf1f85a21294
-[  128.384437] x1 : ffff0cb9db520080 x0 : ffff0cb9db500080
-[  128.390626] Call trace:
-[  128.393964]  hclge_ptp_set_tx_info+0x2c/0x140 [hclge]
-[  128.399893]  hns3_nic_net_xmit+0x39c/0x4c4 [hns3]
-[  128.405468]  xmit_one.constprop.0+0xc4/0x200
-[  128.410600]  dev_hard_start_xmit+0x54/0xf0
-[  128.415556]  sch_direct_xmit+0xe8/0x634
-[  128.420246]  __dev_queue_xmit+0x224/0xc70
-[  128.425101]  dev_queue_xmit+0x1c/0x40
-[  128.429608]  ovs_vport_send+0xac/0x1a0 [openvswitch]
-[  128.435409]  do_output+0x60/0x17c [openvswitch]
-[  128.440770]  do_execute_actions+0x898/0x8c4 [openvswitch]
-[  128.446993]  ovs_execute_actions+0x64/0xf0 [openvswitch]
-[  128.453129]  ovs_dp_process_packet+0xa0/0x224 [openvswitch]
-[  128.459530]  ovs_vport_receive+0x7c/0xfc [openvswitch]
-[  128.465497]  internal_dev_xmit+0x34/0xb0 [openvswitch]
-[  128.471460]  xmit_one.constprop.0+0xc4/0x200
-[  128.476561]  dev_hard_start_xmit+0x54/0xf0
-[  128.481489]  __dev_queue_xmit+0x968/0xc70
-[  128.486330]  dev_queue_xmit+0x1c/0x40
-[  128.490856]  ip_finish_output2+0x250/0x570
-[  128.495810]  __ip_finish_output+0x170/0x1e0
-[  128.500832]  ip_finish_output+0x3c/0xf0
-[  128.505504]  ip_output+0xbc/0x160
-[  128.509654]  ip_send_skb+0x58/0xd4
-[  128.513892]  udp_send_skb+0x12c/0x354
-[  128.518387]  udp_sendmsg+0x7a8/0x9c0
-[  128.522793]  inet_sendmsg+0x4c/0x8c
-[  128.527116]  __sock_sendmsg+0x48/0x80
-[  128.531609]  __sys_sendto+0x124/0x164
-[  128.536099]  __arm64_sys_sendto+0x30/0x5c
-[  128.540935]  invoke_syscall+0x50/0x130
-[  128.545508]  el0_svc_common.constprop.0+0x10c/0x124
-[  128.551205]  do_el0_svc+0x34/0xdc
-[  128.555347]  el0_svc+0x20/0x30
-[  128.559227]  el0_sync_handler+0xb8/0xc0
-[  128.563883]  el0_sync+0x160/0x180
+> Please make [PATCH iwl-net] as a subject prefix. Please CC Vitaly.
+igc is an ethernet driver, should I also add iwl-net tag?
 
-Fixes: 0bf5eb788512 ("net: hns3: add support for PTP")
-Signed-off-by: Jie Wang <wangjie125@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c | 3 +++
- 1 file changed, 3 insertions(+)
+> (But please also wait a day prior to sending v2 for more feedback).
+> 
+> > Signed-off-by: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+> > ---
+> >   drivers/net/ethernet/intel/igc/igc_base.c | 4 ++++
+> >   1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
+> > index 9fae8bdec2a7..54ce60280765 100644
+> > --- a/drivers/net/ethernet/intel/igc/igc_base.c
+> > +++ b/drivers/net/ethernet/intel/igc/igc_base.c
+> > @@ -68,6 +68,10 @@ static s32 igc_init_nvm_params_base(struct igc_hw *hw)
+> 
+> This function is used only in igc_get_invariants_base(), which ignores
+> the return value you have added. I would expect it to propagate instead.
+You are right, looks like the patch fixes the issue accidentally.
+Return earlier in igc_get_invariants_base() skipping the rest of the
+settings. The part impacts the behavior is nvm->word_size will be 0.
+And then in igc_get_hw_semaphore_i225() the timeout value will become
+1. So that we won't hang for 40 seconds to wait for the timeout.
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-index 5505caea88e9..bab16c2191b2 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-@@ -58,6 +58,9 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb)
- 	struct hclge_dev *hdev = vport->back;
- 	struct hclge_ptp *ptp = hdev->ptp;
- 
-+	if (!ptp)
-+		return false;
-+
- 	if (!test_bit(HCLGE_PTP_FLAG_TX_EN, &ptp->flags) ||
- 	    test_and_set_bit(HCLGE_STATE_PTP_TX_HANDLING, &hdev->state)) {
- 		ptp->tx_skipped++;
--- 
-2.33.0
-
+This patch is not perfect, I need to figure out another way to address
+the issue better.
+Please let me know if you got any ideas.
+Thanks.
+> 
+> >   	u32 eecd = rd32(IGC_EECD);
+> >   	u16 size;
+> > +	/* failed to read reg and got all F's */
+> > +	if (!(~eecd))
+> > +		return -ENODEV;
+> > +
+> >   	size = FIELD_GET(IGC_EECD_SIZE_EX_MASK, eecd);
+> >   	/* Added to a constant, "size" becomes the left-shift value
+> 
 
