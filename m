@@ -1,105 +1,84 @@
-Return-Path: <netdev+bounces-152622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F28DE9F4EB2
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 16:01:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CD8A9F4EA7
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 15:59:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EA931894170
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:58:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84730162686
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3A51F758A;
-	Tue, 17 Dec 2024 14:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A031F706C;
+	Tue, 17 Dec 2024 14:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0bIniH/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KaoKgXA3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261E91F3D55;
-	Tue, 17 Dec 2024 14:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FF71F6692
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 14:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734447356; cv=none; b=k0V2A0B9/bExXQF09pLMLPtyBOheq57Kw0zYl115fEp3iv2q3zWb/mR1ttnIdpXglhS5xUweDc+3Me2NrU2R6DOe3JtfIriyF8n/ON1zFOSkX9VT0jTjaZ8LEsLc7mlpJeASCd1ock0H1Q2FkXmyZ6bmrPRiOkVpuxxgqG0Md9U=
+	t=1734447504; cv=none; b=HksDGenqViN+4huCkc4d6kllTtIwQsIx8dshNuwsN4tFwTqzmXudTPDEkL3Rnb3u8yhKEpa/BgPnhHkrQt+4pZmr6n5gzdx3wmBGCwcb7IVMVDUPNTLkBy+ah9x0rz208zJ8bl8xJpZp9OmvMEmidI6FDtOLUbKdsIpHQrlFiUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734447356; c=relaxed/simple;
-	bh=kn0QEklhu4DlNWlEmwaB2mgPMFaePNYpED7/K5qStjI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a76NCY0psSP1asn9uYTvKF2Eqghd6AUJQcU7/7KAk1kO6CtLB/c4PKGJBFmtWERWHEc2MpbvYxY4OCgRcLtwyf9q4DNZG6z/gWnBBWd9fa7wfF8+QOjO5DQFWAoreTLsGC4ghwXd98vrAe2MqBmNLdvP/7AqydDFVz5cpgK35kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0bIniH/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB297C4CED3;
-	Tue, 17 Dec 2024 14:55:54 +0000 (UTC)
+	s=arc-20240116; t=1734447504; c=relaxed/simple;
+	bh=9iEWd3LtyX857/4KLuicuyCbZS7FwsyoYdbVhruq8I0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NWTtMfzT+NQmWh/rknvXkA+N01B/HZzHG16mO6otIB5hy2jK+H5nN91qFxFKA1ozT0xbkSak1ShgJUMVtw4jBGI92lcPdeW5mO59bVZJrrxGyAmsMOjfZEvC4o9+QCSGNBamQ7pwljoC7ALr98SgKgFphGP+gSSvrIS6bPkBi/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KaoKgXA3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C25BC4CED3;
+	Tue, 17 Dec 2024 14:58:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734447356;
-	bh=kn0QEklhu4DlNWlEmwaB2mgPMFaePNYpED7/K5qStjI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L0bIniH/dUhmNJi6+1W2iKhEHFHeE/yOosauVw9/cGJnFoaCRJkpJy0lDSXnmX4Vd
-	 +P5NZSe3iWZI6RNXBDJ0bhjxuCj9+A3WM6A9qW86Tjhe4dWoMcljsH8/kGjzDLhiZh
-	 FUYe12bPalgLSxL2oD8Z9e5VCB0Exvp5NWHYxleGXdq7BJLsepXl3WOehWomKtuU0E
-	 0StRdB+6FXFxS/DpuUmVCWuGyiGLOlh6os6eCp8UfEiQnaIfdnQYQwM13pcDaF96jQ
-	 fI2rAS0bpezXGYIcdQAB8LAxGA+60BLKC/LtXly0rFEUOPzXw78plOYxFf/jj3PdAB
-	 qLF+L+UAgQcnA==
-From: cel@kernel.org
-To: jlayton@kernel.org,
-	neilb@suse.de,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Yang Erkun <yangerkun@huaweicloud.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	yangerkun@huawei.com,
-	yi.zhang@huawei.com
-Subject: Re: [RFC PATCH 0/5] nfsd/sunrpc: cleanup resource with sync mode
-Date: Tue, 17 Dec 2024 09:55:51 -0500
-Message-ID: <173444730015.11407.7732863315759421903.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241216142156.4133267-1-yangerkun@huaweicloud.com>
-References: <20241216142156.4133267-1-yangerkun@huaweicloud.com>
+	s=k20201202; t=1734447503;
+	bh=9iEWd3LtyX857/4KLuicuyCbZS7FwsyoYdbVhruq8I0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KaoKgXA3tsHJUPmucI3dN7acq8p4VRFBnH5gFVdYUsqwyYGfWyCHlEItyf6M7JIXc
+	 U3XxZHl8L7K/BnJ9/mcc1MKoRjsiQ9wqImHFYNqN9msR45HoRmvVdmD4pqXfFzUG1V
+	 Sn+4OiLnMX6vGivr5vqM9xBcc4JDzMoaAp8lk//mqia0cfpLIJ80JT4aILQXqbkYmE
+	 LNtWU8DRiwYqBs/KEFan3Hm+6zzcJpilBKGJC7gXjTsGYpATy/W/sb7eU5eDQ0P3h/
+	 e1cBk9MdN58oB0Zc1/CB1Ik/+lQHiK45Ureb3FPkT7Dkx+erg4EBSdDgm1xCTi8SAO
+	 905+L7xfMFA9Q==
+Date: Tue, 17 Dec 2024 06:58:22 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, rongwei liu
+ <rongweil@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Leon Romanovsky
+ <leonro@nvidia.com>, netdev@vger.kernel.org, Saeed Mahameed
+ <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net-next 02/12] net/mlx5: LAG, Refactor lag logic
+Message-ID: <20241217065822.4243007f@kernel.org>
+In-Reply-To: <624f1c54-8bfe-4031-9614-79c4998a8d78@nvidia.com>
+References: <20241211134223.389616-1-tariqt@nvidia.com>
+	<20241211134223.389616-3-tariqt@nvidia.com>
+	<93a38917-954c-48bb-a637-011533649ed1@intel.com>
+	<981b2b0f-9c35-4968-a5e8-dd0d36ebec05@nvidia.com>
+	<abfe7b20-61d7-4b5f-908c-170697429900@intel.com>
+	<624f1c54-8bfe-4031-9614-79c4998a8d78@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=803; i=chuck.lever@oracle.com; h=from:subject:message-id; bh=bCpsI78rnO1daEnMZ/gkQy9wK8/UsEBtF3olU6NP0s0=; b=owEBbQKS/ZANAwAIATNqszNvZn+XAcsmYgBnYZD4tzBPXPGa+ATOlwlWuO2Sj5kVZQgZrhLvq cyx5nkAg7CJAjMEAAEIAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCZ2GQ+AAKCRAzarMzb2Z/ lywUD/oD2XN1mmhgg0n2tgpnSZS+ETc6q9Pb6rII3F4NW5kUSXrvkLV0VjNDTOme55ejXw4OjYQ Spey+JT2ELUFH0fhJs2aIMsboXpysm8tFfOEOfps/pPI5vWx2RwsvBc8FC3mknVtt8rTLF7Z3hd qF5bejQAp5Q3V5y0MKqYAq4w19VKMMAjxJcsFBGryrL0d4eH2GmT+rXM4nyJn1FXlNTlii7+zBC hBrGPQBPZ2JkuBT7RmoRRnu7oHd+2zMk/Q53OEQQulOYkehSe8m4xw9ykpjtBbn7a21pH4RHiU3 KLJ9DKviMlh0v+9GgZHm94gDio+kO4TWGKJoUTX3A/G42jSOPxgbDj1HdfH2Zy3IBPzh5IMnaYg w1xFIaqVzK773Ks2G/8S8inN2gGiWJY/IDsF8uuUofAhdQ69JOgmBi4nvhYAFYlDHYksN4zP3Ai 1yDCQ/mb9ocNiXBxoIbsdbF8BwrTfoOq9QIXHlgPU30vFAr9D69iLkJpwMVhRcsgzK1coWvYt9a poRhhcKEpyLD8XJWbyTM6E+yPIBgxWZfvDsIIYUD1act+eDIlIfMdavOhNzSGp9nPgt5uMtd2Nw tzBwBKxQ85Ox+9Dx2GjgzGiggNsBhCpd3SY9F2C8IwvzQ5t+k6oQUXUysXdSXLpLIwL2NWBBcjS KaqBZeD
- B/86dP7w==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp; fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Chuck Lever <chuck.lever@oracle.com>
-
-On Mon, 16 Dec 2024 22:21:51 +0800, Yang Erkun wrote:
-> After f8c989a0c89a ("nfsd: release svc_expkey/svc_export with
-> rcu_work"), svc_export_put/expkey_put will call path_put with async
-> mode. This can lead some unexpected failure:
+On Tue, 17 Dec 2024 14:52:55 +0200 Mark Bloch wrote:
+> > All drivers must have its symbols prefixed, otherwise there might be
+> > name conflicts at anytime and also it's not clear where a definition
+> > comes from if it's not prefixed.
 > 
-> mkdir /mnt/sda
-> mkfs.xfs -f /dev/sda
-> echo "/ *(rw,no_root_squash,fsid=0)" > /etc/exports
-> echo "/mnt *(rw,no_root_squash,fsid=1)" >> /etc/exports
-> exportfs -ra
-> service nfs-server start
-> mount -t nfs -o vers=4.0 127.0.0.1:/mnt /mnt1
-> mount /dev/sda /mnt/sda
-> touch /mnt1/sda/file
-> exportfs -r
-> umount /mnt/sda # failed unexcepted
-> 
-> [...]
+> However, those aren't exported symbols, they are used exclusively by the mlx5 lag code.
+> I don't see any added value in prefixing internal functions with mlx5 unless it adds
+> context to the logic.
+> Here it's very clear we are going over the members that are stored inside the ldev struct.
 
-Applied to nfsd-fixes for v6.13, thanks!
-
-[1/5] nfsd: Revert "nfsd: release svc_expkey/svc_export with rcu_work"
-      commit: 69d803c40edeaf94089fbc8751c9b746cdc35044
-
---
-Chuck Lever
-
+Prefixing the symbols makes it easier to read your code for people 
+who aren't exclusively working on mlx5. Also useful when reading
+mlx5-originated stack traces.
 
