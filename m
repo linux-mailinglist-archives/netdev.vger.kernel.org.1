@@ -1,84 +1,125 @@
-Return-Path: <netdev+bounces-152655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05049F5106
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 17:30:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94C729F5117
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 17:33:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 138381643CD
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 16:30:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EFCE188BC00
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 16:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2071459FD;
-	Tue, 17 Dec 2024 16:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4D81F76AC;
+	Tue, 17 Dec 2024 16:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rz1flhZ4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q7H91zBU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DDE211C;
-	Tue, 17 Dec 2024 16:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046791F76A3;
+	Tue, 17 Dec 2024 16:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734453027; cv=none; b=iCAZLp2FVKk5zArrIoj6ON/LCqNqaOjlvG+1YbV8+edYVypbR2cOiKwDBqHUC8dZ8ZIi+ZWgzWyFkEDIjdcjSZ1pj1bYR6LuPaMLrU6apEU1ziHtC9X09GV8iyvzDmxD7Mkx62LHYz5I9ShTbXmCpUsp45Q4g54e+5ZG6+qBu7g=
+	t=1734453134; cv=none; b=bXyBhUoBwJ00fAHgKgfmZSR3JFPUyY05i4CpO8seiVlyoj8ns9YM2AgK63tX+x9hlbmnxoUjZVjKeQLJx2jbaGmeFOSoE1G6NUpjFrGvKiXkZfyrOxgzrlwEdBewuyluAYFbLYJGIEFUkVC1DH4wW6CZ0W/NOw4SPlb3k4PKIrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734453027; c=relaxed/simple;
-	bh=vd1jPB2m2SSZKX/64wtCnC0SCvhkIZ6+Iqpq4FcqM0s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fA/2XTDwdxU8fjPOnE1RwId5JfiNRqoz4qqZoL8xPuiPPArUthP+WMRv+Nl/gutt6eO1X6EQ4OfDU3pDHtty7Z3E3kweMMoQ1h/zVK22B7xiv8jUxNrebizQ8dj+Tef6B5vkhXq39EXUuNY225StX470dNUyl4Q/n5DW48ZgAVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rz1flhZ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA695C4CED3;
-	Tue, 17 Dec 2024 16:30:25 +0000 (UTC)
+	s=arc-20240116; t=1734453134; c=relaxed/simple;
+	bh=NXCDV/TEsO/tkTQikUC6ICuqE+1kO8I/+7YqK4yleGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=erUMYhawVllm5gQ+Dien4PishSXs6VkJUPNxxr6rVcNNnv9xux0WzgbBHuCVdFEkQfTVpB7wRc9dd2Jy4kUukb4gJpw0IXRmIxapTfkZDanAQ3I0CjNJ2wwRyqysNgVpaQBPyP2Ky7kpB5lGI6a6qk4qCloUyyBqzZQwIbIHjvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q7H91zBU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F382C4CED7;
+	Tue, 17 Dec 2024 16:32:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734453027;
-	bh=vd1jPB2m2SSZKX/64wtCnC0SCvhkIZ6+Iqpq4FcqM0s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rz1flhZ4QUeUrr9ECpsXfwmUjB65hOzcJWf1ddox87W7rfz4vriwFTJranxmHpjrE
-	 yQf1tbPG8kS0fvvbFnBwzu2jqyqf/09ahdwr0opqAPxTmL7DZPrxiuS9c1Hl/JNcnU
-	 IURbj6p906+3dJeqnxaJc5ltK8T2DC+mpEO4FaaP4YN2hChFUV4lhvXEnjPmslQcQy
-	 QOt6RquyKtKDGy6uASPTs1mf36pgat+0SFgeaoz6iWeoo/bj/9zNZjZnHsJuW+UJBZ
-	 jl5TPqoOPfKJ8npUO6OFFPZPnkus3QdW5S0xXLDU9GvI54M1QpbTtNe27683jmF0VB
-	 lkPDgqNfVbh7g==
-Date: Tue, 17 Dec 2024 08:30:24 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net,
- michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org,
- ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me,
- asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, kory.maincent@bootlin.com,
- maxime.chevallier@bootlin.com, danieller@nvidia.com,
- hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
- przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
- rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us,
- bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com,
- aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com,
- daniel.zahka@gmail.com
-Subject: Re: [PATCH net-next v5 0/7] bnxt_en: implement tcp-data-split and
- thresh option
-Message-ID: <20241217083024.6b743b74@kernel.org>
-In-Reply-To: <20241113173222.372128-1-ap420073@gmail.com>
-References: <20241113173222.372128-1-ap420073@gmail.com>
+	s=k20201202; t=1734453133;
+	bh=NXCDV/TEsO/tkTQikUC6ICuqE+1kO8I/+7YqK4yleGo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q7H91zBULR+20rclvPa6by87g7IVtdG+2/FlrROgeg91Ie3UJnr2sM4xQK6WrqROh
+	 U6KRzGEtwutUrNDY1WT2u4gWanxaiKJfdjzoC5q/maa2IX/NUo8pKmLxHAwPBnXhu0
+	 2fRlSj+5dPK9AS83Bymb+8roJ91Uh+AKxoC/jVzmW/rZRDc2IZjUxyxS2MaJqedrjf
+	 RaAqHwFUGs+N58HXbImJVR6oqjSIvUQ/HirIeqN2lsDphwnPNBSOur6agOagXML3FX
+	 fsexXvF4LY37kn9fyiY3oEaRCL5YCT2co1+eEuJJ89V6hU8YTnhxEFyS/3fLt3gANK
+	 /HN4EzmHlnWvA==
+Date: Tue, 17 Dec 2024 16:32:08 +0000
+From: Simon Horman <horms@kernel.org>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: dp83822: Add support for PHY LEDs on
+ DP83822
+Message-ID: <20241217163208.GT780307@kernel.org>
+References: <20241217-dp83822-leds-v1-1-800b24461013@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241217-dp83822-leds-v1-1-800b24461013@gmail.com>
 
-On Wed, 13 Nov 2024 17:32:14 +0000 Taehee Yoo wrote:
-> This series implements header-data-split-thresh ethtool command.
-> This series also implements backend of tcp-data-split and
-> header-data-split-thresh ethtool command for bnxt_en driver.
-> These ethtool commands are mandatory options for device memory TCP.
+On Tue, Dec 17, 2024 at 10:16:03AM +0100, Dimitri Fedrau wrote:
+> The DP83822 supports up to three configurable Light Emitting Diode (LED)
+> pins: LED_0, LED_1 (GPIO1), COL (GPIO2) and RX_D3 (GPIO3). Several
+> functions can be multiplexed onto the LEDs for different modes of
+> operation. LED_0 and COL (GPIO2) use the MLED function. MLED can be routed
+> to only one of these two pins at a time. Add minimal LED controller driver
+> supporting the most common uses with the 'netdev' trigger.
+> 
+> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
+> ---
+>  drivers/net/phy/dp83822.c | 271 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 269 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
 
-Hi Taehee! Any progress on this series?
-Being able to increase HDS threshold is highly beneficial for workloads
-sending small RPCs, it'd be great if the changes were part of v6.14.
+...
+
+> +static int dp83822_led_hw_control_set(struct phy_device *phydev, u8 index,
+> +				      unsigned long rules)
+> +{
+> +	int mode;
+> +
+> +	mode = dp83822_led_mode(index, rules);
+> +	if (mode < 0)
+> +		return mode;
+> +
+> +	if (index == DP83822_LED_INDEX_LED_0 || index == DP83822_LED_INDEX_COL_GPIO2)
+> +		return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
+> +				      MII_DP83822_MLEDCR, DP83822_MLEDCR_CFG,
+> +				      FIELD_PREP(DP83822_MLEDCR_CFG, mode));
+
+...
+
+> +}
+> +
+> +static int dp83822_led_hw_control_get(struct phy_device *phydev, u8 index,
+> +				      unsigned long *rules)
+> +{
+> +	int val;
+> +
+> +	if (index == DP83822_LED_INDEX_LED_0 || DP83822_LED_INDEX_COL_GPIO2) {
+
+Hi Dimitri,
+
+As per the condition near the top of dp83822_led_hw_control_set(), should
+this be:
+
+	if (index == DP83822_LED_INDEX_LED_0 ||
+	    index == DP83822_LED_INDEX_COL_GPIO2) {
+
+Flagged by W=1 + -Wno-error build with clang-19.
+
+ drivers/net/phy/dp83822.c:1029:39: note: use '|' for a bitwise operation
+  1029 |         if (index == DP83822_LED_INDEX_LED_0 || DP83822_LED_INDEX_COL_GPIO2) {
+       |                                              ^~
+       |
+
+...
 
