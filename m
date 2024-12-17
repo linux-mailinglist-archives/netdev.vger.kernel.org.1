@@ -1,128 +1,122 @@
-Return-Path: <netdev+bounces-152598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6E249F4C49
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:31:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 464EB9F4C4B
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:31:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4A45174576
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:22:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA3951743E9
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B441F428D;
-	Tue, 17 Dec 2024 13:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A621F1312;
+	Tue, 17 Dec 2024 13:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DxdZ2zbb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8dBlWzz"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE731F03E8;
-	Tue, 17 Dec 2024 13:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49DB1D1730;
+	Tue, 17 Dec 2024 13:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734441566; cv=none; b=HGy+1nmc11F7UojC8ikzkkjpkWHU8di3GoQ7Cns/gvJNmbpm9YfEJQSX+bfvhNiqrt4Tx0WOSablZMbQ1UaFn8Pe9TeJs/oEh2oFQTGyoPQZqxmtccUaGquFrFB1imcLd5jdmv18Doobjdbq/0nDnIsF2m8FpJ5X32w5APrZZvw=
+	t=1734441748; cv=none; b=u3oVng2v2kf+MccfJA5819nfC62doYFr3MXdI0vIW4NaKRFwPRnNqros4KWNVlpXzJcW0wW7TR67mZfvAvyk+PGxmW2xDa3/yrC6il9ZbJgf1xSnT2s+Iw6gI5duxAvtXph886PSFhShuMHE+EBFJ3ztiAdbpuLlnzj1mEch96o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734441566; c=relaxed/simple;
-	bh=A8fII84AFmjcafFwK5VTw+0G0huOuWv2dJPM8L5Hf0s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jhawIyPgzJF09x5QKNYum8KCwqKKbyJJMZlZKBr2uZhCOLMg2AVF7vn0yttOozcB8pW8rj5WlXwZcIluW8+jLX9TuJSo8BEvfMifOETwhfUjXWnAVExw/Lw+SUfu9QH6N44TOco9KiutKWDyeYXfpzIafTxmuYLWZ1ikkF9eGB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DxdZ2zbb; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1A297C000C;
-	Tue, 17 Dec 2024 13:19:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1734441556;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RUvAF8nNh95eCP+DJf/kow70CTWmtALCQZrGVyhyTco=;
-	b=DxdZ2zbbF9lT2rC9CkWB74l9vT5Dd/ap3ZVFqQhl+iuUntR7iTeWMeBIM9cgAynMsFp1QU
-	6jerE5mJBZ3SgAXJ4nh//VZbyCfDGhp5j0QBWFWWZThca7x9uOKfWL0sKzzUg/D4qEo+oo
-	VHci9RDcY7P08cW97PcYF+zzjjJATwEFYpMFojaWxvKf/Y2pkLGX3w4YB6vVy6XCyCp4GY
-	zcW6PTtzazInS0ktppzzY4Ui5RsjY8Un0rexPzG/pZ8PMBSiJCaI6xzVEOUj5SKz9vbTsE
-	xOMfvE1igIujLiMl5NHBzAsQ5IgUIt5/xMVqkt7nITzwNsxSzPOhs/qIqrHrow==
-Date: Tue, 17 Dec 2024 14:19:12 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
- <alexis.lothore@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 5/5] net: stmmac: use PCS supported_interfaces
-Message-ID: <20241217141912.34cdd5ae@fedora.home>
-In-Reply-To: <E1tMBRQ-006vat-7F@rmk-PC.armlinux.org.uk>
-References: <Z1yJQikqneoFNJT4@shell.armlinux.org.uk>
-	<E1tMBRQ-006vat-7F@rmk-PC.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1734441748; c=relaxed/simple;
+	bh=weqUtistC/j/aUBCf8HRH1GcWzJ9pgObt2tpCXoIBzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cIFTVin98KiLo/IBKfSRMU500kyFXM/0Da0mPUSjx8kzK+3IEecbveVofHWOYdLw/evdbVeTsowAdXcY25UI+CHGxvuAihjG0psKQ/slJT214YVx55oM0l4Nmqzlt4u1hVmQl9UqO8yGcJgfHPkkg+6+wM+ZU6kZslfJjiGD8Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8dBlWzz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8002DC4CED4;
+	Tue, 17 Dec 2024 13:22:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734441747;
+	bh=weqUtistC/j/aUBCf8HRH1GcWzJ9pgObt2tpCXoIBzs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C8dBlWzzU3fl8z0UBorZZGsKSLPdtKmczs5kfCDcNl7HzvRahSRsrJrdLkhU8rr+G
+	 Sup9OwsfraUjuVpFYpbxhyddIFsBZERbepnkHoCYcqEk2ZQUoCcW1eN/iY5NSGXt0O
+	 vC2zxxYN4wO+FRcCCrY4silnU3diePleRkMQsv4hKVLPcvL3bR+d8eaTLK/RQGPbP3
+	 qXklhF/Ztq2s838TVaSar5ZuXSsPAeDO7p88NplEZjbfGxggqVTcSD1PtbuzgLyK4G
+	 JjxpfBtFLBzB4uzrFOQ+g79fBJXN0d756ZAuRRjqBFh7JdcwP0JWug/t3yICfC3Sot
+	 d8eeG8oaozdUQ==
+Date: Tue, 17 Dec 2024 15:22:22 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>,
+	Aditya Prabhune <aprabhune@nvidia.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Arun Easi <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>,
+	Bert Kenward <bkenward@solarflare.com>,
+	Matt Carlson <mcarlson@broadcom.com>,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	Jean Delvare <jdelvare@suse.de>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: Re: [PATCH v3] PCI/sysfs: Change read permissions for VPD attributes
+Message-ID: <20241217132222.GK1245331@unreal>
+References: <18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org>
 
-Hi Russell,
-
-On Fri, 13 Dec 2024 19:35:12 +0000
-"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
-
-> Use the PCS' supported_interfaces member to build the MAC level
-> supported_interfaces bitmap.
+On Tue, Dec 03, 2024 at 02:15:28PM +0200, Leon Romanovsky wrote:
+> The Vital Product Data (VPD) attribute is not readable by regular
+> user without root permissions. Such restriction is not needed at
+> all for Mellanox devices, as data presented in that VPD is not
+> sensitive and access to the HW is safe and well tested.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> This change changes the permissions of the VPD attribute to be accessible
+> for read by all users for Mellanox devices, while write continue to be
+> restricted to root only.
+> 
+> The main use case is to remove need to have root/setuid permissions
+> while using monitoring library [1].
+> 
+> [leonro@vm ~]$ lspci |grep nox
+> 00:09.0 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
+> 
+> Before:
+> [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
+> -rw------- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
+> After:
+> [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
+> -rw-r--r-- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
+> 
+> [1] https://developer.nvidia.com/management-library-nvml
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 > ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index d45fd7a3acd5..0e45c4a48bb5 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -1206,6 +1206,7 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
->  	struct stmmac_mdio_bus_data *mdio_bus_data;
->  	int mode = priv->plat->phy_interface;
->  	struct fwnode_handle *fwnode;
-> +	struct phylink_pcs *pcs;
->  	struct phylink *phylink;
->  
->  	priv->phylink_config.dev = &priv->dev->dev;
-> @@ -1227,8 +1228,14 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
->  
->  	/* If we have an xpcs, it defines which PHY interfaces are supported. */
->  	if (priv->hw->xpcs)
-> -		xpcs_get_interfaces(priv->hw->xpcs,
-> -				    priv->phylink_config.supported_interfaces);
-> +		pcs = xpcs_to_phylink_pcs(priv->hw->xpcs);
-> +	else
-> +		pcs = priv->hw->phylink_pcs;
-> +
-> +	if (pcs)
-> +		phy_interface_or(priv->phylink_config.supported_interfaces,
-> +				 priv->phylink_config.supported_interfaces,
-> +				 pcs->supported_interfaces);
->  
->  	fwnode = priv->plat->port_node;
->  	if (!fwnode)
+> Changelog:
+> v3:
+>  * Used | to change file attributes
+>  * Remove WARN_ON
+> v2: https://lore.kernel.org/all/61a0fa74461c15edfae76222522fa445c28bec34.1731502431.git.leon@kernel.org
+>  * Another implementation to make sure that user is presented with
+>    correct permissions without need for driver intervention.
+> v1: https://lore.kernel.org/all/cover.1731005223.git.leonro@nvidia.com
+>  * Changed implementation from open-read-to-everyone to be opt-in
+>  * Removed stable and Fixes tags, as it seems like feature now.
+> v0:
+> https://lore.kernel.org/all/65791906154e3e5ea12ea49127cf7c707325ca56.1730102428.git.leonro@nvidia.com/
+> ---
+>  drivers/pci/vpd.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-I think that we could even make xpcs_get_interfaces a static
-non-exported function now :) But this can be done in a subsequent patch.
+Bjorn,
 
-Thanks for that work !
+Kind reminder.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
+Thanks
 
