@@ -1,93 +1,128 @@
-Return-Path: <netdev+bounces-152597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F13369F4C27
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:28:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6E249F4C49
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:31:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 127AD173BCC
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:21:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4A45174576
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570281F7088;
-	Tue, 17 Dec 2024 13:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B441F428D;
+	Tue, 17 Dec 2024 13:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWEmcPew"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DxdZ2zbb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299761F7081;
-	Tue, 17 Dec 2024 13:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE731F03E8;
+	Tue, 17 Dec 2024 13:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734441496; cv=none; b=hH2fVmh8sZ11NZ0u6CELE7S6opT3LrDfL6SEWI3DLI+Js9GmMQInsYuJjjA07+bUtr9ZTiGEnPi9t2ST1PeTTGR2QzFV203v0ZTJj6FJkMWn3OtGvsskNUFhIugPuGWUwatrKvjd+G9X9kKWLfRwImJk6wsi8voxCOVOxLrM3Ys=
+	t=1734441566; cv=none; b=HGy+1nmc11F7UojC8ikzkkjpkWHU8di3GoQ7Cns/gvJNmbpm9YfEJQSX+bfvhNiqrt4Tx0WOSablZMbQ1UaFn8Pe9TeJs/oEh2oFQTGyoPQZqxmtccUaGquFrFB1imcLd5jdmv18Doobjdbq/0nDnIsF2m8FpJ5X32w5APrZZvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734441496; c=relaxed/simple;
-	bh=LgYSlCVhxva3zcs7YV247UvMnT+OkZcHDucG48hT898=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kFqIAL06VF+X2eHNb6Dul0SALJxd/BXRmmQtnQKNRVDWO6kOR87pw4R/RNFqTdbknKrUNfFmGHECSfVYk35ttDjVX9uG0RKTFTSKXeWgaNjI1846q7J7kyTP8ctQbk4qsmouBJUsKyDUJ5vTJ5gxPx/a/azE/bPsphA/Ta7aOCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWEmcPew; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C2C0C4CED4;
-	Tue, 17 Dec 2024 13:18:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734441495;
-	bh=LgYSlCVhxva3zcs7YV247UvMnT+OkZcHDucG48hT898=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IWEmcPewXktwLgiuhox8ozlQsK/lIgxiVOtV807N931COsH5Lq9S3PcN28jLvTtVW
-	 RCNJfFqw+IiDt7NFzOM1ewhDwAwi+S6rD8g2mz1xw58FG4h/FCic+TSvlaZrxqZly6
-	 f1OniB/T5YSWbnaaJGaTNhV2TJArmrqN2pYE4mj+M5UPo20Ce45LH+s7KHoj68msog
-	 ZSK2g/ic+yoKlkMA6kQxPvtCuq/SLG8B4MT/KS0919fVbGx2W9hVHa4enD8dCeZtWn
-	 nK5G+EkJkQj3SgxKmvTmIMtzDyB2DNMIQ1n2iIOXOMdgA+AqRsADm9SjJw0Q3nrp/q
-	 L1pBQa4IlX7ng==
-Date: Tue, 17 Dec 2024 07:18:13 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Lee Jones <lee@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-mediatek@lists.infradead.org,
-	Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, upstream@airoha.com,
-	Matthias Brugger <matthias.bgg@gmail.com>
-Subject: Re: [net-next PATCH v11 1/9] dt-bindings: nvmem: Document support
- for Airoha AN8855 Switch EFUSE
-Message-ID: <173444149293.1330948.15339441958855664724.robh@kernel.org>
-References: <20241209134459.27110-1-ansuelsmth@gmail.com>
- <20241209134459.27110-2-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1734441566; c=relaxed/simple;
+	bh=A8fII84AFmjcafFwK5VTw+0G0huOuWv2dJPM8L5Hf0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jhawIyPgzJF09x5QKNYum8KCwqKKbyJJMZlZKBr2uZhCOLMg2AVF7vn0yttOozcB8pW8rj5WlXwZcIluW8+jLX9TuJSo8BEvfMifOETwhfUjXWnAVExw/Lw+SUfu9QH6N44TOco9KiutKWDyeYXfpzIafTxmuYLWZ1ikkF9eGB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DxdZ2zbb; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1A297C000C;
+	Tue, 17 Dec 2024 13:19:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1734441556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RUvAF8nNh95eCP+DJf/kow70CTWmtALCQZrGVyhyTco=;
+	b=DxdZ2zbbF9lT2rC9CkWB74l9vT5Dd/ap3ZVFqQhl+iuUntR7iTeWMeBIM9cgAynMsFp1QU
+	6jerE5mJBZ3SgAXJ4nh//VZbyCfDGhp5j0QBWFWWZThca7x9uOKfWL0sKzzUg/D4qEo+oo
+	VHci9RDcY7P08cW97PcYF+zzjjJATwEFYpMFojaWxvKf/Y2pkLGX3w4YB6vVy6XCyCp4GY
+	zcW6PTtzazInS0ktppzzY4Ui5RsjY8Un0rexPzG/pZ8PMBSiJCaI6xzVEOUj5SKz9vbTsE
+	xOMfvE1igIujLiMl5NHBzAsQ5IgUIt5/xMVqkt7nITzwNsxSzPOhs/qIqrHrow==
+Date: Tue, 17 Dec 2024 14:19:12 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
+ <alexis.lothore@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 5/5] net: stmmac: use PCS supported_interfaces
+Message-ID: <20241217141912.34cdd5ae@fedora.home>
+In-Reply-To: <E1tMBRQ-006vat-7F@rmk-PC.armlinux.org.uk>
+References: <Z1yJQikqneoFNJT4@shell.armlinux.org.uk>
+	<E1tMBRQ-006vat-7F@rmk-PC.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241209134459.27110-2-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hi Russell,
 
-On Mon, 09 Dec 2024 14:44:18 +0100, Christian Marangi wrote:
-> Document support for Airoha AN8855 Switch EFUSE used to calibrate
-> internal PHYs and store additional configuration info.
+On Fri, 13 Dec 2024 19:35:12 +0000
+"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
+
+> Use the PCS' supported_interfaces member to build the MAC level
+> supported_interfaces bitmap.
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
->  .../bindings/nvmem/airoha,an8855-efuse.yaml   | 123 ++++++++++++++++++
->  MAINTAINERS                                   |   8 ++
->  2 files changed, 131 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 > 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index d45fd7a3acd5..0e45c4a48bb5 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -1206,6 +1206,7 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+>  	struct stmmac_mdio_bus_data *mdio_bus_data;
+>  	int mode = priv->plat->phy_interface;
+>  	struct fwnode_handle *fwnode;
+> +	struct phylink_pcs *pcs;
+>  	struct phylink *phylink;
+>  
+>  	priv->phylink_config.dev = &priv->dev->dev;
+> @@ -1227,8 +1228,14 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+>  
+>  	/* If we have an xpcs, it defines which PHY interfaces are supported. */
+>  	if (priv->hw->xpcs)
+> -		xpcs_get_interfaces(priv->hw->xpcs,
+> -				    priv->phylink_config.supported_interfaces);
+> +		pcs = xpcs_to_phylink_pcs(priv->hw->xpcs);
+> +	else
+> +		pcs = priv->hw->phylink_pcs;
+> +
+> +	if (pcs)
+> +		phy_interface_or(priv->phylink_config.supported_interfaces,
+> +				 priv->phylink_config.supported_interfaces,
+> +				 pcs->supported_interfaces);
+>  
+>  	fwnode = priv->plat->port_node;
+>  	if (!fwnode)
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+I think that we could even make xpcs_get_interfaces a static
+non-exported function now :) But this can be done in a subsequent patch.
 
+Thanks for that work !
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
 
