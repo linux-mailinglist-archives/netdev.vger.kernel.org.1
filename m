@@ -1,153 +1,151 @@
-Return-Path: <netdev+bounces-152709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A219F5833
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 21:54:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F0AF9F586F
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECD8116E20C
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 20:53:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08DE8188911C
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 21:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9521B1F9ECD;
-	Tue, 17 Dec 2024 20:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5548F1FA15E;
+	Tue, 17 Dec 2024 21:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PN+5X7vl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmUw9iBE"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5E11D89EC;
-	Tue, 17 Dec 2024 20:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE76208CA
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 21:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734468808; cv=none; b=J6iIu0jP5BI8CPgWTJ9wGjMr0xqdNB+cff313scXxM0ONuMsxvJHghfw6k8BLr2A4WFpJDIGUcLAPgn3bmiDmilYYX+A4A3QwdB3E1oyb/w98C6Sfa5PWnVbCwt3WrnEkD/igj5qk83zJ6gkmXyjuQYzeDqXP0jn6ppHUVVrvSg=
+	t=1734469659; cv=none; b=lQW/DY29esaciEWhgXbtobZ5NGPq3dQmAN4fCrq8nv3HxntcjoThhqhRjA0DeP/dG2TpbYjhjchfsXaq5ym7BmD4o/sR9u5bzuXXyA4LaRntvWOWZ2ah/SbZkP1I4h14LcGg56oK9ereagOnRSYAmjN1S64/kcoTjQLp7FxW2lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734468808; c=relaxed/simple;
-	bh=AZ0CsLKt8J6l6W4VDxSftOcj1gfWEjTLXyKq8DV0roY=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=dwDQMpU6mk+Lo8KUOSSXsIzOLy2BKL0l6Wc83FApFCet/kF1R9z2jPo4po/j8cLEwuUqzuKojbuksb7KIOGpNU0a97g1NteXfdtoNSdHbsmJZJxqM6QI+zAbgVSCVQlUF+MEV/GIwXUn5gqKlofdjmdbhU5SqmO7Lj5x83aUlbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PN+5X7vl; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 313DC2171F96;
-	Tue, 17 Dec 2024 12:53:23 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 313DC2171F96
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1734468805;
-	bh=aVc5gziW3F5u0OxTruXlabKnVm24GGvTVYzcdDQRKKI=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=PN+5X7vl8fqADT/aII8zIGfk60UMtxJ9pR+EBirm4pXAa4JZO11zP4etUexy4ZsF1
-	 Hz5jBPkUY126l1G2C1Lf0cgYJmqJpx2Ac/wrr+Dl/I1W058j7FPkFRH8CsABxT6WHb
-	 +lq4b3CWgOR3ojB2J6CV+93O4Hyq14ifZiz9VEy4=
-Message-ID: <14ad0c08-7b3b-47b6-8cc1-8a4179238e5a@linux.microsoft.com>
-Date: Tue, 17 Dec 2024 12:53:22 -0800
+	s=arc-20240116; t=1734469659; c=relaxed/simple;
+	bh=9sUdCk3J2Rtd9ajWzP8R/ayZ93QxhWtrG0DQwm5u75c=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eg6qUdq0AOvVb6h+ATp0nVSkCBZO5+Gg4kPQQ7grgIy8DdyobvSEl/1NnBCnzPhbZbeaauEI0rxz45XqDT92mwu2l/VtvGW5m+B/YlZqspfIww6PAXER64fAF81X+bXSuXYH6rWK60GX3vn97+ZK3/Wmuk3g4LEbMlFhtpN+a+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rmUw9iBE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AD78BC4CED3;
+	Tue, 17 Dec 2024 21:07:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734469658;
+	bh=9sUdCk3J2Rtd9ajWzP8R/ayZ93QxhWtrG0DQwm5u75c=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=rmUw9iBEa2NkSJZjc3ddm1nYC/CJvh2MXi21M6G09IGBdPOs/uG5nZg23YuN+hWGu
+	 RozKUhip+xcWzrVSNOwQMY4q9etvTKpq34pqJAFsSyi2OvDadJL/S0ddKZbxZ6nC5f
+	 ck8mYKK6rswPe0LYqMIdkUASDhbeCXRSSD0EdTB4nw9xc5XrhSbW6j2TDgQY+wc97p
+	 jpBkhbpkPcTmspk6mHYPI8/mNbZULenn99Pjah5/sdhWGlqABz4jETqBvjrnDk7ctZ
+	 nCl/519honpMNzwFeQBCiiILgWfalDORrSvJOIHRl5xuGApaeQuxdPlKu4lYwqUtcP
+	 i4xnSmcZxIZ/Q==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2A0E7717F;
+	Tue, 17 Dec 2024 21:07:38 +0000 (UTC)
+From: Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org>
+Subject: [PATCH net-next v3 0/7] net: tn40xx: add support for AQR105 based
+ cards
+Date: Tue, 17 Dec 2024 22:07:31 +0100
+Message-Id: <20241217-tn9510-v3a-v3-0-4d5ef6f686e0@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
- Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
- Haojian Zhuang <haojian.zhuang@gmail.com>,
- Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
- <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
- Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
- <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
- Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
- Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Louis Peens <louis.peens@corigine.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
- Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Jeff Johnson <quic_jjohnson@quicinc.com>, paul@paul-moore.com
-Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
-To: Andrew Morton <akpm@linux-foundation.org>
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
- <20241210163520.95fa1c8aa83e1915004ed884@linux-foundation.org>
- <422470cd-84f0-469e-93c2-493c5091391d@linux.microsoft.com>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <422470cd-84f0-469e-93c2-493c5091391d@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABPoYWcC/x2MywqDMBAAf0X23IU8qmh/pXhY40b34FqSIIL47
+ 017HIaZCzIn4Qyv5oLEh2TZtYJ/NBBW0oVR5srgjHtaZzssOrTW4OEJXYjB9u3c9SZCDT6Jo5z
+ /2RuUCyqfBcZqJsqMUyIN62+2kSjc9xews51IfQAAAA==
+X-Change-ID: 20241216-tn9510-v3a-2cfc185d680f
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org, Hans-Frieder Vogt <hfdevel@gmx.net>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1734469657; l=3336;
+ i=hfdevel@gmx.net; s=20240915; h=from:subject:message-id;
+ bh=9sUdCk3J2Rtd9ajWzP8R/ayZ93QxhWtrG0DQwm5u75c=;
+ b=39tBlHhuhEEU8Sz1DNp1inQo2hLovUzrsv3QQwwkmGu3LALWlBkb4+RVn6vbX5f3aBQnhL48E
+ 97j1YlxdeS4AyLrAr9VChSHNuBv1aaJQ8wfoq67FWj31qUJlTNguJup
+X-Developer-Key: i=hfdevel@gmx.net; a=ed25519;
+ pk=s3DJ3DFe6BJDRAcnd7VGvvwPXcLgV8mrfbpt8B9coRc=
+X-Endpoint-Received: by B4 Relay for hfdevel@gmx.net/20240915 with
+ auth_id=209
+X-Original-From: Hans-Frieder Vogt <hfdevel@gmx.net>
+Reply-To: hfdevel@gmx.net
 
-On 12/10/2024 5:00 PM, Easwar Hariharan wrote:
-> On 12/10/2024 4:35 PM, Andrew Morton wrote:
->> On Tue, 10 Dec 2024 22:02:31 +0000 Easwar Hariharan <eahariha@linux.microsoft.com> wrote:
->>
->>> This is a series that follows up on my previous series to introduce
->>> secs_to_jiffies() and convert a few initial users.
->>
->> Thanks, I added this to mm.git.  I suppressed the usual added-to-mm
->> emails because soooo many cc's!
->>
->> I'd ask relevant maintainers to send in any acks and I'll paste them
->> into the relevant changelogs.
-> 
-> Thank you, Andrew!
-> 
-> - Easwar
+This patch series adds support to the Tehuti tn40xx driver for TN9510 cards
+which combine a TN4010 MAC with an Aquantia AQR105.
+It is an update of the patch series "net: tn40xx: add support for AQR105
+based cards",
+v1: https://lore.kernel.org/netdev/trinity-33332a4a-1c44-46b7-8526-b53b1a94ffc2-1726082106356@3c-app-gmx-bs04/
+v2: https://lore.kernel.org/netdev/trinity-602c050f-bc76-4557-9824-252b0de48659-1726429697171@3c-app-gmx-bap07/
+addressing review comments and generally cleaning up the series.
 
-Hi Andrew,
+The patch was tested on a Tehuti TN9510 card (1fc9:4025:1fc9:3015).
 
-There have been a couple of comments[1][2] that came in after you queued
-the series to mm. Would you rather I send individual patches addressing
-these, or just send a v4 of the entire series (-netdev of course) so you
-can replace it wholesale?
+Changes v1 -> v2:
+- simplify the check for a firmware-name in a swnode in the aquantia PHY driver
+(comment from Andrew Lunn)
+- changed the software node definition to an mdio node with phy child nodes, to
+be more in line with a typical device tree definition (also comment from
+Andrew Lunn)
+This also solves the problem with several TN4010-based cards that FUJITA
+Tomonori reported
+- clarified the cleanup calls, now calling fwnode_handle_put instead of
+software_node_unregister (comment by FUJITA Tomonori)
+- updated the function mdiobus_scan to support swnodes (following hint of
+Andrew Lunn)
+- remove the small patch to avoid failing after aqr_wait_reset_complete, now
+that a proper patch by Vladimir Oltean is available
+- replace setting of bit 3 in TN40_REG_MDIO_CMD_STAT by calling of
+tn40_mdio_set_speed (suggestion by FUJITA Tomonori)
+- cleaning up the distributed calls to set the MDIO speed in the tn40xx driver
+- define supported PCI-IDs including subvendor IDs to prevent loading on
+unsupported card
 
-Thanks,
-Easwar
+Changes v2 -> v3:
+- aquantia_firmware: remove call to of_property_read_string. It should be
+  called from the more generic function device_property_read_string
+- add more AQR105-specific function, to support proper advertising and auto-
+  negotiation
+- re-organize the patches about the mdio speed and TN40_REG_MDIO_CMD_STAT,
+  skipping the 1MHz intermediate speed step
+- re-organized the sequence of the patches:
+    1. changes to the general support functions (net/phy/mdio_bus.c)
+    2. changes to the aquantia PHY driver
+    3. changes to the tn40xx MAC driver, required to support the TN9510 cards
 
-[1]
-https://lore.kernel.org/all/07784753-6874-4dda-a080-2d2812f4a10a@csgroup.eu/
-[2]
-https://lore.kernel.org/all/Z2G1ZPL2cAlQOYlF@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com/
+---
+Hans-Frieder Vogt (7):
+      net: phy: Add swnode support to mdiobus_scan
+      net: phy: aquantia: add probe function to aqr105 for firmware loading
+      net: phy: aquantia: search for firmware-name in fwnode
+      net: phy: aquantia: add essential functions to aqr105 driver
+      net: tn40xx: create software node for mdio and phy and add to mdiobus
+      net: tn40xx: prepare tn40xx driver to find phy of the TN9510 card
+      net: tn40xx: add pci-id of the aqr105-based Tehuti TN4010 cards
+
+ drivers/net/ethernet/tehuti/tn40.c           |  14 ++-
+ drivers/net/ethernet/tehuti/tn40.h           |  30 +++++
+ drivers/net/ethernet/tehuti/tn40_mdio.c      |  67 ++++++++++-
+ drivers/net/phy/aquantia/aquantia_firmware.c |   7 +-
+ drivers/net/phy/aquantia/aquantia_main.c     | 169 +++++++++++++++++++++++----
+ drivers/net/phy/mdio_bus.c                   |  14 +++
+ 6 files changed, 271 insertions(+), 30 deletions(-)
+---
+base-commit: 860dbab69ad8d07a91117ed9c9eb5fb64adf7e0e
+change-id: 20241216-tn9510-v3a-2cfc185d680f
+
+Best regards,
+-- 
+Hans-Frieder Vogt <hfdevel@gmx.net>
+
+
 
