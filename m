@@ -1,159 +1,180 @@
-Return-Path: <netdev+bounces-152531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F182A9F47CA
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:42:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4399F9F47E0
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:46:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 608871884CC6
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:42:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60E421892CBB
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BC11DEFF5;
-	Tue, 17 Dec 2024 09:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BBB01DF257;
+	Tue, 17 Dec 2024 09:44:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E811DC19F;
-	Tue, 17 Dec 2024 09:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBDB1DE891
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 09:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734428513; cv=none; b=rSNvRP4vBs/wINkqOPV0m5/p2mEAW9yFz2Hz79UzifL7XayCGM6Sa6YYPfUzX2KDIr+Kyfrqx2KgJDx/+x+kyPZ82C2f1DwbpQZ+sTuwQg41Czr6DMUYMFycu/SmbtNL5JQwD18n5mjAT04EIpVgi5ZGpwEUWz+zU2blMhMwzmw=
+	t=1734428667; cv=none; b=Zrc3LBYZwv8h4YNRpOxu7jIeSLXkxzAq5urOL3EWsasBQNH4zo1vfxOgfWZAlLUAa0psgLG3Fr4nuvnIrMjsF6o8CtukbomDFpHNWgJC65xAjMiE1ME2oFtHx5QYb4igzYxOqiomUAoIl0S5PaXaPtn/eOatgUyh9smGrxflp0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734428513; c=relaxed/simple;
-	bh=zvXi+zpQ2PSb79YnO5gx+w5GkO569/pAtSaHL7iDBP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nyLOQsdfgRSvsIHlOw82WACYFdEyKiLReXphaLZvFKObpG34/FBlhkgK+p2eaWxMndn1Bfpc9bUbJSVpQC4dp4UV2kroNOWUbL1pSu+UUBtA4xrBUN0/W8Q8N5we+SKLDFyWxYqdREEnnzFzFYJ62uTTIqArcABoT0omWWV2JZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4YCBfP4lvTz9sPd;
-	Tue, 17 Dec 2024 10:41:49 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hHsnCo-8gqUl; Tue, 17 Dec 2024 10:41:49 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4YCBfP3mYqz9rvV;
-	Tue, 17 Dec 2024 10:41:49 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6DB388B76D;
-	Tue, 17 Dec 2024 10:41:49 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id IQiCAtiPD4Ue; Tue, 17 Dec 2024 10:41:49 +0100 (CET)
-Received: from [192.168.232.97] (unknown [192.168.232.97])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id D28938B763;
-	Tue, 17 Dec 2024 10:41:48 +0100 (CET)
-Message-ID: <8e3c9ebc-e047-4dfd-ad1d-6bbe918aa98b@csgroup.eu>
-Date: Tue, 17 Dec 2024 10:41:48 +0100
+	s=arc-20240116; t=1734428667; c=relaxed/simple;
+	bh=rqiaN2F9c/eaHztCDQp5l2avXEeH7niQR1KGHJpHAQw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=T3cAT1MNdNAL64NQexOPm+63ZcmDY9DNpzVORuD/nAPqWyeumuEUpzv4ATgvFPdP4EB8MdsKYmVhSYnJaRx3qhH6zoQrO1qRKt+B9YJcEhxU+/FyKOtJn3G6t/etUK/rL6saX00RyIJ6I4G/6kpEiMilNvGI5zoyLOWF8KFDELw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a7e0d7b804so52286135ab.0
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 01:44:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734428664; x=1735033464;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=v3WQwo4vPQJd6wOU5xmJ0k4GDIgKmqRK46QxlMpvp1w=;
+        b=obnANJLSbKatIOij9IYKMd1BDqUzT3BEViSDGen1PnY7BuP6Yzr/MfyU2KP8EN5PHt
+         NUWFAdsEwWrwZZeYu7CowGrruWi0fURL8h+bHVv36GZdmbR3rCHH75xHh/ewET0fZWvh
+         Ap0SNBETC9dyqqMDq0paTDj6/YhXRuAYB211AWcx1D/Pk0ZnXAosF2xR4BA26nsrL3Yy
+         gk6GPa/v0yQoJcO2C+VSzpLxK2vsL/55zvr8nalAO+vKGSu6znwpBc0qk5Q9ZRcjNvs7
+         b+/PIW5pB3MOpBKHS+5khTUuPq83HH6Ao/fPCBNqfWDvqZA3h5QyEPC4DUTstuq6fJm1
+         mJGA==
+X-Forwarded-Encrypted: i=1; AJvYcCXj0BOBBzw48Jd9+wenFPFc+pEaA6NCKvMv+WRLR2OkdbvhOAWOqMy3f/Ahc4zpLzCf4drkric=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwvTEJ2BBxlN7vkP0St8PAKcC3a7IuD7lYKdfuE3oVSza1q6Rj
+	KuZ1IHj0zIcJh+bGYmsKOsVB4Z8al2Pmpf2ZxstMObnpLVOD1SM6aNyr7q/xd2j2LWGXxgif/yZ
+	GYVSZz1V6zw5wuaagKBBfreb73286W9iHVfVplpC8BgPhBk/mns63KfI=
+X-Google-Smtp-Source: AGHT+IHQ4sqUrdpVsm0EeJd+/GQRGdlEi6pTpHnTk0w5tBSHkrtmmW+5KhMS1bBFJ7ywzGMogW4nxA/+yfYWfmPT00M2vzWNYUfT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: sysfs: Fix deadlock situation in sysfs accesses
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, "Eric W. Biederman"
- <ebiederm@xmission.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>,
- TRINH THAI Florent <florent.trinh-thai@cs-soprasteria.com>,
- CASAUBON Jean Michel <jean-michel.casaubon@cs-soprasteria.com>
-References: <d416a14ec38c7ba463341b83a7a9ec6ccc435246.1734419614.git.christophe.leroy@csgroup.eu>
- <CANn89iK1+oLktXjHXs0U3Wo4zRZEqimoSgfPVzGGycH7R_HxnA@mail.gmail.com>
- <49a43774-bf97-4b20-8382-4fb921f34c66@csgroup.eu>
- <CANn89iLKPx+=gHaM_V77iwUwzqQe_zyUc0Dm1KkPo3GuE40SRw@mail.gmail.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <CANn89iLKPx+=gHaM_V77iwUwzqQe_zyUc0Dm1KkPo3GuE40SRw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:20e1:b0:3a7:dec1:de55 with SMTP id
+ e9e14a558f8ab-3affb7daecfmr139988155ab.22.1734428664671; Tue, 17 Dec 2024
+ 01:44:24 -0800 (PST)
+Date: Tue, 17 Dec 2024 01:44:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <676147f8.050a0220.37aaf.0154.GAE@google.com>
+Subject: [syzbot] [net?] WARNING: suspicious RCU usage in __ethtool_get_ts_info
+From: syzbot <syzbot+a344326c05c98ba19682@syzkaller.appspotmail.com>
+To: aleksander.lobakin@intel.com, almasrymina@google.com, andrew@lunn.ch, 
+	corbet@lwn.net, danieller@nvidia.com, davem@davemloft.net, 
+	donald.hunter@gmail.com, dtatulea@nvidia.com, ecree.xilinx@gmail.com, 
+	edumazet@google.com, hkallweit1@gmail.com, horms@kernel.org, 
+	kory.maincent@bootlin.com, kuba@kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, petrm@nvidia.com, 
+	przemyslaw.kitszel@intel.com, richardcochran@gmail.com, 
+	rrameshbabu@nvidia.com, syzkaller-bugs@googlegroups.com, 
+	vadim.fedorenko@linux.dev, willemb@google.com, wintera@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    bc6a5efe3dcd Merge branch 'net-timestamp-selectable'
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1309c7e8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=87a291e9e8ffbb16
+dashboard link: https://syzkaller.appspot.com/bug?extid=a344326c05c98ba19682
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=179802df980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=125b34f8580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0e3bb05cbd15/disk-bc6a5efe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/68f124e1efd7/vmlinux-bc6a5efe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c3e210387375/bzImage-bc6a5efe.xz
+
+The issue was bisected to:
+
+commit b9e3f7dc9ed95daeb83cfa45b821cacaa01aa906
+Author: Kory Maincent <kory.maincent@bootlin.com>
+Date:   Thu Dec 12 17:06:44 2024 +0000
+
+    net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12885730580000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=11885730580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=16885730580000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a344326c05c98ba19682@syzkaller.appspotmail.com
+Fixes: b9e3f7dc9ed9 ("net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology")
+
+=============================
+WARNING: suspicious RCU usage
+6.13.0-rc2-syzkaller-00424-gbc6a5efe3dcd #0 Not tainted
+-----------------------------
+net/ethtool/common.c:873 suspicious rcu_dereference_protected() usage!
+
+other info that might help us debug this:
 
 
+rcu_scheduler_active = 2, debug_locks = 1
+1 lock held by syz-executor164/5836:
+ #0: ffff888035ec8258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1617 [inline]
+ #0: ffff888035ec8258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: sockopt_lock_sock net/core/sock.c:1126 [inline]
+ #0: ffff888035ec8258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: sk_setsockopt+0xf0f/0x33b0 net/core/sock.c:1285
 
-Le 17/12/2024 à 10:20, Eric Dumazet a écrit :
-> On Tue, Dec 17, 2024 at 9:59 AM Christophe Leroy
-> <christophe.leroy@csgroup.eu> wrote:
->>
->>
->>
->> Le 17/12/2024 à 09:16, Eric Dumazet a écrit :
->>> On Tue, Dec 17, 2024 at 8:18 AM Christophe Leroy
->>> <christophe.leroy@csgroup.eu> wrote:
->>>>
->>>> The following problem is encountered on kernel built with
->>>> CONFIG_PREEMPT. An snmp daemon running with normal priority is
->>>> regularly calling ioctl(SIOCGMIIPHY). Another process running with
->>>> SCHED_FIFO policy is regularly reading /sys/class/net/eth0/carrier.
->>>>
->>>> After some random time, the snmp daemon gets preempted while holding
->>>> the RTNL mutex then the high priority process is busy looping into
->>>> carrier_show which bails out early due to a non-successfull
->>>> rtnl_trylock() which implies restart_syscall(). Because the snmp
->>>> daemon has a lower priority, it never gets the chances to release
->>>> the RTNL mutex and the high-priority task continues to loop forever.
->>>>
->>>> Replace the trylock by lock_interruptible. This will increase the
->>>> priority of the task holding the lock so that it can release it and
->>>> allow the reader of /sys/class/net/eth0/carrier to actually perform
->>>> its read.
->>>>
->>
->> ...
->>
->>>>
->>>> Fixes: 336ca57c3b4e ("net-sysfs: Use rtnl_trylock in sysfs methods.")
->>>> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
->>>> ---
->>>
->>> At a first glance, this might resurface the deadlock issue Eric W. Biederman
->>> was trying to fix in 336ca57c3b4e ("net-sysfs: Use rtnl_trylock in
->>> sysfs methods.")
->>
->> Are you talking about the deadlock fixed (incompletely) by 5a5990d3090b
->> ("net: Avoid race between network down and sysfs"), or the complement
->> provided by 336ca57c3b4e ?
->>
->> My understanding is that mutex_lock() will return EINTR only if a signal
->> is pending so there is no need to set signal_pending like it was when
->> using mutex_trylock() which does nothing when the mutex is already locked.
->>
->> And an EINTR return is expected and documented for a read() or a
->> write(), I can't see why we want ERESTARTNOINTR instead of ERSTARTSYS.
->> Isn't it the responsibility of the user app to call again read or write
->> if it has decided to not install the necessary sigaction for an
->> automatic restart ?
->>
->> Do you think I should instead use rtnl_lock_killable() and return
->> ERESTARTNOINTR in case of failure ? In that case, is it still possible
->> to interrupt a blocked 'cat /sys/class/net/eth0/carrier' which CTRL+C ?
-> 
-> Issue is when no signal is pending, we have a typical deadlock situation :
-> 
-> One process A is :
-> 
-> Holding sysfs lock, then attempts to grab rtnl.
-> 
-> Another one (B) is :
-> 
-> Holding rtnl, then attempts to grab sysfs lock.
+stack backtrace:
+CPU: 0 UID: 0 PID: 5836 Comm: syz-executor164 Not tainted 6.13.0-rc2-syzkaller-00424-gbc6a5efe3dcd #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/25/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x226/0x340 kernel/locking/lockdep.c:6845
+ __ethtool_get_ts_info+0x97/0x410 net/ethtool/common.c:873
+ ethtool_get_phc_vclocks+0xa1/0x160 net/ethtool/common.c:922
+ sock_timestamping_bind_phc net/core/sock.c:873 [inline]
+ sock_set_timestamping+0x3e2/0xab0 net/core/sock.c:927
+ sk_setsockopt+0x2150/0x33b0 net/core/sock.c:1418
+ do_sock_setsockopt+0x2fb/0x720 net/socket.c:2309
+ __sys_setsockopt net/socket.c:2338 [inline]
+ __do_sys_setsockopt net/socket.c:2344 [inline]
+ __se_sys_setsockopt net/socket.c:2341 [inline]
+ __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2341
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f7dd7b8f2e9
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc67b485b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 00007ffc67b48788 RCX: 00007f7dd7b8f2e9
+RDX: 0000000000000025 RSI: 0000000000000001 RDI: 0000000000000003
+RBP: 00007f7dd7c02610 R08: 0000000000000004 R09: 00007ffc67b48788
+R10: 0000000020000040 R11: 0000000000000246 R12: 0000000000000001
 
-Ok, I see.
 
-But then what can be the solution to avoid busy looping with 
-mutex_trylock , not giving any chance to the task holding the rtnl to 
-run and unlock it ?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> 
-> Using rtnl_lock_interruptible()  in A will still block A and B, until
-> a CTRL+C is sent by another thread.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
