@@ -1,122 +1,85 @@
-Return-Path: <netdev+bounces-152575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AC9A9F4A81
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:01:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD5529F4A91
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:04:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BE62163D79
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:01:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60F8F188FC02
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B00F1EF088;
-	Tue, 17 Dec 2024 12:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECC91EE026;
+	Tue, 17 Dec 2024 12:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LPKIrhWp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="aRrkdswT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D82B156644;
-	Tue, 17 Dec 2024 12:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C961DAC88;
+	Tue, 17 Dec 2024 12:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734436877; cv=none; b=sJlGHPJ1Yey9KYC2m+ItAi0KZlk3HxlyXSnlMV6jUAq1ACq/yz1+hs+3opYNiw3GNga2/0VjUAw+fF5lB6/NKYVpdJoQHYLaWFsj8Kb5dVZeGx6qpJ7RDYCA19cI9ZHKYWwwcEFASfIWz4Dqt+iJNCymjH2xGGMExMnHx0BCg+k=
+	t=1734437053; cv=none; b=Bhbf5y8wghQtKb9TchlqQZX5FFwyXZg0H+BkbmkicDZrQ6TH4FzV20EgoAUDlQarUFJAwHHWN4xm+wZyjP7Xidl0YzZu/76Fkks7so4NQVbQV6dopXzMJJqEvqgHYpI5XWSO7BfaADXBMHRyA+rgirXu0pXl7rshh/y67+/nSCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734436877; c=relaxed/simple;
-	bh=VoT3semKVuV2WPFaeaRZbL6iWWm1byKm0Re6hZoayEA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=brXyqt/D9lNWTzPTmdzBgPQVJJ/I53/BvDphwZCy2u5+NPI82TGfDwP4ZcGHoBsBqPQWvnoQSzJ5Toy10B1y0g/xYOnEvBUtdnq53YKqdLvAl336vAlWWhVJWRxvxUrFZjpvOe9sP/WDU4xv5C0fdi8mQe9zVRv4Fzkuf9oqlK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LPKIrhWp; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6d8a3e99e32so45321576d6.2;
-        Tue, 17 Dec 2024 04:01:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734436875; x=1735041675; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VoT3semKVuV2WPFaeaRZbL6iWWm1byKm0Re6hZoayEA=;
-        b=LPKIrhWpcdJrzNtBogbpK0CzCmYE44KTJqVJLYN4lcJ826elsz7tGsQhUYV3+UBDRm
-         Pn53rh8G2rkusHRodi7OrfxpjebaIL/K8LvVVtjgcQ4VE9g2glwIZrzlx8M8l+GHekU1
-         +kIXscKvVQabj9Boeq8qPmrZmhXEaodTU5/B4sXULolCoXhWgiAni+bDJO8DeQygg2jG
-         NjKTI+dmizI4+aXTGZXxW1nP5UQxpxJAc1J3BhT8WyqmmV8kh6riSwiXTMa5IM+4DNne
-         xY3OoH6OiNIQmCflT9aS9SllNZntQ/umeaKx9CfhTgAw9Tmh/IfioCLkTiNXwHKNa6om
-         ajVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734436875; x=1735041675;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VoT3semKVuV2WPFaeaRZbL6iWWm1byKm0Re6hZoayEA=;
-        b=OwCRdCKa8ZmSIZ1Oc8v+0WQpzlx6sldqrHogyHYLtgEGAQoliKUJIYjQMS/LvebKnX
-         HDS3BJ9zivIlQRoZ/TQhkAt9YR1MF8W6KzHdYwvMnqo7Zdo+v4Fd27Z5cD5F6rB3qKSt
-         Dsw+SYIQX9V/BxjCvO7ynRRhpodvSRvbgGARiSISWMzbhHoTd5BeDpA+7Xh65XtF9nyd
-         85h0/cGhmmQC4I5WWC1QeimEkSwgSe7BsmLq+gn02lWYJW0l1AIx37Eb43qNBsjrSPM8
-         szhp8Otlkl5/bhxef7ffkbrs0lzBLXPbSnSg/PrhVzOiDZ0x/4kPBJrPwLufjKKuJ8/M
-         5RmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVP+YPY44FjbE9kGwnPcul8JkRNGuhSwsJDcHujOd2d3UQd1SPFIqpJPD2gpYNOixGIeNsF1qXE@vger.kernel.org, AJvYcCW0NcKngHRlrJEaeAkYKPG03hje8ElAOanukIrPhyzN53KRm6ZPSoy2Xbpjp3UuQC24588OXPXybHuBMZD9Fg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwF4MS7ZaTz1vp1P8KvHeip646T6/ETh2FDx6KuGnwDkqaLnfcN
-	3p/a9WQqD2skxrEGL5tveZOfGVedzTnpzHU1e6QcejZMuVgmnacK4lR6KJgUwLFq69aXHEwhCG2
-	Gl2InXy2lS+gFbd1U8hImGQfOw1w=
-X-Gm-Gg: ASbGncuZg2ZhtP3vcHsiHWcXWklhSSJIsKhWnkpixeuzELjzg8HBnPwKsEP8ngA73zn
-	IDgXcUEF/uOnTb43E8yVTkA5LSkqdnUD1ZFD3n2lGlpGMPN4JQ3It5VCwcnaJAz30nIU1csUH
-X-Google-Smtp-Source: AGHT+IGPuy8kYfgkFw1kFHqZNhPUceVl1N0oAa24pT4dmlIPic9KYVclc86GEDfDJ+PUKE/ZAGlPoOp1PylTwRMSwUw=
-X-Received: by 2002:a05:6214:194e:b0:6d8:accb:5a30 with SMTP id
- 6a1803df08f44-6dc92299967mr323292606d6.36.1734436874550; Tue, 17 Dec 2024
- 04:01:14 -0800 (PST)
+	s=arc-20240116; t=1734437053; c=relaxed/simple;
+	bh=MoV5dUrWpK3MUnaq34/CH85ZC5O5lbllu84Bv3WzExQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IhpHnd6w0/WgYf6AGKiyK1uqI32h6gy1vQEf9u5CR3nllmAPXXIF3M1138ebWL9kkw4msaNN5cvNnQw/ca97m+Q/3T90Hbz9ZZaqBjJFqNOVM9ZJv4JexZreo+4udOh4/RHEZazWeEQwW1WIrnSHe1HcTThGW8hS5gECs7PLKeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=aRrkdswT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Kyd7fuRsvhaZ4THXfqK627NmpFPWLv9guswigQTwKtE=; b=aRrkdswTYzOyVCiVtwUn0ooP+7
+	jZLrZcScMZJKK/I2HqJkeq/Lz+ygy0vXp0vPzhpn+SRsOovOar3qoARgjstjxBGx8WoNH33arWqjF
+	TXUHbiICckXwdoCkdnN/ygMYZKufpiMN/oHHhAMZNjnnWq1etAdh7U/k3OqbGEFzwqgqpfCF2efEb
+	pwQl9uZ/CNug5vErHXG50UxK/rrir/jXbo19aA6svYuF7Zva58B5R+I/JI0D4vmkKR+umjKZv2/ZY
+	QBmawtc3lLQtj3IRiHdSg0p3ffJOFibUlG1xNB4i64a5kc6HnYnU3KN1YC7ONZQbUrj/wJ7EwoS6U
+	va2+0pLA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tNW5i-0023Ji-0h;
+	Tue, 17 Dec 2024 20:03:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 17 Dec 2024 20:03:38 +0800
+Date: Tue, 17 Dec 2024 20:03:38 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] xfrm: prevent some integer overflows in verify_
+ functions
+Message-ID: <Z2FompbNt6NBEoln@gondor.apana.org.au>
+References: <92dc4619-7598-439e-8544-4b3b2cf5e597@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEkJfYOyWgJW-WAd+GhT07zd2Y3vUWz81+pjbZT9nUAsCc7FGQ@mail.gmail.com>
- <b27dc4d0c3456c6796437b26b887b931d9871977.camel@sipsolutions.net> <de5d98be99086a7182ba2bd0676b261349a145c4.camel@sipsolutions.net>
-In-Reply-To: <de5d98be99086a7182ba2bd0676b261349a145c4.camel@sipsolutions.net>
-From: Sam Sun <samsun1006219@gmail.com>
-Date: Tue, 17 Dec 2024 20:01:03 +0800
-Message-ID: <CAEkJfYP297P=RjvZ9-ctpYHXu7bDhVN0+ZBoMNz2xjzyqOakLQ@mail.gmail.com>
-Subject: Re: [Bug] Deadlock between rfkill_fop_write() and nfc_unregister_device()
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, pabeni@redhat.com, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, davem@davemloft.net, krzk@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <92dc4619-7598-439e-8544-4b3b2cf5e597@stanley.mountain>
 
-On Tue, Dec 17, 2024 at 7:33=E2=80=AFPM Johannes Berg <johannes@sipsolution=
-s.net> wrote:
+On Tue, Dec 17, 2024 at 11:42:31AM +0300, Dan Carpenter wrote:
 >
-> On Tue, 2024-12-17 at 11:46 +0100, Johannes Berg wrote:
-> > On Tue, 2024-12-17 at 17:33 +0800, Sam Sun wrote:
-> > > Dear developers and maintainers,
-> > >
-> > > We originally encountered a task hung while using our modified
-> > > syzkaller. It was tested against the latest upstream kernel. We
-> > > analyzed the root cause and pinpoint the kernel crash log to the
-> > > following two tasks.
-> > >
-> >
-> > This issue has been known a very long time and should be fixed in NFC,
-> > but I guess nobody is around to do it.
-> >
-> > https://syzkaller.appspot.com/bug?extid=3Dbb540a4bbfb4ae3b425d
-> >
->
-> I think this one is also the same:
->
-> https://syzkaller.appspot.com/bug?extid=3D9ef743bba3a17c756174
->
-> and that's much older still.
->
+> +	if (algp->alg_key_len > INT_MAX) {
 
-Thanks for your quick reply! I am sorry that I didn't double-check the
-call stack of historical bugs reported by Syzbot. I will be careful
-next time.
+Why not check for UINT_MAX - 7? INT_MAX seems a bit arbitrary.
 
-Best,
-Yue
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
