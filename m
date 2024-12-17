@@ -1,142 +1,204 @@
-Return-Path: <netdev+bounces-152478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A9C9F411B
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 04:00:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F03B9F4121
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 04:09:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B834169116
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 03:00:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E2E7188A475
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 03:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA18F76025;
-	Tue, 17 Dec 2024 03:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA0B42AAB;
+	Tue, 17 Dec 2024 03:09:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P2FvIFws"
+	dkim=pass (2048-bit key) header.d=getstate.dev header.i=@getstate.dev header.b="HGwOZq2B";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iWoXXXzh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777D91E529;
-	Tue, 17 Dec 2024 03:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CFA288B1;
+	Tue, 17 Dec 2024 03:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734404400; cv=none; b=SW4+d6soNhXAcrIqBf+G8NegteksbNn4madi6Gk+izd6QOJsJCT28nihQPgRaT9/38/MyntSIUCdULqD9DydMvNmHrAET7asN9pKTb3Eav8NkKRp+afXP7qg+B3nFYbLWlnFPMB4MI2Foxy3GD4LUrj1s68qJ9SLQ8KXYs8hCGE=
+	t=1734404945; cv=none; b=rKRfanZecYMWfsvdRDuC2Ozx1tG7ZX9lDluo1rKWkTCnqPqRLZCgsASZ1mfQu6u5EEla3pJQ3aMQB6TRl9Vev/vJ8fUOszWXmoz72J4+2JWy3557oPDZzEU+NdeP2MVhVhjYBf5AFx8t/10hPGQq/sX4S8zuZDf9Rn8Iv13s6XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734404400; c=relaxed/simple;
-	bh=9dQhrqRK+R/Veko5MsdHHHznj3Ffk32kbXw0+H2KeTc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=MdZXKy+KCrjyemdPJ7yEzqGx4JWvSp+s6kmwKJ7m2ERxjt2CE8Y8S22oouNAsDA3FCDz28+tZjgYp+8at6wbzDDoXoSk6/R0w0uFM88FHrOyXaLNNoKguYDmpOAt680szryxgXPrpKVhSa1m3uBQb3T4z1AvxGhTkkMwbZVAP6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P2FvIFws; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E19E4C4CED0;
-	Tue, 17 Dec 2024 02:59:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734404400;
-	bh=9dQhrqRK+R/Veko5MsdHHHznj3Ffk32kbXw0+H2KeTc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=P2FvIFwsRLdK9rBdwik1/dN2Po04NmqQQv93gE/PDf9K1t/s9RxO26AWq4HYo1oZY
-	 BNXR2Op3kP9S3vle1dHmfCYRijh5LoKDfbJkwhv6fvFn7kMt182JqL8rhij3fvd3vS
-	 Pw9AUWjLEh4RWi+6eZFz/3/v9OJeNj8OTBgX+NU66QtZHFXkNXVHkskUQ6gnnNIjgY
-	 0+6YmXhoz65uvrA3H6UnhoX2P8gj83utw6kp34ieCZBAbRAuqiq9lCyAC4Zwym1zla
-	 u3jLEcTvLdBOENNtN1QRDur3ZghAq3r76SniMmQk2qHTBS5l1dbYra6X1w2S8IgzgA
-	 r8OtB6/UUMu+A==
-From: Kees Cook <kees@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <kees@kernel.org>,
-	cferris@google.com,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	s=arc-20240116; t=1734404945; c=relaxed/simple;
+	bh=RIDos4l/17u//yQ878YYYZi94Fi7AB2Btn2RXy+v5vg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b8By3B3iwpLvQQ3Yr1q3GfqJ70OvxAdoCaF8hQ3dJWXJnF8nqgm2hDyPF/x4TaGwo0nmjhTiSpw/ZpCTca0GEZ4+Wg2nnWFdQwNRQMnBM2UkZhKsnGH5xI5LAq01/WgeLT82xpxYAdYBVwEwwbSg0SueC8HJ14oAdrPmRDQbF24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=getstate.dev; spf=pass smtp.mailfrom=getstate.dev; dkim=pass (2048-bit key) header.d=getstate.dev header.i=@getstate.dev header.b=HGwOZq2B; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iWoXXXzh; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=getstate.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=getstate.dev
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfout.stl.internal (Postfix) with ESMTP id 0B903114012E;
+	Mon, 16 Dec 2024 22:09:01 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Mon, 16 Dec 2024 22:09:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=getstate.dev; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1734404940; x=1734491340; bh=YMYmGjTpbD1LWBNys/n4b
+	6hDesh8RNR2ZQpLI4bG7f8=; b=HGwOZq2BhikAoANui6l0/g3C3Waxt56Sj7jOy
+	EMS34iaBwA6gcmlG6n2vHemYx6LYA1SqukkKe8VkkdLElpcYogq595WLkhY9LxjU
+	KxMqGSEXWxBq2SG9sovWyH3Raj5HxwCRFg+A70k7wwMjYzOAp+CtcXhDWOgguBXX
+	0Fc8xeYO0itGZYkyTkaxAepHvMfUWXisSu0VSgFU/TL4S6Sm6uQKBNMj3+g/lN2o
+	OcGes6BFgTBsY5Bpac4QMtl4UHTs0xeAoe1ljg8QkNwlIhk+gU3jrQsAqUQR46Sw
+	QDuOzFTDBzOQRfIfN0pZNFBaG/UeX4hLVAot+BJE6c+7WuSig==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1734404940; x=1734491340; bh=YMYmGjTpbD1LWBNys/n4b6hDesh8RNR2ZQp
+	LI4bG7f8=; b=iWoXXXzh7NGLz4qlvJzzCBmVnNDEp8VwAGNsTZ8oRw1H8DlV+Ty
+	fC/fvI9MFLaq8fbZZbMKipqUwkls5U5w2KXA+XasOaPjRLkYJOF3lWGvFjGgiVxT
+	37EEYNzDQb2CQVy9GWsIN0xPPEjG6zE6RS0ctAhtqnanA72pmQtssffF7QSQe0Xb
+	PlDSP0H0Yt9dV8vkAbooJ6dUtrJi22Cv5MTizafzHRkJA5iJKGK/y1GNxH9SoZRe
+	VwMwmcuGlquE+kmvDaFx4N4FOdc108cA4h2GD0yIZZJui50j3Q1A/xPPZDrmyaDl
+	Mg2Z7MB1qaXkDPmkRCYA+COQIca4Vx6hlfg==
+X-ME-Sender: <xms:TOtgZ67XcdiK2KE0OYIXpLfNcI5ka0W6KVl_iuz9J4FCycX9dO3FOQ>
+    <xme:TOtgZz5FnXC98oDVUk-L7zpscrH2nq8oO8N6KMnxV5lc3d56RbgbKX1K5qENDsErm
+    HFSIi17iHRxpQsOodY>
+X-ME-Received: <xmr:TOtgZ5eHtM8z1rv4i9C-pQfiqBDWxixbYTodZ_ysgxVRcEHnWL2kgPd5HQ8bhh8GQ5ynZYddsiEa>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrleeggdehhecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecunecujfgurhephffvvefuff
+    fkofgggfestdekredtredttdenucfhrhhomhepofgriihinhcutehlucfjrgguuggrugcu
+    oehmrgiiihhnsehgvghtshhtrghtvgdruggvvheqnecuggftrfgrthhtvghrnheptddvgf
+    fgjeduueduiefghedvtdetfeehffevjedtfffgtdfhkefhueehvdfgvddvnecuffhomhgr
+    ihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuvehluhhsthgvrhfuih
+    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgriihinhesghgvthhsthgrthgv
+    rdguvghvpdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpth
+    htohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgv
+    rhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglh
+    gvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrd
+    horhhgpdhrtghpthhtohepmhgriihinhesghgvthhsthgrthgvrdguvghv
+X-ME-Proxy: <xmx:TOtgZ3LRxte4OhTIJJcD-8w2lNEfaP_RMVjXiTIWmBa-iTq8ln2NEA>
+    <xmx:TOtgZ-JdL635TaBnMOOqe3iKZOy-jRhuzyz3OlgejR3xWm5lI1u-Vg>
+    <xmx:TOtgZ4yhwlTS28-4f_znHf67UMZoQ9oKQxI50wrKX-setwVxB7BZCA>
+    <xmx:TOtgZyIisLsSzh6GAIfJ2H5kaj30JdpnK21nB-jBBm9G0plbj0F4Jw>
+    <xmx:TOtgZ7AskTLnWn9dE7zrYIBFSRB6Ps_vCZx7KguGHEoLip3NkflSiZ7S>
+Feedback-ID: i0ed1493d:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 16 Dec 2024 22:08:57 -0500 (EST)
+From: Mazin Al Haddad <mazin@getstate.dev>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH] UAPI: net/sched: Open-code __struct_group() in flex struct tc_u32_sel
-Date: Mon, 16 Dec 2024 18:59:55 -0800
-Message-Id: <20241217025950.work.601-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	Mazin Al Haddad <mazin@getstate.dev>,
+	syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com
+Subject: [PATCH] ip6_tunnel: Fix uninit-value in ip6_tnl_xmit
+Date: Tue, 17 Dec 2024 06:07:51 +0300
+Message-ID: <20241217030751.11226-1-mazin@getstate.dev>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2186; i=kees@kernel.org; h=from:subject:message-id; bh=9dQhrqRK+R/Veko5MsdHHHznj3Ffk32kbXw0+H2KeTc=; b=owGbwMvMwCVmps19z/KJym7G02pJDOkJL7W7cjrdvu/PtXR4fEG7UGH5mZdaMcpnchqmvA4S4 2uY+mNDRykLgxgXg6yYIkuQnXuci8fb9nD3uYowc1iZQIYwcHEKwES8DjL8D/3hm9H6M+PvfKYz rFf1JlX7O+btyZO5puh35NvX7c2x1Qz/wxXFgxZ1J51TDd98VkzrzZPtD8R87Gcu2RKb0nhRai0 7MwA=
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-This switches to using a manually constructed form of struct tagging
-to avoid issues with C++ being unable to parse tagged structs within
-anonymous unions, even under 'extern "C"':
+When taking the branch with skb_realloc_headroom, pskb_expand_head is
+called, as such, pointers referencing content within the new skb's header
+are invalid. Currently, the assignment of hop_limit accesses the now
+invalid pointer in the network header of this "new" skb. Fix this by
+moving the logic to assign hop_limit earlier so that the assignment
+references the original un-resized skb instead.
 
-  ../linux/include/uapi/linux/pkt_cls.h:25124: error: ‘struct tc_u32_sel::<unnamed union>::tc_u32_sel_hdr,’ invalid; an anonymous union may only have public non-static data members [-fpermissive]
+uninit-value in ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
+ ip6t_mangle_out net/ipv6/netfilter/ip6table_mangle.c:56 [inline]
+ ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
+ nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+ nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
+ nf_hook include/linux/netfilter.h:269 [inline]
+ __ip6_local_out+0x5ac/0x640 net/ipv6/output_core.c:143
+ ip6_local_out+0x4c/0x210 net/ipv6/output_core.c:153
+ ip6tunnel_xmit+0x129/0x460 include/net/ip6_tunnel.h:161
+ ip6_tnl_xmit+0x341a/0x3860 net/ipv6/ip6_tunnel.c:1281
 
-To avoid having multiple struct member lists, use a define to declare
-them.
+Uninit was stored to memory at:
+ ip6_tnl_xmit+0x34f7/0x3860 net/ipv6/ip6_tunnel.c:1277
+ __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
+ ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
+ ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
 
-Reported-by: cferris@google.com
-Closes: https://lore.kernel.org/linux-hardening/Z1HZpe3WE5As8UAz@google.com/
-Fixes: 216203bdc228 ("UAPI: net/sched: Use __struct_group() in flex struct tc_u32_sel")
-Link: https://lore.kernel.org/r/202412120927.943DFEDD@keescook
-Signed-off-by: Kees Cook <kees@kernel.org>
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4091 [inline]
+ slab_alloc_node mm/slub.c:4134 [inline]
+ __do_kmalloc_node mm/slub.c:4263 [inline]
+ __kmalloc_node_track_caller_noprof+0x6c7/0xf90 mm/slub.c:4283
+ kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
+ pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
+ skb_realloc_headroom+0x140/0x2b0 net/core/skbuff.c:2355
+ ip6_tnl_xmit+0x2106/0x3860 net/ipv6/ip6_tunnel.c:1227
+ __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
+ ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
+ ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
+
+Reported-by: syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=6023ea32e206eef7920a
+Signed-off-by: Mazin Al Haddad <mazin@getstate.dev>
 ---
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org
----
- include/uapi/linux/pkt_cls.h | 34 +++++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+ net/ipv6/ip6_tunnel.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index 2c32080416b5..02aee6ed6bf0 100644
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -245,20 +245,28 @@ struct tc_u32_key {
- 	int		offmask;
- };
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 48fd53b98972..62a51f03360d 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -1098,7 +1098,7 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
+ 	unsigned int max_headroom = psh_hlen;
+ 	__be16 payload_protocol;
+ 	bool use_cache = false;
+-	u8 hop_limit;
++	u8 hop_limit = 0;
+ 	int err = -1;
  
-+#define tc_u32_sel_hdr_members			\
-+	unsigned char		flags;		\
-+	unsigned char		offshift;	\
-+	unsigned char		nkeys;		\
-+	__be16			offmask;	\
-+	__u16			off;		\
-+	short			offoff;		\
-+	short			hoff;		\
-+	__be32			hmask
-+
-+struct tc_u32_sel_hdr {
-+	tc_u32_sel_hdr_members;
-+};
-+
- struct tc_u32_sel {
--	/* New members MUST be added within the __struct_group() macro below. */
--	__struct_group(tc_u32_sel_hdr, hdr, /* no attrs */,
--		unsigned char		flags;
--		unsigned char		offshift;
--		unsigned char		nkeys;
--
--		__be16			offmask;
--		__u16			off;
--		short			offoff;
--
--		short			hoff;
--		__be32			hmask;
--	);
-+	/* Open-coded struct_group() to avoid C++ errors. */
-+	union {
-+		struct tc_u32_sel_hdr hdr;
-+		struct {
-+			tc_u32_sel_hdr_members;
-+		};
-+	};
- 	struct tc_u32_key	keys[];
- };
+ 	payload_protocol = skb_protocol(skb, true);
+@@ -1215,6 +1215,15 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
  
+ 	skb_scrub_packet(skb, !net_eq(t->net, dev_net(dev)));
+ 
++	if (hop_limit == 0) {
++		if (payload_protocol == htons(ETH_P_IP))
++			hop_limit = ip_hdr(skb)->ttl;
++		else if (payload_protocol == htons(ETH_P_IPV6))
++			hop_limit = ipv6_hdr(skb)->hop_limit;
++		else
++			hop_limit = ip6_dst_hoplimit(dst);
++	}
++
+ 	/*
+ 	 * Okay, now see if we can stuff it in the buffer as-is.
+ 	 */
+@@ -1243,15 +1252,6 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
+ 	}
+ 	skb_dst_set(skb, dst);
+ 
+-	if (hop_limit == 0) {
+-		if (payload_protocol == htons(ETH_P_IP))
+-			hop_limit = ip_hdr(skb)->ttl;
+-		else if (payload_protocol == htons(ETH_P_IPV6))
+-			hop_limit = ipv6_hdr(skb)->hop_limit;
+-		else
+-			hop_limit = ip6_dst_hoplimit(dst);
+-	}
+-
+ 	/* Calculate max headroom for all the headers and adjust
+ 	 * needed_headroom if necessary.
+ 	 */
 -- 
-2.34.1
+2.46.0
 
 
