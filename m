@@ -1,122 +1,119 @@
-Return-Path: <netdev+bounces-152725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9E49F5880
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:12:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A1AB9F589F
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:19:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ADCF16DC1E
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 21:12:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD4F31881A7B
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 21:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7431F9F60;
-	Tue, 17 Dec 2024 21:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4871A1FA158;
+	Tue, 17 Dec 2024 21:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="nmF/sQCS"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="GvSCmQKZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FAD148850;
-	Tue, 17 Dec 2024 21:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4AEA1F9EAA
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 21:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734469945; cv=none; b=BnSzVQoPRnr+ERuP3JjClXumpKL+DwiDGMO0hWqPZg5lBHdhqByHQa6R1CFEbpqrt29sstxSFxsiBecVlN5WNwNug4kQSLbv5nAwITxV6T3CRyzBywI3URTzxRacCQNEx/cq5wqLEN4Unrh+tOHpBCJcoMi40Bqyxolkq1gTHJM=
+	t=1734470074; cv=none; b=gXf2PzMjxB0xiPLkb2/jGOZW3wmdoXML5VgQBTBsyRtBWNtUdbEDfiaKVn5pMjS7u/5Ao5MWQyR550pkQ4wKUtZ6xK3AID4beWYwvwDPm6NW921DwOWnBFeE96eRVsIP64aWv6chUdfMH29q8ekrE8LwEuWiCTIMw/BdemZAYjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734469945; c=relaxed/simple;
-	bh=6wrZIip+47/78xZMxlKfy5iKCSXmDm0ozFscqh0XaL0=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=BDxnZIV7DYhFkaZVCqHYVN+Wvrk8lae8Cdw7IXFIe1h5nu+RLs+Nkf0AIbpcIM4nY8BmwhjP+Ux08m1ozuEPlWHBSiCFgR+eUfMF1L6Afb9ttFhXVXQN5UVesoBroT+CLoFcvzIu4fe8bh9Zs8kazZ/jtu2wkt8hswD9FsURX8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=nmF/sQCS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30F7CC4CED7;
-	Tue, 17 Dec 2024 21:12:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1734469944;
-	bh=6wrZIip+47/78xZMxlKfy5iKCSXmDm0ozFscqh0XaL0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nmF/sQCS1D3KNHotz6/Uis21dHNJl7nLly6pcknq1IkDIafHawvIl5RaL9/QyQcZn
-	 nyGQz6EdiI98Lm7qeFHMwWswlC3Qfefy9eWeYO8Zhv+gHExXCf5+0KsSm0kSj2kwOJ
-	 8nof/rwPL6N6M8ZNuUmnLRmLS4svJ9udLDC6DdE4=
-Date: Tue, 17 Dec 2024 13:12:21 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
- <kadlec@netfilter.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Julia Lawall
- <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack
- <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, Robert
- Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
- Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
- Marchi <lucas.demarchi@intel.com>, Thomas =?ISO-8859-1?Q?Hellstr=F6m?=
- <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Roger Pau =?ISO-8859-1?Q?Monn=E9?=
- <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel
- Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, Scott Branden
- <sbranden@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, Ilya
- Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri
- Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>, Petr Mladek
- <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Louis Peens
- <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
- Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan
- <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Jeff Johnson <quic_jjohnson@quicinc.com>,
- paul@paul-moore.com
-Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
-Message-Id: <20241217131221.e1b1262f97dc6a5d616ca8e7@linux-foundation.org>
-In-Reply-To: <14ad0c08-7b3b-47b6-8cc1-8a4179238e5a@linux.microsoft.com>
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
-	<20241210163520.95fa1c8aa83e1915004ed884@linux-foundation.org>
-	<422470cd-84f0-469e-93c2-493c5091391d@linux.microsoft.com>
-	<14ad0c08-7b3b-47b6-8cc1-8a4179238e5a@linux.microsoft.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1734470074; c=relaxed/simple;
+	bh=Fv/uXbGyGhC9bLPcVm+yw+rf/bMmIUHQtekgDuuPXus=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kNjFebuY+r/rjY8YrshH6p04HxnIOKE5XHerYyY6v5LrwK6WYrmvaQX9xsK1Mu1KmMZUGI9NxlSqvalRQf9G8YwmQpoy+KsSL6jC1uQvOodTBzf3SnRMY9gsBAOUIIhrdMSNLhPM986pGPW60opMq5gSvnEGrtF/JXMTHJKcBe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=GvSCmQKZ; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-725abf74334so5074774b3a.3
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 13:14:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1734470070; x=1735074870; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fv/uXbGyGhC9bLPcVm+yw+rf/bMmIUHQtekgDuuPXus=;
+        b=GvSCmQKZIMEbg8ngMrJco6I/L5iXkv/EdPyq38nTOR3QtCcrY90cELddQ1WoTohaPl
+         OZrW2ELNhYEGevndF3UiHkvj0I0FWCVuKPZwEhPXwOkgyz3B/7BdaG7Xf97D9ZwDPJYE
+         Ixg72vmz/+IrH0VI3MXmAUw+jYjO95uu0ygY5Lf7UFuzSF5WVhYoeV/1LUzXmylyiogq
+         czi1sykpo9msF405XdDPUpd+YDUzvjel8tkg8fi2oLZsRBR9zYa7TknWDC7UXOE5ds3t
+         oAGo9b4qy+GCpGv1bSlKtd/PtPIbH7zmJ0hOT3KlZj01DrNjbJWHqloguo+RpO61tNbf
+         tn2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734470070; x=1735074870;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fv/uXbGyGhC9bLPcVm+yw+rf/bMmIUHQtekgDuuPXus=;
+        b=nTDkaC23A41xXEwkFLmaeYlXag4e+3nk8WPz6dQHx+OeEUBbSQHAPeRTqKUQM4D1qE
+         BRAG0x4UsXKkl7BDaa7F0YszDD5c00wQY31JUXRBBwAx8QC19rXFVI/EOZTclpUDjdbc
+         vsTUK+PM1yKanQB8dGBt92wUjjjCmZH42glM2FnuVNbUSg/D6QUXqpQFW3iZ18udollv
+         NBuS3yaoB7LugHqpd2piiOkAkCtBHTJEut32vKC1Km9qW0VAxuS7yTIuus/B0hJ7CBho
+         UMU8ocWsjcW0qAoWaLie00jBN1zO6CKnD7eUgOzvDqVpirfx5o8eWngJHh0D53dGD87a
+         JdSw==
+X-Gm-Message-State: AOJu0YxQCL3pRISll8/OyOUhTbXtCDet2DyhTszI4Mam/7mL5SY2X3Je
+	90CS5wmkJnFiRwtcVSwK+tItVxSPKvjmcafHNQ3die3khdK3Cpv4is1xV7QYts9aQ9WWT5unrSM
+	dNEw/+bUXudI8sBvj8gIxC12P6S+RloXSOWP4T0Ow3FElwCk=
+X-Gm-Gg: ASbGncvv47klZSMSHNMlqOPWNGtxfWGwrj3BxUlqU/ku5HMOPNBt4NfNGQ5XHnMjPYW
+	U7EvzYqlfGyNulgH7UbRQ9Ed+fkU/eiYKdqr/
+X-Google-Smtp-Source: AGHT+IEBMZ2amxqM0oK/pK8bCESErSAz7swnLQNfFPSCP6Lx4tZ5d+M0iqfAi4GeQPfBR5RQY5ucjxmrHH5NYdDmGzE=
+X-Received: by 2002:a05:6a21:9011:b0:1e0:c6c0:1e1f with SMTP id
+ adf61e73a8af0-1e5b487e5b5mr853334637.36.1734470070573; Tue, 17 Dec 2024
+ 13:14:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20241217184800.36581-1-jhs@mojatatu.com> <CAHS8izM5+WEbB_Cv+pE4oE64Bs2rL3FU2xTxL3m0g5asHJR91A@mail.gmail.com>
+In-Reply-To: <CAHS8izM5+WEbB_Cv+pE4oE64Bs2rL3FU2xTxL3m0g5asHJR91A@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 17 Dec 2024 16:14:19 -0500
+Message-ID: <CAM0EoMnYR7=gfeWyKUECmbbnxbJGGDhCMpQB5BMcWDVfbTCEHw@mail.gmail.com>
+Subject: Fwd: [PATCH net-next 1/1] selftests: net: remove redundant ncdevmem print
+To: Linux Kernel Network Developers <netdev@vger.kernel.org>, Mina Almasry <almasrymina@google.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 17 Dec 2024 12:53:22 -0800 Easwar Hariharan <eahariha@linux.microsoft.com> wrote:
+Thanks Mina - apologies, did not cc the list..
 
-> There have been a couple of comments[1][2] that came in after you queued
-> the series to mm. Would you rather I send individual patches addressing
-> these, or just send a v4 of the entire series (-netdev of course) so you
-> can replace it wholesale?
+cheers,
+jamal
 
-Individual small fixes would be preferable please.  Mainly to
-preserve the validity of current review efforts.
+---------- Forwarded message ---------
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, Dec 17, 2024 at 3:00=E2=80=AFPM
+Subject: Re: [PATCH net-next 1/1] selftests: net: remove redundant
+ncdevmem print
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: <davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
+<pabeni@redhat.com>, <sdf@fomichev.me>
+
+
+On Tue, Dec 17, 2024 at 10:48=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
+>
+> Remove extrenous fprintf
+>
+> Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
+> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+
+Looks identical to the line above it indeed. Sorry we missed this.
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+
+--
+Thanks,
+Mina
 
