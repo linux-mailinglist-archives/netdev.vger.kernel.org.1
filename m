@@ -1,170 +1,308 @@
-Return-Path: <netdev+bounces-152614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CD4B9F4DF8
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 15:39:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1413A9F4E14
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 15:42:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C9117A7D37
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:39:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C45CA7A4878
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5EF1F4E36;
-	Tue, 17 Dec 2024 14:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C741F63CA;
+	Tue, 17 Dec 2024 14:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Pjz0UkYV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="htGRnLVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2076.outbound.protection.outlook.com [40.107.95.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE4B20311;
-	Tue, 17 Dec 2024 14:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734446356; cv=fail; b=TEcakcrPUEeaM7O4X4xa4m2mLwb4o1yA7HUeb7kPk+h3NylNylxUu1tcxJvo28JB/7HGeK7oxQiS78k0OhpSn21kPnteam5xfHdl9dSrw5zfk5617HHC/BMv0QJZWH0Xj1CmGU9SODO7E52jlSKE6ug63Gs7Gz7JyoKpa7CuD7A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734446356; c=relaxed/simple;
-	bh=GpoZ3uWThmQPwUuqi/T4XuMX/MaFiIIYLprzAk3IPNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=RsBwVNFwz7EUbSFuXC8fn4l27k5i/h00cmdXidTUn4XewrEkjBvlu/246Foz/gs9y81eXRvbk4xqELfEuE8LgZg0m+BPZ9XWyB+ifywzB+arCc25wQJx72npn2wHQ1iQjqGwQKKg7f4Z2rlGZOC3jTCbmw+vB1qnj+fyoBHMaqw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Pjz0UkYV; arc=fail smtp.client-ip=40.107.95.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xBQHPabdszj90gXXpavkPXjGmhikMJMUDZQCn+x6JRbLVf+9T/vi3kUARdsXyD4YwQJAe9uwh509nn4/xwwA8KiXMwK+W19Ke+6st4sTSFDzPJJ88ttqLbXzl7tn24tbP2g7zIpqKordG5IhKGrtxr6GC8YjCeENpauTGX9WjCGgF8gOVs5J3I97Wph+p1b0NjDTf6ppbKj8LSkg37gckU1FmoXcbZnV4J9gQvZ063uM2HIMkSMSM64oqKrjLv4y1nMaAogTiIVK8ErkEPdbJuppFvhMu8cbXMxub0IoEaQfLf8UwP5dZiE9VvzIQsxTfVemY1KpkLwjvvUs3BFNrw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ecMQX2G44Q7sn+D0s2bDxpdKGFIzuVEdsQOjAX//5JA=;
- b=RSUBpUE97iMjf/JVf0VuT+265bTC/cd1aWfQqy/cA8VZzZMF3e0zNXYjSdp/xTMQpNHUdcFycNMOC4GsRaksPbrWUew1FVFw5hPLrfszoxaUpUBsk1AUbAaQbjUm3HOTnT155ZyL+0Qh9rkM7wXmN/UU2x3s1DixVh80evLYF52ifHOLRGtWtglnixPBnxhmMoZv6zAY7ZkZuPkz13LrX/qkuZlVePQVtZg3bFGepIfwUHzVbGORT1jrULBULM5qvXwiY8oDnur2ZN+M4KWWjTE3qJ6uBdnIGb1SKpIi+myUh1PvIa5uw++CX48qlWske1gVzDvgZTNBsyTPD5kqwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ecMQX2G44Q7sn+D0s2bDxpdKGFIzuVEdsQOjAX//5JA=;
- b=Pjz0UkYV/Y5a4dpah4Uy0lqP4PiyDzjoqnUJDJdbKhc0cZ7u9XIjE+l58NSisDjpjQI8bkNUKtySesieMuh0VCpAX2FimQMHdby/XSxCJZA2eE1F7g4s2IpCHQ0mfXgsX/9uKNcbzZDWKR0r+X9qwSdJ8st0va8QHu3Ekxh0ywelrLjdEzdlw7gamCtns6S7XWWqM8MzHtMxfuNPep+YqUK5/vLzGdEFdrh94R7UpEcq6TnV0fit9cDgNrvjOLgbLKPKJVFGD/ApZ+DqCemnEOXReo2iXKiFebcLo21dqd5ALrYIj1BT03BlwAAanMgvjy6lylUJ6RU8mOYTtO5zzw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by DS7PR12MB6286.namprd12.prod.outlook.com (2603:10b6:8:95::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.22; Tue, 17 Dec
- 2024 14:39:12 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8%4]) with mapi id 15.20.8251.015; Tue, 17 Dec 2024
- 14:39:11 +0000
-Date: Tue, 17 Dec 2024 16:39:02 +0200
-From: Ido Schimmel <idosch@nvidia.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, Yotam Gigi <yotam.gi@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E9121F543C
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 14:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734446493; cv=none; b=W1rXJW8SGjLLYiCZGrOKGWOVfeKgsysvAH7ZlZ1nRNnK/iOySIw9q3jXwilKi4Bg3BmPi82lm5Y528TAieBSdL7RTtu9JlWkhAKsmqOF3srFK/WYosQLvzH2EwK8tbh7+jJJvIkpM0DyB4XCM5Nb93prreuVHaOVa5BFVBaemEM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734446493; c=relaxed/simple;
+	bh=8AaDbwKFvbcT7zaM0O+vBHHHaxZSkDqoKZJscM4UnIA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W7oZ5jW3heBE7+TtLvKp2Fg+CYIWYUMzjkJio53lEQLZQvw+DhIAShDhTBUBJ2Z3VAfFPwbMBgxY5WrxtWbOp7kfMmgtQQr+ES7p76RYbUoiSmy58NffFj8CZiq9T89hBM+Q4icZHTNlZlbhNYcyzcOMZkqMHLgRhf4eu1hPF8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=htGRnLVk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734446490;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wbF0QnqvZQCN2H1ohlWqQ9MDNp8eXpFsMJUFdmfarCM=;
+	b=htGRnLVkVr2uUcTqtX9b0tZT4FrbojWSD5/862suyZAmQNXXLju4ahuvxs88HyqrXO1OzA
+	sc9z+gwu+nU5Hbnp2Mv7kn9NkqxyXtEPm9uQWw7PqqhNrqHDs0ap85sgFQxyKz0r7ljC+z
+	4NQn/tVSv/7XIADgznWdgRCWYfyn3ec=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-219-sSoGQlv_Oay0PLieaRhZmQ-1; Tue, 17 Dec 2024 09:41:26 -0500
+X-MC-Unique: sSoGQlv_Oay0PLieaRhZmQ-1
+X-Mimecast-MFC-AGG-ID: sSoGQlv_Oay0PLieaRhZmQ
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4359206e1e4so49091925e9.2
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 06:41:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734446484; x=1735051284;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wbF0QnqvZQCN2H1ohlWqQ9MDNp8eXpFsMJUFdmfarCM=;
+        b=bdgIQGTNVD7zeuK9zuQk1/PygnxMUrEZSMgJxQ9CtpA0eCCeYVg0Apf2q1MxekekZ0
+         B/8eY/UT4p8XmzWfq+TDNR3S60y3g7yi+NlEAiYuhpTNNBpl01j5aOdOOmA5xwna+stm
+         z54Q+geew8D9TCgbyRvFi4J8ToGGYJTLpo0fkhk0fTBQc5chyoaFc03P5XjK6WUaro4G
+         U0oyrOHE3SP0Q4+KWeSYbz9N1DOV/XQkn41/XHCp2tRXY5a6mDIGloBBaIK/RrsiFcTB
+         cOUoEr9vhrytYXkN6SYhmlpiBQBG5zfQAI+upfgX8jgB1N9ShLLMoF/t8d5r7IYxY3m/
+         yFnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDbhOvr+Pbl9YYRwKEUAHo5FrYUS74xdMigYbsjS3ftbTZNVzGziz6kHnKot0KdQ/GxZeHRvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs5kRoD69NbNqL7kmHnHZF1SU10T4kVvsP+GW7g914szPIsOXY
+	RYAYFsJgPB7bRTCPvJMk/G+xP9I5Zms5hoHZeXj6UmTPCk7UC8mDpyhK9Dj90Ki27berGqQRz4w
+	BYWYKOvbufdfUbZ1urA8wWcSCFZwk+h3k6y8K22eyb+xe8Ia9VMjkIA==
+X-Gm-Gg: ASbGnctqhFoo3J/f6kHHgPFqPOWmOHwcMl42/KxbBh1XjIh266+AuuONRxWzmxOcae3
+	C7zkGq12VNAwbDrdAb4hJT8wbjThJg0ywQ87QDqGyapSl+fos2Fa1lcudUsHgC6nyANNLvxSNql
+	63x5XA2FNUPzX9y2844KCOOVE7yd7AWCKP5egJmFsnZsqBIyfmb7g1yEkKIceq0oxsVssZLDygx
+	v40v2Zs9T1cS8Mm15aFhZdKPXDwfmGSajdyL4H4rpvRXckXsIM=
+X-Received: by 2002:a05:600c:1c07:b0:434:f131:1e71 with SMTP id 5b1f17b1804b1-4362aa36366mr146939705e9.8.1734446484243;
+        Tue, 17 Dec 2024 06:41:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF7jHu3hMKo7ci38i3N/LDa4GbAjUSHIYuHUYCV2SAptPvL6tGlGEDWezUuc/ZQFOL5fTk9Cw==
+X-Received: by 2002:a05:600c:1c07:b0:434:f131:1e71 with SMTP id 5b1f17b1804b1-4362aa36366mr146939385e9.8.1734446483772;
+        Tue, 17 Dec 2024 06:41:23 -0800 (PST)
+Received: from redhat.com ([2a02:14f:1ed:dd96:e5cc:8b38:146f:2e38])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43625717c9fsm174748175e9.44.2024.12.17.06.41.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2024 06:41:23 -0800 (PST)
+Date: Tue, 17 Dec 2024 09:41:19 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Aaron Conole <aconole@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] psample: adjust size if rate_as_probability is set
-Message-ID: <Z2GNBtGznUHusxNm@shredder>
-References: <20241217113739.3929300-1-amorenoz@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241217113739.3929300-1-amorenoz@redhat.com>
-X-ClientProxiedBy: TL0P290CA0008.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::19) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	eric.dumazet@gmail.com,
+	syzbot+f56a5c5eac2b28439810@syzkaller.appspotmail.com,
+	Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH net-next] ptr_ring: do not block hard interrupts in
+ ptr_ring_resize_multiple()
+Message-ID: <20241217094106-mutt-send-email-mst@kernel.org>
+References: <20241217135121.326370-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS7PR12MB6286:EE_
-X-MS-Office365-Filtering-Correlation-Id: be2b44af-cbbc-404f-8fc0-08dd1ea89271
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|7416014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?EcsOZmbocDRZLEjDi64tJDUvRjMwRNvRPuvjGJ+9HF9FStYTVhzMCPvApLUQ?=
- =?us-ascii?Q?O0Ec27SCBZ0/9uztBiIs5EjGVhye/FegtWeHx4kFShGHCfFOsqReWMgoKfVt?=
- =?us-ascii?Q?CjE7ZLuNShQ5eDeAPN30YovuQhFZELSUFqsw6NTpFNDelg1DkKZCBoqAdb8c?=
- =?us-ascii?Q?gbiXKEgo8JHOdpuk4x/X267et4boEv3ZbicY2BVX5z6gAfqP0D4N6WGbJiG8?=
- =?us-ascii?Q?i3VKWz/7otzrhRxByrwr6NT2uFwkFhYGSqGYK9K0uana5i5VHHOjMBcxvMX+?=
- =?us-ascii?Q?IlKssC3BXd5WsYg3k9PywPGCA3wbrBQlNaHP7DZnB4V4OIXt9bV8uCfEoDaM?=
- =?us-ascii?Q?zRKhw13m+YumZ4SFreoCBe9nsKiVIyWCQI9FpRZYQr9hRzfut+4Od3twCAyV?=
- =?us-ascii?Q?Xk8TCjGMX0hNX9fTgbmV5V2SSFypsEqgv1q0Y/CnKSen+yE8qer9Q24kd1JE?=
- =?us-ascii?Q?IMbgO+OPbyy/z0WwV+swW2smWwn3yRg6HX5qJ6JzDDcX1XK+agDAT0JUqGOT?=
- =?us-ascii?Q?ywshczdVkC5QO9t7THOYbeqA9A+zfvNXXhxfrVG9ty1+Y3GQPw90wC3VrWBP?=
- =?us-ascii?Q?fYyWADE8fIvhNwipsMWIsaS18cvmiYULMYggoWRg4fb970/OQOc22wtNaWc8?=
- =?us-ascii?Q?AUl62ffDRk7f/eNKT5VzzHDHk3ewxR//sxMObRaw5+0V3s5Pt5uO+P+6NfSP?=
- =?us-ascii?Q?Kh9+9zRdRV+q1BQh9xnijVsMwJTyDDZUvDKyx+WFIKI4kkXng+B3cVj6TT1S?=
- =?us-ascii?Q?JX93B6r6Yqn3S6Psd+fAA0eDUeh+fgIzUZaxdrs9ch6G1/a4QI5dxZ07/P4R?=
- =?us-ascii?Q?9tBbdFjrwkect71nGGLfDN206BrvKqQM7OPuoh8NWwEfflDnh8fW7gU4SlQH?=
- =?us-ascii?Q?blz2bnB4t3YSHorViXTapVvLnJv7aYANsH+IAfvu0SsvB7jcCYLHrkzkarUt?=
- =?us-ascii?Q?xHzzjRkP+50ni+2PpJn/3C5TE9NLRptOGHS6vmJbj8pNZUO4VDSjeiBOqZlT?=
- =?us-ascii?Q?zzsQ2jhUjyIbA/iIoFmujIGaALb/GT9fFtWOe1PNdFPhvhSYT4rXc+tWitYJ?=
- =?us-ascii?Q?J6DwvK1wndb3Nj4t6ttJm7S4UNDtA8OQZwLjMlHDnHhDHIrYO7SnYGQ8TPad?=
- =?us-ascii?Q?bdNi4sWJUSQ1k7BBM9ZP8wrTe8jlK7UwNOk+OnI/TVrpQXZ3ZxZ0plReuVBg?=
- =?us-ascii?Q?5kMsL3y5H4RkiTZNaGEdVLbyxwmiarJNbhiExqh1ggkFZ0rjTjCSnIqBSEs4?=
- =?us-ascii?Q?DdGqYT7lZMROQZ3iUEaDKXGZeEGf0mGCIGjeZN+vw7akjV1U/ztTjJhl99ai?=
- =?us-ascii?Q?jRuHM6x4Y2cvogZWamo9g1kE86MYyLrEURliuDNJLpwnaJOFaW8rVE4UP7jW?=
- =?us-ascii?Q?1BIvVxgRh1HsN4LncXyTmYtYndtd?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?oALEN5qU/ianS4kZJlHiuU1slQUDBkFcnNq9I8GuGcolnSQ0h4DkgRWCPEIu?=
- =?us-ascii?Q?SEUsfvgHlGCCn4fnShuo8lNuiCIch4iRomEfID29Q+Rm1Ol2Fvri/MbTv8//?=
- =?us-ascii?Q?nUK7Ws+msDXRJFM1EBHWHwurGo2Ik+v4e3+gUhT1XgiXYGyOVU9HEj6s6n+y?=
- =?us-ascii?Q?eBW4PzATm7TCiA6P2vMYOfGxxHzXyoJKsO3va6a1Gz3GiWGJwcx7+BE+a0+I?=
- =?us-ascii?Q?z67CYg28LHEqGY0ZCRWeVYRGQjdFTByL6Xc6pjmEuYl7Z+yHAZ2kyKvRtlB3?=
- =?us-ascii?Q?yBUcCIxe7cfdZexs01AuwnVhLtOl0+WPGCQTb4hJPFgmDAnQ+vl9dFPbAeGa?=
- =?us-ascii?Q?ENMpIdVdS93Pvh55f+j78dpNAdUe3vPCXsgpT2O7+S12tdvJIgyZvpuvwXg0?=
- =?us-ascii?Q?ffXQ0khE9+fj35+jHuhaY7fJCLyWgT0rOyVReytZMBTK/+Pm+ea8Ai8Fyjkj?=
- =?us-ascii?Q?1YoPlOGVPViFskFIONZII1DoEf8F5LvRHfNdZIgWyKUJzArGcL4AW0u4DuoA?=
- =?us-ascii?Q?n6HNJUErEy2oK2/M/SApBtlV8PjbjxDpuFh6M3SMgdK43QC9EwPpizUYHNA4?=
- =?us-ascii?Q?PuChuVUZ348bEd5uU9yV9B7Sr1VBqBVsquxD82AeG7tWlVHHmOJV9ctQfWMo?=
- =?us-ascii?Q?SGCJro4kQt/1THyxWRT4y1rxeqQYMEtdbXXZJiRxe9Wj7VGCFegZs4iFpsGI?=
- =?us-ascii?Q?q+Ujd8lxIme2/eaJ/0iQnKXcWVfQNA12dbAscpdNAKeCczi5qW6svWm+Cqaa?=
- =?us-ascii?Q?Uh74cMah6KEwLgy9S/wsHQcsgZ1M57dlAOJhx6LrUbcJEa7lD/1nd623tfSK?=
- =?us-ascii?Q?NKfmfoOv4SWQnUFssGZO0TkZrqsVJFxPV3HL6XdVK97BBYdoHCuSsR2YK+k/?=
- =?us-ascii?Q?Wz4RFmnA6Id5RXCt8t3eY1DgPHeBOBkn77MXgiKkEdHTutKDPcDJ9MAxp7vz?=
- =?us-ascii?Q?1B9Lrrbr5UMebO135jTQm8by5jHKbyg3YeVz7VfNxSbx2vwr5d/t8aQ8QtLu?=
- =?us-ascii?Q?TZtE2aCVeG/bhqY/fr69TH8HlNvlZaTboqVuipHQ8daClZMJ5yFJOfsdCBVU?=
- =?us-ascii?Q?PPs1q18kX6K52QOEg6/7CeazE0y8nfx9Oq/ugHtJ7D7d6V/mYGji+XCywI1a?=
- =?us-ascii?Q?wSvHSZ5O6dcFDrSrJZD+fKbV3wcPfXjOecmedIq6Tc8q+n4YH7EX1c5mI5gZ?=
- =?us-ascii?Q?hBckMrs2OZ7HHaR2KSP+CTFn+O8z75Z6PCBoYa7aKr9/bfrc5N4z8IIayYdp?=
- =?us-ascii?Q?+FuPvdoLcDjLW9YbO0ldx4bmnwxDavAmi59Eahh+PsAqsT5Ezb5QNJAv8rDb?=
- =?us-ascii?Q?5yMeeh7nTXGPXMi1FalCWF05odrF+Z2J8MWkmBMl0sXLfQoVrBo+SYLcG0ed?=
- =?us-ascii?Q?qFtNfOuWC/Y8/b9K6dd9JEsNZ3eQhd+qN0mrL39nHJ3e/LXxVzkEgFbta+mg?=
- =?us-ascii?Q?chDUYX9+Nto2iceAxHd6+X/jsOT8KDQzC0ihafFFqYEium8+f3UIg00jqpqb?=
- =?us-ascii?Q?3iW6PMkkfyjWLlh8VYrzsSruZVXqMs+HQuVFU5mWvHIDncHa7yw5focJRBQ2?=
- =?us-ascii?Q?HxfnB2k1zVYWFHmlPtrcjSh5F6HO1zWZg7w9zJdp?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be2b44af-cbbc-404f-8fc0-08dd1ea89271
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2024 14:39:11.8421
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PM3RFLdrc9Vi4Dne+jB2GaEOAB4KS9tE8sckn2ZIid4HhE505NOVishXluZ5ZJGTUwOL7z0ZGIV8IuedvPljUA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6286
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241217135121.326370-1-edumazet@google.com>
 
-On Tue, Dec 17, 2024 at 12:37:39PM +0100, Adrian Moreno wrote:
-> If PSAMPLE_ATTR_SAMPLE_PROBABILITY flag is to be sent, the available
-> size for the packet data has to be adjusted accordingly.
+On Tue, Dec 17, 2024 at 01:51:21PM +0000, Eric Dumazet wrote:
+> Jakub added a lockdep_assert_no_hardirq() check in __page_pool_put_page()
+> to increase test coverage.
 > 
-> Also, check the error code returned by nla_put_flag.
+> syzbot found a splat caused by hard irq blocking in
+> ptr_ring_resize_multiple() [1]
 > 
-> Fixes: 7b1b2b60c63f ("net: psample: allow using rate as probability")
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> As current users of ptr_ring_resize_multiple() do not require
+> hard irqs being masked, replace it to only block BH.
+> 
+> Rename helpers to better reflect they are safe against BH only.
+> 
+> - ptr_ring_resize_multiple() to ptr_ring_resize_multiple_bh()
+> - skb_array_resize_multiple() to skb_array_resize_multiple_bh()
+> 
+> [1]
+> 
+> WARNING: CPU: 1 PID: 9150 at net/core/page_pool.c:709 __page_pool_put_page net/core/page_pool.c:709 [inline]
+> WARNING: CPU: 1 PID: 9150 at net/core/page_pool.c:709 page_pool_put_unrefed_netmem+0x157/0xa40 net/core/page_pool.c:780
+> Modules linked in:
+> CPU: 1 UID: 0 PID: 9150 Comm: syz.1.1052 Not tainted 6.11.0-rc3-syzkaller-00202-gf8669d7b5f5d #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+> RIP: 0010:__page_pool_put_page net/core/page_pool.c:709 [inline]
+> RIP: 0010:page_pool_put_unrefed_netmem+0x157/0xa40 net/core/page_pool.c:780
+> Code: 74 0e e8 7c aa fb f7 eb 43 e8 75 aa fb f7 eb 3c 65 8b 1d 38 a8 6a 76 31 ff 89 de e8 a3 ae fb f7 85 db 74 0b e8 5a aa fb f7 90 <0f> 0b 90 eb 1d 65 8b 1d 15 a8 6a 76 31 ff 89 de e8 84 ae fb f7 85
+> RSP: 0018:ffffc9000bda6b58 EFLAGS: 00010083
+> RAX: ffffffff8997e523 RBX: 0000000000000000 RCX: 0000000000040000
+> RDX: ffffc9000fbd0000 RSI: 0000000000001842 RDI: 0000000000001843
+> RBP: 0000000000000000 R08: ffffffff8997df2c R09: 1ffffd40003a000d
+> R10: dffffc0000000000 R11: fffff940003a000e R12: ffffea0001d00040
+> R13: ffff88802e8a4000 R14: dffffc0000000000 R15: 00000000ffffffff
+> FS:  00007fb7aaf716c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fa15a0d4b72 CR3: 00000000561b0000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  tun_ptr_free drivers/net/tun.c:617 [inline]
+>  __ptr_ring_swap_queue include/linux/ptr_ring.h:571 [inline]
+>  ptr_ring_resize_multiple_noprof include/linux/ptr_ring.h:643 [inline]
+>  tun_queue_resize drivers/net/tun.c:3694 [inline]
+>  tun_device_event+0xaaf/0x1080 drivers/net/tun.c:3714
+>  notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
+>  call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
+>  call_netdevice_notifiers net/core/dev.c:2046 [inline]
+>  dev_change_tx_queue_len+0x158/0x2a0 net/core/dev.c:9024
+>  do_setlink+0xff6/0x41f0 net/core/rtnetlink.c:2923
+>  rtnl_setlink+0x40d/0x5a0 net/core/rtnetlink.c:3201
+>  rtnetlink_rcv_msg+0x73f/0xcf0 net/core/rtnetlink.c:6647
+>  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
+> 
+> Fixes: ff4e538c8c3e ("page_pool: add a lockdep check for recycling in hardirq")
+> Reported-by: syzbot+f56a5c5eac2b28439810@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/671e10df.050a0220.2b8c0f.01cf.GAE@google.com/T/
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+> ---
+>  drivers/net/tap.c         |  6 +++---
+>  drivers/net/tun.c         |  6 +++---
+>  include/linux/ptr_ring.h  | 21 ++++++++++-----------
+>  include/linux/skb_array.h | 17 +++++++++--------
+>  net/sched/sch_generic.c   |  4 ++--
+>  5 files changed, 27 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> index 5aa41d5f7765a6dcf185bccd3cba2299bad89398..5ca6ecf0ce5fbce6777b47d9906586b07f1b690a 100644
+> --- a/drivers/net/tap.c
+> +++ b/drivers/net/tap.c
+> @@ -1329,9 +1329,9 @@ int tap_queue_resize(struct tap_dev *tap)
+>  	list_for_each_entry(q, &tap->queue_list, next)
+>  		rings[i++] = &q->ring;
+>  
+> -	ret = ptr_ring_resize_multiple(rings, n,
+> -				       dev->tx_queue_len, GFP_KERNEL,
+> -				       __skb_array_destroy_skb);
+> +	ret = ptr_ring_resize_multiple_bh(rings, n,
+> +					  dev->tx_queue_len, GFP_KERNEL,
+> +					  __skb_array_destroy_skb);
+>  
+>  	kfree(rings);
+>  	return ret;
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index 8e94df88392c68c0585c26dd7d4fc6928062ec2b..41e3eeac06fdc7d4b7cd029a60dc2acc7e447c4a 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -3701,9 +3701,9 @@ static int tun_queue_resize(struct tun_struct *tun)
+>  	list_for_each_entry(tfile, &tun->disabled, next)
+>  		rings[i++] = &tfile->tx_ring;
+>  
+> -	ret = ptr_ring_resize_multiple(rings, n,
+> -				       dev->tx_queue_len, GFP_KERNEL,
+> -				       tun_ptr_free);
+> +	ret = ptr_ring_resize_multiple_bh(rings, n,
+> +					  dev->tx_queue_len, GFP_KERNEL,
+> +					  tun_ptr_free);
+>  
+>  	kfree(rings);
+>  	return ret;
+> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> index fd037c127bb0713bdccbb0698738e42ef8017641..551329220e4f34c9cc1def216ed91eff8b041a7b 100644
+> --- a/include/linux/ptr_ring.h
+> +++ b/include/linux/ptr_ring.h
+> @@ -615,15 +615,14 @@ static inline int ptr_ring_resize_noprof(struct ptr_ring *r, int size, gfp_t gfp
+>  /*
+>   * Note: producer lock is nested within consumer lock, so if you
+>   * resize you must make sure all uses nest correctly.
+> - * In particular if you consume ring in interrupt or BH context, you must
+> - * disable interrupts/BH when doing so.
+> + * In particular if you consume ring in BH context, you must
+> + * disable BH when doing so.
+>   */
+> -static inline int ptr_ring_resize_multiple_noprof(struct ptr_ring **rings,
+> -						  unsigned int nrings,
+> -						  int size,
+> -						  gfp_t gfp, void (*destroy)(void *))
+> +static inline int ptr_ring_resize_multiple_bh_noprof(struct ptr_ring **rings,
+> +						     unsigned int nrings,
+> +						     int size, gfp_t gfp,
+> +						     void (*destroy)(void *))
+>  {
+> -	unsigned long flags;
+>  	void ***queues;
+>  	int i;
+>  
+> @@ -638,12 +637,12 @@ static inline int ptr_ring_resize_multiple_noprof(struct ptr_ring **rings,
+>  	}
+>  
+>  	for (i = 0; i < nrings; ++i) {
+> -		spin_lock_irqsave(&(rings[i])->consumer_lock, flags);
+> +		spin_lock_bh(&(rings[i])->consumer_lock);
+>  		spin_lock(&(rings[i])->producer_lock);
+>  		queues[i] = __ptr_ring_swap_queue(rings[i], queues[i],
+>  						  size, gfp, destroy);
+>  		spin_unlock(&(rings[i])->producer_lock);
+> -		spin_unlock_irqrestore(&(rings[i])->consumer_lock, flags);
+> +		spin_unlock_bh(&(rings[i])->consumer_lock);
+>  	}
+>  
+>  	for (i = 0; i < nrings; ++i)
+> @@ -662,8 +661,8 @@ static inline int ptr_ring_resize_multiple_noprof(struct ptr_ring **rings,
+>  noqueues:
+>  	return -ENOMEM;
+>  }
+> -#define ptr_ring_resize_multiple(...) \
+> -		alloc_hooks(ptr_ring_resize_multiple_noprof(__VA_ARGS__))
+> +#define ptr_ring_resize_multiple_bh(...) \
+> +		alloc_hooks(ptr_ring_resize_multiple_bh_noprof(__VA_ARGS__))
+>  
+>  static inline void ptr_ring_cleanup(struct ptr_ring *r, void (*destroy)(void *))
+>  {
+> diff --git a/include/linux/skb_array.h b/include/linux/skb_array.h
+> index 926496c9cc9c3b64c6b2d942524d91192e423da2..bf178238a3083d4f56b7386d12e06bc2f0b929fa 100644
+> --- a/include/linux/skb_array.h
+> +++ b/include/linux/skb_array.h
+> @@ -199,17 +199,18 @@ static inline int skb_array_resize(struct skb_array *a, int size, gfp_t gfp)
+>  	return ptr_ring_resize(&a->ring, size, gfp, __skb_array_destroy_skb);
+>  }
+>  
+> -static inline int skb_array_resize_multiple_noprof(struct skb_array **rings,
+> -						   int nrings, unsigned int size,
+> -						   gfp_t gfp)
+> +static inline int skb_array_resize_multiple_bh_noprof(struct skb_array **rings,
+> +						      int nrings,
+> +						      unsigned int size,
+> +						      gfp_t gfp)
+>  {
+>  	BUILD_BUG_ON(offsetof(struct skb_array, ring));
+> -	return ptr_ring_resize_multiple_noprof((struct ptr_ring **)rings,
+> -					       nrings, size, gfp,
+> -					       __skb_array_destroy_skb);
+> +	return ptr_ring_resize_multiple_bh_noprof((struct ptr_ring **)rings,
+> +					          nrings, size, gfp,
+> +					          __skb_array_destroy_skb);
+>  }
+> -#define skb_array_resize_multiple(...)	\
+> -		alloc_hooks(skb_array_resize_multiple_noprof(__VA_ARGS__))
+> +#define skb_array_resize_multiple_bh(...)	\
+> +		alloc_hooks(skb_array_resize_multiple_bh_noprof(__VA_ARGS__))
+>  
+>  static inline void skb_array_cleanup(struct skb_array *a)
+>  {
+> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> index 38ec18f73de43aed565c653fffb838f54e7c824b..8874ae6680952a0531cc5175e1de8510e55914ea 100644
+> --- a/net/sched/sch_generic.c
+> +++ b/net/sched/sch_generic.c
+> @@ -911,8 +911,8 @@ static int pfifo_fast_change_tx_queue_len(struct Qdisc *sch,
+>  		bands[prio] = q;
+>  	}
+>  
+> -	return skb_array_resize_multiple(bands, PFIFO_FAST_BANDS, new_len,
+> -					 GFP_KERNEL);
+> +	return skb_array_resize_multiple_bh(bands, PFIFO_FAST_BANDS, new_len,
+> +					    GFP_KERNEL);
+>  }
+>  
+>  struct Qdisc_ops pfifo_fast_ops __read_mostly = {
+> -- 
+> 2.47.1.613.gc27f4b7a9f-goog
+
 
