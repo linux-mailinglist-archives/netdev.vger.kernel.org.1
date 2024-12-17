@@ -1,102 +1,144 @@
-Return-Path: <netdev+bounces-152555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F303D9F491B
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:42:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C2209F491C
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:43:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FC6B161934
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:42:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 926801619FF
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD73E1E3DC3;
-	Tue, 17 Dec 2024 10:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F241E3DC3;
+	Tue, 17 Dec 2024 10:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wo4K0JV6"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="dZsHYjmk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84ABC1E282D;
-	Tue, 17 Dec 2024 10:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216CC1E104E
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 10:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734432151; cv=none; b=HTWH0YR4vLZolDrZ6AfrxW5g80tJ3DQ3vKy4tVINSqB/+ar6FYdP3oewq3470XC2V63m5he0btvSW/qXcCpSDmEcEDphKbmOLfVGOIW4WU7ljwMxqIPEjvlToxnkZPKatZZ0CM029/5AjYsLtkONbGAZdKcXGP5nvkTQMqTR+Go=
+	t=1734432191; cv=none; b=WdYvyuObLAAONVYQ6HiENSiXl5J2cvtgcBOyjeYmSgvBbLrfwYDfVI/WqwRMWf90uypkHB6g9Bu+fgCmO/kqDNqG9zTGDCkXYTDIDz5ZpIxFSA3zguhquBs+4wLAxQM0aioEFQcXRdbl7jGjqfFC7xJ3AfI3GYmVLfIBDVvamSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734432151; c=relaxed/simple;
-	bh=1DE6usUuc7I/k3TUxkIHydMtKw4QUnTOvFMSLro//cM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J07Ec9ne4Sn0MboSV3yNkcxDJrihllZ9GmSzxjTOCrJPoM7jx9jws4yuDL02Yi1OgBDd4fGIBG3MiThZ6wh7sLjl1cOXHGO4+6QbXbfeNO0+c4fchEGVq89HLTk4fysCMwv89BjqyTGpyf5PLcGVJZl0SzCaSWfRGNulu0OiOEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wo4K0JV6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35E0EC4CED4;
-	Tue, 17 Dec 2024 10:42:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734432151;
-	bh=1DE6usUuc7I/k3TUxkIHydMtKw4QUnTOvFMSLro//cM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Wo4K0JV6nAQFbJG9G+H0dHf/iGpzIigHd/jbC/R6gVIZbabBz+Wnbmk/Tz6tRM9pH
-	 JIJY58LDm1oR9uJFnUDraLOlkRm7PaGCN878Sx4lUucWgZYj7VhlR0qt7XbUTFQOY0
-	 pAL+7Fz5J47bShMWPvJ7N2uBdppKaRbZf7hiFJwI1ErkKEMqBHsL9/VZlVIuuREUa/
-	 rEUOyL2Y8JDBSL/bUHsf3cq6Y6Qi9IhU4ANQ0YRAqt13G8Fd6Nm6zr6w2tO6vLQdJ4
-	 JSIub4hDQ1Jp0u5LCCLs0lO3O1deiZIrLXGX3y1cJqnGvDVw+5V8wlSPXNWhFc95Yd
-	 /9oNtB/1I0yHg==
-Date: Tue, 17 Dec 2024 10:42:25 +0000
-From: Simon Horman <horms@kernel.org>
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, martin.habets@xilinx.com,
-	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v8 18/27] sfc: get endpoint decoder
-Message-ID: <20241217104225.GP780307@kernel.org>
-References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
- <20241216161042.42108-19-alejandro.lucero-palau@amd.com>
+	s=arc-20240116; t=1734432191; c=relaxed/simple;
+	bh=y6kN0ytC+JEAm663I+e3ce52E/uTgwxjwdVw6gidIJg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YW1ZoRD6TShQggTDz/PZebcKCJk+QATxOJMgVeEicnTaARo/g+Tjux5qA8GsrJzjZZTc5rZ2Tug35IyvrwXLtnMkVRBc4NJjs1frWE9EGOc4O608xX/r0u7fxvnj6ukObXcU6lUgsenJQoXjO86nE9tCKzuAp9p8wFd1PGQRUNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=dZsHYjmk; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-436326dcb1cso25095625e9.0
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 02:43:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1734432188; x=1735036988; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6lPpgSVaAv355PXrM8WEJ5CO/JUa9i24YlHdFUS1Mag=;
+        b=dZsHYjmkhvWBVsm2tNMZTYJ6fifUvbeljbA9rzuGPR4hxzY9sTa1bgk/BveyCJn/Bj
+         010mgKQbGqWAeVoFnqoxUE8FX0smvn9wMVd8zLeNMV24ZhSGjjzHDVtstCR8LNh+dOQt
+         RQKEHwEtPbCHTIFgMWzJwak1Sj1f5c71F8Fz8X2nUb5qtVihBlaJQ/dkqeAbhgbBxC2e
+         bDL6ufuTtwJ0M7OtKhA6d7ncZ1Tf0zrYh35377rPYi/q5NqCA73aCAc2pj51VmqrV2KO
+         YO6CUv3jdCn+/5p/brlrKV8WwhevbP9z6V3pTnZU0dVjSuF16UY6u3A3ZdfpCfxcO2+o
+         GDLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734432188; x=1735036988;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6lPpgSVaAv355PXrM8WEJ5CO/JUa9i24YlHdFUS1Mag=;
+        b=TCCWDt0jUFiKV0aqi6GrdOgONYzSbq9WP00Bw4GiJ3L4Dv3NicKS529iZu4hBmF/qJ
+         i1aDxaM/RzIYJQtXJbBf8M4oT0HPWIsqEjB8/iKoNfIfimT8kRlY+870nzLAv+PXMajS
+         ViAB0mcOc3CwoyMrZA2wfxLBYwG/DZu1oRZm9vi94ofznDsC4SxOZpXxlP5aiVUXt/h5
+         +3g5nAkrzTsigOxAo1e8B9xLQhCIJI5+B0hI3xwcudb3CqYeVkN/1HvFNMqUO33glaGT
+         fzirqsvsW+sva0SWbulSHnx3rOWHciga+ja5wBobEYuDk+CK61ZywICYksyHVBl1ZEJX
+         UWEg==
+X-Forwarded-Encrypted: i=1; AJvYcCWbTwgOjiINVZxfLK2/mL2e8ssvntevANIws4I9lMhoG5mdzjHZ3dZ7LYpjN+txAuNCIB3JqNE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8dXV5mSryIZ9UJZjdbqbNLJ6RkZLeC4VtMCwg6mdrQrOoABBR
+	16TIrj0Glzrytqrp4abceoY6q3+kHcktrJwSFvVA2Eau+EEKLbpW+DJ+a6n6/m4=
+X-Gm-Gg: ASbGncvMQruTXf2Wa7GiE3VFX4RkhVCHzqjaHvaQJwCop07qLwb/ilBF0ZN4WWJzLBj
+	xTXBnh9gys63uTlXVnF+MKb86jQdRgC/qnKOJj5GVj5U94kYc6i6gg9SjyWS0OnFzHfVCVk60Q2
+	KqWGO1VNoYUnrIuFuC1R17kTEHKuDjp+Uc61YEh8MJxBJYfa18WSQ2xcU9sIC+KB0kEJu8XSPvS
+	bhvIZBpHIZuxo3YkY+vHU0qWJf5wNmXIRuUefkF6UNkIM1txFR6L3CYlOSVmNoF/bA8kxD5AncW
+	Gbs0Sx3kqmxQ
+X-Google-Smtp-Source: AGHT+IE+WugOposmvo/jcHeaw0Ch/ihxlIzSWqzgKieKmOo/fttsPn7O0uxSSG2XNkVbg/PrQmJctQ==
+X-Received: by 2002:a05:600c:8715:b0:434:f270:a513 with SMTP id 5b1f17b1804b1-4362aaa8b9fmr140737975e9.29.1734432188304;
+        Tue, 17 Dec 2024 02:43:08 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43625706595sm170469495e9.33.2024.12.17.02.43.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2024 02:43:07 -0800 (PST)
+Message-ID: <66adcd4a-d4ae-4dc6-a706-2761efd5084a@blackwall.org>
+Date: Tue, 17 Dec 2024 12:43:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241216161042.42108-19-alejandro.lucero-palau@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/5] net: bridge: constify 'struct bin_attribute'
+To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ Roopa Prabhu <roopa@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Kalle Valo <kvalo@kernel.org>,
+ Manish Chopra <manishc@marvell.com>, Rahul Verma <rahulv@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Shahed Shaikh <shshaikh@marvell.com>
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org
+References: <20241216-sysfs-const-bin_attr-net-v1-0-ec460b91f274@weissschuh.net>
+ <20241216-sysfs-const-bin_attr-net-v1-1-ec460b91f274@weissschuh.net>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20241216-sysfs-const-bin_attr-net-v1-1-ec460b91f274@weissschuh.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 16, 2024 at 04:10:33PM +0000, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
+On 12/16/24 13:30, Thomas Weißschuh wrote:
+> The sysfs core now allows instances of 'struct bin_attribute' to be
+> moved into read-only memory. Make use of that to protect them against
+> accidental or malicious modifications.
 > 
-> Use cxl api for getting DPA (Device Physical Address) to use through an
-> endpoint decoder.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 > ---
->  drivers/net/ethernet/sfc/efx_cxl.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  net/bridge/br_sysfs_br.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index 253c82c61f43..724bca59b4d4 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -121,6 +121,14 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		goto err_memdev;
->  	}
+> diff --git a/net/bridge/br_sysfs_br.c b/net/bridge/br_sysfs_br.c
+> index ea733542244c7e7feeffef3c993404529ba88559..c1176a5e02c43ce32cb3dc152e9aa08eb535a419 100644
+> --- a/net/bridge/br_sysfs_br.c
+> +++ b/net/bridge/br_sysfs_br.c
+> @@ -1002,7 +1002,7 @@ static const struct attribute_group bridge_group = {
+>   * Returns the number of bytes read.
+>   */
+>  static ssize_t brforward_read(struct file *filp, struct kobject *kobj,
+> -			      struct bin_attribute *bin_attr,
+> +			      const struct bin_attribute *bin_attr,
+>  			      char *buf, loff_t off, size_t count)
+>  {
+>  	struct device *dev = kobj_to_dev(kobj);
+> @@ -1023,10 +1023,10 @@ static ssize_t brforward_read(struct file *filp, struct kobject *kobj,
+>  	return n;
+>  }
 >  
-> +	cxl->cxled = cxl_request_dpa(cxl->cxlmd, true, EFX_CTPIO_BUFFER_SIZE,
-> +				     EFX_CTPIO_BUFFER_SIZE);
-> +	if (IS_ERR(cxl->cxled)) {
-> +		pci_err(pci_dev, "CXL accel request DPA failed");
-> +		rc = PTR_ERR(cxl->cxlrd);
+> -static struct bin_attribute bridge_forward = {
+> +static const struct bin_attribute bridge_forward = {
+>  	.attr = { .name = SYSFS_BRIDGE_FDB,
+>  		  .mode = 0444, },
+> -	.read = brforward_read,
+> +	.read_new = brforward_read,
+>  };
+>  
+>  /*
+> 
 
-Hi Alejandro,
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Should the line above use cxl->cxled rather than cxl->cxlrd?
-
-Flagged by Smatch.
-
-> +		goto err_memdev;
-> +	}
-
-...
 
