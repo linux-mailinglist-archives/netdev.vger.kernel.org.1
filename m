@@ -1,115 +1,174 @@
-Return-Path: <netdev+bounces-152686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD0839F5623
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 19:28:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12EAA9F565F
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 19:35:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DEC47A39A1
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 18:27:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEAE5188468B
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 18:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF8C1F8932;
-	Tue, 17 Dec 2024 18:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB1791F8AF0;
+	Tue, 17 Dec 2024 18:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XrHtESlu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="mAVt18oh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta034.useast.a.cloudfilter.net (omta034.useast.a.cloudfilter.net [44.202.169.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5298B1F9412
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 18:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77C31F8688
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 18:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734460031; cv=none; b=Qm5UL/2iD+uT3tCbK/s63Yfnrb6EghSIruJAEFmKZffDWni6qUqjq6Rx+cxV8/0w24yjKatBzFDTE/stmGPSs8C0KOlM5G8gq2ItO941j9qUd3PJoEMNZprFL6EUHO8mPXwptdZkci4y7tFFvde01LLyMZx7z3SiZtoASl/qR0s=
+	t=1734460358; cv=none; b=OZOS9yNauXe0APmAbVgw+DEttM41+J9FGWOplKS4dyDI0BrGuotZqpi+Kk0fwQ7JpaAs8BfjQpm26tDimsMCBkxyMu8UPWwtmaVGTxbO0Fuy5tDRSno1E8onTYsrwEYxMQOl6f17fueE7kNd8bMKxFVEPl1Rk8P6IoYYRGse4y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734460031; c=relaxed/simple;
-	bh=3CBZBlfh+56QfJJs99uRlQZjombPvTGum3x0MjVt7pY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TAHYAwfeFxVPuco0C5SoW9QtXyujBzen7vmCRc1Qy2oYA+AxOr4R9JLtqKdBY9A1UvMuBi46jz+HJ/e9rgjKWmPXPjRi7bnmsCKiGVZKToy7wShEVeIi35WMIHocNcUdfZo/uYXezCImw+Shu8lZoop9/aotI4qIAULR4nhdP80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XrHtESlu; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21644aca3a0so67034495ad.3
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 10:27:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1734460029; x=1735064829; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P0XQDitWKVq4eNGE0XYTq4nsJajScvFqTYG5pnFykTI=;
-        b=XrHtESlugAu096WZCraxIpoQNV/xSUM5s+kishlkacrZNrWS8z0stPx5dQaC0gQz2Y
-         pgkYAqsVK8b7G90AJzdQszR1KT096tLBbMcM+kySJihgjIHC2QDc6jwu/rqOoNZjDC5b
-         UG/21vkIJ+bKz+kXJVZ3bwv36/C29d6sZJuv0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734460029; x=1735064829;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P0XQDitWKVq4eNGE0XYTq4nsJajScvFqTYG5pnFykTI=;
-        b=Nyg/6m8YUtSeKNQPzbS5YPAp0Rag5oFYjHu9NecPJuWoWe9gbdTsF0G0yw4pJ38P+5
-         AXYuXJ0qCaPANvY64warfbW06fZWn30UWXyun6cNuPkLlAlg+GD8M6IGN63Nqe0UZ5LM
-         eWfl6e9pt+86Z7eTJPxElLxqChwYzdH8gXLbJvGQg7bOlegsiMKogfzEf58eceTIKMfF
-         VQURa8sA2c39OKieA35lteZh/FCxpmf8zE8gTgjxBLAxt6B/SUqdshBYOsFMEckriQTe
-         NcbfCt4sk2W0Pkve/w9+NJ9hWIbgF+7tcrhHC2gQ2GDwZ8k+rqwP9EDFou9pW2ij3nLa
-         CcvQ==
-X-Gm-Message-State: AOJu0YxKYoLtsa4WL/ynuvgECb87ICru2L7CStB2jJB4Kp9IlmqkeXC1
-	WBx693DpruJq3Pi00hsGYhOwWeUN3nr0RWIvRrCUToMN51Q1mLF1s1i2rRzxzA==
-X-Gm-Gg: ASbGnctWEOTnFxu/zAbE3dEHcXmhXQr39f29pAmYVu1EUIhKg9p8xKJo94ZDMKdUIGB
-	f+J0S2DWgjO34wz4HEQ6e7xUNUqPq72rDdcpdJahAj+b/VoesDQ9t8lFselFHNxbTrGrNRe7wEw
-	oq0L7KnkiecbGof+vzBDafeQSDXXG5wJpPgMdwB/NyireAh9pJr0vWBRLmil1bMX7pnaY5JYViN
-	6EpfLx89rI0kPgwUQxFqRMVjM9uoyM2mYkyWpKK8SGsi/adAld21oFxUA2ohdOEOvBtuWeNYVdc
-	BJ3L4Pn9G1KvoDhNN4UCdrC8+htElvCW
-X-Google-Smtp-Source: AGHT+IGMHNMKEjPlhVfqnJibVGP2lWKCoF0Rj8LBqRvc8ZfXWQnxW5kq7PG8A5ahiFwJR6zz4xz8vQ==
-X-Received: by 2002:a17:902:f64b:b0:216:55a1:35a with SMTP id d9443c01a7336-218929ee63cmr259088285ad.30.1734460029557;
-        Tue, 17 Dec 2024 10:27:09 -0800 (PST)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e63af1sm62496595ad.226.2024.12.17.10.27.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 10:27:08 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v2 6/6] MAINTAINERS: bnxt_en: Add Pavan Chebbi as co-maintainer
-Date: Tue, 17 Dec 2024 10:26:20 -0800
-Message-ID: <20241217182620.2454075-7-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
-In-Reply-To: <20241217182620.2454075-1-michael.chan@broadcom.com>
-References: <20241217182620.2454075-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1734460358; c=relaxed/simple;
+	bh=Pe6tvbhsMmToE+mb1CKNBDUIKPcCIvGQehInaITBRSg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bvo7pTfXW0QcgL6vXpc0ndcCMlC2SP/U+wr3h7BeeOonAukgDCuW6sxnWrpBVywi9saHGzRRxYUusYzoEv4oPGFeFhBveK3yGryoknG1J4q3Z5lEfoyDnZ7tpKTqcCgdXqoNEv6XjmA5NZbu5NpkhvSTuP+lxmrUhh2Uav8aT74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=mAVt18oh; arc=none smtp.client-ip=44.202.169.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-6001a.ext.cloudfilter.net ([10.0.30.140])
+	by cmsmtp with ESMTPS
+	id NE1OtQ5UrrKrbNcLTtZEft; Tue, 17 Dec 2024 18:30:59 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id NcLStb7SB2Zy0NcLStwVo5; Tue, 17 Dec 2024 18:30:59 +0000
+X-Authority-Analysis: v=2.4 cv=Q4EZ4J2a c=1 sm=1 tr=0 ts=6761c363
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=GtNDhlRIH4u8wNL3EA3KcA==:17
+ a=IkcTkHD0fZMA:10 a=RZcAm9yDv7YA:10 a=7T7KSl7uo7wA:10 a=NEAV23lmAAAA:8
+ a=_Wotqz80AAAA:8 a=VwQbUJbxAAAA:8 a=Eymyif60OLRgAUHZ3uAA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=buJP51TR1BpY-zbLSsyS:22 a=Xt_RvD8W3m28Mn_h3AK8:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=E2r8Z9qRGeJk2+J3GMCUCiaRUUtYxFm6EV4/xEqs6Fg=; b=mAVt18ohtS0DMAjMZPXetI/HfX
+	TouWZY9yaGjH2qj1txnaY+qsuiZnYDbaSi6nulYgSXo41wWXAO4dUeQuxAULAJI90MsXDroCQMqM/
+	s3Btq9PysEbDnNeHiXpyjunMCceryvc1OCOSBpBO84cWF3Ksxk+ryqNScvpucJIFrD9zZOE/SiOyQ
+	4P6zGezbDP0385nZ2T5iP2BJHIrEwYo1P8c8Wt4Z9K5uaxYIKhdkvX4ysxxhcZzCRD/Tuj8gZg4ik
+	iMSBFKAWZ94dk3PhFgI8Z4+zsG5nnGle/zni3te70RMW7GyLGdiRuG6NLZgEyExnKEwlOhmw5jtC2
+	ln+oR60g==;
+Received: from [177.238.21.80] (port=16484 helo=[192.168.0.21])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1tNcLR-001oj4-2N;
+	Tue, 17 Dec 2024 12:30:57 -0600
+Message-ID: <49add42f-42d9-4f34-b4ad-cff31e473f40@embeddedor.com>
+Date: Tue, 17 Dec 2024 12:30:54 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] UAPI: net/sched: Open-code __struct_group() in flex
+ struct tc_u32_sel
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Kees Cook <kees@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ cferris@google.com, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20241217025950.work.601-kees@kernel.org>
+ <f4947447-aa66-470c-a48d-06ed77be58da@intel.com>
+ <bbed49c7-56c0-4642-afec-e47b14425f76@embeddedor.com>
+ <c49d316d-ce8f-43d4-8116-80c760e38a6b@intel.com>
+ <ff680866-b81f-48c1-8a59-1107b4ce14ff@embeddedor.com>
+ <b9a20b9e-c871-451d-8b16-0704eec27329@intel.com>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <b9a20b9e-c871-451d-8b16-0704eec27329@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 177.238.21.80
+X-Source-L: No
+X-Exim-ID: 1tNcLR-001oj4-2N
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.21]) [177.238.21.80]:16484
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 5
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfIK20NxB42i2I3uHBaPzn/ihIO2EXlCnheegSvgatZBPwvnel2TlzEHTTLz2cUDZJGeKvjJLl3A7E+8whwFSCoTgKxyA9HV9lmvX56rOE6b5+fViGeIi
+ RNI0j/KV580kcrGOnw/TK/Q+UKsDA2hS887JFRmo8bPQFKRIfd/IRByp/jKqZGNV6OSYOcqy+J4zRIiEhgmx8ZCISFP8m7Kjwxg=
 
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6cced90772fc..2c73a3aacafb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4611,6 +4611,7 @@ F:	drivers/net/ethernet/broadcom/bnx2x/
- 
- BROADCOM BNXT_EN 50 GIGABIT ETHERNET DRIVER
- M:	Michael Chan <michael.chan@broadcom.com>
-+M:	Pavan Chebbi <pavan.chebbi@broadcom.com>
- L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/firmware/broadcom/tee_bnxt_fw.c
--- 
-2.30.1
 
+On 17/12/24 10:54, Alexander Lobakin wrote:
+> From: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> Date: Tue, 17 Dec 2024 10:25:29 -0600
+> 
+>>
+>>
+>> On 17/12/24 10:04, Alexander Lobakin wrote:
+>>> From: Gustavo A. R. Silva <gustavo@embeddedor.com>
+>>> Date: Tue, 17 Dec 2024 09:58:28 -0600
+>>>
+>>>>
+>>>>
+>>>> On 17/12/24 08:55, Alexander Lobakin wrote:
+>>>>> From: Kees Cook <kees@kernel.org>
+>>>>> Date: Mon, 16 Dec 2024 18:59:55 -0800
+>>>>>
+>>>>>> This switches to using a manually constructed form of struct tagging
+>>>>>> to avoid issues with C++ being unable to parse tagged structs within
+>>>>>> anonymous unions, even under 'extern "C"':
+>>>>>>
+>>>>>>      ../linux/include/uapi/linux/pkt_cls.h:25124: error: ‘struct
+>>>>>> tc_u32_sel::<unnamed union>::tc_u32_sel_hdr,’ invalid; an anonymous
+>>>>>> union may only have public non-static data members [-fpermissive]
+>>>>>
+>>>>> I worked around that like this in the past: [0]
+>>>>> As I'm not sure it would be fine to fix every such occurrence manually
+>>>>> by open-coding.
+>>>>> What do you think?
+>>>>
+>>>> The thing is that, in this particular case, we need a struct tag to
+>>>> change
+>>>> the type of an object in another struct. See:
+>>>
+>>> But the fix I mentioned still allows you to specify a tag in C code...
+>>> cxgb4 is for sure not C++.
+>>
+>>
+>> Oh yes, I see what you mean. If it works, then you should probably
+>> submit that
+>> patch upstream. :)
+> 
+> I added it to my CI tree and will wait for a report (24-36 hrs) before
+> sending. In the meantime, feel free to test whether it solves your issue
+> and give a Tested-by (or an error report :)).
+
+Hopefully, Christopher can confirm whether this[0] resolves the issue he's seeing.
+
+> 
+> BTW, I mentioned in the commit message back in 2022 that some C++
+> standards support tagged structs with anonymous unions (I don't remember
+> that already). Would it make sense to use a separate #define not for the
+> whole __cplusplus, but only for certain standards?
+
+I'd say entirely preventing C++ from seeing the tag is cleaner and safer for
+now.
+
+Thanks
+-Gustavo
+
+[0] https://github.com/alobakin/linux/commit/2a065c7bae821f5fa85fff6f97fbbd460f4aa0f3
 
