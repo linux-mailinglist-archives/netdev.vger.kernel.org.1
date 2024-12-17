@@ -1,164 +1,140 @@
-Return-Path: <netdev+bounces-152510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4879F45D4
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:16:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB0C9F461C
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:34:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C1A41600CE
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 08:16:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DCAD188B293
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 08:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411D91DAC93;
-	Tue, 17 Dec 2024 08:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450AF1C54B3;
+	Tue, 17 Dec 2024 08:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ajqB7DlV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T/mdTuVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9721DA0ED
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 08:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0CF42AA1
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 08:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734423395; cv=none; b=iWQwhbDud47dgSJLaip5pjagoWTfdheA3hUoVEKBZZVdeUeIv53Q0rPn4526lF2K3mUGtnVVL7oUKCrBbvLhxukfeh5MjduwOYtnvuGQEU7eHWoUrhYLbv9zFTMaurNjeIICgNSLFn05eIfguCpIfGx5C6e3fgA/rlEhLRwLE6A=
+	t=1734424447; cv=none; b=Q4FVbcQzPU8CH3XBjCZWs3tM5PRHwBu7cwYFOJSUI7v6nDrKc/Bb83X1xyStFKQWKC5fQpVn7qIIoYN1XjYH/McPL0+utAmdF7kCnp+3q9qKJ8SICi1nlFCInup1nZqKos+L4TNwH89xKZ0dhFYwMkt+UR9J9MQKk47WDaQBUVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734423395; c=relaxed/simple;
-	bh=TEQwfjMPGkhdsR+WurQ2jiRxK3ahF+A9mPh6oCOch4w=;
+	s=arc-20240116; t=1734424447; c=relaxed/simple;
+	bh=Arvryk9fl3rNZHpfN14PFf7wFJruaecK/cLkBk655sM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V4/Rn/INvHOS351BwhA+NHw9stPDTyVNEq7jmhGhlCbBEVC9b6fkAiWSoFxYwn9636rSQi25zcV2Q4vmUbAK3b00OQpSSXbpc63BLuzCrntnkfNsd0yav4HpB2D0P5ZWDtXfQpdmF3QFjZwct9Lt/sichSV0myUSQBqxKJ4WHwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ajqB7DlV; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d3bbb0f09dso7930598a12.2
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 00:16:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734423392; x=1735028192; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JL2feE5AJ6SSI4pvTMa55DednyFd7NS2A7NZzkYnzHo=;
-        b=ajqB7DlVyyMvz3Jb6onUgI2rK1paJZDmsfk3fsgpLfl2yOSmW5TV05Vzo/aUkXAE+h
-         LsXDpoJsQ+UAcRKszEcsadhYkUv5+ukYkCYpZdacHFB1MbSpDsxz9W0k+RZTDZp55PJT
-         aAACnTz6QcSRraQQkHODNiLODDjYqgcH18TKxPG5Gha63X0fcMabAH4Uy+A/rMYctDEZ
-         F6Z0z5lXRXF+/sYL97TFIS6KUuMITqlZVE+b9IXHVCepq1VOfJUamza5Q2Xt/46NXdxE
-         DU6xsiHd2SIOhgzIZ2mtqMTQFzvh77EiZesLPyVoiS5wTNH7pUHyBcVK+aP7OqKMU4iW
-         r3SA==
+	 To:Cc:Content-Type; b=dOhewmbLpID9RFSVHtIEE8bACekH19elwG5kqut15QSsRQaG72lqPZBDmWNzrXr+79P8dfE2WumL4GLsZ4l+/TejtEwcFJWAI60v3ABvPmiOz380lgDp4yxGggad7VDaZMuy5I5erT7cIbbTcEAZshdtOm/3B2HQovY8AtMlw2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T/mdTuVk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734424444;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GTgyAm/t6E5caA9IVSmP44Sy6axmriB2cCoPsf2gtMI=;
+	b=T/mdTuVkO0YTzf9BZuVeTBNc1+i4QXRelimM73vgEMgCwh336hCCl4ykqXdo4MZEDrFA15
+	IrpI29XrqwN3hcDAmjj7opEtt2klFaZx7/DERhmFM+J8G2E4cVfcNgsXVN9wijwk7WmSpJ
+	xIhBYQIKNmGczCskD5BzcdR9dnAX+NA=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-240-KLF35WutO9-WF9U-lPEEsg-1; Tue, 17 Dec 2024 03:34:03 -0500
+X-MC-Unique: KLF35WutO9-WF9U-lPEEsg-1
+X-Mimecast-MFC-AGG-ID: KLF35WutO9-WF9U-lPEEsg
+Received: by mail-yb1-f198.google.com with SMTP id 3f1490d57ef6-e391a2f0f1fso6723510276.3
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 00:34:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734423392; x=1735028192;
+        d=1e100.net; s=20230601; t=1734424442; x=1735029242;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JL2feE5AJ6SSI4pvTMa55DednyFd7NS2A7NZzkYnzHo=;
-        b=FDSGUbLFbYtlY9OQHXc3TRzC2vQloUvWuLfui23ubHYFLLPdMep0tLs7xVKF7i+tet
-         E5GUht4sduUnrN0SVGL8kjYye6LAdl462bdEds2fBmxR7QG/j+hErvHUX+C69TeogMNb
-         uunnWq6AYq99BC4ZETZ+9ZGSw910agA11AOcpsU6uMW3hN4IhPLxzu+KptBBrP23FIkf
-         JiWvrQWjFdzYLvwU+Nbf84s9tjJkmCjyRAUCKm10sCZLIBpbmCqy4YLSjRGLPYgGpKa5
-         pEuAe7yRCnUGu6m4pArNi6Ip5AKOiZoLEmT9ZqK8Oaz99AsQ9/3jfQh/tn6n9lzGQAPF
-         Cd6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXdwlfHcB6+VgjP5b2UqmD8rtQbEP5/MHNhPfCA8AnHtuiQ6WO0QFQuStrNpGvyity7e8UAbAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxghstBT8ie0H7U2qkf5HhXzFLSzHzlRFwbihDrG8yAURYC0wbA
-	W0dVlTvVToL86tsOkc5x+0Iv5+80qhj5Tx3FMDI+0K2m9ExM9dMwPr3p7szl8df96dVeRVi44Q9
-	aEY5HprAaa3WaJ+FDW7LJb1ebIDQYYTdBXT5Q
-X-Gm-Gg: ASbGnctXW1tkTnZHf/jyWP0q9c7VAROUduojUswPJLJGxNVK4tHfJl5MytLJpGIBvet
-	mAedSBDK38uIz6ZGYRIt7EN6EmWQxXCIt2qzZUZ1ZxmJmqW1ceygYCVihI5CUV11aIETzNm3Y
-X-Google-Smtp-Source: AGHT+IHvOQNHHUzZZhpakqGzbgg0f+KZLUwMpZirhCCXzghhhZojKMMtWfuof6FgPRbxHa3SPEkaCDyvaCOA0s5LVS0=
-X-Received: by 2002:a05:6402:1ed5:b0:5d3:e79b:3b3d with SMTP id
- 4fb4d7f45d1cf-5d63c42a44dmr14310743a12.28.1734423391517; Tue, 17 Dec 2024
- 00:16:31 -0800 (PST)
+        bh=GTgyAm/t6E5caA9IVSmP44Sy6axmriB2cCoPsf2gtMI=;
+        b=t3LCyzzj1Yyfr/VWROVDclqNFv8IclwLz8yYOx1RDf+iPPpOog+1GkFbnBCyGnMZVG
+         1Uk10hVrgLLoZMBV391VkFYizE4IZr3ZOvjPpb0CchaP9Nejem5Gz45NumB8t5VHtZ8q
+         YzMWhwIoLK69hboKjDV3PpShWEI8fP4aiUIDu2PS7PmN5vOSMVjpoohPzpR48Vjd7Py1
+         wTCyL0+XCUQk0CCS5pEx8ZWUE61mwUR7prXGfGVm0whOabZ0dn5VHxFGU1ZRicqKi/mN
+         +Bjy9j/AD/gDA0u6/yYVjQNglWZ1xtDKtmwhUtwkW+W3knu9KmPEOkRmveTlKQG2/dcx
+         stHA==
+X-Gm-Message-State: AOJu0YzzI+dosizm1dztWEQP4zolq0yp6GweExoTVSDKigbCynl/59kS
+	ocBsPdghZirqpuOJgjgbb8kUYZ6H9/RY/Xw5MCIwB/UQDRbdffhOebutlkY0uDvFeqGCGSXzthG
+	1fWihdOnrs9po2Q/ZpMEkVf5NUfllIl2QWZem5K7h0+mkiK0TV4b7yYCKC44M1NeT9ggkIvKvpD
+	FPQE8OQbw/CmJfs4t0Qiq/DvVTqJ/YpTaB0O28yZo=
+X-Gm-Gg: ASbGnctLxDC7YRYm8+K6kmi9VpQk46mEkqC+ihBecL54OpgDrb00AYh9EkRh53p300G
+	2vmABAfMwdtxUDfuhuBUNI9sSShb4KAAIz30B
+X-Received: by 2002:a05:6902:2689:b0:e4d:25c6:c3b0 with SMTP id 3f1490d57ef6-e4d25c6d191mr4684779276.9.1734424442227;
+        Tue, 17 Dec 2024 00:34:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGk4Ye+VtTD0k53vvmkzIEMHmo2VfkNaawna/QtLGYrdkGaPQXKTIjLGAJU+Ch/2sc6qc45987gT1bQVsiWu3c=
+X-Received: by 2002:a05:6902:2689:b0:e4d:25c6:c3b0 with SMTP id
+ 3f1490d57ef6-e4d25c6d191mr4684776276.9.1734424441872; Tue, 17 Dec 2024
+ 00:34:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <d416a14ec38c7ba463341b83a7a9ec6ccc435246.1734419614.git.christophe.leroy@csgroup.eu>
-In-Reply-To: <d416a14ec38c7ba463341b83a7a9ec6ccc435246.1734419614.git.christophe.leroy@csgroup.eu>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 17 Dec 2024 09:16:20 +0100
-Message-ID: <CANn89iK1+oLktXjHXs0U3Wo4zRZEqimoSgfPVzGGycH7R_HxnA@mail.gmail.com>
-Subject: Re: [PATCH net] net: sysfs: Fix deadlock situation in sysfs accesses
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"Eric W. Biederman" <ebiederm@xmission.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	TRINH THAI Florent <florent.trinh-thai@cs-soprasteria.com>, 
-	CASAUBON Jean Michel <jean-michel.casaubon@cs-soprasteria.com>
+References: <20241216-test-vsock-leaks-v2-0-55e1405742fc@rbox.co>
+ <20241216-test-vsock-leaks-v2-2-55e1405742fc@rbox.co> <ybwa5wswrwbfmqyttvqljxelmczko5ds2ln5lvyv2z5rcf75us@22lzbskdiv3d>
+ <12fd9c75-8a93-4ce5-949c-2ff2c7c727d6@rbox.co>
+In-Reply-To: <12fd9c75-8a93-4ce5-949c-2ff2c7c727d6@rbox.co>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Tue, 17 Dec 2024 09:33:50 +0100
+Message-ID: <CAGxU2F5zVTrYEkcQDBbHWysUnOR-Y4Z6+uuJ5+Zfmj+QOgD=Wg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/6] vsock/test: Introduce option to run a
+ single test
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 17, 2024 at 8:18=E2=80=AFAM Christophe Leroy
-<christophe.leroy@csgroup.eu> wrote:
+On Mon, Dec 16, 2024 at 4:14=E2=80=AFPM Michal Luczaj <mhal@rbox.co> wrote:
 >
-> The following problem is encountered on kernel built with
-> CONFIG_PREEMPT. An snmp daemon running with normal priority is
-> regularly calling ioctl(SIOCGMIIPHY). Another process running with
-> SCHED_FIFO policy is regularly reading /sys/class/net/eth0/carrier.
+> On 12/16/24 15:32, Stefano Garzarella wrote:
+> > On Mon, Dec 16, 2024 at 01:00:58PM +0100, Michal Luczaj wrote:
+> >> Allow for singling out a specific test ID to be executed.
+> >>
+> >> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> >> [...]
+> >> +            case 't':
+> >> +                    pick_test(test_cases, ARRAY_SIZE(test_cases) - 1,
+> >> +                              optarg);
+> >> +                    break;
+> >
+> > Cool, thanks for adding it!
+> > Currently, if we use multiple times `--test X`, only the last one is
+> > executed.
+> >
+> > If we want that behaviour, we should document in the help, or just erro=
+r
+> > on second time.
+> >
+> > But it would be cool to support multiple --test, so maybe we could do
+> > the following:
+> > - the first time we call pick_test, set skip to true in all tests
+> > - from that point on go, set skip to false for each specified test
+> >
+> > I mean this patch applied on top of your patch (feel free to change it,
+> > it's just an example to explain better the idea) [...]
 >
-> After some random time, the snmp daemon gets preempted while holding
-> the RTNL mutex then the high priority process is busy looping into
-> carrier_show which bails out early due to a non-successfull
-> rtnl_trylock() which implies restart_syscall(). Because the snmp
-> daemon has a lower priority, it never gets the chances to release
-> the RTNL mutex and the high-priority task continues to loop forever.
+> Sure, make sense. One question, though: do you want to stick with the ver=
+b
+> --test? Or should it be something more descriptive, e.g. --select, --pick=
+,
+> --choose?
 >
-> Replace the trylock by lock_interruptible. This will increase the
-> priority of the task holding the lock so that it can release it and
-> allow the reader of /sys/class/net/eth0/carrier to actually perform
-> its read.
->
-> The problem can be reproduced with the following two simple apps:
->
-> The one below runs with normal SCHED_OTHER priority:
->
->         int main(int argc, char **argv)
->         {
->                 int sk =3D socket(AF_INET, SOCK_DGRAM, 0);
->                 char buf[32];
->                 struct ifreq ifr =3D {.ifr_name =3D "eth0"};
->
->                 for (;;)
->                         ioctl(sk, SIOCGMIIPHY, &ifr);
->
->                 exit(0);
->         }
->
-> And the following one is started with chrt -f 80 so it runs with
-> SCHED_FIFO policy:
->
->         int main(int argc, char **argv)
->         {
->                 int fd =3D open("/sys/class/net/eth0/carrier", O_RDONLY);
->                 char buf[32];
->
->                 for (;;) {
->                         read(fd, buf, sizeof(buf));
->                         lseek(fd, 0, SEEK_SET);
->                         usleep(5000);
->                 }
->
->                 exit(0);
->         }
->
-> When running alone, that high priority task takes approx 6% CPU time.
->
-> When running together with the first one above, the high priority task
-> reaches almost 100% of CPU time.
->
-> With this fix applied, the high priority task remains at 6% CPU time
-> while the other one takes the remaining CPU time available.
->
-> Fixes: 336ca57c3b4e ("net-sysfs: Use rtnl_trylock in sysfs methods.")
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> ---
 
-At a first glance, this might resurface the deadlock issue Eric W. Biederma=
-n
-was trying to fix in 336ca57c3b4e ("net-sysfs: Use rtnl_trylock in
-sysfs methods.")
+I'm terrible with names :-)
 
-I was hoping that at some point, some sysfs write methods could be
-marked as : "We do not need to hold the sysfs lock"
+--test looks nice, but also --pick is great since we have --skip.
+So I'd vote for --pick, but I'm fine with --test too.
+
+Thanks,
+Stefano
+
 
