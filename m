@@ -1,162 +1,106 @@
-Return-Path: <netdev+bounces-152484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 547509F4178
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 05:00:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EC079F41C4
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 05:40:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14EBE188AFD4
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 04:00:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F87B188E152
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 04:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E17C14B08E;
-	Tue, 17 Dec 2024 03:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3E714A09E;
+	Tue, 17 Dec 2024 04:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="2wJmJ29F"
 X-Original-To: netdev@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A116714601C;
-	Tue, 17 Dec 2024 03:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF3013C689
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 04:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734407999; cv=none; b=P33K3vy44PjuY1YCruAHsYMuxBECvbr/nn2PI/uJmIaideXIX/LZ58frXMQGf17pbFYkT+SfEyfm0jsYrK2gkvRiTTe0+y9BD5i7FRftrUnN1J9ZB6dS/tYBdLGgQji8gxLwhuWbofgN3/b+x2g/9QKKZ1Pzw/95fJfEzWRrsdE=
+	t=1734410390; cv=none; b=J9GKjoRnSCc9QX2VW2XlCgxiAmRI01DHjNZdB1zQsxo8ZdyQ1EeOSKS5csaHV37JQrfhGFY4BRaUNL7B+6uqDCPfOM1Ef1qKby/mkqWVHKBQLWJVE0jEtE8sACseib4uOEOnRdgx4kXE7/9DdUNvQN2zDjK3AuJi7wmmiatm9cA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734407999; c=relaxed/simple;
-	bh=GXKY4ibAqf+fScHyj3FgJPIYI3um2k9fkI7luLsdvHI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nkaaLAM/nzdoysZ/sJkmrmdr8zjYjiFbZ070p48GQNcbh+YQ4UOGvi6IS8QoHD/Jb2szDqKDo38X00RMYNPjtaR9Drsye42aTmAiLsSUUzFP3riYmdJxd6EnppCFt70VhQwK5IhQ2wscER1gf7PIsyTkd+HkPrNna+igjGCFvQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8E68768C4E; Tue, 17 Dec 2024 04:59:43 +0100 (CET)
-Date: Tue, 17 Dec 2024 04:59:43 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Kees Cook <kees@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Cheng Xu <chengyou@linux.alibaba.com>,
-	Kai Shen <kaishen@linux.alibaba.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Christian Benvenuti <benve@cisco.com>,
-	Nelson Escobar <neescoba@cisco.com>,
-	Bernard Metzler <bmt@zurich.ibm.com>,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Michal Ostrowski <mostrows@earthlink.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1734410390; c=relaxed/simple;
+	bh=ONS2xW78R972FPmIIq4og84deIWQueVXVviERl9RP0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vGAq78OpSvSvUWJ5Uuwx0IY+ANmDgUKthzX4bggyT+jjOBXdoqA1ls3ioeQjSwLphmoDxfgO55Thab5ou3Zr49DRBmf6k4yL/5L2Qs3voZebA8qpYK41gPPF0uCzJy5ePUGG4GRhqrUYZQbaJl2uw6Bpde0hLxlfNsFAdTNm0bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=2wJmJ29F; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 0E5972C097F;
+	Tue, 17 Dec 2024 17:39:44 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1734410384;
+	bh=L2N0j7JelgbHVJvdCA6XmDaiPSFotRbeW9oF1FbdIFI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=2wJmJ29FntYydrsGJLKJ6esH0msg/AUsBNRliWxBqfBG+QCWOmkp7qezYi3GSvE/N
+	 c6BTUYvV2fuMp4sT8tkUzfpyO28NBOyOS96ETdFEnOPvH7SkieH3u+WAp0gMj6YO1O
+	 1nki5KVoe+6SD7PYMIG19c4dJgP30MfMkHc0i1DlJpdfKPXU4EDHB562O0b0IsP0iF
+	 oY7ZPakaklO83hFQoK1wmznL8xP2mh2GlpGSQ1STpzXQmFpP2Zj9Z0jd3tvwl+fm9V
+	 jHQN0vpRrP4aEjbdjDpmwNJb/Mjikb79Go0wgBc3gJNRV1cwQFapMSCcqSAslH6uaZ
+	 UgMwZZ+vPT3+Q==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B6761008f0000>; Tue, 17 Dec 2024 17:39:43 +1300
+Received: from elliota2-dl.ws.atlnz.lc (elliota-dl.ws.atlnz.lc [10.33.23.28])
+	by pat.atlnz.lc (Postfix) with ESMTP id 7898113ED95;
+	Tue, 17 Dec 2024 17:39:43 +1300 (NZDT)
+Received: by elliota2-dl.ws.atlnz.lc (Postfix, from userid 1775)
+	id 73B163C0174; Tue, 17 Dec 2024 17:39:43 +1300 (NZDT)
+From: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>, Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Alexander Aring <aahringo@redhat.com>,
-	David Teigland <teigland@redhat.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>, Mark Fasheh <mark@fasheh.com>,
-	Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>, Simon Horman <horms@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, David Ahern <dsahern@kernel.org>,
-	Joerg Reuter <jreuter@yaina.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Robin van der Gracht <robin@protonic.nl>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	James Chapman <jchapman@katalix.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Remi Denis-Courmont <courmisch@gmail.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, Jon Maloy <jmaloy@redhat.com>,
-	Ying Xue <ying.xue@windriver.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Martin Schiller <ms@dev.tdt.de>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Ahelenia =?utf-8?Q?Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Wu Yunchuan <yunchuan@nfschina.com>,
-	Max Gurtovoy <mgurtovoy@nvidia.com>,
-	Maurizio Lombardi <mlombard@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Atte =?iso-8859-1?Q?Heikkil=E4?= <atteh.mailbox@gmail.com>,
-	Vincent Duvert <vincent.ldev@duvert.net>,
-	Denis Kirjanov <kirjanov@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>, Thomas Huth <thuth@redhat.com>,
-	Andrew Waterman <waterman@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Andrej Shadura <andrew.shadura@collabora.co.uk>,
-	Ying Hsu <yinghsu@chromium.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Tom Parkin <tparkin@katalix.com>,
-	Jason Xing <kernelxing@tencent.com>,
-	Dan Carpenter <error27@gmail.com>, Hyunwoo Kim <v4bel@theori.io>,
-	Bernard Pidoux <f6bvp@free.fr>,
-	Sangsoo Lee <constant.lee@samsung.com>,
-	Doug Brown <doug@schmorgal.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	Gou Hao <gouhao@uniontech.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Yajun Deng <yajun.deng@linux.dev>, Michal Luczaj <mhal@rbox.co>,
-	Jiri Pirko <jiri@resnulli.us>, syzbot <syzkaller@googlegroups.com>,
-	linux-kernel@vger.kernel.org, kernel@pengutronix.de,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
-	linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	target-devel@vger.kernel.org, gfs2@lists.linux.dev,
-	linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
-	linux-cifs@vger.kernel.org, linux-hams@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
-	linux-s390@vger.kernel.org, rds-devel@oss.oracle.com,
-	linux-sctp@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-	virtualization@lists.linux.dev, linux-x25@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] net: Convert proto_ops::getname to sockaddr_storage
-Message-ID: <20241217035943.GB14719@lst.de>
-References: <20241217023417.work.145-kees@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Hans J. Schultz" <netdev@kapio-technology.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+Subject: [PATCH net] net: dsa: mv88e6xxx: Fix switchdev error code
+Date: Tue, 17 Dec 2024 17:39:30 +1300
+Message-ID: <20241217043930.260536-1-elliot.ayrey@alliedtelesis.co.nz>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241217023417.work.145-kees@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=6761008f a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=RZcAm9yDv7YA:10 a=8i6-b8GgAAAA:8 a=N--7mn-ydMt7gBr8E2oA:9 a=3ZKOabzyN94A:10 a=XAGLwFu5sp1jj7jejlXE:22
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-Would be nice to avoid a bunch of the overly long lines, but the
-fundamental changes looks good:
+Calling a switchdev notifier encodes additional information into the
+return code. Using this value directly makes error messages confusing.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Use notifer_to_errno() to restore the original errno value.
+
+Fixes: 830763b96720 ("net: dsa: mv88e6xxx: mac-auth/MAB implementation")
+Signed-off-by: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+---
+ drivers/net/dsa/mv88e6xxx/switchdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/switchdev.c b/drivers/net/dsa/mv88=
+e6xxx/switchdev.c
+index 4c346a884fb2..7c59eca0270d 100644
+--- a/drivers/net/dsa/mv88e6xxx/switchdev.c
++++ b/drivers/net/dsa/mv88e6xxx/switchdev.c
+@@ -79,5 +79,5 @@ int mv88e6xxx_handle_miss_violation(struct mv88e6xxx_ch=
+ip *chip, int port,
+ 				       brport, &info.info, NULL);
+ 	rtnl_unlock();
+=20
+-	return err;
++	return notifier_to_errno(err);
+ }
 
