@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-152508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6EB29F45C4
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:13:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F129F45B5
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D96D7A32EE
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 08:12:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73C8016D907
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 08:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EFC31DB377;
-	Tue, 17 Dec 2024 08:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C087D1DA113;
+	Tue, 17 Dec 2024 08:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Z658jMX4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCcn0jKe"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40631DACBB;
-	Tue, 17 Dec 2024 08:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EA3126BF7;
+	Tue, 17 Dec 2024 08:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734423163; cv=none; b=cbc03Dz9v6V7tktKLwZVSVF5kPRCjCzecFqIYgbVkustyTCy/dr5qRd8k/aI+/KWfTLb1QrHDLO1xbWKv1uqyVY9w7LeD8dCa8ZghpdeXIqP3bQcKz65QrUEWdQyJKS9YCdowdRVaeGWmHIXLeqIqUMFjL+eHZWWbr6+UtfEIEE=
+	t=1734423062; cv=none; b=RChIalZcGys+7RyuIPmDP3VXgmLXvH16Gx6FAqqTGShDrPh1x4QPjIwCkX/N/stJpHj3oSydeQvgbU22Xzr4eBWB2LsAyvU2Rhru1zy/tM0SMIx4WZU9u0DwtIecZg5BfEmz9NzEpsg9nUjSHziivrHCyKmQHd5zundlPr7E1OQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734423163; c=relaxed/simple;
-	bh=xbVzhQl80dmOXJeG9YIgEJequ2/eKnb37OKZNQlyCsk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ow6/0DdnPEgYrNewup296V8HZlAgZOrBJGeblVPdz6yyAuxSFTAHCo/dCzpWdAHssBa3U1xAP0Fcj5Ll8MWruaElWZciru56qw66/Z+zQje2mh/UTmnbncBQ39PPhNhaMGG1njRLKAaGT3iusBpfouJU+K8utbJy4GGwn83YEtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Z658jMX4; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=xnNw9
-	z3AG/FsbDigMUs/0VbAT1ydCrcKkY1WBUINQw0=; b=Z658jMX4Fir1HebDTu1nZ
-	irxs4Zr8Siw5Ls08hfmDkbNAcu3RIx1aBA3tibzMjPSdAHGwqT3a0fqBBDVG2I2F
-	9HERYcfuLPcqrcjW4qHksRjDPUmTYz9YoKGtfZMs3+P5bcUK68Z5AtqDY/GIDa2h
-	OU+3z4D/s0/K4M+2r6Jdzw=
-Received: from hello.company.local (unknown [])
-	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3d8rIMWFnCouYBA--.63668S2;
-	Tue, 17 Dec 2024 16:09:45 +0800 (CST)
-From: Liang Jie <buaajxlj@163.com>
-To: erdnetdev@gmail.com
-Cc: andrew+netdev@lunn.ch,
-	anthony.l.nguyen@intel.com,
-	buaajxlj@163.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	liangjie@lixiang.com,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1734423062; c=relaxed/simple;
+	bh=2z7JFRJcAUvGHRU71NcCuaR1lyuqm1pPGOs2diBBCOA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rsWRKt7S1WFIkvyBllzSGKn8QsRTkFMHAMaM9hzSVhatlO7Yys2sPy/RTBvS8uz5NKg30oGlDzaLG47uWraC2d79OWqmAfQNWyCeVVX9oJ4PRLICKlui+AiC7L8DE0gWl3/QFXsuot2fa2CaY/Comvd8ZzuZxeDPKHt7Phs/AGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCcn0jKe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CC72C4CED3;
+	Tue, 17 Dec 2024 08:10:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734423062;
+	bh=2z7JFRJcAUvGHRU71NcCuaR1lyuqm1pPGOs2diBBCOA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DCcn0jKeLG2nM+e/bAZpIHfhSxtAPAyFHhu9PB3rgk7JyBxywwxnYpxmlsZgBSFLl
+	 vD7upSsrHYfVwu0GKcZ/MZtAPUkWDA/lWsOyat7JRqK5sNvIqeGUdbs5inYV+jAD85
+	 JAOO81JRbpEljrKzneVZdaFRNsKODU1EThVxWTExIb/Gpn7YG9LjtweW1Rv1dUzBrJ
+	 UQWtGAmwRECgdYcMRX7HsD8SYSOuTqtxsg+RlTtznEb3F3obrH0RNyTYiR+fpbbuhX
+	 ll8jbuJfzaNbdmP2RcM3QMCDpPUz4pnA9fyZMjcEV1zQoqdGCaDTJ+WfEv09kPCd8/
+	 s+kCsIjDMjHaA==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xu Liang <lxu@maxlinear.com>,
+	Daniel Golle <daniel@makrotopia.org>
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH] net: Refine key_len calculations in rhashtable_params
-Date: Tue, 17 Dec 2024 16:09:44 +0800
-Message-Id: <20241217080944.3971820-1-buaajxlj@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CAHTyZGwAit_FSHJDSPn4QpCfim321aB478YDuC=uUhvBgPfKGA@mail.gmail.com>
-References: <CAHTyZGwAit_FSHJDSPn4QpCfim321aB478YDuC=uUhvBgPfKGA@mail.gmail.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: phy: avoid undefined behavior in *_led_polarity_set()
+Date: Tue, 17 Dec 2024 09:10:34 +0100
+Message-Id: <20241217081056.238792-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,82 +66,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3d8rIMWFnCouYBA--.63668S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7CF45Jw4DZFyDuw1DWw4UArb_yoW8KF15pF
-	1DK3WkKr4DJryjkr4xuws3ur18tan3GFW7trnYg3ySy3Z0qFn5ZFs7Kry5CayvyF4vkry2
-	v34jga43Zr1DZaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUtPEhUUUUU=
-X-CM-SenderInfo: pexdtyx0omqiywtou0bp/1tbiNhe4IGdhL2RHswAAsA
 
-On Tue, 17 Dec 2024 08:33:57 +0100, ericnetdev dumazet wrote:
+From: Arnd Bergmann <arnd@arndb.de>
 
->>
->> From: Liang Jie <liangjie@lixiang.com>
->>
->> This patch improves the calculation of key_len in the rhashtable_params
->> structures across the net driver modules by replacing hardcoded sizes
->> and previous calculations with appropriate macros like sizeof_field()
->> and offsetofend().
->>
->> Previously, key_len was set using hardcoded sizes like sizeof(u32) or
->> sizeof(unsigned long), or using offsetof() calculations. This patch
->> replaces these with sizeof_field() and correct use of offsetofend(),
->> making the code more robust, maintainable, and improving readability.
->>
->> Using sizeof_field() and offsetofend() provides several advantages:
->> - They explicitly specify the size of the field or the end offset of a
->>   member being used as a key.
->> - They ensure that the key_len is accurate even if the structs change in
->>   the future.
->> - They improve code readability by clearly indicating which fields are used
->>   and how their sizes are determined, making the code easier to understand
->>   and maintain.
->>
->> For example, instead of:
->>     .key_len    = sizeof(u32),
->> we now use:
->>     .key_len    = sizeof_field(struct mae_mport_desc, mport_id),
->>
->> And instead of:
->>     .key_len    = offsetof(struct efx_tc_encap_match, linkage),
->> we now use:
->>     .key_len    = offsetofend(struct efx_tc_encap_match, ip_tos_mask),
->>
->> These changes eliminate the risk of including unintended padding or extra
->> data in the key, ensuring the rhashtable functions correctly.
->
->I do not see how this patch can eliminate padding.
->
->If keys include holes or padding, something still needs to clear the
->holes/padding in objects and lookup keys.
->
->struct key {
->   u8 first_component;
->   u32 second_component;
->};
+gcc runs into undefined behavior at the end of the three led_polarity_set()
+callback functions if it were called with a zero 'modes' argument and it
+just ends the function there without returning from it.
 
-You are right, this patch can not eliminate padding in the case you mentioned.
+This gets flagged by 'objtool' as a function that continues on
+to the next one:
 
-This patch addresses the following cases present in the current code:
+drivers/net/phy/aquantia/aquantia_leds.o: warning: objtool: aqr_phy_led_polarity_set+0xf: can't find jump dest instruction at .text+0x5d9
+drivers/net/phy/intel-xway.o: warning: objtool: xway_gphy_led_polarity_set() falls through to next function xway_gphy_config_init()
+drivers/net/phy/mxl-gpy.o: warning: objtool: gpy_led_polarity_set() falls through to next function gpy_led_hw_control_get()
 
-struct efx_tc_encap_match {
-	__be32 src_ip, dst_ip;
-	struct in6_addr src_ip6, dst_ip6;
-	__be16 udp_dport;
-	__be16 udp_sport, udp_sport_mask;
-	u8 ip_tos, ip_tos_mask;
+There is no point to micro-optimize the behavior here to save a single-digit
+number of bytes in the kernel, so just change this to a "return -EINVAL"
+as we do when any unexpected bits are set.
 
-        <there may be padding gap here>
+Fixes: 1758af47b98c ("net: phy: intel-xway: add support for PHY LEDs")
+Fixes: 9d55e68b19f2 ("net: phy: aquantia: correctly describe LED polarity override")
+Fixes: eb89c79c1b8f ("net: phy: mxl-gpy: correctly describe LED polarity")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/phy/aquantia/aquantia_leds.c | 2 +-
+ drivers/net/phy/intel-xway.c             | 2 +-
+ drivers/net/phy/mxl-gpy.c                | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-	struct rhash_head linkage;
-        ......
-};
-
-
-Instead of:
-     .key_len    = offsetof(struct efx_tc_encap_match, linkage),
-now use:
-     .key_len    = offsetofend(struct efx_tc_encap_match, ip_tos_mask),
-
+diff --git a/drivers/net/phy/aquantia/aquantia_leds.c b/drivers/net/phy/aquantia/aquantia_leds.c
+index 00ad2313fed3..951f46104eff 100644
+--- a/drivers/net/phy/aquantia/aquantia_leds.c
++++ b/drivers/net/phy/aquantia/aquantia_leds.c
+@@ -156,5 +156,5 @@ int aqr_phy_led_polarity_set(struct phy_device *phydev, int index, unsigned long
+ 	if (force_active_high || force_active_low)
+ 		return aqr_phy_led_active_low_set(phydev, index, force_active_low);
+ 
+-	unreachable();
++	return -EINVAL;
+ }
+diff --git a/drivers/net/phy/intel-xway.c b/drivers/net/phy/intel-xway.c
+index b672c55a7a4e..e6ed2413e514 100644
+--- a/drivers/net/phy/intel-xway.c
++++ b/drivers/net/phy/intel-xway.c
+@@ -529,7 +529,7 @@ static int xway_gphy_led_polarity_set(struct phy_device *phydev, int index,
+ 	if (force_active_high)
+ 		return phy_clear_bits(phydev, XWAY_MDIO_LED, XWAY_GPHY_LED_INV(index));
+ 
+-	unreachable();
++	return -EINVAL;
+ }
+ 
+ static struct phy_driver xway_gphy[] = {
+diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
+index db3c1f72b407..a8ccf257c109 100644
+--- a/drivers/net/phy/mxl-gpy.c
++++ b/drivers/net/phy/mxl-gpy.c
+@@ -1014,7 +1014,7 @@ static int gpy_led_polarity_set(struct phy_device *phydev, int index,
+ 	if (force_active_high)
+ 		return phy_clear_bits(phydev, PHY_LED, PHY_LED_POLARITY(index));
+ 
+-	unreachable();
++	return -EINVAL;
+ }
+ 
+ static struct phy_driver gpy_drivers[] = {
+-- 
+2.39.5
 
 
