@@ -1,139 +1,193 @@
-Return-Path: <netdev+bounces-152573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55A8D9F4A56
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:55:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E02A59F4A66
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C529167EA6
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:55:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95D82188FA47
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AC01EF0B7;
-	Tue, 17 Dec 2024 11:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCkaIVnc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60AF1F4288;
+	Tue, 17 Dec 2024 11:56:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2A11EE002;
-	Tue, 17 Dec 2024 11:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A610F1F4270;
+	Tue, 17 Dec 2024 11:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734436507; cv=none; b=f/NVK2P8xQbYEhLdgmNPWLb2hwcziwQHzvPHGI0dJtGeaOQ8ILy5BOA2i10e48/tNb1FFeRKGXESS018qbu6V/8SRriMId1j5A8WwTNTaj9sX/vy1UcbLSEjll+KNZz7OE1+z2OA9pgWt2ILsEkzxTSjGzKhS0fzp9ltuBygGKY=
+	t=1734436602; cv=none; b=hFTjh+nvFkOvDS1jcLvMYdG+7M9wAdCYRFhgoEnvpL3ByR/EecMQeA73ELJqBhGpShiNfmTHyK6ijSXk7Ehbb3gZ+a93lB6mAv++LgkhF+ZO42eDJRbUDB/tUBTrJyGDOxqyiFA2xxi8r0tr5N/Q0GijJ5AXe0KFbYEFLcfYR5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734436507; c=relaxed/simple;
-	bh=EYsHKINsZ9zML7ekiItTfl5biYxh4x+VwUfpilzpOws=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qfOlCe2hxIOtF5abZKZWcN0fjW9arwxY8zVEU61euEW5po+RH/jbm5sq3KmxjSpX3lz1LH87eHqXtMPYyLi4g7F+SiLphimFlhQMyz200JbcY35blA4X+SphloHikpV4fxHg5pYAuc+bYqI2qeOkFqW21HAlicsvNGw0kXnSVN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gCkaIVnc; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ef70c7efa5so3587152a91.2;
-        Tue, 17 Dec 2024 03:55:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734436506; x=1735041306; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3KbDpu+5dgXCRMaHlMudK/PfUogFA3io0WjXBUI+vpI=;
-        b=gCkaIVnc+Yb64+J8xyombW5XzLRyePJbnEzFvT0D+HrVIeRw6cjl16VSbjM9h5t35S
-         68hd5pwwiBkDIQt37zuF5ylTN1/wuJiVkW3KhvnyjKa2jQ7G49E7bV3QWbBJF6ms2HG2
-         f3Fhyk2y3A/vu6Mezy/1QTYaNiiEiNqU20PycdQSI1cKZXsUXz3e76HXCoNl8K7ySpqW
-         d0ZpluYXKIGAGQlmWLlA2ieeqyQUNyDVZbmQjsxGcyl/ePXyvnJr0dbT4NCIAZ6n/c02
-         1IotdijsjkzcqednCCEwPidxIKOsGckZkiIOHXtXWbx0ALpCIyaieK52NQmv3EcWKB82
-         RGlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734436506; x=1735041306;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3KbDpu+5dgXCRMaHlMudK/PfUogFA3io0WjXBUI+vpI=;
-        b=i9WCa2yvXeT0YJVk5RWft9RZTjrvZPPzJAqor90WgI44Ri6luLSH5n6ajtKwPd91Tv
-         9hYF6v7uty8EbWTAOw6enUgosoTaY5V9lD0Ynnq5RYT9NXSj5/JhJuDWUm3/hPn8Ekig
-         mFOeOg/viiCO+S8HyhxfWVgdGlcOYfhALlCbvAKSVo2YsCVIAKsbEgxrmJc4z5+G6e+5
-         qR2LH8cZEiStaYnf8Y2dkHdqI+xZhxF9fb24Ke8HAockCcSCi68VfdImCOLLXSP73HKM
-         SWyLOlX66ZC/+l4Yr+1X9OYts1SJ3ULqgQcI0X50li/dWIBMNYbXgGoKdc8NNfMw1FmG
-         2G1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWFUjSbhmzec9e2h+zQVb5PZ7bCP5q5TzmOwpDbQM+bM28qZjbqBTiR3Vo2UzCOh0M4aW3jq4RkHZPeLKc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3jds8oE5DI1qWyYvgE/fmbxZOcF8r31ixnfS4GecPG+nLsttQ
-	AY4t46N03cIDRPFJUAd1DadgmJIBlECRICy4sx2vBP+0phUrMoEY
-X-Gm-Gg: ASbGncvn7ckU14lMzdyLGqKFp8Q+nwsWZQPizI94XVcSx0Tvk63suOuPBvmp1KBkyxK
-	OcuKT0r385ebf0+p8OEhH0slyGmKwmQqt56UMWScZlhO+ymy8pLRgGvLIB69xjMW5ehW2pGEcgm
-	hTKKmdsVkCXOiMYb+ggD2mVmV9wnL+CuC+rWF3twtS3Bph+XNya4mFq+1tT8Dl8kOi3wW+FYckB
-	pm/2cZcw6loJDld0u3vquuyP7xTsHwzt4+lYPl5mKQ+CBtTPAjsIQ==
-X-Google-Smtp-Source: AGHT+IHngxmcUWV4lDNQlA0QXiov5JsCMkpOQ73Ck+LNIruRGkRdnCgPCkMNUjWYyHkKOes0d7ocDQ==
-X-Received: by 2002:a17:90b:1810:b0:2ee:94d1:7a9d with SMTP id 98e67ed59e1d1-2f2901b3bb3mr21024098a91.32.1734436505718;
-        Tue, 17 Dec 2024 03:55:05 -0800 (PST)
-Received: from localhost ([129.146.253.192])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2a1ebba00sm7161517a91.26.2024.12.17.03.55.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 03:55:05 -0800 (PST)
-Date: Tue, 17 Dec 2024 19:54:54 +0800
-From: Furong Xu <0x1207@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- xfr@outlook.com
-Subject: Re: [PATCH net-next v1] net: stmmac: TSO: Simplify the code flow of
- DMA descriptor allocations
-Message-ID: <20241217195454.000016ce@gmail.com>
-In-Reply-To: <9d0722fe-1547-4b44-8a4a-69a8756bdb39@redhat.com>
-References: <20241213030006.337695-1-0x1207@gmail.com>
-	<9d0722fe-1547-4b44-8a4a-69a8756bdb39@redhat.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1734436602; c=relaxed/simple;
+	bh=Do2X/IiaJW5oPWMmOezg0YcEX+VrBCjV/aOJ0SrBA0Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jLGmMAtVViAlNwjllmj9kY4aw+1T9ARab/iDQjmS+4YJNLq3hkRg8a4cwAu1+3piIMZMLWyJCRFFOy6+Rc4xbsL9FHF1aPn2QsX7XQ8NWOdvdgBN4pqOt2R62NMUYR98IlXUMVpDqGW1D5gko0Z8l2gjmAFmEDjvK0gqrSuFyus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4YCFdy4vqjz9sPd;
+	Tue, 17 Dec 2024 12:56:38 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 3KXSFH_hy5ma; Tue, 17 Dec 2024 12:56:38 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4YCFdy3s6Tz9rvV;
+	Tue, 17 Dec 2024 12:56:38 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6CC908B76E;
+	Tue, 17 Dec 2024 12:56:38 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id 0q0Ly6XhAO90; Tue, 17 Dec 2024 12:56:38 +0100 (CET)
+Received: from [192.168.232.97] (unknown [192.168.232.97])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id D40788B763;
+	Tue, 17 Dec 2024 12:56:37 +0100 (CET)
+Message-ID: <49844fde-9424-4c81-85a0-c5c26a77321d@csgroup.eu>
+Date: Tue, 17 Dec 2024 12:56:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: sysfs: Fix deadlock situation in sysfs accesses
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ TRINH THAI Florent <florent.trinh-thai@cs-soprasteria.com>,
+ CASAUBON Jean Michel <jean-michel.casaubon@cs-soprasteria.com>
+References: <d416a14ec38c7ba463341b83a7a9ec6ccc435246.1734419614.git.christophe.leroy@csgroup.eu>
+ <CANn89iK1+oLktXjHXs0U3Wo4zRZEqimoSgfPVzGGycH7R_HxnA@mail.gmail.com>
+ <49a43774-bf97-4b20-8382-4fb921f34c66@csgroup.eu>
+ <CANn89iLKPx+=gHaM_V77iwUwzqQe_zyUc0Dm1KkPo3GuE40SRw@mail.gmail.com>
+ <8e3c9ebc-e047-4dfd-ad1d-6bbe918aa98b@csgroup.eu>
+ <CANn89iLTGLe2uWz+yCu5ewnDBW2hubqGm8=aRbZVTeXN1Trdaw@mail.gmail.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <CANn89iLTGLe2uWz+yCu5ewnDBW2hubqGm8=aRbZVTeXN1Trdaw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 17 Dec 2024 10:30:24 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
 
-> On 12/13/24 04:00, Furong Xu wrote:
-> > The DMA AXI address width of DWMAC cores can be configured to
-> > 32-bit/40-bit/48-bit, then the format of DMA transmit descriptors
-> > get a little different between 32-bit and 40-bit/48-bit.
-> > Current driver code checks priv->dma_cap.addr64 to use certain format
-> > with certain configuration.
-> > 
-> > This patch converts the format of DMA transmit descriptors on platforms
-> > that the DMA AXI address width is configured to 32-bit (as described by
-> > function comments of stmmac_tso_xmit() in current code) to a more generic
-> > format (see the updated function comments after this patch) which is
-> > actually already used on 40-bit/48-bit platforms to provide better
-> > compatibility and make code flow cleaner.
-> > 
-> > Tested and verified on:
-> > DWMAC CORE 5.10a with 32-bit DMA AXI address width
-> > DWXGMAC CORE 3.20a with 40-bit DMA AXI address width
-> > 
-> > Signed-off-by: Furong Xu <0x1207@gmail.com>  
+
+Le 17/12/2024 à 10:52, Eric Dumazet a écrit :
+> On Tue, Dec 17, 2024 at 10:41 AM Christophe Leroy
+> <christophe.leroy@csgroup.eu> wrote:
+>>
+>>
+>>
+>> Le 17/12/2024 à 10:20, Eric Dumazet a écrit :
+>>> On Tue, Dec 17, 2024 at 9:59 AM Christophe Leroy
+>>> <christophe.leroy@csgroup.eu> wrote:
+>>>>
+>>>>
+>>>>
+>>>> Le 17/12/2024 à 09:16, Eric Dumazet a écrit :
+>>>>> On Tue, Dec 17, 2024 at 8:18 AM Christophe Leroy
+>>>>> <christophe.leroy@csgroup.eu> wrote:
+>>>>>>
+>>>>>> The following problem is encountered on kernel built with
+>>>>>> CONFIG_PREEMPT. An snmp daemon running with normal priority is
+>>>>>> regularly calling ioctl(SIOCGMIIPHY). Another process running with
+>>>>>> SCHED_FIFO policy is regularly reading /sys/class/net/eth0/carrier.
+>>>>>>
+>>>>>> After some random time, the snmp daemon gets preempted while holding
+>>>>>> the RTNL mutex then the high priority process is busy looping into
+>>>>>> carrier_show which bails out early due to a non-successfull
+>>>>>> rtnl_trylock() which implies restart_syscall(). Because the snmp
+>>>>>> daemon has a lower priority, it never gets the chances to release
+>>>>>> the RTNL mutex and the high-priority task continues to loop forever.
+>>>>>>
+>>>>>> Replace the trylock by lock_interruptible. This will increase the
+>>>>>> priority of the task holding the lock so that it can release it and
+>>>>>> allow the reader of /sys/class/net/eth0/carrier to actually perform
+>>>>>> its read.
+>>>>>>
+>>>>
+>>>> ...
+>>>>
+>>>>>>
+>>>>>> Fixes: 336ca57c3b4e ("net-sysfs: Use rtnl_trylock in sysfs methods.")
+>>>>>> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+>>>>>> ---
+>>>>>
+>>>>> At a first glance, this might resurface the deadlock issue Eric W. Biederman
+>>>>> was trying to fix in 336ca57c3b4e ("net-sysfs: Use rtnl_trylock in
+>>>>> sysfs methods.")
+>>>>
+>>>> Are you talking about the deadlock fixed (incompletely) by 5a5990d3090b
+>>>> ("net: Avoid race between network down and sysfs"), or the complement
+>>>> provided by 336ca57c3b4e ?
+>>>>
+>>>> My understanding is that mutex_lock() will return EINTR only if a signal
+>>>> is pending so there is no need to set signal_pending like it was when
+>>>> using mutex_trylock() which does nothing when the mutex is already locked.
+>>>>
+>>>> And an EINTR return is expected and documented for a read() or a
+>>>> write(), I can't see why we want ERESTARTNOINTR instead of ERSTARTSYS.
+>>>> Isn't it the responsibility of the user app to call again read or write
+>>>> if it has decided to not install the necessary sigaction for an
+>>>> automatic restart ?
+>>>>
+>>>> Do you think I should instead use rtnl_lock_killable() and return
+>>>> ERESTARTNOINTR in case of failure ? In that case, is it still possible
+>>>> to interrupt a blocked 'cat /sys/class/net/eth0/carrier' which CTRL+C ?
+>>>
+>>> Issue is when no signal is pending, we have a typical deadlock situation :
+>>>
+>>> One process A is :
+>>>
+>>> Holding sysfs lock, then attempts to grab rtnl.
+>>>
+>>> Another one (B) is :
+>>>
+>>> Holding rtnl, then attempts to grab sysfs lock.
+>>
+>> Ok, I see.
+>>
+>> But then what can be the solution to avoid busy looping with
+>> mutex_trylock , not giving any chance to the task holding the rtnl to
+>> run and unlock it ?
 > 
-> Makes sense to me.
+> One idea would be to add a usleep(500, 1000) if the sysfs read/write handler in
+> returns -ERESTARTNOINTR;
 > 
-> Since this could potentially impact multiple versions, it would be great
-> if we could have a little more 3rd parties testing.
+> Totally untested idea :
+> 
+> diff --git a/fs/seq_file.c b/fs/seq_file.c
+> index 8bbb1ad46335c3b8f50dd35d552f86767e62ead1..276c6d594129a18a7a4c2b1df447b34993398ab4
+> 100644
+> --- a/fs/seq_file.c
+> +++ b/fs/seq_file.c
+> @@ -290,6 +290,8 @@ ssize_t seq_read_iter(struct kiocb *iocb, struct
+> iov_iter *iter)
+>                  m->read_pos += copied;
+>          }
+>          mutex_unlock(&m->lock);
+> +       if (copied == -ERESTARTNOINTR)
+> +               usleep_range(500, 1000);
+>          return copied;
+>   Enomem:
+>          err = -ENOMEM;
 
-Totally agree.
+Ok, that may solve the issue, but it looks more like a hack than a real 
+solution, doesn't it ?
+It doesn't guarantee that the task holding the RTNL lock will be given 
+the floor to run and free the lock.
 
-Multiple devices with multiple versions of DWMAC core which is
-configured to 32-bit DMA AXI address width seem to very hard to find
-and test this patch :(
+The real issue is the nest between sysfs lock and RTNL lock. Can't we 
+ensure that they are always held in the same order ?
 
-Jon Hunter @ NVIDIA has two versions of DWMAC cores different from mine,
-Tegra186 Jetson TX2 (DWMAC CORE 4.10) and
-Tegra194 Jetson AGX Xavier (DWMAC CORE 5.00),
-but both of them are configured to 40-bit DMA AXI address width, this does
-not match the case that this patch tries to convert. So I decided not to
-request him to provide help.
+Christophe
 
