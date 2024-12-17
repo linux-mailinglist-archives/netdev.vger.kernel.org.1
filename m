@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-152442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D429F3FD4
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:16:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B697F9F3FD8
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:16:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36ADE1890F49
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 01:16:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E67B8166E75
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 01:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1184D8CE;
-	Tue, 17 Dec 2024 01:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BAA13C689;
+	Tue, 17 Dec 2024 01:15:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647A4F9D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313778F77;
 	Tue, 17 Dec 2024 01:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734398155; cv=none; b=Lp3Rb5ijIMu4jAlESrjs6Qy3JifCv96PomgYR9eAj1k7X7FZprMS4qJ9KZ/QaxEV5BqGkLtjOpbTKVaynqVJtV+1k0cqba6QG9+p6IW5QbjeLxdi1Weg8g3TQsQv2H6iTpN3oKVvDAw+1yHPnbk35vGlWuK6MOZzLlu/mMa3QJw=
+	t=1734398156; cv=none; b=vFfCMumV0NJS0MIL+xcD3gorr/3ws7fgH6p2XkOyQapUUrPz5yI/xNIYh4bUaYeiPnspC199f9tOZRywbcBwcfqDSi0RMN5bI3dYCZWLmvGlShrgPcBDKbHo281sdZodMelbWDZqT3SMBZY1OcT0f5O2YCRzSvn4cobUiiIQuyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734398155; c=relaxed/simple;
-	bh=fX2Kq04NLDHo2mISB39R9+IJEKDlJVWuuy+NaxD34hs=;
+	s=arc-20240116; t=1734398156; c=relaxed/simple;
+	bh=8jfFIAb0qm3bg4qC4IRS42+p7KEbpv3FRTl0jNu7Hc0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dr+0Oan2rzWhI6EnOgfwP7qcxu+APb514h/V82z8xnsYXkJ5Tkvj5UlJ3VejVXSE0/X1o4z+62QUYK+IkegkbgN8SUpQOMYwv6qAed7i0V8NuJc2hjVueizsY/eX+gvHU9iQQzB7Q6ib+HjayJzkZbqUMHsl7Ru2JbzJrDr/c+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=W4Ahvj1CHEoRnEICMVZcHoVOEBU9XeguNH0eAqbqZ4/+867q4XrDsOiVad7JFGmxyfPTloxsEKA8c3uHf0+bDmjINnEJW5qF5mhpM88ZbVF4cJCWFjCZXjQ1EH52dEXnGUih77IaET6NHN8281E4S34uVpwffV02H3SkaBWw348=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4YBzNR6XrjzRjDp;
-	Tue, 17 Dec 2024 09:13:59 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4YBzMf6bmWz1kwNF;
+	Tue, 17 Dec 2024 09:13:18 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0DA3E140123;
+	by mail.maildlp.com (Postfix) with ESMTPS id A40111A0188;
 	Tue, 17 Dec 2024 09:15:51 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
@@ -47,9 +47,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH RESEND V2 net 2/7] net: hns3: fix missing features due to dev->features configuration too early
-Date: Tue, 17 Dec 2024 09:08:34 +0800
-Message-ID: <20241217010839.1742227-3-shaojijie@huawei.com>
+Subject: [PATCH RESEND V2 net 3/7] net: hns3: Resolved the issue that the debugfs query result is inconsistent.
+Date: Tue, 17 Dec 2024 09:08:35 +0800
+Message-ID: <20241217010839.1742227-4-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20241217010839.1742227-1-shaojijie@huawei.com>
 References: <20241217010839.1742227-1-shaojijie@huawei.com>
@@ -66,31 +66,204 @@ X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
 
 From: Hao Lan <lanhao@huawei.com>
 
-Currently, the netdev->features is configured in hns3_nic_set_features.
-As a result, __netdev_update_features considers that there is no feature
-difference, and the procedures of the real features are missing.
+This patch modifies the implementation of debugfs:
 
-Fixes: 2a7556bb2b73 ("net: hns3: implement ndo_features_check ops for hns3 driver")
+When the user process stops unexpectedly, not all data of the file system
+is read. In this case, the save_buf pointer is not released. When the
+user process is called next time, save_buf is used to copy the cached
+data to the user space. As a result, the queried data is stale.
+
+To solve this problem, this patch implements .open() and .release() handler
+for debugfs file_operations. moving allocation buffer and execution
+of the cmd to the .open() handler and freeing in to the .release() handler.
+Allocate separate buffer for each reader and associate the buffer
+with the file pointer.
+When different user read processes no longer share the buffer,
+the stale data problem is fixed.
+
+Fixes: 5e69ea7ee2a6 ("net: hns3: refactor the debugfs process")
 Signed-off-by: Hao Lan <lanhao@huawei.com>
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Guangwei Zhang <zhangwangwei6@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 1 -
- 1 file changed, 1 deletion(-)
+ChangeLog:
+v1 -> v2:
+  - Fix a data inconsistency issue caused by simultaneous access of multiple readers,
+    suggested by Jakub.
+  v1: https://lore.kernel.org/all/20241107133023.3813095-1-shaojijie@huawei.com/
+---
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  3 -
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 96 ++++++-------------
+ 2 files changed, 31 insertions(+), 68 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 43377a7b2426..a7e3b22f641c 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -2452,7 +2452,6 @@ static int hns3_nic_set_features(struct net_device *netdev,
- 			return ret;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+index 710a8f9f2248..12ba380eb701 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+@@ -916,9 +916,6 @@ struct hnae3_handle {
+ 
+ 	u8 netdev_flags;
+ 	struct dentry *hnae3_dbgfs;
+-	/* protects concurrent contention between debugfs commands */
+-	struct mutex dbgfs_lock;
+-	char **dbgfs_buf;
+ 
+ 	/* Network interface message level enabled bits */
+ 	u32 msg_enable;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+index 807eb3bbb11c..9bbece25552b 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+@@ -1260,69 +1260,55 @@ static int hns3_dbg_read_cmd(struct hns3_dbg_data *dbg_data,
+ static ssize_t hns3_dbg_read(struct file *filp, char __user *buffer,
+ 			     size_t count, loff_t *ppos)
+ {
+-	struct hns3_dbg_data *dbg_data = filp->private_data;
++	char *buf = filp->private_data;
++
++	return simple_read_from_buffer(buffer, count, ppos, buf, strlen(buf));
++}
++
++static int hns3_dbg_open(struct inode *inode, struct file *filp)
++{
++	struct hns3_dbg_data *dbg_data = inode->i_private;
+ 	struct hnae3_handle *handle = dbg_data->handle;
+ 	struct hns3_nic_priv *priv = handle->priv;
+-	ssize_t size = 0;
+-	char **save_buf;
+-	char *read_buf;
+ 	u32 index;
++	char *buf;
+ 	int ret;
+ 
++	if (!test_bit(HNS3_NIC_STATE_INITED, &priv->state) ||
++	    test_bit(HNS3_NIC_STATE_RESETTING, &priv->state))
++		return -EBUSY;
++
+ 	ret = hns3_dbg_get_cmd_index(dbg_data, &index);
+ 	if (ret)
+ 		return ret;
+ 
+-	mutex_lock(&handle->dbgfs_lock);
+-	save_buf = &handle->dbgfs_buf[index];
+-
+-	if (!test_bit(HNS3_NIC_STATE_INITED, &priv->state) ||
+-	    test_bit(HNS3_NIC_STATE_RESETTING, &priv->state)) {
+-		ret = -EBUSY;
+-		goto out;
+-	}
+-
+-	if (*save_buf) {
+-		read_buf = *save_buf;
+-	} else {
+-		read_buf = kvzalloc(hns3_dbg_cmd[index].buf_len, GFP_KERNEL);
+-		if (!read_buf) {
+-			ret = -ENOMEM;
+-			goto out;
+-		}
+-
+-		/* save the buffer addr until the last read operation */
+-		*save_buf = read_buf;
+-
+-		/* get data ready for the first time to read */
+-		ret = hns3_dbg_read_cmd(dbg_data, hns3_dbg_cmd[index].cmd,
+-					read_buf, hns3_dbg_cmd[index].buf_len);
+-		if (ret)
+-			goto out;
+-	}
++	buf = kvzalloc(hns3_dbg_cmd[index].buf_len, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
+ 
+-	size = simple_read_from_buffer(buffer, count, ppos, read_buf,
+-				       strlen(read_buf));
+-	if (size > 0) {
+-		mutex_unlock(&handle->dbgfs_lock);
+-		return size;
++	ret = hns3_dbg_read_cmd(dbg_data, hns3_dbg_cmd[index].cmd,
++				buf, hns3_dbg_cmd[index].buf_len);
++	if (ret) {
++		kvfree(buf);
++		return ret;
  	}
  
--	netdev->features = features;
- 	return 0;
+-out:
+-	/* free the buffer for the last read operation */
+-	if (*save_buf) {
+-		kvfree(*save_buf);
+-		*save_buf = NULL;
+-	}
++	filp->private_data = buf;
++	return 0;
++}
+ 
+-	mutex_unlock(&handle->dbgfs_lock);
+-	return ret;
++static int hns3_dbg_release(struct inode *inode, struct file *filp)
++{
++	kvfree(filp->private_data);
++	filp->private_data = NULL;
++	return 0;
  }
  
+ static const struct file_operations hns3_dbg_fops = {
+ 	.owner = THIS_MODULE,
+-	.open  = simple_open,
++	.open  = hns3_dbg_open,
+ 	.read  = hns3_dbg_read,
++	.release = hns3_dbg_release,
+ };
+ 
+ static int hns3_dbg_bd_file_init(struct hnae3_handle *handle, u32 cmd)
+@@ -1379,13 +1365,6 @@ int hns3_dbg_init(struct hnae3_handle *handle)
+ 	int ret;
+ 	u32 i;
+ 
+-	handle->dbgfs_buf = devm_kcalloc(&handle->pdev->dev,
+-					 ARRAY_SIZE(hns3_dbg_cmd),
+-					 sizeof(*handle->dbgfs_buf),
+-					 GFP_KERNEL);
+-	if (!handle->dbgfs_buf)
+-		return -ENOMEM;
+-
+ 	hns3_dbg_dentry[HNS3_DBG_DENTRY_COMMON].dentry =
+ 				debugfs_create_dir(name, hns3_dbgfs_root);
+ 	handle->hnae3_dbgfs = hns3_dbg_dentry[HNS3_DBG_DENTRY_COMMON].dentry;
+@@ -1395,8 +1374,6 @@ int hns3_dbg_init(struct hnae3_handle *handle)
+ 			debugfs_create_dir(hns3_dbg_dentry[i].name,
+ 					   handle->hnae3_dbgfs);
+ 
+-	mutex_init(&handle->dbgfs_lock);
+-
+ 	for (i = 0; i < ARRAY_SIZE(hns3_dbg_cmd); i++) {
+ 		if ((hns3_dbg_cmd[i].cmd == HNAE3_DBG_CMD_TM_NODES &&
+ 		     ae_dev->dev_version <= HNAE3_DEVICE_VERSION_V2) ||
+@@ -1425,24 +1402,13 @@ int hns3_dbg_init(struct hnae3_handle *handle)
+ out:
+ 	debugfs_remove_recursive(handle->hnae3_dbgfs);
+ 	handle->hnae3_dbgfs = NULL;
+-	mutex_destroy(&handle->dbgfs_lock);
+ 	return ret;
+ }
+ 
+ void hns3_dbg_uninit(struct hnae3_handle *handle)
+ {
+-	u32 i;
+-
+ 	debugfs_remove_recursive(handle->hnae3_dbgfs);
+ 	handle->hnae3_dbgfs = NULL;
+-
+-	for (i = 0; i < ARRAY_SIZE(hns3_dbg_cmd); i++)
+-		if (handle->dbgfs_buf[i]) {
+-			kvfree(handle->dbgfs_buf[i]);
+-			handle->dbgfs_buf[i] = NULL;
+-		}
+-
+-	mutex_destroy(&handle->dbgfs_lock);
+ }
+ 
+ void hns3_dbg_register_debugfs(const char *debugfs_dir_name)
 -- 
 2.33.0
 
