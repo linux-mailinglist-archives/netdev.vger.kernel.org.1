@@ -1,53 +1,94 @@
-Return-Path: <netdev+bounces-152606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E2B9F4CF1
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:57:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 165CA9F4CFB
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:59:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6AD9188B15B
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:57:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DD2F169405
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3B61F4731;
-	Tue, 17 Dec 2024 13:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D631F427C;
+	Tue, 17 Dec 2024 13:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fU/TBeIj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cOFckzmj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2B51F4715;
-	Tue, 17 Dec 2024 13:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7632250F8
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 13:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734443840; cv=none; b=Ie4x0B24W0FfSTKYOt5v9mEmj/1B4HRiYgrkqjSPoGPSJgviAAtUga6PrSXeuYAOezHonGJhJWyMDB02VfrCYUq3c2GS7IAw1UaMfdGyRkcsZXbHxk46y17RxbdGzu+Net4U/5xoxLt6NAq3zVNbyRNEPz7z2J3/Qz7tw0yLs7E=
+	t=1734443970; cv=none; b=npfNQqfUbTSLzK4GOnuabnFtyy5HegKvnNvFFytP6DhgkfNmJI6w+7bSJvSJocx4CcuKISAteXoC5RaJ9CCBb7w8zFxlnfo+D27TLa1cFQgQb3Ed7odsJxURSJcfWSoJ93HKfKxGdX37rSJz6y/Dx3Ak78C5MR2mN9ot2vqXjaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734443840; c=relaxed/simple;
-	bh=8jhuuUsFhgIcpU5CNdxOmgUs9ECyvrSHIBwbvAp6G2A=;
+	s=arc-20240116; t=1734443970; c=relaxed/simple;
+	bh=pcxgYby5WPpyBdlgN7E715zZ03HEYKEFeCg06Z1KpjI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ndCYMZQFrejKvSoK6QlDgFqheLXadHvhwRd0n1paagM4Xg+0PLeSiR9Bg+b/Du1mUEgpm6wtPy6hrRLkmabs0rNhV+YZUtxt9daoBS4LrdVUZJivPFgnyzfWhg/mxbihFQJQIWlMenglfxZ9EOjteGb4WngCoZ1uJnktEVWW06w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fU/TBeIj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE888C4CED3;
-	Tue, 17 Dec 2024 13:57:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1734443839;
-	bh=8jhuuUsFhgIcpU5CNdxOmgUs9ECyvrSHIBwbvAp6G2A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fU/TBeIj6nl2eN6uNis3tw9dAcMeB7KgKc2w/LZQJNKrIcoGTCJJo5AVtjxwTixlP
-	 r7qytg1cY2GERc2e8N44mAi9cNRjf4dnLv5SL0o7dQG3URiY61e1BqVkF3xSo0NdYy
-	 fAoNDBJZ33o5WimoYZwVnlCQQai9cOplujo0DC4I=
-Date: Tue, 17 Dec 2024 14:57:16 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Da Shi Cao <dscao999@hotmail.com>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: TI Ethernet Driver TI_K3_AM65_CPSW_NUSS
-Message-ID: <2024121749-kerchief-treachery-aae6@gregkh>
-References: <CY5PR10MB59880DDECD5D282B7665085B8C042@CY5PR10MB5988.namprd10.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=O4fzKZb1WUmGC/FHCByS2hHJ6XnYksqXDLmoViD4lkTEDbu2jQa2oGlX8STb9dglQQiG4uH2shqDxdo0YxexuY0YhEsPwm4jimNOVaU0INVRAkbpnBczBewga5+zk3XTLK6/QDGCX6RU9JzN/wLDcA29LXVShRgR15HNxI62mGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cOFckzmj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734443966;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xhAc/jC4dYpPGKRVWYaUOHuJTso9Ft2Xk/zIIE5uACQ=;
+	b=cOFckzmjRECUjU9aD6ijFV2FGaYnYfDF8uR4xLAQpWq5Ksidu1kHzjwN2+wVjU2AgXqXBP
+	e6HEOG35s7GBtNTIfWYge0HRJDKPA/wKk+bPl9XuCR32VYcuqqaQznvd0DZircbJGKkbnK
+	6V3m2yCZenusIBKOfZRcE4ycBsc49y4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-617-UycPb7ZLNHOEGKJ2Odg-jg-1; Tue, 17 Dec 2024 08:59:23 -0500
+X-MC-Unique: UycPb7ZLNHOEGKJ2Odg-jg-1
+X-Mimecast-MFC-AGG-ID: UycPb7ZLNHOEGKJ2Odg-jg
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361ac8b25fso30038155e9.2
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 05:59:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734443962; x=1735048762;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xhAc/jC4dYpPGKRVWYaUOHuJTso9Ft2Xk/zIIE5uACQ=;
+        b=ASTU+KCwjbJO51I6/TCnxTxIO388N7aE8pFJ0UCoOYJaA2Sdmm3bucx/O2siafkxvf
+         B/4v2R6+W4Bqw9ZcYsP7wI6dtkRQFkVknME6mYRtqLOkwURDEBAfz9rG7j+GlTi77ZRG
+         HlR82BhNERyIjFOSiRhE8ZUJsTumDUYoKxJa3lfIOBznqXcs0Z6lvGVpwA5xOAFzQ4Xp
+         BuN/x6liT3+fOTMPUzptL27dIk4LPZTW/vNeUMAeygTWZ5I0pzKPW4c+fRsNgnPnNidO
+         1iIV2SYAyQNRFEGQT228MtsqyZBnKFvtM7y2USXLrCdCA6lHMtctNhjlrntZhEjP6U1o
+         xDvA==
+X-Gm-Message-State: AOJu0YyEbZ+bDqJb5K1gFStRnWUzD7EHKkF+UyvuQ0+BxtAZhDDoFPHM
+	Xm1iFcygz+ATMKiNPVGmpRsKPP2XkSLZ/F/v2BM+6jwUGcf//bVLB5EYa78HG2mEm79nfPPGmJ7
+	wySj6JXf2F++p+RADIEwWJ8Gd9QPGDSYQ9sb/4m6qt8u13uhfbXjd5Q==
+X-Gm-Gg: ASbGncvQ26FsTT2dG480LBmcioIaPawoG78cmwajbfJyGWOr51hj2ISLg9aaETsa9qC
+	XTXV6eWIaCnDB5+7/VuCPgPwbcRJgBlNx2tZNyLhqoTv3qfr6AVQWSdR/kQtZtU618It9/EZ3tA
+	bUJr7JAINJdmmQUXxNMArIm5yLTGk5ioHMtgZXpghSn4J+DqMNy2z4d7Br5DL/XJuVFXIyD1XoE
+	4LvDX4wIzMgQHDFN/Zl4GHVNNsoUGTlBuS94kxw3jHjP6NGLxbVHxm3U9zzx/783UkUMFDpEuEX
+	S12kzvz8t64mpKR3nMt18HMFjCWoS24rl2GS
+X-Received: by 2002:a05:600c:4ed4:b0:434:fb65:ebbb with SMTP id 5b1f17b1804b1-4362aa66874mr162680155e9.17.1734443962339;
+        Tue, 17 Dec 2024 05:59:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE5W4gsjGhjNWk8nWu+8lSYeQBM/Jwv9mAVLdL+L5km/+gmZuZG+fWr/Ow9dJs1LDLZZaqhGg==
+X-Received: by 2002:a05:600c:4ed4:b0:434:fb65:ebbb with SMTP id 5b1f17b1804b1-4362aa66874mr162679945e9.17.1734443962049;
+        Tue, 17 Dec 2024 05:59:22 -0800 (PST)
+Received: from debian (2a01cb058d23d600bcb97cb9ff1f3496.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:bcb9:7cb9:ff1f:3496])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4362571776asm171647835e9.40.2024.12.17.05.59.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2024 05:59:21 -0800 (PST)
+Date: Tue, 17 Dec 2024 14:59:19 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+	donald.hunter@gmail.com, horms@kernel.org, rostedt@goodmis.org,
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+	petrm@nvidia.com
+Subject: Re: [PATCH net-next 3/9] ipv6: fib_rules: Add flow label support
+Message-ID: <Z2GDt+5piTRsumVd@debian>
+References: <20241216171201.274644-1-idosch@nvidia.com>
+ <20241216171201.274644-4-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,69 +97,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CY5PR10MB59880DDECD5D282B7665085B8C042@CY5PR10MB5988.namprd10.prod.outlook.com>
+In-Reply-To: <20241216171201.274644-4-idosch@nvidia.com>
 
-On Tue, Dec 17, 2024 at 01:40:12PM +0000, Da Shi Cao wrote:
-> The driver of TI K3 ethernet port depends on PAGE_POOL configuration option. There should be a select PAGE_POOL under it configuration.
-> 
-> --- a/drivers/net/ethernet/ti/Kconfig
-> +++ b/drivers/net/ethernet/ti/Kconfig
-> @@ -114,6 +114,7 @@ config TI_K3_AM65_CPSW_NUSS
->         select TI_DAVINCI_MDIO
->         select PHYLINK
->         select TI_K3_CPPI_DESC_POOL
-> +       select PAGE_POOL
->         imply PHY_TI_GMII_SEL
->         depends on TI_K3_AM65_CPTS || !TI_K3_AM65_CPTS
->         help
-> 
-> Dashi Cao
+On Mon, Dec 16, 2024 at 07:11:55PM +0200, Ido Schimmel wrote:
+> @@ -332,6 +334,9 @@ INDIRECT_CALLABLE_SCOPE int fib6_rule_match(struct fib_rule *rule,
+>  	if (r->dscp && r->dscp != ip6_dscp(fl6->flowlabel))
+>  		return 0;
+>  
+> +	if ((r->flowlabel ^ flowi6_get_flowlabel(fl6)) & r->flowlabel_mask)
+> +		return 0;
+> +
 
+Personally, I'd find the following form easier to read:
++	if ((flowi6_get_flowlabel(fl6) & r->flowlabel_mask) != r->flowlabel)
++		return 0;
 
-Hi,
+Does GCC produce better code with the xor form?
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
-
-You are receiving this message because of the following common error(s)
-as indicated below:
-
-- Your patch contains warnings and/or errors noticed by the
-  scripts/checkpatch.pl tool.
-
-- Your patch is malformed (tabs converted to spaces, linewrapped, etc.)
-  and can not be applied.  Please read the file,
-  Documentation/process/email-clients.rst in order to fix this.
-
-- Your patch does not have a Signed-off-by: line.  Please read the
-  kernel file, Documentation/process/submitting-patches.rst and resend
-  it after adding that line.  Note, the line needs to be in the body of
-  the email, before the patch, not at the bottom of the patch or in the
-  email signature.
-
-- You did not specify a description of why the patch is needed, or
-  possibly, any description at all, in the email body.  Please read the
-  section entitled "The canonical patch format" in the kernel file,
-  Documentation/process/submitting-patches.rst for what is needed in
-  order to properly describe the change.
-
-- You did not write a descriptive Subject: for the patch, allowing Greg,
-  and everyone else, to know what this patch is all about.  Please read
-  the section entitled "The canonical patch format" in the kernel file,
-  Documentation/process/submitting-patches.rst for what a proper
-  Subject: line should look like.
-
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
-
-thanks,
-
-greg k-h's patch email bot
 
