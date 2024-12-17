@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-152472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81DE79F40C2
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 03:30:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E39B49F40C5
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 03:30:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C68491639F0
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:30:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A8F616411D
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEC31465BD;
-	Tue, 17 Dec 2024 02:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A474F14A09C;
+	Tue, 17 Dec 2024 02:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PrMJyYbz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MWjnHYcN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3F9145FE0;
-	Tue, 17 Dec 2024 02:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D84A1494A9
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 02:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734402613; cv=none; b=XvYuEp9gLGPTKUwd2d2wDkbaOtEah6Rt6rUsu9JlabZt9NyCJe2yu3Jv8y0dbjP55jGlOnoCmxMxix7UfT8ZsvrzQVBB/O6rGuTnczm63dK3J8aKMGhLA3At/PGheqGPmESp9OY7P483mwMu0j3KAFZIWp/uDO0Gc6V/HwaavO0=
+	t=1734402614; cv=none; b=K3UVwzToYFsKd9xbP0Wq4UkzFqRs89WLcmY8ygl/+Fuf5Vv3u+IOaCFR9+yaFvyh66WrumJEIq8Qc2Ja691qIXMzgbniTb+lD+d6/wfHSps203Xyp1idCFe28LtYiS+wXTfdFZUA8ke1o5czsvjbVH0++74IIf71pPIGfB7mnFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734402613; c=relaxed/simple;
-	bh=YFVs1GSeMboi50d9wwhk1qZytEoVY03tfo4cZz3xYv4=;
+	s=arc-20240116; t=1734402614; c=relaxed/simple;
+	bh=H7mlplvqQ+N7ECOhgFj3nilCSorz2JCRNDGJftFiNNQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mx3VkTIlj33aZixRShue4J6RcY+0ITkhyxgNbMXjJufEWf8Y5B2xgHOgVypWdAb4gne4pPOux/NhCDF/gtMhMlUiiwI1/DYL1as39VMT4WrJ8vBFT/vehU3Uh9D/Hte/3yucVXwvhULrFqcztspUv8m+Pxlx7Jd4rFPGwFmmt/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PrMJyYbz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9283C4CED7;
-	Tue, 17 Dec 2024 02:30:12 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IN83xriaeQnpPvI1N9H+4fIuxkTuFvWHeomvbZkj7wrl6CFEgBDEHc38M8RKQNpE5cE0dhJAvGIwH6F+Pi7lfbdnB+ZEDLVRp+fEQt8mFJ3kLzzh7Hh9cpYyAJ3i5NN8ij2IWNNTeV2saRCCaOKS4bDNOWlNtxg4RPeD7uhwTIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWjnHYcN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53D3FC4CEDE;
+	Tue, 17 Dec 2024 02:30:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734402612;
-	bh=YFVs1GSeMboi50d9wwhk1qZytEoVY03tfo4cZz3xYv4=;
+	s=k20201202; t=1734402614;
+	bh=H7mlplvqQ+N7ECOhgFj3nilCSorz2JCRNDGJftFiNNQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PrMJyYbz5ueWHY9srQaOXCnR1jWeOMjv7t3sw8QqyEP8hwba8XUqyha1Z39HqTu1s
-	 bCAFjfZX4Omr9aydAEMnw2ewGz6mxq+3ZNc4shp+r9Symrej3PaztVodXypf7ZjQzc
-	 Wae2sQrhC/m1jPRyTMKkeJhNtlOJCPgWC3XwScA3DcJuscxpkoOufJO3tGCt6IQ4Ri
-	 g1e7vBLpOYmpnBwHEszF5jqmbFej8jVZ4EK2S5wBL+i+XjqNVNNZOZVutxTq2tEETp
-	 NhkvmvkFEmttJlr9+bmuxvzsGPaMSba6R9ZuXPocX6cH4hzyKNF3KMqsZU9RVrrW6Z
-	 SD8whiwO8EJRw==
+	b=MWjnHYcNF5AdrwQIUKmW9soXDhrlYfe1ikLQjd3v/UYyaEaqdsPB6lk1XBDeaf+GO
+	 DhNM2BWYEDttw2hQmfknCVlNSamicD0/pWwg1cMdZp2tuyDaXpVaWXppolOBHyQ/Dz
+	 /s2g5u2irA/n2rFdkb1JyNWxqekDmnT1hGi9cp6lCq3IwJimBhPiIQxyP2A+BYjEek
+	 8+QvFewTclKfMacqCzcmxtCnpdmBWl2cnp9PL1K/7YqewN7YgFQKUsWNx2yNZFxxGY
+	 Yz+ONbyMi/fj3KFtdh0TjyBbtWA6PzFjsvxCiyu7CDd1gbhG1S/Bw0DvgIsqTEofuW
+	 eSobyLmSzqHmg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 343EF3806656;
-	Tue, 17 Dec 2024 02:30:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEE63806656;
+	Tue, 17 Dec 2024 02:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: hinic: Fix cleanup in create_rxqs/txqs()
+Subject: Re: [PATCH net] team: Fix feature exposure when no ports are present
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173440263001.420431.12522081889821148366.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Dec 2024 02:30:30 +0000
-References: <0cc98faf-a0ed-4565-a55b-0fa2734bc205@stanley.mountain>
-In-Reply-To: <0cc98faf-a0ed-4565-a55b-0fa2734bc205@stanley.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: aviad.krawczyk@huawei.com, cai.huoqing@linux.dev, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- zhaochen6@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
+ <173440263125.420431.12756256208049130141.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Dec 2024 02:30:31 +0000
+References: <20241213123657.401868-1-daniel@iogearbox.net>
+In-Reply-To: <20241213123657.401868-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, liuhangbin@gmail.com, razor@blackwall.org,
+ mkubecek@suse.cz, jiri@nvidia.com, pabeni@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 13 Dec 2024 17:28:11 +0300 you wrote:
-> There is a check for NULL at the start of create_txqs() and
-> create_rxqs() which tess if "nic_dev->txqs" is non-NULL.  The
-> intention is that if the device is already open and the queues
-> are already created then we don't create them a second time.
+On Fri, 13 Dec 2024 13:36:57 +0100 you wrote:
+> Small follow-up to align this to an equivalent behavior as the bond driver.
+> The change in 3625920b62c3 ("teaming: fix vlan_features computing") removed
+> the netdevice vlan_features when there is no team port attached, yet it
+> leaves the full set of enc_features intact.
 > 
-> However, the bug is that if we have an error in the create_txqs()
-> then the pointer doesn't get set back to NULL.  The NULL check
-> at the start of the function will say that it's already open when
-> it's not and the device can't be used.
+> Instead, leave the default features as pre 3625920b62c3, and recompute once
+> we do have ports attached. Also, similarly as in bonding case, call the
+> netdev_base_features() helper on the enc_features.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: hinic: Fix cleanup in create_rxqs/txqs()
-    https://git.kernel.org/netdev/net/c/7203d10e93b6
+  - [net] team: Fix feature exposure when no ports are present
+    https://git.kernel.org/netdev/net/c/e78c20f327bd
 
 You are awesome, thank you!
 -- 
