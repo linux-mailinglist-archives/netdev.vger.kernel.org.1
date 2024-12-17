@@ -1,115 +1,232 @@
-Return-Path: <netdev+bounces-152661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C4AF9F517E
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 18:00:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DAF09F5187
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 18:03:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D7B9188B309
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 17:00:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7B55188A5F2
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 17:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655E21F76D9;
-	Tue, 17 Dec 2024 17:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rPV7wsNl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455401F76A4;
+	Tue, 17 Dec 2024 17:03:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21371F758C;
-	Tue, 17 Dec 2024 17:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704EC1F758F
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 17:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734454821; cv=none; b=ffr2pRXAoE344I1GgQqvxzKRkOBfEKgOjQs2KIQ0B7sAm69srvHiGEsj+t4Jd6xFftGxLXLtpWK6EFpugLTea97tFCdxsLUPevlZ8d5TMG+WTjl3DlMMNsy+RtF5tlcgJxHaBl/hdcOLe9FiAx+gnQFCa8RRlPKdQcNN0nR8ld8=
+	t=1734455004; cv=none; b=leY8JjFmq2AL7Tw9oZvxF+O6/kpvDqaU6pMoQq8DyGJI/qvS0Br0MliVAZauBKZjN5IYNd3v5Lh75Zvh5mfHg1Yta5K3AVDw3f7tLuZDlGLrvS9DYFjz/WWksl062E95W54zZctJrrg704v9+1J+GN7ltVyt9xW0RrOgGBqcPmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734454821; c=relaxed/simple;
-	bh=WyDyY4aQYqqYQYZFNrphMfbOh5pcveta+Hso/X//v6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iaWZLBgihbMn4SiOre+gNjwa1lE3fyK6AQEDtwoN9g0JY70KZc1MM6p7JztxMg/MTs0LjoIscnKz0SZjJZ1egfS1dcNtMtgygNNbapGpOtVkBe0mWCNEEIWX+ptGgQEqvuua6vtAbSEHBlsiNlqPfGygl69rqmQKrkUbNqBLN7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rPV7wsNl; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=2kdd/C+u6elSrmTw/BdSPP4bZgQQ9P20+IyYEvz+Zyo=; b=rP
-	V7wsNlNeqgeOt+Ao4hBRcTnlYyFLys3fuy2sSL07SuODDlTRXipKtd8Lvf+/7+P/nqbc9tGFV/G6J
-	hXWQlr1HAfzjw5BGBrkGmk/eZcYZ559Q816huzwU+VO+PXTIT8U+05v4HuMG+yiw8/HN1CsIvihUt
-	05lM1wJsSxq1lMU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tNavK-0010v1-SE; Tue, 17 Dec 2024 17:59:54 +0100
-Date: Tue, 17 Dec 2024 17:59:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	TRINH THAI Florent <florent.trinh-thai@cs-soprasteria.com>,
-	CASAUBON Jean Michel <jean-michel.casaubon@cs-soprasteria.com>
-Subject: Re: [PATCH net] net: sysfs: Fix deadlock situation in sysfs accesses
-Message-ID: <c63033ff-ff47-4008-b7d3-f07d016496fa@lunn.ch>
-References: <d416a14ec38c7ba463341b83a7a9ec6ccc435246.1734419614.git.christophe.leroy@csgroup.eu>
- <c0a07217-df63-4b5d-b1a5-13b386b0d7d7@lunn.ch>
- <c1d52a7d-b6b2-4150-99c7-a67b2a127a18@csgroup.eu>
+	s=arc-20240116; t=1734455004; c=relaxed/simple;
+	bh=PmCO1saefPNelwgYlhiOYl4s9nWwvTyuZ8toAOOnN3k=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cWZrp0j9w5L9Bz1V+6B9bDhgQlaEWWAVBj+zygaH4KD8rA3Geudo/4iIo929YDv163h367laYC/8TI9Dqjwt3l9u25Tqr3iNXItuPsEFM8yk//+VKOsiQmhLHclj8PWEF8rKuBhBJx8oflNiFY569c9z2G/k4Fq5FzWTjazVIVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a9cd0b54c1so58778935ab.0
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 09:03:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734455001; x=1735059801;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=M1i8N8MltEGs/Cs4l8HSYYVKaEokhBJdoFZb2Lqw43E=;
+        b=ZaDW6oqg6dfmS4jNloqbgMF/jCo7fjZFVOcgrY4+NSO2qO6PbN/P9hlF2hRm20r1BL
+         PcYkXJqucIhDlEBneEvIe0ulQGlgosOhJuzSENOJueHyqoe/MLOM+1wYU28Nb5DrNmBP
+         uj4bsN/f/xJjnWiiOqbmQBENRF7GTDj0Q86bm0K7mVIvuaCr153ZnMDQDonFgWykamyv
+         KbbEJ4eR7wYNe2BMUvR2bNJJzuCU7HtfyFl6D6uU2+FJ1JIEERteB32xhHDR42qa+7UR
+         N46HedZiBnsbdNv+yQmKNRW5z2ATWZNQDx8FImAWEBoplfmKAfmAtKFMN98ZYFXfnL/M
+         p2iw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKOYbTMqLXNJVN65gnr5GLeQBrX7KUvBRhXrdu/fRndvBRmvgwAQ4E5mC4QlH1DkkimUSTQEU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjQmJCOv5r4mPgMIfl1OjE+IU68D52IYRzcvhSkA5J9WU2ftE6
+	tkXh0jItjaHfz4cZnw1lewDahrcLxu/27kaujMF8TjoFxd6KvOEd3qLzwtRTp6xHd+n+hAY6LoI
+	bn/0gz5DcWs7ZqYUq09Y5C4emdH+s2Hqh2VEpHwhZ2I84tkhBPMPAoPg=
+X-Google-Smtp-Source: AGHT+IFakiee4ROgWbDu9hm0AJP7nzqSk50fk1gsjGPP11/LRufNAksPaNyEp8UxBsOKCOAve9/1jRbKaN6FiA3QmqzqbgcyJeBd
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c1d52a7d-b6b2-4150-99c7-a67b2a127a18@csgroup.eu>
+X-Received: by 2002:a05:6e02:1d81:b0:3a7:a738:d9c8 with SMTP id
+ e9e14a558f8ab-3afee9a3aafmr138714295ab.2.1734455001355; Tue, 17 Dec 2024
+ 09:03:21 -0800 (PST)
+Date: Tue, 17 Dec 2024 09:03:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6761aed9.050a0220.29fcd0.006b.GAE@google.com>
+Subject: [syzbot] [net?] general protection fault in put_page (4)
+From: syzbot <syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, matttbe@kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Dec 17, 2024 at 05:18:40PM +0100, Christophe Leroy wrote:
-> 
-> 
-> Le 17/12/2024 à 16:30, Andrew Lunn a écrit :
-> > On Tue, Dec 17, 2024 at 08:18:25AM +0100, Christophe Leroy wrote:
-> > > The following problem is encountered on kernel built with
-> > > CONFIG_PREEMPT. An snmp daemon running with normal priority is
-> > > regularly calling ioctl(SIOCGMIIPHY).
-> > 
-> > Why is an SNMP daemon using that IOCTL? What MAC driver is this? Is it
-> > using phylib? For phylib, that IOCTL is supposed to be for debug only,
-> > and is a bit of a foot gun. So i would not recommend it.
-> > 
-> 
-> That's the well-known Net-SNMP package.
-> 
-> See for instance https://github.com/net-snmp/net-snmp/blob/master/agent/mibgroup/if-mib/data_access/interface_linux.c#L954
+Hello,
 
-That is pretty broken:
+syzbot found the following issue on:
 
-It assumes the PHY is using C22. Many PHYs now a days are C45.
+HEAD commit:    78d4f34e2115 Linux 6.13-rc3
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=16445730580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6c532525a32eb57d
+dashboard link: https://syzkaller.appspot.com/bug?extid=38a095a81f30d82884c1
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=169b0b44580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f502df980000
 
-It assumes the PHY only supports up to 1G, were as many PHYs now a
-days are > 1G.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7129ee07f8aa/disk-78d4f34e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c23c0af59a16/vmlinux-78d4f34e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/031aecf04ea7/bzImage-78d4f34e.xz
 
-It assumes the PHY is not an automotive PHY which has its registers in
-a different place.
+The issue was bisected to:
 
-Reading the BMSR can change the BMSR, so phylib is going to get
-confused and miss linkup/linkdown events.
+commit b83fbca1b4c9c45628aa55d582c14825b0e71c2b
+Author: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Date:   Mon Sep 2 10:45:53 2024 +0000
 
-There is no locking going on, so the PHY might be on a different page,
-e.g. to read the temperature sensors, blink the LEDs, etc. The SNMP
-daemon has no way to detect this, so it will be applying BMSR, BMCR,
-etc meaning to registers which are in fact not BMSR, BMCR, etc.
+    mptcp: pm: reduce entries iterations on connect
 
-This code needs throwing away and replacing with netlink sockets,
-which is a lot more abstract API, PHY independent, speed independent,
-media independent etc. That would also solve your deadlock.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=163682df980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=153682df980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=113682df980000
 
-	Andrew
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com
+Fixes: b83fbca1b4c9 ("mptcp: pm: reduce entries iterations on connect")
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+CPU: 1 UID: 0 PID: 5836 Comm: sshd Not tainted 6.13.0-rc3-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/25/2024
+RIP: 0010:_compound_head include/linux/page-flags.h:242 [inline]
+RIP: 0010:put_page+0x23/0x260 include/linux/mm.h:1552
+Code: 90 90 90 90 90 90 90 55 41 57 41 56 53 49 89 fe 48 bd 00 00 00 00 00 fc ff df e8 f8 5e 12 f8 49 8d 5e 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74 08 48 89 df e8 8f c7 78 f8 48 8b 1b 48 89 de 48 83
+RSP: 0000:ffffc90003916c90 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: 0000000000000008 RCX: ffff888030458000
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: dffffc0000000000 R08: ffffffff898ca81d R09: 1ffff110054414ac
+R10: dffffc0000000000 R11: ffffed10054414ad R12: 0000000000000007
+R13: ffff88802a20a542 R14: 0000000000000000 R15: 0000000000000000
+FS:  00007f34f496e800(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9d6ec9ec28 CR3: 000000004d260000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ skb_page_unref include/linux/skbuff_ref.h:43 [inline]
+ __skb_frag_unref include/linux/skbuff_ref.h:56 [inline]
+ skb_release_data+0x483/0x8a0 net/core/skbuff.c:1119
+ skb_release_all net/core/skbuff.c:1190 [inline]
+ __kfree_skb+0x55/0x70 net/core/skbuff.c:1204
+ tcp_clean_rtx_queue net/ipv4/tcp_input.c:3436 [inline]
+ tcp_ack+0x2442/0x6bc0 net/ipv4/tcp_input.c:4032
+ tcp_rcv_state_process+0x8eb/0x44e0 net/ipv4/tcp_input.c:6805
+ tcp_v4_do_rcv+0x77d/0xc70 net/ipv4/tcp_ipv4.c:1939
+ tcp_v4_rcv+0x2dc0/0x37f0 net/ipv4/tcp_ipv4.c:2351
+ ip_protocol_deliver_rcu+0x22e/0x440 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x341/0x5f0 net/ipv4/ip_input.c:233
+ NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
+ NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
+ __netif_receive_skb_one_core net/core/dev.c:5672 [inline]
+ __netif_receive_skb+0x2bf/0x650 net/core/dev.c:5785
+ process_backlog+0x662/0x15b0 net/core/dev.c:6117
+ __napi_poll+0xcb/0x490 net/core/dev.c:6883
+ napi_poll net/core/dev.c:6952 [inline]
+ net_rx_action+0x89b/0x1240 net/core/dev.c:7074
+ handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
+ __do_softirq kernel/softirq.c:595 [inline]
+ invoke_softirq kernel/softirq.c:435 [inline]
+ __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0x57/0xc0 arch/x86/kernel/apic/apic.c:1049
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0033:0x7f34f4519ad5
+Code: 85 d2 74 0d 0f 10 02 48 8d 54 24 20 0f 11 44 24 20 64 8b 04 25 18 00 00 00 85 c0 75 27 41 b8 08 00 00 00 b8 0f 01 00 00 0f 05 <48> 3d 00 f0 ff ff 76 75 48 8b 15 24 73 0d 00 f7 d8 64 89 02 48 83
+RSP: 002b:00007ffec5b32ce0 EFLAGS: 00000246
+RAX: 0000000000000001 RBX: 00000000000668a0 RCX: 00007f34f4519ad5
+RDX: 00007ffec5b32d00 RSI: 0000000000000004 RDI: 0000564f4bc6cae0
+RBP: 0000564f4bc6b5a0 R08: 0000000000000008 R09: 0000000000000000
+R10: 00007ffec5b32de8 R11: 0000000000000246 R12: 0000564f48ea8aa4
+R13: 0000000000000001 R14: 0000564f48ea93e8 R15: 00007ffec5b32d68
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:_compound_head include/linux/page-flags.h:242 [inline]
+RIP: 0010:put_page+0x23/0x260 include/linux/mm.h:1552
+Code: 90 90 90 90 90 90 90 55 41 57 41 56 53 49 89 fe 48 bd 00 00 00 00 00 fc ff df e8 f8 5e 12 f8 49 8d 5e 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74 08 48 89 df e8 8f c7 78 f8 48 8b 1b 48 89 de 48 83
+RSP: 0000:ffffc90003916c90 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: 0000000000000008 RCX: ffff888030458000
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: dffffc0000000000 R08: ffffffff898ca81d R09: 1ffff110054414ac
+R10: dffffc0000000000 R11: ffffed10054414ad R12: 0000000000000007
+R13: ffff88802a20a542 R14: 0000000000000000 R15: 0000000000000000
+FS:  00007f34f496e800(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9d6ec9ec28 CR3: 000000004d260000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	90                   	nop
+   1:	90                   	nop
+   2:	90                   	nop
+   3:	90                   	nop
+   4:	90                   	nop
+   5:	90                   	nop
+   6:	90                   	nop
+   7:	55                   	push   %rbp
+   8:	41 57                	push   %r15
+   a:	41 56                	push   %r14
+   c:	53                   	push   %rbx
+   d:	49 89 fe             	mov    %rdi,%r14
+  10:	48 bd 00 00 00 00 00 	movabs $0xdffffc0000000000,%rbp
+  17:	fc ff df
+  1a:	e8 f8 5e 12 f8       	call   0xf8125f17
+  1f:	49 8d 5e 08          	lea    0x8(%r14),%rbx
+  23:	48 89 d8             	mov    %rbx,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1) <-- trapping instruction
+  2e:	74 08                	je     0x38
+  30:	48 89 df             	mov    %rbx,%rdi
+  33:	e8 8f c7 78 f8       	call   0xf878c7c7
+  38:	48 8b 1b             	mov    (%rbx),%rbx
+  3b:	48 89 de             	mov    %rbx,%rsi
+  3e:	48                   	rex.W
+  3f:	83                   	.byte 0x83
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
