@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-152683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 556349F5621
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 19:27:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32A9A9F5624
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 19:28:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68AAD7A3D7B
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 18:27:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C91D170FFC
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 18:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746151F8AF0;
-	Tue, 17 Dec 2024 18:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326F31F8EE4;
+	Tue, 17 Dec 2024 18:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UY8vUV32"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PZHf7nzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92701F8AD6
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 18:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E361F8AFE
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 18:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734460027; cv=none; b=BB2n54X4vVTetDU9MlALMENa9tpxEMdfS0QwFgJEboI80OY1u2Y1LR62aUIazVPjjWtpTKSyxfCf/VyAQ81ylU7GyiInT4M70DMZHZ0+/j0b3Lr8EJt14Q3EP0zq6dEFqpbUzHICCWrqoEFxaFQWYUZwJZMAagMQxFThZScPOKk=
+	t=1734460029; cv=none; b=XkPLtEsElaIHBe/Oj6UcLo/9aP78M0Qeq8xrc43Kdotuokoo/xrKK05QA9Sxe2KkqWCvIF08nrJusXidnA2B0kqtrajAru65uooSISjaSiHAER+pc9HWL9NjuIPfvajyGY4DvZ7KDLf10yan+O5ZaCXq+JZZb2dNhTi6OtMPHLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734460027; c=relaxed/simple;
-	bh=/SbxjZE0CWBdnUK4Eh/KtWKwbEFu2G0/SWFxFkbgbXw=;
+	s=arc-20240116; t=1734460029; c=relaxed/simple;
+	bh=zpTK0PNQOhNC5kD2LgIhbrQ1a3eBbCrVDI9javzEoDA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uI6Ta6MREJd0JKcx5hCJCOBB1xCilBqzE5BSbSL0L+VlX+ZV9YzyojtpM525Cld8IWbc7VaL9+fi5i9P2WGgqwx6Owgwlpbd2qBV2BttWnTP1gjxwIQLiyoR7mm+O5H9RrZ35zX7Q5O+DyYfMdVDwrcEtZdDuwuqxODpj8TWDEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=UY8vUV32; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=SPDvaLp1G48B52ofwWFzgsnERdF5GTRBf1VC6e0veA2jmBgs+ieJdaDTo43iXJwd6E85GBLaAH96lTC2p40oL8BdrSTvH1VrKE2YR9vsXc+AF5j6bvOJgLM9iipTtrlHNisAtpdr+i0vwyOZz6OQJVN/HvdpdnCUIqZBN0h2EKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PZHf7nzI; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-216401de828so45395015ad.3
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 10:27:05 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-216634dd574so32906195ad.2
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 10:27:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1734460025; x=1735064825; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1734460027; x=1735064827; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Izj0krEbHBgNpHKjiv2l6E2w5v2uO+MXE0kMsqnNseQ=;
-        b=UY8vUV32Go3M4lXujP88PC8N8Gg9Rvn2e+h6IOT7xRi09iOJjiEPAhbleKIQ4/eJB6
-         9I8UNSQ4/TT4eUqjA9NGdEbJ/N/aLuNcHi0qU75DEaV+mblSorrcqy0AvqOBcn7fmwP2
-         0KR0kTaeYwnI47I9kTOuArbVsXTXUGmhZriyo=
+        bh=T/U74kSzGU82WaF3YwiwK5Dsre8yynJCW2nmO8At+rU=;
+        b=PZHf7nzIFyxkD+2bwc0vC2OB8powjSYDfOYb+9oT4exnzFfFok3ZiyTueeZoUoN2am
+         n8iqDDtkgK1dKmj2ASFEbI21zBph44iER03XHf4eMQvQ5TmxSQzIImebaLTkbGvSbmGa
+         gSd7Lw/fROYbRtlg0Z9Z20sPGypVm/Wbj6QXk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734460025; x=1735064825;
+        d=1e100.net; s=20230601; t=1734460027; x=1735064827;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Izj0krEbHBgNpHKjiv2l6E2w5v2uO+MXE0kMsqnNseQ=;
-        b=G3w6Nc9odfHQ/26yp74MmDiyzEM92RsHHCYeCnwQkJa4D+O3BZebnJkm8Cznwln3qo
-         ErOJRkc6pDz1HJFKFaa6ikNrXejo2dspkhqHg81HM6zdL0L0kxnII2OXQMyKFgfTcpKb
-         wGfox8L6Ucq5lBz1VTQDeSFFHLHqCkSM015v6wBEDbpucppDAxjEIQ3OCwIq/jmFoqXb
-         Qb34xSjOVC1YfAFxrXLlgYCDXBtzaDg62Rrar3ATyT6e7K4y8TgpypyrpF5yVBNiwKFU
-         FYinpvKBNeqftnnTOt8ipz4FiudSCC2hqEpia7W0SbCT3O03NKYKibq17flPvgFg7eP0
-         MDLQ==
-X-Gm-Message-State: AOJu0YxyUoYvoNfCuwHWt0SxZGSGAVNvY9RAj4qtfngDPtEHHALXzRAe
-	3VgsmBxUPgkyhy2ojksqevKEh/bNfuxX6Iu9sHkvUM8UAte+HuyVb7JEQX+ZyA==
-X-Gm-Gg: ASbGnct7xs5ZEhk0Lb8p6bqmz2RgyqSjGbc+N2H+DYTBs5oACKwH2DznW3mGcAiVmA1
-	QtoAKZlC0538M7bqGNqTnjIkjZebBi7FNbqOaCzOTDvryEPZMIHhX2L9UmfgS0RGf3rZoLQpTXK
-	llQO02e56wfhK46RBXuZH03auXAHiH7yTGtSck3Zu3gNGs3mDsBweSh49mi4/t1Ds++0EETXgt/
-	VEsBCIpoLS6SicbxJIFQt62wluY3kB2j2xGBxRjODfN+C5scGksAkF9AeRmyJRNfcWeHA05InvH
-	5K2QSelfu3Y/WtT1fxsNhaaleYdKppZr
-X-Google-Smtp-Source: AGHT+IFoEjqZZW9tC8sonBMG+kLXKB0pvo6SQ4YyPRAgubZy6S82t1D9mnoaVXnqAPSMb5y/5EZ+tw==
-X-Received: by 2002:a17:902:e545:b0:216:30f9:93d4 with SMTP id d9443c01a7336-2189298bbf7mr257125165ad.8.1734460025155;
-        Tue, 17 Dec 2024 10:27:05 -0800 (PST)
+        bh=T/U74kSzGU82WaF3YwiwK5Dsre8yynJCW2nmO8At+rU=;
+        b=kT1NKtkVRPuwL+LVRgcnxMyFFscTLr5CCISnZZ91EXuuNNJz9duz3b2PK2MAOj0QRc
+         8sWKiwZ4LJwXYTquVMxRYdv/PqJix9FtYSDL5NDUK6++juOr8Gkiz/Zi2nbZmF8NC5AD
+         wFfKTHQ8QLo6MLWl8ruDnejVrXrEXyCiuGAw8nEQyH9CY5doqoyr51qTT3Elw+2OOLVj
+         Xtk4WdEYd2GTUJmEKZxEWTbP8NAjnV6xHrBLXVjPsIyCzE/EeHCsA8bntLi2EaVZDNou
+         /bjWgwTopJIus2RHuPsMztexOS6yVb/lkXkEMosI5W89UkCdofUyy3wDD8Cf0KLeGTAU
+         msiQ==
+X-Gm-Message-State: AOJu0YzEfzaXUBM6DcNmb4K/MjRM0YDpvURg6+d3AHG7kjhi6B7gE4Ws
+	DXqOPtxd4cTxZwm36tvDm6PZQc66igEOuXcNCdVbwpbQvozMvYK1zEJQnyko2Q==
+X-Gm-Gg: ASbGncumrv15Pk7tIiCSSwQzAzsjenhEFjbGCaI+S0ATY2cM1/Zq2TyhGl0/21ozTvq
+	VJxcGBar4xETXpwoWHgRP2L3tKPNdoG+53SNd1bU0vsG0nL3w72xva10/q9OCNVjMZljlleQfTa
+	/WxOL6WfGcHBizGjrXHCoAa0diT3PCWGXTQmVb7LTLxMCuDoCNSYv2LNUAi70klTX/IhQ/mbWl3
+	FfqC2NY24sAoguucwx/xhJQmWFdemp1kU3ZqBR8tdaAW7+e+4uvXsjLT/Qupjf94cEXGTohZ5z1
+	p7HcnyEDPei+d44ExvearZV55tyCh8s+
+X-Google-Smtp-Source: AGHT+IEPpk6Urr1+CMvIklP4UBiB/F9Q8tjd6vrHKHA/uvKNQzzjqCoymUkwAOGPBqShreKzxQZEew==
+X-Received: by 2002:a17:902:ce85:b0:216:7cbf:951f with SMTP id d9443c01a7336-218929c72b5mr205986485ad.21.1734460026696;
+        Tue, 17 Dec 2024 10:27:06 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e63af1sm62496595ad.226.2024.12.17.10.27.04
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e63af1sm62496595ad.226.2024.12.17.10.27.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 10:27:04 -0800 (PST)
+        Tue, 17 Dec 2024 10:27:05 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -77,10 +77,11 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next v2 3/6] bnxt_en: Skip PHY loopback ethtool selftest if unsupported by FW
-Date: Tue, 17 Dec 2024 10:26:17 -0800
-Message-ID: <20241217182620.2454075-4-michael.chan@broadcom.com>
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH net-next v2 4/6] bnxt_en: Skip MAC loopback selftest if it is unsupported by FW
+Date: Tue, 17 Dec 2024 10:26:18 -0800
+Message-ID: <20241217182620.2454075-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20241217182620.2454075-1-michael.chan@broadcom.com>
 References: <20241217182620.2454075-1-michael.chan@broadcom.com>
@@ -92,55 +93,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Skip PHY loopback selftest if firmware advertises that it is unsupported
-in the HWRM_PORT_PHY_QCAPS call.  Only show PHY loopback test result to
-be 0 if the test has run and passes.  Do the same for external loopback
-to be consistent.
+Call the new HWRM_PORT_MAC_QCAPS to check if mac loopback is
+supported.  Skip the MAC loopback ethtool self test if it is
+not supported.
 
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c  | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+v2: Change bnxt_hwrm_mac_qcaps() to void
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 24 +++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  5 ++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 11 +++++----
+ 3 files changed, 36 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index c0728d5ff8bc..46edea75e062 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -11551,6 +11551,26 @@ static int bnxt_hwrm_phy_qcaps(struct bnxt *bp)
+ 	return rc;
+ }
+ 
++static void bnxt_hwrm_mac_qcaps(struct bnxt *bp)
++{
++	struct hwrm_port_mac_qcaps_output *resp;
++	struct hwrm_port_mac_qcaps_input *req;
++	int rc;
++
++	if (bp->hwrm_spec_code < 0x10a03)
++		return;
++
++	rc = hwrm_req_init(bp, req, HWRM_PORT_MAC_QCAPS);
++	if (rc)
++		return;
++
++	resp = hwrm_req_hold(bp, req);
++	rc = hwrm_req_send_silent(bp, req);
++	if (!rc)
++		bp->mac_flags = resp->flags;
++	hwrm_req_drop(bp, req);
++}
++
+ static bool bnxt_support_dropped(u16 advertising, u16 supported)
+ {
+ 	u16 diff = advertising ^ supported;
+@@ -15679,6 +15699,10 @@ static int bnxt_probe_phy(struct bnxt *bp, bool fw_dflt)
+ 		bp->dev->priv_flags |= IFF_SUPP_NOFCS;
+ 	else
+ 		bp->dev->priv_flags &= ~IFF_SUPP_NOFCS;
++
++	bp->mac_flags = 0;
++	bnxt_hwrm_mac_qcaps(bp);
++
+ 	if (!fw_dflt)
+ 		return 0;
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index d5e81e008ab5..094c9e95b463 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2668,6 +2668,11 @@ struct bnxt {
+ #define BNXT_PHY_FL_BANK_SEL		(PORT_PHY_QCAPS_RESP_FLAGS2_BANK_ADDR_SUPPORTED << 8)
+ #define BNXT_PHY_FL_SPEEDS2		(PORT_PHY_QCAPS_RESP_FLAGS2_SPEEDS2_SUPPORTED << 8)
+ 
++	/* copied from flags in hwrm_port_mac_qcaps_output */
++	u8			mac_flags;
++#define BNXT_MAC_FL_NO_MAC_LPBK		\
++	PORT_MAC_QCAPS_RESP_FLAGS_LOCAL_LPBK_NOT_SUPPORTED
++
+ 	u8			num_tests;
+ 	struct bnxt_test_info	*test_info;
+ 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 28f2c471652c..8001849af879 100644
+index 8001849af879..c094abfa1ebc 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -4914,20 +4914,26 @@ static void bnxt_self_test(struct net_device *dev, struct ethtool_test *etest,
+@@ -4899,21 +4899,24 @@ static void bnxt_self_test(struct net_device *dev, struct ethtool_test *etest,
+ 		bnxt_close_nic(bp, true, false);
+ 		bnxt_run_fw_tests(bp, test_mask, &test_results);
+ 
+-		buf[BNXT_MACLPBK_TEST_IDX] = 1;
+-		bnxt_hwrm_mac_loopback(bp, true);
+-		msleep(250);
+ 		rc = bnxt_half_open_nic(bp);
+ 		if (rc) {
+-			bnxt_hwrm_mac_loopback(bp, false);
+ 			etest->flags |= ETH_TEST_FL_FAILED;
+ 			return;
+ 		}
++		buf[BNXT_MACLPBK_TEST_IDX] = 1;
++		if (bp->mac_flags & BNXT_MAC_FL_NO_MAC_LPBK)
++			goto skip_mac_loopback;
++
++		bnxt_hwrm_mac_loopback(bp, true);
++		msleep(250);
+ 		if (bnxt_run_loopback(bp))
+ 			etest->flags |= ETH_TEST_FL_FAILED;
+ 		else
  			buf[BNXT_MACLPBK_TEST_IDX] = 0;
  
  		bnxt_hwrm_mac_loopback(bp, false);
-+		buf[BNXT_PHYLPBK_TEST_IDX] = 1;
-+		if (bp->phy_flags & BNXT_PHY_FL_NO_PHY_LPBK)
-+			goto skip_phy_loopback;
-+
- 		bnxt_hwrm_phy_loopback(bp, true, false);
- 		msleep(1000);
--		if (bnxt_run_loopback(bp)) {
--			buf[BNXT_PHYLPBK_TEST_IDX] = 1;
-+		if (bnxt_run_loopback(bp))
- 			etest->flags |= ETH_TEST_FL_FAILED;
--		}
-+		else
-+			buf[BNXT_PHYLPBK_TEST_IDX] = 0;
-+skip_phy_loopback:
-+		buf[BNXT_EXTLPBK_TEST_IDX] = 1;
- 		if (do_ext_lpbk) {
- 			etest->flags |= ETH_TEST_FL_EXTERNAL_LB_DONE;
- 			bnxt_hwrm_phy_loopback(bp, true, true);
- 			msleep(1000);
--			if (bnxt_run_loopback(bp)) {
--				buf[BNXT_EXTLPBK_TEST_IDX] = 1;
-+			if (bnxt_run_loopback(bp))
- 				etest->flags |= ETH_TEST_FL_FAILED;
--			}
-+			else
-+				buf[BNXT_EXTLPBK_TEST_IDX] = 0;
- 		}
- 		bnxt_hwrm_phy_loopback(bp, false, false);
- 		bnxt_half_close_nic(bp);
++skip_mac_loopback:
+ 		buf[BNXT_PHYLPBK_TEST_IDX] = 1;
+ 		if (bp->phy_flags & BNXT_PHY_FL_NO_PHY_LPBK)
+ 			goto skip_phy_loopback;
 -- 
 2.30.1
 
