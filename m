@@ -1,268 +1,308 @@
-Return-Path: <netdev+bounces-152571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD9489F4A23
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:43:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70B559F4A55
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:55:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B613C7A0396
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:43:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C447188F833
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1BA1EF093;
-	Tue, 17 Dec 2024 11:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309EC1EF088;
+	Tue, 17 Dec 2024 11:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PL9wAVF4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8zjB58V"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2075.outbound.protection.outlook.com [40.107.94.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C751EE031;
-	Tue, 17 Dec 2024 11:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734435788; cv=fail; b=gMFMtQX1yNTPbdZB6RCb9GhJLJXP63nj1+imEnKG/B+Hr02Niu9rf1Ho3GT2wIf56ZJGXy7y6Q9qSeaPhaTKrtzy+0d0Qe4DGalLQW3fha9FcxIY1xSkv5iNoQowElrK48Vive4Hb9gGQBgcoiGuTv+ZqJqvbNdm4dGU/luI1qE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734435788; c=relaxed/simple;
-	bh=NZYWWpgWDw6v03Nz2DpSW19wWJ1MUlQAg16NVLt1+S8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=szHkpx+IVFL3tmCraHitZV3tQC/TL7/K+0d0d6gtvH8vws8snNXI6tQVpQVwx2EBhMlfE0cAUI/LJM4xCEnnUXTKDOr6hRSguRg0WKIVy4HLE3Tp0dBJ7YDoXcnZwx9+uVErthuljtHVQBmivRIMv1SaC9SbssDyB8xC/O0mOwg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PL9wAVF4; arc=fail smtp.client-ip=40.107.94.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=unOcSN985hGFo23IghaSonehdWwvqPtEYIeVhtQDX4rVs/JOm1ZZdrTrTUBC5giN2Jls5bhHubOP8lv90LFwQB+pPyyiPqaonr9SanN0qXXR+nv6VFkBo75qx0QALxjzAmYQrplrFsNiVcJiQbtnLSAEPiffagJOtNSh/3SVB2G1XTb0AqpaHC9Slo3hrrZp0Mknhie0B7cT3hS85ESYEdzHkJkWO2AgqN64PjXJbx5OlAww9UGEj6vOiTwUISgg2e9ZYsV+DAGDwvZynfvOHPt2PozAdoJIZHu8Z9AyYhUW3ydwWrmwxt8PfikOKGfItrudO8rA6F4tnnLOp1OEBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8IJqUvGjHjkYB8KVEuNvQhWl9QkVSVGBljXtoBiib94=;
- b=dBo2lpQbaRwnuVoO0JS6FiXKXlaKSzsLHVfZTGzMJidNlbsl9kd8tXf1zyDjwiU3X/0BbvqwbqlO0re/CBQFW9DXuaH0Q8t6YRTSo9vJCS0igKq3Wi8Flxmv4v9NjzpiNHy2dPsPkL7Q+DH8buDM9IUDiCQwMpLEkpiq4tTIIaEPC9tXLT6P4lHHYPFFInGOiq802wsigyxX0yD9jvYjXH47WkKOUSdUiqa5orQg4K8PCFOWCtA/zy+ax2m5c4EZo5SaaI1heKZcLJNIKl3LeKdVtY/OkP4Z1IHOTr9XEPaaFGQcPudW/mdbBEfkpgnugvYQdJjkepmyYm6lzW0QdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8IJqUvGjHjkYB8KVEuNvQhWl9QkVSVGBljXtoBiib94=;
- b=PL9wAVF4gRV2LxEuiJZnHKKpkfXdphztKTjRvHVFYtNppZUuD2svQ0R3X2LZweE6G8SdQFVq97v538pJN5VIlOxx/QyP1SCpkbl+rCQFgwKeDs7FR/CsHq+MXqa2N4Nw5jaCG/Gw94DEIUmG4v1KAPyTkgxudPvRu5SnEeJGvUzpWfri9FcU3ZF9RLtZOu4a0p4+BuYSsB+WMVIm25IjyBL/CvgKl3L7gZF6e+WNcK8sjWKp1U9nL5R4w/0eWIR3IykP00OTX+CTv7WbBBOBg9+KHqkr0MFSfxJ2VqRCMFHlM7PLS96Tm41clphgUYh5nMNLVcDzT8uzjTmjdRelwg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS0PR12MB8443.namprd12.prod.outlook.com (2603:10b6:8:126::14)
- by MW4PR12MB5665.namprd12.prod.outlook.com (2603:10b6:303:187::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.21; Tue, 17 Dec
- 2024 11:43:04 +0000
-Received: from DS0PR12MB8443.namprd12.prod.outlook.com
- ([fe80::f2f9:e6e:f9c8:4b8]) by DS0PR12MB8443.namprd12.prod.outlook.com
- ([fe80::f2f9:e6e:f9c8:4b8%6]) with mapi id 15.20.8251.015; Tue, 17 Dec 2024
- 11:43:04 +0000
-Message-ID: <b69a5cac-d870-4181-aaf5-715697f5dbdb@nvidia.com>
-Date: Tue, 17 Dec 2024 19:42:55 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 02/12] net/mlx5: LAG, Refactor lag logic
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Leon Romanovsky <leonro@nvidia.com>,
- netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, linux-rdma@vger.kernel.org,
- Mark Bloch <mbloch@nvidia.com>
-References: <20241211134223.389616-1-tariqt@nvidia.com>
- <20241211134223.389616-3-tariqt@nvidia.com>
- <93a38917-954c-48bb-a637-011533649ed1@intel.com>
- <981b2b0f-9c35-4968-a5e8-dd0d36ebec05@nvidia.com>
- <abfe7b20-61d7-4b5f-908c-170697429900@intel.com>
-From: rongwei liu <rongweil@nvidia.com>
-In-Reply-To: <abfe7b20-61d7-4b5f-908c-170697429900@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2P153CA0042.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::11)
- To DS0PR12MB8443.namprd12.prod.outlook.com (2603:10b6:8:126::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BDA1EE002
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 11:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734436496; cv=none; b=ptITXHP7eVAn4zM6KiY26k/C2sC8u+1OycBXwtpPD+lzZJnO/6FAgRN/7Ja/GBHdCEgItt/+s/+gzClAKA5cCjneB4fDDymb15yB/6Bleu7FARv1BeQq8EBHNaeLbB9wyCgp6gl6l7ZqfExqoZjfiZpFy8FVXe7r09eqOsHqm9U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734436496; c=relaxed/simple;
+	bh=E2+x91swcD7kP0KanP0uvqZuz7Svi5/spt0/nkuj7yU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S7lhjeWMd9IRxvoVPwk3MKzJCNMtIAHUnclFRU6uCEKejfsKgRK62rm04Vz9OIgF3YGuEdn83yP4iLTGVZr5+UqXjML65jRtpiNBqnPqoCVuc2HRDonr9GChl1z/FOvklnyWBK9MyjdyKjMfQXL4Dy+WQfbrbK2u4ln0xQYIxCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L8zjB58V; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa551d5dd72so93047266b.3
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 03:54:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734436492; x=1735041292; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Q3nVE5hfc48K26j9DHTNBzXyzDOp1j/KJVGS8G9Hr+k=;
+        b=L8zjB58VEnhnfI7twUIbt1eLc9bGyUdpQk8twhNpFE7ic7bX/Aet/u3qP0NWJjPiDi
+         MtmS3qqCRF7etoT/ii9ZrNBvKp8i9VLMrcdqS+ropPka+e7Cb7thNDRWqA1osWYfKPuY
+         CjbW2EV/Nki08LfP9j/f9m2q2u3BKZkV/yHmCcG6eysNNCOCfOlxvr+bxUhvRgGbYS9c
+         4jJoRbyIKkrw4iG5DICt4JBoUf71KTwdfIF1E5METrQuIMKz9Qkd6u9KFMnhkIpn80ZT
+         vZg2EsAEE2xGw9K8Rwx4VRl8WHSCFgZaUgHKI5U9cIlAXln1dZJQz1AlgXwfFViLPW5k
+         C2nQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734436492; x=1735041292;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q3nVE5hfc48K26j9DHTNBzXyzDOp1j/KJVGS8G9Hr+k=;
+        b=CkG2J+wTNYMJVrw0Y8lZ2Jxxqvqo6jYmzDEOPddSUcJ9rjpOwmF9dhSg9vecLw+Nqw
+         /KPp1tHW8eyMZoTHZLvDnp/zCI0Ol++ikvJWny6lTGtruuneKx7SjDYU8cMuDcZrhyxi
+         /OngplJIMOLfQCPeHI39Jc+lYZxq/gLrkBrQsRT/5N3KR2Kr1Wt2hcj5kKM/vuwDSeMv
+         pzkDQlZbNsRYEAOU1Wy6P9QQ3gvg6XQq2ZeVACQ0/wrk7f75MBzOwNb2oK0YLweWrUW7
+         1kGoTf3TWJ4vImrbmHjPt4kfkj5Bw/8K34MayV3ZveUyRMb5VuxcUie1QFhsNJJ0sxqF
+         9qEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUS27RGaP/21e/6b0Pm5NpI9Ge8wTN92D79SBiRErZK+6cMECd7OfrQl94+g+4Rx2ucykjpbCc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMs9RB9TURV8yUAanz/uz/VPXs8K8LdGPKhY+7LZtNQJAiLbcd
+	FW2C/e216MMal+GQ8G77sNx57sasrL263Y7KInrDJJpD6KELTxnW
+X-Gm-Gg: ASbGncsINI3kHza34nULZsywoU2vK60HQ+3lbQbP5W1wThpURkLlA9Ix/g2Nanr13+g
+	I6+xvmLnCzNFz67bj823erdcCjn5fXszD4ooxtCyaypbaypAcpWFHtajyOJcSKyX6iOONYExtjO
+	VPmtP+LA8uqxnJtfC+580oHYaJfhGiJFtro0E584wk31GfYmbTOXuxxdRqmW0pJKBv7nQ6OhkBp
+	DgXm+EloXVeBedhVosrGBVF5X2Mpj+/ZdW8Yn/xpz1z
+X-Google-Smtp-Source: AGHT+IEFAQ7A4pxeycvbNbfQGUDsM2HPu5UChwTWsxddExiaSSUHMB27F+f93jMlC47SiisbE0RShQ==
+X-Received: by 2002:a17:907:9410:b0:aa6:74ed:4f31 with SMTP id a640c23a62f3a-aab77e90452mr661758366b.10.1734436492209;
+        Tue, 17 Dec 2024 03:54:52 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aabcab0431dsm180029566b.196.2024.12.17.03.54.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2024 03:54:51 -0800 (PST)
+Date: Tue, 17 Dec 2024 13:54:48 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
+	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	lorenzo.bianconi83@gmail.com
+Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
+ EN7581 SoC
+Message-ID: <20241217115448.tyophzmiudpxuxbz@skbuf>
+References: <Z1qqrVWV84DBZuCn@lore-desk>
+ <20241212150613.zhi3vbxuwsc3blui@skbuf>
+ <Z1sXTPeekJ5See_u@lore-desk>
+ <20241212184647.t5n7t2yynh6ro2mz@skbuf>
+ <Z2AYXRy-LjohbxfL@lore-desk>
+ <20241216154947.fms254oqcjj72jmx@skbuf>
+ <Z2B5DW70Wq1tOIhM@lore-desk>
+ <f8e74e29-f4b0-4e38-8701-a4364d68230f@lunn.ch>
+ <Z2FGjeyawnhABnRb@pengutronix.de>
+ <Z2FGjeyawnhABnRb@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB8443:EE_|MW4PR12MB5665:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1b79fa4-5390-4759-827f-08dd1e8ff74d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZTV6T2VZSGd2YVNHaXB5RWVITllTZEdKYURvVXZxdW56NW4yczBiT09CSVBy?=
- =?utf-8?B?ZFJKQWtpVDlSNjFBMXdyMVBlRXYwQnJhR05zcHlzTVd6aXc4YUFSSWl0TnNH?=
- =?utf-8?B?QUdISHVtUHlqb3FoTloyc2xsWjAxRUlBK0xSWkh1MkdXbitIMFlRdTNGc0JW?=
- =?utf-8?B?ZnV2bmtLNW5mL2dNRTE1ZTd1dCtoSDFEMURlTkgzVGFYWk9KUjdLb1RGNVFi?=
- =?utf-8?B?clNCUG9GOHVPSmRhY3J6dDhFbldPNndHQkdOcUplZ1JGaENTZFVJNjVnV1Na?=
- =?utf-8?B?bENWMDhVRXl0bG85THlpY1dBSWJIMFBUdklRbVNITTA2T0NVZzAwTW1UcjNi?=
- =?utf-8?B?NnR2NVpXaUZXaUpaNHlJNWRFVVV0amR2eWlWVEl3ZEo4N2Jua3BJS29ETHE4?=
- =?utf-8?B?cnNNQWNNRC9Zc2l5RDlEYm02WFViYStjVm1rT2wrcldHaXlYUHFxNjZBakRN?=
- =?utf-8?B?QnJjejR6bEo2cW8zZ0xTdjFTM01lTnhNNVd0S3JOMW9LVng1TzZES3RneHAv?=
- =?utf-8?B?SzRnTDFBMk94aU91dGxBSEFoZGhJaUJycTFlVjY2alhVb2gyTkF3Z01BNHRF?=
- =?utf-8?B?SEVEeWFBQjVMN0tQUzhKd0xuM3lPazFjUEJJZWFubHJLVHJ6dUdxcS8zWHQ1?=
- =?utf-8?B?YUhQTDhWQnJDUExycVNjajBVTzZmL0hITUVBV2RJcWJJTEVuZjZralJNTjJr?=
- =?utf-8?B?R2JSR1cvZitsUEMwaXNnQmdwQVNvOGhwbjZ5NG9MRHBNQmxiQWlDdm5kMmRh?=
- =?utf-8?B?V0Y0ZUxmVVJmTThla3ZCblJwWmZabnN3bjF0RXg3UVJYa3FoeVl6OXo0MzFv?=
- =?utf-8?B?R0pWd1Z5YW9nVTVMTVU1R2RxczFqc1J0QUZuYkRFNGhoVEZmMWhWcmVLbi8v?=
- =?utf-8?B?QlphSXBJNHgxL1JrVTNJTkdKQjlJYktmMGswbUw0aFo1UEk4MDlkdWp4cTUw?=
- =?utf-8?B?aktRWXA5L01yRDJqZUNqK3ovdjZ3UTNWb2lGcVFWblppaWROTkF3YlZVazA2?=
- =?utf-8?B?eU1uR1RrRm9ncFZaaGNVci9aYTFycS9TcjRyZzkrVmZaNnVxQTMwbUJkRERo?=
- =?utf-8?B?NVAwUHVpOHhhcFQ4UUxkcmpZYU1nZ2dBM2Ewb3N3aGhLc20rYmowY3h5akRt?=
- =?utf-8?B?VWJhY2E0clNOazlDcVBaMHllbG9QWUsyMmhrVDU1dVdtdGp3STZFNDZXZDRt?=
- =?utf-8?B?ampDV2xqZFIyUlo4b0twbW9lUERzMmNLZVJtNjR3UXltOXZIODVjSFBoSHR1?=
- =?utf-8?B?akRKRWgxaXVkd1phY2NkTU93NVZKaUpYL3dZbjR0OFJUUFlwU3g3T3k3eStK?=
- =?utf-8?B?anhaZElFQ05OWkZCSjAwVFdnWmZGSUwwL3VRR1dnMThxWU9YUzdrT0Z2c1NV?=
- =?utf-8?B?WTFyYzdkb1F3cFBENjdXeUlJK3pFbTE0SnFFWjEwZSt1R25YTUFkNUh6YU5M?=
- =?utf-8?B?R2tka3NORnZvMzhWZGpOU25mNlRVR0ZEM2V0aG11bUhDNnJNR0FxNERNeVZ5?=
- =?utf-8?B?SFV2ckdBTU8wQW1MYXRKYzBhNWljeGhUK2ZVUlQ5VHF1UGVmMEdLRE5jUitv?=
- =?utf-8?B?M2pTUDdHa0NOQk4wSDJMMlF2K3B4d2RrY2hzUVVHb1pTTjY1RXJBWC95blhi?=
- =?utf-8?B?d2pxTHV5TUFpQzRraHY5S3RSL3lSR1hoOFloWTRxbHROY0s4YVFnUXlTVC9C?=
- =?utf-8?B?aDJSdENlVTg3b0ZJaTlXOS9FRHVoYlRMbm8rTVgvLzYvNmsrK1VtSmhxSE8w?=
- =?utf-8?B?SXowMHNMM0JINXVFZlI5VHhpSjhoTVc0RUNFU3BtUDBZUjNlUWJ2cTM1ajha?=
- =?utf-8?B?cmREUnVoM0xheUw2a0toRzVERXI0REY1Z3FKKysxcjRJZGt2R1BsYm00V01V?=
- =?utf-8?Q?nixLaz9Jqzwk6?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB8443.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QVNIdkNLNG0xWDFnekt5TDJrL2NWMlJiWjltUGVJUXJoMS95RUwyVXowd3hZ?=
- =?utf-8?B?UHN6Z2pvMENxOWdJeHNoSTIxOUgwTGx0YjY3UExxU09aK3RNZUUyakRqUVpw?=
- =?utf-8?B?aUU3K1hFZ2JNa1I3RE5LV1JQS2RaMjdESXZ3UXB1eWlKSW5Nd0N6cmFlUjMr?=
- =?utf-8?B?clgvM2F4L2ZLdzg3SHRjR3h2a0VpbWc2OTUxUEdNNy82THZVMG5QWUd3dlhs?=
- =?utf-8?B?UXF1azMxU1NvVmRINnV1TDFuUUV4cG1jSWpiTGdNaFc1bFBMZ1RjODhaeVU2?=
- =?utf-8?B?eHVncEFmZHI5UTZOQVZNWkVQcHdKTWt6dlNWekNKMWVtUTlZTXpUUXAwK0Jk?=
- =?utf-8?B?aTV0STBPbFNJUFBRYk9aUXhqZy8wdkFCczU5REtock5iU0NrTnFNbTdTbEhY?=
- =?utf-8?B?QkdYejZTOE1UR05ZMzcyL1l1RTQ3TVY1Ui9XM2dDWDRLWThWSlhGbXRtd25o?=
- =?utf-8?B?THU2ZkRKMkZKai9yN1hYVVQyVmQybzhUMlVPR1dyaHh3RWx2Q0liWGVVVW8v?=
- =?utf-8?B?QzMyQTFzSFpxVVNpZWg1RjUrcWorNEtFTTF3VWtPTGdBa0lvdWtLS3VhYVJo?=
- =?utf-8?B?RHZrWVNER2RXQ1NCVGRhRk5sYkZiTldueEdLTklDbSszNHlLV2laMWNVUk9z?=
- =?utf-8?B?MU4xVG5NK1c4THB1ZzRsUU9oUXRHdHd2ZTQzMzNFb04vL2FBd2JsL1p2RWtn?=
- =?utf-8?B?YTdnK0tJcE1ZNThQZC91bmlobVIvUzJjOGYzcnlwQ3FPdkhSbkd4Lzd6Z1Fi?=
- =?utf-8?B?SGpIaHc2dGsvWHI5TTR5dW15WXlQL1FsZWlKV0c5aW9UQjRONllrcEg4U1N1?=
- =?utf-8?B?UWxVL0dLRTF6RUJkaFVaa3c1R0VybFFlWkZSUVdkemY3MmdzQlMyM2cxT0Rm?=
- =?utf-8?B?eUpEZ2lUbFlKRjFBd1VNa3FpWXVmc0ltNFAwLzcrUGFqMDRBNm1ONkpNMFZs?=
- =?utf-8?B?cSs0RjZWMEVaRGZoRDN0U0k1elJwM3VxSzAvRFBtdE1kZUF2ZWw1QVZuTDZ3?=
- =?utf-8?B?ckhxSHJpdTJaNEJUY1FRTEJlU29FWFFTYnpwZWtrUkdSOEQ1eUZ6TzZENlJE?=
- =?utf-8?B?ekRGSWFBK0IvK215bFlDQnJXSjdMZ1g0cXRHS0c5elhIZFcxeVJ3ODRPRGl3?=
- =?utf-8?B?M3dVNDJ1QmZ5UDBTTjVhTzNoZlgrbU5zRCtsVUkydGoxL2EzTkZlWjVOS1Ux?=
- =?utf-8?B?SlAvUmNYbWh5am81SXNzNFhncDlST2xoWFJlSUEvdnJMOTU2bmNxOFhlVU04?=
- =?utf-8?B?Sjd5Q0x4anBZZk1MV3JZSHlhR0RhMTRjOW9QYUp6NUFwNDQyNld4M0VMQm1R?=
- =?utf-8?B?eXRzejA1RS9WSStVM0hybWtoZnJuMW9zQ1BUWEFtWVFBc0FHU2VDQXc4b1FF?=
- =?utf-8?B?ZkprZHF4S2o0WWl6Ymx6NHdlTmdmbVl6SG5OYWpsdWRyUzB1RFN2dEdPRkxt?=
- =?utf-8?B?aCthMFhSeWx6TlNabUUxR09nR3lGYjcvNmRNRnpleXc5TWdaNlRIR08xVzhN?=
- =?utf-8?B?ZTF4aUpURFdXemhXNVlnZ0VhbTc2M3M2YVRFM2tHNFEvM3BVeUovS3FuNFhk?=
- =?utf-8?B?OVAxa09JbDVjVFdhWlNyekR4dlNiQ1BZemUzRHdwMmtJNWxIR050L3Y5anVl?=
- =?utf-8?B?R3l0RjVsL0FPSTNvVTdrdFN1UlVDeWRnZ25yU3N0dGtYbTRTa1dYL29zRFp1?=
- =?utf-8?B?SmlDczFHY0pYYm9PYmR3NmpYOTFyb0s3WGNabjYzVnVIRmtlekJqOGhvT25M?=
- =?utf-8?B?Y2VVR2JUMENVb2hIdUMwU0FpRGZhVEtGai9odEpnc2lmWFRNcVQvZjNDazlj?=
- =?utf-8?B?NjdyR2FCNDdHbmdxbUZHYi9xMEZmcHUxbGpiVVhVV0ZNa0lvbzVvQmhoY3dX?=
- =?utf-8?B?Y1RUR0xZRUZSeFBYYkdmeUJxWXpVYnZsZ1VhTGNiekxxa21yQXNsWk1EVmZk?=
- =?utf-8?B?OVk5eWtTS2NqTGNuaStvZDNZQVJqZFhhdCtpajBSeU5PRjZnYjQ5QytDSUl0?=
- =?utf-8?B?NG9xZWJuVUViNVh6ektySEJsckRaMmdoYzV4SUYzR3AxUkVOSnNhL3F3RnVh?=
- =?utf-8?B?Sy9XdU9QS2NaRHQ5ZTF1QU1tbWRMUy9vUlBncFpRN0x0ZzhWNHFCRFVrQnR5?=
- =?utf-8?Q?xOqfW5KD4GQ9qxWoccjNOdzLk?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1b79fa4-5390-4759-827f-08dd1e8ff74d
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB8443.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2024 11:43:03.8299
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /cqVvKSZkq5qLDvocLJc/PmbiygJBIl0xo+0+eBUdgqjcFn9eDpaWgBj+3onKpqiOWBFWngK98V0IdMmcrrGgQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5665
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z2FGjeyawnhABnRb@pengutronix.de>
+ <Z2FGjeyawnhABnRb@pengutronix.de>
 
+On Tue, Dec 17, 2024 at 10:38:21AM +0100, Oleksij Rempel wrote:
+> Hi,
+> 
+> You are absolutely correct that offloading should accelerate what Linux already
+> supports in software, and we need to respect this model. However, I’d like to
+> step back for a moment to clarify the underlying problem before focusing too
+> much on solutions.
+> 
+> ### The Core Problem: Flow Control Limitations
+> 
+> 1. **QoS and Flow Control:** 
+> 
+>    At the heart of proper QoS implementation lies flow control. Flow control
+>    mechanisms exist at various levels:
+> 
+>    - MAC-level signaling (e.g., pause frames)
+> 
+>    - Queue management (e.g., stopping queues when the hardware is congested)
+> 
+>    The typical Linux driver uses flow control signaling from the MAC (e.g.,
+>    stopping queues) to coordinate traffic, and depending on the Qdisc, this
+>    flow control can propagate up to user space applications.
 
+I read this section as "The Core Problem: Ethernet".
 
-On 2024/12/17 19:32, Alexander Lobakin wrote:
-> From: Rongwei Liu <rongweil@nvidia.com>
-> Date: Tue, 17 Dec 2024 13:44:07 +0800
+> 2. **Challenges with DSA:**
+>    In DSA, we lose direct **flow control communication** between:
 > 
->>
->>
->> On 2024/12/17 01:55, Alexander Lobakin wrote:
->>> From: Tariq Toukan <tariqt@nvidia.com>
->>> Date: Wed, 11 Dec 2024 15:42:13 +0200
->>>
->>>> From: Rongwei Liu <rongweil@nvidia.com>
->>>>
->>>> Wrap the lag pf access into two new macros:
->>>> 1. ldev_for_each()
->>>> 2. ldev_for_each_reverse()
->>>> The maximum number of lag ports and the index to `natvie_port_num`
->>>> mapping will be handled by the two new macros.
->>>> Users shouldn't use the for loop anymore.
->>>
->>> [...]
->>>
->>>> @@ -1417,6 +1398,26 @@ void mlx5_lag_add_netdev(struct mlx5_core_dev *dev,
->>>>  	mlx5_queue_bond_work(ldev, 0);
->>>>  }
->>>>  
->>>> +int get_pre_ldev_func(struct mlx5_lag *ldev, int start_idx, int end_idx)
->>>> +{
->>>> +	int i;
->>>> +
->>>> +	for (i = start_idx; i >= end_idx; i--)
->>>> +		if (ldev->pf[i].dev)
->>>> +			return i;
->>>> +	return -1;
->>>> +}
->>>> +
->>>> +int get_next_ldev_func(struct mlx5_lag *ldev, int start_idx)
->>>> +{
->>>> +	int i;
->>>> +
->>>> +	for (i = start_idx; i < MLX5_MAX_PORTS; i++)
->>>> +		if (ldev->pf[i].dev)
->>>> +			return i;
->>>> +	return MLX5_MAX_PORTS;
->>>> +}
->>>
->>> Why aren't these two prefixed with mlx5?
->>> We can have. No mlx5 prefix aligns with "ldev_for_each/ldev_for_each_reverse()", simple, short and meaningful.
+>    - The host MAC
 > 
-> All drivers must have its symbols prefixed, otherwise there might be
-> name conflicts at anytime and also it's not clear where a definition
-> comes from if it's not prefixed.
+>    - The MAC of a DSA user port.
 > 
-ACK
->>>> +
->>>>  bool mlx5_lag_is_roce(struct mlx5_core_dev *dev)
->>>>  {
->>>>  	struct mlx5_lag *ldev;
->>>
->>> [...]
->>>
->>>>  
->>>> +#define ldev_for_each(i, start_index, ldev) \
->>>> +	for (int tmp = start_index; tmp = get_next_ldev_func(ldev, tmp), \
->>>> +	     i = tmp, tmp < MLX5_MAX_PORTS; tmp++)
->>>> +
->>>> +#define ldev_for_each_reverse(i, start_index, end_index, ldev)      \
->>>> +	for (int tmp = start_index, tmp1 = end_index; \
->>>> +	     tmp = get_pre_ldev_func(ldev, tmp, tmp1), \
->>>> +	     i = tmp, tmp >= tmp1; tmp--)
->>>
->>> Same?
->> Reverse is used to the error handling. Add end index is more convenient.
->> Of course, we can remove the end_index. 
->> But all the logic need to add:
->> 	if (i < end_index)
->> 		break;
->> If no strong comments, I would like to keep as now.
+>    While internal flow control within the switch may still work, it does not
+>    extend to the host. Specifically:
 > 
-> By "same?" I meant that there two are also not prefixed with mlx5_, the
-> same as the two above.
+>    - Pause frames often affect **all priorities** and are not granular enough
+>      for low-latency applications.
+> 
+>    - The signaling from the MAC of the DSA user port to the host is either
+>      **not supported** or is **disabled** (often through device tree
+>      configuration).
 
-ACK
-> 
-> Thanks,
-> Olek
+And this as: "Challenges with DSA: uses Ethernet". I think we can all
+agree that standard Ethernet, with all the flexibility it gives to pair
+any discrete DSA switch to any host NIC, does not give us sufficient
+instruments for independent flow control of each user port.
 
+Food for thought: strongly coupled MAC + integrated DSA switch systems,
+like for example Broadcom, have custom methods of pacing transmission to
+user ports by selectively stopping conduit TX queues associated with
+those user ports on congestion:
+https://lore.kernel.org/netdev/7510c29a-b60f-e0d7-4129-cb90fe376c74@gmail.com/
+
+> ### Why This Matters for QoS
+> 
+> For traffic flowing **from the host** to DSA user ports:
+> 
+> - Without proper flow control, congestion cannot be communicated back to the
+>   host, leading to buffer overruns and degraded QoS.  
+
+There are multiple, and sometimes conflicting, goals to QoS and strategies on
+congestion. Generally speaking, it is good to clarify that deterministic latency,
+high throughput and zero loss cannot be all achieved at the same time. It is
+also good to highlight the fact that you are focusing on zero loss and that
+this is not necessarily the full picture. Some AVB/TSN switches, like SJA1105,
+do not support pause frames at all, not even on user ports, because as you say,
+it's like the nuclear solution which stops the entire port regardless of
+packet priorities. And even if they did support it, for deterministic latency
+applications it is best to turn it off. If you make a port enter congestion by
+bombarding it with TC0 traffic, you'll incur latency to TC7 traffic until you
+exit the congestion condition. These switches just expect to have reservations
+very carefully configured by the system administrator. What exceeds reservations
+and cannot consume shared resources (because they are temporarily depleted) is dropped.
+
+> - To address this, we need to compensate for the lack of flow control signaling
+>   by applying traffic limits (or shaping).
+
+A splendid idea in theory. In practice, the traffic rate at the egress
+of a user port is the sum of locally injected traffic plus autonomously
+forwarded traffic. The port can enter congestion even with shaping of
+CPU-injected traffic at a certain rate.
+
+            Conduit
+               |
+               v
+  +-------------------------+
+  |         CPU port        |
+  |            |            |
+  |   +--------+            |
+  |   |                     |
+  |   +<---+                |
+  |   |    |                |
+  |   v    |                |
+  | lan0  lan1  lan2  lan3  |
+  +-------------------------+
+      |
+      v Just 1Gbps.
+
+You _could_ apply this technique to achieve a different purpose than
+net zero packet loss: selective transmission guarantees for CPU-injected
+traffic. But you also need to ensure that injected packets have a higher
+strict priority than the rest, and that the switch resources are
+configured through devlink-sb to have enough reserved space to keep
+these high priority packets on congestion and drop something else instead.
+
+It's a tool to have for sure, but you need to be extremely specific and
+realistic about your goals.
+
+> ### Approach: Applying Limits on the Conduit Interface
+> 
+> One way to solve this is by applying traffic shaping or limits directly on the
+> **conduit MAC**. However, this approach has significant complexity:
+> 
+> 1. **Hardware-Specific Details:**
+> 
+>    We would need deep hardware knowledge to set up traffic filters or disectors
+>    at the conduit level. This includes:
+> 
+>    - Parsing **CPU tags** specific to the switch in use.  
+> 
+>    - Applying port-specific rules, some of which depend on **user port link
+>      speed**.
+> 
+> 2. **Admin Burden:**
+> 
+>    Forcing network administrators to configure conduit-specific filters
+>    manually increases complexity and goes against the existing DSA abstractions,
+>    which are already well-integrated into the kernel.
+
+Agree that there is high complexity. Just need to see a proposal which
+acknowledges that it's not for nothing.
+
+> ### How Things Can Be Implemented
+> 
+> To address QoS for host-to-user port traffic in DSA, I see two possible
+> approaches:
+> 
+> #### 1. Apply Rules on the Conduit Port (Using `dst_port`)
+> 
+> In this approach, rules are applied to the **conduit interface**, and specific
+> user ports are matched using **port indices**.
+> 
+> # Conduit interface  
+> tc qdisc add dev conduit0 clsact  
+> 
+> # Match traffic for user port 1 (e.g., lan0)  
+> tc filter add dev conduit0 egress flower dst_port 1 \  
+>     action police rate 50mbit burst 5k drop  
+> 
+> # Match traffic for user port 2 (e.g., lan1)  
+> tc filter add dev conduit0 egress flower dst_port 2 \  
+>     action police rate 30mbit burst 3k drop  
+
+Ok, so you propose an abstract key set for DSA in the flower classifier
+with mappings to concrete packet fields happening in the backend,
+probably done by the tagging protocol in use. The abstract key set
+represents the superset of all known DSA fields, united by a common
+interpretation, and each tagger rejects keys it cannot map to the
+physical DSA tag.
+
+I can immediately think of a challenge here, that we can dynamically
+change the tagging protocol while tc rules are present, and this can
+affect which flower keys can be mapped and which cannot. For example,
+the ocelot tagging protocol could map a virtual DSA key "TX timestamp
+type" to the REW_OP field, but the ocelot-8021q tagger cannot. Plus, you
+could add tc filters to a block shared by multiple devices. You can't
+always infer the physical tagging protocol from the device that the
+filters are attached to.
+
+> #### 2. Apply Rules Directly on the User Ports (With Conduit Marker)
+> 
+> In this approach, rules are applied **directly to the user-facing DSA ports**
+> (e.g., `lan0`, `lan1`) with a **conduit-specific marker**. The kernel resolves
+> the mapping internally.
+> 
+> # Apply rules with conduit marker for user ports  
+> tc qdisc add dev lan0 root tbf rate 50mbit burst 5k conduit-only  
+> tc qdisc add dev lan1 root tbf rate 30mbit burst 3k conduit-only  
+> 
+> Here:  
+> - **`conduit-only`**: A marker (flag) indicating that the rule applies
+> specifically to **host-to-port traffic** and not to L2-forwarded traffic within
+> the switch.  
+> 
+> ### Recommendation
+> 
+> The second approach (**user port-based with `conduit-only` marker**) is cleaner
+> and more intuitive. It avoids exposing hardware details like port indices while
+> letting the kernel handle conduit-specific behavior transparently.
+> 
+> Best regards,  
+> Oleksij
+
+The second approach that you recommend suffers from the same problem as Lorenzo's
+revised proposal, which is that it treats the conduit interface as a collection of
+independent pipes of infinite capacity to each user port, with no arbitration concerns
+of its own. The model is again great in theory, but maps really poorly on real life.
+Your proposal actively encourages users to look away from the scheduling algorithm
+of the conduit, and just look at user ports in isolation of each other. I strongly
+disagree with it.
 
