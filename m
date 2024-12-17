@@ -1,121 +1,220 @@
-Return-Path: <netdev+bounces-152438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EE2F9F3F87
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 01:53:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54FEE9F3FAA
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 02:05:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9319B1630C3
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 00:53:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1F60188A5FC
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 01:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98217288B1;
-	Tue, 17 Dec 2024 00:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hyZj3CFW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6838C1E480;
+	Tue, 17 Dec 2024 01:05:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED09250F8;
-	Tue, 17 Dec 2024 00:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DA01C687;
+	Tue, 17 Dec 2024 01:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734396477; cv=none; b=AxRqWfSeBVJSiM/GhjZmtSIuh4DB/u3uS7IEVRzuVnsnKoXzavKltRodb5V2RU2k1I+07gI5cY9PyK2oxSUnV5HNz7nBGQf3h4GMuIAvnZIPjBfGZmTlnjW3AdywZuY+P1MaHy1qgumYkCq4qG/CZM420TjC/CJ/XDynky3PrwQ=
+	t=1734397516; cv=none; b=tMJdrTo4Y1nN+OCeiYWB3lvJEQ3Vmy9VAfeDFmRfZ0CsY181wZjBUeC+8WMraBSl9lykFHfVvbncclpadzOHzd4ptjfdFzh8sx38YQIIieR4IfjsVZIZUjU1OPCgD2RQ2pGiKzUkeE3S/SJFod+0dYSzZQ46By9dd2hzaB1QmXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734396477; c=relaxed/simple;
-	bh=RlsgdpLC522Yj0W1svIUqZZURGBN1oFBIzQeZa9+3t4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EgxD5ifQZzRdUyNr096hK2QVxFbzbY9rdE9BFIVNxTsQVXitmn2lSJ8WWe6lkdn6ehydydOvoZxmWP63WTSNALek0Q1SvNuXAwrVgwTOpo0Pn4DpFetQ1NZslsrR2Qqfo/18unsJ/6LVku6Mrzhj+QMVwjuK17owhwrfNmyjv8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hyZj3CFW; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-46772a0f8fbso42388551cf.3;
-        Mon, 16 Dec 2024 16:47:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734396475; x=1735001275; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RrUU1sA/PquF8Kcvm4irBd461MDD9nPT0JTqTCo4L28=;
-        b=hyZj3CFW9QUs/uK+kQepy5OeABzPEe06/jqhdsLrldFSo9Qer3L1JzDFE8WlSIw1q0
-         zsxv+q8bze5MccKByBdVB4nQBJX3tqq3zc+wZfkgA9iSmrt7t9Z4hhMyZmqLELr26ESJ
-         r2oDUuB9+ZeqPWbCk03Q0xwdVHGr1d0kvYxbaXC9orfoiGsK8eKo3WGxkqSihsV6cjM9
-         7sdlQz5Gq/zE+ANFCmyfJAvtGaCSAkCPRW4DtAVoTHvilvaOh3OhJuK7C9xs9HAKOCqD
-         1RsUdc0uUMUwfs8FpPj+OYRwStf1DdIm5MY2S9z6j9d2TcGjSf72X/BPDcKc88ZI/2GH
-         Y+PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734396475; x=1735001275;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RrUU1sA/PquF8Kcvm4irBd461MDD9nPT0JTqTCo4L28=;
-        b=XrNsZ7uf8kA5Cgg2U2KloLyHGDitW4J9J3NTK2dRmLMQygPBQDrmkJrLBklmtrHi5Q
-         EQ8xQW1TT0jP6GVhc5JEurI3X1qdJcIvL9+Fi3Pe2FT8S8TRlgcqoJ8y7DvejUJ8EZYM
-         rKREpzfVxdfTNjVlz/87CaczRF6I4oqnQin2/oPnyqdhXut0jQ7K25SS8iykZACUt20u
-         AOBnwOAdfkybMROcbm0sQjibLTBOZ4nEd0D0J4it9tss9Jj8QzDAEdG8ooKnC8/9lhCq
-         r0Q2KSn16rzySgoPCQpDYj3Vb+RFBMa9AcOoFFTXxxq2dZyI80p8hMuRYu/38nGqUEA+
-         4j0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUFNURlbBKCKtl0VPjJWxQaYh8kXA/7OzcJRhK/24Yr9Ey2zjBdmMU/Zy7Cu2RviX68ULBj0k3+hwEq@vger.kernel.org, AJvYcCUpudS6Oi047TvJcOYXuEFIl0scxxL35FjhJbCh8hwzkxEgpCzTphckoHL/4piWZKs3uQkLz6Mv@vger.kernel.org, AJvYcCV64saUQogMlSf1gW2Rw22RyBQMnCfp9gaC5gtOhw4rKJsysOekcWC5zWGdJvYBIMiXZ1ArLShVAHiUnGTN@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywuhm11IT0sDNPlJwmpcRr6nlwYsTJ/S//Bhk1aGNXKHMhrED1p
-	0Y80AAYOxvLn5bGV5u4LbGeKBkP6Z4CYS+UJ/xfMLgp7uk7yQsKW
-X-Gm-Gg: ASbGnctTM4J4oFI1oEllU/MQTvfL65CikdNdWbyVOJIXATAz2b3eWfEK1nrzrGq7RtV
-	0PlXnsWpHNDYkT663zWts889ktyLGsl0pZ5/ZtGOnXwsdTumeADn/xsQu8QoYaUONJjOQ5l924+
-	AWvZiG7yhcIv+lsIPBnCPL6KSNkjXEaukswei/KKaiyfqU0pPnwoavyWjBmev+Puhls3sfVWM8q
-	EwlvZYV83fZMTXlV5tZdYPeFNsg3BX3
-X-Google-Smtp-Source: AGHT+IHkNqEBTJEhiLtyWa2CGVz+1od1KR/2tzYm9ObLc/fC9+AGP2+40XW+DImZ8NXvMV8LHBW42w==
-X-Received: by 2002:a05:6214:19c3:b0:6d4:36ff:4356 with SMTP id 6a1803df08f44-6dc8ca74ec1mr289693926d6.19.1734396474867;
-        Mon, 16 Dec 2024 16:47:54 -0800 (PST)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dccd38078fsm32822106d6.119.2024.12.16.16.47.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2024 16:47:54 -0800 (PST)
-Date: Tue, 17 Dec 2024 08:47:36 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Chen Wang <unicorn_wang@outlook.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Inochi Amaoto <inochiama@outlook.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, 
-	Inochi Amaoto <inochiama@gmail.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH RFC net-next 0/3] riscv: sophgo: Add ethernet support for
- SG2044
-Message-ID: <puld3vngm4rti74aecpeoro3tatifgasrq6sxg4huufuptmjtk@njfskna3k7ds>
-References: <20241101014327.513732-1-inochiama@gmail.com>
+	s=arc-20240116; t=1734397516; c=relaxed/simple;
+	bh=AvZdtb9/Hz/Mhjyq8HktNmB9tLJDbXQL8KufMQ1EF6o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OAxURyefx04NFPRigYX7ge5YsupuIBIls+Hh8vk8G0WfpaaR1IChmPIEiUzuLsbBPzy0PZTLak1SDDDYrc9AmTqdkNEiwKfiLp3HMT3C+X75/lmorYDAXS0IQ8i4Y1Rn8BzsT8nORMP9kgIvM5hg0/EaIEgejPcKxMgZ33LXZn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YBz9z6lxDz4f3jqb;
+	Tue, 17 Dec 2024 09:04:55 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 5E51F1A018C;
+	Tue, 17 Dec 2024 09:05:10 +0800 (CST)
+Received: from [10.174.177.210] (unknown [10.174.177.210])
+	by APP4 (Coremail) with SMTP id gCh0CgCngYVEzmBnq4tCEw--.13295S3;
+	Tue, 17 Dec 2024 09:05:10 +0800 (CST)
+Message-ID: <e457414e-f106-3c69-a27f-056101c9cbd9@huaweicloud.com>
+Date: Tue, 17 Dec 2024 09:05:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241101014327.513732-1-inochiama@gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [RFC PATCH 1/5] nfsd: Revert "nfsd: release svc_expkey/svc_export
+ with rcu_work"
+To: Chuck Lever <chuck.lever@oracle.com>, jlayton@kernel.org, neilb@suse.de,
+ okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+ anna@kernel.org, linux-nfs@vger.kernel.org, netdev@vger.kernel.org
+Cc: yangerkun@huawei.com, yi.zhang@huawei.com
+References: <20241216142156.4133267-1-yangerkun@huaweicloud.com>
+ <20241216142156.4133267-2-yangerkun@huaweicloud.com>
+ <4cfae0e3-c5dc-4726-bbc8-dc0b5395d8cd@oracle.com>
+From: yangerkun <yangerkun@huaweicloud.com>
+In-Reply-To: <4cfae0e3-c5dc-4726-bbc8-dc0b5395d8cd@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCngYVEzmBnq4tCEw--.13295S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxuFW7Jw17Aw4kXryktr1DZFb_yoW7Cw4rpa
+	ykJayYk3y8XF18Wr4UJw1UX345trn0v3WkGw18JayYyrn8Ar10gF1UZryq9ryYyr48W3yx
+	Ar10qrnru348XF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-On Fri, Nov 01, 2024 at 09:43:24AM +0800, Inochi Amaoto wrote:
-> The ethernet controller of SG2044 is Synopsys DesignWare IP with
-> custom clock. Add glue layer for it.
+
+
+在 2024/12/16 22:52, Chuck Lever 写道:
+> On 12/16/24 9:21 AM, Yang Erkun wrote:
+>> From: Yang Erkun <yangerkun@huawei.com>
+>>
+>> This reverts commit f8c989a0c89a75d30f899a7cabdc14d72522bb8d.
 > 
-> Since v2, these patch depends on that following patch that provides
-> helper function to compute rgmii clock, and this patch are marked as RFC:
-> https://lore.kernel.org/netdev/20241028-upstream_s32cc_gmac-v4-4-03618f10e3e2@oss.nxp.com/
+> The reverted commit is in v6.13-rc1, looks like. Should I apply 1/5 to
+> v6.13-rc ?
+> 
+> The remaining patches in this series will need review and testing,
+> so I would like to reserve them for a later merge window, if that
+> is OK with you.
+
+Thanks, it's ok to me!
+
+> 
+> 
+>> Before this commit, svc_export_put or expkey_put will call path_put with
+>> sync mode. After this commit, path_put will be called with async mode.
+>> And this can lead the unexpected results show as follow.
+>>
+>> mkfs.xfs -f /dev/sda
+>> echo "/ *(rw,no_root_squash,fsid=0)" > /etc/exports
+>> echo "/mnt *(rw,no_root_squash,fsid=1)" >> /etc/exports
+>> exportfs -ra
+>> service nfs-server start
+>> mount -t nfs -o vers=4.0 127.0.0.1:/mnt /mnt1
+>> mount /dev/sda /mnt/sda
+>> touch /mnt1/sda/file
+>> exportfs -r
+>> umount /mnt/sda # failed unexcepted
+>>
+>> The touch will finally call nfsd_cross_mnt, add refcount to mount, and
+>> then add cache_head. Before this commit, exportfs -r will call
+>> cache_flush to cleanup all cache_head, and path_put in
+>> svc_export_put/expkey_put will be finished with sync mode. So, the
+>> latter umount will always success. However, after this commit, path_put
+>> will be called with async mode, the latter umount may failed, and if
+>> we add some delay, umount will success too. Personally I think this bug
+>> and should be fixed. We first revert before bugfix patch, and then fix
+>> the original bug with a different way.
+>>
+>> Fixes: f8c989a0c89a ("nfsd: release svc_expkey/svc_export with rcu_work")
+>> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+>> ---
+>>   fs/nfsd/export.c | 31 ++++++-------------------------
+>>   fs/nfsd/export.h |  4 ++--
+>>   2 files changed, 8 insertions(+), 27 deletions(-)
+>>
+>> diff --git a/fs/nfsd/export.c b/fs/nfsd/export.c
+>> index eacafe46e3b6..aa4712362b3b 100644
+>> --- a/fs/nfsd/export.c
+>> +++ b/fs/nfsd/export.c
+>> @@ -40,24 +40,15 @@
+>>   #define    EXPKEY_HASHMAX        (1 << EXPKEY_HASHBITS)
+>>   #define    EXPKEY_HASHMASK        (EXPKEY_HASHMAX -1)
+>> -static void expkey_put_work(struct work_struct *work)
+>> +static void expkey_put(struct kref *ref)
+>>   {
+>> -    struct svc_expkey *key =
+>> -        container_of(to_rcu_work(work), struct svc_expkey, ek_rcu_work);
+>> +    struct svc_expkey *key = container_of(ref, struct svc_expkey, 
+>> h.ref);
+>>       if (test_bit(CACHE_VALID, &key->h.flags) &&
+>>           !test_bit(CACHE_NEGATIVE, &key->h.flags))
+>>           path_put(&key->ek_path);
+>>       auth_domain_put(key->ek_client);
+>> -    kfree(key);
+>> -}
+>> -
+>> -static void expkey_put(struct kref *ref)
+>> -{
+>> -    struct svc_expkey *key = container_of(ref, struct svc_expkey, 
+>> h.ref);
+>> -
+>> -    INIT_RCU_WORK(&key->ek_rcu_work, expkey_put_work);
+>> -    queue_rcu_work(system_wq, &key->ek_rcu_work);
+>> +    kfree_rcu(key, ek_rcu);
+>>   }
+>>   static int expkey_upcall(struct cache_detail *cd, struct cache_head *h)
+>> @@ -364,26 +355,16 @@ static void export_stats_destroy(struct 
+>> export_stats *stats)
+>>                           EXP_STATS_COUNTERS_NUM);
+>>   }
+>> -static void svc_export_put_work(struct work_struct *work)
+>> +static void svc_export_put(struct kref *ref)
+>>   {
+>> -    struct svc_export *exp =
+>> -        container_of(to_rcu_work(work), struct svc_export, ex_rcu_work);
+>> -
+>> +    struct svc_export *exp = container_of(ref, struct svc_export, 
+>> h.ref);
+>>       path_put(&exp->ex_path);
+>>       auth_domain_put(exp->ex_client);
+>>       nfsd4_fslocs_free(&exp->ex_fslocs);
+>>       export_stats_destroy(exp->ex_stats);
+>>       kfree(exp->ex_stats);
+>>       kfree(exp->ex_uuid);
+>> -    kfree(exp);
+>> -}
+>> -
+>> -static void svc_export_put(struct kref *ref)
+>> -{
+>> -    struct svc_export *exp = container_of(ref, struct svc_export, 
+>> h.ref);
+>> -
+>> -    INIT_RCU_WORK(&exp->ex_rcu_work, svc_export_put_work);
+>> -    queue_rcu_work(system_wq, &exp->ex_rcu_work);
+>> +    kfree_rcu(exp, ex_rcu);
+>>   }
+>>   static int svc_export_upcall(struct cache_detail *cd, struct 
+>> cache_head *h)
+>> diff --git a/fs/nfsd/export.h b/fs/nfsd/export.h
+>> index 6f2fbaae01fa..4d92b99c1ffd 100644
+>> --- a/fs/nfsd/export.h
+>> +++ b/fs/nfsd/export.h
+>> @@ -75,7 +75,7 @@ struct svc_export {
+>>       u32            ex_layout_types;
+>>       struct nfsd4_deviceid_map *ex_devid_map;
+>>       struct cache_detail    *cd;
+>> -    struct rcu_work        ex_rcu_work;
+>> +    struct rcu_head        ex_rcu;
+>>       unsigned long        ex_xprtsec_modes;
+>>       struct export_stats    *ex_stats;
+>>   };
+>> @@ -92,7 +92,7 @@ struct svc_expkey {
+>>       u32            ek_fsid[6];
+>>       struct path        ek_path;
+>> -    struct rcu_work        ek_rcu_work;
+>> +    struct rcu_head        ek_rcu;
+>>   };
+>>   #define EX_ISSYNC(exp)        (!((exp)->ex_flags & NFSEXP_ASYNC))
+> 
 > 
 
-Hi,
-
-I have seen the dependency has been merged, is it possible to 
-resend a normal version of this patch?
-
-https://lore.kernel.org/netdev/173380743727.355055.17303486442146316315.git-patchwork-notify@kernel.org/
-
-Regards,
-Inochi
 
