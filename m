@@ -1,365 +1,307 @@
-Return-Path: <netdev+bounces-152495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA98E9F43CE
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 07:36:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4899F44AA
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 08:01:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 815A716A859
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 06:36:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E138816359D
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 07:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965CA15B0EE;
-	Tue, 17 Dec 2024 06:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4494C1E5702;
+	Tue, 17 Dec 2024 06:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="btHYrLck"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J8kLwzbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4C314A095
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 06:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734417394; cv=none; b=eHiKg+60dxbWXCtgwSXh88yZr41p4Li+5NiXTn2Y0WcHfzIxrvIdfw0p2f50My7uZY7VZUpN02RQNZEPTKwKgCLRNprFvBnPnops2dhWncI023lkxOgQ+Zc7vvXDhKuQkQwV9Mn7xYJXHzfwcowz1BOBWDEHNl9kf4lpiEFNgeY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734417394; c=relaxed/simple;
-	bh=AWvF2j/MJck6A2lbQoUyTLG7fnkX2/wVEcY1KtN+1qc=;
-	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=DvLw8UCpXpzusHloPy3y0NGAoWPkX52v7iNDl5CCxNbTbN2urF/8Fj9xXobybk91aZNqlfwSZPQFxNIKAadoyjKMhVkDuLtWRwrW8Vr1YOpMacxcCtR4kvLIDdtoG0Qy7u27DlgCaPd72vO/TtP5aOdjgLAxgUsYlK8TaGBW8rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=btHYrLck; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43634b570c1so22545045e9.0
-        for <netdev@vger.kernel.org>; Mon, 16 Dec 2024 22:36:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734417391; x=1735022191; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h9Hb6aegTpIAjbQ9FI8lX/nYav5UjD6nZeBYzzREv7c=;
-        b=btHYrLck45k5N1X7GypsZ5+i0yTEoaTj16hoSDoNn8aIWwEzJ2Ca3BTYUnwMCzgnII
-         ZROiRP6QnVGHtsz8sUmc3RQ9eZrBNRf+QHEeMulbqk3Z8zKnjk/5OklyRe/gm2qUZkVR
-         d/pITGNdXw4roLS8z+iSpZLFFwdvhAcJ1SeeahU3Winra68HhLo33lSTWzwCL631bg4r
-         J6XnwCzWZMzT4pOazcf7SDx828HEit78bMTThc47GhyeDdL+qm8lsiONoivEqj9FEK4g
-         sCoMqNiCt+r73riO48TsFYqmW5dayWWC5ZzilAaDm+zEaWFkZoJ1k2Hq7ZzWNvqtnQ/s
-         ETYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734417391; x=1735022191;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h9Hb6aegTpIAjbQ9FI8lX/nYav5UjD6nZeBYzzREv7c=;
-        b=vQ3bSzb7kvN/M3sIkoYN2O0TqS2YtHz7aGgafobyX3VQlGim3jxUNMrNB7uoCa5mNB
-         v6IKFmU6WI86dLQp1u/7Osx/D/k9U1ECKJK2nPJTugg8kLhfNkZsqSzohlCjUXgOipbX
-         i3YIqJn6O+3YdGMplIwEekbX+Lb0AePOWx9GZeWzJH7UjMAuV+mlXpg73Qjjx6p/SXNk
-         TYoRdkaZY8nU4eka7XoAaWibTEvLGaTRpqN+zbq0cUNB0fCLWYZAgHF4VwpUUKidXOJx
-         Y68yCJEaar/6QqsAngvueHcSt4+hKCzGJ4IqZMWCvCpZSWtYkYvEzer4oieE5qNcTTAc
-         sg1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUDNdYK58W8Cyzt8HhEUj2IpEnnk8nuhP6uCqeHQV4qDio4WPggH9AnUXNP9MsOn+R2tGDx5t4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWPyndRGIqZhEKYuNGNA20LYXjAeFxHJUh1ICDhOMASd6U7F3j
-	idLKWzoU48u0oPXWNzOvfvNJTpUhjjQetywda9U07LFgraeIMiighiggiQ==
-X-Gm-Gg: ASbGncu2eSakmt9gZU+JXmS0mB7jVG4kKbeF0zuGk1pYOQRvDAYvBKXd9SkTkTr9Le1
-	42YBbMaa24z5k4WZGy4qXJZW3+spCNjbgGZaZWqCVLpqtjB6czvF/t75nG2PcdODJ6UwNusdV3U
-	/mPG7mWXO86EvMW1eiZdYESax1s4hYVR8JPO+JDfjwzoRSybjI94caV6qch2B+GfaS3wggmWplG
-	unmmf8VyJAlhqbdcTz0Oyvzx8KKRyb7w5I+vC2KfEBn3VU4Oo/0cmEDvOfrVTgr5P6u8MLZUkuG
-	3DrDn8/B9macQU+f0qZEMkBh/4JmY/nLqrWRKZglLo+7
-X-Google-Smtp-Source: AGHT+IGnPQRGG/wXAjYa0UYauLNZJPlBdQHV1SHQbtKK2xBkYarXMnTrV7Xza3V+YN91ONmvdiFqYw==
-X-Received: by 2002:a05:600c:450e:b0:434:f8e5:1bb with SMTP id 5b1f17b1804b1-4362aa42e33mr132392415e9.12.1734417390235;
-        Mon, 16 Dec 2024 22:36:30 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4363602b468sm107249365e9.11.2024.12.16.22.36.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Dec 2024 22:36:29 -0800 (PST)
-Subject: Re: [PATCH net-next v3 03/12] net: homa: create shared Homa header
- files
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-References: <20241209175131.3839-1-ouster@cs.stanford.edu>
- <20241209175131.3839-5-ouster@cs.stanford.edu>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <8a73091e-5d4a-4802-ffef-a382adbbe88f@gmail.com>
-Date: Tue, 17 Dec 2024 06:36:27 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 762CB1D95B3;
+	Tue, 17 Dec 2024 06:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734418482; cv=fail; b=q1X+piddadKG9sacGdEJ3D6zxjJU1RMzOfh92B71eF0d9y8JOoXW5k89XyS/eGhD7IM/k72CZy1/cqvnsJJUoUs6FqSBREZ06zIYXPwb4Hh6SPqrZyXDW1gcwttGKUeVPM68CwotbWpp2EyrWWRp5reYzMpHvtsIFHeKjEOYoKs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734418482; c=relaxed/simple;
+	bh=ZggECrQob9zEzJGut5rbOECsfez7lNaAWwU8HyCigpQ=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KpSibO+zmEQzXkULwWm5wqbHO0K6B4os3eXAQaOJTrfyCPuSuqumYp4sr5SZrXU0IPOch/NaSwRU0uqSFmhdVxwepEOMvkeMnbWRqqquI9OG+or9B4BgUxmX9xDup2UOwamCOKxxr79lifxa5ZQANTwae9vygVEDCilXX+SF+sM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J8kLwzbs; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734418480; x=1765954480;
+  h=message-id:date:subject:to:references:from:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=ZggECrQob9zEzJGut5rbOECsfez7lNaAWwU8HyCigpQ=;
+  b=J8kLwzbs0iV13n496s5AIh3i/3CtCYThg2mT8ed/R5xZ0ghMa0KS1coH
+   dFIDx77+YJgmoNhFDSIyHlIl5iGXWJQJsesU+X1DRXAECTasSB6O46QEq
+   YeM6AVdeCco68mEVztynOTaE1DfU4nlkIENzIXoML0hoiuL3NSQq6QIDn
+   TxQhUI4zcYUV8rfk9+6K/j9f3bNFCxvt9/nwbr2J4DMhhjHGtPclHthbo
+   VTYxait+hKmasjDCToe6lZ2l7KiTJ3scXEtYwTejUYV6wl49wIt4Gadlg
+   X/sItCiHpB4dFKaehPTTnpWCA2/lrikvPL+LbryBaGbvrTJCOODMYQpTK
+   Q==;
+X-CSE-ConnectionGUID: ankmolpIQy2pojDMh27MYA==
+X-CSE-MsgGUID: 0HdxexCGTFmWPMp1XVd+Mg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11288"; a="34979683"
+X-IronPort-AV: E=Sophos;i="6.12,241,1728975600"; 
+   d="scan'208";a="34979683"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2024 22:54:39 -0800
+X-CSE-ConnectionGUID: MSrOqdHUQrGKZ7lrBIBs8w==
+X-CSE-MsgGUID: 0xwclEK+RIi916k7e2t/lA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,241,1728975600"; 
+   d="scan'208";a="97480895"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Dec 2024 22:54:39 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 16 Dec 2024 22:54:38 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Mon, 16 Dec 2024 22:54:38 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 16 Dec 2024 22:54:38 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=U10EgB5b9dYpqXPuqnFdZ9GebeqjswQ+N05qSUVsUXh5CdBtbfp/v/alXKPCq+JiCghHeq5gEKgnuHZK2Kk270d0CuZnv8oChqI52uG++MMDSAlGujaqRvdDzm+lTOXfvCPMwNUioLsG+I1PlBglYRZ14LQfoso0W22HhJkLB3khGs1hhI765SgvtENNtfEsqT8SYLOWMdojFAk6QVbmeeEO3loP69neEGPqMO53Y5y/Y3ooYPy9Nu0Supfe1MopUKJw5p4ZI81hFyXMHfqV6mj7Wsib6E3eeRlW80WpsE7n0TlBnXQEJj6vh/NaOHOgyWmVowNUAbD9OYM757pyDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vnc+PpYlXte67QuXY+S7hT3qegkHWmtLFc5vIOrWyBs=;
+ b=xQGmpudS/a7dfwd9Nkh1FgODkxGmxDV36eq362OGUmfvrXxc+7WnH2MobZ/CgR193Tr3gzVKLwjnirmKA8RhQDg6dq/V1Ebd6USmO3MKdlVkxN/8tAhbiZskwqvRUD1hnEHtdT6E8AqwMcJrCK+/dDn6X54QzvBloHl176BSMiUjmE/5fvLynfieYFc/D+Q1boEIRWx8OY2XAozfbAO2Hu5/KnlNK1BbxtDt0X8FDeu7YDl0PXH+dRQYjg0HLHWmwsFHFGwymuPoHBOuPtrqdWvdlBifJMMYnPwd8qJRAE3UyUf83uZf+pq4vXeofaN55oreYb+iRT9n1jpKYFbK2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
+ by DS7PR11MB7952.namprd11.prod.outlook.com (2603:10b6:8:eb::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8251.21; Tue, 17 Dec 2024 06:54:30 +0000
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861]) by PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861%3]) with mapi id 15.20.8251.015; Tue, 17 Dec 2024
+ 06:54:30 +0000
+Message-ID: <afb768ff-4c1f-4bf6-889e-b602170296b2@intel.com>
+Date: Tue, 17 Dec 2024 08:54:23 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] igc: Return early when failing to read EECD register
+To: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20241216051430.1606770-1-acelan.kao@canonical.com>
+ <a1c44976-9e88-4d58-bad8-34fd397ba626@intel.com>
+ <o6u6fr4znqfcznzq47jlqojdf34vdhardfypw3kl5y76pxjk6n@cxcp2mlsv62k>
+Content-Language: en-US
+From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+In-Reply-To: <o6u6fr4znqfcznzq47jlqojdf34vdhardfypw3kl5y76pxjk6n@cxcp2mlsv62k>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL0P290CA0008.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::19) To PH0PR11MB5949.namprd11.prod.outlook.com
+ (2603:10b6:510:144::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241209175131.3839-5-ouster@cs.stanford.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5949:EE_|DS7PR11MB7952:EE_
+X-MS-Office365-Filtering-Correlation-Id: afd0d436-7124-449b-7c15-08dd1e67a77f
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Uy93TmVEU3oyOTZTbm1SbmxaYm9BWkVkNFlMdjBHVnhOZW5KQnljaFR3Nloz?=
+ =?utf-8?B?YXJJUlo3ZXdsUGNkeEdQd1pvN3YvdHcyd3NvaHVpb3IxWEw4ejE5YVFYSXlP?=
+ =?utf-8?B?bmlxelNHSXBnQ0xGeWRvSkIySHlSS3dYVnBaeERjT0F5RFJ4U0pRdmpYUUFj?=
+ =?utf-8?B?OExLNVI0bnFBQmRoUlM2VUMxZis2cWY1SXcvOGpTODI4RTZqQlJpUjV2OHJW?=
+ =?utf-8?B?dXRHS2RlaGE1ZlVVeWRFVkJ0WFFpRU4vd3lSZHRlMGQ0RUtXK3htNXZmejI1?=
+ =?utf-8?B?SEpIdkdYM2V5Ym5BZ3lRTjVnUDNzREFPQUZUMXRXTXlCNUt1VVdRRlRKNWZl?=
+ =?utf-8?B?SjlPKysxZ2FxNUZWNnEyQXVBMTF5RXBCVm9ydzR3WS9BSUVUWSs4VmhuQUYz?=
+ =?utf-8?B?dmJDbmNyMXErQkVMTVI4Vkd3T3VvSEpCMit2UXFOYXdMUWw1SDk5dnZ2Sjhh?=
+ =?utf-8?B?K3NTQzF5cUoyVTNjVDVvb2V0ditlcWtBTkkxeUdmQlRzV2xQckUxaE8vMW1l?=
+ =?utf-8?B?RzhCWHM0ZGd5a2xZMW55ZDNFOXZKTUtyVWxCZlhLbjJTTzcrNmI2Q0x3aEJT?=
+ =?utf-8?B?Z2JRbXZJN0FhTTBkVUtPM0pCQVNpaTBHN2hBK0hXNnVpMmtpQXcwK29mWHU5?=
+ =?utf-8?B?VWpZdWNrR2wrSU1PQ09xeGl4ZXJUSFN1TlZ2anhubGUxVTdqeXJSbGRTM3Iv?=
+ =?utf-8?B?L3RZbEkzdm0xRTJia0hrSDJOMUJCdkF2Y2xPZWhxejRxcktBYUxOTkhYWW12?=
+ =?utf-8?B?eVg0TnBoYktIVHRualh0ekRJdGRpYk1aQnIya3V0VEVVRU5VY0lCenRkcmE1?=
+ =?utf-8?B?NDhId3hnRkkzMk5UT29oNmpkTzNmSkd0aFdFelZhWGg2aHpkYmEwUHhMRkV6?=
+ =?utf-8?B?Z3hBeTk0ZnVHM1JjQ2l3VkNTVDNVbVNWUnV4M01pNzZKN1EwRmgvdEdiT3FO?=
+ =?utf-8?B?eFlhMUtEZW10Sjh3WEtQcVFQSUpYczhLRFFva0h1RVcrd0xXMnJLcmptN2Jm?=
+ =?utf-8?B?dHpyV0IzL1JlVFpCTE03dlNvY0xabW1ieVhMSjNBSFR2ZEdtUUw5dGRTS0tI?=
+ =?utf-8?B?RmowK216L2dicUhPRnNwZFdLOTdORENUaGZvQW1OU0xNelZyNTB4VzdNOXJH?=
+ =?utf-8?B?Ni8zOElIUm9HNzZicHBqOFhnS1R3QzVOUEVlbXk3UlhsVFFOVmYzL0VnZFNU?=
+ =?utf-8?B?eEIyblZ5dGxIbzhmS1ZkenFEQlQ3K3BpYTFXNFNBRUNmdnJmeEhMMWZIVXdQ?=
+ =?utf-8?B?TU1Zd0FHbkZ2SExDZzB5SkZjZUtxM0hSZDBPaktQRHhVWm84OStLSDNwK2k3?=
+ =?utf-8?B?ejAxTlluY2FLWUJhVGd4ODVMc0RCT0lURDNYdXViSXYvbEwzMWRpUUZvTWw0?=
+ =?utf-8?B?MzdCdzVVWGtIa2NrZlFXTm5RalBFQktTYkEweWtoUG56bVdiSFlPRUdqc1Z3?=
+ =?utf-8?B?SmRzbjJyVVJKQjU5UGV0VlpOd0R1OUVHa1dud3BNMmoyVVUwZDd4Z2FoaUdw?=
+ =?utf-8?B?amJNd0x5TkFhS2tVRDlyazZUOVViRTVRNE15SUEvVWJ4RjdpbCt1R05Tbi84?=
+ =?utf-8?B?QXhsL0tUWFczYkNXMTB0M3RDWmo4bEx1Um9YNmQ0S1FTTnZmZkVvRlFhbHo1?=
+ =?utf-8?B?UlZEbUczVzZHRkUxMDNldWtDb2xna3NBZDlzR1NuNzNrdmhXREQ5cDUya0VV?=
+ =?utf-8?B?c0FhUm55ZkU1WHJaSWRmbmJVaStpdFo2M0V1T0YwZ2l0TnBkdnF5Nnh4WXpS?=
+ =?utf-8?B?OFlNSERac2RVWlQ3OHNzMWxOT3lKZjNxc3FIdkFqNUQ0MXNNZTVZblJLMk9n?=
+ =?utf-8?B?ZmkxcUJmVHRTazdlNzRoK3c3eG1UTU1hYXl5aHhQcXd6NldjNXRNdmNDTmhS?=
+ =?utf-8?B?VlVhVER6OStqbXlNdElSdjVHZXkvUUxrVnhaL1I1NVp2b09DMVdwWm9RUEJM?=
+ =?utf-8?Q?k5HqnxkUQqg=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5949.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cmYzZG96ODE5TUVYcytGcGtnMHZhbEE3aVdoK25KZ3YydXZjVWNxSFpNL29z?=
+ =?utf-8?B?SWtCM3c0V0hBdnJCNlVWdmZSa0tJajFOK2ZtSU44OFRrVzRnY0JFdHNxcjRk?=
+ =?utf-8?B?c0JoaXNGdFNNbCtnckREWUJuOFhJYXZzNlVZa1AxdzRHTmgzMU1oYTl6QVNM?=
+ =?utf-8?B?VjRyKy92SE15Y0MvcVliRU1iTENkL3NjWHkvU0IyTnMyallGU3RVMWxnZ1Jy?=
+ =?utf-8?B?WVgwMkVsUHhXTUpBd3BLVVZVaGtIWVVJM1RTclU0UWRHMW9walZDMHV4VHB0?=
+ =?utf-8?B?RVExM3JtNmlQR0pNZ0pBZ0NnQnNWMlAwc09DZ0JBSzlDcDhLcXNHeFpDTnBS?=
+ =?utf-8?B?SE5nSFRqODdpUCtXQnljVUR6VEE1eS9qeDc5b0lhSlFMWFhHVUJXWHNWUUhi?=
+ =?utf-8?B?aDIxbG1vZUZDeGlKYzZuVEtpK0JpYVNlUkNtRFlmZ3ZVUjZxWWx6YkowYkVB?=
+ =?utf-8?B?dUpDcUNQemlyeGVoc1FlbkEvTXZQNWJUU2UydnIxL3Avc2VtQ2d1dEZBYTVB?=
+ =?utf-8?B?VFRhcEovS2JPZkNzYmdJS2taWVlFNGhzRnEwTFBCRldDc0JzN1BVcWlNejFR?=
+ =?utf-8?B?Mm5HSmdKQlUxM2FpL2VDbjBWaXAvMHU5b3A3MG1oYURjZGE4S25pT0lKUU1h?=
+ =?utf-8?B?Ny9RN296U2VIVExHOEpTZFE0Q2RKbVlWWkJjN211SldZb3dMVytaK0NMYnJB?=
+ =?utf-8?B?eC9STlBzVVhhT3RqdlJzSWxKbWpCaW1aN3E2NkhORkk0N2hKczlhTmRkY0tN?=
+ =?utf-8?B?bjVnWHhZZEo1RnlZRm80UjRsK2RLaCtxWkZtb2pOckVwOCtRczJSOVBXSVB3?=
+ =?utf-8?B?c2R6ekFaRnIzVlRNL2RqRE1LYmtIMGRMZGhKSEZucTJyTkxYNDh6SVJvZ0ZW?=
+ =?utf-8?B?UUJzVyt0OVJMcjVSeVNwUmszaUl6RU9UcS9ZOVZTaGxDeGRqUWpkeXh4dCt2?=
+ =?utf-8?B?TEh2c1lSaXBVdUNWSXEzdHpnTVRGYkxtNDlES3JXTlVSUGs5N3M1VUJLTlFJ?=
+ =?utf-8?B?d29lQmp1MkU2a3ZLVGlRUXRFckJRdEdiOEVyWGtPWHNoUTg4WUxUZVV1OWJR?=
+ =?utf-8?B?REZMdU5Vdk9oMWN2Q3d6R2NORkNZRUJqeEhCSm9tcnA5YXIrKzJsUVFnLy9K?=
+ =?utf-8?B?Q3Nnb2o1USs2SWFVMFpkYnQvR1VpNkhYTjhKTmdvOW1OM0R2OUdnQ1NKZkdC?=
+ =?utf-8?B?cjhIRUFwei94Njk4QWxLTU1sSmNOSWR0UlprVDlCQVo0YVVnVFFaY1VCaURo?=
+ =?utf-8?B?STZHUWNxa0NpcXRSMzhSREZvTnlTL0VjOUZrb0x4UGJBdi9aZ3R2MWlhSzZW?=
+ =?utf-8?B?NHVaRXVBZU9BZjNSV3pCOWJFZDRKMC9FdHNzQnEzaCtMMDM2TmovNHEvSEhh?=
+ =?utf-8?B?OEt5OUJDRDJaN3VWcDdHdlNPdkpzVnpXdSswbG52RmpBZjZmNFZtV0RtaWo4?=
+ =?utf-8?B?Qi9UM0JTZTVpbmIycUFKZHBnTVFtSXJ5MVBXZWxldXVVaXB3SzMrdU9yTFZq?=
+ =?utf-8?B?MURXMEY0c0IreERqbmZ4R1VlMU0rakNSbmY4VXhBN0hPZWZkR3hJbEg4ckZs?=
+ =?utf-8?B?R0JpamF0bDBXbTBlQzdsak1mNEVOWEJCRTFDd0JlOEZuVkFhRng0T2g2ek1o?=
+ =?utf-8?B?aVhmQmswc2FiQ2txKzMzMGFlMVZNZUFxd3ZNdFB0RmlmaTBKRUlvZ2VoQkVl?=
+ =?utf-8?B?NEpVVG9MT0tkZXMybkQ1Qkw4WW1qS0ZvQTRmU08zd3hTMmFabEU2ZUF0ZVN2?=
+ =?utf-8?B?QTZkeGRoaW1sUCtTcGF3Y0NTL3NFaGRyWURBekg5Um9NYkdKNFlsanF3RG1E?=
+ =?utf-8?B?OTBIRFNxMys5NnNOcURHaE9xR2kyM215bHVXUDRGMHdXTVJqMkhnZnB0Tnc3?=
+ =?utf-8?B?TmpWaHkya1ZhNTNlWDJ1MXZvQk55WFhwU3ByWG5KNkpMdFhGYXhiUXAyd2c5?=
+ =?utf-8?B?ZENCZG5LQ013SGlOeXMza2xkYTU4Rm5HWDRTcFFTYXczYVFkM0llUzJ3ME1K?=
+ =?utf-8?B?MFppeXBiSGNERzlsTVFjS05PSEpnWXlwdmdHOEZBSVlkNXRWRzJBdTA1S3pp?=
+ =?utf-8?B?cHRhZmhlTEhpL2tHVzI5bG5QS05aZXRES2JILzR2WnVQUEVkZmFKVGlUMm9M?=
+ =?utf-8?B?OVQ1MlFNTkNKSzdZdFZvYzN1ZlVOQjBmSEpuVzU1RjA5V25NaXFRT1hiRVVv?=
+ =?utf-8?B?U3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: afd0d436-7124-449b-7c15-08dd1e67a77f
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5949.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2024 06:54:30.0310
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WBr6/OKzq5Rd57Ao5MqSpmnPXKbnGf4xnD0yE8icLH8lA7wmLVhUe8IfMHZBsAnmDD/2e6Viu8UNRu8iXTalePjvBv6AwIeHvJKr0KOnDTw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7952
+X-OriginatorOrg: intel.com
 
-On 09/12/2024 17:51, John Ousterhout wrote:
-> oma_impl.h defines "struct homa", which contains overall information
-> about the Homa transport, plus various odds and ends that are used
-> throughout the Homa implementation.
 
-Should parts of 'struct homa' be per network namespace, rather than
- global, so that in systems hosting multiple containers each netns can
- configure Homa for the way it wants to use it?
 
-> +struct homa_interest {
-> +	/**
-> +	 * @thread: Thread that would like to receive a message. Will get
-> +	 * woken up when a suitable message becomes available.
-> +	 */
-> +	struct task_struct *thread;
-> +
-> +	/**
-> +	 * @ready_rpc: This is actually a (struct homa_rpc *) identifying the
-> +	 * RPC that was found; NULL if no RPC has been found yet. This
-> +	 * variable is used for synchronization to handoff the RPC, and
-> +	 * must be set only after @locked is set.
-> +	 */
-> +	atomic_long_t ready_rpc;
-> +
-> +	/**
-> +	 * @locked: Nonzero means that @ready_rpc is locked; only valid
-> +	 * if @ready_rpc is non-NULL.
-> +	 */
-> +	int locked;
+On 12/17/2024 3:23 AM, Chia-Lin Kao (AceLan) wrote:
+> On Mon, Dec 16, 2024 at 06:53:10AM +0100, Przemek Kitszel wrote:
+>> On 12/16/24 06:14, Chia-Lin Kao (AceLan) wrote:
+>>> When booting with a dock connected, the igc driver can get stuck for ~40
+>>> seconds if PCIe link is lost during initialization.
+>>>
+>>> This happens because the driver access device after EECD register reads
+>>> return all F's, indicating failed reads. Consequently, hw->hw_addr is set
+>>> to NULL, which impacts subsequent rd32() reads. This leads to the driver
+>>> hanging in igc_get_hw_semaphore_i225(), as the invalid hw->hw_addr
+>>> prevents retrieving the expected value.
+>>
+>> Than you very much for the patch and the analysis!
+>>
+>>>
+>>> To address this, a validation check is added for the EECD register read
+>>> result. If all F's are returned, indicating PCIe link loss, the driver
+>>> will return -ENXIO immediately. This avoids the 40-second hang and
+>>
+>> It is not clear from the patch what part of the driver will return
+>> -ENXIO, you have put -ENODEV in the patch, but it's ignored anyway.
+> I was thinking of using -ENODEV or -ENXIO, and I forgot to generate
+> the patch again after I changed it to -ENXIO in the commit message.
+> I'll fix this in v2.
+>>
+>>> significantly improves boot time when using a dock with an igc NIC.
+>>>
+>>> [    0.911913] igc 0000:70:00.0: enabling device (0000 -> 0002)
+>>> [    0.912386] igc 0000:70:00.0: PTM enabled, 4ns granularity
+>>> [    1.571098] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCIe link lost, device now detached
+>>> [   43.449095] igc_get_hw_semaphore_i225: igc 0000:70:00.0 (unnamed net_device) (uninitialized): Driver can't access device - SMBI bit is set.
+>>> [   43.449186] igc 0000:70:00.0: probe with driver igc failed with error -13
+>>> [   46.345701] igc 0000:70:00.0: enabling device (0000 -> 0002)
+>>> [   46.345777] igc 0000:70:00.0: PTM enabled, 4ns granularity
+>>>
+>>
+>> Would be best if you could also attach the sequence after your fix.
+> Sure
+> 
+>> Please add a Fixes: tag.
+> I'm not sure which commit should I add Fixes to.
+> 
+>> Please make [PATCH iwl-net] as a subject prefix. Please CC Vitaly.
+> igc is an ethernet driver, should I also add iwl-net tag?
+> 
+>> (But please also wait a day prior to sending v2 for more feedback).
+>>
+>>> Signed-off-by: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+>>> ---
+>>>    drivers/net/ethernet/intel/igc/igc_base.c | 4 ++++
+>>>    1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
+>>> index 9fae8bdec2a7..54ce60280765 100644
+>>> --- a/drivers/net/ethernet/intel/igc/igc_base.c
+>>> +++ b/drivers/net/ethernet/intel/igc/igc_base.c
+>>> @@ -68,6 +68,10 @@ static s32 igc_init_nvm_params_base(struct igc_hw *hw)
+>>
+>> This function is used only in igc_get_invariants_base(), which ignores
+>> the return value you have added. I would expect it to propagate instead.
+> You are right, looks like the patch fixes the issue accidentally.
+> Return earlier in igc_get_invariants_base() skipping the rest of the
+> settings. The part impacts the behavior is nvm->word_size will be 0.
+> And then in igc_get_hw_semaphore_i225() the timeout value will become
+> 1. So that we won't hang for 40 seconds to wait for the timeout.
+> 
+> This patch is not perfect, I need to figure out another way to address
+> the issue better.
+> Please let me know if you got any ideas.
+> Thanks.
 
-These feel weird; what kind of synchronisation is this for and why
- aren't any of Linux's existing locking primitives suitable?  In
- particular the non-typesafe casting of ready_rpc is unpleasant.
-I looked at sync.txt and didn't find an explanation, and it wasn't
- obvious from reading homa_register_interests() either.  (Are plain
- writes to int even guaranteed to be ordered wrt the atomics on
- rpc->flags or ready_rpc?)
-My best guess from looking at how `thread` is used is that all this
- is somehow simulating a completion?  You shouldn't need to manually
- do stuff like sleeping and waking threads from within something as
- generic as a protocol implementation.
 
-> +	interest->request_links.next = LIST_POISON1;
-> +	interest->response_links.next = LIST_POISON1;
+I like your approach to this bug fix.
 
-Any particular reason why you're opencoding poisoning, rather than
- using the list helpers (which distinguish between a list_head that
- has been inited but never added, so list_empty() returns true, and
- one which has been list_del()ed and thus poisoned)?
-It would likely be easier for others to debug any issues that arise
- in Homa if when they see a list_head in an oops or crashdump they
- can relate it to the standard lifecycle.
+However, it seems that without another change in igc_get_invariants_base 
+the failure won't cause an early return with an error status.
+You will need to add something like:
+	ret_val = igc_init_nvm_params_base(hw);
++       if (ret_val)
++		return -ENODEV;
+	switch (hw->mac.type) {
 
-> +/**
-> + * struct homa - Overall information about the Homa protocol implementation.
-> + *
-> + * There will typically only exist one of these at a time, except during
-> + * unit tests.
-> + */
-> +struct homa {
-> +	/**
-> +	 * @next_outgoing_id: Id to use for next outgoing RPC request.
-> +	 * This is always even: it's used only to generate client-side ids.
-> +	 * Accessed without locks.
-> +	 */
-> +	atomic64_t next_outgoing_id;
 
-Does the ID need to be unique for the whole machine or just per-
- interface?  I would imagine it should be sufficient for the
- (id, source address) or even (id, saddr, sport) tuple to be
- unique.
-And are there any security issues here; ought we to do anything
- like TCP does with sequence numbers to try to ensure they aren't
- guessable by an attacker?
+>>
+>>>    	u32 eecd = rd32(IGC_EECD);
+>>>    	u16 size;
+>>> +	/* failed to read reg and got all F's */
+>>> +	if (!(~eecd))
+>>> +		return -ENODEV;
+>>> +
+>>>    	size = FIELD_GET(IGC_EECD_SIZE_EX_MASK, eecd);
+>>>    	/* Added to a constant, "size" becomes the left-shift value
+>>
 
-> +	/**
-> +	 * @throttled_rpcs: Contains all homa_rpcs that have bytes ready
-> +	 * for transmission, but which couldn't be sent without exceeding
-> +	 * the queue limits for transmission. Manipulate only with "_rcu"
-> +	 * functions.
-> +	 */
-> +	struct list_head throttled_rpcs;
-
-I'm not sure exactly how it works but I believe you can annotate
- the declaration with __rcu to get sparse to enforce this.
-
-> +	/**
-> +	 * @next_client_port: A client port number to consider for the
-> +	 * next Homa socket; increments monotonically. Current value may
-> +	 * be in the range allocated for servers; must check before using.
-> +	 * This port may also be in use already; must check.
-> +	 */
-> +	__u16 next_client_port __aligned(L1_CACHE_BYTES);
-
-Again, does guessability by an attacker pose any security risks
- here?
-
-> +	/**
-> +	 * @link_bandwidth: The raw bandwidth of the network uplink, in
-> +	 * units of 1e06 bits per second.  Set externally via sysctl.
-> +	 */
-> +	int link_mbps;
-
-What happens if a machine has two uplinks and someone wants to
- use Homa on both of them?  I wonder if most of the granting and
- pacing part of Homa ought to be per-netdev rather than per-host.
-(Though in an SDN case with a bunch of containers issuing their
- RPCs through veths you'd want a Homa-aware bridge that could do
- the SRPT rather than bandwidth sharing, and having everything go
- through a single Homa stack instance does give you that for free.
- But then a VM use-case still needs the clever bridge anyway.)
-
-> +	/**
-> +	 * @timeout_ticks: abort an RPC if its silent_ticks reaches this value.
-> +	 */
-> +	int timeout_ticks;
-
-This feels more like a socket-level option, perhaps?  Just
- thinking out loud.
-> +	/**
-> +	 * @gso_force_software: A non-zero value will cause Home to perform
-> +	 * segmentation in software using GSO; zero means ask the NIC to
-> +	 * perform TSO. Set externally via sysctl.
-> +	 */
-
-"Home" appears to be a typo.
-> +	/**
-> +	 * @temp: the values in this array can be read and written with sysctl.
-> +	 * They have no officially defined purpose, and are available for
-> +	 * short-term use during testing.
-> +	 */
-> +	int temp[4];
-
-I don't think this belongs in upstream.  At best maybe under an ifdef
- like CONFIG_HOMA_DEBUG?
-
-> +/**
-> + * struct homa_skb_info - Additional information needed by Homa for each
-> + * outbound DATA packet. Space is allocated for this at the very end of the
-> + * linear part of the skb.
-> + */
-> +struct homa_skb_info {
-> +	/**
-> +	 * @next_skb: used to link together all of the skb's for a Homa
-> +	 * message (in order of offset).
-> +	 */
-> +	struct sk_buff *next_skb;
-> +
-> +	/**
-> +	 * @wire_bytes: total number of bytes of network bandwidth that
-> +	 * will be consumed by this packet. This includes everything,
-> +	 * including additional headers added by GSO, IP header, Ethernet
-> +	 * header, CRC, preamble, and inter-packet gap.
-> +	 */
-> +	int wire_bytes;
-> +
-> +	/**
-> +	 * @data_bytes: total bytes of message data across all of the
-> +	 * segments in this packet.
-> +	 */
-> +	int data_bytes;
-> +
-> +	/** @seg_length: maximum number of data bytes in each GSO segment. */
-> +	int seg_length;
-> +
-> +	/**
-> +	 * @offset: offset within the message of the first byte of data in
-> +	 * this packet.
-> +	 */
-> +	int offset;
-> +};
-> +
-> +/**
-> + * homa_get_skb_info() - Return the address of Homa's private information
-> + * for an sk_buff.
-> + * @skb:     Socket buffer whose info is needed.
-> + */
-> +static inline struct homa_skb_info *homa_get_skb_info(struct sk_buff *skb)
-> +{
-> +	return (struct homa_skb_info *)(skb_end_pointer(skb)
-> +			- sizeof(struct homa_skb_info));
-> +}
-> +
-> +/**
-> + * homa_next_skb() - Compute address of Homa's private link field in @skb.
-> + * @skb:     Socket buffer containing private link field.
-> + *
-> + * Homa needs to keep a list of buffers in a message, but it can't use the
-> + * links built into sk_buffs because Homa wants to retain its list even
-> + * after sending the packet, and the built-in links get used during sending.
-> + * Thus we allocate extra space at the very end of the packet's data
-> + * area to hold a forward pointer for a list.
-> + */
-> +static inline struct sk_buff **homa_next_skb(struct sk_buff *skb)
-> +{
-> +	return (struct sk_buff **)(skb_end_pointer(skb) - sizeof(char *));
-> +}
-
-This is confusing — why doesn't homa_next_skb(skb) equal
- &homa_get_skb_info(skb)->next_skb?  Is one used on TX and the other
- on RX, or something?
-
-And could these subtractions be written as first casting to the
- appropriate pointer type and then subtracting 1, instead of
- subtracting sizeof from the unsigned char *end_pointer?
-(Particularly as here you've taken sizeof a different kind of
- pointer — I know sizeof(char *) == sizeof(struct sk_buff *), but
- it's still kind of unclean.)
-
-> +
-> +/**
-> + * homa_set_doff() - Fills in the doff TCP header field for a Homa packet.
-> + * @h:     Packet header whose doff field is to be set.
-> + * @size:  Size of the "header", bytes (must be a multiple of 4). This
-> + *         information is used only for TSO; it's the number of bytes
-> + *         that should be replicated in each segment. The bytes after
-> + *         this will be distributed among segments.
-> + */
-> +static inline void homa_set_doff(struct data_header *h, int size)
-> +{
-> +	h->common.doff = size << 2;
-
-Either put a comment here about the data offset being the high 4
- bits of doff, or use "(size >> 2) << 4" (or both!); at first
- glance this looks like a typo shifting the wrong way.
-(TCP avoids this by playing games with bitfields in struct tcphdr.)
-
-> +/**
-> + * ipv4_to_ipv6() - Given an IPv4 address, return an equivalent IPv6 address
-> + * (an IPv4-mapped one).
-> + * @ip4: IPv4 address, in network byte order.
-> + */
-> +static inline struct in6_addr ipv4_to_ipv6(__be32 ip4)
-> +{
-> +	struct in6_addr ret = {};
-> +
-> +	if (ip4 == htonl(INADDR_ANY))
-> +		return in6addr_any;
-> +	ret.in6_u.u6_addr32[2] = htonl(0xffff);
-> +	ret.in6_u.u6_addr32[3] = ip4;
-> +	return ret;
-> +}
-> +
-> +/**
-> + * ipv6_to_ipv4() - Given an IPv6 address produced by ipv4_to_ipv6, return
-> + * the original IPv4 address (in network byte order).
-> + * @ip6:  IPv6 address; assumed to be a mapped IPv4 address.
-> + */
-> +static inline __be32 ipv6_to_ipv4(const struct in6_addr ip6)
-> +{
-> +	return ip6.in6_u.u6_addr32[3];
-> +}
-...
-> +/**
-> + * is_mapped_ipv4() - Return true if an IPv6 address is actually an
-> + * IPv4-mapped address, false otherwise.
-> + * @x:  The address to check.
-> + */
-> +static inline bool is_mapped_ipv4(const struct in6_addr x)
-> +{
-> +	return ((x.in6_u.u6_addr32[0] == 0) &&
-> +		(x.in6_u.u6_addr32[1] == 0) &&
-> +		(x.in6_u.u6_addr32[2] == htonl(0xffff)));
-> +}
-
-These probably belong in some general inet header rather than being
- buried inside Homa.  There's __ipv6_addr_type() but that might be a
- bit heavyweight; also ipv6_addr_v4mapped() and
- ipv6_addr_set_v4mapped() in include/net/ipv6.h.
 
