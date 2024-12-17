@@ -1,63 +1,58 @@
-Return-Path: <netdev+bounces-152554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA6719F48FB
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:35:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F303D9F491B
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:42:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD8977A1A29
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:35:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FC6B161934
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988DF1E2828;
-	Tue, 17 Dec 2024 10:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD73E1E3DC3;
+	Tue, 17 Dec 2024 10:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P3T0rn98"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wo4K0JV6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639701DF965;
-	Tue, 17 Dec 2024 10:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84ABC1E282D;
+	Tue, 17 Dec 2024 10:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734431716; cv=none; b=CcRxcHdxN9DsSrJJqAyd+GQuXmiHpW/FHfrJ4lef0AkDTjbnwW3NnXC+kYbfLL/Gm4lFk3RVAgMuQygSNCRcKmTgRnf2hb/gOHdbUgCzw1ia/Wg8QYyPDa0rf/gmni8xHnhoUibII4UklEZ/kM5RLq7Bp4V2ExkXSOSg2ROkz6g=
+	t=1734432151; cv=none; b=HTWH0YR4vLZolDrZ6AfrxW5g80tJ3DQ3vKy4tVINSqB/+ar6FYdP3oewq3470XC2V63m5he0btvSW/qXcCpSDmEcEDphKbmOLfVGOIW4WU7ljwMxqIPEjvlToxnkZPKatZZ0CM029/5AjYsLtkONbGAZdKcXGP5nvkTQMqTR+Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734431716; c=relaxed/simple;
-	bh=yDjkBFyqDhWA0hUrGZUYVCNVEP+dZZGyN7HiHVpaSMk=;
+	s=arc-20240116; t=1734432151; c=relaxed/simple;
+	bh=1DE6usUuc7I/k3TUxkIHydMtKw4QUnTOvFMSLro//cM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rL+VGhF/Qej0tBXQVKo0zIPlxi7+KQ0U4utk24WeeCviZC9/nugh25bxx7UAaMCevD0mcl7AiiwGMjMKWYMv8hkFprR9dQUqxdJA9WFmH7hgyJoNTRbe4m35a2SAyNB6OTSeKm+Acp/OcYx5y6TSdap3WyiNpo00m4+bC7aFO9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P3T0rn98; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B086BC4CED3;
-	Tue, 17 Dec 2024 10:35:11 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=J07Ec9ne4Sn0MboSV3yNkcxDJrihllZ9GmSzxjTOCrJPoM7jx9jws4yuDL02Yi1OgBDd4fGIBG3MiThZ6wh7sLjl1cOXHGO4+6QbXbfeNO0+c4fchEGVq89HLTk4fysCMwv89BjqyTGpyf5PLcGVJZl0SzCaSWfRGNulu0OiOEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wo4K0JV6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35E0EC4CED4;
+	Tue, 17 Dec 2024 10:42:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734431715;
-	bh=yDjkBFyqDhWA0hUrGZUYVCNVEP+dZZGyN7HiHVpaSMk=;
+	s=k20201202; t=1734432151;
+	bh=1DE6usUuc7I/k3TUxkIHydMtKw4QUnTOvFMSLro//cM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=P3T0rn98p7PSCmN15nKpKFHWpMt1SUb4PDGaEFALSwbhHe6wVoSfClUJiXOMDe4Ab
-	 Pv1nn+CxhIO3vP/Z6qnkyALCPB9SRxgLeLRPkKIYbtWFxM7DFIELRH3tYPT+iG05Yy
-	 ovD2E/soNrbdfVx+oPRaSY5xq0otKd0KLRTYwlleKiGGSJbrPgxOcT6KerupBDPrDA
-	 heuiHKigf3IQ+sZLfYfDlL6SiRsdfFR7vVtxkdZBE8RAT1AlO89rhEyPqM3AOYqskc
-	 JrTnGdQnHiHH+suk4oa5+GEbFmMlWkt1jHT4cOE2tSAnhOVHtDjIcRMMwkQ0ayOLRu
-	 hDvDlPX/Gdw7w==
-Date: Tue, 17 Dec 2024 10:35:09 +0000
+	b=Wo4K0JV6nAQFbJG9G+H0dHf/iGpzIigHd/jbC/R6gVIZbabBz+Wnbmk/Tz6tRM9pH
+	 JIJY58LDm1oR9uJFnUDraLOlkRm7PaGCN878Sx4lUucWgZYj7VhlR0qt7XbUTFQOY0
+	 pAL+7Fz5J47bShMWPvJ7N2uBdppKaRbZf7hiFJwI1ErkKEMqBHsL9/VZlVIuuREUa/
+	 rEUOyL2Y8JDBSL/bUHsf3cq6Y6Qi9IhU4ANQ0YRAqt13G8Fd6Nm6zr6w2tO6vLQdJ4
+	 JSIub4hDQ1Jp0u5LCCLs0lO3O1deiZIrLXGX3y1cJqnGvDVw+5V8wlSPXNWhFc95Yd
+	 /9oNtB/1I0yHg==
+Date: Tue, 17 Dec 2024 10:42:25 +0000
 From: Simon Horman <horms@kernel.org>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	tsbogend@alpha.franken.de, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, markus.stockhausen@gmx.de,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-mips@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH v2 4/4] net: mdio: Add RTL9300 MDIO driver
-Message-ID: <20241217103509.GO780307@kernel.org>
-References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
- <20241216031346.2626805-5-chris.packham@alliedtelesis.co.nz>
- <20241216164814.GH780307@kernel.org>
- <cf77f08d-0516-4adf-a701-9589f0d99eb5@alliedtelesis.co.nz>
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v8 18/27] sfc: get endpoint decoder
+Message-ID: <20241217104225.GP780307@kernel.org>
+References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
+ <20241216161042.42108-19-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,54 +61,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cf77f08d-0516-4adf-a701-9589f0d99eb5@alliedtelesis.co.nz>
+In-Reply-To: <20241216161042.42108-19-alejandro.lucero-palau@amd.com>
 
-+ Dan Carpenter
-
-On Tue, Dec 17, 2024 at 10:47:10AM +1300, Chris Packham wrote:
+On Mon, Dec 16, 2024 at 04:10:33PM +0000, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> On 17/12/2024 05:48, Simon Horman wrote:
-> > On Mon, Dec 16, 2024 at 04:13:46PM +1300, Chris Packham wrote:
-> > > Add a driver for the MDIO controller on the RTL9300 family of Ethernet
-> > > switches with integrated SoC. There are 4 physical SMI interfaces on the
-> > > RTL9300 but access is done using the switch ports so a single MDIO bus
-> > > is presented to the rest of the system.
-> > > 
-> > > Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
-
-...
-
-> > > +		if (smi_addr[0] > MAX_SMI_BUSSES)
-> > Hi Chris,
-> > 
-> > Should this condition be
-> > 
-> > 		if (smi_addr[0] >= MAX_SMI_BUSSES)
-> Yes. You are correct.
-> > > +			return dev_err_probe(dev, -EINVAL, "illegal smi bus number %d\n",
-> > > +					     smi_addr[0]);
-> > > +
-> > > +		if (smi_addr[1] > MAX_SMI_ADDR)
-> > > +			return dev_err_probe(dev, -EINVAL, "illegal smi addr %d\n", smi_addr[1]);
-> > > +
-> > > +		if (fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45"))
-> > > +			priv->smi_bus_isc45[smi_addr[0]] = true;
-> > Otherwise it seems that smi_bus_isc45 may overflow here.
-> > 
-> > Flagged by Smatch.
+> Use cxl api for getting DPA (Device Physical Address) to use through an
+> endpoint decoder.
 > 
-> Sounds like something I should start looking at for myself. Have you got a
-> link to share?
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+> ---
+>  drivers/net/ethernet/sfc/efx_cxl.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 253c82c61f43..724bca59b4d4 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -121,6 +121,14 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		goto err_memdev;
+>  	}
+>  
+> +	cxl->cxled = cxl_request_dpa(cxl->cxlmd, true, EFX_CTPIO_BUFFER_SIZE,
+> +				     EFX_CTPIO_BUFFER_SIZE);
+> +	if (IS_ERR(cxl->cxled)) {
+> +		pci_err(pci_dev, "CXL accel request DPA failed");
+> +		rc = PTR_ERR(cxl->cxlrd);
 
-Hi Chris,
+Hi Alejandro,
 
-Smatch is here: https://github.com/error27/smatch
-And my usage of it is informed by
-https://blogs.oracle.com/linux/post/smatch-static-analysis-tool-overview-by-dan-carpenter
+Should the line above use cxl->cxled rather than cxl->cxlrd?
 
-FWIIW, I run it usking kchecker on individual source files.
+Flagged by Smatch.
 
-I've also CCed the author, Dan Carpenter, for good measure.
+> +		goto err_memdev;
+> +	}
 
 ...
 
