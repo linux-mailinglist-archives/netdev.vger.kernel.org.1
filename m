@@ -1,224 +1,172 @@
-Return-Path: <netdev+bounces-152523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 209269F4742
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:21:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349129F475E
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:24:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9719D1892470
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:20:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9126A16E35F
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 09:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF24E1E3DC3;
-	Tue, 17 Dec 2024 09:17:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DD61DDA35;
+	Tue, 17 Dec 2024 09:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dTB82IgN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BAyWgjPt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0181DED72;
-	Tue, 17 Dec 2024 09:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28F01D63F6
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 09:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734427061; cv=none; b=XJrUeepQkc/X7Dm4UR/iLg29owEXONO2GT6m/+l35eXpMQvsY2CHNpslOPwS17wj+i2vvQGn6EURV0L+7GRkukguWO900hiMTzaBWPaAxo8oa/3nWtAM/0IgBdHFDQL+LnzTQY/JrafpTBAQ9ljDgGl5M9cKBXJm12hjzh00hoU=
+	t=1734427217; cv=none; b=MnQlGCTD0dtYjZCyB9oBYpupJfARBMTwHF48W9JxSjQVpdLI2zY3ME9+MCwmTGmRb4a7vyTDrhULiaaZDZzO889czaEOu2iC3j03i7DTY/8YgWKRq1TN5aKWw5VuigKau3m25zxikDCeBFm5cDQmvKK7vsrPEd0I7pPzU+A7HjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734427061; c=relaxed/simple;
-	bh=O2KIXg4uxtghksiCyE8Xf6ix27OoSAercp7ixIITozk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oYV5MfTo5McR1EMEXqn3CQVrTyYLJXvMmWl6PL4+BdJoihqTiVb0xwQOnYaEPwnBV0THNr1g3DXpEgooz1v6J2u8zhUsMe5dujKfWBux3VoCcW3t0q7O+J8DUzt0EAIDuTCzuzJOsqm+dF/JyMlbSK6WMYzndlcBZTv6vWR/94w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dTB82IgN; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21661be2c2dso36780495ad.1;
-        Tue, 17 Dec 2024 01:17:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734427059; x=1735031859; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RHB7BdWE+mdq4KW1atHm3QasLuffzsNyx3HPRXiGpvM=;
-        b=dTB82IgNDhQMwa2fH+wN5d0GHfJIm+mXRupcBtkNKA0YhGLuBA/Dcgs2PjV//FHwZD
-         oN6f9k5ExzKiW9bGBXbvrAZhYMFfCTYy36BxjIZ46JoVfBXaUTBUIHuAyP7qRFgGCnKg
-         kBPM7Sx83e0Yd7Eg7oBEKSkeYeIiuJ3FaA57zv7Tu+x7rpI9BZZHHSrn9oVQPGZokXWs
-         bvHX6aHqGw9aSPOvpjp0/VeAeYGOyvOlNESepjKezpfucS24GKuUYBdlDEblU2RFHwf/
-         N1earM+8f0bcGBxaeylhydX+gpTub4YKZYaht7VDWC1OuD8CoC1G9Roy2QoBJQ3DaAHW
-         lyBw==
+	s=arc-20240116; t=1734427217; c=relaxed/simple;
+	bh=h49wb3/FMFiEkSL2cqaXQUDAqaoOthdH188do6RuISM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=maJDTApLB8uPVWPSrsiK0byUJm5Uut8LBAFnaU33tIwHT04o2Dov2420EHhGyQ1Y06ixqDUtGATWe3Guhja2he/h/KcVgWDTrL00NZSz2wzzgkEpQZykUj6RpBTp7Hi9/GL76+0hgjSnQs1DyC6HIAYAIJQ5iJdK6jbSchPCT3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BAyWgjPt; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734427214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ECFrhsJcD9yaPs9mZl15tYc8r1V+g7whohkb6M/rkZg=;
+	b=BAyWgjPteW3eXadPGColjhX2qgmusFnUlU4wwE36vLHn0uRk9IE+u6zpCAEgA7eDc3JxY3
+	vKKklECs+ZXdvEDogrZWW2nSs0BRheItoceQKc6C0idn8CBXz44qJVtxQvSYiIfT01Gk/d
+	c1sVbp5kvRo0tSI496SFvcRtzXIvImA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-8V70qmlKN629fnZBpXvW1g-1; Tue, 17 Dec 2024 04:20:13 -0500
+X-MC-Unique: 8V70qmlKN629fnZBpXvW1g-1
+X-Mimecast-MFC-AGG-ID: 8V70qmlKN629fnZBpXvW1g
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4361c040ba8so22118705e9.1
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 01:20:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734427059; x=1735031859;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RHB7BdWE+mdq4KW1atHm3QasLuffzsNyx3HPRXiGpvM=;
-        b=d8GyN+AK2GcPqy0GWK8/hIO3pA1F4n/USKiJk5VJ0BxO9fF5R7CKYozGcTEvDJGKPH
-         HWwaJYJl+taGkokqKlm3nheJ5SK5S0EROIZ3Q60ZtW3PyVGoBeXjT8K8uaG9jofLzZ0Q
-         qwZhmaLcKU9wcU88gqUbmXSXkLNYtF6QC+PorUEoBJoy79fAYHgNTdWPur+hhgYUVXDp
-         rVlxKZHqjT/0PZ5aRo/5dlxYoU4tqLFHgqdcZu37Be32ZZsCrT1XM3ApjBVca2Qi8SZO
-         Yp771IG8bglNBS8gvpPbdYAewwpsZJI4cXl5V3y5bhr0YRfKEL5Imhv5x/rAvkj3ZF/3
-         XI/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUYbesz5ypB9VxHaYRbgcIe8obi0J0gF/uQkxRI5gb8tyql9KT+b+hGgYjVev60V9xEDDXSyrsDNm384H0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjWepk6AE6gJy64lOSR3BRtbp8JrzIZbkRdOyYfjgfMJBH4sPT
-	pBG6BjM7kLpKLVq6mwod3GUxZWJ6p0pAYGgW/ZRCCwoG2YDH9FZz9HbaXg==
-X-Gm-Gg: ASbGnctEIhdZBDOcWbSCl/AulYp9J3v8q8Xmp3cHT6jTkkYG1gMdUYEnXlVIsOZUyok
-	g/ksJ3Ziw/aVqDz47bBHsSxPIcsSsUhkC4R+OmM6XBAM2fd6HB/Al3lNGkiXXZjqrbVjLdbHsmn
-	4GhAUecDgGptsKzJ44hunvQph198Ju7nB2KtQlEI+bdwOnhfmltILthr9sw2DH7sG3Xk05rynsS
-	RxVYWyZw+tKcCnxGjfffkFpRd2qz12Z0jP+ILT+aDVF4c0iTRtfk37nAsz+RT9CHbTJfg==
-X-Google-Smtp-Source: AGHT+IEpUUha2LoiankVqO1OxKO8y+rZTQ9zEw/8VBZ4PS0Jm8U+EJqmmiMzkJu6dtkcwNLxH8qP9g==
-X-Received: by 2002:a17:903:41cd:b0:215:8ca3:3bac with SMTP id d9443c01a7336-218929a1f14mr212249005ad.16.1734427058537;
-        Tue, 17 Dec 2024 01:17:38 -0800 (PST)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-218a1db74e3sm55007165ad.30.2024.12.17.01.17.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 01:17:37 -0800 (PST)
-From: Furong Xu <0x1207@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	xfr@outlook.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net v1] net: stmmac: Drop useless code related to ethtool rx-copybreak
-Date: Tue, 17 Dec 2024 17:17:12 +0800
-Message-Id: <20241217091712.383911-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1734427212; x=1735032012;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ECFrhsJcD9yaPs9mZl15tYc8r1V+g7whohkb6M/rkZg=;
+        b=g6sEJoXIRTxxLbJlCQwvL1terjJn+XJZSuRfSzu3sseaheGLnvrZ7qBVscGCuuUzLT
+         2bUURXcv+EKP07uMvVbo64MpWGROjcc3NmuKPCg1BwgeyqglmXqzzmErJ3PtgevhdN+w
+         imCu+PsRl1UguULwI/8MMeCRoLkPQtAQ1f6jLKGZvYIWp3XfUzdbxhWwhObEsuHHnu6T
+         2ch2/05K058K/DUp0dKHh4L6OpAxdu9w/A+RksseoJbc+Sugxq6EqzZ8aD3BSD3QAxP6
+         8FZ6XJm8tYNRZQrKM2zs5gMUNUQQ9S0n8Tq26LlpfjCC8Lm1O6t6a1XqHjpiBoYOg6lp
+         Nx2w==
+X-Gm-Message-State: AOJu0YymD4P8mgLXoN0GMgIVZ9oOpU05jrnAAS6sTiXmJlW7DO2PSkAO
+	T4kVvgRKvnSfnZ0oTFx/Iv4/maxxNUFyTP8HHn403uitY/ZlOjK+QVpgvoguU25QXrzW4maG24C
+	sYyxmD39Wux0barYiIyGPrAPvgjdEOlpKSiItdaTrK9xVjeRG0NXnYQ==
+X-Gm-Gg: ASbGnctEn66S5pW0Lzm6uAJ5yeL98FsGcXrmeYECdG+c2FxUz/0E/WU+l6x3ogHdWCB
+	QyU+XBq82obxukdbYJCausyi7WZk+YZPa/z6yxowZ2c1/vXMrlSGtF4quZJVkaacl4aBm6tjTae
+	v95n+or16d7NWEurRTVLqqlbqmJ9cAyJB1im9kzVQpbrDoq3lFkPg/kRAhYk+fqSP+WTFcUpUDJ
+	+tI/JEQ0sCzrDUViHO5T2bY5W+AjlxUbxSM3+4g1iZVvZdrMOnHZLkybfJbpiTlt7QVwVDZ9V8o
+	UCYO6ULQmQ==
+X-Received: by 2002:a5d:6daa:0:b0:385:e38f:8dd with SMTP id ffacd0b85a97d-3888e0b8e56mr14402500f8f.46.1734427212448;
+        Tue, 17 Dec 2024 01:20:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFT45Ia9tcjRNm5HiAwicXMmieHdb6en5L8TLMBtkb6z8PazXLW14+YCs65EkY3Hnh0oRocUQ==
+X-Received: by 2002:a5d:6daa:0:b0:385:e38f:8dd with SMTP id ffacd0b85a97d-3888e0b8e56mr14402465f8f.46.1734427212064;
+        Tue, 17 Dec 2024 01:20:12 -0800 (PST)
+Received: from [192.168.88.24] (146-241-69-227.dyn.eolo.it. [146.241.69.227])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c8016bdfsm10656780f8f.43.2024.12.17.01.20.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2024 01:20:11 -0800 (PST)
+Message-ID: <118bbd72-b1fb-4da2-b1bd-5a66ecfe7322@redhat.com>
+Date: Tue, 17 Dec 2024 10:20:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 net-next 3/4] net: enetc: add LSO support for i.MX95
+ ENETC PF
+To: Wei Fang <wei.fang@nxp.com>, claudiu.manoil@nxp.com,
+ vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, frank.li@nxp.com,
+ horms@kernel.org, idosch@idosch.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
+References: <20241213021731.1157535-1-wei.fang@nxp.com>
+ <20241213021731.1157535-4-wei.fang@nxp.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241213021731.1157535-4-wei.fang@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-After commit 2af6106ae949 ("net: stmmac: Introducing support for Page
-Pool"), these code turned to be useless and users of ethtool may get
-confused about the unhandled rx-copybreak parameter.
+On 12/13/24 03:17, Wei Fang wrote:
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+> index 09ca4223ff9d..41a3798c7564 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> @@ -533,6 +533,224 @@ static void enetc_tso_complete_csum(struct enetc_bdr *tx_ring, struct tso_t *tso
+>  	}
+>  }
+>  
+> +static inline int enetc_lso_count_descs(const struct sk_buff *skb)
 
-This patch mostly reverts
-commit 22ad38381547 ("stmmac: do not perform zero-copy for rx frames")
+Please, don't use inline in c files
 
-Fixes: 2af6106ae949 ("net: stmmac: Introducing support for Page Pool")
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 -
- .../ethernet/stmicro/stmmac/stmmac_ethtool.c  | 39 -------------------
- .../net/ethernet/stmicro/stmmac/stmmac_main.c |  5 ---
- 3 files changed, 46 deletions(-)
+> +{
+> +	/* 4 BDs: 1 BD for LSO header + 1 BD for extended BD + 1 BD
+> +	 * for linear area data but not include LSO header, namely
+> +	 * skb_headlen(skb) - lso_hdr_len. And 1 BD for gap.
+> +	 */
+> +	return skb_shinfo(skb)->nr_frags + 4;
+> +}
+> +static int enetc_lso_hw_offload(struct enetc_bdr *tx_ring, struct sk_buff *skb)
+> +{
+> +	struct enetc_tx_swbd *tx_swbd;
+> +	struct enetc_lso_t lso = {0};
+> +	int err, i, count = 0;
+> +
+> +	/* Initialize the LSO handler */
+> +	enetc_lso_start(skb, &lso);
+> +	i = tx_ring->next_to_use;
+> +
+> +	enetc_lso_map_hdr(tx_ring, skb, &i, &lso);
+> +	/* First BD and an extend BD */
+> +	count += 2;
+> +
+> +	err = enetc_lso_map_data(tx_ring, skb, &i, &lso, &count);
+> +	if (err)
+> +		goto dma_err;
+> +
+> +	/* Go to the next BD */
+> +	enetc_bdr_idx_inc(tx_ring, &i);
+> +	tx_ring->next_to_use = i;
+> +	enetc_update_tx_ring_tail(tx_ring);
+> +
+> +	return count;
+> +
+> +dma_err:
+> +	do {
+> +		tx_swbd = &tx_ring->tx_swbd[i];
+> +		enetc_free_tx_frame(tx_ring, tx_swbd);
+> +		if (i == 0)
+> +			i = tx_ring->bd_count;
+> +		i--;
+> +	} while (count--);
+> +
+> +	return 0;
+> +}
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 1d86439b8a14..b8d631e559c0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -126,7 +126,6 @@ struct stmmac_rx_queue {
- 	unsigned int cur_rx;
- 	unsigned int dirty_rx;
- 	unsigned int buf_alloc_num;
--	u32 rx_zeroc_thresh;
- 	dma_addr_t dma_rx_phy;
- 	u32 rx_tail_addr;
- 	unsigned int state_saved;
-@@ -266,7 +265,6 @@ struct stmmac_priv {
- 	int sph_cap;
- 	u32 sarc_type;
- 
--	unsigned int rx_copybreak;
- 	u32 rx_riwt[MTL_MAX_TX_QUEUES];
- 	int hwts_rx_en;
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index 1d77389ce953..16b4d8c21c90 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -1227,43 +1227,6 @@ static int stmmac_get_ts_info(struct net_device *dev,
- 		return ethtool_op_get_ts_info(dev, info);
- }
- 
--static int stmmac_get_tunable(struct net_device *dev,
--			      const struct ethtool_tunable *tuna, void *data)
--{
--	struct stmmac_priv *priv = netdev_priv(dev);
--	int ret = 0;
--
--	switch (tuna->id) {
--	case ETHTOOL_RX_COPYBREAK:
--		*(u32 *)data = priv->rx_copybreak;
--		break;
--	default:
--		ret = -EINVAL;
--		break;
--	}
--
--	return ret;
--}
--
--static int stmmac_set_tunable(struct net_device *dev,
--			      const struct ethtool_tunable *tuna,
--			      const void *data)
--{
--	struct stmmac_priv *priv = netdev_priv(dev);
--	int ret = 0;
--
--	switch (tuna->id) {
--	case ETHTOOL_RX_COPYBREAK:
--		priv->rx_copybreak = *(u32 *)data;
--		break;
--	default:
--		ret = -EINVAL;
--		break;
--	}
--
--	return ret;
--}
--
- static int stmmac_get_mm(struct net_device *ndev,
- 			 struct ethtool_mm_state *state)
- {
-@@ -1390,8 +1353,6 @@ static const struct ethtool_ops stmmac_ethtool_ops = {
- 	.set_per_queue_coalesce = stmmac_set_per_queue_coalesce,
- 	.get_channels = stmmac_get_channels,
- 	.set_channels = stmmac_set_channels,
--	.get_tunable = stmmac_get_tunable,
--	.set_tunable = stmmac_set_tunable,
- 	.get_link_ksettings = stmmac_ethtool_get_link_ksettings,
- 	.set_link_ksettings = stmmac_ethtool_set_link_ksettings,
- 	.get_mm = stmmac_get_mm,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 16b8bcfa8b11..6bc10ffe7a2b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -77,7 +77,6 @@ module_param(phyaddr, int, 0444);
- MODULE_PARM_DESC(phyaddr, "Physical device address");
- 
- #define STMMAC_TX_THRESH(x)	((x)->dma_conf.dma_tx_size / 4)
--#define STMMAC_RX_THRESH(x)	((x)->dma_conf.dma_rx_size / 4)
- 
- /* Limit to make sure XDP TX and slow path can coexist */
- #define STMMAC_XSK_TX_BUDGET_MAX	256
-@@ -107,8 +106,6 @@ static int buf_sz = DEFAULT_BUFSIZE;
- module_param(buf_sz, int, 0644);
- MODULE_PARM_DESC(buf_sz, "DMA buffer size");
- 
--#define	STMMAC_RX_COPYBREAK	256
--
- static const u32 default_msg_level = (NETIF_MSG_DRV | NETIF_MSG_PROBE |
- 				      NETIF_MSG_LINK | NETIF_MSG_IFUP |
- 				      NETIF_MSG_IFDOWN | NETIF_MSG_TIMER);
-@@ -3927,8 +3924,6 @@ static int __stmmac_open(struct net_device *dev,
- 		}
- 	}
- 
--	priv->rx_copybreak = STMMAC_RX_COPYBREAK;
--
- 	buf_sz = dma_conf->dma_buf_sz;
- 	for (int i = 0; i < MTL_MAX_TX_QUEUES; i++)
- 		if (priv->dma_conf.tx_queue[i].tbs & STMMAC_TBS_EN)
--- 
-2.34.1
+I'm sorry for not catching the issue early, but apparently there is an
+off-by-one in the above loop: if 'count' bds have been used, it will
+attempt to free 'count + 1' of them.
+
+The minimal fix should be using:
+
+	} while (--count);
+
+/P
 
 
