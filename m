@@ -1,122 +1,126 @@
-Return-Path: <netdev+bounces-152599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464EB9F4C4B
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:31:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D557E9F4C63
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:35:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA3951743E9
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:22:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A99C11884DA0
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A621F1312;
-	Tue, 17 Dec 2024 13:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E031F3D41;
+	Tue, 17 Dec 2024 13:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8dBlWzz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ciOv8CiU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49DB1D1730;
-	Tue, 17 Dec 2024 13:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A521F3D29
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 13:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734441748; cv=none; b=u3oVng2v2kf+MccfJA5819nfC62doYFr3MXdI0vIW4NaKRFwPRnNqros4KWNVlpXzJcW0wW7TR67mZfvAvyk+PGxmW2xDa3/yrC6il9ZbJgf1xSnT2s+Iw6gI5duxAvtXph886PSFhShuMHE+EBFJ3ztiAdbpuLlnzj1mEch96o=
+	t=1734442037; cv=none; b=AKFTm4jBxceDupbnLzRMvK59GRQu4a4h9XelBe4tRxEjJ0mDHZgW/lUD4E902RAKJTVoqUZSUdWuneKUn0cvzcUxaG0pDWHdURg5MnBohV3195DCbWbnH2qjTaU0OR0veqt+feXRQMcnCo36Xllk9tAq8zAg67S3XX+874D0o3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734441748; c=relaxed/simple;
-	bh=weqUtistC/j/aUBCf8HRH1GcWzJ9pgObt2tpCXoIBzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cIFTVin98KiLo/IBKfSRMU500kyFXM/0Da0mPUSjx8kzK+3IEecbveVofHWOYdLw/evdbVeTsowAdXcY25UI+CHGxvuAihjG0psKQ/slJT214YVx55oM0l4Nmqzlt4u1hVmQl9UqO8yGcJgfHPkkg+6+wM+ZU6kZslfJjiGD8Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8dBlWzz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8002DC4CED4;
-	Tue, 17 Dec 2024 13:22:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734441747;
-	bh=weqUtistC/j/aUBCf8HRH1GcWzJ9pgObt2tpCXoIBzs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C8dBlWzzU3fl8z0UBorZZGsKSLPdtKmczs5kfCDcNl7HzvRahSRsrJrdLkhU8rr+G
-	 Sup9OwsfraUjuVpFYpbxhyddIFsBZERbepnkHoCYcqEk2ZQUoCcW1eN/iY5NSGXt0O
-	 vC2zxxYN4wO+FRcCCrY4silnU3diePleRkMQsv4hKVLPcvL3bR+d8eaTLK/RQGPbP3
-	 qXklhF/Ztq2s838TVaSar5ZuXSsPAeDO7p88NplEZjbfGxggqVTcSD1PtbuzgLyK4G
-	 JjxpfBtFLBzB4uzrFOQ+g79fBJXN0d756ZAuRRjqBFh7JdcwP0JWug/t3yICfC3Sot
-	 d8eeG8oaozdUQ==
-Date: Tue, 17 Dec 2024 15:22:22 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>,
-	Aditya Prabhune <aprabhune@nvidia.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Arun Easi <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>,
-	Bert Kenward <bkenward@solarflare.com>,
-	Matt Carlson <mcarlson@broadcom.com>,
-	Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	Jean Delvare <jdelvare@suse.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: Re: [PATCH v3] PCI/sysfs: Change read permissions for VPD attributes
-Message-ID: <20241217132222.GK1245331@unreal>
-References: <18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org>
+	s=arc-20240116; t=1734442037; c=relaxed/simple;
+	bh=oXu9vyR8bEvz/6FdRmpHZsnE9d8Gvkxr2zsBDjlNIDE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ZmWPEmg4KbN/D9beXIc6Z9z/qvmOb3Q0YqNkvNZpt0Vc+eCErY+io4jdFItShmzfI7FEii2NoZuG/QVW26hJtNyeQ2A+WzywhnEaHIWjoP3vsQSpdxE/qAMN4hrdSmBN3/QM8b5wTctp0Fl8rq5OdkrNXB4f45keTnodY5BHMSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ciOv8CiU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734442034;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k09JBCTkQ8smzatbd5fY89UwRwfw+yFRHrgaj7+5wvE=;
+	b=ciOv8CiUeVPkTIaHH+ibDI55OTbiaQME2UDfm64kfeuTrH+PXIOarS9mc7IrucqBHqdjEC
+	6qoi58wWyVDKPnyNIfXEY4/2iVEAZMy/7CyPQOQIOPxjmE3Dwm7NHKk3bxNrHLe7O45a95
+	+B1FcQl8X52DuwPAM6mD45+Wgu76DMs=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-333-oB4ynsq5OumJKMnUNPZI7g-1; Tue,
+ 17 Dec 2024 08:27:09 -0500
+X-MC-Unique: oB4ynsq5OumJKMnUNPZI7g-1
+X-Mimecast-MFC-AGG-ID: oB4ynsq5OumJKMnUNPZI7g
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 134601956087;
+	Tue, 17 Dec 2024 13:27:08 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.81.98])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 46C7D30044C1;
+	Tue, 17 Dec 2024 13:27:05 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  Yotam Gigi <yotam.gi@gmail.com>,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Ido Schimmel <idosch@nvidia.com>,  Eelco
+ Chaudron <echaudro@redhat.com>,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] psample: adjust size if rate_as_probability is set
+In-Reply-To: <20241217113739.3929300-1-amorenoz@redhat.com> (Adrian Moreno's
+	message of "Tue, 17 Dec 2024 12:37:39 +0100")
+References: <20241217113739.3929300-1-amorenoz@redhat.com>
+Date: Tue, 17 Dec 2024 08:27:02 -0500
+Message-ID: <f7ty10etp7d.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Dec 03, 2024 at 02:15:28PM +0200, Leon Romanovsky wrote:
-> The Vital Product Data (VPD) attribute is not readable by regular
-> user without root permissions. Such restriction is not needed at
-> all for Mellanox devices, as data presented in that VPD is not
-> sensitive and access to the HW is safe and well tested.
-> 
-> This change changes the permissions of the VPD attribute to be accessible
-> for read by all users for Mellanox devices, while write continue to be
-> restricted to root only.
-> 
-> The main use case is to remove need to have root/setuid permissions
-> while using monitoring library [1].
-> 
-> [leonro@vm ~]$ lspci |grep nox
-> 00:09.0 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
-> 
-> Before:
-> [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
-> -rw------- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
-> After:
-> [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
-> -rw-r--r-- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
-> 
-> [1] https://developer.nvidia.com/management-library-nvml
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Adrian Moreno <amorenoz@redhat.com> writes:
+
+> If PSAMPLE_ATTR_SAMPLE_PROBABILITY flag is to be sent, the available
+> size for the packet data has to be adjusted accordingly.
+>
+> Also, check the error code returned by nla_put_flag.
+>
+> Fixes: 7b1b2b60c63f ("net: psample: allow using rate as probability")
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 > ---
-> Changelog:
-> v3:
->  * Used | to change file attributes
->  * Remove WARN_ON
-> v2: https://lore.kernel.org/all/61a0fa74461c15edfae76222522fa445c28bec34.1731502431.git.leon@kernel.org
->  * Another implementation to make sure that user is presented with
->    correct permissions without need for driver intervention.
-> v1: https://lore.kernel.org/all/cover.1731005223.git.leonro@nvidia.com
->  * Changed implementation from open-read-to-everyone to be opt-in
->  * Removed stable and Fixes tags, as it seems like feature now.
-> v0:
-> https://lore.kernel.org/all/65791906154e3e5ea12ea49127cf7c707325ca56.1730102428.git.leonro@nvidia.com/
-> ---
->  drivers/pci/vpd.c | 7 +++++++
->  1 file changed, 7 insertions(+)
 
-Bjorn,
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
-Kind reminder.
+>  net/psample/psample.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/psample/psample.c b/net/psample/psample.c
+> index a0ddae8a65f9..25f92ba0840c 100644
+> --- a/net/psample/psample.c
+> +++ b/net/psample/psample.c
+> @@ -393,7 +393,9 @@ void psample_sample_packet(struct psample_group *group,
+>  		   nla_total_size_64bit(sizeof(u64)) +	/* timestamp */
+>  		   nla_total_size(sizeof(u16)) +	/* protocol */
+>  		   (md->user_cookie_len ?
+> -		    nla_total_size(md->user_cookie_len) : 0); /* user cookie */
+> +		    nla_total_size(md->user_cookie_len) : 0) + /* user cookie */
+> +		   (md->rate_as_probability ?
+> +		    nla_total_size(0) : 0);	/* rate as probability */
+>  
+>  #ifdef CONFIG_INET
+>  	tun_info = skb_tunnel_info(skb);
+> @@ -498,8 +500,9 @@ void psample_sample_packet(struct psample_group *group,
+>  		    md->user_cookie))
+>  		goto error;
+>  
+> -	if (md->rate_as_probability)
+> -		nla_put_flag(nl_skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
+> +	if (md->rate_as_probability &&
+> +	    nla_put_flag(nl_skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY))
+> +		goto error;
+>  
+>  	genlmsg_end(nl_skb, data);
+>  	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
 
-Thanks
 
