@@ -1,97 +1,65 @@
-Return-Path: <netdev+bounces-152602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 888519F4C75
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:37:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEDDB9F4C85
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 14:38:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22B03188F0E8
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:29:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCE7518925C2
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737A81F3D45;
-	Tue, 17 Dec 2024 13:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D651F4274;
+	Tue, 17 Dec 2024 13:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XhV7AlBI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BhyYMaiy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B746A16ABC6
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 13:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873881F3D57;
+	Tue, 17 Dec 2024 13:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734442131; cv=none; b=UHgNQvyGh2SSbLVHQIN401giMMe8beCubRYKJaJqbraiZVeZM/fnfQBxNLwjSBnrQpcHzq8Nk5KPIRlDyT9fJZ3+4b50J+gMywZAoq1VyvFpGSMas9CqcYaqWcqts6IGJseRn9McZq9SwMnSzaujwY4be52/JPEdmhMyRk/wtng=
+	t=1734442444; cv=none; b=A/mAN4tmkaYN3CanRwyyVmCYGlYvbEgMlR5E/jTxJ41bUBDWbORk2DW+54PQkIqxLcTUVCvEDrNU87O+c45Mo7xBTH5E/ISIwJ2A1OJRK6Jz28+wJeFo6kWg/2K77N5+1ZTRa14MRAhbjr5+3JlqvpcWUAK3krDsq6L2bw+mB/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734442131; c=relaxed/simple;
-	bh=YWhUUe8D1P3L8U2stLcOlVoMOUfmEGkLilRRdNtlKDk=;
+	s=arc-20240116; t=1734442444; c=relaxed/simple;
+	bh=FV7yQyFVJ8Ft59KQYAkWNEMbxJuXWysadQd4/zHTn00=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GXnD9CBIuaTcHWFqPqQjY+fvadfNdoE6bXWiLDsqb04TCcwmAQ44CZ1Tha6HhcEn30WgDHhrvSeyR4sB0lf5UUUwt9ybRyjUhDwD0wj/dbTirVVNez6+DDCUnuR+GYvTUJNM4nFr8VfJlCvFpd0YCHBrY88AajcWOXNtaCC/I34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XhV7AlBI; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-436203f1203so4802095e9.2
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 05:28:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734442128; x=1735046928; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nUDenbDX1h9iAt0PlQfUTXKl10guHO6KftpFnMZ6hpg=;
-        b=XhV7AlBIb/Qo2HHrhT5kis3yPNPtXxj7Xu3T/CMQ+js90r2WIRdlTnzKID7hwM8wOV
-         zhfcH1SXZaFrJZ4JGs0nKtIir1O1tiRhRF0PI8liNSTBY+K6yHkcG7fDxFKWYR5IJ/CL
-         HwuuVgWU+4BZ3GSGadXcHEfF/pu4t347aPlhUWABRqDly1XRePAxWsRKfbtRmwwZe3X2
-         rhxohy3SFYJSgUdv5UzFZn4q3lOnWCK2QM8doqOq7P6YG6/f9RQnM4nKZPi4iWgYdll4
-         azegCGtbEHTsiNHvD0tq9YXgdh/DDXB/UBDBToReDV6neXZnwkULykpBtQASgK0O6Zmj
-         KmDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734442128; x=1735046928;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nUDenbDX1h9iAt0PlQfUTXKl10guHO6KftpFnMZ6hpg=;
-        b=mYtyw0Z1RdsS1/XIrYFhF0rIFj3gWvK0smqj72vwQskP2Et8YJWv4X/rj1neBuwcph
-         KeSsSZhm/T4nck5AiaW5IuuVr4Rcq+1u50W+fzVn8+wjT9MgK0Sq0fEibUEMbfic/jCB
-         P5wYY6oh4Gx+3e2KKFkqdrK04/I1luhTwoWudO5Zd5qLY6ePVkBbFinKMsY7cqvhuoQW
-         8EowVITEPCoN3r8zeoZWGLNcvoG4wGqG4+7NT2AETxfPyesteGunvoNFZa64DPoKhcVX
-         cmnAqvpUdfLp184jzy6sdkfQfD/DzwUq+mcBhF6EmDvR26b28UbzX4jYXPHoBDsQkFyv
-         RTWg==
-X-Forwarded-Encrypted: i=1; AJvYcCWrxPCmWfPOua0pHxMqXoyAStRfjem3pMkruTPEttmYcoY2rpL69i34Q6mmb3rhcdjKmD39wVQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzK74cH/aeVZqE0i4CpHVZr4Jw1OuCp25dlUqyrA66zc0my1Nqe
-	+7hsPrx0bC/rVzUbVFXixBHUw7SWgPyug0FZMS8sCnZZKh1ybOFe0ZrzFb7x
-X-Gm-Gg: ASbGnctv+fzfzM1cC7/i+t1rVM00pLEKN/ce6z2tx0U7ZZ6hEbfFFFP/aI0M+UkavpD
-	QIloGlwpsEV9JAW69kTQ9of0kFG2sNWh1IkbJCca4cD1zE1MOZlJtrt6ySE21Qjf1/6UzpfqB/n
-	ijWmmQdrcsYsyvNeJS6gpeXgLmCFY4RNaeIxcUmLw7TQEfkN89mpAxWZUB08WXoBTmYh7hZR6+H
-	e2obsYjzA+NTVnLERwnvU9dmawvxXZKKM3TPEK9ywyq
-X-Google-Smtp-Source: AGHT+IF/DRs/Nwdl9JsVoCGwTnoF3EeClrKMhoBi+6fRalm1al8cf070gAnDWkBIZFbygt9EqboVfw==
-X-Received: by 2002:a05:600c:4f0b:b0:434:941c:9df2 with SMTP id 5b1f17b1804b1-4362aab44b3mr58489965e9.8.1734442127700;
-        Tue, 17 Dec 2024 05:28:47 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436362b6526sm116364255e9.27.2024.12.17.05.28.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 05:28:47 -0800 (PST)
-Date: Tue, 17 Dec 2024 15:28:44 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Lorenzo Bianconi <lorenzo@kernel.org>,
-	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
-	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	lorenzo.bianconi83@gmail.com
-Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
- EN7581 SoC
-Message-ID: <20241217132844.xapgmkjkxbdguj7h@skbuf>
-References: <Z1sXTPeekJ5See_u@lore-desk>
- <20241212184647.t5n7t2yynh6ro2mz@skbuf>
- <Z2AYXRy-LjohbxfL@lore-desk>
- <20241216154947.fms254oqcjj72jmx@skbuf>
- <Z2B5DW70Wq1tOIhM@lore-desk>
- <f8e74e29-f4b0-4e38-8701-a4364d68230f@lunn.ch>
- <Z2FGjeyawnhABnRb@pengutronix.de>
- <Z2FGjeyawnhABnRb@pengutronix.de>
- <20241217115448.tyophzmiudpxuxbz@skbuf>
- <Z2FtFR6Ll6c-XPTX@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NbPrfP/a4zzk97IGS+11XofUEm3Wa+Zlku4rh1tMQJNBmG1/p+UFHGHe2w5bI5pk81FWO19TJjqdAkCRK+sDEIhXjmlYb1uNKH6azbWzAUXgZ5FtRZBddxIuGU8v7CwbbcHPl3mHd3m6j3vveQDzsqfyc2XuIWOogpbM9KPKvbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BhyYMaiy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC339C4CED3;
+	Tue, 17 Dec 2024 13:34:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734442444;
+	bh=FV7yQyFVJ8Ft59KQYAkWNEMbxJuXWysadQd4/zHTn00=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BhyYMaiy6aGNyGePj+6azwdsJCJBXqJMosk4meHT7M19ZUxxNbfzJ9H7T90QaWUSQ
+	 Qb1AfoEMow6wqOxQYjgewm7r2Aj0/YjQtY/Ccv99dqYWlLspdzKric/3xd6LsnCer1
+	 +2lHwtFDAWUm/6hQ3hUXD8hEVZeyzArkUhBb8CQCmhBGpHvTwuki5npxwkZcSSgnSw
+	 7Xjfd4NeepGzRhbSyeV/mXfLywHW2wnyvFH/LDNXUmkQAGQRp7M6YXJXv3izwYONN7
+	 S/mrFpM/xwiDuuiCBRlzRTa9bF9IguiQeAXRa7nfrI5T07mZXyFcrwuWRcVZ1NmbbJ
+	 Ju5UYkSc3H/LA==
+Date: Tue, 17 Dec 2024 07:34:02 -0600
+From: Rob Herring <robh@kernel.org>
+To: Marek Vasut <marex@denx.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Fedor Ross <fedor.ross@ifm.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	Tristram Ha <tristram.ha@microchip.com>
+Subject: Re: [PATCH net-next 0/2] net: dsa: microchip: Add of config for LED
+ mode for ksz87xx and ksz88x3
+Message-ID: <20241217133402.GA1420212-robh@kernel.org>
+References: <20241209-netdev-net-next-ksz8_led-mode-v1-0-c7b52c2ebf1b@ifm.com>
+ <c934f10d-1a75-4ca8-bd0b-f08544c7d333@lunn.ch>
+ <c970bdbc-5831-470c-9040-b37c4f76baf2@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,27 +68,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z2FtFR6Ll6c-XPTX@pengutronix.de>
+In-Reply-To: <c970bdbc-5831-470c-9040-b37c4f76baf2@denx.de>
 
-On Tue, Dec 17, 2024 at 01:22:45PM +0100, Oleksij Rempel wrote:
-> I'm still thinking about best way to classify DSA user port traffic.
-> Will it be enough to set classid on user port?
+On Mon, Dec 09, 2024 at 09:26:33PM +0100, Marek Vasut wrote:
+> On 12/9/24 7:22 PM, Andrew Lunn wrote:
+> > On Mon, Dec 09, 2024 at 06:58:50PM +0100, Fedor Ross wrote:
+> > > Add support for the led-mode property for the following PHYs which have
+> > > a single LED mode configuration value.
+> > > 
+> > > KSZ8765, KSZ8794 and KSZ8795 use register 0x0b bits 5,4 to control the
+> > > LED configuration.
+> > > 
+> > > KSZ8863 and KSZ8873 use register 0xc3 bits 5,4 to control the LED
+> > > configuration.
+> > 
+> > PHY and MAC LEDs should be configured via /sys/class/leds. Please take
+> > a look at how the Marvell PHY and DSA driver, qca8k driver etc do
+> > LEDs.
+> According to KSZ8794 datasheet, this register 0xb is Global Control:
 > 
-> tc filter add dev lan0 protocol all flower skip_hw \
->     action classid 1:1
-> tc filter add dev lan1 protocol all flower skip_hw \
->     action classid 1:2
+> Register 11 (0x0B): Global Control 9
 > 
-> And then process it on the conduit port:
-> # Add HTB Qdisc on the conduit interface
-> tc qdisc add dev conduit0 root handle 1: htb default 1
-> 
-> # Define rate-limiting classes
-> tc class add dev conduit0 parent 1: classid 1:1 htb rate 100mbit burst 5k
-> tc class add dev conduit0 parent 1: classid 1:2 htb rate 100mbit burst 5k
-> 
-> Or the classid will not be transferred between devices and i'll need to
-> use something like skbedit?
+> So this does not seems like per-port LED control, but rather some global
+> control for all LEDs on all ports on the chip ?
 
-I don't know, if you find out, let us know.
+Still should be able to use the standard binding and sysfs controls. The 
+driver just has to reject invalid combinations.
+
+Rob
+
 
