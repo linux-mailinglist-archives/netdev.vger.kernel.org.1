@@ -1,114 +1,159 @@
-Return-Path: <netdev+bounces-152585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C6E99F4AF9
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:32:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A40E9F4B0F
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 13:38:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D258B16CF28
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:32:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 529FE16D48D
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 12:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943F41F03F1;
-	Tue, 17 Dec 2024 12:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCE31F1312;
+	Tue, 17 Dec 2024 12:38:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qul2Xkte"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iz0FwkVn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E341712C475
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 12:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6C71D47D9;
+	Tue, 17 Dec 2024 12:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734438758; cv=none; b=GHOtJaEh0bpDQqIMLO2TOUoEg6BVg6uDw4Ajz7z5iuj9TFTD/jQ3XjaoMPn75fTUXdRkJQu6liLmKCuYg5Wm8yUDno8P/ybNda3KARzAxMmX+jydCSf0UroeBCnYlcoWfyMUUildk3BLx5BVDI8xX6OQsSOoT9SFFwZtlJar/1Y=
+	t=1734439091; cv=none; b=MLIzu1BjizkzkFAhVS8C8dzz/KM9VgVsaod4im/hHDPa7kXHcCQuvYuSDsm97nGYZKaayrxd48bFKMjmReWDMT6l6t10KS91P25vbS2qT0rCbqNYvY6MzkpRxyA41jQT4q8KNrwvoX5QMuROmy2yJp3EnItKeHx1Zkr/Si+Tpto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734438758; c=relaxed/simple;
-	bh=YbfDs8LoY5asKM7zZM/qu8gLr3JGUTt7arQC8J9od4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=px0SaBXtkv0JXKR3etqx4aF0aC+JcBvAWT+fSDrzxbvFUuQ6+vzyMsyXB0beZxnTvJSAkr+Q4kdKJTspGrFxj7r/eJHENEfGMaaVBEHp7ip0APOFf8rh1E9hSG4sVwdFjs2YLCdqYMXq17XA6VMzo5meO8TPdjlGO58k0xLzMoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Qul2Xkte; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d4e2aa7ea9so2114271a12.2
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 04:32:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734438755; x=1735043555; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vadTVklg9DZ5KZn/j1FjuzNmgd1jDV/1Li8ndKsd3tw=;
-        b=Qul2XkteNGKGuQGn2HWKJC0pzrkQhXq4k9nAgHHAhL1CeOEoBx5Wr3FfWpsXjffc4r
-         t8MqNdhX3kjOpCrCCyY8MZ8txcn3F4Bry7Ibbb6vQ5osDMq3qOigAaxpPJCn28UxiyQD
-         aibyBkIntJZr9HIbTgGVWHm6pcWTGq+usDYHh8kf01Z0GXKCOaa6DFmh4vF2DvQwikbw
-         N+42qhZothYnYNppq60Y5ASH8oMBKwsNazRXdyBaRzW8xk4HvtWvGqIQFBM/iOI+IpHa
-         tUYkhUIgwcb2faqdMZKBjIZP04rnBQLh1qpiIglkGQReTgfbNmM3IUh2p1mHQit0qYPi
-         qflw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734438755; x=1735043555;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vadTVklg9DZ5KZn/j1FjuzNmgd1jDV/1Li8ndKsd3tw=;
-        b=A0nAwFtjRM+34gKVhc0WPd1awBez+JSAdtsB+GBSWveBwJzNvFN1n4avLgQD/Ngs1c
-         iVXWoLHbAxl55lpelptHfd89by7pfEG9KtMHK3G5iFhwKi0NjUjlePZ6cGzpJvME2Ufl
-         fHObJD77dw5jsb9O9bLzAnjhRceIFw+WctdpwW+SowiGgHOl6r05Emowzzh6wX0QB4ep
-         oe5MkOuGcQSN+8yEHw7aSGK9/jIkCvA8o7mwpk67MsM3ojv+C8bcCC+r4HMGrjUhyQvT
-         uxXkziRYlLorbdPNsldF0J8GFXhxZ866u1DOafnDMmA7evMFeAUQTDl85G/Z1ByqPdd6
-         1Wiw==
-X-Forwarded-Encrypted: i=1; AJvYcCWXzsSmGWviBa1vBMBEZPzjWpvXPNFk0z5yrDm0yiSt0kyka0MzzzUV6D1hEixvjppeOpRz1QA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAflrVw4KaXbIyHsUZwvGDTcnb1sqhrnoNORChIv6KPnaLGk5Q
-	/Qh1gEA7rlDYvURTb4dvzCy5wEvHdj3JFZA1BQGQ6UqgKleFGUHBrB0GkiHDQUs=
-X-Gm-Gg: ASbGncs/Hpi2Tt9mpf3VosK7WTeC1n+OeekJCh5FAQanSUJaDpxOhedlvHQTx0n7G5O
-	OmzrobAfqM6MQVCTA4h/BZ7kPwfTRo4V0MVeYCjjQofD7rGpV26iha73xiETK163CcwLOGUm1bW
-	sXkKvuP+4slR88s/jCcpFVikP3Hy/epQ2noDfA/3QBmLJmtVFyajB1g931e/1eb0rnlik+keLUZ
-	miisC5xf2N0c7GoaDILcG5A31UqR0nR8lnLIj1WEjFldgnREFrZB7GInuU6Mg==
-X-Google-Smtp-Source: AGHT+IHQ03iEFjc/Teha21bLrHNLnNIrRs6fDpiX/v4CZTbwJmuV1NtVhgiSm8VrPkB6aW1UmvcDog==
-X-Received: by 2002:a05:6402:5288:b0:5d3:e8d1:a46 with SMTP id 4fb4d7f45d1cf-5d63c3bf48dmr17438136a12.30.1734438755313;
-        Tue, 17 Dec 2024 04:32:35 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d652f271a6sm4407073a12.60.2024.12.17.04.32.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 04:32:34 -0800 (PST)
-Date: Tue, 17 Dec 2024 15:32:31 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] xfrm: prevent some integer overflows in verify_
- functions
-Message-ID: <053456e5-56e7-478b-b73e-96b7c2098d07@stanley.mountain>
-References: <92dc4619-7598-439e-8544-4b3b2cf5e597@stanley.mountain>
- <Z2FompbNt6NBEoln@gondor.apana.org.au>
+	s=arc-20240116; t=1734439091; c=relaxed/simple;
+	bh=PKeJ3zJJK1lWuXvjotJPwclyxHWk97zOS1saNeHsrAw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NC4+YCj57hYr/nwh8MH0Nv3rUvOllrVZQRtE3AhqK4uyP/LonbEtxlHiREfOC3MpPvsE4jgr58IfcGZpnAv2SAH+R8YM7JgWPkV3X1k5cMwbHsDbw4S7JPB0NffkFygBC7ZFk/OBdNFzXDlDbAOF+IQTE49FrSWqkDPgbTQqTrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iz0FwkVn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6E30C4CED3;
+	Tue, 17 Dec 2024 12:38:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734439091;
+	bh=PKeJ3zJJK1lWuXvjotJPwclyxHWk97zOS1saNeHsrAw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Iz0FwkVn//6Gyd4X4RdFwtlJFM5LAODVSy58IbTVpAls7fAbVon9f0EqbWWmrkFQC
+	 WoMMF9LX3Wkt3S4A6uNnzY4J0CFctqZgMh9bp+p2mo+Iy/naz4PZTrckXMh621pQNA
+	 gieH53Hj4HJ55ecu5j12Ur3o3/PuKSz1Aw4mSUr0BiJvuBImIBbylIuSh+UetHTcaO
+	 01jnRc68cJbMUXtt1t7DmjKyd2XJr15FkZGC42CkY3L/dFuOMRF0UBXuINJsfzm0DT
+	 MQK1dxio2Bc2/tEU1h2kEUl3Y/WPZjKkkTCBNcziTYTpxMVV5KwKjbEeD+f3HxosqZ
+	 bD/MqgIy3U1Cw==
+Message-ID: <df71bc43-86c4-43ed-90df-d0ba0fe036ae@kernel.org>
+Date: Tue, 17 Dec 2024 13:38:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z2FompbNt6NBEoln@gondor.apana.org.au>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Bug] Deadlock between rfkill_fop_write() and
+ nfc_unregister_device()
+To: Johannes Berg <johannes@sipsolutions.net>,
+ Sam Sun <samsun1006219@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, pabeni@redhat.com,
+ kuba@kernel.org, Eric Dumazet <edumazet@google.com>, davem@davemloft.net
+References: <CAEkJfYOyWgJW-WAd+GhT07zd2Y3vUWz81+pjbZT9nUAsCc7FGQ@mail.gmail.com>
+ <b27dc4d0c3456c6796437b26b887b931d9871977.camel@sipsolutions.net>
+ <de5d98be99086a7182ba2bd0676b261349a145c4.camel@sipsolutions.net>
+ <CAEkJfYP297P=RjvZ9-ctpYHXu7bDhVN0+ZBoMNz2xjzyqOakLQ@mail.gmail.com>
+ <70f796f623a67b283c4fe3a1b56e59647a39ce6c.camel@sipsolutions.net>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <70f796f623a67b283c4fe3a1b56e59647a39ce6c.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 17, 2024 at 08:03:38PM +0800, Herbert Xu wrote:
-> On Tue, Dec 17, 2024 at 11:42:31AM +0300, Dan Carpenter wrote:
-> >
-> > +	if (algp->alg_key_len > INT_MAX) {
+On 17/12/2024 13:09, Johannes Berg wrote:
+> On Tue, 2024-12-17 at 20:01 +0800, Sam Sun wrote:
+>> On Tue, Dec 17, 2024 at 7:33 PM Johannes Berg <johannes@sipsolutions.net> wrote:
+>>>
+>>> On Tue, 2024-12-17 at 11:46 +0100, Johannes Berg wrote:
+>>>> On Tue, 2024-12-17 at 17:33 +0800, Sam Sun wrote:
+>>>>> Dear developers and maintainers,
+>>>>>
+>>>>> We originally encountered a task hung while using our modified
+>>>>> syzkaller. It was tested against the latest upstream kernel. We
+>>>>> analyzed the root cause and pinpoint the kernel crash log to the
+>>>>> following two tasks.
+>>>>>
+>>>>
+>>>> This issue has been known a very long time and should be fixed in NFC,
+>>>> but I guess nobody is around to do it.
+>>>>
+>>>> https://syzkaller.appspot.com/bug?extid=bb540a4bbfb4ae3b425d
+>>>>
+>>>
+>>> I think this one is also the same:
+>>>
+>>> https://syzkaller.appspot.com/bug?extid=9ef743bba3a17c756174
+>>>
+>>> and that's much older still.
+>>>
+>>
+>> Thanks for your quick reply! I am sorry that I didn't double-check the
+>> call stack of historical bugs reported by Syzbot. I will be careful
+>> next time.
+>>
 > 
-> Why not check for UINT_MAX - 7? INT_MAX seems a bit arbitrary.
-> 
+> No worries. Maybe someone who feels responsible for NFC will wake up ;-)
 
-That seems like basic algebra but we have a long history of getting
-integer overflow checks wrong so these days I like to just use
-INT_MAX where ever I can.  I wanted to use USHRT_MAX. We aren't allowed
-to use more than USHRT_MAX bytes, but maybe we're allowed USHRT_MAX
-bits, so I didn't do that.
+Patches are welcomed. The NFC stack was full of deadlocks, races and
+uses-after-free. The only consolation was that all of them were
+triggered by the virtual device driver, not real world cases. Many
+syzkaller reports were eventually fixed, but I guess many are still open.
 
-regards,
-dan carpenter
+If anyone wants to take the responsibility for NFC in terms of actually
+developing and fixes the stack, go ahead, because I have time here only
+for reviews (and these are still behind netdev timeframe expectations).
 
+Best regards,
+Krzysztof
 
