@@ -1,58 +1,55 @@
-Return-Path: <netdev+bounces-152559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B020A9F492E
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:47:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D20519F4936
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:51:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB5F47A62AC
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:47:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2468E16396B
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D181DFD9D;
-	Tue, 17 Dec 2024 10:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB231E0B7D;
+	Tue, 17 Dec 2024 10:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bx+ncNsx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XSMh8/UJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8FF1DDC1E;
-	Tue, 17 Dec 2024 10:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3236E2E628;
+	Tue, 17 Dec 2024 10:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734432452; cv=none; b=QG4FtxoPlwscP/cLJvvuIOAmQ0UKDhGOxT/L6keGQIyhDT/hWYSKLmkJhazdXilg6NwgEpty39q8NhsFUlTCqC4MgHYAczi0qWpG7NgHXPAwweuyhVyjTVzNLuhJd4DoOWGg0yb2Qz/45u1Did9mytF3MgBuhrhOFM+Kcx+owaI=
+	t=1734432667; cv=none; b=VCWRKg5HGObwkln9FLk0741w8sPSmao9uYpDRp28XMaFCqxyqfc0VtrImqCGD++Oxr/M1xKawW9oXJmozTPyKQhMJqGrvfLJ3C2GC2Du+WaphX4E5S0tJrdtdYPquSAVmwymGDshnghH3rPSu78ZXdi60QDaih1HXmxPmdKN/Uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734432452; c=relaxed/simple;
-	bh=ms7YSqlptMiVH9QYjWXdWB62kowGUi9g3XIRxmyX34g=;
+	s=arc-20240116; t=1734432667; c=relaxed/simple;
+	bh=4mbpskmtOwRuwpa9v+SeXv4dB9RUJYOJS1ztdmHlJs8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qICS3PmLitw6yY77RzS0KPv/XGxzvJMwe8Zk2BMCY/abd6xklApXQjVRdcu83bqOrpWsuU+3nRlwpoExbNJqpTJJo2F74+DpEPWizaB7PKozl+ejQnVzabd5MiNC4p5YpWfjH8SXWanQOdU5AVtgOGnobLnbHKAzEPXjdA2VpC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bx+ncNsx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AA5FC4CED3;
-	Tue, 17 Dec 2024 10:47:29 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QIIADXyMzGYFGep62hyd8jrPKm8br/4WjxtgnTuOUmwtNEOtdwbP1jo2jokjpc0fQahyaP9ROlYeNJ+xrwIXeFPz2Ar9KcfUKaJ8WnLimDnu/Yh3rHECzXkT6vezFVdkA2n5wWuxhv2bp3Wk2qxyfe5KKNI6gNOyvekvP42eUyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XSMh8/UJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0F6CC4CED3;
+	Tue, 17 Dec 2024 10:51:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734432452;
-	bh=ms7YSqlptMiVH9QYjWXdWB62kowGUi9g3XIRxmyX34g=;
+	s=k20201202; t=1734432666;
+	bh=4mbpskmtOwRuwpa9v+SeXv4dB9RUJYOJS1ztdmHlJs8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bx+ncNsxxmXd8oXq1DoWQQjzd4LIxlGMAOoBw4ILcCSFinAQde9J2MUefonna/JN8
-	 P+TFILRfq7fnfNLPsF1CM7xt1FMpeHRubm/UzfHBvlNoWZkWEVB/kgCR6vUiqWJH+s
-	 qjqZjgV5Q1ziiFU9nd2gc9bR+1tfm5zK7hzEnjxfkMyB5DPR4wESgHXKx1H82rN2T2
-	 UelIn/9bNwprdt8O1KT28ZQ/qc7aKp1kFloFBhgrxcHP2SywbngYoVOiUVTvcSPs+0
-	 vRtovMjXTQI83yGKeK6E5lG5nYHUHqVEoYBCuDYQnc0Kajkpin9aSJj00DNTCkbJOJ
-	 5BDQnVQmFcOZw==
-Date: Tue, 17 Dec 2024 10:47:26 +0000
+	b=XSMh8/UJKTpeXZq7KvSFkUX4pVTbJfWV0D6n4Aq9psdWioIpXTMdx8KkbA8K2IzkE
+	 pVw/GBVNzdGlCfblSmcgl0ezV8eTND3/ItyMrabXun0rccxosmn7ArnE2MBov9TFsB
+	 EHmS+f7bwLkhV7ur5ohFMtmZK000pVZM1h55o1z4Fh88bW7UY0TzRsQJzEmAc5/iaY
+	 QOTF98jjGoUxbYJFFddgg2+pbT1i98Y20lwCJjT2eXrAB3VKiz2q0fFpKJYlJGzdyO
+	 dOkyR4h+IddlidOCVXr2md5YpiSXR2Xn1NBizKmBAWW8gTYZFPxPIaFmkRObKQsAg1
+	 1WS+guibpYrLQ==
+Date: Tue, 17 Dec 2024 10:51:02 +0000
 From: Simon Horman <horms@kernel.org>
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, martin.habets@xilinx.com,
-	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v8 27/27] sfc: support pio mapping based on cxl
-Message-ID: <20241217104726.GQ780307@kernel.org>
-References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
- <20241216161042.42108-28-alejandro.lucero-palau@amd.com>
+To: linux@treblig.org
+Cc: jes@trained-monkey.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: Remove bouncing hippi list
+Message-ID: <20241217105102.GR780307@kernel.org>
+References: <20241216165605.63700-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,65 +58,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241216161042.42108-28-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20241216165605.63700-1-linux@treblig.org>
 
-On Mon, Dec 16, 2024 at 04:10:42PM +0000, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
+On Mon, Dec 16, 2024 at 04:56:05PM +0000, linux@treblig.org wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
 > 
-> With a device supporting CXL and successfully initialised, use the cxl
-> region to map the memory range and use this mapping for PIO buffers.
+> linux-hippi is bouncing with:
 > 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+>  <linux-hippi@sunsite.dk>:
+>  Sorry, no mailbox here by that name. (#5.1.1)
+> 
+> Remove it.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-...
+Thanks David,
 
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index 7367ba28a40f..6eab6dfd7ebd 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -27,6 +27,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  	struct pci_dev *pci_dev;
->  	struct efx_cxl *cxl;
->  	struct resource res;
-> +	struct range range;
->  	u16 dvsec;
->  	int rc;
->  
-> @@ -136,10 +137,25 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		goto err_region;
->  	}
->  
-> +	rc = cxl_get_region_range(cxl->efx_region, &range);
-> +	if (rc) {
-> +		pci_err(pci_dev, "CXL getting regions params failed");
-> +		goto err_region_params;
-> +	}
-> +
-> +	cxl->ctpio_cxl = ioremap(range.start, range.end - range.start);
+I have no insight regarding how long this might have been the case.
+But this seems entirely reasonable to me.
 
-nit: Smatch suggests that resource_size() may be used here.
-
-> +	if (!cxl->ctpio_cxl) {
-> +		pci_err(pci_dev, "CXL ioremap region (%pra) pfailed", &range);
-
-I think rc should be be set to an error value here.
-
-Also flagged by Smatch.
-
-> +		goto err_region_params;
-> +	}
-> +
->  	probe_data->cxl = cxl;
-> +	probe_data->cxl_pio_initialised = true;
->  
->  	return 0;
->  
-> +err_region_params:
-> +	cxl_accel_region_detach(cxl->cxled);
->  err_region:
->  	cxl_dpa_free(cxl->cxled);
->  err_memdev:
-
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
