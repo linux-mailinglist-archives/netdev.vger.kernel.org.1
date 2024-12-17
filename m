@@ -1,77 +1,64 @@
-Return-Path: <netdev+bounces-152727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6970B9F589A
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:18:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B731B9F58B8
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03CA916D767
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 21:17:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2E2F188EE38
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 21:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6051FA254;
-	Tue, 17 Dec 2024 21:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CAAC1F9AAD;
+	Tue, 17 Dec 2024 21:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SIxBKpZQ"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="DSJ0Il+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCE71FA140
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 21:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD6D1DA61D;
+	Tue, 17 Dec 2024 21:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734470233; cv=none; b=tbmN+D4gnI7t0KX2B+Inf3L5rfC5s9m8sqh+cSL1QG1FAk6twDj5EFOwTt+POXiHB2iF8GAkRDKE3s+OXR4n/dgjZbghZZI5qVQNqpQBXvx2NBhNITA/9qZlE0BRJ90DHKVbwfsbtcKZRCuFg0BHS5N54ayqxec8ittzmUkwt74=
+	t=1734470423; cv=none; b=aiHzo1aRWPS5jUGSWA7hGJHvi88FauLKr0vG8TFMKQl9WVHUwtzcR7BkancI/IhYF/cuiNE7hffpsRjciz/26JViSMoPklWLUQ36Pmj1KxwNDjczoClqKe24T/0df+D5HXJGTTwil6vjeMrEFTjdsbfVQPYQAPTPmarCFaujsgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734470233; c=relaxed/simple;
-	bh=XQqcSXCS7+3yXeFhYE/LHLIlCgVev1+/ITPt3X/ZZ0Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XivJ8dD1HioNvJbOa4dpmKDpShn82ORNKouPaqX00kLtnMT7IjH3Naw/e7fA3pOo/3+owXarq42Vep4wkn6gs+eNLR3J1KXIp6xEuV7D7is2BqcSxswhCb55M3NFcNBTFAHoGsM1Nk625n+t2sN4f3ODEtqgbx+jtx1a+MDaNK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SIxBKpZQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734470230;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PORQUlxGEfR5cpiw3XNjF5GcFo76IHLBJiTCdzbzG9A=;
-	b=SIxBKpZQAqjDL9xmo3ZQPJartzdqsWhxseBELPfatuPRJwkg4/hrPvd7Xlxc2U8Mgh/cGk
-	WO+YsnnO0awe1Zz80nraf2uVysRqET7kzD+nOEX709Rz/aAgSxOd7JPt7fiTKdIHZSEEFI
-	sY6XWJ480MzCCABSM4U48gs6oAtztEI=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-442-SC-GqNSmPEexydsu2nAyJg-1; Tue,
- 17 Dec 2024 16:17:08 -0500
-X-MC-Unique: SC-GqNSmPEexydsu2nAyJg-1
-X-Mimecast-MFC-AGG-ID: SC-GqNSmPEexydsu2nAyJg
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29EDD1955F66;
-	Tue, 17 Dec 2024 21:17:06 +0000 (UTC)
-Received: from antares.redhat.com (unknown [10.39.194.221])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B00419560A2;
-	Tue, 17 Dec 2024 21:17:00 +0000 (UTC)
-From: Adrian Moreno <amorenoz@redhat.com>
-To: linux-kselftest@vger.kernel.org
-Cc: Adrian Moreno <amorenoz@redhat.com>,
-	Pravin B Shelar <pshelar@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1734470423; c=relaxed/simple;
+	bh=RgbePHvvaBeK0+l594OFpDIFAeIwpggIMOhdYkR0pjI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s8kmMFtiApTy1kLcWJSfonIHVgFWqtXUL4xDKaB6YDt4MMTWZO3PtR2HCzAqNedwBODdAW4vVoM3Dkgx9hwL8Cxdlv0JOnWDyYfx9u9Rda0l8AODZSCQkNoYaaaP1OI+ZkFQ9Cai3kw+tT4e6wuqL0cOPjCDaV6r7bHalr7MJuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=DSJ0Il+o; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from fpc.intra.ispras.ru (unknown [10.10.165.15])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 9BC4A40777B2;
+	Tue, 17 Dec 2024 21:20:08 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 9BC4A40777B2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1734470408;
+	bh=ZIM6X6jHhJs3zfT8dqSZ/6JFwa46VTqpC1EF5WvsU/c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DSJ0Il+oThkN8V9hzYtc2EQ7xMgatryrZ7MYUH06Su/R9PZmqIcgmuTBDrsQTWYsh
+	 Z93ZNg8azPUCkIraS/9AeUk3hbG71KAprj7dzFoC/5Z3rG/r/IEeGbKnhmB8EaiP+G
+	 9GNw93O2PMZwCxLoEaqBTLqwOjsCCThSbGZEvmR8=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Aaron Conole <aconole@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
 	netdev@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] selftests: openvswitch: fix tcpdump execution
-Date: Tue, 17 Dec 2024 22:16:51 +0100
-Message-ID: <20241217211652.483016-1-amorenoz@redhat.com>
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in l2cap_sock_alloc
+Date: Wed, 18 Dec 2024 00:19:59 +0300
+Message-Id: <20241217211959.279881-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,41 +66,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Fix the way tcpdump is executed by:
-- Using the right variable for the namespace. Currently the use of the
-  empty "ns" makes the command fail.
-- Waiting until it starts to capture to ensure the interesting traffic
-  is caught on slow systems.
-- Using line-buffered output to ensure logs are available when the test
-  is paused with "-p". Otherwise the last chunk of data might only be
-  written when tcpdump is killed.
+A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
+from l2cap_sock_new_connection_cb() and the error handling paths should
+also be aware of it.
 
-Fixes: 74cc26f416b9 ("selftests: openvswitch: add interface support")
-Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+Seemingly a more elegant solution would be to swap bt_sock_alloc() and
+l2cap_chan_create() calls since they are not interdependent to that moment
+but then l2cap_chan_create() adds the soon to be deallocated and still
+dummy-initialized channel to the global list accessible by many L2CAP
+paths. The channel would be removed from the list in short period of time
+but be a bit more straight-forward here and just check for NULL instead of
+changing the order of function calls.
+
+Found by Linux Verification Center (linuxtesting.org) with SVACE static
+analysis tool.
+
+Fixes: 7c4f78cdb8e7 ("Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 ---
- tools/testing/selftests/net/openvswitch/openvswitch.sh | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_sock.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index cc0bfae2bafa..960e1ab4dd04 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -171,8 +171,10 @@ ovs_add_netns_and_veths () {
- 		ovs_add_if "$1" "$2" "$4" -u || return 1
- 	fi
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 3d2553dcdb1b..49f97d4138ea 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1888,7 +1888,8 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+ 		sk_free(sk);
+-		sock->sk = NULL;
++		if (sock)
++			sock->sk = NULL;
+ 		return NULL;
+ 	}
  
--	[ $TRACING -eq 1 ] && ovs_netns_spawn_daemon "$1" "$ns" \
--			tcpdump -i any -s 65535
-+	if [ $TRACING -eq 1 ]; then
-+		ovs_netns_spawn_daemon "$1" "$3" tcpdump -l -i any -s 6553
-+		ovs_wait grep -q "listening on any" ${ovs_dir}/stderr
-+	fi
- 
- 	return 0
- }
 -- 
-2.47.1
+2.39.5
 
 
