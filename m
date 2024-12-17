@@ -1,180 +1,172 @@
-Return-Path: <netdev+bounces-152730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D9C9F596A
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 23:14:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BC7E9F5968
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 23:13:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92F207A3CC1
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:13:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C3C37A353B
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 22:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED761DD54C;
-	Tue, 17 Dec 2024 22:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ABA31F9F6F;
+	Tue, 17 Dec 2024 22:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XCHkY8KM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dtkcv8Dm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86EB7C6E6;
-	Tue, 17 Dec 2024 22:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656D17C6E6
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 22:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734473620; cv=none; b=Swz7oRAltIeLK5teyW1YjtPYF8xf3SONNV1dpRSpSxLQOP4lNaidocTZnQxFtdrVkm/XRAMSnkqt7i/9ZYl4e00zCRj5YN4tzh2LubqcyfpyeZQN0KN5jPuBPogkwx8s6KQQlWocX5aBbtZ1FWdC4L807Jq/Y482toAKmANJTvQ=
+	t=1734473602; cv=none; b=L4J9FwTYHj1F2yiU9MbWbJqWPGGyVa23v6BwaHxG72TBO2gI0O4BCvZEK1LMp0q1TkJSNBO30raX7tzb09TuPO4fQE2k0P1rNa4Vyw2qFDHKdHAO23ROjjoRSAFgvOuQ+zfGqUyKuFN416IunPpwwAhnVkPAR6yESP+QDHm4lcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734473620; c=relaxed/simple;
-	bh=DITnIQxNjJGVwuWIq3JaG5pspxw+ruBZ/g44geDsBws=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R16B79zwoPml8hJ5/LOiZPykwwqz1yEPer0A7mTv/+ucVMGgkr8r8i+w172DOwBk9sZBgEkk8H/NBjNl6KFFwPCPQodw2hbSj5DzMjtPKYc1925uLLBcXsfxC3k7L3yCQpWsGn24YugnPD/M6XDalgYfWskFpMUFTQSnlYrPAhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XCHkY8KM; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3eb9ba53f90so1630219b6e.1;
-        Tue, 17 Dec 2024 14:13:37 -0800 (PST)
+	s=arc-20240116; t=1734473602; c=relaxed/simple;
+	bh=x/KLuUSNbbqJ7YIu94h9RPG2gDjw1fSsjYx4Refwaoc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=R9Pv0lvwfNV3ZyGX/x4fzNfdsitnuHI3niyuANOjTAR6Ark8UnKzMKI1VajF4EXpjzoaLk0cxiU4KbLCgg8aUtkJ8qXUEZzqtM3dv90iiL2tI0J4AFEv8P2ZEhEtqtYPPhgZMwkMMAaxPhswfeLGR3NHksx4ePb+beL3X1OqkpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--zhuyifei.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dtkcv8Dm; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--zhuyifei.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-725cab4d72bso4453493b3a.2
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 14:13:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734473616; x=1735078416; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u9QuBOniyMYck+y8PUbC//+oM4oKOj8t9nBe0JYSFFE=;
-        b=XCHkY8KMKnc6AGjfS1r9jafSIm3cH30h+bx0P6UgQUgSqUxuscVGemHYAnxGVqN2ct
-         IQ5ia+1z82ycCCZeB/uZPIDvzKqReN4N/PhW7QScahEUIpouHvctDIkEhTwR9nnVJJnL
-         hkvdTcJyV1CCJat1kGISdj+QchpPV++N7BGxNS+2Udd7Kh4IM9r0r6IyeZ+H1noLBDvm
-         icdYoFvbaSW1i23WyinNk53BV2XhwDb++GM83r2or/FhWkHy9HNgaWRsMP1z5TxX1Tnk
-         eg3PxcNFKDM2rr4B/lsCiywyl8kEGim5Gb6bLEpINkXs61e3KaV+ES3azKyU4tJ9Inh6
-         Vqbg==
+        d=google.com; s=20230601; t=1734473599; x=1735078399; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nk1ptDRLEJiAS3q/c25SsjSlvHD7/gtjwNCRUciNV/Y=;
+        b=Dtkcv8DmrXOx3aFPUDMmBie8Pu0QE1sUuWNjyAowOI+cflc5OfdWd+E37dh7TUSiFs
+         slZgRrDCqy3px+PHi9dNoMEdkBw0Q8Ty5xTJIr4QMNIaXudN0aNCnQBxEvdJ/+aTPj71
+         aDmqTUPwTV3hmA234fjU82LmGvCZ+RzIGQRkIsr1vMZFlLbHH2+rIxCRXtZ9BMfqYJgV
+         dR4OB+5vIxOapm/MYc2UL27ZlKZT8Jlb0KujU8PU1Xjm5bv45cqMZs9TqLJejfXTVHdg
+         qPhZB+i5dKvSGoIyJSSdg/t5iUFYJtAwEn0ZFS15hMbp5e/5NOevHeXvfCdVs7mL5rH3
+         X0lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734473616; x=1735078416;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u9QuBOniyMYck+y8PUbC//+oM4oKOj8t9nBe0JYSFFE=;
-        b=wm/zzHrpYwbOkIWvBJ8gkEDPLWPqcQ93HILqIRKol9/reTXR6oD6duciMOdts2yf1l
-         WcM6ANFMa9tIbCAlmGRFWMbH05VkAldyCpgAwN0i7awH2R08+vOIW79K2oLFn7tSB8ko
-         +NhmMmv845YEUpHLkmDnGSshd2HAA9xP4JZeh9bDD/simFXEL9OiX84Sq5F0WFafLaVU
-         ojm3xoYwLc2t1WQsrKdRhqi0MPvBmXUA7JlkLWgnvH9j2UFaQhyjBHCaWRJgjFwsC4CK
-         02JXLcyPn5OI2Nief7l56l7hu45iQRfkiN8VyXVLZa32HDpwK6u6R9xadl/zNNaTrj5s
-         PCUw==
-X-Forwarded-Encrypted: i=1; AJvYcCVobFcapeXUH79A7DTKpO/jx923fZ/ge8CAYpliWN7pW6rRXdSQXMBLXKlALAreI5+o/lLC0YGM@vger.kernel.org, AJvYcCVxmbFOlB5oh8tzfEZTrKxViqOZHo328sXZ6Z8Xi1KreYxXW68C47IiJV/W/pxBpIBbneHYpmXbtRIn5OY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylQf/D/0ZCltI5K/TLIMd0iTGvGTdmQ1MngpmmVSKmOq/5OT+E
-	Fy1pKQWLbXVkmn8crUkWnFtrQqYwMCxwx1JD/JBHgRxWcArDKGxGwYz6YQeDp+iXkLbUDY3xNX/
-	WxDpyrz9dGnogQLL3wa5EDjkXBx4=
-X-Gm-Gg: ASbGncsmpGGJSTXMcFoGxzhDsS0A1qcc6yz2HdHgLZ7dMHBNLs1U43xNb9hTw0paCP5
-	1y8jb2e7HxbMXn2YshVzPATo1hrLSHgvhSzDh9Uc=
-X-Google-Smtp-Source: AGHT+IF/zHxTNCbH+0IG4qfG4nasiicCiiEwLg7lIZarUEHvAnsCaIkPrT1dguYfLdST8cwE0omtiGPoDFTN/CE+GSQ=
-X-Received: by 2002:a05:6808:3c4d:b0:3ea:4595:13fc with SMTP id
- 5614622812f47-3eccc09aebcmr459934b6e.16.1734473616594; Tue, 17 Dec 2024
- 14:13:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734473599; x=1735078399;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nk1ptDRLEJiAS3q/c25SsjSlvHD7/gtjwNCRUciNV/Y=;
+        b=Q7Yx1hLvnDPdgdosANAV+0WZ+LsTngPSFQWQTt8Mawyte7JQ9n81xMVH1iMo3UADj+
+         C1aJ/D1P6p0WuJ5/tChsAZgvrjVTce5Sl4UgtcBmK18GUsVXU6lIduUERVYtdfqigi2Q
+         8ttg26wkp4vR20u70dWu0YNOsBJl+xoGffGbxl8zJnpyMI3tW5QyvV8bvodnONQPkdkB
+         qwt+sInYhtQgKAPaRmTzgBWRR7Z76Ny2dIRIiUhhUdLjoW/euf1G8wUIfktJsHNFG+id
+         xTHWuPesgLsEnEI1W/8CYwnteOfWINl1Ih73YKV1y9EgkxUcf/LmxDrd3a5EA1MWV5eq
+         G1xA==
+X-Forwarded-Encrypted: i=1; AJvYcCVed7KnKuyQ4asfB7BMrNSLeJDD5zwzk60y27H/Ol/hS5onYxHgEccgmASoEY4qVkx2goQ2Vvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrdkVdO6SvmhmAkxkBK6RqVow7T+gkw8tc7AW/ohPXOyHFzAGR
+	E6dMqi8e/5sLYdIcZIDlzmBCDAV6yjh7TPnqSOk3rYnPU2Uo/HK7PK6nL9OEGjOKeFImQ40cstz
+	yCNAGGdYhtw==
+X-Google-Smtp-Source: AGHT+IHBer4r9UGBFvkFDyecnLFhRXKfdLZ5WB4NGbPNpDI6qff41GDS3WudrKSPegURONVwd9j50+nWdZQjrw==
+X-Received: from pfva18.prod.google.com ([2002:a05:6a00:c92:b0:725:d9ab:3f2e])
+ (user=zhuyifei job=prod-delivery.src-stubby-dispatcher) by
+ 2002:aa7:888c:0:b0:725:ef4b:de21 with SMTP id d2e1a72fcca58-72a8d2c4800mr1049462b3a.20.1734473599629;
+ Tue, 17 Dec 2024 14:13:19 -0800 (PST)
+Date: Tue, 17 Dec 2024 22:13:02 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241216234850.494198-1-jmaxwell37@gmail.com> <aa49d578-dee4-4ee8-b17b-b6e941d9126c@intel.com>
-In-Reply-To: <aa49d578-dee4-4ee8-b17b-b6e941d9126c@intel.com>
-From: Jonathan Maxwell <jmaxwell37@gmail.com>
-Date: Wed, 18 Dec 2024 09:13:00 +1100
-Message-ID: <CAGHK07COaxjj4WJvDKFLj=ev9j-jRxuw5bXh_zCZtL75Twu7rQ@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [net-next] ice: expose non_eop_descs to ethtool
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241217221302.1697291-1-zhuyifei@google.com>
+Subject: [PATCH net-next] sfc: Use netdev refcount tracking in struct efx_async_filter_insertion
+From: YiFei Zhu <zhuyifei@google.com>
+To: Edward Cree <ecree.xilinx@gmail.com>, Martin Habets <habetsm.xilinx@gmail.com>, 
+	netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-net-drivers@amd.com, Willem de Bruijn <willemb@google.com>, 
+	Mina Almasry <almasrymina@google.com>, YiFei Zhu <zhuyifei@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2024 at 1:49=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Jon Maxwell <jmaxwell37@gmail.com>
-> Date: Tue, 17 Dec 2024 10:48:50 +1100
->
-> > The ixgbe driver exposes non_eop_descs to ethtool. Do the same for ice.
->
-> Only due to that?
-> Why would we need it in the first place?
->
+I was debugging some netdev refcount issues in OpenOnload, and one
+of the places I was looking at was in the sfc driver. Only
+struct efx_async_filter_insertion was not using netdev refcount tracker,
+so add it here. GFP_ATOMIC because this code path is called by
+ndo_rx_flow_steer which holds RCU.
 
-Not just that. We had a critical ice bug we were diagnosing and saw this
-counter in the Vmcore. When we set up a reproducer we needed to check that
-counter was incrementing. I added this patch to do that and thought that
-it may aid trouble-shooting in the future as well so I sent it upstream.
+This patch should be a no-op if !CONFIG_NET_DEV_REFCNT_TRACKER
 
-Regards
+Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+---
+ drivers/net/ethernet/sfc/net_driver.h       | 1 +
+ drivers/net/ethernet/sfc/rx_common.c        | 4 ++--
+ drivers/net/ethernet/sfc/siena/net_driver.h | 1 +
+ drivers/net/ethernet/sfc/siena/rx_common.c  | 4 ++--
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-Jon
+diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
+index 620ba6ef3514b..8c831b66c78b9 100644
+--- a/drivers/net/ethernet/sfc/net_driver.h
++++ b/drivers/net/ethernet/sfc/net_driver.h
+@@ -838,6 +838,7 @@ struct efx_arfs_rule {
+  */
+ struct efx_async_filter_insertion {
+ 	struct net_device *net_dev;
++	netdevice_tracker net_dev_tracker;
+ 	struct efx_filter_spec spec;
+ 	struct work_struct work;
+ 	u16 rxq_index;
+diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
+index ab358fe13e1df..cb0a98469f099 100644
+--- a/drivers/net/ethernet/sfc/rx_common.c
++++ b/drivers/net/ethernet/sfc/rx_common.c
+@@ -897,7 +897,7 @@ static void efx_filter_rfs_work(struct work_struct *data)
+ 
+ 	/* Release references */
+ 	clear_bit(slot_idx, &efx->rps_slot_map);
+-	dev_put(req->net_dev);
++	netdev_put(req->net_dev, &req->net_dev_tracker);
+ }
+ 
+ int efx_filter_rfs(struct net_device *net_dev, const struct sk_buff *skb,
+@@ -989,7 +989,7 @@ int efx_filter_rfs(struct net_device *net_dev, const struct sk_buff *skb,
+ 	}
+ 
+ 	/* Queue the request */
+-	dev_hold(req->net_dev = net_dev);
++	netdev_hold(req->net_dev = net_dev, &req->net_dev_tracker, GFP_ATOMIC);
+ 	INIT_WORK(&req->work, efx_filter_rfs_work);
+ 	req->rxq_index = rxq_index;
+ 	req->flow_id = flow_id;
+diff --git a/drivers/net/ethernet/sfc/siena/net_driver.h b/drivers/net/ethernet/sfc/siena/net_driver.h
+index 9785eff10607b..332449bb94580 100644
+--- a/drivers/net/ethernet/sfc/siena/net_driver.h
++++ b/drivers/net/ethernet/sfc/siena/net_driver.h
+@@ -760,6 +760,7 @@ struct efx_arfs_rule {
+  */
+ struct efx_async_filter_insertion {
+ 	struct net_device *net_dev;
++	netdevice_tracker net_dev_tracker;
+ 	struct efx_filter_spec spec;
+ 	struct work_struct work;
+ 	u16 rxq_index;
+diff --git a/drivers/net/ethernet/sfc/siena/rx_common.c b/drivers/net/ethernet/sfc/siena/rx_common.c
+index 082e35c6caaae..450e6d435d5e1 100644
+--- a/drivers/net/ethernet/sfc/siena/rx_common.c
++++ b/drivers/net/ethernet/sfc/siena/rx_common.c
+@@ -888,7 +888,7 @@ static void efx_filter_rfs_work(struct work_struct *data)
+ 
+ 	/* Release references */
+ 	clear_bit(slot_idx, &efx->rps_slot_map);
+-	dev_put(req->net_dev);
++	netdev_put(req->net_dev, &req->net_dev_tracker);
+ }
+ 
+ int efx_siena_filter_rfs(struct net_device *net_dev, const struct sk_buff *skb,
+@@ -980,7 +980,7 @@ int efx_siena_filter_rfs(struct net_device *net_dev, const struct sk_buff *skb,
+ 	}
+ 
+ 	/* Queue the request */
+-	dev_hold(req->net_dev = net_dev);
++	netdev_hold(req->net_dev = net_dev, &req->net_dev_tracker, GFP_ATOMIC);
+ 	INIT_WORK(&req->work, efx_filter_rfs_work);
+ 	req->rxq_index = rxq_index;
+ 	req->flow_id = flow_id;
+-- 
+2.47.1.613.gc27f4b7a9f-goog
 
-> >
-> > With this patch:
-> >
-> > ethtool -S ens2f0np0 | grep non_eop_descs
-> >      non_eop_descs: 956719320
-> >
-> > Signed-off-by: Jon Maxwell <jmaxwell37@gmail.com>
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice.h         | 1 +
-> >  drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 +
-> >  drivers/net/ethernet/intel/ice/ice_main.c    | 2 ++
-> >  3 files changed, 4 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/etherne=
-t/intel/ice/ice.h
-> > index 2f5d6f974185..8ff94400864e 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice.h
-> > +++ b/drivers/net/ethernet/intel/ice/ice.h
-> > @@ -345,6 +345,7 @@ struct ice_vsi {
-> >       u32 rx_buf_failed;
-> >       u32 rx_page_failed;
-> >       u16 num_q_vectors;
-> > +     u64 non_eop_descs;
-> >       /* tell if only dynamic irq allocation is allowed */
-> >       bool irq_dyn_alloc;
-> >
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net=
-/ethernet/intel/ice/ice_ethtool.c
-> > index 3072634bf049..e85b664fa647 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> > @@ -65,6 +65,7 @@ static const struct ice_stats ice_gstrings_vsi_stats[=
-] =3D {
-> >       ICE_VSI_STAT("tx_linearize", tx_linearize),
-> >       ICE_VSI_STAT("tx_busy", tx_busy),
-> >       ICE_VSI_STAT("tx_restart", tx_restart),
-> > +     ICE_VSI_STAT("non_eop_descs", non_eop_descs),
-> >  };
-> >
-> >  enum ice_ethtool_test_id {
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/et=
-hernet/intel/ice/ice_main.c
-> > index 0ab35607e5d5..948c38c0770b 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> > @@ -6896,6 +6896,7 @@ static void ice_update_vsi_ring_stats(struct ice_=
-vsi *vsi)
-> >       vsi->tx_linearize =3D 0;
-> >       vsi->rx_buf_failed =3D 0;
-> >       vsi->rx_page_failed =3D 0;
-> > +     vsi->non_eop_descs =3D 0;
-> >
-> >       rcu_read_lock();
-> >
-> > @@ -6916,6 +6917,7 @@ static void ice_update_vsi_ring_stats(struct ice_=
-vsi *vsi)
-> >               vsi_stats->rx_bytes +=3D bytes;
-> >               vsi->rx_buf_failed +=3D ring_stats->rx_stats.alloc_buf_fa=
-iled;
-> >               vsi->rx_page_failed +=3D ring_stats->rx_stats.alloc_page_=
-failed;
-> > +             vsi->non_eop_descs +=3D ring_stats->rx_stats.non_eop_desc=
-s;
-> >       }
-> >
-> >       /* update XDP Tx rings counters */
->
-> Thanks,
-> Olek
 
