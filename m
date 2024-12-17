@@ -1,164 +1,128 @@
-Return-Path: <netdev+bounces-152645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3143D9F4F8F
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 16:36:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A3B99F4FB0
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 16:44:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D18091883CF6
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 15:35:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C7021679EA
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 15:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6A41F759C;
-	Tue, 17 Dec 2024 15:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE8401F7594;
+	Tue, 17 Dec 2024 15:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hHESXQ42"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lU5CdzPV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D996EAC6;
-	Tue, 17 Dec 2024 15:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF081F7572;
+	Tue, 17 Dec 2024 15:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734449748; cv=none; b=sGEcmBl6ydc8ArOGOQLEifzdvzvT31ec+YJoz5uCATYhij1FGdgdpkAzQvMQg43czwxjINY8OAI/58mhAkIZkRuU6Tb1eJA7qpm26fzJxI2821ChG7QYg77x6P9DXywZ70eofDPOJtBQRwcqkM46fS9IfhsrgphdzQWC4fnuPx8=
+	t=1734450232; cv=none; b=squZIYW9+A48DhhWHvO5tsgwYoTYAWtWOSFyCw85JoofjFSDAbP6Nc/kNsqVNH6ZO/mTTnCWS7nJbHlt9jbmsCbzjRPKeLPmPwAHc3z4OwqLRH+XdXWuy59o6RcUe+cqo0k91ca8gmH/Rz09np8ouHhqCkQY0qLhaCvaAoADmZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734449748; c=relaxed/simple;
-	bh=FpD5UynaL06QwYdt5J8Ahluf6VvLqe4g4Ov9ExwUZ/Y=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=uR1kchNJLKYJb6CY9idXGKrGk3HClryGNy4v6HfBYD7v/ncdyKm1Qov1MO/MAkskJ1yp3a/C6CThaL4erbcFmsxTQOxsk71dM0Yc1ezwF0m0n+bX4fmhWx+jx47zO5o4EEL1qeKX5JXzg6IfNFOh2/m2IfAfiJXuoUDulTM09nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hHESXQ42; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-467a3f1e667so29295971cf.0;
-        Tue, 17 Dec 2024 07:35:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734449745; x=1735054545; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LZqRohsxgDqGeXZWJE1OO5VcgJ9YhttJf/CwCIN3nfg=;
-        b=hHESXQ42QBXUUE6/rQ0rjVDbiHaFwFSP7vUPzIw2JykGFn4SzK1jOjEDFLevhyiQGT
-         wEwEoq3uYUZxzDdoX9+Rrmn2KWHhprhmmT1zzz6ykmAgxrN2yLDEswMqNza0+hy8QjVZ
-         SpyB07pbo+mBT7PzpRcc4CRGrNdPvlS91+mNj/6+VT/9M+IJzB8UuK37QLkIsJdCjM06
-         dczBdQP6IALYJ0GjgKF3K48ZaqpRWeRnv8hI7jAP1hormE9mIkMeGN/70X8EbCMRwKo1
-         ArWWfnzT0wNrM7pJdtGSu5SNcjkwZgvwDtEwn/XgtrqBbBm2KmC/CdNzZ5Lu8x+BqU+p
-         73nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734449745; x=1735054545;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LZqRohsxgDqGeXZWJE1OO5VcgJ9YhttJf/CwCIN3nfg=;
-        b=LZbGcZ7iUvpULimscg+6ekiyXlRVOKdGggYXS9R/IZW+9riUd10m7LklKTsiL4f5kN
-         dqx1YMacgs20erM6sB1lh42if9UZZFOCJK82VDNHvuX/y2rytxTfpxD3hehqbD2tmRni
-         o+yNASoTyUb09uRwh69I2T7CeMvdVL8QRdcqQTFu9QYDHLXZ3L5kTuRYLE/JKcCMKSmg
-         H4oH368YKcu8p8gUS/2pPcWnCps7lXRNPVIiPbo9S2+bfXosQOw8O2+Cm72PQMeGhK61
-         5HfI1R903ynBkkRpKOgE9LYUQiIQ3DLXd7rD8EgkCIF9He6behKPegxSct/dyWKsNXN/
-         qUtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCtsv+qulzEXV124Q5a9D7l4rQUHQTe2bSL4zPXWN1Knbyq5eUUrlKKpBg73kdGUTo9Dx8ctVkGXQSC+OmRs8=@vger.kernel.org, AJvYcCVjqwo/BdQBaJK90gsx7tuGaNMd2QmE1KKwgA04Y7E7USP1XvVl2PmaLovIlqJV1RXizpyD5c6G/U7DyV/w@vger.kernel.org, AJvYcCX/lmd8HWY3VojiNkOxx0hlFq2M5tpJI3UgOyZLGWkKB2zFAu4l8AEXxjkH5+AobcxdNt6K+eX9@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIHNjyBxUhs3iDaNnOcdCCtOUNU8js5gXyDJ89qi6iXikoT15P
-	ebKv5bALP4UHUsWtOeyG5PU/utc68QThghCnoYp1PUP7NABb0mv0
-X-Gm-Gg: ASbGncslWptjJzQLo7GqhAkkJree7jA5EB4GXhUwzN8MT6/+dM8cghObVlpvA72gkDe
-	Zn7mJ/jVTuvUKH/lChKF5/z5AOfLuCSRYiRLNtnaUamldusJrrIbUaypg1Vc2najujIoNaAyWkw
-	UQME2GUW04nrHB2HB/Hz7ho1sZOQNz2+DSsiGdA9iyofILR+BU5D4FVFOCmw6yxiM09amHD+08o
-	1vBDtjFXlliWGPKXIWSSYKMJLW7kci6e/8m6dnA/TZywtnuLamN1uxfgGlLh0u9Q3Er19Poz59L
-	zNaQ8uiHMipQ28pFIG8M20GD3P8V23ojJQ==
-X-Google-Smtp-Source: AGHT+IGafvON1jQeIMfI3YBLEkTEeE7VOYrLT9uhcSvM20sGMVMJLGWZF8Rf0bWihbamUSQ4TcGjJw==
-X-Received: by 2002:a05:622a:144:b0:462:fef1:e1f5 with SMTP id d75a77b69052e-467a578bfb4mr293351011cf.26.1734449745250;
-        Tue, 17 Dec 2024 07:35:45 -0800 (PST)
-Received: from localhost (96.206.236.35.bc.googleusercontent.com. [35.236.206.96])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b7047aa6f8sm327843685a.25.2024.12.17.07.35.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 07:35:44 -0800 (PST)
-Date: Tue, 17 Dec 2024 10:35:44 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kees Cook <kees@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>
-Cc: Kees Cook <kees@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- Simon Horman <horms@kernel.org>, 
- David Ahern <dsahern@kernel.org>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Joe Damato <jdamato@fastly.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- linux-kernel@vger.kernel.org, 
- linux-hardening@vger.kernel.org
-Message-ID: <67619a5029d2c_a046929426@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241217012445.work.979-kees@kernel.org>
-References: <20241217012445.work.979-kees@kernel.org>
-Subject: Re: [PATCH] net: core: dev.c confirmed to use classic sockaddr
+	s=arc-20240116; t=1734450232; c=relaxed/simple;
+	bh=ZwVFELC71dzFSNCZimKgBWaJEA4Y5NkhJ2hwLvlGU/o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=McQBjEql1C1PfE8PMa/1TIlyLzVkCS306pIZB5w8yLgXowC7DVQglNuCJb+LiWfjq4i2O6w+Rj20ywquBPyZ3NhfwMHAuu5HeHyIIs2Q+dmmFAZy3uzYC0A89QystQKP3q6yQ7gZBEapCo2edf9liZYxKO0BiNDjU4aa0jLVHJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lU5CdzPV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A839AC4CED6;
+	Tue, 17 Dec 2024 15:43:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734450232;
+	bh=ZwVFELC71dzFSNCZimKgBWaJEA4Y5NkhJ2hwLvlGU/o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=lU5CdzPVHWwtUmTW2srGDqV3xpYk/1KqcXvrPHBaWOi1E8TXRWJHZf0MTs+o/eKe9
+	 B3mmm1PeAP07cpBVZ1+4C7zc27+tCuHqbH94XbYZVARogDeOewScoVSKr6gRtKKECh
+	 1qY98ZsvXpmzSNTAIzWvkBL4ptbvZBDjgP9ipXZoGLR8A6O0S9VhGRWl0O59gRMEOF
+	 DHTX3Pr+F1BqGKUQIVnKoCrNhJFr22jTamNMHi1nlyjOgLgR5Rhx9AvvEqoSyd36xc
+	 dzncCefvOQE5aOOwCa0BmcMj2SdUaRhld7tg8XuYdUq2bLwAsXSeKo731yILF8BmAB
+	 TJ0xMwIS1EvtQ==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Levi Zim <rsworktech@outlook.com>, Cong Wang <xiyou.wangcong@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki
+ <jakub@cloudflare.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern
+ <dsahern@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/2] Fix NPE discovered by running bpf kselftest
+In-Reply-To: <MEYP282MB2312EE60BC5A38AEB4D77BA9C6372@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+References: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
+ <MEYP282MB23129373641D74DE831E07E9C6342@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+ <Z0+qA4Lym/TWOoSh@pop-os.localdomain>
+ <MEYP282MB2312EE60BC5A38AEB4D77BA9C6372@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+Date: Tue, 17 Dec 2024 16:43:48 +0100
+Message-ID: <87y10e1fij.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Kees Cook wrote:
-> As part of trying to clean up struct sock_addr, add comments about the
-> sockaddr arguments of dev_[gs]et_mac_address() being actual classic "max
-> 14 bytes in sa_data" sockaddr instances and not struct sockaddr_storage.
+Levi Zim <rsworktech@outlook.com> writes:
 
-What is this assertion based on?
+> On 2024-12-04 09:01, Cong Wang wrote:
+>> On Sun, Dec 01, 2024 at 09:42:08AM +0800, Levi Zim wrote:
+>>> On 2024-11-30 21:38, Levi Zim via B4 Relay wrote:
+>>>> I found that bpf kselftest sockhash::test_txmsg_cork_hangs in
+>>>> test_sockmap.c triggers a kernel NULL pointer dereference:
+>> Interesting, I also ran this test recently and I didn't see such a
+>> crash.
+>
+> I am also curious about why other people or the CI didn't hit such crash.
 
-I see various non-Ethernet .ndo_set_mac_address implementations, which
-dev_set_mac_address calls. And dev_set_mac_addr_user is called from
-rtnetlink do_setlink. Which kmalloc's sa based on dev->addr_len.
+FWIW, I'm hitting it on RISC-V:
 
-> 
-> Signed-off-by: Kees Cook <kees@kernel.org>
-> ---
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> ---
->  net/core/dev.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 45a8c3dd4a64..5abfd29a35bf 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -9183,7 +9183,8 @@ EXPORT_SYMBOL(dev_pre_changeaddr_notify);
->  /**
->   *	dev_set_mac_address - Change Media Access Control Address
->   *	@dev: device
-> - *	@sa: new address
-> + *	@sa: new address in a classic "struct sockaddr", which will never
-> + *	     have more than 14 bytes in @sa::sa_data
->   *	@extack: netlink extended ack
->   *
->   *	Change the hardware (MAC) address of the device
-> @@ -9217,6 +9218,7 @@ EXPORT_SYMBOL(dev_set_mac_address);
->  
->  DECLARE_RWSEM(dev_addr_sem);
->  
-> +/* "sa" is a classic sockaddr: it will only ever use 14 bytes from sa_data. */
->  int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
->  			     struct netlink_ext_ack *extack)
->  {
-> @@ -9229,6 +9231,7 @@ int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
->  }
->  EXPORT_SYMBOL(dev_set_mac_address_user);
->  
-> +/* "sa" is a classic sockaddr: it will only ever use 14 bytes from sa_data. */
->  int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
->  {
->  	size_t size = sizeof(sa->sa_data_min);
-> -- 
-> 2.34.1
-> 
+  |  Unable to handle kernel access to user memory without uaccess routines=
+ at virtual address 0000000000000008
+  |  Oops [#1]
+  |  Modules linked in: sch_fq_codel drm fuse drm_panel_orientation_quirks =
+backlight
+  |  CPU: 7 UID: 0 PID: 732 Comm: test_sockmap Not tainted 6.13.0-rc3-00017=
+-gf44d154d6e3d #1
+  |  Hardware name: riscv-virtio qemu/qemu, BIOS 2025.01-rc3-00042-gacab6e7=
+8aca7 01/01/2025
+  |  epc : splice_to_socket+0x376/0x49a
+  |   ra : splice_to_socket+0x37c/0x49a
+  |  epc : ffffffff803d9ffc ra : ffffffff803da002 sp : ff20000001c3b8b0
+  |   gp : ffffffff827aefa8 tp : ff60000083450040 t0 : ff6000008a12d001
+  |   t1 : 0000100100001001 t2 : 0000000000000000 s0 : ff20000001c3bae0
+  |   s1 : ffffffffffffefff a0 : ff6000008245e200 a1 : ff60000087dd0450
+  |   a2 : 0000000000000000 a3 : 0000000000000000 a4 : 0000000000000000
+  |   a5 : 0000000000000000 a6 : ff20000001c3b450 a7 : ff6000008a12c004
+  |   s2 : 000000000000000f s3 : ff6000008245e2d0 s4 : ff6000008245e280
+  |   s5 : 0000000000000000 s6 : 0000000000000002 s7 : 0000000000001001
+  |   s8 : 0000000000003001 s9 : 0000000000000002 s10: 0000000000000002
+  |   s11: ff6000008245e200 t3 : ffffffff8001e78c t4 : 0000000000000000
+  |   t5 : 0000000000000000 t6 : ff6000008869f230
+  |  status: 0000000200000120 badaddr: 0000000000000008 cause: 000000000000=
+000d
+  |  [<ffffffff803d9ffc>] splice_to_socket+0x376/0x49a
+  |  [<ffffffff803d8bc0>] direct_splice_actor+0x44/0x216
+  |  [<ffffffff803d8532>] splice_direct_to_actor+0xb6/0x1e8
+  |  [<ffffffff803d8780>] do_splice_direct+0x70/0xa2
+  |  [<ffffffff80392e40>] do_sendfile+0x26e/0x2d4
+  |  [<ffffffff803939d4>] __riscv_sys_sendfile64+0xf2/0x10e
+  |  [<ffffffff80fdfb64>] do_trap_ecall_u+0x1f8/0x26c
+  |  [<ffffffff80fedaee>] _new_vmalloc_restore_context_a0+0xc6/0xd2
+  |  Code: c5d8 9e35 c590 8bb3 40db eb01 6998 b823 0005 856e (6718) 2d05=20
+  |  ---[ end trace 0000000000000000 ]---
+  |  Kernel panic - not syncing: Fatal exception
+  |  SMP: stopping secondary CPUs
+  |  ---[ end Kernel panic - not syncing: Fatal exception ]---
+
+This is commit f44d154d6e3d ("Merge tag 'soc-fixes-6.13' of
+git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc").
+
+(Yet to bisect!)
 
 
+Bj=C3=B6rn
 
