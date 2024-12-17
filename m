@@ -1,262 +1,287 @@
-Return-Path: <netdev+bounces-152663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A539F51AB
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 18:07:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 899879F51AE
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 18:07:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 643B8188B593
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 17:07:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F77B1632CD
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 17:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F237D1F757B;
-	Tue, 17 Dec 2024 17:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA72D1F76C3;
+	Tue, 17 Dec 2024 17:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nGCC7b8i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="34ICc5MA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AABA1F6671;
-	Tue, 17 Dec 2024 17:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734455225; cv=fail; b=r82tQfMyM2+L3Q1s4Xulcuk9sL7ZR6TtpkNiu1MIy3SIZ7xFOHZDYZKi0SGHt0n2MSL2c5jpq69LyYqlUmaDiD9aawleFBLZ3s2l/b30rhcW0IqKy8bS8iNj/WeuozF9CQoNJdbtq6ZRGZ1e94+fcUcAjoMI8iyeqqAl6Zf3+bA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734455225; c=relaxed/simple;
-	bh=Dq4Szq1qaA4cjCZaNB3bqVvHKl+JpeDg8WslQZl7yzI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=RDjbMOpRFvp1g75q2oTBfbcEBy/gBjOOL/MDpFqswQGxok2iaS+Vft9JNNEhhNBAgAOea9iQY0kv0be9OtSy1Gv9g5FZh5RAMcGXrF6BmfdTU5n7Aj3oGjlgxHRv+G4deQc8pI5JVY5R52rHzWZNpBFIYQlGohoA3rdlq08vwJA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nGCC7b8i; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734455224; x=1765991224;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=Dq4Szq1qaA4cjCZaNB3bqVvHKl+JpeDg8WslQZl7yzI=;
-  b=nGCC7b8icPlYlzbpLdAn0vUoZDR7W0nrUUPA+JBtyC5BxVTzD3Gg9/sC
-   s17Pb5nMG3sPOpuaJSYp6dWUkxkRaZGDzC/kb2gczLc5qzNSNVT0cy8Pl
-   NgUYhFi/9hS1pGnnmoclQJmSBmhT/LW5Z8U161STTY0stRAfwcz9LtHWu
-   YVhanvqPyMqkQCLcSm4Q6Up+YqaFDTXVY5kbeXl2b0RP0S7Ak72xLvyL/
-   DbQKCioPiWuOV3GQQbY4aXy3HXsSumP6U8cjSmdeYekBChMEudcr1CJwU
-   fvhp0w79HxpsM6TdnPvv/hDrTbumKaJ/IgaPUle/wtr2+71x0k/bOXcTi
-   Q==;
-X-CSE-ConnectionGUID: U9ci0JewQWioVBC5lYWyPw==
-X-CSE-MsgGUID: 3QaCePTIRCK/b64AmhTalg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="45378744"
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="45378744"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2024 09:07:03 -0800
-X-CSE-ConnectionGUID: WesZYSq0RsyQDaAb86Xy3g==
-X-CSE-MsgGUID: Ub81EvjzTcGTrq3jKVR2+w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="134931324"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Dec 2024 09:07:03 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 17 Dec 2024 09:07:03 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Tue, 17 Dec 2024 09:07:03 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 17 Dec 2024 09:07:02 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=c3PlhblllvN+H4wZIIxVki4oHkthEyz0Job0WJzJmQpEkPwCuT9FiRbVUWemad1ScCyBh2WnhY5VA9RavJJCdO6lGa/jEOM3dsAZvwoQXyFb8Ds0pXHbb4E0rpH0CSYw9yUzRNm9UV04srFm6n7OzAtSIbQtdoGkM8gq4+J0YjzUf4N6c044CV8LcjlMnnaevYfJzYY0LlrLbtvfrOk6lPkr/hnpUuolUuD/SOa8zaScg+P07JYxH/0kwjxzxZ3LK4D0nSArQ30ffG7VAG7cEnZSUvuTw8x8z/gHFOnS68aNvVFB7Cb1/qSylkoYJ/ubgUqk8EkxepVtV/XliiA2kQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YHTyfwbomxtffWQg621qaMxZ+fM5HOmx0WQRVBOuNRo=;
- b=fU62eRYwgf/aN3FqwYwn2GUS46T6UgL82sVdbDoIqqrsLGE9bCReRJj/Gx2H2AtmoNVaQGsx11bJFRwuKNRq11YELTWzS9+mnOI0LbC1Ig+6xO3vkm9nYf0LMR9jNvDZHxbvUPAah2p//d5W5iY9Ht+4hlChPh9fB70Ay5JEym8WPEEP9lwWC7fFkUQ/4DBPr960CldH+D/7zcG6ZV/hTby7OCsxmjDo4Unj4hrPOXJP8pUyjU69f32rEXRG2+IG9qYqgjusxM8Sy6av4k1DIIr1G0J/L9panG/MXKQwB2WbwqMlAoUdYyNDWQljOELXA/Nk6GwZi2vYJ+VAS9Rlbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by MW5PR11MB5857.namprd11.prod.outlook.com (2603:10b6:303:19d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.21; Tue, 17 Dec
- 2024 17:06:59 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29%5]) with mapi id 15.20.8272.005; Tue, 17 Dec 2024
- 17:06:59 +0000
-Date: Tue, 17 Dec 2024 18:06:47 +0100
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Shinas Rasheed <srasheed@marvell.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Haseeb Gani
-	<hgani@marvell.com>, Sathesh B Edara <sedara@marvell.com>, Vimlesh Kumar
-	<vimleshk@marvell.com>, "thaller@redhat.com" <thaller@redhat.com>,
-	"wizhao@redhat.com" <wizhao@redhat.com>, "kheib@redhat.com"
-	<kheib@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "einstein.xue@synaxg.com"
-	<einstein.xue@synaxg.com>, Veerasenareddy Burru <vburru@marvell.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Abhijit Ayarekar <aayarekar@marvell.com>, "Satananda
- Burla" <sburla@marvell.com>
-Subject: Re: [EXTERNAL] Re: [PATCH net v2 1/4] octeon_ep: fix race conditions
- in ndo_get_stats64
-Message-ID: <Z2GvpzRDSTjkzFxO@lzaremba-mobl.ger.corp.intel.com>
-References: <20241216075842.2394606-1-srasheed@marvell.com>
- <20241216075842.2394606-2-srasheed@marvell.com>
- <Z2A5dHOGhwCQ1KBI@lzaremba-mobl.ger.corp.intel.com>
- <Z2A9UmjW7rnCGiEu@lzaremba-mobl.ger.corp.intel.com>
- <BY3PR18MB4721712299EAB0ED37CCEEEFC73B2@BY3PR18MB4721.namprd18.prod.outlook.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <BY3PR18MB4721712299EAB0ED37CCEEEFC73B2@BY3PR18MB4721.namprd18.prod.outlook.com>
-X-ClientProxiedBy: VI1P190CA0050.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:800:1bb::15) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8187D1F543C
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 17:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734455226; cv=none; b=efAfXiYoFu+RwR87YuDCRkbJUdBXac4p5hwTEKcnNlV52wKkunWgq2r82coWr9fIv0Xkga0O1wqAq8gT5cIdSmld9dsNUJ4xW1fceTjkvcvQBtLZFTUzeYUB6/i/RfMDI4cKtC4rv8wY9YK3P3pNcRuNnA3Ii/LkWl97HqPFuDo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734455226; c=relaxed/simple;
+	bh=mw2+xVBE/FIBM9SPUUIqfTD9IIYfh0N8o7MeUFKGv2w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uMRuYAYyhIkDZ6/VnutjjLvab1OI2/ydxdUBQAliDBYz+/OTQIDS6XCrHZVwhTNTegNcnZBPmYt5hDBTzOYO4st7aJtNw+l9YjJ2IlSdbGvmxayzuN9uFil9AqP6wZd4MqfdPd+TpbBozMmm7xYsQfM8zp+aCAgWdc7Lh5KVyBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=34ICc5MA; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5d27243ba8bso895413a12.2
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 09:07:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734455222; x=1735060022; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A6wmWb5tPk2zarAIm4H3/RhKf5SFM9az+Rl0pOks7CM=;
+        b=34ICc5MAdQxvg2WyrN7juY5RWgkiEcYekc9LC/NG95Z7wpBCeWEfCza621nYaqH+jX
+         Q59YoyXDjm8RwLmuUwb2ZB/txZMdMXmLUo2DPh3nPE88KkxYbeinQ+zkA90wKivlcDS0
+         iOdEsQdnOiM1T7UloWW20tXPNGHjSLFJsKgDa+WDJ1IX4TX2HJKVDCVs0WCOA5dveHAZ
+         txfnZ53X6cXxTAdvDgTbUEimuwcx1p20WGsG+rN4ao3DaSZROB6KKqIyoO5GL4VWja9A
+         Oksld8bHb5f164mxzQTRc+MLP0WunRunAlM1WqkWLOnIV/y1KoGH9HvMWZNEpWfbk+i3
+         yOLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734455222; x=1735060022;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A6wmWb5tPk2zarAIm4H3/RhKf5SFM9az+Rl0pOks7CM=;
+        b=f64BlbNIue79SA0Tz+bFhGXyQfu7omMe1Cv5PELKwZ5YESsm4N8zgiHQL9XJ+8qefM
+         o2z/j5p/5hgHTDUhoiAwtODyObjiPJwo3J1UkQ3Z+RDfSwmFsMfh0cet4FPcVJAUoWuJ
+         vJ/ddEHwgpvS8yXrnbYOsLqvJNSfXfONPmrykOSvNPwecwvYpN4qJ1fW+6VGkM728kOq
+         Sx0YV5Oc2LBn4cJZvKcWoPaU6DJjAYpoDoHrQ0IvKiiJCXjs1vUdgQhYMmsNhsAVfm1M
+         tFAPBDb1rexB29zLVHv0NJPx0p11BqD1dmnqcs7iw4cp6pq5gs0I4+bp2kv0n0dl5s09
+         lSVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUoW7dMMwh+zUPL9ofL1361boIWZTww9PC3mESWc+/Hbc4evQ6cwIO5x+o0RViCg0EFgIDmGUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyffQueHQrS9nGH9wsOpsx9KvcdeC3nnOC+50Ks7y+rhZ/cOnqQ
+	WGe3anTbCZDjdO3FsujuTBgm3vXQXRK8CSenQni2Jn3MOjxM0Ls2f0Edkd8s/W2S9Qf50/eV8MZ
+	8nNVwLb8TERZjzbA2Cwbdx7Kos/eLdqCK4ahj
+X-Gm-Gg: ASbGncsuuzdVl2JkMhMGdep23J2cF9UvQTNrgrKvFW7uPmSbiKxU/kzMqZLDfc+4p3f
+	kCJtUdya5ImMVfRtKsb0spWW5URxqtg19PZZnNFYBZfPhPFIMlZDUTA15HEX9KIMUqtphsVRE
+X-Google-Smtp-Source: AGHT+IFulS567VQhTJh/MTvDod8HAGRrfyRfruMU8tkJNdxsP9I7ZxLOZ9MaFMQUg6lrhLT0Teloi0xB9QHKcr5U8ls=
+X-Received: by 2002:a05:6402:3885:b0:5d3:ff30:b4cc with SMTP id
+ 4fb4d7f45d1cf-5d63c3c19e2mr16040657a12.33.1734455221598; Tue, 17 Dec 2024
+ 09:07:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|MW5PR11MB5857:EE_
-X-MS-Office365-Filtering-Correlation-Id: 99ebf608-5760-4a5c-1065-08dd1ebd37b0
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?0k0pGBKB/mTo8YWejLnqB7uQyQdg2kxiYb93PMCjPkqeyamHXx/U8SZCNJsc?=
- =?us-ascii?Q?H1i2niOC5e/qn/ikwqSQKjKMwjNioZpz8J2x+SJUOSs/v/5PTK9SyIwTgVzQ?=
- =?us-ascii?Q?/ZmIpMZpUVJne76/cEd3kaOse3tkOZoq8kv7gIUQN0Ta1OmPmnu0hLtRHZiC?=
- =?us-ascii?Q?6Qv3/MtexydTN5oscci12+pDyXN/+xYj+QOahSHD/O2DC1qrfGhkxQKm3A/Q?=
- =?us-ascii?Q?BVrvjfMOFBvp01xmYdxv9dIWqMvaNwM+4yrATZdWfJKs94W0jeXudrG1Dirs?=
- =?us-ascii?Q?oUQeVs2ErbVKZWgEGksiVU0oIqJ9KHqe1W4VvcTGWW3OWVuRHh9xE7XFkvUk?=
- =?us-ascii?Q?OiZql+FHYcEciuN7v1HOsfc8TDIZiq5Pjm6sCMT2pTAjxV6PwWcVeu7dfhus?=
- =?us-ascii?Q?8pfO6J8rxV23dXiukcj2GZnv9wRc/mLtRsFnkkvKA6Idb0XSSvXg6tCLuHSP?=
- =?us-ascii?Q?9y/7pIsfnl9zfFHqfn8HidAVkIqBM0Vk/BcifNgQE340KukSanyOGly4LReW?=
- =?us-ascii?Q?ygFHLA/Onb6z0IMhWI3RYN7iLEgJ5mV6QsERj0RFKkU++FzusR4/bF9HJJo1?=
- =?us-ascii?Q?N1MBtiEIhC1Rv2fNASGS3kXTyTumfGQa5oULJlTox68YQHnBqwGvecCROnrg?=
- =?us-ascii?Q?Lr2vFkXcpN2IQK2DH5TtJPxQ1ONjisDfdRy9FOgDz1tWU8fLWFi9SXXJQ3qj?=
- =?us-ascii?Q?h+jE4rT67MI4+UWMdveSNmgxyIAb8/wQDpGSfh7Gicm4nVOeklq+39U7uiNi?=
- =?us-ascii?Q?1I383N85sH73V1Byp+Jny6lTypCP1K62ZD3hbM0h9+rb/clx8U0n7KFYP4l4?=
- =?us-ascii?Q?uzrh02ZUqRZ/mh/d/X/V374mOBhTVw9Hy8FT6FrLnabx7w+havSbd5FBxEkM?=
- =?us-ascii?Q?Bz7rkLr4RBxJZ2mOyG3NQ/uhRpa1QYi3HCnLsjMVzjtrmGQwRcP64udYtVNx?=
- =?us-ascii?Q?YUOv8To2sK/zZwnvOVuP+Bn8cLmPq3vV6C6baFKA4Ed5MKw0hByi8dyi55Uf?=
- =?us-ascii?Q?2/NiEcMtX4JoBO7aiCjc6fYRkXois34ArBGnU6H9FpPg3bu/4OkVrXznHqyi?=
- =?us-ascii?Q?D/LfdygkXD9HYgepKq9a18rGFQ7VIIarhi/G5MsuPAZyIqmZUNEhf2UXG2XC?=
- =?us-ascii?Q?rFfCvuq8s+lid/6NNVxhhmtrzPHb27OYzosTPY76F3JJM70bJ8qi1DZTmAaq?=
- =?us-ascii?Q?P821+IkgySPJpeGqazgekAB2GRvgVWuad3S9/HrLEmOykrysvultFXKTb7iZ?=
- =?us-ascii?Q?anfu+4YRZ7egPTym2mnjbp3JvvjnMsYrSMUtEcqZ+ulKm7tm5StSYiHAkFJY?=
- =?us-ascii?Q?PsihUl2X2YBVow/IPk2ZuhqD3Z3E3GS7vLNUXvStxddXFw=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Beg8tR08Lq5vlhWKiSS6mhAkt1m1ipR0zTWx+jMvjsAU6jHZgKuKqwxU2WiX?=
- =?us-ascii?Q?089/HGYQIS/B2M+e2C2sUlIkUOj94tTdGH2jrd1kLHiDBArU4MwAZPsb2PBC?=
- =?us-ascii?Q?WZqNaNaJ0iyskLnV34IcfLLyl8n2TryfAuPa5axohZNe2rtA9DfMJ81FBthK?=
- =?us-ascii?Q?7BKxKN87PkSgREbq9l+eCte3vZXOH87YByfodBbWzDBKEyKS8+m7PeMz5DPY?=
- =?us-ascii?Q?wHm63DPIxDROcX1Bg1LsMWTAa7n15whIap28BnZBStXzEGvo7S9ImmtjuMSn?=
- =?us-ascii?Q?JCBzGgJ5BIXfgYjW+GhFaQTK84A2uIyQmMDceBkNgysBxruM1y51Wa80KUno?=
- =?us-ascii?Q?aK1qAyHzuPrv2fo88o7RGgxt5/Jbt629Y+b4r6ownKSeaevTTharYObCqQDM?=
- =?us-ascii?Q?pwFmIKNIaTTEE1Ho00SrUWt/hViN1pedJgxBQp5+kuNeW2SzdGmRW9IhI+vS?=
- =?us-ascii?Q?OpAZHF6NR6jGiObVIy7u9HSnNUFJ02omj5mDr0tqC8RL3T8NW3xPCRnd5+G5?=
- =?us-ascii?Q?3auuizWMBD04rXgv7PWKsAdyxbbp8h6cpEWADjXJ9doogGFd2+EuHmFMCQLp?=
- =?us-ascii?Q?15pD05V//2i0bz1iPjeQTHVH4Xjl36Z3ZBcGrAa6tC6u5x9zL3ELT+ndKbAf?=
- =?us-ascii?Q?Db+bU0Jz8CFo+EmES8g0YC1C5I4Pm3hmFoasg1rWapRzb2NWPpdBehi1Hs/1?=
- =?us-ascii?Q?18J2MPKHvGd8bnpPIsrN8xRAfE0XbcYctlvwCfv+71NsBn6QX4+WSr3BQG6/?=
- =?us-ascii?Q?U2eFcLoYx/yYgxf1X62y/vgNit5+ulgkwk/udEU1TNFOtKaLZ4pAND+KMsVG?=
- =?us-ascii?Q?1/Spw7Kl0yd5BfA0EfsRsgH5shLNOaf5Uop+Vtu0wBtGQ1EKgCxhJDSkJ+Pl?=
- =?us-ascii?Q?jQ5p7KQQC9vQIO5kZZrXgiPAEUM97YKcgxYXlkz6MnqX59P8UTWDr2oa2mbB?=
- =?us-ascii?Q?d5sPueTcApoKIyp93cTf8K3oGsOpDavvU4Tcuq1K5ZGq3I0lZBer1XftsWKr?=
- =?us-ascii?Q?m9Jj5XatzAsRcsbIIPDGf8qR9j6qwA+jTuJ5idkNzelmyYjL8R+1CRILWUnh?=
- =?us-ascii?Q?7ZcUkXhs4MztgPWtx9fEGGjElhhwWDcT58wfUOGX7OBGXYX906z8EIofNlJw?=
- =?us-ascii?Q?GyI2t/apSaz3aL4C1LUR4MZNIQ2vWjPrYyrN8kUDeMXA2hc97ZcfitUujPBP?=
- =?us-ascii?Q?LuLTckPChTxqs5fEmvHgM4Tm9DmMDh19hSB0aRtzf03GFIc66NchsHFlGTc+?=
- =?us-ascii?Q?xbJ5emrNpCQPSceeB++Q4UbXQiQHNKoRPUM0gPFtAxKJo4snvG3hGccxe7TV?=
- =?us-ascii?Q?l1P7VTAwyLV4fCFYOranZqkJyfWnenYWsvrRrunK81ohL8BQ+2mXdLhWctpU?=
- =?us-ascii?Q?XysHsEIvJzzGroTJVJEvnunTJuHYTtTnK23nuzT9gotH582VcryC01BNFxy+?=
- =?us-ascii?Q?LnMrZ2BSlKNWngEAITGfAVMZAipNqes4XO+Xen2HA2kU5WZyZFK329RxvLtE?=
- =?us-ascii?Q?S8TUnSdu7zKQu9x492YzukaxTZyWu0A6qMfp1dZlFHYqlwmeqmMvQu5KJTBJ?=
- =?us-ascii?Q?IEFsJtDXT3fdU3OIB/HRTKevgYZeI7OMWzfClISENGVJdEJBwa0UfqjrqAAT?=
- =?us-ascii?Q?sQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99ebf608-5760-4a5c-1065-08dd1ebd37b0
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2024 17:06:59.1410
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T0te/WTanMwoIg9qx/WtFAy/FKEIRkA+NUKTXGjYKAG7rbqBfSFxcOoxfIoo9zsfywdFGzFFqZSszf2G5bmrvozyowBumaIFKNRXJbW/AXs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5857
-X-OriginatorOrg: intel.com
+References: <6761aed9.050a0220.29fcd0.006b.GAE@google.com>
+In-Reply-To: <6761aed9.050a0220.29fcd0.006b.GAE@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 17 Dec 2024 18:06:50 +0100
+Message-ID: <CANn89iLL9EgqDz8sjMke9okhJpxtzZkcPvaEQ3s01F89H5RP3A@mail.gmail.com>
+Subject: Re: [syzbot] [net?] general protection fault in put_page (4)
+To: syzbot <syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martineau@kernel.org, matttbe@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 16, 2024 at 06:28:13PM +0000, Shinas Rasheed wrote:
-> Hi Larysa,
-> 
-> > On Mon, Dec 16, 2024 at 03:30:12PM +0100, Larysa Zaremba wrote:
-> > > On Sun, Dec 15, 2024 at 11:58:39PM -0800, Shinas Rasheed wrote:
-> > > > ndo_get_stats64() can race with ndo_stop(), which frees input and
-> > > > output queue resources. Call synchronize_net() to avoid such races.
-> > > >
-> > > > Fixes: 6a610a46bad1 ("octeon_ep: add support for ndo ops")
-> > > > Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-> > > > ---
-> > > > V2:
-> > > >   - Changed sync mechanism to fix race conditions from using an atomic
-> > > >     set_bit ops to a much simpler synchronize_net()
-> > > >
-> > > > V1: https://urldefense.proofpoint.com/v2/url?u=https-
-> > 3A__lore.kernel.org_all_20241203072130.2316913-2D2-2Dsrasheed-
-> > 40marvell.com_&d=DwIBAg&c=nKjWec2b6R0mOyPaz7xtfQ&r=1OxLD4y-
-> > oxrlgQ1rjXgWtmLz1pnaDjD96sDq-cKUwK4&m=Dh7BH5wsuCdQnE-
-> > 4erjptaJnM42YsLU2tY4wPn5NWqwsymkNOllPfQAkomj1mXPN&s=IjWHk3SOqr
-> > ibgv6kz-WTL8VfGVInSu5DzKSbcjCFIvk&e=
-> > > >
-> > > >  drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 1 +
-> > > >  1 file changed, 1 insertion(+)
-> > > >
-> > > > diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> > b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> > > > index 549436efc204..941bbaaa67b5 100644
-> > > > --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> > > > +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> > > > @@ -757,6 +757,7 @@ static int octep_stop(struct net_device *netdev)
-> > > >  {
-> > > >  	struct octep_device *oct = netdev_priv(netdev);
-> > > >
-> > > > +	synchronize_net();
-> > >
-> > > You should have elaborated on the fact that this synchronize_net() is for
-> > > __LINK_STATE_START flag in the commit message, this is not obvious. Also,
-> > is
-> > > octep_get_stats64() called from RCU-safe context?
-> > >
-> > 
-> > Now I see that in case !netif_running(), you do not bail out of
-> > octep_get_stats64() fully (or at all after the second patch). So, could you
-> > explain, how are you utilizing RCU here?
-> > 
-> 
-> The understanding is that octep_get_stats64() (.ndo_get_stats64() in turn) is called from RCU safe contexts, and
-> that the netdev op is never called after the ndo_stop().
+On Tue, Dec 17, 2024 at 6:03=E2=80=AFPM syzbot
+<syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    78d4f34e2115 Linux 6.13-rc3
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D1644573058000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D6c532525a32eb=
+57d
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D38a095a81f30d82=
+884c1
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D169b0b44580=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D13f502df98000=
+0
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/7129ee07f8aa/dis=
+k-78d4f34e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/c23c0af59a16/vmlinu=
+x-78d4f34e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/031aecf04ea7/b=
+zImage-78d4f34e.xz
+>
+> The issue was bisected to:
+>
+> commit b83fbca1b4c9c45628aa55d582c14825b0e71c2b
+> Author: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> Date:   Mon Sep 2 10:45:53 2024 +0000
+>
+>     mptcp: pm: reduce entries iterations on connect
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D163682df98=
+0000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D153682df98=
+0000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D113682df98000=
+0
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com
+> Fixes: b83fbca1b4c9 ("mptcp: pm: reduce entries iterations on connect")
+>
+> Oops: general protection fault, probably for non-canonical address 0xdfff=
+fc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
+> KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+> CPU: 1 UID: 0 PID: 5836 Comm: sshd Not tainted 6.13.0-rc3-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 11/25/2024
+> RIP: 0010:_compound_head include/linux/page-flags.h:242 [inline]
+> RIP: 0010:put_page+0x23/0x260 include/linux/mm.h:1552
+> Code: 90 90 90 90 90 90 90 55 41 57 41 56 53 49 89 fe 48 bd 00 00 00 00 0=
+0 fc ff df e8 f8 5e 12 f8 49 8d 5e 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74=
+ 08 48 89 df e8 8f c7 78 f8 48 8b 1b 48 89 de 48 83
+> RSP: 0000:ffffc90003916c90 EFLAGS: 00010202
+> RAX: 0000000000000001 RBX: 0000000000000008 RCX: ffff888030458000
+> RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: dffffc0000000000 R08: ffffffff898ca81d R09: 1ffff110054414ac
+> R10: dffffc0000000000 R11: ffffed10054414ad R12: 0000000000000007
+> R13: ffff88802a20a542 R14: 0000000000000000 R15: 0000000000000000
+> FS:  00007f34f496e800(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f9d6ec9ec28 CR3: 000000004d260000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  skb_page_unref include/linux/skbuff_ref.h:43 [inline]
+>  __skb_frag_unref include/linux/skbuff_ref.h:56 [inline]
+>  skb_release_data+0x483/0x8a0 net/core/skbuff.c:1119
+>  skb_release_all net/core/skbuff.c:1190 [inline]
+>  __kfree_skb+0x55/0x70 net/core/skbuff.c:1204
+>  tcp_clean_rtx_queue net/ipv4/tcp_input.c:3436 [inline]
+>  tcp_ack+0x2442/0x6bc0 net/ipv4/tcp_input.c:4032
+>  tcp_rcv_state_process+0x8eb/0x44e0 net/ipv4/tcp_input.c:6805
+>  tcp_v4_do_rcv+0x77d/0xc70 net/ipv4/tcp_ipv4.c:1939
+>  tcp_v4_rcv+0x2dc0/0x37f0 net/ipv4/tcp_ipv4.c:2351
+>  ip_protocol_deliver_rcu+0x22e/0x440 net/ipv4/ip_input.c:205
+>  ip_local_deliver_finish+0x341/0x5f0 net/ipv4/ip_input.c:233
+>  NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
+>  NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
+>  __netif_receive_skb_one_core net/core/dev.c:5672 [inline]
+>  __netif_receive_skb+0x2bf/0x650 net/core/dev.c:5785
+>  process_backlog+0x662/0x15b0 net/core/dev.c:6117
+>  __napi_poll+0xcb/0x490 net/core/dev.c:6883
+>  napi_poll net/core/dev.c:6952 [inline]
+>  net_rx_action+0x89b/0x1240 net/core/dev.c:7074
+>  handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
+>  __do_softirq kernel/softirq.c:595 [inline]
+>  invoke_softirq kernel/softirq.c:435 [inline]
+>  __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
+>  irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
+>  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inli=
+ne]
+>  sysvec_apic_timer_interrupt+0x57/0xc0 arch/x86/kernel/apic/apic.c:1049
+>  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.=
+h:702
+> RIP: 0033:0x7f34f4519ad5
+> Code: 85 d2 74 0d 0f 10 02 48 8d 54 24 20 0f 11 44 24 20 64 8b 04 25 18 0=
+0 00 00 85 c0 75 27 41 b8 08 00 00 00 b8 0f 01 00 00 0f 05 <48> 3d 00 f0 ff=
+ ff 76 75 48 8b 15 24 73 0d 00 f7 d8 64 89 02 48 83
+> RSP: 002b:00007ffec5b32ce0 EFLAGS: 00000246
+> RAX: 0000000000000001 RBX: 00000000000668a0 RCX: 00007f34f4519ad5
+> RDX: 00007ffec5b32d00 RSI: 0000000000000004 RDI: 0000564f4bc6cae0
+> RBP: 0000564f4bc6b5a0 R08: 0000000000000008 R09: 0000000000000000
+> R10: 00007ffec5b32de8 R11: 0000000000000246 R12: 0000564f48ea8aa4
+> R13: 0000000000000001 R14: 0000564f48ea93e8 R15: 00007ffec5b32d68
+>  </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:_compound_head include/linux/page-flags.h:242 [inline]
+> RIP: 0010:put_page+0x23/0x260 include/linux/mm.h:1552
+> Code: 90 90 90 90 90 90 90 55 41 57 41 56 53 49 89 fe 48 bd 00 00 00 00 0=
+0 fc ff df e8 f8 5e 12 f8 49 8d 5e 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74=
+ 08 48 89 df e8 8f c7 78 f8 48 8b 1b 48 89 de 48 83
+> RSP: 0000:ffffc90003916c90 EFLAGS: 00010202
+> RAX: 0000000000000001 RBX: 0000000000000008 RCX: ffff888030458000
+> RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: dffffc0000000000 R08: ffffffff898ca81d R09: 1ffff110054414ac
+> R10: dffffc0000000000 R11: ffffed10054414ad R12: 0000000000000007
+> R13: ffff88802a20a542 R14: 0000000000000000 R15: 0000000000000000
+> FS:  00007f34f496e800(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f9d6ec9ec28 CR3: 000000004d260000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> ----------------
+> Code disassembly (best guess):
+>    0:   90                      nop
+>    1:   90                      nop
+>    2:   90                      nop
+>    3:   90                      nop
+>    4:   90                      nop
+>    5:   90                      nop
+>    6:   90                      nop
+>    7:   55                      push   %rbp
+>    8:   41 57                   push   %r15
+>    a:   41 56                   push   %r14
+>    c:   53                      push   %rbx
+>    d:   49 89 fe                mov    %rdi,%r14
+>   10:   48 bd 00 00 00 00 00    movabs $0xdffffc0000000000,%rbp
+>   17:   fc ff df
+>   1a:   e8 f8 5e 12 f8          call   0xf8125f17
+>   1f:   49 8d 5e 08             lea    0x8(%r14),%rbx
+>   23:   48 89 d8                mov    %rbx,%rax
+>   26:   48 c1 e8 03             shr    $0x3,%rax
+> * 2a:   80 3c 28 00             cmpb   $0x0,(%rax,%rbp,1) <-- trapping in=
+struction
+>   2e:   74 08                   je     0x38
+>   30:   48 89 df                mov    %rbx,%rdi
+>   33:   e8 8f c7 78 f8          call   0xf878c7c7
+>   38:   48 8b 1b                mov    (%rbx),%rbx
+>   3b:   48 89 de                mov    %rbx,%rsi
+>   3e:   48                      rex.W
+>   3f:   83                      .byte 0x83
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
+ion
+>
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+>
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+>
+> If you want to undo deduplication, reply with:
+> #syz undup
 
-As I now see, in net/core/net-sysfs.c, yes there is an rcu read lock around the 
-thing, but there are a lot more callers and for example veth_get_stats64() 
-explicitly calls rcu_read_lock().
+I spent some time on this bug before releasing it, because I have
+other syzbot reports probably
+caused by the same issue, hinting at shinfo->nr_frags corruption.
 
-Also, even with RCU-protected section, I am not sure prevents the 
-octep_get_stats64() to be called after synchronize_net() finishes. Again, the 
-callers seem too diverse to definitely say that we can rely on built-in flags 
-for this to not happen :/
-
-> 
-> Thanks for the comments
+I will hold these reports to avoid flooding the mailing list.
 
