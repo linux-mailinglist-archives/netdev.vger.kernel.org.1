@@ -1,55 +1,58 @@
-Return-Path: <netdev+bounces-152560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D20519F4936
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:51:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 816A69F4939
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:52:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2468E16396B
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:51:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C58091891F16
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB231E0B7D;
-	Tue, 17 Dec 2024 10:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513CD1EBA07;
+	Tue, 17 Dec 2024 10:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XSMh8/UJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CkhRfWme"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3236E2E628;
-	Tue, 17 Dec 2024 10:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEE11EB9E8;
+	Tue, 17 Dec 2024 10:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734432667; cv=none; b=VCWRKg5HGObwkln9FLk0741w8sPSmao9uYpDRp28XMaFCqxyqfc0VtrImqCGD++Oxr/M1xKawW9oXJmozTPyKQhMJqGrvfLJ3C2GC2Du+WaphX4E5S0tJrdtdYPquSAVmwymGDshnghH3rPSu78ZXdi60QDaih1HXmxPmdKN/Uk=
+	t=1734432736; cv=none; b=Aqf7F/4hZsMP/Cy80052gaO2mnIBUxswt+cpjR9KMKqghntiWRgQkyTLWHYZ24cPFLoxSDtsjxE8+7kbJsrSgfmDEKA9AhHx8tBzFBHfpx6gRgspf5g/uIWM+dYIb4SpE00z70r/60VmHLe+oLg1zB7isNJgvegacyGcdALeBmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734432667; c=relaxed/simple;
-	bh=4mbpskmtOwRuwpa9v+SeXv4dB9RUJYOJS1ztdmHlJs8=;
+	s=arc-20240116; t=1734432736; c=relaxed/simple;
+	bh=ia3GvqxjT+P91CXaTlnsbjQPa35vnkH4Dgy4Hx/lhdE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QIIADXyMzGYFGep62hyd8jrPKm8br/4WjxtgnTuOUmwtNEOtdwbP1jo2jokjpc0fQahyaP9ROlYeNJ+xrwIXeFPz2Ar9KcfUKaJ8WnLimDnu/Yh3rHECzXkT6vezFVdkA2n5wWuxhv2bp3Wk2qxyfe5KKNI6gNOyvekvP42eUyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XSMh8/UJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0F6CC4CED3;
-	Tue, 17 Dec 2024 10:51:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734432666;
-	bh=4mbpskmtOwRuwpa9v+SeXv4dB9RUJYOJS1ztdmHlJs8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XSMh8/UJKTpeXZq7KvSFkUX4pVTbJfWV0D6n4Aq9psdWioIpXTMdx8KkbA8K2IzkE
-	 pVw/GBVNzdGlCfblSmcgl0ezV8eTND3/ItyMrabXun0rccxosmn7ArnE2MBov9TFsB
-	 EHmS+f7bwLkhV7ur5ohFMtmZK000pVZM1h55o1z4Fh88bW7UY0TzRsQJzEmAc5/iaY
-	 QOTF98jjGoUxbYJFFddgg2+pbT1i98Y20lwCJjT2eXrAB3VKiz2q0fFpKJYlJGzdyO
-	 dOkyR4h+IddlidOCVXr2md5YpiSXR2Xn1NBizKmBAWW8gTYZFPxPIaFmkRObKQsAg1
-	 1WS+guibpYrLQ==
-Date: Tue, 17 Dec 2024 10:51:02 +0000
-From: Simon Horman <horms@kernel.org>
-To: linux@treblig.org
-Cc: jes@trained-monkey.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: Remove bouncing hippi list
-Message-ID: <20241217105102.GR780307@kernel.org>
-References: <20241216165605.63700-1-linux@treblig.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=s22LVExVs7CYmscVL/4++IBdz2yRqNarj5EB9tKNg/wkPo7qvOahUJKtTC6rU0qN9bu/twS+s9/1dvRkDba/LO01DHMwzDRgIY54JeddFX5/ghZZ21Z3NAsqCuWPR6JDEgb6nncMjAGEm2Sykiuq7uYaAzxiNu3ALNSYjsYwY0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CkhRfWme; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pKIaSLMgzRitaeQqeBKxAj8nc5TyrOFd+OEeRdGYXPE=; b=CkhRfWmeWxL/5x2HeV77SFNevT
+	xWGadKHW6ILfP+HFgtZY4mAyhk4hUPYV3TrbmIEorvoe0uU3PvgqsQiQgEfXK+R0yFwly3kMrPR5E
+	8xd8/6tYYfb9dvrA44DbPxuqGO1wIcIeu8R/MOTqh0waxkni6idzCvdtPIlbA49oBMR8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tNVBP-000vL6-UP; Tue, 17 Dec 2024 11:52:07 +0100
+Date: Tue, 17 Dec 2024 11:52:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Avri Kehat <avri.kehat@intel.com>
+Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	ogabbay@kernel.org, oshpigelman@habana.ai, sgoutham@marvell.com,
+	zyehudai@habana.ai
+Subject: Re: [PATCH 06/15] net: hbl_cn: debugfs support
+Message-ID: <ce20fa38-0949-47fe-8c2f-635f761479f1@lunn.ch>
+References: <b40391d5-66d2-44be-bc83-4ac3b7bcfe08@lunn.ch>
+ <20241217100039.79132-1-avri.kehat@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,24 +61,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241216165605.63700-1-linux@treblig.org>
+In-Reply-To: <20241217100039.79132-1-avri.kehat@intel.com>
 
-On Mon, Dec 16, 2024 at 04:56:05PM +0000, linux@treblig.org wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> linux-hippi is bouncing with:
-> 
->  <linux-hippi@sunsite.dk>:
->  Sorry, no mailbox here by that name. (#5.1.1)
-> 
-> Remove it.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+On Tue, Dec 17, 2024 at 12:00:39PM +0200, Avri Kehat wrote:
+> Revisiting the comments regarding our use of debugfs as an interface for device configurations -
+> A big part of the non-statistics debugfs parameters are HW related debug-only capabilities, and not configurations required by the user.
+> Should these sort of parameters be part of devlink as well?
+> Is there another location where debug related configurations for development can reside in?
 
-Thanks David,
+There are a few options:
 
-I have no insight regarding how long this might have been the case.
-But this seems entirely reasonable to me.
+If the user does not require them, don't even implement them. If the
+user is not using them, who is?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Implement them in an out of tree patch, which your development team
+can use, since these are not user configuration options.
+
+devlink is a possibility, but developers complain it is slow to get
+them merged since we want to understand what the configuration option
+does, why would i want to use it, would any other vendor have the same
+need, and should it be made generic etc.
+
+You could join those asking for fwctl, which is a contentious subject.
+
+	Andrew
 
