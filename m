@@ -1,125 +1,112 @@
-Return-Path: <netdev+bounces-152544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41AAA9F48BD
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:19:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 034E39F48C7
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA1EF188D650
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:19:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3D75188CE41
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91061E1041;
-	Tue, 17 Dec 2024 10:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r1vdaU21"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08D61E048B;
+	Tue, 17 Dec 2024 10:24:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4C31E0DFE
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 10:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35F51DBB35
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 10:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734430756; cv=none; b=kjEUGZONNWY2pDSQ2Ii6Bda4VLCBa02yRhadWk5pslrcjATM1V6WtNijrr4bV7xnMlnHtQpir1DfCjg81/E4DaUcfRz03mACkvC7/3L1HE0x1F9MI8lxCC2wt+R6Mi1P+JDPORbVI11oaxBXifqwxdD5Dh9p5EyfCeUZZzILc0Y=
+	t=1734431052; cv=none; b=sYkvQWsdZLDt78795pRrYsp2m6r3L5Dg0ax13HNfEOl7EVT+S9MuhnbRNby8jWi1ex7EKcYR2TQLDWTtv0xzIZwNHCo3LJ1lVnK0T5g9s8wVHcjV3p+dH7a7Mj6O8YvyC3KIKYYFnGOSRseUEmWt+K6qvRHy2qS+ISg+L2uf/H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734430756; c=relaxed/simple;
-	bh=Z18WrDXPOK8sdE5XwIMLKVLdTqqEpVfwiIQqP8kH+eE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=atV73KUJ8oYrqTYmEA/3WxtZ7BPe8boW+4mDqV3lmWx97lVVJLX+ypqBotmHB0dFohIYgq581tqTY89YZ6KhUihZS+C7wZmiY5dEqkOvit2KgHBgEkVxpbn8DxUCNZY59r2dOfJMMcndzLsQ0MgxpKOT/NFp4Oyl2iIoockk7Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r1vdaU21; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5d3f28881d6so6760218a12.1
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 02:19:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734430753; x=1735035553; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z18WrDXPOK8sdE5XwIMLKVLdTqqEpVfwiIQqP8kH+eE=;
-        b=r1vdaU21inwCY9q0n9XLAqHZFvAtz/cUnpwEIV0YB0xuaAUKF+moVls77El5WcO41y
-         QhR1kHyhBt8LC655s/xoehYcH/JEzpi25twPKC7s5/e7TX8zqkxwW1FxctecMURP0oMz
-         +QzL1FgcVrwQV0p1GKw1d9rk5RDtrylhjAZnS5czeoHfV6TeXd3Y9t3fhyTjV/9fYXX1
-         vaEarSlPcqFQN347mvE2Wkfet/p+CTzxvLmI8/IFaaoD9qRTm85g8/8Fy0xBrQflyvym
-         My3ik5Y8QuvsFISJJGRho+VCBJIVogNMZQVG0Y1/RoepYH2e5Fw+SfEr29fR6m2QQo+T
-         lfPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734430753; x=1735035553;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Z18WrDXPOK8sdE5XwIMLKVLdTqqEpVfwiIQqP8kH+eE=;
-        b=PV6wgKE7tBhAbQDdMLz6V5D3K9B6TLOcorQZtMDVPZKJlfzMhiyR7dTwNQzxzns4ll
-         JXQU1RFDV9gHmpKe3y/38d+4NYkMtF7YcWEJZn1lITRqEaW/vEH2tOu4wP3Rg7xpb741
-         UZHGaZ6d3lgAWhrkqj9WwlnO/ucQbHQt/kTD9RnZ0E2vo5TwRripmuuAN4lxNYPGx2KA
-         EOmx2h7lkZHKLdlMz9Q32OmyPxSdHBMsvfJ3Bg/CVI+WNg/fuRIs8P/Cixcwk0ClnCLG
-         OpiFi0sHPY1LYPsWzvCKK16xcAF69djXK/ZEnTd7OBYBh0s1PCVrHwoVcJGtVUxtP2iy
-         9zFw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6frdYLfcwt7xrTb2dzYOyCgOtwRGk/gEBcVJUjp/5ZLJysx/3awlTy/HgShFwYlzSaHcm8Q0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKstrsx9PToOjcm0aDoH7licMBVdrwHRs3LdtMCBBenhYgFCRm
-	JersSpbEgt7p8hFCY1q7Rj9zls5N79HWjjeUrgYsp4nm9gah8jhl7XFBVuPIyhscr06AX3tOkrG
-	YbheG57dLhRYi5KyJEa4GQsO0OluikZcZtJlA
-X-Gm-Gg: ASbGncuqBmDfAw+zH4BLfToASK8+QjQ4SCHzMFX/riy55Z2xTu4BzPqoZUJUYeHa5Pg
-	kxi0Db82TnuMfRNaGm7QHRK1urINHQmFiJv6+8zk8fQsM+uIgBYDSE8CJQkNY6h2QV306b9Rj
-X-Google-Smtp-Source: AGHT+IGwfOu6ANJJ05jZ+YL/Ec3h75SVW9OIju7Dy/3tpNuFA3NKeaexTVuBR8DEViYivjcF4eZBsHCVbeTz8Hx3SJo=
-X-Received: by 2002:a05:6402:34c7:b0:5d0:cfad:f71 with SMTP id
- 4fb4d7f45d1cf-5d63c407452mr36501089a12.32.1734430753272; Tue, 17 Dec 2024
- 02:19:13 -0800 (PST)
+	s=arc-20240116; t=1734431052; c=relaxed/simple;
+	bh=6arRrA87vBXYEa34I0Qtw5crSOyJNNwrEmLHh4mnJiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cRvLL5KEIOI6G5ya6P5EwJHGrcI3FnI8mbM4oVs006cjXdejThAwcQEtsvfe6HtqqFiDFW6MMeSb8Q3hhYSWTqVAY7RslcyqEMlGpj/8m/9u/KNbIgkKGx/mtjbWM98uZna+zbGYGrAdW6+1dApvbGqngZswAWGU78wu6HHzFtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNUkD-0003em-RE; Tue, 17 Dec 2024 11:24:01 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNUkA-003qct-2M;
+	Tue, 17 Dec 2024 11:23:59 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tNUkB-004V6C-1G;
+	Tue, 17 Dec 2024 11:23:59 +0100
+Date: Tue, 17 Dec 2024 11:23:59 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
+	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
+	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	lorenzo.bianconi83@gmail.com
+Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
+ EN7581 SoC
+Message-ID: <Z2FRP6K0uZRyvtUC@pengutronix.de>
+References: <Z2AYXRy-LjohbxfL@lore-desk>
+ <20241216154947.fms254oqcjj72jmx@skbuf>
+ <Z2B5DW70Wq1tOIhM@lore-desk>
+ <20241216194641.b7altsgtjjuloslx@skbuf>
+ <Z2CpgqpIR5_MXTO7@lore-desk>
+ <20241216231311.odozs4eki7bbagwp@skbuf>
+ <Z2FAUuOh4jrA0uGu@lore-desk>
+ <20241217093040.x4yangwss2xa5lbz@skbuf>
+ <Z2FL-IcDLHXV-WCU@lore-desk>
+ <20241217101724.v6kbmfqpq3kgyrd4@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241217094608.4149466-1-buaajxlj@163.com>
-In-Reply-To: <20241217094608.4149466-1-buaajxlj@163.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 17 Dec 2024 11:19:02 +0100
-Message-ID: <CANn89iL077dDhKwWA8Uqhco-uK=UdjZMy7+UABBT8h5Lq4UF+g@mail.gmail.com>
-Subject: Re: [PATCH v2] net: Refine key_len calculations in rhashtable_params
-To: Liang Jie <buaajxlj@163.com>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, horms@kernel.org, 
-	anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Liang Jie <liangjie@lixiang.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241217101724.v6kbmfqpq3kgyrd4@skbuf>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Dec 17, 2024 at 10:46=E2=80=AFAM Liang Jie <buaajxlj@163.com> wrote=
-:
->
-> From: Liang Jie <liangjie@lixiang.com>
->
-> This patch improves the calculation of key_len in the rhashtable_params
-> structures across the net driver modules by replacing hardcoded sizes
-> and previous calculations with appropriate macros like sizeof_field()
-> and offsetofend().
+On Tue, Dec 17, 2024 at 12:17:24PM +0200, Vladimir Oltean wrote:
+> On Tue, Dec 17, 2024 at 11:01:28AM +0100, Lorenzo Bianconi wrote:
+> > I agree it is unnecessary, but w/o it we must rely on limited QoS capabilities
+> > of the hw dsa switch. The goal of the series is just exploit enhanced QoS
+> > capabilities available on the EN7581 SoC.
+> (...)
+> > AFIR there is even the possibility to configure inter-channel QoS on the chip,
+> > like a Round Robin scheduler or Strict-Priority between channels.
+> 
+> So the conclusion of both these statements is that it would be good to understand
+> the QoS algorithm among channels of the MAC chip, see if there is any classful
+> root Qdisc which can describe that algorithm, then offload it with ndo_setup_tc(),
+> then assign traffic to user ports probably using a software classifier + flowid.
+> The ETS Qdiscs which you are trying to add here should not be attached to the root
+> egress Qdisc of DSA user ports, but to the classes of this unknown conduit root
+> Qdisc. Agree?
 
-Please wait at least 24 hours before sending new versions of a
-networking patch,
-because we are flooded with patches.
+I would love to have some kind of easy to use DSA user ports classifiers.
 
-Documentation/process/maintainer-netdev.rst
-
-Resending after review
-~~~~~~~~~~~~~~~~~~~~~~
-
-Allow at least 24 hours to pass between postings. This will ensure reviewer=
-s
-from all geographical locations have a chance to chime in. Do not wait
-too long (weeks) between postings either as it will make it harder for revi=
-ewers
-to recall all the context.
-
-Make sure you address all the feedback in your new posting. Do not post a n=
-ew
-version of the code if the discussion about the previous version is still
-ongoing, unless directly instructed by a reviewer.
-
-The new version of patches should be posted as a separate thread,
-not as a reply to the previous posting. Change log should include a link
-to the previous posting (see :ref:`Changes requested`).
-
-Thank you.
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
