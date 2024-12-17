@@ -1,186 +1,140 @@
-Return-Path: <netdev+bounces-152537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8D99F483F
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:01:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6875A9F484C
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 11:04:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 472FA1882E93
-	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:01:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F413116B76D
+	for <lists+netdev@lfdr.de>; Tue, 17 Dec 2024 10:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC92C1DC747;
-	Tue, 17 Dec 2024 10:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A681DDA09;
+	Tue, 17 Dec 2024 10:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ht9zZ9AV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gaRd+jJU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A3E1D1E74
-	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 10:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871E91DBB35
+	for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 10:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734429691; cv=none; b=JXBzG9EQ2N+W90t8gndJpmCwY/Na7MyBb9jNkBfNNrixX4KP/CHir/x5BexqcHO7pG4bFrz7rfaRmNR6gGqRNVk+ZfFJ1TWuEzqKnL8d5gNQYaZENXWf9TekAGbpGhw0mofGMAyLIEfG4rUvNSSVtetDq2zjRM141YIX3C9U/a8=
+	t=1734429843; cv=none; b=ld8pK7WdxyhijQWTWhN1Oidtl2HK5ELiC0nqJrX37wqGhQXsRo9GnzAsf4oT8X7Uvovprl9nFrp6uCKU3jpa1CqIGdtOI3WN7HWxX8Hr6qYdHLI2wQ5685SB13yClq3qAaIme6S7boT+cJBbhrpkCBA4teiwUIvK44LZGo8VNFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734429691; c=relaxed/simple;
-	bh=znx75QO08E5c7zjmyuZyLOt4uuIsS0LJcaGOYD3tjDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XGfh4SgcHEDbRm/lpajp2POkrfCVCEhpAmFaCdzyhM5uctpthyu4kPmLJxhO5qtzckD3teNh/bjys3JenzY8ko9xnbCimuluRmetpiH/LvQM71x1vwro4+P3UELqsFk9cdjKi3OfvL/pRAaFyiY7y45J4zK0ndUzMqHi6EIwGw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ht9zZ9AV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4535C4CED3;
-	Tue, 17 Dec 2024 10:01:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734429691;
-	bh=znx75QO08E5c7zjmyuZyLOt4uuIsS0LJcaGOYD3tjDs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ht9zZ9AV3gmL4R0+XIsPxvTZS7CirHjgJtq/PG0/AH2i4dBYLVSrcOKbUvVgUlemh
-	 sxCWbNVdOcHLoPWMwqT0UnOPCHhwV+YLhVDzgfsTIscZBl9Djq6kOOgaO5nteVqLV4
-	 sJF3/dUOk8WUazOls9tO5F9h8t5eHOyD+lmmJgUyLPpCw9tTeVET6hFICZojQ5josg
-	 iTRK6D0hJELTcR3IIgNcOpTZZ/R15hr/CWd7vAF7MEcsHan7ND4ZfQwCaG6O2Q3puf
-	 8zVZpEXvBMJHn0e1VJhE87XAJa+1kUDSZxZR6ZtmRpnHbUPriSvx9FdXVIjXqzxKaa
-	 ITjVxR6w/xukg==
-Date: Tue, 17 Dec 2024 11:01:28 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
-	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
-	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	lorenzo.bianconi83@gmail.com
-Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
- EN7581 SoC
-Message-ID: <Z2FL-IcDLHXV-WCU@lore-desk>
-References: <Z1sXTPeekJ5See_u@lore-desk>
- <20241212184647.t5n7t2yynh6ro2mz@skbuf>
- <Z2AYXRy-LjohbxfL@lore-desk>
- <20241216154947.fms254oqcjj72jmx@skbuf>
- <Z2B5DW70Wq1tOIhM@lore-desk>
- <20241216194641.b7altsgtjjuloslx@skbuf>
- <Z2CpgqpIR5_MXTO7@lore-desk>
- <20241216231311.odozs4eki7bbagwp@skbuf>
- <Z2FAUuOh4jrA0uGu@lore-desk>
- <20241217093040.x4yangwss2xa5lbz@skbuf>
+	s=arc-20240116; t=1734429843; c=relaxed/simple;
+	bh=SiOI+a1yrPefvnCTYRy1HAhiE8ystwgJCaxun3SS034=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nCWAfn8BBJK4JzQUvVgEbep67S2yCdrGD75i+OjROPu3g9ojHDTzie/YIsJYuTgNP/F3b+gEupNqUfekIkXi62F1N/qdx5GVaBP3b8FBiRXo2nTbmj5SAEJL6Y5WffX8XM4gWM55iUhxs1yxrz5QB2GzW7EM2k12uPlBzGLL9oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gaRd+jJU; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a818cd5dcbso65ab.0
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 02:04:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734429840; x=1735034640; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SiOI+a1yrPefvnCTYRy1HAhiE8ystwgJCaxun3SS034=;
+        b=gaRd+jJUpBZn4XZUZXkng5CFmz1zIcNmujuIKQK+ni0MR5ND2PANTHI66iGWQnJNRc
+         vKlMqmpbmJs9fa/hUO0v179AUPKjZsyc4tpiVZv2cbVjWyxY1zzGbIy7Z3tAKniZPjj2
+         7WuAYo4sGvws8xu8BYVnggLeZYite8axq1MTr/aU73+f+etc+N60un65W2p1xVSD5/si
+         SgKrlOxMcrOkTzTrbXHgOu/QRhOTO3Ghf0WoCeWVtOJVujqZmYYGc0YJTHLmVkV873VT
+         +0jut/Xc1Mr5qIi9sYLnGdbEEsSa5xnQFTOleMadp+h42Ng3MGDfog3CoU77rN/qPeCo
+         cpNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734429840; x=1735034640;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SiOI+a1yrPefvnCTYRy1HAhiE8ystwgJCaxun3SS034=;
+        b=suLUDgLAlPYiwriq+Sbtr+mv7W0UaFBQmz2ME/9SfkH5exeQ3YiRnM8oRu6AD+Xf/+
+         Sf9srC8oXQD/gAR8uInlfACMITx/vussilegbdG2PXAKg18V2X0edI937DU3LmDGi8+0
+         /DjLcvzZfioSgrFyRBW/VAedn8arshOIszkrOGLPb5coXwnogY/NA1zi9qfqG8bMJU5a
+         cbxuIoTxdj+aaJanpVhG9LuBfqW4pOfi+Gdy0gvD/5uJTIoEyhEV707VehMeEuYT/IIB
+         iRHwp3WDwK+buh54bhOe5wpdTalmP+APYk08558BYl/kCqBpcD/A8lJQr1Lczo9Kg+m5
+         cMsw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwj8kCkMh3uyYk8Zw6gmZvDR0EiGiYDc8dcAuF9b7kRB01ogKN7QMG5oF46wIcK5FIBTfwcpA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yygz+0QhPk3rH68K2qrVpOLG0T45badmUQgfAuGcJxc6YYg5Xj7
+	PUAEjL2FU8RFVGQpFkPFIp+YqRqZGiqgU32zAwKC/0oNdKN9xakebQOMCErVUxgw3bFj3AqMT/S
+	lnWrT72d/YcMAem+wE7DKG6LFNfRBupt9layl
+X-Gm-Gg: ASbGncse0TEa7ttvHcRF7ivsDxI9w3H1tofbdW+rTIbCh6lCKpQvWoNRzEg0CIuDaN9
+	YxO7BQCRG3bSxqZo3erxmDdS3PyGk7zX8ULpxxzpo12lC/pgNLDJj1Pw1q7cogj/BeS/J
+X-Google-Smtp-Source: AGHT+IH+ubBPmVKVFDGnhrE/uD5pLkyCTnb2tNx0uDqwEt5UqhkXy8jdRQpJBcCAYQqw7tqbntRVJyWTdGegZ140feM=
+X-Received: by 2002:a05:6e02:1d8c:b0:3a7:d682:36f6 with SMTP id
+ e9e14a558f8ab-3bcc30676d8mr18695ab.0.1734429839719; Tue, 17 Dec 2024 02:03:59
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="/PdKOp1lvndNLBiR"
-Content-Disposition: inline
-In-Reply-To: <20241217093040.x4yangwss2xa5lbz@skbuf>
-
-
---/PdKOp1lvndNLBiR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20241217063124.3766605-1-yuyanghuang@google.com> <CANn89iJsO=FppY=qx6Mo5CUP6v5QgeR-c4StSGmCoQ3kcZ-bEg@mail.gmail.com>
+In-Reply-To: <CANn89iJsO=FppY=qx6Mo5CUP6v5QgeR-c4StSGmCoQ3kcZ-bEg@mail.gmail.com>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Tue, 17 Dec 2024 19:03:23 +0900
+X-Gm-Features: AbW1kvbGjpbsadZXS72JPHHuaeFf_VB8tWS3luuvRqV7jt0tRN9VVVea22Iew0g
+Message-ID: <CADXeF1Fq+AimSZSf480D3Hgimzgk2eUCjs0XHNAq5jPkEPjwsA@mail.gmail.com>
+Subject: Re: [PATCH net-next] netlink: support dumping IPv4 multicast addresses
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org, 
+	jimictw@google.com, prohr@google.com, liuhangbin@gmail.com, 
+	nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> On Tue, Dec 17, 2024 at 10:11:46AM +0100, Lorenzo Bianconi wrote:
-> > > When you add an offloaded Qdisc to the egress of lan1, the expectation
-> > > is that packets from lan2 obey it too (offloaded tc goes hand in hand
-> > > with offloaded bridge). Whereas, by using GDM1/QDMA resources, you are
-> > > breaking that expectation, because packets from lan2 bridged by MT7530
-> > > don't go to GDM1 (the "x").
-> >=20
-> > ack, I got your point. I was assuming to cover this case (traffic from =
-lan2 to
-> > lan1) maintaining the port_setup_tc() callback in dsa_user_setup_qdisc(=
-) (this
-> > traffic is not managed by ndo_setup_tc_conduit() callback). If this app=
-roach is
-> > not ok, I guess we will need to revisit the approach.
->=20
-> To offload QoS on the egress of a DSA user port:
->=20
-> port_setup_tc() is:
-> (a) necessary
-> (b) sufficient
->=20
-> ndo_setup_tc_conduit() is:
-> (a) unnecessary
+Hi Eric
 
-I agree it is unnecessary, but w/o it we must rely on limited QoS capabilit=
-ies
-of the hw dsa switch. The goal of the series is just exploit enhanced QoS
-capabilities available on the EN7581 SoC.
+Thanks for the suggestion.
 
-> (b) insufficient
->=20
-> > > But you call it a MAC chip because between the GDM1 and the MT7530 th=
-ere's
-> > > an in-chip Ethernet MAC (GMII netlist), with a fixed packet rate, rig=
-ht?
-> >=20
-> > With "mac chip" I mean the set of PSE/PPE and QDMA blocks in the diagram
-> > (what is managed by airoha_eth driver). There is no other chip in betwe=
-en
-> > of GDM1 and MT7530 switch (sorry for the confusion).
->=20
-> The MT7530 is also on the same chip as the GDM1, correct?
+>Have you tested your patch with LOCKDEP enabled ?
 
-I think so, but I am not sure.
+>CONFIG_PROVE_LOCKING=3Dy
 
->=20
-> > > I'm asking again, are the channels completely independent of one anot=
-her,
-> > > or are they consuming shared bandwidth in a way that with your propos=
-al
-> > > is just not visible? If there is a GMII between the GDM1 and the MT75=
-30,
-> > > how come the bandwidth between the channels is not shared in any way?
-> >=20
-> > Channels are logically independent.
->=20
-> "Logically independent" does not mean "does not share resources", which
-> is what I asked.
->=20
-> > GDM1 is connected to the MT7530 switch via a fixed speed link (10Gbps, =
-similar
-> > to what we have for other MediaTek chipset, like MT7988 [0]). The fixed=
- link speed
-> > is higher than the sum of DSA port link speeds (on my development board=
-s I have
-> > 4 DSA ports @ 1Gbps);
->=20
-> And this fixed connection is a pair of internal Ethernet MACs, correct?
+>I think this should splat, considering your use of for_each_pmc_rtnl()
+>in a section where rtnl is not held.
 
-yes
+>Please make sure to use RCU variant only in the dump operation.
 
-> I see on MT7988 we do have the "pause" property, which would suggest so,
-> since flow control is a MAC level feature. I assume 10 Gbps in the
-> device tree means it is an XGMII really limited at that speed, and that
-> speed is not just for phylink compliance, right?
+After turn on CONFIG_PROVE_LOCKING=3Dy, I can see the error like follows:
 
-I think so
+net/ipv4/devinet.c:1876 suspicious rcu_dereference_protected() usage!
 
->=20
-> What if we push your example to the extreme, and say that the DSA user
-> ports also have 10 Gbps links? How independent are the QDMA channels in
-> this case? What arbitration algorithm will be used for QoS among user
-> ports, when the combined bandwidth exceeds the CPU port capacity?
+I will fix it properly in the next patch version.
 
-AFIR there is even the possibility to configure inter-channel QoS on the ch=
-ip,
-like a Round Robin scheduler or Strict-Priority between channels.
+Thanks,
+Yuyang
 
-Regards,
-Lorenzo
 
---/PdKOp1lvndNLBiR
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ2FL+AAKCRA6cBh0uS2t
-rMPkAPwIVnjFVjRW1JNH0RbpQKJHWmmpBYc3thC+MA1sVKQwBwD9Go4iB+JYpsBt
-F+RrVhO71gLeqAowtDRrGtritBNCWg8=
-=e5hP
------END PGP SIGNATURE-----
-
---/PdKOp1lvndNLBiR--
+On Tue, Dec 17, 2024 at 4:07=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Dec 17, 2024 at 7:31=E2=80=AFAM Yuyang Huang <yuyanghuang@google.=
+com> wrote:
+> >
+> > Extended RTM_GETMULTICAST to support dumping joined IPv4 multicast
+> > addresses, in addition to the existing IPv6 functionality. This allows
+> > userspace applications to retrieve both IPv4 and IPv6 multicast
+> > addresses through similar netlink command and then monitor future
+> > changes by registering to RTNLGRP_IPV4_MCADDR and RTNLGRP_IPV6_MCADDR.
+>
+> Hi Yuyang
+>
+> Have you tested your patch with LOCKDEP enabled ?
+>
+> CONFIG_PROVE_LOCKING=3Dy
+>
+> I think this should splat, considering your use of for_each_pmc_rtnl()
+> in a section where rtnl is not held.
+>
+> Please make sure to use RCU variant only in the dump operation.
 
