@@ -1,315 +1,245 @@
-Return-Path: <netdev+bounces-152958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADA909F6714
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:20:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1DB39F671B
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:20:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3031B16E0EF
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:18:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 162F8171648
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605531FCFD9;
-	Wed, 18 Dec 2024 13:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58601B0430;
+	Wed, 18 Dec 2024 13:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B67qp6RZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nVAWGv0D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8771FCFC2;
-	Wed, 18 Dec 2024 13:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734527457; cv=none; b=Kg5X+Asqsh/CeptfwkVuJxe1OLuZUK9e9rDRUEWrDO88dNVsTUIyWUlDjs7Su3iObEHE10J1LjwA4gQ6Wlz/ram+wDcB064iWa0h6S73tqvJZlgPhyxQ7wK48G5FlX4/qFznhslZudcHPuu/mIdK4XOSAVTI6o6tl1o1sqlTK2k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734527457; c=relaxed/simple;
-	bh=MmoB5+7EOmwBm0nVVOoQDyuB6FG4U5u804h3NW5wIi8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jGQJU5vPH+o2UpEFvcP95GWKyMXI23dywS+AoOKLCwhRbyLfSVevQpeNcL3xX1hUBQEyd+s+2i0nMOWF2JQaVbuHxFI8T7jFmxgw2ADGZ9vEuo4UM+4BegR3Jemuho550E79nPIL8n0tX8CifgXgX+DOwEnPiS/0r0DbePoKGgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B67qp6RZ; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2166651f752so68023295ad.3;
-        Wed, 18 Dec 2024 05:10:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734527454; x=1735132254; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cEe2srsfNQuo3cFtk4Exr0i8mchzSjDC/1TEtzbMZ8U=;
-        b=B67qp6RZKhQnvemU+DKJ1ktWXZyOdMzlOUqwo+QdAnhWwxIbRRECHjtiyCieQlie1M
-         ShXJ6QzBrCtLNjzOwHlLheFKjP5qOT+Rx0/aMc42SatHLVV+Q/h2UGHVFtCHYqHGSVKc
-         wWZ2/3lz1vJ5jLnKe37l5B8Xr8wKa9FgRXT2hOAYMpfdki0EifFNy+LwmtzYxNaH9hkR
-         5H/IZ8wK+ySzuIETBb/FA167p9uls/EasNPlIg/IkTXrqY/k+WZxrkDzbxXnB0aZLhiW
-         JhTfIv44cxi2wX6IaDqTRJRc7hqa0cfMRp2LQ2oPheJacMrDaSaWOb8TvNwFtldka3zv
-         8J1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734527454; x=1735132254;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cEe2srsfNQuo3cFtk4Exr0i8mchzSjDC/1TEtzbMZ8U=;
-        b=P0ry8xqrRBtX9Hkw91oTG1LaO1556Az8EfRNMtaQJvG/IySN1JfHj2TBUDdEg2sdfS
-         ivjceOyi6dwRSN7pswoazQ7GZpIaRJkz1i4830puKCixlkchrpdegW5dwx7bapeEhPBC
-         EcGVfvZ+e6YWbH7cRxZEbGuLGx8EOFDAFDvTXIRgBFvYM+O4OP5HzisvWQKwkz8bFOaT
-         DbfVBrcHVbaV0TdGIgTM3ZMG8veQL/bUfvdjs8HUu8tlOAV8cd1i8cXqcdQELSJVe8RK
-         VdrWccETtVyr+ESgImlFEbsIfeXtZ9mwr1L6lQHmEMhTWAiVXTP521epRsPKOPvh52ls
-         74bA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6VCx46l+HPxRjkcW/eY9nODZJfX6oTTxPhdJ7G9g/ccjG0bJTEaHG5FPmS0uO4eEWZrWZ2ih3obXoCQ==@vger.kernel.org, AJvYcCUFfnK+jkJ9NIrXYlCmfmsgoOEOJ7rW1+mlbFSf8BD5gBO+KJc5L/WhKeHr4dYoEZohHKMBy/37IitV7LKFfiU=@vger.kernel.org, AJvYcCUSu97E2Je16rP74s4aLc83+TWqmhsS9hgSkDUAAO6VcEAswUCBM8v1HQ0EwfeQ4n8sMFVPVG8L4qJl@vger.kernel.org, AJvYcCUhCqtIjqro8hkwPtPmgsOoH8UNalKTToqjU5xOpv8qVuDrBkXeP9liH716c67jYOjfwOpoG/r0ARYm@vger.kernel.org, AJvYcCWRjkc64wGLdK+fvVkf/iqEaZaksPBzuPOADFdEWlimqNJbC4Z4KpT+owzRtwrdBwhGewwX2hIVtQSoF9R4@vger.kernel.org, AJvYcCWXHow90aZJ0YUdmrvqY1VLXkY5U13a011VTYqypeaDg5HyfOxtdGgIiLG57lBYSIYDi3dNzpfQdugxqocDSFhx@vger.kernel.org, AJvYcCXLQFOuB6ytpGz2qRBQbTo/G0Le9oNTy2V4rnbHkq8BPOuXeb3nM++kkt/G0uvl+QzRwGI9vWK5iHcnYg==@vger.kernel.org, AJvYcCXqIouqt+x1KtfysuulEdDt31ZY1ZEWE3aFYP8Ijb/l6oNzbOJ2xxnsHgNJlW6ivuZfMlk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZWAna5M1IJvQ0A7c6tOCigB6Qieym3J9sKWRP6JTvGnY2xK9L
-	66+QzuCNxJwUl7NbIZom46ZC/CGMAhK3YMFN6tt6s22aTD/GTk5VnxnUX/afFxk=
-X-Gm-Gg: ASbGnctbqw0lI4keK6Bv16I8TF6yIYG6I6JwjcX+kI9qbX1Ipl+iIH3C6308wQfOqbh
-	QDhNFoqJ2AcBENx3bdJM3i/Y+wggGuyDi2fYSDI8J3ks0tzWSslskNlbChMUJyFKjxVaZexvI16
-	qE4QdiO8Zfbr6KK6wUAc7PNz+l1JUpauVrByxEqDaXUwgGRN6+i3JLz5fgUDvLfwTCwp0h3aNu0
-	9ce7tUGk5Mpwi4u2KuDrnwKzS4YHKidcGAKO9/FFJr/EJs=
-X-Google-Smtp-Source: AGHT+IGW2ivQBr6ib7m/cmjzjnkogelPQGpBxwq3iWWAr6K+/MU6YNZqq3IUhKj+TIVnGpc4fMVSow==
-X-Received: by 2002:a17:902:f985:b0:216:6c77:7bbb with SMTP id d9443c01a7336-218d70dc242mr29804885ad.17.1734527454469;
-        Wed, 18 Dec 2024 05:10:54 -0800 (PST)
-Received: from ws.. ([103.167.140.11])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-801d5c0f59asm7434754a12.67.2024.12.18.05.10.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2024 05:10:53 -0800 (PST)
-From: Xiao Liang <shaw.leon@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	linux-rdma@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	osmocom-net-gprs@lists.osmocom.org,
-	bpf@vger.kernel.org,
-	linux-ppp@vger.kernel.org,
-	wireguard@lists.zx2c4.com,
-	linux-wireless@vger.kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	bridge@lists.linux.dev,
-	linux-wpan@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v6 11/11] selftests: net: Add test cases for link and peer netns
-Date: Wed, 18 Dec 2024 21:09:09 +0800
-Message-ID: <20241218130909.2173-12-shaw.leon@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241218130909.2173-1-shaw.leon@gmail.com>
-References: <20241218130909.2173-1-shaw.leon@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D699A1B042D
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734527507; cv=fail; b=SS6jijKrxvM7CzsRonvOB8py8MeL5Pv/KUQWf30SYOdjVO85lZE4a2eM/JuXWkKipnTWcGsDuoHR72UUFWhRdkXEUdUtUUtsbDIPMPFsYS7KcBFoE73UnmJ41EOWfnJxPidRO76AUQWHorl1WLeqxda1iOwNO3mE4xhPiwiPznU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734527507; c=relaxed/simple;
+	bh=upwuUmq4GmZ4mMziwFWwf+7+x9Upj74phfffTpAuIgw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=uGgbr35kkqmczFpjHCHLV99seSuf6VrFTCmhepT2slEky7asSso3BTvhhTdGkW3Ei5cvTApiH2lJfnWM2+/1HdB+QInWlOFYqR0W156ePIw7Uq9WNszmyTV2E2MuWnHmdiv6lbiMqcxfWOJGbW8dmQ+1YP2UcFXT03++Fge2DYQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nVAWGv0D; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734527506; x=1766063506;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=upwuUmq4GmZ4mMziwFWwf+7+x9Upj74phfffTpAuIgw=;
+  b=nVAWGv0DVUAEI8WtzAwulkyjNGdsp2zQ+QQUm0Ep9+Lt2DGwvWHmcJDD
+   XD+dvWDcC3OVAnVoonntDCX8dISSVclYE8YdYVqqXOmsYhhP0AtDUI+bb
+   WE/N1bohWtzREUsVC7Il0b8dEoS2P1wR4S/0pJ89WS6YzImzFYVTd/kTX
+   TqL50MtUT2706rjqkEULhLcyPVcHB3ygANvtV+I9BKGUKyJ3lE21eiIXn
+   tGJMUrSsAC7XWYxXoUDl6p6+BkkGWRFcsOPp9r9SfW+kYoczmrWgHEPlU
+   GQeKoUZeR5qp0qpYqYL5nKXk1ob9/Gta0d8EGQf7EXEDOH1CyCi2xmtAI
+   A==;
+X-CSE-ConnectionGUID: S7wlDXqwTZ+O//SdApeGRA==
+X-CSE-MsgGUID: 0l5EyfzwSxe0Ep9LyJWBdQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="35216663"
+X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
+   d="scan'208";a="35216663"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 05:11:45 -0800
+X-CSE-ConnectionGUID: e0bfzJGqTLqnlILJDQzzFw==
+X-CSE-MsgGUID: wx8mvIXOTqGhUQR/U7pNxQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="98337504"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2024 05:11:45 -0800
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 18 Dec 2024 05:11:44 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 18 Dec 2024 05:11:44 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.42) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 18 Dec 2024 05:11:35 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rTuCNnjsfXYUcDhFfmjEgJBeH4GmMzU7MThG3Y0vwdAAyUXxDi6ZHYGnbyF6WXopEJWek5KCrcNoGWahfh95DVDnkaso5SdBkw9+wUK09/zQbWD7bfcufuA3IQs+ML4pfLgXqC91h2VjrPIzVdTh1EzHjPRL2lBaLgsojIZdpJR14HdfoB1/0Ag2skjEhsoQzTRsFu4acRNE23HAnKQmy7yisAZYTO4ZVDS72DNndyTCLHYeXfvnFTbC5jbMVYoNM2PxT+no0aiN2O6yb5WI7Mgqu5uwaxs/0Uj2HGXkas1g36QzRCSzaB8gH2swaGntF21HSrxfz5qNBJrowL5PmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wG6rczmF94+CkB73R/aZyr98410gu/PATk7BR55Zqbc=;
+ b=GiIU89RLXcHyMctRM8nNLdqxAeIOkZeIFtxJVCedKLlqiqYpzEoLuEyMhRjTB67jfRz5tIKtMdNYaQCrzk1lf+k6TJJQs5jioKo4Ut8FnKS3PpBWcFdwt/4qP/XnlHdwkuBwi/3Q7BVpe/fxCwZ974xZ0VZdD/GCE7kpiei28iqnHU44h2eMyVyjfFrYqcJXZ+MN2yn2nKyes9+u25YOB4AMp36mMrVqLuwCwisV12xzELItg099/yriFu30twC4Cf7TrR5e1LWHwNPzoU5di4pN+wPeEMXx8umiESIHr0vC+E1IZ3S5IHHpzXdFf4jE2l4IJBVMPC4Cj6nt39ZAAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
+ by MW4PR11MB5800.namprd11.prod.outlook.com (2603:10b6:303:186::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.21; Wed, 18 Dec
+ 2024 13:10:42 +0000
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::ad6c:cf56:3c3d:4739%3]) with mapi id 15.20.8251.015; Wed, 18 Dec 2024
+ 13:10:42 +0000
+From: "R, Bharath" <bharath.r@intel.com>
+To: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kwapulinski, Piotr"
+	<piotr.kwapulinski@intel.com>, Carolyn Wyborny <carolyn.wyborny@intel.com>,
+	"Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>, "Glaza, Jan"
+	<jan.glaza@intel.com>, Simon Horman <horms@kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v12 8/8] ixgbe: Enable link
+ management in E610 device
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v12 8/8] ixgbe: Enable link
+ management in E610 device
+Thread-Index: AQHbRvI6o+BeNDGCoUGw2Yz9FfLpnLLsDg1g
+Date: Wed, 18 Dec 2024 13:10:42 +0000
+Message-ID: <PH8PR11MB79656541308D11C577601D31F7052@PH8PR11MB7965.namprd11.prod.outlook.com>
+References: <20241205084450.4651-1-piotr.kwapulinski@intel.com>
+ <20241205084450.4651-9-piotr.kwapulinski@intel.com>
+In-Reply-To: <20241205084450.4651-9-piotr.kwapulinski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|MW4PR11MB5800:EE_
+x-ms-office365-filtering-correlation-id: 94125ff6-1651-4e1d-a2ed-08dd1f656014
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?GktRjB27guD8cQJZxDu2JG8bMuDK5Rvo/gGwpPV/fWYObv4BGEsdBU4TWv75?=
+ =?us-ascii?Q?GwUKjHYIRRZZ0alqcD+lM2jBQA3KCRzcYlROqm8Ie+4DUFJuzEZH0AqGa1Rk?=
+ =?us-ascii?Q?NwiVUP7Y9HitUMoXF2+CmBMdiDCgi+/AGdiUjVD+OwgnOPxCnEnuH+dAkBtT?=
+ =?us-ascii?Q?4D4cou4KeHdM0B9yXTnBdr0PKykcJIbjVTKo/oQpgWJJuiOdutUvdOu3wXVF?=
+ =?us-ascii?Q?RC9DInYljOMjUcM48OpmJ/36Iy1mD955NMteMjs8FmV0afBPi/AnjOfJLX2D?=
+ =?us-ascii?Q?xuvOMTZAbisALspcKhMnoPo6OP3DDlgNkpsO7Z3OMyIt6nLqmf/FLlInHtW4?=
+ =?us-ascii?Q?pi+T/rPeGUXHKNFdaXyyDu//eOfpa8JhvPopLU4Tb4Y1vyOaiYEkddCU9teR?=
+ =?us-ascii?Q?U9gOlJvmwqU0Yvi3NDscQreoGgEy6KWNZJkRz0cLYHc6Bka7gt2g4kvQ90A1?=
+ =?us-ascii?Q?Yb6HZ//ABHJzDXtWXi7huFdnUOMlTezaDox9jMvF7JWhqipJnxhoN5JvuzYw?=
+ =?us-ascii?Q?2aS5zFxYCMnuV+3EZ0Ww5jkQeswAHsEUNTJ1r+YmjPPbSwXWqZkoRNLnQt38?=
+ =?us-ascii?Q?r0M2qooSByEH0VPevH/2Z8462/tNgdQfCllrwdIASGXwu9Z87mmhx7xD/rNb?=
+ =?us-ascii?Q?kBSFgZY8S4RSdsjTvG2QhC8zVxIUei9mLhbqxL2+rcgLoAVaFuwclrDfCDIu?=
+ =?us-ascii?Q?2DE/XsHDnmZjunmyvtsotPurTyMWVCcT3qVi0E8XUsK4/KDe76we1Der6qrJ?=
+ =?us-ascii?Q?MPJ9YZcT8NzSFMPzuh7OxvSBseXwavYB6z2JDzXGbOSNgg1HBdeZHzPj3Y6V?=
+ =?us-ascii?Q?Z2wZpSU5TKRKyTrr6ygBQzYUsOLLwbcAAvk213LVy2t/nXacvOffeD2u3Ras?=
+ =?us-ascii?Q?oaT1EO99hOzjO/tjBdjvPSwV/dclFSG8RhxCkPrjUuBcCUCvdtzM36kFNb3B?=
+ =?us-ascii?Q?JftF5dGoEBdvbl0IBgFxTXAkj4pnWNZo+mAZMV3SRAyPDvo8RDxVrwFh3BKu?=
+ =?us-ascii?Q?PCZIxLs7s9Tq/tO6XPWtD9Vc1j3nj2elO4MbtNa1k1+hVzPTTTHsTAXPrPh5?=
+ =?us-ascii?Q?BJGUlblJY7K3Di7nfv+FJBaciUo/NRE+beFlTyQwCAGElR2H28DqK0nxL+Uh?=
+ =?us-ascii?Q?SEXAlhYLkpNrQtIimQ7FUtQOpdXjdRV67fKUNSCCTv+l9acrtgzJoSLyZSJb?=
+ =?us-ascii?Q?D4KaIutEWNbJXFO5PEay1lKLrnhdueB934YyVrMN/BpPzvEd36MQVQ7zC9g9?=
+ =?us-ascii?Q?B8NgA3FN5T8A1hF/+6YenGhO6baCjQpPysvdLLPMSV5przjxojULX6LPDgPT?=
+ =?us-ascii?Q?PQ6taEHmq0CneBbv+JtlC8Z68NKjQRIjzySMwXV9Vk+sEmYsTvNOsz4oEvos?=
+ =?us-ascii?Q?hTVk1Cm3Zji5xRT6zEfdeHt9rhQd7cfA3WofwiWmbwnkQY/5YEMGMGzQnX5h?=
+ =?us-ascii?Q?LyzeNNvKzPXtTRwMIIhIOhACCLSs1aAL?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?JhEcrfSVi8V1HPV2JU+fhAfaUIlk9fDnNqD1P0/Yzb60AywQMsPpZinj5/Qj?=
+ =?us-ascii?Q?488wtoRQNO+OG7iY6lQDWBZbIw7+8e9nSi9W4BYC/AF60WedYKIZUTKL3HPY?=
+ =?us-ascii?Q?LOtQlyY53Z0WeQizkUbzIGi4ecJHRe3aL90ZmScefaPkvj8AGj46UPRJPbc0?=
+ =?us-ascii?Q?ydu53nRaEt03MldPNs2lBtbfQPu3Yx2Ws5IDTydUsj00CujNM3exP6xFJO8M?=
+ =?us-ascii?Q?rofd7KXYH80zdMztKsc90wpHuMowH5YWP0+W1x7+VJLy8u9g1ynw5dzcaL/x?=
+ =?us-ascii?Q?KhZLcYf8elj2njusbHszZQRkThdklHqAg2mPIZZ4XGEQGiPBH5dn9BFgHR0x?=
+ =?us-ascii?Q?G/uHiJ+cf/LfrdtB14xtgLP/ZVCjYuStcd7bd5lu9GREmk+7BSc3z+nZNhhx?=
+ =?us-ascii?Q?7YvKtqEOipKE+b88s6prwBHynPP8QnuBb3KmimCxJ2BX/xYvTgluDDTTW+xO?=
+ =?us-ascii?Q?FWoizggAw0lMo488CunkVCco79qI4ogL6XBXeOxYbADTQEY9cqXJDLSmpv5t?=
+ =?us-ascii?Q?1juKqjo5bjNiigfg2oLhrYgg3PonaqhnlsYDsUanX1PC9axUst4+vBBi4da6?=
+ =?us-ascii?Q?KqRoZPKYdvOuEgSdzwRPDC9UkbPigC2aOtcsYiSefgpTLv7afiMmxSVPgo/H?=
+ =?us-ascii?Q?PNIJqgBHBHLkbBE0r22hq45h5ylmEJ2P2xP62VaNTxNa1UmswOkmxMZUtYdS?=
+ =?us-ascii?Q?yhjMB0LdLdUIAHJsnBslcHEn82wmU2LHrvA7/YWfqp2EhfAMZL9/Pv8S8dZU?=
+ =?us-ascii?Q?HyHU/EiKf9N+eoBL7xNH9lX3MMw91RObgyj32GabKmzsAwPrjuHrioWkIjwB?=
+ =?us-ascii?Q?IOyTZMyKYUAhPEROuB9qbGizc/ZnjinHyI1yNXbE+NyBm9VQIsAcmbOItWib?=
+ =?us-ascii?Q?7cJ1hLqtehpYu3mxCacPmcxBPVuAM4hpi4oaCmCWZl0aVQldQPHvSlFIwhTV?=
+ =?us-ascii?Q?rKxwiJYZvGF9kd95hI905+roUlaOM+A3Fqo75t7hsEZJbWEm7EUN39yiuqwj?=
+ =?us-ascii?Q?/Lcjz4XqGkXCCfU40RfhkQu/HtvxzOu+ZoqllFKX5slGQQb7ACt/9ZV2cAFC?=
+ =?us-ascii?Q?01ySHMsksNeAbBVFafoCOjZmvYWKcYQM38FudaI016bfEam1RMgprakzan6R?=
+ =?us-ascii?Q?pPK608xFX9wc6gni4mdgJakr0oJt5DFXMNDXnbRa7qBLdgfuJHf28pIEfN0K?=
+ =?us-ascii?Q?20v4KZUZYFxPHCgu2sRKlXIIrIT5PdWU4uzm1+z3gkLQmlQYcJY0Qv/5dSXW?=
+ =?us-ascii?Q?GMdJe4Ce5dqsd7MkebxFg6NSKSi67nLoXbxcB1T0OvezKMhHPnZJ928TH0h7?=
+ =?us-ascii?Q?UIOEfKeg77dy82c4spMt6+0N0FPdwD1QLkDfR1ZDjOogG4moK9JJdHGBeGEb?=
+ =?us-ascii?Q?4HZCeEoPI/wHdW0dqaF47IwXSltrau3sYuHWnlK8SzaRRAEaulamL8AixmY1?=
+ =?us-ascii?Q?MRlBVydp+GCrTKedbbUYWhvzu+HZe/1g9B+aHc8xvWIPiV5+WDd3SicyzmJK?=
+ =?us-ascii?Q?9msC9Cl54l5lF0pSHscDzy/zaNo3/sNOUlNNa3zxN1SrSkkoebD3WhKCuQnf?=
+ =?us-ascii?Q?zepoBFE8K7jJpsx+wU8V8XVu/aoBHQEjxmAel9Z8?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94125ff6-1651-4e1d-a2ed-08dd1f656014
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2024 13:10:42.0523
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bPGcwGiXyBNKF+oOwn5ylJEvL0dqdStmcCqJNmsuZK493uwTr2dI2iIRRk3oFTCobLpZPW7p6pVHxbSUxjx4uA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5800
+X-OriginatorOrg: intel.com
 
- - Add test for creating link in another netns when a link of the same
-   name and ifindex exists in current netns.
- - Add test to verify that link is created in target netns directly -
-   no link new/del events should be generated in link netns or current
-   netns.
- - Add test cases to verify that link-netns is set as expected for
-   various drivers and combination of namespace-related parameters.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Piotr Kwapulinski
+> Sent: Thursday, December 5, 2024 2:15 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Kwapulinski, Piotr
+> <piotr.kwapulinski@intel.com>; Carolyn Wyborny
+> <carolyn.wyborny@intel.com>; Jagielski, Jedrzej
+> <jedrzej.jagielski@intel.com>; Glaza, Jan <jan.glaza@intel.com>; Simon
+> Horman <horms@kernel.org>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v12 8/8] ixgbe: Enable link
+> management in E610 device
+>=20
+> Add high level link management support for E610 device. Enable the
+> following features:
+> - driver load
+> - bring up network interface
+> - IP address assignment
+> - pass traffic
+> - show statistics (e.g. via ethtool)
+> - disable network interface
+> - driver unload
+>=20
+> Co-developed-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+> Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Reviewed-by: Jan Glaza <jan.glaza@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  13 +-
+>  .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |   3 +-
+>  .../net/ethernet/intel/ixgbe/ixgbe_common.c   |  19 +-
+>  .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |   3 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 165 +++++++
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   1 +
+>  .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |   6 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |   3 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 414 +++++++++++++++++-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c  |   4 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |   5 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |  12 +-
+> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |  21 +-
+> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |  20 +
+>  14 files changed, 659 insertions(+), 30 deletions(-)  create mode 100644
+>=20
 
-Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
----
- tools/testing/selftests/net/Makefile      |   1 +
- tools/testing/selftests/net/link_netns.py | 142 ++++++++++++++++++++++
- tools/testing/selftests/net/netns-name.sh |  10 ++
- 3 files changed, 153 insertions(+)
- create mode 100755 tools/testing/selftests/net/link_netns.py
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index f09bd96cc978..cc6665212304 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -35,6 +35,7 @@ TEST_PROGS += cmsg_so_mark.sh
- TEST_PROGS += cmsg_so_priority.sh
- TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
- TEST_PROGS += netns-name.sh
-+TEST_PROGS += link_netns.py
- TEST_PROGS += nl_netdev.py
- TEST_PROGS += srv6_end_dt46_l3vpn_test.sh
- TEST_PROGS += srv6_end_dt4_l3vpn_test.sh
-diff --git a/tools/testing/selftests/net/link_netns.py b/tools/testing/selftests/net/link_netns.py
-new file mode 100755
-index 000000000000..c4b2ddf201ff
---- /dev/null
-+++ b/tools/testing/selftests/net/link_netns.py
-@@ -0,0 +1,142 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import time
-+
-+from lib.py import ksft_run, ksft_exit, ksft_true
-+from lib.py import ip
-+from lib.py import NetNS, NetNSEnter
-+from lib.py import RtnlFamily
-+
-+
-+LINK_NETNSID = 100
-+
-+
-+def test_event() -> None:
-+    with NetNS() as ns1, NetNS() as ns2:
-+        with NetNSEnter(str(ns2)):
-+            rtnl = RtnlFamily()
-+
-+        rtnl.ntf_subscribe("rtnlgrp-link")
-+
-+        ip(f"netns set {ns2} {LINK_NETNSID}", ns=str(ns1))
-+        ip(f"link add netns {ns1} link-netnsid {LINK_NETNSID} dummy1 type dummy")
-+        ip(f"link add netns {ns1} dummy2 type dummy", ns=str(ns2))
-+
-+        ip("link del dummy1", ns=str(ns1))
-+        ip("link del dummy2", ns=str(ns1))
-+
-+        time.sleep(1)
-+        rtnl.check_ntf()
-+        ksft_true(rtnl.async_msg_queue.empty(),
-+                  "Received unexpected link notification")
-+
-+
-+def validate_link_netns(netns, ifname, link_netnsid) -> bool:
-+    link_info = ip(f"-d link show dev {ifname}", ns=netns, json=True)
-+    if not link_info:
-+        return False
-+    return link_info[0].get("link_netnsid") == link_netnsid
-+
-+
-+def test_link_net() -> None:
-+    configs = [
-+        # type, common args, type args, fallback to dev_net
-+        ("ipvlan", "link dummy1", "", False),
-+        ("macsec", "link dummy1", "", False),
-+        ("macvlan", "link dummy1", "", False),
-+        ("macvtap", "link dummy1", "", False),
-+        ("vlan", "link dummy1", "id 100", False),
-+        ("gre", "", "local 192.0.2.1", True),
-+        ("vti", "", "local 192.0.2.1", True),
-+        ("ipip", "", "local 192.0.2.1", True),
-+        ("ip6gre", "", "local 2001:db8::1", True),
-+        ("ip6gre", "", "local 2001:db8::1", True),
-+        ("ip6tnl", "", "local 2001:db8::1", True),
-+        ("vti6", "", "local 2001:db8::1", True),
-+        ("sit", "", "local 192.0.2.1", True),
-+        ("xfrm", "", "if_id 1", True),
-+    ]
-+
-+    with NetNS() as ns1, NetNS() as ns2, NetNS() as ns3:
-+        net1, net2, net3 = str(ns1), str(ns2), str(ns3)
-+
-+        # prepare link netnsid  and a dummy link needed by certain drivers
-+        ip(f"netns set {net3} {LINK_NETNSID}", ns=str(net2))
-+        ip("link add dummy1 type dummy", ns=net3)
-+
-+        cases = [
-+            # source, "netns", "link-netns", expected link-netns
-+            (net3, None, None, None, None),
-+            (net3, net2, None, None, LINK_NETNSID),
-+            (net2, None, net3, LINK_NETNSID, LINK_NETNSID),
-+            (net1, net2, net3, LINK_NETNSID, LINK_NETNSID),
-+        ]
-+
-+        for src_net, netns, link_netns, exp1, exp2 in cases:
-+            tgt_net = netns or src_net
-+            for typ, cargs, targs, fb_dev_net in configs:
-+                cmd = "link add"
-+                if netns:
-+                    cmd += f" netns {netns}"
-+                if link_netns:
-+                    cmd += f" link-netns {link_netns}"
-+                cmd += f" {cargs} foo type {typ} {targs}"
-+                ip(cmd, ns=src_net)
-+                if fb_dev_net:
-+                    ksft_true(validate_link_netns(tgt_net, "foo", exp1),
-+                              f"{typ} link_netns validation failed")
-+                else:
-+                    ksft_true(validate_link_netns(tgt_net, "foo", exp2),
-+                              f"{typ} link_netns validation failed")
-+                ip(f"link del foo", ns=tgt_net)
-+
-+
-+def test_peer_net() -> None:
-+    types = [
-+        "vxcan",
-+        "netkit",
-+        "veth",
-+    ]
-+
-+    with NetNS() as ns1, NetNS() as ns2, NetNS() as ns3, NetNS() as ns4:
-+        net1, net2, net3, net4 = str(ns1), str(ns2), str(ns3), str(ns4)
-+
-+        ip(f"netns set {net3} {LINK_NETNSID}", ns=str(net2))
-+
-+        cases = [
-+            # source, "netns", "link-netns", "peer netns", expected
-+            (net1, None, None, None, None),
-+            (net1, net2, None, None, None),
-+            (net2, None, net3, None, LINK_NETNSID),
-+            (net1, net2, net3, None, None),
-+            (net2, None, None, net3, LINK_NETNSID),
-+            (net1, net2, None, net3, LINK_NETNSID),
-+            (net2, None, net2, net3, LINK_NETNSID),
-+            (net1, net2, net4, net3, LINK_NETNSID),
-+        ]
-+
-+        for src_net, netns, link_netns, peer_netns, exp in cases:
-+            tgt_net = netns or src_net
-+            for typ in types:
-+                cmd = "link add"
-+                if netns:
-+                    cmd += f" netns {netns}"
-+                if link_netns:
-+                    cmd += f" link-netns {link_netns}"
-+                cmd += f" foo type {typ}"
-+                if peer_netns:
-+                    cmd += f" peer netns {peer_netns}"
-+                ip(cmd, ns=src_net)
-+                ksft_true(validate_link_netns(tgt_net, "foo", exp),
-+                          f"{typ} peer_netns validation failed")
-+                ip(f"link del foo", ns=tgt_net)
-+
-+
-+def main() -> None:
-+    ksft_run([test_event, test_link_net, test_peer_net])
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/netns-name.sh b/tools/testing/selftests/net/netns-name.sh
-index 6974474c26f3..0be1905d1f2f 100755
---- a/tools/testing/selftests/net/netns-name.sh
-+++ b/tools/testing/selftests/net/netns-name.sh
-@@ -78,6 +78,16 @@ ip -netns $NS link show dev $ALT_NAME 2> /dev/null &&
-     fail "Can still find alt-name after move"
- ip -netns $test_ns link del $DEV || fail
- 
-+#
-+# Test no conflict of the same name/ifindex in different netns
-+#
-+ip -netns $NS link add name $DEV index 100 type dummy || fail
-+ip -netns $NS link add netns $test_ns name $DEV index 100 type dummy ||
-+    fail "Can create in netns without moving"
-+ip -netns $test_ns link show dev $DEV >> /dev/null || fail "Device not found"
-+ip -netns $NS link del $DEV || fail
-+ip -netns $test_ns link del $DEV || fail
-+
- echo -ne "$(basename $0) \t\t\t\t"
- if [ $RET_CODE -eq 0 ]; then
-     echo "[  OK  ]"
--- 
-2.47.1
+Tested-by: Bharath R <bharath.r@intel.com>
 
 
