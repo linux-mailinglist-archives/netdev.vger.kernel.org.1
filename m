@@ -1,217 +1,195 @@
-Return-Path: <netdev+bounces-152980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 420C09F6816
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:19:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF6D49F6833
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:22:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 293AA18914D4
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:19:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DACA518935FE
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1272370819;
-	Wed, 18 Dec 2024 14:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FB31B0414;
+	Wed, 18 Dec 2024 14:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="ELyIy5v1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MOICPwh/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37765219ED
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5DA73446
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734531557; cv=none; b=nG681kQRe4TxHyPxQKVlgBCw1m5S3zenbdq7/0j97VpnlAs6EjHIaDoQSiRwEM5/1Qy67dIAiyAmX2skzpulhWxvqcMSoO9gluxMXdRaYCUDqbFoGeJn1hZKBqipdfpHsgYH/Qg/MYNUOXo2qWckZ4IGkfS5Px185I+2LVZ9oPc=
+	t=1734531687; cv=none; b=htO55H7UK6iHtbdmAbKWfBB/F9NYzaTimi4JpFCzf4xF8j9WSRVluycXnzBy4EtI1Fbj3RA3XMLUOsRY+7OggXmzdt8CUkJYh3+IUPAfBxBvq1BVfgwK1VyfGE8o4W0J1Wq04Hebz7H0y5I/N+1Tqhf1r9tk1fOLY45Y2uXKIF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734531557; c=relaxed/simple;
-	bh=m/if1K64Zqo21BsmqXSEa9AQciQnbHPatnYQy9qNNZg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gIHVU6iOFa7WtnIqgw3FOa6yNG/6x5yv9tMNtjvoCxqu8B1dyVA/VaPkSmnObPcyAy1qI++coywAz3qvnBaI9Mdooo5YWP0FHf6vBLLTc+bpGstQIWP32WBr8h6bS7MkFDfWkL30q10q9ba4JaUk66zAjdZxj31hmNbmUawb43U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io; spf=pass smtp.mailfrom=theori.io; dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b=ELyIy5v1; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theori.io
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7fbc65f6c72so5879469a12.1
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 06:19:14 -0800 (PST)
+	s=arc-20240116; t=1734531687; c=relaxed/simple;
+	bh=7EfhJMAGoUDDd3WAx/fPg7Sc93c/yhaslJXSydwpCdA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UwUIxWKsErnyHFPuU7NbPGuntK+H49DPaiq0wguEoCq4wT8ZjL6Rq5/Szp4o+bDHe+pFjdoCmX0XhfuSK2e9RB9oWVbJfwst1jCe3fVFwZ+nciQIX7BbaAWJeFId+EBMrW0ibzaQaLZxBp15nebXEh9l6XftdLoOn1sLNNLnCss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MOICPwh/; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso8666101a12.0
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 06:21:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1734531553; x=1735136353; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Hy/mNrslR2WJrjQxNAeuMQbIpeAIFJXQ4+GreAFDCQQ=;
-        b=ELyIy5v1k7O5lpjDUyHlKDM2hgi0ykIKUBcuYdIr9wQ07zBv97QjU9aZoJRpsjPIN/
-         EW43GCFu/1jiqmmU/KEEZG+yf3TO66TF+vJIUnKbenaE1TbdwZ9A/jnR8h9UNZ7tG5NR
-         3m7otlKk35adm8DAYtteHQt3j2qbxgntgw//0=
+        d=google.com; s=20230601; t=1734531684; x=1735136484; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qn4pllNqfD1Dkr06yMbYynREm4fDuu4oYb+r3qMVadY=;
+        b=MOICPwh/8bW2g6v7edo/ROYWsAd/0cnDTpqtDflBaxebzQRgpGg0iOoM/ryim69SKI
+         5F97HuCWlaIYe9mSMKWJwzOnCGfcRd+Jy6FfnqEEUBKAherth/QWy6EB+zeFCehbu5xD
+         CpevwGSVDhtin9zss1q86qn6OINOX560lApxdH0OAvOBDvYr3+s6kihbloh71j5sMH6A
+         40ExQO9eNizl2/hWG/sLBHArW4x7A8VpwsnBk0DiNyQLmx6dfwg9l3QG3pdpvfdtgnUH
+         7sZ1QyW/4ktEpsUnHeE+jjIvtruDx3R1wwOYGRmHSBcew/lpYYne8PkllCuAthG8PgaO
+         GWow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734531553; x=1735136353;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hy/mNrslR2WJrjQxNAeuMQbIpeAIFJXQ4+GreAFDCQQ=;
-        b=qHx3cT6cxfJWxkeRcxuoJDya/3/pt48V5SW51r46aAGN0SXDKHrUZK/HM9wK0Ivj1L
-         AdbTH7JkE3t8eg7JFS9fg2i3tF/4y6Ddt9bxtR9HKcXaBM0936sVc3HRCB4pm/2c/86E
-         uV+AtAvVK7qX5SDlIBNbzE2hGDD0GEVdUvfvsGA8LhEaPmBhzWZ0ipneqLMt1Lo565m6
-         kaPn37Q9jm1qfHidGs5C5HSZf5f85Au2M3UiKGWT7p8UxDurOI1C2gCA1cM6kPoRrc2A
-         OBVlcw1vVMOFvhK9Scq5HZZgICowdcaJp+2EREBNmpzfEBJpR/5yqQxwVktRAsVSoUWq
-         D49g==
-X-Forwarded-Encrypted: i=1; AJvYcCUsQrNQWTEaE7dMizYjLH85Qk4mFeBsfLF/QE7Fy7QPw9XRe7pVx9F4YxyrMbkuIlTDtpf1y0I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXD1Bl1pX3rs+G7fgFb1d+sFXe+lWerXzGqb3FTck9GzyIsuCZ
-	ojCtkZ+EnJC/WhiAhxAqoGJwZryddDpwitmbIWdl8YItvCWqFkzAMdrcw7hLkFk=
-X-Gm-Gg: ASbGncvQ7oUGsuHZC6PmMz4ogDG++rIzBYYjcTj+GamVh9tuDDXZPqf3yg017E4iQzi
-	7e6dseHdK+EKJkEaAi+Dy+f+QJgN5sVs0V+Tu2HW/6ZNRmUmO6YB6f++wjowEfw68lBw0dW+LTd
-	GmzqIYo0oJIAIhS88RHlGzyZFccso4zYQaVTCrQANSWPIWVoFAM/LbbeQzammah+/BrWkhIOmUU
-	xEd2sIdiLBFZVg85XsyB6fYPN0MNL6rUHRm+ArRldM9cpK2ChaHr5Dn4Kelhhfc+u5COA==
-X-Google-Smtp-Source: AGHT+IHxHsok6Ghzv4mG5bbwZxtJBm0KrLBeRj9Z3CAnLKY4I1RLA6A0g7k+LKSbVnlN6L2P3p0loQ==
-X-Received: by 2002:a17:90a:e7cb:b0:2ee:aed6:9ec2 with SMTP id 98e67ed59e1d1-2f2e91f10b8mr4828738a91.14.1734531553429;
-        Wed, 18 Dec 2024 06:19:13 -0800 (PST)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2edc3768esm1468228a91.49.2024.12.18.06.19.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2024 06:19:12 -0800 (PST)
-Date: Wed, 18 Dec 2024 09:19:08 -0500
-From: Hyunwoo Kim <v4bel@theori.io>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	qwerty@theori.io, imv4bel@gmail.com, v4bel@theori.io
-Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
-Message-ID: <Z2LZ3HK05RH8OfP5@v4bel-B760M-AORUS-ELITE-AX>
-References: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX>
- <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
+        d=1e100.net; s=20230601; t=1734531684; x=1735136484;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qn4pllNqfD1Dkr06yMbYynREm4fDuu4oYb+r3qMVadY=;
+        b=KDaJ4iINRCPUfKVyJWV78HutJQ3SAroMzk+ogBvF5a5+lygbZhruNTj+ZcSukYoIq4
+         L/CfwkZz4BjcAlPnmjezlKbQyIIEnTSV2YMTG3PUgcJfEyHapcJmDpyy2bOT7df49yfs
+         Y588VhwzKoSMN5IWCBokNTLb36+jWn84iUvf1kIG9gbiU0npOflksf1tLpJ7YyL99e3n
+         PgHPPNhr+QN/fU8VwbvneuxFCzspDHRqj3LvZtMKPUqaJnLRhRT65MjE/SzOAm77KuRO
+         mowX/REGzDaeuMa8tl67clvM3LjTwCk3RisWNecCr+8T9NZx/LbEYdaZDsoPI7D6TMOM
+         JwrA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDku4eZuREEYxSOCoD13rMJp1qd8V9wHu9Ww9IlW4UkQkYtsGt4R4v25/suWmTAevJbJUAffY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL1dqcOyTZp3KZOWTRtqEJG3DgYHr1wk+NrPS1kH0FELLfZ2m7
+	uL1NbGFH/IG4kiFuauQ5fx/k5uOzXX2WkptUxzNk561a7ComJtLMGPwDHDMcP9DI1MBwNvs3hfY
+	+lu8JomiPFlp6QwE0Hz8KC1VcjoLD7mxwF6W7
+X-Gm-Gg: ASbGncvqeNDaPbjutZBW4dVKZluwuv/nEheIm0/Bb0BIwaMAwlsJhqmACipPKYRRBCe
+	u5oh95y8t8EwMcrTj2+glZsZD9IuZJRoA8DhdFepHaFDEqLzV5TRi5zVGG55nCIc0hSW+MLA=
+X-Google-Smtp-Source: AGHT+IFL3w5rIpwCUSg7XCtw1d15+RBvCkJLrp8VpMp0ZysMMGwb0mQCY3A+1Ey/aKk+qUTjCRpYUt4Nxw/u1old79s=
+X-Received: by 2002:a05:6402:35d4:b0:5cf:e66f:678d with SMTP id
+ 4fb4d7f45d1cf-5d7ee410c8bmr2874796a12.28.1734531683791; Wed, 18 Dec 2024
+ 06:21:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
+References: <20241216075842.2394606-1-srasheed@marvell.com>
+ <20241216075842.2394606-2-srasheed@marvell.com> <Z2A5dHOGhwCQ1KBI@lzaremba-mobl.ger.corp.intel.com>
+ <Z2A9UmjW7rnCGiEu@lzaremba-mobl.ger.corp.intel.com> <BY3PR18MB4721712299EAB0ED37CCEEEFC73B2@BY3PR18MB4721.namprd18.prod.outlook.com>
+ <Z2GvpzRDSTjkzFxO@lzaremba-mobl.ger.corp.intel.com> <CO1PR18MB472973A60723E9417FE1BB87C7042@CO1PR18MB4729.namprd18.prod.outlook.com>
+ <Z2LNOLxy0H1JoTnd@lzaremba-mobl.ger.corp.intel.com>
+In-Reply-To: <Z2LNOLxy0H1JoTnd@lzaremba-mobl.ger.corp.intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 18 Dec 2024 15:21:12 +0100
+Message-ID: <CANn89iJXNYRNn7N9AHKr0jECxn0Lh6_CtKG7kk9xjqhbVjjkjQ@mail.gmail.com>
+Subject: Re: [EXTERNAL] Re: [PATCH net v2 1/4] octeon_ep: fix race conditions
+ in ndo_get_stats64
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: Shinas Rasheed <srasheed@marvell.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Haseeb Gani <hgani@marvell.com>, 
+	Sathesh B Edara <sedara@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>, 
+	"thaller@redhat.com" <thaller@redhat.com>, "wizhao@redhat.com" <wizhao@redhat.com>, 
+	"kheib@redhat.com" <kheib@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>, 
+	"horms@kernel.org" <horms@kernel.org>, "einstein.xue@synaxg.com" <einstein.xue@synaxg.com>, 
+	Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Abhijit Ayarekar <aayarekar@marvell.com>, Satananda Burla <sburla@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2024 at 02:40:49PM +0100, Stefano Garzarella wrote:
-> On Wed, Dec 18, 2024 at 07:25:07AM -0500, Hyunwoo Kim wrote:
-> > When calling connect to change the CID of a vsock, the loopback
-> > worker for the VIRTIO_VSOCK_OP_RST command is invoked.
-> > During this process, vsock_stream_has_data() calls
-> > vsk->transport->stream_has_data().
-> > However, a null-ptr-deref occurs because vsk->transport was set
-> > to NULL in vsock_deassign_transport().
-> > 
-> >                     cpu0                                                      cpu1
-> > 
-> >                                                               socket(A)
-> > 
-> >                                                               bind(A, VMADDR_CID_LOCAL)
-> >                                                                 vsock_bind()
-> > 
-> >                                                               listen(A)
-> >                                                                 vsock_listen()
-> >  socket(B)
-> > 
-> >  connect(B, VMADDR_CID_LOCAL)
-> > 
-> >  connect(B, VMADDR_CID_HYPERVISOR)
-> >    vsock_connect(B)
-> >      lock_sock(sk);
-> >      vsock_assign_transport()
-> >        virtio_transport_release()
-> >          virtio_transport_close()
-> >            virtio_transport_shutdown()
-> >              virtio_transport_send_pkt_info()
-> >                vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
-> >                  queue_work(vsock_loopback_work)
-> >        vsock_deassign_transport()
-> >          vsk->transport = NULL;
-> >                                                               vsock_loopback_work()
-> >                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
-> >                                                                   virtio_transport_recv_connected()
-> >                                                                     virtio_transport_reset()
-> >                                                                       virtio_transport_send_pkt_info()
-> >                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RST)
-> >                                                                           queue_work(vsock_loopback_work)
-> > 
-> >                                                               vsock_loopback_work()
-> >                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RST)
-> > 								   virtio_transport_recv_disconnecting()
-> > 								     virtio_transport_do_close()
-> > 								       vsock_stream_has_data()
-> > 								         vsk->transport->stream_has_data(vsk);    // null-ptr-deref
-> > 
-> > To resolve this issue, add a check for vsk->transport, similar to
-> > functions like vsock_send_shutdown().
-> > 
-> > Fixes: fe502c4a38d9 ("vsock: add 'transport' member in the struct vsock_sock")
-> > Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
-> > Signed-off-by: Wongi Lee <qwerty@theori.io>
-> > ---
-> > net/vmw_vsock/af_vsock.c | 3 +++
-> > 1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> > index 5cf8109f672a..a0c008626798 100644
-> > --- a/net/vmw_vsock/af_vsock.c
-> > +++ b/net/vmw_vsock/af_vsock.c
-> > @@ -870,6 +870,9 @@ EXPORT_SYMBOL_GPL(vsock_create_connected);
-> > 
-> > s64 vsock_stream_has_data(struct vsock_sock *vsk)
-> > {
-> > +	if (!vsk->transport)
-> > +		return 0;
-> > +
-> 
-> I understand that this alleviates the problem, but IMO it is not the right
-> solution. We should understand why we're still processing the packet in the
-> context of this socket if it's no longer assigned to the right transport.
+On Wed, Dec 18, 2024 at 2:25=E2=80=AFPM Larysa Zaremba <larysa.zaremba@inte=
+l.com> wrote:
 
-Got it. I agree with you.
+>
+> It is hard to know without testing (but testing should not be hard). I th=
+ink the
+> phrase "Statistics must persist across routine operations like bringing t=
+he
+> interface down and up." [0] implies that bringing the interface down may =
+not
+> necessarily prevent stats calls.
 
-> 
-> Maybe we can try to improve virtio_transport_recv_pkt() and check if the
-> vsk->transport is what we expect, I mean something like this (untested):
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 9acc13ab3f82..18b91149a62e 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -1628,8 +1628,10 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
-> 
->         lock_sock(sk);
-> 
-> -       /* Check if sk has been closed before lock_sock */
-> -       if (sock_flag(sk, SOCK_DONE)) {
-> +       /* Check if sk has been closed or assigned to another transport before
-> +        * lock_sock
-> +        */
-> +       if (sock_flag(sk, SOCK_DONE) || vsk->transport != t) {
->                 (void)virtio_transport_reset_no_sock(t, skb);
->                 release_sock(sk);
->                 sock_put(sk);
-> 
-> BTW I'm not sure it is the best solution, we have to check that we do not
-> introduce strange cases, but IMHO we have to solve the problem earlier in
-> virtio_transport_recv_pkt().
+Please don't  add workarounds to individual drivers.
 
-At least for vsock_loopback.c, this change doesn’t seem to introduce any 
-particular issues.
+I think the core networking stack should handle the possible races.
 
-And separately, I think applying the vsock_stream_has_data patch would help 
-prevent potential issues that could arise when vsock_stream_has_data is 
-called somewhere.
+Most dev_get_stats() callers are correctly testing dev_isalive() or
+are protected by RTNL.
 
-> 
-> Thanks,
-> Stefano
-> 
-> > 	return vsk->transport->stream_has_data(vsk);
-> > }
-> > EXPORT_SYMBOL_GPL(vsock_stream_has_data);
-> > -- 
-> > 2.34.1
-> > 
-> 
+There are few nested cases that are not properly handled, the
+following patch should take care of them.
+
+
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 2593019ad5b1614f3b8c037afb4ba4fa740c7d51..768afc2a18d343d051e7a1b6311=
+24910af9922d2
+100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -5342,6 +5342,12 @@ static inline const char
+*netdev_reg_state(const struct net_device *dev)
+        return " (unknown)";
+ }
+
++/* Caller holds RTNL or RCU */
++static inline int dev_isalive(const struct net_device *dev)
++{
++       return READ_ONCE(dev->reg_state) <=3D NETREG_REGISTERED;
++}
++
+ #define MODULE_ALIAS_NETDEV(device) \
+        MODULE_ALIAS("netdev-" device)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index c7f3dea3e0eb9eb05865e49dd7a8535afb974149..f11f305f3136f208fcb285c7b31=
+4914aef20dfad
+100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11044,8 +11044,13 @@ struct rtnl_link_stats64
+*dev_get_stats(struct net_device *dev,
+        const struct net_device_ops *ops =3D dev->netdev_ops;
+        const struct net_device_core_stats __percpu *p;
+
++       memset(storage, 0, sizeof(*storage));
++       rcu_read_lock();
++
++       if (unlikely(!dev_isalive(dev)))
++               goto unlock;
++
+        if (ops->ndo_get_stats64) {
+-               memset(storage, 0, sizeof(*storage));
+                ops->ndo_get_stats64(dev, storage);
+        } else if (ops->ndo_get_stats) {
+                netdev_stats_to_stats64(storage, ops->ndo_get_stats(dev));
+@@ -11071,6 +11076,8 @@ struct rtnl_link_stats64 *dev_get_stats(struct
+net_device *dev,
+                        storage->rx_otherhost_dropped +=3D
+READ_ONCE(core_stats->rx_otherhost_dropped);
+                }
+        }
++unlock:
++       rcu_read_unlock();
+        return storage;
+ }
+ EXPORT_SYMBOL(dev_get_stats);
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 2d9afc6e2161efa51ffa62813ec10c8f43944bce..3f4851d67015c959dd531c571c4=
+6fc2ac18beb65
+100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -36,12 +36,6 @@ static const char fmt_uint[] =3D "%u\n";
+ static const char fmt_ulong[] =3D "%lu\n";
+ static const char fmt_u64[] =3D "%llu\n";
+
+-/* Caller holds RTNL or RCU */
+-static inline int dev_isalive(const struct net_device *dev)
+-{
+-       return READ_ONCE(dev->reg_state) <=3D NETREG_REGISTERED;
+-}
+-
+ /* use same locking rules as GIF* ioctl's */
+ static ssize_t netdev_show(const struct device *dev,
+                           struct device_attribute *attr, char *buf,
 
