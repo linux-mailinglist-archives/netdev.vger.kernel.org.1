@@ -1,246 +1,347 @@
-Return-Path: <netdev+bounces-153058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8694B9F6AF1
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:21:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898AB9F6B14
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:26:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9088167217
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:21:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB51C1654FF
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:26:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D4A1E9B14;
-	Wed, 18 Dec 2024 16:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUZ++V3k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51EC51F7077;
+	Wed, 18 Dec 2024 16:26:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from passt.top (passt.top [88.198.0.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C27B5FEE6
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615611F63E7
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.198.0.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734538879; cv=none; b=SALu5JanrsibBDcwpABu3tja4gwzdiU5X8OlljKMuhF6VatK5lcyJz0hMwH+vZfj/VoPpuhidvuGE+pgxd9ytHIIjUGf8xYN8IagBM1NIlHUCsslWDqgkw1j0+t4RWgIq9hbPSt8zqy+O4lxqCLHYrY42gL+msDvtZq4Nr7Tuf4=
+	t=1734539194; cv=none; b=Andk0ksyOxDWxW8CE50ASuQtnxd9V2Qu5KLfDJXDHh2eptwsXSZDV8dfqEhjp0I0d8ybCbflJjuLXTwsFGwothsyPIHEVI6lwimDvJM8/CPq2pmXGO269LxiJXqvuNVqThduMurTnZuFla2sW7BS8J//znzeMCg+cB8xablgCbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734538879; c=relaxed/simple;
-	bh=JLmN0pSDOEJFAWE+c0dhwn6SQ+kazlCv+kZtXgT1YfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aUdlXU7Hdh2O2a0yr4KAOhggriKTDdZ1O2FwnRI4g4HqRNvI6PdD+ffSdcgG48wa5MJnX5AlDSrQzwnpJmzeYljUvtZ/wAVsfK+Rlq7sdLmWFHVokXt3ZHOrgXC2X6s8p8AjvfHrQifKbg3+gBKx48Kf+Nfewn8ML7Ma0eYgLhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KUZ++V3k; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734538875;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/wgeUIFAvTYWVq1TJqyDmPUgZ3yFEsvFUnWjDKaDGA0=;
-	b=KUZ++V3kcXatP04UVLJ25xX4h6/XyfY20o4ADxUW18gvRr+aXwu806+m+nlsv8QoSOjfwB
-	8NXNOtl4F5YWQY9e5GfkeM2qXu0SGizaSEeWvqI+5IQhLxkLKaCl+hgPzWWq/GHu1IHSLk
-	rOBor8vYtl+Xlw6fP4MlKylpaAyWHP4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-621-sO8GudSINoGczT1dFR_aPw-1; Wed, 18 Dec 2024 11:21:14 -0500
-X-MC-Unique: sO8GudSINoGczT1dFR_aPw-1
-X-Mimecast-MFC-AGG-ID: sO8GudSINoGczT1dFR_aPw
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4362b9c15d8so31109815e9.3
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 08:21:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734538873; x=1735143673;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/wgeUIFAvTYWVq1TJqyDmPUgZ3yFEsvFUnWjDKaDGA0=;
-        b=RV4bBBwRMGmD4naT2gkice+R8qu/w38NFM7c1jvfRo+BX2wGROCMcblnuwSxzkJW0U
-         z8gp4Rcw0A8D1DWzridYYGCRMr5RSiWaS1kw3d+kG16+4Jx6Dlai/Z73NFTCZKpuYeQ7
-         O2aos0yYDBwpl/5yn++gJR7XFfxIxoeMcjQjCNbdAUCJ7x8g7lZSx4utUuB78zZxEyFT
-         e3JX2mWyLA1ceWoZ5azn4mb8I1V06Ssa+xb+34QEyPZgr5nVIMcQBp+w9ypT7+shuUAm
-         1XiCu89I1y6hztDk9PyNmBnM/uqDbKZRQ7xuM0OaZ+6E8lFILH/iYlMXnbNYc1acTkZ9
-         k+Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCVqqt3wA3h7QHmD5GMUES9VVpPe6AJ7f6L5zNIbeDT04UKck4LZ9rAvFJHEnV7GmprEKarjSfc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLPF08un2asuyKNyqgamjqq7qEaatixvIpeLJ2MFgcKNCJ+lI4
-	Yf8WY8jOifW5N+TaIM1OiIhZqxCgKRxoSnQewGsWnjbJd4KWwgplxH08ugAhZa+OUUBNDR7ZdaB
-	WLATdwliXGAAoxmP9nizhuGRckK+4XmWegBF+CaQhhmZfe5FQCsQ2mg==
-X-Gm-Gg: ASbGncvOuCG9irdHA4YQbd8SVkFhLMErS4LS4MbFfQzqK6l30puaFEQiWX8hfWsZLYm
-	KsC335RYA4GxCBct03D1zGk16Rzj7RK5uZcwMStwIWy3PURRAqs7TeVcYkw4XZjbUM/DLH2a9mF
-	s24uQF3B8z36NvlXDIQgKtXNRY37efIFieqWrRfrFhsfVvq/f7O1PLd5D6dQZhYo7e0lBdOdTlZ
-	RCvNNvgeI7Y+26MhOpmYom3LHO9JqG+OfQF+1svUXdi46rwxAVkoBwWd46BHyU+Wmr2Nz6NVH7X
-	gIEi+WhEyw==
-X-Received: by 2002:a05:600c:1c8f:b0:435:136:75f6 with SMTP id 5b1f17b1804b1-436550af37dmr36639565e9.0.1734538872965;
-        Wed, 18 Dec 2024 08:21:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH/7qiloQ0PAWFSJ1dD+dpG5/JLEDDKg7imZ+ugysNfk2kTokWr9dYq2CoIhNwaG7vNCzVQWA==
-X-Received: by 2002:a05:600c:1c8f:b0:435:136:75f6 with SMTP id 5b1f17b1804b1-436550af37dmr36639205e9.0.1734538872605;
-        Wed, 18 Dec 2024 08:21:12 -0800 (PST)
-Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [176.103.220.4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c801612esm14624344f8f.40.2024.12.18.08.21.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2024 08:21:11 -0800 (PST)
-Date: Wed, 18 Dec 2024 17:21:10 +0100
+	s=arc-20240116; t=1734539194; c=relaxed/simple;
+	bh=Tth1Gqg9rF77adZXka0FrE+DB/H31yyCsGEqseZJ4e0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mvaI8csCw4lJOZ9y8l6zlYdDhKZ1RsFnf2zyPwPkpEbIEYpihLavGCbGdqZv37fExoWqDMrZKiY8z0hqi5puYR/duHgzI17hMtAhro2AQYLx4G0AwpTF15bpoSJfp7iteiRjExfC5Gr4w1EV6ZQJUgtmIIX+P7qLu60NuCgfyNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=passt.top; arc=none smtp.client-ip=88.198.0.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=passt.top
+Received: by passt.top (Postfix, from userid 1000)
+	id ABAC45A0272; Wed, 18 Dec 2024 17:21:16 +0100 (CET)
 From: Stefano Brivio <sbrivio@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Eric Dumazet
- <edumazet@google.com>, netdev@vger.kernel.org, Kuniyuki Iwashima
- <kuniyu@amazon.com>, Mike Manning <mvrmanning@gmail.com>, David Gibson
- <david@gibson.dropbear.id.au>, Paul Holzinger <pholzing@redhat.com>, Philo
- Lu <lulie@linux.alibaba.com>, Cambda Zhu <cambda@linux.alibaba.com>, Fred
- Chen <fred.cc@alibaba-inc.com>, Yubing Qiu
- <yubing.qiuyubing@alibaba-inc.com>
-Subject: Re: [PATCH net-next 2/2] datagram, udp: Set local address and
- rehash socket atomically against lookup
-Message-ID: <20241218172110.12c4016a@elisabeth>
-In-Reply-To: <20241206143535.3e095320@elisabeth>
-References: <20241204221254.3537932-1-sbrivio@redhat.com>
-	<20241204221254.3537932-3-sbrivio@redhat.com>
-	<fa941e0d-2359-4d06-8e61-de40b3d570cb@redhat.com>
-	<20241205165830.64da6fd7@elisabeth>
-	<c1601a03-0643-41ec-a91c-4eac5d26e693@redhat.com>
-	<20241206115042.4e98ff8b@elisabeth>
-	<e02911ae-3561-48be-af92-c3580091015f@redhat.com>
-	<20241206143535.3e095320@elisabeth>
-Organization: Red Hat
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Mike Manning <mvrmanning@gmail.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Paul Holzinger <pholzing@redhat.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Cambda Zhu <cambda@linux.alibaba.com>,
+	Fred Chen <fred.cc@alibaba-inc.com>,
+	Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>,
+	Peter Oskolkov <posk@google.com>
+Subject: [PATCH net-next v2] udp: Deal with race between UDP socket address change and rehash
+Date: Wed, 18 Dec 2024 17:21:16 +0100
+Message-ID: <20241218162116.681734-1-sbrivio@redhat.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 6 Dec 2024 14:35:35 +0100
-Stefano Brivio <sbrivio@redhat.com> wrote:
+If a UDP socket changes its local address while it's receiving
+datagrams, as a result of connect(), there is a period during which
+a lookup operation might fail to find it, after the address is changed
+but before the secondary hash (port and address) and the four-tuple
+hash (local and remote ports and addresses) are updated.
 
-> On Fri, 6 Dec 2024 13:36:47 +0100
-> Paolo Abeni <pabeni@redhat.com> wrote:
-> 
-> > On 12/6/24 11:50, Stefano Brivio wrote:  
-> > > On Thu, 5 Dec 2024 17:53:33 +0100 Paolo Abeni <pabeni@redhat.com> wrote:    
-> > >> I'm wondering if the issue could be solved (almost) entirely in the
-> > >> rehash callback?!? if the rehash happens on connect and the the socket
-> > >> does not have hash4 yet (it's not a reconnect) do the l4 hashing before
-> > >> everything else.    
-> > > 
-> > > So, yes, that's actually the first thing I tried: do the hashing (any
-> > > hash) before setting the address (I guess that's what you mean by
-> > > "everything else").
-> > > 
-> > > If you take this series, and drop the changes in __udp4_lib_lookup(), I
-> > > guess that would match what you suggest.    
-> > 
-> > I mean something slightly different. Just to explain the idea something
-> > alike the following (completely untested):
-> > 
-> > ---
-> > diff --git a/net/ipv4/datagram.c b/net/ipv4/datagram.c
-> > index cc6d0bd7b0a9..e9cc6edbcdc6 100644
-> > --- a/net/ipv4/datagram.c
-> > +++ b/net/ipv4/datagram.c
-> > @@ -61,6 +61,10 @@ int __ip4_datagram_connect(struct sock *sk, struct
-> > sockaddr *uaddr, int addr_len
-> >  		err = -EACCES;
-> >  		goto out;
-> >  	}
-> > +
-> > +	sk->sk_state = TCP_ESTABLISHED;
-> > +	inet->inet_daddr = fl4->daddr;
-> > +	inet->inet_dport = usin->sin_port;
-> >  	if (!inet->inet_saddr)
-> >  		inet->inet_saddr = fl4->saddr;	/* Update source address */
-> >  	if (!inet->inet_rcv_saddr) {
-> > @@ -68,10 +72,7 @@ int __ip4_datagram_connect(struct sock *sk, struct
-> > sockaddr *uaddr, int addr_len
-> >  		if (sk->sk_prot->rehash)
-> >  			sk->sk_prot->rehash(sk);
-> >  	}
-> > -	inet->inet_daddr = fl4->daddr;
-> > -	inet->inet_dport = usin->sin_port;
-> >  	reuseport_has_conns_set(sk);
-> > -	sk->sk_state = TCP_ESTABLISHED;
-> >  	sk_set_txhash(sk);
-> >  	atomic_set(&inet->inet_id, get_random_u16());
-> > 
-> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > index 6a01905d379f..c6c58b0a6b7b 100644
-> > --- a/net/ipv4/udp.c
-> > +++ b/net/ipv4/udp.c
-> > @@ -2194,6 +2194,21 @@ void udp_lib_rehash(struct sock *sk, u16 newhash,
-> > u16 newhash4)
-> >  			if (rcu_access_pointer(sk->sk_reuseport_cb))
-> >  				reuseport_detach_sock(sk);
-> > 
-> > +			if (sk->sk_state == TCP_ESTABLISHED && !udp_hashed4(sk)) {
-> > +				struct udp_hslot * hslot4 = udp_hashslot4(udptable, newhash4);
-> > +
-> > +				udp_sk(sk)->udp_lrpa_hash = newhash4;
-> > +				spin_lock(&hslot4->lock);
-> > +				hlist_nulls_add_head_rcu(&udp_sk(sk)->udp_lrpa_node,
-> > +							 &hslot4->nulls_head);
-> > +				hslot4->count++;
-> > +				spin_unlock(&hslot4->lock);
-> > +
-> > +				spin_lock(&hslot2->lock);
-> > +				udp_hash4_inc(hslot2);
-> > +				spin_unlock(&hslot2->lock);
-> > +			}
-> > +
-> >  			if (hslot2 != nhslot2) {
-> >  				spin_lock(&hslot2->lock);
-> >  				hlist_del_init_rcu(&udp_sk(sk)->udp_portaddr_node);
-> > ---
-> > 
-> > Basically the idea is to leverage the hash4 - which should be not yet
-> > initialized when rehash is invoked due to connect().  
-> 
-> That assumption seems to be correct from my tests.
+Secondary hash chains were introduced by commit 30fff9231fad ("udp:
+bind() optimisation") and, as a result, a rehash operation became
+needed to make a bound socket reachable again after a connect().
 
-...but that doesn't help in a general case, because we don't have a
-wildcard lookup for four-tuple hashes, more on that below.
+This operation was introduced by commit 719f835853a9 ("udp: add
+rehash on connect()") which isn't however a complete fix: the
+socket will be found once the rehashing completes, but not while
+it's pending.
 
-> > In such a case, before touching hash{,2}, do hash4.  
-> 
-> Brilliant, thanks. I'll give that a try.
+This is noticeable with a socat(1) server in UDP4-LISTEN mode, and a
+client sending datagrams to it. After the server receives the first
+datagram (cf. _xioopen_ipdgram_listen()), it issues a connect() to
+the address of the sender, in order to set up a directed flow.
 
-It sounded like a nice idea and I actually tried quite hard, but it
-can't work (so I'm posting a different/simpler fix), mostly for three
-reasons (plus a bunch that would require sparse but doable changes):
+Now, if the client, running on a different CPU thread, happens to
+send a (subsequent) datagram while the server's socket changes its
+address, but is not rehashed yet, this will result in a failed
+lookup and a port unreachable error delivered to the client, as
+apparent from the following reproducer:
 
-1. we can't use four-tuple hashes on CONFIG_BASE_SMALL=y, and it would
-   be rather weird to leave it unfixed in that case (and, worse, to have
-   substantially different behaviours depending on CONFIG_BASE_SMALL).
+  LEN=$(($(cat /proc/sys/net/core/wmem_default) / 4))
+  dd if=/dev/urandom bs=1 count=${LEN} of=tmp.in
 
-   At the same time, I see your point about it (from review to v4 of
-   the four-tuple hash series), and I don't feel like it's worth adding
-   it back also for CONFIG_BASE_SMALL.
+  while :; do
+  	taskset -c 1 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc &
+  	sleep 0.1 || sleep 1
+  	taskset -c 2 socat OPEN:tmp.in UDP4:localhost:1337,shut-null
+  	wait
+  done
 
-   I tried adding some special handling based on a similar concept that
-   wouldn't make struct udp_table bigger, but it's strictly more
-   complicated than the other fix I'm posting.
+where the client will eventually get ECONNREFUSED on a write()
+(typically the second or third one of a given iteration):
 
-2. hash4_cnt is stored in the secondary hash slot, and I see why, but
-   that means that if the secondary hash doesn't match, we'll also fail
-   the lookup based on four-tuple hash.
+  2024/11/13 21:28:23 socat[46901] E write(6, 0x556db2e3c000, 8192): Connection refused
 
-   We could introduce a special case in the lookup, perhaps as fallback
-   only, ignoring the result of udp_has_hash4(), but it looks rather
-   convoluted (especially compared to the fix I'm posting)
+This issue was first observed as a seldom failure in Podman's tests
+checking UDP functionality while using pasta(1) to connect the
+container's network namespace, which leads us to a reproducer with
+the lookup error resulting in an ICMP packet on a tap device:
 
-3. we would need another version of udp{4,6}_lib_lookup4() (or a branch
-   inside it), handling wildcard lookups like udp{4,6}_lib_lookup2()
-   does, and then call udp{4,6}_lib_lookup4() a second time with
-   INADDR_ANY / &in6addr_any, because we don't know if the receive
-   address changed yet, as we're performing the lookup.
+  LOCAL_ADDR="$(ip -j -4 addr show|jq -rM '.[] | .addr_info[0] | select(.scope == "global").local')"
 
-So, instead, I'm resorting to the primary hash, as fallback only. If
-what we need is a hash that doesn't include the address, such as an
-"uninitialised" four-tuple hash, we can as well use the original hash
-that doesn't include addresses by design.
+  while :; do
+  	./pasta --config-net -p pasta.pcap -u 1337 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc &
+  	sleep 0.2 || sleep 1
+  	socat OPEN:tmp.in UDP4:${LOCAL_ADDR}:1337,shut-null
+  	wait
+  	cmp tmp.in tmp.out
+  done
 
+Once this fails:
+
+  tmp.in tmp.out differ: char 8193, line 29
+
+we can finally have a look at what's going on:
+
+  $ tshark -r pasta.pcap
+      1   0.000000           :: ? ff02::16     ICMPv6 110 Multicast Listener Report Message v2
+      2   0.168690 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
+      3   0.168767 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
+      4   0.168806 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
+      5   0.168827 c6:47:05:8d:dc:04 ? Broadcast    ARP 42 Who has 88.198.0.161? Tell 88.198.0.164
+      6   0.168851 9a:55:9a:55:9a:55 ? c6:47:05:8d:dc:04 ARP 42 88.198.0.161 is at 9a:55:9a:55:9a:55
+      7   0.168875 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
+      8   0.168896 88.198.0.164 ? 88.198.0.161 ICMP 590 Destination unreachable (Port unreachable)
+      9   0.168926 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
+     10   0.168959 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
+     11   0.168989 88.198.0.161 ? 88.198.0.164 UDP 4138 60260 ? 1337 Len=4096
+     12   0.169010 88.198.0.161 ? 88.198.0.164 UDP 42 60260 ? 1337 Len=0
+
+On the third datagram received, the network namespace of the container
+initiates an ARP lookup to deliver the ICMP message.
+
+In another variant of this reproducer, starting the client with:
+
+  strace -f pasta --config-net -u 1337 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc 2>strace.log &
+
+and connecting to the socat server using a loopback address:
+
+  socat OPEN:tmp.in UDP4:localhost:1337,shut-null
+
+we can more clearly observe a sendmmsg() call failing after the
+first datagram is delivered:
+
+  [pid 278012] connect(173, 0x7fff96c95fc0, 16) = 0
+  [...]
+  [pid 278012] recvmmsg(173, 0x7fff96c96020, 1024, MSG_DONTWAIT, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+  [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) = 1
+  [...]
+  [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) = -1 ECONNREFUSED (Connection refused)
+
+and, somewhat confusingly, after a connect() on the same socket
+succeeded.
+
+Until commit 4cdeeee9252a ("net: udp: prefer listeners bound to an
+address"), the race between receive address change and lookup didn't
+actually cause visible issues, because, once the lookup based on the
+secondary hash chain failed, we would still attempt a lookup based on
+the primary hash (destination port only), and find the socket with the
+outdated secondary hash.
+
+That change, however, dropped port-only lookups altogether, as side
+effect, making the race visible.
+
+To fix this, while avoiding the need to make address changes and
+rehash atomic against lookups, reintroduce primary hash lookups as
+fallback, if lookups based on four-tuple and secondary hashes fail.
+
+To this end, introduce a simplified lookup implementation, which
+doesn't take care of SO_REUSEPORT groups: if we have one, there are
+multiple sockets that would match the four-tuple or secondary hash,
+meaning that we can't run into this race at all.
+
+v2:
+  - instead of synchronising lookup operations against address change
+    plus rehash, reintroduce a simplified version of the original
+    primary hash lookup as fallback
+
+v1:
+  - fix build with CONFIG_IPV6=n: add ifdef around sk_v6_rcv_saddr
+    usage (Kuniyuki Iwashima)
+  - directly use sk_rcv_saddr for IPv4 receive addresses instead of
+    fetching inet_rcv_saddr (Kuniyuki Iwashima)
+  - move inet_update_saddr() to inet_hashtables.h and use that
+    to set IPv4/IPv6 addresses as suitable (Kuniyuki Iwashima)
+  - rebase onto net-next, update commit message accordingly
+
+Reported-by: Ed Santiago <santiago@redhat.com>
+Link: https://github.com/containers/podman/issues/24147
+Analysed-by: David Gibson <david@gibson.dropbear.id.au>
+Fixes: 30fff9231fad ("udp: bind() optimisation")
+Signed-off-by: Stefano Brivio <sbrivio@redhat.com>
+---
+ net/ipv4/udp.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ net/ipv6/udp.c | 50 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 106 insertions(+)
+
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index e8953e88efef..4bc0a0686fcd 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -420,6 +420,49 @@ u32 udp_ehashfn(const struct net *net, const __be32 laddr, const __u16 lport,
+ }
+ EXPORT_SYMBOL(udp_ehashfn);
+ 
++/**
++ * udp4_lib_lookup1() - Simplified lookup using primary hash (destination port)
++ * @net:	Network namespace
++ * @saddr:	Source address, network order
++ * @sport:	Source port, network order
++ * @daddr:	Destination address, network order
++ * @hnum:	Destination port, host order
++ * @dif:	Destination interface index
++ * @sdif:	Destination bridge port index, if relevant
++ * @udptable:	Set of UDP hash tables
++ *
++ * Simplified lookup to be used as fallback if no sockets are found due to a
++ * potential race between (receive) address change, and lookup happening before
++ * the rehash operation. This function ignores SO_REUSEPORT groups while scoring
++ * result sockets, because if we have one, we don't need the fallback at all.
++ *
++ * Called under rcu_read_lock().
++ *
++ * Return: socket with highest matching score if any, NULL if none
++ */
++static struct sock *udp4_lib_lookup1(const struct net *net,
++				     __be32 saddr, __be16 sport,
++				     __be32 daddr, unsigned int hnum,
++				     int dif, int sdif,
++				     const struct udp_table *udptable)
++{
++	unsigned int slot = udp_hashfn(net, hnum, udptable->mask);
++	struct udp_hslot *hslot = &udptable->hash[slot];
++	struct sock *sk, *result = NULL;
++	int score, badness = 0;
++
++	sk_for_each_rcu(sk, &hslot->head) {
++		score = compute_score(sk, net,
++				      saddr, sport, daddr, hnum, dif, sdif);
++		if (score > badness) {
++			result = sk;
++			badness = score;
++		}
++	}
++
++	return result;
++}
++
+ /* called with rcu_read_lock() */
+ static struct sock *udp4_lib_lookup2(const struct net *net,
+ 				     __be32 saddr, __be16 sport,
+@@ -683,6 +726,19 @@ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
+ 	result = udp4_lib_lookup2(net, saddr, sport,
+ 				  htonl(INADDR_ANY), hnum, dif, sdif,
+ 				  hslot2, skb);
++	if (!IS_ERR_OR_NULL(result))
++		goto done;
++
++	/* Primary hash (destination port) lookup as fallback for this race:
++	 *   1. __ip4_datagram_connect() sets sk_rcv_saddr
++	 *   2. lookup (this function): new sk_rcv_saddr, hashes not updated yet
++	 *   3. rehash operation updating _secondary and four-tuple_ hashes
++	 * The primary hash doesn't need an update after 1., so, thanks to this
++	 * further step, 1. and 3. don't need to be atomic against the lookup.
++	 */
++	result = udp4_lib_lookup1(net, saddr, sport, daddr, hnum, dif, sdif,
++				  udptable);
++
+ done:
+ 	if (IS_ERR(result))
+ 		return NULL;
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 7c14c449804c..6671daa67f4f 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -170,6 +170,49 @@ static int compute_score(struct sock *sk, const struct net *net,
+ 	return score;
+ }
+ 
++/**
++ * udp6_lib_lookup1() - Simplified lookup using primary hash (destination port)
++ * @net:	Network namespace
++ * @saddr:	Source address, network order
++ * @sport:	Source port, network order
++ * @daddr:	Destination address, network order
++ * @hnum:	Destination port, host order
++ * @dif:	Destination interface index
++ * @sdif:	Destination bridge port index, if relevant
++ * @udptable:	Set of UDP hash tables
++ *
++ * Simplified lookup to be used as fallback if no sockets are found due to a
++ * potential race between (receive) address change, and lookup happening before
++ * the rehash operation. This function ignores SO_REUSEPORT groups while scoring
++ * result sockets, because if we have one, we don't need the fallback at all.
++ *
++ * Called under rcu_read_lock().
++ *
++ * Return: socket with highest matching score if any, NULL if none
++ */
++static struct sock *udp6_lib_lookup1(const struct net *net,
++				     const struct in6_addr *saddr, __be16 sport,
++				     const struct in6_addr *daddr,
++				     unsigned int hnum, int dif, int sdif,
++				     const struct udp_table *udptable)
++{
++	unsigned int slot = udp_hashfn(net, hnum, udptable->mask);
++	struct udp_hslot *hslot = &udptable->hash[slot];
++	struct sock *sk, *result = NULL;
++	int score, badness = 0;
++
++	sk_for_each_rcu(sk, &hslot->head) {
++		score = compute_score(sk, net,
++				      saddr, sport, daddr, hnum, dif, sdif);
++		if (score > badness) {
++			result = sk;
++			badness = score;
++		}
++	}
++
++	return result;
++}
++
+ /* called with rcu_read_lock() */
+ static struct sock *udp6_lib_lookup2(const struct net *net,
+ 		const struct in6_addr *saddr, __be16 sport,
+@@ -347,6 +390,13 @@ struct sock *__udp6_lib_lookup(const struct net *net,
+ 	result = udp6_lib_lookup2(net, saddr, sport,
+ 				  &in6addr_any, hnum, dif, sdif,
+ 				  hslot2, skb);
++	if (!IS_ERR_OR_NULL(result))
++		goto done;
++
++	/* Cover address change/lookup/rehash race: see __udp4_lib_lookup() */
++	result = udp6_lib_lookup1(net, saddr, sport, daddr, hnum, dif, sdif,
++				  udptable);
++
+ done:
+ 	if (IS_ERR(result))
+ 		return NULL;
 -- 
-Stefano
+2.40.1
 
 
