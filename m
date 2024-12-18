@@ -1,130 +1,152 @@
-Return-Path: <netdev+bounces-153096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A24C29F6C6D
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:39:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 975819F6C85
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F24341694F0
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:39:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E65D516C921
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0321FA241;
-	Wed, 18 Dec 2024 17:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFB71FAC40;
+	Wed, 18 Dec 2024 17:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="bIG/fc30"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NLSQNew4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C728D175D34;
-	Wed, 18 Dec 2024 17:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063D31F9F50;
+	Wed, 18 Dec 2024 17:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734543546; cv=none; b=P4Vlr9LnFf6dtQzSY/67RMmxMmEj+Nd2ywC2l4YF8LpwGAdIF+uklmRDPbN9ZaIypN7Apb9ht+uYK0Z8FwR3PKJtSRsBUVAcR5PsLo84+PmhqULLQthX++MA3+I2CQunwb1yHmlT6X+DtZAZvCqR/fYISpwpAtGPELoFn1vSmfY=
+	t=1734543923; cv=none; b=rdh2q+fNtscZTxLeRfm9wlaPAQDWw8n8CFxgrUD9PSs+ZA5xeHhV8XqfIsyUwCWznDsODBHcwS2TrZgTlInrO4hDTkOqM7bZjMS9aCBACRN/A1wyYNAvxBVwqzZMP+az239I0QDZPp+IC/AZGWqHXvroQaxaee44r9HKRtJfXIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734543546; c=relaxed/simple;
-	bh=U5S4MwYDBf+wwJoNz8uVZzm4gZ937iYPGnjPcLwGL6w=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=izPfV9gckurmHs6mwPyS2/3kyr4z+CzOkr6omJLQSgB5SV7vPcvAvjN+dGUhnjA2q0YYlb2vlLofhrKL6BeN4mRAEYrW6BWWcJ+mcro4dZfRR1WJR8Yqkrr3O3Art0pKeYxIGN9wO1iUXaNNOa0+d6ALhpkQ+iQJiwchdlYrm+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=bIG/fc30; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1734543510; x=1735148310; i=markus.elfring@web.de;
-	bh=k7t4oNaWZUmDndsSIfmlqR6PmTTjsV953prQswRMY6M=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=bIG/fc30zWhLuiQOSbsD7dn/pQryB+u1z59yt8dCcVFQ3WPzR6WDOOdxVgrdZgDZ
-	 kep8rWQHlg9JDUYtElIy5FIpnpAWhVSMbGYANOAaHCBazxW+OQ/8x5lS9reoace7K
-	 s6ablZ3WlXgSrVYT+hsgBysnzmclYu3xDP2nXiq33n+zsJ+to3y3/OS7xs/lix/Iy
-	 DvKZuSjd3o432MnZvLCSrjbtKlJXb2+HKgGNsGeP12hmSDC7DxkSzmzz9sSzPM07F
-	 Ho0hWTdsWQFPGJj4zbZ+RvK1+4e0TQSOT9XlXIeZMk+gwOWMdNVjmbzCuLR85wm1N
-	 lvy5EHDq6cS18bcy9g==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.70.41]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MuVGC-1tfDwC2FVK-00rZPs; Wed, 18
- Dec 2024 18:38:30 +0100
-Message-ID: <8d54b21b-7ca9-4126-ba13-bbd333d6ba0c@web.de>
-Date: Wed, 18 Dec 2024 18:38:25 +0100
+	s=arc-20240116; t=1734543923; c=relaxed/simple;
+	bh=+ATQ3fLYydshMThk1zPlL0WngjXRHdvU1A1dfJjAKVw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dHnkIia3d2z6IO9U69gpNdtrSZRimLk6smAPT+Mg0e/DjC4fp4c9/j82ON/0i0vxYNdHe6g1qKGawl6KCchZcmQRTWPo7G1dJ2IKucgPcRpH+DsGC476y8vgImVRpZ2zSGqLNns3dtxpz2oKTp013WwiIJcC2CSUYzPb2J4nuvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NLSQNew4; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734543922; x=1766079922;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+ATQ3fLYydshMThk1zPlL0WngjXRHdvU1A1dfJjAKVw=;
+  b=NLSQNew4K1SL6v4cG3jxPzjPgk9hR/FGngpRlbev9b9jyhY+zGe6DeTv
+   Kj5h9508cBbfug58wfMW21lTbXtRQGqsbhbnqMit4uO2aOUhCd3rbfay5
+   IqsvA4P4AFfjFymoxJEiLeV9z2pyKxUXQ7FzcVamYPnn+BXKt1iKzCVwQ
+   6e6vhDwmhdVHMphxNJDZB/LgVKGD7mI8cX2f1I6yUMtkRVrGvfqXmBeC8
+   5FavnIfIOq53KNW8/HEljbg9cYDW45yFryw6Ao0qeiZQy5e2RCYJcuPs6
+   sjJcJ4rWx/teQYOeN3UdtCzfLnQWXqtIxtaFh3qDu29eMda6LaOBPZUNk
+   w==;
+X-CSE-ConnectionGUID: SiNQijJiTLyhHeKwxcm2ZA==
+X-CSE-MsgGUID: RqptBb8FR8inRMfKFbwBBA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="22620945"
+X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
+   d="scan'208";a="22620945"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 09:45:21 -0800
+X-CSE-ConnectionGUID: E4Awc4FzTTORLsCV1l54ww==
+X-CSE-MsgGUID: nZFARySJTZa4OIkZPolMkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="121192185"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa002.fm.intel.com with ESMTP; 18 Dec 2024 09:45:17 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	"Jose E. Marchesi" <jose.marchesi@oracle.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jason Baron <jbaron@akamai.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/7] xdp: a fistful of generic changes pt. III
+Date: Wed, 18 Dec 2024 18:44:28 +0100
+Message-ID: <20241218174435.1445282-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
- netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- Bharat Bhushan <bbhushan2@marvell.com>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Geethasowjanya Akula <gakula@marvell.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
- Sunil Goutham <sgoutham@marvell.com>
-Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- Dan Carpenter <error27@gmail.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20241217052326.1086191-1-harshit.m.mogalapalli@oracle.com>
-Subject: Re: [PATCH net v2 1/2] octeontx2-pf: fix netdev memory leak in
- rvu_rep_create()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20241217052326.1086191-1-harshit.m.mogalapalli@oracle.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:BZjLDS3M5wjs76RkCTAjAg3DkmyAwsH8MfCz5p8ay1IN0xq8HYY
- bJirIjeIXtU1Z/gwK39OG9Y6NnWi66v2Zi/xIU77cnXhwkV7Ecet583igkIr+olwXaYghRZ
- qDB1lLOfsiduqovUynqPlp9YUeprg43yz9F4t6DjTBkq7CkSSFruwizn3GgZjmd1qSuA4XE
- T4bZ21S6cIUTaiWKO3AGw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ZUrw+YskXEE=;a/q1Vn0849OChlob+xMuzKY4leV
- STiYjNoYFO3WDQrYEuoSca64x7sV5tTZAv++89A0fMiRVpcPU33lSYhkVkosqEDrXmnymPE7g
- SHzgLRgh3rZCfoTzbWtv19Cj5uELx+r062ZaPTXuzm8h5Evo2TdjCbKaQ06OcNjJ8FK3xZoPX
- I7KS1N6ohipwHI8H1VTe0dB8ewkk2olug1r2kCjMlyfYoQXCObdJwuz5m+5tTdl6nOrxl36t1
- SbNDJ/0QSBtcJZe/zaRYnhUpIByCCJSvvOhD38BwlGaFHycBjkwBpmzlQ1Gwt87LgJ4HNrx9P
- AVekNw7WDT8CVJdqnJcTU6JO1gc21JCA9aI1TDm/aga/fztA56wXlKIPgT6Ypke5WocflnZcB
- ofIhWHD56lRmogY+epFbbXNFkh3VxygUQsBdxcvq1RxyaedpBhlA7tVhY1wk8HnHoQWLMWFSC
- bwSNmtzUQ2+Y2l7dVZ/XL47RoBXABhUvZ/BYyf4gdRX30KNfEO4n+mKWjZ2XZNSCUiTX7E1TF
- d1+79AGT+vT4JduYyHvOPjQPYmpkCXUwVfvxrics6Z8XqMkkbUhV7uGji7Kpt4t0FNzZfVIFB
- N69eTfEqAkp6H0ShdBwIW37+V5VEGpVxr5L74s7BUQ5RLeQc3KzCclaG604Dgw5a2EnDdmE84
- JocdYuoDZamMoy0eGoTeDCqEqNol68tAIP1IFHKD2L90sGlRFxDhLhFIKBpH4Jt+OSrWSpO92
- B6b5tPrz0FsiLdzZxEg67OHjN0FNerf/348GPoQzr3WyD/TTw4cwp2lRUAOWEqRDZq8LvgN76
- phTtG01RfUgKlB1jEOfgzfY61jMDvoNprQX3mmTQnLcbpSeZ7iQfBE2YplVbLKHQVtqKaS5W7
- 6ri38oyngFzJXE6YzktCXUDRuuHJGfVFfPvRlRJ75XkpCuDctjJ+IE7eTZb0NwSl45abE8fPZ
- ksusK3vUD9juRG4U1tIHCIhjnqLk48Xh1vKxhjClPo0luLvfUNcmZPT2qkcDrPHdAiEwUgs8K
- Ex9NX/mumM8GCWCc9OAG34uwH/0gPx7/17CdwqdYa+8dp3SpMtleJKgXGjhrxsNvwUoTTesjj
- H7sKD6HE0=
+Content-Transfer-Encoding: 8bit
 
-> When rvu_rep_devlink_port_register() fails, free_netdev(ndev) for this
-> incomplete iteration before going to "exit:" label.
+XDP for idpf is currently 5.(6) chapters:
+* convert Rx to libeth;
+* convert Tx and stats to libeth;
+* generic XDP and XSk code changes;
+* generic XDP and XSk code additions pt. 1;
+* generic XDP and XSk code additions pt. 2 (you are here);
+* actual XDP for idpf via new libeth_xdp;
+* XSk for idpf (via ^).
 
+Part III.3 does the following:
+* adds generic functions to build skbs from xdp_buffs (regular and
+  XSk) and attach frags to xdp_buffs (regular and XSk);
+* adds helper to optimize XSk xmit in drivers;
+* add generic loop unroll hint macros.
 
-=E2=80=A6
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-> @@ -680,8 +680,10 @@ int rvu_rep_create(struct otx2_nic *priv, struct ne=
-tlink_ext_ack *extack)
->  		ndev->features |=3D ndev->hw_features;
->  		eth_hw_addr_random(ndev);
->  		err =3D rvu_rep_devlink_port_register(rep);
-> -		if (err)
-> +		if (err) {
-> +			free_netdev(ndev);
->  			goto exit;
-> +		}
->
->  		SET_NETDEV_DEVLINK_PORT(ndev, &rep->dl_port);
-=E2=80=A6
+Everything is prereq for libeth_xdp, but will be useful standalone
+as well: less code in drivers, faster XSk XDP_PASS, smaller object
+code.
 
-I suggest to add another jump target instead so that a bit of exception ha=
-ndling
-can be better reused at the end of this function implementation.
+Alexander Lobakin (7):
+  page_pool: add page_pool_dev_alloc_netmem()
+  xdp: add generic xdp_buff_add_frag()
+  xdp: add generic xdp_build_skb_from_buff()
+  xsk: make xsk_buff_add_frag() really add the frag via
+    __xdp_buff_add_frag()
+  xsk: add generic XSk &xdp_buff -> skb conversion
+  xsk: add helper to get &xdp_desc's DMA and meta pointer in one go
+  unroll: add generic loop unroll helpers
 
-Regards,
-Markus
+ include/linux/skbuff.h                     |  16 +-
+ include/linux/unroll.h                     |  44 +++++
+ include/net/page_pool/helpers.h            |   9 ++
+ include/net/xdp.h                          |  98 +++++++++++-
+ include/net/xdp_sock_drv.h                 |  41 ++++-
+ include/net/xsk_buff_pool.h                |   8 +
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c |  30 +---
+ drivers/net/ethernet/intel/ice/ice_xsk.c   |  32 +---
+ net/core/xdp.c                             | 178 +++++++++++++++++++++
+ net/xdp/xsk_buff_pool.c                    |  40 +++++
+ 10 files changed, 431 insertions(+), 65 deletions(-)
+
+---
+Each patch except trivial 0001 was on the lists already.
+
+Since the not applied part of Chapter III.2:
+* rebase on top of Mina's netmem fixes;
+* 0003: remove redundant double CONFIG_PAGE_POOL check (one inside
+  and another one outside of skb_mark_for_recycle()) (Jakub);
+* 0005: remove !CONFIG_PAGE_POOL code as unreachable (eBPF always
+  selects it) (also Jakub);
+* 0005: actually check the pfmemalloc flag of newly allocated frags;
+* drop exporting static_key_{inc,dec}_cpuslocked() -- were used on
+  slowpath in very unlikely case where saving a few cycles looked
+  worse and less convienient than the "regular" way.
+-- 
+2.47.1
+
 
