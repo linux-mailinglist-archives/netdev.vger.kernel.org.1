@@ -1,221 +1,141 @@
-Return-Path: <netdev+bounces-152896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5527A9F63E0
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:53:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF899F6421
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F22B118834EB
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:53:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24ADB169DE7
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B7319E7D1;
-	Wed, 18 Dec 2024 10:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E9419D071;
+	Wed, 18 Dec 2024 10:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="0Mq2A9jW"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rtPXTwQO"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2044.outbound.protection.outlook.com [40.107.100.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170AA199EB2;
-	Wed, 18 Dec 2024 10:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734519182; cv=fail; b=j2HEFPxOGTJdjNJCBSMtCWewH1zHa10wD+3WQS6ZXPWUirVjBgR1JLwlL2tJOaCxkpjIQiUF+N8edLjCQCMIj4i1ruBWQoXUlCKowO32VV0qL68n6OQ0erq8XKdyZyP/3vIIsVBvQOMhgZ9F7VzD2ATS0yFWh0X5i9poYa64bc0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734519182; c=relaxed/simple;
-	bh=2tiPJuFxEsEF9tZ7hs5kiA7B2ltNJGMIB2fm3S3RQ5w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ftroIFzCGr+Ku0KvH7V/Jzyc3T96hMrKHHCurYVMgg716Wnt06qekEdFPbDN53QgwCc08ReNCwKC9yazXfgPEgNWnG86XvuTUmMtekctwBQEIT8lP4vetVUgWCjLz4z8biGVLysW8ZtOMJUHKF80bDoJltQ/7NnDKNWFWuvAqas=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=0Mq2A9jW; arc=fail smtp.client-ip=40.107.100.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cJDu7WUSP/c7zBy4Vf+0Rzz+S6K7q989ILYEq6xy7zUcM/HWgYSJN6Ko3y4SrajFjfdDWgWw3mBvYpwU+v5WsbAWTR+E774A2m6I8uSAPyJzr5SVBfSwZL4ibmfdOAzG141h7SSKGRi2/czWSZgp3L482e60BNCvcuV4ywuNXOu7UJR+UFbplXqA6XfHt5fcP7dAkRhEUaclRO9iyB/SpAvcYk8oCPgr7Gq3SE2ks7/sYxqVxS9m6aqZY67AMYnGj4inDIQQmlEAfQLybk+F8RiZsPFg20lukO7Qbon3PM+JrY4kGB6yU7g5NlefupmfsKshsS8HwkCN7/y2+cJtiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vWcnyssSQ12CRUkWcmviYagnnAIUUHOCmZzLsFfFvxE=;
- b=Bbc5b7KT6UMMQT6crXt3xiqQXW/QoDiEb5SGg5AZ1UchPq8I76vLcsfvvyTzhGb5uMgNDpbVTnkxP1V/AiRKMyz8qMa0982KZZtI49xpAx35kNwRfC578TlU5A+iWUHPQ5uaFrovrlIFKdAi1X31fIbrYdfrbtNyqnVNntSXgQD/LYlCk73UMZony0bdAf1zis2EeO1euQX9DsV7PRtc6U0Dtcf0lWYSO5J6ifK2BjhOfu46Fb6jMBegywTrh1S+N4yatffLXssbAeF8DlU1YL2TcQiuOEXDFgjyNmjx/Ja4XRfEDiibq3fNlMZVUe1/7PMciJeLk6kZljwrh80D+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vWcnyssSQ12CRUkWcmviYagnnAIUUHOCmZzLsFfFvxE=;
- b=0Mq2A9jWcrg5QM9NElNrfyk0oMVCG8lGTtxcf3if3SW/XcMpsiOTqX+IwlH59yZsCm65B3qznwBsqI1PXejLmi4cxdwZc/F9JoivRMagKID11Xxk1EFw9NlftRv4xGAaBoJSu0qFF3jsigENTqaN78cemaSQzudClTdGdpCrCVI86ufjB1f8nCtJJ3c1xmN4oopMS8N7pITkN83PoVX02ZCGnkEbAx8KHT0xKNFARbFsgUA+Yr6CO7d6Eg6/6HzmZ3VrK7wLOQ3nXjw2QPBHL3AdMmXh5MnHBe+IEQUwKtlEoXVcKYUPFB7VKUWOjJ+Xt02X8yMDHyjNZtG+XIInsA==
-Received: from CO1PR11MB4771.namprd11.prod.outlook.com (2603:10b6:303:9f::9)
- by IA0PR11MB7791.namprd11.prod.outlook.com (2603:10b6:208:401::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.21; Wed, 18 Dec
- 2024 10:52:56 +0000
-Received: from CO1PR11MB4771.namprd11.prod.outlook.com
- ([fe80::bfb9:8346:56a5:e708]) by CO1PR11MB4771.namprd11.prod.outlook.com
- ([fe80::bfb9:8346:56a5:e708%4]) with mapi id 15.20.8251.015; Wed, 18 Dec 2024
- 10:52:56 +0000
-From: <Divya.Koppera@microchip.com>
-To: <kuba@kernel.org>, <richardcochran@gmail.com>
-CC: <andrew@lunn.ch>, <Arun.Ramadoss@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <vadim.fedorenko@linux.dev>
-Subject: RE: [PATCH net-next v7 2/5] net: phy: microchip_rds_ptp : Add rds ptp
- library for Microchip phys
-Thread-Topic: [PATCH net-next v7 2/5] net: phy: microchip_rds_ptp : Add rds
- ptp library for Microchip phys
-Thread-Index: AQHbTVioH6zIUkCJu0CrnJebL2w0LLLrXYUAgAAG1gCAAAL8gIAAb76Q
-Date: Wed, 18 Dec 2024 10:52:56 +0000
-Message-ID:
- <CO1PR11MB4771ED94C34E6A15F87AD812E2052@CO1PR11MB4771.namprd11.prod.outlook.com>
-References: <20241213121403.29687-1-divya.koppera@microchip.com>
-	<20241213121403.29687-3-divya.koppera@microchip.com>
-	<20241217192246.47868890@kernel.org>	<Z2JFwh94o-X7HhP4@hoboy.vegasvil.org>
- <20241217195755.2030f431@kernel.org>
-In-Reply-To: <20241217195755.2030f431@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB4771:EE_|IA0PR11MB7791:EE_
-x-ms-office365-filtering-correlation-id: 11aec3e0-c3c0-49cc-7469-08dd1f52215c
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4771.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?tZPQv1gxum6ZooD1wlQiP4mLWIFY0WP9mmqdn2hhVB9XN5tua3vRf/dmWXds?=
- =?us-ascii?Q?l/5M3B7b7ESGJFxgAdlRZJz22AVUEp7WIvvIFSk0NAe/l6s1ttZLZO7I2s7+?=
- =?us-ascii?Q?z856pJwO+afBAzC/+14WtBDxzPV/5xqEZ3bryBx34lDdFBhyHAYgYvcZsTWf?=
- =?us-ascii?Q?5vsSFu5rTkHmqJXfZSa3epAxlZvJVc8CZYMzUrC27+4XY4IfQ6nHaekV9RkR?=
- =?us-ascii?Q?hVpqytA4G0aqZ42inmPjyHfHmaDzjTHAL/lDg4eLNxvP+Adj1yU4dAzThaZt?=
- =?us-ascii?Q?jRwKe8/fx/PJiYzr2ixnhk1qYlbufArNp/tZTc/EQqdiX2KH+Q0gP2U2Er7l?=
- =?us-ascii?Q?svvQo5TO9hb6sxNFO/Y/Aia6zwsOxA9mgHtP1NLjT55dTbxbgcVfUbK6zD4P?=
- =?us-ascii?Q?bk6JN010d0tliaKN/sUxsH2BkR9ld6lfJ0JKx7gX/+7C25ieFlBg4g3YK/8i?=
- =?us-ascii?Q?H3vgGkSE7JwtpSl2HBRpBEFBsdtGiWrgVZ0ON89etzNH6pjzqyHJotewZN0f?=
- =?us-ascii?Q?51cLvBHazWKxH8TmpFXHR0d3LsmQ66Nl5znO22UJO2N5juUa++4lvT+a/HIP?=
- =?us-ascii?Q?goeTeZ3c1Rn5OOH2jRko9fOVDeSQ8cREfaDf/dHNmjZUUlfD2sLnaaPITGD8?=
- =?us-ascii?Q?ixq31Oeq0Sobsu7kUD84yEPLAdvVmMH3zFAKgJat/PCZPQX9Ml7z4ckXL/pq?=
- =?us-ascii?Q?HZ3zSwijsvP34FFV2qd2/r41Tiuuk++vsGp/J6wfWTi+tKUDwaB1o2BOoDK3?=
- =?us-ascii?Q?2GJhTfH+NZAk1gdQ8T0ivkbxvDads70fVY3XHMRiE6wG6YbQqUR0qgPCo8wJ?=
- =?us-ascii?Q?LExaw3XU9d1wPKwOxpTJNC0lz1LElPtEBm1iRwxeINmZkuZu9A8dNzinBoZ3?=
- =?us-ascii?Q?tVeT3OxlcdWvyr2SLyD4UwpX+2MBsFBaLHReYv5htFmxjKe3nuLGq1Az0q5x?=
- =?us-ascii?Q?DNzSNqfwepB1jqSHNtNK5pwDjJ27iD4tbytIUqOnYQia1vzcU7m0+ufxHe0L?=
- =?us-ascii?Q?vDWmSsUy0nngDyiNnTczhs3fiRTI/mof327ZXuatEkXGmSMijR0fis5XVxn5?=
- =?us-ascii?Q?x4T4Wk3aiezwvZuLbTW1ZBooAr/s7a/8zcXuSivknsYt3kC46CyHzFCTYELD?=
- =?us-ascii?Q?OUTw3ck6cAHdStNWz+lE9NbeAkYKh+LDtFLUAEDd4wPNlZ2u41hbXhf16aoZ?=
- =?us-ascii?Q?NUqJRxeld4Xex02IlayUANa5w7l1KU2FlNeVW1wTfgIf40ImiuBWJyKplGdy?=
- =?us-ascii?Q?d6iH0wBI2B7/OA1ER1uvS0NaViZvV40smMu0yw6bBUqHah9AR69GyrrY/oSX?=
- =?us-ascii?Q?lxcGiLe3xLGaRKN14uo97C4x8wkjeI+R4Hc3wKyhVg+0Ee65eDQ6l9zthgNi?=
- =?us-ascii?Q?7dPBkbyOyTutjD90zFQYsLuDOL+gKaUQy8JzS+gNEu/qzT9EWYcEN524EnFs?=
- =?us-ascii?Q?gvA8oUcHB6A=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?puMfD+yJfYOe2bn38Zh/T/SGUM3HvcXBcjWyvUtf0FpERMW5LGGOsRovD//W?=
- =?us-ascii?Q?+/3N8yoKbbJGtELxpQkiZyCFL2sHZRuOTTdwiTbYsqhcwxRUUGPkG5pBXNnk?=
- =?us-ascii?Q?2JHyliUq4ZuGRDlIRqS9mXaNGiS5ozx5h8FJrfYRA/xo2cIGFwCKV+JA9gYq?=
- =?us-ascii?Q?BzKdyS9a/qIOk4rbglra6RQNR+aNhvP+E+mf3GIxlLKJTMNT7DjuoES7Vmuv?=
- =?us-ascii?Q?BNVvTshMHuSpm6EvLZpI5UsDtxcVyeNw4y+52piUNv8NtiG2rw8DS2Kb49lm?=
- =?us-ascii?Q?6wn35A13FrtnWi+lM7da7JY9FMNBknkWZQf+Sq3Pxo2VrdkcxTHnrN6OiFaw?=
- =?us-ascii?Q?hPUvFMBHtJFk2PH8iWHTgv3qMmCKhxXixLEef7pg7VmyZt5nsrL9JtZu/RI9?=
- =?us-ascii?Q?XsYSdegDeysxdMu0lk9JEvF+Anzq1rEKuCOj96rrsTrtZithCXLv9u3/ViyF?=
- =?us-ascii?Q?Xk7cG8b311XkHQ8+wzyGxQcKMdxQleiOcQj5CegJNi3xX6j731gBOTDwisqo?=
- =?us-ascii?Q?OI9y5K0nRaZev1yKKc3Ox8bgLInwRf3RM+Eva/89p0rK2U8UoMVVP0fD6MTQ?=
- =?us-ascii?Q?/zZqqJUSK7NgVL/dx9/4RlTsuZTXdQz30btZ6UcwdtAZxgNQ5FKq/JGF8GDZ?=
- =?us-ascii?Q?XT4rLB39j/pLXYG0ZyfhpbPWE9M8nBuj2unsxa7gfobW60wjYX2ntroD/DLv?=
- =?us-ascii?Q?l56E9SghrEdzO356qMq1emr9mQcTyRxSMz7HAkEDDi81Ss1E2UlcnAhr2RJv?=
- =?us-ascii?Q?fMFz5P79+kdjcaurCep0e3P1BrvpUKmT2x4jvx9wOPzgixfxDeW69yTdBbf3?=
- =?us-ascii?Q?e8kGFKxp1JoUZwAH5KVT0dVNRTqZbruAzmUVUnng6jSBtkRQyTt7OtPsyVxo?=
- =?us-ascii?Q?LtTqnNDN9UgnN/7vmN3SlLND6uO+MQcyqE+VI0UgrJRwXyZW1JZuVzV+2zHM?=
- =?us-ascii?Q?bFKmYzxyQAneh5iwo6X+MrsGq/W+OL4Lxn6w0JQ68bz5R4ev7bnRvANtrmQc?=
- =?us-ascii?Q?SqADZpuEmsFdEwC8BTAO4zezEPDe13vNcYNBChLXogFMCwzFs/xcTiAsYnr0?=
- =?us-ascii?Q?WyYV/Hv1e5NjVXePrVZ8zfm/MblHuaYyu5Zjqf6JWe0kxn3y8imb3J0XZM1R?=
- =?us-ascii?Q?6dseOGUMtkgZ4V6L72+uSdheb4mA4aawh9pSLXkNA19vTZBg2JpF9mOGXMCA?=
- =?us-ascii?Q?54xNpbuqei9CN6loE/2CeE8g95WBV4tyVLmVy4XkjZInFItsYmi4m5IVeuW6?=
- =?us-ascii?Q?Kd+xRCOo9C65LpE6eqNMHbiiOHnBouiP6xSE8YTPd32ciSigc0acxieakWVm?=
- =?us-ascii?Q?YYzhjXNU3TAkCuBd0yfmqAd2lUtGtofkbwkJpJN+RuyUTKvSNqHNtuS6It/O?=
- =?us-ascii?Q?MN51EIVYOQWDwjhklhJbwqbfVzIGcm+QjqYuJu+X7b8dggDoa8glBeU9JYbE?=
- =?us-ascii?Q?Q/0BO1iiNPpoToAq9l3Yg7CX66WS2aB1GU9ohyn4F7ut2nCh44JmgadSDuKo?=
- =?us-ascii?Q?+J73hn360jBj4X4ko9IC9HeSUPimx6i2KRjilPGhD+XbU2RY3H5S8Pbwik6l?=
- =?us-ascii?Q?nKhJRn6z0rkTbzEjpJ3eFFLmm9RpzyKzkfEnkKDlz/oP2NNEGQSpniTb/TQ4?=
- =?us-ascii?Q?MQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413C619E998
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734519285; cv=none; b=RG2b5YpkbC51jksGv0Bx53S12tOquaqj5VHFkYZ5LAtfeWDS1uBAzGdeK97ifSnUlTafP5gdap9fLfMz/PXjbqzMGTXa2RptHvfI7ZSxn6Rad0M7Hq32AyVQR1j6oulReRWYQdvA87vZhcuMgeY/7bGoCIIA1r63w+X0Gls+ZRI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734519285; c=relaxed/simple;
+	bh=31AJvFncyDZ/FXq2NhVl5iGwRm7DlmYnqi4Ssp7vJGs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e4Kt8D1KJNLwEx1jneAgLxBHz5JXzCz3P1WeTdQseTSIH2xokejVoX9dlHstvd8qXZyApdvmnJMZ0iKx6Kro7UmrZ4/NxDqQVrisHsxGGzsyf7+hA+06SVGZOnmn40pr4nskLkK3QvPWDn1KVQ55bmjZxdjyVNHfqMeejXqYGJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rtPXTwQO; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e8f64d5dso11465437a12.3
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:54:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1734519282; x=1735124082; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bhTokHP9skR7jJeKPK9CVtZx11UuslYBY9BBg+qEOjA=;
+        b=rtPXTwQOcdOhb9yqKuMmBbwMgp+UI8vYI/v0419zOm2xRkHD7jt1obZ6FaBLF5cive
+         ZiFJDWgoogsL5UTN5CkxAZzAsjYc6ItrK5lw3MfM5tFRiipDpjxImNHXKEC0OKkstz8c
+         y1C00kv0OZhwGcto8F8nAmRRiF2gbth16ndCJVdCVoEDyBL46x3qG0Q5xbBN2KvRBRBy
+         9GAR7k/dBaSjOmLEuTTwQHNP70Qz/8JOGga0AVj0Xhw7E4lM9uS+4HqZAxt1kLzkbkuu
+         W+OXX1lwJsdPXCgla9PT0fhZBeA/v2xY7y1qatlOGMBBzCCeE6gcfmeKRejWIbvvZmRI
+         YVaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734519282; x=1735124082;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bhTokHP9skR7jJeKPK9CVtZx11UuslYBY9BBg+qEOjA=;
+        b=ltKDXDpiBKFa0dpCFQS7lYJIunLAHePJ805TZKihkQpfcaRy1YTtd9Nx8dzOP6Al+y
+         MCni5lbDMPG9Hr6yR01+zu5GtFrB25IACwGqwMmejQlQAJUUlMZnaUYJ4yRK6M+S62Vi
+         yMfWaI3CZx0+5TR1Gh9hS0Hw9IGh3olKbq/XHGp5ZsZPKAbd1rDKmPYOB52WDtYF2jWB
+         95LVNDzhpzO07vYXtqYSY4EdCuUC29zueUUgJHY/qkz8y8qK6feOcCbHYBMCWeViPtD5
+         YXUaqZ4cKHRr6HJ5w+M354zBYX/1gZ97duDd/+ycqYd1cSu2FnJnlDzJbfoV0qwIIBli
+         LtTA==
+X-Forwarded-Encrypted: i=1; AJvYcCUyTFuST5YG9IgZ6MQmsJoWOc7Nj07tZ/h1MyytHoP4hSy1oDUQmCGbRtM53qV9QDU5orzeq9g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweZ+Vzbsm5CIIF3PRmUrNryqEIGRdiI6YKbXm3fR9bmFXR5cLb
+	RsJRmAXRxrSnvTkYMwOi2uZ+ZmXWA0BpmTKepFD6QthVPjstj9nE6TA2ZdvpiRQ=
+X-Gm-Gg: ASbGncvm9KBh4Y3raQlNEXGvkMuJbbUqB+T5bNZIIc89gdeiwHC9Qz2WtJlxSjNEh15
+	D635z2H8FulqEIc9iLS7UFLp5V7PsGimYs30LYcS5Qrdph9KCjRExGjk84jTvGhFt9Lh/8kcErj
+	H/XFeDZILJ21RiQD9uBm+rJjGOrIvizS8hbrimI5vAB5AJwDrXhJBQIc7TlE0gRvpD0Bl0L6tPl
+	F8+e2vEEQB2VRziCJrf7WxKPL1yHNgjHwn5wh2jyufTEwzm8RG2Iwfl7+RKhw==
+X-Google-Smtp-Source: AGHT+IGd9c9NZz2gvokmKM5Dng3BnFozJjkFoab/PE7l5nl8JOL6hBsbbn1h4w3R6/1qrT9lM4LqKg==
+X-Received: by 2002:a17:907:3da4:b0:aa6:8fed:7c25 with SMTP id a640c23a62f3a-aabf474bb0cmr240635866b.16.1734519281678;
+        Wed, 18 Dec 2024 02:54:41 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aab9606b3a0sm540413066b.81.2024.12.18.02.54.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2024 02:54:41 -0800 (PST)
+Date: Wed, 18 Dec 2024 13:54:38 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net] xfrm: Rewrite key length conversion to avoid
+ overflows
+Message-ID: <cedbaec9-d149-48af-8068-182f0af5a89c@stanley.mountain>
+References: <92dc4619-7598-439e-8544-4b3b2cf5e597@stanley.mountain>
+ <Z2FompbNt6NBEoln@gondor.apana.org.au>
+ <053456e5-56e7-478b-b73e-96b7c2098d07@stanley.mountain>
+ <Z2KZC71JZ0QnrhfU@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4771.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11aec3e0-c3c0-49cc-7469-08dd1f52215c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2024 10:52:56.3563
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KgdFNJzscmRFubGlnt6VT6mnTi9gCo0t+mMddOPKODtktQ3Es/Pi4qumkZqNQM/fEPKxCI5nu51ekB8KBBj1PCuGxb+yAiUuVwYTXxIEUgU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7791
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z2KZC71JZ0QnrhfU@gondor.apana.org.au>
 
-Hi Jakub,
-
-Thanks for the review.
-
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Wednesday, December 18, 2024 9:28 AM
-> To: Richard Cochran <richardcochran@gmail.com>
-> Cc: Divya Koppera - I30481 <Divya.Koppera@microchip.com>;
-> andrew@lunn.ch; Arun Ramadoss - I17769
-> <Arun.Ramadoss@microchip.com>; UNGLinuxDriver
-> <UNGLinuxDriver@microchip.com>; hkallweit1@gmail.com;
-> linux@armlinux.org.uk; davem@davemloft.net; edumazet@google.com;
-> pabeni@redhat.com; netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
-> vadim.fedorenko@linux.dev
-> Subject: Re: [PATCH net-next v7 2/5] net: phy: microchip_rds_ptp : Add rd=
-s
-> ptp library for Microchip phys
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e
-> content is safe
->=20
-> On Tue, 17 Dec 2024 19:47:14 -0800 Richard Cochran wrote:
-> > > > +static int mchp_rds_ptp_ts_info(struct mii_timestamper *mii_ts,
-> > > > +                         struct kernel_ethtool_ts_info *info) {
-> > > > +struct mchp_rds_ptp_clock *clock =3D container_of(mii_ts,
-> > > > +                                               struct mchp_rds_ptp=
-_clock,
-> > > > +                                               mii_ts);
-> > > > +
-> > > > + info->phc_index =3D
-> > > > +         clock->ptp_clock ? ptp_clock_index(clock->ptp_clock) :
-> > > > + -1;
-> > >
-> > > under what condition can the clock be NULL?
+On Wed, Dec 18, 2024 at 05:42:35PM +0800, Herbert Xu wrote:
+> On Tue, Dec 17, 2024 at 03:32:31PM +0300, Dan Carpenter wrote:
 > >
-> > ptp_clock_register() can return PTR_ERR or null.
->=20
-> Fair point. Since this is a PTP library module, and an optional one (patc=
-h 1 has
-> empty wrappers for its API) - can we make it depend on PTP being configur=
-ed
-> in?
+> > That seems like basic algebra but we have a long history of getting
+> > integer overflow checks wrong so these days I like to just use
+> > INT_MAX where ever I can.  I wanted to use USHRT_MAX. We aren't allowed
+> > to use more than USHRT_MAX bytes, but maybe we're allowed USHRT_MAX
+> > bits, so I didn't do that.
+> 
+> There is no reason for this to overflow if we rewrite it do do
+> the division carefully.  Something like this:
+> 
 
-Null check is not handled for ptp_clock_register. If that is done there, th=
-is is redundant.
+I like it!  So obvious in retrospect.  Kees, Justin, this is probably a
+good strategy for dealing with round_up() related integer overflows
+generally.
 
-Will fix this in next revision.
+overflows to zero:	(len + 7) / 8
+      no overflow:	len / 8 + !!(len & 7)
 
-Thanks,
-Divya
+> Steffen, this raises a new question: Can normal users create socket
+> policies of arbtirarily long key lengths? If so we probably should
+> look into limiting the key length to a sane value.  Of course, given
+> namespaces we probably should do that in any case.
+
+The length is capped in verify_one_alg() type functions:
+
+	if (nla_len(rt) < (int)xfrm_alg_len(algp)) {
+
+nla_len() is a USHRT_MAX so the rounded value can't be higher than that.
+
+The (int) cast is unnecessary and confusing.  The condition should
+probably flipped around so the untrusted part is on the left.
+
+	if (xfrm_alg_len(algp) > nla_len(rt))
+		return -EINVAL;
+
+regards,
+dan carpenter
+
 
