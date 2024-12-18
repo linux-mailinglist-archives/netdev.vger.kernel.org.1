@@ -1,222 +1,301 @@
-Return-Path: <netdev+bounces-152890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9609F63D5
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:52:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E86139F63D4
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:51:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B4131895AED
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:51:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EC6A7A5F0B
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:51:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6354C19CC22;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E372519F40A;
 	Wed, 18 Dec 2024 10:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="HiwyA9vh"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="Ipd3VoqC"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-2-45.ptr.blmpb.com (va-2-45.ptr.blmpb.com [209.127.231.45])
+Received: from va-1-31.ptr.blmpb.com (va-1-31.ptr.blmpb.com [209.127.230.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143AA19E99F
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:51:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5BF19C554
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734519073; cv=none; b=UJ+eMgxASFCU9A03NXnRWZsvLWh+E+t7MQbCHxEYpC9P3PVYzm7jU+0XS2yKzMMuzEpzsJrcqt1pQj1PQW66lO0jV3gZGxweVXOhxxsrjwMZDK4SLqeGsZVjyVQkfJuuJihKsiFq0GZFApUjXLkGPmUAzNbHeLB/JVq2Isfbdqc=
+	t=1734519073; cv=none; b=FUPTrYReOLe0ZqZpfnxwyHkVbO+CtivJSXkYpe0UnhZr8zVP41+wPcz7r+sBBAYAUufO2B56+M9iD6osMbJxCbM4fGdOK4e4maHt6ipsPowBTz6xlTjCVEFk9M+tF7x+P8N6K1abtMSxaww3wToKj/HmkCSfptZOA2amZRlIRXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734519073; c=relaxed/simple;
-	bh=1P+aWE3sZkrqj1Bpr/dl+6TDLut65sc3i6SMb9hVuOo=;
-	h=Message-Id:Mime-Version:In-Reply-To:Content-Type:Subject:Cc:From:
-	 References:To:Date; b=jy7ZT/ZUKhY4Y7Yuw4WoC/2ciPcR8Xkh4+bR7imAfcHygi2y26yYUiRMXf8y4Jqbh0pw6XcOh3/ldVdvzPfs05pSclomB2LQJrMFAAetJqNULKss877q58dpBhsQsrXjX/bAltl9udYnBcE25qu9bGZpPlMWHU445JWpJdnFedw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=HiwyA9vh; arc=none smtp.client-ip=209.127.231.45
+	bh=TX6Gy8FuNv2O9v8S3ndgjnxS/qmF9rvsjVAVQBeWVME=;
+	h=Content-Type:Subject:References:Message-Id:Mime-Version:From:Date:
+	 In-Reply-To:To:Cc; b=COeyo11Vl+0uwRZn6ZqLsbHe4MCkoPPLtfppCDg2QzAfoC4JH3Z1T923Gb2F/a7mofZWHbXbuvmSNFJ27TMXeddRDzFBE7+P18OeSx42FPyFJ+HyKSc4dXlOfe+Y0pLeerqhmhWgnKePFsyLMJVHveMuS4OU26top5LUcdiM9f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=Ipd3VoqC; arc=none smtp.client-ip=209.127.230.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1734519059; h=from:subject:
+ s=feishu2403070942; d=yunsilicon.com; t=1734519061; h=from:subject:
  mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
  mime-version:in-reply-to:message-id;
- bh=QUXZFiXX06Wzo2GpXQAsyufggdcZcheTnLAYEQCT2Ms=;
- b=HiwyA9vhVUEQ3rGmmbkkCyNVXgh+mIJ566dX9Kp1w1amFhlGTgCoohhe4YiWVyQwL5K+B2
- 0yxnnkVwyocnNtY0Vj3Zb1SucrQsFTcqXoTnYSe1cDo3KM9Hhpq04Z/Q9dERWpx12DQKcV
- tj0yvMtFdL9AYebrwvc2VNXo7B1bPjpSOQe2ri+pkniEH7phITcwBi+j37pKiUjIUZOJ/Y
- z/iiPUVkqPA1/rik5dTOKPB6C1m9W5yuRJEKGKalFxhc3ZWzaFJXKB3LTBMuHGNx0nCI5k
- 3xry4c/m0gIZYrrqtTjSMQRwhlm6LwLk97EGiaF/X2jdm2mOZgZm5DcdiO8wsg==
+ bh=fStwo9/n80bRvm8CEBmGAUxFP2stOibfwv4ZKMJ2+0k=;
+ b=Ipd3VoqC7CQ57y+Tc5JyUvsLNnMayshYmYcEiKJEa7wrTjsR38s4KEGVT18IbKZ49jCOCa
+ Fj1GYcsTPETe8zmNv92dZ7Ws/ErOytNuf2jXxbywX3DZ88NJFBJ/hqHyXzO6XDtIAkBug2
+ ABAEnOeDscFm0BXvSZm2eoLcnXJqtMlaT/8L7J6lkE/cAqCj3pILz78zqupk/YjCVCw04M
+ 7uKhrLhCk9L6D4JpdA6m7y2RI6k1l9nVfoxyIVttVnzghsLm94RXADzg2O1rdkfS2vWDVa
+ AjZORZYnDSganJZYJBRgL+ErMvCEOIlYUJ6dH8rUW7A19U4dUB63hbHX6kG/kQ==
+Content-Type: text/plain; charset=UTF-8
 X-Original-From: Xin Tian <tianx@yunsilicon.com>
-Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Wed, 18 Dec 2024 18:50:56 +0800
+Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Wed, 18 Dec 2024 18:50:59 +0800
+Subject: [PATCH v1 16/16] net-next/yunsilicon: Add change mtu
+References: <20241218105023.2237645-1-tianx@yunsilicon.com>
 X-Mailer: git-send-email 2.25.1
+X-Lms-Return-Path: <lba+26762a913+1ac5a7+vger.kernel.org+tianx@yunsilicon.com>
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241218105055.2237645-16-tianx@yunsilicon.com>
+Message-Id: <20241218105057.2237645-17-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+From: "Xin Tian" <tianx@yunsilicon.com>
+Date: Wed, 18 Dec 2024 18:50:59 +0800
 In-Reply-To: <20241218105023.2237645-1-tianx@yunsilicon.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [PATCH v1 15/16] net-next/yunsilicon: Add ndo_set_mac_address
+To: <netdev@vger.kernel.org>
 Cc: <andrew+netdev@lunn.ch>, <kuba@kernel.org>, <pabeni@redhat.com>, 
 	<edumazet@google.com>, <davem@davemloft.net>, 
 	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
 	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>
-From: "Xin Tian" <tianx@yunsilicon.com>
-References: <20241218105023.2237645-1-tianx@yunsilicon.com>
-To: <netdev@vger.kernel.org>
-X-Lms-Return-Path: <lba+26762a911+95623e+vger.kernel.org+tianx@yunsilicon.com>
-Date: Wed, 18 Dec 2024 18:50:56 +0800
 
-Add ndo_set_mac_address
+Add ndo_change_mtu
 
  
 Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
 Co-developed-by: Lei Yan <Jacky@yunsilicon.com>
 Signed-off-by: Xin Tian <tianx@yunsilicon.com>
 ---
- .../ethernet/yunsilicon/xsc/common/xsc_core.h |  2 +
- .../net/ethernet/yunsilicon/xsc/net/main.c    | 22 ++++++
- .../net/ethernet/yunsilicon/xsc/pci/vport.c   | 72 +++++++++++++++++++
- 3 files changed, 96 insertions(+)
+ .../net/ethernet/yunsilicon/xsc/net/main.c    | 185 ++++++++++++++++++
+ .../net/ethernet/yunsilicon/xsc/net/xsc_eth.h |   2 +
+ 2 files changed, 187 insertions(+)
 
-diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
-index d69be5352..5c60b3126 100644
---- a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
-+++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
-@@ -612,6 +612,8 @@ int xsc_register_interface(struct xsc_interface *intf);
- void xsc_unregister_interface(struct xsc_interface *intf);
- 
- u8 xsc_core_query_vport_state(struct xsc_core_device *xdev, u16 vport);
-+int xsc_core_modify_nic_vport_mac_address(struct xsc_core_device *xdev,
-+					  u16 vport, u8 *addr, bool perm_mac);
- 
- static inline void *xsc_buf_offset(struct xsc_buf *buf, int offset)
- {
 diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/main.c b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
-index 0c6e949b5..6df7ed3bb 100644
+index 6df7ed3bb..65d17d311 100644
 --- a/drivers/net/ethernet/yunsilicon/xsc/net/main.c
 +++ b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
-@@ -1647,6 +1647,27 @@ static void xsc_eth_get_stats(struct net_device *netdev, struct rtnl_link_stats6
- 	xsc_eth_fold_sw_stats64(adapter, stats);
+@@ -1668,6 +1668,134 @@ static int xsc_eth_set_mac(struct net_device *netdev, void *addr)
+ 	return 0;
  }
  
-+static int xsc_eth_set_mac(struct net_device *netdev, void *addr)
++static void xsc_eth_rss_params_change(struct xsc_adapter *adapter, u32 change, void *modify)
 +{
-+	struct xsc_adapter *adapter = netdev_priv(netdev);
-+	struct sockaddr *saddr = addr;
 +	struct xsc_core_device *xdev = adapter->xdev;
-+	int ret;
++	struct xsc_rss_params *rss = &adapter->rss_param;
++	struct xsc_eth_params *params = &adapter->nic_param;
++	struct xsc_cmd_modify_nic_hca_mbox_in *in =
++		(struct xsc_cmd_modify_nic_hca_mbox_in *)modify;
++	u32 hash_field = 0;
++	int key_len;
++	u8 rss_caps_mask = 0;
 +
-+	if (!is_valid_ether_addr(saddr->sa_data))
-+		return -EADDRNOTAVAIL;
++	if (xsc_get_user_mode(xdev))
++		return;
 +
-+	ret = xsc_core_modify_nic_vport_mac_address(xdev, 0, saddr->sa_data, false);
-+	if (ret)
-+		xsc_core_err(adapter->xdev, "%s: xsc set mac addr failed\n", __func__);
++	if (change & BIT(XSC_RSS_RXQ_DROP)) {
++		in->rss.rqn_base = cpu_to_be16(adapter->channels.rqn_base -
++				xdev->caps.raweth_rss_qp_id_base);
++		in->rss.rqn_num = 0;
++		rss_caps_mask |= BIT(XSC_RSS_RXQ_DROP);
++		goto rss_caps;
++	}
 +
-+	netif_addr_lock_bh(netdev);
-+	eth_hw_addr_set(netdev, saddr->sa_data);
-+	netif_addr_unlock_bh(netdev);
++	if (change & BIT(XSC_RSS_RXQ_UPDATE)) {
++		in->rss.rqn_base = cpu_to_be16(adapter->channels.rqn_base -
++				xdev->caps.raweth_rss_qp_id_base);
++		in->rss.rqn_num = cpu_to_be16(params->num_channels);
++		rss_caps_mask |= BIT(XSC_RSS_RXQ_UPDATE);
++	}
++
++	if (change & BIT(XSC_RSS_HASH_KEY_UPDATE)) {
++		key_len = min(sizeof(in->rss.hash_key), sizeof(rss->toeplitz_hash_key));
++		memcpy(&in->rss.hash_key, rss->toeplitz_hash_key, key_len);
++		rss_caps_mask |= BIT(XSC_RSS_HASH_KEY_UPDATE);
++	}
++
++	if (change & BIT(XSC_RSS_HASH_TEMP_UPDATE)) {
++		hash_field = rss->rx_hash_fields[XSC_TT_IPV4_TCP] |
++				rss->rx_hash_fields[XSC_TT_IPV6_TCP];
++		in->rss.hash_tmpl = cpu_to_be32(hash_field);
++		rss_caps_mask |= BIT(XSC_RSS_HASH_TEMP_UPDATE);
++	}
++
++	if (change & BIT(XSC_RSS_HASH_FUNC_UPDATE)) {
++		in->rss.hfunc = xsc_hash_func_type(rss->hfunc);
++		rss_caps_mask |= BIT(XSC_RSS_HASH_FUNC_UPDATE);
++	}
++
++rss_caps:
++	if (rss_caps_mask) {
++		in->rss.caps_mask = rss_caps_mask;
++		in->rss.rss_en = 1;
++		in->nic.caps_mask = cpu_to_be16(BIT(XSC_TBM_CAP_RSS));
++		in->nic.caps = in->nic.caps_mask;
++	}
++}
++
++static int xsc_eth_modify_nic_hca(struct xsc_adapter *adapter, u32 flags)
++{
++	struct xsc_core_device *xdev = adapter->xdev;
++	struct xsc_cmd_modify_nic_hca_mbox_in in = {};
++	struct xsc_cmd_modify_nic_hca_mbox_out out = {};
++	int err = 0;
++
++	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_MODIFY_NIC_HCA);
++
++	xsc_eth_rss_params_change(adapter, flags, &in);
++	if (in.rss.caps_mask) {
++		err = xsc_cmd_exec(xdev, &in, sizeof(in), &out, sizeof(out));
++		if (err || out.hdr.status) {
++			xsc_core_err(xdev, "failed!! err=%d, status=%u\n",
++				     err, out.hdr.status);
++			return -ENOEXEC;
++		}
++	}
 +
 +	return 0;
++}
++
++static int xsc_safe_switch_channels(struct xsc_adapter *adapter,
++				    xsc_eth_fp_preactivate preactivate)
++{
++	struct net_device *netdev = adapter->netdev;
++	int carrier_ok;
++	int ret = 0;
++
++	adapter->status = XSCALE_ETH_DRIVER_CLOSE;
++
++	carrier_ok = netif_carrier_ok(netdev);
++	netif_carrier_off(netdev);
++	ret = xsc_eth_modify_nic_hca(adapter, BIT(XSC_RSS_RXQ_DROP));
++	if (ret)
++		goto close_channels;
++
++	xsc_eth_deactivate_priv_channels(adapter);
++	xsc_eth_close_channels(adapter);
++
++	if (preactivate) {
++		ret = preactivate(adapter);
++		if (ret)
++			goto out;
++	}
++
++	ret = xsc_eth_open_channels(adapter);
++	if (ret)
++		goto close_channels;
++
++	xsc_eth_activate_priv_channels(adapter);
++	ret = xsc_eth_modify_nic_hca(adapter, BIT(XSC_RSS_RXQ_UPDATE));
++	if (ret)
++		goto close_channels;
++
++	adapter->status = XSCALE_ETH_DRIVER_OK;
++
++	goto out;
++
++close_channels:
++	xsc_eth_deactivate_priv_channels(adapter);
++	xsc_eth_close_channels(adapter);
++
++out:
++	if (carrier_ok)
++		netif_carrier_on(netdev);
++	xsc_core_dbg(adapter->xdev, "channels=%d, mtu=%d, err=%d\n",
++		     adapter->nic_param.num_channels,
++		     adapter->nic_param.mtu, ret);
++	return ret;
 +}
 +
  static int xsc_eth_set_hw_mtu(struct xsc_core_device *xdev, u16 mtu, u16 rx_buf_sz)
  {
  	struct xsc_set_mtu_mbox_in in;
-@@ -1677,6 +1698,7 @@ static const struct net_device_ops xsc_netdev_ops = {
+@@ -1693,12 +1821,69 @@ static int xsc_eth_set_hw_mtu(struct xsc_core_device *xdev, u16 mtu, u16 rx_buf_
+ 	return ret;
+ }
+ 
++static int xsc_eth_nic_mtu_changed(struct xsc_adapter *priv)
++{
++	u32 new_mtu = priv->nic_param.mtu;
++	int ret;
++
++	ret = xsc_eth_set_hw_mtu(priv->xdev, XSC_SW2HW_MTU(new_mtu),
++				 XSC_SW2HW_RX_PKT_LEN(new_mtu));
++
++	return ret;
++}
++
++static int xsc_eth_change_mtu(struct net_device *netdev, int new_mtu)
++{
++	struct xsc_adapter *adapter = netdev_priv(netdev);
++	int old_mtu = netdev->mtu;
++	int ret = 0;
++	int max_buf_len = 0;
++
++	if (new_mtu > netdev->max_mtu || new_mtu < netdev->min_mtu) {
++		netdev_err(netdev, "%s: Bad MTU (%d), valid range is: [%d..%d]\n",
++			   __func__, new_mtu, netdev->min_mtu, netdev->max_mtu);
++		return -EINVAL;
++	}
++
++	if (!xsc_rx_is_linear_skb(new_mtu)) {
++		max_buf_len = adapter->xdev->caps.recv_ds_num * PAGE_SIZE;
++		if (new_mtu > max_buf_len) {
++			netdev_err(netdev, "Bad MTU (%d), max buf len is %d\n",
++				   new_mtu, max_buf_len);
++			return -EINVAL;
++		}
++	}
++	mutex_lock(&adapter->status_lock);
++	adapter->nic_param.mtu = new_mtu;
++	if (adapter->status != XSCALE_ETH_DRIVER_OK) {
++		ret = xsc_eth_nic_mtu_changed(adapter);
++		if (ret)
++			adapter->nic_param.mtu = old_mtu;
++		else
++			netdev->mtu = adapter->nic_param.mtu;
++		goto out;
++	}
++
++	ret = xsc_safe_switch_channels(adapter, xsc_eth_nic_mtu_changed);
++	if (ret)
++		goto out;
++
++	netdev->mtu = adapter->nic_param.mtu;
++
++out:
++	mutex_unlock(&adapter->status_lock);
++	xsc_core_info(adapter->xdev, "mtu change from %d to %d, new_mtu=%d, err=%d\n",
++		      old_mtu, netdev->mtu, new_mtu, ret);
++	return ret;
++}
++
+ static const struct net_device_ops xsc_netdev_ops = {
+ 	.ndo_open		= xsc_eth_open,
  	.ndo_stop		= xsc_eth_close,
  	.ndo_start_xmit		= xsc_eth_xmit_start,
  	.ndo_get_stats64	= xsc_eth_get_stats,
-+	.ndo_set_mac_address	= xsc_eth_set_mac,
+ 	.ndo_set_mac_address	= xsc_eth_set_mac,
++	.ndo_change_mtu		= xsc_eth_change_mtu,
  };
  
  static void xsc_eth_build_nic_netdev(struct xsc_adapter *adapter)
-diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/vport.c b/drivers/net/ethernet/yunsilicon/xsc/pci/vport.c
-index 8200f6c91..f044ac009 100644
---- a/drivers/net/ethernet/yunsilicon/xsc/pci/vport.c
-+++ b/drivers/net/ethernet/yunsilicon/xsc/pci/vport.c
-@@ -6,6 +6,8 @@
- #include "common/xsc_core.h"
- #include "common/xsc_driver.h"
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
+index 45d8a8cbe..3d0eb95af 100644
+--- a/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
++++ b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
+@@ -53,4 +53,6 @@ struct xsc_adapter {
+ 	struct xsc_stats *stats;
+ };
  
-+#define LAG_ID_INVALID		U16_MAX
++typedef int (*xsc_eth_fp_preactivate)(struct xsc_adapter *priv);
 +
- u8 xsc_core_query_vport_state(struct xsc_core_device *xdev, u16 vport)
- {
- 	struct xsc_query_vport_state_in in;
-@@ -28,3 +30,73 @@ u8 xsc_core_query_vport_state(struct xsc_core_device *xdev, u16 vport)
- 	return out.state;
- }
- EXPORT_SYMBOL(xsc_core_query_vport_state);
-+
-+static int xsc_modify_nic_vport_context(struct xsc_core_device *xdev, void *in,
-+					int inlen)
-+{
-+	struct xsc_modify_nic_vport_context_out out;
-+	struct xsc_modify_nic_vport_context_in *tmp;
-+	int err;
-+
-+	memset(&out, 0, sizeof(out));
-+	tmp = (struct xsc_modify_nic_vport_context_in *)in;
-+	tmp->hdr.opcode = cpu_to_be16(XSC_CMD_OP_MODIFY_NIC_VPORT_CONTEXT);
-+
-+	err = xsc_cmd_exec(xdev, in, inlen, &out, sizeof(out));
-+	if (err || out.hdr.status) {
-+		xsc_core_err(xdev, "fail to modify nic vport err=%d status=%d\n",
-+			     err, out.hdr.status);
-+	}
-+	return err;
-+}
-+
-+static int __xsc_modify_nic_vport_mac_address(struct xsc_core_device *xdev,
-+					      u16 vport, u8 *addr, int force_other, bool perm_mac)
-+{
-+	struct xsc_modify_nic_vport_context_in *in;
-+	int err;
-+	int in_sz;
-+	u8 *mac_addr;
-+	u16 caps = 0;
-+	u16 caps_mask = 0;
-+	u16 lag_id = LAG_ID_INVALID;
-+
-+	in_sz = sizeof(struct xsc_modify_nic_vport_context_in) + 2;
-+
-+	in = kzalloc(in_sz, GFP_KERNEL);
-+	if (!in)
-+		return -ENOMEM;
-+
-+	in->lag_id = cpu_to_be16(lag_id);
-+
-+	if (perm_mac) {
-+		in->field_select.permanent_address = 1;
-+		mac_addr = in->nic_vport_ctx.permanent_address;
-+	} else {
-+		in->field_select.current_address = 1;
-+		mac_addr = in->nic_vport_ctx.current_address;
-+	}
-+
-+	caps_mask |= BIT(XSC_TBM_CAP_PP_BYPASS);
-+	in->caps = cpu_to_be16(caps);
-+	in->caps_mask = cpu_to_be16(caps_mask);
-+
-+	ether_addr_copy(mac_addr, addr);
-+
-+	in->field_select.addresses_list = 1;
-+	in->nic_vport_ctx.vlan_allowed = 0;
-+
-+	err = xsc_modify_nic_vport_context(xdev, in, in_sz);
-+	if (err)
-+		xsc_core_err(xdev, "modify nic vport context failed\n");
-+
-+	kfree(in);
-+	return err;
-+}
-+
-+int xsc_core_modify_nic_vport_mac_address(struct xsc_core_device *xdev,
-+					  u16 vport, u8 *addr, bool perm_mac)
-+{
-+	return __xsc_modify_nic_vport_mac_address(xdev, vport, addr, 0, perm_mac);
-+}
-+EXPORT_SYMBOL(xsc_core_modify_nic_vport_mac_address);
+ #endif /* XSC_ETH_H */
 -- 
 2.43.0
 
