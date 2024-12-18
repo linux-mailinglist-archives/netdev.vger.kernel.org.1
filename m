@@ -1,100 +1,141 @@
-Return-Path: <netdev+bounces-152880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505B99F637B
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:40:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C755B9F639D
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:44:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94C65167F8B
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:40:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20EEB169968
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEEB7192B95;
-	Wed, 18 Dec 2024 10:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5511199EB2;
+	Wed, 18 Dec 2024 10:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CNek/v9Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HWnAcl99"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EF850276
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB604198A07
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734518418; cv=none; b=qyd4Ath/xVoLdm3gvm5e+5kngg5paYcUbeTYR+OP0lOJC7ORyChxjWe7+COUy1p85InTiPMu9q66ldV/4Ffose39ZYzL4NFWac/7P0IhPr4mJEsQQ7evm3xt4FwtaoAwVShg+x16Dsn/pOSgZ/Fy/LHv/J47T0ZLJz5AyNsDXG0=
+	t=1734518675; cv=none; b=iSE9gmeJUz9biWYJrGm0TcJ2hSZleatPdKAn8X0mTnIxIUJi8eH52Q77zjnjDOWQd8GACkeWR7G4UEFAR9pN/SiLVd1kR6cVh94KRVqxIOymh4sZOkQnZRrpl1BrSAZzfoGIaW6l2qozB+Ux3S8QP+5R3rpORaUqwzWe5O2hpjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734518418; c=relaxed/simple;
-	bh=iFlZJXADlKZO9ko2EMF/pds1i5J8WsLM1wePVOEtHuw=;
+	s=arc-20240116; t=1734518675; c=relaxed/simple;
+	bh=dY3melZEzs5uk4TJEI+ZXsxwSDUPYgXVEMJV4rgi6pY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hyz7aC5Dh+BW31uvcHAF7j4cJmzZSQ2S0aeNlsHUaNIIl1JwHDtcid/mrmclUpgh97F78ilVXR8k2HFrsDwsm9zEYDthTiyKN+cO6itjaV0cfwrdYKQEBRlk5vRq1l24yuc51gvVgZFY3ybHPlmeiLIF5GMOo6tJJ2HbPHNuNgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CNek/v9Z; arc=none smtp.client-ip=209.85.208.49
+	 To:Cc:Content-Type; b=V3cvgLsICnrdFKBb3cZgbtWEO+i8v4gdpA23DRr+hs4jvWNH3LIK106t1yGW0wEhzOGyLTzOja+f1WYsIVBi5F5wpZ9kgPmvu6Ey+GQIsWlyc9czAykpb7L7KtKjhwGP873w/rrAz8roVrXCdykM8g/PYK2SvqS2xYM5xEB4Hw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HWnAcl99; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d3e9f60bf4so10071206a12.3
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:40:16 -0800 (PST)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3d2a30afcso10943595a12.3
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:44:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734518415; x=1735123215; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734518672; x=1735123472; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iFlZJXADlKZO9ko2EMF/pds1i5J8WsLM1wePVOEtHuw=;
-        b=CNek/v9Z0gkPFjembUNzc7lFxccWkSOIC4XAx+0MKx2xdYEG1HLjnpLF9dHqPaOSNa
-         QZEK7/CALNffDacJHMo+OKQI3lJRRCUUuBsL1/F626RuhqiqyTfS2D/ypbIkn868wzOV
-         sEAL/TL1Tr67i//6ZwsYwHuqpkP8v5pV28QCo/yya8z7RrWQ3pThbuyAFZLo78MqjHpR
-         kZArOYakkNLaaCWYZrY8z97/cQjEepZX9DIcMh72EIre4pwMPdFW+pvvywYMBz2jiJ+E
-         nEBNcmpaOxCkIn3AsrM2+HIWkfsYx0lgQdDViL8NzPSVLxqtMH3tP6pMI/W04mVDbat3
-         tUrw==
+        bh=MyxYWiLsLJosyQgqhuFbCYST6vChO+RolCv5LvpJWpQ=;
+        b=HWnAcl99mqErhAUZhQsMMq6v5tsmIih0wVtK4ETzEBqSrVOsHS/QIuzmQ2vqtDeEU1
+         htZevrROqLH5qFdIn2TLF3UCFJQvHRVQxEZA25TfF62W8E9lhLqj3JXamvODgL0zp526
+         M8pZ1Xah1rMdp5PXr5th3ufunul5NAgU/xbXaebEZz1CK8EsGWxRfEN8asMWtzG1TW3z
+         Ra7JSX5tVaWJdp8ZzqdNppPGIVwsb4uPUvdasDK448ENPKrW2Sm/2a57fDcdFfGRqyjI
+         XpqDLW78gUJiGHCW0abbwkfsrj96k+jzUwM4erwkPVnVEvVEiY3C0sGoCrOa6+07IKp6
+         oOxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734518415; x=1735123215;
+        d=1e100.net; s=20230601; t=1734518672; x=1735123472;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iFlZJXADlKZO9ko2EMF/pds1i5J8WsLM1wePVOEtHuw=;
-        b=l2oYUFudnGIo8Fd5LPde3PRsG42plp0+8te0uvBFHqF8fs3xTDmPOK3YyN1wk1tyHA
-         N7qunr+kPa81VGXnOMbHaQeEXcjgVQAmRJrKAwhjj0V8BSBhKZiColJ3uGwvZw/C8qnf
-         ooj7Ui1KGwyzTyt6XNDKy+J+ujaFpN3+zHraPp4Y00DwcOlRK9y9myU6XHolI9Mz1RTE
-         tyWhKW6JXxHQ1EnM7VJJsJlo8asxxwx8mzVSpb5eqrB24gbGB95wlg2X01lU9GZ0z+F5
-         /BwLWDu3NoT/tBFJ1WoOKBlcYvDuEphbEvNhwpcE9bhVA5T1czkcuKdCKZUF3Z3PDjWG
-         TsoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvo9RKb3JbbOxHctjFKfPWp4gfRoAEQVuj90lrqwvoLcv610XBiraE03zSTj9XZQ+7CwMThpM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztOoiSE8MPa33E/9G2jrgtYdsW6TF9AqiSoiTKw0YEUZ4crtqe
-	Nx9/0VFaVIeHllqtJ6NtMtmu4yOm7EjdBmJyDfhPHdsgUsAQFr2jL3KX+qdADajbNJs8pggQrQ9
-	jiC5qoU9RdaxeNbV5LElSRYiTWqYKdqDzCZSu
-X-Gm-Gg: ASbGnctjcKTQ/s/Tn4PttA9ftmyYuHqiGhNazYVwSbM01buSczXOB2IASOAyypvbgzB
-	0Vgyc/Z/7onOsthuZxiXMyUI4UXUa7WEpQXp75FGdWGZSywj3JRRQANpOGkduEbyafcijuNs=
-X-Google-Smtp-Source: AGHT+IHg054hzIRVZwplfdoKxsI+MzpwWsE0JhQuaJxEZxz8LzOFGQAbaaj3MZ4DprcWl7Rlyt+UlJuBUD+8zJM4S74=
-X-Received: by 2002:a05:6402:34cb:b0:5d0:e826:f0da with SMTP id
- 4fb4d7f45d1cf-5d7ee3b4ce0mr2004094a12.16.1734518415198; Wed, 18 Dec 2024
- 02:40:15 -0800 (PST)
+        bh=MyxYWiLsLJosyQgqhuFbCYST6vChO+RolCv5LvpJWpQ=;
+        b=s3O97gstaDVMxCGGEAoqp0jXfy0urywi6C9F2ZvoChIaOWo8I2f14X36WsLbN2ZjFm
+         KIxr+wnVmYyGbcIG88OPu90LD/7CRRmfiM5fcMul+4L/z/32hM/wIV0zVHQFVznFKavH
+         mlQHeIphZIZe0y0TkaAYg14X7PFq9zZ4aP9yuAqYDAKSdnQPPbzFPGnoCpFmmGnw2G6P
+         MueTZv3mdazN7cCBvxxHUWaESRlPVhNhn+XeLRbKNuaL/vra/tz4RajAe5bU6vTzR0Qz
+         CzzNe6iVT3V9Mu7MwND5xgW5RSA5Pudho3RC84Jst8A+DjaS6qN8rm9jyp8W2MNA9zul
+         9V9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVuHbrXNQSNCdjLAC4X7sIRb3frHhyKbD2JaHPJIjiFT+wuiNi9ah4c7GcCQ/GErlUP0yUpOGg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOLMZC838oAx+PcItUPzwVXkiN7SWR9keUiH7WSDjcomgMUA/V
+	CJm71kwX8X8Te+DxlmEPmNHc4mctT5/7vslkGLd7pa1PHLsDsItgVzBJtBNrVwqJl5ah+N6IOk0
+	7E97lleLLEL7Ab2U3uB7aXT+1T8K53Qw3n9pp
+X-Gm-Gg: ASbGnctYZJ9vZ52C0gq/Vn6hUR6uVbo+VLgtw6iFXPwKdK2Dj3buoPflejVPMLI7rs2
+	bhKNxxuKucpsPFDydibGxUe0JkFsjUMdyvykzd/G2CT2C19Geycdv7N+faClEJlD1TBxJiVA=
+X-Google-Smtp-Source: AGHT+IEQW87qJlXu8rFaphnGSVjOGLfS/OhdFI+ZixQg699mQU0u7qNiZhcsrd1T719tjbMO48w1PTH+bmOPCoAJB5M=
+X-Received: by 2002:a05:6402:360e:b0:5d0:c9e6:309d with SMTP id
+ 4fb4d7f45d1cf-5d7ee37728dmr2043035a12.1.1734518671981; Wed, 18 Dec 2024
+ 02:44:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218024400.824355-1-kuba@kernel.org>
-In-Reply-To: <20241218024400.824355-1-kuba@kernel.org>
+References: <20241218024305.823683-1-kuba@kernel.org>
+In-Reply-To: <20241218024305.823683-1-kuba@kernel.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 18 Dec 2024 11:40:04 +0100
-Message-ID: <CANn89i+KkT2nzdb4R=gfvKWw3oqnBZQx+umAT+5zFsUrLvZQoA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: netlink: catch attempts to send empty messages
+Date: Wed, 18 Dec 2024 11:44:21 +0100
+Message-ID: <CANn89i+yvyPMU1SE=p3Mm1S=UexsXSa4gzH3heUg17sa+iFK9w@mail.gmail.com>
+Subject: Re: [PATCH net] netdev-genl: avoid empty messages in napi get
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	jdamato@fastly.com, almasrymina@google.com, sridhar.samudrala@intel.com, 
+	amritha.nambiar@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2024 at 3:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+On Wed, Dec 18, 2024 at 3:43=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
 ote:
 >
-> syzbot can figure out a way to redirect a netlink message to a tap.
-> Sending empty skbs to devices is not valid and we end up hitting
-> a skb_assert_len() in __dev_queue_xmit().
+> Empty netlink responses from do() are not correct (as opposed to
+> dump() where not dumping anything is perfectly fine).
+> We should return an error if the target object does not exist,
+> in this case if the netdev is down we "hide" the NAPI instances.
 >
-> Make catching these mistakes easier, assert the skb size directly
-> in netlink core.
->
+> Fixes: 27f91aaf49b3 ("netdev-genl: Add netlink framework functions for na=
+pi")
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: jdamato@fastly.com
+> CC: almasrymina@google.com
+> CC: sridhar.samudrala@intel.com
+> CC: amritha.nambiar@intel.com
+> ---
+>  net/core/netdev-genl.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index b4becd4065d9..dfb2430a0fe3 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -238,6 +238,10 @@ int netdev_nl_napi_get_doit(struct sk_buff *skb, str=
+uct genl_info *info)
+>         napi =3D napi_by_id(napi_id);
+>         if (napi) {
+>                 err =3D netdev_nl_napi_fill_one(rsp, napi, info);
+> +               if (!rsp->len) {
+> +                       err =3D -ENOENT;
+> +                       goto err_free_msg;
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Well, rtnl and rcu are held at this point.
+
+What about instead :
+
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 9527dd46e4dc39a43e965b833df306a5cc44c94d..f86cfb0b33616722ec40874e8bc=
+90cece57df869
+100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -246,6 +246,8 @@ int netdev_nl_napi_get_doit(struct sk_buff *skb,
+struct genl_info *info)
+        rcu_read_unlock();
+        rtnl_unlock();
+
++       if (!err && !rsp->len)
++               err =3D -ENOENT;
+        if (err)
+                goto err_free_msg;
 
