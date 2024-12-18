@@ -1,165 +1,220 @@
-Return-Path: <netdev+bounces-152922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D8769F655A
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 12:53:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A519F659B
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08DB51655C7
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:53:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76E45188784F
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 12:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11111A2399;
-	Wed, 18 Dec 2024 11:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ke8jwy3U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB2319F49F;
+	Wed, 18 Dec 2024 12:13:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222A31A2396;
-	Wed, 18 Dec 2024 11:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5610415957D;
+	Wed, 18 Dec 2024 12:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734522704; cv=none; b=MRw1+7w43GQXqwcHcf1s5Oy/d7P/SMsQzeGCeDeJy6hT4oJgO3Y/zCUcmlcNipi9zurGf4GY7Fqa0yTkzVeLiXUZKcvPM0qTfqGa/OOPHszk2Fo/8bPc9Z02jpWfs5vrW4Z+YCkMHf0JHn/HZJ5Lo8tuEPRTx/7k824Mw1NSk/E=
+	t=1734524022; cv=none; b=CuTjlFnOAnpZMfns1xLx8tjGJgAuZvbtyMTDcp2uaeKMV4BkE/IUHhNkPYnVlD1WahS0VdetW8xJK6hh6geHZ8wIPQWgjEx2UTx7jexHgJZcPpB16tUdeqvsyGV77WuicDJoW5ZDLWJhbqp6LZhBJ/TTZ5zw+qqXTJub6EgMGx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734522704; c=relaxed/simple;
-	bh=ZPjwKF14+rWlR5d+TGWlLYgioHcW+JlqPJprVfdsPis=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E11VJ/6ntowWtaQtzwmLAUsGIHLNHXvstLQ+2lqNpXmFE9Yrwyg9uvrBEoRidAs8XQqcZBRJtLTjHVTh45MyTRP8nlUlbpub7IoQV6cIbB9eGyRwOAGPzymvoBqrHiocCs0gIr/xBdtDyjs9LQNHE4yVDhOQFoUILYeDBqK/LhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ke8jwy3U; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BIAHSvc012776;
-	Wed, 18 Dec 2024 03:51:24 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=i
-	hC4ok/dwsisZqXaQNIlsz/9j5ntvdyV0p89AtJl++U=; b=Ke8jwy3U19E94SllL
-	MEKsN/35Lz3WFl5V7VfvB3OIo6jPfFVDotgxlc7XvvCtLdJctaEVvZiS5/3Fd+U5
-	XOncxb6kuXWXjDt67Ls8XS555/4QhcyoKzEHzB+FS362Pld9sPsGStIkxZBajCkz
-	g1nh16+Bz+z0Shh+vrEBCtIpm0bZyASKVaHyihX0GK88c+fPksBXIoHhx4u58wHY
-	Dn93eJ2J20VZJr+bTncmTJv34V9Gp3sSCNAOJ4+jLjo3+8IBL7jPQzz90TNsutdj
-	V2LMnxxRyg5sijCTcWJQOM7gWbZEjDTtehob9tRCAtA5kWjaaJJrVHLqA3IJ3S8B
-	w0zYQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 43kvgvr505-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 03:51:23 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	s=arc-20240116; t=1734524022; c=relaxed/simple;
+	bh=+t4X0sKux8BOLBwNktInKhd1dfa6LXrQsEy4I1kmQmU=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=hyEncg9eu41waLwHXjO2kvk9ggP3fjn+/SmHXhvCGzOvGvf+9FL8QUGEy2gLBWmqCHnXmEhcekyCJ5G8GOlsswrToFJipp0jPMJUau3AagU3AlrBG9Zej//Uxo0IaInUT5wEZjF4ZueY0C41UYmmkPKf3aRUFoKoJgqxflNlmfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YCsX24ztWzhZVc;
+	Wed, 18 Dec 2024 19:53:38 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id E51C6180105;
+	Wed, 18 Dec 2024 19:56:10 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 18 Dec 2024 03:51:23 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 18 Dec 2024 03:51:23 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 8A63C3F706B;
-	Wed, 18 Dec 2024 03:51:22 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
-        <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
-        <konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
-        "Shinas
- Rasheed" <srasheed@marvell.com>,
-        Veerasenareddy Burru <vburru@marvell.com>,
-        Satananda Burla <sburla@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net v3 4/4] octeon_ep_vf: remove firmware stats fetch in ndo_get_stats64
-Date: Wed, 18 Dec 2024 03:51:11 -0800
-Message-ID: <20241218115111.2407958-5-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241218115111.2407958-1-srasheed@marvell.com>
-References: <20241218115111.2407958-1-srasheed@marvell.com>
+ 15.2.1544.11; Wed, 18 Dec 2024 19:56:10 +0800
+Message-ID: <c350f32a-20f5-4bf3-bc30-36f44b4872a5@huawei.com>
+Date: Wed, 18 Dec 2024 19:56:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 3uwPDK3mVs22R-hvh3sAWT-3_Dx4aWRC
-X-Proofpoint-ORIG-GUID: 3uwPDK3mVs22R-hvh3sAWT-3_Dx4aWRC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/3] net: hisilicon: hns: Remove unused
+ hns_dsaf_roce_reset
+To: <linux@treblig.org>, <salil.mehta@huawei.com>, <shenjian15@huawei.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+References: <20241218005729.244987-1-linux@treblig.org>
+ <20241218005729.244987-2-linux@treblig.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20241218005729.244987-2-linux@treblig.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-The per queue stats are available already and are retrieved
-from register reads during ndo_get_stats64. The firmware stats
-fetch call that happens in ndo_get_stats64() is currently not
-required
 
-The warn log is given below:
+on 2024/12/18 8:57, linux@treblig.org wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+>
+> hns_dsaf_roce_reset() has been unused since 2021's
+> commit 38d220882426 ("RDMA/hns: Remove support for HIP06")
+>
+> Remove it.
+>
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> ---
+>   .../ethernet/hisilicon/hns/hns_dsaf_main.c    | 109 ------------------
+>   .../ethernet/hisilicon/hns/hns_dsaf_main.h    |   2 -
+>   2 files changed, 111 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.c b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.c
+> index 851490346261..6b6ced37e490 100644
+> --- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.c
+> @@ -3019,115 +3019,6 @@ static struct platform_driver g_dsaf_driver = {
+>   
+>   module_platform_driver(g_dsaf_driver);
+>   
+> -/**
+> - * hns_dsaf_roce_reset - reset dsaf and roce
+> - * @dsaf_fwnode: Pointer to framework node for the dasf
+> - * @dereset: false - request reset , true - drop reset
+> - * return 0 - success , negative -fail
+> - */
+> -int hns_dsaf_roce_reset(struct fwnode_handle *dsaf_fwnode, bool dereset)
+> -{
+> -	struct dsaf_device *dsaf_dev;
+> -	struct platform_device *pdev;
+> -	u32 mp;
+> -	u32 sl;
+> -	u32 credit;
+> -	int i;
+> -	static const u32 port_map[DSAF_ROCE_CREDIT_CHN][DSAF_ROCE_CHAN_MODE_NUM] = {
+> -		{DSAF_ROCE_PORT_0, DSAF_ROCE_PORT_0, DSAF_ROCE_PORT_0},
 
-[  123.316837] ------------[ cut here ]------------
-[  123.316840] Voluntary context switch within RCU read-side critical section!
-[  123.316917] pc : rcu_note_context_switch+0x2e4/0x300
-[  123.316919] lr : rcu_note_context_switch+0x2e4/0x300
-[  123.316947] Call trace:
-[  123.316949]  rcu_note_context_switch+0x2e4/0x300
-[  123.316952]  __schedule+0x84/0x584
-[  123.316955]  schedule+0x38/0x90
-[  123.316956]  schedule_timeout+0xa0/0x1d4
-[  123.316959]  octep_send_mbox_req+0x190/0x230 [octeon_ep]
-[  123.316966]  octep_ctrl_net_get_if_stats+0x78/0x100 [octeon_ep]
-[  123.316970]  octep_get_stats64+0xd4/0xf0 [octeon_ep]
-[  123.316975]  dev_get_stats+0x4c/0x114
-[  123.316977]  dev_seq_printf_stats+0x3c/0x11c
-[  123.316980]  dev_seq_show+0x1c/0x40
-[  123.316982]  seq_read_iter+0x3cc/0x4e0
-[  123.316985]  seq_read+0xc8/0x110
-[  123.316987]  proc_reg_read+0x9c/0xec
-[  123.316990]  vfs_read+0xc8/0x2ec
-[  123.316993]  ksys_read+0x70/0x100
-[  123.316995]  __arm64_sys_read+0x20/0x30
-[  123.316997]  invoke_syscall.constprop.0+0x7c/0xd0
-[  123.317000]  do_el0_svc+0xb4/0xd0
-[  123.317002]  el0_svc+0xe8/0x1f4
-[  123.317005]  el0t_64_sync_handler+0x134/0x150
-[  123.317006]  el0t_64_sync+0x17c/0x180
-[  123.317008] ---[ end trace 63399811432ab69b ]---
+It would be better to delete these roce-related definitions together:
+DSAF_ROCE_PORT_1, DSAF_ROCE_SL_0,DSAF_ROCE_6PORT_MODE and so on
 
-Fixes: c3fad23cdc06 ("octeon_ep_vf: add support for ndo ops")
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V3:
-  - Added warn log that happened due to rcu_read_lock in commit message
+Thanks,
+Jijie Shao
 
-V2: https://lore.kernel.org/all/20241216075842.2394606-5-srasheed@marvell.com/
-  - No changes
-
-V1: https://lore.kernel.org/all/20241203072130.2316913-5-srasheed@marvell.com/
-
- drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c | 8 --------
- 1 file changed, 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-index e6253f85b623..75dd3bd2b9ba 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-@@ -800,14 +800,6 @@ static void octep_vf_get_stats64(struct net_device *netdev,
- 	stats->tx_bytes = tx_bytes;
- 	stats->rx_packets = rx_packets;
- 	stats->rx_bytes = rx_bytes;
--	if (!octep_vf_get_if_stats(oct)) {
--		stats->multicast = oct->iface_rx_stats.mcast_pkts;
--		stats->rx_errors = oct->iface_rx_stats.err_pkts;
--		stats->rx_dropped = oct->iface_rx_stats.dropped_pkts_fifo_full +
--				    oct->iface_rx_stats.err_pkts;
--		stats->rx_missed_errors = oct->iface_rx_stats.dropped_pkts_fifo_full;
--		stats->tx_dropped = oct->iface_tx_stats.dropped;
--	}
- }
- 
- /**
--- 
-2.25.1
-
+> -		{DSAF_ROCE_PORT_1, DSAF_ROCE_PORT_0, DSAF_ROCE_PORT_0},
+> -		{DSAF_ROCE_PORT_2, DSAF_ROCE_PORT_1, DSAF_ROCE_PORT_0},
+> -		{DSAF_ROCE_PORT_3, DSAF_ROCE_PORT_1, DSAF_ROCE_PORT_0},
+> -		{DSAF_ROCE_PORT_4, DSAF_ROCE_PORT_2, DSAF_ROCE_PORT_1},
+> -		{DSAF_ROCE_PORT_4, DSAF_ROCE_PORT_2, DSAF_ROCE_PORT_1},
+> -		{DSAF_ROCE_PORT_5, DSAF_ROCE_PORT_3, DSAF_ROCE_PORT_1},
+> -		{DSAF_ROCE_PORT_5, DSAF_ROCE_PORT_3, DSAF_ROCE_PORT_1},
+> -	};
+> -	static const u32 sl_map[DSAF_ROCE_CREDIT_CHN][DSAF_ROCE_CHAN_MODE_NUM] = {
+> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_0, DSAF_ROCE_SL_0},
+> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_1, DSAF_ROCE_SL_1},
+> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_0, DSAF_ROCE_SL_2},
+> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_1, DSAF_ROCE_SL_3},
+> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_0, DSAF_ROCE_SL_0},
+> -		{DSAF_ROCE_SL_1, DSAF_ROCE_SL_1, DSAF_ROCE_SL_1},
+> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_0, DSAF_ROCE_SL_2},
+> -		{DSAF_ROCE_SL_1, DSAF_ROCE_SL_1, DSAF_ROCE_SL_3},
+> -	};
+> -
+> -	/* find the platform device corresponding to fwnode */
+> -	if (is_of_node(dsaf_fwnode)) {
+> -		pdev = of_find_device_by_node(to_of_node(dsaf_fwnode));
+> -	} else if (is_acpi_device_node(dsaf_fwnode)) {
+> -		pdev = hns_dsaf_find_platform_device(dsaf_fwnode);
+> -	} else {
+> -		pr_err("fwnode is neither OF or ACPI type\n");
+> -		return -EINVAL;
+> -	}
+> -
+> -	/* check if we were a success in fetching pdev */
+> -	if (!pdev) {
+> -		pr_err("couldn't find platform device for node\n");
+> -		return -ENODEV;
+> -	}
+> -
+> -	/* retrieve the dsaf_device from the driver data */
+> -	dsaf_dev = dev_get_drvdata(&pdev->dev);
+> -	if (!dsaf_dev) {
+> -		dev_err(&pdev->dev, "dsaf_dev is NULL\n");
+> -		put_device(&pdev->dev);
+> -		return -ENODEV;
+> -	}
+> -
+> -	/* now, make sure we are running on compatible SoC */
+> -	if (AE_IS_VER1(dsaf_dev->dsaf_ver)) {
+> -		dev_err(dsaf_dev->dev, "%s v1 chip doesn't support RoCE!\n",
+> -			dsaf_dev->ae_dev.name);
+> -		put_device(&pdev->dev);
+> -		return -ENODEV;
+> -	}
+> -
+> -	/* do reset or de-reset according to the flag */
+> -	if (!dereset) {
+> -		/* reset rocee-channels in dsaf and rocee */
+> -		dsaf_dev->misc_op->hns_dsaf_srst_chns(dsaf_dev, DSAF_CHNS_MASK,
+> -						      false);
+> -		dsaf_dev->misc_op->hns_dsaf_roce_srst(dsaf_dev, false);
+> -	} else {
+> -		/* configure dsaf tx roce correspond to port map and sl map */
+> -		mp = dsaf_read_dev(dsaf_dev, DSAF_ROCE_PORT_MAP_REG);
+> -		for (i = 0; i < DSAF_ROCE_CREDIT_CHN; i++)
+> -			dsaf_set_field(mp, 7 << i * 3, i * 3,
+> -				       port_map[i][DSAF_ROCE_6PORT_MODE]);
+> -		dsaf_set_field(mp, 3 << i * 3, i * 3, 0);
+> -		dsaf_write_dev(dsaf_dev, DSAF_ROCE_PORT_MAP_REG, mp);
+> -
+> -		sl = dsaf_read_dev(dsaf_dev, DSAF_ROCE_SL_MAP_REG);
+> -		for (i = 0; i < DSAF_ROCE_CREDIT_CHN; i++)
+> -			dsaf_set_field(sl, 3 << i * 2, i * 2,
+> -				       sl_map[i][DSAF_ROCE_6PORT_MODE]);
+> -		dsaf_write_dev(dsaf_dev, DSAF_ROCE_SL_MAP_REG, sl);
+> -
+> -		/* de-reset rocee-channels in dsaf and rocee */
+> -		dsaf_dev->misc_op->hns_dsaf_srst_chns(dsaf_dev, DSAF_CHNS_MASK,
+> -						      true);
+> -		msleep(SRST_TIME_INTERVAL);
+> -		dsaf_dev->misc_op->hns_dsaf_roce_srst(dsaf_dev, true);
+> -
+> -		/* enable dsaf channel rocee credit */
+> -		credit = dsaf_read_dev(dsaf_dev, DSAF_SBM_ROCEE_CFG_REG_REG);
+> -		dsaf_set_bit(credit, DSAF_SBM_ROCEE_CFG_CRD_EN_B, 0);
+> -		dsaf_write_dev(dsaf_dev, DSAF_SBM_ROCEE_CFG_REG_REG, credit);
+> -
+> -		dsaf_set_bit(credit, DSAF_SBM_ROCEE_CFG_CRD_EN_B, 1);
+> -		dsaf_write_dev(dsaf_dev, DSAF_SBM_ROCEE_CFG_REG_REG, credit);
+> -	}
+> -
+> -	put_device(&pdev->dev);
+> -
+> -	return 0;
+> -}
+> -EXPORT_SYMBOL(hns_dsaf_roce_reset);
+> -
+>   MODULE_LICENSE("GPL");
+>   MODULE_AUTHOR("Huawei Tech. Co., Ltd.");
+>   MODULE_DESCRIPTION("HNS DSAF driver");
+> diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.h b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.h
+> index 0eb03dff1a8b..c90f41c75500 100644
+> --- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.h
+> +++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.h
+> @@ -463,6 +463,4 @@ int hns_dsaf_clr_mac_mc_port(struct dsaf_device *dsaf_dev,
+>   			     u8 mac_id, u8 port_num);
+>   int hns_dsaf_wait_pkt_clean(struct dsaf_device *dsaf_dev, int port);
+>   
+> -int hns_dsaf_roce_reset(struct fwnode_handle *dsaf_fwnode, bool dereset);
+> -
+>   #endif /* __HNS_DSAF_MAIN_H__ */
 
