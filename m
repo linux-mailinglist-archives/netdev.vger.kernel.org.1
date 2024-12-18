@@ -1,108 +1,158 @@
-Return-Path: <netdev+bounces-153072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CE139F6B9F
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:58:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4EE69F6BB6
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA7A9167D7F
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:57:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAFCB1892B1D
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284CE1F868D;
-	Wed, 18 Dec 2024 16:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDCC1F8AD2;
+	Wed, 18 Dec 2024 16:59:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DjJl4g8W"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OVQK9BJh"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC4E1F76C4;
-	Wed, 18 Dec 2024 16:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D6C1F9411
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734541076; cv=none; b=Ug8K+XleqTHDehPji2rPuRhIx0zOJKINnwXZ4L3g5gENB1YMqQh4NoEsulGjL8h9AJ6dm9mUZnElNdM61X1TPBBGl6N/VWJvFZwto/xxRQZysy3T9Xz9RIzhlhJmdpiwS4n5N8oZOjLkxpjakUBJusSbSbTez71Z8FBAznT6z2E=
+	t=1734541148; cv=none; b=JTOWvHTRYwJyxGrTCT20jO944LqMkC25sA0eqmErTgBWy3ipAI71wUaVbfJ5Pte4eTq3bvZDNP6CNntFBjn2D+rWCuWZcyiDHN9WC+OxAzpRiWCw1X9NhN/X+TpUX0C9RH7MWUxUcsJqWmF1Z5SlM1C9Yuxi17QsW9bBpbE9Dqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734541076; c=relaxed/simple;
-	bh=KV8ou//Sa6v3jLTAYIJ9bJcbxMO3+EDoGYPwxAHxI/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=njqsi56Vw0uL3KX6+pqGC3kTg/1UpvwpPPuTrh8kbaY7jdn+csVtHmXNUWRMeceC96byLHT4IIRGICQgPHrukBXCk+0uHjiSL11VPOIc6b0IjJJQ6yeMpHKC9nYB/mtCEIOg0sCb7Z76Mv77ZtI0rAiT3tmG2nnJ25Py4yMysx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DjJl4g8W; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/4crNdIxVVaUUjGou9fiNxKR1h+u/fftUOeCRlzjhXo=; b=DjJl4g8WqzlEX8kt+gIn+DeK1o
-	k2ynJY9DxnnNia07FbZuXcsgYXTZfWDd/9RNJ45aZESIqeK2xmJsl4bsjRubIMBO0o6TEiGiTItTV
-	E3RTaHpW4uDWXbCsDjA3If2p2LcRGvH69nEnJaJrBf89fq9y+UlxC+NoLyrmZwsQU+Sg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tNxMo-001L2B-IE; Wed, 18 Dec 2024 17:57:46 +0100
-Date: Wed, 18 Dec 2024 17:57:46 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yijie Yang <quic_yijiyang@quicinc.com>
-Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
- node
-Message-ID: <2b6cd2b8-1738-4131-abfe-4ab35de70c8d@lunn.ch>
-References: <4a6a6697-a476-40f4-b700-09ef18e4ba22@lunn.ch>
- <441f37f5-3c33-4c62-b3fe-728b43669e29@quicinc.com>
- <4287c838-35b2-45bb-b4a2-e128b55ddbaf@lunn.ch>
- <2e518360-be24-45d8-914d-1045c6771620@quicinc.com>
- <31a87bd9-4ffb-4d5a-a77b-7411234f1a03@lunn.ch>
- <581776bc-f3bc-44c1-b7c0-4c2e637fcd67@quicinc.com>
- <174bd1a3-9faf-4850-b341-4a4cce1811cb@lunn.ch>
- <d711ee4b-b315-4d34-86a6-1f1e2d39fc8d@quicinc.com>
- <8acf4557-ac10-43f1-b1ab-7ae63f64401f@lunn.ch>
- <aa1dcdf6-94a0-4922-83f0-3cf49516ac4f@quicinc.com>
+	s=arc-20240116; t=1734541148; c=relaxed/simple;
+	bh=F2ReL54suNLF8b/FnV23UbubkmG90RPdFCGOxZvcdO8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kDxJO7BwrGlo75GT4HQM6B6QKt2Ldr2SiLT/ZKUT6Ordw/dVrUUCcxcu+65CNIntJRSZcHn58tVooZK+fYN8Ba2b7cv79SVPntB5V69i5voYtvqH6dwUoSlEljE7n+vu0VVON/j5XWUAErmRCS6wkOa8fFrCkr598xjQLKwJ5Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OVQK9BJh; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734541147; x=1766077147;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=F2ReL54suNLF8b/FnV23UbubkmG90RPdFCGOxZvcdO8=;
+  b=OVQK9BJh5/6wH9207aLHDkom36WVR8uqub92NFb930RjEUvyrlUoVooe
+   1vA3AkfSfPFejBE20QQO/Pq2UY0yBj0q22RbIAJ+CPkQcBUPQr412S6Tr
+   kDRD+yeOA8rh4pVcd9Lz7veLzrX1RIFnoanRpoXTr/WswXGp5p5/wKP4R
+   oo7P9D3cWWMqNpdlZ0SlpkCILcXHjHdy436VV4E01NVm8TiySSx1bYwA2
+   2TgrqfLIdV6MDZWIygT7DNOc6ekOkg1aI+TIExiYhjhSWh7js+Yku23Pf
+   U6h2nKt4TPNRzW8tmWVdnbfoILZz6n4xbuuMUhzWAUOtSbK/EDrruKGFf
+   w==;
+X-CSE-ConnectionGUID: ZhaSFQcRQ8KN056bA9StoA==
+X-CSE-MsgGUID: 8YLGMWitT2ueuRSzkZVnoQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="46415479"
+X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
+   d="scan'208";a="46415479"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:06 -0800
+X-CSE-ConnectionGUID: kI4oOvCkQ5qYX1e65ntjOA==
+X-CSE-MsgGUID: 5dKS172oQIWd9MwWJ3gi4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="102531559"
+Received: from ldmartin-desk2.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.111.224])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:00 -0800
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	michael.chan@broadcom.com,
+	tariqt@nvidia.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	jdamato@fastly.com,
+	shayd@nvidia.com,
+	akpm@linux-foundation.org,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH net-next v2 0/8] net: napi: add CPU affinity to napi->config 
+Date: Wed, 18 Dec 2024 09:58:35 -0700
+Message-ID: <20241218165843.744647-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aa1dcdf6-94a0-4922-83f0-3cf49516ac4f@quicinc.com>
+Content-Transfer-Encoding: 8bit
 
-> Okay, I will follow your instructions:
-> 1. Change the phy-mode to 'rgmii-id'.
-> 2. Add the delay in the MAC driver.
-> 3. Mask the phy-mode before passing it to the PHY.
+Move the IRQ affinity management to the napi struct. All drivers that are
+already using netif_napi_set_irq() are modified to the new API. Except
+mlx5 because it is implementing IRQ pools and moving to the new API does
+not seem trivial.
 
-Good.
+Tested on bnxt, ice and idpf.
+---
+Opens: is cpu_online_mask the best default mask? drivers do this differently 
 
-> 
-> > 
-> > But i assume Qualcomm RDKs always make use of a Qualcomm PHY, there is
-> > special pricing if you use the combination, so there is probably
-> > little incentive to use somebody elses PHY. And i assume you can
-> > quickly check all Qualcomm PHYs support RGMII delays. PHYs which don't
-> > support RGMII delays are very rare, it just happened that one vendors
-> > RDK happened to use one, so they ended up with delays in the MAC being
-> > standard for their boards.
-> > 
-> 
-> Most Qualcomm MAC applications are actually paired with a third-party PHY.
+v2:
+    - Also move the ARFS IRQ affinity management from drivers to core. Via
+      netif_napi_set_irq(), drivers can ask the core to add the IRQ to the
+      ARFS rmap (already allocated by the driver).
 
-I'm not sure the QCA8K, IPC and old Atheros people would agree with
-you.
+RFC -> v1:
+    - https://lore.kernel.org/netdev/20241210002626.366878-1-ahmed.zaki@intel.com/
+    - move static inline affinity functions to net/dev/core.c
+    - add the new napi->irq_flags (patch 1)
+    - add code changes to bnxt, mlx4 and ice.
 
-But since you don't have any behaviour change, you are not asking the
-PHY to insert the delays, you should be safe in your part of the
-Qualcomm world.
+Ahmed Zaki (8):
+  net: napi: add irq_flags to napi struct
+  net: allow ARFS rmap management in core
+  lib: cpu_rmap: allow passing a notifier callback
+  net: napi: add CPU affinity to napi->config
+  bnxt: use napi's irq affinity
+  ice: use napi's irq affinity
+  idpf: use napi's irq affinity
+  mlx4: use napi's irq affinity
 
-	Andrew
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  | 21 ++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 51 +++--------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 -
+ drivers/net/ethernet/broadcom/tg3.c           |  2 +-
+ drivers/net/ethernet/cisco/enic/enic_main.c   |  3 +-
+ drivers/net/ethernet/google/gve/gve_utils.c   |  2 +-
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |  2 +-
+ drivers/net/ethernet/intel/e1000/e1000_main.c |  2 +-
+ drivers/net/ethernet/intel/e1000e/netdev.c    |  2 +-
+ drivers/net/ethernet/intel/ice/ice.h          |  3 -
+ drivers/net/ethernet/intel/ice/ice_arfs.c     | 10 +--
+ drivers/net/ethernet/intel/ice/ice_base.c     |  7 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      | 14 +--
+ drivers/net/ethernet/intel/ice/ice_main.c     | 44 ----------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 19 ++--
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  6 +-
+ drivers/net/ethernet/mellanox/mlx4/en_cq.c    |  8 +-
+ .../net/ethernet/mellanox/mlx4/en_netdev.c    | 33 +------
+ drivers/net/ethernet/mellanox/mlx4/eq.c       | 24 +----
+ drivers/net/ethernet/mellanox/mlx4/main.c     | 42 +--------
+ drivers/net/ethernet/mellanox/mlx4/mlx4.h     |  1 -
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |  1 -
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/pci_irq.c |  2 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  |  3 +-
+ drivers/net/ethernet/qlogic/qede/qede_main.c  | 28 +++---
+ drivers/net/ethernet/sfc/falcon/efx.c         |  9 ++
+ drivers/net/ethernet/sfc/falcon/nic.c         | 10 ---
+ drivers/net/ethernet/sfc/nic.c                |  2 +-
+ drivers/net/ethernet/sfc/siena/efx_channels.c |  9 ++
+ drivers/net/ethernet/sfc/siena/nic.c          | 10 ---
+ include/linux/cpu_rmap.h                      | 13 ++-
+ include/linux/netdevice.h                     | 23 ++++-
+ lib/cpu_rmap.c                                | 20 ++---
+ net/core/dev.c                                | 87 ++++++++++++++++++-
+ 35 files changed, 215 insertions(+), 302 deletions(-)
+
+-- 
+2.43.0
+
 
