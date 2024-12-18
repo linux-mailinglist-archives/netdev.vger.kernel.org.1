@@ -1,270 +1,272 @@
-Return-Path: <netdev+bounces-153022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DD59F69A3
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:11:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D2C9F6999
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7CA2188DF12
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:09:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0353188A813
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29E81E9B3B;
-	Wed, 18 Dec 2024 15:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 982391DB363;
+	Wed, 18 Dec 2024 15:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QXnsMn32"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NhZFvbQy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC2C1E0DED;
-	Wed, 18 Dec 2024 15:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734534577; cv=fail; b=JUq9xKZUA9iweDBK4DGk8b8GZqHxDOEOFUSLvFB3d/tdulqf/fytPwOdjFjG30nKa25wGAJYeQjVQZf/x/9ACnaI+qoyx5ULy+eUawO4vbCEYWCoE/bw5o2Au9902iy5SEC8EOTyAwoopIPeAx54mo/elqb4tdAdLrgnqp/biG4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734534577; c=relaxed/simple;
-	bh=N0+akU2c4TNeXVuX7JxA1NkRysbxvjguAuYzZb/2/94=;
-	h=Subject:To:CC:References:From:Message-ID:Date:In-Reply-To:
-	 Content-Type:MIME-Version; b=uKJpR60EUSbS1je2QK2iZzFMyu++ndFGKoNVa1Cw/YrUEJItxo4I0S6YhHhjnedidHQu+Z/AydH77600gMGwEzRE1+njvDtVYubbLzJoaVKvcjES03xYUZtRoJYKyVARZ1Oqc1/OXqUlrIblSUB9WLHuOdJ/tcXU6aQTtZVLj5Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QXnsMn32; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734534576; x=1766070576;
-  h=subject:to:cc:references:from:message-id:date:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=N0+akU2c4TNeXVuX7JxA1NkRysbxvjguAuYzZb/2/94=;
-  b=QXnsMn32hpoD3oxMwPIcY2b3BQk8zB6g6zrqawNWHwbtGVJLVjxw2q/i
-   ZFOUc6eKOVoeAPoKYxKik75w1SgDVOD5ApJyOWhRqFeM1fNZFmAF3yfIM
-   34eSRHmv+sJzOBc9mHdmEOs72ocGWZPgHGFFDLImluJiqrrZVbX17RnpG
-   p4CVy+hnAPR5gQ2jTcJeNqv/GBR9577TkiHCHNpSOFBFiRxNiaecVYzAb
-   0rIJnNROAvdsrgZmoJHwNTYlW6Udyd4HKzhRWEPBnzXJ3vHlSIYxxOqKY
-   h/SMW5sqSC1cYziveV5wpkCNjm5gchxcOnTA4JSO2fMX3/Dh5rTTAaoxw
-   w==;
-X-CSE-ConnectionGUID: pLXv/wpJSLiS4gDQ/eW92A==
-X-CSE-MsgGUID: QU9wwqIBQFaxMV+htUpEwg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="46404004"
-X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
-   d="scan'208";a="46404004"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 07:09:35 -0800
-X-CSE-ConnectionGUID: wxmEhQf5Smems7nlVkRfCA==
-X-CSE-MsgGUID: xmBZW36XQ1ud3F/xVoPFMw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
-   d="scan'208";a="97958550"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2024 07:09:33 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 18 Dec 2024 07:09:32 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 18 Dec 2024 07:09:32 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 18 Dec 2024 07:09:31 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JrIy4jpbpzhszUYC5B/mPPLVRKMhDSetAPSuhS2Pwb/+cXdk49rdIPBEhe3cqHvjUNPcbyZ20TXDsTvmYDu7cNzftY5A+H2zzOtki6f2j0/38aN5VoxZH2/0aKh913thuR6L9BS/bAmyJVTfj6baugs4eXQdPDzc7b0NxbGR2Io52Hn79z82ywreZuFtcN8YHZzqxiXMhFA6vc+HbWzHHmRfPu1soMOomcjCHDOVG1dp28q44Sn21KIRZd7FmNV96kStanqDj8UB9H9Ic1CqcEldby2oQo7/1I24C4ENF8esBQVXWpsj+FMkb95L/IwK0uxnUbFMDBrbjs66nH6m3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RvykNPN4wfuaGgTCap6zMmalMiw1VsKjExFKNLOhAc4=;
- b=CXGea51BSrIJR3XJPnwlNV6CvqWhSlPVIa14TW2voBCrdu0mYDSJKFo9K+VaWaCi+hmgpetDrviyGccogBNRHFX7/whsAbcWKndWHm6eYAX5ENpBn87OvL3gX1FIOiisJIrvbG6PhlyVGO9CoNV1viBvIdECfk6LLLX7IKiw/UUu4nIz0+hXuxOPIFzeemmdWvR5czz4d02APJaiQpbH32t0wF9YyGItJL7rkto+t3CwfxCsAQjYh/UZ5nRWt2hmK0DtMjkc80hC3bj+uWJj9PFaoAFQDuXLQMNDRJIfCpfiM+9lmWr1umHJ6/PL0BG48TLQQnZV4aHvJ+NfCdWFvg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BY5PR11MB4194.namprd11.prod.outlook.com (2603:10b6:a03:1c0::13)
- by CY5PR11MB6139.namprd11.prod.outlook.com (2603:10b6:930:29::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.24; Wed, 18 Dec
- 2024 15:08:17 +0000
-Received: from BY5PR11MB4194.namprd11.prod.outlook.com
- ([fe80::9d17:67a6:4f83:ef61]) by BY5PR11MB4194.namprd11.prod.outlook.com
- ([fe80::9d17:67a6:4f83:ef61%6]) with mapi id 15.20.8272.005; Wed, 18 Dec 2024
- 15:08:16 +0000
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] e1000e: Fix real-time
- violations on link up
-To: Gerhard Engleder <gerhard@engleder-embedded.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-pci@vger.kernel.org>
-CC: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <bhelgaas@google.com>,
-	<pmenzel@molgen.mpg.de>, Gerhard Engleder <eg@keba.com>, Vitaly Lifshits
-	<vitaly.lifshits@intel.com>
-References: <20241214191623.7256-1-gerhard@engleder-embedded.com>
-From: Avigail Dahan <Avigailx.dahan@intel.com>
-Message-ID: <cd7d3122-5231-bb7c-cb2c-7b8b94a46968@intel.com>
-Date: Wed, 18 Dec 2024 17:08:09 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-In-Reply-To: <20241214191623.7256-1-gerhard@engleder-embedded.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL0P290CA0015.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:5::7)
- To BY5PR11MB4194.namprd11.prod.outlook.com (2603:10b6:a03:1c0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EDB1B424B
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 15:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734534540; cv=none; b=oXiFxSQMrs+80SxGiwRs2+Rt0PGtQOczSeeKP+mFEWARcVKBuaoBcXo+A+8plmDR7ksY0Fa1iFNQgawk0HR5KTQr1spneYmIMtzfEwMehNHa9IoQ0OSEcmbM2R4z5r0KG7++xUSMFCORVtNaV1JOzqi54aI+ceFRDJft8IpgMlc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734534540; c=relaxed/simple;
+	bh=004sZ/nL4UsVxtzRRlA6x7e/NDoNXUL90a+G92aqfAI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UjR8jagoD41YgHsL1sz6Qnw3F5+FgTIbkagQytr8HsyEh/m9CsoBn0zR2vafOv+eDTeyNn4mnrc8Nr0qzKX2S3V0k/pD3pIZuTTBH4DhjvFSaKFwv65zJgM7+ZZEK2lRu8JqFOvVU/UMrnrRS3q+zaLonFTyinPeLBBRxpKxj3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NhZFvbQy; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-725cf06e7bcso5444282b3a.3
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 07:08:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734534538; x=1735139338; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pV3+lbnIIz3aTESekv7s2IKWuw4bQblntABf+tmBGQk=;
+        b=NhZFvbQyaEWm/sz+MoJ74lqv/+sfPVf/tdASvGIx3pE5DOH/PEcovE+mSrq3m5xFSg
+         U/yXeXIEHqudoDOxCyg0d7IHa8Ubq3vELWcQYIKaxwLy00zehtRLmIPu56+8w0wjsQQ4
+         ThNanVZtSF2doIEUh019OP0fk1oSEq6rmAhWNuv2MhcpUX3QgzqP4/0iAn+okNhw/uLv
+         Dlu3Emfbg1ojhX60mChM+0Cnn3TYH6mflsAKwUhfF+k9L8hNtjOmNAExiBFLDChlMglQ
+         gvc2NV5uBAjKjhS+LgsS2hg7YGhFAF4Z7ov6ewf0s9VzPdDbig6mLFCHN/1CnSdrokfR
+         KEFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734534538; x=1735139338;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pV3+lbnIIz3aTESekv7s2IKWuw4bQblntABf+tmBGQk=;
+        b=BUFfYbgbwKx1zMfZtwd81XwA3j3yfJWxXnj6UcbvQIuauZW1vL+mEmU5h6AZwlldRE
+         /0lpT3dj1Uq0Zs/yMjKV29SaNcHNnyIMEv606/aKzcnEZBdFOdrYt+OmJdQeYrj197io
+         +6YKiH1s2+LLj8FsmycrWeJQIggQUKsh+euWni6k4QAY3cyD1dk5p8skZZGgx0SBvfqm
+         lACbXCx6lOhxBlh9YCcpHXx1fd2iA+KPLEsSjNAUB8tunkHDxvDspdlUi/XWlEFxJppT
+         7o7/GkqzFsLI0u4hhpXiI9ktdSd3JAkjVuGK2m09vyUgtGBLhsg/UyVgiXObO5n0WRZz
+         lQAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXraxNpl1l3GkZJNbs5E5TmbKgsDj+4GbuZIbFQ3vd1qGCtRC5sNPE2xbfrPs3ZeeHnoyW9R+A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyULnNn5+4Xavx8wMTTZsH37ZQrseiZVaBHQLYFthSW6nkKFFjn
+	4+vxnqGSBExLIZYa+76Ik4XMWCi0mvG+P73x4qVMOeSLKJ3bIFTGgiNRaVArWvTCUrIKl0ttvH6
+	VsSD8z8rKrVOGA7NpHuy4iA==
+X-Google-Smtp-Source: AGHT+IEtlCKKVpTNL75q2WaGyiZfuoDa7Vvh3LDu8UOB8DoULqa3iC12lLRW2Uo/bxtxH8jnEpHWkC+bfKqjebwjsA==
+X-Received: from pfbna2.prod.google.com ([2002:a05:6a00:3e02:b0:728:9b0a:2ddf])
+ (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:8017:b0:725:db34:6a7d with SMTP id d2e1a72fcca58-72a8d2dc8afmr5228867b3a.23.1734534538194;
+ Wed, 18 Dec 2024 07:08:58 -0800 (PST)
+Date: Thu, 19 Dec 2024 00:08:52 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR11MB4194:EE_|CY5PR11MB6139:EE_
-X-MS-Office365-Filtering-Correlation-Id: ea60d329-e22e-4e3f-fdb4-08dd1f75ccf2
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?R3JqYmZEUU1SYWFqZFJnSTg5dUR2VHJIV1E4V0xxdFBTQncvL2ExOW1SZWxH?=
- =?utf-8?B?ZjB2QWY2WjJtbWxkVElrUk5EQlQyTXUzQnJDMjZucjJTZnRvSFRMTklubDdV?=
- =?utf-8?B?aUdrUjBiNVhSdmJmcXEyUERTNXFGcW9XWkZFRkk1eUJxOEszUzNpYTRibjl4?=
- =?utf-8?B?RnNuakdlLzNGTlpxNVFsYVlEb3pWTGFiWTBlNXRBR0d2cmVEbHV4Z2pBeFE5?=
- =?utf-8?B?bEQ1R3h3WTVGWm8vR3QrbXFYWVhyRmlCSkd0cnZQK2ozdEN3aE1uRW9LRUg2?=
- =?utf-8?B?czNkeTdtRlZoWEpTVWcxaC9yS3hMaytnK245eXAzM0RVRjV3d3paYWNWOXVL?=
- =?utf-8?B?RjlKRlpuejY3Y2cyaEZtMDFQcDAwV1UvR2xyYnJCYmpReldGak5GYUZyc0Z6?=
- =?utf-8?B?eW44TE80Z0h3ZlJBNGdiOEFHYkI4eExBYUZaQzNOdWFBR1VhNjl1R1VuUDFM?=
- =?utf-8?B?M3cvSzZEVFlQcDNValRMdmIwa3BlbG1lUFRFOVJhdjNiY2MyYWlzV2NFVGE0?=
- =?utf-8?B?WHByM0xJTnBuWHZnbmt5M0xPVTJZTEJ5QnJJMnN4a1VaUTVaaUpicHkrQXRI?=
- =?utf-8?B?TEs1dmJreUt6SUtiMlUyM0xOY2FGTFdGTmk1a0lKcDN6c283dDltQ2dzYTdz?=
- =?utf-8?B?Q0x3U1pzeG42VjNsU0lteTdvWUM4VEhQNkNSQkNNZDBvcm1hWS9Zb2ZHaklm?=
- =?utf-8?B?ZEloVXZCU2lXNkFmUnRRSktocHZVVFpWSC9rUHZ2R3MvSmptWnFKSzBkMFlU?=
- =?utf-8?B?NEttTGhXbkh4d2R2TXZLeHdkMnp4MEtjdEhLYWtIWU1aWXl0TEhXb0k3bk56?=
- =?utf-8?B?K1JNdjc1d24xSlREckV4TnRuTC9uZk9ROW9UMTg0NjV2cG8rTjBpek5QeVZR?=
- =?utf-8?B?T1ZuVkxFWklNd2tBZlJQQVEvWHJLeUhGYkJlZ05hbWt6ZzRCQmFGclFXOUhQ?=
- =?utf-8?B?d3JmWDI2RGM3UDdrZUtrcGwvd0RoTGNHVFRTN2grOVNiRE12NWRWaTNmZHFz?=
- =?utf-8?B?RmRXN0xpYlB0U1MwMGNiWXVGdWx3Yi9GU0hoOE1LWFZZRUhWUU1lMHRoeHJV?=
- =?utf-8?B?UVcwa2t5aFdkM1MrL0hIUnYzVTdZRDJ5UnlnbDA3T29vVlBOZTRaQVBueDFV?=
- =?utf-8?B?azZmODBSN3N6WkwzUTZaYVh5M1M5SGVBTEZ6M3loYXMxUEd0dGZZR0xXckJp?=
- =?utf-8?B?dWxxUER2SkpIS0dIRjZYeHdrejN6Wm5RVkQ5WFB6aTh0SElsSXAwVnFPSS9I?=
- =?utf-8?B?MndxL01xNU5pL0RaWjVoMTIxbGFVVjhJelp6SC9lWjh1aWlvOXR5TDVuMHRD?=
- =?utf-8?B?bjgzQ01hcTQ2UUpaM0o1cDh2ZWE1UFYrMnhlNk9aVzhxd2NjcEY4OEFpbGdn?=
- =?utf-8?B?TlFlZDF6R2pYN21QbElLckd1WWhsdHRPZDN1bTZJWExyNXN3OGZ2azJMVXh5?=
- =?utf-8?B?VndCWXN3d3BoRzJadXY5Ymg3V1d0WVdxeTdpUVdDd2lFQ2c1b056akIrRjVS?=
- =?utf-8?B?ZFFjQWVHM3NORmJVd3FEWFNiWFRoZGRZMjFjS2xDRnFobmFNRHdIZ1Z3VWlN?=
- =?utf-8?B?SDFwVnB3bjNGWFhodVd3cGVLRGN0S1RBazB5QVpiQkRiZDlaRE1uVEd3clJt?=
- =?utf-8?B?eHV3bVFuck0rQzFEOXRnQURHUW1tYUhoeWV1bUViT0pRUGRBaWFBY2RLaWhC?=
- =?utf-8?B?dDZOMFJwT1ZzaElpTkhQRzlRYUo2SzlmNzhCT0xObG11ekdrczJhRXF4V2h3?=
- =?utf-8?B?UlZQTjJ2VkwrWjNPZnhKdDNYUmxialJTelprQi8yWm90OVloNlllQmlDbmg5?=
- =?utf-8?B?VCtqNE5EV0JrL0ZyZjZHdz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR11MB4194.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b0pKOFk2d0h1V1lQRkE0Zkw3UjFMM3Q3Yk5wZk84VG9lSlRpb1V3TjRuK0Fl?=
- =?utf-8?B?V2hSeUZtOWM1Z3h1dlFYSitBYzQwT0hKS0J5bXBtbWw0NGY2UWRqM0xvcFJ0?=
- =?utf-8?B?ckQwOGtrWXkvRlduNnM0TW5tMFIwYlFoazNDNEJNbzV1Rkk0V0N2dVJRYkla?=
- =?utf-8?B?TS9ScFQ0RE43VnNvcm5Fblc4U2FaSGI0RWxPUzI5Y1czTktTRDFtL1l5YlpF?=
- =?utf-8?B?WW5Ceml6RWZNU2RDZ0lFVloxWHQyOVYySENYWUlnVm9jcnVoMGZEOHpqUjYv?=
- =?utf-8?B?cG5MdlhVNnpWSzZqQjVDVWFqRkpHMFRXOXNUYU9lRGxkSGlIL1l6b2twUjB4?=
- =?utf-8?B?cUc0bE9GSnF0UkxndzdRVFNxYnVKUy9OVjBVM1dnSDl3WWQrNXJWRjZYWVZ0?=
- =?utf-8?B?R0tKNVVlY1NqcnJ2a1dDM092eEd4Q3UrQ3VMNFdoOUJRQjZFSXJvNHIyZ3N5?=
- =?utf-8?B?M2RTZmpHdzdTVk95ZDllRDdGVGZPTXlRV3VaOXlZMW0zUjBMMHY4TnlVZ3hk?=
- =?utf-8?B?VEFzS0poZXZvWFBIYTlXbkVYYmwwb2RDOGxPNmV6Umo5TU95a0R4L1pnd2hU?=
- =?utf-8?B?Smo3V3VmYmt2b0s0ZGduempiMXZDYTVuSFdvaHZVNmYzVG9ObmpybVkxQ2hD?=
- =?utf-8?B?Qm9oOWZkUFNIV3IrcE9XbWFnV3VNQWFFczkyZll2SkIzMFQxZXhHdWZoMDRj?=
- =?utf-8?B?VjF5bHRsWHNUV3poeTE4aFUvYlJUU09rakFuTXhhaWV3VjNjRE9KYlhva2hD?=
- =?utf-8?B?SGhNRUlQd0loeE13M3hldE96SE9QdnBpNFJiMElkejQ2U1M1RHhwb2E3cXFM?=
- =?utf-8?B?WkVqSXJGTjY0UnFHOUQyZ0h3RTN0WjQrczM0SjEySldUWlZPZ3YyYU5KRmdZ?=
- =?utf-8?B?elhpWjR4TGVkRTdyUEtZY1lTbC9rUE9qZWptdSt3SE56ZHpKOXpodFAwUzFH?=
- =?utf-8?B?SGd1UUJUT0o4dUY5VUNYbUNTVm5CREFxZ1ZxMUJvYWVzRFNhZk5YTzRReU1O?=
- =?utf-8?B?bCtPdGY5dmxWdG9oOWMxRm5JUmI3ZVdjWk8wTnZ5ZmVLaTM2QU92bGlvTUFI?=
- =?utf-8?B?UzdrMG92R1JhT2lQN0theS9xVkF4RTZsTmVUK014NmhYS3c1a2w5dHpzQ2VJ?=
- =?utf-8?B?UWlXcG9yb1BwemprNmFBbWhEYzZPdnJBWHdSSDNVQnlIa09LQ2MrZHM4RHhK?=
- =?utf-8?B?NjVOTERZWHJ4dGRPcGdHaitSM1dCbXUrbzB4NXV3ZEcvbHVFU0ZTU1h6TmNa?=
- =?utf-8?B?NGZPUmtEL2lzYnVLMVRNMklYUlVrc1RybmNWRW5mSUdLOEVQSER6US91RjBM?=
- =?utf-8?B?S2V1S1FuTFAvMTVMMi9vOUpnQ1VXZldYR3BDa3BSVjZLM2pVM1lkZlVCVUdv?=
- =?utf-8?B?VG03RUxIUDl5bS9SWGhVam12U1FiSGNkVEJ0UVRjYVYvK21LcFV1MUV3N2g3?=
- =?utf-8?B?Zm5jQmNnQUVCVU1Ec1FrOVFPOVlUc05zUXJaU3RBT2pIeGdQYjhQb1gvdk85?=
- =?utf-8?B?VWptNGxtcEx5NUVwTzFyNUVQWUlWVm1rQzh4MlNNb0pBMnIxUHo1MFNyT3Fl?=
- =?utf-8?B?ZDdZK2d2L2hqelhaRmwxUVYrQyszK3QwRVcrSFdtanUxQXlDZklOWkNjNzlj?=
- =?utf-8?B?RTd1Rzhaa3BKWjBMdFpXdFArREthMnhBT05wVi92bVVWUEpmMEkxWmJodWhI?=
- =?utf-8?B?WkFMMmU2UW1nSVRQZGoxaGtjNWQ4L3JHTVNNY25aV0JDa09yTFV2QWxHT0V1?=
- =?utf-8?B?QVRENGVJSlE5RHBUejNQYUlPQkZVbEE3YXI4aFI5L1ZkQUxxTFd0RXZSKys4?=
- =?utf-8?B?YTdTVkovKzFPdC9OYmp1Z2pxYVRXQjRYam9YMFdyQkd6aTdPOGN3UzRTc3hr?=
- =?utf-8?B?bkhUMkFjczJEWGlJNjlZdDZ1NUVvTjdQVUlYNkN2ck5jcVA3MEJKMzZicU9P?=
- =?utf-8?B?c1M3R2tFa3JtQkc2aWlqVWthVGVBZlE2STNGZnd3QlVZTDdFM040eE5LSXlj?=
- =?utf-8?B?Sm1yZlFiemJTOVUycWtCUEtvOG92Vy9vZnVRN09rYklnTTN1cWpBTW1hbFB3?=
- =?utf-8?B?OWNLdS9raEUyY3Q3Nlg2NzlGdms4UGxGNFVvL3hsR1RiUkMyeHhaM0lidXVO?=
- =?utf-8?B?dlRmTHhUdkVqdHg0b0NjU0t0TDhBSi9ZNWIzSHBuVklZRjlwam1jd3d2UFpR?=
- =?utf-8?B?SGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea60d329-e22e-4e3f-fdb4-08dd1f75ccf2
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR11MB4194.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2024 15:08:16.8327
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PLFtBk7kIwyvAa36Lo+oVVUEIc6/8GCtFABTjWTleIJ6XQD38IK8a1I44RslhgH250JPtL5N+7eYFtuq4xSU3+Z2b+z6l9Qa32TLgthNbNI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6139
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241218150852.185489-1-yuyanghuang@google.com>
+Subject: [PATCH iproute2-next, v7] iproute2: add 'ip monitor maddress' support
+From: Yuyang Huang <yuyanghuang@google.com>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
+	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
+	liuhangbin@gmail.com, nicolas.dichtel@6wind.com, andrew@lunn.ch, 
+	pruddy@vyatta.att-mail.com, netdev@vger.kernel.org, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Enhanced the 'ip monitor' command to track changes in IPv4 and IPv6
+multicast addresses. This update allows the command to listen for
+events related to multicast address additions and deletions by
+registering to the newly introduced RTNLGRP_IPV4_MCADDR and
+RTNLGRP_IPV6_MCADDR netlink groups.
 
+Here is an example usage:
 
-On 14/12/2024 21:16, Gerhard Engleder wrote:
-> From: Gerhard Engleder <eg@keba.com>
-> 
-> Link down and up triggers update of MTA table. This update executes many
-> PCIe writes and a final flush. Thus, PCIe will be blocked until all
-> writes are flushed. As a result, DMA transfers of other targets suffer
-> from delay in the range of 50us. This results in timing violations on
-> real-time systems during link down and up of e1000e in combination with
-> an Intel i3-2310E Sandy Bridge CPU.
-> 
-> The i3-2310E is quite old. Launched 2011 by Intel but still in use as
-> robot controller. The exact root cause of the problem is unclear and
-> this situation won't change as Intel support for this CPU has ended
-> years ago. Our experience is that the number of posted PCIe writes needs
-> to be limited at least for real-time systems. With posted PCIe writes a
-> much higher throughput can be generated than with PCIe reads which
-> cannot be posted. Thus, the load on the interconnect is much higher.
-> Additionally, a PCIe read waits until all posted PCIe writes are done.
-> Therefore, the PCIe read can block the CPU for much more than 10us if a
-> lot of PCIe writes were posted before. Both issues are the reason why we
-> are limiting the number of posted PCIe writes in row in general for our
-> real-time systems, not only for this driver.
-> 
-> A flush after a low enough number of posted PCIe writes eliminates the
-> delay but also increases the time needed for MTA table update. The
-> following measurements were done on i3-2310E with e1000e for 128 MTA
-> table entries:
-> 
-> Single flush after all writes: 106us
-> Flush after every write:       429us
-> Flush after every 2nd write:   266us
-> Flush after every 4th write:   180us
-> Flush after every 8th write:   141us
-> Flush after every 16th write:  121us
-> 
-> A flush after every 8th write delays the link up by 35us and the
-> negative impact to DMA transfers of other targets is still tolerable.
-> 
-> Execute a flush after every 8th write. This prevents overloading the
-> interconnect with posted writes.
-> 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> CC: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> Link: https://lore.kernel.org/netdev/f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch/T/
-> Signed-off-by: Gerhard Engleder <eg@keba.com>
-> ---
-> v3:
-> - mention problematic platform explicitly (Bjorn Helgaas)
-> - improve comment (Paul Menzel)
-> 
-> v2:
-> - remove PREEMPT_RT dependency (Andrew Lunn, Przemek Kitszel)
-> ---
->   drivers/net/ethernet/intel/e1000e/mac.c | 9 ++++++++-
->   1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+root@uml-x86-64:/# ip monitor maddress
+9: nettest123    inet6 mcast ff01::1 scope global
+       valid_lft forever preferred_lft forever
+9: nettest123    inet6 mcast ff02::1 scope global
+       valid_lft forever preferred_lft forever
+9: nettest123    inet mcast 224.0.0.1 scope global
+       valid_lft forever preferred_lft forever
+9: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
+       valid_lft forever preferred_lft forever
+Deleted 9: nettest123    inet mcast 224.0.0.1 scope global
+       valid_lft forever preferred_lft forever
+Deleted 9: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
+       valid_lft forever preferred_lft forever
+Deleted 9: nettest123    inet6 mcast ff02::1 scope global
+       valid_lft forever preferred_lft forever
+
+Cc: Maciej =C5=BBenczykowski <maze@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+---
+
+Changelog since v6:
+- Remove unnecessary commit messages given that the kernel patch is already
+  merged.
+
+Changelog since v5:
+- Revise the commit message example to align with the recent kernel notific=
+ation
+  patch updates.
+
+Changelog since v4:
+- To match the existing code style, move the boolean operator to the end of=
+ the
+  line.
+- To match the existing naming pattern, use 'maddress' instead of 'maddr'.
+
+Changelog since v3:
+- Update man/man8/ip-monitor.8 page.
+- Use 'ip monitor maddr' for naming consistency with 'ip maddr' command.
+
+Changelog since v1:
+- Move the UAPI constants to a separate patch.
+- Update the commit message.
+- Fix the indentation format.
+
+ ip/ipaddress.c        | 17 +++++++++++++++--
+ ip/ipmonitor.c        | 25 ++++++++++++++++++++++++-
+ man/man8/ip-monitor.8 |  2 +-
+ 3 files changed, 40 insertions(+), 4 deletions(-)
+
+diff --git a/ip/ipaddress.c b/ip/ipaddress.c
+index d90ba94d..679b4c00 100644
+--- a/ip/ipaddress.c
++++ b/ip/ipaddress.c
+@@ -1504,7 +1504,10 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
+=20
+ 	SPRINT_BUF(b1);
+=20
+-	if (n->nlmsg_type !=3D RTM_NEWADDR && n->nlmsg_type !=3D RTM_DELADDR)
++	if (n->nlmsg_type !=3D RTM_NEWADDR &&
++	    n->nlmsg_type !=3D RTM_DELADDR &&
++	    n->nlmsg_type !=3D RTM_NEWMULTICAST &&
++	    n->nlmsg_type !=3D RTM_DELMULTICAST)
+ 		return 0;
+ 	len -=3D NLMSG_LENGTH(sizeof(*ifa));
+ 	if (len < 0) {
+@@ -1564,7 +1567,7 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
+=20
+ 	print_headers(fp, "[ADDR]");
+=20
+-	if (n->nlmsg_type =3D=3D RTM_DELADDR)
++	if (n->nlmsg_type =3D=3D RTM_DELADDR || n->nlmsg_type =3D=3D RTM_DELMULTI=
+CAST)
+ 		print_bool(PRINT_ANY, "deleted", "Deleted ", true);
+=20
+ 	if (!brief) {
+@@ -1639,6 +1642,16 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
+ 						   rta_tb[IFA_ANYCAST]));
+ 	}
+=20
++	if (rta_tb[IFA_MULTICAST]) {
++		print_string(PRINT_FP, NULL, "%s ", "mcast");
++		print_color_string(PRINT_ANY,
++				   ifa_family_color(ifa->ifa_family),
++				   "multicast",
++				   "%s ",
++				   format_host_rta(ifa->ifa_family,
++						   rta_tb[IFA_MULTICAST]));
++	}
++
+ 	print_string(PRINT_ANY,
+ 		     "scope",
+ 		     "scope %s ",
+diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
+index de67f2c9..b28faa20 100644
+--- a/ip/ipmonitor.c
++++ b/ip/ipmonitor.c
+@@ -30,7 +30,7 @@ static void usage(void)
+ 	fprintf(stderr,
+ 		"Usage: ip monitor [ all | OBJECTS ] [ FILE ] [ label ] [ all-nsid ]\n"
+ 		"                  [ dev DEVICE ]\n"
+-		"OBJECTS :=3D  address | link | mroute | neigh | netconf |\n"
++		"OBJECTS :=3D  address | link | mroute | maddress | neigh | netconf |\n"
+ 		"            nexthop | nsid | prefix | route | rule | stats\n"
+ 		"FILE :=3D file FILENAME\n");
+ 	exit(-1);
+@@ -152,6 +152,11 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
+ 		ipstats_print(n, arg);
+ 		return 0;
+=20
++	case RTM_DELMULTICAST:
++	case RTM_NEWMULTICAST:
++		print_addrinfo(n, arg);
++		return 0;
++
+ 	case NLMSG_ERROR:
+ 	case NLMSG_NOOP:
+ 	case NLMSG_DONE:
+@@ -178,6 +183,7 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
+ #define IPMON_LRULE		BIT(8)
+ #define IPMON_LNSID		BIT(9)
+ #define IPMON_LNEXTHOP		BIT(10)
++#define IPMON_LMADDR		BIT(11)
+=20
+ #define IPMON_L_ALL		(~0)
+=20
+@@ -202,6 +208,8 @@ int do_ipmonitor(int argc, char **argv)
+ 			lmask |=3D IPMON_LLINK;
+ 		} else if (matches(*argv, "address") =3D=3D 0) {
+ 			lmask |=3D IPMON_LADDR;
++		} else if (matches(*argv, "maddress") =3D=3D 0) {
++			lmask |=3D IPMON_LMADDR;
+ 		} else if (matches(*argv, "route") =3D=3D 0) {
+ 			lmask |=3D IPMON_LROUTE;
+ 		} else if (matches(*argv, "mroute") =3D=3D 0) {
+@@ -326,6 +334,21 @@ int do_ipmonitor(int argc, char **argv)
+ 		exit(1);
+ 	}
+=20
++	if (lmask & IPMON_LMADDR) {
++		if ((!preferred_family || preferred_family =3D=3D AF_INET) &&
++		    rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
++			fprintf(stderr,
++				"Failed to add ipv4 mcaddr group to list\n");
++			exit(1);
++		}
++		if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
++		    rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
++			fprintf(stderr,
++				"Failed to add ipv6 mcaddr group to list\n");
++			exit(1);
++		}
++	}
++
+ 	if (listen_all_nsid && rtnl_listen_all_nsid(&rth) < 0)
+ 		exit(1);
+=20
+diff --git a/man/man8/ip-monitor.8 b/man/man8/ip-monitor.8
+index ec033c69..a3c099ae 100644
+--- a/man/man8/ip-monitor.8
++++ b/man/man8/ip-monitor.8
+@@ -54,7 +54,7 @@ command is the first in the command line and then the obj=
+ect list follows:
+ .I OBJECT-LIST
+ is the list of object types that we want to monitor.
+ It may contain
+-.BR link ", " address ", " route ", " mroute ", " prefix ", "
++.BR link ", " address ", " route ", " mroute ", " maddress ", " prefix ", =
+"
+ .BR neigh ", " netconf ", "  rule ", " stats ", " nsid " and " nexthop "."
+ If no
+ .B file
+--=20
+2.47.1.613.gc27f4b7a9f-goog
+
 
