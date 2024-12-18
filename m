@@ -1,87 +1,125 @@
-Return-Path: <netdev+bounces-153119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B1439F6D58
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 19:32:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE6E9F6EA8
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 21:03:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42A4F7A1CBA
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:32:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E85D1890E6B
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 20:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2D51FAC4B;
-	Wed, 18 Dec 2024 18:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D7C1448F2;
+	Wed, 18 Dec 2024 20:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1Q2fZr3r"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="eJPK66ZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx25lb.world4you.com (mx25lb.world4you.com [81.19.149.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DB8156968
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 18:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE14813A87C;
+	Wed, 18 Dec 2024 20:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734546669; cv=none; b=G6Tu2T+VE/xifTO0dcwOHiklOVe5ii10sIOmKidynOnl2SBvo/glmcnauUAc7mgiIuWPVTpIMhGwc4frqE49RBLBNriQuwODdrOP9w9fmutH3JM8zKpxdGDsq8dSnRJtRHLOWScpNEV8c7ETg8xhxiirnoOx5ZGuutNaMDlzDHU=
+	t=1734552184; cv=none; b=qnaWWJmuSc45M5YdvKl10hH2Mzv/XZnDB65txB10WGVVKK22C7SZpy9cswXIvErZ44SxgSW4NeR7KlwXO+xiVv6SxH2rXLoOGJ/A4xWfik5dUzGeru64bpeRqjCfpz9xoMFTDDG7LQMGKgxnmqv6uDncLpeViCwMIbFUeIdiRDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734546669; c=relaxed/simple;
-	bh=0IdzN+Rl5BkAJGcCkueS5gxI6fSxnlmKbxkcmOi0Y10=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NpKCcdkJcHLhnRxuTf6t8TBdZSxJR+E6T8rKwua3xUhtIvXWE5jskc9Q/NgXvP8rs429ulBKfa3uMDECQUqaT3lqR8wiXMupFh6SN8peN3LK1xVvTWTLAVHZLV5xbZKHv8MgZl8Az25kXAirdJ+CuXtRcEBAHqN2An3KPe0Flxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1Q2fZr3r; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GpcYmlELp/Y+uOsekpEkHPdBziPffZ5earBfBWVp51M=; b=1Q2fZr3r+Sx0lRVt2woBFQ3mc7
-	ObSon5cZir//QZ2a6kMOS7G6RmjXJ52gkSSkQefxVOE4arv1Gjn3HEA4QdlrDjulkdO2WcD+GYkTf
-	RetwcPDuvp/tYKPcN/vbA/yYCgxnhCiliUFb+20sUKnj/M1asbhtqfYlDwozIQE1Xypg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tNyp6-001MZE-20; Wed, 18 Dec 2024 19:31:04 +0100
-Date: Wed, 18 Dec 2024 19:31:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Xin Tian <tianx@yunsilicon.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
-	jeff.johnson@oss.qualcomm.com, przemyslaw.kitszel@intel.com,
-	weihg@yunsilicon.com, wanry@yunsilicon.com
-Subject: Re: [PATCH v1 16/16] net-next/yunsilicon: Add change mtu
-Message-ID: <c8ffef39-ce76-4028-b54f-7ec919a4620c@lunn.ch>
-References: <20241218105023.2237645-1-tianx@yunsilicon.com>
- <20241218105057.2237645-17-tianx@yunsilicon.com>
+	s=arc-20240116; t=1734552184; c=relaxed/simple;
+	bh=2Of0j9lU8b9qxWD+ndx3DbCaR0TpusZ7SAyJc5WKOQc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I5TfP04RjWX0m8IlPeLw/qlNoBDcI+1j1BLys8pWW46obz2TGALUBtgU0ARuRZgY+pl0gpfJC4VmsP1GuMISxW7FNTixMQefmtn0Bz64334BUvdlIIuGRQqsAa1GGUCHmzSNcq3xLkJewMVTJWG5OBOvgJUyWpvstAVJs8FkXx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=eJPK66ZA; arc=none smtp.client-ip=81.19.149.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fjmkeAFTdbSZjtHMJws8A6MlB+V8KeXQTp/OqbPGH+s=; b=eJPK66ZAJK3ZdxXkkqMYNnOrxS
+	HjjOJcgNF8Pf3MSKvY+LdxvtevtvjVHCeAMFPJahbVeRz5VTEL7VlOnhDcNzYzOKq433lDDxR37Ye
+	DduaYmpqLAeus/2CTgRSOcW3zogsQdHZ1Aa/xr3ppq+/1uAh/jzuSmPrZVMjBFiNUv4M=;
+Received: from [88.117.62.55] (helo=[10.0.0.160])
+	by mx25lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tNzbi-000000006xh-3u82;
+	Wed, 18 Dec 2024 20:21:19 +0100
+Message-ID: <af154371-8513-4ff2-a288-c8301cc8c65c@engleder-embedded.com>
+Date: Wed, 18 Dec 2024 20:21:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241218105057.2237645-17-tianx@yunsilicon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v3] e1000e: Fix real-time violations on link up
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org, linux-pci@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, bhelgaas@google.com, pmenzel@molgen.mpg.de,
+ Gerhard Engleder <eg@keba.com>, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org
+References: <20241214191623.7256-1-gerhard@engleder-embedded.com>
+ <231abdb7-3b16-4c3c-be17-5d0e6a556f28@intel.com>
+ <047738af-69af-49aa-ae91-7dbca40ae559@engleder-embedded.com>
+ <57948d32-bd6f-473c-a7e6-90185ea41986@intel.com>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <57948d32-bd6f-473c-a7e6-90185ea41986@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-AV-Do-Run: Yes
 
-> +static int xsc_eth_change_mtu(struct net_device *netdev, int new_mtu)
-> +{
-> +	struct xsc_adapter *adapter = netdev_priv(netdev);
-> +	int old_mtu = netdev->mtu;
-> +	int ret = 0;
-> +	int max_buf_len = 0;
-> +
-> +	if (new_mtu > netdev->max_mtu || new_mtu < netdev->min_mtu) {
-> +		netdev_err(netdev, "%s: Bad MTU (%d), valid range is: [%d..%d]\n",
-> +			   __func__, new_mtu, netdev->min_mtu, netdev->max_mtu);
-> +		return -EINVAL;
-> +	}
+On 18.12.24 09:36, Przemek Kitszel wrote:
+> On 12/16/24 20:23, Gerhard Engleder wrote:
+>>>> @@ -331,8 +331,15 @@ void e1000e_update_mc_addr_list_generic(struct 
+>>>> e1000_hw *hw,
+>>>>       }
+>>>>       /* replace the entire MTA table */
+>>>> -    for (i = hw->mac.mta_reg_count - 1; i >= 0; i--)
+>>>> +    for (i = hw->mac.mta_reg_count - 1; i >= 0; i--) {
+>>>>           E1000_WRITE_REG_ARRAY(hw, E1000_MTA, i, hw- 
+>>>> >mac.mta_shadow[i]);
+>>>> +
+>>>> +        /* do not queue up too many posted writes to prevent increased
+>>>> +         * latency for other devices on the interconnect
+>>>> +         */
+>>>> +        if ((i % 8) == 0 && i != 0)
+>>>> +            e1e_flush();
+>>>
+>>>
+>>> I would prefer to avoid adding this code to all devices, particularly 
+>>> those that don't operate on real-time systems. Implementing this code 
+>>> will introduce three additional MMIO transactions which will increase 
+>>> the driver start time in various flows (up, probe, etc.).
+>>>
+>>> Is there a specific reason not to use if 
+>>> (IS_ENABLED(CONFIG_PREEMPT_RT)) as Andrew initially suggested?
+>>
+>> Andrew made two suggestions: IS_ENABLED(CONFIG_PREEMPT_RT) which I used
+>> in the first version after the RFC. And he suggested to check for a
+>> compromise between RT and none RT performance, as some distros might
+>> enable PREEMPT_RT in the future.
+>> Przemek suggested to remove the PREEMPT_RT check as "this change sounds
+>> reasonable also for the standard kernel" after the first version with
+>> IS_ENABLED(CONFIG_PREEMPT_RT).
+>>
+>> I used the PREEMPT_RT dependency to limit effects to real-time systems,
+>> to not make none real-time systems slower. But I could also follow the
+>> reasoning of Andrew and Przemek. With that said, I have no problem to
+>> add IS_ENABLED(CONFIG_PREEMPT_RT) again.
+>>
+>> Gerhard
+> 
+> I'm also fine with limiting the change to RT kernels.
 
-What checking does the core do for you, now that you have set max_mtu
-and min_mtu?
+I will add IS_ENABLED(CONFIG_PREEMPT_RT).
 
+Thanks!
 
-    Andrew
-
----
-pw-bot: cr
+Gerhard
 
