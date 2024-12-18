@@ -1,119 +1,94 @@
-Return-Path: <netdev+bounces-152992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C2879F6897
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:35:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35BB49F689E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:36:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FDE116CE64
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:34:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0231016C741
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572DB1C5CD2;
-	Wed, 18 Dec 2024 14:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1E51BEF61;
+	Wed, 18 Dec 2024 14:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MveLz4zd"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Tc+rc7tu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95AF51B0408
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD90F1B0417;
+	Wed, 18 Dec 2024 14:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734532425; cv=none; b=MsN9tODqjVmylvfMkKUnnhP3YVE5YY6OPcMBGgiRO5k64AoliMIhAncKpzEd8zx+vkiJI6DNTRbLkfWmcuQzXrEy2K9PSoCXIWu72PgHjvFG+D1Vsjcao7zAg4ASqh63qDt9MNdT/Sek6IOlE+sifmaEiJHnYcNJ5+jqdig+LLY=
+	t=1734532451; cv=none; b=M7VIa/uktAnG5NdLA7DbLOCij2EKGJwBDA1SO/+/8KOfklNMQljeNKJcIqzMd0raL/6Rs8eD/aioh1V+CNqWW6tkxvypG9kwju5eIUof4do7z4hlveCR8KAp2JWWOFb025gPP7NSh0pAgGcz2LkqhmmqhNYgrfg5doKaVDJEnzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734532425; c=relaxed/simple;
-	bh=I6sMgpSIbuoJgMruTv0D/eB9H9usJakuNH+cIDpJmG0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YdO0mPyUMuROSkFf4D8di1aQDxT8YR33quWsTHqiy8G3ypCBf035LqA9gYWtCG+wzbk7pUrmYUxlqxK9ii6Sfmnu2X8NoYQlKZC6o6VJDVWwUQi4zTWpE+NYXSXXFVeZ2CzPOIShVoHWjNgXZ4YDZieqsWvylvqOLWKh8FyzEQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=MveLz4zd; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-436203f1203so5956065e9.2
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 06:33:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1734532421; x=1735137221; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S/6gQ9eYwKvtfY37kCvqsh+D1rqnOtVNpwd5npaMbTg=;
-        b=MveLz4zdNXPKwdzfVrbXg5o9WEBdiKePSZKfDopHXse6nvi0asZ5J3Oa8cKukOcYex
-         lB+FdAZXIR6qNhlpsUuw7W6Hihj5WfTbwQKyphwjhaI1c97q66skhFyDQNUvcNK2ZR+s
-         Iv2sFJpmc8Rveap/dcmh02uFS6h67T0xD0WOY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734532421; x=1735137221;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S/6gQ9eYwKvtfY37kCvqsh+D1rqnOtVNpwd5npaMbTg=;
-        b=mA0p0SAh8MuiF+59+DRW6mnH6VQyxAcFgEnQvSrf+Hb2dpGz71cmxyJwHFMD6Jc+4Y
-         lsF/3UJy0rtFdXLTUlWuU5mmjLNufRyWzPPvdoa/CVHOJNcjMdZBSWrs09soSgQLQoHY
-         5Q8JusNyBln4hRYXfSjsX3sXKG1BTC4fFWizALCtvW7CCsrQ3bwzOTGRgPPtGIwm5xtR
-         rl12vFfpkXXXoQgIrynbd+vMF9hjSMwYF8HKx6ejLOdvvAuI/xMrSdhKcxRuYCUV07N2
-         6dOOw7JuxbESbCdu0uZoRfDRQd79RxC7GqJyjgvGidFVLFwmexAurNhaRjuO9Cy5d6pF
-         x6dw==
-X-Gm-Message-State: AOJu0YyXlAEmJNX2t4O2asBhz5WyHI5JSxbdkq3lwBXAiA//GGAHopUC
-	0FiyXqFhzuNdUoFGiEh8eUEReiS6iCzAQ4wco7qXRyBJjdEwPlsz3sRDEOEz5+5GrMyGnj+CfjE
-	=
-X-Gm-Gg: ASbGnctbNIncx+QX0EZWm9QJcc+KbMdXNSRn11xLUO3Ulek5dVg2o40OjxAHKsSdhze
-	SOyQLp5GuYMZV2hP+bfC5K22uFH/OCk0l2+Pa9QH3Gb3ekuAGS3u/odYcuO4sN/JBSp234o6QlU
-	84NZuHQVkV/MSNxrnpvfggXjsepD7lN+zyh2aTg/qW7Zra5TVpcMV8rhdkqcebc2m/A539nqLMX
-	x3uCGVYxnbPzx54eq/8QGpGaQ/3F0dQg61rsLZSHqvTinsPHRdVh5J+6kTJigdzlmWFDpl6
-X-Google-Smtp-Source: AGHT+IGGPRCJdWV53mqhJOMB8s5ih2sGtwEblpI26YxbPSheMfBs9kn94lS444i776WgijEWAi8uQA==
-X-Received: by 2002:a05:6000:18a3:b0:374:ca43:ac00 with SMTP id ffacd0b85a97d-388e4d4b5f3mr1071325f8f.4.1734532421472;
-        Wed, 18 Dec 2024 06:33:41 -0800 (PST)
-Received: from revest.zrh.corp.google.com ([2a00:79e0:9d:6:5f2e:327d:b9f0:a387])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c8016678sm14188770f8f.27.2024.12.18.06.33.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2024 06:33:40 -0800 (PST)
-From: Florent Revest <revest@chromium.org>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kuniyu@amazon.com,
-	rao.shoaib@oracle.com,
-	Florent Revest <revest@chromium.org>
-Subject: [PATCH net] af_unix: Add a prompt to CONFIG_AF_UNIX_OOB
-Date: Wed, 18 Dec 2024 15:33:34 +0100
-Message-ID: <20241218143334.1507465-1-revest@chromium.org>
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+	s=arc-20240116; t=1734532451; c=relaxed/simple;
+	bh=x+ouAiKcuBQkZ/37Owdf/1ycla1yjKbXs8ztdlKCfj8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RiH5XizN5dVU88gntvZC+NB0EYLPuMSa3ooeCuVZ0OUgy0wGyZ62XLYos13uRcDDXRX+zP/CKVpPzwKFfYuLB0bQL66iuPuRZ3ugWC/DUGuUd/qKYxQ67fSUYp/pP3Rb7oH0bG3symJ+ZuUaXMfn1603aV+Je+s8K/AC7bR9fzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Tc+rc7tu; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1734532450; x=1766068450;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=x+ouAiKcuBQkZ/37Owdf/1ycla1yjKbXs8ztdlKCfj8=;
+  b=Tc+rc7tu3cgqJDPzG3mXuGVfhR9h7+m9x2mUXGkvEzdIokAKvDNB+qp6
+   Rak/JXKlKGcTeJbcl2CfHKBjNduXYoC9g/z2EhBmLLBfDr+IcRqGiQn1C
+   ke84Dzi1FS2bPaYHJSXHmZIoHlUAumXAbwsifDfISR5QZ2i0ehDufq2Ok
+   OZ4BaYbYZXOPowKOjr60r4FDbO9r8RVQ3AcrXI4TL/iCHLBlSdnCCUbq4
+   o2FULmXgh7+5mFHQkuTOwTzkBMkk12h4p6mjpdga+vRenAVqRxzLSjAC1
+   /jakCMpRsT/V2Mfnma2VaPRAvBeTWOH6BOJGYcz0B1BbCKmhf+BHSnH9q
+   g==;
+X-CSE-ConnectionGUID: 7sKZ6qhWRXCBO0C3T4e5BA==
+X-CSE-MsgGUID: FGgQ9ZKBQfCEZLpy9D4ImA==
+X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
+   d="scan'208";a="266920911"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Dec 2024 07:34:03 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 18 Dec 2024 07:33:57 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Wed, 18 Dec 2024 07:33:54 -0700
+Date: Wed, 18 Dec 2024 14:33:54 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Lars
+ Povlsen" <lars.povlsen@microchip.com>, Steen Hegelund
+	<Steen.Hegelund@microchip.com>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Russell King <linux@armlinux.org.uk>,
+	<jacob.e.keller@intel.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>
+CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<robert.marko@sartura.hr>
+Subject: Re: [PATCH net-next v4 0/9] net: lan969x: add RGMII support
+Message-ID: <20241218143354.eh6iinemupxncblj@DEN-DL-M70577>
+References: <20241213-sparx5-lan969x-switch-driver-4-v4-0-d1a72c9c4714@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241213-sparx5-lan969x-switch-driver-4-v4-0-d1a72c9c4714@microchip.com>
 
-This makes it possible to disable the MSG_OOB support in .config.
+I would like to defer the pontential removal of sparx5_port_verify_speed()
+function to a separate series (see comments on patch 6/9).  Any chance for a
+maintainer to give the OK for that? I would like to give this series another
+spin before net-next closes. No changes in next version - except adding TB and
+RB tags.
 
-Signed-off-by: Florent Revest <revest@chromium.org>
----
- net/unix/Kconfig | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/unix/Kconfig b/net/unix/Kconfig
-index 8b5d04210d7cf..6f1783c1659b8 100644
---- a/net/unix/Kconfig
-+++ b/net/unix/Kconfig
-@@ -17,9 +17,11 @@ config UNIX
- 	  Say Y unless you know what you are doing.
- 
- config	AF_UNIX_OOB
--	bool
-+	bool "UNIX: out-of-bound messages"
- 	depends on UNIX
- 	default y
-+	help
-+	  Support for MSG_OOB in UNIX domain sockets. If unsure, say Y.
- 
- config UNIX_DIAG
- 	tristate "UNIX: socket monitoring interface"
--- 
-2.47.1.613.gc27f4b7a9f-goog
-
+/Daniel 
 
