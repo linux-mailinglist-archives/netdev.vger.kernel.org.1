@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-152988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28B649F688C
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:34:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D92FA9F6886
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:33:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1A7116CCF3
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:33:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B02F1615BD
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98941D5CE5;
-	Wed, 18 Dec 2024 14:33:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BF41B0417;
+	Wed, 18 Dec 2024 14:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="EIwY/ufz"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="qEhNrxpc"
 X-Original-To: netdev@vger.kernel.org
 Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A36D1B0405
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ECE81A4F12
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734532392; cv=none; b=dsKY7QjOT8v7eZR+47A4ls1jI3KtFDq6ipBZe6/9VtCzKMPO/i2jW6mXPk2ygkmZMptgYwNz8JUBR+EqqNP/a+qXKuZUGPKA5axzb7eC0ACmEayGxu4CvqV8LA6y1ItB1jfFkQbEE+48Oyi5i5OMM8H7g/Rb0KeV+NRRa3jsMMQ=
+	t=1734532385; cv=none; b=HBdzEfraQMZ+caWskQakI9yDcZReRLgDECUtj6LtRFu19S3kIjA7nphLSzXlMJ4PIIlbkPnmzFX2tg0NPmqke6u40VjkcP0HwyVl/kXetawiVEBsmBUy+29BA9C0m+EFE/A2NZ5wlqITXnMOU4lJ4LO8NUTtGEFBAqm9nK9s4g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734532392; c=relaxed/simple;
-	bh=SfbuOyDa8+ndQMh2V1UGoOXKxb3uoTRmJgOU+SyjCtg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mcVnG1vdUZK4svlDjzBYBCI+FBOKT0sX2Fkl3hUqiFeYVz61LY4Nni/DDDNb7Pn4/wqQAOTy3yP1y/uV2gRCx3M2QK6YUEHvXlbal0XSIf3Fy0992dQ6L12rQQ1CbMgVVi6L20UNFoI/6mFkO9A4QrqrtoX7l2Q2yWpgjVhpZNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=EIwY/ufz; arc=none smtp.client-ip=185.226.149.38
+	s=arc-20240116; t=1734532385; c=relaxed/simple;
+	bh=0sDdAEZabG5E9GjTiowtmVlTAEy23d/F9QV7mjnBl8A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=QYmNARadQhkpUn5HJ0KSpQY7HGfzLIFBNyOvf8goEsVSdmVc62hto6ArL4u7bqCff9gjt5X8HmWOqMwTQpXw8dLCfzTQ+buqa6dkCJn70pr9x9/hfRcQO7GW80NV+ZZ+JWI61OGAU4y65XBT2JUvyp8wEKWk1TJ3c8MfC1pSRKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=qEhNrxpc; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
 Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
 	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1tNv6p-004s1R-VC
-	for netdev@vger.kernel.org; Wed, 18 Dec 2024 15:33:07 +0100
+	id 1tNv6Y-004s0c-6p; Wed, 18 Dec 2024 15:32:50 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-Id:Date:Subject:From; bh=lmnlWo2hPLs1HhL+gB5ZaOYhkc5GpETrDblCeltmDQA=
-	; b=EIwY/ufzo7JfzyHbXXMLFjhL+D7mk12XApMFUYKsPJOd7NeebPb6A501j5+sbLGaXcRkEAavg
-	J+b79NGO6+O3pI/cthoAFbOlOsrazzfV0TEvt4pqg6ocBfWdLmQHZBNTsMnyOz//O4LwFH7K3yKhO
-	zXG4/6SMY9sw2Msks/rZHBXI++/hSddZEOnrXxfpmTTHXK2/NarMxERaS6DaQkJ06D00FzbNb45qW
-	f+LU5Oep0yI9wgop4xxDT6jnSIQTYHgO1ATk+CvqV7nSlukN5ZZJacP1PZ9H9L5Q0l3c2tjTU7tvf
-	RuncrksizdL+f/ZvjjQyV1NQsoQmjaLtrvjbsg==;
+	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
+	bh=Ab/Czx5yAuS9fCWJcYUV2QQ76tFP5JZBVcCL+Ei7LOY=; b=qEhNrxpcHTb7V3PZ7h18PnQBwu
+	l9xTf0/p7bOlEmmtCvNgSDBquJTYsNPiSOdMsx69v9hIhDBt6fiGreRBYUFn+Yt3XNViftXos199R
+	1zR6ylKx2Jq9xmNRtqSBQo2SeI+FhJd7GqfjFWDiACoL1K1fFbBPphrcDCYiE/miBXepomelAsFs6
+	gq8eF0ld/byTOWuYPpdL1+IVCgG1JeCH87gjelwF3Sh1k2HrAMXt937I45AINS7PzgqNf5OgFEJ8t
+	MODlNz6SZdy6neBBZ7rTgU7/ymEf5ezEjGVGJ2ye1GNaeNFJoAZAIu24Ecn8yEKObwQGylhhcZZ2/
+	NRjhHvpw==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
 	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1tNv6p-00070z-KB; Wed, 18 Dec 2024 15:33:07 +0100
+	id 1tNv6X-000702-Lj; Wed, 18 Dec 2024 15:32:49 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1tNv6U-008Env-QF; Wed, 18 Dec 2024 15:32:46 +0100
+	id 1tNv6V-008Env-2p; Wed, 18 Dec 2024 15:32:47 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH net-next v3 0/7] vsock/test: Tests for memory leaks
-Date: Wed, 18 Dec 2024 15:32:33 +0100
-Message-Id: <20241218-test-vsock-leaks-v3-0-f1a4dcef9228@rbox.co>
+Date: Wed, 18 Dec 2024 15:32:34 +0100
+Subject: [PATCH net-next v3 1/7] vsock/test: Use NSEC_PER_SEC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,72 +63,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAHdYmcC/22NywrCMBQFf6Vk7ZU8mqZ15X+IixpvbKgkkoRQK
- f13QxAUdDkcZs5KIgaLkRyalQTMNlrvCohdQ/Q0uhuCvRYmnPKWcSogYUyQo9cz3HGcI4jeDFI
- ORnaiI0V7BDR2qckTcZjA4ZLIuSyTjcmHZ/3KrO7vbPebzQwoaMGw172SalDHcPHLXvuayvxLZ
- /90XnQpkbVUqpYb/dG3bXsB831Eg/cAAAA=
-X-Change-ID: 20241203-test-vsock-leaks-38f9559f5636
+Message-Id: <20241218-test-vsock-leaks-v3-1-f1a4dcef9228@rbox.co>
+References: <20241218-test-vsock-leaks-v3-0-f1a4dcef9228@rbox.co>
+In-Reply-To: <20241218-test-vsock-leaks-v3-0-f1a4dcef9228@rbox.co>
 To: Stefano Garzarella <sgarzare@redhat.com>
 Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>, 
  Luigi Leonardi <leonardi@redhat.com>
 X-Mailer: b4 0.14.2
 
-Series adds tests for recently fixed memory leaks[1]:
+Replace 1000000000ULL with NSEC_PER_SEC.
 
-commit d7b0ff5a8667 ("virtio/vsock: Fix accept_queue memory leak")
-commit fbf7085b3ad1 ("vsock: Fix sk_error_queue memory leak")
-commit 60cf6206a1f5 ("virtio/vsock: Improve MSG_ZEROCOPY error handling")
+No functional change intended.
 
-Patch 1/6 is a non-functional preparatory cleanup.
-Patch 2/6 is a test suite extension for picking specific tests.
-Patch 3/6 explains the need of kmemleak scans.
-Patches 4-5-6 add the tests.
-
-NOTE: Test in patch 6/6 ("vsock/test: Add test for MSG_ZEROCOPY completion
-memory leak") may stop working even before this series is merged. See
-changes proposed in [2]. The failslab variant would be unaffected.
-
-[1] https://lore.kernel.org/netdev/20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co/
-[2] https://lore.kernel.org/netdev/CANn89i+oL+qoPmbbGvE_RT3_3OWgeck7cCPcTafeehKrQZ8kyw@mail.gmail.com/
-
+Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
-Changes in v3:
-- Allow for multiple tests selection (Stefano)
-- Generalize CONTINUE/DONE control messages (Stefano)
-- Collect R-b (Stefano)
-- Link to v2: https://lore.kernel.org/r/20241216-test-vsock-leaks-v2-0-55e1405742fc@rbox.co
+ tools/testing/vsock/vsock_test.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Changes in v2:
-- Introduce a vsock_test option to run a single test
-- ZC completion test: rewrite, comment, describe failslab approach (Stefano)
-- accept_queue test: rewrite, comment (Stefano)
-- Annotate functions and commits about the need of kmemleak (Stefano)
-- Add README section about kmemleak (Stefano)
-- Collect R-b (Luigi, Stefano)
-- Link to v1: https://lore.kernel.org/r/20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index 48f17641ca504316d1199926149c9bd62eb2921d..38fd8d96eb83ef1bd45728cfaac6adb3c1e07cfe 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -22,6 +22,7 @@
+ #include <signal.h>
+ #include <sys/ioctl.h>
+ #include <linux/sockios.h>
++#include <linux/time64.h>
+ 
+ #include "vsock_test_zerocopy.h"
+ #include "timeout.h"
+@@ -559,7 +560,7 @@ static time_t current_nsec(void)
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+-	return (ts.tv_sec * 1000000000ULL) + ts.tv_nsec;
++	return (ts.tv_sec * NSEC_PER_SEC) + ts.tv_nsec;
+ }
+ 
+ #define RCVTIMEO_TIMEOUT_SEC 1
+@@ -599,7 +600,7 @@ static void test_seqpacket_timeout_client(const struct test_opts *opts)
+ 	}
+ 
+ 	read_overhead_ns = current_nsec() - read_enter_ns -
+-			1000000000ULL * RCVTIMEO_TIMEOUT_SEC;
++			   NSEC_PER_SEC * RCVTIMEO_TIMEOUT_SEC;
+ 
+ 	if (read_overhead_ns > READ_OVERHEAD_NSEC) {
+ 		fprintf(stderr,
 
----
-Michal Luczaj (7):
-      vsock/test: Use NSEC_PER_SEC
-      vsock/test: Introduce option to select tests
-      vsock/test: Add README blurb about kmemleak usage
-      vsock/test: Adapt send_byte()/recv_byte() to handle MSG_ZEROCOPY
-      vsock/test: Add test for accept_queue memory leak
-      vsock/test: Add test for sk_error_queue memory leak
-      vsock/test: Add test for MSG_ZEROCOPY completion memory leak
-
- tools/testing/vsock/README       |  15 +++
- tools/testing/vsock/util.c       |  33 ++++-
- tools/testing/vsock/util.h       |   2 +
- tools/testing/vsock/vsock_test.c | 265 ++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 309 insertions(+), 6 deletions(-)
----
-base-commit: 2c2b61d2138f472e50b5531ec0cb4a1485837e21
-change-id: 20241203-test-vsock-leaks-38f9559f5636
-
-Best regards,
 -- 
-Michal Luczaj <mhal@rbox.co>
+2.47.1
 
 
