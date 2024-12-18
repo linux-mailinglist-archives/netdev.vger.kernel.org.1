@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-153074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E18D9F6BB0
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:59:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DB6A9F6BB3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:59:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4896A16890B
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:59:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 316D7168167
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F80A1F890F;
-	Wed, 18 Dec 2024 16:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C3D1F8AE6;
+	Wed, 18 Dec 2024 16:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NoaM53pG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k9gDS/nY"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C711F2396
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A4F1F2396
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734541154; cv=none; b=Chc6HfKBsZn+S4+X2CaFzewWAzUrMbF/sSH98p8FkAL8xY2o5fKXXyV0LvhofS42k+D+ICqPl8ekI3z11gvPErcqm1ZYJeQLVzZbkNbNQ4X1uVQjVppRJ98lkB1j7aZUz/Ct4P3lat1syrQjdT8C/0TTOW+XkArDpeRGDW1F58s=
+	t=1734541160; cv=none; b=Fxkdi/8yj0S51SLXMatrygUQdpAsVsasRJwvxeQa6AH2jyO3yjdelhb98o6uzJF2Kc34gnDGKb6cUZIa7EdlWewXsU9KXQTRe/vLKKsmPEgjj4/BgXeHCPAvUOp+g4aIkvhEfwKF3LDpdbnALtfu3YxQ7KCS8R0amy6KY5sS/IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734541154; c=relaxed/simple;
-	bh=ywmYtI0lcrXxPUxnpZCoN+vSygyrLvEeQCaTxsopkqE=;
+	s=arc-20240116; t=1734541160; c=relaxed/simple;
+	bh=KhIPNPJHmImcf0ZEs3qYAp8F5l15ZiL20/BE1f3GjZU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o1DwEvKNpaIyrswLlCiJLBjtr+q0LilfXOh1JyuaHQzD/MlB37WGP6Itx5gOVfMOPjNuirGeFut87uU7gP/TQIbWw98bJbW3XERjj6hecVEgDRY4TEoUHunrhrSGFzU+S3hX6XR4gcznHmcaPrBMliGot8v8uZi5huyi/I2tdIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NoaM53pG; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=IXVv4rAA7XSkLfc9a16aemW2goTbtpmu4lwKSUELATyE+bqKx7WiXSp+DvU1gx70mVzOdxfY2USdlRdurtbWgNcIaBW63Hp1ifKVdST9IoVujThF+qoE1ea0UjVd5YBoaL5Zobq557KiWLfl/0/Fw/FvT0SvcZaRts1t9VCWA8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k9gDS/nY; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734541152; x=1766077152;
+  t=1734541158; x=1766077158;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ywmYtI0lcrXxPUxnpZCoN+vSygyrLvEeQCaTxsopkqE=;
-  b=NoaM53pGCJ/d7u2fMNxoDE5sNFELud8NUEHOzZZ6qPDqTPYiVcjSPjCC
-   +f2AAn4xaN2oF2ReVkH1Bje6DRdFw5T05HqHArf06bDOw9UpfPqVZdUaY
-   K8/pdEk9NcqNaGkn+GTPagCZWPtO5V1RSuoWNPAG4d7U+uMh3kfdJPnQF
-   SDw72KFbvj36QYQVMggIPWrdqfoPH3jVlUJUud/iqrEYXoGIN8LgswTBM
-   YL1K3LvvQbIetx0X0RCIFBSQ9pJCeLSFHdS8JLyDrSgu6bOoQZOblcgpy
-   Ynkdce5u5iaZfNqEStb0/wYmgC4ofNVetbruOWHqKWharyqsAk36GGCJf
-   g==;
-X-CSE-ConnectionGUID: eKHSyTVySDi4LdIsqeF+IA==
-X-CSE-MsgGUID: NAAadlgeSxmOjJ5PTrjeRQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="46415484"
+  bh=KhIPNPJHmImcf0ZEs3qYAp8F5l15ZiL20/BE1f3GjZU=;
+  b=k9gDS/nYKHqntheZ4tLrubYwzEu1hZyofzV801GDJJxXhopJ7tRlhyOi
+   fLWlst5vmB10a9vIhtAIwA6nN8SLBDqeiq/2vt7483lGQR5wndCHes07+
+   5sf0ZsLtcCEoJYLT9UZl/PAK2ExUDFpMNGtaGnhSrBwoPuencDhonYqsq
+   C0ApihNM5D7zOl/07BrCmwz7yA30Gbv+2M4gWtD94EjMpa33AiAis71AW
+   MWnArZU9q5sk670VSgFjJ9wvHR6iRKscsf3Y86NDFOcT/h9XnStXc71WS
+   S/tLf4gic7pJq62M46owGCyy4Tsd/czsX0xgXF6MgOZ3aON7NuGg5OEOE
+   Q==;
+X-CSE-ConnectionGUID: RS4M8iVPR/+HnxYIPK9ZZg==
+X-CSE-MsgGUID: RuaFlHMOSMe+HN9kawCHVg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="46415500"
 X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
-   d="scan'208";a="46415484"
+   d="scan'208";a="46415500"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:12 -0800
-X-CSE-ConnectionGUID: sdJdS6ojQMaByIasp0GI5A==
-X-CSE-MsgGUID: 3imJic9fTxWYh4kJl4ju+A==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:17 -0800
+X-CSE-ConnectionGUID: 7AmGc/ESTnSYjFqyDm6Ltw==
+X-CSE-MsgGUID: 89jf8hhdTV68B1m8NfKe7w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="102531608"
+   d="scan'208";a="102531675"
 Received: from ldmartin-desk2.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.111.224])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:06 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:12 -0800
 From: Ahmed Zaki <ahmed.zaki@intel.com>
 To: netdev@vger.kernel.org
 Cc: intel-wired-lan@lists.osuosl.org,
@@ -74,9 +74,9 @@ Cc: intel-wired-lan@lists.osuosl.org,
 	shayd@nvidia.com,
 	akpm@linux-foundation.org,
 	Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: [PATCH net-next v2 1/8] net: napi: add irq_flags to napi struct
-Date: Wed, 18 Dec 2024 09:58:36 -0700
-Message-ID: <20241218165843.744647-2-ahmed.zaki@intel.com>
+Subject: [PATCH net-next v2 2/8] net: allow ARFS rmap management in core
+Date: Wed, 18 Dec 2024 09:58:37 -0700
+Message-ID: <20241218165843.744647-3-ahmed.zaki@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241218165843.744647-1-ahmed.zaki@intel.com>
 References: <20241218165843.744647-1-ahmed.zaki@intel.com>
@@ -88,216 +88,354 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add irq_flags to the napi struct. This will allow the drivers to choose
-how the core handles the IRQ assigned to the napi via
-netif_napi_set_irq().
+Add a new napi->irq flag; NAPIF_IRQ_ARFS_RMAP. A driver can use the flag
+when binding an irq to a napi:
+
+ netif_napi_set_irq(napi, irq, NAPIF_IRQ_ARFS_RMAP)
+
+and the core will update the ARFS rmap with the assigned irq affinity.
 
 Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_netdev.c      | 2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 2 +-
- drivers/net/ethernet/broadcom/tg3.c               | 2 +-
- drivers/net/ethernet/google/gve/gve_utils.c       | 2 +-
- drivers/net/ethernet/intel/e1000/e1000_main.c     | 2 +-
- drivers/net/ethernet/intel/e1000e/netdev.c        | 2 +-
- drivers/net/ethernet/intel/ice/ice_lib.c          | 2 +-
- drivers/net/ethernet/mellanox/mlx4/en_cq.c        | 4 ++--
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 +-
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c      | 3 ++-
- include/linux/netdevice.h                         | 6 ++----
- net/core/dev.c                                    | 9 ++++++++-
- 12 files changed, 22 insertions(+), 16 deletions(-)
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  | 19 ++++---------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 25 ++++++-----------
+ drivers/net/ethernet/intel/ice/ice_arfs.c     | 10 +------
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  5 ++++
+ drivers/net/ethernet/qlogic/qede/qede_main.c  | 28 +++++++++----------
+ drivers/net/ethernet/sfc/falcon/efx.c         |  9 ++++++
+ drivers/net/ethernet/sfc/falcon/nic.c         | 10 -------
+ drivers/net/ethernet/sfc/siena/efx_channels.c |  9 ++++++
+ drivers/net/ethernet/sfc/siena/nic.c          | 10 -------
+ include/linux/netdevice.h                     | 12 ++++++++
+ net/core/dev.c                                | 14 ++++++++++
+ 11 files changed, 77 insertions(+), 74 deletions(-)
 
 diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index c1295dfad0d0..4898c8be78ad 100644
+index 4898c8be78ad..752b1c61b610 100644
 --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
 +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -1712,7 +1712,7 @@ static int ena_request_io_irq(struct ena_adapter *adapter)
+@@ -165,23 +165,9 @@ int ena_xmit_common(struct ena_adapter *adapter,
+ static int ena_init_rx_cpu_rmap(struct ena_adapter *adapter)
+ {
+ #ifdef CONFIG_RFS_ACCEL
+-	u32 i;
+-	int rc;
+-
+ 	adapter->netdev->rx_cpu_rmap = alloc_irq_cpu_rmap(adapter->num_io_queues);
+ 	if (!adapter->netdev->rx_cpu_rmap)
+ 		return -ENOMEM;
+-	for (i = 0; i < adapter->num_io_queues; i++) {
+-		int irq_idx = ENA_IO_IRQ_IDX(i);
+-
+-		rc = irq_cpu_rmap_add(adapter->netdev->rx_cpu_rmap,
+-				      pci_irq_vector(adapter->pdev, irq_idx));
+-		if (rc) {
+-			free_irq_cpu_rmap(adapter->netdev->rx_cpu_rmap);
+-			adapter->netdev->rx_cpu_rmap = NULL;
+-			return rc;
+-		}
+-	}
+ #endif /* CONFIG_RFS_ACCEL */
+ 	return 0;
+ }
+@@ -1712,7 +1698,12 @@ static int ena_request_io_irq(struct ena_adapter *adapter)
  	for (i = 0; i < io_queue_count; i++) {
  		irq_idx = ENA_IO_IRQ_IDX(i);
  		irq = &adapter->irq_tbl[irq_idx];
--		netif_napi_set_irq(&adapter->ena_napi[i].napi, irq->vector);
-+		netif_napi_set_irq(&adapter->ena_napi[i].napi, irq->vector, 0);
++#ifdef CONFIG_RFS_ACCEL
++		netif_napi_set_irq(&adapter->ena_napi[i].napi, irq->vector,
++				   NAPIF_IRQ_ARFS_RMAP);
++#else
+ 		netif_napi_set_irq(&adapter->ena_napi[i].napi, irq->vector, 0);
++#endif
  	}
  
  	return rc;
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index b86f980fa7ea..4763c6300bd3 100644
+index 4763c6300bd3..ac729a25ba52 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -11225,7 +11225,7 @@ static int bnxt_request_irq(struct bnxt *bp)
+@@ -11192,11 +11192,8 @@ static void bnxt_free_irq(struct bnxt *bp)
+ 
+ static int bnxt_request_irq(struct bnxt *bp)
+ {
+-	int i, j, rc = 0;
++	int i, rc = 0;
+ 	unsigned long flags = 0;
+-#ifdef CONFIG_RFS_ACCEL
+-	struct cpu_rmap *rmap;
+-#endif
+ 
+ 	rc = bnxt_setup_int_mode(bp);
+ 	if (rc) {
+@@ -11204,28 +11201,22 @@ static int bnxt_request_irq(struct bnxt *bp)
+ 			   rc);
+ 		return rc;
+ 	}
+-#ifdef CONFIG_RFS_ACCEL
+-	rmap = bp->dev->rx_cpu_rmap;
+-#endif
+-	for (i = 0, j = 0; i < bp->cp_nr_rings; i++) {
++
++	for (i = 0; i < bp->cp_nr_rings; i++) {
+ 		int map_idx = bnxt_cp_num_to_irq_num(bp, i);
+ 		struct bnxt_irq *irq = &bp->irq_tbl[map_idx];
+ 
+-#ifdef CONFIG_RFS_ACCEL
+-		if (rmap && bp->bnapi[i]->rx_ring) {
+-			rc = irq_cpu_rmap_add(rmap, irq->vector);
+-			if (rc)
+-				netdev_warn(bp->dev, "failed adding irq rmap for ring %d\n",
+-					    j);
+-			j++;
+-		}
+-#endif
+ 		rc = request_irq(irq->vector, irq->handler, flags, irq->name,
+ 				 bp->bnapi[i]);
  		if (rc)
  			break;
  
--		netif_napi_set_irq(&bp->bnapi[i]->napi, irq->vector);
-+		netif_napi_set_irq(&bp->bnapi[i]->napi, irq->vector, 0);
++#ifdef CONFIG_RFS_ACCEL
++		netif_napi_set_irq(&bp->bnapi[i]->napi, irq->vector,
++				   NAPIF_IRQ_ARFS_RMAP);
++#else
+ 		netif_napi_set_irq(&bp->bnapi[i]->napi, irq->vector, 0);
++#endif
  		irq->requested = 1;
  
  		if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 9cc8db10a8d6..0d6383804270 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -7447,7 +7447,7 @@ static void tg3_napi_init(struct tg3 *tp)
- 	for (i = 0; i < tp->irq_cnt; i++) {
- 		netif_napi_add(tp->dev, &tp->napi[i].napi,
- 			       i ? tg3_poll_msix : tg3_poll);
--		netif_napi_set_irq(&tp->napi[i].napi, tp->napi[i].irq_vec);
-+		netif_napi_set_irq(&tp->napi[i].napi, tp->napi[i].irq_vec, 0);
- 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_arfs.c b/drivers/net/ethernet/intel/ice/ice_arfs.c
+index 7cee365cc7d1..54d51d218cae 100644
+--- a/drivers/net/ethernet/intel/ice/ice_arfs.c
++++ b/drivers/net/ethernet/intel/ice/ice_arfs.c
+@@ -590,14 +590,13 @@ void ice_free_cpu_rx_rmap(struct ice_vsi *vsi)
  }
  
-diff --git a/drivers/net/ethernet/google/gve/gve_utils.c b/drivers/net/ethernet/google/gve/gve_utils.c
-index 30fef100257e..2657e583f5c6 100644
---- a/drivers/net/ethernet/google/gve/gve_utils.c
-+++ b/drivers/net/ethernet/google/gve/gve_utils.c
-@@ -111,7 +111,7 @@ void gve_add_napi(struct gve_priv *priv, int ntfy_idx,
- 	struct gve_notify_block *block = &priv->ntfy_blocks[ntfy_idx];
+ /**
+- * ice_set_cpu_rx_rmap - setup CPU reverse map for each queue
++ * ice_set_cpu_rx_rmap - allocate CPU reverse map for a VSI
+  * @vsi: the VSI to be forwarded to
+  */
+ int ice_set_cpu_rx_rmap(struct ice_vsi *vsi)
+ {
+ 	struct net_device *netdev;
+ 	struct ice_pf *pf;
+-	int i;
  
- 	netif_napi_add(priv->dev, &block->napi, gve_poll);
--	netif_napi_set_irq(&block->napi, block->irq);
-+	netif_napi_set_irq(&block->napi, block->irq, 0);
+ 	if (!vsi || vsi->type != ICE_VSI_PF)
+ 		return 0;
+@@ -614,13 +613,6 @@ int ice_set_cpu_rx_rmap(struct ice_vsi *vsi)
+ 	if (unlikely(!netdev->rx_cpu_rmap))
+ 		return -EINVAL;
+ 
+-	ice_for_each_q_vector(vsi, i)
+-		if (irq_cpu_rmap_add(netdev->rx_cpu_rmap,
+-				     vsi->q_vectors[i]->irq.virq)) {
+-			ice_free_cpu_rx_rmap(vsi);
+-			return -EINVAL;
+-		}
+-
+ 	return 0;
  }
  
- void gve_remove_napi(struct gve_priv *priv, int ntfy_idx)
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index 3f089c3d47b2..a83af159837a 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -1394,7 +1394,7 @@ int e1000_open(struct net_device *netdev)
- 	/* From here on the code is the same as e1000_up() */
- 	clear_bit(__E1000_DOWN, &adapter->flags);
- 
--	netif_napi_set_irq(&adapter->napi, adapter->pdev->irq);
-+	netif_napi_set_irq(&adapter->napi, adapter->pdev->irq, 0);
- 	napi_enable(&adapter->napi);
- 	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_RX, &adapter->napi);
- 	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_TX, &adapter->napi);
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 286155efcedf..8fc5603ed962 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -4676,7 +4676,7 @@ int e1000e_open(struct net_device *netdev)
- 	else
- 		irq = adapter->pdev->irq;
- 
--	netif_napi_set_irq(&adapter->napi, irq);
-+	netif_napi_set_irq(&adapter->napi, irq, 0);
- 	napi_enable(&adapter->napi);
- 	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_RX, &adapter->napi);
- 	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_TX, &adapter->napi);
 diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index a7d45a8ce7ac..ff91e70f596f 100644
+index ff91e70f596f..7c0b2d8e86ba 100644
 --- a/drivers/net/ethernet/intel/ice/ice_lib.c
 +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2735,7 +2735,7 @@ void ice_vsi_set_napi_queues(struct ice_vsi *vsi)
+@@ -2735,7 +2735,12 @@ void ice_vsi_set_napi_queues(struct ice_vsi *vsi)
  	ice_for_each_q_vector(vsi, v_idx) {
  		struct ice_q_vector *q_vector = vsi->q_vectors[v_idx];
  
--		netif_napi_set_irq(&q_vector->napi, q_vector->irq.virq);
-+		netif_napi_set_irq(&q_vector->napi, q_vector->irq.virq, 0);
++#ifdef CONFIG_RFS_ACCEL
++		netif_napi_set_irq(&q_vector->napi, q_vector->irq.virq,
++				   NAPIF_IRQ_ARFS_RMAP);
++#else
+ 		netif_napi_set_irq(&q_vector->napi, q_vector->irq.virq, 0);
++#endif
  	}
  }
  
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_cq.c b/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-index 0e92956e84cf..b8531283e3ac 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-@@ -150,7 +150,7 @@ int mlx4_en_activate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq,
- 	case TX:
- 		cq->mcq.comp = mlx4_en_tx_irq;
- 		netif_napi_add_tx(cq->dev, &cq->napi, mlx4_en_poll_tx_cq);
--		netif_napi_set_irq(&cq->napi, irq);
-+		netif_napi_set_irq(&cq->napi, irq, 0);
- 		napi_enable(&cq->napi);
- 		netif_queue_set_napi(cq->dev, cq_idx, NETDEV_QUEUE_TYPE_TX, &cq->napi);
- 		break;
-@@ -158,7 +158,7 @@ int mlx4_en_activate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq,
- 		cq->mcq.comp = mlx4_en_rx_irq;
- 		netif_napi_add_config(cq->dev, &cq->napi, mlx4_en_poll_rx_cq,
- 				      cq_idx);
--		netif_napi_set_irq(&cq->napi, irq);
-+		netif_napi_set_irq(&cq->napi, irq, 0);
- 		napi_enable(&cq->napi);
- 		netif_queue_set_napi(cq->dev, cq_idx, NETDEV_QUEUE_TYPE_RX, &cq->napi);
- 		break;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index dd16d73000c3..58b8313f4c5a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -2733,7 +2733,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
- 	c->lag_port = mlx5e_enumerate_lag_port(mdev, ix);
+diff --git a/drivers/net/ethernet/qlogic/qede/qede_main.c b/drivers/net/ethernet/qlogic/qede/qede_main.c
+index 99df00c30b8c..27c987435242 100644
+--- a/drivers/net/ethernet/qlogic/qede/qede_main.c
++++ b/drivers/net/ethernet/qlogic/qede/qede_main.c
+@@ -1944,12 +1944,24 @@ static void qede_napi_disable_remove(struct qede_dev *edev)
  
- 	netif_napi_add_config(netdev, &c->napi, mlx5e_napi_poll, ix);
--	netif_napi_set_irq(&c->napi, irq);
-+	netif_napi_set_irq(&c->napi, irq, 0);
+ static void qede_napi_add_enable(struct qede_dev *edev)
+ {
++	struct qede_fastpath *fp = &edev->fp_array[i];
+ 	int i;
  
- 	err = mlx5e_open_queues(c, params, cparam);
- 	if (unlikely(err))
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index b5050fabe8fe..6ca91ce85d48 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -1227,7 +1227,8 @@ static int fbnic_alloc_napi_vector(struct fbnic_dev *fbd, struct fbnic_net *fbn,
+ 	/* Add NAPI objects */
+ 	for_each_queue(i) {
+-		netif_napi_add(edev->ndev, &edev->fp_array[i].napi, qede_poll);
+-		napi_enable(&edev->fp_array[i].napi);
++		fp = &edev->fp_array[i];
++		netif_napi_add(edev->ndev, &fp->napi, qede_poll);
++		napi_enable(&fp->napi);
++		if (edev->ndev->rx_cpu_rmap && (fp->type & QEDE_FASTPATH_RX))
++#ifdef CONFIG_RFS_ACCEL
++			netif_napi_set_irq(&edev->fp_array[i].napi,
++					   edev->int_info.msix[i].vector,
++					   NAPIF_IRQ_ARFS_RMAP);
++#else
++			netif_napi_set_irq(&edev->fp_array[i].napi,
++					   edev->int_info.msix[i].vector,
++					   0);
++#endif
+ 	}
+ }
  
- 	/* Record IRQ to NAPI struct */
- 	netif_napi_set_irq(&nv->napi,
--			   pci_irq_vector(to_pci_dev(fbd->dev), nv->v_idx));
-+			   pci_irq_vector(to_pci_dev(fbd->dev), nv->v_idx),
-+			   0);
+@@ -1983,18 +1995,6 @@ static int qede_req_msix_irqs(struct qede_dev *edev)
+ 	}
  
- 	/* Tie nv back to PCIe dev */
- 	nv->dev = fbd->dev;
+ 	for (i = 0; i < QEDE_QUEUE_CNT(edev); i++) {
+-#ifdef CONFIG_RFS_ACCEL
+-		struct qede_fastpath *fp = &edev->fp_array[i];
+-
+-		if (edev->ndev->rx_cpu_rmap && (fp->type & QEDE_FASTPATH_RX)) {
+-			rc = irq_cpu_rmap_add(edev->ndev->rx_cpu_rmap,
+-					      edev->int_info.msix[i].vector);
+-			if (rc) {
+-				DP_ERR(edev, "Failed to add CPU rmap\n");
+-				qede_free_arfs(edev);
+-			}
+-		}
+-#endif
+ 		rc = request_irq(edev->int_info.msix[i].vector,
+ 				 qede_msix_fp_int, 0, edev->fp_array[i].name,
+ 				 &edev->fp_array[i]);
+diff --git a/drivers/net/ethernet/sfc/falcon/efx.c b/drivers/net/ethernet/sfc/falcon/efx.c
+index b07f7e4e2877..8c2f850d4639 100644
+--- a/drivers/net/ethernet/sfc/falcon/efx.c
++++ b/drivers/net/ethernet/sfc/falcon/efx.c
+@@ -2004,6 +2004,15 @@ static void ef4_init_napi_channel(struct ef4_channel *channel)
+ 
+ 	channel->napi_dev = efx->net_dev;
+ 	netif_napi_add(channel->napi_dev, &channel->napi_str, ef4_poll);
++
++	if (efx->interrupt_mode == EF4_INT_MODE_MSIX &&
++	    channel->channel < efx->n_rx_channels)
++#ifdef CONFIG_RFS_ACCEL
++		netif_napi_set_irq(&channel->napi_str, channel->irq,
++				   NAPIF_IRQ_ARFS_RMAP);
++#else
++		netif_napi_set_irq(&channel->napi_str, channel->irq, 0);
++#endif
+ }
+ 
+ static void ef4_init_napi(struct ef4_nic *efx)
+diff --git a/drivers/net/ethernet/sfc/falcon/nic.c b/drivers/net/ethernet/sfc/falcon/nic.c
+index a6304686bc90..fa31d83e64e4 100644
+--- a/drivers/net/ethernet/sfc/falcon/nic.c
++++ b/drivers/net/ethernet/sfc/falcon/nic.c
+@@ -115,16 +115,6 @@ int ef4_nic_init_interrupt(struct ef4_nic *efx)
+ 			goto fail2;
+ 		}
+ 		++n_irqs;
+-
+-#ifdef CONFIG_RFS_ACCEL
+-		if (efx->interrupt_mode == EF4_INT_MODE_MSIX &&
+-		    channel->channel < efx->n_rx_channels) {
+-			rc = irq_cpu_rmap_add(efx->net_dev->rx_cpu_rmap,
+-					      channel->irq);
+-			if (rc)
+-				goto fail2;
+-		}
+-#endif
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/net/ethernet/sfc/siena/efx_channels.c b/drivers/net/ethernet/sfc/siena/efx_channels.c
+index d120b3c83ac0..6fed4f7b311f 100644
+--- a/drivers/net/ethernet/sfc/siena/efx_channels.c
++++ b/drivers/net/ethernet/sfc/siena/efx_channels.c
+@@ -1321,6 +1321,15 @@ static void efx_init_napi_channel(struct efx_channel *channel)
+ 
+ 	channel->napi_dev = efx->net_dev;
+ 	netif_napi_add(channel->napi_dev, &channel->napi_str, efx_poll);
++
++	if (efx->interrupt_mode == EFX_INT_MODE_MSIX &&
++	    channel->channel < efx->n_rx_channels)
++#ifdef CONFIG_RFS_ACCEL
++		netif_napi_set_irq(&channel->napi_str, channel->irq,
++				   NAPIF_IRQ_ARFS_RMAP);
++#else
++		netif_napi_set_irq(&channel->napi_str, channel->irq, 0);
++#endif
+ }
+ 
+ void efx_siena_init_napi(struct efx_nic *efx)
+diff --git a/drivers/net/ethernet/sfc/siena/nic.c b/drivers/net/ethernet/sfc/siena/nic.c
+index 32fce70085e3..28ef6222395e 100644
+--- a/drivers/net/ethernet/sfc/siena/nic.c
++++ b/drivers/net/ethernet/sfc/siena/nic.c
+@@ -117,16 +117,6 @@ int efx_siena_init_interrupt(struct efx_nic *efx)
+ 			goto fail2;
+ 		}
+ 		++n_irqs;
+-
+-#ifdef CONFIG_RFS_ACCEL
+-		if (efx->interrupt_mode == EFX_INT_MODE_MSIX &&
+-		    channel->channel < efx->n_rx_channels) {
+-			rc = irq_cpu_rmap_add(efx->net_dev->rx_cpu_rmap,
+-					      channel->irq);
+-			if (rc)
+-				goto fail2;
+-		}
+-#endif
+ 	}
+ 
+ 	efx->irqs_hooked = true;
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 2593019ad5b1..ca91b6662bde 100644
+index ca91b6662bde..0df419052434 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -392,6 +392,7 @@ struct napi_struct {
- 	struct list_head	dev_list;
- 	struct hlist_node	napi_hash_node;
- 	int			irq;
-+	unsigned long		irq_flags;
- 	int			index;
- 	struct napi_config	*config;
+@@ -354,6 +354,18 @@ struct napi_config {
+ 	unsigned int napi_id;
  };
-@@ -2671,10 +2672,7 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
- 			  enum netdev_queue_type type,
- 			  struct napi_struct *napi);
  
--static inline void netif_napi_set_irq(struct napi_struct *napi, int irq)
--{
--	napi->irq = irq;
--}
-+void netif_napi_set_irq(struct napi_struct *napi, int irq, unsigned long flags);
- 
- /* Default NAPI poll() weight
-  * Device drivers are strongly advised to not use bigger value
++enum {
++#ifdef CONFIG_RFS_ACCEL
++	NAPI_IRQ_ARFS_RMAP,		/* Core handles RMAP updates */
++#endif
++};
++
++enum {
++#ifdef CONFIG_RFS_ACCEL
++	NAPIF_IRQ_ARFS_RMAP		= BIT(NAPI_IRQ_ARFS_RMAP),
++#endif
++};
++
+ /*
+  * Structure for NAPI scheduling similar to tasklet but with weighting
+  */
 diff --git a/net/core/dev.c b/net/core/dev.c
-index c7f3dea3e0eb..88a7d4b6e71b 100644
+index 88a7d4b6e71b..7c3abff48aea 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -6705,6 +6705,13 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
- }
- EXPORT_SYMBOL(netif_queue_set_napi);
+@@ -6707,8 +6707,22 @@ EXPORT_SYMBOL(netif_queue_set_napi);
  
-+void netif_napi_set_irq(struct napi_struct *napi, int irq, unsigned long flags)
-+{
-+	napi->irq = irq;
-+	napi->irq_flags = flags;
-+}
-+EXPORT_SYMBOL(netif_napi_set_irq);
-+
- static void napi_restore_config(struct napi_struct *n)
+ void netif_napi_set_irq(struct napi_struct *napi, int irq, unsigned long flags)
  {
- 	n->defer_hard_irqs = n->config->defer_hard_irqs;
-@@ -6770,7 +6777,7 @@ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
- 	 */
- 	if (dev->threaded && napi_kthread_create(napi))
- 		dev->threaded = false;
--	netif_napi_set_irq(napi, -1);
-+	netif_napi_set_irq(napi, -1, 0);
++	int  rc;
++
+ 	napi->irq = irq;
+ 	napi->irq_flags = flags;
++
++#ifdef CONFIG_RFS_ACCEL
++	if (napi->dev->rx_cpu_rmap && flags & NAPIF_IRQ_ARFS_RMAP) {
++		rc = irq_cpu_rmap_add(napi->dev->rx_cpu_rmap, irq);
++		if (rc) {
++			netdev_warn(napi->dev, "Unable to update ARFS map (%d).\n",
++				    rc);
++			free_irq_cpu_rmap(napi->dev->rx_cpu_rmap);
++			napi->dev->rx_cpu_rmap = NULL;
++		}
++	}
++#endif
  }
- EXPORT_SYMBOL(netif_napi_add_weight);
+ EXPORT_SYMBOL(netif_napi_set_irq);
  
 -- 
 2.43.0
