@@ -1,74 +1,50 @@
-Return-Path: <netdev+bounces-152792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3586D9F5C98
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:04:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA709F5CA2
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:10:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7274D164E87
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 02:04:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F441188E17F
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 02:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C4A450EE;
-	Wed, 18 Dec 2024 02:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8025473C;
+	Wed, 18 Dec 2024 02:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="fjy7hQBm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bv/dJYVN"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CDD35976;
-	Wed, 18 Dec 2024 02:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5710279C4
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734487433; cv=none; b=GKHFGzIuqMxdirE2Bli55fsQUbNdfC3mdg02GzYrnZHOXgJpkL504fJevjApHvAselTOJPXgTWmVoL5Vunc9o55HHDKyi3J7Qd4U2ki8/hMHABHubx+aEYqkUqRbdei42Svsu3e47cV3EXrRHP+rK3p6spXb8unbM48MllLoQnQ=
+	t=1734487817; cv=none; b=ccQOkgqKHO7bqPGLZBj7FAM3X5wB8IKitKELXXjyHpblO9wZkTxH+hfkN3RPSyAlJZSRBcAOLeCDgelvo9aLZOq6PWO7SCbBJoNZJXkE6q4m2mWa705ozUD9N+SyD1GgU8Qv5X6ed3PF3IJOUUNeiKj9iNgp0XvfsdMOEK0Ch2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734487433; c=relaxed/simple;
-	bh=dsQ1qVpn9JoAKcrX4s09Fj3i5aJrldx5P82N3jLp1ws=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dqPhLc8eLLpQybZZImyfdaq5Xa4KnzxEFqcoJw29sHBCYheL2zL1b2UeHEgdQemGD9ktKOoXicQuQatmRWtJj/OqrHtDaql2sll9fXVBhNU8Xv9JB7deA8y3enqMCyZDaHZw/DXLLm1e0yrUz6wA9TXzKM5MZA0TGU0r8Wky/Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fjy7hQBm; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1734487432; x=1766023432;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=dsQ1qVpn9JoAKcrX4s09Fj3i5aJrldx5P82N3jLp1ws=;
-  b=fjy7hQBm90ubb5h7ETP+rC4FJHNHUM9tRKWFTIu6wUJUqnL4+nnLdcEm
-   c0a7KluRDlTFHEjBF/cYPL5EbTwlbVh+jvs52TQRUBbnqXgpoU8uVNTsE
-   VXm9SulA1uSGxtOFgqSP/1aMnJcu9M6/uvFaI7Hct5o6WrMbfVTnGVFPR
-   xEFgSyGjxOIlTyeG9HxAgjgsRJw/rEMwXMKfwAzWA8LsKRiK6HWv/x/GV
-   xUYwPYvCdW6e+jJS0LHzxPjhWPKWU7sK9vdujN12MCAE8v94hqHhYl5w0
-   gYcLBTplB0BsQBVE+cOoURQkC+fsiNjr2YbjfBOHh0HtfL504m1+E1ew0
-   g==;
-X-CSE-ConnectionGUID: BqSBYqbgTD6jKwbb+14uoQ==
-X-CSE-MsgGUID: fB0cVI5FST2Gn7jFPO0+0Q==
-X-IronPort-AV: E=Sophos;i="6.12,243,1728975600"; 
-   d="scan'208";a="35342149"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Dec 2024 19:03:50 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 17 Dec 2024 19:03:10 -0700
-Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 17 Dec 2024 19:03:10 -0700
-From: <Tristram.Ha@microchip.com>
-To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
-	<tristram.ha@microchip.com>
-Subject: [PATCH net-next] net: dsa: microchip: Add suspend/resume support to KSZ DSA driver
-Date: Tue, 17 Dec 2024 18:03:11 -0800
-Message-ID: <20241218020311.70628-1-Tristram.Ha@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1734487817; c=relaxed/simple;
+	bh=YtFMW0/wK4sJfEiDPT6U0u0W3YC0CnV18VZ/3IqGeCk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DlA8hIbtfpXciBHvcHh1/mufW+o/DL40MFFNwq9krG9iXPl5BakbJ1Vjo5SJiJe8B+rHQ0wfmYpc9ir4jZQP0NEwD7mAVV87vvR8c+XBfQeIgvCS9SKXJnwykStPnBFx/zlVzeC1dMvag6U/ZJob1P861kISDnGFuanVgnkjAg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bv/dJYVN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFEE4C4CED3;
+	Wed, 18 Dec 2024 02:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734487816;
+	bh=YtFMW0/wK4sJfEiDPT6U0u0W3YC0CnV18VZ/3IqGeCk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Bv/dJYVNJLhPbaqflTR1eH4qalAyTKMPp+eRtVVMIvR3WUl12PLcDh6M+8eHNFbOf
+	 5MmzSva40idY2qdcXgPM594vr9q5p0nqt4l+cCiYsM5CSkeb7dTIzcVbMBvOTm19+N
+	 xbmqVsstPi9PZ+Oz2b6Ku7Fwkf0D2eq2Zrpri61gZP60SUGQrmgMOtPVI9y71rX7er
+	 H/HS6zTsYPns+yroDG+p552wH73i0X76FcHv3uUTHytOkjakgxfj1COMP+k1xEBvwa
+	 MBmZzFfvvEV+WsAWj9oshFpocD4liRnGB3pb6uwJf3f3EiQ20Lf5k8qT01wfqyadR1
+	 R5bB7Fy660qnw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D2D3806657;
+	Wed, 18 Dec 2024 02:10:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,138 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Subject: Re: [PATCH v1 net] rtnetlink: Try the outer netns attribute in
+ rtnl_get_peer_net().
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173448783406.1150742.9924553595674828094.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Dec 2024 02:10:34 +0000
+References: <20241216110432.51488-1-kuniyu@amazon.com>
+In-Reply-To: <20241216110432.51488-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, cong.wang@bytedance.com,
+ kuni1840@gmail.com, netdev@vger.kernel.org, shaw.leon@gmail.com
 
-From: Tristram Ha <tristram.ha@microchip.com>
+Hello:
 
-The KSZ DSA driver starts a timer to read MIB counters periodically to
-avoid count overrun.  During system suspend this will give an error for
-not able to write to register as the SPI system returns an error when
-it is in suspend state.  This implementation stops the timer when the
-system goes into suspend and restarts it when resumed.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
----
- drivers/net/dsa/microchip/ksz9477_i2c.c |  4 +++
- drivers/net/dsa/microchip/ksz_common.c  | 37 +++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz_common.h  |  2 ++
- drivers/net/dsa/microchip/ksz_spi.c     |  4 +++
- 4 files changed, 47 insertions(+)
+On Mon, 16 Dec 2024 20:04:32 +0900 you wrote:
+> Xiao Liang reported that the cited commit changed netns handling
+> in newlink() of netkit, veth, and vxcan.
+> 
+> Before the patch, if we don't find a netns attribute in the peer
+> device attributes, we tried to find another netns attribute in
+> the outer netlink attributes by passing it to rtnl_link_get_net().
+> 
+> [...]
 
-diff --git a/drivers/net/dsa/microchip/ksz9477_i2c.c b/drivers/net/dsa/microchip/ksz9477_i2c.c
-index 1c6d7fc16772..a2beb27459f1 100644
---- a/drivers/net/dsa/microchip/ksz9477_i2c.c
-+++ b/drivers/net/dsa/microchip/ksz9477_i2c.c
-@@ -127,10 +127,14 @@ static const struct of_device_id ksz9477_dt_ids[] = {
- };
- MODULE_DEVICE_TABLE(of, ksz9477_dt_ids);
- 
-+static DEFINE_SIMPLE_DEV_PM_OPS(ksz_i2c_pm_ops,
-+				ksz_switch_suspend, ksz_switch_resume);
-+
- static struct i2c_driver ksz9477_i2c_driver = {
- 	.driver = {
- 		.name	= "ksz9477-switch",
- 		.of_match_table = ksz9477_dt_ids,
-+		.pm = &ksz_i2c_pm_ops,
- 	},
- 	.probe = ksz9477_i2c_probe,
- 	.remove	= ksz9477_i2c_remove,
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index df314724e6a7..a8dac7ff6b81 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -4586,6 +4586,23 @@ static int ksz_hsr_leave(struct dsa_switch *ds, int port,
- 	return 0;
- }
- 
-+static int ksz_suspend(struct dsa_switch *ds)
-+{
-+	struct ksz_device *dev = ds->priv;
-+
-+	cancel_delayed_work_sync(&dev->mib_read);
-+	return 0;
-+}
-+
-+static int ksz_resume(struct dsa_switch *ds)
-+{
-+	struct ksz_device *dev = ds->priv;
-+
-+	if (dev->mib_read_interval)
-+		schedule_delayed_work(&dev->mib_read, dev->mib_read_interval);
-+	return 0;
-+}
-+
- static const struct dsa_switch_ops ksz_switch_ops = {
- 	.get_tag_protocol	= ksz_get_tag_protocol,
- 	.connect_tag_protocol   = ksz_connect_tag_protocol,
-@@ -4626,6 +4643,8 @@ static const struct dsa_switch_ops ksz_switch_ops = {
- 	.port_max_mtu		= ksz_max_mtu,
- 	.get_wol		= ksz_get_wol,
- 	.set_wol		= ksz_set_wol,
-+	.suspend		= ksz_suspend,
-+	.resume			= ksz_resume,
- 	.get_ts_info		= ksz_get_ts_info,
- 	.port_hwtstamp_get	= ksz_hwtstamp_get,
- 	.port_hwtstamp_set	= ksz_hwtstamp_set,
-@@ -5126,6 +5145,24 @@ void ksz_switch_remove(struct ksz_device *dev)
- }
- EXPORT_SYMBOL(ksz_switch_remove);
- 
-+#ifdef CONFIG_PM_SLEEP
-+int ksz_switch_suspend(struct device *dev)
-+{
-+	struct ksz_device *priv = dev_get_drvdata(dev);
-+
-+	return dsa_switch_suspend(priv->ds);
-+}
-+EXPORT_SYMBOL(ksz_switch_suspend);
-+
-+int ksz_switch_resume(struct device *dev)
-+{
-+	struct ksz_device *priv = dev_get_drvdata(dev);
-+
-+	return dsa_switch_resume(priv->ds);
-+}
-+EXPORT_SYMBOL(ksz_switch_resume);
-+#endif
-+
- MODULE_AUTHOR("Woojung Huh <Woojung.Huh@microchip.com>");
- MODULE_DESCRIPTION("Microchip KSZ Series Switch DSA Driver");
- MODULE_LICENSE("GPL");
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index b3bb75ca0796..2bc96127a447 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -444,6 +444,8 @@ struct ksz_dev_ops {
- struct ksz_device *ksz_switch_alloc(struct device *base, void *priv);
- int ksz_switch_register(struct ksz_device *dev);
- void ksz_switch_remove(struct ksz_device *dev);
-+int ksz_switch_suspend(struct device *dev);
-+int ksz_switch_resume(struct device *dev);
- 
- void ksz_init_mib_timer(struct ksz_device *dev);
- bool ksz_is_port_mac_global_usable(struct dsa_switch *ds, int port);
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index 108a958dc356..b633d263098c 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -239,10 +239,14 @@ static const struct spi_device_id ksz_spi_ids[] = {
- };
- MODULE_DEVICE_TABLE(spi, ksz_spi_ids);
- 
-+static DEFINE_SIMPLE_DEV_PM_OPS(ksz_spi_pm_ops,
-+				ksz_switch_suspend, ksz_switch_resume);
-+
- static struct spi_driver ksz_spi_driver = {
- 	.driver = {
- 		.name	= "ksz-switch",
- 		.of_match_table = ksz_dt_ids,
-+		.pm = &ksz_spi_pm_ops,
- 	},
- 	.id_table = ksz_spi_ids,
- 	.probe	= ksz_spi_probe,
+Here is the summary with links:
+  - [v1,net] rtnetlink: Try the outer netns attribute in rtnl_get_peer_net().
+    https://git.kernel.org/netdev/net/c/954a2b40719a
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
