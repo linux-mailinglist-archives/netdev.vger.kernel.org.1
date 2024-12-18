@@ -1,182 +1,139 @@
-Return-Path: <netdev+bounces-153104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD5E9F6C9E
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:49:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C80E99F6CAD
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:52:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02F4916D36C
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:48:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24ABD164338
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D2D1FDE05;
-	Wed, 18 Dec 2024 17:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6DE81F7072;
+	Wed, 18 Dec 2024 17:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G27KAmJD"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eVM2C8Oe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC7C1FDE04;
-	Wed, 18 Dec 2024 17:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109661A256E
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 17:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734543954; cv=none; b=koatchYi9Tm4Tt6QQfAlzjP3QCfnm7XSh9jgLAmSQGMoWIEIIW2CcNqEBQ5aDebEhNh69b/2WD35yghPAwgBlITv4Z53u0gETN+64fPuL8V/3hivgzpGIamDzxyGJPHhhftpTLvzrVz9IT3LniYbMmBEQYgvzMENq8Au7zac7ec=
+	t=1734544320; cv=none; b=WRda/PYfvrH/8WaimmwfRngYqw2iWX178pIF2aydeNMDG8RIKyRd4rrxPkqGKgRBbnFtjeMU2fFSYT4gjC7VxEx/6i7TrGWf/2lMYvdshFW32A3r+K0cB8JEGPmDVK1oFlyBmua0wUtvYJG7Fgu+BKL67YJXT1yh5j8PGNK/wnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734543954; c=relaxed/simple;
-	bh=UGK9PXGjTDILxlx3M92s+knR+V9YBUJZmeVx8m1Tmbs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OAwW8RpZLbS0oyjNxQxeL9itFJWyqRnxECxl/xkDh/fQe9zt2ATj7SaLD626LVc36LRwK+Fhu6yge1NvZ3BcJm9wpSZnQ2a3UYPNNcZvFWoZCfJZ0OwgxF2D0tuYOl+Rhylyfvc7unvNihpcOKyR3k+IcSSp/ZDc3yzG4+qjV1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G27KAmJD; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734543953; x=1766079953;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UGK9PXGjTDILxlx3M92s+knR+V9YBUJZmeVx8m1Tmbs=;
-  b=G27KAmJDTIrZCOYd0NAsW4D84Tdu/1bBEd1IZCSyve8/rmvZMFMtm27x
-   V2qpgupOyldck41edqYIO8R6k2g2W0CLxHP1ka3+cAPQqHYpUeFVbF3QC
-   R5eUxHZ1CnooTHarwXaB5SALev0x8tJrhZx9mVSPt8VhJjV8xwmFqBc1a
-   r4lPWYB4WoWz/8jtEYIIVsV9O2GwxWFZbs4tz8hUduJV1ZDTHG7gHM4Nj
-   F4b8EiRsPrDkO+CYUu7QmfHv+0I0E+0Qdr6fMcETkmJoFV5RZw9qN9kO4
-   h0pRhXSscoRnuKs+FGQWZyjO+f/CqBp5YyFAIW7vYHh4GYDyoAYSyr/2O
-   w==;
-X-CSE-ConnectionGUID: 12uYQKD7T26E093mMskSvA==
-X-CSE-MsgGUID: 48VmCRj9SOOyKAvgh2f4VQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="22621050"
-X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
-   d="scan'208";a="22621050"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 09:45:52 -0800
-X-CSE-ConnectionGUID: j1MjQuvATR+tvTDQv4MMrw==
-X-CSE-MsgGUID: IAjujpsBQwO1IMCJR3dSPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="121192364"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa002.fm.intel.com with ESMTP; 18 Dec 2024 09:45:48 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1734544320; c=relaxed/simple;
+	bh=2So0nul1mz0/2K4Ol25NHSdvjvCJf1yUkrkJLZzp1jk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JD/NR42nIuI6mwuRIUmWmoNaiLeVYtrWjJWAo0OIaa27qpdgwLofQlzpQjj5q+ZlAsh1BAFuENQ2xVzJSgGLL+qMUY7RKWhgyAusBWJgPX/EIVZ3fRnQSL6Upr4r8XKIFLmPIFSdRRo5pGwFqjOtzZk7Y2UP7Pn28WzlkNhgTdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eVM2C8Oe; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso8974102a12.0
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 09:51:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1734544317; x=1735149117; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WuTI8JBt/EZ+l8PFms5uxro4CHQ/QT9ZzGcBaY71A3k=;
+        b=eVM2C8OeHoEjet1QRZ2YNkAD/OewghUWzeX+AWuzumsyaBz+5Xvvn3/KfTbiBVWxin
+         6vzP6NXiX4taQC1GFnLKb/982MWXadCAyerVBa0MdkMKN5NeiUTOdlWk6lzJtzl0800K
+         gZwfFNH71MAGSwFVWXWyVamphZW+RcUVY+bPlGPJDwlnc/D65286cJ+TvcqJMIOv5699
+         IL7AbPJWew/kUrnC/W1hVt9k/xg3MGySrdKqX5lxXB3ywI9nWn77NWaBmKBO6/+r5o0b
+         oeTfRhH4zlYqJ/tvi3TR+4/AFrz8sFUaD9CJW7n9i680u2VQaVG6jRM1w2tk/bsIjReZ
+         PCrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734544317; x=1735149117;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WuTI8JBt/EZ+l8PFms5uxro4CHQ/QT9ZzGcBaY71A3k=;
+        b=NXRpfG7AttuA85v9dUEnmUxgjJKTluV4N70yDhEuJFEqejySP5nMlsugctkWE2fJuO
+         Sqj1FyoKcwR7YxKWwxsqBu3jRX7ysguVG9V9zbfLXJNRwWRFPViAussSywRYCAtenk8w
+         AEsy7SKGRtuMy90aEGmded2zmPoK60CZFFDz8g37WU7Ki6vnFL7vCZ5RUak1IyAc5VXC
+         BIklqHR7n6p+mrUPAGo5c2F74/kPWWG12sj1d9yfcIjOM+XkeVLWtzDx2c9uM55cB5p7
+         g/BwyhEDq6jRZYj+WDKakavEIX51vqRXVSB6j621+jDQ7cJlRp441xBRUt7A4joruQQA
+         ye+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCViVXsbRXO1/BKLVaBCwTaajO+PIG4MbyeEqDABuavmE//U8oiNICYDAZ5jP0e87rgShFOwJfs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz847wZwzl9dN+LjnJy68synsVon9dft09CTrN4bebXV2ZBmoX1
+	yG0zg9djqWtdcjiXSCNkRdjpNVmOybB88ck9t8W20ra1t6kz+evdMsCJhT1IzyY=
+X-Gm-Gg: ASbGncsI64KLmzXr46n5c5jG6yqYlpuFle7I1bdDQde3jt6RCuD9D7NAzF8tq81y0uE
+	+7bg0akU6siDcvSZ+17j43dgKYrk33H3JldhjtCJ/dr9CC3U8DsPwj7+oX7dAwVDUUynRYa2oWX
+	As5bS44hlqfKAyE0V/L6OYbriG5aRpbg24URF8TjFZRssnpWzThis9dHIeoRacmFmUjVydw5uGK
+	ZQtAS2LBNiEEjz0vvKhGK82B2S+ukfMHephpA0geVqo2MdoQ/BzoRoeGNksSg==
+X-Google-Smtp-Source: AGHT+IH1c0SiqJ9S0vW3GjpTrilhfirwlgVe7LxPXAmcmvdcFWW1srbLC4xqZpvUu0l/1LZk2/U+3g==
+X-Received: by 2002:a05:6402:3581:b0:5d7:ea25:c72f with SMTP id 4fb4d7f45d1cf-5d7ee3ff3acmr4017187a12.25.1734544317452;
+        Wed, 18 Dec 2024 09:51:57 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d652ad1b31sm5553348a12.33.2024.12.18.09.51.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2024 09:51:57 -0800 (PST)
+Date: Wed, 18 Dec 2024 20:51:53 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
+	netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	"Jose E. Marchesi" <jose.marchesi@oracle.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jason Baron <jbaron@akamai.com>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 7/7] unroll: add generic loop unroll helpers
-Date: Wed, 18 Dec 2024 18:44:35 +0100
-Message-ID: <20241218174435.1445282-8-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241218174435.1445282-1-aleksander.lobakin@intel.com>
-References: <20241218174435.1445282-1-aleksander.lobakin@intel.com>
+	Geethasowjanya Akula <gakula@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, Dan Carpenter <error27@gmail.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net v2 1/2] octeontx2-pf: fix netdev memory leak in
+ rvu_rep_create()
+Message-ID: <116fc5cb-cc46-4e0f-9990-499ae7ef90ee@stanley.mountain>
+References: <20241217052326.1086191-1-harshit.m.mogalapalli@oracle.com>
+ <8d54b21b-7ca9-4126-ba13-bbd333d6ba0c@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <8d54b21b-7ca9-4126-ba13-bbd333d6ba0c@web.de>
 
-There are cases when we need to explicitly unroll loops. For example,
-cache operations, filling DMA descriptors on very high speeds etc.
-Add compiler-specific attribute macros to give the compiler a hint
-that we'd like to unroll a loop.
-Example usage:
+On Wed, Dec 18, 2024 at 06:38:25PM +0100, Markus Elfring wrote:
+> > When rvu_rep_devlink_port_register() fails, free_netdev(ndev) for this
+> > incomplete iteration before going to "exit:" label.
+> 
+> 
+> …
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+> > @@ -680,8 +680,10 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
+> >  		ndev->features |= ndev->hw_features;
+> >  		eth_hw_addr_random(ndev);
+> >  		err = rvu_rep_devlink_port_register(rep);
+> > -		if (err)
+> > +		if (err) {
+> > +			free_netdev(ndev);
+> >  			goto exit;
+> > +		}
+> >
+> >  		SET_NETDEV_DEVLINK_PORT(ndev, &rep->dl_port);
+> …
+> 
+> I suggest to add another jump target instead so that a bit of exception handling
+> can be better reused at the end of this function implementation.
+> 
 
- #define UNROLL_BATCH 8
+When you're cleaning up from inside a loop, then the best practices is
+to clean up partial iterations before the goto and then clean up whole
+iterations in the unwind ladder.  So this patch is better the way that
+Harshit his written it.
 
-	unrolled_count(UNROLL_BATCH)
-	for (u32 i = 0; i < UNROLL_BATCH; i++)
-		op(priv, i);
+regards,
+dan carpenter
 
-Note that sometimes the compilers won't unroll loops if they think this
-would have worse optimization and perf than without unrolling, and that
-unroll attributes are available only starting GCC 8. For older compiler
-versions, no hints/attributes will be applied.
-For better unrolling/parallelization, don't have any variables that
-interfere between iterations except for the iterator itself.
-
-Co-developed-by: Jose E. Marchesi <jose.marchesi@oracle.com> # pragmas
-Signed-off-by: Jose E. Marchesi <jose.marchesi@oracle.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/linux/unroll.h | 44 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
-
-diff --git a/include/linux/unroll.h b/include/linux/unroll.h
-index d42fd6366373..863fb69f6a7e 100644
---- a/include/linux/unroll.h
-+++ b/include/linux/unroll.h
-@@ -9,6 +9,50 @@
- 
- #include <linux/args.h>
- 
-+#ifdef CONFIG_CC_IS_CLANG
-+#define __pick_unrolled(x, y)		_Pragma(#x)
-+#elif CONFIG_GCC_VERSION >= 80000
-+#define __pick_unrolled(x, y)		_Pragma(#y)
-+#else
-+#define __pick_unrolled(x, y)		/* not supported */
-+#endif
-+
-+/**
-+ * unrolled - loop attributes to ask the compiler to unroll it
-+ *
-+ * Usage:
-+ *
-+ * #define BATCH 8
-+ *
-+ *	unrolled_count(BATCH)
-+ *	for (u32 i = 0; i < BATCH; i++)
-+ *		// loop body without cross-iteration dependencies
-+ *
-+ * This is only a hint and the compiler is free to disable unrolling if it
-+ * thinks the count is suboptimal and may hurt performance and/or hugely
-+ * increase object code size.
-+ * Not having any cross-iteration dependencies (i.e. when iter x + 1 depends
-+ * on what iter x will do with variables) is not a strict requirement, but
-+ * provides best performance and object code size.
-+ * Available only on Clang and GCC 8.x onwards.
-+ */
-+
-+/* Ask the compiler to pick an optimal unroll count, Clang only */
-+#define unrolled							\
-+	__pick_unrolled(clang loop unroll(enable), /* nothing */)
-+
-+/* Unroll each @n iterations of the loop */
-+#define unrolled_count(n)						\
-+	__pick_unrolled(clang loop unroll_count(n), GCC unroll n)
-+
-+/* Unroll the whole loop */
-+#define unrolled_full							\
-+	__pick_unrolled(clang loop unroll(full), GCC unroll 65534)
-+
-+/* Never unroll the loop */
-+#define unrolled_none							\
-+	__pick_unrolled(clang loop unroll(disable), GCC unroll 1)
-+
- #define UNROLL(N, MACRO, args...) CONCATENATE(__UNROLL_, N)(MACRO, args)
- 
- #define __UNROLL_0(MACRO, args...)
--- 
-2.47.1
 
 
