@@ -1,77 +1,73 @@
-Return-Path: <netdev+bounces-153017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 758879F6956
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:04:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D7159F6BC9
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:03:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24D661717DB
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:02:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE9B316B13E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0521B1F9F69;
-	Wed, 18 Dec 2024 15:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE7D1547E2;
+	Wed, 18 Dec 2024 17:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="krnVpHIG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ns3vn857"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B931F9F50;
-	Wed, 18 Dec 2024 15:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FB11DFE0C
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 17:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734534036; cv=none; b=W0QKwWHa+FBgyB6RnhL8VsLnBBIJ4iAUUtLUHcu3wVPGi9FCdArQ05nhgpon2EImklCccRcHWrS+AHFyL/REilf6JnDHbqOHwZfrQ94S4ibEAcLNZDNozpVa0NKvK0lYJmKEp9fDfNc6+MTOrsZiyqOJHND0CJRjUNOoxKSyQhc=
+	t=1734541400; cv=none; b=IkF8J/fC5Qf+glPh84LdSTq5HqBdbVIpTVxv411qBMW1crrMAlIfeWTvtZH8LyaBHqXj4TC3Qbrh7UxW/5s/06Y38t7o6A+7viBwwbiU3qIT38rUMJndmNCpRLQN3DIDlmTqOCJv3a3eaLB6WJ2TIYV8Hzp99+7QNh7ARtq4m6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734534036; c=relaxed/simple;
-	bh=E6fxrFDS4XsWBsLw2C0eTe9jO+XwhcPYIhxHWaqXyfk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L7caakBTFt1Q8SuK98L/JnVayGq7OKRbxIRENvTGemisvPtrUgAi4ZMk1vwhie9M2M406Jrc4+bbBlOY3QM0B/QEEk4loWZwMjhVnvcZvbqPWp4td/UPFLOnUT7RNNJSWNaB5thb8lKXHRhbe3wBMbSt3SilILm42L91OjG9dmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=krnVpHIG; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BIDSavN016184;
-	Wed, 18 Dec 2024 07:00:22 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=U
-	TFbuDtrDpZAOMmPZ7mz9eIAQwSu6VarjVosTiv2ffU=; b=krnVpHIG+UqEyzSIU
-	fyQNZ581IfwIsl2btBsybZkvE/5H0yiaH1NKAS2nRHKuXCvWCgU5UwpKOy8jNH2N
-	jVAJ+o/mxtoVQPyUAKOjoqSXWNaIxyKKJyWxVExLhy9AcZ/WZKR4e5QtEFJFYEbJ
-	eHxGqbVgmKd7AMu2uUMKDrpKirueHFA5QkUNFCXoVCF8rdYWtIPI3XZ3hj7eiEQE
-	o4dfR7Lym6tsTS2EGDR5FZWYnldom86lPMue8ogpYGRa6auCOEPkr+hkxETXDMri
-	yiMT7O88WG1JL22uVYtY/RkkcnYcQH4VtyHilS2ztHRbxg4D/h7q6TWIVvJ7a/pb
-	EHh6A==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 43kyaf05yx-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 07:00:22 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 18 Dec 2024 07:00:19 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 18 Dec 2024 07:00:19 -0800
-Received: from hyd1425.marvell.com (unknown [10.29.37.152])
-	by maili.marvell.com (Postfix) with ESMTP id 798515C68EF;
-	Wed, 18 Dec 2024 07:00:15 -0800 (PST)
-From: Sai Krishna <saikrishnag@marvell.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
-        <hkelam@marvell.com>, <sbhatta@marvell.com>, <andrew+netdev@lunn.ch>,
-        <kalesh-anakkur.purayil@broadcom.com>
-CC: Sai Krishna <saikrishnag@marvell.com>
-Subject: [net-next PATCH v6 6/6] octeontx2-pf: CN20K mbox implementation between PF-VF
-Date: Wed, 18 Dec 2024 20:29:38 +0530
-Message-ID: <20241218145938.3301279-7-saikrishnag@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241218145938.3301279-1-saikrishnag@marvell.com>
-References: <20241218145938.3301279-1-saikrishnag@marvell.com>
+	s=arc-20240116; t=1734541400; c=relaxed/simple;
+	bh=YwPOY40LgGCD6jfywP775/m6uM4ihk8K4jKCQDY0srk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Piz6jZZaJVEk8F63roW1VSTJv+/yc6/tIeRrPyBAk3cxKS5SiNtSU4qqHcqzNhN7oI5IJYbcQ+XV2gCkMI1WqFEW4L2/ClZli/CebvgqmRETa/eooLo6rGRzDSz1x3B9fjzQY/CbOTGwuNdBtHeuiDcFVnZkENrf0TUu6LbGqDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ns3vn857; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734541398; x=1766077398;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YwPOY40LgGCD6jfywP775/m6uM4ihk8K4jKCQDY0srk=;
+  b=Ns3vn857CIrA8cWAQPNh3dcZb+RHaFO1kML3DxBgBsSnF2yTJ3kV1L4L
+   y0PCAWOEHLllTvxWgDf9kpg0R0kta0BmpCk5Vt89Kar7q68xt78oEWAh+
+   BH33DaCeGwMlYBcsYqwNHczN7TaPoDWeEMQVs3Esfl73wQOISDYrMKgN4
+   txIhIHMq8xnRLoQcVPPm2d+MSMR+TC8Jgr7j5Uzl9rmNwgNQ4DW6MOBY8
+   PY7ONLz690SJ7dvkiwP2BEw/JYzUurrGjKpadIjFdOqg2QCThVN5xANi7
+   aL2p+hPcCyPou8ahAvr8Q/FCT9EaBpyJkRpEWZF4u/rflp4y9OFjp4GmR
+   A==;
+X-CSE-ConnectionGUID: KQwyPMjNSOCpinnu7LyCQQ==
+X-CSE-MsgGUID: dQ9sxj7tQs+IqMIZxCy15A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="35184361"
+X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
+   d="scan'208";a="35184361"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 09:03:11 -0800
+X-CSE-ConnectionGUID: pFI8njKNRCSMd/sZdFQOuA==
+X-CSE-MsgGUID: p4X/2kNTT3qddWPqxloEsw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
+   d="scan'208";a="98154781"
+Received: from unknown (HELO fedora.jf.intel.com) ([10.166.5.147])
+  by fmviesa008.fm.intel.com with ESMTP; 18 Dec 2024 09:03:10 -0800
+From: Paul Greenwalt <paul.greenwalt@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: kuba@kernel.org,
+	netdev@vger.kernel.org,
+	Paul Greenwalt <paul.greenwalt@intel.com>,
+	Alice Michael <alice.michael@intel.com>,
+	Eric Joyner <eric.joyner@intel.com>
+Subject: [PATCH iwl-next v6] ice: Add E830 checksum offload support
+Date: Wed, 18 Dec 2024 04:11:45 -0500
+Message-ID: <20241218091145.240373-1-paul.greenwalt@intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,339 +75,310 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: GMDTGNxQTtsd3g1glMxXh0t6Gdf8N2Pq
-X-Proofpoint-ORIG-GUID: GMDTGNxQTtsd3g1glMxXh0t6Gdf8N2Pq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-This patch implements the CN20k MBOX communication between PF and
-it's VFs. CN20K silicon got extra interrupt of MBOX response for trigger
-interrupt. Also few of the CSR offsets got changed in CN20K against
-prior series of silicons.
+E830 supports raw receive and generic transmit checksum offloads.
 
-Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+Raw receive checksum support is provided by hardware calculating the
+checksum over the whole packet, regardless of type. The calculated
+checksum is provided to driver in the Rx flex descriptor. Then the driver
+assigns the checksum to skb->csum and sets skb->ip_summed to
+CHECKSUM_COMPLETE.
+
+Generic transmit checksum support is provided by hardware calculating the
+checksum given two offsets: the start offset to begin checksum calculation,
+and the offset to insert the calculated checksum in the packet. Support is
+advertised to the stack using NETIF_F_HW_CSUM feature.
+
+E830 has the following limitations when both generic transmit checksum
+offload and TCP Segmentation Offload (TSO) are enabled:
+
+1. Inner packet header modification is not supported. This restriction
+   includes the inability to alter TCP flags, such as the push flag. As a
+   result, this limitation can impact the receiver's ability to coalesce
+   packets, potentially degrading network throughput.
+2. The Maximum Segment Size (MSS) is limited to 1023 bytes, which prevents
+   support of Maximum Transmission Unit (MTU) greater than 1063 bytes.
+
+Therefore NETIF_F_HW_CSUM and NETIF_F_ALL_TSO features are mutually
+exclusive. NETIF_F_HW_CSUM hardware feature support is indicated but is not
+enabled by default. Instead, IP checksums and NETIF_F_ALL_TSO are the
+defaults. Enforcement of mutual exclusivity of NETIF_F_HW_CSUM and
+NETIF_F_ALL_TSO is done in ice_set_features(). Mutual exclusivity
+of IP checksums and NETIF_F_HW_CSUM is handled by netdev_fix_features().
+
+When NETIF_F_HW_CSUM is requested the provided skb->csum_start and
+skb->csum_offset are passed to hardware in the Tx context descriptor
+generic checksum (GCS) parameters. Hardware calculates the 1's complement
+from skb->csum_start to the end of the packet, and inserts the result in
+the packet at skb->csum_offset.
+
+Co-developed-by: Alice Michael <alice.michael@intel.com>
+Signed-off-by: Alice Michael <alice.michael@intel.com>
+Co-developed-by: Eric Joyner <eric.joyner@intel.com>
+Signed-off-by: Eric Joyner <eric.joyner@intel.com>
+Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
 ---
- .../ethernet/marvell/octeontx2/af/common.h    |   2 +-
- .../ethernet/marvell/octeontx2/nic/cn20k.c    | 142 ++++++++++++++++++
- .../ethernet/marvell/octeontx2/nic/cn20k.h    |   3 +
- .../marvell/octeontx2/nic/otx2_common.h       |   2 +
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  59 ++++++--
- 5 files changed, 194 insertions(+), 14 deletions(-)
+Changelog:
+v1->v2
+- Update commit message with additional details.
+- Add newlines, and add params around
+- Return early from ice_fix_features() to avoid extra indentation and
+  large if block.
+- Move and change some defines.
+- replace htons and le16_t_cpu with swap16.
+- Use FIELD_PREP where possible.
+- Removed checksum valid bit check STATUS1_L2TAG2P_S. This check is not
+  needed since there is no situation which will return an error.
+v2->v3
+- Minor fixes in commit message.
+- Removed unused register defines in ice_hw_autogen.h.
+- Moved GCS and TSO feature fix to helper function
+  ice_fix_features_gcs(), and updated logic.
+- Update to align naming with related flags.
+v3->v4
+- Move a check for GCS and TSO mutual exclusivity from
+  ice_fix_features() to ice_set_features().
+v4->v5
+- Remove lingering GCS and TSO mutual exclusivity comments and code in
+  ice_fix_features().
+- Remove unused variable ICE_TX_FLAGS_RING_GCS.
+- Remove Tested-by and Signed-off-by tag due to changes to patch.
+- Use ICE_TX_GCS_DESC_TYPE_M and ICE_TX_GCS_DESC_CSUM_PSH in
+  ice_tx_csum() to set the GCS decriptor field type.
+v5->v6
+- Fix build error.
+---
+ drivers/net/ethernet/intel/ice/ice.h          |  1 +
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    |  9 +++++--
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  8 +++++-
+ drivers/net/ethernet/intel/ice/ice_main.c     | 18 +++++++++++++
+ drivers/net/ethernet/intel/ice/ice_txrx.c     | 27 ++++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 ++
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 26 ++++++++++++++++++
+ 7 files changed, 87 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/common.h b/drivers/net/ethernet/marvell/octeontx2/af/common.h
-index 406c59100a35..8a08bebf08c2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/common.h
-@@ -39,7 +39,7 @@ struct qmem {
- 	void            *base;
- 	dma_addr_t	iova;
- 	int		alloc_sz;
--	u16		entry_sz;
-+	u32		entry_sz;
- 	u8		align;
- 	u32		qsize;
- };
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-index ef37aa0564b5..05f9129284c5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-@@ -13,6 +13,7 @@
- static struct dev_hw_ops cn20k_hw_ops = {
- 	.pfaf_mbox_intr_handler = cn20k_pfaf_mbox_intr_handler,
- 	.vfaf_mbox_intr_handler = cn20k_vfaf_mbox_intr_handler,
-+	.pfvf_mbox_intr_handler = cn20k_pfvf_mbox_intr_handler,
- };
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 2f5d6f974185..0d2c80578633 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -203,6 +203,7 @@ enum ice_feature {
+ 	ICE_F_SMA_CTRL,
+ 	ICE_F_CGU,
+ 	ICE_F_GNSS,
++	ICE_F_GCS,
+ 	ICE_F_ROCE_LAG,
+ 	ICE_F_SRIOV_LAG,
+ 	ICE_F_MBX_LIMIT,
+diff --git a/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h b/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
+index 611577ebc29d..5b98222fe27f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
++++ b/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
+@@ -229,7 +229,7 @@ struct ice_32b_rx_flex_desc_nic {
+ 	__le16 status_error1;
+ 	u8 flexi_flags2;
+ 	u8 ts_low;
+-	__le16 l2tag2_1st;
++	__le16 raw_csum;
+ 	__le16 l2tag2_2nd;
  
- void cn20k_init(struct otx2_nic *pfvf)
-@@ -108,3 +109,144 @@ irqreturn_t cn20k_vfaf_mbox_intr_handler(int irq, void *vf_irq)
- 
- 	return IRQ_HANDLED;
- }
-+
-+void cn20k_enable_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
-+{
-+	/* Clear PF <=> VF mailbox IRQ */
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF_INTX(0), ~0ull);
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF_INTX(1), ~0ull);
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF1_INTX(0), ~0ull);
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF1_INTX(1), ~0ull);
-+
-+	/* Enable PF <=> VF mailbox IRQ */
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF_INT_ENA_W1SX(0), INTR_MASK(numvfs));
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF1_INT_ENA_W1SX(0), INTR_MASK(numvfs));
-+	if (numvfs > 64) {
-+		numvfs -= 64;
-+		otx2_write64(pf, RVU_MBOX_PF_VFPF_INT_ENA_W1SX(1),
-+			     INTR_MASK(numvfs));
-+		otx2_write64(pf, RVU_MBOX_PF_VFPF1_INT_ENA_W1SX(1),
-+			     INTR_MASK(numvfs));
-+	}
-+}
-+
-+void cn20k_disable_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
-+{
-+	int vector, intr_vec, vec = 0;
-+
-+	/* Disable PF <=> VF mailbox IRQ */
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF_INT_ENA_W1CX(0), ~0ull);
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF_INT_ENA_W1CX(1), ~0ull);
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF1_INT_ENA_W1CX(0), ~0ull);
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF1_INT_ENA_W1CX(1), ~0ull);
-+
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF_INTX(0), ~0ull);
-+	otx2_write64(pf, RVU_MBOX_PF_VFPF1_INTX(0), ~0ull);
-+
-+	if (numvfs > 64) {
-+		otx2_write64(pf, RVU_MBOX_PF_VFPF_INTX(1), ~0ull);
-+		otx2_write64(pf, RVU_MBOX_PF_VFPF1_INTX(1), ~0ull);
-+	}
-+
-+	for (intr_vec = RVU_MBOX_PF_INT_VEC_VFPF_MBOX0; intr_vec <=
-+			RVU_MBOX_PF_INT_VEC_VFPF1_MBOX1; intr_vec++, vec++) {
-+		vector = pci_irq_vector(pf->pdev, intr_vec);
-+		free_irq(vector, pf->hw.pfvf_irq_devid[vec]);
-+	}
-+}
-+
-+irqreturn_t cn20k_pfvf_mbox_intr_handler(int irq, void *pf_irq)
-+{
-+	struct pf_irq_data *irq_data = pf_irq;
-+	struct otx2_nic *pf = irq_data->pf;
-+	struct mbox *mbox;
-+	u64 intr;
-+
-+	/* Sync with mbox memory region */
-+	rmb();
-+
-+	/* Clear interrupts */
-+	intr = otx2_read64(pf, irq_data->intr_status);
-+	otx2_write64(pf, irq_data->intr_status, intr);
-+	mbox = pf->mbox_pfvf;
-+
-+	if (intr)
-+		trace_otx2_msg_interrupt(pf->pdev, "VF(s) to PF", intr);
-+
-+	irq_data->pf_queue_work_hdlr(mbox, pf->mbox_pfvf_wq, irq_data->start,
-+				     irq_data->mdevs, intr);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+int cn20k_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
-+{
-+	struct otx2_hw *hw = &pf->hw;
-+	struct pf_irq_data *irq_data;
-+	int intr_vec, ret, vec = 0;
-+	char *irq_name;
-+
-+	/* irq data for 4 PF intr vectors */
-+	irq_data = devm_kcalloc(pf->dev, 4,
-+				sizeof(struct pf_irq_data), GFP_KERNEL);
-+	if (!irq_data)
-+		return -ENOMEM;
-+
-+	for (intr_vec = RVU_MBOX_PF_INT_VEC_VFPF_MBOX0; intr_vec <=
-+			RVU_MBOX_PF_INT_VEC_VFPF1_MBOX1; intr_vec++, vec++) {
-+		switch (intr_vec) {
-+		case RVU_MBOX_PF_INT_VEC_VFPF_MBOX0:
-+			irq_data[vec].intr_status =
-+						RVU_MBOX_PF_VFPF_INTX(0);
-+			irq_data[vec].start = 0;
-+			irq_data[vec].mdevs = 64;
-+			break;
-+		case RVU_MBOX_PF_INT_VEC_VFPF_MBOX1:
-+			irq_data[vec].intr_status =
-+						RVU_MBOX_PF_VFPF_INTX(1);
-+			irq_data[vec].start = 64;
-+			irq_data[vec].mdevs = 96;
-+			break;
-+		case RVU_MBOX_PF_INT_VEC_VFPF1_MBOX0:
-+			irq_data[vec].intr_status =
-+						RVU_MBOX_PF_VFPF1_INTX(0);
-+			irq_data[vec].start = 0;
-+			irq_data[vec].mdevs = 64;
-+			break;
-+		case RVU_MBOX_PF_INT_VEC_VFPF1_MBOX1:
-+			irq_data[vec].intr_status =
-+						RVU_MBOX_PF_VFPF1_INTX(1);
-+			irq_data[vec].start = 64;
-+			irq_data[vec].mdevs = 96;
-+			break;
-+		}
-+		irq_data[vec].pf_queue_work_hdlr = otx2_queue_vf_work;
-+		irq_data[vec].vec_num = intr_vec;
-+		irq_data[vec].pf = pf;
-+
-+		/* Register mailbox interrupt handler */
-+		irq_name = &hw->irq_name[intr_vec * NAME_SIZE];
-+		if (pf->pcifunc)
-+			snprintf(irq_name, NAME_SIZE,
-+				 "RVUPF%d_VF%d Mbox%d", rvu_get_pf(pf->pcifunc),
-+				 vec / 2, vec % 2);
-+		else
-+			snprintf(irq_name, NAME_SIZE, "RVUPF_VF%d Mbox%d",
-+				 vec / 2, vec % 2);
-+
-+		hw->pfvf_irq_devid[vec] = &irq_data[vec];
-+		ret = request_irq(pci_irq_vector(pf->pdev, intr_vec),
-+				  pf->hw_ops->pfvf_mbox_intr_handler, 0,
-+				  irq_name,
-+				  &irq_data[vec]);
-+		if (ret) {
-+			dev_err(pf->dev,
-+				"RVUPF: IRQ registration failed for PFVF mbox0 irq\n");
-+			return ret;
-+		}
-+	}
-+
-+	cn20k_enable_pfvf_mbox_intr(pf, numvfs);
-+
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-index 712bb2b5e2ae..832adaf8c57f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-@@ -11,4 +11,7 @@
- #include "otx2_common.h"
- 
- void cn20k_init(struct otx2_nic *pfvf);
-+int cn20k_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs);
-+void cn20k_disable_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs);
-+void cn20k_enable_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs);
- #endif /* CN20K_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 1757d183b775..8361e68d2baa 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -65,6 +65,7 @@
- irqreturn_t otx2_pfaf_mbox_intr_handler(int irq, void *pf_irq);
- irqreturn_t cn20k_pfaf_mbox_intr_handler(int irq, void *pf_irq);
- irqreturn_t cn20k_vfaf_mbox_intr_handler(int irq, void *vf_irq);
-+irqreturn_t cn20k_pfvf_mbox_intr_handler(int irq, void *pf_irq);
- irqreturn_t otx2_pfvf_mbox_intr_handler(int irq, void *pf_irq);
- 
- enum arua_mapped_qtypes {
-@@ -368,6 +369,7 @@ struct dev_hw_ops {
- 	void	(*aura_freeptr)(void *dev, int aura, u64 buf);
- 	irqreturn_t (*pfaf_mbox_intr_handler)(int irq, void *pf_irq);
- 	irqreturn_t (*vfaf_mbox_intr_handler)(int irq, void *pf_irq);
-+	irqreturn_t (*pfvf_mbox_intr_handler)(int irq, void *pf_irq);
+ 	/* Qword 3 */
+@@ -500,10 +500,15 @@ enum ice_tx_desc_len_fields {
+ struct ice_tx_ctx_desc {
+ 	__le32 tunneling_params;
+ 	__le16 l2tag2;
+-	__le16 rsvd;
++	__le16 gcs;
+ 	__le64 qw1;
  };
  
- #define CN10K_MCS_SA_PER_SC	4
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index cd80c35b9335..690a393b2c7c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -567,6 +567,23 @@ irqreturn_t otx2_pfvf_mbox_intr_handler(int irq, void *pf_irq)
- 	return IRQ_HANDLED;
++#define ICE_TX_GCS_DESC_START_M		GENMASK(7, 0)
++#define ICE_TX_GCS_DESC_OFFSET_M	GENMASK(11, 8)
++#define ICE_TX_GCS_DESC_TYPE_M		GENMASK(14, 12)
++#define ICE_TX_GCS_DESC_CSUM_PSH	1
++
+ #define ICE_TXD_CTX_QW1_CMD_S	4
+ #define ICE_TXD_CTX_QW1_CMD_M	(0x7FUL << ICE_TXD_CTX_QW1_CMD_S)
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index e07fc8851e1d..23d4b0677b21 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1420,6 +1420,10 @@ static int ice_vsi_alloc_rings(struct ice_vsi *vsi)
+ 		ring->dev = dev;
+ 		ring->count = vsi->num_rx_desc;
+ 		ring->cached_phctime = pf->ptp.cached_phc_time;
++
++		if (ice_is_feature_supported(pf, ICE_F_GCS))
++			ring->flags |= ICE_RX_FLAGS_RING_GCS;
++
+ 		WRITE_ONCE(vsi->rx_rings[i], ring);
+ 	}
+ 
+@@ -3883,8 +3887,10 @@ void ice_init_feature_support(struct ice_pf *pf)
+ 		break;
+ 	}
+ 
+-	if (pf->hw.mac_type == ICE_MAC_E830)
++	if (pf->hw.mac_type == ICE_MAC_E830) {
+ 		ice_set_feature_support(pf, ICE_F_MBX_LIMIT);
++		ice_set_feature_support(pf, ICE_F_GCS);
++	}
  }
  
-+static void *cn20k_pfvf_mbox_alloc(struct otx2_nic *pf, int numvfs)
-+{
-+	struct qmem *mbox_addr;
-+	int err;
-+
-+	err = qmem_alloc(&pf->pdev->dev, &mbox_addr, numvfs, MBOX_SIZE);
-+	if (err) {
-+		dev_err(pf->dev, "qmem alloc fail\n");
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	otx2_write64(pf, RVU_PF_VF_MBOX_ADDR, (u64)mbox_addr->iova);
-+	pf->pfvf_mbox_addr = mbox_addr;
-+
-+	return mbox_addr->base;
-+}
-+
- static int otx2_pfvf_mbox_init(struct otx2_nic *pf, int numvfs)
- {
- 	void __iomem *hwbase;
-@@ -588,19 +605,27 @@ static int otx2_pfvf_mbox_init(struct otx2_nic *pf, int numvfs)
- 	if (!pf->mbox_pfvf_wq)
- 		return -ENOMEM;
- 
--	/* On CN10K platform, PF <-> VF mailbox region follows after
--	 * PF <-> AF mailbox region.
-+	/* For CN20K, PF allocates mbox memory in DRAM and writes PF/VF
-+	 * regions/offsets in RVU_PF_VF_MBOX_ADDR, the RVU_PFX_FUNC_PFAF_MBOX
-+	 * gives the aliased address to access PF/VF mailbox regions.
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 89fa3d53d317..16677dca58a8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -3666,6 +3666,12 @@ void ice_set_netdev_features(struct net_device *netdev)
  	 */
--	if (test_bit(CN10K_MBOX, &pf->hw.cap_flag))
--		base = pci_resource_start(pf->pdev, PCI_MBOX_BAR_NUM) +
--		       MBOX_SIZE;
--	else
--		base = readq((pf->reg_base + RVU_PF_VF_BAR4_ADDR));
-+	if (is_cn20k(pf->pdev)) {
-+		hwbase = (void __iomem *)cn20k_pfvf_mbox_alloc(pf, numvfs);
-+	} else {
-+		/* On CN10K platform, PF <-> VF mailbox region follows after
-+		 * PF <-> AF mailbox region.
-+		 */
-+		if (test_bit(CN10K_MBOX, &pf->hw.cap_flag))
-+			base = pci_resource_start(pf->pdev, PCI_MBOX_BAR_NUM) +
-+						  MBOX_SIZE;
-+		else
-+			base = readq((pf->reg_base + RVU_PF_VF_BAR4_ADDR));
+ 	netdev->hw_features |= NETIF_F_RXFCS;
  
--	hwbase = ioremap_wc(base, MBOX_SIZE * pf->total_vfs);
--	if (!hwbase) {
--		err = -ENOMEM;
--		goto free_wq;
-+		hwbase = ioremap_wc(base, MBOX_SIZE * pf->total_vfs);
-+		if (!hwbase) {
-+			err = -ENOMEM;
-+			goto free_wq;
-+		}
- 	}
- 
- 	mbox = &pf->mbox_pfvf[0];
-@@ -624,7 +649,7 @@ static int otx2_pfvf_mbox_init(struct otx2_nic *pf, int numvfs)
- 	return 0;
- 
- free_iomem:
--	if (hwbase)
-+	if (hwbase && !(is_cn20k(pf->pdev)))
- 		iounmap(hwbase);
- free_wq:
- 	destroy_workqueue(pf->mbox_pfvf_wq);
-@@ -643,8 +668,10 @@ static void otx2_pfvf_mbox_destroy(struct otx2_nic *pf)
- 		pf->mbox_pfvf_wq = NULL;
- 	}
- 
--	if (mbox->mbox.hwbase)
-+	if (mbox->mbox.hwbase && !is_cn20k(pf->pdev))
- 		iounmap((void __iomem *)mbox->mbox.hwbase);
-+	else
-+		qmem_free(&pf->pdev->dev, pf->pfvf_mbox_addr);
- 
- 	otx2_mbox_destroy(&mbox->mbox);
++	/* Mutual exclusivity for TSO and GCS is enforced by the set features
++	 * ndo callback.
++	 */
++	if (ice_is_feature_supported(pf, ICE_F_GCS))
++		netdev->hw_features |= NETIF_F_HW_CSUM;
++
+ 	netif_set_tso_max_size(netdev, ICE_MAX_TSO_SIZE);
  }
-@@ -668,6 +695,9 @@ static void otx2_disable_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
+ 
+@@ -6567,6 +6573,18 @@ ice_set_features(struct net_device *netdev, netdev_features_t features)
+ 	if (changed & NETIF_F_LOOPBACK)
+ 		ret = ice_set_loopback(vsi, !!(features & NETIF_F_LOOPBACK));
+ 
++	/* Due to E830 hardware limitations, TSO (NETIF_F_ALL_TSO) with GCS
++	 * (NETIF_F_HW_CSUM) is not supported.
++	 */
++	if (ice_is_feature_supported(pf, ICE_F_GCS) &&
++	    ((features & NETIF_F_HW_CSUM) && (features & NETIF_F_ALL_TSO))) {
++		if (netdev->features & NETIF_F_HW_CSUM)
++			dev_err(ice_pf_to_dev(pf), "To enable TSO, you must first disable HW checksum.\n");
++		else
++			dev_err(ice_pf_to_dev(pf), "To enable HW checksum, you must first disable TSO.\n");
++		return -EIO;
++	}
++
+ 	return ret;
+ }
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 5d2d7736fd5f..f2b2d6bc0c43 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -1753,6 +1753,7 @@ ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
+ static
+ int ice_tx_csum(struct ice_tx_buf *first, struct ice_tx_offload_params *off)
  {
- 	int vector;
++	const struct ice_tx_ring *tx_ring = off->tx_ring;
+ 	u32 l4_len = 0, l3_len = 0, l2_len = 0;
+ 	struct sk_buff *skb = first->skb;
+ 	union {
+@@ -1902,6 +1903,30 @@ int ice_tx_csum(struct ice_tx_buf *first, struct ice_tx_offload_params *off)
+ 	l3_len = l4.hdr - ip.hdr;
+ 	offset |= (l3_len / 4) << ICE_TX_DESC_LEN_IPLEN_S;
  
-+	if (is_cn20k(pf->pdev))
-+		return cn20k_disable_pfvf_mbox_intr(pf, numvfs);
++	if ((tx_ring->netdev->features & NETIF_F_HW_CSUM) &&
++	    !(first->tx_flags & ICE_TX_FLAGS_TSO) &&
++	    !skb_csum_is_sctp(skb)) {
++		/* Set GCS */
++		u16 csum_start = (skb->csum_start - skb->mac_header) / 2;
++		u16 csum_offset = skb->csum_offset / 2;
++		u16 gcs_params;
 +
- 	/* Disable PF <=> VF mailbox IRQ */
- 	otx2_write64(pf, RVU_PF_VFPF_MBOX_INT_ENA_W1CX(0), ~0ull);
- 	otx2_write64(pf, RVU_PF_VFPF_MBOX_INT_ENA_W1CX(1), ~0ull);
-@@ -689,6 +719,9 @@ static int otx2_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
- 	char *irq_name;
- 	int err;
++		gcs_params = FIELD_PREP(ICE_TX_GCS_DESC_START_M, csum_start) |
++			     FIELD_PREP(ICE_TX_GCS_DESC_OFFSET_M, csum_offset) |
++			     FIELD_PREP(ICE_TX_GCS_DESC_TYPE_M,
++					ICE_TX_GCS_DESC_CSUM_PSH);
++
++		/* Unlike legacy HW checksums, GCS requires a context
++		 * descriptor.
++		 */
++		off->cd_qw1 |= ICE_TX_DESC_DTYPE_CTX;
++		off->cd_gcs_params = gcs_params;
++		/* Fill out CSO info in data descriptors */
++		off->td_offset |= offset;
++		off->td_cmd |= cmd;
++		return 1;
++	}
++
+ 	/* Enable L4 checksum offloads */
+ 	switch (l4_proto) {
+ 	case IPPROTO_TCP:
+@@ -2383,7 +2408,7 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
+ 		/* setup context descriptor */
+ 		cdesc->tunneling_params = cpu_to_le32(offload.cd_tunnel_params);
+ 		cdesc->l2tag2 = cpu_to_le16(offload.cd_l2tag2);
+-		cdesc->rsvd = cpu_to_le16(0);
++		cdesc->gcs = cpu_to_le16(offload.cd_gcs_params);
+ 		cdesc->qw1 = cpu_to_le64(offload.cd_qw1);
+ 	}
  
-+	if (is_cn20k(pf->pdev))
-+		return cn20k_register_pfvf_mbox_intr(pf, numvfs);
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+index cb347c852ba9..5b0b54ac5c00 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.h
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+@@ -193,6 +193,7 @@ struct ice_tx_offload_params {
+ 	u32 td_l2tag1;
+ 	u32 cd_tunnel_params;
+ 	u16 cd_l2tag2;
++	u16 cd_gcs_params;
+ 	u8 header_len;
+ };
+ 
+@@ -367,6 +368,7 @@ struct ice_rx_ring {
+ #define ICE_RX_FLAGS_RING_BUILD_SKB	BIT(1)
+ #define ICE_RX_FLAGS_CRC_STRIP_DIS	BIT(2)
+ #define ICE_RX_FLAGS_MULTIDEV		BIT(3)
++#define ICE_RX_FLAGS_RING_GCS		BIT(4)
+ 	u8 flags;
+ 	/* CL5 - 5th cacheline starts here */
+ 	struct xdp_rxq_info xdp_rxq;
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+index 2719f0e20933..45cfaabc41cb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+@@ -80,6 +80,23 @@ ice_rx_hash_to_skb(const struct ice_rx_ring *rx_ring,
+ 		libeth_rx_pt_set_hash(skb, hash, decoded);
+ }
+ 
++/**
++ * ice_rx_gcs - Set generic checksum in skb
++ * @skb: skb currently being received and modified
++ * @rx_desc: receive descriptor
++ */
++static void ice_rx_gcs(struct sk_buff *skb,
++		       const union ice_32b_rx_flex_desc *rx_desc)
++{
++	const struct ice_32b_rx_flex_desc_nic *desc;
++	u16 csum;
 +
- 	/* Register MBOX0 interrupt handler */
- 	irq_name = &hw->irq_name[RVU_PF_INT_VEC_VFPF_MBOX0 * NAME_SIZE];
- 	if (pf->pcifunc)
++	desc = (struct ice_32b_rx_flex_desc_nic *)rx_desc;
++	skb->ip_summed = CHECKSUM_COMPLETE;
++	csum = (__force u16)desc->raw_csum;
++	skb->csum = csum_unfold((__force __sum16)swab16(csum));
++}
++
+ /**
+  * ice_rx_csum - Indicate in skb if checksum is good
+  * @ring: the ring we care about
+@@ -107,6 +124,15 @@ ice_rx_csum(struct ice_rx_ring *ring, struct sk_buff *skb,
+ 	rx_status0 = le16_to_cpu(rx_desc->wb.status_error0);
+ 	rx_status1 = le16_to_cpu(rx_desc->wb.status_error1);
+ 
++	if ((ring->flags & ICE_RX_FLAGS_RING_GCS) &&
++	    rx_desc->wb.rxdid == ICE_RXDID_FLEX_NIC &&
++	    (decoded.inner_prot == LIBETH_RX_PT_INNER_TCP ||
++	     decoded.inner_prot == LIBETH_RX_PT_INNER_UDP ||
++	     decoded.inner_prot == LIBETH_RX_PT_INNER_ICMP)) {
++		ice_rx_gcs(skb, rx_desc);
++		return;
++	}
++
+ 	/* check if HW has decoded the packet and checksum */
+ 	if (!(rx_status0 & BIT(ICE_RX_FLEX_DESC_STATUS0_L3L4P_S)))
+ 		return;
 -- 
-2.25.1
+2.45.0
 
 
