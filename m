@@ -1,307 +1,337 @@
-Return-Path: <netdev+bounces-152864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1C19F60A1
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:02:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D4339F6102
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68B481887966
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:02:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAECE188AC05
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25755174EDB;
-	Wed, 18 Dec 2024 09:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C481A2384;
+	Wed, 18 Dec 2024 09:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vz0L/8Kg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IReszp0X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B68D18D656
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 09:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B09A19F41D;
+	Wed, 18 Dec 2024 09:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734512464; cv=none; b=YAhtcT0TMGq8fkRcaEZ80ibH2UmqcW1h1vDgyGdVNS/GVOtZtzTIdrxYGc4U6mEkJhtaTDY4rwQKAq/w1gp7EIODsvKCzOs2M/ONMsr3prjuMxgiA0J1d7fZS9BmFTbkVV34ygfiKpznuwZJuh8l/hLSpM0X6RZGZzanwkhr5rg=
+	t=1734512771; cv=none; b=j+HgfIMXLeRbmknyxqoRjcJHdYEXzBlBKxriuiP0Ad79o3XrKBHCPYd8B9AGqS2Foil/WzPi95p2pvQ7Xl8eWicAHS0VKQOL+2o0KoxwCInLO/225n9J3GyiaQ+JAmjWkGKOs2MmJciwCetG7SreJjBk8nFqO8qQFWFKJYNgg98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734512464; c=relaxed/simple;
-	bh=iMyMUsvpVel3bCW2MhvsWmIqtgE7lhOwnHJKnRBHreo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZrU1tCBWK1PJxzuipLrt9KhH00YbkoMVVzK8wAHSzMkmk/5QdLkuKQj+qsSbmgU0zWsXcNXeoxQ85+YEY+0lcgh9WSv/ffabzAHzVka+WuVzFigHp7XzX1cTukxYHzahkj2IFlMxBRDHS5Ii40lmq8HFyJz7uRiPV/wCR/urBeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vz0L/8Kg; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2166f9f52fbso88620105ad.2
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 01:01:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734512462; x=1735117262; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vn1DMPiUr6FITE+HvgK4oPLmoMRzM7Pwyk5DelrD80E=;
-        b=Vz0L/8KghNXo86Klf/YTZoTvvBw7s2Ej2ftjVUgyIbFwrIhlGzSDQIBtoSYirZDShI
-         +ScNX2qxoNYXyUYLDL+1WgpO2oy9wr2Cf8D8vHfKi6xgebrnynkqkVzB7uHDjrFyv7BG
-         IPOm2hpcMujhMW8ASMIo/NIRYyjUsGS8JdXBRNmarGMT7VyB/XxNztg9FNXs+AVhFi67
-         Z1ZF2RFEwDkwsdKKu3upFARltfTU0r6MNP7uRK4moz15x/Y+uXZaBe5BEvdAH37V9adu
-         5d5YD+5QZNrcdrHd9OBFkZ9sSb6CrxLFuR77tWO4JhBZABYo+0GgDiOg0k2mlKpHXaP7
-         +AAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734512462; x=1735117262;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vn1DMPiUr6FITE+HvgK4oPLmoMRzM7Pwyk5DelrD80E=;
-        b=mJuPM4kk6kysr8zbWM2/euopEiODh5V2K0LhK3dURCGvsVXpDOBlkizYCsOI/Laanl
-         8hRP39NxTRxXJ+dUVvr2LRoRrXlJlFvNbp1fd9T3PaEMwW8hvhjSW5XexMAknDsfYVsh
-         Xw/uqK3om9CM5EJahtFZYNR6SuRs4chyv+aSExrjrpwiNbTsJxjbmmt0druEE3skmH7o
-         Tl8gu25CvCG00nx2KI18eA3rfdmX0YafO0IjKSx/2n2v4R79jI5XQeGLwp9lZ+/Uz6/I
-         ovRY8otUZw6SVhCmO/W3G0L3rQhU5FxIXQH6A3iCC6fROLAw+BA3p7x72Qxz5EQK6/R1
-         EF2w==
-X-Forwarded-Encrypted: i=1; AJvYcCX+o9/6YbKO/ikOITBnFquISVmDse4AK0nr4TPGUFGz+rqUpjqj94oIhcnZ/D3tRpkBZEuFPCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCQ78E+XFJF4/PjOJm8h0e6dYhb6ly6rvu9KPkX/mNS3phBeKc
-	jDouvh+m9dmUemiCcwp6ThpnNZo38M80pprJaDQvLHljlDRVy4T6zfinZVZs6RxmUpYozSStk5J
-	XJbHA1bS2Asrccazsakwp/A==
-X-Google-Smtp-Source: AGHT+IHrSovWhzDPIg/XxuMr4GSxeCzLSa1ueqqPXbWvfZPxmNIYJMSUPH1Kyy7PD9boeEiIPucRPCFmBJOo0oh32Q==
-X-Received: from plbko4.prod.google.com ([2002:a17:903:7c4:b0:216:3858:3176])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:b613:b0:216:1cfa:2bda with SMTP id d9443c01a7336-218d72621e8mr23928685ad.43.1734512461563;
- Wed, 18 Dec 2024 01:01:01 -0800 (PST)
-Date: Wed, 18 Dec 2024 18:00:57 +0900
+	s=arc-20240116; t=1734512771; c=relaxed/simple;
+	bh=RKs8g8cJXoiaW5GtQzdcafbnKZUBamyZjFRIr0xGmC4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RZ4RjxlP51cEbBh/bvx80fnhJBgde6bVFLhgpMlqzxqFXErbJ9Uw6BsYvpoQkD4fTQEmUKLHLKBWGU5BJbEVSbEzr17k2bbjCLXr0Cscxs8cFCu5pvOkNvgc3c0rLtZ3W2pUw6LAQwTXIKXIgkFNynuPsYalWo6BSpi4oRu8KBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IReszp0X; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734512769; x=1766048769;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RKs8g8cJXoiaW5GtQzdcafbnKZUBamyZjFRIr0xGmC4=;
+  b=IReszp0XpOzbaMVPGOEQgduCjz7jYla8aGcQEOFk6W1LHzmVAYjPiA0N
+   ErwVQSFHkyl8pVgU3Rd27Qrihn6H5mAoVdjaec9iT6xGRXeNnIBMKcvCz
+   NhGIXvvJMGgXjOuDvt+Ojr0hUlseUp38sVZPDsRZr7hl2w8VOHI+h8E9P
+   MRKV8kUVCfNSG2pEUKOKHtmOmGHY6EWz1UW9jEklt2X2FTXPDH+HN4WSR
+   ya1y1f3ECLEMT1bXJA4lw/5cLYfaDn76OJy0t0MfmD3XRIIw0Jj3bIj7Z
+   XQCnuPVmTgs2u/ji/xwlfleBRrs038265jLdlRmeDAXKyLuWkosVzgKT3
+   Q==;
+X-CSE-ConnectionGUID: zgLu3coERL+UnuXsMt/XEQ==
+X-CSE-MsgGUID: 2PpT0l0UTrmZ5CXHL9n3Dw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11289"; a="45577421"
+X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
+   d="scan'208";a="45577421"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 01:06:08 -0800
+X-CSE-ConnectionGUID: mu4IrPtMQv6PP0L8+g4xMQ==
+X-CSE-MsgGUID: MTjyH+A6QSeXjgV8IviAzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="98267551"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 01:06:05 -0800
+Date: Wed, 18 Dec 2024 10:02:59 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND V2 net 1/7] net: hns3: fixed reset failure issues
+ caused by the incorrect reset type
+Message-ID: <Z2KPw9WYCI/SZIjg@mev-dev.igk.intel.com>
+References: <20241217010839.1742227-1-shaojijie@huawei.com>
+ <20241217010839.1742227-2-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241218090057.76899-1-yuyanghuang@google.com>
-Subject: [PATCH net-next, v2] netlink: support dumping IPv4 multicast addresses
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	liuhangbin@gmail.com, nicolas.dichtel@6wind.com, andrew@lunn.ch, 
-	pruddy@vyatta.att-mail.com, netdev@vger.kernel.org, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241217010839.1742227-2-shaojijie@huawei.com>
 
-Extended RTM_GETMULTICAST to support dumping joined IPv4 multicast
-addresses, in addition to the existing IPv6 functionality. This allows
-userspace applications to retrieve both IPv4 and IPv6 multicast
-addresses through similar netlink command and then monitor future
-changes by registering to RTNLGRP_IPV4_MCADDR and RTNLGRP_IPV6_MCADDR.
+On Tue, Dec 17, 2024 at 09:08:33AM +0800, Jijie Shao wrote:
+> From: Hao Lan <lanhao@huawei.com>
+> 
+> When a reset type that is not supported by the driver is input, a reset
+> pending flag bit of the HNAE3_NONE_RESET type is generated in
+> reset_pending. The driver does not have a mechanism to clear this type
+> of error. As a result, the driver considers that the reset is not
+> complete. This patch provides a mechanism to clear the
+> HNAE3_NONE_RESET flag and the parameter of
+> hnae3_ae_ops.set_default_reset_request is verified.
+> 
+> The error message:
+> hns3 0000:39:01.0: cmd failed -16
+> hns3 0000:39:01.0: hclge device re-init failed, VF is disabled!
+> hns3 0000:39:01.0: failed to reset VF stack
+> hns3 0000:39:01.0: failed to reset VF(4)
+> hns3 0000:39:01.0: prepare reset(2) wait done
+> hns3 0000:39:01.0 eth4: already uninitialized
+> 
+> Use the crash tool to view struct hclgevf_dev:
+> struct hclgevf_dev {
+> ...
+> 	default_reset_request = 0x20,
+> 	reset_level = HNAE3_NONE_RESET,
+> 	reset_pending = 0x100,
+> 	reset_type = HNAE3_NONE_RESET,
+> ...
+> };
+> 
+> Fixes: 720bd5837e37 ("net: hns3: add set_default_reset_request in the hnae3_ae_ops")
+> Signed-off-by: Hao Lan <lanhao@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  .../hisilicon/hns3/hns3pf/hclge_main.c        | 33 ++++++++++++++--
+>  .../hisilicon/hns3/hns3vf/hclgevf_main.c      | 38 ++++++++++++++++---
+>  2 files changed, 61 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index 05942fa78b11..7d44dc777dc5 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -3574,6 +3574,17 @@ static int hclge_set_vf_link_state(struct hnae3_handle *handle, int vf,
+>  	return ret;
+>  }
+>  
+> +static void hclge_set_reset_pending(struct hclge_dev *hdev,
+> +				    enum hnae3_reset_type reset_type)
+> +{
+> +	/* When an incorrect reset type is executed, the get_reset_level
+> +	 * function generates the HNAE3_NONE_RESET flag. As a result, this
+> +	 * type do not need to pending.
+> +	 */
+> +	if (reset_type != HNAE3_NONE_RESET)
+> +		set_bit(reset_type, &hdev->reset_pending);
+> +}
+> +
+>  static u32 hclge_check_event_cause(struct hclge_dev *hdev, u32 *clearval)
+>  {
+>  	u32 cmdq_src_reg, msix_src_reg, hw_err_src_reg;
+> @@ -3594,7 +3605,7 @@ static u32 hclge_check_event_cause(struct hclge_dev *hdev, u32 *clearval)
+>  	 */
+>  	if (BIT(HCLGE_VECTOR0_IMPRESET_INT_B) & msix_src_reg) {
+>  		dev_info(&hdev->pdev->dev, "IMP reset interrupt\n");
+> -		set_bit(HNAE3_IMP_RESET, &hdev->reset_pending);
+> +		hclge_set_reset_pending(hdev, HNAE3_IMP_RESET);
+>  		set_bit(HCLGE_COMM_STATE_CMD_DISABLE, &hdev->hw.hw.comm_state);
+>  		*clearval = BIT(HCLGE_VECTOR0_IMPRESET_INT_B);
+>  		hdev->rst_stats.imp_rst_cnt++;
+> @@ -3604,7 +3615,7 @@ static u32 hclge_check_event_cause(struct hclge_dev *hdev, u32 *clearval)
+>  	if (BIT(HCLGE_VECTOR0_GLOBALRESET_INT_B) & msix_src_reg) {
+>  		dev_info(&hdev->pdev->dev, "global reset interrupt\n");
+>  		set_bit(HCLGE_COMM_STATE_CMD_DISABLE, &hdev->hw.hw.comm_state);
+> -		set_bit(HNAE3_GLOBAL_RESET, &hdev->reset_pending);
+> +		hclge_set_reset_pending(hdev, HNAE3_GLOBAL_RESET);
+>  		*clearval = BIT(HCLGE_VECTOR0_GLOBALRESET_INT_B);
+>  		hdev->rst_stats.global_rst_cnt++;
+>  		return HCLGE_VECTOR0_EVENT_RST;
+> @@ -4052,7 +4063,7 @@ static void hclge_do_reset(struct hclge_dev *hdev)
+>  	case HNAE3_FUNC_RESET:
+>  		dev_info(&pdev->dev, "PF reset requested\n");
+>  		/* schedule again to check later */
+> -		set_bit(HNAE3_FUNC_RESET, &hdev->reset_pending);
+> +		hclge_set_reset_pending(hdev, HNAE3_FUNC_RESET);
+>  		hclge_reset_task_schedule(hdev);
+>  		break;
+>  	default:
+> @@ -4086,6 +4097,8 @@ static enum hnae3_reset_type hclge_get_reset_level(struct hnae3_ae_dev *ae_dev,
+>  		clear_bit(HNAE3_FLR_RESET, addr);
+>  	}
+>  
+> +	clear_bit(HNAE3_NONE_RESET, addr);
+> +
+>  	if (hdev->reset_type != HNAE3_NONE_RESET &&
+>  	    rst_level < hdev->reset_type)
+>  		return HNAE3_NONE_RESET;
+> @@ -4227,7 +4240,7 @@ static bool hclge_reset_err_handle(struct hclge_dev *hdev)
+>  		return false;
+>  	} else if (hdev->rst_stats.reset_fail_cnt < MAX_RESET_FAIL_CNT) {
+>  		hdev->rst_stats.reset_fail_cnt++;
+> -		set_bit(hdev->reset_type, &hdev->reset_pending);
+> +		hclge_set_reset_pending(hdev, hdev->reset_type);
+Sth is unclear for me here. Doesn't HNAE3_NONE_RESET mean that there is
+no reset? If yes, why in this case reset_fail_cnt++ is increasing?
 
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
----
+Maybe the check for NONE_RESET should be done in this else if check to
+prevent reset_fail_cnt from increasing (and also solve the problem with
+pending bit set)
+>  		dev_info(&hdev->pdev->dev,
+>  			 "re-schedule reset task(%u)\n",
+>  			 hdev->rst_stats.reset_fail_cnt);
+> @@ -4470,8 +4483,20 @@ static void hclge_reset_event(struct pci_dev *pdev, struct hnae3_handle *handle)
+>  static void hclge_set_def_reset_request(struct hnae3_ae_dev *ae_dev,
+>  					enum hnae3_reset_type rst_type)
+>  {
+> +#define HCLGE_SUPPORT_RESET_TYPE \
+> +	(BIT(HNAE3_FLR_RESET) | BIT(HNAE3_FUNC_RESET) | \
+> +	BIT(HNAE3_GLOBAL_RESET) | BIT(HNAE3_IMP_RESET))
+> +
+>  	struct hclge_dev *hdev = ae_dev->priv;
+>  
+> +	if (!(BIT(rst_type) & HCLGE_SUPPORT_RESET_TYPE)) {
+> +		/* To prevent reset triggered by hclge_reset_event */
+> +		set_bit(HNAE3_NONE_RESET, &hdev->default_reset_request);
+> +		dev_warn(&hdev->pdev->dev, "unsupported reset type %d\n",
+> +			 rst_type);
+> +		return;
+> +	}
+Maybe (nit):
+if (...) {
+	rst_type = 
+	dev_warn();
+}
 
-Changelog since v1:
-- Minor style fixes.
-- Use for_each_pmc_rcu() instead of for_each_pmc_rtnl().
+set_bit(rst_type, );
+It is a little hard to follow with return in the if.
 
- include/linux/igmp.h |  7 +++++
- net/ipv4/devinet.c   | 61 ++++++++++++++++++++++++++++++++++++--------
- net/ipv4/igmp.c      | 14 ++++------
- 3 files changed, 63 insertions(+), 19 deletions(-)
+> +
+>  	set_bit(rst_type, &hdev->default_reset_request);
+>  }
+>  
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+> index 2f6ffb88e700..fd0abe37fdd7 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+> @@ -1393,6 +1393,17 @@ static int hclgevf_notify_roce_client(struct hclgevf_dev *hdev,
+>  	return ret;
+>  }
+>  
+> +static void hclgevf_set_reset_pending(struct hclgevf_dev *hdev,
+> +				      enum hnae3_reset_type reset_type)
+> +{
+> +	/* When an incorrect reset type is executed, the get_reset_level
+> +	 * function generates the HNAE3_NONE_RESET flag. As a result, this
+> +	 * type do not need to pending.
+> +	 */
+> +	if (reset_type != HNAE3_NONE_RESET)
+> +		set_bit(reset_type, &hdev->reset_pending);
+> +}
+You already have a way to share the code between PF and VF, so please
+move the same functions to common file in one direction up.
 
-diff --git a/include/linux/igmp.h b/include/linux/igmp.h
-index 073b30a9b850..221768b47e80 100644
---- a/include/linux/igmp.h
-+++ b/include/linux/igmp.h
-@@ -142,4 +142,11 @@ extern void __ip_mc_inc_group(struct in_device *in_dev=
-, __be32 addr,
- extern void ip_mc_inc_group(struct in_device *in_dev, __be32 addr);
- int ip_mc_check_igmp(struct sk_buff *skb);
-=20
-+#define for_each_pmc_rcu(in_dev, pmc)				\
-+	for (pmc =3D rcu_dereference(in_dev->mc_list);		\
-+	     pmc !=3D NULL;					\
-+	     pmc =3D rcu_dereference(pmc->next_rcu))
-+
-+int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
-+		       const struct ip_mc_list *im, int event, int flags);
- #endif
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index c8b3cf5fba4c..01754d96fa2d 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -114,6 +114,7 @@ struct inet_fill_args {
- 	unsigned int flags;
- 	int netnsid;
- 	int ifindex;
-+	enum addr_type_t type;
- };
-=20
- #define IN4_ADDR_HSIZE_SHIFT	8
-@@ -1850,21 +1851,44 @@ static int in_dev_dump_addr(struct in_device *in_de=
-v, struct sk_buff *skb,
- 			    struct netlink_callback *cb, int *s_ip_idx,
- 			    struct inet_fill_args *fillargs)
- {
-+	struct ip_mc_list *im;
- 	struct in_ifaddr *ifa;
- 	int ip_idx =3D 0;
- 	int err;
-=20
--	in_dev_for_each_ifa_rcu(ifa, in_dev) {
--		if (ip_idx < *s_ip_idx) {
-+	switch (fillargs->type) {
-+	case UNICAST_ADDR:
-+		fillargs->event =3D RTM_NEWADDR;
-+		in_dev_for_each_ifa_rcu(ifa, in_dev) {
-+			if (ip_idx < *s_ip_idx) {
-+				ip_idx++;
-+				continue;
-+			}
-+			err =3D inet_fill_ifaddr(skb, ifa, fillargs);
-+			if (err < 0)
-+				goto done;
-+
-+			nl_dump_check_consistent(cb, nlmsg_hdr(skb));
- 			ip_idx++;
--			continue;
- 		}
--		err =3D inet_fill_ifaddr(skb, ifa, fillargs);
--		if (err < 0)
--			goto done;
-+		break;
-+	case MULTICAST_ADDR:
-+		for_each_pmc_rcu(in_dev, im) {
-+			if (ip_idx < *s_ip_idx) {
-+				ip_idx++;
-+				continue;
-+			}
-+			err =3D inet_fill_ifmcaddr(skb, in_dev->dev, im,
-+						 RTM_GETMULTICAST, NLM_F_MULTI);
-+			if (err < 0)
-+				goto done;
-=20
--		nl_dump_check_consistent(cb, nlmsg_hdr(skb));
--		ip_idx++;
-+			nl_dump_check_consistent(cb, nlmsg_hdr(skb));
-+			ip_idx++;
-+		}
-+		break;
-+	default:
-+		break;
- 	}
- 	err =3D 0;
- 	ip_idx =3D 0;
-@@ -1889,15 +1913,16 @@ static u32 inet_base_seq(const struct net *net)
- 	return res;
- }
-=20
--static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *=
-cb)
-+static int inet_dump_addr(struct sk_buff *skb, struct netlink_callback *cb=
-,
-+			  enum addr_type_t type)
- {
- 	const struct nlmsghdr *nlh =3D cb->nlh;
- 	struct inet_fill_args fillargs =3D {
- 		.portid =3D NETLINK_CB(cb->skb).portid,
- 		.seq =3D nlh->nlmsg_seq,
--		.event =3D RTM_NEWADDR,
- 		.flags =3D NLM_F_MULTI,
- 		.netnsid =3D -1,
-+		.type =3D type,
- 	};
- 	struct net *net =3D sock_net(skb->sk);
- 	struct net *tgt_net =3D net;
-@@ -1949,6 +1974,20 @@ static int inet_dump_ifaddr(struct sk_buff *skb, str=
-uct netlink_callback *cb)
- 	return err;
- }
-=20
-+static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *=
-cb)
-+{
-+	enum addr_type_t type =3D UNICAST_ADDR;
-+
-+	return inet_dump_addr(skb, cb, type);
-+}
-+
-+static int inet_dump_ifmcaddr(struct sk_buff *skb, struct netlink_callback=
- *cb)
-+{
-+	enum addr_type_t type =3D MULTICAST_ADDR;
-+
-+	return inet_dump_addr(skb, cb, type);
-+}
-+
- static void rtmsg_ifa(int event, struct in_ifaddr *ifa, struct nlmsghdr *n=
-lh,
- 		      u32 portid)
- {
-@@ -2845,6 +2884,8 @@ static const struct rtnl_msg_handler devinet_rtnl_msg=
-_handlers[] __initconst =3D {
- 	{.protocol =3D PF_INET, .msgtype =3D RTM_GETNETCONF,
- 	 .doit =3D inet_netconf_get_devconf, .dumpit =3D inet_netconf_dump_devcon=
-f,
- 	 .flags =3D RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
-+	{.owner =3D THIS_MODULE, .protocol =3D PF_INET, .msgtype =3D RTM_GETMULTI=
-CAST,
-+	 .dumpit =3D inet_dump_ifmcaddr, .flags =3D RTNL_FLAG_DUMP_UNLOCKED},
- };
-=20
- void __init devinet_init(void)
-diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-index 8a370ef37d3f..a262614c29ee 100644
---- a/net/ipv4/igmp.c
-+++ b/net/ipv4/igmp.c
-@@ -174,11 +174,6 @@ static void ip_ma_put(struct ip_mc_list *im)
- 	}
- }
-=20
--#define for_each_pmc_rcu(in_dev, pmc)				\
--	for (pmc =3D rcu_dereference(in_dev->mc_list);		\
--	     pmc !=3D NULL;					\
--	     pmc =3D rcu_dereference(pmc->next_rcu))
--
- #define for_each_pmc_rtnl(in_dev, pmc)				\
- 	for (pmc =3D rtnl_dereference(in_dev->mc_list);		\
- 	     pmc !=3D NULL;					\
-@@ -1432,14 +1427,14 @@ static void ip_mc_hash_remove(struct in_device *in_=
-dev,
- 	*mc_hash =3D im->next_hash;
- }
-=20
--static int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
--			      const struct ip_mc_list *im, int event)
-+int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
-+		       const struct ip_mc_list *im, int event, int flags)
- {
- 	struct ifa_cacheinfo ci;
- 	struct ifaddrmsg *ifm;
- 	struct nlmsghdr *nlh;
-=20
--	nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), 0);
-+	nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), flags);
- 	if (!nlh)
- 		return -EMSGSIZE;
-=20
-@@ -1464,6 +1459,7 @@ static int inet_fill_ifmcaddr(struct sk_buff *skb, st=
-ruct net_device *dev,
- 	nlmsg_end(skb, nlh);
- 	return 0;
- }
-+EXPORT_SYMBOL(inet_fill_ifmcaddr);
-=20
- static void inet_ifmcaddr_notify(struct net_device *dev,
- 				 const struct ip_mc_list *im, int event)
-@@ -1477,7 +1473,7 @@ static void inet_ifmcaddr_notify(struct net_device *d=
-ev,
- 	if (!skb)
- 		goto error;
-=20
--	err =3D inet_fill_ifmcaddr(skb, dev, im, event);
-+	err =3D inet_fill_ifmcaddr(skb, dev, im, event, 0);
- 	if (err < 0) {
- 		WARN_ON_ONCE(err =3D=3D -EMSGSIZE);
- 		nlmsg_free(skb);
---=20
-2.47.1.613.gc27f4b7a9f-goog
-
+> +
+>  static int hclgevf_reset_wait(struct hclgevf_dev *hdev)
+>  {
+>  #define HCLGEVF_RESET_WAIT_US	20000
+> @@ -1542,7 +1553,7 @@ static void hclgevf_reset_err_handle(struct hclgevf_dev *hdev)
+>  		hdev->rst_stats.rst_fail_cnt);
+>  
+>  	if (hdev->rst_stats.rst_fail_cnt < HCLGEVF_RESET_MAX_FAIL_CNT)
+> -		set_bit(hdev->reset_type, &hdev->reset_pending);
+> +		hclgevf_set_reset_pending(hdev, hdev->reset_type);
+>  
+>  	if (hclgevf_is_reset_pending(hdev)) {
+>  		set_bit(HCLGEVF_RESET_PENDING, &hdev->reset_state);
+> @@ -1662,6 +1673,8 @@ static enum hnae3_reset_type hclgevf_get_reset_level(unsigned long *addr)
+>  		clear_bit(HNAE3_FLR_RESET, addr);
+>  	}
+>  
+> +	clear_bit(HNAE3_NONE_RESET, addr);
+> +
+>  	return rst_level;
+>  }
+>  
+> @@ -1671,14 +1684,15 @@ static void hclgevf_reset_event(struct pci_dev *pdev,
+>  	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(pdev);
+>  	struct hclgevf_dev *hdev = ae_dev->priv;
+>  
+> -	dev_info(&hdev->pdev->dev, "received reset request from VF enet\n");
+> -
+>  	if (hdev->default_reset_request)
+>  		hdev->reset_level =
+>  			hclgevf_get_reset_level(&hdev->default_reset_request);
+>  	else
+>  		hdev->reset_level = HNAE3_VF_FUNC_RESET;
+>  
+> +	dev_info(&hdev->pdev->dev, "received reset request from VF enet, reset level is %d\n",
+> +		 hdev->reset_level);
+> +
+>  	/* reset of this VF requested */
+>  	set_bit(HCLGEVF_RESET_REQUESTED, &hdev->reset_state);
+>  	hclgevf_reset_task_schedule(hdev);
+> @@ -1689,8 +1703,20 @@ static void hclgevf_reset_event(struct pci_dev *pdev,
+>  static void hclgevf_set_def_reset_request(struct hnae3_ae_dev *ae_dev,
+>  					  enum hnae3_reset_type rst_type)
+>  {
+> +#define HCLGEVF_SUPPORT_RESET_TYPE \
+> +	(BIT(HNAE3_VF_RESET) | BIT(HNAE3_VF_FUNC_RESET) | \
+> +	BIT(HNAE3_VF_PF_FUNC_RESET) | BIT(HNAE3_VF_FULL_RESET) | \
+> +	BIT(HNAE3_FLR_RESET) | BIT(HNAE3_VF_EXP_RESET))
+> +
+>  	struct hclgevf_dev *hdev = ae_dev->priv;
+>  
+> +	if (!(BIT(rst_type) & HCLGEVF_SUPPORT_RESET_TYPE)) {
+> +		/* To prevent reset triggered by hclge_reset_event */
+> +		set_bit(HNAE3_NONE_RESET, &hdev->default_reset_request);
+> +		dev_info(&hdev->pdev->dev, "unsupported reset type %d\n",
+> +			 rst_type);
+> +		return;
+> +	}
+>  	set_bit(rst_type, &hdev->default_reset_request);
+>  }
+>  
+> @@ -1847,14 +1873,14 @@ static void hclgevf_reset_service_task(struct hclgevf_dev *hdev)
+>  		 */
+>  		if (hdev->reset_attempts > HCLGEVF_MAX_RESET_ATTEMPTS_CNT) {
+>  			/* prepare for full reset of stack + pcie interface */
+> -			set_bit(HNAE3_VF_FULL_RESET, &hdev->reset_pending);
+> +			hclgevf_set_reset_pending(hdev, HNAE3_VF_FULL_RESET);
+>  
+>  			/* "defer" schedule the reset task again */
+>  			set_bit(HCLGEVF_RESET_PENDING, &hdev->reset_state);
+>  		} else {
+>  			hdev->reset_attempts++;
+>  
+> -			set_bit(hdev->reset_level, &hdev->reset_pending);
+> +			hclgevf_set_reset_pending(hdev, hdev->reset_level);
+>  			set_bit(HCLGEVF_RESET_PENDING, &hdev->reset_state);
+>  		}
+>  		hclgevf_reset_task_schedule(hdev);
+> @@ -1977,7 +2003,7 @@ static enum hclgevf_evt_cause hclgevf_check_evt_cause(struct hclgevf_dev *hdev,
+>  		rst_ing_reg = hclgevf_read_dev(&hdev->hw, HCLGEVF_RST_ING);
+>  		dev_info(&hdev->pdev->dev,
+>  			 "receive reset interrupt 0x%x!\n", rst_ing_reg);
+> -		set_bit(HNAE3_VF_RESET, &hdev->reset_pending);
+> +		hclgevf_set_reset_pending(hdev, HNAE3_VF_RESET);
+>  		set_bit(HCLGEVF_RESET_PENDING, &hdev->reset_state);
+>  		set_bit(HCLGE_COMM_STATE_CMD_DISABLE, &hdev->hw.hw.comm_state);
+>  		*clearval = ~(1U << HCLGEVF_VECTOR0_RST_INT_B);
+> -- 
+> 2.33.0
 
