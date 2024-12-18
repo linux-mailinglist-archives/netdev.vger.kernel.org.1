@@ -1,165 +1,134 @@
-Return-Path: <netdev+bounces-152983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 523A79F6883
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:32:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28B649F688C
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:34:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06C0C1887475
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:32:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1A7116CCF3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:33:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA82D1ACEA3;
-	Wed, 18 Dec 2024 14:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98941D5CE5;
+	Wed, 18 Dec 2024 14:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RkEH+h7e"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="EIwY/ufz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED42219ED;
-	Wed, 18 Dec 2024 14:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A36D1B0405
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734532351; cv=none; b=KK1dhWQ60wyh+wZjdcd1U+G1IEa8YnHaFwmTYu41s1ZL1rzWEriX6pRHgVJBNAnKyn77mG5atj7yJ4OkrBXiN4rv32D/qCNtsKJLoOBhoe3Kd/rq7zQCP4UgWCsz4isr0YPI7ORVgLhFQKRfr7WBaTrWITK5U934y0bVkYjN1io=
+	t=1734532392; cv=none; b=dsKY7QjOT8v7eZR+47A4ls1jI3KtFDq6ipBZe6/9VtCzKMPO/i2jW6mXPk2ygkmZMptgYwNz8JUBR+EqqNP/a+qXKuZUGPKA5axzb7eC0ACmEayGxu4CvqV8LA6y1ItB1jfFkQbEE+48Oyi5i5OMM8H7g/Rb0KeV+NRRa3jsMMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734532351; c=relaxed/simple;
-	bh=8FsK/bER8lP7OunJFmegsYl6K/NI0Rc49MtT+8SVWsw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A/fkIyzntbcZQ8EGHHaooHiEmbBcRb0f1hs6RXkjcDxsXqggUycpUrtppe8AnWbRey6PvhiQm2qomqt2k+4LeBGa/RNslC0GXCoWawou0KfNsWlZWlzSF0KRmTEUW/GE+lbjsaKqQrdcuBDXh0o3/5Ofh3+ej1k7inU5dAGCf5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RkEH+h7e; arc=none smtp.client-ip=209.85.160.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-2a3bf796cccso2148829fac.1;
-        Wed, 18 Dec 2024 06:32:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734532349; x=1735137149; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=55iqn6k0ksE8M1ea/JmwD0ngi/GTsL3+dCKm5pf5BGc=;
-        b=RkEH+h7eDTVXXyZ73Z1RPGMazu3BT4l320J6p7Rtu112pEvQu4WNpFZ50yzQFkBFAx
-         UOguHvuLczqPKss39jgRcgiup2/FhJgpLBtqUseobPMnyhjM/XRDQmF9d/HCox1VSfk2
-         qJVh+4m4jZDwptwLGkzy+IlJEs+dP7ge4zr3ThALTO6S0OEY+ZB2fkKdzAfzLBuI056O
-         NIw9zmZ/i6wa05HK/kFKrC7ldDHiYwN1yWfuY4KZlpLmAm9uhHAbver2GDJXwmuepzY/
-         wKukKXDi6Zwc300fn8Hinovo5FGBLtYm73boFVibz/5+QjAqy25fCwghQWtvaXWPEAPx
-         cPBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734532349; x=1735137149;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=55iqn6k0ksE8M1ea/JmwD0ngi/GTsL3+dCKm5pf5BGc=;
-        b=kN/KYJz7tYstm0YvSdI1HHgqu2Ju3mGbtggmI1g5IDm6dIeAG9B9XE7oB3d5qhK4aO
-         baahjUyjWsxRTzqJ626hp9cyMdu4syBx3rYrjwceOCsI7X5KAMiqtBWBJd4PfLuzxWyq
-         Ens8eeH7heP3gFf9MGWcgvxdTm1jt19pzPhMGObmFK/fZFspddvOXGyUjJGc6B5VR8kz
-         rNn5lGWSWTvIAo6k+EXJudnaHSTE7rGjHAKsTFGX//2TPdXiySO6Bi2RbgncHP37l3f0
-         JK2XBPK2Vd5pMITHiEqyS7y+2jCCV9zymOkfTzHliZpk5eBkayZx/hREb7l8NuJAKFA8
-         anUA==
-X-Forwarded-Encrypted: i=1; AJvYcCUd4ReLctt2Su14/56PXWs8DN0+1BvuCRdze1YZd5tPfU3RVKyYfVhvrZk3wS6l0eeNSpqYzdUV6EP1JTCqwA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnDUUr894jybGIToxhF9ov57hv8Or48yWKEH94XwaCYAAAgvD6
-	cDsQZW72pHsIenV9j4DvtEmIo4KASm90NTcUjH4m8KyNLtgzM51IjL37qdcR8WnO3m/2OtoWbTL
-	Ix9/KdQ+PHm/Jr7o9FtKfT6uHavR4/w==
-X-Gm-Gg: ASbGncuulO/NAV71IJtuePSBtt8kvO1X6DmvA8vT44xydlUfoF3FcF/dV3iTYaZNW1O
-	SUq7UKAThexgV1NObjX5eEVSfyY78YHKQ/8z88Oxmv/SCLmfOhIgTjgm8lU6gZL0TDRvu
-X-Google-Smtp-Source: AGHT+IFyMW2N5XWmeC401DjiP8EK9p9DQsfIGeAFHCBgMCE5Lk9tMoq/5U6MaQ9K6nHQ0kSO4/uTNPEO6QKa9QHLF+Y=
-X-Received: by 2002:a05:6870:3d8e:b0:2a3:c59f:4cba with SMTP id
- 586e51a60fabf-2a7b3088006mr1283971fac.17.1734532348669; Wed, 18 Dec 2024
- 06:32:28 -0800 (PST)
+	s=arc-20240116; t=1734532392; c=relaxed/simple;
+	bh=SfbuOyDa8+ndQMh2V1UGoOXKxb3uoTRmJgOU+SyjCtg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mcVnG1vdUZK4svlDjzBYBCI+FBOKT0sX2Fkl3hUqiFeYVz61LY4Nni/DDDNb7Pn4/wqQAOTy3yP1y/uV2gRCx3M2QK6YUEHvXlbal0XSIf3Fy0992dQ6L12rQQ1CbMgVVi6L20UNFoI/6mFkO9A4QrqrtoX7l2Q2yWpgjVhpZNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=EIwY/ufz; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tNv6p-004s1R-VC
+	for netdev@vger.kernel.org; Wed, 18 Dec 2024 15:33:07 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=lmnlWo2hPLs1HhL+gB5ZaOYhkc5GpETrDblCeltmDQA=
+	; b=EIwY/ufzo7JfzyHbXXMLFjhL+D7mk12XApMFUYKsPJOd7NeebPb6A501j5+sbLGaXcRkEAavg
+	J+b79NGO6+O3pI/cthoAFbOlOsrazzfV0TEvt4pqg6ocBfWdLmQHZBNTsMnyOz//O4LwFH7K3yKhO
+	zXG4/6SMY9sw2Msks/rZHBXI++/hSddZEOnrXxfpmTTHXK2/NarMxERaS6DaQkJ06D00FzbNb45qW
+	f+LU5Oep0yI9wgop4xxDT6jnSIQTYHgO1ATk+CvqV7nSlukN5ZZJacP1PZ9H9L5Q0l3c2tjTU7tvf
+	RuncrksizdL+f/ZvjjQyV1NQsoQmjaLtrvjbsg==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tNv6p-00070z-KB; Wed, 18 Dec 2024 15:33:07 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tNv6U-008Env-QF; Wed, 18 Dec 2024 15:32:46 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net-next v3 0/7] vsock/test: Tests for memory leaks
+Date: Wed, 18 Dec 2024 15:32:33 +0100
+Message-Id: <20241218-test-vsock-leaks-v3-0-f1a4dcef9228@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210161448.76799-1-donald.hunter@gmail.com>
- <20241210161448.76799-8-donald.hunter@gmail.com> <9c0fcee07cb7b93308a5d0185c4e74fb3cbbef1c.camel@sipsolutions.net>
-In-Reply-To: <9c0fcee07cb7b93308a5d0185c4e74fb3cbbef1c.camel@sipsolutions.net>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Wed, 18 Dec 2024 14:32:17 +0000
-Message-ID: <CAD4GDZz3xSyA2zJcs-wbZa4yD-ZT90PeOLFReOcr286-nycA6g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 7/7] netlink: specs: wireless: add a spec for nl80211
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-wireless@vger.kernel.org, 
-	donald.hunter@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAHdYmcC/22NywrCMBQFf6Vk7ZU8mqZ15X+IixpvbKgkkoRQK
+ f13QxAUdDkcZs5KIgaLkRyalQTMNlrvCohdQ/Q0uhuCvRYmnPKWcSogYUyQo9cz3HGcI4jeDFI
+ ORnaiI0V7BDR2qckTcZjA4ZLIuSyTjcmHZ/3KrO7vbPebzQwoaMGw172SalDHcPHLXvuayvxLZ
+ /90XnQpkbVUqpYb/dG3bXsB831Eg/cAAAA=
+X-Change-ID: 20241203-test-vsock-leaks-38f9559f5636
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>, 
+ Luigi Leonardi <leonardi@redhat.com>
+X-Mailer: b4 0.14.2
 
-On Thu, 12 Dec 2024 at 08:36, Johannes Berg <johannes@sipsolutions.net> wrote:
->
-> On Tue, 2024-12-10 at 16:14 +0000, Donald Hunter wrote:
-> >
-> > +  -
-> > +    name: wlan-cipher-suites
-> > +    type: enum
->
-> I'm not sure exactly what this does, but I'm not sure 'enum' is the
-> right way to think about it. Pretty much every number (OUI + subvalue)
-> could be valid here, if the driver advertises support for it and you
-> have a supplicant that understands it.
+Series adds tests for recently fixed memory leaks[1]:
 
-It was an attempt to enumerate the valid values, but from what you are
-saying I think it will need to remain as u32, probably with
-'display-hint: hex".
+commit d7b0ff5a8667 ("virtio/vsock: Fix accept_queue memory leak")
+commit fbf7085b3ad1 ("vsock: Fix sk_error_queue memory leak")
+commit 60cf6206a1f5 ("virtio/vsock: Improve MSG_ZEROCOPY error handling")
 
-> > +  -
-> > +    name: wiphy-bands
-> > +    attributes:
-> > +      -
-> > +        name: 2ghz
-> > +        doc: 2.4 GHz ISM band
-> > +        value: 0
-> > +        type: nest
-> > +        nested-attributes: band-attrs
-> > +      -
-> > +        name: 5ghz
-> > +        doc: around 5 GHz band (4.9 - 5.7 GHz)
-> > +        type: nest
-> > +        nested-attributes: band-attrs
-> > +      -
-> > +        name: 60ghz
-> > +        doc: around 60 GHz band (58.32 - 69.12 GHz)
-> > +        type: binary
->
-> This (and s1g/lc) should also nest, with the same attributes? There
-> should be no structural difference between the bands, even if most of
-> the values are only used/valid for some of the bands.
+Patch 1/6 is a non-functional preparatory cleanup.
+Patch 2/6 is a test suite extension for picking specific tests.
+Patch 3/6 explains the need of kmemleak scans.
+Patches 4-5-6 add the tests.
 
-That makes sense. I'll add the nest type to them all.
+NOTE: Test in patch 6/6 ("vsock/test: Add test for MSG_ZEROCOPY completion
+memory leak") may stop working even before this series is merged. See
+changes proposed in [2]. The failslab variant would be unaffected.
 
-> > +operations:
-> > +  enum-model: directional
-> > +  list:
-> > +    -
-> > +      name: get-wiphy
-> > +      doc: |
-> > +        Get information about a wiphy or dump a list of all wiphys. Requests to dump get-wiphy
-> > +        should unconditionally include the split-wiphy-dump flag in the request.
-> > +      attribute-set: nl80211-attrs
-> > +      do:
-> > +        request:
-> > +          value: 1
-> > +          attributes:
-> > +            - wiphy
-> > +            - wdev
-> > +            - ifindex
-> > +        reply:
-> > +          value: 3
->
-> could the value not reference "get-wiphy" and "new-wiphy" from the
-> command list? That might be easier to understand?
+[1] https://lore.kernel.org/netdev/20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co/
+[2] https://lore.kernel.org/netdev/CANn89i+oL+qoPmbbGvE_RT3_3OWgeck7cCPcTafeehKrQZ8kyw@mail.gmail.com/
 
-There is currently no schema or tool support for referencing enum
-constants when defining protocol message ids. Most of the netlink
-families don't have any need for an enumeration of commands in the
-spec; nl80211 is unusual in reporting available commands.
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v3:
+- Allow for multiple tests selection (Stefano)
+- Generalize CONTINUE/DONE control messages (Stefano)
+- Collect R-b (Stefano)
+- Link to v2: https://lore.kernel.org/r/20241216-test-vsock-leaks-v2-0-55e1405742fc@rbox.co
 
-I'm currently working on completeness of nl80211 and a couple of
-feature gaps in ynl-gen-c.py to resolve 'make -C tools/net/ynl'
-failures. I doubt that I will have a v3 patchset ready before net-next
-closes for the holidays.
+Changes in v2:
+- Introduce a vsock_test option to run a single test
+- ZC completion test: rewrite, comment, describe failslab approach (Stefano)
+- accept_queue test: rewrite, comment (Stefano)
+- Annotate functions and commits about the need of kmemleak (Stefano)
+- Add README section about kmemleak (Stefano)
+- Collect R-b (Luigi, Stefano)
+- Link to v1: https://lore.kernel.org/r/20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co
 
-Thanks,
-Donald.
+---
+Michal Luczaj (7):
+      vsock/test: Use NSEC_PER_SEC
+      vsock/test: Introduce option to select tests
+      vsock/test: Add README blurb about kmemleak usage
+      vsock/test: Adapt send_byte()/recv_byte() to handle MSG_ZEROCOPY
+      vsock/test: Add test for accept_queue memory leak
+      vsock/test: Add test for sk_error_queue memory leak
+      vsock/test: Add test for MSG_ZEROCOPY completion memory leak
+
+ tools/testing/vsock/README       |  15 +++
+ tools/testing/vsock/util.c       |  33 ++++-
+ tools/testing/vsock/util.h       |   2 +
+ tools/testing/vsock/vsock_test.c | 265 ++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 309 insertions(+), 6 deletions(-)
+---
+base-commit: 2c2b61d2138f472e50b5531ec0cb4a1485837e21
+change-id: 20241203-test-vsock-leaks-38f9559f5636
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
