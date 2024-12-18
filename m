@@ -1,444 +1,263 @@
-Return-Path: <netdev+bounces-153094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7129F6C3A
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:20:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFAA49F6C5C
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:33:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F2B31634C7
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:20:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D8017A385E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168C31FA172;
-	Wed, 18 Dec 2024 17:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2689A1F4284;
+	Wed, 18 Dec 2024 17:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aXGpUF8C"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dLuqPV9/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2082.outbound.protection.outlook.com [40.107.92.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00B81FA140;
-	Wed, 18 Dec 2024 17:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734542427; cv=none; b=GFNRl8Donev7lYReyNWhNG0vKDR4k7lcPg4uka6WvaCfUJgQWqc0vCL5V+YBgO/RJEmqQAhbjinRWCa4qJ5Sqm4oo+gMzmGPgfb0ybOO1p9d89Xdv2fr2msK9E4CuDqpV3GaaxO3jekP/WGv64nTL7nevsZM44LvHxbumFN7Ce8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734542427; c=relaxed/simple;
-	bh=3N+cuewldFaJKRwJl9DNy16Th5B6NVeY4HuuOriBNSk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lw/1m57IlkBrYnE7cHBjDhF4oma4i0kVkls9DSo7OetMCZg1Or0lXb3I5UGW9vYOZBj/tf5uw1eaCiJBuKAL/raIFo36FeSLtLB3+kU1pUjZaBss+K69VW6UfEXbPtUAzlRmlCvgFLK3iaFPnw0r+/bvW59DTfzDptkiAWPx99c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aXGpUF8C; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43623f0c574so47834785e9.2;
-        Wed, 18 Dec 2024 09:20:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734542423; x=1735147223; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QXO/e2KAjZixwNQ1SDIaI26qLFA4hGy8FrCAqG7q2F4=;
-        b=aXGpUF8CblDagvRvFJ9BcRGy4ZBooFNTBF9eNXR5XSCUL4t83rOacgz0p0kp5jv901
-         EObs6jRa9szeOaKhOYuW3hv+v4sowagvcY9aEvXkM4z+Ax9gT/h9Wq94eYFmKF/radSK
-         HYOTscXh59dXCGyt4UtHh5Oc1ipGgDgnpPmSlTny1qx4gkxlfwszyHXU1aTY4Jmjb1mN
-         qYATbe6hDgvW3tIo0GzY/wmfbWZv6uKB0JrawXr0bQWKxy6AMftmxmQh+KqDzbRxSJdI
-         Vu/nJIlir40c3yYoozNw2or1Hs3A3ckNxEKlOJSspOqvO0uclC5cdm2pXy8ULZUW5c9c
-         L0bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734542423; x=1735147223;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QXO/e2KAjZixwNQ1SDIaI26qLFA4hGy8FrCAqG7q2F4=;
-        b=aYjQrx4PbJNtX2Z3y9U1FAQFEdFLif9QsksU+vhjoDSVj55hP+7wsFh6VzEZgtScMD
-         nsMFUnidRlhJw9YrpXIawvtPajR1rHE9OORHJGYqms0kNZuA9/VByhzNwn+XLs1KCzxM
-         IriRDartrmZE6acYsLOBRjkST1mL15cxs8DtSyHWzWB/bs8/V/UDBu3PVpXMhtNfpnqW
-         INJ0j2+i1fxOrO5fbcRfD0HlEueb7T6Lqbu+TUYjwuCOihKliUJzuNa8q01Rd85HAS5Y
-         h5nd6zb8s5PQG8v4bm09YIFE1oqbXyXxh/KfILJSMnYRw+vNuv/U5nc6ciGffkOkAIw5
-         B4xg==
-X-Forwarded-Encrypted: i=1; AJvYcCVt7P7I4qLE0OIWcMRXaZn6sKO4/s3DqeLHx77k/2em0WoLpZUSHS61kQqqE6UCWfMv5mSOnOq1@vger.kernel.org, AJvYcCWMQyYn0xjHXe/nTJPGfP/RnbQrGbwoio0wCqRIMRQXrWO/iMe0Z3Uv/EldM14v6OmTFbw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDRcNnNAjEGg7tGgHJJP2EKKk4rPsv5iJrrR1dZhFRWrQAqeCz
-	WRT5wHjaHSB6+iW3l603OhZfYdzLEvFqeM2QgP7oigNosm2BLpVEB2FZMgFPT6I+dZQKaNwXajD
-	baEUbX1Vp6B+H9nveoyfs8Rh9iPI=
-X-Gm-Gg: ASbGncvkwAvTJFCqFS3dX4EJ3itrd2/CN9uCN6VPq4HmFzepX/gUhWdFWs8sV77g+FP
-	ydOnF3ht/G69awtbU50raFd0UfJeudiFkjw0A6w==
-X-Google-Smtp-Source: AGHT+IEZtz80/SAqak4uXM6RR6jbMoBVQtuTGPssYnYovnpsnugN8JjM2szOqXBQkoPvj//QRcT4AYY2PhbpDwq+wvI=
-X-Received: by 2002:a5d:6d8e:0:b0:385:e1a8:e2a1 with SMTP id
- ffacd0b85a97d-388e4d6bbb1mr3569735f8f.3.1734542422778; Wed, 18 Dec 2024
- 09:20:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF16E153BF7
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 17:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734543184; cv=fail; b=oKAVG6hfX8T4TYplfKWhI6DMQWoj5kGLw5LBF+/+wAt1hIbszXSQYNFE+LswPnhr93zv3hhHOI9PdWh9hbidlQvXyi9QiD/Pa9MWYdZtGLL34HZDGPzqgiUejWfTEgvLUEeQh5Ik7Ow2TiqW40iPbfaQZrtv4qSDIfWdCk1EXgI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734543184; c=relaxed/simple;
+	bh=q9a1tL7qXV+wKAY/1i+NAuZ/ZiGtk5l550TGU4OEAz4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QXN2YDj7iNJActppWTaI2QC4eb7q1shl+hSc5qKWaVS3V83tD73eqWx+hXjjC5sjoPE3f/UHLvgCyoZk9Hxsl4AvClJWoVncVYnK9iCdJaWOWE/H7r7+J1cu47fTfhbi2GA5Z+F00QtS9B/h+IUkjNGbTqTdV+iDxtpDKGCZo/A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dLuqPV9/; arc=fail smtp.client-ip=40.107.92.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zm24bKqUGlsim1ILqvpCUnSU0veeu33yQt/HgOUrjWBaQZQPXEozIiZ0EyqWwJ6tq4Dp689IsCJwJc5iF/OJX0cpH4t2JtfnjffOQOgyQ1kHnZBIC4W/cg9ypAPHSK4O6axK/QHaLHOBPNWHtiVbetGW5+KvntuG+8mtJpNdwm0+3pqnyF3We93fYV8rhVPwHl/UNmm7EKxcpcrwAkJOFxqwUbMFf++NqF//t6dQEiK1oD8l7qPKOSYSeQ+PiIAZjLtfItfiLqH2lc88cZq5caMVqVRNZfNvh0+2Im4luhjnFH/EsgSG+Dy/mcO4THz7qpc80hySa+0nOP5h6L1Ygw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=q9a1tL7qXV+wKAY/1i+NAuZ/ZiGtk5l550TGU4OEAz4=;
+ b=SX1C91aYkQO3aUCpSx9lkbkWB7RALbO49AcCIqH7QQFcyNMKe/NRX+jkiVowmTm//RntIRqd9HKoUE36vl+2z6emk8gTgImE5A9mUVYDVacGtlNNK+nbNNpuLTc1z8RyVUdii7NJvq22Od2Zh3i319PVu/2szWCdoBwltJEX4frFdwwjoBdAa8/GNfbEdQIwxoEDfMcDaUyStE1Ooa+/IweRMkVXwpPxI9NH3QIZ4divIauKvKHzyBNYrgKkxTiGrqhv6l+apted5oPisGq91zDUvuipTYgOz+OzICYLf8IsPIBvRNT4M1+oKGTMCoks1g7KCEA0pwEbPNVy29u1sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q9a1tL7qXV+wKAY/1i+NAuZ/ZiGtk5l550TGU4OEAz4=;
+ b=dLuqPV9//5AyQTI/lbUtwsxPJTjn1vbp2YT349/dDVLetHZIHCFnmVGZDTjpLbFmHTQIPlErutCgKM/IZGZgpHyy/xKl4WfcW+PwLWLpBOU/dPrCDbFY0bbebJRPxGy4YU+JxaW/TO9C12xEZ+7ZqKR7CWiEGlK7uQJ4qA5TKEFGv9KMFu8AVXPeZf6vcrEy+aDZAfvBABlbDsaWHul1lcyqJgJSDydjL/zudoMqB1nZkzC9iQ2mCg8qm187bAgGAUvilLWTZ3Olv/skeP08aMQp56kQsVD1BhHmNox06CP6roT6QybumaPpIu+T3cFzYTDSKWo5fhryy1LZTBBWzA==
+Received: from CH2PR12MB4858.namprd12.prod.outlook.com (2603:10b6:610:67::7)
+ by SJ1PR12MB6314.namprd12.prod.outlook.com (2603:10b6:a03:457::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.12; Wed, 18 Dec
+ 2024 17:32:58 +0000
+Received: from CH2PR12MB4858.namprd12.prod.outlook.com
+ ([fe80::615:9477:2990:face]) by CH2PR12MB4858.namprd12.prod.outlook.com
+ ([fe80::615:9477:2990:face%6]) with mapi id 15.20.8272.013; Wed, 18 Dec 2024
+ 17:32:58 +0000
+From: Yong Wang <yongwang@nvidia.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>, Roopa Prabhu
+	<roopa@nvidia.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Andy Roulin <aroulin@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, Nithya
+ Miyar <nmiyar@nvidia.com>
+Subject: Re: [RFC v2 net-next 1/2] net: bridge: multicast: re-implement port
+ multicast enable/disable functions
+Thread-Topic: [RFC v2 net-next 1/2] net: bridge: multicast: re-implement port
+ multicast enable/disable functions
+Thread-Index: AQHbTRAdG4GdAD18u0y1UHyZZ5sEvbLsEW2A//+0F4A=
+Date: Wed, 18 Dec 2024 17:32:57 +0000
+Message-ID: <59D84867-D6A7-4695-9983-640980117264@nvidia.com>
+References: <20241213033551.3706095-1-yongwang@nvidia.com>
+ <20241213033551.3706095-2-yongwang@nvidia.com>
+ <fb4027a7-48a7-4488-a008-584d3b69c025@blackwall.org>
+In-Reply-To: <fb4027a7-48a7-4488-a008-584d3b69c025@blackwall.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH2PR12MB4858:EE_|SJ1PR12MB6314:EE_
+x-ms-office365-filtering-correlation-id: c9ee6248-5c0a-43ba-5d31-08dd1f8a037b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?aXRLRkdpUGc1bTd1RjNLbzZjaEh4a3ZUTGY0eWhpQXpMNU5NNEpyZU5lNmtx?=
+ =?utf-8?B?ekpQTWR0YUF6RW9kZ25CemFKbFZnOW1YTVd1YjFacStkTFBRT1U1YnJTOXcy?=
+ =?utf-8?B?UjdFTlcwQTFxTzZXbmJVWlB0Ty9xTkJNSXBCSExrUWhReHlUd0pJYk5zWVpl?=
+ =?utf-8?B?NkhtNmtWZXZKMHhDVGpwY09NOTVTTnVQVGJSV0R6eUF5Z1ZWRkVacG9XVjFo?=
+ =?utf-8?B?UWt4ZkNrT3p1ek4zMm9MdW9hOElIZExyeEpWM3JjbENwTWVEdXRwSS9YWTQr?=
+ =?utf-8?B?R2lTb09SWTZKdGhid3NCbU5UZUxvcmVVcldXK3h3dDRlaUlnUXlqdzZpQXlI?=
+ =?utf-8?B?WEEvVWF0V25vQ01kL0NjU2lOYTk1K29IY2MwejFxaDBvZGd3WnNEWmVaVVQ3?=
+ =?utf-8?B?VFVJNXBjN0lMZi9qVUNVMVlHOTJMNGxQdURwZTVEQlZ4RW4xb0IwSXhIbkRn?=
+ =?utf-8?B?aDhJdGZ6Q3c0Z3BGQlpJU29JWlZMaXZTdWFBaEVBL3ZoWmxJUG9KTE9nQnQ3?=
+ =?utf-8?B?WTA1M0ZhZUtTTjJkWFl1b1FUZGdVMzRsWlM0RFZKOUZiYlpBOWlNQWM3cElX?=
+ =?utf-8?B?STNSTlJqSUVoeGhTbjlNaHN0RnZ1UjF1bkFKa1NJOG4wc3FnSXZ2RXRzbVVt?=
+ =?utf-8?B?SjZuRVU2Y1FMNnppV2dqRkVodlR2VHVjYnY2bmlyWXF5VTVLdWVHOWxPUERa?=
+ =?utf-8?B?a3FzY09VVmcrczdqR0Zsa2xvbmtjWk55MUJZbk9wVm14cTk0Vk1pYXVUODFJ?=
+ =?utf-8?B?UDQrWTdJUDNOczBnRDdwVkJMMVNLckFsSVN3N1g4c0xuZktSb1pGVmtabG1k?=
+ =?utf-8?B?cnJuTjBMZmJOSktsUjh2NDZDNkh4cURpODBVQkhHL2NBL285SjFyU2VtTCtD?=
+ =?utf-8?B?SDFhdURycSs0ODIxSUY0THlNTWRGK3M1QjFEM0diQmJXR2EzWGVyZnRQcVUv?=
+ =?utf-8?B?ejIrMmdIQjR4K2hUWDQ4UVlic0JUb1B0OGtXZTFhUmZpeGZSV0MxbCtlN29J?=
+ =?utf-8?B?SHFOOExSQ1R4SnZLOTNrdGhaeWNHUVpJeWVOMWo2c1ZjRVROM1NPNVE1REQ4?=
+ =?utf-8?B?MmFGMU5aSVZWSmVoaG5EWXU0UXlSc25FVnVLY2VHR1l6b2IrVitYalVhbUY0?=
+ =?utf-8?B?NHpwSGhlZWNOQkNnNEsvME9DOGZjSWVtOWNvUVdheGlhaGVEdlZWR0JTclBi?=
+ =?utf-8?B?TVNrU1pic0R5MG1CdFJERlJmcGZ3Uko1ank1ZWdxWjdsS0dVU1N2ajYrMkZZ?=
+ =?utf-8?B?dXJXdnlJUnFZL2k1YXlzeUZqUmtiNWxZQmJhQ0txVzBwTEJjUWlDc09xbEdN?=
+ =?utf-8?B?aXUvNFFxTkF5dUR0YXQ3Y0kyS3VlS25ERGh3UUlRWElTODVCSGFNdEtQM2dI?=
+ =?utf-8?B?Qy91aVREVXdaNW9DbTVVV3ZhYk10djFadCtHb09yTVY4a25RWGwrYnJ0QUVC?=
+ =?utf-8?B?a3YwYnVFcmdQNkE4bVRiTm0rZUlUdTFHRGxWZkNONnhKcDRzOWJRMGpTb0VK?=
+ =?utf-8?B?dHU1djJQZGZwSi8rUERhZzZjMmlIaVI3SzFoR3FOQW1lUzFiYVdKUTRSR2wr?=
+ =?utf-8?B?WTdQRGgrdmkxbEF3TUtoZVYwWXh1Zkl5cU8vOThIU2hqOUtJYUVCVmVLTVpm?=
+ =?utf-8?B?NzhENk1SVm96Njd0M01pOWVmRktNdStSS1R0cWg4azJlR3RTVkRkYTVtQ1dh?=
+ =?utf-8?B?R05XbFhqWm5wdmlHMktnajNxUXZxWlFUSjFiL2QzT2w4OGVQUEFtMGtMOUpu?=
+ =?utf-8?B?ZHd1b04xcEd0NUludVZ3dk0yMVhvdG43a0lJWXZyT0NJcEcreVlvdmNoSjlr?=
+ =?utf-8?B?blhOYWF0ZnpQVHJPRFN6V2tmNnhjdkhLSjVGcG5maU9LREJKVk5HWWZSbnh4?=
+ =?utf-8?B?TUNDUE8yNXlIcWJZZUNocWUrQ2lKNTBJQlRhZXA1TDUycTYxR3NOTFZJZy84?=
+ =?utf-8?Q?m4VuSFHbcOZv0ClHWtt1bAmMY/k2PPun?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4858.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?OVBUT1A2R2c4ZzZEV08wZTdmNUkza1hvSzZFK2tZcWtwYnJWbG5yVFJjSStw?=
+ =?utf-8?B?NVhFRjRqMGVDWGp6TDR5UGRsTU5UempZMkNESjk3NExuZTVnZmhGZHVVSExI?=
+ =?utf-8?B?cEJMOXdnZ1JTelh2eVZvMFVyV2VVY0c5NTNkeXFqOGlhSlYwckpZL3A3cmVL?=
+ =?utf-8?B?M3pCdStRcm5EcDhBY2NISWpxcVFTMDFvZTZzWk1QZW9OWkg1Qk01VnFrbWpC?=
+ =?utf-8?B?cTJBU3IrVy9NREhVTi9UUWoyR25VZGQ1WHVZWVFrSm1sVGJ2SmZJRWtXUEJV?=
+ =?utf-8?B?emRiNGVpQVB4R25qUTdXRWxseTZacjJLdk9SeEVvbUpkamduYTdoWkJqcDBO?=
+ =?utf-8?B?dWdXT3cwR2x2SzM4NlUwQWgyR1EvcGNHMVJiTkJGaU16Qk9tVzVMeDVZUzVo?=
+ =?utf-8?B?YWRMUVR3UCtYUFRIZTU3TVgyL1grMGZ6MEhiTkowQ3BlVGR4RG13OUtRL2o1?=
+ =?utf-8?B?aXViSTBqazBVUmgwUVk3VU1EUUVWemZRWFFKY0taS0twKzdQQVp1NWdqaWV3?=
+ =?utf-8?B?NlpZMjV5RjVuSHA1NUo3L1Q0bHR4RmtjaS8vZ0NKRDlHUWVwQ2NwR29JcXBx?=
+ =?utf-8?B?VDVwOGtXeFlPT0ZjYXJ0VzZUbklrd01hVVZmM1VjdC8wbHVCcmQ1OU0xb202?=
+ =?utf-8?B?RUFsd0treDVKR3Zid0ZtRW0rQWg1VEEzWHFaZHJjSlNnOXlyR1ZJbDRtSUlM?=
+ =?utf-8?B?bTVrdWppRktycTJxZEd2a1ErYWNBckhsK3FZK014cHljQkNFM3pqcUl0WnJD?=
+ =?utf-8?B?RmFxako5azMzWmliRjloQWliS21iV0RaUG42REVrTFc1blM1a3FuSnZkeVpO?=
+ =?utf-8?B?dWV6eG4wU3BqQXdub2loaUVxZmVLRGoxL3dqMFpjbnRRUStKNnNyRUtoK1ZR?=
+ =?utf-8?B?ZGRyMTByM3UxSnlkRHUyTTJ1SzRJbHNKZG1LYlRHSmprcm9xQkhyRHN5bUZh?=
+ =?utf-8?B?RytPK1JlVmJaa3lhbzdLKzQvQzB2ZGJzdTNNb1hUT0NKalRYUkpocFNKY3hi?=
+ =?utf-8?B?eUZzMEhsZHM4bm5iazd5NnVMN1B3M1Q0dXVXQkcvRVhFSnRUTkNldWM2MHBV?=
+ =?utf-8?B?QzhMQjd6MVVQZXJWeGJCNnV0Qmt0L2NZL3RML0pkRitMRms1WUdET3RFQ0E2?=
+ =?utf-8?B?ZjVwS1dNNW1yeU1jUTVIcE9yTUtQeFk1TW8wK1NqbW1TWGZCRUphMEMzV3Ja?=
+ =?utf-8?B?VE9heWZoUHY3V0tueDR1RzFEZVBKQlRxRUJpU1Q0OXNoYjJRWCtlVG50dHRn?=
+ =?utf-8?B?ZVFCMGNPQWhqRkRZUzA0Vzd2QUFhelBiVmVpUHJ3Tm0vaHpMdlBYUzBuZW5r?=
+ =?utf-8?B?UTg0TERNUGhhK1ZwTnJDM2pGN1U1VWxBSXZhcDJRei82MTR2RHhiN1B0cmVt?=
+ =?utf-8?B?K01JWDVCcUhqQVZPSUphWGFJMHNBcGV3R2E2K2RFRFRhWHhwVThHZ1BuWmtP?=
+ =?utf-8?B?b3h6eERUMWRjaTRsOGpvSEtQUzc2aW9IVTdYaUVUZ2FCODhDRlBvbUlUVml0?=
+ =?utf-8?B?ZWw5bWdhc2JLUVU2Z0NvOHdJMlJXQ3F4VjdNaTZVUHhad1JqUnQ1NjY3VExQ?=
+ =?utf-8?B?WHVJV2Y3cmJkZ3JLUnE3ZWUxMDJmYzJqUlFDWmY2RlFuVVE0eTBSM090bmho?=
+ =?utf-8?B?aTkrNlJMRVlEMjlGc0ZoRC96UmVjdURvdDQ4VGx3dndsMC93eEpCUXlqS0Rh?=
+ =?utf-8?B?TjRNenhCYmlVSUpGY2ZNNWpmR29QREJwdmFxZ0RtSnpmRmJBTzlZS0g0bU1N?=
+ =?utf-8?B?blJIUjQvNUsyVE9GYWFnMnhqdHJFYnM1aVhNVGJWZzZ5VUx3OFJSZ0d6TWlL?=
+ =?utf-8?B?THNqMGFOVHJVdEk4SFAxUzFoT2pZbitaNHVMMW84NmZ6dzNFUXhuMkFKMmVt?=
+ =?utf-8?B?Y0piS1Y1bUpTbW1KbFk5Znd4eXFXbHBKVExPVzdXWElndEE1Mmg5R1puc3F3?=
+ =?utf-8?B?bmppQkpLQ3g5WWNOMUg2UFdzVkc1ckhtdHp2ODJTNVE4emtnc1IraHdMWmJ2?=
+ =?utf-8?B?Vk5haHlmS0Ezc2tpTzd3bVprQ0JUaEhnN252RS9RZ1Q5NXVSUnJJazVrNldx?=
+ =?utf-8?B?aGV4S2h6UVFhY0FudzJSb2dBYmFXVjhlTTZES0F5UVdjZ2JHUTBBUGc5UDRl?=
+ =?utf-8?Q?TLFoFN8SVDnpJLbRFNJD82E4M?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EBAD28A602BDA94DAA4C8DE2924DD1FD@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241213232958.2388301-1-amery.hung@bytedance.com>
- <20241213232958.2388301-2-amery.hung@bytedance.com> <65399ffd-da8a-436a-81fd-b5bd3e4b8a54@linux.dev>
- <CAADnVQ+LsEyADkSc7cNXkz=p5z-iNEoKRm25VpthCDAYe=0BVw@mail.gmail.com> <CAMB2axMQ9iFv4XjH3X3QLozudpga=DPSYEgzt3thtMOjYnrv7g@mail.gmail.com>
-In-Reply-To: <CAMB2axMQ9iFv4XjH3X3QLozudpga=DPSYEgzt3thtMOjYnrv7g@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 18 Dec 2024 09:20:11 -0800
-Message-ID: <CAADnVQL0JegqqCGCYE18o33CQrtnRWnH_g5GUgDZXJ2phHKDMg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v1 01/13] bpf: Support getting referenced kptr
- from struct_ops argument
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Amery Hung <amery.hung@bytedance.com>, 
-	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Kui-Feng Lee <sinquersw@gmail.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, stfomichev@gmail.com, 
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Peilin Ye <yepeilin.cs@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4858.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9ee6248-5c0a-43ba-5d31-08dd1f8a037b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2024 17:32:58.0242
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TFdT2m5+fCj5iNVfUj86bBgaIXRRODOqJgK8E2ZvPZ6uSv7+s34W3x24H+CQ6eVEywbOIaqNzrPMzHSB/2xz9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6314
 
-On Wed, Dec 18, 2024 at 8:09=E2=80=AFAM Amery Hung <ameryhung@gmail.com> wr=
-ote:
->
-> On Tue, Dec 17, 2024 at 5:24=E2=80=AFPM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Tue, Dec 17, 2024 at 4:58=E2=80=AFPM Martin KaFai Lau <martin.lau@li=
-nux.dev> wrote:
-> > >
-> > > On 12/13/24 3:29 PM, Amery Hung wrote:
-> > > > Allows struct_ops programs to acqurie referenced kptrs from argumen=
-ts
-> > > > by directly reading the argument.
-> > > >
-> > > > The verifier will acquire a reference for struct_ops a argument tag=
-ged
-> > > > with "__ref" in the stub function in the beginning of the main prog=
-ram.
-> > > > The user will be able to access the referenced kptr directly by rea=
-ding
-> > > > the context as long as it has not been released by the program.
-> > > >
-> > > > This new mechanism to acquire referenced kptr (compared to the exis=
-ting
-> > > > "kfunc with KF_ACQUIRE") is introduced for ergonomic and semantic r=
-easons.
-> > > > In the first use case, Qdisc_ops, an skb is passed to .enqueue in t=
-he
-> > > > first argument. This mechanism provides a natural way for users to =
-get a
-> > > > referenced kptr in the .enqueue struct_ops programs and makes sure =
-that a
-> > > > qdisc will always enqueue or drop the skb.
-> > > >
-> > > > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> > > > ---
-> > > >   include/linux/bpf.h         |  3 +++
-> > > >   kernel/bpf/bpf_struct_ops.c | 26 ++++++++++++++++++++------
-> > > >   kernel/bpf/btf.c            |  1 +
-> > > >   kernel/bpf/verifier.c       | 35 ++++++++++++++++++++++++++++++++=
----
-> > > >   4 files changed, 56 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > > > index 1b84613b10ac..72bf941d1daf 100644
-> > > > --- a/include/linux/bpf.h
-> > > > +++ b/include/linux/bpf.h
-> > > > @@ -968,6 +968,7 @@ struct bpf_insn_access_aux {
-> > > >               struct {
-> > > >                       struct btf *btf;
-> > > >                       u32 btf_id;
-> > > > +                     u32 ref_obj_id;
-> > > >               };
-> > > >       };
-> > > >       struct bpf_verifier_log *log; /* for verbose logs */
-> > > > @@ -1480,6 +1481,8 @@ struct bpf_ctx_arg_aux {
-> > > >       enum bpf_reg_type reg_type;
-> > > >       struct btf *btf;
-> > > >       u32 btf_id;
-> > > > +     u32 ref_obj_id;
-> > > > +     bool refcounted;
-> > > >   };
-> > > >
-> > > >   struct btf_mod_pair {
-> > > > diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_op=
-s.c
-> > > > index fda3dd2ee984..6e7795744f6a 100644
-> > > > --- a/kernel/bpf/bpf_struct_ops.c
-> > > > +++ b/kernel/bpf/bpf_struct_ops.c
-> > > > @@ -145,6 +145,7 @@ void bpf_struct_ops_image_free(void *image)
-> > > >   }
-> > > >
-> > > >   #define MAYBE_NULL_SUFFIX "__nullable"
-> > > > +#define REFCOUNTED_SUFFIX "__ref"
-> > > >   #define MAX_STUB_NAME 128
-> > > >
-> > > >   /* Return the type info of a stub function, if it exists.
-> > > > @@ -206,9 +207,11 @@ static int prepare_arg_info(struct btf *btf,
-> > > >                           struct bpf_struct_ops_arg_info *arg_info)
-> > > >   {
-> > > >       const struct btf_type *stub_func_proto, *pointed_type;
-> > > > +     bool is_nullable =3D false, is_refcounted =3D false;
-> > > >       const struct btf_param *stub_args, *args;
-> > > >       struct bpf_ctx_arg_aux *info, *info_buf;
-> > > >       u32 nargs, arg_no, info_cnt =3D 0;
-> > > > +     const char *suffix;
-> > > >       u32 arg_btf_id;
-> > > >       int offset;
-> > > >
-> > > > @@ -240,12 +243,19 @@ static int prepare_arg_info(struct btf *btf,
-> > > >       info =3D info_buf;
-> > > >       for (arg_no =3D 0; arg_no < nargs; arg_no++) {
-> > > >               /* Skip arguments that is not suffixed with
-> > > > -              * "__nullable".
-> > > > +              * "__nullable or __ref".
-> > > >                */
-> > > > -             if (!btf_param_match_suffix(btf, &stub_args[arg_no],
-> > > > -                                         MAYBE_NULL_SUFFIX))
-> > > > +             is_nullable =3D btf_param_match_suffix(btf, &stub_arg=
-s[arg_no],
-> > > > +                                                  MAYBE_NULL_SUFFI=
-X);
-> > > > +             is_refcounted =3D btf_param_match_suffix(btf, &stub_a=
-rgs[arg_no],
-> > > > +                                                    REFCOUNTED_SUF=
-FIX);
-> > > > +             if (!is_nullable && !is_refcounted)
-> > > >                       continue;
-> > > >
-> > > > +             if (is_nullable)
-> > > > +                     suffix =3D MAYBE_NULL_SUFFIX;
-> > > > +             else if (is_refcounted)
-> > > > +                     suffix =3D REFCOUNTED_SUFFIX;
-> > > >               /* Should be a pointer to struct */
-> > > >               pointed_type =3D btf_type_resolve_ptr(btf,
-> > > >                                                   args[arg_no].type=
-,
-> > > > @@ -253,7 +263,7 @@ static int prepare_arg_info(struct btf *btf,
-> > > >               if (!pointed_type ||
-> > > >                   !btf_type_is_struct(pointed_type)) {
-> > > >                       pr_warn("stub function %s__%s has %s tagging =
-to an unsupported type\n",
-> > > > -                             st_ops_name, member_name, MAYBE_NULL_=
-SUFFIX);
-> > > > +                             st_ops_name, member_name, suffix);
-> > > >                       goto err_out;
-> > > >               }
-> > > >
-> > > > @@ -271,11 +281,15 @@ static int prepare_arg_info(struct btf *btf,
-> > > >               }
-> > > >
-> > > >               /* Fill the information of the new argument */
-> > > > -             info->reg_type =3D
-> > > > -                     PTR_TRUSTED | PTR_TO_BTF_ID | PTR_MAYBE_NULL;
-> > > >               info->btf_id =3D arg_btf_id;
-> > > >               info->btf =3D btf;
-> > > >               info->offset =3D offset;
-> > > > +             if (is_nullable) {
-> > > > +                     info->reg_type =3D PTR_TRUSTED | PTR_TO_BTF_I=
-D | PTR_MAYBE_NULL;
-> > > > +             } else if (is_refcounted) {
-> > > > +                     info->reg_type =3D PTR_TRUSTED | PTR_TO_BTF_I=
-D;
-> > > > +                     info->refcounted =3D true;
-> > > > +             }
-> > > >
-> > > >               info++;
-> > > >               info_cnt++;
-> > > > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> > > > index e7a59e6462a9..a05ccf9ee032 100644
-> > > > --- a/kernel/bpf/btf.c
-> > > > +++ b/kernel/bpf/btf.c
-> > > > @@ -6580,6 +6580,7 @@ bool btf_ctx_access(int off, int size, enum b=
-pf_access_type type,
-> > > >                       info->reg_type =3D ctx_arg_info->reg_type;
-> > > >                       info->btf =3D ctx_arg_info->btf ? : btf_vmlin=
-ux;
-> > > >                       info->btf_id =3D ctx_arg_info->btf_id;
-> > > > +                     info->ref_obj_id =3D ctx_arg_info->ref_obj_id=
-;
-> > > >                       return true;
-> > > >               }
-> > > >       }
-> > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > > > index 9f5de8d4fbd0..69753096075f 100644
-> > > > --- a/kernel/bpf/verifier.c
-> > > > +++ b/kernel/bpf/verifier.c
-> > > > @@ -1402,6 +1402,17 @@ static int release_reference_state(struct bp=
-f_func_state *state, int ptr_id)
-> > > >       return -EINVAL;
-> > > >   }
-> > > >
-> > > > +static bool find_reference_state(struct bpf_func_state *state, int=
- ptr_id)
-> > > > +{
-> > > > +     int i;
-> > > > +
-> > > > +     for (i =3D 0; i < state->acquired_refs; i++)
-> > > > +             if (state->refs[i].id =3D=3D ptr_id)
-> > > > +                     return true;
-> > > > +
-> > > > +     return false;
-> > > > +}
-> > > > +
-> > > >   static int release_lock_state(struct bpf_func_state *state, int t=
-ype, int id, void *ptr)
-> > > >   {
-> > > >       int i, last_idx;
-> > > > @@ -5798,7 +5809,8 @@ static int check_packet_access(struct bpf_ver=
-ifier_env *env, u32 regno, int off,
-> > > >   /* check access to 'struct bpf_context' fields.  Supports fixed o=
-ffsets only */
-> > > >   static int check_ctx_access(struct bpf_verifier_env *env, int ins=
-n_idx, int off, int size,
-> > > >                           enum bpf_access_type t, enum bpf_reg_type=
- *reg_type,
-> > > > -                         struct btf **btf, u32 *btf_id, bool *is_r=
-etval, bool is_ldsx)
-> > > > +                         struct btf **btf, u32 *btf_id, bool *is_r=
-etval, bool is_ldsx,
-> > > > +                         u32 *ref_obj_id)
-> > > >   {
-> > > >       struct bpf_insn_access_aux info =3D {
-> > > >               .reg_type =3D *reg_type,
-> > > > @@ -5820,8 +5832,16 @@ static int check_ctx_access(struct bpf_verif=
-ier_env *env, int insn_idx, int off,
-> > > >               *is_retval =3D info.is_retval;
-> > > >
-> > > >               if (base_type(*reg_type) =3D=3D PTR_TO_BTF_ID) {
-> > > > +                     if (info.ref_obj_id &&
-> > > > +                         !find_reference_state(cur_func(env), info=
-.ref_obj_id)) {
-> > > > +                             verbose(env, "invalid bpf_context acc=
-ess off=3D%d. Reference may already be released\n",
-> > > > +                                     off);
-> > > > +                             return -EACCES;
-> > > > +                     }
-> > > > +
-> > > >                       *btf =3D info.btf;
-> > > >                       *btf_id =3D info.btf_id;
-> > > > +                     *ref_obj_id =3D info.ref_obj_id;
-> > > >               } else {
-> > > >                       env->insn_aux_data[insn_idx].ctx_field_size =
-=3D info.ctx_field_size;
-> > > >               }
-> > > > @@ -7135,7 +7155,7 @@ static int check_mem_access(struct bpf_verifi=
-er_env *env, int insn_idx, u32 regn
-> > > >               struct bpf_retval_range range;
-> > > >               enum bpf_reg_type reg_type =3D SCALAR_VALUE;
-> > > >               struct btf *btf =3D NULL;
-> > > > -             u32 btf_id =3D 0;
-> > > > +             u32 btf_id =3D 0, ref_obj_id =3D 0;
-> > > >
-> > > >               if (t =3D=3D BPF_WRITE && value_regno >=3D 0 &&
-> > > >                   is_pointer_value(env, value_regno)) {
-> > > > @@ -7148,7 +7168,7 @@ static int check_mem_access(struct bpf_verifi=
-er_env *env, int insn_idx, u32 regn
-> > > >                       return err;
-> > > >
-> > > >               err =3D check_ctx_access(env, insn_idx, off, size, t,=
- &reg_type, &btf,
-> > > > -                                    &btf_id, &is_retval, is_ldsx);
-> > > > +                                    &btf_id, &is_retval, is_ldsx, =
-&ref_obj_id);
-> > > >               if (err)
-> > > >                       verbose_linfo(env, insn_idx, "; ");
-> > > >               if (!err && t =3D=3D BPF_READ && value_regno >=3D 0) =
-{
-> > > > @@ -7179,6 +7199,7 @@ static int check_mem_access(struct bpf_verifi=
-er_env *env, int insn_idx, u32 regn
-> > > >                               if (base_type(reg_type) =3D=3D PTR_TO=
-_BTF_ID) {
-> > > >                                       regs[value_regno].btf =3D btf=
-;
-> > > >                                       regs[value_regno].btf_id =3D =
-btf_id;
-> > > > +                                     regs[value_regno].ref_obj_id =
-=3D ref_obj_id;
-> > > >                               }
-> > > >                       }
-> > > >                       regs[value_regno].type =3D reg_type;
-> > > > @@ -21662,6 +21683,7 @@ static int do_check_common(struct bpf_verif=
-ier_env *env, int subprog)
-> > > >   {
-> > > >       bool pop_log =3D !(env->log.level & BPF_LOG_LEVEL2);
-> > > >       struct bpf_subprog_info *sub =3D subprog_info(env, subprog);
-> > > > +     struct bpf_ctx_arg_aux *ctx_arg_info;
-> > > >       struct bpf_verifier_state *state;
-> > > >       struct bpf_reg_state *regs;
-> > > >       int ret, i;
-> > > > @@ -21769,6 +21791,13 @@ static int do_check_common(struct bpf_veri=
-fier_env *env, int subprog)
-> > > >               mark_reg_known_zero(env, regs, BPF_REG_1);
-> > > >       }
-> > > >
-> > > > +     if (!subprog && env->prog->type =3D=3D BPF_PROG_TYPE_STRUCT_O=
-PS) {
-> > > > +             ctx_arg_info =3D (struct bpf_ctx_arg_aux *)env->prog-=
->aux->ctx_arg_info;
-> > > > +             for (i =3D 0; i < env->prog->aux->ctx_arg_info_size; =
-i++)
-> > > > +                     if (ctx_arg_info[i].refcounted)
-> > > > +                             ctx_arg_info[i].ref_obj_id =3D acquir=
-e_reference_state(env, 0);
-> > >
-> > > There is a conflict in the bpf-next/master. acquire_reference_state h=
-as been
-> > > refactored in commit 769b0f1c8214. From looking at the net/sched/sch_=
-*.c
-> > > changes, they should not have conflict with the net-next/main. I woul=
-d suggest
-> > > to rebase this set on bpf-next/master.
-> > >
-> > > At the first glance, the ref_obj_id assignment looks racy because ctx=
-_arg_info
-> > > is shared by different bpf progs that may be verified in parallel. Af=
-ter another
-> > > thought, this should be fine because it should always end up having t=
-he same
-> > > ref_obj_id for the same arg-no, right? Not sure if UBSAN can understa=
-nd this
-> > > without using the READ/WRITE_ONCE. but adding READ/WRITE_ONCE when us=
-ing
-> > > ref_obj_id will be quite puzzling when reading the verifier code. Any=
- better idea?
-> >
-> > ctx_arg_info is kinda read-only from the verifier pov.
-> > bpf_ctx_arg_aux->btf_id is populated before the main verifier loop.
-> > While ref_obj_id is a dynamic property.
-> > It doesn't really fit in bpf_ctx_arg_aux.
-> > It probably needs to be another struct type that is allocated
-> > and populated once with acquire_reference() when the main verifier loop
-> > is happening.
-> > do_check_common() maybe too early?
-> > Looks like it's anyway a reference that is ok to leak per patch 3 ?
-> >
-> > It seems the main goal is to pass ref_obj_id-like argument into bpf pro=
-g
-> > and make sure that prog doesn't call KF_RELEASE kfunc on it twice,
-> > but leaking is ok?
-> > Maybe it needs a different type. Other than REF_TYPE_PTR.
-> >
->
-> The main goal of this patch is to get a unique ref_obj_id to the skb
-> arg in a .enqueue call. Therefore, we acquire that one and only
-> ref_obj_id for __ref arg early in do_check_common() and do not change
-> it afterward. Later in the main loop, the liviness is tracked in the
-> reference states. This feels kind of read-only? Besides, since we
-> acquire the ref automatically, it forces the user to do something with
-> the ref ptr (in qdisc's case, .enqueue needs to either drop or enqueue
-> it).
->
-> I try to break down the requirements from bpf qdisc (1. only a unique
-> reference to the skb in .enqueue; 2. users must enqueue or drop the
-> skb in .enqueue; 3. dequeue a single skb) into two orthogonal patches
-> 1 and 3. so whether this reference can leak or not can be independent.
-> Taking a step back, maybe we can encapsulate them all in one semantic
-> (a new kind of REF like you suggest), but I am not sure if that'd be
-> too specific and then less useful to others.
-
-Makes sense to keep the same ref type then.
-I misread patch 3 comment
-"leak referenced kptr through return value"
-as just "leak referenced kptr".
-Probably better to use a different term than "leak".
-The ref_obj_id is kept valid through the prog.
-It's returned from the prog back to the kernel. Not really leaking.
+DQpPbiAxMi8xOC8yNCwgNjowNCBBTSwgIk5pa29sYXkgQWxla3NhbmRyb3YiIDxyYXpvckBibGFj
+a3dhbGwub3JnIDxtYWlsdG86cmF6b3JAYmxhY2t3YWxsLm9yZz4+IHdyb3RlOg0KDQoNCj5PbiAx
+My8xMi8yMDI0IDA1OjM1LCBZb25nIFdhbmcgd3JvdGU6DQo+PiBSZS1pbXBsZW1lbnQgYnJfbXVs
+dGljYXN0X2VuYWJsZV9wb3J0KCkgLyBicl9tdWx0aWNhc3RfZGlzYWJsZV9wb3J0KCkgYnkNCj4+
+IGFkZGluZyBicl9tdWx0aWNhc3RfdG9nZ2xlX3BvcnQoKSBoZWxwZXIgZnVuY3Rpb24gaW4gb3Jk
+ZXIgdG8gc3VwcG9ydA0KPj4gcGVyIHZsYW4gbXVsdGljYXN0IGNvbnRleHQgZW5hYmxpbmcvZGlz
+YWJsaW5nIGZvciBicmlkZ2UgcG9ydHMuIEFzIHRoZQ0KPj4gcG9ydCBzdGF0ZSBjb3VsZCBiZSBj
+aGFuZ2VkIGJ5IFNUUCwgdGhhdCBpbXBhY3RzIG11bHRpY2FzdCBiZWhhdmlvcnMNCj4+IGxpa2Ug
+aWdtcCBxdWVyeS4gVGhlIGNvcnJlc3BvbmRpbmcgY29udGV4dCBzaG91bGQgYmUgdXNlZCBlaXRo
+ZXIgZm9yDQo+PiBwZXIgcG9ydCBjb250ZXh0IG9yIHBlciB2bGFuIGNvbnRleHQgYWNjb3JkaW5n
+bHkuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogWW9uZyBXYW5nIDx5b25nd2FuZ0BudmlkaWEuY29t
+IDxtYWlsdG86eW9uZ3dhbmdAbnZpZGlhLmNvbT4+DQo+PiBSZXZpZXdlZC1ieTogQW5keSBSb3Vs
+aW4gPGFyb3VsaW5AbnZpZGlhLmNvbSA8bWFpbHRvOmFyb3VsaW5AbnZpZGlhLmNvbT4+DQo+PiAt
+LS0NCj4+IG5ldC9icmlkZ2UvYnJfbXVsdGljYXN0LmMgfCA3MiArKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrLS0tLS0NCj4+IDEgZmlsZSBjaGFuZ2VkLCA2NCBpbnNlcnRpb25zKCsp
+LCA4IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9uZXQvYnJpZGdlL2JyX211bHRp
+Y2FzdC5jIGIvbmV0L2JyaWRnZS9icl9tdWx0aWNhc3QuYw0KPj4gaW5kZXggYjJhZTBkMjQzNGQy
+Li42NzQzOGE3NWJhYmQgMTAwNjQ0DQo+PiAtLS0gYS9uZXQvYnJpZGdlL2JyX211bHRpY2FzdC5j
+DQo+PiArKysgYi9uZXQvYnJpZGdlL2JyX211bHRpY2FzdC5jDQo+PiBAQCAtMjEwNSwxMiArMjEw
+NSwxNyBAQCBzdGF0aWMgdm9pZCBfX2JyX211bHRpY2FzdF9lbmFibGVfcG9ydF9jdHgoc3RydWN0
+IG5ldF9icmlkZ2VfbWNhc3RfcG9ydCAqcG1jdHgpDQo+PiB9DQo+PiB9DQo+Pg0KPj4gLXZvaWQg
+YnJfbXVsdGljYXN0X2VuYWJsZV9wb3J0KHN0cnVjdCBuZXRfYnJpZGdlX3BvcnQgKnBvcnQpDQo+
+PiArc3RhdGljIHZvaWQgYnJfbXVsdGljYXN0X2VuYWJsZV9wb3J0X2N0eChzdHJ1Y3QgbmV0X2Jy
+aWRnZV9tY2FzdF9wb3J0ICpwbWN0eCkNCj4+IHsNCj4+IC0gc3RydWN0IG5ldF9icmlkZ2UgKmJy
+ID0gcG9ydC0+YnI7DQo+PiArIHN0cnVjdCBuZXRfYnJpZGdlICpiciA9IHBtY3R4LT5wb3J0LT5i
+cjsNCj4+DQo+PiBzcGluX2xvY2tfYmgoJmJyLT5tdWx0aWNhc3RfbG9jayk7DQo+PiAtIF9fYnJf
+bXVsdGljYXN0X2VuYWJsZV9wb3J0X2N0eCgmcG9ydC0+bXVsdGljYXN0X2N0eCk7DQo+PiArIGlm
+IChicl9tdWx0aWNhc3RfcG9ydF9jdHhfaXNfdmxhbihwbWN0eCkgJiYNCj4+ICsgIShwbWN0eC0+
+dmxhbi0+cHJpdl9mbGFncyAmIEJSX1ZMRkxBR19NQ0FTVF9FTkFCTEVEKSkgew0KPj4gKyBzcGlu
+X3VubG9ja19iaCgmYnItPm11bHRpY2FzdF9sb2NrKTsNCj4+ICsgcmV0dXJuOw0KPj4gKyB9DQo+
+PiArIF9fYnJfbXVsdGljYXN0X2VuYWJsZV9wb3J0X2N0eChwbWN0eCk7DQo+PiBzcGluX3VubG9j
+a19iaCgmYnItPm11bHRpY2FzdF9sb2NrKTsNCj4+IH0NCj4+DQo+PiBAQCAtMjEzNywxMSArMjE0
+Miw2MiBAQCBzdGF0aWMgdm9pZCBfX2JyX211bHRpY2FzdF9kaXNhYmxlX3BvcnRfY3R4KHN0cnVj
+dCBuZXRfYnJpZGdlX21jYXN0X3BvcnQgKnBtY3R4KQ0KPj4gYnJfbXVsdGljYXN0X3Jwb3J0X2Rl
+bF9ub3RpZnkocG1jdHgsIGRlbCk7DQo+PiB9DQo+Pg0KPj4gK3N0YXRpYyB2b2lkIGJyX211bHRp
+Y2FzdF9kaXNhYmxlX3BvcnRfY3R4KHN0cnVjdCBuZXRfYnJpZGdlX21jYXN0X3BvcnQgKnBtY3R4
+KQ0KPj4gK3sNCj4+ICsgc3RydWN0IG5ldF9icmlkZ2UgKmJyID0gcG1jdHgtPnBvcnQtPmJyOw0K
+Pj4gKw0KPj4gKyBzcGluX2xvY2tfYmgoJmJyLT5tdWx0aWNhc3RfbG9jayk7DQo+PiArIGlmIChi
+cl9tdWx0aWNhc3RfcG9ydF9jdHhfaXNfdmxhbihwbWN0eCkgJiYNCj4+ICsgIShwbWN0eC0+dmxh
+bi0+cHJpdl9mbGFncyAmIEJSX1ZMRkxBR19NQ0FTVF9FTkFCTEVEKSkgew0KPj4gKyBzcGluX3Vu
+bG9ja19iaCgmYnItPm11bHRpY2FzdF9sb2NrKTsNCj4+ICsgcmV0dXJuOw0KPj4gKyB9DQo+PiAr
+DQo+PiArIF9fYnJfbXVsdGljYXN0X2Rpc2FibGVfcG9ydF9jdHgocG1jdHgpOw0KPj4gKyBzcGlu
+X3VubG9ja19iaCgmYnItPm11bHRpY2FzdF9sb2NrKTsNCj4+ICt9DQo+PiArDQo+PiArc3RhdGlj
+IHZvaWQgYnJfbXVsdGljYXN0X3RvZ2dsZV9wb3J0KHN0cnVjdCBuZXRfYnJpZGdlX3BvcnQgKnBv
+cnQsIGJvb2wgb24pDQo+PiArew0KPj4gKyBzdHJ1Y3QgbmV0X2JyaWRnZSAqYnIgPSBwb3J0LT5i
+cjsNCj4+ICsNCj4+ICsgaWYgKGJyX29wdF9nZXQoYnIsIEJST1BUX01DQVNUX1ZMQU5fU05PT1BJ
+TkdfRU5BQkxFRCkpIHsNCj4+ICsgc3RydWN0IG5ldF9icmlkZ2Vfdmxhbl9ncm91cCAqdmc7DQo+
+PiArIHN0cnVjdCBuZXRfYnJpZGdlX3ZsYW4gKnZsYW47DQo+PiArDQo+PiArIHJjdV9yZWFkX2xv
+Y2soKTsNCj4+ICsgdmcgPSBuYnBfdmxhbl9ncm91cF9yY3UocG9ydCk7DQo+PiArIGlmICghdmcp
+IHsNCj4+ICsgcmN1X3JlYWRfdW5sb2NrKCk7DQo+PiArIHJldHVybjsNCj4+ICsgfQ0KPj4gKw0K
+Pj4gKyAvKiBpdGVyYXRlIGVhY2ggdmxhbiBvZiB0aGUgcG9ydCwgdG9nZ2xlIHBvcnRfbWNhc3Rf
+Y3R4IHBlciB2bGFuICovDQo+PiArIGxpc3RfZm9yX2VhY2hfZW50cnkodmxhbiwgJnZnLT52bGFu
+X2xpc3QsIHZsaXN0KSB7DQo+DQo+DQo+bGlzdF9mb3JfZWFjaF9lbnRyeV9yY3UoKQ0KPg0KDQpB
+Q0ssIHRoYW5rIHlvdSBzbyBtdWNoIQ0KDQo+DQo+PiArIC8qIGVuYWJsZSBwb3J0X21jYXN0X2N0
+eCB3aGVuIHZsYW4gaXMgTEVBUk5JTkcgb3IgRk9SV0FSRElORyAqLw0KPj4gKyBpZiAob24gJiYg
+YnJfdmxhbl9zdGF0ZV9hbGxvd2VkKGJyX3ZsYW5fZ2V0X3N0YXRlKHZsYW4pLCB0cnVlKSkNCj4+
+ICsgYnJfbXVsdGljYXN0X2VuYWJsZV9wb3J0X2N0eCgmdmxhbi0+cG9ydF9tY2FzdF9jdHgpOw0K
+Pj4gKyBlbHNlDQo+PiArIGJyX211bHRpY2FzdF9kaXNhYmxlX3BvcnRfY3R4KCZ2bGFuLT5wb3J0
+X21jYXN0X2N0eCk7DQo+PiArIH0NCj4+ICsgcmN1X3JlYWRfdW5sb2NrKCk7DQo+PiArIH0gZWxz
+ZSB7DQo+PiArIC8qIHVzZSB0aGUgcG9ydCdzIG11bHRpY2FzdCBjb250ZXh0IHdoZW4gdmxhbiBz
+bm9vcGluZyBpcyBkaXNhYmxlZCAqLw0KPj4gKyBpZiAob24pDQo+PiArIGJyX211bHRpY2FzdF9l
+bmFibGVfcG9ydF9jdHgoJnBvcnQtPm11bHRpY2FzdF9jdHgpOw0KPj4gKyBlbHNlDQo+PiArIGJy
+X211bHRpY2FzdF9kaXNhYmxlX3BvcnRfY3R4KCZwb3J0LT5tdWx0aWNhc3RfY3R4KTsNCj4+ICsg
+fQ0KPj4gK30NCj4+ICsNCj4+ICt2b2lkIGJyX211bHRpY2FzdF9lbmFibGVfcG9ydChzdHJ1Y3Qg
+bmV0X2JyaWRnZV9wb3J0ICpwb3J0KQ0KPj4gK3sNCj4+ICsgYnJfbXVsdGljYXN0X3RvZ2dsZV9w
+b3J0KHBvcnQsIHRydWUpOw0KPj4gK30NCj4+ICsNCj4+IHZvaWQgYnJfbXVsdGljYXN0X2Rpc2Fi
+bGVfcG9ydChzdHJ1Y3QgbmV0X2JyaWRnZV9wb3J0ICpwb3J0KQ0KPj4gew0KPj4gLSBzcGluX2xv
+Y2tfYmgoJnBvcnQtPmJyLT5tdWx0aWNhc3RfbG9jayk7DQo+PiAtIF9fYnJfbXVsdGljYXN0X2Rp
+c2FibGVfcG9ydF9jdHgoJnBvcnQtPm11bHRpY2FzdF9jdHgpOw0KPj4gLSBzcGluX3VubG9ja19i
+aCgmcG9ydC0+YnItPm11bHRpY2FzdF9sb2NrKTsNCj4+ICsgYnJfbXVsdGljYXN0X3RvZ2dsZV9w
+b3J0KHBvcnQsIGZhbHNlKTsNCj4+IH0NCj4+DQo+PiBzdGF0aWMgaW50IF9fZ3JwX3NyY19kZWxl
+dGVfbWFya2VkKHN0cnVjdCBuZXRfYnJpZGdlX3BvcnRfZ3JvdXAgKnBnKQ0KPj4gQEAgLTQzMDQs
+OSArNDM2MCw5IEBAIGludCBicl9tdWx0aWNhc3RfdG9nZ2xlX3ZsYW5fc25vb3Bpbmcoc3RydWN0
+IG5ldF9icmlkZ2UgKmJyLCBib29sIG9uLA0KPj4gX19icl9tdWx0aWNhc3Rfb3BlbigmYnItPm11
+bHRpY2FzdF9jdHgpOw0KPj4gbGlzdF9mb3JfZWFjaF9lbnRyeShwLCAmYnItPnBvcnRfbGlzdCwg
+bGlzdCkgew0KPj4gaWYgKG9uKQ0KPj4gLSBicl9tdWx0aWNhc3RfZGlzYWJsZV9wb3J0KHApOw0K
+Pj4gKyBicl9tdWx0aWNhc3RfZGlzYWJsZV9wb3J0X2N0eCgmcC0+bXVsdGljYXN0X2N0eCk7DQo+
+PiBlbHNlDQo+PiAtIGJyX211bHRpY2FzdF9lbmFibGVfcG9ydChwKTsNCj4+ICsgYnJfbXVsdGlj
+YXN0X2VuYWJsZV9wb3J0X2N0eCgmcC0+bXVsdGljYXN0X2N0eCk7DQo+PiB9DQo+Pg0KPj4gbGlz
+dF9mb3JfZWFjaF9lbnRyeSh2bGFuLCAmdmctPnZsYW5fbGlzdCwgdmxpc3QpDQoNCg0KDQoNCg==
 
