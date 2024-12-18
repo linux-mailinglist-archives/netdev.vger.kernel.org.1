@@ -1,303 +1,174 @@
-Return-Path: <netdev+bounces-152827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D019F5DA2
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:53:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851D29F5DA3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:54:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A20018913D7
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:53:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1BDA167C77
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC7F146A6C;
-	Wed, 18 Dec 2024 03:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161A01494BB;
+	Wed, 18 Dec 2024 03:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="mgRi3O1p"
+	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="wuzTtuoT"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089E913EFF3
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 03:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BE01369AA
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 03:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734494027; cv=none; b=ltkeN2431xe/ZaPV+Gypm5RDxiV9gYKThOWpZChmPKqqsjQ8jIgJgD6hjsUTQ8cTfaUCvvobo4upal36gJQfzMkkqllXBVRFD2uggfbm3z6tL9AjNWCW93gLlocWHyoBzjKAyiEMxhLn0d2bhbRFASRaFHOK+R/fRGbieLDZeBU=
+	t=1734494053; cv=none; b=GcLYTrpP5ffqWmt5GArCOP7UC5BHv12PKhr7imzfzpTZmPD50pnx6q/S1awMZGwQAin6rZnGtETEcRmUcZGQcvnRSbTgO89sGmkUvAjS9RJktUZZS3quHq0AQDxupsJ8Hc/Lx6LnB79rvzEOCTe03kXRDNGgjs038GOkd63WkFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734494027; c=relaxed/simple;
-	bh=AWcDphPhP6ikj9UH121mnBLcI2f4K9ko2NN1sT31Azc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=D6vtaQ20nEYmSkaEMwyeu+a8MA9EMOxGjFTIqfODlyo24REJit4NLzzVbkyUr5o8+Kw9U8N41bNt0hUWHUqsDO/k63nMda7S6CFjjAiofPGWMs7B9DWYQB9uoNV2CqYS/7TRkVHKoE2/VJY/icrX3Jxe8veJM6PIhxVQUajYX9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=mgRi3O1p; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1734494053; c=relaxed/simple;
+	bh=vbq5pSaQYQAZoDbWUMtKbGXpx09XFyrjdoBIUarXF0g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FE/h4FQTKHUnqPE4XUXlk/mOsVfp+iParvs9hSlDE6R9cYGnzvaTWSOUfDzI5AQwUg4K/TF7iE38q11y6jgLIGuAand+520EDi3AZQo7x1LIGuHUB15vyL6HgOyCpAFlRDfbxwWUd0daSZH/FHOIjSvEw0Bb5m4ogW95gHTMt0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=wuzTtuoT; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-728f1525565so7162089b3a.1
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 19:54:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1734494022;
-	bh=88gqRFj7vqfPEMw1Nyuk1b+HvkQ4C61uAzTKo6ObwzQ=;
-	h=From:Date:Subject:To:Cc;
-	b=mgRi3O1paNHB3lVj3rwiqbgmC2McsmLBuWpNNglbTZV5KEwjZPUNZI5/CSfXCOM1F
-	 ZpeqvMSzt3YmKNJKY5dP3oPV5KBeUXJuPqCTShjHrAvGNQW1jz1l9jNdXTxrjkGmvw
-	 FzABF3Ys0rX7Xq4Rrx5fyAUSeLKDUqGq73E43cB5KpmCfA2VaynUNk+U17o07+m+Vk
-	 X4c148+qfov2kQ6qt+i2C7sUEqesF8LzqRi2fHYhCGpmKtLiMrxvTK+heQbWMcxSog
-	 hva6YS2cRk3uosTi3B7wSBqgzMs6hpnZ4a6dL6eEc2Nt+7SwsiCRxJMiB2/ny+2W4p
-	 /qo/pdjJypv2w==
-Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id B66D26EAAF; Wed, 18 Dec 2024 11:53:42 +0800 (AWST)
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Wed, 18 Dec 2024 11:53:01 +0800
-Subject: [PATCH net v2] net: mctp: handle skb cleanup on sock_queue
- failures
+        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734494050; x=1735098850; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e7iUfh3k31vsLVZJj/3zur5Ue1fxSp8aa6PbNqmKiok=;
+        b=wuzTtuoTT8577IgkN0SyiZTPBWXnu2x6RYJ4azUwLnzMrYiDxtUs9Biw8qOVrUtHaQ
+         j7+RrWBh+U2GyKjgsmuJHe6GVjU7S3yND4vjJfZhGlIGHQqWJSqHsNNmXz3PDd2fsX1L
+         CQkQgZ9MXoCESZeUIPnFp7P2t3Q2IHtQ7tPd/r/KwP747Uthu1i+tpkiKecmpZEGNuE1
+         mgZnfFje4qD8yDsOmBotD5mtKYyJYcbZ9b0RsRap8GU5aUWMGlXvW9o4326xwRZ/YVmi
+         BuXdP9645usbOC9AmWaFcdHIDRir3DbSd98h3K5JpBHo33+EfXSrNzw+kBmIork8z/oT
+         UQbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734494050; x=1735098850;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e7iUfh3k31vsLVZJj/3zur5Ue1fxSp8aa6PbNqmKiok=;
+        b=nmxDW40XyfRMietFZLMRkQ3L32HmdhQbLvzmc2Et9yl4vOC/cvtPHTLhQASkkTe69D
+         zeizjevrjF7qvutLBTRBruHLsS8uE0oIa6n10kbNJ5bJ6Cm43KgIeeYGdHTm28VXPptw
+         7FWNdonTAc/SEUvTT3vP1CamImUBLViV5fgQThuxaFhEj3NBe2iayGzWpq/LDej+wG9G
+         ZhtCQMfVCwIyul9oD9sUrHkhVktxqz6jDv/sS/AfqIZQ0JSqidCEfHNwWMkw8Suk4K8Y
+         jKFnLlHoQJ8Vvq7xlGYbg5h0RFO0PKn0rY/BvXLThKgfeBGIXjp1AzzfgBCZvq1e8rDA
+         Sx/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUSHijULNvTh/GFtVxF6zZe70+THaqISXOZ8opg25gEp9ztEYwvvc8qdljiXZh2mFxtkYnV03s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1iKxQPoOolMBPudBZYVfaP3vYds2dn5ro1TvBRhkryU9KqNgo
+	KMUzehUyDWUXXsi73f9FQCBLH1JWQIiPgmL3pMm9APUsLRUdNiSegMIxBGYxg+o=
+X-Gm-Gg: ASbGnct6zjEY9aGSScmFqDSVyVQ5QxO/BCNBeSVFXTI3go1XyU0pD7up9OjTTTcrEjv
+	Q2OCCbEZ6Ccw6HceSdD9I3KuoYqTEdGF+Yg7LzAE92qbcutpGu/qoxH4XYEsURSTaHx0hSROgD6
+	wF7MhfGCr9mEBQYhSerfVHyd0RkEhG0KZReRUH5IYt8b0jxtimSNakTpvBgsn8hgxK3OS6sDT3n
+	9jWIgLzK7iSOKR3TRcAjskjijzDcVvo40n65flG1GA0JFq9KQsMHN0YuLT6OHFh3115Qtj+DvkQ
+	R314zn7GMeXcPcwVykp/C0572EXqqAssug==
+X-Google-Smtp-Source: AGHT+IF0Fz3irX7PoPBfqwyoZhrb0SZZKrovl8gcvdVc7/NEevlDy6djhfM+nkAHfB6ia/TMZorBvA==
+X-Received: by 2002:aa7:9316:0:b0:725:df1a:275 with SMTP id d2e1a72fcca58-72a8d2c9c99mr2571206b3a.23.1734494050280;
+        Tue, 17 Dec 2024 19:54:10 -0800 (PST)
+Received: from [192.168.0.78] (133-32-227-190.east.xps.vectant.ne.jp. [133.32.227.190])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918b788d1sm7460361b3a.110.2024.12.17.19.54.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2024 19:54:09 -0800 (PST)
+Message-ID: <06dcce52-5df2-4e78-9f7a-418c3e16e4db@pf.is.s.u-tokyo.ac.jp>
+Date: Wed, 18 Dec 2024 12:54:06 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] net: mdiobus: fix an OF node reference leak
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20241216014055.324461-1-joe@pf.is.s.u-tokyo.ac.jp>
+ <c7b55b3d-c7a9-4d42-a6e4-64148816a80d@lunn.ch>
+Content-Language: en-US
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+In-Reply-To: <c7b55b3d-c7a9-4d42-a6e4-64148816a80d@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241218-mctp-next-v2-1-1c1729645eaa@codeconstruct.com.au>
-X-B4-Tracking: v=1; b=H4sIABxHYmcC/22MQQ6DIBBFr2JmXQyD2Maueo/GhRmGykIwgMbGc
- PcS112+/1/eCYmj4wTP5oTIu0su+Arq1gDNk/+wcKYyKKk0KkSxUF6F5yOLTmrsWUtLjwGqv0a
- 27rhab/CcYazj7FIO8Xv1d7yuP6kdhRTcDcp25m6w1y8Khin4lONGuaWwtNMGYynlB7w9ngSyA
- AAA
-X-Change-ID: 20241211-mctp-next-30415e40fc79
-To: Matt Johnston <matt@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
 
-Currently, we don't use the return value from sock_queue_rcv_skb, which
-means we may leak skbs if a message is not successfully queued to a
-socket.
+Thank you for your review.
 
-Instead, ensure that we're freeing the skb where the sock hasn't
-otherwise taken ownership of the skb by adding checks on the
-sock_queue_rcv_skb() to invoke a kfree on failure.
+On 12/16/24 18:33, Andrew Lunn wrote:
+> On Mon, Dec 16, 2024 at 10:40:55AM +0900, Joe Hattori wrote:
+>> fwnode_find_mii_timestamper() calls of_parse_phandle_with_fixed_args()
+>> but does not decrement the refcount of the obtained OF node. Add an
+>> of_node_put() call before returning from the function.
+>>
+>> This bug was detected by an experimental static analysis tool that I am
+>> developing.
+> 
+> Just out of curiosity, have you improved this tool so it now reports
+> the missing put you handled in version 3? I expect there is more code
+> with the same error which a static analyser should be able to find
+> when examining the abstract syntax tree.
 
-In doing so, rather than using the 'rc' value to trigger the
-kfree_skb(), use the skb pointer itself, which is more explicit.
+Yes, and I am experimenting with other driver codes as well.
 
-Also, add a kunit test for the sock delivery failure cases.
+> 
+>> +++ b/drivers/net/mdio/fwnode_mdio.c
+>> @@ -41,6 +41,7 @@ static struct mii_timestamper *
+>>   fwnode_find_mii_timestamper(struct fwnode_handle *fwnode)
+>>   {
+>>   	struct of_phandle_args arg;
+>> +	struct mii_timestamper *mii_ts;
+>>   	int err;
+> 
+> The netdev subsystem wants variables declared longest first, shortest
+> last, also known as reverse Christmas tree. As you work in different
+> parts of the tree, you will find each subsystem has its own set of
+> rules you will need to learn.
 
-Fixes: 4a992bbd3650 ("mctp: Implement message fragmentation & reassembly")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
----
-Changes in v2:
-- split series into a net/net-next submissions
-- restructure reassembly case, simplifying error path, as suggested by
-  Paolo Abeni <pabeni@redhat.com>
-- Link to v1: https://lore.kernel.org/r/20241211-mctp-next-v1-0-e392f3d6d154@codeconstruct.com.au
----
- net/mctp/route.c           | 36 +++++++++++++------
- net/mctp/test/route-test.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 112 insertions(+), 10 deletions(-)
+TIL. Applied in the v4 patch.
 
-diff --git a/net/mctp/route.c b/net/mctp/route.c
-index 597e9cf5aa64445474287a3fee02ba760db15796..3f2bd65ff5e3c940c8204dca14327a15a15ba26d 100644
---- a/net/mctp/route.c
-+++ b/net/mctp/route.c
-@@ -374,8 +374,13 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
- 	msk = NULL;
- 	rc = -EINVAL;
- 
--	/* we may be receiving a locally-routed packet; drop source sk
--	 * accounting
-+	/* We may be receiving a locally-routed packet; drop source sk
-+	 * accounting.
-+	 *
-+	 * From here, we will either queue the skb - either to a frag_queue, or
-+	 * to a receiving socket. When that succeeds, we clear the skb pointer;
-+	 * a non-NULL skb on exit will be otherwise unowned, and hence
-+	 * kfree_skb()-ed.
- 	 */
- 	skb_orphan(skb);
- 
-@@ -434,7 +439,9 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
- 		 * pending key.
- 		 */
- 		if (flags & MCTP_HDR_FLAG_EOM) {
--			sock_queue_rcv_skb(&msk->sk, skb);
-+			rc = sock_queue_rcv_skb(&msk->sk, skb);
-+			if (!rc)
-+				skb = NULL;
- 			if (key) {
- 				/* we've hit a pending reassembly; not much we
- 				 * can do but drop it
-@@ -443,7 +450,6 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
- 						   MCTP_TRACE_KEY_REPLIED);
- 				key = NULL;
- 			}
--			rc = 0;
- 			goto out_unlock;
- 		}
- 
-@@ -470,8 +476,10 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
- 			 * this function.
- 			 */
- 			rc = mctp_key_add(key, msk);
--			if (!rc)
-+			if (!rc) {
- 				trace_mctp_key_acquire(key);
-+				skb = NULL;
-+			}
- 
- 			/* we don't need to release key->lock on exit, so
- 			 * clean up here and suppress the unlock via
-@@ -489,6 +497,8 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
- 				key = NULL;
- 			} else {
- 				rc = mctp_frag_queue(key, skb);
-+				if (!rc)
-+					skb = NULL;
- 			}
- 		}
- 
-@@ -503,12 +513,19 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
- 		else
- 			rc = mctp_frag_queue(key, skb);
- 
-+		if (rc)
-+			goto out_unlock;
-+
-+		/* we've queued; the queue owns the skb now */
-+		skb = NULL;
-+
- 		/* end of message? deliver to socket, and we're done with
- 		 * the reassembly/response key
- 		 */
--		if (!rc && flags & MCTP_HDR_FLAG_EOM) {
--			sock_queue_rcv_skb(key->sk, key->reasm_head);
--			key->reasm_head = NULL;
-+		if (flags & MCTP_HDR_FLAG_EOM) {
-+			rc = sock_queue_rcv_skb(key->sk, key->reasm_head);
-+			if (!rc)
-+				key->reasm_head = NULL;
- 			__mctp_key_done_in(key, net, f, MCTP_TRACE_KEY_REPLIED);
- 			key = NULL;
- 		}
-@@ -527,8 +544,7 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
- 	if (any_key)
- 		mctp_key_unref(any_key);
- out:
--	if (rc)
--		kfree_skb(skb);
-+	kfree_skb(skb);
- 	return rc;
- }
- 
-diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
-index 8551dab1d1e69836c84f68509bc9dab43a96cc67..17165b86ce22d48b10793a82cc10192b8749e7e6 100644
---- a/net/mctp/test/route-test.c
-+++ b/net/mctp/test/route-test.c
-@@ -837,6 +837,90 @@ static void mctp_test_route_input_multiple_nets_key(struct kunit *test)
- 	mctp_test_route_input_multiple_nets_key_fini(test, &t2);
- }
- 
-+/* Input route to socket, using a single-packet message, where sock delivery
-+ * fails. Ensure we're handling the failure appropriately.
-+ */
-+static void mctp_test_route_input_sk_fail_single(struct kunit *test)
-+{
-+	const struct mctp_hdr hdr = RX_HDR(1, 10, 8, FL_S | FL_E | FL_TO);
-+	struct mctp_test_route *rt;
-+	struct mctp_test_dev *dev;
-+	struct socket *sock;
-+	struct sk_buff *skb;
-+	int rc;
-+
-+	__mctp_route_test_init(test, &dev, &rt, &sock, MCTP_NET_ANY);
-+
-+	/* No rcvbuf space, so delivery should fail. __sock_set_rcvbuf will
-+	 * clamp the minimum to SOCK_MIN_RCVBUF, so we open-code this.
-+	 */
-+	lock_sock(sock->sk);
-+	WRITE_ONCE(sock->sk->sk_rcvbuf, 0);
-+	release_sock(sock->sk);
-+
-+	skb = mctp_test_create_skb(&hdr, 10);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, skb);
-+	skb_get(skb);
-+
-+	mctp_test_skb_set_dev(skb, dev);
-+
-+	/* do route input, which should fail */
-+	rc = mctp_route_input(&rt->rt, skb);
-+	KUNIT_EXPECT_NE(test, rc, 0);
-+
-+	/* we should hold the only reference to skb */
-+	KUNIT_EXPECT_EQ(test, refcount_read(&skb->users), 1);
-+	kfree_skb(skb);
-+
-+	__mctp_route_test_fini(test, dev, rt, sock);
-+}
-+
-+/* Input route to socket, using a fragmented message, where sock delivery fails.
-+ */
-+static void mctp_test_route_input_sk_fail_frag(struct kunit *test)
-+{
-+	const struct mctp_hdr hdrs[2] = { RX_FRAG(FL_S, 0), RX_FRAG(FL_E, 1) };
-+	struct mctp_test_route *rt;
-+	struct mctp_test_dev *dev;
-+	struct sk_buff *skbs[2];
-+	struct socket *sock;
-+	unsigned int i;
-+	int rc;
-+
-+	__mctp_route_test_init(test, &dev, &rt, &sock, MCTP_NET_ANY);
-+
-+	lock_sock(sock->sk);
-+	WRITE_ONCE(sock->sk->sk_rcvbuf, 0);
-+	release_sock(sock->sk);
-+
-+	for (i = 0; i < ARRAY_SIZE(skbs); i++) {
-+		skbs[i] = mctp_test_create_skb(&hdrs[i], 10);
-+		KUNIT_ASSERT_NOT_ERR_OR_NULL(test, skbs[i]);
-+		skb_get(skbs[i]);
-+
-+		mctp_test_skb_set_dev(skbs[i], dev);
-+	}
-+
-+	/* first route input should succeed, we're only queueing to the
-+	 * frag list
-+	 */
-+	rc = mctp_route_input(&rt->rt, skbs[0]);
-+	KUNIT_EXPECT_EQ(test, rc, 0);
-+
-+	/* final route input should fail to deliver to the socket */
-+	rc = mctp_route_input(&rt->rt, skbs[1]);
-+	KUNIT_EXPECT_NE(test, rc, 0);
-+
-+	/* we should hold the only reference to both skbs */
-+	KUNIT_EXPECT_EQ(test, refcount_read(&skbs[0]->users), 1);
-+	kfree_skb(skbs[0]);
-+
-+	KUNIT_EXPECT_EQ(test, refcount_read(&skbs[1]->users), 1);
-+	kfree_skb(skbs[1]);
-+
-+	__mctp_route_test_fini(test, dev, rt, sock);
-+}
-+
- #if IS_ENABLED(CONFIG_MCTP_FLOWS)
- 
- static void mctp_test_flow_init(struct kunit *test,
-@@ -1053,6 +1137,8 @@ static struct kunit_case mctp_test_cases[] = {
- 			 mctp_route_input_sk_reasm_gen_params),
- 	KUNIT_CASE_PARAM(mctp_test_route_input_sk_keys,
- 			 mctp_route_input_sk_keys_gen_params),
-+	KUNIT_CASE(mctp_test_route_input_sk_fail_single),
-+	KUNIT_CASE(mctp_test_route_input_sk_fail_frag),
- 	KUNIT_CASE(mctp_test_route_input_multiple_nets_bind),
- 	KUNIT_CASE(mctp_test_route_input_multiple_nets_key),
- 	KUNIT_CASE(mctp_test_packet_flow),
+>    
+>>   	if (is_acpi_node(fwnode))
+>> @@ -53,10 +54,14 @@ fwnode_find_mii_timestamper(struct fwnode_handle *fwnode)
+>>   	else if (err)
+>>   		return ERR_PTR(err);
+>>   
+>> -	if (arg.args_count != 1)
+>> +	if (arg.args_count != 1) {
+>> +		of_node_put(arg.np);
+>>   		return ERR_PTR(-EINVAL);
+>> +	}
+>>   
+>> -	return register_mii_timestamper(arg.np, arg.args[0]);
+>> +	mii_ts = register_mii_timestamper(arg.np, arg.args[0]);
+>> +	of_node_put(arg.np);
+>> +	return mii_ts;
+>>   }
+> 
+> Although this is correct, a more normal practice is to put all the
+> cleanup at the end of the function and use a goto:
+> 
+> 	if (arg.args_count != 1) {
+> 		mii_ts = ERR_PTR(-EINVAL);
+> 		goto put_node;
+> 	}
+> 
+> 	mii_ts = register_mii_timestamper(arg.np, arg.args[0]);
+> 
+> put_node:
+>          of_node_put(arg.np);
+> 	return mii_ts;
+> }
+> 
+> This tends to be more scalable, especially when more cleanup is
+> required.
 
----
-base-commit: 7ea2745766d776866cfbc981b21ed3cfdf50124e
-change-id: 20241211-mctp-next-30415e40fc79
+Makes sense. Applied in the v4 patch as well.
 
-Best regards,
--- 
-Jeremy Kerr <jk@codeconstruct.com.au>
+> 
+> 	Andrew
 
+Best,
+Joe
 
