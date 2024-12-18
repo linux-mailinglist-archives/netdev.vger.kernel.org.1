@@ -1,92 +1,65 @@
-Return-Path: <netdev+bounces-152832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1944C9F5DDB
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 05:41:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A00B9F5E3F
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 06:22:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1515E164552
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:41:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E4431675B0
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 05:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E3B14C5A1;
-	Wed, 18 Dec 2024 04:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFDF614D439;
+	Wed, 18 Dec 2024 05:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G5ZZq4+5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHgwd3Ib"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B231369AA;
-	Wed, 18 Dec 2024 04:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F65E154BE2;
+	Wed, 18 Dec 2024 05:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734496898; cv=none; b=ngibpvw/oIoMyluDqpn8PCxS3uW2gCY8Qd+IHe11GVUdFtgmTAiVuZ6GgMU1QO6o9w1Ovg55ZtHvgjMxJTxfhyW4Ft9c8xVrdoV0DmxeXY9NWMWuAf6aMI4axHhQNVDlsht1uNScEOwC9h89pBvZzKKRnFJrZsR63c13qgqQVxc=
+	t=1734499362; cv=none; b=TS1uqwQRmKqTZzyYIxDmoKGR4tipefwvuSJSwdJG6+Bd8MKuOo9jB2vdWymgufmhF/FtIJrLCmipC+Mn9FKz+2i1eoFD9+PNsPqx2lSMPcb0iI/cEz3YjI9tuyB+cuAbFaGebpR1FiWYzrTSSo0UcFa74Oe7Rd9+MiNbznz6XAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734496898; c=relaxed/simple;
-	bh=2ea2mUHm1euM23IWtdSjpOowpwP+4eDuTDLcW6WZyM4=;
+	s=arc-20240116; t=1734499362; c=relaxed/simple;
+	bh=pKGixUq0wqQUsfZk5Td9IQcLTzvRWnZb+7UOXPDGSpc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=udJCKXib2pc4E0BXS15rmMmAY4hi22RoXEkclJZot4bMhbEOKN3NqWHd/SzVd+cjKD4Yfy3UIKMd3boY9sJcjr2iXiGKFyYv1fmEavmNDdq3RiT/AsQgnLNQ5cR82N+un8GujlmyBwg7xJii6eyJhpJvQHV3cf4vNkUVZJFLPsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G5ZZq4+5; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-72909c459c4so4207748b3a.1;
-        Tue, 17 Dec 2024 20:41:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734496896; x=1735101696; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ea2mUHm1euM23IWtdSjpOowpwP+4eDuTDLcW6WZyM4=;
-        b=G5ZZq4+50ly7hz2K1cKtEpPqQX5QKWCi+JeoP+fyQ0Wwm+6DhFt5EIXPEdIphuxRQ0
-         SxmqUE1KY3x0VGctTZk2rEhmZDObKNgmus4mELfz3X3gCy30wdVgFeSCPNryvDjUIq6Y
-         ZubOV0RbFjEKoK0OTh5zCBWU/zbF4VIkz3q+gPixP985vM7PFOkqx8xf9k0iL1CqaF+N
-         RmL8NxNVHIImLG7W4Qn77GZri/lRBB2nvx1m9ZkHwYErCkGJo4NpBa6xKmb0fwUu9TzD
-         mDYOVIECs+q+j80j0sKU3UFEsYRzx/eg4fsK9TdKZSYcbh0RZVRGgaSs281KRC2V9Y0q
-         +/9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734496896; x=1735101696;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2ea2mUHm1euM23IWtdSjpOowpwP+4eDuTDLcW6WZyM4=;
-        b=EFLXRo7cxVMFzS9YBbCwoWKJRRJ/6qhszIt+E3Q9xNK6mlSRLT53CY9+RYDNPo1uNL
-         Mz2hnAodDbdvKZCOQKsqdYbTBMuTKq4NVRwwvwfbjp9mxN8t9bnySa8xcWeISUJa/zWK
-         84P3GbpK0G9ZfeUR2f2apMxF584MbTo2+8CcZJAObd6Td3geO5oUBtzDRCxICJHJeJ3a
-         EygxaGbfguO63aGt4DXNE9qgwdk6XNIZvEvjm5JRYRGyGNEKFpE1mONUjoBCCgNnpIJp
-         JOfkphHX0dk4f++Lu+SpkZ/7N3VJnQ0AjQDs1xQgyiB/lT88VdeO3BvzH2WCeqie5Nho
-         nveg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6xy14o91ln/b6sHoImy0yuoQmUfnpNwIrh9fT9BzKbU4R+7m8aIK5NKWkpUe0ahBMdpiTs4h7@vger.kernel.org, AJvYcCXA90GrRTBZHsv2VzeW8EMfF5xp/ar9Pr0+iA6cqKIqfVjz3kSNBYKTQX7e/AgbaeddinxJEXi7M8/SyPQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYuWQO607qm+CVh9SZasGp4QDzr/7GmaNRrG2oaB9ZbNJ90JXa
-	TCfSSRML2hmK7ZllByR9wMJTxY8Fsqm/VjdipxCrOV/zh66BhRZV
-X-Gm-Gg: ASbGnctURxdeLyDDNLBNOaIGs5/gwLKcZhCe5xV3Y+iRQDBQr1K7//ZzazuxYoCssbL
-	ilUbokETufFZyHDF/PmxthDRjwWzepXVF0e+MEuXCBYzW7vo2weJaM0fqeFU0YZWjqJwgUwWER4
-	cwCb2seRwuK2aFoMQ5559jc1cjsvHCKTfJXXOy7dtLVh7HwVW0ieoYb2hhi2bC2ofeOnJ48KqlC
-	gpLnz10ID5566QWGbNik67pQhU3b9HgmVZlyLxBuJU+OpKJJnMyoo32zY8b+ClDGqUROvDpktjN
-	tEt2+lVwWa11rl977uytUyfgJSdsqOFAibVIiY4ajH56YwU=
-X-Google-Smtp-Source: AGHT+IHTlEIZ9aSrIot8wJ+q94Y5tlNlokGsdIJVlZMSjpPcSfaiWvTZNKyakl/AMV7Cd0EgMmAOFg==
-X-Received: by 2002:a05:6a21:4a4b:b0:1e0:bf98:42dc with SMTP id adf61e73a8af0-1e5b487d793mr2598254637.28.1734496895842;
-        Tue, 17 Dec 2024 20:41:35 -0800 (PST)
-Received: from hoboy.vegasvil.org (108-78-253-96.lightspeed.sntcca.sbcglobal.net. [108.78.253.96])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918ad55dbsm7552593b3a.43.2024.12.17.20.41.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 20:41:35 -0800 (PST)
-Date: Tue, 17 Dec 2024 20:41:33 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Divya Koppera <divya.koppera@microchip.com>, andrew@lunn.ch,
-	arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next v7 2/5] net: phy: microchip_rds_ptp : Add rds
- ptp library for Microchip phys
-Message-ID: <Z2JSfYKI5LasF5YH@hoboy.vegasvil.org>
-References: <20241213121403.29687-1-divya.koppera@microchip.com>
- <20241213121403.29687-3-divya.koppera@microchip.com>
- <20241217192246.47868890@kernel.org>
- <Z2JFwh94o-X7HhP4@hoboy.vegasvil.org>
- <20241217195755.2030f431@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pxX0zNvfK4IJNZBxsL/oXhS3KGsd0I4f9dq9ARFCoksQD3viDYtpBbMaEaeR0SbzNxlVOoGFy3u0IdiCB78XAvv2LjcLG37EAbFr1ebEay2Eh80WadXHZcI5tqb3quw+F1yozmQJdHL4xD+Madlx31+GW1sR55ixnt8x7JTE6aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uHgwd3Ib; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BC9EC4CECE;
+	Wed, 18 Dec 2024 05:22:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734499362;
+	bh=pKGixUq0wqQUsfZk5Td9IQcLTzvRWnZb+7UOXPDGSpc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uHgwd3Ibgj8KOhXD9Oua9LMFo5VsS250nMIXWQ16SF6PZAd9ksew8n5j1jeSlR8zI
+	 hZ4oqxc7nT4g3E9VrnKyJUyqkE6mPYNqn6g/6pqnw0rqk54ipxgYxcDnIx9hNT5WXA
+	 opK9pj20ZXYXhHloszLqB6FzMaiY4PZSOegxuGviCyoGv2M7o/rreOm2tpA+0igP0Q
+	 XPCTgwvYrB6o1gsbnbApzosLjUxvu+mcetzrfs/yrpDXyZEbUQ5uhVmNZEZljY3u2b
+	 00FGmjt4R0dh68ydP7Ob+RaF1SRVZ+UaZs7OfLPgVH6fiNNnnliAl1IpbuhWz9JsU6
+	 EIHXbpy7zsrFw==
+Date: Tue, 17 Dec 2024 21:22:39 -0800
+From: Kees Cook <kees@kernel.org>
+To: Moshe Shemesh <moshe@nvidia.com>, morbo@google.com,
+	qing.zhao@oracle.com
+Cc: Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Leon Romanovsky <leonro@nvidia.com>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	linux-rdma@vger.kernel.org, Yevgeny Kliteynik <kliteyn@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next 05/12] net/mlx5: fs, add mlx5_fs_pool API
+Message-ID: <202412172115.C7FDE7BA@keescook>
+References: <20241211134223.389616-1-tariqt@nvidia.com>
+ <20241211134223.389616-6-tariqt@nvidia.com>
+ <20241212172355.GE73795@kernel.org>
+ <70b3a7b5-abd3-4db4-8415-e0467a565847@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,16 +68,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241217195755.2030f431@kernel.org>
+In-Reply-To: <70b3a7b5-abd3-4db4-8415-e0467a565847@nvidia.com>
 
-On Tue, Dec 17, 2024 at 07:57:55PM -0800, Jakub Kicinski wrote:
+On Sun, Dec 15, 2024 at 03:39:11PM +0200, Moshe Shemesh wrote:
+> 
+> 
+> On 12/12/2024 7:23 PM, Simon Horman wrote:
+> > External email: Use caution opening links or attachments
+> > 
+> > 
+> > On Wed, Dec 11, 2024 at 03:42:16PM +0200, Tariq Toukan wrote:
+> > > From: Moshe Shemesh <moshe@nvidia.com>
+> > > 
+> > > Refactor fc_pool API to create generic fs_pool API, as HW steering has
+> > > more flow steering elements which can take advantage of the same pool of
+> > > bulks API. Change fs_counters code to use the fs_pool API.
+> > > 
+> > > Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
+> > > Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+> > > Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+> > > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c
+> > 
+> > ...
+> > 
+> > > @@ -447,11 +437,9 @@ void mlx5_fc_update_sampling_interval(struct mlx5_core_dev *dev,
+> > >   /* Flow counter bluks */
+> > > 
+> > >   struct mlx5_fc_bulk {
+> > > -     struct list_head pool_list;
+> > > +     struct mlx5_fs_bulk fs_bulk;
+> > >        u32 base_id;
+> > > -     int bulk_len;
+> > > -     unsigned long *bitmask;
+> > > -     struct mlx5_fc fcs[] __counted_by(bulk_len);
+> > > +     struct mlx5_fc fcs[] __counted_by(fs_bulk.bulk_len);
+> > >   };
+> > 
+> > Unfortunately it seems that clang-19 doesn't know how to handle
+> > __counted_by() when used like this:
+> > 
+> > drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c:442:36: error: 'counted_by' argument must be a simple declaration reference
+> >    442 |         struct mlx5_fc fcs[] __counted_by(fs_bulk.bulk_len);
+> 
+> Thanks Simon, from code perspective, bulk_len should be now in the inner
+> struct fs_bulk.
+> 
+> Keen Cook, is that going to be supported in the future? for now I will just
+> remove __counted_by() from this struct.
 
-> Fair point. Since this is a PTP library module, and an optional one
-> (patch 1 has empty wrappers for its API) - can we make it depend
-> on PTP being configured in?
+I am expecting this will be supported in the future, yes, but there isn't
+an ETA for it yet. Neither GCC 15 nor Clang are currently supporting
+sub-struct members -- the counted_by member needs to be at the same
+"level" in the struct as the annotated flexible array.
 
-Sounds okay to me.
+Is it possible to move "base_id" above "fs_bulk" and move "fcs" into
+the of end struct mlx5_fs_bulk?
 
-Thanks,
-Richard
+-Kees
+
+-- 
+Kees Cook
 
