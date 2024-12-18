@@ -1,204 +1,225 @@
-Return-Path: <netdev+bounces-153084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E4809F6C0E
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:11:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BF569F6C10
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:11:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42D701894555
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:09:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E631164070
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E9C1FA159;
-	Wed, 18 Dec 2024 17:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB421F76A2;
+	Wed, 18 Dec 2024 17:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="IV/euG4g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c6f1L1tk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E18F1F9F79
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 17:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8845F1547E2;
+	Wed, 18 Dec 2024 17:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734541744; cv=none; b=r8taIZZ6UOXXkM1brb6zvNSVwzTIcC/S52NPgG9+3V03t2U2lPhQ+tytjd/nwqT1kBoPzgdgSnEsXSZIVW/kBj15SEJEiJAxcSTseSBMSrmIbpArBOy4BrHg2CxiiK/lK8XhhHPr3p1R+JEwm6tUuC27/ScWZlzuv9SmkcXMYr0=
+	t=1734541907; cv=none; b=lY295MGhi9GylUWzfD79DVkwby1gWrLfGV7ObPSdiQ6g02xqSNE3SjZ6n/ksXFJ3MAK8QUeRFZxAi+WKGam8K3pMKRCHBzgPj0CITgCwpvGMd5IPHMkAmY8/EukSMxBEuOSEwJoaBSTS5CVEwD0dhI7Mo64sLqtPVIxkVNBCNko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734541744; c=relaxed/simple;
-	bh=EsxWV4j978n0te6a6W9t6wV5YT9GBp7l9URdDS6SmgI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I7x+jDWsxBwy2SAvC7K/mEEhqJnI1kiP4J61kEG+DbrAs+Ms8N+6dF5gj8b8RpQYeOT36rh/KqpVo8j09EYKLOM3GJKF/GxBblTfzj2nZDerMyJkNbw3vn1cPVZJeW1a2enlBlKgSGWLN2g8KxjJdcwSMZq3mvloejN8jqOQcOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=IV/euG4g; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-218c8aca5f1so27302595ad.0
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 09:09:03 -0800 (PST)
+	s=arc-20240116; t=1734541907; c=relaxed/simple;
+	bh=QkG5146bo0CGwDE8nvoN/ET4BKac5LPli9otqYJB3wA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i0OeDMmLOzwKyARpE3PW4XTndpvY1b4WqSIlndFLk5yF6uRO1AGdZVYZwIESEvCFMgCkcP6v0uYa2gF7bCWP3ETKe3iOMVrnPlabSRyoxr7US1JiVKNoElK4HejGSs6VgzJmaxiBvNFa+mwhoR+AEsR74yv5z/dsM4Wv32seo7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c6f1L1tk; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e460717039fso3813844276.0;
+        Wed, 18 Dec 2024 09:11:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1734541742; x=1735146542; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PpSQHZ9ybTyyNY7KNiD5NhxYslOMfBGaz48YVmHE+bA=;
-        b=IV/euG4gfobmfFkIBHK8MQiPRiZH1OKuhIulETaabf0x0LLzxrdVh6g0CzWJdQAa+m
-         eyjLBpSgoK7HQX9WDvrQSksuPadoe0dcVGA0DIc7Gvg5ORYka+nqUNVbq71XG3eJDXZU
-         tfj5R69tKt47QGmq2KCxFPGshEnFTTL4a+XwA=
+        d=gmail.com; s=20230601; t=1734541904; x=1735146704; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XVsLO/ozQKiYb6Yyt2h8xhdm9zIQgU0/l+fMFmEPNd0=;
+        b=c6f1L1tkqOT6e2SI6W8swOpmUgq3kMAdrhItCWT9PYsqTJrmtiRULGk3CHgJcFs7JQ
+         EKfEoJQCixyNvlHuwlq6ghKsfXR/lUNB4UqUWlQLC2lZoPvW3KDTDTf+elf2oJNCNqt9
+         2dQeLRp6WiOw/VuDfs9Vfw3bhXYPp+qkjqXHN9qNdhwMRbBE6mnk5TMECaWju8IguzzB
+         +ur03IVaD9VLe5SGa9niMEM/o0axtHWd/SwydyUfJFYehrAwdMUeSukDDcFGN0MYpHj3
+         w0yXvgVoZb4Ov6YcO/AKA6Ok6YoBqQ8qT6uLVlOysDcrM7af0qkh+55mz86q3BRnQd5V
+         99kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734541742; x=1735146542;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PpSQHZ9ybTyyNY7KNiD5NhxYslOMfBGaz48YVmHE+bA=;
-        b=Fk66QjA+DhpRXMYLNWFBjLOY67bnDIV8x38T1Rzkjby2bO2XpSoSB4caf8jaAZQMQx
-         CHW/ULefJKjI7nAUk+m1PRwwHVY52q8sv5Wlj8O6rs4VQcpkuZK1LCWgOjdr1rpkCrj9
-         78U2KI7v6YtEsa4Djyo6kR8KOnBP/9pu3aoA0aL3LkJz31HOvzcFonCPJWqs/Y6h1jSk
-         BGHRnNDHD0DLyuCH2DYeKq0xKIdrq663UrS7ln4MNPo0xpvYVTh1QXP9i2PSTDzr0IN9
-         3p9VvSSRnNRXlOvCpZ/pBWCWLGiqTHIubedQBUnsqd6qOhNYE2VWTpVHe50tSityDRs+
-         s23g==
-X-Forwarded-Encrypted: i=1; AJvYcCV2ROK4YG9wkdeYA1W/4YJzCuCubSCKOEhABu45dDvr7dK43doE706A/Az1alE/ZlW8tL6JQlc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4uQBFPbERzb5tCmVW3izfx6NsofiaRP4uFVWSNBfYihdNRCbf
-	/zEfjY59CFl+SHs3hKTZ0TOmVweDns+FpvfbdsBm1BZiDPqGZhrg/0gF04Pu13o=
-X-Gm-Gg: ASbGncuc1IYoklGRstaTcKtleUZDg63uAstZwQ9vV5hHS/FTTd6RjD7wSSyMy8aNBN9
-	2tAcYQgJ21Kpg6nksva1kN7I4if7RulZHVAWKUwRlN/4mRyZsszupdbvtjAM9SPhsEZBJsl+J8X
-	6iRyBWfVsMvfOwWNTy0DV2cBVNilw7kl/+rWUyAEjM1Uv2j9kMZpfyzKVFMGNqkGBW8WssnCvm/
-	n42i+HFOGF9CtGHGqXiBnjFDOJ3ILUnusgdWCtfKhnfUAsW/+bkIhqdjBFuG1unx9x/YaUKc53d
-	knZT0WCi3wHArRW8aCZnu6U=
-X-Google-Smtp-Source: AGHT+IFLcXEwr+Ux+NRuBtnQUxHIcEJMXQFYotalRPkLUZD05Hvov4X94huhAnS7Lo6myzNs/HTYKw==
-X-Received: by 2002:a17:902:f985:b0:216:6c77:7bbb with SMTP id d9443c01a7336-218d70dc242mr38520155ad.17.1734541742613;
-        Wed, 18 Dec 2024 09:09:02 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1db63c3sm79259875ad.48.2024.12.18.09.08.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2024 09:09:02 -0800 (PST)
-Date: Wed, 18 Dec 2024 09:08:58 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Alex Lazar <alazar@nvidia.com>
-Cc: "aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
-	"almasrymina@google.com" <almasrymina@google.com>,
-	"amritha.nambiar@intel.com" <amritha.nambiar@intel.com>,
-	"bigeasy@linutronix.de" <bigeasy@linutronix.de>,
-	"bjorn@rivosinc.com" <bjorn@rivosinc.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, Dan Jurgens <danielj@nvidia.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"johannes.berg@intel.com" <johannes.berg@intel.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"leitao@debian.org" <leitao@debian.org>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"lorenzo@kernel.org" <lorenzo@kernel.org>,
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
-	"mkarsten@uwaterloo.ca" <mkarsten@uwaterloo.ca>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"skhawaja@google.com" <skhawaja@google.com>,
-	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	Gal Pressman <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
-	Dror Tennenbaum <drort@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [net-next v6 0/9] Add support for per-NAPI config via netlink
-Message-ID: <Z2MBqrc2FM2rizqP@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Alex Lazar <alazar@nvidia.com>,
-	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
-	"almasrymina@google.com" <almasrymina@google.com>,
-	"amritha.nambiar@intel.com" <amritha.nambiar@intel.com>,
-	"bigeasy@linutronix.de" <bigeasy@linutronix.de>,
-	"bjorn@rivosinc.com" <bjorn@rivosinc.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, Dan Jurgens <danielj@nvidia.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"johannes.berg@intel.com" <johannes.berg@intel.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"leitao@debian.org" <leitao@debian.org>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"lorenzo@kernel.org" <lorenzo@kernel.org>,
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
-	"mkarsten@uwaterloo.ca" <mkarsten@uwaterloo.ca>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"skhawaja@google.com" <skhawaja@google.com>,
-	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	Gal Pressman <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
-	Dror Tennenbaum <drort@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-References: <DM8PR12MB5447837576EA58F490D6D4BFAD052@DM8PR12MB5447.namprd12.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1734541904; x=1735146704;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XVsLO/ozQKiYb6Yyt2h8xhdm9zIQgU0/l+fMFmEPNd0=;
+        b=phgk59CNx7tRWzY4ZW1N26U51Ue9o4f2+yyUN+MtQH3RpqcMKaiHA9DME+UhpA4T3R
+         6BFSi18fTgEynFI+KWUHXLVL0AskH6valHNIogyLkqctfYjoFBvxrdZSlcZFdMnp+W7Z
+         E2pv5bjE2/aUFbxfcAcGP1L9iMfqOJVZ8cymuVa5L+0yxCnCFMkQ15rcbSpyYzV5BnPk
+         kcapSrRu1BBrkmoC6nsPWjLi6zI+KSjeNF98Pf6WiZ16S0w73JGjX4m2cB3iab9h1F2I
+         ZqjJIQV6HpcsVqr4/PvUbGEw1BRCxGNNh/nLwBUuOMkuN6N2ag8POQpLm1zl9bH7P+Py
+         ZPiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXMxvm9chQ55OGleYVgtvaCQYeha8md9CvNZYkI3hWU1FnN8Q9yzMysHzu4WuqZwJEQu0M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzBrFEuey+ct0WOQo/0uObccSEoEGbxiEa6NBMQxye8zMQyHts
+	qVuYBFYIL9yh3kolCl3pfH1mZEinviaoUqySlRa3+USziZsvQJBpEaFFiyiPcawr8VKVJCeuCK+
+	vSMCo1YlqqZa0dsJ6jGg3GG+rWjI=
+X-Gm-Gg: ASbGnctFwZr1Te9tsH5OAiR5PCeGro1AwRG5tlmNLdkkjsBgPSiEK6V5SETEdE9R0kC
+	BQffFUGy4bp1f1grIQAYNFi/PSLnA9yHqtokQeXA=
+X-Google-Smtp-Source: AGHT+IHSLxJlpM+8bOvZ/JV/KfwUtQ0DrNWOkukcuMbp0ROa4IYqHfvTVZO0OueFIbmsNr2qX/oKrfzzkusip4+MN3s=
+X-Received: by 2002:a05:690c:6386:b0:6ef:4a57:fc98 with SMTP id
+ 00721157ae682-6f3e1b5bb0fmr5183097b3.16.1734541904328; Wed, 18 Dec 2024
+ 09:11:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM8PR12MB5447837576EA58F490D6D4BFAD052@DM8PR12MB5447.namprd12.prod.outlook.com>
+References: <20241213232958.2388301-1-amery.hung@bytedance.com> <20241213232958.2388301-7-amery.hung@bytedance.com>
+In-Reply-To: <20241213232958.2388301-7-amery.hung@bytedance.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Wed, 18 Dec 2024 09:11:32 -0800
+Message-ID: <CAMB2axPioMoEwLAH4y-nPjYngq_+uv5PiaO=708rS98=t8dEvg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v1 06/13] bpf: net_sched: Add basic bpf qdisc kfuncs
+To: Amery Hung <amery.hung@bytedance.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org, 
+	sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br, 
+	yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2024 at 11:22:33AM +0000, Alex Lazar wrote:
-> Hi Joe and all,
-> 
-> I am part of the NVIDIA Eth drivers team, and we are experiencing a problem,
-> sibesced to this change: commit 86e25f40aa1e ("net: napi: Add napi_config")
-> 
-> The issue occurs when sending packets from one machine to another.
-> On the receiver side, we have XSK (XDPsock) that receives the packet and sends it
-> back to the sender.
-> At some point, one packet (packet A) gets "stuck," and if we send a new packet
-> (packet B), it "pushes" the previous one. Packet A is then processed by the NAPI
-> poll, and packet B gets stuck, and so on.
-> 
-> Your change involves moving napi_hash_del() and napi_hash_add() from
-> netif_napi_del() and netif_napi_add_weight() to napi_enable() and napi_disable().
-> If I move them back to netif_napi_del() and netif_napi_add_weight(),
-> the issue is resolved (I moved the entire if/else block, not just the napi_hash_del/add).
-> 
-> This issue occurs with both the new and old APIs (netif_napi_add/_config).
-> Moving the napi_hash_add() and napi_hash_del() functions resolves it for both.
-> I am debugging this, no breakthrough so far.
-> 
-> I would appreciate if you could look into this.
-> We can provide more details per request.
+On Fri, Dec 13, 2024 at 3:30=E2=80=AFPM Amery Hung <amery.hung@bytedance.co=
+m> wrote:
+>
+> Add basic kfuncs for working on skb in qdisc.
+>
+> Both bpf_qdisc_skb_drop() and bpf_kfree_skb() can be used to release
+> a reference to an skb. However, bpf_qdisc_skb_drop() can only be called
+> in .enqueue where a to_free skb list is available from kernel to defer
+> the release. bpf_kfree_skb() should be used elsewhere. It is also used
+> in bpf_obj_free_fields() when cleaning up skb in maps and collections.
+>
+> bpf_skb_get_hash() returns the flow hash of an skb, which can be used
+> to build flow-based queueing algorithms.
+>
+> Finally, allow users to create read-only dynptr via bpf_dynptr_from_skb()=
+.
+>
+> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> ---
+>  net/sched/bpf_qdisc.c | 77 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 76 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
+> index a2e2db29e5fc..28959424eab0 100644
+> --- a/net/sched/bpf_qdisc.c
+> +++ b/net/sched/bpf_qdisc.c
+> @@ -106,6 +106,67 @@ static int bpf_qdisc_btf_struct_access(struct bpf_ve=
+rifier_log *log,
+>         return 0;
+>  }
+>
+> +__bpf_kfunc_start_defs();
+> +
+> +/* bpf_skb_get_hash - Get the flow hash of an skb.
+> + * @skb: The skb to get the flow hash from.
+> + */
+> +__bpf_kfunc u32 bpf_skb_get_hash(struct sk_buff *skb)
+> +{
+> +       return skb_get_hash(skb);
+> +}
+> +
+> +/* bpf_kfree_skb - Release an skb's reference and drop it immediately.
+> + * @skb: The skb whose reference to be released and dropped.
+> + */
+> +__bpf_kfunc void bpf_kfree_skb(struct sk_buff *skb)
+> +{
+> +       kfree_skb(skb);
+> +}
+> +
+> +/* bpf_qdisc_skb_drop - Drop an skb by adding it to a deferred free list=
+.
+> + * @skb: The skb whose reference to be released and dropped.
+> + * @to_free_list: The list of skbs to be dropped.
+> + */
+> +__bpf_kfunc void bpf_qdisc_skb_drop(struct sk_buff *skb,
+> +                                   struct bpf_sk_buff_ptr *to_free_list)
+> +{
+> +       __qdisc_drop(skb, (struct sk_buff **)to_free_list);
+> +}
+> +
+> +__bpf_kfunc_end_defs();
+> +
+> +#define BPF_QDISC_KFUNC_xxx \
+> +       BPF_QDISC_KFUNC(bpf_skb_get_hash, KF_TRUSTED_ARGS) \
+> +       BPF_QDISC_KFUNC(bpf_kfree_skb, KF_RELEASE) \
+> +       BPF_QDISC_KFUNC(bpf_qdisc_skb_drop, KF_RELEASE) \
+> +
+> +BTF_KFUNCS_START(bpf_qdisc_kfunc_ids)
+> +#define BPF_QDISC_KFUNC(name, flag) BTF_ID_FLAGS(func, name, flag)
+> +BPF_QDISC_KFUNC_xxx
+> +#undef BPF_QDISC_KFUNC
+> +BTF_ID_FLAGS(func, bpf_dynptr_from_skb, KF_TRUSTED_ARGS)
+> +BTF_KFUNCS_END(bpf_qdisc_kfunc_ids)
+> +
+> +#define BPF_QDISC_KFUNC(name, _) BTF_ID_LIST_SINGLE(name##_ids, func, na=
+me)
+> +BPF_QDISC_KFUNC_xxx
+> +#undef BPF_QDISC_KFUNC
+> +
+> +static int bpf_qdisc_kfunc_filter(const struct bpf_prog *prog, u32 kfunc=
+_id)
+> +{
 
-I appreciate your report, but there is not a lot in your message to
-help debug the issue.
+Here is a null pointer dereference since prog->aux->attach_func_name
+is not populated yet during check_cfg(). I will add:
 
-Can you please:
+        if (!btf_id_set8_contains(&bpf_qdisc_kfunc_ids, kfunc_id) ||
+            !prog->aux->attach_func_name)
+                return 0;
 
-1.) Verify that the kernel tree you are testing on has commit
-cecc1555a8c2 ("net: Make napi_hash_lock irq safe") included ? If it
-does not, can you pull in that commit and re-run your test and
-report back if that fixes your problem?
-
-2.) If (1) does not fix your problem, can you please reply with at
-least the following information:
-  - Specify what device this is happening on (in case I have access
-    to one)
-  - Which driver is affected
-  - Which upstream kernel SHA you are building your test kernel from
-  - The reproducer program(s) with clear instructions on how exactly
-    to run it/them in order to reproduce the issue
-
-Thanks,
-Joe
+> +       if (kfunc_id =3D=3D bpf_qdisc_skb_drop_ids[0])
+> +               if (strcmp(prog->aux->attach_func_name, "enqueue"))
+> +                       return -EACCES;
+> +
+> +       return 0;
+> +}
+> +
+> +static const struct btf_kfunc_id_set bpf_qdisc_kfunc_set =3D {
+> +       .owner =3D THIS_MODULE,
+> +       .set   =3D &bpf_qdisc_kfunc_ids,
+> +       .filter =3D bpf_qdisc_kfunc_filter,
+> +};
+> +
+>  static const struct bpf_verifier_ops bpf_qdisc_verifier_ops =3D {
+>         .get_func_proto         =3D bpf_qdisc_get_func_proto,
+>         .is_valid_access        =3D bpf_qdisc_is_valid_access,
+> @@ -209,6 +270,20 @@ static struct bpf_struct_ops bpf_Qdisc_ops =3D {
+>
+>  static int __init bpf_qdisc_kfunc_init(void)
+>  {
+> -       return register_bpf_struct_ops(&bpf_Qdisc_ops, Qdisc_ops);
+> +       int ret;
+> +       const struct btf_id_dtor_kfunc skb_kfunc_dtors[] =3D {
+> +               {
+> +                       .btf_id       =3D bpf_sk_buff_ids[0],
+> +                       .kfunc_btf_id =3D bpf_kfree_skb_ids[0]
+> +               },
+> +       };
+> +
+> +       ret =3D register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_=
+qdisc_kfunc_set);
+> +       ret =3D ret ?: register_btf_id_dtor_kfuncs(skb_kfunc_dtors,
+> +                                                ARRAY_SIZE(skb_kfunc_dto=
+rs),
+> +                                                THIS_MODULE);
+> +       ret =3D ret ?: register_bpf_struct_ops(&bpf_Qdisc_ops, Qdisc_ops)=
+;
+> +
+> +       return ret;
+>  }
+>  late_initcall(bpf_qdisc_kfunc_init);
+> --
+> 2.20.1
+>
 
