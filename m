@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-153117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AABE9F6D15
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 19:20:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07BF29F6D40
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 19:28:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA44F1894723
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D47101888BE8
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85EE71FBEA0;
-	Wed, 18 Dec 2024 18:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5391FA16E;
+	Wed, 18 Dec 2024 18:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Xj08/SEo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4iekdKjJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63851FBC94
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 18:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D47F3597C
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 18:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734546014; cv=none; b=lYyAvVLwfGTXBk494z905TzPxkjZnsHjdKM87b+6IJitBLOKmTXWmmsIPDqy8gJWYYW/xdsr35DT7LZHgrfhBbnWF6vcda1huVLkRj8xnszF2/kufsnn2xyI5l4u1036w58+4MDN5ph1g1N1E+BOEMnbfZ3H96etH1lleBkFpos=
+	t=1734546518; cv=none; b=N5QmcrZJTXCRQoMP9BI3wMZVpzt3C32s7DRIHnKCExKOvk1gqrTXO20CF2dqwmbO5/9H+jWRbBmwgii/O20i/tB8msXn6v9rXO9c/QXQl/Ks6m0XPfiQ4NKhcklGPJC8RY9p3Sdn3Jifyv7gu50mL56EbqDeypLc5W4SX/5G/+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734546014; c=relaxed/simple;
-	bh=4p1AsyLjo2x7S/EkOQVNcmO6NQrVF6KRKKcV+az+qz0=;
+	s=arc-20240116; t=1734546518; c=relaxed/simple;
+	bh=mIuF9d1f+HLJrPmi8y97Wjpyzy6lK6c4oDO5xRAtSiI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uUG7n2HWFBHxMhQlXcFPhuMUzEO0vBgqRStaPeYYFK1XovyEKur3ZYIK0Edcq32hwMZRstYl+2U20FlNHKskP/v2yb+awYTIFQxu3LbinySoweiTR1ckljXxtYoNce3sTZDZtZcjlQ7cDm8dRgO1zhvJG1TU4P0z70wDD3T1ZoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Xj08/SEo; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=lE7su2GnG6GB0dBHqlLymKIGJt7tz48zT6Zhtc2rKgOdfVRylcFi866BQM0UM+it9hBVWk2i4m+4rXnbSlOVfN5RuHTJNh3HHdKHATlJbZu1SvD78K9M7vqKljVsXQCrRkXiH27ts+hEg3WgeqUs38fCsHsdE6duXMxhgudp6ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4iekdKjJ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Kt7Xbnanqrj52TOQQ3oC1wR0pVJPfIogCKDlu0+TXOI=; b=Xj08/SEoLQOF1Ip91qn12vzctm
-	P5zOSsEl34KYPeRI7//PhFJOqfUETCEtM6ZaiZErH0gPQqex/hEYs6lWb2+GlC31b5CzHoVgx9ZrE
-	kQfc3rZ5mo9KubPgGEW7Y0jlMkmCJvvp7s307vxU9LNf9SinDJHEbsL55KRL9Y6c+zDw=;
+	bh=4w2SmD30GoQa4S2X31V42N3+CjNHB5h064z4DqpDDyQ=; b=4iekdKjJmFeTbKwNPc0ZNRy9XO
+	pxYjSG7C2ZQNo7NL57Mxh5bwibtkbFx89Zt0cOxrziz9gvPLXw99J79BwPMmUdQIUUq4HfBZJoHob
+	gxn+x82OHeDPdAxG3uwacIVASkZ+Qtz3bHgxygRhF/yvl7BdVf2OYQH78m85CspXL4A4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tNyeU-001MQ0-7a; Wed, 18 Dec 2024 19:20:06 +0100
-Date: Wed, 18 Dec 2024 19:20:06 +0100
+	id 1tNyme-001MWY-2x; Wed, 18 Dec 2024 19:28:32 +0100
+Date: Wed, 18 Dec 2024 19:28:32 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Xin Tian <tianx@yunsilicon.com>
 Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
 	pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
 	jeff.johnson@oss.qualcomm.com, przemyslaw.kitszel@intel.com,
 	weihg@yunsilicon.com, wanry@yunsilicon.com
-Subject: Re: [PATCH v1 01/16] net-next/yunsilicon: Add xsc driver basic
- framework
-Message-ID: <2792da0b-a1f8-4998-a7ea-f1978f97fc4a@lunn.ch>
+Subject: Re: [PATCH v1 09/16] net-next/yunsilicon: Init net device
+Message-ID: <51fa5341-4e7b-4c76-8fd5-9ca1f4b57de7@lunn.ch>
 References: <20241218105023.2237645-1-tianx@yunsilicon.com>
- <20241218105023.2237645-2-tianx@yunsilicon.com>
+ <20241218105041.2237645-10-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,64 +61,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241218105023.2237645-2-tianx@yunsilicon.com>
+In-Reply-To: <20241218105041.2237645-10-tianx@yunsilicon.com>
 
-> +enum {
-> +	XSC_LOG_LEVEL_DBG	= 0,
-> +	XSC_LOG_LEVEL_INFO	= 1,
-> +	XSC_LOG_LEVEL_WARN	= 2,
-> +	XSC_LOG_LEVEL_ERR	= 3,
-> +};
+> +static int xsc_attach_netdev(struct xsc_adapter *adapter)
+> +{
+> +	int err = -1;
 > +
-> +#define xsc_dev_log(condition, level, dev, fmt, ...)			\
-> +do {									\
-> +	if (condition)							\
-> +		dev_printk(level, dev, dev_fmt(fmt), ##__VA_ARGS__);	\
-> +} while (0)
+> +	err = xsc_eth_nic_enable(adapter);
+> +	if (err)
+> +		return err;
 > +
-> +#define xsc_core_dbg(__dev, format, ...)				\
-> +	xsc_dev_log(xsc_log_level <= XSC_LOG_LEVEL_DBG, KERN_DEBUG,	\
-> +		&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,		\
-> +		__func__, __LINE__, current->pid, ##__VA_ARGS__)
+> +	xsc_core_info(adapter->xdev, "%s ok\n", __func__);
+
+...
+
+> +static int xsc_eth_attach(struct xsc_core_device *xdev, struct xsc_adapter *adapter)
+> +{
+> +	int err = -1;
 > +
-> +#define xsc_core_dbg_once(__dev, format, ...)				\
-> +	dev_dbg_once(&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,	\
-> +		     __func__, __LINE__, current->pid,			\
-> +		     ##__VA_ARGS__)
+> +	if (netif_device_present(adapter->netdev))
+> +		return 0;
 > +
-> +#define xsc_core_dbg_mask(__dev, mask, format, ...)			\
-> +do {									\
-> +	if ((mask) & xsc_debug_mask)					\
-> +		xsc_core_dbg(__dev, format, ##__VA_ARGS__);		\
-> +} while (0)
+> +	err = xsc_attach_netdev(adapter);
+> +	if (err)
+> +		return err;
+> +
+> +	xsc_core_info(adapter->xdev, "%s ok\n", __func__);
 
-You where asked to throw all these away and just use the existing
-methods. 
+Don't spam the log like this. _dbg() or nothing.
 
-If you disagree with a comment, please reply and ask for more details,
-understand the reason behind the comment, or maybe try to justify your
-solution over what already exists.
+> +	err = xsc_eth_nic_init(adapter, rep_priv, num_chl, num_tc);
+> +	if (err) {
+> +		xsc_core_warn(xdev, "xsc_nic_init failed, num_ch=%d, num_tc=%d, err=%d\n",
+> +			      num_chl, num_tc, err);
+> +		goto err_free_netdev;
+> +	}
+> +
+> +	err = xsc_eth_attach(xdev, adapter);
+> +	if (err) {
+> +		xsc_core_warn(xdev, "xsc_eth_attach failed, err=%d\n", err);
+> +		goto err_cleanup_netdev;
+> +	}
+> +
+>  	err = register_netdev(netdev);
+>  	if (err) {
+>  		xsc_core_warn(xdev, "register_netdev failed, err=%d\n", err);
+> -		goto err_free_netdev;
+> +		goto err_detach;
+>  	}
+>  
+>  	xdev->netdev = (void *)netdev;
 
-Maybe look at the ethtool .get_msglevel & .set_msglevel if you are not
-already using them.
+Before register_netdev() returns, the device is live and sending
+packets, especially if you are using NFS root. What will happen if
+xdev->netdev is NULL with those first few packets?
 
-> +unsigned int xsc_log_level = XSC_LOG_LEVEL_WARN;
-> +module_param_named(log_level, xsc_log_level, uint, 0644);
-> +MODULE_PARM_DESC(log_level,
-> +		 "lowest log level to print: 0=debug, 1=info, 2=warning, 3=error. Default=1");
+And why the void * cast? 
 
-Module parameters are not liked. You will however find quite a few
-drivers with something like:
+> +/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
+> +/*
+> + * Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> + * Copyright (c) 2015-2016, Mellanox Technologies. All rights reserved.
+> + *
+> + * This software is available to you under a choice of one of two
+> + * licenses.  You may choose to be licensed under the terms of the GNU
+> + * General Public License (GPL) Version 2, available from the file
+> + * COPYING in the main directory of this source tree, or the
+> + * OpenIB.org BSD license below:
+> + *
+> + *     Redistribution and use in source and binary forms, with or
+> + *     without modification, are permitted provided that the following
+> + *     conditions are met:
+> + *
+> + *      - Redistributions of source code must retain the above
+> + *        copyright notice, this list of conditions and the following
+> + *        disclaimer.
+> + *
+> + *      - Redistributions in binary form must reproduce the above
+> + *        copyright notice, this list of conditions and the following
+> + *        disclaimer in the documentation and/or other materials
+> + *        provided with the distribution.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+> + * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+> + * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+> + * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+> + * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+> + * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+> + * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> + * SOFTWARE.
+> + */
 
-MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
-
-which is used to set the initial msglevel. That will probably be
-accepted.
-
-> +EXPORT_SYMBOL(xsc_log_level);
-
-I've not looked at your overall structure yet, but why export this?
-Are there multiple modules involved?
+The /* SPDX-License-Identifier: line replaces all such license
+boilerplate. Please delete this.
 
 	Andrew
 
