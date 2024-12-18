@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-152786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 585019F5C82
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:00:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 947FB9F5C83
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:00:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2945A1887312
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 02:00:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1A2516908E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 02:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF7780034;
-	Wed, 18 Dec 2024 02:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B691D6EB7C;
+	Wed, 18 Dec 2024 02:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aRTgamAA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nWvSDSbm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9AA70817
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704035336D
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734487213; cv=none; b=A+90repF/rHtWNBISPwfHJyISTZrG7xoMQFmrCr6p1Hw1yDSCulm34EswXrTuQTXVJl+L6tKuybxrS+a8rAWSNOGp9DGwrD2xABE/ru8IHg2Yuf0KYRGLTJigGxnM7NRCFZj+4YkUuUaV4GI6tDgWzgHN6cLJz1xNRVbcTkaH+s=
+	t=1734487217; cv=none; b=pJoASyXYjHXXgm03RBPxXbo2L0j9jGqmdDf5okEWOY1gFQ7z76Js3GrqkeSKz2DNzCPrVLMXVHOl+ETlttGGcpJC504ItBI4zahn8CcafVF3AJv8Vukd91mJQ8Om/PDaoh2Kztt8wa6EqSye+35dzFuw4kWLE32scl8CcrKwOtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734487213; c=relaxed/simple;
-	bh=tE/gydBZjciTdirIvu8WUunNi8vSlMz++B86iVl8dZY=;
+	s=arc-20240116; t=1734487217; c=relaxed/simple;
+	bh=KT0fYllvA3KbR60PMq63QylsL7EftHdRFFZSiwDvGB8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YRxMCef8nvGe00q5ZzMPRRQA8XRN55BX+jmH8IKIPU4b7T7NxvLFSeXD/ST5rkNK58PgOnTPWpoPv27XzehQb2evFrn7XyCDgPTmFG+r9IXgr5JpHjd4QL3VKHK+3GHfrJWElgOpJbCuPrUaoQT6cvMyBm1YcnlAfeAnQ5TRJ2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aRTgamAA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8F12C4CED3;
-	Wed, 18 Dec 2024 02:00:12 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gQZXeM9ytM7+hufw7jW83iat/ibgic91mkwIMX5fRZMvlypIfJUefhrluz45RgFYqP302vUd8Jg4TrlJpi/7ryD6FXpblEiM/SOWjwwodBULvKeiuTFb3lZBrB6sMl9u5fVXPSaVKWeWSkXQ5LiH0YI/O1feHbgg0SCz8N4dnhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nWvSDSbm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6222C4CED3;
+	Wed, 18 Dec 2024 02:00:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734487212;
-	bh=tE/gydBZjciTdirIvu8WUunNi8vSlMz++B86iVl8dZY=;
+	s=k20201202; t=1734487215;
+	bh=KT0fYllvA3KbR60PMq63QylsL7EftHdRFFZSiwDvGB8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aRTgamAA97ltTNguMyUDLn6+z0BOgBkrywsUb59t5UmWKL5vJ6Hq6+DTTAI4UXLdp
-	 8AhtXznouTOnrKTGuwbuswbeyWw5rw1+tF5OYW6Aw32++TzuU7Ip6N/xOSO3aP+yKJ
-	 2I43tJ2Wbxdnek3vnTQb+QecTekhZykUnKWgGbTBsJOe6cGKt7aLRzdz5VP7PBXtCf
-	 JgwoRBO/WZfXGnky7x8rTW6s5Lz+XVt4U1Y7PWCpcNWV3zkdMQyR0XCcfknuyuUZ9w
-	 R1RCAAhFqaUD2/U0zLLs2/pX064EOiKzmix39rrKTccODDIBW0GVUGL3YWNPyLsflJ
-	 Cvpq3y0HAaC/g==
+	b=nWvSDSbmvr4UDElEnL8fJ0BMWV11WE6qAkmxBVFa31nZ90BFO6i6TZI0QlD22FJ+1
+	 mjdCEz+bdzlMhFDhwL3MWq4I0DneHG7LaAg3dQ33VZs+jdSg7ItL7dTUKzmLxuaqhi
+	 kWNTDLJxeU2pvLu4JN7xJd3Esl/3CQYR6t4OwcdAr3U5qeyIAQGJW5gZ2BcBxx2GVv
+	 VTlyc7BD61lgwpve7izXrnhQ3ieUVcKDYwBacFshiWnhuWGgVvt4J1Jcku2b4TvgDi
+	 Nhp1ZZ+x1X+qlEoIF5jHW0DIwnU4ncesL9ibPfsNJ3apWWr6NlvKyiFrYGW0jivG+J
+	 4xvDi8PgEeNuA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C7C3806657;
-	Wed, 18 Dec 2024 02:00:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 81BE53806657;
+	Wed, 18 Dec 2024 02:00:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: netdevsim: fix nsim_pp_hold_write()
+Subject: Re: [PATCH net-next v2] net: page_pool: rename page_pool_is_last_ref()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173448723026.1148670.4011756065393533402.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Dec 2024 02:00:30 +0000
-References: <20241216083703.1859921-1-edumazet@google.com>
-In-Reply-To: <20241216083703.1859921-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, horms@kernel.org, eric.dumazet@gmail.com,
- syzkaller@googlegroups.com
+ <173448723324.1148670.10386119885340908217.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Dec 2024 02:00:33 +0000
+References: <20241215212938.99210-1-kuba@kernel.org>
+In-Reply-To: <20241215212938.99210-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, aleksander.lobakin@intel.com, ilias.apalodimas@linaro.org,
+ hawk@kernel.org, asml.silence@gmail.com, almasrymina@google.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 16 Dec 2024 08:37:03 +0000 you wrote:
-> nsim_pp_hold_write() has two problems:
+On Sun, 15 Dec 2024 13:29:38 -0800 you wrote:
+> page_pool_is_last_ref() releases a reference while the name,
+> to me at least, suggests it just checks if the refcount is 1.
+> The semantics of the function are the same as those of
+> atomic_dec_and_test() and refcount_dec_and_test(), so just
+> use the _and_test() suffix.
 > 
-> 1) It may return with rtnl held, as found by syzbot.
-> 
-> 2) Its return value does not propagate an error if any.
-> 
-> Fixes: 1580cbcbfe77 ("net: netdevsim: add some fake page pool use")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: netdevsim: fix nsim_pp_hold_write()
-    https://git.kernel.org/netdev/net/c/b9b8301d369b
+  - [net-next,v2] net: page_pool: rename page_pool_is_last_ref()
+    https://git.kernel.org/netdev/net-next/c/d3c9510dc900
 
 You are awesome, thank you!
 -- 
