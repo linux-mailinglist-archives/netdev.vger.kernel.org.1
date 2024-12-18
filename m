@@ -1,94 +1,110 @@
-Return-Path: <netdev+bounces-152993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35BB49F689E
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:36:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C808D9F68B8
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:39:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0231016C741
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:35:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3D7017007F
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1E51BEF61;
-	Wed, 18 Dec 2024 14:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572851C5CD9;
+	Wed, 18 Dec 2024 14:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Tc+rc7tu"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="ZfC9+YfY"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD90F1B0417;
-	Wed, 18 Dec 2024 14:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983801C5CC2;
+	Wed, 18 Dec 2024 14:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734532451; cv=none; b=M7VIa/uktAnG5NdLA7DbLOCij2EKGJwBDA1SO/+/8KOfklNMQljeNKJcIqzMd0raL/6Rs8eD/aioh1V+CNqWW6tkxvypG9kwju5eIUof4do7z4hlveCR8KAp2JWWOFb025gPP7NSh0pAgGcz2LkqhmmqhNYgrfg5doKaVDJEnzY=
+	t=1734532677; cv=none; b=dkHyHHOzEse0AJQaKYDrSXmN/LmT5SXIV1lIyHwrlSGbSlKb0MDdKtIr9W1vUzuRLOq3pSm/nkW/oiAoNzLpcehNpuynsV3sDbQhz30ZCSOvTXbL8u089Y+XRdANMuZMRYp/ggZDH3lPhCeE9P5k4MTjx6YMmsw0vbRSQttvq+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734532451; c=relaxed/simple;
-	bh=x+ouAiKcuBQkZ/37Owdf/1ycla1yjKbXs8ztdlKCfj8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RiH5XizN5dVU88gntvZC+NB0EYLPuMSa3ooeCuVZ0OUgy0wGyZ62XLYos13uRcDDXRX+zP/CKVpPzwKFfYuLB0bQL66iuPuRZ3ugWC/DUGuUd/qKYxQ67fSUYp/pP3Rb7oH0bG3symJ+ZuUaXMfn1603aV+Je+s8K/AC7bR9fzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Tc+rc7tu; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1734532450; x=1766068450;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=x+ouAiKcuBQkZ/37Owdf/1ycla1yjKbXs8ztdlKCfj8=;
-  b=Tc+rc7tu3cgqJDPzG3mXuGVfhR9h7+m9x2mUXGkvEzdIokAKvDNB+qp6
-   Rak/JXKlKGcTeJbcl2CfHKBjNduXYoC9g/z2EhBmLLBfDr+IcRqGiQn1C
-   ke84Dzi1FS2bPaYHJSXHmZIoHlUAumXAbwsifDfISR5QZ2i0ehDufq2Ok
-   OZ4BaYbYZXOPowKOjr60r4FDbO9r8RVQ3AcrXI4TL/iCHLBlSdnCCUbq4
-   o2FULmXgh7+5mFHQkuTOwTzkBMkk12h4p6mjpdga+vRenAVqRxzLSjAC1
-   /jakCMpRsT/V2Mfnma2VaPRAvBeTWOH6BOJGYcz0B1BbCKmhf+BHSnH9q
-   g==;
-X-CSE-ConnectionGUID: 7sKZ6qhWRXCBO0C3T4e5BA==
-X-CSE-MsgGUID: FGgQ9ZKBQfCEZLpy9D4ImA==
-X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
-   d="scan'208";a="266920911"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Dec 2024 07:34:03 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 18 Dec 2024 07:33:57 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 18 Dec 2024 07:33:54 -0700
-Date: Wed, 18 Dec 2024 14:33:54 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Lars
- Povlsen" <lars.povlsen@microchip.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Russell King <linux@armlinux.org.uk>,
-	<jacob.e.keller@intel.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>
-CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<robert.marko@sartura.hr>
-Subject: Re: [PATCH net-next v4 0/9] net: lan969x: add RGMII support
-Message-ID: <20241218143354.eh6iinemupxncblj@DEN-DL-M70577>
-References: <20241213-sparx5-lan969x-switch-driver-4-v4-0-d1a72c9c4714@microchip.com>
+	s=arc-20240116; t=1734532677; c=relaxed/simple;
+	bh=IVEcDsaI2OyGFENo11qRp7VorCivjH0WInGiwWFi9lY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=U5XFnoPM/BrYM/Zn0nvS+uELFY23JUEJYc9XYO+hfStGrLTn4u1CHgm/0MeXs2+jktnY7Q9vjIpdFz9ZKIsOllJqsmws3Mj1NkJWRT4yyuAeZH8JtteAFbtl74yqmgTQTkfHMLo0ZUhpbT6HjVLlmMdecF++XiIVxwynK/sT5vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=ZfC9+YfY; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=fiuVh5AdPe50xRuXRwRW1cnMDMEhi+hjNVJMLoiSAw0=;
+	t=1734532675; x=1735742275; b=ZfC9+YfYwozxw0yeQp/WYDbMDEmC2A2TdzH7G1WLn20dcJE
+	T1aFZ/NmInXUv+UwAKkdMLtQiQdIokb6ei26GaPpEWp9njQ6Yp9MI5IJOdnIz9yO9l2i1+LAhR5b2
+	92l9n1TVjYff3lqJ/QdjVz1hDuwohjMvHN7rFXKvjLq6SFYgL5awF9GUh26au2g35GnCnYPYGt1r+
+	LnULrauAA0HyrDmidgVSUOryPJATdxKL1o3uswNO3ofDlHoA8EFnWIDxLxjEdDpwLet1xUBx+3hfs
+	gPHq1uOnPichEFoIsXXkFwWjyaASdAZ2SrWrPwa6O8X2J5MgMH2VnY/1KQkZfH/A==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1tNvBJ-00000003GOZ-3ry4;
+	Wed, 18 Dec 2024 15:37:46 +0100
+Message-ID: <ffe100d99b836d1cf3c63bf9570d34274e83684c.camel@sipsolutions.net>
+Subject: Re: [PATCH net-next v2 7/7] netlink: specs: wireless: add a spec
+ for nl80211
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, "David S.
+ Miller"	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni	 <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-wireless@vger.kernel.org, donald.hunter@redhat.com
+Date: Wed, 18 Dec 2024 15:37:45 +0100
+In-Reply-To: <CAD4GDZz3xSyA2zJcs-wbZa4yD-ZT90PeOLFReOcr286-nycA6g@mail.gmail.com>
+References: <20241210161448.76799-1-donald.hunter@gmail.com>
+	 <20241210161448.76799-8-donald.hunter@gmail.com>
+	 <9c0fcee07cb7b93308a5d0185c4e74fb3cbbef1c.camel@sipsolutions.net>
+	 <CAD4GDZz3xSyA2zJcs-wbZa4yD-ZT90PeOLFReOcr286-nycA6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241213-sparx5-lan969x-switch-driver-4-v4-0-d1a72c9c4714@microchip.com>
+X-malware-bazaar: not-scanned
 
-I would like to defer the pontential removal of sparx5_port_verify_speed()
-function to a separate series (see comments on patch 6/9).  Any chance for a
-maintainer to give the OK for that? I would like to give this series another
-spin before net-next closes. No changes in next version - except adding TB and
-RB tags.
+On Wed, 2024-12-18 at 14:32 +0000, Donald Hunter wrote:
+>=20
+> > > +operations:
+> > > +  enum-model: directional
+> > > +  list:
+> > > +    -
+> > > +      name: get-wiphy
+> > > +      doc: |
+> > > +        Get information about a wiphy or dump a list of all wiphys. =
+Requests to dump get-wiphy
+> > > +        should unconditionally include the split-wiphy-dump flag in =
+the request.
+> > > +      attribute-set: nl80211-attrs
+> > > +      do:
+> > > +        request:
+> > > +          value: 1
+> > > +          attributes:
+> > > +            - wiphy
+> > > +            - wdev
+> > > +            - ifindex
+> > > +        reply:
+> > > +          value: 3
+> >=20
+> > could the value not reference "get-wiphy" and "new-wiphy" from the
+> > command list? That might be easier to understand?
+>=20
+> There is currently no schema or tool support for referencing enum
+> constants when defining protocol message ids. Most of the netlink
+> families don't have any need for an enumeration of commands in the
+> spec; nl80211 is unusual in reporting available commands.
 
-/Daniel 
+Oh, that's what it is. I'm not sure anyone really needs that now with
+the genetlink introspection, though I guess existing tools do use it.
+
+johannes
 
