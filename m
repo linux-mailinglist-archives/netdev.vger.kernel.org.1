@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-152871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57A49F61D4
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:34:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0ABC9F61E3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:36:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C7271896B0F
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:34:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 976171712E0
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECC0199EBB;
-	Wed, 18 Dec 2024 09:32:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539AC19C560;
+	Wed, 18 Dec 2024 09:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F5XLtjuF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fdL8v795"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968D91547FF;
-	Wed, 18 Dec 2024 09:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AF91993B2;
+	Wed, 18 Dec 2024 09:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734514336; cv=none; b=JfIdFdUZ2Ie8HZpaiZhpa1tWAKFLkXc10cw+s9Tj0zi5CHtgXRerupFTl8Hx0HiB3C5y905tyOAn6ymhbyKxA1kUyoHBpKQplV9/nKumNlYKCJZmF33sSAjk8bWKG15n2gXPAKsU1wIuaTzfLjKFtO2QO6u/ilB5TVQrsDVWViw=
+	t=1734514438; cv=none; b=DB9ECyw8Xm+zTIDJr+BK7z4GW0bzI/8LHPzbUJq+FowZRnTX27/tA3boQ1vwLKRs7SVheoCf35pDJHZPPgcV6l65AaJva1BDjq8MtiwRiHimdA79n17rc+/FEj7we7t6BDml1MaPJODW5TTTWQUvd39r5NrKqfKTMc3INN2O6YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734514336; c=relaxed/simple;
-	bh=0BHwrGK6MWavc8faxQG4PkgQjG5/SJe2jLaGOPWwlnU=;
+	s=arc-20240116; t=1734514438; c=relaxed/simple;
+	bh=FBsSfZA/9GvyeGgfb3Gt8tda2g8YnCPK4uie1Qh7nvc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YABYZZR7FcOyysJAB9qnvFK0Mrg4TiI1LeukB1R3Zs5zeWu0zQBSoSMkVeHBC7jKtSqmqq1ZPPsyuwWdw9gJOcMlF7kEEfVjqDkGCsSeXlu8VV+T7CyVCym1/t1IoQJSvgVGS0pnU1KLI4unQzTXlH2tSnAGVeLXTOAX1/oAV2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F5XLtjuF; arc=none smtp.client-ip=192.198.163.19
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xt+r7lcmQaGTLQ36WbctF99IdqxoyqOAggWvorwewMyEZX5519LUpiKvvCX6QvdB5hHY9j8gZ3Z9X05qCwdG6a07eYzrZ27JnDNcuHTUmhyfMOBPrHmIbiibi1bG9MpRyuPgisRTFOpPruEvFXUQTMa3ck8DLG2g51Ee3qzlg78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fdL8v795; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734514335; x=1766050335;
+  t=1734514437; x=1766050437;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=0BHwrGK6MWavc8faxQG4PkgQjG5/SJe2jLaGOPWwlnU=;
-  b=F5XLtjuF9fV94b+pd6dG87hG7Gu8NLKv1soPIdGNNWEcOYXKNfauL/7l
-   GkrZS2FQ7D/FoErNKtUpYmYL1PAf1mbUjq94yvkPC5hO3kX7gHbdymVnU
-   9YbK12eaVpgXlOKsTtN9rD1xh1jcTO049nYl6zxQS1NzJMyXlkJD6tT1+
-   skl/EnCR5evssbdIUGz6loRmVpWx2YO0CRrJMM0dHBmoMtKLSO3TEebeN
-   dJQdrJYFFx4VyUbeU5o59B/ZNbLpqb/Wxx1kDZP581xHyIUFrstwFGHA+
-   bLDwlDpSiJbXmlit6HsG4bB9zk5rAdt2slNnkH2KofwAwGTgg2HCoH/Fg
-   w==;
-X-CSE-ConnectionGUID: kbqMsFuaREy+FWippgyyFw==
-X-CSE-MsgGUID: fte/KoYOSouu4GDxAP33vg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11289"; a="34265520"
+  bh=FBsSfZA/9GvyeGgfb3Gt8tda2g8YnCPK4uie1Qh7nvc=;
+  b=fdL8v795SgN37RDf12TjlH+FFplubcVtolae2v5aa4X9hr0OrnpWcGBc
+   X02UFUA8pNayaAroaHzABii5jF2OVXFriJqoIqSsxLf2eCgUyGlXv2JP4
+   s7jKtxbAk33h9xvLew7AaDy7d3MUPJNhkun3fhhQptTdDyge5vr5bTVq+
+   c/jXU1N3X9TGjUWRYuwIhms3+6Vs48AOhmCl7ZlKaAD8Rp0hSnUDBgotK
+   ucca3Gk2EOmVny5OeD2O3iaycJqER3rbGnbmuYjDwxWaJKG/0dKKtJfXJ
+   /P6pL6dWcgBm8MoT6Bpm1CSU8pyiCm4GF+9kDnQ7pkAWXHeif6/Gpi8Ja
+   A==;
+X-CSE-ConnectionGUID: p0yYNpQRTE+E0GeNOyouIw==
+X-CSE-MsgGUID: DCd6G56fR7SrB6RSFrGJ9Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11289"; a="45674914"
 X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
-   d="scan'208";a="34265520"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 01:32:14 -0800
-X-CSE-ConnectionGUID: S/t1ptD7QXmfffVp3d2T4A==
-X-CSE-MsgGUID: WQmvdnBcSnSp955bZJrB3g==
+   d="scan'208";a="45674914"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 01:33:56 -0800
+X-CSE-ConnectionGUID: xOYcHQrUSY+UHgdQBhlU3g==
+X-CSE-MsgGUID: MKpW+cThS3igUDhici6a/A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="97652226"
+   d="scan'208";a="102807672"
 Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 01:32:10 -0800
-Date: Wed, 18 Dec 2024 10:29:03 +0100
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 01:33:52 -0800
+Date: Wed, 18 Dec 2024 10:30:46 +0100
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -68,11 +68,11 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
 	salil.mehta@huawei.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND V2 net 6/7] net: hns3: fixed hclge_fetch_pf_reg
- accesses bar space out of bounds issue
-Message-ID: <Z2KV37WZL7cpPYKk@mev-dev.igk.intel.com>
+Subject: Re: [PATCH RESEND V2 net 7/7] net: hns3: fix kernel crash when 1588
+ is sent on HIP08 devices
+Message-ID: <Z2KWRsAa7hkdUsWD@mev-dev.igk.intel.com>
 References: <20241217010839.1742227-1-shaojijie@huawei.com>
- <20241217010839.1742227-7-shaojijie@huawei.com>
+ <20241217010839.1742227-8-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,114 +81,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241217010839.1742227-7-shaojijie@huawei.com>
+In-Reply-To: <20241217010839.1742227-8-shaojijie@huawei.com>
 
-On Tue, Dec 17, 2024 at 09:08:38AM +0800, Jijie Shao wrote:
-> From: Hao Lan <lanhao@huawei.com>
+On Tue, Dec 17, 2024 at 09:08:39AM +0800, Jijie Shao wrote:
+> From: Jie Wang <wangjie125@huawei.com>
 > 
-> The TQP BAR space is divided into two segments. TQPs 0-1023 and TQPs
-> 1024-1279 are in different BAR space addresses. However,
-> hclge_fetch_pf_reg does not distinguish the tqp space information when
-> reading the tqp space information. When the number of TQPs is greater
-> than 1024, access bar space overwriting occurs.
-> The problem of different segments has been considered during the
-> initialization of tqp.io_base. Therefore, tqp.io_base is directly used
-> when the queue is read in hclge_fetch_pf_reg.
+> Currently, HIP08 devices does not register the ptp devices, so the
+> hdev->ptp is NULL. But the tx process would still try to set hardware time
+> stamp info with SKBTX_HW_TSTAMP flag and cause a kernel crash.
 > 
-> The error message:
+> [  128.087798] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000018
+> ...
+> [  128.280251] pc : hclge_ptp_set_tx_info+0x2c/0x140 [hclge]
+> [  128.286600] lr : hclge_ptp_set_tx_info+0x20/0x140 [hclge]
+> [  128.292938] sp : ffff800059b93140
+> [  128.297200] x29: ffff800059b93140 x28: 0000000000003280
+> [  128.303455] x27: ffff800020d48280 x26: ffff0cb9dc814080
+> [  128.309715] x25: ffff0cb9cde93fa0 x24: 0000000000000001
+> [  128.315969] x23: 0000000000000000 x22: 0000000000000194
+> [  128.322219] x21: ffff0cd94f986000 x20: 0000000000000000
+> [  128.328462] x19: ffff0cb9d2a166c0 x18: 0000000000000000
+> [  128.334698] x17: 0000000000000000 x16: ffffcf1fc523ed24
+> [  128.340934] x15: 0000ffffd530a518 x14: 0000000000000000
+> [  128.347162] x13: ffff0cd6bdb31310 x12: 0000000000000368
+> [  128.353388] x11: ffff0cb9cfbc7070 x10: ffff2cf55dd11e02
+> [  128.359606] x9 : ffffcf1f85a212b4 x8 : ffff0cd7cf27dab0
+> [  128.365831] x7 : 0000000000000a20 x6 : ffff0cd7cf27d000
+> [  128.372040] x5 : 0000000000000000 x4 : 000000000000ffff
+> [  128.378243] x3 : 0000000000000400 x2 : ffffcf1f85a21294
+> [  128.384437] x1 : ffff0cb9db520080 x0 : ffff0cb9db500080
+> [  128.390626] Call trace:
+> [  128.393964]  hclge_ptp_set_tx_info+0x2c/0x140 [hclge]
+> [  128.399893]  hns3_nic_net_xmit+0x39c/0x4c4 [hns3]
+> [  128.405468]  xmit_one.constprop.0+0xc4/0x200
+> [  128.410600]  dev_hard_start_xmit+0x54/0xf0
+> [  128.415556]  sch_direct_xmit+0xe8/0x634
+> [  128.420246]  __dev_queue_xmit+0x224/0xc70
+> [  128.425101]  dev_queue_xmit+0x1c/0x40
+> [  128.429608]  ovs_vport_send+0xac/0x1a0 [openvswitch]
+> [  128.435409]  do_output+0x60/0x17c [openvswitch]
+> [  128.440770]  do_execute_actions+0x898/0x8c4 [openvswitch]
+> [  128.446993]  ovs_execute_actions+0x64/0xf0 [openvswitch]
+> [  128.453129]  ovs_dp_process_packet+0xa0/0x224 [openvswitch]
+> [  128.459530]  ovs_vport_receive+0x7c/0xfc [openvswitch]
+> [  128.465497]  internal_dev_xmit+0x34/0xb0 [openvswitch]
+> [  128.471460]  xmit_one.constprop.0+0xc4/0x200
+> [  128.476561]  dev_hard_start_xmit+0x54/0xf0
+> [  128.481489]  __dev_queue_xmit+0x968/0xc70
+> [  128.486330]  dev_queue_xmit+0x1c/0x40
+> [  128.490856]  ip_finish_output2+0x250/0x570
+> [  128.495810]  __ip_finish_output+0x170/0x1e0
+> [  128.500832]  ip_finish_output+0x3c/0xf0
+> [  128.505504]  ip_output+0xbc/0x160
+> [  128.509654]  ip_send_skb+0x58/0xd4
+> [  128.513892]  udp_send_skb+0x12c/0x354
+> [  128.518387]  udp_sendmsg+0x7a8/0x9c0
+> [  128.522793]  inet_sendmsg+0x4c/0x8c
+> [  128.527116]  __sock_sendmsg+0x48/0x80
+> [  128.531609]  __sys_sendto+0x124/0x164
+> [  128.536099]  __arm64_sys_sendto+0x30/0x5c
+> [  128.540935]  invoke_syscall+0x50/0x130
+> [  128.545508]  el0_svc_common.constprop.0+0x10c/0x124
+> [  128.551205]  do_el0_svc+0x34/0xdc
+> [  128.555347]  el0_svc+0x20/0x30
+> [  128.559227]  el0_sync_handler+0xb8/0xc0
+> [  128.563883]  el0_sync+0x160/0x180
 > 
-> Unable to handle kernel paging request at virtual address ffff800037200000
-> pc : hclge_fetch_pf_reg+0x138/0x250 [hclge]
-> lr : hclge_get_regs+0x84/0x1d0 [hclge]
-> Call trace:
->  hclge_fetch_pf_reg+0x138/0x250 [hclge]
->  hclge_get_regs+0x84/0x1d0 [hclge]
->  hns3_get_regs+0x2c/0x50 [hns3]
->  ethtool_get_regs+0xf4/0x270
->  dev_ethtool+0x674/0x8a0
->  dev_ioctl+0x270/0x36c
->  sock_do_ioctl+0x110/0x2a0
->  sock_ioctl+0x2ac/0x530
->  __arm64_sys_ioctl+0xa8/0x100
->  invoke_syscall+0x4c/0x124
->  el0_svc_common.constprop.0+0x140/0x15c
->  do_el0_svc+0x30/0xd0
->  el0_svc+0x1c/0x2c
->  el0_sync_handler+0xb0/0xb4
->  el0_sync+0x168/0x180
-> 
-> Fixes: 939ccd107ffc ("net: hns3: move dump regs function to a separate file")
-> Signed-off-by: Hao Lan <lanhao@huawei.com>
+> Fixes: 0bf5eb788512 ("net: hns3: add support for PTP")
+> Signed-off-by: Jie Wang <wangjie125@huawei.com>
 > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 > ---
->  drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_regs.c  | 9 +++++----
->  .../net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c    | 9 +++++----
->  2 files changed, 10 insertions(+), 8 deletions(-)
+>  drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_regs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_regs.c
-> index 43c1c18fa81f..8c057192aae6 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_regs.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_regs.c
-> @@ -510,9 +510,9 @@ static int hclge_get_dfx_reg(struct hclge_dev *hdev, void *data)
->  static int hclge_fetch_pf_reg(struct hclge_dev *hdev, void *data,
->  			      struct hnae3_knic_private_info *kinfo)
->  {
-> -#define HCLGE_RING_REG_OFFSET		0x200
->  #define HCLGE_RING_INT_REG_OFFSET	0x4
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
+> index 5505caea88e9..bab16c2191b2 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
+> @@ -58,6 +58,9 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb)
+>  	struct hclge_dev *hdev = vport->back;
+>  	struct hclge_ptp *ptp = hdev->ptp;
 >  
-> +	struct hnae3_queue *tqp;
->  	int i, j, reg_num;
->  	int data_num_sum;
->  	u32 *reg = data;
-> @@ -533,10 +533,11 @@ static int hclge_fetch_pf_reg(struct hclge_dev *hdev, void *data,
->  	reg_num = ARRAY_SIZE(ring_reg_addr_list);
->  	for (j = 0; j < kinfo->num_tqps; j++) {
-You can define struct hnae3_queue *tqp here to limit the scope
-(same in VF case).
->  		reg += hclge_reg_get_tlv(HCLGE_REG_TAG_RING, reg_num, reg);
-> +		tqp = kinfo->tqp[j];
->  		for (i = 0; i < reg_num; i++)
-> -			*reg++ = hclge_read_dev(&hdev->hw,
-> -						ring_reg_addr_list[i] +
-> -						HCLGE_RING_REG_OFFSET * j);
-> +			*reg++ = readl_relaxed(tqp->io_base -
-> +					       HCLGE_TQP_REG_OFFSET +
-> +					       ring_reg_addr_list[i]);
->  	}
->  	data_num_sum += (reg_num + HCLGE_REG_TLV_SPACE) * kinfo->num_tqps;
->  
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c
-> index 6db415d8b917..7d9d9dbc7560 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c
-> @@ -123,10 +123,10 @@ int hclgevf_get_regs_len(struct hnae3_handle *handle)
->  void hclgevf_get_regs(struct hnae3_handle *handle, u32 *version,
->  		      void *data)
->  {
-> -#define HCLGEVF_RING_REG_OFFSET		0x200
->  #define HCLGEVF_RING_INT_REG_OFFSET	0x4
->  
->  	struct hclgevf_dev *hdev = hclgevf_ae_get_hdev(handle);
-> +	struct hnae3_queue *tqp;
->  	int i, j, reg_um;
->  	u32 *reg = data;
->  
-> @@ -147,10 +147,11 @@ void hclgevf_get_regs(struct hnae3_handle *handle, u32 *version,
->  	reg_um = ARRAY_SIZE(ring_reg_addr_list);
->  	for (j = 0; j < hdev->num_tqps; j++) {
->  		reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_RING, reg_um, reg);
-> +		tqp = &hdev->htqp[j].q;
->  		for (i = 0; i < reg_um; i++)
-> -			*reg++ = hclgevf_read_dev(&hdev->hw,
-> -						  ring_reg_addr_list[i] +
-> -						  HCLGEVF_RING_REG_OFFSET * j);
-> +			*reg++ = readl_relaxed(tqp->io_base -
-> +					       HCLGEVF_TQP_REG_OFFSET +
-> +					       ring_reg_addr_list[i]);
->  	}
->  
->  	reg_um = ARRAY_SIZE(tqp_intr_reg_addr_list);
+> +	if (!ptp)
+> +		return false;
+> +
+>  	if (!test_bit(HCLGE_PTP_FLAG_TX_EN, &ptp->flags) ||
+>  	    test_and_set_bit(HCLGE_STATE_PTP_TX_HANDLING, &hdev->state)) {
+>  		ptp->tx_skipped++;
+
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Thanks
+
 > -- 
 > 2.33.0
 
