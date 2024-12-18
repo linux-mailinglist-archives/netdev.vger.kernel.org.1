@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-153000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BB1B9F6901
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:49:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C3F9F6905
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89499166519
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:46:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E50A6168464
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8DA1B424F;
-	Wed, 18 Dec 2024 14:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D248C1B424F;
+	Wed, 18 Dec 2024 14:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXavGO9M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYyWGnZu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD3E156238;
-	Wed, 18 Dec 2024 14:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D27E1ACEA3;
+	Wed, 18 Dec 2024 14:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734533218; cv=none; b=SfEVb7cUQPq6FMS0568TJCn1wyhHUZm4oodry76sPVMbcY2UUv1zHVPDq0z/f8MtMBmKvLT12EzbLUia8NqG7VUVh7LCoQQf5rCBW2l3+Z3eCb6jtMhdz4VA3uY0ZdTF349/zlKf44kyPXaDay7mipokAyi8838sON1I7TemjLo=
+	t=1734533226; cv=none; b=odEObKLwGjXuW9ZITHphpL5HQG+Y3uudPTeLTYKcpfzhvo4Jdn5UtOkxywbDNZ5DFXhjcpWWOBuvhDeMOrNVjPG+hz0SQ5O9c4e+6ZkFdr5qL3Nip3nsJ+2ZQWDWsfVKScxLRIIp58/54tQoMwnK0KTQDBE6S4mIQKpEt63P0wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734533218; c=relaxed/simple;
-	bh=f+k9+rN62m9qDWt394hRkV40mI6z1QMtf2CbQzoW0+o=;
+	s=arc-20240116; t=1734533226; c=relaxed/simple;
+	bh=pJxNJKaUf6zDb1m8+mn4rmuGwT+DvixiSUVm2dZq6eY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EmYfBhZ78osHaLUixk4KFa3G10a2S+qK5tPp6ta3yrQsbYTZLUDfb3ftjCV53qQd28TyrRchdNmY6SrV5JYyOEETm9jciuiWuhCgmTZpQ7kP/k10PieLlSFzXsEaVLqnddDvBkgC+WGNL4e/KDRlX6MjwP+F6EmIoaM5JbB2yD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lXavGO9M; arc=none smtp.client-ip=209.85.210.177
+	 MIME-Version; b=FkxQGhVU8r97VWV7ltKKPKOgUfwoCZULjcPEqbjUcA4lkSPMT5eOyjBRBdPoegviGge/zr97tza7stTJJiUt7UqhIRujLwVcyjqYJYcjD8ZD5Z50HmwH8D+DdBzVEyRCWyKFzqyb+mYV4uMzeBg3HuNc9JADG64+kH/Y5cOwpDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cYyWGnZu; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-725ecc42d43so5640072b3a.3;
-        Wed, 18 Dec 2024 06:46:56 -0800 (PST)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-725c86bbae7so5750784b3a.3;
+        Wed, 18 Dec 2024 06:47:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734533216; x=1735138016; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1734533224; x=1735138024; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OEKtTmaOJMjBYDbB7DZx12WJWyN2uUzQkj7ulahT+MU=;
-        b=lXavGO9MRL8DbIRRH4UMu3qlNvYNNFGeK3bVYspwO17dtQeWOvdU9h1FedKMDkmJ0D
-         4ysgp2+2KiPw51P52f/pZhUWt9MLQsWb35S4Q9ncq7rtRgwDyn7nSnu8aL8ZMZi7XOIw
-         9TVEkugNjSqypHSp54mBozbnproaO5Gx2s4SDFp5iUGeIZ9oaiFyeeDRYZYbAvjOyvyC
-         j3/kCKFNFPb8lP2AKkPWMEYnUKvqWrk4semBCpcYvcgM+XxQG0/Hnyj632+iIqcqOy+y
-         4T05br6keEXuOGg2Ejv2EJmMm8w5/+abBtuzPV+YFayIggVVWhZfXHw3gaqbV6yN7mBm
-         hDxg==
+        bh=a7Rao6XieC9T0DL79hefU+Cc7jNmFKIhSEFIHF7BW+k=;
+        b=cYyWGnZuqM/Ar6DWwZuTy1G/WNIyJIl5Rz9CeLnQWT+UhClJvCx1/RQ2qqSqZIZjy9
+         qOFrrMG1Drl0ZDHggXnAoxTiB2+k1ELkqnLdh6NPeDInp6QdBwE+MHUdcMO40qIqtDe4
+         sBzy1oG1eOKKb9/P/F4HhPIAl82n72L76WKiHrKY2G9r7Q17o3SCknC1tM2lyKqLCTjt
+         a/aoxSCnb/uHq8DSx1FSPsASotJYAEwJBwU+gf9Zd3APudDrDqfphxMj2bHQkSjPFrtS
+         YhyUf6sdb1tV4pmbZHqbV0rdytSpoeU0a7fdqAQkcN3dnAwBowDhVoKf2ZsBXb0L0mod
+         ri/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734533216; x=1735138016;
+        d=1e100.net; s=20230601; t=1734533224; x=1735138024;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OEKtTmaOJMjBYDbB7DZx12WJWyN2uUzQkj7ulahT+MU=;
-        b=v+qUKJLSxnmpzoUuy4pybTa5Gv9ywT8XgOrzC1DhJgeNLB7F0eGpSHfgJcCWCqNBZd
-         hMZuqpdRQOlp2KbFNXNf9C+I9i+uBS87zTzx1izH3p1flga6Z2gKTvyamllLkGxQ4vZY
-         fnTavutog8t+6Kofugk7fsokO+YBOQWTm9vH06edRdlevKyZRA+jxp84sx5dsVPVIdZi
-         JIXROZyHgCKA+j4yoVRO8fUkBmJIjbrIAcYyVS3ZbZMiL+fsH2FKo8GxvhDBw0E0Ejcy
-         dly0lKcJvGbsB2NPIW1KHAPpN9fBd4B7coAu011qVgHRwBpRfuM/wK58H67eeUIao+Sj
-         YxGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbjTuT3d7UwQqvtSzfiRrg8bmpWEf36SddZtAYNXFCd/exsNqmHQYo4x+6wRqGq/BUmM5Ags7Hyhw=@vger.kernel.org, AJvYcCWrtM8hyWP3LKdu74pdZdr7wJZgFC/31PSC2RC9fh3o9RrP59Fv019FhIaRbs/h+z7tPFKN6fkg@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+ZVjOhgWK9xi2a2clpu/IpYQVAsO9TJuFjJtYY5y3XvlS18qS
-	e/qq+EanETyvsROHV15Amv0MBSJM71Uvt1A0HuJCccS7qUdvallJ
-X-Gm-Gg: ASbGncuv7TqiYcEsdO+8U/kYHqH++WDhOKMip1Wo3YbMRybERcaqoZKc0IHI+AoXVlR
-	ImXEBpTiTcIxjSCWTkmyGam90RdMG6xW8xWXH6jnU+ZpEXLQhyNp4bGmzzLhLBb4QHrCTrBQvFH
-	8j0obI8V890eF88dgGL7KCXZCFk9khwWiiCKWMbBG6oki3nRIh9McXF2dFrp+9qyJHoAbVwqTCM
-	KRPlr7CuGD0+UsxM1TfH02/cyRMFwy+jlrZEPX1dSAREg==
-X-Google-Smtp-Source: AGHT+IH8D3ZsHyPk7hmi5ozBRg6R3YCx01W67p64ytXQEMVFh9Rd+01Igp12+BbZVp/TY3zSxoNcHA==
-X-Received: by 2002:aa7:9316:0:b0:725:df1a:275 with SMTP id d2e1a72fcca58-72a8d2c9c99mr5412619b3a.23.1734533215515;
-        Wed, 18 Dec 2024 06:46:55 -0800 (PST)
+        bh=a7Rao6XieC9T0DL79hefU+Cc7jNmFKIhSEFIHF7BW+k=;
+        b=iWlImZbXFCEHTawXi0+I2zBbeOpeW0UBYQb9Fc4grynkkaHHAAz90FsWL4BwfRQ01v
+         nli+KNdgWdC2fxYVG2n0E9hFRPHdEqxabdj2XvdyYLwi3bWVZSB8ltnN682Gn8BYFHdy
+         sHuSSpxrToWQZm+TWTEgfL2GXyNxCSYI7refG37oSH7ca4KwEjn703mGAOpwk23vP20Z
+         Jx3Ns0Ey0tCv83hm8EPvNjV0wEw571+gItpAYADhZ2DvGr/lVZmGWBlO2ebdSBCT7iwa
+         SAnk7NW8w0JDSXvKEtX17NCerxSbhMsjD3Kjyu+2JeOxeVjoJ5I9oAo9K6XdxyUG+NcN
+         I0HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVZAILSirqJ7MYdU0+TuOQNzylPUnG/cTZM/NFhkd3aJjIFVvkxS3YJ85DzrLBioxMRlVCkj1WL@vger.kernel.org, AJvYcCWV+5DqR0KEoBv6kWlY9Gmm/sc5OXZZA+qLE80QhZ73osPPlyEdThllaH+ozifjS1/p2tW++nfNUFQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxsy53a+ROBkZ24Hva8J8fHBsPi6dicnBPzX8oG6wS/OFXNYlNk
+	GE1zgFiuQsaEG1CtyxwV2Z75RLo3qJVElhqf7kfddiwTXtQiFz3U
+X-Gm-Gg: ASbGncvXOIvJapIaHWbrvovG9DzWwwF2tqeR0D9JA2QNT6u/+UpR4AB6v1MEmQMdysY
+	JK1TG0+1PWvM0gu1pTWY3nBH4SkGjfjGrglAj6QQi55FMdl5eoMp1lMyCYyK9xrh7ZQ6f9rCpOG
+	xxsni6Cm1tnMU3ToMw6uQRKo1o8pstmNM/3hCSOhWlY1tXjUEqagKIIui3Ps6FVkNDM7maDimes
+	njIGI6MdPM9bLnZaOUbIx2ZSEbeQ6vQMgNxhm033eivgg==
+X-Google-Smtp-Source: AGHT+IEgWhwAzHgbjw0cJlvPT8gHa6hVp7fjys7VCgaJJLUz0t7KpBnFbrdASwxDvNBV6wqbH+litQ==
+X-Received: by 2002:a05:6a21:8dc4:b0:1db:9367:d018 with SMTP id adf61e73a8af0-1e5b482c0ebmr5461992637.20.1734533224486;
+        Wed, 18 Dec 2024 06:47:04 -0800 (PST)
 Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918ac5183sm8912687b3a.29.2024.12.18.06.46.46
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918ac5183sm8912687b3a.29.2024.12.18.06.46.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2024 06:46:54 -0800 (PST)
+        Wed, 18 Dec 2024 06:47:03 -0800 (PST)
 From: Taehee Yoo <ap420073@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -110,11 +110,10 @@ Cc: kory.maincent@bootlin.com,
 	kaiyuanz@google.com,
 	willemb@google.com,
 	daniel.zahka@gmail.com,
-	ap420073@gmail.com,
-	Andy Gospodarek <gospo@broadcom.com>
-Subject: [PATCH net-next v6 1/9] bnxt_en: add support for rx-copybreak ethtool command
-Date: Wed, 18 Dec 2024 14:45:22 +0000
-Message-Id: <20241218144530.2963326-2-ap420073@gmail.com>
+	ap420073@gmail.com
+Subject: [PATCH net-next v6 2/9] net: ethtool: add hds_config member in ethtool_netdev_state
+Date: Wed, 18 Dec 2024 14:45:23 +0000
+Message-Id: <20241218144530.2963326-3-ap420073@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241218144530.2963326-1-ap420073@gmail.com>
 References: <20241218144530.2963326-1-ap420073@gmail.com>
@@ -126,248 +125,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The bnxt_en driver supports rx-copybreak, but it couldn't be set by
-userspace. Only the default value(256) has worked.
-This patch makes the bnxt_en driver support following command.
-`ethtool --set-tunable <devname> rx-copybreak <value> ` and
-`ethtool --get-tunable <devname> rx-copybreak`.
+When tcp-data-split is UNKNOWN mode, drivers arbitrarily handle it.
+For example, bnxt_en driver automatically enables if at least one of
+LRO/GRO/JUMBO is enabled.
+If tcp-data-split is UNKNOWN and LRO is enabled, a driver returns
+ENABLES of tcp-data-split, not UNKNOWN.
+So, `ethtool -g eth0` shows tcp-data-split is enabled.
 
-By this patch, hds_threshol is set to the rx-copybreak value.
-But it will be set by `ethtool -G eth0 hds-thresh N`
-in the next patch.
+The problem is in the setting situation.
+In the ethnl_set_rings(), it first calls get_ringparam() to get the
+current driver's config.
+At that moment, if driver's tcp-data-split config is UNKNOWN, it returns
+ENABLE if LRO/GRO/JUMBO is enabled.
+Then, it sets values from the user and driver's current config to
+kernel_ethtool_ringparam.
+Last it calls .set_ringparam().
+The driver, especially bnxt_en driver receives
+ETHTOOL_TCP_DATA_SPLIT_ENABLED.
+But it can't distinguish whether it is set by the user or just the
+current config.
 
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-Tested-by: Andy Gospodarek <gospo@broadcom.com>
+When user updates ring parameter, the new hds_config value is updated
+and current hds_config value is stored to old_hdsconfig.
+Driver's .set_ringparam() callback can distinguish a passed
+tcp-data-split value is came from user explicitly.
+If .set_ringparam() is failed, hds_config is rollbacked immediately.
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v6:
- - No changes.
+ - use hds_config instead of using tcp_data_split_mod.
 
 v5:
- - Do not set HDS if XDP is attached.
- - rx_size and pkt_size are always bigger than 256.
+ - Patch added.
 
-v4:
- - Remove min rx-copybreak value.
- - Add Review tag from Brett.
- - Add Test tag from Stanislav.
+ include/linux/ethtool.h | 2 ++
+ net/ethtool/rings.c     | 4 ++++
+ 2 files changed, 6 insertions(+)
 
-v3:
- - Update copybreak value after closing nic and before opening nic when
-   the device is running.
-
-v2:
- - Define max/vim rx_copybreak value.
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 28 ++++++-----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  5 +-
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 49 ++++++++++++++++++-
- 3 files changed, 68 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index b86f980fa7ea..c31894b9187e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -81,7 +81,6 @@ MODULE_DESCRIPTION("Broadcom NetXtreme network driver");
- 
- #define BNXT_RX_OFFSET (NET_SKB_PAD + NET_IP_ALIGN)
- #define BNXT_RX_DMA_OFFSET NET_SKB_PAD
--#define BNXT_RX_COPY_THRESH 256
- 
- #define BNXT_TX_PUSH_THRESH 164
- 
-@@ -1343,13 +1342,13 @@ static struct sk_buff *bnxt_copy_data(struct bnxt_napi *bnapi, u8 *data,
- 	if (!skb)
- 		return NULL;
- 
--	dma_sync_single_for_cpu(&pdev->dev, mapping, bp->rx_copy_thresh,
-+	dma_sync_single_for_cpu(&pdev->dev, mapping, bp->rx_copybreak,
- 				bp->rx_dir);
- 
- 	memcpy(skb->data - NET_IP_ALIGN, data - NET_IP_ALIGN,
- 	       len + NET_IP_ALIGN);
- 
--	dma_sync_single_for_device(&pdev->dev, mapping, bp->rx_copy_thresh,
-+	dma_sync_single_for_device(&pdev->dev, mapping, bp->rx_copybreak,
- 				   bp->rx_dir);
- 
- 	skb_put(skb, len);
-@@ -1842,7 +1841,7 @@ static inline struct sk_buff *bnxt_tpa_end(struct bnxt *bp,
- 		return NULL;
- 	}
- 
--	if (len <= bp->rx_copy_thresh) {
-+	if (len <= bp->rx_copybreak) {
- 		skb = bnxt_copy_skb(bnapi, data_ptr, len, mapping);
- 		if (!skb) {
- 			bnxt_abort_tpa(cpr, idx, agg_bufs);
-@@ -2176,7 +2175,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 		}
- 	}
- 
--	if (len <= bp->rx_copy_thresh) {
-+	if (len <= bp->rx_copybreak) {
- 		if (!xdp_active)
- 			skb = bnxt_copy_skb(bnapi, data_ptr, len, dma_addr);
- 		else
-@@ -4601,6 +4600,11 @@ void bnxt_set_tpa_flags(struct bnxt *bp)
- 		bp->flags |= BNXT_FLAG_GRO;
- }
- 
-+static void bnxt_init_ring_params(struct bnxt *bp)
-+{
-+	bp->rx_copybreak = BNXT_DEFAULT_RX_COPYBREAK;
-+}
-+
- /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO flags must
-  * be set on entry.
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index f711bfd75c4d..4e451084d58a 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -1134,12 +1134,14 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
+  * @rss_ctx:		XArray of custom RSS contexts
+  * @rss_lock:		Protects entries in @rss_ctx.  May be taken from
+  *			within RTNL.
++ * @hds_config:		HDS value from userspace.
+  * @wol_enabled:	Wake-on-LAN is enabled
+  * @module_fw_flash_in_progress: Module firmware flashing is in progress.
   */
-@@ -4615,7 +4619,6 @@ void bnxt_set_ring_params(struct bnxt *bp)
- 	rx_space = rx_size + ALIGN(max(NET_SKB_PAD, XDP_PACKET_HEADROOM), 8) +
- 		SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+ struct ethtool_netdev_state {
+ 	struct xarray		rss_ctx;
+ 	struct mutex		rss_lock;
++	u8			hds_config;
+ 	unsigned		wol_enabled:1;
+ 	unsigned		module_fw_flash_in_progress:1;
+ };
+diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
+index b7865a14fdf8..2e8239a76234 100644
+--- a/net/ethtool/rings.c
++++ b/net/ethtool/rings.c
+@@ -203,6 +203,7 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
  
--	bp->rx_copy_thresh = BNXT_RX_COPY_THRESH;
- 	ring_size = bp->rx_ring_size;
- 	bp->rx_agg_ring_size = 0;
- 	bp->rx_agg_nr_pages = 0;
-@@ -4660,7 +4663,9 @@ void bnxt_set_ring_params(struct bnxt *bp)
- 				  ALIGN(max(NET_SKB_PAD, XDP_PACKET_HEADROOM), 8) -
- 				  SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 		} else {
--			rx_size = SKB_DATA_ALIGN(BNXT_RX_COPY_THRESH + NET_IP_ALIGN);
-+			rx_size = SKB_DATA_ALIGN(max(BNXT_DEFAULT_RX_COPYBREAK,
-+						     bp->rx_copybreak) +
-+						 NET_IP_ALIGN);
- 			rx_space = rx_size + NET_SKB_PAD +
- 				SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 		}
-@@ -6566,16 +6571,14 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
+ 	dev->ethtool_ops->get_ringparam(dev, &ringparam,
+ 					&kernel_ringparam, info->extack);
++	kernel_ringparam.tcp_data_split = dev->ethtool->hds_config;
  
- 	req->flags = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLACEMENT);
- 	req->enables = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_THRESH_VALID);
-+	req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
+ 	ethnl_update_u32(&ringparam.rx_pending, tb[ETHTOOL_A_RINGS_RX], &mod);
+ 	ethnl_update_u32(&ringparam.rx_mini_pending,
+@@ -252,6 +253,9 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
  
--	if (BNXT_RX_PAGE_MODE(bp)) {
--		req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
--	} else {
-+	if (!BNXT_RX_PAGE_MODE(bp) && (bp->flags & BNXT_FLAG_AGG_RINGS)) {
- 		req->flags |= cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV4 |
- 					  VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
- 		req->enables |=
- 			cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
--		req->jumbo_thresh = cpu_to_le16(bp->rx_copy_thresh);
--		req->hds_threshold = cpu_to_le16(bp->rx_copy_thresh);
-+		req->hds_threshold = cpu_to_le16(bp->rx_copybreak);
- 	}
- 	req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
- 	return hwrm_req_send(bp, req);
-@@ -16188,6 +16191,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	bnxt_init_l2_fltr_tbl(bp);
- 	bnxt_set_rx_skb_mode(bp, false);
- 	bnxt_set_tpa_flags(bp);
-+	bnxt_init_ring_params(bp);
- 	bnxt_set_ring_params(bp);
- 	bnxt_rdma_aux_device_init(bp);
- 	rc = bnxt_set_dflt_rings(bp, true);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 7df7a2233307..b73de5683063 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -34,6 +34,9 @@
- #include <linux/firmware/broadcom/tee_bnxt_fw.h>
- #endif
- 
-+#define BNXT_DEFAULT_RX_COPYBREAK 256
-+#define BNXT_MAX_RX_COPYBREAK 1024
+ 	ret = dev->ethtool_ops->set_ringparam(dev, &ringparam,
+ 					      &kernel_ringparam, info->extack);
++	if (!ret)
++		dev->ethtool->hds_config = kernel_ringparam.tcp_data_split;
 +
- extern struct list_head bnxt_block_cb_list;
- 
- struct page_pool;
-@@ -2342,7 +2345,7 @@ struct bnxt {
- 	enum dma_data_direction	rx_dir;
- 	u32			rx_ring_size;
- 	u32			rx_agg_ring_size;
--	u32			rx_copy_thresh;
-+	u32			rx_copybreak;
- 	u32			rx_ring_mask;
- 	u32			rx_agg_ring_mask;
- 	int			rx_nr_pages;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index d87681d71106..4cdfff5d531c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -4327,6 +4327,50 @@ static int bnxt_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- 	return 0;
+ 	return ret < 0 ? ret : 1;
  }
  
-+static int bnxt_set_tunable(struct net_device *dev,
-+			    const struct ethtool_tunable *tuna,
-+			    const void *data)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+	u32 rx_copybreak;
-+
-+	switch (tuna->id) {
-+	case ETHTOOL_RX_COPYBREAK:
-+		rx_copybreak = *(u32 *)data;
-+		if (rx_copybreak > BNXT_MAX_RX_COPYBREAK)
-+			return -ERANGE;
-+		if (rx_copybreak != bp->rx_copybreak) {
-+			if (netif_running(dev)) {
-+				bnxt_close_nic(bp, false, false);
-+				bp->rx_copybreak = rx_copybreak;
-+				bnxt_set_ring_params(bp);
-+				bnxt_open_nic(bp, false, false);
-+			} else {
-+				bp->rx_copybreak = rx_copybreak;
-+			}
-+		}
-+		return 0;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int bnxt_get_tunable(struct net_device *dev,
-+			    const struct ethtool_tunable *tuna, void *data)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+
-+	switch (tuna->id) {
-+	case ETHTOOL_RX_COPYBREAK:
-+		*(u32 *)data = bp->rx_copybreak;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
- static int bnxt_read_sfp_module_eeprom_info(struct bnxt *bp, u16 i2c_addr,
- 					    u16 page_number, u8 bank,
- 					    u16 start_addr, u16 data_length,
-@@ -4777,7 +4821,8 @@ static int bnxt_run_loopback(struct bnxt *bp)
- 	cpr = &rxr->bnapi->cp_ring;
- 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
- 		cpr = rxr->rx_cpr;
--	pkt_size = min(bp->dev->mtu + ETH_HLEN, bp->rx_copy_thresh);
-+	pkt_size = min(bp->dev->mtu + ETH_HLEN, max(BNXT_DEFAULT_RX_COPYBREAK,
-+						    bp->rx_copybreak));
- 	skb = netdev_alloc_skb(bp->dev, pkt_size);
- 	if (!skb)
- 		return -ENOMEM;
-@@ -5350,6 +5395,8 @@ const struct ethtool_ops bnxt_ethtool_ops = {
- 	.get_link_ext_stats	= bnxt_get_link_ext_stats,
- 	.get_eee		= bnxt_get_eee,
- 	.set_eee		= bnxt_set_eee,
-+	.get_tunable		= bnxt_get_tunable,
-+	.set_tunable		= bnxt_set_tunable,
- 	.get_module_info	= bnxt_get_module_info,
- 	.get_module_eeprom	= bnxt_get_module_eeprom,
- 	.get_module_eeprom_by_page = bnxt_get_module_eeprom_by_page,
 -- 
 2.34.1
 
