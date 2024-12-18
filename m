@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-152815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114C39F5D5D
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:23:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5432C9F5D5E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:23:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE390188D148
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:23:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E05D116F767
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655631369AA;
-	Wed, 18 Dec 2024 03:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E84713D638;
+	Wed, 18 Dec 2024 03:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="CfH3k6Zb"
+	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="bV1Mn1sX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D7014B06A
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 03:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D0884D29
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 03:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734492172; cv=none; b=TA8ZPyBwa0AmaZBTszKatlazXAe1RW/KA3tFW9OGSqfBZoYL3Sda+O7JxBkoiwlo/iYJYZIvqjJYFvozWpTrMX540LdVHKYXVQlGils+J7TZ9Ysextuz26iZKgcry9khSKcWgwSgdUNhoSkyxgKsddCRDjHpRCdCFXM3R8KrmGE=
+	t=1734492179; cv=none; b=siyTebJat2gn4jNwuRMmaA30VIzOAVzKWDlDnYFjrthQNSFiP3ihSmXlYyXPYzuzZFtQGRrZYKnjjbCib3Qe12f26hRZyTZTgCL1j0H1/jV+tBUAALCna3tmZewhpjgAKrvWbHdJnnk82jtHYpSeEvqwdnAx8EEVPCvMdognWpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734492172; c=relaxed/simple;
-	bh=+O3eJn/t90CvIgKVKJUyIZ7oV6fPTqSOBqO4L3l2hG0=;
+	s=arc-20240116; t=1734492179; c=relaxed/simple;
+	bh=BLG9JmyHYUQllcG9Tz2SoPt8OKpBZ8RF5ui8Gg1Qwf0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ppe+1CZwcbc/MsxpdXx4AE8V5TtcAAkyw7N9EPBw9xo51P6BXrPckyv/96v50g8Pcp4QzpBx5Av+IRjZUHp7zRlnEovdKbHDtwrq/xb6Hf2ZrpvG+jzuSh6slc9NFE3HqpBZvbASWFi1jYO6zoZ07Lr8PZfs9QUsLOYLs6gSvA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=CfH3k6Zb; arc=none smtp.client-ip=209.85.210.173
+	 MIME-Version; b=Y4YMVTgOk7z3pwWdbO8HHPAjk2jLKXZ0Zh9HlgVfugS98nFU4r3ytWvIv8Subyh5HwXkrSjBYxSvDQkVR1bhzlkXUA2xjQmEeNEgE9jfB42x08SIb7BdGuDjT82uE+sI8R9NpNLKdKmjm7UO+60UpVIFuUgZCDYvLJRNkoLMfeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=bV1Mn1sX; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-728eccf836bso5286526b3a.1
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 19:22:50 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-725ecc42d43so5106350b3a.3
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 19:22:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734492170; x=1735096970; darn=vger.kernel.org;
+        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734492177; x=1735096977; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+vuMlOm5Vhfm1uY+gt1Iarlvbs+b+hzsU/W/+TpNLRM=;
-        b=CfH3k6ZbA+zra+2rml+gT2V526d0S66ppQDmqvQrfqsj8oLhnCFU7rD37QJJVyyOD6
-         pqE7vkGLxOeywZfrNBPDlfDhMb7dq94IzW94w9MkYvfmfCFXPFI3TS/8n+2z0F8c0YMS
-         IEVPR02zfwPwNHnsDQbTVBi0Ef5kGWNoa7bxMT7DjHlAteYblJZ7PfEJIk0vPuMpO5lj
-         vvf8lGFkIve24+hcNcJ8doFfRgGtHIb1r6HbmdCXiuOqiKeiFKtLwFcg1MSdkNvRf9T9
-         AFBCHS0IUFZaKcGyFvLSTi1l/LSNZ5bPrYYmE1oQ8hlfwsQqUHhgOFMdDvr6Vjnai52r
-         M+lw==
+        bh=HN0kCWzUQSvGKZZ0wt0adgUCnTeQn7XySDNlpXpwm74=;
+        b=bV1Mn1sXBVKw0rlZxnyV1Sh0rxAVbK84pA7emI2kWTxLcbmc4Kb/xa0BBjb+IqB/OB
+         kSxo1IiT5tlEcjU7QPp1kw7BuJHeWD1yPPp5Eu8CB5UKahIozLSpXkE1XCrAs0DRzdZB
+         u9I0V8MlrEqGRPMDLi23jzTQhd2MlULFd3t265tV/cpSwcuv9/eah0L/EzUqBfgU2DlP
+         T2/q0QvihTCo1BVUB+072OPMtXpYNEyBZmF0X2puu/E9eW283Lger64jC7Kw35h0jnru
+         Sof08OMLSUtPAkPFwHnVVlqyhQxVKb8Yo8lUls5xPv7n+Ky58Y+c3v8SwGDR4iufD9AB
+         sekw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734492170; x=1735096970;
+        d=1e100.net; s=20230601; t=1734492177; x=1735096977;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+vuMlOm5Vhfm1uY+gt1Iarlvbs+b+hzsU/W/+TpNLRM=;
-        b=V/czhMPy+d0OUofPz8BvNIQK0mr1joE1vfnu6PKxGLJ7BqPjXmZouXLj06YAsoqPsR
-         nDvmZffIZQwPe2/nMCQMgUc2RjJW2WpsGAMMl+xcDTkYg3j8o6Ws02cHEjld81Jbjawg
-         9ZikH9LqEHyaAY6Oi9JWPQXksTS663LvrFMVqUAXGxC+p9oKTB/VAczn8aXm5oLySfvh
-         aSxSFpzxTHlZBBgqI5FA6QaWkqIfZZqfxA6kV+/IT38duWZjeGmqVYCm7GyOV9WKLGhm
-         47/GbkflRuyfdMf8UppbmAcewUWU7hhmwbLi0u4g9VtRwBa9MppLdaZeuMSSCEFCVwki
-         YMyw==
-X-Forwarded-Encrypted: i=1; AJvYcCXqUTMgCLWXqPnLxGWaK2X5L6ccvS45mNo2l+sdLMYe8elcK/i+w2myRqy92bIu2FSek7m1PVA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxELfqQI/mkjIkiK6C3baUJvSKsgOWMGgH++cD2t5uJn6V/BGpy
-	WVpjN4Q66mJnR1lLMrftcgX85/V3r2YgXHynqGtmgfRN4hZOJVV74W7mdZN5c3k=
-X-Gm-Gg: ASbGncswIYSgN1J26tuL4cTu5WqemogSYM5e2LtXgxoA+n2+Q1GVbK8uHl4R0u/MLbE
-	xUzz0VvqYicq4Tut5Jtn5y5NoqKtBoHIr+Rpm8LIg5Rhz3Jt9K00MH6tZ/Pq0LuRppJYZqCZLtj
-	cS3RgwT/U0D6Ra9xUQF8s+ayv27LaarvKdm01YtMMR01aLJmMiwUHtNGX3ShlEkupmjKC6yHLWP
-	CzOP76Lb8VEyP8VZAG8g1PRbRx8nRGr/URgi40i/f5DwBCaiwbthNvcRj2KG++Z04qSuQ+U3HZE
-	SZmDpBvSbYjPYgSGQHU/clGZvH6kGj1oSmwXh1XZPmQ=
-X-Google-Smtp-Source: AGHT+IF8fwSRfHcuWOf36OfOopQzL2j6KV+8JldHzRqRWJ7xQ/UyVl0JXNaUuzbM6ZfBXf/2BL4kFg==
-X-Received: by 2002:a05:6a00:3a28:b0:71e:4786:98ee with SMTP id d2e1a72fcca58-72a8d2f0b49mr2057104b3a.21.1734492169889;
-        Tue, 17 Dec 2024 19:22:49 -0800 (PST)
+        bh=HN0kCWzUQSvGKZZ0wt0adgUCnTeQn7XySDNlpXpwm74=;
+        b=TJE5QHQ6CoJc7f8YvvYrEmz1srGjT/SNjgM4UE/FstslfGGuimySpj+CWN5tks4TsE
+         Zyo3TQe+dS6J8ry6QRno1kU59wIxdRkoXHdOgxxOCp+BF2uyD3ABCqf96E79GtUnJRUZ
+         so5TWnAWgiIcayn3EoIvz+ajCZA7TeXurZMLTDyJ8b0hFMYyK9szPlQTp3zpIYDM52/J
+         5UEOgW16a261BkKqNCLZW/tUGmvYKN9tKVnMkwpckTdJLVkXiud7l1g3A1VYnPx04Xxh
+         W1Njp1sk7ujzoXrKmuFDpc95vxEm9Afa7kTPSxg6VfhLJ6m8pinq/tpLT+gFqmNIt9zw
+         +xbA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2yYHFU6pZMwN/O1/Hm+987/HRZ24gGT3BL1pqYOukaPbtE1p1gmJMGu8ec6ImZB4/Vy3wgAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxteCKYxj8EO5wiLDWiIQReABcxs40iNLYOCnKog1x3pf4vINVP
+	t7EDAdIhfDOP+6CdToVjHl03B/4sn4F00Zqw5jTN0T6ccuGNBQZckNXmcWJGRvs=
+X-Gm-Gg: ASbGncvAh8kKrZ++BCK9eYVKVZhIpKhK0HvntNFZ9X+4RByZiXYe5AB8WRm8qvUp3Qa
+	x2gyDUGcoQrqxHlOFM/u/MH+NE7LPk42A6ahKFbWUY2eCGRIoT9BbDtgplV6p9UhIR7FmaNy//e
+	/FqBo3v4TWAgDRCwFZXG6cwtwQgPD3gSUwOJKfocKB2FIhRX0dT2i85G0ESkQakEQcc3J1x5SYj
+	WX6n4SAeffuAtzHH7/iL90seDya3ITlJ4znV0+ZFy9jz8wQXQqAJJXkpPoHPsJeJSN6BK/6wWei
+	hLhxRe5rcax0DRzIuyGjcO22WZ8X/+w0Vvkx/RIwnlY=
+X-Google-Smtp-Source: AGHT+IGj44DIDlKeijIuBeM7eDvAm2kP+pj3y9KVOVTeMYdtT6MUF1+/V8hVUTf688XOwS1GIqcHgw==
+X-Received: by 2002:a05:6a00:398a:b0:725:e499:5b88 with SMTP id d2e1a72fcca58-72a8d2c9b7emr1995093b3a.25.1734492177106;
+        Tue, 17 Dec 2024 19:22:57 -0800 (PST)
 Received: from localhost.localdomain (133-32-227-190.east.xps.vectant.ne.jp. [133.32.227.190])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918bb4037sm7453908b3a.168.2024.12.17.19.22.46
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918bb4037sm7453908b3a.168.2024.12.17.19.22.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 19:22:49 -0800 (PST)
+        Tue, 17 Dec 2024 19:22:56 -0800 (PST)
 From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
 To: alexandre.torgue@foss.st.com,
 	joabreu@synopsys.com,
@@ -85,9 +85,9 @@ Cc: krzk@kernel.org,
 	dan.carpenter@linaro.org,
 	netdev@vger.kernel.org,
 	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-Subject: [PATCH v2 1/2] net: stmmac: call of_node_put() and stmmac_remove_config_dt() in error paths in stmmac_probe_config_dt()
-Date: Wed, 18 Dec 2024 12:22:29 +0900
-Message-Id: <20241218032230.117453-2-joe@pf.is.s.u-tokyo.ac.jp>
+Subject: [PATCH v2 2/2] net: stmmac: remove the unnecessary argument of stmmac_remove_config_dt()
+Date: Wed, 18 Dec 2024 12:22:30 +0900
+Message-Id: <20241218032230.117453-3-joe@pf.is.s.u-tokyo.ac.jp>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241218032230.117453-1-joe@pf.is.s.u-tokyo.ac.jp>
 References: <20241218032230.117453-1-joe@pf.is.s.u-tokyo.ac.jp>
@@ -99,86 +99,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Current implementation of stmmac_probe_config_dt() does not release the
-OF node reference obtained by of_parse_phandle() when
-stmmac_mdio_setup() fails, thus call of_node_put(). Also, the
-error_hw_init and error_pclk_get labels can be removed as just calling
-stmmac_remove_config_dt() suffices.
+The first argument of stmmac_remove_config_dt() is not used, so drop it.
 
-This bug was found by an experimental verification tool that I am
-developing.
-
-Fixes: 4838a5405028 ("net: stmmac: Fix wrapper drivers not detecting PHY")
 Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
 ---
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 24 +++++++------------
- 1 file changed, 9 insertions(+), 15 deletions(-)
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 3ac32444e492..669d8eb07044 100644
+index 669d8eb07044..aadacb1d5939 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -436,7 +436,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	struct plat_stmmacenet_data *plat;
- 	struct stmmac_dma_cfg *dma_cfg;
- 	int phy_mode;
--	void *ret;
- 	int rc;
+@@ -407,13 +407,11 @@ static int stmmac_of_get_mac_mode(struct device_node *np)
  
- 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
-@@ -490,8 +489,10 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 		dev_warn(&pdev->dev, "snps,phy-addr property is deprecated\n");
+ /**
+  * stmmac_remove_config_dt - undo the effects of stmmac_probe_config_dt()
+- * @pdev: platform_device structure
+  * @plat: driver data platform structure
+  *
+  * Release resources claimed by stmmac_probe_config_dt().
+  */
+-static void stmmac_remove_config_dt(struct platform_device *pdev,
+-				    struct plat_stmmacenet_data *plat)
++static void stmmac_remove_config_dt(struct plat_stmmacenet_data *plat)
+ {
+ 	clk_disable_unprepare(plat->stmmac_clk);
+ 	clk_disable_unprepare(plat->pclk);
+@@ -582,7 +580,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 	dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*dma_cfg),
+ 			       GFP_KERNEL);
+ 	if (!dma_cfg) {
+-		stmmac_remove_config_dt(pdev, plat);
++		stmmac_remove_config_dt(plat);
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 	plat->dma_cfg = dma_cfg;
+@@ -611,7 +609,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
  
- 	rc = stmmac_mdio_setup(plat, np, &pdev->dev);
--	if (rc)
-+	if (rc) {
-+		of_node_put(plat->phy_node);
+ 	rc = stmmac_mtl_setup(pdev, plat);
+ 	if (rc) {
+-		stmmac_remove_config_dt(pdev, plat);
++		stmmac_remove_config_dt(plat);
  		return ERR_PTR(rc);
-+	}
+ 	}
  
- 	of_property_read_u32(np, "tx-fifo-depth", &plat->tx_fifo_size);
- 
-@@ -627,8 +628,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+@@ -628,7 +626,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
  
  	plat->pclk = devm_clk_get_optional(&pdev->dev, "pclk");
  	if (IS_ERR(plat->pclk)) {
--		ret = plat->pclk;
--		goto error_pclk_get;
-+		stmmac_remove_config_dt(pdev, plat);
-+		return ERR_CAST(plat->pclk);
+-		stmmac_remove_config_dt(pdev, plat);
++		stmmac_remove_config_dt(plat);
+ 		return ERR_CAST(plat->pclk);
  	}
  	clk_prepare_enable(plat->pclk);
- 
-@@ -646,25 +647,18 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+@@ -647,14 +645,14 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
  	plat->stmmac_rst = devm_reset_control_get_optional(&pdev->dev,
  							   STMMAC_RESOURCE_NAME);
  	if (IS_ERR(plat->stmmac_rst)) {
--		ret = plat->stmmac_rst;
--		goto error_hw_init;
-+		stmmac_remove_config_dt(pdev, plat);
-+		return ERR_CAST(plat->stmmac_rst);
+-		stmmac_remove_config_dt(pdev, plat);
++		stmmac_remove_config_dt(plat);
+ 		return ERR_CAST(plat->stmmac_rst);
  	}
  
  	plat->stmmac_ahb_rst = devm_reset_control_get_optional_shared(
  							&pdev->dev, "ahb");
  	if (IS_ERR(plat->stmmac_ahb_rst)) {
--		ret = plat->stmmac_ahb_rst;
--		goto error_hw_init;
-+		stmmac_remove_config_dt(pdev, plat);
-+		return ERR_CAST(plat->stmmac_ahb_rst);
+-		stmmac_remove_config_dt(pdev, plat);
++		stmmac_remove_config_dt(plat);
+ 		return ERR_CAST(plat->stmmac_ahb_rst);
  	}
  
- 	return plat;
--
--error_hw_init:
--	clk_disable_unprepare(plat->pclk);
--error_pclk_get:
--	clk_disable_unprepare(plat->stmmac_clk);
--
--	return ret;
- }
+@@ -663,10 +661,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
  
  static void devm_stmmac_remove_config_dt(void *data)
+ {
+-	struct plat_stmmacenet_data *plat = data;
+-
+-	/* Platform data argument is unused */
+-	stmmac_remove_config_dt(NULL, plat);
++	stmmac_remove_config_dt(data);
+ }
+ 
+ /**
 -- 
 2.34.1
 
