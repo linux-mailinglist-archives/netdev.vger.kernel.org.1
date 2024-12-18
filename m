@@ -1,97 +1,200 @@
-Return-Path: <netdev+bounces-152878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325FA9F62A3
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:20:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 202CA9F62F3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:30:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3198170D86
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:20:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB90D7A3A3A
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38249198A07;
-	Wed, 18 Dec 2024 10:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C181A23AB;
+	Wed, 18 Dec 2024 10:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dtaeGOIY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SNqnne0R"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C2218A922
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2621A2390
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734517209; cv=none; b=kX73sNhBN1YvHIN4sjPtvhh8Ub8zjx5A5u8C/quZ60KUriNmWMAgsXd8DB5a6VAuAVJgDOS9XtYE5eiWjzp7kx960xylz02JQ6yjyqzzKuS2cheuaDfyBuFvP35ouV+g/l8f3avzDQOjTDJ/spL0WEeynvWEuKdZgahWZOTzD18=
+	t=1734517693; cv=none; b=B3B55AQM95kEWeQTbF5v7VZpMXAPkGl8fbgsCfXS/g5J7Tn95zq1q22aTFr/QQRv7/eDLn19obsoXN730tUEedlGAZWqfq2lHm7nSemPxM/DDoL+cji9BWzZL0h8cKu5hAT/WNIw6/RyQoJlC/xOCoPHHILYBoJmT4Px5aW2EHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734517209; c=relaxed/simple;
-	bh=Xo7v/6ukVzLA/O/DYAtaTsb8ByeXIl5K3lCnSkDQ7LE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=afubXHjS3HZIVzG9Gl1tiSo3QVX2RE/W2LR+xQjFY6mXR+7cIbBfsgTF9dxjfCF7JjMUebl5opjEzVNfqagVSAqQ7Ucl2FRxF0hkn0/XgzV1JWUeBWMoZ+0PkUSFSlnlgROZHoqt6cj3nR+626Du7S94P2Oy57m50cNgDYMY8jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dtaeGOIY; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <bbed26a2-4b59-4c99-b5e7-2ca55a666450@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734517203;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Rb3pDiXxkXlb5/YuXJKOc8PCZAGeAZHuQVVmCcglYz0=;
-	b=dtaeGOIYNdXWuLjo0xHJoosWSWHylMWE5cQM3aiB9bBYtNJFXmfyEQECkfzCRTfWfcD++g
-	JE/k4KKsnJZckF/KtPX5KT6OhRxUeQ7IYxw2YTeCC7d8RyjWZA+nXdsjr3UYuuX+eZ9TzX
-	bzpju7U124ZZ/h5PJqR68xh38SVWY2A=
-Date: Wed, 18 Dec 2024 10:19:59 +0000
+	s=arc-20240116; t=1734517693; c=relaxed/simple;
+	bh=xWEGBBMZlrnPHnIAxIg1D5H/4U2KnkKtU7jD9UwTCWY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hLrNBC3AfuN+vjAKpU+m2HbrfkDYQpT3shfS6nMC4eHXPkspb37MdVIxUgbwDY1UCDWs9W3hp1QWi924XU6Y8D82IBLpA2CzPybObvsr15JNDWZLrQkf8SymRxPPC3ivhHpxrWcj8hFCiSNM93FRdcrDwhn4TcYsiLfUAaMMit8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SNqnne0R; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3e6f6cf69so3565315a12.1
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:28:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734517690; x=1735122490; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xWEGBBMZlrnPHnIAxIg1D5H/4U2KnkKtU7jD9UwTCWY=;
+        b=SNqnne0RS0QFdXKscFHrhvDzeK1kewkt0Gn5tPNpqc+/xJJZGmvBljJOhjJyZcZrFi
+         V2k7YT8aIuwx+SurGCg9b0IJkn3HHG1k/8n63v70Q+r58SeXYYBeMecNzrE9Q0+cjzGo
+         S5e1bKF5wY/y9X3PaHlk2Gf51YwydzRbL2XRjuH/kHdCdWlzxMHEe2bDzfeiNrjaQYWL
+         uIIbNiaf+37Lq8yS0vaCzqSQJIoPuGi/UwL0cZQvqGGLjbzEtWM5vQQL7ciw+Geuh0of
+         Q9K5p6tD+qep2HazbNqjSMtqvjyLOQrjy6StboiqhaNXAW8yfhY88oHkkDksYIt6b4Yb
+         OxlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734517690; x=1735122490;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xWEGBBMZlrnPHnIAxIg1D5H/4U2KnkKtU7jD9UwTCWY=;
+        b=qQGbAg8dED7jZgUShQezM5OCtnUzaU2NNI6hRMJdWEmnpoL8sSmQZq0daUaKxtCWtS
+         lXGDmAS7hqFQx+rC3qhwbbMhQDrzz8YNrG/C1NCo0u8mhaAvw29vUpSpcGQedykEj+Yy
+         5tndWEto2dKbFP31Nd6vC7JE8yl6qC9kCM2lQrCpSZpHHlpUmTe58tLKYFEe4pixS6Vu
+         Tas9BRkncDuGNOwsxul9RolOCAsUHaVgz/n2Hpo+YIKxwFFY18KlDYWWbBMEDaeV/XLl
+         OhZ0ufq+VNCBGxD5mJSq/ywRZOFdZnmC27gIFoSg7aRj0eWDvq7kbG7J+E2El0SEWC3H
+         jbDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVd4L9JrbdwG+ui6hNJT/peWGIUGIV/O6rY4JZIeZqyJJizUNlGB1S6HSrkDKUKZmncm9V7ORw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrST4T8sWuDhZQXjVsSN0qdJBzI/akYuBA07QVHGEwH3NQgiCi
+	OpVqAYg8JFOejLkkTK4mcC6Hnd3R9mRVWNmgob1QujcUoSXVamRrYLbf1g3gzXPmRngN8nO+fI8
+	YveUet+KIrPMtzezj5gdSas8LD28yDQmRFLDo
+X-Gm-Gg: ASbGncvjtqI7xIlt+LeuKTp6NbYTLP2SZKEGbBDDGZ+y+CeItsupUHTcvRD20+VQLuk
+	E6Wl5Hs+NJi41dgH1ugogXkx2YAbKz6kHeow2Pbz0JKXThyykXXgf7sVlbOYI1+f8f7ni6zI=
+X-Google-Smtp-Source: AGHT+IGl0ofl/X8Pt3OgAOoAtvL9aND7aGB7sDTB0qbEW9hssXgCsNN3fJOA8M3zaFbNLUjZLtwRrPZ3Zgfq4F4QcrA=
+X-Received: by 2002:a05:6402:524d:b0:5cf:bcaf:98ec with SMTP id
+ 4fb4d7f45d1cf-5d7ee3f54f7mr2335896a12.26.1734517689880; Wed, 18 Dec 2024
+ 02:28:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net/mlx5: use do_aux_work for PHC overflow
- checks
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Carolina Jubran <cjubran@nvidia.com>, Bar Shapira <bshapira@nvidia.com>,
- netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Saeed Mahameed <saeedm@nvidia.com>
-References: <20241217195738.743391-1-vadfed@meta.com>
- <Z2JG8RGcsQXxP-mS@hoboy.vegasvil.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <Z2JG8RGcsQXxP-mS@hoboy.vegasvil.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <CGME20241203081005epcas2p247b3d05bc767b1a50ba85c4433657295@epcas2p2.samsung.com>
+ <20241203081247.1533534-1-youngmin.nam@samsung.com> <CANn89iK+7CKO31=3EvNo6-raUzyibwRRN8HkNXeqzuP9q8k_tA@mail.gmail.com>
+ <CADVnQynUspJL4e3UnZTKps9WmgnE-0ngQnQmn=8gjSmyg4fQ5A@mail.gmail.com>
+ <20241203181839.7d0ed41c@kernel.org> <Z0/O1ivIwiVVNRf0@perf>
+ <CANn89iKms_9EX+wArf1FK7Cy3-Cr_ryX+MJ2YC8yt1xmvpY=Uw@mail.gmail.com>
+ <Z1KRaD78T3FMffuX@perf> <CANn89iKOC9busc9G_akT=H45FvfVjWm97gmCyj=s7_zYJ43T3w@mail.gmail.com>
+ <Z1K9WVykZbo6u7uG@perf> <CANn89i+BuU+1__zSWgjshFzfxFUttDEpn90V+p8+mVGCHidYAA@mail.gmail.com>
+ <000001db4a23$746be360$5d43aa20$@samsung.com> <CANn89iLz=U2RW8S+Yy1WpFYb+dyyPR8TwbMpUUEeUpV9X2hYoA@mail.gmail.com>
+ <000001db5136$336b1060$9a413120$@samsung.com>
+In-Reply-To: <000001db5136$336b1060$9a413120$@samsung.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 18 Dec 2024 11:27:58 +0100
+Message-ID: <CANn89iK8Kdpe_uZ2Q8z3k2=d=jUVCV5Z3hZa4jFedUgKm9hesQ@mail.gmail.com>
+Subject: Re: [PATCH] tcp: check socket state before calling WARN_ON
+To: "Dujeong.lee" <dujeong.lee@samsung.com>
+Cc: Youngmin Nam <youngmin.nam@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, davem@davemloft.net, dsahern@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, guo88.liu@samsung.com, 
+	yiwang.cai@samsung.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	joonki.min@samsung.com, hajun.sung@samsung.com, d7271.choe@samsung.com, 
+	sw.ju@samsung.com, iamyunsu.kim@samsung.com, kw0619.kim@samsung.com, 
+	hsl.lim@samsung.com, hanbum22.lee@samsung.com, chaemoo.lim@samsung.com, 
+	seungjin1.yu@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 18/12/2024 03:52, Richard Cochran wrote:
-> On Tue, Dec 17, 2024 at 11:57:38AM -0800, Vadim Fedorenko wrote:
->> The overflow_work is using system wq to do overflow checks and updates
->> for PHC device timecounter, which might be overhelmed by other tasks.
->> But there is dedicated kthread in PTP subsystem designed for such
->> things. This patch changes the work queue to proper align with PTP
->> subsystem and to avoid overloading system work queue.
-> 
-> Yes, and you can configure that thread with chrt to ensure timely
-> invocation of the callback.
-> 
->> @@ -1188,7 +1192,6 @@ void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
->>   	}
->>   
->>   	cancel_work_sync(&clock->pps_info.out_work);
->> -	cancel_delayed_work_sync(&clock->timer.overflow_work);
-> 
-> Do you need ptp_cancel_worker_sync() ?
+On Wed, Dec 18, 2024 at 11:18=E2=80=AFAM Dujeong.lee <dujeong.lee@samsung.c=
+om> wrote:
+>
+> Tue, December 10, 2024 at 4:10 PM Dujeong Lee wrote:
+> > On Tue, Dec 10, 2024 at 12:39 PM Dujeong Lee wrote:
+> > > On Mon, Dec 9, 2024 at 7:21 PM Eric Dumazet <edumazet@google.com> wro=
+te:
+> > > > On Mon, Dec 9, 2024 at 11:16=E2=80=AFAM Dujeong.lee
+> > > > <dujeong.lee@samsung.com>
+> > > > wrote:
+> > > > >
+> > > >
+> > > > > Thanks for all the details on packetdrill and we are also
+> > > > > exploring
+> > > > USENIX 2013 material.
+> > > > > I have one question. The issue happens when DUT receives TCP ack
+> > > > > with
+> > > > large delay from network, e.g., 28seconds since last Tx. Is
+> > > > packetdrill able to emulate this network delay (or congestion) in
+> > > > script
+> > > level?
+> > > >
+> > > > Yes, the packetdrill scripts can wait an arbitrary amount of time
+> > > > between each event
+> > > >
+> > > > +28 <next event>
+> > > >
+> > > > 28 seconds seems okay. If the issue was triggered after 4 days,
+> > > > packetdrill would be impractical ;)
+> > >
+> > > Hi all,
+> > >
+> > > We secured new ramdump.
+> > > Please find the below values with TCP header details.
+> > >
+> > > tp->packets_out =3D 0
+> > > tp->sacked_out =3D 0
+> > > tp->lost_out =3D 1
+> > > tp->retrans_out =3D 1
+> > > tp->rx_opt.sack_ok =3D 5 (tcp_is_sack(tp)) mss_cache =3D 1400
+> > > ((struct inet_connection_sock *)sk)->icsk_ca_state =3D 4 ((struct
+> > > inet_connection_sock *)sk)->icsk_pmtu_cookie =3D 1500
+> > >
+> > > Hex from ip header:
+> > > 45 00 00 40 75 40 00 00 39 06 91 13 8E FB 2A CA C0 A8 00 F7 01 BB A7
+> > > CC 51
+> > > F8 63 CC 52 59 6D A6 B0 10 04 04 77 76 00 00 01 01 08 0A 89 72 C8 42
+> > > 62 F5
+> > > F5 D1 01 01 05 0A 52 59 6D A5 52 59 6D A6
+> > >
+> > > Transmission Control Protocol
+> > > Source Port: 443
+> > > Destination Port: 42956
+> > > TCP Segment Len: 0
+> > > Sequence Number (raw): 1375232972
+> > > Acknowledgment number (raw): 1381592486
+> > > 1011 .... =3D Header Length: 44 bytes (11)
+> > > Flags: 0x010 (ACK)
+> > > Window: 1028
+> > > Calculated window size: 1028
+> > > Urgent Pointer: 0
+> > > Options: (24 bytes), No-Operation (NOP), No-Operation (NOP),
+> > > Timestamps, No-Operation (NOP), No-Operation (NOP), SACK
+> > >
+> > > If anyone wants to check other values, please feel free to ask me
+> > >
+> > > Thanks,
+> > > Dujeong.
+> >
+> > I have a question.
+> >
+> > From the latest ramdump I could see that
+> > 1) tcp_sk(sk)->packets_out =3D 0
+> > 2) inet_csk(sk)->icsk_backoff =3D 0
+> > 3) sk_write_queue.len =3D 0
+> > which suggests that tcp_write_queue_purge was indeed called.
+> >
+> > Noting that:
+> > 1) tcp_write_queue_purge reset packets_out to 0 and
+> > 2) in_flight should be non-negative where in_flight =3D packets_out -
+> > left_out + retrans_out, what if we reset left_out and retrans_out as we=
+ll
+> > in tcp_write_queue_purge?
+> >
+> > Do we see any potential issue with this?
+>
+> Hello Eric and Neal.
+>
+> It is a gentle reminder.
+> Could you please review the latest ramdump values and and question?
 
-ptp_clock_unregister() calls kthread_cancel_delayed_work_sync() if
-ptp->kworker exists, no need to call ptp_cancel_worker_sync() on cleanup.
+It will have to wait next year, Neal is OOO.
 
-> 
-> Thanks,
-> Richard
+I asked a packetdrill reproducer, I can not spend days working on an
+issue that does not trigger in our production hosts.
 
+Something could be wrong in your trees, or perhaps some eBPF program
+changing the state of the socket...
 
