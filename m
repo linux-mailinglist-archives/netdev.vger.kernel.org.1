@@ -1,337 +1,157 @@
-Return-Path: <netdev+bounces-152866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D4339F6102
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:09:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 285A39F60B6
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:04:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAECE188AC05
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:09:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CA17163C0E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:04:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C481A2384;
-	Wed, 18 Dec 2024 09:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9215C195980;
+	Wed, 18 Dec 2024 09:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IReszp0X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dLDGEGCS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B09A19F41D;
-	Wed, 18 Dec 2024 09:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE16D18858E
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 09:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734512771; cv=none; b=j+HgfIMXLeRbmknyxqoRjcJHdYEXzBlBKxriuiP0Ad79o3XrKBHCPYd8B9AGqS2Foil/WzPi95p2pvQ7Xl8eWicAHS0VKQOL+2o0KoxwCInLO/225n9J3GyiaQ+JAmjWkGKOs2MmJciwCetG7SreJjBk8nFqO8qQFWFKJYNgg98=
+	t=1734512674; cv=none; b=TIDu/cDf8Q+ufpUkYt0sKH1EMH5WYivfTNeVJrE1nL3/k5xCQR18tKFEDWAD/J/bl3AHTzMR4w9vHenFENHlpYFQBXddgJA5SpRtubofu28xckJmRZUWdSl4kCv0uCWupjNqfCysBOiyw+Z56TpUYrbICMnlaviHAJZZOtlC5gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734512771; c=relaxed/simple;
-	bh=RKs8g8cJXoiaW5GtQzdcafbnKZUBamyZjFRIr0xGmC4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZ4RjxlP51cEbBh/bvx80fnhJBgde6bVFLhgpMlqzxqFXErbJ9Uw6BsYvpoQkD4fTQEmUKLHLKBWGU5BJbEVSbEzr17k2bbjCLXr0Cscxs8cFCu5pvOkNvgc3c0rLtZ3W2pUw6LAQwTXIKXIgkFNynuPsYalWo6BSpi4oRu8KBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IReszp0X; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734512769; x=1766048769;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RKs8g8cJXoiaW5GtQzdcafbnKZUBamyZjFRIr0xGmC4=;
-  b=IReszp0XpOzbaMVPGOEQgduCjz7jYla8aGcQEOFk6W1LHzmVAYjPiA0N
-   ErwVQSFHkyl8pVgU3Rd27Qrihn6H5mAoVdjaec9iT6xGRXeNnIBMKcvCz
-   NhGIXvvJMGgXjOuDvt+Ojr0hUlseUp38sVZPDsRZr7hl2w8VOHI+h8E9P
-   MRKV8kUVCfNSG2pEUKOKHtmOmGHY6EWz1UW9jEklt2X2FTXPDH+HN4WSR
-   ya1y1f3ECLEMT1bXJA4lw/5cLYfaDn76OJy0t0MfmD3XRIIw0Jj3bIj7Z
-   XQCnuPVmTgs2u/ji/xwlfleBRrs038265jLdlRmeDAXKyLuWkosVzgKT3
-   Q==;
-X-CSE-ConnectionGUID: zgLu3coERL+UnuXsMt/XEQ==
-X-CSE-MsgGUID: 2PpT0l0UTrmZ5CXHL9n3Dw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11289"; a="45577421"
-X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
-   d="scan'208";a="45577421"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 01:06:08 -0800
-X-CSE-ConnectionGUID: mu4IrPtMQv6PP0L8+g4xMQ==
-X-CSE-MsgGUID: MTjyH+A6QSeXjgV8IviAzA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="98267551"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 01:06:05 -0800
-Date: Wed, 18 Dec 2024 10:02:59 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND V2 net 1/7] net: hns3: fixed reset failure issues
- caused by the incorrect reset type
-Message-ID: <Z2KPw9WYCI/SZIjg@mev-dev.igk.intel.com>
-References: <20241217010839.1742227-1-shaojijie@huawei.com>
- <20241217010839.1742227-2-shaojijie@huawei.com>
+	s=arc-20240116; t=1734512674; c=relaxed/simple;
+	bh=TpDkR3fn5A334/XjGASErlPQW+raj/DFAaML7LST/gs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FhZ3TcDuuQUo05AthabcSDXSXD/HPO9XlN1OsHZycO5akWxZ/9epevUdPZaRbjaJYIqB1gVXrcGUQjSjyp+hC5P4kVz+l0uCZL7BFT5jGSH8wMnxsnhZpGEXY5JbYoqSlVVUYAUnZTw30H2T96uxNk0oWeOdhMgfmJNQk5TcUfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dLDGEGCS; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5d3d14336f0so11194103a12.3
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 01:04:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734512671; x=1735117471; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v7aWbhA1TNSWoniLVgiWwLv1O2JsZ4E98s0k5Mlh8J0=;
+        b=dLDGEGCSg9k5bNyz2w4OTYA3uA1AbFFjOpPhAWYlzmdgHbp5hBXOVJOjYv1NageuVI
+         MpGkCDUCwbQNFWj7e+reGKpxkdw6ZodG2PP9PJXml9ZHP4cM5i2naSD7glHqGSrZv+jy
+         UGXOLFb30c4+7pnnLG4MYCcf5TMC30/STbkXRE/o7GfKhlhsA599nohCrWzQbe9ZQhpm
+         5oVtsb+xqiMrOX2nFp9LHRcEtjvkJBVoADJ2f5d0FbXND1Az5lHn1eh0WTDYAgyb/hwp
+         VHG/0KURSLTCkiYipznIlcA6cEZX4fSeTCEb8x383Y+aMfbmAFtUGspdZ72lPzZ/gWru
+         x+3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734512671; x=1735117471;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v7aWbhA1TNSWoniLVgiWwLv1O2JsZ4E98s0k5Mlh8J0=;
+        b=PsSInA0Q7niYXio1RkDaJyJSvLZdAX5GEfblwTXJbqeknBEFgkaZM9PaxzRKw5VXwR
+         b8byYU+GgBFQJOX3kSlJOGEhk09dxFZsbL4obp5qIQKye0MCLihFhmZIPWkPGE02Uq4b
+         6t/jHSDdVXGTk8ybLtXuLnb6VikXqc43sDH7IKhCQaTs48e/wLY8VR7kbGw4HAvBfogA
+         mJPkZD0Onl1G/oBZBC803gnzXlBX+gptOxrI58hzGtgCH5k2SkcPO8I5bTSFUnAA0WAd
+         FUguA1K035ChFy/H4duXx6gWCn841ELlatY60pIo69HlOxvIE0erYkIIz+57gIzzAWch
+         vbrg==
+X-Forwarded-Encrypted: i=1; AJvYcCV0v9i1Gn83PZnXSszXGlQrILIq5mq6gfaT4RsuhoVIgcA3A8JF7vuegIxULrlLEU7YkyFl0II=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMWMHySYe8Jl5XR/BACHLlQ7ENUs8GhK/Ib2Wc/iXkBed5Y4xC
+	fpIIMUIc/lPob3UAxrVmQ0fq5G/HLOEGwHzCg53bjJHNFc2lhL+u2jAHZtSaP7MYORbouL5G44I
+	R3iHZpQM5uhFQJCiSPysFOeYSOaUVn25ImUqW
+X-Gm-Gg: ASbGncuMjThDV/mo1VjglZGXCXtSG+Gu9SE9w1+5AbSVJrNmCoT1xt7HTka5x2nt7nt
+	EyMmWiUHdILBItjnfmf7gPJdKJaot8hJQUIQivaHTK/B740m50z12+IC8wNSPDn+HOOa0Wqc=
+X-Google-Smtp-Source: AGHT+IEO30UNhBINR8UjVfKZPYaxlfXK5IzIg1veUpetQBkaygbim5WmKA5+gY8aKANbWk9QWGrzPm7ocahajGqCstw=
+X-Received: by 2002:a05:6402:524d:b0:5d0:aa2d:6eee with SMTP id
+ 4fb4d7f45d1cf-5d7ee3eb36dmr1968109a12.26.1734512670785; Wed, 18 Dec 2024
+ 01:04:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241217010839.1742227-2-shaojijie@huawei.com>
+References: <CY5PR12MB63224DE8AEEC1A2410E65466DA3B2@CY5PR12MB6322.namprd12.prod.outlook.com>
+ <CANn89iL8ihnVyi+g1aKNu3=BJCQoRv4_s29OvVSXBBQdOM4foQ@mail.gmail.com>
+ <CANn89iKAZsG=RepuJmStFTH2QK+N5s9Cu=OnD2GmQAb1JKCfeQ@mail.gmail.com> <Z2KHMLJ4oTUwgBSo@gauss3.secunet.de>
+In-Reply-To: <Z2KHMLJ4oTUwgBSo@gauss3.secunet.de>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 18 Dec 2024 10:04:19 +0100
+Message-ID: <CANn89iJGYFzHi7eUQo49hmo0eTZzHvDTTqKXTxrSZvKKJXHa7g@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 4/5] ipv6: tcp: give socket pointer to control skbs
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Shahar Shitrit <shshitrit@nvidia.com>, "brianvv@google.com" <brianvv@google.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "kuniyu@amazon.com" <kuniyu@amazon.com>, 
+	"martin.lau@kernel.org" <martin.lau@kernel.org>, "ncardwell@google.com" <ncardwell@google.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Ziyad Atiyyeh <ziyadat@nvidia.com>, 
+	Dror Tennenbaum <drort@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 17, 2024 at 09:08:33AM +0800, Jijie Shao wrote:
-> From: Hao Lan <lanhao@huawei.com>
-> 
-> When a reset type that is not supported by the driver is input, a reset
-> pending flag bit of the HNAE3_NONE_RESET type is generated in
-> reset_pending. The driver does not have a mechanism to clear this type
-> of error. As a result, the driver considers that the reset is not
-> complete. This patch provides a mechanism to clear the
-> HNAE3_NONE_RESET flag and the parameter of
-> hnae3_ae_ops.set_default_reset_request is verified.
-> 
-> The error message:
-> hns3 0000:39:01.0: cmd failed -16
-> hns3 0000:39:01.0: hclge device re-init failed, VF is disabled!
-> hns3 0000:39:01.0: failed to reset VF stack
-> hns3 0000:39:01.0: failed to reset VF(4)
-> hns3 0000:39:01.0: prepare reset(2) wait done
-> hns3 0000:39:01.0 eth4: already uninitialized
-> 
-> Use the crash tool to view struct hclgevf_dev:
-> struct hclgevf_dev {
-> ...
-> 	default_reset_request = 0x20,
-> 	reset_level = HNAE3_NONE_RESET,
-> 	reset_pending = 0x100,
-> 	reset_type = HNAE3_NONE_RESET,
-> ...
-> };
-> 
-> Fixes: 720bd5837e37 ("net: hns3: add set_default_reset_request in the hnae3_ae_ops")
-> Signed-off-by: Hao Lan <lanhao@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  .../hisilicon/hns3/hns3pf/hclge_main.c        | 33 ++++++++++++++--
->  .../hisilicon/hns3/hns3vf/hclgevf_main.c      | 38 ++++++++++++++++---
->  2 files changed, 61 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-> index 05942fa78b11..7d44dc777dc5 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-> @@ -3574,6 +3574,17 @@ static int hclge_set_vf_link_state(struct hnae3_handle *handle, int vf,
->  	return ret;
->  }
->  
-> +static void hclge_set_reset_pending(struct hclge_dev *hdev,
-> +				    enum hnae3_reset_type reset_type)
-> +{
-> +	/* When an incorrect reset type is executed, the get_reset_level
-> +	 * function generates the HNAE3_NONE_RESET flag. As a result, this
-> +	 * type do not need to pending.
-> +	 */
-> +	if (reset_type != HNAE3_NONE_RESET)
-> +		set_bit(reset_type, &hdev->reset_pending);
-> +}
-> +
->  static u32 hclge_check_event_cause(struct hclge_dev *hdev, u32 *clearval)
->  {
->  	u32 cmdq_src_reg, msix_src_reg, hw_err_src_reg;
-> @@ -3594,7 +3605,7 @@ static u32 hclge_check_event_cause(struct hclge_dev *hdev, u32 *clearval)
->  	 */
->  	if (BIT(HCLGE_VECTOR0_IMPRESET_INT_B) & msix_src_reg) {
->  		dev_info(&hdev->pdev->dev, "IMP reset interrupt\n");
-> -		set_bit(HNAE3_IMP_RESET, &hdev->reset_pending);
-> +		hclge_set_reset_pending(hdev, HNAE3_IMP_RESET);
->  		set_bit(HCLGE_COMM_STATE_CMD_DISABLE, &hdev->hw.hw.comm_state);
->  		*clearval = BIT(HCLGE_VECTOR0_IMPRESET_INT_B);
->  		hdev->rst_stats.imp_rst_cnt++;
-> @@ -3604,7 +3615,7 @@ static u32 hclge_check_event_cause(struct hclge_dev *hdev, u32 *clearval)
->  	if (BIT(HCLGE_VECTOR0_GLOBALRESET_INT_B) & msix_src_reg) {
->  		dev_info(&hdev->pdev->dev, "global reset interrupt\n");
->  		set_bit(HCLGE_COMM_STATE_CMD_DISABLE, &hdev->hw.hw.comm_state);
-> -		set_bit(HNAE3_GLOBAL_RESET, &hdev->reset_pending);
-> +		hclge_set_reset_pending(hdev, HNAE3_GLOBAL_RESET);
->  		*clearval = BIT(HCLGE_VECTOR0_GLOBALRESET_INT_B);
->  		hdev->rst_stats.global_rst_cnt++;
->  		return HCLGE_VECTOR0_EVENT_RST;
-> @@ -4052,7 +4063,7 @@ static void hclge_do_reset(struct hclge_dev *hdev)
->  	case HNAE3_FUNC_RESET:
->  		dev_info(&pdev->dev, "PF reset requested\n");
->  		/* schedule again to check later */
-> -		set_bit(HNAE3_FUNC_RESET, &hdev->reset_pending);
-> +		hclge_set_reset_pending(hdev, HNAE3_FUNC_RESET);
->  		hclge_reset_task_schedule(hdev);
->  		break;
->  	default:
-> @@ -4086,6 +4097,8 @@ static enum hnae3_reset_type hclge_get_reset_level(struct hnae3_ae_dev *ae_dev,
->  		clear_bit(HNAE3_FLR_RESET, addr);
->  	}
->  
-> +	clear_bit(HNAE3_NONE_RESET, addr);
-> +
->  	if (hdev->reset_type != HNAE3_NONE_RESET &&
->  	    rst_level < hdev->reset_type)
->  		return HNAE3_NONE_RESET;
-> @@ -4227,7 +4240,7 @@ static bool hclge_reset_err_handle(struct hclge_dev *hdev)
->  		return false;
->  	} else if (hdev->rst_stats.reset_fail_cnt < MAX_RESET_FAIL_CNT) {
->  		hdev->rst_stats.reset_fail_cnt++;
-> -		set_bit(hdev->reset_type, &hdev->reset_pending);
-> +		hclge_set_reset_pending(hdev, hdev->reset_type);
-Sth is unclear for me here. Doesn't HNAE3_NONE_RESET mean that there is
-no reset? If yes, why in this case reset_fail_cnt++ is increasing?
+On Wed, Dec 18, 2024 at 9:26=E2=80=AFAM Steffen Klassert
+<steffen.klassert@secunet.com> wrote:
+>
+> On Mon, Dec 16, 2024 at 04:21:32PM +0100, Eric Dumazet wrote:
+> > On Mon, Dec 16, 2024 at 2:29=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Mon, Dec 16, 2024 at 2:18=E2=80=AFPM Shahar Shitrit <shshitrit@nvi=
+dia.com> wrote:
+> > > >
+> > > > Hello,
+> > > >
+> > > >
+> > > >
+> > > > We observe memory leaks reported by kmemleak when using IPSec in tr=
+ansport mode with crypto offload.
+> > > >
+> > > > The leaks reproduce for TX offload, RX offload and both.
+> > > >
+> > > > The leaks as shown in stack trace can be seen below.
+> > > >
+> > > >
+> > > >
+> > > > The issue has been bisected to this commit 507a96737d99686ca1714c7b=
+a1f60ac323178189.
+> > > >
+> > > >
+> > >
+> > > Nothing comes to mind. This might be an old bug in loopback paths.
+> >
+> > Or some XFRM assumption.
+> >
+> > Note that ip6_xmit() first parameter can be different than skb->sk
+> >
+> > Apparently, xfrm does not check this possibility.
+>
+> Can you provide a bit more context? I don't see the problem.
 
-Maybe the check for NONE_RESET should be done in this else if check to
-prevent reset_fail_cnt from increasing (and also solve the problem with
-pending bit set)
->  		dev_info(&hdev->pdev->dev,
->  			 "re-schedule reset task(%u)\n",
->  			 hdev->rst_stats.reset_fail_cnt);
-> @@ -4470,8 +4483,20 @@ static void hclge_reset_event(struct pci_dev *pdev, struct hnae3_handle *handle)
->  static void hclge_set_def_reset_request(struct hnae3_ae_dev *ae_dev,
->  					enum hnae3_reset_type rst_type)
->  {
-> +#define HCLGE_SUPPORT_RESET_TYPE \
-> +	(BIT(HNAE3_FLR_RESET) | BIT(HNAE3_FUNC_RESET) | \
-> +	BIT(HNAE3_GLOBAL_RESET) | BIT(HNAE3_IMP_RESET))
-> +
->  	struct hclge_dev *hdev = ae_dev->priv;
->  
-> +	if (!(BIT(rst_type) & HCLGE_SUPPORT_RESET_TYPE)) {
-> +		/* To prevent reset triggered by hclge_reset_event */
-> +		set_bit(HNAE3_NONE_RESET, &hdev->default_reset_request);
-> +		dev_warn(&hdev->pdev->dev, "unsupported reset type %d\n",
-> +			 rst_type);
-> +		return;
-> +	}
-Maybe (nit):
-if (...) {
-	rst_type = 
-	dev_warn();
-}
 
-set_bit(rst_type, );
-It is a little hard to follow with return in the if.
+skb->sk is used in xfrm, and the assumption is that it is a full socket.
 
-> +
->  	set_bit(rst_type, &hdev->default_reset_request);
->  }
->  
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-> index 2f6ffb88e700..fd0abe37fdd7 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-> @@ -1393,6 +1393,17 @@ static int hclgevf_notify_roce_client(struct hclgevf_dev *hdev,
->  	return ret;
->  }
->  
-> +static void hclgevf_set_reset_pending(struct hclgevf_dev *hdev,
-> +				      enum hnae3_reset_type reset_type)
-> +{
-> +	/* When an incorrect reset type is executed, the get_reset_level
-> +	 * function generates the HNAE3_NONE_RESET flag. As a result, this
-> +	 * type do not need to pending.
-> +	 */
-> +	if (reset_type != HNAE3_NONE_RESET)
-> +		set_bit(reset_type, &hdev->reset_pending);
-> +}
-You already have a way to share the code between PF and VF, so please
-move the same functions to common file in one direction up.
+List of things that are supported, even for timewait and
+request_sockets, and used in xfrm:
 
-> +
->  static int hclgevf_reset_wait(struct hclgevf_dev *hdev)
->  {
->  #define HCLGEVF_RESET_WAIT_US	20000
-> @@ -1542,7 +1553,7 @@ static void hclgevf_reset_err_handle(struct hclgevf_dev *hdev)
->  		hdev->rst_stats.rst_fail_cnt);
->  
->  	if (hdev->rst_stats.rst_fail_cnt < HCLGEVF_RESET_MAX_FAIL_CNT)
-> -		set_bit(hdev->reset_type, &hdev->reset_pending);
-> +		hclgevf_set_reset_pending(hdev, hdev->reset_type);
->  
->  	if (hclgevf_is_reset_pending(hdev)) {
->  		set_bit(HCLGEVF_RESET_PENDING, &hdev->reset_state);
-> @@ -1662,6 +1673,8 @@ static enum hnae3_reset_type hclgevf_get_reset_level(unsigned long *addr)
->  		clear_bit(HNAE3_FLR_RESET, addr);
->  	}
->  
-> +	clear_bit(HNAE3_NONE_RESET, addr);
-> +
->  	return rst_level;
->  }
->  
-> @@ -1671,14 +1684,15 @@ static void hclgevf_reset_event(struct pci_dev *pdev,
->  	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(pdev);
->  	struct hclgevf_dev *hdev = ae_dev->priv;
->  
-> -	dev_info(&hdev->pdev->dev, "received reset request from VF enet\n");
-> -
->  	if (hdev->default_reset_request)
->  		hdev->reset_level =
->  			hclgevf_get_reset_level(&hdev->default_reset_request);
->  	else
->  		hdev->reset_level = HNAE3_VF_FUNC_RESET;
->  
-> +	dev_info(&hdev->pdev->dev, "received reset request from VF enet, reset level is %d\n",
-> +		 hdev->reset_level);
-> +
->  	/* reset of this VF requested */
->  	set_bit(HCLGEVF_RESET_REQUESTED, &hdev->reset_state);
->  	hclgevf_reset_task_schedule(hdev);
-> @@ -1689,8 +1703,20 @@ static void hclgevf_reset_event(struct pci_dev *pdev,
->  static void hclgevf_set_def_reset_request(struct hnae3_ae_dev *ae_dev,
->  					  enum hnae3_reset_type rst_type)
->  {
-> +#define HCLGEVF_SUPPORT_RESET_TYPE \
-> +	(BIT(HNAE3_VF_RESET) | BIT(HNAE3_VF_FUNC_RESET) | \
-> +	BIT(HNAE3_VF_PF_FUNC_RESET) | BIT(HNAE3_VF_FULL_RESET) | \
-> +	BIT(HNAE3_FLR_RESET) | BIT(HNAE3_VF_EXP_RESET))
-> +
->  	struct hclgevf_dev *hdev = ae_dev->priv;
->  
-> +	if (!(BIT(rst_type) & HCLGEVF_SUPPORT_RESET_TYPE)) {
-> +		/* To prevent reset triggered by hclge_reset_event */
-> +		set_bit(HNAE3_NONE_RESET, &hdev->default_reset_request);
-> +		dev_info(&hdev->pdev->dev, "unsupported reset type %d\n",
-> +			 rst_type);
-> +		return;
-> +	}
->  	set_bit(rst_type, &hdev->default_reset_request);
->  }
->  
-> @@ -1847,14 +1873,14 @@ static void hclgevf_reset_service_task(struct hclgevf_dev *hdev)
->  		 */
->  		if (hdev->reset_attempts > HCLGEVF_MAX_RESET_ATTEMPTS_CNT) {
->  			/* prepare for full reset of stack + pcie interface */
-> -			set_bit(HNAE3_VF_FULL_RESET, &hdev->reset_pending);
-> +			hclgevf_set_reset_pending(hdev, HNAE3_VF_FULL_RESET);
->  
->  			/* "defer" schedule the reset task again */
->  			set_bit(HCLGEVF_RESET_PENDING, &hdev->reset_state);
->  		} else {
->  			hdev->reset_attempts++;
->  
-> -			set_bit(hdev->reset_level, &hdev->reset_pending);
-> +			hclgevf_set_reset_pending(hdev, hdev->reset_level);
->  			set_bit(HCLGEVF_RESET_PENDING, &hdev->reset_state);
->  		}
->  		hclgevf_reset_task_schedule(hdev);
-> @@ -1977,7 +2003,7 @@ static enum hclgevf_evt_cause hclgevf_check_evt_cause(struct hclgevf_dev *hdev,
->  		rst_ing_reg = hclgevf_read_dev(&hdev->hw, HCLGEVF_RST_ING);
->  		dev_info(&hdev->pdev->dev,
->  			 "receive reset interrupt 0x%x!\n", rst_ing_reg);
-> -		set_bit(HNAE3_VF_RESET, &hdev->reset_pending);
-> +		hclgevf_set_reset_pending(hdev, HNAE3_VF_RESET);
->  		set_bit(HCLGEVF_RESET_PENDING, &hdev->reset_state);
->  		set_bit(HCLGE_COMM_STATE_CMD_DISABLE, &hdev->hw.hw.comm_state);
->  		*clearval = ~(1U << HCLGEVF_VECTOR0_RST_INT_B);
-> -- 
-> 2.33.0
+sk->sk_bound_dev_if
+sock_net(skb->sk)
+inet_sk(sk)->inet_dport;
+
+But xfrmi_xmit2() for instance is doing :
+
+err =3D dst_output(xi->net, skb->sk, skb);
+
+Other dst_output() users use : dst_output(net, sk, skb), because sk
+can be different than skb->sk
+
+Also xfrm6_local_dontfrag() is assuming sk is an inet6 socket:
+
+if (proto =3D=3D IPPROTO_UDP || proto =3D=3D IPPROTO_RAW)
+     return inet6_test_bit(DONTFRAG, sk);
+
+xfrm_lookup_with_ifid() seems ok (it uses sk_const_to_full_sk()), but
+we probably miss some fixes.
 
