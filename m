@@ -1,220 +1,114 @@
-Return-Path: <netdev+bounces-152928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A519F659B
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:13:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6079F6569
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 12:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76E45188784F
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 12:13:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 178F116E156
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB2319F49F;
-	Wed, 18 Dec 2024 12:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5548C1A01BF;
+	Wed, 18 Dec 2024 11:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZdD5dzo"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5610415957D;
-	Wed, 18 Dec 2024 12:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD19819CC24;
+	Wed, 18 Dec 2024 11:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734524022; cv=none; b=CuTjlFnOAnpZMfns1xLx8tjGJgAuZvbtyMTDcp2uaeKMV4BkE/IUHhNkPYnVlD1WahS0VdetW8xJK6hh6geHZ8wIPQWgjEx2UTx7jexHgJZcPpB16tUdeqvsyGV77WuicDJoW5ZDLWJhbqp6LZhBJ/TTZ5zw+qqXTJub6EgMGx0=
+	t=1734523082; cv=none; b=fDvSQxlxleRUN8M0zGeE5GodINO80LrpGEYmYBGnhpgsG9GbOGxj3Qo7TGr3w70dfMNKkGiksqAKIjZAp/E/68YgJkg1b4j0qV9PPYydcemVWijTBn7IxyCe4DXW1TSFgFPPwS3zJ4v5Mo2lTe60VmjeAF+Y6m2adbTF/UXKD00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734524022; c=relaxed/simple;
-	bh=+t4X0sKux8BOLBwNktInKhd1dfa6LXrQsEy4I1kmQmU=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hyEncg9eu41waLwHXjO2kvk9ggP3fjn+/SmHXhvCGzOvGvf+9FL8QUGEy2gLBWmqCHnXmEhcekyCJ5G8GOlsswrToFJipp0jPMJUau3AagU3AlrBG9Zej//Uxo0IaInUT5wEZjF4ZueY0C41UYmmkPKf3aRUFoKoJgqxflNlmfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YCsX24ztWzhZVc;
-	Wed, 18 Dec 2024 19:53:38 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E51C6180105;
-	Wed, 18 Dec 2024 19:56:10 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 18 Dec 2024 19:56:10 +0800
-Message-ID: <c350f32a-20f5-4bf3-bc30-36f44b4872a5@huawei.com>
-Date: Wed, 18 Dec 2024 19:56:09 +0800
+	s=arc-20240116; t=1734523082; c=relaxed/simple;
+	bh=oDanH9KbcyqaAgrkfJgfC45F72HSRGgPBJUOe3njE2M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F/fBTJExOEeRWcohHqqTtg/KFM/qvQBvMCP+2+cg/eAlm7ccESwv2WVsmvz1x8gmLCds0M6O9H2tFjCLQ0mL2oE0z5UKn2XdbjAWLob6yTHXfHKv+PMHrxUzLhJ4Or0JbUaVFTKu66xR7i/tq7YNa3rtx1VF69VTfPDQ9dq4yA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aZdD5dzo; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a7d7db4d89so18301755ab.1;
+        Wed, 18 Dec 2024 03:58:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734523080; x=1735127880; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oDanH9KbcyqaAgrkfJgfC45F72HSRGgPBJUOe3njE2M=;
+        b=aZdD5dzoKsp4l74jP/zOEEKWca3RRWi1ccYAWIjMC9+4pf4tKThgkO4Pua+8RYaA3c
+         icoR8gTCSY0KAXXK7g5xRPAH/fiEG7MhEIBh8tF0MF/grY4aD6TykN096IM7VAeMh/h0
+         wQonvnb85qM3NT8+aOtCnoPWoctqVz2CfERLHr3a4cZdNdPJshRGEWPNDdPw1bcgma9w
+         mFplRaMt1688yscCalOu50+nLeIUt0f4bPUmKsiG9Y6rgbjRlZVFg9RijQtGkBhQ+PjN
+         AfJQlUFjkxophLqHGT+HUGR0WlfjAMGD54peyQXMJhCxbcJnUYYEBjknrT0vARBoW4rv
+         qQOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734523080; x=1735127880;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oDanH9KbcyqaAgrkfJgfC45F72HSRGgPBJUOe3njE2M=;
+        b=qEvotuc9nIUb9sM09Xia83Juv8GtteihtxAN+LFtZLul/TXPlGsGbeOrExC7KjCcGj
+         Zanv62WTI6x9P7zBn4+Jrrqiii998bEhe+1SlSztnc1CDBqieVAzUdqvdXu+HHZ1tlRn
+         Id2+gr/5MEvm2Cwk6mUa6F0QvwfWi8H30Vmb7U4rXImVV0QkRifT23wyjmbaIKVURfzH
+         tjfw7A4wCbTR1lmQUtG2BqJhRTvMKXsPdycmUUf0ultcIcQdrIHT+9kvZQsrOOkfKfvg
+         EHyTcmNuXuSDxF804G3g8bkQ8dfUECJvGTH/d4HdoiKePulRfsrq0KEDeWn/lOkAucbT
+         GORg==
+X-Forwarded-Encrypted: i=1; AJvYcCUuIB/lqbYWQaRHksfMAE4zzV8y8K13hvRNT/bvunJQilbpmn/poLwkhOE4/ae9Oe16aMX7el6qsg86OQ==@vger.kernel.org, AJvYcCVjR5WOuB6eUVEPyQ5Hm8mUu02GjUs1NnAicxCbkDz4r4BeTbiKJVna0l5JLCY2WsIJMLc3xUVBBy+NcQ==@vger.kernel.org, AJvYcCW5sJQBwl8oHKk11LMgUSHSjCR6EkgDCOxBhZ4BHqxWwnPp2EjZ3A956eqcIopM5yW2119EPAVdPAVDqG/SRBld@vger.kernel.org, AJvYcCWPgpPiGie1AROjORv2kfXvxGu0OQe5vuG2p28jnbbqEWnIIB4rnhbzrtO8FTcqGILDUttymNUmlY5uWM29@vger.kernel.org, AJvYcCWRmemiWENLHQQiCECQvIepDJGW7zuWVnDwYNtLQ6lioq4/o9ZUoxlBbKkaVsar5zuVQkoed2hIwpZ/Og==@vger.kernel.org, AJvYcCXv1T2SXyLdwq/dgH+H199j7rP4TvT3hQiPIA0iW3pvlcsY9NS1PldRtPId2r0QGPEmcBb/I5NON0QA@vger.kernel.org, AJvYcCXzlI0aigyxLCkgE/XXesHPK+XGHEcG5z+JYi6GztF7h3+7ukLtWX8GjZSNsdqX3XNbqS2u7WDrS2G8rg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YycX/t3HNg2icVnYeVQuTZIvOWkePGPh/WcNBb1OMlmSN3IrUcv
+	ZbXvPUL2eJ0TaHsYJwfFzhC/SwMwDDVJye++TlkfUCLjRdbD9lxfDRQYc7TjChbH1UT+At+nMlz
+	R6nAzwYfLtzbMW+53DS3bV1rNeTs=
+X-Gm-Gg: ASbGnculHUIHafJDWNpbWTmd9B2SwdArswVdgRCIUJEa+B4HkDXXm9yyM8t9TdXtEbx
+	aK6OW/u3W7UARieyTYsCbi+dSdhikBxM3szkMvbfFQIvjJlD88KanxNYRb2+rgwfOnO/luKc=
+X-Google-Smtp-Source: AGHT+IE9XVHYAxxlYi/lIqkTbCEk29pY3s/JbrTHqng5uSXtp2yGtDmOz0gqvTFlowYDieODZLuKDePCSd4DCR7eu4U=
+X-Received: by 2002:a05:6e02:1565:b0:3a7:8720:9deb with SMTP id
+ e9e14a558f8ab-3bdc1b288c8mr17567595ab.11.1734523079863; Wed, 18 Dec 2024
+ 03:57:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/3] net: hisilicon: hns: Remove unused
- hns_dsaf_roce_reset
-To: <linux@treblig.org>, <salil.mehta@huawei.com>, <shenjian15@huawei.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-References: <20241218005729.244987-1-linux@treblig.org>
- <20241218005729.244987-2-linux@treblig.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20241218005729.244987-2-linux@treblig.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+References: <20241213084457.45120-1-annaemesenyiri@gmail.com>
+ <20241213084457.45120-5-annaemesenyiri@gmail.com> <20241216182001.557e2c19@kernel.org>
+In-Reply-To: <20241216182001.557e2c19@kernel.org>
+From: Anna Nyiri <annaemesenyiri@gmail.com>
+Date: Wed, 18 Dec 2024 12:57:49 +0100
+Message-ID: <CAKm6_RsVpJjA2uHMJQO=5X-GJthkNnHJS=qHbiM2wy0AdADRhg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 4/4] sock: Introduce SO_RCVPRIORITY socket option
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com, 
+	pabeni@redhat.com, willemb@google.com, idosch@idosch.org, horms@kernel.org, 
+	dsahern@kernel.org, linux-can@vger.kernel.org, socketcan@hartkopp.net, 
+	mkl@pengutronix.de, linux-kselftest@vger.kernel.org, shuah@kernel.org, 
+	tsbogend@alpha.franken.de, kaiyuanz@google.com, 
+	James.Bottomley@hansenpartnership.com, richard.henderson@linaro.org, 
+	arnd@arndb.de, almasrymina@google.com, asml.silence@gmail.com, 
+	linux-mips@vger.kernel.org, andreas@gaisler.com, mattst88@gmail.com, 
+	kerneljasonxing@gmail.com, sparclinux@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-arch@vger.kernel.org, deller@gmx.de, 
+	vadim.fedorenko@linux.dev, linux-parisc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-on 2024/12/18 8:57, linux@treblig.org wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+Jakub Kicinski <kuba@kernel.org> ezt =C3=ADrta (id=C5=91pont: 2024. dec. 17=
+., K, 3:20):
 >
-> hns_dsaf_roce_reset() has been unused since 2021's
-> commit 38d220882426 ("RDMA/hns: Remove support for HIP06")
+> On Fri, 13 Dec 2024 09:44:57 +0100 Anna Emese Nyiri wrote:
+> > Add new socket option, SO_RCVPRIORITY, to include SO_PRIORITY in the
+> > ancillary data returned by recvmsg().
+> > This is analogous to the existing support for SO_RCVMARK,
+> > as implemented in commit <6fd1d51cfa253>
+> > ("net: SO_RCVMARK socket option for SO_MARK with recvmsg()").
 >
-> Remove it.
->
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> ---
->   .../ethernet/hisilicon/hns/hns_dsaf_main.c    | 109 ------------------
->   .../ethernet/hisilicon/hns/hns_dsaf_main.h    |   2 -
->   2 files changed, 111 deletions(-)
->
-> diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.c b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.c
-> index 851490346261..6b6ced37e490 100644
-> --- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.c
-> +++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.c
-> @@ -3019,115 +3019,6 @@ static struct platform_driver g_dsaf_driver = {
->   
->   module_platform_driver(g_dsaf_driver);
->   
-> -/**
-> - * hns_dsaf_roce_reset - reset dsaf and roce
-> - * @dsaf_fwnode: Pointer to framework node for the dasf
-> - * @dereset: false - request reset , true - drop reset
-> - * return 0 - success , negative -fail
-> - */
-> -int hns_dsaf_roce_reset(struct fwnode_handle *dsaf_fwnode, bool dereset)
-> -{
-> -	struct dsaf_device *dsaf_dev;
-> -	struct platform_device *pdev;
-> -	u32 mp;
-> -	u32 sl;
-> -	u32 credit;
-> -	int i;
-> -	static const u32 port_map[DSAF_ROCE_CREDIT_CHN][DSAF_ROCE_CHAN_MODE_NUM] = {
-> -		{DSAF_ROCE_PORT_0, DSAF_ROCE_PORT_0, DSAF_ROCE_PORT_0},
+> Could you follow up with a test? The functionality is pretty
+> straightforward but it'd nonetheless be good to exercise it,
+> even if it's a trivial C program which sends a UDP packet to
+> itself over loopback?
 
-It would be better to delete these roce-related definitions together:
-DSAF_ROCE_PORT_1, DSAF_ROCE_SL_0,DSAF_ROCE_6PORT_MODE and so on
-
-Thanks,
-Jijie Shao
-
-> -		{DSAF_ROCE_PORT_1, DSAF_ROCE_PORT_0, DSAF_ROCE_PORT_0},
-> -		{DSAF_ROCE_PORT_2, DSAF_ROCE_PORT_1, DSAF_ROCE_PORT_0},
-> -		{DSAF_ROCE_PORT_3, DSAF_ROCE_PORT_1, DSAF_ROCE_PORT_0},
-> -		{DSAF_ROCE_PORT_4, DSAF_ROCE_PORT_2, DSAF_ROCE_PORT_1},
-> -		{DSAF_ROCE_PORT_4, DSAF_ROCE_PORT_2, DSAF_ROCE_PORT_1},
-> -		{DSAF_ROCE_PORT_5, DSAF_ROCE_PORT_3, DSAF_ROCE_PORT_1},
-> -		{DSAF_ROCE_PORT_5, DSAF_ROCE_PORT_3, DSAF_ROCE_PORT_1},
-> -	};
-> -	static const u32 sl_map[DSAF_ROCE_CREDIT_CHN][DSAF_ROCE_CHAN_MODE_NUM] = {
-> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_0, DSAF_ROCE_SL_0},
-> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_1, DSAF_ROCE_SL_1},
-> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_0, DSAF_ROCE_SL_2},
-> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_1, DSAF_ROCE_SL_3},
-> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_0, DSAF_ROCE_SL_0},
-> -		{DSAF_ROCE_SL_1, DSAF_ROCE_SL_1, DSAF_ROCE_SL_1},
-> -		{DSAF_ROCE_SL_0, DSAF_ROCE_SL_0, DSAF_ROCE_SL_2},
-> -		{DSAF_ROCE_SL_1, DSAF_ROCE_SL_1, DSAF_ROCE_SL_3},
-> -	};
-> -
-> -	/* find the platform device corresponding to fwnode */
-> -	if (is_of_node(dsaf_fwnode)) {
-> -		pdev = of_find_device_by_node(to_of_node(dsaf_fwnode));
-> -	} else if (is_acpi_device_node(dsaf_fwnode)) {
-> -		pdev = hns_dsaf_find_platform_device(dsaf_fwnode);
-> -	} else {
-> -		pr_err("fwnode is neither OF or ACPI type\n");
-> -		return -EINVAL;
-> -	}
-> -
-> -	/* check if we were a success in fetching pdev */
-> -	if (!pdev) {
-> -		pr_err("couldn't find platform device for node\n");
-> -		return -ENODEV;
-> -	}
-> -
-> -	/* retrieve the dsaf_device from the driver data */
-> -	dsaf_dev = dev_get_drvdata(&pdev->dev);
-> -	if (!dsaf_dev) {
-> -		dev_err(&pdev->dev, "dsaf_dev is NULL\n");
-> -		put_device(&pdev->dev);
-> -		return -ENODEV;
-> -	}
-> -
-> -	/* now, make sure we are running on compatible SoC */
-> -	if (AE_IS_VER1(dsaf_dev->dsaf_ver)) {
-> -		dev_err(dsaf_dev->dev, "%s v1 chip doesn't support RoCE!\n",
-> -			dsaf_dev->ae_dev.name);
-> -		put_device(&pdev->dev);
-> -		return -ENODEV;
-> -	}
-> -
-> -	/* do reset or de-reset according to the flag */
-> -	if (!dereset) {
-> -		/* reset rocee-channels in dsaf and rocee */
-> -		dsaf_dev->misc_op->hns_dsaf_srst_chns(dsaf_dev, DSAF_CHNS_MASK,
-> -						      false);
-> -		dsaf_dev->misc_op->hns_dsaf_roce_srst(dsaf_dev, false);
-> -	} else {
-> -		/* configure dsaf tx roce correspond to port map and sl map */
-> -		mp = dsaf_read_dev(dsaf_dev, DSAF_ROCE_PORT_MAP_REG);
-> -		for (i = 0; i < DSAF_ROCE_CREDIT_CHN; i++)
-> -			dsaf_set_field(mp, 7 << i * 3, i * 3,
-> -				       port_map[i][DSAF_ROCE_6PORT_MODE]);
-> -		dsaf_set_field(mp, 3 << i * 3, i * 3, 0);
-> -		dsaf_write_dev(dsaf_dev, DSAF_ROCE_PORT_MAP_REG, mp);
-> -
-> -		sl = dsaf_read_dev(dsaf_dev, DSAF_ROCE_SL_MAP_REG);
-> -		for (i = 0; i < DSAF_ROCE_CREDIT_CHN; i++)
-> -			dsaf_set_field(sl, 3 << i * 2, i * 2,
-> -				       sl_map[i][DSAF_ROCE_6PORT_MODE]);
-> -		dsaf_write_dev(dsaf_dev, DSAF_ROCE_SL_MAP_REG, sl);
-> -
-> -		/* de-reset rocee-channels in dsaf and rocee */
-> -		dsaf_dev->misc_op->hns_dsaf_srst_chns(dsaf_dev, DSAF_CHNS_MASK,
-> -						      true);
-> -		msleep(SRST_TIME_INTERVAL);
-> -		dsaf_dev->misc_op->hns_dsaf_roce_srst(dsaf_dev, true);
-> -
-> -		/* enable dsaf channel rocee credit */
-> -		credit = dsaf_read_dev(dsaf_dev, DSAF_SBM_ROCEE_CFG_REG_REG);
-> -		dsaf_set_bit(credit, DSAF_SBM_ROCEE_CFG_CRD_EN_B, 0);
-> -		dsaf_write_dev(dsaf_dev, DSAF_SBM_ROCEE_CFG_REG_REG, credit);
-> -
-> -		dsaf_set_bit(credit, DSAF_SBM_ROCEE_CFG_CRD_EN_B, 1);
-> -		dsaf_write_dev(dsaf_dev, DSAF_SBM_ROCEE_CFG_REG_REG, credit);
-> -	}
-> -
-> -	put_device(&pdev->dev);
-> -
-> -	return 0;
-> -}
-> -EXPORT_SYMBOL(hns_dsaf_roce_reset);
-> -
->   MODULE_LICENSE("GPL");
->   MODULE_AUTHOR("Huawei Tech. Co., Ltd.");
->   MODULE_DESCRIPTION("HNS DSAF driver");
-> diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.h b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.h
-> index 0eb03dff1a8b..c90f41c75500 100644
-> --- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.h
-> +++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_main.h
-> @@ -463,6 +463,4 @@ int hns_dsaf_clr_mac_mc_port(struct dsaf_device *dsaf_dev,
->   			     u8 mac_id, u8 port_num);
->   int hns_dsaf_wait_pkt_clean(struct dsaf_device *dsaf_dev, int port);
->   
-> -int hns_dsaf_roce_reset(struct fwnode_handle *dsaf_fwnode, bool dereset);
-> -
->   #endif /* __HNS_DSAF_MAIN_H__ */
+Sure, I will send the test after the Christmas holidays.
 
