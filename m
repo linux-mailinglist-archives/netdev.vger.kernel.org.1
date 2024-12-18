@@ -1,347 +1,241 @@
-Return-Path: <netdev+bounces-153061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898AB9F6B14
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:26:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D5FB9F6AFD
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:23:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB51C1654FF
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:26:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8F5E1897A8B
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51EC51F7077;
-	Wed, 18 Dec 2024 16:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72E91F03D6;
+	Wed, 18 Dec 2024 16:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="YAPLRVyt"
 X-Original-To: netdev@vger.kernel.org
-Received: from passt.top (passt.top [88.198.0.164])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11020101.outbound.protection.outlook.com [52.101.85.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615611F63E7
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.198.0.164
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734539194; cv=none; b=Andk0ksyOxDWxW8CE50ASuQtnxd9V2Qu5KLfDJXDHh2eptwsXSZDV8dfqEhjp0I0d8ybCbflJjuLXTwsFGwothsyPIHEVI6lwimDvJM8/CPq2pmXGO269LxiJXqvuNVqThduMurTnZuFla2sW7BS8J//znzeMCg+cB8xablgCbI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734539194; c=relaxed/simple;
-	bh=Tth1Gqg9rF77adZXka0FrE+DB/H31yyCsGEqseZJ4e0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mvaI8csCw4lJOZ9y8l6zlYdDhKZ1RsFnf2zyPwPkpEbIEYpihLavGCbGdqZv37fExoWqDMrZKiY8z0hqi5puYR/duHgzI17hMtAhro2AQYLx4G0AwpTF15bpoSJfp7iteiRjExfC5Gr4w1EV6ZQJUgtmIIX+P7qLu60NuCgfyNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=passt.top; arc=none smtp.client-ip=88.198.0.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=passt.top
-Received: by passt.top (Postfix, from userid 1000)
-	id ABAC45A0272; Wed, 18 Dec 2024 17:21:16 +0100 (CET)
-From: Stefano Brivio <sbrivio@redhat.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Mike Manning <mvrmanning@gmail.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Paul Holzinger <pholzing@redhat.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Cambda Zhu <cambda@linux.alibaba.com>,
-	Fred Chen <fred.cc@alibaba-inc.com>,
-	Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>,
-	Peter Oskolkov <posk@google.com>
-Subject: [PATCH net-next v2] udp: Deal with race between UDP socket address change and rehash
-Date: Wed, 18 Dec 2024 17:21:16 +0100
-Message-ID: <20241218162116.681734-1-sbrivio@redhat.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B99314AD0E;
+	Wed, 18 Dec 2024 16:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.101
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734538994; cv=fail; b=SC1XBqig7EEWpBZRR4zjHW03z1FYQ36I+MqYXIpDGLaJfH7dOAF69yDuEE9a+h2NlpoKWa7fMtkHoyDpoAw/wM+KUoeOi+mmNOQErCBUrI6ab6v5PJ/1xwHJs9hYMQ7tq/z75hwEo/oZexCctx3djLCmVDs+vR3Zb/S7wIneewI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734538994; c=relaxed/simple;
+	bh=bQyKJa2q3aapgwJE5tl373Lkb3BBVPp1TL0dq9+SB5k=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GbBDZ359Daj2LGv79t6Re0mnT1WrJ7SuzLeXMZbtXeWHFsswizG2xP4YknRx5zcIGxaXwYX5BnZv5hNxPmCRCDRI6Jz/UcfSlJySgVBiT+Q3TXKbHJPaD/jAtX/+DC2HpJGzrrE/MShTRMbKuM7GBu43IBSHc2GSuAbW8JGAjUI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=YAPLRVyt reason="key not found in DNS"; arc=fail smtp.client-ip=52.101.85.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vPQOhR6VOaya06miDatx7AdxBVWga0caRWlpNhE9xAsg1i5tRukjwKYagX5Ebu/A9LigwwHSTvq1Z92m3eGItPM2aFhXAvZJcm1VXmtohEyA27/D8DNc5oxGpVgmimG5jQF3puNKU84QRc0LBE5kkhjscHG4WemZO3HqtiMVYyTeG9jMlBLvPJizoG05bi1sFoJQm7ZkkkfqI/o+TuLgXUzPP/THTUDBkD0aV0EPrjTs7rBZcU6FGTeu76quWKDQ9ElhcR1KCof4kJQesI6GSWbrd0IeLC+v05v8zR/ePeorMNQLwbX+Ss+VmKdJAlMECZD94eLgscxsgQNPB/qtzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UaCHM49tYPJQMY2gY+oxhUg/fLvhGKJ9uncfEaDzdYI=;
+ b=Oh3jJXhB9lzQEy4lehtkdwQgUbt+bo6UnWI8q5p7t2K1FiQfNwAL1fRsVNetFc2PNWhBpThngZckhDPykzSrOsswC4LEQ3tIR8Gf25CAra0KTYg1jRWt06QrgVDcoV3TRtw8u5W78xBSkBHopcUvZy05b0aV5QeDBLkEBvOzBjRMfB3/9S5wP5+MCs/lBQCucKJ6F+hOOb4sp6S2B0WBgD/juczVLl3vd+4Nsm/05i3WwYd5oOBx8qJpVseHuxSp6ECNByfsQVp8w2Oj+Xuehc8T92jAN7yrG3V0ECxOi94wS3PbuLoQpjE1ovVfiVMIhMajAx16weG8XExWmcw88g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UaCHM49tYPJQMY2gY+oxhUg/fLvhGKJ9uncfEaDzdYI=;
+ b=YAPLRVyt37kWhrBIW4NV7uAKaFJjs8oUjBxJK7K24NG5jRwZaz+6tMf9InL8Xnw8NXzB7sX/UhUZI/iClOldQmu+d6BNXXs/05Aw/x92z8fWxTXxnoRvHegqg3CjAmYwy12eq1E/hlIVSdF7Gx6DVb5o1N7NvWD1GADubOHnMY0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
+ SJ0PR01MB7238.prod.exchangelabs.com (2603:10b6:a03:3f7::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8272.12; Wed, 18 Dec 2024 16:23:09 +0000
+Received: from SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d%6]) with mapi id 15.20.8272.005; Wed, 18 Dec 2024
+ 16:23:09 +0000
+Message-ID: <7bfb8a48-8a14-47cb-bd69-1d864535aeba@amperemail.onmicrosoft.com>
+Date: Wed, 18 Dec 2024 11:23:06 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 1/1] mctp pcc: Implement MCTP over PCC Transport
+To: Joe Damato <jdamato@fastly.com>, admiyo@os.amperecomputing.com,
+ Jeremy Kerr <jk@codeconstruct.com.au>,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Huisong Li <lihuisong@huawei.com>
+References: <20241217182528.108062-1-admiyo@os.amperecomputing.com>
+ <20241217182528.108062-2-admiyo@os.amperecomputing.com>
+ <Z2HLJD8z3wFNvnlV@LQ3V64L9R2>
+Content-Language: en-US
+From: Adam Young <admiyo@amperemail.onmicrosoft.com>
+In-Reply-To: <Z2HLJD8z3wFNvnlV@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CYXPR02CA0047.namprd02.prod.outlook.com
+ (2603:10b6:930:cc::14) To SA0PR01MB6171.prod.exchangelabs.com
+ (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|SJ0PR01MB7238:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a4ad253-64dc-4a09-7954-08dd1f8042e8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|10070799003|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?R3k1ZFZ2T0QvZWpNV2RqcDFXbEx5cFloWld0VzB5cDVtdWtLWTJWb3lmTjkr?=
+ =?utf-8?B?THhTcW5UQWRPSkk5VVF6NmJhYzdraHY2S3dLdGRZbkhCNkdaaXNBTmVvVjA4?=
+ =?utf-8?B?aXJQU1hiZHFCQWV2ZlRRNGRuSCtIRkxkVFZFQjA4QnRtZVhFVEtkWE1zejhX?=
+ =?utf-8?B?MDFqZXVyRzZ0VEZyeUp1U29PNnhjVEt4VnZ4QWNkME5wYm1OWDFiNFhmRFFQ?=
+ =?utf-8?B?aE0rRU8zTW1wZ1E1QXNoRThMUitrLzd4TE9QMkdGckRhSitIZER6U1lINCti?=
+ =?utf-8?B?SDIxTjNrakZpY2ZVZmFscWZ4eE45ODlsUU9COC9YV0NyYk1VSmRuUERUc2xX?=
+ =?utf-8?B?cGFSaWg2MWd5UlJ4OVdleUROQ2x1NFg2Z0hqYlBhUXVxVnN0dFpJOVQzR3JS?=
+ =?utf-8?B?UjNLSDlJeWpTUFRwMVErSkxwZWMxaS9VUFBaa041NW1FNW9IWk91c2dyVFdS?=
+ =?utf-8?B?anNndGRTalVkVjlHbnBQeENTaGdoaEx0dEllc3FscDR2U0RaNk53aFQxRkJ5?=
+ =?utf-8?B?MlpaOGF2T3A5L29OUko2ZjRGQ1Y2RGVoMHFmLzFpWVBTY0dWY01aSEk4RTFI?=
+ =?utf-8?B?eWs1VXFDNU8rTlNsdHdQVDk4cXdqWFBPbS9uelBvYXNKV0FxcDVMdzFUTlpP?=
+ =?utf-8?B?TGFXWkFxckJOeHlLbUp4dk4wRHg0TlZtbVJ6aTBPSkhhUCtKUEJ4cXFjOHZD?=
+ =?utf-8?B?M0FTVm95dE85SEkybEc5QzQyanY2STg0eXFGVEs0UUk3a3Y0bUgzTHhqTDRK?=
+ =?utf-8?B?b1VsaGJoV28vbXNjdHFzZXA5eXlIL3NjZjIzRm4rOENnazhwUnZOaHVXVWYv?=
+ =?utf-8?B?a1pEbUdSaW5VWklkaXh2U2xHblhQT0dhRW93aTZTQ3NQVVl4eDVKanNUTWQ5?=
+ =?utf-8?B?K2VQWmk2QmxnWVNQc0dkVW05RFVINER4bSt3a2owdm16c3RqY1BuVWxqVWhv?=
+ =?utf-8?B?ei9ZM3gybXFpdFMzTEoxWWg5b0diTWJxMVJPbGVWd1JBUEdUSjJsb2FlRlMr?=
+ =?utf-8?B?MzBOdEU3NVRTVDEzNXBnVDIyTWpYOUNGMVVqMmpLMVFXbGNnNHBjalhQUFAz?=
+ =?utf-8?B?TVlHVGtETm04QXRDZFJ5ZkFONUF6em9OMnc2UENoK1hWL0Yyamt6SXZqbDQw?=
+ =?utf-8?B?dUFVYkdnMUFDU0s5RUNNNFBGd0VKSGl2M2VjaEozRTRFMnM3clErcytDK1Ra?=
+ =?utf-8?B?akIybzVscjhLRGZKL0RZOC9NcTRxNXMvdEdVVHZ5Rno3YzF4d2NXcTlFWGcz?=
+ =?utf-8?B?YzByR2NTNWZiaGxWNEYzRldTOGNRVlpQRzJNaXhiZEhVN2k4ZzBaWU4weWVI?=
+ =?utf-8?B?cDZUV0o2SXRoc2NoNHora00vR0JzVG9mc0gzRmlVbS9qdFA2ajh1Q0tsdkV0?=
+ =?utf-8?B?dU04TkJqV0JXc0NaV1JVUUpQc0JSdFFRT3ZQbUlPNWxJS3lSdzhaRGhrUXo5?=
+ =?utf-8?B?RE5uMjkzN3VabWhXQUxsbmR2RDNldWpoN0x2eVdyOEtJWU95Ykd0ejNMbkhB?=
+ =?utf-8?B?RG1hUkw3L0c3M01JWlA2b293WHNwb2ZDMVd2dkpycFd3TFd5ZHk1SFZQK3Vx?=
+ =?utf-8?B?a1ZLa01MNElZWmxBSHJ6K0piRlZNd2NLbW5RMzYyVkhOUmQ1WHZoT0c2MDQ5?=
+ =?utf-8?B?bG91L1VEbUo4RVUwV3FrL0RBaTZwNnkzK25reHZnUU93dm50Ym5RekpOYWhD?=
+ =?utf-8?B?cjFSYnlFc0xVL1NpSW1zbjh0L21INFdOLzcyQ1YyR3JtbUR6MHJYRDhYYnIr?=
+ =?utf-8?B?VlRQQ3lPZk4vcm1mMmk4c2gwOW1lYlFkMkRWNlA4aHlCdUFkT3BXVHFuZ0Vj?=
+ =?utf-8?B?L0hnMHNOWEZyaHVySVZUOTRjbVJ3cUdkcWtadFNlWDUrRTZWWEVVa3k0b1J6?=
+ =?utf-8?B?OEF4ZmZxOXFJbDBiMGdvdmV4UHBsVlcralZkbG9GN1JhRm5sOTJwZnBDdngv?=
+ =?utf-8?Q?eTY3tMycsAU=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(10070799003)(1800799024)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aG9SQWJVbUNPRDNBWXJZTWJXdDN2QnNVVnpHYjN0TDVaTUlFS3VBaU9HLzYw?=
+ =?utf-8?B?cDRYRVBReWl6S2RjeDlKQ1ZkL1JibTdFZ01vbGZLQWgwTUZUU01MZEc5TGZl?=
+ =?utf-8?B?MnhKb0RPVTVFU1BQZXlBVUlrM0N2cTdJSmpjS241aWE3RjdrVjFBa1lKRUpW?=
+ =?utf-8?B?MHIvdTdCTzFnbUdGaWdLQ3FOZGhyZ1JtNEF1NFJvRnV6YXVWdCtUdGJwdDlL?=
+ =?utf-8?B?WGtRN1EwR2pDK2ZGUGZaOWhEMGYyMWo2ZHh0VXRvUTlKT3NiMU5SV3kvY1k5?=
+ =?utf-8?B?UUJLNkViVjZPQWxQYjRTZnhIYVJRQ3dxekx4bG5xV3QxT1pxbDFvRjNENkNq?=
+ =?utf-8?B?NzcwWHYyQ1Y1cGVHZ0pKMTJMVE0wd0RZcCs4OFZVd01lVFBTWmRLeFdVeGZV?=
+ =?utf-8?B?TmVOeHIzNmR1QldYaUFxZ29KN216VVZibHM1d0hjSW54TXcyclY2ZENaWjlG?=
+ =?utf-8?B?eVFwcy9CeUphZzVIV1E1cXk2SDZoc2dqWDFvZTc5RVh6UC9uVWN2ZGlLVXhU?=
+ =?utf-8?B?SWE3QzNpd0xCdXNoREpGUU50YVk3MTdJMGFVeGF0VFU0bjZyZDJpWVhDaTJT?=
+ =?utf-8?B?SE5Za0tvYkZBa1BxQWViNEw0cE9pbUt4dWdpQ1Nmakg5dkFURmpmT29TakF2?=
+ =?utf-8?B?Ly9UQ1I2aXhsTHNRZ0N5aDNOTmlpYWFmc2lBelNnUjIrRDkzWVVrdVhLZ2lx?=
+ =?utf-8?B?aE9hdmQ1eDAwSG1vc0VKdmwwTDhsZWt2OG4xYm5DZHhuYU51TTE2bnh4ODJ2?=
+ =?utf-8?B?YU9uMlRaRmdsNmFIZGZxWlJDa250Z25Cd1M1WllMR29QQ3FpcWhIcExTYjRT?=
+ =?utf-8?B?T0Q1S1ZjTEtxSlZ5VmNGZEFERm9sa1VRNm95Zk1pSG92S2haRGFNNVloQi9i?=
+ =?utf-8?B?SmVLSEhEbFFLZnNHWEkvRlkwVE81b2g4SThQUmhSa01XVlJiQVRNMFZhb28y?=
+ =?utf-8?B?Kys4QkdpRWRPSk9zZHRXekgySkkrR3pMek9hOEh5TFlJWjIvT2VnOS9sWTF1?=
+ =?utf-8?B?V1JNamNJMjJaUmVzZ0Z4QnR3VENIZG1oN0tWOFovS0ZyNnRpblEyMjZGODRL?=
+ =?utf-8?B?SXQwUG9ZblRQMlZ5YUw3bzRpOEQ4SWx1aXpUdEpFYjNKWlZoNE1lWlRsWWhx?=
+ =?utf-8?B?anptdDUyYTRVclRJemFDd0NOYkY5MVpTbU1wbUorc1R4UVk3VXpRQlFiWUpZ?=
+ =?utf-8?B?cjFURDl4TnhEbWlocXNHVTBJN0xPd3ZOblorZmJNTS9SWG1CNGZXTmRNZjBP?=
+ =?utf-8?B?eUpYZEVydDhUWitENGRGVm1wenU4YnVBWlUwbHp5VWlVM3c5S2szVXJlWVhW?=
+ =?utf-8?B?d3BEVmQ4bFYwejRqb0xHRFZPSG5BYlVIVlMrU2QvZkRueVgzM1JqMnpjeWRN?=
+ =?utf-8?B?TWNPK1RxbTVZelArQTFJaENmNXgyRmdvY0JBeW84bTRWOXVYSkJ2YzNTS1Bv?=
+ =?utf-8?B?aTBXOXVEV2NOMHBOREpReFM2Q3FnZXVyYTcxUFExMjhQYmh5U0tWZzdlaExx?=
+ =?utf-8?B?T05VV0NtaHNmdGVEbGdvQ2RUT2JFSkVBWEc0cURlaFRMMEwrSldlUGRydFdr?=
+ =?utf-8?B?VWhsckhRazlpclRnZlBRQkpUa1QxUGJ4VDRUTCsxM1h4YUZubkx0S2J3UGtP?=
+ =?utf-8?B?STR0SndtYitiREVvU3lrMDdCQmNxS3ZXakxzd1VWalpzSGJlSUo0S2JTdzZS?=
+ =?utf-8?B?QmROcDYwbWNObSttL1hPeGI3RW55NlE0aXhKTkVWczEyVUh6R1htc2VNaWJR?=
+ =?utf-8?B?L3hQMjFsMG4zLzhIUC9uK3E2Z2lGMEpBK1JxaXlydkVCUGx1OGhVZjRIYTRW?=
+ =?utf-8?B?aWlpVFR0SmJrb2RITWhxZ2pncndyNUVDUHc4YzBZUlA0MUtKSzN0Ky9mYnpH?=
+ =?utf-8?B?ZHFIOTNOMVJTZnVFTEVieTJudVlOTlBnR1d4M0p6NDA4ZkxXejZZby9yWEk5?=
+ =?utf-8?B?QzVXYUV4T0VqbnJRVk1pZ2JLL3V3NVZBbDRjTVJVVTR6TXBCM0VSYStFWjR5?=
+ =?utf-8?B?NCtlSElNZS95THNWK3hDN2FFTDdzZFdSZ1RuaWRSRU9BcEhaTHJ6aVQ5MERF?=
+ =?utf-8?B?dzFhdUswbGgvRC9Db0VTK1pGVzdUalBpZG5JYzRhMUVUcG43ZXp4SGk0ZmRz?=
+ =?utf-8?B?dUJqNDJ5MTUxaTN4WFM4Q3NBQVR2Y1NrTGdFdVZFZ2pBVGZPWlpsR0VRSm5D?=
+ =?utf-8?B?dzgxR3JxYjBMa3FVWU5IR2EyNWszeWZOZWJMMlRWcTFWaEQ0cVZ4WlA5UGRQ?=
+ =?utf-8?Q?FEeeyBWrVN2a3Y6+w3oEyUfqovskxT7fZgM8IfRpm0=3D?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a4ad253-64dc-4a09-7954-08dd1f8042e8
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2024 16:23:09.6683
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NmkT+I6928m4QJ9bQxDgXwOQU+KIAtdriLcC01Ojzy6erMIKH2i70oxDJYT1eoSjfkCdshIANhRbkVK/VoDIevIT1M2DOtqOHbpk8s1xk7MhwSCDwIa4KWz/m7kNW+UU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB7238
 
-If a UDP socket changes its local address while it's receiving
-datagrams, as a result of connect(), there is a period during which
-a lookup operation might fail to find it, after the address is changed
-but before the secondary hash (port and address) and the four-tuple
-hash (local and remote ports and addresses) are updated.
 
-Secondary hash chains were introduced by commit 30fff9231fad ("udp:
-bind() optimisation") and, as a result, a rehash operation became
-needed to make a bound socket reachable again after a connect().
+On 12/17/24 14:04, Joe Damato wrote:
+>> +static void mctp_pcc_client_rx_callback(struct mbox_client *c, void *buffer)
+>> +{
+>> +	struct mctp_pcc_ndev *mctp_pcc_ndev;
+>> +	struct mctp_pcc_hdr mctp_pcc_hdr;
+>> +	struct pcpu_dstats *dstats;
+>> +	struct mctp_skb_cb *cb;
+>> +	struct sk_buff *skb;
+>> +	void *skb_buf;
+>> +	u32 data_len;
+>> +
+>> +	mctp_pcc_ndev = container_of(c, struct mctp_pcc_ndev, inbox.client);
+>> +	memcpy_fromio(&mctp_pcc_hdr, mctp_pcc_ndev->inbox.chan->shmem,
+>> +		      sizeof(struct mctp_pcc_hdr));
+>> +	data_len = mctp_pcc_hdr.length + MCTP_HEADER_LENGTH;
+>> +	skb = netdev_alloc_skb(mctp_pcc_ndev->mdev.dev, data_len);
+>> +
+>> +	dstats = this_cpu_ptr(mctp_pcc_ndev->mdev.dev->dstats);
+>> +	u64_stats_update_begin(&dstats->syncp);
+>> +	if (data_len > mctp_pcc_ndev->mdev.dev->mtu) {
+>> +		u64_stats_inc(&dstats->rx_drops);
+>> +		u64_stats_inc(&dstats->rx_drops);
+> Double counting rx_drops ?
 
-This operation was introduced by commit 719f835853a9 ("udp: add
-rehash on connect()") which isn't however a complete fix: the
-socket will be found once the rehashing completes, but not while
-it's pending.
+Oops.  Yes I was.  Thanks.
 
-This is noticeable with a socat(1) server in UDP4-LISTEN mode, and a
-client sending datagrams to it. After the server receives the first
-datagram (cf. _xioopen_ipdgram_listen()), it issues a connect() to
-the address of the sender, in order to set up a directed flow.
+>
+>> +		u64_stats_update_end(&dstats->syncp);
+>> +		return;
+>> +	}
+>> +	if (!skb) {
+>> +		u64_stats_inc(&dstats->rx_drops);
+>> +		u64_stats_update_end(&dstats->syncp);
+>> +		return;
+>> +	}
+>> +	u64_stats_inc(&dstats->rx_packets);
+>> +	u64_stats_add(&dstats->rx_bytes, data_len);
+>> +	u64_stats_update_end(&dstats->syncp);
+> I suspect what Jeremy meant (but please feel free to correct me if
+> I'm mistaken, Jeremy) was that you may want to use the helpers in:
+>
+> include/linux/netdevice.h
+>
+> e.g.
+>
+>    dev_dstats_rx_add(mctp_pcc_ndev->mdev.dev, data_len);
+>    dev_dstats_rx_dropped(mctp_pcc_ndev->mdev.dev);
+>
+> etc.
 
-Now, if the client, running on a different CPU thread, happens to
-send a (subsequent) datagram while the server's socket changes its
-address, but is not rehashed yet, this will result in a failed
-lookup and a port unreachable error delivered to the client, as
-apparent from the following reproducer:
+I don't see those function calls in the 6.13-rc3 tree I am working 
+with.  Are they coming later?
 
-  LEN=$(($(cat /proc/sys/net/core/wmem_default) / 4))
-  dd if=/dev/urandom bs=1 count=${LEN} of=tmp.in
-
-  while :; do
-  	taskset -c 1 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc &
-  	sleep 0.1 || sleep 1
-  	taskset -c 2 socat OPEN:tmp.in UDP4:localhost:1337,shut-null
-  	wait
-  done
-
-where the client will eventually get ECONNREFUSED on a write()
-(typically the second or third one of a given iteration):
-
-  2024/11/13 21:28:23 socat[46901] E write(6, 0x556db2e3c000, 8192): Connection refused
-
-This issue was first observed as a seldom failure in Podman's tests
-checking UDP functionality while using pasta(1) to connect the
-container's network namespace, which leads us to a reproducer with
-the lookup error resulting in an ICMP packet on a tap device:
-
-  LOCAL_ADDR="$(ip -j -4 addr show|jq -rM '.[] | .addr_info[0] | select(.scope == "global").local')"
-
-  while :; do
-  	./pasta --config-net -p pasta.pcap -u 1337 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc &
-  	sleep 0.2 || sleep 1
-  	socat OPEN:tmp.in UDP4:${LOCAL_ADDR}:1337,shut-null
-  	wait
-  	cmp tmp.in tmp.out
-  done
-
-Once this fails:
-
-  tmp.in tmp.out differ: char 8193, line 29
-
-we can finally have a look at what's going on:
-
-  $ tshark -r pasta.pcap
-      1   0.000000           :: ? ff02::16     ICMPv6 110 Multicast Listener Report Message v2
-      2   0.168690 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-      3   0.168767 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-      4   0.168806 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-      5   0.168827 c6:47:05:8d:dc:04 ? Broadcast    ARP 42 Who has 88.198.0.161? Tell 88.198.0.164
-      6   0.168851 9a:55:9a:55:9a:55 ? c6:47:05:8d:dc:04 ARP 42 88.198.0.161 is at 9a:55:9a:55:9a:55
-      7   0.168875 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-      8   0.168896 88.198.0.164 ? 88.198.0.161 ICMP 590 Destination unreachable (Port unreachable)
-      9   0.168926 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-     10   0.168959 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-     11   0.168989 88.198.0.161 ? 88.198.0.164 UDP 4138 60260 ? 1337 Len=4096
-     12   0.169010 88.198.0.161 ? 88.198.0.164 UDP 42 60260 ? 1337 Len=0
-
-On the third datagram received, the network namespace of the container
-initiates an ARP lookup to deliver the ICMP message.
-
-In another variant of this reproducer, starting the client with:
-
-  strace -f pasta --config-net -u 1337 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc 2>strace.log &
-
-and connecting to the socat server using a loopback address:
-
-  socat OPEN:tmp.in UDP4:localhost:1337,shut-null
-
-we can more clearly observe a sendmmsg() call failing after the
-first datagram is delivered:
-
-  [pid 278012] connect(173, 0x7fff96c95fc0, 16) = 0
-  [...]
-  [pid 278012] recvmmsg(173, 0x7fff96c96020, 1024, MSG_DONTWAIT, NULL) = -1 EAGAIN (Resource temporarily unavailable)
-  [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) = 1
-  [...]
-  [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) = -1 ECONNREFUSED (Connection refused)
-
-and, somewhat confusingly, after a connect() on the same socket
-succeeded.
-
-Until commit 4cdeeee9252a ("net: udp: prefer listeners bound to an
-address"), the race between receive address change and lookup didn't
-actually cause visible issues, because, once the lookup based on the
-secondary hash chain failed, we would still attempt a lookup based on
-the primary hash (destination port only), and find the socket with the
-outdated secondary hash.
-
-That change, however, dropped port-only lookups altogether, as side
-effect, making the race visible.
-
-To fix this, while avoiding the need to make address changes and
-rehash atomic against lookups, reintroduce primary hash lookups as
-fallback, if lookups based on four-tuple and secondary hashes fail.
-
-To this end, introduce a simplified lookup implementation, which
-doesn't take care of SO_REUSEPORT groups: if we have one, there are
-multiple sockets that would match the four-tuple or secondary hash,
-meaning that we can't run into this race at all.
-
-v2:
-  - instead of synchronising lookup operations against address change
-    plus rehash, reintroduce a simplified version of the original
-    primary hash lookup as fallback
-
-v1:
-  - fix build with CONFIG_IPV6=n: add ifdef around sk_v6_rcv_saddr
-    usage (Kuniyuki Iwashima)
-  - directly use sk_rcv_saddr for IPv4 receive addresses instead of
-    fetching inet_rcv_saddr (Kuniyuki Iwashima)
-  - move inet_update_saddr() to inet_hashtables.h and use that
-    to set IPv4/IPv6 addresses as suitable (Kuniyuki Iwashima)
-  - rebase onto net-next, update commit message accordingly
-
-Reported-by: Ed Santiago <santiago@redhat.com>
-Link: https://github.com/containers/podman/issues/24147
-Analysed-by: David Gibson <david@gibson.dropbear.id.au>
-Fixes: 30fff9231fad ("udp: bind() optimisation")
-Signed-off-by: Stefano Brivio <sbrivio@redhat.com>
----
- net/ipv4/udp.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
- net/ipv6/udp.c | 50 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 106 insertions(+)
-
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index e8953e88efef..4bc0a0686fcd 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -420,6 +420,49 @@ u32 udp_ehashfn(const struct net *net, const __be32 laddr, const __u16 lport,
- }
- EXPORT_SYMBOL(udp_ehashfn);
- 
-+/**
-+ * udp4_lib_lookup1() - Simplified lookup using primary hash (destination port)
-+ * @net:	Network namespace
-+ * @saddr:	Source address, network order
-+ * @sport:	Source port, network order
-+ * @daddr:	Destination address, network order
-+ * @hnum:	Destination port, host order
-+ * @dif:	Destination interface index
-+ * @sdif:	Destination bridge port index, if relevant
-+ * @udptable:	Set of UDP hash tables
-+ *
-+ * Simplified lookup to be used as fallback if no sockets are found due to a
-+ * potential race between (receive) address change, and lookup happening before
-+ * the rehash operation. This function ignores SO_REUSEPORT groups while scoring
-+ * result sockets, because if we have one, we don't need the fallback at all.
-+ *
-+ * Called under rcu_read_lock().
-+ *
-+ * Return: socket with highest matching score if any, NULL if none
-+ */
-+static struct sock *udp4_lib_lookup1(const struct net *net,
-+				     __be32 saddr, __be16 sport,
-+				     __be32 daddr, unsigned int hnum,
-+				     int dif, int sdif,
-+				     const struct udp_table *udptable)
-+{
-+	unsigned int slot = udp_hashfn(net, hnum, udptable->mask);
-+	struct udp_hslot *hslot = &udptable->hash[slot];
-+	struct sock *sk, *result = NULL;
-+	int score, badness = 0;
-+
-+	sk_for_each_rcu(sk, &hslot->head) {
-+		score = compute_score(sk, net,
-+				      saddr, sport, daddr, hnum, dif, sdif);
-+		if (score > badness) {
-+			result = sk;
-+			badness = score;
-+		}
-+	}
-+
-+	return result;
-+}
-+
- /* called with rcu_read_lock() */
- static struct sock *udp4_lib_lookup2(const struct net *net,
- 				     __be32 saddr, __be16 sport,
-@@ -683,6 +726,19 @@ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
- 	result = udp4_lib_lookup2(net, saddr, sport,
- 				  htonl(INADDR_ANY), hnum, dif, sdif,
- 				  hslot2, skb);
-+	if (!IS_ERR_OR_NULL(result))
-+		goto done;
-+
-+	/* Primary hash (destination port) lookup as fallback for this race:
-+	 *   1. __ip4_datagram_connect() sets sk_rcv_saddr
-+	 *   2. lookup (this function): new sk_rcv_saddr, hashes not updated yet
-+	 *   3. rehash operation updating _secondary and four-tuple_ hashes
-+	 * The primary hash doesn't need an update after 1., so, thanks to this
-+	 * further step, 1. and 3. don't need to be atomic against the lookup.
-+	 */
-+	result = udp4_lib_lookup1(net, saddr, sport, daddr, hnum, dif, sdif,
-+				  udptable);
-+
- done:
- 	if (IS_ERR(result))
- 		return NULL;
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 7c14c449804c..6671daa67f4f 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -170,6 +170,49 @@ static int compute_score(struct sock *sk, const struct net *net,
- 	return score;
- }
- 
-+/**
-+ * udp6_lib_lookup1() - Simplified lookup using primary hash (destination port)
-+ * @net:	Network namespace
-+ * @saddr:	Source address, network order
-+ * @sport:	Source port, network order
-+ * @daddr:	Destination address, network order
-+ * @hnum:	Destination port, host order
-+ * @dif:	Destination interface index
-+ * @sdif:	Destination bridge port index, if relevant
-+ * @udptable:	Set of UDP hash tables
-+ *
-+ * Simplified lookup to be used as fallback if no sockets are found due to a
-+ * potential race between (receive) address change, and lookup happening before
-+ * the rehash operation. This function ignores SO_REUSEPORT groups while scoring
-+ * result sockets, because if we have one, we don't need the fallback at all.
-+ *
-+ * Called under rcu_read_lock().
-+ *
-+ * Return: socket with highest matching score if any, NULL if none
-+ */
-+static struct sock *udp6_lib_lookup1(const struct net *net,
-+				     const struct in6_addr *saddr, __be16 sport,
-+				     const struct in6_addr *daddr,
-+				     unsigned int hnum, int dif, int sdif,
-+				     const struct udp_table *udptable)
-+{
-+	unsigned int slot = udp_hashfn(net, hnum, udptable->mask);
-+	struct udp_hslot *hslot = &udptable->hash[slot];
-+	struct sock *sk, *result = NULL;
-+	int score, badness = 0;
-+
-+	sk_for_each_rcu(sk, &hslot->head) {
-+		score = compute_score(sk, net,
-+				      saddr, sport, daddr, hnum, dif, sdif);
-+		if (score > badness) {
-+			result = sk;
-+			badness = score;
-+		}
-+	}
-+
-+	return result;
-+}
-+
- /* called with rcu_read_lock() */
- static struct sock *udp6_lib_lookup2(const struct net *net,
- 		const struct in6_addr *saddr, __be16 sport,
-@@ -347,6 +390,13 @@ struct sock *__udp6_lib_lookup(const struct net *net,
- 	result = udp6_lib_lookup2(net, saddr, sport,
- 				  &in6addr_any, hnum, dif, sdif,
- 				  hslot2, skb);
-+	if (!IS_ERR_OR_NULL(result))
-+		goto done;
-+
-+	/* Cover address change/lookup/rehash race: see __udp4_lib_lookup() */
-+	result = udp6_lib_lookup1(net, saddr, sport, daddr, hnum, dif, sdif,
-+				  udptable);
-+
- done:
- 	if (IS_ERR(result))
- 		return NULL;
--- 
-2.40.1
 
 
