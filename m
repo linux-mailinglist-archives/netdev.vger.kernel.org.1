@@ -1,93 +1,92 @@
-Return-Path: <netdev+bounces-153148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F21C09F710B
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 00:42:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6853A9F7115
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 00:43:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06432161A23
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 23:42:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CA6E16206A
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 23:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793631FDE03;
-	Wed, 18 Dec 2024 23:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMB95StF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917AF1FDE33;
+	Wed, 18 Dec 2024 23:41:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2947E19CCEC;
-	Wed, 18 Dec 2024 23:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E081FCFF4;
+	Wed, 18 Dec 2024 23:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734565081; cv=none; b=I4mObAh5Uz/8WJHj4fjezexar8bkfSG4/kZoQ+f0y0L/MUpbsLoBnAKBL853s4VsCm5SgpVGeFewh36EbxNTcUuQE6U1DUb7tB9OXlyNtKpuDs5zW+IaQryuy7SXUS1dN3HpuiN7qPEilzqFJGcef71bpu8+ofCFhceOVm3XJog=
+	t=1734565312; cv=none; b=AC49P4uBux0XhaLmk1Ro/fVXLi7v1gPi2XYoVNWxiDXSUahC8IwjuBlNy2RVBt88JjxUeGuapoCePywRmJmyDivFbeZs05jcTghWYwpRvPUreeQw2d0OHPitTmK0NYu1Dzj128LabBsGDDkdFTmFxXbMA+NnfxYfQCqlVLrDvbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734565081; c=relaxed/simple;
-	bh=TE9MeQggFrUNHk7GnpsPc1qOO621qZHYt6YKXQvYGUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uUFcnQ9HasVvhYRx6bQG2VCh7AJ68uSHy46mgS2LED2hmIDRPkWAPwVaNSwabrwBXmtSU+Qqqou6Rg17Nu7bet9yj1m2Qy1qc0VAkmUVavJN578pEdKt6/4cp4yk1Fsjo890fdj230dO6+dCzD6bI57uKadixfKK0u624IgY7rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMB95StF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9872C4CECD;
-	Wed, 18 Dec 2024 23:37:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734565080;
-	bh=TE9MeQggFrUNHk7GnpsPc1qOO621qZHYt6YKXQvYGUs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SMB95StF87lMswBTmoy5w+GFfz3iCmebU4gbeFCJK7sk9+I16C9cplpIYLf0W9Qul
-	 QxmbLpIR7/E6R0kf5eKkyEYZx8mBxxIidhrnHdr7M4IeFwaA3J5y2wWv4oQmfmxORv
-	 D1j6lmCsAMuKx+jWknHgUh8GEb58788JfHfg1N+UuccR+d6b8ALbB6vzMOTnfrbNpk
-	 nrbFqHQ3vUtoVAGtl14Lhqr/MD+oEcAwxAPHEo6k2fp/JS6ZLbq87qH4FknN0j6i1c
-	 yDKA9jZ2UNpUbRlqHX4gnIrK03GFSOZ91dNOO2mqCDLBVJi/w2/4kNnX7grOmVIZvb
-	 15jS4zu2mRPLw==
-Date: Wed, 18 Dec 2024 15:37:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xiao Liang <shaw.leon@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Kuniyuki
- Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Ido
- Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
- Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
- <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
- linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
- osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
- linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
- linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
- bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 11/11] selftests: net: Add test cases for
- link and peer netns
-Message-ID: <20241218153759.672b7014@kernel.org>
-In-Reply-To: <20241218130909.2173-12-shaw.leon@gmail.com>
-References: <20241218130909.2173-1-shaw.leon@gmail.com>
-	<20241218130909.2173-12-shaw.leon@gmail.com>
+	s=arc-20240116; t=1734565312; c=relaxed/simple;
+	bh=uMSG5ER061vR6o17OJ5d/JzFjjqUwmyqr69/UYhN8E8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cqT6D7JLLCX2rfiTqje+YidGLiLp6bO/hplK82Q54kXe0R3hM24PH6z4/O3EMg7ycP4R37xJQX6EuZOa2OHenSAcYkno05QDpEdHHemuqm/Iw9upKUUGYLf+yd7XzEBBgQBLgnJpLjLZpabg9FlzKbK9k91xm8vMcSxEF/nK9qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net 0/2] Netfilter/IPVS fixes for net
+Date: Thu, 19 Dec 2024 00:41:35 +0100
+Message-Id: <20241218234137.1687288-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 18 Dec 2024 21:09:09 +0800 Xiao Liang wrote:
->  - Add test for creating link in another netns when a link of the same
->    name and ifindex exists in current netns.
->  - Add test to verify that link is created in target netns directly -
->    no link new/del events should be generated in link netns or current
->    netns.
->  - Add test cases to verify that link-netns is set as expected for
->    various drivers and combination of namespace-related parameters.
+Hi,
 
-Nice work!
+The following series contains two fixes for Netfilter/IPVS:
 
-You need to make sure all the drivers the test is using are enabled by
-the selftest kernel config: tools/testing/selftests/net/config
+1) Possible build failure in IPVS on systems with less than 512MB
+   memory due to incorrect use of clamp(), from David Laight.
 
-This may be helpful:
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style#how-to-build
--- 
-pw-bot: cr
+2) Fix bogus lockdep nesting splat with ipset list:set type,
+   from Phil Sutter.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-12-19
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 954a2b40719a21e763a1bba2f0da92347e058fce:
+
+  rtnetlink: Try the outer netns attribute in rtnl_get_peer_net(). (2024-12-17 17:54:18 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-12-19
+
+for you to fetch changes up to 70b6f46a4ed8bd56c85ffff22df91e20e8c85e33:
+
+  netfilter: ipset: Fix for recursive locking warning (2024-12-19 00:28:47 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-12-19
+
+----------------------------------------------------------------
+David Laight (1):
+      ipvs: Fix clamp() of ip_vs_conn_tab on small memory systems
+
+Phil Sutter (1):
+      netfilter: ipset: Fix for recursive locking warning
+
+ net/netfilter/ipset/ip_set_list_set.c | 3 +++
+ net/netfilter/ipvs/ip_vs_conn.c       | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
