@@ -1,81 +1,64 @@
-Return-Path: <netdev+bounces-153127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E4A9F6EC8
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 21:17:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03CF19F6ECD
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 21:20:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BF38169BF3
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 20:17:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 559EC169FAC
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 20:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2BB1FBEAC;
-	Wed, 18 Dec 2024 20:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9CB158536;
+	Wed, 18 Dec 2024 20:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NMAtgjRI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="trMGkvTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4E8158531
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 20:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CC4157E82;
+	Wed, 18 Dec 2024 20:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734553049; cv=none; b=L2h6O0W9BBucEbdUw9K5XScAQstcLDFy8sj5BV7c+RVXIKI0LBbLk8u3WUJ5WyrvbZ8det+HcrIcjBxEIAVqx0+a1AzOriisaNBZURQr3qnmTeQooacf/z5gr2t6pbLCZ7Olk886xqOBDvLLTs6C7bOP7TtpLoKg6FHLcDgXaAg=
+	t=1734553198; cv=none; b=TPyVHrzGBMW0GTprrdBzUiPf5MkPhGWA9HtwXhG/TNnuIbSFCUnf00qsD6sMldvjGNHcKsAACYtivmpkzBUnOrSydkjwiccNpbvtwBQhmL7j7TOCOqeDoVT0kBhOzzsYxo529OE+UyHK+I6QGr7pFIfiSjf4x44XUnXGALq6mUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734553049; c=relaxed/simple;
-	bh=os0R3YlpxIFAksdVVec1bCoWOcHEzdEMzQbQ26/Eoq0=;
+	s=arc-20240116; t=1734553198; c=relaxed/simple;
+	bh=jWzGBd0BKEuiLmx+uld7GcpzYovijF/kf5TEFJf1oco=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YkyYCMqWjLIYgdp3Lyt/IS6gXooJpRzulfEAw3TzP+4OMdIJZSjwFJVCAfhzpq/9v8RHqtDMEgCkzGu8zYLNGDlRUyMoi6k3MNIbescBoMh0ZfoXy/ZGbbtWw94wYLIDn96suND4fVeori8tElPXB8WsxzJiaA7r0IoxhB/3F5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NMAtgjRI; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734553048; x=1766089048;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=os0R3YlpxIFAksdVVec1bCoWOcHEzdEMzQbQ26/Eoq0=;
-  b=NMAtgjRIk3VowIGonxV54r/hQkb+RNJZs9Txd7xTKb3QP42W5V/nnusq
-   5/yuazA43QXPgiIF0tEmrYm2SGNqYhkOiTKvCek+/G9LO5++/jNU3HBaO
-   a1OkjREjaKLcXA/kthnJXMTvmwMPMoem0uD1oT3Ly2ADQB+ek8MnwsMlw
-   A8O2yCmxefC1R8EoX8vJEjJinAO1WzzWYnMWj/3oZ0MJHyuppx4CWc2SR
-   kHvMTtASxkw/XslSomfx7gV/uELJjGjWlZqkOSvPES99mcxRQTUzyQXAv
-   GL7bbt7q7NQw8kl82zuy+fErn1J5Ag/p6G+Vs37TgEAGGcnbfaf/l6+pL
-   Q==;
-X-CSE-ConnectionGUID: SVLY1A5eROGNs7THuJoiQg==
-X-CSE-MsgGUID: 8Z0uAnZkQiKIIoAi2VYoGA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="34328591"
-X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
-   d="scan'208";a="34328591"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 12:17:27 -0800
-X-CSE-ConnectionGUID: +N1nUnjfSUaj9gak7/gslw==
-X-CSE-MsgGUID: AYwPWfvYQXGIUcs7FwgBdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="98783251"
-Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 18 Dec 2024 12:17:24 -0800
-Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tO0Tx-000Gbu-0e;
-	Wed, 18 Dec 2024 20:17:21 +0000
-Date: Thu, 19 Dec 2024 04:16:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, michael.chan@broadcom.com, tariqt@nvidia.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	jdamato@fastly.com, shayd@nvidia.com, akpm@linux-foundation.org,
-	Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next v2 4/8] net: napi: add CPU
- affinity to napi->config
-Message-ID: <202412190421.N2xtn20H-lkp@intel.com>
-References: <20241218165843.744647-5-ahmed.zaki@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ACmlhjm1ZmaC0hiJf28Pzm0L9myK2vzMZbavARB+NZ/pRqkukye1w5Uf57hR6TzYYydwYaxZaWaUd5lOMt0UpATT7qtvxu5vjYx+fdhKCC/6JA0329QD7wh5UzgON26QO5PfRuKVT9/0rzQj+t3aHPkTQxyqCxWGF52gQeW+Cx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=trMGkvTx; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=lV+4t7X5XKoe8b6mNRsLV4cReA6+ap4h4QaHMnaKT1A=; b=trMGkvTxbYY4nkzXbB7P62JFCV
+	dzafWnoG5u1caSJAehj5BcoWPlhJOG6a0T3b4aAKMx+YvHOKwM8/LWdx3t/sNCbBMqUe6e9z5jwoz
+	VN8tvE+hOM7DlLHK1g8AA2Kz1UctROPQXjj5Blq7Lu1NrcEBbEVe/fzvwZhGOAJtQXNA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tO0WJ-001O1x-1E; Wed, 18 Dec 2024 21:19:47 +0100
+Date: Wed, 18 Dec 2024 21:19:47 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: dp83822: Add support for PHY LEDs on
+ DP83822
+Message-ID: <4f40c476-565f-4f74-8cab-7250045fdd90@lunn.ch>
+References: <20241217-dp83822-leds-v1-1-800b24461013@gmail.com>
+ <1a7513fd-c78f-47de-94d7-757c83e9b94c@lunn.ch>
+ <20241218085400.GA779107@debian>
+ <c63316ac-696d-4ca9-8169-109ed1739f2a@lunn.ch>
+ <20241218181752.GA792287@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,63 +67,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241218165843.744647-5-ahmed.zaki@intel.com>
+In-Reply-To: <20241218181752.GA792287@debian>
 
-Hi Ahmed,
+On Wed, Dec 18, 2024 at 07:17:52PM +0100, Dimitri Fedrau wrote:
+> Am Wed, Dec 18, 2024 at 06:16:20PM +0100 schrieb Andrew Lunn:
+> > > By the way. Wouldn't it be helpful adding a u32 max_leds to
+> > > struct phy_driver ? Every driver supporting PHY LEDs validates index at the
+> > > moment. With max_leds it should be easy to check it in of_phy_leds and
+> > > return with an error if index is not valid.
+> > 
+> > I have been considering it. However, so far developers have been good
+> > at adding the checks, because the first driver had the checks, cargo
+> > cult at its best.
+> > 
+> > If we are going to add it, we should do it early, before there are too
+> > many PHY drivers which need updating.
+> >
+> Another solution without breaking others driver would be to add a
+> callback in struct phy_driver:
 
-kernel test robot noticed the following build warnings:
+Adding the maximum number of LEDs to struct phy_driver will not break
+anything. But we would want to remove all the tests for the index
+value from the drivers, since they become pointless. That will be
+easier to do when there are less drivers which need editing.
 
-[auto build test WARNING on net-next/main]
+> int (*led_validate_index)(struct phy_device *dev, int index)
+> It should be called in of_phy_led right after reading in reg property:
+> if (phydev->drv->led_validate_index)
+> 	ret = phydev->drv->led_validate_index(phydev, index);
+> 
+> This would solve another isssue I have. The LED pins of the DP83822 can
+> be multiplexed. Not all of them have per default a LED function. So I
+> need to set them up. In dp83822_of_init_leds I iterate over all DT nodes
+> in leds to get the information which of the pins should output LED
+> function. Using the callback would eleminate the need for copying code of
+> functions of_phy_leds and of_phy_led.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ahmed-Zaki/net-napi-add-irq_flags-to-napi-struct/20241219-010125
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241218165843.744647-5-ahmed.zaki%40intel.com
-patch subject: [Intel-wired-lan] [PATCH net-next v2 4/8] net: napi: add CPU affinity to napi->config
-config: arm-randconfig-001-20241219 (https://download.01.org/0day-ci/archive/20241219/202412190421.N2xtn20H-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241219/202412190421.N2xtn20H-lkp@intel.com/reproduce)
+Your hardware is pretty unique. It might be best to keep it in the
+driver, until there is a second driver which needs the same. I also
+think you need the complete configuration in order to validate it, not
+each LED one by one, which your led_validate_index() would provide.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412190421.N2xtn20H-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   net/core/dev.c:6716:6: warning: unused variable 'rc' [-Wunused-variable]
-    6716 |         int rc;
-         |             ^~
-   net/core/dev.c:6746:7: warning: unused variable 'rc' [-Wunused-variable]
-    6746 |         int  rc;
-         |              ^~
->> net/core/dev.c:6766:7: warning: variable 'glue_created' is uninitialized when used here [-Wuninitialized]
-    6766 |         if (!glue_created && flags & NAPIF_IRQ_AFFINITY) {
-         |              ^~~~~~~~~~~~
-   net/core/dev.c:6745:19: note: initialize the variable 'glue_created' to silence this warning
-    6745 |         bool glue_created;
-         |                          ^
-         |                           = 0
-   3 warnings generated.
-
-
-vim +/glue_created +6766 net/core/dev.c
-
-  6765	
-> 6766		if (!glue_created && flags & NAPIF_IRQ_AFFINITY) {
-  6767			glue = kzalloc(sizeof(*glue), GFP_KERNEL);
-  6768			if (!glue)
-  6769				return;
-  6770			glue->notify.notify = netif_irq_cpu_rmap_notify;
-  6771			glue->notify.release = netif_napi_affinity_release;
-  6772			glue->data = napi;
-  6773			glue->rmap = NULL;
-  6774			napi->irq_flags |= NAPIF_IRQ_NORMAP;
-  6775		}
-  6776	}
-  6777	EXPORT_SYMBOL(netif_napi_set_irq);
-  6778	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+	Andrew
 
