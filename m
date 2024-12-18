@@ -1,248 +1,170 @@
-Return-Path: <netdev+bounces-152962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C0189F6720
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:21:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A8F79F6728
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:22:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEC39172553
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:19:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33775173712
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273281D47BB;
-	Wed, 18 Dec 2024 13:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4CE1B0423;
+	Wed, 18 Dec 2024 13:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TL+EgFzB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PTLEgIzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574141B040F
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DB41AA1DC
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734527603; cv=none; b=F2NxKt6ppLuBtUhGEbzFizLPqNTEqmaWVEHLphHIOb3SZF2dJvregyLbbPSJGdWgh1l1TCNay5o2Ou5IXEx/1BSiHUXjtxQzBrJD2jJw00sIVR+O/1sy3perLZUL3FO1V1AIMCb436hK+GrysUVglwFCe+DVePMnMbjKzjiJdJ8=
+	t=1734527844; cv=none; b=svV6r///Y1bJTZ66qvyo3WaFHyeNQFzpQAAZGktXo34fZMjPZMyFXXTYAdsDcVLRjYQg1FaViSYKQ3rNPwDFlgWm3JId/1LE788JF+gO/Lj5kcDmmgPsOKh96BtogYOnnpfmmbTZM7BUXhzLRdYyCpLO2mOLg7PJxHHHy3niVFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734527603; c=relaxed/simple;
-	bh=hftdpT7DLDmaJUgdz0/ePQIjLk9sglWZvxDwFvXzhRY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ewwxIdkO6f4WsM+2c+DqILb0UDcucu+S8LYB7QLJBW46/j+UEw1g/gmi/kQOeTtwoRWaRsLpxUUTaZvunaC6+JUUiAGflNCNFYhnAlr5VdaWcvuGHv8Gue/w4NoE5ijsYYd8Io9XtVSnX8hIH6pJ6W5UtgmswYnzWufLBPAIgvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TL+EgFzB; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734527601; x=1766063601;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hftdpT7DLDmaJUgdz0/ePQIjLk9sglWZvxDwFvXzhRY=;
-  b=TL+EgFzBEoMzj6Wc53d98wIEpeyylDA5OjEA5/QJazVptfl7Nx38u9lc
-   azKGm44+NXlAsNMIYyvEbENyqPCIyetty4/FVMmotZTqwWEwG2EPEL6TU
-   LiIcA35VF+yZJ0VDpigTv5GJJXTkOTOgITLQGXMoUvi3/90Hoei0CHGOU
-   mjlf74hujrxF05UlscoxXq6WEL6YHomKVbgqjxVyCrM06DGs/Pd4WIALi
-   ETLN6M48NNd+aGZA7Q94heedJcAbqtqTTrQcgL7hRlrSA5UcPkBorLRs4
-   uofRkqWcQ8558yoCCFIAk22Pxc0SZCPudR4giojoXm6ezwqyi2cas4lj8
-   w==;
-X-CSE-ConnectionGUID: wUSU+kluRMaAix03sIRwBg==
-X-CSE-MsgGUID: GzvX9mjEQMCVW5Ihtnsrkg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="22589667"
-X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
-   d="scan'208";a="22589667"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 05:13:21 -0800
-X-CSE-ConnectionGUID: uO3jy1/ZRQKq6xHapq/iDw==
-X-CSE-MsgGUID: vjerWv2kR4mKRZsxLBiHfg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="102471164"
-Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.245.118.127])
-  by fmviesa005.fm.intel.com with ESMTP; 18 Dec 2024 05:13:19 -0800
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH iwl-next v3 2/2] ixgbevf: Add support for Intel(R) E610 device
-Date: Wed, 18 Dec 2024 14:12:38 +0100
-Message-ID: <20241218131238.5968-3-piotr.kwapulinski@intel.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241218131238.5968-1-piotr.kwapulinski@intel.com>
-References: <20241218131238.5968-1-piotr.kwapulinski@intel.com>
+	s=arc-20240116; t=1734527844; c=relaxed/simple;
+	bh=Q76oatco7cuC6zFeFCUmQl1afYbdN6l6V/M8gR1GIKM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=IdPVnhSM+Hg54wZzIVmEPCPpjLAVYY49E6QmseNT+V7uXhJ7DbgSDPMeMcjUFYRaWMuY5FindhSO9ccfr+LeiDsZqIe3Gzqhg6tgC5+FtvdWzaKBDg946oIAD2vycwUFvB8qL7v92Pb4off2d6pU9bQytqieqwgyAQqZUFrOp9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PTLEgIzI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734527841;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=ivizjjN4Lz+lPIVERr0pY0koraWnQhz5/NfNltazcUE=;
+	b=PTLEgIzIi2Uu7vOP3DnIRf+8ZLAJLeXNeaoudOy8O0Zj6n77BsKXS21UT8kOVT/00CI+uD
+	dH3XCZEVw5oAGJl/OIejvQhGmUOari5MKtvfWVWZKcJQUYx0HS4bXzanqnpyLUbEBuvDPj
+	lBinPQmOsqWmGPuRIQdBgzlV6Mbk/kE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-230-TCkHECi2N-eIZUSpu4J43Q-1; Wed, 18 Dec 2024 08:17:20 -0500
+X-MC-Unique: TCkHECi2N-eIZUSpu4J43Q-1
+X-Mimecast-MFC-AGG-ID: TCkHECi2N-eIZUSpu4J43Q
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436328fcfeeso39668895e9.1
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 05:17:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734527839; x=1735132639;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ivizjjN4Lz+lPIVERr0pY0koraWnQhz5/NfNltazcUE=;
+        b=kUmsSlYdeEOStkKpOam3xzBWGxgwKhmqRpDYonr/nP2WmK0fy0KJfGkXjgZmSCg0SK
+         NmASGuVZfJYis9BPNFkQLqdHOA7rtK2g6dPustzicDWfLMegeWgYCGptyRjN5X8i3bQK
+         DFplTkzLB01SeX0PYg0MZva1/2Ng6SOXlKJ81HVLRJBo64tEOmJNpYkD81ZzUzCpxkSx
+         SukuH78nbfI+kRDYRCsaTVmTck1Enien7Ah82d6Vlos+8KnKR8+Al9nKkweJ++bZPZqY
+         5uJaNZ5gpetJFrgszVaqnXuDSsQKPikkgtiXA5fuReB1nZTy9mgVBiZ75BzFkZNN7wDA
+         CwQQ==
+X-Gm-Message-State: AOJu0YwefJ21b0SeJEebojqOllKb8pdg3zx0brXhpKXVpTgV1dfpz2Xc
+	qvWuLnTIy5BXKs4oP90kr8fzOe+NnU80GSYyC/O4CEojphDYBa2/OJsc38cnzlpkhpPHlvuqPYS
+	smHKlKADREIRjeaQ+aXx8YAXLYQtBypuFk/pNiRtYeyZ30+eqXiGkAQ==
+X-Gm-Gg: ASbGnctv8S2mGm2RP0MZ/OQSwWkW+8SBrGD8ieo98uIAPCfImVbGe8b2t+IQWdypitI
+	uOh0dRlGg5YKuHgbfYtZWl6jdJL+kt/kH4oa08QN0Bj8M2Z/C11pcKioRKUp852cFfbi1Ibs4Aq
+	udcZb7UViEROAGQWWjYBjCwfkCw3d4fU0ix0gbZxahDdui4aVtACtQSU290pMFs2z+s0v2YVXP5
+	BJpXQAmhrgxvQBm4VV3ZOhqAHCbuxjONmHe6NaSHvHLW3/3UymN0pRdBB716zO+BTkAqKTLomzN
+	E5duG6T529vpPq60GOpQVK+k48w4zax1gAk=
+X-Received: by 2002:a05:6000:4021:b0:385:e034:8d47 with SMTP id ffacd0b85a97d-388e4d8fbf5mr2740117f8f.46.1734527839061;
+        Wed, 18 Dec 2024 05:17:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEvBpmcBo3TITTCFmMhATnpRhsPDmG1fosLYohVybXcWLFmAn5TPMQsrwnOWEfnbmjJUXdZ5Q==
+X-Received: by 2002:a05:6000:4021:b0:385:e034:8d47 with SMTP id ffacd0b85a97d-388e4d8fbf5mr2740093f8f.46.1734527838648;
+        Wed, 18 Dec 2024 05:17:18 -0800 (PST)
+Received: from debian (2a01cb058d23d6000ef26855a45fab6e.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:ef2:6855:a45f:ab6e])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c806055bsm13855624f8f.92.2024.12.18.05.17.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2024 05:17:18 -0800 (PST)
+Date: Wed, 18 Dec 2024 14:17:16 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next] gre: Drop ip_route_output_gre().
+Message-ID: <ab7cba47b8558cd4bfe2dc843c38b622a95ee48e.1734527729.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Add support for Intel(R) E610 Series of network devices. The E610
-is based on X550 but adds firmware managed link, enhanced security
-capabilities and support for updated server manageability
+We already have enough variants of ip_route_output*() functions. We
+don't need a GRE specific one in the generic route.h header file.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Furthermore, ip_route_output_gre() is only used once, in ipgre_open(),
+where it can be easily replaced by a simple call to
+ip_route_output_key().
+
+While there, and for clarity, explicitly set .flowi4_scope to
+RT_SCOPE_UNIVERSE instead of relying on the implicit zero
+initialisation.
+
+Signed-off-by: Guillaume Nault <gnault@redhat.com>
 ---
- drivers/net/ethernet/intel/ixgbevf/defines.h      |  5 ++++-
- drivers/net/ethernet/intel/ixgbevf/ixgbevf.h      |  6 +++++-
- drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 12 ++++++++++--
- drivers/net/ethernet/intel/ixgbevf/vf.c           | 12 +++++++++++-
- drivers/net/ethernet/intel/ixgbevf/vf.h           |  4 +++-
- 5 files changed, 33 insertions(+), 6 deletions(-)
+ include/net/route.h | 14 --------------
+ net/ipv4/ip_gre.c   | 17 ++++++++++-------
+ 2 files changed, 10 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/defines.h b/drivers/net/ethernet/intel/ixgbevf/defines.h
-index 5f08779..a9bc96f 100644
---- a/drivers/net/ethernet/intel/ixgbevf/defines.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/defines.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
+diff --git a/include/net/route.h b/include/net/route.h
+index 84cb1e04f5cd..6947a155d501 100644
+--- a/include/net/route.h
++++ b/include/net/route.h
+@@ -185,20 +185,6 @@ static inline struct rtable *ip_route_output_ports(struct net *net, struct flowi
+ 	return ip_route_output_flow(net, fl4, sk);
+ }
  
- #ifndef _IXGBEVF_DEFINES_H_
- #define _IXGBEVF_DEFINES_H_
-@@ -16,6 +16,9 @@
- #define IXGBE_DEV_ID_X550_VF_HV		0x1564
- #define IXGBE_DEV_ID_X550EM_X_VF_HV	0x15A9
+-static inline struct rtable *ip_route_output_gre(struct net *net, struct flowi4 *fl4,
+-						 __be32 daddr, __be32 saddr,
+-						 __be32 gre_key, __u8 tos, int oif)
+-{
+-	memset(fl4, 0, sizeof(*fl4));
+-	fl4->flowi4_oif = oif;
+-	fl4->daddr = daddr;
+-	fl4->saddr = saddr;
+-	fl4->flowi4_tos = tos;
+-	fl4->flowi4_proto = IPPROTO_GRE;
+-	fl4->fl4_gre_key = gre_key;
+-	return ip_route_output_key(net, fl4);
+-}
+-
+ enum skb_drop_reason
+ ip_mc_validate_source(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+ 		      dscp_t dscp, struct net_device *dev,
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index f1f31ebfc793..a020342f618d 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -924,15 +924,18 @@ static int ipgre_open(struct net_device *dev)
+ 	struct ip_tunnel *t = netdev_priv(dev);
  
-+#define IXGBE_DEV_ID_E610_VF		0x57AD
-+#define IXGBE_SUBDEV_ID_E610_VF_HV	0x00FF
-+
- #define IXGBE_VF_IRQ_CLEAR_MASK		7
- #define IXGBE_VF_MAX_TX_QUEUES		8
- #define IXGBE_VF_MAX_RX_QUEUES		8
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-index 130cb86..9b37f35 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
+ 	if (ipv4_is_multicast(t->parms.iph.daddr)) {
+-		struct flowi4 fl4;
++		struct flowi4 fl4 = {
++			.flowi4_oif = t->parms.link,
++			.flowi4_tos = t->parms.iph.tos & INET_DSCP_MASK,
++			.flowi4_scope = RT_SCOPE_UNIVERSE,
++			.flowi4_proto = IPPROTO_GRE,
++			.saddr = t->parms.iph.saddr,
++			.daddr = t->parms.iph.daddr,
++			.fl4_gre_key = t->parms.o_key,
++		};
+ 		struct rtable *rt;
  
- #ifndef _IXGBEVF_H_
- #define _IXGBEVF_H_
-@@ -418,6 +418,8 @@ enum ixgbevf_boards {
- 	board_X550EM_x_vf,
- 	board_X550EM_x_vf_hv,
- 	board_x550em_a_vf,
-+	board_e610_vf,
-+	board_e610_vf_hv,
- };
- 
- enum ixgbevf_xcast_modes {
-@@ -434,11 +436,13 @@ extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_info;
- extern const struct ixgbe_mbx_operations ixgbevf_mbx_ops;
- extern const struct ixgbe_mbx_operations ixgbevf_mbx_ops_legacy;
- extern const struct ixgbevf_info ixgbevf_x550em_a_vf_info;
-+extern const struct ixgbevf_info ixgbevf_e610_vf_info;
- 
- extern const struct ixgbevf_info ixgbevf_82599_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X540_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X550_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_hv_info;
-+extern const struct ixgbevf_info ixgbevf_e610_vf_hv_info;
- extern const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops;
- 
- /* needed by ethtool.c */
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index 149911e..2829bac 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
- 
- /******************************************************************************
-  Copyright (c)2006 - 2007 Myricom, Inc. for some LRO specific code
-@@ -39,7 +39,7 @@ static const char ixgbevf_driver_string[] =
- 	"Intel(R) 10 Gigabit PCI Express Virtual Function Network Driver";
- 
- static char ixgbevf_copyright[] =
--	"Copyright (c) 2009 - 2018 Intel Corporation.";
-+	"Copyright (c) 2009 - 2024 Intel Corporation.";
- 
- static const struct ixgbevf_info *ixgbevf_info_tbl[] = {
- 	[board_82599_vf]	= &ixgbevf_82599_vf_info,
-@@ -51,6 +51,8 @@ static const struct ixgbevf_info *ixgbevf_info_tbl[] = {
- 	[board_X550EM_x_vf]	= &ixgbevf_X550EM_x_vf_info,
- 	[board_X550EM_x_vf_hv]	= &ixgbevf_X550EM_x_vf_hv_info,
- 	[board_x550em_a_vf]	= &ixgbevf_x550em_a_vf_info,
-+	[board_e610_vf]         = &ixgbevf_e610_vf_info,
-+	[board_e610_vf_hv]      = &ixgbevf_e610_vf_hv_info,
- };
- 
- /* ixgbevf_pci_tbl - PCI Device ID Table
-@@ -71,6 +73,9 @@ static const struct pci_device_id ixgbevf_pci_tbl[] = {
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_X_VF), board_X550EM_x_vf },
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_X_VF_HV), board_X550EM_x_vf_hv},
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_A_VF), board_x550em_a_vf },
-+	{PCI_VDEVICE_SUB(INTEL, IXGBE_DEV_ID_E610_VF, PCI_ANY_ID,
-+			 IXGBE_SUBDEV_ID_E610_VF_HV), board_e610_vf_hv},
-+	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_E610_VF), board_e610_vf},
- 	/* required last entry */
- 	{0, }
- };
-@@ -4693,6 +4698,9 @@ static int ixgbevf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	case ixgbe_mac_X540_vf:
- 		dev_info(&pdev->dev, "Intel(R) X540 Virtual Function\n");
- 		break;
-+	case ixgbe_mac_e610_vf:
-+		dev_info(&pdev->dev, "Intel(R) E610 Virtual Function\n");
-+		break;
- 	case ixgbe_mac_82599_vf:
- 	default:
- 		dev_info(&pdev->dev, "Intel(R) 82599 Virtual Function\n");
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
-index 1641d00..da7a72e 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
- 
- #include "vf.h"
- #include "ixgbevf.h"
-@@ -1076,3 +1076,13 @@ const struct ixgbevf_info ixgbevf_x550em_a_vf_info = {
- 	.mac = ixgbe_mac_x550em_a_vf,
- 	.mac_ops = &ixgbevf_mac_ops,
- };
-+
-+const struct ixgbevf_info ixgbevf_e610_vf_info = {
-+	.mac                    = ixgbe_mac_e610_vf,
-+	.mac_ops                = &ixgbevf_mac_ops,
-+};
-+
-+const struct ixgbevf_info ixgbevf_e610_vf_hv_info = {
-+	.mac            = ixgbe_mac_e610_vf,
-+	.mac_ops        = &ixgbevf_hv_mac_ops,
-+};
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.h b/drivers/net/ethernet/intel/ixgbevf/vf.h
-index b4eef5b..2d791bc 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
- 
- #ifndef __IXGBE_VF_H__
- #define __IXGBE_VF_H__
-@@ -54,6 +54,8 @@ enum ixgbe_mac_type {
- 	ixgbe_mac_X550_vf,
- 	ixgbe_mac_X550EM_x_vf,
- 	ixgbe_mac_x550em_a_vf,
-+	ixgbe_mac_e610,
-+	ixgbe_mac_e610_vf,
- 	ixgbe_num_macs
- };
- 
+-		rt = ip_route_output_gre(t->net, &fl4,
+-					 t->parms.iph.daddr,
+-					 t->parms.iph.saddr,
+-					 t->parms.o_key,
+-					 t->parms.iph.tos & INET_DSCP_MASK,
+-					 t->parms.link);
++		rt = ip_route_output_key(t->net, &fl4);
+ 		if (IS_ERR(rt))
+ 			return -EADDRNOTAVAIL;
+ 		dev = rt->dst.dev;
 -- 
-2.43.0
+2.39.2
 
 
