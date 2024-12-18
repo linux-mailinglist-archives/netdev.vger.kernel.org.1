@@ -1,103 +1,146 @@
-Return-Path: <netdev+bounces-153125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0194D9F6EA1
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 20:58:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E4A9F6EC8
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 21:17:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2D1E188D75C
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 19:58:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BF38169BF3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 20:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6270B1FA826;
-	Wed, 18 Dec 2024 19:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2BB1FBEAC;
+	Wed, 18 Dec 2024 20:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mD8ts/MU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NMAtgjRI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3849C157E82;
-	Wed, 18 Dec 2024 19:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4E8158531
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 20:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734551932; cv=none; b=KQ85BYm1OxoHJS3WmuikrAGd/EUpxu5FmWZ+i2hftDZiklgK3KIqnCZNcr4cKASdeMLrzIeyYtDIVHtNofVlQFj5sLQKN4CTi00I67dY5OEfI9za/PE6tLvw5v7A1ivJWI0hmFY9CkwGpJ86XS8SsvbbhxPQ34rmYKOwjkD36Dk=
+	t=1734553049; cv=none; b=L2h6O0W9BBucEbdUw9K5XScAQstcLDFy8sj5BV7c+RVXIKI0LBbLk8u3WUJ5WyrvbZ8det+HcrIcjBxEIAVqx0+a1AzOriisaNBZURQr3qnmTeQooacf/z5gr2t6pbLCZ7Olk886xqOBDvLLTs6C7bOP7TtpLoKg6FHLcDgXaAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734551932; c=relaxed/simple;
-	bh=64TEifuWzCtLWZ9wQ/LM35+YWk8+89ojp68myyOQLB8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ECxipq8wjpVSi07L/RISIETjKgeOo3F9rz+ZcjWT3cPIpZtdZSwvKbttRjvYLp5BR0YEXh7j1MSPteQSMw7vvbueENKpQ8f2o2gAo++GSADRJ0SlaRe7cSMz1pHsdRZAmDPHSFjnULPc99GcivEK5eOznumikhW8GvYX6tSR+tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mD8ts/MU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 404BDC4CECD;
-	Wed, 18 Dec 2024 19:58:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734551931;
-	bh=64TEifuWzCtLWZ9wQ/LM35+YWk8+89ojp68myyOQLB8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mD8ts/MUKkYSzgN1rFvqQg+ow8GLBGzyr8Up6+/rBr/WCXhHbdxeh6YY9dpGTFoGh
-	 J8OscPGLSpJDHWNbDlguHoa7BICahuHI3bd24KnfgmBwVn0KIFlhFMZrtJX+EWAFtW
-	 nkbJoTcyoEiCp88CmV/orzz96MQSplFHxo3Qs0/MVFK+q8SuCKDCxTN4vW1hsZTE6N
-	 FZsWH9zNgrJrFVx1WJtdpx5vlbJCqaGZmyA+ke3QDIPsYpZMWcpdJvGmOojWQTlCIQ
-	 SVE98XkYddg1CRfgZqiB/fwQA08SjysVf3E5vt7E2dHVpuezM2edtsmAZ64c10sSGE
-	 ccGV9Gid0/YqA==
-Date: Wed, 18 Dec 2024 11:58:50 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, davem@davemloft.net,
- edumazet@google.com, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, tmgross@umich.edu, aliceryhl@google.com,
- boqun.feng@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- benno.lossin@proton.me, a.hindborg@kernel.org, ojeda@kernel.org,
- alex.gaynor@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] rust: net::phy fix module autoloading
-Message-ID: <20241218115850.22cba4bc@kernel.org>
-In-Reply-To: <da411dfa-3dac-4205-85f5-b99bc35f3333@redhat.com>
-References: <20241212130015.238863-1-fujita.tomonori@gmail.com>
-	<778db676-9719-4139-a9e3-8b64ffa87fd2@redhat.com>
-	<20241217065439.25e383fe@kernel.org>
-	<b701482d-760a-437b-b3fb-915dc3fc2296@redhat.com>
-	<20241217074400.13c21e22@kernel.org>
-	<20241217085124.761566e6@kernel.org>
-	<da411dfa-3dac-4205-85f5-b99bc35f3333@redhat.com>
+	s=arc-20240116; t=1734553049; c=relaxed/simple;
+	bh=os0R3YlpxIFAksdVVec1bCoWOcHEzdEMzQbQ26/Eoq0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YkyYCMqWjLIYgdp3Lyt/IS6gXooJpRzulfEAw3TzP+4OMdIJZSjwFJVCAfhzpq/9v8RHqtDMEgCkzGu8zYLNGDlRUyMoi6k3MNIbescBoMh0ZfoXy/ZGbbtWw94wYLIDn96suND4fVeori8tElPXB8WsxzJiaA7r0IoxhB/3F5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NMAtgjRI; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734553048; x=1766089048;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=os0R3YlpxIFAksdVVec1bCoWOcHEzdEMzQbQ26/Eoq0=;
+  b=NMAtgjRIk3VowIGonxV54r/hQkb+RNJZs9Txd7xTKb3QP42W5V/nnusq
+   5/yuazA43QXPgiIF0tEmrYm2SGNqYhkOiTKvCek+/G9LO5++/jNU3HBaO
+   a1OkjREjaKLcXA/kthnJXMTvmwMPMoem0uD1oT3Ly2ADQB+ek8MnwsMlw
+   A8O2yCmxefC1R8EoX8vJEjJinAO1WzzWYnMWj/3oZ0MJHyuppx4CWc2SR
+   kHvMTtASxkw/XslSomfx7gV/uELJjGjWlZqkOSvPES99mcxRQTUzyQXAv
+   GL7bbt7q7NQw8kl82zuy+fErn1J5Ag/p6G+Vs37TgEAGGcnbfaf/l6+pL
+   Q==;
+X-CSE-ConnectionGUID: SVLY1A5eROGNs7THuJoiQg==
+X-CSE-MsgGUID: 8Z0uAnZkQiKIIoAi2VYoGA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="34328591"
+X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
+   d="scan'208";a="34328591"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 12:17:27 -0800
+X-CSE-ConnectionGUID: +N1nUnjfSUaj9gak7/gslw==
+X-CSE-MsgGUID: AYwPWfvYQXGIUcs7FwgBdw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="98783251"
+Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 18 Dec 2024 12:17:24 -0800
+Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tO0Tx-000Gbu-0e;
+	Wed, 18 Dec 2024 20:17:21 +0000
+Date: Thu, 19 Dec 2024 04:16:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, michael.chan@broadcom.com, tariqt@nvidia.com,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	jdamato@fastly.com, shayd@nvidia.com, akpm@linux-foundation.org,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v2 4/8] net: napi: add CPU
+ affinity to napi->config
+Message-ID: <202412190421.N2xtn20H-lkp@intel.com>
+References: <20241218165843.744647-5-ahmed.zaki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241218165843.744647-5-ahmed.zaki@intel.com>
 
-On Wed, 18 Dec 2024 11:04:25 +0100 Paolo Abeni wrote:
-> >> I think I figured it out, you must have old clang. On Fedora 41
-> >> CFI_CLANG defaults to y and prevents RUST from getting enabled.  
-> > 
-> > Still hitting a problem in module signing. 
-> > Rust folks does this ring a bell?
-> > 
-> > make[4]: *** Deleting file 'certs/signing_key.pem'
-> >   GENKEY  certs/signing_key.pem
-> > ....+.........+++++
-> > -----
-> > 80728E46C07F0000:error:03000098:digital envelope routines:do_sigver_init:invalid digest:crypto/evp/m_sigver.c:342:
-> > make[4]: *** [../certs/Makefile:53: certs/signing_key.pem] Error 1
-> > make[4]: *** Waiting for unfinished jobs....
-> > 
-> > allmodconfig without Rust builds fine with both GCC and clang.  
-> 
-> FTR, I got a similar error (even without RUST) when I had
-> 
-> CONFIG_MODULE_SIG_HASH="sha1"
-> 
-> I moved to
-> 
-> CONFIG_MODULE_SIG_HASH="sha256"
-> 
-> since a while, and that fixed the issue for me (also
-> CONFIG_MODULE_SIG_SHA256=y is needed).
+Hi Ahmed,
 
-Oh, some form of forced SHA1 deprecation in Fedora 41 possibly?
-I switched to sha256 and that fixes the issue. We'll find out
-if Rust is really fixed next time a Rust patch comes :)
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ahmed-Zaki/net-napi-add-irq_flags-to-napi-struct/20241219-010125
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241218165843.744647-5-ahmed.zaki%40intel.com
+patch subject: [Intel-wired-lan] [PATCH net-next v2 4/8] net: napi: add CPU affinity to napi->config
+config: arm-randconfig-001-20241219 (https://download.01.org/0day-ci/archive/20241219/202412190421.N2xtn20H-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241219/202412190421.N2xtn20H-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412190421.N2xtn20H-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/core/dev.c:6716:6: warning: unused variable 'rc' [-Wunused-variable]
+    6716 |         int rc;
+         |             ^~
+   net/core/dev.c:6746:7: warning: unused variable 'rc' [-Wunused-variable]
+    6746 |         int  rc;
+         |              ^~
+>> net/core/dev.c:6766:7: warning: variable 'glue_created' is uninitialized when used here [-Wuninitialized]
+    6766 |         if (!glue_created && flags & NAPIF_IRQ_AFFINITY) {
+         |              ^~~~~~~~~~~~
+   net/core/dev.c:6745:19: note: initialize the variable 'glue_created' to silence this warning
+    6745 |         bool glue_created;
+         |                          ^
+         |                           = 0
+   3 warnings generated.
+
+
+vim +/glue_created +6766 net/core/dev.c
+
+  6765	
+> 6766		if (!glue_created && flags & NAPIF_IRQ_AFFINITY) {
+  6767			glue = kzalloc(sizeof(*glue), GFP_KERNEL);
+  6768			if (!glue)
+  6769				return;
+  6770			glue->notify.notify = netif_irq_cpu_rmap_notify;
+  6771			glue->notify.release = netif_napi_affinity_release;
+  6772			glue->data = napi;
+  6773			glue->rmap = NULL;
+  6774			napi->irq_flags |= NAPIF_IRQ_NORMAP;
+  6775		}
+  6776	}
+  6777	EXPORT_SYMBOL(netif_napi_set_irq);
+  6778	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
