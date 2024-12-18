@@ -1,93 +1,97 @@
-Return-Path: <netdev+bounces-153023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2DF59F69AF
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:13:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C7E99F699E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:11:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BD5818836EB
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:11:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C87AC1665C9
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4CE1D5AAC;
-	Wed, 18 Dec 2024 15:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758701DF27F;
+	Wed, 18 Dec 2024 15:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZDlepW7R"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NVlIt+q4"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2064.outbound.protection.outlook.com [40.107.237.64])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2058.outbound.protection.outlook.com [40.107.237.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2097B1D5CD1
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 15:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AC21D45FC
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 15:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734534656; cv=fail; b=r5wwjK899WTg5LyoVQQTx1nSlKIgBiYPOGBpj7S1aPAzZpiPivLjw8+jCdyizDWk5NdwBqlEmudoDSX18fGMXEUADR3zlzzP+x0tVaGWegzZLERVpJw/n8rXBu6R3HHaW0wyLIFTE10ifOlSW8M1KqwRZHax5lxYRDQTVaGdPGI=
+	t=1734534667; cv=fail; b=eDds76ODa4biXqvVnu1ajvoldeH7CVgVxYXw52Nnpu5dR2An3IXQ1vrGOp/l+qxJWwC1bnxtR5+rPMrBdv9msdbF5rfBkN7kBR2IfeXWLbaM2Cl541gIvLPr4Kf08f2Wgk3vUHzvk1l7vxxTDVlwDY7WC5L1YH/NwYS/xKPVGBk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734534656; c=relaxed/simple;
-	bh=D2r5LjfLQLtzezVZgVMaozz1fHXbxViyOcwxeNj7FJI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GVOa+j88CE819Ord5xknDEUGG0ymEo6AEzEh0jCWLPCPr/neveXD5SyX/Mir0bhODwXlN+4uqL1LPXnhhkw5+/IjJ0tNvVNavUhcT1lzAfOtVZ+wTsF2lWNrQMu1EDCkya8qfJ9hENGlp3VmdhCukyFJTOLwXWmf3qfk8d3vdCw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZDlepW7R; arc=fail smtp.client-ip=40.107.237.64
+	s=arc-20240116; t=1734534667; c=relaxed/simple;
+	bh=122+/9b60EJip3GrKd9VVE8kfKrwZ0O2hU2ZlRbg0Vg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VUWZm9yBmQeP7MX55pijoMkURYHU1FDX2gnTiXmgPe/Sy3GL5B1G6bBbFdZ9UQvTe+UBqnOGgcIPz8m40V8UTtaQnwZa4gN20z9V40lpH4ChIvCiUTUSCOPoKSW2EYXpoclly1UqpCTzxD2ow0NBLLZMjHiy7UpPZAZMuSWmZ9s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NVlIt+q4; arc=fail smtp.client-ip=40.107.237.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xOuLQeTPaj2uu2IorXpSXZil86/yTEjPMwAskgOu97AXDrkE8cld0/mnV6wbx/fvKhGjXzCpcrzohyulS3dYgBeP/r3vLWbqu+Cb84P0Ty8gkGQjgyKts0IDrKEkn0SkZlK2SzVKuR5nf81tUuQr7/buzi0jqvhcGZadX+O1waDDzilYano6C3IAx3nrR1N7D4I1JB4raKS8O2PTJ16YVQsLPkwYS9j9gmHCrmB+cZoaQuQk8w3rVTbVsn4cl3gNwaq6/A/Nwrjn/AA2Yl7nDJ9VNgGRPyi4jJ1DRK9G930Xj3qf6MPbZJv9oM2u1+MWH+coBp1T7AepvKfocJhshw==
+ b=C9F6r9icXjtBEW+TeiTDqtTMmZyR1gv/sgZl15RZQ8anfLtMFPP4LdCHwXFNboA9jIMUOSoUpNbWvPN18deTnFcBwJJhXsdbwWMP/Mj4i7b6aEEgnxSL11kCmB7htgFhbtrQas+UuGTvQZ4kc884DTxXzWSuLnMeQEVnl9Jg2IVNCFC8Wq/k9d2k49EJsqWnuqdoS13e00PfWc5YSXzr7QCCZQA7ivsVb2v45BUwbtyBeGKjhw3jT4pUp0mA9QvJM16S4DvBUq0cTYv0R4HPfUFs6iwoAp2LN2+KRZQSR2U/RRrqnQp3ka6Ucu3g/lWbOV3nlKuOci4I7EKsJazsaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h5sKOSlaZZb2FZHDL9GhorBLYOavW6TqEMnR/ccg5MI=;
- b=NnabWjOByZ+iXrQC1UKDYow94qZGToxC58nz+J4XMrFMNbD/YH2wMI+ZJYaCV87Uvk3HVYeHI02wkEtbeSfjne0eoKKgReOj5va4ZXYwLKP9YnUf8dEXDxx/iXM3Qvy9x4ehokkrPIJWSUgQvt+Oyr8wdzhK7ZkshWzigdpgDbuLjGVVezKprPqafIjs10Ude5SOmtizBi7KuKWWbHAHW2zjUKbGEPqFUejYT5cH1q6JoyYKQxpFzkvk/1Ub3bGr1nrpjVdehwjF3eUfz0059ew1TDmZ35q259plry5R7Fgca3JQCFQQeBI4B4z8M6JqInR00LEkq/dP5SkztHbogA==
+ bh=YMhgMLb5BTB5ZMsbJ4apeBBBd++z1t9X5PpWIEL+aMU=;
+ b=xDSA7e1eW9l2l7TDZXgJIbOWY+7ppwaxf681WjqNJUKEbhA+RGVMmewP1Q2Jv9b79xxtEdtqTZNdu/fJMcJ8oijTn9C0vN15B7flwGBjBaT8NkGeoGin13SU7TfWDjKbWlvY13VIy1U9xOh5KCbg1YHN6qlZRMTnNvI7MXvc9VY+aGQagcxF+FppmaPx1lWpVFRKtm7Ehf744sn7g3PyX4Ucq7IcpimWJH9sdzzDyChj3JXtvg0ULAToDdRfUU4PucGN+lb/oSYM5AbFwWAzJbSLKB83cpAEXrQPzrcvX0ZAkYnd4OXiy9up2SPunHe2u9rV4rrA3IDXQLC2J/kjyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h5sKOSlaZZb2FZHDL9GhorBLYOavW6TqEMnR/ccg5MI=;
- b=ZDlepW7RrrCULBJc/6gp4P1Fwpc2BJIwoqIlMAvZn4yeYXMR8jiMBq0iBfP2G4qFpjfPHrgHIxQF4OX2KdeSMxkNOdGq/c+8fiEa6ypM1pPpkCxaoLV0iie2m7cqufEFo70lU+3HG1PdTwYGTTSxfrnBNDmAx0YuZZh8yE6+eiRawH0otwAznpmXwvU8CJNyQjYZpCuf0P9UuwAaXE6dULzKN83wZgqHtYA3o3petOxdLsYyRGYvEqok2dIeSAEA/dXb96l4csuXCEE4BmO5pjHURmzzeRrTrtuAT4tADr9PyEUF9JA1FiyKiv4CR1KWsiKY7R+PlU7Pz7QPkB45fw==
-Received: from SA1PR05CA0010.namprd05.prod.outlook.com (2603:10b6:806:2d2::12)
- by DS0PR12MB7560.namprd12.prod.outlook.com (2603:10b6:8:133::17) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=YMhgMLb5BTB5ZMsbJ4apeBBBd++z1t9X5PpWIEL+aMU=;
+ b=NVlIt+q41kAUTfPX9oR/RIQQp+WS3bo9rCfHc/nnTtzOvRCv84Vq4oo1fv1GH6h6pxgzC69fA8Njbq9VIWMqYr1JPLgP2zBVL+e9F2ECR43IJNE3kSQjIRNC1CtBMxpc1/yrtHNyhWkdv3x54jCmDdkIn5/mJqTaCo9hhskFLFMVF2HOhOYyw1T3uRq6s5xMUZiG3dR481xWyFJ6CXotPUoClSEABjsJrYNQPgntmc0Tj99nTi/z7fhToW3GtJ6sXtJresbI8BG+8c1YXFMTmAAO6ToRToMOsIEXLMmNRXdgEtffK0NvUChH/p0E+p9bpjozr5nI3dBYbqkR0I9NOg==
+Received: from BL6PEPF00013E03.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1001:0:1b) by CH3PR12MB8902.namprd12.prod.outlook.com
+ (2603:10b6:610:17d::5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Wed, 18 Dec
- 2024 15:10:47 +0000
-Received: from SA2PEPF00003F64.namprd04.prod.outlook.com
- (2603:10b6:806:2d2:cafe::b9) by SA1PR05CA0010.outlook.office365.com
- (2603:10b6:806:2d2::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8272.8 via Frontend Transport; Wed,
- 18 Dec 2024 15:10:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ 2024 15:10:59 +0000
+Received: from BL6PEPF0001AB74.namprd02.prod.outlook.com
+ (2a01:111:f403:f901::3) by BL6PEPF00013E03.outlook.office365.com
+ (2603:1036:903:4::4) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.16 via Frontend Transport; Wed,
+ 18 Dec 2024 15:10:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF00003F64.mail.protection.outlook.com (10.167.248.39) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL6PEPF0001AB74.mail.protection.outlook.com (10.167.242.167) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8251.15 via Frontend Transport; Wed, 18 Dec 2024 15:10:47 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.8251.15 via Frontend Transport; Wed, 18 Dec 2024 15:10:58 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 18 Dec
- 2024 07:10:38 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 07:10:42 -0800
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 18 Dec
- 2024 07:10:38 -0800
+ 2024 07:10:42 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.8)
  with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Wed, 18 Dec
- 2024 07:10:35 -0800
+ 2024 07:10:39 -0800
 From: Tariq Toukan <tariqt@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
  Lunn" <andrew+netdev@lunn.ch>
 CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
 	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next V3 00/11] mlx5 misc changes 2024-12-18
-Date: Wed, 18 Dec 2024 17:09:38 +0200
-Message-ID: <20241218150949.1037752-1-tariqt@nvidia.com>
+	<mbloch@nvidia.com>, Rongwei Liu <rongweil@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net-next V3 01/11] net/mlx5: LAG, Refactor lag logic
+Date: Wed, 18 Dec 2024 17:09:39 +0200
+Message-ID: <20241218150949.1037752-2-tariqt@nvidia.com>
 X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20241218150949.1037752-1-tariqt@nvidia.com>
+References: <20241218150949.1037752-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,155 +103,872 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: AnonymousSubmission
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F64:EE_|DS0PR12MB7560:EE_
-X-MS-Office365-Filtering-Correlation-Id: 01728979-5511-4d4d-af55-08dd1f7626a4
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB74:EE_|CH3PR12MB8902:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4f69b678-18ef-4cf6-3511-08dd1f762d9e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?H4v5/DKTbdc7VZEXXbkvbrhRaadWsyjyP6H9Rep21Rq6CAL53WPnzBAcsnAs?=
- =?us-ascii?Q?s87PF3vvA/RClNzjzrOZGv5F06J5QXjvPntnbLOIbstRgKL+PY3fYH4gF+BM?=
- =?us-ascii?Q?iDrI2jUuHMC5CkGq9xP0WdCP7yvS+n1Y1REP9iGYiilo4D0/PlMp02Ro5Vgl?=
- =?us-ascii?Q?iqMvUgm5aqUKfJ+jOqbyTLVmH3j4pfamwNK57fhhQX1+8bAbI4/cOMlKiqyo?=
- =?us-ascii?Q?95jD/MeejG8noIVVDnhZ/y6Vrha572qcVbZbWAVGutG13sZz4x/SDuMdBpNo?=
- =?us-ascii?Q?lXPFRkvkpZiT+I7q3CUiwABs97kttczmYosWfB4PIZJRsuPPZlPHOBSkOy9t?=
- =?us-ascii?Q?yzSbQCIDXYMn9JopoVJVrMmCVmoTwmhKk7LuHoSf/QoHfqhWCQrqsETr3EQU?=
- =?us-ascii?Q?BMNI9GqNG9f3KIVNVi4rXIcy9ZG8hQvaxREgSynam4XFS0jpT8Cy74oUyFAe?=
- =?us-ascii?Q?U0SXXcb9ysxEnEO29FoeSsZup5g/Fkj34JidA6KhtyIJxCx251i6ADRWxd7r?=
- =?us-ascii?Q?gvICFXg2UGZhVjTSWynhaCefo13EtGCimfBZ8hY/ZdDG9IfK04YGBk71a3Fc?=
- =?us-ascii?Q?FGynZ8/imbnpGbjG5ttVWVOFWe0MCJs/S2pcFYuzeEWBrPEfFcsqLn/NKqan?=
- =?us-ascii?Q?xJ9AdadzACSuaUl/BhdZjYSBYCIdSN+U0GzNKxUJnjcYjOYe/OFEzH8eufGy?=
- =?us-ascii?Q?3a3MZmQpxmd6ND5rynDysVRpi49IrP1FlHxSi7zqEM7S5vUjy/qtWBVyLIug?=
- =?us-ascii?Q?WCvsDjUm+XKd3Ku2n91obQEJhnzgMrdOizZ4UuS0fMVkSoXegzuZCKOu5nR5?=
- =?us-ascii?Q?DFQWh6rq8q3SVWWOL+YnNcUUPfsyCKb3s5te/FxUKAGoTlvnnMpTp3KpM9uI?=
- =?us-ascii?Q?iSGMX1SuQrvtb8cB8+eoYIOPXw+KyinHwY+BTvnPBDBmbZUkmtFIQhWW5v0j?=
- =?us-ascii?Q?4q6hQxS+9IiMZBPOnzq3YpThbH/+haHInnuY1HtfwlU+RTKheam3Zc3ZR3Bm?=
- =?us-ascii?Q?ydZsWdE7L/kQcaUKGLMwHIbHXTQ0C7XLtR76XkAR8Zs8Anfk6OT9Q5okQ3CT?=
- =?us-ascii?Q?pCUjmZRDcB1NX9yFYROujw4RfgKvvbAg8yVBkDHxsKwcCeEibu5jyLBIzt9o?=
- =?us-ascii?Q?KZxhGF4YsRttPaKaI9dQtDrAi2NVntkpFJVYTCJZg4Qp9WlsQda5ATzS+0Jw?=
- =?us-ascii?Q?WpYN6AU0PKeFXF/m/vlquAZw0RP7OIPM89iOy9viNEO2P2JVMot0XWk5YspM?=
- =?us-ascii?Q?69brLNCzXizkRd5flzCV5NoPu84gMR5d2JYxVAc5AgFTItu8NSYwl8qLiDpS?=
- =?us-ascii?Q?sou42cX/5td7V1aC4MLM8mP+UMsjK7TxWDVP9GKC4cGYgA4Fhw9NVAcciEIF?=
- =?us-ascii?Q?iLC6ahV2hzAnJU3/pBU3zW1Ns/coswhN2R6p948HOWP+NfU+YU6AvecG7XGk?=
- =?us-ascii?Q?M5iNGTXfAhmW+NuoSAwxWpDsg6GVe6nPlL9VNnekQCsJOeJFBQyjwJXu3vC2?=
- =?us-ascii?Q?RBuBpIKJ4Lb8pR4=3D?=
+	=?us-ascii?Q?8j4L38DlOrhZs66byvOm2X8gFhfo5xSHvsIwbZ7LKNzYbWEQecL3DkE8qwrT?=
+ =?us-ascii?Q?8dmxk3/ab8IWLhIyMkq/KTn217T9HzNDUYBjJVyh3wjRX/wrBIIOLikJ4gy5?=
+ =?us-ascii?Q?3IdZSYxU/0Lsg5R/EpAsupuqvuU2Pz+XYwB7VKOpwxyvJCo3/vf7vv6sI9cg?=
+ =?us-ascii?Q?+b3GXuqicK8lqBBiB5cx7nlBpNQlIF8uypj9BpHK+p9bx3zfys65aYUONam+?=
+ =?us-ascii?Q?xNa5/uaJ/WH5S3zRW3YnCvhV7W8o/x5NVS13fGg8xxAGf45ocjwmhpBdsJ3A?=
+ =?us-ascii?Q?p5Nk0JweTci6zQNuwX6DyXMeWC/oA93qHvOK59NSnuQyxtOdvZ65Y4W/Qc8J?=
+ =?us-ascii?Q?ThmGHsDbwx/IY1zMoAXXqTzYdQfRMQjtzp7Db+NS0DhahY403n149Tofn8Ib?=
+ =?us-ascii?Q?wbKywyYs5GATnvAVW8o6lzg6dCwH3pm/vDcN7ZoqBeSr5tEwsgTBAWUrJkOq?=
+ =?us-ascii?Q?5kf7W+B/aM0uz6eVpMqOhN+LmnVls5VjtWQwGaWTMy1WktazhfFePXrmdCyu?=
+ =?us-ascii?Q?B1hsuxiX2qyK7E+TntbTA88R9q2OeEMCI0bO5IKrKMdubEq41Mlvc5u0Ho59?=
+ =?us-ascii?Q?+6gQ4iyU2Bniqb0mlqDAPSzVxDUPp/zdAK6unOvUUeYXnYxTBK/rqwfAQyNb?=
+ =?us-ascii?Q?8lovN2Tv++il8RnGVGnNINvxHhdvpZKTZuIGqzwVDr2hr9Z3oisl8XOOqy3K?=
+ =?us-ascii?Q?hnCTixKj2yKQDSylOluz3VyFJzlNj0Av65KtdzetnYBjz3VGZb8Yp8z5VARQ?=
+ =?us-ascii?Q?p6MUvk6cfyeBIC/o6Vmeu9soeNMI6eaz4st8kXYwpj82p0J3VI6lypfWc6v7?=
+ =?us-ascii?Q?f1tecSqR+3pn7s12osTS68MVClyWIZbzAzyV3MV1lZqqhExK3S0hrg0uahgl?=
+ =?us-ascii?Q?PqBTRF+I0QQBuf/MVSTCkDvPMh76Up1lUTirfcsAXPsuVAnfqtt1dPujtrgT?=
+ =?us-ascii?Q?eAa3VN0Ff9d/j/vCuyxAiu/eIh51StYbfeWOGx42oDtvqGF60qFdDEMSk8ry?=
+ =?us-ascii?Q?SVSVKAKWiKc7LeqcI1CWO69Fr0fGvjP6faM4UNtlZKrSE3GqNVUQ17kbCtER?=
+ =?us-ascii?Q?780awGJ12Y5BqSP4OT3jPu7fUwVcX+Kn6FS2l4ho/1QxcqIfh2BhEbwrJB1w?=
+ =?us-ascii?Q?PLpk9bi7AFlKB4OH+/w0G/rKNVLWf7pUDU1LQL1G6G6x5qAPtSqm+P2021Kc?=
+ =?us-ascii?Q?IssHIEM/sATG1NsdubtQYxyTEWIlzcPRz/UwZFMyo99m/9pm64AOxxy3HA0H?=
+ =?us-ascii?Q?FvlAR23rQuR7r6I9btmqZJd4YPWVGiw5ZF1HkGCvvK57spA5+Mzau73XAC22?=
+ =?us-ascii?Q?N4tj4wQAOfMkXIfn+p6h0v/v7krS8PcJ7S0FXzmUVVsmvRicVAP15PQTyf/0?=
+ =?us-ascii?Q?F9Vzl3/8xy7wLuzRGAjQ0c5xtpNT8YtDfsFndh/nh0NAUlVkd19cFQdQQzth?=
+ =?us-ascii?Q?jI3a93WjhGQtK+59aExOWAld6m05j4gKFRWnkkwHw4fk93txwLWy6Q=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2024 15:10:47.0001
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2024 15:10:58.6392
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01728979-5511-4d4d-af55-08dd1f7626a4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f69b678-18ef-4cf6-3511-08dd1f762d9e
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F64.namprd04.prod.outlook.com
+	BL6PEPF0001AB74.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7560
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8902
 
-Hi,
+From: Rongwei Liu <rongweil@nvidia.com>
 
-The first two patches by Rongwei add support for multi-host LAG. The new
-multi-host NICs provide each host with partial ports, allowing each host
-to maintain its unique LAG configuration.
+Wrap the lag pf access into two new macros:
+1. ldev_for_each()
+2. ldev_for_each_reverse()
+The maximum number of lag ports and the index to `natvie_port_num`
+mapping will be handled by the two new macros.
+Users shouldn't use the for loop anymore.
 
-Patches 3-7 by Moshe, Mark and Yevgeny are enhancements and preparations
-in fs_core and HW steering, in preparation for future patchsets.
-
-Patches 8-9 by Itamar add SW Steering support for ConnectX-8. They are
-moved here after being part of previous submissions, yet to be accepted.
-
-Patch 10 by Carolina cleans up an unnecessary log message.
-
-Patch 11 by Patrisious allows RDMA RX steering creation over devices
-with IB link layer.
-
-Regards,
-Tariq
-
-V3:
-- Drop IFC patches, they are already in net-next.
-- Address comments and re-add two fs_core patches by Moshe.
-- Add mlx5_ prefix to functions/macros names in patch #1.
-
-V2:
-- Remove Moshe's 2 fs_core patches from the series.
-
-
-Carolina Jubran (1):
-  net/mlx5: Remove PTM support log message
-
-Itamar Gozlan (2):
-  net/mlx5: DR, expand SWS STE callbacks and consolidate common structs
-  net/mlx5: DR, add support for ConnectX-8 steering
-
-Mark Bloch (1):
-  net/mlx5: fs, retry insertion to hash table on EBUSY
-
-Moshe Shemesh (2):
-  net/mlx5: fs, add counter object to flow destination
-  net/mlx5: fs, add mlx5_fs_pool API
-
-Patrisious Haddad (1):
-  net/mlx5: fs, Add support for RDMA RX steering over IB link layer
-
-Rongwei Liu (2):
-  net/mlx5: LAG, Refactor lag logic
-  net/mlx5: LAG, Support LAG over Multi-Host NICs
-
-Yevgeny Kliteynik (2):
-  net/mlx5: HWS, no need to expose mlx5hws_send_queues_open/close
-  net/mlx5: HWS, do not initialize native API queues
-
- drivers/infiniband/hw/mlx5/fs.c               |  37 +-
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   3 +-
- .../mellanox/mlx5/core/diag/fs_tracepoint.h   |   2 +-
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c    |  20 +-
- .../net/ethernet/mellanox/mlx5/core/en_tc.c   |   2 +-
- .../mellanox/mlx5/core/esw/acl/egress_lgcy.c  |   2 +-
- .../mellanox/mlx5/core/esw/acl/ingress_lgcy.c |   2 +-
- .../ethernet/mellanox/mlx5/core/esw/bridge.c  |  20 +-
- .../mellanox/mlx5/core/eswitch_offloads.c     |   2 +-
- .../net/ethernet/mellanox/mlx5/core/fs_cmd.c  |   5 +-
- .../net/ethernet/mellanox/mlx5/core/fs_core.c |  12 +-
- .../ethernet/mellanox/mlx5/core/fs_counters.c | 292 +++++---------
- .../net/ethernet/mellanox/mlx5/core/fs_pool.c | 194 ++++++++++
- .../net/ethernet/mellanox/mlx5/core/fs_pool.h |  54 +++
+Signed-off-by: Rongwei Liu <rongweil@nvidia.com>
+Reviewed-by: Saeed Mahameed <saeedm@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+---
  .../ethernet/mellanox/mlx5/core/lag/debugfs.c |  13 +-
- .../net/ethernet/mellanox/mlx5/core/lag/lag.c | 365 ++++++++++++------
- .../net/ethernet/mellanox/mlx5/core/lag/lag.h |  17 +-
- .../net/ethernet/mellanox/mlx5/core/lag/mp.c  |  77 ++--
- .../ethernet/mellanox/mlx5/core/lag/mpesw.c   |  16 +-
- .../mellanox/mlx5/core/lag/port_sel.c         |  55 ++-
- .../mellanox/mlx5/core/lib/macsec_fs.c        |   8 +-
- .../net/ethernet/mellanox/mlx5/core/main.c    |   8 +-
- .../mellanox/mlx5/core/steering/hws/bwc.h     |   6 +-
- .../mellanox/mlx5/core/steering/hws/context.c |   6 +-
- .../mellanox/mlx5/core/steering/hws/context.h |   6 +
- .../mellanox/mlx5/core/steering/hws/mlx5hws.h |   1 -
- .../mellanox/mlx5/core/steering/hws/send.c    |  48 ++-
- .../mellanox/mlx5/core/steering/hws/send.h    |   6 -
- .../mlx5/core/steering/sws/dr_domain.c        |   2 +-
- .../mellanox/mlx5/core/steering/sws/dr_ste.c  |   6 +-
- .../mellanox/mlx5/core/steering/sws/dr_ste.h  |  19 +-
- .../mlx5/core/steering/sws/dr_ste_v0.c        |   6 +-
- .../mlx5/core/steering/sws/dr_ste_v1.c        | 207 ++--------
- .../mlx5/core/steering/sws/dr_ste_v1.h        | 147 ++++++-
- .../mlx5/core/steering/sws/dr_ste_v2.c        | 169 +-------
- .../mlx5/core/steering/sws/dr_ste_v2.h        | 168 ++++++++
- .../mlx5/core/steering/sws/dr_ste_v3.c        | 221 +++++++++++
- .../mellanox/mlx5/core/steering/sws/fs_dr.c   |   2 +-
- .../mlx5/core/steering/sws/mlx5_ifc_dr.h      |  40 ++
- .../mellanox/mlx5/core/steering/sws/mlx5dr.h  |   2 +-
- drivers/vdpa/mlx5/net/mlx5_vnet.c             |   4 +-
- include/linux/mlx5/fs.h                       |   4 +-
- 42 files changed, 1480 insertions(+), 796 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/fs_pool.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/fs_pool.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v2.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v3.c
+ .../net/ethernet/mellanox/mlx5/core/lag/lag.c | 181 +++++++++---------
+ .../net/ethernet/mellanox/mlx5/core/lag/lag.h |  14 +-
+ .../net/ethernet/mellanox/mlx5/core/lag/mp.c  |  24 ++-
+ .../ethernet/mellanox/mlx5/core/lag/mpesw.c   |  10 +-
+ .../mellanox/mlx5/core/lag/port_sel.c         |  16 +-
+ 6 files changed, 137 insertions(+), 121 deletions(-)
 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/debugfs.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/debugfs.c
+index f4b777d4e108..62b6faa4276a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/debugfs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/debugfs.c
+@@ -105,20 +105,20 @@ static int mapping_show(struct seq_file *file, void *priv)
+ 	struct mlx5_lag *ldev;
+ 	bool hash = false;
+ 	bool lag_active;
++	int i, idx = 0;
+ 	int num_ports;
+-	int i;
+ 
+ 	ldev = mlx5_lag_dev(dev);
+ 	mutex_lock(&ldev->lock);
+ 	lag_active = __mlx5_lag_is_active(ldev);
+ 	if (lag_active) {
+ 		if (test_bit(MLX5_LAG_MODE_FLAG_HASH_BASED, &ldev->mode_flags)) {
+-			mlx5_infer_tx_enabled(&ldev->tracker, ldev->ports, ports,
++			mlx5_infer_tx_enabled(&ldev->tracker, ldev, ports,
+ 					      &num_ports);
+ 			hash = true;
+ 		} else {
+-			for (i = 0; i < ldev->ports; i++)
+-				ports[i] = ldev->v2p_map[i];
++			mlx5_ldev_for_each(i, 0, ldev)
++				ports[idx++] = ldev->v2p_map[i];
+ 			num_ports = ldev->ports;
+ 		}
+ 	}
+@@ -144,11 +144,8 @@ static int members_show(struct seq_file *file, void *priv)
+ 
+ 	ldev = mlx5_lag_dev(dev);
+ 	mutex_lock(&ldev->lock);
+-	for (i = 0; i < ldev->ports; i++) {
+-		if (!ldev->pf[i].dev)
+-			continue;
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		seq_printf(file, "%s\n", dev_name(ldev->pf[i].dev->device));
+-	}
+ 	mutex_unlock(&ldev->lock);
+ 
+ 	return 0;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+index 7f68468c2e75..ed539ac4fef1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+@@ -43,10 +43,6 @@
+ #include "mp.h"
+ #include "mpesw.h"
+ 
+-enum {
+-	MLX5_LAG_EGRESS_PORT_1 = 1,
+-	MLX5_LAG_EGRESS_PORT_2,
+-};
+ 
+ /* General purpose, use for short periods of time.
+  * Beware of lock dependencies (preferably, no locks should be acquired
+@@ -72,7 +68,7 @@ static u8 lag_active_port_bits(struct mlx5_lag *ldev)
+ 	int num_enabled;
+ 	int idx;
+ 
+-	mlx5_infer_tx_enabled(&ldev->tracker, ldev->ports, enabled_ports,
++	mlx5_infer_tx_enabled(&ldev->tracker, ldev, enabled_ports,
+ 			      &num_enabled);
+ 	for (idx = 0; idx < num_enabled; idx++)
+ 		active_port |= BIT_MASK(enabled_ports[idx]);
+@@ -113,7 +109,7 @@ static int mlx5_cmd_create_lag(struct mlx5_core_dev *dev, u8 *ports, int mode,
+ 	return mlx5_cmd_exec_in(dev, create_lag, in);
+ }
+ 
+-static int mlx5_cmd_modify_lag(struct mlx5_core_dev *dev, u8 num_ports,
++static int mlx5_cmd_modify_lag(struct mlx5_core_dev *dev, struct mlx5_lag *ldev,
+ 			       u8 *ports)
+ {
+ 	u32 in[MLX5_ST_SZ_DW(modify_lag_in)] = {};
+@@ -148,33 +144,31 @@ int mlx5_cmd_destroy_vport_lag(struct mlx5_core_dev *dev)
+ }
+ EXPORT_SYMBOL(mlx5_cmd_destroy_vport_lag);
+ 
+-static void mlx5_infer_tx_disabled(struct lag_tracker *tracker, u8 num_ports,
++static void mlx5_infer_tx_disabled(struct lag_tracker *tracker, struct mlx5_lag *ldev,
+ 				   u8 *ports, int *num_disabled)
+ {
+ 	int i;
+ 
+ 	*num_disabled = 0;
+-	for (i = 0; i < num_ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		if (!tracker->netdev_state[i].tx_enabled ||
+ 		    !tracker->netdev_state[i].link_up)
+ 			ports[(*num_disabled)++] = i;
+-	}
+ }
+ 
+-void mlx5_infer_tx_enabled(struct lag_tracker *tracker, u8 num_ports,
++void mlx5_infer_tx_enabled(struct lag_tracker *tracker, struct mlx5_lag *ldev,
+ 			   u8 *ports, int *num_enabled)
+ {
+ 	int i;
+ 
+ 	*num_enabled = 0;
+-	for (i = 0; i < num_ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		if (tracker->netdev_state[i].tx_enabled &&
+ 		    tracker->netdev_state[i].link_up)
+ 			ports[(*num_enabled)++] = i;
+-	}
+ 
+ 	if (*num_enabled == 0)
+-		mlx5_infer_tx_disabled(tracker, num_ports, ports, num_enabled);
++		mlx5_infer_tx_disabled(tracker, ldev, ports, num_enabled);
+ }
+ 
+ static void mlx5_lag_print_mapping(struct mlx5_core_dev *dev,
+@@ -192,7 +186,7 @@ static void mlx5_lag_print_mapping(struct mlx5_core_dev *dev,
+ 	int j;
+ 
+ 	if (test_bit(MLX5_LAG_MODE_FLAG_HASH_BASED, &flags)) {
+-		mlx5_infer_tx_enabled(tracker, ldev->ports, enabled_ports,
++		mlx5_infer_tx_enabled(tracker, ldev, enabled_ports,
+ 				      &num_enabled);
+ 		for (i = 0; i < num_enabled; i++) {
+ 			err = scnprintf(buf + written, 4, "%d, ", enabled_ports[i] + 1);
+@@ -203,7 +197,7 @@ static void mlx5_lag_print_mapping(struct mlx5_core_dev *dev,
+ 		buf[written - 2] = 0;
+ 		mlx5_core_info(dev, "lag map active ports: %s\n", buf);
+ 	} else {
+-		for (i = 0; i < ldev->ports; i++) {
++		mlx5_ldev_for_each(i, 0, ldev) {
+ 			for (j  = 0; j < ldev->buckets; j++) {
+ 				idx = i * ldev->buckets + j;
+ 				err = scnprintf(buf + written, 10,
+@@ -286,7 +280,7 @@ int mlx5_lag_dev_get_netdev_idx(struct mlx5_lag *ldev,
+ {
+ 	int i;
+ 
+-	for (i = 0; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		if (ldev->pf[i].netdev == ndev)
+ 			return i;
+ 
+@@ -310,7 +304,7 @@ static bool __mlx5_lag_is_sriov(struct mlx5_lag *ldev)
+  * with mapping that points to active ports.
+  */
+ static void mlx5_infer_tx_affinity_mapping(struct lag_tracker *tracker,
+-					   u8 num_ports,
++					   struct mlx5_lag *ldev,
+ 					   u8 buckets,
+ 					   u8 *ports)
+ {
+@@ -323,7 +317,7 @@ static void mlx5_infer_tx_affinity_mapping(struct lag_tracker *tracker,
+ 	int i;
+ 	int j;
+ 
+-	for (i = 0; i < num_ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		if (tracker->netdev_state[i].tx_enabled &&
+ 		    tracker->netdev_state[i].link_up)
+ 			enabled[enabled_ports_num++] = i;
+@@ -334,15 +328,16 @@ static void mlx5_infer_tx_affinity_mapping(struct lag_tracker *tracker,
+ 	/* Use native mapping by default where each port's buckets
+ 	 * point the native port: 1 1 1 .. 1 2 2 2 ... 2 3 3 3 ... 3 etc
+ 	 */
+-	for (i = 0; i < num_ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		for (j = 0; j < buckets; j++) {
+ 			idx = i * buckets + j;
+-			ports[idx] = MLX5_LAG_EGRESS_PORT_1 + i;
++			ports[idx] = i + 1;
+ 		}
++	}
+ 
+ 	/* If all ports are disabled/enabled keep native mapping */
+-	if (enabled_ports_num == num_ports ||
+-	    disabled_ports_num == num_ports)
++	if (enabled_ports_num == ldev->ports ||
++	    disabled_ports_num == ldev->ports)
+ 		return;
+ 
+ 	/* Go over the disabled ports and for each assign a random active port */
+@@ -358,7 +353,7 @@ static bool mlx5_lag_has_drop_rule(struct mlx5_lag *ldev)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		if (ldev->pf[i].has_drop)
+ 			return true;
+ 	return false;
+@@ -368,7 +363,7 @@ static void mlx5_lag_drop_rule_cleanup(struct mlx5_lag *ldev)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		if (!ldev->pf[i].has_drop)
+ 			continue;
+ 
+@@ -396,7 +391,7 @@ static void mlx5_lag_drop_rule_setup(struct mlx5_lag *ldev,
+ 	if (!ldev->tracker.has_inactive)
+ 		return;
+ 
+-	mlx5_infer_tx_disabled(tracker, ldev->ports, disabled_ports, &num_disabled);
++	mlx5_infer_tx_disabled(tracker, ldev, disabled_ports, &num_disabled);
+ 
+ 	for (i = 0; i < num_disabled; i++) {
+ 		disabled_index = disabled_ports[i];
+@@ -442,7 +437,7 @@ static int _mlx5_modify_lag(struct mlx5_lag *ldev, u8 *ports)
+ 
+ 		return mlx5_cmd_modify_active_port(dev0, active_ports);
+ 	}
+-	return mlx5_cmd_modify_lag(dev0, ldev->ports, ports);
++	return mlx5_cmd_modify_lag(dev0, ldev, ports);
+ }
+ 
+ static struct net_device *mlx5_lag_active_backup_get_netdev(struct mlx5_core_dev *dev)
+@@ -458,7 +453,7 @@ static struct net_device *mlx5_lag_active_backup_get_netdev(struct mlx5_core_dev
+ 	if (!ldev)
+ 		goto unlock;
+ 
+-	for (i = 0; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		if (ldev->tracker.netdev_state[i].tx_enabled)
+ 			ndev = ldev->pf[i].netdev;
+ 	if (!ndev)
+@@ -483,9 +478,9 @@ void mlx5_modify_lag(struct mlx5_lag *ldev,
+ 	int i;
+ 	int j;
+ 
+-	mlx5_infer_tx_affinity_mapping(tracker, ldev->ports, ldev->buckets, ports);
++	mlx5_infer_tx_affinity_mapping(tracker, ldev, ldev->buckets, ports);
+ 
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		for (j = 0; j < ldev->buckets; j++) {
+ 			idx = i * ldev->buckets + j;
+ 			if (ports[idx] == ldev->v2p_map[idx])
+@@ -596,9 +591,9 @@ static int mlx5_lag_create_single_fdb(struct mlx5_lag *ldev)
+ 	struct mlx5_core_dev *dev0 = ldev->pf[MLX5_LAG_P1].dev;
+ 	struct mlx5_eswitch *master_esw = dev0->priv.eswitch;
+ 	int err;
+-	int i;
++	int i, j;
+ 
+-	for (i = MLX5_LAG_P1 + 1; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 1, ldev) {
+ 		struct mlx5_eswitch *slave_esw = ldev->pf[i].dev->priv.eswitch;
+ 
+ 		err = mlx5_eswitch_offloads_single_fdb_add_one(master_esw,
+@@ -608,9 +603,9 @@ static int mlx5_lag_create_single_fdb(struct mlx5_lag *ldev)
+ 	}
+ 	return 0;
+ err:
+-	for (; i > MLX5_LAG_P1; i--)
++	mlx5_ldev_for_each_reverse(j, i, 1, ldev)
+ 		mlx5_eswitch_offloads_single_fdb_del_one(master_esw,
+-							 ldev->pf[i].dev->priv.eswitch);
++							 ldev->pf[j].dev->priv.eswitch);
+ 	return err;
+ }
+ 
+@@ -671,7 +666,7 @@ int mlx5_activate_lag(struct mlx5_lag *ldev,
+ 		return err;
+ 
+ 	if (mode != MLX5_LAG_MODE_MPESW) {
+-		mlx5_infer_tx_affinity_mapping(tracker, ldev->ports, ldev->buckets, ldev->v2p_map);
++		mlx5_infer_tx_affinity_mapping(tracker, ldev, ldev->buckets, ldev->v2p_map);
+ 		if (test_bit(MLX5_LAG_MODE_FLAG_HASH_BASED, &flags)) {
+ 			err = mlx5_lag_port_sel_create(ldev, tracker->hash_type,
+ 						       ldev->v2p_map);
+@@ -722,7 +717,7 @@ int mlx5_deactivate_lag(struct mlx5_lag *ldev)
+ 	mlx5_lag_mp_reset(ldev);
+ 
+ 	if (test_bit(MLX5_LAG_MODE_FLAG_SHARED_FDB, &flags)) {
+-		for (i = MLX5_LAG_P1 + 1; i < ldev->ports; i++)
++		mlx5_ldev_for_each(i, 1, ldev)
+ 			mlx5_eswitch_offloads_single_fdb_del_one(master_esw,
+ 								 ldev->pf[i].dev->priv.eswitch);
+ 		clear_bit(MLX5_LAG_MODE_FLAG_SHARED_FDB, &flags);
+@@ -766,7 +761,7 @@ bool mlx5_lag_check_prereq(struct mlx5_lag *ldev)
+ 			return false;
+ 
+ #ifdef CONFIG_MLX5_ESWITCH
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		dev = ldev->pf[i].dev;
+ 		if (mlx5_eswitch_num_vfs(dev->priv.eswitch) && !is_mdev_switchdev_mode(dev))
+ 			return false;
+@@ -774,17 +769,17 @@ bool mlx5_lag_check_prereq(struct mlx5_lag *ldev)
+ 
+ 	dev = ldev->pf[MLX5_LAG_P1].dev;
+ 	mode = mlx5_eswitch_mode(dev);
+-	for (i = 0; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		if (mlx5_eswitch_mode(ldev->pf[i].dev) != mode)
+ 			return false;
+ 
+ #else
+-	for (i = 0; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		if (mlx5_sriov_is_enabled(ldev->pf[i].dev))
+ 			return false;
+ #endif
+ 	roce_support = mlx5_get_roce_state(ldev->pf[MLX5_LAG_P1].dev);
+-	for (i = 1; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, MLX5_LAG_P2, ldev)
+ 		if (mlx5_get_roce_state(ldev->pf[i].dev) != roce_support)
+ 			return false;
+ 
+@@ -795,10 +790,7 @@ void mlx5_lag_add_devices(struct mlx5_lag *ldev)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < ldev->ports; i++) {
+-		if (!ldev->pf[i].dev)
+-			continue;
+-
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		if (ldev->pf[i].dev->priv.flags &
+ 		    MLX5_PRIV_FLAGS_DISABLE_ALL_ADEV)
+ 			continue;
+@@ -812,10 +804,7 @@ void mlx5_lag_remove_devices(struct mlx5_lag *ldev)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < ldev->ports; i++) {
+-		if (!ldev->pf[i].dev)
+-			continue;
+-
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		if (ldev->pf[i].dev->priv.flags &
+ 		    MLX5_PRIV_FLAGS_DISABLE_ALL_ADEV)
+ 			continue;
+@@ -842,7 +831,7 @@ void mlx5_disable_lag(struct mlx5_lag *ldev)
+ 			dev0->priv.flags |= MLX5_PRIV_FLAGS_DISABLE_IB_ADEV;
+ 			mlx5_rescan_drivers_locked(dev0);
+ 		}
+-		for (i = 1; i < ldev->ports; i++)
++		mlx5_ldev_for_each(i, MLX5_LAG_P2, ldev)
+ 			mlx5_nic_vport_disable_roce(ldev->pf[i].dev);
+ 	}
+ 
+@@ -854,7 +843,7 @@ void mlx5_disable_lag(struct mlx5_lag *ldev)
+ 		mlx5_lag_add_devices(ldev);
+ 
+ 	if (shared_fdb)
+-		for (i = 0; i < ldev->ports; i++)
++		mlx5_ldev_for_each(i, 0, ldev)
+ 			if (!(ldev->pf[i].dev->priv.flags & MLX5_PRIV_FLAGS_DISABLE_ALL_ADEV))
+ 				mlx5_eswitch_reload_ib_reps(ldev->pf[i].dev->priv.eswitch);
+ }
+@@ -864,7 +853,7 @@ static bool mlx5_shared_fdb_supported(struct mlx5_lag *ldev)
+ 	struct mlx5_core_dev *dev;
+ 	int i;
+ 
+-	for (i = MLX5_LAG_P1 + 1; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, MLX5_LAG_P1 + 1, ldev) {
+ 		dev = ldev->pf[i].dev;
+ 		if (is_mdev_switchdev_mode(dev) &&
+ 		    mlx5_eswitch_vport_match_metadata_enabled(dev->priv.eswitch) &&
+@@ -892,11 +881,11 @@ static bool mlx5_lag_is_roce_lag(struct mlx5_lag *ldev)
+ 	bool roce_lag = true;
+ 	int i;
+ 
+-	for (i = 0; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		roce_lag = roce_lag && !mlx5_sriov_is_enabled(ldev->pf[i].dev);
+ 
+ #ifdef CONFIG_MLX5_ESWITCH
+-	for (i = 0; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		roce_lag = roce_lag && is_mdev_legacy_mode(ldev->pf[i].dev);
+ #endif
+ 
+@@ -956,7 +945,7 @@ static void mlx5_do_bond(struct mlx5_lag *ldev)
+ 		} else if (roce_lag) {
+ 			dev0->priv.flags &= ~MLX5_PRIV_FLAGS_DISABLE_IB_ADEV;
+ 			mlx5_rescan_drivers_locked(dev0);
+-			for (i = 1; i < ldev->ports; i++) {
++			mlx5_ldev_for_each(i, MLX5_LAG_P2, ldev) {
+ 				if (mlx5_get_roce_state(ldev->pf[i].dev))
+ 					mlx5_nic_vport_enable_roce(ldev->pf[i].dev);
+ 			}
+@@ -966,7 +955,7 @@ static void mlx5_do_bond(struct mlx5_lag *ldev)
+ 			dev0->priv.flags &= ~MLX5_PRIV_FLAGS_DISABLE_IB_ADEV;
+ 			mlx5_rescan_drivers_locked(dev0);
+ 
+-			for (i = 0; i < ldev->ports; i++) {
++			mlx5_ldev_for_each(i, 0, ldev) {
+ 				err = mlx5_eswitch_reload_ib_reps(ldev->pf[i].dev->priv.eswitch);
+ 				if (err)
+ 					break;
+@@ -977,7 +966,7 @@ static void mlx5_do_bond(struct mlx5_lag *ldev)
+ 				mlx5_rescan_drivers_locked(dev0);
+ 				mlx5_deactivate_lag(ldev);
+ 				mlx5_lag_add_devices(ldev);
+-				for (i = 0; i < ldev->ports; i++)
++				mlx5_ldev_for_each(i, 0, ldev)
+ 					mlx5_eswitch_reload_ib_reps(ldev->pf[i].dev->priv.eswitch);
+ 				mlx5_core_err(dev0, "Failed to enable lag\n");
+ 				return;
+@@ -1010,12 +999,9 @@ struct mlx5_devcom_comp_dev *mlx5_lag_get_devcom_comp(struct mlx5_lag *ldev)
+ 	int i;
+ 
+ 	mutex_lock(&ldev->lock);
+-	for (i = 0; i < ldev->ports; i++) {
+-		if (ldev->pf[i].dev) {
+-			devcom = ldev->pf[i].dev->priv.hca_devcom_comp;
+-			break;
+-		}
+-	}
++	i = mlx5_get_next_ldev_func(ldev, 0);
++	if (i < MLX5_MAX_PORTS)
++		devcom = ldev->pf[i].dev->priv.hca_devcom_comp;
+ 	mutex_unlock(&ldev->lock);
+ 	return devcom;
+ }
+@@ -1068,7 +1054,7 @@ static int mlx5_handle_changeupper_event(struct mlx5_lag *ldev,
+ 	u8 bond_status = 0;
+ 	int num_slaves = 0;
+ 	int changed = 0;
+-	int idx;
++	int i, idx = -1;
+ 
+ 	if (!netif_is_lag_master(upper))
+ 		return 0;
+@@ -1083,8 +1069,13 @@ static int mlx5_handle_changeupper_event(struct mlx5_lag *ldev,
+ 	 */
+ 	rcu_read_lock();
+ 	for_each_netdev_in_bond_rcu(upper, ndev_tmp) {
+-		idx = mlx5_lag_dev_get_netdev_idx(ldev, ndev_tmp);
+-		if (idx >= 0) {
++		mlx5_ldev_for_each(i, 0, ldev) {
++			if (ldev->pf[i].netdev == ndev_tmp) {
++				idx++;
++				break;
++			}
++		}
++		if (i < MLX5_MAX_PORTS) {
+ 			slave = bond_slave_get_rcu(ndev_tmp);
+ 			if (slave)
+ 				has_inactive |= bond_is_slave_inactive(slave);
+@@ -1234,15 +1225,12 @@ static int mlx5_lag_netdev_event(struct notifier_block *this,
+ }
+ 
+ static void mlx5_ldev_add_netdev(struct mlx5_lag *ldev,
+-				 struct mlx5_core_dev *dev,
+-				 struct net_device *netdev)
++				struct mlx5_core_dev *dev,
++				struct net_device *netdev)
+ {
+ 	unsigned int fn = mlx5_get_dev_index(dev);
+ 	unsigned long flags;
+ 
+-	if (fn >= ldev->ports)
+-		return;
+-
+ 	spin_lock_irqsave(&lag_lock, flags);
+ 	ldev->pf[fn].netdev = netdev;
+ 	ldev->tracker.netdev_state[fn].link_up = 0;
+@@ -1257,7 +1245,7 @@ static void mlx5_ldev_remove_netdev(struct mlx5_lag *ldev,
+ 	int i;
+ 
+ 	spin_lock_irqsave(&lag_lock, flags);
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		if (ldev->pf[i].netdev == netdev) {
+ 			ldev->pf[i].netdev = NULL;
+ 			break;
+@@ -1267,13 +1255,10 @@ static void mlx5_ldev_remove_netdev(struct mlx5_lag *ldev,
+ }
+ 
+ static void mlx5_ldev_add_mdev(struct mlx5_lag *ldev,
+-			       struct mlx5_core_dev *dev)
++			      struct mlx5_core_dev *dev)
+ {
+ 	unsigned int fn = mlx5_get_dev_index(dev);
+ 
+-	if (fn >= ldev->ports)
+-		return;
+-
+ 	ldev->pf[fn].dev = dev;
+ 	dev->priv.lag = ldev;
+ }
+@@ -1281,16 +1266,13 @@ static void mlx5_ldev_add_mdev(struct mlx5_lag *ldev,
+ static void mlx5_ldev_remove_mdev(struct mlx5_lag *ldev,
+ 				  struct mlx5_core_dev *dev)
+ {
+-	int i;
++	int fn;
+ 
+-	for (i = 0; i < ldev->ports; i++)
+-		if (ldev->pf[i].dev == dev)
+-			break;
+-
+-	if (i == ldev->ports)
++	fn = mlx5_get_dev_index(dev);
++	if (ldev->pf[fn].dev != dev)
+ 		return;
+ 
+-	ldev->pf[i].dev = NULL;
++	ldev->pf[fn].dev = NULL;
+ 	dev->priv.lag = NULL;
+ }
+ 
+@@ -1406,7 +1388,6 @@ void mlx5_lag_add_netdev(struct mlx5_core_dev *dev,
+ 
+ 	mutex_lock(&ldev->lock);
+ 	mlx5_ldev_add_netdev(ldev, dev, netdev);
+-
+ 	for (i = 0; i < ldev->ports; i++)
+ 		if (!ldev->pf[i].netdev)
+ 			break;
+@@ -1417,6 +1398,26 @@ void mlx5_lag_add_netdev(struct mlx5_core_dev *dev,
+ 	mlx5_queue_bond_work(ldev, 0);
+ }
+ 
++int mlx5_get_pre_ldev_func(struct mlx5_lag *ldev, int start_idx, int end_idx)
++{
++	int i;
++
++	for (i = start_idx; i >= end_idx; i--)
++		if (ldev->pf[i].dev)
++			return i;
++	return -1;
++}
++
++int mlx5_get_next_ldev_func(struct mlx5_lag *ldev, int start_idx)
++{
++	int i;
++
++	for (i = start_idx; i < MLX5_MAX_PORTS; i++)
++		if (ldev->pf[i].dev)
++			return i;
++	return MLX5_MAX_PORTS;
++}
++
+ bool mlx5_lag_is_roce(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_lag *ldev;
+@@ -1467,7 +1468,7 @@ bool mlx5_lag_is_master(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_lag *ldev;
+ 	unsigned long flags;
+-	bool res;
++	bool res = false;
+ 
+ 	spin_lock_irqsave(&lag_lock, flags);
+ 	ldev = mlx5_lag_dev(dev);
+@@ -1555,7 +1556,7 @@ u8 mlx5_lag_get_slave_port(struct mlx5_core_dev *dev,
+ 	if (!(ldev && __mlx5_lag_is_roce(ldev)))
+ 		goto unlock;
+ 
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		if (ldev->pf[i].netdev == slave) {
+ 			port = i;
+ 			break;
+@@ -1594,13 +1595,13 @@ struct mlx5_core_dev *mlx5_lag_get_next_peer_mdev(struct mlx5_core_dev *dev, int
+ 	if (!ldev)
+ 		goto unlock;
+ 
+-	if (*i == ldev->ports)
++	if (*i == MLX5_MAX_PORTS)
+ 		goto unlock;
+-	for (idx = *i; idx < ldev->ports; idx++)
++	mlx5_ldev_for_each(idx, *i, ldev)
+ 		if (ldev->pf[idx].dev != dev)
+ 			break;
+ 
+-	if (idx == ldev->ports) {
++	if (idx == MLX5_MAX_PORTS) {
+ 		*i = idx;
+ 		goto unlock;
+ 	}
+@@ -1621,10 +1622,10 @@ int mlx5_lag_query_cong_counters(struct mlx5_core_dev *dev,
+ {
+ 	int outlen = MLX5_ST_SZ_BYTES(query_cong_statistics_out);
+ 	struct mlx5_core_dev **mdev;
++	int ret = 0, i, j, idx = 0;
+ 	struct mlx5_lag *ldev;
+ 	unsigned long flags;
+ 	int num_ports;
+-	int ret, i, j;
+ 	void *out;
+ 
+ 	out = kvzalloc(outlen, GFP_KERNEL);
+@@ -1643,8 +1644,8 @@ int mlx5_lag_query_cong_counters(struct mlx5_core_dev *dev,
+ 	ldev = mlx5_lag_dev(dev);
+ 	if (ldev && __mlx5_lag_is_active(ldev)) {
+ 		num_ports = ldev->ports;
+-		for (i = 0; i < ldev->ports; i++)
+-			mdev[i] = ldev->pf[i].dev;
++		mlx5_ldev_for_each(i, 0, ldev)
++			mdev[idx++] = ldev->pf[i].dev;
+ 	} else {
+ 		num_ports = 1;
+ 		mdev[MLX5_LAG_P1] = dev;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
+index 50fcb1eee574..1dada791815e 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
+@@ -103,7 +103,7 @@ int mlx5_lag_dev_get_netdev_idx(struct mlx5_lag *ldev,
+ 				struct net_device *ndev);
+ 
+ char *mlx5_get_str_port_sel_mode(enum mlx5_lag_mode mode, unsigned long flags);
+-void mlx5_infer_tx_enabled(struct lag_tracker *tracker, u8 num_ports,
++void mlx5_infer_tx_enabled(struct lag_tracker *tracker, struct mlx5_lag *ldev,
+ 			   u8 *ports, int *num_enabled);
+ 
+ void mlx5_ldev_add_debugfs(struct mlx5_core_dev *dev);
+@@ -119,9 +119,21 @@ static inline bool mlx5_lag_is_supported(struct mlx5_core_dev *dev)
+ 	if (!MLX5_CAP_GEN(dev, vport_group_manager) ||
+ 	    !MLX5_CAP_GEN(dev, lag_master) ||
+ 	    MLX5_CAP_GEN(dev, num_lag_ports) < 2 ||
++	    mlx5_get_dev_index(dev) >= MLX5_MAX_PORTS ||
+ 	    MLX5_CAP_GEN(dev, num_lag_ports) > MLX5_MAX_PORTS)
+ 		return false;
+ 	return true;
+ }
+ 
++#define mlx5_ldev_for_each(i, start_index, ldev) \
++	for (int tmp = start_index; tmp = mlx5_get_next_ldev_func(ldev, tmp), \
++	     i = tmp, tmp < MLX5_MAX_PORTS; tmp++)
++
++#define mlx5_ldev_for_each_reverse(i, start_index, end_index, ldev)      \
++	for (int tmp = start_index, tmp1 = end_index; \
++	     tmp = mlx5_get_pre_ldev_func(ldev, tmp, tmp1), \
++	     i = tmp, tmp >= tmp1; tmp--)
++
++int mlx5_get_pre_ldev_func(struct mlx5_lag *ldev, int start_idx, int end_idx);
++int mlx5_get_next_ldev_func(struct mlx5_lag *ldev, int start_idx);
+ #endif /* __MLX5_LAG_H__ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/mp.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/mp.c
+index b1aa494c76ba..40406d04adc9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/mp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/mp.c
+@@ -153,6 +153,7 @@ static void mlx5_lag_fib_route_event(struct mlx5_lag *ldev, unsigned long event,
+ 	struct net_device *nh_dev0, *nh_dev1;
+ 	struct fib_info *fi = fen_info->fi;
+ 	struct lag_mp *mp = &ldev->lag_mp;
++	int i, dev_idx = 0;
+ 
+ 	/* Handle delete event */
+ 	if (event == FIB_EVENT_ENTRY_DEL) {
+@@ -186,10 +187,12 @@ static void mlx5_lag_fib_route_event(struct mlx5_lag *ldev, unsigned long event,
+ 
+ 	if (!nh_dev1) {
+ 		if (__mlx5_lag_is_active(ldev)) {
+-			int i = mlx5_lag_dev_get_netdev_idx(ldev, nh_dev0);
+-
+-			i++;
+-			mlx5_lag_set_port_affinity(ldev, i);
++			mlx5_ldev_for_each(i, 0, ldev) {
++				dev_idx++;
++				if (ldev->pf[i].netdev == nh_dev0)
++					break;
++			}
++			mlx5_lag_set_port_affinity(ldev, dev_idx);
+ 			mlx5_lag_fib_set(mp, fi, fen_info->dst, fen_info->dst_len);
+ 		}
+ 
+@@ -214,6 +217,7 @@ static void mlx5_lag_fib_nexthop_event(struct mlx5_lag *ldev,
+ 				       struct fib_info *fi)
+ {
+ 	struct lag_mp *mp = &ldev->lag_mp;
++	int i, dev_idx = 0;
+ 
+ 	/* Check the nh event is related to the route */
+ 	if (!mp->fib.mfi || mp->fib.mfi != fi)
+@@ -221,11 +225,15 @@ static void mlx5_lag_fib_nexthop_event(struct mlx5_lag *ldev,
+ 
+ 	/* nh added/removed */
+ 	if (event == FIB_EVENT_NH_DEL) {
+-		int i = mlx5_lag_dev_get_netdev_idx(ldev, fib_nh->fib_nh_dev);
++		mlx5_ldev_for_each(i, 0, ldev) {
++			if (ldev->pf[i].netdev == fib_nh->fib_nh_dev)
++				break;
++			dev_idx++;
++		}
+ 
+-		if (i >= 0) {
+-			i = (i + 1) % 2 + 1; /* peer port */
+-			mlx5_lag_set_port_affinity(ldev, i);
++		if (dev_idx >= 0) {
++			dev_idx = (dev_idx + 1) % 2 + 1; /* peer port */
++			mlx5_lag_set_port_affinity(ldev, dev_idx);
+ 		}
+ 	} else if (event == FIB_EVENT_NH_ADD &&
+ 		   fib_info_num_path(fi) == 2) {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/mpesw.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/mpesw.c
+index 571ea26edd0c..1123c8afcf9e 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/mpesw.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/mpesw.c
+@@ -15,7 +15,7 @@ static void mlx5_mpesw_metadata_cleanup(struct mlx5_lag *ldev)
+ 	u32 pf_metadata;
+ 	int i;
+ 
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		dev = ldev->pf[i].dev;
+ 		esw = dev->priv.eswitch;
+ 		pf_metadata = ldev->lag_mpesw.pf_metadata[i];
+@@ -36,7 +36,7 @@ static int mlx5_mpesw_metadata_set(struct mlx5_lag *ldev)
+ 	u32 pf_metadata;
+ 	int i, err;
+ 
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		dev = ldev->pf[i].dev;
+ 		esw = dev->priv.eswitch;
+ 		pf_metadata = mlx5_esw_match_metadata_alloc(esw);
+@@ -52,7 +52,7 @@ static int mlx5_mpesw_metadata_set(struct mlx5_lag *ldev)
+ 			goto err_metadata;
+ 	}
+ 
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		dev = ldev->pf[i].dev;
+ 		mlx5_notifier_call_chain(dev->priv.events, MLX5_DEV_EVENT_MULTIPORT_ESW,
+ 					 (void *)0);
+@@ -98,7 +98,7 @@ static int enable_mpesw(struct mlx5_lag *ldev)
+ 
+ 	dev0->priv.flags &= ~MLX5_PRIV_FLAGS_DISABLE_IB_ADEV;
+ 	mlx5_rescan_drivers_locked(dev0);
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		err = mlx5_eswitch_reload_ib_reps(ldev->pf[i].dev->priv.eswitch);
+ 		if (err)
+ 			goto err_rescan_drivers;
+@@ -112,7 +112,7 @@ static int enable_mpesw(struct mlx5_lag *ldev)
+ 	mlx5_deactivate_lag(ldev);
+ err_add_devices:
+ 	mlx5_lag_add_devices(ldev);
+-	for (i = 0; i < ldev->ports; i++)
++	mlx5_ldev_for_each(i, 0, ldev)
+ 		mlx5_eswitch_reload_ib_reps(ldev->pf[i].dev->priv.eswitch);
+ 	mlx5_mpesw_metadata_cleanup(ldev);
+ 	return err;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
+index ab2717012b79..f98f0735fce0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
+@@ -44,9 +44,7 @@ static int mlx5_lag_create_port_sel_table(struct mlx5_lag *ldev,
+ 	struct mlx5_flow_destination dest = {};
+ 	MLX5_DECLARE_FLOW_ACT(flow_act);
+ 	struct mlx5_flow_namespace *ns;
+-	int err, i;
+-	int idx;
+-	int j;
++	int err, i, j, k, idx;
+ 
+ 	ft_attr.max_fte = ldev->ports * ldev->buckets;
+ 	ft_attr.level = MLX5_LAG_FT_LEVEL_DEFINER;
+@@ -74,7 +72,7 @@ static int mlx5_lag_create_port_sel_table(struct mlx5_lag *ldev,
+ 	dest.type = MLX5_FLOW_DESTINATION_TYPE_UPLINK;
+ 	dest.vport.flags |= MLX5_FLOW_DEST_VPORT_VHCA_ID;
+ 	flow_act.flags |= FLOW_ACT_NO_APPEND;
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		for (j = 0; j < ldev->buckets; j++) {
+ 			u8 affinity;
+ 
+@@ -88,13 +86,13 @@ static int mlx5_lag_create_port_sel_table(struct mlx5_lag *ldev,
+ 								      &dest, 1);
+ 			if (IS_ERR(lag_definer->rules[idx])) {
+ 				err = PTR_ERR(lag_definer->rules[idx]);
+-				do {
++				mlx5_ldev_for_each_reverse(k, i, 0, ldev) {
+ 					while (j--) {
+-						idx = i * ldev->buckets + j;
++						idx = k * ldev->buckets + j;
+ 						mlx5_del_flow_rules(lag_definer->rules[idx]);
+ 					}
+ 					j = ldev->buckets;
+-				} while (i--);
++				};
+ 				goto destroy_fg;
+ 			}
+ 		}
+@@ -346,7 +344,7 @@ static void mlx5_lag_destroy_definer(struct mlx5_lag *ldev,
+ 	int i;
+ 	int j;
+ 
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		for (j = 0; j < ldev->buckets; j++) {
+ 			idx = i * ldev->buckets + j;
+ 			mlx5_del_flow_rules(lag_definer->rules[idx]);
+@@ -565,7 +563,7 @@ static int __mlx5_lag_modify_definers_destinations(struct mlx5_lag *ldev,
+ 	dest.type = MLX5_FLOW_DESTINATION_TYPE_UPLINK;
+ 	dest.vport.flags |= MLX5_FLOW_DEST_VPORT_VHCA_ID;
+ 
+-	for (i = 0; i < ldev->ports; i++) {
++	mlx5_ldev_for_each(i, 0, ldev) {
+ 		for (j = 0; j < ldev->buckets; j++) {
+ 			idx = i * ldev->buckets + j;
+ 			if (ldev->v2p_map[idx] == ports[idx])
 -- 
 2.45.0
 
