@@ -1,156 +1,149 @@
-Return-Path: <netdev+bounces-152856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8DC99F6052
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:41:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 179D69F6054
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05E62169BEC
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 08:41:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3C901884CA6
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 08:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3451791F4;
-	Wed, 18 Dec 2024 08:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6941791F4;
+	Wed, 18 Dec 2024 08:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EvICn/++"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WLzhjs/z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CD114F9E2;
-	Wed, 18 Dec 2024 08:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EB214F9E2
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 08:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734511266; cv=none; b=Nk+uUBedfSbkmW0rBmLN0u0t4JCSIlxoNWrWUIy+V74Ar02xl7V4Wsez2gRsGtZUdz49o0bGP2GZfC9vuC8eaddjhkNoqjqkCdkhEuVRTjkZo1S+AgrbNkUSCHQe9/n+7G7S4gKWLB2DF4EDfAn2Avk7SxIlbOvcQNDkdaiWjlg=
+	t=1734511440; cv=none; b=E0+uVH59usV8LDSY05hA/FTixMyZ0+LrelJDj3F7/+4cRiUkXwIwpWJ4z3K6zToZxpiunr7wvJIxQOCIb81j8dPFbipxAnr3ZXy/xUPkCrhYACwjEiZyzK2I/UlK1xuGO2wifi3BNNAgHWlkZLpWK+7wBQ0r/qwpoeOsi7c7Rpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734511266; c=relaxed/simple;
-	bh=n/qie5vH/eAqD1mHugHzqX3jkGmyJ0CSjiQvm6cwSXQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KsuA6G31h8m5N6H5ZOTIs0Wob7+TATaZdHmRsT8rtaVoV1atSnPuqdYJzNGYWjdwbUB6QKNbj2LVD7gyFOB6GPqZ8PFkUU3PXzPiODegSO9Og6nO1EO17WCJsmOijO/mtHpeJARx2EMjNQLI3DcFUxjs4SSRDl+6kmhM515Qkhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EvICn/++; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-3022598e213so60043301fa.0;
-        Wed, 18 Dec 2024 00:41:04 -0800 (PST)
+	s=arc-20240116; t=1734511440; c=relaxed/simple;
+	bh=YzcJl1FbFDEHDQf72+B90WAbhYMxAhvg5sqVxs6Ue/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mr8CebfJ3mVeVcA97VKbviEFVCXwoChBOsdNAGsMReSBPN2uMHIYBYFTH5tqW2xk9ddRt2ffSw2xIULmO2Gel8Fn2yKQYgTipEUr8W0aTPIi37b2fPwf438nTwSPIdLBWuzJXwDbEg3IOOm+t2RAT4n6Fb/nr8LIkfE1z7TmkQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WLzhjs/z; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa684b6d9c7so1022548466b.2
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 00:43:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734511263; x=1735116063; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9Uth7hzk5WKYEXwnMXWVgZ5kbZA+3ppaKuwLhWTd9os=;
-        b=EvICn/++QAqpbPeekheNx8hkS4OSPPfPNyETnRO63EXEMkhmOZ7FrY/c0H/2K5Vs7P
-         Rep0Q8w5wVnJmb8QKscX/TuXTh5kesfzfVnwsfwcnDgplQ77KJEYzr7Uh2lQqObQX2/i
-         miqOuodkC0zlNemNTwUpOYXsew+DmQyZwHyFcNAgW2au2IHduFF0uxFv8KUP47V/GjPH
-         HhFmfSt36ZsUtARIp29BVTCaQq0uAMYNG2Ab/4ZG8QWG8ZlrtUIW0nRHzkdy8ANx6Isl
-         2mJpLvbaQ9Sc6d1UtXYb87Ggb9xymffd9stSbhguk7tC85QLoFlfSa4lEkoiwSe9UyeV
-         +pvg==
+        d=linaro.org; s=google; t=1734511437; x=1735116237; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MU+DAJGYy3oCu/TF/zialaJ4v/JIvCr+RgufidPD9TI=;
+        b=WLzhjs/zWMkTOOVgLnrh3dZmxQx1tCYKy10unK63e3+67H3J/34GfyCCLpCM10m0lz
+         ugoI5hoe+XNHkJHpu9Ha2+m6acp3ArTdugQ4d6FZjLS85KN6ze0iNlguRdH7zw3Ce4nw
+         Rq0QUAY4kMXdRscIt21ABlWMPhX6U2XIaTyy3xiA7EVUKI00K9gkXpiU4m59tgWqcYeh
+         cqIXKvpzUjgb1KNwA3YppqjYTO6wiCdEbNZPLkUUs9Nz9CZm2NVgFr5jO+jvlrLnQ+KM
+         8+nLqIMZRn2H+NSWV5QQD6sm8C2IxAO4fme3vmv6Ff+/OKiHIv0ZYV1YoQ+5pArLoSCC
+         A3JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734511263; x=1735116063;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9Uth7hzk5WKYEXwnMXWVgZ5kbZA+3ppaKuwLhWTd9os=;
-        b=tTtqdcsDsxL4Smv+s9JoUImZeT2T/6PoRD1xKkoLKjIdy1FGC14iUsgoU92egztEew
-         +VWRtXah/4so3lBlafUyuvrxAy7i0wCM7oj34kd6XlKZ2obuXfbec1mHSvqjKMdMuA0U
-         tw9TPwvtfluHdC2o3GNBdb7i6wzR+/0qwFW60iUTUkwrsZhsxd9io0LN6TrB8ugMg/d+
-         2NWCSlJ1DXkJ1VD2mNMLhuGLpuCoGn9Vvxo0+mTuSNJUqB9NdFGmw2/HwoA02KH0SFhr
-         UQQeqeWJf8GJDjopxpg+VxEAKfNaML0XUmZrc9vRfIMLHRQZ+uF+Vp0YGP5GWTQSqjY9
-         iDLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvTts+G9E+kHm7MPs7hX8difqV+kRxLh8gI7VeY3BQOMh4rXBPaI+Qot2lBn3gWDiwqUhTI0Gs@vger.kernel.org, AJvYcCXAOdCsdnfi9e42laWQ1Xxqa3n3B2KxTDs9PClegL6akPuY/kdlAQsMiUGO5/i5KMs3AZtFxxh8AAHg0iY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgUeAzhsu36yZQabFu1osdmcy/7KyalABotPIhzfKohYLj1Q4+
-	yMCAxCMf4CsY3/LP0W1s36ZZxuX1fteRGeB3JdK3kGmvybps80vs9yuBe/8box7FbeXL5Z8z3J1
-	FhWVYqX96Icyuc8kq9K1sKkGNsPQ=
-X-Gm-Gg: ASbGncsKXw6NKamk5xKAjHgPOVYped5wijU6kA+KK0gFRM/y+vzzwg6Q3VeTGcbhi22
-	f5Chzqzf0vV/Uk38+cXl3nN5hixRmYGrWvU0zQA==
-X-Google-Smtp-Source: AGHT+IHbWGwiqGhsP6zXehmQVddvNfAxD+0ZuLK1J7qM3ySYcwfbNR1Z7kC8GYFO5+f4dcJvuwhfzdMUmo1BSgfc5Cg=
-X-Received: by 2002:a05:651c:198c:b0:302:1aed:f62a with SMTP id
- 38308e7fff4ca-3044db05760mr6697331fa.21.1734511262601; Wed, 18 Dec 2024
- 00:41:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734511437; x=1735116237;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MU+DAJGYy3oCu/TF/zialaJ4v/JIvCr+RgufidPD9TI=;
+        b=Kl6+QZ4DvJ9nRDXkzsib5Qy3/CQ5ylGkd6T9tR2Er4QZVd1MGJQ1hGqAhDZOZGdOon
+         BLOq1QO8fc+Lsa0NFJHNGeqK6mZRD9HdEVfArYf0+XpAlCGpyecs6z69LkRsQ5EfYS4V
+         I0IfByAcpuMNqe4UriiHS7hwx4fBAqcahNc5+f0J4LrDXvbT2ofoTUWGpQu6zEP2fTHI
+         uRV2c8J3+27IGxSwKl03PLkBhbVgcYQzSi0x3zQzTxdsyE3tDPsqfZImHvPwGQCAtf7o
+         oYDFPOLFjP3vNaioG5FM/KKFWpTqfe9ZnG4Wy0lzGCvTi7bhs2waptx0ibRwpSC/IEHf
+         AzmA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+qa152i2kp+vY8n7W5kB8RfiezuTYp6VOASL3ZZYnbqfxpdSX2rlAga8A8d6npEIhKxeIVSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXp0rUZ+UDmLT3WaX0ykHFZkm3b+J+JXspkxdwRg8Hzi5ekTY2
+	xtyLxCyPD2k99MpKO8oBGByrya2fJM2LDQPthEOT7+eIjEsKrOShy7czOatBshE=
+X-Gm-Gg: ASbGncsdZmzazm0or+if908of8iOAvzz8dQi4lSTQtluPUNlo6Er1lLoFCuyU81m1YN
+	4RPCdBOJ9MGmLbNPevc8iYhC4+Sg6lebjrEIYlKJmk0KNMUbW3Yobb91Wlx/S7iAyv4NJknM7Ug
+	H5Qm881EUL/td0sTG0lMZ/L+fiZ3tFuR7I+1VYC1MCinEdPPl0yD16GT3keiAt1nzbCzuK4S9Zl
+	+qTf58Bpmo5q44e11xCspIHxEOvVBWdeNwxEv+0DjIqseiIrvK8Y9ZaPrh3UQ==
+X-Google-Smtp-Source: AGHT+IGB2sToVn4vti1D2vhTFdBJYdg2TfbR8CbMlMyUVjPXfQrZG/iM44121J6wvyAgWLXs/DwIvQ==
+X-Received: by 2002:a17:906:309b:b0:aab:740f:e467 with SMTP id a640c23a62f3a-aabf471f759mr147708466b.8.1734511436884;
+        Wed, 18 Dec 2024 00:43:56 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aab9c3eb5e0sm510398866b.44.2024.12.18.00.43.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2024 00:43:56 -0800 (PST)
+Date: Wed, 18 Dec 2024 11:43:53 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	krzk@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] net: stmmac: call of_node_put() and
+ stmmac_remove_config_dt() in error paths in stmmac_probe_config_dt()
+Message-ID: <50d126f4-e87a-4502-8a9b-7291d0143ed6@stanley.mountain>
+References: <20241218032230.117453-1-joe@pf.is.s.u-tokyo.ac.jp>
+ <20241218032230.117453-2-joe@pf.is.s.u-tokyo.ac.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241021080856.48746-1-ubizjak@gmail.com> <20241021080856.48746-3-ubizjak@gmail.com>
- <7590f546-4021-4602-9252-0d525de35b52@nvidia.com>
-In-Reply-To: <7590f546-4021-4602-9252-0d525de35b52@nvidia.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Wed, 18 Dec 2024 09:40:50 +0100
-Message-ID: <CAFULd4aL+qVxyFquMTTQLyVFpVSc1DwcahJprj73RtvrW_XsXA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] percpu: Cast percpu pointer in PERCPU_PTR() via
- unsigned long
-To: Gal Pressman <gal@nvidia.com>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241218032230.117453-2-joe@pf.is.s.u-tokyo.ac.jp>
 
-On Wed, Dec 18, 2024 at 8:54=E2=80=AFAM Gal Pressman <gal@nvidia.com> wrote=
-:
->
-> On 21/10/2024 11:07, Uros Bizjak wrote:
-> > Cast pointer from percpu address space to generic (kernel) address
-> > space in PERCPU_PTR() macro via unsigned long intermediate cast [1].
-> > This intermediate cast is also required to avoid build failure
-> > when GCC's strict named address space checks for x86 targets [2]
-> > are enabled.
-> >
-> > Found by GCC's named address space checks.
-> >
-> > [1] https://sparse.docs.kernel.org/en/latest/annotations.html#address-s=
-pace-name
-> > [2] https://gcc.gnu.org/onlinedocs/gcc/Named-Address-Spaces.html#x86-Na=
-med-Address-Spaces
-> >
-> > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> > Cc: Dennis Zhou <dennis@kernel.org>
-> > Cc: Tejun Heo <tj@kernel.org>
-> > Cc: Christoph Lameter <cl@linux.com>
-> > Cc: Andrew Morton <akpm@linux-foundation.org>
-> > ---
-> >  include/linux/percpu-defs.h | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/linux/percpu-defs.h b/include/linux/percpu-defs.h
-> > index e1cf7982424f..35842d1e3879 100644
-> > --- a/include/linux/percpu-defs.h
-> > +++ b/include/linux/percpu-defs.h
-> > @@ -221,7 +221,10 @@ do {                                              =
-                       \
-> >  } while (0)
-> >
-> >  #define PERCPU_PTR(__p)                                               =
-       \
-> > -     (typeof(*(__p)) __force __kernel *)(__p);
-> > +({                                                                   \
-> > +     unsigned long __pcpu_ptr =3D (__force unsigned long)(__p);       =
- \
-> > +     (typeof(*(__p)) __force __kernel *)(__pcpu_ptr);                \
-> > +})
-> >
-> >  #ifdef CONFIG_SMP
-> >
->
-> Hello Uros,
->
-> We've encountered a kernel panic on boot [1] bisected to this patch.
-> I believe the patch is fine and the issue is caused by a compiler bug.
-> The panic reproduces when compiling the kernel with gcc 11.3.1, but does
-> not reproduce with latest gcc/clang.
->
-> I have a patch that workarounds the issue by ditching the intermediate
-> variable and does the casting in a single line. Will that be enough to
-> solve the sparse/build issues?
+The subject is too long.
 
-Yes, single line like:
+On Wed, Dec 18, 2024 at 12:22:29PM +0900, Joe Hattori wrote:
+>  	plat->stmmac_ahb_rst = devm_reset_control_get_optional_shared(
+>  							&pdev->dev, "ahb");
+>  	if (IS_ERR(plat->stmmac_ahb_rst)) {
+> -		ret = plat->stmmac_ahb_rst;
+> -		goto error_hw_init;
+> +		stmmac_remove_config_dt(pdev, plat);
+> +		return ERR_CAST(plat->stmmac_ahb_rst);
+>  	}
+>  
+>  	return plat;
+> -
+> -error_hw_init:
+> -	clk_disable_unprepare(plat->pclk);
+> -error_pclk_get:
+> -	clk_disable_unprepare(plat->stmmac_clk);
+> -
+> -	return ret;
 
-(typeof(*(__p)) __force __kernel *)(__force unsigned long)(__pcpu_ptr);
+Ah...  This is a bug fix, but it's not fixed in the right way.
 
-should be OK.
+These labels at the end of the function are called an unwind ladder.
+This is where people mostly expect the error handling to be done.  Don't
+get rid of the unwind ladder, but instead add the calls to:
 
-Thanks,
-Uros.
+error_put_phy:
+	of_node_put(plat->phy_node);
+error_put_mdio:
+	of_node_put(plat->mdio_node);
+
+The original code had some code paths which called
+stmmac_remove_config_dt().  Get rid of that.  Everything should use the
+unwind ladder.  This business of mixing error handling styles is what led
+to this bug.
+
+Calling a function to cleanup "everything" doesn't work because we keep
+adding more stuff so it starts out as "everything" today but tomorrow
+it's a leak.
+
+This can all be sent as one patch if you describe it in the right way.
+
+    The error handling in stmmac_probe_config_dt() has some
+    error paths which don't call of_node_put().  The problem is
+    that some error paths call stmmac_remove_config_dt() to
+    clean up but others use and unwind ladder.  These two types
+    of error handling have not kept in sync and have been a
+    recurring source of bugs.  Re-write the error handling in
+    stmmac_probe_config_dt() to use an unwind ladder.
+
+regards,
+dan carpenter
+
 
