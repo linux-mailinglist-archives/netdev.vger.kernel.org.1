@@ -1,362 +1,228 @@
-Return-Path: <netdev+bounces-153081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA119F6BC5
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:02:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5FE79F6BC1
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:01:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8DC118951EB
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:01:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F13C77A39D3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5181F9F7D;
-	Wed, 18 Dec 2024 16:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E641547D5;
+	Wed, 18 Dec 2024 17:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RrrZO4qL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tlqzo/JA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049581F8AD2
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734541194; cv=none; b=kW3Wg7KX681uN7wujjBCg9mqVt9P/qLJVvcESAXWNYl58CWRzVhEVYlX/T+YClCJOCJVH61inULKOnDHtRuDJxdQLo6t05six2L7SHYgodlmF4LS2sHsv43YyyyNLNvfKj9mnysGOsKClGt0kfdrx5KpEPj/ikSix5kzIwZpFKA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734541194; c=relaxed/simple;
-	bh=o32FlmOLhDk2frzKQACZCmNSQ7xsXevYinxlSiFJGE0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bbMdMqEzyQaNUnaGWy1Ov97iDgNRxYvJCNUhPZt9bbhHljNe6Du8gMro2Jc6q8BrQbb6h6YsgJXWUOzCekCS+xe10rWHqwLbcpHTxMZgib2tVUgsZjXnzR5cbkPM3cW5MWhtNcKQnighWvf5VG4uQD2FGGnRViOM3815IakRKh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RrrZO4qL; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683F31FA257;
+	Wed, 18 Dec 2024 17:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734541209; cv=fail; b=bbbs0schfjBKZkhg1a0DTcqJpDuO1btwsqY/Nl5s4DHWZ0TZ/hzNVxlp4Biky5nWkmI0PIHI37MVNbe7lwpJNZIap99YX4EbW8ihQifvrQKLOmtCJP8MI+M7BcXgDJtpy2nhLuJ3U9inRzxAKtd4IldigcHz29BDSE3LsFYPBy4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734541209; c=relaxed/simple;
+	bh=CvmJt6BZWwRtE5mCBgDWdIRwBLpTbukBYYDZta7dEPk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ShBBcvfbj/14zYZQAULohP66Zr5ncXLVZVE9RBgGEKpal2vz5x6wLs7garu5qyMAWu5zs22bI6AHEbcy9Ywz0lCxv7v4tFxCpEnI4tkHmaiipruPgwpLbselzcPQ7oP1mm7d/bWiXOOyN4djOdE3TvmgtYGk0XkTZ11vGvyM1UI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tlqzo/JA; arc=fail smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734541193; x=1766077193;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=o32FlmOLhDk2frzKQACZCmNSQ7xsXevYinxlSiFJGE0=;
-  b=RrrZO4qLyzabBoaQsvW3G7RbEJSA+9ZWckqAlgd3k5yQkv4BRMF++Bli
-   x/8ZRxzzsSw2ZGAn4aplVSnlEx+5KmWGMc9yQYPgDPVTjezCiOejXraBu
-   vkIxZEZBoxLYZZJW26g0gX3yqYdIouP2i5OE21Ewa+j/BYtOve6YD0hSo
-   gYnUgH0W9ufVb16Zn11PWcQXujHgPNY9pYOCp6mI7e5ZSAX5KLXsY2wrU
-   yb3qJ4iS8otli/NH5lZ3phVPQPy5zGIiKfNKlYHdUiOAgvafakJugB3at
-   n1nN40E+GYw1K3o5TanBJmCtzV+fkzSVd+pyZU1g9uencub3e4Y2r2eOS
-   g==;
-X-CSE-ConnectionGUID: 4UV3vUrZSAmpfb8gai54XQ==
-X-CSE-MsgGUID: y1FXqUUwS6KHEnKqD5Dzjw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="46415686"
+  t=1734541209; x=1766077209;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=CvmJt6BZWwRtE5mCBgDWdIRwBLpTbukBYYDZta7dEPk=;
+  b=Tlqzo/JAGETAOtZwylYiGOLxTKzsbTVRXLpZLYI9IE5NXbgsxL3Qf8xl
+   hqisxkqn4v58i++yS6uFH/ZCoYEq64DPj7wQxIijC3oRKeGVPjDWY131q
+   4oe+w19UYril6x607vG/cyIDO0Orlj3aWm/3Okpku0jbrKhgxNt0Ac2Om
+   REbr6FJ+16EPDjsvBHw3xtvAN5kW6NfhZao+pGu6dwyjiptYplzNprvve
+   1OKmTe2ZZfnVEDIPYui1BaXR9J5E8clozMa7GdOWGjHG5+4Q0myxy9uL+
+   r0+Xzxn9Aqr4CZzdCkJpjCwlJqPGnqb+5OxWQ/Oav9qDpv7zMCNLmaz1/
+   w==;
+X-CSE-ConnectionGUID: nQvz/mftTyKREjuuDjd6nQ==
+X-CSE-MsgGUID: AnezO6DJTfioexJduFXo3g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="38808185"
 X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
-   d="scan'208";a="46415686"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:52 -0800
-X-CSE-ConnectionGUID: gw6bJWe8Rrqp7Tn3b+roSw==
-X-CSE-MsgGUID: A/OwIEffTxi0uRWwu5sgbg==
+   d="scan'208";a="38808185"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 09:00:08 -0800
+X-CSE-ConnectionGUID: PD3/jQQJSYydX1ABOrGb7g==
+X-CSE-MsgGUID: k0yEzSNaRG2TmaJxysVO0Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="102532129"
-Received: from ldmartin-desk2.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.111.224])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:46 -0800
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	michael.chan@broadcom.com,
-	tariqt@nvidia.com,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jdamato@fastly.com,
-	shayd@nvidia.com,
-	akpm@linux-foundation.org,
-	Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: [PATCH net-next v2 8/8] mlx4: use napi's irq affinity
-Date: Wed, 18 Dec 2024 09:58:43 -0700
-Message-ID: <20241218165843.744647-9-ahmed.zaki@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241218165843.744647-1-ahmed.zaki@intel.com>
-References: <20241218165843.744647-1-ahmed.zaki@intel.com>
+   d="scan'208";a="102064106"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2024 09:00:06 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 18 Dec 2024 09:00:05 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 18 Dec 2024 09:00:05 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.177)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 18 Dec 2024 09:00:05 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bte20Tm264HLwwiyJQfxHCy9W7ZrA9kyXAWZGp4xjl6BiUQ0t0blNOE6rkQRRlQrdsD7LAmz7e13GPFpC8UAnQ3Xfruhkj2mZh1EhvN5kxc3yLMzDvBNnoM/xF0cckQGmXblFRMBvkxQeugBT4QXV9sxoOJPsTGDYaYfeGSoqtJ7OZozAQ85uFKmgu1nL6tjha1xYgBbNbLyjMXGfOCW1BBlwUerQ2u3rdrfbLCN6dbziE6UN5yCsLED58a33I9MSs8pNN7FYtULnQ4uJo/VdgSGkOdN65NyXCfhvZDIFEinNDLleSmlp4NM5qfGAsogezs2lGAQDwCKl35H9sowdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qAV/FBBiGwF2AnVJInOXobKUv+b/Df5o1FC5ePnk+Mg=;
+ b=Vh1K7JlasMJFhO693w807VyritluDY1x12cMsGZzp+Jj5D3N0tUYEMcO+25anO0rH/8BRUuLNDsA5ldXslVNp8vpa5m8lTSCBExllBN0MxfoYfAshldmq5/YR5z9OMuZgioxjRvD/iz0HdXm41j1kzegoLnauHKhILPn9b4h7pelnUpNWw7R8+EUMxWOe6lFZzGnWm6/U+XilKeyXeCV7AkvMyj7rI0AAlqByVz4jlGFgcpr9kJyr1CxU9XTNBNgU6uks+uNoU0LUDqN6+Pyhz76s1HMCM8gxYcHjluB8Mn0fub1sR3WWEkMkst4xXcJqiHSRx8jo2IzhiTqQDPDzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by MW3PR11MB4556.namprd11.prod.outlook.com (2603:10b6:303:5b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Wed, 18 Dec
+ 2024 17:00:02 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29%5]) with mapi id 15.20.8272.005; Wed, 18 Dec 2024
+ 17:00:02 +0000
+Date: Wed, 18 Dec 2024 17:59:51 +0100
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: MD Danish Anwar <danishanwar@ti.com>
+CC: <aleksander.lobakin@intel.com>, <lukma@denx.de>, <m-malladi@ti.com>,
+	<diogo.ivo@siemens.com>, <rdunlap@infradead.org>, <schnelle@linux.ibm.com>,
+	<vladimir.oltean@nxp.com>, <horms@kernel.org>, <rogerq@kernel.org>,
+	<pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [PATCH net-next 1/4] net: ti: Kconfig: Select HSR for ICSSG
+ Driver
+Message-ID: <Z2L/hwH5pgBV9pSB@lzaremba-mobl.ger.corp.intel.com>
+References: <20241216100044.577489-1-danishanwar@ti.com>
+ <20241216100044.577489-2-danishanwar@ti.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241216100044.577489-2-danishanwar@ti.com>
+X-ClientProxiedBy: VE1PR08CA0032.eurprd08.prod.outlook.com
+ (2603:10a6:803:104::45) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|MW3PR11MB4556:EE_
+X-MS-Office365-Filtering-Correlation-Id: c5b1aa23-e23d-406e-40bc-08dd1f85698b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?TxwvCOwdNc0yuqCmmgjyWcQSiLsCUpolTpgQWv7d2cTW7g4snje+UuIKDtvN?=
+ =?us-ascii?Q?c3C14cgokVKew1+8BO8SeM6BxCKr6zUZyzKWwW+qNfQIbAcieiWlqS345TzK?=
+ =?us-ascii?Q?1nYSAQrIsB9nfU94v2vk4jXhyyitxgcU0W0SX8DK7dU8jNsP1ntW20SVb8ez?=
+ =?us-ascii?Q?Q4BvI/BiBmaIJz/UmVLHNCWBFuQaJdVTJnq8ohtoVwFS05sBGbkJjr6HpsoG?=
+ =?us-ascii?Q?kmQg5h2Zj1G5tJvyAzQq+toMx/guszOHMsuqqtsI8mZWQ4kN25SI+C9zUXw4?=
+ =?us-ascii?Q?0ciagOc1QstSzYAuNnpQzARxadkgbyqjzxyH94vdf+NouE8cI02zIHt0ul11?=
+ =?us-ascii?Q?CbJ35tmJrWahRUjKi1XDsViMDolpxu2YoB6AyyibKdCTYTfOYYHU1ZRwb9n6?=
+ =?us-ascii?Q?1+0QN+4kOrDJRu3KZfdyVXZxNsiCkesVIitG7SSTnr2lUwQDFnBqpbQjnxIP?=
+ =?us-ascii?Q?1kHpnOziLUN0sV6X1Jvh9SeH+lEZ3Tj+HjcqpJ3LhZBvV2ji6jb3kaECqqRx?=
+ =?us-ascii?Q?xFpgNT22N9uudkVxtmMbmlBIWmJ4FF0HChaLe0tWSe31pquHnWF7aTQmIMAf?=
+ =?us-ascii?Q?9ABIcIQqmoZO4W7vud3PIz9oIb6MkbNYkX+Qt40jhzjB8emBEUexGCPgXxcA?=
+ =?us-ascii?Q?Z0qWM88V1LV/aj0MeF0wzH/2yRiR2c5qLnzRPrJqfUtYy/8wy2+yDvPnspXJ?=
+ =?us-ascii?Q?hsIF6+f2J11NzDetVQASnaBGXGgCmkfIz25yIYfjmh/OUemqSUD1hvciSJzY?=
+ =?us-ascii?Q?14Eq9shlxjPpHPsOGGEgLQGlgf0/mbOS/QnChcVHhRCfzVpBW1o405u1hkY0?=
+ =?us-ascii?Q?9+sDc1G+s1ir3btQ800BTsgDyP/xhIUWLw60FNofAFsQVrqSaO/JWr86Xx2X?=
+ =?us-ascii?Q?SQ0e4CMymbJTW6sMLOBA/ZSn3jOHHm9XuVTq7W10N4vMRMz2vYLNwLgwfymA?=
+ =?us-ascii?Q?N5jUl0mMCMXcFJ3PKlu3Nw9uaZfUg5Q2uDMDHMwW9egcz8LZFGgkXvfgif5h?=
+ =?us-ascii?Q?26MomOOG5l/Ea/hMZ9wOFAoiFNpdXBhv1J7R0wMUHnzWXbWaDJwq2SS73q5T?=
+ =?us-ascii?Q?GzHvZUC+gaHVOR+BKYXXC/GkL15Ds0Q4wQjZzoz33MXHbbsXBUx2igQwgk1n?=
+ =?us-ascii?Q?nav2l3VCfXU9gsdO9FbDTq3WJjDoS9+NaD9nMYSAOSC3LMykmIaufEOKVkCQ?=
+ =?us-ascii?Q?ZAYK5d+bSX4F7b6q5FMiepDG2Pj8SK0s12ZGe3/NiMBq4hLdWmCOWjRVl3ZO?=
+ =?us-ascii?Q?pRFzIb9+OxhrPzQY1//uAHVMIam/6ihFZZbEe8q9FTWFDkTBzEUxHoW4sVgd?=
+ =?us-ascii?Q?wb6o7H+NPYj+8J+MrOobmfaynyKrUosz9MMs3eArDJ2R6bLTyNN5hmEbH+3K?=
+ =?us-ascii?Q?U4BT0nq7FVe72E/bcpBnE0B4RZDr?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wFHjdZ3FPngi8z3ScnyRovFnxUhg4nrpoE0lshFB0HtLst6GKmhIIskja9j3?=
+ =?us-ascii?Q?pEix++1vobb1Rwc7zdGn15+R4sTCNA0ptidQLi/G9CO5nCnBW/hmeXIdZRnd?=
+ =?us-ascii?Q?n8xmK0Xu6Ebehqrj8t1oE3mJGMM6PKPRBGqvITesx3CpzWfXkmhenT2EBUZR?=
+ =?us-ascii?Q?8GU9L6+GXT5OKmH+Y/JGY4Z6Vdsl4tmfzDa7udL+amDsYG+mFDYJph+H4xcL?=
+ =?us-ascii?Q?60U0Qi/zAF1oP8pguLKJxcESQzE+XY0a1Cv75nJEerG8Pj1LncHMPykVUZk4?=
+ =?us-ascii?Q?W7FaXti6DlEH773I1JMqBEHr07txqnDWx3NcQQH6pgY1HkTqv1n7SK6YnkKt?=
+ =?us-ascii?Q?3bDk8dwbvOl/Ysxd3bLCIXxZEYm2ug1iJ2kN3K1Ch2MTTEhk2Y+NzSVfruJz?=
+ =?us-ascii?Q?btumKkNPrrMmInVcp8wZvHUShDz+AZ+8ho8Mi6JR3AqS99HDRZ1WaRZw/ItW?=
+ =?us-ascii?Q?0WLKD7W/uba7oUFpJpM/i6NPiI/aECuEvqzMKsbwmzb0XJ8H8OtFuoD+UJui?=
+ =?us-ascii?Q?WS/81x3r4abi9+uv2DKASwNnmsHZ/N6uJwjTaLTsX7KTBLZW9ujd5Yu0XSYS?=
+ =?us-ascii?Q?ujG3DO/sM1mAHnup2RJRPYDEIpCJS/pIGuUf7oHAmbs5c7KXoucM7Ajo1Hs8?=
+ =?us-ascii?Q?MiWlWlF0ZNjnDMCIK2Z7ej5rfkwlQ98EAyzGotBk40EaUeTAL1L0Bj61rk4B?=
+ =?us-ascii?Q?RY8i9C1cGDYa/XNwVEe75sCR4Fb+/fB6VVMwcyL/m8qdY55uyvdYk3eKgq/S?=
+ =?us-ascii?Q?GeQdLLTRIiik8uLHJC1G5vbKpErV8bg5MlSk7RKeCr11XT34IIaxOBFk/Pa+?=
+ =?us-ascii?Q?Yq2llVS+GcClWSCu4OiEwnVd16+ZBjxfla2T2zmzR+Rcgzar2kj4lz1IYEkO?=
+ =?us-ascii?Q?4IRRDN/vqLmrvQvN3r4Spt3erzsFdyzDCjr4rQt2oF/AWt/TGloXAyh5Kdec?=
+ =?us-ascii?Q?WZji/jPNZ2P+CrsIJ6CP9PL/B1HtV+4si0x1YyAozts7odC3+paIPBBrmrzA?=
+ =?us-ascii?Q?pIx/5lveBEOYcAIBeiXHLnCDDL36EK0DEMQdaa8OvNkAUmBWtkVbGaETKSv6?=
+ =?us-ascii?Q?AVW9coQliyg/elA+uFh+XpNGNcbgv75SQdhQc7Dp1Wv78WXI3KmNMyqvmh/w?=
+ =?us-ascii?Q?TOoAc+R8xK7yjSdN36gbE0cAs6ZERoF0HJCOwE2KAtssamK7ETYxdx6vGpck?=
+ =?us-ascii?Q?4jEYvg4FUL7t8lm8KTNzKQrWbilqW1F5SrVF9u2wBURGi7xqhlvCpEyphdHD?=
+ =?us-ascii?Q?TLp9pkh70Zt0aTY9xz3JqDt1uOpowdTc1LqQrv2DRnr3BUHJYrIUAVZJuIzx?=
+ =?us-ascii?Q?15IiKAH9f7gTjYSw/oawa7JTjwTYMO8mmXQHVDXlR9igQLOszkOlLqDM2SZS?=
+ =?us-ascii?Q?ChL3h2q2zQhsqFzS0akPow5FGdCZeU8c2gRQ07uYD7guwrgeBUdRKQv+EI3x?=
+ =?us-ascii?Q?w1HgM8c7qzA86cdmAULl+8R3f5p8wdXj3PJnp6lZjKvAdribzjzLPSYp8UDn?=
+ =?us-ascii?Q?feY0ISQLIElcUqnpikIbbcUHbMN5DGzTjsNeJMdPKfj3GZYspMsUX2JxwJ0x?=
+ =?us-ascii?Q?aC1JjE8h9I8eBYekrqXh8aKc0aNF8F7Cqzd7wa9I0EMNDFLU7wuK9bWnVbBo?=
+ =?us-ascii?Q?IA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5b1aa23-e23d-406e-40bc-08dd1f85698b
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2024 17:00:01.9449
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SDw1HY7V+mkep2kEZwz/UWWagoo75UXlAhEpxK0/l9RbB4NeC934F1P/B973x4/jy43FlrEARDAiZ9tR1LKWg6qclNFZwwKdHWanbRzHOMc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4556
+X-OriginatorOrg: intel.com
 
-Delete the driver CPU affinity info and use the core's napi config
-instead.
+On Mon, Dec 16, 2024 at 03:30:41PM +0530, MD Danish Anwar wrote:
+> HSR offloading is supported by ICSSG driver. Select the symbol HSR for
+> TI_ICSSG_PRUETH. Also select NET_SWITCHDEV instead of depending on it to
+> remove recursive dependency.
+>
 
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
----
- drivers/net/ethernet/mellanox/mlx4/en_cq.c    |  8 ++--
- .../net/ethernet/mellanox/mlx4/en_netdev.c    | 33 +--------------
- drivers/net/ethernet/mellanox/mlx4/eq.c       | 22 ----------
- drivers/net/ethernet/mellanox/mlx4/main.c     | 42 ++-----------------
- drivers/net/ethernet/mellanox/mlx4/mlx4.h     |  1 -
- drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |  1 -
- 6 files changed, 10 insertions(+), 97 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_cq.c b/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-index b8531283e3ac..46e28e0bfcd0 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-@@ -90,6 +90,7 @@ int mlx4_en_activate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq,
- 			int cq_idx)
- {
- 	struct mlx4_en_dev *mdev = priv->mdev;
-+	struct napi_config *napi_config;
- 	int irq, err = 0;
- 	int timestamp_en = 0;
- 	bool assigned_eq = false;
-@@ -100,11 +101,12 @@ int mlx4_en_activate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq,
- 	*cq->mcq.set_ci_db = 0;
- 	*cq->mcq.arm_db    = 0;
- 	memset(cq->buf, 0, cq->buf_size);
-+	napi_config = cq->napi.config;
+2 things:
+1) The explanation from the cover should have been included in the commit 
+   message.
+2) Why not `depends on HSR`?
  
- 	if (cq->type == RX) {
- 		if (!mlx4_is_eq_vector_valid(mdev->dev, priv->port,
- 					     cq->vector)) {
--			cq->vector = cpumask_first(priv->rx_ring[cq->ring]->affinity_mask);
-+			cq->vector = cpumask_first(&napi_config->affinity_mask);
- 
- 			err = mlx4_assign_eq(mdev->dev, priv->port,
- 					     &cq->vector);
-@@ -150,7 +152,7 @@ int mlx4_en_activate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq,
- 	case TX:
- 		cq->mcq.comp = mlx4_en_tx_irq;
- 		netif_napi_add_tx(cq->dev, &cq->napi, mlx4_en_poll_tx_cq);
--		netif_napi_set_irq(&cq->napi, irq, 0);
-+		netif_napi_set_irq(&cq->napi, irq, NAPIF_IRQ_AFFINITY);
- 		napi_enable(&cq->napi);
- 		netif_queue_set_napi(cq->dev, cq_idx, NETDEV_QUEUE_TYPE_TX, &cq->napi);
- 		break;
-@@ -158,7 +160,7 @@ int mlx4_en_activate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq,
- 		cq->mcq.comp = mlx4_en_rx_irq;
- 		netif_napi_add_config(cq->dev, &cq->napi, mlx4_en_poll_rx_cq,
- 				      cq_idx);
--		netif_napi_set_irq(&cq->napi, irq, 0);
-+		netif_napi_set_irq(&cq->napi, irq, NAPIF_IRQ_AFFINITY);
- 		napi_enable(&cq->napi);
- 		netif_queue_set_napi(cq->dev, cq_idx, NETDEV_QUEUE_TYPE_RX, &cq->napi);
- 		break;
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
-index 281b34af0bb4..e4c2532b5909 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
-@@ -1596,24 +1596,6 @@ static void mlx4_en_linkstate_work(struct work_struct *work)
- 	mutex_unlock(&mdev->state_lock);
- }
- 
--static int mlx4_en_init_affinity_hint(struct mlx4_en_priv *priv, int ring_idx)
--{
--	struct mlx4_en_rx_ring *ring = priv->rx_ring[ring_idx];
--	int numa_node = priv->mdev->dev->numa_node;
--
--	if (!zalloc_cpumask_var(&ring->affinity_mask, GFP_KERNEL))
--		return -ENOMEM;
--
--	cpumask_set_cpu(cpumask_local_spread(ring_idx, numa_node),
--			ring->affinity_mask);
--	return 0;
--}
--
--static void mlx4_en_free_affinity_hint(struct mlx4_en_priv *priv, int ring_idx)
--{
--	free_cpumask_var(priv->rx_ring[ring_idx]->affinity_mask);
--}
--
- static void mlx4_en_init_recycle_ring(struct mlx4_en_priv *priv,
- 				      int tx_ring_idx)
- {
-@@ -1663,16 +1645,9 @@ int mlx4_en_start_port(struct net_device *dev)
- 	for (i = 0; i < priv->rx_ring_num; i++) {
- 		cq = priv->rx_cq[i];
- 
--		err = mlx4_en_init_affinity_hint(priv, i);
--		if (err) {
--			en_err(priv, "Failed preparing IRQ affinity hint\n");
--			goto cq_err;
--		}
--
- 		err = mlx4_en_activate_cq(priv, cq, i);
- 		if (err) {
- 			en_err(priv, "Failed activating Rx CQ\n");
--			mlx4_en_free_affinity_hint(priv, i);
- 			goto cq_err;
- 		}
- 
-@@ -1688,7 +1663,6 @@ int mlx4_en_start_port(struct net_device *dev)
- 		if (err) {
- 			en_err(priv, "Failed setting cq moderation parameters\n");
- 			mlx4_en_deactivate_cq(priv, cq);
--			mlx4_en_free_affinity_hint(priv, i);
- 			goto cq_err;
- 		}
- 		mlx4_en_arm_cq(priv, cq);
-@@ -1874,10 +1848,9 @@ int mlx4_en_start_port(struct net_device *dev)
- mac_err:
- 	mlx4_en_put_qp(priv);
- cq_err:
--	while (rx_index--) {
-+	while (rx_index--)
- 		mlx4_en_deactivate_cq(priv, priv->rx_cq[rx_index]);
--		mlx4_en_free_affinity_hint(priv, rx_index);
--	}
-+
- 	for (i = 0; i < priv->rx_ring_num; i++)
- 		mlx4_en_deactivate_rx_ring(priv, priv->rx_ring[i]);
- 
-@@ -2011,8 +1984,6 @@ void mlx4_en_stop_port(struct net_device *dev, int detach)
- 		napi_synchronize(&cq->napi);
- 		mlx4_en_deactivate_rx_ring(priv, priv->rx_ring[i]);
- 		mlx4_en_deactivate_cq(priv, cq);
--
--		mlx4_en_free_affinity_hint(priv, i);
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/eq.c b/drivers/net/ethernet/mellanox/mlx4/eq.c
-index d768a6a828c4..b005eb697c64 100644
---- a/drivers/net/ethernet/mellanox/mlx4/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/eq.c
-@@ -233,23 +233,6 @@ static void mlx4_slave_event(struct mlx4_dev *dev, int slave,
- 	slave_event(dev, slave, eqe);
- }
- 
--#if defined(CONFIG_SMP)
--static void mlx4_set_eq_affinity_hint(struct mlx4_priv *priv, int vec)
--{
--	int hint_err;
--	struct mlx4_dev *dev = &priv->dev;
--	struct mlx4_eq *eq = &priv->eq_table.eq[vec];
--
--	if (!cpumask_available(eq->affinity_mask) ||
--	    cpumask_empty(eq->affinity_mask))
--		return;
--
--	hint_err = irq_update_affinity_hint(eq->irq, eq->affinity_mask);
--	if (hint_err)
--		mlx4_warn(dev, "irq_update_affinity_hint failed, err %d\n", hint_err);
--}
--#endif
--
- int mlx4_gen_pkey_eqe(struct mlx4_dev *dev, int slave, u8 port)
- {
- 	struct mlx4_eqe eqe;
-@@ -1123,8 +1106,6 @@ static void mlx4_free_irqs(struct mlx4_dev *dev)
- 
- 	for (i = 0; i < dev->caps.num_comp_vectors + 1; ++i)
- 		if (eq_table->eq[i].have_irq) {
--			free_cpumask_var(eq_table->eq[i].affinity_mask);
--			irq_update_affinity_hint(eq_table->eq[i].irq, NULL);
- 			free_irq(eq_table->eq[i].irq, eq_table->eq + i);
- 			eq_table->eq[i].have_irq = 0;
- 		}
-@@ -1516,9 +1497,6 @@ int mlx4_assign_eq(struct mlx4_dev *dev, u8 port, int *vector)
- 			clear_bit(*prequested_vector, priv->msix_ctl.pool_bm);
- 			*prequested_vector = -1;
- 		} else {
--#if defined(CONFIG_SMP)
--			mlx4_set_eq_affinity_hint(priv, *prequested_vector);
--#endif
- 			eq_set_ci(&priv->eq_table.eq[*prequested_vector], 1);
- 			priv->eq_table.eq[*prequested_vector].have_irq = 1;
- 		}
-diff --git a/drivers/net/ethernet/mellanox/mlx4/main.c b/drivers/net/ethernet/mellanox/mlx4/main.c
-index febeadfdd5a5..5f88c297332f 100644
---- a/drivers/net/ethernet/mellanox/mlx4/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/main.c
-@@ -2923,36 +2923,6 @@ static int mlx4_setup_hca(struct mlx4_dev *dev)
- 	return err;
- }
- 
--static int mlx4_init_affinity_hint(struct mlx4_dev *dev, int port, int eqn)
--{
--	int requested_cpu = 0;
--	struct mlx4_priv *priv = mlx4_priv(dev);
--	struct mlx4_eq *eq;
--	int off = 0;
--	int i;
--
--	if (eqn > dev->caps.num_comp_vectors)
--		return -EINVAL;
--
--	for (i = 1; i < port; i++)
--		off += mlx4_get_eqs_per_port(dev, i);
--
--	requested_cpu = eqn - off - !!(eqn > MLX4_EQ_ASYNC);
--
--	/* Meaning EQs are shared, and this call comes from the second port */
--	if (requested_cpu < 0)
--		return 0;
--
--	eq = &priv->eq_table.eq[eqn];
--
--	if (!zalloc_cpumask_var(&eq->affinity_mask, GFP_KERNEL))
--		return -ENOMEM;
--
--	cpumask_set_cpu(requested_cpu, eq->affinity_mask);
--
--	return 0;
--}
--
- static void mlx4_enable_msi_x(struct mlx4_dev *dev)
- {
- 	struct mlx4_priv *priv = mlx4_priv(dev);
-@@ -2997,19 +2967,13 @@ static void mlx4_enable_msi_x(struct mlx4_dev *dev)
- 			priv->eq_table.eq[i].irq =
- 				entries[i + 1 - !!(i > MLX4_EQ_ASYNC)].vector;
- 
--			if (MLX4_IS_LEGACY_EQ_MODE(dev->caps)) {
-+			if (MLX4_IS_LEGACY_EQ_MODE(dev->caps))
- 				bitmap_fill(priv->eq_table.eq[i].actv_ports.ports,
- 					    dev->caps.num_ports);
--				/* We don't set affinity hint when there
--				 * aren't enough EQs
--				 */
--			} else {
-+			else
- 				set_bit(port,
- 					priv->eq_table.eq[i].actv_ports.ports);
--				if (mlx4_init_affinity_hint(dev, port + 1, i))
--					mlx4_warn(dev, "Couldn't init hint cpumask for EQ %d\n",
--						  i);
--			}
-+
- 			/* We divide the Eqs evenly between the two ports.
- 			 * (dev->caps.num_comp_vectors / dev->caps.num_ports)
- 			 * refers to the number of Eqs per port
-diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4.h b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-index d7d856d1758a..66b1ebfd5816 100644
---- a/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-+++ b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-@@ -403,7 +403,6 @@ struct mlx4_eq {
- 	struct mlx4_eq_tasklet	tasklet_ctx;
- 	struct mlx4_active_ports actv_ports;
- 	u32			ref_count;
--	cpumask_var_t		affinity_mask;
- };
- 
- struct mlx4_slave_eqe {
-diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-index 28b70dcc652e..41594dd00636 100644
---- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-+++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-@@ -357,7 +357,6 @@ struct mlx4_en_rx_ring {
- 	unsigned long dropped;
- 	unsigned long alloc_fail;
- 	int hwtstamp_rx_filter;
--	cpumask_var_t affinity_mask;
- 	struct xdp_rxq_info xdp_rxq;
- };
- 
--- 
-2.43.0
-
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+>  drivers/net/ethernet/ti/Kconfig | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+> index 0d5a862cd78a..ad366abfa746 100644
+> --- a/drivers/net/ethernet/ti/Kconfig
+> +++ b/drivers/net/ethernet/ti/Kconfig
+> @@ -187,8 +187,9 @@ config TI_ICSSG_PRUETH
+>  	select PHYLIB
+>  	select TI_ICSS_IEP
+>  	select TI_K3_CPPI_DESC_POOL
+> +	select NET_SWITCHDEV
+> +	select HSR
+>  	depends on PRU_REMOTEPROC
+> -	depends on NET_SWITCHDEV
+>  	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
+>  	depends on PTP_1588_CLOCK_OPTIONAL
+>  	help
+> -- 
+> 2.34.1
+> 
+> 
 
