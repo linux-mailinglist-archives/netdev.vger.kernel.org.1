@@ -1,133 +1,94 @@
-Return-Path: <netdev+bounces-152744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04139F5B1C
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 01:09:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C7959F5B2B
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 01:10:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CEA6163C78
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 00:09:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 761361891035
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 00:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D903C191;
-	Wed, 18 Dec 2024 00:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03CB320B;
+	Wed, 18 Dec 2024 00:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E0Cv2Ygl"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="TeGK7Yto"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086062F2A
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 00:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F9B33D8;
+	Wed, 18 Dec 2024 00:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734480451; cv=none; b=jVpMsfwbU+jnpx+ug4RWoiaLRsJn5VqgM6AGuQN775s7zouI8CtxR0IIEdtiO3hGBZ7EERHCjfXnIu8gDr0Ogiw2KSmnMjFpbACHHFAxb73ARDH/F4iD9+zW8gT20Pbiij/PlL68wnUPFkO3W6UrsVoi44dXfbpJx0Aln9pbHik=
+	t=1734480567; cv=none; b=nFL0HTL3Cjj5s1ZhFpWztARLSfCf9g1E8GdbKX7leBhTQ/jUfl4V67RUzqiXOsHZuHh1+vL58jP1DsoXhGhoDmHwZUBuR8nCQcL76jfFiUbJezujzjhXMWIZcgzvpCSAeB+b3O7XxvvkZX11ggLWpb+y69UKQCy9kwdQ8ewrzPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734480451; c=relaxed/simple;
-	bh=j7uA8fVKMd9CEijahcXeOUavdMw9m+h9aGl/+h5swJU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=c5E9rK+OFNhh3LpHkl/Hopvu0j1jprjrpULyFw791BZSmfID3jHEv6cQFpBvElkZQ9aJFLAYX0CGs7buQHh22DwAGpWervfSIbtbBltLcNoGe6x0vxZ8LOdfFz6QxoQYgKri7aElwCnWo57unGAAfD739xBDOvpXKALy6gvlrYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E0Cv2Ygl; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3862d16b4f5so152912f8f.0
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 16:07:29 -0800 (PST)
+	s=arc-20240116; t=1734480567; c=relaxed/simple;
+	bh=9+cKn7QEeUDoB/RqtHyOeDf93MZ40cdw5taP99fDmLA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=bJcTute60ZQ85OuCpHPBLrtOO+vVZq09WBUQH5j8E/X/e65Z1g5Jv3Jqk7pOi5G1uxd9CrHF9LAS4HQfTipc0nobi1ElnTkppLwx/3ddHlptBdq4pMxljD589Ss7/UlgOaTsx/Ym+33nfr8pl8MvtuFCvAur8RNXTWWCWpadgVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=TeGK7Yto; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734480448; x=1735085248; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CqNThULah4PzV7al9vVXXlqGBtf7kZ43w5+oGKHtVU0=;
-        b=E0Cv2Ygl8j6CPNQb01KLTj2fHKSaPpx6awbEJQOloTpS5KcISMd0lrqZIu4WG/l0mv
-         Q5nIAJF8o3gXOZHTbqySWr1AhQ1jPJnZYt5OGg5m5P2Ov8PC4dgYfxCeGwB7SHKe15O8
-         c8bFnEHiCVAs2bEYI2z2DVZdFyh18wrNFtyXwXvX4JIpVdMJlx8Cnx8Mxyg/qJYzydhU
-         l/FigRzrxUANNAWbd60iL+p9Rll+kyoSqeJ9nojT7JWEcFewe5EkIiAwaIFIA0Zs1dVE
-         uoeR28I4PiLVDMtznqLk8h0TKk8CWQtmOGKieqxlLENFOivgIpejyVssJIBcfdhyod6+
-         10YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734480448; x=1735085248;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CqNThULah4PzV7al9vVXXlqGBtf7kZ43w5+oGKHtVU0=;
-        b=EFb52d6cfHYznkXMLW7kY4Fiafk4sSZrBubxTY13/q3H0+9wpOFjmOpctUe7ucxZMD
-         SOVmIOnsOUdAdXzKQ9fg2jK4jPDE7EWKE8opNgsojtco6DCmOVRuKrPWfNG9FbcNdMq9
-         W1yMCBGvZCK9HfRCGVUDGMruT12NKjN/YomTmfQpNy2XqNkoFZAU+/4vNpeDFFXk9qXE
-         AONV+f4BjC4ihCX9dmgLT8mPAgRDlZAWQ8/i6ygBZ3Uv7EYrOa2Gh4RYFKb02+Sz0iPs
-         XeHi8DHPUDi3IuDIuAzBgPGqoHiunEYF2KsjyhTUw4UDvqNb5Ibm0eKMq77qX81aRI8n
-         qJjw==
-X-Forwarded-Encrypted: i=1; AJvYcCWp3SS5HzJ7iq1MvO5j5Y4HZLsqfemGrVG2XP36wYYmfgqpKhbem/gq8IFD1GthpIF5Kyg2bKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh9FokGpOfQECINDzjoeNtm+mC5TTDfBpvqwT+BEBgsEu5YsNF
-	4AoPYG2DxWmHVXfCJWATGichBWHSzyNYuVK61El4qG3995zbpGGCCtYzgf6gHLDzno7EJwGtv2Q
-	CI31mb3SxZprir0R5EllKK7cGTe+jatD4
-X-Gm-Gg: ASbGncupKjOcxjoLSv5vNlc9DZkKEEV56Jl7u8RyqWvhpWWbuVUz+Jd+rDhzVUXv7CE
-	6zjd4BlZ3Te9sl5h3wsl9AlLIOaKB8OfS078arxg4TLOgCji/0zC44g==
-X-Google-Smtp-Source: AGHT+IFntzPJB8kApDo4bzhZWKogR+xtOyJcajgjC5P1zItdiybBrTxuqTa1veYv7m2j4XUM2BLzJ+gFL1wE9xVIESI=
-X-Received: by 2002:a05:6000:2a6:b0:385:f138:97ac with SMTP id
- ffacd0b85a97d-388e4e15136mr391850f8f.1.1734480448109; Tue, 17 Dec 2024
- 16:07:28 -0800 (PST)
+	d=codeconstruct.com.au; s=2022a; t=1734480562;
+	bh=9+cKn7QEeUDoB/RqtHyOeDf93MZ40cdw5taP99fDmLA=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=TeGK7YtofpEdTn+QXHIgNzR2pOGglZjJqbtojjMg1Tsmjx/tuyLs+ugkaW+dT6S+e
+	 j6mKVbwECq2s2WOMUKIH8Jr60sbHrY9yi3E42aXwpXp9dEcwAB1hW+Fn0RtusNilBw
+	 Tao/4iXfmANzhcix3jyFfW1pPtcNBLiUrojVFKp0lubuL/fCfBy7dpsGgoYD0ewEq6
+	 dZqmjCvcUZ1Lhy/7+oWarxrJqYy0ju6LeD/MLuG55VK9JTel7887DfWH0hDvRIZ2q6
+	 Kgh/SpPkma7La/XNv6Ik/+3gj/mOUgGKK/fEDVFXg6ASG/maJ62//SRYYCrXm5mfme
+	 A+1JrniUidSvA==
+Received: from [192.168.72.171] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id A8FE26F531;
+	Wed, 18 Dec 2024 08:09:20 +0800 (AWST)
+Message-ID: <0ea0aac339c2ee7522510f1dab5f69a27413434d.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v9 1/1] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Joe Damato <jdamato@fastly.com>, admiyo@os.amperecomputing.com
+Cc: Matt Johnston <matt@codeconstruct.com.au>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  Sudeep Holla <sudeep.holla@arm.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, Huisong Li
+ <lihuisong@huawei.com>
+Date: Wed, 18 Dec 2024 08:09:20 +0800
+In-Reply-To: <Z2HLJD8z3wFNvnlV@LQ3V64L9R2>
+References: <20241217182528.108062-1-admiyo@os.amperecomputing.com>
+	 <20241217182528.108062-2-admiyo@os.amperecomputing.com>
+	 <Z2HLJD8z3wFNvnlV@LQ3V64L9R2>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 17 Dec 2024 16:07:16 -0800
-Message-ID: <CAADnVQKkCLaj=roayH=Mjiiqz_svdf1tsC3OE4EC0E=mAD+L1A@mail.gmail.com>
-Subject: xfrm in RT
-To: Sebastian Sewior <bigeasy@linutronix.de>, Network Development <netdev@vger.kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hi Joe,
 
-Looks like xfrm isn't friendly to PREEMPT_RT.
-xfrm_input_state_lookup() is doing:
+> I suspect what Jeremy meant (but please feel free to correct me if
+> I'm mistaken, Jeremy) was that you may want to use the helpers in:
+>=20
+> include/linux/netdevice.h
 
-int cpu = get_cpu();
-...
-spin_lock_bh(&net->xfrm.xfrm_state_lock);
+No, I was just referring to the new(-ish) dstats infrastructure in the
+core, with dstats collection in rtnl_link_stats64() as of 94b601bc.
 
-which causes a splat:
+However, your suggestion of:
 
-[  811.175877] BUG: sleeping function called from invalid context at
-kernel/locking/spinlock_rt.c:48
-[  811.175884] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid:
-13785, name: ping
-[  811.175886] preempt_count: 1, expected: 0
-[  811.175888] RCU nest depth: 6, expected: 6
-[  811.175889] INFO: lockdep is turned off.
-[  811.175891] CPU: 9 UID: 0 PID: 13785 Comm: ping Tainted: G        W
- O       6.13.0-rc3-00067-ga3c4183875d5-dirty #2
-[  811.175900] Call Trace:
-[  811.175901]  <TASK>
-[  811.175902]  dump_stack_lvl+0x80/0x90
-[  811.175911]  __might_resched+0x2c7/0x480
-[  811.175917]  rt_spin_lock+0xbd/0x240
-[  811.175922]  ? rtlock_slowlock_locked+0x4cd0/0x4cd0
-[  811.175925]  xfrm_input_state_lookup+0x643/0xa10
-[  811.175930]  ? skb_ext_add+0x4dd/0x690
-[  811.175934]  ? xfrm_state_lookup+0x1d0/0x1d0
-[  811.175937]  ? __asan_memset+0x23/0x40
-[  811.175940]  xfrm_input+0x78c/0x5820
-[  811.175943]  ? reacquire_held_locks+0x4d0/0x4d0
-[  811.175948]  ? bpf_prog_1a2cc90c3a1be51f_xfrm_get_state+0x31/0x7d
-[  811.175978]  ? fib_multipath_hash+0x1190/0x1190
-[  811.175983]  ? cls_bpf_classify+0x4ad/0x12e0
-[  811.176001]  ? xfrm_rcv_cb+0x270/0x270
-[  811.176001]  ? raw_rcv+0x6c0/0x6c0
-[  811.176001]  xfrm4_esp_rcv+0x80/0x190
-[  811.176001]  ip_protocol_deliver_rcu+0x82/0x300
-[  811.176001]  ip_local_deliver_finish+0x29b/0x420
-[  811.176001]  ip_local_deliver+0x17b/0x400
-[  811.176001]  ? ip_local_deliver_finish+0x420/0x420
-[  811.176001]  ? lock_release+0x464/0x640
-[  811.176001]  ? rcu_read_lock_held+0xe/0x50
-[  811.176001]  ? ip_rcv_finish_core.isra.0+0x943/0x1f80
-[  811.176001]  ip_sublist_rcv_finish+0x84/0x230
-[  811.176001]  ip_sublist_rcv+0x3e2/0x780
-[  811.176001]  ? ip_rcv_finish_core.isra.0+0x1f80/0x1f80
-[  811.176001]  ? do_xdp_generic+0xbf0/0xbf0
-[  811.176001]  ? xfrm_state_lookup+0xf5/0x1d0
-[  811.176001]  ? ip_sublist_rcv+0x780/0x780
-[  811.176001]  ip_list_rcv+0x266/0x360
+> =C2=A0 dev_dstats_rx_add(mctp_pcc_ndev->mdev.dev, data_len);
+> =C2=A0 dev_dstats_rx_dropped(mctp_pcc_ndev->mdev.dev);
+
+make it even simpler! I would agree with the recommendation there.
+
+Cheers,
+
+
+Jeremy
 
