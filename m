@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-153076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F5B39F6BB7
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:59:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 621039F6BBD
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:00:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E346D169C6A
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:59:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 487F41894D46
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1220F1F9408;
-	Wed, 18 Dec 2024 16:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2661FA828;
+	Wed, 18 Dec 2024 16:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZWrSebV9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G0AvZZBy"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3501F8F0B
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F7A1F9EA4
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 16:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734541166; cv=none; b=e+Q08vQJn7AYfsA/65/w/Sq0dz9K7G2pqXxfQCqY89FG6sWKiMn/MFYyRe9GmKs4IC+2+Si+tGUR4IAXNQZE/s+xCZuMjMhYILw9SZwkoZ7qd7aK/TbmNGB0NC5dWsqk3k6CCP+RphhgizF2byUW3moRg7RH7KiXKHNbr3lVLiQ=
+	t=1734541172; cv=none; b=RO/FPxM2YMOpo7dAkxyRm3VHWx66Wm8GUuDY4REtGtLd49NuKxScS2j4RHQNmd9GxOlavjJla0TCHtE7fv8qwefVxpuiVznyUHrpxfxA//SYfdaq9COYP+o46NRLes2Q3rcEVyjSVAw6gaQlzDjAdyHzx+R3OQ/wDnUXaKyV54w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734541166; c=relaxed/simple;
-	bh=2fwKur69SkO2Al+4r9/Gm9fu59bB1iv1Ov283megPig=;
+	s=arc-20240116; t=1734541172; c=relaxed/simple;
+	bh=uvohYjXV2F2dAriFn/q9+6q/VifOLx3veE1xtuRsoyw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y3b4Em/x0+vBrSlZpVQP3VKPYjp/4Pwcu/rRFxZ6tlMoBwWRxBCixa5n8wt2gO9/bSXXprrfDcWd/96+80Y/Zsd2MgRm1L4tNLwiF6iKKPcjmOkVkg0vM/bH3YjuRmXERfto6TgVxWmVxdoZK8KHbExWd0gFaukek5HXB8XLLT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZWrSebV9; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=bcghVO6IBzgcrboEoGlXkC/0HkyppxGOSxTax01GEVddtZZEjpKsHsZreIKBqZo0p3xaFJoBQffrVOIm/lSjKUpufh9tlOWBR7hMzNokw+LySGM1cx/tLev1LGQSghxl3XIh5U6L0YId73sgoQo7ek2olkacnPTr0FRa4O/d9cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G0AvZZBy; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734541164; x=1766077164;
+  t=1734541170; x=1766077170;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2fwKur69SkO2Al+4r9/Gm9fu59bB1iv1Ov283megPig=;
-  b=ZWrSebV9taYDIzAJpw0BrM8zyOTGC50XaiESRjgfaLGrkASVGQtrEfAg
-   /L7pWbokoAybc5Z5i1ln9JDQDnjF3WEW+kJrD0FhF89AZXcczAXCNvd+n
-   lTWhEaOnntG1Qhg27cNZsrgY59ppwpVzbWJ/dsnoJDf3nt4jgDD2h1bf+
-   AY5ndgSBxJzAzr4acobqGRY7S+GAnbC26kmrssh8p0rH5DYHJ0PHCJZZe
-   ablA7wiTAmciSNeoALfytxLcmmRl2CVsTDr7gwyx5HPJaEIH/U6AmskT6
-   9DrhbDwt1loIRh2gYzIjWrw7M9u3ZQ5yk57UL3ZX86LPrtidhG2feyu0g
-   Q==;
-X-CSE-ConnectionGUID: ryt7TDdWSiae1TsKzS5n2g==
-X-CSE-MsgGUID: U9P1dwk9QJij+hExWiAWdw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="46415520"
+  bh=uvohYjXV2F2dAriFn/q9+6q/VifOLx3veE1xtuRsoyw=;
+  b=G0AvZZByK0R+PTa8Xh51fL3X8JMBt+nk/YurRGJQMnkfR3UGhXGr+pU5
+   c2tFsJfCsJRK19IWkh1E/ZQApMAd7cEr9zvkGWHlf5F9EAkumgjg+sddm
+   4kA2cPbpvANeTRp9vep5YOrGCiNkMVh4ohVnfVoePzQ3sLWdzj5eNKSDI
+   jTIf5dXnmHAEJvFmewuN/NTTVTbvRnogBuywtI7cT+saiSwFRgNTEfrcY
+   VJDRLIBEMi6H/sIe6PPT22BFNHl2Eya0UEWCheWTUwiaNZ3V1lwONLIJm
+   e8T8YYaaIiyM0bgvu+wTe0faHhAdRnMzYmzpP8LbtmuT4/pE3v9s19hZX
+   w==;
+X-CSE-ConnectionGUID: enTbx4NUTIG5vbZLha/F7Q==
+X-CSE-MsgGUID: 7N6a+9dhQOqalQ8I4QNJbQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="46415528"
 X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
-   d="scan'208";a="46415520"
+   d="scan'208";a="46415528"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:24 -0800
-X-CSE-ConnectionGUID: MY7m7WPISTqkaxg30e5H+w==
-X-CSE-MsgGUID: RugHsvEfQw+fSFpUufel5Q==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:30 -0800
+X-CSE-ConnectionGUID: q4UprfIvSbC1nKl2eM83VQ==
+X-CSE-MsgGUID: XwakriFQT2+ez7o8sMUxdw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="102531758"
+   d="scan'208";a="102531837"
 Received: from ldmartin-desk2.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.111.224])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:18 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:59:24 -0800
 From: Ahmed Zaki <ahmed.zaki@intel.com>
 To: netdev@vger.kernel.org
 Cc: intel-wired-lan@lists.osuosl.org,
@@ -74,9 +74,9 @@ Cc: intel-wired-lan@lists.osuosl.org,
 	shayd@nvidia.com,
 	akpm@linux-foundation.org,
 	Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: [PATCH net-next v2 3/8] lib: cpu_rmap: allow passing a notifier callback
-Date: Wed, 18 Dec 2024 09:58:38 -0700
-Message-ID: <20241218165843.744647-4-ahmed.zaki@intel.com>
+Subject: [PATCH net-next v2 4/8] net: napi: add CPU affinity to napi->config
+Date: Wed, 18 Dec 2024 09:58:39 -0700
+Message-ID: <20241218165843.744647-5-ahmed.zaki@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241218165843.744647-1-ahmed.zaki@intel.com>
 References: <20241218165843.744647-1-ahmed.zaki@intel.com>
@@ -88,174 +88,179 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow the rmap users to pass a notifier callback function that can be
-called instead of irq_cpu_rmap_notify().
+A common task for most drivers is to remember the user-set CPU affinity
+to its IRQs. On each netdev reset, the driver should re-assign the
+user's setting to the IRQs.
 
-Two modifications are made:
-   * make struct irg_glue visible in cpu_rmap.h
-   * pass a new "void* data" parameter that can be used by the cb
-     function.
+Add CPU affinity mask to napi->config. To delegate the CPU affinity
+management to the core, drivers must:
+ 1 - add a persistent napi config:     netif_napi_add_config()
+ 2 - bind an IRQ to the napi instance: netif_napi_set_irq() with the new
+     flag NAPIF_IRQ_AFFINITY
 
+the core will then make sure to use re-assign affinity to the napi's
+IRQ.
+
+The default mask set to all IRQs is all online CPUs.
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 ---
- drivers/net/ethernet/cisco/enic/enic_main.c   |  3 ++-
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx4/eq.c       |  2 +-
- .../net/ethernet/mellanox/mlx5/core/pci_irq.c |  2 +-
- drivers/net/ethernet/sfc/nic.c                |  2 +-
- include/linux/cpu_rmap.h                      | 13 +++++++++++-
- lib/cpu_rmap.c                                | 20 +++++++++----------
- 7 files changed, 28 insertions(+), 16 deletions(-)
+ include/linux/netdevice.h |  5 +++
+ net/core/dev.c            | 66 +++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 69 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index 9913952ccb42..e384b975b8af 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -1657,7 +1657,8 @@ static void enic_set_rx_cpu_rmap(struct enic *enic)
- 			return;
- 		for (i = 0; i < enic->rq_count; i++) {
- 			res = irq_cpu_rmap_add(enic->netdev->rx_cpu_rmap,
--					       enic->msix_entry[i].vector);
-+					       enic->msix_entry[i].vector,
-+					       NULL, NULL);
- 			if (unlikely(res)) {
- 				enic_free_rx_cpu_rmap(enic);
- 				return;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 43377a7b2426..3f732516c8ee 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -697,7 +697,7 @@ static int hns3_set_rx_cpu_rmap(struct net_device *netdev)
- 	for (i = 0; i < priv->vector_num; i++) {
- 		tqp_vector = &priv->tqp_vector[i];
- 		ret = irq_cpu_rmap_add(netdev->rx_cpu_rmap,
--				       tqp_vector->vector_irq);
-+				       tqp_vector->vector_irq, NULL, NULL);
- 		if (ret) {
- 			hns3_free_rx_cpu_rmap(netdev);
- 			return ret;
-diff --git a/drivers/net/ethernet/mellanox/mlx4/eq.c b/drivers/net/ethernet/mellanox/mlx4/eq.c
-index 9572a45f6143..d768a6a828c4 100644
---- a/drivers/net/ethernet/mellanox/mlx4/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/eq.c
-@@ -1243,7 +1243,7 @@ int mlx4_init_eq_table(struct mlx4_dev *dev)
- 				}
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0df419052434..4fa047fad8fb 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -351,6 +351,7 @@ struct napi_config {
+ 	u64 gro_flush_timeout;
+ 	u64 irq_suspend_timeout;
+ 	u32 defer_hard_irqs;
++	cpumask_t affinity_mask;
+ 	unsigned int napi_id;
+ };
  
- 				err = irq_cpu_rmap_add(
--					info->rmap, eq->irq);
-+					info->rmap, eq->irq, NULL, NULL);
- 				if (err)
- 					mlx4_warn(dev, "Failed adding irq rmap\n");
- 			}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-index 7db9cab9bedf..4f2c4631aecb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-@@ -285,7 +285,7 @@ struct mlx5_irq *mlx5_irq_alloc(struct mlx5_irq_pool *pool, int i,
- 
- 	if (i && rmap && *rmap) {
+@@ -358,12 +359,16 @@ enum {
  #ifdef CONFIG_RFS_ACCEL
--		err = irq_cpu_rmap_add(*rmap, irq->map.virq);
-+		err = irq_cpu_rmap_add(*rmap, irq->map.virq, NULL, NULL);
- 		if (err)
- 			goto err_irq_rmap;
+ 	NAPI_IRQ_ARFS_RMAP,		/* Core handles RMAP updates */
  #endif
-diff --git a/drivers/net/ethernet/sfc/nic.c b/drivers/net/ethernet/sfc/nic.c
-index 80aa5e9c732a..e7c6c3002826 100644
---- a/drivers/net/ethernet/sfc/nic.c
-+++ b/drivers/net/ethernet/sfc/nic.c
-@@ -122,7 +122,7 @@ int efx_nic_init_interrupt(struct efx_nic *efx)
- 		if (efx->interrupt_mode == EFX_INT_MODE_MSIX &&
- 		    channel->channel < efx->n_rx_channels) {
- 			rc = irq_cpu_rmap_add(efx->net_dev->rx_cpu_rmap,
--					      channel->irq);
-+					      channel->irq, NULL, NULL);
- 			if (rc)
- 				goto fail2;
- 		}
-diff --git a/include/linux/cpu_rmap.h b/include/linux/cpu_rmap.h
-index 20b5729903d7..48f89d19bdb9 100644
---- a/include/linux/cpu_rmap.h
-+++ b/include/linux/cpu_rmap.h
-@@ -11,6 +11,15 @@
- #include <linux/gfp.h>
- #include <linux/slab.h>
- #include <linux/kref.h>
-+#include <linux/interrupt.h>
-+
-+/* Glue between IRQ affinity notifiers and CPU rmaps */
-+struct irq_glue {
-+	struct irq_affinity_notify notify;
-+	struct cpu_rmap *rmap;
-+	void *data;
-+	u16 index;
-+};
++	NAPI_IRQ_AFFINITY,		/* Core manages IRQ affinity */
++	NAPI_IRQ_NORMAP			/* Set by core (internal) */
+ };
  
- /**
-  * struct cpu_rmap - CPU affinity reverse-map
-@@ -61,6 +70,8 @@ static inline struct cpu_rmap *alloc_irq_cpu_rmap(unsigned int size)
- extern void free_irq_cpu_rmap(struct cpu_rmap *rmap);
+ enum {
+ #ifdef CONFIG_RFS_ACCEL
+ 	NAPIF_IRQ_ARFS_RMAP		= BIT(NAPI_IRQ_ARFS_RMAP),
+ #endif
++	NAPIF_IRQ_AFFINITY		= BIT(NAPI_IRQ_AFFINITY),
++	NAPIF_IRQ_NORMAP		= BIT(NAPI_IRQ_NORMAP),
+ };
  
- int irq_cpu_rmap_remove(struct cpu_rmap *rmap, int irq);
--extern int irq_cpu_rmap_add(struct cpu_rmap *rmap, int irq);
-+extern int irq_cpu_rmap_add(struct cpu_rmap *rmap, int irq, void *data,
-+			    void (*notify)(struct irq_affinity_notify *notify,
-+					   const cpumask_t *mask));
- 
- #endif /* __LINUX_CPU_RMAP_H */
-diff --git a/lib/cpu_rmap.c b/lib/cpu_rmap.c
-index 4c348670da31..0c9c1078143d 100644
---- a/lib/cpu_rmap.c
-+++ b/lib/cpu_rmap.c
-@@ -220,14 +220,6 @@ int cpu_rmap_update(struct cpu_rmap *rmap, u16 index,
+ /*
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 7c3abff48aea..84745cea03a7 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6705,8 +6705,44 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
  }
- EXPORT_SYMBOL(cpu_rmap_update);
+ EXPORT_SYMBOL(netif_queue_set_napi);
  
--/* Glue between IRQ affinity notifiers and CPU rmaps */
--
--struct irq_glue {
--	struct irq_affinity_notify notify;
--	struct cpu_rmap *rmap;
--	u16 index;
--};
--
- /**
-  * free_irq_cpu_rmap - free a CPU affinity reverse-map used for IRQs
-  * @rmap: Reverse-map allocated with alloc_irq_cpu_map(), or %NULL
-@@ -300,6 +292,8 @@ EXPORT_SYMBOL(irq_cpu_rmap_remove);
-  * irq_cpu_rmap_add - add an IRQ to a CPU affinity reverse-map
-  * @rmap: The reverse-map
-  * @irq: The IRQ number
-+ * @data: Generic data
-+ * @notify: Callback function to update the CPU-IRQ rmap
-  *
-  * This adds an IRQ affinity notifier that will update the reverse-map
-  * automatically.
-@@ -307,16 +301,22 @@ EXPORT_SYMBOL(irq_cpu_rmap_remove);
-  * Must be called in process context, after the IRQ is allocated but
-  * before it is bound with request_irq().
-  */
--int irq_cpu_rmap_add(struct cpu_rmap *rmap, int irq)
-+int irq_cpu_rmap_add(struct cpu_rmap *rmap, int irq, void *data,
-+		     void (*notify)(struct irq_affinity_notify *notify,
-+				    const cpumask_t *mask))
- {
- 	struct irq_glue *glue = kzalloc(sizeof(*glue), GFP_KERNEL);
- 	int rc;
- 
- 	if (!glue)
- 		return -ENOMEM;
--	glue->notify.notify = irq_cpu_rmap_notify;
++static void
++netif_irq_cpu_rmap_notify(struct irq_affinity_notify *notify,
++			  const cpumask_t *mask)
++{
++	struct irq_glue *glue =
++		container_of(notify, struct irq_glue, notify);
++	struct napi_struct *napi = glue->data;
++	unsigned int flags;
++	int rc;
 +
-+	if (!notify)
-+		notify = irq_cpu_rmap_notify;
-+	glue->notify.notify = notify;
- 	glue->notify.release = irq_cpu_rmap_release;
- 	glue->rmap = rmap;
-+	glue->data = data;
- 	cpu_rmap_get(rmap);
- 	rc = cpu_rmap_add(rmap, glue);
- 	if (rc < 0)
++	flags = napi->irq_flags;
++
++	if (napi->config && flags & NAPIF_IRQ_AFFINITY)
++		cpumask_copy(&napi->config->affinity_mask, mask);
++
++#ifdef CONFIG_RFS_ACCEL
++	if (napi->dev->rx_cpu_rmap && flags & NAPIF_IRQ_ARFS_RMAP) {
++		rc = cpu_rmap_update(glue->rmap, glue->index, mask);
++		if (rc)
++			pr_warn("%s: update failed: %d\n",
++				__func__, rc);
++	}
++#endif
++}
++
++static void
++netif_napi_affinity_release(struct kref __always_unused *ref)
++{
++	struct irq_glue *glue =
++		container_of(ref, struct irq_glue, notify.kref);
++
++	kfree(glue);
++}
++
+ void netif_napi_set_irq(struct napi_struct *napi, int irq, unsigned long flags)
+ {
++	struct irq_glue *glue = NULL;
++	bool glue_created;
+ 	int  rc;
+ 
+ 	napi->irq = irq;
+@@ -6714,15 +6750,29 @@ void netif_napi_set_irq(struct napi_struct *napi, int irq, unsigned long flags)
+ 
+ #ifdef CONFIG_RFS_ACCEL
+ 	if (napi->dev->rx_cpu_rmap && flags & NAPIF_IRQ_ARFS_RMAP) {
+-		rc = irq_cpu_rmap_add(napi->dev->rx_cpu_rmap, irq);
++		rc = irq_cpu_rmap_add(napi->dev->rx_cpu_rmap, irq, napi,
++				      netif_irq_cpu_rmap_notify);
+ 		if (rc) {
+ 			netdev_warn(napi->dev, "Unable to update ARFS map (%d).\n",
+ 				    rc);
+ 			free_irq_cpu_rmap(napi->dev->rx_cpu_rmap);
+ 			napi->dev->rx_cpu_rmap = NULL;
++		} else {
++			glue_created = true;
+ 		}
+ 	}
+ #endif
++
++	if (!glue_created && flags & NAPIF_IRQ_AFFINITY) {
++		glue = kzalloc(sizeof(*glue), GFP_KERNEL);
++		if (!glue)
++			return;
++		glue->notify.notify = netif_irq_cpu_rmap_notify;
++		glue->notify.release = netif_napi_affinity_release;
++		glue->data = napi;
++		glue->rmap = NULL;
++		napi->irq_flags |= NAPIF_IRQ_NORMAP;
++	}
+ }
+ EXPORT_SYMBOL(netif_napi_set_irq);
+ 
+@@ -6731,6 +6781,10 @@ static void napi_restore_config(struct napi_struct *n)
+ 	n->defer_hard_irqs = n->config->defer_hard_irqs;
+ 	n->gro_flush_timeout = n->config->gro_flush_timeout;
+ 	n->irq_suspend_timeout = n->config->irq_suspend_timeout;
++
++	if (n->irq > 0 && n->irq_flags & NAPIF_IRQ_AFFINITY)
++		irq_set_affinity(n->irq, &n->config->affinity_mask);
++
+ 	/* a NAPI ID might be stored in the config, if so use it. if not, use
+ 	 * napi_hash_add to generate one for us. It will be saved to the config
+ 	 * in napi_disable.
+@@ -6747,6 +6801,11 @@ static void napi_save_config(struct napi_struct *n)
+ 	n->config->gro_flush_timeout = n->gro_flush_timeout;
+ 	n->config->irq_suspend_timeout = n->irq_suspend_timeout;
+ 	n->config->napi_id = n->napi_id;
++
++	if (n->irq > 0 &&
++	    n->irq_flags & (NAPIF_IRQ_AFFINITY | NAPIF_IRQ_NORMAP))
++		irq_set_affinity_notifier(n->irq, NULL);
++
+ 	napi_hash_del(n);
+ }
+ 
+@@ -11211,7 +11270,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+ {
+ 	struct net_device *dev;
+ 	size_t napi_config_sz;
+-	unsigned int maxqs;
++	unsigned int maxqs, i;
+ 
+ 	BUG_ON(strlen(name) >= sizeof(dev->name));
+ 
+@@ -11307,6 +11366,9 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+ 	dev->napi_config = kvzalloc(napi_config_sz, GFP_KERNEL_ACCOUNT);
+ 	if (!dev->napi_config)
+ 		goto free_all;
++	for (i = 0; i < maxqs; i++)
++		cpumask_copy(&dev->napi_config[i].affinity_mask,
++			     cpu_online_mask);
+ 
+ 	strscpy(dev->name, name);
+ 	dev->name_assign_type = name_assign_type;
 -- 
 2.43.0
 
