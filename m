@@ -1,111 +1,168 @@
-Return-Path: <netdev+bounces-153143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289D59F6FEC
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 23:14:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B04419F7004
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 23:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B7FA7A2E10
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 22:14:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06B1716B170
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 22:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC841FC7E3;
-	Wed, 18 Dec 2024 22:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900F41FC107;
+	Wed, 18 Dec 2024 22:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="n1yyk4+T"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D53o4+xX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46AAE198845;
-	Wed, 18 Dec 2024 22:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DA018B46A
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 22:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734560063; cv=none; b=Z2QxW/3xqxgONPrCLTXuq/mx4/8xXwhs9oaFuDt8v29zS3/wWLtfbVMfolqbikqT9/q3AauesqJ1JEueHYmYCiBDc7/ggYbxOuRCQrdotqEbCBBFJUgbCz6MI9vm3fURzAp556OVPWwlsT5FitCeEg8MyVl3Kpi0EAXBIXWl23Q=
+	t=1734560993; cv=none; b=Jxquj1AKlacWE8GwBGBSJJ/LATJXMPOaqA/oTX18vXqU8dapQQ/RnMaVnq+o60wNhkKX1tsmc6/k0f4LjMlp7AyphmW0FI6egj0+4mOWETA647MvCLwMhuVk3X4pSgiW3NegyHmXBxXtWaiiC3HrOkUWM27JAvkEwtYxxdZ311c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734560063; c=relaxed/simple;
-	bh=pBAjRf6/7ZtcePblB6Y/dqT4Irvg6nS6xuOSXcKuDkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C+agBZ96kycxPh0u4na6Lo9M31o9yfYggrhT+8y8TMOdZzo30/tJfE6eB4u7+xNods8ElJH6yYDWsn3i2RGQySD6/giBsoIP2nzAuU7K1E9YFo8WdiSrEmfoANY/nBMXjeEUsr8hAJwc5oZ66sUGt0Hb2JefrhuYrXTG5y5ATFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=n1yyk4+T; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=4NUia+wIcaKIZ7/rgsmAY6MfPqCs64GQoJNfdsBZX9Y=; b=n1yyk4+TeTHQ1VIX
-	HHyBNxP4Tc2GXGbubEviAkmy2FfoG4Uk4SF1AvgWKxVoRkavTV3L1IXYxK0Pdxnh1JBpWoIRFqX69
-	QR6V9xxfvjluirMgBPCAKcMrmwPlgJFPsg6h6bED3KDuuQPrKwIaeiuB1WPkJszbIbJ5wjzNL5EXc
-	BXFdyiiSVo88QAK/eq0VQ2WtmASlHhgT7j7cbW0h52Dk1tC4AnI1vZqnKn6EirUPMEKyIdbLNgk1T
-	1xq412Mw8DjDkWM3a/4WXpJNL59v7rXlUNM+gkfenX3K4xHlFEOiL3ellvkmH4GnUjHVMuH3dKyA6
-	ln2OP9z45wJRfng7ZQ==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1tO2J4-006BkG-25;
-	Wed, 18 Dec 2024 22:14:14 +0000
-Date: Wed, 18 Dec 2024 22:14:14 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Jes Sorensen <jes@trained-monkey.org>
-Cc: Simon Horman <horms@kernel.org>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: Remove bouncing hippi list
-Message-ID: <Z2NJNmoTV7sLC9Qw@gallifrey>
-References: <20241216165605.63700-1-linux@treblig.org>
- <20241217105102.GR780307@kernel.org>
- <3500c9d7-2b81-41e0-985c-7a63bcb87723@trained-monkey.org>
+	s=arc-20240116; t=1734560993; c=relaxed/simple;
+	bh=JFR8+kseyLJhd//6WbvbJrjsSIRftpdG948dnZ4pFhI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iJT9WYfdYf682pa5DxsJjAycx28dzeIqbPvJjkw9M39OgcJ4U5eBKxgnTslCLJgjabJtZD9sv2Sad/gF6O3jGqzTO5WzfK8rYRxd2xSqUePG0LpsP9UtCifMlaryqKCVaGk5vgd3qz/dXp7hsVblxeqz4dH7Zua74mI+J4wCYgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=D53o4+xX; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6f857105-3f75-47ea-934c-129289b475e1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734560988;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/fp3yqO3IL8VYELA0A+BT5pptYQygYQEOLe1XbCoS9I=;
+	b=D53o4+xXIbwbguaCU59Nssxarqhw7xwkizHCRrBCTGmRl3FOy0jbEzn0WHsqi1eD/qE/if
+	dq81R2M9R4A22XfxWovEm1oqYj+NW/gIH3sz/qXRqtpJ+Ytndho5rzQ0dr9k4xKqQQCjBU
+	kPq4bbAo5IqW3JwGTNenRjhO4CeryVY=
+Date: Wed, 18 Dec 2024 14:29:41 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <3500c9d7-2b81-41e0-985c-7a63bcb87723@trained-monkey.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 22:13:38 up 224 days,  9:27,  1 user,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Subject: Re: [PATCH bpf-next v1 03/13] bpf: Allow struct_ops prog to return
+ referenced kptr
+To: Amery Hung <amery.hung@bytedance.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
+ sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
+ stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
+ yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com,
+ ameryhung@gmail.com
+References: <20241213232958.2388301-1-amery.hung@bytedance.com>
+ <20241213232958.2388301-4-amery.hung@bytedance.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241213232958.2388301-4-amery.hung@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-* Jes Sorensen (jes@trained-monkey.org) wrote:
-> On 12/17/24 5:51 AM, Simon Horman wrote:
-> > On Mon, Dec 16, 2024 at 04:56:05PM +0000, linux@treblig.org wrote:
-> >> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> >>
-> >> linux-hippi is bouncing with:
-> >>
-> >>  <linux-hippi@sunsite.dk>:
-> >>  Sorry, no mailbox here by that name. (#5.1.1)
-> >>
-> >> Remove it.
-> >>
-> >> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> > 
-> > Thanks David,
-> > 
-> > I have no insight regarding how long this might have been the case.
-> > But this seems entirely reasonable to me.
-> > 
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> Yes sunsite.dk has been gone for at least a decade
+On 12/13/24 3:29 PM, Amery Hung wrote:
+> @@ -15993,13 +16001,15 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
+>   	const char *exit_ctx = "At program exit";
+>   	struct tnum enforce_attach_type_range = tnum_unknown;
+>   	const struct bpf_prog *prog = env->prog;
+> -	struct bpf_reg_state *reg;
+> +	struct bpf_reg_state *reg = reg_state(env, regno);
+>   	struct bpf_retval_range range = retval_range(0, 1);
+>   	enum bpf_prog_type prog_type = resolve_prog_type(env->prog);
+>   	int err;
+>   	struct bpf_func_state *frame = env->cur_state->frame[0];
+>   	const bool is_subprog = frame->subprogno;
+>   	bool return_32bit = false;
+> +	struct btf *btf = bpf_prog_get_target_btf(prog);
+> +	const struct btf_type *ret_type = NULL;
+>   
+>   	/* LSM and struct_ops func-ptr's return type could be "void" */
+>   	if (!is_subprog || frame->in_exception_callback_fn) {
+> @@ -16008,10 +16018,31 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
+>   			if (prog->expected_attach_type == BPF_LSM_CGROUP)
+>   				/* See below, can be 0 or 0-1 depending on hook. */
+>   				break;
+> -			fallthrough;
+> +			if (!prog->aux->attach_func_proto->type)
+> +				return 0;
+> +			break;
+>   		case BPF_PROG_TYPE_STRUCT_OPS:
+>   			if (!prog->aux->attach_func_proto->type)
+>   				return 0;
+> +
+> +			if (frame->in_exception_callback_fn)
+> +				break;
+> +
+> +			/* Allow a struct_ops program to return a referenced kptr if it
+> +			 * matches the operator's return type and is in its unmodified
+> +			 * form. A scalar zero (i.e., a null pointer) is also allowed.
+> +			 */
+> +			ret_type = btf_type_by_id(btf, prog->aux->attach_func_proto->type);
+> +			if (btf_type_is_ptr(ret_type) && reg->type & PTR_TO_BTF_ID &&
 
-Ah right, you might like to fix the Acenic driver entry as well.
+The "reg->type & PTR_TO_BTF_ID" does not look right. It should be 
+"base_type(reg->type) == PTR_TO_BTF_ID".
 
-> Acked-by: Jes Sorensen <jes@trained-monkey.org>
+> +			    reg->ref_obj_id) {
+> +				if (reg->btf_id != ret_type->type) {
 
-Thanks,
+reg->btf could be a bpf prog's btf (i.e. prog->aux->btf) instead of the kernel 
+btf, so only comparing btf_id here is not very correct.
 
-Dave
-> 
-> 
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+One way could be to first compare the reg->btf == prog->aux->attach_btf.
+prog->aux->attach_btf here must be a kernel btf.
+
+Another way is, btf_type_resolve_ptr() should be a better helper than 
+btf_type_by_id() here. It only returns non NULL if the type is a pointer and 
+also skips the modifiers like "const" before returning. Then it can directly
+compare the "struct btf_type *" returned by 
+'btf_type_resolve_ptr(prog->aux->attach_btf, prog->aux->attach_func_proto->type, 
+NULL)' and 'btf_type_resolve_ptr(reg->btf, reg->btf_id, NULL)'
+
+May as well enforce the pointer returned by an "ops" must be a struct (i.e. 
+__btf_type_is_struct(t) == true). This enforcement can be done in 
+bpf_struct_ops_desc_init().
+
+
+
+> +					verbose(env, "Return kptr type, struct %s, doesn't match function prototype, struct %s\n",
+> +						btf_type_name(reg->btf, reg->btf_id),
+> +						btf_type_name(btf, ret_type->type));
+> +					return -EINVAL;
+> +				}
+> +				return __check_ptr_off_reg(env, reg, regno, false);
+> +			}
+>   			break;
+>   		default:
+>   			break;
+> @@ -16033,8 +16064,6 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
+>   		return -EACCES;
+>   	}
+>   
+> -	reg = cur_regs(env) + regno;
+> -
+>   	if (frame->in_async_callback_fn) {
+>   		/* enforce return zero from async callbacks like timer */
+>   		exit_ctx = "At async callback return";
+> @@ -16133,6 +16162,11 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
+>   	case BPF_PROG_TYPE_NETFILTER:
+>   		range = retval_range(NF_DROP, NF_ACCEPT);
+>   		break;
+> +	case BPF_PROG_TYPE_STRUCT_OPS:
+> +		if (!ret_type || !btf_type_is_ptr(ret_type))
+> +			return 0;
+> +		range = retval_range(0, 0);
+> +		break;
+>   	case BPF_PROG_TYPE_EXT:
+>   		/* freplace program can return anything as its return value
+>   		 * depends on the to-be-replaced kernel func or bpf program.
+
 
