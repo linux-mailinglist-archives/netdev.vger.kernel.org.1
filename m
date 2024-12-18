@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-152790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AFFA9F5C95
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:04:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F2C09F5C91
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:03:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA8FC1884A31
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 02:03:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7D4A7A3302
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 02:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329D6139579;
-	Wed, 18 Dec 2024 02:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AED42048;
+	Wed, 18 Dec 2024 02:02:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UxtBzOeZ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="g0s6flsF"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD94450EE;
-	Wed, 18 Dec 2024 02:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360D435949;
+	Wed, 18 Dec 2024 02:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734487389; cv=none; b=W8IomVlnSHfJmgq0eahoIeZAfz/mWRiZcLmRnMsyCVMkGLmWU0qLKXkVWPVMzF0vQfz9K/HIP1qyTfbTim9zS4qEnE/D3t5xaWGpTritCApABvIY0O1Wu/mOplkr1XdXumbjy9t/L4jvNgGDLr3wH51c/5k8JrOF+NbzCN5GAJc=
+	t=1734487377; cv=none; b=r3751jjK7F//Kazm2BwrvGyohf45ljBCJy31aRtk/3HaTuY69F16gvwQOara1E4ASOEtHCAHNPRpDgB7on4/hFkPJ8dqM8gG2f5tE9GT7rs9mUvzya8C5QWA0xinMmvSwDjgv6Rr10UfCYviNAuuWGy5cpTR/UodfL9C16R9VSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734487389; c=relaxed/simple;
-	bh=BVagBaiisBzIAS4MLeneoJzJTAv0WxDuk7NiJyKprws=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C2AhYmaTPvm/dsH+3DmKn0JI1ihp3AOHV6VwFTMPIZsB0H7seUIazC7gQV8bxsOkhd5QgTadGetAF5cWsNg4Z7UD/lw+JoBfv0OTdHAKAYOdDtH6vja7jmeDAnyKc9TQWLsAaxhH8ZjhtQOo2CIcwvJ/1CY1MpBG+o9kDQJGS60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UxtBzOeZ; arc=none smtp.client-ip=68.232.154.123
+	s=arc-20240116; t=1734487377; c=relaxed/simple;
+	bh=CkztOJypNzOHapYhzul2pjQ4wmSLpA3mKHVDBfFOkis=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RW/sl8Tw07z05d5B7Dkgs59xmsFHA5VltPryE9+knC3Pu3BEeKyfgmBt2e+fDzj1Fd88V5ATzWpzE4crI9wTdMhPMaCdV9nj9MhQqgXKTqkMV4ogUT6P3Iv1OCifPTzMSldgDAbLGRNFEV7fF5GC7A9kzVKnEbgOCNjwLwu9xAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=g0s6flsF; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1734487387; x=1766023387;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BVagBaiisBzIAS4MLeneoJzJTAv0WxDuk7NiJyKprws=;
-  b=UxtBzOeZuDm5EdHbPNjYBEzjqOwmimLD78F8/ei3xLPO2GOF8qFV/9IJ
-   M0+CEAVOfsRLDVwktBhKMvic1HIOkKeVkjwWXN7mxXbKnQupVyI4S+vdz
-   5AtrcYZZFQXymoc+/MwIkr3b/Og81fUG7ta38K6GgtfTYlCRvrldzg6VR
-   mI/DwsKEcwydQAg7urKOviZEd8CuZkScOhXeqiUzx6vzEFPoFQKm8BS9i
-   dSsiFRks0755DGq3e0kkArG+mxKcpSxEq1qsFROE29FsiaKQoE5DOd/se
-   W2CVLmvBSVFxHy1MHmSvsMxFALKaU2RNoZNuhRwpEhkiNCzNgkOnSqLlD
-   g==;
-X-CSE-ConnectionGUID: ISTjjhv+RS2GzfsLd7mNTQ==
-X-CSE-MsgGUID: HBXWIT0BRbmObxXBpYVrKQ==
+  t=1734487375; x=1766023375;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CkztOJypNzOHapYhzul2pjQ4wmSLpA3mKHVDBfFOkis=;
+  b=g0s6flsF3wBcXkR5b5yd6k2lbfUzIsPB5G4O6aOdsYBw71ulC5qNuXJw
+   ZbCamLqtsKJylNPSXO4Y0Cd+Ox7KbaWt2t+Jau2ZLwDl9BydGiVR8GCKk
+   klKiMTbZ04LDC/IMifenjmDSqEHOTjxR8NFvAZZcgnIYwYWgD9BNBeFQV
+   hPKKrE543c8Adb92Ju4/USVbUA3TIcFpUWnqMnZhS96UoxdQ9vQoWrjSa
+   JwM8gh5KxSbsCXrg6mbpHpXcDYg8XNtIaWNbAUvKFFaimwAcDzACcJw72
+   8SNh6kiTK+e3ybhx2DmxvSgtelvNNidS1JhbkzgtZGkk+SdHwfnDEQ71O
+   Q==;
+X-CSE-ConnectionGUID: Re11vxomR/a0J49cWbJkUQ==
+X-CSE-MsgGUID: c3p5AkhdRy6Ny4VFH45rsA==
 X-IronPort-AV: E=Sophos;i="6.12,243,1728975600"; 
-   d="scan'208";a="203135195"
+   d="scan'208";a="35342117"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Dec 2024 19:03:04 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Dec 2024 19:02:54 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 17 Dec 2024 19:02:25 -0700
-Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 17 Dec 2024 19:02:24 -0700
+ 15.1.2507.35; Tue, 17 Dec 2024 19:02:39 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Tue, 17 Dec 2024 19:02:39 -0700
 From: <Tristram.Ha@microchip.com>
 To: Woojung Huh <woojung.huh@microchip.com>, Arun Ramadoss
 	<arun.ramadoss@microchip.com>, Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean
@@ -67,12 +66,10 @@ CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
 	<tristram.ha@microchip.com>
-Subject: [PATCH net 2/2] net: dsa: microchip: Fix LAN937X set_ageing_time function
-Date: Tue, 17 Dec 2024 18:02:24 -0800
-Message-ID: <20241218020224.70590-3-Tristram.Ha@microchip.com>
+Subject: [PATCH net-next] net: dsa: microchip: Do not execute PTP driver code for unsupported switches
+Date: Tue, 17 Dec 2024 18:02:40 -0800
+Message-ID: <20241218020240.70601-1-Tristram.Ha@microchip.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241218020224.70590-1-Tristram.Ha@microchip.com>
-References: <20241218020224.70590-1-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,135 +81,173 @@ Content-Type: text/plain
 
 From: Tristram Ha <tristram.ha@microchip.com>
 
-The aging count is not a simple 20-bit value but comprises a 3-bit
-multiplier and a 20-bit second time.  The code tries to use the
-original multiplier which is 4 as the second count is still 300 seconds
-by default.
+The PTP driver code only works for certain KSZ switches like KSZ9477,
+KSZ9567, LAN937X and their varieties.  This code is enabled by kernel
+configuration CONFIG_NET_DSA_MICROCHIP_KSZ_PTP.  As the DSA driver is
+common to work with all KSZ switches this PTP code is not appropriate
+for other unsupported switches.  The ptp_capable indication is added to
+the chip data structure to signal whether to execute those code.
 
-As the 20-bit number is now too large for practical use there is an option
-to interpret it as microseconds instead of seconds.
-
-Fixes: 2c119d9982b1 ("net: dsa: microchip: add the support for set_ageing_time")
 Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 ---
- drivers/net/dsa/microchip/lan937x_main.c | 62 ++++++++++++++++++++++--
- drivers/net/dsa/microchip/lan937x_reg.h  |  9 ++--
- 2 files changed, 65 insertions(+), 6 deletions(-)
+ drivers/net/dsa/microchip/ksz_common.c | 40 +++++++++++++++++++-------
+ drivers/net/dsa/microchip/ksz_common.h |  1 +
+ 2 files changed, 30 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
-index b7652efd632e..b1ae3b9de3d1 100644
---- a/drivers/net/dsa/microchip/lan937x_main.c
-+++ b/drivers/net/dsa/microchip/lan937x_main.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Microchip LAN937X switch driver main logic
-- * Copyright (C) 2019-2022 Microchip Technology Inc.
-+ * Copyright (C) 2019-2024 Microchip Technology Inc.
-  */
- #include <linux/kernel.h>
- #include <linux/module.h>
-@@ -461,10 +461,66 @@ int lan937x_change_mtu(struct ksz_device *dev, int port, int new_mtu)
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index df314724e6a7..2c465c466222 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -1339,6 +1339,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.supports_rgmii = {false, false, true},
+ 		.internal_phy = {true, true, false},
+ 		.gbit_capable = {false, false, true},
++		.ptp_capable = true,
+ 		.wr_table = &ksz8563_register_set,
+ 		.rd_table = &ksz8563_register_set,
+ 	},
+@@ -1550,6 +1551,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.internal_phy	= {true, true, true, true,
+ 				   true, false, false},
+ 		.gbit_capable	= {true, true, true, true, true, true, true},
++		.ptp_capable = true,
+ 		.wr_table = &ksz9477_register_set,
+ 		.rd_table = &ksz9477_register_set,
+ 	},
+@@ -1677,6 +1679,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.supports_rgmii = {false, false, true},
+ 		.internal_phy = {true, true, false},
+ 		.gbit_capable = {true, true, true},
++		.ptp_capable = true,
+ 	},
  
- int lan937x_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
- {
--	u32 secs = msecs / 1000;
--	u32 value;
-+	u8 data, mult, value8;
-+	bool in_msec = false;
-+	u32 max_val, value;
-+	u32 secs = msecs;
- 	int ret;
+ 	[KSZ8567] = {
+@@ -1712,6 +1715,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 				   true, false, false},
+ 		.gbit_capable	= {false, false, false, false, false,
+ 				   true, true},
++		.ptp_capable = true,
+ 	},
  
-+#define MAX_TIMER_VAL	((1 << 20) - 1)
-+
-+	/* The aging timer comprises a 3-bit multiplier and a 20-bit second
-+	 * value.  Either of them cannot be zero.  The maximum timer is then
-+	 * 7 * 1048575 = 7340025 seconds.  As this value is too large for
-+	 * practical use it can be interpreted as microseconds, making the
-+	 * maximum timer 7340 seconds with finer control.  This allows for
-+	 * maximum 122 minutes compared to 29 minutes in KSZ9477 switch.
-+	 */
-+	if (msecs % 1000)
-+		in_msec = true;
-+	else
-+		secs /= 1000;
-+	if (!secs)
-+		secs = 1;
-+
-+	/* Return error if too large. */
-+	else if (secs > 7 * MAX_TIMER_VAL)
-+		return -EINVAL;
-+
-+	/* Configure how to interpret the number value. */
-+	ret = ksz_rmw8(dev, REG_SW_LUE_CTRL_2, SW_AGE_CNT_IN_MICROSEC,
-+		       in_msec ? SW_AGE_CNT_IN_MICROSEC : 0);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = ksz_read8(dev, REG_SW_LUE_CTRL_0, &value8);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Check whether there is need to update the multiplier. */
-+	mult = FIELD_GET(SW_AGE_CNT_M, value8);
-+	max_val = MAX_TIMER_VAL;
-+	if (mult > 0) {
-+		/* Try to use the same multiplier already in the register as
-+		 * the hardware default uses multiplier 4 and 75 seconds for
-+		 * 300 seconds.
-+		 */
-+		max_val = DIV_ROUND_UP(secs, mult);
-+		if (max_val > MAX_TIMER_VAL || max_val * mult != secs)
-+			max_val = MAX_TIMER_VAL;
-+	}
-+
-+	data = DIV_ROUND_UP(secs, max_val);
-+	if (mult != data) {
-+		value8 &= ~SW_AGE_CNT_M;
-+		value8 |= FIELD_PREP(SW_AGE_CNT_M, data);
-+		ret = ksz_write8(dev, REG_SW_LUE_CTRL_0, value8);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	secs = DIV_ROUND_UP(secs, data);
-+
- 	value = FIELD_GET(SW_AGE_PERIOD_7_0_M, secs);
+ 	[KSZ9567] = {
+@@ -1744,6 +1748,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.internal_phy	= {true, true, true, true,
+ 				   true, false, false},
+ 		.gbit_capable	= {true, true, true, true, true, true, true},
++		.ptp_capable = true,
+ 	},
  
- 	ret = ksz_write8(dev, REG_SW_AGE_PERIOD__1, value);
-diff --git a/drivers/net/dsa/microchip/lan937x_reg.h b/drivers/net/dsa/microchip/lan937x_reg.h
-index 4ec93e421da4..72042fd64e5b 100644
---- a/drivers/net/dsa/microchip/lan937x_reg.h
-+++ b/drivers/net/dsa/microchip/lan937x_reg.h
-@@ -1,6 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- /* Microchip LAN937X switch register definitions
-- * Copyright (C) 2019-2021 Microchip Technology Inc.
-+ * Copyright (C) 2019-2024 Microchip Technology Inc.
-  */
- #ifndef __LAN937X_REG_H
- #define __LAN937X_REG_H
-@@ -56,8 +56,7 @@
+ 	[LAN9370] = {
+@@ -1773,6 +1778,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.supports_rmii = {false, false, false, false, true},
+ 		.supports_rgmii = {false, false, false, false, true},
+ 		.internal_phy = {true, true, true, true, false},
++		.ptp_capable = true,
+ 	},
  
- #define SW_VLAN_ENABLE			BIT(7)
- #define SW_DROP_INVALID_VID		BIT(6)
--#define SW_AGE_CNT_M			0x7
--#define SW_AGE_CNT_S			3
-+#define SW_AGE_CNT_M			GENMASK(5, 3)
- #define SW_RESV_MCAST_ENABLE		BIT(2)
+ 	[LAN9371] = {
+@@ -1802,6 +1808,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.supports_rmii = {false, false, false, false, true, true},
+ 		.supports_rgmii = {false, false, false, false, true, true},
+ 		.internal_phy = {true, true, true, true, false, false},
++		.ptp_capable = true,
+ 	},
  
- #define REG_SW_LUE_CTRL_1		0x0311
-@@ -70,6 +69,10 @@
- #define SW_FAST_AGING			BIT(1)
- #define SW_LINK_AUTO_AGING		BIT(0)
+ 	[LAN9372] = {
+@@ -1835,6 +1842,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 				   true, true, false, false},
+ 		.internal_phy	= {true, true, true, true,
+ 				   false, false, true, true},
++		.ptp_capable = true,
+ 	},
  
-+#define REG_SW_LUE_CTRL_2		0x0312
-+
-+#define SW_AGE_CNT_IN_MICROSEC		BIT(7)
-+
- #define REG_SW_AGE_PERIOD__1		0x0313
- #define SW_AGE_PERIOD_7_0_M		GENMASK(7, 0)
+ 	[LAN9373] = {
+@@ -1868,6 +1876,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 				   true, true, false, false},
+ 		.internal_phy	= {true, true, true, false,
+ 				   false, false, true, true},
++		.ptp_capable = true,
+ 	},
  
+ 	[LAN9374] = {
+@@ -1901,6 +1910,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 				   true, true, false, false},
+ 		.internal_phy	= {true, true, true, true,
+ 				   false, false, true, true},
++		.ptp_capable = true,
+ 	},
+ 
+ 	[LAN9646] = {
+@@ -2809,16 +2819,21 @@ static int ksz_setup(struct dsa_switch *ds)
+ 			if (ret)
+ 				goto out_girq;
+ 
+-			ret = ksz_ptp_irq_setup(ds, dp->index);
+-			if (ret)
+-				goto out_pirq;
++			if (dev->info->ptp_capable) {
++				ret = ksz_ptp_irq_setup(ds, dp->index);
++				if (ret)
++					goto out_pirq;
++			}
+ 		}
+ 	}
+ 
+-	ret = ksz_ptp_clock_register(ds);
+-	if (ret) {
+-		dev_err(dev->dev, "Failed to register PTP clock: %d\n", ret);
+-		goto out_ptpirq;
++	if (dev->info->ptp_capable) {
++		ret = ksz_ptp_clock_register(ds);
++		if (ret) {
++			dev_err(dev->dev, "Failed to register PTP clock: %d\n",
++				ret);
++			goto out_ptpirq;
++		}
+ 	}
+ 
+ 	ret = ksz_mdio_register(dev);
+@@ -2838,9 +2853,10 @@ static int ksz_setup(struct dsa_switch *ds)
+ 	return 0;
+ 
+ out_ptp_clock_unregister:
+-	ksz_ptp_clock_unregister(ds);
++	if (dev->info->ptp_capable)
++		ksz_ptp_clock_unregister(ds);
+ out_ptpirq:
+-	if (dev->irq > 0)
++	if (dev->irq > 0 && dev->info->ptp_capable)
+ 		dsa_switch_for_each_user_port(dp, dev->ds)
+ 			ksz_ptp_irq_free(ds, dp->index);
+ out_pirq:
+@@ -2859,11 +2875,13 @@ static void ksz_teardown(struct dsa_switch *ds)
+ 	struct ksz_device *dev = ds->priv;
+ 	struct dsa_port *dp;
+ 
+-	ksz_ptp_clock_unregister(ds);
++	if (dev->info->ptp_capable)
++		ksz_ptp_clock_unregister(ds);
+ 
+ 	if (dev->irq > 0) {
+ 		dsa_switch_for_each_user_port(dp, dev->ds) {
+-			ksz_ptp_irq_free(ds, dp->index);
++			if (dev->info->ptp_capable)
++				ksz_ptp_irq_free(ds, dp->index);
+ 
+ 			ksz_irq_free(&dev->ports[dp->index].pirq);
+ 		}
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index b3bb75ca0796..97f0ff16dc50 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -92,6 +92,7 @@ struct ksz_chip_data {
+ 	bool supports_rgmii[KSZ_MAX_NUM_PORTS];
+ 	bool internal_phy[KSZ_MAX_NUM_PORTS];
+ 	bool gbit_capable[KSZ_MAX_NUM_PORTS];
++	bool ptp_capable;
+ 	const struct regmap_access_table *wr_table;
+ 	const struct regmap_access_table *rd_table;
+ };
 -- 
 2.34.1
 
