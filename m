@@ -1,291 +1,833 @@
-Return-Path: <netdev+bounces-152975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 813FE9F67CC
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:58:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DC99F67D0
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:59:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E91A37A025D
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:58:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B30A7A41DF
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334E51B042E;
-	Wed, 18 Dec 2024 13:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33631B4257;
+	Wed, 18 Dec 2024 13:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="iK7MgKeN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f4CzWLpg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475B5158853;
-	Wed, 18 Dec 2024 13:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DBB1B4235
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734530320; cv=fail; b=RapL/pK9r8O4426XoHpuEZ8vax3JfeoI9Wo9BdNy6rUjztIv8hl4xa2dgHoNIT6NxTl6XiZeMtxH+jvvM7c32PHgIx693x/k2SIrGo5ltlB1fg0ujz3EeKGm0m2CXDavYurfCWpy+PgLoClkctqCa+fJzg7KUAa4zsYL7K/MsEU=
+	t=1734530363; cv=fail; b=aQXBuWEHnLkJtuBkIojbf/lT5VmewErRej0CLM0qTXr03QhwaNWHBX5nrStwYWCF72rCfbsX9lNXwvT1YF365S6m+Qv9VnGUiWOWpYylvZUhgUYczZG1gdnlS917d9zz58VAwTHPrCxq4nP226x5IPqTR9LKelX4CWTRPZaCAXs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734530320; c=relaxed/simple;
-	bh=MQnaM2N7kzJ1P2YH3cFbzQeGOUNx1A8XkxnqKc3LmAU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HNxCytZXGRywzaob4bxICNXJCrvNRoTfDsTxx06ZqEgevt7Q6uGw4lIgSHhTNDKO3wsYt9n7CZZA/oKawRBdCYQqg0TLdHuLp8qXVHVpHaO3YTHeR2KWIPugskJJxJ0UHNcjIhQFAQ7WejFr4I2tn1gSnxYoOA+fETHEsst4e4Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=iK7MgKeN; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BID2T16016916;
-	Wed, 18 Dec 2024 05:58:18 -0800
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2043.outbound.protection.outlook.com [104.47.56.43])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 43kxx8g2vm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 05:58:17 -0800 (PST)
+	s=arc-20240116; t=1734530363; c=relaxed/simple;
+	bh=oZppF8eLutMcvTaCxgvmI0eMTGA9Fvhc30VGmqNYQEc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=h011qk9TUT7rh9LmiBqLH+wmjyLKH15t4kdhapqlpmI/Ze++IZqHwGUajNm3BcDfjy6R9eqETMIokGInvlZ2JdQArzCfGyYgYoj8da7ljEAxhhcLQX6LzLUvDua+QHhNR6AlnjAVhQC8v2eKL47KW6Tm21JBcOQbhnt++/zhn8o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f4CzWLpg; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734530361; x=1766066361;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=oZppF8eLutMcvTaCxgvmI0eMTGA9Fvhc30VGmqNYQEc=;
+  b=f4CzWLpgwnPTRTA0ClQ65+F6FL+h4QjisDbdxNeijAAAodRAJDa35yMk
+   lFAMGzysmpqKIlqTHanr+sNrI1wj5r+43Av92bKiCH+LtSJ+KSK37+owt
+   Srt6na/58RtLJghDOKpPv22L1Lz2eD1x8D88jhk2NNkrZ1ywanYjfcYT5
+   oqguXgHgbxkIyi16OGChBOksVGGuJaM1/jFLffDQBZlqa6Z6dTr+tSEwv
+   +lqOJ+p9z2QSB7ufnNfKqG58Nt/0G8zWPZ5Q4h//BOgEPQs7kxQMklatS
+   IY2Z7YcIhyIfGRGidui/e3b4DtIterFQe56NkUqrBVHTV6YJybk8icQfY
+   g==;
+X-CSE-ConnectionGUID: OLcbGh2GSRWY1rRJpnYu2A==
+X-CSE-MsgGUID: v7DiK0+QQuC7SQQN6WvtCA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="35038053"
+X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
+   d="scan'208";a="35038053"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 05:59:17 -0800
+X-CSE-ConnectionGUID: 179VdclkQ32+A21Qi7EIuQ==
+X-CSE-MsgGUID: tt7I9ZAuTya3CBBWTIWxlA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="128854263"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2024 05:59:06 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 18 Dec 2024 05:58:59 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 18 Dec 2024 05:58:59 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 18 Dec 2024 05:58:59 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EwIptq7ci/584LzSVne8OgbmhCXhflNC6Eet4kD2DgLOCMB5/LsIYOKeEgmCs38gfw9n3rrp9jyTAY8BRmUtarmvit0f7fz+O0kd/3F+pLoY20/lbjnV+JrCrJyso6phCqsQWHxtu2HZedGbcpKAEeb66hXCKImFOGxrHlDOB/q6SIotDMj4ZT2b0W4Ge1oZE0VKd3yqSK0I6KC3mcsfShoNR8V3m1ua4LV8WyZ/3mJ3jZv1ChEXgjyQertv4fb10IEPtsPOjyQmQIg4O/fUlYhfsGMx5dW5C8vPCuelz6XCWofG5oW2M3ydTnZ4kyBnTZ1ohH83luWqBvhsNbrH4g==
+ b=UTl/0XRMAR904jRc2kwMctZbwcG5zNjmIP+TY0fF8EIitMb/ZgOYYjIct5zvA+ZBbJXdPqoWFnbteCxB3krGAGOG56yTXBC7aGAcUzaXshpIz+wxohcpbtbKZox1xKVjPtk0wD91J1kccbioDX+1VLWPsiSIx9y95HWgwlCTQyPsWIP62sRAAbEQsBkllDybNJe8KGdBFNkaEhr45slb4W2ru2Tf2yMV0dLhYccDtfn9oV7bv8xN2Ls2SUoMG3ENjwZim6B7CUZbOwjpTs96PWvKLiUBkDq5O6PXMxgzvrJW2ZF1dnCZHEgeH3XoLO3wnRB/S4fHeycoGZR7d+FDDQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MQnaM2N7kzJ1P2YH3cFbzQeGOUNx1A8XkxnqKc3LmAU=;
- b=smUmsuJ8MX3nGFXMx0V1XDRbYjpjWUqxEobcJIZjs/rS9lPujNqi9jVE1UuPwn1paNvYxAYTG1lcqHuL1M0GU7bLXgfs3yG9r5uG3OVFxNS5LPFnmBlhXSymxSji9sEv7uY7rUvk5tLvtvF7WQKuRLMKn00RbuzuXSi9fkTg3Q0jByl0xU/WafFcgjpB8bUUvN/MUqQMAIMu1whDTzlHuUcWtc6205Bj8tYZ2QIM2FtlDZ9xENj66AAFknkBT5yKA2rCFkG8wGLfb302BTya4MJqdNxx8Ic7v+6SnWgiLWXuKfjkcPxm3Srry05Io2mnOsNa7rJRjJh6vm11HWjDog==
+ bh=cecOXXSdjOeHEDcNlqXFxJr/6FZ8/rMxrS/oPcplqQg=;
+ b=aK9Ku5OQa+QroPgyKIBy39jDiQOUHV5tHK0KJzjp7m198b1U2Y+z+2U18LWWkYs55l4cQ4pnEGw+8nEkJU4Y+3OOEEs7jNbwKkZuQVsGqbINaXZCQoSwNL8X3zWZMPBLzuLpJuswHAr9ji//tFGWjZFki2QzNDvk0pxsiU9CVIyFoM++ndWiqdCg/fcp952ifEJnASzUEheAKAA5bPhMU0m7rNRiqvRH3UE/x2Zq3NvL+fAl8uywEDB+zlDKN1KyqZ9QadJOlsONWVOKnYS3KdiPVHnPsTCRNqtsAVDQwzGwPEvUzVOGA3Qehs8PIkHHzlmzg5hxPGtyVyMWBHZYig==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MQnaM2N7kzJ1P2YH3cFbzQeGOUNx1A8XkxnqKc3LmAU=;
- b=iK7MgKeNWXCPv+X9xg/erOi54nJ89PfNVmu/wcqQijzrJeRAMVqeo1BifGIE2RmMyftY8p/7QoGgaH2NnhVfOKLq1LCOcc7y8FdNG4eno4xy2vqS7MvX2UVc+IrwCWVxjcPHLuMCldK8FTpO0Nd7rvM0zg3HLZ8PzWxYDg9M830=
-Received: from BY3PR18MB4721.namprd18.prod.outlook.com (2603:10b6:a03:3c8::14)
- by SA0PR18MB3549.namprd18.prod.outlook.com (2603:10b6:806:97::11) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DS0PR11MB7803.namprd11.prod.outlook.com (2603:10b6:8:f5::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.14; Wed, 18 Dec
- 2024 13:58:14 +0000
-Received: from BY3PR18MB4721.namprd18.prod.outlook.com
- ([fe80::dfc:5b62:8f30:84db]) by BY3PR18MB4721.namprd18.prod.outlook.com
- ([fe80::dfc:5b62:8f30:84db%5]) with mapi id 15.20.8272.005; Wed, 18 Dec 2024
- 13:58:14 +0000
-From: Shinas Rasheed <srasheed@marvell.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Haseeb Gani
-	<hgani@marvell.com>, Sathesh B Edara <sedara@marvell.com>,
-        Vimlesh Kumar
-	<vimleshk@marvell.com>,
-        "thaller@redhat.com" <thaller@redhat.com>,
-        "wizhao@redhat.com" <wizhao@redhat.com>,
-        "kheib@redhat.com"
-	<kheib@redhat.com>,
-        "konguyen@redhat.com" <konguyen@redhat.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "einstein.xue@synaxg.com"
-	<einstein.xue@synaxg.com>,
-        Veerasenareddy Burru <vburru@marvell.com>,
-        Andrew
- Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>,
-        Abhijit Ayarekar <aayarekar@marvell.com>,
-        Satananda
- Burla <sburla@marvell.com>
-Subject: RE: [EXTERNAL] Re: [PATCH net v2 1/4] octeon_ep: fix race conditions
- in ndo_get_stats64
-Thread-Topic: [EXTERNAL] Re: [PATCH net v2 1/4] octeon_ep: fix race conditions
- in ndo_get_stats64
-Thread-Index:
- AQHbT5BaYIqjRH+Vi0yNdgQ+YpYURrLo7ucAgAAEnACAAD0IMIABfHCAgAAKTTCAAUofAIAABj7Q
-Date: Wed, 18 Dec 2024 13:58:14 +0000
-Message-ID:
- <BY3PR18MB4721AF7DFD7F5F0384C37B84C7052@BY3PR18MB4721.namprd18.prod.outlook.com>
-References: <20241216075842.2394606-1-srasheed@marvell.com>
- <20241216075842.2394606-2-srasheed@marvell.com>
- <Z2A5dHOGhwCQ1KBI@lzaremba-mobl.ger.corp.intel.com>
- <Z2A9UmjW7rnCGiEu@lzaremba-mobl.ger.corp.intel.com>
- <BY3PR18MB4721712299EAB0ED37CCEEEFC73B2@BY3PR18MB4721.namprd18.prod.outlook.com>
- <Z2GvpzRDSTjkzFxO@lzaremba-mobl.ger.corp.intel.com>
- <CO1PR18MB472973A60723E9417FE1BB87C7042@CO1PR18MB4729.namprd18.prod.outlook.com>
- <Z2LNOLxy0H1JoTnd@lzaremba-mobl.ger.corp.intel.com>
-In-Reply-To: <Z2LNOLxy0H1JoTnd@lzaremba-mobl.ger.corp.intel.com>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.22; Wed, 18 Dec
+ 2024 13:58:30 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.8272.005; Wed, 18 Dec 2024
+ 13:58:30 +0000
+Message-ID: <efa084c6-8a06-4345-8bbc-5e6741dc5d0b@intel.com>
+Date: Wed, 18 Dec 2024 14:58:24 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 01/16] net-next/yunsilicon: Add xsc driver basic
+ framework
+To: Xin Tian <tianx@yunsilicon.com>
+CC: <andrew+netdev@lunn.ch>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>,
+	<jeff.johnson@oss.qualcomm.com>, <weihg@yunsilicon.com>,
+	<wanry@yunsilicon.com>
+References: <20241218105023.2237645-1-tianx@yunsilicon.com>
+ <20241218105023.2237645-2-tianx@yunsilicon.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR18MB4721:EE_|SA0PR18MB3549:EE_
-x-ms-office365-filtering-correlation-id: df017559-8333-484c-1f2a-08dd1f6c0428
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?RkhtSnh6V0FEdGZ3dUVBckUrMVl6bkp4dWxlMm13Z2xrYkx4VVdPKzR3MFRt?=
- =?utf-8?B?cFBtbkpENUhrUHZrTHI4c08xUUtCdTJvR1poVDNzS0VnOGpXeXR4QVNtVUNZ?=
- =?utf-8?B?Y2ZMd1pXOUxiSDhCTUtvbnpQRzRPbzE3VTB1cnhmcnd4QVRTUnp1ZlJaY08z?=
- =?utf-8?B?alhCWUg0ditlRHV1VFg5L3F0TUR1VlJaN0hUOWdPQzhUUk9ROTJRRXhpUU1s?=
- =?utf-8?B?Tks4b3pDY2xHMzloVWQ3RE40c3E2THQ2aThpU0NSYkgzS3dMN290S2dWQnlG?=
- =?utf-8?B?Z2ZxN1pRY3I2UWtsUjFJM3JscnpBVDBMV210ZHVDaGdQc3hySDVlVndoUjBm?=
- =?utf-8?B?MHhhSVRKcWdoNGtBdmQzWmRpaTVBZEdlSzkxUHZJQlAxM3VKT0ZzVVQwTlUv?=
- =?utf-8?B?czRCMzJWeW1vcUNRd0Zpck1xVy9KT3hFRS8yV2MyRjd3SjlSMDBONEhJZGNC?=
- =?utf-8?B?aUJndlZhQzNiQ2xXNXk3WHcwR1FBd0VTUDAxdkJ1US8wVkptU2tyaDJFOTBv?=
- =?utf-8?B?MG5jWEt1RENNK1FKWG0xTDdtZXA0MUJScTlQNHFoM3YvWC9HL3AreVVqWmor?=
- =?utf-8?B?QnVsemZSUjBES2FGaWM3U2ZTWGo2eWNXbnZSTThPR0FUMmVXclErdWRBTnNY?=
- =?utf-8?B?dEN6RVFIZlhnZlRET2JkUjBoZnhZeTZ1cGkxTkdBbFFIWlVOTEJBOXptMldw?=
- =?utf-8?B?MGFNMlp4bk9IZXI3enFPV3lwdWw3MUZ4YzErMkxwbDdTa2M2aGpIbmRRRUZo?=
- =?utf-8?B?S1NFM1ZmU3VkMDYvSEdKS0dIQkhtYU9aTDRvd0sxNjh3alQxOVluekt3V3NV?=
- =?utf-8?B?YkZuYi9WT21tRkdPTTFoeW45b3hYeUQwSUlPWG9lUEcvVzhuc083a0dNS0Ja?=
- =?utf-8?B?UWJjZlRGazFFREhRMFhMV1hmekFVZVVFUU00bkw0dDRjcFpRWEZEbkQ2aE5C?=
- =?utf-8?B?cEVEYit5N1FSaDNiUGJ6QnBnQW1FWklkWHdpNFBQaEE5ZmNpNk54MTBWUnJG?=
- =?utf-8?B?NEpXVWsweFhNM1dDS1B6eDEzV2N5UWVHYWdvNW80OFRzOUNxQlE4enQ3Vjdl?=
- =?utf-8?B?ejJ0cHZtVXU4ZUZkRWlhUUk3M2FJTEczekxUZnNQbWNSUHJNeGNMbk12L3ov?=
- =?utf-8?B?OXNHaHd2Z2lBaEpMekdHS2RsVmkyVTVGZ3FjTzF3NG9RTnpFT3dZWUxUWEpL?=
- =?utf-8?B?eStYNGpjdUxiSHg4TW0xQjM0b25sT05jQmxKRTRhSHFHeVZGYVZhd3lEQjAv?=
- =?utf-8?B?K2ljOFBTa2xCYzg4ejBBMUdLSWgzWlp4YkowSWVDc1pLTy9TSStIWnJEcC9l?=
- =?utf-8?B?bnRaMGowWHk5dGhSRWhTYlFQZFVxckhzL1BuV01QNStJTWpmVVNLb2RYT1RE?=
- =?utf-8?B?SEVsWG8vYktnVGRoM1BGVWM0Tm8rS3B3eUVaV3pBcUF0RTRZZzNzb3poMFVP?=
- =?utf-8?B?eEwwbG5Hd2hpL0JZRG1EVjNEQnBBZU0yN3ZzaHVlUTRaNnRVRHFHcmFlcThh?=
- =?utf-8?B?SkVWQ0lsQUNrd200TkV2WmgzenFub0g4QmMzcytSNUVIaFU0ZmFjSjE5ZnB6?=
- =?utf-8?B?ajdGYkFBWHMydVU0VFI1VkZWSWlYT0l5VnFKaGx6ckFyUkFVS2tpVU5YTWVG?=
- =?utf-8?B?QnNaUFYvRUxFaGF3UkQ2UXUyQ0VyOXdMbDhqdnFrNHVQbzhpeitJS1JsOThN?=
- =?utf-8?B?SGVHTEl2VDVNZ1Z2MWVxRzZWeGk0MW5RajhmM1dDS2lsSzRJdjlHMU1XUDZI?=
- =?utf-8?B?WjcreC9sM25Rak9rcFhzMlM2MVZpWjV3OVBUMlFEcjg5cmVMNktBZU1QeGY5?=
- =?utf-8?B?UFFEL1dPQ0VQS0FVYk9kcmJEbk1Ia1BhcDI3RG5udm0rOEhRNkxVanRSUWFj?=
- =?utf-8?B?YTh0SDhGZU1GZUc0YkZ3R3paVWd6ZGtpc3Mwb2V0Nm5ka0E9PQ==?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4721.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?bmVzRE83TU1weGN1ZHMzT3d6aTVzeHA0TCtEeng4Nk5tQlVDK2JIbTEvTFU1?=
- =?utf-8?B?dWowWHRrVW4ra1lXd21sVlc4ckt0RE1iRmhJY2hQWlRSQWJWc090SjJIN3JL?=
- =?utf-8?B?cFBHei84Y0JGSUpKNVhDWk1pd0J4K2N6ci9tc3Z3S3dYckpsSDk0bnZvcXI5?=
- =?utf-8?B?SHFPUkVVVjRmMXZaZ3JJV3M1bUJ6dHBHY1owaGdSdVRXUmxYOE52WWR4ZnNW?=
- =?utf-8?B?WkMzSkJEV0RDQnJBbjJvc0lveHp1Mkk4REkrMFkvVDhRL01uUmFwdWVrVHZs?=
- =?utf-8?B?SE51bE5CckxqQzJoRkZDR214ZlZoZWMvL3JZZnRWWlN1VzZVMjV3QXFTcktw?=
- =?utf-8?B?Yy9HNTNoWWZBdUx6SVd5UjljMGlvMnRZZ3VQRXliVEYvOWdNUVoyNU9oV3cy?=
- =?utf-8?B?MGs5L1J0c3ZkOXdoSlJLR0dyZXNITUxqVVRFZjljdVBHbmZZbTZJY3RxRkdM?=
- =?utf-8?B?eHhsTUJjSXQ0SkpoTVZsL2tGNmtPMW05SUZ1UUNQdTNHazd5SVFNZ3JqNUt6?=
- =?utf-8?B?WEJVeDVvQWF3UjVKajJMUjVkcy91TUtpdXJlcmx1SXI5OG0vZFlNbUxyd1Fr?=
- =?utf-8?B?NlhNdTBxQmRxU1MzOVJ3M2djSFFjcHNMU2dnTTBNcG1xZ0NBSzN4U2hZcE5z?=
- =?utf-8?B?cjhVTnBReXpnVHJWWkd5M2hBRGc5eHh2c1puMTcxTWVCbS9ON0FMWnBsVC9o?=
- =?utf-8?B?cnhTYURPdVNab0tUTHFydXlhU3ZFTVhDdUxtSUhheC9pcWF3SUk5a3BBR0cr?=
- =?utf-8?B?aFAyRnJGY011RFpCcVNXcytVdGJoN0M0WTZMaDdVTncyQ2pFNHNSV29XN2c4?=
- =?utf-8?B?bi80dkd4NlZ5MjFZVG5YdlJIVFpKRDBjVXJmaFBZVU9VUWJWNEx5R1RXWEtL?=
- =?utf-8?B?cS9qNk5penJ4b2h5SHRpT1QxZTArc0FUWTZLaVE3aHVKRXRHOU1NNlJVOGRz?=
- =?utf-8?B?cEVyU3I5U3hYWUZzdnJleCsvQ2FMWG1vWFNMb0lEUzNKM2lMTm1OZ01lVXFh?=
- =?utf-8?B?ZWFEY3BYT1JKb0lxbUIvY2hmK1VJNllpRS8ycmd4N2lMTXk5RUxPOUNVcWR6?=
- =?utf-8?B?OWNnZGgyaUJZbE1uYWlXbUNvMVBWNjlZMXd5ZXNzN2ZuRXhsZnhJZWYrKzNK?=
- =?utf-8?B?d3EwMTcwNm1UM1ByaitaZnU5aGovVkxhQkFabDkvNHU1VmxTVzhwU2x2WXFL?=
- =?utf-8?B?eTRCNm5kY0psa2d0bWQ3SGxDcWFBQkU5TjNoOWJ2MDVSU2ZoTlY5eTNKbHZB?=
- =?utf-8?B?UCszZXp1RVU4NnZORjI0WnFOSVF6OUN6TzhodGVxWkVhQnFGKy9uRm84MzVG?=
- =?utf-8?B?MHdERVh3M2U2ekt6dU1jbTJzaEtkQjJqQnRZUENyajNzMTlqek96Ly82VGlM?=
- =?utf-8?B?dlQ5UGEwNWV2eUI4UGF4WWtpa3czaDJKdUJUK24xejFEdmR5M3JLRk1YTmpP?=
- =?utf-8?B?ZzkrdFV2R0tqUnBLWmI0UG5tMmJvRWdkOGhEdEZTT0FEeGRTeWZ2TDI0OUZm?=
- =?utf-8?B?Q2llREY4cE4rNXcxb2k2OFlDSHg2L2hoRkpNQzhYL1A3SEpTNzNhNlRYOUpH?=
- =?utf-8?B?NEJWTmZ0VGM4QXRrcU8veG1vSkFwTXZpUFgzMnhLbkxlaFZycjltNU4yL0Jm?=
- =?utf-8?B?dXk0N1NSc2k0OVNabmliRnBTd3AxZ3JUSzJmZ2hSVm96WDcyeGRWOHdTaDdp?=
- =?utf-8?B?K1B1L0s0NWVHOEU1Uis0c2ptcDRlRERKbmZpREc5N2N3cEFON2RFME1ZaDU3?=
- =?utf-8?B?L1pyb25tSnpGaFRranduSGt2dnZmbURNb3lodFRxS0dpYWVXaXFBMXlSazFY?=
- =?utf-8?B?NHZVVk94eGppVGVkNk9GR2tTTkJZYVZiSy8zeWZNZGJ0ZUMyeEdjdDF2K2RU?=
- =?utf-8?B?RkFTdGIzZ1pYVlNTUFhhWkJCOERPa1VxWGppRDdYVUxKT3RBYk54aUVUUmhx?=
- =?utf-8?B?UjZESWxhQmNudXJZMnc4REJBTUpnT0NFWDZwSmZuMW10OG5VT1dwZUJhbmIv?=
- =?utf-8?B?Rzd1MFhtaEFwWHRTYU90a25XcmJWQkxPd2ZFZ0lDLzliTEpWL2hCVUZFQzND?=
- =?utf-8?B?Rm16ZS9sZ2pKQW0vRS9YTDloNituOXdVYkptcE1MVXk1MWFTbkRnYzBibWh3?=
- =?utf-8?Q?sTkU171OoE5Azgg7cwW/Joir1?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+In-Reply-To: <20241218105023.2237645-2-tianx@yunsilicon.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR03CA0059.eurprd03.prod.outlook.com
+ (2603:10a6:803:50::30) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DS0PR11MB7803:EE_
+X-MS-Office365-Filtering-Correlation-Id: f176ae1c-81fe-4f1c-3a4b-08dd1f6c0d84
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?dStBcUtuK0d3dU0veGdYTktlWU5hOFNld2V2Mi9FU1g5Y3NlWmczOERSbG1m?=
+ =?utf-8?B?b2JtTGY1aTZCVDUyOUJvNTRmMk1ad25LRnF1UERhZmFYYi9ldDQrdDZqL0da?=
+ =?utf-8?B?Y2cwblJLKy9QSkl5RkFhM2pFOUJHL3M0alBGNnA4MGxBdXdXblhZVUd3cEhl?=
+ =?utf-8?B?NHdvdkVJOGJBazlqa0hTN2lKNnZFaHN1QXNqSnFOZTMvcUZZZThlYzQyZTVR?=
+ =?utf-8?B?dWRSdTNEVk5TWWNOeVBERzgwbTR1TFF5d3lTd0Jqa0NCc1NTb3pNNS85TXN3?=
+ =?utf-8?B?S0hXamc5b0syNTJOdjlka3pkRUZWUWJNeGw3UTd5VzhOMUpkNUdubDErTVpa?=
+ =?utf-8?B?RHdDblNrRHBxS1JzaWVKdDdNZFVYTFlKaVJ5WEkvelpKSzh6dzFiSkl3Y0d5?=
+ =?utf-8?B?bHlKUXNBQ0hTUm9ZVEdSS2xkU2p3VUtBRnpxdTZhWE5mOGxJYlYwZEhvY05L?=
+ =?utf-8?B?OGY4VG1IaGNCV1pUR2RSYXpaeUJsenJJekRWd0tPZzE0M3ZhaGdBTUFtTzZN?=
+ =?utf-8?B?UEFXSHduWG9pRUQ2RTcxNG5Zakl2TnRteVhRNTU3ODFkaTZ4UGdITjhIQ1da?=
+ =?utf-8?B?Rk1JMWh5NkNsWU1JcFdncjBxWkYxTW9zaVlsMVFZdUVFMU9ZMEswUklvdmNR?=
+ =?utf-8?B?WTFPSnVZdUVqd3BmaElsOVJsUm9EdUlGeU5wZjFSUlk5YnhVRTkzelpLd2t5?=
+ =?utf-8?B?NjZub0VxbHd3ekdQM1pYMG02UGgxaHpWWkpoS2x0a1gxdklIUm03RHVLMnBa?=
+ =?utf-8?B?eU5yWXdqMS8zZzRtK3FHM0RKd2M5Qy9Ta3hkNTdWWHAvS01XM0lYZmlnVkhn?=
+ =?utf-8?B?SHpKdzloQ0hzejkwK2oxWVdrUUg2R3FkM0ZvSG10S2FIb3h5ZmNQWFdPbmhE?=
+ =?utf-8?B?bm93VjNTS2xxUjVrM21wS0Z4NjlPb3UwdnF3Q0NVRFVpY2xJa1BobXNMQnJZ?=
+ =?utf-8?B?bXNaNUp0VmdVWElhS053WklXYXN1YTBwWWFjRVEvK0JhVGpvRkw0U3U1cVZs?=
+ =?utf-8?B?bW9sa1pZMTRBVFZoWERaYm9zMTVUaEtHN1A0WTdPSVczMjBDWDMwV1J3NU9q?=
+ =?utf-8?B?MnNXWUNFN1hWcEg1a0VWOEZ4SmNaRVpVclBRQU9oVUxIdFREcE5qZTBuU29o?=
+ =?utf-8?B?bVZNSlVaMmRTcFY5S3NEN0ZJc2ZpSlFoNXFXYkEwMC9FRkJIbFJ6UUJlVTd5?=
+ =?utf-8?B?MWhPb3UvUW4xa1g2d1ZnVnlWcjg5TzVJRitrMGdXaWZIaWhyTEQwZUhRUG9k?=
+ =?utf-8?B?cnkxY25mM2t0Qk1RdHZUNmlMR2MwY1NvNjBabDNFaVJrdmowOTNWdzhobGZo?=
+ =?utf-8?B?N043dEUxQi9WaUNHWm82eTRGMUF1ZGUyalBXanRvWFU5NUtNQksvKzdwWGM5?=
+ =?utf-8?B?NXlYdzVVQXhsSE5LcCtFVmNjQXk0eVpNamZDS0RyT09DZnVYaXNENEtpQ2hJ?=
+ =?utf-8?B?b2N1Y0NmYnJUc2tWMHU3eXNKekJJVEkzMmJaOFNlRGJuZk1FMzZkMGxrc1Vy?=
+ =?utf-8?B?cnBFZjlxbmNOZ0t4WFhrY2I0TDFjL3p0NTV0WDJVaitqS3hLZmlIYlc0dTFJ?=
+ =?utf-8?B?eU9USkVTSkVpTzlxcWxmMW1JcWtyc0ZVRTdUb1dUQVFBMjBjaEhWb0l6eHVU?=
+ =?utf-8?B?dkJrS25oS0d2cGZ4V2tCMEhZVTZkdTV5TVEvbmRmalZyaCt1ZEV4NzUwcUg4?=
+ =?utf-8?B?c0NPWFFKbm1JQ2ZHYVFXcEI5YnIwSllXcXhtc0svQ2JpNWZnZmJxS25BeVNk?=
+ =?utf-8?B?VndGSVdjWDRWaDB6ZXl0WE01c1ZOWjdyMUp0T245Vm5KcTU3d29WWnRreXlp?=
+ =?utf-8?B?Zmt6blJjT0Q3T0pwSkFRWnQ1MmNiaGtDay9wOUpNcXFFMU55ZzRrcFdVSytU?=
+ =?utf-8?Q?/vlAlrmjHcm4w?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bUQ3V2VRVFpLTlV1Yll2SGN2Z2Q3RS9SbmNoNStCZ1E1LzZCcE56dDl3V2FN?=
+ =?utf-8?B?QTJ6dVhWazI1M3NtS0k1aUFhL000SkVxOWFOaDdVdnBPRmVLakozRHBZTWI5?=
+ =?utf-8?B?dmQ0aEhjd0c0bkx4SmFMc3NVUmpwbXNXZlRiejE5azNOL2ZhQ3Z3REh3eDFy?=
+ =?utf-8?B?ZlBhbzNUbHh6U2cvcTZnVkVXb3dnR1pOdE85NnBwWFZmOTU3WisrdHNiWkF4?=
+ =?utf-8?B?eEdGTmR0LzhUZ1E3YThXeG5JU29HT2VyQmc1emM5a3dtZCt6RHBBQURseCty?=
+ =?utf-8?B?T3IzU2hMM3YxcWhPY3NkdTFvMWF1VUdMTm1GVjJ0cTZUZ3dtdmlDaE85SlpM?=
+ =?utf-8?B?YVMyNDJVR2hhTVV0RXJ3RW1ub0hkSGlxNFJJVTkyUUI1MmVKTHNrRHJxSmg4?=
+ =?utf-8?B?NmdZRUhtcFFjWHpmYnFGaG5hWVZ5a0pzQmxvTk9JdjJzMUNrOEdVMElGWVhy?=
+ =?utf-8?B?WTRQOTM2UllrNDU1emszTlFvNkxRZzNKZkJjZHVwdE1zU0R0RjdhUUxmZlhX?=
+ =?utf-8?B?dGVqUFNHUEptckxVYnN5bzN5V3paYXBwdytzTkluOVRDSE1XbzdTMzNDVVRH?=
+ =?utf-8?B?aDdoSTJRa1RNZURPOGxWOEt1dGJnRG5sby9kOEI3YXltaDZ2VnJZNlZLMTh6?=
+ =?utf-8?B?WmZwck5HbmdRcWllYjlXcVVYMVc3ei9IOXNHRjhicW5UKzNORHMrTFcrUmQv?=
+ =?utf-8?B?T09oVHByR2R1bCttejJGTFNHVEd5MnFCYSt0SFdMOEJCK2g0RHAxWFpwRGNz?=
+ =?utf-8?B?djR6VVBQeURKa2Rpd0hmbjJtYy9EaUIvSUdLc2N2bzdpT3ZBRFVmTUdDZWwz?=
+ =?utf-8?B?ZGVuSVRXa3UvRzdyV1B5YzZrclFYaFNVMWtFMGkxYStBbVB0WEVIbXdkcEpv?=
+ =?utf-8?B?b1F1WnBNSHZWM0NNRU5HUG5CQXNxVEsxNmdLSERPUmdzNDR4VTdRL1UwVENT?=
+ =?utf-8?B?R252ZktvQkQxUWxtWFZtYkRBYnF1a2Erb29IR2VsOHlqcTBYejJKR1BaWm82?=
+ =?utf-8?B?M1RrTXJmUEZOOHEyWU5Wclh2eHhQcE9TMFpXSVRKcmtnY1Z3ajlST1UrNHhx?=
+ =?utf-8?B?MzFNUkxjMU1DTTVpcXVOTEUxUVV4RlJ5S1NGdk1PQlJmdnE1RjR0Zis5WmJs?=
+ =?utf-8?B?Y1VrR1BQNEx5WjliNFZMQTRpQnYwUHpCQnBFM05TQjVIbi9CNGg3ams3cDhj?=
+ =?utf-8?B?dndOOXczS1pMNkQ5QVYyaTVicnpUN09QK0x6RnJzZThvMTNZV2taUDAzYWxM?=
+ =?utf-8?B?YXdhc3FZZmQ3NGMyRTNTMVZLTUlHOVdRc2NySWxvUmcrTW53by9jT3l4Q0dP?=
+ =?utf-8?B?WTdRVmo4dHFYWFFGNEpaZVFSaFowaytrVW50Y0NHeFV5VWtOLzZMamJHQWI2?=
+ =?utf-8?B?dHAzbzlkSXV2SDdsZjJBNXZ1Y0pXaS9hNHRaOTgvZVRLMWh4QTA2ekppUUNm?=
+ =?utf-8?B?RzRQaFlWSm1naWZYZjJSNXUvQlZtZWxCUDVRc2dZL1lINFpnTGp2SGRZK05x?=
+ =?utf-8?B?RmZHOENSWDJreEpKZUlPNCt2eUozZERvNWJITVl6UUh1Y21qdHN4TW1JOWFK?=
+ =?utf-8?B?bVE5RkRTa3FFMkxhY2oxWTVocXFYQ2dLTFRQNVdYUEhzTk1iWkpCQ0RNSjcv?=
+ =?utf-8?B?NFcvRGxPZ0ZuclRmeUlqZFpPN3h1NVhVNENrOW8yWWdhdEVHMER4MWREa0Rj?=
+ =?utf-8?B?bHN1R0pMZThYM1FoWGFwUmFibnNMQVhpVmlPYmp6Z2x2eDR6Z1lGSlVqMGhq?=
+ =?utf-8?B?YkxmaDZWejF3Wk5qTm1LOXd1eHJXVENVZ0dUR00wV2NLWUZoTmxjbDd0M2ps?=
+ =?utf-8?B?d2daNmF0RWVRWDd0aWxZbHRWSWZQaEx4QWgvNVN6RVA2SWZUM3Q2WjV0bCth?=
+ =?utf-8?B?QVlTVSt3eS9wbEtGZnU0S0hhV0kzVnJ0QjE4ejR4TWRqSTRXcURMQ3NoMFhT?=
+ =?utf-8?B?bG41WDRuVVBFaU5ZVjQvN3hiNmVOdk5nQ0JOZEFiQXU1VHB5N1BtWjNYUXN1?=
+ =?utf-8?B?Q0lJamFZcFpIbEw1TnkxUUdaemd2Z1VtNzB3SGVnbmNnUko3cGgxUFlnUElP?=
+ =?utf-8?B?YzZ5djFxcXFpd3BsN3BvTmFuRG96OTNNdGdQSUo0Q3pPSCtRajdWd0c2WXl0?=
+ =?utf-8?B?TEliZkdHQWdUaXN1aTR0WWY4RGxOT3Z3RExudlQwUnMraG1IVmg5M1pHbUFn?=
+ =?utf-8?B?c0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f176ae1c-81fe-4f1c-3a4b-08dd1f6c0d84
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4721.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: df017559-8333-484c-1f2a-08dd1f6c0428
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2024 13:58:14.2937
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2024 13:58:30.2073
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: EdnedOYrRcIplCYfFEf49wwFWzD/uhHez3VlkYHD3nT4poU33JvE/otSnqAj1sTtbmw6b5doiCp5RZcQuCqYuA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR18MB3549
-X-Proofpoint-GUID: 7SoaVvUSJ1Ymz1v2V8_1PvbG6Wfs1Bol
-X-Proofpoint-ORIG-GUID: 7SoaVvUSJ1Ymz1v2V8_1PvbG6Wfs1Bol
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qO8kSssr3vDnYniqyyH7ba6r+vUXgEEjgcByFhK/HwdMvAeKr8N4Ak3I+MBgRPE8whgPXjzed2NRWc/EXpWTPMNt3FW1DJ8pz9eGHZsVaOg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7803
+X-OriginatorOrg: intel.com
 
-SGkgTGFyeXNhLA0KDQo+ID4gPiA+ID4gT24gTW9uLCBEZWMgMTYsIDIwMjQgYXQgMDM6MzA6MTJQ
-TSArMDEwMCwgTGFyeXNhIFphcmVtYmEgd3JvdGU6DQo+ID4gPiA+ID4gPiBPbiBTdW4sIERlYyAx
-NSwgMjAyNCBhdCAxMTo1ODozOVBNIC0wODAwLCBTaGluYXMgUmFzaGVlZCB3cm90ZToNCj4gPiA+
-ID4gPiA+ID4gbmRvX2dldF9zdGF0czY0KCkgY2FuIHJhY2Ugd2l0aCBuZG9fc3RvcCgpLCB3aGlj
-aCBmcmVlcyBpbnB1dCBhbmQNCj4gPiA+ID4gPiA+ID4gb3V0cHV0IHF1ZXVlIHJlc291cmNlcy4g
-Q2FsbCBzeW5jaHJvbml6ZV9uZXQoKSB0byBhdm9pZCBzdWNoDQo+IHJhY2VzLg0KPiA+ID4gPiA+
-ID4gPg0KPiA+ID4gPiA+ID4gPiBGaXhlczogNmE2MTBhNDZiYWQxICgib2N0ZW9uX2VwOiBhZGQg
-c3VwcG9ydCBmb3IgbmRvIG9wcyIpDQo+ID4gPiA+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IFNoaW5h
-cyBSYXNoZWVkIDxzcmFzaGVlZEBtYXJ2ZWxsLmNvbT4NCj4gPiA+ID4gPiA+ID4gLS0tDQo+ID4g
-PiA+ID4gPiA+IFYyOg0KPiA+ID4gPiA+ID4gPiAgIC0gQ2hhbmdlZCBzeW5jIG1lY2hhbmlzbSB0
-byBmaXggcmFjZSBjb25kaXRpb25zIGZyb20gdXNpbmcgYW4NCj4gPiA+IGF0b21pYw0KPiA+ID4g
-PiA+ID4gPiAgICAgc2V0X2JpdCBvcHMgdG8gYSBtdWNoIHNpbXBsZXIgc3luY2hyb25pemVfbmV0
-KCkNCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L21h
-cnZlbGwvb2N0ZW9uX2VwL29jdGVwX21haW4uYyB8IDEgKw0KPiA+ID4gPiA+ID4gPiAgMSBmaWxl
-IGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspDQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IGRp
-ZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9tYXJ2ZWxsL29jdGVvbl9lcC9vY3RlcF9t
-YWluLmMNCj4gPiA+ID4gPiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L21hcnZlbGwvb2N0ZW9uX2Vw
-L29jdGVwX21haW4uYw0KPiA+ID4gPiA+ID4gPiBpbmRleCA1NDk0MzZlZmMyMDQuLjk0MWJiYWFh
-NjdiNSAxMDA2NDQNCj4gPiA+ID4gPiA+ID4gLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvbWFy
-dmVsbC9vY3Rlb25fZXAvb2N0ZXBfbWFpbi5jDQo+ID4gPiA+ID4gPiA+ICsrKyBiL2RyaXZlcnMv
-bmV0L2V0aGVybmV0L21hcnZlbGwvb2N0ZW9uX2VwL29jdGVwX21haW4uYw0KPiA+ID4gPiA+ID4g
-PiBAQCAtNzU3LDYgKzc1Nyw3IEBAIHN0YXRpYyBpbnQgb2N0ZXBfc3RvcChzdHJ1Y3QgbmV0X2Rl
-dmljZQ0KPiA+ID4gKm5ldGRldikNCj4gPiA+ID4gPiA+ID4gIHsNCj4gPiA+ID4gPiA+ID4gIAlz
-dHJ1Y3Qgb2N0ZXBfZGV2aWNlICpvY3QgPSBuZXRkZXZfcHJpdihuZXRkZXYpOw0KPiA+ID4gPiA+
-ID4gPg0KPiA+ID4gPiA+ID4gPiArCXN5bmNocm9uaXplX25ldCgpOw0KPiA+ID4gPiA+ID4NCj4g
-PiA+ID4gPiA+IFlvdSBzaG91bGQgaGF2ZSBlbGFib3JhdGVkIG9uIHRoZSBmYWN0IHRoYXQgdGhp
-cyBzeW5jaHJvbml6ZV9uZXQoKSBpcw0KPiBmb3INCj4gPiA+ID4gPiA+IF9fTElOS19TVEFURV9T
-VEFSVCBmbGFnIGluIHRoZSBjb21taXQgbWVzc2FnZSwgdGhpcyBpcyBub3Qgb2J2aW91cy4NCj4g
-PiA+IEFsc28sDQo+ID4gPiA+ID4gaXMNCj4gPiA+ID4gPiA+IG9jdGVwX2dldF9zdGF0czY0KCkg
-Y2FsbGVkIGZyb20gUkNVLXNhZmUgY29udGV4dD8NCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4NCj4g
-PiA+ID4gPiBOb3cgSSBzZWUgdGhhdCBpbiBjYXNlICFuZXRpZl9ydW5uaW5nKCksIHlvdSBkbyBu
-b3QgYmFpbCBvdXQgb2YNCj4gPiA+ID4gPiBvY3RlcF9nZXRfc3RhdHM2NCgpIGZ1bGx5IChvciBh
-dCBhbGwgYWZ0ZXIgdGhlIHNlY29uZCBwYXRjaCkuIFNvLCBjb3VsZA0KPiB5b3UNCj4gPiA+ID4g
-PiBleHBsYWluLCBob3cgYXJlIHlvdSB1dGlsaXppbmcgUkNVIGhlcmU/DQo+ID4gPiA+ID4NCj4g
-PiA+ID4NCj4gPiA+ID4gVGhlIHVuZGVyc3RhbmRpbmcgaXMgdGhhdCBvY3RlcF9nZXRfc3RhdHM2
-NCgpICgubmRvX2dldF9zdGF0czY0KCkgaW4NCj4gdHVybikgaXMNCj4gPiA+IGNhbGxlZCBmcm9t
-IFJDVSBzYWZlIGNvbnRleHRzLCBhbmQNCj4gPiA+ID4gdGhhdCB0aGUgbmV0ZGV2IG9wIGlzIG5l
-dmVyIGNhbGxlZCBhZnRlciB0aGUgbmRvX3N0b3AoKS4NCj4gPiA+DQo+ID4gPiBBcyBJIG5vdyBz
-ZWUsIGluIG5ldC9jb3JlL25ldC1zeXNmcy5jLCB5ZXMgdGhlcmUgaXMgYW4gcmN1IHJlYWQgbG9j
-ayBhcm91bmQNCj4gdGhlDQo+ID4gPiB0aGluZywgYnV0IHRoZXJlIGFyZSBhIGxvdCBtb3JlIGNh
-bGxlcnMgYW5kIGZvciBleGFtcGxlIHZldGhfZ2V0X3N0YXRzNjQoKQ0KPiA+ID4gZXhwbGljaXRs
-eSBjYWxscyByY3VfcmVhZF9sb2NrKCkuDQo+ID4gPg0KPiA+ID4gQWxzbywgZXZlbiB3aXRoIFJD
-VS1wcm90ZWN0ZWQgc2VjdGlvbiwgSSBhbSBub3Qgc3VyZSBwcmV2ZW50cyB0aGUNCj4gPiA+IG9j
-dGVwX2dldF9zdGF0czY0KCkgdG8gYmUgY2FsbGVkIGFmdGVyIHN5bmNocm9uaXplX25ldCgpIGZp
-bmlzaGVzLiBBZ2FpbiwNCj4gdGhlDQo+ID4gPiBjYWxsZXJzIHNlZW0gdG9vIGRpdmVyc2UgdG8g
-ZGVmaW5pdGVseSBzYXkgdGhhdCB3ZSBjYW4gcmVseSBvbiBidWlsdC1pbiBmbGFncw0KPiA+ID4g
-Zm9yIHRoaXMgdG8gbm90IGhhcHBlbiA6Lw0KPiA+DQo+ID4gVXN1YWxseSwgdGhlIHVuZGVyc3Rh
-bmRpbmcgaXMgdGhhdCBuZG9fZ2V0X3N0YXRzIHdvbid0IGJlIGNhbGxlZCBieSB0aGUNCj4gbmV0
-d29yayBzdGFjayBhZnRlciB0aGUgaW50ZXJmYWNlIGlzIHB1dCBkb3duLiBBcyBsb25nIGFzIHRo
-YXQgaXMgdGhlIGNhc2UsIEkNCj4gZG9uJ3QgdGhpbmsgd2Ugc2hvdWxkIGtlZXAgYWRkaW5nIGNo
-ZWNrcyB1bnRpbCB0aGVyZSBpcyBhIHN0cm9uZyByZWFzb24gdG8gZG8NCj4gc28uIFdoYXQgZG8g
-eW91IHRoaW5rPw0KPiA+DQo+IA0KPiBJdCBpcyBoYXJkIHRvIGtub3cgd2l0aG91dCB0ZXN0aW5n
-IChidXQgdGVzdGluZyBzaG91bGQgbm90IGJlIGhhcmQpLiBJIHRoaW5rIHRoZQ0KPiBwaHJhc2Ug
-IlN0YXRpc3RpY3MgbXVzdCBwZXJzaXN0IGFjcm9zcyByb3V0aW5lIG9wZXJhdGlvbnMgbGlrZSBi
-cmluZ2luZyB0aGUNCj4gaW50ZXJmYWNlIGRvd24gYW5kIHVwLiIgWzBdIGltcGxpZXMgdGhhdCBi
-cmluZ2luZyB0aGUgaW50ZXJmYWNlIGRvd24gbWF5IG5vdA0KPiBuZWNlc3NhcmlseSBwcmV2ZW50
-IHN0YXRzIGNhbGxzLg0KPiANCj4gWzBdIGh0dHBzOi8vdXJsZGVmZW5zZS5wcm9vZnBvaW50LmNv
-bS92Mi91cmw/dT1odHRwcy0NCj4gM0FfX2RvY3Mua2VybmVsLm9yZ19uZXR3b3JraW5nX3N0YXRp
-c3RpY3MuaHRtbCZkPUR3SUJBZyZjPW5LaldlYzJiNlIwDQo+IG1PeVBhejd4dGZRJnI9MU94TEQ0
-eS1veHJsZ1ExcmpYZ1d0bUx6MXBuYURqRDk2c0RxLQ0KPiBjS1V3SzQmbT1ESnpKTm85V1QxMHBT
-SGlrSmhDQmJONy1DZkItDQo+IE8ya3o5T1ZHc21pSVJRWHZjSUlXREs2MDM0dE1telpHdmxGcyZz
-PWVzc0UwMXN1TFdGNDJ0YU5pMHlKM0gzWUMNCj4gMEV0OEdvZk1qNXd4b3I5eUQ0JmU9DQo+DQoN
-ClNvcnJ5LCBJIG1pc3dvcmRlZCBteSBwcmV2aW91cyBzdGF0ZW1lbnQuIE9mIGNvdXJzZSBuZG9f
-Z2V0X3N0YXRzIGNhbiBnZXQgY2FsbGVkIHdoaWxlIHRoZSBuZXRkZXYgaXMgZG93bi4gVGhpcyBp
-cyB0ZXN0ZWQgY29kZSwgYW5kIHRoZSByZWFzb24gd2h5IHRoZXJlIGlzIG5vIGlzc3VlIGluIHRo
-aXMgc2NlbmFyaW8gaXMgYmVjYXVzZSBmb3IgYSBuZG9fZ2V0X3N0YXRzIGNhbGwgdGhhdCBoYXBw
-ZW5zIGFmdGVyIG5kb19zdG9wKCkgaGFwcGVucywgdGhlIG9jdC0+bnVtX29xcyB3aWxsIGJlIHNl
-ZW4gYXMgMCwgYW5kIGhlbmNlIG9jdGVwX2lxIG5vciBvY3RlcF9vcSBpcyBub3QgYWNjZXNzZWQg
-aW4gdGhlIGZvciBsb29wIHRoYXQgZm9sbG93cy4gT2N0ZXBfaXEgYW5kIG9jdGVwX29xIGFyZSB0
-aGUgcmVzb3VyY2VzIHRoYXQgd2UncmUgdHJ5aW5nIHRvIHByb3RlY3QgZnJvbSByYWNlIGNvbmRp
-dGlvbnMuIEhvcGUgdGhhdCBjbGFyaWZpZXMgdGhpbmdzLg0KDQoNCj4gPiA+ID4gVGhhbmtzIGZv
-ciB0aGUgY29tbWVudHMNCg==
+On 12/18/24 11:50, Xin Tian wrote:
+> Add yunsilicon xsc driver basic framework, including xsc_pci driver
+> and xsc_eth driver
+> 
+>   
+> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> Co-developed-by: Lei Yan <Jacky@yunsilicon.com>
+
+Co-devs need to sign-off too, scripts/checkpatch.pl would catch that
+(and more)
+
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> ---
+>   drivers/net/ethernet/Kconfig                  |   1 +
+>   drivers/net/ethernet/Makefile                 |   1 +
+>   drivers/net/ethernet/yunsilicon/Kconfig       |  26 ++
+>   drivers/net/ethernet/yunsilicon/Makefile      |   8 +
+>   .../ethernet/yunsilicon/xsc/common/xsc_core.h | 132 +++++++++
+>   .../net/ethernet/yunsilicon/xsc/net/Kconfig   |  16 ++
+>   .../net/ethernet/yunsilicon/xsc/net/Makefile  |   9 +
+>   .../net/ethernet/yunsilicon/xsc/pci/Kconfig   |  16 ++
+>   .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   9 +
+>   .../net/ethernet/yunsilicon/xsc/pci/main.c    | 272 ++++++++++++++++++
+>   10 files changed, 490 insertions(+)
+>   create mode 100644 drivers/net/ethernet/yunsilicon/Kconfig
+>   create mode 100644 drivers/net/ethernet/yunsilicon/Makefile
+>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+> 
+> diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+> index 0baac25db..aa6016597 100644
+> --- a/drivers/net/ethernet/Kconfig
+> +++ b/drivers/net/ethernet/Kconfig
+> @@ -82,6 +82,7 @@ source "drivers/net/ethernet/i825xx/Kconfig"
+>   source "drivers/net/ethernet/ibm/Kconfig"
+>   source "drivers/net/ethernet/intel/Kconfig"
+>   source "drivers/net/ethernet/xscale/Kconfig"
+> +source "drivers/net/ethernet/yunsilicon/Kconfig"
+>   
+>   config JME
+>   	tristate "JMicron(R) PCI-Express Gigabit Ethernet support"
+> diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+> index c03203439..c16c34d4b 100644
+> --- a/drivers/net/ethernet/Makefile
+> +++ b/drivers/net/ethernet/Makefile
+> @@ -51,6 +51,7 @@ obj-$(CONFIG_NET_VENDOR_INTEL) += intel/
+>   obj-$(CONFIG_NET_VENDOR_I825XX) += i825xx/
+>   obj-$(CONFIG_NET_VENDOR_MICROSOFT) += microsoft/
+>   obj-$(CONFIG_NET_VENDOR_XSCALE) += xscale/
+> +obj-$(CONFIG_NET_VENDOR_YUNSILICON) += yunsilicon/
+>   obj-$(CONFIG_JME) += jme.o
+>   obj-$(CONFIG_KORINA) += korina.o
+>   obj-$(CONFIG_LANTIQ_ETOP) += lantiq_etop.o
+> diff --git a/drivers/net/ethernet/yunsilicon/Kconfig b/drivers/net/ethernet/yunsilicon/Kconfig
+> new file mode 100644
+> index 000000000..c766390b4
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/Kconfig
+> @@ -0,0 +1,26 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> +# All rights reserved.
+> +# Yunsilicon driver configuration
+> +#
+> +
+> +config NET_VENDOR_YUNSILICON
+> +	bool "Yunsilicon devices"
+> +	default y
+> +	depends on PCI || NET
+
+Would it work for you to have only one of the above enabled?
+
+I didn't noticed your response to the same question on your v0
+(BTW, versioning starts at v0, remember to add also links to previous
+versions (not needed for your v0, to don't bother you with 16 URLs :))
+
+> +	depends on ARM64 || X86_64
+> +	help
+> +	  If you have a network (Ethernet) device belonging to this class,
+> +	  say Y.
+> +
+> +	  Note that the answer to this question doesn't directly affect the
+> +	  kernel: saying N will just cause the configurator to skip all
+> +	  the questions about Yunsilicon cards. If you say Y, you will be asked
+> +	  for your specific card in the following questions.
+> +
+> +if NET_VENDOR_YUNSILICON
+> +
+> +source "drivers/net/ethernet/yunsilicon/xsc/net/Kconfig"
+> +source "drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig"
+> +
+> +endif # NET_VENDOR_YUNSILICON
+> diff --git a/drivers/net/ethernet/yunsilicon/Makefile b/drivers/net/ethernet/yunsilicon/Makefile
+> new file mode 100644
+> index 000000000..6fc8259a7
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/Makefile
+> @@ -0,0 +1,8 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> +# All rights reserved.
+> +# Makefile for the Yunsilicon device drivers.
+> +#
+> +
+> +# obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc/net/
+> +obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc/pci/
+> \ No newline at end of file
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> new file mode 100644
+> index 000000000..5ed12760e
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> @@ -0,0 +1,132 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> + * All rights reserved.
+> + */
+> +
+> +#ifndef XSC_CORE_H
+> +#define XSC_CORE_H
+
+typically there are two underscores in the header names
+
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/pci.h>
+> +
+> +extern unsigned int xsc_log_level;
+> +
+> +#define XSC_PCI_VENDOR_ID		0x1f67
+> +
+> +#define XSC_MC_PF_DEV_ID		0x1011
+> +#define XSC_MC_VF_DEV_ID		0x1012
+> +#define XSC_MC_PF_DEV_ID_DIAMOND	0x1021
+> +
+> +#define XSC_MF_HOST_PF_DEV_ID		0x1051
+> +#define XSC_MF_HOST_VF_DEV_ID		0x1052
+> +#define XSC_MF_SOC_PF_DEV_ID		0x1053
+> +
+> +#define XSC_MS_PF_DEV_ID		0x1111
+> +#define XSC_MS_VF_DEV_ID		0x1112
+> +
+> +#define XSC_MV_HOST_PF_DEV_ID		0x1151
+> +#define XSC_MV_HOST_VF_DEV_ID		0x1152
+> +#define XSC_MV_SOC_PF_DEV_ID		0x1153
+> +
+> +enum {
+> +	XSC_LOG_LEVEL_DBG	= 0,
+> +	XSC_LOG_LEVEL_INFO	= 1,
+> +	XSC_LOG_LEVEL_WARN	= 2,
+> +	XSC_LOG_LEVEL_ERR	= 3,
+> +};
+> +
+> +#define xsc_dev_log(condition, level, dev, fmt, ...)			\
+> +do {									\
+> +	if (condition)							\
+> +		dev_printk(level, dev, dev_fmt(fmt), ##__VA_ARGS__);	\
+> +} while (0)
+> +
+> +#define xsc_core_dbg(__dev, format, ...)				\
+> +	xsc_dev_log(xsc_log_level <= XSC_LOG_LEVEL_DBG, KERN_DEBUG,	\
+> +		&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,		\
+> +		__func__, __LINE__, current->pid, ##__VA_ARGS__)
+> +
+> +#define xsc_core_dbg_once(__dev, format, ...)				\
+> +	dev_dbg_once(&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,	\
+> +		     __func__, __LINE__, current->pid,			\
+> +		     ##__VA_ARGS__)
+> +
+> +#define xsc_core_dbg_mask(__dev, mask, format, ...)			\
+> +do {									\
+> +	if ((mask) & xsc_debug_mask)					\
+> +		xsc_core_dbg(__dev, format, ##__VA_ARGS__);		\
+> +} while (0)
+> +
+> +#define xsc_core_err(__dev, format, ...)				\
+> +	xsc_dev_log(xsc_log_level <= XSC_LOG_LEVEL_ERR, KERN_ERR,	\
+> +		&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,		\
+> +		__func__, __LINE__, current->pid, ##__VA_ARGS__)
+> +
+> +#define xsc_core_err_rl(__dev, format, ...)				\
+> +	dev_err_ratelimited(&(__dev)->pdev->dev,			\
+> +			   "%s:%d:(pid %d): " format,			\
+> +			   __func__, __LINE__, current->pid,		\
+> +			   ##__VA_ARGS__)
+> +
+> +#define xsc_core_warn(__dev, format, ...)				\
+> +	xsc_dev_log(xsc_log_level <= XSC_LOG_LEVEL_WARN, KERN_WARNING,	\
+> +		&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,		\
+> +		__func__, __LINE__, current->pid, ##__VA_ARGS__)
+> +
+> +#define xsc_core_info(__dev, format, ...)				\
+> +	xsc_dev_log(xsc_log_level <= XSC_LOG_LEVEL_INFO, KERN_INFO,	\
+> +		&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,		\
+> +		__func__, __LINE__, current->pid, ##__VA_ARGS__)
+> +
+> +#define xsc_pr_debug(format, ...)					\
+> +do {									\
+> +	if (xsc_log_level <= XSC_LOG_LEVEL_DBG)				\
+> +		pr_debug(format, ##__VA_ARGS__);		\
+> +} while (0)
+> +
+> +#define assert(__dev, expr)						\
+> +do {									\
+> +	if (!(expr)) {							\
+> +		dev_err(&(__dev)->pdev->dev,				\
+> +		"Assertion failed! %s, %s, %s, line %d\n",		\
+> +		#expr, __FILE__, __func__, __LINE__);			\
+> +	}								\
+> +} while (0)
+
+as a rule of thumb, don't add functions/macros that you don't use in
+given patch
+
+have you seen WARN_ON() family?
+
+> +
+> +enum {
+> +	XSC_MAX_NAME_LEN = 32,
+> +};
+> +
+> +struct xsc_dev_resource {
+> +	struct mutex alloc_mutex;	/* protect buffer alocation according to numa node */
+> +};
+> +
+> +enum xsc_pci_state {
+> +	XSC_PCI_STATE_DISABLED,
+> +	XSC_PCI_STATE_ENABLED,
+> +};
+> +
+> +struct xsc_priv {
+> +	char			name[XSC_MAX_NAME_LEN];
+> +	struct list_head	dev_list;
+> +	struct list_head	ctx_list;
+> +	spinlock_t		ctx_lock;	/* protect ctx_list */
+> +	int			numa_node;
+> +};
+> +
+> +struct xsc_core_device {
+> +	struct pci_dev		*pdev;
+> +	struct device		*device;
+> +	struct xsc_priv		priv;
+> +	struct xsc_dev_resource	*dev_res;
+> +
+> +	void __iomem		*bar;
+> +	int			bar_num;
+> +
+> +	struct mutex		pci_state_mutex;	/* protect pci_state */
+> +	enum xsc_pci_state	pci_state;
+> +	struct mutex		intf_state_mutex;	/* protect intf_state */
+> +	unsigned long		intf_state;
+> +};
+> +
+> +#endif
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+> new file mode 100644
+> index 000000000..0d9a4ff8a
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+> @@ -0,0 +1,16 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> +# All rights reserved.
+> +# Yunsilicon driver configuration
+> +#
+> +
+> +config YUNSILICON_XSC_ETH
+> +	tristate "Yunsilicon XSC ethernet driver"
+> +	default n
+> +	depends on YUNSILICON_XSC_PCI
+> +	help
+> +	  This driver provides ethernet support for
+> +	  Yunsilicon XSC devices.
+> +
+> +	  To compile this driver as a module, choose M here. The module
+> +	  will be called xsc_eth.
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Makefile b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+> new file mode 100644
+> index 000000000..2811433af
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+> @@ -0,0 +1,9 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> +# All rights reserved.
+> +
+> +ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
+> +
+> +obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc_eth.o
+> +
+> +xsc_eth-y := main.o
+> \ No newline at end of file
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+> new file mode 100644
+> index 000000000..2b6d79905
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+> @@ -0,0 +1,16 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> +# All rights reserved.
+> +# Yunsilicon PCI configuration
+> +#
+> +
+> +config YUNSILICON_XSC_PCI
+> +	tristate "Yunsilicon XSC PCI driver"
+> +	default n
+> +	select PAGE_POOL
+> +	help
+> +	  This driver is common for Yunsilicon XSC
+> +	  ethernet and RDMA drivers.
+> +
+> +	  To compile this driver as a module, choose M here. The module
+> +	  will be called xsc_pci.
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+> new file mode 100644
+> index 000000000..709270df8
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+> @@ -0,0 +1,9 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> +# All rights reserved.
+> +
+> +ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
+> +
+> +obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc_pci.o
+> +
+> +xsc_pci-y := main.o
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/main.c b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+> new file mode 100644
+> index 000000000..cbe0bfbd1
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+> @@ -0,0 +1,272 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> + * All rights reserved.
+> + */
+> +
+> +#include "common/xsc_core.h"
+> +
+> +unsigned int xsc_log_level = XSC_LOG_LEVEL_WARN;
+> +module_param_named(log_level, xsc_log_level, uint, 0644);
+> +MODULE_PARM_DESC(log_level,
+> +		 "lowest log level to print: 0=debug, 1=info, 2=warning, 3=error. Default=1");
+> +EXPORT_SYMBOL(xsc_log_level);
+> +
+> +#define XSC_PCI_DRV_DESC	"Yunsilicon Xsc PCI driver"
+
+remove the define and just use the string inplace as desription
+
+> +
+> +static const struct pci_device_id xsc_pci_id_table[] = {
+> +	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID) },
+> +	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID_DIAMOND) },
+> +	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MF_HOST_PF_DEV_ID) },
+> +	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MF_SOC_PF_DEV_ID) },
+> +	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MS_PF_DEV_ID) },
+> +	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MV_HOST_PF_DEV_ID) },
+> +	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MV_SOC_PF_DEV_ID) },
+> +	{ 0 }
+> +};
+> +
+> +static int set_dma_caps(struct pci_dev *pdev)
+> +{
+> +	int err;
+> +
+> +	err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
+> +	if (err)
+> +		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
+> +	else
+> +		err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
+> +
+> +	if (!err)
+> +		dma_set_max_seg_size(&pdev->dev, SZ_2G);
+> +
+> +	return err;
+> +}
+> +
+> +static int xsc_pci_enable_device(struct xsc_core_device *xdev)
+> +{
+> +	struct pci_dev *pdev = xdev->pdev;
+> +	int err = 0;
+> +
+> +	mutex_lock(&xdev->pci_state_mutex);
+> +	if (xdev->pci_state == XSC_PCI_STATE_DISABLED) {
+> +		err = pci_enable_device(pdev);
+> +		if (!err)
+> +			xdev->pci_state = XSC_PCI_STATE_ENABLED;
+> +	}
+> +	mutex_unlock(&xdev->pci_state_mutex);
+> +
+> +	return err;
+> +}
+> +
+> +static void xsc_pci_disable_device(struct xsc_core_device *xdev)
+> +{
+> +	struct pci_dev *pdev = xdev->pdev;
+> +
+> +	mutex_lock(&xdev->pci_state_mutex);
+> +	if (xdev->pci_state == XSC_PCI_STATE_ENABLED) {
+> +		pci_disable_device(pdev);
+> +		xdev->pci_state = XSC_PCI_STATE_DISABLED;
+> +	}
+> +	mutex_unlock(&xdev->pci_state_mutex);
+> +}
+> +
+> +static int xsc_pci_init(struct xsc_core_device *xdev, const struct pci_device_id *id)
+> +{
+> +	struct pci_dev *pdev = xdev->pdev;
+> +	void __iomem *bar_base;
+> +	int bar_num = 0;
+> +	int err;
+> +
+> +	mutex_init(&xdev->pci_state_mutex);
+> +	xdev->priv.numa_node = dev_to_node(&pdev->dev);
+> +
+> +	err = xsc_pci_enable_device(xdev);
+> +	if (err) {
+> +		xsc_core_err(xdev, "failed to enable PCI device: err=%d\n", err);
+> +		goto err_ret;
+> +	}
+> +
+> +	err = pci_request_region(pdev, bar_num, KBUILD_MODNAME);
+> +	if (err) {
+> +		xsc_core_err(xdev, "failed to request %s pci_region=%d: err=%d\n",
+> +			     KBUILD_MODNAME, bar_num, err);
+> +		goto err_disable;
+> +	}
+> +
+> +	pci_set_master(pdev);
+> +
+> +	err = set_dma_caps(pdev);
+> +	if (err) {
+> +		xsc_core_err(xdev, "failed to set DMA capabilities mask: err=%d\n", err);
+> +		goto err_clr_master;
+> +	}
+> +
+> +	bar_base = pci_ioremap_bar(pdev, bar_num);
+> +	if (!bar_base) {
+> +		xsc_core_err(xdev, "failed to ioremap %s bar%d\n", KBUILD_MODNAME, bar_num);
+> +		goto err_clr_master;
+> +	}
+> +
+> +	err = pci_save_state(pdev);
+> +	if (err) {
+> +		xsc_core_err(xdev, "pci_save_state failed: err=%d\n", err);
+> +		goto err_io_unmap;
+> +	}
+> +
+> +	xdev->bar_num = bar_num;
+> +	xdev->bar = bar_base;
+> +
+> +	return 0;
+> +
+> +err_io_unmap:
+> +	pci_iounmap(pdev, bar_base);
+> +err_clr_master:
+> +	pci_clear_master(pdev);
+> +	pci_release_region(pdev, bar_num);
+> +err_disable:
+> +	xsc_pci_disable_device(xdev);
+> +err_ret:
+> +	return err;
+> +}
+> +
+> +static void xsc_pci_fini(struct xsc_core_device *xdev)
+> +{
+> +	struct pci_dev *pdev = xdev->pdev;
+> +
+> +	if (xdev->bar)
+> +		pci_iounmap(pdev, xdev->bar);
+> +	pci_clear_master(pdev);
+> +	pci_release_region(pdev, xdev->bar_num);
+> +	xsc_pci_disable_device(xdev);
+> +}
+> +
+> +static int xsc_priv_init(struct xsc_core_device *xdev)
+> +{
+> +	struct xsc_priv *priv = &xdev->priv;
+> +
+> +	strscpy(priv->name, dev_name(&xdev->pdev->dev), XSC_MAX_NAME_LEN);
+> +
+> +	INIT_LIST_HEAD(&priv->ctx_list);
+> +	spin_lock_init(&priv->ctx_lock);
+> +	mutex_init(&xdev->intf_state_mutex);
+> +
+> +	return 0;
+> +}
+> +
+> +static int xsc_dev_res_init(struct xsc_core_device *xdev)
+> +{
+> +	struct xsc_dev_resource *dev_res;
+> +
+> +	dev_res = kvzalloc(sizeof(*dev_res), GFP_KERNEL);
+> +	if (!dev_res)
+> +		return -ENOMEM;
+> +
+> +	xdev->dev_res = dev_res;
+> +	mutex_init(&dev_res->alloc_mutex);
+> +
+> +	return 0;
+> +}
+> +
+> +static void xsc_dev_res_cleanup(struct xsc_core_device *xdev)
+> +{
+> +	kfree(xdev->dev_res);
+> +}
+> +
+> +static int xsc_core_dev_init(struct xsc_core_device *xdev)
+> +{
+> +	int err;
+> +
+> +	xsc_priv_init(xdev);
+> +
+> +	err = xsc_dev_res_init(xdev);
+> +	if (err) {
+> +		xsc_core_err(xdev, "xsc dev res init failed %d\n", err);
+> +		goto out;
+
+return err...
+
+> +	}
+> +
+> +	return 0;
+> +out:
+> +	return err;
+
+...so you could remove last two lines
+
+> +}
+> +
+> +static void xsc_core_dev_cleanup(struct xsc_core_device *xdev)
+> +{
+> +	xsc_dev_res_cleanup(xdev);
+> +}
+> +
+> +static int xsc_pci_probe(struct pci_dev *pci_dev,
+> +			 const struct pci_device_id *id)
+> +{
+> +	struct xsc_core_device *xdev;
+> +	int err;
+> +
+> +	xdev = kzalloc(sizeof(*xdev), GFP_KERNEL);
+> +	if (!xdev)
+> +		return -ENOMEM;
+> +
+> +	xdev->pdev = pci_dev;
+> +	xdev->device = &pci_dev->dev;
+> +
+> +	pci_set_drvdata(pci_dev, xdev);
+> +	err = xsc_pci_init(xdev, id);
+> +	if (err) {
+> +		xsc_core_err(xdev, "xsc_pci_init failed %d\n", err);
+> +		goto err_unset_pci_drvdata;
+> +	}
+> +
+> +	err = xsc_core_dev_init(xdev);
+> +	if (err) {
+> +		xsc_core_err(xdev, "xsc_core_dev_init failed %d\n", err);
+> +		goto err_pci_fini;
+> +	}
+> +
+> +	return 0;
+> +err_pci_fini:
+> +	xsc_pci_fini(xdev);
+> +err_unset_pci_drvdata:
+> +	pci_set_drvdata(pci_dev, NULL);
+> +	kfree(xdev);
+> +
+> +	return err;
+> +}
+> +
+> +static void xsc_pci_remove(struct pci_dev *pci_dev)
+> +{
+> +	struct xsc_core_device *xdev = pci_get_drvdata(pci_dev);
+> +
+> +	xsc_core_dev_cleanup(xdev);
+> +	xsc_pci_fini(xdev);
+> +	pci_set_drvdata(pci_dev, NULL);
+> +	kfree(xdev);
+> +}
+> +
+> +static struct pci_driver xsc_pci_driver = {
+> +	.name		= "xsc-pci",
+> +	.id_table	= xsc_pci_id_table,
+> +	.probe		= xsc_pci_probe,
+> +	.remove		= xsc_pci_remove,
+> +};
+> +
+> +static int __init xsc_init(void)
+> +{
+> +	int err;
+> +
+> +	err = pci_register_driver(&xsc_pci_driver);
+> +	if (err) {
+> +		pr_err("failed to register pci driver\n");
+> +		goto out;
+
+ditto plain return
+
+> +	}
+> +	return 0;
+> +
+> +out:
+> +	return err;
+> +}
+> +
+> +static void __exit xsc_fini(void)
+> +{
+> +	pci_unregister_driver(&xsc_pci_driver);
+> +}
+> +
+> +module_init(xsc_init);
+> +module_exit(xsc_fini);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION(XSC_PCI_DRV_DESC);
+
 
