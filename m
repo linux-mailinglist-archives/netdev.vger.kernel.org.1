@@ -1,162 +1,355 @@
-Return-Path: <netdev+bounces-153018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32FB9F6963
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:06:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC3349F6984
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 16:09:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 106D6189AC8A
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:03:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBF7918858A3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68E51C5CCF;
-	Wed, 18 Dec 2024 15:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159C01B0408;
+	Wed, 18 Dec 2024 15:08:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LwtiVMox"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bYXG2tgC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0860D35966
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 15:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734534198; cv=none; b=Cg+snipeQtbUgM7rGx0SoaC13zPLw2T+88WutogxU6uHwOWIeGZuJdIsOSJKPi98ow/lQ4wbb6bNz3Xp+69Sr/OvXuxC7z8QtzcfJW60i/Ke3vn9z//1kJOwVwcpnm+S9zspud+e3SJeHX5cUkBRWPU+Ximg+WPD3UL49bGLq4Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734534198; c=relaxed/simple;
-	bh=zFf9OcCPuC9U5YVeZ2HHqNCagmdJnJNo3sfU94ExjjQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NwtHpL86xlCrs5qc12DgW3OtZZjbd/HfekARv2FWi606X9oLBGv3kduFrGu7Noywdw9gduKlrSRSUc5AZqIxtPLvIj8uU43wukbL20NI79cYIdIgeC4SOxaIGcGcwRmI+FyYcLRBd0pfNGEBTmkmABIBQTgjlDNQtGfx+j+d8rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LwtiVMox; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5cec9609303so9174742a12.1
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 07:03:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734534195; x=1735138995; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X9yISal3LIZqGo5DXurOAVpzSZMbYmrPdakIw4/P9jA=;
-        b=LwtiVMoxXA0gB8xjO0KhKzV//DP6P4jXW4Oq8anCCzNwz96kLkFiDTUfKIbu3bWtrB
-         p3gNCSGGIOnqJXhBr8h8Sk/po/9fNVEp6qnXIPMpnQJ7CAPTRnlb9ZUtfWOHxmAIsa9b
-         vgrygfTJT00o8iBEKoocx1bWHMb0jmXREZvVrQZQH7VOhImfHkZoEGHUgg34GEeSx5S2
-         DIPzaxx3NmVSzHdgAKwuZw4O9ogVhfUpUoyxHFMiftGbXUObr7OOmodj1I733smPZbu+
-         nYDl+28OP4GIzowCkh7Rs8mVtjBvwtpLlEdwvk7MYesEGyIVe8Rk2Bx83F6git/nsNd9
-         TAQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734534195; x=1735138995;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X9yISal3LIZqGo5DXurOAVpzSZMbYmrPdakIw4/P9jA=;
-        b=gJNkd/VmuwMjLRXflw2b4stGU37sMczZoVdD8fZ23GUmK3phae5MdW95fj4yqrro6c
-         t0FsQoCv0Vzlm5TKhGXsk6t8t646p+3ISc14qWEFWubxWtB58yw6ed/G8nUeJSJcqcWi
-         8VXn/tN+xjiIctYJ4b8CShLTt5g72MgOgFNwoIeTM406wd4Hx3HW0NVbtHJNElKA6XGA
-         Eea95pTCanC2YfBJSF+FhvFkdw/qnxdJbe2N3vTxmWqogBxkg8FjggIuvZjr4KCDROqe
-         iW+uwbUF55ur1hPbKohN4ZWQHh6XLz+7AedK0tus0rBDFFeiIiOlnxZRVfIxRtdLxivH
-         i/bg==
-X-Forwarded-Encrypted: i=1; AJvYcCVts5dPUiI817+5uhRdyZw+E/uX6oTCDLefSEyx/UyAx4l0oJIDmNoGBME27++VzWe2rc6FPnk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1nDs0UyvpeRewIFTFjfiJIMBDB1i0xbupTe7lQqDhKpH8JSzA
-	k+MlKLQoweAKyJ/eKIOaY8c0vZafvj3Tu0MxwBGmM0gmyzB1oY1aJKftPUxO0Tr/BCVsfMhsV7r
-	tELERW+OP7CDi9p7lEZ3IHHZlv0VEtRrJuqDR
-X-Gm-Gg: ASbGncvWcAEzNQ9igqy6E328tgRadGY2ogtlWxZCevWh+RcUdXg/jpwXKLvNJEbx3vi
-	b0OM6EGlYKuQYbOzDRuWTPfs5gyhO2t0IqRUDRYKlEXfAf0EirtCROVFkHT3DwMv1sTHQgkk=
-X-Google-Smtp-Source: AGHT+IGlbMxcYr/+LyxevZyHY4pXZlEnMFerxZkoRfJmPOxtgP55jEGC/XPfsIveHXsIB2+D3GrRI0PH4TRON4L+4Kc=
-X-Received: by 2002:a05:6402:34c2:b0:5d0:cfad:f6b with SMTP id
- 4fb4d7f45d1cf-5d7ee3baa56mr3067548a12.11.1734534194949; Wed, 18 Dec 2024
- 07:03:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E489E15854A
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 15:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734534498; cv=fail; b=ba0dGFM1vv4AC+IaJ4hXLosBtloFAbkwKXz/8YkkVWG0A1sNAqcI/wVe7KuIAeUuUN9wS2gBejtEpN+teQf+iON12bkIEwgWTtU7WUinyHmOz1j+9vvjrCFZZGVoRus8K9KvvxBk8D7RDoOsAu6smT12a9kbiw7ThtEz2tLzZCE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734534498; c=relaxed/simple;
+	bh=6Nf7OQYqvBE59DOmBeMvAyNoPY5Zgl8YNOCHhT4PudU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WXEh3PEsCkCpd7YKDT2mKi5joqGktm5+2lCSQoipyqOykNKE2+L7GBMzMz6V6VcyZ8Gt2UFXM8EZTJECGpGFPAZu0jrVIMNKw7lfyXxFzTceey3czI2ou8O47EKz4A2/Eatn7yWUKuJ3sRmYZ2Zs0Pwe6ZF6VhGH5jtLRHczusI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bYXG2tgC; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734534496; x=1766070496;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=6Nf7OQYqvBE59DOmBeMvAyNoPY5Zgl8YNOCHhT4PudU=;
+  b=bYXG2tgCjn82N7qBRFW5U0JD6Tk135/U6KyWWODm4ER+0zFOah+MueAQ
+   0kzbAiU/VX6Nt9UmAO51oezMIqICn++YcYz4K2ZO2SRzrZFtjpSzX9Anp
+   izO5EIJfm8CC9/9tKlveDSWAlEDhv46olfbHpMwpVwxaVu7onnVa4VIEv
+   a3qLo4RnBnjyL2dO/aSyhEkyog0MbE4ETQN+PR8GAZpDbOMMNmlqxFlXD
+   +CUTeaTNnrd72lYW0eRc9G+V/Jeq9lJ5fyiZ4yjU/mPNpaMCvpBSzzJXp
+   jyEPOdlsu5OUkon4t6+tZcxrxIJ0e7i/DHDyg15XAfiP+2dkE9sVQejBt
+   w==;
+X-CSE-ConnectionGUID: QvRsGosgT8qGG7FvVBR1nQ==
+X-CSE-MsgGUID: gdxZPOBxT5GyXZtpFiXRsQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="57490128"
+X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
+   d="scan'208";a="57490128"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 07:08:06 -0800
+X-CSE-ConnectionGUID: r6HI6m2qRyuJXCTecx8FTg==
+X-CSE-MsgGUID: 4UTEehU0T2CQV+smT0E2pA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
+   d="scan'208";a="128682322"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2024 07:08:06 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 18 Dec 2024 07:08:04 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 18 Dec 2024 07:08:04 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 18 Dec 2024 07:08:04 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jUjY8qUJLyq/zggHNditCm6vipLS55YOdq8CcrSDgc3SqBpp5jfRxuzr21Fd6+o8kKLnOE8DAIiRt/shLRHWHIakN9EYT6ENj/z5KbCONsnm77M13JsV9IGTRdIV0MmLu+2rsobpsw4BYhYU9y4fSZ9NlXIB/Zcg3KJbkfe7JeDAmiG82zRwVTc4ndmAcO8LFaovtoiOP8wKXbesgoj0ess8g5uX7fSdkGDeuYOHc/QGJQOnIbLELQ+Pe9hacgOT0y8+0/vfPxfaEF+1QAt0Hwo0T1OAch8KLOvcHKEx6MUlpcx9RLHkt8/BuodGTfnZ+TWMBg+Z0IxQo8akRJyvzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jq8kkhGsGEiDGX31sh2rznwy4+JKyqgXamI2ZzsTRKM=;
+ b=PMiE/adUkUni/6YwIiQTV6qLc63wArZSIXtgGq97BuloOavideWHB95IdEgEeTt6jQla7CVuTzxQi0ExC3kgqNhNO6gvSqAR3m7LawP9kRxfTWSyz6sV9L2kNRJ1Llv2X5t8CnoR63x0pst1JFZb5PLWhflM9BUmwjYy38fv0QBVGPKzFb8RidhN6JUWNOCdbGm5DZyvbd/XSorJsPabcuw0lWwBaatQd2nAOWeNhQ7fPT+Q0fq1I2zqS+9GMDd+zIpTccIetCdjfaNNfL0V8W27HONFPN4ozAODTI/YxgnnZvb40dnrIgKdXmnv/MFcQLBWG9++cwzRxkyUwxyAKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH7PR11MB5885.namprd11.prod.outlook.com (2603:10b6:510:134::22)
+ by CO1PR11MB4978.namprd11.prod.outlook.com (2603:10b6:303:91::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.14; Wed, 18 Dec
+ 2024 15:08:02 +0000
+Received: from PH7PR11MB5885.namprd11.prod.outlook.com
+ ([fe80::b1f3:809e:5b8a:c46e]) by PH7PR11MB5885.namprd11.prod.outlook.com
+ ([fe80::b1f3:809e:5b8a:c46e%6]) with mapi id 15.20.8251.015; Wed, 18 Dec 2024
+ 15:08:02 +0000
+From: "Olech, Milena" <milena.olech@intel.com>
+To: Simon Horman <horms@kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "Tantilov, Emil S"
+	<emil.s.tantilov@intel.com>, "Linga, Pavan Kumar"
+	<pavan.kumar.linga@intel.com>
+Subject: RE: [PATCH v2 iwl-next 07/10] idpf: add Tx timestamp capabilities
+ negotiation
+Thread-Topic: [PATCH v2 iwl-next 07/10] idpf: add Tx timestamp capabilities
+ negotiation
+Thread-Index: AQHbP/oCOLXQoexp/UG82XBQ8RX6U7LUpwYAgBeVQsA=
+Date: Wed, 18 Dec 2024 15:08:02 +0000
+Message-ID: <PH7PR11MB588506F083523298ADF85EF48E052@PH7PR11MB5885.namprd11.prod.outlook.com>
+References: <20241126035849.6441-1-milena.olech@intel.com>
+ <20241126035849.6441-8-milena.olech@intel.com>
+ <20241203145610.GE9361@kernel.org>
+In-Reply-To: <20241203145610.GE9361@kernel.org>
+Accept-Language: en-US, pl-PL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR11MB5885:EE_|CO1PR11MB4978:EE_
+x-ms-office365-filtering-correlation-id: 882f4ae2-5e68-4db6-7f2c-08dd1f75c45b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?CkBMl5iwEeIShIZ62hM2IohVDVrUqgONN46/vWiiCLBCd3J95XcZJXZR2yem?=
+ =?us-ascii?Q?q5f02chXQNF0nYWVTUcgsmY6WEQ0wZ6HhIM579UKHLU4oHggpXd2eKjUtxlU?=
+ =?us-ascii?Q?W9mP/ucoLNl/QY+UH9ctG3dhsrgkaB1YRC8lWLjRC/tJ4fijQtaLD1RaNAbk?=
+ =?us-ascii?Q?lxdeouNm2091ElfLrZ8H6Z3yRMs+bJd6C25jNbMhZtaklGkZSwOjARF7Rk8E?=
+ =?us-ascii?Q?ZQ6w5imB6kDnqRN51iP+6KKFBG/nojJRIPDB9JKLH/8laH034D3+w2S7Xnd8?=
+ =?us-ascii?Q?f/K/Hrb8dctkDhcmWNGPKQjsW7dVyo0WXOZaBKRnrrElHQ2OFkh0CHR1tzg0?=
+ =?us-ascii?Q?+OZ9UsU/A+dsrRm/OKLgvcJwAtlk5H9ImueXgx8gINKcYyOHlKyWY7ADZAUk?=
+ =?us-ascii?Q?UxHw0IhNjaiG6rbWdpzYZB8SRdDu1LLh+ZoBzHMiATViGCnbSNupfbDjnPOu?=
+ =?us-ascii?Q?xvPmFOclkTutrc3W1OjUX4iDMeV4cCSXtLl+CpgtiJ1hWnFVw6sg10LnrbMp?=
+ =?us-ascii?Q?Ae2tYDKhwQZ/Gk39lUztt3D2L744xkBHqAbs9jVWLFTdaU7EWLrAPa6Fxctj?=
+ =?us-ascii?Q?1+Dyra+xzJdHJeSOI8cSRfkWBErjfudRdAyLheWFnixfAdN4EYiuPjM356Ud?=
+ =?us-ascii?Q?BvWc9lUI8Tb3H1AmU8LPlCUxbllUINv3kpLikYqcsy1FKMN2eqwxUAhuDESS?=
+ =?us-ascii?Q?+GsEpAgimUQpZzU+j7UyQ4nfeSCXDmVctL57x/WAauODSRwriOovDU08UEaB?=
+ =?us-ascii?Q?E6Oh21Co0ocI0YoaF2p346ZOE4ID4YObPsMSmWdHmr3y0KUvdzBjtbWDztjm?=
+ =?us-ascii?Q?LfKwRugcMwBwQMHn6JvNz+b8kNd6l5+c3GPyuTq4IMmzT4vdBlSp2bT2B8lO?=
+ =?us-ascii?Q?dKZiZ3evqLNEZ+WADAsSs72vSzT7BumVXSmO08o0Uoy8g84n8loq5DMynfYa?=
+ =?us-ascii?Q?KAS7XDmaCoZwJKBBoO1hZz8EbEhZgcDoxGbh9Ufju0mTUijY7MxByBQ728O0?=
+ =?us-ascii?Q?zblwF8Qn6AWIlOAaRuGdJ2LGeJTPjt6r/PGpvZBKmMgnCO87FBu6fbi/VFvd?=
+ =?us-ascii?Q?19X+bs7ve73whMf1gRqaIVQCPPf8KT7Ce0xnEfzg0D0RGrt0sk8Z66xbOzF4?=
+ =?us-ascii?Q?ddP6GB5AJ4yeZpy7wvy+10EbEI3kU4NaD68k9roqBqxVlB4YiHAxpm77XWWT?=
+ =?us-ascii?Q?uFIjx/FTiEWVYg1i9WCO8WimsDxBuZ2H8iUmiiYxuWuUdVkXvm2kNTFlDGe2?=
+ =?us-ascii?Q?/N/PP8wpkT8oGUd2O9eaU/GzI6gA7nerLwYCxNcAfqMWsxON7RZK/8uFYOsu?=
+ =?us-ascii?Q?LhmPhenz6zMfaDsIthZZnFZCsXrcnwWf+vTivOVDVqJxsk68KWb4jFEVpZOm?=
+ =?us-ascii?Q?74ODIk6C/u0HBVM4brrBEzwwb4Ka3qe4NhWyR1VYYJM2RaLi0UG3WUPD2ttp?=
+ =?us-ascii?Q?b9rSqMbQTbEWEtDgLgIekzOFZMtWBRFs?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB5885.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?iD7vyF/kUQQCyZnGxdnoHwA9CBGkuqXRcKcEj7SBA8e/wtAhJFOfkx/4G07T?=
+ =?us-ascii?Q?/ijBDh9JKLtBlNiPUi0FeSPk4ROTQvoIqE/jdTQGkDEcdbQxtiL+49m/pPEB?=
+ =?us-ascii?Q?3U6IBlbLvjSQDxXycsvbGrS51Uv32QqQMW477jl/98oK9UN2wD+7/KSjpwsG?=
+ =?us-ascii?Q?qHlzwB2kkwhih2+yB7+RPK7dhIL+nYEB1fiNcjC9rMkoJJbg227RbTOsD769?=
+ =?us-ascii?Q?J5DNbfx3McGLwnJVQCxSqYGbzHHXwdoQSgcBewWHc9KDZ6xTZ4PLhNWaAlvw?=
+ =?us-ascii?Q?nlCqUkQqrrz0Oyt8L9WNrsmO8HTn4Lx5oaJeQf3kES23+VHPe5uCMzd0Jls1?=
+ =?us-ascii?Q?fMYI66BDnlrbYe7J865MzQWeC+hCxa9yEz+uj5w5oxfcWaCh9JzAGm5fF8Vz?=
+ =?us-ascii?Q?mphnqmxHXGOprVJpCXXnadhXOVictna/Sql+j3tVlAEwJlCiI/Ip5+ZoQeQl?=
+ =?us-ascii?Q?dJ+8yOO9B8IuZ83pSAb1+T4Tgce3HoH6HNMHMoSIybLIA/l6B6Y+HcWCZr50?=
+ =?us-ascii?Q?OsQwo0NmqW2UI/iz0xd7a464pw01dthoeawmcFLlMVxpDfSPPxqUqJUXodKu?=
+ =?us-ascii?Q?GXcCDOhRdxYuQ5L3jXI/f2SzLgUUG4vmHoMx/qB9uTEJPgnfWVS4WpNMsdgo?=
+ =?us-ascii?Q?sxmNUjj5ihMu08pYj4BpE1iybmwP/lYShfI+8vj8HCEj5/JRd8NLofdoxVyE?=
+ =?us-ascii?Q?QPPAw1E7Ep9FRoH0NW/pB+7rcf1BIL6St1+f4xLZSgK0/g4s0zGe32k7ZJqu?=
+ =?us-ascii?Q?oPl8jsX4tYNRCKsXvT6V4jzZrVv3MOVyq0Yuh/BDIfdi4tbOdOLLYabXG4mS?=
+ =?us-ascii?Q?OhHJX+dx19uKg+/tfK2PwGaVGJP5SokyCLtzwJZ9qiVMecTwn8C6ProRlIO4?=
+ =?us-ascii?Q?/yRS/RI+33rfFRfHDnRePLXEEoozMJ2vEoyEiYUdehGmNb8CjMcsgE3cvUSR?=
+ =?us-ascii?Q?kyJNkeuKF6hGS8/R+N+2RE7ynGcwR0GdBB7ISnQak5Jv5+EogSSLLzYaaj8u?=
+ =?us-ascii?Q?zN2KhVrHN7c4HCHE8QzV0BtjI5wbyOKOJ/J424OJshlRWyZbB/WipI3q9o72?=
+ =?us-ascii?Q?962QLPMnqbekMHreQzv8WhTe5B94CuksQ/FHkiNF/13bjV9CF8AzRqIU/Mhe?=
+ =?us-ascii?Q?PQhpD7GpY082an0moDiZxsV7exOasFl0uO7QvjW93nek6c8TMJAcY+ipjLhZ?=
+ =?us-ascii?Q?zCYZWiEC/pmoScf9LV0szofrsfjQEt81xKmmwUw3GytHlzUa/UyuAf1W9Uwm?=
+ =?us-ascii?Q?wsZjbJQ7mDOUqaIo6f7amV5mnZnuD+keL3hhQvkNXNoUbR5lsBdfcPGRNiYl?=
+ =?us-ascii?Q?KedNz+zm9Y9T8nn7rXjF5LfNzW3NV7oW/+HX//aQ2oOx6ZPwnbSbjXOuPe47?=
+ =?us-ascii?Q?IO07QBe7MuMWi1ZQFeBJldgtpY53KfypD8Vk/PWty6uT8pluF4SQNFu25lti?=
+ =?us-ascii?Q?FkQYIRCpBlUJ3KXDeZQydp0HfjAFwrH46OZThJAKicmXt17hofQ4Ns+rEJ0d?=
+ =?us-ascii?Q?o5AY7SyC3H/LFd7UzlZrPxgSU4SpXH4cnzKBqxcpJVxqOt/9PeNIINv5h1A4?=
+ =?us-ascii?Q?7dUcVTx+b0fTLaaj1zPAbCUtuFUvK3phQVyW0DsK?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241216075842.2394606-1-srasheed@marvell.com>
- <20241216075842.2394606-2-srasheed@marvell.com> <Z2A5dHOGhwCQ1KBI@lzaremba-mobl.ger.corp.intel.com>
- <Z2A9UmjW7rnCGiEu@lzaremba-mobl.ger.corp.intel.com> <BY3PR18MB4721712299EAB0ED37CCEEEFC73B2@BY3PR18MB4721.namprd18.prod.outlook.com>
- <Z2GvpzRDSTjkzFxO@lzaremba-mobl.ger.corp.intel.com> <CO1PR18MB472973A60723E9417FE1BB87C7042@CO1PR18MB4729.namprd18.prod.outlook.com>
- <Z2LNOLxy0H1JoTnd@lzaremba-mobl.ger.corp.intel.com> <CANn89iJXNYRNn7N9AHKr0jECxn0Lh6_CtKG7kk9xjqhbVjjkjQ@mail.gmail.com>
- <Z2Lg/LDjrB2hDJSO@lzaremba-mobl.ger.corp.intel.com>
-In-Reply-To: <Z2Lg/LDjrB2hDJSO@lzaremba-mobl.ger.corp.intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 18 Dec 2024 16:03:02 +0100
-Message-ID: <CANn89iJQ5sw3B81UZqJKWfLkp3uRpsV_wC1SyQMV=NM1ktsc7w@mail.gmail.com>
-Subject: Re: [EXTERNAL] Re: [PATCH net v2 1/4] octeon_ep: fix race conditions
- in ndo_get_stats64
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: Shinas Rasheed <srasheed@marvell.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Haseeb Gani <hgani@marvell.com>, 
-	Sathesh B Edara <sedara@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>, 
-	"thaller@redhat.com" <thaller@redhat.com>, "wizhao@redhat.com" <wizhao@redhat.com>, 
-	"kheib@redhat.com" <kheib@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>, 
-	"horms@kernel.org" <horms@kernel.org>, "einstein.xue@synaxg.com" <einstein.xue@synaxg.com>, 
-	Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Abhijit Ayarekar <aayarekar@marvell.com>, Satananda Burla <sburla@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB5885.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 882f4ae2-5e68-4db6-7f2c-08dd1f75c45b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2024 15:08:02.2348
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LRPhlfLTKCCyMPw3Xq5xm1Hio4k2DJh/z06L67xZqsjYFeLT7n+9t0uf7iFe0khF2EXznF77EZdwO5tgj70WLA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4978
+X-OriginatorOrg: intel.com
 
-On Wed, Dec 18, 2024 at 3:49=E2=80=AFPM Larysa Zaremba <larysa.zaremba@inte=
-l.com> wrote:
+On 12/03/2024 3:56PM Simon Horman wrote:
+
+>> Tx timestamp capabilities are negotiated for the uplink Vport.
+>> Driver receives information about the number of available Tx timestamp
+>> latches, the size of Tx timestamp value and the set of indexes used
+>> for Tx timestamping.
+>>=20
+>> Add function to get the Tx timestamp capabilities and parse the uplink
+>> vport flag.
+>>=20
+>> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>> Co-developed-by: Emil Tantilov <emil.s.tantilov@intel.com>
+>> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+>> Co-developed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+>> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+>> Signed-off-by: Milena Olech <milena.olech@intel.com>
+>> ---
+>> v1 -> v2: change the idpf_for_each_vport macro
 >
-> On Wed, Dec 18, 2024 at 03:21:12PM +0100, Eric Dumazet wrote:
-> > On Wed, Dec 18, 2024 at 2:25=E2=80=AFPM Larysa Zaremba <larysa.zaremba@=
-intel.com> wrote:
-> >
-> > >
-> > > It is hard to know without testing (but testing should not be hard). =
-I think the
-> > > phrase "Statistics must persist across routine operations like bringi=
-ng the
-> > > interface down and up." [0] implies that bringing the interface down =
-may not
-> > > necessarily prevent stats calls.
-> >
-> > Please don't  add workarounds to individual drivers.
-> >
-> > I think the core networking stack should handle the possible races.
-> >
-> > Most dev_get_stats() callers are correctly testing dev_isalive() or
-> > are protected by RTNL.
-> >
-> > There are few nested cases that are not properly handled, the
-> > following patch should take care of them.
-> >
+>Hi Milena,
 >
-> I was under the impression that .ndo_stop() being called does not mean th=
-e
-> device stops being NETREG_REGISTERED, such link would be required to solv=
-e the
-> original problem  with your patch alone (though it is generally a good ch=
-ange).
-> Could you please explain this relation?
+>Some minor nits from my side.
 >
+>> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/et=
+hernet/intel/idpf/idpf_ptp.h
+>> index e7ccdcbdbd47..057d1c546417 100644
+>> --- a/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+>> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+>> @@ -83,6 +83,70 @@ struct idpf_ptp_secondary_mbx {
+>>  	bool valid:1;
+>>  };
+>> =20
+>> +/**
+>> + * enum idpf_ptp_tx_tstamp_state - Tx timestamp states
+>> + * @IDPF_PTP_FREE: Tx timestamp index free to use
+>> + * @IDPF_PTP_REQUEST: Tx timestamp index set to the Tx descriptor
+>> + * @IDPF_PTP_READ_VALUE: Tx timestamp value ready to be read
+>> + */
+>> +enum idpf_ptp_tx_tstamp_state {
+>> +	IDPF_PTP_FREE,
+>> +	IDPF_PTP_REQUEST,
+>> +	IDPF_PTP_READ_VALUE,
+>> +};
+>> +
+>> +/**
+>> + * struct idpf_ptp_tx_tstamp_status - Parameters to track Tx timestamp
+>> + * @skb: the pointer to the SKB that received the completion tag
+>> + * @state: the state of the Tx timestamp
+>> + */
+>> +struct idpf_ptp_tx_tstamp_status {
+>> +	struct sk_buff *skb;
+>> +	enum idpf_ptp_tx_tstamp_state state;
+>> +};
+>> +
+>> +/**
+>> + * struct idpf_ptp_tx_tstamp - Parameters for Tx timestamping
+>> + * @list_member: the list member strutcure
+>
+>nit: structure
+>
+>     Flagged by checkpatch.pl --codespell
+>
+>> + * @tx_latch_reg_offset_l: Tx tstamp latch low register offset
+>> + * @tx_latch_reg_offset_h: Tx tstamp latch high register offset
+>> + * @skb: the pointer to the SKB for this timestamp request
+>> + * @tstamp: the Tx tstamp value
+>> + * @idx: the index of the Tx tstamp
+>> + */
+>> +struct idpf_ptp_tx_tstamp {
+>> +	struct list_head list_member;
+>> +	u32 tx_latch_reg_offset_l;
+>> +	u32 tx_latch_reg_offset_h;
+>> +	struct sk_buff *skb;
+>> +	u64 tstamp;
+>> +	u32 idx;
+>> +};
+>
+>...
+>
+>> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/n=
+et/ethernet/intel/idpf/idpf_virtchnl.c
+>
+>...
+>
+>> @@ -3154,6 +3157,14 @@ void idpf_vport_init(struct idpf_vport *vport, st=
+ruct idpf_vport_max_q *max_q)
+>>  	idpf_vport_alloc_vec_indexes(vport);
+>> =20
+>>  	vport->crc_enable =3D adapter->crc_enable;
+>> +
+>> +	if (!(vport_msg->vport_flags &
+>> +	      le16_to_cpu(VIRTCHNL2_VPORT_UPLINK_PORT)))
+>
+>I think this should be cpu_to_le16.
+>
+>Flagged by Sparse.
 
-ndo_stop() being called must have no impact on statistics :
+Definitely! Thanks
 
-# ip -s link sh dev lo
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
-mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    RX:  bytes packets errors dropped  missed   mcast
-       3473568   41352      0       0       0       0
-    TX:  bytes packets errors dropped carrier collsns
-       3473568   41352      0       0       0       0
+>
+>> +		return;
+>> +
+>> +	err =3D idpf_ptp_get_vport_tstamps_caps(vport);
+>> +	if (err)
+>> +		pci_dbg(vport->adapter->pdev, "Tx timestamping not supported\n");
+>>  }
+>> =20
+>>  /**
+>
+>...
+>
+>> diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/e=
+thernet/intel/idpf/virtchnl2.h
+>> index 44a5ee84ed60..fdeebc621bdb 100644
+>> --- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
+>> +++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
+>> @@ -569,6 +569,14 @@ struct virtchnl2_queue_reg_chunks {
+>>  };
+>>  VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_queue_reg_chunks);
+>> =20
+>> +/**
+>> + * enum virtchnl2_vport_flags - Vport flags that indicate vport capabil=
+ities.
+>> + * @VIRTCHNL2_VPORT_UPLINK_PORT: Representatives of underlying physical=
+ ports
+>> + */
+>> +enum virtchnl2_vport_flags {
+>> +	VIRTCHNL2_VPORT_UPLINK_PORT	=3D BIT(0),
+>> +};
+>> +
+>>  /**
+>>   * struct virtchnl2_create_vport - Create vport config info.
+>>   * @vport_type: See enum virtchnl2_vport_type.
+>> @@ -620,7 +628,7 @@ struct virtchnl2_create_vport {
+>>  	__le16 max_mtu;
+>>  	__le32 vport_id;
+>>  	u8 default_mac_addr[ETH_ALEN];
+>> -	__le16 pad;
+>> +	__le16 vport_flags;
+>
+>The kernel doc for this structure, which is immediately above the
+>structure, should also be updated.
 
-# ip link set dev lo down  # would call ndo_stop() if loopback had one
+Correct, will fix in v3.
 
-# ip -s link sh dev lo
-1: lo: <LOOPBACK> mtu 65536 qdisc noqueue state DOWN mode DEFAULT
-group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    RX:  bytes packets errors dropped  missed   mcast
-       3473568   41352      0       0       0       0
-    TX:  bytes packets errors dropped carrier collsns
-       3473568   41352      0       0       0       0
+>
+>Flagged by ./scripts/kernel-doc -none
+>
+>>  	__le64 rx_desc_ids;
+>>  	__le64 tx_desc_ids;
+>>  	u8 pad1[72];
+>> --=20
+>> 2.31.1
+>>
 
-
-So perhaps the problem with this driver is that its ndo_stop() is
-doing things it should not.
+Thanks,
+Milena
 
