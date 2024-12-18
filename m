@@ -1,108 +1,109 @@
-Return-Path: <netdev+bounces-152966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE4719F6759
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:34:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B9E869F6760
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:35:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DFAF1888819
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:34:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 129801893645
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591CA1ACEB7;
-	Wed, 18 Dec 2024 13:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0C71B425D;
+	Wed, 18 Dec 2024 13:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZRG94yQi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YYFuGHqF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864D817C219
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D01156225
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734528834; cv=none; b=S7IpjnTWWgjojEhHwjX5F/+lyhUtNpRuJebVxGBakIBjCYPjOh0gGAeeKNmA7uaxMY4cgBWjGcULx14qrsVsKLJDlhCor/j/JY/+v/uvj3RGVvo81rjZxGW4+fGWV7oAKYg+QqPtEBjnyrkMIY7UX6ZLvKMoasQX3d4N8tb3uLE=
+	t=1734528868; cv=none; b=rlMndeg2t4fL0xYFlXt+hdiOFanmnH5WuLwnYXha51FvBmQjctQ9M6Wl1yz9AOHpMZ0jAb2wYfUKXk2YTfq/CNEAg4ovFlLtx5pa6PiHyZMw7LNfHcp7UKMj6943Jp+Ba+b3KRjeAJynvVaHZKDRHSKjNS7MFB1K1o2c7n4hw2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734528834; c=relaxed/simple;
-	bh=/x6POKQ2jqawB+VQH91Eb7vTwY62fr79VjnEuQ0y24Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=daEZtId54DPUUhkVeVlLJEpCkOzpAsaGb7/5iG2hA5AcNmJTCxjriHwAwN6I7hNmbZzMj2VrN0DYdW5TuYFhwc+AbbKGwMEx369Mwn/D3L19OfyVgJrly1y1ILweYB+VstfvaG/NKlF3B48k3YeGOxGI1N/7cqp8nu7l44uuoyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZRG94yQi; arc=none smtp.client-ip=209.85.208.44
+	s=arc-20240116; t=1734528868; c=relaxed/simple;
+	bh=wDaSHl6EOLx2HW9/Hvaguz2TFU28I1zbXh8HD0FM3Oc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oLpu2FaMwH+ZgV1HmR+Gwk0C/zOCbkHQNiDpy/hrsxPacJnM9YiSgZy0WGYAvyIOKBS+Z3qxvOIERXx8PccjQhBqGQ4VtBWwShoIwwf5tKZHflFM8e61L2y1HjIl3wqmizb5jeIUxGRuiROAmd0ht3SugbRn016q61PWkUCIMtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YYFuGHqF; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d3e6f6cf69so3851632a12.1
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 05:33:52 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-728f1c4b95aso5077073b3a.0
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 05:34:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734528831; x=1735133631; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/x6POKQ2jqawB+VQH91Eb7vTwY62fr79VjnEuQ0y24Y=;
-        b=ZRG94yQi8t3ym9CATphzzwThtwIihup7rBVlf+XLDtWnxjYKWp5jAv8G0uNMu9B3pp
-         KCw71320zjcVW2/4YJnSJPObEFTzYs3EPTiCyLpXyTrN0la2kSYaO+L3NUINK76HXStc
-         /jGw574qQnhTqb9utVa33wS3Y7s7M6reu0Im0uA7CgRN2Cv/MLQLclJCssavonqsSAEO
-         I13bDUmPe7NmQQeeo7bWaM3KrLlVV29cxepwNgb4h+ErioSvBoaUJ/ya+es3Pr3Vw6d3
-         I4nQIb3ulMaOrwRLvHlWPFVUKmzU3+Oj5P9WOIEBF6JJOrLxciULTUbG5HnKk95iszb9
-         PK/A==
+        d=google.com; s=20230601; t=1734528865; x=1735133665; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PYcDCL2CgJWsHG7wlCFHCfYZtvaurKzilwan+RLOuVo=;
+        b=YYFuGHqFBQRSSboqLgxRI+YijyyueC9Pkbj5w1SRYQ1IpPlvRtCLIFV6lqlY2e3EJF
+         lu/XEJ3tArmJoRjiN6YjSAhv6cvGV9JMUfe/iGS5VGzVVKMUMqcmmZSYL4Ce5aPtl9hE
+         fCA+zoRS2j0ToiH5DrLWvOAN62xzVzsqQh7rRCtYcSUPEFL6QUV9MBILW4IOAFZNQdBv
+         PN91YfmZmPEhmIFEDFXWtDJZvEAE3vd7uNGWzq9yLsJ/TM54gujkKB0rDOjm/m7eyDU1
+         aow99hqW9Oz/BVel6VD4lU0qv35ybe608MrDG/u8wNXfaWfXGAi5/QKpDOOntO79uy+3
+         JT1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734528831; x=1735133631;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/x6POKQ2jqawB+VQH91Eb7vTwY62fr79VjnEuQ0y24Y=;
-        b=N6W/h95V94HN6MQioDyI3FtNQ1jlTDCMrC/4g2ZgALgveIUrYdigVJB2v4gimhdjdB
-         5YBVYFzedVnZ3k46ziOC5546KxJNcYRu28Neqc0E8TQwx13KyTt+ES1MyyCgOZuRyoEj
-         D9bMJYHrQV4N+10M1hcIiMDTfggYyf/RY2AeyG23+ZGhDqd8tGqxIHNQqyKUY7aOGFor
-         /d5aVwJC/ta17kNgJmddnt0AOOLJjq7/6ExuU532JF8+ypFTtuSVctD/oGTv7sjvvh3Y
-         GwNdcnzuqldlNsi4zw85u7ZQHG/WjDonw7vqty36QGOLBcKgrr0W5yPV/6q1Dbh9uwZI
-         4/vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUYGeva/hQEaxqxKpa+o+B17DhiaN6nb7HvHrTHm77ekVmZZt52Aee4lwndzmPNITDhFEOeNLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxu85BCmhqMEXQudHuEv3NqTVTpAFYrduQoCIDrNcy/8ta6v/JC
-	a6RqSN+tI3lqNzrhsyNnuGI61SkDk8FyYF2jaKW9SS+tqrNIg2G7AHzBO3pZZ0pWxjxp3D6A4yJ
-	2nAR1Nv5Plw8C4xT2J2AC425hIEekHoF7Of14
-X-Gm-Gg: ASbGncvvZixbbRpntpKlAjzq2Kau1Ykn2MEGhClXwv2zKb2EDxHC0V11mAg2Ad8ICY3
-	klZMR/xPBT5IxIHHVREhiuGqW5ZF7FjInnxtujCMt/nSzTG/ny+XTdQVNrrTB4c03+ddndWk=
-X-Google-Smtp-Source: AGHT+IETX8zlLe43FoP+qMsYWDGY/BRu+1bXdAWyFW+g8iJOO+sdAxkXQrY/LDx/KnE3+LcjshD2nQJ1Slq6MhpW1IU=
-X-Received: by 2002:a05:6402:3510:b0:5d2:2768:4f10 with SMTP id
- 4fb4d7f45d1cf-5d7ee3b5737mr2558020a12.17.1734528830639; Wed, 18 Dec 2024
- 05:33:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734528865; x=1735133665;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PYcDCL2CgJWsHG7wlCFHCfYZtvaurKzilwan+RLOuVo=;
+        b=hVazEhg/zgkahN56GMh9Pz6KfgVa5bkuUpybNDEBNAWER+K2/EeOc2t2iAzQPIc40b
+         x9XKrIuFqpru65qZK1zngSz/mN+cMMbmiUCSQgzllEO5cddvNqKGnGysCN8WPjlCGLCA
+         AxVZfC3AsWHgy5ttzhb51Z6ZKhrRiIMXjLetUzrTIYBs1E1IHt/ehYA+vvV2LBNuoP/P
+         /2ycLdBrL8uxCbtLyl86H5eHYqc2ZMUryjYhXTEJfFkna3uv74KKf0qZTMJINrE2rJv1
+         0B6oIYvzHfezfjfHQkP+4d4LvTfWNzIKqcU5hhDV8lxafHbQwSQAl0rwL8OQTXGs9oEP
+         /Z1g==
+X-Gm-Message-State: AOJu0YwgqWA80Ckx5UY0FPJED2OfeHBdsIxJoscwMKHsb83txlBrIL/R
+	WFcE/D0l2sfotSTLZ6QtVEa3m+TLGjy6l2GA8GOsPPu2PrF8pfsr3W1ze63wgn5tfhXdM+Z/+uM
+	86ji8g8Ts7ky1U4Tgw1d3vcpXl+jEJRP2G7A5kNe8QisrVtmYzipGVVdN9CBVNWsU9LXEjwPiGa
+	4wA5Ajrjlx+cpOXCFSEoYIMxllWlMM10mLLMIkzElZzdIPaPy/DCFepp4yok0GbrXm
+X-Google-Smtp-Source: AGHT+IGMX4JT+B6/tlI32NjXcY4ud9Il+SfQQbPXW/r5+4XqZYAzfxIh0LcMi0lWc9+Erexa8mQQmnaBzkGs9j0vCFM=
+X-Received: from pfik23.prod.google.com ([2002:aa7:8217:0:b0:725:1e74:6a17])
+ (user=pkaligineedi job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1311:b0:72a:8b90:92e9 with SMTP id d2e1a72fcca58-72a8d0310c1mr5167172b3a.5.1734528865392;
+ Wed, 18 Dec 2024 05:34:25 -0800 (PST)
+Date: Wed, 18 Dec 2024 05:34:10 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241218090057.76899-1-yuyanghuang@google.com>
-In-Reply-To: <20241218090057.76899-1-yuyanghuang@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 18 Dec 2024 14:33:39 +0100
-Message-ID: <CANn89i+1-it-nLix4JHdbt0TRTOoC1GX-0RstfqBmW2b1D_1mg@mail.gmail.com>
-Subject: Re: [PATCH net-next, v2] netlink: support dumping IPv4 multicast addresses
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org, 
-	jimictw@google.com, prohr@google.com, liuhangbin@gmail.com, 
-	nicolas.dichtel@6wind.com, andrew@lunn.ch, pruddy@vyatta.att-mail.com, 
-	netdev@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241218133415.3759501-1-pkaligineedi@google.com>
+Subject: [PATCH net 0/5] gve: various XDP fixes
+From: Praveen Kaligineedi <pkaligineedi@google.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com, shailend@google.com, willemb@google.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org, 
+	hramamurthy@google.com, joshwash@google.com, ziweixiao@google.com, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2024 at 10:01=E2=80=AFAM Yuyang Huang <yuyanghuang@google.c=
-om> wrote:
->
-> Extended RTM_GETMULTICAST to support dumping joined IPv4 multicast
-> addresses, in addition to the existing IPv6 functionality. This allows
-> userspace applications to retrieve both IPv4 and IPv6 multicast
-> addresses through similar netlink command and then monitor future
-> changes by registering to RTNLGRP_IPV4_MCADDR and RTNLGRP_IPV6_MCADDR.
->
-> Cc: Maciej =C5=BBenczykowski <maze@google.com>
-> Cc: Lorenzo Colitti <lorenzo@google.com>
-> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
-> ---
+From: Joshua Washington <joshwash@google.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This patch series contains the following XDP fixes:
+ - clean up XDP tx queue when stopping rings
+ - use RCU synchronization to guard existence of XDP queues
+ - perform XSK TX as part of RX NAPI to fix busy polling
+ - fix XDP allocation issues when non-XDP configurations occur
+
+Joshua Washington (5):
+  gve: clean XDP queues in gve_tx_stop_ring_gqi
+  gve: guard XDP xmit NDO on existence of xdp queues
+  gve: guard XSK operations on the existence of queues
+  gve: share napi for RX and XSK TX
+  gve: fix XDP allocation path in edge cases
+
+ drivers/net/ethernet/google/gve/gve.h      |  1 +
+ drivers/net/ethernet/google/gve/gve_main.c | 42 ++++++++++++++------
+ drivers/net/ethernet/google/gve/gve_tx.c   | 46 ++++++++++++++--------
+ 3 files changed, 60 insertions(+), 29 deletions(-)
+
+-- 
+2.47.1.613.gc27f4b7a9f-goog
+
 
