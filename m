@@ -1,139 +1,136 @@
-Return-Path: <netdev+bounces-153105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80E99F6CAD
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:52:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3ACF9F6CB3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 18:54:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24ABD164338
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:52:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E81D1653D4
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 17:54:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6DE81F7072;
-	Wed, 18 Dec 2024 17:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8CF1F37D8;
+	Wed, 18 Dec 2024 17:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eVM2C8Oe"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="WrlzXytN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109661A256E
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 17:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926E4142624
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 17:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734544320; cv=none; b=WRda/PYfvrH/8WaimmwfRngYqw2iWX178pIF2aydeNMDG8RIKyRd4rrxPkqGKgRBbnFtjeMU2fFSYT4gjC7VxEx/6i7TrGWf/2lMYvdshFW32A3r+K0cB8JEGPmDVK1oFlyBmua0wUtvYJG7Fgu+BKL67YJXT1yh5j8PGNK/wnQ=
+	t=1734544479; cv=none; b=Maz6DLlWZycoiTZi5X6GwF8/Iv0MWigDtt4M1nafykQriUoMEhblb9+2WluSeASinyKUxjliOtMEXQs6kyAbuKynYOfHGa+AT0lQxAHiL2TWhreUaaqLQT/T24b4Nx/Jlvvx1Rjdutk3GZmKPPiCnwqM1eghNc4sEEyCUS8C4ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734544320; c=relaxed/simple;
-	bh=2So0nul1mz0/2K4Ol25NHSdvjvCJf1yUkrkJLZzp1jk=;
+	s=arc-20240116; t=1734544479; c=relaxed/simple;
+	bh=LKJ3ew+UL8bdbsFTg6otZabKISaX3+wXfHECYksSXLM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JD/NR42nIuI6mwuRIUmWmoNaiLeVYtrWjJWAo0OIaa27qpdgwLofQlzpQjj5q+ZlAsh1BAFuENQ2xVzJSgGLL+qMUY7RKWhgyAusBWJgPX/EIVZ3fRnQSL6Upr4r8XKIFLmPIFSdRRo5pGwFqjOtzZk7Y2UP7Pn28WzlkNhgTdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eVM2C8Oe; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso8974102a12.0
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 09:51:58 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=NAwdqG9fVEZg5vG2fsVnWLD/8xiOi4+BtHG/7/BeVWIj16/9hqjR++xcm5c4pLCjlH3FwDzIaWPEprOh8kxmRsKahfhevImf6Gc1CZ/UXbXX6clcNlK/5KLudM2EgxfF4sBsNVnWeU6vz/4Ot1UKOx3U2vrUYpHAVQiNE5Aa7E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=WrlzXytN; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2ef87d24c2dso5295161a91.1
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 09:54:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734544317; x=1735149117; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WuTI8JBt/EZ+l8PFms5uxro4CHQ/QT9ZzGcBaY71A3k=;
-        b=eVM2C8OeHoEjet1QRZ2YNkAD/OewghUWzeX+AWuzumsyaBz+5Xvvn3/KfTbiBVWxin
-         6vzP6NXiX4taQC1GFnLKb/982MWXadCAyerVBa0MdkMKN5NeiUTOdlWk6lzJtzl0800K
-         gZwfFNH71MAGSwFVWXWyVamphZW+RcUVY+bPlGPJDwlnc/D65286cJ+TvcqJMIOv5699
-         IL7AbPJWew/kUrnC/W1hVt9k/xg3MGySrdKqX5lxXB3ywI9nWn77NWaBmKBO6/+r5o0b
-         oeTfRhH4zlYqJ/tvi3TR+4/AFrz8sFUaD9CJW7n9i680u2VQaVG6jRM1w2tk/bsIjReZ
-         PCrA==
+        d=fastly.com; s=google; t=1734544477; x=1735149277; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/dwpmHD/hmiiul/J6dkVbk6tK1qeXotwCjTUGXOKR5I=;
+        b=WrlzXytN+f8/1Jq8Vu9RoToTmMRQy9yv8ZasdJXxRFv5jo0RRixFmCyN/6gql18lHk
+         kISRFDlcWRVocvR6rIkoPw3CwMzFaKEx337bC9i5l1+ZkSHm7Y+NVbjX8uNcD2DMFktP
+         d+gnwlTlIuZ83O0/9TwpqzEWgmgrS/zbMXsF8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734544317; x=1735149117;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1734544477; x=1735149277;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WuTI8JBt/EZ+l8PFms5uxro4CHQ/QT9ZzGcBaY71A3k=;
-        b=NXRpfG7AttuA85v9dUEnmUxgjJKTluV4N70yDhEuJFEqejySP5nMlsugctkWE2fJuO
-         Sqj1FyoKcwR7YxKWwxsqBu3jRX7ysguVG9V9zbfLXJNRwWRFPViAussSywRYCAtenk8w
-         AEsy7SKGRtuMy90aEGmded2zmPoK60CZFFDz8g37WU7Ki6vnFL7vCZ5RUak1IyAc5VXC
-         BIklqHR7n6p+mrUPAGo5c2F74/kPWWG12sj1d9yfcIjOM+XkeVLWtzDx2c9uM55cB5p7
-         g/BwyhEDq6jRZYj+WDKakavEIX51vqRXVSB6j621+jDQ7cJlRp441xBRUt7A4joruQQA
-         ye+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCViVXsbRXO1/BKLVaBCwTaajO+PIG4MbyeEqDABuavmE//U8oiNICYDAZ5jP0e87rgShFOwJfs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz847wZwzl9dN+LjnJy68synsVon9dft09CTrN4bebXV2ZBmoX1
-	yG0zg9djqWtdcjiXSCNkRdjpNVmOybB88ck9t8W20ra1t6kz+evdMsCJhT1IzyY=
-X-Gm-Gg: ASbGncsI64KLmzXr46n5c5jG6yqYlpuFle7I1bdDQde3jt6RCuD9D7NAzF8tq81y0uE
-	+7bg0akU6siDcvSZ+17j43dgKYrk33H3JldhjtCJ/dr9CC3U8DsPwj7+oX7dAwVDUUynRYa2oWX
-	As5bS44hlqfKAyE0V/L6OYbriG5aRpbg24URF8TjFZRssnpWzThis9dHIeoRacmFmUjVydw5uGK
-	ZQtAS2LBNiEEjz0vvKhGK82B2S+ukfMHephpA0geVqo2MdoQ/BzoRoeGNksSg==
-X-Google-Smtp-Source: AGHT+IH1c0SiqJ9S0vW3GjpTrilhfirwlgVe7LxPXAmcmvdcFWW1srbLC4xqZpvUu0l/1LZk2/U+3g==
-X-Received: by 2002:a05:6402:3581:b0:5d7:ea25:c72f with SMTP id 4fb4d7f45d1cf-5d7ee3ff3acmr4017187a12.25.1734544317452;
-        Wed, 18 Dec 2024 09:51:57 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d652ad1b31sm5553348a12.33.2024.12.18.09.51.56
+        bh=/dwpmHD/hmiiul/J6dkVbk6tK1qeXotwCjTUGXOKR5I=;
+        b=DrUlzlftQxz0r6NEIYNVzE6ODgE7jCrs1T997ctbNJ/5gRFZGqM2pHjlCa9wcAP1Hh
+         fawd9ESgcNS+DueTSNXv5s8weWJQpsqZlQ85EM4O3tBiVIYRyWxlb6O5tj70ThEnM1xV
+         76mpT04YgzfJSBruIcC6RvZtAZ8pEs+bpTiqdhu8CRwfZxIBo9q7hL9sEplYaLstAKv4
+         w9YGbkyOPASxoY5w+c586lEfqpAbLdO8lLTg/kr0+QKh+yJB1bU4jTaNpRiy0t4mXMM+
+         SQwYliOv9uKq4TEgeGwxjoadMdwwnxeIGQqKEe9UL0rw62szxBJGH10JISqZ/KY4Of24
+         T+Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCXjxbQsig13KI4fpjzU4+XDvCbg0a4JSSr+VFrReUhnTs8UBIJAjcpwn6zDQJoUGQrD4nqYL8E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZlhjh8Zga+FBranCctxcfpInfuDxhWvSt2coozXS0iutrUWgh
+	mEuyH9GyDLgC8iZIyDfpo5WAT5TeSwE6XcJ7vsG+ltEqpPLBk4HnLbD7JcnVkXU=
+X-Gm-Gg: ASbGncvNa7lDBNtWlrZQS2j8VQ3ptd7PJw4dO1r54DZ+tQh9KrI9QL4gOq0m2xMcVXx
+	9wjZvGo1xrFtD6wbS59FFnhMI8mM6Orp4vi9TVqgSe7KK5HicoR4/4zo65FCrqlFoXp8G/ZMG8M
+	5AxzHHbTBxgXxJBl9JetVR2CogBrcKe14UImqndqeGMN0aqUFo9Pl/Z5abC55WFPS/jgLBDtiHf
+	IyLcGF1RDl/GmKo+gs5vaV3HP/C16kLDLoRXYSCsjXTlkpS2qmw3M2YH6u0FnnbkaoI0Xu4fjf+
+	gKhYd7kmPFSDg3VFoybqFBY=
+X-Google-Smtp-Source: AGHT+IGugBmpGHmA2Fpg9fCAH0JYcUdpkHjZFbsgBaehn0Jg6/YNjHR2KcXRy1Pb2nFtKzWM4t3ODQ==
+X-Received: by 2002:a17:90b:274c:b0:2ee:edae:780 with SMTP id 98e67ed59e1d1-2f2e91d92e0mr6156047a91.15.1734544476802;
+        Wed, 18 Dec 2024 09:54:36 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e5cec5sm79079745ad.172.2024.12.18.09.54.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2024 09:51:57 -0800 (PST)
-Date: Wed, 18 Dec 2024 20:51:53 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
-	netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Geethasowjanya Akula <gakula@marvell.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-	Sunil Goutham <sgoutham@marvell.com>, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, Dan Carpenter <error27@gmail.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net v2 1/2] octeontx2-pf: fix netdev memory leak in
- rvu_rep_create()
-Message-ID: <116fc5cb-cc46-4e0f-9990-499ae7ef90ee@stanley.mountain>
-References: <20241217052326.1086191-1-harshit.m.mogalapalli@oracle.com>
- <8d54b21b-7ca9-4126-ba13-bbd333d6ba0c@web.de>
+        Wed, 18 Dec 2024 09:54:36 -0800 (PST)
+Date: Wed, 18 Dec 2024 09:54:33 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com,
+	syzbot+0a884bc2d304ce4af70f@syzkaller.appspotmail.com,
+	almasrymina@google.com, sridhar.samudrala@intel.com,
+	amritha.nambiar@intel.com
+Subject: Re: [PATCH net] netdev-genl: avoid empty messages in queue dump
+Message-ID: <Z2MMWeVefydph52d@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	syzbot+0a884bc2d304ce4af70f@syzkaller.appspotmail.com,
+	almasrymina@google.com, sridhar.samudrala@intel.com,
+	amritha.nambiar@intel.com
+References: <20241218022508.815344-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8d54b21b-7ca9-4126-ba13-bbd333d6ba0c@web.de>
+In-Reply-To: <20241218022508.815344-1-kuba@kernel.org>
 
-On Wed, Dec 18, 2024 at 06:38:25PM +0100, Markus Elfring wrote:
-> > When rvu_rep_devlink_port_register() fails, free_netdev(ndev) for this
-> > incomplete iteration before going to "exit:" label.
+On Tue, Dec 17, 2024 at 06:25:08PM -0800, Jakub Kicinski wrote:
+> Empty netlink responses from do() are not correct (as opposed to
+> dump() where not dumping anything is perfectly fine).
+> We should return an error if the target object does not exist,
+> in this case if the netdev is down it has no queues.
 > 
+> Fixes: 6b6171db7fc8 ("netdev-genl: Add netlink framework functions for queue")
+> Reported-by: syzbot+0a884bc2d304ce4af70f@syzkaller.appspotmail.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: jdamato@fastly.com
+> CC: almasrymina@google.com
+> CC: sridhar.samudrala@intel.com
+> CC: amritha.nambiar@intel.com
+> ---
+>  net/core/netdev-genl.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> …
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-> > @@ -680,8 +680,10 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
-> >  		ndev->features |= ndev->hw_features;
-> >  		eth_hw_addr_random(ndev);
-> >  		err = rvu_rep_devlink_port_register(rep);
-> > -		if (err)
-> > +		if (err) {
-> > +			free_netdev(ndev);
-> >  			goto exit;
-> > +		}
-> >
-> >  		SET_NETDEV_DEVLINK_PORT(ndev, &rep->dl_port);
-> …
-> 
-> I suggest to add another jump target instead so that a bit of exception handling
-> can be better reused at the end of this function implementation.
-> 
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index 9527dd46e4dc..b4becd4065d9 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -430,10 +430,10 @@ static int
+>  netdev_nl_queue_fill(struct sk_buff *rsp, struct net_device *netdev, u32 q_idx,
+>  		     u32 q_type, const struct genl_info *info)
+>  {
+> -	int err = 0;
+> +	int err;
+>  
+>  	if (!(netdev->flags & IFF_UP))
+> -		return err;
+> +		return -ENOENT;
+>  
+>  	err = netdev_nl_queue_validate(netdev, q_idx, q_type);
+>  	if (err)
 
-When you're cleaning up from inside a loop, then the best practices is
-to clean up partial iterations before the goto and then clean up whole
-iterations in the unwind ladder.  So this patch is better the way that
-Harshit his written it.
-
-regards,
-dan carpenter
-
-
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
