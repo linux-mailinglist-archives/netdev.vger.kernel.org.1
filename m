@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-152989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595439F6890
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:34:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5CA9F688E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:34:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD2F11893FE1
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:33:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C6FB7A3184
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052691DB363;
-	Wed, 18 Dec 2024 14:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6221D5CD1;
+	Wed, 18 Dec 2024 14:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="PMzG4BWy"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="AlWuwNTq"
 X-Original-To: netdev@vger.kernel.org
 Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D4D1B0417
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B701DD54C
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734532393; cv=none; b=eocL5jSaZN4vUOf9o+N9ah+R+bDk2U6ZTP1A7Lz+nGEac+HGCysLgrN8fVJgC80BDzks5F/Wo5cYuHPlJ1csden2CtHDm3CyMrAQMc0OCLC6OzQms+MITkq+xwCxPn1X8YjGbu9+hXeS8GQMLBPGYInyRGGm55p0v5I5ebqfrLE=
+	t=1734532396; cv=none; b=WlMJUhemtDRCcGfJep4ncK5fYA/JQMmNPtHNp3XFRLyi379UTk4g/tISHIIWR90mfeu7ccJASGlR24Y8G1RjBIpj9FInL/PwrmHk1QmWfhZkGwW95KvOWEsgdwHpxQ8IrWRpgFVrghGqq5NDmWwr4oEAocCQjYDbC3Ok8oYqFAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734532393; c=relaxed/simple;
-	bh=OD040imbW2yV/0U8dRlyv9pGGxmj6Y+WphcRdZmXcus=;
+	s=arc-20240116; t=1734532396; c=relaxed/simple;
+	bh=3eAePnfwqYNESTgHFOww/NPFPEG18gdAbQExjXxuUnw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HBV+qRpFwitagpzTrJQkDrwsdniPE3ruzg6aGuURR+X/97sJpAM6zQsz1fBkCtTEVt4wnoveW7lMC1ZbX8PAcSXx2ikgLAMCp5q26MI1/tzzYC3vkcZtNmeyR83olip7hw0dyZwpJcv0t9ORCj8Fjd1YM1GWLrOIBakWHd9/Zgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=PMzG4BWy; arc=none smtp.client-ip=185.226.149.37
+	 In-Reply-To:To:Cc; b=lNJMC9kk4PK1YAykYNTtlCznRFYOiGMv/5YEPJFCDUi7lZ/rMxzpucpRxTlEMUD6h3GXfXit2xa/5eBoU049Z81aDC3haEh5lwEtxFvLb4VO4qBdzDoX6nvt7lS7XhCyMzRgW0RK7EYeZ51BF4uMsQgsJDF/FU/rvns6MK17Bcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=AlWuwNTq; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
 Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
 	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1tNv6r-004ceB-1P; Wed, 18 Dec 2024 15:33:09 +0100
+	id 1tNv6t-004ceJ-V6; Wed, 18 Dec 2024 15:33:11 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=DJg1AzGG5wTXwMVaemQbEGXpC8TQCp81zUdC7bdHEvQ=; b=PMzG4BWyfIgNI76/GyompC8VU2
-	Mb1BSlh0S7IEUCt90ocuf9d2osmBXyCNDg3Om7KLJiXasZYDlly9snTA60b4xvaEU6UK9Tpgno8m0
-	AiPlbvivx7konHgT8ZSfEe3xOgITUepNNFbij278T7JsKBbZ3yJ/6XCKhB6Yte208KzSYSj1foWfu
-	WmTBJKk4k6FqmbSLow0hcqKaN+FFlbQLm8GGJXib5fJ2MYKUXlQhtOMP3YJtv7EttRcT7H+yxMQNf
-	fpH/3ozREkA3s/ifULJ9rXXZ3IqoWJHLtJj/zBJTR0lyK+VTtFaBdwSNcii0F0AyCTQeF9EnqN3o5
-	8aL8xSVA==;
+	bh=qJ6rfp97mx5WloVWAm7EujuRtbreW2+NNaOhtKxXWNA=; b=AlWuwNTqpH067kvPwdTEkQ20pB
+	lCw1Czqq4/ErsyfrejLS47NPt0VkNvEReRkF+629a72VV7WKzXwWFL29uHsMRtpddAaleQbxcZiqP
+	fIMBaRTN3YjUOS+Ub52nWh05aT+LqDAMHiSMox0TWeYsSnuFTypMwJejVvblkVrA31CPfX6cz2eo0
+	QNYGouT8MKMIQ7lremWsBNl4SVQTmNgn+WVKbqRx2BXAI9PHanuZn2LLcLKlYiHRMBcJfg+iwSvZ0
+	Ar1nE6Gs2vzfUvO4cWdSBGFwB6gGowkdcqPEYETRLy4EF2bdUzsnjx5H8nLe/1xYlGaof1Q3yZEUR
+	JwuNnngw==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
 	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1tNv6q-0000Qt-Ob; Wed, 18 Dec 2024 15:33:08 +0100
+	id 1tNv6t-0000R6-DV; Wed, 18 Dec 2024 15:33:11 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1tNv6W-008Env-B0; Wed, 18 Dec 2024 15:32:48 +0100
+	id 1tNv6W-008Env-Ik; Wed, 18 Dec 2024 15:32:48 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Date: Wed, 18 Dec 2024 15:32:39 +0100
-Subject: [PATCH net-next v3 6/7] vsock/test: Add test for sk_error_queue
- memory leak
+Date: Wed, 18 Dec 2024 15:32:40 +0100
+Subject: [PATCH net-next v3 7/7] vsock/test: Add test for MSG_ZEROCOPY
+ completion memory leak
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,37 +64,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241218-test-vsock-leaks-v3-6-f1a4dcef9228@rbox.co>
+Message-Id: <20241218-test-vsock-leaks-v3-7-f1a4dcef9228@rbox.co>
 References: <20241218-test-vsock-leaks-v3-0-f1a4dcef9228@rbox.co>
 In-Reply-To: <20241218-test-vsock-leaks-v3-0-f1a4dcef9228@rbox.co>
 To: Stefano Garzarella <sgarzare@redhat.com>
 Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
 X-Mailer: b4 0.14.2
 
-Ask for MSG_ZEROCOPY completion notification, but do not recv() it.
-Test attempts to create a memory leak, kmemleak should be employed.
+Exercise the ENOMEM error path by attempting to hit net.core.optmem_max
+limit on send().
 
-Fixed by commit fbf7085b3ad1 ("vsock: Fix sk_error_queue memory leak").
+Test aims to create a memory leak, kmemleak should be employed.
+
+Fixed by commit 60cf6206a1f5 ("virtio/vsock: Improve MSG_ZEROCOPY error
+handling").
 
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- tools/testing/vsock/vsock_test.c | 45 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ tools/testing/vsock/vsock_test.c | 152 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 152 insertions(+)
 
 diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 2a8fcb062d9d207be988da5dd350e503ca20a143..2dec6290b075fb5f7be3a24a4d1372a980389c6a 100644
+index 2dec6290b075fb5f7be3a24a4d1372a980389c6a..1eebbc0d5f616bb1afab3ec3f9e59cb609f9f6e8 100644
 --- a/tools/testing/vsock/vsock_test.c
 +++ b/tools/testing/vsock/vsock_test.c
-@@ -1521,6 +1521,46 @@ static void test_stream_leak_acceptq_server(const struct test_opts *opts)
- 	}
+@@ -1561,6 +1561,153 @@ static void test_stream_msgzcopy_leak_errq_server(const struct test_opts *opts)
+ 	close(fd);
  }
  
++/* Test msgzcopy_leak_zcskb is meant to exercise sendmsg() error handling path,
++ * that might leak an skb. The idea is to fail virtio_transport_init_zcopy_skb()
++ * by hitting net.core.optmem_max limit in sock_omalloc(), specifically
++ *
++ *   vsock_connectible_sendmsg
++ *     virtio_transport_stream_enqueue
++ *       virtio_transport_send_pkt_info
++ *         virtio_transport_init_zcopy_skb
++ *         . msg_zerocopy_realloc
++ *         .   msg_zerocopy_alloc
++ *         .     sock_omalloc
++ *         .       sk_omem_alloc + size > sysctl_optmem_max
++ *         return -ENOMEM
++ *
++ * We abuse the implementation detail of net/socket.c:____sys_sendmsg().
++ * sk_omem_alloc can be precisely bumped by sock_kmalloc(), as it is used to
++ * fetch user-provided control data.
++ *
++ * While this approach works for now, it relies on assumptions regarding the
++ * implementation and configuration (for example, order of net.core.optmem_max
++ * can not exceed MAX_PAGE_ORDER), which may not hold in the future. A more
++ * resilient testing could be implemented by leveraging the Fault injection
++ * framework (CONFIG_FAULT_INJECTION), e.g.
++ *
++ *   client# echo N > /sys/kernel/debug/failslab/ignore-gfp-wait
++ *   client# echo 0 > /sys/kernel/debug/failslab/verbose
++ *
++ *   void client(const struct test_opts *opts)
++ *   {
++ *       char buf[16];
++ *       int f, s, i;
++ *
++ *       f = open("/proc/self/fail-nth", O_WRONLY);
++ *
++ *       for (i = 1; i < 32; i++) {
++ *           control_writeulong(CONTROL_CONTINUE);
++ *
++ *           s = vsock_stream_connect(opts->peer_cid, opts->peer_port);
++ *           enable_so_zerocopy_check(s);
++ *
++ *           sprintf(buf, "%d", i);
++ *           write(f, buf, strlen(buf));
++ *
++ *           send(s, &(char){ 0 }, 1, MSG_ZEROCOPY);
++ *
++ *           write(f, "0", 1);
++ *           close(s);
++ *       }
++ *
++ *       control_writeulong(CONTROL_DONE);
++ *       close(f);
++ *   }
++ *
++ *   void server(const struct test_opts *opts)
++ *   {
++ *       int fd;
++ *
++ *       while (control_readulong() == CONTROL_CONTINUE) {
++ *           fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
++ *           vsock_wait_remote_close(fd);
++ *           close(fd);
++ *       }
++ *   }
++ *
++ * Refer to Documentation/fault-injection/fault-injection.rst.
++ */
++#define MAX_PAGE_ORDER	10	/* usually */
++#define PAGE_SIZE	4096
++
 +/* Test for a memory leak. User is expected to run kmemleak scan, see README. */
-+static void test_stream_msgzcopy_leak_errq_client(const struct test_opts *opts)
++static void test_stream_msgzcopy_leak_zcskb_client(const struct test_opts *opts)
 +{
-+	struct pollfd fds = { 0 };
-+	int fd;
++	size_t optmem_max, ctl_len, chunk_size;
++	struct msghdr msg = { 0 };
++	struct iovec iov;
++	char *chunk;
++	int fd, res;
++	FILE *f;
++
++	f = fopen("/proc/sys/net/core/optmem_max", "r");
++	if (!f) {
++		perror("fopen(optmem_max)");
++		exit(EXIT_FAILURE);
++	}
++
++	if (fscanf(f, "%zu", &optmem_max) != 1) {
++		fprintf(stderr, "fscanf(optmem_max) failed\n");
++		exit(EXIT_FAILURE);
++	}
++
++	fclose(f);
 +
 +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
 +	if (fd < 0) {
@@ -103,19 +192,41 @@ index 2a8fcb062d9d207be988da5dd350e503ca20a143..2dec6290b075fb5f7be3a24a4d1372a9
 +	}
 +
 +	enable_so_zerocopy_check(fd);
-+	send_byte(fd, 1, MSG_ZEROCOPY);
 +
-+	fds.fd = fd;
-+	fds.events = 0;
-+	if (poll(&fds, 1, -1) < 0) {
-+		perror("poll");
++	ctl_len = optmem_max - 1;
++	if (ctl_len > PAGE_SIZE << MAX_PAGE_ORDER) {
++		fprintf(stderr, "Try with net.core.optmem_max = 100000\n");
++		exit(EXIT_FAILURE);
++	}
++
++	chunk_size = CMSG_SPACE(ctl_len);
++	chunk = malloc(chunk_size);
++	if (!chunk) {
++		perror("malloc");
++		exit(EXIT_FAILURE);
++	}
++	memset(chunk, 0, chunk_size);
++
++	iov.iov_base = &(char){ 0 };
++	iov.iov_len = 1;
++
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++	msg.msg_control = chunk;
++	msg.msg_controllen = ctl_len;
++
++	errno = 0;
++	res = sendmsg(fd, &msg, MSG_ZEROCOPY);
++	if (res >= 0 || errno != ENOMEM) {
++		fprintf(stderr, "Expected ENOMEM, got errno=%d res=%d\n",
++			errno, res);
 +		exit(EXIT_FAILURE);
 +	}
 +
 +	close(fd);
 +}
 +
-+static void test_stream_msgzcopy_leak_errq_server(const struct test_opts *opts)
++static void test_stream_msgzcopy_leak_zcskb_server(const struct test_opts *opts)
 +{
 +	int fd;
 +
@@ -125,7 +236,6 @@ index 2a8fcb062d9d207be988da5dd350e503ca20a143..2dec6290b075fb5f7be3a24a4d1372a9
 +		exit(EXIT_FAILURE);
 +	}
 +
-+	recv_byte(fd, 1, 0);
 +	vsock_wait_remote_close(fd);
 +	close(fd);
 +}
@@ -133,14 +243,14 @@ index 2a8fcb062d9d207be988da5dd350e503ca20a143..2dec6290b075fb5f7be3a24a4d1372a9
  static struct test_case test_cases[] = {
  	{
  		.name = "SOCK_STREAM connection reset",
-@@ -1656,6 +1696,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_leak_acceptq_client,
- 		.run_server = test_stream_leak_acceptq_server,
+@@ -1701,6 +1848,11 @@ static struct test_case test_cases[] = {
+ 		.run_client = test_stream_msgzcopy_leak_errq_client,
+ 		.run_server = test_stream_msgzcopy_leak_errq_server,
  	},
 +	{
-+		.name = "SOCK_STREAM MSG_ZEROCOPY leak MSG_ERRQUEUE",
-+		.run_client = test_stream_msgzcopy_leak_errq_client,
-+		.run_server = test_stream_msgzcopy_leak_errq_server,
++		.name = "SOCK_STREAM MSG_ZEROCOPY leak completion skb",
++		.run_client = test_stream_msgzcopy_leak_zcskb_client,
++		.run_server = test_stream_msgzcopy_leak_zcskb_server,
 +	},
  	{},
  };
