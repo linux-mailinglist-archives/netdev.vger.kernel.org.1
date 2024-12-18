@@ -1,174 +1,185 @@
-Return-Path: <netdev+bounces-152842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95BAA9F5F3D
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 08:25:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37A7C9F5FAC
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 08:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B9FA188C66E
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 07:25:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56545165BCE
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 07:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89AEB1586DB;
-	Wed, 18 Dec 2024 07:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5D4158D96;
+	Wed, 18 Dec 2024 07:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VLzrkF6z"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="f4hpqjA6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855B014B077;
-	Wed, 18 Dec 2024 07:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37411552E7
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 07:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734506738; cv=none; b=I4bI/cDwrPbSa9ZlXRYgzfS66fwNdeA9UnDFk3ZRGZl7OBTvSdWEpdvRahQo700QL9TLcHNB7mtXame8f5UM22U06hslwGL8W8yQYbwCjtkqOfF7l93k9yR9rotdh/i0SV7iR66CC/MuMjkkFovhybSPAQc6sj6eEAqdWOeY1Es=
+	t=1734508402; cv=none; b=ttURbe+HoidiWepe7rSbuNV+ept0ONCH9TOsyphJQyNel3HT2mIImLmkekEjX9n3+K4VyoQze7TAqT2zkfU3hOIA3ZQ9LXankCM/OwAC0TyN6t41t2eElPS/xJ/Sd+THhZHVwWTBqI+SwvfuKhgqvD1xh0Cm6DZPQV8bJ3BX7sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734506738; c=relaxed/simple;
-	bh=Nyn2llNRgrE3c0TiG/8Iy4jQeqUsMO97SgApNunDDOQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=P4gLDCzHoWZEYqYCL8XLB7hPCW6gcF10Qyng9rFl+hFyDlD7fX+jR9/2v3YeYflUxaAHLorHEFPZWV3glz6TYe20fFAxG/87nH2TLNHRb9wkcy3KfWOu0ttBc0Z+A47tMp1F8xm6wGHiy1h1GQrGaD/E1WJI9cLDSrEfWeLEZTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=VLzrkF6z; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BI4sMAU001865;
-	Wed, 18 Dec 2024 07:25:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	3Z4W6jFrpDDtKiC9NIbf8Go6/NgQkWsIptmOlqe3R6s=; b=VLzrkF6zlkeksGy4
-	zV35pxH+tT0Ie3ewi/nR1stQr93QaUFly656LkqD7Z16hz6Hb1skufUYo+JfGlF/
-	H6TC1wmTEl8sjJh7PFcrlczgXbxFsGYH1NvFsPx1M8A2ge46Y84qQtbeqaVY5Mu7
-	Mb/3srZ6Zs3FDhsrG9zV9nnj3YcVwJsZhDjtBBukfi7goAWGrVTQOyV2euwHdkQu
-	m5HMQR63Aof7q38WCuSJDdtoz+F3DPRQiSoI9HM0wV0aTVJw262kYYjImsQ9Mco/
-	56HtpopJK9uipITuLvFPRJbbFJx6pBnfLpvizGWkYa1rI2s2Dfjcn+zdJHT4ryP5
-	rlaj1A==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43kqs3ga7r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 07:25:29 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BI7PSAe002277
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 07:25:28 GMT
-Received: from [10.253.15.72] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 17 Dec
- 2024 23:25:25 -0800
-Message-ID: <aa1dcdf6-94a0-4922-83f0-3cf49516ac4f@quicinc.com>
-Date: Wed, 18 Dec 2024 15:25:22 +0800
+	s=arc-20240116; t=1734508402; c=relaxed/simple;
+	bh=GvkJqtbzEQFpARHdlR/UImr7fknJxIE2E9oMmXuUR3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rpI6D9BKcAsuDC/MKieq+el46sSAIhX+4r3pykSzyMApHsG35+TVMuls95HDU26KKznSAn6Fx2KDoA26ZJGC6CY9RptW+ZrYkbr54O9RUiUcHBtfA6eDmkLcolD0hH/AFaq1VMRMHzrv002lIFU02YSpsilB8U3tW8JApqPKGeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=f4hpqjA6; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 8352F3F171
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 07:53:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1734508392;
+	bh=QA7qYluRuUIa7usBURYUiloTnmBO9zMmnIOKmpkGqzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:In-Reply-To;
+	b=f4hpqjA6djTik1WGsKY5R/OtegEbe2Wuo3PCGhdZMnPpiyjZe6c+2OL802mmn9UUE
+	 DI/LQLc+AaGEPn3o3OPJMlNY5JLMRMHrM8jYgmt2LRoqChJlDDxG53yaZHTbynX0ZU
+	 o3FQHaisCqYsSkvdXC1hGIIks4OcSVc0wUVE78hltu705XnvcYzfQ9MK5p90J3nk1Y
+	 5TUuHxHC1JJmXdKiQATt1t8/11mxPsfGikIo5vJoljTPt8qdaCmDUY5nQT5u8i1UgS
+	 TNmxKCy7yPY3pT0l05FCzokMa4vBBGrl8jSx9ILIy1JQ98ySL2fAj3z92qL+aqA2MP
+	 yxo2GQ6P6Lz3Q==
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-216405eea1fso51039665ad.0
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 23:53:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734508388; x=1735113188;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QA7qYluRuUIa7usBURYUiloTnmBO9zMmnIOKmpkGqzk=;
+        b=lACk5rXrD3opOCphVB9wQKFg4XZ8F3ugOgTVuxJCQoG+M8hsbjQMkTVAInUDITV6Kr
+         nKjDXpXLQMlsFUBDWVLn/P2MV9dgtxPf2s6o0sBrVzdcUgZ+ulRL4aozxltPUjw3dsf0
+         Gxr9kgXO+QnPjZ/TDtCU25Jl0IM+9nNyi6UvPeDYtzu3W0oj+j+JNhfCcRQxjSgRdZA8
+         5Wb7/re7+CiDdoiLU3zmEv7DOwx41q+h65q49oPlbKbVMrdXQT+62IragApVJecH9DCq
+         9wOR+VUZBLehRlGpkZWGhrRaJC3AtBhgNFTsQrGZCgdxe/Rc3B3QGFEYkXIc5jZagLTB
+         fcNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUV1c5SCS4x6gGENEi0M1WUw/n6yckKO4v8TeReOgqMKlaOh0s7lOZDtXlSfiei4GYNcy9KAL4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyno6iwewsJ+bjY6Y3fhw5LvBGcvhbPLvDkKaAwJIekSKNswaXe
+	8814qr0Q5V3pGLUUlWjmwxs1BRZgiGpJKPXrXEezFqhUzNNMk06ILLn9uAMmXiFjLzWpJzIhOPS
+	3bqswoYF8YbvE3IdD+93CK++hpiLaikFXAWTxRhManZvzVufseQATpKtI0qK5N0M8PVFAxw==
+X-Gm-Gg: ASbGncsmOUyg7yeUxh1B7QOD+EkrVSvwa0fq88IovALMcVg2UX21e1XQXzxCKMdQg5Z
+	+MZc6ufSgEvyeXhu4zRRkHnBHZcRmWw1H/ASPphgF6pTA/0ZsWvvaa7oQOrEEYM6718wjd1VGy7
+	f3rXfL6wEo2BC/CTog+qWYoZmqFYzUmb+HTaOzeGvv1CTRbSg17hb8wQAGUFN6oC2CTZvHcD+D9
+	nloqepXL0vRChzeyOAlcowNveyGX9M7DaFKcdNEcanvQMkUFRL5367JGDLOEMAqlgUQ3q9Vn8ws
+	sFbrqqLKSdjGFhvv0UTym2ZOu8jd8Gjq1O4=
+X-Received: by 2002:a17:902:e5cd:b0:215:a434:b6ad with SMTP id d9443c01a7336-218d7232943mr25584215ad.33.1734508388469;
+        Tue, 17 Dec 2024 23:53:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE8buoRwWFzglreuoOoKDyupa7wxpFqo9x1eMl1ZfFbJ0E6MvUkTFSZN2/LUGq0kuulji31iw==
+X-Received: by 2002:a17:902:e5cd:b0:215:a434:b6ad with SMTP id d9443c01a7336-218d7232943mr25584005ad.33.1734508388127;
+        Tue, 17 Dec 2024 23:53:08 -0800 (PST)
+Received: from acelan-precision5470 (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e500a2sm69929225ad.118.2024.12.17.23.53.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2024 23:53:07 -0800 (PST)
+Date: Wed, 18 Dec 2024 15:53:00 +0800
+From: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>
+To: En-Wei Wu <en-wei.wu@canonical.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, vitaly.lifshits@intel.com
+Subject: Re: [PATCH iwl-net v2] igc: return early when failing to read EECD
+ register
+Message-ID: <rdwtgcpvchdejucyraohjm52sqyhqm23sec6omkbys6wrxaslv@tspjghkgsx2m>
+Mail-Followup-To: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>, 
+	En-Wei Wu <en-wei.wu@canonical.com>, anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, vitaly.lifshits@intel.com
+References: <20241218023742.882811-1-en-wei.wu@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
- node
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
- <75fb42cc-1cc5-4dd3-924c-e6fda4061f03@quicinc.com>
- <4a6a6697-a476-40f4-b700-09ef18e4ba22@lunn.ch>
- <441f37f5-3c33-4c62-b3fe-728b43669e29@quicinc.com>
- <4287c838-35b2-45bb-b4a2-e128b55ddbaf@lunn.ch>
- <2e518360-be24-45d8-914d-1045c6771620@quicinc.com>
- <31a87bd9-4ffb-4d5a-a77b-7411234f1a03@lunn.ch>
- <581776bc-f3bc-44c1-b7c0-4c2e637fcd67@quicinc.com>
- <174bd1a3-9faf-4850-b341-4a4cce1811cb@lunn.ch>
- <d711ee4b-b315-4d34-86a6-1f1e2d39fc8d@quicinc.com>
- <8acf4557-ac10-43f1-b1ab-7ae63f64401f@lunn.ch>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <8acf4557-ac10-43f1-b1ab-7ae63f64401f@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: A4ZjIu75VbPGB7_ca6tBmQcOQdnuVuo8
-X-Proofpoint-GUID: A4ZjIu75VbPGB7_ca6tBmQcOQdnuVuo8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=899 bulkscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0
- adultscore=0 impostorscore=0 malwarescore=0 priorityscore=1501
- clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412180058
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241218023742.882811-1-en-wei.wu@canonical.com>
 
-
-
-On 2024-12-17 18:18, Andrew Lunn wrote:
-> On Tue, Dec 17, 2024 at 10:26:15AM +0800, Yijie Yang wrote:
->>
->>
->> On 2024-12-16 17:18, Andrew Lunn wrote:
->>>> I intend to follow these steps. Could you please check if they are correct?
->>>> 1. Add a new flag in DTS to inform the MAC driver to include the delay when
->>>> configured with 'rgmii-id'. Without this flag, the MAC driver will not be
->>>> aware of the need for the delay.
->>>
->>> Why do you need this flag?
->>>
->>> If the phy-mode is rgmii-id, either the MAC or the PHY needs to add
->>> the delay.
->>>
->>> The MAC driver gets to see phy-mode first. If it wants to add the
->>> delay, it can, but it needs to mask out the delays before passing
->>> phy-mode to the PHY. If the MAC driver does not want to add the
->>> delays, pass phy-mode as is the PHY, and it will add the delays.
->>
->> In this scenario, the delay in 'rgmii-id' mode is currently introduced by
->> the MAC as it is fixed in the driver code. How can we enable the PHY to add
->> the delay in this mode in the future (If we intend to revert to the most
->> common approach of the Linux kernel)? After all, the MAC driver is unsure
->> when to add the delay.
+On Wed, Dec 18, 2024 at 10:37:42AM +0800, En-Wei Wu wrote:
+> When booting with a dock connected, the igc driver may get stuck for ~40
+> seconds if PCIe link is lost during initialization.
 > 
-> You just take out the code in the MAC driver which adds the delay and
-> masks the phy-mode. 2ns should be 2ns delay, independent of who
-> inserts it. The only danger is, there might be some board uses a PHY
-> which is incapable of adding the 2ns delay, and such a change breaks
-> that board.
-
-Okay, I will follow your instructions:
-1. Change the phy-mode to 'rgmii-id'.
-2. Add the delay in the MAC driver.
-3. Mask the phy-mode before passing it to the PHY.
+> This happens because the driver access device after EECD register reads
+> return all F's, indicating failed reads. Consequently, hw->hw_addr is set
+> to NULL, which impacts subsequent rd32() reads. This leads to the driver
+> hanging in igc_get_hw_semaphore_i225(), as the invalid hw->hw_addr
+> prevents retrieving the expected value.
+> 
+> To address this, a validation check and a corresponding return value
+> catch is added for the EECD register read result. If all F's are
+> returned, indicating PCIe link loss, the driver will return -ENXIO
+> immediately. This avoids the 40-second hang and significantly improves
+> boot time when using a dock with an igc NIC.
+> 
+> Log before the patch:
+> [    0.911913] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> [    0.912386] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> [    1.571098] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCIe link lost, device now detached
+> [   43.449095] igc_get_hw_semaphore_i225: igc 0000:70:00.0 (unnamed net_device) (uninitialized): Driver can't access device - SMBI bit is set.
+> [   43.449186] igc 0000:70:00.0: probe with driver igc failed with error -13
+> [   46.345701] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> [   46.345777] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> 
+> Log after the patch:
+> [    1.031000] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> [    1.032097] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> [    1.642291] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCIe link lost, device now detached
+> [    5.480490] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> [    5.480516] igc 0000:70:00.0: PTM enabled, 4ns granularity
+Thank En-Wei, this is a good fix.
 
 > 
-> But i assume Qualcomm RDKs always make use of a Qualcomm PHY, there is
-> special pricing if you use the combination, so there is probably
-> little incentive to use somebody elses PHY. And i assume you can
-> quickly check all Qualcomm PHYs support RGMII delays. PHYs which don't
-> support RGMII delays are very rare, it just happened that one vendors
-> RDK happened to use one, so they ended up with delays in the MAC being
-> standard for their boards.
+> Fixes: ab4056126813 ("igc: Add NVM support")
+> Cc: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
+> ---
+> Changes in v2:
+> - Added "after" logs showing improved boot time
+> - Fixed error code (use -ENXIO instead of -ENODEV)
+> - Added error propagation in igc_get_invariants_base()
+> - Added Fixes tag
+> - Added [PATCH iwl-net] prefix
+> - Changed original author from AceLan to En-Wei
 > 
-
-Most Qualcomm MAC applications are actually paired with a third-party 
-PHY. I agree that the original author's PHY might not support adding the 
-delay. However, this assumption cannot be verified since the initial 
-code was uploaded from the internal code base.
-
-> 	Andrew
+>  drivers/net/ethernet/intel/igc/igc_base.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-
--- 
-Best Regards,
-Yijie
-
+> diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
+> index 9fae8bdec2a7..1613b562d17c 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_base.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_base.c
+> @@ -68,6 +68,10 @@ static s32 igc_init_nvm_params_base(struct igc_hw *hw)
+>  	u32 eecd = rd32(IGC_EECD);
+>  	u16 size;
+>  
+> +	/* failed to read reg and got all F's */
+> +	if (!(~eecd))
+> +		return -ENXIO;
+> +
+>  	size = FIELD_GET(IGC_EECD_SIZE_EX_MASK, eecd);
+>  
+>  	/* Added to a constant, "size" becomes the left-shift value
+> @@ -221,6 +225,8 @@ static s32 igc_get_invariants_base(struct igc_hw *hw)
+>  
+>  	/* NVM initialization */
+>  	ret_val = igc_init_nvm_params_base(hw);
+> +	if (ret_val)
+> +		goto out;
+>  	switch (hw->mac.type) {
+>  	case igc_i225:
+>  		ret_val = igc_init_nvm_params_i225(hw);
+> -- 
+> 2.43.0
+> 
 
