@@ -1,245 +1,281 @@
-Return-Path: <netdev+bounces-152946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C9DC9F6685
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:10:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F6439F6688
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 259BE1894034
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:10:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 206AE1894275
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC4271ACEBB;
-	Wed, 18 Dec 2024 13:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2F71B4230;
+	Wed, 18 Dec 2024 13:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JLoZj7cr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jHy1eaPo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E197619D8A4
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734527323; cv=fail; b=rdp+a/0e5QsBkEWg0V2RHLcPXy5V6/uU/UPV4DZ9m21KvgtBHruxORWqocb1cV6D/poFJZVogwFYfJIVswkQ/h6y3dhL11V/eZQStmP2aIcQFAuOIdAD08amQQyf82F9fUrhehCG5hdVOWaGMwIbVAln/9XGM7nZlVbYHHfrppY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734527323; c=relaxed/simple;
-	bh=upwuUmq4GmZ4mMziwFWwf+7+x9Upj74phfffTpAuIgw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=LpOYbXzxWfXS/XB4dkzO80nQBrGBaBrn57AgSMySseSw61BcgGrPelEZTwn95gdNSqOA20rG84BwYt2GQnQ19t8aJOSTReY6GoVr39hiBtxRbbLxo6zo1MV32UVAMLhTXYgV1QFDfbPo0y4d8IhoyLF96Dgi525vVuZpj1VIPUQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JLoZj7cr; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734527322; x=1766063322;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=upwuUmq4GmZ4mMziwFWwf+7+x9Upj74phfffTpAuIgw=;
-  b=JLoZj7crzBHmZmdI/tnKVHYt4sRnkebfDM5d77/2M2TIddAtOSg/XVdp
-   I/YHJfb1r8EiM9ZP+l5bnzeFPpDsU4kV4rZufdN7vZNb6zojSohvB1unB
-   J7JcDtR3Wmu3rpFCmkl89sxIvuqIc/FJxvc2Do2d+3XjlMOJFzgQFq/9C
-   TLmK07mrkRABReOxAZvsE4+WgAfwmgdOoGSVE6V04tywPmL4qc+dwRsN3
-   UAHMR7EhaHV6ZuDmprNRYNy9jQtECi013ftHEMOzm0mzeitle8UelCoRe
-   BouL2cgiflTt//GBfqPTA1U17E8WJmk/a+uPNaNsmeBhObo67x+Hz0STX
-   g==;
-X-CSE-ConnectionGUID: QXW4Ze9nTHqs9BAOc/vihA==
-X-CSE-MsgGUID: 4nIfWKuwSPOEZk2SP6yr+w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="22588764"
-X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
-   d="scan'208";a="22588764"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 05:08:39 -0800
-X-CSE-ConnectionGUID: nCnd9gw+TiOkMyYxjSxeHg==
-X-CSE-MsgGUID: 8tU52h58QvitK84jJ4dq4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="121109094"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2024 05:05:54 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 18 Dec 2024 05:05:53 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 18 Dec 2024 05:05:53 -0800
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.44) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 18 Dec 2024 05:05:53 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dMkM9kiS0DirBQ864lYMhm8aN8qOs+oE7JDdB4UGv5UzYEM8Eu3opQ5NBfLa/3f/1zFy6EA5fqKeOP6JLVOFnFOe5Gi/CUpeth65fRxVhq0r0Gp4NN6wQBNwAZo1hNeVKWiGbO1bL/wEpweSFqYYw480IaLIMr79SyI78lYtV14btSX9ii/gaqAGSvcglseMM7DVHSdB5OLawcRhMww6SL7x0h5SG+iAq8JSu0lXzAzcc52PNtoomTyHrxqM1DoOgnR0yWPtgY20pS+BlUz1bBHYMF84osAqN1w2pO2S3685Z695xiQLGzZdJ/Pz/4Q4XMMFlpYToybUWo7G7YNKaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wG6rczmF94+CkB73R/aZyr98410gu/PATk7BR55Zqbc=;
- b=bw9EZH/7QwN3cuR9zKprpCf6UD23SG7oGGTawrkZEjTmoZjqNIeidVdsvDKse/dH0fSBpWwk3mx63Xe9ULwOiWFvDEQu1WEH/1t038+HBVp3BTaMaOLgpEgyOWaka4cEdOqgFQkK4eQ9j8sVrq8Z2OTPbnkmPyjsNcw/grExd/lJPG8hitHH0JzO+vvgn9tGqAxpNDwwo4jcEC65yEy+CQvMzCr1yPGgKgbHnOni6mQdK8Zu/aAOZ6hGQd8rD2GEYboZrawB1yhaIIfylE4kwFik6xwEbQ1ZlkbCHCbli8uQTNGs7FtEkKI0koepo48IcmunZK4KE/3pOfrZqNihaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
- by PH0PR11MB5951.namprd11.prod.outlook.com (2603:10b6:510:145::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.12; Wed, 18 Dec
- 2024 13:05:19 +0000
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739%3]) with mapi id 15.20.8251.015; Wed, 18 Dec 2024
- 13:05:19 +0000
-From: "R, Bharath" <bharath.r@intel.com>
-To: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kwapulinski, Piotr"
-	<piotr.kwapulinski@intel.com>, Carolyn Wyborny <carolyn.wyborny@intel.com>,
-	"Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>, "Glaza, Jan"
-	<jan.glaza@intel.com>, Simon Horman <horms@kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v12 8/8] ixgbe: Enable link
- management in E610 device
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v12 8/8] ixgbe: Enable link
- management in E610 device
-Thread-Index: AQHbRvI6o+BeNDGCoUGw2Yz9FfLpnLLsDN6A
-Date: Wed, 18 Dec 2024 13:05:18 +0000
-Message-ID: <PH8PR11MB79658BE01985079039DEFB9CF7052@PH8PR11MB7965.namprd11.prod.outlook.com>
-References: <20241205084450.4651-1-piotr.kwapulinski@intel.com>
- <20241205084450.4651-9-piotr.kwapulinski@intel.com>
-In-Reply-To: <20241205084450.4651-9-piotr.kwapulinski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|PH0PR11MB5951:EE_
-x-ms-office365-filtering-correlation-id: 6ad726ca-c5ac-46b8-f8b5-08dd1f649f7f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?BN+I0PDcTJT36zUM8kDEvpGsE1dYxBrhspFCwC5iZjJjaFpVMnxRts8S4nDJ?=
- =?us-ascii?Q?2JwrJTTZohK6G/DTj8bDy06sIMbg6DCdb3rjXjMjWE/MYGgMiJhZYQPS691H?=
- =?us-ascii?Q?5vvU6W7r16VwTCzRRxySPex6Hmi4HfWHrG9JrDvCZSek8jBJ3c6Ulv3ln6GM?=
- =?us-ascii?Q?hy5ydAHrIf1WyKOLFForrbS62LumKQHHf0UPC6JGBzBovk+eCFaWPh0FKvuP?=
- =?us-ascii?Q?TogGBOD9eEuc9peYc0yxqCmof/o2D3t7KOCkfELC/tGldZ545w9oz24yEezy?=
- =?us-ascii?Q?ZTPXZrdhYO79xOJDmluuSLkzrWrZUS9Bpz1es9KUoragR3eBOji3FHFBwkp2?=
- =?us-ascii?Q?hVZuFga1GgZePVUM9PK43Bkl45RoNm4JQ0M6YbEBNOCxV4OV2lCZPFA1grSm?=
- =?us-ascii?Q?82D1b+hZdz+tNPQ9Uea9YlN1K7QZ+PSPjmiPnaPRPtmNTyPnZ87Ia3OHrwYx?=
- =?us-ascii?Q?s5OeFqSqZj7CKSaBHJvqZIL3lawWO1fs/5dpPhXwTX//bdvp3wxrZNx7vkEI?=
- =?us-ascii?Q?bfxFsgXDcT2BQBPrsgFV/irsGbCypKkeg0iDN4ILJ9N+VQw4BjfoMZAK6iWx?=
- =?us-ascii?Q?h25KqaZnOTL0k1gVGLUyy45lOWshqub8/JToAa2ofMDddcIekrq1GqX18qQ+?=
- =?us-ascii?Q?GVTfgMFNFm1r5auZvZMh30WpmT+nlbPkEQquMCNBx9rbn1JqzsRr6jQnq0b4?=
- =?us-ascii?Q?INWpKhY5bOsol7l8fbkPr/tGorN2yeA6rhFPjrUH2vpjYXd+ZTLqcj7bqMiK?=
- =?us-ascii?Q?L5dLhvX7lpsq4Ff1lBe/gdFkRKGB1MtfOeNY0xmhp5Hs/RZ200OlwL9FbdPt?=
- =?us-ascii?Q?3GMXHt6DFDFftB1eTooXsd1DQSXxI+aAd10ZS7ssWuQ11fwkdg+zIW8pjecY?=
- =?us-ascii?Q?GbVALfEe6IpbodgutV/MAbT6YIqamD8i7iYIM8hvVDnIy4/LND4FpznNe0V4?=
- =?us-ascii?Q?6mY4PIPtUwpWEJthreEKv3XEnmJE4w+otzZpsyqTb6fFOn7SgA3iW/NVZweD?=
- =?us-ascii?Q?bFtD7JY5zOFN/Uv4GhBz2br8G1HL3bI8FFfP63FoaG7HMJAvWpjFV0M4IToR?=
- =?us-ascii?Q?RAgotBs8Z3n+F6h+z6pWKxjBVSsdIzz2forIhq2l6gLgEMAXD+jCg7/IFtKW?=
- =?us-ascii?Q?3Ghjy6Y06RTjYRNaHxTRLYe5eeXeVD2t0PBG2/7VKGLBqx7VODT/fZpUQpSS?=
- =?us-ascii?Q?fTSCCofW6i+rxbcS1ObaJ0gseYXFplTaqlPcECfY0M50yvv2HVuroK69wOzh?=
- =?us-ascii?Q?D0xgb82YsCG1v2fCTS5zFxuPbiNQn8f+SOQVv/NSu71v69Yt/b8YJ0on6hj+?=
- =?us-ascii?Q?rUE8KcNcXYwK2uSpry+o9UVK8hq1RM5AFqyPR8YqyQdQoJkPwUwG1iiFzc/d?=
- =?us-ascii?Q?G/s7QyOtOv3AGf4psr+Uif0mywPC2jZpu18KLRh3bzRZI7I9THMFNNmLrR3u?=
- =?us-ascii?Q?1RwpelBAmkNAXYRcR7JtGjtPMYhI1DVu?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?3x773KJXAuj9s5Yx8VNL7joZH5VDIdnmVErvAr6O0miCNM/q10jgrN2/U697?=
- =?us-ascii?Q?/EEK43XFxlZpYSHzp4RN61V+OOhgJg8LAK+ds5LY3pKL2kXl82KMHOlnieBT?=
- =?us-ascii?Q?+gYvAd7GUUYS9JShU9HEZtfZGuRsFY9h2JN2srJx1bCXWlKUjKF/OICDG0ft?=
- =?us-ascii?Q?E8dNanVrHh0ugzaHbkMRtBvBEw7SMmaIA+dLTioukkTll43jLJmJcsdn0a6W?=
- =?us-ascii?Q?rKiEjyaHIWBuQxVaMOYH5QXjSY8LhddYRsKy2iabHn9jtNWNssV+K1TZIwWY?=
- =?us-ascii?Q?KRAdGi12I7UQM1Nqgk7pWJIm3sUjZhoGYzwcRqMYMPgiQK6stP2YsP+tKObA?=
- =?us-ascii?Q?jgBe2eQsnN/V8Kqj9DhcNrycQ8JOzqig52VcV6m1ZGs5cMYfwQlZ3m8AIFAW?=
- =?us-ascii?Q?5v1nPKJoefs+AWv8t5BiXIL7R/oDSNDTi+RBaVEz1WBKU5g2wnITs9zz3cU0?=
- =?us-ascii?Q?5z4Hx/LFOcjILbBF8s41lBBLGqWz6RyjOuG2dzvlA8xxMBIIoKTOw9H2B+Rz?=
- =?us-ascii?Q?WM2cYq2bqrt5CVNNEIVhmgNMeLX9EOSH+8E/oKgYLZ+FNvqC1FYF4dSLnP3k?=
- =?us-ascii?Q?7B3EyfTFpUTvkhZsn9o9aiW9WqpptKfU0MOF0uIm4C5KYvNFgcji/2l8SIrI?=
- =?us-ascii?Q?LeovOXhu7DOj1AvCCVtfdaIHC7RhOcrk706GSpOrLSegX133S8KF0fbjz6ys?=
- =?us-ascii?Q?3K323BG8rnpACoi634J5JRqKPpjrAvsywi6QRalTTmhO2MAd81d/hUOunZxK?=
- =?us-ascii?Q?a0Gbr4W3HKkhgv4lQEKdc7JykBm0PxYkWl4PsbIn2xnNbZeSm0QhQew9zWAv?=
- =?us-ascii?Q?mZmfAeagT/kpzjfXOdyiLfVW95zI5Hx3CSCJRChCaujkUz9+th5JzzgpEDGV?=
- =?us-ascii?Q?hc7TZMxqZ6spxNpQu5fqIgJgw38DFZC8ZQsWsHLoEdbWieCWUWoIsT2Ru+Gz?=
- =?us-ascii?Q?6Plbx3HdEp1iMti6vXT/5rGYIlv0xLBa+WEykMmRjoPy9adCylrtGEgRMgmz?=
- =?us-ascii?Q?3puaTCYHmsdU3mZcZ2TLJV4n98G1nb3iRQjDv7IXhD+/5oQx6lXfrwnFvcOy?=
- =?us-ascii?Q?0txXBjNLSusrTZZRPgMGJTuK2DnR6D7RLMqTiEIuSOm1TDJlSJZ9Cx/NWZer?=
- =?us-ascii?Q?p4W9IXRtK8/WmtuNwRr1kv0Kr2oeNHMR2WhsQFpr0EcWNnxF3JMK5Uzr+xxN?=
- =?us-ascii?Q?2ggZTY6JzW78qo9LSY8ZcgYxXKdF6UsOx0LcupfdSWcgNTggsKes8igLOs8p?=
- =?us-ascii?Q?fEOfEd+eGh6AU2u6upCSEDPR5ZhRTmI5qvP5iQchQLnpcQWvxCrwweQkt7Hr?=
- =?us-ascii?Q?EosK+82mV/P3xtLc+Qto0HXljSoUUflpdDrdOP0fKjPxhhci7WBpJ5eUxkbP?=
- =?us-ascii?Q?FyhX4jgvwbDjQvnSJuymKpz0xeZkVi7KbkRsNiolqOZuzETnC9isOoC6NDiK?=
- =?us-ascii?Q?s3fNoDmC4RH4p5GMstvUhX8Chbsx4hy2bjvoHs914DlU8wS0W4fPy+cFnOg9?=
- =?us-ascii?Q?/H8CKBeDKJLZ5wxOyREnY4iZae7rSA/gjyVpCSvnlb9olUd1If1PdvfIn/Kp?=
- =?us-ascii?Q?zm6TAf3Y9EN4eF0G46CO/NdU+RA03JkQr3Qths5/?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3FA1B0422;
+	Wed, 18 Dec 2024 13:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734527370; cv=none; b=uxpi7yV+BtwwHZ9TOsqM2dHeNubKv5/q2MjK+s2k2ctIBe7JqeV20z7YLWzWZCbUpj/4Ia2N8AW8+Vhob9oVwNAvpLaBXuOspS8TxcJPBAs6bzCrU5H2mnFfnC0pX3/e1ZchEBFLuzxcpCHZKdZV8pV6dDEbtpk/eP9fVjZwbqc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734527370; c=relaxed/simple;
+	bh=8H4aPlHzanTRVMIUnxjQ3Gybrz297B10rZES1FqaXRk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UrGffxJzkzCOi7eWeOB2Z+H1ngBmxLPi0wxzabDhdI7uVqwNGMSujrXAaQTWcxAPiB1lXGSJeoE/8zKzrkWRmHwxuebVLhSH918Lw4ivCXTsPCIjgxVZ0qcnQ35dsKlhC85ROIyyJcbbJDLuoSEv6P9iH5REDGDuf+aSdvQ0ZPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jHy1eaPo; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-72764c995e5so3952573b3a.2;
+        Wed, 18 Dec 2024 05:09:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734527365; x=1735132165; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6llrxywd5dEoVM0OKwihGrkHHqwNftGWmdHiygXfmj8=;
+        b=jHy1eaPo/ggkULgS/rAxP+cgTHUjNAR+nocqJIQXB6xJ8Z9KwFvzTqpQV4N4jZZphM
+         1wKdWxjeprcODu3eSRi7gYEFJKt54mm8DRnH0yjCWl4BeKEO4HOXAMZORupSy2RMCiQ/
+         kfNqHC+RgUZl53z/KOVzpKGqW48QAoifgbvWgisOPvG3RDt3HaMiBR1EFZvHyliCJJJo
+         DuWDt6hd7F4aVSUw+05G78W31K5mEC4FGxVHASY9ANufcMrL00BoP+dr2WvXiuzZTSt+
+         stu/PA7LciPOwUF+pqFTR2B+o17Ih8jBJdLrZLBrobbidH95SrkWSSnbPdNwKMpHQzZP
+         Md6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734527365; x=1735132165;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6llrxywd5dEoVM0OKwihGrkHHqwNftGWmdHiygXfmj8=;
+        b=mULmVZGTpsNy5tGHacNx02VFVPsD3GfKMQUEf1K5ZajCJ8Uvgy72qdfAOyDb3HxUCf
+         cb9UU/TpQR5W+qHETu5xIlMaWCBhJuo2aamujOQEyvxSXvnfo7hfDrurYGL2QaOK5Cd5
+         XBptzNDhH0DDVe9e7ABW0C0TgGsdhPFfhM2YFY7X7Io1lKX1FQJxtkFK34p3liEcKS0b
+         jnh+QdNenasb9Er2tXmjrfCmACW4aywH4vY3KxgEe2alXvhQ0QfXXUt8USqmeWNh0s45
+         jO+KoffC9oWENo+p9DP+fMAhDMnIJPKqTIHdp1Mz92naTVzQ+GUAsMG9ztHVyf+7c+93
+         NgnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDoC735de2A3JHvo2fhw3TTWvog5uLql8bGmVmO2f4fwQMo315naiXragAgq5Pg0wZZz7PxXJyfU30@vger.kernel.org, AJvYcCUKjihy26KqEiZ0jEdEya2Sf7rHzam8Onb4Lk8R62UkJs0VFzOK7iAMRrX+6UKpbxhLbhEI3wpI3bot+9U+ToNS@vger.kernel.org, AJvYcCV7YMPpN1vz7ZOP2t3bec7tB2PpAnexfpS8qVQX6El9k7ibK/hCWpalKe/kepSJ60gpApqlQcWo95GR@vger.kernel.org, AJvYcCVNyxZS1GkLgm29bt1eQuNIUaiH2ZKvE+emIQ38JQOUtB43P5aCjF3UoHF4p1fcnRAwSZI=@vger.kernel.org, AJvYcCVd5JBm3EjP35BwyzlRNFiCHv5GPBnAsdnGVfCdFurFQ7AqoG8/9wmYoSWYqRU1s77vDsUuryBY8xx2EFWWRD8=@vger.kernel.org, AJvYcCWVqTmLsBMAw6kRnZFwg1gPMCZ4pJkXAkbXyhwMrfBw3SQr0gQHClHq5MF8vH2IPPxT3lZ351uxev1SOw==@vger.kernel.org, AJvYcCWfZN/WjhnGmVwACA9xMD+/4YJAKq5NJrkR48+r7/YuL54lhco2/pjj7lhafNL8+0iwGUtQ8j70JE7uRee7@vger.kernel.org, AJvYcCXaG4OQ+4DIgslVGB7Ip/LD65DAO6l6qLqJts20RZXbVFr6S37DvngU8P+uhO3j66CBcSBMWhhqtLlc8Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyCA6StMdSecrWy1mcrlj9QMhkT2lSZODtGRmd++aKAAkbZdg3
+	rcAvII8PyUFCyhZa/lTerF03lIu+RBEgAraGL8TrDLDEZ0MbIGmPp7emi7zP1zk=
+X-Gm-Gg: ASbGncsJ6HGHhDz4lTC0Uel5u4wBREm8TPbgOQpdw9ljuGS98G14ZBwLxJSBQs1ehoq
+	7KhDQ4x/FB3W7/ejI45ob4z1pue+/PaIUL9NeKNFm3+3Bh9qLMVgtPA7ZhKzyVrjT/CcPmIyWlQ
+	LD1kOnQXbVFHmoDMPblIn/bCWeQHsuJfxYf73XJDccvr2R2RCKNlSRBryhU93kDlrQeHGHiWXXy
+	jzNSZ48G80OOXpq5E80OscoQb7GnP4y/1gN63LSong391I=
+X-Google-Smtp-Source: AGHT+IHxL0OHgUEQczY58g8XDBLqS8Ex4WTxtaZ2NUqH1g4R3asgqmGfw3HW/w2dfnMjfE/n2fJrPg==
+X-Received: by 2002:a05:6a00:2313:b0:728:e906:e466 with SMTP id d2e1a72fcca58-72a8d2dc70cmr4546358b3a.21.1734527364845;
+        Wed, 18 Dec 2024 05:09:24 -0800 (PST)
+Received: from ws.. ([103.167.140.11])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-801d5c0f59asm7434754a12.67.2024.12.18.05.09.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2024 05:09:24 -0800 (PST)
+From: Xiao Liang <shaw.leon@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	linux-rdma@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	osmocom-net-gprs@lists.osmocom.org,
+	bpf@vger.kernel.org,
+	linux-ppp@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	linux-wireless@vger.kernel.org,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	bridge@lists.linux.dev,
+	linux-wpan@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v6 00/11] net: Improve netns handling in rtnetlink
+Date: Wed, 18 Dec 2024 21:08:58 +0800
+Message-ID: <20241218130909.2173-1-shaw.leon@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ad726ca-c5ac-46b8-f8b5-08dd1f649f7f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2024 13:05:18.9091
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zWjAUto1xRtnbA3nNvN7ttb4oDVAOo9kBehVIzbd8YW/uX7IRlC0SMqGulQGCdiednbK/ka1YlX/gQWEpxV2MQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5951
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Piotr Kwapulinski
-> Sent: Thursday, December 5, 2024 2:15 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Kwapulinski, Piotr
-> <piotr.kwapulinski@intel.com>; Carolyn Wyborny
-> <carolyn.wyborny@intel.com>; Jagielski, Jedrzej
-> <jedrzej.jagielski@intel.com>; Glaza, Jan <jan.glaza@intel.com>; Simon
-> Horman <horms@kernel.org>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v12 8/8] ixgbe: Enable link
-> management in E610 device
->=20
-> Add high level link management support for E610 device. Enable the
-> following features:
-> - driver load
-> - bring up network interface
-> - IP address assignment
-> - pass traffic
-> - show statistics (e.g. via ethtool)
-> - disable network interface
-> - driver unload
->=20
-> Co-developed-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
-> Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
-> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Reviewed-by: Jan Glaza <jan.glaza@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  13 +-
->  .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |   3 +-
->  .../net/ethernet/intel/ixgbe/ixgbe_common.c   |  19 +-
->  .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |   3 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 165 +++++++
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   1 +
->  .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |   6 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |   3 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 414 +++++++++++++++++-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c  |   4 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |   5 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |  12 +-
-> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |  21 +-
-> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |  20 +
->  14 files changed, 659 insertions(+), 30 deletions(-)  create mode 100644
->=20
+This patch series includes some netns-related improvements and fixes for
+rtnetlink, to make link creation more intuitive:
 
-Tested-by: Bharath R <bharath.r@intel.com>
+ 1) Creating link in another net namespace doesn't conflict with link
+    names in current one.
+ 2) Refector rtnetlink link creation. Create link in target namespace
+    directly.
+
+So that
+
+  # ip link add netns ns1 link-netns ns2 tun0 type gre ...
+
+will create tun0 in ns1, rather than create it in ns2 and move to ns1.
+And don't conflict with another interface named "tun0" in current netns.
+
+Patch 01 servers for 1) to avoids link name conflict in different netns.
+
+To achieve 2), there're mainly 3 steps:
+
+ - Patch 02 packs newlink() parameters into a struct, including
+   the original "src_net" along with more netns context.
+ - Patch 03 ~ 07 converts device drivers to use the explicit netns
+   extracted from params.
+ - Patch 08 ~ 09 removes the old netns parameter, and converts
+   rtnetlink to create device in target netns directly.
+
+Patch 10 ~ 11 adds some tests for link name and link netns.
+
+
+BTW please note there're some issues found in current code:
+
+- In amt_newlink() drivers/net/amt.c:
+
+    amt->net = net;
+    ...
+    amt->stream_dev = dev_get_by_index(net, ...
+
+  Uses net, but amt_lookup_upper_dev() only searches in dev_net.
+  So the AMT device may not be properly deleted if it's in a different
+  netns from lower dev.
+
+- In gtp_newlink() in drivers/net/gtp.c:
+
+    gtp->net = src_net;
+    ...
+    gn = net_generic(dev_net(dev), gtp_net_id);
+    list_add_rcu(&gtp->list, &gn->gtp_dev_list);
+
+  Uses src_net, but priv is linked to list in dev_net. So it may not be
+  properly deleted on removal of link netns.
+
+- In pfcp_newlink() in drivers/net/pfcp.c:
+
+    pfcp->net = net;
+    ...
+    pn = net_generic(dev_net(dev), pfcp_net_id);
+    list_add_rcu(&pfcp->list, &pn->pfcp_dev_list);
+
+  Same as above.
+
+- In lowpan_newlink() in net/ieee802154/6lowpan/core.c:
+
+    wdev = dev_get_by_index(dev_net(ldev), nla_get_u32(tb[IFLA_LINK]));
+
+  Looks for IFLA_LINK in dev_net, but in theory the ifindex is defined
+  in link netns.
+
+---
+
+v6:
+ - Split prototype, driver and rtnetlink changes.
+ - Add more tests for link netns.
+ - Fix IPv6 tunnel net overwriten in ndo_init().
+ - Reorder variable declarations.
+ - Exclude a ip_tunnel-specific patch.
+
+v5:
+ link: https://lore.kernel.org/all/20241209140151.231257-1-shaw.leon@gmail.com/
+ - Fix function doc in batman-adv.
+ - Include peer_net in rtnl newlink parameters.
+
+v4:
+ link: https://lore.kernel.org/all/20241118143244.1773-1-shaw.leon@gmail.com/
+ - Pack newlink() parameters to a single struct.
+ - Use ynl async_msg_queue.empty() in selftest.
+
+v3:
+ link: https://lore.kernel.org/all/20241113125715.150201-1-shaw.leon@gmail.com/
+ - Drop "netns_atomic" flag and module parameter. Add netns parameter to
+   newlink() instead, and convert drivers accordingly.
+ - Move python NetNSEnter helper to net selftest lib.
+
+v2:
+ link: https://lore.kernel.org/all/20241107133004.7469-1-shaw.leon@gmail.com/
+ - Check NLM_F_EXCL to ensure only link creation is affected.
+ - Add self tests for link name/ifindex conflict and notifications
+   in different netns.
+ - Changes in dummy driver and ynl in order to add the test case.
+
+v1:
+ link: https://lore.kernel.org/all/20241023023146.372653-1-shaw.leon@gmail.com/
+
+
+Xiao Liang (11):
+  rtnetlink: Lookup device in target netns when creating link
+  rtnetlink: Pack newlink() params into struct
+  net: Use link netns in newlink() of rtnl_link_ops
+  ieee802154: 6lowpan: Use link netns in newlink() of rtnl_link_ops
+  net: ip_tunnel: Use link netns in newlink() of rtnl_link_ops
+  net: ipv6: Use link netns in newlink() of rtnl_link_ops
+  net: xfrm: Use link netns in newlink() of rtnl_link_ops
+  rtnetlink: Remove "net" from newlink params
+  rtnetlink: Create link directly in target net namespace
+  selftests: net: Add python context manager for netns entering
+  selftests: net: Add test cases for link and peer netns
+
+ drivers/infiniband/ulp/ipoib/ipoib_netlink.c  |  11 +-
+ drivers/net/amt.c                             |  16 +-
+ drivers/net/bareudp.c                         |  11 +-
+ drivers/net/bonding/bond_netlink.c            |   8 +-
+ drivers/net/can/dev/netlink.c                 |   4 +-
+ drivers/net/can/vxcan.c                       |   9 +-
+ .../ethernet/qualcomm/rmnet/rmnet_config.c    |  11 +-
+ drivers/net/geneve.c                          |  11 +-
+ drivers/net/gtp.c                             |   9 +-
+ drivers/net/ipvlan/ipvlan.h                   |   4 +-
+ drivers/net/ipvlan/ipvlan_main.c              |  15 +-
+ drivers/net/ipvlan/ipvtap.c                   |  10 +-
+ drivers/net/macsec.c                          |  15 +-
+ drivers/net/macvlan.c                         |   8 +-
+ drivers/net/macvtap.c                         |  11 +-
+ drivers/net/netkit.c                          |   9 +-
+ drivers/net/pfcp.c                            |  11 +-
+ drivers/net/ppp/ppp_generic.c                 |  10 +-
+ drivers/net/team/team_core.c                  |   7 +-
+ drivers/net/veth.c                            |   9 +-
+ drivers/net/vrf.c                             |  11 +-
+ drivers/net/vxlan/vxlan_core.c                |  11 +-
+ drivers/net/wireguard/device.c                |  11 +-
+ drivers/net/wireless/virtual/virt_wifi.c      |  14 +-
+ drivers/net/wwan/wwan_core.c                  |  25 ++-
+ include/net/ip_tunnels.h                      |   5 +-
+ include/net/rtnetlink.h                       |  44 +++++-
+ net/8021q/vlan_netlink.c                      |  15 +-
+ net/batman-adv/soft-interface.c               |  16 +-
+ net/bridge/br_netlink.c                       |  12 +-
+ net/caif/chnl_net.c                           |   6 +-
+ net/core/rtnetlink.c                          |  35 +++--
+ net/hsr/hsr_netlink.c                         |  14 +-
+ net/ieee802154/6lowpan/core.c                 |   9 +-
+ net/ipv4/ip_gre.c                             |  27 ++--
+ net/ipv4/ip_tunnel.c                          |  10 +-
+ net/ipv4/ip_vti.c                             |  10 +-
+ net/ipv4/ipip.c                               |  14 +-
+ net/ipv6/ip6_gre.c                            |  42 ++++--
+ net/ipv6/ip6_tunnel.c                         |  20 ++-
+ net/ipv6/ip6_vti.c                            |  16 +-
+ net/ipv6/sit.c                                |  18 ++-
+ net/xfrm/xfrm_interface_core.c                |  15 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../testing/selftests/net/lib/py/__init__.py  |   2 +-
+ tools/testing/selftests/net/lib/py/netns.py   |  18 +++
+ tools/testing/selftests/net/link_netns.py     | 142 ++++++++++++++++++
+ tools/testing/selftests/net/netns-name.sh     |  10 ++
+ 48 files changed, 546 insertions(+), 226 deletions(-)
+ create mode 100755 tools/testing/selftests/net/link_netns.py
+
+-- 
+2.47.1
 
 
