@@ -1,110 +1,88 @@
-Return-Path: <netdev+bounces-152810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B4E9F5D44
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:10:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2E19F5D4E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:13:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72044166FA1
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:10:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 630AD16F399
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB3413BC0E;
-	Wed, 18 Dec 2024 03:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072121448F2;
+	Wed, 18 Dec 2024 03:13:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGF3U4IB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AYZ9PYMr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2899835956;
-	Wed, 18 Dec 2024 03:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D023284D29;
+	Wed, 18 Dec 2024 03:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734491414; cv=none; b=ayV3TFYj1+g8dCd+EiyTg1GiD8Cfmj3a/7btZ80tjEClriS+TQLdoHV7qau3WLoE66SutQ2T8qRWPPdldEYum02nRfDWxATtzfpTU/kO1S671Pdh1rM6lOl1zrcohkvUIJl3n8WcONkUNtwU10evAvYG2kumpxMeC+a9mlrZH54=
+	t=1734491619; cv=none; b=dZivpsjYaI+9nArilHxhK6Ppq65et2b2jprwbapPuAGNUFkLlZbR7njEuZ5sYrp6Dnh11OYPLaAFOASFtzK/vKL5l2fkuoTb7UEJHQ51j6VOeSM8Rlj2nLmT08rAh9jEDWci/xdOy2NAVGB/EoEE19Vr0rvfA5hXZmB47bNpH6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734491414; c=relaxed/simple;
-	bh=vl1vxVxEi6TKW7aMZclumsaDOCaNBRiyPN4zZU9o4/I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ojRkW8EpOhOs30TgvNoqD6XCsLXu8v6bxbP6NsYI++3RiUzOcU6Md3wDSKyTfv6kYyXtVxpEUqXUWU3Xo9YtYwOjJ0vfGpnilhwdNURor3HTz6Scp14m4H1/ZgVhat8cCRQz0pEc7gnaOZ8g+RvYFBiK61jMmJgg2LHjPbMTtEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGF3U4IB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A558BC4CED3;
-	Wed, 18 Dec 2024 03:10:13 +0000 (UTC)
+	s=arc-20240116; t=1734491619; c=relaxed/simple;
+	bh=UOtdAZS/7C5uGHpW+JSybdHqlBYp1DwMs/EcAnIy6fo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u/jlDEwH+3KK7QdOTkD1kjr6NEKwBcTO1QCPATW5uc0tuKuRGLNuJxzkL0zyIkwTkanubVpqwkQtMnebvLjYS8eoqgjqqD+jBLF57ixeh1jbP4NWB5D9oY92rIVRsKDOGF6jjAgI2QAJ3/amQog57lY1/MPZQcQi/nbDMMgZIsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AYZ9PYMr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4B98C4CED3;
+	Wed, 18 Dec 2024 03:13:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734491413;
-	bh=vl1vxVxEi6TKW7aMZclumsaDOCaNBRiyPN4zZU9o4/I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gGF3U4IBCkkMudaxDml4lhAuEtQAdAR3Nm4+Xmst8l9xxP8us6haQJcdj0Szxu3qG
-	 uf2ge87XsOgvJrJLwTn/c+4nMKOyBO7hLMfsWiyZowCdT5U/Z5YpxpHvAgY230W2c3
-	 njE5pFM3pLqVf9SDRnKTJDmUNp3X76zwkIUijgm/3wro6ufxsYDu+0sVY6R29+BMM0
-	 1B9O4uBxgamKfqW71QtVs1cVGtkc3f2046E/S05WlHnT9ps3MS04/E4kkjAs/VPBLt
-	 DqQyevyRjzcEIGwQW0B6p/dJc7ot833nB49bob4nFAEyATy/eE3AzYPm1B82jMq8f8
-	 oGlyzbnzamXJA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D143806657;
-	Wed, 18 Dec 2024 03:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1734491619;
+	bh=UOtdAZS/7C5uGHpW+JSybdHqlBYp1DwMs/EcAnIy6fo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AYZ9PYMrGaxeGqOv7d5stY+JwTaksBuxIxz/+8Vzu5yXxvCq2X0CcteLTRVZeOj7z
+	 NX61egzZbH9MXUkRnLdlGnITLaI06OKSsc1d0sleHyQ7iBo+iravxDArpikZnAVUlc
+	 o1eKTWlIfnaynyCATDTmjyMdfVZwDty8oIaXlBihG4FX76xUBIZ4uDkR2S/iNJLPbx
+	 yYcPefzMLPF6CkT4aqczu94/ux19fj+shAPMJmoLO8hMrnAr5VQZBj8he8E/m5F20S
+	 gpLFO9cnFbHqpU1ydHQOruGiisdArA1f8+yEHgf+rpcK8cdKkrHHrPqPeseU6u+3Vf
+	 zRwtUsKUUvP9Q==
+Date: Tue, 17 Dec 2024 19:13:37 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Divya Koppera <divya.koppera@microchip.com>
+Cc: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
+ <UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
+ <linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
+ <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net-next v7 5/5] net: phy: microchip_t1 : Add
+ initialization of ptp for lan887x
+Message-ID: <20241217191337.717be46a@kernel.org>
+In-Reply-To: <20241213121403.29687-6-divya.koppera@microchip.com>
+References: <20241213121403.29687-1-divya.koppera@microchip.com>
+	<20241213121403.29687-6-divya.koppera@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] net: constify 'struct bin_attribute'
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173449143102.1163899.8938848059479285986.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Dec 2024 03:10:31 +0000
-References: <20241216-sysfs-const-bin_attr-net-v1-0-ec460b91f274@weissschuh.net>
-In-Reply-To: <20241216-sysfs-const-bin_attr-net-v1-0-ec460b91f274@weissschuh.net>
-To: =?utf-8?q?Thomas_Wei=C3=9Fschuh_=3Clinux=40weissschuh=2Enet=3E?=@codeaurora.org
-Cc: roopa@nvidia.com, razor@blackwall.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- kvalo@kernel.org, manishc@marvell.com, rahulv@marvell.com,
- GR-Linux-NIC-Dev@marvell.com, andrew+netdev@lunn.ch, shshaikh@marvell.com,
- bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 13 Dec 2024 17:44:03 +0530 Divya Koppera wrote:
+>  static int lan887x_phy_init(struct phy_device *phydev)
+>  {
+> +	struct lan887x_priv *priv = phydev->priv;
+>  	int ret;
+>  
+> +	if (!priv->init_done && phy_interrupt_is_valid(phydev)) {
+> +		priv->clock = mchp_rds_ptp_probe(phydev, MDIO_MMD_VEND1,
+> +						 MCHP_RDS_PTP_LTC_BASE_ADDR,
+> +						 MCHP_RDS_PTP_PORT_BASE_ADDR);
+> +		if (IS_ERR(priv->clock))
+> +			return PTR_ERR(priv->clock);
+> +
+> +		priv->init_done = true;
+> +	}
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 16 Dec 2024 12:30:07 +0100 you wrote:
-> The sysfs core now allows instances of 'struct bin_attribute' to be
-> moved into read-only memory. Make use of that to protect them against
-> accidental or malicious modifications.
-> 
-> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
-> ---
-> Thomas Weißschuh (5):
->       net: bridge: constify 'struct bin_attribute'
->       net: phy: ks8995: constify 'struct bin_attribute'
->       wlcore: sysfs: constify 'struct bin_attribute'
->       netxen_nic: constify 'struct bin_attribute'
->       qlcnic: constify 'struct bin_attribute'
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/5] net: bridge: constify 'struct bin_attribute'
-    https://git.kernel.org/netdev/net-next/c/a2558b410de3
-  - [net-next,2/5] net: phy: ks8995: constify 'struct bin_attribute'
-    https://git.kernel.org/netdev/net-next/c/2d7b422fa795
-  - [net-next,3/5] wlcore: sysfs: constify 'struct bin_attribute'
-    (no matching commit)
-  - [net-next,4/5] netxen_nic: constify 'struct bin_attribute'
-    https://git.kernel.org/netdev/net-next/c/ae026eae08e7
-  - [net-next,5/5] qlcnic: constify 'struct bin_attribute'
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+If this only has to happen once, why not call mchp_rds_ptp_probe() from
+lan887x_probe() ? If there is some inherent reason the function needs 
+to be protected from multiple calls maybe it's better to let
+mchp_rds_ptp_probe() handle that case ?
 
