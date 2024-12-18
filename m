@@ -1,117 +1,92 @@
-Return-Path: <netdev+bounces-153139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F9DA9F6FAF
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 22:44:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B21989F6FC2
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 22:55:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 621921663A8
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 21:44:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 067B3169399
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 21:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DF31FC10E;
-	Wed, 18 Dec 2024 21:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HkgL6Byl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6C11FCFD2;
+	Wed, 18 Dec 2024 21:55:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender2-op-o11.zoho.eu (sender2-op-o11.zoho.eu [136.143.171.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E64135949;
-	Wed, 18 Dec 2024 21:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734558291; cv=none; b=JvjL2cLHyL2IjLFDOsFVWj9Mgam+go0aQmqdX2XSyu93oUMtGe/wtlatFwdEvsMpdwXX5vnVmlKNo3diNxeTzzEOqONCqHktYxLsaEYFoL7YKPBcZSXCRVLH+YmPlqrl4v1FFyH/wew97gzll8zVniGbFBo2fDQ65Hc7QJ+NcbU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734558291; c=relaxed/simple;
-	bh=edYBZ11YYqwZSp46/krx8ylEh93INu4/gD9nmkbYM7c=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=RYF2S61A4o+uCBONMFBYesMNBOh++ZAFgIPcvccqs6KBIuY25yRLYpN7Ih+UyscdsUVp+cqmfJ8HL58Xx+Hflbmm5SUTUE9R8S9EKZfZEcvVZyiWgEa4VI+ecWF+6OLWFLEc61jlkBPacWO3GlA3C8uSR6Eg7WXI4bEdL5rIxUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HkgL6Byl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8940AC4CECD;
-	Wed, 18 Dec 2024 21:44:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734558290;
-	bh=edYBZ11YYqwZSp46/krx8ylEh93INu4/gD9nmkbYM7c=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=HkgL6BylkA2oCiTYEUxu6ip6gvJbDnAA9ohgrXER5+c7S1Y1fH8+tnFLcacxNgvUH
-	 k+7Tenl6R0iAugypn+93OhXyCBbytyR+kKTVSs7akn1rN6Thp821D/ldVjLt12MDEf
-	 lq6B45XkXfOf2lFitv2+QThkpiMUMQpup04WD6hGy+7BsY4NPwSLTz1rpG2XjTfajO
-	 QmlEmmQ0VEPsRCDoMedzBJEq6Y4grdPTT0GdWW1P2emtLlfOsKjREkIH5dUraT01PV
-	 ojRCVIj6tkg6HIB1tJUYGjePXJhZt6r5lTAi262ap8FkjJCzlrWRkzR3ouF/5bUREB
-	 +Alpj5beJhjvw==
-Date: Wed, 18 Dec 2024 13:44:47 -0800
-From: Kees Cook <kees@kernel.org>
-To: Alexandra Winter <wintera@linux.ibm.com>, Jakub Kicinski <kuba@kernel.org>
-CC: linux-kernel@vger.kernel.org,
- ", linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
- ", netdev" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] net: Convert proto_ops::getname to sockaddr_storage
-User-Agent: K-9 Mail for Android
-In-Reply-To: <aa6c671d-f4f4-446d-b024-923555c3f041@linux.ibm.com>
-References: <20241217023417.work.145-kees@kernel.org> <aa6c671d-f4f4-446d-b024-923555c3f041@linux.ibm.com>
-Message-ID: <C822C723-2141-4380-87FF-CA1D87FF8DBF@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69BA1F63D5;
+	Wed, 18 Dec 2024 21:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.171.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734558912; cv=pass; b=ANS8v2mns5T3wg5Uauv6S+QeN0+S3HEYv+bQ4bSYL0j8zDxtdtTpdJ9WToSZdHJ05Z7KrYR91gHmyT/kFMjZXgNuOo2O+KknH2RTznbg5Ys8OpjDtyx/iXVZ17+X6R3wOqd6Tca/xP8ElK9H17trIvL3t6Xjn7eSOmk20bqfeK8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734558912; c=relaxed/simple;
+	bh=pyyDpIDAm3TXBlVbYSyzly1hM/RGmRyYavZYESyY1j8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HCHwGFpd/8poDTsL5tiIxHves866RXnneIkcCMf2HAg96nQwXnVDgtCnLF1moXIICcQhIQxEtGzQtvhJ0mheU/LNzEZjokYLujsHnlVGnKxW2NVMuTuBO8a7Z0r50PiB/VM7io1i7laKro1JxsKGWKkLvGN6dklwbWJJY4gDPMU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trained-monkey.org; spf=pass smtp.mailfrom=trained-monkey.org; arc=pass smtp.client-ip=136.143.171.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trained-monkey.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trained-monkey.org
+ARC-Seal: i=1; a=rsa-sha256; t=1734558876; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=RkvryVTCXbKm36LKL8Pu2zGmrkxaVAkNtIAR67hTc4au5WULkpj//IsrhbyIjb3T5Mb78K4kx0vQDiMUHhpNvtghGYgned5xmv0V3yuPBSDABb9UqGYUjkw9Ml7jT0J/PRdqI13IFCGKpB5RXBcZ/b8+yU3qEF1MK5GGyrtSd+Q=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1734558876; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=AbCCgIQ4kREKGgQgAXdjH7laVuupWapCYL9Iysam8wA=; 
+	b=XtIbhevJDQtZZdVK5tTeQGuF95Ndus7bZiZHkEwBNq97vVSGi+2RFFL2ZXR+1ZMViH2PnlZwUaYurApRRr2UNsKKauvoPDB7PZ/0EdQrPLfVPSGwBZrx1BV7kAOXdzBt5IicQJrRNugKizDkiCHfz2dkClGaO9XDPK7lGMacoWA=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	spf=pass  smtp.mailfrom=jes@trained-monkey.org;
+	dmarc=pass header.from=<jes@trained-monkey.org>
+Received: by mx.zoho.eu with SMTPS id 1734558872983404.94538270672706;
+	Wed, 18 Dec 2024 22:54:32 +0100 (CET)
+Message-ID: <3500c9d7-2b81-41e0-985c-7a63bcb87723@trained-monkey.org>
+Date: Wed, 18 Dec 2024 16:54:30 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: Remove bouncing hippi list
+To: Simon Horman <horms@kernel.org>, linux@treblig.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241216165605.63700-1-linux@treblig.org>
+ <20241217105102.GR780307@kernel.org>
+Content-Language: en-US
+From: Jes Sorensen <jes@trained-monkey.org>
+In-Reply-To: <20241217105102.GR780307@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
+
+On 12/17/24 5:51 AM, Simon Horman wrote:
+> On Mon, Dec 16, 2024 at 04:56:05PM +0000, linux@treblig.org wrote:
+>> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+>>
+>> linux-hippi is bouncing with:
+>>
+>>  <linux-hippi@sunsite.dk>:
+>>  Sorry, no mailbox here by that name. (#5.1.1)
+>>
+>> Remove it.
+>>
+>> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> 
+> Thanks David,
+> 
+> I have no insight regarding how long this might have been the case.
+> But this seems entirely reasonable to me.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+
+Yes sunsite.dk has been gone for at least a decade
+
+Acked-by: Jes Sorensen <jes@trained-monkey.org>
 
 
-
-On December 18, 2024 4:26:37 AM PST, Alexandra Winter <wintera@linux=2Eibm=
-=2Ecom> wrote:
->
->I had to shorten the CC-List to get this message through our mailserver, =
-sorry about that=2E
->
->On 17=2E12=2E24 03:34, Kees Cook wrote:
->> diff --git a/net/iucv/af_iucv=2Ec b/net/iucv/af_iucv=2Ec
->> index 7929df08d4e0=2E=2E2612382e1a48 100644
->> --- a/net/iucv/af_iucv=2Ec
->> +++ b/net/iucv/af_iucv=2Ec
->> @@ -848,14 +848,14 @@ static int iucv_sock_accept(struct socket *sock, =
-struct socket *newsock,
->>  	return err;
->>  }
->> =20
->> -static int iucv_sock_getname(struct socket *sock, struct sockaddr *add=
-r,
->> -			     int peer)
->> +static int iucv_sock_getname(struct socket *sock,
->> +			     struct sockaddr_storage *addr, int peer)
->>  {
->>  	DECLARE_SOCKADDR(struct sockaddr_iucv *, siucv, addr);
->>  	struct sock *sk =3D sock->sk;
->>  	struct iucv_sock *iucv =3D iucv_sk(sk);
->> =20
->> -	addr->sa_family =3D AF_IUCV;
->> +	siucv->sa_family =3D AF_IUCV;
->
->
->This does not compile, it needs to be:
->siucv->siucv_family =3D AF_IUCV;
-
-Thanks! I saw 0-day reported the same=2E I've fixed this for the next revi=
-sion=2E Do you happen to know why this doesn't get built during an x86 allm=
-odconfig build?
-
--Kees
-
->
->> =20
->>  	if (peer) {
->>  		memcpy(siucv->siucv_user_id, iucv->dst_user_id, 8);
->
->
->With this change feel free to add my=20
->Acked-by: Alexandra Winter <wintera@linux=2Eibm=2Ecom>
-
---=20
-Kees Cook
 
