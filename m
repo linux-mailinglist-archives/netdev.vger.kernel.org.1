@@ -1,179 +1,178 @@
-Return-Path: <netdev+bounces-152798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F539F5CEE
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:38:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4329F5CF2
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:42:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EEC616F35A
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 02:38:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41A82165C70
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 02:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EA85336D;
-	Wed, 18 Dec 2024 02:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2767F3597B;
+	Wed, 18 Dec 2024 02:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="j8PQZyJN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNx8VzIP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA506481AF
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494EC5695
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734489481; cv=none; b=c8H3HkwaWnOBUmqN/0Umypnhci8qxkVGNxuZUdxFVQc0KjmFSq7BDB0fJr5ubfWm+WHygooME3gZ+zgSGTi8UrGY7o9KFNpN1+rI9PPmIq2XyCpkk8LOouAOhP1vaRZoCvQnWuZRfkm7Bcc6SFMxl5YKW6XUeh+UD79wZH5ipcM=
+	t=1734489727; cv=none; b=KyQ0l/ZmZXjkEnerw/tDCoaLUfqcL9Hjz9515rkmwGIoC/nUufgrTxW4RGRpKdFJdnCjcfchTMFPQRp+wD4BcSfWNf71xZckkUf+SiSRen0xmsI5nXWwy63zs0qieiIygS8GqiuWn9zJMule3wxzFc/RKFC1Rzpv5ktopqPFRJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734489481; c=relaxed/simple;
-	bh=iMPPzW/fOg1yXbJy86HU8s3UQaJRbFNDDtnOn7pMfMo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TSOsWKyyhYl8k4oQDAW7UFUjVMZbcySNQwhcTM8sdI1Luh/8GdtA5hju/cgESnqVEly25MdV1T2MvWszpSs8Yp42HRXCqwbNa0pyNz9GyJHkUSIP6+/RBxd+Yysz/MgujbNeuV4KfhJY9wkUjlNLe/Dwdx+wdUn/iLw8P9JLT2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=j8PQZyJN; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id B680E3F5AE
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 02:37:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1734489469;
-	bh=TFaVEYsO+0RIB0bo3fMP3mzQbKddwngJ+5DgQ8I1mWg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=j8PQZyJNhXEjGZZkDf9K2vbJoChZzguE7g+7c0J4+X1HA14VO9RJgoMS8ubgw17vw
-	 8dpiWVGZffinEcCej3XRxEf2j2nedv/rCePo9CqnjavRaTi6XOWuTa1AGJAhwrTAES
-	 ZF/78Fk33p2nmy5P8GevMeJNEl1TeC5CclrBAx0lZ46N5es2YBJnjlqC4X+2twJiZ2
-	 rQ5LH0TT1XEt/UZi6nIynxiizT6COKcVoXd7o4R4uTBdo/oi6PsBfiwaIqeno0DVZ9
-	 lmubwft8pGVvVyHTDn9rYpj2TeeNOV5X5NvM4rSOwc6uGbBj+/bOjyHAl71BSyz0wc
-	 eCLRPI1z8M/TA==
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2163dc0f689so90198305ad.1
-        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 18:37:49 -0800 (PST)
+	s=arc-20240116; t=1734489727; c=relaxed/simple;
+	bh=p/qllEYm/O9+QOpl3W0QztfSaLE990gb0E0dYuTsw7Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tBO7w9ZzP41MbdJkP1KOW20ahNzc4RGizMuBallERrHPR2G0rg1ZAsUNWVJjN9+lxOutKia3VMPp6KRYuoBjHLgqplXWhfxi/jixfEJAO1bmcgpKP8+/nutLb78uBxZKjmz6LKBcuQgA+9ekWS+Rz0se4ZkWDnfl/58U9r71noo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LNx8VzIP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734489724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8DqYaz+N5elcOwAwtpvizXidppUyzvLIH/DUCN6/cnc=;
+	b=LNx8VzIPxanxTkhmhv7qn6OAb71yglhwzOmFfv51/jJaYXg1ztsZVltrPX8a7nj8p7UD/p
+	D1woq6WWZZ6WSS6EIXg25B/W5M75pU/TRefyCZoNVU0RioneDeoSRPj/CVNRrLa4qbgmz3
+	U7LEBxW7LDfyL+S5aVNsW9bz6EU3RN8=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-600-a-hWFBDFOCGdRy553mxoNg-1; Tue, 17 Dec 2024 21:42:02 -0500
+X-MC-Unique: a-hWFBDFOCGdRy553mxoNg-1
+X-Mimecast-MFC-AGG-ID: a-hWFBDFOCGdRy553mxoNg
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ef7fbd99a6so5321222a91.1
+        for <netdev@vger.kernel.org>; Tue, 17 Dec 2024 18:42:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734489466; x=1735094266;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TFaVEYsO+0RIB0bo3fMP3mzQbKddwngJ+5DgQ8I1mWg=;
-        b=gZ/UsiWsw4ccTMJeKOi8KVxXQ9JFAmd5NUt+tR8IYyTqmLBzgsllw5rdDe4JXaoewp
-         dYd/Owaw/qGUGJsat/dZccqPN+mp6pkkqD09UxaDuj9jbkWmCnUs5/6AWN/twZ7P0kab
-         NZGARsKFx//H6advZLKhc5w8gimVz2/BXNw8IYSfhxqSWYLUbEE5iV4Y2CksRt6PcZfI
-         Lr7wAtb2O+rZXxhw5LwdnixGaiNeykPUqkH9I7zEAoIOxaqeOxS2dGI+xo5UlJYY7ddN
-         e490MVDDcTv3EpmDm8Lq/P3br4D9z0s12f4ypY8tTOV82eIMcwp5qon9KCm52QTBMMAX
-         Lviw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkOldchsZoJokPjnYuFtBgT1spF7c4Lzq9ucajwvoHACXpOKUaDEaV06zuameZBQgE+p0Zsus=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXjb+lU211mhf0Pwk2T0ZpXXU5pyrzdP+LiZjOJcm8BZqlQUS3
-	BUnFDzvhtWlvDMpBtypUFJVkgOGzOCVgvc4mshR3kWV8Skjq3RZ29dExO/ciwrVEtZR474SC4xd
-	+dLZlkqrBh2x/r+piyVy5ug2j2zggjllSgUVcQS6x5BQfJKzdsZbxKjad3RgyxoVkutUBWQ==
-X-Gm-Gg: ASbGncul9w2GtherwyEoWIzFmMBMHB7eZtasTbUa2N8ALx7WbGEJNmo3fPnSaEXcgbm
-	u+RUHDM0zpilQnjGVaWGbncrrnipYTDigtHezSHyrKuHNtGIRwjvvVANkD2cXx//hiJ3Ws39ACe
-	LISnxKHsvL+Nvwa0lyPYD15VUeTHPogm42KC7YZ6yoXZaplNSznY4UWyvnEeEhjrQ12YnpfqEsJ
-	k/muRZy6RlTREB+c8VuFyLG7Vp7wEBiCZ6vzdc+Xd51J8PKMimwEwPCRJvapuSl9JhkiRvdignF
-	uNteqLUfkA2WTmccgeeumblsyc/RGrF/YQKlvWwIajpRcVNlF6dX/dh/oLs=
-X-Received: by 2002:a17:903:234d:b0:216:4064:53ad with SMTP id d9443c01a7336-218d7258781mr20456585ad.48.1734489466667;
-        Tue, 17 Dec 2024 18:37:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFGnjXVQbSCPpcLEMs1vNBYJeTiWQaRdGDFeNo4OX7+T80FP/PD94tyzBKNkLNro+8IXcQ2nA==
-X-Received: by 2002:a17:903:234d:b0:216:4064:53ad with SMTP id d9443c01a7336-218d7258781mr20456265ad.48.1734489466357;
-        Tue, 17 Dec 2024 18:37:46 -0800 (PST)
-Received: from rickywu0421-ThinkPad-X1-Carbon-Gen-11.. (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219ce1b347fsm212475ad.78.2024.12.17.18.37.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 18:37:46 -0800 (PST)
-From: En-Wei Wu <en-wei.wu@canonical.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: vitaly.lifshits@intel.com,
-	Chia-Lin Kao <acelan.kao@canonical.com>
-Subject: [PATCH iwl-net v2] igc: return early when failing to read EECD register
-Date: Wed, 18 Dec 2024 10:37:42 +0800
-Message-ID: <20241218023742.882811-1-en-wei.wu@canonical.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1734489722; x=1735094522;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8DqYaz+N5elcOwAwtpvizXidppUyzvLIH/DUCN6/cnc=;
+        b=K2d6OZA+yhql/6YzPKkbIQxhk8P/R5dN5MibhDoAqsGayWn/UzmVQtRo2+zeuC/v+8
+         mBPj+pmJcxr/YIWYmUh+8U4U6qtvwJRV+3tEwedmkolxVfyJPTTfAwG/F/LV8vnqrfqS
+         XZ+hHmkexHdMyDtnxqqs5qlIyFzUQyRsCs243RH95u/usjmG9vcn6ZQoYvmx1vEW3hSW
+         LTW7CLKjcedDnSVKQldZt5h7auFRmjlbJWzua2Fb5dNCPeX5oJOwyP0z8WATai4r0JCG
+         53kJhzkxpUXz5ZuzleW9pKfDJVu7Aazco6Dxyc9CiYyE+s7ldJmW85IiR5sxH5EkgSTB
+         9EqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlmA/5/3CrJqmY6rmuX6sIzrBeSn07+yv5xx/dKleMxHCSK7a/v66LNmzsNfbulxj4n3FXOjI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgm18H3/EZ16UxFG0uqtPBNjCeWLhI5uwA5+kFTqMcQ/ndgn3s
+	Jp41NECxAhe4TQPzROh09KeUfz5o1JA8m8vJkYdV3+fWDRWX8J5kiVhtGPHcE1UzeGWzdNSa01h
+	+n8Qun00YOw9FJI6NlsCsUhRTIWYAj0vtCpAIfBCMyqCgNRACora5gkjQ/68l+rQeDf/97e8GKF
+	b2RbdxePQkbfGIPIGmTtAP3rrl/yXR
+X-Gm-Gg: ASbGncu5Xujc5nvN4BG070sl4LR43qoehTcF66h1p8gPy5Bd6eoBIHeda6p9kr3oJJF
+	wIWBLI0nIsuMY+DfosZHGx/H8yECcMhSqzkwbtg==
+X-Received: by 2002:a17:90b:384f:b0:2ee:d024:e4f7 with SMTP id 98e67ed59e1d1-2f2e8f53927mr1959610a91.0.1734489721858;
+        Tue, 17 Dec 2024 18:42:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHmsfz+qx+3bzXNatAF6YMYon4Uqw6IkTgAwLrfgD8l/ExEkp0gG57q4OuLtOJ9Ks29mQHR8iYVpoqHtx5gWQw=
+X-Received: by 2002:a17:90b:384f:b0:2ee:d024:e4f7 with SMTP id
+ 98e67ed59e1d1-2f2e8f53927mr1959579a91.0.1734489721450; Tue, 17 Dec 2024
+ 18:42:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241217135121.326370-1-edumazet@google.com> <20241217094106-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20241217094106-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 18 Dec 2024 10:41:50 +0800
+Message-ID: <CACGkMEvuseZoHcLrLH6d0UeK12nrA-n=Prg0wt=57BP0UbmpqQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] ptr_ring: do not block hard interrupts in ptr_ring_resize_multiple()
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
+	syzbot+f56a5c5eac2b28439810@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When booting with a dock connected, the igc driver may get stuck for ~40
-seconds if PCIe link is lost during initialization.
+On Tue, Dec 17, 2024 at 10:41=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
+> wrote:
+>
+> On Tue, Dec 17, 2024 at 01:51:21PM +0000, Eric Dumazet wrote:
+> > Jakub added a lockdep_assert_no_hardirq() check in __page_pool_put_page=
+()
+> > to increase test coverage.
+> >
+> > syzbot found a splat caused by hard irq blocking in
+> > ptr_ring_resize_multiple() [1]
+> >
+> > As current users of ptr_ring_resize_multiple() do not require
+> > hard irqs being masked, replace it to only block BH.
+> >
+> > Rename helpers to better reflect they are safe against BH only.
+> >
+> > - ptr_ring_resize_multiple() to ptr_ring_resize_multiple_bh()
+> > - skb_array_resize_multiple() to skb_array_resize_multiple_bh()
+> >
+> > [1]
+> >
+> > WARNING: CPU: 1 PID: 9150 at net/core/page_pool.c:709 __page_pool_put_p=
+age net/core/page_pool.c:709 [inline]
+> > WARNING: CPU: 1 PID: 9150 at net/core/page_pool.c:709 page_pool_put_unr=
+efed_netmem+0x157/0xa40 net/core/page_pool.c:780
+> > Modules linked in:
+> > CPU: 1 UID: 0 PID: 9150 Comm: syz.1.1052 Not tainted 6.11.0-rc3-syzkall=
+er-00202-gf8669d7b5f5d #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
+ Google 08/06/2024
+> > RIP: 0010:__page_pool_put_page net/core/page_pool.c:709 [inline]
+> > RIP: 0010:page_pool_put_unrefed_netmem+0x157/0xa40 net/core/page_pool.c=
+:780
+> > Code: 74 0e e8 7c aa fb f7 eb 43 e8 75 aa fb f7 eb 3c 65 8b 1d 38 a8 6a=
+ 76 31 ff 89 de e8 a3 ae fb f7 85 db 74 0b e8 5a aa fb f7 90 <0f> 0b 90 eb =
+1d 65 8b 1d 15 a8 6a 76 31 ff 89 de e8 84 ae fb f7 85
+> > RSP: 0018:ffffc9000bda6b58 EFLAGS: 00010083
+> > RAX: ffffffff8997e523 RBX: 0000000000000000 RCX: 0000000000040000
+> > RDX: ffffc9000fbd0000 RSI: 0000000000001842 RDI: 0000000000001843
+> > RBP: 0000000000000000 R08: ffffffff8997df2c R09: 1ffffd40003a000d
+> > R10: dffffc0000000000 R11: fffff940003a000e R12: ffffea0001d00040
+> > R13: ffff88802e8a4000 R14: dffffc0000000000 R15: 00000000ffffffff
+> > FS:  00007fb7aaf716c0(0000) GS:ffff8880b9300000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007fa15a0d4b72 CR3: 00000000561b0000 CR4: 00000000003506f0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > Call Trace:
+> >  <TASK>
+> >  tun_ptr_free drivers/net/tun.c:617 [inline]
+> >  __ptr_ring_swap_queue include/linux/ptr_ring.h:571 [inline]
+> >  ptr_ring_resize_multiple_noprof include/linux/ptr_ring.h:643 [inline]
+> >  tun_queue_resize drivers/net/tun.c:3694 [inline]
+> >  tun_device_event+0xaaf/0x1080 drivers/net/tun.c:3714
+> >  notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
+> >  call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
+> >  call_netdevice_notifiers net/core/dev.c:2046 [inline]
+> >  dev_change_tx_queue_len+0x158/0x2a0 net/core/dev.c:9024
+> >  do_setlink+0xff6/0x41f0 net/core/rtnetlink.c:2923
+> >  rtnl_setlink+0x40d/0x5a0 net/core/rtnetlink.c:3201
+> >  rtnetlink_rcv_msg+0x73f/0xcf0 net/core/rtnetlink.c:6647
+> >  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
+> >
+> > Fixes: ff4e538c8c3e ("page_pool: add a lockdep check for recycling in h=
+ardirq")
+> > Reported-by: syzbot+f56a5c5eac2b28439810@syzkaller.appspotmail.com
+> > Closes: https://lore.kernel.org/netdev/671e10df.050a0220.2b8c0f.01cf.GA=
+E@google.com/T/
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Cc: Jason Wang <jasowang@redhat.com>
+> > Cc: Michael S. Tsirkin <mst@redhat.com>
+>
+>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>
 
-This happens because the driver access device after EECD register reads
-return all F's, indicating failed reads. Consequently, hw->hw_addr is set
-to NULL, which impacts subsequent rd32() reads. This leads to the driver
-hanging in igc_get_hw_semaphore_i225(), as the invalid hw->hw_addr
-prevents retrieving the expected value.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-To address this, a validation check and a corresponding return value
-catch is added for the EECD register read result. If all F's are
-returned, indicating PCIe link loss, the driver will return -ENXIO
-immediately. This avoids the 40-second hang and significantly improves
-boot time when using a dock with an igc NIC.
-
-Log before the patch:
-[    0.911913] igc 0000:70:00.0: enabling device (0000 -> 0002)
-[    0.912386] igc 0000:70:00.0: PTM enabled, 4ns granularity
-[    1.571098] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCIe link lost, device now detached
-[   43.449095] igc_get_hw_semaphore_i225: igc 0000:70:00.0 (unnamed net_device) (uninitialized): Driver can't access device - SMBI bit is set.
-[   43.449186] igc 0000:70:00.0: probe with driver igc failed with error -13
-[   46.345701] igc 0000:70:00.0: enabling device (0000 -> 0002)
-[   46.345777] igc 0000:70:00.0: PTM enabled, 4ns granularity
-
-Log after the patch:
-[    1.031000] igc 0000:70:00.0: enabling device (0000 -> 0002)
-[    1.032097] igc 0000:70:00.0: PTM enabled, 4ns granularity
-[    1.642291] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCIe link lost, device now detached
-[    5.480490] igc 0000:70:00.0: enabling device (0000 -> 0002)
-[    5.480516] igc 0000:70:00.0: PTM enabled, 4ns granularity
-
-Fixes: ab4056126813 ("igc: Add NVM support")
-Cc: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
-Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
----
-Changes in v2:
-- Added "after" logs showing improved boot time
-- Fixed error code (use -ENXIO instead of -ENODEV)
-- Added error propagation in igc_get_invariants_base()
-- Added Fixes tag
-- Added [PATCH iwl-net] prefix
-- Changed original author from AceLan to En-Wei
-
- drivers/net/ethernet/intel/igc/igc_base.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
-index 9fae8bdec2a7..1613b562d17c 100644
---- a/drivers/net/ethernet/intel/igc/igc_base.c
-+++ b/drivers/net/ethernet/intel/igc/igc_base.c
-@@ -68,6 +68,10 @@ static s32 igc_init_nvm_params_base(struct igc_hw *hw)
- 	u32 eecd = rd32(IGC_EECD);
- 	u16 size;
- 
-+	/* failed to read reg and got all F's */
-+	if (!(~eecd))
-+		return -ENXIO;
-+
- 	size = FIELD_GET(IGC_EECD_SIZE_EX_MASK, eecd);
- 
- 	/* Added to a constant, "size" becomes the left-shift value
-@@ -221,6 +225,8 @@ static s32 igc_get_invariants_base(struct igc_hw *hw)
- 
- 	/* NVM initialization */
- 	ret_val = igc_init_nvm_params_base(hw);
-+	if (ret_val)
-+		goto out;
- 	switch (hw->mac.type) {
- 	case igc_i225:
- 		ret_val = igc_init_nvm_params_i225(hw);
--- 
-2.43.0
+Thanks
 
 
