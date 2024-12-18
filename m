@@ -1,81 +1,63 @@
-Return-Path: <netdev+bounces-152841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 139919F5F04
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 08:01:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95BAA9F5F3D
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 08:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D17CF1698AC
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 07:01:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B9FA188C66E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 07:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B1AF156C74;
-	Wed, 18 Dec 2024 07:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89AEB1586DB;
+	Wed, 18 Dec 2024 07:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1ZUQzKK"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VLzrkF6z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E6145005;
-	Wed, 18 Dec 2024 07:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855B014B077;
+	Wed, 18 Dec 2024 07:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734505307; cv=none; b=SaAxFn0v89mezRUo52wslkh9bGgoJzjAVL2pTQPHeIT2y70LFybrtL0TqVK+2uF7jg2stDB3s9cEE5bCrLPmVpxg7DyUWJdMd1gqOjQ0FyEQLCdcG4rQ8XYuPC3POEG5n0uI1F9ZDMgefTPaJae8S4xyxkfPw+Y+CwknoKrWPiw=
+	t=1734506738; cv=none; b=I4bI/cDwrPbSa9ZlXRYgzfS66fwNdeA9UnDFk3ZRGZl7OBTvSdWEpdvRahQo700QL9TLcHNB7mtXame8f5UM22U06hslwGL8W8yQYbwCjtkqOfF7l93k9yR9rotdh/i0SV7iR66CC/MuMjkkFovhybSPAQc6sj6eEAqdWOeY1Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734505307; c=relaxed/simple;
-	bh=8eXBVnXurdTuZsN7l/54KDApfOyeG95twbHS9PqgQos=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G6l1dua4uUBJXn/vwCABigZ4WHkFmVM4HNY+V/cTPHJkL8d/cySUxKjUbCiB+E2FrIsQOTgd6d8q5idyD+lLDU9Kzz/dt9w/p5urkg9AWp0sCfeEn2LDPDvQ2RGZg5khijwt+7ss8ApLdHpgY4B8gSktNLsyvW0uKlrzQdmzS5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1ZUQzKK; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3f65844deso10128377a12.0;
-        Tue, 17 Dec 2024 23:01:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734505304; x=1735110104; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=JNIZmW4+sPsBWP1BNqFNvrEC05c3x+qKrZPcfPqWLRM=;
-        b=V1ZUQzKKJLn8/JrvBRcqo6UyaFPAeyHNa/Ebv+RJOshxm0gBbA1aJmJHjyofzkadJ7
-         XTTlcTD+kFyKpbPrGYEOWdEWOwGV5f9mYR5y6E+z7yXq/NZhduBDo75iCfCO02FwJHK0
-         lqSG92yufrfVPvTHMrNQeIPzQl2MXf+EUzucgkeZtePjKlBzlGp9pmjKrWkgg48xuEWL
-         KI/xx9I8NiTv5fbRhiwTeQXdN3dWDzPAo3rEXFtrwUiIJyT+08GkD11GfAQmUJ+SCGke
-         5KXP0t4+bEeexDH0EfdhvjDUD4+pNWIbYCFzZgGXExiTYlwKtOlZJ/DHmMFuUigINJGa
-         bVBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734505304; x=1735110104;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JNIZmW4+sPsBWP1BNqFNvrEC05c3x+qKrZPcfPqWLRM=;
-        b=W6CtlNzI7GmOfNX18snUEwvxDYOI/SgnfXoz0pJG0YzKqJI6Zm5GeWjzvFtCRIB2na
-         uA31mPnECdPnFrojPJ0V9MsXhAV8zG/PfBC3dfIM40Kfb7nfzKKrGU8lAzM0hdgGnRDP
-         I92ZraCEY+hE425Mqy+jNhvmnYeKv+WZeY2Nse5fct1+DLGTHrLHA33OB/U27f3IMWY+
-         YHSfriMD72/YG89qtpWTzPanmD6aXrxofN66/ilfiECv2+ok7mv4yNdToyKjhNE9XCHl
-         lKwCD/Y+kM73rx6wiBcCUiQUuMyZHBquLMN0dfwBY5gHCGhvpZrJDDqLbbNm/UEvBP9z
-         bK4g==
-X-Forwarded-Encrypted: i=1; AJvYcCU+7dgHZNVsbCwcomiMDUeCm7/+ItfMOTIPlRlN24kDxRgRQl4l8fB3pEIs3jn4mlzSTe/u4YDHA8jm@vger.kernel.org, AJvYcCVWqOnRn1W9rXJr3TmrigUW75tui5cOQ21HvgHLPaT0x9Ng8q5+kdSAiQx7GRuuYhYZ9wZrNOe4@vger.kernel.org, AJvYcCWgrO+LfusmC9wLANawoq+mk7+N3boCUviJnvSaZQcSCSNO+7+nElECcBIGehIFYxsBp5lg6VKmEMiy+g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbQGVDCNyzc/iE7nkEYrzc1zfqOt7PSmOWl2xWqnbIM0LvvgXS
-	0/PMqwqr2gDvobin6BBSb6lObZlJmz8NmbYGzo+NQwPjkXIwOjyg
-X-Gm-Gg: ASbGnct1wKmC2cuWJLhU4PoZqDmij9At1bks43Zy/LM4HL0jGEyMh439Ax8GMEhQe6r
-	sygwo7op/d1bJYviPsMeQBE776q7pPadE3EOVNf45gdhee1JOMODdDvRoxVCc92oAqNBppqiiq3
-	3mYW2UkN5KIMWYk6GoxYvOe+Qtjew70S5BjmjyKF73p6txvOdjMHz3GY8WiH2LWLZdZgA207uCt
-	GIEaXslX+PgFnq0LfpXFH23Q4c07M98NJ9fkQtPV/MlgPMj9BBjthk2OXw/8ZYInzCsq7vTU72S
-	Pm2jORT65yg8XWaFr2aB/frrCdOscfLwrH3XFiUsfdePXF7kTQknGOp4F+VTMIf0ERC3X8fG4Fd
-	r4zAsuYyjq5rDkCb8L6uaUDLKhhRDfz5lETwGI5xyrzLMpg==
-X-Google-Smtp-Source: AGHT+IE/0DkKoSEm2CX6Xdm+66DT71x8C0s/CR05DI78SD6rzpWrEcjSpHcbGjGNaSJMXzscMoQcKQ==
-X-Received: by 2002:a17:907:7817:b0:aa6:aa8a:9088 with SMTP id a640c23a62f3a-aabf48f72d8mr126784566b.41.1734505303390;
-        Tue, 17 Dec 2024 23:01:43 -0800 (PST)
-Received: from ?IPV6:2a02:3100:af42:2600:dc26:da5a:209:facc? (dynamic-2a02-3100-af42-2600-dc26-da5a-0209-facc.310.pool.telefonica.de. [2a02:3100:af42:2600:dc26:da5a:209:facc])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aab963c54a0sm526400466b.181.2024.12.17.23.01.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2024 23:01:42 -0800 (PST)
-Message-ID: <950a7738-1308-46ee-b913-018c51db76b8@gmail.com>
-Date: Wed, 18 Dec 2024 08:01:40 +0100
+	s=arc-20240116; t=1734506738; c=relaxed/simple;
+	bh=Nyn2llNRgrE3c0TiG/8Iy4jQeqUsMO97SgApNunDDOQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=P4gLDCzHoWZEYqYCL8XLB7hPCW6gcF10Qyng9rFl+hFyDlD7fX+jR9/2v3YeYflUxaAHLorHEFPZWV3glz6TYe20fFAxG/87nH2TLNHRb9wkcy3KfWOu0ttBc0Z+A47tMp1F8xm6wGHiy1h1GQrGaD/E1WJI9cLDSrEfWeLEZTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=VLzrkF6z; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BI4sMAU001865;
+	Wed, 18 Dec 2024 07:25:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	3Z4W6jFrpDDtKiC9NIbf8Go6/NgQkWsIptmOlqe3R6s=; b=VLzrkF6zlkeksGy4
+	zV35pxH+tT0Ie3ewi/nR1stQr93QaUFly656LkqD7Z16hz6Hb1skufUYo+JfGlF/
+	H6TC1wmTEl8sjJh7PFcrlczgXbxFsGYH1NvFsPx1M8A2ge46Y84qQtbeqaVY5Mu7
+	Mb/3srZ6Zs3FDhsrG9zV9nnj3YcVwJsZhDjtBBukfi7goAWGrVTQOyV2euwHdkQu
+	m5HMQR63Aof7q38WCuSJDdtoz+F3DPRQiSoI9HM0wV0aTVJw262kYYjImsQ9Mco/
+	56HtpopJK9uipITuLvFPRJbbFJx6pBnfLpvizGWkYa1rI2s2Dfjcn+zdJHT4ryP5
+	rlaj1A==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43kqs3ga7r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Dec 2024 07:25:29 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BI7PSAe002277
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Dec 2024 07:25:28 GMT
+Received: from [10.253.15.72] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 17 Dec
+ 2024 23:25:25 -0800
+Message-ID: <aa1dcdf6-94a0-4922-83f0-3cf49516ac4f@quicinc.com>
+Date: Wed, 18 Dec 2024 15:25:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,112 +65,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net: phy: add phy_disable_eee
-To: Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, linux-omap@vger.kernel.org,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <5139374e-7151-4d0d-8ba9-9ec3d9b52f67@gmail.com>
- <fd51738c-dcd6-4d61-b8c5-faa6ac0f1026@gmail.com>
- <35e1ded5-e33f-4ea4-ab16-c460da402822@lunn.ch>
- <7f8d2b63-390d-4f7e-9ede-d28c7793538c@gmail.com>
- <35cd4b23-06fe-4ac8-99f2-5eb59ff275a4@lunn.ch>
+Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
+ node
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
+ <75fb42cc-1cc5-4dd3-924c-e6fda4061f03@quicinc.com>
+ <4a6a6697-a476-40f4-b700-09ef18e4ba22@lunn.ch>
+ <441f37f5-3c33-4c62-b3fe-728b43669e29@quicinc.com>
+ <4287c838-35b2-45bb-b4a2-e128b55ddbaf@lunn.ch>
+ <2e518360-be24-45d8-914d-1045c6771620@quicinc.com>
+ <31a87bd9-4ffb-4d5a-a77b-7411234f1a03@lunn.ch>
+ <581776bc-f3bc-44c1-b7c0-4c2e637fcd67@quicinc.com>
+ <174bd1a3-9faf-4850-b341-4a4cce1811cb@lunn.ch>
+ <d711ee4b-b315-4d34-86a6-1f1e2d39fc8d@quicinc.com>
+ <8acf4557-ac10-43f1-b1ab-7ae63f64401f@lunn.ch>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <35cd4b23-06fe-4ac8-99f2-5eb59ff275a4@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <8acf4557-ac10-43f1-b1ab-7ae63f64401f@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: A4ZjIu75VbPGB7_ca6tBmQcOQdnuVuo8
+X-Proofpoint-GUID: A4ZjIu75VbPGB7_ca6tBmQcOQdnuVuo8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=899 bulkscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0
+ adultscore=0 impostorscore=0 malwarescore=0 priorityscore=1501
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412180058
 
-On 17.12.2024 23:34, Andrew Lunn wrote:
-> On Tue, Dec 17, 2024 at 09:50:12PM +0100, Heiner Kallweit wrote:
->> On 17.12.2024 11:43, Andrew Lunn wrote:
->>>> @@ -2071,6 +2071,7 @@ void phy_advertise_eee_all(struct phy_device *phydev);
->>>>  void phy_support_sym_pause(struct phy_device *phydev);
->>>>  void phy_support_asym_pause(struct phy_device *phydev);
->>>>  void phy_support_eee(struct phy_device *phydev);
->>>> +void phy_disable_eee(struct phy_device *phydev);
+
+
+On 2024-12-17 18:18, Andrew Lunn wrote:
+> On Tue, Dec 17, 2024 at 10:26:15AM +0800, Yijie Yang wrote:
+>>
+>>
+>> On 2024-12-16 17:18, Andrew Lunn wrote:
+>>>> I intend to follow these steps. Could you please check if they are correct?
+>>>> 1. Add a new flag in DTS to inform the MAC driver to include the delay when
+>>>> configured with 'rgmii-id'. Without this flag, the MAC driver will not be
+>>>> aware of the need for the delay.
 >>>
->>> So we have three states:
+>>> Why do you need this flag?
 >>>
->>> MAC tells PHYLIB it does support EEE
->>> MAC tells PHYLIB it does not support EEE
->>> MAC says nothing.
+>>> If the phy-mode is rgmii-id, either the MAC or the PHY needs to add
+>>> the delay.
 >>>
->>> Do we really want this?
->>>
->>> For phylink, i think we have a nice new clean design and can say, if
->>> the MAC does not indicate it supports EEE, we turn it off in the
->>> PHY. For phylib, we have more of a mess, and there could be MACs
->>> actually doing EEE by default using default setting but with no user
->>> space control. Do we want to keep this, or should we say any MAC which
->>> does not call phy_support_eee() before phy_start() would have EEE
->>> disabled in the PHY?
->>>
->> The case "MAC says nothing" isn't desirable. However, if we did what
->> you mention, we'd silently change the behavior of several drivers,
->> resulting in disabled EEE and higher power consumption.
->> I briefly grepped the kernel source for phy_start() and found about
->> 70 drivers. Some of them have the phylib EEE call, and in some cases
->> like cpsw the MAC doesn't support EEE. But what remains is IMO too
->> many drivers where we'd change the behavior.
+>>> The MAC driver gets to see phy-mode first. If it wants to add the
+>>> delay, it can, but it needs to mask out the delays before passing
+>>> phy-mode to the PHY. If the MAC driver does not want to add the
+>>> delays, pass phy-mode as is the PHY, and it will add the delays.
+>>
+>> In this scenario, the delay in 'rgmii-id' mode is currently introduced by
+>> the MAC as it is fixed in the driver code. How can we enable the PHY to add
+>> the delay in this mode in the future (If we intend to revert to the most
+>> common approach of the Linux kernel)? After all, the MAC driver is unsure
+>> when to add the delay.
 > 
-> So for phylib, we keep with the three states. But phylink? Can we
-> disable EEE when the MAC says nothing?
+> You just take out the code in the MAC driver which adds the delay and
+> masks the phy-mode. 2ns should be 2ns delay, independent of who
+> inserts it. The only danger is, there might be some board uses a PHY
+> which is incapable of adding the 2ns delay, and such a change breaks
+> that board.
+
+Okay, I will follow your instructions:
+1. Change the phy-mode to 'rgmii-id'.
+2. Add the delay in the MAC driver.
+3. Mask the phy-mode before passing it to the PHY.
+
 > 
-Looking at patch 5 of Russell's series behavior doesn't change if
-pl->mac_supports_eee is false. So I think he also goes with the three
-states, at least initially, until all drivers using phylink have
-implemented the new phylink ops. AFAICS this affects about 25 drivers.
+> But i assume Qualcomm RDKs always make use of a Qualcomm PHY, there is
+> special pricing if you use the combination, so there is probably
+> little incentive to use somebody elses PHY. And i assume you can
+> quickly check all Qualcomm PHYs support RGMII delays. PHYs which don't
+> support RGMII delays are very rare, it just happened that one vendors
+> RDK happened to use one, so they ended up with delays in the MAC being
+> standard for their boards.
+> 
+
+Most Qualcomm MAC applications are actually paired with a third-party 
+PHY. I agree that the original author's PHY might not support adding the 
+delay. However, this assumption cannot be verified since the initial 
+code was uploaded from the internal code base.
 
 > 	Andrew
-Heiner
+> 
+
+-- 
+Best Regards,
+Yijie
+
 
