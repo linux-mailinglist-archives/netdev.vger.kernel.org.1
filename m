@@ -1,112 +1,79 @@
-Return-Path: <netdev+bounces-152908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41769F64AE
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 12:20:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A8E9F64B3
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 12:21:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F09091691DA
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:20:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9DEB166F63
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E0619F103;
-	Wed, 18 Dec 2024 11:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2CB919DFA7;
+	Wed, 18 Dec 2024 11:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CU7CEYZe"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="DE6liuZE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from va-2-44.ptr.blmpb.com (va-2-44.ptr.blmpb.com [209.127.231.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5686519939D;
-	Wed, 18 Dec 2024 11:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64A019E7D1
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 11:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734520631; cv=none; b=buRz31TjmmQ6k6xX6Jp908iu8CUtDIGvBTY0FcoD5Rj7n9DXo5kyPp9Oj3CUdAL7DIEFcr7184Lc06hQSLzq2VA8d8fo3saTxqowqT60SwpyeAwjAfFw+203+pKR0vM22OkMeDzEaUH16PiedJXUnAoBkpFNTMeyaxJXmvGX4Cw=
+	t=1734520784; cv=none; b=STrB56MqTLqOBIce8p3LPm58uLDmsB/bGxvrKx43+RJ4xIn2bIX8/DuZruX2rdwHVsbzkQfs5pFcqvw1z9hZVNhAjpe9IKQ07iiWMsdQzrxgJZONSyrXcvbVOrWvzeLUAvmxOKpjgI8xAfdad7fxphPFegNwqDw2i9fQ1IQv+d8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734520631; c=relaxed/simple;
-	bh=0g7ZRLLkMCnVxeqL6Z+cStGdJI030IIUaV0Fbw8B0sA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=i/JEnan5KUtWyLJvSD3pVAOktExgtT7dbkexvrHTgbuZjZXjd/3vGQpSQ02hbtaC/eeKuL7HFL5Mg95yW7tqjfHXv1WzW3cBvLJuLoBycnw8LJ+jEF1+4m8DqXZJ3YhJixsnRl5m4D1zUr7V9fslpdp1YUFnLsNacVdK3cQuWlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CU7CEYZe; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-436202dd730so45538145e9.2;
-        Wed, 18 Dec 2024 03:17:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734520627; x=1735125427; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1s+2TGeEw+GH8Eu09SMgINcA6qH0dwtnjAOICu4c8HI=;
-        b=CU7CEYZeN3w08TmQ8QZ3jPJuwIHp0orzLAjmJQmy+VFM3jpgPxKNfwyzhZ1zA21xO/
-         ZCCP5BPB6mek1dzLWxU0kAsY1WqdBDlpGeHvf48Grhnko3wELm7yTHADnxz8aSGc/O+X
-         Lc8I+FhAgqgi3Dqsi/0yLnKlKdw1uO0wbDV4YfDuZFvOzoUFboPf8zwPBCJpH7ThQQKc
-         Vd38j8lmtZmBcx3xBnyGqG/rTtRU2j6Vj1M/sLAc68odXoe5gfMlpxbXEFZD/im1l0uD
-         uxCvDt53pyYuHzcPXn0MkrvZdHrGzL8R7yfMHSf6DpHjIdHJ1ueq1KIqwKmJArx+TYGw
-         yaUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734520627; x=1735125427;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1s+2TGeEw+GH8Eu09SMgINcA6qH0dwtnjAOICu4c8HI=;
-        b=ZX6Gcvk4xaHokL7roXB9pTjtis9qRsVNpoS92Cis1iv+gAIMb2yd6JZmpIez4dpPbP
-         ylDpAtLPHOJ7AsCyJqk7QoM+Bp8UZMClmT4wO5mZyS93HO2p9doinLrgHa1lqAoI2nwY
-         fSGeHDcXdmiQ1p7zz8alwqi5woUAxlQt/6fdVCdDles1bE/IpOu2+cbf2X3cUQYo2Tvn
-         ppp2isFefv16k2VKSQFyHywfsIpCcTzQJVQvtiyWAoka2YyrqvZUh9NaXmOP+aJ7eccG
-         zWV8NjE7QeTVVSsP2+hAFxBtlV0TPXaS6NJHbsyrT4JxP6d05jCEbsgmCrKdiERWrv25
-         nnbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdtrhv9fCyg60VLTiV2/ekoRBUy0k5QEZnjslaaSP+xBB3MOYyfYfu4+NFp6I2fiKwzsPPX3STE+E=@vger.kernel.org, AJvYcCWug4Z3Q2QpbTTVbyqVXT1vgKK2/S9P+4gE7uwOzHr2qlkSvHDe+fandeZr6b2K5bvRkgfqowHG@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuXVZiKLW8JyjUM0Dl4HA0wflEE+A7kFQA+OdAXrLLQL0NhjAC
-	ea1wdTUgtjL/kzGvY/51bqPPwsvqmOg+rc6Q702AmgS5ZYYrtCdP
-X-Gm-Gg: ASbGnct96dk3AKx2PxNnBCq+bFacOX/w4T9nV4QuUPjeMKkSsuTmcbAeChLQNIRkklF
-	2mi5lcnXk/qq9apunx3s8fhby1AM3CxS3h3n2GPkU4GWTLlLIHfsIXb8k3iqz9ghE0Hio+Z+jln
-	gljyfY3wp9w8PLD+eVrlCr5PtdxKpkyC52w5MCnNw7j2WQ5PCn06VuSs8xafG+TgD11ENPqTMPQ
-	xtrUouY5+29y0DHnyCRSM7u6TOQB9XecJVoGI9/2e8srCc9vTQMHX84SaDT5lXc+/vHjPdhsL8W
-	YACAGLj2+/Rj66svB8yzRPUdpL2mcWhaiO+eP6GT2a5g
-X-Google-Smtp-Source: AGHT+IGBoPrBdALKcs8sjwLUrOoXT0m61mj/vt2coJ4TTQW73voS3kTZHbGhPxA1m5CgoU6fNToz6g==
-X-Received: by 2002:a05:600c:3ba8:b0:434:e8cf:6390 with SMTP id 5b1f17b1804b1-43655343c1cmr19812935e9.6.1734520627337;
-        Wed, 18 Dec 2024 03:17:07 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656afc163sm17040615e9.1.2024.12.18.03.17.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Dec 2024 03:17:06 -0800 (PST)
-Subject: Re: [PATCH v8 16/27] sfc: obtain root decoder with enough HPA free
- space
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
- <20241216161042.42108-17-alejandro.lucero-palau@amd.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <ccc0e0e5-b430-726f-ada4-5346c0e5a4ec@gmail.com>
-Date: Wed, 18 Dec 2024 11:17:06 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1734520784; c=relaxed/simple;
+	bh=1qLm6JPgKPZO9muCEuvJxTVCIXxa4+WAPicAbLW+iv8=;
+	h=From:Mime-Version:Content-Type:In-Reply-To:Subject:Date:To:Cc:
+	 Message-Id:References; b=Kq7E+1hXNKU76Bi774M17emXJjxXVhUv2jZMANQcCCH+Vw5eRas0Y0oeGYkJLAC+24uyEmmluWdM39BHB0xnoVGZhjYU7ryN83VSJIKnMpH/uJfo8MFKo1SRqo/nECRd4l5NcqVAjNVZ/stsuQNciif3oqdHi1O0MOFQJtXphjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=DE6liuZE; arc=none smtp.client-ip=209.127.231.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1734520776; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=xGslPPde6YE6gZGLLgXP+XJIr7j+Ka8aO4C2zSmkP0g=;
+ b=DE6liuZE0BOCUzyHkzn3exDRf0GMCFhhHt1bpDEmwHxzBdIMvFnMPAvU3J4yPBlswleKlQ
+ ryj76q09S137y8jLaXSt4NxyaWdoOoI21RSxVVG01xZLxxcy1AfV0zNZpgU1JUlbJkQGKC
+ K1/75VPBg3hOC+rSuKf3zG1ybhPlGWyAaOrU9lFdN+IUrVEDy43KSzEi1PHGZO30ruSR22
+ zh/8T1e4hXh3k1O+Gvx678pxu4eAMPKmUGT3B9kmonAYl55mMVHVHYKe8vkQvCWUqaaGcr
+ zVsDFsJAP109cFUV5qi1IEawBcj9RKfwajVL87Y0XcUDvQPSZsM7aK0vhrLG6Q==
+X-Lms-Return-Path: <lba+26762afc6+8c6a49+vger.kernel.org+tianx@yunsilicon.com>
+From: "tianx" <tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20241216161042.42108-17-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <e1b54362-7156-4515-af54-e71aabd6c198@lunn.ch>
+Subject: Re: [PATCH 14/16] net-next/yunsilicon: add ndo_get_stats64
+Date: Wed, 18 Dec 2024 19:19:32 +0800
+X-Original-From: tianx <tianx@yunsilicon.com>
+User-Agent: Mozilla Thunderbird
+To: "Andrew Lunn" <andrew@lunn.ch>
+Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <weihg@yunsilicon.com>
+Received: from [127.0.0.1] ([116.231.104.97]) by smtp.feishu.cn with ESMTPS; Wed, 18 Dec 2024 19:19:33 +0800
+Message-Id: <e9959d98-f46d-4562-9c8e-ac48859e8e45@yunsilicon.com>
+References: <20241209071101.3392590-15-tianx@yunsilicon.com> <e1b54362-7156-4515-af54-e71aabd6c198@lunn.ch>
 
-On 16/12/2024 16:10, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Asking for available HPA space is the previous step to try to obtain
-> an HPA range suitable to accel driver purposes.
-> 
-> Add this call to efx cxl initialization.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+Agreed, probe code doesn't need that level of attention. This have been 
+modified in v1 code. Thanks for the reminder!
 
-Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+
+On 2024/12/9 21:53, Andrew Lunn wrote:
+>> +	adapter->stats = kvzalloc(sizeof(*adapter->stats), GFP_KERNEL);
+>> +	if (unlikely(!adapter->stats))
+>> +		goto err_detach;
+>> +
+> Please only use unlikely() in the hot path, handling packets.
+>
+> Does it really matter if you save a couple of cycles during probe?
+>
+>       Andrew
 
