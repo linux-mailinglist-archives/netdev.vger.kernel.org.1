@@ -1,87 +1,104 @@
-Return-Path: <netdev+bounces-152829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9EF9F5DA7
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:58:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C35949F5DB7
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 05:10:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32E2316CBDE
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 03:58:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5F997A1440
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 04:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A426314A62A;
-	Wed, 18 Dec 2024 03:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC1314A4C1;
+	Wed, 18 Dec 2024 04:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJdAkXQv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwxEgtcM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E2B35963;
-	Wed, 18 Dec 2024 03:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FA8146D57;
+	Wed, 18 Dec 2024 04:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734494278; cv=none; b=SdKjfCfl8m7wgr7gmfJ+Gjr7N1Dk0fgknUz7jm/wM+iSd9JWcJF/NGnnslW7SzsJt0Ymzu7Q1GMK8mofZE2pAh4S3HpOpFKwdY/PfD/jfLEY7EYmJSoEKSRAeN5iKmaZf1av5MPu/ht28YYRkNIZyrOw/P/qf9gQLxnOeqFOUIQ=
+	t=1734495015; cv=none; b=r0vntD7mOrE55KxZ0swvzQFdbAL5WTEUgPv02njenKFO9UJ4GuIahQqANqsT+1LCpq51yjZ7nUGhJ4kqlctqQH4D5fjxo87fDmWNtcU4uuL4ZRHAfvMh4pRlpEdmLmJp7OgOxS6M8AsOdYhj8UgAjhe1VSEhOrPq0iKG5H0MA6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734494278; c=relaxed/simple;
-	bh=AAaWMipgujI54mRxelTa2hI1sK13puS+twLH4/fj78s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YJEZSbwx+Vin9kq1vTiPsGNZuCjyy8MYT6m5jL5TagmAT8v6liS1eMpf+tUgv0X+1+mLPbiSiFJEC8d3Bjf+ywtk1yNkSsYuhAzgzc2rkG2v+o923hpQLiNkSQnljd8bLleUo4nD1jUYUTESabuo+6cRqkE4CI+IZxCntsrOb/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJdAkXQv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65ECCC4CECE;
-	Wed, 18 Dec 2024 03:57:56 +0000 (UTC)
+	s=arc-20240116; t=1734495015; c=relaxed/simple;
+	bh=KAl13n8HQ94z5cQMCjy1pw/iGkTBRO8nMbyS+lZU+AE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bOLceUcI0x7EOpAbzN2LtGwmOcxtng9BuZcZdBdQm65sOQqn2nu8r4cZR2gZOvWB5ReZhOgkcwIfQ0mvgOwf8mr9IITFs6QQeaIzCHSeOmgwIX41LKraHUsP/RFeI5gf1Byp2hgePiU5RAzD/7ASRqsv+NrV6jMj2gUYI/2jghQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwxEgtcM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D75EC4CECE;
+	Wed, 18 Dec 2024 04:10:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734494277;
-	bh=AAaWMipgujI54mRxelTa2hI1sK13puS+twLH4/fj78s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nJdAkXQvkhrFyitkV631mPnxtthL1oeHgLC0Boqxf5JeIfe/GRBGRO2DiXPTCxRYP
-	 lmdfEO+m5T7wAGwNcdMsDdnLe5zOOtJum+aQuUqNxLkz0Vmn5Qcq0e+TF8ohdE1KBY
-	 zQGUHGtrMr506WuEkJ24Ih5XkNRu9ATYXaHWJaPf3c4aT5X4sozjIX+pJ4k6FetdWT
-	 ZZu568ZbubODIKpBBglaQ4EJ5sV/n1A8VOeE9g7Rybb+fWwEIsDYLKs+1jr/2oLUGX
-	 uGXV20T9yDbHYMrRJvtTnh5cxaPpU0mllA5YKfDQQK3gtQSvMaYGoVqVkrNYJ2R+Tp
-	 loqn87kFKpAeg==
-Date: Tue, 17 Dec 2024 19:57:55 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Divya Koppera <divya.koppera@microchip.com>, andrew@lunn.ch,
- arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next v7 2/5] net: phy: microchip_rds_ptp : Add rds
- ptp library for Microchip phys
-Message-ID: <20241217195755.2030f431@kernel.org>
-In-Reply-To: <Z2JFwh94o-X7HhP4@hoboy.vegasvil.org>
-References: <20241213121403.29687-1-divya.koppera@microchip.com>
-	<20241213121403.29687-3-divya.koppera@microchip.com>
-	<20241217192246.47868890@kernel.org>
-	<Z2JFwh94o-X7HhP4@hoboy.vegasvil.org>
+	s=k20201202; t=1734495015;
+	bh=KAl13n8HQ94z5cQMCjy1pw/iGkTBRO8nMbyS+lZU+AE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dwxEgtcMpEbgVAqlSO5vXkohnG9onYKPmYeMbvimpbFoLveej87G0sj7gPxnmQYyi
+	 eX7obxQp95IQPBxQpvxoGTxZnq0ZtuCsBy6TL2Oad5Tjfsgu7an4hiKjXSXjWQo4Eo
+	 g81GuARzkZjReDfmgcDEZS3U4ml5Eb2RR1iEs4Hif4jsf19wqtoVekYIsQ5Tm+uL+3
+	 Coggl9gQjy1cUzYoYopodrSPp9dnqV/WlOmeZVZIlBMrpmLSoIhcHcM1StNCycbiLl
+	 LJFPFSONGvx5iO+gWh7hYm+U6u4Mhxlut5qDlHbHEBBtwDm6d/SZRuoR+nxf4xV1ru
+	 1fhfGDGJaSk/A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ECEFF3806657;
+	Wed, 18 Dec 2024 04:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v1 0/6] lan78xx: Preparations for PHYlink
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173449503275.1173615.15384763618371407824.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Dec 2024 04:10:32 +0000
+References: <20241216120941.1690908-1-o.rempel@pengutronix.de>
+In-Reply-To: <20241216120941.1690908-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, woojung.huh@microchip.com, andrew+netdev@lunn.ch,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, phil@raspberrypi.org
 
-On Tue, 17 Dec 2024 19:47:14 -0800 Richard Cochran wrote:
-> > > +static int mchp_rds_ptp_ts_info(struct mii_timestamper *mii_ts,
-> > > +				struct kernel_ethtool_ts_info *info)
-> > > +{
-> > > +	struct mchp_rds_ptp_clock *clock = container_of(mii_ts,
-> > > +						      struct mchp_rds_ptp_clock,
-> > > +						      mii_ts);
-> > > +
-> > > +	info->phc_index =
-> > > +		clock->ptp_clock ? ptp_clock_index(clock->ptp_clock) : -1;  
-> > 
-> > under what condition can the clock be NULL?  
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 16 Dec 2024 13:09:35 +0100 you wrote:
+> This patch set is a third part of the preparatory work for migrating
+> the lan78xx USB Ethernet driver to the PHYlink framework. During
+> extensive testing, I observed that resetting the USB adapter can lead to
+> various read/write errors. While the errors themselves are acceptable,
+> they generate excessive log messages, resulting in significant log spam.
+> This set improves error handling to reduce logging noise by addressing
+> errors directly and returning early when necessary.
 > 
-> ptp_clock_register() can return PTR_ERR or null.
+> [...]
 
-Fair point. Since this is a PTP library module, and an optional one
-(patch 1 has empty wrappers for its API) - can we make it depend
-on PTP being configured in?
+Here is the summary with links:
+  - [net-next,v1,1/6] net: usb: lan78xx: Add error handling to lan78xx_get_regs
+    https://git.kernel.org/netdev/net-next/c/30c63abaee90
+  - [net-next,v1,2/6] net: usb: lan78xx: Use ETIMEDOUT instead of ETIME in lan78xx_stop_hw
+    https://git.kernel.org/netdev/net-next/c/18bdefe62439
+  - [net-next,v1,3/6] net: usb: lan78xx: Use action-specific label in lan78xx_mac_reset
+    https://git.kernel.org/netdev/net-next/c/7433d022b915
+  - [net-next,v1,4/6] net: usb: lan78xx: rename phy_mutex to mdiobus_mutex
+    https://git.kernel.org/netdev/net-next/c/3a59437ed907
+  - [net-next,v1,5/6] net: usb: lan78xx: remove PHY register access from ethtool get_regs
+    https://git.kernel.org/netdev/net-next/c/d09de7ebd4ab
+  - [net-next,v1,6/6] net: usb: lan78xx: Improve error handling in WoL operations
+    https://git.kernel.org/netdev/net-next/c/01e2f4d55bda
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
