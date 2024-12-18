@@ -1,301 +1,206 @@
-Return-Path: <netdev+bounces-152891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E86139F63D4
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:51:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FAE19F63D6
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 11:52:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EC6A7A5F0B
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:51:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E80E1166F22
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E372519F40A;
-	Wed, 18 Dec 2024 10:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5397B19C54B;
+	Wed, 18 Dec 2024 10:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="Ipd3VoqC"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="J+TLRNPy"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-1-31.ptr.blmpb.com (va-1-31.ptr.blmpb.com [209.127.230.31])
+Received: from va-2-55.ptr.blmpb.com (va-2-55.ptr.blmpb.com [209.127.231.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5BF19C554
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40E419D07A
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 10:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734519073; cv=none; b=FUPTrYReOLe0ZqZpfnxwyHkVbO+CtivJSXkYpe0UnhZr8zVP41+wPcz7r+sBBAYAUufO2B56+M9iD6osMbJxCbM4fGdOK4e4maHt6ipsPowBTz6xlTjCVEFk9M+tF7x+P8N6K1abtMSxaww3wToKj/HmkCSfptZOA2amZRlIRXc=
+	t=1734519071; cv=none; b=f44oNmKpqk7bw4RgXTSYlc4adZt3mO6991zlXYtWTNWoi8IdA+vwYAIT3M8VKIs2uEs+Bo4KgCUquLGtBOZ6127+qZUB+yPbqoLgOU2DAJiFtFM5xebVQWeQ0VzSeiBXDCLl8IKickis92eBdaa97VC07sqNahtVI7VNxKI8y0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734519073; c=relaxed/simple;
-	bh=TX6Gy8FuNv2O9v8S3ndgjnxS/qmF9rvsjVAVQBeWVME=;
-	h=Content-Type:Subject:References:Message-Id:Mime-Version:From:Date:
-	 In-Reply-To:To:Cc; b=COeyo11Vl+0uwRZn6ZqLsbHe4MCkoPPLtfppCDg2QzAfoC4JH3Z1T923Gb2F/a7mofZWHbXbuvmSNFJ27TMXeddRDzFBE7+P18OeSx42FPyFJ+HyKSc4dXlOfe+Y0pLeerqhmhWgnKePFsyLMJVHveMuS4OU26top5LUcdiM9f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=Ipd3VoqC; arc=none smtp.client-ip=209.127.230.31
+	s=arc-20240116; t=1734519071; c=relaxed/simple;
+	bh=0l3AAZLVj5xWQk6J0pQ9ySLPrExPsHKO1y5f/t11ZvY=;
+	h=Subject:Message-Id:Content-Type:From:Mime-Version:To:Cc:Date; b=Fp8D/P7fMpNm1cEBlKmHdcaxyxLnhCwQol8jMi9hjmhuEox4+yzzvdy4cQDW0cF0rmOBz0D416VYPfiQVts698qlE1TuYDf+Eqm3nO15zoGJnQuWZmYEycOy/LN3o/AnRNeKiiQHJFakzVkF+nld8BJ2NldRktRD+1PfqTcjK6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=J+TLRNPy; arc=none smtp.client-ip=209.127.231.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1734519061; h=from:subject:
+ s=feishu2403070942; d=yunsilicon.com; t=1734519064; h=from:subject:
  mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
  mime-version:in-reply-to:message-id;
- bh=fStwo9/n80bRvm8CEBmGAUxFP2stOibfwv4ZKMJ2+0k=;
- b=Ipd3VoqC7CQ57y+Tc5JyUvsLNnMayshYmYcEiKJEa7wrTjsR38s4KEGVT18IbKZ49jCOCa
- Fj1GYcsTPETe8zmNv92dZ7Ws/ErOytNuf2jXxbywX3DZ88NJFBJ/hqHyXzO6XDtIAkBug2
- ABAEnOeDscFm0BXvSZm2eoLcnXJqtMlaT/8L7J6lkE/cAqCj3pILz78zqupk/YjCVCw04M
- 7uKhrLhCk9L6D4JpdA6m7y2RI6k1l9nVfoxyIVttVnzghsLm94RXADzg2O1rdkfS2vWDVa
- AjZORZYnDSganJZYJBRgL+ErMvCEOIlYUJ6dH8rUW7A19U4dUB63hbHX6kG/kQ==
+ bh=FyuX+a3nlckv214je0Sg+p6w2lmUyuXh+qQCNIT3w3U=;
+ b=J+TLRNPyzq5ir2cgH75sUWEU3jEfRiXFKFgfn5IGm0chhfERofOEM8X7o9bkP4o1mNaYVO
+ KOK79e4uL3WEEnRAaCVG9N+o1QJDeiUP7U8obk5yMsqRCxzgApZHqHly6FaIwCluymczTC
+ mi3IYANJNFL4R9+fDUFHpVlF5RsmZfbQA1x0cmLzyS44Rp/HN0HUq33h7ZdEJTBmxfhnic
+ pXmBBmmi5Nuuc8Xt9RBfHXXXfrTkw8gr8Blln9H/JhafwahXWnh7sKTPtmcPzCOqjuqxhc
+ t2mWyr+/iNOnz3wZxKgLIUky3I1ZE+yGaI9bxO4QmfMcXKCPeuoZNBUNB2E4Bw==
+Subject: [PATCH v1 00/16] net-next/yunsilicon: ADD Yunsilicon XSC Ethernet Driver
+Message-Id: <20241218105023.2237645-1-tianx@yunsilicon.com>
 Content-Type: text/plain; charset=UTF-8
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
-Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Wed, 18 Dec 2024 18:50:59 +0800
-Subject: [PATCH v1 16/16] net-next/yunsilicon: Add change mtu
-References: <20241218105023.2237645-1-tianx@yunsilicon.com>
-X-Mailer: git-send-email 2.25.1
-X-Lms-Return-Path: <lba+26762a913+1ac5a7+vger.kernel.org+tianx@yunsilicon.com>
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241218105057.2237645-17-tianx@yunsilicon.com>
+From: "Xin Tian" <tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-From: "Xin Tian" <tianx@yunsilicon.com>
-Date: Wed, 18 Dec 2024 18:50:59 +0800
-In-Reply-To: <20241218105023.2237645-1-tianx@yunsilicon.com>
+X-Mailer: git-send-email 2.25.1
+Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Wed, 18 Dec 2024 18:51:01 +0800
 To: <netdev@vger.kernel.org>
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
 Cc: <andrew+netdev@lunn.ch>, <kuba@kernel.org>, <pabeni@redhat.com>, 
 	<edumazet@google.com>, <davem@davemloft.net>, 
 	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
 	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>
+Date: Wed, 18 Dec 2024 18:51:01 +0800
+X-Lms-Return-Path: <lba+26762a916+c43950+vger.kernel.org+tianx@yunsilicon.com>
+Content-Transfer-Encoding: 7bit
 
-Add ndo_change_mtu
+The patch series adds the xsc driver, which will support the Yuncilicon
+MS/MC/MV series of network devices.
 
- 
-Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
-Co-developed-by: Lei Yan <Jacky@yunsilicon.com>
-Signed-off-by: Xin Tian <tianx@yunsilicon.com>
----
- .../net/ethernet/yunsilicon/xsc/net/main.c    | 185 ++++++++++++++++++
- .../net/ethernet/yunsilicon/xsc/net/xsc_eth.h |   2 +
- 2 files changed, 187 insertions(+)
+The Yunsilicon MS/MC/MV series network cards provide support for both
+Ethernet and RDMA functionalities.
 
-diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/main.c b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
-index 6df7ed3bb..65d17d311 100644
---- a/drivers/net/ethernet/yunsilicon/xsc/net/main.c
-+++ b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
-@@ -1668,6 +1668,134 @@ static int xsc_eth_set_mac(struct net_device *netdev, void *addr)
- 	return 0;
- }
- 
-+static void xsc_eth_rss_params_change(struct xsc_adapter *adapter, u32 change, void *modify)
-+{
-+	struct xsc_core_device *xdev = adapter->xdev;
-+	struct xsc_rss_params *rss = &adapter->rss_param;
-+	struct xsc_eth_params *params = &adapter->nic_param;
-+	struct xsc_cmd_modify_nic_hca_mbox_in *in =
-+		(struct xsc_cmd_modify_nic_hca_mbox_in *)modify;
-+	u32 hash_field = 0;
-+	int key_len;
-+	u8 rss_caps_mask = 0;
-+
-+	if (xsc_get_user_mode(xdev))
-+		return;
-+
-+	if (change & BIT(XSC_RSS_RXQ_DROP)) {
-+		in->rss.rqn_base = cpu_to_be16(adapter->channels.rqn_base -
-+				xdev->caps.raweth_rss_qp_id_base);
-+		in->rss.rqn_num = 0;
-+		rss_caps_mask |= BIT(XSC_RSS_RXQ_DROP);
-+		goto rss_caps;
-+	}
-+
-+	if (change & BIT(XSC_RSS_RXQ_UPDATE)) {
-+		in->rss.rqn_base = cpu_to_be16(adapter->channels.rqn_base -
-+				xdev->caps.raweth_rss_qp_id_base);
-+		in->rss.rqn_num = cpu_to_be16(params->num_channels);
-+		rss_caps_mask |= BIT(XSC_RSS_RXQ_UPDATE);
-+	}
-+
-+	if (change & BIT(XSC_RSS_HASH_KEY_UPDATE)) {
-+		key_len = min(sizeof(in->rss.hash_key), sizeof(rss->toeplitz_hash_key));
-+		memcpy(&in->rss.hash_key, rss->toeplitz_hash_key, key_len);
-+		rss_caps_mask |= BIT(XSC_RSS_HASH_KEY_UPDATE);
-+	}
-+
-+	if (change & BIT(XSC_RSS_HASH_TEMP_UPDATE)) {
-+		hash_field = rss->rx_hash_fields[XSC_TT_IPV4_TCP] |
-+				rss->rx_hash_fields[XSC_TT_IPV6_TCP];
-+		in->rss.hash_tmpl = cpu_to_be32(hash_field);
-+		rss_caps_mask |= BIT(XSC_RSS_HASH_TEMP_UPDATE);
-+	}
-+
-+	if (change & BIT(XSC_RSS_HASH_FUNC_UPDATE)) {
-+		in->rss.hfunc = xsc_hash_func_type(rss->hfunc);
-+		rss_caps_mask |= BIT(XSC_RSS_HASH_FUNC_UPDATE);
-+	}
-+
-+rss_caps:
-+	if (rss_caps_mask) {
-+		in->rss.caps_mask = rss_caps_mask;
-+		in->rss.rss_en = 1;
-+		in->nic.caps_mask = cpu_to_be16(BIT(XSC_TBM_CAP_RSS));
-+		in->nic.caps = in->nic.caps_mask;
-+	}
-+}
-+
-+static int xsc_eth_modify_nic_hca(struct xsc_adapter *adapter, u32 flags)
-+{
-+	struct xsc_core_device *xdev = adapter->xdev;
-+	struct xsc_cmd_modify_nic_hca_mbox_in in = {};
-+	struct xsc_cmd_modify_nic_hca_mbox_out out = {};
-+	int err = 0;
-+
-+	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_MODIFY_NIC_HCA);
-+
-+	xsc_eth_rss_params_change(adapter, flags, &in);
-+	if (in.rss.caps_mask) {
-+		err = xsc_cmd_exec(xdev, &in, sizeof(in), &out, sizeof(out));
-+		if (err || out.hdr.status) {
-+			xsc_core_err(xdev, "failed!! err=%d, status=%u\n",
-+				     err, out.hdr.status);
-+			return -ENOEXEC;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int xsc_safe_switch_channels(struct xsc_adapter *adapter,
-+				    xsc_eth_fp_preactivate preactivate)
-+{
-+	struct net_device *netdev = adapter->netdev;
-+	int carrier_ok;
-+	int ret = 0;
-+
-+	adapter->status = XSCALE_ETH_DRIVER_CLOSE;
-+
-+	carrier_ok = netif_carrier_ok(netdev);
-+	netif_carrier_off(netdev);
-+	ret = xsc_eth_modify_nic_hca(adapter, BIT(XSC_RSS_RXQ_DROP));
-+	if (ret)
-+		goto close_channels;
-+
-+	xsc_eth_deactivate_priv_channels(adapter);
-+	xsc_eth_close_channels(adapter);
-+
-+	if (preactivate) {
-+		ret = preactivate(adapter);
-+		if (ret)
-+			goto out;
-+	}
-+
-+	ret = xsc_eth_open_channels(adapter);
-+	if (ret)
-+		goto close_channels;
-+
-+	xsc_eth_activate_priv_channels(adapter);
-+	ret = xsc_eth_modify_nic_hca(adapter, BIT(XSC_RSS_RXQ_UPDATE));
-+	if (ret)
-+		goto close_channels;
-+
-+	adapter->status = XSCALE_ETH_DRIVER_OK;
-+
-+	goto out;
-+
-+close_channels:
-+	xsc_eth_deactivate_priv_channels(adapter);
-+	xsc_eth_close_channels(adapter);
-+
-+out:
-+	if (carrier_ok)
-+		netif_carrier_on(netdev);
-+	xsc_core_dbg(adapter->xdev, "channels=%d, mtu=%d, err=%d\n",
-+		     adapter->nic_param.num_channels,
-+		     adapter->nic_param.mtu, ret);
-+	return ret;
-+}
-+
- static int xsc_eth_set_hw_mtu(struct xsc_core_device *xdev, u16 mtu, u16 rx_buf_sz)
- {
- 	struct xsc_set_mtu_mbox_in in;
-@@ -1693,12 +1821,69 @@ static int xsc_eth_set_hw_mtu(struct xsc_core_device *xdev, u16 mtu, u16 rx_buf_
- 	return ret;
- }
- 
-+static int xsc_eth_nic_mtu_changed(struct xsc_adapter *priv)
-+{
-+	u32 new_mtu = priv->nic_param.mtu;
-+	int ret;
-+
-+	ret = xsc_eth_set_hw_mtu(priv->xdev, XSC_SW2HW_MTU(new_mtu),
-+				 XSC_SW2HW_RX_PKT_LEN(new_mtu));
-+
-+	return ret;
-+}
-+
-+static int xsc_eth_change_mtu(struct net_device *netdev, int new_mtu)
-+{
-+	struct xsc_adapter *adapter = netdev_priv(netdev);
-+	int old_mtu = netdev->mtu;
-+	int ret = 0;
-+	int max_buf_len = 0;
-+
-+	if (new_mtu > netdev->max_mtu || new_mtu < netdev->min_mtu) {
-+		netdev_err(netdev, "%s: Bad MTU (%d), valid range is: [%d..%d]\n",
-+			   __func__, new_mtu, netdev->min_mtu, netdev->max_mtu);
-+		return -EINVAL;
-+	}
-+
-+	if (!xsc_rx_is_linear_skb(new_mtu)) {
-+		max_buf_len = adapter->xdev->caps.recv_ds_num * PAGE_SIZE;
-+		if (new_mtu > max_buf_len) {
-+			netdev_err(netdev, "Bad MTU (%d), max buf len is %d\n",
-+				   new_mtu, max_buf_len);
-+			return -EINVAL;
-+		}
-+	}
-+	mutex_lock(&adapter->status_lock);
-+	adapter->nic_param.mtu = new_mtu;
-+	if (adapter->status != XSCALE_ETH_DRIVER_OK) {
-+		ret = xsc_eth_nic_mtu_changed(adapter);
-+		if (ret)
-+			adapter->nic_param.mtu = old_mtu;
-+		else
-+			netdev->mtu = adapter->nic_param.mtu;
-+		goto out;
-+	}
-+
-+	ret = xsc_safe_switch_channels(adapter, xsc_eth_nic_mtu_changed);
-+	if (ret)
-+		goto out;
-+
-+	netdev->mtu = adapter->nic_param.mtu;
-+
-+out:
-+	mutex_unlock(&adapter->status_lock);
-+	xsc_core_info(adapter->xdev, "mtu change from %d to %d, new_mtu=%d, err=%d\n",
-+		      old_mtu, netdev->mtu, new_mtu, ret);
-+	return ret;
-+}
-+
- static const struct net_device_ops xsc_netdev_ops = {
- 	.ndo_open		= xsc_eth_open,
- 	.ndo_stop		= xsc_eth_close,
- 	.ndo_start_xmit		= xsc_eth_xmit_start,
- 	.ndo_get_stats64	= xsc_eth_get_stats,
- 	.ndo_set_mac_address	= xsc_eth_set_mac,
-+	.ndo_change_mtu		= xsc_eth_change_mtu,
- };
- 
- static void xsc_eth_build_nic_netdev(struct xsc_adapter *adapter)
-diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
-index 45d8a8cbe..3d0eb95af 100644
---- a/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
-+++ b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
-@@ -53,4 +53,6 @@ struct xsc_adapter {
- 	struct xsc_stats *stats;
- };
- 
-+typedef int (*xsc_eth_fp_preactivate)(struct xsc_adapter *priv);
-+
- #endif /* XSC_ETH_H */
+This submission is the first phase, which includes the PF-based Ethernet
+transmit and receive functionality. Once this is merged, we will submit
+additional patches to implement support for other features, such as SR-IOV,
+ethtool support, and a new RDMA driver.
+
+Changes v0->v1:
+1. name xsc_core_device as xdev instead of dev
+2. modify Signed-off-by tag to Co-developed-by
+3. remove some obvious comments
+4. remove unnecessary zero-init and NULL-init
+5. modify bad-named goto labels
+6. reordered variable declarations according to the RCT rule
+- Przemek Kitszel comments
+
+7. add MODULE_DESCRIPTION()
+- Jeff Johnson comments
+
+8. remove unnecessary dev_info logs
+9. replace these magic numbers with #defines in xsc_eth_common.h
+10. move code to right place
+11. delete unlikely() used in probe
+12. remove unnecessary reboot callbacks
+- Andrew Lunn comments
+
+
+Xin Tian (16):
+  net-next/yunsilicon: Add yunsilicon xsc driver basic framework
+  net-next/yunsilicon: Enable CMDQ
+  net-next/yunsilicon: Add hardware setup APIs
+  net-next/yunsilicon: Add qp and cq management
+  net-next/yunsilicon: Add eq and alloc
+  net-next/yunsilicon: Add pci irq
+  net-next/yunsilicon: Device and interface management
+  net-next/yunsilicon: Add ethernet interface
+  net-next/yunsilicon: Init net device
+  net-next/yunsilicon: Add eth needed qp and cq apis
+  net-next/yunsilicon: ndo_open and ndo_stop
+  net-next/yunsilicon: Add ndo_start_xmit
+  net-next/yunsilicon: Add eth rx
+  net-next/yunsilicon: add ndo_get_stats64
+  net-next/yunsilicon: Add ndo_set_mac_address
+  net-next/yunsilicon: Add change mtu
+
+ drivers/net/ethernet/Kconfig                  |    1 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/yunsilicon/Kconfig       |   26 +
+ drivers/net/ethernet/yunsilicon/Makefile      |    8 +
+ .../yunsilicon/xsc/common/xsc_auto_hw.h       |   94 +
+ .../ethernet/yunsilicon/xsc/common/xsc_cmd.h  | 2513 +++++++++++++++++
+ .../ethernet/yunsilicon/xsc/common/xsc_cmdq.h |  218 ++
+ .../ethernet/yunsilicon/xsc/common/xsc_core.h |  647 +++++
+ .../yunsilicon/xsc/common/xsc_device.h        |   77 +
+ .../yunsilicon/xsc/common/xsc_driver.h        |   25 +
+ .../ethernet/yunsilicon/xsc/common/xsc_pp.h   |   38 +
+ .../net/ethernet/yunsilicon/xsc/net/Kconfig   |   16 +
+ .../net/ethernet/yunsilicon/xsc/net/Makefile  |    9 +
+ .../net/ethernet/yunsilicon/xsc/net/main.c    | 2180 ++++++++++++++
+ .../net/ethernet/yunsilicon/xsc/net/xsc_eth.h |   58 +
+ .../yunsilicon/xsc/net/xsc_eth_common.h       |  239 ++
+ .../ethernet/yunsilicon/xsc/net/xsc_eth_rx.c  |  608 ++++
+ .../yunsilicon/xsc/net/xsc_eth_stats.c        |   42 +
+ .../yunsilicon/xsc/net/xsc_eth_stats.h        |   33 +
+ .../ethernet/yunsilicon/xsc/net/xsc_eth_tx.c  |  310 ++
+ .../yunsilicon/xsc/net/xsc_eth_txrx.c         |  185 ++
+ .../yunsilicon/xsc/net/xsc_eth_txrx.h         |   90 +
+ .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.c  |  109 +
+ .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.h  |  207 ++
+ .../net/ethernet/yunsilicon/xsc/net/xsc_pph.h |  176 ++
+ .../ethernet/yunsilicon/xsc/net/xsc_queue.h   |  230 ++
+ .../net/ethernet/yunsilicon/xsc/pci/Kconfig   |   16 +
+ .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   10 +
+ .../net/ethernet/yunsilicon/xsc/pci/alloc.c   |  225 ++
+ .../net/ethernet/yunsilicon/xsc/pci/alloc.h   |   15 +
+ .../net/ethernet/yunsilicon/xsc/pci/cmdq.c    | 2000 +++++++++++++
+ drivers/net/ethernet/yunsilicon/xsc/pci/cq.c  |  151 +
+ drivers/net/ethernet/yunsilicon/xsc/pci/cq.h  |   14 +
+ drivers/net/ethernet/yunsilicon/xsc/pci/eq.c  |  345 +++
+ drivers/net/ethernet/yunsilicon/xsc/pci/eq.h  |   46 +
+ drivers/net/ethernet/yunsilicon/xsc/pci/hw.c  |  269 ++
+ drivers/net/ethernet/yunsilicon/xsc/pci/hw.h  |   18 +
+ .../net/ethernet/yunsilicon/xsc/pci/intf.c    |  279 ++
+ .../net/ethernet/yunsilicon/xsc/pci/intf.h    |   22 +
+ .../net/ethernet/yunsilicon/xsc/pci/main.c    |  426 +++
+ .../net/ethernet/yunsilicon/xsc/pci/pci_irq.c |  427 +++
+ .../net/ethernet/yunsilicon/xsc/pci/pci_irq.h |   14 +
+ drivers/net/ethernet/yunsilicon/xsc/pci/qp.c  |  189 ++
+ drivers/net/ethernet/yunsilicon/xsc/pci/qp.h  |   15 +
+ .../net/ethernet/yunsilicon/xsc/pci/vport.c   |  102 +
+ 45 files changed, 12723 insertions(+)
+ create mode 100644 drivers/net/ethernet/yunsilicon/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_auto_hw.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_cmd.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_cmdq.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_device.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_driver.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_pp.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/main.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_common.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_rx.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_stats.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_stats.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_tx.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_txrx.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_txrx.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_pph.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_queue.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cq.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cq.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/eq.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/eq.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/intf.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/intf.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/pci_irq.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/pci_irq.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/qp.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/qp.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/vport.c
+
 -- 
 2.43.0
 
