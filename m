@@ -1,70 +1,75 @@
-Return-Path: <netdev+bounces-152960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B639F6721
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:21:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D707B9F671F
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:21:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 221A8189497F
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:18:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3C2F1722BF
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3461ACED2;
-	Wed, 18 Dec 2024 13:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA841BEF7A;
+	Wed, 18 Dec 2024 13:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jx5bD0xF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jUJJ0dYG"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E981ACEB0
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE45B1C5CC9
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 13:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734527575; cv=none; b=s9FFF076W7b4PkoUhgnba6Gwv+MgJ5PWQeoSw+QlZQvHAI3Adv8Fww61xiFbYCJvQv4iU+3kAqlbN6nHihTXpvr+NvOFoTqZOhnq9/PbX0LEJNSTYWGqoN6wd2x+S8KeDtoMTMyB9UwChR9Shq/K7Twy+nINNN4dVVk2e6jukF0=
+	t=1734527601; cv=none; b=Nt90/GfwQj9KgrbmKlNhoA2vi7HemGZsqm9jv5z0qSD/ViFtHen1uz6vG/HhGOCLBbm5Lbv9iAMMnx2FZxg74Z0qpnvJ5dGNC2rnhfQMcBrqUjsf09ftyFkmL0+14GtYgGR1Hd32C73ANdO4VbrC0KmFfLtOwNhYm1hpliN2zaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734527575; c=relaxed/simple;
-	bh=Lv2CDgoXs13IOcxlzHVU5MTFI+KJ6mbBs57kYxXXYVc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y0QfdD+BLbgKDfOySDtXfjC3/H0TQQsjYGXsVHbswvhJmR/qlTsO0CgZlA6d/yBkKqpVgaIyl5CbAiOif1t6NF099mvmxNlDhfmaS8Y/J895vyfwQxj4pchkwHcawNrfOoGUcbf+S7mP3mnXmbU+fFOD8OTBfjKmC78CzvxT4tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jx5bD0xF; arc=none smtp.client-ip=192.198.163.16
+	s=arc-20240116; t=1734527601; c=relaxed/simple;
+	bh=RiM0PsOgUFlrINJbsCWgonnbsteTL2ePM2B3IzPf8/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Hn1ptJcrBozvVkzHBZX3KAkfrN4oPo1iPDTXdWhwB/rvKxho2HxP+NND6YL+PYNZpyAT02N0bwtMvK5CsHKyB2Cp54YYhPplHzJHhXC8JLo5TelKthqBJOM5MjT9GWwlUdPyW1nkDNQ6xnbWIJrA2ksIecABpjAvPOYGYqUt8k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jUJJ0dYG; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734527574; x=1766063574;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Lv2CDgoXs13IOcxlzHVU5MTFI+KJ6mbBs57kYxXXYVc=;
-  b=Jx5bD0xFKPEoiQF+lpBQ4Mf5g8dhzVSz6ylKk0t+v/c6EONbkf7qawHh
-   AeQZzSBHL6Huq/RLPPaa7DAsryfNitQglJsQBvpMhOotzXgCkubZKMW5e
-   feqbcQU6kzS+DPEfmYLosPNud3NeI6QzEIE+Wizf/rJdDXtEr2dth+hWR
-   6YCMxKw8UIpNacIFQ1hUkK1VNpGzLMvPCK4u8FURIo4etlqJhSUqEq21o
-   a4iD+kw27NcME/o/LZ0UdpAiRybogYuFAcTKx4KasZlAls2FqoSwfdB+z
-   O8JZPM/aP8zcYkaGSx3F/0pBYMUCtv4+vjGaeHSfSLQHdUsD6ZLRIdmPD
-   A==;
-X-CSE-ConnectionGUID: 9IHBP5uUSXmIOI+PHeNiCA==
-X-CSE-MsgGUID: rCin4V3uSd6V3YerfjQvwQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="22589566"
+  t=1734527600; x=1766063600;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=RiM0PsOgUFlrINJbsCWgonnbsteTL2ePM2B3IzPf8/w=;
+  b=jUJJ0dYGx3k64f8qVEQZa4WG7ToQrLTV68k6GqsXlO5CsDRCHS4Ik2bl
+   epVa/9d5Fhk6S3Son22PiUlUnuPHqDfFdK8biKFEqhKFejOThdxZaT9Wm
+   AB7YASjyV6SP5RCOKKTljUajWxVhaQsNYSuRmFboUN0eJcGHAF7Q/BS5M
+   5zRZ58e2Ari/I+y1LII+wXqHp28Vff0TerjSQEAJ+Lg/H5kLet/SscE7B
+   GEqueNoNPe/SEa+6ODeC95rgmprt6kjwE1UOxV4v9GGCWqItIw4KMBIXg
+   Midpp9keBKMNAj82V+lqq1b4kqA3BzC2PCb/cJj7gW0IjvAygjEKmTFNf
+   Q==;
+X-CSE-ConnectionGUID: vVp93gHPT8yknlA/mKI4AA==
+X-CSE-MsgGUID: QQvXuHB1Tf+/YebhYODOUw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="22589659"
 X-IronPort-AV: E=Sophos;i="6.12,244,1728975600"; 
-   d="scan'208";a="22589566"
+   d="scan'208";a="22589659"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 05:12:53 -0800
-X-CSE-ConnectionGUID: PkDnewjFRvy4yFb6QUOuDw==
-X-CSE-MsgGUID: FDuqev5VRu67/fSfqDohMA==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 05:13:18 -0800
+X-CSE-ConnectionGUID: K4ZH83JEQBO4DtRxWliHTw==
+X-CSE-MsgGUID: LO7hICXLSMS/oVO9u4zcHw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="102471016"
+   d="scan'208";a="102471150"
 Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.245.118.127])
-  by fmviesa005.fm.intel.com with ESMTP; 18 Dec 2024 05:12:52 -0800
+  by fmviesa005.fm.intel.com with ESMTP; 18 Dec 2024 05:13:16 -0800
 From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Subject: [PATCH iwl-next v3 0/2] ixgbevf: Add support for Intel(R) E610 device
-Date: Wed, 18 Dec 2024 14:12:36 +0100
-Message-ID: <20241218131238.5968-1-piotr.kwapulinski@intel.com>
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Subject: [PATCH iwl-next v3 1/2] PCI: Add PCI_VDEVICE_SUB helper macro
+Date: Wed, 18 Dec 2024 14:12:37 +0100
+Message-ID: <20241218131238.5968-2-piotr.kwapulinski@intel.com>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241218131238.5968-1-piotr.kwapulinski@intel.com>
+References: <20241218131238.5968-1-piotr.kwapulinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,29 +78,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for Intel(R) E610 Series of network devices. The E610 is
-based on X550 but adds firmware managed link, enhanced security
-capabilities and support for updated server manageability.
+PCI_VDEVICE_SUB generates the pci_device_id struct layout for
+the specific PCI device/subdevice. Private data may follow the
+output.
 
-Piotr Kwapulinski (2):
-  PCI: Add PCI_VDEVICE_SUB helper macro
-  ixgbevf: Add support for Intel(R) E610 device
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+---
+ include/linux/pci.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
- drivers/net/ethernet/intel/ixgbevf/defines.h      |  5 ++++-
- drivers/net/ethernet/intel/ixgbevf/ixgbevf.h      |  6 +++++-
- drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 12 ++++++++++--
- drivers/net/ethernet/intel/ixgbevf/vf.c           | 12 +++++++++++-
- drivers/net/ethernet/intel/ixgbevf/vf.h           |  4 +++-
- include/linux/pci.h                               | 14 ++++++++++++++
- 6 files changed, 47 insertions(+), 6 deletions(-)
-
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index db9b47c..414ee5f 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -1046,6 +1046,20 @@ struct pci_driver {
+ 	.vendor = PCI_VENDOR_ID_##vend, .device = (dev), \
+ 	.subvendor = PCI_ANY_ID, .subdevice = PCI_ANY_ID, 0, 0
+ 
++/**
++ * PCI_VDEVICE_SUB - describe a specific PCI device/subdevice in a short form
++ * @vend: the vendor name
++ * @dev: the 16 bit PCI Device ID
++ * @subvend: the 16 bit PCI Subvendor ID
++ * @subdev: the 16 bit PCI Subdevice ID
++ *
++ * Generate the pci_device_id struct layout for the specific PCI
++ * device/subdevice. Private data may follow the output.
++ */
++#define PCI_VDEVICE_SUB(vend, dev, subvend, subdev) \
++	.vendor = PCI_VENDOR_ID_##vend, .device = (dev), \
++	.subvendor = (subvend), .subdevice = (subdev), 0, 0
++
+ /**
+  * PCI_DEVICE_DATA - macro used to describe a specific PCI device in very short form
+  * @vend: the vendor name (without PCI_VENDOR_ID_ prefix)
 -- 
-v1 -> v2
-  allow specifying the subvendor ("Subsystem Vendor ID" in the spec) in
-  the PCI_VDEVICE_SUB macro
-v2 -> v3
-  update IXGBE_SUBDEV_ID_E610_VF_HV to 0x00FF
-
 2.43.0
 
 
