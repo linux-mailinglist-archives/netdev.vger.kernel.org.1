@@ -1,118 +1,179 @@
-Return-Path: <netdev+bounces-152867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E86719F6106
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:10:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A5039F611E
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 10:12:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E028162C9E
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:10:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BA9E18879E9
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 09:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1CF192B95;
-	Wed, 18 Dec 2024 09:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75D01925A2;
+	Wed, 18 Dec 2024 09:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BF/Wq7Em"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="BQ4v/j/u"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD79192B83;
-	Wed, 18 Dec 2024 09:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EEC158208;
+	Wed, 18 Dec 2024 09:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734512883; cv=none; b=koOHmnQiu/9JrKDpXcVnXMVhGRXz9cwkuGHVLoZMcUNDzviHpv94oUMBBZk+ucRZ0Z6HxbPm15aPl69Y1fuk5jcvTWDI3qKi8NQZXMZn7A75wsm5luQW1HlGsfkJso+WnCDkaTz1nKV8kIbsU+T6yG7A2x1mq881BhRcTYESZyw=
+	t=1734513134; cv=none; b=df7UICZsumPFeZv+8IIXRbCypIeHJav4JO4x1mbFb1vCb8dJKOO2G7Ul+Su7yRR4R7yUW/0qgP9Yy/iuWqqp53x/Ueiv2znBlhOKOFCCAoGttJNc3hp2ozczZkCb0jKvNv/o89VJrS+fH8K2CJgZqHifxczKqKJnA08Qk795kL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734512883; c=relaxed/simple;
-	bh=16mMtJuOvxw8d3/oUHhHWZ1p+UqOMxaBYih6OxWvsg4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AnOoHo28yfhxUYGhE/RVc8YVSi8YjbYNzSLgoMWuDovf8j6VgHiVLCLn5xDLXb9eQecLODU4xnVBHO8eKcFhA2YKmvRDVu1NYo356ClBQO0Cz5Zxvn7vQY/buKgUyQEpptPmxiF40P8pwbX7EG83YAwd+DNUIKSCNsv/eOMe/Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BF/Wq7Em; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 125FD24000B;
-	Wed, 18 Dec 2024 09:07:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1734512878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oMuYYSNrGJHO3pOqsca4n7mxUQZgqKNB0TGOKm+gUDs=;
-	b=BF/Wq7Em1diblMfNugnFc3Vm9120IrW2mvjOs7goniIA9ErD5oztxF4gwJ8Z9c/YKZCYxc
-	mEWdKFqXn/CucYg6tE6F8+5WNLsPjsaIFJbaFuYNqfKWE2zdri32qy5faVdRZc0vprmjta
-	bVrBR+kfX7VJJ850BppGCWA1ZFL0i5BI+ifyu6zjfmREA/2gXO9PvuBJHZ5LwqafHJYtAN
-	C7bYJ52TMMzIMK3m8uc02GJ6IsC03ylg+xgY0PHEqpgCL+UzfbVb5Cu83pEvBgyYL7nP/w
-	NCo7hhVZlOt/KgDy5RYgckng1WM7uIig2hX6JRIbSLTbytIFpGa/kpB757oPUg==
-Date: Wed, 18 Dec 2024 10:07:56 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- syzbot+a344326c05c98ba19682@syzkaller.appspotmail.com,
- thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next] net: ethtool: Fix suspicious rcu_dereference
- usage
-Message-ID: <20241218100756.30de216b@kmaincent-XPS-13-7390>
-In-Reply-To: <CANn89iJcQis_1u5PyBn6gPhge1r6SsVicCCywKeVTrjn9o83_g@mail.gmail.com>
-References: <20241217140323.782346-1-kory.maincent@bootlin.com>
-	<CANn89iJ3sax3eRDPCF+sgk4FQzTn45eFuz+c+tE9sD+gE_f4jA@mail.gmail.com>
-	<20241217181712.049b5524@kmaincent-XPS-13-7390>
-	<CANn89iJcQis_1u5PyBn6gPhge1r6SsVicCCywKeVTrjn9o83_g@mail.gmail.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1734513134; c=relaxed/simple;
+	bh=m1nH9k1mfGAKPFfwMW45ncE2Y8cDxmK05/T/+o2NdFY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jHftCTBrVq74uFeeWHeG1Fu/jezL5chIVi1ajDwK9inwR304Wm0GZELULiOoSuegsh3sUDVYaSDUYs3McDfM2jEuLv+++QMkT5y+/OJuKcXLE4d0Bl/5fiE6K2LmlzsgEbuSvKD1zsazat707Dipm2NCgMbtdPZSEAi7ZRgZLgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=BQ4v/j/u; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1734512974;
+	bh=oSmadU8r0m/jAstE7lBKy2o54FyM5MvoTj7czqiYO4Y=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=BQ4v/j/uUMScDCAzrIEmC+8R+DfMkcHVHNwkJCPULPijoB2qO4PLHMmHMAHl6mnLn
+	 by8LwSerGGRp658O36mVTSR3OBPDlSANJD1nASyh6uFcNWKyy0781ziXrqX4KW1TH2
+	 a1DZE12H3O2sWI2T3GbLwTzdyMevzUtWXEG8JKx4=
+X-QQ-mid: bizesmtpip4t1734512924ta12gj3
+X-QQ-Originating-IP: dKoav+z8nrulxgB/v6xyTXVff+GrvYyc2HS0hpJYez8=
+Received: from localhost.localdomain ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 18 Dec 2024 17:08:37 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 8655085733377736607
+From: WangYuli <wangyuli@uniontech.com>
+To: nbd@nbd.name,
+	lorenzo@kernel.org,
+	ryder.lee@mediatek.com,
+	shayne.chen@mediatek.com,
+	sean.wang@mediatek.com,
+	kvalo@kernel.org,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	alexander.deucher@amd.com,
+	gregkh@linuxfoundation.org,
+	rodrigo.vivi@intel.com
+Cc: linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	raoxu@uniontech.com,
+	guanwentao@uniontech.com,
+	zhanjun@uniontech.com,
+	cug_yangyuancong@hotmail.com,
+	lorenzo.bianconi@redhat.com,
+	kvalo@codeaurora.org,
+	sidhayn@gmail.com,
+	lorenzo.bianconi83@gmail.com,
+	sgruszka@redhat.com,
+	keescook@chromium.org,
+	markus.theil@tu-ilmenau.de,
+	gustavoars@kernel.org,
+	stf_xl@wp.pl,
+	romain.perier@gmail.com,
+	apais@linux.microsoft.com,
+	mrkiko.rs@gmail.com,
+	oliver@neukum.org,
+	woojung.huh@microchip.com,
+	helmut.schaa@googlemail.com,
+	mailhol.vincent@wanadoo.fr,
+	dokyungs@yonsei.ac.kr,
+	deren.wu@mediatek.com,
+	daniel@makrotopia.org,
+	sujuan.chen@mediatek.com,
+	mikhail.v.gavrilov@gmail.com,
+	stern@rowland.harvard.edu,
+	linux-usb@vger.kernel.org,
+	leitao@debian.org,
+	dsahern@kernel.org,
+	weiwan@google.com,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	andrew@lunn.ch,
+	leit@fb.com,
+	wang.zhao@mediatek.com,
+	chui-hao.chiu@mediatek.com,
+	lynxis@fe80.eu,
+	mingyen.hsieh@mediatek.com,
+	yn.chen@mediatek.com,
+	quan.zhou@mediatek.com,
+	dzm91@hust.edu.cn,
+	gch981213@gmail.com,
+	git@qrsnap.io,
+	jiefeng_li@hust.edu.cn,
+	nelson.yu@mediatek.com,
+	rong.yan@mediatek.com,
+	Bo.Jiao@mediatek.com,
+	StanleyYP.Wang@mediatek.com,
+	WangYuli <wangyuli@uniontech.com>
+Subject: [RESEND. PATCH] mt76: mt76u_vendor_request: Do not print error messages when -EPROTO
+Date: Wed, 18 Dec 2024 17:08:33 +0800
+Message-ID: <1E6ABDEA91ADAB1A+20241218090833.140045-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MbBTNOOgGymjBp86sgvxqBOtFIOA/TcHsfMJNuMKI3EXNtS7QBezWtI0
+	hg/RKrNMPHsOs9Oh1aU4BaE6d+xXrVWlRY8wkODdcala0D/xW0o6pJ3DcS9mtsdSw/AyZpk
+	cCumhSyTBHSB9ZQizW7III//YFYeFoXKDwit3jRvjZw4BP7PjE/Si+TNCxUPqzsL8bqXvVm
+	Tjm0bwGlnr+fa+/Wm0tnS8mQHEK48M43rgjY58EXwI61HjM6G2mh0332nSUFQo1u5cdNOvk
+	lPytHW9YTTPFuviSg64wzBWUeYm2HrqihMQQ+jwcydPN7FcETniPwVw0i26jGgP6AXJyivt
+	4IUbZYQbXHAAmKZq3qKcV9QUIA271BdtSSFCMZGljKpxCIi56GxrGv4nUHKRCxOqo1yVvTX
+	I5ZO/vVqkKt2d4goGDHrixYpXG4HPrW6Eula9SgNYy7/2JEt7i2WATzts2l+gTxtSpDll2Y
+	8dRSfuclbzoCYKzKZPcstMs+vSYAI5XJm5P8NQOQf1gy0MCxfSFJI124TgYHeDu8MLib+PE
+	yOC6zTCZFhx4RSvCE4tOmxZ8OVB2M/Ose9HJQit9sxi5PdEoXlVbC5YyWqdEFMDRpvvU6Iz
+	ulLxxlBjyAqJtXZ/svAmGUDtEpTnLD88hNinfR+VlgvqJb4dIcpGw9mjPKz7fBoi591Y06q
+	Rr1nwc1qi+wyeBv0Dx7tvRkp0pXiqWIq4wNdA5Dp5B8cDTNa0S9UPOBV86Ac8ri1LYNNUOo
+	GPDYfjQbgVYs61313HO7E/09Q9q8z6vZOenCAGuSuiwCltTHoG3T6Aa0okG2wwTFG+JBKf/
+	kXIdvotqu2a79LWVyG02GDiepHHUBBvHQBvVH9ceDPs1Om4pd9vXS3OodSHc59yOIGbqOlN
+	YrA2PFenbmI69rjfpRYlgbD+FV3McGATEmTZ0G2OYWY24N/QFz2UoEFlzPoksu7ANXfT2aI
+	roobMCPJ5BF+fZBlpV1EdTgybT51W/1AQb8qbN1lxt7uByg==
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+X-QQ-RECHKSPAM: 0
 
-On Tue, 17 Dec 2024 18:28:16 +0100
-Eric Dumazet <edumazet@google.com> wrote:
+When initializing the network card, unplugging the device will
+trigger an -EPROTO error, resulting in a flood of error messages
+being printed frantically.
 
-> On Tue, Dec 17, 2024 at 6:17=E2=80=AFPM Kory Maincent <kory.maincent@boot=
-lin.com>
-> wrote:
-> >
-> > On Tue, 17 Dec 2024 16:47:07 +0100
-> > Eric Dumazet <edumazet@google.com> wrote:
-> > =20
-> > > On Tue, Dec 17, 2024 at 3:03=E2=80=AFPM Kory Maincent <kory.maincent@=
-bootlin.com>
-> > > wrote: =20
->  [...] =20
-> > >
-> > > I have to ask : Can you tell how this patch has been tested ? =20
-> >
-> > Oh, it was not at all sufficiently tested. Sorry!
-> > I thought I had spotted the issue but I hadn't.
-> > =20
-> > > rcu is not held according to syzbot report.
-> > >
-> > > If rtnl and rcu are not held, lockdep will still complain. =20
-> >
-> > You are totally right.
-> > I may be able to see it with the timestamping kselftest. I will try. =20
->=20
-> syzbot has a repro that you can compile and run.
+Co-developed-by: Xu Rao <raoxu@uniontech.com>
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ drivers/net/wireless/mediatek/mt76/usb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Oh indeed, thanks for the pointer.
+diff --git a/drivers/net/wireless/mediatek/mt76/usb.c b/drivers/net/wireless/mediatek/mt76/usb.c
+index 58ff06823389..f9e67b8c3b3c 100644
+--- a/drivers/net/wireless/mediatek/mt76/usb.c
++++ b/drivers/net/wireless/mediatek/mt76/usb.c
+@@ -33,9 +33,9 @@ int __mt76u_vendor_request(struct mt76_dev *dev, u8 req, u8 req_type,
+ 
+ 		ret = usb_control_msg(udev, pipe, req, req_type, val,
+ 				      offset, buf, len, MT_VEND_REQ_TOUT_MS);
+-		if (ret == -ENODEV)
++		if (ret == -ENODEV || ret == -EPROTO)
+ 			set_bit(MT76_REMOVED, &dev->phy.state);
+-		if (ret >= 0 || ret == -ENODEV)
++		if (ret >= 0 || ret == -ENODEV || ret == -EPROTO)
+ 			return ret;
+ 		usleep_range(5000, 10000);
+ 	}
+-- 
+2.45.2
 
-> Make sure to build and use a kernel with
->=20
-> CONFIG_PROVE_LOCKING=3Dy
-
-Yes I did.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
