@@ -1,59 +1,78 @@
-Return-Path: <netdev+bounces-152995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4281A9F68C6
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:42:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D440A9F68D9
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 15:44:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C792172790
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:40:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F9E818987A9
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 14:42:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA6F1C173D;
-	Wed, 18 Dec 2024 14:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBFE31F0E21;
+	Wed, 18 Dec 2024 14:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="XVdx/QuC"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GNdiAf9m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A248D1F4E52
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E6D1E9B0D
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 14:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734532712; cv=none; b=FVRWVtILrAjE3pklA3V+FGXOraGsFzWJC28Ti9SCqWGSahWJfBLzbwoeGvaSd5pe+Bs4O99Euyix86R+XmY0U7KpO2OKHSaBkpymiqBLReh1yl4T2A6x6Ud9+1xG2lonqpVNeckm5VXuD3Wbw2GCO7kgaxuSUN9sC/4ROm7ZyyI=
+	t=1734532830; cv=none; b=AqaaO8LDw9Bn/qmzJgM3WMSwdtpOBnIiUl8M/Eq6l8G4weGNNK6CxZwp387pxtVawNpKeoyWJZ+yuH0bjJPZkYeGOYPi3aPyd6YKntk/1T4B0layUscj5mBJ9jgXIytJafQAFbkBMxRJEVmRQeUHzuf/euiuQN9CaLueXpzXKZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734532712; c=relaxed/simple;
-	bh=uMmFbVCTRat4dNYAiTug4x/Qd0svvTDndjbW0XaB/4o=;
+	s=arc-20240116; t=1734532830; c=relaxed/simple;
+	bh=NutV2UpKj6s7PqPNFOfGdNacIA0IVdXlKusPGgaLyHk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DAGw/4+hif3izRDl3JOsWKsqbUvg5gLtCmcBJbIMc86XB7+xSH5ToT1lUKo4KRtbr7BQ6E3dgdfTeKYeCIOcp4344sneB9nh/pPVJ5WMfWGngxjx3uqGRk1jEHYaQ6pk389nsKMgkR6ue3jXpAlMDxZTJEQH+Q0TNlRo0XHkG+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=XVdx/QuC; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tNvBz-004sgL-C7; Wed, 18 Dec 2024 15:38:27 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=c5x931FVhSQnVoyKesY6NH4T1m7uU8HBNGBaFotNpUk=; b=XVdx/QuCoR+zamfO8F8v/iTU26
-	aMq7Zn/9S3+Ni4oITjo5DJcCTNAPIsRfFyxfvgEhMFeihZ0F2RYITi5l6LZxzJ9q2/GtumgNtzdvR
-	yY8WuzsGS/Xz0hpAZrrPZzl9XjA7sMzOI3Odh6nMGSB3uac48dCRM7VFv+6zDMtN23Enr+E3tBjdg
-	S6R1NljzeGASWmDEfL2xSL3AGAKb1eCspkjE3udmH1q66KAQ1MQLWyNLG6IEc7ARZZtueelt1IhLt
-	QkGqJV781bx1E1sbaY61Yfd2gzmYbkRW7Mvtu1uxQ8cXY/BhZzKEj/EZVP1dts3S4Dmb1Am0b1n8b
-	4tkmiBpw==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tNvBt-0000xy-S8; Wed, 18 Dec 2024 15:38:22 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tNvBq-006Pgn-6N; Wed, 18 Dec 2024 15:38:18 +0100
-Message-ID: <03ae1a3e-9dde-4cb0-b617-b03bcaadab64@rbox.co>
-Date: Wed, 18 Dec 2024 15:38:17 +0100
+	 In-Reply-To:Content-Type; b=hwxnCXrUORG8MNPiMfuN7359Pp2hmfwM4Orow4jKZF5uouWpdkLP3UtOvmdUkpa668nEdOkaGr8tup3qu0WFT7R2wzlQUYQYsdd+G9rdZojETBOfuDl/kmZdizsPghxEurOslQ8BXrZrBxH+aa+hqqqpjZf/8rMVHssio/OiL+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GNdiAf9m; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a78b39034dso18746745ab.3
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 06:40:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734532827; x=1735137627; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AJDGOuIdnuxZMwEFopgwHkwjXajkMEZIhm8f0iRuciQ=;
+        b=GNdiAf9m06sL86/Eg4ULKAAtQIq5lElpM8xCMYTMqwIOY5dW6ZyK+M//PtxEhaL26K
+         t5st5UmxzBvcbkC4j47oMvQUhjRpgIZi5qCv2Bfa4ufxrXiA7Aj3AtHCDU1siGpxouGk
+         ne4BgAsCIXRgYreySZOfVLl/3Ef9kXG4s3UlX0F3pt/FzJrS5xqwEAntEF9wA3HJBF40
+         hPoPW04Uc6YCqJMtRCV4Pp5I6pKhiVDybjQm1mpX2GOl4UkQM0RofDxYE8wRTce2xOfr
+         miUWxfQHIRBfVybXqjC9nJ/iHP2LA3lhEMqrEEjRZoOGgioeR8jjj0QyLZcoW70Ug5eR
+         pS1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734532827; x=1735137627;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AJDGOuIdnuxZMwEFopgwHkwjXajkMEZIhm8f0iRuciQ=;
+        b=w+Pqq6YQ3p8J5jsKIi4tEm2Ya1/cs3PXshxHelbvyEqVXuhuTkiOTlwqmuEXmBduh8
+         ZDaiq/bpM9qBFDXqaU+F6fCj8zCXVrRGJMjmbBWmbjB+QWc38s53+ZWQagTwoFCoknbU
+         70V6GFsOty+1hQ1Gb1AesHg8HgrM6uCwRvvoagpPV2QYPSWeQLvEVnGiZRnFJA6OqJyG
+         31kdBzMS9SMOgfvQ/p340bhD/3VeCkFUeS5GqrDj1nO1C4Tb8NVvj/eX7ajUszyWEbRS
+         ViQZAzAFclAXtgWuNxohkj5aGpkMAb2mhvne9yasKJEsB6twT4RI5OqgCGZHGrSnLRBa
+         VGfw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOUAPjehB0J3PFgbs4J7IPrbhUsMuPuH4ZbuCe2QfN1doFSqxKAiGND+TW7SznteG+8788WKY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJ+5WyEkXTSkEwWh94OfDxuuEq4S36TbgzgOQPK2cbWm9EfyCb
+	4f6YJmFG8jp9VFJGSx4r7f8SsgcUHJ16ahuLDOwrqRSqGq5NnUoKvsZ1wXAKFHk=
+X-Gm-Gg: ASbGncuEcKJQT3thw8wfrb8gc0v8ve4QBJej74OjT6TmdPwXC6RXLljLxTJ6iLuJx2A
+	Hv2l782vZ6+XhJvOAP9UnQcHaIyVpi8zRetQ9Ucfj74IKOlT+pC/gb7cMQguzveuXzSn6wV0H0b
+	eIXox5anCxr7/vsPXHimmzLBPurSDdzOhnz5rkhs4DLcoLXl3YnuIrzhl6GFjIlGU073civMZ4K
+	2RKsqMWYnpyd/JuNkH5uEIfyiGBACxcxwtYsre8QX5VtcFVmBvm
+X-Google-Smtp-Source: AGHT+IF1xjYTetHQMKzb4AksPKutzVdeTKW8D1c5CoJVkGJ3rlE6ZV7s0twdl7FAByD4Ss36+SV8bQ==
+X-Received: by 2002:a05:6e02:3308:b0:3a7:a3a4:2d4b with SMTP id e9e14a558f8ab-3bdc1b2ac71mr28204275ab.14.1734532827048;
+        Wed, 18 Dec 2024 06:40:27 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3b24d8dc980sm26733005ab.67.2024.12.18.06.40.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Dec 2024 06:40:26 -0800 (PST)
+Message-ID: <25bcc402-623d-4449-aa48-82b809040f6d@kernel.dk>
+Date: Wed, 18 Dec 2024 07:40:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,35 +80,27 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/7] vsock/test: Tests for memory leaks
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Luigi Leonardi <leonardi@redhat.com>
-References: <20241218-test-vsock-leaks-v3-0-f1a4dcef9228@rbox.co>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20241218-test-vsock-leaks-v3-0-f1a4dcef9228@rbox.co>
+Subject: Re: [PATCH RESEND net-next v9 00/21] io_uring zero copy rx
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241218003748.796939-1-dw@davidwei.uk>
+From: Jens Axboe <axboe@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <20241218003748.796939-1-dw@davidwei.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/18/24 15:32, Michal Luczaj wrote:
-> Series adds tests for recently fixed memory leaks[1]:
-> 
-> commit d7b0ff5a8667 ("virtio/vsock: Fix accept_queue memory leak")
-> commit fbf7085b3ad1 ("vsock: Fix sk_error_queue memory leak")
-> commit 60cf6206a1f5 ("virtio/vsock: Improve MSG_ZEROCOPY error handling")
-> 
-> Patch 1/6 is a non-functional preparatory cleanup.
-> Patch 2/6 is a test suite extension for picking specific tests.
-> Patch 3/6 explains the need of kmemleak scans.
-> Patches 4-5-6 add the tests.
-> 
-> NOTE: Test in patch 6/6 ("vsock/test: Add test for MSG_ZEROCOPY completion
-> memory leak") may stop working even before this series is merged. See
-> changes proposed in [2]. The failslab variant would be unaffected. [...]
+For the io_uring bits:
 
-Bah, I've added one more patch: "vsock/test: Adapt send_byte()/recv_byte()
-to handle MSG_ZEROCOPY" and broke the numbering above, sorry.
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-Michal
-
+-- 
+Jens Axboe
 
