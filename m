@@ -1,164 +1,237 @@
-Return-Path: <netdev+bounces-152932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-152933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BE1B9F65DE
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:25:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77FDE9F65DF
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 13:25:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3687C1618F5
-	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 12:25:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B25C1621FE
+	for <lists+netdev@lfdr.de>; Wed, 18 Dec 2024 12:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D7B19F111;
-	Wed, 18 Dec 2024 12:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20CB1A0706;
+	Wed, 18 Dec 2024 12:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="V9lkXr95"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3kffD3x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D694719CD01
-	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 12:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B8E19CD01
+	for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 12:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734524715; cv=none; b=H8TfSUuQyhiAr47puNtNmF4lnzIgZYh4C/qXfXMMBHRXd7hCXR7jG8Jc5KJ5Hv7j/WvrkdOFEdLPasuV1EEcQ4By0VAuV/senxaAzv9+nKvCydLKJbmozou/gZd5rnszYkGd61DfngkzSZUND1PqIPGFf1itP90PapY2OFf/TKc=
+	t=1734524726; cv=none; b=PFPJ4ZLs1mQzWCd4anrRYvXilF2HLdU1omuvbbm62/d7A4Vl1nOZa4OnyGSqlo16k6/wxilpdqxJl1qZRqmLBJQ6wBbvvSyTR5xqiYtSknWfN3ujiI7hEZjj71BxeEaTBPnZWpyR6+hZ9ArIEqB/MEyTUdEpober880aTj8bNBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734524715; c=relaxed/simple;
-	bh=WAdidfifqCck/K5RDR49Wzv02UWwY6ooFoZfvj2xh3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=IXqF8IoS8Pa1u7kprnmiaNVIxUwqntPIdyM7RBPWxWcp6XYVEgeXdIwm44jXLacFMFDSUU87vzMfPuSbMLNRU/cl4Yo8MYlPe5OIGSs8EJ773mVX5SoGSaHtXbsTWnCM+3LhPyXGoS93b5VQA1Vor6menLkWVDHQ2kKzXQLMFYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io; spf=pass smtp.mailfrom=theori.io; dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b=V9lkXr95; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theori.io
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-801986033f9so3341473a12.1
-        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 04:25:13 -0800 (PST)
+	s=arc-20240116; t=1734524726; c=relaxed/simple;
+	bh=FdFpiqV22MblOejbOyUzLPrF67j9DJcsAOaiSKHegVE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=n24CYI7vT8TVkr3D8nZQYLK29YtG6XXbLAP2SQzaGyfZ2gtDcjDcFK/6rFBbNS83P7Ru2jXhpusa3OdLkq9L0hZUH+w/xbC/nWzAdPEuJZn22n9XkezTtbQOhwCIWJRfPuv37DsgcL1CW3JmJfnNJSXMPo6tFW7bXkkIx2uKq9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3kffD3x; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-436341f575fso51353615e9.1
+        for <netdev@vger.kernel.org>; Wed, 18 Dec 2024 04:25:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1734524713; x=1735129513; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ry1f8EH2vuZ78FOFS8afWTJPFj2kQaLGsja4DlOwPIU=;
-        b=V9lkXr95iHDCgSMuj3NS/cO9Xm1I2xOD9Bs8dwlLzqz9+bNkN+hjdv3nDe7Og4sbnG
-         qnVCpz4fxHK3ycWMpU4MbgybNrkDLqP2F+q2RzFSCxgFx9V3j57zxlGeJ9Ly7KIbAAEG
-         GQHiyGIK0twM1AXOBzXAvXi3JKX1ffBCh+x0M=
+        d=gmail.com; s=20230601; t=1734524723; x=1735129523; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IjlngrUzTM77JY3Zl+nOz6jl5AEvnrVMJimbtHgDfKE=;
+        b=L3kffD3xGMif7Z2oa9VqvsWCalGz91MaFZNby/JggvGVnxFEpU+ZDqRfz213eifSHD
+         /BtTNqi99z/R5TYVd7TdnKMK2bHbNhACFWh6MGYsxijPeXBY0CoC+C40Cw+mfSYqnOrk
+         rKKheMmZpNS5dj20oFGah6MsTx25AIBD1GaGG+ZtVrIEtVyJTvIsx96zK1E6iYIWQqOV
+         +Wyscm84KNyOliJ6YBSAYj1QT3lNxqaF5FIY1ZC/b3a1qA2baj0neAv5zIwf+4SgsdSE
+         YYux6OI7x4u2128zY8KtIlspX//4rCz33kGqE02DAzmA6rlrDKu0p/HN8WR6NV1OE0rw
+         bfgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734524713; x=1735129513;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1734524723; x=1735129523;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ry1f8EH2vuZ78FOFS8afWTJPFj2kQaLGsja4DlOwPIU=;
-        b=MTwsvgeU+3NJIePvpsijY323tl6HZPIdTUhxrRcgWCxbdZ8bN9qcaqplRMpbjWnhiv
-         /aopWVivud7JSyY3pk+V7RWfugL2W2AYV8cO0dWTQGpp/peOZhjsiidUBt+Koc0vM0Xc
-         t6r1OiQGWnunwCtLMKYk7AXxPZlAJS/IPb4C1EUo4VYxZbhay3RoQbkaHW6xGRPBDTYw
-         JiNDkg4wA5BnlDy2ECbinAj8HPYurjKqKmPwXvrn7rLESBxZdsc6mhflUZP5XfLmO/6Z
-         VaKTFDmF2NgIBYh4VhBUd9JggmSXvmynwprz0cT36dWkT3QKjaVABKIZTtX1a1gVtmEY
-         HyUg==
-X-Forwarded-Encrypted: i=1; AJvYcCVHve4MjJNeQuLohWGs/PSllYqYXzjbZ/OyJNxJG/C5lWDeCh3fi6+3WoY6Mz0POmMnpr6gPL8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaorHzsljF7DxuSy+GX+PIvM3hFhKjoI4YwP6ubz4zwbG+pgTr
-	9Lc+D57EPJTROinB5pK7T8/frt1G56VtCsbqe/shayZffkAj8AVdmUMCkaYldqI=
-X-Gm-Gg: ASbGncu+jvcn3erVCKSjv8Zf4JfVDLeA0aK1mVu4n3F7KzUdvcdYwlsaYSVwRUEuv0e
-	ZQBKWPIIx+tPfuStgyiW79uwKYrUaNsc6KAjzwlPq+KlEegssF1/2pOsj5tTmZvGPEHbxvZdXOK
-	ckWmJwIWW5SPZjBki4pT1ayKanstqN3j8SwxNr8wkoiBScynzRB7vxX0r3EG43QnK0ytyam3I09
-	/62JjyoJYvsTRR5aCgDz8HiyuxVK1FIUm5XB31MPxdxNEJlqMsn8y2ipwdxZ1/MNDXdIA==
-X-Google-Smtp-Source: AGHT+IGiEpjydlEOeDKpnYMGuWBf7igzfRiDu6SwBhJlykAsoY8LX6DKzv9Bxwbl+1NeeAlcB8jGQg==
-X-Received: by 2002:a17:90b:2742:b0:2ea:3f34:f18f with SMTP id 98e67ed59e1d1-2f2e9302d14mr3697071a91.19.1734524713119;
-        Wed, 18 Dec 2024 04:25:13 -0800 (PST)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2ee06dd46sm1386521a91.36.2024.12.18.04.25.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2024 04:25:12 -0800 (PST)
-Date: Wed, 18 Dec 2024 07:25:07 -0500
-From: Hyunwoo Kim <v4bel@theori.io>
-To: Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	qwerty@theori.io, v4bel@theori.io, imv4bel@gmail.com
-Subject: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
-Message-ID: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX>
+        bh=IjlngrUzTM77JY3Zl+nOz6jl5AEvnrVMJimbtHgDfKE=;
+        b=gjbldjGyQJWGlMsekbDJqMxAtaxVbAPJOwcokf+Om/X0VxCyzoXmzIl7gjY9N7jz9n
+         favkw0NQu6TYehI565bBKAJvKHUhQOWtFJhtc7LER96bSpgaWOQo64AEz64oDDVOMG3g
+         X+P4vTDkZ85qZ77nxxuVCo5Fk5YQrkt6+AHWRiK7xV09U1tVUqcWijMOcZiqoIPngWzM
+         SjnJsUx6+h+qdTajJavAhIosP/YFh9nfdg8MRWvyZbtCxC002fc5XvPlR6EZKt7AEJGL
+         wn5eVJAEwXVTJtyyX+XOeXpryALXRlbY+PiSuMOObptsz2KAKbfFR7JWHTPRV5YwXArn
+         stJw==
+X-Gm-Message-State: AOJu0YzXYIPZfMvOXH8ugTi/wUcqPLIrOxCt+ycY60SboY0HtcxBzqf9
+	ldYLI2Zc7vcYH5ciTm1v9ogRyDa/ygZ86H3hWJTHntnNdzqqfosIpuuKFw==
+X-Gm-Gg: ASbGncuYXqv8TvyqV2qfWhYOLGlSlxdE1x1j/1OLOP3xOoZzMQlc+rMbp5WPlB7KqR6
+	tFAx0oas7OMwsRod/zXsXPyfLjS8nKGug4uxoa+SO4FmmUtAlmJNmjG9jOM7oI0bU/N3ikBcQ9A
+	KI733ebnI5PKLJ+KlyWPzVteSsHJbIrD79pcE/6Y4w9XNZlN18kLoTFkNlVszf3bNqDEpcYRXhG
+	fxOsiyLQHnJ1ffyuSpBbpG65rQcSD+s1mtEqiG5czhHdKcKU89ESN+JB0JsB/O6Od36AWOweH+i
+	zB3uvSU86WhJEhaBAKh0olfwlvR7FxjyyaAuiFDtOl1u
+X-Google-Smtp-Source: AGHT+IESfDZXfo/VGUwXdOJ1IYsywqDnKEuxae1n9ZBthJBlPGH3H8SjPSlvImL5oXLnOmHqP25ogg==
+X-Received: by 2002:a05:600c:548b:b0:431:54f3:11ab with SMTP id 5b1f17b1804b1-4365540ce51mr20667455e9.33.1734524722674;
+        Wed, 18 Dec 2024 04:25:22 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c8011feesm13779278f8f.21.2024.12.18.04.25.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Dec 2024 04:25:22 -0800 (PST)
+Subject: Re: [PATCH net-next v3 03/12] net: homa: create shared Homa header
+ files
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org
+References: <20241209175131.3839-1-ouster@cs.stanford.edu>
+ <20241209175131.3839-5-ouster@cs.stanford.edu>
+ <8a73091e-5d4a-4802-ffef-a382adbbe88f@gmail.com>
+ <CAGXJAmzVYDQtBVwdhazf9R2UgMCOOwppD+EM2-NY25t+N1vJhA@mail.gmail.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <e1ed4a57-f32c-3fcd-5caf-0861ef7cf0b5@gmail.com>
+Date: Wed, 18 Dec 2024 12:25:21 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <CAGXJAmzVYDQtBVwdhazf9R2UgMCOOwppD+EM2-NY25t+N1vJhA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 
-When calling connect to change the CID of a vsock, the loopback
-worker for the VIRTIO_VSOCK_OP_RST command is invoked.
-During this process, vsock_stream_has_data() calls
-vsk->transport->stream_has_data().
-However, a null-ptr-deref occurs because vsk->transport was set
-to NULL in vsock_deassign_transport().
+On 18/12/2024 05:46, John Ousterhout wrote:
+> (note: these comments arrived after I posted the v4 patch series, so
+> fixes will appear in v5)
 
-                     cpu0                                                      cpu1
+Yeah, I'm really slow at getting these reviews done, sorry about that.
+(This is probably the last one until after the holidays.)
 
-                                                               socket(A)
+> On Mon, Dec 16, 2024 at 10:36 PM Edward Cree <ecree.xilinx@gmail.com> wrote:
+>> Should parts of 'struct homa' be per network namespace, rather than
+>>  global, so that in systems hosting multiple containers each netns can
+>>  configure Homa for the way it wants to use it?
+> 
+> Possibly. I haven't addressed the issue of customizing the
+> configuration very thoroughly yet, but I can imagine it might happen
+> at multiple levels (e.g. for a network namespace, a socket, etc.). I'd
+> like to defer this a bit if possible.
 
-                                                               bind(A, VMADDR_CID_LOCAL)
-                                                                 vsock_bind()
+I think it's reasonable to leave that out of the initial upstreaming,
+ yeah, as long as you're confident you're not backing yourself into a
+ corner with either implementation or uAPI that would make that
+ difficult later.
 
-                                                               listen(A)
-                                                                 vsock_listen()
-  socket(B)
+>>> +     /**
+>>> +      * @locked: Nonzero means that @ready_rpc is locked; only valid
+>>> +      * if @ready_rpc is non-NULL.
+>>> +      */
 
-  connect(B, VMADDR_CID_LOCAL)
+Oh, I think I understand this now; does it mean that "the RPC lock on
+ ready_rpc is held"?  I initially read it as "the field @ready_rpc is
+ in some sense latched and its value won't change", which didn't make
+ a lot of sense.
 
-  connect(B, VMADDR_CID_HYPERVISOR)
-    vsock_connect(B)
-      lock_sock(sk);
-      vsock_assign_transport()
-        virtio_transport_release()
-          virtio_transport_close()
-            virtio_transport_shutdown()
-              virtio_transport_send_pkt_info()
-                vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
-                  queue_work(vsock_loopback_work)
-        vsock_deassign_transport()
-          vsk->transport = NULL;
-                                                               vsock_loopback_work()
-                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
-                                                                   virtio_transport_recv_connected()
-                                                                     virtio_transport_reset()
-                                                                       virtio_transport_send_pkt_info()
-                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RST)
-                                                                           queue_work(vsock_loopback_work)
+> This is a lock-free mechanism to hand off a complete message to a
+> receiver thread (which may be polling, though the polling code has
+> been removed from this stripped down patch series). I couldn't find an
+> "atomic pointer" structure, which is why the code uses atomic_long_t
+> (which I agree is a bit ugly).
 
-                                                               vsock_loopback_work()
-                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RST)
-								   virtio_transport_recv_disconnecting()
-								     virtio_transport_do_close()
-								       vsock_stream_has_data()
-								         vsk->transport->stream_has_data(vsk);    // null-ptr-deref
+As far as I can tell, ready_rpc only ever transitions from NULL to
+ populated; once non-NULL, the value is never overwritten by a
+ different pointer.  Is that correct?  If so, I believe you could use
+ a (typed) nonatomic pointer and an atomic flag to indicate "there is
+ an RPC in ready_rpc".
 
-To resolve this issue, add a check for vsk->transport, similar to
-functions like vsock_send_shutdown().
+> I'm not
+> sure I understand your comment about not manually sleeping and waking
+> threads from within Homa; is there a particular mechanism for this
+> that you have in mind?
 
-Fixes: fe502c4a38d9 ("vsock: add 'transport' member in the struct vsock_sock")
-Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
-Signed-off-by: Wongi Lee <qwerty@theori.io>
----
- net/vmw_vsock/af_vsock.c | 3 +++
- 1 file changed, 3 insertions(+)
+It's not in this patch but homa_rpc_handoff() does a wake_up_process()
+ and home_wait_for_message() does set_current_state(), neither of
+ which ought to be necessary.
+I think wait-queues do what you want (see `struct wait_queue_head` and
+ `wait_event_interruptible` in include/linux/wait.h — it's basically a
+ condvar), or if you want to wake unconditionally then completions
+ (kernel/sched/completion.c, include/linux/completion.h).
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 5cf8109f672a..a0c008626798 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -870,6 +870,9 @@ EXPORT_SYMBOL_GPL(vsock_create_connected);
- 
- s64 vsock_stream_has_data(struct vsock_sock *vsk)
- {
-+	if (!vsk->transport)
-+		return 0;
-+
- 	return vsk->transport->stream_has_data(vsk);
- }
- EXPORT_SYMBOL_GPL(vsock_stream_has_data);
--- 
-2.34.1
+>>> +     interest->request_links.next = LIST_POISON1;
+>>> +     interest->response_links.next = LIST_POISON1;
+>>
+>> Any particular reason why you're opencoding poisoning, rather than
+>>  using the list helpers (which distinguish between a list_head that
+>>  has been inited but never added, so list_empty() returns true, and
+>>  one which has been list_del()ed and thus poisoned)?
+>> It would likely be easier for others to debug any issues that arise
+>>  in Homa if when they see a list_head in an oops or crashdump they
+>>  can relate it to the standard lifecycle.
+> 
+> I couldn't find any other way to do this: I want to initialize the
+> links to be the same state as if list_del had been called,
 
+If there's a reason why this is necessary, there should be a comment
+ here explaining why.  I *think*, from poking around the rest of the
+ Homa code, you're using 'next == LIST_POISON1' to signal some kind
+ of state, but if it's just "this interest is not on a list", then
+ list_empty() after INIT_LIST_HEAD() or list_del_init() should work
+ just as well.  (Use list_del_init(), rather than plain list_del(),
+ if the interest is still reachable by some code that may need to
+ tell whether the interest is on a list; otherwise, using list_del()
+ gets the poisoning behaviour that will give a recognisable error if
+ buggy code tries to walk the list anyway.)
+
+>> And are there any security issues here; ought we to do anything
+>>  like TCP does with sequence numbers to try to ensure they aren't
+>>  guessable by an attacker?
+> 
+> There probably are, and the right solutions may well be similar to
+> TCP. I'm fairly ignorant on the potential security issues; is there
+> someplace where I can learn more?
+
+I don't really know either, sorry.  All I can suggest is asking the
+ TCP folks.
+
+>> I'm not sure exactly how it works but I believe you can annotate
+>>  the declaration with __rcu to get sparse to enforce this.
+> 
+> I poked around and it appears to me that list_head's don't get
+> declared '__rcu' (this designation is intended for pointers, if I'm
+> understanding correctly). Instead, the list_head is manipulated with
+> rcu functions such as list_for_each_entry_rcu. Let me know if I'm
+> missing something?
+
+I thought that declaring a struct (like list_head) __rcu would
+ propagate through to its members, but I may be wrong about that.
+My hope was that sparse could check that all operations on the list
+ were indeed using the correct _rcu-suffixed functions, but if
+ that's not the case then feel free to ignore me.
+
+>>> +     /**
+>>> +      * @link_bandwidth: The raw bandwidth of the network uplink, in
+>>> +      * units of 1e06 bits per second.  Set externally via sysctl.
+>>> +      */
+>>> +     int link_mbps;
+>>
+>> What happens if a machine has two uplinks and someone wants to
+>>  use Homa on both of them?  I wonder if most of the granting and
+>>  pacing part of Homa ought to be per-netdev rather than per-host.
+>> (Though in an SDN case with a bunch of containers issuing their
+>>  RPCs through veths you'd want a Homa-aware bridge that could do
+>>  the SRPT rather than bandwidth sharing, and having everything go
+>>  through a single Homa stack instance does give you that for free.
+>>  But then a VM use-case still needs the clever bridge anyway.)
+> 
+> Yes, I'm planning to implement a Homa-specific qdisc that will
+> implement packet pacing on a per-netdev basis, and that will eliminate
+> the need for this variable.
+
+Sounds good.
+
+> Virtual machines are more complex;
+> to do Homa right, pacing (and potentially granting also) must be done
+> in a central place that knows about all traffic on a given link.
+
+I guess that means to support SR-IOV at least part of the Homa
+ transport needs to be implemented in the NIC.
+I agree that this problem doesn't need to be solved for the
+ initial upstreaming.
+
+-ed
 
