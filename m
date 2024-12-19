@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-153357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A28269F7C37
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:25:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6BF09F7C3C
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3761890068
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 13:26:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1EA616A096
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 13:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE181224AF9;
-	Thu, 19 Dec 2024 13:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6501225779;
+	Thu, 19 Dec 2024 13:25:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359F6111AD
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 13:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77EA2248B5
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 13:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734614754; cv=none; b=XdV201gc10e55WBV2dm580UptaF9u3vWcx7pJVzJHljsZFfQYoZXcL8WIofmUeuoQuumphgPKBTUYGYWfTZl1u3U8+W3/PTb5KPsd95Vv2Mu25zTrqvdLihAdVi7TExItJpoSUJMmAdlMXG1cna9XGTLktWyRR4CFDpR3gZirEI=
+	t=1734614756; cv=none; b=PITP24pygVjZvdYJoWpBsIbpyAs8BvolxeJZnRvGrrfebkA8AP7dqeQwWRP87rLUkZhL2T2F5NC2Ir9sJnfpEEhx9/sqPHo5TwJ4ENuiPwkc44g71NAA2Yb2VP7lrlVfVrQr6WyQXGsE4q0S6NmQ4cY1Pmm0V5r6Yz/g5I+0ybs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734614754; c=relaxed/simple;
-	bh=9rPX7enLQubJau7pA8Xr9gZgChYKgAcHlbg/6SijClA=;
+	s=arc-20240116; t=1734614756; c=relaxed/simple;
+	bh=lu0eRQDbBvBGUZpWJ17CDiCpntoRAUtUnZ1r8PnHdhE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UtvRFHzDRT0nO90qfYbQJ6iIUXQk28t5W+LWmVZMBW9VZabrP9mvJwLux4vevcQw6IqHRu5gJb0wbUxmgZaEcxnMo5i15kRB8Ww29e265RRynfiTmi5l4vwDDZelCYmeWSwmpfkAgyFxYP9Kyu+5bvZI8dRsD1ZDRvN8JG+1e2s=
+	 MIME-Version; b=IJ7pM1LzP0qsa65FA79TNImLfxck9cq+cp9+prFS81/l2ptE0tiSIqA9rzd2v/MkIrgnXFdR6YstFmONzTSUTgjiMve9TqPgO/7yOvzt/Q6Xp0DkL+Whc5/sncr3bQyZlxb7M4OKm6fNTw8srCvjIXHkX1UM3MrWB7gtoaIxwS8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tOGX5-0001bC-Of; Thu, 19 Dec 2024 14:25:39 +0100
+	id 1tOGX5-0001bD-Od; Thu, 19 Dec 2024 14:25:39 +0100
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tOGX0-004DDJ-29;
+	id 1tOGX0-004DDM-2E;
 	Thu, 19 Dec 2024 14:25:35 +0100
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tOGX1-0032j3-15;
+	id 1tOGX1-0032jM-18;
 	Thu, 19 Dec 2024 14:25:35 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -60,9 +60,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Russell King <linux@armlinux.org.uk>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v2 7/8] net: phy: dp83td510: add statistics support
-Date: Thu, 19 Dec 2024 14:25:33 +0100
-Message-Id: <20241219132534.725051-8-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v2 8/8] net: phy: dp83tg720: add statistics support
+Date: Thu, 19 Dec 2024 14:25:34 +0100
+Message-Id: <20241219132534.725051-9-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241219132534.725051-1-o.rempel@pengutronix.de>
 References: <20241219132534.725051-1-o.rempel@pengutronix.de>
@@ -78,10 +78,11 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Add support for reporting PHY statistics in the DP83TD510 driver. This
-includes cumulative tracking of transmit/receive packet counts, and
-error counts. Implemented functions to update and provide statistics via
-ethtool, with optional polling support enabled through `PHY_POLL_STATS`.
+Add support for reporting PHY statistics in the DP83TG720 driver. This
+includes cumulative tracking of link loss events, transmit/receive
+packet counts, and error counts. Implemented functions to update and
+provide statistics via ethtool, with optional polling support enabled
+through `PHY_POLL_STATS`.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
@@ -89,66 +90,71 @@ changes v2:
 - drop use of FIELD_GET
 - add comments
 ---
- drivers/net/phy/dp83td510.c | 112 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 112 insertions(+)
+ drivers/net/phy/dp83tg720.c | 161 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 161 insertions(+)
 
-diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
-index 92aa3a2b9744..2edda7c231fc 100644
---- a/drivers/net/phy/dp83td510.c
-+++ b/drivers/net/phy/dp83td510.c
-@@ -34,6 +34,29 @@
- #define DP83TD510E_CTRL_HW_RESET		BIT(15)
- #define DP83TD510E_CTRL_SW_RESET		BIT(14)
+diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
+index 0ef4d7dba065..ea2f0bc27c4c 100644
+--- a/drivers/net/phy/dp83tg720.c
++++ b/drivers/net/phy/dp83tg720.c
+@@ -51,6 +51,9 @@
+ /* Register 0x0405: Unknown Register */
+ #define DP83TG720S_UNKNOWN_0405			0x405
+ 
++#define DP83TG720S_LINK_QUAL_3			0x547
++#define DP83TG720S_LINK_LOSS_CNT_MASK		GENMASK(15, 10)
++
+ /* Register 0x0576: TDR Master Link Down Control */
+ #define DP83TG720S_TDR_MASTER_LINK_DOWN		0x576
+ 
+@@ -60,6 +63,29 @@
+ /* In RGMII mode, Enable or disable the internal delay for TXD */
+ #define DP83TG720S_RGMII_TX_CLK_SEL		BIT(0)
  
 +/*
-+ * DP83TD510E_PKT_STAT_x registers correspond to similarly named registers
++ * DP83TG720S_PKT_STAT_x registers correspond to similarly named registers
 + * in the datasheet (PKT_STAT_1 through PKT_STAT_6). These registers store
 + * 32-bit or 16-bit counters for TX and RX statistics and must be read in
 + * sequence to ensure the counters are cleared correctly.
 + *
-+ * - DP83TD510E_PKT_STAT_1: Contains TX packet count bits [15:0].
-+ * - DP83TD510E_PKT_STAT_2: Contains TX packet count bits [31:16].
-+ * - DP83TD510E_PKT_STAT_3: Contains TX error packet count.
-+ * - DP83TD510E_PKT_STAT_4: Contains RX packet count bits [15:0].
-+ * - DP83TD510E_PKT_STAT_5: Contains RX packet count bits [31:16].
-+ * - DP83TD510E_PKT_STAT_6: Contains RX error packet count.
++ * - DP83TG720S_PKT_STAT_1: Contains TX packet count bits [15:0].
++ * - DP83TG720S_PKT_STAT_2: Contains TX packet count bits [31:16].
++ * - DP83TG720S_PKT_STAT_3: Contains TX error packet count.
++ * - DP83TG720S_PKT_STAT_4: Contains RX packet count bits [15:0].
++ * - DP83TG720S_PKT_STAT_5: Contains RX packet count bits [31:16].
++ * - DP83TG720S_PKT_STAT_6: Contains RX error packet count.
 + *
 + * Keeping the register names as defined in the datasheet helps maintain
 + * clarity and alignment with the documentation.
 + */
-+#define DP83TD510E_PKT_STAT_1			0x12b
-+#define DP83TD510E_PKT_STAT_2			0x12c
-+#define DP83TD510E_PKT_STAT_3			0x12d
-+#define DP83TD510E_PKT_STAT_4			0x12e
-+#define DP83TD510E_PKT_STAT_5			0x12f
-+#define DP83TD510E_PKT_STAT_6			0x130
++#define DP83TG720S_PKT_STAT_1			0x639
++#define DP83TG720S_PKT_STAT_2			0x63a
++#define DP83TG720S_PKT_STAT_3			0x63b
++#define DP83TG720S_PKT_STAT_4			0x63c
++#define DP83TG720S_PKT_STAT_5			0x63d
++#define DP83TG720S_PKT_STAT_6			0x63e
 +
- #define DP83TD510E_AN_STAT_1			0x60c
- #define DP83TD510E_MASTER_SLAVE_RESOL_FAIL	BIT(15)
+ /* Register 0x083F: Unknown Register */
+ #define DP83TG720S_UNKNOWN_083F			0x83f
  
-@@ -58,8 +81,16 @@ static const u16 dp83td510_mse_sqi_map[] = {
- 	0x0000  /* 24dB =< SNR */
- };
+@@ -69,6 +95,113 @@
  
-+struct dp83td510_stats {
+ #define DP83TG720_SQI_MAX			7
+ 
++struct dp83tg720_stats {
++	u64 link_loss_cnt;
 +	u64 tx_pkt_cnt;
 +	u64 tx_err_pkt_cnt;
 +	u64 rx_pkt_cnt;
 +	u64 rx_err_pkt_cnt;
 +};
 +
- struct dp83td510_priv {
- 	bool alcd_test_active;
-+	struct dp83td510_stats stats;
- };
- 
- /* Time Domain Reflectometry (TDR) Functionality of DP83TD510 PHY
-@@ -177,6 +208,85 @@ struct dp83td510_priv {
- #define DP83TD510E_ALCD_COMPLETE			BIT(15)
- #define DP83TD510E_ALCD_CABLE_LENGTH			GENMASK(10, 0)
- 
++struct dp83tg720_priv {
++	struct dp83tg720_stats stats;
++};
++
 +/**
-+ * dp83td510_update_stats - Update the PHY statistics for the DP83TD510 PHY.
++ * dp83tg720_update_stats - Update the PHY statistics for the DP83TD510 PHY.
 + * @phydev: Pointer to the phy_device structure.
 + *
 + * The function reads the PHY statistics registers and updates the statistics
@@ -156,15 +162,23 @@ index 92aa3a2b9744..2edda7c231fc 100644
 + *
 + * Returns: 0 on success or a negative error code on failure.
 + */
-+static int dp83td510_update_stats(struct phy_device *phydev)
++static int dp83tg720_update_stats(struct phy_device *phydev)
 +{
-+	struct dp83td510_priv *priv = phydev->priv;
++	struct dp83tg720_priv *priv = phydev->priv;
 +	u32 count;
 +	int ret;
 +
-+	/* The DP83TD510E_PKT_STAT registers are divided into two groups:
-+	 * - Group 1 (TX stats): DP83TD510E_PKT_STAT_1 to DP83TD510E_PKT_STAT_3
-+	 * - Group 2 (RX stats): DP83TD510E_PKT_STAT_4 to DP83TD510E_PKT_STAT_6
++	/* Read the link loss count */
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_LINK_QUAL_3);
++	if (ret < 0)
++		return ret;
++	/* link_loss_cnt */
++	count = FIELD_GET(DP83TG720S_LINK_LOSS_CNT_MASK, ret);
++	ethtool_stat_add(&priv->stats.link_loss_cnt, count);
++
++	/* The DP83TG720S_PKT_STAT registers are divided into two groups:
++	 * - Group 1 (TX stats): DP83TG720S_PKT_STAT_1 to DP83TG720S_PKT_STAT_3
++	 * - Group 2 (RX stats): DP83TG720S_PKT_STAT_4 to DP83TG720S_PKT_STAT_6
 +	 *
 +	 * Registers in each group are cleared only after reading them in a
 +	 * plain sequence (e.g., 1, 2, 3 for Group 1 or 4, 5, 6 for Group 2).
@@ -173,39 +187,39 @@ index 92aa3a2b9744..2edda7c231fc 100644
 +	 * for a group are frozen as soon as the first register in that group
 +	 * is accessed.
 +	 */
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_1);
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_1);
 +	if (ret < 0)
 +		return ret;
 +	/* tx_pkt_cnt_15_0 */
 +	count = ret;
 +
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_2);
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_2);
 +	if (ret < 0)
 +		return ret;
 +	/* tx_pkt_cnt_31_16 */
 +	count |= ret << 16;
 +	ethtool_stat_add(&priv->stats.tx_pkt_cnt, count);
 +
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_3);
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_3);
 +	if (ret < 0)
 +		return ret;
 +	/* tx_err_pkt_cnt */
 +	ethtool_stat_add(&priv->stats.tx_err_pkt_cnt, ret);
 +
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_4);
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_4);
 +	if (ret < 0)
 +		return ret;
 +	/* rx_pkt_cnt_15_0 */
 +	count = ret;
 +
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_5);
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_5);
 +	if (ret < 0)
 +		return ret;
 +	/* rx_pkt_cnt_31_16 */
 +	count |= ret << 16;
 +	ethtool_stat_add(&priv->stats.rx_pkt_cnt, count);
 +
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_6);
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_6);
 +	if (ret < 0)
 +		return ret;
 +	/* rx_err_pkt_cnt */
@@ -214,11 +228,19 @@ index 92aa3a2b9744..2edda7c231fc 100644
 +	return 0;
 +}
 +
-+static void dp83td510_get_phy_stats(struct phy_device *phydev,
++static void dp83tg720_get_link_stats(struct phy_device *phydev,
++				     struct ethtool_link_ext_stats *link_stats)
++{
++	struct dp83tg720_priv *priv = phydev->priv;
++
++	link_stats->link_down_events = priv->stats.link_loss_cnt;
++}
++
++static void dp83tg720_get_phy_stats(struct phy_device *phydev,
 +				    struct ethtool_eth_phy_stats *eth_stats,
 +				    struct ethtool_phy_stats *stats)
 +{
-+	struct dp83td510_priv *priv = phydev->priv;
++	struct dp83tg720_priv *priv = phydev->priv;
 +
 +	stats->tx_packets = priv->stats.tx_pkt_cnt;
 +	stats->tx_errors = priv->stats.tx_err_pkt_cnt;
@@ -226,15 +248,68 @@ index 92aa3a2b9744..2edda7c231fc 100644
 +	stats->rx_errors = priv->stats.rx_err_pkt_cnt;
 +}
 +
- static int dp83td510_config_intr(struct phy_device *phydev)
+ /**
+  * dp83tg720_cable_test_start - Start the cable test for the DP83TG720 PHY.
+  * @phydev: Pointer to the phy_device structure.
+@@ -182,6 +315,11 @@ static int dp83tg720_cable_test_get_status(struct phy_device *phydev,
+ 
+ 	ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A, stat);
+ 
++	/* save the current stats before resetting the PHY */
++	ret = dp83tg720_update_stats(phydev);
++	if (ret)
++		return ret;
++
+ 	return phy_init_hw(phydev);
+ }
+ 
+@@ -217,6 +355,11 @@ static int dp83tg720_read_status(struct phy_device *phydev)
+ 	phy_sts = phy_read(phydev, DP83TG720S_MII_REG_10);
+ 	phydev->link = !!(phy_sts & DP83TG720S_LINK_STATUS);
+ 	if (!phydev->link) {
++		/* save the current stats before resetting the PHY */
++		ret = dp83tg720_update_stats(phydev);
++		if (ret)
++			return ret;
++
+ 		/* According to the "DP83TC81x, DP83TG72x Software
+ 		 * Implementation Guide", the PHY needs to be reset after a
+ 		 * link loss or if no link is created after at least 100ms.
+@@ -341,12 +484,27 @@ static int dp83tg720_config_init(struct phy_device *phydev)
+ 	return genphy_c45_pma_baset1_read_master_slave(phydev);
+ }
+ 
++static int dp83tg720_probe(struct phy_device *phydev)
++{
++	struct device *dev = &phydev->mdio.dev;
++	struct dp83tg720_priv *priv;
++
++	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++
++	phydev->priv = priv;
++
++	return 0;
++}
++
+ static struct phy_driver dp83tg720_driver[] = {
  {
- 	int ret;
-@@ -599,6 +709,8 @@ static struct phy_driver dp83td510_driver[] = {
- 	.get_sqi_max	= dp83td510_get_sqi_max,
- 	.cable_test_start = dp83td510_cable_test_start,
- 	.cable_test_get_status = dp83td510_cable_test_get_status,
-+	.get_phy_stats	= dp83td510_get_phy_stats,
-+	.update_stats	= dp83td510_update_stats,
+ 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
+ 	.name		= "TI DP83TG720S",
+ 
+ 	.flags          = PHY_POLL_CABLE_TEST,
++	.probe		= dp83tg720_probe,
+ 	.config_aneg	= dp83tg720_config_aneg,
+ 	.read_status	= dp83tg720_read_status,
+ 	.get_features	= genphy_c45_pma_read_ext_abilities,
+@@ -355,6 +513,9 @@ static struct phy_driver dp83tg720_driver[] = {
+ 	.get_sqi_max	= dp83tg720_get_sqi_max,
+ 	.cable_test_start = dp83tg720_cable_test_start,
+ 	.cable_test_get_status = dp83tg720_cable_test_get_status,
++	.get_link_stats	= dp83tg720_get_link_stats,
++	.get_phy_stats	= dp83tg720_get_phy_stats,
++	.update_stats	= dp83tg720_update_stats,
  
  	.suspend	= genphy_suspend,
  	.resume		= genphy_resume,
