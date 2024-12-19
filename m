@@ -1,152 +1,139 @@
-Return-Path: <netdev+bounces-153355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982459F7BF1
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:04:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41769F7C53
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:29:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEDA41648A7
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 13:03:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE0A1895706
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 13:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EE1228E37;
-	Thu, 19 Dec 2024 13:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229DD224B19;
+	Thu, 19 Dec 2024 13:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JIX1fzfy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MjtZzZp/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BA317BD9
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 13:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0315B224B0C;
+	Thu, 19 Dec 2024 13:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734613437; cv=none; b=bCrKiMcE0TwrL2B48UIEXBRJheE46YHNWKokl0/FbPDHoCxsV0SdCzUirOQIC29Xm9LG1vdvpsAcGOmjp+LIBsPYxMCT5YKfsE5HMtw7nOrz82t0NXHZ53hBiwCJaUmcmtsQOZH8TOCrYyOdXl9NYXUmeWc7IdbSFn+wPS85524=
+	t=1734614777; cv=none; b=H1eQnaYwUOAqiBUTOdNW2NgdALkeVp2AztTFjhjVK1CToi9Q/db6+vsCvmBggFceFLsAoxigqiiOti2maeql32CfutlNNmGiw49B3UwQD5/XNPgpLdiqlgpqCvBdNiThrKjrl9ORce/OivgcqzRvSJ8D2qmEqO9gu4HuvmMwRkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734613437; c=relaxed/simple;
-	bh=l993BuhaOemrNpdrbLFkOyhPOUTMU0O43qDzmxDK5C8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rDQu/9Z57bOEu3Wc5xB8sMqBJ7Cmdf/GQSisCgrFaIDPrEAKk7tuTzBO2K9GojMSMjvS6QbnB2qvahi2zuR2MfqIrhJW/OqP8r1obx1XAJNqUsQT7E8mZ8IBKq1GfW5Ti/cTQpjWmy0s6iCkNr8uzQBwy8nYw+avo5247GIdz0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JIX1fzfy; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-216728b1836so6349475ad.0
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 05:03:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734613434; x=1735218234; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ckpWyywRorf26orlDJPPCy+wE/kAUMKsiVsa+2ev0TQ=;
-        b=JIX1fzfyyabxiwLG8MrRYeu0jBUowlnbKngRdO0cVizE2joBs0BewAp+EoBt18i615
-         gLKax4ZuNuPJHCvy8m1cnLCD+MKOiwKYcc5h78Dd4lVRoYYyaPriWRQEDXUdVngLRAfu
-         oCc5uZgarqON3xG3+WeUtEXiZPfU6l/4bo12B1pzDjujTlFGav4duq7AQDi4gNtoAsTy
-         Es/3GY3vilwga5xQnGk22HAMAu8DFDZVltGm0vt1E6Dg7w+V3egKAXwLmsgmE4l/27GN
-         rycogzeEJDMSl7rEES2m5nzj65id5FwpQxZ2XmBOanpK8g1fVBzzf4C7O3iBzyX8kZh8
-         Gz7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734613434; x=1735218234;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ckpWyywRorf26orlDJPPCy+wE/kAUMKsiVsa+2ev0TQ=;
-        b=MnfCFAFpuWKxfiMf7Z30yFXwjJ23hbJ8lpx9UU9rqhQmQPMyXYrn3z2GJ4b4h4ujaO
-         yw0vo3IFLK9OKcz+XQ+iU6vm3U/CXtA6e5isLutU/rBwppVa4CNqd0YTHQRX7GEuV4Ze
-         e+8bts0dUFpxBvQ7F3D2OUOJ54vBJs8Wxjqa98Rg6vBdYRnYpfgHFimPr61vKnoezU0b
-         OuNqy6nzj6NUXAtZxW7Dm+3bAmD29ZO2v3fAekZPO1yOc/R7Ujf8P883XJSzQ9eWxv/r
-         B+wk+cBLAdWFhIEZOM1EI9+OOKuatvcQKkmBkfS1h64E24AG1ETCEtplcsUQ5EWTXwVh
-         Faag==
-X-Gm-Message-State: AOJu0Yx8RihK03iCnJaqHWON8WkmU6j6dxMoexnHIKnxBEQSHvSlLU/5
-	LH1AcC5BO5k3xhFUxzBiSLk5nWWVjlCT2JkZSdG59BngH3UhZgHJaZ5a0Ri5u/A=
-X-Gm-Gg: ASbGncsGY0U7up/7imrrwGISrGWz4WLFXqdYjPCZyUq/3Lx7rlXb4Jx3xDAq453wGZU
-	03l0x0WhN5WP0MB/ZRRp8Bxh5rE3T86Qo0vxSsGxjz/lWyB2Wl+naVMg5uY/9jIS4ttqJRwwQht
-	aveSdidUmxQL0BQIVN+5kQ7WiM0wNbWKFtAxpTG8YR7TSsIc7M8Z9xd119XrsVCAdx2GX70QZvt
-	t5viiy1KtV4r6V2VNQaltddKJwilMwbi/b/iVkslSTUXZU=
-X-Google-Smtp-Source: AGHT+IGh1xUxtMEAdR2zpOrZIxxHJb+EY7+Lt2/5uJjwKSgmVR8gTcuG15Tpc2lX2DPRUtHwGcfv+Q==
-X-Received: by 2002:a17:902:e809:b0:215:aae1:40f0 with SMTP id d9443c01a7336-218d6c4aebfmr114306485ad.0.1734613434017;
-        Thu, 19 Dec 2024 05:03:54 -0800 (PST)
-Received: from ws.. ([103.167.140.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9f51c2sm11656535ad.190.2024.12.19.05.03.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 05:03:52 -0800 (PST)
-From: Xiao Liang <shaw.leon@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ido Schimmel <idosch@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net] net: Fix netns for ip_tunnel_init_flow()
-Date: Thu, 19 Dec 2024 21:03:36 +0800
-Message-ID: <20241219130336.103839-1-shaw.leon@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1734614777; c=relaxed/simple;
+	bh=vI9Shmm0nwdv8XdhOxp6m7r/LSGT4zlOwCvERf5GSEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hQxFuDaYZMOdtGbGznNrgvQRV1Qk5yf9RmDVjwUEQVOF87r/cyaKOCSmMMNIdP6RFhZ9ater8olU8duXl5cgFFMJ3hH75gKpHg0RerCrzWBrjnsbT5CQSMBf3L87imn7lBVm6DHsNnyLWNa8lthSKL9tkIHJdAyDXQnbDuymosk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MjtZzZp/; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734614775; x=1766150775;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vI9Shmm0nwdv8XdhOxp6m7r/LSGT4zlOwCvERf5GSEk=;
+  b=MjtZzZp/bzT5l4TToK04+oOD3W4hkY9CyChb8LobwlAbfaD1/6VKo7QL
+   KuqhXb9JW1E4R8NJhN9riHWqdOnU8g4UPtVTODjK7n/Ed5Vx5n0U552uy
+   2b+5R+mCpY8pWGPJQRwCQUlA1Feu28YuX90pJLaRaEQnWgx7WTbq6cbA8
+   U75qUV4iMLO1mzhFiFCjKYGBYPZo/G1eHq3C4JMXqsdfQ8EHej2v7lFn8
+   u2pXfw85nCTbcng/LMYxYee156rg8Y/yhRQnTMlqEgVH+sk3RDcBoQ/wY
+   v3wYcc2TF12/hND9b1pOavIADO6H85NlcwKBrRDSp/0XlFVlQUKvG9lGe
+   A==;
+X-CSE-ConnectionGUID: cXPqi60zQRW3L3ttdJ5tfg==
+X-CSE-MsgGUID: t9SnK+faSTmdSKnrQwXHBw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="37964367"
+X-IronPort-AV: E=Sophos;i="6.12,247,1728975600"; 
+   d="scan'208";a="37964367"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2024 05:26:14 -0800
+X-CSE-ConnectionGUID: yPGKzD65TdmrZid8e14Ehg==
+X-CSE-MsgGUID: 88JXXY3FRDmWum8F7+sdbA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="129158240"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2024 05:26:12 -0800
+Date: Thu, 19 Dec 2024 14:23:04 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Mark Zhang <markzhang@nvidia.com>,
+	Francesco Poli <invernomuto@paranoici.org>,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH mlx5-next] RDMA/mlx5: Enable multiplane mode only when it
+ is supported
+Message-ID: <Z2QeOOzRpimm3pyc@mev-dev.igk.intel.com>
+References: <1ef901acdf564716fcf550453cf5e94f343777ec.1734610916.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ef901acdf564716fcf550453cf5e94f343777ec.1734610916.git.leon@kernel.org>
 
-The device denoted by tunnel->parms.link resides in the underlay net
-namespace. Therefore pass tunnel->net to ip_tunnel_init_flow().
+On Thu, Dec 19, 2024 at 02:23:36PM +0200, Leon Romanovsky wrote:
+> From: Mark Zhang <markzhang@nvidia.com>
+> 
+> Driver queries vport_cxt.num_plane and enables multiplane when it is
+> greater then 0, but some old FWs (versions from x.40.1000 till x.42.1000),
+> report vport_cxt.num_plane = 1 unexpectedly.
+> 
+> Fix it by querying num_plane only when HCA_CAP2.multiplane bit is set.
+> 
+> Fixes: 2a5db20fa532 ("RDMA/mlx5: Add support to multi-plane device and port")
+> Cc: stable@vger.kernel.org
+> Reported-by: Francesco Poli <invernomuto@paranoici.org>
+> Closes: https://lore.kernel.org/all/nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl/
+> Signed-off-by: Mark Zhang <markzhang@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/infiniband/hw/mlx5/main.c | 2 +-
+>  include/linux/mlx5/mlx5_ifc.h     | 4 +++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
+> index c2314797afc9..f5b59d02f4d3 100644
+> --- a/drivers/infiniband/hw/mlx5/main.c
+> +++ b/drivers/infiniband/hw/mlx5/main.c
+> @@ -2839,7 +2839,7 @@ static int mlx5_ib_get_plane_num(struct mlx5_core_dev *mdev, u8 *num_plane)
+>  	int err;
+>  
+>  	*num_plane = 0;
+> -	if (!MLX5_CAP_GEN(mdev, ib_virt))
+> +	if (!MLX5_CAP_GEN(mdev, ib_virt) || !MLX5_CAP_GEN_2(mdev, multiplane))
+>  		return 0;
+>  
+>  	err = mlx5_query_hca_vport_context(mdev, 0, 1, 0, &vport_ctx);
+> diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+> index 4fbbcf35498b..48d47181c7cd 100644
+> --- a/include/linux/mlx5/mlx5_ifc.h
+> +++ b/include/linux/mlx5/mlx5_ifc.h
+> @@ -2119,7 +2119,9 @@ struct mlx5_ifc_cmd_hca_cap_2_bits {
+>  	u8	   migration_in_chunks[0x1];
+>  	u8	   reserved_at_d1[0x1];
+>  	u8	   sf_eq_usage[0x1];
+> -	u8	   reserved_at_d3[0xd];
+> +	u8	   reserved_at_d3[0x5];
+> +	u8	   multiplane[0x1];
+> +	u8	   reserved_at_d9[0x7];
+>  
+>  	u8	   cross_vhca_object_to_object_supported[0x20];
 
-Fixes: db53cd3d88dc ("net: Handle l3mdev in ip_tunnel_init_flow")
-Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
----
- drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c | 3 +--
- net/ipv4/ip_tunnel.c                                | 6 +++---
- 2 files changed, 4 insertions(+), 5 deletions(-)
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
-index 4b5fd71c897d..32d2e61f2b82 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
-@@ -423,8 +423,7 @@ mlxsw_sp_span_gretap4_route(const struct net_device *to_dev,
- 
- 	parms = mlxsw_sp_ipip_netdev_parms4(to_dev);
- 	ip_tunnel_init_flow(&fl4, parms.iph.protocol, *daddrp, *saddrp,
--			    0, 0, dev_net(to_dev), parms.link, tun->fwmark, 0,
--			    0);
-+			    0, 0, tun->net, parms.link, tun->fwmark, 0, 0);
- 
- 	rt = ip_route_output_key(tun->net, &fl4);
- 	if (IS_ERR(rt))
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 25505f9b724c..09b73acf037a 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -294,7 +294,7 @@ static int ip_tunnel_bind_dev(struct net_device *dev)
- 
- 		ip_tunnel_init_flow(&fl4, iph->protocol, iph->daddr,
- 				    iph->saddr, tunnel->parms.o_key,
--				    iph->tos & INET_DSCP_MASK, dev_net(dev),
-+				    iph->tos & INET_DSCP_MASK, tunnel->net,
- 				    tunnel->parms.link, tunnel->fwmark, 0, 0);
- 		rt = ip_route_output_key(tunnel->net, &fl4);
- 
-@@ -611,7 +611,7 @@ void ip_md_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
- 	}
- 	ip_tunnel_init_flow(&fl4, proto, key->u.ipv4.dst, key->u.ipv4.src,
- 			    tunnel_id_to_key32(key->tun_id),
--			    tos & INET_DSCP_MASK, dev_net(dev), 0, skb->mark,
-+			    tos & INET_DSCP_MASK, tunnel->net, 0, skb->mark,
- 			    skb_get_hash(skb), key->flow_flags);
- 
- 	if (!tunnel_hlen)
-@@ -774,7 +774,7 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
- 
- 	ip_tunnel_init_flow(&fl4, protocol, dst, tnl_params->saddr,
- 			    tunnel->parms.o_key, tos & INET_DSCP_MASK,
--			    dev_net(dev), READ_ONCE(tunnel->parms.link),
-+			    tunnel->net, READ_ONCE(tunnel->parms.link),
- 			    tunnel->fwmark, skb_get_hash(skb), 0);
- 
- 	if (ip_tunnel_encap(skb, &tunnel->encap, &protocol, &fl4) < 0)
--- 
-2.47.1
+Just out of curiosity, don't you have mlx5-net or sth like that for
+fixes?
 
+>  
+> -- 
+> 2.47.0
 
