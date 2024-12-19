@@ -1,85 +1,174 @@
-Return-Path: <netdev+bounces-153522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB13F9F87E6
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 23:32:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620D99F8805
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 23:43:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0B421898655
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 22:32:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED9AA7A2FF0
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 22:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC601C5F30;
-	Thu, 19 Dec 2024 22:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76161D7E4C;
+	Thu, 19 Dec 2024 22:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5PkR9hQp"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ft+wKP6q"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A11B1BDABE
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 22:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A071D79B1
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 22:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734647569; cv=none; b=p9HoZ32M49VKBrXkTSVyxbSD0Tjhm5ql4tI+DCAn1B3QVnja+F04FpmzfP1SXEmmOFKRvMnrni7mvIx3ZlriehO+9KrphjGG60ZT0XDVOd31uZTDEylh1BHuGFLyqWoYhT3N6rzJMapAbFjDYlLPOB5d1/EGW5CcrxHJSEgQb+w=
+	t=1734648231; cv=none; b=IAbck5p/r+ES1KfyJp56bXDYi3jGEPUjvB5khaSr71fX8ESH30lDDaGGRmG4lKIC0pEQEG/rRY0R8+MnUl/mJRJ4pPi7yUed1OSbJj8kXvb/kgrCP2Zm7PJFekKpNik8Usb2AQ/hbcD4IR9b0hLlCuzbIXSO1YCogJNLLQICIbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734647569; c=relaxed/simple;
-	bh=KerXWWshCR+Jgvvpj6V4Fj/9DHRA+7IXWE8FjbOCdlo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GXHJRd5KDslFkIPxwmvMMfHMtJLPPhRN1zek6SAVhW7swLZLoCPiQlc83a0wdjrUWeb0UgSsBwONR9pf/N/q0q8N+KPJp/oG6QYnZLL+syVhh04M2FWS8eXswiOSMOq0WUxOdfkRtK1nM+toADSVhPTsCQw41R5//tcrj0jIkR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5PkR9hQp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Aqv2p2QDVXA6x+5jJGOvu5Usc1awCXk0UhAR9dJFtq4=; b=5PkR9hQpwoOYwCMYZyIvK0swHz
-	qWJc1crngACn8LVMTiA929jwgwEWpHdiXYSYzYXwZWxLLV8rrfgoXY/RO6NnAixXMQUJoxkHBbKI/
-	EedmbS92TpNdKFqoJMHEiRgNIuyUpHruda66AX/Tdq8b+bZtdfKs39Eh+5X0UONsWNwU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tOP4V-001mRY-IW; Thu, 19 Dec 2024 23:32:43 +0100
-Date: Thu, 19 Dec 2024 23:32:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	pabeni@redhat.com, edumazet@google.com, horms@kernel.org
-Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API
- for Homa
-Message-ID: <781ea004-6422-470e-a7b5-9a25d602f9f9@lunn.ch>
-References: <20241217000626.2958-1-ouster@cs.stanford.edu>
- <20241217000626.2958-2-ouster@cs.stanford.edu>
- <20241218174345.453907db@kernel.org>
- <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
+	s=arc-20240116; t=1734648231; c=relaxed/simple;
+	bh=4fmPcWKjeO67qj6ciJPlVo6dJyCUn+0clUCf5Birzy8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=REkOHsPtf6w8qVmheai+iJrBP0Rz4A3R3qz1tOAWycUEBaLaSVsL357uZq7V4F3NV/l3b0/FRoDiwkdd1Xw5eG7TvrmyVVrRgBnC9qsMCyRTTzqj3QCchDlZ1dlk9ZMywDBSXJRjp008rXvpk6wvAQaFRuCXQUdtepiVsiBtm1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ft+wKP6q; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2f56aca3-a27a-49b6-90de-7f1b2ff39df1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734648217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q+i4PtjvWS84jCmxpRNu1g3Fzl6WMJ7eBdsTXPqebBg=;
+	b=Ft+wKP6q6S5wsyOb5FP9+VzdSYp8OdSpAuPpk3Tgii6ZLXEelP9M2xOAsvkD17FsFTlWvK
+	5051wHWOzA6YgrGmmm76c/qk2xn/tge4c22azzSpuBoyVtpevLMRIu/la/bM58PnBM4uca
+	qxgjqCMaYuoHICVL027sUcvsmawjxYk=
+Date: Thu, 19 Dec 2024 14:43:30 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 4/5] libbpf: fix error when st-prefix_ops and
+ ops from differ btf
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
+ song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
+ edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, Daniel Xu <dlxu@meta.com>
+References: <20241218024422.23423-1-alibuda@linux.alibaba.com>
+ <20241218024422.23423-5-alibuda@linux.alibaba.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241218024422.23423-5-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> > --
-> > pw-bot: cr
+On 12/17/24 6:44 PM, D. Wythe wrote:
+> When a struct_ops named xxx_ops was registered by a module, and
+> it will be used in both built-in modules and the module itself,
+> so that the btf_type of xxx_ops will be present in btf_vmlinux
+> instead of in btf_mod, which means that the btf_type of
+> bpf_struct_ops_xxx_ops and xxx_ops will not be in the same btf.
 > 
-> I'm not sure what "pw-bot: cr" means; I assume this is related to the
-> "#ifdef __cplusplus" discussion above?
+> Here are four possible case:
+> 
+> +--------+-------------+-------------+---------------------------------+
+> |        | st_opx_xxx  | xxx         |                                 |
+> +--------+-------------+-------------+---------------------------------+
+> | case 0 | btf_vmlinux | bft_vmlinux | be used and reg only in vmlinux |
+> +--------+-------------+-------------+---------------------------------+
+> | case 1 | btf_vmlinux | bpf_mod     | INVALID                         |
+> +--------+-------------+-------------+---------------------------------+
+> | case 2 | btf_mod     | btf_vmlinux | reg in mod but be used both in  |
+> |        |             |             | vmlinux and mod.                |
+> +--------+-------------+-------------+---------------------------------+
+> | case 3 | btf_mod     | btf_mod     | be used and reg only in mod     |
+> +--------+-------------+-------------+---------------------------------+
+> 
+> At present, cases 0, 1, and 3 can be correctly identified, because
+> st_ops_xxx is searched from the same btf with xxx. In order to
+> handle case 2 correctly without affecting other cases, we cannot simply
+> change the search method for st_ops_xxx from find_btf_by_prefix_kind()
+> to find_ksym_btf_id(), because in this way, case 1 will not be
+> recognized anymore.
+> 
+> To address this issue, if st_ops_xxx cannot be found in the btf with xxx
+> and mod_btf does not exist, do find_ksym_btf_id() again to
+> avoid such issue.
+> 
+> Fixes: 590a00888250 ("bpf: libbpf: Add STRUCT_OPS support")
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> ---
+>   tools/lib/bpf/libbpf.c | 25 +++++++++++++++++--------
+>   1 file changed, 17 insertions(+), 8 deletions(-)
+> 
+> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> index 66173ddb5a2d..56bf74894110 100644
+> --- a/tools/lib/bpf/libbpf.c
+> +++ b/tools/lib/bpf/libbpf.c
+> @@ -1005,7 +1005,8 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
+>   	const struct btf_member *kern_data_member;
+>   	struct btf *btf = NULL;
+>   	__s32 kern_vtype_id, kern_type_id;
+> -	char tname[256];
+> +	char tname[256], stname[256];
+> +	int ret;
+>   	__u32 i;
+>   
+>   	snprintf(tname, sizeof(tname), "%.*s",
+> @@ -1020,17 +1021,25 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
+>   	}
+>   	kern_type = btf__type_by_id(btf, kern_type_id);
+>   
+> +	ret = snprintf(stname, sizeof(stname), "%s%s", STRUCT_OPS_VALUE_PREFIX, tname);
 
-It is documented here:
+How about always look for "struct bpf_struct_ops_smc_ops" first, figure out the 
+btf, and then look for "struct smc_ops", would it work?
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#updating-patch-status
+If CONFIG_SMC=y instead of =m, this change cannot be tested?
 
-although the documentation spells it out in full, but the patchworks
-bot understands a few abbreviations like cr for change-request.
+> +	if (ret < 0 || ret >= sizeof(stname))
+> +		return -ENAMETOOLONG;
+> +
+>   	/* Find the corresponding "map_value" type that will be used
+>   	 * in map_update(BPF_MAP_TYPE_STRUCT_OPS).  For example,
+>   	 * find "struct bpf_struct_ops_tcp_congestion_ops" from the
+>   	 * btf_vmlinux.
+>   	 */
+> -	kern_vtype_id = find_btf_by_prefix_kind(btf, STRUCT_OPS_VALUE_PREFIX,
+> -						tname, BTF_KIND_STRUCT);
+> +	kern_vtype_id = btf__find_by_name_kind(btf, stname, BTF_KIND_STRUCT);
+>   	if (kern_vtype_id < 0) {
+> -		pr_warn("struct_ops init_kern: struct %s%s is not found in kernel BTF\n",
+> -			STRUCT_OPS_VALUE_PREFIX, tname);
+> -		return kern_vtype_id;
+> +		if (kern_vtype_id == -ENOENT && !*mod_btf)
+> +			kern_vtype_id = find_ksym_btf_id(obj, stname, BTF_KIND_STRUCT,
+> +							 &btf, mod_btf);
+> +		if (kern_vtype_id < 0) {
+> +			pr_warn("struct_ops init_kern: struct %s is not found in kernel BTF\n",
+> +				stname);
+> +			return kern_vtype_id;
+> +		}
+>   	}
+>   	kern_vtype = btf__type_by_id(btf, kern_vtype_id);
+>   
+> @@ -1046,8 +1055,8 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
+>   			break;
+>   	}
+>   	if (i == btf_vlen(kern_vtype)) {
+> -		pr_warn("struct_ops init_kern: struct %s data is not found in struct %s%s\n",
+> -			tname, STRUCT_OPS_VALUE_PREFIX, tname);
+> +		pr_warn("struct_ops init_kern: struct %s data is not found in struct %s\n",
+> +			tname, stname);
+>   		return -EINVAL;
+>   	}
+>   
 
-Marking a patchset as changes-requested will drop it out of the list
-of patches waiting to be merged, so included it at the end of a review
-comment can save the Maintainers some time.
-
-	Andrew
 
