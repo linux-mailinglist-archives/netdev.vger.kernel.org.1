@@ -1,149 +1,159 @@
-Return-Path: <netdev+bounces-153264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE2519F77BE
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:54:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A04649F779D
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:41:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FFB416D409
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:54:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5741A7A2A4F
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488CB220681;
-	Thu, 19 Dec 2024 08:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZ6ZNg/r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33BDD21D5B7;
+	Thu, 19 Dec 2024 08:41:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9402165E4
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 08:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD6141C79;
+	Thu, 19 Dec 2024 08:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734598475; cv=none; b=UpjLS8yPyldlW9iDdwgzPNW3yYDFGcaR40Pz7w8EuCjE5hoE60Wdro4ixZL7djhGZGXMMGZLWElB6mtbdd1egt1ysiG1mMoj4H+rmhCEp1VFjAadL9nNo0nxdAkcLOjQ7glNoaaF8YCZjRzuwVU49h2OaIIzuHSevsJF60XJ00w=
+	t=1734597710; cv=none; b=fQAdJsPHoVQENWW5Dr3/2h2Fw7TFG3sCUjj1En2Y5OyJzZItdx27zSSiRq0eodhd3xKls5FOihSugFC2lpQXMbhmKyl5Ihi0ZUvZPrjFvQdI3EaZ1KCtoi1E7wxzcCKqLFVVpp6GMWp1Iba2al/ydQioX9HcBYfzVmlymMG4Z84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734598475; c=relaxed/simple;
-	bh=AbZVrsl5rcNSdQpiQSZHZhwFsv98yfZDMrhu36UQQ0M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sBYmCWhvd7RJX6yGfMASIONGrn4MtUn7PhI/Nq33MVGIiu/loSeS5nKyomgDZ+P9lq0vlNIAZ/+qqH1238fMZdhdSr+3F4eloQPyaLW4zcpr5VlHorTyl2EvQIjibyycQGcc9pGzotra5sbSfwhv5OMCnDHc6GV1mnQZ8bg0JL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XZ6ZNg/r; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734598472;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ln73Acm3j+A5OSP5LEbrk72iNmfw3DGuza7Hn+SfBsI=;
-	b=XZ6ZNg/rV2a6VJkfFu4rpFjblbs/EwGFiydjpsrnjia5UwJM/3hcKzx0LU7q8HzunDf02w
-	/ugxiJ8K4VKvlJ0BoeB2dQAxr+btTB5rRl0XLXmVRstwQ6yQCW93SxN7gsfWynZRYrMu6y
-	C0w/vAuIKgBruIgkpi9ykUL4VaEdXwc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-128-X9r9x-GbOFekPeuKLvwuWQ-1; Thu, 19 Dec 2024 03:54:29 -0500
-X-MC-Unique: X9r9x-GbOFekPeuKLvwuWQ-1
-X-Mimecast-MFC-AGG-ID: X9r9x-GbOFekPeuKLvwuWQ
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43619b135bcso3065375e9.1
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 00:54:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734598468; x=1735203268;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ln73Acm3j+A5OSP5LEbrk72iNmfw3DGuza7Hn+SfBsI=;
-        b=jmgp7FtWcFXpOnsLBb0XR3KC6n3sCCk5EiFf6K+lWYoPcGy44AJhF/MeFbhSG0401W
-         IRdYhLxLaKVN3vb0IzPaIlz8+hpOBSiiJ8oKw5tXxxtV20rXTgUjTFu/LdI2cb7LbkFo
-         TWqnjd6S9HP47yiXhM0Ryakdg/iRHb2n4H5clrHcddEryJ4WrN3qhkhvp26U3/FQ/slx
-         bE8O9vtNgXao1MaFoazCqSro6WW/Mk8y4Al8q9KL9s6vo8wuxaVj6i2yshAe/k7PhZOb
-         Ervl6AIm5Y43jidPT33xDKbvkMU0j4DUHuTH9Yf6/Mf+5I2LK54hvyl6DiemneOl74Ta
-         l35A==
-X-Gm-Message-State: AOJu0YzcvrmkquY85+R5KO0sUojIHSKKn/FJe0rXIC9VLY9pDTLVyWvZ
-	LR5VOKG5PnU48zBFyY4qnmUNTANFgp4AVpn+sMzAcTLNT52MNeP17sZqsivzELmgFRxpviw4BTp
-	NCx1J0phQXYZo5KJKse2mAL11LAEw5CXNjS13tyz1isR4igr+klLXfg==
-X-Gm-Gg: ASbGncuIzHU+MgLxhbHYuXEBrRZ4h0jsGqHiuAYWDP7l1a6YVWvyhb2g+7/keSr+5t6
-	hrWSYoTJiudnKQsatwOebFBiElncApH25EUsRmk+SNrD6Nn/czjqG/CqBUYPy8xOfK5cLIzChcx
-	8TMFc4dB1VVdY63m9F4KNweg6GF/7WykMgJn2aS+nPKgl85Ov5kPR1I+vqh/+4HvqMkP0vP7bBQ
-	O3+oabdFsTjX1KHkg+hXd+Qvt+aFPI+VAH6Tsb0W2GZ13uxAbQoA5FJwG5G/WAhBo5vh624g0f7
-	YscFrTHwGA==
-X-Received: by 2002:a05:6000:4a18:b0:385:fd24:3303 with SMTP id ffacd0b85a97d-388e4c94037mr5970412f8f.0.1734598467832;
-        Thu, 19 Dec 2024 00:54:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF8u3gkOMLTQkOjSqvv39VU4biDyXs1jALCJ+S0HqVLmGxgtgTo7tJ8iRysWUI+BMylGj423w==
-X-Received: by 2002:a05:6000:4a18:b0:385:fd24:3303 with SMTP id ffacd0b85a97d-388e4c94037mr5970386f8f.0.1734598467277;
-        Thu, 19 Dec 2024 00:54:27 -0800 (PST)
-Received: from [192.168.88.24] (146-241-69-227.dyn.eolo.it. [146.241.69.227])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c833149sm1020867f8f.39.2024.12.19.00.54.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Dec 2024 00:54:26 -0800 (PST)
-Message-ID: <19df2c4d-c40c-40c5-8fec-bb3e63e65533@redhat.com>
-Date: Thu, 19 Dec 2024 09:54:25 +0100
+	s=arc-20240116; t=1734597710; c=relaxed/simple;
+	bh=snkC2yhtkrzPCscAJDw/TA1auWphpv+5kqavOBntcO0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XVWoG7ZSkHjkz6OR0p5742yHn3rogQmcB3pQtB6FfJXdAlswzjbC20v/7SrKpVIdCOiCQCmDYW37ZsEldyMJpHn2V6l7H1syyflGRbDk2jV6A7XIYxY/2DT7iJAof0o7Uco9aZpLljkEY9FVgtGpKEdX2QGAr26c8HZ8cYr5Zu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YDPD04Fsdz6K6RT;
+	Thu, 19 Dec 2024 16:41:36 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id A034C140393;
+	Thu, 19 Dec 2024 16:41:39 +0800 (CST)
+Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 19 Dec
+ 2024 09:41:29 +0100
+From: Gur Stavi <gur.stavi@huawei.com>
+To: <andrew@lunn.ch>
+CC: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
+	<davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
+	<guoxin09@huawei.com>, <gur.stavi@huawei.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <meny.yossefi@huawei.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shenchenyang1@hisilicon.com>,
+	<shijing34@huawei.com>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>
+Subject: Re: [RFC net-next v02 1/3] net: hinic3: module initialization and tx/rx logic
+Date: Thu, 19 Dec 2024 10:55:02 +0200
+Message-ID: <20241219085502.2485372-1-gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <b794027a-ef3b-4262-a952-db249a840e89@lunn.ch>
+References: <b794027a-ef3b-4262-a952-db249a840e89@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/4] selftests/net: packetdrill: import multiple
- tests
-To: Soham Chakradeo <sohamch.kernel@gmail.com>,
- Willem de Bruijn <willemb@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- linux-kselftest@vger.kernel.org, Soham Chakradeo <sohamch@google.com>,
- Jakub Kicinski <kuba@kernel.org>
-References: <20241217185203.297935-1-sohamch.kernel@gmail.com>
- <20241218100013.0c698629@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241218100013.0c698629@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-On 12/18/24 19:00, Jakub Kicinski wrote:
-> On Tue, 17 Dec 2024 18:51:57 +0000 Soham Chakradeo wrote:
->> Import tests for the following features (folder names in brackets):
->> ECN (ecn) : RFC 3168
->> Close (close) : RFC 9293
->> TCP_INFO (tcp_info) : RFC 9293
->> Fast recovery (fast_recovery) : RFC 5681
->> Timestamping (timestamping) : RFC 1323
->> Nagle (nagle) : RFC 896
->> Selective Acknowledgments (sack) : RFC 2018
->> Recent Timestamp (ts_recent) : RFC 1323
->> Send file (sendfile)
->> Syscall bad arg (syscall_bad_arg)
->> Validate (validate)
->> Blocking (blocking)
->> Splice (splice)
->> End of record (eor)
->> Limited transmit (limited_transmit)
-> 
-> Excellent, thanks for adding all these! I will merge the patches
-> momentarily but I do see a number of flakes on our VMs with debug
-> configs enabled:
-> https://netdev.bots.linux.dev/flakes.html?min-flip=0&tn-needle=packetdrill-dbg
-> 
-> In the 7 runs so far we got 2 flakes on:
-> 
->  tcp-timestamping-client-only-last-byte-pkt
+> > +static void hinic3_del_one_adev(struct hinic3_hwdev *hwdev,
+> > +				enum hinic3_service_type svc_type)
+> > +{
+> > +	struct hinic3_pcidev *pci_adapter = hwdev->adapter;
+> > +	struct hinic3_adev *hadev;
+> > +	bool timeout = true;
+> > +	unsigned long end;
+> > +
+> > +	end = jiffies + msecs_to_jiffies(HINIC3_EVENT_PROCESS_TIMEOUT);
+> > +	do {
+> > +		if (!test_and_set_bit(svc_type, &pci_adapter->state)) {
+> > +			timeout = false;
+> > +			break;
+> > +		}
+> > +		usleep_range(900, 1000);
+> > +	} while (time_before(jiffies, end));
+> > +
+> > +	if (timeout && !test_and_set_bit(svc_type, &pci_adapter->state))
+> > +		timeout = false;
+>
+> Please look at using iopoll.h
+>
 
-Quickly skimming over this one, it looks like it does not account for
-the increased default 'tolerance_us'. Kernel packetdrill set it by
-default to 14K (instead of 10K IIRC).
+Ack
 
-I guess this statement:
+> > +static int hinic3_sw_init(struct net_device *netdev)
+> > +{
+> > +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> > +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
+> > +	int err;
+> > +
+> > +	nic_dev->q_params.sq_depth = HINIC3_SQ_DEPTH;
+> > +	nic_dev->q_params.rq_depth = HINIC3_RQ_DEPTH;
+> > +
+> > +	hinic3_try_to_enable_rss(netdev);
+> > +
+> > +	eth_hw_addr_random(netdev);
+>
+> Is using a random MAC just a temporary thing until more code is added
+> to access an OTP?
+>
 
-// SCM_TSTAMP_SCHED for the last byte should be received almost immediately
-// once 10001 is acked at t=20ms.
+No, using a random MAC is not a temporary solution.
+This device is designed for cloud environments. VFs are expected to be
+used by VMs that may migrate from device to device. Therefore the HW does
+not provide a MAC address to VFs, but rather the VF driver selects a
+random MAC address and configures it into the (current) device.
 
-the the follow-up check should be updated accordingly. In the failures
-observed so far the max timestamp is > 35ms.
+Once the driver is extended to support PFs, the PF MAC will be obtained
+from the device.
 
-Cheers,
+> > +	err = register_netdev(netdev);
+> > +	if (err) {
+> > +		err = -ENOMEM;
+> > +		goto err_netdev;
+> > +	}
+> > +
+> > +	netif_carrier_off(netdev);
+> > +
+> > +	dev_set_drvdata(&adev->dev, nic_dev);
+>
+> Is this used anywhere in the driver? Calling register_netdev() makes
+> the interface live, even before it returns. If you have NFS root for
+> example, it could be sending packets, etc, before drvdata is set.
+>
 
-Paolo
+Ack
 
+> > +int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu)
+> > +{
+> > +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> > +	struct hinic3_func_tbl_cfg func_tbl_cfg = {};
+> > +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
+> > +
+> > +	if (new_mtu < HINIC3_MIN_MTU_SIZE) {
+> > +		dev_err(hwdev->dev,
+> > +			"Invalid mtu size: %ubytes, mtu size < %ubytes\n",
+> > +			new_mtu, HINIC3_MIN_MTU_SIZE);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	if (new_mtu > HINIC3_MAX_JUMBO_FRAME_SIZE) {
+> > +		dev_err(hwdev->dev, "Invalid mtu size: %ubytes, mtu size > %ubytes\n",
+> > +			new_mtu, HINIC3_MAX_JUMBO_FRAME_SIZE);
+> > +		return -EINVAL;
+> > +	}
+>
+> The core can do this validation for you, if you set ndev->max_mtu,
+> ndev->min_mtu.
+
+Ack
 
