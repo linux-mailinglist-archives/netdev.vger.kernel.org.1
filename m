@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-153202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A9699F7286
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 03:16:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2119F728F
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 03:25:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B838E164BF6
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:16:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CC2E188B998
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F034154727;
-	Thu, 19 Dec 2024 02:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2F87580C;
+	Thu, 19 Dec 2024 02:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1rWt160"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GP7FOC/c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C573F1754B;
-	Thu, 19 Dec 2024 02:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F28EB665;
+	Thu, 19 Dec 2024 02:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734574563; cv=none; b=UdXYwUDxL+tRqy1C+ZKBPvXgru5DQxhiyfA8mE9/w58QD9SNDMy0DYkc0XsaGs89/Em7IRjL10pUpb0hmdgmPaiv2Yqp+pP8WHN6aVFAOKS7kJyNsKzfk/KI6GD1Yx5LT+C/U1DEbKNc6G4Pg5kijdcsP5XUk87o7InyNZOTzYI=
+	t=1734575150; cv=none; b=YeBbzqxajoTx9o0/8hH7MaE0UJsTeiqgY8+xJUI/pAwvrBQ5CtBkPy/mJ1OWQ+Mi6A44PLwt1Z6610fs/bKov2YyC56/IvvErjxQJsjJeTDNQaLw8PghKgWTgLH/xS2BoBrHtNQZuUbzhpwr1TEjx4FYTb7qamtnmTDVhx2AzKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734574563; c=relaxed/simple;
-	bh=bLuyOdl5VDekWN399Y4B1zP27tyl5ytXESUZzoVP5F0=;
+	s=arc-20240116; t=1734575150; c=relaxed/simple;
+	bh=+0NOtrmq8FIr/AUqm/wCu7PlSuiDYzL04GYeAsxctdM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J0Ee9d+5LsF4Nf83HsuT+VVSNBoS7gcMbVgt/ezfQ0ue1X7iHqDp9KgyDddMav21nni5CtQaJ0/wtbOSrE330rH8wvYgfgVzyk0pFKWWXO24k/rxkjnPjEio/Gp2jcduoDdQgCq48Ri9hC0Uq+X6nL6yJ10pTL2AAJLX7sKQGnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1rWt160; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF2E9C4CECD;
-	Thu, 19 Dec 2024 02:16:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=sQr/LFORkGgXPyU3JRWWohW6NYCcZIkraRdGfPNaKK6jDl7XMHiGXVHsbol4Y2wysDt/+SyhjA2kH7LMd7qJcm08M8XxBfngmQb0QqOCwVCnSaIFejmV4t6VMBqIZdhi6VvlFG6DGXylswWt/NQYdEiTZjqwi6klZ6E3OhuNxoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GP7FOC/c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F44C4CECD;
+	Thu, 19 Dec 2024 02:25:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734574563;
-	bh=bLuyOdl5VDekWN399Y4B1zP27tyl5ytXESUZzoVP5F0=;
+	s=k20201202; t=1734575149;
+	bh=+0NOtrmq8FIr/AUqm/wCu7PlSuiDYzL04GYeAsxctdM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h1rWt1608d0wFw9yBeoWYCECgFj9mkFu7TF7y/TUuuvecPvf7gpHRZ5utA32CqnQW
-	 2P6MFBSUKqp3qDiiGEtoq7bb6QFLppP5Gbb0cq3+nPG9yxpvpE6tUAkyBD0qRwcVCM
-	 TnJvGzy0I2REcUEi3FX6gAuWN5GtCVjvqZqXRju9lLnGSGq55CZoTTWWdBFMErTCDa
-	 JUC9Z96iHgtupfWL3vWeMkvtT4Y4q2PZAN9I3XXR75vRLpnNMS7mQ90AfX0yl8fnnT
-	 CdYTBJycBQr403CUFSO8bsembesxpXJO+KpRlPouWLiNeRVWRKAL9DVsHzZ0NAUTGo
-	 w8zCGfVE5Wedw==
-Date: Wed, 18 Dec 2024 18:16:01 -0800
+	b=GP7FOC/c9bC46GSuks1u31vDzEauAtGxpgn/KwC0kytMHYsHnJgzRdpb88oT4fH3Z
+	 SDxa5Yu7zSw4LYXZnl4H4JWtWBs3aGf/EDflZWfOTMb+ueYCA0c/Y3jcXHNrPqx3mA
+	 XKXoWO+KxWRRXxRkiyF077QuHzz7bBu4ThE4kVPIe3FOv9gfILvTdJCGDqAjdzUcB4
+	 qXav3vShQ111NmlKQMHvDA9L6gWvn5kX1qP8uKJcI5cK7PsSWKu7jKzQ6/Bz78EpWH
+	 1gJRjWb05CBQNf9GcThE5GmChFdbtG8NkAqYsEJeqd3inowi7wItf2SHWLPyuoq0oK
+	 Z16ZUu3KTvHEg==
+Date: Wed, 18 Dec 2024 18:25:47 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Taehee Yoo <ap420073@gmail.com>
 Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
@@ -57,13 +57,13 @@ Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
  rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us,
  bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com,
  aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com,
- daniel.zahka@gmail.com
-Subject: Re: [PATCH net-next v6 2/9] net: ethtool: add hds_config member in
- ethtool_netdev_state
-Message-ID: <20241218181601.4c3c29f7@kernel.org>
-In-Reply-To: <20241218144530.2963326-3-ap420073@gmail.com>
+ daniel.zahka@gmail.com, Andy Gospodarek <gospo@broadcom.com>
+Subject: Re: [PATCH net-next v6 3/9] bnxt_en: add support for tcp-data-split
+ ethtool command
+Message-ID: <20241218182547.177d83f8@kernel.org>
+In-Reply-To: <20241218144530.2963326-4-ap420073@gmail.com>
 References: <20241218144530.2963326-1-ap420073@gmail.com>
-	<20241218144530.2963326-3-ap420073@gmail.com>
+	<20241218144530.2963326-4-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,35 +73,73 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 18 Dec 2024 14:45:23 +0000 Taehee Yoo wrote:
-> When tcp-data-split is UNKNOWN mode, drivers arbitrarily handle it.
-> For example, bnxt_en driver automatically enables if at least one of
-> LRO/GRO/JUMBO is enabled.
-> If tcp-data-split is UNKNOWN and LRO is enabled, a driver returns
-> ENABLES of tcp-data-split, not UNKNOWN.
-> So, `ethtool -g eth0` shows tcp-data-split is enabled.
-> 
-> The problem is in the setting situation.
-> In the ethnl_set_rings(), it first calls get_ringparam() to get the
-> current driver's config.
-> At that moment, if driver's tcp-data-split config is UNKNOWN, it returns
-> ENABLE if LRO/GRO/JUMBO is enabled.
-> Then, it sets values from the user and driver's current config to
-> kernel_ethtool_ringparam.
-> Last it calls .set_ringparam().
-> The driver, especially bnxt_en driver receives
-> ETHTOOL_TCP_DATA_SPLIT_ENABLED.
-> But it can't distinguish whether it is set by the user or just the
-> current config.
-> 
-> When user updates ring parameter, the new hds_config value is updated
-> and current hds_config value is stored to old_hdsconfig.
-> Driver's .set_ringparam() callback can distinguish a passed
-> tcp-data-split value is came from user explicitly.
-> If .set_ringparam() is failed, hds_config is rollbacked immediately.
-> 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+On Wed, 18 Dec 2024 14:45:24 +0000 Taehee Yoo wrote:
+> +	if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_DISABLED && hds_config_mod)
+> +		return -EOPNOTSUPP;
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+I think ethtool ops generally return -EINVAL when param not supported.
+EOPNOTSUPP means entire op is not supported (again, that's just how
+ethtool ops generally work, not a kernel-wide rule).
+
+> +	if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
+> +	    hds_config_mod && BNXT_RX_PAGE_MODE(bp)) {
+
+Looks like patch 4 adds this check in the core. I think adding the
+check in the core can be a separate patch. If you put it before this
+patch in the series this bnxt check can be removed?
+
+I mean this chunk in the core:
+
++	hds_config_mod = old_hds_config != kernel_ringparam.tcp_data_split;
++	if (kernel_ringparam.tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
++	    hds_config_mod && dev_xdp_sb_prog_count(dev)) {
++		NL_SET_ERR_MSG(info->extack,
++			       "tcp-data-split can not be enabled with single buffer XDP");
++		return -EINVAL;
++	}
+
+It's currently in the hds-thresh patch but really it's unrelated 
+to the threshold..
+
+> +		NL_SET_ERR_MSG_MOD(extack, "tcp-data-split is disallowed when XDP is attached");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+>  	if (netif_running(dev))
+>  		bnxt_close_nic(bp, false, false);
+>  
+> +	if (hds_config_mod) {
+> +		if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED)
+> +			bp->flags |= BNXT_FLAG_HDS;
+> +		else if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_UNKNOWN)
+> +			bp->flags &= ~BNXT_FLAG_HDS;
+> +	}
+> +
+>  	bp->rx_ring_size = ering->rx_pending;
+>  	bp->tx_ring_size = ering->tx_pending;
+>  	bnxt_set_ring_params(bp);
+> @@ -5354,6 +5374,7 @@ const struct ethtool_ops bnxt_ethtool_ops = {
+>  				     ETHTOOL_COALESCE_STATS_BLOCK_USECS |
+>  				     ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
+>  				     ETHTOOL_COALESCE_USE_CQE,
+> +	.supported_ring_params	= ETHTOOL_RING_USE_TCP_DATA_SPLIT,
+>  	.get_link_ksettings	= bnxt_get_link_ksettings,
+>  	.set_link_ksettings	= bnxt_set_link_ksettings,
+>  	.get_fec_stats		= bnxt_get_fec_stats,
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> index f88b641533fc..1bfff7f29310 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> @@ -395,6 +395,10 @@ static int bnxt_xdp_set(struct bnxt *bp, struct bpf_prog *prog)
+>  			    bp->dev->mtu, BNXT_MAX_PAGE_MODE_MTU);
+>  		return -EOPNOTSUPP;
+>  	}
+> +	if (prog && bp->flags & BNXT_FLAG_HDS) {
+> +		netdev_warn(dev, "XDP is disallowed when HDS is enabled.\n");
+> +		return -EOPNOTSUPP;
+> +	}
+
+And this check should also live in the core, now that core has access
+to dev->ethtool->hds_config ? I think you can add this check to the
+core in the same patch as the chunk referred to above.
 
