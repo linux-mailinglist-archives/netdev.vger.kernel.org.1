@@ -1,472 +1,205 @@
-Return-Path: <netdev+bounces-153488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 901FF9F8396
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 19:57:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D3A9F8399
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 19:58:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DD18188C271
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:57:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DF39188C30E
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263B41A071C;
-	Thu, 19 Dec 2024 18:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1AF31A0AFE;
+	Thu, 19 Dec 2024 18:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="imCkbeQE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="ulqvp+ih"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB52198A31;
-	Thu, 19 Dec 2024 18:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A121A08A3
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 18:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734634631; cv=none; b=twkNag50j7Pgpmg6ueDmuBM41rjJlgJO6tl7V3vhpGElyqVXKzROrWH38hkyLG6A9lClq60ae6tmO1w64xUfZEloKY5yBI5jCY6geUtroi443O5msTn+xIbZ/9+GzG60R0W43jlqyzB+rSgEcLD65iuUJFdGRV68De/uouxEryI=
+	t=1734634680; cv=none; b=LeE91GS2bCrSbR5jsTk9ABG/OmDyubR88xJyeFIVu1jxkIKlTX6JIiWeGy2pmJZ51e04goiqUXD4BI8b/rtg4WdPp8kqNPe4fMk5z5NepMfTOSW8SMawgUst+0Se2ioBuw+SIISKhjewYdFiKwjE4ozpXgNYaqJCZ7WfypngKHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734634631; c=relaxed/simple;
-	bh=eYyOk2bEyqd9fGa1vFqfVwiRsgnVF5MO1LvYr05b2SY=;
-	h=Content-Type:MIME-Version:From:Subject:To:Cc:Message-Id:Date; b=tg7lyh4DuIJjJTjbM/pVj50RX4sMkGMGRFe8HqIx4tv+D4znqRdgpp5e2VB42jgKHePMC3NYGua0fv+WNQAsQXjhVMFR6IvzlVZmhallZEShie3gY8JdrXp9WF6Lu98cOEnqKATZcoo/mOAB9xSrITeyZJoXptXP+JgXBqHbPc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=imCkbeQE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 774EDC4CECE;
-	Thu, 19 Dec 2024 18:57:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734634630;
-	bh=eYyOk2bEyqd9fGa1vFqfVwiRsgnVF5MO1LvYr05b2SY=;
-	h=From:Subject:To:Cc:Date:From;
-	b=imCkbeQEZN10UjeP6p3bxXTDEb6l7Sw0IE6WFyMYfJDNQ4eEqDI6T/enSTbDvGuva
-	 Pb+ZAme87dBBTlytfN6xR4yElgNWGb9CTl1NLDHZbLKLfIBZ+Q+sSiMNXckG8L4kN3
-	 wDet/PfzxwsNvMGLBZIjX/80kWpLC7JCxjNzPLRYadKdGcUwLJUekTlC/Y5Aq4OsQP
-	 yZP17nBOyqbast6GT35bRHIwEGjUS29JijxWQF6U+mJWMNTAsXKYbnIdoVTJbOW5si
-	 k1p77E/pSKuQWFEQiTn+SalxlmhuFA65/QkA7HOgYnvOvnTNdNRTM/A0Q3zyL0jg12
-	 HWcwAd1fDpyaQ==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1734634680; c=relaxed/simple;
+	bh=Cu3spGZCQ72U+XRFdeGMW8VB9ztzslTSWk1iur4BCzU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dZtf2Fk3tg5x0A5i+nTb7HID8OGXgi3X2WJDEjw/97h1fzMjZ7L8v6gDlUub+Oe9kq8iN8nzjOKmzLX/6CVJaocrahvX1FrRlOFsQERT0sER5YiX40tsjtU1FS//Syolehj6ySby6epNafPyDw1lj+AgWZ0KpBtjhSwBAEth13w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=ulqvp+ih; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AzGEIu0zFE7WiR6/nCXO042kOHUfhZAtU19UEHR7SOc=; t=1734634679; x=1735498679; 
+	b=ulqvp+ihX3PbEyaR7xyOosw/9Sj2kGu3p1PAVHYB3TBJ770+SaOqD5Qpymxhfit4cWlDlL8jp4F
+	4kfeE72JRRK8FlLsFXCyogp9PxrCg8z/u805CbZqw7I8Osa9YDb+Nr77vGU33d+frzv4tTtJ8dsHN
+	vHCc9vZcEcYOpzHEw6HDoK6N0xgGGMU29D9v8aM8KCjFPguFhZX7M+9pB3HN4rMpVhjw4Wn1jgK37
+	EuxcCxekSVl90Pj/0h8hJl9fKVKuG5Vp6YbFuNsRwSkhAcVacXpWJjhFV2tNWz455Q/MWlZLm5S19
+	KT+R3vUuyuH+z/6sUrAQ+CwV/3qGh8KE2VWA==;
+Received: from mail-oa1-f54.google.com ([209.85.160.54]:44261)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tOLif-0000Lm-Nl
+	for netdev@vger.kernel.org; Thu, 19 Dec 2024 10:57:58 -0800
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-2a0206590a7so555957fac.0
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 10:57:57 -0800 (PST)
+X-Gm-Message-State: AOJu0YyHpEHTAxUSG9US9fP57jjVEUHZICmUEzJbOrzqH6qCA06VbKKH
+	swB+hdgZq04Tskmm5hfubvZ6BVQShqwPdQDw4tdwb5wEdbDAu2YdhpDM9r2EZe5ZwaND1J8pHhv
+	hCGpXAXwA4q0lpJVWw4hhrJFdtXY=
+X-Google-Smtp-Source: AGHT+IEi+hIA9HF6RCU7p9TNdp46If0xHVi8W6C1qG2NEbTUhzJDX6SGwmoXmSTP7UJkKyCV1h/Y3vjGXq8l4OS511Q=
+X-Received: by 2002:a05:6870:7d85:b0:29e:5522:8eea with SMTP id
+ 586e51a60fabf-2a7fb553df2mr19908fac.38.1734634677127; Thu, 19 Dec 2024
+ 10:57:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Kalle Valo <kvalo@kernel.org>
-Subject: pull-request: wireless-next-2024-12-19
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Message-Id: <20241219185709.774EDC4CECE@smtp.kernel.org>
-Date: Thu, 19 Dec 2024 18:57:09 +0000 (UTC)
-
-Hi,
-
-here's a pull request to net-next tree, more info below. Please let me know if
-there are any problems.
-
-Kalle
-
-The following changes since commit 40384c840ea1944d7c5a392e8975ed088ecf0b37:
-
-  Linux 6.13-rc1 (2024-12-01 14:28:56 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2024-12-19
-
-for you to fetch changes up to 8ab3bf4764136e8ad8d1064c304be50297bcf9ad:
-
-  wifi: wlcore: sysfs: constify 'struct bin_attribute' (2024-12-18 20:05:06 +0200)
-
-----------------------------------------------------------------
-wireless-next patches for v6.14
-
-Multi-Link Operation implementation continues, both in stack and in
-drivers. Otherwise it has been relatively quiet.
-
-Major changes:
-
-cfg80211/mac80211
-
-* define wiphy guard
-
-* get TX power per link
-
-* EHT 320 MHz channel support for mesh
-
-ath11k
-
-* QCA6698AQ support
-
-ath9k
-
-* RX inactivity detection
-
-rtl8xxxu
-
-* add more USB device IDs
-
-rtw88
-
-* add more USB device IDs
-
-* enable USB RX aggregation and USB 3 to improve performance
-
-rtw89
-
-* PowerSave flow for Multi-Link Operation
-
-----------------------------------------------------------------
-Aditya Kumar Singh (3):
-      wifi: ath12k: ath12k_bss_assoc(): MLO support
-      wifi: mac80211_hwsim: add 6 GHz EHT Mesh capabilities
-      wifi: ath12k: rename mlo_capable_flags to single_chip_mlo_supp
-
-Alex Shumsky (1):
-      wifi: brcmfmac: clarify unmodifiable headroom log message
-
-Aloka Dixit (1):
-      wifi: mac80211: fix variable used in for_each_sdata_link()
-
-Andrei Otcheretianski (1):
-      wifi: mac80211: Accept authentication frames on P2P device
-
-Balaji Pothunoori (2):
-      wifi: ath11k: Suspend hardware before firmware mode off for WCN6750
-      wifi: ath11k: Fix unexpected return buffer manager error for WCN6750/WCN6855
-
-Barnabás Czémán (1):
-      wifi: wcn36xx: fix channel survey memory allocation size
-
-Bitterblue Smith (2):
-      wifi: rtw88: usb: Support USB 3 with RTL8812AU
-      wifi: rtw88: usb: Enable RX aggregation for 8821au/8812au
-
-Chih-Kang Chang (3):
-      wifi: rtw89: 8922a: use RSSI from PHY report in RX descriptor
-      wifi: rtw89: add crystal_cap check to avoid setting as overflow value
-      wifi: rtw89: 8922a: update format of RFK pre-notify H2C command v2
-
-Christophe JAILLET (1):
-      wifi: wlcore: testmode: Constify strutc nla_policy
-
-Colin Ian King (1):
-      wifi: rtlwifi: rtl8821ae: phy: restore removed code to fix infinite loop
-
-Dinesh Karthikeyan (4):
-      wifi: ath12k: Support Downlink Pager Stats
-      wifi: ath12k: Support phy counter and TPC stats
-      wifi: ath12k: Support SoC Common Stats
-      wifi: ath12k: Support Transmit PER Rate Stats
-
-Dmitry Antipov (6):
-      wifi: ath9k: miscellaneous spelling fixes
-      wifi: ath11k: cleanup struct ath11k_vif
-      wifi: ath11k: cleanup struct ath11k_reg_tpc_power_info
-      wifi: ath11k: cleanup struct ath11k_mon_data
-      wifi: ath11k: miscellaneous spelling fixes
-      wifi: brcmsmac: add gain range check to wlc_phy_iqcal_gainparams_nphy()
-
-Dylan Eskew (1):
-      wifi: mac80211: ethtool: add monitor channel reporting
-
-Eric Huang (1):
-      wifi: rtw89: ps: update data for firmware and settings for hardware before/after PS
-
-Hans de Goede (1):
-      wifi: rtl8xxxu: add more missing rtl8192cu USB IDs
-
-Jeff Johnson (4):
-      wifi: ath12k: mark QMI driver event helpers as noinline
-      wifi: ath11k: mark some QMI driver event helpers as noinline
-      wifi: ath11k: mark ath11k_dp_rx_mon_mpdu_pop() as noinline
-      wifi: ath11k: mark ath11k_wow_convert_8023_to_80211() as noinline
-
-Johannes Berg (2):
-      wifi: cfg80211: define and use wiphy guard
-      wifi: mac80211: use wiphy guard
-
-Juan José Arboleda (1):
-      wifi: iwlwifi: mvm: Replace spaces for tabs in iwl_mvm_vendor_events_idx
-
-Kalle Valo (7):
-      wifi: ath12k: ath12k_mac_vdev_create(): use goto for error handling
-      wifi: ath12k: introduce ath12k_hw_warn()
-      wifi: ath12k: convert struct ath12k::wmi_mgmt_tx_work to struct wiphy_work
-      wifi: ath12k: ath12k_mac_op_set_key(): fix uninitialized symbol 'ret'
-      wifi: ath12k: ath12k_mac_op_sta_rc_update(): use mac80211 provided link id
-      Merge tag 'ath-next-20241209' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-      Merge tag 'rtw-next-2024-12-12' of https://github.com/pkshih/rtw
-
-Karol Przybylski (1):
-      wifi: ath12k: Fix for out-of bound access error
-
-Karthikeyan Periyasamy (10):
-      wifi: ath12k: Refactor core startup
-      wifi: ath12k: add ath12k_ab_to_ah() and ath12k_ab_set_ah()
-      wifi: ath12k: add ath12k_get_num_hw()
-      wifi: ath12k: introduce QMI firmware ready flag
-      wifi: ath12k: move ATH12K_FLAG_REGISTERED handling to ath12k_mac_register()
-      wifi: ath12k: introduce device group abstraction
-      wifi: ath12k: refactor core start based on hardware group
-      wifi: ath12k: move struct ath12k_hw from per device to group
-      wifi: ath12k: send QMI host capability after device group is ready
-      wifi: ath12k: introduce mlo_capable flag for device group
-
-Kuan-Chung Chen (5):
-      wifi: rtw89: sar: tweak 6GHz SAR subbands span
-      wifi: rtw89: introduce dynamic antenna gain feature
-      wifi: rtw89: handle different TX power between RF path
-      wifi: rtw89: disable firmware training HE GI and LTF
-      wifi: rtw89: 8852c: disable ER SU when 4x HE-LTF and 0.8 GI capability differ
-
-Larry Finger (1):
-      wifi: rtw88: 8821au: Add additional devices to the USB_DEVICE list
-
-Liu Jing (1):
-      wifi: qtnfmac: fix spelling error in core.h
-
-Marcel Hamer (1):
-      wifi: brcmfmac: add missing header include for brcmf_dbg
-
-Miaoqing Pan (1):
-      wifi: ath11k: add support for QCA6698AQ
-
-Nick Morrow (2):
-      wifi: rtw88: 8812au: Add more device IDs
-      wifi: rtw88: Add additional USB IDs for RTL8812BU
-
-Norbert van Bolhuis (1):
-      wifi: brcmfmac: fix scatter-gather handling by detecting end of sg list
-
-P Praneesh (1):
-      wifi: ath12k: Fix endianness issue in struct hal_tlv_64_hdr
-
-Pin-yen Lin (1):
-      wifi: mwifiex: decrease timeout waiting for host sleep from 10s to 5s
-
-Ping-Ke Shih (6):
-      wifi: rtw89: pci: disable PCIE wake bit when PCIE deinit
-      wifi: rtw89: ps: refactor PS flow to support MLO
-      wifi: rtw89: ps: refactor channel info to firmware before entering PS
-      wifi: rtw89: 8852c: rfk: refine target channel calculation in _rx_dck_channel_calc()
-      wifi: rtw89: 8851b: rfk: remove unnecessary assignment of return value of _dpk_dgain_read()
-      wifi: rtw89: phy: add dummy C2H event handler for report of TAS power
-
-Po-Hao Huang (3):
-      wifi: rtw89: 8922a: Extend channel info field length for scan
-      wifi: rtw89: 8852b: add beacon filter and CQM support
-      wifi: rtw89: 8852bt: add beacon filter and CQM support
-
-Rameshkumar Sundaram (6):
-      wifi: ath12k: add reo queue lookup table for ML peers
-      wifi: ath12k: modify chanctx iterators for MLO
-      wifi: ath12k: ath12k_mac_station_add(): fix potential rx_stats leak
-      wifi: ath12k: defer vdev creation for MLO
-      wifi: cfg80211: send MLO links tx power info in GET_INTERFACE
-      wifi: mac80211: get tx power per link
-
-Renjaya Raga Zenta (1):
-      wifi: brcmfmac: fix brcmf_vif_clear_mgmt_ies when stopping AP
-
-Roopni Devanathan (1):
-      wifi: ath12k: Fix inappropriate use of print_array_to_buf_index()
-
-Sathishkumar Muruganandam (1):
-      wifi: mac80211: add EHT 320 MHz support for mesh
-
-Sidhanta Sahu (1):
-      wifi: ath12k: Support MBSSID Control Frame Stats
-
-Sriram R (16):
-      wifi: ath12k: MLO vdev bringup changes
-      wifi: ath12k: Refactor sta state machine
-      wifi: ath12k: Add helpers for multi link peer creation and deletion
-      wifi: ath12k: add multi-link flag in peer create command
-      wifi: ath12k: add helper to find multi-link station
-      wifi: ath12k: Add MLO peer assoc command support
-      wifi: ath12k: Add MLO station state change handling
-      wifi: ath12k: support change_sta_links() mac80211 op
-      wifi: ath12k: add primary link for data path operations
-      wifi: ath12k: use arsta instead of sta
-      wifi: ath12k: Use mac80211 vif's link_conf instead of bss_conf
-      wifi: ath12k: Use mac80211 sta's link_sta instead of deflink
-      wifi: ath12k: ath12k_mac_op_tx(): MLO support
-      wifi: ath12k: ath12k_mac_op_flush(): MLO support
-      wifi: ath12k: ath12k_mac_op_ampdu_action(): MLO support
-      wifi: ath12k: do not return invalid link id for scan link
-
-Thadeu Lima de Souza Cascardo (9):
-      wifi: rtlwifi: do not complete firmware loading needlessly
-      wifi: rtlwifi: rtl8192se: rise completion of firmware loading as last step
-      wifi: rtlwifi: wait for firmware loading before releasing memory
-      wifi: rtlwifi: fix init_sw_vars leak when probe fails
-      wifi: rtlwifi: usb: fix workqueue leak when probe fails
-      wifi: rtlwifi: remove unused check_buddy_priv
-      wifi: rtlwifi: destroy workqueue at rtl_deinit_core
-      wifi: rtlwifi: fix memory leaks and invalid access at probe error path
-      wifi: rtlwifi: pci: wait for firmware loading before releasing memory
-
-Thomas Weißschuh (1):
-      wifi: wlcore: sysfs: constify 'struct bin_attribute'
-
-Toke Høiland-Jørgensen (1):
-      wifi: ath9k: Add RX inactivity detection and reset chip when it occurs
-
-Zichen Xie (1):
-      wifi: cfg80211: tests: Fix potential NULL dereference in test_cfg80211_parse_colocated_ap()
-
-Zong-Zhe Yang (8):
-      wifi: rtw89: 8922a: configure AP_LINK_PS if FW supports
-      wifi: rtw89: register ops of can_activate_links
-      wifi: rtw89: implement ops of change vif/sta links
-      wifi: rtw89: apply MLD pairwise key to dynamically active links
-      wifi: rtw89: pass target link_id to ieee80211_gtk_rekey_add()
-      wifi: rtw89: pass target link_id to ieee80211_nullfunc_get()
-      wifi: rtw89: refine link handling for link_sta_rc_update
-      wifi: rtw89: regd: update regulatory map to R68-R51
-
- drivers/net/wireless/ath/ath11k/core.c             |  132 ++
- drivers/net/wireless/ath/ath11k/core.h             |    4 +-
- drivers/net/wireless/ath/ath11k/dp.h               |    1 -
- drivers/net/wireless/ath/ath11k/dp_rx.c            |   14 +-
- drivers/net/wireless/ath/ath11k/hal.h              |    6 +-
- drivers/net/wireless/ath/ath11k/hal_rx.c           |    3 +-
- drivers/net/wireless/ath/ath11k/hw.h               |    1 +
- drivers/net/wireless/ath/ath11k/mac.c              |    7 +-
- drivers/net/wireless/ath/ath11k/mhi.c              |    1 +
- drivers/net/wireless/ath/ath11k/pci.c              |    3 +
- drivers/net/wireless/ath/ath11k/pcic.c             |   13 +-
- drivers/net/wireless/ath/ath11k/qmi.c              |    8 +-
- drivers/net/wireless/ath/ath11k/wow.c              |    6 +-
- drivers/net/wireless/ath/ath12k/core.c             |  486 ++++-
- drivers/net/wireless/ath/ath12k/core.h             |  134 +-
- drivers/net/wireless/ath/ath12k/debug.c            |    6 +-
- drivers/net/wireless/ath/ath12k/debug.h            |    5 +-
- .../net/wireless/ath/ath12k/debugfs_htt_stats.c    |  681 ++++++-
- .../net/wireless/ath/ath12k/debugfs_htt_stats.h    |  218 ++-
- drivers/net/wireless/ath/ath12k/dp.c               |   70 +-
- drivers/net/wireless/ath/ath12k/dp.h               |    3 +-
- drivers/net/wireless/ath/ath12k/dp_rx.c            |   96 +-
- drivers/net/wireless/ath/ath12k/dp_rx.h            |    6 +-
- drivers/net/wireless/ath/ath12k/hal_desc.h         |    2 +-
- drivers/net/wireless/ath/ath12k/hal_rx.c           |   12 +-
- drivers/net/wireless/ath/ath12k/mac.c              | 1999 +++++++++++++++-----
- drivers/net/wireless/ath/ath12k/mac.h              |   16 +-
- drivers/net/wireless/ath/ath12k/pci.c              |   10 +
- drivers/net/wireless/ath/ath12k/peer.c             |  223 ++-
- drivers/net/wireless/ath/ath12k/peer.h             |   23 +-
- drivers/net/wireless/ath/ath12k/qmi.c              |  167 +-
- drivers/net/wireless/ath/ath12k/qmi.h              |   20 +
- drivers/net/wireless/ath/ath12k/wmi.c              |  207 +-
- drivers/net/wireless/ath/ath12k/wmi.h              |  115 ++
- drivers/net/wireless/ath/ath6kl/cfg80211.c         |    1 +
- drivers/net/wireless/ath/ath9k/antenna.c           |    2 +-
- drivers/net/wireless/ath/ath9k/ar9002_hw.c         |    2 +-
- drivers/net/wireless/ath/ath9k/ar9003_hw.c         |    2 +-
- drivers/net/wireless/ath/ath9k/ar9003_mci.c        |    4 +-
- drivers/net/wireless/ath/ath9k/ar9003_phy.h        |    2 +-
- drivers/net/wireless/ath/ath9k/ath9k.h             |    2 +
- drivers/net/wireless/ath/ath9k/channel.c           |    2 +-
- drivers/net/wireless/ath/ath9k/common-spectral.c   |    2 +-
- drivers/net/wireless/ath/ath9k/debug.c             |    1 +
- drivers/net/wireless/ath/ath9k/debug.h             |    1 +
- drivers/net/wireless/ath/ath9k/dfs.c               |    2 +-
- drivers/net/wireless/ath/ath9k/hif_usb.c           |    2 +-
- drivers/net/wireless/ath/ath9k/hw.c                |    4 +-
- drivers/net/wireless/ath/ath9k/hw.h                |    2 +-
- drivers/net/wireless/ath/ath9k/link.c              |   33 +-
- drivers/net/wireless/ath/ath9k/mac.h               |    2 +-
- drivers/net/wireless/ath/ath9k/main.c              |    5 +-
- drivers/net/wireless/ath/ath9k/wow.c               |    6 +-
- drivers/net/wireless/ath/ath9k/xmit.c              |    2 +-
- drivers/net/wireless/ath/wcn36xx/main.c            |    5 +-
- .../wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c  |    5 +
- .../broadcom/brcm80211/brcmfmac/cfg80211.c         |    8 +-
- .../wireless/broadcom/brcm80211/brcmfmac/core.c    |    4 +-
- .../wireless/broadcom/brcm80211/brcmfmac/fwil.h    |    2 +
- .../broadcom/brcm80211/brcmsmac/phy/phy_n.c        |    3 +
- .../net/wireless/intel/iwlwifi/mvm/vendor-cmd.c    |    6 +-
- drivers/net/wireless/marvell/mwifiex/cfg80211.c    |    2 +-
- drivers/net/wireless/marvell/mwifiex/sta_ioctl.c   |    2 +-
- drivers/net/wireless/mediatek/mt76/mac80211.c      |    2 +-
- drivers/net/wireless/mediatek/mt76/mt76.h          |    2 +-
- drivers/net/wireless/microchip/wilc1000/cfg80211.c |    2 +-
- drivers/net/wireless/quantenna/qtnfmac/cfg80211.c  |    2 +-
- drivers/net/wireless/quantenna/qtnfmac/core.h      |    2 +-
- drivers/net/wireless/realtek/rtl8xxxu/core.c       |   20 +
- drivers/net/wireless/realtek/rtlwifi/base.c        |   13 +-
- drivers/net/wireless/realtek/rtlwifi/base.h        |    1 -
- drivers/net/wireless/realtek/rtlwifi/pci.c         |   61 +-
- .../net/wireless/realtek/rtlwifi/rtl8192se/sw.c    |    7 +-
- .../net/wireless/realtek/rtlwifi/rtl8821ae/phy.c   |    4 +-
- drivers/net/wireless/realtek/rtlwifi/usb.c         |   12 +-
- drivers/net/wireless/realtek/rtlwifi/wifi.h        |   12 -
- drivers/net/wireless/realtek/rtw88/rtw8812au.c     |   68 +-
- drivers/net/wireless/realtek/rtw88/rtw8821au.c     |   52 +-
- drivers/net/wireless/realtek/rtw88/rtw8822bu.c     |    6 +
- drivers/net/wireless/realtek/rtw88/usb.c           |   72 +-
- drivers/net/wireless/realtek/rtw89/acpi.c          |   47 +
- drivers/net/wireless/realtek/rtw89/acpi.h          |    9 +
- drivers/net/wireless/realtek/rtw89/cam.c           |   32 +-
- drivers/net/wireless/realtek/rtw89/cam.h           |    5 +
- drivers/net/wireless/realtek/rtw89/core.c          |  164 +-
- drivers/net/wireless/realtek/rtw89/core.h          |  145 ++
- drivers/net/wireless/realtek/rtw89/debug.c         |    4 +
- drivers/net/wireless/realtek/rtw89/fw.c            |  266 ++-
- drivers/net/wireless/realtek/rtw89/fw.h            |   69 +-
- drivers/net/wireless/realtek/rtw89/mac.c           |   79 +-
- drivers/net/wireless/realtek/rtw89/mac.h           |   43 +
- drivers/net/wireless/realtek/rtw89/mac80211.c      |  289 ++-
- drivers/net/wireless/realtek/rtw89/mac_be.c        |   15 +
- drivers/net/wireless/realtek/rtw89/pci.c           |   16 +-
- drivers/net/wireless/realtek/rtw89/pci.h           |    9 +
- drivers/net/wireless/realtek/rtw89/pci_be.c        |    1 +
- drivers/net/wireless/realtek/rtw89/phy.c           |  315 ++-
- drivers/net/wireless/realtek/rtw89/phy.h           |   33 +-
- drivers/net/wireless/realtek/rtw89/ps.c            |   42 +-
- drivers/net/wireless/realtek/rtw89/ps.h            |    4 +-
- drivers/net/wireless/realtek/rtw89/reg.h           |    4 +
- drivers/net/wireless/realtek/rtw89/regd.c          |   57 +-
- drivers/net/wireless/realtek/rtw89/rtw8851b.c      |    6 +-
- drivers/net/wireless/realtek/rtw89/rtw8851b_rfk.c  |    2 +-
- drivers/net/wireless/realtek/rtw89/rtw8852a.c      |    7 +-
- drivers/net/wireless/realtek/rtw89/rtw8852b.c      |    3 +
- .../net/wireless/realtek/rtw89/rtw8852b_common.c   |   50 +-
- drivers/net/wireless/realtek/rtw89/rtw8852bt.c     |    3 +
- drivers/net/wireless/realtek/rtw89/rtw8852c.c      |   54 +-
- drivers/net/wireless/realtek/rtw89/rtw8852c_rfk.c  |    6 +-
- drivers/net/wireless/realtek/rtw89/rtw8922a.c      |   21 +-
- drivers/net/wireless/realtek/rtw89/sar.c           |   55 +-
- drivers/net/wireless/realtek/rtw89/ser.c           |    1 +
- drivers/net/wireless/realtek/rtw89/txrx.h          |    3 +
- drivers/net/wireless/realtek/rtw89/wow.c           |   11 +-
- drivers/net/wireless/ti/wlcore/sysfs.c             |    4 +-
- drivers/net/wireless/ti/wlcore/testmode.c          |    2 +-
- drivers/net/wireless/virtual/mac80211_hwsim.c      |   39 +
- drivers/staging/rtl8723bs/os_dep/ioctl_cfg80211.c  |    3 +-
- include/net/cfg80211.h                             |    6 +-
- include/net/mac80211.h                             |    2 +-
- net/mac80211/cfg.c                                 |   16 +-
- net/mac80211/debugfs.c                             |    4 +-
- net/mac80211/driver-ops.h                          |    7 +-
- net/mac80211/ethtool.c                             |   22 +-
- net/mac80211/ieee80211_i.h                         |    2 +-
- net/mac80211/iface.c                               |   25 +-
- net/mac80211/main.c                                |    9 +-
- net/mac80211/rx.c                                  |    4 +-
- net/mac80211/trace.h                               |   10 +-
- net/mac80211/util.c                                |   29 +-
- net/wireless/chan.c                                |    4 +-
- net/wireless/core.c                                |   42 +-
- net/wireless/mlme.c                                |    8 +-
- net/wireless/nl80211.c                             |  203 +-
- net/wireless/pmsr.c                                |    4 +-
- net/wireless/rdev-ops.h                            |    7 +-
- net/wireless/reg.c                                 |   53 +-
- net/wireless/scan.c                                |   40 +-
- net/wireless/sme.c                                 |   12 +-
- net/wireless/tests/scan.c                          |    2 +
- net/wireless/trace.h                               |   44 +-
- net/wireless/util.c                                |    7 +-
- net/wireless/wext-compat.c                         |  317 ++--
- net/wireless/wext-sme.c                            |   43 +-
- 145 files changed, 6347 insertions(+), 1645 deletions(-)
-
+References: <20241217000626.2958-1-ouster@cs.stanford.edu> <20241217000626.2958-2-ouster@cs.stanford.edu>
+ <20241218174345.453907db@kernel.org>
+In-Reply-To: <20241218174345.453907db@kernel.org>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Thu, 19 Dec 2024 10:57:22 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
+Message-ID: <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API for Homa
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: ae8206b624f71ff41c2281f68712021f
+
+On Wed, Dec 18, 2024 at 5:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 16 Dec 2024 16:06:14 -0800 John Ousterhout wrote:
+> > +#ifdef __cplusplus
+> > +extern "C"
+> > +{
+> > +#endif
+>
+> I'm not aware of any networking header wrapped in extern "C"
+> Let's not make this precedent?
+
+Without this I don't seem to be able to use this header in C++ files:
+I end up getting linker errors such as 'undefined reference to
+`homa_replyv(int, iovec const*, int, sockaddr const*, unsigned int,
+unsigned long)'.
+
+Any suggestions on how to make the header file work with C++ files
+without the #ifdef __cplusplus?
+
+> > +/**
+> > + * define HOMA_MIN_DEFAULT_PORT - The 16-bit port space is divided int=
+o
+> > + * two nonoverlapping regions. Ports 1-32767 are reserved exclusively
+> > + * for well-defined server ports. The remaining ports are used for cli=
+ent
+> > + * ports; these are allocated automatically by Homa. Port 0 is reserve=
+d.
+> > + */
+> > +#define HOMA_MIN_DEFAULT_PORT 0x8000
+>
+> Not sure why but ./scripts/kernel-doc does not like this:
+>
+> include/uapi/linux/homa.h:51: warning: expecting prototype for HOMA_MIN_D=
+EFAULT_PORT - The 16(). Prototype was for HOMA_MIN_DEFAULT_PORT() instead
+
+I saw this warning from kernel-doc before I posted the patch, but I
+couldn't figure out why it is happening. After staring at the error
+message some more I figured it out: kernel-doc is getting confused by
+the "-" in "16-bit" (it seems to use the last "-" on the line rather
+than the first). I've modified the comment to replace "16-bit" with
+"16 bit" and filed a bug report for kernel-doc.
+
+> > +/**
+> > + * struct homa_sendmsg_args - Provides information needed by Homa's
+> > + * sendmsg; passed to sendmsg using the msg_control field.
+> > + */
+> > +struct homa_sendmsg_args {
+> > +     /**
+> > +      * @id: (in/out) An initial value of 0 means a new request is
+> > +      * being sent; nonzero means the message is a reply to the given
+> > +      * id. If the message is a request, then the value is modified to
+> > +      * hold the id of the new RPC.
+> > +      */
+> > +     uint64_t id;
+>
+> Please use Linux uapi types, __u64
+
+Done. In the process I discovered that the underlying type for __u64
+is not the same as that for uint64_t; this results in awkwardness in
+programs that use both...
+
+> > +/** define SO_HOMA_RCVBUF - setsockopt option for specifying buffer re=
+gion. */
+> > +#define SO_HOMA_RCVBUF 10
+> > +
+> > +/** struct homa_rcvbuf_args - setsockopt argument for SO_HOMA_RCVBUF. =
+*/
+> > +struct homa_rcvbuf_args {
+> > +     /** @start: First byte of buffer region. */
+> > +     void *start;
+>
+> I'm not sure if pointers are legal in uAPI.
+> I *think* we are supposed to use __aligned_u64, because pointers
+> will be different size for 32b binaries running in compat mode
+> on 64b kernels, or some such.
+
+I see that "void *" is used in the declaration for struct msghdr
+(along with some other pointer types as well) and struct msghdr is
+part of several uAPI interfaces, no?
+
+> > +/**
+> > + * define HOMA_FLAG_DONT_THROTTLE - disable the output throttling mech=
+anism:
+> > + * always send all packets immediately.
+> > + */
+>
+> Also makes kernel-doc unhappy:
+>
+> include/uapi/linux/homa.h:159: warning: expecting prototype for HOMA_FLAG=
+_DONT_THROTTLE - disable the output throttling mechanism(). Prototype was f=
+or HOMA_FLAG_DONT_THROTTLE() instead
+
+It seems that the ":" also confuses kernel-doc. I've worked around this as =
+well.
+
+> Note that next patch adds more kernel-doc warnings, you probably want
+> to TAL at those as well. Use
+>
+>   ./scripts/kernel-doc -none -Wall $file
+
+Hmm, I did run kernel-doc before posting the patch, but maybe I missed
+some stuff. I'll take another look. There are a few things kernel-doc
+complained about where the requested documentation would add no useful
+information; it would just end up repeating what is already obvious
+from the code. Is any discretion allowed for cases like this? If the
+expectation is that there will be zero kernel-doc complaints, then
+I'll go ahead and add the useless documentation.
+
+> > +#ifdef __cplusplus
+> > +}
+> > +#endif
+> --
+> pw-bot: cr
+
+I'm not sure what "pw-bot: cr" means; I assume this is related to the
+"#ifdef __cplusplus" discussion above?
+
+Thanks for the comments.
+
+-John-
 
