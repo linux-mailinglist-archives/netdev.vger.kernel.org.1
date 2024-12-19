@@ -1,84 +1,147 @@
-Return-Path: <netdev+bounces-153313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D7E09F7965
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 11:19:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EBD59F796F
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 11:21:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B2A67A3D04
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 10:19:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEF3E1895E15
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 10:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266F822259B;
-	Thu, 19 Dec 2024 10:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcyY2043"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15EB223318;
+	Thu, 19 Dec 2024 10:20:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AD7221DA0;
-	Thu, 19 Dec 2024 10:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34005222D45;
+	Thu, 19 Dec 2024 10:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734603564; cv=none; b=TX+84VVwRHLuF8rEu27TA6Rus4xuI36kAg52srwBysYDEy49ye2KYlXh5PcUAZj45m/5fp7l6qT9MIX8+zPeELV+AOE+FQvzvzx9GosnOw/S0M7+iMfFUQdmqJMiKQRImjfF/WVJmm73e/2ESuj5evb3yO8SpcbyVsYgVlKigbI=
+	t=1734603637; cv=none; b=THyxVhuqTLrC0i1tv4TMx7ARxPXkvsJx95Od/ezu+4Mx4KG/7i8Xi8QjLWOX/txfV+I8bohkOAO0xq6svM57D4AJ7SqQVGExVuJhZ/Elyn/2jHG1JPrvUwNrIRRGxcDpCaFQcwyYeyle00z9J/rEBliZRxo93tyxqM2ycRG1lk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734603564; c=relaxed/simple;
-	bh=YARuEnKCY3DjNkFjefNtHIJtCVS0Uy8rwW6nb5xs85s=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=jptBmZ2OSDfUNjBvu5TJsdGYIhl+Zwrx+KIiWFGxwV2Od4D4GhNYRCvlt7iq2GRXxsS35n65u2RqwZLm7bFuTcPX+CZT2kgJAMGweVfbimttJ/1/vWOdDJgjI4Ra5XdAurXByQLGH1z7pFYRG226J1HDhGMH0AWy1b+D+f9aoRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcyY2043; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 127B0C4CECE;
-	Thu, 19 Dec 2024 10:19:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734603563;
-	bh=YARuEnKCY3DjNkFjefNtHIJtCVS0Uy8rwW6nb5xs85s=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=fcyY2043vkv0GTcHBmAWP5Gi/Y9QOSAyqXCKXn/fL//POSSDU+J1oAjbmSXAvfUiL
-	 9k2B+y7zUV6HoRifF10RddsIWCx2M59H8/8sww6/zlrlKHwddFVcsMg3jUt8Hw5Dj5
-	 y6dcvNCuOj+EcLV+I2LFpEFpUHMMiE9lSo8qFLJXbdlKjRAB4zP0BnldX2nioCM+wg
-	 T6Y2xgZm02eug257TrSWRzT98/A+YDanZ+7Bi8x4C5tVAXkz2DxtLvPZwaJsdj+2Mn
-	 elQulv1pvwXWvzSCEQOh/IA9OSBe4DByuuCyr/vh8xojrsS4GJWQjIEUKnHfJdUakl
-	 SLBqJhzh0XY8w==
-From: Leon Romanovsky <leon@kernel.org>
-To: linux-rdma@vger.kernel.org, Bernard Metzler <bmt@zurich.ibm.com>
-Cc: jgg@ziepe.ca, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com, 
- syzbot+4b87489410b4efd181bf@syzkaller.appspotmail.com
-In-Reply-To: <20241212151848.564872-1-bmt@zurich.ibm.com>
-References: <20241212151848.564872-1-bmt@zurich.ibm.com>
-Subject: Re: [PATCH RESEND v2] RDMA/siw: Remove direct link to net_device
-Message-Id: <173460356012.346747.2939412852773263195.b4-ty@kernel.org>
-Date: Thu, 19 Dec 2024 05:19:20 -0500
+	s=arc-20240116; t=1734603637; c=relaxed/simple;
+	bh=bVAK5qqrzNv/+QX0XmTlgynG+PuvzBKkGTqdKXAMwC0=;
+	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=fAetzd8Cx55JX5vPAjzUQZ2ntZxBZFmnDHTyX1zsiN1XfoQ7kfgXUdGAY8Bu+Wl+GQcSmBqh0wGHk4UaBugKawpIuJKbhjWmCqIpUOuFsU/VJEMZE4yT6VqFJScf2Z3c+7s+vjKXNdwX7RwUmM+PCGlu07TTGqSlraSQDswsyYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4YDRMr3q9XzRjrm;
+	Thu, 19 Dec 2024 18:18:32 +0800 (CST)
+Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id 39D8F1402E1;
+	Thu, 19 Dec 2024 18:20:26 +0800 (CST)
+Received: from [10.174.179.93] (10.174.179.93) by
+ kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 19 Dec 2024 18:20:22 +0800
+Subject: Re: [PATCH v3 -next 11/15] sunrpc: use vfs_pressure_ratio() helper
+To: Jeff Layton <jlayton@kernel.org>, NeilBrown <neilb@suse.de>
+References: <> <12ec5b63b17b360f2e249a4de0ac7b86e09851a3.camel@kernel.org>
+ <172859659591.444407.1507982523726708908@noble.neil.brown.name>
+ <b0cf00eec77014ad473d4510904eb2d4fd084e5a.camel@kernel.org>
+CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
+	<ysato@users.sourceforge.jp>, <dalias@libc.org>,
+	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<hpa@zytor.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+	<jack@suse.cz>, <kees@kernel.org>, <j.granados@samsung.com>,
+	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
+	<chuck.lever@oracle.com>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
+	<tom@talpey.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <paul@paul-moore.com>,
+	<jmorris@namei.org>, <linux-sh@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
+	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
+	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
+	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
+	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
+	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
+	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
+	<wangkefeng.wang@huawei.com>, <sunnanyong@huawei.com>
+From: yukaixiong <yukaixiong@huawei.com>
+Message-ID: <3efccfae-3f76-c99c-29f9-fdf5dd65894d@huawei.com>
+Date: Thu, 19 Dec 2024 18:20:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <b0cf00eec77014ad473d4510904eb2d4fd084e5a.camel@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-37811
+X-ClientProxiedBy: dggpeml100004.china.huawei.com (7.185.36.247) To
+ kwepemh100016.china.huawei.com (7.202.181.102)
 
 
-On Thu, 12 Dec 2024 16:18:48 +0100, Bernard Metzler wrote:
-> Do not manage a per device direct link to net_device. Rely
-> on associated ib_devices net_device management, not doubling
-> the effort locally. A badly managed local link to net_device
-> was causing a 'KASAN: slab-use-after-free' exception during
-> siw_query_port() call.
-> 
-> 
-> [...]
 
-Applied, thanks!
-
-[1/1] RDMA/siw: Remove direct link to net_device
-      https://git.kernel.org/rdma/rdma/c/16b87037b48889
-
-Best regards,
--- 
-Leon Romanovsky <leon@kernel.org>
+On 2024/10/11 20:38, Jeff Layton wrote:
+> On Fri, 2024-10-11 at 08:43 +1100, NeilBrown wrote:
+>> On Fri, 11 Oct 2024, Jeff Layton wrote:
+>>> On Thu, 2024-10-10 at 23:22 +0800, Kaixiong Yu wrote:
+>>>> Use vfs_pressure_ratio() to simplify code.
+>>>>
+>>>> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
+>>>> Reviewed-by: Kees Cook <kees@kernel.org>
+>>>> Acked-by: Anna Schumaker <anna.schumaker@oracle.com>
+>>>> ---
+>>>>   net/sunrpc/auth.c | 2 +-
+>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/net/sunrpc/auth.c b/net/sunrpc/auth.c
+>>>> index 04534ea537c8..3d2b51d7e934 100644
+>>>> --- a/net/sunrpc/auth.c
+>>>> +++ b/net/sunrpc/auth.c
+>>>> @@ -489,7 +489,7 @@ static unsigned long
+>>>>   rpcauth_cache_shrink_count(struct shrinker *shrink, struct shrink_control *sc)
+>>>>   
+>>>>   {
+>>>> -	return number_cred_unused * sysctl_vfs_cache_pressure / 100;
+>>>> +	return vfs_pressure_ratio(number_cred_unused);
+>>>>   }
+>>>>   
+>>>>   static void
+>>> Acked-by: Jeff Layton <jlayton@kernel.org>
+>>>
+>> I realise this is a bit of a tangent, and I'm not objecting to this
+>> patch, but I wonder what the justification is for using
+>> vfs_cache_pressure here.  The sysctl is documented as
+>>
+>>     This percentage value controls the tendency of the kernel to reclaim
+>>     the memory which is used for caching of directory and inode objects.
+>>
+>> So it can sensibly be used for dentries and inode, and for anything
+>> directly related like the nfs access cache (which is attached to inodes)
+>> and the nfs xattr cache.
+>>
+>> But the sunrpc cred cache scales with the number of active users, not
+>> the number of inodes/dentries.
+>>
+>> So I think this should simply "return number_cred_unused;".
+>>
+>> What do others think?
+>>
+>> NeilBrown
+>>
+> -----------------8<------------------
+>   * @count_objects should return the number of freeable items in the cache. If
+>   * there are no objects to free, it should return SHRINK_EMPTY, while 0 is
+>   * returned in cases of the number of freeable items cannot be determined
+>   * or shrinker should skip this cache for this time (e.g., their number
+>   * is below shrinkable limit)...
+> -----------------8<------------------
+>
+> number_cred_unused does sound like a better way to report this.
+Thanks, I'll take NeilBrown's advice.
 
 
