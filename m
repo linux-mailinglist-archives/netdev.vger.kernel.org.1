@@ -1,179 +1,321 @@
-Return-Path: <netdev+bounces-153251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 070999F7715
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:17:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 348FF9F7720
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:20:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56291162BEE
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:17:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C2AB163411
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C721BD01D;
-	Thu, 19 Dec 2024 08:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DD3216E3D;
+	Thu, 19 Dec 2024 08:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bwsoyUjU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cW/ZtB44"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2085.outbound.protection.outlook.com [40.107.244.85])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8131853
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 08:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734596246; cv=fail; b=tWyAhbuvyEjrLOYo+9dLdVwty20ejgGEJ/cR1/khPy6h4/oHL2jpZ4yUDWIuqpH4s2+8PxHf9SdzjM43+V7POL8pM+bZ4uhQkP1AjBhpTa5duRAjIIcxzprKN6FZlVknlOBp/dXK3MJmfTg0ZlMQnkHeaDbPo+lMZytySJPGffM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734596246; c=relaxed/simple;
-	bh=fD4wRv7jOPinrjBoKvdU+GoGhKjB2IeOpf3yVEKCooY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=GDZTi+i0qPTMnHMNlNziVeB0JzItppAQHIOmQeNdlXhu78FXVeWV7NZ3v3/uB1unco2xkBYrjdkoPLw/iUZGUAL2u5Oyg3YPQDczkkLKk++i3B7Nj2f2JqJwV6l/ntUncFwRwGwJAIcH1rQyRNoRpjOyTpa5U7nqUr7fgQW5S6g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bwsoyUjU; arc=fail smtp.client-ip=40.107.244.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kg5KhDP/BLk3fTugRYxkzfEaZDysedyXDb4pVo0sKsEvK5L7vO8EJF3KzaY3DHP6gVHkW4GlasBztskLrc+YItQ7qU7gGLe1bqjdY/8p5re6pHPSZ7Rs0TuRNmR8uYGcuattOlQkuy694PzIZUzomAxPXWIO+thDep6qcgS2g4jZDvcSQgaeqONgUJQIcrGzLyVhBSJsqUC7UxseLnqUiLa9mwNETzqfZZ0pmVvfo0Rxvy6oZC3ffky1Pv14mAoGVInTu6RlyrVduDv1MDkoLKdo6bRhjLWRvHDdAft7ANbVEJXsfb/AVvUpTp2cgIIs5IefvlGRfuI0PqowjQ4/qg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xTRl2PN+AK1HpGBJXzwFpqnjbw/8vNadxBMcHcKnF/0=;
- b=rLwjWc8ukFwH7EOTmDXOz6zPuleyrSwGv3biEJBwmNT3gdfHja2EFitrBkPr2DPqWF9FAN6MrvqET5uheGIAHxMNlzdOWLLZnaeKhUvvRHFyYOm3I526jUfY5obdd9eQ+B+ZvUmwmTBd3+wkVfnFaT3XUIl/UYCyPDcMe6QELIPPip2bv93U5WKKd2Bi19PA05F4QOCyaw42/6qn/Fs+CCSV2aWsOvDE8jUTmhg2Biye3sYDtd6SCiB44xhgxewuMZroYvb9bC7I/z1Ndn/G7U77BsFUUs1Ukkw09OUmgVdZ6uDL0ohmqSzgV1hoYqiquUtgS9vr5g6roBNGwnE5gg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xTRl2PN+AK1HpGBJXzwFpqnjbw/8vNadxBMcHcKnF/0=;
- b=bwsoyUjUFvFwBEXMxTN9H5or3iMQw6qMhctYwJrULr42OOaj52WetZflSFElwy0hmIJCm0i8HX7aSl20W/telJQc3M1EVCSvlG6oGlnIBLkIvbs4PcbRqIY7HD1CuuEMZV+XDNbO6lDKw4rXDxCeuIhbcWRM62+9iPIiGCzynePpybqjwS9EJHQkEy58XIXa+wH7pKw0cnPZFjWZ0j8uHjo9V8WAiLsF0hbydv7R4bziXQML6skw8mxVW6AFqIDiofv70t12Y+Gu9Cx0pnS0r+cv83dC7SGRYVhmfJGdvmd2dHALeDUUOXG77dh8LfMlugMx31bEvqbQeNMsTBzLZA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by MW6PR12MB8999.namprd12.prod.outlook.com (2603:10b6:303:247::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Thu, 19 Dec
- 2024 08:17:22 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8%4]) with mapi id 15.20.8251.015; Thu, 19 Dec 2024
- 08:17:22 +0000
-Date: Thu, 19 Dec 2024 10:17:12 +0200
-From: Ido Schimmel <idosch@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, dsahern@kernel.org, donald.hunter@gmail.com,
-	horms@kernel.org, gnault@redhat.com, rostedt@goodmis.org,
-	mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
-	petrm@nvidia.com
-Subject: Re: [PATCH net-next 3/9] ipv6: fib_rules: Add flow label support
-Message-ID: <Z2PWiNKaCHz3yOJ8@shredder>
-References: <20241216171201.274644-1-idosch@nvidia.com>
- <20241216171201.274644-4-idosch@nvidia.com>
- <20241218190509.5aba9223@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241218190509.5aba9223@kernel.org>
-X-ClientProxiedBy: TL0P290CA0013.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::20) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFA615B135
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 08:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734596398; cv=none; b=Li57TP7q8xFmumGDYWIFhrL6YuYdyFxXVFFNCUjAIEdBINA+ZmUQdkbNNkVrK6+OIZhTPcgBjcy6szKtrTklPV2OFLczO+fJ8DRXGWdsfdBFrrz8lFzWoF8FP3H1N9EQTvnZmdhFsSalY7tjhtjT9Xz58nm7RR0Ur0WFTH6KZ7w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734596398; c=relaxed/simple;
+	bh=eJUkN9ilHcw1SnkVlgtb32oUI9TlDttRegj5MNnKna4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mmdw7hvQ184lZHRjWkATEQzI5sxOjz7TXxKCUJqafuFv9+FnP+7qL3RXnbh4/PyNYVAjarV4swmL8w1nB6CkZWh98Euv3upsVPyRIRwHqE5E5vvPxQRU9IFDfa/V9QS3Lj7Nr25ttXkuYD6/jm2VrWKW/xo5ExMwXfzGbBrgn/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cW/ZtB44; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734596395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZbdOr6aQNDsdO5CKQMhPyCwxIDtzeBIbnye+AambmwI=;
+	b=cW/ZtB44d+jmMxWQjb4oikMbeVAFH6+bAyvTMQ5XorT4AHLEAUlJOWng+KI8uJ7WKDCR/b
+	GBUrLBVrP4iAqagLpRo76vH35siMjXJ7dPa5cg3RavNeooXxRlkGl6YwQrHA9bUe99yRNO
+	4qvRtosF7XA4fIaNd9bKgBMB+HvF5K4=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-544-Blbil7LzNSiJrI6qHRE25w-1; Thu, 19 Dec 2024 03:19:52 -0500
+X-MC-Unique: Blbil7LzNSiJrI6qHRE25w-1
+X-Mimecast-MFC-AGG-ID: Blbil7LzNSiJrI6qHRE25w
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aa6a87f324cso49143566b.1
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 00:19:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734596391; x=1735201191;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZbdOr6aQNDsdO5CKQMhPyCwxIDtzeBIbnye+AambmwI=;
+        b=tgusp4IDPX78MfbtUAw3ZEWGI7Ci/EcxqL52VxQXiwvpECZfnh7l+T2aK99q7Ssmxj
+         KDz/lGJo2tfGhrLfrnkMdkay88I/A8MA2wT+cmQkr2G47pLD6oek3MJk+aEfp57ZOE7G
+         MRe4lBLXMQL/EtjiBf7c/raBMPor+/J7X2a146VnHv/4a4QdaddPrjaf4MWESTq6gkyG
+         3Q/GupitkISTJ42hTm8MB8Qm9J8v2JU+5tOh0cOBTvGf6ZoLqJZKRCl5whCvI/XmsA4G
+         dVtzb3fmxjV7bYm8WLNnLzweQecuyCq4lFk7DmrZH9bzaJk9RwqN5MRjXTkntlFf2Dqr
+         kgHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDVIdKF26JC4ALowulT7adQubJjA/j6mVoE/Wt1Rw9w4ON6V4+tQ1Eo/hwPk21Pl5V2paQr0w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3EF+qBeRHfktzIb5NXa0mPV94P27RHBLKDHAS9YweBYjVyFde
+	H2Y99otdeJHVSLHSYiZpkq7Jhvouc2eiFH6y/AqQfViAkV8CTAgVOPf9ZLnJIVMZU+ff2LUXZou
+	oSVL2gxHlfQFKAVawFI77GdREsQX7u7qM4MzB4Ar4L62i8Ai5mYURmA==
+X-Gm-Gg: ASbGncvTwOYjCnZTfkUrkxl1Z6aJUw5ZfReRZEBYjKrB8uhE9E6dBJXklMHHlvMtTrh
+	a0hViEtpdMVW5AQ//LversETyfokPQPZzvvO4XUio0gOz8Y9vaQbCn/eBJKh4hIofGdKpzvtuqe
+	3yQtUMmwFeAuYwBVQiC/64+DFEEZPiwoNfN0e73hJL77JxY0YtqKn8/6PWsrIlxRDyh4zNU/Bdj
+	txYnI69bfaBd9ZIynO4DPxj9ZQT4P5RjxLhPTNJu5azH6ozqDKygL5jnALlM/pBK9FOn1jaNgCZ
+	A+i3FgS4c3HqOFohyPMogQsE2aLUJ26G
+X-Received: by 2002:a17:907:2cc2:b0:aa6:6e10:61f1 with SMTP id a640c23a62f3a-aac078c92e2mr184819366b.1.1734596390872;
+        Thu, 19 Dec 2024 00:19:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF6AY4CH+pW6AjjnNaTPyzUaYWwgoFHV93tESaaZ5B1C3mKDdPQiYU8a/vc14wmkcmoeiztqA==
+X-Received: by 2002:a17:907:2cc2:b0:aa6:6e10:61f1 with SMTP id a640c23a62f3a-aac078c92e2mr184815266b.1.1734596390021;
+        Thu, 19 Dec 2024 00:19:50 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-185-21.business.telecomitalia.it. [87.12.185.21])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e896163sm39197566b.59.2024.12.19.00.19.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 00:19:49 -0800 (PST)
+Date: Thu, 19 Dec 2024 09:19:44 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Hyunwoo Kim <v4bel@theori.io>, Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, qwerty@theori.io
+Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
+Message-ID: <fezrztdzj5bz54ys6qialz4w3bjqqxmhx74t2tnklbif6ns5dn@mtcjqnqbx6n4>
+References: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX>
+ <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
+ <Z2LZ3HK05RH8OfP5@v4bel-B760M-AORUS-ELITE-AX>
+ <s2k74f6zvjm7uexqfyej6txvoqgf6lkaa47igo2eh4pq55d4n2@wnrrcr6aa6lk>
+ <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
+ <Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX>
+ <5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co>
+ <Z2N44ka8+l83XqcG@v4bel-B760M-AORUS-ELITE-AX>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|MW6PR12MB8999:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a8a7a39-a6f8-4469-9a37-08dd20058ff0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xj7AXdSBVJOMLIRYHQ6TqdMX9HSaT5Wv2FdbKPOSRQn0JdKoSlvK5CofMG4U?=
- =?us-ascii?Q?01+y6syTHe3fI/ezAXjeh7F5XgSAk5nS8BHEf02H86xS3PiKJqxWgThDxHCQ?=
- =?us-ascii?Q?05d0lrRCho+jPCHyxQIixFN5x57tOlfC+JRHc1fcQ1C7mNJlXku/BSfS0h7p?=
- =?us-ascii?Q?n7h2dNq7wS6WWiXtHLquo2D+1aGbGOH958sbKkvRFnBW31L8M+Ud/DW6jq6D?=
- =?us-ascii?Q?xqi7B7onRUlaTw38/r4InBGI6DWsd+OwxHPP/I6/pc0/T6BB1jOZerELXiyv?=
- =?us-ascii?Q?PvOuOuLio1TXWkE6WICgByAvkPoecxDRA+41PrUaPecqg+lMGxoAVDcI8/OK?=
- =?us-ascii?Q?+p6obCGTqunLx6cCq4SRCi7cEh6ra1/pdNchgxpnidxqYcJx+S9cHcCrtuDI?=
- =?us-ascii?Q?qGg+WZF3Y1qEO3QbVS8h0/6RHDLSNkRAyuiOUSdZ6uVsMMWFksUUTD4KO4HL?=
- =?us-ascii?Q?Xsqt4k8oBBzpH4qabNddNe10j2kN+fHuxxt2EHhbiNAjohEGJCUAlycQS6pI?=
- =?us-ascii?Q?gmT3tG02tqlFhvradm6nygS4xDTXMijyFb1bOz9CMDYd4ZF6ALUg7tA9/fU8?=
- =?us-ascii?Q?QpJbRi2sqpd9jPg7XKUz/Hw+1YvRw1szaNU+H1nZ0xao88IswTd8CiUrs5gV?=
- =?us-ascii?Q?k8kgiZrU1jMrTVNGrnve8kUPiepFgpYr5w9zOSapH2YEmz2K1gbPIqSLuDYn?=
- =?us-ascii?Q?eUhEPxyN2joYN7c51WESj2hGPJZxKVikrZINdV30VQw/c/qMchg4SQ6rSLHM?=
- =?us-ascii?Q?G1HnQHo5cAgyaq8mDwKWCJullhBmcAUaJGmvLqYDIS5coqJ8vEQrEgYhJDBc?=
- =?us-ascii?Q?Uz7y+fNrO3KRbvh7xiEvw8mjl+7KNnnYxbzJlnZBJXScL9hMHCeIoXazMJpT?=
- =?us-ascii?Q?aVyCme/ldPD7TBeuSDuPCLK1ifMfBlaWGvd0+TWfvwS1EDzgr1KYmzagb/YN?=
- =?us-ascii?Q?LYiGESnPBid0OtuGzODZ7JyVJRgBWKjoOUFfi069R5i1aEr8IPeInS3hjJUX?=
- =?us-ascii?Q?Ov5kfSY9THjfTzGltR9c1QanhYz4uOtitVtNJWtdQ7RkgOldgltMvf2zjOki?=
- =?us-ascii?Q?beAtFhf/TIcqiWyNJttZJm+ltA1FJ5R0jKnLQbkDn4fps1aJkZ6NUmmx3+2h?=
- =?us-ascii?Q?oDg2M7q9SqzBH/CIRdzEx7GHAwbrzg/1TiW10FFH7La1ZD8DK6bgm3yUCKNi?=
- =?us-ascii?Q?J9LXGpzpvWCErronrXLm1QksBuZltLphB7qg4lvCTLN9c/4Mzv5MK28kOm28?=
- =?us-ascii?Q?iakkKvOePk8tayUXfKNHIbu/7Awy8vV9n9ZtYxIiTcika2gDw6piH132BgZi?=
- =?us-ascii?Q?enkAbiaBkRUGYo9eeAM2ojUcPGEVs3X74YNA8luLTmMs7A/eT38/0zdoOqJp?=
- =?us-ascii?Q?grwNz4F7elrVpSimBYWHCYf6R/Q+?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?fnZ7cpquCTvUXxKI/oYbcKLi4TOK4Vi5VZmP4ZR0njv3NpHzv63uUMTmvRU1?=
- =?us-ascii?Q?jPbln4bh1clXYruxpBPeYVyNl5SBE2l33ix/cWnAM4K/DcproY1A/IS88TDt?=
- =?us-ascii?Q?mLVmhr3mV5bxVkFsVZ4sAELFJau5m3lDiOtaUMGnv3PiKaVI2ViDPCbwyMyV?=
- =?us-ascii?Q?nWoblYXNZeQHiLVRQMgGWGGABBMCJGXjWlqOSO3tQy5cKduoYitce6VXUDO4?=
- =?us-ascii?Q?LHuvOo8Oqj+AskNdC3OzvWDNfZ14HbGrPEGv7KgGsTX0CCDj0ARBbrzRzXqi?=
- =?us-ascii?Q?dZGeDujZuWUbuogC2Sre88fMHlQOMTTJExv8vLLw3Dyt6I5lMvyH5iKFeHBy?=
- =?us-ascii?Q?SqEZLjWW87TR9doPOhgUcOcrFgFhWbsEIUrSc8OzntUpq93uEnHTHFzPbpvp?=
- =?us-ascii?Q?MYfGsOAnVrmdboxkQYI5ddayxp4NeOx8wif7ACtjlp4Tm48oGPi0hkmFPyrV?=
- =?us-ascii?Q?XUUkBMp1fxs6hHAhlmOa78wdEJsVt82Fk/X+EOYxsXafDD1+tY5KMYjJ6dAC?=
- =?us-ascii?Q?dqAioZXGaZsMlyApLkMUsvWuO6KrtV3eMc8ULr4EgrzBvD4aFgrIO1GnzALf?=
- =?us-ascii?Q?4Z5mMMe6cYitfIfE8lEYhI6g8eTaJsHZhQDwB4EmjQTrtrJNNJUwBTfOnGnA?=
- =?us-ascii?Q?EjHg6wa1qVyBmKTqrKdw1GihrOr1/yvNyHU1pGgOvGwCm3E/o+UzqSACCWcA?=
- =?us-ascii?Q?iBzhuC/z14wXoOMDf2BhgyW9DtbQONCnPlS9c0eUR9P/XeW2oP8+2UDqh+sJ?=
- =?us-ascii?Q?vaClnYNiX6t9+R16oCXrXKYwUb9XmW42lfrZ4sMlRT/mcfOoTvoT3hRHcL+x?=
- =?us-ascii?Q?92cJzBei5lN2Kn3BwDIUGGZgqZzuzriSrd1cCC4lmyUGMc2xvt52d1eT+6CV?=
- =?us-ascii?Q?CizkZKjrlm1zEHS7/gTOKAWAItbDg2EHkcnhmAhzixDhM18p+gxrVw5jYSkq?=
- =?us-ascii?Q?JASvtWaWl/A09xugbPS8T10x539SXZ2MpMefmVQQTy5r6saZenerIVDUKG3Y?=
- =?us-ascii?Q?UJU0GTeZhoCqKiG+kIimVplnKNA+5jtT/FwNamkxF00oAFEiXB5uSix7kJUu?=
- =?us-ascii?Q?2TzWGJruAKwOaw5J20h6FO6qrlXPp+brnhyJxLyKHqyYRhkQgcAMVNg7mHGl?=
- =?us-ascii?Q?LkulSpDM36hydpeM6CGZTGomLcIuRJ4bGaqhUa5ysBaz+RKUv8nE8t0WiOHJ?=
- =?us-ascii?Q?wdnNfVQtZ/T1FVMwzMRzI6ho1leAPGX7vfp8QAv33Hcz3Rr48fzulNTm5gcg?=
- =?us-ascii?Q?lYLLJH+Q2zPOSjcZRAvSSfaqqtmd370MOEcX0d5ZT1Y3/tG+qHS+9tM/Eewg?=
- =?us-ascii?Q?zhIZRjJh5oD5G35hpF+OqK1JcW6V1ZQqSYGWE8p+9mb/xkSPyvLupxkHLNO5?=
- =?us-ascii?Q?Ou71krYd20KslHqAbkV4vdoNEaXhcY9re1F6DAGgDTEcC7VRW4JuXr2jeWt5?=
- =?us-ascii?Q?HvBUwBAG88e+vNAWiLRu3r9mX+jSQN7oa3Pje5QezXp3wF6dlB/qda77f7B1?=
- =?us-ascii?Q?11g3yUYPAC9df4DFJ2jHXoHmDku4JE/S0H4dFbaawGpLUAc17cAU4KkBh7SJ?=
- =?us-ascii?Q?40ISmAngTeF8ZsXAA2iBo8MMhC7wRE3OPm4tpD1j?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a8a7a39-a6f8-4469-9a37-08dd20058ff0
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2024 08:17:21.9755
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HOSjE5HvhRwWSxu8CuWfMmB653tJRb1hOgO9Ca02TgQIdQFZ1SgGeZ7KjX6PV5AFCeAgX0BdB8eFjpHWqAJ43g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8999
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z2N44ka8+l83XqcG@v4bel-B760M-AORUS-ELITE-AX>
 
-On Wed, Dec 18, 2024 at 07:05:09PM -0800, Jakub Kicinski wrote:
-> On Mon, 16 Dec 2024 19:11:55 +0200 Ido Schimmel wrote:
-> > +	if (flowlabel_mask & ~IPV6_FLOWLABEL_MASK) {
-> > +		NL_SET_ERR_MSG_ATTR(extack, tb[FRA_FLOWLABEL_MASK],
-> > +				    "Invalid flow label mask");
-> > +		return -EINVAL;
-> > +	}
-> 
-> Have you considered NLA_POLICY_MASK() ?
-> Technically it does support be32, but we'd need to bswap ~IPV6_FLOWLABEL_MASK
-> and you need the helper anyway... so up to you.
+On Wed, Dec 18, 2024 at 08:37:38PM -0500, Hyunwoo Kim wrote:
+>On Thu, Dec 19, 2024 at 01:25:34AM +0100, Michal Luczaj wrote:
+>> On 12/18/24 16:51, Hyunwoo Kim wrote:
+>> > On Wed, Dec 18, 2024 at 04:31:03PM +0100, Stefano Garzarella wrote:
+>> >> On Wed, Dec 18, 2024 at 03:40:40PM +0100, Stefano Garzarella wrote:
+>> >>> On Wed, Dec 18, 2024 at 09:19:08AM -0500, Hyunwoo Kim wrote:
+>> >>>> At least for vsock_loopback.c, this change doesn’t seem to introduce any
+>> >>>> particular issues.
+>> >>>
+>> >>> But was it working for you? because the check was wrong, this one should
+>> >>> work, but still, I didn't have time to test it properly, I'll do later.
+>> >>>
+>> >>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> >>> index 9acc13ab3f82..ddecf6e430d6 100644
+>> >>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> >>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> >>> @@ -1628,8 +1628,10 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+>> >>>        lock_sock(sk);
+>> >>> -       /* Check if sk has been closed before lock_sock */
+>> >>> -       if (sock_flag(sk, SOCK_DONE)) {
+>> >>> +       /* Check if sk has been closed or assigned to another transport before
+>> >>> +        * lock_sock
+>> >>> +        */
+>> >>> +       if (sock_flag(sk, SOCK_DONE) || vsk->transport != &t->transport) {
+>> >>>                (void)virtio_transport_reset_no_sock(t, skb);
+>> >>>                release_sock(sk);
+>> >>>                sock_put(sk);
+>>
+>> Hi, I got curious about this race, my 2 cents:
+>>
+>> Your patch seems to fix the reported issue, but there's also a variant (as
+>> in: transport going null unexpectedly) involving BPF:
 
-I did consider it, but I preferred to have all the checks at the same
-place in the IPv6 code instead of having it split between IPv6 and core
+I think it is a different problem, to be solved in vsock_bpf.c
 
-> 
-> > +	if (flowlabel & ~flowlabel_mask) {
-> > +		NL_SET_ERR_MSG(extack, "Flow label and mask do not match");
-> > +		return -EINVAL;
-> > +	}
+With something like this (untested):
+
+diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
+index 4aa6e74ec295..8c2322dc2af7 100644
+--- a/net/vmw_vsock/vsock_bpf.c
++++ b/net/vmw_vsock/vsock_bpf.c
+@@ -25,10 +25,8 @@ static struct proto vsock_bpf_prot;
+  static bool vsock_has_data(struct sock *sk, struct sk_psock *psock)
+  {
+         struct vsock_sock *vsk = vsock_sk(sk);
+-       s64 ret;
+
+-       ret = vsock_connectible_has_data(vsk);
+-       if (ret > 0)
++       if (vsk->transport && vsock_connectible_has_data(vsk) > 0)
+                 return true;
+
+         return vsock_sk_has_data(sk, psock);
+
+Note: we should check better this, because sometime we call it without
+lock_sock, also thi
+
+>
+>Yes. It seems that calling connect() twice causes the transport to become
+>NULL, leading to null-ptr-deref in any flow that tries to access that
+>transport.
+
+We already expect vsk->transport to be null in several parts, but in 
+some we assume it is called when this is valid. So we should check 
+better what we do when we deassign a transport.
+
+>
+>And that null-ptr-deref occurs because, unlike __vsock_stream_recvmsg,
+>vsock_bpf_recvmsg does not check vsock->transport:
+
+Right.
+
+So, thanks for the report, I'll try to see if I can make a patch with 
+everything before tomorrow, because then I'm gone for 2 weeks.
+
+Otherwise we'll see as soon as I get back or if you have time in the 
+meantime, any solution is welcome.
+
+I think the best thing though is to better understand how to handle 
+deassign, rather than checking everywhere that it's not null, also 
+because in some cases (like the one in virtio-vsock), it's also 
+important that the transport is the same.
+
+Thanks,
+Stefano
+
+>```
+>int
+>__vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>                            int flags)
+>{
+>	...
+>
+>        lock_sock(sk);
+>
+>        transport = vsk->transport;
+>
+>        if (!transport || sk->sk_state != TCP_ESTABLISHED) {
+>                /* Recvmsg is supposed to return 0 if a peer performs an
+>                 * orderly shutdown. Differentiate between that case and when a
+>                 * peer has not connected or a local shutdown occurred with the
+>                 * SOCK_DONE flag.
+>                 */
+>                if (sock_flag(sk, SOCK_DONE))
+>                        err = 0;
+>                else
+>                        err = -ENOTCONN;
+>
+>                goto out;
+>        }
+>```
+>
+>>
+>> /*
+>> $ gcc vsock-transport.c && sudo ./a.out
+>>
+>> BUG: kernel NULL pointer dereference, address: 00000000000000a0
+>> #PF: supervisor read access in kernel mode
+>> #PF: error_code(0x0000) - not-present page
+>> PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
+>> Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+>> CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
+>> RIP: 0010:vsock_connectible_has_data+0x1f/0x40
+>> Call Trace:
+>>  vsock_bpf_recvmsg+0xca/0x5e0
+>>  sock_recvmsg+0xb9/0xc0
+>>  __sys_recvfrom+0xb3/0x130
+>>  __x64_sys_recvfrom+0x20/0x30
+>>  do_syscall_64+0x93/0x180
+>>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>> */
+>>
+>> #include <stdio.h>
+>> #include <stdint.h>
+>> #include <stdlib.h>
+>> #include <unistd.h>
+>> #include <sys/socket.h>
+>> #include <sys/syscall.h>
+>> #include <linux/bpf.h>
+>> #include <linux/vm_sockets.h>
+>>
+>> static void die(const char *msg)
+>> {
+>> 	perror(msg);
+>> 	exit(-1);
+>> }
+>>
+>> static int create_sockmap(void)
+>> {
+>> 	union bpf_attr attr = {
+>> 		.map_type = BPF_MAP_TYPE_SOCKMAP,
+>> 		.key_size = sizeof(int),
+>> 		.value_size = sizeof(int),
+>> 		.max_entries = 1
+>> 	};
+>> 	int map;
+>>
+>> 	map = syscall(SYS_bpf, BPF_MAP_CREATE, &attr, sizeof(attr));
+>> 	if (map < 0)
+>> 		die("create_sockmap");
+>>
+>> 	return map;
+>> }
+>>
+>> static void map_update_elem(int fd, int key, int value)
+>> {
+>> 	union bpf_attr attr = {
+>> 		.map_fd = fd,
+>> 		.key = (uint64_t)&key,
+>> 		.value = (uint64_t)&value,
+>> 		.flags = BPF_ANY
+>> 	};
+>>
+>> 	if (syscall(SYS_bpf, BPF_MAP_UPDATE_ELEM, &attr, sizeof(attr)))
+>> 		die("map_update_elem");
+>> }
+>>
+>> int main(void)
+>> {
+>> 	struct sockaddr_vm addr = {
+>> 		.svm_family = AF_VSOCK,
+>> 		.svm_port = VMADDR_PORT_ANY,
+>> 		.svm_cid = VMADDR_CID_LOCAL
+>> 	};
+>> 	socklen_t alen = sizeof(addr);
+>> 	int map, s;
+>>
+>> 	map = create_sockmap();
+>>
+>> 	s = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
+>> 	if (s < 0)
+>> 		die("socket");
+>>
+>> 	if (!connect(s, (struct sockaddr *)&addr, alen))
+>> 		die("connect #1");
+>> 	perror("ok, connect #1 failed; transport set");
+>>
+>> 	map_update_elem(map, 0, s);
+>>
+>> 	addr.svm_cid = 42;
+>> 	if (!connect(s, (struct sockaddr *)&addr, alen))
+>> 		die("connect #2");
+>> 	perror("ok, connect #2 failed; transport unset");
+>>
+>> 	recv(s, NULL, 0, 0);
+>> 	return 0;
+>> }
+>>
+>
+
 
