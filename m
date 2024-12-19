@@ -1,135 +1,203 @@
-Return-Path: <netdev+bounces-153376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B53369F7CBC
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:02:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E196D9F7CCB
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:05:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA0CF18847B9
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:02:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36E381617B3
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:05:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8805D225768;
-	Thu, 19 Dec 2024 14:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C550433CA;
+	Thu, 19 Dec 2024 14:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QuMhjjkY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T0UbVWwe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA3A225411;
-	Thu, 19 Dec 2024 14:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BD922075;
+	Thu, 19 Dec 2024 14:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734616905; cv=none; b=BAw+NUw8FZ+rQT0SRgvDQH2HI+wTDddwc5esAOvslB01Ipz4WBRNxq4yu7g9wyAp3Hs3IjxxR2qvgisYBcVg4/+F4vn9TFfTBn6PRCXELKD7ws3qE/csn9bMjbNg+FYha5i55oBwcLOwOBTia1ciTBqZ+YpLialh+mh+1Wba+xU=
+	t=1734617146; cv=none; b=lNo5ZSoMfEErFxms7ot5zGeM2Z6rgAB3tk969FnYPCapiCDLVP6g+ahuK7g8zh/ZjvhGgoYQL1X/++xRHV9UYJMHKXZpPk9Y8rgehcIseYLnvyvRViKAPBBeiGeZIG2FVxwJg199oish1kao+lHF8c4CZYvdEfyjztIpXs/GDJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734616905; c=relaxed/simple;
-	bh=hSZhEtM6UOgAO96Kze7oeKsO79Zojos2sg8GTS86sYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C6IFi+wez4tH3oXiTYg5GwMzaK9VeREU8c6kFYLXCsq6CB5Ne3H1szHLTdU0sp77PQnkvHftdBXLRA+TeGOpM59ZZ6NL98pKhx/NO7DbiO6bzRP37E/ntjDpXgOa5zlCz5c/Zyhih+eDEudWQ+1EvXwA7kjaIZ86yAb7uawbO/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QuMhjjkY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47F47C4CED0;
-	Thu, 19 Dec 2024 14:01:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734616904;
-	bh=hSZhEtM6UOgAO96Kze7oeKsO79Zojos2sg8GTS86sYc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QuMhjjkYvCuvLVvq6QuQclUAE/QglkMkX8Ic8W+/QJlVl8SX5BVuR74eIOnrY7y0W
-	 4VU1Rv2Lnx4PLBf4htBxnxfVgl8WLe+vWmB67/oujlgXczpTCW0wuwTSEOXAW8m/XQ
-	 WWWJb6kGvl44HGHhQXFPH2BbsqWmyFQKpCYtDtRjkJwMJw0yB3K2qAK2vhE1GRcyMB
-	 C1DcR8Q82ijGyq1pH/LNp8hv1wAPIhC2DqJknz7ULOZxkwWy2MvRrw1KKkLDBY5W04
-	 xpOGiZNzSyERLyXScOJwWgohOMCV/0etIkTIglksc+TySiZw0rmW5xNhTkJWO91UTE
-	 GdpNHCnU9IAwg==
-Date: Thu, 19 Dec 2024 16:01:40 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Mark Zhang <markzhang@nvidia.com>,
-	Francesco Poli <invernomuto@paranoici.org>,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH mlx5-next] RDMA/mlx5: Enable multiplane mode only when it
- is supported
-Message-ID: <20241219140140.GE82731@unreal>
-References: <1ef901acdf564716fcf550453cf5e94f343777ec.1734610916.git.leon@kernel.org>
- <Z2QeOOzRpimm3pyc@mev-dev.igk.intel.com>
+	s=arc-20240116; t=1734617146; c=relaxed/simple;
+	bh=LQuvRPkkECRjuBxoMm5LisEmYoylQlr8GMS9zFI1Hx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WAbeYub4bQpijMBljHMUFrrTnckWMalBy1+T9xEsryi3gZTW+YRbMc6ZvwQCeB0lYpZNR92PYyzcH7UGm6vfi9Fs9UC/EcTn10AQlmm+mCVvLEzbqxb6PkUpoEwDC8a7zguKLwA+uPTnXbsFBnRK0myU9MrGpKQpXO7C/ynGGMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T0UbVWwe; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aab925654d9so158783666b.2;
+        Thu, 19 Dec 2024 06:05:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734617143; x=1735221943; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ntEgSIINYUFJbAGsxQmLJiThHyN2BlQp6rPy7mWVRSI=;
+        b=T0UbVWweTrS63zlS9DmMgqlrgZjkB3OsyIat2yos6aKr9Q+EfM5gk9kZKWOt2mo8T8
+         +A4G/PC9/Urk6Ozd/ZZ/xSRUIF0hIdMXeFAkZ6hgpJpE5JO8drYlj9II5yFGSy1S6AQp
+         T2pEJMpo6DcD4d/g/kTDefqhmI4kle7+XXV/LUcGJzNQH2zI/70En3qadhQ/criMKdXR
+         P6r/SJT+5LCxmTSEhdjhJuYWp5M2HK08MF3DJA6fwPH+WVexoD7ayGE2rxlAr08T4bDn
+         ecKV7tH6blpYkldOm3ZXvWUNVnQOPUMRP0S6mGyYOAiwuRC3EKPe5gs9BwdhCYP7fpEW
+         3Qyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734617143; x=1735221943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ntEgSIINYUFJbAGsxQmLJiThHyN2BlQp6rPy7mWVRSI=;
+        b=taBL0+Ugn5GNqCyZ0RkBMDzB4ft2RFeHLCHJsc3moQupQSf6tjC1AFQcKeDc9wua2h
+         wbGyiqZsVk8HexN7nW6JTKLw0HxNce/b4k5ZwEUG0U6O70BZV6qo1lrnB4zBmYsxFA9I
+         k270QY1ObR1NfNdcTLMZ6QaER4RZcxsfs9gRbQYPWK0j+1YZ9F12xCc8qO6da6txI7w8
+         k+e/gwq8ANsYeHzw8ysPJOkhIY+EfiRrLN91ko4lzb590AA1lyVOyCVw77EFa2MBOI91
+         LJUJp5gbcM6UKADmvDGprBl2+KSHJoY7jldBWZ4qcx2CAD6gKWjZ+K8eQkdahbj3SRz2
+         uhug==
+X-Forwarded-Encrypted: i=1; AJvYcCVIe6KMdN8poR2RUcc3b+2N3e6P3kkDhBOUdvgLa36hulMGHMpUp4tK+CvhBFLT8rp6iPD/Ze8H@vger.kernel.org, AJvYcCVb3HIqGKfGtszbm34w9o/T3pNXAPiMaxNTLfBzc2bNIofTM0UradaGFxCq5ntiUql8e4GUw5Iw8oo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4Dxf8iU9ZiQ/faaOp91kxNTS8AzjSCNzYUqdQr65WJHQhPjl2
+	AVpyljjwYfvsR+jlB5gvTd2Uyt+xHCeL2l7tROsRf204kWt2lH4V1/yW7R8/SnchQrauTtajwlf
+	W5x5CZ+io5b/JKhO1r7QvO/pFjr0=
+X-Gm-Gg: ASbGnctWDgWxb/yBfzUckL7MmzySBcgzBgzjJ3KaM/LJ9Pa76z4pQtrrguRccwzFWoX
+	dp987ubbdzeDGw4J+acOMyndB1Jl4r5NA+01eP30=
+X-Google-Smtp-Source: AGHT+IHfEy+l2gpD6X5F+qzS9831iLWHNoWbWMk02+H/m1ztTUDqXX6dz/7RZNjjOZMAT2j0pNe1Stme/jmpFkDCMbM=
+X-Received: by 2002:a17:906:32ce:b0:aa6:8814:1545 with SMTP id
+ a640c23a62f3a-aabf48ce201mr648682766b.41.1734617142495; Thu, 19 Dec 2024
+ 06:05:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z2QeOOzRpimm3pyc@mev-dev.igk.intel.com>
+References: <20241218144530.2963326-1-ap420073@gmail.com> <20241218144530.2963326-4-ap420073@gmail.com>
+ <20241218182547.177d83f8@kernel.org>
+In-Reply-To: <20241218182547.177d83f8@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Thu, 19 Dec 2024 23:05:30 +0900
+Message-ID: <CAMArcTXAm9_zMN0g_2pECbz3855xN48wvkwrO0gnPovy92nt8g@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 3/9] bnxt_en: add support for tcp-data-split
+ ethtool command
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
+	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
+	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
+	willemb@google.com, daniel.zahka@gmail.com, 
+	Andy Gospodarek <gospo@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 19, 2024 at 02:23:04PM +0100, Michal Swiatkowski wrote:
-> On Thu, Dec 19, 2024 at 02:23:36PM +0200, Leon Romanovsky wrote:
-> > From: Mark Zhang <markzhang@nvidia.com>
-> > 
-> > Driver queries vport_cxt.num_plane and enables multiplane when it is
-> > greater then 0, but some old FWs (versions from x.40.1000 till x.42.1000),
-> > report vport_cxt.num_plane = 1 unexpectedly.
-> > 
-> > Fix it by querying num_plane only when HCA_CAP2.multiplane bit is set.
-> > 
-> > Fixes: 2a5db20fa532 ("RDMA/mlx5: Add support to multi-plane device and port")
-> > Cc: stable@vger.kernel.org
-> > Reported-by: Francesco Poli <invernomuto@paranoici.org>
-> > Closes: https://lore.kernel.org/all/nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl/
-> > Signed-off-by: Mark Zhang <markzhang@nvidia.com>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/infiniband/hw/mlx5/main.c | 2 +-
-> >  include/linux/mlx5/mlx5_ifc.h     | 4 +++-
-> >  2 files changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
-> > index c2314797afc9..f5b59d02f4d3 100644
-> > --- a/drivers/infiniband/hw/mlx5/main.c
-> > +++ b/drivers/infiniband/hw/mlx5/main.c
-> > @@ -2839,7 +2839,7 @@ static int mlx5_ib_get_plane_num(struct mlx5_core_dev *mdev, u8 *num_plane)
-> >  	int err;
-> >  
-> >  	*num_plane = 0;
-> > -	if (!MLX5_CAP_GEN(mdev, ib_virt))
-> > +	if (!MLX5_CAP_GEN(mdev, ib_virt) || !MLX5_CAP_GEN_2(mdev, multiplane))
-> >  		return 0;
-> >  
-> >  	err = mlx5_query_hca_vport_context(mdev, 0, 1, 0, &vport_ctx);
-> > diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-> > index 4fbbcf35498b..48d47181c7cd 100644
-> > --- a/include/linux/mlx5/mlx5_ifc.h
-> > +++ b/include/linux/mlx5/mlx5_ifc.h
-> > @@ -2119,7 +2119,9 @@ struct mlx5_ifc_cmd_hca_cap_2_bits {
-> >  	u8	   migration_in_chunks[0x1];
-> >  	u8	   reserved_at_d1[0x1];
-> >  	u8	   sf_eq_usage[0x1];
-> > -	u8	   reserved_at_d3[0xd];
-> > +	u8	   reserved_at_d3[0x5];
-> > +	u8	   multiplane[0x1];
-> > +	u8	   reserved_at_d9[0x7];
-> >  
-> >  	u8	   cross_vhca_object_to_object_supported[0x20];
-> 
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> 
-> Just out of curiosity, don't you have mlx5-net or sth like that for
-> fixes?
+On Thu, Dec 19, 2024 at 11:25=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Wed, 18 Dec 2024 14:45:24 +0000 Taehee Yoo wrote:
+> > +     if (tcp_data_split =3D=3D ETHTOOL_TCP_DATA_SPLIT_DISABLED && hds_=
+config_mod)
+> > +             return -EOPNOTSUPP;
+>
+> I think ethtool ops generally return -EINVAL when param not supported.
+> EOPNOTSUPP means entire op is not supported (again, that's just how
+> ethtool ops generally work, not a kernel-wide rule).
 
-No, we don't have such as it is so rare situation that we have fix for
-shared branch. I wrote here mlx5-next target because this patch changes
-the shared mlx5_ifc.h file and for the visibility, but it doesn't affect
-mlx5 eth devices.
+Thanks! I will use -EINVAL instead of EOPNOTSUPP.
 
-Most likely, we will end taking this patch directly to rdma-rc and sending
-as part of usual PR to Linus.
+>
+> > +     if (tcp_data_split =3D=3D ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
+> > +         hds_config_mod && BNXT_RX_PAGE_MODE(bp)) {
+>
+> Looks like patch 4 adds this check in the core. I think adding the
+> check in the core can be a separate patch. If you put it before this
+> patch in the series this bnxt check can be removed?
+>
+> I mean this chunk in the core:
+>
+> +       hds_config_mod =3D old_hds_config !=3D kernel_ringparam.tcp_data_=
+split;
+> +       if (kernel_ringparam.tcp_data_split =3D=3D ETHTOOL_TCP_DATA_SPLIT=
+_ENABLED &&
+> +           hds_config_mod && dev_xdp_sb_prog_count(dev)) {
+> +               NL_SET_ERR_MSG(info->extack,
+> +                              "tcp-data-split can not be enabled with si=
+ngle buffer XDP");
+> +               return -EINVAL;
+> +       }
+>
 
-Thanks
+Right, The core checks single buffer XDP.
+But there was a review that bnxt_en driver doesn't support both
+single and multi buffer XDP if HDS is in use.
+So, this is the reason why logic exists.
 
-> 
-> >  
-> > -- 
-> > 2.47.0
+> It's currently in the hds-thresh patch but really it's unrelated
+> to the threshold..
+
+Thanks, I will move this code to a HDS related patch, not hds-threshold,
+or create new patch for this.
+
+>
+> > +             NL_SET_ERR_MSG_MOD(extack, "tcp-data-split is disallowed =
+when XDP is attached");
+> > +             return -EOPNOTSUPP;
+> > +     }
+> > +
+> >       if (netif_running(dev))
+> >               bnxt_close_nic(bp, false, false);
+> >
+> > +     if (hds_config_mod) {
+> > +             if (tcp_data_split =3D=3D ETHTOOL_TCP_DATA_SPLIT_ENABLED)
+> > +                     bp->flags |=3D BNXT_FLAG_HDS;
+> > +             else if (tcp_data_split =3D=3D ETHTOOL_TCP_DATA_SPLIT_UNK=
+NOWN)
+> > +                     bp->flags &=3D ~BNXT_FLAG_HDS;
+> > +     }
+> > +
+> >       bp->rx_ring_size =3D ering->rx_pending;
+> >       bp->tx_ring_size =3D ering->tx_pending;
+> >       bnxt_set_ring_params(bp);
+> > @@ -5354,6 +5374,7 @@ const struct ethtool_ops bnxt_ethtool_ops =3D {
+> >                                    ETHTOOL_COALESCE_STATS_BLOCK_USECS |
+> >                                    ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
+> >                                    ETHTOOL_COALESCE_USE_CQE,
+> > +     .supported_ring_params  =3D ETHTOOL_RING_USE_TCP_DATA_SPLIT,
+> >       .get_link_ksettings     =3D bnxt_get_link_ksettings,
+> >       .set_link_ksettings     =3D bnxt_set_link_ksettings,
+> >       .get_fec_stats          =3D bnxt_get_fec_stats,
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/ne=
+t/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > index f88b641533fc..1bfff7f29310 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > @@ -395,6 +395,10 @@ static int bnxt_xdp_set(struct bnxt *bp, struct bp=
+f_prog *prog)
+> >                           bp->dev->mtu, BNXT_MAX_PAGE_MODE_MTU);
+> >               return -EOPNOTSUPP;
+> >       }
+> > +     if (prog && bp->flags & BNXT_FLAG_HDS) {
+> > +             netdev_warn(dev, "XDP is disallowed when HDS is enabled.\=
+n");
+> > +             return -EOPNOTSUPP;
+> > +     }
+>
+> And this check should also live in the core, now that core has access
+> to dev->ethtool->hds_config ? I think you can add this check to the
+> core in the same patch as the chunk referred to above.
+
+The bnxt_en disallows setting up both single and multi buffer XDP, but core
+checks only single buffer XDP. So, if multi buffer XDP is attaching to
+the bnxt_en driver when HDS is enabled, the core can't filter it.
+
+Thanks a lot!
+Taehee Yoo
 
