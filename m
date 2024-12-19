@@ -1,126 +1,162 @@
-Return-Path: <netdev+bounces-153230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AC279F7468
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 06:56:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01DB19F74E7
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 07:37:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEF051648AD
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 05:56:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65FC77A3687
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 06:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228DB216612;
-	Thu, 19 Dec 2024 05:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0B52163A9;
+	Thu, 19 Dec 2024 06:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlvsVA+w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hUC8C5H/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B6D1FAC26;
-	Thu, 19 Dec 2024 05:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5D613BAF1;
+	Thu, 19 Dec 2024 06:36:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734587685; cv=none; b=ruu0/ap8rVbmHHO1qx5nIYZjryt9iwShIpFhSdpTUMDzl36/TGaJgO09i7EUIG+P6GCy07Fk+ijvUT3L5ARxqeO1jCvi8AHXMUtQ5QMzAflEF0eY8ArQugAM7Xb/CVwNKkzA+3blUo4gBru/Y/ifB1HnKBSuDTnLEpaZF8fKgu8=
+	t=1734590210; cv=none; b=Yg6LNoDnvgtcdrFPgNihEx7FdQrXAUEvg+GP8SnKnb+/0ugNt0iKaM0XqawVmGdvsue07xvrECVXx/yE45t4B492/vK2zDfAbfM7LPY7SANMYbkNJD9tQkTwPDTU3jbuGUHanPi6EEy3V5ipYW8MquNgzJe6A43CA5wVeRc3iHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734587685; c=relaxed/simple;
-	bh=VsNY71lG5lYULBvFXVp0KhrDlqgduRP+ORPVKzySpuo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a4TG8q2+fM+C1GGV8wDPlnogH8WkLThbfP4//vTctqqkUP/XcGXbDjb0KMptYl3zCV1EeKuncOboS1JwqfNFcVKrngKDNHO3voZ6AP0e0ji4qUR2bfuSIQR4CL4n8oeJyMNTmaR/7gvyKamgkA+jDvPgWsKVY23t1gGot2D32Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DlvsVA+w; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4361f664af5so4374875e9.1;
-        Wed, 18 Dec 2024 21:54:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734587681; x=1735192481; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZfCpfOoSh8ogvEFAzzK5Sh/fDzaPC/IoHjTWRLgy2Xc=;
-        b=DlvsVA+wXI6i1KZT9lm7VOFI7czigiGhZADLOrnKSV9b0EIZkwsKPjMCneGSwuWDNt
-         tqSzzXqZLPu/ECOYzRmlJMx5TxWB50zZtgcQYQwd00cCAAqit7VeMa0yS9/3VjGpDH7I
-         aXHKaysIBOGFkpqv0A/T9dOWYLdk1i1eyf5oypzdcnQK5xxmnibQdENbKYeDBYrtv6zg
-         bFXv9iGDXju6rmkqMIIhNGHPPfYld1g1CnkPcw2RNERa6hqxFIMHoo3nlwPQBOAKXOlm
-         JwwRtlm7CHhEXquivsuy+qSh/XNDxr4FJU/feblYVePstfyNOuwfH+sZaj9J2SWprcVX
-         8QYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734587681; x=1735192481;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZfCpfOoSh8ogvEFAzzK5Sh/fDzaPC/IoHjTWRLgy2Xc=;
-        b=QEtqVhzAQ/htuy3UdwVCI9wz3xFSH/YZXUrq2ssfztulmKLlACSaMMcYwM1EksIK9W
-         rYTwqSsxc5STOXr/GMXKoD2xlw5fjFC2w//CSxPt2UsLML//475E6H2C187VXx80Thbo
-         DY1oYvPhcixJaMigAabuLYtFCWhtbMMcaG4MCJvv8F8q8gdT4nOY0dhoKTvk9Fiypg3c
-         YQlrHRD1CPUyfS23ywQDl++xhhjIR+fdrpr05UNwHipUh/NsdDa0FCaxNJudmECJ+IT/
-         XTygTtRpvjGyEo7rDLwiIIaIoWo1AfjJtzKH21C1sG9XKu7BrRgYRo4nqwrdQKrubQ0z
-         77cw==
-X-Forwarded-Encrypted: i=1; AJvYcCVE5bHAOCx/Ir+omCK/lQzi9/AKeI0MfusOWgeR8jU+pdzKacdpBqgrlyFxpUJHrkK+9VCPvpSeWvAzbA==@vger.kernel.org, AJvYcCVfBhM8rQsUyVYa1/0G4Q6wp5MY/j2NipK6zBW3dmMuj9Fcmju2sH6onzKzvNS72pAkR1z9qwDRzfJDbsn+jEc=@vger.kernel.org, AJvYcCW1U7pZvhGGMm/7WhY7P0Uja0Gqr3SGChRplnFcA5Mnc0co6IRs2eaDfxQziT0P+NgsCglEV7sWGljH@vger.kernel.org, AJvYcCWIy/bZ8E3sgs4RrDQ8cBVzi2jTtq0DxvDbnX7FO0St5MnqI5hOD45D0T5FMgSsAcPaPt9CTKUoqL1rZCOWyPTi@vger.kernel.org, AJvYcCWxKszMr7PTK+BCVN9NRxXreNBPFmpMU/QlfJ8eCyCxBtRTcS8hjeC+3tUB6CLOCd6AhQ7szXXmsIV/uOBw@vger.kernel.org, AJvYcCWxP9c4je4LN3uGv9+iTmdoCKXhZeduAAE1sqFi/3AB7nJoIgQ0bWahIo7hEOohoqw8JKc=@vger.kernel.org, AJvYcCX1P+Q3cTk3NwKYPdVvgMl++Wq3l10sZDSv/rGv7Cd/HTqSulNgLTAuN19s3+vxOqsdnmI3BBCsrZpo@vger.kernel.org, AJvYcCXwrBTBjEvqf6JEMth4HSrxTjXzxMoE49szMpq2a5xxZ7BgpIw+xe4CgB/7BjOvpEICioeyAzbGKH7UMQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcLyNPLdbpZd06rIRvErliYm7TJ5cL/U+sTDGKIVSqQMEtWluS
-	mniKrys5qq8zNEK5vI6G2dzGh15CwMP1wQ1ychhjB3Q1xPIEjdQ8HBtahJ1nmQON4xs/q7yxMFY
-	kxeS0V+KHWYS+n7HUtE/jMhTqUIU=
-X-Gm-Gg: ASbGncuEH4Xw7pYcaU7E0g48nMEwu7wJLKkQNK6vE4KRklbTj3MkfvV2crG3Qz+XCJX
-	SiJ6VFiibV4z6q0c0KXLQrKNndFVw3dcRLZoj
-X-Google-Smtp-Source: AGHT+IFXswhNY3wf74HiVRQ6mWtI+LQ0dYPzH2WDbrTkg0k3vCjw9PHsmFSj9uux2yKPzKWzDIYRJF3gX8R2i5iXHRM=
-X-Received: by 2002:a05:600c:4ed2:b0:434:f7ea:fb44 with SMTP id
- 5b1f17b1804b1-4365535c6a3mr52447275e9.14.1734587681279; Wed, 18 Dec 2024
- 21:54:41 -0800 (PST)
+	s=arc-20240116; t=1734590210; c=relaxed/simple;
+	bh=JeK3PSY/uAsIpSovqDpVy+FzbFgEGL/lK4rVq8Cbgnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jqIexUtbgxPudBPiTdfSZSzYJ2H7hIlT4sjz6xSgv35FtKiC88vNIcG22/YkTxnt/HNXzFZ6bBW+PHJTMq+T3z/s2Ey1CxuAeR64WAaFNA0+60Xv7S1eVA62ADJE/kl96ODmjMx0sw4TqfGRLchc0nIad8GT3OlumnVyN4oxX+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hUC8C5H/; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734590208; x=1766126208;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JeK3PSY/uAsIpSovqDpVy+FzbFgEGL/lK4rVq8Cbgnk=;
+  b=hUC8C5H/xzBCnD9703zoMnshvF/Ldfnxm3inQVS3+L1XEf2C7dzJH0C2
+   iBzQJ4NOP/JQV5uwXZ2PfCVvSruDTJREEMUSefYys6sqzd1UdmP84L6QU
+   H6WIoQt4seDxKys7p0SCfVx2pI6/3Ef3aYtJcPoGANSYbnbKCbwpMKj8Y
+   caSeBWF1Sw/ZqfDOESUNVSEkr1kafOMQwSKqS5V0H/1vx2doxrDkxYTWe
+   ggXQeYdNWsV4OCaT375/BKgUSGkOk3Q+x4gTsdPnxPqb5cynf0XC6b7am
+   /kYuGGhEPwZ5qux2RjdGkdqMt60OuKNVM1Ri6+SuHgaL9gREerLnRZWTK
+   Q==;
+X-CSE-ConnectionGUID: C36MDV2VQBytMQsuzV0XbQ==
+X-CSE-MsgGUID: TTuz5yKWQISQvvKSSk8bKg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="34369748"
+X-IronPort-AV: E=Sophos;i="6.12,246,1728975600"; 
+   d="scan'208";a="34369748"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 22:36:47 -0800
+X-CSE-ConnectionGUID: tcYVdPGFSmuQ0qdHO90Q3Q==
+X-CSE-MsgGUID: x8EBWXoWRBmwaUctpECvdQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,246,1728975600"; 
+   d="scan'208";a="103088072"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 22:36:45 -0800
+Date: Thu, 19 Dec 2024 07:33:39 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Roshan Khatri <topofeverest8848@gmail.com>
+Cc: Michael Chan <michael.chan@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: b44: uninitialized variable in multiple places in
+ b44.c
+Message-ID: <Z2O+Q5Qp1R5KdMbg@mev-dev.igk.intel.com>
+References: <20241219043410.1912288-1-topofeverest8848@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218130909.2173-1-shaw.leon@gmail.com> <20241218130909.2173-12-shaw.leon@gmail.com>
- <20241218153759.672b7014@kernel.org>
-In-Reply-To: <20241218153759.672b7014@kernel.org>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Thu, 19 Dec 2024 13:54:03 +0800
-Message-ID: <CABAhCORszq9ao3OCVW-1EBsxsnLxbQ096eV+cbs12Es2HvCgUA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 11/11] selftests: net: Add test cases for link
- and peer netns
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	Hangbin Liu <liuhangbin@gmail.com>, linux-rdma@vger.kernel.org, 
-	linux-can@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org, 
-	bpf@vger.kernel.org, linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com, 
-	linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org, 
-	bridge@lists.linux.dev, linux-wpan@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241219043410.1912288-1-topofeverest8848@gmail.com>
 
-On Thu, Dec 19, 2024 at 7:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 18 Dec 2024 21:09:09 +0800 Xiao Liang wrote:
-> >  - Add test for creating link in another netns when a link of the same
-> >    name and ifindex exists in current netns.
-> >  - Add test to verify that link is created in target netns directly -
-> >    no link new/del events should be generated in link netns or current
-> >    netns.
-> >  - Add test cases to verify that link-netns is set as expected for
-> >    various drivers and combination of namespace-related parameters.
->
-> Nice work!
->
-> You need to make sure all the drivers the test is using are enabled by
-> the selftest kernel config: tools/testing/selftests/net/config
->
-> This may be helpful:
-> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-=
-style#how-to-build
+On Thu, Dec 19, 2024 at 04:34:10AM +0000, Roshan Khatri wrote:
+> smatch reported uninitialized variable in multiples places in b44.c.
+> This patch fixes the uniinitialized variable errors in multiple places
+> reported by smatch.
+> 
 
-Thanks for pointing it out. And vng is really cool. I will add
-the missing config in the next version.
+You need fixes tag with the commit that introduced the issue when
+targetting net. Like here for example [1]
 
-> --
-> pw-bot: cr
+[1] https://lore.kernel.org/netdev/CANn89i+yvyPMU1SE=p3Mm1S=UexsXSa4gzH3heUg17sa+iFK9w@mail.gmail.com/T/#t
+
+> Signed-off-by: Roshan Khatri <topofeverest8848@gmail.com>
+> ---
+>  drivers/net/ethernet/broadcom/b44.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/b44.c b/drivers/net/ethernet/broadcom/b44.c
+> index e5809ad5eb82..9a466c5c4b6c 100644
+> --- a/drivers/net/ethernet/broadcom/b44.c
+> +++ b/drivers/net/ethernet/broadcom/b44.c
+> @@ -314,7 +314,7 @@ static int b44_mdio_write_phylib(struct mii_bus *bus, int phy_id, int location,
+>  
+>  static int b44_phy_reset(struct b44 *bp)
+>  {
+> -	u32 val;
+> +	u32 val = 0;
+>  	int err;
+>  
+>  	if (bp->flags & B44_FLAG_EXTERNAL_PHY)
+> @@ -414,7 +414,7 @@ static inline void b44_wap54g10_workaround(struct b44 *bp)
+>  
+>  static int b44_setup_phy(struct b44 *bp)
+>  {
+> -	u32 val;
+> +	u32 val = 0;
+>  	int err;
+>  
+>  	b44_wap54g10_workaround(bp);
+> @@ -512,7 +512,7 @@ static void b44_link_report(struct b44 *bp)
+>  
+>  static void b44_check_phy(struct b44 *bp)
+>  {
+> -	u32 bmsr, aux;
+> +	u32 bmsr = 0, aux = 0;
+>  
+>  	if (bp->flags & B44_FLAG_EXTERNAL_PHY) {
+>  		bp->flags |= B44_FLAG_100_BASE_T;
+> @@ -544,7 +544,7 @@ static void b44_check_phy(struct b44 *bp)
+>  		if (!netif_carrier_ok(bp->dev) &&
+>  		    (bmsr & BMSR_LSTATUS)) {
+>  			u32 val = br32(bp, B44_TX_CTRL);
+> -			u32 local_adv, remote_adv;
+> +			u32 local_adv = 0, remote_adv = 0;
+This two are real problems, because if the flag isn't clear, or first
+read fails the variables won't be initialized when used.
+
+>  
+>  			if (bp->flags & B44_FLAG_FULL_DUPLEX)
+>  				val |= TX_CTRL_DUPLEX;
+> @@ -1786,7 +1786,7 @@ static void b44_get_drvinfo (struct net_device *dev, struct ethtool_drvinfo *inf
+>  static int b44_nway_reset(struct net_device *dev)
+>  {
+>  	struct b44 *bp = netdev_priv(dev);
+> -	u32 bmcr;
+> +	u32 bmcr = 0;
+
+The rest doesn't look like unitialized, you passing a pointer and
+filling it with a value. Can't see the branch when the value is left
+without filling, but maybe I don't see something obvious.
+
+BTW, you have many "incorrect type in assignment" in cnic.c file.
+
+Thanks
+>  	int r;
+>  
+>  	spin_lock_irq(&bp->lock);
+> -- 
+> 2.34.1
 
