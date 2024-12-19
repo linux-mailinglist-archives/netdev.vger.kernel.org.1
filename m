@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-153206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93FB19F72C8
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 03:42:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 632BB9F72E3
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 03:46:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86C571891186
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:42:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BCA97A3A23
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9294D146596;
-	Thu, 19 Dec 2024 02:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5D71419A9;
+	Thu, 19 Dec 2024 02:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QGmJErVB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V5UiW6rU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66CF778F52;
-	Thu, 19 Dec 2024 02:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E5A132117;
+	Thu, 19 Dec 2024 02:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734576084; cv=none; b=ik/XVZi6SAAGVYrZBKcouTSPMrDsUiAVJC9yvAWsYpV6+AvO0h3Wvi1YYtDOHA8EHRqge0SxIIZUkFM1NKfOH+gSw/J3jMO2hj09QHd6/dLaEf5vtjDaC4YX0EqvaTiCz7YKyxBH3MkdKb2aS1gFrMtIINWRR9gG+lCYJPvW7nc=
+	t=1734576287; cv=none; b=ndOXw6yCTXRfrN3BjTYEHqm8WRclRXVg9nimZIFiHUX3p0xvS/c7/gF6xbkYwcJ7vE6TdZ6+4rrtqaYt48lQ1bEjbQ2SXo5/qCGM8Z1oREs2kuf/zBv20omKuWK7aY2REr84SHEqlVN9F4lghqW+VcxfsBA6IpUXGoQze7w8C18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734576084; c=relaxed/simple;
-	bh=x8AYl8HDSHlZ7J+FFdQAC8suQ91ToLdJ5RIn53cMnaE=;
+	s=arc-20240116; t=1734576287; c=relaxed/simple;
+	bh=FWuyD0b//osOYc5mdv1nNnrcBvI+LR+MMEdxaIjvNUM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=csVD4V573zpVXMVF3TG119mFVSTou9a1hbMdP1C2sHwJSi1/tkjUjTgfQTzJ6p02eOtFGkLN19Hyf494yyA9L32atb+9B6ufUm6svz2FgjnKRT3pf9B4ldORFJ4homJRTbrwhZT0BQYKDWCcoD29K5YfvU+OKpAeDOybCJGo46Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QGmJErVB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9619DC4CED4;
-	Thu, 19 Dec 2024 02:41:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QiP78sUx9yNcFlQCITydH2WXlYSR1liSlYyXZIi+PzRzRs9Le3mWO1xu8+e6mRJm5ShdesbavD+vD42BU2zF3MUu3Pw+pyfY1GHxARrLmVSDLuBgeHZ/i+HUS0h4FexrabRHhV5uwHVHpnV0FNSIWLWLTjUoUJ6WyHv9kP7beC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V5UiW6rU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71918C4CED7;
+	Thu, 19 Dec 2024 02:44:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734576083;
-	bh=x8AYl8HDSHlZ7J+FFdQAC8suQ91ToLdJ5RIn53cMnaE=;
+	s=k20201202; t=1734576286;
+	bh=FWuyD0b//osOYc5mdv1nNnrcBvI+LR+MMEdxaIjvNUM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QGmJErVBSgGO4eGYNSB9Uqzr6MebQg319eyh1N/Z4fw0QXg5sgtlUzB09pU2ol3t8
-	 ZPUOjay8XzVwq9r5cjdloUTIXY8BUmZNZ11yRrMjGv3txu8R1cFJtECscb5XVxj6u/
-	 FhfVui9rcB1oKIRKDrz9cfTDpZ9HalNmpQ/AfzrixElfdWCwyibJ0e4fxjhA0FFa8g
-	 /j0Nv++zbvj526UUl+y/ZwWeKliJdfzHxxbZz5H974VA3ywj2o7MkfBbKWVwyuOlz3
-	 OxDQsZW7xaPC17H9mF2GGE9YSaGV6uLM8VHrRPGAkaJqpFjVlklq6B/VwjzxsyLhmS
-	 2zQkUOTfpLoZA==
-Date: Wed, 18 Dec 2024 18:41:21 -0800
+	b=V5UiW6rUHIdYG0Lz1tF2lysflTmxG57TuP+WnvTnFcT04tHJxUTq78CkIfZ3rCeWw
+	 GhWJ3uRRW5JSYdYTmRyUvOCcwz7e4uhEWuEiRNtuPfTj/kbQlwDUoSJIfXLsuK+Shc
+	 FbLmZsqiXL/2c+3dsv+Z6ulOawFsWisEw9RWulln407TuYdYXf/9TOJ+/BfIB6EyZ4
+	 y70G63W+i7RY8wtqDSdkZoKiDB9wPTpVV/EsYQyjDI/d8HFR3w5GTQWSTlqDxKKbTJ
+	 Q/RwJHgT5IWI7DPxeEF++FBgj9PwgH+wKU5BEVMIz53O9kF8K5HxoHYrpIfa4uy9z/
+	 n+wVuIe9nKoCQ==
+Date: Wed, 18 Dec 2024 18:44:44 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Taehee Yoo <ap420073@gmail.com>
 Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
@@ -57,14 +57,13 @@ Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
  rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us,
  bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com,
  aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com,
- daniel.zahka@gmail.com, Andy Gospodarek <gospo@broadcom.com>
-Subject: Re: [PATCH net-next v6 3/9] bnxt_en: add support for tcp-data-split
- ethtool command
-Message-ID: <20241218184121.7117cf67@kernel.org>
-In-Reply-To: <20241218182547.177d83f8@kernel.org>
+ daniel.zahka@gmail.com
+Subject: Re: [PATCH net-next v6 8/9] net: disallow setup single buffer XDP
+ when tcp-data-split is enabled.
+Message-ID: <20241218184444.1e726730@kernel.org>
+In-Reply-To: <20241218144530.2963326-9-ap420073@gmail.com>
 References: <20241218144530.2963326-1-ap420073@gmail.com>
-	<20241218144530.2963326-4-ap420073@gmail.com>
-	<20241218182547.177d83f8@kernel.org>
+	<20241218144530.2963326-9-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,17 +73,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 18 Dec 2024 18:25:47 -0800 Jakub Kicinski wrote:
-> > +	if (prog && bp->flags & BNXT_FLAG_HDS) {
-> > +		netdev_warn(dev, "XDP is disallowed when HDS is enabled.\n");
-> > +		return -EOPNOTSUPP;
-> > +	}  
-> 
-> And this check should also live in the core, now that core has access
-> to dev->ethtool->hds_config ? I think you can add this check to the
-> core in the same patch as the chunk referred to above.
+On Wed, 18 Dec 2024 14:45:29 +0000 Taehee Yoo wrote:
+> +	     bpf->command == XDP_SETUP_PROG_HW) &&
 
-Oh, you also already have this logic in patch 7?
-So it just needs to be reordered in the series, and then the driver
-doesn't need to check?
+PROG_HW will be fine, you can drop this part of the check.
+HDS is a host feature, if the program is offloaded offload driver
+does much more precise geometry validation already.
 
