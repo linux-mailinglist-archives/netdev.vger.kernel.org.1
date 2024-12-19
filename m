@@ -1,127 +1,121 @@
-Return-Path: <netdev+bounces-153392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFDFF9F7D3F
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:38:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DAF79F7D4B
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE29E188F18E
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:38:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6DA81894CCD
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07290224B07;
-	Thu, 19 Dec 2024 14:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9967C2253E2;
+	Thu, 19 Dec 2024 14:42:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iWexPPXq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ammv515O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E05A17C;
-	Thu, 19 Dec 2024 14:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD472253EC
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 14:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734619080; cv=none; b=fWl2IuWMBFJ4I7yu8DbE1YJQJ7gwF2BtMODPRoJNXYgDJXmmxoomIBJrIaex7PzvbpwLsc+aJo3RtVsIT9L9n0BL0QuqOU2GD/yFmbsKMwt0/tWwspY74bVFJeTepZ2DcRRzidLtSJfzpMFC8xGSx3Yi2pARuzZnnWGBYwJx9bQ=
+	t=1734619335; cv=none; b=WYbuBD0syt+WZm4qfZiGOc0N5cnyGZp0Bdg8c6NoV2Bt69XT9N/XvpWmLDpvQk5kL6imLB3JrL8MIa8mVKg0Xkb8Dg1we2NJR9L6juLOJHQlx+MqP2/YqqVa8N4ZgJiLHWKaafjptiXBknCB6KXfdUS2PzpDe0RRZp81cCYDBkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734619080; c=relaxed/simple;
-	bh=NjI6i5qeo7whHIRT/3vNBPOor6E3SlvcrErnr/ttbCA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hzxu1eyqtsAkw5GcgMP6BT/1gxF4dKl68DpqYM3EOta2jStPEeTl5qlyNPmnuiTdXSe6GytDqOU5BR/XhDiJm8QNct8E949tzVME0+abEEMqjcnQ+QTJ1bHmjD0fhDwvz0iDkxgM1oqbrHF+/gbs0V+p7GYjWDvT6uYR8AgjyR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iWexPPXq; arc=none smtp.client-ip=209.85.208.50
+	s=arc-20240116; t=1734619335; c=relaxed/simple;
+	bh=/tOijhdV0VmrGrhon/6ga5/4+xoOYjX4ZKgNBz9b9e0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c/VySaws2XYfMxgxhoeJKoq6DJh94LWgFISD/bks3rJcXck+YB45aLT/C/OHtzGD6Afmb+2LN0FwT4epFC8OlZTlpzE0T42AJVzFe9pMeQrUdQE5sJ2DRqT+qLoqwq1VERuc42bXW/55DWxRPuYcveiSeP7Qeqc/VF98kh8UEOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ammv515O; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5cecbddb574so1309253a12.1;
-        Thu, 19 Dec 2024 06:37:58 -0800 (PST)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-434f398a171so1253425e9.2
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 06:42:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734619077; x=1735223877; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mXX798Ae/hwtwg3qjpPRVUNwxJBK+LNIPfXosAeJ080=;
-        b=iWexPPXqNLUkGJRaEmziCGHhnd0vgPThq6GhzNCksANmyl211lZ9Eg2BbJL2UK2Swy
-         XA/zS+8sG4yV6potre8iDgCwI8UIC2Twh22ZREG43ee7q9WL6mJeus99MFhcl0pEZiM3
-         BDeUZE1S07U1nEq1wrg4asceA3vh0OlGs/d5cBTIWC3j/eaX1KZO3/W6I3BZHjwE0n7n
-         jAQuZCHNiXUuPavTXLrbFGRGJm6lTPClwQeHHTZL6N9+RfLCPoHuvksTlqoFFQQ9llH5
-         lfBss1WaYYGOYkDenP8j0/wJZOCYBAL2nz2FphhW3wzRJfNY9f4hAERwMWn3y3rp20CB
-         9Y9g==
+        d=gmail.com; s=20230601; t=1734619332; x=1735224132; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KZ2nOg2dfpWqUt6elpjol266IyrPwg8XgenoY3QoROM=;
+        b=Ammv515OF7jk0JAiTetwUBUyMofZ7hGiWwEGexcS2430VuIqJ5Za9gDAx6eUtDB6y2
+         K1qM/Q1snC5YiW+HBjfVsvrozJCc4Whs0LACBh7Zt0HuZgmq7mG7TYoW9HyI5IvgkvK+
+         l7xoeXkRgpSwBPEhasVfir0aeYadtVqgSK19L5Mp3qcJs3FAeI3ewZzt4gxPDRi896qk
+         EsSdE5RFSLTbUI2po4aHFNorTgD4M6BCMgDsBt09qQ1t6ZQLRO0z1loUXddhR/GMdGlq
+         LPs3SuSBkmX6C/HrXn2Pz3NxmQjb2jO+5Qqq288Vco8zs+B2R69DWp4hZqEg4bzCE9sk
+         3ICQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734619077; x=1735223877;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mXX798Ae/hwtwg3qjpPRVUNwxJBK+LNIPfXosAeJ080=;
-        b=dT/zlpeu7+SQptS7vQKA/ys0WhY6wrCAtEWNmUc/po1IoseaveAZGdh40S1VOM8K8c
-         ua88pI74eBD94Qy6yPceIossRfuMSZb0snUl40I+4c+KqTp/DIEKd11Zbk/dR8lQuKtD
-         e4WOxoxTyZdxlwWVkZGfiFNXesogi1Ecl0SXs6ZWDl3urtcXYriMA/IXBTgllBWlA31O
-         rr3gLD458Oz83ydJEc0hAi7tCkzsflPJhWgMM8Vlx2G8IcjYrOppJb52h1nnD1xVrXOZ
-         fddRcaG0EdPKFhA/UtEnVY5YKSpcycsHlqtoXeit/qfGqH+HhKevaaSolXrVhH4Oo6JO
-         1kVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaXe5rzp+X+wSCMmhH8T33bUTMW+BoArUGVPFA5NdnOF1aVJor7w7jDsBrVaxW8Kv3I7Tw6wV0SSw=@vger.kernel.org, AJvYcCXJYPyfBn6TSy+34OXJfX2lPXpvFfr7JGrWroxn0ZeRYeQR7wIFYkgvCsxbhOP+s2A/L5uQCdAx@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxh3djUBXSnk6GI5mTj7VocwSG2Nh0gjopvV2p0BcwpIZd4Gen7
-	momPJktuwGmCfY/CLIvhIorr0ec3o4akm6qVrh7N8Qp6ZyX7aWGieGG4eKRTEUjlKqhgND3BLpi
-	t9JXEcUQW7i69S6H1m5iJeWxUkkU=
-X-Gm-Gg: ASbGnctzhBoEvVvgqz8K+P68GiQesffNdry5F4fkLV2f8+lGRWr5MPdN1oiDf7MQag2
-	9zOfuO4F5PB9Y98SAlM+cPfkUPJTN0+N3oHuol08=
-X-Google-Smtp-Source: AGHT+IHCabhWvDWKzLxgFO2fB0d0NozcBMeeacGFfgszVYezH2ilzNU6swwWwB9AKg0E1phdJNroBQYzeZy1Ep2I9eY=
-X-Received: by 2002:a05:6402:26c6:b0:5d0:c9e6:30b9 with SMTP id
- 4fb4d7f45d1cf-5d7ee3a2840mr6144179a12.3.1734619077525; Thu, 19 Dec 2024
- 06:37:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734619332; x=1735224132;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KZ2nOg2dfpWqUt6elpjol266IyrPwg8XgenoY3QoROM=;
+        b=p4NzptQD+U75THA/sUZgWPAninHl6XHhOG5hh5BjAG43NMAfPL5lnyxCN3ZlR+KfOa
+         PS+z+C+dUh4wtj/Bf7T9qHclWBAD9th6BsKUoWQtQIfNgZk3I6cT+HHDwdyJdd+Wvks1
+         DJBddBCMWZXcpKJVEUle0NuiIZZALT7uZSQuMJr6+pvJEb95fIMFIUedPYolSy1+hgcS
+         zjH+af01GIn1kNfczbG43UBXbCdo7zi3xrasZHjxhPzbBXWBeQd6UuEZKMFjEgUoqMz2
+         SkXqJoc3bozA952kXCpHJ8yo5bXblJPMJCFNAKNj4FjoEX5G8x1qFdIXlyZPUwUMCUdA
+         aL+w==
+X-Forwarded-Encrypted: i=1; AJvYcCXHmEaKVhMYOhiPCpcHOMDnhlGsR52IQV7mi1vvGZaecyKzvnLld0gX7aLawj9anN79y3p9T7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfFr+PC7JzXK2TS281U58sqGPfGy4jpT+CDff3RhUJzyVFRSt/
+	yIjGu2TgRJ2hWSSGSSuCIyAspnbBJGd6DVCfGxuzknMCPVGnrivJ
+X-Gm-Gg: ASbGncvQGlq9H2RIdjn352QaEMpQrOJb55FJ5BBaDciDSEdyvAnS4A+fjR111AJNYgX
+	agkmILH78i6i3pmXvEoACXj/vezxwjKehgZ62FSnyWjZ71DQtMCnaubEMvplX/oFJ8GvewnzqAa
+	vTUI0YZsf/HCvGgFxMrY4KDU6CFTDS3dLTUiPQLNwC0nk9onuOK67BZHYCrgOtpqiZ4AyVPwiOe
+	i9NN8DdRKZWVosV2Nk7W/2IQ14y7z6tldRnhCzBR7NS
+X-Google-Smtp-Source: AGHT+IFIY/8QNNjWECKHZNq7YOm+J84/tzg9QCxmTNDW/RTmk7rWduXMtSQINE0ZnqZcKJv+4fFAyw==
+X-Received: by 2002:a05:600c:310f:b0:434:f335:aa0d with SMTP id 5b1f17b1804b1-43655349166mr27901685e9.2.1734619331927;
+        Thu, 19 Dec 2024 06:42:11 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656b119b6sm55107335e9.22.2024.12.19.06.42.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 06:42:11 -0800 (PST)
+Date: Thu, 19 Dec 2024 16:42:08 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
+	f.fainelli@gmail.com, netdev@vger.kernel.org, linux@armlinux.org.uk,
+	chris.packham@alliedtelesis.co.nz, pabeni@redhat.com
+Subject: Re: [PATCH v2 net 4/4] net: dsa: mv88e6xxx: Limit rsvd2cpu policy to
+ user ports on 6393X
+Message-ID: <20241219144208.dp7pfbh566htfc4v@skbuf>
+References: <20241219123106.730032-1-tobias@waldekranz.com>
+ <20241219123106.730032-1-tobias@waldekranz.com>
+ <20241219123106.730032-5-tobias@waldekranz.com>
+ <20241219123106.730032-5-tobias@waldekranz.com>
+ <20241219140541.qmzzheu5ruhjjc63@skbuf>
+ <875xnf91x8.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218144530.2963326-1-ap420073@gmail.com> <20241218144530.2963326-10-ap420073@gmail.com>
- <20241218184917.288f0b29@kernel.org>
-In-Reply-To: <20241218184917.288f0b29@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Thu, 19 Dec 2024 23:37:45 +0900
-Message-ID: <CAMArcTWH=xuExBBxGjOL2OUCdkQiFm8PK4mBbyWcdrK282nS9w@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 9/9] netdevsim: add HDS feature
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
-	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
-	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875xnf91x8.fsf@waldekranz.com>
 
-On Thu, Dec 19, 2024 at 11:49=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Wed, 18 Dec 2024 14:45:30 +0000 Taehee Yoo wrote:
-> >  drivers/net/netdevsim/ethtool.c   | 15 ++++++++++++++-
-> >  drivers/net/netdevsim/netdevsim.h |  4 ++++
->
-> netdevsim patches must come with a selftest that uses them :)
-> We support bash, C and Python tests. Look inside
-> tools/testing/selftests/drivers/net/
-> These tests could serve as examples: stats.py, hw/ncdevmem.c
->
+On Thu, Dec 19, 2024 at 03:34:43PM +0100, Tobias Waldekranz wrote:
+> On tor, dec 19, 2024 at 16:05, Vladimir Oltean <olteanv@gmail.com> wrote:
+> > It looks like an oversight in the switchdev tx_fwd_offload scheme. Can't
+> > we teach nbp_switchdev_frame_mark_tx_fwd_offload() to make an exception
+> > for is_link_local_ether_addr() packets, and not set skb->offload_fwd_mark?
+> 
+> That sounds like a better option if it is acceptible to the broader
+> community. I thought that this might be a quirk of mv88e6xxx's rsvd2cpu
+> bits. But if more devices behave in the same way, then it would be
+> better to just exempt this whole class from offloading.
+> 
+> Do you know how any other ASICs behave from this perspective?
 
+The other driver with tx_fwd_offload, sja1105, is going to drop any
+packet coming from the host_port which isn't sent through a management
+route (set up by sja1105_defer_xmit()). So it's more than likely bugged.
 
-> TBH it doesn't look like netdevsim _actually_ supports HDS,
-> as in forwarded packets will not be split with the current
-> code, or linearized. You'd need to modify nsim_start_xmit()
-> to either linearize the packet or not based on *peer's* HDS
-> settings.
+We can't fix this from sja1105_xmit() by reordering sja1105_imprecise_xmit()
+and sja1105_defer_xmit(). It's not just the order of operations in the
+tagger. It's the fact that the bridge thinks it doesn't need to clone
+the skb, and it does.
 
-Ah, Sorry for the sloppy change.
-I will write a selftest. Also, I will modify nsim_start_xmit() to support H=
-DS.
-The example would be very helpful to me.
-
-Thank you so much!
-Taehee Yoo.
+So yes, it's probably best to exclude link-local from skb->offload_fwd_mark.
 
