@@ -1,97 +1,285 @@
-Return-Path: <netdev+bounces-153271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A22619F7814
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 10:11:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD1199F7825
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 10:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 597DE163701
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:11:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C4147A0555
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A834221DB6;
-	Thu, 19 Dec 2024 09:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4384216E23;
+	Thu, 19 Dec 2024 09:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F6/Z/kej"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZ0f1WNL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7240A149DF4;
-	Thu, 19 Dec 2024 09:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976FA149DF4;
+	Thu, 19 Dec 2024 09:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734599411; cv=none; b=rCP91GRRVNE+MFaItCz8aA3xswlK8sywwxHIDzop2iEQNhYwu9pvqgmEtrMdVvTnGGcXCao8MG/jgBZHvq0VGtmPXMpUeFEz3YwyAb8A553VnsE6O2U3q+ySfqSTWX8xa2IwO2sNbFjQglnyM4scBj+hk+oFTv4IZkcbRoRYJ24=
+	t=1734599826; cv=none; b=lnRYGJg+OFMKfkkN+2Qkm5A3tClheD40X8x61/zq1/lsy9+pb54+zuJLIB2ek3GFuVBevq5mA7sefnABcE2Kvzx+ycD7TOf3bgT/XcG54Pjguk8Anu+A7SCN0D71EBoVUuk6lQcZGM6xU+IElqDKfNonPwuzoMBGtORs8dNx4LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734599411; c=relaxed/simple;
-	bh=VYAOV0DQQggPY2XmjJx09Xty29Hn2skvfDGqACr2QpI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MpTCoEnnH76MY7Zcyvwk+X4iUEAQNwyz2ND2CfVNtGGitZ9g6Z2rjkhchsgNAmRKOMYHj7eH68zmsnR7oyT7bKhgOGII7dTrzZUlSEVp9Rgp5yuSABBqoSJa0Q9HjBSmOyKUNuQ3Iy3C1Uz1ltTBp3Szr1b4U8dH0uLaDXwDMwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F6/Z/kej; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5DD4C4CED0;
-	Thu, 19 Dec 2024 09:10:10 +0000 (UTC)
+	s=arc-20240116; t=1734599826; c=relaxed/simple;
+	bh=wKbQpvXF7K681GWgTpDCDoJREdYoPuaq8Q9YAISZd6U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LRaMVezDLP3OF2Sb1VbaCZgDctHkeWq/SQH8Od1R7idT1ozkU/V3lo9owS3OW9vXRmi4kyi9TjPHCLGWR2iVHi0eanXLBUZGLQG8iDpwf2XAa9VjGrmsidmIuX9Rz4DkYKbJHwYPCpFwfw7Ix1n5oCTUmkjuwjlbT2emyW1W3O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZ0f1WNL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCBB8C4CECE;
+	Thu, 19 Dec 2024 09:17:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734599411;
-	bh=VYAOV0DQQggPY2XmjJx09Xty29Hn2skvfDGqACr2QpI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=F6/Z/kejTxoCZqW+Mj3gLNbc0+CDeS3X/zdp1MUaJwLB+3zHVxFtIEyA4dHNGRwic
-	 2chdZCJKxsa2UsidXjHByNJHr2CKcq8+/2Q+KELhh6sb5mYCsXa2Bo0a/ESHdkDeBE
-	 eJT2WeeyFcmWWgECKFrx6ygZZF8V50KEzfgaQLcjGF/7vFlmhS16HDxONZmHMkQeOd
-	 I5mRy3zboIyO5IOHZARR+OhcXBaB/kaY7vif4xhnQeFz3HM+lh+PHGFweyX88LDFog
-	 fQ354put+wzCPYAX0fF+HTgH6G/efXiYY3rGi23sj4XAMzL0K12b7N0TGq5xOL24DK
-	 1T//xJm+uOZQQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEFF3806656;
-	Thu, 19 Dec 2024 09:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1734599826;
+	bh=wKbQpvXF7K681GWgTpDCDoJREdYoPuaq8Q9YAISZd6U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=WZ0f1WNLTjcenitip1/F7ERxKQUkWseye4CTzTBr9ikldrV4Q+LOeCWR7cVOI2szF
+	 YlVeezD6F5dJvB8zESkogPaf9fjl15sSyPvdZJZs8ZX2sVDoEtQ6PpU/CmBlVa05au
+	 VBdGL2K8d/fZseljBAe19iuV0qJnODgROBZrXqOWN6IJvgLnrlGBXJUb8SDS/EriwS
+	 jybxOoxbxUdhmG2vPHVMsS+lJqGuaLAAqltWyeVodEqaCz7rg+H9kPWaEQXqmHk5Sy
+	 xifwLtPtbPVsCuII4DHtriIHW0yhZLT3W/pVb0ZagyPx5vYUUWtd/sdN2xg7TbmTrq
+	 MeO5FqY9wjldw==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Levi Zim <rsworktech@outlook.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ John Fastabend <john.fastabend@gmail.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern
+ <dsahern@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/2] Fix NPE discovered by running bpf kselftest
+In-Reply-To: <87y10e1fij.fsf@all.your.base.are.belong.to.us>
+References: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
+ <MEYP282MB23129373641D74DE831E07E9C6342@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+ <Z0+qA4Lym/TWOoSh@pop-os.localdomain>
+ <MEYP282MB2312EE60BC5A38AEB4D77BA9C6372@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+ <87y10e1fij.fsf@all.your.base.are.belong.to.us>
+Date: Thu, 19 Dec 2024 10:17:02 +0100
+Message-ID: <87msgs9gmp.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] ipvs: Fix clamp() of ip_vs_conn_tab on small memory
- systems
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173459942851.2189520.15547045150510561758.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Dec 2024 09:10:28 +0000
-References: <20241218234137.1687288-2-pablo@netfilter.org>
-In-Reply-To: <20241218234137.1687288-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org> writes:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+> Levi Zim <rsworktech@outlook.com> writes:
+>
+>> On 2024-12-04 09:01, Cong Wang wrote:
+>>> On Sun, Dec 01, 2024 at 09:42:08AM +0800, Levi Zim wrote:
+>>>> On 2024-11-30 21:38, Levi Zim via B4 Relay wrote:
+>>>>> I found that bpf kselftest sockhash::test_txmsg_cork_hangs in
+>>>>> test_sockmap.c triggers a kernel NULL pointer dereference:
+>>> Interesting, I also ran this test recently and I didn't see such a
+>>> crash.
+>>
+>> I am also curious about why other people or the CI didn't hit such crash.
+>
+> FWIW, I'm hitting it on RISC-V:
+>
+>   |  Unable to handle kernel access to user memory without uaccess routin=
+es at virtual address 0000000000000008
+>   |  Oops [#1]
+>   |  Modules linked in: sch_fq_codel drm fuse drm_panel_orientation_quirk=
+s backlight
+>   |  CPU: 7 UID: 0 PID: 732 Comm: test_sockmap Not tainted 6.13.0-rc3-000=
+17-gf44d154d6e3d #1
+>   |  Hardware name: riscv-virtio qemu/qemu, BIOS 2025.01-rc3-00042-gacab6=
+e78aca7 01/01/2025
+>   |  epc : splice_to_socket+0x376/0x49a
+>   |   ra : splice_to_socket+0x37c/0x49a
+>   |  epc : ffffffff803d9ffc ra : ffffffff803da002 sp : ff20000001c3b8b0
+>   |   gp : ffffffff827aefa8 tp : ff60000083450040 t0 : ff6000008a12d001
+>   |   t1 : 0000100100001001 t2 : 0000000000000000 s0 : ff20000001c3bae0
+>   |   s1 : ffffffffffffefff a0 : ff6000008245e200 a1 : ff60000087dd0450
+>   |   a2 : 0000000000000000 a3 : 0000000000000000 a4 : 0000000000000000
+>   |   a5 : 0000000000000000 a6 : ff20000001c3b450 a7 : ff6000008a12c004
+>   |   s2 : 000000000000000f s3 : ff6000008245e2d0 s4 : ff6000008245e280
+>   |   s5 : 0000000000000000 s6 : 0000000000000002 s7 : 0000000000001001
+>   |   s8 : 0000000000003001 s9 : 0000000000000002 s10: 0000000000000002
+>   |   s11: ff6000008245e200 t3 : ffffffff8001e78c t4 : 0000000000000000
+>   |   t5 : 0000000000000000 t6 : ff6000008869f230
+>   |  status: 0000000200000120 badaddr: 0000000000000008 cause: 0000000000=
+00000d
+>   |  [<ffffffff803d9ffc>] splice_to_socket+0x376/0x49a
+>   |  [<ffffffff803d8bc0>] direct_splice_actor+0x44/0x216
+>   |  [<ffffffff803d8532>] splice_direct_to_actor+0xb6/0x1e8
+>   |  [<ffffffff803d8780>] do_splice_direct+0x70/0xa2
+>   |  [<ffffffff80392e40>] do_sendfile+0x26e/0x2d4
+>   |  [<ffffffff803939d4>] __riscv_sys_sendfile64+0xf2/0x10e
+>   |  [<ffffffff80fdfb64>] do_trap_ecall_u+0x1f8/0x26c
+>   |  [<ffffffff80fedaee>] _new_vmalloc_restore_context_a0+0xc6/0xd2
+>   |  Code: c5d8 9e35 c590 8bb3 40db eb01 6998 b823 0005 856e (6718) 2d05=
+=20
+>   |  ---[ end trace 0000000000000000 ]---
+>   |  Kernel panic - not syncing: Fatal exception
+>   |  SMP: stopping secondary CPUs
+>   |  ---[ end Kernel panic - not syncing: Fatal exception ]---
+>
+> This is commit f44d154d6e3d ("Merge tag 'soc-fixes-6.13' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc").
+>
+> (Yet to bisect!)
 
-On Thu, 19 Dec 2024 00:41:36 +0100 you wrote:
-> From: David Laight <David.Laight@ACULAB.COM>
-> 
-> The 'max_avail' value is calculated from the system memory
-> size using order_base_2().
-> order_base_2(x) is defined as '(x) ? fn(x) : 0'.
-> The compiler generates two copies of the code that follows
-> and then expands clamp(max, min, PAGE_SHIFT - 12) (11 on 32bit).
-> This triggers a compile-time assert since min is 5.
-> 
-> [...]
+Took the series for a run, and it does solve crash, but I'm getting
+additional failures:
 
-Here is the summary with links:
-  - [net,1/2] ipvs: Fix clamp() of ip_vs_conn_tab on small memory systems
-    https://git.kernel.org/netdev/net/c/cf2c97423a4f
-  - [net,2/2] netfilter: ipset: Fix for recursive locking warning
-    https://git.kernel.org/netdev/net/c/70b6f46a4ed8
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+  |  [TEST 298]: (512, 1, 3, sendpage, pass,pop (1,3),ktls,): socket(peer2)=
+ kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+  | socket(client1) kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | recv failed(): Invalid argument=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | rx thread exited with err 1.=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  |  FAILED=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+  |  [TEST 299]: (100, 1, 5, sendpage, pass,pop (1,3),ktls,): socket(peer2)=
+ kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+  | socket(client1) kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | recv failed(): Invalid argument=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | rx thread exited with err 1.=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+  |  FAILED=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+  |  [TEST 300]: (2, 32, 8192, sendpage, pass,pop (4096,8192),ktls,): socke=
+t(peer2) kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | socket(client1) kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | recv failed(): Bad message=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | rx thread exited with err 1.=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  |  FAILED=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20
+  |  ...
+  | #42/ 9 sockhash:ktls:txmsg test pop-data:FAIL=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+  | ...
+  |  [TEST 308]: (2, 32, 8192, sendpage, pass,pop (5,21),ktls,): socket(pee=
+r2) kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20
+  | socket(client1) kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | recv failed(): Bad message=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | rx thread exited with err 1.=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  |  FAILED=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20
+  |  [TEST 309]: (2, 32, 8192, sendpage, pass,pop (1,11),ktls,): socket(pee=
+r2) kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20
+  | socket(client1) kTLS enabled=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | recv failed(): Bad message=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  | rx thread exited with err 1.=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  |  FAILED
+  | ...
+  | #43/ 6 sockhash:ktls:txmsg test push/pop data:FAIL=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
 
 
