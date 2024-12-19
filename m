@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-153346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE39D9F7B6C
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 13:35:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B9E69F7B6E
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 13:35:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CF0816E82F
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 12:34:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 287AC16EFE0
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 12:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CA922576B;
-	Thu, 19 Dec 2024 12:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08CE227563;
+	Thu, 19 Dec 2024 12:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="aUEadRkG"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="gNSPhuj3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB710224B04
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 12:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AF2224AE8
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 12:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734611493; cv=none; b=jwLtW3NX2dhN7DEVRsUwFI74H7qorEz+4Le1cajU/4c9XMZIGkQOh7JtbqTNZTayZRtfdH/HUX0OWNBAHC5WdsSfIczlVPC2EYHrEXrnxSqo1qNqPZHCskDZFUKo9wggpu0yP4gSOjVqwlfjsCAeAdUeOfV7tv52KFdKj+qqtdo=
+	t=1734611494; cv=none; b=Ni89L5fWYwufs1FNF6XUMIBkvOPrxJHD8yH0M/xpDCGbKXRruImE6Ru64c2PyncahjkCJEkuhvVi/I5o84RQVJWFuDB6N9SOBU+sBEYlJjUI7Rv5GOKWENzlKbIebsuBoHkIRiReaKXqi7zJtHEmIm2uY0rRn4uwGzmAPYxBHDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734611493; c=relaxed/simple;
-	bh=554KnmQewfLNAaaVI7EBynvYbb/1peXCRMYhqw2CdDs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cLbm5YksSHFq50TlxwLMTrBS0BsoaDnxgB6xHSTFYtA3BXtowcZVKo40Kxvr/hgOlP3wBpShUAmqH7w6mM0D432NK1XAirgogtvhPPSWTh3WwzAzGV+sA4LviwYyUmVdbLmnP8sz9GVTRGXVsN+jLDc+hwZZMy6hGN623iZ1OCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=aUEadRkG; arc=none smtp.client-ip=209.85.208.171
+	s=arc-20240116; t=1734611494; c=relaxed/simple;
+	bh=08hazq2tpp5U1ZBYQbPHctBIvGpIFHZdk7LpzexFtnU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YEWu8Y5smBYcFrwdT92pQESrYQATR27yAkXnlvR1XgUoRwuHQP8+y5qbsfJhH3DVt4vu4FVlByTITQ5MNvuhtC5AkxtDD0j5guItfJ4/dbwHqO6tAxtIzKKlbyL2f2AwhDeD2dgThTMNRbBREjdVRz6oYe2PFByD96XN8MLvdsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=gNSPhuj3; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-30034ad2ca3so6861161fa.1
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 04:31:30 -0800 (PST)
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-53e3a5fa6aaso1962037e87.0
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 04:31:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1734611489; x=1735216289; darn=vger.kernel.org;
-        h=content-transfer-encoding:organization:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G0aMpJcJTSWMr2EaVqhJNcaeXRle7w7jsNMq5lBPsGg=;
-        b=aUEadRkGLD8zrm52NOMBmi0WuGsaYSkE35D4MudXovYJrUOk1b9lk/QX8j8z0FJzrS
-         2XSJb2loq9jEQtOhaRv4svn/DJJ/IOo715tA676kNCrgHGtmJmpC43hv0xtsNHy05o/9
-         wLzg0Gvnugbfa0qLkd62kLvxTnqlgPRfzspYD0k3cVUQ7SaGe6SNzHfRH8LvhAYtYVZi
-         XRFs1lB4gjqtoDdGWwAM2d10Qknki7JalX38I5WMcvmlGl/MsuNdlUkezmHZf6Zk10B+
-         +4J2s/HUYGuTeC04j04GEy0e1cXqHDgDSYPKoTxvOarWebeu93rYksx/gVQtcJEsl21X
-         8kGA==
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1734611491; x=1735216291; darn=vger.kernel.org;
+        h=content-transfer-encoding:organization:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1BB3Jy8S65eVmx6HaPAgKajQmaTeuZOvuBP1iY2h06s=;
+        b=gNSPhuj3Gf+/fiV/HE2SI4PBs+ReinKNnsr2vQMYbUOq7lcyfdNVhvlrK7EkKx8Oyv
+         5QBpnP9qtQaz7+zdaYzUIPYaiflnlgKScxSx7+wc2Dq55CXm9ZDV8ztHgstfdkLJvA9x
+         iIG9zHSRoaDWTlZOmDdxQ4vkte1ITLPSleBK+N04OS6Ke55iFO4+NCAtp3hpVb5ngwVH
+         uDrdawGFEZ+3tCxZwaMTQY1vD2/p2fVBiEqqKcDhd2Iel62KAQZk5iA3nv74vvJWENh2
+         8M1j4fGqHvnEZwFowaDO6UN9aawVNkHgekf9aB3kbXfTwtcvPUiyz6PUi6SR5LV33tgN
+         BWtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734611489; x=1735216289;
-        h=content-transfer-encoding:organization:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G0aMpJcJTSWMr2EaVqhJNcaeXRle7w7jsNMq5lBPsGg=;
-        b=gM1lDkMKRa3wuOotl6JDsAksHLEXytmZBeOlFFPmN6WqDMNHuepX0k7HNCsBNvYshn
-         NgB7ikXly76ksg2gEv1D2XKCvOaGyzLAP2BsIfkBb4wF5QNT4RIG+BEK1bHqd/Qs/Cgw
-         qUolPIbfm2ghUfTV7+hmj6nUsk3Tmm2AsK1cUeOVdT/zj009BWZjVS6alT9GRFGVfK0W
-         OOWq1ljwkGrVy2SnrG6WW8Bk403C95sMvsV5ezGIiWj83KuM3G9/n9z0kLvY/jH6FLRh
-         TrnbWa4mppIj3TL2cLcroZo/AepOai5TWc0uAeHuZshmdUXdvCyYog2D44vvUs/WNxEm
-         XxSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVrQEkns2cOsVqFWlqwxLWcdhmdKHUIcI8TJLwNriL5WiHwdvKXZOp/FaSZ5RHz5JAs3TUqZPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw+Pb3asqP7FXsWG99lVz3U2etZyWKyztUj20skvD9Yy65ShE8
-	PMFT+vnocUzU7pxosP8QDZII3O1McP3Yfj49rtQLpxl9fXc5iX8zQC0Gk+hREJs=
-X-Gm-Gg: ASbGnctgG7gykHTrOavZSxc9/GIheL94qAScTGcr1WJHUZGYtcAN/vvBX1y7PCMmVKE
-	uacsQeb54M+GU7BUwj4lR8Wp0fvVeMnW06PMp7O5md+W/g1cM0qb5mnLlUq2A7fhuRJEWcUJh0T
-	xCAie8PRfuV6uV7/0KL/zr/TiQbEI2+Do3XZTCU0OOTC27br+LuNxJYugq87mM2eYGw+ZCWlAbv
-	kE0tfL7baFTU8OMPPorKfRFDxGU6OXNhR2W9zozNnkMaetKzjpnX4CRSjOIxzTYRCjG8uIrZTc3
-	H+o5C2e8BSka7fwivQQTAHfo
-X-Google-Smtp-Source: AGHT+IGyOn5JesJIllper5+aBTClH9ZXtDTehHux4azl9vNfoxZonXPgoVZYr22mtBchQPsZXti+CA==
-X-Received: by 2002:a05:6512:3e15:b0:542:2166:44cb with SMTP id 2adb3069b0e04-54221664572mr1025716e87.35.1734611488717;
-        Thu, 19 Dec 2024 04:31:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734611491; x=1735216291;
+        h=content-transfer-encoding:organization:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1BB3Jy8S65eVmx6HaPAgKajQmaTeuZOvuBP1iY2h06s=;
+        b=OFDhIGY6TX/+HqMUW/SBo53IQZJpSH3wT66Xrry7LN+39Zk8dzh+vUGTzdBHI+4vEZ
+         T7ZOAMdMeBItwHJd3C3P4o8pUbsh0wdWmy3nzwN1QpNh6pmwqaDna5lfPjY/xq40y5md
+         4ZiH47AfWZDrG0Zm8R6reCpqSD4ZMK9jY2xKO6cNlfPe0YomxFqCRQisAvobX0H8f4Gu
+         VbnH3qwFBIFpdRRQMolujXEsyqknLGKLpCPrsaks0JRRgm9zscFXI9x1eHjfodfosLaH
+         dUqLvldwlfv8K7moFHrducTtb2YVFwSf666dBQNANMgS19W3Djc//a/fMU7NDfIg0rv+
+         lteg==
+X-Forwarded-Encrypted: i=1; AJvYcCUyTZsQECttwKOQ3ZRGWeVTQxOzIP7iquWRJGcY+HJY37D2Zq3cNu/x+5ucDdZK4sweefpGnIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2qs6z1+Nr7Tm8coqUjMlkrgDht3Jq3CkI+caMnKN5EIMMtUDG
+	SEWHPyFBZ4DeWSzYuKxWxQ+OfjMrEUq1bj4r7Uw5a36G000bJq70hu2QydA6sNk=
+X-Gm-Gg: ASbGncsBxe+jNvJradPn4X7qNhKPSBrA97X1wkGHKPqIdkxhYo22n+IYYUZUXHacGC2
+	9V4Orb5BSFJbVHRJxNn9OwLTBImqLg5VVWXmh9ZGKEukCWJuFiyc/zCbmi28nocMj4vjZ5FQIGW
+	g8vv4vN1v5a15DFwmoRTuNYC5nIvfmVUiVmNX9ZV8NZHbTskrvyl7i+U8WLefUh8wRBUQ8eA+BA
+	ZlHu8QcKTL884px0nGRg4f+zjej6h0uwSpIcZ4Lmip/YUHEapK1dPT4yLSNqP+ByPMnKjH9xyrW
+	ankxxotb8eSBsq7O6YvGKgVI
+X-Google-Smtp-Source: AGHT+IEJ9N+SaqyKs1sSAdUKEe5QT1FGY01op6yGqZUMOPhz0rCxgx3kCBze2v45tIfZMPku++2QjQ==
+X-Received: by 2002:ac2:5681:0:b0:53e:2098:861d with SMTP id 2adb3069b0e04-542212f0034mr1037525e87.15.1734611490934;
+        Thu, 19 Dec 2024 04:31:30 -0800 (PST)
 Received: from wkz-x13.addiva.ad (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54223b28722sm145975e87.243.2024.12.19.04.31.26
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54223b28722sm145975e87.243.2024.12.19.04.31.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 04:31:27 -0800 (PST)
+        Thu, 19 Dec 2024 04:31:29 -0800 (PST)
 From: Tobias Waldekranz <tobias@waldekranz.com>
 To: davem@davemloft.net,
 	kuba@kernel.org
@@ -80,10 +82,12 @@ Cc: andrew@lunn.ch,
 	linux@armlinux.org.uk,
 	chris.packham@alliedtelesis.co.nz,
 	pabeni@redhat.com
-Subject: [PATCH v2 net 0/4] net: dsa: mv88e6xxx: Amethyst (6393X) fixes
-Date: Thu, 19 Dec 2024 13:30:39 +0100
-Message-ID: <20241219123106.730032-1-tobias@waldekranz.com>
+Subject: [PATCH v2 net 1/4] net: dsa: mv88e6xxx: Improve I/O related error logging
+Date: Thu, 19 Dec 2024 13:30:40 +0100
+Message-ID: <20241219123106.730032-2-tobias@waldekranz.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241219123106.730032-1-tobias@waldekranz.com>
+References: <20241219123106.730032-1-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,49 +97,106 @@ MIME-Version: 1.0
 Organization: Addiva Elektronik
 Content-Transfer-Encoding: 8bit
 
-This series provides a set of bug fixes discovered while bringing up a
-new board using mv88e6393x chips.
+In the rare event of an I/O error - e.g. a broken bus controller,
+frozen chip, etc. - make sure to log all available information, so
+that there is some hope of determining _where_ the error; not just
+_that_ an error occurred.
 
-1/4 adds logging of low-level I/O errors that where previously only
-logged at a much higher layer, e.g. "probe failed" or "failed to add
-VLAN", at which time the origin of the error was long gone. Not
-exactly a bugfix, though still suitable for -net IMHO; but I'm also
-happy to send it via net-next instead if that makes more sense.
+Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+---
+ drivers/net/dsa/mv88e6xxx/chip.c | 51 +++++++++++++++++++++++++++-----
+ 1 file changed, 43 insertions(+), 8 deletions(-)
 
-2/4 fixes an issue I've never seen on any other board. At first I
-assumed that there was some board-specific issue, but we've not been
-able to find one. If you give the chip enough time, it will eventually
-signal "PPU Polling" and everything else will work as
-expected. Therefore I assume that all is in order, and that we simply
-need to increase the timeout.
-
-3/4 just broadens Chris' original fix to apply to all chips. Though I
-have obviously not tested this on every supported device, I can't see
-how this could possibly be chip specific. Was there some specific
-reason for originally limiting the set of chips that this applied to?
-
-4/4 can only be supported on the Amethyst, which can control the
-ieee-multicast policy per-port, rather than via a global setting as
-it's done on the older families.
-
-v1 -> v2:
- - Increase the global timeout in mv88e6xxx_wait_mask() to cover the
-   slow PPU init, rather handling PPU init as a special case (Andrew)
- - (Because of the previous change, Paolo's suggestion on lowering the
-   priority of the log message was rendered mute)
-
-Tobias Waldekranz (4):
-  net: dsa: mv88e6xxx: Improve I/O related error logging
-  net: dsa: mv88e6xxx: Give chips more time to activate their PPUs
-  net: dsa: mv88e6xxx: Never force link on in-band managed MACs
-  net: dsa: mv88e6xxx: Limit rsvd2cpu policy to user ports on 6393X
-
- drivers/net/dsa/mv88e6xxx/chip.c | 88 +++++++++++++++++---------------
- drivers/net/dsa/mv88e6xxx/chip.h |  4 --
- drivers/net/dsa/mv88e6xxx/port.c | 48 ++++++++---------
- drivers/net/dsa/mv88e6xxx/port.h |  1 -
- 4 files changed, 72 insertions(+), 69 deletions(-)
-
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 3a792f79270d..46926b769460 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -59,8 +59,11 @@ int mv88e6xxx_read(struct mv88e6xxx_chip *chip, int addr, int reg, u16 *val)
+ 	assert_reg_lock(chip);
+ 
+ 	err = mv88e6xxx_smi_read(chip, addr, reg, val);
+-	if (err)
++	if (err) {
++		dev_err_ratelimited(chip->dev, "Failed to read from 0x%02x/0x%02x: %d",
++				    addr, reg, err);
+ 		return err;
++	}
+ 
+ 	dev_dbg(chip->dev, "<- addr: 0x%.2x reg: 0x%.2x val: 0x%.4x\n",
+ 		addr, reg, *val);
+@@ -75,17 +78,19 @@ int mv88e6xxx_write(struct mv88e6xxx_chip *chip, int addr, int reg, u16 val)
+ 	assert_reg_lock(chip);
+ 
+ 	err = mv88e6xxx_smi_write(chip, addr, reg, val);
+-	if (err)
++	if (err) {
++		dev_err_ratelimited(chip->dev, "Failed to write 0x%04x to 0x%02x/0x%02x: %d",
++				    val, addr, reg, err);
+ 		return err;
+-
++	}
+ 	dev_dbg(chip->dev, "-> addr: 0x%.2x reg: 0x%.2x val: 0x%.4x\n",
+ 		addr, reg, val);
+ 
+ 	return 0;
+ }
+ 
+-int mv88e6xxx_wait_mask(struct mv88e6xxx_chip *chip, int addr, int reg,
+-			u16 mask, u16 val)
++static int _mv88e6xxx_wait_mask(struct mv88e6xxx_chip *chip, int addr, int reg,
++				u16 mask, u16 val, u16 *last)
+ {
+ 	const unsigned long timeout = jiffies + msecs_to_jiffies(50);
+ 	u16 data;
+@@ -117,15 +122,45 @@ int mv88e6xxx_wait_mask(struct mv88e6xxx_chip *chip, int addr, int reg,
+ 	if ((data & mask) == val)
+ 		return 0;
+ 
+-	dev_err(chip->dev, "Timeout while waiting for switch\n");
++	if (last)
++		*last = data;
++
+ 	return -ETIMEDOUT;
+ }
+ 
++int mv88e6xxx_wait_mask(struct mv88e6xxx_chip *chip, int addr, int reg,
++			u16 mask, u16 val)
++{
++	u16 last;
++	int err;
++
++	err = _mv88e6xxx_wait_mask(chip, addr, reg, mask, val, &last);
++	if (!err)
++		return 0;
++
++	dev_err(chip->dev,
++		"%s waiting for 0x%02x/0x%02x to match 0x%04x (mask:0x%04x last:0x%04x)\n",
++		(err == -ETIMEDOUT) ? "Timed out" : "Failed",
++		addr, reg, val, mask, last);
++	return err;
++}
++
+ int mv88e6xxx_wait_bit(struct mv88e6xxx_chip *chip, int addr, int reg,
+ 		       int bit, int val)
+ {
+-	return mv88e6xxx_wait_mask(chip, addr, reg, BIT(bit),
+-				   val ? BIT(bit) : 0x0000);
++	u16 last;
++	int err;
++
++	err = _mv88e6xxx_wait_mask(chip, addr, reg, BIT(bit),
++				   val ? BIT(bit) : 0x0000, &last);
++	if (!err)
++		return 0;
++
++	dev_err(chip->dev,
++		"%s waiting for bit %d in 0x%02x/0x%02x to %s (last:0x%04x)\n",
++		(err == -ETIMEDOUT) ? "Timed out" : "Failed",
++		bit, addr, reg, val ? "set" : "clear", last);
++	return err;
+ }
+ 
+ struct mii_bus *mv88e6xxx_default_mdio_bus(struct mv88e6xxx_chip *chip)
 -- 
 2.43.0
 
