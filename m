@@ -1,157 +1,123 @@
-Return-Path: <netdev+bounces-153326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F02C49F7AA6
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 12:47:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A8859F7AAB
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 12:48:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93DF11614EC
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 11:46:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 361097A0321
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 11:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AD1224B05;
-	Thu, 19 Dec 2024 11:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FTakhQcu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707B3223330;
+	Thu, 19 Dec 2024 11:48:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112BE224B03;
-	Thu, 19 Dec 2024 11:45:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682221FCFCB;
+	Thu, 19 Dec 2024 11:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734608755; cv=none; b=aofaKv/7St7UrESLkaB6oOF1JjN/5NZldBkO3so9uRGPHCYMWCQOXoM5wsVxx/qS8L6VpulH7kmhBO/p9Ap/8e0rydGBOgJo8QQzwMzfNVrPHGxuv8163RIW+BGGDlENZ4YELqrBeMy+8W4lj6GP06FpkSMyS/gD4lIv2iq2+eA=
+	t=1734608914; cv=none; b=h2PZn+741qdww0CuiJTrVZAjpAFNSKw/xwUP6hwXyQJ4wbpsow0I27lzOCczFgH74RpdyxEll6WwpUMpbv3Aic9JQ9bqvXYUbfIs/I5YxcL1vTCYWaCX96L5KRLGzdd3obyrImoHxYoNTkMmw9SXtHwvcvRV4enWCRFxyQ/SPms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734608755; c=relaxed/simple;
-	bh=ryauDGaV2QHx9bvaKw23915p8KRYzK7ghEvxtEuqeVs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L96gBFbVcoPknC+W12ia1wtV34puiPtj0etnkxO1O1VRaBovgiZPqbYEDmvxnXrFyukL0tZxRqMtvrAU5fmrZiKVQ4j8atrYcOBBHDCRgy2NwbnvcHpzLa1v8Q0DGGw9JUIsxSwexJ+MrNQg0npB9uft9ZFf7grGcfAeiFEIJZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FTakhQcu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2397C4CECE;
-	Thu, 19 Dec 2024 11:45:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734608754;
-	bh=ryauDGaV2QHx9bvaKw23915p8KRYzK7ghEvxtEuqeVs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FTakhQcuXVIcAfb7YSnh1oSxVg4mNdSZuiKxYjqKOh9e6N+krS80zq1jrHJrfGL31
-	 7taezG7624oRU3jTlTRzue+hiluGcAm3NJqFNEqXZ2eTf+XzxqcPBPWPhKnol4Oilb
-	 bIElwSnCTpX96o3pT2azCW0RY7LRDGDUSPqQUmFC9qxuyboVfREac2j+j3o1EtJ6Zk
-	 2ry4w8hDYU+mcgb0H5chh8gE2ZOM7NVwgpMQd7KIeMrpDl8mtgMvHcIL83IyUWIn8j
-	 hbtuJe8xzjN9RAxJI9+O8ZON/97uql7bCZnnThmm/PDbrxAxGrmZzqZU/dpgV3vp+z
-	 wihcfRRCRS8FA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Thu, 19 Dec 2024 12:45:29 +0100
-Subject: [PATCH net 3/3] netlink: specs: mptcp: fix missing doc
+	s=arc-20240116; t=1734608914; c=relaxed/simple;
+	bh=lA8KN30gn0SXjqkoEs7SWyWLrJJJ1JF30PO/CZNfUnY=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=mttFYPZSWTmJ89q522XBw8Ihra+c6cveVOXEFqQhfGlKBMusiNRyPLUeGAidfEgB+M8D5bY5bP3j4hlv0sA19EuWQfD6aJ/dTZpOmDIsUEFLqAFwdyEc6ykLdQ6AKhgP2UjUlgONTcbLLTz8ledDNp8QPsbBlgcbhmQtdvunvEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4YDTJc3HDyz2KXsx;
+	Thu, 19 Dec 2024 19:45:52 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 784EC140202;
+	Thu, 19 Dec 2024 19:48:28 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 19 Dec 2024 19:48:27 +0800
+Message-ID: <a96a6923-6a48-4760-97fb-01eed3735e26@huawei.com>
+Date: Thu, 19 Dec 2024 19:48:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RESEND V2 net 5/7] net: hns3: initialize reset_timer
+ before hclgevf_misc_irq_init()
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+References: <20241217010839.1742227-1-shaojijie@huawei.com>
+ <20241217010839.1742227-6-shaojijie@huawei.com>
+ <Z2KT7bLfHmx01wSU@mev-dev.igk.intel.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <Z2KT7bLfHmx01wSU@mev-dev.igk.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241219-net-mptcp-netlink-specs-pm-doc-fixes-v1-3-825d3b45f27b@kernel.org>
-References: <20241219-net-mptcp-netlink-specs-pm-doc-fixes-v1-0-825d3b45f27b@kernel.org>
-In-Reply-To: <20241219-net-mptcp-netlink-specs-pm-doc-fixes-v1-0-825d3b45f27b@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Kishen Maloor <kishen.maloor@intel.com>, 
- Davide Caratti <dcaratti@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2303; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=ryauDGaV2QHx9bvaKw23915p8KRYzK7ghEvxtEuqeVs=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnZAdlzuGXzA3A6/O1SLyvTrLBmTTpkRX/zu2sc
- CR+BFyISraJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ2QHZQAKCRD2t4JPQmmg
- c3+rD/9rVcEyFP0Ktq5YY/84fhUL3T0aWD/ASYqjrP7likvyMhmCUQ9owuywqB2Br0AwbB+pKZy
- dtc//ZWPjQEH5M2bBh3neR5iuRwYq9BNe5kO2FwLGEFL88wLdbJPHqbRrTHeZWQtKg+vCOufUvO
- ATPImKIGu7HYplkaNL6ZybBWSs3vYyQ7MgdgV2NPf8Vi+3z3lakdrdxBKb7HkGbSIRuQysUrj4G
- Y1scL6twCmTajRjo5TVcu0suaSa/k+fWmvHNvq3BmmlP1Bkc1Nd5sswwVU5Fto9+zDFMRfvF3QW
- /OXb3u+pkDQgxb//WUVkkOUsGMuUahCYvOVTx+Qsq4b5kMUL/R8ef8USZASAGZhcQ6u0/sowoEn
- Ye6yuVJ784OHN1B5EsDH64IWHcDaoDD087X1gMP98un18QjBfP0ZLMLmYv9ElURAHkiwfOR4q+q
- Xv2GzpywGJjD0JRVdlyJ/zvxB+aLBaujYItbGw5mm4BcASmvj0lGYlbM3FiOQ2oac+SRj+D//Z2
- BDZSHYPYy4ou9ODdYR8jLQFkK6QiO2Qr8lRX6VQMehSW+9OF4uCuiuVfjcsV9XpIfceeGzucL+6
- MlevL948W9sudHl6olk+biOVICmMdOhoD2WfXXklwsZkuICCi3ocOZVJo/XwQla6UCQ6Tj1SOiq
- XAnYKZ+UwYaSCfA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-Two operations didn't have a small description. It looks like something
-that has been missed in the original commit introducing this file.
 
-Replace the two "todo" by a small and simple description: Create/Destroy
-subflow.
+on 2024/12/18 17:20, Michal Swiatkowski wrote:
+> On Tue, Dec 17, 2024 at 09:08:37AM +0800, Jijie Shao wrote:
+>> From: Jian Shen <shenjian15@huawei.com>
+>>
+>> Currently the misc irq is initialized before reset_timer setup. But
+>> it will access the reset_timer in the irq handler. So initialize
+>> the reset_timer earlier.
+>>
+>> Fixes: ff200099d271 ("net: hns3: remove unnecessary work in hclgevf_main")
+>> Signed-off-by: Jian Shen <shenjian15@huawei.com>
+>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>> ---
+>>   drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+>> index fd0abe37fdd7..8739da317897 100644
+>> --- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+>> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+>> @@ -2313,6 +2313,7 @@ static void hclgevf_state_init(struct hclgevf_dev *hdev)
+>>   	clear_bit(HCLGEVF_STATE_RST_FAIL, &hdev->state);
+>>   
+>>   	INIT_DELAYED_WORK(&hdev->service_task, hclgevf_service_task);
+> Comment here that timer needs to be initialized before misc irq will be
+> nice, but that is onlu my impression.
 
-While at it, also uniform the capital letters, avoid double spaces, and
-fix the "announce" event description: a new "address" has been
-announced, not a new "subflow".
 
-Fixes: bc8aeb2045e2 ("Documentation: netlink: add a YAML spec for mptcp")
-Cc: stable@vger.kernel.org
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- Documentation/netlink/specs/mptcp_pm.yaml | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+I'll add a comment in the next version.
 
-diff --git a/Documentation/netlink/specs/mptcp_pm.yaml b/Documentation/netlink/specs/mptcp_pm.yaml
-index 59087a23056510dfb939b702e231b6e97ae042c7..dfd017780d2f942eefd6e5ab0f1edd3fba653172 100644
---- a/Documentation/netlink/specs/mptcp_pm.yaml
-+++ b/Documentation/netlink/specs/mptcp_pm.yaml
-@@ -308,8 +308,8 @@ operations:
-          attributes:
-            - addr
-     -
--      name:  flush-addrs
--      doc: flush addresses
-+      name: flush-addrs
-+      doc: Flush addresses
-       attribute-set: endpoint
-       dont-validate: [ strict ]
-       flags: [ uns-admin-perm ]
-@@ -353,7 +353,7 @@ operations:
-             - addr-remote
-     -
-       name: announce
--      doc: announce new sf
-+      doc: Announce new address
-       attribute-set: attr
-       dont-validate: [ strict ]
-       flags: [ uns-admin-perm ]
-@@ -364,7 +364,7 @@ operations:
-             - token
-     -
-       name: remove
--      doc: announce removal
-+      doc: Announce removal
-       attribute-set: attr
-       dont-validate: [ strict ]
-       flags: [ uns-admin-perm ]
-@@ -375,7 +375,7 @@ operations:
-            - loc-id
-     -
-       name: subflow-create
--      doc: todo
-+      doc: Create subflow
-       attribute-set: attr
-       dont-validate: [ strict ]
-       flags: [ uns-admin-perm ]
-@@ -387,7 +387,7 @@ operations:
-             - addr-remote
-     -
-       name: subflow-destroy
--      doc: todo
-+      doc: Destroy subflow
-       attribute-set: attr
-       dont-validate: [ strict ]
-       flags: [ uns-admin-perm ]
+Thanks,
+Jijie Shao
 
--- 
-2.47.1
-
+>
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>
+> Thanks
+>> +	timer_setup(&hdev->reset_timer, hclgevf_reset_timer, 0);
+>>   
+>>   	mutex_init(&hdev->mbx_resp.mbx_mutex);
+>>   	sema_init(&hdev->reset_sem, 1);
+>> @@ -3012,7 +3013,6 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
+>>   		 HCLGEVF_DRIVER_NAME);
+>>   
+>>   	hclgevf_task_schedule(hdev, round_jiffies_relative(HZ));
+>> -	timer_setup(&hdev->reset_timer, hclgevf_reset_timer, 0);
+>>   
+>>   	return 0;
+>>   
+>> -- 
+>> 2.33.0
 
