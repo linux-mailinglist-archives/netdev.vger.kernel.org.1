@@ -1,357 +1,270 @@
-Return-Path: <netdev+bounces-153426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E45629F7E7C
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:53:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8939F7E5C
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:50:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF6AD163299
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:53:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2487188DF78
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B24229692;
-	Thu, 19 Dec 2024 15:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB80A225A37;
+	Thu, 19 Dec 2024 15:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W1Z3fvyE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T59nczg/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFFA226878;
-	Thu, 19 Dec 2024 15:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734623451; cv=none; b=ZmpD13G7Q99EQiMNOdnKgjixchVqUeUJ9vqvzQkkQOoxTS88yr8PpYgjUj9WQ2n1+I6b2Wwkr4jhoza/6CHptdT9awYo4aDbwgIp0dicKzCCxmLGTlXWGoM1B0t3Q0Hsu/Zr0g75cL/ts+pvljKyFc3PYFRsdD4LzXNF3H5vxZ0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734623451; c=relaxed/simple;
-	bh=yOr4YVcrLbV+j2DBB+pvmmyHN5Y3wzr/J7XUepFTf/0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=V54BbqZHHEUmwrU2kyO2/Tc44rb7rwfAXtD19tmMRBUqTbPbTOkd3ZpdllDpJ/HcASi36Axvg1hnnzMGkqN7WFGc4QsHe5tMmNkE3M03IQb0R4fMVLtE7R3eb3u+pqZ/AIStDCF53MCpaSJrcpY904vF0pLcN4vG9Sl/Pz8pVig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W1Z3fvyE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4025FC4CED7;
-	Thu, 19 Dec 2024 15:50:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734623451;
-	bh=yOr4YVcrLbV+j2DBB+pvmmyHN5Y3wzr/J7XUepFTf/0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=W1Z3fvyEOnOk96rrWoGzGnO4TNKEJ0JBdXkThEPz2AsVK4XDhoh6PXxtryifjRK31
-	 VIQbhnLoErkNMZz3qqg+6Akl2oKdteEc+fm71+/1z7LT0f4hr9C7l1ovemGNvR3Eah
-	 f7BuhKGxLg9yLXlIy0qJjw/P/doDoCCFCbeQkjSjfT1stkZSTohMysmiPXZbuuC/R6
-	 1/yb4aZXfBQ2OHVsPBaRA4wGR4SBBExQhbm0Ndo806Y6axwSfSA0t8Gf4gt/gIgoWF
-	 CE4mIGwjwtEP1Tg6h+vP9UiT0IWESsIP2ocKwVh4S0xRayuOB97RiqZcactwgVxpv5
-	 axjwmLXVIBPew==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Thu, 19 Dec 2024 16:46:46 +0100
-Subject: [PATCH bpf-next/net v2 7/7] selftests/bpf: Add mptcp_subflow
- bpf_iter subtest
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8B3225A47
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 15:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734623368; cv=fail; b=StDYjcUWNp/ex8LYPWMsrW9qocLDt2iKOjpS/OLI1NX3rfnND14z0vbiMzYq9uKfvsHDetwaxboPnpCRqhhl6d1HHmd5elaA2Jk0qu2mXq8CtyEQ304GWHCeP2Y0scoqIFWyfXh6Krxz0wDFqXXSPusQDZe8q9nW6HmhnTJ74wk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734623368; c=relaxed/simple;
+	bh=y7nMTunuDNxDH+liTtPibXaKtmBfZFVNauMPccQm4Qs=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cfnm1GuptWIOo5k5L+Gze4jiTG+vjmvLtZG5TahQ6Yw1gl+GIi/tQDfrZ7VFbI8wJFUCbAhgWg7FDUwrsEUDwtaoy/jhwGtA6agwcqWDgfNecTgzC93+uCyd2+KHt9fsI9OOSwVbJoUhnY9jSXqhXt7dRku8PKEOawWRwbNYGQQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T59nczg/; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734623367; x=1766159367;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=y7nMTunuDNxDH+liTtPibXaKtmBfZFVNauMPccQm4Qs=;
+  b=T59nczg/dGq3xp4QaJbsGhjmNJP7qVLNC1BSIaSs8WHDUrTDejylGiwt
+   AFQ6ijR6U2GTQThLuLZr6E7wTdu3fXomrz2D1gHIaBpW+TfE/dV4h+Mfa
+   RbVzRVgHS76xuNczS6gMSCiE0lhPZXYNZ4o4sYqM1LfDw+5P6nPPnq35A
+   et1GtKPO5d1TfaZJGFwkiC4NcU0I4Ptn0nNIxqlzNIhi6gLvVG+7lyQhV
+   Wet8WRxi+oMA22hiIxZM2QZ5OXs7hyFZSD9+PikIH/zZ3pfLMLH4vEeuY
+   dgp3k6nPckfqmNqk2SJJ1VxG7TLVPNQ6qSNlGGVoLch5HMcMUdka9Deyf
+   g==;
+X-CSE-ConnectionGUID: dbdumvzwRbCHdW2p1izyiA==
+X-CSE-MsgGUID: LW1swW/YR5GKmu2mul2YOA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="39078790"
+X-IronPort-AV: E=Sophos;i="6.12,248,1728975600"; 
+   d="scan'208";a="39078790"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2024 07:49:22 -0800
+X-CSE-ConnectionGUID: ZKx502ydRSK9vk0FrPX/jw==
+X-CSE-MsgGUID: qCaAXba0R2e7LyG8g6q5ig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,248,1728975600"; 
+   d="scan'208";a="98763301"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Dec 2024 07:49:21 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 19 Dec 2024 07:49:20 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 19 Dec 2024 07:49:20 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 19 Dec 2024 07:49:20 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Fx0blqLYn+xEdenKC6P8cNXGOHVgvPUEjZgDygfTM9dIUmNptvSPGjIr0tK9QWlppcrfl5pLd/83zhVmVUfu6PVPAb+LP5CXQhDdBGBUTa8k179oEHWkFtIf7qaIxxELMBMHkSlXR300GiRYhu0Hn/ej/hZ6TOakDYPalw9FMU2hcqetyUCtIyanX/s0Kt1YI5rCyRnCuM2ty49x5FOIrArmqUx2Tf1S9DIuSXNDUqLx8oMI+apoLDJB5h6o3TFGqyFHxmV+fB6jM66s2QK7d2KKS1AaVdIjDN7iXJsj41NzZ+Vuo2bOPwRswv4WIqdlNJehal8pD9fwn5p/krHsBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tCQvqrvWntGNyA6gQVmjNoFytQ9uj/Dh7uCWPODMieI=;
+ b=Fkzci/me2bQaCB95jvmF0/zZkQCYAs2mEh+ZO6f13zS5Xv23mdgC8YJqNgN1MQ7S5Iu2hmnJ4pZgoDiv/tnD76G+MzeOe31qV2nQ6AO9NkiOv8Dz2mv35kgAGFuYMPCPVHucjdIc9RzLADqCmq3fAZrY2TTOnMBPCcyL20MNfO04CnV28FJMfqyzgmKRRXedVWXoU5T5PRdtV9hfhKYXrrWAqkZs5zkqOtuY1U2ArznV97yMh4NTR5hf+kyn2Rw55bNTnAcvU94NFXigNGb2uJLyBFoH3uYx/sFV9EKZUA6eTZvpMDXUEFJwdsF733jD9Fv6t/mwG7sR29BX4Ds9sA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by CH3PR11MB7818.namprd11.prod.outlook.com (2603:10b6:610:129::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Thu, 19 Dec
+ 2024 15:49:18 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.8272.005; Thu, 19 Dec 2024
+ 15:49:18 +0000
+Message-ID: <633062bb-5c70-409d-a55b-5785294d59da@intel.com>
+Date: Thu, 19 Dec 2024 16:49:12 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 4/4] ice: Add correct PHY lane assignment
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: Paolo Abeni <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>
+CC: Karol Kolacinski <karol.kolacinski@intel.com>, <richardcochran@gmail.com>,
+	<horms@kernel.org>, Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>, Pucha Himasekhar Reddy
+	<himasekharx.reddy.pucha@intel.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+References: <20241206193542.4121545-1-anthony.l.nguyen@intel.com>
+ <20241206193542.4121545-5-anthony.l.nguyen@intel.com>
+ <04a216d1-6952-40f0-b7d0-f9d8b4f5a866@redhat.com>
+ <a7b0cf34-4445-40cf-9a8a-b3c24be08fc9@intel.com>
+Content-Language: en-US
+In-Reply-To: <a7b0cf34-4445-40cf-9a8a-b3c24be08fc9@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MI1P293CA0025.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:3::11) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241219-bpf-next-net-mptcp-bpf_iter-subflows-v2-7-ae244d3cdbbc@kernel.org>
-References: <20241219-bpf-next-net-mptcp-bpf_iter-subflows-v2-0-ae244d3cdbbc@kernel.org>
-In-Reply-To: <20241219-bpf-next-net-mptcp-bpf_iter-subflows-v2-0-ae244d3cdbbc@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <geliang@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9284; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=bq/oYTxQQ+2A/IA41fcrwu1uM6Uk6qmTeqE376zM200=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnZECu1e8GkpdmZGYvyXzQArL8DlgcE6mHZlmKN
- MxIeil0/kqJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ2RArgAKCRD2t4JPQmmg
- c+pxD/9ny3wXWFBPZiEJWambXs+hb29ypQ+IXpG/grTa8P9tb0zcqmoLG+J7MiQsyKr1keCbF6J
- DW1420z/XcviOZhtdJ0S2qN/pGU5D+4XS0j53v51suQMqt0b2o+uil8EAew6VmapyfPh2lOZCKv
- wmczAakHIzg9N5Wh12UINOCCcmrBdvaVxW0E9kJSQ+f0+7yE86BYSs8nDluDafKUZ0OtXQTUSyn
- O6zYvvEpV9frKPvL0uncm2rzV63C3Ix+YsGCMhGBxF+V3uo5QE7fTCATtIko0ECIql/+yXehE4c
- u0/Jz/iUw3YxRCRm1irHhilZMBAKj9zc4lhd0kmKREuaFhCDISGJvBfVZpqPW20KY63WcbV25vu
- REchtTCbZo1Te57y3JgSYQTWRal/2Jhxmg+y2lqXbzM539nuOxrFlBxOvf61ggqNi35GZ5A77AH
- ysWC7oOiDVyhAVrI9BqCa29l+DbvYhrDUKGlk9Jcs7Pf1TG0ScduX9RWXIXBtCwHEA750ibH2kO
- X7/jycj7u/KertC7E5Vyz5rD69QApSIMAMF41q4XGpfiaVabDKZuJzRMzcLyam4SkhLPtf9SZn9
- FABm+JPXUKDyj1O35rnqG1OI7v2F1g2E8t71fGmF+hwsW/rsAY1gSQbd9iE8qA5jtofZ3OwbiYy
- 8FKJS1CTZbpe/2g==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CH3PR11MB7818:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4ac965b8-c713-42ba-6cf3-08dd2044b282
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?VWR4empCTGFKcHFDMDVPM3cvcmJGR1BDTnpRT3d0cTBsU3BiRm1qSDdKbFYv?=
+ =?utf-8?B?M1hNendKUllzTFF4cGFtWmlGZVQ3RTFEWFBMRWJtRTZmSTJseU1wK3djRXpM?=
+ =?utf-8?B?RzJZamNxNE0xeVUwTUpPRnVCKzdpN1pMc21vcDluR0c4aHhZV29xMjUxZld2?=
+ =?utf-8?B?QWZIWEVJZ1ZMYm1UT21za3N6WjRlOHJwMFVnSEV5TnQra2lQTmZKd1dWUjJ2?=
+ =?utf-8?B?cXBGanVaenhDcHZwV1BDL1R0NGlWK0lFOXBpaHQxL0s3cGJoZCtHMis2bGpK?=
+ =?utf-8?B?NWkxT01vWnVuTDRrZExXYko1TUlHQ3kwb0I4SXdoa0tmcVBqb01UNkliem9G?=
+ =?utf-8?B?aUtIcWFSRTBvUDNjNGdidDVydUd2dC94V0FjMmxSWVVFV2s4Uk4rczIwRTha?=
+ =?utf-8?B?UHo2a2JlZEErMFdHMEJnendaQjcrLy9lN0tyZ0Z0bTdTQjBJOHJMVG5PQ2ZS?=
+ =?utf-8?B?QWppYnVpM01VdHJ5ODhybmFZQTZWcHJ5VXJ0cWFlNENmcHdsd0xEVmt3dC9v?=
+ =?utf-8?B?UkR2bmxnZDBXQjlHcTdDT0lIVlVjM1RGYmpnVis2RzZFOFZnQkZkNVdGY3VR?=
+ =?utf-8?B?S1FjVi9VK1lqVVBqL20venFqYXVqRVlpY1Q5VGZET085ME14L2ZTR3lacWZx?=
+ =?utf-8?B?OEJ5NGc0a2l5L0V1WXNOWS9yTEp5WVp5VDB3aHgveS9RZWlxNW1JMG9ETWgx?=
+ =?utf-8?B?Y240dW5MclZ6QlQxOFpuclpPWWJCOWRpZjZ4OGZOMmlqa3JPNXFSMjdVN3ND?=
+ =?utf-8?B?Nm1WWFNZN1FnUUorVFlCcXJTbU5NeDRLTVhxS1doWm40eXdxY0NZZnh3V29p?=
+ =?utf-8?B?enUvclFHYUxNV0o1Y2o2SWlLUEppMlpjZ3pkR25neDQwbWpZNzNtSnl5T1g0?=
+ =?utf-8?B?d1JZTGtpNHB3bnZyZU0zbWlrZFh4eG8wNkVPOTYzSy9TNGRDaVZlNUtVWVJE?=
+ =?utf-8?B?TWprRldPcTh6UXpMUVpyeDMwVjI3dm93aG00QWh6UG5OcmVBOStZbWJEYmhm?=
+ =?utf-8?B?MER5TDVLZ3RZeExDNjB3NGl3bHo4elM3dGJ4RzFhQXRuTkVOcytmcTZpeTJl?=
+ =?utf-8?B?UVRlOFp6WSttdmFwRDZsaFJoUm9tK0xRbWwzN0hFNlZFZmJoN2pLUyt6Q1hK?=
+ =?utf-8?B?SzRXdmIzMld1dldLT3h6MXRpT244WTNJT0JwQzNTdXNuem5LR2FmTVZES29X?=
+ =?utf-8?B?UWVOU29iRG53RndQa0xzNnNJaEcveXFZVmY2QXQ3NzBOZ3oyTXZMQXN2YWpq?=
+ =?utf-8?B?MkRZNEFjM0dtWWE1NEoxbUhPWWNMZ1FqelQ4TndIUkJiNkgxU2JoNFlJR1dG?=
+ =?utf-8?B?V3Y3SkRqWmFNTFhOc3JkRUxCK2E4QlU0VUNvOXk4Z0sxQkViRzNYeDRGaUwz?=
+ =?utf-8?B?dC80bjcrQXptejgzTDJ3WnBXcVJVOWdIaFdwQ1ZuYUR2ekNKNXpTMGFHWVJL?=
+ =?utf-8?B?ck5ZTW5nQWpSTEdvWHFaUVlEbWlIbTRoNGxFRkptcWhDY3dWSjdNaFFUUFpY?=
+ =?utf-8?B?d3lFbHpBYVAzYlFmaEdza3ZCY21RZnRyRHJRREliZEJlK0MvbEV5K29MdS9l?=
+ =?utf-8?B?VkVoNmM1aDF4SkF2WTdGNW12Ymp4UkZOOTR0REZkT09IL0pUUnBvSWRBK1B5?=
+ =?utf-8?B?d2RyWnFBZTBKYXE4VzdFMEt0eDlrYVY1NjlCU3VDT2psMERhWjIyNURVVkVl?=
+ =?utf-8?B?VzFnaXFsUkg4ZXZ4amZub1dCTFlINm9RVldWVXh4N0g1RDQxNy8rbzdaQnc3?=
+ =?utf-8?B?Q3hIM3RyOGhtdXQ2OHJ4WWZQTVNjcDBNNXRKbGlzVDdEL2NONkU5TnlOaDYw?=
+ =?utf-8?B?MzJ6b1dDdFFOelI3c2EzQT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eTAwQVRkQ25DMGdwYTdCQUxvTy8xN1dma1Z5ckM5Q041dzhiZ0pjVDlhbS9l?=
+ =?utf-8?B?L3ltS2dOU3dxY1lZVkR3TjFvdEh5RVc1VEg5RDN3TWlvZFlFTXNGUGlOeDNy?=
+ =?utf-8?B?WURGbjRURm5ObHhzNlJXak0vZUtmUVUrU2hKZzNZVklDZWExc3BueFNaZHA0?=
+ =?utf-8?B?bWpCTVgwV3AzNWd5T0VEai94dURGWWZhSHVQU0RxWG4zWTZ1TTZrNzhlc2Rx?=
+ =?utf-8?B?WkQyNnJacCtOZzdoVTNqYVBvS210K3BlMkFKOHhEenNXdEYxT1JqSUFnMmZl?=
+ =?utf-8?B?QkZyRldzaVlTdXF2bytXNVhQQitVVUxMdU1SVks1aVNZcFlwVjhrN1BQdDA2?=
+ =?utf-8?B?NEhVSW1BMFFYNnExQjhUQ0NVY05jYnZJR3hYLzRIOTdERlNKdWdRcUNhR2JD?=
+ =?utf-8?B?aHdlTFVhNWpkemJNN1dQYzFLckRmMFFmZmwzbjVaMDJpQS8zUVR0OEMxWFBD?=
+ =?utf-8?B?WHZtUkVFQ3ZCQWpCY0RXSFRTL1UvWGZ6Yk5pQzM1NVBHRi9WQ29NQ2Q3MUx0?=
+ =?utf-8?B?dWJPU2dCcmZzUHVGSFZQNXl6ZzMrODdTR2l6VE54aGQ0OUNiWjBZSlJtK1ky?=
+ =?utf-8?B?NU1rMlVrdVZaZ3BWL0gwenlxbFFYTVc2WjQ0ZWJyNHJJTGd6UXZTN1FYY0Mv?=
+ =?utf-8?B?SXg2RDZSNXh3ME9kK2djY0NsVmFFUGRKcUNqdVoxRWM1ZzlESGhFaWl4bG9O?=
+ =?utf-8?B?T3dPem1zNHRNNWZVYk5EcW95Q01xT0hpRnNKalNrMWYzSUQ4aXVZek0vRjlW?=
+ =?utf-8?B?M2lRUFRjRWd5MmZhN3Z6aDdudDZ1TmdhMXlSb2NSZFc5eVZJbWM5VHlOWXlK?=
+ =?utf-8?B?bzdHcGtmSUNLNFhGMkhnWSs2QjUxdHhDWmVCZFFUNmkrdGdsSFNCTlNLOVVU?=
+ =?utf-8?B?MHpPMjdmZVRKTFNLdTVGWVNDakYwY2c0aVJCWWpGUUJHUGJOL3laZ3h6VjNM?=
+ =?utf-8?B?SlMybFdkWXp4VFBqTXRncWNCM2x6MTV3THBqM2pFVVkwQ081NWVEOU1CWHh4?=
+ =?utf-8?B?N1kwMTJrR3FYYkE0UmkwdVpQUGtzM2RQTHMremdhazB0RkQyZ3VMYWV0bU9k?=
+ =?utf-8?B?UVRPREl6ckpPYUMvMFpVM01XQll1cWY1d0Z3S1llaG9mb2RvV0lVK1NTaG1R?=
+ =?utf-8?B?S1ZyYXVkSm9oR0wxbGw4RHlLSmlKNmN5SGVFYThVNENDYTlrTjhrRytxa043?=
+ =?utf-8?B?ZCt0SVJLa0FoSTRMMk5Oem52N0prQi9maEdRbllLSG1OVVRyUHdReFV0cVBE?=
+ =?utf-8?B?UHg4SEJMZTdjQVRaT3h6eSt6cUxVREJVdVVnV095a0VZK21XSy9CRnltQkth?=
+ =?utf-8?B?cm1KaGp4MlExM0ZrQTFRcEMrQzlmMWRDOVEzWE5NZXBza2M5cGdiRmc4THcr?=
+ =?utf-8?B?dmRzdGhoWnFlRVBEOEsyVmZvYjdVVzh5YitlZ0tNSVNPdzljTVlrSzd1R0lZ?=
+ =?utf-8?B?SndlbGxmVnU1Z0NGUkN4YWduZi9rM3FHSllrU3dZWWQvTUtqVlVMaDZxOUp1?=
+ =?utf-8?B?Zm82N0U3V0RDVWJGaE5wbzdKb005ZitoRlRBTGk3dmZXWmc2RHA5Qi9CbzhK?=
+ =?utf-8?B?ZzBJK2hsU29rT016Z3hsdlV4ZENONVdPdWd0U0FoN0xFV2FQbmI4d1RSUUJF?=
+ =?utf-8?B?aTQwZ2NCU29FdE9kNzJBV1FocjZLOWw2R2pJcHJUOUpkaUxWWFgrS2JZTjFr?=
+ =?utf-8?B?OUdZTENWZHNjaHVoSUlWTjAwYmJrZ1lTMXp1L3hTdXdtamhHT1lETTQ0U0dE?=
+ =?utf-8?B?N2pFN1pER0R4ditMODRkSGQrb2JoVHU4S0lxek5BbFVwUlpIOXJZM2l6ZFRE?=
+ =?utf-8?B?RWNZaHFCWEprOGtyNU5RRGNPTUNHMUlLNXdBZG83OEtYYTdTb095NUJreU9o?=
+ =?utf-8?B?dWlTdGZ3YWxsQ1dTNGltOU81QURKRmxCelpDRUdTWXNEWmkxRThybVZVZitw?=
+ =?utf-8?B?VzFXUkN4R0l6UXdkSVh0cHdqa0o1T2NRQ29JN2xaZlNVVFZJVUwwTWpFT2pr?=
+ =?utf-8?B?ekJjZ2tBL2RyK290NFJXME1EeUE4YysyT3lTRnBUWWsySEtyZmZwanhEZTlH?=
+ =?utf-8?B?eDhsMHBkbEI5aG5jNzk5UXBCZ1ZjUHRFZVhkWDJGNlRlYkhqVzZRVkt1NXlS?=
+ =?utf-8?B?UWMwN2FmbFJYblVaYjUyQkVrZmYvSzRqWUpNbktvRU1qQTNVUGxEbFc5eDhx?=
+ =?utf-8?B?Tmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4ac965b8-c713-42ba-6cf3-08dd2044b282
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2024 15:49:18.2933
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +doK7PYvIAqugQb0Kpkrtyl1xiWFyBPEbz7PCVYAVoaQvl5zLLaf2upTNt1wJ0ZB0qHO3X/RkLbDSfArA+fk/QNaJF2j2TYykA/dOU0FOvM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7818
+X-OriginatorOrg: intel.com
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+On 12/11/24 11:36, Przemek Kitszel wrote:
+> On 12/10/24 15:54, Paolo Abeni wrote:
+>> On 12/6/24 20:35, Tony Nguyen wrote:
+>>> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/ 
+>>> net/ethernet/intel/ice/ice_common.c
+>>> index 496d86cbd13f..ab25ccd7e8ec 100644
+>>> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+>>> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+>>> @@ -4095,6 +4095,51 @@ ice_aq_set_port_option(struct ice_hw *hw, u8 
+>>> lport, u8 lport_valid,
+>>>       return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
+>>>   }
+>>> +/**
+>>> + * ice_get_phy_lane_number - Get PHY lane number for current adapter
+>>> + * @hw: pointer to the hw struct
+>>> + *
+>>> + * Return: PHY lane number on success, negative error code otherwise.
+>>> + */
+>>> +int ice_get_phy_lane_number(struct ice_hw *hw)
+>>> +{
+>>> +    struct ice_aqc_get_port_options_elem *options __free(kfree);
+>>
+>> Please avoid the __free() construct:
+>>
+>> https://elixir.bootlin.com/linux/v6.13-rc2/source/Documentation/ 
+>> process/maintainer-netdev.rst#L393
+> 
+> My understanding was that conversions to __free() (w/o any other reason)
+> are bad. But for new code, it's fine. I get the "discourage" part from
+> the doc, as "don't use __free() by default, for all pointers, or all
+> allocations, but apply your judgement and sanity to tell if that makes
+> given function better".
+> I still believe that this function is better with __free(). We develop
+> (new code) with such assumptions for the better part of the year.
+> 
+> I think that static analysis tools/Reviewers already got used to that
+> (after the first false-positive memleak reported). Developers (and
+> Reviewers for sure) know that those pointers could not be left
+> uninitialized at function return. The only concern that is unresolved
+> for me yet, is: "there is a lot of characters to type", but that is also
+> good in some way, as one needs bigger function to justify the added
+> "complexity".
+> 
+>>
+>> Thanks,
+>>
+>> Paolo
+>>
+> 
 
-This patch adds a "cgroup/getsockopt" program "iters_subflow" to test the
-newly added mptcp_subflow bpf_iter.
+Paolo, could you please revisit this? In short I propose: let the 
+developer and reviewers to decide if __free() makes given code
+better, instead of an umbrella "just no" statement.
 
-Export mptcp_subflow helpers bpf_iter_mptcp_subflow_new/_next/_destroy,
-bpf_mptcp_sock_acquire/_release and other helpers into bpf_experimental.h.
-
-Use bpf_mptcp_sock_acquire() to acquire the msk, then use bpf_for_each()
-to walk the subflow list of this msk. From there, future MPTCP-specific
-kfunc can be called in the loop. Because they are not there yet, this
-test doesn't do anything very useful for the moment, but it focuses on
-validating the 'bpf_iter' part and the basic MPTCP kfunc. That's why it
-simply adds all subflow ids to local variable local_ids to make sure all
-subflows have been seen, then invoke mptcp_subflow_tcp_sock() in the
-loop to pick the subflow context.
-
-Out of the loop, use bpf_mptcp_subflow_ctx() to get the subflow context
-of the picked subflow context and do some verifications. Finally, assign
-local_ids to global variable ids so that the application can obtain this
-value, and release the msk.
-
-A related subtest called test_iters_subflow is added to load and verify
-the newly added mptcp_subflow type bpf_iter example in test_mptcp. The
-endpoint_init() helper is used to add 3 new subflow endpoints. Then one
-byte of message is sent to trigger the creation of new subflows.
-getsockopt() is invoked once the subflows have been created to trigger
-the "cgroup/getsockopt" test program "iters_subflow". skel->bss->ids is
-then checked to make sure it equals 10, the sum of each subflow ID: we
-should have 4 subflows: 1 + 2 + 3 + 4 = 10. If that's the case, the
-bpf_iter loop did the job as expected.
-
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
-Notes:
- - v2:
-   - explicit sk protocol checks are no longer needed, implicitly done
-     in bpf_skc_to_mptcp_sock().
-   - use bpf_skc_to_mptcp_sock() instead of bpf_mptcp_sk(), and
-     mptcp_subflow_tcp_sock() instead of bpf_mptcp_subflow_tcp_sock().
-   - bpf_mptcp_subflow_ctx() can now return NULL.
----
- tools/testing/selftests/bpf/bpf_experimental.h     |  8 +++
- tools/testing/selftests/bpf/prog_tests/mptcp.c     | 73 ++++++++++++++++++++++
- tools/testing/selftests/bpf/progs/mptcp_bpf.h      |  9 +++
- .../testing/selftests/bpf/progs/mptcp_bpf_iters.c  | 63 +++++++++++++++++++
- 4 files changed, 153 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/bpf_experimental.h b/tools/testing/selftests/bpf/bpf_experimental.h
-index cd8ecd39c3f3c68d40c6e3e1465b42ed66537027..2ab3f0063c0fd6091ee19da4787671b89b5661f0 100644
---- a/tools/testing/selftests/bpf/bpf_experimental.h
-+++ b/tools/testing/selftests/bpf/bpf_experimental.h
-@@ -575,6 +575,14 @@ extern int bpf_iter_css_new(struct bpf_iter_css *it,
- extern struct cgroup_subsys_state *bpf_iter_css_next(struct bpf_iter_css *it) __weak __ksym;
- extern void bpf_iter_css_destroy(struct bpf_iter_css *it) __weak __ksym;
- 
-+struct bpf_iter_mptcp_subflow;
-+extern int bpf_iter_mptcp_subflow_new(struct bpf_iter_mptcp_subflow *it,
-+				      struct mptcp_sock *msk) __weak __ksym;
-+extern struct mptcp_subflow_context *
-+bpf_iter_mptcp_subflow_next(struct bpf_iter_mptcp_subflow *it) __weak __ksym;
-+extern void
-+bpf_iter_mptcp_subflow_destroy(struct bpf_iter_mptcp_subflow *it) __weak __ksym;
-+
- extern int bpf_wq_init(struct bpf_wq *wq, void *p__map, unsigned int flags) __weak __ksym;
- extern int bpf_wq_start(struct bpf_wq *wq, unsigned int flags) __weak __ksym;
- extern int bpf_wq_set_callback_impl(struct bpf_wq *wq,
-diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-index 85f3d4119802a85c86cde7b74a0b857252bad8b8..f37574b5ef68d8f32f8002df317869dfdf1d4b2d 100644
---- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-+++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-@@ -11,6 +11,7 @@
- #include "mptcp_sock.skel.h"
- #include "mptcpify.skel.h"
- #include "mptcp_subflow.skel.h"
-+#include "mptcp_bpf_iters.skel.h"
- 
- #define NS_TEST "mptcp_ns"
- #define ADDR_1	"10.0.1.1"
-@@ -33,6 +34,9 @@
- #ifndef MPTCP_INFO
- #define MPTCP_INFO		1
- #endif
-+#ifndef TCP_IS_MPTCP
-+#define TCP_IS_MPTCP		43	/* Is MPTCP being used? */
-+#endif
- #ifndef MPTCP_INFO_FLAG_FALLBACK
- #define MPTCP_INFO_FLAG_FALLBACK		_BITUL(0)
- #endif
-@@ -480,6 +484,73 @@ static void test_subflow(void)
- 	close(cgroup_fd);
- }
- 
-+static void run_iters_subflow(void)
-+{
-+	int server_fd, client_fd;
-+	int is_mptcp, err;
-+	socklen_t len;
-+
-+	server_fd = start_mptcp_server(AF_INET, ADDR_1, PORT_1, 0);
-+	if (!ASSERT_OK_FD(server_fd, "start_mptcp_server"))
-+		return;
-+
-+	client_fd = connect_to_fd(server_fd, 0);
-+	if (!ASSERT_OK_FD(client_fd, "connect_to_fd"))
-+		goto close_server;
-+
-+	send_byte(client_fd);
-+	wait_for_new_subflows(client_fd);
-+
-+	len = sizeof(is_mptcp);
-+	/* mainly to trigger the BPF program */
-+	err = getsockopt(client_fd, SOL_TCP, TCP_IS_MPTCP, &is_mptcp, &len);
-+	if (ASSERT_OK(err, "getsockopt(client_fd, TCP_IS_MPTCP)"))
-+		ASSERT_EQ(is_mptcp, 1, "is_mptcp");
-+
-+	close(client_fd);
-+close_server:
-+	close(server_fd);
-+}
-+
-+static void test_iters_subflow(void)
-+{
-+	struct mptcp_bpf_iters *skel;
-+	struct netns_obj *netns;
-+	int cgroup_fd;
-+
-+	cgroup_fd = test__join_cgroup("/iters_subflow");
-+	if (!ASSERT_OK_FD(cgroup_fd, "join_cgroup: iters_subflow"))
-+		return;
-+
-+	skel = mptcp_bpf_iters__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open_load: iters_subflow"))
-+		goto close_cgroup;
-+
-+	skel->links.iters_subflow = bpf_program__attach_cgroup(skel->progs.iters_subflow,
-+							       cgroup_fd);
-+	if (!ASSERT_OK_PTR(skel->links.iters_subflow, "attach getsockopt"))
-+		goto skel_destroy;
-+
-+	netns = netns_new(NS_TEST, true);
-+	if (!ASSERT_OK_PTR(netns, "netns_new: iters_subflow"))
-+		goto skel_destroy;
-+
-+	if (endpoint_init("subflow", 4) < 0)
-+		goto close_netns;
-+
-+	run_iters_subflow();
-+
-+	/* 1 + 2 + 3 + 4 = 10 */
-+	ASSERT_EQ(skel->bss->ids, 10, "subflow ids");
-+
-+close_netns:
-+	netns_free(netns);
-+skel_destroy:
-+	mptcp_bpf_iters__destroy(skel);
-+close_cgroup:
-+	close(cgroup_fd);
-+}
-+
- void test_mptcp(void)
- {
- 	if (test__start_subtest("base"))
-@@ -488,4 +559,6 @@ void test_mptcp(void)
- 		test_mptcpify();
- 	if (test__start_subtest("subflow"))
- 		test_subflow();
-+	if (test__start_subtest("iters_subflow"))
-+		test_iters_subflow();
- }
-diff --git a/tools/testing/selftests/bpf/progs/mptcp_bpf.h b/tools/testing/selftests/bpf/progs/mptcp_bpf.h
-index 3b188ccdcc4041acb4f7ed38ae8ddf5a7305466a..31d7ecdc4c0489c63d28a25778f91093a6a093a5 100644
---- a/tools/testing/selftests/bpf/progs/mptcp_bpf.h
-+++ b/tools/testing/selftests/bpf/progs/mptcp_bpf.h
-@@ -39,4 +39,13 @@ mptcp_subflow_tcp_sock(const struct mptcp_subflow_context *subflow)
- 	return subflow->tcp_sock;
- }
- 
-+/* ksym */
-+extern struct mptcp_sock *bpf_mptcp_sock_acquire(struct mptcp_sock *msk) __ksym;
-+extern void bpf_mptcp_sock_release(struct mptcp_sock *msk) __ksym;
-+
-+extern struct mptcp_subflow_context *
-+bpf_mptcp_subflow_ctx(const struct sock *sk) __ksym;
-+extern struct sock *
-+bpf_mptcp_subflow_tcp_sock(const struct mptcp_subflow_context *subflow) __ksym;
-+
- #endif
-diff --git a/tools/testing/selftests/bpf/progs/mptcp_bpf_iters.c b/tools/testing/selftests/bpf/progs/mptcp_bpf_iters.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..fd5691a4073b22c24d3fa6f7ed6edb32d366492c
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/mptcp_bpf_iters.c
-@@ -0,0 +1,63 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2024, Kylin Software */
-+
-+/* vmlinux.h, bpf_helpers.h and other 'define' */
-+#include "bpf_tracing_net.h"
-+#include "mptcp_bpf.h"
-+
-+char _license[] SEC("license") = "GPL";
-+int ids;
-+
-+#ifndef TCP_IS_MPTCP
-+#define TCP_IS_MPTCP		43	/* Is MPTCP being used? */
-+#endif
-+
-+SEC("cgroup/getsockopt")
-+int iters_subflow(struct bpf_sockopt *ctx)
-+{
-+	struct mptcp_subflow_context *subflow;
-+	struct bpf_sock *sk = ctx->sk;
-+	struct sock *ssk = NULL;
-+	struct mptcp_sock *msk;
-+	int local_ids = 0;
-+
-+	if (ctx->level != SOL_TCP || ctx->optname != TCP_IS_MPTCP)
-+		return 1;
-+
-+	msk = bpf_skc_to_mptcp_sock(sk);
-+	if (!msk || msk->pm.server_side || !msk->pm.subflows)
-+		return 1;
-+
-+	msk = bpf_mptcp_sock_acquire(msk);
-+	if (!msk)
-+		return 1;
-+	bpf_for_each(mptcp_subflow, subflow, msk) {
-+		/* Here MPTCP-specific packet scheduler kfunc can be called:
-+		 * this test is not doing anything really useful, only to
-+		 * verify the iteration works.
-+		 */
-+
-+		local_ids += subflow->subflow_id;
-+
-+		/* only to check the following kfunc works */
-+		ssk = mptcp_subflow_tcp_sock(subflow);
-+	}
-+
-+	if (!ssk)
-+		goto out;
-+
-+	/* assert: if not OK, something wrong on the kernel side */
-+	if (ssk->sk_dport != ((struct sock *)msk)->sk_dport)
-+		goto out;
-+
-+	/* only to check the following kfunc works */
-+	subflow = bpf_mptcp_subflow_ctx(ssk);
-+	if (!subflow || subflow->token != msk->token)
-+		goto out;
-+
-+	ids = local_ids;
-+
-+out:
-+	bpf_mptcp_sock_release(msk);
-+	return 1;
-+}
-
--- 
-2.47.1
+I believe that Jiri would be happy too, to back it up as another
+HW Vendor.
+https://lore.kernel.org/lkml/ZfW9lVhnClqr9Han@nanopsycho/T/
 
 
