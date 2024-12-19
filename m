@@ -1,82 +1,93 @@
-Return-Path: <netdev+bounces-153157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E709F7176
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 01:42:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1AA39F7189
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:00:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8558B7A4070
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 00:42:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2BF8188F3D5
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 01:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A80F1805E;
-	Thu, 19 Dec 2024 00:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2AD66CDBA;
+	Thu, 19 Dec 2024 01:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HWT0ap6p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DWypneW1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65BFB676;
-	Thu, 19 Dec 2024 00:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF835674D;
+	Thu, 19 Dec 2024 01:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734568928; cv=none; b=XXdvrFPKJ/wHAoyH3HmBn1/8MhYHvN1RjmWsaRomhaUNHMTL3bWbc6VRR3gVe3BmjKuc0zaMZm/n+gWLVOYVjMyhrHXRGJDb7EqWFop300jkopBN3NpXFTdjM2V0bMZrmWCPZpYhIWZTKrsleThyvRjQ6XhG8O7CjP8y0yZf7Wc=
+	t=1734570012; cv=none; b=QXwSnKD2WjcCCvZGThrANz7KDb1u2EVzdUl9VpsXaNzzrfRMRnVtNUiqfUX+sA59expo5VnnPi8nKXILaojcx7Dq0BmfUMjsvty84I5YMGnMShf9YoMWxgnisgREd03tf0XYTEe4W3OkIsOKWGNaM2Iy5FkCAJ6G2F8YMom9q1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734568928; c=relaxed/simple;
-	bh=ETOdpjMOcIfpgrnZ8m3rcLo9Y44+EC3i/OGlHZ4PawE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XqddvhrHzhzBA2FjgqeBMqR5aqTf/nGmyoU628DL/tcn9ldzHNKnSazMePR1JdOO9GyB0/K2KKlrM0RqT94xOuGfNP6cefApx3ePmxhi2eZQ1YqwIa7a8OU2SApSglcF2drV51tgeY9au6ueNQZ6d8DGgQgWRV/BmzkF66XRwNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HWT0ap6p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA7C6C4CECD;
-	Thu, 19 Dec 2024 00:42:07 +0000 (UTC)
+	s=arc-20240116; t=1734570012; c=relaxed/simple;
+	bh=vLD1EqHF+ZDq8S/ebGt8PFQEMVsqIqfEnyszBr09Qss=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nXhLw8/o7lY7/40+Da09bg1Pw7UOulaeGOqsS8AGsiaNKHF3wHuUzq+noKFKrVfakMgSvH2X1VOWxARqWFkUQ7wnjR/zE+lNIopNG+61dD++RVLubnEXDt3Zsh+30ji/fwnmtiJpwDRuyo+VwOhcN1SEgzFLYUTIBjtqyu08IuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DWypneW1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36424C4CECD;
+	Thu, 19 Dec 2024 01:00:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734568928;
-	bh=ETOdpjMOcIfpgrnZ8m3rcLo9Y44+EC3i/OGlHZ4PawE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HWT0ap6pyizLpwwjBoNr1Yr8mFmNZZZQQSoqoKIFOy7TEMmR71Nl8EqtWPIAKUchQ
-	 MpotDbqhht18A7Je6NT6D5zGZwpLFe2J9/yIiRq9a5611Xdl8IMO8xQkIJF8Y2vWFb
-	 HFDu5dR7NpHGdOWURBAFavSEhkddjfp9fR0SfqWaUiv0y5KvUflQZpru1q6do4GSRl
-	 jvZl49pfQpvS53dnm3wg00Xhi6O1/hCEV/3G4Vzc17BVB/vqWq2ouUW2rASfsIaFdG
-	 q/D3yzIOw4O0Ks96lWlwUH69vfJhiW01Xe+P+xv2lSq17eb/ZWbRftM/mvHniyb600
-	 T89VQeH6ODj5A==
-Date: Wed, 18 Dec 2024 16:42:06 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Furong Xu <0x1207@gmail.com>, <netdev@vger.kernel.org>,
- <linux-stm32@st-md-mailman.stormreply.com>,
- <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
- "Simon Horman" <horms@kernel.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Maxime
- Coquelin" <mcoquelin.stm32@gmail.com>, <xfr@outlook.com>
-Subject: Re: [PATCH net-next v1] net: stmmac: Drop useless code related to
- ethtool rx-copybreak
-Message-ID: <20241218164206.437fcedc@kernel.org>
-In-Reply-To: <b2ae6b80-83e3-4b22-8301-c91569c89494@intel.com>
-References: <20241218083407.390509-1-0x1207@gmail.com>
-	<b2ae6b80-83e3-4b22-8301-c91569c89494@intel.com>
+	s=k20201202; t=1734570012;
+	bh=vLD1EqHF+ZDq8S/ebGt8PFQEMVsqIqfEnyszBr09Qss=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DWypneW1wOedmzqVkVXQAVYdxf4V/1qb+aTD8mwJAzy/I0QdMsZLVNNypyX9HyXsM
+	 2w+YFRZFtFHg/CoPzBqDOgZk0jPjgNJzhX40rS9utDqp57eD1cEsJQjO7cgUa7j+Dk
+	 rN7wgBaLViFh+YO5V3XWvfH79OXwQUhM+h7HzxCNkH1MbmNl3P7xw5OtIjU72FlpZX
+	 aHYxGlNbpKSkAgB2eFqMFeQWkoxvDVJdUXTcRN56LsC6rNcl4hv3PmUpEngoK2u2f8
+	 FAjCPzwdSZPzeoShEPpzjUA6Zixhu/Z0WckBY2UrFfSfFlcbVk3O9rtWF0h1+uohtY
+	 wMUk9PLsr8ewg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB4A53805DB1;
+	Thu, 19 Dec 2024 01:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 net-next] net/mlx5e: Report rx_discards_phy via rx_dropped
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173457002977.1776609.4427230236566101128.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Dec 2024 01:00:29 +0000
+References: <20241210022706.6665-1-laoar.shao@gmail.com>
+In-Reply-To: <20241210022706.6665-1-laoar.shao@gmail.com>
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org, gal@nvidia.com,
+ kuba@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ ttoukan.linux@gmail.com
 
-On Wed, 18 Dec 2024 16:48:38 +0100 Alexander Lobakin wrote:
-> If sizeof(dma_addr_t) == 8, you're clearly introducing a 4-byte hole
-> here. Perhaps you could reshuffle the struct a bit to avoid this.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 10 Dec 2024 10:27:06 +0800 you wrote:
+> We noticed a high number of rx_discards_phy events on certain servers while
+> running `ethtool -S`. However, this critical counter is not currently
+> included in the standard /proc/net/dev statistics file, making it difficult
+> to monitor effectively—especially given the diversity of vendors across a
+> large fleet of servers.
 > 
-> It's always good to inspect the .kos with pahole after modifying
-> structures to make sure there are no regressions.
+> Let's report it via the standard rx_dropped metric.
+> 
+> [...]
 
-Pretty off topic but I have a dumb question - how do you dump a struct
-with pahole using debug info or BTF from a random .ko?
-Ever since pahole got converted to BTF modules stopped working for me :S
-I never cared enough to check as most interesting stuff is built-in
-in Meta's kernels but it annoys me every now and then..
+Here is the summary with links:
+  - [v4,net-next] net/mlx5e: Report rx_discards_phy via rx_dropped
+    https://git.kernel.org/netdev/net-next/c/c9cfced17365
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
