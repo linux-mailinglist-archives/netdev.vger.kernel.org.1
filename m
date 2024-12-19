@@ -1,61 +1,59 @@
-Return-Path: <netdev+bounces-153160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9436D9F71A3
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:19:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FF7C9F71B6
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:23:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46109168FAD
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 01:19:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C505A168E96
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 01:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274EB41C72;
-	Thu, 19 Dec 2024 01:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A8E40BE0;
+	Thu, 19 Dec 2024 01:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HekLFyLp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRr/MB2w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CFD35960;
-	Thu, 19 Dec 2024 01:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFA61853;
+	Thu, 19 Dec 2024 01:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734571159; cv=none; b=W17bx+vmb0N9BlU3X1d/hJvj0CmJsdljoT6cXqnRRmTnLH+PtZYTy0eOxoBHfW25BRydhiMZW7yyrFB20y114vwKVMJBFlE1Wc5VFkwrX63Lzuud+enJTZJe8qKIiffVxGyQymkZRZ1OxLZF+MO9hOyVqsH/O2giKpaClxTWp+g=
+	t=1734571403; cv=none; b=tpy4MEYdG83455oGrgBkU+KRcQvEfWdUgZSexhH1z8N5IxQphPV3+GDdYDc4F7SNYU0X3+TvkZA46bC2ldjU5R3B74wW8ndJNqwVE7CMfLl3xKkI+fv6i9qTj56LmklGwvAYLMnv4FvLwaCnIXeVm0QToJY0uAHboTkugC5yRJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734571159; c=relaxed/simple;
-	bh=WgKrOQgc5+ve3ZEs3d+wbWdTrA44m5zY+NgdD/BDjKk=;
+	s=arc-20240116; t=1734571403; c=relaxed/simple;
+	bh=dzuFxmPBZPLG/7XxTZKJQwWOuhlikv9IRCeqf77quic=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gwwxH6yzeSzu2iixbIYGZsuElfx03GzHvYUrxyynj1fskqlVyce2miJJI1DxP3fUD/V/1M2XBTZHXjH+ByUNnj3cmHjSYFyKcV9Xq0ZANLtU4R1yLUW0Z3R4KxcEIpUXncNk5hc9yNYA9ZuHMAwzYczGdfNPFgQ2KnqM3yYIFKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HekLFyLp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301B1C4CECD;
-	Thu, 19 Dec 2024 01:19:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=RwS+Zktq4is4j2pV+eiA+5lc9muToZn+ifpjr0NCn3+KmboKVjqkg6hga8viFYzG5CbN97TPz3n3dbbVPxidksU0PWk5sPIZE+chZgA0860/GUF/Ac2v89kRJV2sDK+VYV86sk2RY5T1449W3Kl4e6huXD9cnusz9GYLikVpxss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRr/MB2w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9375BC4CECD;
+	Thu, 19 Dec 2024 01:23:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734571157;
-	bh=WgKrOQgc5+ve3ZEs3d+wbWdTrA44m5zY+NgdD/BDjKk=;
+	s=k20201202; t=1734571403;
+	bh=dzuFxmPBZPLG/7XxTZKJQwWOuhlikv9IRCeqf77quic=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HekLFyLp4SrCKPmY5L8j2MeK+4ZuTsqK6fI8koG/ZKdSytND9ZyY44zwKlTOLUFWo
-	 UR0tJV37jgCFCdRoA5r+tAdWmEzAfJa8frBLSMr8iRuthRU67Cp9lutbr+/2b0YCqr
-	 LjI+e1eoMk323iyi5s4hy1ngIIaAaVFgpSFEnZc2Umml2fkLcaG+McO/xZUoodBFUl
-	 6fXxv2+YxOXMFoZcBbOS8lPV14Vic/iGrYptQ1Bn4iudzfK7UuTt7a+JZFoOwtAwT+
-	 H8mHUs8F3/JMIeSe73Y6Q2XuNZgZHQA2sSpK4ypoN0WyT3cw7FPG8SBYFRN1JKyJAT
-	 W9Zxccha2uS1A==
-Date: Wed, 18 Dec 2024 17:19:16 -0800
+	b=fRr/MB2w/38rdvQZyJsXXt0XXLFCvft2hmMQd4+wmyzHLKAc1MwUJQrdnKloTzRvY
+	 FdJvKPFbwJPaSroES2rH75CSY1WyufqpDWaT9klFLd1QeL3iEH2CcpukgZvEqnLeJu
+	 qHWB7wNK50kRIWWUcSCmYgdmx8Es1/FWp+REHxROv21YKQuYygh2wiIq6isSzI9n2L
+	 67m2bIQen2pXrnciMC0Llbmjkhy3udXE1cOVlUpEnCbTX8r1fmHdQUEdaC2tlZgCEM
+	 54mZgGdh6dOMIIzDGddNdPyotU9iIaCBFvS45W51vZRZXFyhdZ0+k9DIhv9SPHe8XT
+	 ssJwef6Nuxxew==
+Date: Wed, 18 Dec 2024 17:23:21 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Furong Xu <0x1207@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- xfr@outlook.com
-Subject: Re: [PATCH net-next v1] net: stmmac: TSO: Simplify the code flow of
- DMA descriptor allocations
-Message-ID: <20241218171916.24a7e24f@kernel.org>
-In-Reply-To: <20241213030006.337695-1-0x1207@gmail.com>
-References: <20241213030006.337695-1-0x1207@gmail.com>
+To: Caleb Sander <csander@purestorage.com>
+Cc: David Miller <davem@davemloft.net>, Tom Herbert <therbert@google.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Eli Cohen <elic@nvidia.com>, Ben
+ Hutchings <ben@decadent.org.uk>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>
+Subject: Re: cpu_rmap maps CPUs to wrong interrupts after reprogramming
+ affinities
+Message-ID: <20241218172321.71ea4b4a@kernel.org>
+In-Reply-To: <CADUfDZpUFmBCJPX+u3GYeyFUbQ3RgqevvCpL=ZE48E4_p_BpPA@mail.gmail.com>
+References: <CADUfDZpUFmBCJPX+u3GYeyFUbQ3RgqevvCpL=ZE48E4_p_BpPA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,22 +63,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 13 Dec 2024 11:00:06 +0800 Furong Xu wrote:
-> -		if (priv->dma_cap.addr64 <= 32)
-> -			desc->des0 = cpu_to_le32(curr_addr);
-> -		else
-> -			stmmac_set_desc_addr(priv, desc, curr_addr);
-> -
-> +		stmmac_set_desc_addr(priv, desc, curr_addr);
+On Fri, 13 Dec 2024 10:18:30 -0800 Caleb Sander wrote:
+> I can see a few possible ways to address this:
+> - Store the current affinity masks for all the IRQs in struct cpu_rmap
+> so the next closest IRQ can be computed when a CPU's closest IRQ is
+> invalidated. This would significantly increase the size of struct
+> cpu_rmap.
 
-I can't figure out if this is correct or not in a reasonable amount of
-time. dwmac4 and dwxgmac2 looks pretty obviously okay. But there are
-also ndesc and enh, which don't seem to map to platform in an obvious
-way to an outside reviewer.
-
-Please provide more context/guidance in the commit message, otherwise
-this looks like a high risk refactoring for a driver this poorly
-designed.
--- 
-pw-bot: cr
+Ahmed is actively working on something along those lines:
+https://lore.kernel.org/all/20241218165843.744647-1-ahmed.zaki@intel.com/
+hopefully we can leverage it?
 
