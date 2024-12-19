@@ -1,179 +1,197 @@
-Return-Path: <netdev+bounces-153455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 663EF9F80EE
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:03:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 632889F810A
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:06:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 179E6188C412
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:02:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D45C218945A5
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AF2171E7C;
-	Thu, 19 Dec 2024 17:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503E219DF6A;
+	Thu, 19 Dec 2024 17:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DalJcNQe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JoJcMmNC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FEF1537C3;
-	Thu, 19 Dec 2024 17:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D9015252D;
+	Thu, 19 Dec 2024 17:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734627758; cv=none; b=r76oirKov8h7LHSc2tpBiUcJV+iaAAObw/8+XkreS5TzCF/HqZe1cQY1CyMaz7j2pVV/H/rPPzyXGwKJV1sUKRm3bIPWDq/3SGEVucjhZ6gXkAFzZ39jm/rHAW72YTSwi8HW6U97I9u7JhIHNLQqP2QQsSxoFURwN1tTiL+hdRg=
+	t=1734627843; cv=none; b=P8ds9fBARj5V3Y948CCwMPqE7TMojpSDW/4HPmNmT8zACj6/nCAazCjphTFxzxl4TcQjnkWX8Ot8DeEb7NoL+BOBLU89bE+q0Q8GW9pQDOzEQu1IgKe1Yf+KO9QVLIiL6Sok+ZSXgXPvKSgb5i5fNV2UX88I/GfqYifUKMUtk5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734627758; c=relaxed/simple;
-	bh=PEFphxGvGg2l4l0PN0KE0EA9RP0MzBCoenGBhETqabw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oR0Qodl5hgB65cWGCgweXSYV0LWmFZP8kLCILuMUauU3QbYnn6ZXhpSBw2M0bX69e0WmauahNsTwxQTBIVa2fS64csSw8ozZX0PrNqUaxsjC+m/kQ2Ho/2wJkdIQqBc7gF9+Qciuoaq4HeL0zcSTOhvSF8AXPnOh5IMMswgoBxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DalJcNQe; arc=none smtp.client-ip=209.85.210.174
+	s=arc-20240116; t=1734627843; c=relaxed/simple;
+	bh=Um6KpQMeUpI1o98cH9o1qH/UWhFM16FvOlogG0Gc6iI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e97CC9qFyVDnK0FAlYS0rQpvXnU+rVnJ/wzSMdzuxqW9Q4EbFX1+b1ALVd8AM0aKjrFQHeWbAd+UaG6/oo8/4IVWeaXQ1kIxHHLnpThQqU3XU8mhaS0rCKRIVq3Ga5SiB4Y7kTA/TeHwyCbMCO5aXJPa3tuPYWwzrWKsUevm758=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JoJcMmNC; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-728e78c4d7bso835842b3a.0;
-        Thu, 19 Dec 2024 09:02:36 -0800 (PST)
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-30039432861so10279211fa.2;
+        Thu, 19 Dec 2024 09:04:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734627756; x=1735232556; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0/L3yqkrFphLSLfi9k6BWAjTwMXwunYK2ocDlQzb2Y8=;
-        b=DalJcNQe0rO+Gx8Wuz6GHuhv3IGS4GGdNfFR5WXtBMuH88/Mw8kodrspnIQx41HZWf
-         XuHBjH5eGGkfrdV4iCeItwmiDT4Nma3djHez6B4lUpRbCGGTi0YxsBhvG/qLNhMsW5f2
-         vebthKKzdlwSD1r8WD9WZ3E2Kbs2T8YYtrZM8XgknSCUzHqpijokByQF8Bl35CjO1cWQ
-         h/A9pjSmczlSoAzxp1yi6+6buW7GOrbQhsbSWCGSVq/wBHGyu6mfIhJq2rVHZXlr64mB
-         tEcbLS7quhkI/UXYottWq3mIr6PiDVWRdTLrZkxM+tV8O9wZoo3YLtVu+nxP8USLNfAH
-         s4jQ==
+        d=gmail.com; s=20230601; t=1734627839; x=1735232639; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sur0OeWfd50x4tbBVyuDh7nPTJzAWoHCo8e3rWELqB4=;
+        b=JoJcMmNCSjD57XAALoBuplroqhja2XL2PDPmwKeMGsgQsKtru4mFxzhwELub4U2AK4
+         SXFl5rYMAjvSc+qzd/1Mi/7vrhAalQzvsROqzjSeVPTBIZfLl8C3Zgp7zcZzpeDQg8r3
+         XxWJ/x8JVkSdExU4Wt5iT1yHw6yc7Ibyh7BZVyZXkUAeX6cidDj0t4ugvLVKkn+8Abx5
+         O7qHfFaPhevHtuulRTo3jTDfUss/hvvthgFYr2rVXFjAgIvflnv4ccu1O35SSLd7InWr
+         ckJTYuHUX1g32bjOCLGE4VDLR2cs8vcuzr8rzuApZVL4YYcx1h94HiRvSEOuZAHOD4gv
+         v1qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734627756; x=1735232556;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0/L3yqkrFphLSLfi9k6BWAjTwMXwunYK2ocDlQzb2Y8=;
-        b=faJVjEe2znL3TdNoCqmqUh0BisYfeQeEGS+9AbtvjN3Zh0u3HW/BkQu0y0NxIQPeH2
-         K9kkmzQ10kFOEOt9X1taHGXFyGvlMqQH9Z9y+WvbFXSrfLqoSbRBlFn/dl3pQVhp2xQN
-         +t2fQ5G03FX/5LERScOHGCpaxkhnjDFJTsF3ITVbvVMktG1mZTMjYGXFMnM0a+cjHipm
-         a56bbEKADl2HljoDIwfk9n+k9h5E3uj91t//LEbtlDAhHUKPHJrEsF3n6BHGc/97xGP7
-         Yih3bDCwyUcXKxy8vLdNoFpQTjONG3KbNm40GwC1QMP5Km/eaXgFmRMXv/tGrqIfpZXT
-         ubnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXfUXWhyll6S/yTNgn8hRdd5NlvP8/QZGTb7v6hMxh00tekQ6iDSBxdfkia5Npv+fsT5pocbnq/gr+59mU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO/ucooG28iLR6wdti9T+26DUbSYnCq6CDGIQCMSVG1xhbFrU1
-	8wnqjDtkEWjFXdJ/2aWoWohJ74hmuIW5q5TZBt+RTdPems0ef3Kj
-X-Gm-Gg: ASbGncsmcXoyNNrlEYQIfASmZlUDaaNpFjenscUqTYr+qug5PEBrLgy8Mxdxe2UAtdT
-	9Mf6Ncvd+Of4uo3nq8blXSFZ2V33hqCjvlREvpJItywdrAVfn5ZHWS/3ob6thKlmka+875Ipyju
-	GWeH/g3KcMpHgQzF92mesaCeer9fYDYkm4bj+5DOtdoqAKEhBTZ5UJrc9SXxgKQzyh3APYstgvS
-	I2q/OtmtokFGbf8wXJTHsiYhnHjFgwHjV30/zCz7upBSb9Thn2/4nQatbMTKwdW3cUyZkLk4mOY
-	wNc+PdFh
-X-Google-Smtp-Source: AGHT+IFvO/vY33BZqTQhbbTJF5eCLtVfCMylIh1R3YvZnFBh1z0Kxx8OrN4QUhUjizZ7XF0Hpji1eQ==
-X-Received: by 2002:aa7:8d15:0:b0:72a:83ec:b1cb with SMTP id d2e1a72fcca58-72aa98f5b53mr5561488b3a.0.1734627755927;
-        Thu, 19 Dec 2024 09:02:35 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8fd58asm1580581b3a.145.2024.12.19.09.02.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Dec 2024 09:02:31 -0800 (PST)
-Message-ID: <629802cd-ddb1-4e3d-9050-612739d8f3fc@gmail.com>
-Date: Thu, 19 Dec 2024 09:02:29 -0800
+        d=1e100.net; s=20230601; t=1734627839; x=1735232639;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sur0OeWfd50x4tbBVyuDh7nPTJzAWoHCo8e3rWELqB4=;
+        b=LZkzjEAz9BBSCYp+dMHyWlVeAKg9vrb5Gn6Yhprco36BFFew/82eODod/QRyo0VE7n
+         jx9nLjZjzL0hB2Qvoz5B+xmSErzKNtlROaBiSPMy0B0Q/7MLPdFDQs7MRdtjxXQqnc6U
+         bzh0/42wvz+t3NO4KoVS+lGVwgnvhhU27dHk34vz2ZPM01liSNzKXPW989497PE5shWm
+         q1xx45kDdk0Zm9h3rq7nyfQfoLAxTT2UFdz/p3/4aWs0hkx5GbYK5+yosnmaEFeFZ06O
+         R5JtZfc+l+J9eBuIVGoswLlOAgpPUcTlb0vclWgDc69xm1v/L2sdA9czlxuRu8LSkXTn
+         a+Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7fs2mK7vKcM+ryDsBcn49gFFqAf07+95vyvwHPkOClG1fQBid4c0j76Pl+iXUv1QJ4eK0aCtb@vger.kernel.org, AJvYcCW/CPGPxA5i6YNW7mwQZuKnd/+tNlpFTJz9gQ0S6MxcAABJDBfpVQYUtbB31OFCSZFRcYU10RywfmJFfpw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuyCOvx3wTozOox++VCEfQY+reoaRkGNGXmCKtLj98Nw0ex17D
+	wNLxr51mL0xCtELN2iNR6zwo3n8Zq+h30efcKa7HaOn0elYnnKgi4R0rLOqqTCi2PmYbndhSW1o
+	hj/VJOME9fMn2Wb7vO36ugFAMyOQ=
+X-Gm-Gg: ASbGnctOl8OwVskAP+Xq+9syXibZbr9Jxg2RA9YxcChl40duOYw18HbB26m8Y4Qqey3
+	fAwXchUXZffGwkaZdFXeB2crorX+q4jhajAzLoQ==
+X-Google-Smtp-Source: AGHT+IEKsHKJaiNWPxarhgtnZN8O/nmNTDsV3KFFzk7Y+PV1ziPvwtrIF5ZsSH81W5pFevVXV3yL4kfI8HMNPd1vMi4=
+X-Received: by 2002:a2e:a710:0:b0:2fc:9869:2e19 with SMTP id
+ 38308e7fff4ca-3044db56bd0mr25595751fa.34.1734627839217; Thu, 19 Dec 2024
+ 09:03:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net] net: phy: micrel: Dynamically control external
- clock of KSZ PHY
-To: Wei Fang <wei.fang@nxp.com>, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, florian.fainelli@broadcom.com,
- heiko.stuebner@cherry.de, frank.li@nxp.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
-References: <20241217063500.1424011-1-wei.fang@nxp.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
-In-Reply-To: <20241217063500.1424011-1-wei.fang@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241219121828.2120780-1-gal@nvidia.com> <CAFULd4YHFFKBzaF28f8n3z8WcOzom1WUe_hfRBx0ehhCpT9xnQ@mail.gmail.com>
+ <CAFULd4Z0PSzwvsFx_5deMKb7tV34uJWcHEadYGdk+D72QuHonA@mail.gmail.com>
+In-Reply-To: <CAFULd4Z0PSzwvsFx_5deMKb7tV34uJWcHEadYGdk+D72QuHonA@mail.gmail.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Thu, 19 Dec 2024 18:03:47 +0100
+Message-ID: <CAFULd4ZcSY+1WPn2T9dHVJZyyg1p+YaexQMJzAXHnCDy90j2fA@mail.gmail.com>
+Subject: Re: [PATCH] percpu: Remove intermediate variable in PERCPU_PTR()
+To: Gal Pressman <gal@nvidia.com>
+Cc: Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, netdev@vger.kernel.org
+Content-Type: multipart/mixed; boundary="0000000000002cb00e0629a28415"
 
-On 12/16/24 22:35, Wei Fang wrote:
-> On the i.MX6ULL-14x14-EVK board, enet1_ref and enet2_ref are used as the
-> clock sources for two external KSZ PHYs. However, after closing the two
-> FEC ports, the clk_enable_count of the enet1_ref and enet2_ref clocks is
-> not 0. The root cause is that since the commit 985329462723 ("net: phy:
-> micrel: use devm_clk_get_optional_enabled for the rmii-ref clock"), the
-> external clock of KSZ PHY has been enabled when the PHY driver probes,
-> and it can only be disabled when the PHY driver is removed. This causes
-> the clock to continue working when the system is suspended or the network
-> port is down.
-> 
-> Although Heiko explained in the commit message that the patch was because
-> some clock suppliers need to enable the clock to get the valid clock rate
-> , it seems that the simple fix is to disable the clock after getting the
-> clock rate to solve the current problem. This is indeed true, but we need
-> to admit that Heiko's patch has been applied for more than a year, and we
-> cannot guarantee whether there are platforms that only enable rmii-ref in
-> the KSZ PHY driver during this period. If this is the case, disabling
-> rmii-ref will cause RMII on these platforms to not work.
-> 
-> Secondly, commit 99ac4cbcc2a5 ("net: phy: micrel: allow usage of generic
-> ethernet-phy clock") just simply enables the generic clock permanently,
-> which seems like the generic clock may only be enabled in the PHY driver.
-> If we simply disable the generic clock, RMII may not work. If we keep it
-> as it is, the platform using the generic clock will have the same problem
-> as the i.MX6ULL platform.
-> 
-> To solve this problem, the clock is enabled when phy_driver::resume() is
-> called, and the clock is disabled when phy_driver::suspend() is called.
-> Since phy_driver::resume() and phy_driver::suspend() are not called in
-> pairs, an additional clk_enable flag is added. When phy_driver::suspend()
-> is called, the clock is disabled only if clk_enable is true. Conversely,
-> when phy_driver::resume() is called, the clock is enabled if clk_enable
-> is false.
-> 
-> The changes that introduced the problem were only a few lines, while the
-> current fix is about a hundred lines, which seems out of proportion, but
-> it is necessary because kszphy_probe() is used by multiple KSZ PHYs and
-> we need to fix all of them.
-> 
-> Fixes: 985329462723 ("net: phy: micrel: use devm_clk_get_optional_enabled for the rmii-ref clock")
-> Fixes: 99ac4cbcc2a5 ("net: phy: micrel: allow usage of generic ethernet-phy clock")
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+--0000000000002cb00e0629a28415
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+On Thu, Dec 19, 2024 at 5:02=E2=80=AFPM Uros Bizjak <ubizjak@gmail.com> wro=
+te:
+
+> > > The intermediate variable in the PERCPU_PTR() macro results in a kern=
+el
+> > > panic on boot [1] due to a compiler bug seen when compiling the kerne=
+l
+> > > (+ KASAN) with gcc 11.3.1, but not when compiling with latest gcc
+> > > (v14.2)/clang(v18.1).
+> > >
+> > > To solve it, remove the intermediate variable (which is not needed) a=
+nd
+> > > keep the casting that resolves the address space checks.
+
+[...]
+
+> > >  include/linux/percpu-defs.h | 3 +--
+> > >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > >
+> > > diff --git a/include/linux/percpu-defs.h b/include/linux/percpu-defs.=
+h
+> > > index 35842d1e3879..573adb643d90 100644
+> > > --- a/include/linux/percpu-defs.h
+> > > +++ b/include/linux/percpu-defs.h
+> > > @@ -222,8 +222,7 @@ do {                                             =
+                           \
+> > >
+> > >  #define PERCPU_PTR(__p)                                             =
+           \
+> > >  ({                                                                  =
+   \
+> > > -       unsigned long __pcpu_ptr =3D (__force unsigned long)(__p);   =
+     \
+> > > -       (typeof(*(__p)) __force __kernel *)(__pcpu_ptr);             =
+   \
+> > > +       (typeof(*(__p)) __force __kernel *)((__force unsigned long)(_=
+_p)); \
+> > >  })
+>
+> Actually, you can simplify the above a bit by writing it as:
+>
+> #define PERCPU_PTR(__p)                            \
+>     ((typeof(*(__p)) __force __kernel *)(__force unsigned long)(__p)) \
+
+Andrew, please find attached a substitute patch "[PATCH 4/6] percpu:
+Use TYPEOF_UNQUAL() in *_cpu_ptr() accessors" for your MM tree
+relative to the above hotfix. The whole patch series (+ hotfix) has
+been re-tested against the current mainline defconfig (+ KASAN),
+compiled once with gcc-11.4.1 and once with gcc-14.2.1.
+
+Uros.
+
+--0000000000002cb00e0629a28415
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0004-percpu-Use-TYPEOF_UNQUAL-in-_cpu_ptr-accessors.patch"
+Content-Disposition: attachment; 
+	filename="0004-percpu-Use-TYPEOF_UNQUAL-in-_cpu_ptr-accessors.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m4vkkzvw0>
+X-Attachment-Id: f_m4vkkzvw0
+
+RnJvbSBmYzkzM2M5Nzg0NDZkNmFhZTk3N2I1NDBmMDBjZmNmYmZjNjViNzU1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBVcm9zIEJpemphayA8dWJpempha0BnbWFpbC5jb20+CkRhdGU6
+IFR1ZSwgMjYgTm92IDIwMjQgMTY6NDY6NDIgKzAxMDAKU3ViamVjdDogW1BBVENIIDQvNl0gcGVy
+Y3B1OiBVc2UgVFlQRU9GX1VOUVVBTCgpIGluICpfY3B1X3B0cigpIGFjY2Vzc29ycwoKVXNlIFRZ
+UEVPRl9VTlFVQUwoKSBtYWNybyB0byBkZWNsYXJlIHRoZSByZXR1cm4gdHlwZSBvZiAqX2NwdV9w
+dHIoKQphY2Nlc3NvcnMgaW4gdGhlIGdlbmVyaWMgbmFtZWQgYWRkcmVzcyBzcGFjZSB0byBhdm9p
+ZCBhY2Nlc3MgdG8KZGF0YSBmcm9tIHBvaW50ZXIgdG8gbm9uLWVuY2xvc2VkIGFkZHJlc3Mgc3Bh
+Y2UgdHlwZSBvZiBlcnJvcnMuCgpTaWduZWQtb2ZmLWJ5OiBVcm9zIEJpemphayA8dWJpempha0Bn
+bWFpbC5jb20+CkFja2VkLWJ5OiBOYWRhdiBBbWl0IDxuYWRhdi5hbWl0QGdtYWlsLmNvbT4KQWNr
+ZWQtYnk6IENocmlzdG9waCBMYW1ldGVyIDxjbEBsaW51eC5jb20+CkNjOiBEZW5uaXMgWmhvdSA8
+ZGVubmlzQGtlcm5lbC5vcmc+CkNjOiBUZWp1biBIZW8gPHRqQGtlcm5lbC5vcmc+CkNjOiBUaG9t
+YXMgR2xlaXhuZXIgPHRnbHhAbGludXRyb25peC5kZT4KQ2M6IEluZ28gTW9sbmFyIDxtaW5nb0Br
+ZXJuZWwub3JnPgpDYzogQm9yaXNsYXYgUGV0a292IDxicEBhbGllbjguZGU+CkNjOiBEYXZlIEhh
+bnNlbiA8ZGF2ZS5oYW5zZW5AbGludXguaW50ZWwuY29tPgpDYzogIkguIFBldGVyIEFudmluIiA8
+aHBhQHp5dG9yLmNvbT4KQ2M6IExpbnVzIFRvcnZhbGRzIDx0b3J2YWxkc0BsaW51eC1mb3VuZGF0
+aW9uLm9yZz4KQ2M6IEFuZHkgTHV0b21pcnNraSA8bHV0b0BrZXJuZWwub3JnPgpDYzogQnJpYW4g
+R2Vyc3QgPGJyZ2Vyc3RAZ21haWwuY29tPgpDYzogUGV0ZXIgWmlqbHN0cmEgPHBldGVyekBpbmZy
+YWRlYWQub3JnPgotLS0KIGFyY2gveDg2L2luY2x1ZGUvYXNtL3BlcmNwdS5oIHwgOCArKysrKyst
+LQogaW5jbHVkZS9saW51eC9wZXJjcHUtZGVmcy5oICAgfCAyICstCiAyIGZpbGVzIGNoYW5nZWQs
+IDcgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9p
+bmNsdWRlL2FzbS9wZXJjcHUuaCBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL3BlcmNwdS5oCmluZGV4
+IDY2NmU0MTM3YjA5Zi4uMjdmNjY4NjYwYWJlIDEwMDY0NAotLS0gYS9hcmNoL3g4Ni9pbmNsdWRl
+L2FzbS9wZXJjcHUuaAorKysgYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9wZXJjcHUuaApAQCAtNzMs
+MTAgKzczLDE0IEBACiAJdW5zaWduZWQgbG9uZyB0Y3BfcHRyX18gPSByYXdfY3B1X3JlYWRfbG9u
+Zyh0aGlzX2NwdV9vZmYpOwlcCiAJCQkJCQkJCQlcCiAJdGNwX3B0cl9fICs9IChfX2ZvcmNlIHVu
+c2lnbmVkIGxvbmcpKF9wdHIpOwkJCVwKLQkodHlwZW9mKCooX3B0cikpIF9fa2VybmVsIF9fZm9y
+Y2UgKil0Y3BfcHRyX187CQkJXAorCShUWVBFT0ZfVU5RVUFMKCooX3B0cikpIF9fZm9yY2UgX19r
+ZXJuZWwgKil0Y3BfcHRyX187CQlcCiB9KQogI2Vsc2UKLSNkZWZpbmUgYXJjaF9yYXdfY3B1X3B0
+cihfcHRyKSAoeyBCVUlMRF9CVUcoKTsgKHR5cGVvZihfcHRyKSkwOyB9KQorI2RlZmluZSBhcmNo
+X3Jhd19jcHVfcHRyKF9wdHIpCQkJCQkJXAorKHsJCQkJCQkJCQlcCisJQlVJTERfQlVHKCk7CQkJ
+CQkJCVwKKwkoVFlQRU9GX1VOUVVBTCgqKF9wdHIpKSBfX2ZvcmNlIF9fa2VybmVsICopMDsJCQlc
+Cit9KQogI2VuZGlmCiAKICNkZWZpbmUgUEVSX0NQVV9WQVIodmFyKQklX19wZXJjcHVfc2VnOih2
+YXIpX19wZXJjcHVfcmVsCmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L3BlcmNwdS1kZWZzLmgg
+Yi9pbmNsdWRlL2xpbnV4L3BlcmNwdS1kZWZzLmgKaW5kZXggNGZkZTkzMzM0YWMzLi44YTdjOGQy
+ZDU3MGQgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvcGVyY3B1LWRlZnMuaAorKysgYi9pbmNs
+dWRlL2xpbnV4L3BlcmNwdS1kZWZzLmgKQEAgLTIyMSw3ICsyMjEsNyBAQCBkbyB7CQkJCQkJCQkJ
+XAogfSB3aGlsZSAoMCkKIAogI2RlZmluZSBQRVJDUFVfUFRSKF9fcCkJCQkJCQkJXAotCSgodHlw
+ZW9mKCooX19wKSkgX19mb3JjZSBfX2tlcm5lbCAqKShfX2ZvcmNlIHVuc2lnbmVkIGxvbmcpKF9f
+cCkpIFwKKwkoKFRZUEVPRl9VTlFVQUwoKihfX3ApKSBfX2ZvcmNlIF9fa2VybmVsICopKF9fZm9y
+Y2UgdW5zaWduZWQgbG9uZykoX19wKSkgXAogCiAjaWZkZWYgQ09ORklHX1NNUAogCi0tIAoyLjQy
+LjAKCg==
+--0000000000002cb00e0629a28415--
 
