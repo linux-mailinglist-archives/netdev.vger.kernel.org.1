@@ -1,123 +1,166 @@
-Return-Path: <netdev+bounces-153517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02E149F864F
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 21:50:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A18869F873A
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 22:41:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C01627A1B80
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 20:50:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 809D8188FBF2
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 21:41:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89C61A7044;
-	Thu, 19 Dec 2024 20:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8371BCA05;
+	Thu, 19 Dec 2024 21:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="o3J3f/8N"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="aXqnkQNR";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gni1hwxs"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BF617799F
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 20:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B6817E00E;
+	Thu, 19 Dec 2024 21:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734641444; cv=none; b=FSk4jZBiFbxanQwu/Ww+br/H6RFfDPdIEZ5/v47WWQv8S6Ufv5BAamAiQ+N4omVlZ2wcX/V05f7D4r+tJWEit2BJRF/vIHLVqArxc3OqHj49BWWM7jaFQbQgdw7abQZ21SlQVlwPTA/3Q6aK3tHy71i3DjNP1UGpvklCoEqbuUI=
+	t=1734644496; cv=none; b=tEdWkNyLf3g3ToneVXA0MPWtHN7zeJAvuS49n92IXQyC2nZIDnecr8Vomnv+21ImweymfKVjwIUOb6FGjD7jn9F4a4V0O6uuOfJXiZ/6Zsncfxk7iEoCBUEjGA1Tevo0WKhYe8aCxNH8eXpHIpI3CL6u422nJ7kQcx4KnvZMniI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734641444; c=relaxed/simple;
-	bh=9xmHHI5/quMmmR4rp3VeCfmGXY9B6uCmOF34QVpAjwI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X5G32bc9jRDTUSZ3l+j8Can0t1c6SfWYR2Tqsn83CLyTHht8D2R94vKqKmTjG6m1EvLk1eb/uOxO6NXIlTFPsJlW2osI+Bgi/eudxNya/xiVfPYr7JTl+1PXqWirFAk8V5G+Yb6LXBOIuz9FpAZ0fI0t8fMhkdqW7G62fiYv7pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=o3J3f/8N; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 99E882C0A10;
-	Fri, 20 Dec 2024 09:50:40 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1734641440;
-	bh=IJewloyzQP8QD3M6cSDceGRsjsevbmToqia9hbkmL+o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o3J3f/8NG08l231PWvTvYqWFg7pjxA1EVYfr3HuqYuO7Su6bUzfcd8Jokqi1K7BeO
-	 CPLjCpDyHTDUG7G0YFWpsIS6DkR6BzlwccD5yo7p2PG+BZHSXMUFcYZ3+LV+2kVr9k
-	 ow8jY5sroZFtggt7ZrUlLeY0rVDEGly9bbZqYaSvk/l9BS5L/pHiJRL1ULdg4YjUjT
-	 6+49u79L+laO3IMVQzrWlYejvTgtmQS5s6hJw2xX5uL36/MX1bMt97SPiAkmqXn1m2
-	 VofuLbIL1iwchFjmBCxQONio4X+S3u3AX7VGjt5LcjqN6abpVc+vCv+5RK5K0WHhn4
-	 ZvbcULMJgUkEQ==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B676487200000>; Fri, 20 Dec 2024 09:50:40 +1300
-Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id 7DFE913EE00;
-	Fri, 20 Dec 2024 09:50:40 +1300 (NZDT)
-Message-ID: <057a3004-f771-432f-a60b-962c2ebf399a@alliedtelesis.co.nz>
-Date: Fri, 20 Dec 2024 09:50:40 +1300
+	s=arc-20240116; t=1734644496; c=relaxed/simple;
+	bh=8UmFB3ctcuiDHHQgssQ2wpXNJtLZB9VRdpGjPoqc53c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SoWvEIJWHEcGn6UBTf6LCxNpNk6Ir1bI+bMtUkIagvRX+pZoM27hlLeVmn/zIBjk5vFqSvokqzcz0xYvCOlKgBgKggG7bPG76hnzr51+VbFv8RkyPIniak75SCW2OK9+41DeTvXDKoDwX0VHLWXlpLekzDtmfGDn2FdI8I2wH6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=aXqnkQNR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gni1hwxs; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 3D1292540182;
+	Thu, 19 Dec 2024 16:41:33 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Thu, 19 Dec 2024 16:41:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1734644493;
+	 x=1734730893; bh=7HNi+Oxo7O1Ju2DD7K0mOmaR80xjOw6PNJN1e+KhpbM=; b=
+	aXqnkQNR3d4MgNYa6yjoWsP6xiRkRsdBfyzbaBPfFgYL2p9cOD4pg+6UxHFcLC5k
+	J50kpE5mXr8qXwcQKQxoAhXjiy9l6ouEOkkHiEFMlfSWgn/7tlbvs7ye8YFfDj4R
+	SnQmEPepYRlfLbK2keSzfro7v8jrCJHlhsikDsCIRCXvJuEoa+fESE5v6BlLod5d
+	wrLvRIhuUQVwIxKzB1k2lz1Xzk/leKfdRp9Pi0L8eoRV/QayGR7RAvgEfMaJJ9z6
+	KCzY20R86edRUjXKR2HiVqQ4B2N3x7c/7rDaGgBdxbiw54ekvmHOG/XGC1B0VIg4
+	Uf9jImKEdTafcxvKWZRfjg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1734644493; x=
+	1734730893; bh=7HNi+Oxo7O1Ju2DD7K0mOmaR80xjOw6PNJN1e+KhpbM=; b=g
+	ni1hwxsdt4SNB0gY+1IgszsJ9zAT+MxNl/2jLMy2SlPZpWPQ3yeuPthjsgn4xY6E
+	t+RK7s85SZR6vpxTK9asl0vMe9Sx6ChpE01Xdrb7jf+5mj3HwNo+QeiQqRmLh8gf
+	81hyCYql5vNYWMtgf4OvAHC7kAOiih0oovOIsWgiILNbH73sYeo+lj1pePstwP5L
+	4cG9Jg1TAeKz1fjT7H9SD+evrOoMbDz6iZ4+5joXf2gyalPrn1HIzVfuZg1W8HAe
+	TBmpQ6pG2aH2uPIZl+sxwTNxoWQbEOezw/8QlSlaOcxa1aVtMQkqK/zX3DQD9jpH
+	WwCDo22CRv5mVu+0pdtmw==
+X-ME-Sender: <xms:DJNkZ4MfS_mMLK-6pgjkj4iNJcdBe1MCEG_nYiLSROzlMYvu6f1rvQ>
+    <xme:DJNkZ-84BpKcm-vbdCGMBYvx51fgjjdVMtcA1xJBb46mxjomyLpmdGZC3WmtaykXm
+    7Juoay2cdGNPVE3dA>
+X-ME-Received: <xmr:DJNkZ_RPgXleWpRlpYjgkVgZwxXJHl7_pVayffhAJAPPy6aayesmVu-r0ZGHU_Qy16_w4HH4TLX1J-4nr4ltjL4wKFPX8z2yLJY1obBS1K1q7g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddruddttddgudehtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffk
+    fhggtggugfgjsehtkefstddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguh
+    esugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnheptdfgueeuueekieekgfeiueek
+    ffelteekkeekgeegffevtddvjeeuheeuueelfeetnecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghr
+    tghpthhtohepudelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhgurhhiih
+    drnhgrkhhrhihikhhosehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguugihiiekjees
+    ghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhhiiheskhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtoheprghstheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgrhhes
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrd
+    hnvghtpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhm
+    pdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghvpdhrtghpthhtoh
+    epshhonhhgsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:DJNkZwuvt3tnYN54Eq1uCnYDL2NlcgftMQqLbPS3hCicaEnlK-C9RQ>
+    <xmx:DJNkZwcu4dgkXVG_TC3yvX_tQUw50WSvlFrwejV8-9ZTU2yDULRqCw>
+    <xmx:DJNkZ01_lajFu88kt7VPEYaTOYbNua-CPngYe30YRiAe3pQzO4D1gg>
+    <xmx:DJNkZ0_zn6tANlSHMEmNp7rv9Qo5dDBHnLCG03IrUQZQd5i-__UpSQ>
+    <xmx:DZNkZ1CNOK4IR9-6Dou635QXItOGMbuJqTvu-3T0UnBwzn7Hc6e7U4hZ>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 19 Dec 2024 16:41:30 -0500 (EST)
+Date: Thu, 19 Dec 2024 14:41:28 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Eduard Zingerman <eddyz87@gmail.com>, andrii@kernel.org, 
+	ast@kernel.org, shuah@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com, 
+	martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v5 4/5] bpf: verifier: Support eliding map
+ lookup nullness
+Message-ID: <kghvgxu5wdkupssnq7dy5upuf2wscsxgsnwl2yoam4mwk3h5pn@wjjsliwg6fzl>
+References: <cover.1734045451.git.dxu@dxuuu.xyz>
+ <92065ca054beccd6d0f35efe9715ef965e8d379f.1734045451.git.dxu@dxuuu.xyz>
+ <CAEf4BzaqCgW9keiT+tJUBQWT6Q+jMwuvn4O2ZghO0c+ZvACNrw@mail.gmail.com>
+ <zow3q3nhlz6vedbni3upag5yr7zzrhyiqysl5nwyubebmbwojk@th7kbm62x36g>
+ <31b0c85dbf85486df116ade20caf8685843899b4.camel@gmail.com>
+ <CAEf4BzaEOBtrSWZTx40AdT=SQY6Qaia405KWgU-NowaqNdmpkA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 4/4] net: mdio: Add RTL9300 MDIO driver
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
- hkallweit1@gmail.com, linux@armlinux.org.uk, markus.stockhausen@gmx.de,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-mips@vger.kernel.org
-References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
- <20241216031346.2626805-5-chris.packham@alliedtelesis.co.nz>
- <CAJq09z49uBPPZqDyc3O+4nVppKoKdrJunQnQKBUfQmwzdV+ZFQ@mail.gmail.com>
-Content-Language: en-US
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-In-Reply-To: <CAJq09z49uBPPZqDyc3O+4nVppKoKdrJunQnQKBUfQmwzdV+ZFQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=67648720 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=RZcAm9yDv7YA:10 a=5ljOSnMwgXI2k2dc92oA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4BzaEOBtrSWZTx40AdT=SQY6Qaia405KWgU-NowaqNdmpkA@mail.gmail.com>
 
+On Mon, Dec 16, 2024 at 03:24:01PM -0800, Andrii Nakryiko wrote:
+> On Fri, Dec 13, 2024 at 7:13 PM Eduard Zingerman <eddyz87@gmail.com> wrote:
+> >
+> > On Fri, 2024-12-13 at 19:44 -0700, Daniel Xu wrote:
+> >
+> > [...]
+> >
+> > > > > +       /* First handle precisely tracked STACK_ZERO, up to BPF_REG_SIZE */
+> > > > > +       stype = state->stack[spi].slot_type;
+> > > > > +       for (i = 0; i < BPF_REG_SIZE && stype[i] == STACK_ZERO; i++)
+> > > >
+> > > > it's Friday and I'm lazy, but please double-check that this works for
+> > > > both big-endian and little-endian :)
+> > >
+> > > Any tips? Are the existing tests running thru s390x hosts in CI
+> > > sufficient or should I add some tests writen in C (and not BPF
+> > > assembler)? I can never think about endianness correctly...
+> >
+> > I think that if test operates on a key like:
+> >
+> >       valid key 15
+> >              v
+> >       0000000f   <-- written to stack as a single u64 value
+> >       ^^^^^^^
+> >     stack zero marks
+> >
+> > and is executed (e.g. using __retval annotation),
+> > then CI passing for s390 should be enough.
+> 
+> +1, something like that where for big-endian it will be all zero while
+> for little endian it would be 0xf (and then make sure that the test
+> should *fail* by making sure that 0xf is not a valid index, so NULL
+> check is necessary)
 
-On 19/12/2024 17:46, Luiz Angelo Daros de Luca wrote:
->> +#define SMI_GLB_CTRL                   0x000
->> +#define   GLB_CTRL_INTF_SEL(intf)      BIT(16 + (intf))
->> +#define SMI_PORT0_15_POLLING_SEL       0x008
->> +#define SMI_ACCESS_PHY_CTRL_0          0x170
->> +#define SMI_ACCESS_PHY_CTRL_1          0x174
->> +#define   PHY_CTRL_RWOP                        BIT(2)
->> +#define   PHY_CTRL_TYPE                        BIT(1)
->> +#define   PHY_CTRL_CMD                 BIT(0)
->> +#define   PHY_CTRL_FAIL                        BIT(25)
->> +#define SMI_ACCESS_PHY_CTRL_2          0x178
->> +#define SMI_ACCESS_PHY_CTRL_3          0x17c
->> +#define SMI_PORT0_5_ADDR_CTRL          0x180
->> +
->> +#define MAX_PORTS       28
->> +#define MAX_SMI_BUSSES  4
->> +#define MAX_SMI_ADDR   0x1f
->> +
->> +struct realtek_mdio_priv {
->> +       struct regmap *regmap;
->> +       u8 smi_bus[MAX_PORTS];
->> +       u8 smi_addr[MAX_PORTS];
->> +       bool smi_bus_isc45[MAX_SMI_BUSSES];
->> +       u32 reg_base;
->> +};
->> +
->> +static int realtek_mdio_wait_ready(struct realtek_mdio_priv *priv)
->> +{
->> +       struct regmap *regmap = priv->regmap;
->> +       u32 reg_base = priv->reg_base;
->> +       u32 val;
->> +
->> +       return regmap_read_poll_timeout(regmap, reg_base + SMI_ACCESS_PHY_CTRL_1,
-> All regmap funcs are adding reg_base to the register address. Isn't a
-> remap job to do that sum? It just looks odd but I never worked with
-> MFD. It looks like it is missing a subregmap-like variant.
-I'm thinking about dropping the base and just using the full 16-bit 
-address. I've already confused myself between this code and the datasheet.
+How would it work for LE to be 0xF but BE to be 0x0?
+
+The prog passes a pointer to the beginning of the u32 to
+bpf_map_lookup_elem(). The kernel does a 4 byte read starting from that
+address. On both BE and LE all 4 bytes will be interpreted. So set bits
+cannot just go away.
+
+Am I missing something?
+
+Thanks,
+Daniel
 
