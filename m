@@ -1,226 +1,215 @@
-Return-Path: <netdev+bounces-153432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657B59F7ECD
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:03:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6093E9F7EDF
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:07:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0AB9165337
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:02:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E922E16CD35
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758D4225784;
-	Thu, 19 Dec 2024 16:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2955A226885;
+	Thu, 19 Dec 2024 16:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P6cK1RB+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k2VhsN0O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8262B146A6B;
-	Thu, 19 Dec 2024 16:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABDA143895;
+	Thu, 19 Dec 2024 16:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734624159; cv=none; b=WkyTUm1f/3K40QU8H+F3+J5gjpzur/30xYSFmWSC5C7TwJzegzk63O0vnZIc9d0ieOzvSA5zb+2sdoCIY4d1P6ezD6Z1PXHS42Ngc8VV5v8EFrPQV0cT8QvXSo1D4inITmIqWLJB/ymiXr4m/WhjJxW7EJVpMj3c3GdghzbzwVI=
+	t=1734624357; cv=none; b=MHP4PRoEN1g0AEMtSoapv+JmHpU7GPSMsLhIXa9kcs5eJ0fLNzSl20ySwM25bZAeccolY01y60PclEr3nDBiC5+Z/+RECwubqEgWzILBC1vEg+1pce/nxGUZZB0I3Er1WZd/FMw2Rp0pBjxDlOzoamTbRCT010sNqqJ/lxDVcf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734624159; c=relaxed/simple;
-	bh=mP7E2b7q/836oHj5vJxaxKTUUt6joVbMS7hjtvjNdR4=;
+	s=arc-20240116; t=1734624357; c=relaxed/simple;
+	bh=K+jbPgvMzgj1ziZA052uh5kiEoslytI3nUGjoHGAEj4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uF5lkneoVRAXaL9goD282oudbE/VZ9FRryreMgPDVPO0Usf+9WbY41n5dPehIW2xTCeW+j5YHw1H3/f2++2D6AmzK3Z7EWn1e9k2ttmIoZVp4YM6RU6F0/MWt9IOfzxkivs5mfvfimFmcgBtH5OkWfuVifeJd9nXAi9caeo+35U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P6cK1RB+; arc=none smtp.client-ip=209.85.208.173
+	 To:Cc:Content-Type; b=JDZvsFoVe/HbTRPGOLfJTsnE2SB24ktBv584S7M457071Qzy1Ow1U+kmQRMyhyg97FCwVGyoauG79XVkG7FJ8ufnSmZxET5ve85lbcAqxlD84NQwQ9adm4G+oEgRB98+Z/H7UoubMCWZyLypgzuA6M9yicbqr1RhmyDGJgzxZl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k2VhsN0O; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-303548a933aso7725051fa.3;
-        Thu, 19 Dec 2024 08:02:37 -0800 (PST)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3863c36a731so731773f8f.1;
+        Thu, 19 Dec 2024 08:05:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734624155; x=1735228955; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1734624353; x=1735229153; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pCc+bIRFJ7uKHEzOqjmhR8oFW6S9US5llU5iPyKV0QE=;
-        b=P6cK1RB+QbPuRWkayo1layS1p3JzRfInlpITdRAtcoXqzXMsfWFa+KRT2/L4kt0HJR
-         RTxoq2QK/RYLduxsC1GAAfRqJmtDpke8ZttNDOLnYXJcjUeegkpm1QGyL0T6hP4uF4A2
-         oHCteFpKaX4fTJ13JKRhsNkNtpTG9aurhMeNz+/WZnF4C6wzuSmiDesYsZ8dI8kFp5Q8
-         uqam7OObwkurfgaW6DsMXLyKPbGO37nsSSYngKOgAbXLnmreaeBwbbzi3fsDXGF5gsaj
-         P7r1IxoZQXJsgoF6ferIJMgu8cwyBArNVY81eElbGAu/dJucCsSdigJJWCks/3t8g3Lx
-         dmMQ==
+        bh=z917kOVPARb8dKIs9uBD/0/reoE5C4OJp1UlmVGQFbU=;
+        b=k2VhsN0OF6/JOL7iws+lxAMlBXCMGDh2ZKrzI4N6kOP+pGcVWXbOys7Pv/H9xDAdlz
+         v0Z8y0TfWwemuy+lN3e80tvHTwQ/30O7kCFAAzK60vGCVGfKpJlii2eqr1aK0LCQDiWA
+         LqfJd+vOKxVam2cumvEzMPnLdFxEIh88aM/punqcHg2sIt+mxRD8w1YU8UpeNl4PJmar
+         +FXvPrgmqmbMbPzu05zpKhOGlZpeSBPAomzCOGnXwSCuHt4B6rd49GpzE3vKqTGqeOzz
+         /dxdRD1ou3jY0U0Mcs86xA/SiXmnXl/5qq3Y/f5oREBE2dci+4YhvsKBp+ytVdX4G9J0
+         O3RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734624155; x=1735228955;
+        d=1e100.net; s=20230601; t=1734624353; x=1735229153;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pCc+bIRFJ7uKHEzOqjmhR8oFW6S9US5llU5iPyKV0QE=;
-        b=PgM/Yvd/57WV+t/rGJgIQaj+tD94tOAXkDrRFCRWfSuos+wW4viAYw21yImcVj4ENQ
-         dqGKA0p9+ZnJ9QsZBIcvEQZBHTY0LWXwc/6j2cM1gXli01w4Nv9ZbambJoJbfFjZ+HT/
-         eyOKc+vW1jPEIlxlfijyGj4Ba9TV9ydEjLjDPfwoOP+ZwmBXn2NM4PpVodYjpaRDI6OQ
-         gWti1wNoOgcuwASmKDhQzwIHFkMLOq/2PxqiSuLCAPE/V5YB7yhQvcrJOG7sM/dYMA1E
-         iVaOURSafJuWVe+YEccuiW0BvpZACejxwtd4+xQbJ6sMXPYvjltdSzjJ37p3UigYutNW
-         hK4g==
-X-Forwarded-Encrypted: i=1; AJvYcCU8U+AN6LuFg5hAEaWZK/3fvnman62n+682UK44EzCZjH7gjSuAQVMn09DFFIbiQ+PlHPqMx98XDOO/IGk=@vger.kernel.org, AJvYcCUQrzgW03H6NVXH29S6mN4CE5JGV3eXCtbI1ft0Ms+LSEh2yM0THGiUtVfydjqa8SnIpagvN5T6@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+U5hRYOBmNdNSgRNje+9TmBPRQt6DWVKFk/MoPgFh4oPa+nR1
-	6IBO35d86qoS9cGvWBYCh30222nBM/rA3O1BTZm4+gFzcc0BIiUl6k73VJ+hIG5cnrudoQKjpfj
-	9H3o5LSZec+6Drc3aqWdbxsnztFo=
-X-Gm-Gg: ASbGncsWRENSixpQa7p5JutwLygwJAyV4pTfU/aIvJXcBgbAeX7+Q0G1+GSw3QlR3Um
-	ULKxhKL08A5j/tMsr7NfVpTb3SM69FvH2wWe+oA==
-X-Google-Smtp-Source: AGHT+IHKqt5V6dT52AhO5kHkjIWjpVTnFDAFOsd8VPDI+LiXlzauyjQ6OmV02ageYI+6Bmd/9PmRcoEwHblm3Xyi6cM=
-X-Received: by 2002:a05:651c:50f:b0:300:3a15:8f19 with SMTP id
- 38308e7fff4ca-3044db51d52mr32106251fa.32.1734624154888; Thu, 19 Dec 2024
- 08:02:34 -0800 (PST)
+        bh=z917kOVPARb8dKIs9uBD/0/reoE5C4OJp1UlmVGQFbU=;
+        b=SUangQzzwuWDlv1zuZjTumzeKbppaxEBKQLeUKwOyqL61Mns2Uk0yNaTNbxS2wNpON
+         LheIv9gPL0JQIYTn0s922YZ+elshsQuuvquVAa09UYAwiomo2H1BYTB4MQ1TFywK4zRR
+         6CzVAKaDa7cmFbdfuhTvveyg9sdQbDZVxGj8vhwnpUF4DnOR9+SKQqVgVak+oX0Dj5Zf
+         JkDniV6a8+hJpgKiocSAg1926WUbJW5oK4eAaXWm4IUcC/3tC+NSoXy9K/uXvSzJmNhh
+         kIc5n6QjHrWhKh5wMNFfLUaoWS8xpI97lDdfbNdpExeUfMU/ViRemPx2A2zXkeXf6Yr/
+         tteg==
+X-Forwarded-Encrypted: i=1; AJvYcCUlcj6JXcKHoqKjIzv2vvvAKTKFDsvHXdu8jG4U8Qn4eK3sazzgPVYGVpGU8bciBERrd7I317JpIdzD5Li3@vger.kernel.org, AJvYcCXBd7IybVwqJ8FlNHQbRmgCby9a/vpCjvPvSQNKJ/cvT1NyNmu/ha9Tqx7RYNj5J6Wm4YjtdbhQ@vger.kernel.org, AJvYcCXUOqXa+vjx/VCjYZUi0ERK1usD4ImSVQo6RJHuGu99IvQ6CeeGiMc42TF/eRS6IB9O+aM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE+mP0sJDLRjjI0n1isgcZ2o4Q6GsiYBXhf2ul67AGSKcycS+C
+	hRjsjbSdaBqlGR168VoiDjuCoyBpvDMLkm1xQnmICIQtzsGVOo+KH9gOiRctCVioiq/crGkfW5l
+	9W5YeJSxDbRIuYT8Qgx7CQ6Ipa1A=
+X-Gm-Gg: ASbGncuSVaragiGD1esTZGuI38ELNoilwavdOGvpNaQTIU7L5N4z06RayTTUEyeEOAq
+	s98boseNLQwhenSijgZ+p5vyCMvvlsZVW96hW0hMh
+X-Google-Smtp-Source: AGHT+IF4qH4MjsPrc029Wu90m92Gv0fVSgURCC1A2GlOpIw7H3s64v8s4SE4MhgK/yfKS7M/UQE4Ej/xAHod+0Uwx5Q=
+X-Received: by 2002:a5d:5f4f:0:b0:386:3262:28c6 with SMTP id
+ ffacd0b85a97d-388e4d310d8mr7377658f8f.5.1734624353030; Thu, 19 Dec 2024
+ 08:05:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241219121828.2120780-1-gal@nvidia.com> <CAFULd4YHFFKBzaF28f8n3z8WcOzom1WUe_hfRBx0ehhCpT9xnQ@mail.gmail.com>
-In-Reply-To: <CAFULd4YHFFKBzaF28f8n3z8WcOzom1WUe_hfRBx0ehhCpT9xnQ@mail.gmail.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Thu, 19 Dec 2024 17:02:23 +0100
-Message-ID: <CAFULd4Z0PSzwvsFx_5deMKb7tV34uJWcHEadYGdk+D72QuHonA@mail.gmail.com>
-Subject: Re: [PATCH] percpu: Remove intermediate variable in PERCPU_PTR()
-To: Gal Pressman <gal@nvidia.com>
-Cc: Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, netdev@vger.kernel.org
+References: <20241219-bpf-cond-ids-v2-1-8f121cae5374@weissschuh.net>
+In-Reply-To: <20241219-bpf-cond-ids-v2-1-8f121cae5374@weissschuh.net>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 19 Dec 2024 08:05:42 -0800
+Message-ID: <CAADnVQJQpVziHzrPCCpGE5=8uzw2OkxP8gqe1FkJ6_XVVyVbNw@mail.gmail.com>
+Subject: Re: [PATCH bpf v2] bpf: fix configuration-dependent BTF function references
+To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 19, 2024 at 1:30=E2=80=AFPM Uros Bizjak <ubizjak@gmail.com> wro=
-te:
+On Wed, Dec 18, 2024 at 11:24=E2=80=AFPM Thomas Wei=C3=9Fschuh <linux@weiss=
+schuh.net> wrote:
 >
-> On Thu, Dec 19, 2024 at 1:18=E2=80=AFPM Gal Pressman <gal@nvidia.com> wro=
-te:
-> >
-> > The intermediate variable in the PERCPU_PTR() macro results in a kernel
-> > panic on boot [1] due to a compiler bug seen when compiling the kernel
-> > (+ KASAN) with gcc 11.3.1, but not when compiling with latest gcc
-> > (v14.2)/clang(v18.1).
-> >
-> > To solve it, remove the intermediate variable (which is not needed) and
-> > keep the casting that resolves the address space checks.
-> >
-> > [1]
-> >   Oops: general protection fault, probably for non-canonical address 0x=
-dffffc0000000003: 0000 [#1] SMP KASAN
-> >   KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f=
-]
-> >   CPU: 0 UID: 0 PID: 547 Comm: iptables Not tainted 6.13.0-rc1_external=
-_tested-master #1
-> >   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0=
--gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-> >   RIP: 0010:nf_ct_netns_do_get+0x139/0x540
-> >   Code: 03 00 00 48 81 c4 88 00 00 00 5b 5d 41 5c 41 5d 41 5e 41 5f c3 =
-4d 8d 75 08 48 b8 00 00 00 00 00 fc ff df 4c 89 f2 48 c1 ea 03 <0f> b6 04 0=
-2 84 c0 74 08 3c 03 0f 8e 27 03 00 00 41 8b 45 08 83 c0
-> >   RSP: 0018:ffff888116df75e8 EFLAGS: 00010207
-> >   RAX: dffffc0000000000 RBX: 1ffff11022dbeebe RCX: ffffffff839a2382
-> >   RDX: 0000000000000003 RSI: 0000000000000008 RDI: ffff88842ec46d10
-> >   RBP: 0000000000000002 R08: 0000000000000000 R09: fffffbfff0b0860c
-> >   R10: ffff888116df75e8 R11: 0000000000000001 R12: ffffffff879d6a80
-> >   R13: 0000000000000016 R14: 000000000000001e R15: ffff888116df7908
-> >   FS:  00007fba01646740(0000) GS:ffff88842ec00000(0000) knlGS:000000000=
-0000000
-> >   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >   CR2: 000055bd901800d8 CR3: 00000001205f0003 CR4: 0000000000172eb0
-> >   Call Trace:
-> >    <TASK>
-> >    ? die_addr+0x3d/0xa0
-> >    ? exc_general_protection+0x144/0x220
-> >    ? asm_exc_general_protection+0x22/0x30
-> >    ? __mutex_lock+0x2c2/0x1d70
-> >    ? nf_ct_netns_do_get+0x139/0x540
-> >    ? nf_ct_netns_do_get+0xb5/0x540
-> >    ? net_generic+0x1f0/0x1f0
-> >    ? __create_object+0x5e/0x80
-> >    xt_check_target+0x1f0/0x930
-> >    ? textify_hooks.constprop.0+0x110/0x110
-> >    ? pcpu_alloc_noprof+0x7cd/0xcf0
-> >    ? xt_find_target+0x148/0x1e0
-> >    find_check_entry.constprop.0+0x6c0/0x920
-> >    ? get_info+0x380/0x380
-> >    ? __virt_addr_valid+0x1df/0x3b0
-> >    ? kasan_quarantine_put+0xe3/0x200
-> >    ? kfree+0x13e/0x3d0
-> >    ? translate_table+0xaf5/0x1750
-> >    translate_table+0xbd8/0x1750
-> >    ? ipt_unregister_table_exit+0x30/0x30
-> >    ? __might_fault+0xbb/0x170
-> >    do_ipt_set_ctl+0x408/0x1340
-> >    ? nf_sockopt_find.constprop.0+0x17b/0x1f0
-> >    ? lock_downgrade+0x680/0x680
-> >    ? lockdep_hardirqs_on_prepare+0x284/0x400
-> >    ? ipt_register_table+0x440/0x440
-> >    ? bit_wait_timeout+0x160/0x160
-> >    nf_setsockopt+0x6f/0xd0
-> >    raw_setsockopt+0x7e/0x200
-> >    ? raw_bind+0x590/0x590
-> >    ? do_user_addr_fault+0x812/0xd20
-> >    do_sock_setsockopt+0x1e2/0x3f0
-> >    ? move_addr_to_user+0x90/0x90
-> >    ? lock_downgrade+0x680/0x680
-> >    __sys_setsockopt+0x9e/0x100
-> >    __x64_sys_setsockopt+0xb9/0x150
-> >    ? do_syscall_64+0x33/0x140
-> >    do_syscall_64+0x6d/0x140
-> >    entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> >   RIP: 0033:0x7fba015134ce
-> >   Code: 0f 1f 40 00 48 8b 15 59 69 0e 00 f7 d8 64 89 02 48 c7 c0 ff ff =
-ff ff eb b1 0f 1f 00 f3 0f 1e fa 49 89 ca b8 36 00 00 00 0f 05 <48> 3d 00 f=
-0 ff ff 77 0a c3 66 0f 1f 84 00 00 00 00 00 48 8b 15 21
-> >   RSP: 002b:00007ffd9de6f388 EFLAGS: 00000246 ORIG_RAX: 000000000000003=
-6
-> >   RAX: ffffffffffffffda RBX: 000055bd9017f490 RCX: 00007fba015134ce
-> >   RDX: 0000000000000040 RSI: 0000000000000000 RDI: 0000000000000004
-> >   RBP: 0000000000000500 R08: 0000000000000560 R09: 0000000000000052
-> >   R10: 000055bd901800e0 R11: 0000000000000246 R12: 000055bd90180140
-> >   R13: 000055bd901800e0 R14: 000055bd9017f498 R15: 000055bd9017ff10
-> >    </TASK>
-> >   Modules linked in: xt_MASQUERADE nf_conntrack_netlink nfnetlink xt_ad=
-drtype iptable_nat nf_nat br_netfilter rpcsec_gss_krb5 auth_rpcgss oid_regi=
-stry overlay zram zsmalloc mlx4_ib mlx4_en mlx4_core rpcrdma rdma_ucm ib_uv=
-erbs ib_iser libiscsi scsi_transport_iscsi fuse ib_umad rdma_cm ib_ipoib iw=
-_cm ib_cm ib_core
-> >   ---[ end trace 0000000000000000 ]---
-> >
-> > Fixes: dabddd687c9e ("percpu: cast percpu pointer in PERCPU_PTR() via u=
-nsigned long")
-> > Closes: https://lore.kernel.org/all/7590f546-4021-4602-9252-0d525de35b5=
-2@nvidia.com
-> > Cc: Uros Bizjak <ubizjak@gmail.com>
-> > Signed-off-by: Gal Pressman <gal@nvidia.com>
+> These BTF functions are not available unconditionally,
+> only reference them when they are available.
 >
-> Reviewed-by: Uros Bizjak <ubizjak@gmail.com>
+> Avoid the following build warnings:
 >
-> > ---
-> >  include/linux/percpu-defs.h | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> >
-> > diff --git a/include/linux/percpu-defs.h b/include/linux/percpu-defs.h
-> > index 35842d1e3879..573adb643d90 100644
-> > --- a/include/linux/percpu-defs.h
-> > +++ b/include/linux/percpu-defs.h
-> > @@ -222,8 +222,7 @@ do {                                               =
-                         \
-> >
-> >  #define PERCPU_PTR(__p)                                               =
-         \
-> >  ({                                                                    =
- \
-> > -       unsigned long __pcpu_ptr =3D (__force unsigned long)(__p);     =
-   \
-> > -       (typeof(*(__p)) __force __kernel *)(__pcpu_ptr);               =
- \
-> > +       (typeof(*(__p)) __force __kernel *)((__force unsigned long)(__p=
-)); \
-> >  })
+>   BTF     .tmp_vmlinux1.btf.o
+> btf_encoder__tag_kfunc: failed to find kfunc 'bpf_send_signal_task' in BT=
+F
+> btf_encoder__tag_kfuncs: failed to tag kfunc 'bpf_send_signal_task'
+>   NM      .tmp_vmlinux1.syms
+>   KSYMS   .tmp_vmlinux1.kallsyms.S
+>   AS      .tmp_vmlinux1.kallsyms.o
+>   LD      .tmp_vmlinux2
+>   NM      .tmp_vmlinux2.syms
+>   KSYMS   .tmp_vmlinux2.kallsyms.S
+>   AS      .tmp_vmlinux2.kallsyms.o
+>   LD      vmlinux
+>   BTFIDS  vmlinux
+> WARN: resolve_btfids: unresolved symbol prog_test_ref_kfunc
+> WARN: resolve_btfids: unresolved symbol bpf_crypto_ctx
+> WARN: resolve_btfids: unresolved symbol bpf_send_signal_task
+> WARN: resolve_btfids: unresolved symbol bpf_modify_return_test_tp
+> WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_xdp
+> WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_skb
+>
+> Signed-off-by: Thomas Wei=C3=9Fschuh <linux@weissschuh.net>
+> ---
+> Changes in v2:
+> - Properly use BTF_ID_UNUSED in special_kfunc_list()
+> - Link to v1: https://lore.kernel.org/r/20241213-bpf-cond-ids-v1-1-881849=
+997219@weissschuh.net
+> ---
+>  kernel/bpf/helpers.c  |  4 ++++
+>  kernel/bpf/verifier.c | 11 +++++++++++
+>  2 files changed, 15 insertions(+)
+>
+> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+> index 751c150f9e1cd7f56e6a2b68a7ebb4ae89a30d2d..5edf5436a7804816b7dcf1bbe=
+f2624d71a985f20 100644
+> --- a/kernel/bpf/helpers.c
+> +++ b/kernel/bpf/helpers.c
+> @@ -3089,7 +3089,9 @@ BTF_ID_FLAGS(func, bpf_task_get_cgroup1, KF_ACQUIRE=
+ | KF_RCU | KF_RET_NULL)
+>  BTF_ID_FLAGS(func, bpf_task_from_pid, KF_ACQUIRE | KF_RET_NULL)
+>  BTF_ID_FLAGS(func, bpf_task_from_vpid, KF_ACQUIRE | KF_RET_NULL)
+>  BTF_ID_FLAGS(func, bpf_throw)
+> +#ifdef CONFIG_BPF_EVENTS
+>  BTF_ID_FLAGS(func, bpf_send_signal_task, KF_TRUSTED_ARGS)
+> +#endif
+>  BTF_KFUNCS_END(generic_btf_ids)
+>
+>  static const struct btf_kfunc_id_set generic_kfunc_set =3D {
+> @@ -3135,7 +3137,9 @@ BTF_ID_FLAGS(func, bpf_dynptr_is_null)
+>  BTF_ID_FLAGS(func, bpf_dynptr_is_rdonly)
+>  BTF_ID_FLAGS(func, bpf_dynptr_size)
+>  BTF_ID_FLAGS(func, bpf_dynptr_clone)
+> +#ifdef CONFIG_NET
+>  BTF_ID_FLAGS(func, bpf_modify_return_test_tp)
+> +#endif
+>  BTF_ID_FLAGS(func, bpf_wq_init)
+>  BTF_ID_FLAGS(func, bpf_wq_set_callback_impl)
+>  BTF_ID_FLAGS(func, bpf_wq_start)
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index 77f56674aaa99a0b88ced5100ba57409e255fd29..2704fa4477ee2504897c82f04=
+16aa7d61fb086ed 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+> @@ -5507,7 +5507,9 @@ static bool in_rcu_cs(struct bpf_verifier_env *env)
+>
+>  /* Once GCC supports btf_type_tag the following mechanism will be replac=
+ed with tag check */
+>  BTF_SET_START(rcu_protected_types)
+> +#ifdef CONFIG_NET
+>  BTF_ID(struct, prog_test_ref_kfunc)
+> +#endif
+>  #ifdef CONFIG_CGROUPS
+>  BTF_ID(struct, cgroup)
+>  #endif
+> @@ -5515,7 +5517,9 @@ BTF_ID(struct, cgroup)
+>  BTF_ID(struct, bpf_cpumask)
+>  #endif
+>  BTF_ID(struct, task_struct)
+> +#ifdef CONFIG_CRYPTO
+>  BTF_ID(struct, bpf_crypto_ctx)
+> +#endif
+>  BTF_SET_END(rcu_protected_types)
+>
+>  static bool rcu_protected_object(const struct btf *btf, u32 btf_id)
+> @@ -11486,8 +11490,10 @@ BTF_ID(func, bpf_rdonly_cast)
+>  BTF_ID(func, bpf_rbtree_remove)
+>  BTF_ID(func, bpf_rbtree_add_impl)
+>  BTF_ID(func, bpf_rbtree_first)
+> +#ifdef CONFIG_NET
+>  BTF_ID(func, bpf_dynptr_from_skb)
+>  BTF_ID(func, bpf_dynptr_from_xdp)
+> +#endif
+>  BTF_ID(func, bpf_dynptr_slice)
+>  BTF_ID(func, bpf_dynptr_slice_rdwr)
+>  BTF_ID(func, bpf_dynptr_clone)
+> @@ -11515,8 +11521,13 @@ BTF_ID(func, bpf_rcu_read_unlock)
+>  BTF_ID(func, bpf_rbtree_remove)
+>  BTF_ID(func, bpf_rbtree_add_impl)
+>  BTF_ID(func, bpf_rbtree_first)
+> +#ifdef CONFIG_NET
+>  BTF_ID(func, bpf_dynptr_from_skb)
+>  BTF_ID(func, bpf_dynptr_from_xdp)
+> +#else
+> +BTF_ID_UNUSED
+> +BTF_ID_UNUSED
+> +#endif
 
-Actually, you can simplify the above a bit by writing it as:
+The previous patch was already applied and it's too late
+to revert.
+Pls send an incremental fix with:
+Fixes: 00a5acdbf398 ("bpf: Fix configuration-dependent BTF function referen=
+ces")
 
-#define PERCPU_PTR(__p)                            \
-    ((typeof(*(__p)) __force __kernel *)(__force unsigned long)(__p)) \
-
-Uros.
+pw-bot: cr
 
