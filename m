@@ -1,86 +1,139 @@
-Return-Path: <netdev+bounces-153395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9CB19F7D4F
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:45:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 825729F7D53
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:48:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1487116C40A
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:45:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11694188B5CE
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B5E225775;
-	Thu, 19 Dec 2024 14:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805CA86343;
+	Thu, 19 Dec 2024 14:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKIvtwyv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhYIathI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A7541C79;
-	Thu, 19 Dec 2024 14:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E55678F2A
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 14:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734619535; cv=none; b=KimzroPHi3FqQCluOcK6bM1hIXBcb4V1S25NHjFWhh6UqFLo4Ddnc0U6n3jTi3xhcNBIITYh96L+8qFDeC2EKYdoFXUDgn5HWi/3RqbpRjMTqHBhklRUrbpgv1t47aQRNlR/Hd+wZUWE7t1xLiig1EAXdkHh88peBj6uDRtBh5c=
+	t=1734619715; cv=none; b=N3FN/hgSrzzDKl5iA6O4ByHLmI0CBB96Z8EAyTo0U+ykYLEuNyO0nSmtyy+IJOhjygwCxAQ5VLfwys6SXvY3mTI9V02F2JeY43hxDpzHgtUjgr7h10dz9yuyOgVDUHOwsnckUtmYBhMEUQ7caiX2hr2vbh4V36OgyigHj0HmuqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734619535; c=relaxed/simple;
-	bh=6f8nqFn0DLcwByMUHHSmStBbq0eGOyRVrO+eVq/o75Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JrxPZfG8qQ/fWekMIbVUPAayvDO8HcOyqB+4X8cpfZuz1mofgi+8kRgR58mxOtexWA+ZEiTjHGG8k2tddZuL+MeLUfOTwK80wVKUlsrAzY5zUHQZpFabP+ehIm77XJeAnRAVi2KRI1HLS0YUBokh2eSY+dQuxjoDkYXUgKcRlpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKIvtwyv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39C8BC4CED0;
-	Thu, 19 Dec 2024 14:45:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734619534;
-	bh=6f8nqFn0DLcwByMUHHSmStBbq0eGOyRVrO+eVq/o75Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vKIvtwyvfeCj5Ufr/H19zzXaqNRtYZweUOhLxxP9xXGkin6a1ks/l9IlBWt/LH1Ok
-	 5BJPmw/yr4tdoFYyaJ8NqwmN4hLHcVoCqH62qmC/d/L0Nbipsw1ODel97Wk+quwWuQ
-	 YsJBhS2PRI/r+ocd4ELx8mfhgS4QM6/MDVs9ft1eS+BmfPvYE/rY/wFEt+ebAMwRZU
-	 zUfAaCI4MW+YHn4R0ZnYvDOVKOwGykrWuRTvQArMZVs55gODKUf9YYgSwzdsyustPs
-	 xLNrSK1DIBpMzqp9j+BU3PIwYbabRBsdGhT+JXwUzIl+90nUDNI/i1YiL4QP9VDXw3
-	 9F16IExEq+Sag==
-Date: Thu, 19 Dec 2024 06:45:32 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net,
- michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org,
- ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me,
- asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, kory.maincent@bootlin.com,
- maxime.chevallier@bootlin.com, danieller@nvidia.com,
- hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
- przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
- rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us,
- bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com,
- aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com,
- daniel.zahka@gmail.com
-Subject: Re: [PATCH net-next v6 9/9] netdevsim: add HDS feature
-Message-ID: <20241219064532.36dc07b6@kernel.org>
-In-Reply-To: <CAMArcTWH=xuExBBxGjOL2OUCdkQiFm8PK4mBbyWcdrK282nS9w@mail.gmail.com>
-References: <20241218144530.2963326-1-ap420073@gmail.com>
-	<20241218144530.2963326-10-ap420073@gmail.com>
-	<20241218184917.288f0b29@kernel.org>
-	<CAMArcTWH=xuExBBxGjOL2OUCdkQiFm8PK4mBbyWcdrK282nS9w@mail.gmail.com>
+	s=arc-20240116; t=1734619715; c=relaxed/simple;
+	bh=sWynjvh9dabSYwRUA+Jjv/DQhoRvo7p8rsykS+/gwvY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FIcfwp+oIVQan9B1PP0LMKfQrx66JFh0Wrq1Jm64Qt1+jnbKOkkiijM7MJQNOSteDJb6rCqSFoVj7uBmItVCR1Kj96kXLVZMi7kOnwc3+ROP+ZuFKRazgiFqHdAoIsw/LNx5r+0ez/9jV1rvaul4GxgKxXo1NJ5ysweclXKYq8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NhYIathI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734619712;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sWynjvh9dabSYwRUA+Jjv/DQhoRvo7p8rsykS+/gwvY=;
+	b=NhYIathIyocgGho1PD7aKyFmz9IAkN0+sz06siKw2WET9E4V8sVtZ5YdsNEHZ7lW69r8p0
+	VmXtrbmqCo4Neeu6/DQfYYYjdLAfcO9M5vtbDQLoAgPVCPUDsuogE6RLsQ67f1ldxgwzYc
+	jgK0TLq+GQTw9JLZ945C1ivgujwNFPk=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-620-KP4lKimFNkiZ4Ptw-JTRtw-1; Thu, 19 Dec 2024 09:48:30 -0500
+X-MC-Unique: KP4lKimFNkiZ4Ptw-JTRtw-1
+X-Mimecast-MFC-AGG-ID: KP4lKimFNkiZ4Ptw-JTRtw
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-6efed40a56aso9416977b3.3
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 06:48:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734619709; x=1735224509;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sWynjvh9dabSYwRUA+Jjv/DQhoRvo7p8rsykS+/gwvY=;
+        b=lKUGeK3OhdQyo5MI3PUYqXQ7Tuc4vzjWXxaUHOGEjLAr92Y5sZsQzXYGsB7q0XXhhD
+         AtA0BLoDRrESaL5+mJQi99YO1pqG7IvnKOBf8yegCF8BovQoRqliNzIi9uNPOBGmFPdw
+         PB2qzo1xgkz9fMSRd4C6uaKwHYKUhL9hOsr/ZXNNI2mDldUAC5we8fJILGShHH243cDg
+         +HMc7Xtgdsfl5DURUiF8dW8UwqjK4hazea5430LgnHXOVtf744yyCQqHdLs/LAV53TUL
+         gehJLqGP+W4k5l6SImJp5u/3P3IFU4QyZIzBq9H+1XzpQv+0Uy63byPip4IOYN6dP8rN
+         fUtA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXDlG1SzT7y8VuEWtyMaokdjmjR1ZifesRsBeInL4f1wLQ+M8+EXLZw08lyVufjOXRWRsoBp4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy84/krqoHBVWyFFPoxR5g9A9B1NKXB8CzKbK9XL4EhUAGEeApt
+	uaF00v08NPyjPJAFItCMFiWoOM4UB3UHCa7NlY/dgZK5ZJn9I0wXERmEQBANLnLV3uPFepcMYbk
+	RwFs8vxB6nPsN4TpxUxW5DfXT5DoRmwmQ4MdtBJzM82aAfugZ8hkixV6aQg2ZgbAp82CCq2/y5M
+	+4xHz7/8fPir3MVmm1dJ7wUcOcCRvB
+X-Gm-Gg: ASbGncuT597SMSE7TUOwBDiVVspKj6wavETy4ka4cn2gE1BfLvadEoTQmkV6ETcMqRI
+	ThNniGoqxr60RMJ9m2Nu7RWiViXefKKz1YNpj
+X-Received: by 2002:a05:690c:d93:b0:6ef:146a:aac0 with SMTP id 00721157ae682-6f3e1b33cc6mr28410157b3.4.1734619709695;
+        Thu, 19 Dec 2024 06:48:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHgYDQOhtfDr+AO1Qgyag7331PuEiAbwWl2ozIO3vR/nCLHHckhLKLG/7TJoTfW7k7xl48SvjELlcyMVoR1Ttk=
+X-Received: by 2002:a05:690c:d93:b0:6ef:146a:aac0 with SMTP id
+ 00721157ae682-6f3e1b33cc6mr28409887b3.4.1734619709336; Thu, 19 Dec 2024
+ 06:48:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX> <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
+ <Z2LZ3HK05RH8OfP5@v4bel-B760M-AORUS-ELITE-AX> <s2k74f6zvjm7uexqfyej6txvoqgf6lkaa47igo2eh4pq55d4n2@wnrrcr6aa6lk>
+ <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
+ <Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX> <5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co>
+ <Z2N44ka8+l83XqcG@v4bel-B760M-AORUS-ELITE-AX> <fezrztdzj5bz54ys6qialz4w3bjqqxmhx74t2tnklbif6ns5dn@mtcjqnqbx6n4>
+ <722e8d32-fe5c-4522-be2b-5967fdbb6b30@rbox.co>
+In-Reply-To: <722e8d32-fe5c-4522-be2b-5967fdbb6b30@rbox.co>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 19 Dec 2024 15:48:18 +0100
+Message-ID: <CAGxU2F5VMGg--iv8Nxvmo_tGhHf_4d_hO5WuibXLUcwVVNgQEg@mail.gmail.com>
+Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Hyunwoo Kim <v4bel@theori.io>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jason Wang <jasowang@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	qwerty@theori.io
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 19 Dec 2024 23:37:45 +0900 Taehee Yoo wrote:
-> The example would be very helpful to me.
+On Thu, 19 Dec 2024 at 15:36, Michal Luczaj <mhal@rbox.co> wrote:
+>
+> On 12/19/24 09:19, Stefano Garzarella wrote:
+> > ...
+> > I think the best thing though is to better understand how to handle
+> > deassign, rather than checking everywhere that it's not null, also
+> > because in some cases (like the one in virtio-vsock), it's also
+> > important that the transport is the same.
+>
+> My vote would be to apply your virtio_transport_recv_pkt() patch *and* make
+> it impossible-by-design to switch ->transport from non-NULL to NULL in
+> vsock_assign_transport().
 
-Just to make sure nothing gets lost in translation, are you saying that:
- - the examples of tests I listed are useful; or
- - you'd appreciate examples of how to code up HDS in netdevsim; or
- - you'd appreciate more suitable examples of the tests?
+I don't know if that's enough, in this case the problem is that some
+response packets are intended for a socket, where the transport has
+changed. So whether it's null or assigned but different, it's still a
+problem we have to handle.
 
-:)
+So making it impossible for the transport to be null, but allowing it
+to be different (we can't prevent it from changing), doesn't solve the
+problem for us, it only shifts it.
+
+>
+> If I'm not mistaken, that would require rewriting vsock_assign_transport()
+> so that a new transport is assigned only once fully initialized, otherwise
+> keep the old one (still unhurt and functional) and return error. Because
+> failing connect() should not change anything under the hood, right?
+>
+
+Nope, connect should be able to change the transport.
+
+Because a user can do an initial connect() that requires a specific
+transport, this one fails maybe because there's no peer with that cid.
+Then the user can redo the connect() to a different cid that requires
+a different transport.
+
+Stefano
+
 
