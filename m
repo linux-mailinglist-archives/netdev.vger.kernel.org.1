@@ -1,201 +1,86 @@
-Return-Path: <netdev+bounces-153159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76DD39F7198
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:16:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9436D9F71A3
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:19:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B5DF188CD4B
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 01:16:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46109168FAD
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 01:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5EA22075;
-	Thu, 19 Dec 2024 01:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274EB41C72;
+	Thu, 19 Dec 2024 01:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l7BXrkjo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HekLFyLp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E27B67F
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 01:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CFD35960;
+	Thu, 19 Dec 2024 01:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734571009; cv=none; b=ij8qxrvfeSldpT4qlWeSV6CF7cpzrRYiGKuAvjcV+dsrhVMPQYBwibI2iRaNaXtBzqD6WRSvkuB+g/nA+9KLS2jD/4IC9/LNXscKVgYR2ccjKU7rU5ktfIMiC/9EkvTrMex4qYVUgQeSAcL41L6Eab2vi90WVJxWrXxx2OxVEQs=
+	t=1734571159; cv=none; b=W17bx+vmb0N9BlU3X1d/hJvj0CmJsdljoT6cXqnRRmTnLH+PtZYTy0eOxoBHfW25BRydhiMZW7yyrFB20y114vwKVMJBFlE1Wc5VFkwrX63Lzuud+enJTZJe8qKIiffVxGyQymkZRZ1OxLZF+MO9hOyVqsH/O2giKpaClxTWp+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734571009; c=relaxed/simple;
-	bh=ywjyRX0wFDmT3x6BXZ5aEoPG06dNitHbPnWy2rAW4jk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AlHfdeEUkYf3Q32EeWNVugtLSjHGFqy3wi3qYF81sspMKyaRSz/1777ox/Wro2yQxO19R/IFxrRI5Xdqp/ctg7B7Cpa+5djsOdOmiHJn1lJPKqKmsQz3p3RRtj/oBIVLLDYsKObBAgrkGoRRLa6166ShBBCH/KaGBUBj46WF/BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l7BXrkjo; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f57ee5de-bf8b-40ce-8883-904653c422b5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734570994;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DC46yMvTlgzEmr0S66jR2jZbGeEUYCTIBmtIkpXV5Ro=;
-	b=l7BXrkjozgkPNpas5+kAiX+q2j98MYIoZlW5dBlq+gXOj6hofb+SlBfFPHhtMwlLDY4X+d
-	LQcQtoP1FybyUSCN3Q1OG+rrFIYHoVtgbHMOKC+xBNCc8XXmuRaE/8u4qgYVg0jBQKt60d
-	IMlmtNaS168kuLe0k+lSeADE4Pt3zz4=
-Date: Wed, 18 Dec 2024 17:16:27 -0800
+	s=arc-20240116; t=1734571159; c=relaxed/simple;
+	bh=WgKrOQgc5+ve3ZEs3d+wbWdTrA44m5zY+NgdD/BDjKk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gwwxH6yzeSzu2iixbIYGZsuElfx03GzHvYUrxyynj1fskqlVyce2miJJI1DxP3fUD/V/1M2XBTZHXjH+ByUNnj3cmHjSYFyKcV9Xq0ZANLtU4R1yLUW0Z3R4KxcEIpUXncNk5hc9yNYA9ZuHMAwzYczGdfNPFgQ2KnqM3yYIFKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HekLFyLp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301B1C4CECD;
+	Thu, 19 Dec 2024 01:19:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734571157;
+	bh=WgKrOQgc5+ve3ZEs3d+wbWdTrA44m5zY+NgdD/BDjKk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HekLFyLp4SrCKPmY5L8j2MeK+4ZuTsqK6fI8koG/ZKdSytND9ZyY44zwKlTOLUFWo
+	 UR0tJV37jgCFCdRoA5r+tAdWmEzAfJa8frBLSMr8iRuthRU67Cp9lutbr+/2b0YCqr
+	 LjI+e1eoMk323iyi5s4hy1ngIIaAaVFgpSFEnZc2Umml2fkLcaG+McO/xZUoodBFUl
+	 6fXxv2+YxOXMFoZcBbOS8lPV14Vic/iGrYptQ1Bn4iudzfK7UuTt7a+JZFoOwtAwT+
+	 H8mHUs8F3/JMIeSe73Y6Q2XuNZgZHQA2sSpK4ypoN0WyT3cw7FPG8SBYFRN1JKyJAT
+	 W9Zxccha2uS1A==
+Date: Wed, 18 Dec 2024 17:19:16 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Furong Xu <0x1207@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ xfr@outlook.com
+Subject: Re: [PATCH net-next v1] net: stmmac: TSO: Simplify the code flow of
+ DMA descriptor allocations
+Message-ID: <20241218171916.24a7e24f@kernel.org>
+In-Reply-To: <20241213030006.337695-1-0x1207@gmail.com>
+References: <20241213030006.337695-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v1 07/13] bpf: net_sched: Add a qdisc watchdog
- timer
-To: Amery Hung <amery.hung@bytedance.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
- sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
- stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
- yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com,
- ameryhung@gmail.com
-References: <20241213232958.2388301-1-amery.hung@bytedance.com>
- <20241213232958.2388301-8-amery.hung@bytedance.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241213232958.2388301-8-amery.hung@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 12/13/24 3:29 PM, Amery Hung wrote:
-> Add a watchdog timer to bpf qdisc. The watchdog can be used to schedule
-> the execution of qdisc through kfunc, bpf_qdisc_schedule(). It can be
-> useful for building traffic shaping scheduling algorithm, where the time
-> the next packet will be dequeued is known.
-> 
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> ---
->   include/net/sch_generic.h |  4 +++
->   net/sched/bpf_qdisc.c     | 51 ++++++++++++++++++++++++++++++++++++++-
->   net/sched/sch_api.c       | 11 +++++++++
->   net/sched/sch_generic.c   |  8 ++++++
->   4 files changed, 73 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> index 5d74fa7e694c..6a252b1b0680 100644
-> --- a/include/net/sch_generic.h
-> +++ b/include/net/sch_generic.h
-> @@ -1357,4 +1357,8 @@ static inline void qdisc_synchronize(const struct Qdisc *q)
->   		msleep(1);
->   }
->   
-> +int bpf_qdisc_init_pre_op(struct Qdisc *sch, struct nlattr *opt, struct netlink_ext_ack *extack);
-> +void bpf_qdisc_destroy_post_op(struct Qdisc *sch);
-> +void bpf_qdisc_reset_post_op(struct Qdisc *sch);
-> +
->   #endif
-> diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-> index 28959424eab0..7c155207fe1e 100644
-> --- a/net/sched/bpf_qdisc.c
-> +++ b/net/sched/bpf_qdisc.c
-> @@ -8,6 +8,10 @@
->   
->   static struct bpf_struct_ops bpf_Qdisc_ops;
->   
-> +struct bpf_sched_data {
-> +	struct qdisc_watchdog watchdog;
-> +};
-> +
->   struct bpf_sk_buff_ptr {
->   	struct sk_buff *skb;
->   };
-> @@ -17,6 +21,32 @@ static int bpf_qdisc_init(struct btf *btf)
->   	return 0;
->   }
->   
-> +int bpf_qdisc_init_pre_op(struct Qdisc *sch, struct nlattr *opt,
-> +			  struct netlink_ext_ack *extack)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +
-> +	qdisc_watchdog_init(&q->watchdog, sch);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL(bpf_qdisc_init_pre_op);
-> +
-> +void bpf_qdisc_reset_post_op(struct Qdisc *sch)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +
-> +	qdisc_watchdog_cancel(&q->watchdog);
-> +}
-> +EXPORT_SYMBOL(bpf_qdisc_reset_post_op);
-> +
-> +void bpf_qdisc_destroy_post_op(struct Qdisc *sch)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +
-> +	qdisc_watchdog_cancel(&q->watchdog);
-> +}
-> +EXPORT_SYMBOL(bpf_qdisc_destroy_post_op);
+On Fri, 13 Dec 2024 11:00:06 +0800 Furong Xu wrote:
+> -		if (priv->dma_cap.addr64 <= 32)
+> -			desc->des0 = cpu_to_le32(curr_addr);
+> -		else
+> -			stmmac_set_desc_addr(priv, desc, curr_addr);
+> -
+> +		stmmac_set_desc_addr(priv, desc, curr_addr);
 
-These feel like the candidates for the ".gen_prologue" and ".gen_epilogue". Then 
-the changes to sch_api.c is not needed.
+I can't figure out if this is correct or not in a reasonable amount of
+time. dwmac4 and dwxgmac2 looks pretty obviously okay. But there are
+also ndesc and enh, which don't seem to map to platform in an obvious
+way to an outside reviewer.
 
-> +
->   static const struct bpf_func_proto *
->   bpf_qdisc_get_func_proto(enum bpf_func_id func_id,
->   			 const struct bpf_prog *prog)
-> @@ -134,12 +164,25 @@ __bpf_kfunc void bpf_qdisc_skb_drop(struct sk_buff *skb,
->   	__qdisc_drop(skb, (struct sk_buff **)to_free_list);
->   }
->   
-> +/* bpf_qdisc_watchdog_schedule - Schedule a qdisc to a later time using a timer.
-> + * @sch: The qdisc to be scheduled.
-> + * @expire: The expiry time of the timer.
-> + * @delta_ns: The slack range of the timer.
-> + */
-> +__bpf_kfunc void bpf_qdisc_watchdog_schedule(struct Qdisc *sch, u64 expire, u64 delta_ns)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +
-> +	qdisc_watchdog_schedule_range_ns(&q->watchdog, expire, delta_ns);
-> +}
-> +
->   __bpf_kfunc_end_defs();
->   
->   #define BPF_QDISC_KFUNC_xxx \
->   	BPF_QDISC_KFUNC(bpf_skb_get_hash, KF_TRUSTED_ARGS) \
->   	BPF_QDISC_KFUNC(bpf_kfree_skb, KF_RELEASE) \
->   	BPF_QDISC_KFUNC(bpf_qdisc_skb_drop, KF_RELEASE) \
-> +	BPF_QDISC_KFUNC(bpf_qdisc_watchdog_schedule, KF_TRUSTED_ARGS) \
->   
->   BTF_KFUNCS_START(bpf_qdisc_kfunc_ids)
->   #define BPF_QDISC_KFUNC(name, flag) BTF_ID_FLAGS(func, name, flag)
-> @@ -154,9 +197,14 @@ BPF_QDISC_KFUNC_xxx
->   
->   static int bpf_qdisc_kfunc_filter(const struct bpf_prog *prog, u32 kfunc_id)
->   {
-> -	if (kfunc_id == bpf_qdisc_skb_drop_ids[0])
-> +	if (kfunc_id == bpf_qdisc_skb_drop_ids[0]) {
->   		if (strcmp(prog->aux->attach_func_name, "enqueue"))
->   			return -EACCES;
-> +	} else if (kfunc_id == bpf_qdisc_watchdog_schedule_ids[0]) {
-> +		if (strcmp(prog->aux->attach_func_name, "enqueue") &&
-> +		    strcmp(prog->aux->attach_func_name, "dequeue"))
-> +			return -EACCES;
-> +	}
->   
->   	return 0;
->   }
-> @@ -189,6 +237,7 @@ static int bpf_qdisc_init_member(const struct btf_type *t,
->   	case offsetof(struct Qdisc_ops, priv_size):
->   		if (uqdisc_ops->priv_size)
->   			return -EINVAL;
-> +		qdisc_ops->priv_size = sizeof(struct bpf_sched_data);
-
-ah. ok. The priv_size case is still needed.
-
-
+Please provide more context/guidance in the commit message, otherwise
+this looks like a high risk refactoring for a driver this poorly
+designed.
+-- 
+pw-bot: cr
 
