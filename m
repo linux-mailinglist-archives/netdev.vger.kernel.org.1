@@ -1,159 +1,140 @@
-Return-Path: <netdev+bounces-153408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2ADA9F7DC9
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:15:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE16F9F7DCE
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:15:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3757E16FA62
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:13:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C3F61629EE
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA2F22579B;
-	Thu, 19 Dec 2024 15:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254B4225784;
+	Thu, 19 Dec 2024 15:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEt5451k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SpFg9ObS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2A8225792
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 15:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CAF41C64;
+	Thu, 19 Dec 2024 15:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734621181; cv=none; b=HadO+9I0eC/uTh8MmcWIyKXypBjGwjQKPCo0dLLmWI2O+yzT9+oC0BDeLUKMTlLVUCHl/OEFC3qweI3Fh4Fc2O8w/Vm6HVjlZ8CRgj3vnKf6PZ+XvKmtythcdmrKOA23J1NZMYZgvzyWaIcNxkPeVM4EWG0tIYPIl2zAXFcjZ/I=
+	t=1734621257; cv=none; b=hs7II/JHfcqzUyIQqbaonqNPaREd7qC+Rs3uRsxstBuKp/r8P3qxwygmsXW33QqS18qswn1dSXsS7FO/8gGdXgbVjAPvYm/SvS+Mybt48SAsmmT6wabTtOmkI7ibAPdQykJc2epxMrwhC1luRMZIjoiEkrerG+uhhxZg1ubeSp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734621181; c=relaxed/simple;
-	bh=BS1e2dHZHI3fvwxGNU/s5HGMxXY4wseBqH7EwQUXzlA=;
+	s=arc-20240116; t=1734621257; c=relaxed/simple;
+	bh=lmQB6ZImK2UMRsAhsCHDt9W1HPsGOTifgLSoKJRzUao=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ddr0YzmwEC9pJmdOuIoCt0JIgoZA1ATaAdge5nWIObgWX4KOr8HcG47yO0Dni1nTbOriKhVJclmvNxSDsn10uQfTwABusYiRo2WZSu0u7X1zZOIJ9apI7D1ypvpkd00/lAVCDsn1WpnhrtPXnvKj9TqT1kfTkO4nj9uo+VgtrNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AEt5451k; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734621178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BS1e2dHZHI3fvwxGNU/s5HGMxXY4wseBqH7EwQUXzlA=;
-	b=AEt5451kIRhN0WaDPeYIDwUZjQJuMQHDCz2j0JAPd+Kkh80xv5BpN/puDwGt34u6XewBHG
-	I+4Xs86BNTPUfpD9aIELqTjURqDERpYLINoeIpEDIS1h9MHU6/x3S3T+LnI5ZNFmzE1UK1
-	KSBKbg2RekEsgTe5ri3vvji8NXa2CQE=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-vFLECKWuNmC0hvaiA1qhZQ-1; Thu, 19 Dec 2024 10:12:57 -0500
-X-MC-Unique: vFLECKWuNmC0hvaiA1qhZQ-1
-X-Mimecast-MFC-AGG-ID: vFLECKWuNmC0hvaiA1qhZQ
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-6f2b3f1eb8cso9308217b3.2
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 07:12:57 -0800 (PST)
+	 To:Cc:Content-Type; b=pxOHU/uv/+B/ON0QDQLmCUiy69SlCrx7qCOjp40gE8GnqvW5sRCLlt6AokCiB9Wvft7pucBaw5HbExoR8VdblNMoJ4FYjIsx8AV0Rgl7TD5Cn+nXBY3xTvtB3CkWCB7AXVfITCHEMJQGDiHOtSjv9TyF6KFFnsluDk9JNLV55Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SpFg9ObS; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d3e8f64d5dso1577249a12.3;
+        Thu, 19 Dec 2024 07:14:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734621254; x=1735226054; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KE+gvEw/fT7toeK0Wn7EsKMrAhVGbItWCmR6ayk++sU=;
+        b=SpFg9ObSOP1frzcqzsldfX++CItbtlag+dX7smyJ44JioK9OC6XfsnngTDTihXw41e
+         zjxU/qn49VdIHPdJkae/ouRiD/7f/0FE+SvkFm0r4G+Dq7qiEbAqsZ7nqCH6K9DFla3z
+         RCiXZRvutD9s50T2gvY+XMdz7RmqroZ76bfam+YFYw8ZTLbA7HLjJA/C5q2rL25L7I6x
+         hAFW0ZSvgDTzE1ijKssanyiBJYO82pwJs/0qLBPjEO7jhtRTnqqBcVjBL/xoUPjfn8cf
+         EtzvUENg0IjSOcDEjgE4FJbYOKa8CjOqEcu62DT6kAkRmsZb6WuIZFmd9eMPJD3o+Bm8
+         PM8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734621176; x=1735225976;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BS1e2dHZHI3fvwxGNU/s5HGMxXY4wseBqH7EwQUXzlA=;
-        b=A0hbeNI0qkwospGkG+YVNg9XQtcFNCaAXhb2v/O1VBCyMKV11UnyvbUx82EFcFE4C7
-         d6DEPAxua6Sbi2CnjFhguyNgt9o9oUH/9ouyiYsuZkrUBJiWEVRmAaLJxhpLLnKh9VIt
-         xCrxYlukl0pRlVgsK8rRUdxd7WHr54l7rDkduRHzA7zMwW4tWqKxPMMQuB4g7cdWi9mF
-         xQq/ZHSt2gXjpKf9sqiE52dZecz4J2sBJj9tmRqTsuzS4cgJOTSaEqWyPFuMCm7MjwKQ
-         nh1aHUzeL1n+OFZtrk89jDitElR7vEjJZ/KZ9YwNAN8ro5bhhiYMWFloxF6az4GIqWcz
-         t+Kg==
-X-Forwarded-Encrypted: i=1; AJvYcCWYnM4S//1NfA94U5KR6X/Sgnb0Vo80D2laLAgb8aExoF7NQQxZGEax3DXVwgzdt2V27hBk2jM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3FZipPvNlOf8yAsU/wtdXispQTwUVJPxvEZWW7V9Vl1XXKx/f
-	XdRPKwPY/YDR8r890e3Kg05Hol9o2pTALlJCfQyLdr3TaKswSAhEbiUxH0NUr1jtFwEA8K2vIhd
-	lW+zOnNth8ooEE4KGRPwJk4ApWRa3wGsLDVgLqhTXfjrgl9hjCHr/hwLfTF1Jsqa/xW1ojRP/J+
-	SrNhHvHBQVJu1F6QEeOiC99Qg6YDdv
-X-Gm-Gg: ASbGncu84Tofe6LYQ7LvKZtDQgigo+9SKFIRvwkfOf1sZ2gB5FSqrzV4iQpBDWux1+n
-	YaUyrx1cLNpeKF9LduEY+jijd7kgOg20j7fHC
-X-Received: by 2002:a05:690c:6d0c:b0:6ef:81c0:5b56 with SMTP id 00721157ae682-6f3e1b5ce05mr41292427b3.14.1734621176510;
-        Thu, 19 Dec 2024 07:12:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH1e1vKWNdpMhQtoYe0ECNznGPLcHrkVfOEIgjsb3Ce0adQykjZ0v+sCHN5/nm1oh7Kq8n+MtXssaBfGQPaLyA=
-X-Received: by 2002:a05:690c:6d0c:b0:6ef:81c0:5b56 with SMTP id
- 00721157ae682-6f3e1b5ce05mr41291937b3.14.1734621176096; Thu, 19 Dec 2024
- 07:12:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734621254; x=1735226054;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KE+gvEw/fT7toeK0Wn7EsKMrAhVGbItWCmR6ayk++sU=;
+        b=cO8SYSGnfhV5dfKO+YZwtixTaJr8jEbjRuk6yTZCSFVfp+IMKcj0cz6SNTdRvMxbv6
+         I1ZTXvpis3dJ6RgOYhTO9eprgBr3McETHPmrLX8i1xsv7MJ82anJcf16TcPBd5HhCxrG
+         ckMZ+kKm0cQL6AQpw/Z7WsDjUWvmkrEuQ7HfIeyvywgQorT8699L6zf9DyGOBkVzoEfH
+         3c0OI80RDBoL13hC2My9LiLtuieQq+CdiYd5KOYy3YMMV7tHGSQwVexiE55TVrcsIvFI
+         HyGS4ookKskj4Ujox60L2Yt8ogCx830RMyiLI0fuphRZRMl8cT4gt6gpz+qNedtQo4gF
+         Wrlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVg+Dzie91Q7WpMFL5rXUnoTXXcptKBFsKU8n+UZZ4LTk2skb77gDq/D/PwMuhRoixEjYYi/p7B0AU=@vger.kernel.org, AJvYcCXNpWfXFq3MxYX0D9HIr0jacup9jdt4q6BbQhQz/I3p2yR5dB4Q2SQMyBl9BTUSA5EvhZyNCEJc@vger.kernel.org
+X-Gm-Message-State: AOJu0Yws0gE9o1zSC/QXBoLpGoWG6YXtG2MlIkI5m/ozIexZPi/Bxcec
+	JxQDUElTNt0Up6EdQxrH7Vb64YX/+XoCl4RPd9gw6T42Nw1t/ADnLs4Mz8AHW8pU0uhvxw4uaYo
+	E3R9NYyHRqxqLYLpNQOq9lrsqT1s=
+X-Gm-Gg: ASbGncvZerBroTiFQR2bIOlqFQgPpf6cPyY6Dd2lBocHD4LT4gANVi1x/+TlggHOiLU
+	6qn+mkeW9Hx/L+QShGx8CUuBhN8PCIJFAU0ZttqA=
+X-Google-Smtp-Source: AGHT+IFLoYAYxtFOQGp9bUCzx/j78L2g4AATrA7ieG2lh/+k7wCxeq+giYsgTyqf5JURsqnZqKkf8Mpe8l93hUb4AOI=
+X-Received: by 2002:a05:6402:5109:b0:5cf:a1c1:5289 with SMTP id
+ 4fb4d7f45d1cf-5d7ee3ff16cmr5491845a12.21.1734621253481; Thu, 19 Dec 2024
+ 07:14:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX> <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
- <Z2LZ3HK05RH8OfP5@v4bel-B760M-AORUS-ELITE-AX> <s2k74f6zvjm7uexqfyej6txvoqgf6lkaa47igo2eh4pq55d4n2@wnrrcr6aa6lk>
- <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
- <Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX> <5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co>
- <Z2N44ka8+l83XqcG@v4bel-B760M-AORUS-ELITE-AX> <fezrztdzj5bz54ys6qialz4w3bjqqxmhx74t2tnklbif6ns5dn@mtcjqnqbx6n4>
- <722e8d32-fe5c-4522-be2b-5967fdbb6b30@rbox.co> <CAGxU2F5VMGg--iv8Nxvmo_tGhHf_4d_hO5WuibXLUcwVVNgQEg@mail.gmail.com>
- <cc04fe7a-aa49-47a7-8d54-7a0e7c5bfbdc@rbox.co>
-In-Reply-To: <cc04fe7a-aa49-47a7-8d54-7a0e7c5bfbdc@rbox.co>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 19 Dec 2024 16:12:44 +0100
-Message-ID: <CAGxU2F5K+0s9hnk=uuC_fE=otrH+iSe7OVi1gQbDjr7xt5wY9g@mail.gmail.com>
-Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Hyunwoo Kim <v4bel@theori.io>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jason Wang <jasowang@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	qwerty@theori.io
+References: <20241218144530.2963326-1-ap420073@gmail.com> <20241218144530.2963326-4-ap420073@gmail.com>
+ <20241218182547.177d83f8@kernel.org> <CAMArcTXAm9_zMN0g_2pECbz3855xN48wvkwrO0gnPovy92nt8g@mail.gmail.com>
+ <20241219062942.0d84d992@kernel.org>
+In-Reply-To: <20241219062942.0d84d992@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Fri, 20 Dec 2024 00:14:01 +0900
+Message-ID: <CAMArcTUToUPUceEFd0Xh_JL8kVZOX=rTarpy1iOAD5KvRWP5Fg@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 3/9] bnxt_en: add support for tcp-data-split
+ ethtool command
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
+	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
+	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
+	willemb@google.com, daniel.zahka@gmail.com, 
+	Andy Gospodarek <gospo@broadcom.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 19 Dec 2024 at 16:05, Michal Luczaj <mhal@rbox.co> wrote:
+On Thu, Dec 19, 2024 at 11:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
 >
-> On 12/19/24 15:48, Stefano Garzarella wrote:
-> > On Thu, 19 Dec 2024 at 15:36, Michal Luczaj <mhal@rbox.co> wrote:
-> >>
-> >> On 12/19/24 09:19, Stefano Garzarella wrote:
-> >>> ...
-> >>> I think the best thing though is to better understand how to handle
-> >>> deassign, rather than checking everywhere that it's not null, also
-> >>> because in some cases (like the one in virtio-vsock), it's also
-> >>> important that the transport is the same.
-> >>
-> >> My vote would be to apply your virtio_transport_recv_pkt() patch *and* make
-> >> it impossible-by-design to switch ->transport from non-NULL to NULL in
-> >> vsock_assign_transport().
+> On Thu, 19 Dec 2024 23:05:30 +0900 Taehee Yoo wrote:
+> > > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/driver=
+s/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > > > index f88b641533fc..1bfff7f29310 100644
+> > > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > > > @@ -395,6 +395,10 @@ static int bnxt_xdp_set(struct bnxt *bp, struc=
+t bpf_prog *prog)
+> > > >                           bp->dev->mtu, BNXT_MAX_PAGE_MODE_MTU);
+> > > >               return -EOPNOTSUPP;
+> > > >       }
+> > > > +     if (prog && bp->flags & BNXT_FLAG_HDS) {
+> > > > +             netdev_warn(dev, "XDP is disallowed when HDS is enabl=
+ed.\n");
+> > > > +             return -EOPNOTSUPP;
+> > > > +     }
+> > >
+> > > And this check should also live in the core, now that core has access
+> > > to dev->ethtool->hds_config ? I think you can add this check to the
+> > > core in the same patch as the chunk referred to above.
 > >
-> > I don't know if that's enough, in this case the problem is that some
-> > response packets are intended for a socket, where the transport has
-> > changed. So whether it's null or assigned but different, it's still a
-> > problem we have to handle.
-> >
-> > So making it impossible for the transport to be null, but allowing it
-> > to be different (we can't prevent it from changing), doesn't solve the
-> > problem for us, it only shifts it.
+> > The bnxt_en disallows setting up both single and multi buffer XDP, but =
+core
+> > checks only single buffer XDP. So, if multi buffer XDP is attaching to
+> > the bnxt_en driver when HDS is enabled, the core can't filter it.
 >
-> Got it. I assumed this issue would be solved by `vsk->transport !=
-> &t->transport` in the critical place(s).
->
-> (Note that BPF doesn't care if transport has changed; BPF just expects to
-> have _a_ transport.)
->
-> >> If I'm not mistaken, that would require rewriting vsock_assign_transport()
-> >> so that a new transport is assigned only once fully initialized, otherwise
-> >> keep the old one (still unhurt and functional) and return error. Because
-> >> failing connect() should not change anything under the hood, right?
-> >>
-> >
-> > Nope, connect should be able to change the transport.
-> >
-> > Because a user can do an initial connect() that requires a specific
-> > transport, this one fails maybe because there's no peer with that cid.
-> > Then the user can redo the connect() to a different cid that requires
-> > a different transport.
->
-> But the initial connect() failing does not change anything under the hood
-> (transport should/could stay NULL).
+> Hm. Did you find this in the code, or did Broadcom folks suggest it?
+> AFAICT bnxt supports multi-buf XDP. Is there something in the code
+> that special-cases aggregation but doesn't work for pure HDS?
 
-Nope, isn't null, it's assigned to a transport, because for example it
-has to send a packet to connect to the remote CID and wait back for a
-response that for example says the CID doesn't exist.
-
-> Then a successful re-connect assigns
-> the transport (NULL -> non-NULL). And it's all good because all I wanted to
-> avoid (because of BPF) was non-NULL -> NULL. Anyway, that's my possibly
-> shallow understanding :)
->
-
+There were some comments about HDS with XDP in the following thread.
+https://lore.kernel.org/netdev/20241022162359.2713094-1-ap420073@gmail.com/=
+T/
+I may misunderstand reviews from Broadcom folks.
 
