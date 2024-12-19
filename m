@@ -1,130 +1,199 @@
-Return-Path: <netdev+bounces-153378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2919F7CCD
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:06:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 291C69F7CD7
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:11:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4B3161C51
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:05:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72A391651E6
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDCF2253ED;
-	Thu, 19 Dec 2024 14:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F007C224AFB;
+	Thu, 19 Dec 2024 14:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LnvOMPbI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxQc1liR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AD3224AF7
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 14:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C5A2111;
+	Thu, 19 Dec 2024 14:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734617148; cv=none; b=Ir86zlKWh7E7sWJ3uci0GuY3tThLgf9w+/eSOqUe/DigmogJLUKg1QGbiZW5mSzszuWE68GEAIA0QRHpZT9MVZ82NYEa6UwgHm0cHfyy1Qd0mBGXsjhM6lirLGMDwQaLfEX52HN/iEMPFfaEIeTWVK2VzKDgzsnkYUqWYYOpdds=
+	t=1734617454; cv=none; b=jGyFVPKwfmaAr21Mg6LOVEL8faLtVtKpAtuTo/hdtVVznYzjsbXO1H0b/19d9RverWgzioSfLE2Z0kAkxIJokCUKrhle7O4xfkBHbL62oUODLwosr4Uutnw7FFzgjQxHRcOPzra3Bf4hnLeGfmGqDoIcyMBeRxAwLq19SK4Cv7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734617148; c=relaxed/simple;
-	bh=J4JIg8c7TLLtZwHomusVgchMc16scxcHnbRFolDuzJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=but7zNptTHm4ACGmxl25HVtrRux5OdFWiROze1CLYfonlzJ4wz9TKgz63HsJxS0usB2uYYrGbW/+KZ/QNmSGvoxHLBujwLLDINXHeRj8KJ5Y8Tot37yYK2OGFIihvaVloEFDmyj74j/svj/N/xKUQoIO/6SxIR8t0Qq55t5pFGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LnvOMPbI; arc=none smtp.client-ip=209.85.221.50
+	s=arc-20240116; t=1734617454; c=relaxed/simple;
+	bh=E3wf8TOoKmPE7cP1MXBQMHxHy5JaPrHfgU747vTnZ2Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q9taWiY/Oohl6V0w7MCXDjSheJKePSo8xwcRChGLJWYTYfouf9eB5BfnlI2Fo8Rfq716NVR/wk/8y+EUwPTJsIxm44kmmq/cGohzTEVwEgVWbySeXpW0taY1/mo9crQ3lzaKbg83X2GItjs+CD5WxTANfQ44tj4byY1YVn5xSts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxQc1liR; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3862a999594so33160f8f.0
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 06:05:46 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5d27243ba8bso1443099a12.2;
+        Thu, 19 Dec 2024 06:10:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734617145; x=1735221945; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BtXNKmzDehZwpVJC21KqNjR2sCn5ZrbtX9TMaSzw3VY=;
-        b=LnvOMPbI9OwD88hQ38VH00OcxQ8Q91LBVsN5ymJw3oRVku8BD2RyBlg8B/30lGBcGp
-         544HikCIFfzQNbzPZJIoPQarQwjT6wrmyANgtqIY4CacC7BYFcnXImSBYLKLFQFjcDwQ
-         03UVGy+/R3ExQ4C0EfEpiv+7q844JPCSkADW4DbznKDnEd2fKT4V32gMJU6QKi61GYLQ
-         eQHR16dIEWr86CSfyANCui7iC25l12Y30FB1Vs1Uct1yLZntac+yFTj7OdOZtJdv5YyN
-         y/esrm//GQ5uxDjy5vIYtRLnsQVilwJxExCDNrHu+yha1deOB6AOEYoGHHkzrYz8FEHA
-         mZhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734617145; x=1735221945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1734617451; x=1735222251; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BtXNKmzDehZwpVJC21KqNjR2sCn5ZrbtX9TMaSzw3VY=;
-        b=Ro9A7jvOJLnD25YuBwXtJIoqDYi5PD6aAXPBEpMG/wpfN93RmigriKRztFNgvlQTiv
-         yL+Vi4cFTQtfLtYkfzuc3omDYcJLuxMrzrc2NIVB8cAmu9cq3slDujuRt4uSxCFBhTqp
-         Lpv9prgvzOsNKbNdBUHtTSr3jAatoQWRnr9eQ1rukw8XyIDGhhdY6VNQhnerCVSWkm+b
-         UHoRK1b9v6dx/uxbncRjuB7JW+WwHYSHBYLmEvCwKm4kASS8xkbgYt30RIiCbzLWN2z2
-         Eot2dOpiEmYQm8kRCEEP3IM8YeXV35E6s2K939Me3oeDxRJX/0UUa5MCwb9t5ZgwAxLb
-         qfNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxI6R1l8omyY0Razt+0YqA/eP+eVAqOtsl/G2NTegMwWKnHuJPhkVvz7cdZwoHZ2vthijppUc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpQgRAMTxc0ihujJM4ctltBsk2ViOpDFO7QHbMtmGIyBlY39Wm
-	X5Y/BVzGyGiwRkGsn+qv8RkmducU+rodctCJ4rssxxL41OnQ/CI++Nhx18Hp
-X-Gm-Gg: ASbGnct3xX2DCDXGRu2kr/E6QBp83nUJ+iGJRwnlbV3mYHU9datak2A2uf4AfrYB8fI
-	w6J2drt1KPggYtN/Ynjeq3kncg0Z0yklk/hhSXSzRqrhEu94Wh1kHacwkeQlgXvqhzlN5coFK9e
-	s1OOrNdPecSHYytHnW1TKHef/ZenWXtR79BmBMlyJ1KwdzNCbWytrUxEoktgJ1RoEgXEbIvuV9j
-	+A4yLEhlm7A1ATUHGPwUnxHLL+1Aj5b/X8wunuhHGvZ
-X-Google-Smtp-Source: AGHT+IFDd30rUBj8nLpmRZiMcT/yUyc3dEV+ewV28KhXJ7MBcwaUVBJl8pvWAmp2wwFkK2byQqkMtg==
-X-Received: by 2002:a05:6000:4b0a:b0:385:df17:214f with SMTP id ffacd0b85a97d-388e4d8ab2cmr2232229f8f.9.1734617144626;
-        Thu, 19 Dec 2024 06:05:44 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366127c515sm19089595e9.30.2024.12.19.06.05.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 06:05:43 -0800 (PST)
-Date: Thu, 19 Dec 2024 16:05:41 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, netdev@vger.kernel.org, linux@armlinux.org.uk,
-	chris.packham@alliedtelesis.co.nz, pabeni@redhat.com
-Subject: Re: [PATCH v2 net 4/4] net: dsa: mv88e6xxx: Limit rsvd2cpu policy to
- user ports on 6393X
-Message-ID: <20241219140541.qmzzheu5ruhjjc63@skbuf>
-References: <20241219123106.730032-1-tobias@waldekranz.com>
- <20241219123106.730032-1-tobias@waldekranz.com>
- <20241219123106.730032-5-tobias@waldekranz.com>
- <20241219123106.730032-5-tobias@waldekranz.com>
+        bh=ofqsslm0RVD3ogGqNQ4RIQnAfKvNRRygfEx58KTogKk=;
+        b=TxQc1liRc5aO7oI/bkmFFirq8201Z1AUkNbRT3AEuPTzsRnG+jPnNyGp7r/1nfpDgt
+         p9RxkQ1lP8m5zcfMzbm2LGUye4kEweZHea7CzGTjRKyF6fR2QpOkXuyHeYGZN1XF/WUw
+         PYimSqEQkU+iTWmiNf4nlGuwAm5llrkdZ9ROtszVleqFnbQN5S94yGqKKEy0Pu6DgSqw
+         sOSx07eBpwc10fbdsxGcIYRZxWSnvGhDB6zZQkQdy5Jd+p+o4RIiMHg1BA5FWa1c3t5J
+         4umTzl0aDJlt2gwd+MJGK3Rk86gA+Lt8V4iWZhGVtvTUZbhPek2tg0RCgM6ygU/kl65u
+         NGEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734617451; x=1735222251;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ofqsslm0RVD3ogGqNQ4RIQnAfKvNRRygfEx58KTogKk=;
+        b=ZQjBlVxWmXCfuAXyzl/jT4aH0mkKeOOgB+4FPsYS4JuhciH8DtDM8g5uEIq3cK7BnU
+         Yf12TAi5kwP2J/Cr7YzB3ePZldts+09FR5ZldX73OA4oNFOEhKdKUjEvG7qX2Z0+/Tpf
+         S+Pxwfxe4y9WowBSxgHHF/hAszTnbC2sBeX/0MgMPhesQCQpmHvby5koHHyHcgLZatvE
+         QstAo3TKFfKKV3nMzUm9VT0fZaF6mobcDw8mM8Lv7bBEjIbRbpQkzRxY3Mf1xXL0nOdC
+         fALie73YUelwJ+UbtKlnG4ss4VRvjKMcSalXA19DVAaTeM7WYcWQZPj9mVaC0ORYubBW
+         5Z5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUtwpZvr0vReVJXFvyoNjH/198Hhfj1jc+xyTzY2cJsLjSVWJmN64DTIukac5p9RFjpKqfDBOC+@vger.kernel.org, AJvYcCXWJrl1hx7kEQHcJzEK6IrAhv8rOOk0n4TZ0kiax9ePvwiiIo+yd35d1TCicl6/W72Vrz5OmpfnkCg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQw5SqQwbyKziu2Jn9jcyYbXc//ZsD2c09sebovsiZ/CRv1QTv
+	s4mKclkLOOVsi0zkFVnwcwg6FcHQCDUVziLRtpkVcKwpKU2uzrCBewCcx4lXFD+/veM00xS/tcl
+	uIzvPl2O6atPKw+aogNyzlfnVMbk=
+X-Gm-Gg: ASbGnctKNw1BkvQBvGzxJqMPGbf1CSWR5uO+gneHuDJmMXbmhcAQE5SViI1p3jMjSgw
+	LHoAlwdlZ0fZnGUc8HtFRK0p6Ihk3NpHm/AVQhdI=
+X-Google-Smtp-Source: AGHT+IEzk6t2j53LVAASS7A1AuxYbOu4dy4dFxol4mCuy36/IYJaRA6nn75YoYOEPweKxadxqbfYrzeZR/q3CjrYtWs=
+X-Received: by 2002:a05:6402:43cd:b0:5d0:cfad:f6c with SMTP id
+ 4fb4d7f45d1cf-5d7ee418b93mr5684598a12.21.1734617451133; Thu, 19 Dec 2024
+ 06:10:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241219123106.730032-5-tobias@waldekranz.com>
- <20241219123106.730032-5-tobias@waldekranz.com>
+References: <20241218144530.2963326-1-ap420073@gmail.com> <20241218144530.2963326-5-ap420073@gmail.com>
+ <20241218183547.45273b87@kernel.org>
+In-Reply-To: <20241218183547.45273b87@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Thu, 19 Dec 2024 23:10:39 +0900
+Message-ID: <CAMArcTUCy2Wkrw5foPheHq=1x5SeDcwp0uvSniGzOGZudVqY+w@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 4/9] net: ethtool: add support for configuring hds-thresh
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
+	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
+	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
+	willemb@google.com, daniel.zahka@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 19, 2024 at 01:30:43PM +0100, Tobias Waldekranz wrote:
-> For packets with a DA in the IEEE reserved L2 group range, originating
-> from a CPU, forward it as normal, rather than classifying it as
-> management.
+On Thu, Dec 19, 2024 at 11:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Wed, 18 Dec 2024 14:45:25 +0000 Taehee Yoo wrote:
+> > diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> > index 4e451084d58a..4f407ce9eed1 100644
+> > --- a/include/linux/ethtool.h
+> > +++ b/include/linux/ethtool.h
+> > @@ -78,6 +78,8 @@ enum {
+> >   * @cqe_size: Size of TX/RX completion queue event
+> >   * @tx_push_buf_len: Size of TX push buffer
+> >   * @tx_push_buf_max_len: Maximum allowed size of TX push buffer
+> > + * @hds_thresh: Threshold value of header-data-split-thresh
+> > + * @hds_thresh_max: Maximum allowed threshold of header-data-split-thr=
+esh
+>
+> nit: s/allowed/supported/
 
-Doesn't this break STP? Must be able to inject into ports with an STP
-state other than FORWARDING. I expect that you need a DSA_CMD_FROM_CPU
-tag for that, can't do it with DSA_CMD_FORWARD.
+Thanks, I will change it.
 
-> Example use-case:
-> 
->      bridge (group_fwd_mask 0x4000)
->      / |  \
->  swp1 swp2 tap0
->    \   /
-> (mv88e6xxx)
-> 
-> We've created a bridge with a non-zero group_fwd_mask (allowing LLDP
-> in this example) containing a set of ports managed by mv88e6xxx and
-> some foreign interface (e.g. an L2 VPN tunnel).
-> 
-> Since an LLDP packet coming in to the bridge from the other side of
-> tap0 is eligable for tx forward offloading, a FORWARD frame destined
-> for swp1 and swp2 would be send to the conduit interface.
-> 
-> Before this change, due to rsvd2cpu being enabled on the CPU port, the
-> switch would try to trap it back to the CPU. Given that the CPU is
-> trusted, instead assume that it indeed meant for the packet to be
-> forwarded like any other.
+>
+> > +u8 dev_xdp_sb_prog_count(struct net_device *dev)
+> > +{
+> > +     u8 count =3D 0;
+> > +     int i;
+> > +
+> > +     for (i =3D 0; i < __MAX_XDP_MODE; i++)
+> > +             if (dev->xdp_state[i].prog &&
+> > +                 !dev->xdp_state[i].prog->aux->xdp_has_frags)
+> > +                     count++;
+> > +     return count;
+> > +}
+> > +EXPORT_SYMBOL_GPL(dev_xdp_sb_prog_count);
+>
+> No need to export this, AFAICT, none of the callers can be built
+> as a module.
 
-It looks like an oversight in the switchdev tx_fwd_offload scheme. Can't
-we teach nbp_switchdev_frame_mark_tx_fwd_offload() to make an exception
-for is_link_local_ether_addr() packets, and not set skb->offload_fwd_mark?
+Okay, I will not export this function.
+
+>
+> > +     hds_config_mod =3D old_hds_config !=3D kernel_ringparam.tcp_data_=
+split;
+>
+> Does it really matter if we modified the HDS setting for the XDP check?
+> Whether it was already set or the current config is asking for it to be
+> set having XDP SB and HDS is invalid, we can return an error.
+
+Right, it doesn't need to check modification.
+I will remove it.
+
+>
+> > +     if (kernel_ringparam.tcp_data_split =3D=3D ETHTOOL_TCP_DATA_SPLIT=
+_ENABLED &&
+> > +         hds_config_mod && dev_xdp_sb_prog_count(dev)) {
+> > +             NL_SET_ERR_MSG(info->extack,
+>
+>                 NL_SET_ERR_MSG_ATTR(info->extack,
+
+Thanks for it too, I will use it.
+
+>                                     tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT],
+>                                     ...
+>
+> > +                            "tcp-data-split can not be enabled with si=
+ngle buffer XDP");
+> > +             return -EINVAL;
+> > +     }
+> > +
+> > +     if (kernel_ringparam.hds_thresh > kernel_ringparam.hds_thresh_max=
+) {
+> > +             NL_SET_BAD_ATTR(info->extack,
+> > +                             tb[ETHTOOL_A_RINGS_HDS_THRESH_MAX]);
+> > +             return -ERANGE;
+> > +     }
+>
+> Can this condition not be handled by the big if "ladder" below?
+> I mean like this:
+
+Thanks for that, I will try to apply it!
+
+>
+> @@ -282,6 +276,8 @@ ethnl_set_rings(struct ethnl_req_info *req_info, stru=
+ct genl_info *info)
+>                 err_attr =3D tb[ETHTOOL_A_RINGS_RX_JUMBO];
+>         else if (ringparam.tx_pending > ringparam.tx_max_pending)
+>                 err_attr =3D tb[ETHTOOL_A_RINGS_TX];
+> +       else if (kernel_ringparam.hds_thresh > kernel_ringparam.hds_thres=
+h_max)
+> +               err_attr =3D tb[ETHTOOL_A_RINGS_HDS_THRESH_MAX];
+>         else
+>                 err_attr =3D NULL;
+>         if (err_attr) {
+>
+> >       /* ensure new ring parameters are within limits */
+> >       if (ringparam.rx_pending > ringparam.rx_max_pending)
+> >               err_attr =3D tb[ETHTOOL_A_RINGS_RX];
+
+Thanks a lot!
+Taehee Yoo
 
