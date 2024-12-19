@@ -1,215 +1,190 @@
-Return-Path: <netdev+bounces-153434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6093E9F7EDF
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:07:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 431CD9F7EF4
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:10:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E922E16CD35
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:06:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 107BE188F037
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2955A226885;
-	Thu, 19 Dec 2024 16:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C85226168;
+	Thu, 19 Dec 2024 16:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k2VhsN0O"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="YHY1GRX2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABDA143895;
-	Thu, 19 Dec 2024 16:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499DD136E09
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 16:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734624357; cv=none; b=MHP4PRoEN1g0AEMtSoapv+JmHpU7GPSMsLhIXa9kcs5eJ0fLNzSl20ySwM25bZAeccolY01y60PclEr3nDBiC5+Z/+RECwubqEgWzILBC1vEg+1pce/nxGUZZB0I3Er1WZd/FMw2Rp0pBjxDlOzoamTbRCT010sNqqJ/lxDVcf0=
+	t=1734624607; cv=none; b=GKWZFjB/9MlGI8rUYM6FqcVqDjuY9uTwwNJRA1QVkNxsI0NoxBEFcRr75Q+CrM4gTwHtKY6J8W7k5sm4lIRNRm+Qf8Lk5E9qEDRxB7jSeWKBsC07ohxW5b3+D8ICLjjepwzC0ia1zqPzHxq7CthnegRpfatfTQp61dkmS+ZSIAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734624357; c=relaxed/simple;
-	bh=K+jbPgvMzgj1ziZA052uh5kiEoslytI3nUGjoHGAEj4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JDZvsFoVe/HbTRPGOLfJTsnE2SB24ktBv584S7M457071Qzy1Ow1U+kmQRMyhyg97FCwVGyoauG79XVkG7FJ8ufnSmZxET5ve85lbcAqxlD84NQwQ9adm4G+oEgRB98+Z/H7UoubMCWZyLypgzuA6M9yicbqr1RhmyDGJgzxZl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k2VhsN0O; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3863c36a731so731773f8f.1;
-        Thu, 19 Dec 2024 08:05:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734624353; x=1735229153; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z917kOVPARb8dKIs9uBD/0/reoE5C4OJp1UlmVGQFbU=;
-        b=k2VhsN0OF6/JOL7iws+lxAMlBXCMGDh2ZKrzI4N6kOP+pGcVWXbOys7Pv/H9xDAdlz
-         v0Z8y0TfWwemuy+lN3e80tvHTwQ/30O7kCFAAzK60vGCVGfKpJlii2eqr1aK0LCQDiWA
-         LqfJd+vOKxVam2cumvEzMPnLdFxEIh88aM/punqcHg2sIt+mxRD8w1YU8UpeNl4PJmar
-         +FXvPrgmqmbMbPzu05zpKhOGlZpeSBPAomzCOGnXwSCuHt4B6rd49GpzE3vKqTGqeOzz
-         /dxdRD1ou3jY0U0Mcs86xA/SiXmnXl/5qq3Y/f5oREBE2dci+4YhvsKBp+ytVdX4G9J0
-         O3RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734624353; x=1735229153;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z917kOVPARb8dKIs9uBD/0/reoE5C4OJp1UlmVGQFbU=;
-        b=SUangQzzwuWDlv1zuZjTumzeKbppaxEBKQLeUKwOyqL61Mns2Uk0yNaTNbxS2wNpON
-         LheIv9gPL0JQIYTn0s922YZ+elshsQuuvquVAa09UYAwiomo2H1BYTB4MQ1TFywK4zRR
-         6CzVAKaDa7cmFbdfuhTvveyg9sdQbDZVxGj8vhwnpUF4DnOR9+SKQqVgVak+oX0Dj5Zf
-         JkDniV6a8+hJpgKiocSAg1926WUbJW5oK4eAaXWm4IUcC/3tC+NSoXy9K/uXvSzJmNhh
-         kIc5n6QjHrWhKh5wMNFfLUaoWS8xpI97lDdfbNdpExeUfMU/ViRemPx2A2zXkeXf6Yr/
-         tteg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlcj6JXcKHoqKjIzv2vvvAKTKFDsvHXdu8jG4U8Qn4eK3sazzgPVYGVpGU8bciBERrd7I317JpIdzD5Li3@vger.kernel.org, AJvYcCXBd7IybVwqJ8FlNHQbRmgCby9a/vpCjvPvSQNKJ/cvT1NyNmu/ha9Tqx7RYNj5J6Wm4YjtdbhQ@vger.kernel.org, AJvYcCXUOqXa+vjx/VCjYZUi0ERK1usD4ImSVQo6RJHuGu99IvQ6CeeGiMc42TF/eRS6IB9O+aM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE+mP0sJDLRjjI0n1isgcZ2o4Q6GsiYBXhf2ul67AGSKcycS+C
-	hRjsjbSdaBqlGR168VoiDjuCoyBpvDMLkm1xQnmICIQtzsGVOo+KH9gOiRctCVioiq/crGkfW5l
-	9W5YeJSxDbRIuYT8Qgx7CQ6Ipa1A=
-X-Gm-Gg: ASbGncuSVaragiGD1esTZGuI38ELNoilwavdOGvpNaQTIU7L5N4z06RayTTUEyeEOAq
-	s98boseNLQwhenSijgZ+p5vyCMvvlsZVW96hW0hMh
-X-Google-Smtp-Source: AGHT+IF4qH4MjsPrc029Wu90m92Gv0fVSgURCC1A2GlOpIw7H3s64v8s4SE4MhgK/yfKS7M/UQE4Ej/xAHod+0Uwx5Q=
-X-Received: by 2002:a5d:5f4f:0:b0:386:3262:28c6 with SMTP id
- ffacd0b85a97d-388e4d310d8mr7377658f8f.5.1734624353030; Thu, 19 Dec 2024
- 08:05:53 -0800 (PST)
+	s=arc-20240116; t=1734624607; c=relaxed/simple;
+	bh=w8uHLAOWytKhZ+2rc6CmLW4hjt/sBLkeIYoFGGtcGKc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aROrxWUCGXmC4do7ydTEUB7Q9GHmAlxi9hTVv2Q/Em0jhX3Dj36EHS7CXBmcQX708NNw8im1uJMviru67GYyEynlIpHP+K47UTTTPLXu7VMo4b6wSzYfiFPpnx7bfy4akTRgUjN8LHyirRG/d8sTxs4g69wJ+0a+oGIa0vo3vwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=YHY1GRX2; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tOJ63-008EMI-60; Thu, 19 Dec 2024 17:09:55 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=QVsORav3DcVAhBYvUaAOANSrKkq0cKBzJoIMSAjqDVQ=; b=YHY1GRX20+/b0sq3p9K21iUEom
+	dZjaWWOi64Qwp7hLn1BFKyXgIS1q1Grmj1rgvarCBURRp5Wxzcy6sCvOEcStIXUlNnBxUrUNnWfJV
+	WRjwhqXbJXQJpfgWM0Nxxrq5/NHy5MpkxEQMup1jKXDd0/2fGOuofaUVyoT83iZPEyWAQmDx1FKP8
+	4dglqCWayHf9FNLWF7ktY84iym1Dvm3c+SNOJU5c4ciuyPZQOjWiF99VwyZfxmJurUhLTz/YKD7o/
+	EiBXkv42H0qxVq55KYhbBlFwZg3Up3MH5LVH2w3nTGuQwLaI/PErMhSQ7NKr3BsKSzA3npCOyimbg
+	1LejDZog==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tOJ62-0002R7-6c; Thu, 19 Dec 2024 17:09:54 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tOJ5r-00Ealw-Pp; Thu, 19 Dec 2024 17:09:43 +0100
+Message-ID: <2906e706-bb0d-47c6-a4bb-9f3dc9ff7834@rbox.co>
+Date: Thu, 19 Dec 2024 17:09:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241219-bpf-cond-ids-v2-1-8f121cae5374@weissschuh.net>
-In-Reply-To: <20241219-bpf-cond-ids-v2-1-8f121cae5374@weissschuh.net>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 19 Dec 2024 08:05:42 -0800
-Message-ID: <CAADnVQJQpVziHzrPCCpGE5=8uzw2OkxP8gqe1FkJ6_XVVyVbNw@mail.gmail.com>
-Subject: Re: [PATCH bpf v2] bpf: fix configuration-dependent BTF function references
-To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Hyunwoo Kim <v4bel@theori.io>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org, qwerty@theori.io
+References: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX>
+ <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
+ <Z2LZ3HK05RH8OfP5@v4bel-B760M-AORUS-ELITE-AX>
+ <s2k74f6zvjm7uexqfyej6txvoqgf6lkaa47igo2eh4pq55d4n2@wnrrcr6aa6lk>
+ <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
+ <Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX>
+ <5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co>
+ <Z2N44ka8+l83XqcG@v4bel-B760M-AORUS-ELITE-AX>
+ <fezrztdzj5bz54ys6qialz4w3bjqqxmhx74t2tnklbif6ns5dn@mtcjqnqbx6n4>
+ <722e8d32-fe5c-4522-be2b-5967fdbb6b30@rbox.co>
+ <CAGxU2F5VMGg--iv8Nxvmo_tGhHf_4d_hO5WuibXLUcwVVNgQEg@mail.gmail.com>
+ <cc04fe7a-aa49-47a7-8d54-7a0e7c5bfbdc@rbox.co>
+ <CAGxU2F5K+0s9hnk=uuC_fE=otrH+iSe7OVi1gQbDjr7xt5wY9g@mail.gmail.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <CAGxU2F5K+0s9hnk=uuC_fE=otrH+iSe7OVi1gQbDjr7xt5wY9g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 18, 2024 at 11:24=E2=80=AFPM Thomas Wei=C3=9Fschuh <linux@weiss=
-schuh.net> wrote:
->
-> These BTF functions are not available unconditionally,
-> only reference them when they are available.
->
-> Avoid the following build warnings:
->
->   BTF     .tmp_vmlinux1.btf.o
-> btf_encoder__tag_kfunc: failed to find kfunc 'bpf_send_signal_task' in BT=
-F
-> btf_encoder__tag_kfuncs: failed to tag kfunc 'bpf_send_signal_task'
->   NM      .tmp_vmlinux1.syms
->   KSYMS   .tmp_vmlinux1.kallsyms.S
->   AS      .tmp_vmlinux1.kallsyms.o
->   LD      .tmp_vmlinux2
->   NM      .tmp_vmlinux2.syms
->   KSYMS   .tmp_vmlinux2.kallsyms.S
->   AS      .tmp_vmlinux2.kallsyms.o
->   LD      vmlinux
->   BTFIDS  vmlinux
-> WARN: resolve_btfids: unresolved symbol prog_test_ref_kfunc
-> WARN: resolve_btfids: unresolved symbol bpf_crypto_ctx
-> WARN: resolve_btfids: unresolved symbol bpf_send_signal_task
-> WARN: resolve_btfids: unresolved symbol bpf_modify_return_test_tp
-> WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_xdp
-> WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_skb
->
-> Signed-off-by: Thomas Wei=C3=9Fschuh <linux@weissschuh.net>
-> ---
-> Changes in v2:
-> - Properly use BTF_ID_UNUSED in special_kfunc_list()
-> - Link to v1: https://lore.kernel.org/r/20241213-bpf-cond-ids-v1-1-881849=
-997219@weissschuh.net
-> ---
->  kernel/bpf/helpers.c  |  4 ++++
->  kernel/bpf/verifier.c | 11 +++++++++++
->  2 files changed, 15 insertions(+)
->
-> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-> index 751c150f9e1cd7f56e6a2b68a7ebb4ae89a30d2d..5edf5436a7804816b7dcf1bbe=
-f2624d71a985f20 100644
-> --- a/kernel/bpf/helpers.c
-> +++ b/kernel/bpf/helpers.c
-> @@ -3089,7 +3089,9 @@ BTF_ID_FLAGS(func, bpf_task_get_cgroup1, KF_ACQUIRE=
- | KF_RCU | KF_RET_NULL)
->  BTF_ID_FLAGS(func, bpf_task_from_pid, KF_ACQUIRE | KF_RET_NULL)
->  BTF_ID_FLAGS(func, bpf_task_from_vpid, KF_ACQUIRE | KF_RET_NULL)
->  BTF_ID_FLAGS(func, bpf_throw)
-> +#ifdef CONFIG_BPF_EVENTS
->  BTF_ID_FLAGS(func, bpf_send_signal_task, KF_TRUSTED_ARGS)
-> +#endif
->  BTF_KFUNCS_END(generic_btf_ids)
->
->  static const struct btf_kfunc_id_set generic_kfunc_set =3D {
-> @@ -3135,7 +3137,9 @@ BTF_ID_FLAGS(func, bpf_dynptr_is_null)
->  BTF_ID_FLAGS(func, bpf_dynptr_is_rdonly)
->  BTF_ID_FLAGS(func, bpf_dynptr_size)
->  BTF_ID_FLAGS(func, bpf_dynptr_clone)
-> +#ifdef CONFIG_NET
->  BTF_ID_FLAGS(func, bpf_modify_return_test_tp)
-> +#endif
->  BTF_ID_FLAGS(func, bpf_wq_init)
->  BTF_ID_FLAGS(func, bpf_wq_set_callback_impl)
->  BTF_ID_FLAGS(func, bpf_wq_start)
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 77f56674aaa99a0b88ced5100ba57409e255fd29..2704fa4477ee2504897c82f04=
-16aa7d61fb086ed 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -5507,7 +5507,9 @@ static bool in_rcu_cs(struct bpf_verifier_env *env)
->
->  /* Once GCC supports btf_type_tag the following mechanism will be replac=
-ed with tag check */
->  BTF_SET_START(rcu_protected_types)
-> +#ifdef CONFIG_NET
->  BTF_ID(struct, prog_test_ref_kfunc)
-> +#endif
->  #ifdef CONFIG_CGROUPS
->  BTF_ID(struct, cgroup)
->  #endif
-> @@ -5515,7 +5517,9 @@ BTF_ID(struct, cgroup)
->  BTF_ID(struct, bpf_cpumask)
->  #endif
->  BTF_ID(struct, task_struct)
-> +#ifdef CONFIG_CRYPTO
->  BTF_ID(struct, bpf_crypto_ctx)
-> +#endif
->  BTF_SET_END(rcu_protected_types)
->
->  static bool rcu_protected_object(const struct btf *btf, u32 btf_id)
-> @@ -11486,8 +11490,10 @@ BTF_ID(func, bpf_rdonly_cast)
->  BTF_ID(func, bpf_rbtree_remove)
->  BTF_ID(func, bpf_rbtree_add_impl)
->  BTF_ID(func, bpf_rbtree_first)
-> +#ifdef CONFIG_NET
->  BTF_ID(func, bpf_dynptr_from_skb)
->  BTF_ID(func, bpf_dynptr_from_xdp)
-> +#endif
->  BTF_ID(func, bpf_dynptr_slice)
->  BTF_ID(func, bpf_dynptr_slice_rdwr)
->  BTF_ID(func, bpf_dynptr_clone)
-> @@ -11515,8 +11521,13 @@ BTF_ID(func, bpf_rcu_read_unlock)
->  BTF_ID(func, bpf_rbtree_remove)
->  BTF_ID(func, bpf_rbtree_add_impl)
->  BTF_ID(func, bpf_rbtree_first)
-> +#ifdef CONFIG_NET
->  BTF_ID(func, bpf_dynptr_from_skb)
->  BTF_ID(func, bpf_dynptr_from_xdp)
-> +#else
-> +BTF_ID_UNUSED
-> +BTF_ID_UNUSED
-> +#endif
+On 12/19/24 16:12, Stefano Garzarella wrote:
+> On Thu, 19 Dec 2024 at 16:05, Michal Luczaj <mhal@rbox.co> wrote:
+>>
+>> On 12/19/24 15:48, Stefano Garzarella wrote:
+>>> On Thu, 19 Dec 2024 at 15:36, Michal Luczaj <mhal@rbox.co> wrote:
+>>>>
+>>>> On 12/19/24 09:19, Stefano Garzarella wrote:
+>>>>> ...
+>>>>> I think the best thing though is to better understand how to handle
+>>>>> deassign, rather than checking everywhere that it's not null, also
+>>>>> because in some cases (like the one in virtio-vsock), it's also
+>>>>> important that the transport is the same.
+>>>>
+>>>> My vote would be to apply your virtio_transport_recv_pkt() patch *and* make
+>>>> it impossible-by-design to switch ->transport from non-NULL to NULL in
+>>>> vsock_assign_transport().
+>>>
+>>> I don't know if that's enough, in this case the problem is that some
+>>> response packets are intended for a socket, where the transport has
+>>> changed. So whether it's null or assigned but different, it's still a
+>>> problem we have to handle.
+>>>
+>>> So making it impossible for the transport to be null, but allowing it
+>>> to be different (we can't prevent it from changing), doesn't solve the
+>>> problem for us, it only shifts it.
+>>
+>> Got it. I assumed this issue would be solved by `vsk->transport !=
+>> &t->transport` in the critical place(s).
+>>
+>> (Note that BPF doesn't care if transport has changed; BPF just expects to
+>> have _a_ transport.)
+>>
+>>>> If I'm not mistaken, that would require rewriting vsock_assign_transport()
+>>>> so that a new transport is assigned only once fully initialized, otherwise
+>>>> keep the old one (still unhurt and functional) and return error. Because
+>>>> failing connect() should not change anything under the hood, right?
+>>>>
+>>>
+>>> Nope, connect should be able to change the transport.
+>>>
+>>> Because a user can do an initial connect() that requires a specific
+>>> transport, this one fails maybe because there's no peer with that cid.
+>>> Then the user can redo the connect() to a different cid that requires
+>>> a different transport.
+>>
+>> But the initial connect() failing does not change anything under the hood
+>> (transport should/could stay NULL).
+> 
+> Nope, isn't null, it's assigned to a transport, because for example it
+> has to send a packet to connect to the remote CID and wait back for a
+> response that for example says the CID doesn't exist.
 
-The previous patch was already applied and it's too late
-to revert.
-Pls send an incremental fix with:
-Fixes: 00a5acdbf398 ("bpf: Fix configuration-dependent BTF function referen=
-ces")
+Ahh, I think I get it. So the initial connect() passed
+vsock_assign_transport() successfully and then failed deeper in
+vsock_connect(), right? That's fine. Let the socket have a useless
+transport (a valid pointer nevertheless). Sure, upcoming connect() can
+assign a new (possibly useless just as well) transport, but there's no
+reason to allow ->transport becoming NULL.
 
-pw-bot: cr
+And a pre-connect socket (where ->transport==NULL) is not an issue, because
+BPF won't let it in any sockmap, so vsock_bpf_recvmsg() won't be reachable.
+
+Anywa, thanks for explaining,
+Michal
+
+PS. Or ignore the above and remove the socket from the sockmap at every
+reconnect? Possible unhash abuse:
+
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 5cf8109f672a..8a65153ee186 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -483,6 +483,10 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+ 		if (vsk->transport == new_transport)
+ 			return 0;
+ 
++		const struct proto *prot = READ_ONCE(sk->sk_prot);
++		if (prot->unhash)
++			prot->unhash(sk);
++
+ 		/* transport->release() must be called with sock lock acquired.
+ 		 * This path can only be taken during vsock_connect(), where we
+ 		 * have already held the sock lock. In the other cases, this
+diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
+index 4aa6e74ec295..80deb4d70aea 100644
+--- a/net/vmw_vsock/vsock_bpf.c
++++ b/net/vmw_vsock/vsock_bpf.c
+@@ -119,6 +119,7 @@ static void vsock_bpf_rebuild_protos(struct proto *prot, const struct proto *bas
+ 	*prot        = *base;
+ 	prot->close  = sock_map_close;
+ 	prot->recvmsg = vsock_bpf_recvmsg;
++	prot->unhash = sock_map_unhash;
+ 	prot->sock_is_readable = sk_msg_is_readable;
+ }
+
+>> Then a successful re-connect assigns
+>> the transport (NULL -> non-NULL). And it's all good because all I wanted to
+>> avoid (because of BPF) was non-NULL -> NULL. Anyway, that's my possibly
+>> shallow understanding :)
+
 
