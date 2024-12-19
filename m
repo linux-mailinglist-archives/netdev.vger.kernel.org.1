@@ -1,205 +1,343 @@
-Return-Path: <netdev+bounces-153489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47D3A9F8399
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 19:58:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F0FE9F83E2
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 20:16:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DF39188C30E
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:58:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9CFB1684AE
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 19:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1AF31A0AFE;
-	Thu, 19 Dec 2024 18:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CF11AA1FD;
+	Thu, 19 Dec 2024 19:16:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="ulqvp+ih"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="n2E7ka5P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from SJ2PR03CU002.outbound.protection.outlook.com (mail-westusazon11023112.outbound.protection.outlook.com [52.101.44.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A121A08A3
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 18:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734634680; cv=none; b=LeE91GS2bCrSbR5jsTk9ABG/OmDyubR88xJyeFIVu1jxkIKlTX6JIiWeGy2pmJZ51e04goiqUXD4BI8b/rtg4WdPp8kqNPe4fMk5z5NepMfTOSW8SMawgUst+0Se2ioBuw+SIISKhjewYdFiKwjE4ozpXgNYaqJCZ7WfypngKHY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734634680; c=relaxed/simple;
-	bh=Cu3spGZCQ72U+XRFdeGMW8VB9ztzslTSWk1iur4BCzU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dZtf2Fk3tg5x0A5i+nTb7HID8OGXgi3X2WJDEjw/97h1fzMjZ7L8v6gDlUub+Oe9kq8iN8nzjOKmzLX/6CVJaocrahvX1FrRlOFsQERT0sER5YiX40tsjtU1FS//Syolehj6ySby6epNafPyDw1lj+AgWZ0KpBtjhSwBAEth13w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=ulqvp+ih; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AzGEIu0zFE7WiR6/nCXO042kOHUfhZAtU19UEHR7SOc=; t=1734634679; x=1735498679; 
-	b=ulqvp+ihX3PbEyaR7xyOosw/9Sj2kGu3p1PAVHYB3TBJ770+SaOqD5Qpymxhfit4cWlDlL8jp4F
-	4kfeE72JRRK8FlLsFXCyogp9PxrCg8z/u805CbZqw7I8Osa9YDb+Nr77vGU33d+frzv4tTtJ8dsHN
-	vHCc9vZcEcYOpzHEw6HDoK6N0xgGGMU29D9v8aM8KCjFPguFhZX7M+9pB3HN4rMpVhjw4Wn1jgK37
-	EuxcCxekSVl90Pj/0h8hJl9fKVKuG5Vp6YbFuNsRwSkhAcVacXpWJjhFV2tNWz455Q/MWlZLm5S19
-	KT+R3vUuyuH+z/6sUrAQ+CwV/3qGh8KE2VWA==;
-Received: from mail-oa1-f54.google.com ([209.85.160.54]:44261)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tOLif-0000Lm-Nl
-	for netdev@vger.kernel.org; Thu, 19 Dec 2024 10:57:58 -0800
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-2a0206590a7so555957fac.0
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 10:57:57 -0800 (PST)
-X-Gm-Message-State: AOJu0YyHpEHTAxUSG9US9fP57jjVEUHZICmUEzJbOrzqH6qCA06VbKKH
-	swB+hdgZq04Tskmm5hfubvZ6BVQShqwPdQDw4tdwb5wEdbDAu2YdhpDM9r2EZe5ZwaND1J8pHhv
-	hCGpXAXwA4q0lpJVWw4hhrJFdtXY=
-X-Google-Smtp-Source: AGHT+IEi+hIA9HF6RCU7p9TNdp46If0xHVi8W6C1qG2NEbTUhzJDX6SGwmoXmSTP7UJkKyCV1h/Y3vjGXq8l4OS511Q=
-X-Received: by 2002:a05:6870:7d85:b0:29e:5522:8eea with SMTP id
- 586e51a60fabf-2a7fb553df2mr19908fac.38.1734634677127; Thu, 19 Dec 2024
- 10:57:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF9E1A9B25;
+	Thu, 19 Dec 2024 19:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.44.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734635781; cv=fail; b=s+tGdtnX4oCL5l/hFYmxFIvsUKO1cd11XYIWopri9+N/8/u2cs9nmdDTz6Q0lsSPX+7T5Kr2XSm8992nFQCpcjG2skNmzcnQElhnN8uLw5mcvVcl7okMLNBHZd385/SCaN1FAsTAKdIvGVAOL283bKNLJIKnkWGxthlHcYaC9+A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734635781; c=relaxed/simple;
+	bh=wYBCvlXXqJalf8X4Gw2o8PVKn2rm13x0Vg6LBPSOUTU=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=XwCcyv+Eu8/vnGsHD+piTk/1MinKciRYIUQCjluQWNvXk98ckEidMi6jKzC03nxKZIKpZlxKfRlCw6xVO5wJpqDwB/rMD6O7WNZanooovmy7F2XAhR9z1EcZ8BaWogpvvigzbe4HPzV41yeB0/jI96yx0yF5dUKGmoSntOKwEwM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=n2E7ka5P; arc=fail smtp.client-ip=52.101.44.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jtPrVBqF/NoL/FALhID1yEejYDfsSUoqwxQLEeNgTpaM+oVN8t/VfMtXbJESoHX6b7dQ+OlDokjQC6eVDOrge/nYjKFpthcR4oPwqJjvFfuxecb35yshoOmmL1OVRgmbbEutjhlz4misrRCaXA9Y0UYMN95KIGhbKBFhoOaIYlSNSC79ck0On3GViIK3B7NI4jp1P0cDkx4GNwq5fgFt68irgSlWUh8UC+qSpZJoFfemsd7AOoh9cuvpzvokwKiYc7keprHb0wjbhF1HiAIoFL1VGQyDTvBhOAx0lm9nNZlA8z810Ky1U5VDIVDUoE1nLD887D/1gE4vmZ1nOGXSpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hcp87+Keqns051kAtkqt2xUEvhSdDkVZDfxa9UEEnJ4=;
+ b=GNY2if1/8ZaSsmxyTHEp3w9KstBIlzFwdRYpRSVaAru9tXkuvteVdn0AaLqDRFNElbCszKm5OkyIs3gNWbXNu3hfKKQbAtHCp55A3K0LCozHfYPITk8JQNJJgOlpcYAMmevJGybVyrBcqyKNB05UoVeQKbvE0xq/+nWcwPV18oGHqdUIhLk8v8XnREi4y91FqLNcNLQZ9E9ZPSmIwzFKx0Tqf25v39Ti6O7QQ+h3y16o99ActEqQIzr6cq/qgE1UMwh9/R/WXtLHUphuiI6iRok8BCVoWOMuGGBSNQQHaCuFoDGp/8i/pTpvn2esaXDuxnQrBTs3fppsMbnG2qZsZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hcp87+Keqns051kAtkqt2xUEvhSdDkVZDfxa9UEEnJ4=;
+ b=n2E7ka5PAVzX98ayY/JmuZ4+KaaYnb2vKvFNnN44sEinMFqNxknBaGiG9rh9bGg5WIKyQGqRbg9MdJYlJL3serjeZsPEPA8To6I6zbhTzFjZLjGxB4rt1XdWonDd6BKa+uiP9Qb6iqHS0+Mcmy+9MIGWAl0cNSyZGH1kBE6Xl7o=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
+ SJ0PR01MB7527.prod.exchangelabs.com (2603:10b6:a03:3da::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8272.13; Thu, 19 Dec 2024 19:16:15 +0000
+Received: from SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d%6]) with mapi id 15.20.8293.000; Thu, 19 Dec 2024
+ 19:16:15 +0000
+From: admiyo@os.amperecomputing.com
+To:
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: [PATCH v10 0/1] MCTP Over PCC Transport
+Date: Thu, 19 Dec 2024 14:16:09 -0500
+Message-ID: <20241219191610.257649-1-admiyo@os.amperecomputing.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL1PR13CA0003.namprd13.prod.outlook.com
+ (2603:10b6:208:256::8) To SA0PR01MB6171.prod.exchangelabs.com
+ (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241217000626.2958-1-ouster@cs.stanford.edu> <20241217000626.2958-2-ouster@cs.stanford.edu>
- <20241218174345.453907db@kernel.org>
-In-Reply-To: <20241218174345.453907db@kernel.org>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Thu, 19 Dec 2024 10:57:22 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
-Message-ID: <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API for Homa
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
-	horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: ae8206b624f71ff41c2281f68712021f
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|SJ0PR01MB7527:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8adf1d45-ba7c-4c0a-2435-08dd20619b93
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|376014|52116014|1800799024|10070799003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?udleFn7LDrQbWneILJEFE9uQ4OY0FM4xifJv7FLDMEu6OUqb4G/QNFp1gL8X?=
+ =?us-ascii?Q?GiWLWYmr8vbm8dJKlL3bsc3sa9Sm9oVaElvjgpSMmJ7hZTrHT7xR5IxnOZUp?=
+ =?us-ascii?Q?Z5N3K/JVYNFciRvZnj/N0fsllKMIgDlbK+/jQxFgE7L3DaOX3BkjFVWSO90C?=
+ =?us-ascii?Q?67ZnOUWpubKdLTnmflO6tyAI2TGHFNpWacPW31j3mM5+4pFAmFAu/fiu2tUr?=
+ =?us-ascii?Q?NMZyMxjlbGB3u7zGnm/0hLuftENMQARovJNdIX7h0MuffJw3Sr8rXnrcsfOx?=
+ =?us-ascii?Q?YQQVRdg4MDxll8sBEiYGEIUyPDyL1wVqbx38snAC0qS22C2FSAUnpi4S7sEf?=
+ =?us-ascii?Q?oDNDHmBN+AJteIoyNFzIvtdt3vfBDCWdTNNLKFav4RAcSqirCIrtbuCnarBG?=
+ =?us-ascii?Q?715jqQJPW7fw477d4IK9MUagMBIMC2bv6uQH3m9XppPnn2gGFDnB4KYeB3rs?=
+ =?us-ascii?Q?/XJy+NWY6DIZhPov2/LnSy0UyHDby855UFlBUjuSuyf+R0MWWQj6cZQ2EmGP?=
+ =?us-ascii?Q?lm33W1zvBfUKrHdO8DcTO8xkNOyRoLDH4fbnv8cin8BZa/k+GeOuzYYFCp0q?=
+ =?us-ascii?Q?6pQE6xlqwkh0OUVQcV0PXmwmtiHqa+p7mbs0iEAENPa5rW+zlv0skr29eclU?=
+ =?us-ascii?Q?hi5MT+Z+E+BkbKhfOpGnCEqCMAP1rJ2YKcvUXhHuMsVXpRZ4SqjTabLZge9X?=
+ =?us-ascii?Q?5rpGLRbgv+gGbMMt7jh77xINocnG0EpL5Y0K0DsfEa25m0KE1cuxuLkJFSfK?=
+ =?us-ascii?Q?rY+Gj7nfU0tBQBWW4NmWK4jU8VRDEFGwgNKeFXe8ckIyyGvI11ahr7jCsU8R?=
+ =?us-ascii?Q?gAKWEuMT40zBS1uCjyJSDAIgvcNmpnWQr5A3S1NargIRu3zyU+wpIJNqwqG3?=
+ =?us-ascii?Q?YKnIA0JbRNkgyhAnowIHWcrVEHcHWD+DFegRDBaNGzjyqMlDBW5aDXgu/nhU?=
+ =?us-ascii?Q?VViEmAuAcxk1S8JSVOe8FZDGkHd4QM9r82PkBfhJaqoESEixi6+G9yrGk0Cw?=
+ =?us-ascii?Q?u76h6Ny7C1G7A6/pq/dPMp9JsVqtBgQWpK7ZMHfQV6ra2Uf8I/7FnJF5nH5x?=
+ =?us-ascii?Q?qzvGJZsqwkOvIDcnCFL7lGLtGICuJg/oj34lpXcF35U/s2wi2sYQXoe2xgHZ?=
+ =?us-ascii?Q?IdCO8XdjrcGj0KQ7pYY71coSidhDTy/uSHxH+XYDJU9XG8xddTvYZpMGMajM?=
+ =?us-ascii?Q?1EM2RxKI9dYNHI3YjXuwlqdQBSl0OfJ5QvZHrHVX4/lRZ+2vmUT2ipxOXHTA?=
+ =?us-ascii?Q?Nlb/tLNv39KiVImYRYrhIHbt+ucb0417ZWHOi1ulTHB9O+2dHd5heCwQGv6g?=
+ =?us-ascii?Q?BVhDo2IO+/3wZ4cf8N73GhtbQ9WojMpid3zC1ITyzjBc6A=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(52116014)(1800799024)(10070799003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?GwfwxR6HeB0dfgMdkGXDZETUv48Nzrj1BQXt4W7ULYNU8Yrd1g/r9g9rElE6?=
+ =?us-ascii?Q?W6mqSeFTbG28cWOOvKgp7d0CRJcDJX7pZ7qX+NxZbnHiIw+aW55PQCGf98nQ?=
+ =?us-ascii?Q?w66MrrZcL/Tiw1rvorUEuEzJkzCwxGSbyM1oz+bMP9QmsZV3eQroovAGCI9e?=
+ =?us-ascii?Q?0S1QyGZ1np5yUtqjvHU79NVJcNaECZ0E3YyFyCPdLD7w0G0Cw81GA3xpzKJn?=
+ =?us-ascii?Q?FPo+vrx63wGL+NAGum1dL3qpZJF7PaIJkBuH3tMlrWdoZrFu7qoIOXt226XO?=
+ =?us-ascii?Q?bjLWHFlwuOwMjo1QWzYZ54TeQpsoZpK/no2Y2GqWwUYRt59HYsCPWtKdAkoV?=
+ =?us-ascii?Q?zdxgP3azvKUaPNpL8EXTlJylAGQwfbfNahi57Fl7SAzdbSs4BqNQnwomYYhI?=
+ =?us-ascii?Q?PP9hGI7pvOdWWGWkNROFwT6gM6MCdqcBde+KhaBTRR98Oro/veQ6N0DW6dUQ?=
+ =?us-ascii?Q?Xmt6E/A8HWVdcN/jFvYiwLbD2JQqushrX8aRXNeRqOBav8GDLZid9Q2If/rA?=
+ =?us-ascii?Q?850J7iO5A5J/3y4wOjt/PyBpTd8Gt34jsIK4SZ4W97VdYZ7vGncyINUoLEoZ?=
+ =?us-ascii?Q?5laqyG5z4TBCIegt92XfP/ictvozmbviSwMt6ckUT7On2Gwu6Z/9zGwvSc8d?=
+ =?us-ascii?Q?e2+1oF/hlvyiOJyXqYjS4frXmZbRKAvRA4SqZk91+dizhk50gyonF3roHneJ?=
+ =?us-ascii?Q?UGS7JMD/3PKxBAsgENpL33CoQD8vOs2d2S7GKmcMMHELSG6bzcwcNhSTsAoj?=
+ =?us-ascii?Q?iWNYkuCCj8dHAPlfAWZ5RHwDnjV+nt01NPevzX3uNWUne77Ws3nPQbUgFl+G?=
+ =?us-ascii?Q?Sqyd1e9Ssfjs3Vk4Cl29vojXeaaWZMwQaSqdhEsA9wzV5Zlz/5FXAi/Ou/KZ?=
+ =?us-ascii?Q?FyNNELmL/OAT58U0pTo1TxY/wX1k6VH666NzM8xcfaxqXfCXu+tDo1P+PGut?=
+ =?us-ascii?Q?r7HndJsoQu5yqngqCk0rRNe+l+q3EQm3wa/wHSjlBJOq5mUOpj3NIouXqxQY?=
+ =?us-ascii?Q?c52YGLnDWIVoed2cMQccgnTLV0naVGn33/Ci1qbKJ2Q7shf3TSWxib99IMUm?=
+ =?us-ascii?Q?3TUUxcwfMx7FgOylBPHoqKwyv3fgfcQg+TalFt3D9FxcuV70F2TMp6G6xvsf?=
+ =?us-ascii?Q?c7hb5XNf7K3JdzdVnxyUnivPk6Qtl0Njc1SfVur40o9XlcZVFOp+/GAiZkh8?=
+ =?us-ascii?Q?OYcpL/7ZRLEYtDlWvkFsgX4azMDXpPJ+pxds5k9ns1GfjiT8oQsjsFQ0BmDq?=
+ =?us-ascii?Q?3bm/JgfXdFhiRW99jXlqdcwPiBVC88zcx20QVF+QNQzuH/FSpadZJ1oKsz4t?=
+ =?us-ascii?Q?NKsaZ3ymkA7f3S8CNQMKPq2V+revOmocYzW2s4TlftEa3wRMztqH981qBMnc?=
+ =?us-ascii?Q?w7Yse2mEs6qKnpfO1K61hBgXsKpahSz72dA5HZDUW/dJei0DAyp3C9vcXFPb?=
+ =?us-ascii?Q?a9EnEp+z7UX78Wdpsd3q0v1x3B5ioY9LppAKWgE3KzPgp01XraKk7puHsBIL?=
+ =?us-ascii?Q?t0OYEGDwxfJmZSPyIlwypLtpKSfBEL5ReUE8cy7Jq2AfIhqPjKPjYbez+fGK?=
+ =?us-ascii?Q?8kgvq0pAJSnmW0Eo/BL9a4GSuYptlaXXeQKC96jiy/QItMz6AKTy1wWZXnN6?=
+ =?us-ascii?Q?v5SF2nLKytxN0nKoHU70F4aeskL6LBARo9DKdVI6otX46jOS66T9CTg4+Vqf?=
+ =?us-ascii?Q?fu+xYUR97t09Xf7TAYsHMq/sN/8=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8adf1d45-ba7c-4c0a-2435-08dd20619b93
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2024 19:16:15.2055
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GXKySNnjPI7epXEKKvCOnkvvKXBm+c46PQo+qWVpdupygrhAo2wm60hhQPX22XXiKEvxrrZ2iyrV1op/kwIHg38ktfMetsb8A4uyO0NKa9BWSHTZhasDf+BM8fi8/aol
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB7527
 
-On Wed, Dec 18, 2024 at 5:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 16 Dec 2024 16:06:14 -0800 John Ousterhout wrote:
-> > +#ifdef __cplusplus
-> > +extern "C"
-> > +{
-> > +#endif
->
-> I'm not aware of any networking header wrapped in extern "C"
-> Let's not make this precedent?
+From: Adam Young <admiyo@os.amperecomputing.com>
 
-Without this I don't seem to be able to use this header in C++ files:
-I end up getting linker errors such as 'undefined reference to
-`homa_replyv(int, iovec const*, int, sockaddr const*, unsigned int,
-unsigned long)'.
+This series adds support for the Management Control Transport Protocol (MCTP)
+over the Platform Communication Channel (PCC) mechanism.
 
-Any suggestions on how to make the header file work with C++ files
-without the #ifdef __cplusplus?
+DMTF DSP:0292
+https://www.dmtf.org/sites/default/files/standards/documents/DSP0292_1.0.0WIP50.pdf
 
-> > +/**
-> > + * define HOMA_MIN_DEFAULT_PORT - The 16-bit port space is divided int=
-o
-> > + * two nonoverlapping regions. Ports 1-32767 are reserved exclusively
-> > + * for well-defined server ports. The remaining ports are used for cli=
-ent
-> > + * ports; these are allocated automatically by Homa. Port 0 is reserve=
-d.
-> > + */
-> > +#define HOMA_MIN_DEFAULT_PORT 0x8000
->
-> Not sure why but ./scripts/kernel-doc does not like this:
->
-> include/uapi/linux/homa.h:51: warning: expecting prototype for HOMA_MIN_D=
-EFAULT_PORT - The 16(). Prototype was for HOMA_MIN_DEFAULT_PORT() instead
+MCTP defines a communication model intended to
+facilitate communication between Management controllers
+and other management controllers, and between Management
+controllers and management devices
 
-I saw this warning from kernel-doc before I posted the patch, but I
-couldn't figure out why it is happening. After staring at the error
-message some more I figured it out: kernel-doc is getting confused by
-the "-" in "16-bit" (it seems to use the last "-" on the line rather
-than the first). I've modified the comment to replace "16-bit" with
-"16 bit" and filed a bug report for kernel-doc.
+PCC is a mechanism for communication between components within
+the  Platform.  It is a composed of shared memory regions,
+interrupt registers, and status registers.
 
-> > +/**
-> > + * struct homa_sendmsg_args - Provides information needed by Homa's
-> > + * sendmsg; passed to sendmsg using the msg_control field.
-> > + */
-> > +struct homa_sendmsg_args {
-> > +     /**
-> > +      * @id: (in/out) An initial value of 0 means a new request is
-> > +      * being sent; nonzero means the message is a reply to the given
-> > +      * id. If the message is a request, then the value is modified to
-> > +      * hold the id of the new RPC.
-> > +      */
-> > +     uint64_t id;
->
-> Please use Linux uapi types, __u64
+The MCTP over PCC driver makes use of two PCC channels. For
+sending messages, it uses a Type 3 channel, and for receiving
+messages it uses the paired Type 4 channel.  The device
+and corresponding channels are specified via ACPI.
 
-Done. In the process I discovered that the underlying type for __u64
-is not the same as that for uint64_t; this results in awkwardness in
-programs that use both...
+The first patch in the series implements a mechanism to allow the driver
+to indicate whether an ACK should be sent back to the caller
+after processing the interrupt.  This is an optional feature in
+the PCC code, but has been made explicitly required in another driver.
+The implementation here maintains the backwards compatibility of that
+driver.
 
-> > +/** define SO_HOMA_RCVBUF - setsockopt option for specifying buffer re=
-gion. */
-> > +#define SO_HOMA_RCVBUF 10
-> > +
-> > +/** struct homa_rcvbuf_args - setsockopt argument for SO_HOMA_RCVBUF. =
-*/
-> > +struct homa_rcvbuf_args {
-> > +     /** @start: First byte of buffer region. */
-> > +     void *start;
->
-> I'm not sure if pointers are legal in uAPI.
-> I *think* we are supposed to use __aligned_u64, because pointers
-> will be different size for 32b binaries running in compat mode
-> on 64b kernels, or some such.
+MCTP is a general purpose  protocol so  it would  be impossible to enumerate
+all the use cases, but some of the ones that are most topical are attestation
+and RAS support.  There are a handful of protocols built on top of MCTP, to
+include PLDM and SPDM, both specified by the DMTF.
 
-I see that "void *" is used in the declaration for struct msghdr
-(along with some other pointer types as well) and struct msghdr is
-part of several uAPI interfaces, no?
+https://www.dmtf.org/sites/default/files/standards/documents/DSP0240_1.0.0.pdf
+https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.3.0.pd
 
-> > +/**
-> > + * define HOMA_FLAG_DONT_THROTTLE - disable the output throttling mech=
-anism:
-> > + * always send all packets immediately.
-> > + */
->
-> Also makes kernel-doc unhappy:
->
-> include/uapi/linux/homa.h:159: warning: expecting prototype for HOMA_FLAG=
-_DONT_THROTTLE - disable the output throttling mechanism(). Prototype was f=
-or HOMA_FLAG_DONT_THROTTLE() instead
+SPDM entails various usages, including device identity collection, device
+authentication, measurement collection, and device secure session establishment.
 
-It seems that the ":" also confuses kernel-doc. I've worked around this as =
-well.
+PLDM is more likely to be used  for hardware support: temperature, voltage, or
+fan sensor control.
 
-> Note that next patch adds more kernel-doc warnings, you probably want
-> to TAL at those as well. Use
->
->   ./scripts/kernel-doc -none -Wall $file
+At least two companies have devices that can make use of the mechanism. One is
+Ampere Computing, my employer.
 
-Hmm, I did run kernel-doc before posting the patch, but maybe I missed
-some stuff. I'll take another look. There are a few things kernel-doc
-complained about where the requested documentation would add no useful
-information; it would just end up repeating what is already obvious
-from the code. Is any discretion allowed for cases like this? If the
-expectation is that there will be zero kernel-doc complaints, then
-I'll go ahead and add the useless documentation.
+The mechanism it uses is called Platform Communication Channels is part of the
+ACPI spec: https://uefi.org/htmlspecs/ACPI_Spec_6_4_html/14_Platform_Communications_Channel/Platform_Comm_Channel.html
 
-> > +#ifdef __cplusplus
-> > +}
-> > +#endif
-> --
-> pw-bot: cr
+Since it is a socket interface, the system administrator also has  the ability
+to ignore an MCTP link that they do not want to enable.  This link would be visible
+to the end user, but would not be usable.
 
-I'm not sure what "pw-bot: cr" means; I assume this is related to the
-"#ifdef __cplusplus" discussion above?
+If MCTP support is disabled in the Kernel, this driver would also be disabled.
 
-Thanks for the comments.
+PCC is based on a shared buffer and a set of I/O mapped memory locations that the
+Spec calls registers.  This mechanism exists regardless of the existence of the
+driver. Thus, if the user has the ability to map these  physical location to
+virtual locations, they have the ability to drive the hardware.  Thus, there
+is a security aspect to this mechanism that extends beyond the responsibilities
+of the operating system.
 
--John-
+If the hardware does not expose the PCC in the ACPI table, this device will never
+be enabled.  Thus it is only an issue on hard that does support PCC.  In that case,
+it is up to the remote controller to sanitize communication; MCTP will be exposed
+as a socket interface, and userland can send any crafted packet it wants.  It would
+thus also be incumbent on the hardware manufacturer to allow the end user to disable
+MCTP over PCC communication if they did not want to expose it.
+
+Previous Version:
+https://lore.kernel.org/all/20241217182528.108062-1-admiyo@os.amperecomputing.com/
+
+Changes in V10:
+- sync with net-next branch
+- use dstats helper functions
+- remove duplicate drop stat
+- remove more double spaces
+
+Changes in V9:
+- Prerequisite patch for PCC mailbox has been merged
+- Stats collection now use helper functions
+- many double spaces reduced to single
+
+Changes in V8:
+- change 0 to NULL for pointer check of shmem
+- add semi for static version of pcc_mbox_ioremap
+- convert pcc_mbox_ioremap function to static inline when client code is not being built
+- remove shmem comment from struct pcc_chan_info descriptor
+- copy rx_dropped in mctp_pcc_net_stats
+- removed trailing newline on error message
+- removed double space in dev_dbg string
+- use big endian for header members
+- Fix use full spec ID in description
+- Fix typo in file description
+- Form the complete outbound message in the sk_buff
+
+Changes in V7:
+- Removed the Hardware address as specification is not published.
+- Map the shared buffer in the mailbox and share the mapped region with the driver
+- Use the sk_buff memory to prepare the message before copying to shared region
+
+Changes in V6:
+- Removed patch for ACPICA code that has merged
+- Includes the hardware address in the network device
+- Converted all device resources to devm resources
+- Removed mctp_pcc_driver_remove function
+- uses acpi_driver_module for initialization
+- created helper structure for in and out mailboxes
+- Consolidated code for initializing mailboxes in the add_device function
+- Added specification references
+- Removed duplicate constant PCC_ACK_FLAG_MASK
+- Use the MCTP_SIGNATURE_LENGTH define
+- made naming of header structs consistent
+- use sizeof local variables for offset calculations
+- prefix structure name to avoid potential clash
+- removed unnecessary null initialization from acpi_device_id
+
+Changes in V5
+- Removed Owner field from ACPI module declaration
+- removed unused next field from struct mctp_pcc_ndev
+- Corrected logic reading  RX ACK flag.
+- Added comment for struct pcc_chan_info field shmem_base_addr
+- check against current mtu instead of max mtu for packet length\
+- removed unnecessary lookups of pnd->mdev.dev
+
+Changes in V4
+- Read flags out of shared buffer to trigger ACK for Type 4 RX
+- Remove list of netdevs and cleanup from devices only
+- tag PCCT protocol headers as little endian
+- Remove unused constants
+
+Changes in V3
+- removed unused header
+- removed spurious space
+- removed spurious semis after functiomns
+- removed null assignment for init
+- remove redundant set of device on skb
+- tabify constant declarations
+- added  rtnl_link_stats64 function
+- set MTU to minimum to start
+- clean up logic on driver removal
+- remove cast on void * assignment
+- call cleanup function directly
+- check received length before allocating skb
+- introduce symbolic constatn for ACK FLAG MASK
+- symbolic constant for PCC header flag.
+- Add namespace ID to PCC magic
+- replaced readls with copy from io of PCC header
+- replaced custom modules init and cleanup with ACPI version
+
+Changes in V2
+
+- All Variable Declarations are in reverse Xmass Tree Format
+- All Checkpatch Warnings Are Fixed
+- Removed Dead code
+- Added packet tx/rx stats
+- Removed network physical address.  This is still in
+  disucssion in the spec, and will be added once there
+  is consensus. The protocol can be used with out it.
+  This also lead to the removal of the Big Endian
+  conversions.
+- Avoided using non volatile pointers in copy to and from io space
+- Reorderd the patches to put the ACK check for the PCC Mailbox
+  as a pre-requisite.  The corresponding change for the MCTP
+  driver has been inlined in the main patch.
+- Replaced magic numbers with constants, fixed typos, and other
+  minor changes from code review.
+
+Adam Young (1):
+  mctp pcc: Implement MCTP over PCC Transport
+
+ drivers/net/mctp/Kconfig    |  13 ++
+ drivers/net/mctp/Makefile   |   1 +
+ drivers/net/mctp/mctp-pcc.c | 307 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 321 insertions(+)
+ create mode 100644 drivers/net/mctp/mctp-pcc.c
+
+-- 
+2.43.0
+
 
