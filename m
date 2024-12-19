@@ -1,313 +1,195 @@
-Return-Path: <netdev+bounces-153241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02EFA9F7531
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:13:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43E0F9F755D
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:25:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C9216C9ED
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 07:13:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88CE71893345
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 07:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91FAC216E3E;
-	Thu, 19 Dec 2024 07:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98FB216E09;
+	Thu, 19 Dec 2024 07:24:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="nadw9C5N"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="mw+6XVRm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BD815AD9C
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 07:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E038E524F;
+	Thu, 19 Dec 2024 07:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734592419; cv=none; b=etsH2OIjZFbYo/Q0MbXOhAXt11o0YVzuBiTi4pzkilQBKpw2uScqLqubb6MqGmDeEa6zb4i1bBYgLR2ye1hCHgsh2yPU1B4ka+n9Cgn5FWlLv2QJ1+P7H1YZnu3wIfu4Ez+RfQOAT/Q+7CeM7gyYhKgeAYrPNkkyQZLb6dg4Ecs=
+	t=1734593081; cv=none; b=uDDAYntznMOllko0Wd/QGhJxXPkKllAr2mR3oABei5UujzMaeaqBX4p3Kj28ivSGBqDLoRUeOVewHak6ydXX+AfIdQOwIJQ8MEGfrOzpCfxfuT4cY4YUX8r7muXD2ujiQr9gVEl9uvVeIf6o5NvB84EZxfjvm0yXjvVohorpgS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734592419; c=relaxed/simple;
-	bh=VVmsLsYLgJ6dfYR63bJCgBlqhF8GN4cvCDdBn4Ry0xk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QnD9yA770w9WERO0E34dyIVHfvROfMUKU/vwQTgFDF5wBQBANycCTqIgXuCw5+WGUsuqPcVQU7X/N/mE2RKz1rQzcEucev5wdtexD3l6hQLsBcy1jSROiw4FT83mIWoITRtChDKpfHONw7mUn6vD2xrkuRpI8i+Pkm7xfIsPh+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=nadw9C5N; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1734592335;
-	bh=+MEAUGGXL0Erz0WkbnodWUkGrFLvVkbl1vv6+fCRWH8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=nadw9C5N50EYCmEPuefl3Rqm5ak+Z8zeBHRBXtljQLvZNu2Hy8AigV7WWMegjzmrL
-	 lBSQ4C8mfeIDzdlpt2JAXIpI2ykdjxYGG8pd7gKuw82LLXDI1UZvUFt+9keYEIs4W1
-	 VkYMFrW2sl/khC5sQfRBCMkxs98JdL9S6/qZL5sw=
-X-QQ-mid: bizesmtpip4t1734592290tjr7r2n
-X-QQ-Originating-IP: l6hQyAfuhMYTk+SclTpaR6OaKpjGMSd86SRP/orbWPg=
-Received: from [IPV6:240e:668:120a::253:10f] ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 19 Dec 2024 15:11:24 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 16436400738179319441
-Message-ID: <5DB5DA2260D540B9+359f8cbf-e560-495d-8afe-392573f1171b@uniontech.com>
-Date: Thu, 19 Dec 2024 15:11:24 +0800
+	s=arc-20240116; t=1734593081; c=relaxed/simple;
+	bh=MZ56Gk24lso758TZZGrga25F7eajp0AXtFgCuXVL4EY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=TTv7kAcChZsJRPj6IB8dRi3RnRlYDNX1jc8fss6VLyxq+0uvdd64L4pcd5GOfjdGUpLkTwT+YtKmJTjkPo9GNFeb9OnyinAEo9IjZzWM3r4DHP9s49ynhAjw/CLKgc6gFt7mf8gdvg+ztwFWsVZdNfUk2r99dDUIm1V496NSNcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=mw+6XVRm; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1734593073;
+	bh=MZ56Gk24lso758TZZGrga25F7eajp0AXtFgCuXVL4EY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=mw+6XVRmktGF2ySJzZBhU7eaFhFMdjMWFG1GSKwUMgtsY8mZvf2qcyt7ML1TQ1sWP
+	 A6aVq1BNqgg2V+RowPXxq9CzYWLp4vyq8RwG+iTweakVwxg96D7PDsT9A9oHwZZXqT
+	 jsaJ2Nw+Ly+KYOQewNrKr3gVYbHKjo6eeu/q9ZPA=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Thu, 19 Dec 2024 08:24:28 +0100
+Subject: [PATCH bpf v2] bpf: fix configuration-dependent BTF function
+ references
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND. PATCH] mt76: mt76u_vendor_request: Do not print error
- messages when -EPROTO
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: nbd@nbd.name, lorenzo@kernel.org, ryder.lee@mediatek.com,
- shayne.chen@mediatek.com, sean.wang@mediatek.com, kvalo@kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
- gregkh@linuxfoundation.org, rodrigo.vivi@intel.com,
- linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- raoxu@uniontech.com, guanwentao@uniontech.com, zhanjun@uniontech.com,
- cug_yangyuancong@hotmail.com, lorenzo.bianconi@redhat.com,
- kvalo@codeaurora.org, sidhayn@gmail.com, lorenzo.bianconi83@gmail.com,
- sgruszka@redhat.com, keescook@chromium.org, markus.theil@tu-ilmenau.de,
- gustavoars@kernel.org, stf_xl@wp.pl, romain.perier@gmail.com,
- apais@linux.microsoft.com, mrkiko.rs@gmail.com, oliver@neukum.org,
- woojung.huh@microchip.com, helmut.schaa@googlemail.com,
- mailhol.vincent@wanadoo.fr, dokyungs@yonsei.ac.kr, deren.wu@mediatek.com,
- daniel@makrotopia.org, sujuan.chen@mediatek.com,
- mikhail.v.gavrilov@gmail.com, stern@rowland.harvard.edu,
- linux-usb@vger.kernel.org, leitao@debian.org, dsahern@kernel.org,
- weiwan@google.com, netdev@vger.kernel.org, horms@kernel.org, andrew@lunn.ch,
- leit@fb.com, wang.zhao@mediatek.com, chui-hao.chiu@mediatek.com,
- lynxis@fe80.eu, mingyen.hsieh@mediatek.com, yn.chen@mediatek.com,
- quan.zhou@mediatek.com, dzm91@hust.edu.cn, gch981213@gmail.com,
- git@qrsnap.io, jiefeng_li@hust.edu.cn, nelson.yu@mediatek.com,
- rong.yan@mediatek.com, Bo.Jiao@mediatek.com, StanleyYP.Wang@mediatek.com
-References: <1E6ABDEA91ADAB1A+20241218090833.140045-1-wangyuli@uniontech.com>
- <a2bbdfb4-19ed-461e-a14b-e91a5636cc77@intel.com>
-Content-Language: en-US
-From: WangYuli <wangyuli@uniontech.com>
-Autocrypt: addr=wangyuli@uniontech.com; keydata=
- xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
- IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
- qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
- 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
- 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
- VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
- DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
- o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
-In-Reply-To: <a2bbdfb4-19ed-461e-a14b-e91a5636cc77@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------lzZ32JdsjGIy0QqsKa26e0mC"
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N0JG5d2dvsRDZrFOWdicm9YxypA1VUqzgskXmkpuX4P+Rlz55V30y8pg
-	cpWs7Jrbr7Lj2NWYMQjSfaGTNGnkhOKgev1tqOvy2zz7hdWgI8Ipf+mEe8EymFR7VuJ59Xd
-	Kopz6QCvVxYX4YdHEthfBAp0Cx9ylpLSQEZLjiK6cm719hCCb9Mwxw8EPVIidyqPqx6Z/um
-	2fVqR7dzotqGWM2QniXIaT9tMByqxd6Ebq2DPBZCHJhJ9BPzHD57vs6iXyoXxobnow2F3e0
-	DpmDNH8QZVUvaHjUCNt/wTmqVyoNdIH4VG/G2wzZ/hOT+AYMwHJGkKhTaXQxejq7BStHh43
-	znGx4abpM7//F8x9fPnCpXcva3+BxtVgS7In2cpHZlGlSqCkmJIbtC/uB/i1rBstBiod4l+
-	l/suOCPEBxAAyCntc63M5KBfT+0z/K3B3LaxhFIaghSXjOPtcB0fjyhgpSWR8xSLaEhGII2
-	XjgcEx4DUGteDPGuQN7klpfkqRQ//XEV0Y8/JC6WLOKPsL2jQXts32n0HydOITTQbizi9+V
-	11QoZlCks5ZUOrQoWh7Vi9xAa8heJpNCxIu7WL4rrfEj8CFjJaHERhPxH9T3zpJZvpXfFMd
-	Qpxppc58jtWhUFMcdKzzs8TeqwabhqQBwdsmB6FcnIzOrkfbsBMWiAcLRTCkn89fXFwzjkC
-	HQYxNBuWEQ6YvMRUqJBcAvvvv5T7sQZW9PLXFHpbH84zG7oRjpuaDUx3/CDH1CY/r87cbGc
-	77ITiC8+07NDUZ7eqrnbctN8Xp97/xmlqP76DrxjrSG1ZyJqcjRh0MZnQYt7Tp0aobKDH8V
-	w35vVspbILE37h/rY72DWNGKKUGQPHoZoKQxtQR6MY7+yuDg1OdhsvfVHabNjFy76qrTrVx
-	1noRaK8yJk7Zxj8GSyYu47H/Uavu3ZDlaJgSU5EMAJ5AIqydD1yn6r9iqVZjy9Znw/gNSV6
-	UDzSz3pWwatD6EsGW69UbSAe+l4GSFr4UNmPsdF1Jcl609vXXKNwGvkg2SKzxrBOaJUY7NY
-	V1t45q+yqMIxwtgfAsaKpmCN2Ujmo1dG64wcO8Z63t7bpPoWrjOCU60dmIHoUmij0NJ0xf6
-	QsLIpYZEa0b
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20241219-bpf-cond-ids-v2-1-8f121cae5374@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIACvKY2cC/1WNTQ7CIBCFr9LMWoyDxBZXvYfpQmAqs6ENU6um6
+ d0lxI3L9/e9DYQyk8C12SDTysJTKkIfGvDxnh6kOBQN+qQNatTKzaPyUwrFF2Xd6PzFhNC2Dsp
+ kzjTyu+JuUJowFDOyLFP+1IsVa/Sjnf9pKypUXYedsda2Gm3/IhYRH5/xmGiBYd/3LxMI4j6yA
+ AAA
+X-Change-ID: 20241212-bpf-cond-ids-9bfbc64dd77b
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1734593072; l=4129;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=MZ56Gk24lso758TZZGrga25F7eajp0AXtFgCuXVL4EY=;
+ b=z2K9l+WIlFYVMd0/pvMGRnrWKjzPn6JGxv8baJYB+1odyIhgHX38udxrhThvGNDbBKxQqi0Ep
+ MeYjiHT1F5wBnVSg1W6SFfZQKq08NaBytQz5unRjDDoOAFF5xYy/9At
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------lzZ32JdsjGIy0QqsKa26e0mC
-Content-Type: multipart/mixed; boundary="------------t9kOQFUFBryxJS1kEc7YATUG";
- protected-headers="v1"
-From: WangYuli <wangyuli@uniontech.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: nbd@nbd.name, lorenzo@kernel.org, ryder.lee@mediatek.com,
- shayne.chen@mediatek.com, sean.wang@mediatek.com, kvalo@kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
- gregkh@linuxfoundation.org, rodrigo.vivi@intel.com,
- linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- raoxu@uniontech.com, guanwentao@uniontech.com, zhanjun@uniontech.com,
- cug_yangyuancong@hotmail.com, lorenzo.bianconi@redhat.com,
- kvalo@codeaurora.org, sidhayn@gmail.com, lorenzo.bianconi83@gmail.com,
- sgruszka@redhat.com, keescook@chromium.org, markus.theil@tu-ilmenau.de,
- gustavoars@kernel.org, stf_xl@wp.pl, romain.perier@gmail.com,
- apais@linux.microsoft.com, mrkiko.rs@gmail.com, oliver@neukum.org,
- woojung.huh@microchip.com, helmut.schaa@googlemail.com,
- mailhol.vincent@wanadoo.fr, dokyungs@yonsei.ac.kr, deren.wu@mediatek.com,
- daniel@makrotopia.org, sujuan.chen@mediatek.com,
- mikhail.v.gavrilov@gmail.com, stern@rowland.harvard.edu,
- linux-usb@vger.kernel.org, leitao@debian.org, dsahern@kernel.org,
- weiwan@google.com, netdev@vger.kernel.org, horms@kernel.org, andrew@lunn.ch,
- leit@fb.com, wang.zhao@mediatek.com, chui-hao.chiu@mediatek.com,
- lynxis@fe80.eu, mingyen.hsieh@mediatek.com, yn.chen@mediatek.com,
- quan.zhou@mediatek.com, dzm91@hust.edu.cn, gch981213@gmail.com,
- git@qrsnap.io, jiefeng_li@hust.edu.cn, nelson.yu@mediatek.com,
- rong.yan@mediatek.com, Bo.Jiao@mediatek.com, StanleyYP.Wang@mediatek.com
-Message-ID: <359f8cbf-e560-495d-8afe-392573f1171b@uniontech.com>
-Subject: Re: [RESEND. PATCH] mt76: mt76u_vendor_request: Do not print error
- messages when -EPROTO
-References: <1E6ABDEA91ADAB1A+20241218090833.140045-1-wangyuli@uniontech.com>
- <a2bbdfb4-19ed-461e-a14b-e91a5636cc77@intel.com>
-In-Reply-To: <a2bbdfb4-19ed-461e-a14b-e91a5636cc77@intel.com>
+These BTF functions are not available unconditionally,
+only reference them when they are available.
 
---------------t9kOQFUFBryxJS1kEc7YATUG
-Content-Type: multipart/mixed; boundary="------------yW0HEyhQsnN0e7VNb0LN57Ek"
+Avoid the following build warnings:
 
---------------yW0HEyhQsnN0e7VNb0LN57Ek
-Content-Type: multipart/alternative;
- boundary="------------v8YpJ2JjzcZFOBmM8z0ncFDr"
+  BTF     .tmp_vmlinux1.btf.o
+btf_encoder__tag_kfunc: failed to find kfunc 'bpf_send_signal_task' in BTF
+btf_encoder__tag_kfuncs: failed to tag kfunc 'bpf_send_signal_task'
+  NM      .tmp_vmlinux1.syms
+  KSYMS   .tmp_vmlinux1.kallsyms.S
+  AS      .tmp_vmlinux1.kallsyms.o
+  LD      .tmp_vmlinux2
+  NM      .tmp_vmlinux2.syms
+  KSYMS   .tmp_vmlinux2.kallsyms.S
+  AS      .tmp_vmlinux2.kallsyms.o
+  LD      vmlinux
+  BTFIDS  vmlinux
+WARN: resolve_btfids: unresolved symbol prog_test_ref_kfunc
+WARN: resolve_btfids: unresolved symbol bpf_crypto_ctx
+WARN: resolve_btfids: unresolved symbol bpf_send_signal_task
+WARN: resolve_btfids: unresolved symbol bpf_modify_return_test_tp
+WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_xdp
+WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_skb
 
---------------v8YpJ2JjzcZFOBmM8z0ncFDr
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+Changes in v2:
+- Properly use BTF_ID_UNUSED in special_kfunc_list()
+- Link to v1: https://lore.kernel.org/r/20241213-bpf-cond-ids-v1-1-881849997219@weissschuh.net
+---
+ kernel/bpf/helpers.c  |  4 ++++
+ kernel/bpf/verifier.c | 11 +++++++++++
+ 2 files changed, 15 insertions(+)
 
-T24gMjAyNC8xMi8xOSAwMDoxMCwgQWxleGFuZGVyIExvYmFraW4gd3JvdGU6DQoNCj4gSXMg
-aXQgYSBmaXggb3IgYW4gaW1wcm92ZW1lbnQ/DQo+IFlvdSBuZWVkIHRvIHNwZWNpZnkgdGhl
-IHRhcmdldCB0cmVlLCBlaXRoZXIgJ1BBVENIIG5ldCcgKGZpeGVzKSBvcg0KPiAnUEFUQ0gg
-bmV0LW5leHQnIChpbXByb3ZlbWVudHMpLg0KIMKgSXQgaXMgYSBmaXggbm90IGFuIGltcHJv
-dmVtZW50Lg0KPiBIb3cgZG8gb3RoZXIgZHJpdmVycyBoYW5kbGUgdGhpcz8NCj4gQ2FuIC1F
-UFJPVE8gaGFwcGVuIGluIG90aGVyIGNhc2VzLCBub3Qgb25seSB1bnBsdWdnaW5nLCB3aGlj
-aCB0aGlzIHBhdGNoDQo+IHdvdWxkIGJyZWFrPw0KPg0KV2hlbiBpbml0aWFsaXppbmcgdGhl
-IG5ldHdvcmsgY2FyZCwgdW5wbHVnZ2luZyB0aGUgZGV2aWNlIHdpbGwgdHJpZ2dlciANCmFu
-IC1FUFJPVE8gZXJyb3IuDQoNClRoZSBleGNlcHRpb24gaXMgcHJpbnRlZCBhcyBmb2xsb3dz
-77yaDQoNCg0KIMKgwqDCoMKgwqDCoMKgIG10NzZ4MnUgMi0yLjQ6MS4wOiB2ZW5kb3IgcmVx
-dWVzdCByZXE6NDcgb2ZmOjkwMTggZmFpbGVkOi03MQ0KIMKgwqDCoMKgwqDCoMKgIG10NzZ4
-MnUgMi0yLjQ6MS4wOiB2ZW5kb3IgcmVxdWVzdCByZXE6NDcgb2ZmOjkwMTggZmFpbGVkOi03
-MQ0KIMKgwqDCoMKgwqDCoMKgIC4uLg0KDQpJdCB3aWxsIGNvbnRpbnVlIHRvIHByaW50IG1v
-cmUgdGhhbiAyMDAwIHRpbWVzIGZvciBhYm91dCA1IG1pbnV0ZXMsIA0KY2F1c2luZyB0aGUg
-dXNiIGRldmljZSB0byBiZSB1bmFibGUgdG8gYmUgZGlzY29ubmVjdGVkLiBEdXJpbmcgdGhp
-cyANCnBlcmlvZCwgdGhlIHVzYiBwb3J0IGNhbm5vdCByZWNvZ25pemUgdGhlIG5ldyBkZXZp
-Y2UgYmVjYXVzZSB0aGUgb2xkIA0KZGV2aWNlIGhhcyBub3QgZGlzY29ubmVjdGVkLg0KDQpU
-aGVyZSBtYXkgYmUgb3RoZXIgb3BlcmF0aW5nIG1ldGhvZHMgdGhhdCBjYXVzZSAtRVBST1RP
-LCBidXQgLUVQUk9UTyBpcyANCmEgbG93LWxldmVsIGhhcmR3YXJlIGVycm9yLiBJdCBpcyB1
-bndpc2UgdG8gcmVwZWF0IHZlbmRvciByZXF1ZXN0cyANCmV4cGVjdGluZyB0byByZWFkIGNv
-cnJlY3QgZGF0YS4gSXQgaXMgYSBiZXR0ZXIgY2hvaWNlIHRvIHRyZWF0IC1FUFJPVE8gDQph
-bmQgLUVOT0RFViB0aGUgc2FtZSB3YXnjgIINCg0KU2ltaWxhciB0byBjb21taXQg77yIbXQ3
-NjogdXNiOiBwcm9jZXNzIFVSQnMgd2l0aCBzdGF0dXMgRVBST1RPIA0KcHJvcGVybHnvvIlk
-byBubyBzY2hlZHVsZSByeF93b3JrZXIgZm9yIHVyYiBtYXJrZWQgd2l0aCBzdGF0dXMgc2V0
-IA0KLUVQUk9UTy4gSSBhbHNvIHJlcHJvZHVjZWQgdGhpcyBzaXR1YXRpb24gd2hlbiBwbHVn
-Z2luZyBhbmQgdW5wbHVnZ2luZyANCnRoZSBkZXZpY2UsIGFuZCB0aGlzIHBhdGNoIGlzIGVm
-ZmVjdGl2ZS4NCg0KSnVzdCBkbyBub3QgdmVuZG9yIHJlcXVlc3QgYWdhaW4gZm9yIHVyYiBt
-YXJrZWQgd2l0aCBzdGF0dXMgc2V0IC1FUFJPVE8gLg0KDQoNClRoYW5rcywNCg0KLS0gDQpX
-YW5nWXVsaQ0K
---------------v8YpJ2JjzcZFOBmM8z0ncFDr
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index 751c150f9e1cd7f56e6a2b68a7ebb4ae89a30d2d..5edf5436a7804816b7dcf1bbef2624d71a985f20 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -3089,7 +3089,9 @@ BTF_ID_FLAGS(func, bpf_task_get_cgroup1, KF_ACQUIRE | KF_RCU | KF_RET_NULL)
+ BTF_ID_FLAGS(func, bpf_task_from_pid, KF_ACQUIRE | KF_RET_NULL)
+ BTF_ID_FLAGS(func, bpf_task_from_vpid, KF_ACQUIRE | KF_RET_NULL)
+ BTF_ID_FLAGS(func, bpf_throw)
++#ifdef CONFIG_BPF_EVENTS
+ BTF_ID_FLAGS(func, bpf_send_signal_task, KF_TRUSTED_ARGS)
++#endif
+ BTF_KFUNCS_END(generic_btf_ids)
+ 
+ static const struct btf_kfunc_id_set generic_kfunc_set = {
+@@ -3135,7 +3137,9 @@ BTF_ID_FLAGS(func, bpf_dynptr_is_null)
+ BTF_ID_FLAGS(func, bpf_dynptr_is_rdonly)
+ BTF_ID_FLAGS(func, bpf_dynptr_size)
+ BTF_ID_FLAGS(func, bpf_dynptr_clone)
++#ifdef CONFIG_NET
+ BTF_ID_FLAGS(func, bpf_modify_return_test_tp)
++#endif
+ BTF_ID_FLAGS(func, bpf_wq_init)
+ BTF_ID_FLAGS(func, bpf_wq_set_callback_impl)
+ BTF_ID_FLAGS(func, bpf_wq_start)
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 77f56674aaa99a0b88ced5100ba57409e255fd29..2704fa4477ee2504897c82f0416aa7d61fb086ed 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -5507,7 +5507,9 @@ static bool in_rcu_cs(struct bpf_verifier_env *env)
+ 
+ /* Once GCC supports btf_type_tag the following mechanism will be replaced with tag check */
+ BTF_SET_START(rcu_protected_types)
++#ifdef CONFIG_NET
+ BTF_ID(struct, prog_test_ref_kfunc)
++#endif
+ #ifdef CONFIG_CGROUPS
+ BTF_ID(struct, cgroup)
+ #endif
+@@ -5515,7 +5517,9 @@ BTF_ID(struct, cgroup)
+ BTF_ID(struct, bpf_cpumask)
+ #endif
+ BTF_ID(struct, task_struct)
++#ifdef CONFIG_CRYPTO
+ BTF_ID(struct, bpf_crypto_ctx)
++#endif
+ BTF_SET_END(rcu_protected_types)
+ 
+ static bool rcu_protected_object(const struct btf *btf, u32 btf_id)
+@@ -11486,8 +11490,10 @@ BTF_ID(func, bpf_rdonly_cast)
+ BTF_ID(func, bpf_rbtree_remove)
+ BTF_ID(func, bpf_rbtree_add_impl)
+ BTF_ID(func, bpf_rbtree_first)
++#ifdef CONFIG_NET
+ BTF_ID(func, bpf_dynptr_from_skb)
+ BTF_ID(func, bpf_dynptr_from_xdp)
++#endif
+ BTF_ID(func, bpf_dynptr_slice)
+ BTF_ID(func, bpf_dynptr_slice_rdwr)
+ BTF_ID(func, bpf_dynptr_clone)
+@@ -11515,8 +11521,13 @@ BTF_ID(func, bpf_rcu_read_unlock)
+ BTF_ID(func, bpf_rbtree_remove)
+ BTF_ID(func, bpf_rbtree_add_impl)
+ BTF_ID(func, bpf_rbtree_first)
++#ifdef CONFIG_NET
+ BTF_ID(func, bpf_dynptr_from_skb)
+ BTF_ID(func, bpf_dynptr_from_xdp)
++#else
++BTF_ID_UNUSED
++BTF_ID_UNUSED
++#endif
+ BTF_ID(func, bpf_dynptr_slice)
+ BTF_ID(func, bpf_dynptr_slice_rdwr)
+ BTF_ID(func, bpf_dynptr_clone)
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF=
--8">
-  </head>
-  <body>
-    <p>On 2024/12/19 00:10, Alexander Lobakin wrote:</p>
-    <blockquote type=3D"cite"
-      cite=3D"mid:a2bbdfb4-19ed-461e-a14b-e91a5636cc77@intel.com">
-      <pre wrap=3D"" class=3D"moz-quote-pre">Is it a fix or an improvemen=
-t?
-You need to specify the target tree, either 'PATCH net' (fixes) or
-'PATCH net-next' (improvements).
-</pre>
-    </blockquote>
-    =C2=A0It is a fix not an improvement.<span style=3D"white-space: pre-=
-wrap">
-</span>
-    <blockquote type=3D"cite"
-      cite=3D"mid:a2bbdfb4-19ed-461e-a14b-e91a5636cc77@intel.com">
-      <pre wrap=3D"" class=3D"moz-quote-pre">How do other drivers handle =
-this?
-Can -EPROTO happen in other cases, not only unplugging, which this patch
-would break?
+---
+base-commit: d9df5df183eede1041cbd5ff1d776e94757e338b
+change-id: 20241212-bpf-cond-ids-9bfbc64dd77b
 
-</pre>
-    </blockquote>
-    <p>When initializing the network card, unplugging the device will
-      trigger an -EPROTO error.</p>
-    <p>The exception is printed as follows=EF=BC=9A</p>
-    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0<br>
-    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mt76x2u 2-2.4:1.0: vendor =
-request req:47 off:9018 failed:-71<br>
-    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mt76x2u 2-2.4:1.0: vendor =
-request req:47 off:9018 failed:-71<br>
-    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ...<br>
-    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0<br>
-    <p>It will continue to print more than 2000 times for about 5
-      minutes, causing the usb device to be unable to be disconnected.=C2=
-=A0
-      During this period, the usb port cannot recognize the new device
-      because the old device has not disconnected.</p>
-    <p>There may be other operating methods that cause -EPROTO, but
-      -EPROTO is a low-level hardware error. It is unwise to repeat
-      vendor requests expecting to read correct data. It is a better
-      choice to treat -EPROTO and -ENODEV the same way=E3=80=82</p>
-    <p>Similar to commit =EF=BC=88mt76: usb: process URBs with status EPR=
-OTO
-      properly=EF=BC=89do no schedule rx_worker for urb marked with statu=
-s set
-      -EPROTO. I also reproduced this situation when plugging and
-      unplugging the device, and this patch is effective.</p>
-    <p>Just do not vendor request again for urb marked with status set
-      -EPROTO .</p>
-    <p><br>
-    </p>
-    <p>Thanks,<br>
-    </p>
-    <div class=3D"moz-signature">-- <br>
-      <meta http-equiv=3D"content-type" content=3D"text/html; charset=3DU=
-TF-8">
-      WangYuli</div>
-  </body>
-</html>
+Best regards,
+-- 
+Thomas Weißschuh <linux@weissschuh.net>
 
---------------v8YpJ2JjzcZFOBmM8z0ncFDr--
-
---------------yW0HEyhQsnN0e7VNb0LN57Ek
-Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
-P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
-FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
-AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
-bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
-AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
-GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
-7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
-/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
-=3DBlkq
------END PGP PUBLIC KEY BLOCK-----
-
---------------yW0HEyhQsnN0e7VNb0LN57Ek--
-
---------------t9kOQFUFBryxJS1kEc7YATUG--
-
---------------lzZ32JdsjGIy0QqsKa26e0mC
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZ2PHHAUDAAAAAAAKCRDF2h8wRvQL7gYX
-AP0W8PzI7QVqA+31JnDg1CxYYXzmXk/c3NaAuW8VObPOqQD/ab4eOVfD6UTQ2ZoytfW3G7bDgzc+
-vn00zaCUbHdmrA4=
-=1v9C
------END PGP SIGNATURE-----
-
---------------lzZ32JdsjGIy0QqsKa26e0mC--
 
