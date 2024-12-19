@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-153254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92BCF9F7738
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:25:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3CC09F775C
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:34:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 889F17A20E9
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:25:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 366AC188B6A5
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347C721C9F7;
-	Thu, 19 Dec 2024 08:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B409C221463;
+	Thu, 19 Dec 2024 08:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CWkcSZ9z"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XBJMxU0u"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA5F78F34
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 08:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B3515E5BB;
+	Thu, 19 Dec 2024 08:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734596749; cv=none; b=qrF4T2j3cEBoNls/LB3cAOVRb9EZmjJfdc5dwan9gG+eDHYz00lkoOuO1Y2NakejWwA0APy6sWPsqI4JvKR7EWg9vZ4BEevdP1B9M2irxGquJ2fG2ziIACIfs3Q/9pS0BiGMmlvEUuefnlKrt4mImX6p++iaQzsyhJI1V+L3oVE=
+	t=1734597252; cv=none; b=FQvdEUiyJ4TcMjsWDNhZl2eo8W27hK1lQll+RZATBiISOzhOhqkUU96/b3hIn4XcopxxoXhIClKqb6NMohoF4t/pcEDPurhmd02+gwZjb6DGTHmTBOhJUY5GXYANb9naWT1bNP+ti5bKEd8DLrUSwcMZ/vbb93MfMJzyCe+C6jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734596749; c=relaxed/simple;
-	bh=+IV1YM0zj+IizMIL92Foi//61pkoKgRLJjO0jsxg1BU=;
+	s=arc-20240116; t=1734597252; c=relaxed/simple;
+	bh=ZDNPTus+pl0pyyVdBneRJIycZqkl5M4AmC4zHYoInrM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mCut+T9UqX+PHKY/hRuRrjZd21a4If9TitXC/Fkpfa7wxFrb99/ARlx/UmidHNk2QYl40EFyCPOWg6Gak/w5K1kDJwc4/Ofznmj0U0EY8s6hvlIZblTCJK6SUMRyku+9mDELpy34iQu/oeesjzySPTTNLSwsZCXyyektlSY7jm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CWkcSZ9z; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=CO7SdhpH8aC5zuFOKwf+1PE2op2B9y1BIycHIdM/5XmZ2EYGPbhv4V0xUtjZNgylNXq2sipnE/vNv5MnfkS5Zt0jjEJkpbSTNZV4Ax4bgQKnN7bctQcTFP+mKNILkpUre5HB7PjL6szIcImUis8PLnETz0V4xROzDDVoZ0gONhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XBJMxU0u; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,21 +36,30 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=L6C74ZNxb25ty4+r4Sn4DchfdKRS/Uy4sn5pI0fqDkc=; b=CWkcSZ9zjHyf6JQZVMlvMn5mD3
-	mV2MKEvIC/PpGrbNkqArXCmjibhOREFme3ZHtVV0Dac9ykD9mubifdtqehBBqSWHyxHPu0cqlotwN
-	oqVbir8JmbP2YrfSpwLZJBlXyPq7wMCeLZVWyzmrS94xxuepzit1CQHMjnz/Cjvf3ydY=;
+	bh=Q9Vo7EMgyx3gITUSk3Rz41lLOoXpLKhtDG+rDzbzpi8=; b=XBJMxU0uF7+eYTjPPt201hkgq4
+	sgiSRCCTJ/Ry26Hdxk2uPJVACMT0B7RWk3vahniFyLZeg2Qy8F+aN9fe+2px8Nr1P+rnNFG3heVY2
+	AMOU1xhWVyY2P9nURy+H8oQa348iGN6yZDRIIi6AehBkQhV7qXvTZw3OLleKpaZbYJY0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tOBqn-001Xrt-3Q; Thu, 19 Dec 2024 09:25:41 +0100
-Date: Thu, 19 Dec 2024 09:25:41 +0100
+	id 1tOByq-001Y0i-No; Thu, 19 Dec 2024 09:34:00 +0100
+Date: Thu, 19 Dec 2024 09:34:00 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, kernel-team@meta.com
-Subject: Re: [PATCH net-next] eth: fbnic: fix csr boundary for RPM RAM section
-Message-ID: <2a375625-5016-4f4a-a5fa-5a73dc536651@lunn.ch>
-References: <20241218232614.439329-1-mohsin.bashr@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	linux-omap@vger.kernel.org,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/3] net: phy: add phy_disable_eee
+Message-ID: <2397ac08-8cb7-4158-bc0c-48fc4a2e0c2c@lunn.ch>
+References: <5139374e-7151-4d0d-8ba9-9ec3d9b52f67@gmail.com>
+ <fd51738c-dcd6-4d61-b8c5-faa6ac0f1026@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,18 +68,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241218232614.439329-1-mohsin.bashr@gmail.com>
+In-Reply-To: <fd51738c-dcd6-4d61-b8c5-faa6ac0f1026@gmail.com>
 
-On Wed, Dec 18, 2024 at 03:25:58PM -0800, Mohsin Bashir wrote:
-> The CSR dump support leverages the FBNIC_BOUNDS macro, which pads the end
-> condition for each section by adding an offset of 1. However, the RPC RAM
-> section, which is dumped differently from other sections, does not rely
-> on this macro and instead directly uses end boundary address. Hence,
-> subtracting 1 from the end address results in skipping a register.
+On Mon, Dec 16, 2024 at 10:31:18PM +0100, Heiner Kallweit wrote:
+> If a MAC driver doesn't support EEE, then the PHY shouldn't advertise it.
+> Add phy_disable_eee() for this purpose.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Maybe it would be better to actually use FBNIC_BOUNDS macro, to make
-it the same as all the others, and so avoid errors like this because
-it is special?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-	Andrew
+    Andrew
 
