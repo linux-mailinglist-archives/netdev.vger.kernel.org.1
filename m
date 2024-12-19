@@ -1,142 +1,153 @@
-Return-Path: <netdev+bounces-153510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A90F9F8602
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 21:36:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C6B9F8621
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 21:43:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5681891B4E
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 20:36:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D55518937C0
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 20:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7279C1BDA8C;
-	Thu, 19 Dec 2024 20:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD361C1F15;
+	Thu, 19 Dec 2024 20:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="jqEFdJVO"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Hirg2Q7I"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07111B6CEC
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 20:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAC53FD1;
+	Thu, 19 Dec 2024 20:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734640608; cv=none; b=tlK1K2lc2vsOhKvnsoU+X1PVK9VcYTIikREBcsrSzjGefLk2DOBPvpaLrrVB5k3M4Ud3xDygT/1ny7ngIcBg5eKmZ2xHJoPj8grOg2jHwcRgR29Ik+lBwotU5ep/15SilGpyPLzS2isivoYce2Cdyz6VfYSJG7vuwBwFJLVjPdI=
+	t=1734640996; cv=none; b=uGUGMaxOyYw3ytkecGt9YooBFQDPSj6krC4m+wcfSDGZnVFhCvT7oLj/Kbyupm4QBpuhEn5mv0UTgMrPjiZyIGsqCQHU5nkmhGimYn4rAa6azH6QXDCh2/M39dlRTeGX/BaXNl4tVnszR3uukEoYyIEVAMDGV1fU4TVUXaF+zZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734640608; c=relaxed/simple;
-	bh=wda/lOi/x8S8oGXon3Gu91m7K9vSKbCp+D1/y3DYncA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dPfUnU0jyqLM/No9dMg4j4gGAY9PHEhga1CFLr7PKHQTP1Ffvw6oGEhLtM8lLdN7HfdpjwpIHkx4F7LJlGLS2um/WIFCZrtXhRGVu2oSOf3GjrXIVynqDlUUqc8+cJOMKWVZJMIxivTo2w0JOdYdVtd2BKfsSALcv8OryMn4//Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=jqEFdJVO; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id C375F2C07BD;
-	Fri, 20 Dec 2024 09:36:37 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1734640597;
-	bh=8beJoOU5Nrta/GXSMFPY+yvlk7KJmBRMZB0sO9Gd+Ro=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jqEFdJVOq6Df+bjKIhfgMOLjctChMcKvTbYs8PHUtnLpfZGHn7w/8zVcTIP7moPxB
-	 odBUo1Ekh2zZODP3gutiiEDziPjZRxEDphGwbaEkUW7xTVTnYX+6zbH+XIhHa2b0Hy
-	 ujZukwsR/X4uhOhJiPfrk8Of3IgryH0hNTXBd6efKMvPfq9eYddXKoSQNAF1dxq9lO
-	 RJLbkssXvY5Lv9qhJ1XOrQ52QMZ9mzN4p/vPQjB2ngYcLDYu7Y7IDGSo8V9lDw29qF
-	 qV3YYmTRy2S2+kDGiJrc2clnMq8CH2Ye9lLRDZ551tHv4IZxJH5L/4hi8r5C5gigOy
-	 oVZYPZZvsKTRw==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B676483d50000>; Fri, 20 Dec 2024 09:36:37 +1300
-Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id A90AE13EE00;
-	Fri, 20 Dec 2024 09:36:37 +1300 (NZDT)
-Message-ID: <fe34b6b0-01fd-4dc7-a1b4-6c27ad2c9e74@alliedtelesis.co.nz>
-Date: Fri, 20 Dec 2024 09:36:37 +1300
+	s=arc-20240116; t=1734640996; c=relaxed/simple;
+	bh=SBBbcrBX+Vk77S2+bxd2AMqwNH5jo2J+2V2RaUvSlEM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lY300EXKB8psj5nrx8JDmy9FHxD2Qqz1p96IQhAUhywCnhXGfbfu3IGCgVH9QOPht2ATlvn3UkJpSRlKsqToMofNr/nvYQT5hUPboV+N4V4LNj4D7W9m9y8mNSGevh/Cu08nC6kZWvew6tv0gd9A0y9mAesT5xtTF/ZccgzDwL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Hirg2Q7I; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BJHKrH1015075;
+	Thu, 19 Dec 2024 20:42:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=JDSWUwXe1gR2On55ugw/yZ
+	9uh7N0B2gfTrX8HgykqsU=; b=Hirg2Q7IRSLIxdVty0Fipom/WtEnyN4O1upYOS
+	xM3K0d+B6s6LrbZU8tVFFie4Au0pRkfrzrkEg4DcFs8Bd/wTf3fLN9bVpY0R/L2V
+	B43Xy+s4BYFL+i2NIDhgCgVLRgLa7c2kE2WYInJuoiGEZY/MJoyHlEXd2VdCXMpC
+	Vqhaf/KeF+2XzjEn1Xpl4irLcCQvyTDFmEUdyjvDYEflPap6jGZHtIDS2pAgVvdA
+	jMTZb7GHzM7D3MC1/WUFAcVTJGtAqX1i33ClkcP/FksqBnjjtzKatuLUAhy3PVua
+	BHssxdZOj2VOzeXDDatJ0v31N/gfBTnvkvruG1dJ/uicnssw==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43mqt80dtv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Dec 2024 20:42:46 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BJKgi9a011364
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Dec 2024 20:42:44 GMT
+Received: from PHILBER.qualcomm.com (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 19 Dec
+ 2024 12:42:39 -0800
+From: Peter Hilber <quic_philber@quicinc.com>
+To: <linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
+        <virtio-dev@lists.linux.dev>, <netdev@vger.kernel.org>
+CC: Trilok Soni <quic_tsoni@quicinc.com>,
+        Srivatsa Vaddagiri
+	<quic_svaddagi@quicinc.com>,
+        Peter Hilber <quic_philber@quicinc.com>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?=
+	<eperezma@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Jason Wang <jasowang@redhat.com>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Shuah Khan
+	<shuah@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        <linux-kselftest@vger.kernel.org>, <linux-api@vger.kernel.org>,
+        "David
+ Woodhouse" <dwmw2@infradead.org>,
+        "Ridoux, Julien" <ridouxj@amazon.com>,
+        "John Stultz" <jstultz@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Stephen Boyd" <sboyd@kernel.org>,
+        Anna-Maria Behnsen
+	<anna-maria@linutronix.de>
+Subject: [RFC PATCH 0/2] ptp: add PTP_SYS_OFFSET_STAT ioctl, support it in virtio_rtc
+Date: Thu, 19 Dec 2024 21:42:02 +0100
+Message-ID: <20241219204208.3160-1-quic_philber@quicinc.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 4/4] net: mdio: Add RTL9300 MDIO driver
-To: Andrew Lunn <andrew@lunn.ch>,
- Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
- hkallweit1@gmail.com, linux@armlinux.org.uk, markus.stockhausen@gmx.de,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-mips@vger.kernel.org
-References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
- <20241216031346.2626805-5-chris.packham@alliedtelesis.co.nz>
- <CAJq09z49uBPPZqDyc3O+4nVppKoKdrJunQnQKBUfQmwzdV+ZFQ@mail.gmail.com>
- <07073382-df51-4064-9802-cdbfcf732523@lunn.ch>
-Content-Language: en-US
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-In-Reply-To: <07073382-df51-4064-9802-cdbfcf732523@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=676483d5 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=RZcAm9yDv7YA:10 a=TaXqMiGPp3LDd7P4VpYA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: WZjrY0ycIR4EgJb4WPifMdayeJ-b49VT
+X-Proofpoint-GUID: WZjrY0ycIR4EgJb4WPifMdayeJ-b49VT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ suspectscore=0 priorityscore=1501 spamscore=0 mlxlogscore=777
+ malwarescore=0 impostorscore=0 phishscore=0 clxscore=1011
+ lowpriorityscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2412190164
+
+This RFC patch series proposes a new ioctl PTP_SYS_OFFSET_STAT and adds
+support for it in the proposed virtio_rtc driver [1]. The new
+PTP_SYS_OFFSET_STAT ioctl provides a cross-timestamp like
+PTP_SYS_OFFSET_PRECISE2, plus any the following status information (for
+now):
+
+- for UTC timescale clocks: leap second related status,
+
+- clock accuracy.
+
+The second commit adds support for the ioctl in the proposed virtio_rtc
+driver, and hence depends on the patch series "Add virtio_rtc module" [1].
+
+[1] https://lore.kernel.org/lkml/20241219201118.2233-1-quic_philber@quicinc.com/T/#t
+
+Signed-off-by: Peter Hilber <quic_philber@quicinc.com>
 
 
-On 19/12/2024 22:40, Andrew Lunn wrote:
-> On Thu, Dec 19, 2024 at 01:46:41AM -0300, Luiz Angelo Daros de Luca wro=
-te:
->> Hello Chris,
->>
->>> +++ b/drivers/net/mdio/mdio-realtek-rtl.c
->> I wonder if the name might be dubious in the future with other realtek
->> products with MDIO. Realtek is quite a large company with many
->> products. Would a version/model/family/usage in that name help a far
->> future reader to identify what this file is about?
-> Isnt rtl the family name? Or would you prefer mdio-realtek-rtl9300.c?
+Peter Hilber (2):
+  ptp: add PTP_SYS_OFFSET_STAT for xtstamping with status
+  virtio_rtc: Support PTP_SYS_OFFSET_STAT ioctl
 
-Yes my intention was that "rtl" was the family name. I'm happy to change=20
-to rtl9300.
+ drivers/ptp/ptp_chardev.c             |  39 ++++++++
+ drivers/ptp/ptp_clock.c               |   9 ++
+ drivers/virtio/Kconfig                |   4 +-
+ drivers/virtio/virtio_rtc_driver.c    | 122 +++++++++++++++++++++++-
+ drivers/virtio/virtio_rtc_internal.h  |   3 +-
+ drivers/virtio/virtio_rtc_ptp.c       |  25 +++--
+ include/linux/ptp_clock_kernel.h      |  31 ++++++
+ include/uapi/linux/ptp_clock.h        | 130 +++++++++++++++++++++++++-
+ tools/testing/selftests/ptp/Makefile  |   2 +-
+ tools/testing/selftests/ptp/testptp.c | 126 ++++++++++++++++++++++++-
+ 10 files changed, 471 insertions(+), 20 deletions(-)
 
-I suspect this probably will be compatible with the rtl9310. I've just=20
-received a RTL9313 based board so will probably start looking at that in=20
-the new year.
 
->>> +static int realtek_mdio_wait_ready(struct realtek_mdio_priv *priv)
->> All those realtek_mdio_* prefix might collide with realtek_mdio_* from
->> drivers/net/dsa/realtek/realtek-mdio.c. This realtek_mdio_* is about a
->> Realtek SoC MDIO interface with the switch. The other realtek_mdio_*
->> is about the interface (MDIO or SMI) between (the other vendor) SoC
->> and the switch. I don't know if the maintainers are OK with it but
->> listing those symbols in alphabetic order from both sources might be
->> confusing.
-> rtl9300_ as a prefix?
-
-I'd happily=C2=A0 change to rtl_ or rtl9300_
-
->>> +static const struct of_device_id realtek_mdio_ids[] =3D {
->>> +       { .compatible =3D "realtek,rtl9301-mdio" },
->>> +       { .compatible =3D "realtek,rtl9302b-mdio" },
->>> +       { .compatible =3D "realtek,rtl9302c-mdio" },
->>> +       { .compatible =3D "realtek,rtl9303-mdio" },
->> Do these different compatible strings really matter? AFAIK, compatible
->> are not for listing all supported models/variants but to describe
->> devices that have a different behavior and indicating that (with
->> different strings) is needed to decide how the driver will work. If
->> the driver does not use which compatible was set, it might indicate
->> that we don't really need 4 compatible but 1.
-> It can be useful when we initially think they are compatible, but
-> later find out they are not, and we need different behaviour.
-
-The way I've written the dt-binding any board should include=20
-"realtek,rtl9301-mdio" and may also include one of=20
-"realtek,rtl9302b-mdio", "realtek,rtl9302c-mdio",=20
-"realtek,rtl9303-mdio". For the MDIO driver the specific chip could=20
-possibly tell us the maximum SMI bus number. Unfortunately I've only got=20
-a block diagram of the RTL9302C, I know that does have 4 SMI interfaces,=20
-the others may have fewer. Things would probably work fine for now with=20
-just "realtek,rtl9301-mdio" but is there any harm in including the others=
-?
+base-commit: 8a8009abbfa04e58f1b01b20534cac9e8fe61a46
+-- 
+2.43.0
 
 
