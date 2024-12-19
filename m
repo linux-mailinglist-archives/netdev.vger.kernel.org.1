@@ -1,139 +1,136 @@
-Return-Path: <netdev+bounces-153402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 262D39F7D91
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:03:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F5849F7D97
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C0B31652CF
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:03:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7850C7A04A2
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20AFC21C182;
-	Thu, 19 Dec 2024 15:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43A4224B1E;
+	Thu, 19 Dec 2024 15:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p5VnODcM"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="aEikJbut"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8319841C6C
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 15:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1474F41C64;
+	Thu, 19 Dec 2024 15:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734620617; cv=none; b=GWfTGmpVa5ewe5/HDFC6BI8SKxlNblTItvEILLSxjeKuxlbO5oQ+YI0/6vZ43FQ54HcmcGowxuuZSWt4N0B8uZ89RoSFSKmhHjyAsChuwfaIkkKXJ3qMirqtj+akDjyNgJkG0phPEbeCH7BnueqLruzSDpOT5LevTdNqPWZL5yI=
+	t=1734620712; cv=none; b=T6Vdx4jUnQuFkI9W5HRf4Ojaa63tJqQepEdmcH4aGBN4zjZwnzMSCuzv8ImW54MzZbVof6JQKZQ80giTWKvn5xgYAt63pATAKeMc4iWwMhxVfAFRrxcPnVU7CxGj2BdyZ3LET67Y+2Tovw1vO9+cAWkOZRsHztxl45ab1hd4Zms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734620617; c=relaxed/simple;
-	bh=cjoQbpqNQCMays5FUi0iw5PxYvzF5wG89yCM1N61ZtA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=e6dWb3LtY4jODdgfGwMgYS1kPrwAPD0uqxQoBKxTJG6cYbBArDMk3w5pnCV7IcvoAaJkcB90cmOYothlIkiYh3V+L6dykYkrjqN79pXg4sGevjtgFcc5wOg4cI+FxjAstLW3b0Wtxs2RqRxwWza30IVquXPUsw910hsKoC1yAns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p5VnODcM; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4679aeb21e6so16343591cf.0
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 07:03:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734620613; x=1735225413; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nYXQzEmf/Sap1RXFcM8emfzZNVqZoJGBOycpRIPyCOw=;
-        b=p5VnODcMOJeukA/Q6svzKYE9wVGviBA07igGM3H+2Nsjo98iE55sgh/uzwOm9TRN34
-         Sy6Kl0S/zepTNEYGVJSCMpWjH37teXo4MUvVtITwtlFV4VbEYYm2BMRXc78CuohifICe
-         Y8tuSjTNtvNfQp0jBUe1emAkddfFkm5xu7bn7m8W93I2G/7azY1zbji8oQuKgCFA1Sja
-         aHO3lEm0xQosU17OxeVrHLTGDlWsmOpukv3cu5SsPg/sFbgg9IwmWABAnfgdNUkeYFXi
-         lOBlfzAUC+d7xnnOGQq+rS/4umxJASY9bgnex85l+yLTp12d4zmZ1TUkXLkYrF2XzG+U
-         Xs1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734620613; x=1735225413;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nYXQzEmf/Sap1RXFcM8emfzZNVqZoJGBOycpRIPyCOw=;
-        b=MdAwATvDOtfAPjopO/HIGuAevoS/M/VN8dcNwSJZeWadirS6jXY2O54/I7/Uo50vKQ
-         U0vhTIrnUbSr12hvZFyCLlpn7FflN9vyHXAbcr/mMAIDa1clFKrt1PzvBySntpcVyGji
-         Jar7HYh1ihV2tqeJ1cVAa0x9z0vq8o48dX7+3dVP9jR/2DwxxwQBwwveuSsU9q2TvFXm
-         f9VWlBqNQ8HV+NdG3O2ALbMjcBMxl6DdqPuGAhMB91XtEiDwc+qarDU4jhfXGMfPLE/x
-         AKDayeaedLw88nUQg7UBQA7+lKiBki2DKEx6hgAhM+BY/7TupPTCO7I5UYvdi2RBYIWo
-         4Jrg==
-X-Gm-Message-State: AOJu0YzhVybfh7Oq7gm3vKWei1VE0NrsvssufDRThTYeVJT0HsqMuB4M
-	g3xpD/wlzLfHvnr68vG+s2u0q7BIvSPCmM7IlyhyjUeqsPgj5BwLHA24oO3Uki9V3nzHZLlI96m
-	V3rQJwM0dkQ==
-X-Google-Smtp-Source: AGHT+IHnqgEoIIgiX4JTK5wL2RCg0Lu0CqwWh/AVDPedROdgWz6lfRtm5BTN7V+tAlRxTverwbDCeJJZRQ/nqw==
-X-Received: from qtbfe8.prod.google.com ([2002:a05:622a:4d48:b0:467:7076:37d7])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7dd3:0:b0:461:22f0:4f83 with SMTP id d75a77b69052e-46908e7e9bamr99718151cf.43.1734620613416;
- Thu, 19 Dec 2024 07:03:33 -0800 (PST)
-Date: Thu, 19 Dec 2024 15:03:30 +0000
+	s=arc-20240116; t=1734620712; c=relaxed/simple;
+	bh=iwGKqwTTWXUxoDHoKQIjb/ql93uq4d++zxqRLk5SRrc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OMXWYruSb7OTxY8Y67ZaofSOPCYOMU8tA09mzDIpG+Ekyv7UpPqT9LWJ8uJcZbwoITXEaffoq2TAajrGzJa1pse45DdCGxryxPxuY9hCPVbYTzqVAZxRQjW0yxwwDjTLZtL5dVEfyJYZ+q4x4lxh/xFewXM+JrvLvP+9K/JvQZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=aEikJbut; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tOI5F-0084ke-0c; Thu, 19 Dec 2024 16:05:01 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=zifHlnhZp8kfHV1mHurt72vHOoVuTpoxDlZ+dstXlwc=; b=aEikJbutTfQMb9Xtj/ob5QpdtL
+	tjMfv/GZGxC2nkhtXLYadl+7tbpQvH1SpzKLLEwQLpTuiOt8nE9J6teK9ZtM5+FhGIfOKDlOhKMCI
+	nbartSzSqdDFGJblNOHTyhwINQgeROD6dO6qNrG/NfFcyc8zym1K3j9jVjSiTYzF+eaTQe2UXL1BH
+	Al6ZsK9Vr/0zVw1ti7ZM7MBvUP8cx6OR+sYUUm/HvTQnuSNdGytm2VDLFV9FHf28GNMWF3OOcRhFc
+	J+hiykUdmo6lb5n5aYt5QB3MDcgrvN/C0ULqsC2AajcJMA9kEwfUlrOs6zBdwdhjpB+6b4WqDM0Ax
+	DwlMVddw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tOI5D-0004wn-QO; Thu, 19 Dec 2024 16:04:59 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tOI4x-00ELnH-DN; Thu, 19 Dec 2024 16:04:43 +0100
+Message-ID: <cc04fe7a-aa49-47a7-8d54-7a0e7c5bfbdc@rbox.co>
+Date: Thu, 19 Dec 2024 16:04:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241219150330.3159027-1-edumazet@google.com>
-Subject: [PATCH net-next] inetpeer: avoid false sharing in inet_peer_xrlim_allow()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Hyunwoo Kim <v4bel@theori.io>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org, qwerty@theori.io
+References: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX>
+ <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
+ <Z2LZ3HK05RH8OfP5@v4bel-B760M-AORUS-ELITE-AX>
+ <s2k74f6zvjm7uexqfyej6txvoqgf6lkaa47igo2eh4pq55d4n2@wnrrcr6aa6lk>
+ <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
+ <Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX>
+ <5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co>
+ <Z2N44ka8+l83XqcG@v4bel-B760M-AORUS-ELITE-AX>
+ <fezrztdzj5bz54ys6qialz4w3bjqqxmhx74t2tnklbif6ns5dn@mtcjqnqbx6n4>
+ <722e8d32-fe5c-4522-be2b-5967fdbb6b30@rbox.co>
+ <CAGxU2F5VMGg--iv8Nxvmo_tGhHf_4d_hO5WuibXLUcwVVNgQEg@mail.gmail.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <CAGxU2F5VMGg--iv8Nxvmo_tGhHf_4d_hO5WuibXLUcwVVNgQEg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Under DOS, inet_peer_xrlim_allow() might be called millions
-of times per second from different cpus.
+On 12/19/24 15:48, Stefano Garzarella wrote:
+> On Thu, 19 Dec 2024 at 15:36, Michal Luczaj <mhal@rbox.co> wrote:
+>>
+>> On 12/19/24 09:19, Stefano Garzarella wrote:
+>>> ...
+>>> I think the best thing though is to better understand how to handle
+>>> deassign, rather than checking everywhere that it's not null, also
+>>> because in some cases (like the one in virtio-vsock), it's also
+>>> important that the transport is the same.
+>>
+>> My vote would be to apply your virtio_transport_recv_pkt() patch *and* make
+>> it impossible-by-design to switch ->transport from non-NULL to NULL in
+>> vsock_assign_transport().
+> 
+> I don't know if that's enough, in this case the problem is that some
+> response packets are intended for a socket, where the transport has
+> changed. So whether it's null or assigned but different, it's still a
+> problem we have to handle.
+> 
+> So making it impossible for the transport to be null, but allowing it
+> to be different (we can't prevent it from changing), doesn't solve the
+> problem for us, it only shifts it.
 
-Make sure to write over peer->rate_tokens and peer->rate_last
-only when really needed.
+Got it. I assumed this issue would be solved by `vsk->transport !=
+&t->transport` in the critical place(s).
 
-Note the inherent races of this function are still there,
-we do not care of precise ICMP rate limiting.
+(Note that BPF doesn't care if transport has changed; BPF just expects to
+have _a_ transport.)
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/inetpeer.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+>> If I'm not mistaken, that would require rewriting vsock_assign_transport()
+>> so that a new transport is assigned only once fully initialized, otherwise
+>> keep the old one (still unhurt and functional) and return error. Because
+>> failing connect() should not change anything under the hood, right?
+>>
+> 
+> Nope, connect should be able to change the transport.
+> 
+> Because a user can do an initial connect() that requires a specific
+> transport, this one fails maybe because there's no peer with that cid.
+> Then the user can redo the connect() to a different cid that requires
+> a different transport.
 
-diff --git a/net/ipv4/inetpeer.c b/net/ipv4/inetpeer.c
-index e02484f4d22b8ea47cbaeed46c5fb0a7411462a1..b8b23a77ceb4f0f1a3d3adaacea2a7c59a7da3c9 100644
---- a/net/ipv4/inetpeer.c
-+++ b/net/ipv4/inetpeer.c
-@@ -246,23 +246,27 @@ void inet_putpeer(struct inet_peer *p)
- #define XRLIM_BURST_FACTOR 6
- bool inet_peer_xrlim_allow(struct inet_peer *peer, int timeout)
- {
--	unsigned long now, token;
-+	unsigned long now, token, otoken, delta;
- 	bool rc = false;
- 
- 	if (!peer)
- 		return true;
- 
--	token = peer->rate_tokens;
-+	token = otoken = READ_ONCE(peer->rate_tokens);
- 	now = jiffies;
--	token += now - peer->rate_last;
--	peer->rate_last = now;
--	if (token > XRLIM_BURST_FACTOR * timeout)
--		token = XRLIM_BURST_FACTOR * timeout;
-+	delta = now - READ_ONCE(peer->rate_last);
-+	if (delta) {
-+		WRITE_ONCE(peer->rate_last, now);
-+		token += delta;
-+		if (token > XRLIM_BURST_FACTOR * timeout)
-+			token = XRLIM_BURST_FACTOR * timeout;
-+	}
- 	if (token >= timeout) {
- 		token -= timeout;
- 		rc = true;
- 	}
--	peer->rate_tokens = token;
-+	if (token != otoken)
-+		WRITE_ONCE(peer->rate_tokens, token);
- 	return rc;
- }
- EXPORT_SYMBOL(inet_peer_xrlim_allow);
--- 
-2.47.1.613.gc27f4b7a9f-goog
+But the initial connect() failing does not change anything under the hood
+(transport should/could stay NULL). Then a successful re-connect assigns
+the transport (NULL -> non-NULL). And it's all good because all I wanted to
+avoid (because of BPF) was non-NULL -> NULL. Anyway, that's my possibly
+shallow understanding :)
 
 
