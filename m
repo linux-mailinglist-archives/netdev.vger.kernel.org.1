@@ -1,136 +1,118 @@
-Return-Path: <netdev+bounces-153403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F5849F7D97
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:05:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 642CC9F7D9C
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:06:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7850C7A04A2
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:05:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1DD618875D0
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43A4224B1E;
-	Thu, 19 Dec 2024 15:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE62225A4C;
+	Thu, 19 Dec 2024 15:06:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="aEikJbut"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ir/HvO2I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1474F41C64;
-	Thu, 19 Dec 2024 15:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B81225799
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 15:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734620712; cv=none; b=T6Vdx4jUnQuFkI9W5HRf4Ojaa63tJqQepEdmcH4aGBN4zjZwnzMSCuzv8ImW54MzZbVof6JQKZQ80giTWKvn5xgYAt63pATAKeMc4iWwMhxVfAFRrxcPnVU7CxGj2BdyZ3LET67Y+2Tovw1vO9+cAWkOZRsHztxl45ab1hd4Zms=
+	t=1734620760; cv=none; b=ZIj5Po0HaQ9bwk3RN5BH/FtebWCZgrML1sj3zhisfA66vkWV60ah8Vk7PcE4tTbrlBI9OlnMyf9MY3tROeJLV0vhvXyg80oKDUP7Jguvcl/yeB4kYW7Txc/zGgULi1MWcpjSBjTOd1EN+2IOl379y91rOWltJwKVSjjoLhiAm60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734620712; c=relaxed/simple;
-	bh=iwGKqwTTWXUxoDHoKQIjb/ql93uq4d++zxqRLk5SRrc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OMXWYruSb7OTxY8Y67ZaofSOPCYOMU8tA09mzDIpG+Ekyv7UpPqT9LWJ8uJcZbwoITXEaffoq2TAajrGzJa1pse45DdCGxryxPxuY9hCPVbYTzqVAZxRQjW0yxwwDjTLZtL5dVEfyJYZ+q4x4lxh/xFewXM+JrvLvP+9K/JvQZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=aEikJbut; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tOI5F-0084ke-0c; Thu, 19 Dec 2024 16:05:01 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=zifHlnhZp8kfHV1mHurt72vHOoVuTpoxDlZ+dstXlwc=; b=aEikJbutTfQMb9Xtj/ob5QpdtL
-	tjMfv/GZGxC2nkhtXLYadl+7tbpQvH1SpzKLLEwQLpTuiOt8nE9J6teK9ZtM5+FhGIfOKDlOhKMCI
-	nbartSzSqdDFGJblNOHTyhwINQgeROD6dO6qNrG/NfFcyc8zym1K3j9jVjSiTYzF+eaTQe2UXL1BH
-	Al6ZsK9Vr/0zVw1ti7ZM7MBvUP8cx6OR+sYUUm/HvTQnuSNdGytm2VDLFV9FHf28GNMWF3OOcRhFc
-	J+hiykUdmo6lb5n5aYt5QB3MDcgrvN/C0ULqsC2AajcJMA9kEwfUlrOs6zBdwdhjpB+6b4WqDM0Ax
-	DwlMVddw==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tOI5D-0004wn-QO; Thu, 19 Dec 2024 16:04:59 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tOI4x-00ELnH-DN; Thu, 19 Dec 2024 16:04:43 +0100
-Message-ID: <cc04fe7a-aa49-47a7-8d54-7a0e7c5bfbdc@rbox.co>
-Date: Thu, 19 Dec 2024 16:04:41 +0100
+	s=arc-20240116; t=1734620760; c=relaxed/simple;
+	bh=FVPm6Hv/TdlLqrKyWYNr8r1+ghMZiEwG5LrElSks5fk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=PGGwcYOVRp0nElrnzWKk7aVLn3V1AtkxHtir98G+RuyVt0Mcd/5uNgcxxQpBZzm5WiWvDX7OJDe5xs7ZMUYIY6Kya8m+h/szY85fj8mrA3W9BFkbPTzxf7mv1Z50fBDdH1CYV5F2FpaObYSR2I4g2XSD+jKVeogDwUCVRF8NsoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ir/HvO2I; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7b15467f383so66030485a.3
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 07:05:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734620757; x=1735225557; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MFAFaT7H3vJsEqUqZgMndld6HXM2bslGfmNYfbEwjWs=;
+        b=ir/HvO2IxVhufNC+GnDOhzCBUNXRALn88d4zLnLZ21SM1D1UmkUVMDGfZsqBOE0vet
+         7yQ3rENILg4Fxq6doyiJ4IzMsxJaEBX/nNKM08uv8eXZTHu+fm51VxK7UHiiHoX2k7+O
+         Skgi9pHCXLjXdaWvDCkQ2LMIhF6/a4x1haHX5eQeR5jt4muQwXFouEFEKzau4ak6ie/l
+         1KkhsSdx9PMbJrGiU+CPv+t1JxzLpl3RjVsDjMDyxqLCsZxH1gcwe6fKot4ei46gRzIu
+         b4Ofdrm3UOsudJN7zSA4USNVoxodPaAfTHjhT7fCT7nEl9b8GrC4HHWBin3yKQkK1Qqj
+         CXRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734620757; x=1735225557;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MFAFaT7H3vJsEqUqZgMndld6HXM2bslGfmNYfbEwjWs=;
+        b=Kx4jGCig3oZ8x5cR6S9qzuXiZ/pGJZUiCS5qTkLyT9/d5JXGWAuGvAYP9LGGhQHOq2
+         RKMhphES7wumGavaKU915OpcJskAUdLijjw6RwjpOMNiIo+yrvVUApU9+stUJ6WOsFDT
+         3g+20C9sxH3Ree1iQAsmymQipcsG4kZ8BxijFvFAwrhbDOctvqURmiC8xtPhjL5SEc9G
+         q46sCRYEc1NsZvEeNPp3LZD+1U+5OPilE/5ebElmj9NJPyH1FOzVx5oMxxAQIKDukm6/
+         xQb0bO7k2x9iRrMJ7mVgHe9EaNn3RZrH+/gfkFs9Y5Fe9ewVLSi7u4dGCuzPcBbX+LCm
+         z9PQ==
+X-Gm-Message-State: AOJu0YxwTDGIQJ6QlElBn+2/0nbCxTXRiuHDyjk9Gl7OBPksdjH4pSQm
+	p1IrIjrudjfZ9qStW16ZkodOov2MAo6yan5IYtfY2WztGETL43qS
+X-Gm-Gg: ASbGncsMMVvSYNXxb5yCxNMcPcnpYm9JjsvHq1zH1PAVWOQT9rd/Fb/yLYCeVtrthGv
+	m0GOIOeA9KixRbGOosO+ddiV/ZmiSbwooH2GtCEUr/WMmpZ3r0FSrjLHPhhB/DjApojBBNZEKYD
+	lyOsP0kHohpSszersQFPna96jbqv+4Rn5RELWC0oqU/3CmuyU3wrzgZ7FT64kBu0nAmLInXhRUD
+	VG2VSma8VPqeVB60iJ26TdCUmirrp72VGNkakCo09cdygl2sFhwLsQWkjNlNIT2eEJmnEEby9yO
+	V1luFnhnZTBmHf7wiFifnYOgTl6Y206c5Q==
+X-Google-Smtp-Source: AGHT+IHxVSLVfe2pwOKsdi9/cnNsKhfPDaez/0PMOVLhzZTX1detS7jXcy82ffFhZjts2wBxEf0dkg==
+X-Received: by 2002:a05:620a:4453:b0:7b7:106a:19a0 with SMTP id af79cd13be357-7b863720701mr1166403885a.24.1734620757491;
+        Thu, 19 Dec 2024 07:05:57 -0800 (PST)
+Received: from localhost (96.206.236.35.bc.googleusercontent.com. [35.236.206.96])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac2f8fe6sm55109285a.51.2024.12.19.07.05.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 07:05:56 -0800 (PST)
+Date: Thu, 19 Dec 2024 10:05:56 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Milena Olech <milena.olech@intel.com>, 
+ intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, 
+ anthony.l.nguyen@intel.com, 
+ przemyslaw.kitszel@intel.com, 
+ Milena Olech <milena.olech@intel.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Emil Tantilov <emil.s.tantilov@intel.com>, 
+ Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Message-ID: <67643654983ec_1d0f5c29421@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241219094411.110082-8-milena.olech@intel.com>
+References: <20241219094411.110082-1-milena.olech@intel.com>
+ <20241219094411.110082-8-milena.olech@intel.com>
+Subject: Re: [PATCH v3 iwl-next 07/10] idpf: add Tx timestamp capabilities
+ negotiation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Hyunwoo Kim <v4bel@theori.io>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org, qwerty@theori.io
-References: <Z2K/I4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX>
- <lwfkm3salizjvubc5vqnkxi4bk4zdglg5um4xygfxwmrkktrbc@bvazoy4k723k>
- <Z2LZ3HK05RH8OfP5@v4bel-B760M-AORUS-ELITE-AX>
- <s2k74f6zvjm7uexqfyej6txvoqgf6lkaa47igo2eh4pq55d4n2@wnrrcr6aa6lk>
- <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
- <Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX>
- <5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co>
- <Z2N44ka8+l83XqcG@v4bel-B760M-AORUS-ELITE-AX>
- <fezrztdzj5bz54ys6qialz4w3bjqqxmhx74t2tnklbif6ns5dn@mtcjqnqbx6n4>
- <722e8d32-fe5c-4522-be2b-5967fdbb6b30@rbox.co>
- <CAGxU2F5VMGg--iv8Nxvmo_tGhHf_4d_hO5WuibXLUcwVVNgQEg@mail.gmail.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <CAGxU2F5VMGg--iv8Nxvmo_tGhHf_4d_hO5WuibXLUcwVVNgQEg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 12/19/24 15:48, Stefano Garzarella wrote:
-> On Thu, 19 Dec 2024 at 15:36, Michal Luczaj <mhal@rbox.co> wrote:
->>
->> On 12/19/24 09:19, Stefano Garzarella wrote:
->>> ...
->>> I think the best thing though is to better understand how to handle
->>> deassign, rather than checking everywhere that it's not null, also
->>> because in some cases (like the one in virtio-vsock), it's also
->>> important that the transport is the same.
->>
->> My vote would be to apply your virtio_transport_recv_pkt() patch *and* make
->> it impossible-by-design to switch ->transport from non-NULL to NULL in
->> vsock_assign_transport().
+Milena Olech wrote:
+> Tx timestamp capabilities are negotiated for the uplink Vport.
+> Driver receives information about the number of available Tx timestamp
+> latches, the size of Tx timestamp value and the set of indexes used
+> for Tx timestamping.
 > 
-> I don't know if that's enough, in this case the problem is that some
-> response packets are intended for a socket, where the transport has
-> changed. So whether it's null or assigned but different, it's still a
-> problem we have to handle.
+> Add function to get the Tx timestamp capabilities and parse the uplink
+> vport flag.
 > 
-> So making it impossible for the transport to be null, but allowing it
-> to be different (we can't prevent it from changing), doesn't solve the
-> problem for us, it only shifts it.
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Co-developed-by: Emil Tantilov <emil.s.tantilov@intel.com>
+> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+> Co-developed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> Signed-off-by: Milena Olech <milena.olech@intel.com>
 
-Got it. I assumed this issue would be solved by `vsk->transport !=
-&t->transport` in the critical place(s).
-
-(Note that BPF doesn't care if transport has changed; BPF just expects to
-have _a_ transport.)
-
->> If I'm not mistaken, that would require rewriting vsock_assign_transport()
->> so that a new transport is assigned only once fully initialized, otherwise
->> keep the old one (still unhurt and functional) and return error. Because
->> failing connect() should not change anything under the hood, right?
->>
-> 
-> Nope, connect should be able to change the transport.
-> 
-> Because a user can do an initial connect() that requires a specific
-> transport, this one fails maybe because there's no peer with that cid.
-> Then the user can redo the connect() to a different cid that requires
-> a different transport.
-
-But the initial connect() failing does not change anything under the hood
-(transport should/could stay NULL). Then a successful re-connect assigns
-the transport (NULL -> non-NULL). And it's all good because all I wanted to
-avoid (because of BPF) was non-NULL -> NULL. Anyway, that's my possibly
-shallow understanding :)
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
