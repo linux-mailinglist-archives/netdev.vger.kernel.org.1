@@ -1,139 +1,118 @@
-Return-Path: <netdev+bounces-153322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DBC79F7A23
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 12:15:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 332F49F7A98
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 12:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B33C41893D85
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 11:15:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FDD116E467
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 11:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30526223C62;
-	Thu, 19 Dec 2024 11:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F69223E73;
+	Thu, 19 Dec 2024 11:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V0hIl9Pw"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D8C223C7B;
-	Thu, 19 Dec 2024 11:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF86F223C64;
+	Thu, 19 Dec 2024 11:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734606928; cv=none; b=dJG4QLDkZivzrPlep7Yh+QMqDsNkgDKjVxZeJ2ipssWnSaJ48iZF4J9MPqzAg7wG6yR5xCDiUJQTb4Ybt7S2/fo0Lbs/glzXInhHkd9puoqGF2TtVfIy6EUDsJgh9HllsHiuicMoFM7IYYFyc1DaFX1QInRXg4/jklS+vvaaaDI=
+	t=1734608745; cv=none; b=PhiMuLDJ6ITNok5HJkQWu31+eMa8h275fxz68NtGsNImPhupPrcWLPJ8mJ8lx+hGnVdpOknMP1lVgfOvghREr7P/rSwWVJMyRSBnzrf54zwADHvDZt/351HqcNBMG/bd4d2+TORSrMWhk30dTEPqepUuDiYayIJ1d2aiBDsRpvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734606928; c=relaxed/simple;
-	bh=5VZPTkXvtP9mboW6aOefRLAEFA01dufNNfD6ISGDIMM=;
-	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=h27u+JsAWnPeMCnkmXwAL2j308MIhi/RaTkDwb4GTIVrEFO3NFWt8OGD1xClZK0BYSx4WQjN6bQcos3Fr+blNBUz+PKa7GmG4gRqyafhPqVjeldy/eHKoBuuAuoC/FVfF0V9O56BlcTPdih2IrrxliWA3++2S/I6QSFpj5ZRJXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4YDSbC6M4Kz21kWm;
-	Thu, 19 Dec 2024 19:13:27 +0800 (CST)
-Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id 601141A0171;
-	Thu, 19 Dec 2024 19:15:21 +0800 (CST)
-Received: from [10.174.179.93] (10.174.179.93) by
- kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 19 Dec 2024 19:15:17 +0800
-Subject: Re: [PATCH v3 -next 00/15] sysctl: move sysctls from vm_table into
- its own files
-To: Joel Granados <j.granados@samsung.com>
-References: <CGME20241010141133eucas1p1999f17c74198d3880cbd345276bcd3bd@eucas1p1.samsung.com>
- <20241010152215.3025842-1-yukaixiong@huawei.com>
- <ngknhtecptqk56gtiikvb5mdujhtxdyngzndiaz7ifslzrki7q@4wcykosdnsna>
- <79b33640-fc81-b4c1-4967-30189d9a4b23@huawei.com>
- <wk7dqsx42rxjt76dowrydumhinwwdltw7e5ptp7fh4rc4c4sji@jrtopui4fpwb>
-CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>, <ysato@users.osdn.me>,
-	<dalias@libc.org>, <glaubitz@physik.fu-berlin.de>, <luto@kernel.org>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <hpa@zytor.com>, <viro@zeniv.linux.org.uk>,
-	<brauner@kernel.org>, <jack@suse.cz>, <kees@kernel.org>,
-	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
-	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
-	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
-	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<linux-sh@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
-	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
-	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
-	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
-	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
-	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
-	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
-	<wangkefeng.wang@huawei.com>, <sunnanyong@huawei.com>,
-	<joel.granados@kernel.org>
-From: yukaixiong <yukaixiong@huawei.com>
-Message-ID: <69509584-92c2-6bcd-0aef-406af7606239@huawei.com>
-Date: Thu, 19 Dec 2024 19:15:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+	s=arc-20240116; t=1734608745; c=relaxed/simple;
+	bh=L5I92xzjE+xlE2hla+sscgIGlaUc5vih+n82H4lZf7g=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OmqH1E8+bycRsSxNGV8nhjjiaSs9l+qAubenKv+7aOWY7c7xlfUQQBCOeZl7ZPZ4pJaNKn9gwmVkkPzg+cth2UIeoWj0VQBbR2CYur/vDJYePdWyp9JlYrr0EmdPe0mbyNsLgTmx5y94LYBWzZBMcZNCHqqrEpQ0iGj+qmBjxfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V0hIl9Pw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BE18C4CECE;
+	Thu, 19 Dec 2024 11:45:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734608744;
+	bh=L5I92xzjE+xlE2hla+sscgIGlaUc5vih+n82H4lZf7g=;
+	h=From:Subject:Date:To:Cc:From;
+	b=V0hIl9PwamjLKsCO3qFvXjhS/vtrhHXK2RIvPkDAPuVc8KOR4Y4m/HgnSy0yTyem2
+	 Aqnho6VhxDTViQbunuaAAY0ez1P7rjgCVaATsemtIsk/O72LIQK5v0Ei8gbGeJ+okz
+	 4aL2bl5w8d+puhJ5ccnf7sqOD2FVRjcyF2dvuYF9PjKfhRUSaqE9+N30Lbi9XRUFjh
+	 3cpAbjkqn/IAbnQ0nynvnxVr01P9NtSfINYDnQsCACeK/Vp75SYaqTk8yzL0z0uEVK
+	 AsXAbKA2nn0laLOraTZRSYPU5H8w18+HFaDkcDL6o943DH7GFUEAmeEUThk9NlYsd/
+	 tFWf994iKsDvg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/3] netlink: specs: mptcp: fixes for some descriptions
+Date: Thu, 19 Dec 2024 12:45:26 +0100
+Message-Id: <20241219-net-mptcp-netlink-specs-pm-doc-fixes-v1-0-825d3b45f27b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <wk7dqsx42rxjt76dowrydumhinwwdltw7e5ptp7fh4rc4c4sji@jrtopui4fpwb>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggpeml100006.china.huawei.com (7.185.36.169) To
- kwepemh100016.china.huawei.com (7.202.181.102)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFYHZGcC/x2M0QqCQBBFf0XmuYF2EbF+JXrY1msN5TrsiATiv
+ zv1dg+XczYyVIHRtdmoYhWTuTiEU0P5lcoTLIMzxXNsQwwXLlh40iXrb32kvNkU2VgnHubMo3x
+ h3IU+RfRjl/AgT2nF//DSjdyj+74fw//HensAAAA=
+X-Change-ID: 20241219-net-mptcp-netlink-specs-pm-doc-fixes-618a2e8f6aeb
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Kishen Maloor <kishen.maloor@intel.com>, 
+ Davide Caratti <dcaratti@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1140; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=L5I92xzjE+xlE2hla+sscgIGlaUc5vih+n82H4lZf7g=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnZAdl4U+V32qYR7n8/pblQCq+PCzlJWpUpCSQ4
+ B9nJ7ZUcMmJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ2QHZQAKCRD2t4JPQmmg
+ c9EZEADITUi98FJ+QXIOKMI0q8HLBLBAoTuHAtMaD3cB3kEXRRIEgMgX0CUetonRlPDxz4cLJlc
+ im1HF9tUqsajxGh/MXLZ5wXTK/nRW6dizFZPIAoFmyZlI34+PyAvISZ+BXSKIzFLy2EHUhzZEyc
+ 6QWZhpL3RSDcoYgyQzyHDQ4QR3Q5nxW8DV5BXsWwSrdMVACWTh68KbLK+Lx9mN6EeP64K0w3oxy
+ I6n2cJ9gxi55VcOeq7viHo6vll8moVT8ThbCKvsj21g/oasGBddudTt23ek2dLbPXI5YhUtpfyI
+ padwppFtA98o9DLkeuiBK6vUChUHx1lKoXYNijylY7fEif1w+6B/V+3YQF5n1b5pg33vgjpfLuD
+ CONWPsM1OSdU9jlnoHelKKTfW3cR1IXRHytF+K5DvfK0GjLVPUxb8uBnKKVm2+8hwGd/PHVrY9O
+ sQbFt6Wo9upciWXTixWJBt3SElqO7WFg1ycqREBtrhMsOhY3wlwDmDBxm3FFHn+yxjIbrAAFMLl
+ dDaD7Za/NzTonsagt/OYAI/wnH0/2fDJ97bnOVDbgZCX6o43/RlbawysCkDqP+YwAHOlh9rtGzy
+ RHzFe/CX/jgItmt9ATUfFdvdqPB/zp4i60r/jDxSWz5+/cNEmVHyONmr5FzZBn/INqzy21MKsZW
+ 18oFKdDwhYLWj2g==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
+When looking at the MPTCP PM Netlink specs rendered version [1], a few
+small issues have been found with the descriptions, and fixed here:
 
+- Patch 1: add a missing attribute for two events. For >= v5.19.
 
-On 2024/10/24 16:59, Joel Granados wrote:
-> On Thu, Oct 24, 2024 at 04:07:10PM +0800, yukaixiong wrote:
-> ...
->>
->>>>    mm/swap.c                          |  16 ++-
->>>>    mm/swap.h                          |   1 +
->>>>    mm/util.c                          |  67 +++++++--
->>>>    mm/vmscan.c                        |  23 +++
->>>>    mm/vmstat.c                        |  44 +++++-
->>>>    net/sunrpc/auth.c                  |   2 +-
->>>>    security/min_addr.c                |  11 ++
->>>>    23 files changed, 330 insertions(+), 312 deletions(-)
->>>>
->>>> -- 
->>>> 2.34.1
->>>>
->>> General comment for the patchset in general. I would consider making the
->>> new sysctl tables const. There is an effort for doing this and it has
->>> already lanted in linux-next. So if you base your patch from a recent
->>> next release, then it should just work. If you *do* decide to add a
->>> const qualifier, then note that you will create a dependency with the
->>> sysctl patchset currently in next and that will have to go in before.
->>>
->>> Best
->>>
->> Sorry,  I don't understand what is the meaning of "create a dependency
->> with the sysctl patchset".
-> The patches in the sysctl subsys that allow you to qualify the ctl_table
-> as const are not in mainline yet. They are in linux-next. This means
-> that if these patches go into the next kernel release before the
-> sysctl-next branch, it will have compilation errors. Therefore the
-> sysctl-next branch needs to be pulled in to the new kernel release
-> before this patchest. This also means that for this to build properly it
-> has to be based on a linux-next release.
->
->> Do you just want me to change all "static struct ctl_table" type table
->> into "static const struct ctl_table" type in my patchset?
-> You should const qualify them if the maintainer that is pulling in these
-> patches is ok with it. You should *not* const qualify them if the
-> maintainer prefers otherwise.
->
-> Please get back to me if I did not address your questions.
->
-> Best
+- Patch 2: clearly mention the attributes. For >= v6.7.
 
-Thank you! Now， I decide to const qualify them. Maybe, it will be better.
+- Patch 3: fix missing descriptions and replace a wrong one. For >= v6.7.
+
+Link: https://docs.kernel.org/networking/netlink_spec/mptcp_pm.html [1]
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Please note that there is no urgency here: this can of course be sent to
+Linus next year!
+
+Enjoy this holiday period!
+
+---
+Matthieu Baerts (NGI0) (3):
+      netlink: specs: mptcp: add missing 'server-side' attr
+      netlink: specs: mptcp: clearly mention attributes
+      netlink: specs: mptcp: fix missing doc
+
+ Documentation/netlink/specs/mptcp_pm.yaml | 60 ++++++++++++++++---------------
+ 1 file changed, 31 insertions(+), 29 deletions(-)
+---
+base-commit: ce1219c3f76bb131d095e90521506d3c6ccfa086
+change-id: 20241219-net-mptcp-netlink-specs-pm-doc-fixes-618a2e8f6aeb
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
