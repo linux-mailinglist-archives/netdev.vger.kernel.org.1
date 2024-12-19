@@ -1,61 +1,65 @@
-Return-Path: <netdev+bounces-153457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D12F9F81AE
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:24:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3B29F81C2
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:27:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA8251722EF
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:20:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1903516F801
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1612919CD1E;
-	Thu, 19 Dec 2024 17:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83681A255C;
+	Thu, 19 Dec 2024 17:20:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hwImnKBt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H3oEXGbe"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CBA16CD1D;
-	Thu, 19 Dec 2024 17:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3381A2545;
+	Thu, 19 Dec 2024 17:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734628732; cv=none; b=Vvx0CnoOeejI8UDgH3xdBKPI+0akg8b7FZKbXaKvdXAA2AsKwdY7h68I7g1J0S68V/YLX98+tm3l6ZoNt9s6eCewh3MA4csEMVwz50k3hCogMYw4A5O4id7ro775DKZrc2YLeBx763/07N4QPfoYNMBjzxfhZE5LNEvvnikuZco=
+	t=1734628847; cv=none; b=uUedVN+sONlbfvxc0ax5DUvoAUDU6as6XB1scZZRbaOmquJ6GBLWcgpIczThcw3G8avSyNE2efxLyJBuFMLRQyrvHgkUbbTzzf41ibpjarfhaOufkDgtX/7zQnZwF2hcczqMTV1HIZE9uuanyclytuUD+hvjIXBV6KnYYV/a+nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734628732; c=relaxed/simple;
-	bh=+CJD9rqKmY1LYwzuly8F3TbOl/Tbkiv5716yA0T+biA=;
+	s=arc-20240116; t=1734628847; c=relaxed/simple;
+	bh=Dp61a4XyXJ9LmojQA+6CWAeq8GDrOBVwfXno33BmibM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUYKyifNgyx3gUvm82Pjdk7+N+jljzqU0yFxuUJUfJQ0EKuKu2Rl2Kkq9DRMJqmZQQHYEsRgzLHPymvkdiJTdJ9flH/iJRJb4+Q1AlrcYuJ4DmtAidYRpiVhy04m4l3KIiZyJaR8o5rsb8EQAQTv/ZVlomkmVTo9FZVDZhxHr6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hwImnKBt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=b8bzFozVIiRjivIdEqpSWoYNYqayq64rz5POIYHbbcw=; b=hwImnKBtXWed377wihmw/M6S4Z
-	ti2Z1SAEj0FUyqDwaMSuTIUk9gy7ITloryHhVawWaE02gKoHyxxZIYls6ADE2dcrPHtNFx653/cRi
-	kzPmCV/KDMtKr9GokeSCqcMbPGRdLlFwsC3n+OQwiNmdzqrQTLVb0NFzOjKMgTMg2TnI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tOKAc-001hCk-VL; Thu, 19 Dec 2024 18:18:42 +0100
-Date: Thu, 19 Dec 2024 18:18:42 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tristram.Ha@microchip.com
-Cc: Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=l5uCYGHSzyU17tpJXf9256CBtwhtkMvMcI1wEQIyh5kwqxIazdwF3Yd/J5WEtEgfOXV1Ft1pfdpgZLLHCxeHHy7RRImgJaEF9hY/xM5jiib+WtNGemW784SA4uWIHztBanL+n/mTxeqSbLXWrSOB6cLmi5FrtVrXgkPKXczUO/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H3oEXGbe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C154C4CECE;
+	Thu, 19 Dec 2024 17:20:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734628847;
+	bh=Dp61a4XyXJ9LmojQA+6CWAeq8GDrOBVwfXno33BmibM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H3oEXGbeN0fS81ba9DcuNlggBx9qJFQArvXnlKshAeSyTsvBYisJmkQaVOlTZW4Qw
+	 UzguT9ki6M+JauPG+kSSPipv4iDQXjg9tmvTuhdsO1sf/H4Yy4mtX35lcm9XEwtNS5
+	 viiiweupR1zGpzaJoq0KpMy7B603k3ambsAQtpJf5ZsfcYX8KIHVY3ovotR21Y94gC
+	 oMiyxts+cFONgdazH8lFrXG8me9svrXQY8Q4ZawcXZz08AXp2XMGwTdbAG1TYTW8/5
+	 D6oERFcN1q920JnFfc9RoxoRZ+C2yzQkA2oA3/kyH+OImDgkkrsYpWCfwKbxE0KrY6
+	 oceGq5RGzcpeg==
+Date: Thu, 19 Dec 2024 17:20:41 +0000
+From: Will Deacon <will@kernel.org>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: microchip: Add suspend/resume support
- to KSZ DSA driver
-Message-ID: <64300c21-59af-4971-a82f-1dde3edff755@lunn.ch>
-References: <20241218020311.70628-1-Tristram.Ha@microchip.com>
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
+	ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH net-next v16 06/26] kref/refcount: implement
+ kref_put_sock()
+Message-ID: <20241219172040.GA25368@willie-the-truck>
+References: <20241219-b4-ovpn-v16-0-3e3001153683@openvpn.net>
+ <20241219-b4-ovpn-v16-6-3e3001153683@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,20 +68,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241218020311.70628-1-Tristram.Ha@microchip.com>
+In-Reply-To: <20241219-b4-ovpn-v16-6-3e3001153683@openvpn.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Dec 17, 2024 at 06:03:11PM -0800, Tristram.Ha@microchip.com wrote:
-> From: Tristram Ha <tristram.ha@microchip.com>
+On Thu, Dec 19, 2024 at 02:42:00AM +0100, Antonio Quartulli wrote:
+> Similarly so kref_put_lock(), decrease the refcount
+> and call bh_lock_sock(sk) if it reached 0.
 > 
-> The KSZ DSA driver starts a timer to read MIB counters periodically to
-> avoid count overrun.  During system suspend this will give an error for
-> not able to write to register as the SPI system returns an error when
-> it is in suspend state.  This implementation stops the timer when the
-> system goes into suspend and restarts it when resumed.
+> This kref_put variant comes handy when in need of
+> atomically cleanup any socket context along with
+> setting the refcount to 0.
 > 
-> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> Cc: Will Deacon <will@kernel.org> (maintainer:ATOMIC INFRASTRUCTURE)
+> Cc: Peter Zijlstra <peterz@infradead.org> (maintainer:ATOMIC INFRASTRUCTURE)
+> Cc: Boqun Feng <boqun.feng@gmail.com> (reviewer:ATOMIC INFRASTRUCTURE)
+> Cc: Mark Rutland <mark.rutland@arm.com> (reviewer:ATOMIC INFRASTRUCTURE)
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> ---
+>  include/linux/kref.h     | 11 +++++++++++
+>  include/linux/refcount.h |  3 +++
+>  lib/refcount.c           | 32 ++++++++++++++++++++++++++++++++
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+[...]
 
-    Andrew
+> diff --git a/lib/refcount.c b/lib/refcount.c
+> index a207a8f22b3ca35890671e51c480266d89e4d8d6..76a728581aa49a41ef13f5141f3f2e9816d72e75 100644
+> --- a/lib/refcount.c
+> +++ b/lib/refcount.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/refcount.h>
+>  #include <linux/spinlock.h>
+>  #include <linux/bug.h>
+> +#include <net/sock.h>
+>  
+>  #define REFCOUNT_WARN(str)	WARN_ONCE(1, "refcount_t: " str ".\n")
+>  
+> @@ -156,6 +157,37 @@ bool refcount_dec_and_lock(refcount_t *r, spinlock_t *lock)
+>  }
+>  EXPORT_SYMBOL(refcount_dec_and_lock);
+>  
+> +/**
+> + * refcount_dec_and_lock_sock - return holding locked sock if able to decrement
+> + *				refcount to 0
+> + * @r: the refcount
+> + * @sock: the sock to be locked
+> + *
+> + * Similar to atomic_dec_and_lock(), it will WARN on underflow and fail to
+> + * decrement when saturated at REFCOUNT_SATURATED.
+> + *
+> + * Provides release memory ordering, such that prior loads and stores are done
+> + * before, and provides a control dependency such that free() must come after.
+> + * See the comment on top.
+> + *
+> + * Return: true and hold sock if able to decrement refcount to 0, false
+> + *	   otherwise
+> + */
+> +bool refcount_dec_and_lock_sock(refcount_t *r, struct sock *sock)
+> +{
+> +	if (refcount_dec_not_one(r))
+> +		return false;
+> +
+> +	bh_lock_sock(sock);
+> +	if (!refcount_dec_and_test(r)) {
+> +		bh_unlock_sock(sock);
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +EXPORT_SYMBOL(refcount_dec_and_lock_sock);
+
+It feels a little out-of-place to me having socket-specific functions in
+lib/refcount.c. I'd suggest sticking this somewhere else _or_ maybe we
+could generate this pattern of code:
+
+#define REFCOUNT_DEC_AND_LOCKNAME(lockname, locktype, lock, unlock)	\
+static __always_inline							\
+bool refcount_dec_and_lock_##lockname(refcount_t *r, locktype *l)	\
+{									\
+	...
+
+inside a generator macro in refcount.h, like we do for seqlocks in
+linux/seqlock.h. The downside of that is the cost of inlining.
+
+Will
 
