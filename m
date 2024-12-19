@@ -1,222 +1,142 @@
-Return-Path: <netdev+bounces-153344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 660E49F7B5F
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 13:33:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4BEF9F7B8D
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 13:39:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CA4B18936E3
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 12:33:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2424416DB3D
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 12:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EA3226549;
-	Thu, 19 Dec 2024 12:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F39223E69;
+	Thu, 19 Dec 2024 12:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SOpeqa29"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LFyHH90v"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5D4226522;
-	Thu, 19 Dec 2024 12:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B01221447;
+	Thu, 19 Dec 2024 12:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734611448; cv=none; b=HC0HFBNso+jbwX/vANbY42Icc3QFSIFsZ6JealQECYZu3SLDqMbrmrNRwx+DpbLRYzsk9gzSqZ+ZFykOUUTqKjOYHmFUFNVpwUaezvWMjJBJRhuqdEgDzmnA6/c2iln/dpO6+Oh8WMWucb2LwaEf2A/f+pjop48mM4K7/xWU7Hs=
+	t=1734611857; cv=none; b=YUQEtzd1jywiZ5zwyxLm7H3LhCy0EvkOZ1WsIrGH01JiC21dYr2REuQaGSn3d5EhvGkPe36+Cp+chgopGzXx0bZ+ZDEeNVUTZf+M8WFj6xVOywWasisOGb5qL4JD4G3c+nV47NybhB+sFUPyDJF+6aDDYlEqMuusapLn/UCqhcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734611448; c=relaxed/simple;
-	bh=gJt/CAVz4zRtG8WElXvLmQ/PrR5lf0Wihn5sGJ/A6iQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Os1zzGOARLo2ysEt0zKNt58Tyj5rrBr9YXxiioloLFrdLtll1BaWOIB329ZN8l+lEdUawmY/1Gu5dxijEL2q3AOhZJcGdfhhRtoj+HJqaonSm+aIE/qoLyMs2N6zfo/jryknqBCPV0ZsiNIdoKkbeAQOh7lly9Da+cV7pa/NCEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SOpeqa29; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1734611447; x=1766147447;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version;
-  bh=gJt/CAVz4zRtG8WElXvLmQ/PrR5lf0Wihn5sGJ/A6iQ=;
-  b=SOpeqa29U5+cR6VWAgZq3VJU3SMsDoOKdYYg8msCz8dax2aL0arR3hfm
-   pKDtiagqgoaWNl+QaNv5eaNrXgi1ArzpXBQpX2Xe19fELqUMuP0b078io
-   oDN2t0DdE6TNqtji27yZvPOX5edehPE3sL0y+AEOkZp9VBNmvIp2vj7OR
-   ckjqDV5XIRAlSoEZBugrU1eRpkrj8xuTArEwF/POiMp4+3RjS9P8JaXD8
-   NtQglROUCbBOyCPy2X8plUpThugvQNFNlxLmIIQkdd2678goQXSaSzKIE
-   plvQJAZ0o6u5BjXBya2YRj/W/xG7GP2xdPjYbw4usrT0YQ72QqqcUPusT
-   Q==;
-X-CSE-ConnectionGUID: NB4TeJuwRMyLWuysxUyzIQ==
-X-CSE-MsgGUID: WXOgDIJVRY++VzHYK/LZeQ==
-X-IronPort-AV: E=Sophos;i="6.12,247,1728975600"; 
-   d="scan'208";a="35409656"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Dec 2024 05:30:44 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 19 Dec 2024 05:30:39 -0700
-Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 19 Dec 2024 05:30:35 -0700
-From: Divya Koppera <divya.koppera@microchip.com>
-To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
-	<vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v8 5/5] net: phy: microchip_t1 : Add initialization of ptp for lan887x
-Date: Thu, 19 Dec 2024 18:03:11 +0530
-Message-ID: <20241219123311.30213-6-divya.koppera@microchip.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20241219123311.30213-1-divya.koppera@microchip.com>
-References: <20241219123311.30213-1-divya.koppera@microchip.com>
+	s=arc-20240116; t=1734611857; c=relaxed/simple;
+	bh=iTa+ur7lm+4z/RqHiWarKbLC9Qqkyo0J2aItQd06+kA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pF1AgxLtpreUBsA5hMgPGfmQqGpjNTMTKGsdYF0+VghDvG+n1vUZqbQdSCYK3O6yIrkGw9HYQx6Hrj5S2jsK7PLURVrbF3369erXAnLffHxY39MrIYOsrg9XUXPmRefu/nzkhJCy5jcQvHlam8vxp2jvJubon8DuNARzfRZfygA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LFyHH90v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD090C4CECE;
+	Thu, 19 Dec 2024 12:37:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734611857;
+	bh=iTa+ur7lm+4z/RqHiWarKbLC9Qqkyo0J2aItQd06+kA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LFyHH90v7aIIaiYgtuCkgNduif2EcRXx+t1NKd7L1JnKgp9JhZhnEOSlm4mq5hs8Y
+	 6KOUOnY+Ox80NZ6TDiY23JfeIOdNvobIpOdA6QS9ywdFu0dbA3FOY6XfpOIqDbUy8W
+	 1ZINLSJE220I6N3v3/y0cFy5e7hAdIp8CQYlAm8x3XG2o46sRdpYygpXV7ipsBrDNa
+	 mT5pP8APZt4w3AFD60pC2UIolum9bf1RKsZi0ABswVkGRLf8/MO7aXZWHnr+ft87oS
+	 krYLDiy3AcMy44LN7D0yJ6eFAOmGg4MvU8cPpznL+wZzWC13I2wBNGcNOCYHbYVKDM
+	 Mwe/5FBFWzAww==
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Jianbo Liu <jianbol@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [PATCH ipsec-next 1/2] xfrm: Support ESN context update to hardware for TX
+Date: Thu, 19 Dec 2024 14:37:29 +0200
+Message-ID: <874f965d786606b0b4351c976f50271349f68b03.1734611621.git.leon@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Add initialization of ptp for lan887x.
+From: Jianbo Liu <jianbol@nvidia.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
+Previously xfrm_dev_state_advance_esn() was added for RX only. But
+it's possible that ESN context also need to be synced to hardware for
+TX, so call it for outbound in this patch.
+
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
-v6 -> v8
-- No changes
+ Documentation/networking/xfrm_device.rst                 | 3 ++-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c          | 3 +++
+ drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c | 3 +++
+ net/xfrm/xfrm_replay.c                                   | 1 +
+ 4 files changed, 9 insertions(+), 1 deletion(-)
 
-v5 -> v6
-- Renamed ptp functions and macros.
-
-v2 -> v5
-- No changes
-
-v1 -> v2
-Fixed below review comment
-  Added ptp support only if interrupts are supported as interrupts are mandatory
-  for ptp.
----
- drivers/net/phy/microchip_t1.c | 41 +++++++++++++++++++++++++++++++---
- 1 file changed, 38 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
-index b17bf6708003..73f28463bc35 100644
---- a/drivers/net/phy/microchip_t1.c
-+++ b/drivers/net/phy/microchip_t1.c
-@@ -10,11 +10,15 @@
- #include <linux/ethtool.h>
- #include <linux/ethtool_netlink.h>
- #include <linux/bitfield.h>
-+#include "microchip_rds_ptp.h"
+diff --git a/Documentation/networking/xfrm_device.rst b/Documentation/networking/xfrm_device.rst
+index bfea9d8579ed..66f6e9a9b59a 100644
+--- a/Documentation/networking/xfrm_device.rst
++++ b/Documentation/networking/xfrm_device.rst
+@@ -169,7 +169,8 @@ the stack in xfrm_input().
  
- #define PHY_ID_LAN87XX				0x0007c150
- #define PHY_ID_LAN937X				0x0007c180
- #define PHY_ID_LAN887X				0x0007c1f0
+ 	hand the packet to napi_gro_receive() as usual
  
-+#define MCHP_RDS_PTP_LTC_BASE_ADDR		0xe000
-+#define MCHP_RDS_PTP_PORT_BASE_ADDR	    (MCHP_RDS_PTP_LTC_BASE_ADDR + 0x800)
-+
- /* External Register Control Register */
- #define LAN87XX_EXT_REG_CTL                     (0x14)
- #define LAN87XX_EXT_REG_CTL_RD_CTL              (0x1000)
-@@ -229,6 +233,7 @@
+-In ESN mode, xdo_dev_state_advance_esn() is called from xfrm_replay_advance_esn().
++In ESN mode, xdo_dev_state_advance_esn() is called from
++xfrm_replay_advance_esn() for RX, and xfrm_replay_overflow_offload_esn for TX.
+ Driver will check packet seq number and update HW ESN state machine if needed.
  
- #define LAN887X_INT_STS				0xf000
- #define LAN887X_INT_MSK				0xf001
-+#define LAN887X_INT_MSK_P1588_MOD_INT_MSK	BIT(3)
- #define LAN887X_INT_MSK_T1_PHY_INT_MSK		BIT(2)
- #define LAN887X_INT_MSK_LINK_UP_MSK		BIT(1)
- #define LAN887X_INT_MSK_LINK_DOWN_MSK		BIT(0)
-@@ -319,6 +324,8 @@ struct lan887x_regwr_map {
- 
- struct lan887x_priv {
- 	u64 stats[ARRAY_SIZE(lan887x_hw_stats)];
-+	struct mchp_rds_ptp_clock *clock;
-+	bool init_done;
- };
- 
- static int lan937x_dsp_workaround(struct phy_device *phydev, u16 ereg, u8 bank)
-@@ -1269,8 +1276,19 @@ static int lan887x_get_features(struct phy_device *phydev)
- 
- static int lan887x_phy_init(struct phy_device *phydev)
+ Packet offload mode:
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+index bc3af0054406..e56e4f238795 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+@@ -6559,6 +6559,9 @@ static void cxgb4_advance_esn_state(struct xfrm_state *x)
  {
-+	struct lan887x_priv *priv = phydev->priv;
- 	int ret;
+ 	struct adapter *adap = netdev2adap(x->xso.dev);
  
-+	if (!priv->init_done && phy_interrupt_is_valid(phydev)) {
-+		priv->clock = mchp_rds_ptp_probe(phydev, MDIO_MMD_VEND1,
-+						 MCHP_RDS_PTP_LTC_BASE_ADDR,
-+						 MCHP_RDS_PTP_PORT_BASE_ADDR);
-+		if (IS_ERR(priv->clock))
-+			return PTR_ERR(priv->clock);
++	if (x->xso.dir != XFRM_DEV_OFFLOAD_IN)
++		return;
 +
-+		priv->init_done = true;
-+	}
+ 	if (!mutex_trylock(&uld_mutex)) {
+ 		dev_dbg(adap->pdev_dev,
+ 			"crypto uld critical resource is under use\n");
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+index ca92e518be76..3dd4f2492090 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+@@ -980,6 +980,9 @@ static void mlx5e_xfrm_advance_esn_state(struct xfrm_state *x)
+ 	struct mlx5e_ipsec_sa_entry *sa_entry_shadow;
+ 	bool need_update;
+ 
++	if (x->xso.dir != XFRM_DEV_OFFLOAD_IN)
++		return;
 +
- 	/* Clear loopback */
- 	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1,
- 				 LAN887X_MIS_CFG_REG2,
-@@ -1470,6 +1488,7 @@ static int lan887x_probe(struct phy_device *phydev)
- 	if (!priv)
- 		return -ENOMEM;
+ 	need_update = mlx5e_ipsec_update_esn_state(sa_entry);
+ 	if (!need_update)
+ 		return;
+diff --git a/net/xfrm/xfrm_replay.c b/net/xfrm/xfrm_replay.c
+index bc56c6305725..e500aebbad22 100644
+--- a/net/xfrm/xfrm_replay.c
++++ b/net/xfrm/xfrm_replay.c
+@@ -729,6 +729,7 @@ static int xfrm_replay_overflow_offload_esn(struct xfrm_state *x, struct sk_buff
+ 		}
  
-+	priv->init_done = false;
- 	phydev->priv = priv;
+ 		replay_esn->oseq = oseq;
++		xfrm_dev_state_advance_esn(x);
  
- 	return lan887x_phy_setup(phydev);
-@@ -1518,6 +1537,7 @@ static void lan887x_get_strings(struct phy_device *phydev, u8 *data)
- 
- static int lan887x_config_intr(struct phy_device *phydev)
- {
-+	struct lan887x_priv *priv = phydev->priv;
- 	int rc;
- 
- 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
-@@ -1537,12 +1557,24 @@ static int lan887x_config_intr(struct phy_device *phydev)
- 
- 		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_INT_STS);
- 	}
-+	if (rc < 0)
-+		return rc;
- 
--	return rc < 0 ? rc : 0;
-+	if (phy_is_default_hwtstamp(phydev)) {
-+		return mchp_rds_ptp_top_config_intr(priv->clock,
-+					LAN887X_INT_MSK,
-+					LAN887X_INT_MSK_P1588_MOD_INT_MSK,
-+					(phydev->interrupts ==
-+					 PHY_INTERRUPT_ENABLED));
-+	}
-+
-+	return 0;
- }
- 
- static irqreturn_t lan887x_handle_interrupt(struct phy_device *phydev)
- {
-+	struct lan887x_priv *priv = phydev->priv;
-+	int rc = IRQ_NONE;
- 	int irq_status;
- 
- 	irq_status = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_INT_STS);
-@@ -1553,10 +1585,13 @@ static irqreturn_t lan887x_handle_interrupt(struct phy_device *phydev)
- 
- 	if (irq_status & LAN887X_MX_CHIP_TOP_LINK_MSK) {
- 		phy_trigger_machine(phydev);
--		return IRQ_HANDLED;
-+		rc = IRQ_HANDLED;
- 	}
- 
--	return IRQ_NONE;
-+	if (irq_status & LAN887X_INT_MSK_P1588_MOD_INT_MSK)
-+		rc = mchp_rds_ptp_handle_interrupt(priv->clock);
-+
-+	return rc;
- }
- 
- static int lan887x_cd_reset(struct phy_device *phydev,
+ 		if (xfrm_aevent_is_on(net))
+ 			xfrm_replay_notify(x, XFRM_REPLAY_UPDATE);
 -- 
-2.17.1
+2.47.0
 
 
