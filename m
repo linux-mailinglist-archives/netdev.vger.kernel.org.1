@@ -1,156 +1,79 @@
-Return-Path: <netdev+bounces-153458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E3B29F81C2
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:27:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFC3B9F81D2
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:30:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1903516F801
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:22:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 798FA165B94
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83681A255C;
-	Thu, 19 Dec 2024 17:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C0119993B;
+	Thu, 19 Dec 2024 17:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H3oEXGbe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daWB4LX6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3381A2545;
-	Thu, 19 Dec 2024 17:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8507155757;
+	Thu, 19 Dec 2024 17:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734628847; cv=none; b=uUedVN+sONlbfvxc0ax5DUvoAUDU6as6XB1scZZRbaOmquJ6GBLWcgpIczThcw3G8avSyNE2efxLyJBuFMLRQyrvHgkUbbTzzf41ibpjarfhaOufkDgtX/7zQnZwF2hcczqMTV1HIZE9uuanyclytuUD+hvjIXBV6KnYYV/a+nI=
+	t=1734629169; cv=none; b=uzfIEr8e/1Qx1SGva0RXgGeRpFasu539A9gq/Z2gSmOCLm9bJoQSncg0NMitj8WwqdeLlhtgDEyKEiS4yRby5Amvb0UzsNHv7S+YlgloPf5mKjuCu6I1Q9Mj7iIUrPdGVU6jWF1+IuSL7BLHnx4JuKhPD6N+Rthw62EpjsD2Wyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734628847; c=relaxed/simple;
-	bh=Dp61a4XyXJ9LmojQA+6CWAeq8GDrOBVwfXno33BmibM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l5uCYGHSzyU17tpJXf9256CBtwhtkMvMcI1wEQIyh5kwqxIazdwF3Yd/J5WEtEgfOXV1Ft1pfdpgZLLHCxeHHy7RRImgJaEF9hY/xM5jiib+WtNGemW784SA4uWIHztBanL+n/mTxeqSbLXWrSOB6cLmi5FrtVrXgkPKXczUO/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H3oEXGbe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C154C4CECE;
-	Thu, 19 Dec 2024 17:20:44 +0000 (UTC)
+	s=arc-20240116; t=1734629169; c=relaxed/simple;
+	bh=4x0nHju7+elgdsO/T94eXgK32PWhD8gwSNIKAwTP2PA=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Cm7KTX6pxwMIqKnPOAundfnz6S5vrCdg6+KwipQlOfnKw+LjsIz67+dFqZDlq/JhYYE3qdcqx07ndyi/cHz0YXpVCXpFuRWWYUrei3r4VtuR667z7xr55m2PvqsHOeHwO5/sPgYcmhIeZAYfpoBWTAoVARFRo3F803TiTks4tQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daWB4LX6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F7ABC4CECE;
+	Thu, 19 Dec 2024 17:26:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734628847;
-	bh=Dp61a4XyXJ9LmojQA+6CWAeq8GDrOBVwfXno33BmibM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H3oEXGbeN0fS81ba9DcuNlggBx9qJFQArvXnlKshAeSyTsvBYisJmkQaVOlTZW4Qw
-	 UzguT9ki6M+JauPG+kSSPipv4iDQXjg9tmvTuhdsO1sf/H4Yy4mtX35lcm9XEwtNS5
-	 viiiweupR1zGpzaJoq0KpMy7B603k3ambsAQtpJf5ZsfcYX8KIHVY3ovotR21Y94gC
-	 oMiyxts+cFONgdazH8lFrXG8me9svrXQY8Q4ZawcXZz08AXp2XMGwTdbAG1TYTW8/5
-	 D6oERFcN1q920JnFfc9RoxoRZ+C2yzQkA2oA3/kyH+OImDgkkrsYpWCfwKbxE0KrY6
-	 oceGq5RGzcpeg==
-Date: Thu, 19 Dec 2024 17:20:41 +0000
-From: Will Deacon <will@kernel.org>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
-	ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH net-next v16 06/26] kref/refcount: implement
- kref_put_sock()
-Message-ID: <20241219172040.GA25368@willie-the-truck>
-References: <20241219-b4-ovpn-v16-0-3e3001153683@openvpn.net>
- <20241219-b4-ovpn-v16-6-3e3001153683@openvpn.net>
+	s=k20201202; t=1734629169;
+	bh=4x0nHju7+elgdsO/T94eXgK32PWhD8gwSNIKAwTP2PA=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=daWB4LX6tplRCJQW3yeTxfnJUivIhIOhkyXTzA+drkehG+7SdPSlhvjibcV+ONKTN
+	 Xa6wPGPXO7o/5Loq5etkyi0/y4xhTqSSmd4G6te8BYM1rbpYRvE+10QCXihcuta94N
+	 vJ89C20eGzEyuSH21Lf4dzC7RFG3xZRwDvOvyQ7FRX3fvKa7ctFKdtXQpLxW15KHPn
+	 zA7tdnpl5JYqxnpiTnexb3CXIUTaBi8HHB/DAnnOCVA7nG2DXumKRjDEhOdosm0NSR
+	 bilYDq7nMeolhBLYWeUwdCB5eDNlgU83ZIQFXmqLG2h8IEd65sVzqc4vLss4/pMd8Z
+	 mP3WxP+hEqVkg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 712043806656;
+	Thu, 19 Dec 2024 17:26:28 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.13-rc4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20241219124011.23689-1-pabeni@redhat.com>
+References: <20241219124011.23689-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20241219124011.23689-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.13-rc4
+X-PR-Tracked-Commit-Id: ce1219c3f76bb131d095e90521506d3c6ccfa086
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8faabc041a001140564f718dabe37753e88b37fa
+Message-Id: <173462918699.2326610.9594884558119783456.pr-tracker-bot@kernel.org>
+Date: Thu, 19 Dec 2024 17:26:26 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241219-b4-ovpn-v16-6-3e3001153683@openvpn.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, Dec 19, 2024 at 02:42:00AM +0100, Antonio Quartulli wrote:
-> Similarly so kref_put_lock(), decrease the refcount
-> and call bh_lock_sock(sk) if it reached 0.
-> 
-> This kref_put variant comes handy when in need of
-> atomically cleanup any socket context along with
-> setting the refcount to 0.
-> 
-> Cc: Will Deacon <will@kernel.org> (maintainer:ATOMIC INFRASTRUCTURE)
-> Cc: Peter Zijlstra <peterz@infradead.org> (maintainer:ATOMIC INFRASTRUCTURE)
-> Cc: Boqun Feng <boqun.feng@gmail.com> (reviewer:ATOMIC INFRASTRUCTURE)
-> Cc: Mark Rutland <mark.rutland@arm.com> (reviewer:ATOMIC INFRASTRUCTURE)
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-> ---
->  include/linux/kref.h     | 11 +++++++++++
->  include/linux/refcount.h |  3 +++
->  lib/refcount.c           | 32 ++++++++++++++++++++++++++++++++
+The pull request you sent on Thu, 19 Dec 2024 13:40:11 +0100:
 
-[...]
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.13-rc4
 
-> diff --git a/lib/refcount.c b/lib/refcount.c
-> index a207a8f22b3ca35890671e51c480266d89e4d8d6..76a728581aa49a41ef13f5141f3f2e9816d72e75 100644
-> --- a/lib/refcount.c
-> +++ b/lib/refcount.c
-> @@ -7,6 +7,7 @@
->  #include <linux/refcount.h>
->  #include <linux/spinlock.h>
->  #include <linux/bug.h>
-> +#include <net/sock.h>
->  
->  #define REFCOUNT_WARN(str)	WARN_ONCE(1, "refcount_t: " str ".\n")
->  
-> @@ -156,6 +157,37 @@ bool refcount_dec_and_lock(refcount_t *r, spinlock_t *lock)
->  }
->  EXPORT_SYMBOL(refcount_dec_and_lock);
->  
-> +/**
-> + * refcount_dec_and_lock_sock - return holding locked sock if able to decrement
-> + *				refcount to 0
-> + * @r: the refcount
-> + * @sock: the sock to be locked
-> + *
-> + * Similar to atomic_dec_and_lock(), it will WARN on underflow and fail to
-> + * decrement when saturated at REFCOUNT_SATURATED.
-> + *
-> + * Provides release memory ordering, such that prior loads and stores are done
-> + * before, and provides a control dependency such that free() must come after.
-> + * See the comment on top.
-> + *
-> + * Return: true and hold sock if able to decrement refcount to 0, false
-> + *	   otherwise
-> + */
-> +bool refcount_dec_and_lock_sock(refcount_t *r, struct sock *sock)
-> +{
-> +	if (refcount_dec_not_one(r))
-> +		return false;
-> +
-> +	bh_lock_sock(sock);
-> +	if (!refcount_dec_and_test(r)) {
-> +		bh_unlock_sock(sock);
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +EXPORT_SYMBOL(refcount_dec_and_lock_sock);
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8faabc041a001140564f718dabe37753e88b37fa
 
-It feels a little out-of-place to me having socket-specific functions in
-lib/refcount.c. I'd suggest sticking this somewhere else _or_ maybe we
-could generate this pattern of code:
+Thank you!
 
-#define REFCOUNT_DEC_AND_LOCKNAME(lockname, locktype, lock, unlock)	\
-static __always_inline							\
-bool refcount_dec_and_lock_##lockname(refcount_t *r, locktype *l)	\
-{									\
-	...
-
-inside a generator macro in refcount.h, like we do for seqlocks in
-linux/seqlock.h. The downside of that is the cost of inlining.
-
-Will
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
