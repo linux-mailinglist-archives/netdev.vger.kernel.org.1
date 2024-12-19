@@ -1,55 +1,61 @@
-Return-Path: <netdev+bounces-153463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 062749F824E
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:47:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F30739F8237
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 18:44:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CABC51899ADB
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:40:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CB531653DA
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1690E1AAA1B;
-	Thu, 19 Dec 2024 17:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF811B4249;
+	Thu, 19 Dec 2024 17:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="UQp0Ztjq"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="YztEenBW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C79D1AA783
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 17:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97B81A42D8;
+	Thu, 19 Dec 2024 17:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734629899; cv=none; b=UN1w9bE8JNlruAzi2Onh5zSybq3sBRPieMj4uxpIkhRvNkkQLDOgaj2Xr0rx1xN1jKm6MWfIICLuxgtiFfo9S2ETvth4DGjbnRbQv2OqqfAVoW94EcZq5tpEGMRk4PBMxlzbtaUN/hCFVyWz9hcQjI/CiZGJ/zBRh1o735taIvw=
+	t=1734629976; cv=none; b=cebLJBuljTFMI5xaJmiTUf0vcKt65Pb6nIr9NQkriYikubTnnOM4yOpBD88af7O4ccYZyEAQhL9JvfFRb5EQ2XuOm6H/+ENMvi+3cEs0Fjn2LOW+1jcw58MD6gHKAldtmigescK0NFojDFw3Gj7DKAVBVhV0CWKXZlLfEIw8BFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734629899; c=relaxed/simple;
-	bh=VEZbEuADBPGRv4V2QXFXoWDC/Ge4X8hRzfyCBp91+lE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E3gybAbjP/G1f9ibulc9NgtvjE8UtLopxEIU7tv3CnLj93dpLjBoRFH+L7UaY+4VsD45CGyhLZlH9l0q0oZZQb2tR4YK6PuG7G02uQ8775fO8A2xTzO5xDGvX63P1HUvT3ZybA/EG7juEgoOXtyt7bCJBHbTZxvt+gFUmeuS1j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=UQp0Ztjq; arc=none smtp.client-ip=185.136.64.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 2024121917380906a05cf13f7c5ece3d
-        for <netdev@vger.kernel.org>;
-        Thu, 19 Dec 2024 18:38:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=it40NgbFFEujfXinS48YKcikqgNCRiHyd1xRTeZkF9o=;
- b=UQp0ZtjqoTCE76r4S0agqQE9ZwsDlZ/EjCfXbnMJweiv9NjUndRLQE/3rIkcJE1plSEaLo
- oB1z1Axnz3N7BKueOiJTGATjxoFnvafmJbci+wIEmHPMTXcUDiucWVVEqSRMPh5f94oJb9Ru
- B7f5PsEUhGKCde0imXMK/gmtVbNSmcCCpYu8ahDVIbNuFyiG6km6nWjOf0x16BXkic1t+y9u
- bYnOrc8i7XD+e5hg1fa5fl8mNLv1sF2yTvp76RCXjfnctiCq1oWFix0a9PdtdIkLCOql9VbM
- q/2W3I9XmBZliKtLzcE7GIFqaRcZXH9EPiq4I7ZemGHg4zTnaSSJYS2A==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-To: netdev@vger.kernel.org
-Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next] net: dsa: honor "max-speed" for implicit PHYs on user ports
-Date: Thu, 19 Dec 2024 18:38:01 +0100
-Message-ID: <20241219173805.503900-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1734629976; c=relaxed/simple;
+	bh=nMtNF8jgMV12hHMHxmoGPD7EdBlEfeZcMkMpfEqDSwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T+ir6+QB75LNmuGQmc7Khuo314HZZE+Oaz1rc6pLofnkfWSoZaCUDF7RBMQYnWOMrJKchUHnJ8SIuuWQ2Zj15DWGV+zr0lG2dxfxwoSzD/EpqimeBPJwADbemmwdrl67YWaBrJBm89Urg/MwwhCmoIBXnXWi728uq+KOu/0GA14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=YztEenBW; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=faeUG6yKFS2gk3F1aCroSJO9YLzCZLggD/KHRlKDqdU=; b=YztEenBW9vUwI7ZOHTTE1eQPoK
+	kAqsldKMD972BepQD8ZR+Knux9gChJVXQrI7NpBT1Ob/2MVzWDxnl+H6Ec1LrkvtFir5KaeUai1f/
+	ZalEC9WKz4Xe2niyzXx6LDO5KT0LFbXxKgEw7mBX0qBSPj62A6ttwF1prDvetbSJTVv9mbyCA0qYN
+	8Ngvk9GLKPk+lFNSaYyTeRY4+j/8PrzC8oss0aLWDMfUcfwJcpOhTXViEcwjeeXnVQDxbAWBDKNi6
+	woNdAFMKNh1tQvCgRf2nfj7P1F0QSXRcWiNK0lnrZRFPjdB+3rNLNU37KN+96tPftaeXzQdGbu8Pu
+	dpPNJhqw==;
+Received: from 226.206.1.85.dynamic.cust.swisscom.net ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1tOKUj-000MmT-03; Thu, 19 Dec 2024 18:39:29 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: martin.lau@linux.dev
+Cc: razor@blackwall.org,
+	pabeni@redhat.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf-next 1/3] netkit: Allow for configuring needed_{head,tail}room
+Date: Thu, 19 Dec 2024 18:39:26 +0100
+Message-ID: <20241219173928.464437-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,47 +63,201 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27492/Thu Dec 19 10:44:32 2024)
 
-From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Allow the user to configure needed_{head,tail}room for both netkit
+devices. The idea is similar to 163e529200af ("veth: implement
+ndo_set_rx_headroom") with the difference that the two parameters
+can be specified upon device creation. By default the current behavior
+stays as is which is needed_{head,tail}room is 0.
 
-If the PHYs on user ports are not specified explicitly, but a common
-user_mii_bus is being registered and scanned there is no way to limit
-Auto Negotiation options currently. If a gigabit switch is deployed in a
-way that the ports cannot support gigabit rates (4-wire PCB/magnetics,
-for instance), there is no way to limit ports' AN not to advertise gigabit
-options. Some PHYs take considerably longer time to AutoNegotiate in such
-cases.
+In case of Cilium, for example, the netkit devices are not enslaved
+into a bridge or openvswitch device (rather, BPF-based redirection
+is used out of tcx), and as such these parameters are not propagated
+into the Pod's netns via peer device.
 
-Provide a way to limit AN advertisement options by examining "max-speed"
-property in the DT node of the corresponding user port and call
-phy_set_max_speed() right before attaching the PHY to he port netdevice.
+Given Cilium can run in vxlan/geneve tunneling mode (needed_headroom)
+and/or be used in combination with WireGuard (needed_{head,tail}room),
+allow the Cilium CNI plugin to specify these two upon netkit device
+creation.
 
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- net/dsa/user.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/net/netkit.c               | 66 +++++++++++++++++++-----------
+ include/uapi/linux/if_link.h       |  2 +
+ tools/include/uapi/linux/if_link.h |  2 +
+ 3 files changed, 47 insertions(+), 23 deletions(-)
 
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index 4a8de48a6f24..9e3f5b0f9af3 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -2625,6 +2625,13 @@ static int dsa_user_phy_connect(struct net_device *user_dev, int addr,
+diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+index c1d881dc6409..fb290dcfbc96 100644
+--- a/drivers/net/netkit.c
++++ b/drivers/net/netkit.c
+@@ -338,6 +338,7 @@ static int netkit_new_link(struct net *peer_net, struct net_device *dev,
+ 	enum netkit_scrub scrub_peer = NETKIT_SCRUB_DEFAULT;
+ 	enum netkit_mode mode = NETKIT_L3;
+ 	unsigned char ifname_assign_type;
++	u16 headroom = 0, tailroom = 0;
+ 	struct ifinfomsg *ifmp = NULL;
+ 	struct net_device *peer;
+ 	char ifname[IFNAMSIZ];
+@@ -371,6 +372,10 @@ static int netkit_new_link(struct net *peer_net, struct net_device *dev,
+ 			if (err < 0)
+ 				return err;
+ 		}
++		if (data[IFLA_NETKIT_HEADROOM])
++			headroom = nla_get_u16(data[IFLA_NETKIT_HEADROOM]);
++		if (data[IFLA_NETKIT_TAILROOM])
++			tailroom = nla_get_u16(data[IFLA_NETKIT_TAILROOM]);
+ 	}
  
- 	user_dev->phydev->dev_flags |= flags;
+ 	if (ifmp && tbp[IFLA_IFNAME]) {
+@@ -390,6 +395,14 @@ static int netkit_new_link(struct net *peer_net, struct net_device *dev,
+ 		return PTR_ERR(peer);
  
-+	if (dp->dn) {
-+		u32 max_speed;
-+
-+		if (!of_property_read_u32(dp->dn, "max-speed", &max_speed))
-+			phy_set_max_speed(user_dev->phydev, max_speed);
+ 	netif_inherit_tso_max(peer, dev);
++	if (headroom) {
++		peer->needed_headroom = headroom;
++		dev->needed_headroom = headroom;
 +	}
-+
- 	return phylink_connect_phy(dp->pl, user_dev->phydev);
++	if (tailroom) {
++		peer->needed_tailroom = tailroom;
++		dev->needed_tailroom = tailroom;
++	}
+ 
+ 	if (mode == NETKIT_L2 && !(ifmp && tbp[IFLA_ADDRESS]))
+ 		eth_hw_addr_random(peer);
+@@ -401,6 +414,7 @@ static int netkit_new_link(struct net *peer_net, struct net_device *dev,
+ 	nk->policy = policy_peer;
+ 	nk->scrub = scrub_peer;
+ 	nk->mode = mode;
++	nk->headroom = headroom;
+ 	bpf_mprog_bundle_init(&nk->bundle);
+ 
+ 	err = register_netdevice(peer);
+@@ -426,6 +440,7 @@ static int netkit_new_link(struct net *peer_net, struct net_device *dev,
+ 	nk->policy = policy_prim;
+ 	nk->scrub = scrub_prim;
+ 	nk->mode = mode;
++	nk->headroom = headroom;
+ 	bpf_mprog_bundle_init(&nk->bundle);
+ 
+ 	err = register_netdevice(dev);
+@@ -850,7 +865,18 @@ static int netkit_change_link(struct net_device *dev, struct nlattr *tb[],
+ 	struct net_device *peer = rtnl_dereference(nk->peer);
+ 	enum netkit_action policy;
+ 	struct nlattr *attr;
+-	int err;
++	int err, i;
++	struct {
++		u32 attr;
++		char *name;
++	} fixed_params[] = {
++		{ IFLA_NETKIT_MODE,       "operating mode" },
++		{ IFLA_NETKIT_SCRUB,      "scrubbing" },
++		{ IFLA_NETKIT_PEER_SCRUB, "peer scrubbing" },
++		{ IFLA_NETKIT_PEER_INFO,  "peer info" },
++		{ IFLA_NETKIT_HEADROOM,   "headroom" },
++		{ IFLA_NETKIT_TAILROOM,   "tailroom" },
++	};
+ 
+ 	if (!nk->primary) {
+ 		NL_SET_ERR_MSG(extack,
+@@ -858,28 +884,14 @@ static int netkit_change_link(struct net_device *dev, struct nlattr *tb[],
+ 		return -EACCES;
+ 	}
+ 
+-	if (data[IFLA_NETKIT_MODE]) {
+-		NL_SET_ERR_MSG_ATTR(extack, data[IFLA_NETKIT_MODE],
+-				    "netkit link operating mode cannot be changed after device creation");
+-		return -EACCES;
+-	}
+-
+-	if (data[IFLA_NETKIT_SCRUB]) {
+-		NL_SET_ERR_MSG_ATTR(extack, data[IFLA_NETKIT_SCRUB],
+-				    "netkit scrubbing cannot be changed after device creation");
+-		return -EACCES;
+-	}
+-
+-	if (data[IFLA_NETKIT_PEER_SCRUB]) {
+-		NL_SET_ERR_MSG_ATTR(extack, data[IFLA_NETKIT_PEER_SCRUB],
+-				    "netkit scrubbing cannot be changed after device creation");
+-		return -EACCES;
+-	}
+-
+-	if (data[IFLA_NETKIT_PEER_INFO]) {
+-		NL_SET_ERR_MSG_ATTR(extack, data[IFLA_NETKIT_PEER_INFO],
+-				    "netkit peer info cannot be changed after device creation");
+-		return -EINVAL;
++	for (i = 0; i < ARRAY_SIZE(fixed_params); i++) {
++		attr = data[fixed_params[i].attr];
++		if (attr) {
++			NL_SET_ERR_MSG_ATTR_FMT(extack, attr,
++						"netkit link %s cannot be changed after device creation",
++						fixed_params[i].name);
++			return -EACCES;
++		}
+ 	}
+ 
+ 	if (data[IFLA_NETKIT_POLICY]) {
+@@ -914,6 +926,8 @@ static size_t netkit_get_size(const struct net_device *dev)
+ 	       nla_total_size(sizeof(u32)) + /* IFLA_NETKIT_PEER_SCRUB */
+ 	       nla_total_size(sizeof(u32)) + /* IFLA_NETKIT_MODE */
+ 	       nla_total_size(sizeof(u8))  + /* IFLA_NETKIT_PRIMARY */
++	       nla_total_size(sizeof(u16)) + /* IFLA_NETKIT_HEADROOM */
++	       nla_total_size(sizeof(u16)) + /* IFLA_NETKIT_TAILROOM */
+ 	       0;
  }
  
+@@ -930,6 +944,10 @@ static int netkit_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 		return -EMSGSIZE;
+ 	if (nla_put_u32(skb, IFLA_NETKIT_SCRUB, nk->scrub))
+ 		return -EMSGSIZE;
++	if (nla_put_u16(skb, IFLA_NETKIT_HEADROOM, dev->needed_headroom))
++		return -EMSGSIZE;
++	if (nla_put_u16(skb, IFLA_NETKIT_TAILROOM, dev->needed_tailroom))
++		return -EMSGSIZE;
+ 
+ 	if (peer) {
+ 		nk = netkit_priv(peer);
+@@ -947,6 +965,8 @@ static const struct nla_policy netkit_policy[IFLA_NETKIT_MAX + 1] = {
+ 	[IFLA_NETKIT_MODE]		= NLA_POLICY_MAX(NLA_U32, NETKIT_L3),
+ 	[IFLA_NETKIT_POLICY]		= { .type = NLA_U32 },
+ 	[IFLA_NETKIT_PEER_POLICY]	= { .type = NLA_U32 },
++	[IFLA_NETKIT_HEADROOM]		= { .type = NLA_U16 },
++	[IFLA_NETKIT_TAILROOM]		= { .type = NLA_U16 },
+ 	[IFLA_NETKIT_SCRUB]		= NLA_POLICY_MAX(NLA_U32, NETKIT_SCRUB_DEFAULT),
+ 	[IFLA_NETKIT_PEER_SCRUB]	= NLA_POLICY_MAX(NLA_U32, NETKIT_SCRUB_DEFAULT),
+ 	[IFLA_NETKIT_PRIMARY]		= { .type = NLA_REJECT,
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index 2575e0cd9b48..2fa2c265dcba 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -1315,6 +1315,8 @@ enum {
+ 	IFLA_NETKIT_MODE,
+ 	IFLA_NETKIT_SCRUB,
+ 	IFLA_NETKIT_PEER_SCRUB,
++	IFLA_NETKIT_HEADROOM,
++	IFLA_NETKIT_TAILROOM,
+ 	__IFLA_NETKIT_MAX,
+ };
+ #define IFLA_NETKIT_MAX	(__IFLA_NETKIT_MAX - 1)
+diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
+index 8516c1ccd57a..7e46ca4cd31b 100644
+--- a/tools/include/uapi/linux/if_link.h
++++ b/tools/include/uapi/linux/if_link.h
+@@ -1315,6 +1315,8 @@ enum {
+ 	IFLA_NETKIT_MODE,
+ 	IFLA_NETKIT_SCRUB,
+ 	IFLA_NETKIT_PEER_SCRUB,
++	IFLA_NETKIT_HEADROOM,
++	IFLA_NETKIT_TAILROOM,
+ 	__IFLA_NETKIT_MAX,
+ };
+ #define IFLA_NETKIT_MAX	(__IFLA_NETKIT_MAX - 1)
 -- 
-2.47.1
+2.43.0
 
 
