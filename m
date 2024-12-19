@@ -1,58 +1,50 @@
-Return-Path: <netdev+bounces-153216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDD969F7354
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 04:28:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 624C59F7355
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 04:30:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC4647A1946
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 03:28:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48C5A188A41D
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 03:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA7913B59A;
-	Thu, 19 Dec 2024 03:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918C215B122;
+	Thu, 19 Dec 2024 03:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R1q1//G2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kOXDagVO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEC513AA38
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 03:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD5D1531C0
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 03:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734578916; cv=none; b=L2AzxKxv6paizM9Chcrz84jX1vBzbW9iKuZCP180o9YwSq0YNaHRkY4uy7175+8yxStpEDXp1zUQyCFuwY3lOctYygLzpB/QKoEUDjBrm+C2GBztWzshXsqbHQ97ZKSbcQ84FSj9cNssCuVxR2Jmy1hzjnN2LNQSJRjXYCyxSlA=
+	t=1734579014; cv=none; b=ZLve0/8oFe8GJbt658thvJ2DhsP9TURS5T8/oD5Z2XT/IvnMxYnlEBQj8Dbj1/fYMABbShr1MvkCNE+CY+WiJxSN6WM2hDd4sNaiY7ODSFYZjI1RECpwXLTfXeAdMuPYL712v6GTm2zUC857ZFzSl5VRz9ZThyUpWKU+GCMm/wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734578916; c=relaxed/simple;
-	bh=awvvBD8hci1kx6hi2UiFqAE+XhnyA5OqaVkbmdQOcL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tWQFJ/dAgGC0iwV1zme3JNnhfSVuelOn83wpN1WTF3qNkD2+cLe81JgcoRYXzUakb2rrdv5Ky/b6iO1nofcrxq4G+AIublu6BYogZA9+S+LtkgrJyVVlbVk08eP96ZB3ASRA81mtk7jRHrAT8SC8+QDz2HnVrRHvbpsNH5Dl9GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R1q1//G2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD32C4CEDC;
-	Thu, 19 Dec 2024 03:28:35 +0000 (UTC)
+	s=arc-20240116; t=1734579014; c=relaxed/simple;
+	bh=3a+1aT9rHcU+DVyXtBlLPhNMQlfG1T4xukUktrk9BiY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=B1GXp4/H3gw1N/kJXljYUj+07V26dn0kVcBn8O1eO/UBKQqADy80fpKbs3hiMb6f3n/CwGrNnYxaWdnjTalkulteBIaX+ZblUBemEUY7SvpwsQXJ6sXLoJ8gwKHmvOyHB5N1wi0QuvxST3No6lv6Dmk4NXbJ3E/SMA6FB5Y3pso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kOXDagVO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBD09C4CED4;
+	Thu, 19 Dec 2024 03:30:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734578915;
-	bh=awvvBD8hci1kx6hi2UiFqAE+XhnyA5OqaVkbmdQOcL0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=R1q1//G2O0Yd8WQzTk7RSx1l7FWEefexvF50ysE36UjwUdoj8ucKaJXiHXn0+nqIE
-	 HwQNbcHaUIU1PYc1zBmQiPiAwyPIMLaIzgpjao0ODaSnT5qPdBWQhUIckPo12GZxr2
-	 4kL/oZ0CaTKPfes+1DMDNxdKCSGGeTaOkqLizRx53qB86I3U0xghLOsXN0dszhyC22
-	 7jM4+GqdDC4zinnglN/zdvx8NBUGMthXsOmfmlXGK87keyWXGCqmJ7/5IM1Xp2FSTD
-	 wXX49J6Qc0n+p1MNl1iBV8n6ShlXywIOYNdBUYU/j8NCDDFqYX3gKHJVkNicm0c4Kv
-	 JnTQKVZDcqBFQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v2 2/2] selftests: drv-net: test empty queue and NAPI responses in netlink
-Date: Wed, 18 Dec 2024 19:28:33 -0800
-Message-ID: <20241219032833.1165433-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241219032833.1165433-1-kuba@kernel.org>
-References: <20241219032833.1165433-1-kuba@kernel.org>
+	s=k20201202; t=1734579014;
+	bh=3a+1aT9rHcU+DVyXtBlLPhNMQlfG1T4xukUktrk9BiY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kOXDagVOcnZO6xEa0aRK2yGO/hV9PzQXP+g5/e/1mvZZp8RWuDx3G1FmSMfVnfZn8
+	 8OPN2CSP5wOuOzBNPEGG97DALN5hRtVExbathRb1Bf6srYKUJg9eErbxpE42IIA7hE
+	 dAvn5eHj9KCHtIx1U23uToGEg8Vayz9jheAgG/BT8SbEJ3EWFsuZt7ETn5BDVYVgPR
+	 aGEo5naUqIzyHjrhEXOT4WoZUbJmOkY7arAkdu75xvdYXZpMemLIH5qyuzfrvUGECq
+	 0C6EoiELQnMlp6jdE7RI6q6234850UlAv+aZvZMhdZZB0GpoZYNb0YoXm8pzXKk/8m
+	 S7hqKBSx5u7Mw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEE73805DB1;
+	Thu, 19 Dec 2024 03:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,66 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: dsa: restore dsa_software_vlan_untag() ability to
+ operate on VLAN-untagged traffic
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173457903151.1807897.16925032481407031771.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Dec 2024 03:30:31 +0000
+References: <20241216135059.1258266-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20241216135059.1258266-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, claudiu.manoil@nxp.com,
+ alexandre.belloni@bootlin.com, UNGLinuxDriver@microchip.com,
+ robert.hodaszi@digi.com
 
-Make sure kernel doesn't respond to GETs for queues and NAPIs when
-link is down. Not with valid data, or with empty message, we want
-a ENOENT.
+Hello:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/drivers/net/queues.py | 28 ++++++++++++++++---
- 1 file changed, 24 insertions(+), 4 deletions(-)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/tools/testing/selftests/drivers/net/queues.py b/tools/testing/selftests/drivers/net/queues.py
-index 9c5473abbd78..38303da957ee 100755
---- a/tools/testing/selftests/drivers/net/queues.py
-+++ b/tools/testing/selftests/drivers/net/queues.py
-@@ -1,10 +1,12 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- 
--from lib.py import ksft_run, ksft_exit, ksft_eq, KsftSkipEx
--from lib.py import EthtoolFamily, NetdevFamily
-+from lib.py import ksft_disruptive, ksft_exit, ksft_run
-+from lib.py import ksft_eq, ksft_raises, KsftSkipEx
-+from lib.py import EthtoolFamily, NetdevFamily, NlError
- from lib.py import NetDrvEnv
--from lib.py import cmd
-+from lib.py import cmd, defer, ip
-+import errno
- import glob
- 
- 
-@@ -59,9 +61,27 @@ import glob
-     ksft_eq(queues, expected)
- 
- 
-+@ksft_disruptive
-+def check_down(cfg, nl) -> None:
-+    # Check the NAPI IDs before interface goes down and hides them
-+    napis = nl.napi_get({'ifindex': cfg.ifindex}, dump=True)
-+
-+    ip(f"link set dev {cfg.dev['ifname']} down")
-+    defer(ip, f"link set dev {cfg.dev['ifname']} up")
-+
-+    with ksft_raises(NlError) as cm:
-+        nl.queue_get({'ifindex': cfg.ifindex, 'id': 0, 'type': 'rx'})
-+    ksft_eq(cm.exception.nl_msg.error, -errno.ENOENT)
-+
-+    if napis:
-+        with ksft_raises(NlError) as cm:
-+            nl.napi_get({'id': napis[0]['id']})
-+        ksft_eq(cm.exception.nl_msg.error, -errno.ENOENT)
-+
-+
- def main() -> None:
-     with NetDrvEnv(__file__, queue_count=100) as cfg:
--        ksft_run([get_queues, addremove_queues], args=(cfg, NetdevFamily()))
-+        ksft_run([get_queues, addremove_queues, check_down], args=(cfg, NetdevFamily()))
-     ksft_exit()
- 
- 
+On Mon, 16 Dec 2024 15:50:59 +0200 you wrote:
+> Robert Hodaszi reports that locally terminated traffic towards
+> VLAN-unaware bridge ports is broken with ocelot-8021q. He is describing
+> the same symptoms as for commit 1f9fc48fd302 ("net: dsa: sja1105: fix
+> reception from VLAN-unaware bridges").
+> 
+> For context, the set merged as "VLAN fixes for Ocelot driver":
+> https://lore.kernel.org/netdev/20240815000707.2006121-1-vladimir.oltean@nxp.com/
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: dsa: restore dsa_software_vlan_untag() ability to operate on VLAN-untagged traffic
+    https://git.kernel.org/netdev/net/c/16f027cd40ee
+
+You are awesome, thank you!
 -- 
-2.47.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
