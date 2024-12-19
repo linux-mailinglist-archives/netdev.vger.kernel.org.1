@@ -1,126 +1,93 @@
-Return-Path: <netdev+bounces-153397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 140EC9F7D5C
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:52:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0879F7D79
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:59:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 071981894CA3
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:52:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A104616223C
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99FE86343;
-	Thu, 19 Dec 2024 14:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D742322576E;
+	Thu, 19 Dec 2024 14:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zp7pVRp2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sUWOEHqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4E338FB9
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 14:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F0622540A
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 14:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734619956; cv=none; b=Zj7Lg1c67+nuI24+LuVLGQxMzCImTIMlj3SRDW1YQsRfY2LDAtwejfcdJ2dxCppD0w2bxspPeI9Hb0BmjWHSbNuZJgw4v/ujgZoYnWmBT9zmzesTG0JoR9eHpjC6JYentLxy4WgRQ9lb9HoO+30jR3vsuUFkfyVFlmpemaklVic=
+	t=1734620394; cv=none; b=QTGnJqUN/V2kzqrZhTdM4b3nqQRMjwWhp6MbhJVQpD0suFIZCTa4R7vzi0qM21rW7rcIrwCLwkRyFruqCfnZoSxqC7fapum6BSzcYOWs6kaCsHxjnvZqB3dhgOUlwpElCQEy2Nk9J53sY1++c2zXAYSv6Kc6WRBIfn+vCIa6kD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734619956; c=relaxed/simple;
-	bh=OEwAoSJCW328UWZEmMkywUE4J+Pji6qPDmmJp1k3cKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BRtc9h+5pj5o+70ZRoDNaJxdOpQYQHWj4RlkFtrNvGmvofs4WyvM8RhKjeL3U8NAfHQ3EJQQ7HpgjbJQ0btWiBpS7OHsOfFdDeDvnNuV4uO826FavyhoiznOJmWKUj/HwXofRLXVtdkrHAIMnsOJVt8fFoF3CbUOFp/ogUMDDYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zp7pVRp2; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-434f398a171so1267095e9.2
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 06:52:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734619953; x=1735224753; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nPlbkHxZJObTZGKDGU22yyxdCIuxxhqJHh9p7lFB1Tg=;
-        b=Zp7pVRp2tMOiKRMUS8GZqvLFZpVZg+lYu2yCSKiomA9VTKO0/2uAXJtN54NrYIcEjp
-         KzMvgIyAu9K+wcOLctuqgTllxUDG3a0Eg+9e5dF2qo57HkAPEkfLR5rLrP+lLM0FC8Gm
-         kgMOi5e4Nh+56hDGZIxAb5LqwNxKW5zp6bc6VoiZYMoT+7ewkNu72vi1mdlKYSM9O3KX
-         tk/WZ65vktz8U/4y3wmKm7dh+ZacRSlXOoax57tWhzz1mZ/aRrS5pmpOU+XLNV7iH4UI
-         svwIL8qFVhTNT5rg98dblf1/1U/0/Ta048GQK5ZaDfcO/RjUAD7ENn8gYt9xutwsAANm
-         hHmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734619953; x=1735224753;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nPlbkHxZJObTZGKDGU22yyxdCIuxxhqJHh9p7lFB1Tg=;
-        b=Ut34Hx4YEMf5ZDc1eDFYBOkic8Op/Ncnr2qPHyRLmx4dK+LaFO5hPhkpebx1M2oL6U
-         LUc0CgDdpYfCoIqUj5ZqI2uhQ/+LGVoTrwEjoHoGeYiBxJcTvIaG6XwUfalgUFxagx3o
-         pQjgCo+sBIHWXab0MJAwF64wb/TYpkR8d1XtdJfm5Xlu8v1XCwnUYCcjTAumcyCyXJda
-         IW5fceogVJp/z0QHe3W4GInBql3qtYwTB/kqNKjFZNjHjrLUmx8yWCtcTtpIgYvTj+ap
-         5N2ONXWNgfBx/U82cDEP2/94zfCWMPnDGtEaxnrP2V74RJsfQWXYEn8jdKDm8ndvFVZu
-         G+fA==
-X-Forwarded-Encrypted: i=1; AJvYcCXhToL/pcNMo84YOCg18mv5lBwu7Dm1u1EUtvJt8K2ssejZ+mZkyooX1mRoGVcZC/DdyDppGrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycEcgadvJR9jVboqzvBzzzmA1PGyn+3dh3nqW33zU1d+WlMX0O
-	xQDDjhdVAJfc73B9PrROmT1Rf3TAC3a/8vvQ6YR9LnVGdSlXcRtOHzhGGhVL
-X-Gm-Gg: ASbGncvmUI3XkAUybeIrpJAajnoxoyvpk5u9RIYhLyE5NGWSDeBr7o5HVCw92hTg/Fz
-	guP/BZSRyN5WQctZ9agUwc9/szFO6gtYf2dZB/8W2lFpsCuSqZxNwWC7PBAVqtK78NV1/4MdfIL
-	GBRDfJVwo5F7NbixlcGM8mE3q3YP5F4jJZ3/DFiM/+shYXtmlVK8OXTEZg/DfgeuI2OrV3Br+5r
-	ioTvprsZpXENYj8uD0w7NZ3Rk77zpW8iPT+okFOUm2e
-X-Google-Smtp-Source: AGHT+IE1jQkhyMOa/HoOfM0mBN7DtxYGCd+rxRCcHrxoRdIrgSGHTwTQTpZWY+enY1sJnzXlVFIUMw==
-X-Received: by 2002:a05:600c:4e06:b0:434:f7f0:189c with SMTP id 5b1f17b1804b1-43655401970mr26650405e9.7.1734619953244;
-        Thu, 19 Dec 2024 06:52:33 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43661218f43sm20149615e9.19.2024.12.19.06.52.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 06:52:32 -0800 (PST)
-Date: Thu, 19 Dec 2024 16:52:29 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, netdev@vger.kernel.org, linux@armlinux.org.uk,
-	chris.packham@alliedtelesis.co.nz, pabeni@redhat.com
-Subject: Re: [PATCH v2 net 4/4] net: dsa: mv88e6xxx: Limit rsvd2cpu policy to
- user ports on 6393X
-Message-ID: <20241219145229.2uy3d3pnjqmimq66@skbuf>
-References: <20241219123106.730032-1-tobias@waldekranz.com>
- <20241219123106.730032-1-tobias@waldekranz.com>
- <20241219123106.730032-5-tobias@waldekranz.com>
- <20241219123106.730032-5-tobias@waldekranz.com>
- <20241219140541.qmzzheu5ruhjjc63@skbuf>
- <875xnf91x8.fsf@waldekranz.com>
- <20241219144208.dp7pfbh566htfc4v@skbuf>
+	s=arc-20240116; t=1734620394; c=relaxed/simple;
+	bh=78lelRYgUnyfQgdhg67b6jOoAH6Eo0jdvNLmkOzCREQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ODxA2LzVqa9f/u+yvJJf/Q25m2C9VyEzvuPKJAVkrdA3qGSIQA3JOoLdkMBlB7NtuoQL52TS4jeYPdQcIDqzNyUkFc7zQzjShRWJ7XXTSZRzfbL8dm83vkimIJKgFCBwIqD/PrjmfRkPDVzQkBs9PXZxXNFNXS1hmY3vH58ErLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sUWOEHqu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD4BFC4CED0;
+	Thu, 19 Dec 2024 14:59:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734620394;
+	bh=78lelRYgUnyfQgdhg67b6jOoAH6Eo0jdvNLmkOzCREQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sUWOEHquI0jWbFspZ6hqOu4zW1u9Kjh0WJEJeEb/rWbo8v9pz67lT+RLqCpYkDcOP
+	 NQnd1z2ycwj8p9kHMksTbJwCoJ/Bm4/5gWy7x0axXguhz9lCTLi8/jEfqGlE/PdyDf
+	 AlXZNHmpD94v5dtVfBv/9e80r+9WsE18e6ylarELcjZYXCElQFwUxETBlRpj/c7P1I
+	 8iUBiFFi1lZPtHpcvFQ5rNN/vOMoK8S2ktltccvtWZnoUf3o1lT81dSeaqEK/lJ2mt
+	 fRiW7vfIorE1M4dgpVPBPKqmgF9V29Iv0Fk2hoqxE6YCvE5YUKZZvhQxqcE0BHziPY
+	 n5ZOVLOuc4EPw==
+Date: Thu, 19 Dec 2024 06:59:53 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com, Ajit Khaparde <ajit.khaparde@broadcom.com>,
+ Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, Somnath Kotur
+ <somnath.kotur@broadcom.com>
+Subject: Re: [PATCH net-next v2 5/6] bnxt_en: Skip reading PXP registers
+ during ethtool -d if unsupported
+Message-ID: <20241219065953.73e08f77@kernel.org>
+In-Reply-To: <CACKFLimq7juLHbEs9gbuzRm7mFGvD62RsgrXdxr-fmj5e+zBbw@mail.gmail.com>
+References: <20241217182620.2454075-1-michael.chan@broadcom.com>
+	<20241217182620.2454075-6-michael.chan@broadcom.com>
+	<20241218191346.5c974cb5@kernel.org>
+	<CACKFLimq7juLHbEs9gbuzRm7mFGvD62RsgrXdxr-fmj5e+zBbw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241219144208.dp7pfbh566htfc4v@skbuf>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 19, 2024 at 04:42:08PM +0200, Vladimir Oltean wrote:
-> The other driver with tx_fwd_offload, sja1105,
-
-Correction: I forgot there is one more driver with tx_fwd_offload:
-vsc73xx, but that doesn't properly support link-local traffic yet at all,
-according to the vsc73xx_port_stp_state_set() comment. So we can ignore it.
-
-> is going to drop any
-> packet coming from the host_port which isn't sent through a management
-> route (set up by sja1105_defer_xmit()). So it's more than likely bugged.
+On Wed, 18 Dec 2024 22:57:09 -0800 Michael Chan wrote:
+> > On Tue, 17 Dec 2024 10:26:19 -0800 Michael Chan wrote:  
+> > > Newer firmware does not allow reading the PXP registers during
+> > > ethtool -d, so skip the firmware call in that case.  Userspace
+> > > (bnxt.c) always expects the register block to be populated so
+> > > zeroes will be returned instead.  
+> >
+> > We have both the ability to return the number of registers (regs_len),
+> > and the regs->version. Are you sure you don't want to use either option
+> > to let user space know the regs aren't there?  
 > 
-> We can't fix this from sja1105_xmit() by reordering sja1105_imprecise_xmit()
-> and sja1105_defer_xmit(). It's not just the order of operations in the
-> tagger. It's the fact that the bridge thinks it doesn't need to clone
-> the skb, and it does.
+> The existing bnxt.c in userspace since 2020 always assumes that the
+> beginning part always contains the PXP register block regardless of
+> regs->version as long as the register length >= the length of the
+> register block.  I guess we didn't anticipate that this PXP block
+> would ever be changed or FW would disallow reading it.
 
-Another correction: we could probably make a best-effort attempt to
-honor skb->offload_fwd_mark in sja1105_mgmt_xmit() by setting mgmt_route.destports
-to the bit mask of all other ports that are in dsa_port_bridge_dev_get(dp).
-But it gets unpleasantly difficult to manage, plus I think we still don't
-get MAC SA learning from these packets.
+So if you bumped the version the existing userspace wouldn't care but
+then you _could_ follow up and update user space to ignore these
+registers when version is 1?
 
-> So yes, it's probably best to exclude link-local from skb->offload_fwd_mark.
-
-So I'm still of this opinion :) I think the effort to handle the corner
-cases isn't worth it relative to the benefit of offloading the forwarding
-of slow protocols.
+It's alright, it's just debug, I got curious recently about how little
+use the version field gets. I'm not sure anyone has a good idea on
+what to do with it.
 
