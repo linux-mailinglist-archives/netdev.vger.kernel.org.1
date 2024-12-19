@@ -1,59 +1,81 @@
-Return-Path: <netdev+bounces-153260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A04649F779D
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:41:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AEF9F77D5
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 09:58:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5741A7A2A4F
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:41:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8197B188D760
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 08:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33BDD21D5B7;
-	Thu, 19 Dec 2024 08:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC0C22146F;
+	Thu, 19 Dec 2024 08:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="cCgGt0Y9"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from esa10.hc1455-7.c3s2.iphmx.com (esa10.hc1455-7.c3s2.iphmx.com [139.138.36.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD6141C79;
-	Thu, 19 Dec 2024 08:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426EC1FA174;
+	Thu, 19 Dec 2024 08:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734597710; cv=none; b=fQAdJsPHoVQENWW5Dr3/2h2Fw7TFG3sCUjj1En2Y5OyJzZItdx27zSSiRq0eodhd3xKls5FOihSugFC2lpQXMbhmKyl5Ihi0ZUvZPrjFvQdI3EaZ1KCtoi1E7wxzcCKqLFVVpp6GMWp1Iba2al/ydQioX9HcBYfzVmlymMG4Z84=
+	t=1734598724; cv=none; b=Kt/h/XFChyqTq7WDsq2Mp1PexL5EfeJwafz9w3SIXkRp8+160E8wnvRM3Jmjck7t6e3Db7BixEcQLeHxoXJm7uR6M2mb/4xgYnSloq461xjlWCpzUWjp8YKcfTNQHaRaiNnEDyGl+Ne7JBrmyFqHxTcsdOtQS/HBmKMLK5HK6GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734597710; c=relaxed/simple;
-	bh=snkC2yhtkrzPCscAJDw/TA1auWphpv+5kqavOBntcO0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XVWoG7ZSkHjkz6OR0p5742yHn3rogQmcB3pQtB6FfJXdAlswzjbC20v/7SrKpVIdCOiCQCmDYW37ZsEldyMJpHn2V6l7H1syyflGRbDk2jV6A7XIYxY/2DT7iJAof0o7Uco9aZpLljkEY9FVgtGpKEdX2QGAr26c8HZ8cYr5Zu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YDPD04Fsdz6K6RT;
-	Thu, 19 Dec 2024 16:41:36 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id A034C140393;
-	Thu, 19 Dec 2024 16:41:39 +0800 (CST)
-Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 19 Dec
- 2024 09:41:29 +0100
-From: Gur Stavi <gur.stavi@huawei.com>
-To: <andrew@lunn.ch>
-CC: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
-	<davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
-	<guoxin09@huawei.com>, <gur.stavi@huawei.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <meny.yossefi@huawei.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shenchenyang1@hisilicon.com>,
-	<shijing34@huawei.com>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>
-Subject: Re: [RFC net-next v02 1/3] net: hinic3: module initialization and tx/rx logic
-Date: Thu, 19 Dec 2024 10:55:02 +0200
-Message-ID: <20241219085502.2485372-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <b794027a-ef3b-4262-a952-db249a840e89@lunn.ch>
-References: <b794027a-ef3b-4262-a952-db249a840e89@lunn.ch>
+	s=arc-20240116; t=1734598724; c=relaxed/simple;
+	bh=r235KXsKtpOWvva4ExNas8rWHaEiUsyLYktMeM+2PsU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UGNien4oMUsBHj8hvLiw32yH0tvhT0g1gYISKvleP3k9quKNRLE3bB9SEzxKDIv0C6DueXTH1QqOmuoxBXdf8AEaqDtGSd6rAZUo9g+8p2SGnUWhBE08t2AmtzSEMSUes9UftwT6GH4Q8A6ogi+t7P1aukPy72JueJmt5/pdmi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=cCgGt0Y9; arc=none smtp.client-ip=139.138.36.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1734598722; x=1766134722;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=r235KXsKtpOWvva4ExNas8rWHaEiUsyLYktMeM+2PsU=;
+  b=cCgGt0Y9cnnZYsa7oZMZ7FZxJaVqrY+a+TszJcecnbjdS5dS/fjSx7kN
+   rNVpVGkkmwN4bHhEgtIQnIB4SpeUZuy3XbvdA+mX0BmjyZadv5yuGhBro
+   q7kbZIXrPH8pLdL6v6M9+X8l5s8G0gALLsI54jmkgy9qPo7l5bV5Ljq4T
+   CA510fO2ggAuHyci3vMy1Blwc3VYy1JAcd4ZRiwSDnlRtDpSxp7tBZwI1
+   kx23w95vWw9zLxsTiBjOpziBqA78HbhiZo9SGe4Qr81hUlzNgNokgmSq6
+   9/Hs8EVJkj0I0uaUV2jNizKJ3XgnHs8c2zNZezQ8aFpgPdPVoYzJhc8Se
+   Q==;
+X-CSE-ConnectionGUID: sxuTwDafQaO7gyTIkDP+bw==
+X-CSE-MsgGUID: VET7gJo6SL+toOcmexgxZQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="171631681"
+X-IronPort-AV: E=Sophos;i="6.12,247,1728918000"; 
+   d="scan'208";a="171631681"
+Received: from unknown (HELO yto-r1.gw.nic.fujitsu.com) ([218.44.52.217])
+  by esa10.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2024 17:57:31 +0900
+Received: from yto-m3.gw.nic.fujitsu.com (yto-nat-yto-m3.gw.nic.fujitsu.com [192.168.83.66])
+	by yto-r1.gw.nic.fujitsu.com (Postfix) with ESMTP id BCDDCD6EA5;
+	Thu, 19 Dec 2024 17:57:28 +0900 (JST)
+Received: from kws-ab4.gw.nic.fujitsu.com (kws-ab4.gw.nic.fujitsu.com [192.51.206.22])
+	by yto-m3.gw.nic.fujitsu.com (Postfix) with ESMTP id 8C9D5D9748;
+	Thu, 19 Dec 2024 17:57:28 +0900 (JST)
+Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
+	by kws-ab4.gw.nic.fujitsu.com (Postfix) with ESMTP id 00D1A220E74;
+	Thu, 19 Dec 2024 17:57:28 +0900 (JST)
+Received: from iaas-rdma.. (unknown [10.167.135.44])
+	by edo.cn.fujitsu.com (Postfix) with ESMTP id E84831A006C;
+	Thu, 19 Dec 2024 16:57:26 +0800 (CST)
+From: Li Zhijian <lizhijian@fujitsu.com>
+To: linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Li Zhijian <lizhijian@fujitsu.com>
+Subject: [PATCH for-next 0/2] selftests: Fix run_tests and install for net TARGET
+Date: Thu, 19 Dec 2024 16:58:01 +0800
+Message-ID: <20241219085803.1145606-1-lizhijian@fujitsu.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,99 +83,30 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- frapeml500005.china.huawei.com (7.182.85.13)
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28868.006
+X-TM-AS-User-Approved-Sender: Yes
+X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28868.006
+X-TMASE-Result: 10--3.178200-10.000000
+X-TMASE-MatchedRID: cEobPIBZMxau2WUlRg7UeirLqyE6Ur/jgbNN0R684zMT4iDztnfIOWZY
+	/RdXrUKNHWa2bSeZPhtgRWLzgh5fxjcpdZ3fQiLdFEUknJ/kEl51f3bbwLy/mMLQF1IYnOnS5MI
+	x11wv+COyO81X3yak8+/YZNRftZZqWSU6E2ZmcuAJuRO60D4LfRjOxKAktS7dmV9yAfU8E4BbjB
+	uldNvkMkoq97WSHdFjfupJaud1uZCfRs6uIbkFVw==
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
 
-> > +static void hinic3_del_one_adev(struct hinic3_hwdev *hwdev,
-> > +				enum hinic3_service_type svc_type)
-> > +{
-> > +	struct hinic3_pcidev *pci_adapter = hwdev->adapter;
-> > +	struct hinic3_adev *hadev;
-> > +	bool timeout = true;
-> > +	unsigned long end;
-> > +
-> > +	end = jiffies + msecs_to_jiffies(HINIC3_EVENT_PROCESS_TIMEOUT);
-> > +	do {
-> > +		if (!test_and_set_bit(svc_type, &pci_adapter->state)) {
-> > +			timeout = false;
-> > +			break;
-> > +		}
-> > +		usleep_range(900, 1000);
-> > +	} while (time_before(jiffies, end));
-> > +
-> > +	if (timeout && !test_and_set_bit(svc_type, &pci_adapter->state))
-> > +		timeout = false;
->
-> Please look at using iopoll.h
->
+This patch set intends to fix the errors in install and run_tests when
+'O=' is specified. such as `make O=/path/to/build TARGETS=net kselftest-install`
 
-Ack
 
-> > +static int hinic3_sw_init(struct net_device *netdev)
-> > +{
-> > +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> > +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-> > +	int err;
-> > +
-> > +	nic_dev->q_params.sq_depth = HINIC3_SQ_DEPTH;
-> > +	nic_dev->q_params.rq_depth = HINIC3_RQ_DEPTH;
-> > +
-> > +	hinic3_try_to_enable_rss(netdev);
-> > +
-> > +	eth_hw_addr_random(netdev);
->
-> Is using a random MAC just a temporary thing until more code is added
-> to access an OTP?
->
+Li Zhijian (2):
+  selftests/Makefile: Create BUILD_TARGET directory for
+    INSTALL_DEP_TARGETS
+  selftests/Makefile: add INSTALL_DEP_TARGETS to run_tests
 
-No, using a random MAC is not a temporary solution.
-This device is designed for cloud environments. VFs are expected to be
-used by VMs that may migrate from device to device. Therefore the HW does
-not provide a MAC address to VFs, but rather the VF driver selects a
-random MAC address and configures it into the (current) device.
+ tools/testing/selftests/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Once the driver is extended to support PFs, the PF MAC will be obtained
-from the device.
+-- 
+2.44.0
 
-> > +	err = register_netdev(netdev);
-> > +	if (err) {
-> > +		err = -ENOMEM;
-> > +		goto err_netdev;
-> > +	}
-> > +
-> > +	netif_carrier_off(netdev);
-> > +
-> > +	dev_set_drvdata(&adev->dev, nic_dev);
->
-> Is this used anywhere in the driver? Calling register_netdev() makes
-> the interface live, even before it returns. If you have NFS root for
-> example, it could be sending packets, etc, before drvdata is set.
->
-
-Ack
-
-> > +int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu)
-> > +{
-> > +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> > +	struct hinic3_func_tbl_cfg func_tbl_cfg = {};
-> > +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-> > +
-> > +	if (new_mtu < HINIC3_MIN_MTU_SIZE) {
-> > +		dev_err(hwdev->dev,
-> > +			"Invalid mtu size: %ubytes, mtu size < %ubytes\n",
-> > +			new_mtu, HINIC3_MIN_MTU_SIZE);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	if (new_mtu > HINIC3_MAX_JUMBO_FRAME_SIZE) {
-> > +		dev_err(hwdev->dev, "Invalid mtu size: %ubytes, mtu size > %ubytes\n",
-> > +			new_mtu, HINIC3_MAX_JUMBO_FRAME_SIZE);
-> > +		return -EINVAL;
-> > +	}
->
-> The core can do this validation for you, if you set ndev->max_mtu,
-> ndev->min_mtu.
-
-Ack
 
