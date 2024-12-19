@@ -1,93 +1,106 @@
-Return-Path: <netdev+bounces-153398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0879F7D79
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:59:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C08429F7D87
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:01:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A104616223C
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 14:59:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C47DC16E924
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 15:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D742322576E;
-	Thu, 19 Dec 2024 14:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2258E2248B4;
+	Thu, 19 Dec 2024 15:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sUWOEHqu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CyBSLc2w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F0622540A
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 14:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0D6224B1A
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 15:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734620394; cv=none; b=QTGnJqUN/V2kzqrZhTdM4b3nqQRMjwWhp6MbhJVQpD0suFIZCTa4R7vzi0qM21rW7rcIrwCLwkRyFruqCfnZoSxqC7fapum6BSzcYOWs6kaCsHxjnvZqB3dhgOUlwpElCQEy2Nk9J53sY1++c2zXAYSv6Kc6WRBIfn+vCIa6kD8=
+	t=1734620493; cv=none; b=Hd52lKgOrYUUCvoSqYsh8dgyBp+8xbX0km8yiSOw/VJfn6rN3UpOhFFxsHmr/vgpIi9Y9H1SVqLjMh1tW+nXPb3jmbPUjW9DGT9JWg9g9UiSM8Ve7+ypRyMejJE0IF1M/T/4ereqt4EawzEvkivvy1eAo79J78HfZyjuqom1BhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734620394; c=relaxed/simple;
-	bh=78lelRYgUnyfQgdhg67b6jOoAH6Eo0jdvNLmkOzCREQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ODxA2LzVqa9f/u+yvJJf/Q25m2C9VyEzvuPKJAVkrdA3qGSIQA3JOoLdkMBlB7NtuoQL52TS4jeYPdQcIDqzNyUkFc7zQzjShRWJ7XXTSZRzfbL8dm83vkimIJKgFCBwIqD/PrjmfRkPDVzQkBs9PXZxXNFNXS1hmY3vH58ErLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sUWOEHqu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD4BFC4CED0;
-	Thu, 19 Dec 2024 14:59:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734620394;
-	bh=78lelRYgUnyfQgdhg67b6jOoAH6Eo0jdvNLmkOzCREQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sUWOEHquI0jWbFspZ6hqOu4zW1u9Kjh0WJEJeEb/rWbo8v9pz67lT+RLqCpYkDcOP
-	 NQnd1z2ycwj8p9kHMksTbJwCoJ/Bm4/5gWy7x0axXguhz9lCTLi8/jEfqGlE/PdyDf
-	 AlXZNHmpD94v5dtVfBv/9e80r+9WsE18e6ylarELcjZYXCElQFwUxETBlRpj/c7P1I
-	 8iUBiFFi1lZPtHpcvFQ5rNN/vOMoK8S2ktltccvtWZnoUf3o1lT81dSeaqEK/lJ2mt
-	 fRiW7vfIorE1M4dgpVPBPKqmgF9V29Iv0Fk2hoqxE6YCvE5YUKZZvhQxqcE0BHziPY
-	 n5ZOVLOuc4EPw==
-Date: Thu, 19 Dec 2024 06:59:53 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, Ajit Khaparde <ajit.khaparde@broadcom.com>,
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, Somnath Kotur
- <somnath.kotur@broadcom.com>
-Subject: Re: [PATCH net-next v2 5/6] bnxt_en: Skip reading PXP registers
- during ethtool -d if unsupported
-Message-ID: <20241219065953.73e08f77@kernel.org>
-In-Reply-To: <CACKFLimq7juLHbEs9gbuzRm7mFGvD62RsgrXdxr-fmj5e+zBbw@mail.gmail.com>
-References: <20241217182620.2454075-1-michael.chan@broadcom.com>
-	<20241217182620.2454075-6-michael.chan@broadcom.com>
-	<20241218191346.5c974cb5@kernel.org>
-	<CACKFLimq7juLHbEs9gbuzRm7mFGvD62RsgrXdxr-fmj5e+zBbw@mail.gmail.com>
+	s=arc-20240116; t=1734620493; c=relaxed/simple;
+	bh=cB4uDBZHX8+2Q4OcLl0RJkaSaPj0kflE8nHqsd33fjs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=p+o7k2QduAa/iOyrwlNjVU8+fheNgGEU8EcTGMOz2tJGXpCZiNOMce2Ac3Nh9izDeYFYsVos7XYWI4MHPoRFKRLubkhCfGKDyDFwrdcQsu04shK1yzBHqusN5DKlcgIBljy2Q32QiBGXPIGCFK8Kw7r0Ei1nhis6xfqiIqleP7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CyBSLc2w; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4678cce3d60so7608161cf.2
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 07:01:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734620490; x=1735225290; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MmG5yPAwJimVagbIlzy3QYFL/gbvegmXZ5hlAqrdtBI=;
+        b=CyBSLc2wPYgMsYDm4PbEqNEhXNR86Fv6Yu7Y5hOaLEwzaCWRdEqNChJ172J/wWf9i5
+         /hdyaYHWAuKoKffpYOTnPx2fqESRQAsWV4dBC8Q67wURNTyTV6GP1Mb1cLcwvn7Gf5JZ
+         0joyLld6UTFPqyWt0Q6pugDpnxLEJ2mqXZPrUoCVa9FhZKKMuH8WrzlAAhU3dA30q9FE
+         s9XDic0NTto5otYQJwO/dd3WgKVPv3o5pJxh8e9TAu4hKnIIouyMEJeC6gc1GO3OSma5
+         /u+R86+UNs7oMo+xeIhnw/GKw1yQqW72oszK23MHNaiwv2r5/zdG/CeezWlehOtg1URI
+         /Xaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734620490; x=1735225290;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MmG5yPAwJimVagbIlzy3QYFL/gbvegmXZ5hlAqrdtBI=;
+        b=jXKfxPtl6+rX/xcFFL3+h4SR4cPqsf2D8QoIpy8zblFHaB20BkTktyO8EqdLY2rGJ6
+         pVnxTuM78RqVEMz2B1guOAS/N+lZw7Vxi8haRVExdjhj7fiHiAeF5fTTUTF1ZZ8X5FH0
+         2ksgRj8Dt1ZJvho2lKfiOOstAbl8EdvWgUul3u4BORZsHaz+N7lI3gXpc5/Kdrnxmwm/
+         1RuQWus2Zhkbo4ChqNXMZUPSVwBKINP/wS7GjlGAZHVO7qwlCUDuKeziI4ahJ6SEwYQW
+         yEd74RP2ZhlyeBPYuPw/yXuXxzgtDjQEHRka4LTLmUaSF5Ir0qaqH3PkfjVHVMFqErhp
+         1YDg==
+X-Gm-Message-State: AOJu0Yx9cDL1QLfsvtRYQu+gbwg9qk4lqMpZp9BmSBU3ZShcJjo61CR3
+	oS1ZfPUgtamS2xuSfmUuVAOgxdVx9CUiloAipkohj+3hnZsImHjhK0Ulwg==
+X-Gm-Gg: ASbGncsV+Mf9V0WK0eAspEGV2+LpOEemkF+ruKLQwwm2mQjYzXOdBJlUrgixHd4KFfi
+	UgrGB3WiqZrECJfnZqyxvpkWigyKkjpLckW0j6VWmoln6Vm8kP1uYqafwdaBZuLoE2AY1L01ONT
+	EIhN4gB9K+/Jam8VQ0RJixz6f0H8vJ/qPlctGuCZMwX0obVMADxl05eBrqXyZz8aChlVmoLhZSx
+	j9UXXkuhwwUWPbujquDXMAlTAYagSFjeQInX283JaxqT8ugC/gV82KCgOTgPrmaaydaGSuHTrG+
+	zjGKUXy0BFN+sx5c4H8wpeKa1asmNAluYQ==
+X-Google-Smtp-Source: AGHT+IGcbJQmMdv2/L5QG/PihDrviubYJfkoAHws+kOELeBXr0OTca4+vHua2LQtw13KGxYVdmJoYQ==
+X-Received: by 2002:a05:622a:1a1c:b0:467:5457:c380 with SMTP id d75a77b69052e-46908ec139cmr131097961cf.52.1734620490168;
+        Thu, 19 Dec 2024 07:01:30 -0800 (PST)
+Received: from localhost (96.206.236.35.bc.googleusercontent.com. [35.236.206.96])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac2bcfd8sm54765885a.14.2024.12.19.07.01.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 07:01:29 -0800 (PST)
+Date: Thu, 19 Dec 2024 10:01:29 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Milena Olech <milena.olech@intel.com>, 
+ intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, 
+ anthony.l.nguyen@intel.com, 
+ przemyslaw.kitszel@intel.com, 
+ Milena Olech <milena.olech@intel.com>
+Message-ID: <6764354958acc_1d0f5c29479@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241219094411.110082-10-milena.olech@intel.com>
+References: <20241219094411.110082-1-milena.olech@intel.com>
+ <20241219094411.110082-10-milena.olech@intel.com>
+Subject: Re: [PATCH v3 iwl-next 09/10] idpf: add support for Rx timestamping
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 18 Dec 2024 22:57:09 -0800 Michael Chan wrote:
-> > On Tue, 17 Dec 2024 10:26:19 -0800 Michael Chan wrote:  
-> > > Newer firmware does not allow reading the PXP registers during
-> > > ethtool -d, so skip the firmware call in that case.  Userspace
-> > > (bnxt.c) always expects the register block to be populated so
-> > > zeroes will be returned instead.  
-> >
-> > We have both the ability to return the number of registers (regs_len),
-> > and the regs->version. Are you sure you don't want to use either option
-> > to let user space know the regs aren't there?  
+Milena Olech wrote:
+> Add Rx timestamp function when the Rx timestamp value is read directly
+> from the Rx descriptor. In order to extend the Rx timestamp value to 64
+> bit in hot path, the PHC time is cached in the receive groups.
+> Add supported Rx timestamp modes.
 > 
-> The existing bnxt.c in userspace since 2020 always assumes that the
-> beginning part always contains the PXP register block regardless of
-> regs->version as long as the register length >= the length of the
-> register block.  I guess we didn't anticipate that this PXP block
-> would ever be changed or FW would disallow reading it.
+> Signed-off-by: Milena Olech <milena.olech@intel.com>
 
-So if you bumped the version the existing userspace wouldn't care but
-then you _could_ follow up and update user space to ignore these
-registers when version is 1?
-
-It's alright, it's just debug, I got curious recently about how little
-use the version field gets. I'm not sure anyone has a good idea on
-what to do with it.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
