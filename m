@@ -1,78 +1,96 @@
-Return-Path: <netdev+bounces-153198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57A649F726A
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 03:02:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84FE89F726B
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 03:03:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8DA6165EE0
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 01:59:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4389117141D
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 02:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E824B7081C;
-	Thu, 19 Dec 2024 01:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D9586320;
+	Thu, 19 Dec 2024 02:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E4LdgTts"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iOi9iXTP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BB469D2B
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 01:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FDD78F43;
+	Thu, 19 Dec 2024 02:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734573595; cv=none; b=MZmvRvMBog3G3GhWJB8gd1yxQnk4kVV0Bf6j8Yl3JQGxiUhuqwr/ezV8M+GZ13QKH70XHdKiW3//y9ywUU74yMygVD/Do484Jcl7yjbfOMtkyHjoh4YAca9FWEwfdCOqa5T8q5BHGznVhSkNcO2eYfInhiYo/0L9JPixZphmsVY=
+	t=1734573616; cv=none; b=Q4H4Vai7NOfXjMsIp3gOnqDvn6NoWQHo/lzrimF5y5xH0yV4xAGf2Sogu7no5paxHGOHzHoSSVdB+4x7yd2UGiBAxCwxCIeV809aA0pGZVLWs80oHtNFaHJqGuJ2Xj8bC4uyJgmYc12an8c8niPJyjCiRta7kwwZAoVvOpHJ0fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734573595; c=relaxed/simple;
-	bh=pktD9tMB/NkIA24GcTNudFt0kYH6590n4rXQZVZy5Xw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uw/9gwverwtKSlEoSzk3gSo/gPQSmjQ7pqZH/eW7KSMqt6S/BUk43MuYtiVsAmxz0tiqkJd84KA12ORSQR+oLIbZHaHDEncRQBwHDhJ42tOsUnzgRv1Wf6URXkboa/II5tYfjK9aamU4Y3/OLjzQnv2Tg89TYTHR4VVEW0LJDCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E4LdgTts; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E2E6C4CECD;
-	Thu, 19 Dec 2024 01:59:55 +0000 (UTC)
+	s=arc-20240116; t=1734573616; c=relaxed/simple;
+	bh=PEBLwfa1cgAGFpGSFRskjctBO5Ns88AYIlFrBdIyZLE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DKmrYjox43TH8FAfvu5EBPLWDdzdLZjcOK6mATJjT6HhG+L4jQDmRqiYOsWCYbybwal6+KAqKgABbYHftGBNQQIh26Ilypr48ituRq3vWE0RgWB9+mk+05MUsyZR0judLdJtKP5eLtgQ9KLX88E5G+eN6/mPFzfSEsUUbur9TII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iOi9iXTP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 740D2C4CECD;
+	Thu, 19 Dec 2024 02:00:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734573595;
-	bh=pktD9tMB/NkIA24GcTNudFt0kYH6590n4rXQZVZy5Xw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E4LdgTtsbkMKdioeAmYB8lQWJpPTV/Gaj/Usy+7dMJeWFdycJfWIgI4P3m0eDgtxl
-	 dYEvcPDypEeiZBlR7yMJZRHT+iYgohlDdcovU6GFTPkFiJM8buLg9xETxOscpSi9Wb
-	 +W+Hs7/XmuVWEnvsaInEcHR2sQBTOeu7G5osplb3gy2fG/VWkCtWB2z+5iV+bJ8lhc
-	 s2lbR6uthBiJQAKtP4ZV1qYy5gohwf2Likwosgr6F4HduevedYG73DUr17VcDO/P10
-	 pyBn0fmltb6M6mRCMK2btbpGewTy0UN1dbiSjusSRqkv3ID79ClxfpVJCjDUKTfCqe
-	 CH8CzMHNv9K1Q==
-Date: Wed, 18 Dec 2024 17:59:54 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: <linuxppc-dev@lists.ozlabs.org>, <arnd@arndb.de>, <jk@ozlabs.org>,
- <segher@kernel.crashing.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 24/25] net: spider_net: Remove powerpc Cell driver
-Message-ID: <20241218175954.3d0487c1@kernel.org>
-In-Reply-To: <20241218175917.74a404c1@kernel.org>
-References: <20241218105523.416573-1-mpe@ellerman.id.au>
-	<20241218105523.416573-24-mpe@ellerman.id.au>
-	<20241218175917.74a404c1@kernel.org>
+	s=k20201202; t=1734573614;
+	bh=PEBLwfa1cgAGFpGSFRskjctBO5Ns88AYIlFrBdIyZLE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iOi9iXTP2adzM4d/nA56Y/bmMt5q5TY4Njp4jPzUEn6It7tt8X+AdzZqCikpRrMkd
+	 kfi1Z18PAo9XarzO8fXH/PMgrzVZm0xEuFvVlDCX19DPcNK+SmK95u6YEDL3owXjUp
+	 mSh3X2xPbD852GqrP2Kp00r9sirvph84KxNem3B1qGq+iwPIHzqUdNlVjndhy5QtEi
+	 KXU6aVxyFtpC02KqEOK5AFUKO9Pc9YTopzAmSjxh53+95IpJDzlGoRERCfQf3gocb7
+	 cGsf1nfYQicVdhK6VrenOZl6dJ/4i8XRqmclSjsRhqXSXbh2R+Uwk5XVYrN8hV11Gi
+	 9H/avPLa72ddQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DC03805DB1;
+	Thu, 19 Dec 2024 02:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/2] can: m_can: set init flag earlier in probe
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173457363203.1790990.3275795076100390604.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Dec 2024 02:00:32 +0000
+References: <20241218121722.2311963-2-mkl@pengutronix.de>
+In-Reply-To: <20241218121722.2311963-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de,
+ matthias.schiffer@ew.tq-group.com, msp@baylibre.com
 
-On Wed, 18 Dec 2024 17:59:17 -0800 Jakub Kicinski wrote:
-> On Wed, 18 Dec 2024 21:55:12 +1100 Michael Ellerman wrote:
-> > This driver can no longer be built since support for IBM Cell Blades was
-> > removed, in particular PPC_IBM_CELL_BLADE.
-> > 
-> > Remove the driver and the documentation.
-> > Remove the MAINTAINERS entry, and add Ishizaki and Geoff to CREDITS.  
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
+
+On Wed, 18 Dec 2024 13:10:27 +0100 you wrote:
+> From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 > 
-> Yay! Please let us know if you'd like us to take these, otherwise I'll
-> assume you'll take them via powerpc.
+> While an m_can controller usually already has the init flag from a
+> hardware reset, no such reset happens on the integrated m_can_pci of the
+> Intel Elkhart Lake. If the CAN controller is found in an active state,
+> m_can_dev_setup() would fail because m_can_niso_supported() calls
+> m_can_cccr_update_bits(), which refuses to modify any other configuration
+> bits when CCCR_INIT is not set.
+> 
+> [...]
 
-I meant to say:
+Here is the summary with links:
+  - [net,1/2] can: m_can: set init flag earlier in probe
+    https://git.kernel.org/netdev/net/c/fca2977629f4
+  - [net,2/2] can: m_can: fix missed interrupts with m_can_pci
+    https://git.kernel.org/netdev/net/c/743375f8deee
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
