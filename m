@@ -1,123 +1,99 @@
-Return-Path: <netdev+bounces-153436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F319F7F28
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:16:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14D959F7F91
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 17:25:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58678189089E
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:15:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B061C188FF5A
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 16:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45555228C84;
-	Thu, 19 Dec 2024 16:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DA422A7FA;
+	Thu, 19 Dec 2024 16:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uf8qxjFM"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="CpNR1OJT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forwardcorp1b.mail.yandex.net (forwardcorp1b.mail.yandex.net [178.154.239.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CF92288E3
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 16:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF49D2288E5;
+	Thu, 19 Dec 2024 16:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734624842; cv=none; b=B0CUy53sRKw16mxS+Uyb7HWjGcnfv+AXhFKA18GgPJaJue22MoCs9gxLog28e+0w8rxPK185Y4cHdBqTI0oKOBK9+2rV6UHS9qeaHuUxCt86Uw0Pgi5FCYX1XtzAcPiJ/22RPqUb4olQzDugPtdRp3uKRyT2Clysazo0yNY/lzM=
+	t=1734625327; cv=none; b=O33U6f9YWBqRtDMacwSkWm8EMhSi0y9Q2X7t2pplCA/1HewTmbyd6kviUbZjvpVjyLq2b7SQh26LhkYoGESoVnRqTaiJdIlJhH79hgekfFiDsIIUxY25QOqzprhH53ODxz5IAeNukoykHNVWZOveUtmbsk3Kf0kIHvJRsB9/9gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734624842; c=relaxed/simple;
-	bh=Ao1M9tsAYMe/J2ewOjf8yqlnleUiHC7z6nKS8hyU3vM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EL0JuwKzBlb3soPShzJLgLHqMycQNbwnqP8hzZQ5eUWDpqxaSwXyN9VeC0tdQ6xv3id+dwcBnAT56TWdwLJJnm/T5TGsbr5H07I8O5WzHpGjRAytMJFEYMzPfs6d+WbufJP/uGSqIJVOZVdtNMaANMcci06D6wId2njPHN8KinI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uf8qxjFM; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3a818cd5dcbso305ab.0
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 08:14:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734624840; x=1735229640; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ao1M9tsAYMe/J2ewOjf8yqlnleUiHC7z6nKS8hyU3vM=;
-        b=uf8qxjFMztS1QpTY0ZpD4O+sITLcetjkJj/9GnUOb1wemJMTQ54CqhoKXZXUCNbdxl
-         c6SyVDxb372MTXhB4jdY15HzvJhgAI+vKftVPhdn9coOqTciSbwTbGyrmO20Q2gExDIo
-         EGHf+mUcbtWxo1SNx5BVbjti1rc/HMPwZON6VdDuK8Zt7FAEgLt1dAtnCTNKtUP0LYcS
-         X5OTZ8m8QW6g37vwcyiRLeyWm4h+BEzrWU+3oOenIAetoaNMYbax4PA4GPWRqW00gVY1
-         C/He29kv0NbPrpRePxOB2gTXwu+Ly3InQ4y3ok6gKz3ZTInDhZ9+wn8kuIBxNVdcp2w9
-         Z4Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734624840; x=1735229640;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ao1M9tsAYMe/J2ewOjf8yqlnleUiHC7z6nKS8hyU3vM=;
-        b=r8lsglX8RQjJHtCSpk0BCJxKh7P7+WTKkRaL7DwXgXDfPbu+XCZ+lUTIlhH2vxy/H9
-         mhcCmPV8KbmVBSDjkV1ftwgssrrQX5bCi9WKAcA2oKb1TONPXjMi60a0bucxxv/045Hn
-         rfvX/d1uBDXTrvPfUIPuxp2VSMedMqIK2KjCQWAUMGgDJez4He7ZlBCfW2OgFNP9Xq76
-         rur8mnaDJyz/mNuezVCQ/9234LOjLVRrNPtBkueg/iQxfAHl2hnmLPceZ7cJmT+SRVMl
-         hOlBEw7UeeoAD0mBvs+K5FvvcBBwXDswPcd1XyaV6rhaEkDKmMHtbXVwjNjujAxemIGD
-         tWqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNQzE9pdZXZpslKDIiJCYsw2NkLxHwRXYtM0FAOdSrAwpYByacWiztwTmxZWgdjrKV+lGbSU4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6EQgkiLX9KAm7yKIR7d1cLyfMqXKGgtFAfdYn6OU98ydaxKKs
-	EJgxXSdnJfNUH5nC9WTNKQknVw4dBiLQydErvQxl2sRh2LMdp5c5i8KtSzws16V/VJUy2Ha125j
-	Q2PatYj5RqAdsGEUG2CBx6vqebFNuvti5YbsC
-X-Gm-Gg: ASbGncvRA1FSdkUKGHqkOHixbdt9jLrTFmDNbPhjNHs43k/c5a9rhTZ1bbThoLnf+OC
-	5+gJJqVjGYFavGAgAZiWYTpLvuWxAoY5mwhk+CnIOocAmO5ilfVtGRKy5XW4/rc+L9LhRlHE=
-X-Google-Smtp-Source: AGHT+IH/DVNRKjvM8vgJxbGcE+1BQG6yAxpuOxGzyRKMPwP1oPkyCthNQVlsBED8laj9mGC+2zZKYAazjvoVkIbUbtI=
-X-Received: by 2002:a92:c26d:0:b0:3a7:d682:36f6 with SMTP id
- e9e14a558f8ab-3c24cbd5995mr129695ab.0.1734624839207; Thu, 19 Dec 2024
- 08:13:59 -0800 (PST)
+	s=arc-20240116; t=1734625327; c=relaxed/simple;
+	bh=eoT3hYSWOt04Fah9DMV+xiBDwTAmeZ3TdRd1eAC5COQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JcWGMcQaeHCi54afKE3LpChvX1iRyhZfKInpUhL29viPuiqlxKYq4A77mXmgtszoC702WkqJseX7qN0nG+oIe/xhm/vaguqlE/c04YiHwW1W1doP/sh/iXL8QQRDviFYFheuGiXyHplTazP3+RpM9fljkP+L7DVNvowanhLsS4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=CpNR1OJT; arc=none smtp.client-ip=178.154.239.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+Received: from mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:a1f:0:640:ba2e:0])
+	by forwardcorp1b.mail.yandex.net (Yandex) with ESMTPS id 1817E60E94;
+	Thu, 19 Dec 2024 19:21:58 +0300 (MSK)
+Received: from kniv-nix.yandex-team.ru (unknown [2a02:6b8:b081:8104::1:2c])
+	by mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id jLV8H32IkKo0-spD1uvcw;
+	Thu, 19 Dec 2024 19:21:57 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; t=1734625317;
+	bh=86uF8z9q8RfEa7z7ymSGoeaNjFcJEcHXRQPm5ok7o+w=;
+	h=Message-Id:Date:Cc:Subject:To:From;
+	b=CpNR1OJT7377vXm4IW+ayYb70xlilV+FrV+o8ehvWulRTYfkupFhuEPWG4TbVJTQI
+	 otXtMEK0unW3f37i0cGVXO9aypwDTqdHJhPaVbCB29ZS9emWWGFc/0ZtzzUZiHna2B
+	 oNCmvfz635IeOWkarwUKX9l6jsRx/sWwmeVVsbho=
+Authentication-Results: mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+From: Nikolay Kuratov <kniv@yandex-team.ru>
+To: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-sctp@vger.kernel.org,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Xi Wang <xi.wang@gmail.com>,
+	Neil Horman <nhorman@tuxdriver.com>,
+	Vlad Yasevich <vyasevich@gmail.com>,
+	Nikolay Kuratov <kniv@yandex-team.ru>,
+	stable@vger.kernel.org
+Subject: [PATCH] net/sctp: Prevent autoclose integer overflow in sctp_association_init()
+Date: Thu, 19 Dec 2024 19:21:14 +0300
+Message-Id: <20241219162114.2863827-1-kniv@yandex-team.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241219132644.725161-1-yuyanghuang@google.com>
- <CANn89iKcVDM-na-kF+o3octj16K-8ZRLFZvShTR_rLAKb-CSoA@mail.gmail.com>
- <CANn89i+SMrCH1XqL8Q9-rr7k2bez1DNqeQNhO0rBrrHiyOrFXw@mail.gmail.com>
- <CADXeF1Gg7H+e+47KihOTMdSg=KXXe=eirHD01=VbAM5Dvqz1uw@mail.gmail.com>
- <CADXeF1GvpMOyTHOYaE5v6w+4jpBKjnT=he3qNpehghRWY+hNHQ@mail.gmail.com>
- <CADXeF1E16ffcJ2tsYDHWr5OX=9B9u0_t3QoKus=RnuQw_e_0EQ@mail.gmail.com> <CANn89iJEz=HWXN9fV4iLX6uGumBuOvcup6pEJvPWs3efy4=4OA@mail.gmail.com>
-In-Reply-To: <CANn89iJEz=HWXN9fV4iLX6uGumBuOvcup6pEJvPWs3efy4=4OA@mail.gmail.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Fri, 20 Dec 2024 01:13:21 +0900
-X-Gm-Features: AbW1kvbuIRYKCj1K9XHi90nKy9fd7ykqu9gmDzYrBLB8E2BAQzO9lVfVgJgS7iM
-Message-ID: <CADXeF1FVRY4t7L-J16FDu_6SvuvU3_jKJQo3+kFyDR7s_92kAg@mail.gmail.com>
-Subject: Re: [PATCH net-next] netlink: correct nlmsg size for multicast notifications
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org, 
-	jimictw@google.com, prohr@google.com, liuhangbin@gmail.com, 
-	nicolas.dichtel@6wind.com, andrew@lunn.ch, pruddy@vyatta.att-mail.com, 
-	netdev@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Thank you very much for the detailed explanation.
+While by default max_autoclose equals to INT_MAX / HZ, one may set
+net.sctp.max_autoclose to UINT_MAX. There is code in
+sctp_association_init() that can consequently trigger overflow.
 
-I will change GFP_ATOMIC to GFP_KERNEL in the v2 patch.
+Cc: stable@vger.kernel.org
+Fixes: 9f70f46bd4c7 ("sctp: properly latch and use autoclose value from sock to association")
+Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
+---
+ net/sctp/associola.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thanks,
-Yuyang
+diff --git a/net/sctp/associola.c b/net/sctp/associola.c
+index c45c192b7878..0b0794f164cf 100644
+--- a/net/sctp/associola.c
++++ b/net/sctp/associola.c
+@@ -137,7 +137,8 @@ static struct sctp_association *sctp_association_init(
+ 		= 5 * asoc->rto_max;
+ 
+ 	asoc->timeouts[SCTP_EVENT_TIMEOUT_SACK] = asoc->sackdelay;
+-	asoc->timeouts[SCTP_EVENT_TIMEOUT_AUTOCLOSE] = sp->autoclose * HZ;
++	asoc->timeouts[SCTP_EVENT_TIMEOUT_AUTOCLOSE] =
++		(unsigned long)sp->autoclose * HZ;
+ 
+ 	/* Initializes the timers */
+ 	for (i = SCTP_EVENT_TIMEOUT_NONE; i < SCTP_NUM_TIMEOUT_TYPES; ++i)
+-- 
+2.34.1
 
-On Fri, Dec 20, 2024 at 12:53=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Thu, Dec 19, 2024 at 4:35=E2=80=AFPM Yuyang Huang <yuyanghuang@google.=
-com> wrote:
-> >
-> > >Same remark for inet_ifmcaddr_notify()
-> >
-> > Moreover, for both IPv4 and IPv6, when a device is up, the kernel
-> > joins the all-hosts multicast addresses (224.0.0.1/ff02::1). I guess
-> > this logic also does not run in process context?
-> >
->
-> Hopefully all these paths are stressed in kselftest.
->
-> A wrong gfp would trigger issues when you run the selftests before
-> submission, or in netdev CI.
 
