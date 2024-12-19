@@ -1,89 +1,104 @@
-Return-Path: <netdev+bounces-153525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD58D9F8817
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 23:51:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56C449F8831
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 23:59:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8400B189050D
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 22:51:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B170B169908
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 22:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABA31D86C3;
-	Thu, 19 Dec 2024 22:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DBE1D2B2A;
+	Thu, 19 Dec 2024 22:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="t0rhhzjp"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pTHkA93C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46A81D79A3;
-	Thu, 19 Dec 2024 22:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF1B78F4A
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 22:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734648672; cv=none; b=qMzcoQv9h8X5kvUN5+ksKHlcUfDC8xtojly5SGfyo3F1BHYczqiKNrFVgcKQzmUdZkB3JKniigr1sBFCJ8UFlXiDgpRuXJyQEX1FT6wZSHdCvi7I+VB/TIKazVOvKfqvVlWJvJPyXcY0tAhQIumELz4g5Ks2PHsjfoxycl3sWtM=
+	t=1734649170; cv=none; b=ce05fm3I7Pws7s/Dmglv8q6MC6d7mBwmACaOPhuO6Dlj1jPR11CSLLFStuT8WUEUjmWCnOsiaO7hnUW1BJZWZwAWYU8ctdAPHDb7i4NSVp2OfDist8w90ohnC38g99laEl13xpb2kAOC/tR/0VEFZwl1Sv5YJaBPy5HqOp/nIPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734648672; c=relaxed/simple;
-	bh=vn2Y7HOGnDiERqHrmWj9W5nFrgVwON2deCzXDJZ+tIw=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=Nte2wqMOU8bDneMdPdq2IiDrXtscWmHRYJRXFSv3nv5BSjfj4PMPBJnhPx1LpAqB2NSmPDE2uW8iZ3nFCjQjZgZPKL6cLM3QPtpp7NZdM5QsuQ4Q4o+fGlBCmyfs8OIrlHayVtXA/kz6G7G1Eul5ymdBSfSLf6LWUuiybFptUzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=t0rhhzjp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBE18C4CECE;
-	Thu, 19 Dec 2024 22:51:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1734648671;
-	bh=vn2Y7HOGnDiERqHrmWj9W5nFrgVwON2deCzXDJZ+tIw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t0rhhzjpz1vdogEA28Fuz6THqQkcz06UXa/pxjoJwkMHEOkW2Hoc0+OlDTF1h93YH
-	 kXPOg9U0/QVr1oW9unJNYie8W/5guioFlUO/vGigsJsCVETXNdy4yRVsOUoNUkUpAu
-	 H7efylqhoOToOqhPLENNK395OTBawe7wI9jBDNg8=
-Date: Thu, 19 Dec 2024 14:51:10 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: Gal Pressman <gal@nvidia.com>, Dennis Zhou <dennis@kernel.org>, Tejun
- Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, Nathan Chancellor
- <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Bill
- Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
- netdev@vger.kernel.org
-Subject: Re: [PATCH] percpu: Remove intermediate variable in PERCPU_PTR()
-Message-Id: <20241219145110.a4815019ca69d6d5c36f1fdf@linux-foundation.org>
-In-Reply-To: <CAFULd4ZcSY+1WPn2T9dHVJZyyg1p+YaexQMJzAXHnCDy90j2fA@mail.gmail.com>
-References: <20241219121828.2120780-1-gal@nvidia.com>
-	<CAFULd4YHFFKBzaF28f8n3z8WcOzom1WUe_hfRBx0ehhCpT9xnQ@mail.gmail.com>
-	<CAFULd4Z0PSzwvsFx_5deMKb7tV34uJWcHEadYGdk+D72QuHonA@mail.gmail.com>
-	<CAFULd4ZcSY+1WPn2T9dHVJZyyg1p+YaexQMJzAXHnCDy90j2fA@mail.gmail.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1734649170; c=relaxed/simple;
+	bh=hlg8xwkylNI5eAv8KQzJt8kXxJW9Zb549XA7kLLl+i0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CfRczJkg2XUIavMZTcyqfqtRnVzHZ9rC9HjI5+GpH2SVE9dbPccThhzyL/41tRJIrDSXSPVG/Gi7c/4o/Kl+Qcqj/TgeGA3UHNt6Jd/aJKxFg2X1brjwPcD3/37xVjYXO0YxgK1T2nv1WxOu4mg0q2UAbmOgp/n/kY87gglBJ+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pTHkA93C; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e3bf6bf6-5e81-4b6b-a9cd-40476cff67df@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734649164;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IhXQOLtk7dKTmN52PYjr4l//xRRdGTGNVljbAp+LMuQ=;
+	b=pTHkA93CLNr7gPLJS8+OkIAh4fP5+3TQ0a8bkD3WTAtQci6/BqQkCHjE69xFVEtEcRRqhD
+	57YQiXJGXm9z29MWyLwektE+NnbKNsndiBzCOImSMyQSekGIdwQzgLm9rZPioo9IP/AiS2
+	oikpjouDIbPjUilemOqugGqetV4nfPI=
+Date: Thu, 19 Dec 2024 14:59:15 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Subject: Re: [PATCH bpf-next v3 5/5] bpf/selftests: add selftest for
+ bpf_smc_ops
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
+ song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
+ edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org
+References: <20241218024422.23423-1-alibuda@linux.alibaba.com>
+ <20241218024422.23423-6-alibuda@linux.alibaba.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241218024422.23423-6-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 19 Dec 2024 18:03:47 +0100 Uros Bizjak <ubizjak@gmail.com> wrote:
+On 12/17/24 6:44 PM, D. Wythe wrote:
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include "vmlinux.h"
+> +
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_tracing.h>
+> +#include "bpf_tracing_net.h"
+> +
+> +char _license[] SEC("license") = "GPL";
+> +
+> +struct smc_sock {
 
-> > Actually, you can simplify the above a bit by writing it as:
-> >
-> > #define PERCPU_PTR(__p)                            \
-> >     ((typeof(*(__p)) __force __kernel *)(__force unsigned long)(__p)) \
-> 
-> Andrew, please find attached a substitute patch "[PATCH 4/6] percpu:
-> Use TYPEOF_UNQUAL() in *_cpu_ptr() accessors" for your MM tree
-> relative to the above hotfix. The whole patch series (+ hotfix) has
-> been re-tested against the current mainline defconfig (+ KASAN),
-> compiled once with gcc-11.4.1 and once with gcc-14.2.1.
+I suspect this should be "smc_sock___local". Otherwise, it can't compile if the 
+same type is found in vmlinux.h.
 
-Updated, thanks.
+I only looked at the high level of prog_tests/test_bpf_smc.c. A few comments,
 
->  #define PERCPU_PTR(__p)							\
-> -	((typeof(*(__p)) __force __kernel *)(__force unsigned long)(__p)) \
-> +	((TYPEOF_UNQUAL(*(__p)) __force __kernel *)(__force unsigned long)(__p)) \
->
+Try to reuse the helpers in network_helpers.c and test_progs.c, e.g. netns 
+creation helpers, start_server, ...etc. There are many examples in 
+selftests/bpf/prog_tests using them.
 
-I removed that final " \".
+I see 1s timeout everywhere. BPF CI could be slow some time. Please consider how 
+reliable the multi-thread test is. If the test is too flaky, it will be put in 
+the selftests/bpf/DENYLIST.
+
+> +	struct sock sk;
+> +	struct smc_sock *listen_smc;
+> +	bool use_fallback;
+> +} __attribute__((preserve_access_index));
+> +
 
 
