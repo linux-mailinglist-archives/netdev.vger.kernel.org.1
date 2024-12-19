@@ -1,120 +1,134 @@
-Return-Path: <netdev+bounces-153318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C5A9F7992
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 11:27:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E62A69F797A
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 11:23:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0028A1896442
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 10:27:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3994416B079
+	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 10:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6E1222592;
-	Thu, 19 Dec 2024 10:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7738E221DB6;
+	Thu, 19 Dec 2024 10:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cqs0R2Vk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q7vzv+Pm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3D770830;
-	Thu, 19 Dec 2024 10:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCD554727
+	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 10:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734603982; cv=none; b=cfIvdE+mFJTMCd1gjKeGQB8RsiZ2WkZHzGmrMOnBfxj3KUw6kl33sNsEaxBamqBYqd5MTW+/LUHBMN864hht3mUCy5+5lV7jWBmddlU2iA0cArctvb+RmlZcRZxVmCr5Gnv4Qa35Hnh4pt77I0fkVsGrXcTd7D3+lldBYRDrhHc=
+	t=1734603820; cv=none; b=fka5Xf5KlmxScZLnXQnUwx7kqBJ6xyVLSe9w9sGcI70kfy64Aw6qLlty91+eDLBLVTADwYSuP3eDOvCChhwK0fsoaZxfQgmb5JgvnAfnSEpu8TmLXss66tJHSjrTSSf849cjQHcBrzjvKLcRAZgufrQl5d3feifcawrgHvHsNsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734603982; c=relaxed/simple;
-	bh=JBaAXYC/613rjy8IrbYF33YHJ1MUW3pMGts5COhxsms=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bUls55nky8U+knd6dzZsVWH/DtteZMeQufbWNje6qnYknrEt/D9sq2xcG2axvFiFovWHmj5BgEVxh9z4dSX4FTA9mbhfM9ZLUTNq4DDhgHILlM9RU7D+tBye1N+oV/HL1XuuEoRZAdse0eR/Ki0dqBO36j9w9VQbvnGxw17W2bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cqs0R2Vk; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734603981; x=1766139981;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JBaAXYC/613rjy8IrbYF33YHJ1MUW3pMGts5COhxsms=;
-  b=Cqs0R2VkZrZOHu0ySLfdv2Ied/Oj5Cf47BUjYxueW0Eaytt8f48yH/Ju
-   XTLA/iyaRT7UCFrpRFyXZjfYY0o124DMrUlgRR6clRmzuzM5NdmcW5bzE
-   TkcFh9LWAUvR0rQwr8zUV3RgrRWy+nt1I2GsUFGDSMmI7lvYi2ZOXYV2i
-   Vj/BG/FR0RT/OtXxFoG20EwN9vD5tQw13zC3McIzUp58zMUUjRrI1GQQA
-   fuHywpLaUQ23Gx4yBLvSaMwu6l/jPPSGTDs4j+sgfB5usYvOvhpjyZzIG
-   xTSIzavWkPRs+OZ6p7Wy4YoO7PkJIX3p/79iPKzY2egTZAORWNMvnnOKe
-   g==;
-X-CSE-ConnectionGUID: +XAVbfNjQey3x5jA7PVc9w==
-X-CSE-MsgGUID: tPRuFMgdQJeuSapmBNxzWA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="34431764"
-X-IronPort-AV: E=Sophos;i="6.12,247,1728975600"; 
-   d="scan'208";a="34431764"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2024 02:26:18 -0800
-X-CSE-ConnectionGUID: RN/UiJS3Qnuy4tBWpYcRcQ==
-X-CSE-MsgGUID: VK4ZnmOXSQCK4dOvFPfp+A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="98625801"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2024 02:26:14 -0800
-Date: Thu, 19 Dec 2024 11:23:12 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jijie Shao <shaojijie@huawei.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, andrew+netdev@lunn.ch,
-	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND V2 net 6/7] net: hns3: fixed hclge_fetch_pf_reg
- accesses bar space out of bounds issue
-Message-ID: <Z2P0EJyn80msv6/M@mev-dev.igk.intel.com>
-References: <20241217010839.1742227-1-shaojijie@huawei.com>
- <20241217010839.1742227-7-shaojijie@huawei.com>
- <Z2KV37WZL7cpPYKk@mev-dev.igk.intel.com>
- <f661b60c-c271-4778-b6c2-c4c9a6e68fc5@redhat.com>
+	s=arc-20240116; t=1734603820; c=relaxed/simple;
+	bh=eqo9Zp9dMHAsWSIMIklkPf9ZRC+SukRNszFP/7/QB+U=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=XTjTNasImxDLOCLkUpfxVJ9k/FIMUUANvHb6oRrHSePWsMuxJcAfbTwb+6rdlLVwFWPoFEukXlRqNmtvhn7fg6360LLaRHhA5TRvVqQ1H3Gid5vi5TBDsu0sV+ggjlHhoE0wUNELDX/o4X1lkG3xXXt9udkkh6wRs6LOIRpXAiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q7vzv+Pm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734603817;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PMcN4vEQnO/DQsgnu4MwWvMfZdt3RE+kXzFJoU4nGOs=;
+	b=Q7vzv+Pmx4tMEipXiRL1rLgRvSxsqnHWVdBDnT15TJrkChbBAmAjPPXneusnhS/lQaQklX
+	egJvWBT07IaIUoKMGah9K0xjjVV7EYDi4WI2zYFkePshzB+TS7SRTPTXmGoARp1rRhT6zv
+	PE7Kmd027/4QWLKQWFk/1UD/1l7aD1I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-60-dzg4VVKNPTK6XPGJpZp7mA-1; Thu, 19 Dec 2024 05:23:35 -0500
+X-MC-Unique: dzg4VVKNPTK6XPGJpZp7mA-1
+X-Mimecast-MFC-AGG-ID: dzg4VVKNPTK6XPGJpZp7mA
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43621907030so5062145e9.1
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 02:23:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734603814; x=1735208614;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PMcN4vEQnO/DQsgnu4MwWvMfZdt3RE+kXzFJoU4nGOs=;
+        b=vtNdXyBSBqwqkuQ2WXrgSJg+tQ3mImSmolwlw+3D9lqRTu8kzWVhQvsukzeiMQzH4o
+         cl7RhiYBYQEyOLry10Ws9SK7h9fuucAdMqQBuOsaU7fWnFLs4Ze13FJEsut7mGeBEBF2
+         bzZNfWMYykI5bNk8ZKLzxZohS8/kPxnPOi1S5wvBWpJe3pAgeet/jqm9mR+K13mll9JK
+         9M+rQiN+Ruo1l+fVMQr/G+vNUMeOLUXAMDE0OnDbLz/ITJYAovihzNQPBpSI5LOWYT8u
+         XGo0J8gzjyRdggnJ56dBffxzGoYAt1HUVogrKFCfePjy4oEvvxA75EX+JPU4CYIAFwye
+         Dxcg==
+X-Gm-Message-State: AOJu0YzGpYy63+cxpsAcEWZHEl4gzrlrTKW/xhRFyHlo8Pfh12Pw/+t4
+	HWOJBEGbhy6SrVSZvGNs+Pf9yp94BcVD7wk0ANC+xDqBwV3CoG22tXBm69FHay8iQYtIASrvzo5
+	YqyqUUj807SDgwfUsn2I3+t9DgKPTeDnU5+JVU9x6HXaCWR1WOBVbeN19hWMw2A==
+X-Gm-Gg: ASbGnct799zODH+K7byGFASRgm7qu/l/L7thYzhAWtCOnCfSIfrqlB7+vWchLvX5pIp
+	mK/Hlh4d6uv47HDa65evbmfx/CUOYB3gAg9tEZb25PUn+a2ZtQsobSSkUCfZEkKMd+YvZ5nweIV
+	1H1psfac+gb12nDj0Co2raBTaPy2joFQEvnRC6LU1vpFHAS+Jnzu0KjeSUOUVNJOBodlKzQnthX
+	ptQ4OfVr8xoQSaz6q2aLjss13XRFo0pezac7jn30DtbWNilDeOyiVBhSTqlM67MOHwaJ+pgRgAo
+	wm8HXaygRQ==
+X-Received: by 2002:a05:600c:35d4:b0:436:2238:97f6 with SMTP id 5b1f17b1804b1-4365c77dd1fmr21209345e9.1.1734603814380;
+        Thu, 19 Dec 2024 02:23:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHr8lz9S82Kr/fJC6YC8TUfq2pbcLsPWamwvZ3WhfHMmIths/9KcCBpwWTLNo/ZizGcrhZf0Q==
+X-Received: by 2002:a05:600c:35d4:b0:436:2238:97f6 with SMTP id 5b1f17b1804b1-4365c77dd1fmr21209125e9.1.1734603814078;
+        Thu, 19 Dec 2024 02:23:34 -0800 (PST)
+Received: from [192.168.88.24] (146-241-54-197.dyn.eolo.it. [146.241.54.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366112e780sm14045495e9.0.2024.12.19.02.23.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Dec 2024 02:23:33 -0800 (PST)
+Message-ID: <5f878cd5-3166-4ddd-9c26-ed913439408c@redhat.com>
+Date: Thu, 19 Dec 2024 11:23:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f661b60c-c271-4778-b6c2-c4c9a6e68fc5@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: mv643xx_eth: fix an OF node reference leak
+From: Paolo Abeni <pabeni@redhat.com>
+To: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>, sebastian.hesselbarth@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org
+Cc: netdev@vger.kernel.org, dan.carpenter@linaro.org
+References: <20241218012849.3214468-1-joe@pf.is.s.u-tokyo.ac.jp>
+ <13a68f91-b691-4024-8ae8-5f108b4e4587@redhat.com>
+Content-Language: en-US
+In-Reply-To: <13a68f91-b691-4024-8ae8-5f108b4e4587@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 19, 2024 at 10:51:08AM +0100, Paolo Abeni wrote:
-> On 12/18/24 10:29, Michal Swiatkowski wrote:
-> >> @@ -533,10 +533,11 @@ static int hclge_fetch_pf_reg(struct hclge_dev *hdev, void *data,
-> >>  	reg_num = ARRAY_SIZE(ring_reg_addr_list);
-> >>  	for (j = 0; j < kinfo->num_tqps; j++) {
-> > You can define struct hnae3_queue *tqp here to limit the scope
-> > (same in VF case).
+On 12/19/24 11:21, Paolo Abeni wrote:
+> On 12/18/24 02:28, Joe Hattori wrote:
+>> Current implementation of mv643xx_eth_shared_of_add_port() calls
+>> of_parse_phandle(), but does not release the refcount on error. Call
+>> of_node_put() in the error path and in mv643xx_eth_shared_of_remove().
+>>
+>> This bug was found by an experimental verification tool that I am
+>> developing.
+>>
+>> Fixes: 76723bca2802 ("net: mv643xx_eth: add DT parsing support")
+>> Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+>> ---
+>> Changes in v3:
+>> - Insert a NULL check for port_platdev[n].
+>> Changes in v2:
+>> - Insert a NULL check before accessing the platform data.
 > 
-> @Michal, please let me refer to prior feedback from Jakub:
+> I'm sorry for nit-picking, but many little things are adding-up and
+> should be noticed.
 > 
-> https://lore.kernel.org/netdev/20241028163554.7dddff8b@kernel.org/
-> 
-> I also agree subjective stylistic feedback should be avoided unless the
-> style issue is really gross - in such a case the feedback should not be
-> subjective, so the original guidance still applies ;)
-> 
+> The subj prefix must include the correct revision number (v3 in this case).
 
-Sure, I thought sometimes there were a feedback about scoping, but maybe
-not from the maintainers. I will drop such comments next time, thanks
-for letting me know.
+Oops, I almost forgot... the patch subj prefix must additionally include
+the target tree - 'net' in this case - see:
 
-Side note is that by "You can define" I meant if you want, if you feel
-so, not you have to (sorry, not a native speaker).
-But I understand that this unnecessary slow down the process when there
-is no other (valid) changes to do, so I won't do that next time.
+https://elixir.bootlin.com/linux/v6.12.5/source/Documentation/process/maintainer-netdev.rst#L332
 
-Thanks
+Thanks,
 
-> Thanks,
-> 
-> Paolo
-> 
+Paolo
+
 
