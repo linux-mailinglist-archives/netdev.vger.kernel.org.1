@@ -1,100 +1,77 @@
-Return-Path: <netdev+bounces-153836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E83E49F9CB4
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 23:20:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E33C9F9CBF
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 23:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30E2C16BE4C
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 22:20:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E118188AB69
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 22:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7ABF227BB8;
-	Fri, 20 Dec 2024 22:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B1B1BE223;
+	Fri, 20 Dec 2024 22:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pnVL+l8g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t1PcxBhb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802EE227B94;
-	Fri, 20 Dec 2024 22:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F8A1A9B27;
+	Fri, 20 Dec 2024 22:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734733217; cv=none; b=RR3ZMVyfp/sPBG1DGp/dSMkl1FFvJYmAcS76XczN74WSrMfcLENP5Zxo4PFw6miIjN6BwcBBqp1g+ppcKatjCEZ3oDd2AqtdXGLnPXWfSswNnjVCa9wezPqb8+ZEVnSZRyg6V0/tLiB3FugLcGW7lQJINg2Fe2BZdyFQ0ZSTtgs=
+	t=1734733920; cv=none; b=CCMFmYXEghfDfIjYa64967hodKCaE6JHS4twoEifqyTylN6ytzYEkipRVej5fBKKqcHC5wdadUJAreiIvOGBxvkE/2FzzDRb4Ed0sCC7OnOF6twM5NfyLxfRyOnbhrXxGzP81XK6l0yBFlIZ0kCZW2b0liw8lOWhuiVxUFM9c3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734733217; c=relaxed/simple;
-	bh=7SZ1eF0pxYedrhawWxd0yixMBjGQ+fZtPvYJTM2ques=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mIFB2VcIQYmapvicDMwZfxVhCCe2YYkuKD4340od2zNh7LbPrsaqAX1FCwFpdNMbbi10aOnNHGa6iMkW6c1lSGFuhCLUxTaWKSQgLZhkBbjONyUGCc9njKDy4pUI7bXJzx5e3RbgzZZvpBEa0RUxZc15LkZHop0tpiVUXF6IYr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pnVL+l8g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59634C4CECD;
-	Fri, 20 Dec 2024 22:20:17 +0000 (UTC)
+	s=arc-20240116; t=1734733920; c=relaxed/simple;
+	bh=/855uDMbqGBjr11vy+t6Q5pZWDcsGfAvBLLNa0i0HQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BnIc5bdfJ1CS4q6zI+Dizt8bGj5C/3P8xzT2ZcEz+cBpmihPRg6y1WEZNyFvBlQcL26hAo2+yVyIAzj6/xQOCpG3BZBbPTtMCkSP/MiVkI05KmYo8+2PX6YSckQQiBZJhRL4jXii6tXvVMS2aHmfhISi621fN1nhbbEX4v9SPoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t1PcxBhb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC7F1C4CECD;
+	Fri, 20 Dec 2024 22:31:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734733217;
-	bh=7SZ1eF0pxYedrhawWxd0yixMBjGQ+fZtPvYJTM2ques=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pnVL+l8gEHpALSt4qG44/FPswpHrZ3PgQHfK6GcSnIkyv8xkCVdFskkAR+oUKsq3F
-	 74MJoo9cDolLfrmHcPFBk50+V51V+E8vvotf3XrarqjwFwVJNUJP83nhUMVkAC23dM
-	 daRpdNHRZSpCYWw2L9LHkXvj0rjSrv8+syjBiiV+gbEf5/p2FYKo/aZPOQLyc8CVcn
-	 b9Ym3rJXiWmTuiYTbcoIEOBrvIpd4fIFKjizYkXrBErfdHSeqoL7sIUnAiyBtVA7nk
-	 DUqw6i1ST1E6c/Wk+eKtdJOFj5CnBd/lJhyIqao4f4kCzkxjMy8PbqgVn+CPCXN79y
-	 azId46gJzZPWg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7741C3806656;
-	Fri, 20 Dec 2024 22:20:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1734733919;
+	bh=/855uDMbqGBjr11vy+t6Q5pZWDcsGfAvBLLNa0i0HQg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t1PcxBhbC1/AXn3NxGpG9uIAdprbX7BBaF3cAwbgbhBkXum9akcN3554OYfv5JiC2
+	 35MCZellDHmyi/ukdnDjB9Y/SzdJ9Xd7MHXrChmRJaEnki1T+YHMWQlWbpTRvoE+zA
+	 YhIwab7N1O83UiJVVXs9KNQPWAthPo9QOCiVgxSI5DaqNzi2FCI1FVoCBd0VPkeNN0
+	 EINp2qvQGCk0eUAPN40U0TTK5l0V6e9YwrwXxKcz8GBD5k+uQfErJGah8xvNWgLq6e
+	 ZOHCXF3VurUFYKGPj8Ffs+ABAEqcsTA5JY/B/pX8/SaX08pHe1Gc5WOmLVOCjKqV6s
+	 ezkx8D1eSWSzg==
+Date: Fri, 20 Dec 2024 14:31:58 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
+ <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
+ Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [PATCH net-next v9 08/20] net: expose
+ page_pool_{set,clear}_pp_info
+Message-ID: <20241220143158.11585b2d@kernel.org>
+In-Reply-To: <20241218003748.796939-9-dw@davidwei.uk>
+References: <20241218003748.796939-1-dw@davidwei.uk>
+	<20241218003748.796939-9-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Patch bpf v3 0/4] bpf: a bug fix and test cases for
- bpf_skb_change_tail()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173473323519.3037384.12810053109977507523.git-patchwork-notify@kernel.org>
-Date: Fri, 20 Dec 2024 22:20:35 +0000
-References: <20241213034057.246437-1-xiyou.wangcong@gmail.com>
-In-Reply-To: <20241213034057.246437-1-xiyou.wangcong@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, cong.wang@bytedance.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to bpf/bpf.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
-
-On Thu, 12 Dec 2024 19:40:53 -0800 you wrote:
-> From: Cong Wang <cong.wang@bytedance.com>
+On Tue, 17 Dec 2024 16:37:34 -0800 David Wei wrote:
+> From: Pavel Begunkov <asml.silence@gmail.com>
 > 
-> This patchset fixes a bug in bpf_skb_change_tail() helper and adds test
-> cases for it, as requested by Daniel and John.
-> 
-> ---
-> v3: switched to TCX prog attaching API
->     switched to UDP from TCP for TC test
->     cleaned up TC test code
-> 
-> [...]
+> Memory providers need to set page pool to its net_iovs on allocation, so
+> expose page_pool_{set,clear}_pp_info to providers outside net/.
 
-Here is the summary with links:
-  - [bpf,v3,1/4] bpf: Check negative offsets in __bpf_skb_min_len()
-    https://git.kernel.org/bpf/bpf/c/9ecc4d858b92
-  - [bpf,v3,2/4] selftests/bpf: Add a BPF selftest for bpf_skb_change_tail()
-    https://git.kernel.org/bpf/bpf/c/9ee0c7b86543
-  - [bpf,v3,3/4] selftests/bpf: Introduce socket_helpers.h for TC tests
-    https://git.kernel.org/bpf/bpf/c/472759c9f537
-  - [bpf,v3,4/4] selftests/bpf: Test bpf_skb_change_tail() in TC ingress
-    https://git.kernel.org/bpf/bpf/c/4a58963d10fa
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I'd really rather not expose such low level functions in a header
+included by every single user of the page pool API.
 
