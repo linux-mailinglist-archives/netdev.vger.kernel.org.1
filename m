@@ -1,299 +1,87 @@
-Return-Path: <netdev+bounces-153563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41549F8A81
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 04:15:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F06E9F8A85
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 04:21:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 294BA188F767
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 03:15:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC1EC168595
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 03:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31E12F509;
-	Fri, 20 Dec 2024 03:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097F41CAAC;
+	Fri, 20 Dec 2024 03:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="K3LzJ5yF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CXhDbDbR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4AE33993;
-	Fri, 20 Dec 2024 03:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D8133F6;
+	Fri, 20 Dec 2024 03:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734664509; cv=none; b=XYagYitD08pVN24Ak5crI7M7pganYTcHJTBDmXbNr6ZNeV3jrgrAT5Ex4iCQU4XTzEiorMOljswSkF8QHTIhhRnreypryTzQOk/xUeABBVeqkXK+PDaygzcVHJfSLd57s1l88wSznREpMEEdqCnx9Bre8T+x6ClT1b01XkAgPcI=
+	t=1734664885; cv=none; b=isgl/z/o7aeQxftbLBfftk4QDbpOMMuuUqrRntYycDcEGwM8DTNWb5NplvJRgzGT0i0VpL4m/8Ooby3MKu6VYEDr5INMtTVumKl2sWKNEbvEBBKEexBMKOgsxfYEfHAf4dIc4GwQiThu4xYTutNw1AtmW+TUTBwDSY6l4GCjhwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734664509; c=relaxed/simple;
-	bh=MrjKHl08WG7I6KsHrAmlTjxG+QUeZvK3AkOTAmSzFoc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YchP5tN9TuZ3iw557SwnE8/wruq16attMhqFC/CgUBwB/YtTQlMn+GWGiKkOpP8MH4U8pzo7MWMeedKJVkx1VUgIRXrgGTUeYmtjCFsMnlxnN0ZGrNp20MEW53AunSS21fbWe41cdsFuTEUpu/BXNjJaZckfb5b6OBAehnV8AVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=K3LzJ5yF; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1734664496; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=L6FmUvXrbK5qPalUsZlUdWxbXtiHVKENTq+v6+NdXGI=;
-	b=K3LzJ5yFEKNEk+hpfZb5wBa4yiUP1zBE+tEECCdnyzQyLJGtgukOXXlGb1QjEThETcHpXp2Bm9y4ZVgR2g6NqHFEtVBAR4Lz9SmzyrF9v4HZ96t+B4x4hBQ5YVkqrq0N2fzKhpqqvPqCbfmHeg4589B36vQBGbEbduuArI16A/Q=
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WLsFhS8_1734664494 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 20 Dec 2024 11:14:56 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	PASIC@de.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net/smc: fix data error when recvmsg with MSG_PEEK flag
-Date: Fri, 20 Dec 2024 11:14:51 +0800
-Message-Id: <20241220031451.52343-1-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+	s=arc-20240116; t=1734664885; c=relaxed/simple;
+	bh=LpXZNLwyu+pe8JMKwhPjrZb9NBYxO1pkZDNccLN7VJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wz1Sol95bDYFQ31uSjkgGnjaoT3p29xuzGywAImbAlZXeWIEgBZk99FdFzklpWOnCjg4vqUdec7OFSbfYAzYVhYMoUNWlpv6NsVU3zAw+J897g4B1wClYwaBUBq7QCbKL7YEFyZlPjs+fTUcQpVFkgJFim8kSM/CCUMwxWrUYC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CXhDbDbR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9FD4C4CECE;
+	Fri, 20 Dec 2024 03:21:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734664885;
+	bh=LpXZNLwyu+pe8JMKwhPjrZb9NBYxO1pkZDNccLN7VJ8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CXhDbDbRj6JCIC6qXGls+F5r32jV7U9qWzj4m0mgGNxPAmWgCxy+xa//Oo5R39wwn
+	 ioBKlrqahJ05eEOwce8+/enim5jTZQdq7jWsM2nFFWlCYDQFMJ4TSsuZDxMNCHGjnB
+	 z2XOip2ugEhg2jQskMCiJ11iJclUiYioAAmjhLagOYVQvDCTn6Qoj/qtChgCSL1iuj
+	 lq1XGciC6Yks1mB22xYoNjoVZPOmzfqrEniuHtjo02Ti8wraDyFMk1CvLLJZWg/Ieb
+	 sluGG+c+EAffLQoEdsC3oqQM5jYUwpZeMGKzLZENBcjnYNHDW1o2yntPUkvRLXBi+S
+	 ZzlxIUVTFNwlQ==
+Date: Thu, 19 Dec 2024 19:21:23 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
+ <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
+ <konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
+ Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>, Satananda
+ Burla <sburla@marvell.com>, "Abhijit Ayarekar" <aayarekar@marvell.com>
+Subject: Re: [PATCH net v3 1/4] octeon_ep: fix race conditions in
+ ndo_get_stats64
+Message-ID: <20241219192123.4a5f6e75@kernel.org>
+In-Reply-To: <20241218115111.2407958-2-srasheed@marvell.com>
+References: <20241218115111.2407958-1-srasheed@marvell.com>
+	<20241218115111.2407958-2-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-When recvmsg with MSG_PEEK flag, the data will be copied to
-user's buffer without advancing consume cursor and without
-reducing the length of rx available data. Once the expected
-peek length is larger than the value of bytes_to_rcv, in the
-loop of do while in smc_rx_recvmsg, the first loop will copy
-bytes_to_rcv bytes of data from the position local_tx_ctrl.cons,
-the second loop will copy the min(bytes_to_rcv, read_remaining)
-bytes from the position local_tx_ctrl.cons again because of the
-lacking of process with advancing consume cursor and reducing
-the length of available data. So do the subsequent loops. The
-data copied in the second loop and the subsequent loops will
-result in data error, as it should not be copied if no more data
-arrives and it should be copied from the position advancing
-bytes_to_rcv bytes from the local_tx_ctrl.cons if more data arrives.
+On Wed, 18 Dec 2024 03:51:08 -0800 Shinas Rasheed wrote:
+> ndo_get_stats64() can race with ndo_stop(), which frees input and
+> output queue resources. Call synchronize_net() to avoid such races.
 
-This issue can be reproduce by the following python script:
-server.py:
-import socket
-import time
-server_ip = '0.0.0.0'
-server_port = 12346
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((server_ip, server_port))
-server_socket.listen(1)
-print('Server is running and listening for connections...')
-conn, addr = server_socket.accept()
-print('Connected by', addr)
-while True:
-    data = conn.recv(1024)
-    if not data:
-        break
-    print('Received request:', data.decode())
-    conn.sendall(b'Hello, client!\n')
-    time.sleep(5)
-    conn.sendall(b'Hello, again!\n')
-conn.close()
+synchronize_rcu() acts as a barrier.
+What are the two operations you are separating with this barrier?
 
-client.py:
-import socket
-server_ip = '<server ip>'
-server_port = 12346
-resp=b'Hello, client!\nHello, again!\n'
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((server_ip, server_port))
-request = 'Hello, server!'
-client_socket.sendall(request.encode())
-peek_data = client_socket.recv(len(resp),
-    socket.MSG_PEEK | socket.MSG_WAITALL)
-print('Peeked data:', peek_data.decode())
-client_socket.close()
-
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
----
- net/smc/af_smc.c |  2 +-
- net/smc/smc_rx.c | 37 +++++++++++++++++++++----------------
- net/smc/smc_rx.h |  8 ++++----
- 3 files changed, 26 insertions(+), 21 deletions(-)
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 6cc7b846cff1..ebc41a7b13db 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -2738,7 +2738,7 @@ int smc_accept(struct socket *sock, struct socket *new_sock,
- 			release_sock(clcsk);
- 		} else if (!atomic_read(&smc_sk(nsk)->conn.bytes_to_rcv)) {
- 			lock_sock(nsk);
--			smc_rx_wait(smc_sk(nsk), &timeo, smc_rx_data_available);
-+			smc_rx_wait(smc_sk(nsk), &timeo, 0, smc_rx_data_available);
- 			release_sock(nsk);
- 		}
- 	}
-diff --git a/net/smc/smc_rx.c b/net/smc/smc_rx.c
-index f0cbe77a80b4..79047721df51 100644
---- a/net/smc/smc_rx.c
-+++ b/net/smc/smc_rx.c
-@@ -238,22 +238,23 @@ static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
- 	return -ENOMEM;
- }
- 
--static int smc_rx_data_available_and_no_splice_pend(struct smc_connection *conn)
-+static int smc_rx_data_available_and_no_splice_pend(struct smc_connection *conn, size_t peeked)
- {
--	return atomic_read(&conn->bytes_to_rcv) &&
-+	return smc_rx_data_available(conn, peeked) &&
- 	       !atomic_read(&conn->splice_pending);
- }
- 
- /* blocks rcvbuf consumer until >=len bytes available or timeout or interrupted
-  *   @smc    smc socket
-  *   @timeo  pointer to max seconds to wait, pointer to value 0 for no timeout
-+ *   @peeked  number of bytes already peeked
-  *   @fcrit  add'l criterion to evaluate as function pointer
-  * Returns:
-  * 1 if at least 1 byte available in rcvbuf or if socket error/shutdown.
-  * 0 otherwise (nothing in rcvbuf nor timeout, e.g. interrupted).
-  */
--int smc_rx_wait(struct smc_sock *smc, long *timeo,
--		int (*fcrit)(struct smc_connection *conn))
-+int smc_rx_wait(struct smc_sock *smc, long *timeo, size_t peeked,
-+		int (*fcrit)(struct smc_connection *conn, size_t baseline))
- {
- 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
- 	struct smc_connection *conn = &smc->conn;
-@@ -262,7 +263,7 @@ int smc_rx_wait(struct smc_sock *smc, long *timeo,
- 	struct sock *sk = &smc->sk;
- 	int rc;
- 
--	if (fcrit(conn))
-+	if (fcrit(conn, peeked))
- 		return 1;
- 	sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
- 	add_wait_queue(sk_sleep(sk), &wait);
-@@ -271,7 +272,7 @@ int smc_rx_wait(struct smc_sock *smc, long *timeo,
- 			   cflags->peer_conn_abort ||
- 			   READ_ONCE(sk->sk_shutdown) & RCV_SHUTDOWN ||
- 			   conn->killed ||
--			   fcrit(conn),
-+			   fcrit(conn, peeked),
- 			   &wait);
- 	remove_wait_queue(sk_sleep(sk), &wait);
- 	sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
-@@ -322,11 +323,11 @@ static int smc_rx_recv_urg(struct smc_sock *smc, struct msghdr *msg, int len,
- 	return -EAGAIN;
- }
- 
--static bool smc_rx_recvmsg_data_available(struct smc_sock *smc)
-+static bool smc_rx_recvmsg_data_available(struct smc_sock *smc, size_t peeked)
- {
- 	struct smc_connection *conn = &smc->conn;
- 
--	if (smc_rx_data_available(conn))
-+	if (smc_rx_data_available(conn, peeked))
- 		return true;
- 	else if (conn->urg_state == SMC_URG_VALID)
- 		/* we received a single urgent Byte - skip */
-@@ -344,10 +345,10 @@ static bool smc_rx_recvmsg_data_available(struct smc_sock *smc)
- int smc_rx_recvmsg(struct smc_sock *smc, struct msghdr *msg,
- 		   struct pipe_inode_info *pipe, size_t len, int flags)
- {
--	size_t copylen, read_done = 0, read_remaining = len;
-+	size_t copylen, read_done = 0, read_remaining = len, peeked_bytes = 0;
- 	size_t chunk_len, chunk_off, chunk_len_sum;
- 	struct smc_connection *conn = &smc->conn;
--	int (*func)(struct smc_connection *conn);
-+	int (*func)(struct smc_connection *conn, size_t baseline);
- 	union smc_host_cursor cons;
- 	int readable, chunk;
- 	char *rcvbuf_base;
-@@ -384,14 +385,14 @@ int smc_rx_recvmsg(struct smc_sock *smc, struct msghdr *msg,
- 		if (conn->killed)
- 			break;
- 
--		if (smc_rx_recvmsg_data_available(smc))
-+		if (smc_rx_recvmsg_data_available(smc, peeked_bytes))
- 			goto copy;
- 
- 		if (sk->sk_shutdown & RCV_SHUTDOWN) {
- 			/* smc_cdc_msg_recv_action() could have run after
- 			 * above smc_rx_recvmsg_data_available()
- 			 */
--			if (smc_rx_recvmsg_data_available(smc))
-+			if (smc_rx_recvmsg_data_available(smc, peeked_bytes))
- 				goto copy;
- 			break;
- 		}
-@@ -425,26 +426,28 @@ int smc_rx_recvmsg(struct smc_sock *smc, struct msghdr *msg,
- 			}
- 		}
- 
--		if (!smc_rx_data_available(conn)) {
--			smc_rx_wait(smc, &timeo, smc_rx_data_available);
-+		if (!smc_rx_data_available(conn, peeked_bytes)) {
-+			smc_rx_wait(smc, &timeo, peeked_bytes, smc_rx_data_available);
- 			continue;
- 		}
- 
- copy:
- 		/* initialize variables for 1st iteration of subsequent loop */
- 		/* could be just 1 byte, even after waiting on data above */
--		readable = atomic_read(&conn->bytes_to_rcv);
-+		readable = smc_rx_data_available(conn, peeked_bytes);
- 		splbytes = atomic_read(&conn->splice_pending);
- 		if (!readable || (msg && splbytes)) {
- 			if (splbytes)
- 				func = smc_rx_data_available_and_no_splice_pend;
- 			else
- 				func = smc_rx_data_available;
--			smc_rx_wait(smc, &timeo, func);
-+			smc_rx_wait(smc, &timeo, peeked_bytes, func);
- 			continue;
- 		}
- 
- 		smc_curs_copy(&cons, &conn->local_tx_ctrl.cons, conn);
-+		if ((flags & MSG_PEEK) && peeked_bytes)
-+			smc_curs_add(conn->rmb_desc->len, &cons, peeked_bytes);
- 		/* subsequent splice() calls pick up where previous left */
- 		if (splbytes)
- 			smc_curs_add(conn->rmb_desc->len, &cons, splbytes);
-@@ -480,6 +483,8 @@ int smc_rx_recvmsg(struct smc_sock *smc, struct msghdr *msg,
- 			}
- 			read_remaining -= chunk_len;
- 			read_done += chunk_len;
-+			if (flags & MSG_PEEK)
-+				peeked_bytes += chunk_len;
- 
- 			if (chunk_len_sum == copylen)
- 				break; /* either on 1st or 2nd iteration */
-diff --git a/net/smc/smc_rx.h b/net/smc/smc_rx.h
-index db823c97d824..994f5e42d1ba 100644
---- a/net/smc/smc_rx.h
-+++ b/net/smc/smc_rx.h
-@@ -21,11 +21,11 @@ void smc_rx_init(struct smc_sock *smc);
- 
- int smc_rx_recvmsg(struct smc_sock *smc, struct msghdr *msg,
- 		   struct pipe_inode_info *pipe, size_t len, int flags);
--int smc_rx_wait(struct smc_sock *smc, long *timeo,
--		int (*fcrit)(struct smc_connection *conn));
--static inline int smc_rx_data_available(struct smc_connection *conn)
-+int smc_rx_wait(struct smc_sock *smc, long *timeo, size_t peeked,
-+		int (*fcrit)(struct smc_connection *conn, size_t baseline));
-+static inline int smc_rx_data_available(struct smc_connection *conn, size_t peeked)
- {
--	return atomic_read(&conn->bytes_to_rcv);
-+	return atomic_read(&conn->bytes_to_rcv) - peeked;
- }
- 
- #endif /* SMC_RX_H */
--- 
-2.24.3 (Apple Git-128)
-
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> index 549436efc204..941bbaaa67b5 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> @@ -757,6 +757,7 @@ static int octep_stop(struct net_device *netdev)
+>  {
+>  	struct octep_device *oct = netdev_priv(netdev);
+>  
+> +	synchronize_net();
+>  	netdev_info(netdev, "Stopping the device ...\n");
 
