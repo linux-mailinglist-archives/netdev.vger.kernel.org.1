@@ -1,266 +1,135 @@
-Return-Path: <netdev+bounces-153702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D90D9F941A
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 15:17:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10E19F9423
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 15:21:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F8D17A367B
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:17:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F8A51887FA1
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5652215764;
-	Fri, 20 Dec 2024 14:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E6C21519D;
+	Fri, 20 Dec 2024 14:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oCiuAdLD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g4Mr8FbO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC983186607
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 14:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5362D1C5488
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 14:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734704217; cv=none; b=A96CAowGE79Enx0t2GxCektm5sEg57Wj93BkuOOaLNld18uWQd84HVakTE6rITumKgVezDPfv1Nnrd6/ROqPVE+g3JvTzF/OBs9caSD4fkzqxhPHMDdluicl53NuDoD46OIyIkj2jILv8FQ1LytBm3YhWeow2/mzAo8/AwjLv/g=
+	t=1734704458; cv=none; b=izO9Zs4rGYsh8m1D8/mt33fIsyAbHpMsodnXVYmTUibJgGzuni99sUmexyVNBnQM8jvu07ZbHRhokGR3vgXZYrV5gn7JfNojsdI8MbdNpR+PpCimbpxNW4grUIegSwwgq027q7l/hgE0y0CoCYUIGh6rV+heMn56CV+bb1aynsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734704217; c=relaxed/simple;
-	bh=ZNixlel1Wgl89ImeCjmGign5P1vgWG7xsf6dd3jFclE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NTEZY/SnH5eBEQuSNyNDGgolNEEG1RU7UhvrjPchze1gBQzggbR2DNqoLvpNwks9RCm/rcoh7/aY6PIRH0BBkaPpaWmFntfCOL5d0pffXVb0b1i3nErchC/BtxjO8OBkF71J1hy8qiRbkQqOtPE1o2uaAn75UTHbjz+zvHW2U8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oCiuAdLD; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5ceb03aadb1so2654099a12.0
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 06:16:55 -0800 (PST)
+	s=arc-20240116; t=1734704458; c=relaxed/simple;
+	bh=EgnJ/Tkh1C1LQYcKEaughP+rbf5J1jqLZWDAyyDB7yc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=czyj6IsWBMElRpqhGCEbT4VkrY57duqEykfZnQ1l1gCq1ID2uXnY7kMzQlJ3eOLGXFxBDjBFeSSQ+r2xHJ5S2Awi1B8FHPF3gF/I217zfBYpTMLD6u/klmN55CbrpHJr/6rZlRZkD60XA5N+Zs6jiLXIMBrdGcH/Z2bscRSzw4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g4Mr8FbO; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-844e10ef3cfso148409339f.2
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 06:20:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734704214; x=1735309014; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fd+p6RlLVZyzuGKTLNFNczVgzdaevQwx74B9+dMUIcA=;
-        b=oCiuAdLDdgPKxC/2p7Saow9Ti+YfhdAd5mpiolRR9h+8qkaCGP95BZ0AKNuYZUAoiQ
-         hUrkclexQ2BTGbeTwidmKkqTxYeyMXaBz6wHFMSwXpjP66gMVPpSivO37iwg3wHhmxwU
-         o5WUaTQHHkwNG08KKgtRIdD0IoD46WYyWk5NzlVajmWIJeacAIFSj+IJ7KizuUHHAtlr
-         uT+D06ahxcqHupSxBpLnbZoXkSvHrwJoVN5Z5um2tWI2H6WNXUx/t0aiOxMrnWE2Ao0t
-         eFbDaFLIb06xoiXbzAoL/ZnrlnEhy0Kl4js+zqiBjLepuIZbKbJYaPf8xRzChw95yJxU
-         n6QQ==
+        d=gmail.com; s=20230601; t=1734704456; x=1735309256; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7mDKl6tzxVN4OlPSHKO5eWK8XZLJ0ANoR86UwcJiqUw=;
+        b=g4Mr8FbOYYPGt3jg/8Y9Mh9T1a1Z9cO94kl/11Dmpmtckim1o88aFhJUqK9xR9zWsg
+         jSTED1Txb2JQId1vS4qWhcDIDvhiU6eePNqZ1vBOSq8xnPquCh+lI0jBN3/AlEYznPq/
+         7SXXUs4u3Wq9PHmZ0s5iIWEYE1mDFmiAVdUHYyDGlV3UJ4e6vz6MPy+9eDGLXyfMNttZ
+         PcRgjmtbHdEn1EXyuRhh8fRLGYxV2yejHLi6ER+A/M347iizhcSKqCmy8EJntnCpyg6B
+         Oz/QuH3jmLDd6GFOtrDNobzU6/twrNqyStiLcgQztGXN+JSKKB7VrQFsYI4KcsGmteyg
+         wJHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734704214; x=1735309014;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fd+p6RlLVZyzuGKTLNFNczVgzdaevQwx74B9+dMUIcA=;
-        b=oyIWsk3oQve+N2TbaMvlXBjo61KX6FH22UP3hnAL2CjXhs+S7f6MsLfW/dgz43ThXm
-         HzKbcCZSWtFGp9i4M8AA4Hym/p0qMlfi/wlv7hImzIw7YBezgmIUY1ZahlYDT/wG8UTr
-         aXgRu4ah0Vd8S9N6mY1uXwqMo85ykQcjuIbNO8vcg72gp8Xptu8ap5RUF8o5hlOeznad
-         3nEHtgfArwTqRvjdxUv87Te6vTTmEwVoGQgiXNlKhgCNP+bf/+9R72jqEOuZhJuVZzTT
-         ZF67Ht6jXNWZBRVb9iA2ALKfOAbdP47vvHX1I1RDj+Vc++2qOgHqekyqVsJGSMKqZow2
-         iWqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVYS0SUigueheqC+kZJxHccTR2+anj1t0MGsQfiO2zDwdAlPGXFzvqxx9g+sjq8L9zizlU139A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwomLU45x3+OkIAA5DE75JJcS2MF+8CRxbQZm6ze8jjpwLR7hxK
-	B9s+qr7hyLAy3twUr281hBJ1sWYlvUer5pneSetmdM5eiFy94FY4uR3KECvNqqlS46CqzrCLONz
-	bYumEdY6Tr6ac3d9JI40vEh72qbbKdMYC3V9g
-X-Gm-Gg: ASbGncsnQ2Qk7MZdi0rSi/BbKvcfMx3UdlmucVNKe7SwzDnVsk2fKm6dsW9q9V9xPVH
-	R93DZ7VeotlYnfa4ZEEuxxDK8535XLKr5eU5bFw==
-X-Google-Smtp-Source: AGHT+IE5gqk3P2/Ih3zI9VWeCMpC1df2p4hcSDcpHGmWaU4BMZzINp1ECSdryBjQHq2hF4UmBisUt2Cs9G/4lFr62Ns=
-X-Received: by 2002:a05:6402:3549:b0:5d3:ce7f:abee with SMTP id
- 4fb4d7f45d1cf-5d81ddffac3mr2329514a12.25.1734704213839; Fri, 20 Dec 2024
- 06:16:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734704456; x=1735309256;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7mDKl6tzxVN4OlPSHKO5eWK8XZLJ0ANoR86UwcJiqUw=;
+        b=M66ehTr8/4BHozr+4XTqEeVb/kF6qothI71EEGgb352X7SPB8kusUDyKbMmF1l7+2K
+         uyVBieU7uqZJOXrkiH6jmIkJ49H6YtAMit/3esTFzQACD1sFz7X6g/ChHgYJ7GmiKysG
+         LWDv7ZdZ91E+U0Sn2Bn9qI+usu5CpcjlBVdDxsq6yZEZ19izPYoLpbaDHQbmvkqL8KLr
+         8/qFxbE7xcEKjTehcd5hvGTt6OfAJXPknnoec08YddHsh9HuISGd3oA9aBjNAJx6wkZ5
+         2vMy/gyQLYlnwMM8Gh+abjcUEHm8woLPkgGgTXFwQD2rLDYDLcz8bvZiu8OhweF+IlPf
+         gKwg==
+X-Gm-Message-State: AOJu0YxLmF+lb0c0Q2fC+aQpTW7iSQ8G9RBBE0sC9TeHU46KuV6xQJ0z
+	Wq5pd/cRjYZ14dkbxWffQEbxTFxLp9o2OSK1f7/WCpSv+nAluH1r4w9o5A==
+X-Gm-Gg: ASbGncvIZhfLKFtAa/XNezZaCXwQ8w/meVs8J8me9JU3MyhXSy2H0rvDjzomIZMJ8WD
+	jQAC2gk0jUqD0MvojYo9XzoruwjELWNahkMAO6U6HOzq+QCdJn+j9xER1BTxjGlAkqsqrthdFSV
+	lBSnOW9e7AETnIE+UramQsPkP4LYFiXiKrz4GsiihTbtR1/jMr1Uyp1rk3Prl6h5wpYZVi9L530
+	ZqaToPDtvprQ5+DU/m2AeBmDeDG6X33bKu3yivQoedFkmplZ03lbw4ozLq8LHr/gib+vWEJIgbJ
+	5RbQRFOfDzbIb7M/bee9f10wCpV8nbvHR/Bjz4CG96SnsLyWE8eTww==
+X-Google-Smtp-Source: AGHT+IH62ymBhxgPcNssf0jsIwFi1XwyBWK2oaxmsI0s0iywLKHXKjI4oZaDr61vqAGYpiVtnIfRxQ==
+X-Received: by 2002:a05:6e02:3042:b0:3a7:e147:812f with SMTP id e9e14a558f8ab-3c2d2d50ab6mr33058555ab.12.1734704456005;
+        Fri, 20 Dec 2024 06:20:56 -0800 (PST)
+Received: from T490s.eknapm (bras-base-toroon0335w-grc-37-142-114-175-98.dsl.bell.ca. [142.114.175.98])
+        by smtp.googlemail.com with ESMTPSA id e9e14a558f8ab-3c0e411e88esm8953065ab.49.2024.12.20.06.20.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Dec 2024 06:20:55 -0800 (PST)
+From: Antonio Pastor <antonio.pastor@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Antonio Pastor <antonio.pastor@gmail.com>
+Subject: [PATCH] net: llc: explicitly set skb->transport_header
+Date: Fri, 20 Dec 2024 09:20:08 -0500
+Message-ID: <20241220142020.1131017-1-antonio.pastor@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218162116.681734-1-sbrivio@redhat.com>
-In-Reply-To: <20241218162116.681734-1-sbrivio@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 20 Dec 2024 15:16:42 +0100
-Message-ID: <CANn89iL4hJptSzM7KUjjUbDOHS_fwvha_569G7tX=c_GS=AT2A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] udp: Deal with race between UDP socket
- address change and rehash
-To: Stefano Brivio <sbrivio@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Mike Manning <mvrmanning@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, 
-	Paul Holzinger <pholzing@redhat.com>, Philo Lu <lulie@linux.alibaba.com>, 
-	Cambda Zhu <cambda@linux.alibaba.com>, Fred Chen <fred.cc@alibaba-inc.com>, 
-	Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>, Peter Oskolkov <posk@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 18, 2024 at 5:21=E2=80=AFPM Stefano Brivio <sbrivio@redhat.com>=
- wrote:
->
-> If a UDP socket changes its local address while it's receiving
-> datagrams, as a result of connect(), there is a period during which
-> a lookup operation might fail to find it, after the address is changed
-> but before the secondary hash (port and address) and the four-tuple
-> hash (local and remote ports and addresses) are updated.
->
-> Secondary hash chains were introduced by commit 30fff9231fad ("udp:
-> bind() optimisation") and, as a result, a rehash operation became
-> needed to make a bound socket reachable again after a connect().
->
-> This operation was introduced by commit 719f835853a9 ("udp: add
-> rehash on connect()") which isn't however a complete fix: the
-> socket will be found once the rehashing completes, but not while
-> it's pending.
->
-> This is noticeable with a socat(1) server in UDP4-LISTEN mode, and a
-> client sending datagrams to it. After the server receives the first
-> datagram (cf. _xioopen_ipdgram_listen()), it issues a connect() to
-> the address of the sender, in order to set up a directed flow.
->
-> Now, if the client, running on a different CPU thread, happens to
-> send a (subsequent) datagram while the server's socket changes its
-> address, but is not rehashed yet, this will result in a failed
-> lookup and a port unreachable error delivered to the client, as
-> apparent from the following reproducer:
->
->   LEN=3D$(($(cat /proc/sys/net/core/wmem_default) / 4))
->   dd if=3D/dev/urandom bs=3D1 count=3D${LEN} of=3Dtmp.in
->
->   while :; do
->         taskset -c 1 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,=
-trunc &
->         sleep 0.1 || sleep 1
->         taskset -c 2 socat OPEN:tmp.in UDP4:localhost:1337,shut-null
->         wait
->   done
->
-> where the client will eventually get ECONNREFUSED on a write()
-> (typically the second or third one of a given iteration):
->
->   2024/11/13 21:28:23 socat[46901] E write(6, 0x556db2e3c000, 8192): Conn=
-ection refused
->
-> This issue was first observed as a seldom failure in Podman's tests
-> checking UDP functionality while using pasta(1) to connect the
-> container's network namespace, which leads us to a reproducer with
-> the lookup error resulting in an ICMP packet on a tap device:
->
->   LOCAL_ADDR=3D"$(ip -j -4 addr show|jq -rM '.[] | .addr_info[0] | select=
-(.scope =3D=3D "global").local')"
->
->   while :; do
->         ./pasta --config-net -p pasta.pcap -u 1337 socat UDP4-LISTEN:1337=
-,null-eof OPEN:tmp.out,create,trunc &
->         sleep 0.2 || sleep 1
->         socat OPEN:tmp.in UDP4:${LOCAL_ADDR}:1337,shut-null
->         wait
->         cmp tmp.in tmp.out
->   done
->
-> Once this fails:
->
->   tmp.in tmp.out differ: char 8193, line 29
->
-> we can finally have a look at what's going on:
->
->   $ tshark -r pasta.pcap
->       1   0.000000           :: ? ff02::16     ICMPv6 110 Multicast Liste=
-ner Report Message v2
->       2   0.168690 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=
-=3D8192
->       3   0.168767 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=
-=3D8192
->       4   0.168806 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=
-=3D8192
->       5   0.168827 c6:47:05:8d:dc:04 ? Broadcast    ARP 42 Who has 88.198=
-.0.161? Tell 88.198.0.164
->       6   0.168851 9a:55:9a:55:9a:55 ? c6:47:05:8d:dc:04 ARP 42 88.198.0.=
-161 is at 9a:55:9a:55:9a:55
->       7   0.168875 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=
-=3D8192
->       8   0.168896 88.198.0.164 ? 88.198.0.161 ICMP 590 Destination unrea=
-chable (Port unreachable)
->       9   0.168926 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=
-=3D8192
->      10   0.168959 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=
-=3D8192
->      11   0.168989 88.198.0.161 ? 88.198.0.164 UDP 4138 60260 ? 1337 Len=
-=3D4096
->      12   0.169010 88.198.0.161 ? 88.198.0.164 UDP 42 60260 ? 1337 Len=3D=
-0
->
-> On the third datagram received, the network namespace of the container
-> initiates an ARP lookup to deliver the ICMP message.
->
-> In another variant of this reproducer, starting the client with:
->
->   strace -f pasta --config-net -u 1337 socat UDP4-LISTEN:1337,null-eof OP=
-EN:tmp.out,create,trunc 2>strace.log &
->
-> and connecting to the socat server using a loopback address:
->
->   socat OPEN:tmp.in UDP4:localhost:1337,shut-null
->
-> we can more clearly observe a sendmmsg() call failing after the
-> first datagram is delivered:
->
->   [pid 278012] connect(173, 0x7fff96c95fc0, 16) =3D 0
->   [...]
->   [pid 278012] recvmmsg(173, 0x7fff96c96020, 1024, MSG_DONTWAIT, NULL) =
-=3D -1 EAGAIN (Resource temporarily unavailable)
->   [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) =3D 1
->   [...]
->   [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) =3D -1 ECON=
-NREFUSED (Connection refused)
->
-> and, somewhat confusingly, after a connect() on the same socket
-> succeeded.
->
-> Until commit 4cdeeee9252a ("net: udp: prefer listeners bound to an
-> address"), the race between receive address change and lookup didn't
-> actually cause visible issues, because, once the lookup based on the
-> secondary hash chain failed, we would still attempt a lookup based on
-> the primary hash (destination port only), and find the socket with the
-> outdated secondary hash.
->
-> That change, however, dropped port-only lookups altogether, as side
-> effect, making the race visible.
->
-> To fix this, while avoiding the need to make address changes and
-> rehash atomic against lookups, reintroduce primary hash lookups as
-> fallback, if lookups based on four-tuple and secondary hashes fail.
->
-> To this end, introduce a simplified lookup implementation, which
-> doesn't take care of SO_REUSEPORT groups: if we have one, there are
-> multiple sockets that would match the four-tuple or secondary hash,
-> meaning that we can't run into this race at all.
->
-> v2:
->   - instead of synchronising lookup operations against address change
->     plus rehash, reintroduce a simplified version of the original
->     primary hash lookup as fallback
->
-> v1:
->   - fix build with CONFIG_IPV6=3Dn: add ifdef around sk_v6_rcv_saddr
->     usage (Kuniyuki Iwashima)
->   - directly use sk_rcv_saddr for IPv4 receive addresses instead of
->     fetching inet_rcv_saddr (Kuniyuki Iwashima)
->   - move inet_update_saddr() to inet_hashtables.h and use that
->     to set IPv4/IPv6 addresses as suitable (Kuniyuki Iwashima)
->   - rebase onto net-next, update commit message accordingly
->
-> Reported-by: Ed Santiago <santiago@redhat.com>
-> Link: https://github.com/containers/podman/issues/24147
-> Analysed-by: David Gibson <david@gibson.dropbear.id.au>
-> Fixes: 30fff9231fad ("udp: bind() optimisation")
-> Signed-off-by: Stefano Brivio <sbrivio@redhat.com>
-> ---
+802.2+LLC+SNAP frames received by napi_complete_done with GRO and DSA
+have skb->transport_header set two bytes short, or pointing 2 bytes
+before network_header & skb->data. As snap_rcv expects transport_header
+to point to SNAP header (OID:PID) after LLC processing advances offset
+over LLC header (llc_rcv & llc_fixup_skb), code doesn't find a match
+and packet is dropped.
 
-I think this should work. Another solution would have been to add a
-sequence to each UDP socket.
+Between napi_complete_done and snap_rcv, transport_header is not used
+until __netif_receive_skb_core, where originally it was being reset.
+Commit fda55eca5a33 ("net: introduce skb_transport_header_was_set()")
+only does so if not set, on the assumption the value was set correctly
+by GRO (and also on assumption that "network stacks usually reset the
+transport header anyway"). Afterwards it is moved forward by
+llc_fixup_skb.
 
-Fixes: tag probably could refer to 4cdeeee9252a ("net: udp: prefer
-listeners bound to an address"), because your patch
-is partially kind-of reverting it.
+Locally generated traffic shows up at __netif_receive_skb_core with no
+transport_header set and is processed without issue. On a setup with
+GRO but no DSA, transport_header and network_header are both set to
+point to skb->data which is also correct.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+As issue is LLC specific, to avoid impacting non-LLC traffic, and to
+follow up on original assumption made on previous code change,
+llc_fixup_skb to reset and advance the offset. llc_fixup_skb already
+assumes the LLC header is at skb->data, and by definition SNAP header
+immediately follows.
 
-I will post additional patches for net-next to better take care of
-data-races in compute_score()
+Fixes: fda55eca5a33 ("net: introduce skb_transport_header_was_set()")
+Signed-off-by: Antonio Pastor <antonio.pastor@gmail.com>
+---
+ net/llc/llc_input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/llc/llc_input.c b/net/llc/llc_input.c
+index 51bccfb00a9c..6f33ae9095f8 100644
+--- a/net/llc/llc_input.c
++++ b/net/llc/llc_input.c
+@@ -124,7 +124,7 @@ static inline int llc_fixup_skb(struct sk_buff *skb)
+ 	if (unlikely(!pskb_may_pull(skb, llc_len)))
+ 		return 0;
+ 
+-	skb->transport_header += llc_len;
++	skb_set_transport_header(skb, llc_len);
+ 	skb_pull(skb, llc_len);
+ 	if (skb->protocol == htons(ETH_P_802_2)) {
+ 		__be16 pdulen;
+-- 
+2.43.0
+
 
