@@ -1,110 +1,134 @@
-Return-Path: <netdev+bounces-153725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 805929F96A5
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:35:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 929159F970A
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:56:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 005801884EBF
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 16:34:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F137A167C91
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 16:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D45219A9A;
-	Fri, 20 Dec 2024 16:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4A2223E76;
+	Fri, 20 Dec 2024 16:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UacXoMUh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+9lL9f8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0F4219A66
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 16:33:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663F522332B;
+	Fri, 20 Dec 2024 16:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734712435; cv=none; b=nHoyMPQBTGn5a0SAVjCeYc0Q2gn5pkWv6eXNJoZhfkcRhrqenuS76BdyvMGn5rtDs10z5WAa7gJWUDOAQh79tRgi1kgcKsOUkw+1FtPI/lj7dI0hIGcki4LtklQuZ8B9xVrndFI7Ah/lMNQcyn4JEZdTgNRFy6tldjMOm9a+UWY=
+	t=1734713497; cv=none; b=qxsNNTDEaNT7Fs39wwoCsjOhfwi0OulAX/nO8T1+cB9Ufnloh0TmgLXZA4BA13gYpfb01ROGkEhlMLKkS3gf0i3k1DD8f6E8RtLSnKkHIVMYE1U3vKTATKtpy77K4xfHc3aAZU4bDuWbHh7F5Yo3caqfIu/uVFAgBTTUGmsmhWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734712435; c=relaxed/simple;
-	bh=1kGU6egwkuzhglcqvh7xKay5WLUx2cchusisAF8ds3E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ITJzdSqjfILce9jFM7lxI/e07p0gZFDSybP8MyThm4o28yM9mbzJ4UmjVcg2gqlvgH08uadKdtLCDoX6VutkJFZyPKVZeDn5SpL6jVipDd7oFkfn443fDWU/nZJxe+i0Ik38TMEBJBjELhcTlygJ5+G/J6CQq7bkSStwJxKCHJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UacXoMUh; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e829ff44so5739561a12.0
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 08:33:53 -0800 (PST)
+	s=arc-20240116; t=1734713497; c=relaxed/simple;
+	bh=HPkhIBw/4uEx84HWtKiBxCfbApwv+OS0b7/QpplHQec=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=t6+vIOhIwAcx6bUjxoQ3VJs9Qs0oD9IciKhYMzkJOxKBhfUVJqKuh3aRQNnZ7mp3CHIFGh65rMTpOd1EsudYfLXZcoqZvlx+dxjvyP0CET42w7pCMnHTNUMGIT7DvJfOdmK4lHy1WO4Mh1IiNhkOrLDJWXosgisRKPVS7b8j9fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+9lL9f8; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2161eb94cceso15288595ad.2;
+        Fri, 20 Dec 2024 08:51:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734712432; x=1735317232; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1734713495; x=1735318295; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1kGU6egwkuzhglcqvh7xKay5WLUx2cchusisAF8ds3E=;
-        b=UacXoMUhOvVjB9+oZDeHLqARg3dzP/biwBi19bMzb1an0JE2IJnRJ2rUHkfve+Vn90
-         xOcTnUpU4dhF1B9XcTCar6qXXQ/BympAtZ0z6OgflUa6pfOP6AyuDLergOgQBXEc69Ij
-         KjsksRmEq2LjpDGyXULd/tpGy8gXBi6aIImp5YZav+feMuNOemRbHwBxX5rzqbcPpNwu
-         2JHx6HWSrg66Rtq8Zmcl1zwee7ZVsweUr/6dQMH52y0CYFkNVAJvQR2sxcIOTHZuGTTJ
-         YwndfVGYuenZo3zasJ3JXZjbmwLhmsnwq4UhsbKjmaMxNDCxnsXuw8dvYxlUjsE5U6ZQ
-         l3rw==
+        bh=lEud0HpUzW8AGsAHXsgRgKAN5zSUNFNJtoYvN7JgreE=;
+        b=C+9lL9f8eEuT2GqFtYwxpZvSR6lK/5RCR/ZyH8H7T65h8Ipc+StMnCsS99V2Hh87VX
+         AjrVNwVb9MBIjvYSkai6/GgYTNmZvAIpzP7waQBez/1UnBQBd82zsD7Es4f8rDtqmVR7
+         H9OsFt3uLGLUZkmZOmQw/WxSTc8b8LxmrIT2gryg5BCel+507GtKgujyxjBBCzgbz3Gi
+         sZJ2iZ7uklqdooOj/vigpt1MBcMPP8poYAYcDXVWz7Xn4K+xIvn9sIYcvvdEyILK2VHu
+         SbPF3Vg7xhuEMAaT2/5PmSIUjNHSLj9pVS1HURMAlH4N4UStURDIjjgE2d0g6N79COpM
+         y89Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734712432; x=1735317232;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1kGU6egwkuzhglcqvh7xKay5WLUx2cchusisAF8ds3E=;
-        b=M1PKLLPeLr4yPbp65Eifps/oOoU6NGZfxQfA8seBfGRJKqkLM6Thn4XT3Q76QfOpS3
-         0oJpCpExiqU49z6BACRaBxcyWekHy7Mrru01jkIE+bAlJA3vvAAszIj8W6R7ypf5ZiXS
-         8WB+9lsK3Ky/Nkpbda0+EfvojnbOmDgXlc7W7k4QMTAZhtkc2RfKWSydRbUuLOk4q6Qw
-         D9vofpvmZXS2lwBzAXghOxqqtJqLq80CBPHkA9cLyuqWEJzlw+Hiw/D6DvtqKGveUrj7
-         xhG3X54a4cIC2lqCDkeM5F8jMkKC6Z9uvaSZDtMp3Q/8eub7m8z/MBrFx7UgGGqdgEf3
-         2vpw==
-X-Forwarded-Encrypted: i=1; AJvYcCV7wtGhzXGtX8ejrXRgjaM0R6EUdjD8FVgrPqfmjCDax4RPz/EmHyLo97mbHde2qgfSSbquEkQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyj04ejEZd5oXgzmKybl+0yBt2jWQ8E1Fbv4gJmlFi/kPUxRhC8
-	s/UbBK0MA/5Pb9IEDAlooOj5FKfyssZREnAHAKfj4n6qua3ho5ipKUHw02oyZlJqX5bKW7FrSk4
-	RUFdR2s45o+iA9FXmxyteEiYV5eGwLQkf0Sn3
-X-Gm-Gg: ASbGncskYuYe319n/qHFGwUDKn4ahP9GW5dWAs30gw6EiOLB5QMa0soaX9VNYl+SRjX
-	ca9DNQJ5fqy3Aw8TN/6lQIOouu5/YTXcbyVBw3g==
-X-Google-Smtp-Source: AGHT+IEn85XwxIOd07ptRDetwMHk8igd6GDxq/plvtdpDoK72zGLsUPGGlA0Fh+K4R5bUBDmUb0Txn7cJUGS/r9nW7o=
-X-Received: by 2002:a17:907:704:b0:aa5:b8dd:fec4 with SMTP id
- a640c23a62f3a-aac080fe63emr726019366b.4.1734712432014; Fri, 20 Dec 2024
- 08:33:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734713495; x=1735318295;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lEud0HpUzW8AGsAHXsgRgKAN5zSUNFNJtoYvN7JgreE=;
+        b=I3/J/W0qHtuoSSVtJYufJsB7pgMMFiWphRFo1TxaxnpuUGj70BMLytnNg792h9KVnS
+         SP03GioVFV+d2bkudMY1a2AEdNjskek/V/l+vSyrFnsDXPJPsGv/Ue61R2CGKwpLM79/
+         hVvMl9LkuOrjfHlGt8VwLVGtdDnDzgeG0hcyWsjQPbBoEwD9PwYpS+UzNne+MbHdUpIF
+         GLPQOCc8PFFHipR5c+DAjbQGnZ7xH1dJ/heo0Qw4V40S4j9WZm/P/OtMDCemQIkwRSd7
+         h0n/rVQz5vT5xyi7xF68EGPVv6VHA+WWDytVIRlq+nCihFvgr+N1gt9ii/hDpxKcjjBD
+         erTg==
+X-Forwarded-Encrypted: i=1; AJvYcCW65AAhUukDgEC5IIlZiXszxcjtXi18xVGvwH83NgAXhaUliV6Vf7rN6EjW+A8h1VZP7fgOrpy5@vger.kernel.org, AJvYcCX+hE0H3HVkKYSF7x5X/AJEmtFZ+u3F/M/vrril/4cSTq0WjatpDQWclUJ63IC+eFe5SDk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzm2PGT1D9PzaquI4MfIES8gl/w0wKrtqf8bS6EDOWdhNfp9nGf
+	SZQeHXqE9MAkgobB8XGXLFPsX9zRUZAMJkCef9Cn69AFuXeyx2gPrR/9Fw==
+X-Gm-Gg: ASbGncub8nEsRAyQ8dEutodADUwUG4+JSMeIOJZ1l/fi6kGNoz1BroSLs6aslC8Kg3N
+	2B7zJ5PYh5yKXKqKDeJ7iBVoSYaGMq1qHokmKKVLkoAnnzPXWYhbkC4YSzYzFUTiZX+QpTX5Lgn
+	kYb1KUJIptUTIOJA1imXoJYIrSfxnUKvvkuMrmUqcn+g8jIGlWB9co1u+oaD4Z+N8AcK+z7xqPf
+	35N+9iYDEhHxBOJzuUvVdQHuJ6e26u/yRntNOCyaHS2GpnPqUL5V0s=
+X-Google-Smtp-Source: AGHT+IH6hncF/IXzQqsfRxzRQS3FjeB5XNGzIaaBFZ6mk/sB7K7m1zCBlM90qhx2V3qOr/jvkYfJYw==
+X-Received: by 2002:a17:902:e54e:b0:216:45eb:5e4d with SMTP id d9443c01a7336-219e6e8c529mr52391405ad.6.1734713495643;
+        Fri, 20 Dec 2024 08:51:35 -0800 (PST)
+Received: from localhost ([98.97.44.4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dca006fasm31240115ad.227.2024.12.20.08.51.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Dec 2024 08:51:35 -0800 (PST)
+Date: Fri, 20 Dec 2024 08:51:32 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: zijianzhang@bytedance.com, 
+ bpf@vger.kernel.org
+Cc: john.fastabend@gmail.com, 
+ jakub@cloudflare.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ horms@kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ netdev@vger.kernel.org, 
+ Zijian Zhang <zijianzhang@bytedance.com>
+Message-ID: <6765a094c9db5_21de2208d9@john.notmuch>
+In-Reply-To: <20241210012039.1669389-1-zijianzhang@bytedance.com>
+References: <20241210012039.1669389-1-zijianzhang@bytedance.com>
+Subject: RE: [PATCH v2 bpf 0/2] tcp_bpf: update the rmem scheduling for
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241220083741.175329-1-kory.maincent@bootlin.com>
-In-Reply-To: <20241220083741.175329-1-kory.maincent@bootlin.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 20 Dec 2024 17:33:41 +0100
-Message-ID: <CANn89iK0VdrCV7Hk=vjT4t3v=OJZXnKaOiMuTN_=ZDzDEuCzvQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: ethtool: Fix suspicious rcu_dereference usage
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+a344326c05c98ba19682@syzkaller.appspotmail.com, 
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 20, 2024 at 9:37=E2=80=AFAM Kory Maincent <kory.maincent@bootli=
-n.com> wrote:
->
-> The __ethtool_get_ts_info function can be called with or without the
-> rtnl lock held. When the rtnl lock is not held, using rtnl_dereference()
-> triggers a warning due to the lack of lock context.
->
-> Add an rcu_read_lock() to ensure the lock is acquired and to maintain
-> synchronization.
->
-> Reported-by: syzbot+a344326c05c98ba19682@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/676147f8.050a0220.37aaf.0154.GAE@g=
-oogle.com/
-> Fixes: b9e3f7dc9ed9 ("net: ethtool: tsinfo: Enhance tsinfo to support sev=
-eral hwtstamp by net topology")
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
+zijianzhang@ wrote:
+> From: Zijian Zhang <zijianzhang@bytedance.com>
+> 
+> We should do sk_rmem_schedule instead of sk_wmem_schedule in function
+> bpf_tcp_ingress. We also need to update sk_rmem_alloc in bpf_tcp_ingress
+> accordingly to account for the rmem.
+> 
+> v2:
+>   - Update the commit message to indicate the reason for msg->skb check
+> 
+> Cong Wang (1):
+>   tcp_bpf: charge receive socket buffer in bpf_tcp_ingress()
+> 
+> Zijian Zhang (1):
+>   tcp_bpf: add sk_rmem_alloc related logic for tcp_bpf ingress
+>     redirection
+> 
+>  include/linux/skmsg.h | 11 ++++++++---
+>  include/net/sock.h    | 10 ++++++++--
+>  net/core/skmsg.c      |  6 +++++-
+>  net/ipv4/tcp_bpf.c    |  6 ++++--
+>  4 files changed, 25 insertions(+), 8 deletions(-)
+> 
+> -- 
+> 2.20.1
+> 
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Thanks. Sorry fo rthe delay I thought this had an ACK already. My fault.
+
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
