@@ -1,301 +1,262 @@
-Return-Path: <netdev+bounces-153716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B89D9F950D
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 16:06:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C139F9517
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 16:11:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7841C18935D4
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 15:06:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37D361882D62
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 15:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E376C218AAA;
-	Fri, 20 Dec 2024 15:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D78021883F;
+	Fri, 20 Dec 2024 15:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U93YP4PC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SmnPt98u"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBC2215F44
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 15:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734707162; cv=none; b=tHBYbfWuXF5N2o1YiITp70OBakyZjTYj5n2xN0MjdN0Av7kmpkoiDsRaBVylyY7fT4WKA2bbTFljWL0YHW6jDDC3fG8dRR9zg/qFbxVXfPFOELut3avwlyyKZszW+rX1a6Nv70eqdHmRwR9/pHWujJNAZa2J2quyld+uXJV9o2Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734707162; c=relaxed/simple;
-	bh=9bNyNXq8ZBuWAZCiQAfoZ2QkiXOuKEzS0VgzfBiIIvo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=POZRozcQQug2VI2lad9vdVo1lj7QzkZfgWziCsJDg7Mc32HE260rJ2DWsOfJdj5a6d9dWHuYwL/MmVGVz67ZFPOTL4HWaxcx6zMOhnqw4PZ4tnD6Zotyq1ed0AUw4rt6yW4py/GuWRyciJZ+tP6YlA/9n2pPIxG0DzzRoYEN7n8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U93YP4PC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734707159;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R31kY5tJXOAoXoGKKqD3SFFNHIschOeD3SfPaGvQVeo=;
-	b=U93YP4PCfsDGksKLNULQaHTzcru7a3HCnx6CSeCi5KNj0Q1kIAx4ZhFybPjJ9YiUl0NJdD
-	hs7s8CKrP/T6+6jlryppn54AaYn54a19DdlV2jQdqI9M4Mrldo3OHoHf6wfKCixi4aRlKv
-	oZPhLirlYhp52oAV5400I6KxOuFGuKA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-646-eZAzDOq8Ogi9__ePm9n4jg-1; Fri, 20 Dec 2024 10:05:58 -0500
-X-MC-Unique: eZAzDOq8Ogi9__ePm9n4jg-1
-X-Mimecast-MFC-AGG-ID: eZAzDOq8Ogi9__ePm9n4jg
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43635895374so15635095e9.0
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 07:05:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734707157; x=1735311957;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=R31kY5tJXOAoXoGKKqD3SFFNHIschOeD3SfPaGvQVeo=;
-        b=LcunwKZaCBfYBSB2OTZ3eeOBW62AKYe7gR/rlvzXvvczr1j9h0Zxpv4IJetixeYZFD
-         B0i1/wL2Gd9FO3EML/p3PMhc5K5EO3G0hQ8ekrHP05a0o1ZQscVFvJsoIVRfUnbkrbZH
-         aeG1BRIGB9R6Q7CNcnyL8jR2rf9OFiaUs/8k6mzqqYO/3bcQR1FuczM1xihnuovWjT7o
-         lcnTZoZEeiCB6Y5gRQy9nhM8IAk9zSyjuuiEOp+jb/VlG4acc8S7YagprOcESxpqFdwD
-         b+g73K2C2K+xd8oegCW4yCD0x6mQQfLqOg8yQCC+RQvibmssUubS+bANb2omxFv89XSk
-         JYtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6x1EOkUTudA5WNs5g/2KJXvp+EwmWGFHVntGc9B2h8AT2NNAsT+7JOFgDFLavYsiHDf33NIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSchG6EnCuQr032QlnRLlhvUK6AaZm6CFAPHdXtrYJ/pgVdC5/
-	Mjsa9E8japGMwjtp0CmFfMJS+kZJ8l+aBqCuWXzrcXNqZTnOpRTNIkscRp/w3LMHv3cdogAGeCU
-	PrDD/XZi3UtRuP0NeHu1srRMT3nbicCr9HvO8weL3pJ0Zd4G+4Cly3Q==
-X-Gm-Gg: ASbGncuTl58fEskaVvQRyzCcAeDtsCIgyvR6Y0jPhhMFPRwB4He3jPB7uRVtIaOWb+s
-	2YZ5zdYtX75+27t2VyZpb/dF7gPhBQn4WR/QCXtxacxMpOobqoh8uEu0/fkLqVe4OsbgA+zsQZ5
-	1UVnUNTpZPprf1fS05foCc0IYIJb69Z7d+VuWkZMF67kFnIuXtJieAEEUeOnvEsF/mQk+H+2gUA
-	p6dsIzMOOaVL3PyU2afevVXHMl7qGVsXIMA4tmCRCgIJxx8h9D086CBDgfo4LCJ0GnN
-X-Received: by 2002:a05:600c:4ed2:b0:42c:b8c9:16c8 with SMTP id 5b1f17b1804b1-43669a22d92mr28015155e9.10.1734707155418;
-        Fri, 20 Dec 2024 07:05:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEA3RoTKqANOqPh3kdl3/DmZtiwQwHvoKzwxmqEXJa0WzZ8DD4iV3i7Tp25oxjuIwT5rynaqw==
-X-Received: by 2002:a05:600c:4ed2:b0:42c:b8c9:16c8 with SMTP id 5b1f17b1804b1-43669a22d92mr28012625e9.10.1734707152926;
-        Fri, 20 Dec 2024 07:05:52 -0800 (PST)
-Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [2a10:fc81:a806:d6a9::1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4364b1516bbsm75716325e9.1.2024.12.20.07.05.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2024 07:05:52 -0800 (PST)
-Date: Fri, 20 Dec 2024 16:05:50 +0100
-From: Stefano Brivio <sbrivio@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, Kuniyuki Iwashima
- <kuniyu@amazon.com>, Mike Manning <mvrmanning@gmail.com>, David Gibson
- <david@gibson.dropbear.id.au>, Paul Holzinger <pholzing@redhat.com>, Philo
- Lu <lulie@linux.alibaba.com>, Cambda Zhu <cambda@linux.alibaba.com>, Fred
- Chen <fred.cc@alibaba-inc.com>, Yubing Qiu
- <yubing.qiuyubing@alibaba-inc.com>, Peter Oskolkov <posk@google.com>
-Subject: Re: [PATCH net-next v2] udp: Deal with race between UDP socket
- address change and rehash
-Message-ID: <20241220160550.74c1c7e0@elisabeth>
-In-Reply-To: <CANn89iL4hJptSzM7KUjjUbDOHS_fwvha_569G7tX=c_GS=AT2A@mail.gmail.com>
-References: <20241218162116.681734-1-sbrivio@redhat.com>
-	<CANn89iL4hJptSzM7KUjjUbDOHS_fwvha_569G7tX=c_GS=AT2A@mail.gmail.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEB1A31
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 15:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734707474; cv=fail; b=WsfKyQ+4WGJ3KFkKTg2o/+sJHWaAgmwkvlWQ70I3GsFF0oYZws1Sz+pF++DhtYUKoMDJrJtc6OHNOFz6VPpogoCC5UVGSUPzauGhLrMrcX3DHlrvlFnEOLxHaYh+Dg88I6/X0SmCCBA7/zYAh+AiGg4yTcYQ84xkgsFixIA4K3U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734707474; c=relaxed/simple;
+	bh=kcvZzy9kheum+f+eIt/rrpAAQCXHYT0tCqfP/Gi2BHM=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=s2KHJUIlhavLqH+3Scu2JuI+iNGZZzNTzrfl36wlT6wt2ifrAShPEXCKXVNo39nBRUoF7lcpLyM19BSDAbFTzsFwyZ74S2fUYQ/7SoDEeFSM/R0bhkHJV59cF/KVLFrYCzZDrcss+OiPIbiY1tXQtyRG/2cZXII/85bRHDpYbKc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SmnPt98u; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734707473; x=1766243473;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=kcvZzy9kheum+f+eIt/rrpAAQCXHYT0tCqfP/Gi2BHM=;
+  b=SmnPt98uZcP+Xd4EjpWdzSpwBQjuE60EAuFsveT0tnA3PYq0+j+ppTyA
+   6aEW+9QZ9/mjhM3Em8SmI76LEmG6/w6/wwtyG9ERBwG/pkdeQEtZ6lsOh
+   vAv7+veok33Dqe2tsvT8FXo1wY4etMpfnWd9Y3QM0XTY1efLLnVd0JzjP
+   fym/dCCY2MdqWhvFQKI9+OBrt8VU+KfBCN6XC4b2FTminaWcMnp2hbIx2
+   ANsDFgpj1PfRevRxgEXpS+UlP5F0KyeSCnihsgLjQnQF3bQs1orSM3MMp
+   oMHWj0ThdWCmVfydMLIEjMixpxXJUMLdKTn1eBmtHg6TNsmOP4jCabSgq
+   A==;
+X-CSE-ConnectionGUID: AeqV52LjRtyBB17zl3GV1w==
+X-CSE-MsgGUID: q89eCHMERTSGWPNab22sxQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="34540394"
+X-IronPort-AV: E=Sophos;i="6.12,251,1728975600"; 
+   d="scan'208";a="34540394"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 07:11:12 -0800
+X-CSE-ConnectionGUID: K+dIToppRuWG3OsConOaHg==
+X-CSE-MsgGUID: fByga2hRQHqCn63OhXlsEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,251,1728975600"; 
+   d="scan'208";a="98596149"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Dec 2024 07:11:13 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 20 Dec 2024 07:11:12 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Fri, 20 Dec 2024 07:11:12 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.44) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 20 Dec 2024 07:11:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qEpEM770ETG8yncxMtpAIsufIBzkF3QChUcaqQMMM3SwLuXjiqP7VR3skHKq9KzjR3wFKOBW3gBjwGsXtqKcvXBXDzkrWN9vL1Ehce3ZU6sR6p8oblHyk/v/MosVCFdrGf4ady6uhD4C6Yv/BChhX8tfNZI/68ET6DEElm36cYgPw4B29z7ChoaiNenaES9S7sx5r7KnmJviOYRpmuaxjuGC4s2m0hcYGteTIS5ea80zlCv+MSEJE/BeiTPa1Iv0yHKwc6k2JiuKliba3uD+kOWlRMmljvvlLdCRryjMrL8RXsoj/g1AAaTOZC3E0DNh0Gzza9963ggxUXKnAz+66Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fvYWuZmkN0oamNeAgqo89Sm6c78ko5h5/ryndMtXEnE=;
+ b=NbMtXUlfx0TOEb6z2X0CJaxa+HgdumeogcoGT5JGWpLlCAg/ZyRZ6akJwVe2Lv1d7CEvn3cPstcrHEDgfPKMty/koKGOqV1Fu3Fp6pX/dymJgD0czHAyq01EAdUsdHFtpzeFVphDoCqDxqA2F3WZElT2jspsB0vqvebFv695ecjDOx+kFefVD9jRmX/irB3C/4dH1FEb98UNiTIzb8FLXHfS0gFPrTCFNi9ukV59tk9mVzKO+Noztstw4DsYkz7gfL2QelEGmXB03rucOjsFYv4jv2ohEsnluJCg6x/x3NeT9tb8gZUMv4VRepd1lWb96VJPcoaKeWsobXG9aHfJqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by MW4PR11MB8292.namprd11.prod.outlook.com (2603:10b6:303:20c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.16; Fri, 20 Dec
+ 2024 15:11:00 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.8272.013; Fri, 20 Dec 2024
+ 15:11:00 +0000
+Message-ID: <65ef1684-b2d5-40f6-b20a-71ccb9ee302d@intel.com>
+Date: Fri, 20 Dec 2024 16:10:54 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 4/4] net/mlx5e: Keep netdev when leave switchdev for
+ devlink set legacy only
+To: Jakub Kicinski <kuba@kernel.org>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>
+CC: Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	<netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+	<pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, ITP Upstream
+	<nxne.cnse.osdt.itp.upstreaming@intel.com>
+References: <20241220081505.1286093-1-tariqt@nvidia.com>
+ <20241220081505.1286093-5-tariqt@nvidia.com>
+ <ec95c546-114d-402f-b7b9-b3e54b33dbf0@intel.com>
+ <20241220064634.10b127f9@kernel.org>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20241220064634.10b127f9@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI1P293CA0011.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:2::20) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|MW4PR11MB8292:EE_
+X-MS-Office365-Filtering-Correlation-Id: f11d9cdd-7283-4655-8496-08dd2108836d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?c3lZSTd4Z2ExUVBOYXBPZ3p3amVHK0Z0Q0hjZ2pmbmdBdkkwam1MSk9qKy9F?=
+ =?utf-8?B?QlFmM21rc25Wd1c4dTRObkZKVlB2TitscjB4eHM1OGJVNjBhWmpvd2QrNGxi?=
+ =?utf-8?B?TEZZVEN1dDY5M1lrVStpdFV4N0xGdlVCcFpDNFB6VlhZRGI2U1lJd0doVDdo?=
+ =?utf-8?B?WG5BLzdFdUpqSkgvSEpqZ01rQllTZ3VIUXZkUDFKRHJaL091MklzU1ZiSHNK?=
+ =?utf-8?B?MDFTUUdXTmhROFQvWEd2N1h0M3hqRlpoTTJYRW81eXZHYlNISmhmMm5ERUJi?=
+ =?utf-8?B?eFVtMVJGNDZ2UXBlTU92ZGs5MlRtZTRBUkw1VE1zRVdad2ovVnFlK2JmY2Y4?=
+ =?utf-8?B?L09NNzQxQ3gyWVJRNGlBY3Nqc3MyNkN0cUcrY2ZLVzJIWGJiVk80SEhqeWVl?=
+ =?utf-8?B?QUN6RkxjcTRSM2gya0FJenkrTzVPTVhFVGh3MlRWcnNvaGFRcUVMNjR4aGg0?=
+ =?utf-8?B?V3FQbWN3aGNielpEK2lwb091OTE0emoyTXJlSGZONmhYR0Z1YXVjQzBicjNh?=
+ =?utf-8?B?SHo5OXh4MllBUE9YWWphdUZKSVRuRURaUW9STEFFeWk1UlI3L2N1c3dHbGdL?=
+ =?utf-8?B?a3RuSXJCQWNJakZnSWdqWG9hdXU3bEI2RnNHckdrbllab09VZXNxWVZQMkdn?=
+ =?utf-8?B?VVBCaEFQb29mM1ExdXFWRUd6eEpoaDlDWUd5Qm5FMTFYcUZlcitUR3l6TVpJ?=
+ =?utf-8?B?K2lKNDJsQWtOL1BQaGtUQ1RlVndlamF1NTFmZ2NPbTNHVUd3eXJKVFdqMklp?=
+ =?utf-8?B?anhRd1AwaXBwNjdvZ1h1ZWQ5ZHg1MXZjL2hTQkxoR1VEWEhyYS91ZnpveW9u?=
+ =?utf-8?B?NEQ4cTlxTjkzZUh4dzIzSHZMVzd5aWVlQUF5a1czYmxRTEs1eVdWNWtpU2VT?=
+ =?utf-8?B?Qkl3UWlmRmRuTDdGRWR0Q016bklKSGlaYUM2V2lTaHJWeWFMUUNsSkl4ZUlF?=
+ =?utf-8?B?RDBETHZJVHJyTTJoZSs5WVRMdGJPd2xsZWdsSEZXK0ZtaHpLbm0rSmpDdlZy?=
+ =?utf-8?B?Q0FkRjN0L284bjNmWjdoZDZwQzNWSUFSZTZ0cEZhaWJibk8xMm40RkRxd1ps?=
+ =?utf-8?B?Qm1vSUhiTkxJakJRZThRWkU2L1VVSFc2QnRHSjBrUFg1Yll5QTZSaURVNjlZ?=
+ =?utf-8?B?TnBSZGJVYXlQVHNza0hkOG41SDRUbnJvclNrL3cwMGtoOXpnRlBUUUZENEQw?=
+ =?utf-8?B?cUVCVk5OeFNmaUdsWklDQlFwYytsY1BEQUpNeTlUdlpTUjZ2ZVdMV1l4WTFJ?=
+ =?utf-8?B?S0VVdFFjU0g0eUhORDhlcmtNRjBZcGFzM0t1cUUwNThldVI0ZEM1Rlh2U0ND?=
+ =?utf-8?B?WFlxeGxlb0ttVHU5VzhLUnUzc2s2Y2c5dnVaeHpyNXNKZXJPTVY0ZTFhUTJF?=
+ =?utf-8?B?bGovYllWL05rUldkS0tKcitaTjB1ZCtXblB6ZzZZTTdXUW1IZ2o5ZjVFUWtY?=
+ =?utf-8?B?WlI5TDUveUY5OUZOK1JpSVhwVXN3Z1JFMS9NS1RZR1ZWR3huQktxeFA4cXFj?=
+ =?utf-8?B?Z3QxeHgwbWZwelUrUTNuOFB4K3NOaWNmYXNDbWtUcmdCMmQ5bXpaWE9RbjNP?=
+ =?utf-8?B?Skh0ZXdSWE9RV1J2YnJ0UXo0NlA0c1JqQmtQMEtpMXpTL3FrWHVzY3U1YjBH?=
+ =?utf-8?B?ZlM0aDFKYzl4UWVBYW82SVJISllpRnBXTnI3VktRdWFjdDJJcG5lYnZoWGJ2?=
+ =?utf-8?B?dmVxMXNCR3MvaklzSnlsRjlzVnZEN3hTNmg5MmEvUmlobW0zWUZOZzJ0N1NB?=
+ =?utf-8?B?T09paFY4RzNNT2hPRjFyUjFHRDFKWlBrVjFaMkVkQzNpbUVBTHRDY2pmdCtk?=
+ =?utf-8?B?bmczclJVYk4ySTZXRkZlWFRGZkE1ZEw2R29LNXNCdmQ5THRmWlZ1YTVIeE1k?=
+ =?utf-8?Q?LtPIurdqFtnO7?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VzhlZDg0TGd6c29xRWQycW83aFd1K1J3dk5NOXRzby9jYTM5TmpEZnl3Wmht?=
+ =?utf-8?B?NnNOTHVHY0l0M0dZcEF3MWVtNVJVSGFKeW15dkM0SzY4cHlMemE5WGk3NVAx?=
+ =?utf-8?B?bXAxRXVDZEltL3VpcmUvM2xhOUk5eExwbFVmQzBzNFNsT1FUYURXT3Z3Q1N1?=
+ =?utf-8?B?THd3MWtESDJwdnNmRW1QYUVTemF3TWJpayt2eFcwQTF6UWVxWXlYRk93Q3RE?=
+ =?utf-8?B?dTF4QXkyWVkwYi9lYW5BSVQ1R3NNNWVkS3N4L0pwQ2luQ1lKZXZyWDFVaWJa?=
+ =?utf-8?B?RmNkTzhsZDF4VGMveDBqbStsdml4aWtnNktNK0xJanBYM1RWekY2R09UN2k2?=
+ =?utf-8?B?SVZ2WTNZZTA3Z08rcU96Y0xod0gwUVZaSjRrN25tR1lBNGdROE1hejk5eStr?=
+ =?utf-8?B?Y21aMTMwdUtubEFsTzgvZXhWVTNjZDZEbFdVTDIrK0tQMU9pSWs2THF6dHRx?=
+ =?utf-8?B?bEVGREk5YkhocWM0MU9BT1RtazdWTmNKUDdIdnNaeGsycXBxeVc2NzVuVlVL?=
+ =?utf-8?B?V29WQjlUak9WSTRHck92ZGRkRE5ZZ00yRThqRXBnOG50WmdDN2dkRXk0dlNI?=
+ =?utf-8?B?dlg0NnJlZ0RJbFVIMGRQMHRDK0doQkxCeFMvaVhqVGpUYWRpZzliSFY3YVBJ?=
+ =?utf-8?B?Q0F4REVZTTFjcHB1MUNXa2xIUXBLL1JxcDlNTDZ5Snd5ZEhLd0RYYU5jQmx2?=
+ =?utf-8?B?SnNvWXNiQzhFRTlRSnFGT1luWjhSREYyTDVjMEVxVGdZM2hLT2hQT3hlWTha?=
+ =?utf-8?B?NkkzSkFtZHhzWGdteTYzeFNrUitxekNzT3ZtbnJtY3pHQmNBa2g5R3FTdzBv?=
+ =?utf-8?B?R2lmWkJLVFJOQVRuV0hJZ2lOU2RHb1NLSjRXVDZaaWpiSTBYZVpBTmQ2YXNM?=
+ =?utf-8?B?M3U3Yyt6Y2tXcFpNSVFJdDVGVXBFNWRUUzY1THFGRVJLekExM1ZSUy9IY2tO?=
+ =?utf-8?B?STIrRVM5dWkweC9uUHFPTzFhR1BqRHFrcmpSWVFBQWhjeTRwcW02bVJBQXBC?=
+ =?utf-8?B?cndFSVVnR1ZoSEd5VVNsUjU0WDhTbTBobjFjZ0NVNEJQR0pGU0RiWlVqOFB5?=
+ =?utf-8?B?L05xZjNFWUFCanh0MWFlSS85ampxc2VSdkI1cEk1WVByODhYOFo3VkZBMzVq?=
+ =?utf-8?B?eXRZU1daNDV1Y1NwOEVKbUZnck5JMjRSclV2NlZqeHM3L0NGdWV0VXkzb3E4?=
+ =?utf-8?B?M3lkN0tGYWdUV0tQc1RxVUdCTWtsL29ta1RKMzlJSW5HMkJURzFnQ2JXWk9o?=
+ =?utf-8?B?SS81SlRMOTJjcnA4Skk1RThTRyszcEZSRlZpbDA1TWJCSk11a2lEbE12WWVW?=
+ =?utf-8?B?SFk1TmtzY1MxRW8zOWdndHN4aFFhK0pvOGpkZHdNd2RFVTBicUZyRUdlYjNn?=
+ =?utf-8?B?SjZZTzh1TDRkM0ZUZUVwcmdGRmo1R1hncWRSNXlPSHFFNUszUVN5azJHYVly?=
+ =?utf-8?B?TUxEYWxGNG9ldkpkOEFSSUprZjJLRkt6QlRvYndrdjY2OHVwOVlPSmRvOUxB?=
+ =?utf-8?B?UXA1eUo4d0hHT096d1drL0h4MHJFeVZIQkhvS0I5VXZITGU2S1RmckxmaEk4?=
+ =?utf-8?B?K1NKRE9tWVgyUnVBaEVaZVdQMXE5anVCRDJ2MlZtS2VGdXM2dGVoYkxleGJw?=
+ =?utf-8?B?Q1BZaUpiRUFYSElnSHBqVWoxSVNuNVA0NzJib0tLU3JyeTNNUEN2Z2JrNllR?=
+ =?utf-8?B?bm9vU2toOEhUUm00Tm1Nc3JKYkxFcEs1enBSZUVycHBYRUJwTTM1SHZuSXNa?=
+ =?utf-8?B?cEhIdU9YaU1Ockx1b2drRjlBY1h5SzBNbWRWY0Mvb05haEJvYUIzVm05R1pz?=
+ =?utf-8?B?TW44eUFBcTZUNVZhVGpESWMxbjNOaVBnZlV4bC9iU2NxZzNFT0FtRWI4akZP?=
+ =?utf-8?B?c1BqekdMQk9Ka21ucU1tL29janYrdVB1UzBjVE5aY2VqbWVnZ0UxMnFvQ1ZZ?=
+ =?utf-8?B?ckkwNFZuQXRTYTdxdTdML2RMSWthYm40Mlg1aXlBaW1BakZ1UENFbTV5OHBy?=
+ =?utf-8?B?cWp1SUNtemV5REwraHRLNzVnYXZDdjF6a2JOZjhOSVBuV0NwbFFFODNXZ0VY?=
+ =?utf-8?B?QjZMT0phK0lkTVp1ME92UkxraVZQMUE5L3p4Skp5Z2NSeVRrbVZqc3dwOUNW?=
+ =?utf-8?B?RjJHOGQ0OXgxWjEyVnV3Tld5QkVlWklwaVBpcGl3eURZazRaNDVhbnBGcWRU?=
+ =?utf-8?Q?GbOkwxicyAr2+mG32uVtQgI=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f11d9cdd-7283-4655-8496-08dd2108836d
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2024 15:11:00.6035
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2jArSmskqru7wXieSXahzvlxi9OmNq4/0AU+PxGwxs3bnWXnZrV/rF08dD4LLxiyutFYbOx8t/cj0f8IXtSANpMTi4XbG9jBIcaTqshFyII=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB8292
+X-OriginatorOrg: intel.com
 
-On Fri, 20 Dec 2024 15:16:42 +0100
-Eric Dumazet <edumazet@google.com> wrote:
+On 12/20/24 15:46, Jakub Kicinski wrote:
+> On Fri, 20 Dec 2024 09:48:11 +0100 Przemek Kitszel wrote:
+>>>    	mlx5_core_uplink_netdev_set(mdev, NULL);
+>>>    	mlx5e_dcbnl_delete_app(priv);
+>>> -	unregister_netdev(priv->netdev);
+>>> -	_mlx5e_suspend(adev, false);
+>>> +	/* When unload driver, the netdev is in registered state
+>>
+>> /*
+>>    * Netdev dropped the special comment allowance rule,
+>>    * now you have to put one line almost blank at the front.
+>>    */
+> 
+> Incorrect, we still prefer the old comment style, we just give a pass
+> now to people who have a strong preference the opposite way.
 
-> On Wed, Dec 18, 2024 at 5:21=E2=80=AFPM Stefano Brivio <sbrivio@redhat.co=
-m> wrote:
-> >
-> > If a UDP socket changes its local address while it's receiving
-> > datagrams, as a result of connect(), there is a period during which
-> > a lookup operation might fail to find it, after the address is changed
-> > but before the secondary hash (port and address) and the four-tuple
-> > hash (local and remote ports and addresses) are updated.
-> >
-> > Secondary hash chains were introduced by commit 30fff9231fad ("udp:
-> > bind() optimisation") and, as a result, a rehash operation became
-> > needed to make a bound socket reachable again after a connect().
-> >
-> > This operation was introduced by commit 719f835853a9 ("udp: add
-> > rehash on connect()") which isn't however a complete fix: the
-> > socket will be found once the rehashing completes, but not while
-> > it's pending.
-> >
-> > This is noticeable with a socat(1) server in UDP4-LISTEN mode, and a
-> > client sending datagrams to it. After the server receives the first
-> > datagram (cf. _xioopen_ipdgram_listen()), it issues a connect() to
-> > the address of the sender, in order to set up a directed flow.
-> >
-> > Now, if the client, running on a different CPU thread, happens to
-> > send a (subsequent) datagram while the server's socket changes its
-> > address, but is not rehashed yet, this will result in a failed
-> > lookup and a port unreachable error delivered to the client, as
-> > apparent from the following reproducer:
-> >
-> >   LEN=3D$(($(cat /proc/sys/net/core/wmem_default) / 4))
-> >   dd if=3D/dev/urandom bs=3D1 count=3D${LEN} of=3Dtmp.in
-> >
-> >   while :; do
-> >         taskset -c 1 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,creat=
-e,trunc &
-> >         sleep 0.1 || sleep 1
-> >         taskset -c 2 socat OPEN:tmp.in UDP4:localhost:1337,shut-null
-> >         wait
-> >   done
-> >
-> > where the client will eventually get ECONNREFUSED on a write()
-> > (typically the second or third one of a given iteration):
-> >
-> >   2024/11/13 21:28:23 socat[46901] E write(6, 0x556db2e3c000, 8192): Co=
-nnection refused
-> >
-> > This issue was first observed as a seldom failure in Podman's tests
-> > checking UDP functionality while using pasta(1) to connect the
-> > container's network namespace, which leads us to a reproducer with
-> > the lookup error resulting in an ICMP packet on a tap device:
-> >
-> >   LOCAL_ADDR=3D"$(ip -j -4 addr show|jq -rM '.[] | .addr_info[0] | sele=
-ct(.scope =3D=3D "global").local')"
-> >
-> >   while :; do
-> >         ./pasta --config-net -p pasta.pcap -u 1337 socat UDP4-LISTEN:13=
-37,null-eof OPEN:tmp.out,create,trunc &
-> >         sleep 0.2 || sleep 1
-> >         socat OPEN:tmp.in UDP4:${LOCAL_ADDR}:1337,shut-null
-> >         wait
-> >         cmp tmp.in tmp.out
-> >   done
-> >
-> > Once this fails:
-> >
-> >   tmp.in tmp.out differ: char 8193, line 29
-> >
-> > we can finally have a look at what's going on:
-> >
-> >   $ tshark -r pasta.pcap
-> >       1   0.000000           :: ? ff02::16     ICMPv6 110 Multicast Lis=
-tener Report Message v2
-> >       2   0.168690 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Le=
-n=3D8192
-> >       3   0.168767 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Le=
-n=3D8192
-> >       4   0.168806 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Le=
-n=3D8192
-> >       5   0.168827 c6:47:05:8d:dc:04 ? Broadcast    ARP 42 Who has 88.1=
-98.0.161? Tell 88.198.0.164
-> >       6   0.168851 9a:55:9a:55:9a:55 ? c6:47:05:8d:dc:04 ARP 42 88.198.=
-0.161 is at 9a:55:9a:55:9a:55
-> >       7   0.168875 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Le=
-n=3D8192
-> >       8   0.168896 88.198.0.164 ? 88.198.0.161 ICMP 590 Destination unr=
-eachable (Port unreachable)
-> >       9   0.168926 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Le=
-n=3D8192
-> >      10   0.168959 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Le=
-n=3D8192
-> >      11   0.168989 88.198.0.161 ? 88.198.0.164 UDP 4138 60260 ? 1337 Le=
-n=3D4096
-> >      12   0.169010 88.198.0.161 ? 88.198.0.164 UDP 42 60260 ? 1337 Len=
-=3D0
-> >
-> > On the third datagram received, the network namespace of the container
-> > initiates an ARP lookup to deliver the ICMP message.
-> >
-> > In another variant of this reproducer, starting the client with:
-> >
-> >   strace -f pasta --config-net -u 1337 socat UDP4-LISTEN:1337,null-eof =
-OPEN:tmp.out,create,trunc 2>strace.log &
-> >
-> > and connecting to the socat server using a loopback address:
-> >
-> >   socat OPEN:tmp.in UDP4:localhost:1337,shut-null
-> >
-> > we can more clearly observe a sendmmsg() call failing after the
-> > first datagram is delivered:
-> >
-> >   [pid 278012] connect(173, 0x7fff96c95fc0, 16) =3D 0
-> >   [...]
-> >   [pid 278012] recvmmsg(173, 0x7fff96c96020, 1024, MSG_DONTWAIT, NULL) =
-=3D -1 EAGAIN (Resource temporarily unavailable)
-> >   [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) =3D 1
-> >   [...]
-> >   [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) =3D -1 EC=
-ONNREFUSED (Connection refused)
-> >
-> > and, somewhat confusingly, after a connect() on the same socket
-> > succeeded.
-> >
-> > Until commit 4cdeeee9252a ("net: udp: prefer listeners bound to an
-> > address"), the race between receive address change and lookup didn't
-> > actually cause visible issues, because, once the lookup based on the
-> > secondary hash chain failed, we would still attempt a lookup based on
-> > the primary hash (destination port only), and find the socket with the
-> > outdated secondary hash.
-> >
-> > That change, however, dropped port-only lookups altogether, as side
-> > effect, making the race visible.
-> >
-> > To fix this, while avoiding the need to make address changes and
-> > rehash atomic against lookups, reintroduce primary hash lookups as
-> > fallback, if lookups based on four-tuple and secondary hashes fail.
-> >
-> > To this end, introduce a simplified lookup implementation, which
-> > doesn't take care of SO_REUSEPORT groups: if we have one, there are
-> > multiple sockets that would match the four-tuple or secondary hash,
-> > meaning that we can't run into this race at all.
-> >
-> > v2:
-> >   - instead of synchronising lookup operations against address change
-> >     plus rehash, reintroduce a simplified version of the original
-> >     primary hash lookup as fallback
-> >
-> > v1:
-> >   - fix build with CONFIG_IPV6=3Dn: add ifdef around sk_v6_rcv_saddr
-> >     usage (Kuniyuki Iwashima)
-> >   - directly use sk_rcv_saddr for IPv4 receive addresses instead of
-> >     fetching inet_rcv_saddr (Kuniyuki Iwashima)
-> >   - move inet_update_saddr() to inet_hashtables.h and use that
-> >     to set IPv4/IPv6 addresses as suitable (Kuniyuki Iwashima)
-> >   - rebase onto net-next, update commit message accordingly
-> >
-> > Reported-by: Ed Santiago <santiago@redhat.com>
-> > Link: https://github.com/containers/podman/issues/24147
-> > Analysed-by: David Gibson <david@gibson.dropbear.id.au>
-> > Fixes: 30fff9231fad ("udp: bind() optimisation")
-> > Signed-off-by: Stefano Brivio <sbrivio@redhat.com>
-> > --- =20
->=20
-> I think this should work. Another solution would have been to add a
-> sequence to each UDP socket.
->=20
-> Fixes: tag probably could refer to 4cdeeee9252a ("net: udp: prefer
-> listeners bound to an address"), because your patch
-> is partially kind-of reverting it.
+good to know, I will pass it down to my folks
 
-I was actually a bit undecided because, conceptually, the race condition
-itself was added by 30fff9231fad. On the other hand, it can't really be
-called a race without 4cdeeee9252a, because by itself it was a mere
-optimisation not affecting the result of the lookup.
+> 
+>>> +	 * if it's from legacy mode. If from switchdev mode, it
+>>> +	 * is already unregistered before changing to NIC profile.
+>>> +	 */
+>>> +	if (priv->netdev->reg_state == NETREG_REGISTERED) {
+>>> +		unregister_netdev(priv->netdev);
+>>> +		_mlx5e_suspend(adev, false);
+>>> +	} else {
+>>> +		struct mlx5_core_dev *pos;
+>>> +		int i;
+>>> +
+>>> +		if (test_bit(MLX5E_STATE_DESTROYING, &priv->state))
+>>
+>> you have more than one statement/expression inside the if,
+>> so you must wrap with braces
+> 
+> I'm not aware of that as a hard rule either.
 
-And on a second thought, perhaps more relevant for backports, there's
-no issue without 4cdeeee9252a. So yeah, I guess you're right, the tag
-should be amended to:
+[1] says
+"Also, use braces when a loop contains more than a single simple statement:"
 
-Fixes: 4cdeeee9252a ("net: udp: prefer listeners bound to an address")
+And I see that here we have and if() instead of a loop, but I believe
+that the intent of "the rule" (not sure how hard) was to pet the brace
+in such cases.
+To be clear, I don't want to stop an otherwise good PR just for this!
 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
->=20
-> I will post additional patches for net-next to better take care of
-> data-races in compute_score()
-
-Ah, right, thanks, those are potentially nasty as well.
-
---=20
-Stefano
+[1] 
+https://www.kernel.org/doc/html/latest/process/coding-style.html#placing-braces-and-spaces
 
 
