@@ -1,230 +1,157 @@
-Return-Path: <netdev+bounces-153529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BB589F889E
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 00:41:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E0C19F88CC
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 01:04:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EBCB166F45
-	for <lists+netdev@lfdr.de>; Thu, 19 Dec 2024 23:41:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D544616F6B2
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 00:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B04C1D9A40;
-	Thu, 19 Dec 2024 23:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB39ECC;
+	Fri, 20 Dec 2024 00:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FfGQfcXh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HnjoD8rp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A989F1D63D1
-	for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 23:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337F44430;
+	Fri, 20 Dec 2024 00:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734651692; cv=none; b=IPDphE4ZpBV+Bo3XnH8LyMMjGJxFo+QrUEyegTyoOL1jS0HZ/ZjIsBSSZTEhnPhGQEHjLEbou5euUJtk7pjEVEahiZFsKMNWOLLlS4KvWvMoGbBZli19MkuLaA1rfQGXzA9Ge0oLJuItZRVtMfCvEtkpawfWJ7xmfPzuJRkkNRM=
+	t=1734653088; cv=none; b=RtW1IGmczE4IZv7784sGC7mcC+r+DQRFVx9F6G9cRp9SXoyKbSQV7HEkpxg/Rn+F1jSXAHKomvfgjoD5aBDt/fMwS/Z3Eye/Hu0aZhpGBa2U/ZVFQFNn7utc12FzvxLseCPAEGRk8LY9UTGl6uhQXYTCtUkQpea9DZQM0wo6/cM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734651692; c=relaxed/simple;
-	bh=Bg8vW6U/vV4Gyt3E66H7NX1sAvZIJogM+C09U4365yg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CYMvgRcm+6Yf7IAmtq/Q3y1R+W55CwiupE9unQzJXNmlXO2QLJEKO/g32U1aCN315BpKz7RK/PgEpSlXmbVHcI03yeQz556e8MgfnTeiOhFDHWvOXzITt+71Hiq141JR2jtJeGkCEF5Dl9gxI9coc10Qk8Ujiue9gyZx+Va8B9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FfGQfcXh; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d3e9f60bf4so2049805a12.3
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 15:41:30 -0800 (PST)
+	s=arc-20240116; t=1734653088; c=relaxed/simple;
+	bh=ANrtncHo1LQh/35fTDtHJD5Xd2dfDSJs3cHDwSzS9zk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=L8ic8ByqMJHUdRlpWA5Q+AbiPb1WZvKkBS3Rg1ZYI1jK9tCjfmPbDkbpW7vL18ZR6/F3lCmmnLdm89v6zw3sf8PEzUuWSqUYFOgT97DEIor2HgoGK7NUqBtMPjutMkJPusalQYcmu8O7J5R9nAhTt98pn31DHB0DK6mMm1GFXKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HnjoD8rp; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21634338cfdso18043815ad.2;
+        Thu, 19 Dec 2024 16:04:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1734651689; x=1735256489; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=JdYK/sdQtinzUtrxF+aBWF+qOp1fPp4kKNkAtmAPfA8=;
-        b=FfGQfcXhLFrOQZTPsZ6vVOR6NR/dZGWb9204c+agj6qZC2yg/sdivHzUl6sBX19DWb
-         w8a+swV1Or8YMCtLDFKubosdUKnh3Ugbu2c4xoMWl2PRlbxqapFrwe++6E1squBkK7CS
-         idbS531x449QV/riGLfEcUA64BBnAijRQ5JEY=
+        d=gmail.com; s=20230601; t=1734653086; x=1735257886; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8CepycYxL28B04HmL1mPwK+B9B80yTS6FANimaMQbIc=;
+        b=HnjoD8rp55TYjCa0mEZKY2biSVSe9HdRgerM2927NYY3VF3Ml3QVe0pQ1MQIckFME4
+         nCCju0eESaE60atM38eF6zF5KHdd257s3F3jWp7KVavFKORrb4ppP1q3VGRg5OanzSjh
+         tjZKoj8Aod4gJnezCilE3hbEvWcTuvErd+ZU9UkUKfC4fwvekeAeTe34nL0B5QnMJ4BW
+         gxhpoGHhNU7ykZvjCJKhss5/nUsoThl7+SMfLAcZ9vpSlqUxpxnaUxlOWDZFZSbVAsh4
+         skE69uh5qiPWJYVf+aY40sWsFhl/QvIhjdwhhg/WBLpnAtengb6V4tGd2Xqe6tKaR4Lb
+         Ox+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734651689; x=1735256489;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JdYK/sdQtinzUtrxF+aBWF+qOp1fPp4kKNkAtmAPfA8=;
-        b=AmoQ4ScnaYNJz34QcspmqSaWg4ZTZz+I4No82wvnMyyUHcvp6e1cLSDU0awsH/vTYN
-         WHbUg88Vmy8ApRg0MmdLYntUvUrquV2WwLxigemyQA4xijZyzTfoWyTTOnjDiAwOrEDb
-         j/R4kOwxbhy0lX9/rgI3LAmQjzeq1W4dgCVHIv9jfrsH0IkF74bLns/W51R3ERFEzemx
-         i3+deH5xzwO6PCpXP/BVtCyubgY0e+rStbEugL6SOFlc/QhskQV8Wcq2GapUB4AEG8VS
-         3IWYcwhbtpT6xlt0aRrrqt35lhV5KMimmcfyHXP2iuCknbTK0a+YrDnyYnY/MhwrxbYA
-         H+vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2Ci61yLitdy2Hc6lca+1QAp479MHO2RR2/l4AQvqItUjDA9sP5VCxXn6KqJQ0UPABAO0Jj0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfSFWme5/e6i4WZzNuuw4wKG8+ZXV/rPYRPg9MjP/lS1MV2q+S
-	vy7Yc0RoQ0o8vD26CeiWXQ0ivvrJx2QWQyF8xuDkbadLfgPZKOPzp1gBWqmOIx2zsrqXqpUXIDH
-	EJMFRrZZaMu+k9znZxI5csVEd0IpFf+eOJPS3
-X-Gm-Gg: ASbGncvnlFHX7AlFj3a74QE5dpyqkpjcDKUipU7tpYT81H5c6NYD9E+u32t4n2+KY67
-	96HkRIuVGp+L+tTsah8+IhDIP1rXZwAcspQWqN+c=
-X-Google-Smtp-Source: AGHT+IGaoQrUWyLJNQiMpuxwtC3GnHPLv3rva1m1n9dwrEkiMlRXzNwgtDyo9UeFbJwH3y+KpEXG3bUTSVRTZaM0j4A=
-X-Received: by 2002:a05:6402:2813:b0:5d3:d7ae:a893 with SMTP id
- 4fb4d7f45d1cf-5d81de23133mr481446a12.25.1734651688990; Thu, 19 Dec 2024
- 15:41:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734653086; x=1735257886;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8CepycYxL28B04HmL1mPwK+B9B80yTS6FANimaMQbIc=;
+        b=D/HC/1wVVaJuHU3ASgcaWg2pSYSV4gehCil0mAEdoe5W4lUWIOEgbZO4TmeiHCf5AC
+         IZLz0yEoZvECIam+HIxDMFpoj/Lo5RrwwcQ/xNWb9huDTBJqmVw+lMKYChb0Epsyx4lq
+         ekgHrGLNKnRQrkpyUlcsWIAgMdik9WjWpn7nj2Q6ar9U2NnES7wxGGw5ZEnOR02s/iWG
+         vpvoe7yRrMOyIHIUImeQ++daHtc3UH7dd3+XgqcQv0ju+uDpJhf6rCWh4av/wbLF3ef3
+         ACtm/QhkONp7QKGMy0H0Bd1f+0meMCWoOEWjHKdCaSHQJZOYE+NvIeDG7qTGOHFMr36s
+         MjfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2r5OkCYCsQy3khh10f+0y+mjikTf1FhbE2LL6Kr9F32+j3ZpVixqecRu0cxAByLQyFZaj6xiVJ3PmUHhD/X4k@vger.kernel.org, AJvYcCX5z6kTJ0/2LQUm177EptR0bxh+o1NXG2cbw82X6cDMjUwjsSuJeGDS5Pnw7RtaqfowLiI=@vger.kernel.org, AJvYcCXwObR6M589va5Rb4Rvg1zyki0crzqvGUg1BpWGpRBOiWuY4fRdGTeGSWExvxW0LPZTFW6yTqx0TDddTYW+@vger.kernel.org, AJvYcCXwX6DlDF84JU+b4J8S8CwaO912d1uH7pfdZrEHmO7ATVrsfwzJNkJzQEXJMzWu68S2W9DBo/T2@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzi2oN099MdS0nBfmpTchqflYkck+9H3SvoLNXovS6U0CVPuvWC
+	hNbv0phEE+1omIla8XoX25roIMB+mdmOsxMqBmsHvXpt8qDNjUvH2Y0hUiIX0wo=
+X-Gm-Gg: ASbGncuHYJBEbFLcwGSVDxsLtLv6EeIjjLFvEt/fudWm8+QZbJ6grwRuCmOM9NbAVwM
+	NJN7LGqB+QhiLh1KNopqgzxtWaTSwbM5jVaZQyW5FZ5yNIOgG20jH3wkSO1U/s9w6sD9zV20yfc
+	5vJZeeekpNH/LIO/7iXFcfCVwJV+FSJ1WN5QX7fvMbEMZRJv6GOsZ/uMWPL7nCSSev9faBwRNnP
+	mCSfJamWaRoBiiwsi3VzHa33y8J51QHrfQ15Ti8jbG5exG/X1UXbc/pdykA554qEJsie39ZxVrr
+	73zqHuE=
+X-Google-Smtp-Source: AGHT+IEa91rQ3bLAoWCP7bDL2vYjgeFKcb/ugKDPqLNMvg/RpNsaGfVLVTL4JGYYfofP+JedO+A/sA==
+X-Received: by 2002:a17:903:181:b0:216:66d2:f172 with SMTP id d9443c01a7336-219e6f4a86bmr7525045ad.56.1734653086431;
+        Thu, 19 Dec 2024 16:04:46 -0800 (PST)
+Received: from ?IPv6:2620:10d:c096:14a:6d82:facf:302d:61b7? ([2620:10d:c090:600::1:12c7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc962db4sm18109885ad.7.2024.12.19.16.04.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 16:04:45 -0800 (PST)
+Message-ID: <a2999d8b4827516fe4bfd17646d2284580712d08.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v5 4/5] bpf: verifier: Support eliding map
+ lookup nullness
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Daniel Xu <dxu@dxuuu.xyz>, Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, shuah@kernel.org,
+ daniel@iogearbox.net,  john.fastabend@gmail.com, martin.lau@linux.dev,
+ song@kernel.org,  yonghong.song@linux.dev, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com,  jolsa@kernel.org, mykolal@fb.com,
+ bpf@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org,  netdev@vger.kernel.org
+Date: Thu, 19 Dec 2024 16:04:43 -0800
+In-Reply-To: <kghvgxu5wdkupssnq7dy5upuf2wscsxgsnwl2yoam4mwk3h5pn@wjjsliwg6fzl>
+References: <cover.1734045451.git.dxu@dxuuu.xyz>
+	 <92065ca054beccd6d0f35efe9715ef965e8d379f.1734045451.git.dxu@dxuuu.xyz>
+	 <CAEf4BzaqCgW9keiT+tJUBQWT6Q+jMwuvn4O2ZghO0c+ZvACNrw@mail.gmail.com>
+	 <zow3q3nhlz6vedbni3upag5yr7zzrhyiqysl5nwyubebmbwojk@th7kbm62x36g>
+	 <31b0c85dbf85486df116ade20caf8685843899b4.camel@gmail.com>
+	 <CAEf4BzaEOBtrSWZTx40AdT=SQY6Qaia405KWgU-NowaqNdmpkA@mail.gmail.com>
+	 <kghvgxu5wdkupssnq7dy5upuf2wscsxgsnwl2yoam4mwk3h5pn@wjjsliwg6fzl>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218144530.2963326-1-ap420073@gmail.com> <20241218144530.2963326-4-ap420073@gmail.com>
- <20241218182547.177d83f8@kernel.org> <CAMArcTXAm9_zMN0g_2pECbz3855xN48wvkwrO0gnPovy92nt8g@mail.gmail.com>
- <20241219062942.0d84d992@kernel.org> <CAMArcTUToUPUceEFd0Xh_JL8kVZOX=rTarpy1iOAD5KvRWP5Fg@mail.gmail.com>
- <20241219072519.4f35de6e@kernel.org> <Z2R1GFOg1hapdfl-@JRM7P7Q02P.dhcp.broadcom.net>
- <20241219121841.3ed4de71@kernel.org>
-In-Reply-To: <20241219121841.3ed4de71@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 19 Dec 2024 15:41:17 -0800
-Message-ID: <CACKFLikUM=Vt1EeYEs_-amCmahak3nQPSbwz_v4T1pB=UShQ3w@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 3/9] bnxt_en: add support for tcp-data-split
- ethtool command
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Taehee Yoo <ap420073@gmail.com>, 
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
-	andrew+netdev@lunn.ch, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com, 
-	dw@davidwei.uk, sdf@fomichev.me, asml.silence@gmail.com, 
-	brett.creeley@amd.com, linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
-	kory.maincent@bootlin.com, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us, 
-	bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com, 
-	aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com, 
-	daniel.zahka@gmail.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000c137dd0629a811a5"
 
---000000000000c137dd0629a811a5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Thu, 2024-12-19 at 14:41 -0700, Daniel Xu wrote:
 
-On Thu, Dec 19, 2024 at 12:18=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Thu, 19 Dec 2024 14:33:44 -0500 Andy Gospodarek wrote:
-> > > I see it now in bnxt_set_rx_skb_mode. I guess with high MTU
-> > > the device splits in some "dumb" way, at a fixed offset..
-> > > You're right, we have to keep the check in the driver,
-> > > at least for now.
-> >
-> > The mutlti-buffer implementation followed what was done at the time in
-> > other drivers.  Is the 'dumb way' you mention this check?
-> >
-> >  4717                 if (dev->mtu > BNXT_MAX_PAGE_MODE_MTU) {
-> >  4718                         bp->flags |=3D BNXT_FLAG_JUMBO;
-> >  4719                         bp->rx_skb_func =3D bnxt_rx_multi_page_sk=
-b;
-> >  4720                 } else {
-> >  4721                         bp->flags |=3D BNXT_FLAG_NO_AGG_RINGS;
-> >  4722                         bp->rx_skb_func =3D bnxt_rx_page_skb;
-> >  4723                 }
->
-> Yes, that and my interpretation of the previous discussion let me to
-> believe that the BNXT_FLAG_JUMBO does not enable header-data split.
-> And speculating further I thought that perhaps the buffer split with
-> jumbo > 4k is to fill first buffer completely, header+however much
-> data fits.
->
-> I could have misread the previous conversation (perhaps Michael meant
-> XDP SB / PAGE_MODE when he was referring to XDP limitations?)
+[...]
 
-To clarify, my review comment applied to XDP SB and MB modes.  Andy's
-MB implementation from 2022 disables HWGRO/LRO and HDS in XDP MB mode.
-My comment was to preserve this implementation.
+> > > I think that if test operates on a key like:
+> > >=20
+> > >       valid key 15
+> > >              v
+> > >       0000000f   <-- written to stack as a single u64 value
+> > >       ^^^^^^^
+> > >     stack zero marks
+> > >=20
+> > > and is executed (e.g. using __retval annotation),
+> > > then CI passing for s390 should be enough.
+> >=20
+> > +1, something like that where for big-endian it will be all zero while
+> > for little endian it would be 0xf (and then make sure that the test
+> > should *fail* by making sure that 0xf is not a valid index, so NULL
+> > check is necessary)
+>=20
+> How would it work for LE to be 0xF but BE to be 0x0?
+>=20
+> The prog passes a pointer to the beginning of the u32 to
+> bpf_map_lookup_elem(). The kernel does a 4 byte read starting from that
+> address. On both BE and LE all 4 bytes will be interpreted. So set bits
+> cannot just go away.
+>=20
+> Am I missing something?
 
->
-> Or maybe the HDS does happen with XDP MB but there is another
-> limitation in the code?
+Ok, thinking a bit more, the best test I can come up with is:
 
-HW doesn't know whether we're in XDP mode or not and can definitely do
-HDS.  But again, HDS is disabled currently in any XDP mode.  Andy will
-respond to discuss this further.  Long term, we may be able to enable
-HDS in XDP MB mode, but for now I think we should disable it just to
-keep it unchanged.
+  u8 vals[8];
+  vals[0] =3D 0;
+  ...
+  vals[6] =3D 0;
+  vals[7] =3D 0xf;
+  p =3D bpf_map_lookup_elem(... vals ...);
+  *p =3D 42;
 
---000000000000c137dd0629a811a5
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+For LE vals as u32 should be 0x0f;
+For BE vals as u32 should be 0xf000_0000.
+Hence, it is not safe to remove null check for this program.
+What would verifier think about the value of such key?
+As far as I understand, there would be stack zero for for vals[0-6]
+and u8 stack spill for vals[7].
+You were going to add a check for the spill size, which should help here.
+So, a negative test like above that checks that verifier complains
+that 'p' should be checked for nullness first?
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIENY2hBlLtK9c7SJzNPLcBd1xBzVrsAY
-D+FFizHYkwvSMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIx
-OTIzNDEyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQA78GqX+KuvmSmchpZoDKKp5FPn+Wk82POvZypk0uP+OIcET8D1
-1vyXc82IXsBWLJnd4YXdQLiUvGl8DvPQViD9eFHV5Y0f3zJc/tDUrF23AFNgl/RmPn8o6tHLTRt7
-Jv196kMCvBS7oi7zEtJmuHMPq8Z9x4g4Sr1r8Z1j9Lvmh2qInOOWTcm1v8WU5NmnLPkQJrPzddE/
-mkEjfPOZQWEGKp7QINd1eKLuPJ6HQf969+ux4chshtfbNag+eIskRo05jAKiv2B0PnZ/JUKEtPBd
-YjpGURWTy51SHzMy1dcBLCk8GbNuKQzAVLuXai4Ich+tUBUyIdE00oStCl9lDPUR
---000000000000c137dd0629a811a5--
+If anyone has better test in mind, please speak-up.
+
+[...]
 
