@@ -1,112 +1,141 @@
-Return-Path: <netdev+bounces-153755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68FBB9F996C
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:26:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2FB19F991C
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:09:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA61419807DD
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:08:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E2A37A429E
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E59121E092;
-	Fri, 20 Dec 2024 17:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41475220694;
+	Fri, 20 Dec 2024 18:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4rpZaog"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="aQ7aFsuu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A89E10F1;
-	Fri, 20 Dec 2024 17:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965F8219A6E
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 18:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734717312; cv=none; b=hl64OovyaRLSJfdmC0zPTau1tMqFn/ucQ72b6SLvJOkHMgP3M/ePrmgES597/DEfNDNI5N5mdYq+Y53vX9GzGShaejiswCToKb8v/CteEO+sbtM3PxoCf4MQVnnXvX4sN+uahyJ/qxvzsqBqhCyWLqHtzyqsnY4VhU6d8q8Umcw=
+	t=1734717638; cv=none; b=Fa1wCPTBMOvLgrsURhPOtfR/n+9epsQIzCcQH1tlG+Gb5J01SKcFE2WsjXp/iKBGgMnDfEsa7XcGmlpVImouTz5W0mZS2sYK/bV+JVlmeY1czpcOrrherdx1Vb/O/64b2xNtL0ELdSQuJZlHOS29/Zsedpkn7bBbPJMVZydruFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734717312; c=relaxed/simple;
-	bh=35l9rRgs1DErNRza6ycXPtAZ3df3oaMWWFFVeuvsD+4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=K/VW5buhsExwP97RbiJTL9p8yynzhSQ/+Z3xEf7Y7TNwA6c4y4ZPNYdu74DdsGenrSm5Ra3D9b921RmpfILrl7CVqyBqL/nLwX53VU1Jy4WxHnnr4/xgkZ9C7MPzd+cDxtbEUevOo0rrOtRMT+C+q7DoN4lA6yGNNl3A01nes84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l4rpZaog; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ee46851b5eso1676564a91.1;
-        Fri, 20 Dec 2024 09:55:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734717310; x=1735322110; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6fuBMAZLNGvTIeHMQCC4Mxsre2LvLoRdbv1sMvSw46A=;
-        b=l4rpZaog66ox44DmfX1P9m5Pb75GCEzf3v//P1+IzGUBz1fpXkNEIxZPLW2L2SJZCx
-         PqANsXRgCzia/uhyend9SbNfYu+LyXl9btZ3eXPwZmuvme4xxX5sdNkB0xd1AqTg4bpJ
-         mLO8aew+YwTTnBSrCzeN183CVv3CFMx4iRO2bhXDro2HKU9A5DNVH/9QSDf/j/jol2QW
-         AhWKo33upLHtIylT/Wh4AmfDWKfdLGzGXhcN7BIwrmaA5S2rnxak3sb4OiuaN7HbXUoj
-         QOnZFrMdepc58qXdOIF0SI5cjB4/TOzzAszhhigXyMOZkusOQMfilOKZ5js7uAh1rGcP
-         g/Dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734717310; x=1735322110;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6fuBMAZLNGvTIeHMQCC4Mxsre2LvLoRdbv1sMvSw46A=;
-        b=kkRizLoB1rdXuVfhGhYdCFxhWrPLNPyPeO9xEq9/7fC0ZejVdAqE398j3hqrioNU9G
-         jJHhR5HQL2OPHRyZmfYfigu85m4LUxWdoPkU6Vt102RN50gJ08rPW762EEmHi2ELH97J
-         NKhu9991xRU7oWLcb3IJvwaKIWBk/43C2fD31C+jPK9fnSDVUy1uRYHBlm5LpzxmWfgf
-         fFKQCyHlPAJuohvNZuD6W7ITx1VW8bMcpiiRM2BU2GM3VaFyaTtA8KzB53EcYDTHVlx4
-         6yc97Jx9Y1Bgp5KET3Py8AzZIAksC1Cb5lbbcxopuehMHb840D4itGqvWYpfiY6nQz2c
-         s4jg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3DfkmSAHlgwMmOqLzM7WqNUnlmFPd7ZcR690YeiGQgr8dArXLC30HR23Qu4FPN0hUQPFZjMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaW+dxyNrs6PMiS5q33gQay0ePjJ1KAQNYmd66zAiiok76pF1c
-	shMzG0rVDVrnBH54OOAnjaXmSjytHXMSemQu1k3RWG2o/igeCe57
-X-Gm-Gg: ASbGncsH2p3KLpMy4/aHC0L0Vd3FtBHvkFN/vZiXzIKVGwRsLm3B4PEJ8h0Y/9BIo9v
-	Kgj7Trcc7FPiJgt3HCYDCfw1zKX2IXDDngREV7l+MtMH7r6HjCXkdMAbm1qgp7/D6ZJpV5Bfyba
-	5b6yF1jB0gfFfoK08rirdD21L3ERV/GNi5AQFxozZw1OdMkvDBGJ5gKOeh4VDvw+dHp01epaQBZ
-	6rbRxLhR9FDiq+nu+NVNl/0UHiWsrNP6hjTk28Qd9J4Hll/3fMen84=
-X-Google-Smtp-Source: AGHT+IEaCuEZ7WGpxt8CsRJXqIlOzmVgbCWImIT9I7K2e4l5EkqsSP2UDJoSh7SprKto865h5fOrJg==
-X-Received: by 2002:a17:90b:534f:b0:2ee:e961:3052 with SMTP id 98e67ed59e1d1-2f452e2fe57mr5936193a91.14.1734717310480;
-        Fri, 20 Dec 2024 09:55:10 -0800 (PST)
-Received: from localhost ([98.97.44.4])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2ee06de88sm6041522a91.39.2024.12.20.09.55.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2024 09:55:09 -0800 (PST)
-Date: Fri, 20 Dec 2024 09:55:09 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>, 
- netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, 
- Cong Wang <cong.wang@bytedance.com>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Zijian Zhang <zijianzhang@bytedance.com>
-Message-ID: <6765af7db9a7_21de2208b2@john.notmuch>
-In-Reply-To: <20241213034057.246437-5-xiyou.wangcong@gmail.com>
-References: <20241213034057.246437-1-xiyou.wangcong@gmail.com>
- <20241213034057.246437-5-xiyou.wangcong@gmail.com>
-Subject: RE: [Patch bpf v3 4/4] selftests/bpf: Test bpf_skb_change_tail() in
- TC ingress
+	s=arc-20240116; t=1734717638; c=relaxed/simple;
+	bh=A6LCKva4VTRvxuTUWokFc6SK9dEtgQHGD34yJmgs5Uo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VzGZNCfpQ2WbNMqH5Dquh+09Hd0+4r3cN7bpdhYTZoOB4TXOeS34ooFOn0RL1KfK4UpM8S8Ix/EuzzKwM9LyeJSTZkKLkz9rwHPo3UjcdoCO2wjBkIitClsHJVMFJ1rWV8lXqAKNqviMQ4gzCizngTN8P9W3UO9otTcVvgOdkEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=aQ7aFsuu; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=CpmmNqkNZCL1dWRONRNCTvQI6DJYb79eUI9KQGez/Yo=; t=1734717636; x=1735581636; 
+	b=aQ7aFsuu3LJ4+klFkmBvfdJYlAbayDhF/WWSUywBLzz310x7MiIZHddcCtXGPJzQBBCQ2PGGrCl
+	CvAYFoeWwcL/xiP7+/7v1lfjoNdnQsDmqT7Z/XZH/SrXFl8WFSu9UFIBiDCNv6izIKSYXK9huM1ti
+	iSYXoYReDGF6ONy1xz9tdeeMBOlRAYn45eqVQLXU7wMnqcl+UEWUsyN5rb2nVuR2/nn72MIyQoJYK
+	0CfAM6mc1ivV7cl+1t62tc2ckGIyOxFD0SC+/Ad7CqMFy3SAtYZFqHaoXNJdnsvl3I+rXe5XBOdXr
+	fSzU7B8I9vs3lb/M45bxljGQQzqjJoBDAIzQ==;
+Received: from mail-oa1-f52.google.com ([209.85.160.52]:59800)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tOhIb-0004g1-Bx
+	for netdev@vger.kernel.org; Fri, 20 Dec 2024 10:00:30 -0800
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-29e5c0c46c3so1157875fac.3
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 10:00:29 -0800 (PST)
+X-Gm-Message-State: AOJu0YzulwyB5yULT0KdeGIo3NcZpzYlR21aJgg0PJ94NfVyVqff3syc
+	q9BR9leEnZZwHEZv4rQvTsDpDy2TKyvTtmM2Blj39PrrH6nbcBahYtPFIgYRUmfRt+IFPj5URM3
+	3H1cWX6wgBAhpK5hwxBPUdmoTlqI=
+X-Google-Smtp-Source: AGHT+IFUTbzqSTHTGCvaPkcSl1xyHGUfdWqiEpNUimgSDfIxYmzpqYmK6D82c6ZCifcNGXi3HXB2BX87CZU21YeRG2A=
+X-Received: by 2002:a05:6871:d114:b0:27c:a414:b907 with SMTP id
+ 586e51a60fabf-2a7fb4d0065mr2089610fac.33.1734717628809; Fri, 20 Dec 2024
+ 10:00:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20241217000626.2958-1-ouster@cs.stanford.edu> <20241217000626.2958-2-ouster@cs.stanford.edu>
+ <20241218174345.453907db@kernel.org> <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
+ <20241219174109.198f7094@kernel.org>
+In-Reply-To: <20241219174109.198f7094@kernel.org>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Fri, 20 Dec 2024 09:59:53 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmyW2Mnz1hwvTo7PKsXLVJO6dy_TK-ZtDW1E-Lrds6o+WA@mail.gmail.com>
+Message-ID: <CAGXJAmyW2Mnz1hwvTo7PKsXLVJO6dy_TK-ZtDW1E-Lrds6o+WA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API for Homa
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 6890477ab20817755420d5b1edd0addc
 
-Cong Wang wrote:
-> From: Cong Wang <cong.wang@bytedance.com>
-> 
-> Similarly to the previous test, we also need a test case to cover
-> positive offsets as well, TC is an excellent hook for this.
-> 
-> Cc: John Fastabend <john.fastabend@gmail.com>
-> Cc: Daniel Borkmann <daniel@iogearbox.net>
-> Tested-by: Zijian Zhang <zijianzhang@bytedance.com>
-> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
-> ---
+On Thu, Dec 19, 2024 at 5:41=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> > Any suggestions on how to make the header file work with C++ files
+> > without the #ifdef __cplusplus?
+>
+> With the little C++ understanding I have, I _think_ the include site
+> can wrap:
+>
+> extern "C" {
+> #include "<linux/homa.h>"
+> }
 
-Acked-by: John Fastabend <john.fastabend@gmail.com>
+I have done this now. I was hesitant to do that because it seemed like
+it was creating unnecessary extra work for anyone who uses homa.h in a
+C++ program, but since this seems to be the convention I have
+conformed to it.
+
+> > > > +/** define SO_HOMA_RCVBUF - setsockopt option for specifying buffe=
+r region. */
+> > > > +#define SO_HOMA_RCVBUF 10
+> > > > +
+> > > > +/** struct homa_rcvbuf_args - setsockopt argument for SO_HOMA_RCVB=
+UF. */
+> > > > +struct homa_rcvbuf_args {
+> > > > +     /** @start: First byte of buffer region. */
+> > > > +     void *start;
+> > >
+> > > I'm not sure if pointers are legal in uAPI.
+> > > I *think* we are supposed to use __aligned_u64, because pointers
+> > > will be different size for 32b binaries running in compat mode
+> > > on 64b kernels, or some such.
+> >
+> > I see that "void *" is used in the declaration for struct msghdr
+> > (along with some other pointer types as well) and struct msghdr is
+> > part of several uAPI interfaces, no?
+>
+> Off the top off my head this use is a source of major pain, grep around
+> for compat_msghdr.
+
+How should I go about confirming that this __aligned_u64 is indeed the
+expected convention (sounds like you aren't certain)? Also, any idea
+why it needs to be aligned rather than just __u64?
+
+> My recommendation is to use normal comments where kdoc just repeats
+> obvious stuff. All these warnings sooner or later will result in some
+> semi-automated and often poor quality patch submissions to "fix" it.
+> Which is just work for maintainers to deal with :(
+
+I have done this now. I had assumed that kdoc would also complain if
+there was a declaration without official kdoc documentation, but now
+that I see that it won't, I'll use that approach for places where kdoc
+style is awkward. Personally I'm agnostic about whether to use kdoc; I
+assumed that I should use it since it exists.
+
+-John-
 
