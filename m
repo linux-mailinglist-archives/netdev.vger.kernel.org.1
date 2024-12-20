@@ -1,56 +1,55 @@
-Return-Path: <netdev+bounces-153558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2C19F8A48
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 03:53:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 725939F8A49
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 03:53:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7100165E82
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 02:53:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEF1E163739
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 02:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB36126C18;
-	Fri, 20 Dec 2024 02:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC3D139D19;
+	Fri, 20 Dec 2024 02:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TtXSwprF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BY/YrUUn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B8086338
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB65F126F0A
 	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 02:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734663171; cv=none; b=ZtkzKMTQYMm/l8iMZEMz/iocpnQzX+9pHJDJ1RKVMQtZxabw2YU739ECsE+fozWGpnpte8b7gpn3ly51jwygnuUDFTkriqwb71NbYLnzOOesxPNddR9vmMvxnmAekP181JUAT6m2MfsqhJTBh4aR1Rj3s4nyen4Y08kHFXIk+d8=
+	t=1734663171; cv=none; b=H0RPN1KIN/O4Y7fVk8VKVxZ7ZoxLiqKf3hadnHTFJlJPua9w4khJnznEFosSPvWGVF+Bvc72udHTnHd6jUNDu5yFAvpk/eLH2uxquX9Xhhpbkae9kFq+BVdFNQXHELl8IRy4fqOYRWEVeg6//ULnkxf+q6ZHgBOP1goMKG/K7sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734663171; c=relaxed/simple;
-	bh=MHijPVmRNgFlTGtf1uz38UqMTEII7iJDUjhwPm75v/Q=;
+	bh=YldcOYcFb4EN/eJo8AWch6xWExV+89F8/A7kv8RF8gc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tud6lkQx8jc/2k274E6xRj9sEhnv+0lw2CT42nWh6DGS2slu75jh12dnkpHYTPrtukVDdGhgi9wP19NFfiKwWV7Jwv/Tie6qbJddDKVkk6WoARhE0WJ81phZ24+tD/iksp0pNguMqtHMkV52AsDaAdCNsJbZiSBtlmeZ7V7H3fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtXSwprF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B83C4CEDE;
-	Fri, 20 Dec 2024 02:52:50 +0000 (UTC)
+	 MIME-Version; b=r9xd2oaf9F2aQaG7ebxyOfjnhcP/B/q2MH3PTkGF6/0dhS+AgZb2L3V3JaggiSdh2Ir3zU8KD2RQhJ9Zn/NOEQ6TFtRrDhdvfjjI/0M8qV/++82xj01nUNGKWogtvjI0gKpdXC4O+1ceJ0Srx5oYa8/lahJpPBAyTINlUQhy2Fw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BY/YrUUn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5158EC4CEE1;
+	Fri, 20 Dec 2024 02:52:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1734663171;
-	bh=MHijPVmRNgFlTGtf1uz38UqMTEII7iJDUjhwPm75v/Q=;
+	bh=YldcOYcFb4EN/eJo8AWch6xWExV+89F8/A7kv8RF8gc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TtXSwprFwMNulhc97QO1y4KgcEDqjBDe6peOVMHR+l2Saom98OtUjXFm+u9tb7wC2
-	 r8h80Bx1tBtU/NtBlC172kimxE/bWmh0NklTXSWxhncFccW1piaBxpvp/9VVQHtDDw
-	 5/ZCoZS3g5ALPXrkm20I98WhrR8wWeBIKaerQFBQZ3gOElsXVXt/bYAxxXwFIVgBQT
-	 p6wAzgvAK+/XvuAa+83QBAfntMFkVAOlGoSc+FWV2kgwpr03QMl/omqm6WYa8TDe8y
-	 tewPD3Bs65MIybJin1/zYtxc8jN2kVVxLQ7wl2jmdHv8iX4KbfmPZVQuTgai2bLF87
-	 UWF7zlzfuau+Q==
+	b=BY/YrUUnGYUhbrQiGgjg04+eDCfdfZU2aIq/oZi5lpAjqtXVIHGYyNo59hOODeHKY
+	 YyZauiCxCW2vzTqQrRjX89bUOm3iVhA+Qsp8mVQ8BaVOoMXQAwggbMRVJ/ayqm9+6Z
+	 ad2jrYDuggBZOy7auk39GBkfter7VXZjAAGfaIjMAtTOuxBeTdY58bbva7IfFyxC9a
+	 o0IqR0HllKd3DwgzuOs/YeYMWnSGP3dXl8RIBiDjBtg1Eo6tsct7+Nb5S4OZq88WAl
+	 bfnRwcs9K0GO0Fmk+T8D/x8HcameV0w+Rsi71d8BeSHT1jGtEFs7WN8YVAUdVU8nPR
+	 6YokeGObasdiA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	Alexander Duyck <alexanderduyck@fb.com>,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 08/10] eth: fbnic: centralize the queue count and NAPI<>queue setting
-Date: Thu, 19 Dec 2024 18:52:39 -0800
-Message-ID: <20241220025241.1522781-9-kuba@kernel.org>
+Subject: [PATCH net-next 09/10] eth: fbnic: support ring channel get and set while down
+Date: Thu, 19 Dec 2024 18:52:40 -0800
+Message-ID: <20241220025241.1522781-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241220025241.1522781-1-kuba@kernel.org>
 References: <20241220025241.1522781-1-kuba@kernel.org>
@@ -62,189 +61,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Alexander Duyck <alexanderduyck@fb.com>
+Trivial implementation of ethtool channel get and set. Set is only
+supported when device is closed, next patch will add code for
+live reconfig.
 
-To simplify dealing with RTNL_ASSERT() requirements further
-down the line, move setting queue count and NAPI<>queue
-association to their own helpers.
+Asymmetric configurations are supported (combined + extra Tx or Rx),
+so are configurations with independent IRQs for Rx and Tx.
+Having all 3 NAPI types (combined, Tx, Rx) is not supported.
 
-Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+We used to only call fbnic_reset_indir_tbl() during init.
+Now that we call it after device had been register must
+be careful not to override user config.
+
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  9 +-
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 92 +++++++++++++------
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  2 +
- 3 files changed, 70 insertions(+), 33 deletions(-)
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 64 +++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |  3 +
+ 2 files changed, 67 insertions(+)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 2f19144e4410..7a96b6ee773f 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -23,13 +23,7 @@ int __fbnic_open(struct fbnic_net *fbn)
- 	if (err)
- 		goto free_napi_vectors;
- 
--	err = netif_set_real_num_tx_queues(fbn->netdev,
--					   fbn->num_tx_queues);
--	if (err)
--		goto free_resources;
--
--	err = netif_set_real_num_rx_queues(fbn->netdev,
--					   fbn->num_rx_queues);
-+	err = fbnic_set_netif_queues(fbn);
- 	if (err)
- 		goto free_resources;
- 
-@@ -93,6 +87,7 @@ static int fbnic_stop(struct net_device *netdev)
- 	fbnic_time_stop(fbn);
- 	fbnic_fw_xmit_ownership_msg(fbn->fbd, false);
- 
-+	fbnic_reset_netif_queues(fbn);
- 	fbnic_free_resources(fbn);
- 	fbnic_free_napi_vectors(fbn);
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 75b491b8e1ca..92fc1ad6ed6f 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -1621,6 +1621,71 @@ int fbnic_alloc_resources(struct fbnic_net *fbn)
- 	return err;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+index d1be8fc30404..d2fe97ae6a71 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+@@ -304,6 +304,68 @@ fbnic_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
+ 	return 0;
  }
  
-+static void fbnic_set_netif_napi(struct fbnic_napi_vector *nv)
++static void fbnic_get_channels(struct net_device *netdev,
++			       struct ethtool_channels *ch)
 +{
-+	int i, j;
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
 +
-+	/* Associate Tx queue with NAPI */
-+	for (i = 0; i < nv->txt_count; i++) {
-+		struct fbnic_q_triad *qt = &nv->qt[i];
++	ch->max_rx = fbd->max_num_queues;
++	ch->max_tx = fbd->max_num_queues;
++	ch->max_combined = min(ch->max_rx, ch->max_tx);
++	ch->max_other =	FBNIC_NON_NAPI_VECTORS;
 +
-+		netif_queue_set_napi(nv->napi.dev, qt->sub0.q_idx,
-+				     NETDEV_QUEUE_TYPE_TX, &nv->napi);
-+	}
-+
-+	/* Associate Rx queue with NAPI */
-+	for (j = 0; j < nv->rxt_count; j++, i++) {
-+		struct fbnic_q_triad *qt = &nv->qt[i];
-+
-+		netif_queue_set_napi(nv->napi.dev, qt->cmpl.q_idx,
-+				     NETDEV_QUEUE_TYPE_RX, &nv->napi);
-+	}
++	if (fbn->num_rx_queues > fbn->num_napi ||
++	    fbn->num_tx_queues > fbn->num_napi)
++		ch->combined_count = min(fbn->num_rx_queues,
++					 fbn->num_tx_queues);
++	else
++		ch->combined_count =
++			fbn->num_rx_queues + fbn->num_tx_queues - fbn->num_napi;
++	ch->rx_count = fbn->num_rx_queues - ch->combined_count;
++	ch->tx_count = fbn->num_tx_queues - ch->combined_count;
++	ch->other_count = FBNIC_NON_NAPI_VECTORS;
 +}
 +
-+static void fbnic_reset_netif_napi(struct fbnic_napi_vector *nv)
++static void fbnic_set_queues(struct fbnic_net *fbn, struct ethtool_channels *ch,
++			     unsigned int max_napis)
 +{
-+	int i, j;
++	fbn->num_rx_queues = ch->rx_count + ch->combined_count;
++	fbn->num_tx_queues = ch->tx_count + ch->combined_count;
++	fbn->num_napi = min(ch->rx_count + ch->tx_count + ch->combined_count,
++			    max_napis);
++}
 +
-+	/* Disassociate Tx queue from NAPI */
-+	for (i = 0; i < nv->txt_count; i++) {
-+		struct fbnic_q_triad *qt = &nv->qt[i];
++static int fbnic_set_channels(struct net_device *netdev,
++			      struct ethtool_channels *ch)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	unsigned int max_napis, standalone;
++	struct fbnic_dev *fbd = fbn->fbd;
 +
-+		netif_queue_set_napi(nv->napi.dev, qt->sub0.q_idx,
-+				     NETDEV_QUEUE_TYPE_TX, NULL);
++	max_napis = fbd->num_irqs - FBNIC_NON_NAPI_VECTORS;
++	standalone = ch->rx_count + ch->tx_count;
++
++	/* Limits for standalone queues:
++	 *  - each queue has it's own NAPI (num_napi >= rx + tx + combined)
++	 *  - combining queues (combined not 0, rx or tx must be 0)
++	 */
++	if ((ch->rx_count && ch->tx_count && ch->combined_count) ||
++	    (standalone && standalone + ch->combined_count > max_napis) ||
++	    ch->rx_count + ch->combined_count > fbd->max_num_queues ||
++	    ch->tx_count + ch->combined_count > fbd->max_num_queues ||
++	    ch->other_count != FBNIC_NON_NAPI_VECTORS)
++		return -EINVAL;
++
++	if (!netif_running(netdev)) {
++		fbnic_set_queues(fbn, ch, max_napis);
++		fbnic_reset_indir_tbl(fbn);
++		return 0;
 +	}
 +
-+	/* Disassociate Rx queue from NAPI */
-+	for (j = 0; j < nv->rxt_count; j++, i++) {
-+		struct fbnic_q_triad *qt = &nv->qt[i];
-+
-+		netif_queue_set_napi(nv->napi.dev, qt->cmpl.q_idx,
-+				     NETDEV_QUEUE_TYPE_RX, NULL);
-+	}
++	return -EBUSY;
 +}
 +
-+int fbnic_set_netif_queues(struct fbnic_net *fbn)
-+{
-+	int i, err;
-+
-+	err = netif_set_real_num_queues(fbn->netdev, fbn->num_tx_queues,
-+					fbn->num_rx_queues);
-+	if (err)
-+		return err;
-+
-+	for (i = 0; i < fbn->num_napi; i++)
-+		fbnic_set_netif_napi(fbn->napi[i]);
-+
-+	return 0;
-+}
-+
-+void fbnic_reset_netif_queues(struct fbnic_net *fbn)
-+{
-+	int i;
-+
-+	for (i = 0; i < fbn->num_napi; i++)
-+		fbnic_reset_netif_napi(fbn->napi[i]);
-+}
-+
- static void fbnic_disable_twq0(struct fbnic_ring *txr)
- {
- 	u32 twq_ctl = fbnic_ring_rd32(txr, FBNIC_QUEUE_TWQ0_CTL);
-@@ -1801,10 +1866,6 @@ void fbnic_flush(struct fbnic_net *fbn)
- 			tx_queue = netdev_get_tx_queue(nv->napi.dev,
- 						       qt->sub0.q_idx);
- 			netdev_tx_reset_queue(tx_queue);
--
--			/* Disassociate Tx queue from NAPI */
--			netif_queue_set_napi(nv->napi.dev, qt->sub0.q_idx,
--					     NETDEV_QUEUE_TYPE_TX, NULL);
- 		}
+ static int
+ fbnic_get_ts_info(struct net_device *netdev,
+ 		  struct kernel_ethtool_ts_info *tsinfo)
+@@ -417,6 +479,8 @@ static const struct ethtool_ops fbnic_ethtool_ops = {
+ 	.get_rxfh_indir_size	= fbnic_get_rxfh_indir_size,
+ 	.get_rxfh		= fbnic_get_rxfh,
+ 	.set_rxfh		= fbnic_set_rxfh,
++	.get_channels		= fbnic_get_channels,
++	.set_channels		= fbnic_set_channels,
+ 	.get_ts_info		= fbnic_get_ts_info,
+ 	.get_ts_stats		= fbnic_get_ts_stats,
+ 	.get_eth_mac_stats	= fbnic_get_eth_mac_stats,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+index b99c890ac43f..c25bd300b902 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+@@ -13,6 +13,9 @@ void fbnic_reset_indir_tbl(struct fbnic_net *fbn)
+ 	unsigned int num_rx = fbn->num_rx_queues;
+ 	unsigned int i;
  
- 		/* Flush any processed Rx Queue Triads and drop the rest */
-@@ -1820,10 +1881,6 @@ void fbnic_flush(struct fbnic_net *fbn)
- 
- 			fbnic_put_pkt_buff(nv, qt->cmpl.pkt, 0);
- 			qt->cmpl.pkt->buff.data_hard_start = NULL;
--
--			/* Disassociate Rx queue from NAPI */
--			netif_queue_set_napi(nv->napi.dev, qt->cmpl.q_idx,
--					     NETDEV_QUEUE_TYPE_RX, NULL);
- 		}
- 	}
++	if (netif_is_rxfh_configured(fbn->netdev))
++		return;
++
+ 	for (i = 0; i < FBNIC_RPC_RSS_TBL_SIZE; i++)
+ 		fbn->indir_tbl[0][i] = ethtool_rxfh_indir_default(i, num_rx);
  }
-@@ -1836,29 +1893,12 @@ void fbnic_fill(struct fbnic_net *fbn)
- 		struct fbnic_napi_vector *nv = fbn->napi[i];
- 		int j, t;
- 
--		/* Configure NAPI mapping for Tx */
--		for (t = 0; t < nv->txt_count; t++) {
--			struct fbnic_q_triad *qt = &nv->qt[t];
--
--			/* Nothing to do if Tx queue is disabled */
--			if (qt->sub0.flags & FBNIC_RING_F_DISABLED)
--				continue;
--
--			/* Associate Tx queue with NAPI */
--			netif_queue_set_napi(nv->napi.dev, qt->sub0.q_idx,
--					     NETDEV_QUEUE_TYPE_TX, &nv->napi);
--		}
--
- 		/* Configure NAPI mapping and populate pages
- 		 * in the BDQ rings to use for Rx
- 		 */
--		for (j = 0; j < nv->rxt_count; j++, t++) {
-+		for (j = 0, t = nv->txt_count; j < nv->rxt_count; j++, t++) {
- 			struct fbnic_q_triad *qt = &nv->qt[t];
- 
--			/* Associate Rx queue with NAPI */
--			netif_queue_set_napi(nv->napi.dev, qt->cmpl.q_idx,
--					     NETDEV_QUEUE_TYPE_RX, &nv->napi);
--
- 			/* Populate the header and payload BDQs */
- 			fbnic_fill_bdq(nv, &qt->sub0);
- 			fbnic_fill_bdq(nv, &qt->sub1);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index c8d908860ab0..92c671135ad7 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -124,6 +124,8 @@ int fbnic_alloc_napi_vectors(struct fbnic_net *fbn);
- void fbnic_free_napi_vectors(struct fbnic_net *fbn);
- int fbnic_alloc_resources(struct fbnic_net *fbn);
- void fbnic_free_resources(struct fbnic_net *fbn);
-+int fbnic_set_netif_queues(struct fbnic_net *fbn);
-+void fbnic_reset_netif_queues(struct fbnic_net *fbn);
- irqreturn_t fbnic_msix_clean_rings(int irq, void *data);
- void fbnic_napi_enable(struct fbnic_net *fbn);
- void fbnic_napi_disable(struct fbnic_net *fbn);
 -- 
 2.47.1
 
