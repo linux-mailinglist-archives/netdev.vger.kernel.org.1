@@ -1,182 +1,80 @@
-Return-Path: <netdev+bounces-153540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 636D29F89A8
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 02:42:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9558F9F89E9
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 03:01:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57632162E1B
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 01:42:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF79616891E
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 02:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F572594AE;
-	Fri, 20 Dec 2024 01:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373495680;
+	Fri, 20 Dec 2024 02:01:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sOnKKAXE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tLGEqlOK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC491F94D
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 01:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2AC2594B4;
+	Fri, 20 Dec 2024 02:01:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734658872; cv=none; b=HJ22WPy0TWtEL+wDosBtdfxnR7CNdd1Y/2J6hqvSxe9ReUwmQ6QUNkL7l7JwbZHCi0T9BY+zbbxSrPX1P8VVTeIGD93FN0IVDe7OrfBmkuttQD5pE0g7XQpunJiBUbrFz6nJrTnAMjuGaF4ZAH8oFF7PJB//u7+keyxlC0e2RY4=
+	t=1734660106; cv=none; b=XHAlvW/A1afu3cx4UEbpeVHVBVsFHG60sub90aXGCGjKXazuclSJT9+ctgN2+kkPpwj2T9GWvFnKAAal9L5DwAS1eGhe7amNyOVzY+Pt2yf5uAOGpyvVm7lG2Q6tF3gW3gL5os5xUwZuLeVRcLZMChv0iNhxLBS7FsNYzwH+DnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734658872; c=relaxed/simple;
-	bh=qsrn7LyKZ0w1BhwKJsIw12XDvy1jCdYJJORwZTL8JUc=;
+	s=arc-20240116; t=1734660106; c=relaxed/simple;
+	bh=o7NN7eBTW6iyhgMe/qkQ8oAOywcdwyvBMXA9yXkj4ic=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gaOsGlNqc9Zzfycnaajv2BhVYU4mlvm1ITC2FU6ORw0dCeF9uoHjKAm2MHbZRm1YyMfB4II4IkJ0HeHXJDYyqgSareAvMYDAIc4MsrTuGOae4A3goOGuQVZDJWU4J5WwNLFKNXPb2GO8LheOHe9qtbqWDgckChqkadAXgoidwuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sOnKKAXE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F32C4CECE;
-	Fri, 20 Dec 2024 01:41:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=axVMnwGnLBqlJLR0mgSgx5FkxyZ26LSKhTEkpiEBB+mdLkoeJB5qPFMvXIx4AyOUu897aiwXDgGy15Nwk8WWplPj9FY34ABI1+6zgJg7A+iAxUntcW3SjQ6sn9kaZZSEf49tdtdJw4ZHP5UzlLruvuq1a0AAqJTfb6gqLfxfg3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tLGEqlOK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52504C4CECE;
+	Fri, 20 Dec 2024 02:01:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734658870;
-	bh=qsrn7LyKZ0w1BhwKJsIw12XDvy1jCdYJJORwZTL8JUc=;
+	s=k20201202; t=1734660105;
+	bh=o7NN7eBTW6iyhgMe/qkQ8oAOywcdwyvBMXA9yXkj4ic=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sOnKKAXEZUmYP6R8+mQDab/SrMbi1445LyWeQxx/dAxqEYR3goSDYAbdZeF1CR59/
-	 5K/WXmId2PDJYSczn3IbKTEm3/m0+xXYS6N0us1Kni7xZbo9NteOg7+Lgm0TY2L6Ds
-	 AgZJvKe0SipxqfuLocWyTvugEfS+P9xN45KsqZ1s683Fp+KtfFU32atrMWRfBoEvrg
-	 Rm7RmHVZHp3yxfSNR7o4v6uNtUviwK8ap8AFH46AhCZZJNkOJGvMMNt5krPDce4nff
-	 kl07Z0lSBeASKkJct+0P+HDeJwFM7Dh3IJ1eHVVTX91hb1pBy7ken2WMrNa2G5/WtJ
-	 QVL8sKnzcAW4Q==
-Date: Thu, 19 Dec 2024 17:41:09 -0800
+	b=tLGEqlOK62xm/Xp4gks9GdAwmh1D4ll0SKBzOR9HW09xbP9frDaox+oRsa30WRcoX
+	 7MO8L0wHdJdC+AsNYCG27Fujkfi5d4m7dML/lWXbjMuoA29Ya+fXffoUT0KTS1Iktx
+	 hwKCiWtpvDTuZIeRF6EWRFfmwgNOHs23Ww6qOTJPc7IOAUyZtq3wYm5N1D8a5I6AV2
+	 1d+VOSsODkXnJ/nnzUxSOkBKx+3AWfHUZlQsgVGKvEzjVdr/0O0LODHdh5XBM07Yzj
+	 51XwCdEowUpjhQmXqUWOfwH0v1deQYg2XzP7GLr+e5LG9XpXzA5N9/o1+wwzPnTU+j
+	 iGjiWvBUwjyaA==
+Date: Thu, 19 Dec 2024 18:01:44 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- horms@kernel.org
-Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API
- for Homa
-Message-ID: <20241219174109.198f7094@kernel.org>
-In-Reply-To: <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
-References: <20241217000626.2958-1-ouster@cs.stanford.edu>
-	<20241217000626.2958-2-ouster@cs.stanford.edu>
-	<20241218174345.453907db@kernel.org>
-	<CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Soham Chakradeo
+ <sohamch.kernel@gmail.com>, Willem de Bruijn <willemb@google.com>,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ linux-kselftest@vger.kernel.org, Soham Chakradeo <sohamch@google.com>
+Subject: Re: [PATCH net-next 0/4] selftests/net: packetdrill: import
+ multiple tests
+Message-ID: <20241219180144.7cf5226c@kernel.org>
+In-Reply-To: <676474a0398f0_1f2e51294ad@willemb.c.googlers.com.notmuch>
+References: <20241217185203.297935-1-sohamch.kernel@gmail.com>
+	<20241218100013.0c698629@kernel.org>
+	<19df2c4d-c40c-40c5-8fec-bb3e63e65533@redhat.com>
+	<676474a0398f0_1f2e51294ad@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 19 Dec 2024 10:57:22 -0800 John Ousterhout wrote:
-> On Wed, Dec 18, 2024 at 5:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Mon, 16 Dec 2024 16:06:14 -0800 John Ousterhout wrote: =20
-> > > +#ifdef __cplusplus
-> > > +extern "C"
-> > > +{
-> > > +#endif =20
-> >
-> > I'm not aware of any networking header wrapped in extern "C"
-> > Let's not make this precedent? =20
->=20
-> Without this I don't seem to be able to use this header in C++ files:
-> I end up getting linker errors such as 'undefined reference to
-> `homa_replyv(int, iovec const*, int, sockaddr const*, unsigned int,
-> unsigned long)'.
+On Thu, 19 Dec 2024 14:31:44 -0500 Willem de Bruijn wrote:
+> All three timestamping flakes are instances where the script expects
+> the timestamp to be taken essentially instantaneously after the send
+> call.
+> 
+> This is not the case, and the delay is outside even the 14K tolerance.
+> I see occurrences of 20K. At some point we cannot keep increasing the
+> tolerance, perhaps.
 
-No idea TBH, I don't see homa_reply anywhere in the submission
-
-> Any suggestions on how to make the header file work with C++ files
-> without the #ifdef __cplusplus?
-
-With the little C++ understanding I have, I _think_ the include site
-can wrap:
-
-extern "C" {
-#include "<linux/homa.h>"
-}
-
-> > > +/**
-> > > + * define HOMA_MIN_DEFAULT_PORT - The 16-bit port space is divided i=
-nto
-> > > + * two nonoverlapping regions. Ports 1-32767 are reserved exclusively
-> > > + * for well-defined server ports. The remaining ports are used for c=
-lient
-> > > + * ports; these are allocated automatically by Homa. Port 0 is reser=
-ved.
-> > > + */
-> > > +#define HOMA_MIN_DEFAULT_PORT 0x8000 =20
-> >
-> > Not sure why but ./scripts/kernel-doc does not like this:
-> >
-> > include/uapi/linux/homa.h:51: warning: expecting prototype for HOMA_MIN=
-_DEFAULT_PORT - The 16(). Prototype was for HOMA_MIN_DEFAULT_PORT() instead=
- =20
->=20
-> I saw this warning from kernel-doc before I posted the patch, but I
-> couldn't figure out why it is happening. After staring at the error
-> message some more I figured it out: kernel-doc is getting confused by
-> the "-" in "16-bit" (it seems to use the last "-" on the line rather
-> than the first). I've modified the comment to replace "16-bit" with
-> "16 bit" and filed a bug report for kernel-doc.
-
-Unless you're planning to render the docs on docs.kernel.org you can
-just switch from /** to /* comments. IMVHO kdoc is overused, unless
-there's full documentation with API rendered like
-https://www.kernel.org/doc/html/latest/networking/net_dim.html
-kdoc is more trouble than gain.
-
-> > > +/** define SO_HOMA_RCVBUF - setsockopt option for specifying buffer =
-region. */
-> > > +#define SO_HOMA_RCVBUF 10
-> > > +
-> > > +/** struct homa_rcvbuf_args - setsockopt argument for SO_HOMA_RCVBUF=
-. */
-> > > +struct homa_rcvbuf_args {
-> > > +     /** @start: First byte of buffer region. */
-> > > +     void *start; =20
-> >
-> > I'm not sure if pointers are legal in uAPI.
-> > I *think* we are supposed to use __aligned_u64, because pointers
-> > will be different size for 32b binaries running in compat mode
-> > on 64b kernels, or some such. =20
->=20
-> I see that "void *" is used in the declaration for struct msghdr
-> (along with some other pointer types as well) and struct msghdr is
-> part of several uAPI interfaces, no?
-
-Off the top off my head this use is a source of major pain, grep around
-for compat_msghdr.
-
-> > > +/**
-> > > + * define HOMA_FLAG_DONT_THROTTLE - disable the output throttling me=
-chanism:
-> > > + * always send all packets immediately.
-> > > + */ =20
-> >
-> > Also makes kernel-doc unhappy:
-> >
-> > include/uapi/linux/homa.h:159: warning: expecting prototype for HOMA_FL=
-AG_DONT_THROTTLE - disable the output throttling mechanism(). Prototype was=
- for HOMA_FLAG_DONT_THROTTLE() instead =20
->=20
-> It seems that the ":" also confuses kernel-doc. I've worked around this a=
-s well.
->=20
-> > Note that next patch adds more kernel-doc warnings, you probably want
-> > to TAL at those as well. Use
-> >
-> >   ./scripts/kernel-doc -none -Wall $file =20
->=20
-> Hmm, I did run kernel-doc before posting the patch, but maybe I missed
-> some stuff. I'll take another look. There are a few things kernel-doc
-> complained about where the requested documentation would add no useful
-> information; it would just end up repeating what is already obvious
-> from the code. Is any discretion allowed for cases like this? If the
-> expectation is that there will be zero kernel-doc complaints, then
-> I'll go ahead and add the useless documentation.
-
-My recommendation is to use normal comments where kdoc just repeats
-obvious stuff. All these warnings sooner or later will result in some
-semi-automated and often poor quality patch submissions to "fix" it.
-Which is just work for maintainers to deal with :(
-
-
+I pinned the other services away and gave the packetdrill tester its
+own cores. Let's see how much of a difference this makes.
+The net-next-2024-12-20--03-00 branch will be the first to have this.
 
