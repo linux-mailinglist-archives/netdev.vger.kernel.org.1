@@ -1,118 +1,116 @@
-Return-Path: <netdev+bounces-153538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C9C69F895D
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 02:25:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4A49F8990
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 02:34:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77EBB188BE26
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 01:25:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 124971885706
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 01:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831689476;
-	Fri, 20 Dec 2024 01:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CD72594AE;
+	Fri, 20 Dec 2024 01:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3XKDy3u"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cX/UkfXj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E553C17
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 01:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467BD259497
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 01:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734657852; cv=none; b=OAAMg2BGz3eqHT/O+o8cdqf7b94cYo4FSR9HLjhgoLvhp0+ev6QRj7gYPINGvCeYaAbRuYA5QAShTjfShhPQI/4G7D9hv6zjFcy7P4E777FVzKQjd6bX9zFeKVkCqdhanJ81y6j54FdsyfcOzCAV/+eQS1XByZ6CnsImHm5n5hI=
+	t=1734658449; cv=none; b=MPDlPLnf/S/eFEYRKd49cx3QDX788pCbfxRZuxpim4Ehozbly33tq+LyMRfGLZ5ynzjqU+uJk08NjzergYlCelcEBYbLPLjnyVCNunkLMx74HQjOuxVI+SekHp6+BEADK9aQ1JOIVD1SIk/4p/rVsYyQCu40A4kqK5Q9fewV130=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734657852; c=relaxed/simple;
-	bh=fWcvIsas5MhC/ByJ4SplBPGgziLnaxlT6FHRsPGA1PU=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=dWzbmCS85a/wjdw0YOlDAPwHJh00JjFmo1ANyNj2MNFgJe6L9Xkp6M9ho7BrTj+wBmAYHODnMStpD4QwpIY8YDUknPCPipMyIAWDpFD8uxPJsqtKoOWFvbV/kASEv6caRt+psn4o+Hye4dDHLZyaLrAfr9HbFuXoi1vdlZ26ruc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f3XKDy3u; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2165448243fso15096345ad.1
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 17:24:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734657850; x=1735262650; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AVe8uGYzHcopdi4aDYiFW+esZuf1pcKpD8sGVyYLhTs=;
-        b=f3XKDy3u4Ogxd3ZEdnu67QE4YS8/hjkZGxFzMuhxcbtjFk7BpiitRzHcjvbZSjN9Ss
-         8uyPJataVOQXBUHdnAH5PqSjH0ubqK9yqwqvcBW9wD4ls30Sz4yoX5FbL/OrFCcyqx04
-         2K32meQrpEmBZtqQy5b0r2IIIcIooOiF/hXyNo2pLEZ0s17ySKoMTXNBa7/sZiz+Zqqd
-         W2YUqJdu0tks89jnqSPAnxQXa6Myr+WjX7KwityuuYW7vcuVq8AE85uwEfpl9QLHguoB
-         5DLhVYOkW3TZVDpq1xdaikcrUUBVDD3to6gA9eoFvOpfw3eQIvC1PLybW50pi2zKOLof
-         vGTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734657850; x=1735262650;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AVe8uGYzHcopdi4aDYiFW+esZuf1pcKpD8sGVyYLhTs=;
-        b=LXH0ljppxznRDI5nUQIxoGaZco3bV3f1Gj+CoQ6aOL30T1nug0hgeLAmMqtg5ZgQJK
-         nm5umcakJ4R42tiPOhanGUKbx7d9u9qfl76s1vPuTd73Tf1lENZYUlu/ycOnwuHHtaei
-         lBPuPMyCZ8RzCabfu0/aKmdipIGCw7VmELBM11D+2CdUH+fzEcm3ysh3ug9olgxXFgzk
-         F5lnkUZ4i+2dslo8zKBcgvN50ro4KVKwwlyKhqW/0uuWmj+MR8LPjedzvuGzOdSiQgzV
-         o1LOW4h+j2WKlt/EoLd6mbBeESOSpww43gExRQ6TcujMnwJHggEm+Ohe7M7eCjXvwHI6
-         U6Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPC/ZGuW+9vgL/5E6PKkM2vCuOfTAT5wT1ftP2ly/8XpGFCPEDwv/zLXjH+SrpGPuXi7vepvo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbpizVubcxQ+fNSnC87yr28JrjZ5NjaNmvl3KmamxIxU+/NJJs
-	U44X0tjCkIHfqyZocMGsThjaYURYhD4b3SgzMqx06fJtEuBZDoGp
-X-Gm-Gg: ASbGncu8g3COsP5z7EHfX97r2zGd3/GFPt3yhWkzDeTRzF1ZdQyW5intYKa0LEuJmdB
-	X8r0yY9TO7LJd9Sm7vlYrq8DYCOqTbxQpskfQA+DerSTivKvTWSWwClAxHvQUBKRJxKMS/y/A7M
-	Qr25Ig9GUwVp8p/9aFWe514VY6jFfz2qLLKBH81MCjxHodjv77263OlWntnWc7H9bQFgGXErpVW
-	Zm/YEq24zyppZNudO/8tctn7Yt9qrrd0GdAxixGv8hx/eYXmgdivX/2q/xCP9ZoLeduaDW+2rjf
-	kFoMdzL9st2BV7jGNQ==
-X-Google-Smtp-Source: AGHT+IFN1jtSaGy6aVtc9cMuS8Knwtx+fhnL4GA4pW6BoI1AjXflwdvzTlbut4ysDcZDEvOruEHkJA==
-X-Received: by 2002:a17:902:cec5:b0:219:d28a:ca23 with SMTP id d9443c01a7336-219e6f1484emr10759555ad.36.1734657850264;
-        Thu, 19 Dec 2024 17:24:10 -0800 (PST)
-Received: from localhost (p7659208-ipoefx.ipoe.ocn.ne.jp. [221.188.16.207])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9f68efsm18523735ad.177.2024.12.19.17.24.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 17:24:09 -0800 (PST)
-Date: Fri, 20 Dec 2024 10:24:08 +0900 (JST)
-Message-Id: <20241220.102408.968249477814979263.fujita.tomonori@gmail.com>
-To: hfdevel@gmx.net, devnull+hfdevel.gmx.net@kernel.org
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, fujita.tomonori@gmail.com, andrew+netdev@lunn.ch,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 5/7] net: tn40xx: create software node for
- mdio and phy and add to mdiobus
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20241217-tn9510-v3a-v3-5-4d5ef6f686e0@gmx.net>
-References: <20241217-tn9510-v3a-v3-0-4d5ef6f686e0@gmx.net>
-	<20241217-tn9510-v3a-v3-5-4d5ef6f686e0@gmx.net>
+	s=arc-20240116; t=1734658449; c=relaxed/simple;
+	bh=WU9SX61oilyzAPKKxaHpZ7IaIVhXMkvbS+IUVw6Eo38=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=oRgTTHzjLHYPONB2WQzJwOU5VAk3IP2qJ30AIMH6LmM0re4EjTZrPvqPNS0N6SCZdexyjcjhWa6YxCrCIoc61YNXc3DBHRYgtL0rxCPKjFofilAmm3Y04DaxvPNbjYvNIYaY9ilniaI413xTbY/k33yX/vWotLozHjYxfO1ngfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cX/UkfXj; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734658443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BomEA7lvJnvVYAFn67tkqTGATCMBN+1ck92UY7i1ISA=;
+	b=cX/UkfXjB3jS8oNf09reoHD7oXnb0UbxDfW7jWD2obht3YViq/N67WDtK99hLvkPuV6DzU
+	HbVm4YxYpFbOW4YGmXj3Oj9Ivdnejq2sqzEdcemaAYF0O5E5v4RguEuqbbgkZ7lQsNOyR8
+	Tc3bQs3nJBv60UvZPbgFLy6bDaVMT+0=
+Date: Fri, 20 Dec 2024 01:34:00 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Yajun Deng" <yajun.deng@linux.dev>
+Message-ID: <c35f6cd71fcf782e0333b8cc4cabb6d65812f134@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net-next v2] net: mdio_bus: change the bus name to mdio
+To: "Florian Fainelli" <f.fainelli@gmail.com>, "Andrew Lunn" <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <40cbb576-edd9-40c1-8f7a-8dd6dfa5d7ed@gmail.com>
+References: <20241219100454.1623211-1-yajun.deng@linux.dev>
+ <f062d436-5448-418a-9969-f1c368e10f8c@lunn.ch>
+ <40cbb576-edd9-40c1-8f7a-8dd6dfa5d7ed@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 17 Dec 2024 22:07:36 +0100
-Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org> wrote:
+December 20, 2024 at 12:52 AM, "Florian Fainelli" <f.fainelli@gmail.com> =
+wrote:
 
-> From: Hans-Frieder Vogt <hfdevel@gmx.net>
-> 
-> Create a software node for the mdio function, with a child node for the
-> Aquantia AQR105 PHY, providing a firmware-name (and a bit more, which may
-> be used for future checks) to allow the PHY to load a MAC specific
-> firmware from the file system.
-> 
-> The name of the PHY software node follows the naming convention suggested
-> in the patch for the mdiobus_scan function (in the same patch series).
-> 
-> Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
-> ---
->  drivers/net/ethernet/tehuti/tn40.c      | 10 ++++-
->  drivers/net/ethernet/tehuti/tn40.h      | 30 +++++++++++++++
->  drivers/net/ethernet/tehuti/tn40_mdio.c | 65 ++++++++++++++++++++++++++++++++-
->  3 files changed, 103 insertions(+), 2 deletions(-)
 
-Boards with QT2025 also creates a software node for AQR105 PHY?
+
+>=20
+>=20On 12/19/24 02:20, Andrew Lunn wrote:
+>=20
+>=20>=20
+>=20> On Thu, Dec 19, 2024 at 06:04:54PM +0800, Yajun Deng wrote:
+> >=20
+>=20> >=20
+>=20> > Since all directories under the /sys/bus are bus, we don't need t=
+o add a
+> > >=20
+>=20> >  bus suffix to mdio.
+> > >=20
+>=20> >  This is the only one directory with the bus suffix, sysfs-bus-md=
+io is
+> > >=20
+>=20> >  now a testing ABI, and didn't have Users in it. This is the time=
+ to change
+> > >=20
+>=20> >  it before it's moved to the stable ABI.
+> > >=20
+>=20>=20
+>=20>  So are you saying nobody has udev scripts referencing MDIO devices=
+?
+> >=20
+>=20>  Nobody has scripts accessing the statistics? You don't expect anyt=
+hing
+> >=20
+>=20>  in userspace to break because of this change?
+> >=20
+>=20>  I personally think it is too late to change this, something will b=
+reak
+> >=20
+>=20>  and somebody will report a regression.
+> >=20
+>=20
+> It is too late, merging this patch would be breaking ABI and that is no=
+t acceptable.
+>=20
+
+Okay,=20I got it.
+
+> -- Florian
+>
 
