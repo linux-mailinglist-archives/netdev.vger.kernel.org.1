@@ -1,87 +1,95 @@
-Return-Path: <netdev+bounces-153803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16A359F9B3C
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 21:51:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920809F9B4B
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 22:00:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F0361670D5
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 20:51:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F7E07A154E
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 21:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0559F221451;
-	Fri, 20 Dec 2024 20:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3F42236EB;
+	Fri, 20 Dec 2024 21:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOCSuIrn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYXztb2n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CE4157A48
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 20:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B24222D44
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 21:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734727871; cv=none; b=bzRUGFkeATP1/bo7PouqOUMOuPTWVcSZIIXaCiRy5cLY8kuTr8teiwCkwVO3nYmeXSwG7YWlO1LIrj2LCU5y/AZpDtL6bcAOgycevnQe/i0BwroxfIqUMgo7ZejUIxnIWjXB8LuqjZhuFWWV+HT9BcRoN7z0BWJXKh2CYwj9au8=
+	t=1734728414; cv=none; b=UYQnndVBVVWx+Bf/Op7tSM0pLiPw1k4hHcjVuv7NNKukFNIa4GoMBA5STEFGb7KY03cgnHZwmdY/xSYQHiRozN6ruVkhUF9wNLdgeviubQOsNMamoPXwvyOExY2LceSgzLx7x+avWZnxt8NAA5+U4pnNtO3QRJspmaDCwANUrH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734727871; c=relaxed/simple;
-	bh=PsiINN6x+FJAs3KH/LvlP/yQ3ibuFQXygFtnAYzvISs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gXogSvXsMAhsdW/+WHCzDajI/ct3O8wIUqWhMMQ+uAgAWfi0Ko8PYMZkEDxtUMJdJUgGHHmCVCW1hQwYjaJeOV+QKS+2LqA/AejJZ8N6KvzIvyGxEadoUc1lbvEKqzDZtXxubEHhcqEle8BwgNdcEdV2Z7XJBMBlcXPuNehEU80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOCSuIrn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3C29C4CECD;
-	Fri, 20 Dec 2024 20:51:10 +0000 (UTC)
+	s=arc-20240116; t=1734728414; c=relaxed/simple;
+	bh=SOXkqMEmAu03o0ChSNj80svlqls47kB/7zH7ztB0UjU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=E6lbtD0Rn0s93PEB/Ghhp+i4YGRm//OjD/FqiEHqBoIw7V2mfyZrlMGSVdmdnA0+dyV17yzcLwfQWnFR5I+Cw+TrYhvcvgWa2MhwpoGlxRCGKUFqIlw/MAc9WYe3bLCfDhLvADXxDUZ3Lotzlj3Elo8SUTjORuWBaFV+eYXHuEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYXztb2n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96EBBC4CECD;
+	Fri, 20 Dec 2024 21:00:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734727871;
-	bh=PsiINN6x+FJAs3KH/LvlP/yQ3ibuFQXygFtnAYzvISs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hOCSuIrnj/tN6MjeBHmXeTkQvlYWe1HfX3X20KOF/efdLnbQZk2utxHEpkJDosl68
-	 np1Kx0Yi0RrjgxE56JEDql1TsxvcLp26mTGVDGlsdaIN0wHdyC5zt3gCuZoYyKuYBi
-	 N8XRYS5XAHCzcJK/gGOr1sOQVfhb3faRFDB1g1fWWaTi4WUK13Eb9elpMjD7N9QGaE
-	 IZqAUEcpGwbR+5+4NKclEFljAktG09QNc63BiXi2HiVsF+SCpUgRfPdbPskAXkgmP3
-	 PvT84SM2+IefalLEYi3ZlQBDTew3u9yRcXX7QGFIV4emLPiVg6bV9JIHSnuuc46V3n
-	 BjRvNWDp81c0Q==
-Date: Fri, 20 Dec 2024 12:51:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
- <andrew+netdev@lunn.ch>, <edumazet@google.com>, <pabeni@redhat.com>,
- <davem@davemloft.net>, <michael.chan@broadcom.com>, <tariqt@nvidia.com>,
- <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
- <jdamato@fastly.com>, <shayd@nvidia.com>, <akpm@linux-foundation.org>
-Subject: Re: [PATCH net-next v2 4/8] net: napi: add CPU affinity to
- napi->config
-Message-ID: <20241220125110.4f8d8e6b@kernel.org>
-In-Reply-To: <df42a234-f289-4be7-a698-54b645b0fd81@intel.com>
-References: <20241218165843.744647-1-ahmed.zaki@intel.com>
-	<20241218165843.744647-5-ahmed.zaki@intel.com>
-	<20241219194237.31822cba@kernel.org>
-	<cf836232-ef2b-40c8-b9e5-4f0dffdcc839@intel.com>
-	<20241220092356.69c9aa1e@kernel.org>
-	<35441a41-d543-4e7b-b0dc-537062d32c9c@intel.com>
-	<20241220113711.5b09140b@kernel.org>
-	<df42a234-f289-4be7-a698-54b645b0fd81@intel.com>
+	s=k20201202; t=1734728413;
+	bh=SOXkqMEmAu03o0ChSNj80svlqls47kB/7zH7ztB0UjU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bYXztb2nT1Z2tojwtGWGXXLl0p4sTHmCA5xPRJK9UXIQSyLh8Kfi+B17dIYv1GvsO
+	 pKanLY8FmdMlbf2XopyUAfZpt9+hLw9LrrGebnV7MLAuQzdfRCUpLXEtE2LxPhiy68
+	 S99Ix0sZ/o9PvxTAn5wVm29CjWilZq2pUKMBHZACTpsCKxoFGyvVB9qd3JCKEV+l33
+	 wdmntvpDctbGiVTom7a7uObZKzHCdCOmpwd95Z0wgZUhsIRVmuTGQkeHYezDS8wMm8
+	 0MYiwbN3NtH7HbEKXIoyNS6RLs/lPISn3sCT+YL0m11aJroAGiaNfbnj/BL6mGVboh
+	 jByEEYXce1PTA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC723806656;
+	Fri, 20 Dec 2024 21:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/2] netdev-genl: avoid empty messages in napi get
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173472843153.3019277.8963909942881596835.git-patchwork-notify@kernel.org>
+Date: Fri, 20 Dec 2024 21:00:31 +0000
+References: <20241219032833.1165433-1-kuba@kernel.org>
+In-Reply-To: <20241219032833.1165433-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jdamato@fastly.com, almasrymina@google.com,
+ sridhar.samudrala@intel.com, amritha.nambiar@intel.com
 
-On Fri, 20 Dec 2024 13:14:48 -0700 Ahmed Zaki wrote:
-> > Then you can probably register a single unified handler, and inside
-> > that handler check if the device wanted to have rmap or just affinity?  
-> 
-> This is what is in this patch already, all drivers following new 
-> approach will have netif_irq_cpu_rmap_notify() as their IRQ notifier.
-> 
-> IIUC, your goal is to have the notifier inside napi, not irq_glue. For 
-> this, we'll have to have our own version of irq_cpu_rmap_add() (for the 
-> above reason).
-> 
-> sounds OK?
+Hello:
 
-Yes.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 18 Dec 2024 19:28:32 -0800 you wrote:
+> Empty netlink responses from do() are not correct (as opposed to
+> dump() where not dumping anything is perfectly fine).
+> We should return an error if the target object does not exist,
+> in this case if the netdev is down we "hide" the NAPI instances.
+> 
+> Fixes: 27f91aaf49b3 ("netdev-genl: Add netlink framework functions for napi")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] netdev-genl: avoid empty messages in napi get
+    https://git.kernel.org/netdev/net/c/4a25201aa46c
+  - [net,v2,2/2] selftests: drv-net: test empty queue and NAPI responses in netlink
+    https://git.kernel.org/netdev/net/c/30b981796b94
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
