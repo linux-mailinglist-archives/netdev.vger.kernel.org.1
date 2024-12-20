@@ -1,219 +1,206 @@
-Return-Path: <netdev+bounces-153593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E079F8C55
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 07:05:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A499F8C96
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 07:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B72B51889B73
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 06:05:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BD3E1896C0C
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 06:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564C974059;
-	Fri, 20 Dec 2024 06:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310F719D06A;
+	Fri, 20 Dec 2024 06:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j5Sd47Xh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EBC3BBC5;
-	Fri, 20 Dec 2024 06:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4801A19D88B;
+	Fri, 20 Dec 2024 06:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734674739; cv=none; b=dBkMWelaYmVm5eed+pAN9n9dX+TceW3CVK3I5cnlKMuKCWolLRwVHw/Uc+SW6q7le8sTRHdOFwE10sdtSmXf6Q9LW29N/vGuRCXZMCynT2zSJx4c5tLk+XUCUv/ND9SaCPsuwC1z9JsAnssHS5jTeEPH7o6alvrdP0TIvC+DmzA=
+	t=1734675661; cv=none; b=ICxfSWUUfbBnSzvcGubS16mVvD46CukG321ER2gqiSZEZ8AqVbpqFv3RC7nbv/lmFIttOLVZWMS55hdQICItepaVTtWx0V3Y4Emfcxc81t2zxONLhCHxIH0H67DrbStcNiMXnoHgVQWL3XjAeyEp1cg31Nyv0jtQ2FExlvV6tRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734674739; c=relaxed/simple;
-	bh=xBdleAwdTVw76DYoTJBXmnZ53VZ1aTdYMwWZiAcUVqs=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=TwQf6722uk/ZyI1X2QhqJHVUDYb4V6J8RnieHGZipC2thLHdhrzRESirlfSX0oXYecFyW9ybWFftklR9CTN9QgqLCdo74VM7XnmY+YQ4yUjjEIWWP2bUhqeT1rj+hCclqypKluqh7U0G/4GINTNW2K/vlMp1IOBpgdVrK/dD8A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4YDxjM5Smfz5B1KS;
-	Fri, 20 Dec 2024 14:05:27 +0800 (CST)
-Received: from njb2app06.zte.com.cn ([10.55.23.119])
-	by mse-fl1.zte.com.cn with SMTP id 4BK65EmX024649;
-	Fri, 20 Dec 2024 14:05:14 +0800 (+08)
-	(envelope-from jiang.kun2@zte.com.cn)
-Received: from mapi (njb2app05[null])
-	by mapi (Zmail) with MAPI id mid204;
-	Fri, 20 Dec 2024 14:05:16 +0800 (CST)
-Date: Fri, 20 Dec 2024 14:05:16 +0800 (CST)
-X-Zmail-TransId: 2afd6765091c639-989bb
-X-Mailer: Zmail v1.0
-Message-ID: <20241220140516563WDQ_X40bt0ZOch3Qte1YO@zte.com.cn>
+	s=arc-20240116; t=1734675661; c=relaxed/simple;
+	bh=bMso3DHfsWBN0gDBTq+K2KopRQ7F5J1XtcvYTrPrpIU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iRw9wHTBHfo6kzcui383P78+0aFtPdBxEovvlZMYWJmYXv41rDDPWkK5+uHGaavsF/WKBAHavB8WYC250lLEnVM9xQbUH0nMwnMjvlO+bgerc4jFDbTvoHT28iKpp/TPIEPJqThlZC+M8Vf/XwX4cndgxLc38FNB8m1y5wgJJEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j5Sd47Xh; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7fd4998b0dbso1233106a12.0;
+        Thu, 19 Dec 2024 22:20:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734675658; x=1735280458; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Olb0QLGj+RCh4kd80efX/TZFFIjD27aCKDh0v0M6XD8=;
+        b=j5Sd47XhZOTxkN5tv1jqghLiU0APJcWlKpxzYtoIsssPWUe/Pg75jmpa3RttOs2wgv
+         djwZrnQABk/CBUaS2i3W0bDl9nizXRnBpc9iR/bhDgRRcAD51O7tj3Xqr1i5NCai/cCk
+         yIQsYrMQqoB1EEDj0Cs4i/JpykIVzaY19F4uaoLDRpaig+c5OgC1BvqDq7DgMrAbonMF
+         vO4xjp+REPP9afb7sPX7CGcdRZf/wGtbIIoJhPznHvoiueTeB1ynf3MvDz0b/lWFn2Ez
+         TJhg0a5NxMQy1m0hOEG29KD2bv3rc82EApXbyUwkFylOfuvT8uGCKqvYQw2O3tTT+4Xz
+         iWbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734675658; x=1735280458;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Olb0QLGj+RCh4kd80efX/TZFFIjD27aCKDh0v0M6XD8=;
+        b=asRIVToXOylZlJZbqC3tGeyUgixk7yypaGaW3EULFDTWfW6Agd1Lp2JeHjeJOzGnr8
+         Uaohh3xuFp1McSUzi3EOZHrFr6JUw/rR7TOCyDVRzTykGMjdsp90L40ZShxMGZyWK8hu
+         LAwDH6/Rnnhgvmh8C1XroKfb6XEx2BfT6hb1acb0lSTsosteQINR69CxMLFpUmTXdeq5
+         D7Vk+ZC+3pjZq535B7/DaG5MOuWkq1Zps5sMgWCBDzCO9ErMy1KbpDY4ofUOhelfVp9p
+         pMCUhOVSE1m4hWG9uwtwxKoVJz8F6Ob7J4Wu/rXFjeu21EbNey+RAb+gj7Ka/7cZ36QV
+         jCrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUyDWi4dPYsu33XwTxkQR6czvYlJALxq47BzFSKYV/N7qQZ1nWKSJImIl4Stsv1/cft2LL987I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6cW5LEJxFm2UUryGtkvc+ryJVmVlsom2UI4iwZA/F+KkQhe5O
+	5rn606Fnou4hGNWgInaOsjZSXsR/zD3UfojvaUvGY1gzonkG5zo5YBMKtjVT
+X-Gm-Gg: ASbGncsN3Z3V6DY7VjH7XGpHo5lKCdV5tOgeUawUdo7prmHd0iK+auXLj5XhV/5f9OP
+	WOuMQw0+j7HbzR2j1hfZB71pIdhNmNAA3ycwtKlrqGqjA6bxYo0kN/G0/O60LdmdAb4Mucg8AYi
+	g10S4sSyfwVI06ee0LS85HcOvCjX54BPrnSog47WRVG4FgoaMc3ZnqOEGY3f6W7HOMcXJYcFdpM
+	o8tKLfvfnEHwcVK6yhxJFI3Z3eHb4r+ATTjjhGx7XBl0Gf/7VeBS1dFBK0YqeAhHUNtx5CxRyL/
+	gkzlRTtBP1UgGLwvQg==
+X-Google-Smtp-Source: AGHT+IF6E9cVqnkRiwBBwaZlakFvSiONZRloqIlwwAi61MxMcEEA6Z1StgE3u7hVaMW9/CawqrkL6g==
+X-Received: by 2002:a05:6a21:164e:b0:1e1:bdae:e054 with SMTP id adf61e73a8af0-1e5e079985emr3580688637.25.1734675658262;
+        Thu, 19 Dec 2024 22:20:58 -0800 (PST)
+Received: from snail23.. (p7659208-ipoefx.ipoe.ocn.ne.jp. [221.188.16.207])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-842b1ce01d3sm2158548a12.23.2024.12.19.22.20.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 22:20:57 -0800 (PST)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org,
+	netdev@vger.kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	tmgross@umich.edu,
+	ojeda@kernel.org,
+	alex.gaynor@gmail.com,
+	gary@garyguo.net,
+	bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me,
+	a.hindborg@samsung.com,
+	aliceryhl@google.com,
+	anna-maria@linutronix.de,
+	frederic@kernel.org,
+	tglx@linutronix.de,
+	arnd@arndb.de,
+	jstultz@google.com,
+	sboyd@kernel.org,
+	mingo@redhat.com,
+	peterz@infradead.org,
+	juri.lelli@redhat.com,
+	vincent.guittot@linaro.org,
+	dietmar.eggemann@arm.com,
+	rostedt@goodmis.org,
+	bsegall@google.com,
+	mgorman@suse.de,
+	vschneid@redhat.com
+Subject: [PATCH v7 0/7] rust: Add IO polling
+Date: Fri, 20 Dec 2024 15:18:46 +0900
+Message-ID: <20241220061853.2782878-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <jiang.kun2@zte.com.cn>
-To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Cc: <hehe.peilin@zte.com.cn>, <xu.xin16@zte.com.cn>, <fan.yu9@zte.com.cn>,
-        <qiu.yutan@zte.com.cn>, <wang.yaxin@zte.com.cn>,
-        <tu.qiang35@zte.com.cn>, <yang.yang29@zte.com.cn>,
-        <ye.xingchen@zte.com.cn>, <zhang.yunkai@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4IG5leHRdIG5ldDpkc2E6Zml4IHRoZSBkc2FfcHRyIG51bGwgcG9pbnRlciBkZXJlZmVyZW5jZQ==?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 4BK65EmX024649
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 67650927.000/4YDxjM5Smfz5B1KS
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Peilin He<he.peilin@zte.com.cn>
+Add a helper function to poll periodically until a condition is met or
+a timeout is reached. By using the function, the 7th patch fixes
+QT2025 PHY driver to sleep until the hardware becomes ready.
 
-Issue
-=====
-Repeatedly accessing the DSA Ethernet controller via the ethtool command,
-followed by a system reboot, may trigger a DSA null pointer dereference,
-causing a kernel panic and preventing the system from rebooting properly.
-This can lead to data loss or denial-of-service, resulting in serious 
-consequences.
+As a result of the past discussion, this introduces two new types,
+Instant and Delta, which represent a specific point in time and a span
+of time, respectively.
 
-The original problem occurred in the Linux kernel version 5.4.19.
-The following is the panic log:
+Unlike the old rust branch, This adds a wrapper for fsleep() instead
+of msleep(). fsleep() automatically chooses the best sleep method
+based on a duration.
 
-[  172.523467] Unable to handle kernel NULL pointer dereference at virtual 
-address 0000000000000020
-[  172.532455] Mem abort info:
-[  172.535313] printk: console [ttyS0]: printing thread stopped
-[  172.536352]   ESR = 0x0000000096000006
-[  172.544926]   EC = 0x25: DABT (current EL), IL = 32 bits
-[  172.550321]   SET = 0, FnV = 0
-[  172.553427]   EA = 0, S1PTW = 0
-[  172.556646]   FSC = 0x06: level 2 translation fault
-[  172.561604] Data abort info:
-[  172.564563]   ISV = 0, ISS = 0x00000006
-[  172.568466]   CM = 0, WnR = 0
-[  172.571502] user pgtable: 4k pages, 48-bit VAs, pgdp=00000020a4b34000
-[  172.578058] [0000000000000020] pgd=08000020a4ce6003, p4d=08000020a4ce6003, 
-pud=08000020a4b4d003, pmd=0000000000000000
-[  172.588785] Internal error: Oops: 96000006 [#1] PREEMPT_RT SMP
-[  172.594641] Modules linked in: r8168(O) bcmdhd(O) ossmod(O) tipc(O)
-[  172.600933] CPU: 1 PID: 548 Comm: lldpd Tainted: G           O      
-[  172.610795] Hardware name: LS1028A RDB Board (DT)
-[  172.615508] pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[  172.622492] pc : dsa_master_get_sset_count+0x24/0xa4
-[  172.627475] lr : ethtool_get_drvinfo+0x8c/0x210
-[  172.632020] sp : ffff80000c233a90
-[  172.635338] x29: ffff80000c233a90 x28: ffff67ad21e45a00 x27: 0000000000000000
-[  172.642498] x26: 0000000000000000 x25: 0000ffffd1102110 x24: 0000000000000000
-[  172.649657] x23: 00020100001149a9 x22: 0000ffffd1102110 x21: 0000000000000000
-[  172.656816] x20: 0000000000000000 x19: ffff67ad00bbe000 x18: 0000000000000000
-[  172.663974] x17: 0000000000000000 x16: 0000000000000000 x15: 0000ffffd1102110
-[  172.671132] x14: ffffffffffffffff x13: 30322e344230342e x12: 33302e37564c4547
-[  172.678290] x11: 0000000000000020 x10: 0101010101010101 x9 : ffffd837fcebe6fc
-[  172.685448] x8 : 0101010101010101 x7 : 6374656e655f6c73 x6 : 74656e655f6c7366
-[  172.692606] x5 : ffff80000c233b01 x4 : ffffd837fdae0251 x3 : 0000000000000063
-[  172.699764] x2 : ffffd837fd076da0 x1 : 0000000000000000 x0 : ffff67ad00bbe000
-[  172.706923] Call trace:
-[  172.709371]  dsa_master_get_sset_count+0x24/0xa4
-[  172.714000]  ethtool_get_drvinfo+0x8c/0x210
-[  172.718193]  dev_ethtool+0x780/0x2120
-[  172.721863]  dev_ioctl+0x1b0/0x580
-[  172.725273]  sock_do_ioctl+0xc0/0x100
-[  172.728944]  sock_ioctl+0x130/0x3c0
-[  172.732440]  __arm64_sys_ioctl+0xb4/0x100
-[  172.736460]  invoke_syscall+0x50/0x120
-[  172.740219]  el0_svc_common.constprop.0+0x4c/0xf4
-[  172.744936]  do_el0_svc+0x2c/0xa0
-[  172.748257]  el0_svc+0x20/0x60
-[  172.751318]  el0t_64_sync_handler+0xe8/0x114
-[  172.755599]  el0t_64_sync+0x180/0x184
-[  172.759271] Code: a90153f3 2a0103f4 a9025bf5 f9418015 (f94012b6)
-[  172.765383] ---[ end trace 0000000000000002 ]---
+Add __might_sleep_precision(), rust friendly version of
+__might_sleep(), which takes a pointer to a string with the length.
+core::panic::Location::file() doesn't provide a null-terminated string
+so a work around is necessary to use __might_sleep(). Providing a
+null-terminated string for better C interoperability is under
+discussion [1].
 
-Root Cause
-==========
-Analysis of linux-next-6.13.0-rc3 reveals that the 
-dsa_conduit_get_sset_count() function accesses members of 
-a structure pointed to by cpu_dp without checking 
-if cpu_dp is a null pointer. This can lead to a kernel panic 
-if cpu_dp is NULL.
+[1]: https://github.com/rust-lang/libs-team/issues/466
 
-	static int dsa_conduit_get_sset_count(struct net_device *dev, 
-                                        int sset)
-	{
-		struct dsa_port *cpu_dp = dev->dsa_ptr;
-		const struct ethtool_ops *ops = cpu_dp->orig_ethtool_ops;
-		struct dsa_switch *ds = cpu_dp->ds;
-		...
-	}
+v7:
+- rebased on rust-next
+- use crate::ffi instead of core::ffi
+v6: https://lore.kernel.org/netdev/20241114070234.116329-1-fujita.tomonori@gmail.com/
+- use super::Delta in delay.rs
+- improve the comments
+- add Delta's is_negative() method
+- rename processor.rs to cpu.rs for cpu_relax()
+- add __might_sleep_precision() taking pointer to a string with the length
+- implement read_poll_timeout as normal function instead of macro
+v5: https://lore.kernel.org/netdev/20241101010121.69221-1-fujita.tomonori@gmail.com/
+- set the range of Delta for fsleep function
+- update comments
+v4: https://lore.kernel.org/lkml/20241025033118.44452-1-fujita.tomonori@gmail.com/
+- rebase on the tip tree's timers/core
+- add Instant instead of using Ktime
+- remove unused basic methods
+- add Delta as_micros_ceil method
+- use const fn for Delta from_* methods
+- add more comments based on the feedback
+- add a safe wrapper for cpu_relax()
+- add __might_sleep() macro
+v3: https://lore.kernel.org/lkml/20241016035214.2229-1-fujita.tomonori@gmail.com/
+- Update time::Delta methods (use i64 for everything)
+- Fix read_poll_timeout to show the proper debug info (file and line)
+- Move fsleep to rust/kernel/time/delay.rs
+- Round up delta for fsleep
+- Access directly ktime_t instead of using ktime APIs
+- Add Eq and Ord with PartialEq and PartialOrd
+v2: https://lore.kernel.org/lkml/20241005122531.20298-1-fujita.tomonori@gmail.com/
+- Introduce time::Delta instead of core::time::Duration
+- Add some trait to Ktime for calculating timeout
+- Use read_poll_timeout in QT2025 driver instead of using fsleep directly
+v1: https://lore.kernel.org/netdev/20241001112512.4861-1-fujita.tomonori@gmail.com/
 
-dev->dsa_ptr is set to NULL in both the dsa_switch_shutdown and
-dsa_conduit_teardown functions.  When the DSA module unloads,
-dsa_conduit_ethtool_teardown(dev) restores the original copy of the DSA 
-device's ethtool_ops using  "dev->ethtool_ops = cpu_dp->orig_ethtool_ops;"
-before setting dev->dsa_ptr to NULL. This ensures that ethtool_ops
-remains accessible after DSA unloading. However, dsa_switch_shutdown does 
-not restore the original copy of the DSA device's ethtool_ops, potentially 
-leading to a null pointer dereference of dsa_ptr and subsequently a system 
-panic.
+FUJITA Tomonori (7):
+  rust: time: Add PartialEq/Eq/PartialOrd/Ord trait to Ktime
+  rust: time: Introduce Delta type
+  rust: time: Introduce Instant type
+  rust: time: Add wrapper for fsleep function
+  MAINTAINERS: rust: Add TIMEKEEPING and TIMER abstractions
+  rust: Add read_poll_timeout functions
+  net: phy: qt2025: Wait until PHY becomes ready
 
-Solution
-========
-In the kernel's dsa_switch_shutdown function, before dp->conduit->dsa_ptr
-is set to NULL, the dsa_conduit_ethtool_shutdown function is called to
-restore the DSA master's ethtool_ops pointer to its original value.
-This prevents the kernel from entering the DSA ethtool_ops flow even if
-the user executes ethtool, thus avoiding the null pointer dereference issue
-with dsa_ptr.
+ MAINTAINERS               |   2 +
+ drivers/net/phy/qt2025.rs |  10 +++-
+ include/linux/kernel.h    |   2 +
+ kernel/sched/core.c       |  27 ++++++++--
+ rust/helpers/helpers.c    |   2 +
+ rust/helpers/kernel.c     |  13 +++++
+ rust/helpers/time.c       |   8 +++
+ rust/kernel/cpu.rs        |  13 +++++
+ rust/kernel/error.rs      |   1 +
+ rust/kernel/io.rs         |   5 ++
+ rust/kernel/io/poll.rs    |  84 +++++++++++++++++++++++++++++++
+ rust/kernel/lib.rs        |   2 +
+ rust/kernel/time.rs       | 103 ++++++++++++++++++++++++++++----------
+ rust/kernel/time/delay.rs |  43 ++++++++++++++++
+ 14 files changed, 282 insertions(+), 33 deletions(-)
+ create mode 100644 rust/helpers/kernel.c
+ create mode 100644 rust/helpers/time.c
+ create mode 100644 rust/kernel/cpu.rs
+ create mode 100644 rust/kernel/io.rs
+ create mode 100644 rust/kernel/io/poll.rs
+ create mode 100644 rust/kernel/time/delay.rs
 
-Signed-off-by: Peilin He<he.peilin@zte.com.cn>
-Co-developed-by: xu xin <xu.xin16@zte.com.cn>
-Signed-off-by: xu xin <xu.xin16@zte.com.cn>
-Signed-off-by: Kun Jiang <jiang.kun2@zte.com.cn>
-Cc: Fan Yu <fan.yu9@zte.com.cn>
-Cc: Yutan Qiu <qiu.yutan@zte.com.cn>
-Cc: Yaxin Wang <wang.yaxin@zte.com.cn>
-Cc: tuqiang <tu.qiang35@zte.com.cn>
-Cc: Yang Yang <yang.yang29@zte.com.cn>
-Cc: ye xingchen <ye.xingchen@zte.com.cn>
-Cc: Yunkai Zhang <zhang.yunkai@zte.com.cn>
 
----
- net/dsa/dsa.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 5a7c0e565a89..5eee0c436848 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -1561,6 +1561,17 @@ void dsa_unregister_switch(struct dsa_switch *ds)
- }
- EXPORT_SYMBOL_GPL(dsa_unregister_switch);
-
-+static void dsa_conduit_ethtool_shutdown(struct net_device *dev)
-+{
-+	struct dsa_port *cpu_dp = dev->dsa_ptr;
-+
-+	if (netif_is_lag_master(dev))
-+		return;
-+
-+	dev->ethtool_ops = cpu_dp->orig_ethtool_ops;
-+	cpu_dp->orig_ethtool_ops = NULL;
-+}
-+
- /* If the DSA conduit chooses to unregister its net_device on .shutdown, DSA is
-  * blocking that operation from completion, due to the dev_hold taken inside
-  * netdev_upper_dev_link. Unlink the DSA user interfaces from being uppers of
-@@ -1595,8 +1606,10 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
- 	/* Disconnect from further netdevice notifiers on the conduit,
- 	 * since netdev_uses_dsa() will now return false.
- 	 */
--	dsa_switch_for_each_cpu_port(dp, ds)
-+	dsa_switch_for_each_cpu_port(dp, ds) {
-+		dsa_conduit_ethtool_shutdown(dp->conduit);
- 		dp->conduit->dsa_ptr = NULL;
-+	}
-
- 	rtnl_unlock();
- out:
+base-commit: 0c5928deada15a8d075516e6e0d9ee19011bb000
 -- 
-2.25.1
+2.43.0
+
 
