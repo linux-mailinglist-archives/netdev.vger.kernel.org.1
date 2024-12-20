@@ -1,125 +1,119 @@
-Return-Path: <netdev+bounces-153751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B8DF9F9905
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:07:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ADA19F9974
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:26:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2378D166D26
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:06:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 438A41964791
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C793621CA16;
-	Fri, 20 Dec 2024 17:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44AD22A1E6;
+	Fri, 20 Dec 2024 17:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="Fct8SPxt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aXB/5nvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633E31A072C
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 17:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774E922A1D5;
+	Fri, 20 Dec 2024 17:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734716954; cv=none; b=Clw2BE50Ckl7P2ct8h+IcrsqdC4fZZIs6O09eJ50Y/buysDDoOxtYKCXT1OkdWr/Qn8+hfvsKdGgW2lnyFlTp1qJt+hP06Z04WW0CMhF9DavG4YfZqQrcDBkclbolWGZwewoqvelL+laI3kM45PZSNRQMjisbY9RHBSbk2aZ0EE=
+	t=1734717091; cv=none; b=dhjPsvNWuVAnQ/N6e2HJjcCLp4Euvc34Dx7uB0w2bzpWqhC22fLdFAJVACJEK6ba9oKeGYs5DA1dp53mvpbbZx8vIM7s2EdFfHgx2IY+xWQ612KLc37x2pKDJr+qHNO13/RTrklDIjtgNMltSIUw2tP73/QXPZ8QemfEHo8sG0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734716954; c=relaxed/simple;
-	bh=K98m4zNVDyefaUndlyrdmPvP/H/yy8VIJo96tE8aN4E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SWNf/5WPGmmhbbvpVEY9fi1uE35Hp9e4IV3FylqLvwLEf8ogQKtOy0+CT/+79hCu7jsBHP57WaaPRiQW08+8Cbiz/ldCdG7LV7J8tZ7fGKWN+FeRuRpftUARLbeEQNZqkaeVRzZMVAoMjmLpJusc3Qs6NFZGs/lhk+dVzDgQM2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=Fct8SPxt; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1734716937; x=1735321737; i=hfdevel@gmx.net;
-	bh=BfpnPC7fwmJTYpjs9IeXrw+VryP9Nb4v+CbGXMc5rLU=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=Fct8SPxtYDblX79tN9PzhhZL1s2aM8ifxNAYDvPzP5LH5QeWPJT4ztGnmqm6PQ4k
-	 OVO5GvFjrHvCm7fXf+dB9Ewj+UZ+qaMve5dhjeJHQqjmdiSCpcBdqDbLFwR0OTRKA
-	 nnrGko8TlgiOwZlA0r5F4CffDB6rzaKSjYThCwq6h48O0WNWWeKUeyYk7/9u2Tn7U
-	 8Vm18yc0HxktlPExdHBxMHmhDXHSsIbtocWAjtGIs2nctzoXjJCXJhRpnj/FlCl9v
-	 mevtaXlIEhi+R56BnRWcnFOTIy7n9Z4AL51kk04HhpIBF86YlQslIoVJozzRIdbDy
-	 vaOnRCjMhc0FSP0nhQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MFsUv-1tLdf423Y7-003leY; Fri, 20
- Dec 2024 18:48:57 +0100
-Message-ID: <33fbefb0-8b4f-4429-95a9-180b658e7914@gmx.net>
-Date: Fri, 20 Dec 2024 18:48:54 +0100
+	s=arc-20240116; t=1734717091; c=relaxed/simple;
+	bh=G3Dcv5kXUa9cHfOn+qLnQS0QmYMPszCsMH3p4VhBSEU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Ld7ihRsl7FbDX1w8VTM4TkZ3UIwTlWJVf4dYDkTs4gRvr0E5OMtMZ6pks2wUH/hrAtUI9Qkw/eBQKhwkNHh5d2NVlL6s47+dxCL3i3hmwJ/mVp283SBIgMAn2Knf8Sgzcjz1pxvzwO4Wf2eHcecttoOwqScRyo+FtNEZFjywAcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aXB/5nvU; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-725ed193c9eso2091996b3a.1;
+        Fri, 20 Dec 2024 09:51:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734717090; x=1735321890; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=68m2V1Lyf3TW9YMWZ2b+k97sw1EJgMttv425t2usl/k=;
+        b=aXB/5nvU6XHcJgwpyaMdXqjFk6/xVdPdUQhi+OY+Qp/Q0tHd1nuL9/saojIaNcOY+8
+         MODm+T6br0eDgtHEtntS0uFLaTQp/LfuW3biJThgUl9U2GSLisUluMmdrDLGkkqnSfMz
+         KslRDHMaiXTGThDrWfbrHLSaJIiIEjgJEz0H9UTbeH4fSsKXoZOgndSOx07Oo7e8Dg79
+         AGkzDT0kQWmT95gLDl7MtHIRuU63v8Z5IRV3wqhtbZsw2UBCQDXKY/6Og3IAuNlXJif5
+         lf89OyWfIybWPFjTIJKl1J3BF/gKL8xAuizl1cY02OnnqGUScSOoeSxuaL36ISd9g1P/
+         E+yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734717090; x=1735321890;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=68m2V1Lyf3TW9YMWZ2b+k97sw1EJgMttv425t2usl/k=;
+        b=VHjTjB0KQahu/w+P9jyqO/InZCYAUMf2xcxnt0AcJNPLWBhUmtKEcOv2xVV9PyPXZu
+         WNaTJjrOQCihx/Ufw9QfunUfIsm1yYX/0xebQrYfC3+WsaYIFTJr5oHGYyKPBYm8dVx/
+         VV8Ox8b3hggZxXdwPyrVcWiJs/0MBeW9Mlkvu0yo7FdnNj9wHvp3lYBSjobAmBB8Mqb7
+         /AyN1vOOVd1/Y2YA3QRr8Wef/lacff2V9U+CsXO5m3j3bDTl62Ffbvcj1SBnm7IqsIg5
+         5qvEX/zl6Scs2TGrgKtOeX0XTKovhTvmpFH1TFFHVWABM03ruPOhwdva9SuQFUBLx/S8
+         ruvw==
+X-Forwarded-Encrypted: i=1; AJvYcCWgC4Gx4WbY1zLd+S8vv4pv54eGezN0SlQLByMAnMo5uh+YV5MElm45C3KrW2qsxlKFedp6LGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWzRVlclMNats6UZaeylGaixymEvalLwNGLNyThRjXY+O2mfO1
+	gTQHTa40Da3oqDpp6Q/59m5ibR22XXNIx+ehRgnDGn6+yGnn2qZ8EQSxdA==
+X-Gm-Gg: ASbGncsyxf4YueeoCm422c16/C1HCo1ZnkRjOnS6E1J2fUEs3wBsJ/sCZMYvZW2UwBS
+	Fj8XHvwMpTgx1LIMBkBhvlCxjHEEM51nSZzkxofQtzzW3daz7y3ft+IY0pi6X4Gm5hFoSY80lut
+	sb1wZekDeWrE9fp8g2CDGmDnrKDDAZ8uc/4wfAip70R/MuAdiU1eA0yqGZk1DD4W2QbIqBtwDnT
+	qtsJlvVBO7MEvDuGI8thVMfCOesBTp0RIMQB9Rih17huYA+0u3YutU=
+X-Google-Smtp-Source: AGHT+IFy0EltL/dutMq9XQO23HR5oIQnqz/laJ9qwqdJ7+phnJf2h6CZSvbnN4yk0n50T4FgneEK1w==
+X-Received: by 2002:a05:6a21:6da4:b0:1e0:d4f4:5b2f with SMTP id adf61e73a8af0-1e5e07ffb0dmr7660932637.32.1734717089728;
+        Fri, 20 Dec 2024 09:51:29 -0800 (PST)
+Received: from localhost ([98.97.44.4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8fd58asm3482058b3a.145.2024.12.20.09.51.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Dec 2024 09:51:29 -0800 (PST)
+Date: Fri, 20 Dec 2024 09:51:28 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, 
+ Cong Wang <cong.wang@bytedance.com>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <6765aea049149_21de2208b@john.notmuch>
+In-Reply-To: <20241213034057.246437-2-xiyou.wangcong@gmail.com>
+References: <20241213034057.246437-1-xiyou.wangcong@gmail.com>
+ <20241213034057.246437-2-xiyou.wangcong@gmail.com>
+Subject: RE: [Patch bpf v3 1/4] bpf: Check negative offsets in
+ __bpf_skb_min_len()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 5/7] net: tn40xx: create software node for
- mdio and phy and add to mdiobus
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>,
- devnull+hfdevel.gmx.net@kernel.org
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
-References: <20241217-tn9510-v3a-v3-0-4d5ef6f686e0@gmx.net>
- <20241217-tn9510-v3a-v3-5-4d5ef6f686e0@gmx.net>
- <20241220.102408.968249477814979263.fujita.tomonori@gmail.com>
-Content-Language: en-US
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-In-Reply-To: <20241220.102408.968249477814979263.fujita.tomonori@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:ldY01dgDoqWK4UPsCu2oy6Coh/VN1bdudPeB/q2/2VEtF91+bM8
- vbmtpOhG96y1UqBcfyyYj1Z0KKNo6PgqHdtO5HOQotLr2ShOODwt61SzYQhZSmNKLF0kdZi
- c3AFl0CtQG/IylyII7PHcGjBLe8ttqZkrIQaXpc25de2XU19yDUq9MjFNqRGVEhh74KwwRq
- vL1LHBCTwmxnYwP6M7nkA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:blC1Tby4kNE=;+KPcuAJta7MHqgrZpi7qVPUlU5r
- DfQVE3YPGXuXx4yVXCgwYMp9t815ga/kmfBvp7/u6639FsTx6fHz4cTpAmDwik9g8zAxQc9nw
- np+xNeERPqwYzRjv6d5+RIz9+wjU7LF5/O51cEZ2pkeJq4H348CDclFEtNjkfGT4xqn49+6Vx
- dpDvFnyCRK5TAPCQIk1A/0H0mb59EKjt7vgyAEPc46BOnncthXaHBCeE2N+WcjBjW1p5hqtI0
- Do0nMumPuUv0G5fXWzGqR2hHLo6lhRW69r0RXchWnws29iNAm1ngrUh9OD4DQ4CXicqB8rUUO
- O48/HT+U2gmWeAk5eLjdEdsx94P35oOWxyTl5j9vwlbBbSg5wna271uAzHLf2p+ZNoC6DIlC4
- JpiCUvme4se+ykucXaivFLAvz6V69Zejwz0T82nYbsiL0duEdG2gTSMTtA8k4+ybOBpm58hzw
- UVZkroiuO01DwO+y+erwKqhd/BjKqySd3vV6qXMiAE6Ro+kUS5LXkYEZWUYkEuAxy0jJJxx34
- mugnjremNfhxJlpMDZK5PfuqKMwETDqA/vIgnljuzDLhL0rd8E3oawA1BSrvIjl0ppJstRj9K
- v1+PNRbr0oT0zo0iXtlKXVt1Kr76hh84THFJma69zApuLYBPUwoIA+cn5eUxyQS0XILg7lhWC
- wXJecTuM9wvqmpC74YX30gdhpM8vnrM5OJkXrlU4yVSe2WJ+qdLV6L8bznnrasoDBfmjC/jCq
- Oe8u/Xnqvo8dGewcZ72kl8B3OOWEPDsm8Eq1gAkj/KWeof2NNv5dfn2168xH39g1IlyS/RVqL
- pSqFW0vPSOtNv8xUZjGKjntEh7a6wEgQ9m4ri7BWNLmzHG6z15kvr08e3yvAEXErmnhqKYVJf
- oP6ea6Q1B5VRfujocqgaIuymzlCwkuOdhNJUnlLCDjBfPnAYOfTS62zTsJNBPsa0qNpfMwRtf
- yxTy1lW/xA8EegZHwIs7j9ST7YsIeeHjaIg8+6Qg/HpYYOA5+JiTl7BXb6lvNrIZty93KVzQi
- LEX9P7abE/V3A45dsoyghY3FsXWAwkQplKQIrgyz3jNaHtN8aIbS9/bO6AWIyC8ydEOzttTye
- d/IW+PfjVBpgXjfi4MYnsBgoj2pRKO
 
-On 20.12.2024 02.24, FUJITA Tomonori wrote:
-> On Tue, 17 Dec 2024 22:07:36 +0100
-> Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org> wrote:
->
->> From: Hans-Frieder Vogt <hfdevel@gmx.net>
->>
->> Create a software node for the mdio function, with a child node for the
->> Aquantia AQR105 PHY, providing a firmware-name (and a bit more, which may
->> be used for future checks) to allow the PHY to load a MAC specific
->> firmware from the file system.
->>
->> The name of the PHY software node follows the naming convention suggested
->> in the patch for the mdiobus_scan function (in the same patch series).
->>
->> Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
->> ---
->>   drivers/net/ethernet/tehuti/tn40.c      | 10 ++++-
->>   drivers/net/ethernet/tehuti/tn40.h      | 30 +++++++++++++++
->>   drivers/net/ethernet/tehuti/tn40_mdio.c | 65 ++++++++++++++++++++++++++++++++-
->>   3 files changed, 103 insertions(+), 2 deletions(-)
-> Boards with QT2025 also creates a software node for AQR105 PHY?
-Yes, that's the idea. Of course, creation of the software node could be made
-dependent on the actual device, but creating it unconditionally just makes
-things a bit easier.
-Would you rather prefer to have the software node only created for a device
-that is likely to need it?
+Cong Wang wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
+> 
+> skb_network_offset() and skb_transport_offset() can be negative when
+> they are called after we pull the transport header, for example, when
+> we use eBPF sockmap at the point of ->sk_data_ready().
+> 
+> __bpf_skb_min_len() uses an unsigned int to get these offsets, this
+> leads to a very large number which then causes bpf_skb_change_tail()
+> failed unexpectedly.
+> 
+> Fix this by using a signed int to get these offsets and ensure the
+> minimum is at least zero.
+> 
+> Fixes: 5293efe62df8 ("bpf: add bpf_skb_change_tail helper")
+> Cc: John Fastabend <john.fastabend@gmail.com>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> ---
+
+Acked-by: John Fastabend <john.fastabend@gmail.com>
 
