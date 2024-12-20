@@ -1,71 +1,65 @@
-Return-Path: <netdev+bounces-153734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B7A9F97F6
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:29:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E16349F97F8
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:29:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B59E81897A42
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:22:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6808B165C41
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8A122ACDF;
-	Fri, 20 Dec 2024 17:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D424B22F3A3;
+	Fri, 20 Dec 2024 17:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tErzRYkh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NOTeML45"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2C121C9FD;
-	Fri, 20 Dec 2024 17:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A608A22F39B;
+	Fri, 20 Dec 2024 17:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734714760; cv=none; b=dBhJRfOyTG0LJbUfgO+EOat5Q5ZkSN4sA+u5iLdxTaqRSnWwq7gwbH+eVbcjCCS5CJx0xnefBNHABJnu4gHhL1Ok5OgvbpkHVLmnD5mZX7aCn1YORnQevoNkFv9wetkhvPpCbajgAHvRb7T5Poovh7ZvYnKjnrBURI6/1XmmjDA=
+	t=1734714790; cv=none; b=Ewk6QTDm2S8OYlE1q1uwwL6ldLYhzObxZ5nL2ypmusvdtEUI3lst0q9ElHCmkFRRHQM8QqcI2pZDYiHUbHm9xQow6EEcaB/Dkx7kAo2+gyONTReuRrzA8G6leX9OkZEjSA/jU6nFj10FzGZuj9qtgo0+qcDlBvENN6tUPgrQtPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734714760; c=relaxed/simple;
-	bh=/PFeFh6y0Sc/gSAjY8li4ftQqcEtlJf8W6ZfdfyquI8=;
+	s=arc-20240116; t=1734714790; c=relaxed/simple;
+	bh=HVIKNU5iVlXNtr2zMBfv80CrAya3k2UMQgene8bL7zI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Mq9G21iL/KaexBmozmvKgZ0TsTBZcZ5mhOkUomcY9MBAAvV4X/Q2F4BQiHQFnlxt5mDewf0Q963FgAcGEjydM7ohEJutfdyjE9gkoF9UmWTWJ5r84yTFN1NOaGkOPeehBhSZ/l41r7YqF9/gYdrDtl8H6GpGCSF8uqEDk5zROJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tErzRYkh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32DFBC4CECD;
-	Fri, 20 Dec 2024 17:12:38 +0000 (UTC)
+	 MIME-Version; b=BKsdYYNyjNA2r8+m4se/LuWXCOOdQQ6ve2nEeYDBUG0sxT3ZrM1Tka/9V+jvQYPcLY3sgy5CAn6wEUnJZbgRCG6UHKCDvBPGLDoZFCF9VgyChWig4VnbtqtfXkqA+7qkm5hRE4vH0QlMb+oCb19C8gzQZYlGXgut0tERQIC7eYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NOTeML45; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F4EFC4CECD;
+	Fri, 20 Dec 2024 17:13:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734714760;
-	bh=/PFeFh6y0Sc/gSAjY8li4ftQqcEtlJf8W6ZfdfyquI8=;
+	s=k20201202; t=1734714790;
+	bh=HVIKNU5iVlXNtr2zMBfv80CrAya3k2UMQgene8bL7zI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tErzRYkhTKCRYI+mCVWDu9vpMlItDzorNzOXbLyHaSvaQEv3YzckMQqpJhXeKexuU
-	 zo4FgWxxo3JfhWo8LHIbCK9iSNY0aVmherjZR534+YlH0Bu5Q7P4zBJs/wkbiAw5B2
-	 15f4A4XUpkMEfaYQ96sPO6frU1dOfTKsZD5kH8lew78IuxD269yduzH11ihWQdmvIl
-	 ivZL0gbbX7DSCkSDQ51/XXvHw3+YrFD6UfBpYtRoSd4osQnUO33+l9SI1CQELZYIw4
-	 hhfsW98oqIGgXkwOeKHt6ENbB4x+geSxrj4MmioO848MiSA0BHWC/XtmZfqyU+alXb
-	 lrjVKv0Hoctiw==
+	b=NOTeML45c33iBzC8iNMCapxe0qf65b+D5rWwOjQ2CXLnu6GeMEyMPaF32iSbNMI1I
+	 pE9/LKYWVtYp0bl9RJpEdrLLDPYr1T5UVcsgdQTaFAsqOlnuWCYFo9mZVSOVnmst5V
+	 sgSFDO65ragD/cljW6DXDlR84IWi3MtoyQ4a24+gfNneWX4UJp5AdF31wGB3ZDYmjq
+	 X+nQuuLmziN8Lj02vHEkuRSkMBBDBrs/44b5viqFYxWJ2p32kve2t4fQat2KTd2EMX
+	 feuCo+xrv+gnyU+J2+DM1LDAEDrgGasMxZMapy4xjNymtZ3lFtbO9s0sNNuyR80WpC
+	 y1NaYceTjAvwQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eduard Zingerman <eddyz87@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
+Cc: Daniele Palmas <dnlplm@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
+	bjorn@mork.no,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	shuah@kernel.org,
-	leon.hwang@linux.dev,
-	yonghong.song@linux.dev,
-	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 29/29] bpf: consider that tail calls invalidate packet pointers
-Date: Fri, 20 Dec 2024 12:11:30 -0500
-Message-Id: <20241220171130.511389-29-sashal@kernel.org>
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 13/16] net: usb: qmi_wwan: add Telit FE910C04 compositions
+Date: Fri, 20 Dec 2024 12:12:37 -0500
+Message-Id: <20241220171240.511904-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241220171130.511389-1-sashal@kernel.org>
-References: <20241220171130.511389-1-sashal@kernel.org>
+In-Reply-To: <20241220171240.511904-1-sashal@kernel.org>
+References: <20241220171240.511904-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,77 +68,110 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.6
+X-stable-base: Linux 6.6.67
 Content-Transfer-Encoding: 8bit
 
-From: Eduard Zingerman <eddyz87@gmail.com>
+From: Daniele Palmas <dnlplm@gmail.com>
 
-[ Upstream commit 1a4607ffba35bf2a630aab299e34dd3f6e658d70 ]
+[ Upstream commit 3b58b53a26598209a7ad8259a5114ce71f7c3d64 ]
 
-Tail-called programs could execute any of the helpers that invalidate
-packet pointers. Hence, conservatively assume that each tail call
-invalidates packet pointers.
+Add the following Telit FE910C04 compositions:
 
-Making the change in bpf_helper_changes_pkt_data() automatically makes
-use of check_cfg() logic that computes 'changes_pkt_data' effect for
-global sub-programs, such that the following program could be
-rejected:
+0x10c0: rmnet + tty (AT/NMEA) + tty (AT) + tty (diag)
+T:  Bus=02 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#= 13 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=10c0 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FE910
+S:  SerialNumber=f71b8b32
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-    int tail_call(struct __sk_buff *sk)
-    {
-    	bpf_tail_call_static(sk, &jmp_table, 0);
-    	return 0;
-    }
+0x10c4: rmnet + tty (AT) + tty (AT) + tty (diag)
+T:  Bus=02 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#= 14 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=10c4 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FE910
+S:  SerialNumber=f71b8b32
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-    SEC("tc")
-    int not_safe(struct __sk_buff *sk)
-    {
-    	int *p = (void *)(long)sk->data;
-    	... make p valid ...
-    	tail_call(sk);
-    	*p = 42; /* this is unsafe */
-    	...
-    }
+0x10c8: rmnet + tty (AT) + tty (diag) + DPL (data packet logging) + adb
+T:  Bus=02 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#= 17 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=10c8 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FE910
+S:  SerialNumber=f71b8b32
+C:  #Ifs= 5 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 3 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=80 Driver=(none)
+E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=(none)
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-The tc_bpf2bpf.c:subprog_tc() needs change: mark it as a function that
-can invalidate packet pointers. Otherwise, it can't be freplaced with
-tailcall_freplace.c:entry_freplace() that does a tail call.
-
-Signed-off-by: Eduard Zingerman <eddyz87@gmail.com>
-Link: https://lore.kernel.org/r/20241210041100.1898468-8-eddyz87@gmail.com
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+Signed-off-by: Daniele Palmas <dnlplm@gmail.com>
+Link: https://patch.msgid.link/20241209151821.3688829-1-dnlplm@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/filter.c                              | 2 ++
- tools/testing/selftests/bpf/progs/tc_bpf2bpf.c | 2 ++
- 2 files changed, 4 insertions(+)
+ drivers/net/usb/qmi_wwan.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 33125317994e..bbd0c08072cb 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -7934,6 +7934,8 @@ bool bpf_helper_changes_pkt_data(enum bpf_func_id func_id)
- 	case BPF_FUNC_xdp_adjust_head:
- 	case BPF_FUNC_xdp_adjust_meta:
- 	case BPF_FUNC_xdp_adjust_tail:
-+	/* tail-called program could call any of the above */
-+	case BPF_FUNC_tail_call:
- 		return true;
- 	default:
- 		return false;
-diff --git a/tools/testing/selftests/bpf/progs/tc_bpf2bpf.c b/tools/testing/selftests/bpf/progs/tc_bpf2bpf.c
-index 8a0632c37839..79f5087dade2 100644
---- a/tools/testing/selftests/bpf/progs/tc_bpf2bpf.c
-+++ b/tools/testing/selftests/bpf/progs/tc_bpf2bpf.c
-@@ -10,6 +10,8 @@ int subprog(struct __sk_buff *skb)
- 	int ret = 1;
- 
- 	__sink(ret);
-+	/* let verifier know that 'subprog_tc' can change pointers to skb->data */
-+	bpf_skb_change_proto(skb, 0, 0);
- 	return ret;
- }
- 
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index 89775b6d0699..8e30df676ede 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1373,6 +1373,9 @@ static const struct usb_device_id products[] = {
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a0, 0)}, /* Telit FN920C04 */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a4, 0)}, /* Telit FN920C04 */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a9, 0)}, /* Telit FN920C04 */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10c0, 0)}, /* Telit FE910C04 */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10c4, 0)}, /* Telit FE910C04 */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10c8, 0)}, /* Telit FE910C04 */
+ 	{QMI_FIXED_INTF(0x1bc7, 0x1100, 3)},	/* Telit ME910 */
+ 	{QMI_FIXED_INTF(0x1bc7, 0x1101, 3)},	/* Telit ME910 dual modem */
+ 	{QMI_FIXED_INTF(0x1bc7, 0x1200, 5)},	/* Telit LE920 */
 -- 
 2.39.5
 
