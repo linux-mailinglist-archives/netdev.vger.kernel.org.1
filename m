@@ -1,239 +1,120 @@
-Return-Path: <netdev+bounces-153763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9CE9F9A6F
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 20:27:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1E39F9A8C
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 20:32:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59B831897183
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:25:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39E3E188B360
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D171E21D581;
-	Fri, 20 Dec 2024 19:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8B52210F0;
+	Fri, 20 Dec 2024 19:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CSI3wKaD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ITl20kCr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147B7143736;
-	Fri, 20 Dec 2024 19:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68FD219A8A;
+	Fri, 20 Dec 2024 19:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734722697; cv=none; b=bRAya4HxCsDIjAzAkbBq+zPdz7ZDA0PEYGXvJ+X0zL2WHk6phPEXAVlRQhyD6A150gegH5UP7mQMqpUquruqjay8syuixvPZ4qYhGgyk/Tij3ay/gejDXmYicfd0GmdBNKGn5IQWrUY6rZytuE1w43qgb8LANQvGk5yVHi8M20c=
+	t=1734723087; cv=none; b=qKV5tDomwSzIjfvKk2hi9X8g/cYhC+8dVobq97jjAG0QfYiwest1+M+wZI6XDTTLzzED5sarQ1/VG6q4TjF+72CMxk9NtYhocHigc+AyCBgfPO86Ok/Z9cc/NUP9StQtyOoK2zIOkY+VwbogkQoSxP60ksHLixpg0Q4SaAZcCWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734722697; c=relaxed/simple;
-	bh=wV/YdBlfQNiDvTJrVJVxOSzC/plNKeR73VQON2TyRo4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WZ7EuVt08kd7IIcxiLJ/5oK2yCBQENVTGiV+8rFZdG+DiFfUDRdt7OloLHQq1hsX9ye+wEf7S4wY36881+tbu9BVaQD4V7kwHKRIu79VSxSZMvJtIpa6e7OYCWjQB1yczZCpy4eNF6mMz9x0STQxufB3H/9xjQ/Zzo77FFoH9qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CSI3wKaD; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6efe4324f96so19631307b3.1;
-        Fri, 20 Dec 2024 11:24:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734722695; x=1735327495; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jEVwMyQgA+Ia+XCUUmg6Gvt7/yGoGQXRqwNATybxg9A=;
-        b=CSI3wKaDJWAf8IV+FrJZbvP8ISxUzOfDpwQy9UEydkxgi0icuQDy4PipL46lvrXV5g
-         yvLkawS/Yy6raN6I+4uvw6NxRhswLhE3d2YaffdzXqOw7sWyil+cFFDLxpWLLmWfXS/I
-         QF7ZzG2eSeEji/P74YmuB7tTTtUGUSW6LEC8on7R+P9t+SXJxCjZlaUs4WpEUMt7ohxu
-         VBxPOwJ/pBnW0Jtpt0HiZiI3qfKsqDjYnkPr7wTAmLMTG3HQ3H9vVa8KsDjW89yJ3RyO
-         jpeM7loMh7XMEtRxAPINyYMbGmopqpjKbCmzbiPJTRsZP/Bt4zg6wGBrvDsGVewA1glc
-         4m6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734722695; x=1735327495;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jEVwMyQgA+Ia+XCUUmg6Gvt7/yGoGQXRqwNATybxg9A=;
-        b=lUQFgmHBPpILBRKoYMj6CosnNuS58pqvFfNOLariIPL7KekNgXbpt0nk9/D78mgp1Z
-         VgMvZdnLRXGr8PUINk5rb6wVlcqRbp3mKE0VZshcxq8f0vzCn1Dwcf90wQlpcg/FVw49
-         S93WqmYNbPrkHD6P0XqNuFDCNC4rvrLatHV5hDQ6rrsGFChWvflJlLZtxob6kj9C3LZt
-         T79y5cXNVmGowBBkdGNn6eDTMDwc2sLWEgGFnK3Xl7FwhgSGCRHfd1F7dn88pf++YLDP
-         A2ABLgGNBUAXGIvx+gL5fpBKWazvfaZDHHOiTWJ+V8fh9aty5ovAcvXhn0XFEXoEnYQK
-         mKyw==
-X-Forwarded-Encrypted: i=1; AJvYcCW9A+nWXQNPzt5ZFU2U9y2/+8ssB12IpOzcusgmdr1/Nheg19DCSFVbhurxVfhJoiiEuQw=@vger.kernel.org, AJvYcCXOBoAM+qSUKZB1gmUI8c3MOK9SH/CpfW98BIv7A9gLzTlBlwG5BHortm4hZK5tFNuORoJxyxqH@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzbXI//NgbJEJKpPm/8A7WiIimXQAyjaiJdsbXSwBEC85oDpeQ
-	CNCD0eh8krVjVFWX8DUZFruVyqo42LxIEJY/HlxienyBzFo1rOpfhDiYgY4q+IPmt3OaA+bQX8G
-	mtVueNrX0Wfd35xpbqGTtegA533Q=
-X-Gm-Gg: ASbGncsMRb7IpOEsmdJ3knTLE9GnlS+V8/oDrLpr1/OUOsgF09/+I/Cs8U/OqSVZ7Og
-	bM4IamhfPpUF7yc/4Lacq1UB38WwYk/h+IRTkBg==
-X-Google-Smtp-Source: AGHT+IF/UPm6g8FXn2V4OW8zPDsR+IJ+xbp4ik2pKznZ5isSFqJVUBAX6mOyH9H/vWdaGgB2PuKB0hYro0HbesKQ8/U=
-X-Received: by 2002:a05:690c:f84:b0:6ef:4ed2:7df4 with SMTP id
- 00721157ae682-6f3f821a9cemr35710437b3.33.1734722694929; Fri, 20 Dec 2024
- 11:24:54 -0800 (PST)
+	s=arc-20240116; t=1734723087; c=relaxed/simple;
+	bh=gE5B/harMQOgrohpMM0tjbu+TwLh/J6VRdbbGp8Y0Q4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g+SHR0VDvBr7ytlOwVc99GyhtaYCAUoWgIjnZ4qmK9yQBs1zuejSuXnpxGq/iuQSeYPqYp9ti3QwA9AwfkKo6PmcJ53aMCJ9MBQ3tJe/yZt7j9sgXdFsK6VgXoqJJLwM3GMroMQNPp+PgmPmm9WzzaV0GEdpm7QAK50PbG+nNPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ITl20kCr; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734723085; x=1766259085;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gE5B/harMQOgrohpMM0tjbu+TwLh/J6VRdbbGp8Y0Q4=;
+  b=ITl20kCrkL9BGrQy04/UGDJ0KtAgqNcSvkxY3lqx0UxrTg1W3MuZUvmw
+   ormnEZbSRHADeEHrKiOnMmY+js6SHVVOr5rNybexZMHe6cH7beMrPSTbO
+   3fFHpfQ35qWNUgSuri6c1e1UrZO24yNbeK8Pjj/IteIu48lbf3EDcCBcw
+   4K1JcyMiaVSpiVjDwGVtlc5uOWSvIlNaQltQOgYzpiBxtakn7OklcopLS
+   UA/P8AGB3fGyZQaztPpgfBS2SsrEtLZlxOAg9qGBM8RLVilvW2LziC0Qh
+   JMukctWITzWhAmVH3b8jSpNrT//T4bjpuhSRv13Q0Mc2wOXhX6bypmu4n
+   A==;
+X-CSE-ConnectionGUID: Ebf1tThMT2m68gNffk+BqA==
+X-CSE-MsgGUID: hnYdn4i5R7e9ljbHQnEjXw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="45773430"
+X-IronPort-AV: E=Sophos;i="6.12,251,1728975600"; 
+   d="scan'208";a="45773430"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 11:31:15 -0800
+X-CSE-ConnectionGUID: Im4d5srGTq6qkVGqKay+qA==
+X-CSE-MsgGUID: ZEwlx298SN2ELracm5cmMA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,251,1728975600"; 
+   d="scan'208";a="103568129"
+Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 20 Dec 2024 11:31:08 -0800
+Received: from kbuild by a46f226878e0 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tOiiH-0001dL-1p;
+	Fri, 20 Dec 2024 19:31:05 +0000
+Date: Sat, 21 Dec 2024 03:30:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: MD Danish Anwar <danishanwar@ti.com>, aleksander.lobakin@intel.com,
+	lukma@denx.de, m-malladi@ti.com, diogo.ivo@siemens.com,
+	rdunlap@infradead.org, schnelle@linux.ibm.com,
+	vladimir.oltean@nxp.com, horms@kernel.org, rogerq@kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, andrew+netdev@lunn.ch
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [PATCH net-next 1/4] net: ti: Kconfig: Select HSR for ICSSG
+ Driver
+Message-ID: <202412210336.BmgcX3Td-lkp@intel.com>
+References: <20241216100044.577489-2-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241213232958.2388301-1-amery.hung@bytedance.com>
- <20241213232958.2388301-8-amery.hung@bytedance.com> <f57ee5de-bf8b-40ce-8883-904653c422b5@linux.dev>
-In-Reply-To: <f57ee5de-bf8b-40ce-8883-904653c422b5@linux.dev>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 20 Dec 2024 11:24:44 -0800
-Message-ID: <CAMB2axNgThq22C+w7OCY5FXy4Gp4_RYF+twT5Rk9AUHOF2SHkw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v1 07/13] bpf: net_sched: Add a qdisc watchdog timer
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Amery Hung <amery.hung@bytedance.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com, 
-	martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br, 
-	yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241216100044.577489-2-danishanwar@ti.com>
 
-On Wed, Dec 18, 2024 at 5:16=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 12/13/24 3:29 PM, Amery Hung wrote:
-> > Add a watchdog timer to bpf qdisc. The watchdog can be used to schedule
-> > the execution of qdisc through kfunc, bpf_qdisc_schedule(). It can be
-> > useful for building traffic shaping scheduling algorithm, where the tim=
-e
-> > the next packet will be dequeued is known.
-> >
-> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> > ---
-> >   include/net/sch_generic.h |  4 +++
-> >   net/sched/bpf_qdisc.c     | 51 ++++++++++++++++++++++++++++++++++++++=
--
-> >   net/sched/sch_api.c       | 11 +++++++++
-> >   net/sched/sch_generic.c   |  8 ++++++
-> >   4 files changed, 73 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> > index 5d74fa7e694c..6a252b1b0680 100644
-> > --- a/include/net/sch_generic.h
-> > +++ b/include/net/sch_generic.h
-> > @@ -1357,4 +1357,8 @@ static inline void qdisc_synchronize(const struct=
- Qdisc *q)
-> >               msleep(1);
-> >   }
-> >
-> > +int bpf_qdisc_init_pre_op(struct Qdisc *sch, struct nlattr *opt, struc=
-t netlink_ext_ack *extack);
-> > +void bpf_qdisc_destroy_post_op(struct Qdisc *sch);
-> > +void bpf_qdisc_reset_post_op(struct Qdisc *sch);
-> > +
-> >   #endif
-> > diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-> > index 28959424eab0..7c155207fe1e 100644
-> > --- a/net/sched/bpf_qdisc.c
-> > +++ b/net/sched/bpf_qdisc.c
-> > @@ -8,6 +8,10 @@
-> >
-> >   static struct bpf_struct_ops bpf_Qdisc_ops;
-> >
-> > +struct bpf_sched_data {
-> > +     struct qdisc_watchdog watchdog;
-> > +};
-> > +
-> >   struct bpf_sk_buff_ptr {
-> >       struct sk_buff *skb;
-> >   };
-> > @@ -17,6 +21,32 @@ static int bpf_qdisc_init(struct btf *btf)
-> >       return 0;
-> >   }
-> >
-> > +int bpf_qdisc_init_pre_op(struct Qdisc *sch, struct nlattr *opt,
-> > +                       struct netlink_ext_ack *extack)
-> > +{
-> > +     struct bpf_sched_data *q =3D qdisc_priv(sch);
-> > +
-> > +     qdisc_watchdog_init(&q->watchdog, sch);
-> > +     return 0;
-> > +}
-> > +EXPORT_SYMBOL(bpf_qdisc_init_pre_op);
-> > +
-> > +void bpf_qdisc_reset_post_op(struct Qdisc *sch)
-> > +{
-> > +     struct bpf_sched_data *q =3D qdisc_priv(sch);
-> > +
-> > +     qdisc_watchdog_cancel(&q->watchdog);
-> > +}
-> > +EXPORT_SYMBOL(bpf_qdisc_reset_post_op);
-> > +
-> > +void bpf_qdisc_destroy_post_op(struct Qdisc *sch)
-> > +{
-> > +     struct bpf_sched_data *q =3D qdisc_priv(sch);
-> > +
-> > +     qdisc_watchdog_cancel(&q->watchdog);
-> > +}
-> > +EXPORT_SYMBOL(bpf_qdisc_destroy_post_op);
->
-> These feel like the candidates for the ".gen_prologue" and ".gen_epilogue=
-". Then
-> the changes to sch_api.c is not needed.
->
+Hi MD,
 
-I will switch to gen_prologue and gen_epilogue in the next version.
-Thank you so much for working on this.
+kernel test robot noticed the following build warnings:
 
-> > +
-> >   static const struct bpf_func_proto *
-> >   bpf_qdisc_get_func_proto(enum bpf_func_id func_id,
-> >                        const struct bpf_prog *prog)
-> > @@ -134,12 +164,25 @@ __bpf_kfunc void bpf_qdisc_skb_drop(struct sk_buf=
-f *skb,
-> >       __qdisc_drop(skb, (struct sk_buff **)to_free_list);
-> >   }
-> >
-> > +/* bpf_qdisc_watchdog_schedule - Schedule a qdisc to a later time usin=
-g a timer.
-> > + * @sch: The qdisc to be scheduled.
-> > + * @expire: The expiry time of the timer.
-> > + * @delta_ns: The slack range of the timer.
-> > + */
-> > +__bpf_kfunc void bpf_qdisc_watchdog_schedule(struct Qdisc *sch, u64 ex=
-pire, u64 delta_ns)
-> > +{
-> > +     struct bpf_sched_data *q =3D qdisc_priv(sch);
-> > +
-> > +     qdisc_watchdog_schedule_range_ns(&q->watchdog, expire, delta_ns);
-> > +}
-> > +
-> >   __bpf_kfunc_end_defs();
-> >
-> >   #define BPF_QDISC_KFUNC_xxx \
-> >       BPF_QDISC_KFUNC(bpf_skb_get_hash, KF_TRUSTED_ARGS) \
-> >       BPF_QDISC_KFUNC(bpf_kfree_skb, KF_RELEASE) \
-> >       BPF_QDISC_KFUNC(bpf_qdisc_skb_drop, KF_RELEASE) \
-> > +     BPF_QDISC_KFUNC(bpf_qdisc_watchdog_schedule, KF_TRUSTED_ARGS) \
-> >
-> >   BTF_KFUNCS_START(bpf_qdisc_kfunc_ids)
-> >   #define BPF_QDISC_KFUNC(name, flag) BTF_ID_FLAGS(func, name, flag)
-> > @@ -154,9 +197,14 @@ BPF_QDISC_KFUNC_xxx
-> >
-> >   static int bpf_qdisc_kfunc_filter(const struct bpf_prog *prog, u32 kf=
-unc_id)
-> >   {
-> > -     if (kfunc_id =3D=3D bpf_qdisc_skb_drop_ids[0])
-> > +     if (kfunc_id =3D=3D bpf_qdisc_skb_drop_ids[0]) {
-> >               if (strcmp(prog->aux->attach_func_name, "enqueue"))
-> >                       return -EACCES;
-> > +     } else if (kfunc_id =3D=3D bpf_qdisc_watchdog_schedule_ids[0]) {
-> > +             if (strcmp(prog->aux->attach_func_name, "enqueue") &&
-> > +                 strcmp(prog->aux->attach_func_name, "dequeue"))
-> > +                     return -EACCES;
-> > +     }
-> >
-> >       return 0;
-> >   }
-> > @@ -189,6 +237,7 @@ static int bpf_qdisc_init_member(const struct btf_t=
-ype *t,
-> >       case offsetof(struct Qdisc_ops, priv_size):
-> >               if (uqdisc_ops->priv_size)
-> >                       return -EINVAL;
-> > +             qdisc_ops->priv_size =3D sizeof(struct bpf_sched_data);
->
-> ah. ok. The priv_size case is still needed.
->
->
+[auto build test WARNING on 92c932b9946c1e082406aa0515916adb3e662e24]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/MD-Danish-Anwar/net-ti-Kconfig-Select-HSR-for-ICSSG-Driver/20241216-180412
+base:   92c932b9946c1e082406aa0515916adb3e662e24
+patch link:    https://lore.kernel.org/r/20241216100044.577489-2-danishanwar%40ti.com
+patch subject: [PATCH net-next 1/4] net: ti: Kconfig: Select HSR for ICSSG Driver
+config: arm64-kismet-CONFIG_NET_SWITCHDEV-CONFIG_TI_ICSSG_PRUETH-0-0 (https://download.01.org/0day-ci/archive/20241221/202412210336.BmgcX3Td-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20241221/202412210336.BmgcX3Td-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412210336.BmgcX3Td-lkp@intel.com/
+
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for NET_SWITCHDEV when selected by TI_ICSSG_PRUETH
+   WARNING: unmet direct dependencies detected for NET_SWITCHDEV
+     Depends on [n]: NET [=y] && INET [=n]
+     Selected by [y]:
+     - TI_ICSSG_PRUETH [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_TI [=y] && PRU_REMOTEPROC [=y] && ARCH_K3 [=y] && OF [=y] && TI_K3_UDMA_GLUE_LAYER [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
