@@ -1,123 +1,92 @@
-Return-Path: <netdev+bounces-153585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE9AC9F8AE3
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 05:10:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5750B9F8B13
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 05:17:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46EF816B777
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 04:10:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A95D71620B2
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 04:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C920717C9F1;
-	Fri, 20 Dec 2024 04:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D165F7DA7F;
+	Fri, 20 Dec 2024 04:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="j/ElAzTs";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eeww0wge"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="M3L6Ozy/"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b2-smtp.messagingengine.com (flow-b2-smtp.messagingengine.com [202.12.124.137])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2C016EB42;
-	Fri, 20 Dec 2024 04:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1672F509
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734667810; cv=none; b=CuFssYNbaSXmfnDxvgCWClNUQpg/wDEhuA0JL298yoFKog0fkbt/Gxa/rsjKP2nUBoFQ651mcTJvfjy6TYblqPt0KWBVDveR3DYAusVHxn5z3/UVyRmX/TdNzF25wpl2/Hug2j2+65cgDOPBUiMw5lUbITAoX66tlHngX0F+1y8=
+	t=1734668229; cv=none; b=gW1q9NqQrSa5l3KYbMlNqLxvujV1cT0Fi9ZXMLTerIQAxcQjwbV+tfvYDoAqIAlLCrDXZ/yZQRBTIkd5BNlDAW/zpbLxVgBObrUg5n4WnppI4Y+xZ8IveP8t1tn7V3F61+jOCesxQdB12fRTVuIInsc+SCZ67pfMsLuvaDvkfHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734667810; c=relaxed/simple;
-	bh=M3sPUnOlMOUEjIyxNXS7N0GciZ/ZSrap+cHlJvyandE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VqGHLqhNKBd8TYf0FHYoiNBFSROkQJfWYORFoYZzvcsWzGo90H7vc2uN0kiBC4xHQgFWRe1rLiBpZTqD+hw2stZVNYucPpzWrX4fYhBp2GF7PkaQceTD+7u3eyF5pY1oC2GAXzTUTyqLpxcy+qCCDRSfXGJxJ00+KOUhmCUn35g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=j/ElAzTs; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eeww0wge; arc=none smtp.client-ip=202.12.124.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailflow.stl.internal (Postfix) with ESMTP id 5C1E91D40601;
-	Thu, 19 Dec 2024 23:10:07 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Thu, 19 Dec 2024 23:10:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1734667807; x=
-	1734675007; bh=YxyPwDN5jF3WrYeLfnPg62rlODl4h0Cotdz5rtDrqTA=; b=j
-	/ElAzTsR5AjBK08HUxWQDRnilSdQGhKqR9kxVt3CMEWkpKOeQHD/FLNPAq8bIq9J
-	xGScCmKOqOIk5w4fCu6K6GrEmCxif6vSu9sl06h/s9OFYet8zKi1LuW7GVCe3gNG
-	q2NBB1pzSYlw4HioCQjMaseeQaoSmJHlNDwR2j7b2iB4z4NpV1sFRhbHJe2el238
-	dqipradcBYtnHFm8FIaWRPpCQ6sslQZ5m0O0YVSX2RCUw1REqzl3JrTeKX1hoBMC
-	WUP5XDMEYEPIGbkNyOfbsb/v259NFMEUq3DjPeV2k5Jnbl365w1fPaqSqQQe6T3E
-	+NoWRe26ChJT8ZyGPMytw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1734667807; x=1734675007; bh=Y
-	xyPwDN5jF3WrYeLfnPg62rlODl4h0Cotdz5rtDrqTA=; b=eeww0wgegHHfTrSiQ
-	x5+7ykElNshtpAo5u3SpYhzrbnXw/cAjMU3iiPQ/hxmPQKB0MBiO9g1qk+8O5O+E
-	bbDK1hNVQNKiBsHqAntg8M7jXoNjTNKnby7W49s166dh4EKljYCFtW0WqvRlHeV0
-	RNLYrgCG1cMqz9RHm/WLzKssz73bmh9ti4luuaKfpWReBHgzlOTB8xKz0e/dUUXu
-	ofzWfvK80+iN8d/FWFRJEr+xGrGpkE+IZ6xv1Xc+yeH6efSXm65HwBfZ4kCsXq0X
-	x9H1nLpAyQT+YXCjs3/cirpY+KHh9v5n95CSqwwmVNZW00TlGkCwFGvhE5F4o7Ic
-	HXM4A==
-X-ME-Sender: <xms:Hu5kZ20JO209uO6Vj9j3U-MR8sCbmymOqQj2SRr7IDL8tkL5K_UF6A>
-    <xme:Hu5kZ5ENDQsQME9es5G0jYfzb2urdzyRtX2Kw5k4Jk8RhLPEItNwaZXWW28Ktktzq
-    _nX11iYRHzazVqE8g>
-X-ME-Received: <xmr:Hu5kZ-5ky6XijPafz-52HIe3ddaLkmqqlZr7MlDJdbVjHjhHLgvSokAG-3lDDlk8q5ox61aLJMcjPvfd6qBH_dwGLdlak-1-eqOcWqjZdBSgM5eqFtDh>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddruddtuddgieeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnegfrhhlucfvnfffucdljedtmdenucfjughrpefhvfevufffkffo
-    jghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesug
-    iguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgfefgfegjefhudeikedvueetffel
-    ieefuedvhfehjeeljeejkefgffeghfdttdetnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghp
-    thhtohepvddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurg
-    hvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdr
-    tghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprg
-    hnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrshhtsehkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtph
-    htthhopehmrghrthhinhdrlhgruheslhhinhhugidruggvvhdprhgtphhtthhopehmvghm
-    gihorhesghhmrghilhdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrd
-    gtohhm
-X-ME-Proxy: <xmx:Hu5kZ305kwgwTCWzlUL8qPvYG7Rpewdiuhh-1ievnfeHEhjeZ71Ncw>
-    <xmx:Hu5kZ5GM1Y2S8dNiWsXIYaabz6-r-87Q-ruKk-XbwVxjjGWZQw1Yzw>
-    <xmx:Hu5kZw-8yRQWXZ2gORHKnqBmaL6RXDcsxyB1nZ0hjCjuNVJIBP7iwg>
-    <xmx:Hu5kZ-kdTOvG1ZHkF-lsceT6Fv2nnU7uiqzmNlE50UtPBwwwatTnZw>
-    <xmx:H-5kZ9Kk3VrdMScD7LKn0AdY9qSKGv9d3inJIJPjpH0zFQMK8UIAbdF7>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 19 Dec 2024 23:10:04 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	andrii@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@linux.dev,
-	memxor@gmail.com,
-	pabeni@redhat.com,
-	eddyz87@gmail.com
-Cc: song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	horms@kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1734668229; c=relaxed/simple;
+	bh=RT07yzo82VgnOLgnzIwCLH/Ph+ly8TDmbW5eT7fDV64=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FEVHpAoAN9cxlqd0fXUa1n4FiQqshR20cepxmqt/mRbxiQPnCedZ/3Xi7ibbw1lmQ4s5tyKOg52zsJqCT0kPWsD0fQuoMVSI90DdZ/NAlnHimSL+fnhAkLQp0CjR9cokl+88Bpj+kdBWeuFZP5v2mtmcQ3p63dXuBi78y1hZN6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=M3L6Ozy/; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5401fb9fa03so1497080e87.1
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 20:17:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1734668226; x=1735273026; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qUR6QxjH/XKpq6/uxgbPtVelmv0GEa1mOlsKd9dqvck=;
+        b=M3L6Ozy/Wgaq5XwFrRXOPhRu9zB40Ofg6Z0PohX1qEQQwUiVXcnrI+PoEryTGdWBvg
+         PK3OsvWeh8mPk72VnKSbdWHpqCT2/69Z59/6pywy/STpRv2TlPsJHmEbkPrmUa4yPQ5F
+         UMoEpIWVNE2nXQthrY5R79T6nrU+tj3Li3TXNuxV8zomFBoIZe2ITmJ4D4CtRsJHZQj4
+         V2DOJ+ieXLkaUhhRnjeFmFKbXj2Lt+krDHN6hTe3ksmTXyMDgc4E9XqIgr59cEEurMl9
+         uFzmyY81J3Iq6M4WZFn2wwkhLlLlnPqaK54JWq3r/XRlqtaBpCSnYU1jyddL+p1Py/QI
+         JsqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734668226; x=1735273026;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qUR6QxjH/XKpq6/uxgbPtVelmv0GEa1mOlsKd9dqvck=;
+        b=p8dJNojkUvhfMF7Ni6r4BWtrwRCambOBkkBdVcfqchhvdNqxIcllXn3WLDYIu3FXPl
+         hDjdH57/FkRB2jKuGuBzvheeqIlJuKzeoYT9rhDLcFXg0yLYfAey6KcYwyLgTe0Itkki
+         OLRC51uWdQnu5K+vryihuSg3a5dZqOgvnVHtA5VRJ3kyPbVTc0IpNHHGpcADZArF3cn+
+         q3wTi4L+nEafndTPPrrLQ8gXi+vlNegL+hpC4o+G/2bQ4ffAehpmjuufkxB9y5fNxXpG
+         gYkNxc+CMq2HTPDZpvjrbOUTtMOYx738nPNGuflk5xCPlejJ6zZwEQdT9ksAewHzR7Wt
+         wadw==
+X-Gm-Message-State: AOJu0YzcIacNORhMaQqCqUmtzhGCjN6EOKTvooIwiogfidO3djMUrcVg
+	EJRY3u4KUr+txdz9bbaH3yl7KpkSipfpHMfZWBj3cb1gExqEZ+VuMt63MlKo7qw=
+X-Gm-Gg: ASbGnctKScXizd8GaGxIg9asFzMutvmm6fCyrgRriCHzgve/fJgJCc7/lzs6eLRwnaz
+	CDcsKrsaOcM6EEMHiXgzD0DYCFwlyNyhZlk7MsblFvJqxhglpRffgoR2ld42e2SzOYdxM8mycmK
+	I1MtiV9U1vUKlNBX9C6aqW/7tl1JaAwn1yua+wBmtefzvOSgnE2zSl58QDCqQlGYyWqp2X6TCXI
+	GWQuTR16MfcmjvsK3uzSt1wRw//OByihGqKQ8dHLKS11I7w57p+xekAauHePtCU9HLNCnE=
+X-Google-Smtp-Source: AGHT+IFou583DBvKBiY/GjCG1N580/eBnCfNksmDMwsIjhIaqx1DSBeDG7vU0yCMAN6wyGXxTRsoqw==
+X-Received: by 2002:a05:6512:1246:b0:53d:f769:14cb with SMTP id 2adb3069b0e04-5422944350cmr292136e87.9.1734668225237;
+        Thu, 19 Dec 2024 20:17:05 -0800 (PST)
+Received: from cobook.home ([91.198.101.25])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54223832c1bsm357078e87.280.2024.12.19.20.17.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 20:17:04 -0800 (PST)
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Martin KaFai Lau <martin.lau@kernel.org>
-Subject: [PATCH bpf-next v6 2/5] bpf: tcp: Mark bpf_load_hdr_opt() arg2 as read-write
-Date: Thu, 19 Dec 2024 21:09:44 -0700
-Message-ID: <766c01238ae028c27fe0661bd29eeb8f7386cf70.1734667691.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <cover.1734667691.git.dxu@dxuuu.xyz>
-References: <cover.1734667691.git.dxu@dxuuu.xyz>
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>,
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Subject: [PATCH net-next 0/2] net: renesas: rswitch: update irq handling
+Date: Fri, 20 Dec 2024 09:16:57 +0500
+Message-Id: <20241220041659.2985492-1-nikita.yoush@cogentembedded.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -126,36 +95,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-MEM_WRITE attribute is defined as: "Non-presence of MEM_WRITE means that
-MEM is only being read". bpf_load_hdr_opt() both reads and writes from
-its arg2 - void *search_res.
+This series switches rswitch driver to per-port interrupt handlers and
+does related cleanup.
 
-This matters a lot for the next commit where we more precisely track
-stack accesses. Without this annotation, the verifier will make false
-assumptions about the contents of memory written to by helpers and
-possibly prune valid branches.
+Nikita Yushchenko (2):
+  net: renesas: rswitch: use per-port irq handlers
+  net: renesas: rswitch: request ts interrupt at port open
 
-Fixes: 6fad274f06f0 ("bpf: Add MEM_WRITE attribute")
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- net/core/filter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/renesas/rswitch.c | 223 ++++++++++---------------
+ drivers/net/ethernet/renesas/rswitch.h |  12 +-
+ 2 files changed, 99 insertions(+), 136 deletions(-)
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 21131ec25f24..713d6f454df3 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -7643,7 +7643,7 @@ static const struct bpf_func_proto bpf_sock_ops_load_hdr_opt_proto = {
- 	.gpl_only	= false,
- 	.ret_type	= RET_INTEGER,
- 	.arg1_type	= ARG_PTR_TO_CTX,
--	.arg2_type	= ARG_PTR_TO_MEM,
-+	.arg2_type	= ARG_PTR_TO_MEM | MEM_WRITE,
- 	.arg3_type	= ARG_CONST_SIZE,
- 	.arg4_type	= ARG_ANYTHING,
- };
 -- 
-2.47.1
+2.39.5
 
 
