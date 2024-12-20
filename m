@@ -1,123 +1,206 @@
-Return-Path: <netdev+bounces-153669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D10CA9F9258
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:38:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6475E9F9268
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:42:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C1FA7A2577
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:38:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A9117A1928
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D3B21571C;
-	Fri, 20 Dec 2024 12:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4896E2156E7;
+	Fri, 20 Dec 2024 12:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IIPLepSA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZSfMj0bY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182C9215703;
-	Fri, 20 Dec 2024 12:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD092153D0
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 12:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734698244; cv=none; b=tRFVBk997CPKRTzLHQxNhfWAZTtypbcAV9yW2tNyW2VMkNgonHBVMJM0Ngkz1/WAGtBwgN+OXkA9DFShcspmfsNsRj5S9vIogSTivo0ZuRPUZZreh4yFq9z+jpEg3/PhvraF+bbrY2du22DnVifrmuZ3liQcornBB99T/7MeS8c=
+	t=1734698534; cv=none; b=G3F5PiA90biP5AtOv9Hi/TRrZ9vS+pyjFanTdjOAIWvnPbxTil30xg7IlJ4yhjDVD1M6TOZUFKNP6XTlakUsCKMErGy+apsecRlre+y8sCPOWmNVXPVxt1SsV8qObyrMQUXCuy9Q2pCOxkRC9LsdXT4lpggQfnQzWfVQ7/qp2Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734698244; c=relaxed/simple;
-	bh=6VjXhVnkEzgOMFd4xLgiPLNAjwJ2JXk5yqCOlFgunTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LBnP7IUO3t3gda+onNn4s1D+Lp+6MgkefehEZVAst0p2hwH0IroveLNEYrK4ub7zfzotuwA6sT2OeYn2Lk07W3tlPh/vt46/c+CsSADQt3wV1tPmD9uP1bNbbdvJ6MNKJBHf7E7r+Z+Q69c6dnsYT+DQDQUu7lw+KrDLOGepE04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IIPLepSA; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734698243; x=1766234243;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6VjXhVnkEzgOMFd4xLgiPLNAjwJ2JXk5yqCOlFgunTQ=;
-  b=IIPLepSAOplx8K1Bp0Hqs7LXnCCNxkxwroFEnGGNjubbT48VMSzGrVMN
-   e2/WYsFgkwRbipMdMPwpXwacXKXYISx9Wl2saSlh3GGfwDpWawpZMLRxH
-   67w25EQQ5hMVChPJ2hPanSTF3sPds92ok4goRI8x10FK25z1nocAz9049
-   H1MGipKbJ/UUtO92+zLGLoo3Nc2GskIIqmBkBYuBGCvCAFwypnEJmcSMy
-   z/Td0s4oMX4nYoZtw2IeJvfAQXjOpAGnXpnSw9g2IDhuwBL2LBdMa3zeE
-   V77CXMyYdc64GKksX0eJy/Jerx5MKln5ReJKDlCiqLKDMy10mtj54wmGS
-   A==;
-X-CSE-ConnectionGUID: Fa2Jt8hgRD2KSuSYghLY8w==
-X-CSE-MsgGUID: esNbAYfmSoiv2pCUrnP0Jg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="52650729"
-X-IronPort-AV: E=Sophos;i="6.12,250,1728975600"; 
-   d="scan'208";a="52650729"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 04:37:22 -0800
-X-CSE-ConnectionGUID: likqNpzjSySnfm5pm7n8qg==
-X-CSE-MsgGUID: N8eCzxXBQhK49/c1QhxERQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="103121745"
-Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 20 Dec 2024 04:37:19 -0800
-Received: from kbuild by a46f226878e0 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tOcFp-00018p-0G;
-	Fri, 20 Dec 2024 12:37:17 +0000
-Date: Fri, 20 Dec 2024 20:36:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/8] net: ethtool: plumb PHY stats to PHY
- drivers
-Message-ID: <202412202011.MKXldsMF-lkp@intel.com>
-References: <20241219132534.725051-3-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1734698534; c=relaxed/simple;
+	bh=HlBOh4jSSPlbfpktzNvwp+qwVjt5nv4jbi7s8EDlL/o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UKNQPM4AaWai8Vm+GIQqTmpQSP7tEOpK/lXW03WBDFv7lmby2Id7RqnejlRnhTk7WYb/Bo+J2kXq7EO+o0hfh6+F6vXXA1hdT/JrXU7s8IB/QGxkZ3uWhv/ijXF5CITN2lSJ8jHSfNbM6dWr3YSJniwGgqNjvznVqJazuvMk4jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZSfMj0bY; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54024ecc33dso2151330e87.0
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:42:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1734698530; x=1735303330; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6JAaYSv0Ae1yeH34mVXmK+u6UW76Um4Sm/+sIA+YD/I=;
+        b=ZSfMj0bYjlPZLWmuWDgA4Da9C1QVUPPwtBC3SiYjXmMD/6V8MGsNjyi743ZCK4cWEH
+         ADdHj8y1WE6IG2U1TTb6MqyBGxX5zrf8lI9FmhF4C4wVYRzPDytmjUmu1nDf8IZffLzC
+         F8m1NxRDsyejLaLwV5VqD6qe9v/OgOSQE7m8H85NNa3bt0RpMur5sRcPwFbrQS1cBAEo
+         6ERxm3vBXfTUCa2xh5bIo5H55QjFiAd5f3nk2+H09b5MAvk1z6Lgl+DQlqjGm7zLN9GE
+         QnXi/ijgaaJAOk+1GEKyvwGL6O9yssG8C+2fvDNDwGyQK28onE+Zm/hXrFfUEqWH8tfy
+         8B1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734698530; x=1735303330;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6JAaYSv0Ae1yeH34mVXmK+u6UW76Um4Sm/+sIA+YD/I=;
+        b=rjOgrYGzYWdODAc45GuDoA4taHDJ+tEetuw+YlYppBg31ZuLS/yiWTXdci/VMkTNVu
+         m012uAKcTx9VvtAOksI7O8Pxrzqg1Bgc/5UA5z9kZRkcwNb6PHgx/H5ge7tlvwTQKfPn
+         NTK9AoVA0f16nGkKRtv9eQuZxzOXQqMbxOxliehIikntRzYTevA6CWtKTqtDB1xVq2fL
+         xLELK5ccWFRHBmAKtZ7uuUEeAMY+MBukGztJUFR22oiJd8eE2LdDrmcpOOO6xp7zC9JE
+         WMjogR0WwwdoWWjarZzwfGCOBqj0cU0IhxQHVJo3HoHNsJovmJ58I4r/y9Lhmn7dOCZX
+         Q5ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXVzf+UEilkrtc3GaiYUgRCnoagNo1lbkBmUbbhxQpzd1qm4Jbdf4HJU6mwfEl0uRsJKygyG4M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqsYsGKUO/+NRv+ALJGVasbevlWzPftvzlRJf7SXHAYBVGKB1x
+	v6XFaYwSNmBswzcr1gK0sjcOnp1QMX7/Caov32x2bvMsjsM6gjhtAOYdTF/+AHH2vlwmDMeyNfk
+	kCSqF0WHFww/eTqWfqD//jJPklPh3WD/UiBGhwg==
+X-Gm-Gg: ASbGncvaDlYyiiH/sM6HIY/736Q9QuSW+nkEXytB5sncBOxwRkWXP+c3qBzKbtWYnxM
+	fCtNXct5qppHE2cpCZ18WTYikP5DCgVBeMdUUEA==
+X-Google-Smtp-Source: AGHT+IG/0DIpoBQtLX+2xTrpZ52kWuFm4zd5NY5XA3IybGxFiXX/atFeHWgT1av/lrPuINKlOWhHxww9t7kKEEWHrDk=
+X-Received: by 2002:ac2:4c48:0:b0:540:3579:f38f with SMTP id
+ 2adb3069b0e04-542295821afmr969235e87.37.1734698530305; Fri, 20 Dec 2024
+ 04:42:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241219132534.725051-3-o.rempel@pengutronix.de>
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-3-tmyu0@nuvoton.com>
+In-Reply-To: <20241210104524.2466586-3-tmyu0@nuvoton.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 20 Dec 2024 13:41:59 +0100
+Message-ID: <CACRpkdajLe94novxjsHkCCx3m5raB0DxMnnSegCqkdWxRoWazw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/7] gpio: Add Nuvoton NCT6694 GPIO support
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Oleksij,
+Hi Ming,
 
-kernel test robot noticed the following build errors:
+thanks for your patch!
 
-[auto build test ERROR on net-next/main]
+Some nits below:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/ethtool-linkstate-migrate-linkstate-functions-to-support-multi-PHY-setups/20241219-213024
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241219132534.725051-3-o.rempel%40pengutronix.de
-patch subject: [PATCH net-next v2 2/8] net: ethtool: plumb PHY stats to PHY drivers
-config: i386-buildonly-randconfig-001-20241220 (https://download.01.org/0day-ci/archive/20241220/202412202011.MKXldsMF-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241220/202412202011.MKXldsMF-lkp@intel.com/reproduce)
+On Tue, Dec 10, 2024 at 11:46=E2=80=AFAM Ming Yu <a0282524688@gmail.com> wr=
+ote:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412202011.MKXldsMF-lkp@intel.com/
+> This driver supports GPIO and IRQ functionality for NCT6694 MFD
+> device based on USB interface.
+>
+> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+(...)
+> +#include <linux/gpio/driver.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/mfd/core.h>
+> +#include <linux/mfd/nct6694.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
 
-All errors (new ones prefixed by >>):
+#include <linux/bits.h>
+is missing, include it explicitly.
 
-   ld: net/ethtool/linkstate.o: in function `linkstate_prepare_data':
->> linkstate.c:(.text+0x2d9): undefined reference to `phy_ethtool_get_link_ext_stats'
-   ld: net/ethtool/stats.o: in function `stats_prepare_data':
->> stats.c:(.text+0x150): undefined reference to `phy_ethtool_get_phy_stats'
+> +       return !(BIT(offset) & data->xmit_buf);
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Here you use the BIT() macro from <linux/bits.h>
+
+> +static int nct6694_direction_input(struct gpio_chip *gpio, unsigned int =
+offset)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPO_DIR + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       data->xmit_buf &=3D ~(1 << offset);
+
+data->xmit_buf &=3D ~BIT(offset);
+
+> +static int nct6694_direction_output(struct gpio_chip *gpio,
+> +                                   unsigned int offset, int val)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       /* Set direction to output */
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPO_DIR + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       data->xmit_buf |=3D (1 << offset);
+
+data->xmit_buf |=3D BIT(offset);
+
+> +       if (val)
+> +               data->xmit_buf |=3D (1 << offset);
+> +       else
+> +               data->xmit_buf &=3D ~(1 << offset);
+
+Same
+
+> +static void nct6694_set_value(struct gpio_chip *gpio, unsigned int offse=
+t,
+> +                             int val)
+> +{
+(...)
+> +       if (val)
+> +               data->xmit_buf |=3D (1 << offset);
+> +       else
+> +               data->xmit_buf &=3D ~(1 << offset);
+
+Same
+
+> +static irqreturn_t nct6694_irq_handler(int irq, void *priv)
+> +{
+> +       struct nct6694_gpio_data *data =3D priv;
+> +       unsigned char status;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                        NCT6694_GPI_STS + data->group,
+> +                        NCT6694_GPIO_LEN, &data->xmit_buf);
+> +
+> +       status =3D data->xmit_buf;
+> +
+> +       while (status) {
+> +               int bit =3D __ffs(status);
+> +
+> +               data->xmit_buf =3D BIT(bit);
+> +               handle_nested_irq(irq_find_mapping(data->gpio.irq.domain,=
+ bit));
+> +               status &=3D ~(1 << bit);
+
+Same
+
+Just use BIT() consistently please.
+
+Yours,
+Linus Walleij
 
