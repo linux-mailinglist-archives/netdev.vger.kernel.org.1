@@ -1,272 +1,366 @@
-Return-Path: <netdev+bounces-153621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7190C9F8DCE
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 09:16:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC72A9F8DDE
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 09:21:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D57318941BA
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:16:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B39AE1693E3
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAAB41A4E98;
-	Fri, 20 Dec 2024 08:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="j4VfvAsN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159591A7AE3;
+	Fri, 20 Dec 2024 08:21:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2071.outbound.protection.outlook.com [40.107.244.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5EB154BE5
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 08:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734682586; cv=fail; b=iimZv57SUjBRsI2vezYBzPXXP4EAOzTigd8Ow4VFfTbB1s6qsuqiwc4PpWztw/tvKsl3C9i/mF+kVkYj4aRF6iG0+Dv+PtiFMYrxUXUwY6P07qL9eNZqRVMu+2p6tdf2RjWg1nX07iYJWcz1hgAiKv3Bh0S8xeyM59qEy8xmY2I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734682586; c=relaxed/simple;
-	bh=PYnTZJ3wu42dlc+7GKP/tXLkhDjXJdbW3+PwjSQyrgQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=io11L/XiI29QZA0p+5bzU/SvqRFECEkMUSyFGWcVtEiWU/hRlNLVUcsqVDguDvqEpfK1cxigK5jMYO7vAfyGa4dPk6EqBKWSWE/yn9wtp6QuWcXiNL3OqBGGcC19IuY+P9BmqThWM5IAezDYTDDGJzVQNZSY5bH1epwO72ddcec=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=j4VfvAsN; arc=fail smtp.client-ip=40.107.244.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nrPqE9G6hF2z8dDVl+spORtr4rRhWKli9hEF12lkfNNwlsr0p6zYGZie8kmE6CWH0r8IY55gt2lI62wYSLXFj+vKQuamtCrU5eXh9NZJ5VZu+Ua1yHNWewkF8DMc/xF1aqdjvNguXNbYoyZif3Y+uJLhlEmEKiRgrDKqUhekAgKpftOwtH9DVXbzmMrnY+dY1DNjrKZmOv+YITiy2+aSyl1mQvQoN7xBX1ba3v/ln94OVeKdCmhVqsIRLwX9pJutl6FA5ZBGVlPQY8o469d+xEK+Vkx3EyNLgb+/eR0rlMMsUthGnFBLPHDfV3PgYU8Sc1uvO2+NpQi6R0q1ddynyw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DVEqexDKL9mey9U2kV89fH6rrMowgW6KqC/n3RTgq6Y=;
- b=RgDOTqEo9ttDoTjgh1ib8PklqaDTy2EGIH4VxL520kQ/EMXf4/p9QBc0IwNfQOWo5WDX2ij332kwzym6RTZHuOSksRWlrsOR+jKyPZ/8xuEcK1FLhzyK1heWUvepsxFcHOBK0YHSkRPfnUEHaozjG3R4dPyw62KistPdxF8YyVrw74cdPpD/xLmSK6Xn2ew/iAdoDwqyga0wEY3Esvvqd2EmreU3CXFccws6OuFkREFSzhrJ05rxaTEuIGh/RZSGcJutLR/eUP8vtbTh1bmbua5ENBoM9XgeEqhlGe1gGl55oEU39aG0X7OOt0Wx+9QCl1+V/eiVJYQMCQG248LznQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DVEqexDKL9mey9U2kV89fH6rrMowgW6KqC/n3RTgq6Y=;
- b=j4VfvAsNRPKXnR0pfOUxMVGPepQ6FyLLKdOLz/20W/d7UHXL97F7oFkRod0u9i/3jTQznglYAo0nJ2RyRw/WLEWAqh/urg957gbbNFz8YldaWSNBe3ODjxkjd0RHGKM3kpxMdHxvIu1FQHZBzjEn3LTBQA8VKgkvzHqnNOK8aQ3lK5WhTrjuvIJDE2QM04cSl3ZdOnIt3X+Cf6Zz4nxrhzdj9cL4CyrD4YFAbM6IS7/N9p9AqKPfEAxdq3YiYnUfhRl9niQUJEcWkVoX/Diyk0SuBzecBKYtENRhNbrB6I6cnj3WnGXg5BW5aEHf4qsOnlCkf/6WW3vk2Xdmo9J7uA==
-Received: from MW4P223CA0018.NAMP223.PROD.OUTLOOK.COM (2603:10b6:303:80::23)
- by PH0PR12MB8030.namprd12.prod.outlook.com (2603:10b6:510:28d::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.14; Fri, 20 Dec
- 2024 08:16:14 +0000
-Received: from SJ1PEPF00002318.namprd03.prod.outlook.com (2603:10b6:303:80::4)
- by MW4P223CA0018.outlook.office365.com (2603:10b6:303:80::23) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8272.16
- via Frontend Transport; Fri, 20 Dec 2024 08:16:14 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- SJ1PEPF00002318.mail.protection.outlook.com (10.167.242.228) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8251.15 via Frontend Transport; Fri, 20 Dec 2024 08:16:13 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 20 Dec
- 2024 00:16:04 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 20 Dec 2024 00:16:03 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 20 Dec 2024 00:16:01 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>
-Subject: [PATCH net 4/4] net/mlx5e: Keep netdev when leave switchdev for devlink set legacy only
-Date: Fri, 20 Dec 2024 10:15:05 +0200
-Message-ID: <20241220081505.1286093-5-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20241220081505.1286093-1-tariqt@nvidia.com>
-References: <20241220081505.1286093-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFDB1A83F5
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 08:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734682887; cv=none; b=Fq3f7ezzSehMvqACk8my0X+RlRP3uvxvzE7MQUfnJM6a0wywgxC3eL7oiDxPmB82m2svYLLJO1nIg2OM75NTROFI9Gc/qrKINK6616URUgW8bVrfe1L2Ky2aUVElVSJMoIxdxMFtGdUyEPeqGlyXw7VTbkpJA37LHKkW43c48vg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734682887; c=relaxed/simple;
+	bh=LyqVQn4e48VyMPkIGTwZBk07jQJoE7cbeYffNeQQ9vU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Z2NqI1aNc7hJC+mIW3o2H9Na3CfTdHmCmm1dtROr0S2q1utG0aM9kbKcT2xentmCA8cHJcWEBsZcyNiBQX1FRS5bDVVGXOcd1JsKcD5o59yrxxpFV+l94uq7rcIMLS/Py2jyL/gmu7F9mYIIksc+FW58iPEyNLibjHT0aIAqgEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a9c9b37244so30565815ab.1
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 00:21:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734682883; x=1735287683;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+P+FoLpru327VOQAxh/1BswuYR1NX7BucZaLxxxV8/I=;
+        b=DaK6Cq/RZvcd0IlRxJ3MLsyx7qbZZsZkGCj3Xv0rSi7Y0fnVz6FLqVmMqFDE4DrAFO
+         7hr04SeOFn7MGJH1DAUxt/ACPsyyDQaWCZhUWF6D4cGP98v5APDU8Ui7R/UI1TM6jfE7
+         riCElRMavG/jsmoelrWMxObCRE9zOuo5NX49kegRfa0EcfOxEpNh9WofoVPvCwKSxRD6
+         eDROJHBplXlzBou6OCR/u/AHyrijb+J21VBCgejPzs0vGxBNEBCD944ELS5ADQluAbg4
+         BuoGDwo29loLQpA0RDdZGRljAg+In7JYxw2aLrlUAa2ABW0Qk0AWCs5IgT5vmqVK2jmM
+         Bb4A==
+X-Forwarded-Encrypted: i=1; AJvYcCW5Q77HSJ2Qf0oJv5yLBJ9RWs+OHepZrwhblHLnJ5t4oa1z7w/KHfZl5Az5XwGr9CEUCMPy7vY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7BDR/fznRTJtPelfSYEjrHFFEOHfzfJsxdUlPdUHMXQMBGrFx
+	Ec3N10RepDbZAAQkG9Ur3Pw4kWnTnLUlP0DGMqm3Ss9G0NTsdFsumCouR1CoLC/y8hPTaWEYexe
+	0wS73kcrv/MxsJEvI5ZbYmzP7NdEz7daagWCqEGQUB4VPTBiSutAeMDQ=
+X-Google-Smtp-Source: AGHT+IH264pnwTuzNMS6Cf1f81MFkSOAlkbgC3cyZpVZtFyTWPo6TmGwp0A8mYxYK2uJ9/+jy2vgXHHOOuwOuHvImsnBQkwob5g9
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002318:EE_|PH0PR12MB8030:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12854554-e2c8-459a-c831-08dd20ce91ec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024|30052699003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Oknqf1ZEG5DKx3jY+9kZlfHwOSCbKDVVvIEZ33gf61F/or1n293uWWm/terk?=
- =?us-ascii?Q?OKNQ6Li/FF4gyhY7pwVYT900WxO501RWvkiIzmaOqY3M9PBHccNaU2QGSEjB?=
- =?us-ascii?Q?CgYULNc0k7zErnvmyC3Xwq1Dj0G2SskNjOIbDi35QV7M0VNUzvciPnk6/LDY?=
- =?us-ascii?Q?wPBoltN20/CNOUd/5aaYJ6OrM36sKLv7XgZ4NLdD/nApF9x7643KjoyMqBba?=
- =?us-ascii?Q?YobYlPP2RLx8RJrVX28V+ItSQR2A3FAe4vMJiBOp4x9El47K7DXK1L+fVaxP?=
- =?us-ascii?Q?2I9c18DDh7GSKsg/XQRhvKwez6w//WFAbUcuQr4OIQC2m6SOSaZhBKyCn9xm?=
- =?us-ascii?Q?7TaiC5DHaRGx+0rVtF6acfb9KStV41xh/HDckdxAUCJsvgZzYyi+7Xb7h+N4?=
- =?us-ascii?Q?24ogpgHPg+bV8KYmhC4+IucETzAIaFJKhy1ckUjaynzKlZJS8bW8sP9uTYAm?=
- =?us-ascii?Q?JfhjYko+jDFDEeixGDs8XaCVsoEE0bTMkFuKXXBxUtcNv7jGOo8MFsF2wHIY?=
- =?us-ascii?Q?QxMWBNRkO8al4O7EjphV3E9IDaQjgZriZkqukgrM8ShEnDYHjMGUtHNbniYI?=
- =?us-ascii?Q?0AGYEXerAYmHUnTD9ly/FIvCv5ybOe4vxJ5vlMDaeGZKnxTu4j/ZaBPYzjtB?=
- =?us-ascii?Q?omzrbROvouvJ5m83w2IVvex77iWSF770bpHhJ3Ta9o6Ec13SosMgzVqwcHdb?=
- =?us-ascii?Q?IyuDIngve3Z1doIM02yGy3itwcP13c/KEcjiQ7AGdeLguBhysXeSIDWQogRo?=
- =?us-ascii?Q?/FgsOhFH09CzbZkW+QjXrp4fOBOHSMU1WX+8UMWcSkcNzrqRkjQDADbjRWpI?=
- =?us-ascii?Q?mxlfwhQ00GNoKIZ0IX5Ovrsg6b3iNo3D8fk+cfNP7KCO4XLZhNXQ0HzgLLEh?=
- =?us-ascii?Q?ikfZhuBPIVYZfhQa8X6xSJD+8THIzNdidUEMEb7D755jpUWLYm48k8PamkKO?=
- =?us-ascii?Q?jMgVBpAILJOnw2Zkr6I03lUWGdjkbyuLJ7VFZzzkEV7KvyKgSjXpByjiip2S?=
- =?us-ascii?Q?9gURxjEKxgMJZFDkvTR7zSD22MmTr1pCqzg8Bt8qNTiJTUYcc2p1WzsepRxO?=
- =?us-ascii?Q?KJ3IodB8sWWWpOLAYbBqYt0U0CxraO0KZC8X5YtTSPYE0BHg1lsW52Cv8GOI?=
- =?us-ascii?Q?tnzR8MubPRiNGwja4+0+K3BfaNuwQ8vCGfXkza9U9aWys27PEjAmLfjY+TcJ?=
- =?us-ascii?Q?BPAJ1y0vxyS/ImbF/KN6ZQUZzA8cUzXAMn41fUBPzkjh+4AUq2HujXwcW3AH?=
- =?us-ascii?Q?3eDw/nBYw9wSLgu1xBT92xtATkVDf+rlDJFauJtEavtaDfbSwmYDKDOGC5NO?=
- =?us-ascii?Q?tIqSKvdrkAYjwb3vFH8CfS5Zo0UiHyqA1F2o3wW8kwADnSAwZ0VAYxLfXMwO?=
- =?us-ascii?Q?NJA2TNkQw9roCZYhARSe6Uy6if361pIb/eX8EBMG/Z50ED3fiukXEvTTnNp/?=
- =?us-ascii?Q?1h4lp3MK40QTYKRsJJGERjqm57z8ZXIO5wd9Rs2bkEBW85KybWdpzySWYQ9w?=
- =?us-ascii?Q?bJjKV+7eaSMipyo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024)(30052699003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2024 08:16:13.9419
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12854554-e2c8-459a-c831-08dd20ce91ec
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002318.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8030
+X-Received: by 2002:a05:6e02:3a10:b0:3a7:4674:d637 with SMTP id
+ e9e14a558f8ab-3c2d1b98479mr27905805ab.3.1734682883610; Fri, 20 Dec 2024
+ 00:21:23 -0800 (PST)
+Date: Fri, 20 Dec 2024 00:21:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67652903.050a0220.1bfc9e.0008.GAE@google.com>
+Subject: [syzbot] [rdma?] INFO: task hung in rdma_dev_exit_net (6)
+From: syzbot <syzbot+3658758f38a2f0f062e7@syzkaller.appspotmail.com>
+To: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Jianbo Liu <jianbol@nvidia.com>
+Hello,
 
-In the cited commit, when changing from switchdev to legacy mode,
-uplink representor's netdev is kept, and its profile is replaced with
-nic profile, so netdev is detached from old profile, then attach to
-new profile.
+syzbot found the following issue on:
 
-During profile change, the hardware resources allocated by the old
-profile will be cleaned up. However, the cleanup is relying on the
-related kernel modules. And they may need to flush themselves first,
-which is triggered by netdev events, for example, NETDEV_UNREGISTER.
-However, netdev is kept, or netdev_register is called after the
-cleanup, which may cause troubles because the resources are still
-referred by kernel modules.
+HEAD commit:    9f16d5e6f220 Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=136465c0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fb680913ee293bcc
+dashboard link: https://syzkaller.appspot.com/bug?extid=3658758f38a2f0f062e7
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-The same process applies to all the caes when uplink is leaving
-switchdev mode, including devlink eswitch mode set legacy, driver
-unload and devlink reload. For the first one, it can be blocked and
-returns failure to users, whenever possible. But it's hard for the
-others. Besides, the attachment to nic profile is unnecessary as the
-netdev will be unregistered anyway for such cases.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-So in this patch, the original behavior is kept only for devlink
-eswitch set mode legacy. For the others, moves netdev unregistration
-before the profile change.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e72a74c4c0d3/disk-9f16d5e6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/940322501ec7/vmlinux-9f16d5e6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6318087c1412/bzImage-9f16d5e6.xz
 
-Fixes: 7a9fb35e8c3a ("net/mlx5e: Do not reload ethernet ports when changing eswitch mode")
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3658758f38a2f0f062e7@syzkaller.appspotmail.com
+
+INFO: task syz-executor:15271 blocked for more than 143 seconds.
+      Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:22912 pid:15271 tgid:15271 ppid:1      flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5369 [inline]
+ __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
+ __schedule_loop kernel/sched/core.c:6833 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6848
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6905
+ rwsem_down_write_slowpath+0xeee/0x13b0 kernel/locking/rwsem.c:1176
+ __down_write_common kernel/locking/rwsem.c:1304 [inline]
+ __down_write kernel/locking/rwsem.c:1313 [inline]
+ down_write+0x1d7/0x220 kernel/locking/rwsem.c:1578
+ rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
+ ops_exit_list net/core/net_namespace.c:172 [inline]
+ setup_net+0x796/0x9e0 net/core/net_namespace.c:394
+ copy_net_ns+0x33f/0x570 net/core/net_namespace.c:500
+ create_new_namespaces+0x425/0x7b0 kernel/nsproxy.c:110
+ unshare_nsproxy_namespaces+0x124/0x180 kernel/nsproxy.c:228
+ ksys_unshare+0x57d/0xa70 kernel/fork.c:3314
+ __do_sys_unshare kernel/fork.c:3385 [inline]
+ __se_sys_unshare kernel/fork.c:3383 [inline]
+ __x64_sys_unshare+0x38/0x40 kernel/fork.c:3383
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe049180017
+RSP: 002b:00007ffc67fd06b8 EFLAGS: 00000206 ORIG_RAX: 0000000000000110
+RAX: ffffffffffffffda RBX: 00007fe049335f40 RCX: 00007fe049180017
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000040000000
+RBP: 00007fe049336738 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000008
+R13: 0000000000000003 R14: 0000000000000009 R15: 0000000000000000
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/30:
+ #0: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #0: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6744
+4 locks held by kworker/u8:3/52:
+ #0: ffff88801baed948 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88801baed948 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90000bc7d00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90000bc7d00 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:586
+ #3: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
+2 locks held by kworker/u8:8/3523:
+ #0: ffff8880b863e798 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:598
+ #1: ffffc9000d4a7d00 ((work_completion)(&(&bat_priv->nc.work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc9000d4a7d00 ((work_completion)(&(&bat_priv->nc.work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+1 lock held by dhcpcd/5512:
+ #0: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6917
+2 locks held by getty/5599:
+ #0: ffff88814d0a00a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc9000330b2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
+3 locks held by kworker/1:6/5946:
+2 locks held by syz-executor/15271:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
+2 locks held by syz-executor/15279:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
+2 locks held by syz-executor/15289:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
+2 locks held by syz-executor/15293:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
+2 locks held by syz-executor/15305:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
+2 locks held by syz-executor/15311:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
+4 locks held by syz-executor/15321:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+3 locks held by syz-executor/15327:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: setup_net+0x602/0x9e0 net/core/net_namespace.c:384
+ #2: ffffffff8e7d6410 (cpu_hotplug_lock){++++}-{0:0}, at: flush_all_backlogs net/core/dev.c:6031 [inline]
+ #2: ffffffff8e7d6410 (cpu_hotplug_lock){++++}-{0:0}, at: unregister_netdevice_many_notify+0x5ea/0x1da0 net/core/dev.c:11501
+4 locks held by syz-executor/15330:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+4 locks held by syz-executor/15333:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+4 locks held by syz-executor/15336:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+4 locks held by syz-executor/15338:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+4 locks held by syz-executor/15391:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+2 locks held by syz-executor/15398:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: ppp_exit_net+0xe3/0x3d0 drivers/net/ppp/ppp_generic.c:1146
+6 locks held by syz-executor/15400:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+ #4: ffff888030865238 (&rxe->usdev_lock){+.+.}-{4:4}, at: rxe_query_port+0x61/0x260 drivers/infiniband/sw/rxe/rxe_verbs.c:54
+ #5: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: ib_get_eth_speed+0x153/0x800 drivers/infiniband/core/verbs.c:1995
+4 locks held by syz-executor/15403:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+2 locks held by syz-executor/15406:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: ip_tunnel_init_net+0x20e/0x720 net/ipv4/ip_tunnel.c:1159
+4 locks held by syz-executor/15408:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+ #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
+3 locks held by syz-executor/15449:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+3 locks held by syz-executor/15454:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+3 locks held by syz-executor/15458:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+3 locks held by syz-executor/15461:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+3 locks held by syz-executor/15464:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+3 locks held by syz-executor/15467:
+ #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
+ #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
+ #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:223 [inline]
+ watchdog+0xff4/0x1040 kernel/hung_task.c:379
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 5946 Comm: kworker/1:6 Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: events_power_efficient neigh_periodic_work
+RIP: 0010:lockdep_hardirqs_off+0x80/0x110 kernel/locking/lockdep.c:4508
+Code: 8b 05 ec 51 30 74 85 c0 74 54 65 48 8b 1c 25 c0 d4 03 00 48 c7 c7 a0 d8 0a 8c e8 2b 1c 00 00 65 c7 05 c8 51 30 74 00 00 00 00 <4c> 89 b3 88 0a 00 00 8b 83 78 0a 00 00 ff c0 89 83 78 0a 00 00 89
+RSP: 0018:ffffc90000a17288 EFLAGS: 00000086
+RAX: 0000000000000001 RBX: ffff888030fbbc00 RCX: ffffc90000a17203
+RDX: 0000000000000005 RSI: ffffffff8c0ad8a0 RDI: ffffffff8c6154a0
+RBP: ffffc90000a17370 R08: ffffffff901e4037 R09: 1ffffffff203c806
+R10: dffffc0000000000 R11: fffffbfff203c807 R12: dffffc0000000000
+R13: 1ffff92000142e60 R14: ffffffff81583326 R15: 0000000000000200
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055555b78a608 CR3: 000000000e738000 CR4: 0000000000350ef0
+Call Trace:
+ <NMI>
+ </NMI>
+ <IRQ>
+ trace_hardirqs_off+0x12/0x40 kernel/trace/trace_preemptirq.c:73
+ __local_bh_enable_ip+0x106/0x200 kernel/softirq.c:364
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
+ __dev_queue_xmit+0x1775/0x3f50 net/core/dev.c:4461
+ dev_queue_xmit include/linux/netdevice.h:3168 [inline]
+ br_dev_queue_push_xmit+0x726/0x900 net/bridge/br_forward.c:53
+ NF_HOOK+0x702/0x7c0 include/linux/netfilter.h:314
+ br_nf_post_routing+0xa20/0xe80 net/bridge/br_netfilter_hooks.c:997
+ nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+ nf_hook_slow+0xc5/0x220 net/netfilter/core.c:626
+ nf_hook include/linux/netfilter.h:269 [inline]
+ NF_HOOK+0x2a7/0x460 include/linux/netfilter.h:312
+ br_forward_finish+0xd8/0x130 net/bridge/br_forward.c:66
+ br_nf_forward_finish+0xb49/0xfb0 net/bridge/br_netfilter_hooks.c:693
+ NF_HOOK+0x702/0x7c0 include/linux/netfilter.h:314
+ br_nf_forward_ip+0x61e/0x7b0 net/bridge/br_netfilter_hooks.c:747
+ nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+ nf_hook_slow+0xc5/0x220 net/netfilter/core.c:626
+ nf_hook include/linux/netfilter.h:269 [inline]
+ NF_HOOK+0x2a7/0x460 include/linux/netfilter.h:312
+ __br_forward+0x489/0x660 net/bridge/br_forward.c:115
+ deliver_clone net/bridge/br_forward.c:131 [inline]
+ maybe_deliver+0xb3/0x150 net/bridge/br_forward.c:190
+ br_flood+0x2e4/0x660 net/bridge/br_forward.c:236
+ br_handle_frame_finish+0x18ba/0x1fe0 net/bridge/br_input.c:215
+ br_nf_hook_thresh+0x474/0x590
+ br_nf_pre_routing_finish_ipv6+0xaa0/0xdd0
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ br_nf_pre_routing_ipv6+0x379/0x770 net/bridge/br_netfilter_ipv6.c:184
+ nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+ nf_hook_bridge_pre net/bridge/br_input.c:277 [inline]
+ br_handle_frame+0x9ff/0x1530 net/bridge/br_input.c:424
+ __netif_receive_skb_core+0x14ed/0x4690 net/core/dev.c:5566
+ __netif_receive_skb_one_core net/core/dev.c:5670 [inline]
+ __netif_receive_skb+0x12f/0x650 net/core/dev.c:5785
+ process_backlog+0x662/0x15b0 net/core/dev.c:6117
+ __napi_poll+0xcd/0x490 net/core/dev.c:6877
+ napi_poll net/core/dev.c:6946 [inline]
+ net_rx_action+0x89b/0x1240 net/core/dev.c:7068
+ handle_softirqs+0x2c7/0x980 kernel/softirq.c:554
+ do_softirq+0x11b/0x1e0 kernel/softirq.c:455
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
+ neigh_periodic_work+0xbcb/0xde0 net/core/neighbour.c:968
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa65/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+net_ratelimit: 8442 callbacks suppressed
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:5e:30:90:49:37:cb, vlan:0)
+
+
 ---
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 19 +++++++++++++++++--
- .../net/ethernet/mellanox/mlx5/core/en_rep.c  | 15 +++++++++++++++
- .../mellanox/mlx5/core/eswitch_offloads.c     |  2 ++
- include/linux/mlx5/driver.h                   |  1 +
- 4 files changed, 35 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index dd16d73000c3..0ec17c276bdd 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -6542,8 +6542,23 @@ static void _mlx5e_remove(struct auxiliary_device *adev)
- 
- 	mlx5_core_uplink_netdev_set(mdev, NULL);
- 	mlx5e_dcbnl_delete_app(priv);
--	unregister_netdev(priv->netdev);
--	_mlx5e_suspend(adev, false);
-+	/* When unload driver, the netdev is in registered state
-+	 * if it's from legacy mode. If from switchdev mode, it
-+	 * is already unregistered before changing to NIC profile.
-+	 */
-+	if (priv->netdev->reg_state == NETREG_REGISTERED) {
-+		unregister_netdev(priv->netdev);
-+		_mlx5e_suspend(adev, false);
-+	} else {
-+		struct mlx5_core_dev *pos;
-+		int i;
-+
-+		if (test_bit(MLX5E_STATE_DESTROYING, &priv->state))
-+			mlx5_sd_for_each_dev(i, mdev, pos)
-+				mlx5e_destroy_mdev_resources(pos);
-+		else
-+			_mlx5e_suspend(adev, true);
-+	}
- 	/* Avoid cleanup if profile rollback failed. */
- 	if (priv->profile)
- 		priv->profile->cleanup(priv);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 554f9cb5b53f..fdff9fd8a89e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -1509,6 +1509,21 @@ mlx5e_vport_uplink_rep_unload(struct mlx5e_rep_priv *rpriv)
- 
- 	priv = netdev_priv(netdev);
- 
-+	/* This bit is set when using devlink to change eswitch mode from
-+	 * switchdev to legacy. As need to keep uplink netdev ifindex, we
-+	 * detach uplink representor profile and attach NIC profile only.
-+	 * The netdev will be unregistered later when unload NIC auxiliary
-+	 * driver for this case.
-+	 * We explicitly block devlink eswitch mode change if any IPSec rules
-+	 * offloaded, but can't block other cases, such as driver unload
-+	 * and devlink reload. We have to unregister netdev before profile
-+	 * change for those cases. This is to avoid resource leak because
-+	 * the offloaded rules don't have the chance to be unoffloaded before
-+	 * cleanup which is triggered by detach uplink representor profile.
-+	 */
-+	if (!(priv->mdev->priv.flags & MLX5_PRIV_FLAGS_SWITCH_LEGACY))
-+		unregister_netdev(netdev);
-+
- 	mlx5e_netdev_attach_nic_profile(priv);
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index 40359f320724..06076dd9ec64 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -3777,6 +3777,8 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 	esw->eswitch_operation_in_progress = true;
- 	up_write(&esw->mode_lock);
- 
-+	if (mode == DEVLINK_ESWITCH_MODE_LEGACY)
-+		esw->dev->priv.flags |= MLX5_PRIV_FLAGS_SWITCH_LEGACY;
- 	mlx5_eswitch_disable_locked(esw);
- 	if (mode == DEVLINK_ESWITCH_MODE_SWITCHDEV) {
- 		if (mlx5_devlink_trap_get_num_active(esw->dev)) {
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index fc7e6153b73d..8f5991168ccd 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -524,6 +524,7 @@ enum {
- 	 * creation/deletion on drivers rescan. Unset during device attach.
- 	 */
- 	MLX5_PRIV_FLAGS_DETACH = 1 << 2,
-+	MLX5_PRIV_FLAGS_SWITCH_LEGACY = 1 << 3,
- };
- 
- struct mlx5_adev {
--- 
-2.45.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
