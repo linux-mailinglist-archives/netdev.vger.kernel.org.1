@@ -1,147 +1,178 @@
-Return-Path: <netdev+bounces-153613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35709F8D81
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:56:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C309F8D86
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:59:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 711B47A11A8
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 07:56:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CB6D16480F
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 07:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73CB41C6A;
-	Fri, 20 Dec 2024 07:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="LAoiwnCa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F94E1A706A;
+	Fri, 20 Dec 2024 07:59:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2FB17333D;
-	Fri, 20 Dec 2024 07:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C1541C6A;
+	Fri, 20 Dec 2024 07:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734681404; cv=none; b=DaqMuHpRbPYI7itzWCU9NApZbDb2BkUMNdboSLSdLuuLF/p1SiJU/5g9qsXduihlt4Lr8vg1YD2FsV7Lv6sT4Xl2frRtsDB2ZmPQ7kE7+j1+zxKBQfsT5jyb8FdpImp2+uRSRnWAxtuiGem+cE2wyEA0J4bR+yc28aLv4ALqCK4=
+	t=1734681582; cv=none; b=GCZdtbDFoOxVJjxEqJJ6kAu/0wn9li/bm7WcBxB3Ikoj7KJ/dvyrrdFK+LkXDaaB7XZYUReyEjePwhRaHDtp1Uc/YX2auUpTfKPTfHzM3d+28G1G1kcmhh4VpmGvr2mLBpczACXdP+LL5dPtsFw587CfGhT2TbaPdi4njOD9Of0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734681404; c=relaxed/simple;
-	bh=L07KuzN1YDEdwpAUdA0s0itwegnBc//dmFKVTJ8Q+oQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SiC+4DQZV0B2+716rJe7oy5SsHLJcJlKySAiJQeYoFpkRfuxYOBKvLqbrXAbXD4ndidKdQEnN+5S+wZVWB0vScX72NO2B8zpmSFy81wNj2sCUZ3HtbFMriwDJ4MsfOMhr0bjNtK+rvyTsh78d/KcL3kQdNs5tpQWbnNmgfi05Ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=LAoiwnCa; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 4BK7uP75131959
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 20 Dec 2024 01:56:25 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1734681385;
-	bh=2Bt4m09KXbqu6J6J7KVBHJ7tDcVAz605f/h9bU/fv88=;
-	h=From:To:CC:Subject:Date;
-	b=LAoiwnCaRBfMvDjpmf3HwaEo5No+5F+pLKXtPLWbM7B8xG4R7zDYcZvR/ofwC5BMz
-	 IMAFle+3HuhYbeQEPAJn8sQG7TLH3hmK7f8b3Et8V0V8tcz7PKegE+aWdgZuTGSjPt
-	 MEBSR1kC/5HG2cqYlpCvRUbT367PSyGd6WTWE4ig=
-Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4BK7uPa2008642;
-	Fri, 20 Dec 2024 01:56:25 -0600
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
- Dec 2024 01:56:24 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 20 Dec 2024 01:56:24 -0600
-Received: from uda0492258.dhcp.ti.com (uda0492258.dhcp.ti.com [10.24.72.81])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4BK7uJg3057628;
-	Fri, 20 Dec 2024 01:56:20 -0600
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rogerq@kernel.org>,
-        <horms@kernel.org>, <dan.carpenter@linaro.org>, <c-vankar@ti.com>,
-        <jpanis@baylibre.com>, <npitre@baylibre.com>
-CC: <stable@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <vigneshr@ti.com>, <srk@ti.com>, <s-vadapalli@ti.com>
-Subject: [PATCH net] net: ethernet: ti: am65-cpsw: default to round-robin for host port receive
-Date: Fri, 20 Dec 2024 13:26:14 +0530
-Message-ID: <20241220075618.228202-1-s-vadapalli@ti.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1734681582; c=relaxed/simple;
+	bh=rRK8vdzk2T00oBXlTaQEzJuE8Aau5JjYRDz6BukhA2w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pcFN53NW7yCOZJLAAVPy6YgCkBNXg7Eaky5p2zd+i1gKkkVj6GomVIZqV9a1ODQ3eskpHjQbbI82mhg5sKN79oqyEjI3NjxP37lKHxNIrAuxxWXQfxBHDgSZiI2ML0kiO+hgXKuYZj+oJ5k3H7zYwk+18I/IgTZEifcFn78jcSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4aff620b232so478585137.0;
+        Thu, 19 Dec 2024 23:59:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734681578; x=1735286378;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yQKCf5v8WyFEUzlQoQMHccUlj0SB5zKTak1Ob6poM/Q=;
+        b=Jo8lsaTn5ATAPciO6L1TU0JL2aDBRnmFbmKhRhmy1qTiDWp1S5dVoNdqIiXWQDU/b/
+         DnX9zZsSAGNX58bR362MvBMSkrip8XJU8R5xdHQB5CxgT9J/HF+MNq0Ont07tee3mc7i
+         69qhlQEKVVIbfdG6+omfyRD/pwfL8o5acBtnLQOG6sr0RypnHfrV2F0rwAXMQofSdSpr
+         GV+5lA0pn8oPz5wO76yqSXHCuTESXBwgufMpEObHtSYNt+tsTUtUC/Bl7exvP/Gq9agU
+         R6ZU3uX0dARDS5J6xvHj4jWrsVCvRygnd4yr4bG7Yoli38xs9TFxO/W8Ix2HbrYh+U8z
+         UgJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzZSGjyzrxiO9wTPuXGMF5feIJOtVc7Ta7HIjAWkGwdp7AjffHxbf12Cv4X1RlrqliEbWbYlRa@vger.kernel.org, AJvYcCVD34dUqoCFTxm9FaZKcL5ec9D4rxhwQvyR9PtrRmuK/Lp2ZpFBY88NUei+xtLxrCFJa/CaSBacvr9yG5KlFXxsck8=@vger.kernel.org, AJvYcCX5v251OeI0tqclYKn9TTa9aOTmgVONtgFYpgC9rP1QGozWerbbhqHzliFVAosxBGvHDstLOkDrS+bqCyG/@vger.kernel.org, AJvYcCXhejHPQiz1o/1d5gSFLzOb7ojVQzLhaE5QHoaoqxEThVd5YFz7a/XaAWF9GbZBTfpwTMSzSWOcChYE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy86uii6TcdLrm1KKqhF71mmrJXFnWA+qQdwV1Dho4pvhyjbxk
+	VoCgUf2m0dTOlU1Zo+kekMb0rufu8nlBhCtXjMIO18pat0iN2UUmCGatP9E0
+X-Gm-Gg: ASbGncvzajO/MubdzTGRfyVkL1V5ZDGegcLaweTSGAn7T2bIlFX64QsAPp+8dZDsm1g
+	Nw671QGacDVnIJt6TdqAMOYnh+lORLPjf8Y5AY4gsajsVilM4/4e24Q1/2ww3fOxEB4SvsuSIjl
+	F+jcnKbnQ0aw1pazIq8mFW70vB5p7/clFsjUft2rI91s4BZxSruuyKLSAZEN7hW//+mcc998BP+
+	g8KWmr4UymJQmrSqquPtQOxAw4xA+gxOEkXCfIVLdhBSGyrnc+0qeBy8sCO8ZIRxOQnOvFSg5mn
+	D689BykYvxmaMum1B/8=
+X-Google-Smtp-Source: AGHT+IE1v2q6S2CWTn9/LbSTK+mMiQQRRmKUWWKkkut+CmsTlUVReix1ECeW0Yzt8+a1IE3Qsric8Q==
+X-Received: by 2002:a05:6102:f10:b0:4af:fa7d:71bd with SMTP id ada2fe7eead31-4b2cc31e70cmr1896581137.3.1734681577778;
+        Thu, 19 Dec 2024 23:59:37 -0800 (PST)
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com. [209.85.217.54])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8610ac4bf66sm514261241.8.2024.12.19.23.59.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Dec 2024 23:59:37 -0800 (PST)
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-4afe4f1ce18so445081137.3;
+        Thu, 19 Dec 2024 23:59:36 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU6KqFLk70A8L5FFXJaeFpJzj8XjrHNqjXOmKAxU5yM42NQPLj32zXakr9qPtz3Vk42/rN4ixP3Act/Koxx81KczKQ=@vger.kernel.org, AJvYcCUIB3kYHWPbnscUoJCajwPGChlq5zmsyvUezqPjD9CNY73dW2taGQRWfdAySJaFviq/y2Rvj+wT@vger.kernel.org, AJvYcCUix33SRPj/JqqlhDltt2VbKZbvRpaGNucp29geZX/Fm8CjkD+QKbXxLrkLcsH5ZrxSJeF8AbW8FAkQ@vger.kernel.org, AJvYcCX0eCne3OUuQEn5cGmcOFyXZkl0c5t92llzZ8UVTh0rOEcTwJDKeg18My/4dgNjCAjS+WZdJIrlKXnu1k4k@vger.kernel.org
+X-Received: by 2002:a05:6102:3fa5:b0:4b1:130f:9fbb with SMTP id
+ ada2fe7eead31-4b2cc488b98mr2282884137.26.1734681576656; Thu, 19 Dec 2024
+ 23:59:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20241220041659.2985492-1-nikita.yoush@cogentembedded.com> <20241220041659.2985492-2-nikita.yoush@cogentembedded.com>
+In-Reply-To: <20241220041659.2985492-2-nikita.yoush@cogentembedded.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 20 Dec 2024 08:59:24 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXV-2bdU9Cmk_VHTJ=M3Afg5aTfY=_k=p6v1igzpV5kBA@mail.gmail.com>
+Message-ID: <CAMuHMdXV-2bdU9Cmk_VHTJ=M3Afg5aTfY=_k=p6v1igzpV5kBA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: renesas: rswitch: use per-port irq handlers
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michael Dege <michael.dege@renesas.com>, 
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>, 
+	Dennis Ostermann <dennis.ostermann@renesas.com>, 
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The Host Port (i.e. CPU facing port) of CPSW receives traffic from Linux
-via TX DMA Channels which are Hardware Queues consisting of traffic
-categorized according to their priority. The Host Port is configured to
-dequeue traffic from these Hardware Queues on the basis of priority i.e.
-as long as traffic exists on a Hardware Queue of a higher priority, the
-traffic on Hardware Queues of lower priority isn't dequeued. An alternate
-operation is also supported wherein traffic can be dequeued by the Host
-Port in a Round-Robin manner.
+Hi Nikita,
 
-Until [0], the am65-cpsw driver enabled a single TX DMA Channel, due to
-which, unless modified by user via "ethtool", all traffic from Linux is
-transmitted on DMA Channel 0. Therefore, configuring the Host Port for
-priority based dequeuing or Round-Robin operation is identical since
-there is a single DMA Channel.
+CC devicetree
 
-Since [0], all 8 TX DMA Channels are enabled by default. Additionally,
-the default "tc mapping" doesn't take into account the possibility of
-different traffic profiles which various users might have. This results
-in traffic starvation at the Host Port due to the priority based dequeuing
-which has been enabled by default since the inception of the driver. The
-traffic starvation triggers NETDEV WATCHDOG timeout for all TX DMA Channels
-that haven't been serviced due to the presence of traffic on the higher
-priority TX DMA Channels.
+Thanks for your patch!
 
-Fix this by defaulting to Round-Robin dequeuing at the Host Port, which
-shall ensure that traffic is dequeued from all TX DMA Channels irrespective
-of the traffic profile. This will address the NETDEV WATCHDOG timeouts.
-At the same time, users can still switch from Round-Robin to Priority
-based dequeuing at the Host Port with the help of the "p0-rx-ptype-rrobin"
-private flag of "ethtool". Users are expected to setup an appropriate
-"tc mapping" that suits their traffic profile when switching to priority
-based dequeuing at the Host Port.
+On Fri, Dec 20, 2024 at 5:17=E2=80=AFAM Nikita Yushchenko
+<nikita.yoush@cogentembedded.com> wrote:
+> Instead of handling all possible data interrupts in the same handler,
+> switch to per-port handlers.
+>
+> This significantly simplifies handling: when the same interrupt is used
+> for several ports, system calls all handlers, and each handler only has
+> to check interrupts for one port's tx and rx queues.
+>
+> But it is not required to use the same interrupt for all ports - GWCA
+> provides 8 data interrupts and allows arbitrary per-queue assignment
+> of those. Support that by reading interrupt index for each port from
+> optional 'irq-index' device tree property.
 
-[0] commit be397ea3473d ("net: ethernet: am65-cpsw: Set default TX channels to maximum")
-Fixes: be397ea3473d ("net: ethernet: am65-cpsw: Set default TX channels to maximum")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
----
+Sorry, but I can't find where this property is documented?
 
-Hello,
+> With per-port interrupts it becomes possible to configure affinity such
+> that traffic coming from different ports is serviced simultaneously on
+> different CPUs.
+>
+> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
 
-This patch is based on commit
-8faabc041a00 Merge tag 'net-6.13-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
-of Mainline Linux.
+> --- a/drivers/net/ethernet/renesas/rswitch.c
+> +++ b/drivers/net/ethernet/renesas/rswitch.c
 
-Regards,
-Siddharth.
+> @@ -1906,6 +1841,34 @@ static void rswitch_etha_init(struct rswitch_priva=
+te *priv, unsigned int index)
+>         etha->psmcs =3D clk_get_rate(priv->clk) / 100000 / (25 * 2) - 1;
+>  }
+>
+> +static int rswitch_port_get_irq(struct rswitch_device *rdev)
+> +{
+> +       unsigned int irq_index;
+> +       char *name;
+> +       int err;
+> +
+> +       err =3D of_property_read_u32(rdev->np_port, "irq-index", &irq_ind=
+ex);
+> +       if (err =3D=3D 0) {
+> +               if (irq_index < GWCA_NUM_IRQS)
+> +                       rdev->irq_index =3D irq_index;
+> +               else
+> +                       dev_warn(&rdev->priv->pdev->dev,
+> +                                "%pOF: irq-index out of range\n",
+> +                                rdev->np_port);
+> +       }
+> +
+> +       name =3D kasprintf(GFP_KERNEL, GWCA_IRQ_RESOURCE_NAME, rdev->irq_=
+index);
+> +       if (!name)
+> +               return -ENOMEM;
+> +       err =3D platform_get_irq_byname(rdev->priv->pdev, name);
+> +       kfree(name);
+> +       if (err < 0)
+> +               return err;
+> +       rdev->irq =3D err;
+> +
+> +       return 0;
+> +}
+> +
+>  static int rswitch_device_alloc(struct rswitch_private *priv, unsigned i=
+nt index)
+>  {
+>         struct platform_device *pdev =3D priv->pdev;
 
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Gr{oetje,eeting}s,
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 14e1df721f2e..5465bf872734 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -3551,7 +3551,7 @@ static int am65_cpsw_nuss_probe(struct platform_device *pdev)
- 	init_completion(&common->tdown_complete);
- 	common->tx_ch_num = AM65_CPSW_DEFAULT_TX_CHNS;
- 	common->rx_ch_num_flows = AM65_CPSW_DEFAULT_RX_CHN_FLOWS;
--	common->pf_p0_rx_ptype_rrobin = false;
-+	common->pf_p0_rx_ptype_rrobin = true;
- 	common->default_vlan = 1;
- 
- 	common->ports = devm_kcalloc(dev, common->port_num,
--- 
-2.43.0
+                        Geert
 
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
