@@ -1,82 +1,60 @@
-Return-Path: <netdev+bounces-153629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 459459F8E1B
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 09:41:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E916E9F8E19
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 09:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CC50169A0A
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:41:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CFB7169C40
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A851A83E5;
-	Fri, 20 Dec 2024 08:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755BB1A8404;
+	Fri, 20 Dec 2024 08:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XupupPfG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="htMgKyC5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B19197A8F;
-	Fri, 20 Dec 2024 08:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839DE198845;
+	Fri, 20 Dec 2024 08:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734684104; cv=none; b=F63RFyYl2vIuE7Z7g+8pfNX8XeLkm76Woe8iiWvhd8/sD7+PUpl3qNwo5zCo146za4qa1QDTDlZYhKSDaSjcrAYJxxdeAnO7+alYHgHaRGjdgQuNHr/bSGdC0En0s2xPEajP/S9vlGWsn/hiwA85/Q4AVYns7Ui624GA02iBL/s=
+	t=1734684054; cv=none; b=KxXUHpope0CUpUsPKilN6A91gTFJq+xKuAOrK+0Tmri58pZLAxuYMUGWazHTbmPyWpCHgToEI4SsTx8NPzgeBGXSTAjzLvaFeNxDoOa5HMxD/K/QzDWIygm+w5mWwMEirCypn8dcBwKxqE0FW3Hbsq0X4nWx5qWFwZDYbsfHgAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734684104; c=relaxed/simple;
-	bh=Qtbfppz/HaVXE/BeA07M+1Tp9cfNt0aMIRIJLlJbctA=;
+	s=arc-20240116; t=1734684054; c=relaxed/simple;
+	bh=GXjHFSfHXGkbazxF4UtzYwq7XneAfM1/GwSJhO2/4jw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GDDti8VQApJYK+V+Su6pskEXjM4VbxlMFP2+/4ygNiR2nqSwtXdpttuVLPGwM0VBUjQBzNHPeWygJlUW7LWmzLDHfzo8roNGjwxUvyS9AhIl07XY2goZ8UaI87i2Nu/OvvK2MptlGYFHFYKoeEkwAJSNISKaXdDhFEu+VSzKL7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XupupPfG; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734684103; x=1766220103;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Qtbfppz/HaVXE/BeA07M+1Tp9cfNt0aMIRIJLlJbctA=;
-  b=XupupPfG6yUGaCTQNCTwpN6PpDxK2izUPselt749nt4ANJPtPND+CfB9
-   0SlYR/dNrcEEMev5dQYTxgcZCxFoInh+muhfYBZO3jhyA/PGuXU0b6gAD
-   qtxQ15PEaes49lwUmayQSw8PmnKMnUvFQ9HlDCn4HMkH8E7dOqPUu14VA
-   s3618Mb/PLXKghZd+49GSHcCeodAco4xdTow3JV8HJvw4vxab3ct/ZiCj
-   90LpCLrOxJMMLjy+mYi8o664I9vu5lvGuzabRftxMInXtSQpXL+17es7I
-   OkAW4LWawIyu2jOzPFvczxJub6IGioJWHwAEq/MXxUEROePI9F35ooG4a
-   Q==;
-X-CSE-ConnectionGUID: 9B3+Nlg+TkyY6Se9KwEn8Q==
-X-CSE-MsgGUID: dpXZ63kASEOzOBaCK+0XxQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11291"; a="35111945"
-X-IronPort-AV: E=Sophos;i="6.12,250,1728975600"; 
-   d="scan'208";a="35111945"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 00:41:43 -0800
-X-CSE-ConnectionGUID: mjhaqTYlTY2OuJnSpLreWA==
-X-CSE-MsgGUID: X+a3B7RBRV+GyXIRJpvbCA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="135778228"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 00:41:39 -0800
-Date: Fri, 20 Dec 2024 09:38:32 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>
-Subject: Re: [PATCH net-next 2/2] net: renesas: rswitch: request ts interrupt
- at port open
-Message-ID: <Z2UtCBwofyoHlZi0@mev-dev.igk.intel.com>
-References: <20241220041659.2985492-1-nikita.yoush@cogentembedded.com>
- <20241220041659.2985492-3-nikita.yoush@cogentembedded.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mx2NKrBOU1Yg1G1L8EJujGphKlmiuVmtjrgieADJL7pkrJQyuwZh3ab8m6E3+k2YYd9uLUx6IXRMtLcldDaJqVaEO2YWN3d5lWFR762cPQTmgszod7Vnl1VL5bljq+wlPJCgx9J6zh7XMXPL9fePuUEgfv+EUV8dFvBl2SeUYDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=htMgKyC5; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=j9U1VGdr2s8YAl9q2+JeX1Vkwfvzj9l8PtZs4y7rNZM=; b=htMgKyC59nsU4y0SItUayWEIez
+	kuajlKd2QCLkxvaS1/lORP1G419ulxo9AN+JkUsCG0u295BqIIiDTHIyWB9Yky3waPC5/ciU/4wMK
+	K6NihyTGVSu3HpTou+GWSPqtn0GckfA5Ej68IGuAZKcSygvpkrqB5fSLcE2SmqpHDG6g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tOYYo-001vPI-2d; Fri, 20 Dec 2024 09:40:38 +0100
+Date: Fri, 20 Dec 2024 09:40:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: kuba@kernel.org, tony@atomide.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linux@armlinux.org.uk, andrew+netdev@lunn.ch,
+	pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, linux-omap@vger.kernel.org,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 0/3] net: add and use phy_disable_eee
+Message-ID: <072064ab-50d2-4517-97df-73acd9262103@lunn.ch>
+References: <5139374e-7151-4d0d-8ba9-9ec3d9b52f67@gmail.com>
+ <173466543676.2462446.11795736705448322037.git-patchwork-notify@kernel.org>
+ <7128fc70-895d-4622-b12c-eab2475e3049@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,132 +63,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241220041659.2985492-3-nikita.yoush@cogentembedded.com>
+In-Reply-To: <7128fc70-895d-4622-b12c-eab2475e3049@gmail.com>
 
-On Fri, Dec 20, 2024 at 09:16:59AM +0500, Nikita Yushchenko wrote:
-> Data interrupts are now requested at port open and freed at port close.
-> 
-> For symmetry, do the same for ts interrupt.
-> 
-> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-> ---
->  drivers/net/ethernet/renesas/rswitch.c | 35 +++++++++++++-------------
->  drivers/net/ethernet/renesas/rswitch.h |  2 +-
->  2 files changed, 18 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-> index eb9dea8b16f3..cc8f2a4e3d70 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.c
-> +++ b/drivers/net/ethernet/renesas/rswitch.c
-> @@ -989,18 +989,6 @@ static irqreturn_t rswitch_gwca_ts_irq(int irq, void *dev_id)
->  	return IRQ_NONE;
->  }
->  
-> -static int rswitch_gwca_ts_request_irqs(struct rswitch_private *priv)
-> -{
-> -	int irq;
-> -
-> -	irq = platform_get_irq_byname(priv->pdev, GWCA_TS_IRQ_RESOURCE_NAME);
-> -	if (irq < 0)
-> -		return irq;
-> -
-> -	return devm_request_irq(&priv->pdev->dev, irq, rswitch_gwca_ts_irq,
-> -				0, GWCA_TS_IRQ_NAME, priv);
-> -}
-> -
->  /* Ethernet TSN Agent block (ETHA) and Ethernet MAC IP block (RMAC) */
->  static int rswitch_etha_change_mode(struct rswitch_etha *etha,
->  				    enum rswitch_etha_mode mode)
-> @@ -1510,8 +1498,14 @@ static int rswitch_open(struct net_device *ndev)
->  	unsigned long flags;
->  	int ret;
->  
-> -	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
-> +	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS)) {
-> +		ret = request_irq(rdev->priv->gwca.ts_irq, rswitch_gwca_ts_irq,
-> +				  0, "rswitch_ts", rdev->priv);
-> +		if (ret < 0)
-> +			return ret;
-> +
->  		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDIE);
-> +	}
->  
->  	napi_enable(&rdev->napi);
->  
-> @@ -1535,8 +1529,10 @@ static int rswitch_open(struct net_device *ndev)
->  err_request_irq:
->  	napi_disable(&rdev->napi);
->  
-> -	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
-> +	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS)) {
->  		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
-> +		free_irq(rdev->priv->gwca.ts_irq, rdev->priv);
-> +	}
->  
->  	return ret;
->  };
-> @@ -1562,8 +1558,10 @@ static int rswitch_stop(struct net_device *ndev)
->  
->  	napi_disable(&rdev->napi);
->  
-> -	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
-> +	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS)) {
->  		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
-> +		free_irq(rdev->priv->gwca.ts_irq, rdev->priv);
-> +	}
->  
->  	for (tag = find_first_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT);
->  	     tag < TS_TAGS_PER_PORT;
-> @@ -2001,9 +1999,10 @@ static int rswitch_init(struct rswitch_private *priv)
->  	if (err < 0)
->  		goto err_ptp_register;
->  
-> -	err = rswitch_gwca_ts_request_irqs(priv);
-> +	err = platform_get_irq_byname(priv->pdev, GWCA_TS_IRQ_RESOURCE_NAME);
->  	if (err < 0)
-> -		goto err_gwca_ts_request_irq;
-> +		goto err_gwca_ts_irq;
-> +	priv->gwca.ts_irq = err;
->  
->  	err = rswitch_gwca_hw_init(priv);
->  	if (err < 0)
-> @@ -2035,7 +2034,7 @@ static int rswitch_init(struct rswitch_private *priv)
->  	rswitch_gwca_hw_deinit(priv);
->  
->  err_gwca_hw_init:
-> -err_gwca_ts_request_irq:
-> +err_gwca_ts_irq:
->  	rcar_gen4_ptp_unregister(priv->ptp_priv);
->  
->  err_ptp_register:
-> diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-> index a1e62a6b3844..54b9f059707a 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.h
-> +++ b/drivers/net/ethernet/renesas/rswitch.h
-> @@ -58,7 +58,6 @@
->  #define GWRO			RSWITCH_GWCA0_OFFSET
->  
->  #define GWCA_TS_IRQ_RESOURCE_NAME	"gwca0_rxts0"
-> -#define GWCA_TS_IRQ_NAME		"rswitch: gwca0_rxts0"
->  #define GWCA_TS_IRQ_BIT			BIT(0)
->  
->  #define FWRO	0
-> @@ -978,6 +977,7 @@ struct rswitch_gwca {
->  	struct rswitch_gwca_queue *queues;
->  	int num_queues;
->  	struct rswitch_gwca_queue ts_queue;
-> +	int ts_irq;
->  	DECLARE_BITMAP(used, RSWITCH_MAX_NUM_QUEUES);
->  };
+On Fri, Dec 20, 2024 at 09:26:54AM +0100, Heiner Kallweit wrote:
+> On 20.12.2024 04:30, patchwork-bot+netdevbpf@kernel.org wrote:
+> > Hello:
+> > 
+> > This series was applied to netdev/net-next.git (main)
+> > by Jakub Kicinski <kuba@kernel.org>:
+> > 
+> > On Mon, 16 Dec 2024 22:29:58 +0100 you wrote:
+> >> If a MAC driver doesn't support EEE, then the PHY shouldn't advertise it.
+> >> Add phy_disable_eee() for this purpose, and use it in cpsw driver.
+> >>
+> >> Heiner Kallweit (3):
+> >>   net: phy: add phy_disable_eee
+> >>   net: ethernet: ti: cpsw: disable PHY EEE advertisement
+> >>   ARM: dts: ti/omap: remove eee-broken properties
+> >>
+> >> [...]
+> > 
+> > Here is the summary with links:
+> >   - [net-next,1/3] net: phy: add phy_disable_eee
+> >     https://git.kernel.org/netdev/net-next/c/b55498ff14bd
+> >   - [net-next,2/3] net: ethernet: ti: cpsw: disable PHY EEE advertisement
+> >     https://git.kernel.org/netdev/net-next/c/c9f5a5dabbf5
+> >   - [net-next,3/3] ARM: dts: ti/omap: remove eee-broken properties
+> >     (no matching commit)
+> > 
+> Patch 3 is marked "not applicable" in patchwork and didn't make it to net-next.
+> Any issue with this patch?
 
-Wasn't previous implementation more obvious? This ts irq you have one
-per device, no per port, so it better fit to one time initialization
-instead of checking if it is first and last port.
+Maybe Jakub wants you to submit it to the TI DT Maintainer? Or get an
+Acked-by: from said Maintainer.
 
-Anyway, it is your descision, patch looks correct:
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-
->  
-> -- 
-> 2.39.5
+	Andrew
 
