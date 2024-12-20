@@ -1,144 +1,301 @@
-Return-Path: <netdev+bounces-153611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A49069F8D62
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:40:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62E239F8D7E
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:56:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0642188B1ED
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 07:40:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E27E18932BC
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 07:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD2B17B401;
-	Fri, 20 Dec 2024 07:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767E3199E84;
+	Fri, 20 Dec 2024 07:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="bInsg9mS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BC0A9s8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439F786337;
-	Fri, 20 Dec 2024 07:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D9141C6A;
+	Fri, 20 Dec 2024 07:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734680445; cv=none; b=fLHM3+6o6Zv78WaLt5vqLU+Yz3WRUd7Qt77HkM26I3p8wxQtWWOnvhbjJVDtUIGJ25ancX+94AYaLciJ01oNrYXX+0q6PToOUKFtlpRpWBN6xz1Z74jMygUyfWuSIEuksglYNYNlEjABWkA8x1RrbbYs5U0aIv2INoOSuOHf5XM=
+	t=1734681377; cv=none; b=qP2i/McH244K/LVbqdB/5Dt2e8FgO2zcNsWmjwhw1cRrCO70vxrs4cz6Qu15rjdtf9dy9Zf6TS5X5urxAn4CUOy+xfqu0rvajVai9TUz2zrh42ptnFVvoBgm3xZ2ckP/mb3qssgS+vjTA7svsajmgnc2LakEYz0n9kv1QccHOrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734680445; c=relaxed/simple;
-	bh=oZwO3EKeLGNnLdka2GhCy5e37M34CKThU9bQvjA99Ic=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UVis+riCK6Fuo8wJx9jYc+ogGDLkPJ5Z1/G9UyEDTzB1h2hCovOf5lL+79ckRVhRKpwsCN49zUrChfRb8K3NhHRwVafD4uOYYMaXuN1D938s34s3ZWSF/O2erl8Sw+MS5tChWLxNZq2gTyFsjp+WcLtplkt1nkTklSCcNrl/Dds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=bInsg9mS; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1734681377; c=relaxed/simple;
+	bh=e4F2m1FFUSwO/OMiUHzHsOW54aum4mUteR+BHX5RlOM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=WftDfdcDgQgnLSMyaJ/pSXpQAjBRh1H3fltqPdgCl41L5njucok6zLccEFErLN4TYtv/9QpADf2/oM5g6+DIkr+ypMv/A0bOoTjLlcswOxCVn5BdMd2MF+EMD/lcG71biT8qIykenLfdm4E3G6GvSdiPWT5w7eEKkCn3T05oqpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BC0A9s8n; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-801c081a652so2145340a12.0;
+        Thu, 19 Dec 2024 23:56:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1734680433;
-	bh=oZwO3EKeLGNnLdka2GhCy5e37M34CKThU9bQvjA99Ic=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=bInsg9mS1OF70/p1jhuuPwkSshLAe4jUKfgvYAdIexBVj6WVjAAXmKinJ04S0mU0Q
-	 Wgwh//ZlU5bp4AMCzO3f9trNVuD5IlH2GawRj9NAgSzGTd5yLE/60RtE7errqFKfj0
-	 M71QJXJFOb4hV213pQvwLKSwCQCUYltqLbsN/JLpVNmvvQGxlemgh4Yaks4D9PgzZU
-	 /HLH6u/iBuYyn2lBEHdbC43bpWvMT0XZeKY95g55/YXHqs6flA9E9ajuzATzTNKA+7
-	 2XNkhqEjOFvuXCsdQGkC1uLmjy/mm7+kKRDtISDicO9Omctfq34eniPEbMjzWj7cUF
-	 76Ba3q2V5t7sA==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id CE2826F8DC;
-	Fri, 20 Dec 2024 15:40:31 +0800 (AWST)
-Message-ID: <b5be0f5cef13cec69fbea5f10539481dbafd9ba3.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v10 1/1] mctp pcc: Implement MCTP over PCC Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: admiyo@os.amperecomputing.com, Matt Johnston
- <matt@codeconstruct.com.au>,  Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Fri, 20 Dec 2024 15:40:31 +0800
-In-Reply-To: <20241219191610.257649-2-admiyo@os.amperecomputing.com>
-References: <20241219191610.257649-1-admiyo@os.amperecomputing.com>
-	 <20241219191610.257649-2-admiyo@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4-2 
+        d=gmail.com; s=20230601; t=1734681375; x=1735286175; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cwv6cGXBMSPsqiQk43DsTTbOsw6YSE/MxSGSYva2uIA=;
+        b=BC0A9s8nmJno7LRtdgtAGd3ezqlAnTLUIKXvhJv/Ezacw2J+PLGB0RZpTs2LLmDrYA
+         WTPEItFQgJauEEBx9Muuz5OGurBi0ChZMUhsbBODNZ7xfIDJSPdnhBoXUBWk112Hq3DM
+         22lhd4TR3tPIHDVzk43Yzl9MF1MrNNVsktS+7vFCmtyKgucIOFkNe/smDr0SX26+aWpw
+         WTnVz/gP9PnKpajKi8L290i8+PASaW9gNpAxP+UcNGkU1XXBG3CLFJDvjkznyAt6+QZj
+         rb6VELRQuHw8d4hBGOIuEeZnNSB0TUBhhoml6DJ+W6GNaNw6olhUgilXX4zWepAlY92i
+         JuVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734681375; x=1735286175;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Cwv6cGXBMSPsqiQk43DsTTbOsw6YSE/MxSGSYva2uIA=;
+        b=CENjqLJZhJt6n4AR8GKOLo0Vfz1fhdfwZ/RQ/ZXIfNYB46tET8UljLCRAfx88Lck1Q
+         emk1LDCxW87ZZUZWmvhznrQx4Wa6QZ2rtvVOHu1icVuRI8CPhg2DXfTT19VIXrZu8Qon
+         WIgaVGH908yB5UCN9JaTXle1SYrmwSCsX4kgTqYia5Lltm7w8EGF3P2vpH8LJRIgguRF
+         ZXbtwA/W5C/gqmqZheap0Cm7Ab3rmIKzuywvMlyg8XWcPwOl+5xuGKbwLC0cWyKf4n4r
+         fIQBXY0WV+eCwL6bHrs2k+uCijq+5xvmf9BaCtZMIXgP/67FUiXzcRpQYshrrGMaqLq+
+         n87w==
+X-Forwarded-Encrypted: i=1; AJvYcCU4zkPKIAjgLe2LKzXSh5Uw/7N8GL0hDTX1RpR7FKVULDuDGVisvaLy8buYR/qfEcrrLFgTfKzW@vger.kernel.org, AJvYcCVY+VutI1UgALsVpYiZMgNRzfajLMNYG8rXX//20ZpCrVVhymTLZ7OjFxRzegiSkizh1ZEghxELpWD/TYKw@vger.kernel.org, AJvYcCWXFmmlDbZ4xexltSVZcVPFOs/QGydL1+IhfHbHxI1otNqFfzo2Vi4QUI92g+1snxKUKEI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9VTxHvseVHbMWeQTMkptbRS0pR1fO9gbASezRhQKHGuKbUmip
+	Eabx4bxD7SQPLjcFzp+v2aJBx6+uFgHFycpjhyi0hE/o1YbKo0Vb
+X-Gm-Gg: ASbGncuxF2MvovX5yjL2JxsulhshnLMezH0Ptlp2xz9cZouL3yS03HTkZnC3h+vwMte
+	UlzCR//a340jUWQ+l02Ca9ko6ifhqqm4RzjGwadAHkTDwuFHgHs12UYHkqmvhH5YEevCX8hCxrP
+	7V2u9iSIe8Gj78mUB3GSOtnZtZjBR3l9ZkEcu4wZX+n9N0PeUWaQwNBSsW+cMq0CAEsBluCIn89
+	kvYREculo/7V6ZicIc39RIGje8/SUTUeQAhA0jaw8TN7P2Jzz51smQYkw==
+X-Google-Smtp-Source: AGHT+IE6a7wsKwBZ5rvYFGHEGlJeEvek2IxDmYvcsUFoxAsXTenhTxST4UptIvwhBmlczsoynJyy7Q==
+X-Received: by 2002:a17:90b:2d4e:b0:2ea:61c4:a443 with SMTP id 98e67ed59e1d1-2f44353f053mr9578296a91.4.1734681375038;
+        Thu, 19 Dec 2024 23:56:15 -0800 (PST)
+Received: from localhost ([98.97.40.162])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2ed82d273sm4574772a91.30.2024.12.19.23.56.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 23:56:14 -0800 (PST)
+Date: Thu, 19 Dec 2024 23:56:12 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+ Levi Zim <rsworktech@outlook.com>, 
+ Cong Wang <xiyou.wangcong@gmail.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <6765231ce87bd_4e17208be@john.notmuch>
+In-Reply-To: <87msgs9gmp.fsf@all.your.base.are.belong.to.us>
+References: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
+ <MEYP282MB23129373641D74DE831E07E9C6342@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+ <Z0+qA4Lym/TWOoSh@pop-os.localdomain>
+ <MEYP282MB2312EE60BC5A38AEB4D77BA9C6372@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+ <87y10e1fij.fsf@all.your.base.are.belong.to.us>
+ <87msgs9gmp.fsf@all.your.base.are.belong.to.us>
+Subject: Re: [PATCH net 0/2] Fix NPE discovered by running bpf kselftest
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-SGkgQWRhbSwKCkxvb2tpbmcgZ29vZC4gSSBzZWUgdGhhdCB0aGVyZSBhcmUgc29tZSB3YXJuaW5n
-cyByZXBvcnRlZCBmcm9tIHRoZQphY2Nlc3NlcyB0byB0aGUgX19iZTMyIGZpZWxkcyBpbiB0aGUg
-aGVhZGVyIHN0cnVjdDoKCiAgaHR0cHM6Ly9uZXRkZXYuYm90cy5saW51eC5kZXYvc3RhdGljL25p
-cGEvOTE5NjEyLzEzOTE1NTM4L2J1aWxkX2FsbG1vZGNvbmZpZ193YXJuL3N0ZGVycgoKW3RoZXJl
-IGFyZSBzb21lIHByZS1leGlzdGluZyB3YXJuaW5ncyB0aGVyZTsgYnV0IHRoZXkncmUgZmluZSB0
-byBpZ25vcmUKZm9yIHlvdXIgcHVycG9zZXNdCgpZb3UnbGwgbGlrZWx5IG5lZWQgc29tZSBlbmRp
-YW4gY29udmVyc2lvbiB0aGVyZTsgYXJlIHRob3NlIGRlZmluZWQgYXMKYmlnIGVuZGlhbiB0aG91
-Z2g/CgpBbmQgaWYgeW91J3JlIHJlLXJvbGxpbmcsIEkgd291bGQgc3VnZ2VzdDoKCj4gK3N0YXRp
-YyB2b2lkIG1jdHBfY2xlYW51cF9uZXRkZXYodm9pZCAqZGF0YSkKPiArewo+ICvCoMKgwqDCoMKg
-wqDCoHN0cnVjdCBuZXRfZGV2aWNlICpuZGV2ID0gZGF0YTsKPiArCj4gK8KgwqDCoMKgwqDCoMKg
-bWN0cF91bnJlZ2lzdGVyX25ldGRldihuZGV2KTsKPiArfQo+Cj4gK3N0YXRpYyBpbnQgbWN0cF9w
-Y2NfZHJpdmVyX2FkZChzdHJ1Y3QgYWNwaV9kZXZpY2UgKmFjcGlfZGV2KQo+ICt7Cj4gK8KgwqDC
-oMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX2xvb2t1cF9jb250ZXh0IGNvbnRleHQgPSB7MCwgMCwg
-MH07Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX25kZXYgKm1jdHBfcGNjX25kZXY7
-Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IGRldmljZSAqZGV2ID0gJmFjcGlfZGV2LT5kZXY7Cj4g
-K8KgwqDCoMKgwqDCoMKgc3RydWN0IG5ldF9kZXZpY2UgKm5kZXY7Cj4gK8KgwqDCoMKgwqDCoMKg
-YWNwaV9oYW5kbGUgZGV2X2hhbmRsZTsKPiArwqDCoMKgwqDCoMKgwqBhY3BpX3N0YXR1cyBzdGF0
-dXM7Cj4gK8KgwqDCoMKgwqDCoMKgaW50IG1jdHBfcGNjX210dTsKPiArwqDCoMKgwqDCoMKgwqBj
-aGFyIG5hbWVbMzJdOwo+ICvCoMKgwqDCoMKgwqDCoGludCByYzsKPiArCj4gK8KgwqDCoMKgwqDC
-oMKgZGV2X2RiZyhkZXYsICJBZGRpbmcgbWN0cF9wY2MgZGV2aWNlIGZvciBISUQgJXNcbiIsCj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGFjcGlfZGV2aWNlX2hpZChhY3BpX2Rldikp
-Owo+ICvCoMKgwqDCoMKgwqDCoGRldl9oYW5kbGUgPSBhY3BpX2RldmljZV9oYW5kbGUoYWNwaV9k
-ZXYpOwo+ICvCoMKgwqDCoMKgwqDCoHN0YXR1cyA9IGFjcGlfd2Fsa19yZXNvdXJjZXMoZGV2X2hh
-bmRsZSwgIl9DUlMiLCBsb29rdXBfcGNjdF9pbmRpY2VzLAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICZjb250
-ZXh0KTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoIUFDUElfU1VDQ0VTUyhzdGF0dXMpKSB7Cj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRldl9lcnIoZGV2LCAiRkFJTFVSRSB0byBsb29r
-dXAgUENDIGluZGV4ZXMgZnJvbSBDUlNcbiIpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqByZXR1cm4gLUVJTlZBTDsKPiArwqDCoMKgwqDCoMKgwqB9Cj4gKwo+ICvCoMKgwqDCoMKg
-wqDCoC8vaW5ib3ggaW5pdGlhbGl6YXRpb24KPiArwqDCoMKgwqDCoMKgwqBzbnByaW50ZihuYW1l
-LCBzaXplb2YobmFtZSksICJtY3RwaXBjYyVkIiwgY29udGV4dC5pbmJveF9pbmRleCk7Cj4gK8Kg
-wqDCoMKgwqDCoMKgbmRldiA9IGFsbG9jX25ldGRldihzaXplb2Yoc3RydWN0IG1jdHBfcGNjX25k
-ZXYpLCBuYW1lLCBORVRfTkFNRV9FTlVNLAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG1jdHBfcGNjX3NldHVwKTsKPiArwqDCoMKgwqDCoMKg
-wqBpZiAoIW5kZXYpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAtRU5P
-TUVNOwo+ICsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19uZGV2ID0gbmV0ZGV2X3ByaXYobmRl
-dik7Cj4gK8KgwqDCoMKgwqDCoMKgcmMgPSBkZXZtX2FkZF9hY3Rpb25fb3JfcmVzZXQoZGV2LCBt
-Y3RwX2NsZWFudXBfbmV0ZGV2LCBuZGV2KTsKPiArwqDCoMKgwqDCoMKgwqBpZiAocmMpCj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gY2xlYW51cF9uZXRkZXY7Cj4gK8KgwqDC
-oMKgwqDCoMKgc3Bpbl9sb2NrX2luaXQoJm1jdHBfcGNjX25kZXYtPmxvY2spOwo+ICsKPiArwqDC
-oMKgwqDCoMKgwqByYyA9IG1jdHBfcGNjX2luaXRpYWxpemVfbWFpbGJveChkZXYsICZtY3RwX3Bj
-Y19uZGV2LT5pbmJveCwKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnRleHQuaW5ib3hfaW5k
-ZXgpOwo+ICvCoMKgwqDCoMKgwqDCoGlmIChyYykKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgZ290byBjbGVhbnVwX25ldGRldjsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19uZGV2
-LT5pbmJveC5jbGllbnQucnhfY2FsbGJhY2sgPSBtY3RwX3BjY19jbGllbnRfcnhfY2FsbGJhY2s7
-Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoC8vb3V0Ym94IGluaXRpYWxpemF0aW9uCj4gK8KgwqDCoMKg
-wqDCoMKgcmMgPSBtY3RwX3BjY19pbml0aWFsaXplX21haWxib3goZGV2LCAmbWN0cF9wY2NfbmRl
-di0+b3V0Ym94LAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29udGV4dC5vdXRib3hfaW5kZXgp
-Owo+ICvCoMKgwqDCoMKgwqDCoGlmIChyYykKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgZ290byBjbGVhbnVwX25ldGRldjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRl
-di0+YWNwaV9kZXZpY2UgPSBhY3BpX2RldjsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19uZGV2
-LT5pbmJveC5jbGllbnQuZGV2ID0gZGV2Owo+ICvCoMKgwqDCoMKgwqDCoG1jdHBfcGNjX25kZXYt
-Pm91dGJveC5jbGllbnQuZGV2ID0gZGV2Owo+ICvCoMKgwqDCoMKgwqDCoG1jdHBfcGNjX25kZXYt
-Pm1kZXYuZGV2ID0gbmRldjsKPiArwqDCoMKgwqDCoMKgwqBhY3BpX2Rldi0+ZHJpdmVyX2RhdGEg
-PSBtY3RwX3BjY19uZGV2Owo+ICsKPiArwqDCoMKgwqDCoMKgwqAvKiBUaGVyZSBpcyBubyBjbGVh
-biB3YXkgdG8gcGFzcyB0aGUgTVRVIHRvIHRoZSBjYWxsYmFjayBmdW5jdGlvbgo+ICvCoMKgwqDC
-oMKgwqDCoCAqIHVzZWQgZm9yIHJlZ2lzdHJhdGlvbiwgc28gc2V0IHRoZSB2YWx1ZXMgYWhlYWQg
-b2YgdGltZS4KPiArwqDCoMKgwqDCoMKgwqAgKi8KPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19t
-dHUgPSBtY3RwX3BjY19uZGV2LT5vdXRib3guY2hhbi0+c2htZW1fc2l6ZSAtCj4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoHNpemVvZihzdHJ1Y3QgbWN0cF9wY2NfaGRyKTsKPiArwqDC
-oMKgwqDCoMKgwqBuZGV2LT5tdHUgPSBNQ1RQX01JTl9NVFU7Cj4gK8KgwqDCoMKgwqDCoMKgbmRl
-di0+bWF4X210dSA9IG1jdHBfcGNjX210dTsKPiArwqDCoMKgwqDCoMKgwqBuZGV2LT5taW5fbXR1
-ID0gTUNUUF9NSU5fTVRVOwo+ICsKPiArwqDCoMKgwqDCoMKgwqAvKiBuZGV2IG5lZWRzIHRvIGJl
-IGZyZWVkIGJlZm9yZSB0aGUgaW9tZW1vcnkgKG1hcHBlZCBhYm92ZSkgZ2V0cwo+ICvCoMKgwqDC
-oMKgwqDCoCAqIHVubWFwcGVkLMKgIGRldm0gcmVzb3VyY2VzIGdldCBmcmVlZCBpbiByZXZlcnNl
-IHRvIHRoZSBvcmRlciB0aGV5Cj4gK8KgwqDCoMKgwqDCoMKgICogYXJlIGFkZGVkLgo+ICvCoMKg
-wqDCoMKgwqDCoCAqLwo+ICvCoMKgwqDCoMKgwqDCoHJjID0gcmVnaXN0ZXJfbmV0ZGV2KG5kZXYp
-OwoKbWN0cF9yZWdpc3Rlcl9uZXRkZXYoKSwgc28gdGhhdCB5b3UncmUgc3ltbWV0cmljYWwgd2l0
-aCB0aGUKbWN0cF91bnJlZ2lzdGVyX25ldGRldigpIGluIHRoZSBjbGVhbnVwIHBhdGguCgpDaGVl
-cnMsCgoKSmVyZW15Cg==
+Bj=C3=B6rn T=C3=B6pel wrote:
+> Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org> writes:
+> =
+
+> > Levi Zim <rsworktech@outlook.com> writes:
+> >
+> >> On 2024-12-04 09:01, Cong Wang wrote:
+> >>> On Sun, Dec 01, 2024 at 09:42:08AM +0800, Levi Zim wrote:
+> >>>> On 2024-11-30 21:38, Levi Zim via B4 Relay wrote:
+> >>>>> I found that bpf kselftest sockhash::test_txmsg_cork_hangs in
+> >>>>> test_sockmap.c triggers a kernel NULL pointer dereference:
+> >>> Interesting, I also ran this test recently and I didn't see such a
+> >>> crash.
+> >>
+> >> I am also curious about why other people or the CI didn't hit such c=
+rash.
+> >
+> > FWIW, I'm hitting it on RISC-V:
+> >
+> >   |  Unable to handle kernel access to user memory without uaccess ro=
+utines at virtual address 0000000000000008
+> >   |  Oops [#1]
+> >   |  Modules linked in: sch_fq_codel drm fuse drm_panel_orientation_q=
+uirks backlight
+> >   |  CPU: 7 UID: 0 PID: 732 Comm: test_sockmap Not tainted 6.13.0-rc3=
+-00017-gf44d154d6e3d #1
+> >   |  Hardware name: riscv-virtio qemu/qemu, BIOS 2025.01-rc3-00042-ga=
+cab6e78aca7 01/01/2025
+> >   |  epc : splice_to_socket+0x376/0x49a
+> >   |   ra : splice_to_socket+0x37c/0x49a
+> >   |  epc : ffffffff803d9ffc ra : ffffffff803da002 sp : ff20000001c3b8=
+b0
+> >   |   gp : ffffffff827aefa8 tp : ff60000083450040 t0 : ff6000008a12d0=
+01
+> >   |   t1 : 0000100100001001 t2 : 0000000000000000 s0 : ff20000001c3ba=
+e0
+> >   |   s1 : ffffffffffffefff a0 : ff6000008245e200 a1 : ff60000087dd04=
+50
+> >   |   a2 : 0000000000000000 a3 : 0000000000000000 a4 : 00000000000000=
+00
+> >   |   a5 : 0000000000000000 a6 : ff20000001c3b450 a7 : ff6000008a12c0=
+04
+> >   |   s2 : 000000000000000f s3 : ff6000008245e2d0 s4 : ff6000008245e2=
+80
+> >   |   s5 : 0000000000000000 s6 : 0000000000000002 s7 : 00000000000010=
+01
+> >   |   s8 : 0000000000003001 s9 : 0000000000000002 s10: 00000000000000=
+02
+> >   |   s11: ff6000008245e200 t3 : ffffffff8001e78c t4 : 00000000000000=
+00
+> >   |   t5 : 0000000000000000 t6 : ff6000008869f230
+> >   |  status: 0000000200000120 badaddr: 0000000000000008 cause: 000000=
+000000000d
+> >   |  [<ffffffff803d9ffc>] splice_to_socket+0x376/0x49a
+> >   |  [<ffffffff803d8bc0>] direct_splice_actor+0x44/0x216
+> >   |  [<ffffffff803d8532>] splice_direct_to_actor+0xb6/0x1e8
+> >   |  [<ffffffff803d8780>] do_splice_direct+0x70/0xa2
+> >   |  [<ffffffff80392e40>] do_sendfile+0x26e/0x2d4
+> >   |  [<ffffffff803939d4>] __riscv_sys_sendfile64+0xf2/0x10e
+> >   |  [<ffffffff80fdfb64>] do_trap_ecall_u+0x1f8/0x26c
+> >   |  [<ffffffff80fedaee>] _new_vmalloc_restore_context_a0+0xc6/0xd2
+> >   |  Code: c5d8 9e35 c590 8bb3 40db eb01 6998 b823 0005 856e (6718) 2=
+d05 =
+
+> >   |  ---[ end trace 0000000000000000 ]---
+> >   |  Kernel panic - not syncing: Fatal exception
+> >   |  SMP: stopping secondary CPUs
+> >   |  ---[ end Kernel panic - not syncing: Fatal exception ]---
+> >
+> > This is commit f44d154d6e3d ("Merge tag 'soc-fixes-6.13' of
+> > git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc").
+> >
+> > (Yet to bisect!)
+> =
+
+> Took the series for a run, and it does solve crash, but I'm getting
+> additional failures:
+
+Hi Bjorn,
+
+Thanks! I'm guessing those tests were failing even without the patch
+though right?
+
+Thanks,
+John
+
+> =
+
+>   |  [TEST 298]: (512, 1, 3, sendpage, pass,pop (1,3),ktls,): socket(pe=
+er2) kTLS enabled                               =
+
+>   | socket(client1) kTLS enabled                                       =
+                                                =
+
+>   | recv failed(): Invalid argument                                    =
+                                                =
+
+>   | rx thread exited with err 1.                                       =
+                                                =
+
+>   |  FAILED                                                            =
+                                                =
+
+>   |  [TEST 299]: (100, 1, 5, sendpage, pass,pop (1,3),ktls,): socket(pe=
+er2) kTLS enabled                               =
+
+>   | socket(client1) kTLS enabled                                       =
+                                                =
+
+>   | recv failed(): Invalid argument                                    =
+                                                =
+
+>   | rx thread exited with err 1.                                       =
+                                                                         =
+                                                                         =
+                 =
+
+>   |  FAILED                                                            =
+                                                =
+
+>   |  [TEST 300]: (2, 32, 8192, sendpage, pass,pop (4096,8192),ktls,): s=
+ocket(peer2) kTLS enabled                                                =
+                                                                         =
+                 =
+
+>   | socket(client1) kTLS enabled                                       =
+                                                =
+
+>   | recv failed(): Bad message                                         =
+                                                                         =
+                                                                         =
+                 =
+
+>   | rx thread exited with err 1.                                       =
+                                                =
+
+>   |  FAILED                                                            =
+                                                                         =
+                                                                         =
+                 =
+
+>   |  ...
+>   | #42/ 9 sockhash:ktls:txmsg test pop-data:FAIL                      =
+                                                =
+
+>   | ...
+>   |  [TEST 308]: (2, 32, 8192, sendpage, pass,pop (5,21),ktls,): socket=
+(peer2) kTLS enabled                            =
+
+>   | socket(client1) kTLS enabled                                       =
+                                                                         =
+                                                                         =
+                 =
+
+>   | recv failed(): Bad message                                         =
+                                                                         =
+                                                                         =
+                 =
+
+>   | rx thread exited with err 1.                                       =
+                                                =
+
+>   |  FAILED                                                            =
+                                                                         =
+                                                                         =
+                 =
+
+>   |  [TEST 309]: (2, 32, 8192, sendpage, pass,pop (1,11),ktls,): socket=
+(peer2) kTLS enabled                            =
+
+>   | socket(client1) kTLS enabled                                       =
+                                                =
+
+>   | recv failed(): Bad message                                         =
+                                                                         =
+                                                                         =
+                 =
+
+>   | rx thread exited with err 1.                                       =
+                                                =
+
+>   |  FAILED
+>   | ...
+>   | #43/ 6 sockhash:ktls:txmsg test push/pop data:FAIL                 =
+                                                                         =
+                                                                         =
+                 =
+
+> =
+
+
 
 
