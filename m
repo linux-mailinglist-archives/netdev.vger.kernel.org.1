@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-153670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6475E9F9268
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:42:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 082CC9F9277
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:46:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A9117A1928
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:42:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACB091893259
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4896E2156E7;
-	Fri, 20 Dec 2024 12:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7722156E2;
+	Fri, 20 Dec 2024 12:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZSfMj0bY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eonzgd44"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD092153D0
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 12:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F831C5F08
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 12:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734698534; cv=none; b=G3F5PiA90biP5AtOv9Hi/TRrZ9vS+pyjFanTdjOAIWvnPbxTil30xg7IlJ4yhjDVD1M6TOZUFKNP6XTlakUsCKMErGy+apsecRlre+y8sCPOWmNVXPVxt1SsV8qObyrMQUXCuy9Q2pCOxkRC9LsdXT4lpggQfnQzWfVQ7/qp2Ww=
+	t=1734698755; cv=none; b=cU50IogNI/9UpnhQPu0ke9d8ITkMQRMBFkCmcyqk7deaeiTTs3Z4EeQ2do6wufzjn4SeMtytiq5nieaDHJX4mbdGpVAA/XXTGcU982lNDpOeWHBepSyOjxzuleC4qyqA6jFr8TagQARYh55zLytffftZuM014wJESxeHBk5Id+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734698534; c=relaxed/simple;
-	bh=HlBOh4jSSPlbfpktzNvwp+qwVjt5nv4jbi7s8EDlL/o=;
+	s=arc-20240116; t=1734698755; c=relaxed/simple;
+	bh=eIvJgkvy6HRuXmDaqsB7MX3E+E+alDS9//+kZ9m0t6Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UKNQPM4AaWai8Vm+GIQqTmpQSP7tEOpK/lXW03WBDFv7lmby2Id7RqnejlRnhTk7WYb/Bo+J2kXq7EO+o0hfh6+F6vXXA1hdT/JrXU7s8IB/QGxkZ3uWhv/ijXF5CITN2lSJ8jHSfNbM6dWr3YSJniwGgqNjvznVqJazuvMk4jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZSfMj0bY; arc=none smtp.client-ip=209.85.167.49
+	 To:Cc:Content-Type; b=W3R1iWywuxhAqdg3KMHJpPsjkAqGaj8ZynC1ceTxuumvTND7eZht3oxwLJjnqkGFh9iyysHc8kFPzmAdB7ocnNbVP2WSj772vEt+bZzSKU7/DHVyTrMuSM7f7PZw9/Ga4+S/LTEXNuV/oTnQDlg+t1LrI7j4pqnrP54sVF7MroI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eonzgd44; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54024ecc33dso2151330e87.0
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:42:11 -0800 (PST)
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-53df80eeeedso1842436e87.2
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:45:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734698530; x=1735303330; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1734698751; x=1735303551; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6JAaYSv0Ae1yeH34mVXmK+u6UW76Um4Sm/+sIA+YD/I=;
-        b=ZSfMj0bYjlPZLWmuWDgA4Da9C1QVUPPwtBC3SiYjXmMD/6V8MGsNjyi743ZCK4cWEH
-         ADdHj8y1WE6IG2U1TTb6MqyBGxX5zrf8lI9FmhF4C4wVYRzPDytmjUmu1nDf8IZffLzC
-         F8m1NxRDsyejLaLwV5VqD6qe9v/OgOSQE7m8H85NNa3bt0RpMur5sRcPwFbrQS1cBAEo
-         6ERxm3vBXfTUCa2xh5bIo5H55QjFiAd5f3nk2+H09b5MAvk1z6Lgl+DQlqjGm7zLN9GE
-         QnXi/ijgaaJAOk+1GEKyvwGL6O9yssG8C+2fvDNDwGyQK28onE+Zm/hXrFfUEqWH8tfy
-         8B1w==
+        bh=q+v+f0F+ggXM/pkSaGIpemMgLpckgFL+0mqDxCkmiPc=;
+        b=eonzgd44hq3ryZG4G65d3usc9iXHmng4QZBz+h6huIRQtPiVzd8RqWpA+IvNyM+afe
+         YSWw9pW+g9evbv7WQDtxPQL1j4xjpZvknXtudiwsU6vptgsEq5T45djbDMx9oq08Z5Pb
+         wHpiDNUwSNMr2BRGWYATXXMgeuXmIYcaq8l8MWI7JKjIuyAS3BHXB4u2TJMn1nGUaFrS
+         DkeTwG3ALTAeLR+y2oWzvNSO6XeFlCYbWXxthmz21GuYLFIN5Rthn2jPyzdNlQfyi1AK
+         3Lz6v5eEoF+S0jKzSXWxiUSGNiDGB4I5CH1bDAQzsNjwuup9MQmUM2QI5e7yELEGw6fY
+         rXnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734698530; x=1735303330;
+        d=1e100.net; s=20230601; t=1734698751; x=1735303551;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6JAaYSv0Ae1yeH34mVXmK+u6UW76Um4Sm/+sIA+YD/I=;
-        b=rjOgrYGzYWdODAc45GuDoA4taHDJ+tEetuw+YlYppBg31ZuLS/yiWTXdci/VMkTNVu
-         m012uAKcTx9VvtAOksI7O8Pxrzqg1Bgc/5UA5z9kZRkcwNb6PHgx/H5ge7tlvwTQKfPn
-         NTK9AoVA0f16nGkKRtv9eQuZxzOXQqMbxOxliehIikntRzYTevA6CWtKTqtDB1xVq2fL
-         xLELK5ccWFRHBmAKtZ7uuUEeAMY+MBukGztJUFR22oiJd8eE2LdDrmcpOOO6xp7zC9JE
-         WMjogR0WwwdoWWjarZzwfGCOBqj0cU0IhxQHVJo3HoHNsJovmJ58I4r/y9Lhmn7dOCZX
-         Q5ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVzf+UEilkrtc3GaiYUgRCnoagNo1lbkBmUbbhxQpzd1qm4Jbdf4HJU6mwfEl0uRsJKygyG4M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqsYsGKUO/+NRv+ALJGVasbevlWzPftvzlRJf7SXHAYBVGKB1x
-	v6XFaYwSNmBswzcr1gK0sjcOnp1QMX7/Caov32x2bvMsjsM6gjhtAOYdTF/+AHH2vlwmDMeyNfk
-	kCSqF0WHFww/eTqWfqD//jJPklPh3WD/UiBGhwg==
-X-Gm-Gg: ASbGncvaDlYyiiH/sM6HIY/736Q9QuSW+nkEXytB5sncBOxwRkWXP+c3qBzKbtWYnxM
-	fCtNXct5qppHE2cpCZ18WTYikP5DCgVBeMdUUEA==
-X-Google-Smtp-Source: AGHT+IG/0DIpoBQtLX+2xTrpZ52kWuFm4zd5NY5XA3IybGxFiXX/atFeHWgT1av/lrPuINKlOWhHxww9t7kKEEWHrDk=
-X-Received: by 2002:ac2:4c48:0:b0:540:3579:f38f with SMTP id
- 2adb3069b0e04-542295821afmr969235e87.37.1734698530305; Fri, 20 Dec 2024
- 04:42:10 -0800 (PST)
+        bh=q+v+f0F+ggXM/pkSaGIpemMgLpckgFL+0mqDxCkmiPc=;
+        b=RId25S3F0R+4Ca2nxvozoWVtXRg0yZRl8vT1Zp9Aj+eO9u6aij/1kmLSZN5BGle9LV
+         PqFAqLTo2lVqsh4ioJoU8kg8tgR1IQaS4dDoACTNG9JZbn/eEQ6ae1zzORSVK8YwirgA
+         vxf/mFChH8vEL5znzBMnuitMmiETKt+I47Y2PHCyIm46CJ/pxK5fMz6DkLri/n0Mw3lT
+         j5LLXG1LNtc+Djkj+xGWZyUAg38i+t6q7tgvpVKhXAA5oG1gZiLBA9FVW1UxyqQwx4PZ
+         z7d8DYsLBCdlq1LbwWy/oJ4JL5pKTlglVPjmY7zn9hxz4yhTKutpQol2kcJmCv/Ad8h5
+         oRmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWjJRg5JhRfieO+Onjv8z/ZprsP611vDKthjb04HpmAezOjJs6O1sMceMiZuf0lclBoTluVW9M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMiQY2YaTFW16TRBo9xkOq9Xyu+hfTeO3aJH5g6Wt68a55IVKG
+	l9mSJYpIs42AtzYTkY2YXhvVyJIxalgn+Dcpv8hvpPAYysSZnEL0ke2POCvMU4OC9WBHWBe3K/9
+	qXsGFdreF7WUmH4oBkoHVXi1H07J+Nb42YPxCtA==
+X-Gm-Gg: ASbGnctpq8wCedn1jKEYLSrhzH/UdMOvjvCghcdGKHkUJSxTehMue+bd3NAKeryhSdX
+	P4wmmcwKp9Iu0LuZ2SLzfLrG/A6lP1NDW9xfZ0g==
+X-Google-Smtp-Source: AGHT+IFQLxoTvDBhmmMtrluimmMG49UjGriPLeDS3/xO9K0D1RUiifqIPS/6LdImELHSoCVS/nonG7W60F+gutNSGmY=
+X-Received: by 2002:a05:6512:3f25:b0:540:1be6:f15f with SMTP id
+ 2adb3069b0e04-542294aceebmr908589e87.0.1734698751140; Fri, 20 Dec 2024
+ 04:45:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-3-tmyu0@nuvoton.com>
-In-Reply-To: <20241210104524.2466586-3-tmyu0@nuvoton.com>
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-2-tmyu0@nuvoton.com>
+In-Reply-To: <20241210104524.2466586-2-tmyu0@nuvoton.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 20 Dec 2024 13:41:59 +0100
-Message-ID: <CACRpkdajLe94novxjsHkCCx3m5raB0DxMnnSegCqkdWxRoWazw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/7] gpio: Add Nuvoton NCT6694 GPIO support
+Date: Fri, 20 Dec 2024 13:45:39 +0100
+Message-ID: <CACRpkdZh4hCvBN=7beFEgm-mmdwSTW1fd8OZhQO3kr6Cy7P=dA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/7] mfd: Add core driver for Nuvoton NCT6694
 To: Ming Yu <a0282524688@gmail.com>
 Cc: tmyu0@nuvoton.com, lee@kernel.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
 	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
@@ -96,110 +96,44 @@ Hi Ming,
 
 thanks for your patch!
 
-Some nits below:
-
-On Tue, Dec 10, 2024 at 11:46=E2=80=AFAM Ming Yu <a0282524688@gmail.com> wr=
+On Tue, Dec 10, 2024 at 11:45=E2=80=AFAM Ming Yu <a0282524688@gmail.com> wr=
 ote:
 
-> This driver supports GPIO and IRQ functionality for NCT6694 MFD
-> device based on USB interface.
+> The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
+> 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
+> PWM, and RTC.
+>
+> This driver implements USB device functionality and shares the
+> chip's peripherals as a child device.
+>
+> Each child device can use the USB functions nct6694_read_msg()
+> and nct6694_write_msg() to issue a command. They can also request
+> interrupt that will be called when the USB device receives its
+> interrupt pipe.
 >
 > Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
 (...)
-> +#include <linux/gpio/driver.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/mfd/core.h>
-> +#include <linux/mfd/nct6694.h>
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
+> +       while (*int_status) {
+> +               int irq =3D __ffs(*int_status);
+> +
+> +               if (*int_status & (1 << irq))
+> +                       generic_handle_irq_safe(irq_find_mapping(nct6694-=
+>domain, irq));
+> +
+> +               *int_status &=3D ~(1 << irq);
 
+What about doing what you do in the GPIO driver and
 #include <linux/bits.h>
-is missing, include it explicitly.
 
-> +       return !(BIT(offset) & data->xmit_buf);
+And search and replace "(1 << irq)" with BIT(irq)?
 
-Here you use the BIT() macro from <linux/bits.h>
+PS the main reason we do this is because
 
-> +static int nct6694_direction_input(struct gpio_chip *gpio, unsigned int =
-offset)
-> +{
-> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
-> +       int ret;
-> +
-> +       guard(mutex)(&data->lock);
-> +
-> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
-> +                              NCT6694_GPO_DIR + data->group,
-> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
-> +       if (ret < 0)
-> +               return ret;
-> +
-> +       data->xmit_buf &=3D ~(1 << offset);
+int a =3D (1 << 31);
 
-data->xmit_buf &=3D ~BIT(offset);
-
-> +static int nct6694_direction_output(struct gpio_chip *gpio,
-> +                                   unsigned int offset, int val)
-> +{
-> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
-> +       int ret;
-> +
-> +       guard(mutex)(&data->lock);
-> +
-> +       /* Set direction to output */
-> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
-> +                              NCT6694_GPO_DIR + data->group,
-> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
-> +       if (ret < 0)
-> +               return ret;
-> +
-> +       data->xmit_buf |=3D (1 << offset);
-
-data->xmit_buf |=3D BIT(offset);
-
-> +       if (val)
-> +               data->xmit_buf |=3D (1 << offset);
-> +       else
-> +               data->xmit_buf &=3D ~(1 << offset);
-
-Same
-
-> +static void nct6694_set_value(struct gpio_chip *gpio, unsigned int offse=
-t,
-> +                             int val)
-> +{
-(...)
-> +       if (val)
-> +               data->xmit_buf |=3D (1 << offset);
-> +       else
-> +               data->xmit_buf &=3D ~(1 << offset);
-
-Same
-
-> +static irqreturn_t nct6694_irq_handler(int irq, void *priv)
-> +{
-> +       struct nct6694_gpio_data *data =3D priv;
-> +       unsigned char status;
-> +
-> +       guard(mutex)(&data->lock);
-> +
-> +       nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
-> +                        NCT6694_GPI_STS + data->group,
-> +                        NCT6694_GPIO_LEN, &data->xmit_buf);
-> +
-> +       status =3D data->xmit_buf;
-> +
-> +       while (status) {
-> +               int bit =3D __ffs(status);
-> +
-> +               data->xmit_buf =3D BIT(bit);
-> +               handle_nested_irq(irq_find_mapping(data->gpio.irq.domain,=
- bit));
-> +               status &=3D ~(1 << bit);
-
-Same
-
-Just use BIT() consistently please.
+becomes a negative number on 32bit machines, and
+can lead to confusing side effects. BIT() always work
+on unsigned.
 
 Yours,
 Linus Walleij
