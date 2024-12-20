@@ -1,120 +1,153 @@
-Return-Path: <netdev+bounces-153664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DDD19F922B
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:28:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFAC69F9229
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3820167F68
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:27:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AD4F1664FD
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:27:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C67204696;
-	Fri, 20 Dec 2024 12:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9E720468E;
+	Fri, 20 Dec 2024 12:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xPN68AKn"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="3LJddNKS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E9E1C4A1C
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 12:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519CA204596
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 12:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734697674; cv=none; b=k+YfJXqzJ3o1zbyzY1RxBGalA0yyrBMt9GJ3+0XpvnvXGMJqFhUvO/5g4l5tCmPTJbh8k8yGoCKIjtiCLFFBKl0ykOrNXjma1tdyVVi65WUzwaF1yNcJCWumq2p0bveC3fZUG4tbQDSMOusf6JmBuewQGRaYbk21uOLd+gmv994=
+	t=1734697656; cv=none; b=ZY1ocEsGl65E58ChFT8eveahTIQ4ccnMZEvBSC0jhpaxGFh8yHRPydloXzcKBTThdLkelBC4c6xRUXc8QOeV+lQWXeRMXWlqM+v/HokegBf7d7ITNK0bgGC1zG24YtWNv0zXSIKlatkbeJpAzJIPqoNk3+2cs3W55JONZEWgv3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734697674; c=relaxed/simple;
-	bh=oSr3LHswhPmJmMFXcCpEhJ0cJycpCyyzRGJFwGchNCI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VbtoPS+obZQYGcv45p7GQpGxVQEm3i5Ki4XSjaUcFMsPobOilc4kkiZFQPi/ggTFssQoXFmuABYxDOa/OFT9Mn466P46GcoFSWc31VEafNQ/z7ktOAT7NisbrefqM3EkoZKpHzf4fWpXmvsPKzUDIiL8M3WOwrWbcRpWkEs3/qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xPN68AKn; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e537d9e3d75so1374440276.3
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:27:52 -0800 (PST)
+	s=arc-20240116; t=1734697656; c=relaxed/simple;
+	bh=zA7a4bZu48ACitHBhxc9qodT4PaQ4DeroceLOgXAYH8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=enZBlnTL5xbyV8FlFCmrsCCkKQ4MwnKe1+d6t1M1Hu0YPeIYHd3LWukImBt4vNigZARWE5GCEJmW1vuYMsRFMRfqsilT4iydMl4uVlBwA2uZwz0OJ2aheqHjXzkNe70ip0iHWKScvJHt40Uk7o+/Ma8AkLyhXJGiQP2QfQKXLtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=3LJddNKS; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4361f65ca01so17851205e9.1
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:27:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734697672; x=1735302472; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=oSr3LHswhPmJmMFXcCpEhJ0cJycpCyyzRGJFwGchNCI=;
-        b=xPN68AKn29Dotj4sSAqvXat27cBL7ZzYPBoaqs03X514+j46jhyZCE0o5aL3U3ErLb
-         b24EAUQfkKhTRT0uwu15EPahxRReETRLBYt8wRhvI413Ib2LQfp6U9pfUVFc6pim4HyN
-         O6pD3sMtm79LVdG7jT22JDhS6dWNa4nGCSlZYUiAwrO812Nrt9m3uyHBwRUYj4QcwIlz
-         d5N2GFAi+lRWSB/Im9r+OPNNf+77trulcnUdV30W6WFnBNpR6r3d8M1DciLov3dfntp8
-         r3fiZDNgQlmgEBANrXdSXofUFJs3O5BdaIOARh6Qki5tN5xqZRn5vxncmrZI88jNM8tF
-         1qRg==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1734697652; x=1735302452; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6yxLq8x+6aHmMAIO4raWWraNl83b7b09sXoVthd5fIM=;
+        b=3LJddNKSaSaDViv0aQzAWku9AZhTADfJxNrkhGUcOMKXFXqVlmy/VVfq0g0jvnIdsX
+         EWtyQquEcj51Y/QRSRqimwaOo6GcyQXh2G+VUGuZrdMPQ61VFTj8bgNu2t063cMzWz8K
+         FRtbCqOGEuR5N/RcpM1RcKVQcax/Voya7O2kgWWpXSMzrisAdPNwGYutwUVrFUrBRu81
+         DKJx4FpysOXXeubqja9i+oApfFNe2/LnbqU4mB58azpQc+/WDytaeGpcuoYXN3xJHfk+
+         eB7MFlSSRvsC9zSGBTJKhoPSVorSZ4zFL0J+yqfbg9pgNUdSnT5XKtkhX7Ab1Dn/eDsZ
+         0z5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734697672; x=1735302472;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oSr3LHswhPmJmMFXcCpEhJ0cJycpCyyzRGJFwGchNCI=;
-        b=JJ6QH8nqpqnxSgCJyDX4OhfiqUnF7ljkrmosTCogxhpBkaXawIKeuE7+ayNYg7umfg
-         VlH9TAK24XUCYRKurmqZxdgh44v/fsjTyNg5V7ZO1A26b1LSjurLrjN/gzHG4xRinJHl
-         mP242jbo5KuC5GM0JEt5YzgLeCn+4aSb7WJ+odj/EkE3VBIEPY4etXAh7wY+dVn1LfYk
-         gUmDJ6NRIjtrhVH6KO/eHHwt50k4c2qCn9PI+Y2kNTaLqAcHcf9gXCDa3PYodZ2+vgXG
-         3pFBgDT4kne+xsQvkXzWfQCl2bHTHSUZQnEBRZ9eQgqz9gp4Bdl0pZUUQQjtbeRFOz5F
-         Xk1w==
-X-Forwarded-Encrypted: i=1; AJvYcCXTsT2p+QdOghXeHrm6K/VlRDdSGehDynVhBQODviBC6tL9+82JdHmUYeriydauwlPYZvpb4qA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz091CvG37rDAAzo7buQHlgQt+r+9L2Zh2OWSS6Vs57jv8kcLLJ
-	hRguSSKW4n92aBHCcsU+4jh6RnUdOW5Ze2TDOnNuike/8XI4sWkRpbnTcDl5uEEdWRhkZ62xRlU
-	E1n6RGMKKAutAS2jp8G+3xRvvMBgQzdbOJTXAFA==
-X-Gm-Gg: ASbGncvJefDByjecmrA342Z9s7u4AGBMbfkHI5jKIIdbyu8DbBb+ls1DjH3pnDC4164
-	Vro7rzsBy/pOPNqZbVg9mihNSoOUN8BI9dYIiBg==
-X-Google-Smtp-Source: AGHT+IFOyYvAtNLLNQuQ4Vm215PmlP/mvkQLrjkr41LtvrtXHQyDVGy+sl9zSqL3xwxQtAcUOlvK6e8nZ/9kSyjoPlg=
-X-Received: by 2002:a05:6902:1108:b0:e44:82ef:3973 with SMTP id
- 3f1490d57ef6-e538c207807mr1637718276.4.1734697671887; Fri, 20 Dec 2024
- 04:27:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734697652; x=1735302452;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6yxLq8x+6aHmMAIO4raWWraNl83b7b09sXoVthd5fIM=;
+        b=p0m+/bedU9+WDROdToVdo+pLs8vZ7LckSZxUoryMmdoptJM7X2hSB7hKgzfD8fJs9K
+         5UAW3hXBIXzHr4dVtqwOOwLtq4K+EWCHzJ7E0p1YlNTMkbgfpoTwM8qXp/kme2yNlG6N
+         dpG6G56ovgbtr+EyoY+HrkZc/B/r03/MpyBmv6KjiMIV6nM3nW8gxTzbZKFz4zjWJeEL
+         LHf9EQOoYV8CGQZHgUpXcg7cbNuTUjpu4PUZvZ6JQr6b3D07h8rM6a3vCK9h4XtPI4ah
+         74EORGX3AvEEfO6A9ryneVAsTT7vDz68Dno/3riFHC8xGtc+M6P4p6NWkE0etwU9FNt2
+         +Hcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVK2NSbDeCdsgKaxDaC+FMMBcTcImognl5OMEFE3lBs8WEb/GG1RlxYahhb5GmOpQJlZTuG7SQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq0TIMaC1FBqb7rH28sgaXQd2eEK6RccR36XdgfUIVTEaWMB6m
+	vPzViYWiVpOiTbL9ot+qgnMk9yULKGBv5THD6Qn6xBN+loKrZkYpO0hO0akdHiY=
+X-Gm-Gg: ASbGncs41nECj4IFu/kQc+AT1HkEuZo9y85GH7hIZYJXwU1Cgb1bPGGQKqF3sFNc/Vq
+	lD+9XXGzUlQjL8YGzyO+BHDBEe+hHVlPCaJrl4o3O5Ef33dJ8dgSiMyWdYMikgKyl6hlFh/yPCI
+	ypFJ2t3oa05YnRHHqXwZnXHR5pWd74ZhHGsHmhu36Bkyb/75q8aldgQZmnVanxpv0Vq5BIzXF5r
+	0PT/JzkimL9Iu7SSKOnZGwupR/nfzMLx20qyMMJPY062yC/bcJ/B1rdT3Rk/SldQ9v3idfx0n93
+	2FdAnz+Q2pJk
+X-Google-Smtp-Source: AGHT+IF0nXfFMV2mR1adR3X1lrTPlRuKqMQUEP6YuFL1k1v8N1A4WExmKhshpLKhwZ4tokJIrcSxnQ==
+X-Received: by 2002:a05:600c:358d:b0:435:fa90:f19f with SMTP id 5b1f17b1804b1-436686425eamr24106235e9.12.1734697652460;
+        Fri, 20 Dec 2024 04:27:32 -0800 (PST)
+Received: from [192.168.0.123] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8a8d32sm3964112f8f.99.2024.12.20.04.27.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Dec 2024 04:27:31 -0800 (PST)
+Message-ID: <d23db9cd-d9ec-4697-a851-3b395c6afae9@blackwall.org>
+Date: Fri, 20 Dec 2024 14:27:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <tencent_76E62F6A47A7C7E818FC7C74A6B02772F308@qq.com> <20241219062438.1c89b98b@kernel.org>
-In-Reply-To: <20241219062438.1c89b98b@kernel.org>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Fri, 20 Dec 2024 14:27:16 +0200
-Message-ID: <CAC_iWjLy4-cErYjCQ1W4h6fWVn17+A-uA5NiYy2-Wv5T=iQvxw@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] net: page_pool: add page_pool_put_page_nosync()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Guowei Dang <guowei.dang@foxmail.com>, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Yunsheng Lin <linyunsheng@huawei.com>, Furong Xu <0x1207@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] net: bridge: Extract a helper to handle
+ bridge_binding toggles
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>, Roopa Prabhu <roopa@nvidia.com>,
+ bridge@lists.linux.dev, Ido Schimmel <idosch@nvidia.com>, mlxsw@nvidia.com
+References: <cover.1734540770.git.petrm@nvidia.com>
+ <a7455f6fe1dfa7b13126ed8a7fb33d3b611eecb8.1734540770.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <a7455f6fe1dfa7b13126ed8a7fb33d3b611eecb8.1734540770.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub
+On 12/18/24 19:15, Petr Machata wrote:
+> Currently, the BROPT_VLAN_BRIDGE_BINDING bridge option is only toggled when
+> VLAN devices are added on top of a bridge or removed from it. Extract the
+> toggling of the option to a function so that it could be invoked by a
+> subsequent patch when the state of an upper VLAN device changes.
+> 
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>  net/bridge/br_vlan.c | 20 ++++++++++++++------
+>  1 file changed, 14 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
+> index 89f51ea4cabe..b728b71e693f 100644
+> --- a/net/bridge/br_vlan.c
+> +++ b/net/bridge/br_vlan.c
+> @@ -1664,6 +1664,18 @@ static void br_vlan_set_all_vlan_dev_state(struct net_bridge_port *p)
+>  	}
+>  }
+>  
+> +static void br_vlan_toggle_bridge_binding(struct net_device *br_dev,
+> +					  bool enable)
+> +{
+> +	struct net_bridge *br = netdev_priv(br_dev);
+> +
+> +	if (enable)
+> +		br_opt_toggle(br, BROPT_VLAN_BRIDGE_BINDING, true);
+> +	else
+> +		br_opt_toggle(br, BROPT_VLAN_BRIDGE_BINDING,
+> +			      br_vlan_has_upper_bind_vlan_dev(br_dev));
+> +}
+> +
+>  static void br_vlan_upper_change(struct net_device *dev,
+>  				 struct net_device *upper_dev,
+>  				 bool linking)
+> @@ -1673,13 +1685,9 @@ static void br_vlan_upper_change(struct net_device *dev,
+>  	if (!br_vlan_is_bind_vlan_dev(upper_dev))
+>  		return;
+>  
+> -	if (linking) {
+> +	br_vlan_toggle_bridge_binding(dev, linking);
+> +	if (linking)
+>  		br_vlan_set_vlan_dev_state(br, upper_dev);
+> -		br_opt_toggle(br, BROPT_VLAN_BRIDGE_BINDING, true);
+> -	} else {
+> -		br_opt_toggle(br, BROPT_VLAN_BRIDGE_BINDING,
+> -			      br_vlan_has_upper_bind_vlan_dev(dev));
+> -	}
+>  }
+>  
+>  struct br_vlan_link_state_walk_data {
 
-On Thu, 19 Dec 2024 at 16:24, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Thu, 19 Dec 2024 11:11:38 +0800 Guowei Dang wrote:
-> > Add page_pool_put_page_nosync() to respond to dma_sync_size being 0.
-> >
-> > The purpose of this is to make the semantics more obvious and may
-> > enable removing some checkings in the future.
-> >
-> > And in the long term, treating the nosync scenario separately provides
-> > more flexibility for the user and enable removing of the
-> > PP_FLAG_DMA_SYNC_DEV in the future.
-> >
-> > Since we do have a page_pool_put_full_page(), adding a variant for
-> > the nosync seems reasonable.
->
-> You should provide an upstream user with the API.
-> But IMHO this just complicates the already very large API,
-> for little benefit.
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-+1000, I think the API has grown more than it has to and we now have
-way too many abstractions.
-
-I'll try to find some time and see if I can come up with a cleanup
-that makes sense
-
-Thanks
-/Ilias
-> I'm going to leave this in patchwork for a day in case page
-> pool maintainers disagree, but I vote "no".
 
