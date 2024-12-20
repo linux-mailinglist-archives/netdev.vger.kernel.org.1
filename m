@@ -1,366 +1,1070 @@
-Return-Path: <netdev+bounces-153622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC72A9F8DDE
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 09:21:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DC529F8DEF
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 09:26:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B39AE1693E3
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:21:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FDE416C991
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 08:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159591A7AE3;
-	Fri, 20 Dec 2024 08:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9C01A83E5;
+	Fri, 20 Dec 2024 08:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Q6yed1xL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFDB1A83F5
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 08:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 693BF1A83F9;
+	Fri, 20 Dec 2024 08:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734682887; cv=none; b=Fq3f7ezzSehMvqACk8my0X+RlRP3uvxvzE7MQUfnJM6a0wywgxC3eL7oiDxPmB82m2svYLLJO1nIg2OM75NTROFI9Gc/qrKINK6616URUgW8bVrfe1L2Ky2aUVElVSJMoIxdxMFtGdUyEPeqGlyXw7VTbkpJA37LHKkW43c48vg=
+	t=1734683177; cv=none; b=YXrXoeMfqP5wpCPtAox+RMNNe8xw3NuErDkSqJTO0TeT0MMGMyLEw2OcPFWtjq6YZ+9baV1BRooAx/mLCnqKXnDuC/wG03g166bII4f6pOXXGekTjM9R8r/O1W6r98UQdp1EK6vL60uoicj+16gZabxKxxYOY9bU3m1wVgNRHPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734682887; c=relaxed/simple;
-	bh=LyqVQn4e48VyMPkIGTwZBk07jQJoE7cbeYffNeQQ9vU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Z2NqI1aNc7hJC+mIW3o2H9Na3CfTdHmCmm1dtROr0S2q1utG0aM9kbKcT2xentmCA8cHJcWEBsZcyNiBQX1FRS5bDVVGXOcd1JsKcD5o59yrxxpFV+l94uq7rcIMLS/Py2jyL/gmu7F9mYIIksc+FW58iPEyNLibjHT0aIAqgEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a9c9b37244so30565815ab.1
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 00:21:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734682883; x=1735287683;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+P+FoLpru327VOQAxh/1BswuYR1NX7BucZaLxxxV8/I=;
-        b=DaK6Cq/RZvcd0IlRxJ3MLsyx7qbZZsZkGCj3Xv0rSi7Y0fnVz6FLqVmMqFDE4DrAFO
-         7hr04SeOFn7MGJH1DAUxt/ACPsyyDQaWCZhUWF6D4cGP98v5APDU8Ui7R/UI1TM6jfE7
-         riCElRMavG/jsmoelrWMxObCRE9zOuo5NX49kegRfa0EcfOxEpNh9WofoVPvCwKSxRD6
-         eDROJHBplXlzBou6OCR/u/AHyrijb+J21VBCgejPzs0vGxBNEBCD944ELS5ADQluAbg4
-         BuoGDwo29loLQpA0RDdZGRljAg+In7JYxw2aLrlUAa2ABW0Qk0AWCs5IgT5vmqVK2jmM
-         Bb4A==
-X-Forwarded-Encrypted: i=1; AJvYcCW5Q77HSJ2Qf0oJv5yLBJ9RWs+OHepZrwhblHLnJ5t4oa1z7w/KHfZl5Az5XwGr9CEUCMPy7vY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7BDR/fznRTJtPelfSYEjrHFFEOHfzfJsxdUlPdUHMXQMBGrFx
-	Ec3N10RepDbZAAQkG9Ur3Pw4kWnTnLUlP0DGMqm3Ss9G0NTsdFsumCouR1CoLC/y8hPTaWEYexe
-	0wS73kcrv/MxsJEvI5ZbYmzP7NdEz7daagWCqEGQUB4VPTBiSutAeMDQ=
-X-Google-Smtp-Source: AGHT+IH264pnwTuzNMS6Cf1f81MFkSOAlkbgC3cyZpVZtFyTWPo6TmGwp0A8mYxYK2uJ9/+jy2vgXHHOOuwOuHvImsnBQkwob5g9
+	s=arc-20240116; t=1734683177; c=relaxed/simple;
+	bh=UN0tDie0FDiR9t9v0KhwstVcnTKfcEuODf0x5fU77EY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PoUCSUJ4ROh96B1oKN5dqa8//OK7qI2LO7LSqqgLEvQ3ar1lWNVNZYXzCWZilStu89Ov5PMUPNqdbIrnSHOgaEb6OqXeV+kBCvgC3eRma/U0J6X9NP95Ex2pE1l9DgjWJOox/Zb9hS87LkkadIYQL1MrCDHmXUxGnxiaDL9zwD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Q6yed1xL; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=+GXbS
+	QZB3HaOmNoWG/wDFKnJW4pDM88FLPcUvP99uwg=; b=Q6yed1xLG7sABofafwhZd
+	xMNkPRLTKvUriCHTseeuTTqnq1kzgtMZTzBVNr/mB5IWV8XsmPsGb5rQb0Shichv
+	W4kRIVY+HiNJS8VIZyJRjsnm7Wib743qXXMpeabw8a/0OhA9tAYkMlTFCzGsaCzS
+	10OPjzGNypt1Ol1ZAZtYzU=
+Received: from hello.company.local (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wA36s_HKWVngPi1AQ--.24831S2;
+	Fri, 20 Dec 2024 16:24:40 +0800 (CST)
+From: Liang Jie <buaajxlj@163.com>
+To: edumazet@google.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	anthony.l.nguyen@intel.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Liang Jie <liangjie@lixiang.com>
+Subject: [PATCH net v3] net: Refine key_len calculations in rhashtable_params
+Date: Fri, 20 Dec 2024 16:24:36 +0800
+Message-Id: <20241220082436.1195276-1-buaajxlj@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3a10:b0:3a7:4674:d637 with SMTP id
- e9e14a558f8ab-3c2d1b98479mr27905805ab.3.1734682883610; Fri, 20 Dec 2024
- 00:21:23 -0800 (PST)
-Date: Fri, 20 Dec 2024 00:21:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67652903.050a0220.1bfc9e.0008.GAE@google.com>
-Subject: [syzbot] [rdma?] INFO: task hung in rdma_dev_exit_net (6)
-From: syzbot <syzbot+3658758f38a2f0f062e7@syzkaller.appspotmail.com>
-To: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wA36s_HKWVngPi1AQ--.24831S2
+X-Coremail-Antispam: 1Uf129KBjvAXoWDCw4UJw17ZF1rWr1kKry8Xwb_yoW7JFWUAo
+	Z3JFs0yw18Cr18X3ykGr92gF95Xa1DK393Aw4agws5uwnI9w1UGr13tw45Aayqqr1xJF1U
+	uw1UXas8ZFW2qr1Un29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUeiihUUUUU
+X-CM-SenderInfo: pexdtyx0omqiywtou0bp/1tbioAq7IGdlKKYbLgAAsI
 
-Hello,
+From: Liang Jie <liangjie@lixiang.com>
 
-syzbot found the following issue on:
+This patch improves the calculation of key_len in the rhashtable_params
+structures across the net driver modules by replacing hardcoded sizes
+and previous calculations with appropriate macros like sizeof_field()
+and offsetofend().
 
-HEAD commit:    9f16d5e6f220 Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=136465c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fb680913ee293bcc
-dashboard link: https://syzkaller.appspot.com/bug?extid=3658758f38a2f0f062e7
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Previously, key_len was set using hardcoded sizes like sizeof(u32) or
+sizeof(unsigned long), or using offsetof() calculations. This patch
+replaces these with sizeof_field() and correct use of offsetofend(),
+making the code more robust, maintainable, and improving readability.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Using sizeof_field() and offsetofend() provides several advantages:
+- They explicitly specify the size of the field or the end offset of a
+  member being used as a key.
+- They ensure that the key_len is accurate even if the structs change in
+  the future.
+- They improve code readability by clearly indicating which fields are used
+  and how their sizes are determined, making the code easier to understand
+  and maintain.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e72a74c4c0d3/disk-9f16d5e6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/940322501ec7/vmlinux-9f16d5e6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6318087c1412/bzImage-9f16d5e6.xz
+For example, instead of:
+    .key_len    = sizeof(u32),
+we now use:
+    .key_len    = sizeof_field(struct mae_mport_desc, mport_id),
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3658758f38a2f0f062e7@syzkaller.appspotmail.com
+And instead of:
+    .key_len    = offsetof(struct efx_tc_encap_match, linkage),
+we now use:
+    .key_len    = offsetofend(struct efx_tc_encap_match, ip_tos_mask),
 
-INFO: task syz-executor:15271 blocked for more than 143 seconds.
-      Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:22912 pid:15271 tgid:15271 ppid:1      flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5369 [inline]
- __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
- __schedule_loop kernel/sched/core.c:6833 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6848
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6905
- rwsem_down_write_slowpath+0xeee/0x13b0 kernel/locking/rwsem.c:1176
- __down_write_common kernel/locking/rwsem.c:1304 [inline]
- __down_write kernel/locking/rwsem.c:1313 [inline]
- down_write+0x1d7/0x220 kernel/locking/rwsem.c:1578
- rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
- ops_exit_list net/core/net_namespace.c:172 [inline]
- setup_net+0x796/0x9e0 net/core/net_namespace.c:394
- copy_net_ns+0x33f/0x570 net/core/net_namespace.c:500
- create_new_namespaces+0x425/0x7b0 kernel/nsproxy.c:110
- unshare_nsproxy_namespaces+0x124/0x180 kernel/nsproxy.c:228
- ksys_unshare+0x57d/0xa70 kernel/fork.c:3314
- __do_sys_unshare kernel/fork.c:3385 [inline]
- __se_sys_unshare kernel/fork.c:3383 [inline]
- __x64_sys_unshare+0x38/0x40 kernel/fork.c:3383
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe049180017
-RSP: 002b:00007ffc67fd06b8 EFLAGS: 00000206 ORIG_RAX: 0000000000000110
-RAX: ffffffffffffffda RBX: 00007fe049335f40 RCX: 00007fe049180017
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000040000000
-RBP: 00007fe049336738 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000008
-R13: 0000000000000003 R14: 0000000000000009 R15: 0000000000000000
- </TASK>
+These changes eliminate the risk in certain scenarios of including
+unintended padding or extra data in the key, ensuring the rhashtable
+functions correctly.
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/30:
- #0: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6744
-4 locks held by kworker/u8:3/52:
- #0: ffff88801baed948 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff88801baed948 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc90000bc7d00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc90000bc7d00 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
- #2: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:586
- #3: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
-2 locks held by kworker/u8:8/3523:
- #0: ffff8880b863e798 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:598
- #1: ffffc9000d4a7d00 ((work_completion)(&(&bat_priv->nc.work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc9000d4a7d00 ((work_completion)(&(&bat_priv->nc.work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
-1 lock held by dhcpcd/5512:
- #0: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
- #0: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6917
-2 locks held by getty/5599:
- #0: ffff88814d0a00a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: ffffc9000330b2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
-3 locks held by kworker/1:6/5946:
-2 locks held by syz-executor/15271:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
-2 locks held by syz-executor/15279:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
-2 locks held by syz-executor/15289:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
-2 locks held by syz-executor/15293:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
-2 locks held by syz-executor/15305:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
-2 locks held by syz-executor/15311:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_exit_net+0x8e/0x350 drivers/infiniband/core/device.c:1130
-4 locks held by syz-executor/15321:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
-3 locks held by syz-executor/15327:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: setup_net+0x602/0x9e0 net/core/net_namespace.c:384
- #2: ffffffff8e7d6410 (cpu_hotplug_lock){++++}-{0:0}, at: flush_all_backlogs net/core/dev.c:6031 [inline]
- #2: ffffffff8e7d6410 (cpu_hotplug_lock){++++}-{0:0}, at: unregister_netdevice_many_notify+0x5ea/0x1da0 net/core/dev.c:11501
-4 locks held by syz-executor/15330:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
-4 locks held by syz-executor/15333:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
-4 locks held by syz-executor/15336:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
-4 locks held by syz-executor/15338:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
-4 locks held by syz-executor/15391:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
-2 locks held by syz-executor/15398:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: ppp_exit_net+0xe3/0x3d0 drivers/net/ppp/ppp_generic.c:1146
-6 locks held by syz-executor/15400:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
- #4: ffff888030865238 (&rxe->usdev_lock){+.+.}-{4:4}, at: rxe_query_port+0x61/0x260 drivers/infiniband/sw/rxe/rxe_verbs.c:54
- #5: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: ib_get_eth_speed+0x153/0x800 drivers/infiniband/core/verbs.c:1995
-4 locks held by syz-executor/15403:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
-2 locks held by syz-executor/15406:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fce9388 (rtnl_mutex){+.+.}-{4:4}, at: ip_tunnel_init_net+0x20e/0x720 net/ipv4/ip_tunnel.c:1159
-4 locks held by syz-executor/15408:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
- #3: ffff888030864f40 (&device->compat_devs_mutex){+.+.}-{4:4}, at: add_one_compat_dev+0x10d/0x710 drivers/infiniband/core/device.c:950
-3 locks held by syz-executor/15449:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
-3 locks held by syz-executor/15454:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
-3 locks held by syz-executor/15458:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
-3 locks held by syz-executor/15461:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
-3 locks held by syz-executor/15464:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
-3 locks held by syz-executor/15467:
- #0: ffffffff8fcdc850 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x328/0x570 net/core/net_namespace.c:496
- #1: ffffffff8fa55f30 (devices_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x198/0x280 drivers/infiniband/core/device.c:1186
- #2: ffffffff8fa560f0 (rdma_nets_rwsem){++++}-{4:4}, at: rdma_dev_init_net+0x1e6/0x280 drivers/infiniband/core/device.c:1191
-
-=============================================
-
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:223 [inline]
- watchdog+0xff4/0x1040 kernel/hung_task.c:379
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 5946 Comm: kworker/1:6 Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: events_power_efficient neigh_periodic_work
-RIP: 0010:lockdep_hardirqs_off+0x80/0x110 kernel/locking/lockdep.c:4508
-Code: 8b 05 ec 51 30 74 85 c0 74 54 65 48 8b 1c 25 c0 d4 03 00 48 c7 c7 a0 d8 0a 8c e8 2b 1c 00 00 65 c7 05 c8 51 30 74 00 00 00 00 <4c> 89 b3 88 0a 00 00 8b 83 78 0a 00 00 ff c0 89 83 78 0a 00 00 89
-RSP: 0018:ffffc90000a17288 EFLAGS: 00000086
-RAX: 0000000000000001 RBX: ffff888030fbbc00 RCX: ffffc90000a17203
-RDX: 0000000000000005 RSI: ffffffff8c0ad8a0 RDI: ffffffff8c6154a0
-RBP: ffffc90000a17370 R08: ffffffff901e4037 R09: 1ffffffff203c806
-R10: dffffc0000000000 R11: fffffbfff203c807 R12: dffffc0000000000
-R13: 1ffff92000142e60 R14: ffffffff81583326 R15: 0000000000000200
-FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055555b78a608 CR3: 000000000e738000 CR4: 0000000000350ef0
-Call Trace:
- <NMI>
- </NMI>
- <IRQ>
- trace_hardirqs_off+0x12/0x40 kernel/trace/trace_preemptirq.c:73
- __local_bh_enable_ip+0x106/0x200 kernel/softirq.c:364
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
- __dev_queue_xmit+0x1775/0x3f50 net/core/dev.c:4461
- dev_queue_xmit include/linux/netdevice.h:3168 [inline]
- br_dev_queue_push_xmit+0x726/0x900 net/bridge/br_forward.c:53
- NF_HOOK+0x702/0x7c0 include/linux/netfilter.h:314
- br_nf_post_routing+0xa20/0xe80 net/bridge/br_netfilter_hooks.c:997
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc5/0x220 net/netfilter/core.c:626
- nf_hook include/linux/netfilter.h:269 [inline]
- NF_HOOK+0x2a7/0x460 include/linux/netfilter.h:312
- br_forward_finish+0xd8/0x130 net/bridge/br_forward.c:66
- br_nf_forward_finish+0xb49/0xfb0 net/bridge/br_netfilter_hooks.c:693
- NF_HOOK+0x702/0x7c0 include/linux/netfilter.h:314
- br_nf_forward_ip+0x61e/0x7b0 net/bridge/br_netfilter_hooks.c:747
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc5/0x220 net/netfilter/core.c:626
- nf_hook include/linux/netfilter.h:269 [inline]
- NF_HOOK+0x2a7/0x460 include/linux/netfilter.h:312
- __br_forward+0x489/0x660 net/bridge/br_forward.c:115
- deliver_clone net/bridge/br_forward.c:131 [inline]
- maybe_deliver+0xb3/0x150 net/bridge/br_forward.c:190
- br_flood+0x2e4/0x660 net/bridge/br_forward.c:236
- br_handle_frame_finish+0x18ba/0x1fe0 net/bridge/br_input.c:215
- br_nf_hook_thresh+0x474/0x590
- br_nf_pre_routing_finish_ipv6+0xaa0/0xdd0
- NF_HOOK include/linux/netfilter.h:314 [inline]
- br_nf_pre_routing_ipv6+0x379/0x770 net/bridge/br_netfilter_ipv6.c:184
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_bridge_pre net/bridge/br_input.c:277 [inline]
- br_handle_frame+0x9ff/0x1530 net/bridge/br_input.c:424
- __netif_receive_skb_core+0x14ed/0x4690 net/core/dev.c:5566
- __netif_receive_skb_one_core net/core/dev.c:5670 [inline]
- __netif_receive_skb+0x12f/0x650 net/core/dev.c:5785
- process_backlog+0x662/0x15b0 net/core/dev.c:6117
- __napi_poll+0xcd/0x490 net/core/dev.c:6877
- napi_poll net/core/dev.c:6946 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:7068
- handle_softirqs+0x2c7/0x980 kernel/softirq.c:554
- do_softirq+0x11b/0x1e0 kernel/softirq.c:455
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
- neigh_periodic_work+0xbcb/0xde0 net/core/neighbour.c:968
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa65/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-net_ratelimit: 8442 callbacks suppressed
-bridge0: received packet on veth0_to_bridge with own address as source address (addr:5e:30:90:49:37:cb, vlan:0)
-
+Signed-off-by: Liang Jie <liangjie@lixiang.com>
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Changes in v3:
+- Slove checkpatch warrnings.
+- Link to v2: https://lore.kernel.org/all/20241217094608.4149466-1-buaajxlj@163.com/
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Changes in v2:
+- Apply similar modifications to the 'net' directory.
+- Fix compilation errors.
+- Link to v1: https://lore.kernel.org/all/20241217071411.3863379-1-buaajxlj@163.com/
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c        |  8 ++++----
+ drivers/net/ethernet/broadcom/bnxt/bnxt_tc.h        |  1 -
+ .../net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c    |  2 +-
+ drivers/net/ethernet/intel/ice/ice_eswitch_br.c     |  2 +-
+ .../net/ethernet/marvell/prestera/prestera_acl.c    |  6 +++---
+ .../net/ethernet/marvell/prestera/prestera_router.c |  4 ++--
+ .../ethernet/marvell/prestera/prestera_router_hw.c  |  6 +++---
+ drivers/net/ethernet/mediatek/mtk_ppe_offload.c     |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/rep/neigh.c  |  2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c  |  8 ++++----
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c     |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/esw/bridge.c    |  2 +-
+ .../ethernet/mellanox/mlx5/core/esw/bridge_mcast.c  |  2 +-
+ .../ethernet/mellanox/mlxsw/core_acl_flex_actions.c |  6 +++---
+ drivers/net/ethernet/mellanox/mlxsw/spectrum.c      |  4 ++--
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c  |  4 ++--
+ .../ethernet/mellanox/mlxsw/spectrum_acl_atcam.c    |  4 ++--
+ .../net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c |  2 +-
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_mr.c   |  2 +-
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_nve.c  |  4 ++--
+ .../net/ethernet/mellanox/mlxsw/spectrum_router.c   |  8 ++++----
+ .../ethernet/mellanox/mlxsw/spectrum_switchdev.c    |  2 +-
+ drivers/net/ethernet/netronome/nfp/bpf/main.c       |  3 ++-
+ .../net/ethernet/netronome/nfp/flower/conntrack.c   |  6 ++++--
+ .../net/ethernet/netronome/nfp/flower/metadata.c    | 13 ++++++++-----
+ .../net/ethernet/netronome/nfp/flower/qos_conf.c    |  2 +-
+ .../net/ethernet/netronome/nfp/flower/tunnel_conf.c |  2 +-
+ drivers/net/ethernet/sfc/mae.c                      |  2 +-
+ drivers/net/ethernet/sfc/tc.c                       | 12 ++++++------
+ drivers/net/ethernet/sfc/tc_conntrack.c             |  8 ++++----
+ drivers/net/ethernet/sfc/tc_counters.c              |  8 ++++----
+ drivers/net/ethernet/sfc/tc_encap_actions.c         |  2 +-
+ drivers/net/netdevsim/fib.c                         |  4 ++--
+ drivers/net/vxlan/vxlan_mdb.c                       |  2 +-
+ drivers/net/vxlan/vxlan_vnifilter.c                 |  2 +-
+ drivers/net/wireless/virtual/mac80211_hwsim.c       |  2 +-
+ net/bridge/br_multicast.c                           |  4 ++--
+ net/bridge/br_vlan.c                                |  2 +-
+ net/ipv4/ip_fragment.c                              |  4 ++--
+ net/ipv4/ipmr.c                                     |  2 +-
+ net/ipv6/ila/ila_xlat.c                             |  2 +-
+ net/ipv6/ioam6.c                                    |  4 ++--
+ net/ipv6/ip6mr.c                                    |  2 +-
+ net/mac80211/mesh_pathtbl.c                         |  2 +-
+ net/rds/bind.c                                      |  2 +-
+ net/sched/cls_flower.c                              |  2 +-
+ net/tipc/socket.c                                   |  2 +-
+ 47 files changed, 92 insertions(+), 87 deletions(-)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
+index d2ca90407cce..7aff67fad4a9 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
+@@ -1982,28 +1982,28 @@ static int bnxt_tc_setup_indr_cb(struct net_device *netdev, struct Qdisc *sch, v
+ static const struct rhashtable_params bnxt_tc_flow_ht_params = {
+ 	.head_offset = offsetof(struct bnxt_tc_flow_node, node),
+ 	.key_offset = offsetof(struct bnxt_tc_flow_node, cookie),
+-	.key_len = sizeof(((struct bnxt_tc_flow_node *)0)->cookie),
++	.key_len = sizeof_field(struct bnxt_tc_flow_node, cookie),
+ 	.automatic_shrinking = true
+ };
+ 
+ static const struct rhashtable_params bnxt_tc_l2_ht_params = {
+ 	.head_offset = offsetof(struct bnxt_tc_l2_node, node),
+ 	.key_offset = offsetof(struct bnxt_tc_l2_node, key),
+-	.key_len = BNXT_TC_L2_KEY_LEN,
++	.key_len = offsetofend(struct bnxt_tc_l2_key, inner_vlan_tci),
+ 	.automatic_shrinking = true
+ };
+ 
+ static const struct rhashtable_params bnxt_tc_decap_l2_ht_params = {
+ 	.head_offset = offsetof(struct bnxt_tc_l2_node, node),
+ 	.key_offset = offsetof(struct bnxt_tc_l2_node, key),
+-	.key_len = BNXT_TC_L2_KEY_LEN,
++	.key_len = offsetofend(struct bnxt_tc_l2_key, inner_vlan_tci),
+ 	.automatic_shrinking = true
+ };
+ 
+ static const struct rhashtable_params bnxt_tc_tunnel_ht_params = {
+ 	.head_offset = offsetof(struct bnxt_tc_tunnel_node, node),
+ 	.key_offset = offsetof(struct bnxt_tc_tunnel_node, key),
+-	.key_len = sizeof(struct ip_tunnel_key),
++	.key_len = sizeof_field(struct bnxt_tc_tunnel_node, key),
+ 	.automatic_shrinking = true
+ };
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.h
+index 10c62b094914..9a48f6bc25ed 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.h
+@@ -173,7 +173,6 @@ struct bnxt_tc_tunnel_node {
+  */
+ struct bnxt_tc_l2_node {
+ 	/* hash key: first 16b of key */
+-#define BNXT_TC_L2_KEY_LEN			16
+ 	struct bnxt_tc_l2_key	key;
+ 	struct rhash_head	node;
+ 
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
+index 69d045d769c4..ac5b209e46e7 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
+@@ -1103,7 +1103,7 @@ static const struct rhashtable_params cxgb4_tc_flower_ht_params = {
+ 	.nelem_hint = 384,
+ 	.head_offset = offsetof(struct ch_tc_flower_entry, node),
+ 	.key_offset = offsetof(struct ch_tc_flower_entry, tc_flower_cookie),
+-	.key_len = sizeof(((struct ch_tc_flower_entry *)0)->tc_flower_cookie),
++	.key_len = sizeof_field(struct ch_tc_flower_entry, tc_flower_cookie),
+ 	.max_size = 524288,
+ 	.min_size = 512,
+ 	.automatic_shrinking = true
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+index cccb7ddf61c9..b06e188985ee 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+@@ -13,7 +13,7 @@
+ 
+ static const struct rhashtable_params ice_fdb_ht_params = {
+ 	.key_offset = offsetof(struct ice_esw_br_fdb_entry, data),
+-	.key_len = sizeof(struct ice_esw_br_fdb_data),
++	.key_len = sizeof_field(struct ice_esw_br_fdb_entry, data),
+ 	.head_offset = offsetof(struct ice_esw_br_fdb_entry, ht_node),
+ 	.automatic_shrinking = true,
+ };
+diff --git a/drivers/net/ethernet/marvell/prestera/prestera_acl.c b/drivers/net/ethernet/marvell/prestera/prestera_acl.c
+index cba89fda504b..312a725c10f7 100644
+--- a/drivers/net/ethernet/marvell/prestera/prestera_acl.c
++++ b/drivers/net/ethernet/marvell/prestera/prestera_acl.c
+@@ -79,14 +79,14 @@ struct prestera_acl_vtcam {
+ };
+ 
+ static const struct rhashtable_params prestera_acl_ruleset_ht_params = {
+-	.key_len = sizeof(struct prestera_acl_ruleset_ht_key),
++	.key_len = sizeof_field(struct prestera_acl_ruleset, ht_key),
+ 	.key_offset = offsetof(struct prestera_acl_ruleset, ht_key),
+ 	.head_offset = offsetof(struct prestera_acl_ruleset, ht_node),
+ 	.automatic_shrinking = true,
+ };
+ 
+ static const struct rhashtable_params prestera_acl_rule_ht_params = {
+-	.key_len = sizeof(unsigned long),
++	.key_len = sizeof_field(struct prestera_acl_rule, cookie),
+ 	.key_offset = offsetof(struct prestera_acl_rule, cookie),
+ 	.head_offset = offsetof(struct prestera_acl_rule, ht_node),
+ 	.automatic_shrinking = true,
+@@ -95,7 +95,7 @@ static const struct rhashtable_params prestera_acl_rule_ht_params = {
+ static const struct rhashtable_params __prestera_acl_rule_entry_ht_params = {
+ 	.key_offset  = offsetof(struct prestera_acl_rule_entry, key),
+ 	.head_offset = offsetof(struct prestera_acl_rule_entry, ht_node),
+-	.key_len     = sizeof(struct prestera_acl_rule_entry_key),
++	.key_len     = sizeof_field(struct prestera_acl_rule_entry, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/ethernet/marvell/prestera/prestera_router.c b/drivers/net/ethernet/marvell/prestera/prestera_router.c
+index de317179a7dc..dcde1fbd6da1 100644
+--- a/drivers/net/ethernet/marvell/prestera/prestera_router.c
++++ b/drivers/net/ethernet/marvell/prestera/prestera_router.c
+@@ -67,14 +67,14 @@ struct prestera_kern_fib_cache {
+ static const struct rhashtable_params __prestera_kern_neigh_cache_ht_params = {
+ 	.key_offset  = offsetof(struct prestera_kern_neigh_cache, key),
+ 	.head_offset = offsetof(struct prestera_kern_neigh_cache, ht_node),
+-	.key_len     = sizeof(struct prestera_kern_neigh_cache_key),
++	.key_len     = sizeof_field(struct prestera_kern_neigh_cache, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+ static const struct rhashtable_params __prestera_kern_fib_cache_ht_params = {
+ 	.key_offset  = offsetof(struct prestera_kern_fib_cache, key),
+ 	.head_offset = offsetof(struct prestera_kern_fib_cache, ht_node),
+-	.key_len     = sizeof(struct prestera_kern_fib_cache_key),
++	.key_len     = sizeof_field(struct prestera_kern_fib_cache, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/ethernet/marvell/prestera/prestera_router_hw.c b/drivers/net/ethernet/marvell/prestera/prestera_router_hw.c
+index 02faaea2aefa..9830b5512056 100644
+--- a/drivers/net/ethernet/marvell/prestera/prestera_router_hw.c
++++ b/drivers/net/ethernet/marvell/prestera/prestera_router_hw.c
+@@ -35,19 +35,19 @@
+ static const struct rhashtable_params __prestera_fib_ht_params = {
+ 	.key_offset  = offsetof(struct prestera_fib_node, key),
+ 	.head_offset = offsetof(struct prestera_fib_node, ht_node),
+-	.key_len     = sizeof(struct prestera_fib_key),
++	.key_len     = sizeof_field(struct prestera_fib_node, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+ static const struct rhashtable_params __prestera_nh_neigh_ht_params = {
+ 	.key_offset  = offsetof(struct prestera_nh_neigh, key),
+-	.key_len     = sizeof(struct prestera_nh_neigh_key),
++	.key_len     = sizeof_field(struct prestera_nh_neigh, key),
+ 	.head_offset = offsetof(struct prestera_nh_neigh, ht_node),
+ };
+ 
+ static const struct rhashtable_params __prestera_nexthop_group_ht_params = {
+ 	.key_offset  = offsetof(struct prestera_nexthop_group, key),
+-	.key_len     = sizeof(struct prestera_nexthop_group_key),
++	.key_len     = sizeof_field(struct prestera_nexthop_group, key),
+ 	.head_offset = offsetof(struct prestera_nexthop_group, ht_node),
+ };
+ 
+diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+index f20bb390df3a..0145c06ebec9 100644
+--- a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
++++ b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+@@ -47,7 +47,7 @@ struct mtk_flow_data {
+ static const struct rhashtable_params mtk_flow_ht_params = {
+ 	.head_offset = offsetof(struct mtk_flow_entry, node),
+ 	.key_offset = offsetof(struct mtk_flow_entry, cookie),
+-	.key_len = sizeof(unsigned long),
++	.key_len = sizeof_field(struct mtk_flow_entry, cookie),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rep/neigh.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rep/neigh.c
+index 2e9bee4e5209..dfd798c59051 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rep/neigh.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rep/neigh.c
+@@ -269,7 +269,7 @@ static int mlx5e_rep_netevent_event(struct notifier_block *nb,
+ static const struct rhashtable_params mlx5e_neigh_ht_params = {
+ 	.head_offset = offsetof(struct mlx5e_neigh_hash_entry, rhash_node),
+ 	.key_offset = offsetof(struct mlx5e_neigh_hash_entry, m_neigh),
+-	.key_len = sizeof(struct mlx5e_neigh),
++	.key_len = sizeof_field(struct mlx5e_neigh_hash_entry, m_neigh),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c
+index a84ebac2f011..5a3f370ab136 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c
+@@ -173,7 +173,7 @@ mlx5_tc_ct_entry_destroy_mod_hdr(struct mlx5_tc_ct_priv *ct_priv,
+ static const struct rhashtable_params cts_ht_params = {
+ 	.head_offset = offsetof(struct mlx5_ct_entry, node),
+ 	.key_offset = offsetof(struct mlx5_ct_entry, cookie),
+-	.key_len = sizeof(((struct mlx5_ct_entry *)0)->cookie),
++	.key_len = sizeof_field(struct mlx5_ct_entry, cookie),
+ 	.automatic_shrinking = true,
+ 	.min_size = 16 * 1024,
+ };
+@@ -181,14 +181,14 @@ static const struct rhashtable_params cts_ht_params = {
+ static const struct rhashtable_params zone_params = {
+ 	.head_offset = offsetof(struct mlx5_ct_ft, node),
+ 	.key_offset = offsetof(struct mlx5_ct_ft, zone),
+-	.key_len = sizeof(((struct mlx5_ct_ft *)0)->zone),
++	.key_len = sizeof_field(struct mlx5_ct_ft, zone),
+ 	.automatic_shrinking = true,
+ };
+ 
+ static const struct rhashtable_params tuples_ht_params = {
+ 	.head_offset = offsetof(struct mlx5_ct_entry, tuple_node),
+ 	.key_offset = offsetof(struct mlx5_ct_entry, tuple),
+-	.key_len = sizeof(((struct mlx5_ct_entry *)0)->tuple),
++	.key_len = sizeof_field(struct mlx5_ct_entry, tuple),
+ 	.automatic_shrinking = true,
+ 	.min_size = 16 * 1024,
+ };
+@@ -196,7 +196,7 @@ static const struct rhashtable_params tuples_ht_params = {
+ static const struct rhashtable_params tuples_nat_ht_params = {
+ 	.head_offset = offsetof(struct mlx5_ct_entry, tuple_nat_node),
+ 	.key_offset = offsetof(struct mlx5_ct_entry, tuple_nat),
+-	.key_len = sizeof(((struct mlx5_ct_entry *)0)->tuple_nat),
++	.key_len = sizeof_field(struct mlx5_ct_entry, tuple_nat),
+ 	.automatic_shrinking = true,
+ 	.min_size = 16 * 1024,
+ };
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index 6b3b1afe8312..ee40c89b0f3f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -4339,7 +4339,7 @@ static void get_flags(int flags, unsigned long *flow_flags)
+ static const struct rhashtable_params tc_ht_params = {
+ 	.head_offset = offsetof(struct mlx5e_tc_flow, node),
+ 	.key_offset = offsetof(struct mlx5e_tc_flow, cookie),
+-	.key_len = sizeof(((struct mlx5e_tc_flow *)0)->cookie),
++	.key_len = sizeof_field(struct mlx5e_tc_flow, cookie),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+index c5ea1d1d2b03..9b9877bc7eb0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+@@ -15,7 +15,7 @@
+ 
+ static const struct rhashtable_params fdb_ht_params = {
+ 	.key_offset = offsetof(struct mlx5_esw_bridge_fdb_entry, key),
+-	.key_len = sizeof(struct mlx5_esw_bridge_fdb_key),
++	.key_len = sizeof_field(struct mlx5_esw_bridge_fdb_entry, key),
+ 	.head_offset = offsetof(struct mlx5_esw_bridge_fdb_entry, ht_node),
+ 	.automatic_shrinking = true,
+ };
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
+index 22dd30cf8033..7a39446c23f7 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
+@@ -9,7 +9,7 @@
+ 
+ static const struct rhashtable_params mdb_ht_params = {
+ 	.key_offset = offsetof(struct mlx5_esw_bridge_mdb_entry, key),
+-	.key_len = sizeof(struct mlx5_esw_bridge_mdb_key),
++	.key_len = sizeof_field(struct mlx5_esw_bridge_mdb_entry, key),
+ 	.head_offset = offsetof(struct mlx5_esw_bridge_mdb_entry, ht_node),
+ 	.automatic_shrinking = true,
+ };
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c
+index 1915fa41c622..1dc77bf66c17 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c
+@@ -106,7 +106,7 @@ struct mlxsw_afa_set {
+ };
+ 
+ static const struct rhashtable_params mlxsw_afa_set_ht_params = {
+-	.key_len = sizeof(struct mlxsw_afa_set_ht_key),
++	.key_len = sizeof_field(struct mlxsw_afa_set, ht_key),
+ 	.key_offset = offsetof(struct mlxsw_afa_set, ht_key),
+ 	.head_offset = offsetof(struct mlxsw_afa_set, ht_node),
+ 	.automatic_shrinking = true,
+@@ -124,7 +124,7 @@ struct mlxsw_afa_fwd_entry {
+ };
+ 
+ static const struct rhashtable_params mlxsw_afa_fwd_entry_ht_params = {
+-	.key_len = sizeof(struct mlxsw_afa_fwd_entry_ht_key),
++	.key_len = sizeof_field(struct mlxsw_afa_fwd_entry, ht_key),
+ 	.key_offset = offsetof(struct mlxsw_afa_fwd_entry, ht_key),
+ 	.head_offset = offsetof(struct mlxsw_afa_fwd_entry, ht_node),
+ 	.automatic_shrinking = true,
+@@ -188,7 +188,7 @@ struct mlxsw_afa_policer {
+ };
+ 
+ static const struct rhashtable_params mlxsw_afa_policer_ht_params = {
+-	.key_len = sizeof(u32),
++	.key_len = sizeof_field(struct mlxsw_afa_policer, fa_index),
+ 	.key_offset = offsetof(struct mlxsw_afa_policer, fa_index),
+ 	.head_offset = offsetof(struct mlxsw_afa_policer, ht_node),
+ 	.automatic_shrinking = true,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+index 3f5e5d99251b..744084836fe7 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+@@ -2844,7 +2844,7 @@ struct mlxsw_sp_sample_trigger_node {
+ static const struct rhashtable_params mlxsw_sp_sample_trigger_ht_params = {
+ 	.key_offset = offsetof(struct mlxsw_sp_sample_trigger_node, trigger),
+ 	.head_offset = offsetof(struct mlxsw_sp_sample_trigger_node, ht_node),
+-	.key_len = sizeof(struct mlxsw_sp_sample_trigger),
++	.key_len = sizeof_field(struct mlxsw_sp_sample_trigger_node, trigger),
+ 	.automatic_shrinking = true,
+ };
+ 
+@@ -3005,7 +3005,7 @@ struct mlxsw_sp_ipv6_addr_node {
+ static const struct rhashtable_params mlxsw_sp_ipv6_addr_ht_params = {
+ 	.key_offset = offsetof(struct mlxsw_sp_ipv6_addr_node, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_ipv6_addr_node, ht_node),
+-	.key_len = sizeof(struct in6_addr),
++	.key_len = sizeof_field(struct mlxsw_sp_ipv6_addr_node, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c
+index 3e70cee4d2f3..3701911fa5d5 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c
+@@ -78,14 +78,14 @@ struct mlxsw_sp_acl_rule {
+ };
+ 
+ static const struct rhashtable_params mlxsw_sp_acl_ruleset_ht_params = {
+-	.key_len = sizeof(struct mlxsw_sp_acl_ruleset_ht_key),
++	.key_len = sizeof_field(struct mlxsw_sp_acl_ruleset, ht_key),
+ 	.key_offset = offsetof(struct mlxsw_sp_acl_ruleset, ht_key),
+ 	.head_offset = offsetof(struct mlxsw_sp_acl_ruleset, ht_node),
+ 	.automatic_shrinking = true,
+ };
+ 
+ static const struct rhashtable_params mlxsw_sp_acl_rule_ht_params = {
+-	.key_len = sizeof(unsigned long),
++	.key_len = sizeof_field(struct mlxsw_sp_acl_rule, cookie),
+ 	.key_offset = offsetof(struct mlxsw_sp_acl_rule, cookie),
+ 	.head_offset = offsetof(struct mlxsw_sp_acl_rule, ht_node),
+ 	.automatic_shrinking = true,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_atcam.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_atcam.c
+index 07cb1e26ca3e..49201c4324ac 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_atcam.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_atcam.c
+@@ -52,13 +52,13 @@ struct mlxsw_sp_acl_atcam_region_12kb {
+ };
+ 
+ static const struct rhashtable_params mlxsw_sp_acl_atcam_lkey_id_ht_params = {
+-	.key_len = sizeof(struct mlxsw_sp_acl_atcam_lkey_id_ht_key),
++	.key_len = sizeof_field(struct mlxsw_sp_acl_atcam_lkey_id, ht_key),
+ 	.key_offset = offsetof(struct mlxsw_sp_acl_atcam_lkey_id, ht_key),
+ 	.head_offset = offsetof(struct mlxsw_sp_acl_atcam_lkey_id, ht_node),
+ };
+ 
+ static const struct rhashtable_params mlxsw_sp_acl_atcam_entries_ht_params = {
+-	.key_len = sizeof(struct mlxsw_sp_acl_atcam_entry_ht_key),
++	.key_len = sizeof_field(struct mlxsw_sp_acl_atcam_entry, ht_key),
+ 	.key_offset = offsetof(struct mlxsw_sp_acl_atcam_entry, ht_key),
+ 	.head_offset = offsetof(struct mlxsw_sp_acl_atcam_entry, ht_node),
+ };
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
+index b1d08e958bf9..adf293dccda3 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
+@@ -198,7 +198,7 @@ struct mlxsw_sp_acl_tcam_ventry {
+ };
+ 
+ static const struct rhashtable_params mlxsw_sp_acl_tcam_vchunk_ht_params = {
+-	.key_len = sizeof(unsigned int),
++	.key_len = sizeof_field(struct mlxsw_sp_acl_tcam_vchunk, priority),
+ 	.key_offset = offsetof(struct mlxsw_sp_acl_tcam_vchunk, priority),
+ 	.head_offset = offsetof(struct mlxsw_sp_acl_tcam_vchunk, ht_node),
+ 	.automatic_shrinking = true,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_mr.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_mr.c
+index 69cd689dbc83..5805520c5bbc 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_mr.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_mr.c
+@@ -91,7 +91,7 @@ struct mlxsw_sp_mr_route {
+ };
+ 
+ static const struct rhashtable_params mlxsw_sp_mr_route_ht_params = {
+-	.key_len = sizeof(struct mlxsw_sp_mr_route_key),
++	.key_len = sizeof_field(struct mlxsw_sp_mr_route, key),
+ 	.key_offset = offsetof(struct mlxsw_sp_mr_route, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_mr_route, ht_node),
+ 	.automatic_shrinking = true,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_nve.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_nve.c
+index 5479a1c19d2e..11e1ae8decce 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_nve.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_nve.c
+@@ -77,7 +77,7 @@ struct mlxsw_sp_nve_mc_list {
+ };
+ 
+ static const struct rhashtable_params mlxsw_sp_nve_mc_list_ht_params = {
+-	.key_len = sizeof(struct mlxsw_sp_nve_mc_list_key),
++	.key_len = sizeof_field(struct mlxsw_sp_nve_mc_list, key),
+ 	.key_offset = offsetof(struct mlxsw_sp_nve_mc_list, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_nve_mc_list, ht_node),
+ };
+@@ -810,7 +810,7 @@ struct mlxsw_sp_nve_ipv6_ht_node {
+ };
+ 
+ static const struct rhashtable_params mlxsw_sp_nve_ipv6_ht_params = {
+-	.key_len = sizeof(struct mlxsw_sp_nve_ipv6_ht_key),
++	.key_len = sizeof_field(struct mlxsw_sp_nve_ipv6_ht_node, key),
+ 	.key_offset = offsetof(struct mlxsw_sp_nve_ipv6_ht_node, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_nve_ipv6_ht_node, ht_node),
+ };
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
+index 7d6d859cef3f..f114b52a0ab0 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
+@@ -2196,7 +2196,7 @@ struct mlxsw_sp_neigh_entry {
+ static const struct rhashtable_params mlxsw_sp_neigh_ht_params = {
+ 	.key_offset = offsetof(struct mlxsw_sp_neigh_entry, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_neigh_entry, ht_node),
+-	.key_len = sizeof(struct mlxsw_sp_neigh_key),
++	.key_len = sizeof_field(struct mlxsw_sp_neigh_entry, key),
+ };
+ 
+ struct mlxsw_sp_neigh_entry *
+@@ -3375,7 +3375,7 @@ bool mlxsw_sp_nexthop_group_has_ipip(struct mlxsw_sp_nexthop *nh)
+ static const struct rhashtable_params mlxsw_sp_nexthop_group_vr_ht_params = {
+ 	.key_offset = offsetof(struct mlxsw_sp_nexthop_group_vr_entry, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_nexthop_group_vr_entry, ht_node),
+-	.key_len = sizeof(struct mlxsw_sp_nexthop_group_vr_key),
++	.key_len = sizeof_field(struct mlxsw_sp_nexthop_group_vr_entry, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+@@ -3662,7 +3662,7 @@ mlxsw_sp_nexthop6_group_lookup(struct mlxsw_sp *mlxsw_sp,
+ static const struct rhashtable_params mlxsw_sp_nexthop_ht_params = {
+ 	.key_offset = offsetof(struct mlxsw_sp_nexthop, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_nexthop, ht_node),
+-	.key_len = sizeof(struct mlxsw_sp_nexthop_key),
++	.key_len = sizeof_field(struct mlxsw_sp_nexthop, key),
+ };
+ 
+ static int mlxsw_sp_nexthop_insert(struct mlxsw_sp *mlxsw_sp,
+@@ -6561,7 +6561,7 @@ mlxsw_sp_fib4_entry_lookup(struct mlxsw_sp *mlxsw_sp,
+ static const struct rhashtable_params mlxsw_sp_fib_ht_params = {
+ 	.key_offset = offsetof(struct mlxsw_sp_fib_node, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_fib_node, ht_node),
+-	.key_len = sizeof(struct mlxsw_sp_fib_key),
++	.key_len = sizeof_field(struct mlxsw_sp_fib_node, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
+index 6397ff0dc951..cee484cbe31f 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
+@@ -127,7 +127,7 @@ struct mlxsw_sp_mdb_entry_port {
+ static const struct rhashtable_params mlxsw_sp_mdb_ht_params = {
+ 	.key_offset = offsetof(struct mlxsw_sp_mdb_entry, key),
+ 	.head_offset = offsetof(struct mlxsw_sp_mdb_entry, ht_node),
+-	.key_len = sizeof(struct mlxsw_sp_mdb_entry_key),
++	.key_len = sizeof_field(struct mlxsw_sp_mdb_entry, key),
+ };
+ 
+ static int
+diff --git a/drivers/net/ethernet/netronome/nfp/bpf/main.c b/drivers/net/ethernet/netronome/nfp/bpf/main.c
+index f469950c7265..e63f36d3a34f 100644
+--- a/drivers/net/ethernet/netronome/nfp/bpf/main.c
++++ b/drivers/net/ethernet/netronome/nfp/bpf/main.c
+@@ -15,7 +15,8 @@
+ 
+ const struct rhashtable_params nfp_bpf_maps_neutral_params = {
+ 	.nelem_hint		= 4,
+-	.key_len		= sizeof_field(struct bpf_map, id),
++	.key_len		= sizeof_field(struct nfp_bpf_neutral_map,
++						map_id),
+ 	.key_offset		= offsetof(struct nfp_bpf_neutral_map, map_id),
+ 	.head_offset		= offsetof(struct nfp_bpf_neutral_map, l),
+ 	.automatic_shrinking	= true,
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/conntrack.c b/drivers/net/ethernet/netronome/nfp/flower/conntrack.c
+index 15180538b80a..ea0ce4e9a798 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/conntrack.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/conntrack.c
+@@ -10,7 +10,8 @@
+ const struct rhashtable_params nfp_tc_ct_merge_params = {
+ 	.head_offset		= offsetof(struct nfp_fl_ct_tc_merge,
+ 					   hash_node),
+-	.key_len		= sizeof(unsigned long) * 2,
++	.key_len		= sizeof_field(struct nfp_fl_ct_tc_merge,
++						cookie),
+ 	.key_offset		= offsetof(struct nfp_fl_ct_tc_merge, cookie),
+ 	.automatic_shrinking	= true,
+ };
+@@ -18,7 +19,8 @@ const struct rhashtable_params nfp_tc_ct_merge_params = {
+ const struct rhashtable_params nfp_nft_ct_merge_params = {
+ 	.head_offset		= offsetof(struct nfp_fl_nft_tc_merge,
+ 					   hash_node),
+-	.key_len		= sizeof(unsigned long) * 3,
++	.key_len		= sizeof_field(struct nfp_fl_nft_tc_merge,
++						cookie),
+ 	.key_offset		= offsetof(struct nfp_fl_nft_tc_merge, cookie),
+ 	.automatic_shrinking	= true,
+ };
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/metadata.c b/drivers/net/ethernet/netronome/nfp/flower/metadata.c
+index 80e4675582bf..aece799a5ed7 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/metadata.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/metadata.c
+@@ -34,7 +34,8 @@ struct nfp_fl_stats_ctx_to_flow {
+ static const struct rhashtable_params stats_ctx_table_params = {
+ 	.key_offset	= offsetof(struct nfp_fl_stats_ctx_to_flow, stats_cxt),
+ 	.head_offset	= offsetof(struct nfp_fl_stats_ctx_to_flow, ht_node),
+-	.key_len	= sizeof(u32),
++	.key_len	= sizeof_field(struct nfp_fl_stats_ctx_to_flow,
++					stats_cxt),
+ };
+ 
+ static int nfp_release_stats_entry(struct nfp_app *app, u32 stats_context_id)
+@@ -485,19 +486,21 @@ const struct rhashtable_params nfp_flower_table_params = {
+ const struct rhashtable_params merge_table_params = {
+ 	.key_offset	= offsetof(struct nfp_merge_info, parent_ctx),
+ 	.head_offset	= offsetof(struct nfp_merge_info, ht_node),
+-	.key_len	= sizeof(u64),
++	.key_len	= sizeof_field(struct nfp_merge_info, parent_ctx),
+ };
+ 
+ const struct rhashtable_params nfp_zone_table_params = {
+ 	.head_offset		= offsetof(struct nfp_fl_ct_zone_entry, hash_node),
+-	.key_len		= sizeof(u16),
++	.key_len		= sizeof_field(struct nfp_fl_ct_zone_entry,
++						zone),
+ 	.key_offset		= offsetof(struct nfp_fl_ct_zone_entry, zone),
+ 	.automatic_shrinking	= false,
+ };
+ 
+ const struct rhashtable_params nfp_ct_map_params = {
+ 	.head_offset		= offsetof(struct nfp_fl_ct_map_entry, hash_node),
+-	.key_len		= sizeof(unsigned long),
++	.key_len		= sizeof_field(struct nfp_fl_ct_map_entry,
++						cookie),
+ 	.key_offset		= offsetof(struct nfp_fl_ct_map_entry, cookie),
+ 	.automatic_shrinking	= true,
+ };
+@@ -505,7 +508,7 @@ const struct rhashtable_params nfp_ct_map_params = {
+ const struct rhashtable_params neigh_table_params = {
+ 	.key_offset	= offsetof(struct nfp_neigh_entry, neigh_cookie),
+ 	.head_offset	= offsetof(struct nfp_neigh_entry, ht_node),
+-	.key_len	= sizeof(unsigned long),
++	.key_len	= sizeof_field(struct nfp_neigh_entry, neigh_cookie),
+ };
+ 
+ int nfp_flower_metadata_init(struct nfp_app *app, u64 host_ctx_count,
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/qos_conf.c b/drivers/net/ethernet/netronome/nfp/flower/qos_conf.c
+index e7180b4793c7..1785ad13e1a8 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/qos_conf.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/qos_conf.c
+@@ -555,7 +555,7 @@ int nfp_flower_setup_qos_offload(struct nfp_app *app, struct net_device *netdev,
+ static const struct rhashtable_params stats_meter_table_params = {
+ 	.key_offset	= offsetof(struct nfp_meter_entry, meter_id),
+ 	.head_offset	= offsetof(struct nfp_meter_entry, ht_node),
+-	.key_len	= sizeof(u32),
++	.key_len	= sizeof_field(struct nfp_meter_entry, meter_id),
+ };
+ 
+ struct nfp_meter_entry *
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c b/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
+index 0d7d138d6e0d..51ae5e2244aa 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
+@@ -201,7 +201,7 @@ struct nfp_tun_offloaded_mac {
+ static const struct rhashtable_params offloaded_macs_params = {
+ 	.key_offset	= offsetof(struct nfp_tun_offloaded_mac, addr),
+ 	.head_offset	= offsetof(struct nfp_tun_offloaded_mac, ht_node),
+-	.key_len	= ETH_ALEN,
++	.key_len	= sizeof_field(struct nfp_tun_offloaded_mac, addr),
+ 	.automatic_shrinking	= true,
+ };
+ 
+diff --git a/drivers/net/ethernet/sfc/mae.c b/drivers/net/ethernet/sfc/mae.c
+index 50f097487b14..72907685cbec 100644
+--- a/drivers/net/ethernet/sfc/mae.c
++++ b/drivers/net/ethernet/sfc/mae.c
+@@ -1053,7 +1053,7 @@ static bool efx_mae_asl_id(u32 id)
+ 
+ /* mport handling */
+ static const struct rhashtable_params efx_mae_mports_ht_params = {
+-	.key_len	= sizeof(u32),
++	.key_len	= sizeof_field(struct mae_mport_desc, mport_id),
+ 	.key_offset	= offsetof(struct mae_mport_desc, mport_id),
+ 	.head_offset	= offsetof(struct mae_mport_desc, linkage),
+ };
+diff --git a/drivers/net/ethernet/sfc/tc.c b/drivers/net/ethernet/sfc/tc.c
+index 0d93164988fc..d62e3e815acf 100644
+--- a/drivers/net/ethernet/sfc/tc.c
++++ b/drivers/net/ethernet/sfc/tc.c
+@@ -90,31 +90,31 @@ s64 efx_tc_flower_external_mport(struct efx_nic *efx, struct efx_rep *efv)
+ }
+ 
+ static const struct rhashtable_params efx_tc_mac_ht_params = {
+-	.key_len	= offsetofend(struct efx_tc_mac_pedit_action, h_addr),
+-	.key_offset	= 0,
++	.key_len	= sizeof_field(struct efx_tc_mac_pedit_action, h_addr),
++	.key_offset	= offsetof(struct efx_tc_mac_pedit_action, h_addr),
+ 	.head_offset	= offsetof(struct efx_tc_mac_pedit_action, linkage),
+ };
+ 
+ static const struct rhashtable_params efx_tc_encap_match_ht_params = {
+-	.key_len	= offsetof(struct efx_tc_encap_match, linkage),
++	.key_len	= offsetofend(struct efx_tc_encap_match, ip_tos_mask),
+ 	.key_offset	= 0,
+ 	.head_offset	= offsetof(struct efx_tc_encap_match, linkage),
+ };
+ 
+ static const struct rhashtable_params efx_tc_match_action_ht_params = {
+-	.key_len	= sizeof(unsigned long),
++	.key_len	= sizeof_field(struct efx_tc_flow_rule, cookie),
+ 	.key_offset	= offsetof(struct efx_tc_flow_rule, cookie),
+ 	.head_offset	= offsetof(struct efx_tc_flow_rule, linkage),
+ };
+ 
+ static const struct rhashtable_params efx_tc_lhs_rule_ht_params = {
+-	.key_len	= sizeof(unsigned long),
++	.key_len	= sizeof_field(struct efx_tc_lhs_rule, cookie),
+ 	.key_offset	= offsetof(struct efx_tc_lhs_rule, cookie),
+ 	.head_offset	= offsetof(struct efx_tc_lhs_rule, linkage),
+ };
+ 
+ static const struct rhashtable_params efx_tc_recirc_ht_params = {
+-	.key_len	= offsetof(struct efx_tc_recirc_id, linkage),
++	.key_len	= offsetofend(struct efx_tc_recirc_id, net_dev),
+ 	.key_offset	= 0,
+ 	.head_offset	= offsetof(struct efx_tc_recirc_id, linkage),
+ };
+diff --git a/drivers/net/ethernet/sfc/tc_conntrack.c b/drivers/net/ethernet/sfc/tc_conntrack.c
+index d90206f27161..36bb7c78f2b9 100644
+--- a/drivers/net/ethernet/sfc/tc_conntrack.c
++++ b/drivers/net/ethernet/sfc/tc_conntrack.c
+@@ -16,14 +16,14 @@ static int efx_tc_flow_block(enum tc_setup_type type, void *type_data,
+ 			     void *cb_priv);
+ 
+ static const struct rhashtable_params efx_tc_ct_zone_ht_params = {
+-	.key_len	= offsetof(struct efx_tc_ct_zone, linkage),
+-	.key_offset	= 0,
++	.key_len	= sizeof_field(struct efx_tc_ct_zone, zone),
++	.key_offset	= offsetof(struct efx_tc_ct_zone, zone),
+ 	.head_offset	= offsetof(struct efx_tc_ct_zone, linkage),
+ };
+ 
+ static const struct rhashtable_params efx_tc_ct_ht_params = {
+-	.key_len	= offsetof(struct efx_tc_ct_entry, linkage),
+-	.key_offset	= 0,
++	.key_len	= sizeof_field(struct efx_tc_ct_entry, cookie),
++	.key_offset	= offsetof(struct efx_tc_ct_entry, cookie),
+ 	.head_offset	= offsetof(struct efx_tc_ct_entry, linkage),
+ };
+ 
+diff --git a/drivers/net/ethernet/sfc/tc_counters.c b/drivers/net/ethernet/sfc/tc_counters.c
+index a421b0123506..067d75973f0a 100644
+--- a/drivers/net/ethernet/sfc/tc_counters.c
++++ b/drivers/net/ethernet/sfc/tc_counters.c
+@@ -17,14 +17,14 @@
+ /* Counter-management hashtables */
+ 
+ static const struct rhashtable_params efx_tc_counter_id_ht_params = {
+-	.key_len	= offsetof(struct efx_tc_counter_index, linkage),
+-	.key_offset	= 0,
++	.key_len	= sizeof_field(struct efx_tc_counter_index, cookie),
++	.key_offset	= offsetof(struct efx_tc_counter_index, cookie),
+ 	.head_offset	= offsetof(struct efx_tc_counter_index, linkage),
+ };
+ 
+ static const struct rhashtable_params efx_tc_counter_ht_params = {
+-	.key_len	= offsetof(struct efx_tc_counter, linkage),
+-	.key_offset	= 0,
++	.key_len	= sizeof_field(struct efx_tc_counter, fw_id),
++	.key_offset	= offsetof(struct efx_tc_counter, fw_id),
+ 	.head_offset	= offsetof(struct efx_tc_counter, linkage),
+ };
+ 
+diff --git a/drivers/net/ethernet/sfc/tc_encap_actions.c b/drivers/net/ethernet/sfc/tc_encap_actions.c
+index 87443f9dfd22..fa081bbcdef6 100644
+--- a/drivers/net/ethernet/sfc/tc_encap_actions.c
++++ b/drivers/net/ethernet/sfc/tc_encap_actions.c
+@@ -17,7 +17,7 @@
+ #include <net/arp.h>
+ 
+ static const struct rhashtable_params efx_neigh_ht_params = {
+-	.key_len	= offsetof(struct efx_neigh_binder, ha),
++	.key_len	= offsetofend(struct efx_neigh_binder, dst_ip6),
+ 	.key_offset	= 0,
+ 	.head_offset	= offsetof(struct efx_neigh_binder, linkage),
+ };
+diff --git a/drivers/net/netdevsim/fib.c b/drivers/net/netdevsim/fib.c
+index 16c382c42227..4184b0f0a196 100644
+--- a/drivers/net/netdevsim/fib.c
++++ b/drivers/net/netdevsim/fib.c
+@@ -115,7 +115,7 @@ struct nsim_fib_event {
+ static const struct rhashtable_params nsim_fib_rt_ht_params = {
+ 	.key_offset = offsetof(struct nsim_fib_rt, key),
+ 	.head_offset = offsetof(struct nsim_fib_rt, ht_node),
+-	.key_len = sizeof(struct nsim_fib_rt_key),
++	.key_len = sizeof_field(struct nsim_fib_rt, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+@@ -129,7 +129,7 @@ struct nsim_nexthop {
+ static const struct rhashtable_params nsim_nexthop_ht_params = {
+ 	.key_offset = offsetof(struct nsim_nexthop, id),
+ 	.head_offset = offsetof(struct nsim_nexthop, ht_node),
+-	.key_len = sizeof(u32),
++	.key_len = sizeof_field(struct nsim_nexthop, id),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/vxlan/vxlan_mdb.c b/drivers/net/vxlan/vxlan_mdb.c
+index 8735891ee128..29e7c91ffd2b 100644
+--- a/drivers/net/vxlan/vxlan_mdb.c
++++ b/drivers/net/vxlan/vxlan_mdb.c
+@@ -85,7 +85,7 @@ struct vxlan_mdb_flush_desc {
+ static const struct rhashtable_params vxlan_mdb_rht_params = {
+ 	.head_offset = offsetof(struct vxlan_mdb_entry, rhnode),
+ 	.key_offset = offsetof(struct vxlan_mdb_entry, key),
+-	.key_len = sizeof(struct vxlan_mdb_entry_key),
++	.key_len = sizeof_field(struct vxlan_mdb_entry, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
+index d2023e7131bd..c70954c54e92 100644
+--- a/drivers/net/vxlan/vxlan_vnifilter.c
++++ b/drivers/net/vxlan/vxlan_vnifilter.c
+@@ -29,7 +29,7 @@ static inline int vxlan_vni_cmp(struct rhashtable_compare_arg *arg,
+ const struct rhashtable_params vxlan_vni_rht_params = {
+ 	.head_offset = offsetof(struct vxlan_vni_node, vnode),
+ 	.key_offset = offsetof(struct vxlan_vni_node, vni),
+-	.key_len = sizeof(__be32),
++	.key_len = sizeof_field(struct vxlan_vni_node, vni),
+ 	.nelem_hint = 3,
+ 	.max_size = VXLAN_N_VID,
+ 	.obj_cmpfn = vxlan_vni_cmp,
+diff --git a/drivers/net/wireless/virtual/mac80211_hwsim.c b/drivers/net/wireless/virtual/mac80211_hwsim.c
+index 347a15544afe..8d405d15a09b 100644
+--- a/drivers/net/wireless/virtual/mac80211_hwsim.c
++++ b/drivers/net/wireless/virtual/mac80211_hwsim.c
+@@ -757,7 +757,7 @@ struct mac80211_hwsim_data {
+ static const struct rhashtable_params hwsim_rht_params = {
+ 	.nelem_hint = 2,
+ 	.automatic_shrinking = true,
+-	.key_len = ETH_ALEN,
++	.key_len = sizeof_field(struct mac80211_hwsim_data, addresses[1]),
+ 	.key_offset = offsetof(struct mac80211_hwsim_data, addresses[1]),
+ 	.head_offset = offsetof(struct mac80211_hwsim_data, rht),
+ };
+diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+index b2ae0d2434d2..cb21142f4686 100644
+--- a/net/bridge/br_multicast.c
++++ b/net/bridge/br_multicast.c
+@@ -39,14 +39,14 @@
+ static const struct rhashtable_params br_mdb_rht_params = {
+ 	.head_offset = offsetof(struct net_bridge_mdb_entry, rhnode),
+ 	.key_offset = offsetof(struct net_bridge_mdb_entry, addr),
+-	.key_len = sizeof(struct br_ip),
++	.key_len = sizeof_field(struct net_bridge_mdb_entry, addr),
+ 	.automatic_shrinking = true,
+ };
+ 
+ static const struct rhashtable_params br_sg_port_rht_params = {
+ 	.head_offset = offsetof(struct net_bridge_port_group, rhnode),
+ 	.key_offset = offsetof(struct net_bridge_port_group, key),
+-	.key_len = sizeof(struct net_bridge_port_group_sg_key),
++	.key_len = sizeof_field(struct net_bridge_port_group, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
+index 89f51ea4cabe..95674019106d 100644
+--- a/net/bridge/br_vlan.c
++++ b/net/bridge/br_vlan.c
+@@ -22,7 +22,7 @@ static inline int br_vlan_cmp(struct rhashtable_compare_arg *arg,
+ static const struct rhashtable_params br_vlan_rht_params = {
+ 	.head_offset = offsetof(struct net_bridge_vlan, vnode),
+ 	.key_offset = offsetof(struct net_bridge_vlan, vid),
+-	.key_len = sizeof(u16),
++	.key_len = sizeof_field(struct net_bridge_vlan, vid),
+ 	.nelem_hint = 3,
+ 	.max_size = VLAN_N_VID,
+ 	.obj_cmpfn = br_vlan_cmp,
+diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
+index 07036a2943c1..0d8234460a13 100644
+--- a/net/ipv4/ip_fragment.c
++++ b/net/ipv4/ip_fragment.c
+@@ -737,8 +737,8 @@ static int ip4_obj_cmpfn(struct rhashtable_compare_arg *arg, const void *ptr)
+ 
+ static const struct rhashtable_params ip4_rhash_params = {
+ 	.head_offset		= offsetof(struct inet_frag_queue, node),
+-	.key_offset		= offsetof(struct inet_frag_queue, key),
+-	.key_len		= sizeof(struct frag_v4_compare_key),
++	.key_offset		= offsetof(struct inet_frag_queue, key.v4),
++	.key_len		= sizeof_field(struct inet_frag_queue, key.v4),
+ 	.hashfn			= ip4_key_hashfn,
+ 	.obj_hashfn		= ip4_obj_hashfn,
+ 	.obj_cmpfn		= ip4_obj_cmpfn,
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 99d8faa508e5..217b2dd200f1 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -393,7 +393,7 @@ static inline int ipmr_hash_cmp(struct rhashtable_compare_arg *arg,
+ static const struct rhashtable_params ipmr_rht_params = {
+ 	.head_offset = offsetof(struct mr_mfc, mnode),
+ 	.key_offset = offsetof(struct mfc_cache, cmparg),
+-	.key_len = sizeof(struct mfc_cache_cmp_arg),
++	.key_len = sizeof_field(struct mfc_cache, cmparg),
+ 	.nelem_hint = 3,
+ 	.obj_cmpfn = ipmr_hash_cmp,
+ 	.automatic_shrinking = true,
+diff --git a/net/ipv6/ila/ila_xlat.c b/net/ipv6/ila/ila_xlat.c
+index 7646e401c630..8f0550fc3673 100644
+--- a/net/ipv6/ila/ila_xlat.c
++++ b/net/ipv6/ila/ila_xlat.c
+@@ -85,7 +85,7 @@ static const struct rhashtable_params rht_params = {
+ 	.nelem_hint = 1024,
+ 	.head_offset = offsetof(struct ila_map, node),
+ 	.key_offset = offsetof(struct ila_map, xp.ip.locator_match),
+-	.key_len = sizeof(u64), /* identifier */
++	.key_len = sizeof_field(struct ila_map, xp.ip.locator_match),
+ 	.max_size = 1048576,
+ 	.min_size = 256,
+ 	.automatic_shrinking = true,
+diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
+index a84d332f952f..a4cd627b4531 100644
+--- a/net/ipv6/ioam6.c
++++ b/net/ipv6/ioam6.c
+@@ -61,7 +61,7 @@ static int ioam6_sc_cmpfn(struct rhashtable_compare_arg *arg, const void *obj)
+ }
+ 
+ static const struct rhashtable_params rht_ns_params = {
+-	.key_len		= sizeof(__be16),
++	.key_len		= sizeof_field(struct ioam6_namespace, id),
+ 	.key_offset		= offsetof(struct ioam6_namespace, id),
+ 	.head_offset		= offsetof(struct ioam6_namespace, head),
+ 	.automatic_shrinking	= true,
+@@ -69,7 +69,7 @@ static const struct rhashtable_params rht_ns_params = {
+ };
+ 
+ static const struct rhashtable_params rht_sc_params = {
+-	.key_len		= sizeof(u32),
++	.key_len		= sizeof_field(struct ioam6_schema, id),
+ 	.key_offset		= offsetof(struct ioam6_schema, id),
+ 	.head_offset		= offsetof(struct ioam6_schema, head),
+ 	.automatic_shrinking	= true,
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index 578ff1336afe..d63fbe7f51f6 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -376,7 +376,7 @@ static int ip6mr_hash_cmp(struct rhashtable_compare_arg *arg,
+ static const struct rhashtable_params ip6mr_rht_params = {
+ 	.head_offset = offsetof(struct mr_mfc, mnode),
+ 	.key_offset = offsetof(struct mfc6_cache, cmparg),
+-	.key_len = sizeof(struct mfc6_cache_cmp_arg),
++	.key_len = sizeof_field(struct mfc6_cache, cmparg),
+ 	.nelem_hint = 3,
+ 	.obj_cmpfn = ip6mr_hash_cmp,
+ 	.automatic_shrinking = true,
+diff --git a/net/mac80211/mesh_pathtbl.c b/net/mac80211/mesh_pathtbl.c
+index 9f9cb5af0a97..672036d1cf34 100644
+--- a/net/mac80211/mesh_pathtbl.c
++++ b/net/mac80211/mesh_pathtbl.c
+@@ -28,7 +28,7 @@ static u32 mesh_table_hash(const void *addr, u32 len, u32 seed)
+ static const struct rhashtable_params mesh_rht_params = {
+ 	.nelem_hint = 2,
+ 	.automatic_shrinking = true,
+-	.key_len = ETH_ALEN,
++	.key_len = sizeof_field(struct mesh_path, dst),
+ 	.key_offset = offsetof(struct mesh_path, dst),
+ 	.head_offset = offsetof(struct mesh_path, rhash),
+ 	.hashfn = mesh_table_hash,
+diff --git a/net/rds/bind.c b/net/rds/bind.c
+index 97a29172a8ee..67ff5444d4a1 100644
+--- a/net/rds/bind.c
++++ b/net/rds/bind.c
+@@ -43,7 +43,7 @@ static struct rhashtable bind_hash_table;
+ 
+ static const struct rhashtable_params ht_parms = {
+ 	.nelem_hint = 768,
+-	.key_len = RDS_BOUND_KEY_LEN,
++	.key_len = sizeof_field(struct rds_sock, rs_bound_key),
+ 	.key_offset = offsetof(struct rds_sock, rs_bound_key),
+ 	.head_offset = offsetof(struct rds_sock, rs_bound_node),
+ 	.max_size = 16384,
+diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+index 1008ec8a464c..ec127f9ff56e 100644
+--- a/net/sched/cls_flower.c
++++ b/net/sched/cls_flower.c
+@@ -147,7 +147,7 @@ struct cls_fl_filter {
+ 
+ static const struct rhashtable_params mask_ht_params = {
+ 	.key_offset = offsetof(struct fl_flow_mask, key),
+-	.key_len = sizeof(struct fl_flow_key),
++	.key_len = sizeof_field(struct fl_flow_mask, key),
+ 	.head_offset = offsetof(struct fl_flow_mask, ht_node),
+ 	.automatic_shrinking = true,
+ };
+diff --git a/net/tipc/socket.c b/net/tipc/socket.c
+index 65dcbb54f55d..ab76c8c1580a 100644
+--- a/net/tipc/socket.c
++++ b/net/tipc/socket.c
+@@ -3041,7 +3041,7 @@ static const struct rhashtable_params tsk_rht_params = {
+ 	.nelem_hint = 192,
+ 	.head_offset = offsetof(struct tipc_sock, node),
+ 	.key_offset = offsetof(struct tipc_sock, portid),
+-	.key_len = sizeof(u32), /* portid */
++	.key_len = sizeof_field(struct tipc_sock, portid),
+ 	.max_size = 1048576,
+ 	.min_size = 256,
+ 	.automatic_shrinking = true,
+-- 
+2.25.1
 
-If you want to undo deduplication, reply with:
-#syz undup
 
