@@ -1,82 +1,119 @@
-Return-Path: <netdev+bounces-153834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1607B9F9CAE
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 23:19:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C78039F9CB1
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 23:20:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE071883D25
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 22:18:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D690918861CC
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 22:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60E121A447;
-	Fri, 20 Dec 2024 22:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C654225A4B;
+	Fri, 20 Dec 2024 22:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQ6q6o6Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9CYA8TQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2BB1A3BAD;
-	Fri, 20 Dec 2024 22:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEE4155342;
+	Fri, 20 Dec 2024 22:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734733126; cv=none; b=Y0g8NZymrhaB4Bq9TbKFkyxAvoJi1zr5ghSM08D+GcsitsL/xDNqJD0m69yS8Xb4SNEdU7QV68vbsb/r4pHwnQbTTzvmH8Sk0ix/g14w5aNnw9GE5ZwzNFu8DRe+IcqDzyOgwPre4n/jtyACaEXpOMJ1DhoePJCe0A4iTvTPUp8=
+	t=1734733216; cv=none; b=U/jF+ipBwG23PcTtVrRbv3e7DLEI7PcrLrCGDsa4d1pPzlgDFDMn5LrZthS3F2w39BejYHTsxD4dQDYF2ILQiwTsYLNpe2KJLhHpTfMAA1+aYSeA2RyC6rXU8sIYGvXO6/xG6r52r7ipGqtM+bKLgaKSPm/KXEI4WqMl0D0ciHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734733126; c=relaxed/simple;
-	bh=L1LBj7z2i6uNkHxxevZlBomiDineKOMTpvMu6F7DgFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e0Bu2iKEopEcyX9ilc1qTft8ujJ9DfBRbfkjtpDtvytVfxltr2mIgJkT6FNOZdRy6B4nE5XXv4B/8fKYwQMdTIFwtnNwTxXIAAEdCMGS6ihnQx0mqzUf9QkLyXoAwzl08/OlKnhmLXzQKLT61ZtkFyD3HeG7j1t2yH+v/cW2cns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pQ6q6o6Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1793CC4CECD;
-	Fri, 20 Dec 2024 22:18:46 +0000 (UTC)
+	s=arc-20240116; t=1734733216; c=relaxed/simple;
+	bh=SRrrMI3Ve0fnBt8s85Tlk4Gjw+jfFYv0pPQ/7O2oxD8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mw+PuKz1wpq0b8bsvkR9sGj6+3gmlw95r2EBj0MvUywDJFcUqcUgzjVkmdzt9x8tlqKv04ecJP041DmzoHfn1TDNOgSG0XP5d60mZWtKUXCbM7IDKVTghU4n9T5NDqbQeVpNMlFCQX8Xh41ebb10lQszmCZUpetjWyzpWv69aNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9CYA8TQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8159C4CECD;
+	Fri, 20 Dec 2024 22:20:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734733126;
-	bh=L1LBj7z2i6uNkHxxevZlBomiDineKOMTpvMu6F7DgFk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pQ6q6o6QqZ7iUtiDfuy/t+tHRVbKzQHvtP/gcFGPPZfDFv4w+bx3q6Sl8m8BGoYxj
-	 6Vln6USrBfZ5lGz9Cf7/8jGRHiftqZjtHPgJOnzCTGKQ1tqJI516w435riXxTI9KHm
-	 7H6O7sF5vXa0yupzNxyezMes6JTGGhnCt7lCj0FIZ0YwLpS7BPp5Sbz0X2wbuok6Gv
-	 nzMXhCiA8+Enems1lOwtdF2mE+J6qpaLjwOdyI1iSK2V6T0OWghKW5Z6/fMWa3E7yu
-	 MuKtgXr1puIYma8qShZCACdN5F2joCprrHMVcCbmauz7E2brQpI7HC9yjm1FXOEEnq
-	 yKt6oOH6MX71Q==
-Date: Fri, 20 Dec 2024 14:18:45 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
- <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
- Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH net-next v9 07/20] net: prepare for non devmem TCP
- memory providers
-Message-ID: <20241220141845.2bf23574@kernel.org>
-In-Reply-To: <20241218003748.796939-8-dw@davidwei.uk>
-References: <20241218003748.796939-1-dw@davidwei.uk>
-	<20241218003748.796939-8-dw@davidwei.uk>
+	s=k20201202; t=1734733215;
+	bh=SRrrMI3Ve0fnBt8s85Tlk4Gjw+jfFYv0pPQ/7O2oxD8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=k9CYA8TQtF/hoEuGL96h9QZVQzCsmV7r+PX7FHVt098nsyXtMB3Anuxf3MIEivaHP
+	 TjmPb2HmVJtnTGSXP5tb7kl0qOEqyLprmQS/r+751Wls/KEZ0nZiekJAQIC+SG2hwa
+	 5/pHpD/Y0ZW/q9j5EbBOen8mnZ8z+Jhyh7/ykvo9LcakHfYt9TaESxDLRXf1pvyKAi
+	 55s37wh2aG1UjRULP/w1S5t4bZyKrBVFjRJjnQE6osXDjTRnux/16PqyxDXZfDStmh
+	 nsbUlfn5KBfM1iCapPMuOp6SG9e7PbbqZDzkeYmB+0FSjmL9thZLc69L785SqOqUtZ
+	 OMrxuhcDcWh+A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE283806656;
+	Fri, 20 Dec 2024 22:20:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] Fix NPE discovered by running bpf kselftest
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173473323379.3037384.4089610194127923528.git-patchwork-notify@kernel.org>
+Date: Fri, 20 Dec 2024 22:20:33 +0000
+References: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
+In-Reply-To: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
+To: Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>
+Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, rsworktech@outlook.com
 
-On Tue, 17 Dec 2024 16:37:33 -0800 David Wei wrote:
-> From: Pavel Begunkov <asml.silence@gmail.com>
-> 
-> There is a good bunch of places in generic paths assuming that the only
-> page pool memory provider is devmem TCP. As we want to reuse the net_iov
-> and provider infrastructure, we need to patch it up and explicitly check
-> the provider type when we branch into devmem TCP code.
-> 
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
+Hello:
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+This series was applied to bpf/bpf.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
+
+On Sat, 30 Nov 2024 21:38:21 +0800 you wrote:
+> I found that bpf kselftest sockhash::test_txmsg_cork_hangs in
+> test_sockmap.c triggers a kernel NULL pointer dereference:
+> 
+> BUG: kernel NULL pointer dereference, address: 0000000000000008
+>  ? __die_body+0x6e/0xb0
+>  ? __die+0x8b/0xa0
+>  ? page_fault_oops+0x358/0x3c0
+>  ? local_clock+0x19/0x30
+>  ? lock_release+0x11b/0x440
+>  ? kernelmode_fixup_or_oops+0x54/0x60
+>  ? __bad_area_nosemaphore+0x4f/0x210
+>  ? mmap_read_unlock+0x13/0x30
+>  ? bad_area_nosemaphore+0x16/0x20
+>  ? do_user_addr_fault+0x6fd/0x740
+>  ? prb_read_valid+0x1d/0x30
+>  ? exc_page_fault+0x55/0xd0
+>  ? asm_exc_page_fault+0x2b/0x30
+>  ? splice_to_socket+0x52e/0x630
+>  ? shmem_file_splice_read+0x2b1/0x310
+>  direct_splice_actor+0x47/0x70
+>  splice_direct_to_actor+0x133/0x300
+>  ? do_splice_direct+0x90/0x90
+>  do_splice_direct+0x64/0x90
+>  ? __ia32_sys_tee+0x30/0x30
+>  do_sendfile+0x214/0x300
+>  __se_sys_sendfile64+0x8e/0xb0
+>  __x64_sys_sendfile64+0x25/0x30
+>  x64_sys_call+0xb82/0x2840
+>  do_syscall_64+0x75/0x110
+>  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/2] skmsg: return copied bytes in sk_msg_memcopy_from_iter
+    https://git.kernel.org/bpf/bpf/c/fdf478d236dc
+  - [net,2/2] tcp_bpf: fix copied value in tcp_bpf_sendmsg
+    https://git.kernel.org/bpf/bpf/c/5153a75ef34b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
