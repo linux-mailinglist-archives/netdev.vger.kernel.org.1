@@ -1,304 +1,99 @@
-Return-Path: <netdev+bounces-153846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C49549F9D42
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 00:47:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D27B09F9D49
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 00:52:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 224D71896AF7
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 23:47:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD42C188BFFD
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 23:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849C82288FC;
-	Fri, 20 Dec 2024 23:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25A621E08B;
+	Fri, 20 Dec 2024 23:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="p5vpkCFX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="HD5GE55A"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8101F2206B5;
-	Fri, 20 Dec 2024 23:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542661A3BAD
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 23:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734738430; cv=none; b=oR4J2OK9SQRkz24a+sF8ka86HOAdEaGOzqge9fXMuxzBC4vw/wIAWsa/fR1epVEDpEvt97W/QJK2LdUTI+S4regUbhaWxPLzVfgtYNVX70uo835DqS62Q8HcFT8tyeXrq7R+QCInOJ02j3Ml1BOaBP+B/NMEKQ5/ADpF3p+4jdY=
+	t=1734738734; cv=none; b=eNMurS/DWv+QvHTKYLPF2aZsjFo2OShtlKY2V0Si0+AFo9pJfUkZID7+bQWcgFvMcs+bukkvoya/WQmcA2qwsCpJIZ1CFpxrPZj61/WwuaghV0V3qC4GGBYLO6MCAqq8ZRIFC8HLuHL7ZiRgNjJn5bMsjNFaw2Rv3VONCxEwltQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734738430; c=relaxed/simple;
-	bh=Z/LdRIvY620pygs5zgVRdsJFWIkHF6hgs+XnHWEMtq0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YUVKs2SI14WEZ1tiDDn13iJNLhYDloJ+w3YgIAuiE62BK8OM2FgQ4hlhbbggF28wUmAz6WZrTHOOIryB22cxpCWzcsIsF7O6NQgikH8EfbzJupJCUm6CIi6TvxpfPPwAD95K6wWrr9V45BMY/U2+PPFQXRcAobXJExK38jfGRyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=p5vpkCFX; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+	s=arc-20240116; t=1734738734; c=relaxed/simple;
+	bh=ocSwRrEewH8Adfk/sPj+qADI82/ipq2sXjmivI+Q8ig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZwfPZFA54VW/JOJX1vvXKTCiRiy/+/B9Z5ntf/3gSpBCPqm7NCt5FqsncYyvcV0FiwXEYeF9pl0++bMzGhxz+QVPtfQEKN0qfwjJDhFj/pkZ4yF+EfSK9DxoxOlAb4nd0P3e1bRDaA5zSAzztU0Ln1F3NWBKsIuTo+mJmD5ukHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=HD5GE55A; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=FEbnGn9GnSTZj0GETED4Of/KjHNRULwfIHoHmgRf7UE=; b=p5vpkCFXLFVhc72GEwHDQhnEXM
-	4NldN36R9N/Nkfnu7N+efS2C1J1iLpslsk/tWgrIFeYWlC2rCIwy8lrRfPnzTNME9fTDvsjyzFu0D
-	3D7a2PnXPUbHl0kP48bF4NhFNmZZlmA6n+j62IOu9uyHmauSr4f86R27sdIfwuet4Fa0uBGOaNHQj
-	pQ9odJiAeT25KI0ZTFtu3tPXtcSaN7uB7p2Jgii0sQ0P/s+aV/M18CdKrYiuyXAASDu/52EeN2Wb6
-	T0M1GFBJpdaCd7OzGmbJVmwkI5PmBuUCg4EPYrjTTTUwrVq3l7OlLWfd1TXOMmq4JmmWK3LtVIsxv
-	8cXt1HHg==;
-Received: from 226.206.1.85.dynamic.cust.swisscom.net ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ocSwRrEewH8Adfk/sPj+qADI82/ipq2sXjmivI+Q8ig=; t=1734738733; x=1735602733; 
+	b=HD5GE55AXsgwEldw9JaPCo0lf5UaK4c+iMPijhfRO9thGHxjU8kqt/MLg1b5QjuNoM8WI0wkdnK
+	o0VNsy9Og821EugSK2H0aYFat0skBiubfL5ZHumdKyLc3ph0ujTPH/fbM6VR/08NjkrN+Jro5nUcM
+	2hzdkXRY/DvmPr0lBZgxOkSqhRL7hyx4CM3dOEH7sNOoE9U8RLIELA2lD8aKACUah9F0NpTYcLdaK
+	cxRs8wL0h+EVlJCylGFLpfwp9IjMn6v/CQXksYxA8BgxprQe7wYNAW97XmDsybvow7Rqh6vm7Eu79
+	RNpjsjtQ5KD88xs5Ausxm2qlsqxexRGBqfSQ==;
+Received: from mail-oa1-f43.google.com ([209.85.160.43]:58635)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tOmhw-000ISw-Ct; Sat, 21 Dec 2024 00:47:00 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: martin.lau@linux.dev
-Cc: razor@blackwall.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH bpf-next v2 3/3] selftests/bpf: Extend netkit tests to validate set {head,tail}room
-Date: Sat, 21 Dec 2024 00:46:58 +0100
-Message-ID: <20241220234658.490686-3-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241220234658.490686-1-daniel@iogearbox.net>
-References: <20241220234658.490686-1-daniel@iogearbox.net>
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tOmmx-0008A6-Ta
+	for netdev@vger.kernel.org; Fri, 20 Dec 2024 15:52:12 -0800
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-29fad34bb62so1155166fac.1
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 15:52:11 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV5Ze1aKP732g9GMJOp1JZTxx3lrffTjeCcXeJzq4gGocjgK2CLCWabcUTJkUcCJpYhACgjt3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfSs0C+kaTX5Db45T4/P1JlBccOvgwHtEwpHbihVNkb0XDf6Fc
+	3nj1nuewof7wQfkAz1DpnE51xeOrfPjvmtOz1XVdrgmTfM6ho8TuJ6R9gRd9+XBglDR3VPU09Gd
+	7i+GVwKB3xQhlwcdsTv14gWuQ104=
+X-Google-Smtp-Source: AGHT+IHPFCkz9iH3n1oJzmgZXGywJTkkkg0pIUygRp+h9hJBHaF8bVN9DT1S8rM2/rKEbPcz/Dgzotuj8yOL2cUgDs0=
+X-Received: by 2002:a05:6871:a585:b0:2a3:d9b3:3d02 with SMTP id
+ 586e51a60fabf-2a7fb566179mr2530213fac.40.1734738731378; Fri, 20 Dec 2024
+ 15:52:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27493/Fri Dec 20 10:46:49 2024)
+References: <20241217000626.2958-1-ouster@cs.stanford.edu> <20241217000626.2958-2-ouster@cs.stanford.edu>
+ <20241218174345.453907db@kernel.org> <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
+ <20241219174109.198f7094@kernel.org> <CAGXJAmyW2Mnz1hwvTo7PKsXLVJO6dy_TK-ZtDW1E-Lrds6o+WA@mail.gmail.com>
+ <20241220113150.26fc7b8f@kernel.org> <f1a91e78-8187-458e-942c-880b8792aa6d@app.fastmail.com>
+ <CAGXJAmw6XpNoAt=tTPACsJVjPD+i9wwnouifk0ym5vDb-xf6MQ@mail.gmail.com>
+In-Reply-To: <CAGXJAmw6XpNoAt=tTPACsJVjPD+i9wwnouifk0ym5vDb-xf6MQ@mail.gmail.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Fri, 20 Dec 2024 15:51:36 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmxaCcbJy5cygga13WegYTMp-LeD3KCdBYE24Eow=qoZDg@mail.gmail.com>
+Message-ID: <CAGXJAmxaCcbJy5cygga13WegYTMp-LeD3KCdBYE24Eow=qoZDg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API for Homa
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: 0.8
+X-Spam-Level: 
+X-Scan-Signature: 58355bea2820b4cf9b9c8322cdf0b49d
 
-Extend the netkit selftests to specify and validate the {head,tail}room
-on the netdevice:
+On Fri, Dec 20, 2024 at 3:42=E2=80=AFPM John Ousterhout <ouster@cs.stanford=
+.edu> wrote:
+>
+> I hadn't considered this, but the buffering mechanism prevents the
+> same socket from being shared across processes.
 
-  # ./vmtest.sh -- ./test_progs -t netkit
-  [...]
-  ./test_progs -t netkit
-  [    1.174147] bpf_testmod: loading out-of-tree module taints kernel.
-  [    1.174585] bpf_testmod: module verification failed: signature and/or required key missing - tainting kernel
-  [    1.422307] tsc: Refined TSC clocksource calibration: 3407.983 MHz
-  [    1.424511] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x311fc3e5084, max_idle_ns: 440795359833 ns
-  [    1.428092] clocksource: Switched to clocksource tsc
-  #363     tc_netkit_basic:OK
-  #364     tc_netkit_device:OK
-  #365     tc_netkit_multi_links:OK
-  #366     tc_netkit_multi_opts:OK
-  #367     tc_netkit_neigh_links:OK
-  #368     tc_netkit_pkt_type:OK
-  #369     tc_netkit_scrub:OK
-  Summary: 7/0 PASSED, 0 SKIPPED, 0 FAILED
+It just occurred to me that a Homa socket should be sharable by
+multiple processes as long as the buffer region is also shared at the
+same virtual address in each process.
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
----
-  v2:
-    - Rework to pass flags to create_netkit
-
- .../selftests/bpf/prog_tests/tc_netkit.c      | 49 ++++++++++++-------
- .../selftests/bpf/progs/test_tc_link.c        | 15 ++++++
- 2 files changed, 46 insertions(+), 18 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/tc_netkit.c b/tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-index 151a4210028f..2461d183dee5 100644
---- a/tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-@@ -14,10 +14,16 @@
- #include "netlink_helpers.h"
- #include "tc_helpers.h"
- 
-+#define NETKIT_HEADROOM	32
-+#define NETKIT_TAILROOM	8
-+
- #define MARK		42
- #define PRIO		0xeb9f
- #define ICMP_ECHO	8
- 
-+#define FLAG_ADJUST_ROOM (1 << 0)
-+#define FLAG_SAME_NETNS  (1 << 1)
-+
- struct icmphdr {
- 	__u8		type;
- 	__u8		code;
-@@ -35,7 +41,7 @@ struct iplink_req {
- };
- 
- static int create_netkit(int mode, int policy, int peer_policy, int *ifindex,
--			 bool same_netns, int scrub, int peer_scrub)
-+			 int scrub, int peer_scrub, __u32 flags)
- {
- 	struct rtnl_handle rth = { .fd = -1 };
- 	struct iplink_req req = {};
-@@ -63,6 +69,10 @@ static int create_netkit(int mode, int policy, int peer_policy, int *ifindex,
- 	addattr32(&req.n, sizeof(req), IFLA_NETKIT_SCRUB, scrub);
- 	addattr32(&req.n, sizeof(req), IFLA_NETKIT_PEER_SCRUB, peer_scrub);
- 	addattr32(&req.n, sizeof(req), IFLA_NETKIT_MODE, mode);
-+	if (flags & FLAG_ADJUST_ROOM) {
-+		addattr16(&req.n, sizeof(req), IFLA_NETKIT_HEADROOM, NETKIT_HEADROOM);
-+		addattr16(&req.n, sizeof(req), IFLA_NETKIT_TAILROOM, NETKIT_TAILROOM);
-+	}
- 	addattr_nest_end(&req.n, data);
- 	addattr_nest_end(&req.n, linkinfo);
- 
-@@ -87,7 +97,7 @@ static int create_netkit(int mode, int policy, int peer_policy, int *ifindex,
- 				 " addr ee:ff:bb:cc:aa:dd"),
- 				 "set hwaddress");
- 	}
--	if (same_netns) {
-+	if (flags & FLAG_SAME_NETNS) {
- 		ASSERT_OK(system("ip link set dev " netkit_peer " up"),
- 				 "up peer");
- 		ASSERT_OK(system("ip addr add dev " netkit_peer " 10.0.0.2/24"),
-@@ -184,8 +194,8 @@ void serial_test_tc_netkit_basic(void)
- 	int err, ifindex;
- 
- 	err = create_netkit(NETKIT_L2, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false, NETKIT_SCRUB_DEFAULT,
--			    NETKIT_SCRUB_DEFAULT);
-+			    &ifindex, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT, 0);
- 	if (err)
- 		return;
- 
-@@ -299,8 +309,8 @@ static void serial_test_tc_netkit_multi_links_target(int mode, int target)
- 	int err, ifindex;
- 
- 	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false, NETKIT_SCRUB_DEFAULT,
--			    NETKIT_SCRUB_DEFAULT);
-+			    &ifindex, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT, 0);
- 	if (err)
- 		return;
- 
-@@ -428,8 +438,8 @@ static void serial_test_tc_netkit_multi_opts_target(int mode, int target)
- 	int err, ifindex;
- 
- 	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false, NETKIT_SCRUB_DEFAULT,
--			    NETKIT_SCRUB_DEFAULT);
-+			    &ifindex, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT, 0);
- 	if (err)
- 		return;
- 
-@@ -543,8 +553,8 @@ void serial_test_tc_netkit_device(void)
- 	int err, ifindex, ifindex2;
- 
- 	err = create_netkit(NETKIT_L3, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, true, NETKIT_SCRUB_DEFAULT,
--			    NETKIT_SCRUB_DEFAULT);
-+			    &ifindex, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT, FLAG_SAME_NETNS);
- 	if (err)
- 		return;
- 
-@@ -655,8 +665,8 @@ static void serial_test_tc_netkit_neigh_links_target(int mode, int target)
- 	int err, ifindex;
- 
- 	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false, NETKIT_SCRUB_DEFAULT,
--			    NETKIT_SCRUB_DEFAULT);
-+			    &ifindex, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT, 0);
- 	if (err)
- 		return;
- 
-@@ -733,8 +743,8 @@ static void serial_test_tc_netkit_pkt_type_mode(int mode)
- 	struct bpf_link *link;
- 
- 	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, true, NETKIT_SCRUB_DEFAULT,
--			    NETKIT_SCRUB_DEFAULT);
-+			    &ifindex, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT, FLAG_SAME_NETNS);
- 	if (err)
- 		return;
- 
-@@ -799,7 +809,7 @@ void serial_test_tc_netkit_pkt_type(void)
- 	serial_test_tc_netkit_pkt_type_mode(NETKIT_L3);
- }
- 
--static void serial_test_tc_netkit_scrub_type(int scrub)
-+static void serial_test_tc_netkit_scrub_type(int scrub, bool room)
- {
- 	LIBBPF_OPTS(bpf_netkit_opts, optl);
- 	struct test_tc_link *skel;
-@@ -807,7 +817,8 @@ static void serial_test_tc_netkit_scrub_type(int scrub)
- 	int err, ifindex;
- 
- 	err = create_netkit(NETKIT_L2, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false, scrub, scrub);
-+			    &ifindex, scrub, scrub,
-+			    room ? FLAG_ADJUST_ROOM : 0);
- 	if (err)
- 		return;
- 
-@@ -842,6 +853,8 @@ static void serial_test_tc_netkit_scrub_type(int scrub)
- 	ASSERT_EQ(skel->bss->seen_tc8, true, "seen_tc8");
- 	ASSERT_EQ(skel->bss->mark, scrub == NETKIT_SCRUB_NONE ? MARK : 0, "mark");
- 	ASSERT_EQ(skel->bss->prio, scrub == NETKIT_SCRUB_NONE ? PRIO : 0, "prio");
-+	ASSERT_EQ(skel->bss->headroom, room ? NETKIT_HEADROOM : 0, "headroom");
-+	ASSERT_EQ(skel->bss->tailroom, room ? NETKIT_TAILROOM : 0, "tailroom");
- cleanup:
- 	test_tc_link__destroy(skel);
- 
-@@ -852,6 +865,6 @@ static void serial_test_tc_netkit_scrub_type(int scrub)
- 
- void serial_test_tc_netkit_scrub(void)
- {
--	serial_test_tc_netkit_scrub_type(NETKIT_SCRUB_DEFAULT);
--	serial_test_tc_netkit_scrub_type(NETKIT_SCRUB_NONE);
-+	serial_test_tc_netkit_scrub_type(NETKIT_SCRUB_DEFAULT, false);
-+	serial_test_tc_netkit_scrub_type(NETKIT_SCRUB_NONE, true);
- }
-diff --git a/tools/testing/selftests/bpf/progs/test_tc_link.c b/tools/testing/selftests/bpf/progs/test_tc_link.c
-index 10d825928499..630f12e51b07 100644
---- a/tools/testing/selftests/bpf/progs/test_tc_link.c
-+++ b/tools/testing/selftests/bpf/progs/test_tc_link.c
-@@ -8,6 +8,7 @@
- #include <linux/if_packet.h>
- #include <bpf/bpf_endian.h>
- #include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_core_read.h>
- 
- char LICENSE[] SEC("license") = "GPL";
- 
-@@ -27,6 +28,7 @@ bool seen_host;
- bool seen_mcast;
- 
- int mark, prio;
-+unsigned short headroom, tailroom;
- 
- SEC("tc/ingress")
- int tc1(struct __sk_buff *skb)
-@@ -104,11 +106,24 @@ int tc7(struct __sk_buff *skb)
- 	return TCX_PASS;
- }
- 
-+struct sk_buff {
-+	struct net_device *dev;
-+};
-+
-+struct net_device {
-+	unsigned short needed_headroom;
-+	unsigned short needed_tailroom;
-+};
-+
- SEC("tc/egress")
- int tc8(struct __sk_buff *skb)
- {
-+	struct net_device *dev = BPF_CORE_READ((struct sk_buff *)skb, dev);
-+
- 	seen_tc8 = true;
- 	mark = skb->mark;
- 	prio = skb->priority;
-+	headroom = BPF_CORE_READ(dev, needed_headroom);
-+	tailroom = BPF_CORE_READ(dev, needed_tailroom);
- 	return TCX_PASS;
- }
--- 
-2.43.0
-
+-John-
 
