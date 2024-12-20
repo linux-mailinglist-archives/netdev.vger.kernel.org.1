@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-153566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5AC09F8A8A
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 04:23:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472F59F8A91
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 04:26:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C9CA7A2272
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 03:23:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FD751882EA9
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 03:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E134A26ADD;
-	Fri, 20 Dec 2024 03:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD1B2AD2A;
+	Fri, 20 Dec 2024 03:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YlnyQmbz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O2llIR5q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90171CD0C;
-	Fri, 20 Dec 2024 03:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84105800;
+	Fri, 20 Dec 2024 03:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734665005; cv=none; b=QG7n4OLWRAti9bJp5FXAFp6QyZRKmofoUYK79xuOV6j39JJP56pgyA7yjMzowiW0OAJtSERQPCsIqMWERBc6v5NHOn7ESMAEBRzGyaNzy0yeJNn2YHyM3NmECqDDrVKzJfxpC+lKHvDMCTDFYQRu72S5G9tcSi5Hgv++dlVegLE=
+	t=1734665192; cv=none; b=IGWDFoLUONRJvet0K8iH37ftqsLpfDBXFKSv76REk//tZzpm1mlPeMN4YrC95DBQDzbklYykmCilio3HqnF9qLe/lZolUqZ9P1m16BASpWkTnMvdfhhMKtJaRQ8C+fMS5An5t9/QUcc5uu58CvqEkSmfW1KI/BBQZkbhXwTPuw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734665005; c=relaxed/simple;
-	bh=D5o1KS1ZXYqDexW5gR7ofSa6ubikoY1hKDDLGKr32/s=;
+	s=arc-20240116; t=1734665192; c=relaxed/simple;
+	bh=poHXdx2pVMv0xfr2di/Ho1i9OQ0pVCRclqHkoaApryk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tjs1MshcMYmI5OKdw6Q4letLEjD2BW84LUXMdMf06spKX37uBuPdLnZ5v6hM2GsaJ13oXK5vZNNZqAh2rGodt8d+lKA0CCCX9amt7zYmkaCgOporoSGGp1q76+EB7leHOhBV2g6vf1rL+ymIHI0rKb13ADP9+H8DwA1VVwRKMTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YlnyQmbz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96D23C4CECE;
-	Fri, 20 Dec 2024 03:23:24 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Mahwvb97c27HKy/foNjZgidELAi+i1L71Kc50keglzcHOkAd02i6I9QBidrvd+nSKAOurqGlmxZhH5YVgLZ2LRDviOyTZ52cLIsM3/XApRv9zG+bi4SfecAx4vBRabGFB+BZugly8iQr1rDQZ/T6Ow4ogDLZxu8ZXS1bLH44RNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O2llIR5q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88491C4CECE;
+	Fri, 20 Dec 2024 03:26:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734665005;
-	bh=D5o1KS1ZXYqDexW5gR7ofSa6ubikoY1hKDDLGKr32/s=;
+	s=k20201202; t=1734665192;
+	bh=poHXdx2pVMv0xfr2di/Ho1i9OQ0pVCRclqHkoaApryk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YlnyQmbzIr16276pVP9oCaRdFS4pBR0bVA2Fq0taAD9IFXDL7wDAjs5MLuFv8ZI5b
-	 f5XHr2RhFPBUf55NH3we4J7OJEkPGQaIRoOWM0IoxqH7Rzfg5N40t9AsP+RypD27do
-	 6EnzLuC6rqO3ahAEdakcbSNKwIlkuSmANmmg8TPDe9Wh81H0QHywR4Ppmu9Z1Ep4/v
-	 dQqj4hv3ih4zugwTC2bFdVjmXYcHNaxj6UzkYfLfbCYJsJYlUKaEIk9SaVelMj9mT3
-	 FA3O3U01P11Zr5G9Ix3ZX4KfA2sYcnq6kFVaPH0iNDaePvjaV5D61uL0e9pXwdm9oq
-	 paCn0D0GipUUg==
-Date: Thu, 19 Dec 2024 19:23:23 -0800
+	b=O2llIR5q06LU1M15Xtyi2bxYOtPs+/z//z+cqHHVb/pUlrgPxtQymaGSHwMlye1+b
+	 FLaN4WQgGQSt2InhGxrK9dyjd9wlAEX/zldBTDwyw9/vWWu2s34MYQXx61xYNgRZbQ
+	 PNS/LNk7LyiBtagyFwmS67ytSBWP4+iVNw4PGFgHjMbv8D5UDrGeBJXIGiCu0RAfnd
+	 CbtLK7cX12rVmUMyvuiPpaesPr8tzCo8k8QEMMk0NtaOTyGfn8TzsHmXFrEqTAxymA
+	 5n93XptmC0/dlgypdjF+pcxVTd/zEnVkOUNs3IvsS2WBJJhKFMPIZMWdQglRFmvryl
+	 qQknyAvpBqByQ==
+Date: Thu, 19 Dec 2024 19:26:30 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
- <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
- <konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
- Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>, Abhijit
- Ayarekar <aayarekar@marvell.com>, Satananda Burla <sburla@marvell.com>
-Subject: Re: [PATCH net v3 2/4] octeon_ep: remove firmware stats fetch in
- ndo_get_stats64
-Message-ID: <20241219192323.4a083d37@kernel.org>
-In-Reply-To: <20241218115111.2407958-3-srasheed@marvell.com>
-References: <20241218115111.2407958-1-srasheed@marvell.com>
-	<20241218115111.2407958-3-srasheed@marvell.com>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <sgoutham@marvell.com>, <gakula@marvell.com>, <lcherian@marvell.com>,
+ <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+ <andrew+netdev@lunn.ch>, <kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [net-next PATCH v6 5/6] octeontx2-af: CN20K mbox implementation
+ for AF's VF
+Message-ID: <20241219192630.684eae48@kernel.org>
+In-Reply-To: <20241218145938.3301279-6-saikrishnag@marvell.com>
+References: <20241218145938.3301279-1-saikrishnag@marvell.com>
+	<20241218145938.3301279-6-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,13 +64,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 18 Dec 2024 03:51:09 -0800 Shinas Rasheed wrote:
-> The per queue stats are available already and are retrieved
-> from register reads during ndo_get_stats64. The firmware stats
-> fetch call that happens in ndo_get_stats64() is currently not
-> required
+On Wed, 18 Dec 2024 20:29:37 +0530 Sai Krishna wrote:
+> This patch implements the CN20k MBOX communication between AF and
+> AF's VFs. This implementation uses separate trigger interrupts
+> for request, response messages against using trigger message data in CN10K.
 
-Because they are just additional error stats?
-No longer reporting errors could cause a regression for monitoring
-systems.
+clang says:
+
+drivers/net/ethernet/marvell/octeontx2/af/rvu.c:2993:47: warning: arithmetic between different enumeration types ('enum rvu_af_int_vec_e' and 'enum rvu_pf_int_vec_e') [-Wenum-enum-conversion]
+ 2993 |         return (pfvf->msix.max >= RVU_AF_INT_VEC_CNT + RVU_PF_INT_VEC_CNT) &&
+      |                                   ~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~
+-- 
+pw-bot: cr
 
