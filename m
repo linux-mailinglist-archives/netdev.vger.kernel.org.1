@@ -1,277 +1,118 @@
-Return-Path: <netdev+bounces-153642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B349F8EEA
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 10:26:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14E7B9F8F06
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 10:32:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4F0A1886FF6
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 09:26:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 181E01897240
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 09:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0D51A9B25;
-	Fri, 20 Dec 2024 09:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A761BD9C5;
+	Fri, 20 Dec 2024 09:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="hrLLs+kA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GYQ2+DvP"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7021A0732;
-	Fri, 20 Dec 2024 09:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356E31BD004;
+	Fri, 20 Dec 2024 09:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734686807; cv=none; b=g3XS5yxcp+ZXyHXK8ek428bAL4goW8wycp3vHJY6hTorXywG/YVri+9K1srMB7ie+YaZI3Qk25D+KeIvw/zBLOqK2w+tbvGPvfubF1zG0Q0dKQXRH0/teGivcRpAPdBeGfnwG/jR+NbkPV0MpoqTZkHMd/5r/KCk7nxJvkgDBUI=
+	t=1734687121; cv=none; b=j5KWITf7+Xyy2rSaQKHew6zum0/bRBrArVaiv8LWG7VuDcSjkzaGABOy4oPA2RZMa3ocRS/scazPLlxkbDICsiZ72dTWUFlRy+LxpHtLnm9jUsoMNgGEBD6ELXDa869zYIqcY81aT+TAqHWL49+6OoVvkPYkMoaB0RfFqUQ+/nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734686807; c=relaxed/simple;
-	bh=hFhVAs16viyiBQ+X5cyxxDABiVoBrI6P7FF//bs0B4A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bUYj06XQ375Z6yD2mOY/MbL9895jEIBMV7sZCK/vud0QKas88WWEFbgIsUPMPelsNnffSdKHDKYOi6HsskeHs/HRHJi7S+4PQAr9LktHbdqcT1Uu5Y9Gmxaflp5cspFTnDsFdUoDd/i8qNKtdpZImr5TXM9xoQTrlvZMW3+EM28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=hrLLs+kA; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4BK9QGIm81275819, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1734686776; bh=hFhVAs16viyiBQ+X5cyxxDABiVoBrI6P7FF//bs0B4A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=hrLLs+kAbgiY6Pe5utXGQV2wjtKUHMVQgI1Iz/EIZKxfAIPCsfxP06G6CSC6QYdzf
-	 kgiX4W8MahCbWnJDfx+6S6luorBcX7yjySRNKV5jEapquzPvhJpjFIfZlOkhMM/6QZ
-	 Iddcqk/kLmXv6dzyiCD0ctj29FBCkrglbmqUeKp4cysjg71J4kcu6iqEnxgxH2Zdqn
-	 nGGYQf8PhIpMElXszQHQbLsKgayNIic7/Z/KG6IeBa3wD1eU+ZFGIkon9MqfngL7PA
-	 Uh3rr/VT5KiUa/QMfGdbu2HVWby32rGkc75Rr4ILDg8xa9h967QldWWEMAXFvtiZSi
-	 RmFRfbq8j4Z0g==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4BK9QGIm81275819
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Dec 2024 17:26:16 +0800
-Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 20 Dec 2024 17:26:17 +0800
-Received: from RTEXH36506.realtek.com.tw (172.21.6.27) by
- RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 20 Dec 2024 17:26:16 +0800
-Received: from fc40.realtek.com.tw (172.22.241.7) by RTEXH36506.realtek.com.tw
- (172.21.6.27) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Fri, 20 Dec 2024 17:26:16 +0800
-From: <hau@realtek.com>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        ChunHao Lin
-	<hau@realtek.com>
-Subject: [PATCH net-next v2] r8169: add support for RTL8125BP rev.b
-Date: Fri, 20 Dec 2024 17:26:10 +0800
-Message-ID: <20241220092610.11699-438-nic_swsd@realtek.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1734687121; c=relaxed/simple;
+	bh=yPM/LW+bfWvt1MyA1G9gHVOrAHzvtZWm4cfm+QkEuBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LPw/cqTj1i+iz1qc50qiRnSoAmDu9svn6jhJHNhqDvUn+lPD6nUkXtt7CfH7UEDxmxD0YdqWAVS6wegUdgFpyCspou09VRz97c4AtG18MzEyYQaWdgLYRVq1A2BRv4ozqiwcoR98KvzaM+GDHC1n0cr2LcxT8BhxwChr3LNIFLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GYQ2+DvP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=j7xmBAzEXQnknelxXqChfysQESiy2Y/n5d30YkxfEyA=; b=GYQ2+DvPrPp8l/1Hn10bbrbZwd
+	Wib8faxYtamL+1dvd/5aqZjYClnZWU0GeuziU1W3FpwRneEifLsZAOqvTG8WEu7l4GkGm6V7+KnBU
+	t0NPbMgk807MkDjumlKfXkbTTvVQgBjjAX7Z4AB9hx6Ktj08bQZjNtELQe5ptoY3Rn1I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tOZMN-001wKq-Fc; Fri, 20 Dec 2024 10:31:51 +0100
+Date: Fri, 20 Dec 2024 10:31:51 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>,
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/2] net: renesas: rswitch: use per-port irq
+ handlers
+Message-ID: <7c8c1baf-f398-4439-b974-b7d1425942b1@lunn.ch>
+References: <20241220041659.2985492-1-nikita.yoush@cogentembedded.com>
+ <20241220041659.2985492-2-nikita.yoush@cogentembedded.com>
+ <CAMuHMdXV-2bdU9Cmk_VHTJ=M3Afg5aTfY=_k=p6v1igzpV5kBA@mail.gmail.com>
+ <7b009b7f-0406-4dc1-80b3-79927d6143f0@cogentembedded.com>
+ <TYCPR01MB1104022CD76BDE941D1C22536D8072@TYCPR01MB11040.jpnprd01.prod.outlook.com>
+ <01c3755a-d57c-4da8-9505-551663a694c7@cogentembedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-KSE-ServerInfo: RTEXMBS02.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01c3755a-d57c-4da8-9505-551663a694c7@cogentembedded.com>
 
-From: ChunHao Lin <hau@realtek.com>
+On Fri, Dec 20, 2024 at 02:23:31PM +0500, Nikita Yushchenko wrote:
+> > > > Sorry, but I can't find where this property is documented?
+> > > 
+> > > I will add this.
+> > 
+> > Device tree properties should be a hardware description. However,
+> > about the "irq-index", it seems a software configuration. So, even if we would
+> > like to submit such a patch to add the property, it will be rejected.
+> 
+> Hmm...
+> 
+> Indeed it is a software configuration.
+> 
+> I was not aware of such a rule.
+> 
+> I believe there shall be plenty of situations when a per-hardware-node
+> software configuration is desired. What method do other use, if not device
+> tree?
+> 
+> > Also, even if we can add a new device tree property, we should keep backward compatible.
+> > However, this patch seems to break a backward compatibility.
+> 
+> It does not.
+> If this new property is not defined, then it will default to 0, which will
+> result exactly into previous behavior.
 
-Add support for RTL8125BP rev.b. Its XID is 0x689. This chip supports
-DASH and its dash type is "RTL_DASH_25_BP".
+This is where the DT binding patch would of been useful, because you
+would of stated that in the binding...
 
-Signed-off-by: ChunHao Lin <hau@realtek.com>
----
-v2:
-- under rtl_hw_config(), add new entry for rtl8125bp
----
- drivers/net/ethernet/realtek/r8169.h          |  1 +
- drivers/net/ethernet/realtek/r8169_main.c     | 35 +++++++++++++++++++
- .../net/ethernet/realtek/r8169_phy_config.c   | 23 ++++++++++++
- 3 files changed, 59 insertions(+)
+Backwards compatibility is something reviewers always look for, so it
+is good to make it obvious that it has been considered.
 
-diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
-index e0817f2a311a..7a194a8ab989 100644
---- a/drivers/net/ethernet/realtek/r8169.h
-+++ b/drivers/net/ethernet/realtek/r8169.h
-@@ -70,6 +70,7 @@ enum mac_version {
- 	RTL_GIGA_MAC_VER_63,
- 	RTL_GIGA_MAC_VER_64,
- 	RTL_GIGA_MAC_VER_65,
-+	RTL_GIGA_MAC_VER_66,
- 	RTL_GIGA_MAC_VER_70,
- 	RTL_GIGA_MAC_VER_71,
- 	RTL_GIGA_MAC_NONE
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 5724f650f9c6..425b1d7291b8 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -58,6 +58,7 @@
- #define FIRMWARE_8125B_2	"rtl_nic/rtl8125b-2.fw"
- #define FIRMWARE_8125D_1	"rtl_nic/rtl8125d-1.fw"
- #define FIRMWARE_8125D_2	"rtl_nic/rtl8125d-2.fw"
-+#define FIRMWARE_8125BP_2	"rtl_nic/rtl8125bp-2.fw"
- #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
- #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
- 
-@@ -142,6 +143,7 @@ static const struct {
- 	[RTL_GIGA_MAC_VER_63] = {"RTL8125B",		FIRMWARE_8125B_2},
- 	[RTL_GIGA_MAC_VER_64] = {"RTL8125D",		FIRMWARE_8125D_1},
- 	[RTL_GIGA_MAC_VER_65] = {"RTL8125D",		FIRMWARE_8125D_2},
-+	[RTL_GIGA_MAC_VER_66] = {"RTL8125BP",		FIRMWARE_8125BP_2},
- 	[RTL_GIGA_MAC_VER_70] = {"RTL8126A",		FIRMWARE_8126A_2},
- 	[RTL_GIGA_MAC_VER_71] = {"RTL8126A",		FIRMWARE_8126A_3},
- };
-@@ -632,6 +634,7 @@ enum rtl_dash_type {
- 	RTL_DASH_NONE,
- 	RTL_DASH_DP,
- 	RTL_DASH_EP,
-+	RTL_DASH_25_BP,
- };
- 
- struct rtl8169_private {
-@@ -1361,10 +1364,19 @@ static void rtl8168ep_driver_start(struct rtl8169_private *tp)
- 		rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
- }
- 
-+static void rtl8125bp_driver_start(struct rtl8169_private *tp)
-+{
-+	r8168ep_ocp_write(tp, 0x01, 0x14, OOB_CMD_DRIVER_START);
-+	r8168ep_ocp_write(tp, 0x01, 0x18, 0x00);
-+	r8168ep_ocp_write(tp, 0x01, 0x10, 0x01);
-+}
-+
- static void rtl8168_driver_start(struct rtl8169_private *tp)
- {
- 	if (tp->dash_type == RTL_DASH_DP)
- 		rtl8168dp_driver_start(tp);
-+	else if (tp->dash_type == RTL_DASH_25_BP)
-+		rtl8125bp_driver_start(tp);
- 	else
- 		rtl8168ep_driver_start(tp);
- }
-@@ -1385,10 +1397,19 @@ static void rtl8168ep_driver_stop(struct rtl8169_private *tp)
- 		rtl_loop_wait_low(tp, &rtl_ep_ocp_read_cond, 10000, 10);
- }
- 
-+static void rtl8125bp_driver_stop(struct rtl8169_private *tp)
-+{
-+	r8168ep_ocp_write(tp, 0x01, 0x14, OOB_CMD_DRIVER_STOP);
-+	r8168ep_ocp_write(tp, 0x01, 0x18, 0x00);
-+	r8168ep_ocp_write(tp, 0x01, 0x10, 0x01);
-+}
-+
- static void rtl8168_driver_stop(struct rtl8169_private *tp)
- {
- 	if (tp->dash_type == RTL_DASH_DP)
- 		rtl8168dp_driver_stop(tp);
-+	else if (tp->dash_type == RTL_DASH_25_BP)
-+		rtl8125bp_driver_stop(tp);
- 	else
- 		rtl8168ep_driver_stop(tp);
- }
-@@ -1411,6 +1432,7 @@ static bool rtl_dash_is_enabled(struct rtl8169_private *tp)
- 	case RTL_DASH_DP:
- 		return r8168dp_check_dash(tp);
- 	case RTL_DASH_EP:
-+	case RTL_DASH_25_BP:
- 		return r8168ep_check_dash(tp);
- 	default:
- 		return false;
-@@ -1425,6 +1447,8 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
- 		return RTL_DASH_DP;
- 	case RTL_GIGA_MAC_VER_51 ... RTL_GIGA_MAC_VER_53:
- 		return RTL_DASH_EP;
-+	case RTL_GIGA_MAC_VER_66:
-+		return RTL_DASH_25_BP;
- 	default:
- 		return RTL_DASH_NONE;
- 	}
-@@ -2261,6 +2285,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
- 		{ 0x7cf, 0x64a,	RTL_GIGA_MAC_VER_71 },
- 		{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_70 },
- 
-+		/* 8125BP family. */
-+		{ 0x7cf, 0x681,	RTL_GIGA_MAC_VER_66 },
-+
- 		/* 8125D family. */
- 		{ 0x7cf, 0x689,	RTL_GIGA_MAC_VER_65 },
- 		{ 0x7cf, 0x688,	RTL_GIGA_MAC_VER_64 },
-@@ -3793,6 +3820,12 @@ static void rtl_hw_start_8125d(struct rtl8169_private *tp)
- 	rtl_hw_start_8125_common(tp);
- }
- 
-+static void rtl_hw_start_8125bp(struct rtl8169_private *tp)
-+{
-+	rtl_set_def_aspm_entry_latency(tp);
-+	rtl_hw_start_8125_common(tp);
-+}
-+
- static void rtl_hw_start_8126a(struct rtl8169_private *tp)
- {
- 	rtl_set_def_aspm_entry_latency(tp);
-@@ -3842,6 +3875,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
- 		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
- 		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
- 		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8125d,
-+		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8125bp,
- 		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
- 		[RTL_GIGA_MAC_VER_71] = rtl_hw_start_8126a,
- 	};
-@@ -3861,6 +3895,7 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_61:
- 	case RTL_GIGA_MAC_VER_64:
- 	case RTL_GIGA_MAC_VER_65:
-+	case RTL_GIGA_MAC_VER_66:
- 		for (i = 0xa00; i < 0xb00; i += 4)
- 			RTL_W32(tp, i, 0);
- 		break;
-diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
-index 968c8a2185a4..cf95e579c65d 100644
---- a/drivers/net/ethernet/realtek/r8169_phy_config.c
-+++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-@@ -1102,6 +1102,28 @@ static void rtl8125d_hw_phy_config(struct rtl8169_private *tp,
- 	rtl8125_config_eee_phy(phydev);
- }
- 
-+static void rtl8125bp_hw_phy_config(struct rtl8169_private *tp,
-+				    struct phy_device *phydev)
-+{
-+	r8169_apply_firmware(tp);
-+	rtl8168g_enable_gphy_10m(phydev);
-+
-+	r8168g_phy_param(phydev, 0x8010, 0x0800, 0x0000);
-+
-+	phy_write(phydev, 0x1f, 0x0b87);
-+	phy_write(phydev, 0x16, 0x8088);
-+	phy_modify(phydev, 0x17, 0xff00, 0x9000);
-+	phy_write(phydev, 0x16, 0x808f);
-+	phy_modify(phydev, 0x17, 0xff00, 0x9000);
-+	phy_write(phydev, 0x1f, 0x0000);
-+
-+	r8168g_phy_param(phydev, 0x8174, 0x2000, 0x1800);
-+
-+	rtl8125_legacy_force_mode(phydev);
-+	rtl8168g_disable_aldps(phydev);
-+	rtl8125_config_eee_phy(phydev);
-+}
-+
- static void rtl8126a_hw_phy_config(struct rtl8169_private *tp,
- 				   struct phy_device *phydev)
- {
-@@ -1163,6 +1185,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
- 		[RTL_GIGA_MAC_VER_63] = rtl8125b_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_64] = rtl8125d_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_65] = rtl8125d_hw_phy_config,
-+		[RTL_GIGA_MAC_VER_66] = rtl8125bp_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_70] = rtl8126a_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_71] = rtl8126a_hw_phy_config,
- 	};
--- 
-2.43.0
+Even if it is backwards compatible, lets see if we can think of a way
+to not require the property. Maybe you can explain the hardware in
+more details, and what you are trying to achieve.
 
+	Andrew
 
