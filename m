@@ -1,50 +1,68 @@
-Return-Path: <netdev+bounces-153674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 955E79F92B9
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:00:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D96479F92D2
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:10:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B5707A104B
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:00:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1C461898C59
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABACB2156FE;
-	Fri, 20 Dec 2024 13:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cg6v9eLn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AEFF216E16;
+	Fri, 20 Dec 2024 13:09:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9C42156F3;
-	Fri, 20 Dec 2024 13:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40929215F4E
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 13:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734699618; cv=none; b=eMNLxkKNnk4yXdGhH5HvX6B5XEw1e3dXC+v5wW4o4cDb/bVp7u1mJGBewi4CTp4MEobYFLbK2da/12nsttGOg6ol6XgeD0QTAV7uQ6q1okU4YgqmlKS6vUlaaLmtgA0NVfAIOUOWtI6BKxgP01rsOZ+kg3BQojQ7POV7JpcKYPs=
+	t=1734700149; cv=none; b=LUVr/mKhjFQuSoLfHY/1YFrKve/O/D0fR8CX+d+dJG3+QkauNBmz19gQ+eW7S432nq3HGVs9nfvAEowqOEiaKw8BxMF760bsL0fAO2kOv4f7TwH1uagzARUOM/0z8dN45Nr2vxG4xhkCPYs2CDxE2Hq0ShZ7vJEGvCBdsGxqhfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734699618; c=relaxed/simple;
-	bh=3JQ9ZfN5ioufoK7K0DrG50y58gPQcrUNsg7oXkjbzU8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Jo+dH2ZljAPWvJAinzGd3NItl3Hsvi0NiGxMdYjHCCvdJentxsr5RZsRQmRk5RNADRt8QXjCPryT9XnfRti6bzrlB59+Zw0W7DPAfovAoHOjWGNz5WwjYHq6J3U69ptfBHEJ8k9tgYJm57mEIPLibaOsKHGmiXn+xtU/z/z/nIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cg6v9eLn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFBCDC4CECD;
-	Fri, 20 Dec 2024 13:00:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734699617;
-	bh=3JQ9ZfN5ioufoK7K0DrG50y58gPQcrUNsg7oXkjbzU8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Cg6v9eLnE/rvSiFzFe69ZEJcawLij5y/1Gfi8P8hJ1ox10Ktvk9/zEE7iq00mVEwD
-	 gml2BguUBxb6e72JuGw0ozhHQS4B6EGGtenN2DWFy54SA0W9HK2mgRTHScow9NF2gb
-	 18oTfXsNpo/5u5HYUeuiHdDZTMdb5kTO8KSDhDytZW1EfjfOlBbXSl54mHs8FQkzpr
-	 9TLV6hhq4Bsr4RxD3KVG6MbgetokZOREqcjSEA6ilm4VOCujkgQZZffD/c6pN/wDja
-	 iZWJekDDkpWOBReF+C2F7TifYYDlOFgDQeK52f3ByHxaiD8Wlh+oM1uxeLPaChsOGF
-	 gN5U0H98VoW7A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EC82A3806656;
-	Fri, 20 Dec 2024 13:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1734700149; c=relaxed/simple;
+	bh=jbrWJi/Ozx7YWY6sI5FVsxAwBkIdvKjr6sFzshCz8A4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=H33NZAmIEECgPKZek4kT1btuR6zSlEMAghW2+4yKCYOYIzNmwUiI+/f+35AIgnrGdcM2f5IBwdCskqxbBFBwqHxY7ROqoRBh9j2zJR9s9yZ2m2b5BXrvicpR0avLfKfWgnhEwk6OvjOzcEOhgXVgiMbgrFj/AkYeclQ4Y/TY9tY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOckA-0004Du-4I; Fri, 20 Dec 2024 14:08:38 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOck7-004NZg-3D;
+	Fri, 20 Dec 2024 14:08:36 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOck8-008MjO-2D;
+	Fri, 20 Dec 2024 14:08:36 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net-next v3 0/8] Introduce unified and structured PHY
+Date: Fri, 20 Dec 2024 14:08:27 +0100
+Message-Id: <20241220130836.1993966-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,53 +70,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] gve: various XDP fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173469963470.2895973.2113580557517865563.git-patchwork-notify@kernel.org>
-Date: Fri, 20 Dec 2024 13:00:34 +0000
-References: <20241218133415.3759501-1-pkaligineedi@google.com>
-In-Reply-To: <20241218133415.3759501-1-pkaligineedi@google.com>
-To: Praveen Kaligineedi <pkaligineedi@google.com>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, shailend@google.com,
- willemb@google.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- horms@kernel.org, hramamurthy@google.com, joshwash@google.com,
- ziweixiao@google.com, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello:
+This patch set introduces a unified and well-structured interface for
+reporting PHY statistics. Instead of relying on arbitrary strings in PHY
+drivers, this interface provides a consistent and structured way to
+expose PHY statistics to userspace via ethtool.
 
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+The initial groundwork for this effort was laid by Jakub Kicinski, who
+contributed patches to plumb PHY statistics to drivers and added support
+for structured statistics in ethtool. Building on Jakub's work, I tested
+the implementation with several PHYs, addressed a few issues, and added
+support for statistics in two specific PHY drivers.
 
-On Wed, 18 Dec 2024 05:34:10 -0800 you wrote:
-> From: Joshua Washington <joshwash@google.com>
-> 
-> This patch series contains the following XDP fixes:
->  - clean up XDP tx queue when stopping rings
->  - use RCU synchronization to guard existence of XDP queues
->  - perform XSK TX as part of RX NAPI to fix busy polling
->  - fix XDP allocation issues when non-XDP configurations occur
-> 
-> [...]
+changes are tracked in separate patches.
 
-Here is the summary with links:
-  - [net,1/5] gve: clean XDP queues in gve_tx_stop_ring_gqi
-    https://git.kernel.org/netdev/net/c/6321f5fb70d5
-  - [net,2/5] gve: guard XDP xmit NDO on existence of xdp queues
-    https://git.kernel.org/netdev/net/c/ff7c2dea9dd1
-  - [net,3/5] gve: guard XSK operations on the existence of queues
-    https://git.kernel.org/netdev/net/c/40338d7987d8
-  - [net,4/5] gve: process XSK TX descriptors as part of RX NAPI
-    https://git.kernel.org/netdev/net/c/ba0925c34e0f
-  - [net,5/5] gve: fix XDP allocation path in edge cases
-    https://git.kernel.org/netdev/net/c/de63ac44a527
+Jakub Kicinski (2):
+  net: ethtool: plumb PHY stats to PHY drivers
+  net: ethtool: add support for structured PHY statistics
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Oleksij Rempel (6):
+  ethtool: linkstate: migrate linkstate functions to support multi-PHY
+    setups
+  Documentation: networking: update PHY error counter diagnostics in
+    twisted pair guide
+  net: phy: introduce optional polling interface for PHY statistics
+  ethtool: add helper to prevent invalid statistics exposure to
+    userspace
+  net: phy: dp83td510: add statistics support
+  net: phy: dp83tg720: add statistics support
 
+ .../twisted_pair_layer1_diagnostics.rst       |  39 +++--
+ Documentation/networking/ethtool-netlink.rst  |   1 +
+ drivers/net/phy/dp83td510.c                   | 112 ++++++++++++
+ drivers/net/phy/dp83tg720.c                   | 161 ++++++++++++++++++
+ drivers/net/phy/phy.c                         |  20 +++
+ include/linux/ethtool.h                       |  39 +++++
+ include/linux/phy.h                           | 100 +++++++++++
+ include/uapi/linux/ethtool.h                  |   2 +
+ include/uapi/linux/ethtool_netlink.h          |  14 ++
+ net/ethtool/linkstate.c                       |  25 ++-
+ net/ethtool/netlink.h                         |   1 +
+ net/ethtool/stats.c                           |  54 ++++++
+ net/ethtool/strset.c                          |   5 +
+ 13 files changed, 553 insertions(+), 20 deletions(-)
+
+--
+2.39.5
 
 
