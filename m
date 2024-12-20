@@ -1,211 +1,250 @@
-Return-Path: <netdev+bounces-153590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF3B9F8BC7
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 06:11:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 282839F8BDE
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 06:32:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB74916B23B
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 05:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F29421894FD9
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 05:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE241442F2;
-	Fri, 20 Dec 2024 05:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6113770FE;
+	Fri, 20 Dec 2024 05:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LdVhZE6E"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="a/y/hGBY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71C5139D19;
-	Fri, 20 Dec 2024 05:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1F42594AC;
+	Fri, 20 Dec 2024 05:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734671490; cv=none; b=pGGKSA9SNwnoHA9Ps2Yyy6g8WD84PQgs+Zb/1PdhqhWm+ceN6AAIArXlUBZEUW4b7zk+l4EmjI+uqJvBM9kKZ+f/jWQ2LiUlkXkN4qLN93X1QV1xc1FMz8ljC69sqif764yMXlnn7rc1GSoQGj3n2SUK0wCKpZS0IsYhtq447wg=
+	t=1734672722; cv=none; b=iLDtK9nQyRIT+pp+I7sU8R+v3D+S4+fS3rHuM8+SDt5HS1nNMGseu+0a+MAg5vj30J+OyfS2eTFBFTRDqYFdKRIZhoD2Stjq2Y4H1sch6wxGx14hJtDT+LUeHVMGqSUdULe6sH/hSFNz7JuY8LDPRffCrHSnhdWDa6BasVsHSxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734671490; c=relaxed/simple;
-	bh=OC27o8t86FmqI52rIO1fGT5v2s+ed/TzaM2ahgXOH0M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=payikTThOrJVNtqXDPVhLoxoyqfEbKGgBHsGmov960ICSie+MhbZ5jDe0apjtq5zMAKBLo7POxddujpYTJifFxoybQaL/SKQ7r85SYcHPKCsDw0U7c+UTydb8pn47qQ9MWhlK4hBS5ftLpsirU2Yh8SVCEaCZ+goR5el7pCkcD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LdVhZE6E; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5401fb9fa03so1525158e87.1;
-        Thu, 19 Dec 2024 21:11:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734671487; x=1735276287; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7v+VLAudnzcimduDrszP/4v8bnyy4XN2zkzBwOehlBo=;
-        b=LdVhZE6Eecyb42v4hqF4PT2QWKFiIcrCBh+qXBVdbtZRkBraPRcsVmD6e9csjxo86H
-         NrfeLID/EuvT8WABm0qa1rKJ1eq/oVhpRx4Gp+UnQTjA06Nr0yJ05mK034za+EVPsJ2w
-         5NzQiJub+dQbnKRqkA/1bkVuA56865oAuiL5DCB+KZiNNKVAozSQ9G3Z7FKU+6rhe8QE
-         SiJ3ppmlIZOndFI9gjpDMPDZynwN7PYAFPmjBMbvgFh+T6XyMrimLZKR7lrELJ7hQPN+
-         dY/a1BAoODsP7xmfL9b/eiG8rEI9sCQcPrdYpcswwfs2Rfka5rR501jkGlMPvejvQa/9
-         EeLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734671487; x=1735276287;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7v+VLAudnzcimduDrszP/4v8bnyy4XN2zkzBwOehlBo=;
-        b=jLOx1GdZQ9XwBT08F5vEhTxFcAHI/jzWiKhojhyw8WITj+9+oxwgnBbBbVNPXKZI4P
-         /hwZimh/8r8xrj3Iwf2WNPLnDMOc1VUheCbZGWAucYn0Gv4769+kGICqyk52/ALlTYCd
-         2kuuc1m3J2qhZAMowpOokRLJS4EraqyGOq1JQjoRqcFzkYv/OBIQprCIIHfa1hDjzUfm
-         e062aTzQQD5HqLzRXqGJztYNxQVRDWiMuB7aDtSPJo97Vpvn1ymipmRqMBS2JWFGBoek
-         csgXoc8qQa7SzLbWEpw0A58oThb0bpcCawuY6k37plZ6SXZlxkve1kMCHPfuVzWzj3Px
-         Ai8g==
-X-Forwarded-Encrypted: i=1; AJvYcCU5WPdGp03qC4nCy7HeU03tBqXygiK0RxmDEjcfjQiT72fMTXhAvq3emHolB0Lwi9lwv5adA6BKN+SP@vger.kernel.org, AJvYcCUPusFVHi9CXVYjna/cUu8Ad9Y2woifkveucCQB9Nypxm/0fhYP+kimw3THpyKHX8mEglVb0qKD@vger.kernel.org, AJvYcCUzNejIfjcy/DZiHTY3ovG5ohi0Sx4Y/8i0l/xNq0iCneY79zFe8lP7MF7Cc3yU8TEmNYw2mlDJZAEOclsl@vger.kernel.org, AJvYcCXdPEpnXXRYXA0WNhk4EW1zGwUwCGBCEfIuvuFw62KviL8WnExVKJAyK2+Y02mJSNZTFMhF6ikr5l4/Zg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiI//dpapAEEuWgtkgjBgLsE/l3L0ByfB9vLCEWAyiA0SLPOPq
-	SWfhCFwMom9aydzxVQkrlQUQGx8GBOxbeLmbj++Xk2OLJsBP5UrRt74sakjZMRV213iQfuV8vJ+
-	pqY+VLEXDogeCq7PeKArypnLm6VY=
-X-Gm-Gg: ASbGnctdr+AmCyChLJ8b/adg07J+iiuZWZZJwxdPxrE4HeKvw6wVcvCoaX8LnZxTbEk
-	Tc4Y/x9CuIDc1z3pDDcLxYp1fEO6ya1eVOJP8K7OqdwfI5tBSM5lpQsc36ovrE40oHeW9c3c=
-X-Google-Smtp-Source: AGHT+IEcSNk/G9l5uKdj89SsrYgwwgdTzi9daKQR4IAmTn2NDIwTrCu2iM6XFZh9keWJS6m/wKUJxBLPh3yzSCSfcdA=
-X-Received: by 2002:a19:6a10:0:b0:542:2160:26cf with SMTP id
- 2adb3069b0e04-54221602842mr1433747e87.25.1734671486577; Thu, 19 Dec 2024
- 21:11:26 -0800 (PST)
+	s=arc-20240116; t=1734672722; c=relaxed/simple;
+	bh=rIaL4buy2BToGmcjrQVEZOKEyvI/BSZOYxEO865pEbg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=TfQttq+M54m5na6KBVZbIKZ9jDegl9J3t/rMa6kyujKnNufqkzFjCYUFzjU+ipczXBeHPwsRkq3b6AA2Z+RMP02jSX0LUSJ47AEKqvp+SgOJzwJ0CNp51bxQJfi5imCITWWi2wer4q34EjsjKNIamqmCdbZRhHyJekNBnJNM5qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=a/y/hGBY; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4BK5VSCV009994;
+	Thu, 19 Dec 2024 23:31:28 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1734672688;
+	bh=sIEekh1dcWJLz/wg6VM5yynHoFyG0LGIZRZL+MHvV9I=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=a/y/hGBYuzR6VzGdv2nQEpJrd6NviOFqMOd/51UN2ykjidLnB05z8Yff2oBH3JLJ3
+	 QhMIVw3LZGHxn8jk32C3um0yS2WSi8aTlqEhth4bUKfVskHHPsmqbgG0zVezqau6B6
+	 dTWOsZJmdwu2fwhCJm+SbBA9t2AHvBRL8nTE7XnM=
+Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4BK5VSWw054409;
+	Thu, 19 Dec 2024 23:31:28 -0600
+Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 19
+ Dec 2024 23:31:27 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 19 Dec 2024 23:31:27 -0600
+Received: from [10.250.150.168] ([10.250.150.168])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4BK5VKFA112689;
+	Thu, 19 Dec 2024 23:31:21 -0600
+Message-ID: <73bc878e-a323-44ef-b90f-11723ce129e3@ti.com>
+Date: Fri, 20 Dec 2024 11:01:20 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
- <20241216031346.2626805-5-chris.packham@alliedtelesis.co.nz>
- <CAJq09z49uBPPZqDyc3O+4nVppKoKdrJunQnQKBUfQmwzdV+ZFQ@mail.gmail.com>
- <07073382-df51-4064-9802-cdbfcf732523@lunn.ch> <fe34b6b0-01fd-4dc7-a1b4-6c27ad2c9e74@alliedtelesis.co.nz>
-In-Reply-To: <fe34b6b0-01fd-4dc7-a1b4-6c27ad2c9e74@alliedtelesis.co.nz>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Fri, 20 Dec 2024 02:11:15 -0300
-Message-ID: <CAJq09z7GDOmKqmbD5evafSFaQswgSJPU-G+44DtwfidmZMS6sA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] net: mdio: Add RTL9300 MDIO driver
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: Andrew Lunn <andrew@lunn.ch>, lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	tsbogend@alpha.franken.de, hkallweit1@gmail.com, linux@armlinux.org.uk, 
-	markus.stockhausen@gmx.de, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-mips@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] net: ti: Kconfig: Select HSR for ICSSG
+ Driver
+To: Larysa Zaremba <larysa.zaremba@intel.com>,
+        MD Danish Anwar
+	<danishanwar@ti.com>
+CC: <aleksander.lobakin@intel.com>, <lukma@denx.de>, <m-malladi@ti.com>,
+        <diogo.ivo@siemens.com>, <rdunlap@infradead.org>,
+        <schnelle@linux.ibm.com>, <vladimir.oltean@nxp.com>,
+        <horms@kernel.org>, <rogerq@kernel.org>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>
+References: <20241216100044.577489-1-danishanwar@ti.com>
+ <20241216100044.577489-2-danishanwar@ti.com>
+ <Z2L/hwH5pgBV9pSB@lzaremba-mobl.ger.corp.intel.com>
+ <c6254178-6e2a-47e1-ac16-22af5affc8ca@ti.com>
+ <Z2RQ7xj6IwPXsqHO@lzaremba-mobl.ger.corp.intel.com>
+Content-Language: en-US
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <Z2RQ7xj6IwPXsqHO@lzaremba-mobl.ger.corp.intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-> On 19/12/2024 22:40, Andrew Lunn wrote:
-> > On Thu, Dec 19, 2024 at 01:46:41AM -0300, Luiz Angelo Daros de Luca wrote:
-> >> Hello Chris,
-> >>
-> >>> +++ b/drivers/net/mdio/mdio-realtek-rtl.c
-> >> I wonder if the name might be dubious in the future with other realtek
-> >> products with MDIO. Realtek is quite a large company with many
-> >> products. Would a version/model/family/usage in that name help a far
-> >> future reader to identify what this file is about?
-> > Isnt rtl the family name? Or would you prefer mdio-realtek-rtl9300.c?
->
-> Yes my intention was that "rtl" was the family name.
+Hi,
 
-rtl just means realtek. It is the same prefix for a wide range of
-Realtek products (audio, usb, storage, network).
+On 12/19/2024 10:29 PM, Larysa Zaremba wrote:
+> On Thu, Dec 19, 2024 at 10:36:57AM +0530, MD Danish Anwar wrote:
+>>
+>>
+>> On 18/12/24 10:29 pm, Larysa Zaremba wrote:
+>>> On Mon, Dec 16, 2024 at 03:30:41PM +0530, MD Danish Anwar wrote:
+>>>> HSR offloading is supported by ICSSG driver. Select the symbol HSR for
+>>>> TI_ICSSG_PRUETH. Also select NET_SWITCHDEV instead of depending on it to
+>>>> remove recursive dependency.
+>>>>
+>>>
+>>> 2 things:
+>>> 1) The explanation from the cover should have been included in the commit 
+>>>    message.
+>>
+>> I wanted to keep the commit message brief so I provided the actual
+>> errors in cover letter. I will add the logs here as well.
+>>
+> 
+> Commit message has to be as verbose as needed to provide enough context for 
+> whoever needs to explore the code history later.
+>  
 
-> I'm happy to change to rtl9300.
+Sure I will update the commit message.
 
-Even the product number might be confusing. For example, the switch
-rtl8365mb is newer than (and incompatible with) the rtl8366rb. Realtek
-has a library/driver name that could indicate the family (rtl8367b,
-rtl8367c, rtl8367d), but it is not tightly related to model numbers.
-In the DSA case, we simply adopted the first device that was supported
-as the filename, even after that file was expanded to include other
-models. I hope rtl93xx model numbers will be less confusing but it is
-a Realtek decision. With the realtek past cases, if you want to be
-sure it will not be confused with another model in the future, just
-use the model "most significant" to your driver, like
-modio-realtek-rtl9301. Do not expect that a future rtl93xx model will
-be compatible with rtl9300. If rtl9300 does not really mean rtl93??,
-rtl9301 would be, at least, more informative.
+>>> 2) Why not `depends on HSR`?
+>>
+>> Adding `depends on HSR` in `config TI_ICSSG_PRUETH` is not setting HSR.
+>> I have tried below scenarios and only one of them work.
+>>
+>> 1) depends on NET_SWITCHDEV
+>>    depends on HSR
+>>
+>> 	HSR doesn't get set in .config - `# CONFIG_HSR is not set`. Even the
+>> CONFIG_TI_ICSSG_PRUETH also gets unset although this is set to =m in
+>> defconfig. But keeping both as `depends on` makes CONFIG_TI_ICSSG_PRUETH
+>> disabled.
+> 
+> I do not understand your problem with this option, CONFIG_HSR is a visible 
+> option that you can enable manually only then you will be able to successfully 
+> set CONFIG_TI_ICSSG_PRUETH to m/y, this is how the relation with NET_SWITCHDEV 
+> currently works.
+> 
 
-mdio-realtek-rtl9300.c or even mdio-rtl9300.c are just fine, but I
-prefer the former as the common prefix will group different future
-models, even if realtek abandons the rtl prefix.
+The only problem with this option is that when I do `make defconfig`, it
+will unset CONFIG_TI_ICSSG_PRUETH.
 
-> I suspect this probably will be compatible with the rtl9310. I've just
-> received a RTL9313 based board so will probably start looking at that in
-> the new year.
+I will have to manually change the arch/arm64/configs/defconfig to set
+HSR=m and then only `make defconfig` will enable CONFIG_TI_ICSSG_PRUETH
 
-At least for the realtek switch-only products, if you have access to
-the Realtek Programming Guide or the vendor library/driver, it would
-be easy to spot compatible models as they share the same driver
-generation. From what I saw from the difference between vendor switch
-drivers rtl8367b, rtl8367c and rtl8367d, Relatek tends to use an
-incremental model, but breaking the support to older models on every
-new family release. They share a lot of code but they differ on
-registers (normally constants on each generation). If you intend to
-also upstream a DSA driver, you'll probably need to share some code
-with the existing drivers as duplicating that much code is normally
-rejected in the upstream kernel.
+Currently HSR is not enabled in defconfig. I will have to send out a
+patch to set HSR=m in defconfig
 
-> >>> +static int realtek_mdio_wait_ready(struct realtek_mdio_priv *priv)
-> >> All those realtek_mdio_* prefix might collide with realtek_mdio_* from
-> >> drivers/net/dsa/realtek/realtek-mdio.c. This realtek_mdio_* is about a
-> >> Realtek SoC MDIO interface with the switch. The other realtek_mdio_*
-> >> is about the interface (MDIO or SMI) between (the other vendor) SoC
-> >> and the switch. I don't know if the maintainers are OK with it but
-> >> listing those symbols in alphabetic order from both sources might be
-> >> confusing.
-> > rtl9300_ as a prefix?
->
-> I'd happily  change to rtl_ or rtl9300_
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index c62831e61586..ff3e5d960e2a 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -129,6 +129,7 @@ CONFIG_MEMORY_FAILURE=y
+ CONFIG_TRANSPARENT_HUGEPAGE=y
+ CONFIG_NET=y
+ CONFIG_PACKET=y
++CONFIG_HSR=m
+ CONFIG_UNIX=y
+ CONFIG_INET=y
+ CONFIG_IP_MULTICAST=y
 
-"rtl9300_", please (or "rtl9301_") a "rtl" just means realtek.
 
-> >>> +static const struct of_device_id realtek_mdio_ids[] = {
-> >>> +       { .compatible = "realtek,rtl9301-mdio" },
-> >>> +       { .compatible = "realtek,rtl9302b-mdio" },
-> >>> +       { .compatible = "realtek,rtl9302c-mdio" },
-> >>> +       { .compatible = "realtek,rtl9303-mdio" },
-> >> Do these different compatible strings really matter? AFAIK, compatible
-> >> are not for listing all supported models/variants but to describe
-> >> devices that have a different behavior and indicating that (with
-> >> different strings) is needed to decide how the driver will work. If
-> >> the driver does not use which compatible was set, it might indicate
-> >> that we don't really need 4 compatible but 1.
-> > It can be useful when we initially think they are compatible, but
-> > later find out they are not, and we need different behaviour.
->
-> The way I've written the dt-binding any board should include
-> "realtek,rtl9301-mdio" and may also include one of
-> "realtek,rtl9302b-mdio", "realtek,rtl9302c-mdio",
-> "realtek,rtl9303-mdio". For the MDIO driver the specific chip could
-> possibly tell us the maximum SMI bus number. Unfortunately I've only got
-> a block diagram of the RTL9302C, I know that does have 4 SMI interfaces,
-> the others may have fewer. Things would probably work fine for now with
-> just "realtek,rtl9301-mdio" but is there any harm in including the others?
+Since I am the only one needing HSR, I thought it would be better if I
+select HSR and it only gets built if CONFIG_TI_ICSSG_PRUETH is enabled
+instead of always getting built.
 
-If "realtek,rtl9301-mdio" is mandatory, until you need to
-differentiate each model, the extra compatible strings are not useful.
-It would increase the compatible table a little bit. My concern was
-not about the extra data but that a similar approach was rejected in
-the past. If maintainers are OK with it, I have nothing else to say.
+For this reason I thought selecting HSR would be good choice, since just
+selecting HSR wasn't enough and resulted in recursive dependency,  I had
+to change NET_SWITCHDEV also to select.
 
->>> +{
->>> +       struct regmap *regmap = priv->regmap;
->>> +       u32 reg_base = priv->reg_base;
->>> +       u32 val;
->>> +
->>> +       return regmap_read_poll_timeout(regmap, reg_base + SMI_ACCESS_PHY_CTRL_1,
->> All regmap funcs are adding reg_base to the register address. Isn't a
->> remap job to do that sum? It just looks odd but I never worked with
->> MFD. It looks like it is missing a subregmap-like variant.
->
-> I'm thinking about dropping the base and just using the full 16-bit
-> address. I've already confused myself between this code and the datasheet.
+BTW `NET_DSA` selects `NET_SWITCHDEV` (net/dsa/Kconfig:9)
 
-That's what I thought when I saw the sum. I would definitely miss it
-at some point.
-If their positions are fixed related to syscon base, I would use the
-full 16-bit. You could use the base+relative_reg_addr in the macro
-that defines the register address without increasing the complexity.
+> Just 'depends on' is still a preferred way for me, as there is not a single 
+> driver that does 'select NET_SWITCHDEV'
+> 
+>>
+>> 2) select NET_SWITCHDEV
+>>    depends on HSR
+>>
+>> 	HSR doesn't get set in .config - `# CONFIG_HSR is not set`. Even the
+>> CONFIG_TI_ICSSG_PRUETH also gets unset although this is set to =m in
+>> defconfig. But keeping both as `depends on` makes CONFIG_TI_ICSSG_PRUETH
+>> disabled.
+>>
+>> 3) depends on NET_SWITCHDEV
+>>    select HSR
+>> 	
+>> 	Results in recursive dependency
+>>
+>> error: recursive dependency detected!
+>> 	symbol NET_DSA depends on HSR
+>> 	symbol HSR is selected by TI_ICSSG_PRUETH
+>> 	symbol TI_ICSSG_PRUETH depends on NET_SWITCHDEV
+>> 	symbol NET_SWITCHDEV is selected by NET_DSA
+>> For a resolution refer to Documentation/kbuild/kconfig-language.rst
+>> subsection "Kconfig recursive dependency limitations"
+>>
+>> make[2]: *** [scripts/kconfig/Makefile:95: defconfig] Error 1
+>> make[1]: *** [/home/danish/workspace/net-next/Makefile:733: defconfig]
+>> Error 2
+>> make: *** [Makefile:251: __sub-make] Error 2
+>>
+>> 4) select NET_SWITCHDEV
+>>    select HSR
+>>
+>> 	HSR is set as `m` along with `CONFIG_TI_ICSSG_PRUETH`
+>>
+>> CONFIG_HSR=m
+>> CONFIG_NET_SWITCHDEV=y
+>> CONFIG_TI_ICSSG_PRUETH=m
+>>
+>> #4 is the only secnario where HSR gets built. That's why I sent the
+>> patch with `select NET_SWITCHDEV` and `select HSR`
+>>
 
-Regards,
+I still think 4 is the best option. Only difference here is that we have
+to `select NET_SWITCHDEV` as well.
 
-Luiz
+>>>  
+>>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>>> ---
+>>>>  drivers/net/ethernet/ti/Kconfig | 3 ++-
+>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+>>>> index 0d5a862cd78a..ad366abfa746 100644
+>>>> --- a/drivers/net/ethernet/ti/Kconfig
+>>>> +++ b/drivers/net/ethernet/ti/Kconfig
+>>>> @@ -187,8 +187,9 @@ config TI_ICSSG_PRUETH
+>>>>  	select PHYLIB
+>>>>  	select TI_ICSS_IEP
+>>>>  	select TI_K3_CPPI_DESC_POOL
+>>>> +	select NET_SWITCHDEV
+>>>> +	select HSR
+>>>>  	depends on PRU_REMOTEPROC
+>>>> -	depends on NET_SWITCHDEV
+>>>>  	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
+>>>>  	depends on PTP_1588_CLOCK_OPTIONAL
+>>>>  	help
+>>>> -- 
+>>>> 2.34.1
+>>>>
+>>>>
+>>
+>> -- 
+>> Thanks and Regards,
+>> Danish
+
+-- 
+Thanks and Regards,
+Md Danish Anwar
 
