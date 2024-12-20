@@ -1,104 +1,138 @@
-Return-Path: <netdev+bounces-153747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3E199F988F
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:48:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 271179F9896
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:49:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F47C164A3A
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:48:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB53516494C
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7874D21D00B;
-	Fri, 20 Dec 2024 17:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF7822ACC5;
+	Fri, 20 Dec 2024 17:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K804B67s"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sux4smDW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2FF215F74;
-	Fri, 20 Dec 2024 17:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DB922ACD2
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 17:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734715609; cv=none; b=cnsaSEetzimkbaxAgY5QDzTdE0dgdUNtpW07HzmeF060+cONmMkkFlj6ca/a9W9G20MHvvh2WR6OfIKC+Eygdw7XirncqD/Qv7rY9NOV/5uaSB0gmi6bKbkzMkF6qr9g9BGUi1Jg9ILoXvHpWOuDxLY87Y+wAYc87Q1aRjXSalM=
+	t=1734715663; cv=none; b=TPkibJj19Zj3P3JzgsAUXadc9f6CTpWkyhrpALV707JitMVV/ciMpwop0X2/xmkg43sYMVVanQ56x3SVMQb92xw+Cl6aI4c/H/97LAMfLCV3Feo3okpKvuZNpCGuF3PxSpT4mJ3lRAJyzGbx1RsxrixrR+2vLrxDSmoUpkLXjEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734715609; c=relaxed/simple;
-	bh=7NyLAA1WEljU+qXEHmkJUnhhHGok3Qw1EqYfD/FkVTY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q9qhDEV1bysrPzaXAb13xsXz1qAUyVp5hAdto2B+pDtNCmMOZbTiOFd8D5PCq9XsJS0UZlH9ewIfBPz93mjmqiU0eN+qID1xwBBjndat5H31BfBmDrEAd1yYxrHTDd8aeuSptl1R94n5a8SO3YfCwUnMAH76oWZoJXSk9eqM9U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K804B67s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37272C4CED3;
-	Fri, 20 Dec 2024 17:26:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734715608;
-	bh=7NyLAA1WEljU+qXEHmkJUnhhHGok3Qw1EqYfD/FkVTY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K804B67s4c1BZNjrrI24TwYCA4Z51ti2bcDvEVkSrvOGQaY8oN7oi50wogqcXQg+T
-	 KI5flG9Bh84mHKpT41GjoAnRfP1BswylwspzL1ml/WkyOXDK1cqFtVmSa5lxrk7T6S
-	 ck4C1xrWRi7/tD9jE/j7VCW4hp+JEvp4Ys14qbsGvQgUQXxNZeyI7qd+cE/e9bAW4s
-	 rkR7fkTpr/Itv6IVvHGuGw3N8MnIavm5kWsmkdedNlGqanePwvqZUtPg8uBdDkjfoP
-	 Z2pTDrmuArm+HS+tLh0oTm0xqYjD9pwyLKMjTHWcSxK+vh1+D+/J5dLiO/UPZto5gb
-	 u2tEPWiUjtA3A==
-Date: Fri, 20 Dec 2024 09:26:47 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, "Andrii
- Nakryiko" <andrii@kernel.org>, "Jose E. Marchesi"
- <jose.marchesi@oracle.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
- <toke@redhat.com>, "Magnus Karlsson" <magnus.karlsson@intel.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Jason Baron <jbaron@akamai.com>, "Casey
- Schaufler" <casey@schaufler-ca.com>, Nathan Chancellor <nathan@kernel.org>,
- <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 6/7] xsk: add helper to get &xdp_desc's DMA and
- meta pointer in one go
-Message-ID: <20241220092647.63affabc@kernel.org>
-In-Reply-To: <388fe411-d06f-4cb4-b58a-a2b9b5eb08ce@intel.com>
-References: <20241218174435.1445282-1-aleksander.lobakin@intel.com>
-	<20241218174435.1445282-7-aleksander.lobakin@intel.com>
-	<20241219195058.7910c10a@kernel.org>
-	<388fe411-d06f-4cb4-b58a-a2b9b5eb08ce@intel.com>
+	s=arc-20240116; t=1734715663; c=relaxed/simple;
+	bh=ftFlFL8Hf6gjCPdcRFrVx2YclVhyvU0X+h6fy2EfzIQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=cFO3PXzGsB6yixtV/5l0MAknzrfdpXUu4gXI6KNn9m3t3JXaOeDaBwkBabo9S53Yi5b5hTn0zg0PK2jgBiYr9aW3Dy4Ln7JPbMbua/zDGJWwKKNCPfgwfJ5cKid3cBo4D8hpMXMzCqCrGWNmHGcWXedVvFhsPzDkymmibR1m6c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Sux4smDW; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3862d16b4f5so1519563f8f.0
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 09:27:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1734715658; x=1735320458; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rl2GUGW1SKIB73yuGvAyVPoBfBy5XbBiVj4hV5yN+VI=;
+        b=Sux4smDWvhRYVAocCLrB8sH5Gn4iglVnvLOtYXjw2SwmbrW98B6c98IdTir+VF+VQJ
+         W10BWI4R3GFC1zT/iJoBlxuzYK0hnggsfABamHJxaKShxH8tLAyw6SYs1kiT5Zpq5DY/
+         y8F5G+SxDNISHMSnfr/J8ZC+W2oNrTFwJ0KMsYltX1nRmRejzvK8hykx9rw4E4PSCPjK
+         hBR+wlIXLMxbiloh7lXnf5z8TBJg0j3ePqZ9LWqb7cYYzpaMr36BzlgWIDpW6dDQHpe5
+         znRcS8BpCe/go3BIeiuQzZZSpEoYEyOJCj8IeINw++6FJJgIOUIPFK+PvAzsigdqsUly
+         aZ0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734715658; x=1735320458;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rl2GUGW1SKIB73yuGvAyVPoBfBy5XbBiVj4hV5yN+VI=;
+        b=m/f70SQAxo9zhAzhICRysddPUmFxJQ3A0VIEu3Ixcib1sZoAd2IxG6gJkYZ3xUzuDI
+         TO3QHU9JzU2ayGxntx/40haGq7h6i4wEunH8And/RNmNQIIupMiwfMh3/yQd4DV7CVwy
+         wUFMIdKGIFdmebuMWskNw/Dqu+DVgtF/RQ3Su+mbWQ8+3FJSBwIoIc9BJWuK2AbcMLEb
+         RK4fVn+uvcHxhxNzAhnjIr03/9nFloO5BHbf7mnbsYlg+zff5j2Y/yVtPNUJ9cYT8MuR
+         Rj7Glv28PcIL2caS9hqUGWpBxOrmVnCx/lqj9OEll8SXgdXwhgtkjv/Ey7D66TwHZadq
+         uIUA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+6TyIAgE70RZPeN5OIj8jGznmycFjRO5Gb5U1W6Krn27HseHPMe47w9KhKcXhQlqM83ytK5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxo4Y7QlwwgHHyGecM76iRvWfpvpE+dv2tZjvYugJYTLMfrnctM
+	f3nHsNbsOFVcMvLpWHJbnHQrnGP3O0W2okkYuyjB42H2wR5MZL4+0AgMm3hm2mQ=
+X-Gm-Gg: ASbGncsPq9d6/da0D2JmEFUUXVx6e+Nqz/dJot2wNxcqmjaXmRExzLY/nKaVBPc3bUT
+	SJ8hJLOQvZGhQO8o939KyEFmSE0v0Nc1mYHD1+q7Oo2PBHmQ6CNcGtdh0xtmpitz17TwlJakf5k
+	TxX4ZbECYZlJJjI/voJ1F35scWF6nbODHonMdCWmM31DGlZVAl6n3unsphqSM5h/4DFIbAL432Q
+	CQO1OhuTEp9bYJ9HsnXop6gzaYY66mNHA5wmgO53g5LBTM1li2fAilSJVAQUhdCdHiWAyraNNQ=
+X-Google-Smtp-Source: AGHT+IHQofl14bIpVpiQqz6qAEwAjKsEmWVjRCOjis6wH9jKfvKMjWLHCbYlsDgmYPDOjR7ci+Y7xw==
+X-Received: by 2002:a5d:47c3:0:b0:388:cacf:24b0 with SMTP id ffacd0b85a97d-38a1a1f7253mr6745803f8f.2.1734715658179;
+        Fri, 20 Dec 2024 09:27:38 -0800 (PST)
+Received: from [192.168.68.114] ([5.133.47.210])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c89e357sm4642915f8f.72.2024.12.20.09.27.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Dec 2024 09:27:37 -0800 (PST)
+From: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+To: linux-gpio@vger.kernel.org, Julia Lawall <Julia.Lawall@inria.fr>
+Cc: kernel-janitors@vger.kernel.org, audit@vger.kernel.org, 
+ linux-mtd@lists.infradead.org, Zhihao Cheng <chengzhihao1@huawei.com>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, linux-arm-msm@vger.kernel.org, 
+ linux-pci@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ linux-usb@vger.kernel.org, linux-mm@kvack.org, 
+ maple-tree@lists.infradead.org, alsa-devel@alsa-project.org, 
+ Sanyog Kale <sanyog.r.kale@intel.com>, 
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, dccp@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, Jan Kara <jack@suse.cz>, 
+ drbd-dev@lists.linbit.com, linux-sound@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+ nvdimm@lists.linux.dev, linux-leds@vger.kernel.org, 
+ Nicholas Piggin <npiggin@gmail.com>, 
+ Christophe Leroy <christophe.leroy@csgroup.eu>, 
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+ linuxppc-dev@lists.ozlabs.org, tipc-discussion@lists.sourceforge.net, 
+ Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ linux-trace-kernel@vger.kernel.org, Neil Brown <neilb@suse.de>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org, 
+ amd-gfx@lists.freedesktop.org, linux-wireless@vger.kernel.org, 
+ intel-wired-lan@lists.osuosl.org
+In-Reply-To: <20240930112121.95324-1-Julia.Lawall@inria.fr>
+References: <20240930112121.95324-1-Julia.Lawall@inria.fr>
+Subject: Re: (subset) [PATCH 00/35] Reorganize kerneldoc parameter names
+Message-Id: <173471565665.227782.7244101246430956449.b4-ty@linaro.org>
+Date: Fri, 20 Dec 2024 17:27:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.2
 
-On Fri, 20 Dec 2024 16:58:57 +0100 Alexander Lobakin wrote:
-> > On Wed, 18 Dec 2024 18:44:34 +0100 Alexander Lobakin wrote:  
-> >> +	ret = (typeof(ret)){
-> >> +		/* Same logic as in xp_raw_get_dma() */
-> >> +		.dma	= (pool->dma_pages[addr >> PAGE_SHIFT] &
-> >> +			   ~XSK_NEXT_PG_CONTIG_MASK) + (addr & ~PAGE_MASK),
-> >> +	};  
-> > 
-> > This is quite ugly IMHO  
+
+On Mon, 30 Sep 2024 13:20:46 +0200, Julia Lawall wrote:
+> Reorganize kerneldoc parameter names to match the parameter
+> order in the function header.
 > 
-> What exactly: that the logic is copied or how that code (>> & ~ + & ~)
-> looks like?
+> The misordered cases were identified using the following
+> Coccinelle semantic patch:
 > 
-> If the former, I already thought of making a couple internal defs to
-> avoid copying.
-> If the latter, I also thought of this, just wanted to be clear that it's
-> the same as in xp_raw_get_dma(). But it can be refactored to look more
-> fancy anyway.
+> // <smpl>
+> @initialize:ocaml@
+> @@
 > 
-> Or the compound return looks ugly? Or the struct initialization?
+> [...]
 
-Compound using typeof() and the fact it's multi line.
+Applied, thanks!
 
-It's a two member struct, which you return by value,
-so unlikely to grow. Why not init the members manually?
+[31/35] slimbus: messaging: Reorganize kerneldoc parameter names
+        commit: 52d3d7f7a77ee9afc6a846b415790e13e1434847
 
-And you could save the intermediate computations to a temp variable
-(addr >> PAGE_SHIFT, addr & ~PAGE_MASK) to make the line shorter.
+Best regards,
+-- 
+Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+
 
