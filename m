@@ -1,142 +1,110 @@
-Return-Path: <netdev+bounces-153724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297E69F9629
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:17:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805929F96A5
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:35:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B05B7A377C
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 16:17:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 005801884EBF
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 16:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA3F218E81;
-	Fri, 20 Dec 2024 16:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D45219A9A;
+	Fri, 20 Dec 2024 16:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="WdrcnkyX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UacXoMUh"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC5F29405;
-	Fri, 20 Dec 2024 16:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0F4219A66
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 16:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734711450; cv=none; b=t5WKT0Zgz+VGUEvMdOeL0KSI9n9N+ytPeZJUggVIaSYlwf9by185WQ0TKeg8uv4AANIxrQBUrc8c6NcZZMtndnjbrDyL2MEheRh2Su5ZXxtrIR8/IXBLQHFi7IkMUXaTpcIMTYv+9DruWgpaTuFA6mobtnNEZh42vmU1r8AuYkI=
+	t=1734712435; cv=none; b=nHoyMPQBTGn5a0SAVjCeYc0Q2gn5pkWv6eXNJoZhfkcRhrqenuS76BdyvMGn5rtDs10z5WAa7gJWUDOAQh79tRgi1kgcKsOUkw+1FtPI/lj7dI0hIGcki4LtklQuZ8B9xVrndFI7Ah/lMNQcyn4JEZdTgNRFy6tldjMOm9a+UWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734711450; c=relaxed/simple;
-	bh=azLLe2xwEn0w8mRT14qtqnntr6V54zf2BAoWZmVQ4wo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PaqXyrosSW6Ri4i918x6FGSpsF98RvzRG61qkjm82AEfnNp1l3hhUQLoc+Vp0TN6+iXrMX6xd3xPc1DO4yGjwl6ypNoXFxUOUuGvhb/MZ3nOhWAmKL1hZeEDvuTHDLDoiEuoElNp5lR3gPj7l0JKq37Ykpmb7EAjE9702K4wm2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=WdrcnkyX; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4BKGH7n0088336;
-	Fri, 20 Dec 2024 10:17:07 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1734711427;
-	bh=XgGAjTZNwBn/Z85i6WDZT8AJq3hE2+N5shzkenhzSio=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=WdrcnkyXuFzZWTAEEqwHRefcFOFE8sqXYOvjF1tjaWRC3ohzyAJE5oiZFHZQPyB8F
-	 WlkgYnZUSDTh+V20jydUZePPXCLSh1gx/LEixIco1kA7x3szg9S8PZ5OroKF7t4CFu
-	 5Eg82C83/YwGz8znlZkFlva/DuWIsIIdXaDwAa5Y=
-Received: from DLEE112.ent.ti.com (dlee112.ent.ti.com [157.170.170.23])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4BKGH7Hp074138
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Dec 2024 10:17:07 -0600
-Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE112.ent.ti.com
- (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
- Dec 2024 10:17:06 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE101.ent.ti.com
- (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 20 Dec 2024 10:17:06 -0600
-Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.81])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4BKGH5eQ049440;
-	Fri, 20 Dec 2024 10:17:06 -0600
-Date: Fri, 20 Dec 2024 21:47:05 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-CC: Siddharth Vadapalli <s-vadapalli@ti.com>, <stable@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rogerq@kernel.org>,
-        <horms@kernel.org>, <dan.carpenter@linaro.org>, <c-vankar@ti.com>,
-        <jpanis@baylibre.com>, <npitre@baylibre.com>,
-        <linux-arm-kernel@lists.infradead.org>, <vigneshr@ti.com>,
-        <srk@ti.com>
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: default to round-robin
- for host port receive
-Message-ID: <6whu7jzxigyqmnk5424ltu3tpdnlgetpqv6nvfbaxvlw2nseq4@y2vi3c56o3dd>
-References: <20241220075618.228202-1-s-vadapalli@ti.com>
- <eb573f51-4363-4cd7-ab1b-0d7304820d85@intel.com>
+	s=arc-20240116; t=1734712435; c=relaxed/simple;
+	bh=1kGU6egwkuzhglcqvh7xKay5WLUx2cchusisAF8ds3E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ITJzdSqjfILce9jFM7lxI/e07p0gZFDSybP8MyThm4o28yM9mbzJ4UmjVcg2gqlvgH08uadKdtLCDoX6VutkJFZyPKVZeDn5SpL6jVipDd7oFkfn443fDWU/nZJxe+i0Ik38TMEBJBjELhcTlygJ5+G/J6CQq7bkSStwJxKCHJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UacXoMUh; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e829ff44so5739561a12.0
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 08:33:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734712432; x=1735317232; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1kGU6egwkuzhglcqvh7xKay5WLUx2cchusisAF8ds3E=;
+        b=UacXoMUhOvVjB9+oZDeHLqARg3dzP/biwBi19bMzb1an0JE2IJnRJ2rUHkfve+Vn90
+         xOcTnUpU4dhF1B9XcTCar6qXXQ/BympAtZ0z6OgflUa6pfOP6AyuDLergOgQBXEc69Ij
+         KjsksRmEq2LjpDGyXULd/tpGy8gXBi6aIImp5YZav+feMuNOemRbHwBxX5rzqbcPpNwu
+         2JHx6HWSrg66Rtq8Zmcl1zwee7ZVsweUr/6dQMH52y0CYFkNVAJvQR2sxcIOTHZuGTTJ
+         YwndfVGYuenZo3zasJ3JXZjbmwLhmsnwq4UhsbKjmaMxNDCxnsXuw8dvYxlUjsE5U6ZQ
+         l3rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734712432; x=1735317232;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1kGU6egwkuzhglcqvh7xKay5WLUx2cchusisAF8ds3E=;
+        b=M1PKLLPeLr4yPbp65Eifps/oOoU6NGZfxQfA8seBfGRJKqkLM6Thn4XT3Q76QfOpS3
+         0oJpCpExiqU49z6BACRaBxcyWekHy7Mrru01jkIE+bAlJA3vvAAszIj8W6R7ypf5ZiXS
+         8WB+9lsK3Ky/Nkpbda0+EfvojnbOmDgXlc7W7k4QMTAZhtkc2RfKWSydRbUuLOk4q6Qw
+         D9vofpvmZXS2lwBzAXghOxqqtJqLq80CBPHkA9cLyuqWEJzlw+Hiw/D6DvtqKGveUrj7
+         xhG3X54a4cIC2lqCDkeM5F8jMkKC6Z9uvaSZDtMp3Q/8eub7m8z/MBrFx7UgGGqdgEf3
+         2vpw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7wtGhzXGtX8ejrXRgjaM0R6EUdjD8FVgrPqfmjCDax4RPz/EmHyLo97mbHde2qgfSSbquEkQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyj04ejEZd5oXgzmKybl+0yBt2jWQ8E1Fbv4gJmlFi/kPUxRhC8
+	s/UbBK0MA/5Pb9IEDAlooOj5FKfyssZREnAHAKfj4n6qua3ho5ipKUHw02oyZlJqX5bKW7FrSk4
+	RUFdR2s45o+iA9FXmxyteEiYV5eGwLQkf0Sn3
+X-Gm-Gg: ASbGncskYuYe319n/qHFGwUDKn4ahP9GW5dWAs30gw6EiOLB5QMa0soaX9VNYl+SRjX
+	ca9DNQJ5fqy3Aw8TN/6lQIOouu5/YTXcbyVBw3g==
+X-Google-Smtp-Source: AGHT+IEn85XwxIOd07ptRDetwMHk8igd6GDxq/plvtdpDoK72zGLsUPGGlA0Fh+K4R5bUBDmUb0Txn7cJUGS/r9nW7o=
+X-Received: by 2002:a17:907:704:b0:aa5:b8dd:fec4 with SMTP id
+ a640c23a62f3a-aac080fe63emr726019366b.4.1734712432014; Fri, 20 Dec 2024
+ 08:33:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <eb573f51-4363-4cd7-ab1b-0d7304820d85@intel.com>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20241220083741.175329-1-kory.maincent@bootlin.com>
+In-Reply-To: <20241220083741.175329-1-kory.maincent@bootlin.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 20 Dec 2024 17:33:41 +0100
+Message-ID: <CANn89iK0VdrCV7Hk=vjT4t3v=OJZXnKaOiMuTN_=ZDzDEuCzvQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: ethtool: Fix suspicious rcu_dereference usage
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	syzbot+a344326c05c98ba19682@syzkaller.appspotmail.com, 
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 20, 2024 at 11:41:26AM +0100, Przemek Kitszel wrote:
-> On 12/20/24 08:56, Siddharth Vadapalli wrote:
-> > The Host Port (i.e. CPU facing port) of CPSW receives traffic from Linux
-> > via TX DMA Channels which are Hardware Queues consisting of traffic
-> > categorized according to their priority. The Host Port is configured to
-> > dequeue traffic from these Hardware Queues on the basis of priority i.e.
-> > as long as traffic exists on a Hardware Queue of a higher priority, the
-> > traffic on Hardware Queues of lower priority isn't dequeued. An alternate
-> > operation is also supported wherein traffic can be dequeued by the Host
-> > Port in a Round-Robin manner.
-> > 
-> > Until [0], the am65-cpsw driver enabled a single TX DMA Channel, due to
-> > which, unless modified by user via "ethtool", all traffic from Linux is
-> > transmitted on DMA Channel 0. Therefore, configuring the Host Port for
-> > priority based dequeuing or Round-Robin operation is identical since
-> > there is a single DMA Channel.
-> > 
-> > Since [0], all 8 TX DMA Channels are enabled by default. Additionally,
-> > the default "tc mapping" doesn't take into account the possibility of
-> > different traffic profiles which various users might have. This results
-> > in traffic starvation at the Host Port due to the priority based dequeuing
-> > which has been enabled by default since the inception of the driver. The
-> > traffic starvation triggers NETDEV WATCHDOG timeout for all TX DMA Channels
-> > that haven't been serviced due to the presence of traffic on the higher
-> > priority TX DMA Channels.
-> 
-> I get it right that the starving is caused by HW/DMA (not SW)
+On Fri, Dec 20, 2024 at 9:37=E2=80=AFAM Kory Maincent <kory.maincent@bootli=
+n.com> wrote:
+>
+> The __ethtool_get_ts_info function can be called with or without the
+> rtnl lock held. When the rtnl lock is not held, using rtnl_dereference()
+> triggers a warning due to the lack of lock context.
+>
+> Add an rcu_read_lock() to ensure the lock is acquired and to maintain
+> synchronization.
+>
+> Reported-by: syzbot+a344326c05c98ba19682@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/676147f8.050a0220.37aaf.0154.GAE@g=
+oogle.com/
+> Fixes: b9e3f7dc9ed9 ("net: ethtool: tsinfo: Enhance tsinfo to support sev=
+eral hwtstamp by net topology")
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
 
-Yes. The CPSW Host Port in Hardware can be configured to dequeue packets
-queued onto the DMA Channels by Linux in either a Priority-based manner
-or Round-Robin manner. Linux is submitting the packets onto the TX DMA
-Channels to be received by CPSW, with CPSW's Host Port dequeuing them
-in one of the two modes (fixed priority or round-robin) that has been
-programmed.
-
-> 
-> > 
-> > Fix this by defaulting to Round-Robin dequeuing at the Host Port, which
-> > shall ensure that traffic is dequeued from all TX DMA Channels irrespective
-> > of the traffic profile. This will address the NETDEV WATCHDOG timeouts.
-> > At the same time, users can still switch from Round-Robin to Priority
-> > based dequeuing at the Host Port with the help of the "p0-rx-ptype-rrobin"
-> 
-> why the flag has rx in the name?
-
-The "rx" corresponds to "receive" w.r.t. the Host Port (P0). As indicated
-in the $subject of this patch, we are defaulting to "Round-Robin" (rrobin)
-mode of operation of Host Port dequeuing i.e. packets received by the Host
-Port from Linux are to be dequeued in a Round-Robin manner from each of the
-TX DMA Channels (TX from Linux's perspective). As for the naming convention
-being followed, it is based on the Techincal Reference Manual.
-
-[...]
-
-Regards,
-Siddharth.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
