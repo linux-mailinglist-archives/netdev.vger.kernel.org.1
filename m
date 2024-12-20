@@ -1,116 +1,104 @@
-Return-Path: <netdev+bounces-153746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584519F9921
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:10:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E199F988F
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:48:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D81B2196257F
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:48:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F47C164A3A
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F1F21CFFA;
-	Fri, 20 Dec 2024 17:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7874D21D00B;
+	Fri, 20 Dec 2024 17:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="nefljVlI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K804B67s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7054721CFEF
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 17:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2FF215F74;
+	Fri, 20 Dec 2024 17:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734715577; cv=none; b=Sq4/hhXiKGU0mMGzOt6CBtdDZDpnghg0vkGUVujQ2BGB3FxtjGVhflVFA3uuY5YpxNRjwIvFKm7QIqVXNGJQWysmRoSu3zkGh/byBWxDe+Yi0LjcvQiGLHZCmh8IF0JXT0j8mc6vDdzqSzRCH6MfKuxJr+oC50//7/BSHdLbF24=
+	t=1734715609; cv=none; b=cnsaSEetzimkbaxAgY5QDzTdE0dgdUNtpW07HzmeF060+cONmMkkFlj6ca/a9W9G20MHvvh2WR6OfIKC+Eygdw7XirncqD/Qv7rY9NOV/5uaSB0gmi6bKbkzMkF6qr9g9BGUi1Jg9ILoXvHpWOuDxLY87Y+wAYc87Q1aRjXSalM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734715577; c=relaxed/simple;
-	bh=WkuG10G1XzQZ2zSDFqo9dq02+hIGGFF35c7yljo62zM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fiCtWgdfEgKv4RSu0Rs4xHeFe9HsJf0eLQHEPC8FlAO7EinArrlVlcb50Mma3TqmFB7tnDevolOZwxXS+C6QUvFxuKtTr5VGZSSwiIzvQZgcjyIRAXgO849ROrK5/5nOb+/Umg8b5El9qJASwt18ALURr01DiWZWmgWJrTPvwYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=nefljVlI; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WkuG10G1XzQZ2zSDFqo9dq02+hIGGFF35c7yljo62zM=; t=1734715576; x=1735579576; 
-	b=nefljVlIudSaElWqlXGHJjM4NpiColdm1ZrNHVpkqC87fWQvsBNCq4OA326aYklznnIrj6mOMn6
-	weW5qh+Rz2karlbcTnAjqhQE7ep0C+VfAwUmt9Sypiiy97DfXneBY6ZyuvnIqy5ny0NGjTi1w8/oa
-	1N9TGYF7OeY9qytzcyRbeLcW2tKrh2QslsnBBvwjxvrzcjYQV2bwyB4JlDcd9dZAccoAIaq7YqsEw
-	o2kQkUpePSb3NHeZdJQxzvp3c8JZGTvfdJhbSXHFcJXoG2GTAi9IsoJbMtJWxMJvmzJOjKu4FVL+R
-	tdkOjyxXPlso0pCtxpJN1MFb2HFL6uqhUR2w==;
-Received: from mail-ot1-f47.google.com ([209.85.210.47]:43409)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tOglS-0002Uy-Oi
-	for netdev@vger.kernel.org; Fri, 20 Dec 2024 09:26:15 -0800
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-71df1f45b0cso1424609a34.1
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 09:26:14 -0800 (PST)
-X-Gm-Message-State: AOJu0YxatKHEH31pyWieHDGHypnVVsA2aknEPIrP9SJEfoK3YC4lCaFA
-	Jxk9vlIezG3kRQ2b5xYRS8jL33vhDT8O7t1599UdBmHSAHdnVkAje4EHUMxvEvuT/m3GcRYir7/
-	M4de1UqyKwOy1hqHuHWQZrOoZ3zQ=
-X-Google-Smtp-Source: AGHT+IE8+V7EvU6PLZEPnpkiHTwd6RY94YHXJtb6XvkFCEe4bcC95i1fE5vkZc2c/9sG/gaqaozuKTCYCkBlQDwZQfA=
-X-Received: by 2002:a05:6871:b13:b0:29f:99de:4330 with SMTP id
- 586e51a60fabf-2a7d10b0bdcmr4935872fac.4.1734715574141; Fri, 20 Dec 2024
- 09:26:14 -0800 (PST)
+	s=arc-20240116; t=1734715609; c=relaxed/simple;
+	bh=7NyLAA1WEljU+qXEHmkJUnhhHGok3Qw1EqYfD/FkVTY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q9qhDEV1bysrPzaXAb13xsXz1qAUyVp5hAdto2B+pDtNCmMOZbTiOFd8D5PCq9XsJS0UZlH9ewIfBPz93mjmqiU0eN+qID1xwBBjndat5H31BfBmDrEAd1yYxrHTDd8aeuSptl1R94n5a8SO3YfCwUnMAH76oWZoJXSk9eqM9U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K804B67s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37272C4CED3;
+	Fri, 20 Dec 2024 17:26:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734715608;
+	bh=7NyLAA1WEljU+qXEHmkJUnhhHGok3Qw1EqYfD/FkVTY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K804B67s4c1BZNjrrI24TwYCA4Z51ti2bcDvEVkSrvOGQaY8oN7oi50wogqcXQg+T
+	 KI5flG9Bh84mHKpT41GjoAnRfP1BswylwspzL1ml/WkyOXDK1cqFtVmSa5lxrk7T6S
+	 ck4C1xrWRi7/tD9jE/j7VCW4hp+JEvp4Ys14qbsGvQgUQXxNZeyI7qd+cE/e9bAW4s
+	 rkR7fkTpr/Itv6IVvHGuGw3N8MnIavm5kWsmkdedNlGqanePwvqZUtPg8uBdDkjfoP
+	 Z2pTDrmuArm+HS+tLh0oTm0xqYjD9pwyLKMjTHWcSxK+vh1+D+/J5dLiO/UPZto5gb
+	 u2tEPWiUjtA3A==
+Date: Fri, 20 Dec 2024 09:26:47 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, "Andrii
+ Nakryiko" <andrii@kernel.org>, "Jose E. Marchesi"
+ <jose.marchesi@oracle.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@redhat.com>, "Magnus Karlsson" <magnus.karlsson@intel.com>, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Jason Baron <jbaron@akamai.com>, "Casey
+ Schaufler" <casey@schaufler-ca.com>, Nathan Chancellor <nathan@kernel.org>,
+ <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 6/7] xsk: add helper to get &xdp_desc's DMA and
+ meta pointer in one go
+Message-ID: <20241220092647.63affabc@kernel.org>
+In-Reply-To: <388fe411-d06f-4cb4-b58a-a2b9b5eb08ce@intel.com>
+References: <20241218174435.1445282-1-aleksander.lobakin@intel.com>
+	<20241218174435.1445282-7-aleksander.lobakin@intel.com>
+	<20241219195058.7910c10a@kernel.org>
+	<388fe411-d06f-4cb4-b58a-a2b9b5eb08ce@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241217000626.2958-1-ouster@cs.stanford.edu> <20241217000626.2958-2-ouster@cs.stanford.edu>
- <20241218174345.453907db@kernel.org> <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
- <c606d8cf-4895-430a-b163-3a04b932736d@intel.com>
-In-Reply-To: <c606d8cf-4895-430a-b163-3a04b932736d@intel.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Fri, 20 Dec 2024 09:25:38 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmyaF2UYH1ySR8uaV8WGPQR15G_R1WWOcUhk7N0Zfd+Vuw@mail.gmail.com>
-Message-ID: <CAGXJAmyaF2UYH1ySR8uaV8WGPQR15G_R1WWOcUhk7N0Zfd+Vuw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API for Homa
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, 
-	Jakub Kicinski <kuba@kernel.org>, edumazet@google.com, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: d568c20fab0e2ccae07d583947984559
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 19, 2024 at 2:06=E2=80=AFPM Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
->
-> On 12/19/24 19:57, John Ousterhout wrote:
-> > On Wed, Dec 18, 2024 at 5:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> >>
-> >> On Mon, 16 Dec 2024 16:06:14 -0800 John Ousterhout wrote:
->
->
-> >>> +#ifdef __cplusplus
-> >>> +}
-> >>> +#endif
-> >> --
-> >> pw-bot: cr
-> >
-> > I'm not sure what "pw-bot: cr" means; I assume this is related to the
-> > "#ifdef __cplusplus" discussion above?
->
-> it's a shortcut for:
-> Patchwork Bot, please mark that as "ChangesRequested" [by Maintainer]
->
-> C++ program could simply wrap all includes by extern "C" section
->
-> not sure what is better, but there is very little precedence for any
-> courtesy for C++ in the kernel ATM
+On Fri, 20 Dec 2024 16:58:57 +0100 Alexander Lobakin wrote:
+> > On Wed, 18 Dec 2024 18:44:34 +0100 Alexander Lobakin wrote:  
+> >> +	ret = (typeof(ret)){
+> >> +		/* Same logic as in xp_raw_get_dma() */
+> >> +		.dma	= (pool->dma_pages[addr >> PAGE_SHIFT] &
+> >> +			   ~XSK_NEXT_PG_CONTIG_MASK) + (addr & ~PAGE_MASK),
+> >> +	};  
+> > 
+> > This is quite ugly IMHO  
+> 
+> What exactly: that the logic is copied or how that code (>> & ~ + & ~)
+> looks like?
+> 
+> If the former, I already thought of making a couple internal defs to
+> avoid copying.
+> If the latter, I also thought of this, just wanted to be clear that it's
+> the same as in xp_raw_get_dma(). But it can be refactored to look more
+> fancy anyway.
+> 
+> Or the compound return looks ugly? Or the struct initialization?
 
-I have now removed the 'extern "C"' from homa.h and moved it to all of
-the programs that #include it.
+Compound using typeof() and the fact it's multi line.
 
--John-
+It's a two member struct, which you return by value,
+so unlikely to grow. Why not init the members manually?
+
+And you could save the intermediate computations to a temp variable
+(addr >> PAGE_SHIFT, addr & ~PAGE_MASK) to make the line shorter.
 
