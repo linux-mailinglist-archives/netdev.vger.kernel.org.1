@@ -1,160 +1,118 @@
-Return-Path: <netdev+bounces-153535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 154859F891E
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 01:49:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA9E9F8923
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 01:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53F5016CCDB
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 00:49:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4F5016CB42
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 00:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0234A01;
-	Fri, 20 Dec 2024 00:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49352594AE;
+	Fri, 20 Dec 2024 00:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqw1nXeN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XQPjyPfy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B81F5383;
-	Fri, 20 Dec 2024 00:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628882594A4
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 00:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734655767; cv=none; b=Blq/nWLAc9EAdYTPpn7r7KuULt0ZtrAxSiPKOQQwfT6j8z6a/O3QlrGO5z4e6toKx00/gnPWFzrq5k/eImL4luSwfMjps/b2JQtaHab6XWCw0cO6SUdIfK16lpsx+49m13OIXbeXp770qbGR3aD0aST6OITCA3ZXVX/Ou2m1zJc=
+	t=1734656235; cv=none; b=UCpYyp56c8+/Ly0OUnlMW0dyMFlscTePlV54w2GlvGNocAr1ZTgMZr6iO45WAE758Y1JXVdrYN+WILmu+M9QxjES8+jc0W8t0IWKzvDwTyURO8GrD6PsSIT4kchARt6EBcUnwV/XCoZ/aZquG50ZziCp2QW4d1wC1NH4x+dJWq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734655767; c=relaxed/simple;
-	bh=EsNchNsgLi9NKgKgusMJtQOj3Mvxvz/inQM29tynq+M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ud6mN8De4vWEBm+uF1yO4JNBaz6mqFKR30vcHIPmZgBARja4kGeEyc9lZvY2F3k++9wL7Dkl+GABJJkw8z82x2C2hEE8qhh/L4j7wq24sZ+CdlncWUtzGdHgWIRKaUWnRLdzV9yYyw6WbLZUF83gt18gEI+ZExBDTCWQoh2YG5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nqw1nXeN; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1734656235; c=relaxed/simple;
+	bh=+oLW6qi22ALTxG9PLhYdXkWWc5OPUPt5Q+0d46IcqB4=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=rOUXYQlfAD3vS4yoUdBTzttSYz2shmBcaaIQeAaU2YRazymc3TxNRbpUFyrqrRfOCcJ28KqEaTVqKoXAWnWpAOX96lHypT/r3LbrLt7nBIGIi6Diz0gSPzYoVw3A2hF/mzANVFrV+tkFVOo8XNLjDPzHCPgas527dkzFOsrVR90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XQPjyPfy; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43625c4a50dso9756085e9.0;
-        Thu, 19 Dec 2024 16:49:25 -0800 (PST)
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2f44353649aso1048923a91.0
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 16:57:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734655764; x=1735260564; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xuZI3ulWjAFi2AzZ0aYmiv3guuJ9AjC0a+kRD8wMWjM=;
-        b=nqw1nXeNplCrFdg4AIpIlo4GCmh7OVPcOcHrzN9t61R8jNlDhfrddBnNhQ5dHiPv4v
-         6H+WFmvGPwQysf5pG+eKfLDILiiIiIqvzYuvquXoKChfFdhaXdUQPuRZYxMVAIfZBNCu
-         GZsEyaXoKhrYlwABbCLDuPRrU9Rg8WxS97cSjBH628Uxg3ZWK1QiOCFmC4yU1vEGfR7U
-         xhd5z3jHEpDcGABxRxCJ4ULXLAYyM9/2sclteZ7q243senFx0IZh8EzmqnX7UMZAyNXn
-         QSlOFvd+87mrxU0F/2QED+sh8zJG9sWPhSYkQSfTrXF2b+02yuJA9ZWtOEVFO3nx1ali
-         WLzg==
+        d=gmail.com; s=20230601; t=1734656234; x=1735261034; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WVIU4S8Tx5aVpXfHqtcRwGb3W5YVFzbRy9IUOrLnBk8=;
+        b=XQPjyPfyant2dQX/Xo4QpdbquiB2FHoffJvtO3ZXXBWV1aLoHoB8Hax/9QqxfZu/F8
+         hai8DY+FfKPw94eB3PwyQz/+pOjM0niK8QNZtLXINRE5nhdZy/ectlvFdFeA7CKYWyPe
+         0DYaWxF+EmLxcb3UlxvaAwxcvv7MdGby7fGoOZVE1Sw/SusT3GjQCSylUx5YmxddZCCd
+         3XaynHjlPRNbL8OlFCd+ZSjd93GSE8gTp3SqX/jTk7p6uMDQlhvKuwITddSinSSDIDc2
+         XtmfTOu6M09rT3LffP5kfCEt9g1yrqP2c3hiR+rxSRL+PFliypsFPpqKPvRPzqCJ7pi6
+         iZCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734655764; x=1735260564;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xuZI3ulWjAFi2AzZ0aYmiv3guuJ9AjC0a+kRD8wMWjM=;
-        b=XOvInE2/rxMod+2MB+st4k+xzE1IT5BMkX4jkJanoXnBqkvLcjRLOT54GLDoWbDYX0
-         refhWW1MYXFqc5EioqJxpHh6hB4lv6LQ1BmPV9xKPtT3ePNhYyXVUU6u5qSNIveC1nO8
-         n+0vJj2SgwdFxHZCXuzQG3uaQdfLn2W/y3l9bNXkGu52p14oWAiad8D4gTrV+nlKkJbK
-         e8azD/pJFCq5i6G0YkEtX1iKg1gc6qDyiL7XGM+Du22sMWyZMhnyhfcJpGCgVEfWMNEA
-         baIpXlDeQ9a74NNzUGqEjc+F6xWHphkMP48O5xwa5CSEevWhkhoVGpEargJ8Jq72J8zK
-         O7tA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+EPApGPNZqWjjXltSrjrLY3uFsyUneimulvHgGwAspHSYZKm/8X8j2nhqO8UMAkaCeWxR4oxFTigREZuc@vger.kernel.org, AJvYcCUFSMev0wqwr5G8TxhedHSdjk5LAV4L/qd4xpUEjYK6DSg+LtIVHTKAJj87/CuiGdTFww/SYAZD@vger.kernel.org, AJvYcCV7qdERt3iAkxm8KPEx6m+Shqd2ZY5V6SMPCB7LgnQczD4Mx4EDcTikpvlrY2ezAICIqrY=@vger.kernel.org, AJvYcCXGNyzOOQi9boTNMAYI+5X5G25fu//q0nY5lVj5YgPexZw2yg3Hx1ckrQcpHqtMRIGS6FrHjmkQ22HFWmLXbhtB@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwU0/NVBflpbpdSUh9CbCTxzbboPTin/pgfnPCY8ALU2TnLarC
-	9LY3bReuuOR20/PZOaudEzhi8GIV/DEKarSexZpTGrWdsTXA/B0J3SHjRYtLEIz5DjZZBoaAc3N
-	lp6WC7TKgsGJrzIrgGmbuT5Bq3LE=
-X-Gm-Gg: ASbGncvfMLXBoceA6uNJN0IB4eh/L/xGa8ydB+mqDBqUadS3+opIDY+Rahntiklpxpw
-	Bp4Fj5ETiGz4ZK4lW70rzoWXERWn6wuty2GPEGw==
-X-Google-Smtp-Source: AGHT+IHS89C4V0R9V1vvBTgYx7sd3REU/1ybhwNYHIIy6pt0wl7aYGhtsODhSc67kX9JJcFRGhh690qG1vduF+r673I=
-X-Received: by 2002:a05:600c:511d:b0:436:5fc9:309d with SMTP id
- 5b1f17b1804b1-43668b78383mr6470205e9.30.1734655763974; Thu, 19 Dec 2024
- 16:49:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734656234; x=1735261034;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WVIU4S8Tx5aVpXfHqtcRwGb3W5YVFzbRy9IUOrLnBk8=;
+        b=b/oIqzwwNQksNgC3gh7ETLVkUXL+Vh2HC/lOkwUdv3GD8CepxRzsbI5oO1E1x+Eqqs
+         Cjw0nCeH7f7g2es2p007ttSAAXvCr3i67XspC57gaZ/MTVk/llkKqt50Gt1mF5kiGWiJ
+         1pTN8UCactfbutOcPmrH00N/oXiAGo1F5rDn6Qz75T3ELXeY1mkmGidMNiBHV0WyzBjW
+         /wWfTpVmZm8wwCi12W7hwRT/Zuf6Rvbt8kWjj10AOyYsYye5cuWmxtdDE+EGnZ/g8Lgz
+         Y4/wT2Ma4i1rwhPW0Aa5w5SOC5I+ibHbbclU4z92MAW5gcV6LWangDQGjtd9DJtklhKJ
+         LuSw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHhbKSGxml3/HVqJypKwcR7oseU7DUGBW6Bq9xQk9aWdXIief2K/ccC3klYsa+MVxnDIj8Drw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNUF+QlfqlN7u2GuogLYL1sgUmh1JpQTD5aZInPDbWGaJbtgxh
+	OB3E+voWaMCgRyHGO44/J/H3JzJYPVFvWT+dZN3FL3IK8rGfA3G7
+X-Gm-Gg: ASbGncvdC2TIZN/21LtKpb1wB5etfaqUMAsjfPYDlm+XN7eLlmHB6QGrVq30qrDTO0/
+	lgoKSYGohjwKyI0Ph/CPLWJ5JFNOJjSZ5pZTAIgSyZ1PiK9dL0YL10JDDmfg2nJnmbjXL83c6Ql
+	v4d5fnDMSP9ao/FtCBoye9rLL84/DwSjCAS4T2FUlrp5jtZYMk4NM7dTRbiy5Nr7oMIec2gP8YQ
+	X2WJI3LWiPpjvA8S5K0OUxtGwzdMxAQIoNe2qfBRojsGh7cwE1iRazrXqVAChEnFeHB4/uKNK/8
+	VoS32Wto5BLdIE8p+A==
+X-Google-Smtp-Source: AGHT+IHwuaoHZLwcoGFikzV1A2ffWhH9fd3gpSGU2jys0738zniBHj9kj1gkHc/Tb052S08Yhjf4lQ==
+X-Received: by 2002:a17:90b:54cb:b0:2ee:ba84:5cac with SMTP id 98e67ed59e1d1-2f452dfd2eamr1652020a91.7.1734656233680;
+        Thu, 19 Dec 2024 16:57:13 -0800 (PST)
+Received: from localhost (p7659208-ipoefx.ipoe.ocn.ne.jp. [221.188.16.207])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f4478aaa74sm2056049a91.45.2024.12.19.16.57.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 16:57:13 -0800 (PST)
+Date: Fri, 20 Dec 2024 09:57:12 +0900 (JST)
+Message-Id: <20241220.095712.813534337789962014.fujita.tomonori@gmail.com>
+To: hfdevel@gmx.net, devnull+hfdevel.gmx.net@kernel.org
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, fujita.tomonori@gmail.com, andrew+netdev@lunn.ch,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 6/7] net: tn40xx: prepare tn40xx driver to
+ find phy of the TN9510 card
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20241217-tn9510-v3a-v3-6-4d5ef6f686e0@gmx.net>
+References: <20241217-tn9510-v3a-v3-0-4d5ef6f686e0@gmx.net>
+	<20241217-tn9510-v3a-v3-6-4d5ef6f686e0@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1734045451.git.dxu@dxuuu.xyz> <92065ca054beccd6d0f35efe9715ef965e8d379f.1734045451.git.dxu@dxuuu.xyz>
- <CAEf4BzaqCgW9keiT+tJUBQWT6Q+jMwuvn4O2ZghO0c+ZvACNrw@mail.gmail.com>
- <zow3q3nhlz6vedbni3upag5yr7zzrhyiqysl5nwyubebmbwojk@th7kbm62x36g>
- <31b0c85dbf85486df116ade20caf8685843899b4.camel@gmail.com>
- <CAEf4BzaEOBtrSWZTx40AdT=SQY6Qaia405KWgU-NowaqNdmpkA@mail.gmail.com>
- <kghvgxu5wdkupssnq7dy5upuf2wscsxgsnwl2yoam4mwk3h5pn@wjjsliwg6fzl>
- <a2999d8b4827516fe4bfd17646d2284580712d08.camel@gmail.com>
- <f7taicw6c3f3yae4d6lrdagv26jiuihumklo4tkmqduvauargi@ld4bcmsbbiqn> <d0b5e424445f498fdedca04fd4b0f138fbb6ae36.camel@gmail.com>
-In-Reply-To: <d0b5e424445f498fdedca04fd4b0f138fbb6ae36.camel@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 19 Dec 2024 16:49:13 -0800
-Message-ID: <CAADnVQKs3=pEea7VeTfxpuB7uxzZRCjikPGu17uusTpGdqLxDA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 4/5] bpf: verifier: Support eliding map lookup nullness
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Mykola Lysenko <mykolal@fb.com>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 19, 2024 at 4:43=E2=80=AFPM Eduard Zingerman <eddyz87@gmail.com=
-> wrote:
->
-> On Thu, 2024-12-19 at 17:40 -0700, Daniel Xu wrote:
->
-> [...]
->
-> > > Ok, thinking a bit more, the best test I can come up with is:
-> > >
-> > >   u8 vals[8];
-> > >   vals[0] =3D 0;
-> > >   ...
-> > >   vals[6] =3D 0;
-> > >   vals[7] =3D 0xf;
-> > >   p =3D bpf_map_lookup_elem(... vals ...);
-> > >   *p =3D 42;
-> > >
-> > > For LE vals as u32 should be 0x0f;
-> > > For BE vals as u32 should be 0xf000_0000.
-> > > Hence, it is not safe to remove null check for this program.
-> > > What would verifier think about the value of such key?
-> > > As far as I understand, there would be stack zero for for vals[0-6]
-> > > and u8 stack spill for vals[7].
-> >
-> > Right. By checking that spill size is same as key size, we stay endian
-> > neutral, as constant values are tracked in native endianness.
-> >
-> > However, if we were to start interpreting combinations of STACK_ZERO,
-> > STACK_MISC, and STACK_SPILL, the verifier would have to be endian aware
-> > (IIUC). Which makes it a somewhat interesting problem but also requires
-> > some thought to correctly handle the state space.
->
-> Right.
->
-> > > You were going to add a check for the spill size, which should help h=
-ere.
-> > > So, a negative test like above that checks that verifier complains
-> > > that 'p' should be checked for nullness first?
-> > >
-> > > If anyone has better test in mind, please speak-up.
-> >
-> > I think this case reduces down to a spill_size !=3D key_size test. As l=
-ong
-> > as the sizes match, we don't have to worry about endianness.
->
-> Agree.
+On Tue, 17 Dec 2024 22:07:37 +0100
+Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org> wrote:
 
-Earlier I suggested to generalize this zero/misc/spill counting
-into a helper and reuse here and in check_stack_read_fixed_off().
+> From: Hans-Frieder Vogt <hfdevel@gmx.net>
+> 
+> Prepare the tn40xx driver to load for Tehuti TN9510 cards, which require
+> bit 3 in the register TN40_REG_MDIO_CMD_STAT to be set. The function of bit
+> 3 is unclear, but may have something to do with the length of the preamble
+> in the MDIO communication. If bit 3 is not set, the PHY will not be found
+> when performing a scan for PHYs. Use the available tn40_mdio_set_speed
+> function which includes setting bit 3. Just move the function to before the
+> devm_mdio_register function, which scans the mdio bus for PHYs.
+> 
+> Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
+> ---
+>  drivers/net/ethernet/tehuti/tn40_mdio.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-We do very similar checks there with a similar purpose.
+I confirmed that this also works for TN9310 card with QT2025 PHY.
 
-It sounds there are ideas to make this particular feature smarter
-than what we have in check_stack_read_fixed_off().
-Let's not overdo it.
-Even if a common helper is not possible, keep things consistent.
-The simpler the better.
+Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 
