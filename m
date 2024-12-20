@@ -1,102 +1,119 @@
-Return-Path: <netdev+bounces-153707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E78F9F947B
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 15:35:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 314B09F94A6
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 15:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEC6F165298
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:35:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97C7B188CB7F
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1670B2163A7;
-	Fri, 20 Dec 2024 14:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Tcr2XS+w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8843217F45;
+	Fri, 20 Dec 2024 14:41:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33877204567;
-	Fri, 20 Dec 2024 14:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2527217F39
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 14:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734705311; cv=none; b=cJ7jZfGNMKO/fQsRYKJOE4YVsRKVpyp1oiQW67+HfyoKeh3oPWStS16vDky3FX5R7+ORU7T0gEcZ4rMeaQ3KXUHxWtpunD7zwYfysMg/MNi9WcBF5AZ/9y7Iwib5HqEVGN1XDOqHsssQUnDQIOr6cXWIFbkgErWagD63lfzkhp4=
+	t=1734705664; cv=none; b=Ch+5VRIVsrjW/zFrF6YI7qeVrz5AL2PE/QMo4tWKIjI0sUq/s+jFCiOKCyqN7i9LEvbgHQsQUhqf3mJ3k48dOarfXpN/D9as1x+uTnpifK30noKhb31JXILM/Ep5kTPOZlsRbJFhgPE8f3+F+WXQj9AaykM+51502b8FoE9yvVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734705311; c=relaxed/simple;
-	bh=LCPBtL/uXiFkgmQXVHF5Nv5K6A46/9d86qUCYOlizc8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f6wP6Y5OqpXgTzsRtmMr2DY2sHA7E0tl2rfEoVeAGa3SgK2PodyARr2qzdVjE1lYlkHiloiTxuaE07xHYXMuHZml2j6iMkurskcLGp001c00zdc+Ap3/21ETHlr02vhsHBe8NQAOWGRlslIyGVZiwYTuwHeAN4zYI68MS/mX0BY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Tcr2XS+w; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tOe5e-00Ayr5-Bh; Fri, 20 Dec 2024 15:34:54 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=Lfv9zF1rca+KAyc4+BgK6OBzttFWIwtQNyXSxi64xOc=; b=Tcr2XS+wr3wf3pznEqyailSDKg
-	5Ryyncm0zuWza6RmF6Y/SDr9H3SDUgw7XPU5yjWOs78Fcn/Md3ns8VP6e+eOjlm03JsNHGfmlQ6Hi
-	9J44+91awjbU8+41C0hb42tfJ39pcN8JtnKY2x04hBq76ZB4dFwGZD9IG5MbC+hiV6Cnt0k9X3p6Q
-	qQYW1XqkRc61R6ILHo7ZRzdhj90ntaaXI6JYCHhz40UPjQdg3lz7DwCDx4IT+TB5+Tn2jUNOAhdhx
-	xizxc8ToAId6w38qL6ZqZfGsw/gcTVNOjORDkqs5ownntv28kPyyQn2+2VvJSMqdaXF9QTAokC7TK
-	DTFXseag==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tOe5d-0003jC-HE; Fri, 20 Dec 2024 15:34:53 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tOe5Z-000CXF-8S; Fri, 20 Dec 2024 15:34:49 +0100
-Message-ID: <b098c1e0-4422-460a-8372-b5aaea76bfc1@rbox.co>
-Date: Fri, 20 Dec 2024 15:34:47 +0100
+	s=arc-20240116; t=1734705664; c=relaxed/simple;
+	bh=CtmTRg53dMIFFVduYKe8ZM2QFm/vYNiOF3sv0OqEh10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kkJdn274zoQgmSSknekKkvvrB78MFUhxaGLXWu3eTsT0b2f70n7MLt6qefAzYHqBY5YJXfOuAeJFl/GIXuj/2rH33IezU77O+9n0+5CW8buSdQvgqFm3I5swLffgRIBQuTrfuvcp1b7vsQuD38ojpq0E6DzCGpQPLa9k56HJWl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOeBL-0006PK-HG; Fri, 20 Dec 2024 15:40:47 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOeBI-004OLa-33;
+	Fri, 20 Dec 2024 15:40:45 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOeBJ-00ATIt-1z;
+	Fri, 20 Dec 2024 15:40:45 +0100
+Date: Fri, 20 Dec 2024 15:40:45 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Microchip Linux Driver Support <UNGLinuxDriver@microchip.com>,
+	Tim Harvey <tharvey@gateworks.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/2] net: phy: micrel: disable EEE on
+ KSZ9477-type PHY
+Message-ID: <Z2WB7aOs0m4Kamfl@pengutronix.de>
+References: <942da603-ec84-4cb8-b452-22b5d8651ec1@gmail.com>
+ <77df52d5-a7b9-4a5c-b004-a785750a1291@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vsock/virtio: Fix null-ptr-deref in vsock_stream_has_data
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Hyunwoo Kim <v4bel@theori.io>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org, qwerty@theori.io
-References: <f7a3rlgpc36wk75grqeg6ndqmlprvilznlsesyruqfb7m5vrp7@myil7ex4f62n>
- <Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX>
- <5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co>
- <Z2N44ka8+l83XqcG@v4bel-B760M-AORUS-ELITE-AX>
- <fezrztdzj5bz54ys6qialz4w3bjqqxmhx74t2tnklbif6ns5dn@mtcjqnqbx6n4>
- <722e8d32-fe5c-4522-be2b-5967fdbb6b30@rbox.co>
- <CAGxU2F5VMGg--iv8Nxvmo_tGhHf_4d_hO5WuibXLUcwVVNgQEg@mail.gmail.com>
- <cc04fe7a-aa49-47a7-8d54-7a0e7c5bfbdc@rbox.co>
- <CAGxU2F5K+0s9hnk=uuC_fE=otrH+iSe7OVi1gQbDjr7xt5wY9g@mail.gmail.com>
- <2906e706-bb0d-47c6-a4bb-9f3dc9ff7834@rbox.co>
- <jkhr2v5zjebxnckmhn3f3dvv5zdzbldkyxbe5kx5m7vzvw6kzi@nrqipygyhlix>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <jkhr2v5zjebxnckmhn3f3dvv5zdzbldkyxbe5kx5m7vzvw6kzi@nrqipygyhlix>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <77df52d5-a7b9-4a5c-b004-a785750a1291@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 12/20/24 11:49, Stefano Garzarella wrote:
-> ...
-> Note that non-NULL -> NULL should only occur before a connection is 
-> established, so before any data is passed. Is this a problem for BPF?
+On Fri, Dec 20, 2024 at 02:51:32PM +0100, Heiner Kallweit wrote:
+> On several supported switches the integrated PHY's have buggy EEE.
+> On the GBit-capable ones it's always the same type of PHY with PHY ID
+> 0x00221631. So we can simplify the erratum handling by simply clearing
+> phydev->supported_eee for this PHY type.
+> 
+> Note: The KSZ9477 PHY driver also covers e.g. the internal PHY of
+>       KSZ9563 (ID: 0x00221637), which is unaffected by the EEE issue.
+>       Therefore check for the exact PHY ID.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/phy/micrel.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> index 3ef508840..ece6d026e 100644
+> --- a/drivers/net/phy/micrel.c
+> +++ b/drivers/net/phy/micrel.c
+> @@ -1522,6 +1522,12 @@ static int ksz9477_get_features(struct phy_device *phydev)
+>  	if (ret)
+>  		return ret;
+>  
+> +	/* See KSZ9477 Errata DS80000754C Module 4 */
+> +	if (phydev->phy_id == PHY_ID_KSZ9477) {
+> +		linkmode_zero(phydev->supported_eee);
+> +		return 0;
+> +	}
 
-Please take a look at vsock_bpf_update_proto(). The condition is to have a
-transport assigned. BPF assumes transport will stay valid.
+Hm.. with this change, we won't be able to disable EEE. Zeroed
+supported_eee will avoid writing to the EEE advertisement register.
 
-And currently that's a wrong assumption: transport can transition from
-non-NULL to NULL (due to a failed reconnect). That's why we hit null ptr
-deref via vsock_bpf_recvmsg().
-
-That said, I sure hope someone BPF-competent is reading this :)
-
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
