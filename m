@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-153698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67DC59F93D3
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 15:00:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5ACF9F93DB
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 15:01:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08B5018943E1
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:56:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1325B18993D1
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F4B217F42;
-	Fri, 20 Dec 2024 13:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC50A215F62;
+	Fri, 20 Dec 2024 13:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5rHx9xF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D8jQpQq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C7A1C5F19
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 13:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181431E50B
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 13:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734702697; cv=none; b=sS8LBqvOhPnoRxu5GYbO3inuDoEob6iKQAOdzwqPIG6PjdMU+PIx0+cc4zUzOXH0RF90E+QULA8cbxFwZa4BBp0JARkvnHWpfnAWV+OJBbWYuZWRS3VB0KSZWvzBXbBDQGOjAveOtZl71/afxdE5ON2Fh7C/ndyYdsI6CYz8M7g=
+	t=1734702791; cv=none; b=tU4S7zNfUqfkpPf5jWNcMVxRsVlSyOpXXALVK9utiQO2r3P3Ts4KTpDKb9GXKFiT2ac4agX9MKurumACniD2mqyQGlBqw01GwUNqbqdPGyeXwWy1PfRSy3KCMqPuw3srF/E5GQoJwyMhbwOBtvESTbNljpjkAIdPgvuwXrTICbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734702697; c=relaxed/simple;
-	bh=nplSBzwl31z+Mt/fY4US1/Fw5U8kBllV+HgOgwWKcus=;
+	s=arc-20240116; t=1734702791; c=relaxed/simple;
+	bh=m1mCPvBp43UbZ7rArGrXPCOB0+OgvAZcctk37qDgAms=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gYlqh6DSHFqdmJ8u2g8778PgM9JYrWM1Ck1nVQWyBULHu5mZpW6aQb1LaM/YZUlhnO9CbDuLLhmRdsEAMBA5KAyqysc23zOLKMKAkudwSF2hXflsSFrSKKZt1x0dcd2e92v0dngEj9QgapSLwu1xbYLYFzPXd+W7uhf2+oef4rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E5rHx9xF; arc=none smtp.client-ip=209.85.208.48
+	 In-Reply-To:Content-Type; b=kiKMO4hIAxufMti+cWuqQdMcnc6ln+J+bc8NTOMPheTmTsdFijSoj/C6mWPkx836wmz2dbdw8AocJGRznmrbXLuN7dEVVzS/cwOPIMmFk50QSiv7H1Me2BSDK/rMvrb7woca0K9cK8rSSiMgwsHcSLTG9kUmY4pGsW6xNFvkYUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D8jQpQq0; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d3d143376dso2725729a12.3
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 05:51:35 -0800 (PST)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d647d5df90so3184113a12.2
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 05:53:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734702694; x=1735307494; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1734702788; x=1735307588; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ncBWufviQi5N362JzS8y2BzdkDuzo+WeoGCs1fgi/vc=;
-        b=E5rHx9xFP36H+FsfZjJJ/746UqnVCm+vsrn5dQkQm5Jqnw+WCgW3I8IBX903J0iGIJ
-         TDZQ1Vg3hfMwvseABK6ulwbhlAAgt+M6i9HnMNqVdF5DY+sM1qFjizWDd/G3SAauGiBx
-         E9PZjvsY4jpECIe2RHW0klRCI2vGvt0LVqcJ33aeV8m3glxHrUVlrlHhJAucD0KQSLDH
-         KPO47+Zw8zTvXkrEj/q7lRZCNRRdr21uRlW8XTWNFyRwPUtHHkKq8PH7dQ6G78VMtfXz
-         34A96CaJmd7OAARcCWqr6wumuKfLDen5exUVpLU4Rr5GaAGv5Ax38uiBF4mKtNSiyNny
-         cSQw==
+        bh=IlNbFsuhYHbkoNMP8k7KamF4IsayJ/k2ixFqpG4Rrtg=;
+        b=D8jQpQq0TyT5b71JlaTtG/P9lWXXW+lOh98P6I1kH6EmJbse4khfNyHKlC3eTHMESS
+         QAoLUAlXGPzDDhRNV374H/JZTOMrUmHk3YVulaB8SflYk8ceFXw9TPDBKxbvvdEnSzdm
+         Lum7E0I9ZbDiCScXlrX6oO/xBZHI+HULm34W1e0y2m+sCnTeFzeaOl5fgtiaw/iJmdTA
+         z/EU3LQpHzJr7kE0ukGlROIoI63dS+t1KAMO/EnREjwOMvL0APlOmQCbRy7f/5IdFg8O
+         KQhHvEuZcUMkn/86Rg1fu/iaXGxX04QMxuliGoDbhXc2eeuzXLLgmV91csQ/pBBpB9bP
+         TtIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734702694; x=1735307494;
+        d=1e100.net; s=20230601; t=1734702788; x=1735307588;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ncBWufviQi5N362JzS8y2BzdkDuzo+WeoGCs1fgi/vc=;
-        b=h2D5syWW/rf4hUC/B1nMGXyL8dMM21Kmup2eFl/oipSg+hPgyniaKXRloCMt3nz5i6
-         ICqtOrZRaa6eHc8ZGbYP7ygC1re1fYv82/o4vv35K37QuFmz8dRAcQ4+AEUpD6udeoup
-         4zp59bl5XhmOLJ32AUoa1RNOdA2bZSXq2dua1sQZSwMEBmTCdm3yXBctQznyPhW41UCi
-         DqKhB51hbWsLqTsQP+xUNDyzeqxIu0Xm8CKazWdF/U1ym27bkxp7SIXreLnVQtdAgpw7
-         P/9hIaqLUjBv0O5QGtfG5AnQaVEZAkBwqS1CbjmVZRkerAIRO0NfGrTBOR/358tMiV4h
-         PVKg==
-X-Gm-Message-State: AOJu0YzUrRxaHo2nnA70+m0RFmAI0EgU/hDuTa7gytJgja3R3XmLOZNW
-	FLnbbg69vpgIFuAdzlK0Se0Ryf5+g0E2L9U/WzZ92Rxv0VtDtgMs
-X-Gm-Gg: ASbGncvF9H4mVEIoNhY6ekW7YTKeQqXQ9EQ1JoSMwh/LVFQVREIGKMgFNrn7TlAF/IZ
-	Iue9+hjIIsR1mR0qSPpCY7hiyuNT5aMF8/YfdHjfe6s/sY3mHWsrzrwwPEbDFxJsf05VrnmfAs9
-	FUV8N3M7MKFIIXzm1Qe3m1KU7N818yxbLRl040WQ4ETXlOmHgn9OzN5tkIcJak5jufYm1syUaaV
-	MVpV2sXSHzwzMhf++b1jAhalPkcJlAwagCVte9totp36twY0gwB4jbEBgHb7GcH8QQJeLm93qWj
-	0hkCOnUo+VcyyUs9IUEnOU4FhsC12Hj/D6nGpUyFlTA5mQeZ//VAU24QdiYtyuilN4Ywlxe1BWp
-	JevV6d4Bg2UqybMgyFA/SUU1xVbpyW+kPxBLNpRXu1g/ctMIW
-X-Google-Smtp-Source: AGHT+IGQFEZ9WpIURsTixlCe6uEso/9/2XWRwdVQX/j45RkPtO6SAusWtl55RTyiAcIn+dAWa49TNw==
-X-Received: by 2002:a05:6402:3217:b0:5d4:4143:c06c with SMTP id 4fb4d7f45d1cf-5d81ddffa67mr2667667a12.23.1734702694413;
-        Fri, 20 Dec 2024 05:51:34 -0800 (PST)
+        bh=IlNbFsuhYHbkoNMP8k7KamF4IsayJ/k2ixFqpG4Rrtg=;
+        b=NcgoRIbqqtffYWPed0JYJJ7FN/4MQgn2MCvB7sMFHiJpI8vvoFAw7+kLSktmOy/RlJ
+         8QJJcJ8EV3ufaIb+tCYIKlx7JpXTQa8WoC6fEplaT3sQry/bJ6A3DiWilxkYsM20TG7L
+         zV7+al3tGQ1+5GlZygtQGvFONvyzJotkZAhDTqv33IP5qnRAbNBuVd89JdErnRVbo3kC
+         QRqcT9iOM4lo0AYnyFFv175urXR1FpOkMRJi5vfchJZX7m5XYZ48DB3eDNQoOMynmBdU
+         JqbnNokNjn/bGTZlPsgdqwnS0NczVMJGgx7ZuzNrP0BxEItaRA6yeOqETXQC9Bd7Pmcg
+         orhg==
+X-Gm-Message-State: AOJu0YxjvfZ2+KcsSefqlz42mWhqDFU1TXvjAM18nvs5Ip1ziEKXu8xV
+	MwJh8tMETYleO4/aPm4SO2yj0hN/5NBRjhaRA2lrhN8xotErnC14
+X-Gm-Gg: ASbGncsi79XgqzeqVFgbWLNR92tyTWgw+C7wS1/nziduOiSllchDxD27RxzW9sAqOF/
+	ZNPyqZMGytfA6trk9noVOvabQ0/0PBHLfuDh1LTFttDtKx7OqU8CT8iWeZI+m3q/P72dw8A+avB
+	xxezQ5WkdeiCx2fgtrB+BgKF6e1mbwWOaGUkCqjlnSlJaID6YRV6crWQMO6LYgkRSv7zYfQ1O/H
+	ktAhApZJCT/NX/71Lzdh9b/G4KjOVJfI2wBNQtqST4t09/zr6V2qFvNcsAS7XPe0iJFwESXOPcP
+	AT+z9KWHG5x0fwvcFsacN8EUTSZcmC84Dclb11IJ1ikofRqjHqa/cXEcLsgGlnQ1WXnkWCBZQ0B
+	kcMag0h+IPqCR007Rrpjaq1J0JUw7zuXsQLWTjePA7ggFYgJK
+X-Google-Smtp-Source: AGHT+IEKR9lqo/hqz8KB7weodz8v7Aqpf53KghXcIYZZZWBswPHglSjrY6/FG0qMlC4Vb42mAnlGcg==
+X-Received: by 2002:a05:6402:5384:b0:5d0:88da:c235 with SMTP id 4fb4d7f45d1cf-5d81de19814mr2304032a12.31.1734702788134;
+        Fri, 20 Dec 2024 05:53:08 -0800 (PST)
 Received: from ?IPV6:2a02:3100:a560:5100:8565:bec9:a1c7:2d82? (dynamic-2a02-3100-a560-5100-8565-bec9-a1c7-2d82.310.pool.telefonica.de. [2a02:3100:a560:5100:8565:bec9:a1c7:2d82])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5d806feddfasm1841255a12.58.2024.12.20.05.51.32
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5d80679f3e8sm1738212a12.43.2024.12.20.05.53.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Dec 2024 05:51:33 -0800 (PST)
-Message-ID: <77df52d5-a7b9-4a5c-b004-a785750a1291@gmail.com>
-Date: Fri, 20 Dec 2024 14:51:32 +0100
+        Fri, 20 Dec 2024 05:53:07 -0800 (PST)
+Message-ID: <678a7f46-f8df-4967-b298-05b97537bc28@gmail.com>
+Date: Fri, 20 Dec 2024 14:53:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/2] net: phy: micrel: disable EEE on KSZ9477-type
- PHY
+Subject: [PATCH net-next 2/2] net: dsa: microchip: remove MICREL_NO_EEE
+ workaround
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Russell King - ARM Linux <linux@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
@@ -142,50 +142,71 @@ In-Reply-To: <942da603-ec84-4cb8-b452-22b5d8651ec1@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On several supported switches the integrated PHY's have buggy EEE.
-On the GBit-capable ones it's always the same type of PHY with PHY ID
-0x00221631. So we can simplify the erratum handling by simply clearing
-phydev->supported_eee for this PHY type.
+The integrated PHY's on all these switch types have the same PHY ID.
+So we can assume that the issue is related to the PHY type, not the
+switch type. After having disabled EEE for this PHY type, we can remove
+the workarouund code here.
 
-Note: The KSZ9477 PHY driver also covers e.g. the internal PHY of
-      KSZ9563 (ID: 0x00221637), which is unaffected by the EEE issue.
-      Therefore check for the exact PHY ID.
+Note: On the fast ethernet models listed here the integrated PHY has
+      PHY ID 0x00221550, which is handled by PHY driver
+      "Micrel KSZ87XX Switch". This PHY driver doesn't handle flag
+      MICREL_NO_EEE, therefore setting the flag for these models
+      results in a no-op.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/micrel.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/dsa/microchip/ksz_common.c | 25 -------------------------
+ include/linux/micrel_phy.h             |  1 -
+ 2 files changed, 26 deletions(-)
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 3ef508840..ece6d026e 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1522,6 +1522,12 @@ static int ksz9477_get_features(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	/* See KSZ9477 Errata DS80000754C Module 4 */
-+	if (phydev->phy_id == PHY_ID_KSZ9477) {
-+		linkmode_zero(phydev->supported_eee);
-+		return 0;
-+	}
-+
- 	/* The "EEE control and capability 1" (Register 3.20) seems to be
- 	 * influenced by the "EEE advertisement 1" (Register 7.60). Changes
- 	 * on the 7.60 will affect 3.20. So, we need to construct our own list
-@@ -2000,12 +2006,6 @@ static int ksz9477_config_init(struct phy_device *phydev)
- 			return err;
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index df314724e..c29dc1c9c 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2990,31 +2990,6 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
+ 		if (!port)
+ 			return MICREL_KSZ8_P1_ERRATA;
+ 		break;
+-	case KSZ8567_CHIP_ID:
+-		/* KSZ8567R Errata DS80000752C Module 4 */
+-	case KSZ8765_CHIP_ID:
+-	case KSZ8794_CHIP_ID:
+-	case KSZ8795_CHIP_ID:
+-		/* KSZ879x/KSZ877x/KSZ876x Errata DS80000687C Module 2 */
+-	case KSZ9477_CHIP_ID:
+-		/* KSZ9477S Errata DS80000754A Module 4 */
+-	case KSZ9567_CHIP_ID:
+-		/* KSZ9567S Errata DS80000756A Module 4 */
+-	case KSZ9896_CHIP_ID:
+-		/* KSZ9896C Errata DS80000757A Module 3 */
+-	case KSZ9897_CHIP_ID:
+-	case LAN9646_CHIP_ID:
+-		/* KSZ9897R Errata DS80000758C Module 4 */
+-		/* Energy Efficient Ethernet (EEE) feature select must be manually disabled
+-		 *   The EEE feature is enabled by default, but it is not fully
+-		 *   operational. It must be manually disabled through register
+-		 *   controls. If not disabled, the PHY ports can auto-negotiate
+-		 *   to enable EEE, and this feature can cause link drops when
+-		 *   linked to another device supporting EEE.
+-		 *
+-		 * The same item appears in the errata for all switches above.
+-		 */
+-		return MICREL_NO_EEE;
  	}
  
--	/* According to KSZ9477 Errata DS80000754C (Module 4) all EEE modes
--	 * in this switch shall be regarded as broken.
--	 */
--	if (phydev->dev_flags & MICREL_NO_EEE)
--		linkmode_fill(phydev->eee_broken_modes);
--
- 	return kszphy_config_init(phydev);
- }
+ 	return 0;
+diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
+index 591bf5b5e..9af01bdd8 100644
+--- a/include/linux/micrel_phy.h
++++ b/include/linux/micrel_phy.h
+@@ -44,7 +44,6 @@
+ #define MICREL_PHY_50MHZ_CLK	BIT(0)
+ #define MICREL_PHY_FXEN		BIT(1)
+ #define MICREL_KSZ8_P1_ERRATA	BIT(2)
+-#define MICREL_NO_EEE		BIT(3)
  
+ #define MICREL_KSZ9021_EXTREG_CTRL	0xB
+ #define MICREL_KSZ9021_EXTREG_DATA_WRITE	0xC
 -- 
 2.47.1
 
