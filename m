@@ -1,134 +1,109 @@
-Return-Path: <netdev+bounces-153726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929159F970A
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:56:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED2699F9759
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F137A167C91
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 16:55:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1799D16862C
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4A2223E76;
-	Fri, 20 Dec 2024 16:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB5C21C18D;
+	Fri, 20 Dec 2024 16:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+9lL9f8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dPgu79rI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663F522332B;
-	Fri, 20 Dec 2024 16:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A70621C184
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 16:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734713497; cv=none; b=qxsNNTDEaNT7Fs39wwoCsjOhfwi0OulAX/nO8T1+cB9Ufnloh0TmgLXZA4BA13gYpfb01ROGkEhlMLKkS3gf0i3k1DD8f6E8RtLSnKkHIVMYE1U3vKTATKtpy77K4xfHc3aAZU4bDuWbHh7F5Yo3caqfIu/uVFAgBTTUGmsmhWQ=
+	t=1734713853; cv=none; b=Ns4HVVeQuDhFJqgy4bHaNcLMRF2Gg5deDJ18trK0Qtm9bTLq0gXduvxWuv9Xs5JOSxv5knGg49neTnRgcjGxj+LFTPwR8/BC6LFuU2jAnnZxmBnBSIULzH5SckbqJ4iY1WiG7N2KiDIUMKJEx3Wtoic2oZHV344KBPrsKbmRDUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734713497; c=relaxed/simple;
-	bh=HPkhIBw/4uEx84HWtKiBxCfbApwv+OS0b7/QpplHQec=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=t6+vIOhIwAcx6bUjxoQ3VJs9Qs0oD9IciKhYMzkJOxKBhfUVJqKuh3aRQNnZ7mp3CHIFGh65rMTpOd1EsudYfLXZcoqZvlx+dxjvyP0CET42w7pCMnHTNUMGIT7DvJfOdmK4lHy1WO4Mh1IiNhkOrLDJWXosgisRKPVS7b8j9fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+9lL9f8; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2161eb94cceso15288595ad.2;
-        Fri, 20 Dec 2024 08:51:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734713495; x=1735318295; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lEud0HpUzW8AGsAHXsgRgKAN5zSUNFNJtoYvN7JgreE=;
-        b=C+9lL9f8eEuT2GqFtYwxpZvSR6lK/5RCR/ZyH8H7T65h8Ipc+StMnCsS99V2Hh87VX
-         AjrVNwVb9MBIjvYSkai6/GgYTNmZvAIpzP7waQBez/1UnBQBd82zsD7Es4f8rDtqmVR7
-         H9OsFt3uLGLUZkmZOmQw/WxSTc8b8LxmrIT2gryg5BCel+507GtKgujyxjBBCzgbz3Gi
-         sZJ2iZ7uklqdooOj/vigpt1MBcMPP8poYAYcDXVWz7Xn4K+xIvn9sIYcvvdEyILK2VHu
-         SbPF3Vg7xhuEMAaT2/5PmSIUjNHSLj9pVS1HURMAlH4N4UStURDIjjgE2d0g6N79COpM
-         y89Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734713495; x=1735318295;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lEud0HpUzW8AGsAHXsgRgKAN5zSUNFNJtoYvN7JgreE=;
-        b=I3/J/W0qHtuoSSVtJYufJsB7pgMMFiWphRFo1TxaxnpuUGj70BMLytnNg792h9KVnS
-         SP03GioVFV+d2bkudMY1a2AEdNjskek/V/l+vSyrFnsDXPJPsGv/Ue61R2CGKwpLM79/
-         hVvMl9LkuOrjfHlGt8VwLVGtdDnDzgeG0hcyWsjQPbBoEwD9PwYpS+UzNne+MbHdUpIF
-         GLPQOCc8PFFHipR5c+DAjbQGnZ7xH1dJ/heo0Qw4V40S4j9WZm/P/OtMDCemQIkwRSd7
-         h0n/rVQz5vT5xyi7xF68EGPVv6VHA+WWDytVIRlq+nCihFvgr+N1gt9ii/hDpxKcjjBD
-         erTg==
-X-Forwarded-Encrypted: i=1; AJvYcCW65AAhUukDgEC5IIlZiXszxcjtXi18xVGvwH83NgAXhaUliV6Vf7rN6EjW+A8h1VZP7fgOrpy5@vger.kernel.org, AJvYcCX+hE0H3HVkKYSF7x5X/AJEmtFZ+u3F/M/vrril/4cSTq0WjatpDQWclUJ63IC+eFe5SDk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm2PGT1D9PzaquI4MfIES8gl/w0wKrtqf8bS6EDOWdhNfp9nGf
-	SZQeHXqE9MAkgobB8XGXLFPsX9zRUZAMJkCef9Cn69AFuXeyx2gPrR/9Fw==
-X-Gm-Gg: ASbGncub8nEsRAyQ8dEutodADUwUG4+JSMeIOJZ1l/fi6kGNoz1BroSLs6aslC8Kg3N
-	2B7zJ5PYh5yKXKqKDeJ7iBVoSYaGMq1qHokmKKVLkoAnnzPXWYhbkC4YSzYzFUTiZX+QpTX5Lgn
-	kYb1KUJIptUTIOJA1imXoJYIrSfxnUKvvkuMrmUqcn+g8jIGlWB9co1u+oaD4Z+N8AcK+z7xqPf
-	35N+9iYDEhHxBOJzuUvVdQHuJ6e26u/yRntNOCyaHS2GpnPqUL5V0s=
-X-Google-Smtp-Source: AGHT+IH6hncF/IXzQqsfRxzRQS3FjeB5XNGzIaaBFZ6mk/sB7K7m1zCBlM90qhx2V3qOr/jvkYfJYw==
-X-Received: by 2002:a17:902:e54e:b0:216:45eb:5e4d with SMTP id d9443c01a7336-219e6e8c529mr52391405ad.6.1734713495643;
-        Fri, 20 Dec 2024 08:51:35 -0800 (PST)
-Received: from localhost ([98.97.44.4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dca006fasm31240115ad.227.2024.12.20.08.51.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2024 08:51:35 -0800 (PST)
-Date: Fri, 20 Dec 2024 08:51:32 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: zijianzhang@bytedance.com, 
- bpf@vger.kernel.org
-Cc: john.fastabend@gmail.com, 
- jakub@cloudflare.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- horms@kernel.org, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- netdev@vger.kernel.org, 
- Zijian Zhang <zijianzhang@bytedance.com>
-Message-ID: <6765a094c9db5_21de2208d9@john.notmuch>
-In-Reply-To: <20241210012039.1669389-1-zijianzhang@bytedance.com>
-References: <20241210012039.1669389-1-zijianzhang@bytedance.com>
-Subject: RE: [PATCH v2 bpf 0/2] tcp_bpf: update the rmem scheduling for
+	s=arc-20240116; t=1734713853; c=relaxed/simple;
+	bh=AOBd0F7Qx7Fxbmbd5Onnm0Dzrn/3mRnjriqMQSE4qoo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Hk5qIXmd4hTaC/69l4W5JrmTSBIgHR9lDICTEmPa7olS5dwZ+P3GLL4IMLcySR3PmbpwtNtq7AXAtc6OZZTpm9XI4ufB5AytF8FziwaU2HL8FWyqP7zJczjl0L2SmJHiubj7DSt9v8fcjQ2WMtQnbZN7EIG5HXkw2GlGudTPdSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dPgu79rI; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 047F5C0004;
+	Fri, 20 Dec 2024 16:57:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1734713848;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=THLHDzmAHxt/qZwMrTMralDc8lxghKhfxiCYeYGJvCA=;
+	b=dPgu79rITDboi9CGw3HRO+W6rNNRVFN2gcUFd3MbG70Y6ylmyDlBsa/BF5bC2qprzgHe1E
+	FF9GE112Lr/KU0g9xI7aKznxw0sTkgdDNn+IE4rlj10rD0gc+0SsU4dPUc2d971HBpoRfb
+	YgmBUbi7ow0vFl4yjJyn8IO+F/UewInyHh/GorwIEC1k3Q/HOUVfZg+hNZiu2/pcyf7XXb
+	S5VAkUnfZWyZQve6g60jNkqJ/7p46k/7Jh3RjsAKu9ryebS9Ng2hho5IBpVtItCqgiYAH5
+	zWwDfudAuCMZE7RZZDIUQfvrF9bKcrnnLkXDRNRxOT2jZbmlzXLbva+04K3rKw==
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Date: Fri, 20 Dec 2024 17:56:01 +0100
+Subject: [PATCH iproute2-next] man: fix two small typos on xdp
+ manipulations
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20241220-man-v1-1-2ac51fb859e1@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIAKChZWcC/x3MQQqAIBBA0avErBN0EIquEi3ExppFKmoRiHdPW
+ j74/AqZElOGZaiQ6OHMwXeocQB7Gn+Q4L0bUKJWiFJcxovZSqcnqdE6Db2MiRy//2UFjinchVB
+ 4egtsrX28C8zGZAAAAA==
+X-Change-ID: 20241220-man-8c0f47042cf4
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>, 
+ David Ahern <dsahern@gmail.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+X-Mailer: b4 0.14.2
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-zijianzhang@ wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
-> 
-> We should do sk_rmem_schedule instead of sk_wmem_schedule in function
-> bpf_tcp_ingress. We also need to update sk_rmem_alloc in bpf_tcp_ingress
-> accordingly to account for the rmem.
-> 
-> v2:
->   - Update the commit message to indicate the reason for msg->skb check
-> 
-> Cong Wang (1):
->   tcp_bpf: charge receive socket buffer in bpf_tcp_ingress()
-> 
-> Zijian Zhang (1):
->   tcp_bpf: add sk_rmem_alloc related logic for tcp_bpf ingress
->     redirection
-> 
->  include/linux/skmsg.h | 11 ++++++++---
->  include/net/sock.h    | 10 ++++++++--
->  net/core/skmsg.c      |  6 +++++-
->  net/ipv4/tcp_bpf.c    |  6 ++++--
->  4 files changed, 25 insertions(+), 8 deletions(-)
-> 
-> -- 
-> 2.20.1
-> 
+Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
+---
+ man/man8/ip-link.8.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks. Sorry fo rthe delay I thought this had an ACK already. My fault.
+diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
+index 64b5ba21c222e12b9b0f6e087f85bddf7e374a4b..b40c9938f5a88a05ffa0f2c4628438668e7231dc 100644
+--- a/man/man8/ip-link.8.in
++++ b/man/man8/ip-link.8.in
+@@ -2467,7 +2467,7 @@ loaded under
+ .B xdpgeneric object "|" pinned
+ then the kernel will use the generic XDP variant instead of the native one.
+ .B xdpdrv
+-has the opposite effect of requestsing that the automatic fallback to the
++has the opposite effect of requesting that the automatic fallback to the
+ generic XDP variant be disabled and in case driver is not XDP-capable error
+ should be returned.
+ .B xdpdrv
+@@ -2476,7 +2476,7 @@ also disables hardware offloads.
+ in ip link output indicates that the program has been offloaded to hardware
+ and can also be used to request the "offload" mode, much like
+ .B xdpgeneric
+-it forces program to be installed specifically in HW/FW of the apater.
++it forces program to be installed specifically in HW/FW of the adapter.
+ 
+ .B off
+ (or
 
-Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+---
+base-commit: 19514606dce31e85039b3b19d538e576824a03f5
+change-id: 20241220-man-8c0f47042cf4
+
+Best regards,
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
