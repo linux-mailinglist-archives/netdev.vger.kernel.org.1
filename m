@@ -1,143 +1,143 @@
-Return-Path: <netdev+bounces-153684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 015079F9337
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:28:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E909F9377
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:44:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0521883B8A
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:26:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 749A6188AAB8
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF5B2153E9;
-	Fri, 20 Dec 2024 13:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD31215F40;
+	Fri, 20 Dec 2024 13:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pKW0EyTr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ef9mAkKn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3681CBE8C
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 13:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB9686349;
+	Fri, 20 Dec 2024 13:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734701165; cv=none; b=ms0CuiBnh/i1BGBQn8eQRX6nrEW+12m8xP/HDuLq02alCuZWqnLPEYl05qS83T/gR73a7oJIAFuCo3bw7/7CV50tGVWFCypTaFUt1knHRXabp837A6aRRBGRFe0iATEwOJJoOJN1wfu40ZE65y+/uQHIOL/DV9CC4I9uvYfY0Cw=
+	t=1734702211; cv=none; b=k1GSxhFSKmM3VqR7Cm38ZXPYeKamBlY7dVTPRwRkVV5lKnVmIg/HTWJi78dzbSSzwZvsdV4KYvhYbwAnBRweeiUSRguovIOwcxE5I2DJArBBoekA2pGS4DS9JITJ4pEqwmH0LtknvTiRYgCOerXhg9Ay5xsFgyxO8VhTOTftUNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734701165; c=relaxed/simple;
-	bh=n4pdjIE8wk6+RrT25j2XZ+MN5qzobRKdoai9EioUYbg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cnyxo6S3iaK4RxFRUHRgMR4u8UmyiQag/2FEAC7j+InqxQOMk0FLYqy7JdGhdzHU7HycZoRSkK1SsznOPL9dmno6hUawyHpbaihdUcdQ0+wgo95mJIF+z1iGYAqLuKLmYL+v3NzTlcYuN0KNcuxrOw9tg22bZFIJmS+e/pZQVhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pKW0EyTr; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BK7Llj1028178
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 13:26:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	1i0DA82kkn8WuMBOuii7HiTKNDRCyKMaAec5At2Bx5g=; b=pKW0EyTri/sXirk8
-	DqTpbTjast0OqJWtHVOIjLeWwU0zch1+6n8TCbafhNcaARUr1tW3SV3a0WCdVkte
-	mAjpydCR0lnLDoX9amtfSYmtP0twAEp1ddHWC+yu7J9U5BKCuRKnRRdUla7upPYj
-	BnlQnQFOz24VZORjj3i8402+5xnUSe2ReCgZU8YbfzncfeIib5VpreAUiirppin/
-	rBvnS4X+5D4N1iXPIH7kKIHAFaKQdr8RD9a1DBA10k7X2OB1Rjg+A2MKYl6mI06i
-	wpAGuarPOa6Jh96o1ysoaohtqsxlhFDW9hBxYEwWrzTX+b1C2bMAkMkhYXiLT5bJ
-	uWacAA==
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43n44ggwt7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 13:26:01 +0000 (GMT)
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6d8824c96cdso5718816d6.2
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 05:26:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734701161; x=1735305961;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1i0DA82kkn8WuMBOuii7HiTKNDRCyKMaAec5At2Bx5g=;
-        b=AJLhpnwd4kms2Rx2p4ufa99kCyf2dUM/3bYD+lhph3TXZSRZJUGIu1xQ0zB8xHfTDA
-         fjPDVz0SsiwaQZ83NZjeG4OlIV0aIOehAQuiOQqSolzmH3TPIpzGYHcys6wieP+qULW+
-         IWaRpejDoo0v1GoEtFIkPfkDPEkfiTkJRqVGW7tiq5glscEdkfenDxD/6vLrUWaU+xLL
-         b4C1zTmS9f/u5USB8gEQHBnMo9HqXgEyvzh5GfRcOkwJWq1pPZM3ez+CcjcC31XNQ4Ic
-         PJImB3DrKBjGeMns4xFXOxxBgpCrp0MM10rNRt4mNMygMqsV2sQC9v7ko0bmWDL9lwMe
-         ++og==
-X-Forwarded-Encrypted: i=1; AJvYcCVH6Ej6r6DBWHXrRInOmfsbESe6in4J/WwyJ+4OQpF9vsjYIf9xsu7Zn/YovpQjg3rcOw/3nIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWKa08JqsSkjKsC9RtfRvevX9VmBoD5y2COEQfvVGhkFamEukX
-	Mzda5AO80m4PvT2lITEqOZWqmIreB2kal04/ycr0byhoLmspYJob/WRRz4xMo8ka0/mLvXt6mVq
-	Sid9k4Ba7XiBTLYq1NP0jUIZqOSqn/ZMV0hQP/lAXHFbeZMOcqPJY3aU=
-X-Gm-Gg: ASbGncvrYNHbYsH+SYibHspUD/ikPWLr9CzePBItyTXgpNRPrpLcLF0JSOlJ9xKmsBz
-	ezOf5X5OMntutu6vi38f2xNaMtEZ24DFIydl0fRZE+HAT7Au6JKstzwGyqHAS/egnabToD9NdYR
-	kUKI8PFe7ptncTwGBx6AOM9SngouZOjIxRge8KnX45t9qSCvTzJ/jhEDovENw6c+ICBDqs3/XB4
-	s6jybt7ZKpymtfwaXQGS6GMjZrcNVARRyNS8uEW4I6VpZqe8qcq5q8fSAokr0LzuKwLCKFzfj9X
-	265HaFjKxIBYsfLxSJjcmIdikomLnsu/bzA=
-X-Received: by 2002:a05:6214:5504:b0:6d8:8283:445c with SMTP id 6a1803df08f44-6dd2332ec62mr16425036d6.4.1734701161299;
-        Fri, 20 Dec 2024 05:26:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFkq09EQ0ae97mVq22oeA9jfGWGDmW+Y+xZX/h1a5jnx6pnSBVt7BZ44l6VTdHgTK4Dtqih8Q==
-X-Received: by 2002:a05:6214:5504:b0:6d8:8283:445c with SMTP id 6a1803df08f44-6dd2332ec62mr16424876d6.4.1734701160960;
-        Fri, 20 Dec 2024 05:26:00 -0800 (PST)
-Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0f015270sm175995166b.162.2024.12.20.05.25.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Dec 2024 05:26:00 -0800 (PST)
-Message-ID: <7d33eed7-92ba-4cbb-89b0-9b7e894f1c94@oss.qualcomm.com>
-Date: Fri, 20 Dec 2024 14:25:57 +0100
+	s=arc-20240116; t=1734702211; c=relaxed/simple;
+	bh=D1DYlVWx+N8q+xaoc+H+qkYq6L6bLr3bZzEX+jbTMfE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s9ZKjrpxv8v2oxVcRivmPLezoWtdQDtlm7opBRKI8BuKRtQsssnecr1zJkHa6hUd8TstguSu85WeDk8hEcqmXkD+Bs5oWv7VEXiq9vgLCZGjUmyqHnz5hQ4Uur3jyj35KWbaCMV5tzsOg2nFqPCju2jWeScW/TPh8qYikBhRUZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ef9mAkKn; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734702208; x=1766238208;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=D1DYlVWx+N8q+xaoc+H+qkYq6L6bLr3bZzEX+jbTMfE=;
+  b=ef9mAkKngJ2Ad/lkOm/1Y/HxnLEAon81mLG48urQcC7GMUUQq/qIVQtR
+   Uz8/tLJH9AqBnXyUOh572XUZru+Z+XYE/vi2TaB3fgH6Dti25PnK2w85A
+   e5qahy9o3OvBJV1Oq4qvy3T1eTSAVkC9i9bUQzGkDpXFSOp4+PULla/0J
+   Kn8gi+No5HL4ipWaVwc1aW1WX+zs4z0/j//yR/XqhptAei2WOEVf5KRm9
+   wXDixVwW4IdhBmAMCxCWkNSEjvMp7U0jF+nqeaxGaeG50VrRMm8c/xCRi
+   6zqBUee2PM0NmnehdUzJX04s3uh2Vg0kWtT1gmWhnTcApUpuFjmQ96yfK
+   g==;
+X-CSE-ConnectionGUID: BewbjRXUT4meh9txweXVoA==
+X-CSE-MsgGUID: uLn/T/UfQi+yyTg3pK1XDQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="35281101"
+X-IronPort-AV: E=Sophos;i="6.12,250,1728975600"; 
+   d="scan'208";a="35281101"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 05:43:28 -0800
+X-CSE-ConnectionGUID: nqWMJoNzQdmMiP1bG6aL6A==
+X-CSE-MsgGUID: rHjW1K4lQVOXgQ7ljJDvLw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="121791754"
+Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 20 Dec 2024 05:43:25 -0800
+Received: from kbuild by a46f226878e0 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tOdHn-0001C5-1c;
+	Fri, 20 Dec 2024 13:43:23 +0000
+Date: Fri, 20 Dec 2024 21:42:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yajun Deng <yajun.deng@linux.dev>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Yajun Deng <yajun.deng@linux.dev>
+Subject: Re: [PATCH net-next] sock: make SKB_FRAG_PAGE_ORDER equal to
+ PAGE_ALLOC_COSTLY_ORDER
+Message-ID: <202412202122.04V0tnNx-lkp@intel.com>
+References: <20241217105659.2215649-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: qcom,ipa: document qcm2290
- compatible
-To: Wojciech Slenska <wojciech.slenska@gmail.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S . Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20241220073540.37631-1-wojciech.slenska@gmail.com>
- <20241220073540.37631-2-wojciech.slenska@gmail.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20241220073540.37631-2-wojciech.slenska@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: wQKvRt8FjC6DP7YYQ8VUmLTHigmT0xE-
-X-Proofpoint-GUID: wQKvRt8FjC6DP7YYQ8VUmLTHigmT0xE-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=955 spamscore=0 phishscore=0 lowpriorityscore=0 mlxscore=0
- clxscore=1015 suspectscore=0 bulkscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412200110
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241217105659.2215649-1-yajun.deng@linux.dev>
 
-On 20.12.2024 8:35 AM, Wojciech Slenska wrote:
-> Document that ipa on qcm2290 uses version 4.2, the same
-> as sc7180.
-> 
-> Signed-off-by: Wojciech Slenska <wojciech.slenska@gmail.com>
-> ---
+Hi Yajun,
 
-FWIW this needs some more work on the Linux side, the IPA driver
-currently hardcodes a reference to IMEM, which has a different
-base between these two SoCs.
+kernel test robot noticed the following build warnings:
 
-The IMEM region doesn't seem to be used as of current, but things
-will explode the second it is.
+[auto build test WARNING on net-next/main]
 
-A long overdue update would be to make the IPA driver consume
-a syscon/memory-region-like property pointing to IMEM (or a slice
-of it, maybe Alex knows what it was supposed to be used for).
+url:    https://github.com/intel-lab-lkp/linux/commits/Yajun-Deng/sock-make-SKB_FRAG_PAGE_ORDER-equal-to-PAGE_ALLOC_COSTLY_ORDER/20241217-185748
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241217105659.2215649-1-yajun.deng%40linux.dev
+patch subject: [PATCH net-next] sock: make SKB_FRAG_PAGE_ORDER equal to PAGE_ALLOC_COSTLY_ORDER
+config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20241220/202412202122.04V0tnNx-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241220/202412202122.04V0tnNx-lkp@intel.com/reproduce)
 
-Konrad
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412202122.04V0tnNx-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from arch/openrisc/include/asm/page.h:18,
+                    from arch/openrisc/include/asm/processor.h:19,
+                    from arch/openrisc/include/asm/thread_info.h:22,
+                    from include/linux/thread_info.h:60,
+                    from include/asm-generic/preempt.h:5,
+                    from ./arch/openrisc/include/generated/asm/preempt.h:1,
+                    from include/linux/preempt.h:79,
+                    from include/linux/spinlock.h:56,
+                    from include/linux/wait.h:9,
+                    from include/linux/wait_bit.h:8,
+                    from include/linux/fs.h:6,
+                    from include/linux/highmem.h:5,
+                    from include/linux/bvec.h:10,
+                    from include/linux/skbuff.h:17,
+                    from include/linux/ip.h:16,
+                    from include/net/ip.h:22,
+                    from include/linux/errqueue.h:6,
+                    from net/core/sock.c:91:
+   net/core/sock.c: In function 'skb_page_frag_refill':
+>> include/vdso/page.h:15:25: warning: conversion from 'long unsigned int' to '__u16' {aka 'short unsigned int'} changes value from '65536' to '0' [-Woverflow]
+      15 | #define PAGE_SIZE       (_AC(1,UL) << CONFIG_PAGE_SHIFT)
+         |                         ^
+   net/core/sock.c:3044:39: note: in expansion of macro 'PAGE_SIZE'
+    3044 |                         pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+         |                                       ^~~~~~~~~
+
+
+vim +15 include/vdso/page.h
+
+efe8419ae78d65 Vincenzo Frascino 2024-10-14  14  
+efe8419ae78d65 Vincenzo Frascino 2024-10-14 @15  #define PAGE_SIZE	(_AC(1,UL) << CONFIG_PAGE_SHIFT)
+efe8419ae78d65 Vincenzo Frascino 2024-10-14  16  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
