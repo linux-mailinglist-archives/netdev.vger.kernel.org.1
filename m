@@ -1,140 +1,133 @@
-Return-Path: <netdev+bounces-153671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082CC9F9277
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:46:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF649F927C
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:47:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACB091893259
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:46:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 090D6163CF0
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7722156E2;
-	Fri, 20 Dec 2024 12:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3CE2046B6;
+	Fri, 20 Dec 2024 12:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eonzgd44"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="sUFXG+vn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F831C5F08
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 12:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37061C5F08
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 12:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734698755; cv=none; b=cU50IogNI/9UpnhQPu0ke9d8ITkMQRMBFkCmcyqk7deaeiTTs3Z4EeQ2do6wufzjn4SeMtytiq5nieaDHJX4mbdGpVAA/XXTGcU982lNDpOeWHBepSyOjxzuleC4qyqA6jFr8TagQARYh55zLytffftZuM014wJESxeHBk5Id+U=
+	t=1734698816; cv=none; b=HzO+F0r4njJXhOmJEFwW64kD11fLW50omgWCfaegRJQedfWmpVUxlqs7XGRqh8wlITj8B3pDE5BnDlwcNGlCv7mk3BO2KQUSNfmjMwM4KW6zeX+92xOK/Q0jKJWYo4DpibOgG1ks2jyFaC0eaxDXLeEFbROEcxqRp3DNRpepb1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734698755; c=relaxed/simple;
-	bh=eIvJgkvy6HRuXmDaqsB7MX3E+E+alDS9//+kZ9m0t6Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W3R1iWywuxhAqdg3KMHJpPsjkAqGaj8ZynC1ceTxuumvTND7eZht3oxwLJjnqkGFh9iyysHc8kFPzmAdB7ocnNbVP2WSj772vEt+bZzSKU7/DHVyTrMuSM7f7PZw9/Ga4+S/LTEXNuV/oTnQDlg+t1LrI7j4pqnrP54sVF7MroI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eonzgd44; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-53df80eeeedso1842436e87.2
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:45:52 -0800 (PST)
+	s=arc-20240116; t=1734698816; c=relaxed/simple;
+	bh=5khHjsT1KuPi0a5zmTt4KqcGl30ctxJ3hwpuSXe7JXE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L7U4Z+ThgzLNjKKO0XQTyVlyg0UTt1mREK3C9k3stnIXPSUeQ3XvGnAafZlpho8XgPdehPprAUM0QljeB1lRXGeboufxSEEbrvUdTGaSO7v/BwNmUzuhnBbe1PnrAr5+o8ebBSvLlfJIjn3heU2OQX8+GJGYGsr1nQDvBIDoQFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=sUFXG+vn; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-540218726d5so1811714e87.2
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:46:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734698751; x=1735303551; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q+v+f0F+ggXM/pkSaGIpemMgLpckgFL+0mqDxCkmiPc=;
-        b=eonzgd44hq3ryZG4G65d3usc9iXHmng4QZBz+h6huIRQtPiVzd8RqWpA+IvNyM+afe
-         YSWw9pW+g9evbv7WQDtxPQL1j4xjpZvknXtudiwsU6vptgsEq5T45djbDMx9oq08Z5Pb
-         wHpiDNUwSNMr2BRGWYATXXMgeuXmIYcaq8l8MWI7JKjIuyAS3BHXB4u2TJMn1nGUaFrS
-         DkeTwG3ALTAeLR+y2oWzvNSO6XeFlCYbWXxthmz21GuYLFIN5Rthn2jPyzdNlQfyi1AK
-         3Lz6v5eEoF+S0jKzSXWxiUSGNiDGB4I5CH1bDAQzsNjwuup9MQmUM2QI5e7yELEGw6fY
-         rXnQ==
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1734698813; x=1735303613; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VAfL/GZOdN5vbvq3CRu6BK/jXF2l81O7enXcx/p2vpQ=;
+        b=sUFXG+vnYfK6NV5ha5o44BmYoAE0Ic2tgl1me2Cg+6r9hiUKP13f+zLZp1cTf5qsEe
+         dR4NavFY8lWuaSIlNWE74X9hTdPNlHiHPw2rKfoyz/dTFzmEv41fo6NBpTBV1fNIi+xk
+         nkaNL6aqG1yblG5p/KC6KHlp49XOrKNFjdS8GBgt+NfDvcYjEgGbD5UiaoR2zb7v/wHz
+         8SUT2feEQr9CDw63CngIxyUvLRivtcqluRM7C2zLuxJi0EoW37MCFuApVyud+0noQ0U1
+         ktGqdqiUONh48BTdKISBvfz5G8zQZcl7KUGVpGQiQBs1jJ1siZ281964e/naIlPw0WDh
+         tMvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734698751; x=1735303551;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q+v+f0F+ggXM/pkSaGIpemMgLpckgFL+0mqDxCkmiPc=;
-        b=RId25S3F0R+4Ca2nxvozoWVtXRg0yZRl8vT1Zp9Aj+eO9u6aij/1kmLSZN5BGle9LV
-         PqFAqLTo2lVqsh4ioJoU8kg8tgR1IQaS4dDoACTNG9JZbn/eEQ6ae1zzORSVK8YwirgA
-         vxf/mFChH8vEL5znzBMnuitMmiETKt+I47Y2PHCyIm46CJ/pxK5fMz6DkLri/n0Mw3lT
-         j5LLXG1LNtc+Djkj+xGWZyUAg38i+t6q7tgvpVKhXAA5oG1gZiLBA9FVW1UxyqQwx4PZ
-         z7d8DYsLBCdlq1LbwWy/oJ4JL5pKTlglVPjmY7zn9hxz4yhTKutpQol2kcJmCv/Ad8h5
-         oRmg==
-X-Forwarded-Encrypted: i=1; AJvYcCWjJRg5JhRfieO+Onjv8z/ZprsP611vDKthjb04HpmAezOjJs6O1sMceMiZuf0lclBoTluVW9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMiQY2YaTFW16TRBo9xkOq9Xyu+hfTeO3aJH5g6Wt68a55IVKG
-	l9mSJYpIs42AtzYTkY2YXhvVyJIxalgn+Dcpv8hvpPAYysSZnEL0ke2POCvMU4OC9WBHWBe3K/9
-	qXsGFdreF7WUmH4oBkoHVXi1H07J+Nb42YPxCtA==
-X-Gm-Gg: ASbGnctpq8wCedn1jKEYLSrhzH/UdMOvjvCghcdGKHkUJSxTehMue+bd3NAKeryhSdX
-	P4wmmcwKp9Iu0LuZ2SLzfLrG/A6lP1NDW9xfZ0g==
-X-Google-Smtp-Source: AGHT+IFQLxoTvDBhmmMtrluimmMG49UjGriPLeDS3/xO9K0D1RUiifqIPS/6LdImELHSoCVS/nonG7W60F+gutNSGmY=
-X-Received: by 2002:a05:6512:3f25:b0:540:1be6:f15f with SMTP id
- 2adb3069b0e04-542294aceebmr908589e87.0.1734698751140; Fri, 20 Dec 2024
- 04:45:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734698813; x=1735303613;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VAfL/GZOdN5vbvq3CRu6BK/jXF2l81O7enXcx/p2vpQ=;
+        b=g7/F58tG1gfMDTAUrKoLgfxSSWJx0ftdP7T3KVtJEiHMpP1Q9sPwWGSbvo4ReuJ+D4
+         qV71Qudf0Y8piFyyS5k1TWjZuuJwG/mLw062M5N9ckXnNCi4/QdHOG4Y7gc4CybrRlTF
+         AFH2JQCSClshwlh/icFdHp8KggmtpBHq7gShZhM2Ednnsci7mvRFqcCTF9j9730L6Jms
+         r6/UbyZlQ391r+r+p43PB5X0f9vLar3KNgG08Fmxmnosma70TwTZv5/zB3Et0fu6RHKJ
+         0lmfLqATb9rPxSCpGhvjTobj5iu0U8i5BnixegUQGvQ/9rZ/V47DvWWvX0/CYIc2NVU9
+         5iDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbzBNNYqZbXhk2+qGhX6Qbb2OVCJhebLGbW1N1L2toXIk5+7WomwHPMniTZln2npsHF/Q4q3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywgl4QQQmyWkEtwOBo/VkMWdtMAAkSGqsL8/crzAJaQFK0Hnapi
+	U6OVK6KmMzPotDO3Ikmz5jE3t3GHzKx/WWftQDmT/yFiXRZ2wqXzhsmPUr5jyUU=
+X-Gm-Gg: ASbGncsJdbPknl+kpWVepDA6f1tNw8YzVCtLFg5TZVWEaGp76T47+S2eUqxwG41aXpl
+	CT36kxvhlbK+FJVPVxNp/DHyzR1ehwaAaboXG+24cCy+tUqxoIsm809vgBIGrp6LjZnkQ+Uj3jH
+	iBYnS8YbVfOn9l1dpy/XCm8RxwkDAkPrE5FZxjr0Aag5Sx118796JD/iB/dRiSIDLF2erFLAGTo
+	ItkTPrjS1HN4lSQddKjDeW88HPgbxutqCFGSeeZusVwgbAY+866v9I9OaII/qBnrr6MhZTtMBPH
+X-Google-Smtp-Source: AGHT+IFRug0gAtFzEi7SVSfbVtJJPnSgb4yzeT1ZeS1to7j0mgIVY3nWKOx6iFynybRq9q6BDl3nNw==
+X-Received: by 2002:a05:6512:1055:b0:53e:39e6:a1c1 with SMTP id 2adb3069b0e04-54229560360mr1003264e87.43.1734698812945;
+        Fri, 20 Dec 2024 04:46:52 -0800 (PST)
+Received: from [192.168.0.104] ([91.198.101.25])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-542235ffe48sm477812e87.73.2024.12.20.04.46.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Dec 2024 04:46:52 -0800 (PST)
+Message-ID: <ca2f1f63-0682-420f-b447-eebe7ba66c63@cogentembedded.com>
+Date: Fri, 20 Dec 2024 17:46:50 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-2-tmyu0@nuvoton.com>
-In-Reply-To: <20241210104524.2466586-2-tmyu0@nuvoton.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 20 Dec 2024 13:45:39 +0100
-Message-ID: <CACRpkdZh4hCvBN=7beFEgm-mmdwSTW1fd8OZhQO3kr6Cy7P=dA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/7] mfd: Add core driver for Nuvoton NCT6694
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: renesas: rswitch: use per-port irq
+ handlers
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michael Dege <michael.dege@renesas.com>,
+ Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+ Dennis Ostermann <dennis.ostermann@renesas.com>
+References: <20241220041659.2985492-1-nikita.yoush@cogentembedded.com>
+ <20241220041659.2985492-2-nikita.yoush@cogentembedded.com>
+ <1f4b60ec-544c-49c5-b939-89882e1311ed@lunn.ch>
+ <21f0aa0e-9df3-4b5a-957a-dcf68399cdce@cogentembedded.com>
+ <b82ba8c6-b8ba-4045-bd65-b2cdc80d7df9@lunn.ch>
+Content-Language: en-US, ru-RU
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+In-Reply-To: <b82ba8c6-b8ba-4045-bd65-b2cdc80d7df9@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Ming,
+>> There are only 3 physical ports, however the use case I'm targeting is -
+>> virtual ports serving virtual machines (with offloading features making
+>> hardware directly L2-forward or L3-route most traffic between outside world
+>> and VM-owned virtual port frontends). In this setup, some of 8 GWCA irqs
+>> will be given to VMs and thus there are definitely not enough to
+>> per-consumer allocation.
+> 
+> And you are describing your VMs in DT as well? And if you change your
+> VM setup, you are going to modify your DT? This all sounds wrong.
 
-thanks for your patch!
+Since this is for embedded, particular setups will likely be static... so defining driver configuration 
+in device tree suits the needs quite well.
 
-On Tue, Dec 10, 2024 at 11:45=E2=80=AFAM Ming Yu <a0282524688@gmail.com> wr=
-ote:
+Still, if this is considered as device tree misuse, I will implement some other solution.
 
-> The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
-> 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
-> PWM, and RTC.
->
-> This driver implements USB device functionality and shares the
-> chip's peripherals as a child device.
->
-> Each child device can use the USB functions nct6694_read_msg()
-> and nct6694_write_msg() to issue a command. They can also request
-> interrupt that will be called when the USB device receives its
-> interrupt pipe.
->
-> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
-(...)
-> +       while (*int_status) {
-> +               int irq =3D __ffs(*int_status);
-> +
-> +               if (*int_status & (1 << irq))
-> +                       generic_handle_irq_safe(irq_find_mapping(nct6694-=
->domain, irq));
-> +
-> +               *int_status &=3D ~(1 << irq);
+Maybe, add a sysfs_group to port netdev and have irq_index attribute there?
+Then, target rootfs will be able to configure that via udev rules file.
 
-What about doing what you do in the GPIO driver and
-#include <linux/bits.h>
+> I don't know if it will help, but ethtool mentions:
+> 
+>         -l --show-channels
+> ... 
+>         -L --set-channels
 
-And search and replace "(1 << irq)" with BIT(irq)?
+I believe this is for multi-queue devices configuration, which is a somewhat different thing.
 
-PS the main reason we do this is because
-
-int a =3D (1 << 31);
-
-becomes a negative number on 32bit machines, and
-can lead to confusing side effects. BIT() always work
-on unsigned.
-
-Yours,
-Linus Walleij
+Nikita
 
