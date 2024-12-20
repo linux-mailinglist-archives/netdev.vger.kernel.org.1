@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-153587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF1B9F8B16
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 05:17:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 220009F8B22
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 05:18:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30E7A1894763
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 04:17:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FF207A2227
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 04:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5631442F2;
-	Fri, 20 Dec 2024 04:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C817189BB3;
+	Fri, 20 Dec 2024 04:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="W3DUukMz"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="C/5/BU97"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A39E70805
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422BF157E99
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 04:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734668231; cv=none; b=tKeXxesWSxvl07pFD+F54MgAXm9eNEzoxewKpVdyzkJuUE/fq11tzA0pfpelbavI/lHt+vspoP0ZjcfSkmzLNFab3QuO+fuqBW6hA1G60tx4m/PXqn8HuitVKSYHQfiX4FdX36t6etXSKSOUy13rsE6E0OEZIxsHWh0+O3a7plo=
+	t=1734668234; cv=none; b=VNDImxfgNVMHaHcgvCD0ZVMrZnqNH5al9MVL293SNOl9Br5drzYeCRf9sv6h687ZMBt+XukdnR9TouYhXOxUg1m7f2EhfxTub04xmcjBcKRAhGctb3FbUOqBtgOu9Zq5+05gOn1MwsWQsU4lGEXCZ+M00jxILDzn2PqOqIt4GQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734668231; c=relaxed/simple;
-	bh=Zzz2EPje6+3TuGXV1Q1rqzKmSt6Pb5THyarRvmhP+Xk=;
+	s=arc-20240116; t=1734668234; c=relaxed/simple;
+	bh=7UUTsmjRchZRPWt1L9EdlY0v8i26VrF6o4c6qJ5IuEw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ngyAHTd9RmwEJYSaSITdGMjqepQlMcczAwXCipKyrWVhWBgT9lG6+Rj3n+NkdmdIYmVAFeeJNtlX6wpdiHSNenxsN3+TVDNYYVo0I8U1NYe1u+R+mDmRCvd/rYscIa909ELoeg9xuEB46m3N6fI6G8WvWr8BVvQMXmolPBF5Hk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=W3DUukMz; arc=none smtp.client-ip=209.85.167.49
+	 MIME-Version; b=gV2x3QI1rvzhywjjIWc0iA7uv2l5yzAenvB0CP/7qiMXJHLd6WsyF/4OA5oqcm8UNljo8guOxi/MGXzYfan3XaDiqP2XVQJEKylVyeMzZOwW3GByQzXNSRRq7SvE7A6LCAHsz06jJPKIH2AAoTrOP5J0jvbO5FJT1wsFTXXJ0l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=C/5/BU97; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5401c68b89eso1678738e87.0
-        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 20:17:09 -0800 (PST)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53e3a5fa6aaso2775754e87.0
+        for <netdev@vger.kernel.org>; Thu, 19 Dec 2024 20:17:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1734668227; x=1735273027; darn=vger.kernel.org;
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1734668229; x=1735273029; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MdyfGmuzzdq2sa9nFxISnqHi8az8zfldhWocEWhpN90=;
-        b=W3DUukMzVg/QS5ixYElsNbukPKsCouvKBQQfVQ6VfjQf5ttQz67OW2pvVCNKALHikT
-         1YXPNZXc0srtf2oivGocWZcvZSg7wMLzJYKuGmb0W2k0UIcA60+SOJpubHiMut7VBBGE
-         qIz9E+Eq2Q53piWnzAbxC74SA8fmtY+9RLbj0ckeIWJgRsf4JYDf9wKDhsoczyV2qpVm
-         cYLhTEYZcH3J2SR21kMZlgeaROSqh+vw6l8D205nonYMTMykdW+vlnCcUQoAzKgcLuOg
-         l2Yy9UG6eI8h0x8rueMLiScH8MymQEU131Xs+v7dygAgqh0r2NwcRBupvndVfBgCrWiS
-         ApOQ==
+        bh=LTwIjsFkDY5wb4hiAoIm9JErxNYkg5bDw1x4lkN+29w=;
+        b=C/5/BU97WUAHskdaqwHOyALD2wJogE7lKIPRtIv0mxSpReUWljdAJq9HG5SQCI4aBD
+         Moq5j1i67w6Pfq8M+Iy4JpSSsAS/wBYXrtEe3tpF6sT+3oJIDU5tlhKPme3Z80vixWvL
+         BjuCHWiu0za2Hrcx0o9PNF3xhLTwjUybjLRy3RiSi2/gOLKK44j2ArfpaxqloBshXsMG
+         Da2lmcWbGP3M+7b4K3pHjV5c5PRMH4Lg+QTGk7jQMK+ZWZz5N+PSixYm3RFbfdc5SXGm
+         R5jDdqg0LJMAvzqXR/rIsQmw+ppKCQnORD/IEDYvKbH25OrqaDORtQwouw7NYJqY0cfT
+         IoEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734668227; x=1735273027;
+        d=1e100.net; s=20230601; t=1734668229; x=1735273029;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MdyfGmuzzdq2sa9nFxISnqHi8az8zfldhWocEWhpN90=;
-        b=bku5bLNeObMnOkie2rlHZluQ7xO8xdmBA/nYe4nPPMQSnC/U8NNsIlP8e4V8zpWVVo
-         j7EGrlWXprbBVERoFeGceVs7nDab10+cw+5eGRVwbB4ddsT8iDwqaSZDdeCgK01EHdJF
-         gVVazzTaYCYmYvomkHAgwF49lfW/RkcEjWjvCjaDMFiQRTbTM0iLJVYlkRFsQqp78uHx
-         rb5ZR6irpjvG7AamX5M9fKSS0WTEihxDfT/Xbo2yg8VoITTIqK+6GPPkLbfL8dvw/McU
-         im5A+juRLmvf/rtrjrQoT56pPQrOJZwJB7C3oj4F3BHqEntL6tqAfzfEPMwUKXv78qs+
-         EMgw==
-X-Gm-Message-State: AOJu0Yzx9WFYtHT7PozKId/ojr0xoPog6MTPT5/VCohpHV6Lds4rkdrA
-	63IgVygT6BzpQK4kvE9e9+nxdoXlVfE0/Vl1zrlL7IEl6/YIl9oKx3q+BhFCE2U=
-X-Gm-Gg: ASbGncv2xco3qsjyMBh1f6NFAHUaS03R8NMropog/2hldHFhoz/rggqT3OwKa6WAyV4
-	gkEzwlapbccyD/TkWlYr7oeS3FeV+9yIfPXFJ5B2XWxGs7RQIsNwokZCnn98Jzwpiqj7MWvnk1P
-	qjLS7l/D6XwEoL+J31LzNZ5gy+O4cWpM6R5Dqnvo/juFJYK7+XXK2w4DTEAYb6ryzldcTKyXP7h
-	u6sr69sDbsz36tlIJ2nqdn0JH1eO6C1+qAbsPQXK/sUpVANn0pagIsXNI1iy6A7RBIgmbU=
-X-Google-Smtp-Source: AGHT+IEm/48JRG9rYImWJCL4b/vA9ZZZm32z9vp+IsOg3BhPCH2QFQWygKbCz9GD+scIV0XfwvxHMw==
-X-Received: by 2002:a05:6512:32c8:b0:541:3175:19b4 with SMTP id 2adb3069b0e04-542212eee43mr2221258e87.11.1734668227314;
-        Thu, 19 Dec 2024 20:17:07 -0800 (PST)
+        bh=LTwIjsFkDY5wb4hiAoIm9JErxNYkg5bDw1x4lkN+29w=;
+        b=MllUxWNj2wtp0LRb7faeK6KxdpwhvTHz+AzxjMWoZG3Zt9CRruHeZaQYB4/7Sk9CB2
+         cW1nn5v89/JucAlI75R3Q+t1nL3r2uw0ruqkYG94Ir2OOMRFjVseLBhCO3guuiRbBrpJ
+         10Ln9JANbNxSMQcufvJJDSLovoE7Q0pzl2C6XcyUxVTnGVQ54U1nQuKrzjdU+L6w9wFG
+         yeVofAMkYLX6Q59qg3ZnXqqrWI6A6FsJaOvdb49liAo+T+tliP0SV9a+peId511kZcR6
+         oTv7ELcKHXnNUTagtv2rfJuaLozvFUVDKd7lIjh9BYavyuIA8GgOP4m3UnhRI4fZrTyP
+         ZxKw==
+X-Gm-Message-State: AOJu0Yy4Cfa0UGDqMgMjcHnZ0bhzMTot8JCF/bmlHRVE9GpbW3gEC/2W
+	wAgG3TUL0oLusZiFfgXTsb5DY0LLbo4TAXnfPg0+znGWFlVeo40ExYyjyOR2oq0=
+X-Gm-Gg: ASbGncuuxhTeX2H7N4Fg4zJuv7ftPkrFp1DqnmT6I+vzEL75QXlICtrerX6KA13K/A5
+	KojeWE8RZHkwamfBIIFVjmOitQgRgdYMFa3FkBHR6vwnaZASxAhgM7LA/Mpv9sf+Ei8aD97jCKc
+	Tsl+ff+mJTYgIR+Lv6UFII0/MnBdOaPC6hPoJOzBptsMv1P1usXTqj0jNgX3Yy3it7+8MqIF0iW
+	dyQGK6X1b8Yi1HussxA0xhqtCeFvH1GwQARF9NAy0HzGV1burLytg/W3HdsRbIibgVGVPU=
+X-Google-Smtp-Source: AGHT+IE5czr4LmTwoALi/RSdvS2Orti1CAw/4SDl5Z6ra7AljW2hSxHfLwtSebbfg5iMM0wrj4ad/w==
+X-Received: by 2002:a05:6512:1042:b0:540:2add:c1f1 with SMTP id 2adb3069b0e04-5422133b657mr1889695e87.18.1734668229367;
+        Thu, 19 Dec 2024 20:17:09 -0800 (PST)
 Received: from cobook.home ([91.198.101.25])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54223832c1bsm357078e87.280.2024.12.19.20.17.05
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54223832c1bsm357078e87.280.2024.12.19.20.17.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 20:17:07 -0800 (PST)
+        Thu, 19 Dec 2024 20:17:09 -0800 (PST)
 From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
 To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -85,9 +85,9 @@ Cc: netdev@vger.kernel.org,
 	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
 	Dennis Ostermann <dennis.ostermann@renesas.com>,
 	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: [PATCH net-next 1/2] net: renesas: rswitch: use per-port irq handlers
-Date: Fri, 20 Dec 2024 09:16:58 +0500
-Message-Id: <20241220041659.2985492-2-nikita.yoush@cogentembedded.com>
+Subject: [PATCH net-next 2/2] net: renesas: rswitch: request ts interrupt at port open
+Date: Fri, 20 Dec 2024 09:16:59 +0500
+Message-Id: <20241220041659.2985492-3-nikita.yoush@cogentembedded.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241220041659.2985492-1-nikita.yoush@cogentembedded.com>
 References: <20241220041659.2985492-1-nikita.yoush@cogentembedded.com>
@@ -99,417 +99,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of handling all possible data interrupts in the same handler,
-switch to per-port handlers.
+Data interrupts are now requested at port open and freed at port close.
 
-This significantly simplifies handling: when the same interrupt is used
-for several ports, system calls all handlers, and each handler only has
-to check interrupts for one port's tx and rx queues.
-
-But it is not required to use the same interrupt for all ports - GWCA
-provides 8 data interrupts and allows arbitrary per-queue assignment
-of those. Support that by reading interrupt index for each port from
-optional 'irq-index' device tree property.
-
-With per-port interrupts it becomes possible to configure affinity such
-that traffic coming from different ports is serviced simultaneously on
-different CPUs.
+For symmetry, do the same for ts interrupt.
 
 Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
 ---
- drivers/net/ethernet/renesas/rswitch.c | 190 ++++++++++---------------
- drivers/net/ethernet/renesas/rswitch.h |  10 +-
- 2 files changed, 82 insertions(+), 118 deletions(-)
+ drivers/net/ethernet/renesas/rswitch.c | 35 +++++++++++++-------------
+ drivers/net/ethernet/renesas/rswitch.h |  2 +-
+ 2 files changed, 18 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index 84d09a8973b7..eb9dea8b16f3 100644
+index eb9dea8b16f3..cc8f2a4e3d70 100644
 --- a/drivers/net/ethernet/renesas/rswitch.c
 +++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -99,15 +99,6 @@ static void rswitch_coma_init(struct rswitch_private *priv)
- 	iowrite32(CABPPFLC_INIT_VALUE, priv->addr + CABPPFLC0);
+@@ -989,18 +989,6 @@ static irqreturn_t rswitch_gwca_ts_irq(int irq, void *dev_id)
+ 	return IRQ_NONE;
  }
  
--/* R-Switch-2 block (TOP) */
--static void rswitch_top_init(struct rswitch_private *priv)
+-static int rswitch_gwca_ts_request_irqs(struct rswitch_private *priv)
 -{
--	unsigned int i;
+-	int irq;
 -
--	for (i = 0; i < RSWITCH_MAX_NUM_QUEUES; i++)
--		iowrite32((i / 16) << (GWCA_INDEX * 8), priv->addr + TPEMIMC7(i));
+-	irq = platform_get_irq_byname(priv->pdev, GWCA_TS_IRQ_RESOURCE_NAME);
+-	if (irq < 0)
+-		return irq;
+-
+-	return devm_request_irq(&priv->pdev->dev, irq, rswitch_gwca_ts_irq,
+-				0, GWCA_TS_IRQ_NAME, priv);
 -}
 -
- /* Forwarding engine block (MFWD) */
- static void rswitch_fwd_init(struct rswitch_private *priv)
- {
-@@ -175,29 +166,6 @@ static int rswitch_gwca_axi_ram_reset(struct rswitch_private *priv)
- 	return rswitch_reg_wait(priv->addr, GWARIRM, GWARIRM_ARR, GWARIRM_ARR);
- }
- 
--static bool rswitch_is_any_data_irq(struct rswitch_private *priv, u32 *dis, bool tx)
--{
--	u32 *mask = tx ? priv->gwca.tx_irq_bits : priv->gwca.rx_irq_bits;
--	unsigned int i;
--
--	for (i = 0; i < RSWITCH_NUM_IRQ_REGS; i++) {
--		if (dis[i] & mask[i])
--			return true;
--	}
--
--	return false;
--}
--
--static void rswitch_get_data_irq_status(struct rswitch_private *priv, u32 *dis)
--{
--	unsigned int i;
--
--	for (i = 0; i < RSWITCH_NUM_IRQ_REGS; i++) {
--		dis[i] = ioread32(priv->addr + GWDIS(i));
--		dis[i] &= ioread32(priv->addr + GWDIE(i));
--	}
--}
--
- static void rswitch_enadis_data_irq(struct rswitch_private *priv,
- 				    unsigned int index, bool enable)
- {
-@@ -206,12 +174,18 @@ static void rswitch_enadis_data_irq(struct rswitch_private *priv,
- 	iowrite32(BIT(index % 32), priv->addr + offs);
- }
- 
--static void rswitch_ack_data_irq(struct rswitch_private *priv,
--				 unsigned int index)
-+static bool rswitch_check_ack_data_irq(struct rswitch_private *priv,
-+				       unsigned int index)
- {
--	u32 offs = GWDIS(index / 32);
-+	u32 reg = GWDIS(index / 32);
-+	u32 bit = BIT(index % 32);
- 
--	iowrite32(BIT(index % 32), priv->addr + offs);
-+	if (ioread32(priv->addr + reg) & bit) {
-+		iowrite32(bit, priv->addr + reg);
-+		return true;
-+	}
-+
-+	return false;
- }
- 
- static unsigned int rswitch_next_queue_index(struct rswitch_gwca_queue *gq,
-@@ -314,8 +288,6 @@ static int rswitch_gwca_queue_alloc(struct net_device *ndev,
- 				    struct rswitch_gwca_queue *gq,
- 				    bool dir_tx, unsigned int ring_size)
- {
--	unsigned int i, bit;
--
- 	gq->dir_tx = dir_tx;
- 	gq->ring_size = ring_size;
- 	gq->ndev = ndev;
-@@ -345,13 +317,6 @@ static int rswitch_gwca_queue_alloc(struct net_device *ndev,
- 	if (!gq->rx_ring && !gq->tx_ring)
- 		goto out;
- 
--	i = gq->index / 32;
--	bit = BIT(gq->index % 32);
--	if (dir_tx)
--		priv->gwca.tx_irq_bits[i] |= bit;
--	else
--		priv->gwca.rx_irq_bits[i] |= bit;
--
- 	return 0;
- 
- out:
-@@ -583,6 +548,15 @@ static void rswitch_gwca_put(struct rswitch_private *priv,
- 	clear_bit(gq->index, priv->gwca.used);
- }
- 
-+static void rswitch_gwca_queue_assign_irq(struct rswitch_private *priv,
-+					  struct rswitch_gwca_queue *gq,
-+					  unsigned int irq_index)
-+{
-+	rswitch_modify(priv->addr, TPEMIMC7(gq->index),
-+		       TPEMIMC7_GDICM(GWCA_INDEX),
-+		       TPEMIMC7_GDICM_PREP(GWCA_INDEX, irq_index));
-+}
-+
- static int rswitch_txdmac_alloc(struct net_device *ndev)
- {
- 	struct rswitch_device *rdev = netdev_priv(ndev);
-@@ -614,6 +588,7 @@ static int rswitch_txdmac_init(struct rswitch_private *priv, unsigned int index)
- {
- 	struct rswitch_device *rdev = priv->rdev[index];
- 
-+	rswitch_gwca_queue_assign_irq(priv, rdev->tx_queue, rdev->irq_index);
- 	return rswitch_gwca_queue_format(rdev->ndev, priv, rdev->tx_queue);
- }
- 
-@@ -649,6 +624,7 @@ static int rswitch_rxdmac_init(struct rswitch_private *priv, unsigned int index)
- 	struct rswitch_device *rdev = priv->rdev[index];
- 	struct net_device *ndev = rdev->ndev;
- 
-+	rswitch_gwca_queue_assign_irq(priv, rdev->rx_queue, rdev->irq_index);
- 	return rswitch_gwca_queue_ext_ts_format(ndev, priv, rdev->rx_queue);
- }
- 
-@@ -933,9 +909,13 @@ static int rswitch_poll(struct napi_struct *napi, int budget)
- 	return 0;
- }
- 
--static void rswitch_queue_interrupt(struct net_device *ndev)
-+static irqreturn_t rswitch_gwca_data_irq(int irq, void *data)
- {
--	struct rswitch_device *rdev = netdev_priv(ndev);
-+	struct rswitch_device *rdev = data;
-+
-+	if (!rswitch_check_ack_data_irq(rdev->priv, rdev->tx_queue->index) &&
-+	    !rswitch_check_ack_data_irq(rdev->priv, rdev->rx_queue->index))
-+		return IRQ_NONE;
- 
- 	if (napi_schedule_prep(&rdev->napi)) {
- 		spin_lock(&rdev->priv->lock);
-@@ -944,71 +924,10 @@ static void rswitch_queue_interrupt(struct net_device *ndev)
- 		spin_unlock(&rdev->priv->lock);
- 		__napi_schedule(&rdev->napi);
- 	}
--}
--
--static irqreturn_t rswitch_data_irq(struct rswitch_private *priv, u32 *dis)
--{
--	struct rswitch_gwca_queue *gq;
--	unsigned int i, index, bit;
--
--	for (i = 0; i < priv->gwca.num_queues; i++) {
--		gq = &priv->gwca.queues[i];
--		index = gq->index / 32;
--		bit = BIT(gq->index % 32);
--		if (!(dis[index] & bit))
--			continue;
--
--		rswitch_ack_data_irq(priv, gq->index);
--		rswitch_queue_interrupt(gq->ndev);
--	}
- 
- 	return IRQ_HANDLED;
- }
- 
--static irqreturn_t rswitch_gwca_irq(int irq, void *dev_id)
--{
--	struct rswitch_private *priv = dev_id;
--	u32 dis[RSWITCH_NUM_IRQ_REGS];
--	irqreturn_t ret = IRQ_NONE;
--
--	rswitch_get_data_irq_status(priv, dis);
--
--	if (rswitch_is_any_data_irq(priv, dis, true) ||
--	    rswitch_is_any_data_irq(priv, dis, false))
--		ret = rswitch_data_irq(priv, dis);
--
--	return ret;
--}
--
--static int rswitch_gwca_request_irqs(struct rswitch_private *priv)
--{
--	char *resource_name, *irq_name;
--	int i, ret, irq;
--
--	for (i = 0; i < GWCA_NUM_IRQS; i++) {
--		resource_name = kasprintf(GFP_KERNEL, GWCA_IRQ_RESOURCE_NAME, i);
--		if (!resource_name)
--			return -ENOMEM;
--
--		irq = platform_get_irq_byname(priv->pdev, resource_name);
--		kfree(resource_name);
--		if (irq < 0)
--			return irq;
--
--		irq_name = devm_kasprintf(&priv->pdev->dev, GFP_KERNEL,
--					  GWCA_IRQ_NAME, i);
--		if (!irq_name)
--			return -ENOMEM;
--
--		ret = devm_request_irq(&priv->pdev->dev, irq, rswitch_gwca_irq,
--				       0, irq_name, priv);
--		if (ret < 0)
--			return ret;
--	}
--
--	return 0;
--}
--
- static void rswitch_ts(struct rswitch_private *priv)
- {
- 	struct rswitch_gwca_queue *gq = &priv->gwca.ts_queue;
-@@ -1589,12 +1508,18 @@ static int rswitch_open(struct net_device *ndev)
- {
- 	struct rswitch_device *rdev = netdev_priv(ndev);
+ /* Ethernet TSN Agent block (ETHA) and Ethernet MAC IP block (RMAC) */
+ static int rswitch_etha_change_mode(struct rswitch_etha *etha,
+ 				    enum rswitch_etha_mode mode)
+@@ -1510,8 +1498,14 @@ static int rswitch_open(struct net_device *ndev)
  	unsigned long flags;
-+	int ret;
+ 	int ret;
  
- 	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
+-	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
++	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS)) {
++		ret = request_irq(rdev->priv->gwca.ts_irq, rswitch_gwca_ts_irq,
++				  0, "rswitch_ts", rdev->priv);
++		if (ret < 0)
++			return ret;
++
  		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDIE);
++	}
  
  	napi_enable(&rdev->napi);
  
-+	ret = request_irq(rdev->irq, rswitch_gwca_data_irq, IRQF_SHARED,
-+			  netdev_name(ndev), rdev);
-+	if (ret < 0)
-+		goto err_request_irq;
-+
- 	spin_lock_irqsave(&rdev->priv->lock, flags);
- 	bitmap_set(rdev->priv->opened_ports, rdev->port, 1);
- 	rswitch_enadis_data_irq(rdev->priv, rdev->tx_queue->index, true);
-@@ -1606,6 +1531,14 @@ static int rswitch_open(struct net_device *ndev)
- 	netif_start_queue(ndev);
- 
- 	return 0;
-+
-+err_request_irq:
-+	napi_disable(&rdev->napi);
-+
-+	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
-+		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
-+
-+	return ret;
- };
- 
- static int rswitch_stop(struct net_device *ndev)
-@@ -1625,6 +1558,8 @@ static int rswitch_stop(struct net_device *ndev)
- 	bitmap_clear(rdev->priv->opened_ports, rdev->port, 1);
- 	spin_unlock_irqrestore(&rdev->priv->lock, flags);
- 
-+	free_irq(rdev->irq, rdev);
-+
+@@ -1535,8 +1529,10 @@ static int rswitch_open(struct net_device *ndev)
+ err_request_irq:
  	napi_disable(&rdev->napi);
  
- 	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
-@@ -1906,6 +1841,34 @@ static void rswitch_etha_init(struct rswitch_private *priv, unsigned int index)
- 	etha->psmcs = clk_get_rate(priv->clk) / 100000 / (25 * 2) - 1;
- }
- 
-+static int rswitch_port_get_irq(struct rswitch_device *rdev)
-+{
-+	unsigned int irq_index;
-+	char *name;
-+	int err;
-+
-+	err = of_property_read_u32(rdev->np_port, "irq-index", &irq_index);
-+	if (err == 0) {
-+		if (irq_index < GWCA_NUM_IRQS)
-+			rdev->irq_index = irq_index;
-+		else
-+			dev_warn(&rdev->priv->pdev->dev,
-+				 "%pOF: irq-index out of range\n",
-+				 rdev->np_port);
+-	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
++	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS)) {
+ 		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
++		free_irq(rdev->priv->gwca.ts_irq, rdev->priv);
 +	}
-+
-+	name = kasprintf(GFP_KERNEL, GWCA_IRQ_RESOURCE_NAME, rdev->irq_index);
-+	if (!name)
-+		return -ENOMEM;
-+	err = platform_get_irq_byname(rdev->priv->pdev, name);
-+	kfree(name);
-+	if (err < 0)
-+		return err;
-+	rdev->irq = err;
-+
-+	return 0;
-+}
-+
- static int rswitch_device_alloc(struct rswitch_private *priv, unsigned int index)
- {
- 	struct platform_device *pdev = priv->pdev;
-@@ -1954,6 +1917,10 @@ static int rswitch_device_alloc(struct rswitch_private *priv, unsigned int index
- 	if (err < 0)
- 		goto out_get_params;
  
-+	err = rswitch_port_get_irq(rdev);
-+	if (err < 0)
-+		goto out_get_irq;
-+
- 	err = rswitch_rxdmac_alloc(ndev);
- 	if (err < 0)
- 		goto out_rxdmac;
-@@ -1968,6 +1935,7 @@ static int rswitch_device_alloc(struct rswitch_private *priv, unsigned int index
- 	rswitch_rxdmac_free(ndev);
+ 	return ret;
+ };
+@@ -1562,8 +1558,10 @@ static int rswitch_stop(struct net_device *ndev)
  
- out_rxdmac:
-+out_get_irq:
- out_get_params:
- 	of_node_put(rdev->np_port);
- 	netif_napi_del(&rdev->napi);
-@@ -2003,7 +1971,6 @@ static int rswitch_init(struct rswitch_private *priv)
- 	rswitch_reset(priv);
+ 	napi_disable(&rdev->napi);
  
- 	rswitch_clock_enable(priv);
--	rswitch_top_init(priv);
- 	err = rswitch_bpool_config(priv);
- 	if (err < 0)
- 		return err;
-@@ -2034,10 +2001,6 @@ static int rswitch_init(struct rswitch_private *priv)
+-	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
++	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS)) {
+ 		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
++		free_irq(rdev->priv->gwca.ts_irq, rdev->priv);
++	}
+ 
+ 	for (tag = find_first_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT);
+ 	     tag < TS_TAGS_PER_PORT;
+@@ -2001,9 +1999,10 @@ static int rswitch_init(struct rswitch_private *priv)
  	if (err < 0)
  		goto err_ptp_register;
  
--	err = rswitch_gwca_request_irqs(priv);
--	if (err < 0)
--		goto err_gwca_request_irq;
--
- 	err = rswitch_gwca_ts_request_irqs(priv);
+-	err = rswitch_gwca_ts_request_irqs(priv);
++	err = platform_get_irq_byname(priv->pdev, GWCA_TS_IRQ_RESOURCE_NAME);
  	if (err < 0)
- 		goto err_gwca_ts_request_irq;
-@@ -2073,7 +2036,6 @@ static int rswitch_init(struct rswitch_private *priv)
+-		goto err_gwca_ts_request_irq;
++		goto err_gwca_ts_irq;
++	priv->gwca.ts_irq = err;
+ 
+ 	err = rswitch_gwca_hw_init(priv);
+ 	if (err < 0)
+@@ -2035,7 +2034,7 @@ static int rswitch_init(struct rswitch_private *priv)
+ 	rswitch_gwca_hw_deinit(priv);
  
  err_gwca_hw_init:
- err_gwca_ts_request_irq:
--err_gwca_request_irq:
+-err_gwca_ts_request_irq:
++err_gwca_ts_irq:
  	rcar_gen4_ptp_unregister(priv->ptp_priv);
  
  err_ptp_register:
 diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index 532192cbca4b..a1e62a6b3844 100644
+index a1e62a6b3844..54b9f059707a 100644
 --- a/drivers/net/ethernet/renesas/rswitch.h
 +++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -51,7 +51,6 @@
+@@ -58,7 +58,6 @@
+ #define GWRO			RSWITCH_GWCA0_OFFSET
  
- /* TODO: hardcoded ETHA/GWCA settings for now */
- #define GWCA_IRQ_RESOURCE_NAME	"gwca0_rxtx%d"
--#define GWCA_IRQ_NAME		"rswitch: gwca0_rxtx%d"
- #define GWCA_NUM_IRQS		8
- #define GWCA_INDEX		0
- #define AGENT_INDEX_GWCA	3
-@@ -828,6 +827,10 @@ enum rswitch_gwca_mode {
+ #define GWCA_TS_IRQ_RESOURCE_NAME	"gwca0_rxts0"
+-#define GWCA_TS_IRQ_NAME		"rswitch: gwca0_rxts0"
+ #define GWCA_TS_IRQ_BIT			BIT(0)
  
- /* TOP */
- #define TPEMIMC7(queue)		(TPEMIMC70 + (queue) * 4)
-+#define TPEMIMC7_GDICM0			GENMASK(2, 0)
-+#define TPEMIMC7_GDICM_SHIFT(i)		((i) * 8)
-+#define TPEMIMC7_GDICM(i)		(TPEMIMC7_GDICM0 << TPEMIMC7_GDICM_SHIFT(i))
-+#define TPEMIMC7_GDICM_PREP(i, val)	(((val) & TPEMIMC7_GDICM0) << TPEMIMC7_GDICM_SHIFT(i))
- 
- /* Descriptors */
- enum RX_DS_CC_BIT {
-@@ -967,7 +970,6 @@ struct rswitch_gwca_queue {
- 	};
- };
- 
--#define RSWITCH_NUM_IRQ_REGS	(RSWITCH_MAX_NUM_QUEUES / BITS_PER_TYPE(u32))
- struct rswitch_gwca {
- 	unsigned int index;
- 	struct rswitch_desc *linkfix_table;
-@@ -977,8 +979,6 @@ struct rswitch_gwca {
+ #define FWRO	0
+@@ -978,6 +977,7 @@ struct rswitch_gwca {
+ 	struct rswitch_gwca_queue *queues;
  	int num_queues;
  	struct rswitch_gwca_queue ts_queue;
++	int ts_irq;
  	DECLARE_BITMAP(used, RSWITCH_MAX_NUM_QUEUES);
--	u32 tx_irq_bits[RSWITCH_NUM_IRQ_REGS];
--	u32 rx_irq_bits[RSWITCH_NUM_IRQ_REGS];
  };
  
- #define NUM_QUEUES_PER_NDEV	2
-@@ -990,6 +990,8 @@ struct rswitch_device {
- 	void __iomem *addr;
- 	struct rswitch_gwca_queue *tx_queue;
- 	struct rswitch_gwca_queue *rx_queue;
-+	unsigned int irq_index;
-+	int irq;
- 	struct sk_buff *ts_skb[TS_TAGS_PER_PORT];
- 	DECLARE_BITMAP(ts_skb_used, TS_TAGS_PER_PORT);
- 	bool disabled;
 -- 
 2.39.5
 
