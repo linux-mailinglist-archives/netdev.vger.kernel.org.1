@@ -1,283 +1,248 @@
-Return-Path: <netdev+bounces-153785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C6839F9AEE
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 21:15:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A4179F9AF1
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 21:15:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E460816D53A
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 20:15:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 232367A2BC1
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 20:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B11A224887;
-	Fri, 20 Dec 2024 20:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC98822577F;
+	Fri, 20 Dec 2024 20:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l0PA0Dx5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JO1igV59"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C81F22144F
-	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 20:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734725710; cv=fail; b=WQYcep1anxIIIFfYBeHDLM5bZ886Xl3Hui9ukw2eThr4qIgcyIa6cAi7L8r9ZxKPJ2gV3jjJZZwfTVNuZkVGUQCOW5a8aRNhZ+6ONpnzJdWFHYGCKIAVhv9P3oLr8WDzthvbu02evlcSzAJO/CEXORorNAyd3ES23mKTWWbTbUs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734725710; c=relaxed/simple;
-	bh=On4cUEchvst4R8sXbdNuwZ9fip6cV+3cooNgh3JsIOw=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YaT35fSj5bPtzwbI/TTOCLRr36f1wGQ0p9SrygMBmUFC7d31zsXlTMD43EzptjQ2ZseD1IRNex6QkS7RWvjcVO6dB9TOdmfSZ7RRvSHdrwwo2Ej2ZZmpXumYcRm6UIU1acjkKSwCXnKvWumdl8nRiMqo2DtqLf4zMGQbmS3RyE4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l0PA0Dx5; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734725708; x=1766261708;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=On4cUEchvst4R8sXbdNuwZ9fip6cV+3cooNgh3JsIOw=;
-  b=l0PA0Dx55Q+6OIhtvQk6U9z/mZcRdKBS5CRu6eLXn6u8b9h6wvylsI6y
-   sPlpcrTK+qSrPs9rXXNMcgVnVlGGDjB45OmSLr51ZQ8U27/B9X90yvrX+
-   LR/lkVrhEHQ0GyG/4DsDw0Gzm3L9llvxIYyWIGX0BOh956LnHd8+IRFl3
-   1cnTd7VeIhSqth4YnNhGLFu883mrDEdtT6AVv4f5UMyva5TnBqN53X5jH
-   ppeHNQRUTE0fDTE20ENGihPwwjMyJ72Z2STEavWtm+Aex3wg/lUDwHJQj
-   D2rKlbe/ormOiaRNzSIrXLTVkQaZdNFczqEltbtOvif0e/sAzNNxbIgbB
-   g==;
-X-CSE-ConnectionGUID: pWYTcQosQJqAAVbldAHNmQ==
-X-CSE-MsgGUID: No/OLh4zTeis1Y844vXiJw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="45776344"
-X-IronPort-AV: E=Sophos;i="6.12,251,1728975600"; 
-   d="scan'208";a="45776344"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 12:15:08 -0800
-X-CSE-ConnectionGUID: oZUtGO7vTS+WByxnpy46sg==
-X-CSE-MsgGUID: 2ereycyqQayOY5GMbxIDvQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="103591250"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Dec 2024 12:15:08 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Fri, 20 Dec 2024 12:15:07 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Fri, 20 Dec 2024 12:15:07 -0800
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.45) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 20 Dec 2024 12:15:06 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tzcSVFSJp0qc713FiL3+dcFSQXYyt0LIqyqpXhQF6IjBF8tvfgZ2X2rOUvybDRskBWcIV8wFQ8Xc1mjsZEObT9X+xVDgxinzcCI+3oYkFoouuFxRtUTX4bYmigNMeaeHrdO5Hm+61QDsb+IN7UvRtHDvuVJmGTcH5BixbIa0w8HLKo7/6wpc7fKEw4hY/LtbVOotCXoxjxpp/3zCw3sYA8MgLeUb3p+TBCROyI42cGP1QeX6TnPsF90kxma5aVLkuRQ5kUqYY/rASv/XE1fW9pjCOhbLef5QfA3VEdFldjH/773CVVmYi7HPzE0QDf+1D4termTfeuKIe+5OhENSWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m5P1C+0PgaVnFYjTB50EA+svyfTwjEAIS8tYZu0GudQ=;
- b=AhprtgHUOXobKF5+qww85PFrgzYd9iKgbgo13gV2aj7SrJDd9ub76PmMSuris/wsldMLTtSDqtsdVr4v+YKhjSGOfmldIgefcfJ3FqMC9k6TpRAQuZkvR4PpNjgSemZ9w6QFfx0iuvwSeCZUWEBalzj4xjdPXDbdCmn3Sz+TqJRn4FRtfmJl5v3XYY3Dwm0sV4Zos90OP6lzXeI0Z8hSd0fB5tLjZo5n419SQk/5/Amy0GJdN5dSAMQyMOR77IXMMhp6DoB9uwNV3pR/G2vXXE/qT6YiZ5fIY3zO0ocQB1UHfbGbI3IDQ54ymjcA74lp181xLPwgPzmBSYvffdxZiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
- by CH3PR11MB8209.namprd11.prod.outlook.com (2603:10b6:610:15d::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Fri, 20 Dec
- 2024 20:14:58 +0000
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::b8ba:be35:3903:118f%7]) with mapi id 15.20.8272.013; Fri, 20 Dec 2024
- 20:14:58 +0000
-Message-ID: <df42a234-f289-4be7-a698-54b645b0fd81@intel.com>
-Date: Fri, 20 Dec 2024 13:14:48 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 4/8] net: napi: add CPU affinity to
- napi->config
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<andrew+netdev@lunn.ch>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<davem@davemloft.net>, <michael.chan@broadcom.com>, <tariqt@nvidia.com>,
-	<anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<jdamato@fastly.com>, <shayd@nvidia.com>, <akpm@linux-foundation.org>
-References: <20241218165843.744647-1-ahmed.zaki@intel.com>
- <20241218165843.744647-5-ahmed.zaki@intel.com>
- <20241219194237.31822cba@kernel.org>
- <cf836232-ef2b-40c8-b9e5-4f0dffdcc839@intel.com>
- <20241220092356.69c9aa1e@kernel.org>
- <35441a41-d543-4e7b-b0dc-537062d32c9c@intel.com>
- <20241220113711.5b09140b@kernel.org>
-Content-Language: en-US
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-In-Reply-To: <20241220113711.5b09140b@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0312.namprd03.prod.outlook.com
- (2603:10b6:303:dd::17) To SN7PR11MB7420.namprd11.prod.outlook.com
- (2603:10b6:806:328::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85389224AE6;
+	Fri, 20 Dec 2024 20:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734725720; cv=none; b=FD8eBGm40gCcgMYHjS3D7Czse794/4YNYB1YwC4AL9YHW1umY5gEQi7yfZb28oK0z046a3kodkINoyR3XsBCmRzbS5LgULWdslZEdIINoa0gaUsi6bl6ZZHrdWHA00C3PAHX/grA5mFzScg1ftMOr5gCxucBbezQLH4czUUtk88=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734725720; c=relaxed/simple;
+	bh=BlLG2/GyGaBg+029j+DhVMIHxYl3uQcGXi8+tsLEvqo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oEFHMfMeJSgzkmF+tH9xjzpfqQmIIZ5338liMfwgMiKiXjSVHI+2thFRu+ZfDtyUQYlnZm6J/PstRvPoKB6UDW2HtNS7wvorLRv0NOC4Z2xU+PJoN0dS0MEkhEe35X7yrcSoqxk9DnFHcPEhKkeT6VJzTxx62Fo4Nxf2h2irs+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JO1igV59; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 34E2DE0003;
+	Fri, 20 Dec 2024 20:15:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1734725710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=u2MMjEyytEL5CdgAhFxrsK7rIqJmCWS3UWTBJEjAmcE=;
+	b=JO1igV59eWIttc2wpOMNbIkrZeHlqDuQnDC4iAi1L2ARrfj9JI4iDDNChKxPbPb/fxZimk
+	/FO0aufF3bFJxV6t9dP2wHh4VFL3ipANsHlKNNlU8a//JTfJlvJbDXwTrlZmAZSlnNhy/l
+	wUURv1VjxEWAzLHCjPYOGe1eQSKmizzJlOdAjptFq3FLULQghdtjaAudNGmgiatpcJimZh
+	pkSiYXY9QI43VWGSM7Y0vuxTSwnt0C8sIy0WItFBNHaw5RRQaNKsa+bz2QKtLz1muOEhHp
+	sO5HEfbfPFNQ1tOyHirXsBoJdzFM5Wo7CW+Y5wA8KrEDsuIZ/OXw93t1r7d/QQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>
+Subject: [PATCH net-next RFC 0/5] net: phy: Introduce a port representation
+Date: Fri, 20 Dec 2024 21:14:59 +0100
+Message-ID: <20241220201506.2791940-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|CH3PR11MB8209:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39b098ee-d79a-4e2d-b819-08dd2132f9de
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?ZmhBRTN4ZG41ZjN0NDNxVUh2QW0yVFpRQjRROEFqblJxWmg4T0NVT3dIOVhh?=
- =?utf-8?B?Umc0N3NabVlHaSttTFo0VDBKR0tZb0hkN3Vma0kxbWwydEVKb3BNb0thUVow?=
- =?utf-8?B?T3AyNkVSUmNmWHpra1VlRmM2Z3A3c3RtYUY4bmI4enNaY2lpaENKR3h6S0F4?=
- =?utf-8?B?S3RPUTFVSmhpUkJ0M21WSEpKTkQ0RFI1enF3Z1c1NlNId0pjbkE2TVptK25i?=
- =?utf-8?B?UU14cnBnbW1iakNqNFlXblN1YXp5Nlo2WStxcERzVGpYakFncy9TODlTWTJH?=
- =?utf-8?B?VURlOUhmekpHczAvVVBtMEZ6WTlHMVRUd1YzeTFWM08zM1l5d3NYNHcyRno1?=
- =?utf-8?B?anZjS21WTWVKakJaNk15SFg2V0h2SUNDMlljeGxpNkFlYkhnOXNvd1lYZm0w?=
- =?utf-8?B?VGNRdk1wRkFjLy9JUGNNQlZPSUJhY2lxY3Y0cFp3YmU5YlZ1aHp6Yk15d2V4?=
- =?utf-8?B?YndRdzhTWmUwRlp0bTJpUGdpZ2RYbGRSRHBTYTRxb3owRk93ek8vQ1Y4Ris3?=
- =?utf-8?B?V2ppdlJMc2VSOTBidHRvZ0loNU04TVJiTGdiQUErQ0o3TEhYZHhrNjNzT21T?=
- =?utf-8?B?RFg3ZlBaSTdmUm53WHFvRUNnaVkwa0h1SFdpa1llQ3ZTUWsyNUJRN2dENUNH?=
- =?utf-8?B?dzBsQ0dpQ2ozSld4UkZ4RS9QaXBZWmdMOWt4UGtDdm94UUVONFdkdCtUUkxq?=
- =?utf-8?B?RVJBcjJnL09EWEJaR1ZKcmg2WldoRlRBT1VnU25ESGpJV2lsQ0hVd0VqK3FV?=
- =?utf-8?B?bTd3UzRia3pJdzJ3QXdLV05HV0FxTjZwV2RGaHBmQ3dLb210dXhvN0RmUk5i?=
- =?utf-8?B?dk5xOW04dWN5d0VoY3FEV0orU214TnhqN0lreFMxcFlDVTZUUHVsUi9YcmRq?=
- =?utf-8?B?c21YUG8rOEVlOHRnOExzVjNtUzFRZ1dnVEZOTkxmeXlaa08zY2djK3Z2emcx?=
- =?utf-8?B?QmZacmZCY1BYN0Y4YWhrcHNnNFRuMDN6enBzZEovaVBCWUw4VnQ5VER0dlpt?=
- =?utf-8?B?NjdwSmZVbzRjZ0dSNTRYaDdnUHQ4K0Z6UnFEWnN1RGYzeEZ2NmgydmduQWw3?=
- =?utf-8?B?ZDhZL2cyNXNJbktyL0JXMGc1WFQ4VUpCWTVLdkJiTW5LRkJPWkd5Yi9PTVNs?=
- =?utf-8?B?UVN6UkJEazJDWndDWVc0aUxhdGJpNEZVMDE1TGhkYThyR2haRWpURUNvbHFD?=
- =?utf-8?B?NExOZzZ2QzlpMHdXbjNUNzVJVjhyL3c2NEhpemtpRHlBT0xUNzc4amlIQzRK?=
- =?utf-8?B?Z2ZncUc2YzFGYWIwYnlrT24rNWdVUDdya3l0UDhoWmgyTnhNQ0QydTRsSk43?=
- =?utf-8?B?MFhhT2krRDRkZWdMK2VCVzJlNjNxYVhkSjcvT2M4cFlCcWtiQkRaT05PNkFD?=
- =?utf-8?B?ekQ4MUJWSGg3eVhwSmxucnV1MGJFNFRNWW1DOFh6YWRJdkwweGY0SHczS2dY?=
- =?utf-8?B?YU1YSzRGYTlxTCtLcDlIRllpNzlucEhLczFBdVZHRXJiQ2NxTGd0czJFVktZ?=
- =?utf-8?B?ellXV0srZHUycEt6SG1qZ0xCRDZCTE1iTWE4ZFF3ekJpaVRHQisvcENhUlA5?=
- =?utf-8?B?elJTVFhiZzFWYWFOWHpoZVUzT2x0VTJ3VDFDekxKQ2IveHJQQ3RZQ1VvR1Fn?=
- =?utf-8?B?VzRlVGV4STluTVp0SHpiNG14RGZjSmhDQ3cxdVNENzhBSTMrd2pWM1FPbWNP?=
- =?utf-8?B?NFBSVFhSK2JlVWVDQVlIU3F4eWtnMS9ZTyt4dGdFOURoa0xzN3R6NmJKSkFO?=
- =?utf-8?B?RC9BS1B6cjlhV0tIS1FFTXcxUnVueldBRUtuMG5tSnB5TDROYUpXNDN4QlN2?=
- =?utf-8?B?Q1pBNjZ5QWh2N3BnMG14N0UrcWcvVktNL2tzNVZBbU85UGd5N1JLazVvMXdF?=
- =?utf-8?Q?61OEu8z/3DgI6?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R3JEd0tuZG8zQmE3c09CYlBYUE16emRIQzgzRkFhZUdpVUxRbDZIL3M3aU5y?=
- =?utf-8?B?R2o1WXdwTTV4cEFVVFVnT2dMdGJBL0tEUFB3QitEY2lvYlBRbDBLVitFWCtZ?=
- =?utf-8?B?UkxXWG1uVWxnNERaYk5KQjBxL1c3anJKZ0IxNUtiajVtZytQUHV4S1lwQW5G?=
- =?utf-8?B?cDkvT0FBaWM1ZUZFNXlhWXVUN0JHYSs3S05WQk1WSGxURXc1ckhhMXJYS0Jl?=
- =?utf-8?B?MTBkbzFKd2ZSdHUzeW5uZWVOTUI2V0dsV29VQk1iQURMUGNoaGhkSHpvZ3px?=
- =?utf-8?B?eVFOdVNpR1YwdXdkZldhVkJXOEQ4RnVqWTdmMWc1YTYrM1hMWnMwalU2R052?=
- =?utf-8?B?VnE4L0tjNDdNUTV2YUpJZE1kcHg4ZWNRbGNHUysxdEJzd3IwNVduaE5YSE5L?=
- =?utf-8?B?WUczc1VvK05aRE1CYzUrRFcrbVB0dTQ0RlZRV3ZsSi9MU01xY2g0YnA1RUNK?=
- =?utf-8?B?U3RvZkhXK1ZRVzd6QmVQd3JXZTBnUXI5a2N4UERZTXgvUnJ6L2JsRC9FNmtk?=
- =?utf-8?B?cC9SaUxkZU9Jd3UrMjdSUzNpWm9xcUwrdlFySmg2dTBCeFE1cHF5bjVPcGtG?=
- =?utf-8?B?YUJRUlJoOThLRFJGellmVUFJWkdyeU14dzhaV1dibSs1SHlNYkQvc20rZ1Rv?=
- =?utf-8?B?cWJFaEZIVEcxTVZlK2dJSlNkcmV0c05UTTFLOGJUNjhWK1p1b3p4YkVWY29q?=
- =?utf-8?B?LzBLVlRUVWZrQkxVb0FpaFp5Q0VPYkZ1ck5WMEw1dTZsdVNSNkkxL094dmdD?=
- =?utf-8?B?TmFXOE10NzZaWVl6aUNpa0FSZEE3NnFrT3lDVW1Gb2FBY1dLd3FnZWdzbGpk?=
- =?utf-8?B?eDVkdDV2Wk55S0JlZ2lCT0hrZFFMRkFEdktyckV1TzBqNW5Qb04xbDB2R0I5?=
- =?utf-8?B?UlhWdmVzUFBRdTRhbHFaM3VjUForSjJidHlhTWRHQ2RqL0F5cmU1QjJvRGUy?=
- =?utf-8?B?aFR3WDlySnUxdFRRcVBhK05zOFVLTGtnOElBOEt0ekhBSXlDZG1DbmYwODFw?=
- =?utf-8?B?T3IreGs4ek9LbzBhN2pISEUrbWNML3dvNmwwODJoQ1JaeFcxMnk0eEVybXZJ?=
- =?utf-8?B?QkZoRVJVVDYzZWNicW9KV0NuandHdS8zRUM3YUlsYndhaE5ibEJlYVRCVkpG?=
- =?utf-8?B?NU5jR1RNYzBHRlo5L2FKQ1lKVCtvL0dMM1g2Vml1RUU2T2FHdWd0QUtEdEZZ?=
- =?utf-8?B?cWluZzZaOHlZRFA4OC95ZU1oOXRGZVdCN21QQ1RucjlYRlZGRW5melVmSUxs?=
- =?utf-8?B?KytKb2s5OUdBR3hiTmtxVWRQWXRDbm9YMjF0REFwM0lEU3owNWM2dlIwaWF1?=
- =?utf-8?B?V0xzclk0N2t4TXJEZGZHVStPMkhaMVVwTmxhMVVqamZmUE9vVWVodHJQeXhr?=
- =?utf-8?B?VFR2NTVVV1p2ZjI0NGtidkh4MU1rb3ZoTjYrQ0U4VmUwVXNqaWw2VGFmUWtu?=
- =?utf-8?B?RkJQUjZTUFhhNTRnMXJqQW9JYS9GVnRGSVRVNEE5WHRvbmdJS0VzMGFQV1VV?=
- =?utf-8?B?L0V5M0NRcjZWQTRNQ2JWK2tOWVcyVzAxU1IwdndPUTdGZjExOW5MMXRscUhU?=
- =?utf-8?B?ejBwVWtUNnZ6ZDZXSXpDK2pmRmx1WFNQMlRHUUN2Q29oRzgwdk9aelM2YkNl?=
- =?utf-8?B?VnZJS3Q0Y1BHTllzQk90VkxINDBBRmJFUkQ2ZzNjSGp0RFk3dFRiMW5Ed2t5?=
- =?utf-8?B?SUlheXE0UDh4LytUYjVZbVN3WjR3aUZqUnRlakRiYlJFUis1QlVyWFdNNlU0?=
- =?utf-8?B?Q1RVK0NNcGhTcm9hYjFDV3FmdGtScVIrUUcwNFZpRHFZdFNlamUxWVkxQmU3?=
- =?utf-8?B?SDV2dWFMR0w0eEI1c01XT1hpMlc2S0JKOXZCeGFaT0tpTkM4dFk5bVlFaXNY?=
- =?utf-8?B?YjE5TE1Tbkk4M1BFUTBwamZ0VUFsSGwvSXBncEdnMHFsUmNoc0YrYTcrSkJT?=
- =?utf-8?B?MTRqQWllNU1sc05sdUprSlk0eElrOHkweXNZTEVpM0l1ZGlJNVpUOWlkODFY?=
- =?utf-8?B?OUtQdHZ4L1pTNlF1MXVGUFErUHVONWN1dVZzaUlnNWhCa2QwamN0Q3M3OXE0?=
- =?utf-8?B?ekNHeE9FTnBkbjJIajVSbUU0enAyOWRualo5R0F1cDh2VjNxeGpZdnNBVEM5?=
- =?utf-8?Q?vcQWF/oEl4TmOOfEfn39sbOjb?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39b098ee-d79a-4e2d-b819-08dd2132f9de
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2024 20:14:58.2200
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TG+6uQXmnjxWBRWe6BMeEgJTJNIx+P1d4LG89VO35F0//3qNmyTT/nMsQd5ZiT8hWet2cgeM+9yh/lBvRZtuew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8209
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hello everyone,
 
+This is a long overdue series to kick-off the introduction of a better representation
+of front-facing ports for ethernet interfaces.
 
-On 2024-12-20 12:37 p.m., Jakub Kicinski wrote:
-> On Fri, 20 Dec 2024 12:15:33 -0700 Ahmed Zaki wrote:
->>> I don't understand what you're trying to say, could you rephrase?
->>
->> Sure. After this patch, we have (simplified):
->>
->> void netif_napi_set_irq(struct napi_struct *napi, int irq, unsigned long
->> flags)
->>    {
->> 	struct irq_glue *glue = NULL;
->>    	int  rc;
->>
->>    	napi->irq = irq;
->>
->>    #ifdef CONFIG_RFS_ACCEL
->>    	if (napi->dev->rx_cpu_rmap && flags & NAPIF_IRQ_ARFS_RMAP) {
->> 		rc = irq_cpu_rmap_add(napi->dev->rx_cpu_rmap, irq, napi,
->> 				      netif_irq_cpu_rmap_notify);
->> 		.
->> 		.
->> 		.
->>    	}
->>    #endif
->>
->> 	if (flags & NAPIF_IRQ_AFFINITY) {
->> 		glue = kzalloc(sizeof(*glue), GFP_KERNEL);
->> 		if (!glue)
->> 			return;
->> 		glue->notify.notify = netif_irq_cpu_rmap_notify;
->> 		glue->notify.release = netif_napi_affinity_release;
->> 		.
->> 		.
->> 	}
->>    }
->>
->>
->> Both branches assign the new cb function "netif_irq_cpu_rmap_notify()"
->> as the new IRQ notifier, but the first branch calls irq_cpu_rmap_add()
->> where the notifier is embedded in "struct irq_glue". So the cb function
->> needs to assume the notifier is inside irq_glue, so the second "if"
->> branch needs to do the same.
-> 
-> First off, I'm still a bit confused why you think the flags should be
-> per NAPI call and not set at init time, once.
-> Perhaps rename netif_enable_cpu_rmap() suggested earlier to something
-> more generic (netif_enable_irq_tracking()?) and pass the flags there?
-> Or is there a driver which wants to vary the flags per NAPI instance?
-> 
+First, a short disclaimer. This series is RFC, and there are quite a lot of
+shortcomings :
 
-set_irq() just seemed like natural choice since it is already called for 
-each IRQ. I was also trying to avoid adding a new function. But sure I 
-can do that and move the flags to netdev.
+ - There's no DT binding although this series adds a generic representation of
+   ports
+ - The port representation is in a minimal form
+ - No SFP support is included, but it will be required for that series to come
+   out of RFC as we can't gracefully handle multi-port interfaces without it.
 
-> Then you can probably register a single unified handler, and inside
-> that handler check if the device wanted to have rmap or just affinity?
+These shortcomigs come from timing constraints, but also because I'd like to
+start discussing that topic with some code as a basis.
 
-This is what is in this patch already, all drivers following new 
-approach will have netif_irq_cpu_rmap_notify() as their IRQ notifier.
+For now, the only representation we have about the physical ports of an interface
+come from the 'port' field (PORT_FIBRE, PORT_TP, PORT_MII, etc.), the presence or
+not of an SFP module and the linkmodes reported by the ethtol ksettings ops. This
+isn't enough to get a good idea of what the actual interface with the outside world
+looks like.
 
-IIUC, your goal is to have the notifier inside napi, not irq_glue. For 
-this, we'll have to have our own version of irq_cpu_rmap_add() (for the 
-above reason).
+The end-goal of the work this series is a part of is to get support for multi-port
+interfaces. My end use-case has 2 ports, each driven by a dedicated PHY, but this
+also applies to dual-port PHYs.
 
-sounds OK?
+The current series introduces the object "struct phy_port". The naming may be
+improved, as I think we could consider supporting port representation without
+depending on phylib (not the case in this RFC). For now, not only do we integrate
+that work in phylib, but only PHY-driven ports are supported.
 
+In some situations, having a good representation of the physical port in devicetree
+proves to be quite useful. We're seeing vendor properties to address the lack of
+port representation such as micrel,fiber-mode or ti,fiber-mode, but there are needs
+for more (glitchy straps that detect fiber mode on a PHY connected to copper,
+RJ45 ports connected with 2 lanes only, ...).
+
+As I said this RFC has no binding, sorry about that, but let's take a look at
+the proposed DT syntax :
+
+Example 1 : PHY with RJ45 connected with 2 lanes only
+
+&mdio {
+
+	ge_phy: ethernet-phy@0 {
+		reg = <0>;
+
+		mdi {
+			port@0 {
+				media = "BaseT",
+				lanes = <2>;
+			};
+		};
+
+	};
+};
+
+Example 2 : PHY with a 100BaseFX port, without SFP
+
+&mdio {
+
+	fiber-phy: ethernet-phy@0 {
+		reg = <0>;
+
+		mdi {
+			port@0 {
+				media = "BaseF",
+				lanes = <1>;
+			};
+		};
+
+	};
+};
+
+These ports may even be used to specify PSE-PD information for PoE ports that
+are drivern by a dedicated PoE controller sitting in-between the PHY and the
+connector :
+
+&mdio {
+
+	ge_phy: ethernet-phy@0 {
+		reg = <0>;
+
+		mdi {
+			port@0 {
+				media = "BaseT",
+				lanes = <4>;
+				pse = <&pse1>;
+			};
+		};
+
+	};
+};
+
+The ports are initialized using the following sequence :
+
+1: The PHY driver's probe() function indicated the max number of ports the device
+can control
+
+2: We parse the devicetree to find generic port representations
+
+3: If we don't have at least one port from DT, we create one
+
+4: We call the phy's .attach_port() for each port created so far. This allows
+   the phy driver either to take action based on the generic port devicetree
+   indications, or to populate the port information based on straps and
+   vendor-specific DT properties (think micrel,fiber-mode and similar)
+
+5: If the ports are still not initialized (no .attach_port, no generic DT), then
+   we use snesible default value from what the PHY's supported modes.
+
+6: We reconstruct the PHY's supported field in case there are limitations from the
+   port (2 lanes on BaseT for example). This last step will need to be changed
+   when SFP gets added.
+
+So, the current work is only about init. The next steps for that work are :
+
+ - Introduce phy_port_ops, including a .configure() and a .read_status() to get
+ proper support for multi-port PHYs. This also means maintaining a list of
+ advertising/lp_advertising modes for each port.
+
+ - Add SFP support. It's a tricky part, the way I see that and have prototyped is
+ by representing the SFP cage itself as a port, as well as the SFP module's port.
+ ports therefore become chainable.
+
+ - Add the ability to list the ports in userspace.
+
+Prototype work for the above parts exist, but due to lack of time I couldn't get
+them polished enough for inclusion in that RFC.
+
+Let me know if you see this going in the right direction, I'm really all ears
+for suggestions on this, it's quite difficult to make sure no current use-case
+breaks and no heavy rework is needed in PHY drivers.
+
+Patches 1, 2 and 3 are preparatory work for the mediums representation. Patch 4
+introduces the phy_port and patch 5 shows an example of usage in the dp83822 phy.
+
+Thanks,
+
+Maxime
+
+Maxime Chevallier (5):
+  net: ethtool: common: Make BaseT a 4-lanes mode
+  net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
+  net: ethtool: Export the link_mode_params definitions
+  net: phy: Introduce PHY ports representation
+  net: phy: dp83822: Add support for phy_port representation
+
+ drivers/net/phy/Makefile     |   2 +-
+ drivers/net/phy/dp83822.c    |  60 +++++++----
+ drivers/net/phy/phy_device.c | 167 +++++++++++++++++++++++++++++
+ drivers/net/phy/phy_port.c   | 159 ++++++++++++++++++++++++++++
+ include/linux/ethtool.h      |  62 +++++++++++
+ include/linux/phy.h          |  31 ++++++
+ include/linux/phy_port.h     |  69 ++++++++++++
+ net/ethtool/common.c         | 197 +++++++++++++++++++----------------
+ net/ethtool/common.h         |   7 --
+ 9 files changed, 633 insertions(+), 121 deletions(-)
+ create mode 100644 drivers/net/phy/phy_port.c
+ create mode 100644 include/linux/phy_port.h
+
+-- 
+2.47.1
 
 
