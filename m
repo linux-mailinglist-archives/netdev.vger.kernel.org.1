@@ -1,127 +1,104 @@
-Return-Path: <netdev+bounces-153673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1129F9282
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:48:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 955E79F92B9
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 14:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3AC916D705
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 12:48:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B5707A104B
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 13:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D004B215198;
-	Fri, 20 Dec 2024 12:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABACB2156FE;
+	Fri, 20 Dec 2024 13:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d7c7rwfR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cg6v9eLn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F261C5F21;
-	Fri, 20 Dec 2024 12:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9C42156F3;
+	Fri, 20 Dec 2024 13:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734698905; cv=none; b=DnOqV5IaZOnllEOeVNld/ZpQ8e2R66A8oECLKS3ptZn3E8dec9nCSGr+kMyNJiXxVrAv++I1+Rr8NL8NK7rJPskl0fcWUxmsskUvlQOU51F0X2goJhEcnBL/lBtJ20oK3vtgIb/6aKN56HxFoCgSro7aWdUfB2BIIwHXM7iS3NY=
+	t=1734699618; cv=none; b=eMNLxkKNnk4yXdGhH5HvX6B5XEw1e3dXC+v5wW4o4cDb/bVp7u1mJGBewi4CTp4MEobYFLbK2da/12nsttGOg6ol6XgeD0QTAV7uQ6q1okU4YgqmlKS6vUlaaLmtgA0NVfAIOUOWtI6BKxgP01rsOZ+kg3BQojQ7POV7JpcKYPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734698905; c=relaxed/simple;
-	bh=FDdJ2lBFifNTt/lTvkM/SY/UtKg5l+gUiTFgEfwyL2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HGP5no5phq7lurD7sE1lmIRzNihmVArKg99Vx4+ExB/ZurlvVH/frvogAbS6InQPPf65HB+wr2TY7iqhDuqLiqNXUgnCqxhM646udwn7Lw5pypYUeJDG32O8R0+aU8BpU81SyXwDlS9UfbSlPfDcWg2A3z44aAFj0hkDuIb3Pxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d7c7rwfR; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734698904; x=1766234904;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FDdJ2lBFifNTt/lTvkM/SY/UtKg5l+gUiTFgEfwyL2c=;
-  b=d7c7rwfRlY244ugosD28BiHk7Nw9W+cFfB8QgyEW4035akmmRedfIuse
-   qnAcvd/V27kyBUE6EdV+3QFmI4bJKKsab8foHZQ5G2J2kvIkqaDiSalhm
-   TFelzKKWcdHWX97M7hTfvWW6GQ7uYd8i/TRpjcGL8asfWV9PeB5vuFhyF
-   FHDUYTy4uJgbSbEp8lUiSwDLcxywGMv3/b/j378koMm8uxncVuVy4EBUd
-   uVigDo4sZdTPmOpYnA96h+a7q9IAFtWj8yETdQn7+wH1rDGzxhz1SI/yr
-   p8pEeJ0Z73QhX8d0r7S0PSy8QZl6M49cbxPS8oyOKj46YcxlH6d0fG/Wk
-   Q==;
-X-CSE-ConnectionGUID: vwriY1ztRhKAh1GAqw2b8g==
-X-CSE-MsgGUID: bNOhPZigQJWv+63Mz7kBpw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="35129421"
-X-IronPort-AV: E=Sophos;i="6.12,250,1728975600"; 
-   d="scan'208";a="35129421"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 04:48:24 -0800
-X-CSE-ConnectionGUID: x+DoA/PTQHKmMiqDUDD6Zg==
-X-CSE-MsgGUID: WG3pATEDTtCBOQrj2PA1yg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,250,1728975600"; 
-   d="scan'208";a="98326547"
-Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 20 Dec 2024 04:48:19 -0800
-Received: from kbuild by a46f226878e0 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tOcQT-00019D-2y;
-	Fri, 20 Dec 2024 12:48:17 +0000
-Date: Fri, 20 Dec 2024 20:47:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/8] net: ethtool: plumb PHY stats to PHY
- drivers
-Message-ID: <202412202052.YznBmblv-lkp@intel.com>
-References: <20241219132534.725051-3-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1734699618; c=relaxed/simple;
+	bh=3JQ9ZfN5ioufoK7K0DrG50y58gPQcrUNsg7oXkjbzU8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Jo+dH2ZljAPWvJAinzGd3NItl3Hsvi0NiGxMdYjHCCvdJentxsr5RZsRQmRk5RNADRt8QXjCPryT9XnfRti6bzrlB59+Zw0W7DPAfovAoHOjWGNz5WwjYHq6J3U69ptfBHEJ8k9tgYJm57mEIPLibaOsKHGmiXn+xtU/z/z/nIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cg6v9eLn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFBCDC4CECD;
+	Fri, 20 Dec 2024 13:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734699617;
+	bh=3JQ9ZfN5ioufoK7K0DrG50y58gPQcrUNsg7oXkjbzU8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Cg6v9eLnE/rvSiFzFe69ZEJcawLij5y/1Gfi8P8hJ1ox10Ktvk9/zEE7iq00mVEwD
+	 gml2BguUBxb6e72JuGw0ozhHQS4B6EGGtenN2DWFy54SA0W9HK2mgRTHScow9NF2gb
+	 18oTfXsNpo/5u5HYUeuiHdDZTMdb5kTO8KSDhDytZW1EfjfOlBbXSl54mHs8FQkzpr
+	 9TLV6hhq4Bsr4RxD3KVG6MbgetokZOREqcjSEA6ilm4VOCujkgQZZffD/c6pN/wDja
+	 iZWJekDDkpWOBReF+C2F7TifYYDlOFgDQeK52f3ByHxaiD8Wlh+oM1uxeLPaChsOGF
+	 gN5U0H98VoW7A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EC82A3806656;
+	Fri, 20 Dec 2024 13:00:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241219132534.725051-3-o.rempel@pengutronix.de>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/5] gve: various XDP fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173469963470.2895973.2113580557517865563.git-patchwork-notify@kernel.org>
+Date: Fri, 20 Dec 2024 13:00:34 +0000
+References: <20241218133415.3759501-1-pkaligineedi@google.com>
+In-Reply-To: <20241218133415.3759501-1-pkaligineedi@google.com>
+To: Praveen Kaligineedi <pkaligineedi@google.com>
+Cc: netdev@vger.kernel.org, jeroendb@google.com, shailend@google.com,
+ willemb@google.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ horms@kernel.org, hramamurthy@google.com, joshwash@google.com,
+ ziweixiao@google.com, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 
-Hi Oleksij,
+Hello:
 
-kernel test robot noticed the following build errors:
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-[auto build test ERROR on net-next/main]
+On Wed, 18 Dec 2024 05:34:10 -0800 you wrote:
+> From: Joshua Washington <joshwash@google.com>
+> 
+> This patch series contains the following XDP fixes:
+>  - clean up XDP tx queue when stopping rings
+>  - use RCU synchronization to guard existence of XDP queues
+>  - perform XSK TX as part of RX NAPI to fix busy polling
+>  - fix XDP allocation issues when non-XDP configurations occur
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/ethtool-linkstate-migrate-linkstate-functions-to-support-multi-PHY-setups/20241219-213024
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241219132534.725051-3-o.rempel%40pengutronix.de
-patch subject: [PATCH net-next v2 2/8] net: ethtool: plumb PHY stats to PHY drivers
-config: arm-randconfig-004-20241220 (https://download.01.org/0day-ci/archive/20241220/202412202052.YznBmblv-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 9daf10ff8f29ba3a88a105aaa9d2379c21b77d35)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241220/202412202052.YznBmblv-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net,1/5] gve: clean XDP queues in gve_tx_stop_ring_gqi
+    https://git.kernel.org/netdev/net/c/6321f5fb70d5
+  - [net,2/5] gve: guard XDP xmit NDO on existence of xdp queues
+    https://git.kernel.org/netdev/net/c/ff7c2dea9dd1
+  - [net,3/5] gve: guard XSK operations on the existence of queues
+    https://git.kernel.org/netdev/net/c/40338d7987d8
+  - [net,4/5] gve: process XSK TX descriptors as part of RX NAPI
+    https://git.kernel.org/netdev/net/c/ba0925c34e0f
+  - [net,5/5] gve: fix XDP allocation path in edge cases
+    https://git.kernel.org/netdev/net/c/de63ac44a527
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412202052.YznBmblv-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> ld.lld: error: undefined symbol: phy_ethtool_get_phy_stats
-   >>> referenced by stats.c
-   >>>               net/ethtool/stats.o:(stats_prepare_data) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: phy_ethtool_get_link_ext_stats
-   >>> referenced by linkstate.c
-   >>>               net/ethtool/linkstate.o:(linkstate_prepare_data) in archive vmlinux.a
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
