@@ -1,120 +1,90 @@
-Return-Path: <netdev+bounces-153764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC1E39F9A8C
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 20:32:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 984E09F9A85
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 20:31:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39E3E188B360
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:31:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 737F17A0344
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8B52210F0;
-	Fri, 20 Dec 2024 19:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BCB21D591;
+	Fri, 20 Dec 2024 19:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ITl20kCr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+BwZ7dA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68FD219A8A;
-	Fri, 20 Dec 2024 19:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C89F1A00D1
+	for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 19:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734723087; cv=none; b=qKV5tDomwSzIjfvKk2hi9X8g/cYhC+8dVobq97jjAG0QfYiwest1+M+wZI6XDTTLzzED5sarQ1/VG6q4TjF+72CMxk9NtYhocHigc+AyCBgfPO86Ok/Z9cc/NUP9StQtyOoK2zIOkY+VwbogkQoSxP60ksHLixpg0Q4SaAZcCWs=
+	t=1734723112; cv=none; b=tiu0bcUY9ZhaA19q+FaFL0GNinSFPaTjW+i/dcrLGpf/LEYDNifBOCtoSCQzW6LBmXgGkVXImHdyYupJBx/7Kxn1cphj++yiPM2bAq4QS/FYwNIFU0kocNZWjkUXyUgKEg0si9L+smnMpddhacMc32hEjUKjdjmbvP8/7OAWOvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734723087; c=relaxed/simple;
-	bh=gE5B/harMQOgrohpMM0tjbu+TwLh/J6VRdbbGp8Y0Q4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g+SHR0VDvBr7ytlOwVc99GyhtaYCAUoWgIjnZ4qmK9yQBs1zuejSuXnpxGq/iuQSeYPqYp9ti3QwA9AwfkKo6PmcJ53aMCJ9MBQ3tJe/yZt7j9sgXdFsK6VgXoqJJLwM3GMroMQNPp+PgmPmm9WzzaV0GEdpm7QAK50PbG+nNPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ITl20kCr; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734723085; x=1766259085;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gE5B/harMQOgrohpMM0tjbu+TwLh/J6VRdbbGp8Y0Q4=;
-  b=ITl20kCrkL9BGrQy04/UGDJ0KtAgqNcSvkxY3lqx0UxrTg1W3MuZUvmw
-   ormnEZbSRHADeEHrKiOnMmY+js6SHVVOr5rNybexZMHe6cH7beMrPSTbO
-   3fFHpfQ35qWNUgSuri6c1e1UrZO24yNbeK8Pjj/IteIu48lbf3EDcCBcw
-   4K1JcyMiaVSpiVjDwGVtlc5uOWSvIlNaQltQOgYzpiBxtakn7OklcopLS
-   UA/P8AGB3fGyZQaztPpgfBS2SsrEtLZlxOAg9qGBM8RLVilvW2LziC0Qh
-   JMukctWITzWhAmVH3b8jSpNrT//T4bjpuhSRv13Q0Mc2wOXhX6bypmu4n
-   A==;
-X-CSE-ConnectionGUID: Ebf1tThMT2m68gNffk+BqA==
-X-CSE-MsgGUID: hnYdn4i5R7e9ljbHQnEjXw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="45773430"
-X-IronPort-AV: E=Sophos;i="6.12,251,1728975600"; 
-   d="scan'208";a="45773430"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 11:31:15 -0800
-X-CSE-ConnectionGUID: Im4d5srGTq6qkVGqKay+qA==
-X-CSE-MsgGUID: ZEwlx298SN2ELracm5cmMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,251,1728975600"; 
-   d="scan'208";a="103568129"
-Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 20 Dec 2024 11:31:08 -0800
-Received: from kbuild by a46f226878e0 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tOiiH-0001dL-1p;
-	Fri, 20 Dec 2024 19:31:05 +0000
-Date: Sat, 21 Dec 2024 03:30:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: MD Danish Anwar <danishanwar@ti.com>, aleksander.lobakin@intel.com,
-	lukma@denx.de, m-malladi@ti.com, diogo.ivo@siemens.com,
-	rdunlap@infradead.org, schnelle@linux.ibm.com,
-	vladimir.oltean@nxp.com, horms@kernel.org, rogerq@kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch
-Cc: Paul Gazzillo <paul@pgazz.com>,
-	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-	oe-kbuild-all@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>
-Subject: Re: [PATCH net-next 1/4] net: ti: Kconfig: Select HSR for ICSSG
- Driver
-Message-ID: <202412210336.BmgcX3Td-lkp@intel.com>
-References: <20241216100044.577489-2-danishanwar@ti.com>
+	s=arc-20240116; t=1734723112; c=relaxed/simple;
+	bh=+4g4e4/8/+FDcyJHcl/sVApYT/CcOCKIby3fyXQX2pw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QvMb4A1RKXxwxZ9ZUDLPA5GmvYCPwa7hI3DTri9F1IoTlxPqz6Q+DbVQ8CvR5s09dbU+LKHtw+eI4q+np2MDyot79/7ob6oAVD/fPpr39s1cw+YJ3f5aHos0xo3NfeQxdzSRoX0Zu/Tb0PR6pqmEjb9OSBg1DxJhCQn3MD5kMdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+BwZ7dA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80CE8C4CECD;
+	Fri, 20 Dec 2024 19:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734723111;
+	bh=+4g4e4/8/+FDcyJHcl/sVApYT/CcOCKIby3fyXQX2pw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u+BwZ7dAqUU63NzEoYE/uaCP+32cdn76WZxJkPrP1X1f76fnQmmIt/Tsl+mVES+Ca
+	 VSanIA0ieLU45V4oJBMq2qeRnhx/+AGJHnU43j0L/LIvsJ30i4YJmIn5llnty9j+NV
+	 ImZ69n7A1wrenZ8cVuq0nBWoJjU3u6kK8jCfHUpwbn+TKWJmZKmyeNff0ViB4tNK2+
+	 rx/GuZCj4d/qIkVElokQrThA30pPMssdqXrqW+Ex5vmBz8PHVqwwRW0kmjnNMJ9p+H
+	 Jrsg+xW5t5Ss4Kh+b6wH+FVCldgT8VVX/2EyD1c25Ye1JCnyEQAeZ8dkV9sM3s+xZj
+	 rueIYPJ2+u79g==
+Date: Fri, 20 Dec 2024 11:31:50 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ horms@kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API
+ for Homa
+Message-ID: <20241220113150.26fc7b8f@kernel.org>
+In-Reply-To: <CAGXJAmyW2Mnz1hwvTo7PKsXLVJO6dy_TK-ZtDW1E-Lrds6o+WA@mail.gmail.com>
+References: <20241217000626.2958-1-ouster@cs.stanford.edu>
+	<20241217000626.2958-2-ouster@cs.stanford.edu>
+	<20241218174345.453907db@kernel.org>
+	<CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
+	<20241219174109.198f7094@kernel.org>
+	<CAGXJAmyW2Mnz1hwvTo7PKsXLVJO6dy_TK-ZtDW1E-Lrds6o+WA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241216100044.577489-2-danishanwar@ti.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi MD,
+On Fri, 20 Dec 2024 09:59:53 -0800 John Ousterhout wrote:
+> > > I see that "void *" is used in the declaration for struct msghdr
+> > > (along with some other pointer types as well) and struct msghdr is
+> > > part of several uAPI interfaces, no?  
+> >
+> > Off the top off my head this use is a source of major pain, grep around
+> > for compat_msghdr.  
+> 
+> How should I go about confirming that this __aligned_u64 is indeed the
+> expected convention (sounds like you aren't certain)?
 
-kernel test robot noticed the following build warnings:
+Let me add Arnd Bergmann to the CC list, he will correct me if 
+I'm wrong. Otherwise you can trust my intuition :)
 
-[auto build test WARNING on 92c932b9946c1e082406aa0515916adb3e662e24]
+> Also, any idea why it needs to be aligned rather than just __u64?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/MD-Danish-Anwar/net-ti-Kconfig-Select-HSR-for-ICSSG-Driver/20241216-180412
-base:   92c932b9946c1e082406aa0515916adb3e662e24
-patch link:    https://lore.kernel.org/r/20241216100044.577489-2-danishanwar%40ti.com
-patch subject: [PATCH net-next 1/4] net: ti: Kconfig: Select HSR for ICSSG Driver
-config: arm64-kismet-CONFIG_NET_SWITCHDEV-CONFIG_TI_ICSSG_PRUETH-0-0 (https://download.01.org/0day-ci/archive/20241221/202412210336.BmgcX3Td-lkp@intel.com/config)
-reproduce: (https://download.01.org/0day-ci/archive/20241221/202412210336.BmgcX3Td-lkp@intel.com/reproduce)
+The main problem is that if __u64 doesn't force alignment on a 32b
+version of a platform the struct may have holes and padding in
+different places on 32b vs 64b compat.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412210336.BmgcX3Td-lkp@intel.com/
-
-kismet warnings: (new ones prefixed by >>)
->> kismet: WARNING: unmet direct dependencies detected for NET_SWITCHDEV when selected by TI_ICSSG_PRUETH
-   WARNING: unmet direct dependencies detected for NET_SWITCHDEV
-     Depends on [n]: NET [=y] && INET [=n]
-     Selected by [y]:
-     - TI_ICSSG_PRUETH [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_TI [=y] && PRU_REMOTEPROC [=y] && ARCH_K3 [=y] && OF [=y] && TI_K3_UDMA_GLUE_LAYER [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Double checking, I don't think that's the case for your structs, 
+so you can most likely go with a plain __u64.
 
