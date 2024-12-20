@@ -1,90 +1,87 @@
-Return-Path: <netdev+bounces-153743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 649059F986C
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 18:45:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3A759F9938
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 19:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E485E7A3F6F
-	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:43:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63547189E167
+	for <lists+netdev@lfdr.de>; Fri, 20 Dec 2024 17:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A8921C185;
-	Fri, 20 Dec 2024 17:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993CD22756E;
+	Fri, 20 Dec 2024 17:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ptLZbOdk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WCYD3YzE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BF521C175;
-	Fri, 20 Dec 2024 17:19:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3978821CA09;
+	Fri, 20 Dec 2024 17:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734715167; cv=none; b=ns/9nIJvlD3poCncj+boyIq3tFAfX+6KjIwSWKaT/G6IWVCA7NX3sAOyPmki3rT/00CWw7dxT3Ufkq8BPhJkj1/haUE3KqsiD9F4ppE1R6dKGD2qFlDt4vugT9t9fnJFBUk9dW+8OWpVS528ZyuFYQOB5hq5Vr+EuLknkUHbVsw=
+	t=1734715426; cv=none; b=cmzwcxwy9BFWMeZhfZvKvzjDejF5YHGUosm8uWZeW8P9nSWFPjARZAUwG2Yu+WZIgEJtJlcL4RVzSW0r4mY3fbB5Vr3VDP2Ks7zKkGUP6B8Ozjsk/d6q+IaNV5UolHA5QwYvJVQkNRc2PsCIxVQ/Es7RhY/I42BbRv5MgjH6Igk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734715167; c=relaxed/simple;
-	bh=FUIqa+Gitn30dawnqBvseQbi6wEPRxT9Aw0rFXxUhzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rDwNhBfYY6sWRPPYk/LFmmz8NhgjHJYPlzApF4S9x8XcEeOoz7/e3Tx1B3D7vgo7mkzHkAXmbiEBE4eoLonow960RrOsSqX/5MRq/xlaFQAKKIktgS6hw43s/12+RNYPN82miVGtCxZGA2F9kPxt5hp30mHdCbSfxAgjAHv2CQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ptLZbOdk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7491CC4CECD;
-	Fri, 20 Dec 2024 17:19:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734715166;
-	bh=FUIqa+Gitn30dawnqBvseQbi6wEPRxT9Aw0rFXxUhzs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ptLZbOdk4hkPS7sLJGgNDzID6wVCo/WUmov2dWeJwFeW1b54vCS8XTfK3IUCres8I
-	 vC21u/08rQ0XHBDtkzTHB7pAZoI14szwxeY+hq2ypcVwcxUnEdpKmc6mFD0zdTg+yv
-	 ViEkipvCrPkIy+w89dQFFR6HVAJHjuvr4EjuudrUazMFNEir+Dz8iXhthtISGTLxGO
-	 qd0gjTFmgibNOVSUldAo/SeEcasfylKAR+DEP2gZATvyqz6Jm7Xqbp5WtsnN57WlMG
-	 3pxfl4/Aa1Qh3DgqWxHze/kBTsLDgw6o3q5TLObYWB5IdlZ0qFwXyVTXkHAQuCoDA6
-	 zai2Huh/QaVgw==
-Date: Fri, 20 Dec 2024 09:19:24 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "=?UTF-8?B?TsOtY29sYXM=?= F. R. A. Prado" <nfraprado@collabora.com>
-Cc: patchwork-bot+netdevbpf@kernel.org,
-	"=?UTF-8?B?TsOtY29sYXM=?= F. R. A.  Prado" <"nfraprado@collabora.com"@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org,>,
-	""@codeaurora.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com, biao.huang@mediatek.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	mcoquelin.stm32@gmail.com, bartosz.golaszewski@linaro.org,
-	ahalaney@redhat.com, horms@kernel.org, kernel@collabora.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	s=arc-20240116; t=1734715426; c=relaxed/simple;
+	bh=pB22/j8NqAiHhB7OLNKZqfW1Mp/dMFCM5XyVKMdz4dA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SMMjJs0p51Mmo7VGirJL9eEXsjMElc15qjvnWLHCpq/YzIOe8kigUjBF+4veFyQRFZhV98Z+D5UIO/aiQvRzmGFwzqadrpRWkFHypeNZ7dVT238IFnFoMPl0iKSIk6RFZ8NrEccPdKrqNcXyfuTKfkjmJaZQ3rAwwSadlWmKsGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WCYD3YzE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IXrxemTVaqUjgMVsYG39XHX92KiKfDfge1KnIOy6Lp0=; b=WCYD3YzEOme2+6CQaXwzfrsCTq
+	di+xwAqH1nAdbCdo89GUac0ngarb0K2jnYqcSx0JQjPIzxgJxhLDtbV9nGca9vUzj85NK6wM2Nilg
+	OOhmV28llWu/OFv9teDBD10neohtmNuyT56qbxoTfTRTHxBIJAClHiQNWXJYWORt2y/E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tOgil-0023oA-K6; Fri, 20 Dec 2024 18:23:27 +0100
+Date: Fri, 20 Dec 2024 18:23:27 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Russell King <linux@armlinux.org.uk>, jacob.e.keller@intel.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH v2 0/2] net: stmmac: dwmac-mediatek: Fix inverted logic
- for mediatek,mac-wol
-Message-ID: <20241220091924.6be11286@kernel.org>
-In-Reply-To: <876cf020-e2ba-46a7-b9b2-82dcd47f7a04@notapiano>
-References: <20241109-mediatek-mac-wol-noninverted-v2-0-0e264e213878@collabora.com>
-	<173155682775.1476954.16636894744432122406.git-patchwork-notify@kernel.org>
-	<876cf020-e2ba-46a7-b9b2-82dcd47f7a04@notapiano>
+	robert.marko@sartura.hr
+Subject: Re: [PATCH net-next v5 9/9] dt-bindings: net: sparx5: document RGMII
+ delays
+Message-ID: <cb42f0d7-d2fd-460b-9f38-3b9ebfec7607@lunn.ch>
+References: <20241220-sparx5-lan969x-switch-driver-4-v5-0-fa8ba5dff732@microchip.com>
+ <20241220-sparx5-lan969x-switch-driver-4-v5-9-fa8ba5dff732@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241220-sparx5-lan969x-switch-driver-4-v5-9-fa8ba5dff732@microchip.com>
 
-On Fri, 20 Dec 2024 13:09:45 -0300 N=C3=ADcolas F. R. A. Prado wrote:
-> This message implies patch 2 was also applied, but I only see patch 1, no=
-t patch
-> 2 there:
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/log/?qt=3D=
-grep&q=3Dmac-wol
->=20
-> So I just wanted to confirm whether it was applied or not. It would be fi=
-ne for
-> patch 2 to be merged through the mediatek tree as is usual if you haven't
-> already taken it.
+On Fri, Dec 20, 2024 at 02:48:48PM +0100, Daniel Machon wrote:
+> The lan969x switch device supports two RGMII port interfaces that can be
+> configured for MAC level rx and tx delays. Document two new properties
+> {rx,tx}-internal-delay-ps in the bindings, used to select these delays.
+> 
+> Tested-by: Robert Marko <robert.marko@sartura.hr>
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 
-Yes, the DTS patch needs to go via the appropriate platform tree.
-Sorry for not calling it out.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
