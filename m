@@ -1,131 +1,162 @@
-Return-Path: <netdev+bounces-153883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2E129F9F0D
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:24:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 413E79F9F30
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E8FC188AD3B
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 07:24:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50C15188AF94
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AB81EC4C1;
-	Sat, 21 Dec 2024 07:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90251EC4CC;
+	Sat, 21 Dec 2024 08:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="CtdJKTsk"
+	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="PFxqLGig"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9236D1EBFFA
-	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 07:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E161E9B3C
+	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 08:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734765851; cv=none; b=iv05VdOTX+wVdQAOYTEdSBq877z/O4WMbDlNJ9xxkLOUZ/Arb0iPt4+gKe1smkUXq7qRbMUPAkcnaYWvwMrMgTfwA0PAPw48RlXjoP/xz8DkKXjwfkREkiufyl7kxYENhoAGFq6Qw/on2Y/y8rBisG1y9Pk2hr3rawSGlLdt8yc=
+	t=1734768920; cv=none; b=Gv0Ff4Nb9CO2NvxrAslcsndJKgx+k1IEYA/5ELlvydL/Hx/X0bQhfc6mIH/QQSD0H1Om1bcRqy9CxU/bjIylH88d5yF87brGAz1/69s3Q83qEC0icM/ARX6qb3o68HJXpPAOLPytMF4ZjeUJnqkJN9+ER0GNJ2nRTxgdi6LomjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734765851; c=relaxed/simple;
-	bh=vk60omweXjX6SnQqQJyR2j+N9Ja1OJHyKZkcgTBw5QM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BJMHqTNoCV3jj9SE3nH/OUUAue8ZnRlf1QxiUXd6ojEonQV3YFuqtm5UttBq9ydNz/TX9kACDy5EyXFx/k1l85Ms5l0Qunt6cQVXjJk5HZgf7v986nsv0gdm3E3otycdbrwiSgnUMRV16AJXNG4ZPNFmVqCja2asrKg0aM+ZnWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=CtdJKTsk; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4364a37a1d7so26487605e9.3
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 23:24:09 -0800 (PST)
+	s=arc-20240116; t=1734768920; c=relaxed/simple;
+	bh=L5LPT3BWLfNdOAMNUUwasAlbHjTyGbJl42kz0zvbJCE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NPH6ygFOPJa+LdjbAskjMaHeIUIwM+Z31M7SXsOWU54pu2y3z5hNfn588v+mDqfM2XW8M2wQGHsdKx6BAEeJyKKLBKfHQCimfEBUNIVnHDkfR1PZSg6AiOcaezpUNch4iSHdyHTEocvowmvJpxBzcc98fTzHO8wPEDDZ/cLl4/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=PFxqLGig; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-728e81257bfso2344032b3a.2
+        for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 00:15:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1734765848; x=1735370648; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EGEFp1KPbeLDL94qhspE2PUo2l278kl6WFBceVcNGBk=;
-        b=CtdJKTskldDvq1OcpJLXi0jtnZST9yDZsoanwgEeXwTwKiWhCbiLZ4HovZlRi7Bhba
-         lMdPxXOjWnGq0ekwc6EtOUbzWny1HhXPW+erVnutQexsTxyAA6k4Cst6VX2v5BktHOZM
-         /wCwIMIGVnCrd4ZxlzklWhug8Np4vnFDlrcJ6oSqF3ANtjpWzh2VUUvy8wSWyszNz7WU
-         a27ng33jAAiThyKN/WhS/PCx6yeuSHlxgfWuRO5DDdotoYuaLRrC9Jvgk/HmQUnZvHfX
-         8xA2/xHzdNi6XUPHPq3u5GQh2W7sn6upIvCW35nm10BhoQTzvPhQPX0eHc8fpnhqJMsz
-         2svw==
+        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734768918; x=1735373718; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=slTUwbxtcSMPK8G6S2IH/36OybBp8SgMfp9mnjaHTjQ=;
+        b=PFxqLGigmsIfk+K2wolNlSbAUcEcaeJQhyq5NPvxND9PxYH0MHX+I9cnIMgLk7IFb0
+         dH9oIUaVfLGKrxQqtCmYbZeZM4QEps751VSaMzUG9Dot+5MwxWKGA1i6zWRqPu8GzSUp
+         Cm7Q57/uRqcHnjtXT8Fh3tAk7sVQj8ZaHd3vt8regQVfe3JTrj84uXDFDhkaUDbSpT1J
+         +5yKHvrg4mNkaxVQZWmt0O6b6MqJV+eCGKAsoJPQ86Ahk73p4QZswOzckChRNoi4GGlb
+         3YMeg/gmDk11Hxp0+PYyCH367lOJKc8GJb9aMj52YmOdvMbmHEJrkQXaMf1HkXKGfUmC
+         DVUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734765848; x=1735370648;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGEFp1KPbeLDL94qhspE2PUo2l278kl6WFBceVcNGBk=;
-        b=OjtEP+gP2U472MDOMEuW1lcXILJOk0brS/P1EiXKAvAzIkQfhj9CU1bTX58++bbbOm
-         TkxfmmNnzCdGc2regs+1WNNu7hzABikRGxi3SBU2k1vAV1YKkSP6ItDz07ODmv2D/0b1
-         ggE6DSiEWFt+dRpUPGg6QTVfHB7Yrq0FjC2yntTgDGsq9CoI/w3fZJBN5m3ZYgW4sR6t
-         KfalAFa1apm4vNGklhBO1fBO3sN5jrUWg2ZY60hdWTeU2NgyRtyUbaVqwdxfLcPMnogR
-         LKEeb+0eihcW5/wnVtNrRxMz9A64XEZ7aZn2Vkd0NGgpGGuufiVXdNJXgFBHzX/KexaN
-         Ob9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVJQTycTgNdcagnuX72vMpNmcggLXJqhH6d+S/vfUrJRWDCf/xF7r8fbvquVzJ/GHChmsZu1WM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVy8N5FO5tdQrXP+UNcSlHlQDXZlYMg77C5UcqIgYxQxWrFAhV
-	SbVfRnrG7MzQgHnCgk87RANlfGldK3Z0LLJeC7g79tWMohQkmPo3VphKHiRZy08=
-X-Gm-Gg: ASbGncv5MmeTolPVVK8TCWhJmolV7AUm4miM217ybXNE+yaCsbxT4DafcTFvsZE3uU4
-	i5hNiWH3r2/QtdmZkvwaB0T5U9/N0N05G+uKPJsbJWvwwRiABLEKDNfKdiNVs7JtBL097zsl/gY
-	9HQQmZepgYayS92YwVF483YoEUPl/8KAJnabTq8aZfM9jHfAxNR7V9xEicBy7TBVDevFAYIbIUb
-	9mIevFEMd0RfiICGIub8YxjDzc7PlVNqCSIwlog2kBwyTwsfjFfqFvgOl1dmyeofDwK/WtjmmCL
-	w4QNETLf0KWT
-X-Google-Smtp-Source: AGHT+IFK4C/XgshfBwOKq/NkUSSIx04Y0eC4xtK3xybQdj6GwzPmOY1eORzQR2obtBLIIkIuUgUzlQ==
-X-Received: by 2002:a05:600c:6b64:b0:436:469f:2210 with SMTP id 5b1f17b1804b1-43668548aa7mr37920275e9.1.1734765847845;
-        Fri, 20 Dec 2024 23:24:07 -0800 (PST)
-Received: from [192.168.0.123] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436611ea3d5sm68543305e9.5.2024.12.20.23.24.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Dec 2024 23:24:07 -0800 (PST)
-Message-ID: <f1652194-13cf-4304-a81a-a3de91d4b839@blackwall.org>
-Date: Sat, 21 Dec 2024 09:24:06 +0200
+        d=1e100.net; s=20230601; t=1734768918; x=1735373718;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=slTUwbxtcSMPK8G6S2IH/36OybBp8SgMfp9mnjaHTjQ=;
+        b=MA11Fyqh5mD4qavnC6mScotOpnDeQqerYxDgeY1d1G6nXXRZzXJPbKedsUB6t1tOMD
+         aUfj6UMFae2czQbQ3c+zVsTcyhCcpUnenD50evqL29hYR50sKJrr4R1qwEbF2wXmHVX2
+         F84LU2Nl05tXYFAer2PvD2zTbMKr1oncItgzKHc1NHoOGKYMufKSzNvX83GPGP8vhWOs
+         IV4M3+9CueIlcb87/i1nMBAev6ABGK3w0qk4yfV4sWtE4idVJxHr3+WA8bdb0Rkc4onj
+         iiSvWmL6DhE0x4V2EgMNINmcHMua8IdFLoySrOrUbIeZLEuR3CUTVzDlcRwYD2Cjy/gF
+         HUpg==
+X-Gm-Message-State: AOJu0Yxs6K3bkyLdtMIgOHDnCB3Xd9ej0/Vg5DcOPmcVbYaKCEatjXoX
+	/R4iPwFPc2pKo1a67ytoVeFsHXA2zcet1Bv0jp6fX7YQ0/vIlSGDlgB2atrIV0YTuhj7klvCtUi
+	AAEY=
+X-Gm-Gg: ASbGncv6uUEUN/EIkWHGJapkRfo1ZeXDrk8j6yy6wmh13Ed2rUqf5Zkvkeuzp43XoNU
+	7S8THr3xvIX/XJxnNZQw7C5yQa9aDJb6SGm+NUPgMQvTExToX45eK+TiUoBEW20Or9XjTg2Y5jC
+	typw9/EHMWccUp6fRcnxl/tT3IDRBvLSyuX/5wJYwroESP8CU2iLnqGRO+hZmercD4zydSiaTTf
+	xNFIzaQaN5ozhUWgVYs0qiP+tvOBWIphocKPz7QaQ7Md8VASc+FmqVzPnRn3Cibhdh7/36Poz2A
+	EiqGsLU2kmFiEJ7g79bBTc3LdH4kZwuunRmRwRlXpmU=
+X-Google-Smtp-Source: AGHT+IFbqCyDOdZTAUMikM7TTVxukkDPL7eL3KTKQklbmIvXNygbp0Rw61F9Y5Ky4vDJinIgIDD7xg==
+X-Received: by 2002:a05:6a00:2405:b0:725:aa5d:f217 with SMTP id d2e1a72fcca58-72abdd912fdmr7167929b3a.7.1734768918065;
+        Sat, 21 Dec 2024 00:15:18 -0800 (PST)
+Received: from localhost.localdomain (133-32-227-190.east.xps.vectant.ne.jp. [133.32.227.190])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad81622dsm4279093b3a.30.2024.12.21.00.15.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Dec 2024 00:15:17 -0800 (PST)
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+To: sebastian.hesselbarth@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Subject: [PATCH net v4] net: mv643xx_eth: fix an OF node reference leak
+Date: Sat, 21 Dec 2024 17:14:48 +0900
+Message-Id: <20241221081448.3313163-1-joe@pf.is.s.u-tokyo.ac.jp>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2 3/3] selftests/bpf: Extend netkit tests to
- validate set {head,tail}room
-To: Daniel Borkmann <daniel@iogearbox.net>, martin.lau@linux.dev
-Cc: pabeni@redhat.com, kuba@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241220234658.490686-1-daniel@iogearbox.net>
- <20241220234658.490686-3-daniel@iogearbox.net>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241220234658.490686-3-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/21/24 01:46, Daniel Borkmann wrote:
-> Extend the netkit selftests to specify and validate the {head,tail}room
-> on the netdevice:
-> 
->   # ./vmtest.sh -- ./test_progs -t netkit
->   [...]
->   ./test_progs -t netkit
->   [    1.174147] bpf_testmod: loading out-of-tree module taints kernel.
->   [    1.174585] bpf_testmod: module verification failed: signature and/or required key missing - tainting kernel
->   [    1.422307] tsc: Refined TSC clocksource calibration: 3407.983 MHz
->   [    1.424511] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x311fc3e5084, max_idle_ns: 440795359833 ns
->   [    1.428092] clocksource: Switched to clocksource tsc
->   #363     tc_netkit_basic:OK
->   #364     tc_netkit_device:OK
->   #365     tc_netkit_multi_links:OK
->   #366     tc_netkit_multi_opts:OK
->   #367     tc_netkit_neigh_links:OK
->   #368     tc_netkit_pkt_type:OK
->   #369     tc_netkit_scrub:OK
->   Summary: 7/0 PASSED, 0 SKIPPED, 0 FAILED
-> 
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> ---
->   v2:
->     - Rework to pass flags to create_netkit
-> 
->  .../selftests/bpf/prog_tests/tc_netkit.c      | 49 ++++++++++++-------
->  .../selftests/bpf/progs/test_tc_link.c        | 15 ++++++
->  2 files changed, 46 insertions(+), 18 deletions(-)
-> 
+Current implementation of mv643xx_eth_shared_of_add_port() calls
+of_parse_phandle(), but does not release the refcount on error. Call
+of_node_put() in the error path and in mv643xx_eth_shared_of_remove().
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+This bug was found by an experimental verification tool that I am
+developing.
+
+Fixes: 76723bca2802 ("net: mv643xx_eth: add DT parsing support")
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+---
+Changes in v4:
+- Reorder the variable declaration to comply with the reverse xmax tree.
+- Add the target tree to the patch subject.
+
+Changes in v3:
+- Insert a NULL check for port_platdev[n].
+
+Changes in v2:
+- Insert a NULL check before accessing the platform data.
+---
+ drivers/net/ethernet/marvell/mv643xx_eth.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/mv643xx_eth.c b/drivers/net/ethernet/marvell/mv643xx_eth.c
+index a06048719e84..67a6ff07c83d 100644
+--- a/drivers/net/ethernet/marvell/mv643xx_eth.c
++++ b/drivers/net/ethernet/marvell/mv643xx_eth.c
+@@ -2704,9 +2704,15 @@ static struct platform_device *port_platdev[3];
+ 
+ static void mv643xx_eth_shared_of_remove(void)
+ {
++	struct mv643xx_eth_platform_data *pd;
+ 	int n;
+ 
+ 	for (n = 0; n < 3; n++) {
++		if (!port_platdev[n])
++			continue;
++		pd = dev_get_platdata(&port_platdev[n]->dev);
++		if (pd)
++			of_node_put(pd->phy_node);
+ 		platform_device_del(port_platdev[n]);
+ 		port_platdev[n] = NULL;
+ 	}
+@@ -2769,8 +2775,10 @@ static int mv643xx_eth_shared_of_add_port(struct platform_device *pdev,
+ 	}
+ 
+ 	ppdev = platform_device_alloc(MV643XX_ETH_NAME, dev_num);
+-	if (!ppdev)
+-		return -ENOMEM;
++	if (!ppdev) {
++		ret = -ENOMEM;
++		goto put_err;
++	}
+ 	ppdev->dev.coherent_dma_mask = DMA_BIT_MASK(32);
+ 	ppdev->dev.of_node = pnp;
+ 
+@@ -2792,6 +2800,8 @@ static int mv643xx_eth_shared_of_add_port(struct platform_device *pdev,
+ 
+ port_err:
+ 	platform_device_put(ppdev);
++put_err:
++	of_node_put(ppd.phy_node);
+ 	return ret;
+ }
+ 
+-- 
+2.34.1
 
 
