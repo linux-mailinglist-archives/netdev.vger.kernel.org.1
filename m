@@ -1,147 +1,125 @@
-Return-Path: <netdev+bounces-153902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8C359FA043
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 12:08:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED8ED9FA046
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 12:09:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FDC1167E8F
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 11:08:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56BEF167E3E
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 11:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A652A1F0E44;
-	Sat, 21 Dec 2024 11:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C441F190F;
+	Sat, 21 Dec 2024 11:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJQHXlJb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSDRYgrp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716FD646;
-	Sat, 21 Dec 2024 11:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B483F9D2;
+	Sat, 21 Dec 2024 11:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734779319; cv=none; b=JMLBPaSl5ztIDC+QxDQOgcf5FN83GRjr0dIQTfFi3MnR9htR6+ahcKfsAxF0Fv07JwuwEFup0u5ajAqsCOUQfpLuzdIMeQcfC1Pyciil90g7feZUFSGdbFOT6AM0ZA1xLMYd7nftJpIYXO5p/gbmcE5gw8eKR4ruAh8nj0algsM=
+	t=1734779361; cv=none; b=hvSWfSBcvE8+oi2VkibXlG0SyMWBe4Nq412ITVCFho0ocLhGNv8I+f/fG7AszrzqnVtZFaTNrlPi+BYJVlz9m3veLgateDJLp0tDVuOBsosgRrNtJAuEe2F5U6Vs+f4Iz7ltAS7vbDfDikjPPesfZiBEQzQS8otoHeCFw/ceai0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734779319; c=relaxed/simple;
-	bh=tAckshAuXhsjwcMCAwMvEAWkCcOcREPvM+07Vs6s8Ms=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hW8Dph7pNl2HvtanizlnDj1WpmTQk+tJNRJJcgkjKS6a6kGihjo61t3q7vMqlQVP+Doqz865501MlawBklyGXdOy82yiJeFPzi3cLLxHOiIMlOlaMDNNz+JDOkrxYcHfxZy6eXmc67It8qt9U2iyd1M/pqQZfi9IAl9Tn7JgmEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJQHXlJb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B7D7C4CECE;
-	Sat, 21 Dec 2024 11:08:35 +0000 (UTC)
+	s=arc-20240116; t=1734779361; c=relaxed/simple;
+	bh=p+VMVhejjD6MxrL25Fa85g0D15NNkDS89g2aKgkhmxM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mVhlVSN7Q/qigyl93JRiVPYndCt80J2c8h0S0NbueDQgqKLgfEZWntS7SUlftoWkskIQO2LUeZapIdZuyJ6Xp31SKJWyJOaffr5Rrgq4nIhhTkJJZlDZ2hbIY6dlZW+qxo/4MomutjX98uL94rcpOxYmMfgP3/TMmNEM0BBHxKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSDRYgrp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19B52C4CECE;
+	Sat, 21 Dec 2024 11:09:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734779318;
-	bh=tAckshAuXhsjwcMCAwMvEAWkCcOcREPvM+07Vs6s8Ms=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uJQHXlJbVLyHpbB5ELeOdRCpFCnDKcqhhvkFyZBUE732ItgFFi4Lvym+zl3WewHXD
-	 6aBbs8wZA7p07jrtJZClRnjRyRm+1Kv/q9vN37W6pT6oNI3uOZeJrodfo8WgI4ynM+
-	 y5tFitCuWYYuVLsVH11whTUmMNJnFHVOSuxN/tvng8nhEaoeWxeX0hdCG3w18ODkXi
-	 uXnjpAQ/cmXoLst0d489j52aNg4oWZypDFhA8gyiwie77wCGOYyh2rINiZTpteKXl4
-	 MUESZIZQLSmr+7/+T2jx/ZBBvhzfrkdBQfQVjsQZ2PrzautR6A8TMXZEreK2VXBaTv
-	 TD/nnzj2EfZGw==
-Message-ID: <bf12223a-42f6-4c31-992e-142568890af1@kernel.org>
-Date: Sat, 21 Dec 2024 12:08:33 +0100
+	s=k20201202; t=1734779360;
+	bh=p+VMVhejjD6MxrL25Fa85g0D15NNkDS89g2aKgkhmxM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=NSDRYgrp6PYPkqDWk4QhFrs/7VutPbL41BPPl5mL2seP/AIn2v7oIWQJh0gP47UBn
+	 lsrqzRc/m1G8eEDmaLDIrw+K1SgL5nARUUBm/h0j/L3t9L4Fp8QE3bCf5YWnJtXWi8
+	 nRjp8UMEczTRgCKiOdwjg7MIRpeF1Lot1j/P59lNRDqt6QnNMbvy+hs8tVZ/4Mf4wv
+	 /aZQgp8wMDnbuIoKOTihoM6LCoH4hh96apWRKpgWl45F2BPU9+usmlJ4zyAREOO6Cb
+	 27W+b1RlVci+LlQJ3HbIy6ivoGLqVksVNsBo0oP5ebzHsmyZH6ywpBqvtz19/r8tlE
+	 84IqLDowKnQyA==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net v2 0/3] netlink: specs: mptcp: fixes for some
+ descriptions
+Date: Sat, 21 Dec 2024 12:09:13 +0100
+Message-Id: <20241221-net-mptcp-netlink-specs-pm-doc-fixes-v2-0-e54f2db3f844@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net 0/3] netlink: specs: mptcp: fixes for some
- descriptions
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Kishen Maloor <kishen.maloor@intel.com>, Davide Caratti
- <dcaratti@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20241219-net-mptcp-netlink-specs-pm-doc-fixes-v1-0-825d3b45f27b@kernel.org>
- <20241220115406.407a4c82@kernel.org> <20241220115622.2101e554@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20241220115622.2101e554@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANqhZmcC/5WNwQ6CMBBEf4Xs2TV0BURO/ofhAGWBDdA2LSEaw
+ r9b+QNvM/MyMzsE9sIBqmQHz5sEsSYauiSgx8YMjNJFD5RSpkg90PCKi1u1+6lZzITBsQ7oFuy
+ sxl7eHLBQZUNc9kXDLcQp5/kEcekFsQd1DEcJq/Wf83pTJ/rvZVOYYkl5d2uzvKd7+5zYG56v1
+ g9QH8fxBSzSOoLeAAAA
+X-Change-ID: 20241219-net-mptcp-netlink-specs-pm-doc-fixes-618a2e8f6aeb
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Davide Caratti <dcaratti@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1407; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=p+VMVhejjD6MxrL25Fa85g0D15NNkDS89g2aKgkhmxM=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnZqHd8e8rfUDz24fy+pcF9go6eNFfC4BcaIpSM
+ 0VZMlLf4hOJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ2ah3QAKCRD2t4JPQmmg
+ cw7dEADOfEXAXmvKJ/vMPCRQLJmVs/LdLdJlw23kf2qdkewQslvqQDoDOMMch/ptnOnbbOl2LQ6
+ Ugml5HkKvAIYA86gUjJd0UUVhZyVyu9fl86fx9s/WW6rEj73KyQMkD9fByC5luJagkzPJC/2sIT
+ 2GFvfEBJczLBykt62ylhDcGYO+jQkkKn5WF8v/ozczcCUPfHbkXeqmK+hJctkZcZOQwNfMXM+Ji
+ u1jDM08kz3es92qhr6zUecDeGWJMjrt+gdenz+WDThN+V0/qebJmfa2CvBcqOEbEVrhCvNXs03Q
+ d85BvcE45vchHGNWzir7zGAOJPfQPMMV52YZalzK1qUQgWym39AK+PUOkQ687Y9jUMT99J2z0Fd
+ /3bRRjiDdkNDfZ6mHhVj1yjSlZ6qwNCeQKZkpOkb9O+9oVsqdHAvHH8rg/WLzhCFa99HEnJUayH
+ d9zpxVzu6iFTD3bjuDkhX7QbPSTbCE5p1VJ916OZrmSLtL/RZmiFLEDHYcKW+lgLwb2T/sT3s0r
+ qbqQ1QYmKyzBNFXMz2Pxt7p66/PofR+PuaRSM1Q3SZ1Oi2rypThZqQEYh1OuzhbTQ59A9NsWdA2
+ xKSk2tMTO0STmR6aUCB8YorCwPqhuVQQ59J+AYv4OC6WDv/D9xPpqCZwKOlytQISV624C9ImMeV
+ g5L1xAGqcoJ84kw==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Hi Jakub,
+When looking at the MPTCP PM Netlink specs rendered version [1], a few
+small issues have been found with the descriptions, and fixed here:
 
-Thank you for the review!
+- Patch 1: add a missing attribute for two events. For >= v5.19.
 
-On 20/12/2024 20:56, Jakub Kicinski wrote:
-> On Fri, 20 Dec 2024 11:54:06 -0800 Jakub Kicinski wrote:
->> On Thu, 19 Dec 2024 12:45:26 +0100 Matthieu Baerts (NGI0) wrote:
->>> When looking at the MPTCP PM Netlink specs rendered version [1], a few
->>> small issues have been found with the descriptions, and fixed here:
->>>
->>> - Patch 1: add a missing attribute for two events. For >= v5.19.
->>>
->>> - Patch 2: clearly mention the attributes. For >= v6.7.
->>>
->>> - Patch 3: fix missing descriptions and replace a wrong one. For >= v6.7.  
->>
->> I'm going to treat this as documentation fixes, so perfectly fine for
->> net but they don't need Fixes tags. Hope that's okay, and that I'm
->> not missing anything.
-> 
-> Ah, these also need a regen since the kdoc has changed!
-> 
-> please run ./tools/net/ynl/ynl-regen.sh
+- Patch 2: clearly mention the attributes. For >= v6.7.
 
-Oh, sorry, I didn't know. I will fix that in a v2 without the Fixes and
-cc stable.
+- Patch 3: fix missing descriptions and replace a wrong one. For >= v6.7.
 
-Cheers,
-Matt
+Link: https://docs.kernel.org/networking/netlink_spec/mptcp_pm.html [1]
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Please note that there is no urgency here: this can of course be sent to
+Linus next year!
+
+Enjoy this holiday period!
+
+---
+Changes in v2:
+- Run ynl-regen.sh and removed Fixes tag. (Jakub)
+- Link to v1: https://lore.kernel.org/r/20241219-net-mptcp-netlink-specs-pm-doc-fixes-v1-0-825d3b45f27b@kernel.org
+
+---
+Matthieu Baerts (NGI0) (3):
+      netlink: specs: mptcp: add missing 'server-side' attr
+      netlink: specs: mptcp: clearly mention attributes
+      netlink: specs: mptcp: fix missing doc
+
+ Documentation/netlink/specs/mptcp_pm.yaml | 60 ++++++++++++++++---------------
+ include/uapi/linux/mptcp_pm.h             | 50 +++++++++++++-------------
+ 2 files changed, 57 insertions(+), 53 deletions(-)
+---
+base-commit: 30b981796b94b083da8fdded7cb74cb493608760
+change-id: 20241219-net-mptcp-netlink-specs-pm-doc-fixes-618a2e8f6aeb
+
+Best regards,
 -- 
-Sponsored by the NGI0 Core fund.
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
