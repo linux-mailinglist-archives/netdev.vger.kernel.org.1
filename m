@@ -1,139 +1,190 @@
-Return-Path: <netdev+bounces-153895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352209F9F51
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:20:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D86259F9F5B
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:53:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62C9F189468A
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:19:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33A1216966D
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3641EC4DF;
-	Sat, 21 Dec 2024 08:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E331E9B32;
+	Sat, 21 Dec 2024 08:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="VSAjfr5r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0BwMLNy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6846D1EC4D9
-	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 08:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92B82594B0
+	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 08:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734769151; cv=none; b=AbaAVGr5O+I5qAgNtJiF8Gc/UbaZqeHfJMV280bupg2a3v3448NjjpoYOYHVcxxn2mzMcBXGDd5T3Rh7Ey90jJSyvKk4LNnWXcMziztxmF5UlGo0e3vXkYxJWoIlOEDJrBQuTK6v8MSid1z6gawqpkJ76JS75xR9Q/JMbc8q7Ug=
+	t=1734771182; cv=none; b=A3EYSVwh22dnIEGLaoPmfHjWNf9LbMiKYWBqR2ZhNhijfcFMGKbfKkc8xc0RUcQFYlfpefGxuaXe+bp/T7XffQ71cYGNcxJYTD+8kn9d50QBw6nB72EN97fhdZIEWf517ADzA9MJz+IsDb/KPxlzNd10cxVZOg+4r7BKkGnxDGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734769151; c=relaxed/simple;
-	bh=kux5ZLcPHHXM/aL+fmbGsKY/9C/5t3kCIZRamKk3JUc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FbKym+Vejd6qDgHEuXfd7esHgc4VBZLiMP5ChkCe1b8Dgw7g8WrcT4K9spZXmriH5qlcctmr11B5Btt8lW4XOCW9vQ0U3fKwibNIj4dSTmcevEFDUFgID7j8b4g2ijjjE2k5gvYURwhHC9mKtNMELIIk/QNwxFW0QRzu5Odud8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=VSAjfr5r; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2f441904a42so2519333a91.1
-        for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 00:19:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734769149; x=1735373949; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kzOSF3r5Q79uOz1ZiBdyUdRqFPs3HIeDVmQxK7bZmu8=;
-        b=VSAjfr5rFlE/pZ2z085i8dx7uloRUYB0xuMsJnje1KSEzH0F5aaOUY4ejz8sE9IhLn
-         5pzfWb9mhRur7kGQPBrLla4dTrMce8ZLP37+VLmmoAUHcX7s9ylATCW4ZgVH7Qd8REm/
-         l10Yt9b33VZUkCmLYUpAowOmjW/aFzRZHJV/zEGx98UlmSPObymj8fGCdD8zZkZAggvb
-         HQLjZx2Rq2lygmhUGbdNRR00y0x+udV9Ev4XyxYLvaYPCKxMHgDZnF0vo6oukawtd5On
-         UqGRIC4Kvl1K9C8LwKSPTq47CzuJHaDdrVaQazFopoFazyke4a4Zy6OqNT2ugtupaYVj
-         jthA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734769149; x=1735373949;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kzOSF3r5Q79uOz1ZiBdyUdRqFPs3HIeDVmQxK7bZmu8=;
-        b=jzAByofQ6nQgdzKckLa0LNbDlg9A0VAiXcWm5SreVCgAnftYK/PBvZX6fEEee8sPxP
-         Li0IM0yvAUaSeks6pxwQQFClploj6jMmq3rOG+TdrDoZqR/t7v70j86X8aUlqSdnw6+Q
-         TWW1pCiki8CUeIu1uk0kR4nNZO0akndnkIRxljXLJTr37IifHoPoCj4OTqI9yPGZx0eN
-         gg+8JxWmO5sw1HJq9J3thnED0pEGhukf4WmWay0POM7ueMIJ5/kFI+5vvVV0XJxoWWvu
-         hKAD2oE6dRX5HL1w+t7xprg5YSR5A5T8Kmf3sTK4eWFtPioFac/CFdKchGyQCAomp2VI
-         uqYg==
-X-Gm-Message-State: AOJu0Yy/hBvPUH+n0LHiuyQfA2dLShMGL7GMzYAnN6IMzZeZ+hUbOXPc
-	CDXXLeY12WPGitj9zYLH2vPkMMhMbN6pOAXX86nrfcm04y80uwA4yrgZjGCRlBYR8loPcIPbi4R
-	jX80=
-X-Gm-Gg: ASbGnctPs8Hqvvd8wGVb7pfIKg2NVZ8ofSFgT8BJcZOL79Ed1yPSjUVH09JAnLDDC3w
-	2hEh0vIqIitU1R39CgN80AE9HKVSC5gMDGZekpgxNOdQlXC4JQxKJijM9u6AVeEUk8v3Xhx1Mpe
-	VMhLDx9oO7nTYq3wUiPcP0yrRx+pXKndWqEvjH59JnxD+6rKVh8en8abzwQOvMPHl0K7QqRCSAZ
-	pQEaVjQRVkqrilkUmZFLyAlC8UBZTfkIQirP8RWwRgqEM5hlZ8ppsZVq3yBOGVn4nM/zgIC+JVS
-	a2kbX1ppIJ4B91w+ZQ+nR/nefYEb2QJcJg==
-X-Google-Smtp-Source: AGHT+IGBcsza61rxfHIcEfbUDNKf17WVBWKfvbAzc0p98eMM792xLSV07JHTIfPC9bq0JXSbrJhJvA==
-X-Received: by 2002:a17:90b:6c6:b0:2ee:3cc1:793e with SMTP id 98e67ed59e1d1-2f452ee08f0mr7980017a91.32.1734769148669;
-        Sat, 21 Dec 2024 00:19:08 -0800 (PST)
-Received: from [192.168.0.78] (133-32-227-190.east.xps.vectant.ne.jp. [133.32.227.190])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f363dd7013sm6771188a91.47.2024.12.21.00.19.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Dec 2024 00:19:08 -0800 (PST)
-Message-ID: <27f4d606-8fcb-4bdd-9b1e-970c9a166ae9@pf.is.s.u-tokyo.ac.jp>
-Date: Sat, 21 Dec 2024 17:19:04 +0900
+	s=arc-20240116; t=1734771182; c=relaxed/simple;
+	bh=cjKF2C9TZmQVmts5DW4GLLkPodNlIEAgBCccDDu79Is=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KAAa7YhU4KNXdzLeczH866S2SRsYYyEUhyyq1s2NEaS6z+Uhq4uZRicW3sKz9PAnkTpqkd2X7buXnpqNC/9RzfZGLd/NjQFXD7GxIjRfGUrnpFEi+37BCgrN/UjFGa7iSfXYdOT3MDIiV0nyOXACVTKDW0T7hwk7emWI4eZNW8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C0BwMLNy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734771178;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5u7ODnEiVmrU6NmFwmTtOY2PwDk2M+piTrUPkLuAqSY=;
+	b=C0BwMLNyYLU+wXmhTmF4W54WcZeJXnA395JOZ4I0n5c8znQC8YBsEoUsaPWWb1KnTR6mVI
+	XbR1r5Im51JfM49JR7uy06UcK0DHQQVF2oRTNihlF/OMFWiBQVq1H1vXw7WLRqvJxMyyrD
+	1S7NmC595/t1TxpL7eL5SJ2J6OaC6fQ=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-492-uDYhupN2OKC2e8CdgsnKUg-1; Sat,
+ 21 Dec 2024 03:52:56 -0500
+X-MC-Unique: uDYhupN2OKC2e8CdgsnKUg-1
+X-Mimecast-MFC-AGG-ID: uDYhupN2OKC2e8CdgsnKUg
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7012B1956096;
+	Sat, 21 Dec 2024 08:52:54 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.39.192.36])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1373A19560A2;
+	Sat, 21 Dec 2024 08:52:50 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	mptcp@lists.linux.dev
+Subject: [PATCH net] mptcp: fix TCP options overflow.
+Date: Sat, 21 Dec 2024 09:51:46 +0100
+Message-ID: <025d9df8cde3c9a557befc47e9bc08fbbe3476e5.1734771049.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: mv643xx_eth: fix an OF node reference leak
-To: Paolo Abeni <pabeni@redhat.com>, sebastian.hesselbarth@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org
-Cc: netdev@vger.kernel.org, dan.carpenter@linaro.org
-References: <20241218012849.3214468-1-joe@pf.is.s.u-tokyo.ac.jp>
- <13a68f91-b691-4024-8ae8-5f108b4e4587@redhat.com>
- <5f878cd5-3166-4ddd-9c26-ed913439408c@redhat.com>
-Content-Language: en-US
-From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-In-Reply-To: <5f878cd5-3166-4ddd-9c26-ed913439408c@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Thank you for your review.
+Syzbot reported the following splat:
 
-On 12/19/24 19:23, Paolo Abeni wrote:
-> On 12/19/24 11:21, Paolo Abeni wrote:
->> On 12/18/24 02:28, Joe Hattori wrote:
->>> Current implementation of mv643xx_eth_shared_of_add_port() calls
->>> of_parse_phandle(), but does not release the refcount on error. Call
->>> of_node_put() in the error path and in mv643xx_eth_shared_of_remove().
->>>
->>> This bug was found by an experimental verification tool that I am
->>> developing.
->>>
->>> Fixes: 76723bca2802 ("net: mv643xx_eth: add DT parsing support")
->>> Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
->>> ---
->>> Changes in v3:
->>> - Insert a NULL check for port_platdev[n].
->>> Changes in v2:
->>> - Insert a NULL check before accessing the platform data.
->>
->> I'm sorry for nit-picking, but many little things are adding-up and
->> should be noticed.
->>
->> The subj prefix must include the correct revision number (v3 in this case).
-> 
-> Oops, I almost forgot... the patch subj prefix must additionally include
-> the target tree - 'net' in this case - see:
-> 
-> https://elixir.bootlin.com/linux/v6.12.5/source/Documentation/process/maintainer-netdev.rst#L332
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+CPU: 1 UID: 0 PID: 5836 Comm: sshd Not tainted 6.13.0-rc3-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/25/2024
+RIP: 0010:_compound_head include/linux/page-flags.h:242 [inline]
+RIP: 0010:put_page+0x23/0x260 include/linux/mm.h:1552
+Code: 90 90 90 90 90 90 90 55 41 57 41 56 53 49 89 fe 48 bd 00 00 00 00 00 fc ff df e8 f8 5e 12 f8 49 8d 5e 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74 08 48 89 df e8 8f c7 78 f8 48 8b 1b 48 89 de 48 83
+RSP: 0000:ffffc90003916c90 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: 0000000000000008 RCX: ffff888030458000
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: dffffc0000000000 R08: ffffffff898ca81d R09: 1ffff110054414ac
+R10: dffffc0000000000 R11: ffffed10054414ad R12: 0000000000000007
+R13: ffff88802a20a542 R14: 0000000000000000 R15: 0000000000000000
+FS:  00007f34f496e800(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9d6ec9ec28 CR3: 000000004d260000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ skb_page_unref include/linux/skbuff_ref.h:43 [inline]
+ __skb_frag_unref include/linux/skbuff_ref.h:56 [inline]
+ skb_release_data+0x483/0x8a0 net/core/skbuff.c:1119
+ skb_release_all net/core/skbuff.c:1190 [inline]
+ __kfree_skb+0x55/0x70 net/core/skbuff.c:1204
+ tcp_clean_rtx_queue net/ipv4/tcp_input.c:3436 [inline]
+ tcp_ack+0x2442/0x6bc0 net/ipv4/tcp_input.c:4032
+ tcp_rcv_state_process+0x8eb/0x44e0 net/ipv4/tcp_input.c:6805
+ tcp_v4_do_rcv+0x77d/0xc70 net/ipv4/tcp_ipv4.c:1939
+ tcp_v4_rcv+0x2dc0/0x37f0 net/ipv4/tcp_ipv4.c:2351
+ ip_protocol_deliver_rcu+0x22e/0x440 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x341/0x5f0 net/ipv4/ip_input.c:233
+ NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
+ NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
+ __netif_receive_skb_one_core net/core/dev.c:5672 [inline]
+ __netif_receive_skb+0x2bf/0x650 net/core/dev.c:5785
+ process_backlog+0x662/0x15b0 net/core/dev.c:6117
+ __napi_poll+0xcb/0x490 net/core/dev.c:6883
+ napi_poll net/core/dev.c:6952 [inline]
+ net_rx_action+0x89b/0x1240 net/core/dev.c:7074
+ handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
+ __do_softirq kernel/softirq.c:595 [inline]
+ invoke_softirq kernel/softirq.c:435 [inline]
+ __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0x57/0xc0 arch/x86/kernel/apic/apic.c:1049
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0033:0x7f34f4519ad5
+Code: 85 d2 74 0d 0f 10 02 48 8d 54 24 20 0f 11 44 24 20 64 8b 04 25 18 00 00 00 85 c0 75 27 41 b8 08 00 00 00 b8 0f 01 00 00 0f 05 <48> 3d 00 f0 ff ff 76 75 48 8b 15 24 73 0d 00 f7 d8 64 89 02 48 83
+RSP: 002b:00007ffec5b32ce0 EFLAGS: 00000246
+RAX: 0000000000000001 RBX: 00000000000668a0 RCX: 00007f34f4519ad5
+RDX: 00007ffec5b32d00 RSI: 0000000000000004 RDI: 0000564f4bc6cae0
+RBP: 0000564f4bc6b5a0 R08: 0000000000000008 R09: 0000000000000000
+R10: 00007ffec5b32de8 R11: 0000000000000246 R12: 0000564f48ea8aa4
+R13: 0000000000000001 R14: 0000564f48ea93e8 R15: 00007ffec5b32d68
+ </TASK>
 
-Thank you for pointing out. All the points you raised have been fixed in 
-the v4 patch.
+Eric noted a probable shinfo->nr_frags corruption, which indeed
+occurs.
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
+The root cause is a buggy MPTCP option len computation in some
+circumstances: the ADD_ADDR option should be mutually exclusive
+with DSS since the blamed commit.
 
-Best,
-Joe
+Still, mptcp_established_options_add_addr() tries to set the
+relevant info in mptcp_out_options, if the remaining space is
+large enough even when DSS is present.
+
+Since the ADD_ADDR infos and the DSS share the same union
+fields, adding first corrupts the latter. In the worst-case
+scenario, such corruption increases the DSS binary layout,
+exceeding the computed length and possibly overwriting the
+skb shared info.
+
+Address the issue by enforcing mutual exclusion in
+mptcp_established_options_add_addr(), too.
+
+Reported-by: syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com
+Fixes: 1bff1e43a30e ("mptcp: optimize out option generation")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+ net/mptcp/options.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+index ad22622843a2..9ea7356d9fab 100644
+--- a/net/mptcp/options.c
++++ b/net/mptcp/options.c
+@@ -667,8 +667,15 @@ static bool mptcp_established_options_add_addr(struct sock *sk, struct sk_buff *
+ 		    &echo, &drop_other_suboptions))
+ 		return false;
+ 
++	/*
++	 * Later on, mptcp_write_options() will enforce mutually exclusion with
++	 * DSS, bail out if such option is set and we can't drop it.
++	 */
+ 	if (drop_other_suboptions)
+ 		remaining += opt_size;
++	else if (opts->suboptions & OPTION_MPTCP_DSS)
++		return false;
++
+ 	len = mptcp_add_addr_len(opts->addr.family, echo, !!opts->addr.port);
+ 	if (remaining < len)
+ 		return false;
+-- 
+2.45.2
+
 
