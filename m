@@ -1,153 +1,160 @@
-Return-Path: <netdev+bounces-153848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597DC9F9D53
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 01:05:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7289F9D56
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 01:06:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 122637A3023
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 00:04:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 158B2160B15
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 00:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99445163;
-	Sat, 21 Dec 2024 00:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B55C17E;
+	Sat, 21 Dec 2024 00:06:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Achgq6l9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aY49UTzv"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E87F173;
-	Sat, 21 Dec 2024 00:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76519370;
+	Sat, 21 Dec 2024 00:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734739497; cv=none; b=UfF7bvGGUiH1bFGVaqECKIb3dM5vIvzdx0ALR4/aYbK2OCHWPtpyi4CPUhL037VnFAb8qISF4dz8c/HYB9lRaCMnjypubX2QnOdbRoBV68r2XXiIA0n2vVgGKW2J4hO5fEyWjvIpzkLiooRC3QFs9bLCUJWZMRmgEMQovgfO8lQ=
+	t=1734739595; cv=none; b=J3Cn4qczjTxh6llpz1Ua+M/7TndMBSk8i1HSQCXdSeBk0FtSQuj/euRNZBdp4vL1UugH9icPDFXDlTA/lQGfNDOcsKpYpawJbTTNAYreHh6aymq3XB1Ngg830Lu9s7r0AkiemUKtkK1Qwe2B5q0LvOFwFlXJw6cLIWly8VnA2bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734739497; c=relaxed/simple;
-	bh=EJtpds71Jav8cDcwPNbcUvrO6fSVwCIQOulhReOlYuE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=AYD2G0p3WfHkvpikvAqpfHXc2G7cDZ5EWuFmcMCv2pSeVXOnO/RAt4NlQbZ6mk0Nt0oiCvpcuUqhVYloHeAI1zXS+De8PbmFcn0n0Wt/+qnrXE8klygHK3od7oj7GwwpBwLMQ4EQ4jZvONz/oRfnsKsNY25wcvd2t/MmwqX2H9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Achgq6l9; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=nQN28esCIoKBQOmWqZCij3ByTu+jxi/BTUyBXv40SWA=; b=Achgq6l9N/SQ5KUsu+30jw/s2L
-	KFfAj+td8mIplrG8NTPTKSJ8iPCL+BYVIYqy9cUOq2W8/w8VpZJJRZxOBYI9o4OB4QEy8wpUdUBCT
-	zgL4iHGHow8KThmiGOybp3EoSuXlzi4fVVoT6WJ4acyPf6Stqw/kFzh0ri8tCxT6oL+Pmdk9PhRod
-	NqyqpnOYi42aG+K/cP/tUY+YbX3WA/wR0ycZiB0yqSCbZMSTGp+KwVR4X097pC5NrHfDZRi2k9gOX
-	/qJ824iC1g2mdPQrk9Wze+DC4/IOxs4X7r9u4oWL30botBdc6iWHa9A9R8TTywYnhRd5QhRkrG3nZ
-	01mqfUdw==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tOmzF-000Jta-Hm; Sat, 21 Dec 2024 01:04:53 +0100
-Received: from [85.1.206.226] (helo=[192.168.1.114])
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tOmzF-0004BG-0T;
-	Sat, 21 Dec 2024 01:04:53 +0100
-Message-ID: <7c6fab5a-8925-4be6-8c1c-2d0a4fcc3585@iogearbox.net>
-Date: Sat, 21 Dec 2024 01:04:52 +0100
+	s=arc-20240116; t=1734739595; c=relaxed/simple;
+	bh=7eKynyAGbkufr/ZNtz935UBCsTC5J1w/8/uhytNNyKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tVJ7luUB8zihco+3M5VsCENPfcGpIjJKfrYYwALmA0BQ8pd2j3/4byLJrXNa+P2N0AFjgc1PsipOBsfcwNIrK41F/Qg0eWBbCinkFddnDo3l6Cy9qAQNU5DUNMZkcuZucS8nCHVlE3+VPmEA9bJcuPsHtIXjhVse5FKS2nNPLwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aY49UTzv; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734739594; x=1766275594;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7eKynyAGbkufr/ZNtz935UBCsTC5J1w/8/uhytNNyKs=;
+  b=aY49UTzvbpgNLyuNLUcfBGLAX3+SvEa9ur9ONG/MD0Uyd1c9IX0p+lf3
+   Zw5xl8tVdQL7dZDBvRbof2rEV64zSdJLpY8GzYnGlzpiDX3Et1XG+MKaB
+   KrqBY90R3VfnDvjVcTRAs25jW90hX42EWN+qUWAM0xDD9CLAKb6939iGT
+   OQp6x6XUhI8QYkSjSsq5sibP6t1TB2RxHpgIOzHahGUnYMgPX+OcuYKwa
+   bZQ349fuhEnTmvXtqOqmny0usAu45/PDJMO1tjVc6SkMHKtq/4YASGCie
+   3ktnV6+/F0NsVo156d6nOA75g8qA0cdEWt2xAtCgoGq1Z6CH/bTe3Gp8D
+   w==;
+X-CSE-ConnectionGUID: lUQpZTV4RKObW0yiSblWuQ==
+X-CSE-MsgGUID: V/6lqnpJTPC71mvEqGU5CA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="52701388"
+X-IronPort-AV: E=Sophos;i="6.12,252,1728975600"; 
+   d="scan'208";a="52701388"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 16:06:33 -0800
+X-CSE-ConnectionGUID: TxkhmUMoQKuSFKkNU0rLJA==
+X-CSE-MsgGUID: FyMziybBSlSrO2NSt9J37A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="102756568"
+Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 20 Dec 2024 16:06:30 -0800
+Received: from kbuild by a46f226878e0 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tOn0m-0001nH-1R;
+	Sat, 21 Dec 2024 00:06:28 +0000
+Date: Sat, 21 Dec 2024 08:05:56 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yajun Deng <yajun.deng@linux.dev>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Yajun Deng <yajun.deng@linux.dev>
+Subject: Re: [PATCH net-next] sock: make SKB_FRAG_PAGE_ORDER equal to
+ PAGE_ALLOC_COSTLY_ORDER
+Message-ID: <202412210700.fAOJ9ocm-lkp@intel.com>
+References: <20241217105659.2215649-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 1/3] netkit: Allow for configuring
- needed_{head,tail}room
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: martin.lau@linux.dev, razor@blackwall.org, pabeni@redhat.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20241219173928.464437-1-daniel@iogearbox.net>
- <20241219182324.4707e425@kernel.org>
- <c0abbe9e-edad-4860-a2f2-9cd32e19a6a1@iogearbox.net>
-Content-Language: en-US
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <c0abbe9e-edad-4860-a2f2-9cd32e19a6a1@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27493/Fri Dec 20 10:46:49 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241217105659.2215649-1-yajun.deng@linux.dev>
 
-On 12/20/24 10:06 AM, Daniel Borkmann wrote:
-> On 12/20/24 3:23 AM, Jakub Kicinski wrote:
->> On Thu, 19 Dec 2024 18:39:26 +0100 Daniel Borkmann wrote:
->>> +    if (headroom) {
->>> +        peer->needed_headroom = headroom;
->>> +        dev->needed_headroom = headroom;
->>> +    }
->>> +    if (tailroom) {
->>> +        peer->needed_tailroom = tailroom;
->>> +        dev->needed_tailroom = tailroom;
->>> +    }
->>
->> Since you use the same one for main dev and peer should there be
->> something rejecting the use of the new attr in the peer attrs?
->> (IFLA_NETKIT_PEER_INFO)
-> 
-> The peer info is parsed via rtnl_nla_parse_ifinfomsg() which internally
-> uses ifla_policy filter where IFLA_INFO_DATA is not part of, but to be
-> sure I can add one more selftest case to confirm.
+Hi Yajun,
 
-Looks like we don't bail out anymore after the conversion in fefd5d082172
-("netkit: Set IFLA_NETKIT_PEER_INFO to netkit_link_ops.peer_type."), so I
-left it out for now from the series.. need to experiment some more whether
-fefd5d082172 dropping the error has any unintended side-effects. But I'm
-currently not seeing how it would be much different to, for example, the
-preceding netif_inherit_tso_max() call.
+kernel test robot noticed the following build warnings:
 
-Thanks,
-Daniel
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yajun-Deng/sock-make-SKB_FRAG_PAGE_ORDER-equal-to-PAGE_ALLOC_COSTLY_ORDER/20241217-185748
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241217105659.2215649-1-yajun.deng%40linux.dev
+patch subject: [PATCH net-next] sock: make SKB_FRAG_PAGE_ORDER equal to PAGE_ALLOC_COSTLY_ORDER
+config: openrisc-randconfig-r122-20241220 (https://download.01.org/0day-ci/archive/20241221/202412210700.fAOJ9ocm-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 14.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20241221/202412210700.fAOJ9ocm-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412210700.fAOJ9ocm-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+   net/core/sock.c:2496:9: sparse: sparse: context imbalance in 'sk_clone_lock' - wrong count at exit
+   net/core/sock.c:2500:6: sparse: sparse: context imbalance in 'sk_free_unlock_clone' - unexpected unlock
+>> net/core/sock.c:3044:49: sparse: sparse: cast truncates bits from constant value (10000 becomes 0)
+
+vim +3044 net/core/sock.c
+
+5640f7685831e08 Eric Dumazet 2012-09-23  3013  
+400dfd3ae899849 Eric Dumazet 2013-10-17  3014  /**
+400dfd3ae899849 Eric Dumazet 2013-10-17  3015   * skb_page_frag_refill - check that a page_frag contains enough room
+400dfd3ae899849 Eric Dumazet 2013-10-17  3016   * @sz: minimum size of the fragment we want to get
+400dfd3ae899849 Eric Dumazet 2013-10-17  3017   * @pfrag: pointer to page_frag
+82d5e2b8b466d5b Eric Dumazet 2014-09-08  3018   * @gfp: priority for memory allocation
+400dfd3ae899849 Eric Dumazet 2013-10-17  3019   *
+400dfd3ae899849 Eric Dumazet 2013-10-17  3020   * Note: While this allocator tries to use high order pages, there is
+400dfd3ae899849 Eric Dumazet 2013-10-17  3021   * no guarantee that allocations succeed. Therefore, @sz MUST be
+400dfd3ae899849 Eric Dumazet 2013-10-17  3022   * less or equal than PAGE_SIZE.
+400dfd3ae899849 Eric Dumazet 2013-10-17  3023   */
+d9b2938aabf757d Eric Dumazet 2014-08-27  3024  bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
+5640f7685831e08 Eric Dumazet 2012-09-23  3025  {
+5640f7685831e08 Eric Dumazet 2012-09-23  3026  	if (pfrag->page) {
+fe896d1878949ea Joonsoo Kim  2016-03-17  3027  		if (page_ref_count(pfrag->page) == 1) {
+5640f7685831e08 Eric Dumazet 2012-09-23  3028  			pfrag->offset = 0;
+5640f7685831e08 Eric Dumazet 2012-09-23  3029  			return true;
+5640f7685831e08 Eric Dumazet 2012-09-23  3030  		}
+400dfd3ae899849 Eric Dumazet 2013-10-17  3031  		if (pfrag->offset + sz <= pfrag->size)
+5640f7685831e08 Eric Dumazet 2012-09-23  3032  			return true;
+5640f7685831e08 Eric Dumazet 2012-09-23  3033  		put_page(pfrag->page);
+5640f7685831e08 Eric Dumazet 2012-09-23  3034  	}
+5640f7685831e08 Eric Dumazet 2012-09-23  3035  
+5640f7685831e08 Eric Dumazet 2012-09-23  3036  	pfrag->offset = 0;
+af87ed7a96a9372 Yajun Deng   2024-12-17  3037  	if (!static_branch_unlikely(&net_high_order_alloc_disable_key)) {
+d0164adc89f6bb3 Mel Gorman   2015-11-06  3038  		/* Avoid direct reclaim but allow kswapd to wake */
+d0164adc89f6bb3 Mel Gorman   2015-11-06  3039  		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+d0164adc89f6bb3 Mel Gorman   2015-11-06  3040  					  __GFP_COMP | __GFP_NOWARN |
+d0164adc89f6bb3 Mel Gorman   2015-11-06  3041  					  __GFP_NORETRY,
+d9b2938aabf757d Eric Dumazet 2014-08-27  3042  					  SKB_FRAG_PAGE_ORDER);
+d9b2938aabf757d Eric Dumazet 2014-08-27  3043  		if (likely(pfrag->page)) {
+d9b2938aabf757d Eric Dumazet 2014-08-27 @3044  			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+d9b2938aabf757d Eric Dumazet 2014-08-27  3045  			return true;
+d9b2938aabf757d Eric Dumazet 2014-08-27  3046  		}
+d9b2938aabf757d Eric Dumazet 2014-08-27  3047  	}
+d9b2938aabf757d Eric Dumazet 2014-08-27  3048  	pfrag->page = alloc_page(gfp);
+d9b2938aabf757d Eric Dumazet 2014-08-27  3049  	if (likely(pfrag->page)) {
+d9b2938aabf757d Eric Dumazet 2014-08-27  3050  		pfrag->size = PAGE_SIZE;
+5640f7685831e08 Eric Dumazet 2012-09-23  3051  		return true;
+5640f7685831e08 Eric Dumazet 2012-09-23  3052  	}
+400dfd3ae899849 Eric Dumazet 2013-10-17  3053  	return false;
+400dfd3ae899849 Eric Dumazet 2013-10-17  3054  }
+400dfd3ae899849 Eric Dumazet 2013-10-17  3055  EXPORT_SYMBOL(skb_page_frag_refill);
+400dfd3ae899849 Eric Dumazet 2013-10-17  3056  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
