@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-153926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 611FD9FA140
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 16:06:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C3949FA147
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 16:18:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FDA61885EE7
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 15:06:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59ED01887E74
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 15:18:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB391F4726;
-	Sat, 21 Dec 2024 15:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E051F8669;
+	Sat, 21 Dec 2024 15:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DnW3p0Wq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZvahHlPJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FCC1F427B;
-	Sat, 21 Dec 2024 15:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8F42EB00;
+	Sat, 21 Dec 2024 15:18:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734793579; cv=none; b=j/Qq8ipI/s0jqSz+dqNTc3cR6pjLIq/Gp0jDHNsYLCQyWTTjShTXrkVAnJS0qp5NaC+TtZInG6OctySFWVRwmVs+6gPBcv8lPbmUq4mstOjNoJshFKkYMwcl8kC2kCHS52ewRc6cj4GWjr3ejdzOWJ08FjhzgWLfl/RcmCzJ+Ag=
+	t=1734794284; cv=none; b=IiZvVx1uH80PBVPJ29qG9XGppTt3zDRy84K68XNBMshNsDg0ZxQRvWlbakOpgPaUuUE8dbnx3wyKbVIFeYt6fVYDNqNpNsj+ikW5DYADyDkzGSpNi+YfDa96jVd/PfP/gr98TSeT5cwhHx4rbSYARke0BAA8ZrYX1pXi6lLKTxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734793579; c=relaxed/simple;
-	bh=fg9AM9uCOoy34gPSOGcTPBKBCJnw5BhZsPbWtU5StSI=;
+	s=arc-20240116; t=1734794284; c=relaxed/simple;
+	bh=5npocbCtF0vS/uYKknr1J0qqeN4M9EK8eV//ntVdydY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OqaCGLGBB1WDtl4qRny/DFLS2GjvuCmFqK13gXRaer9GTRMIMtEJAPBVml/wFJE5pgUT/8eiPlqjsdhecbfahNXflqESNBI1dS9n85X1P9LOZ0nwfi5428QXZstxrCy90zSKvX8u/XU0vL0M5SWSrw1zNAlyliyzQTnSXBuv8Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DnW3p0Wq; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=BM2i86D5HxDMgHQKb/YFE/vlmzzlO7grCNvNLQU8uW8PEZB8MlIQNr229vGbAK2jauGPoAUSf+zJHh0bRVqz8ZXjY0FMHv8hN4vqzgCsS1DQG5IVtrRik6ZYp4hH6KxnnI6oKNYRmfyV0NyxDfoPrjwC61l5iKDQ6nYR5VwWjRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZvahHlPJ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,33 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nnUaS3ZdfldbVv26q/JCdoZX4cOue7uHQN0UsIPsLgw=; b=DnW3p0WqYpcwpI5GhqekySA0OP
-	ThuDzjKUrdCaUb9/cjsTSqxexPQhx0ueNtDLJIEV33ZDlUdpVtiiEm1SmgkXv++B04iM4nUASSqEt
-	2Vmvq6h/4FrGWtBMRvBiGtjtO6d+g561CUxBmAANScbAlgt98N6xVQ3W28c1SXIIgHtk=;
+	bh=Z/zWEEAFiJhjASlpovWheTu6czHSNtboPXzunoqWqNU=; b=ZvahHlPJqsL76Zxjdfy9FCDjBb
+	R/IIqoL+hBFOYHVAXBMRe/18w94D3CLB21ThZMQNQEgVuk+qOmQmUlNs3meiujeTeeoDji8+TLh+F
+	MnxwxMhl9c44kMQsd14CT/88imtLwLWkRnfBSAFHPhlIXQ58/oe1tKDGajSfglxyKYDA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tP13T-002KH5-R5; Sat, 21 Dec 2024 16:06:11 +0100
-Date: Sat, 21 Dec 2024 16:06:11 +0100
+	id 1tP1Er-002KPf-2D; Sat, 21 Dec 2024 16:17:57 +0100
+Date: Sat, 21 Dec 2024 16:17:57 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+Cc: linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
+	netdev@vger.kernel.org, linux-can@vger.kernel.org,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH 2/2] net/phy,neterion: Remove dead values
-Message-ID: <9f15203a-349f-48f3-a812-ca3f7ec995ab@lunn.ch>
-References: <20241221124445.1094460-1-ariel.otilibili-anieli@eurecom.fr>
- <20241221124445.1094460-3-ariel.otilibili-anieli@eurecom.fr>
+Subject: Re: [PATCH 1/3] drivers/firmware/broadcom, ethernet/marvell: Remove
+ unused values
+Message-ID: <e99c8ff0-4b72-400b-a530-6808adbd5d1a@lunn.ch>
+References: <20241221035352.1020228-1-ariel.otilibili-anieli@eurecom.fr>
+ <20241221035352.1020228-2-ariel.otilibili-anieli@eurecom.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,51 +71,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241221124445.1094460-3-ariel.otilibili-anieli@eurecom.fr>
+In-Reply-To: <20241221035352.1020228-2-ariel.otilibili-anieli@eurecom.fr>
 
-On Sat, Dec 21, 2024 at 01:39:33PM +0100, Ariel Otilibili wrote:
-> Coverity-ID: 1269173, 1575053
+On Sat, Dec 21, 2024 at 04:44:15AM +0100, Ariel Otilibili wrote:
+> Coverity-IDs: 1487817, 1561102
 > Signed-off-by: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
-> ---
->  drivers/net/ethernet/neterion/s2io.c     | 2 --
->  drivers/net/phy/nxp-c45-tja11xx-macsec.c | 1 -
 
-Please split this into a patch per driver.
+One patch per driver please.
 
->  2 files changed, 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/neterion/s2io.c b/drivers/net/ethernet/neterion/s2io.c
-> index f8016dc25e0a..4f89f9fd8043 100644
-> --- a/drivers/net/ethernet/neterion/s2io.c
-> +++ b/drivers/net/ethernet/neterion/s2io.c
-> @@ -1969,8 +1969,6 @@ static void en_dis_err_alarms(struct s2io_nic *nic, u16 mask, int flag)
->  				   MC_ERR_REG_ECC_ALL_DBL | PLL_LOCK_N, flag,
->  				   &bar0->mc_err_mask);
->  	}
-> -	nic->general_int_mask = gen_int_mask;
-> -
->  	/* Remove this line when alarm interrupts are enabled */
->  	nic->general_int_mask = 0;
-
-So this change looks reasonable, but you need to update the comment,
-because it is now wrong.
-
->  }
-> diff --git a/drivers/net/phy/nxp-c45-tja11xx-macsec.c b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-> index 550ef08970f4..e15ab9ba2f50 100644
-> --- a/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-> +++ b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-> @@ -818,7 +818,6 @@ static void nxp_c45_rx_sc_update(struct phy_device *phydev,
->  	u32 cfg = 0;
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+> @@ -329,11 +329,9 @@ static int cn10k_mcs_write_rx_flowid(struct otx2_nic *pfvf,
+>  	mac_da = ether_addr_to_u64(secy->netdev->dev_addr);
 >  
->  	nxp_c45_macsec_read(phydev, MACSEC_RXSC_CFG, &cfg);
-> -	cfg &= ~MACSEC_RXSC_CFG_VF_MASK;
->  	cfg = phy_secy->secy->validate_frames << MACSEC_RXSC_CFG_VF_OFF;
+>  	req->data[0] = FIELD_PREP(MCS_TCAM0_MAC_DA_MASK, mac_da);
+> -	req->mask[0] = ~0ULL;
+>  	req->mask[0] = ~MCS_TCAM0_MAC_DA_MASK;
+>  
+>  	req->data[1] = FIELD_PREP(MCS_TCAM1_ETYPE_MASK, ETH_P_MACSEC);
+> -	req->mask[1] = ~0ULL;
+>  	req->mask[1] &= ~MCS_TCAM1_ETYPE_MASK;
+>  
 
-I can see why a static analysis tool would point this out, but you
-need to include some justification why your change is correct, and it
-is not a bug, maybe cfg should be written back after being masked? Or
-the assignment to cfg should actually be an |= not = ?
+As i said to another patch, you need to argue why you change is
+correct. If you have no idea what the correct fix is, you should
+simply report the issue to the Maintainer, and look at the git history
+for these lines and see who added them, and ask them what is the
+correct fix.
 
 	Andrew
 
