@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-153940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE1F9FA201
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 19:46:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CCF9FA204
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 19:47:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E1491887AF2
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 18:46:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEC4F18856A1
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 18:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00C5178383;
-	Sat, 21 Dec 2024 18:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971C51862BD;
+	Sat, 21 Dec 2024 18:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="R8BXJxLT"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="rb6jmhXq"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362841C68A3;
-	Sat, 21 Dec 2024 18:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E904C185B4C;
+	Sat, 21 Dec 2024 18:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734806594; cv=none; b=gqYMj0pRc+i7ksyS2qXnVcz7jj4p4rM83W1HskMW70XX4+6bLTMrh7WjseE+laQoV2DiOxehcB2Z68B7nl24ZWB+QGv5nYeq05ULYr/0AWZZiT5IzhoTVzRbCcd2fzQ0c7z1oOME+LRgfHajWZA+YoXHtnyHyj5ZFXDPiZstedI=
+	t=1734806602; cv=none; b=nW04qS5uDuvZPuUieTt+MNNgUJk3y+pqCfl8cMdziE4u6yxaOnh8m67WFvEla7z5n/ygnrkLSjtmkS6dKpFlvP5FBmOM+wcYTfvGJhDY2gKUwFDpgo/tPhzUkFVvb0IAPY0RdOF50OQWJsyPsLcU6GmY4MtRBdatJpO1TJSmJyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734806594; c=relaxed/simple;
-	bh=d5aakrVX4yeTY7hducvdCR/gG2oYHLw7wao3jo+Lq3A=;
+	s=arc-20240116; t=1734806602; c=relaxed/simple;
+	bh=xUjMR8E/oB7ectCizWxE8cp7aytblS1UCtWrZAqZ+U8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sX1J3wX85QQg7TD+muI2fZpYqwfBLsYI9aPjsfdAgMjVMrZHMTbeJOfVXHI2BRcWolgspesT866NiwOwzOcM25bbAELXl1dxduj3S2HHtBafcKRFBOlt7buhqvuqLql7XzsTWedT9nK0VVGsQYfxJOoC13GEQ500GQ9DYoem8Pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=R8BXJxLT; arc=none smtp.client-ip=46.235.229.95
+	 MIME-Version; b=SPMHibr60Mjo8Hy5OAc4mg9QFzkysiAqWIkqCo1vCknmCXmwwEgNWGnAJkcJlV8toMX/vSvRqiP9CPDzUcznNqr2gG+DgOWSMCIjb8/x54CtP2F5VhJ4xUlaisY5vGTY9nUxRVa2A6PV+aJEvvB3xHooqcSDRTZHsT33TylawvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=rb6jmhXq; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=EL9sWILBSGTYl+aZk0fVJx8i0jxQ5SOOcBDq3z7WT58=; b=R8BXJxLT9V+pwos6
-	FOeczG84Ohn5m6Akr7GQNoT2wQ0NggE5tfA3u0jF3Y+k1iIKmv15LsW/zUBIY1N/je02JiOPM3wCP
-	lhEBsD39w5SyIlWeMt5v2Uzcd0G/sDmSD833A6hvO983rrdVVM0N/Kjyj2kPU+aRdIXjmaPZmtFzT
-	NSCuI2uxXyvZ9wsib03v6Fp1BR74yZFR7+X0bgpLhFkzcIKmfeb09c/ByPxt3/OeLRCoZt8pF2PuB
-	9gcnbLuV6RrC5l0Fbt/meBRuFqw1Yb67+Q22AdZkTcjoihQjKGaIWh6UDjUodaGXsYJj57hUiT5Bl
-	JC5T0P3ohJDjn67zgg==;
+	:Subject; bh=7DIlELWgzNGvwf4ldWAU2dlgWl8Sx9HJfUGOtuYL0nc=; b=rb6jmhXqCeG5nhsJ
+	0/rURDtLdjx2DUq7d3LPzbdJgnhACOUvxYwuhpZBH2iSnQUyNyhbjeFEc3HS+BE1V9UAZb+aEhTul
+	IY632KqXQrXW/7rI+bCZrH698HuYRQhXmVuLbllUwryUBvgLOSRqr5F8Gkvpv7ZkSvS576igCwtmX
+	w3Yi5u6ZXCQvt+C96+HeHyJapFkIndVWGe4J7IEZrQKJijd6czHJuuH/AwZ+avnQeR9Rm79O6Oipc
+	ddEidahJWIkBohGMwwWoSLtvQsjyGIxszBYy/WgyIZSQ9sgaZ+PurjVMfB3jkP293oAHa7apew30w
+	TIsPRKw/RuFkaitSoA==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1tP4R7-006hEJ-1B;
-	Sat, 21 Dec 2024 18:42:49 +0000
+	id 1tP4R8-006hEJ-02;
+	Sat, 21 Dec 2024 18:42:50 +0000
 From: linux@treblig.org
 To: anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com,
@@ -56,9 +56,9 @@ To: anthony.l.nguyen@intel.com,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [RFC net-next 2/9] i40e: Remove unused i40e_blink_phy_link_led
-Date: Sat, 21 Dec 2024 18:42:40 +0000
-Message-ID: <20241221184247.118752-3-linux@treblig.org>
+Subject: [RFC net-next 3/9] i40e: Remove unused i40e_(read|write)_phy_register
+Date: Sat, 21 Dec 2024 18:42:41 +0000
+Message-ID: <20241221184247.118752-4-linux@treblig.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241221184247.118752-1-linux@treblig.org>
 References: <20241221184247.118752-1-linux@treblig.org>
@@ -72,126 +72,128 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-i40e_blink_phy_link_led() was added in 2016 by
-commit fd077cd3399b ("i40e: Add functions to blink led on 10GBaseT PHY")
+i40e_read_phy_register() and i40e_write_phy_register() were added in
+2016 by
+commit f62ba91458b5 ("i40e: Add functions which apply correct PHY access
+method for read and write operation")
 
-but hasn't been used.
+but haven't been used.
 
-Remove it.
+Remove them.
+
+(There are more specific _clause* variants of these functions
+that are still used.)
 
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- drivers/net/ethernet/intel/i40e/i40e_common.c | 74 -------------------
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 78 -------------------
  .../net/ethernet/intel/i40e/i40e_prototype.h  |  4 -
- 2 files changed, 78 deletions(-)
+ 2 files changed, 82 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
-index 47e71f72d87b..ba780a949a47 100644
+index ba780a949a47..6779e281a648 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_common.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
-@@ -4428,80 +4428,6 @@ u8 i40e_get_phy_address(struct i40e_hw *hw, u8 dev_num)
- 	return (u8)(reg_val >> ((dev_num + 1) * 5)) & 0x1f;
+@@ -4335,84 +4335,6 @@ int i40e_write_phy_register_clause45(struct i40e_hw *hw,
+ 	return status;
  }
  
 -/**
-- * i40e_blink_phy_link_led
+- * i40e_write_phy_register
 - * @hw: pointer to the HW structure
-- * @time: time how long led will blinks in secs
-- * @interval: gap between LED on and off in msecs
+- * @page: registers page number
+- * @reg: register address in the page
+- * @phy_addr: PHY address on MDIO interface
+- * @value: PHY register value
 - *
-- * Blinks PHY link LED
+- * Writes value to specified PHY register
 - **/
--int i40e_blink_phy_link_led(struct i40e_hw *hw,
--			    u32 time, u32 interval)
+-int i40e_write_phy_register(struct i40e_hw *hw,
+-			    u8 page, u16 reg, u8 phy_addr, u16 value)
 -{
--	u16 led_addr = I40E_PHY_LED_PROV_REG_1;
--	u16 gpio_led_port;
--	u8 phy_addr = 0;
--	int status = 0;
--	u16 led_ctl;
--	u8 port_num;
--	u16 led_reg;
--	u32 i;
+-	int status;
 -
--	i = rd32(hw, I40E_PFGEN_PORTNUM);
--	port_num = (u8)(i & I40E_PFGEN_PORTNUM_PORT_NUM_MASK);
--	phy_addr = i40e_get_phy_address(hw, port_num);
--
--	for (gpio_led_port = 0; gpio_led_port < 3; gpio_led_port++,
--	     led_addr++) {
--		status = i40e_read_phy_register_clause45(hw,
--							 I40E_PHY_COM_REG_PAGE,
--							 led_addr, phy_addr,
--							 &led_reg);
--		if (status)
--			goto phy_blinking_end;
--		led_ctl = led_reg;
--		if (led_reg & I40E_PHY_LED_LINK_MODE_MASK) {
--			led_reg = 0;
--			status = i40e_write_phy_register_clause45(hw,
--							 I40E_PHY_COM_REG_PAGE,
--							 led_addr, phy_addr,
--							 led_reg);
--			if (status)
--				goto phy_blinking_end;
--			break;
--		}
+-	switch (hw->device_id) {
+-	case I40E_DEV_ID_1G_BASE_T_X722:
+-		status = i40e_write_phy_register_clause22(hw, reg, phy_addr,
+-							  value);
+-		break;
+-	case I40E_DEV_ID_1G_BASE_T_BC:
+-	case I40E_DEV_ID_5G_BASE_T_BC:
+-	case I40E_DEV_ID_10G_BASE_T:
+-	case I40E_DEV_ID_10G_BASE_T4:
+-	case I40E_DEV_ID_10G_BASE_T_BC:
+-	case I40E_DEV_ID_10G_BASE_T_X722:
+-	case I40E_DEV_ID_25G_B:
+-	case I40E_DEV_ID_25G_SFP28:
+-		status = i40e_write_phy_register_clause45(hw, page, reg,
+-							  phy_addr, value);
+-		break;
+-	default:
+-		status = -EIO;
+-		break;
 -	}
 -
--	if (time > 0 && interval > 0) {
--		for (i = 0; i < time * 1000; i += interval) {
--			status = i40e_read_phy_register_clause45(hw,
--						I40E_PHY_COM_REG_PAGE,
--						led_addr, phy_addr, &led_reg);
--			if (status)
--				goto restore_config;
--			if (led_reg & I40E_PHY_LED_MANUAL_ON)
--				led_reg = 0;
--			else
--				led_reg = I40E_PHY_LED_MANUAL_ON;
--			status = i40e_write_phy_register_clause45(hw,
--						I40E_PHY_COM_REG_PAGE,
--						led_addr, phy_addr, led_reg);
--			if (status)
--				goto restore_config;
--			msleep(interval);
--		}
+-	return status;
+-}
+-
+-/**
+- * i40e_read_phy_register
+- * @hw: pointer to the HW structure
+- * @page: registers page number
+- * @reg: register address in the page
+- * @phy_addr: PHY address on MDIO interface
+- * @value: PHY register value
+- *
+- * Reads specified PHY register value
+- **/
+-int i40e_read_phy_register(struct i40e_hw *hw,
+-			   u8 page, u16 reg, u8 phy_addr, u16 *value)
+-{
+-	int status;
+-
+-	switch (hw->device_id) {
+-	case I40E_DEV_ID_1G_BASE_T_X722:
+-		status = i40e_read_phy_register_clause22(hw, reg, phy_addr,
+-							 value);
+-		break;
+-	case I40E_DEV_ID_1G_BASE_T_BC:
+-	case I40E_DEV_ID_5G_BASE_T_BC:
+-	case I40E_DEV_ID_10G_BASE_T:
+-	case I40E_DEV_ID_10G_BASE_T4:
+-	case I40E_DEV_ID_10G_BASE_T_BC:
+-	case I40E_DEV_ID_10G_BASE_T_X722:
+-	case I40E_DEV_ID_25G_B:
+-	case I40E_DEV_ID_25G_SFP28:
+-		status = i40e_read_phy_register_clause45(hw, page, reg,
+-							 phy_addr, value);
+-		break;
+-	default:
+-		status = -EIO;
+-		break;
 -	}
 -
--restore_config:
--	status = i40e_write_phy_register_clause45(hw,
--						  I40E_PHY_COM_REG_PAGE,
--						  led_addr, phy_addr, led_ctl);
--
--phy_blinking_end:
 -	return status;
 -}
 -
  /**
-  * i40e_led_get_reg - read LED register
+  * i40e_get_phy_address
   * @hw: pointer to the HW structure
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_prototype.h b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-index 29f6a903a30c..c0a4bd53501c 100644
+index c0a4bd53501c..bfebe18c0041 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_prototype.h
 +++ b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-@@ -72,8 +72,6 @@ int i40e_led_set_phy(struct i40e_hw *hw, bool on,
- 		     u16 led_addr, u32 mode);
- int i40e_led_get_phy(struct i40e_hw *hw, u16 *led_addr,
- 		     u16 *val);
--int i40e_blink_phy_link_led(struct i40e_hw *hw,
--			    u32 time, u32 interval);
- 
- /* admin send queue commands */
- 
-@@ -446,8 +444,6 @@ int i40e_read_phy_register(struct i40e_hw *hw, u8 page, u16 reg,
- int i40e_write_phy_register(struct i40e_hw *hw, u8 page, u16 reg,
- 			    u8 phy_addr, u16 value);
+@@ -439,10 +439,6 @@ int i40e_read_phy_register_clause45(struct i40e_hw *hw,
+ 				    u8 page, u16 reg, u8 phy_addr, u16 *value);
+ int i40e_write_phy_register_clause45(struct i40e_hw *hw,
+ 				     u8 page, u16 reg, u8 phy_addr, u16 value);
+-int i40e_read_phy_register(struct i40e_hw *hw, u8 page, u16 reg,
+-			   u8 phy_addr, u16 *value);
+-int i40e_write_phy_register(struct i40e_hw *hw, u8 page, u16 reg,
+-			    u8 phy_addr, u16 value);
  u8 i40e_get_phy_address(struct i40e_hw *hw, u8 dev_num);
--int i40e_blink_phy_link_led(struct i40e_hw *hw,
--			    u32 time, u32 interval);
  int i40e_aq_write_ddp(struct i40e_hw *hw, void *buff,
  		      u16 buff_size, u32 track_id,
- 		      u32 *error_offset, u32 *error_info,
 -- 
 2.47.1
 
