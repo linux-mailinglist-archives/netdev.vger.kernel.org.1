@@ -1,151 +1,185 @@
-Return-Path: <netdev+bounces-153898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 614289F9F87
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 10:12:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAEF49FA006
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 11:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3810418913D4
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:12:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD8827A018B
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 10:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4641F2C3E;
-	Sat, 21 Dec 2024 09:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0B51F193F;
+	Sat, 21 Dec 2024 10:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JUY4X2ds"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q1QZOUDM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873E21F2C38;
-	Sat, 21 Dec 2024 09:11:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1821F192E
+	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 10:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734772296; cv=none; b=bBsj2d/pP4khvGu0xh9YW+jVh1ostzmU+BYLzqFqfmt15yMl/B/r3y0ib747ZCweD3mU+h9j8stu26Mj4bEv4a7AULJDZdQBZdJzrSHDjTJnt6IMU9p2eWZs9EnIC4510DKo01PtAa627xO8BdX30cY8gkhEh2tBX9fBr/1XyIo=
+	t=1734775224; cv=none; b=hc5XSlJ0mXDkMU2qHu+5UMv74ZqM1Bc8MMdPRkGADU/YuAu1WJEYOo53dta9zDJdAqtxoiGhOKRV1cM5ZoJfulUBDN/8At47T12aZJLH5N2JrRCaMqw3FifgX05sbJ0eIoZZl3vwG16CHNf1lPoyJlTPaKDMKKwewUpaAPOTu+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734772296; c=relaxed/simple;
-	bh=xG4c1QDQkeqmFr3xpqJo4Ptz4ABndWUjgc6I+1XA6i0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q13RyUNfasMh8rf4UaWXPtP8h4tVlzVTBZf1uG4HVnXSln9ItW+xjDLBXMZT0BXph2SC2KJqb5UE5f/g+ROTIlBhwJZsXEC7RM7btydTVWTOF0VNCkmk6J7qunSfn3gpJPC0N/JoLil/8F3URIYmZ/RUYBzSmJp9NIl3xj6SsFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JUY4X2ds; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46698C4CED7;
-	Sat, 21 Dec 2024 09:11:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734772296;
-	bh=xG4c1QDQkeqmFr3xpqJo4Ptz4ABndWUjgc6I+1XA6i0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JUY4X2dsvUZCVkG3vD1om9Bjs10e0juTq7qRZNtdgmsiyKsZyfKEycU7VPSp4phFB
-	 oJw0HYdxyr00hIr82r5OraLaJolhjLjN3OiVvPXfZ/GfgQ3dqAWcdihu5moFGXmied
-	 NX5Lqq3P0OvqyPQjjoFXA8hybbTwJ+J1SoftNh3G/RbMBIOifTcmdt6e4oszUOfiTu
-	 CzxMEuToQZOj36wxN6rwXPBrHBnb9HRhT2/u1Nw26731jAo54twSPmgua5bDvu8CM6
-	 8g0G2TPcpcJJOHqfpmi9cAyYwEuXzzWCq3sXW63dAD5rfsxedXNtU9axBb/rf1c8Kf
-	 JBpxg0uaCtpIQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH 26/29] net/tls: use the new scatterwalk functions
-Date: Sat, 21 Dec 2024 01:10:53 -0800
-Message-ID: <20241221091056.282098-27-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241221091056.282098-1-ebiggers@kernel.org>
-References: <20241221091056.282098-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1734775224; c=relaxed/simple;
+	bh=EZeOzFrvRWC/ARBiLgjIiWnevqTL8Vf5+49OtVPdbRM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jsveyAu9MTl08NitzuICNZUYsrM0lTgmHhbSDmU60ewkqdoBCEeCqtl+UhqS+FLFLJS0ap8pjltkMHxD1p9y+QP28oezkeuVW30kNTlNTNXnERmeflvy5LvvJDZwb8RaZQXPIrOfWm2Ia21kab1af8dgQEauhItgtDdVioGAVO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q1QZOUDM; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-725e4bee2b0so3885982b3a.2
+        for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 02:00:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734775222; x=1735380022; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=czmSyFUkYN/2oT9iFBNPQYgt6v+o090wOwQQEui5uQM=;
+        b=Q1QZOUDMfwwYisLYhI21soFNrd3HCx5QtVUJaIGCOIEH7A0zjS8y22aNha57luTbXU
+         438pUoffRnjry3Uwl5hGILOSylDIhBiCbanNi9J1tc5ZL+TwIwZh8T9LWCJt2t4Nn3QF
+         gG959pDAMg3MIY/Zqnk3FaxkQ+1hw3q+yI5ohv/dtPGvFLdh7fySNFwqJl6M3XAt3NVR
+         JNM76bc7g047K+3flAA229GausFNy4tJONt8UUcEuJrRPc8vlSOu2gAQBN6sUDtttUof
+         En8K+rolFxXxZUsYZpPET2qk8lS30eyMqGo9NPWq+MkyWYUARroga3wcAFqC581zjhln
+         u60g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734775222; x=1735380022;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=czmSyFUkYN/2oT9iFBNPQYgt6v+o090wOwQQEui5uQM=;
+        b=W9oIivOThPPZ4Mj/7uljs9kvCqNVgRPa8Izz8l0X5SxJBN7AcXiWEizMFTAYAgzeR8
+         nASzKctsaUkE2t8B4HwGSHhVheSRBx+GHYlljNtIkBW75EhuTvlb1QdAFmoCvoG4v++p
+         pqhh8uyaSKLffyJlyU87RlTIpkuUqqy+yt/K3FTbww9EmAnOCqyNpe2rMV84LtNwOsk5
+         2PdJWHypoMn+MavKBQ5P2gWf895hNW2kHFseoYOeLc8wTbIGJNd7z5XdrhMmBhFDiFt+
+         /4RX4kD8LZO67msYgiHMBSVnT1B/y3ZUISykYRPmKzsilmHmO9ew+fsybBe8w0WWCKZJ
+         66Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCXPGGN0WtNP7Rxjx9q7lV5YqX7qIKaFMIZSGr+SQzgywmCJcTMZNIn+hXWwxdpTlbLzJXl+B24=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1z8fFREy79DiEN63b7XIxFpKn4maXHpPTjM91bBB0oS1JWeUJ
+	bKkiS3tsGo+L85KlEUVZnxB98NPWIph9dQDRd5fsRvT3JX1g9JBFEbftbeFV0O8TEkQZdZ7vWw6
+	+TS7JVQTuEmhYgaCLk/VZdQ==
+X-Google-Smtp-Source: AGHT+IFwQKmJ461oairkKjA3AvHJIynGg3mVVkk1cxMxx1mJkOP7WYo+qz+PVk18G7at/vtoTi1Qgbylq+xl54HdlQ==
+X-Received: from pfbay30.prod.google.com ([2002:a05:6a00:301e:b0:728:b3dd:ba8c])
+ (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:140e:b0:727:3cd0:122f with SMTP id d2e1a72fcca58-72abdd8c667mr8092172b3a.9.1734775222298;
+ Sat, 21 Dec 2024 02:00:22 -0800 (PST)
+Date: Sat, 21 Dec 2024 19:00:07 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241221100007.1910089-1-yuyanghuang@google.com>
+Subject: [PATCH net-next, v2] netlink: correct nlmsg size for multicast notifications
+From: Yuyang Huang <yuyanghuang@google.com>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
+	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
+	liuhangbin@gmail.com, nicolas.dichtel@6wind.com, andrew@lunn.ch, 
+	pruddy@vyatta.att-mail.com, netdev@vger.kernel.org, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Biggers <ebiggers@google.com>
+Corrected the netlink message size calculation for multicast group
+join/leave notifications. The previous calculation did not account for
+the inclusion of both IPv4/IPv6 addresses and ifa_cacheinfo in the
+payload. This fix ensures that the allocated message size is
+sufficient to hold all necessary information.
 
-Replace calls to the deprecated function scatterwalk_copychunks() with
-memcpy_from_scatterwalk(), memcpy_to_scatterwalk(), or
-scatterwalk_skip() as appropriate.
+This patch also includes the following improvements:
+* Uses GFP_KERNEL instead of GFP_ATOMIC when holding the RTNL mutex.
+* Uses nla_total_size(sizeof(struct in6_addr)) instead of
+  nla_total_size(16).
+* Removes unnecessary EXPORT_SYMBOL().
 
-The new functions behave more as expected and eliminate the need to call
-scatterwalk_done() or scatterwalk_pagedone().  This was not always being
-done when needed, and therefore the old code appears to have also had a
-bug where the dcache of the destination page(s) was not always being
-flushed on architectures that need that.
-
-Cc: Boris Pismenny <borisp@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: netdev@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Fixes: 2c2b61d2138f ("netlink: add IGMP/MLD join/leave notifications")
+Cc: Maciej =C5=BBenczykowski <maze@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
 ---
 
-This patch is part of a long series touching many files, so I have
-limited the Cc list on the full series.  If you want the full series and
-did not receive it, please retrieve it from lore.kernel.org.
+Changelog since v1:
+- Uses GFP_KERNEL instead of GFP_ATOMIC when holding the RTNL mutex.
+- Uses nla_total_size(sizeof(struct in6_addr)) instead of
+  nla_total_size(16).
+- Removes unnecessary EXPORT_SYMBOL().
 
- net/tls/tls_device_fallback.c | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+ net/ipv4/igmp.c     | 6 ++++--
+ net/ipv6/addrconf.c | 1 -
+ net/ipv6/mcast.c    | 6 ++++--
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/net/tls/tls_device_fallback.c b/net/tls/tls_device_fallback.c
-index f9e3d3d90dcf..ec7017c80b6a 100644
---- a/net/tls/tls_device_fallback.c
-+++ b/net/tls/tls_device_fallback.c
-@@ -67,20 +67,17 @@ static int tls_enc_record(struct aead_request *aead_req,
- 	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
- 
- 	buf_size = TLS_HEADER_SIZE + cipher_desc->iv;
- 	len = min_t(int, *in_len, buf_size);
- 
--	scatterwalk_copychunks(buf, in, len, 0);
--	scatterwalk_copychunks(buf, out, len, 1);
-+	memcpy_from_scatterwalk(buf, in, len);
-+	memcpy_to_scatterwalk(out, buf, len);
- 
- 	*in_len -= len;
- 	if (!*in_len)
- 		return 0;
- 
--	scatterwalk_pagedone(in, 0, 1);
--	scatterwalk_pagedone(out, 1, 1);
--
- 	len = buf[4] | (buf[3] << 8);
- 	len -= cipher_desc->iv;
- 
- 	tls_make_aad(aad, len - cipher_desc->tag, (char *)&rcd_sn, buf[0], prot);
- 
-@@ -108,14 +105,12 @@ static int tls_enc_record(struct aead_request *aead_req,
- 
- 		*in_len = 0;
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 8a370ef37d3f..3da126cea884 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -1473,7 +1473,9 @@ static void inet_ifmcaddr_notify(struct net_device *d=
+ev,
+ 	int err =3D -ENOMEM;
+=20
+ 	skb =3D nlmsg_new(NLMSG_ALIGN(sizeof(struct ifaddrmsg)) +
+-			nla_total_size(sizeof(__be32)), GFP_ATOMIC);
++			nla_total_size(sizeof(__be32)) +
++			nla_total_size(sizeof(struct ifa_cacheinfo)),
++			GFP_KERNEL);
+ 	if (!skb)
+ 		goto error;
+=20
+@@ -1484,7 +1486,7 @@ static void inet_ifmcaddr_notify(struct net_device *d=
+ev,
+ 		goto error;
  	}
- 
- 	if (*in_len) {
--		scatterwalk_copychunks(NULL, in, len, 2);
--		scatterwalk_pagedone(in, 0, 1);
--		scatterwalk_copychunks(NULL, out, len, 2);
--		scatterwalk_pagedone(out, 1, 1);
-+		scatterwalk_skip(in, len);
-+		scatterwalk_skip(out, len);
- 	}
- 
- 	len -= cipher_desc->tag;
- 	aead_request_set_crypt(aead_req, sg_in, sg_out, len, iv);
- 
-@@ -160,13 +155,10 @@ static int tls_enc_records(struct aead_request *aead_req,
- 				    cpu_to_be64(rcd_sn), &in, &out, &len, prot);
- 		rcd_sn++;
- 
- 	} while (rc == 0 && len);
- 
--	scatterwalk_done(&in, 0, 0);
--	scatterwalk_done(&out, 1, 0);
--
- 	return rc;
+=20
+-	rtnl_notify(skb, net, 0, RTNLGRP_IPV4_MCADDR, NULL, GFP_ATOMIC);
++	rtnl_notify(skb, net, 0, RTNLGRP_IPV4_MCADDR, NULL, GFP_KERNEL);
+ 	return;
+ error:
+ 	rtnl_set_sk_err(net, RTNLGRP_IPV4_MCADDR, err);
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 2e2684886953..4da409bc4577 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -5239,7 +5239,6 @@ int inet6_fill_ifmcaddr(struct sk_buff *skb,
+ 	nlmsg_end(skb, nlh);
+ 	return 0;
  }
- 
- /* Can't use icsk->icsk_af_ops->send_check here because the ip addresses
-  * might have been changed by NAT.
--- 
-2.47.1
+-EXPORT_SYMBOL(inet6_fill_ifmcaddr);
+=20
+ static int inet6_fill_ifacaddr(struct sk_buff *skb,
+ 			       const struct ifacaddr6 *ifaca,
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index 587831c148de..9dfdb40988b0 100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -920,7 +920,9 @@ static void inet6_ifmcaddr_notify(struct net_device *de=
+v,
+ 	int err =3D -ENOMEM;
+=20
+ 	skb =3D nlmsg_new(NLMSG_ALIGN(sizeof(struct ifaddrmsg)) +
+-			nla_total_size(16), GFP_ATOMIC);
++			nla_total_size(sizeof(struct in6_addr)) +
++			nla_total_size(sizeof(struct ifa_cacheinfo)),
++			GFP_KERNEL);
+ 	if (!skb)
+ 		goto error;
+=20
+@@ -931,7 +933,7 @@ static void inet6_ifmcaddr_notify(struct net_device *de=
+v,
+ 		goto error;
+ 	}
+=20
+-	rtnl_notify(skb, net, 0, RTNLGRP_IPV6_MCADDR, NULL, GFP_ATOMIC);
++	rtnl_notify(skb, net, 0, RTNLGRP_IPV6_MCADDR, NULL, GFP_KERNEL);
+ 	return;
+ error:
+ 	rtnl_set_sk_err(net, RTNLGRP_IPV6_MCADDR, err);
+--=20
+2.47.1.613.gc27f4b7a9f-goog
 
 
