@@ -1,187 +1,153 @@
-Return-Path: <netdev+bounces-153916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE23D9FA0D0
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 14:43:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4B1F9FA0F3
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 15:19:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BD43167AF5
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 13:43:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 210E9169AB1
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 14:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD271F3D21;
-	Sat, 21 Dec 2024 13:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="rbh5MGPc";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="D7b/Hv+X"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9261F1F37DF;
+	Sat, 21 Dec 2024 14:19:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CB52746C
-	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 13:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E523FBB3
+	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 14:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734788619; cv=none; b=SPRskhZf3ua+gWGdvaFHX9jBoehXDMS8PKn6CV4PYzkEsGTs18q5sVh56CRHbjD3cZfysYN7HimkfokBZQsjUmvxP42dc9xmlVxJj1K9EXMhJUrBg6EitmVrUQaJeq8Wrfatq1r2URA37OofoZgkJ3hV9X2M81Qug/CJJIo9XbM=
+	t=1734790766; cv=none; b=hFxYM4nDIrYZUMZ4Pna3JBTnJFCM+1DaZ1SSBDSZnD7wOy31ZU6LGU40AVJ+cR8zSatGLwBSXE751A3IxFGN1Sr/K711BL/3cE3QSHJau9rlBvzaP5IF0zDgkvGsTuAhFn+XaCtYVCKMZBvfaH/tiYoS+I7VvRm92w/7FUJIGmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734788619; c=relaxed/simple;
-	bh=E8q8HumIVUrz7k/PYiFplILTFsdRAUqek31XCDlyc+Y=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=CJ4z+XpNTJ96I8dJQH1BEXNqxqZ9SDbWeI3be4HI0N0JAaj/aZpbUVhzAzFyXoQx1fYQNLUux8wWAPtJiNHlB1eYITQqYv3v4WjbR8IYE8lua7Wd9+ntEuzJQt6PlF2OoiDn8nopCkJpWGTplDwPLVFOD0nTm8VFiGW7YXGs25I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=rbh5MGPc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=D7b/Hv+X; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.phl.internal (Postfix) with ESMTP id 6A1C413801C7;
-	Sat, 21 Dec 2024 08:43:35 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Sat, 21 Dec 2024 08:43:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1734788615;
-	 x=1734875015; bh=Slv2cA6xPTjIjg0ZfsJo8aeJ3139X0527tOb3Um81jI=; b=
-	rbh5MGPc2RmZu4IaR80N6El/50cgoz4l5vvCuGA54SNoAM9a6+M+kccFgMDtr61R
-	+iGOtpfgZjAVsp6Q2CoLuMbsywyP1xZI9W0Ln9VOqhM55pXVVcJa/v1wR/i4e6Bk
-	WXgW37B2QruH7kxAFoAOmgC++HcUkzmF25NDwjsSSFi85AWMxIJx52Q8baBatXYn
-	LF9HVoJfvpjLOCIIs5VxYSCrndbLpNHNONloc0bYJJ57ZIVYWUQokJNWkz4/i7vC
-	kdlHG4Y2/37sTgW2bjV47B6nsTupwWop1cB6nMSRsZjH7zaP1Z1yWOpaBrtywO4v
-	lac4WRh64UF/zTS9rZFBKA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1734788615; x=
-	1734875015; bh=Slv2cA6xPTjIjg0ZfsJo8aeJ3139X0527tOb3Um81jI=; b=D
-	7b/Hv+XZ4M+KQeRfnxdi8Plh+b7qTJji4o0lBvZfxLSrKiLK/U5GzILIVEzCqJi9
-	ue+jsYo+Es2srtgtsAzAE58H0QakC+A4As0I/5S4B5G7okdPfaGrSrSVyUJTqj77
-	ojf6WaUe76FJQ2DaAB53UEHXHM6oWG/isEn8GTXUL944DOocBEHY8B/aZ5BtBHdm
-	oh8fp9fsXUulJWRWvuXigdotYOJl9QAuToI882afxzRSMCwVnLf99hOTN44HpHWo
-	ZoIoqZr7Nl5mrO0ObFoBphRt2SpX1FLf4T+TNeiVM9NElSsoJyvoJ+tJiqxLRPcG
-	D8lkbLge3UTU6bCZryUOw==
-X-ME-Sender: <xms:B8ZmZwmnjzIiNvdHlUJ5fPAcRzZ-4HYrPgEwQRT0hTEdehWsvXuVRw>
-    <xme:B8ZmZ_1QfqnVcZU_YM-E4VsedOsQWSVuJJDvh2ugD63kTb8LFufPt72vnM-0AanI6
-    HnNTStNwXWOuNejtQ4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddruddthedgfedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhepvdfhvdekueduveffffetgfdvveefvdelhedvvdeg
-    jedvfeehtdeggeevheefleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepiedp
-    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepohhushhtvghrsegtshdrshhtrghnfh
-    horhgurdgvughupdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdp
-    rhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrg
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtgho
-    mhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:B8ZmZ-ohKK57tTFGYVzLWbneICIIUjJmtpGp09wQNtyU1_Fac-QriQ>
-    <xmx:B8ZmZ8kYKqoqL1Q3uqGyEsXDYUPylx62nzFy-jN9K7CtnT0wqNwicA>
-    <xmx:B8ZmZ-3nwKkAT6EMb4hyJqup7Op1GacdIi5TQTUm-Ef1yIIFaRtIZw>
-    <xmx:B8ZmZztK5GybbESJr-_b9E-E3b2E73XhyZC0eIOcwNWv4grnEewzLg>
-    <xmx:B8ZmZ69_wSMO7TI0PKT1RyTCHdbmFhyhE19tUOdpoc5ivInTRMG11fG_>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 106812220072; Sat, 21 Dec 2024 08:43:34 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1734790766; c=relaxed/simple;
+	bh=nTFkNhV0eaATNy0xfDJFTe2P9/OiOudK/G5FzPBoP40=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=ceCOsBtRxAOXK1sGLTMJogDAo6p14XolY4ATVR8eKdqP6a2IKfxwXaHMT6WVJNR7zd5q6APMLo1oN7YcSQCKZIC3WcUVjMqhaC75sGn1dsw+rGfKCLoM115MLAzZRkecWQAmja6DV8fsQY9s0ZbX8cygpDhziknEvg+86/pVTjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3abe7375ba6so51411715ab.3
+        for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 06:19:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734790764; x=1735395564;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9YQVhEgBv7J3tvUn1uwF626v640gjPkr9QtcuT6tahQ=;
+        b=BWz5BAw3WMrrGe+QiBFkCl6OTsoDi0GJGNp+A+bjkvBb4brZL46EgWzlAtHKDbrEF2
+         uFHxHhF/tYJtraIcFo60jKluAk5qariA9FmnTq1FrPn5XzI5s+WhKrWpoZ4m+rrZ6FqI
+         NZKDoyZevP28At5dTcaVJIGMviPloRyBze7nCQ8XZFM97QoLPaIyJnFhgpzoZDTRj3+y
+         cbTWQfuweWY9+m7qk5ZI8EMpvzme0fJM+pcqobFoIFcUF9UPcHelfvL1jVz9O0rog+4w
+         VHLAx/HdGArvpI8ubuDaogIy7vPpdcIj4FaTehGQaMyRFqTNQq8lf/lH0UBSBIv7Pjmp
+         GoJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGxlQD+DTSEPazPHQW6I2AVJgXlDf2M//37mn6TOd4uBpT6zLps7PeKxAPFOjzJOdnir5GsQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yym7BNyXpspXDqIs8RKNu+JNzTEGZaKHEx0BoOGeZDN0FKOBIpG
+	3cSx5dGi1eA0xrI3M7TeELn5RumYYCelLU4YKMjBPVn1/bBC+IElHHBKe1CtXfUZMFHmOT7eJdb
+	VVPBghee5zsBhLpwDKJzYRp0j23TelzHbgo2IKEB6hNRgb/srWRm2Seo=
+X-Google-Smtp-Source: AGHT+IFhoW1RdoeXvSRubE41vBBiMjX/kFHai96nGIBFX1fa06h249wtmVXzb3J7tEn8XUe5MEV1r0Pzi4toOkMsPvL2c9wr0gXk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sat, 21 Dec 2024 14:43:13 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "John Ousterhout" <ouster@cs.stanford.edu>
-Cc: "Jakub Kicinski" <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Eric Dumazet" <edumazet@google.com>,
- "Simon Horman" <horms@kernel.org>
-Message-Id: <728cebe2-6480-4b55-a6dd-858317810cff@app.fastmail.com>
-In-Reply-To: 
- <CAGXJAmw6XpNoAt=tTPACsJVjPD+i9wwnouifk0ym5vDb-xf6MQ@mail.gmail.com>
-References: <20241217000626.2958-1-ouster@cs.stanford.edu>
- <20241217000626.2958-2-ouster@cs.stanford.edu>
- <20241218174345.453907db@kernel.org>
- <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
- <20241219174109.198f7094@kernel.org>
- <CAGXJAmyW2Mnz1hwvTo7PKsXLVJO6dy_TK-ZtDW1E-Lrds6o+WA@mail.gmail.com>
- <20241220113150.26fc7b8f@kernel.org>
- <f1a91e78-8187-458e-942c-880b8792aa6d@app.fastmail.com>
- <CAGXJAmw6XpNoAt=tTPACsJVjPD+i9wwnouifk0ym5vDb-xf6MQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API for Homa
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Received: by 2002:a05:6e02:148d:b0:3a7:d7dd:e70f with SMTP id
+ e9e14a558f8ab-3c2d2d5112bmr59976535ab.12.1734790764247; Sat, 21 Dec 2024
+ 06:19:24 -0800 (PST)
+Date: Sat, 21 Dec 2024 06:19:24 -0800
+In-Reply-To: <000000000000cd69c7061dfe35d2@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6766ce6c.050a0220.226966.000e.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] WARNING: ODEBUG bug in hci_release_dev (2)
+From: syzbot <syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Dec 21, 2024, at 00:42, John Ousterhout wrote:
-> On Fri, Dec 20, 2024 at 1:13=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> =
-wrote:
->> Assuming this is actually meant as a persistent __user
->> pointer, I'm still unsure what this means if the socket is
->> available to more than one process, e.g. through a fork()
->> or explicit file descriptor passing, or if the original
->> process dies while there is still a transfer in progress.
->> I realize that there is a lot of information already out
->> there that I haven't all read, so this is probably explained
->> somewhere, but it would be nice to point to that documentation
->> somewhere near the code to clarify the corner cases.
->
-> I hadn't considered this, but the buffering mechanism prevents the
-> same socket from being shared across processes. I'm okay with that:
-> I'm not sure that sharing between processes adds much value for Homa,
-> and the performance benefit from the buffer mechanism is quite large.
-> I will document this. Is there a way to prevent a socket from being
-> shared across processes (e.g. can I set close-on-exec from within the
-> kernel?) I don't think there is any risk to kernel integrity if the
-> socket does end up shared; the worst that will happen is that the
-> memory of one of the processes will get trashed because Homa will
-> write to memory that isn't actually buffer space in that process.
+syzbot has found a reproducer for the following issue on:
 
-It would definitely be nicer to ensure that it's only available
-for a particular 'struct mm'. Setting O_CLOEXEC is probably not
-be enough since this does not close the fd on a fork without exec,
-and does not prevent the flag from being reset through fcntl().
+HEAD commit:    499551201b5f Merge tag 'arm64-fixes' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17916f30580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c22efbd20f8da769
+dashboard link: https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1090c0c4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10a1efe8580000
 
-Maybe see what io_uring() does to handle userspace pointers
-here, I think the problem is quite similar there.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5ee1fc255de9/disk-49955120.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/24f10c9fac9a/vmlinux-49955120.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/211e35102c2e/bzImage-49955120.xz
 
->> That probably also explains what type of memory the
->> __user buffer can point to, but I would like to make
->> sure that this has well-defined behavior e.g. if that
->> buffer is an mmap()ed file on NFS that was itself
->> mounted over a homa socket. Is there any guarantee that
->> this is either prohibited or is free of deadlocks and
->> recursion?
->
-> Given the API incompatibilities between Homa and TCP, I don't think it
-> is possible to have NFS mounted over a Homa socket. But you raise the
-> issue of whether some kinds of addresses might not be suitable for
-> Homa's buffer use this way. I don't know enough about the various
-> possible kinds of memory to know what kinds of problems could occur.
-> My assumption is that the buffer area will be a simple mmap()ed
-> region. The only use Homa makes of the buffer address is to call
-> import_ubuf with addresses in the buffer region, followed by
-> skb_copy_datagram_iter with the resulting iov_iter.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com
 
-Right, NFS was just an example, but there are other interesting
-cases. You certainly have to deal with buffers in userspace
-memory that are blocked indefinitely. Another interesting case
-is memory that has additional constraints, e.g. the MMIO
-space of a PCI device like a GPU, which may fault when writing
-data into it, or which cannot be mapped into the DMA space
-of a network device.
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff888033d51248 object type: timer_list hint: hci_devcd_timeout+0x0/0x2f0 include/linux/skbuff.h:2741
+WARNING: CPU: 1 PID: 5828 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
+Modules linked in:
+CPU: 1 UID: 0 PID: 5828 Comm: syz-executor344 Not tainted 6.13.0-rc3-syzkaller-00209-g499551201b5f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
+Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 54 48 8b 14 dd a0 7f b1 8b 41 56 4c 89 e6 48 c7 c7 20 74 b1 8b e8 4f 59 bc fc 90 <0f> 0b 90 90 58 83 05 b6 5a 7f 0b 01 48 83 c4 18 5b 5d 41 5c 41 5d
+RSP: 0018:ffffc90003faf768 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffffff815a16c9
+RDX: ffff888028419e00 RSI: ffffffff815a16d6 RDI: 0000000000000001
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffffffff8bb17ac0
+R13: ffffffff8b4f8020 R14: ffffffff8a2ad340 R15: ffffc90003faf878
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055f6d80ebeb8 CR3: 000000007c30e000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
+ debug_check_no_obj_freed+0x4b7/0x600 lib/debugobjects.c:1129
+ slab_free_hook mm/slub.c:2284 [inline]
+ slab_free mm/slub.c:4613 [inline]
+ kfree+0x2b3/0x4b0 mm/slub.c:4761
+ hci_release_dev+0x4d9/0x600 net/bluetooth/hci_core.c:2758
+ bt_host_release+0x6a/0xb0 net/bluetooth/hci_sysfs.c:87
+ device_release+0xa1/0x240 drivers/base/core.c:2567
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1e4/0x5a0 lib/kobject.c:737
+ put_device+0x1f/0x30 drivers/base/core.c:3773
+ vhci_release+0x81/0xf0 drivers/bluetooth/hci_vhci.c:665
+ __fput+0x3f8/0xb60 fs/file_table.c:450
+ task_work_run+0x14e/0x250 kernel/task_work.c:239
+ exit_task_work include/linux/task_work.h:43 [inline]
+ do_exit+0xad8/0x2d70 kernel/exit.c:938
+ do_group_exit+0xd3/0x2a0 kernel/exit.c:1087
+ get_signal+0x2576/0x2610 kernel/signal.c:3017
+ arch_do_signal_or_restart+0x90/0x7e0 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0x150/0x2a0 kernel/entry/common.c:218
+ do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f977f68926a
+Code: Unable to access opcode bytes at 0x7f977f689240.
+RSP: 002b:00007ffc28c89690 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+RAX: 0000000000000000 RBX: 0000000000000004 RCX: 00007f977f68926a
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 00007f977f6e1049 R09: 00007f977f6e1049
+R10: 0000000000008000 R11: 0000000000000293 R12: 00007f977f6e1049
+R13: 00007ffc28c896e0 R14: 00007ffc28c89720 R15: 0000000000000000
+ </TASK>
 
-> Is there some way I can check the "kind" of memory behind the buffer
-> pointer, so Homa could reject anything other than the simple case?
 
-I don't think so. I still don't know what the exact constraints
-are that you have here, but I suspect this would all be a lot
-simpler if you could change the interface to not pass arbitrary
-user addresses but instead have a single file descriptor that
-backs the buffers, either by passing a tmpfs/hugetlbfs file into
-the socket instead of a pointer, or by using mmap() on the
-socket to map it into userspace like we do for packet sockets.
-
-      Arnd
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
