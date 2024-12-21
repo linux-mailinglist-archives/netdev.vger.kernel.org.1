@@ -1,156 +1,115 @@
-Return-Path: <netdev+bounces-153901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C0039FA012
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 11:28:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 434D99FA053
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 12:15:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 883671886AF5
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 10:28:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21A8C189081C
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 11:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EC21EC4FB;
-	Sat, 21 Dec 2024 10:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E8F1F37A4;
+	Sat, 21 Dec 2024 11:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iyLdsT/n"
+	dkim=pass (1024-bit key) header.d=eurecom.fr header.i=@eurecom.fr header.b="D0Dcjtqp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.eurecom.fr (smtp.eurecom.fr [193.55.113.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EB8CA5A;
-	Sat, 21 Dec 2024 10:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DF41F37A5;
+	Sat, 21 Dec 2024 11:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.55.113.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734776910; cv=none; b=Zd/hiES75pzMXxL6Db3PMwbnEzOkHGBZVMg4TVFpZDrsx5EQHTzgWsypI5Csej+DTHVYm3P3DHa5zwEtN3CwBe9jhvgPw1/HXJrJJUaUv6QQRpz9ztgsb1sPdxmsv/B1xwwYCo6FXCx75bNYlmaJHnZqj3Et/vFHPhFL283DAOQ=
+	t=1734779719; cv=none; b=k4nQlytifw9SPtkoUcrOlsz0FfUNsnNlttIeww5wVGvXaKKXS+cDx1CWUFQHHHpw9w1LbwCkYRh9rZ4aAmDmGhpSxu+xw53qb1SQH2qKIELaX+K5/xdBJOe+kG0MV9oR7Y3j8CGktoohwrmIESenXKslYnJN2KXFQBU51Wo0Ch8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734776910; c=relaxed/simple;
-	bh=F8qyLk2tQa0JK3a0b5tK09o53tJ+d/qyRpNct4qmXKc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lyh7CZ+OsVfETbIr3OQMvopUNpB09q4/fYQul8I4/hzfcovsCkFMcbXb65KFhkM7uMzmK7vOVBRRZ51MJEU65dLohoGKkhilGawJactqi8rJ2qABBINVTv778OK3YFQVMPGA9K6QgberYdpqLR+2M+1GOtJ9Q75w/rdYDhh/keg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iyLdsT/n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E52BC4CECE;
-	Sat, 21 Dec 2024 10:28:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734776910;
-	bh=F8qyLk2tQa0JK3a0b5tK09o53tJ+d/qyRpNct4qmXKc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=iyLdsT/nJrKFR2MLsSwIx9L76rSuuFPuR6fMP9dPZq/A1D/KZRdIS/Wn3TYdCURnR
-	 l8lWD9JEVFQif/1NPHwDT/Og/Uc6kM6zV942nE4m/Fm0f35js8twbgbeCpFyak0NB3
-	 CTpwtCR5su71BwQqwdGeOG37PY7eKMfywfsWr6raPne7Ac+IXVATKTb9lr+8VRYvqJ
-	 7t/hnBrSdse3ZoUlgm0MFuaBCduoM9W6pAMPll6so04wbG4K5fyTtQgonKEstOrY3y
-	 co5H2+3veYjslLNWH1VLzgy60ywWIqTXJ8HGsHqSCDVoqWXmN/y8is8G/13+FY3HRy
-	 R8NV2h+GbfYTQ==
-Message-ID: <047cb3ef-f0c0-43e4-82e9-dc0073c8b953@kernel.org>
-Date: Sat, 21 Dec 2024 11:28:26 +0100
+	s=arc-20240116; t=1734779719; c=relaxed/simple;
+	bh=uEmo1klH0U7SH5rDjz3FuRRP2JFUHt/yzHHWnAmkJws=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DNkDZ9Kt+uLdyNV8YLQmbLPQPpqKbrEh+K2jp+FuvlYPyuF1RtcMkBLIvkRUOvH7sPfMCFSGgF6YFlnJss40GMH5l4UFxJwBJu/6sFu8LIVm1vShtQMPgO+KtkhP16Fh/F1GEoxQhGIT15BDs0qGOXDIj0NxKmtbUrabFY20X6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eurecom.fr; spf=pass smtp.mailfrom=eurecom.fr; dkim=pass (1024-bit key) header.d=eurecom.fr header.i=@eurecom.fr header.b=D0Dcjtqp; arc=none smtp.client-ip=193.55.113.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eurecom.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eurecom.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=eurecom.fr; i=@eurecom.fr; q=dns/txt; s=default;
+  t=1734779716; x=1766315716;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=uEmo1klH0U7SH5rDjz3FuRRP2JFUHt/yzHHWnAmkJws=;
+  b=D0DcjtqpcpDlW6Wn6VM2XID4PiRCRuag3oWs6kdNg7On7I81jUtEf7Xf
+   v+EyKeKmlTAisQGGCLX8pQiOnKuADmbrRgNzdGxshquRAaf8YcsitH4nB
+   arWMFIndvoj6Ki3RF+njRJckqN5m9EwG1ZXlIAyiRJO6HcyQmP9/MUL9w
+   U=;
+X-CSE-ConnectionGUID: R61O3hRBSjuysspIkS5DpA==
+X-CSE-MsgGUID: p9IExXMRSMCJ6o8EooLJsg==
+X-IronPort-AV: E=Sophos;i="6.12,253,1728943200"; 
+   d="scan'208";a="28285769"
+Received: from waha.eurecom.fr (HELO smtps.eurecom.fr) ([10.3.2.236])
+  by drago1i.eurecom.fr with ESMTP; 21 Dec 2024 12:15:07 +0100
+Received: from localhost.localdomain (88-183-119-157.subs.proxad.net [88.183.119.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtps.eurecom.fr (Postfix) with ESMTPSA id 9155D24E0;
+	Sat, 21 Dec 2024 12:15:06 +0100 (CET)
+From: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
+To: linux-media@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-can@vger.kernel.org
+Cc: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>,
+	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Subject: [PATCH v2 0/3] broadcom, ethernet/marvell,cx231xx,can/dev: Remove unused values and dead code
+Date: Sat, 21 Dec 2024 12:06:46 +0100
+Message-ID: <20241221111454.1074285-1-ariel.otilibili-anieli@eurecom.fr>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241221035352.1020228-1-ariel.otilibili-anieli@eurecom.fr>
+References: <20241221035352.1020228-1-ariel.otilibili-anieli@eurecom.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net] mptcp: fix TCP options overflow.
-Content-Language: en-GB
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- mptcp@lists.linux.dev, stable@vger.kernel.org
-References: <025d9df8cde3c9a557befc47e9bc08fbbe3476e5.1734771049.git.pabeni@redhat.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <025d9df8cde3c9a557befc47e9bc08fbbe3476e5.1734771049.git.pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+Hello,
 
-On 21/12/2024 09:51, Paolo Abeni wrote:
-> Syzbot reported the following splat:
+This series clears out the Coverity IDs 1487817, 1561102, 1497123,
+& 1269153.
 
-(...)
+Thank you,
+--
+v2:
+* fixed CI warnings
+* see, https://linux-media.pages.freedesktop.org/-/users/patchwork/-/jobs/68562001/artifacts/report.htm
 
-> Eric noted a probable shinfo->nr_frags corruption, which indeed
-> occurs.
-> 
-> The root cause is a buggy MPTCP option len computation in some
-> circumstances: the ADD_ADDR option should be mutually exclusive
-> with DSS since the blamed commit.
-> 
-> Still, mptcp_established_options_add_addr() tries to set the
-> relevant info in mptcp_out_options, if the remaining space is
-> large enough even when DSS is present.
-> 
-> Since the ADD_ADDR infos and the DSS share the same union
-> fields, adding first corrupts the latter. In the worst-case
-> scenario, such corruption increases the DSS binary layout,
-> exceeding the computed length and possibly overwriting the
-> skb shared info.
-> 
-> Address the issue by enforcing mutual exclusion in
-> mptcp_established_options_add_addr(), too.
+Ariel Otilibili (3):
+  drivers/firmware/broadcom, ethernet/marvell: Remove unused values
+  usb/cx231xx: Remove unused value
+  net/can/dev: Remove dead code
 
-Thank you for the investigation and the fix, it looks good to me:
+ drivers/firmware/broadcom/tee_bnxt_fw.c                   | 2 --
+ drivers/media/usb/cx231xx/cx231xx-avcore.c                | 1 -
+ drivers/net/can/dev/dev.c                                 | 2 --
+ drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c | 2 --
+ 4 files changed, 7 deletions(-)
 
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-> Reported-by: syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com
-
-If you don't mind, can you please add these two tags when applying the
-patches to help to track the backports?
-
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/538
-Cc: stable@vger.kernel.org
-
-> Fixes: 1bff1e43a30e ("mptcp: optimize out option generation")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
+2.47.1
 
 
