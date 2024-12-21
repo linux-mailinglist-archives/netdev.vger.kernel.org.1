@@ -1,71 +1,75 @@
-Return-Path: <netdev+bounces-153888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03E9C9F9F3A
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:17:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B114F9F9F4E
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:19:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DFA516C78A
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:16:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97D3616EA30
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:19:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B761F2C2E;
-	Sat, 21 Dec 2024 08:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CCB1EC4D9;
+	Sat, 21 Dec 2024 08:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="S+tp3DpF"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545961F0E39
-	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 08:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319ED1DF269;
+	Sat, 21 Dec 2024 08:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734768954; cv=none; b=HaG+nOJ2IhfGOvN3sMm8jIeV4LXGtET87oEVOVtYHQNiz+ggHbUcZIdv8PDBR5slJmvsmIV+Ekncaz0q8acFWE3Voj7XNg+rhghsvhE3T9wj2ENhrnB8BAO84MbUorAl6tIgPxCGqxpByTKR1trpn81gIrqIzWtY690BY3WCz9g=
+	t=1734769061; cv=none; b=CPiRfDAR6P/nJtTbQNQSbaLD46xVSBjjjqS/B1nDDCRQ5dXrI9V/vQoOB5uiQbeC14BTcTolYeCpwxR1y1T3li1a10RHYTtT1zwwrRdzCXMASuZCOZ2Non+mPHU4dLlJGSm5yRnR1Z4hQjjXy8ga5NoXp0wfcDHZ6/1X/lnjxDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734768954; c=relaxed/simple;
-	bh=lu0eRQDbBvBGUZpWJ17CDiCpntoRAUtUnZ1r8PnHdhE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZpfzDOf0ScZhbe3CFYDzHdvV+lqoHAtccKPgJAs8+H5joaZhFzrmZ28VwwEptKAh/BotY52qQR8cga7vAHPDx2ZoyUArUaoB1qhP6JOleqMMsxZZ0fqUkj11ITV6apzsRNTbk3TPjQHsHkn2AhaZq83d1whCvfK2K8mKqRI3bhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tOue8-0000Qu-3y; Sat, 21 Dec 2024 09:15:36 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tOue3-004Ve2-0A;
-	Sat, 21 Dec 2024 09:15:31 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tOue3-00CbTt-2K;
-	Sat, 21 Dec 2024 09:15:31 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v4 8/8] net: phy: dp83tg720: add statistics support
-Date: Sat, 21 Dec 2024 09:15:30 +0100
-Message-Id: <20241221081530.3003900-9-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241221081530.3003900-1-o.rempel@pengutronix.de>
-References: <20241221081530.3003900-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1734769061; c=relaxed/simple;
+	bh=ZfCo1bskYbhtwN12RIG2EQFQ0aAZfTnGZ5Ya543AloQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AlDpSAdrMvlbzvqBCbNr3zM90OJg0ALu+4Y+EkuxbNWb89URAHlAd/eHAObAgOzMPI+U8bryI8/fCGi+zTKMCh7bejgXssv+2LVK4yLDPkzhcElLCpoIU4QLQ0gKH6v6HBc/WxSfhnIZC3kDxOkab31kPeK7E5uMzxu1IRzdVFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=S+tp3DpF; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1734769060; x=1766305060;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=B3pUGK886agq7GOCKwKEUH1qlETW5QxolobcuW4Z5mk=;
+  b=S+tp3DpFOOthWqJC3VEQnzqdM3Ok4zwrcP49nDwSD9BdhTfwpvnnpY2d
+   oXyIzaMjOFCgjYiq91LrZPUs0q6W49ubd9qzhjaQBc2yLZww4v9p2/VRD
+   +as1qvE35K3dham50ZtgH0E6M/o4PIx8hdWKRhGD4AtgaZWPbsCpxLKfL
+   U=;
+X-IronPort-AV: E=Sophos;i="6.12,253,1728950400"; 
+   d="scan'208";a="157705105"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2024 08:17:38 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:21727]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.219:2525] with esmtp (Farcaster)
+ id d0764f2f-112f-4a2f-b34d-80eccdab9453; Sat, 21 Dec 2024 08:17:38 +0000 (UTC)
+X-Farcaster-Flow-ID: d0764f2f-112f-4a2f-b34d-80eccdab9453
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Sat, 21 Dec 2024 08:17:38 +0000
+Received: from 6c7e67c6786f.amazon.com (10.118.252.154) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Sat, 21 Dec 2024 08:17:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pchelkin@ispras.ru>
+CC: <edumazet@google.com>, <ignat@cloudflare.com>, <johan.hedberg@gmail.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <luiz.dentz@gmail.com>,
+	<lvc-project@linuxtesting.org>, <marcel@holtmann.org>,
+	<netdev@vger.kernel.org>, <stable@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in l2cap_sock_alloc
+Date: Sat, 21 Dec 2024 17:17:18 +0900
+Message-ID: <20241221081718.98353-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241217211959.279881-1-pchelkin@ispras.ru>
+References: <20241217211959.279881-1-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,247 +77,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Add support for reporting PHY statistics in the DP83TG720 driver. This
-includes cumulative tracking of link loss events, transmit/receive
-packet counts, and error counts. Implemented functions to update and
-provide statistics via ethtool, with optional polling support enabled
-through `PHY_POLL_STATS`.
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+Date: Wed, 18 Dec 2024 00:19:59 +0300
+> A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
+> from l2cap_sock_new_connection_cb() and the error handling paths should
+> also be aware of it.
+> 
+> Seemingly a more elegant solution would be to swap bt_sock_alloc() and
+> l2cap_chan_create() calls since they are not interdependent to that moment
+> but then l2cap_chan_create() adds the soon to be deallocated and still
+> dummy-initialized channel to the global list accessible by many L2CAP
+> paths. The channel would be removed from the list in short period of time
+> but be a bit more straight-forward here and just check for NULL instead of
+> changing the order of function calls.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE static
+> analysis tool.
+> 
+> Fixes: 7c4f78cdb8e7 ("Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v2:
-- drop use of FIELD_GET
-- add comments
----
- drivers/net/phy/dp83tg720.c | 161 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 161 insertions(+)
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index 0ef4d7dba065..ea2f0bc27c4c 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -51,6 +51,9 @@
- /* Register 0x0405: Unknown Register */
- #define DP83TG720S_UNKNOWN_0405			0x405
- 
-+#define DP83TG720S_LINK_QUAL_3			0x547
-+#define DP83TG720S_LINK_LOSS_CNT_MASK		GENMASK(15, 10)
-+
- /* Register 0x0576: TDR Master Link Down Control */
- #define DP83TG720S_TDR_MASTER_LINK_DOWN		0x576
- 
-@@ -60,6 +63,29 @@
- /* In RGMII mode, Enable or disable the internal delay for TXD */
- #define DP83TG720S_RGMII_TX_CLK_SEL		BIT(0)
- 
-+/*
-+ * DP83TG720S_PKT_STAT_x registers correspond to similarly named registers
-+ * in the datasheet (PKT_STAT_1 through PKT_STAT_6). These registers store
-+ * 32-bit or 16-bit counters for TX and RX statistics and must be read in
-+ * sequence to ensure the counters are cleared correctly.
-+ *
-+ * - DP83TG720S_PKT_STAT_1: Contains TX packet count bits [15:0].
-+ * - DP83TG720S_PKT_STAT_2: Contains TX packet count bits [31:16].
-+ * - DP83TG720S_PKT_STAT_3: Contains TX error packet count.
-+ * - DP83TG720S_PKT_STAT_4: Contains RX packet count bits [15:0].
-+ * - DP83TG720S_PKT_STAT_5: Contains RX packet count bits [31:16].
-+ * - DP83TG720S_PKT_STAT_6: Contains RX error packet count.
-+ *
-+ * Keeping the register names as defined in the datasheet helps maintain
-+ * clarity and alignment with the documentation.
-+ */
-+#define DP83TG720S_PKT_STAT_1			0x639
-+#define DP83TG720S_PKT_STAT_2			0x63a
-+#define DP83TG720S_PKT_STAT_3			0x63b
-+#define DP83TG720S_PKT_STAT_4			0x63c
-+#define DP83TG720S_PKT_STAT_5			0x63d
-+#define DP83TG720S_PKT_STAT_6			0x63e
-+
- /* Register 0x083F: Unknown Register */
- #define DP83TG720S_UNKNOWN_083F			0x83f
- 
-@@ -69,6 +95,113 @@
- 
- #define DP83TG720_SQI_MAX			7
- 
-+struct dp83tg720_stats {
-+	u64 link_loss_cnt;
-+	u64 tx_pkt_cnt;
-+	u64 tx_err_pkt_cnt;
-+	u64 rx_pkt_cnt;
-+	u64 rx_err_pkt_cnt;
-+};
-+
-+struct dp83tg720_priv {
-+	struct dp83tg720_stats stats;
-+};
-+
-+/**
-+ * dp83tg720_update_stats - Update the PHY statistics for the DP83TD510 PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * The function reads the PHY statistics registers and updates the statistics
-+ * structure.
-+ *
-+ * Returns: 0 on success or a negative error code on failure.
-+ */
-+static int dp83tg720_update_stats(struct phy_device *phydev)
-+{
-+	struct dp83tg720_priv *priv = phydev->priv;
-+	u32 count;
-+	int ret;
-+
-+	/* Read the link loss count */
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_LINK_QUAL_3);
-+	if (ret < 0)
-+		return ret;
-+	/* link_loss_cnt */
-+	count = FIELD_GET(DP83TG720S_LINK_LOSS_CNT_MASK, ret);
-+	ethtool_stat_add(&priv->stats.link_loss_cnt, count);
-+
-+	/* The DP83TG720S_PKT_STAT registers are divided into two groups:
-+	 * - Group 1 (TX stats): DP83TG720S_PKT_STAT_1 to DP83TG720S_PKT_STAT_3
-+	 * - Group 2 (RX stats): DP83TG720S_PKT_STAT_4 to DP83TG720S_PKT_STAT_6
-+	 *
-+	 * Registers in each group are cleared only after reading them in a
-+	 * plain sequence (e.g., 1, 2, 3 for Group 1 or 4, 5, 6 for Group 2).
-+	 * Any deviation from the sequence, such as reading 1, 2, 1, 2, 3, will
-+	 * prevent the group from being cleared. Additionally, the counters
-+	 * for a group are frozen as soon as the first register in that group
-+	 * is accessed.
-+	 */
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_1);
-+	if (ret < 0)
-+		return ret;
-+	/* tx_pkt_cnt_15_0 */
-+	count = ret;
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_2);
-+	if (ret < 0)
-+		return ret;
-+	/* tx_pkt_cnt_31_16 */
-+	count |= ret << 16;
-+	ethtool_stat_add(&priv->stats.tx_pkt_cnt, count);
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_3);
-+	if (ret < 0)
-+		return ret;
-+	/* tx_err_pkt_cnt */
-+	ethtool_stat_add(&priv->stats.tx_err_pkt_cnt, ret);
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_4);
-+	if (ret < 0)
-+		return ret;
-+	/* rx_pkt_cnt_15_0 */
-+	count = ret;
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_5);
-+	if (ret < 0)
-+		return ret;
-+	/* rx_pkt_cnt_31_16 */
-+	count |= ret << 16;
-+	ethtool_stat_add(&priv->stats.rx_pkt_cnt, count);
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_PKT_STAT_6);
-+	if (ret < 0)
-+		return ret;
-+	/* rx_err_pkt_cnt */
-+	ethtool_stat_add(&priv->stats.rx_err_pkt_cnt, ret);
-+
-+	return 0;
-+}
-+
-+static void dp83tg720_get_link_stats(struct phy_device *phydev,
-+				     struct ethtool_link_ext_stats *link_stats)
-+{
-+	struct dp83tg720_priv *priv = phydev->priv;
-+
-+	link_stats->link_down_events = priv->stats.link_loss_cnt;
-+}
-+
-+static void dp83tg720_get_phy_stats(struct phy_device *phydev,
-+				    struct ethtool_eth_phy_stats *eth_stats,
-+				    struct ethtool_phy_stats *stats)
-+{
-+	struct dp83tg720_priv *priv = phydev->priv;
-+
-+	stats->tx_packets = priv->stats.tx_pkt_cnt;
-+	stats->tx_errors = priv->stats.tx_err_pkt_cnt;
-+	stats->rx_packets = priv->stats.rx_pkt_cnt;
-+	stats->rx_errors = priv->stats.rx_err_pkt_cnt;
-+}
-+
- /**
-  * dp83tg720_cable_test_start - Start the cable test for the DP83TG720 PHY.
-  * @phydev: Pointer to the phy_device structure.
-@@ -182,6 +315,11 @@ static int dp83tg720_cable_test_get_status(struct phy_device *phydev,
- 
- 	ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A, stat);
- 
-+	/* save the current stats before resetting the PHY */
-+	ret = dp83tg720_update_stats(phydev);
-+	if (ret)
-+		return ret;
-+
- 	return phy_init_hw(phydev);
- }
- 
-@@ -217,6 +355,11 @@ static int dp83tg720_read_status(struct phy_device *phydev)
- 	phy_sts = phy_read(phydev, DP83TG720S_MII_REG_10);
- 	phydev->link = !!(phy_sts & DP83TG720S_LINK_STATUS);
- 	if (!phydev->link) {
-+		/* save the current stats before resetting the PHY */
-+		ret = dp83tg720_update_stats(phydev);
-+		if (ret)
-+			return ret;
-+
- 		/* According to the "DP83TC81x, DP83TG72x Software
- 		 * Implementation Guide", the PHY needs to be reset after a
- 		 * link loss or if no link is created after at least 100ms.
-@@ -341,12 +484,27 @@ static int dp83tg720_config_init(struct phy_device *phydev)
- 	return genphy_c45_pma_baset1_read_master_slave(phydev);
- }
- 
-+static int dp83tg720_probe(struct phy_device *phydev)
-+{
-+	struct device *dev = &phydev->mdio.dev;
-+	struct dp83tg720_priv *priv;
-+
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	phydev->priv = priv;
-+
-+	return 0;
-+}
-+
- static struct phy_driver dp83tg720_driver[] = {
- {
- 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
- 	.name		= "TI DP83TG720S",
- 
- 	.flags          = PHY_POLL_CABLE_TEST,
-+	.probe		= dp83tg720_probe,
- 	.config_aneg	= dp83tg720_config_aneg,
- 	.read_status	= dp83tg720_read_status,
- 	.get_features	= genphy_c45_pma_read_ext_abilities,
-@@ -355,6 +513,9 @@ static struct phy_driver dp83tg720_driver[] = {
- 	.get_sqi_max	= dp83tg720_get_sqi_max,
- 	.cable_test_start = dp83tg720_cable_test_start,
- 	.cable_test_get_status = dp83tg720_cable_test_get_status,
-+	.get_link_stats	= dp83tg720_get_link_stats,
-+	.get_phy_stats	= dp83tg720_get_phy_stats,
-+	.update_stats	= dp83tg720_update_stats,
- 
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
--- 
-2.39.5
 
+> ---
+>  net/bluetooth/l2cap_sock.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 3d2553dcdb1b..49f97d4138ea 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1888,7 +1888,8 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+>  	chan = l2cap_chan_create();
+>  	if (!chan) {
+>  		sk_free(sk);
+> -		sock->sk = NULL;
+> +		if (sock)
+> +			sock->sk = NULL;
+>  		return NULL;
+>  	}
+>  
+> -- 
+> 2.39.5
 
