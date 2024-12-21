@@ -1,85 +1,151 @@
-Return-Path: <netdev+bounces-153897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA9FA9F9F66
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 10:07:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 614289F9F87
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 10:12:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D45C1890F01
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:07:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3810418913D4
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4CAF1EC4D1;
-	Sat, 21 Dec 2024 09:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4641F2C3E;
+	Sat, 21 Dec 2024 09:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="FCtGZvS9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JUY4X2ds"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EDECA5A;
-	Sat, 21 Dec 2024 09:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873E21F2C38;
+	Sat, 21 Dec 2024 09:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734772039; cv=none; b=bgaLljQcfTp2TqZVQdmNP1V3Gibry8yordy8i/bRb7iTGq2wVKEM+dmaitI5JW2evs0FCrHX/34zz/MyzpRM15uHVCqqcJLIeFCG3U0t6mRhvAEq1fPYbR3MYV2Cvm5fUvBKS0nBQEymNEblzsuAfbOr7lQmX+ioOeQoJeDKIMI=
+	t=1734772296; cv=none; b=bBsj2d/pP4khvGu0xh9YW+jVh1ostzmU+BYLzqFqfmt15yMl/B/r3y0ib747ZCweD3mU+h9j8stu26Mj4bEv4a7AULJDZdQBZdJzrSHDjTJnt6IMU9p2eWZs9EnIC4510DKo01PtAa627xO8BdX30cY8gkhEh2tBX9fBr/1XyIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734772039; c=relaxed/simple;
-	bh=WYH0na+ESOSGPKUfQK2wiYT9UF3AAcwfwCpYokRJ6tA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X1Gn0kPt0KxJpbjsmDePSCP4SxJiTXfGnEbrQznc2qX2M3Pn0NM/cBDHQW+vohOnERflSNNQLjsv/oYBBPuBOCFXFlf+hyI5MuCdqR2csQnJgkSHi0gINJMb6/okkExtP/9iCpsdPKIn1Wlgg2D7h8yUVlu7mfxmTcwYxf9bfW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=FCtGZvS9; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=SzB6uK94xo5/T0BXO1kM/kvir9oQYumj4tut2grbd/g=; b=FCtGZvS95oZ9iiPLt7x2QryztN
-	qviPrHzbNRkP16c1SkkmKT7rW0JzmbZNniA+HmGI7nMzYwpMoAD79Rj7IvU1gQmW1HmAx2VIGsWrS
-	0hKtrLYy6TlTmLnmIjif9FIZDmYJfx4j6MCi6K6hgZOBnMIclt0GmS80eAsnndapcgZKzxio8ChRs
-	2ViMoV/XCcc0e7oWS91ET0M9Aus8uGND+MIhFVey28/HNlGenpbXGSZYGYiXt6V5stdrBvV/ISl6t
-	3i2EihT+zwtVCzw3SGP2ioV4T7FAQwRH7fDt40LCOGEehC0h5IwYUFaDh2yzyqOdXPXHosDCoKSBR
-	AMujarEg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tOvEs-002Q20-2S;
-	Sat, 21 Dec 2024 17:06:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 21 Dec 2024 17:06:55 +0800
-Date: Sat, 21 Dec 2024 17:06:55 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
-	Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
-	Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
- schedule_work outside lock
-Message-ID: <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
-References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
- <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
+	s=arc-20240116; t=1734772296; c=relaxed/simple;
+	bh=xG4c1QDQkeqmFr3xpqJo4Ptz4ABndWUjgc6I+1XA6i0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Q13RyUNfasMh8rf4UaWXPtP8h4tVlzVTBZf1uG4HVnXSln9ItW+xjDLBXMZT0BXph2SC2KJqb5UE5f/g+ROTIlBhwJZsXEC7RM7btydTVWTOF0VNCkmk6J7qunSfn3gpJPC0N/JoLil/8F3URIYmZ/RUYBzSmJp9NIl3xj6SsFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JUY4X2ds; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46698C4CED7;
+	Sat, 21 Dec 2024 09:11:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734772296;
+	bh=xG4c1QDQkeqmFr3xpqJo4Ptz4ABndWUjgc6I+1XA6i0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=JUY4X2dsvUZCVkG3vD1om9Bjs10e0juTq7qRZNtdgmsiyKsZyfKEycU7VPSp4phFB
+	 oJw0HYdxyr00hIr82r5OraLaJolhjLjN3OiVvPXfZ/GfgQ3dqAWcdihu5moFGXmied
+	 NX5Lqq3P0OvqyPQjjoFXA8hybbTwJ+J1SoftNh3G/RbMBIOifTcmdt6e4oszUOfiTu
+	 CzxMEuToQZOj36wxN6rwXPBrHBnb9HRhT2/u1Nw26731jAo54twSPmgua5bDvu8CM6
+	 8g0G2TPcpcJJOHqfpmi9cAyYwEuXzzWCq3sXW63dAD5rfsxedXNtU9axBb/rf1c8Kf
+	 JBpxg0uaCtpIQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Boris Pismenny <borisp@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 26/29] net/tls: use the new scatterwalk functions
+Date: Sat, 21 Dec 2024 01:10:53 -0800
+Message-ID: <20241221091056.282098-27-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241221091056.282098-1-ebiggers@kernel.org>
+References: <20241221091056.282098-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 12, 2024 at 08:33:31PM +0800, Herbert Xu wrote:
->
-> The growth check should stay with the atomic_inc.  Something like
-> this should work:
+From: Eric Biggers <ebiggers@google.com>
 
-OK I've applied your patch with the atomic_inc move.
+Replace calls to the deprecated function scatterwalk_copychunks() with
+memcpy_from_scatterwalk(), memcpy_to_scatterwalk(), or
+scatterwalk_skip() as appropriate.
 
-Thanks,
+The new functions behave more as expected and eliminate the need to call
+scatterwalk_done() or scatterwalk_pagedone().  This was not always being
+done when needed, and therefore the old code appears to have also had a
+bug where the dcache of the destination page(s) was not always being
+flushed on architectures that need that.
+
+Cc: Boris Pismenny <borisp@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+
+This patch is part of a long series touching many files, so I have
+limited the Cc list on the full series.  If you want the full series and
+did not receive it, please retrieve it from lore.kernel.org.
+
+ net/tls/tls_device_fallback.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/net/tls/tls_device_fallback.c b/net/tls/tls_device_fallback.c
+index f9e3d3d90dcf..ec7017c80b6a 100644
+--- a/net/tls/tls_device_fallback.c
++++ b/net/tls/tls_device_fallback.c
+@@ -67,20 +67,17 @@ static int tls_enc_record(struct aead_request *aead_req,
+ 	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
+ 
+ 	buf_size = TLS_HEADER_SIZE + cipher_desc->iv;
+ 	len = min_t(int, *in_len, buf_size);
+ 
+-	scatterwalk_copychunks(buf, in, len, 0);
+-	scatterwalk_copychunks(buf, out, len, 1);
++	memcpy_from_scatterwalk(buf, in, len);
++	memcpy_to_scatterwalk(out, buf, len);
+ 
+ 	*in_len -= len;
+ 	if (!*in_len)
+ 		return 0;
+ 
+-	scatterwalk_pagedone(in, 0, 1);
+-	scatterwalk_pagedone(out, 1, 1);
+-
+ 	len = buf[4] | (buf[3] << 8);
+ 	len -= cipher_desc->iv;
+ 
+ 	tls_make_aad(aad, len - cipher_desc->tag, (char *)&rcd_sn, buf[0], prot);
+ 
+@@ -108,14 +105,12 @@ static int tls_enc_record(struct aead_request *aead_req,
+ 
+ 		*in_len = 0;
+ 	}
+ 
+ 	if (*in_len) {
+-		scatterwalk_copychunks(NULL, in, len, 2);
+-		scatterwalk_pagedone(in, 0, 1);
+-		scatterwalk_copychunks(NULL, out, len, 2);
+-		scatterwalk_pagedone(out, 1, 1);
++		scatterwalk_skip(in, len);
++		scatterwalk_skip(out, len);
+ 	}
+ 
+ 	len -= cipher_desc->tag;
+ 	aead_request_set_crypt(aead_req, sg_in, sg_out, len, iv);
+ 
+@@ -160,13 +155,10 @@ static int tls_enc_records(struct aead_request *aead_req,
+ 				    cpu_to_be64(rcd_sn), &in, &out, &len, prot);
+ 		rcd_sn++;
+ 
+ 	} while (rc == 0 && len);
+ 
+-	scatterwalk_done(&in, 0, 0);
+-	scatterwalk_done(&out, 1, 0);
+-
+ 	return rc;
+ }
+ 
+ /* Can't use icsk->icsk_af_ops->send_check here because the ip addresses
+  * might have been changed by NAT.
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.47.1
+
 
