@@ -1,287 +1,124 @@
-Return-Path: <netdev+bounces-153877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E26659F9EDE
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 07:35:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F219F9F03
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 459E31641B8
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 06:35:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A89116B94B
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 07:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1F71DF269;
-	Sat, 21 Dec 2024 06:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8FA1DF986;
+	Sat, 21 Dec 2024 07:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GJ6D3AVG"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="FY1rdupN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA3E3F9D2
-	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 06:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FC21AAA3D
+	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 07:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734762941; cv=none; b=F+YRciOl7065naTg07YkOLvjhAXrblT8beBSdVZPtoJRYFlzaSpCRlvJvzAeBGUXcG14Vs2SL577XzH/Tr9bMXKvAxRT4+RZgaNmUqqW/4UukkkmAjErgSXnSEOatNFGQj+7bTz5UeatBRHBcOcSylZfm7Jjr4N/GdfF/Zy3/gs=
+	t=1734765734; cv=none; b=FrWyLc1l8ynkUVu9CYTEJTHKROvSFdV8blUqjoMNpaITnvAmzaU7lVDD9Fs+tc/3CchE8F5DZxr48QlafB3XdsLttE9E/FJ9+LdyPm67aEc6x0zkGEQgoGj644YIKXWVtllSGg4P62T9lqWzoULyNSiCloDCi7vS4XDgi8kzcds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734762941; c=relaxed/simple;
-	bh=cA49dLWLPeXMo8EkDyJuvvqslUmMVWWyR+Zoo77Nm48=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RmK/Wng2R1kfyYo6EYYpxWhK6zTJOqx1S2IjY93XS2pWyG9hGH3IVfeDc7aWFQ6i17OnQKcaMXm+Z95cn6fnJ0lNHz+LnfqpgXXEJQJWjrD8gQnPWFn4zmAfTq0nJLphrPldNDb5mSuLlNLwo0YE3ZzO3mgaUlBE0Ue/mmD10dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GJ6D3AVG; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21661949f23so38312925ad.3
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 22:35:39 -0800 (PST)
+	s=arc-20240116; t=1734765734; c=relaxed/simple;
+	bh=VdYgoyIugbj+71Cae8f7b/3XNaXG1CuIVgxK69uZCTs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fjJXFu23QOZ/uaCPhqj12JT2eUeu6Ckt1Zpko+rVKbT7A0+LmniyECEUJT3KUdZRKrnbykOGjQNur2HkpbCMbBeBBGsHSBnpNls8y+CEE4ssaf5hIYtBcsHVxPOiK7UBq2jG+j+Rg+8pzBs4TbwBYoqz97xNKfBkHHmDKAMF0HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=FY1rdupN; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4361f796586so28092345e9.3
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 23:22:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734762939; x=1735367739; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iMcfKA1YHrVykkv4z+7oNS4M200AweVT6BkZXKe+0UA=;
-        b=GJ6D3AVGeHR6PIItHAEuoPoxHm2tHDiU+12zt0K+KWwuGEXUwrOb+3EB0OruIEe+qm
-         YhvlgKnjcIQHLqXm9FiXxHzLzmQU0UpCotQVw2Y4JvT6GK3JA7hK0+ocx2f5nMSgY2By
-         gS/Gl/mgXJ68i1vQpJknrgrQGJTCKCkoA52kToV1RCWdFoFD/qt8Em3hCSQDYC+rhSB+
-         DNJOFzsmJN0IbIcT/JuiK3dzgGMFW1m4O7X8Uk7QGR2KNWKVaMm3F/KQ4vBkCOBrStu9
-         ruPvlLi3azH6HVIPUtqNU7LqsyHfgtwCRVeUuVf4ZjxiJ4HTpEqKwZ3yhye1G38QjVpJ
-         GQjw==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1734765731; x=1735370531; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UDfqCZrNP8M56R6K06iXL2WlA0atYz/trKoVRKTWAZM=;
+        b=FY1rdupN5Wu84zkmu9gNp391xx/aitkUYeVqoYAO7QJzf+LUyb0WVQAxPdSpBjO07f
+         oh1yyPc5J3jXALZnFDAkzsAKNSND+5jZTA1lkZtCFpKMWj3vdb4tNN+l7nv/XKMrY780
+         33ImwfR24j0tlxfhe+XpRstb49X1L5GCPKwSIAH5fhnzj5b9j/GogEvO/I0tklyVieXk
+         cxgRo7gP9hddLhkBKTiAfcbEyaS5YYnBjT2SidRZr+Xgv6KDtW3m1twRaQy37STghU5V
+         MDOobpWUQOFMsGvzJ0/dY9DNQPsVVHTB6RT8nZv444LyIX8K40V++nVPbwN+szZxAkjs
+         Lxpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734762939; x=1735367739;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iMcfKA1YHrVykkv4z+7oNS4M200AweVT6BkZXKe+0UA=;
-        b=jPt682iz/bUX79gtQU0QlRDYhobk+8io+lmzTK3Q51U3j996qsIqaNaHJuHgr6Ks5x
-         8mz+/GkRQFCAHhKk+BdAREmesx8O1VnvsdJznpqZxy0xHlupnsT0kAxZnM6B4CphAZX7
-         HE+kthMBDxs4n+ukwXIvk3VgUU4MBhzr6cuAP54UiF2fSdNH78kcsLjzHtT7UeTuvM2q
-         qWlyIUhyhakJEz5mI3Lpm0Y0QPkGaAeWehHtJRIFJxWaz02rmFKMcJfpKXhH/c9rCq+0
-         eccuhWGj7p6TyAnszsx+CWhC+nNm/rbdmQA9BXSTBDyhYGNy0vZpbdUWNuGDIs5rq2fq
-         Lfmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVhDoYxYkRIzgvj8oqAZcSesdYPj4izVH0c6Np1TPLQuToQe+S7Lwxq+YAihHGY2DTwdDrR8Ok=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxtr5MzrTyo4kHalp180LqmM6ImW68Rm8gwjmOSStZ3ZL+IWRGt
-	1TSKA67n7rU3beKLI6++yGk7LTW7MoFQbh4S+M0mD3JiNcRl0jV+hp0Z92NcG3eA9uAr4b+QsOD
-	KM2zeALxsgoVG/aGLJPKWMw==
-X-Google-Smtp-Source: AGHT+IFjKY+k1yJx/j5W1t9/kN3ou1S1abC7Vqps0cvP3QEiC6rvJpqTb0+Ww7uqngmTYNcLNHGKzObc+SWmOb34sQ==
-X-Received: from plbmg13.prod.google.com ([2002:a17:903:348d:b0:217:8109:e87])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:f68f:b0:215:63a0:b58c with SMTP id d9443c01a7336-219e6f25f6bmr74279055ad.46.1734762938846;
- Fri, 20 Dec 2024 22:35:38 -0800 (PST)
-Date: Sat, 21 Dec 2024 15:35:22 +0900
+        d=1e100.net; s=20230601; t=1734765731; x=1735370531;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UDfqCZrNP8M56R6K06iXL2WlA0atYz/trKoVRKTWAZM=;
+        b=vyDioPQFfXeuS/rdH2HAoSXuHFRHFUSuF5TznaBfeZRw2GBjEEg9ZpImE+HCtqL+1g
+         iabDRnGaa3PklSi/4m8MCXrRwyNoCI0O/hWBvXsNmf0Gf9lTDAjKf1OBGrf/oRw4pHMT
+         Opgl1+bt4ajGv4/uDreDF43zG0tg9o4i4Iy4cLjoEt66gJu72geS4M69anREfL3io2kL
+         BLEFJpWxkUvqc0cl1zij9AIa5XKYEMEu03Ge1x9wB9oIS/pOLX+bZTqU5v04YNK+H2Wk
+         KYpWCPTzlur0h86YX6zTlNLEU0Ic/T6JdU+T3l7dGVqMRGTZ23II+Sc8hdR2unF9Wa+6
+         WRxA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+FyOjDYn2KA5at3Zd7LF0gPTdB2AW+REqLkAWR4barxlwziA9kRuMJQHZb35sYl9xSzM/yPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSn8F6Cl3QVwEtb77vVTq1BrI8kTyD0TwqnNM0Hupe1B8Xo1gE
+	4LRni6hj5MdZ3ESJfKiydelIrRWJq7ZNO5btzv73HJ10vVwsbUjAeviSpmDCLRo=
+X-Gm-Gg: ASbGncsrFA99VZePP/K1KFQBt34pyZv3qm+NTxmYloQIdCleRaaVD/S936/dkGGcm28
+	++EZHMHHgq1O2eqVzZIagOn7Wb69aMx/v9pJjUuW4nZ8HsPXAvkFDJR7TF95vuscAR0GbhtUarK
+	DqzrlSI52WGUkDcY+pgMwb3xdKkJ6YQeTSPP6jSr6yalkKuRR7ij6IjUus3SSAyTBDFlMtSpVgD
+	MagHuMiLDJZ7+9prJkABA3CYKOWdFHwqSJjANnCmZIOagtu4rdLGsvO1kh7+wHd3vV9yblArWw/
+	hV/A0d5X6bH9
+X-Google-Smtp-Source: AGHT+IG9GgzCc7c19ajzoMiNbxsVpjcaCnOwHoxuB+nszKyInY0ZdFm38wO5hbiuDOtZGERyjVA/Vw==
+X-Received: by 2002:a05:600c:4586:b0:431:5c3d:1700 with SMTP id 5b1f17b1804b1-43668a3a3c4mr45392495e9.21.1734765731030;
+        Fri, 20 Dec 2024 23:22:11 -0800 (PST)
+Received: from [192.168.0.123] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656b3b287sm100799385e9.29.2024.12.20.23.22.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Dec 2024 23:22:10 -0800 (PST)
+Message-ID: <26e95063-4737-42f1-91e2-74aae0e71941@blackwall.org>
+Date: Sat, 21 Dec 2024 09:22:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241221063522.1839126-1-yuyanghuang@google.com>
-Subject: [PATCH net-next, v3] netlink: support dumping IPv4 multicast addresses
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	liuhangbin@gmail.com, nicolas.dichtel@6wind.com, andrew@lunn.ch, 
-	pruddy@vyatta.att-mail.com, netdev@vger.kernel.org, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next 1/3] netkit: Allow for configuring
+ needed_{head,tail}room
+To: Daniel Borkmann <daniel@iogearbox.net>, martin.lau@linux.dev
+Cc: pabeni@redhat.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20241219173928.464437-1-daniel@iogearbox.net>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20241219173928.464437-1-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Extended RTM_GETMULTICAST to support dumping joined IPv4 multicast
-addresses, in addition to the existing IPv6 functionality. This allows
-userspace applications to retrieve both IPv4 and IPv6 multicast
-addresses through similar netlink command and then monitor future
-changes by registering to RTNLGRP_IPV4_MCADDR and RTNLGRP_IPV6_MCADDR.
+On 12/19/24 19:39, Daniel Borkmann wrote:
+> Allow the user to configure needed_{head,tail}room for both netkit
+> devices. The idea is similar to 163e529200af ("veth: implement
+> ndo_set_rx_headroom") with the difference that the two parameters
+> can be specified upon device creation. By default the current behavior
+> stays as is which is needed_{head,tail}room is 0.
+> 
+> In case of Cilium, for example, the netkit devices are not enslaved
+> into a bridge or openvswitch device (rather, BPF-based redirection
+> is used out of tcx), and as such these parameters are not propagated
+> into the Pod's netns via peer device.
+> 
+> Given Cilium can run in vxlan/geneve tunneling mode (needed_headroom)
+> and/or be used in combination with WireGuard (needed_{head,tail}room),
+> allow the Cilium CNI plugin to specify these two upon netkit device
+> creation.
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> ---
+>  drivers/net/netkit.c               | 66 +++++++++++++++++++-----------
+>  include/uapi/linux/if_link.h       |  2 +
+>  tools/include/uapi/linux/if_link.h |  2 +
+>  3 files changed, 47 insertions(+), 23 deletions(-)
+> 
 
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
----
-
-Changelog since v2:
-- Fix checkpatch.pl warnings.
-- Remove one redundant EXPORT_SYMBOL().
-
-Changelog since v1:
-- Minor style fixes.
-- Use for_each_pmc_rcu() instead of for_each_pmc_rtnl().
-
- include/linux/igmp.h |  2 ++
- net/ipv4/devinet.c   | 63 +++++++++++++++++++++++++++++++++++++-------
- net/ipv4/igmp.c      |  8 +++---
- 3 files changed, 59 insertions(+), 14 deletions(-)
-
-diff --git a/include/linux/igmp.h b/include/linux/igmp.h
-index 073b30a9b850..757c0aeea1ac 100644
---- a/include/linux/igmp.h
-+++ b/include/linux/igmp.h
-@@ -142,4 +142,6 @@ extern void __ip_mc_inc_group(struct in_device *in_dev,=
- __be32 addr,
- extern void ip_mc_inc_group(struct in_device *in_dev, __be32 addr);
- int ip_mc_check_igmp(struct sk_buff *skb);
-=20
-+int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
-+		       const struct ip_mc_list *im, int event, int flags);
- #endif
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index c8b3cf5fba4c..2c8817229052 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -114,6 +114,7 @@ struct inet_fill_args {
- 	unsigned int flags;
- 	int netnsid;
- 	int ifindex;
-+	enum addr_type_t type;
- };
-=20
- #define IN4_ADDR_HSIZE_SHIFT	8
-@@ -1850,21 +1851,46 @@ static int in_dev_dump_addr(struct in_device *in_de=
-v, struct sk_buff *skb,
- 			    struct netlink_callback *cb, int *s_ip_idx,
- 			    struct inet_fill_args *fillargs)
- {
-+	struct ip_mc_list *im;
- 	struct in_ifaddr *ifa;
- 	int ip_idx =3D 0;
- 	int err;
-=20
--	in_dev_for_each_ifa_rcu(ifa, in_dev) {
--		if (ip_idx < *s_ip_idx) {
-+	switch (fillargs->type) {
-+	case UNICAST_ADDR:
-+		fillargs->event =3D RTM_NEWADDR;
-+		in_dev_for_each_ifa_rcu(ifa, in_dev) {
-+			if (ip_idx < *s_ip_idx) {
-+				ip_idx++;
-+				continue;
-+			}
-+			err =3D inet_fill_ifaddr(skb, ifa, fillargs);
-+			if (err < 0)
-+				goto done;
-+
-+			nl_dump_check_consistent(cb, nlmsg_hdr(skb));
- 			ip_idx++;
--			continue;
- 		}
--		err =3D inet_fill_ifaddr(skb, ifa, fillargs);
--		if (err < 0)
--			goto done;
-+		break;
-+	case MULTICAST_ADDR:
-+		for (im =3D rcu_dereference(in_dev->mc_list);
-+		     im;
-+		     im =3D rcu_dereference(im->next_rcu)) {
-+			if (ip_idx < *s_ip_idx) {
-+				ip_idx++;
-+				continue;
-+			}
-+			err =3D inet_fill_ifmcaddr(skb, in_dev->dev, im,
-+						 RTM_GETMULTICAST, NLM_F_MULTI);
-+			if (err < 0)
-+				goto done;
-=20
--		nl_dump_check_consistent(cb, nlmsg_hdr(skb));
--		ip_idx++;
-+			nl_dump_check_consistent(cb, nlmsg_hdr(skb));
-+			ip_idx++;
-+		}
-+		break;
-+	default:
-+		break;
- 	}
- 	err =3D 0;
- 	ip_idx =3D 0;
-@@ -1889,15 +1915,16 @@ static u32 inet_base_seq(const struct net *net)
- 	return res;
- }
-=20
--static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *=
-cb)
-+static int inet_dump_addr(struct sk_buff *skb, struct netlink_callback *cb=
-,
-+			  enum addr_type_t type)
- {
- 	const struct nlmsghdr *nlh =3D cb->nlh;
- 	struct inet_fill_args fillargs =3D {
- 		.portid =3D NETLINK_CB(cb->skb).portid,
- 		.seq =3D nlh->nlmsg_seq,
--		.event =3D RTM_NEWADDR,
- 		.flags =3D NLM_F_MULTI,
- 		.netnsid =3D -1,
-+		.type =3D type,
- 	};
- 	struct net *net =3D sock_net(skb->sk);
- 	struct net *tgt_net =3D net;
-@@ -1949,6 +1976,20 @@ static int inet_dump_ifaddr(struct sk_buff *skb, str=
-uct netlink_callback *cb)
- 	return err;
- }
-=20
-+static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *=
-cb)
-+{
-+	enum addr_type_t type =3D UNICAST_ADDR;
-+
-+	return inet_dump_addr(skb, cb, type);
-+}
-+
-+static int inet_dump_ifmcaddr(struct sk_buff *skb, struct netlink_callback=
- *cb)
-+{
-+	enum addr_type_t type =3D MULTICAST_ADDR;
-+
-+	return inet_dump_addr(skb, cb, type);
-+}
-+
- static void rtmsg_ifa(int event, struct in_ifaddr *ifa, struct nlmsghdr *n=
-lh,
- 		      u32 portid)
- {
-@@ -2845,6 +2886,8 @@ static const struct rtnl_msg_handler devinet_rtnl_msg=
-_handlers[] __initconst =3D {
- 	{.protocol =3D PF_INET, .msgtype =3D RTM_GETNETCONF,
- 	 .doit =3D inet_netconf_get_devconf, .dumpit =3D inet_netconf_dump_devcon=
-f,
- 	 .flags =3D RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
-+	{.owner =3D THIS_MODULE, .protocol =3D PF_INET, .msgtype =3D RTM_GETMULTI=
-CAST,
-+	 .dumpit =3D inet_dump_ifmcaddr, .flags =3D RTNL_FLAG_DUMP_UNLOCKED},
- };
-=20
- void __init devinet_init(void)
-diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-index 8a370ef37d3f..32230f381e14 100644
---- a/net/ipv4/igmp.c
-+++ b/net/ipv4/igmp.c
-@@ -1432,14 +1432,14 @@ static void ip_mc_hash_remove(struct in_device *in_=
-dev,
- 	*mc_hash =3D im->next_hash;
- }
-=20
--static int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
--			      const struct ip_mc_list *im, int event)
-+int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
-+		       const struct ip_mc_list *im, int event, int flags)
- {
- 	struct ifa_cacheinfo ci;
- 	struct ifaddrmsg *ifm;
- 	struct nlmsghdr *nlh;
-=20
--	nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), 0);
-+	nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), flags);
- 	if (!nlh)
- 		return -EMSGSIZE;
-=20
-@@ -1477,7 +1477,7 @@ static void inet_ifmcaddr_notify(struct net_device *d=
-ev,
- 	if (!skb)
- 		goto error;
-=20
--	err =3D inet_fill_ifmcaddr(skb, dev, im, event);
-+	err =3D inet_fill_ifmcaddr(skb, dev, im, event, 0);
- 	if (err < 0) {
- 		WARN_ON_ONCE(err =3D=3D -EMSGSIZE);
- 		nlmsg_free(skb);
---=20
-2.47.1.613.gc27f4b7a9f-goog
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
