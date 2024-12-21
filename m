@@ -1,190 +1,85 @@
-Return-Path: <netdev+bounces-153896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86259F9F5B
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:53:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA9FA9F9F66
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 10:07:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33A1216966D
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:53:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D45C1890F01
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E331E9B32;
-	Sat, 21 Dec 2024 08:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4CAF1EC4D1;
+	Sat, 21 Dec 2024 09:07:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0BwMLNy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="FCtGZvS9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92B82594B0
-	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 08:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EDECA5A;
+	Sat, 21 Dec 2024 09:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734771182; cv=none; b=A3EYSVwh22dnIEGLaoPmfHjWNf9LbMiKYWBqR2ZhNhijfcFMGKbfKkc8xc0RUcQFYlfpefGxuaXe+bp/T7XffQ71cYGNcxJYTD+8kn9d50QBw6nB72EN97fhdZIEWf517ADzA9MJz+IsDb/KPxlzNd10cxVZOg+4r7BKkGnxDGw=
+	t=1734772039; cv=none; b=bgaLljQcfTp2TqZVQdmNP1V3Gibry8yordy8i/bRb7iTGq2wVKEM+dmaitI5JW2evs0FCrHX/34zz/MyzpRM15uHVCqqcJLIeFCG3U0t6mRhvAEq1fPYbR3MYV2Cvm5fUvBKS0nBQEymNEblzsuAfbOr7lQmX+ioOeQoJeDKIMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734771182; c=relaxed/simple;
-	bh=cjKF2C9TZmQVmts5DW4GLLkPodNlIEAgBCccDDu79Is=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KAAa7YhU4KNXdzLeczH866S2SRsYYyEUhyyq1s2NEaS6z+Uhq4uZRicW3sKz9PAnkTpqkd2X7buXnpqNC/9RzfZGLd/NjQFXD7GxIjRfGUrnpFEi+37BCgrN/UjFGa7iSfXYdOT3MDIiV0nyOXACVTKDW0T7hwk7emWI4eZNW8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C0BwMLNy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734771178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5u7ODnEiVmrU6NmFwmTtOY2PwDk2M+piTrUPkLuAqSY=;
-	b=C0BwMLNyYLU+wXmhTmF4W54WcZeJXnA395JOZ4I0n5c8znQC8YBsEoUsaPWWb1KnTR6mVI
-	XbR1r5Im51JfM49JR7uy06UcK0DHQQVF2oRTNihlF/OMFWiBQVq1H1vXw7WLRqvJxMyyrD
-	1S7NmC595/t1TxpL7eL5SJ2J6OaC6fQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-492-uDYhupN2OKC2e8CdgsnKUg-1; Sat,
- 21 Dec 2024 03:52:56 -0500
-X-MC-Unique: uDYhupN2OKC2e8CdgsnKUg-1
-X-Mimecast-MFC-AGG-ID: uDYhupN2OKC2e8CdgsnKUg
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7012B1956096;
-	Sat, 21 Dec 2024 08:52:54 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.39.192.36])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1373A19560A2;
-	Sat, 21 Dec 2024 08:52:50 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	mptcp@lists.linux.dev
-Subject: [PATCH net] mptcp: fix TCP options overflow.
-Date: Sat, 21 Dec 2024 09:51:46 +0100
-Message-ID: <025d9df8cde3c9a557befc47e9bc08fbbe3476e5.1734771049.git.pabeni@redhat.com>
+	s=arc-20240116; t=1734772039; c=relaxed/simple;
+	bh=WYH0na+ESOSGPKUfQK2wiYT9UF3AAcwfwCpYokRJ6tA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1Gn0kPt0KxJpbjsmDePSCP4SxJiTXfGnEbrQznc2qX2M3Pn0NM/cBDHQW+vohOnERflSNNQLjsv/oYBBPuBOCFXFlf+hyI5MuCdqR2csQnJgkSHi0gINJMb6/okkExtP/9iCpsdPKIn1Wlgg2D7h8yUVlu7mfxmTcwYxf9bfW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=FCtGZvS9; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=SzB6uK94xo5/T0BXO1kM/kvir9oQYumj4tut2grbd/g=; b=FCtGZvS95oZ9iiPLt7x2QryztN
+	qviPrHzbNRkP16c1SkkmKT7rW0JzmbZNniA+HmGI7nMzYwpMoAD79Rj7IvU1gQmW1HmAx2VIGsWrS
+	0hKtrLYy6TlTmLnmIjif9FIZDmYJfx4j6MCi6K6hgZOBnMIclt0GmS80eAsnndapcgZKzxio8ChRs
+	2ViMoV/XCcc0e7oWS91ET0M9Aus8uGND+MIhFVey28/HNlGenpbXGSZYGYiXt6V5stdrBvV/ISl6t
+	3i2EihT+zwtVCzw3SGP2ioV4T7FAQwRH7fDt40LCOGEehC0h5IwYUFaDh2yzyqOdXPXHosDCoKSBR
+	AMujarEg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tOvEs-002Q20-2S;
+	Sat, 21 Dec 2024 17:06:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 21 Dec 2024 17:06:55 +0800
+Date: Sat, 21 Dec 2024 17:06:55 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+	Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
+	Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
+ schedule_work outside lock
+Message-ID: <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
+ <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
 
-Syzbot reported the following splat:
+On Thu, Dec 12, 2024 at 08:33:31PM +0800, Herbert Xu wrote:
+>
+> The growth check should stay with the atomic_inc.  Something like
+> this should work:
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 1 UID: 0 PID: 5836 Comm: sshd Not tainted 6.13.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/25/2024
-RIP: 0010:_compound_head include/linux/page-flags.h:242 [inline]
-RIP: 0010:put_page+0x23/0x260 include/linux/mm.h:1552
-Code: 90 90 90 90 90 90 90 55 41 57 41 56 53 49 89 fe 48 bd 00 00 00 00 00 fc ff df e8 f8 5e 12 f8 49 8d 5e 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74 08 48 89 df e8 8f c7 78 f8 48 8b 1b 48 89 de 48 83
-RSP: 0000:ffffc90003916c90 EFLAGS: 00010202
-RAX: 0000000000000001 RBX: 0000000000000008 RCX: ffff888030458000
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: dffffc0000000000 R08: ffffffff898ca81d R09: 1ffff110054414ac
-R10: dffffc0000000000 R11: ffffed10054414ad R12: 0000000000000007
-R13: ffff88802a20a542 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007f34f496e800(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f9d6ec9ec28 CR3: 000000004d260000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- skb_page_unref include/linux/skbuff_ref.h:43 [inline]
- __skb_frag_unref include/linux/skbuff_ref.h:56 [inline]
- skb_release_data+0x483/0x8a0 net/core/skbuff.c:1119
- skb_release_all net/core/skbuff.c:1190 [inline]
- __kfree_skb+0x55/0x70 net/core/skbuff.c:1204
- tcp_clean_rtx_queue net/ipv4/tcp_input.c:3436 [inline]
- tcp_ack+0x2442/0x6bc0 net/ipv4/tcp_input.c:4032
- tcp_rcv_state_process+0x8eb/0x44e0 net/ipv4/tcp_input.c:6805
- tcp_v4_do_rcv+0x77d/0xc70 net/ipv4/tcp_ipv4.c:1939
- tcp_v4_rcv+0x2dc0/0x37f0 net/ipv4/tcp_ipv4.c:2351
- ip_protocol_deliver_rcu+0x22e/0x440 net/ipv4/ip_input.c:205
- ip_local_deliver_finish+0x341/0x5f0 net/ipv4/ip_input.c:233
- NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
- NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
- __netif_receive_skb_one_core net/core/dev.c:5672 [inline]
- __netif_receive_skb+0x2bf/0x650 net/core/dev.c:5785
- process_backlog+0x662/0x15b0 net/core/dev.c:6117
- __napi_poll+0xcb/0x490 net/core/dev.c:6883
- napi_poll net/core/dev.c:6952 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:7074
- handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
- __do_softirq kernel/softirq.c:595 [inline]
- invoke_softirq kernel/softirq.c:435 [inline]
- __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0x57/0xc0 arch/x86/kernel/apic/apic.c:1049
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0033:0x7f34f4519ad5
-Code: 85 d2 74 0d 0f 10 02 48 8d 54 24 20 0f 11 44 24 20 64 8b 04 25 18 00 00 00 85 c0 75 27 41 b8 08 00 00 00 b8 0f 01 00 00 0f 05 <48> 3d 00 f0 ff ff 76 75 48 8b 15 24 73 0d 00 f7 d8 64 89 02 48 83
-RSP: 002b:00007ffec5b32ce0 EFLAGS: 00000246
-RAX: 0000000000000001 RBX: 00000000000668a0 RCX: 00007f34f4519ad5
-RDX: 00007ffec5b32d00 RSI: 0000000000000004 RDI: 0000564f4bc6cae0
-RBP: 0000564f4bc6b5a0 R08: 0000000000000008 R09: 0000000000000000
-R10: 00007ffec5b32de8 R11: 0000000000000246 R12: 0000564f48ea8aa4
-R13: 0000000000000001 R14: 0000564f48ea93e8 R15: 00007ffec5b32d68
- </TASK>
+OK I've applied your patch with the atomic_inc move.
 
-Eric noted a probable shinfo->nr_frags corruption, which indeed
-occurs.
-
-The root cause is a buggy MPTCP option len computation in some
-circumstances: the ADD_ADDR option should be mutually exclusive
-with DSS since the blamed commit.
-
-Still, mptcp_established_options_add_addr() tries to set the
-relevant info in mptcp_out_options, if the remaining space is
-large enough even when DSS is present.
-
-Since the ADD_ADDR infos and the DSS share the same union
-fields, adding first corrupts the latter. In the worst-case
-scenario, such corruption increases the DSS binary layout,
-exceeding the computed length and possibly overwriting the
-skb shared info.
-
-Address the issue by enforcing mutual exclusion in
-mptcp_established_options_add_addr(), too.
-
-Reported-by: syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com
-Fixes: 1bff1e43a30e ("mptcp: optimize out option generation")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- net/mptcp/options.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/net/mptcp/options.c b/net/mptcp/options.c
-index ad22622843a2..9ea7356d9fab 100644
---- a/net/mptcp/options.c
-+++ b/net/mptcp/options.c
-@@ -667,8 +667,15 @@ static bool mptcp_established_options_add_addr(struct sock *sk, struct sk_buff *
- 		    &echo, &drop_other_suboptions))
- 		return false;
- 
-+	/*
-+	 * Later on, mptcp_write_options() will enforce mutually exclusion with
-+	 * DSS, bail out if such option is set and we can't drop it.
-+	 */
- 	if (drop_other_suboptions)
- 		remaining += opt_size;
-+	else if (opts->suboptions & OPTION_MPTCP_DSS)
-+		return false;
-+
- 	len = mptcp_add_addr_len(opts->addr.family, echo, !!opts->addr.port);
- 	if (remaining < len)
- 		return false;
+Thanks,
 -- 
-2.45.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
