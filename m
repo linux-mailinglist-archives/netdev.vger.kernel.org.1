@@ -1,231 +1,156 @@
-Return-Path: <netdev+bounces-153900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFCEE9FA00D
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 11:02:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0039FA012
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 11:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41DAE1641F2
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 10:01:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 883671886AF5
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 10:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87791F2C30;
-	Sat, 21 Dec 2024 10:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EC21EC4FB;
+	Sat, 21 Dec 2024 10:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LGeN96xK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iyLdsT/n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABD61F2C28;
-	Sat, 21 Dec 2024 10:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EB8CA5A;
+	Sat, 21 Dec 2024 10:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734775290; cv=none; b=ndRtUN9/euD79UXQ211BTrz1os59DGjkapLAbQ4q1XyLaXdwEC8vqdfEJZ/WyZ33zQA1hh1h4Qe/6tQEYsknv6x0pehElNKaBCaj1zlveFbFzmgstLPq3sIIsxcnF4Po0dOauDI9SrwyHIfN/1nuEQCEwKmMxnRKCq5PpEFpRGA=
+	t=1734776910; cv=none; b=Zd/hiES75pzMXxL6Db3PMwbnEzOkHGBZVMg4TVFpZDrsx5EQHTzgWsypI5Csej+DTHVYm3P3DHa5zwEtN3CwBe9jhvgPw1/HXJrJJUaUv6QQRpz9ztgsb1sPdxmsv/B1xwwYCo6FXCx75bNYlmaJHnZqj3Et/vFHPhFL283DAOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734775290; c=relaxed/simple;
-	bh=klfr5iDrlwgyFse2esVRRcM5EeFYLG3zxkM25WwC5pE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ha0j+y7PWn/i3vZc2VbtKKSaZJGOb1L7YBkTgQfFbEokyBYxoJYZFSyLx+UCpj4JC7a8MEato7o61eGHVKhNJkL3JMFQM83SkG27BifmHCYvObB9pbdMtITShjBravnDu1kNetXttnqXuqmQQl0+HqP6bCCaCBtyH3blAb1fQsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LGeN96xK; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734775289; x=1766311289;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=klfr5iDrlwgyFse2esVRRcM5EeFYLG3zxkM25WwC5pE=;
-  b=LGeN96xK6hTfiVawBn53gXqcaLsrOID85TGlrnq8XCTY5U5fBSZw50EJ
-   7ylf7q06oQ1rtwPQDVZA1LB1gH+WF6huxhRm20Q7XtuJJmqkLM7prjEPB
-   2ed94REImtWyE2C657MbQg8W28Begf39VNejshfLPtlSjG9QmtLk3Ckvc
-   +K/hCuLLx2vMBaMBU5ArPd+o5pCPlOtZTe2WtkTiMVHtf98R0tlfjZ0cS
-   n+oxkOQb+yRQhAA1QC8gM1sTvyZOJQL8X3+jSKwqbPqNPd0LOiDEEvtP9
-   ZXAX9cjsplFzZi02qGNiilVuzLWSWf5Q/lKjpV5nYKclsqONslW8w99Gj
-   A==;
-X-CSE-ConnectionGUID: H1mNKHWUSxeCu5wadQhPzw==
-X-CSE-MsgGUID: OAhig7NEQzmC3+3oiQPfww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="35460286"
-X-IronPort-AV: E=Sophos;i="6.12,253,1728975600"; 
-   d="scan'208";a="35460286"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2024 02:01:29 -0800
-X-CSE-ConnectionGUID: OOvwgj4wRa+1P3ewiSL91g==
-X-CSE-MsgGUID: o425voEzQGKH0fcxkd42AQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,253,1728975600"; 
-   d="scan'208";a="129562415"
-Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 21 Dec 2024 02:01:22 -0800
-Received: from kbuild by a46f226878e0 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tOwIR-000281-08;
-	Sat, 21 Dec 2024 10:01:19 +0000
-Date: Sat, 21 Dec 2024 18:01:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Boqun Feng <boqun.feng@gmail.com>,
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
-	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, aliceryhl@google.com,
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
-	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	vschneid@redhat.com
-Subject: Re: [PATCH v7 6/7] rust: Add read_poll_timeout functions
-Message-ID: <202412211700.9lWP3KmT-lkp@intel.com>
-References: <20241220061853.2782878-7-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1734776910; c=relaxed/simple;
+	bh=F8qyLk2tQa0JK3a0b5tK09o53tJ+d/qyRpNct4qmXKc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lyh7CZ+OsVfETbIr3OQMvopUNpB09q4/fYQul8I4/hzfcovsCkFMcbXb65KFhkM7uMzmK7vOVBRRZ51MJEU65dLohoGKkhilGawJactqi8rJ2qABBINVTv778OK3YFQVMPGA9K6QgberYdpqLR+2M+1GOtJ9Q75w/rdYDhh/keg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iyLdsT/n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E52BC4CECE;
+	Sat, 21 Dec 2024 10:28:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734776910;
+	bh=F8qyLk2tQa0JK3a0b5tK09o53tJ+d/qyRpNct4qmXKc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iyLdsT/nJrKFR2MLsSwIx9L76rSuuFPuR6fMP9dPZq/A1D/KZRdIS/Wn3TYdCURnR
+	 l8lWD9JEVFQif/1NPHwDT/Og/Uc6kM6zV942nE4m/Fm0f35js8twbgbeCpFyak0NB3
+	 CTpwtCR5su71BwQqwdGeOG37PY7eKMfywfsWr6raPne7Ac+IXVATKTb9lr+8VRYvqJ
+	 7t/hnBrSdse3ZoUlgm0MFuaBCduoM9W6pAMPll6so04wbG4K5fyTtQgonKEstOrY3y
+	 co5H2+3veYjslLNWH1VLzgy60ywWIqTXJ8HGsHqSCDVoqWXmN/y8is8G/13+FY3HRy
+	 R8NV2h+GbfYTQ==
+Message-ID: <047cb3ef-f0c0-43e4-82e9-dc0073c8b953@kernel.org>
+Date: Sat, 21 Dec 2024 11:28:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241220061853.2782878-7-fujita.tomonori@gmail.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net] mptcp: fix TCP options overflow.
+Content-Language: en-GB
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ mptcp@lists.linux.dev, stable@vger.kernel.org
+References: <025d9df8cde3c9a557befc47e9bc08fbbe3476e5.1734771049.git.pabeni@redhat.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <025d9df8cde3c9a557befc47e9bc08fbbe3476e5.1734771049.git.pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi FUJITA,
+Hi Paolo,
 
-kernel test robot noticed the following build warnings:
+On 21/12/2024 09:51, Paolo Abeni wrote:
+> Syzbot reported the following splat:
 
-[auto build test WARNING on 0c5928deada15a8d075516e6e0d9ee19011bb000]
+(...)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/FUJITA-Tomonori/rust-time-Add-PartialEq-Eq-PartialOrd-Ord-trait-to-Ktime/20241220-142722
-base:   0c5928deada15a8d075516e6e0d9ee19011bb000
-patch link:    https://lore.kernel.org/r/20241220061853.2782878-7-fujita.tomonori%40gmail.com
-patch subject: [PATCH v7 6/7] rust: Add read_poll_timeout functions
-config: microblaze-randconfig-r131-20241221 (https://download.01.org/0day-ci/archive/20241221/202412211700.9lWP3KmT-lkp@intel.com/config)
-compiler: microblaze-linux-gcc (GCC) 14.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20241221/202412211700.9lWP3KmT-lkp@intel.com/reproduce)
+> Eric noted a probable shinfo->nr_frags corruption, which indeed
+> occurs.
+> 
+> The root cause is a buggy MPTCP option len computation in some
+> circumstances: the ADD_ADDR option should be mutually exclusive
+> with DSS since the blamed commit.
+> 
+> Still, mptcp_established_options_add_addr() tries to set the
+> relevant info in mptcp_out_options, if the remaining space is
+> large enough even when DSS is present.
+> 
+> Since the ADD_ADDR infos and the DSS share the same union
+> fields, adding first corrupts the latter. In the worst-case
+> scenario, such corruption increases the DSS binary layout,
+> exceeding the computed length and possibly overwriting the
+> skb shared info.
+> 
+> Address the issue by enforcing mutual exclusion in
+> mptcp_established_options_add_addr(), too.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412211700.9lWP3KmT-lkp@intel.com/
+Thank you for the investigation and the fix, it looks good to me:
 
-sparse warnings: (new ones prefixed by >>)
-   kernel/sched/core.c:1080:38: sparse: sparse: incorrect type in initializer (different address spaces) @@     expected struct task_struct *curr @@     got struct task_struct [noderef] __rcu *curr @@
-   kernel/sched/core.c:1080:38: sparse:     expected struct task_struct *curr
-   kernel/sched/core.c:1080:38: sparse:     got struct task_struct [noderef] __rcu *curr
-   kernel/sched/core.c:2179:39: sparse: sparse: incorrect type in initializer (different address spaces) @@     expected struct task_struct *donor @@     got struct task_struct [noderef] __rcu *donor @@
-   kernel/sched/core.c:2179:39: sparse:     expected struct task_struct *donor
-   kernel/sched/core.c:2179:39: sparse:     got struct task_struct [noderef] __rcu *donor
-   kernel/sched/core.c:2190:65: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct task_struct *tsk @@     got struct task_struct [noderef] __rcu *curr @@
-   kernel/sched/core.c:2190:65: sparse:     expected struct task_struct *tsk
-   kernel/sched/core.c:2190:65: sparse:     got struct task_struct [noderef] __rcu *curr
-   kernel/sched/core.c:5641:15: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct task_struct *donor @@     got struct task_struct [noderef] __rcu *donor @@
-   kernel/sched/core.c:5641:15: sparse:     expected struct task_struct *donor
-   kernel/sched/core.c:5641:15: sparse:     got struct task_struct [noderef] __rcu *donor
-   kernel/sched/core.c:6653:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct task_struct *prev @@     got struct task_struct [noderef] __rcu *curr @@
-   kernel/sched/core.c:6653:14: sparse:     expected struct task_struct *prev
-   kernel/sched/core.c:6653:14: sparse:     got struct task_struct [noderef] __rcu *curr
-   kernel/sched/core.c:7199:17: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/core.c:7199:17: sparse:    struct task_struct *
-   kernel/sched/core.c:7199:17: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/core.c:8901:16: sparse: sparse: incorrect type in return expression (different address spaces) @@     expected struct task_struct * @@     got struct task_struct [noderef] __rcu *curr @@
-   kernel/sched/core.c:8901:16: sparse:     expected struct task_struct *
-   kernel/sched/core.c:8901:16: sparse:     got struct task_struct [noderef] __rcu *curr
-   kernel/sched/core.c:10116:25: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct task_struct *p @@     got struct task_struct [noderef] __rcu *curr @@
-   kernel/sched/core.c:10116:25: sparse:     expected struct task_struct *p
-   kernel/sched/core.c:10116:25: sparse:     got struct task_struct [noderef] __rcu *curr
-   kernel/sched/core.c: note: in included file:
-   kernel/sched/sched.h:1490:17: sparse: sparse: self-comparison always evaluates to true
-   kernel/sched/core.c:591:6: sparse: sparse: context imbalance in 'raw_spin_rq_lock_nested' - wrong count at exit
-   kernel/sched/sched.h:1490:17: sparse: sparse: self-comparison always evaluates to true
-   kernel/sched/core.c:624:23: sparse: sparse: context imbalance in 'raw_spin_rq_trylock' - wrong count at exit
-   kernel/sched/core.c:640:6: sparse: sparse: context imbalance in 'raw_spin_rq_unlock' - unexpected unlock
-   kernel/sched/core.c:677:21: sparse: sparse: self-comparison always evaluates to true
-   kernel/sched/core.c:678:36: sparse: sparse: context imbalance in '__task_rq_lock' - wrong count at exit
-   kernel/sched/core.c:718:21: sparse: sparse: self-comparison always evaluates to true
-   kernel/sched/core.c:719:36: sparse: sparse: context imbalance in 'task_rq_lock' - wrong count at exit
-   kernel/sched/sched.h:2258:25: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/sched.h:2258:25: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/sched.h:2258:25: sparse:    struct task_struct *
-   kernel/sched/sched.h:2258:25: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/sched.h:2258:25: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/sched.h:2258:25: sparse:    struct task_struct *
-   kernel/sched/sched.h:2258:25: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/sched.h:2258:25: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/sched.h:2258:25: sparse:    struct task_struct *
-   kernel/sched/sched.h:2269:26: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/sched.h:2269:26: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/sched.h:2269:26: sparse:    struct task_struct *
-   kernel/sched/sched.h:2481:9: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/sched.h:2481:9: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/sched.h:2481:9: sparse:    struct task_struct *
-   kernel/sched/sched.h:2481:9: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/sched.h:2481:9: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/sched.h:2481:9: sparse:    struct task_struct *
-   kernel/sched/sched.h:2269:26: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/sched.h:2269:26: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/sched.h:2269:26: sparse:    struct task_struct *
-   kernel/sched/sched.h:2458:9: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   kernel/sched/sched.h:2458:9: sparse:    struct task_struct [noderef] __rcu *
-   kernel/sched/sched.h:2458:9: sparse:    struct task_struct *
->> kernel/sched/core.c:8722:31: sparse: sparse: marked inline, but without a definition
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-vim +8722 kernel/sched/core.c
+> Reported-by: syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com
 
-  8721	
-> 8722	void __might_resched_precision(const char *file, int len, int line, unsigned int offsets)
-  8723	{
-  8724		/* Ratelimiting timestamp: */
-  8725		static unsigned long prev_jiffy;
-  8726	
-  8727		unsigned long preempt_disable_ip;
-  8728	
-  8729		/* WARN_ON_ONCE() by default, no rate limit required: */
-  8730		rcu_sleep_check();
-  8731	
-  8732		if ((resched_offsets_ok(offsets) && !irqs_disabled() &&
-  8733		     !is_idle_task(current) && !current->non_block_count) ||
-  8734		    system_state == SYSTEM_BOOTING || system_state > SYSTEM_RUNNING ||
-  8735		    oops_in_progress)
-  8736			return;
-  8737	
-  8738		if (time_before(jiffies, prev_jiffy + HZ) && prev_jiffy)
-  8739			return;
-  8740		prev_jiffy = jiffies;
-  8741	
-  8742		/* Save this before calling printk(), since that will clobber it: */
-  8743		preempt_disable_ip = get_preempt_disable_ip(current);
-  8744	
-  8745		pr_err("BUG: sleeping function called from invalid context at %.*s:%d\n",
-  8746		       len, file, line);
-  8747		pr_err("in_atomic(): %d, irqs_disabled(): %d, non_block: %d, pid: %d, name: %s\n",
-  8748		       in_atomic(), irqs_disabled(), current->non_block_count,
-  8749		       current->pid, current->comm);
-  8750		pr_err("preempt_count: %x, expected: %x\n", preempt_count(),
-  8751		       offsets & MIGHT_RESCHED_PREEMPT_MASK);
-  8752	
-  8753		if (IS_ENABLED(CONFIG_PREEMPT_RCU)) {
-  8754			pr_err("RCU nest depth: %d, expected: %u\n",
-  8755			       rcu_preempt_depth(), offsets >> MIGHT_RESCHED_RCU_SHIFT);
-  8756		}
-  8757	
-  8758		if (task_stack_end_corrupted(current))
-  8759			pr_emerg("Thread overran stack, or stack corrupted\n");
-  8760	
-  8761		debug_show_held_locks(current);
-  8762		if (irqs_disabled())
-  8763			print_irqtrace_events(current);
-  8764	
-  8765		print_preempt_disable_ip(offsets & MIGHT_RESCHED_PREEMPT_MASK,
-  8766					 preempt_disable_ip);
-  8767	
-  8768		dump_stack();
-  8769		add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
-  8770	}
-  8771	
+If you don't mind, can you please add these two tags when applying the
+patches to help to track the backports?
 
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/538
+Cc: stable@vger.kernel.org
+
+> Fixes: 1bff1e43a30e ("mptcp: optimize out option generation")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Cheers,
+Matt
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sponsored by the NGI0 Core fund.
+
 
