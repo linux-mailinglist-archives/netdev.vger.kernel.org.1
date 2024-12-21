@@ -1,80 +1,79 @@
-Return-Path: <netdev+bounces-153879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596099F9F06
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:22:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2D99F9F07
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:22:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CCA0188D57B
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 07:22:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B78D16B984
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 07:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521811E9B30;
-	Sat, 21 Dec 2024 07:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31EE01E9B10;
+	Sat, 21 Dec 2024 07:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="zgoga0QS"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Ibav1y8J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AC91AAA3D
-	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 07:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866DF1AAA3D
+	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 07:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734765746; cv=none; b=M7kYvMcvpPeZMHNfyQnabQLO+StvF9YYhVd1TgcqneZXkbx5aUaEvtV7xMxxlY0aCemt60vSFUdPm04p5HG+eaTLlUZEMZRnRcgwuc9Gh1jhhJAVKvBgMsadxR/t8GhkEVec/6QjXXBMppQ9ejpaUr5bnKVhMnZ/SbTLJmU2078=
+	t=1734765766; cv=none; b=h6r/YbmCPUrlQNvGvjiR0AR9hyv6Ak5NQdAOJvB0o/q4BtiiK0kwwhLHnujLU/8KHUsEEgLRL4LLRa6ePIzaBy9dkaKRq8I8AMckpvnGVjHNExOUen6HsZ/Fy3iJi8quf4qYwjgqqypSsG278dlmjD5rFufadOXQQmbera/Xt34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734765746; c=relaxed/simple;
-	bh=37a/v6V/qVTYj75OLJ0gfzJnVO9B2xvI3YKnXrcIlW4=;
+	s=arc-20240116; t=1734765766; c=relaxed/simple;
+	bh=0rAosgF3Ztuz5d8Yvh86KvdnQ2ufSZRKMNHOv7KYSTE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eyzzV+PsUPyI1nmITLhfkOcJFOWYUxmzIQ03mcC578DCmQG1QQJb5PrJw7PYlT29/WS858uCEK9r4K3Czt0Mb2/yrG+/WI2EZfcqEI0gygcjBiOiAlP6zvqDHaIEDIKWi2hSp97TCfLkM6FP8pSQUDKT9nmwTFw5gvM5W9wg748=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=zgoga0QS; arc=none smtp.client-ip=209.85.128.46
+	 In-Reply-To:Content-Type; b=rfM6y6B6IDyQzMdDqDp+prWAtHO8EFdSO3AGu8hCJEmtLIxjW/zltqLZvwaQAaswjtm9EqHalPKtevHwUT/kkq+77YtJNfS7xRrXQsRRXF3NDzj5SX2KE0WEDVSQ1naw5D3aFuqKdWhiWkqBQLgJxjIkIVRU7Ey414gKHCl67EY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=Ibav1y8J; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-436202dd730so19059875e9.2
-        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 23:22:24 -0800 (PST)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3863494591bso1428826f8f.1
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 23:22:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1734765743; x=1735370543; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1734765763; x=1735370563; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rDuHJJaQb5fwBxcoZeTtCnujI4Vxi85W3MczCC/iP6k=;
-        b=zgoga0QSs/FSgmWkPC34lIGH65A4rdwERvxYqaWx5t+WCKyHXuthfWAROfxECnxzxG
-         Ywbb6u7QDCvn+KpLR+wdqRQG3gXBEN98WVApTkE0DTG5SCrKO/8bXhpJZdJM8DeyiYmr
-         AT3o0ne+JxmsZLuWH8zaY91JgeKh3LQFWMIpC+7SJ66ZmiuImlhpXLQJ6ypoHitagjK5
-         reTCagvVeO7/ozbLaS/kJJ000xt2WO6hZpN15oNYBYmFKuWNPq929cBKtvrX1cl/OOGB
-         Cgzcr+1hXHAzA5S35LlHCOwDAaX65o2cA1T5piFp+O8ULfgvrPQdHjoOQiX/mkJllIFs
-         oBnQ==
+        bh=2EUlBe1ti783aJq8oYTzxxJuGG7AnBX8HC1zASLsrUg=;
+        b=Ibav1y8Jf0i4VecL5JpNV3A72I3nXExj45em048cNfQN10o2pkTskbx5HFiZe57UfR
+         AROUZLNPjXVKYBvNVa7JaL4yhH50/rM4v+9pu2ovYmm5nqIG52SfoqXzfuMlGhuvZFqM
+         vtMoR63Mb5CptFh/T65Jf3PJXlkfwsOqc5SzfntXMAbx7285o7SPVzgjH5cGLeWOmO61
+         QfD+XXCSWRhwFGmlg1b22VRqwM6EoWyyCWV0pA27I2p7Xjpm7e3vR6Gd24A05Rp/98WU
+         YkwpzwCjPofyRpxTqhpXl9iFSU19rm+82Bvl4Zh4hsLb0n2WSBj5rUB+hcbveo+kuN56
+         Au5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734765743; x=1735370543;
+        d=1e100.net; s=20230601; t=1734765763; x=1735370563;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rDuHJJaQb5fwBxcoZeTtCnujI4Vxi85W3MczCC/iP6k=;
-        b=fpxqXdMsGhZB17NNduP/tXCa32rKcMb56GjZC2v1jo1DF7e9zdACatSvM0jt3w5GKR
-         JLUwh7HolHPT1qQwnuLycLZCbERjoXDuKHzSq7qbOaTbsjMHfDThIyqPxl0h1/Wi8upA
-         SrAX65ra1F/mYzslnuwVXyj8GYrvkMhU/6d0amCRDg2l3hHrcZB5epEh9mmlq6UuidFJ
-         POrFf3mt0wKo0U8i3RDOg6FE6RruKvrJ4PnjhIllfUz57U9JjP6qrxWJaacmHxbZqADu
-         nz4nMl3TeI8h2zW4tKjLHJSfTNZ9gDmLN2RqPs5E0Rx1GD5yk455nlc0N/MWBmA2h1Dr
-         yP3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVtRkd7PQQe8kTp3nssHpF5ijLad0Dim64IecWkLskMhG3Cqj7WsSp80hEQTPC2+OIR7b1kS84=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1fJ+hMhF0Ir9QrjCpOSkQtXUAC5ogpE1pyDfb8eAE+e7BWttT
-	aR+sbNoGiypi5fO9PgVsMOdGvcDOUsW+VNU/vJsTylOG/3B+YHp7hzAiQUwHFakyxNEPyxPqZeR
-	U
-X-Gm-Gg: ASbGncuyjUlzo9GxpGmcO8kheJCO5aetxowU0Xq94BFQwtpLlTBnCVVMz/WzIPr9/IH
-	86HxUdJthianQZZITZzISi6J19JPDGn8jDgDqENW8IHMHGYJA7U+V34DYTjea2mBmgCJUoUl9b1
-	VuFAyjul0et/f5MHbQWBfEYHJaEAMMwfOG4aSFXQGC6xgbk4i62kHzBFPe2DnusPm14xEHxh/uN
-	1XY7s1t+Afzenssw0cHwpxF0YBKFN6O9JXcFDSV2FUWhxqi8JuW8POU5k5dYRQX4HhDVZPVNPgJ
-	1O5fwdNARmHz
-X-Google-Smtp-Source: AGHT+IHfdIN3rLQI8OJcOpR3tltD5UI8SyUBOxEPS8cqsdqsJyiKRr61UnJbs/KMz699DK7W2DbVXA==
-X-Received: by 2002:a05:600c:4710:b0:434:9e1d:7626 with SMTP id 5b1f17b1804b1-43668b5dff4mr42643005e9.25.1734765742814;
-        Fri, 20 Dec 2024 23:22:22 -0800 (PST)
+        bh=2EUlBe1ti783aJq8oYTzxxJuGG7AnBX8HC1zASLsrUg=;
+        b=vQdTyjyGzF2wLrwF/pTmzPxq4RAKSuFZpUye+Du3PGhwCR0W+3f7WhAyfYFhpHNkHK
+         YyZOXuT+3bdayp6xNHWWW0v9j3Tqa9iVZMyej+0jhhFeIOtxapcjqYOTcOV3Xp/M7pfW
+         EYu0WrtZ2DE3ESVXNeFWhSFiXMrQyvWuCcei3hw+lkxIdGtj1j/WIcw00iUlqCTxVuXh
+         TMGuKazuTGGiXNhjqJguqFju4GmSMqyaB6zbQygN6/GDFAAVlHss/1ZblpzkOHaAukIP
+         eoqIU5d9fQyH5NyNLIGl25vI1bdXPS0nZMR1HGB4qpN6UlkTkdhGSEWezaXO7mGdUY+X
+         c2Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeGDMb6GWASbMwNFit0Ys4qPlMUJTXCoEXPF5l+tCQkSJ0fMZlC/Y9v4PswAzNSbr2ubvsAcQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9yLEGZUDWFkkV92T9eb5eJNNQH9OM2TUsM3OncEjRHVqjDD/c
+	e39fk9vsdZagjqTkRZtSbHA0mgC6sjepM8lk9Z8AL6jjOsSe2bx36chFW4hVIPQ=
+X-Gm-Gg: ASbGncvH2VU6wfnmZRkcsgEkD8jJEsrDTNZMmp6zSN4/TniNQoK6U5H1d7DHChDkVnQ
+	w5wu17UnJxylYEMwv3IElSIQ5rFQhfzLDnrdpS9rOJ0a36kYjtrxNJepR85yh1OOYuk1iU6ypuT
+	JhbvRwD+wbMpbeaIgqy2frQOEInGGtSoAVDD06MiV+Va1aFMEBde40KzTexZRu2F20zzvY6rwwS
+	eWn6pAIV1ZVbHl6+8McFDjlXp5R0tPUOCZv2T4jJdtZFEjzs8raH2e/8G+SW62xUoOUWhXzrxQB
+	43Ya45HKsv2S
+X-Google-Smtp-Source: AGHT+IEb7LQUNtCxYlO/uzup8sRen9gVLF0bzI6pmzmw36NSidzZZ11gwIBnl8/npx6c01D8spL8yA==
+X-Received: by 2002:a5d:5f95:0:b0:385:dc45:ea06 with SMTP id ffacd0b85a97d-38a221fab2dmr4994638f8f.13.1734765762909;
+        Fri, 20 Dec 2024 23:22:42 -0800 (PST)
 Received: from [192.168.0.123] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656af6c4esm101601405e9.4.2024.12.20.23.22.22
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8acb85sm5752647f8f.103.2024.12.20.23.22.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Dec 2024 23:22:22 -0800 (PST)
-Message-ID: <5338e487-0e6a-4b90-affd-328d8c471d62@blackwall.org>
-Date: Sat, 21 Dec 2024 09:22:21 +0200
+        Fri, 20 Dec 2024 23:22:42 -0800 (PST)
+Message-ID: <960da366-baf5-4b27-9583-579534e5ee00@blackwall.org>
+Date: Sat, 21 Dec 2024 09:22:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,56 +81,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 2/3] netkit: Add add netkit {head,tail}room to
- rt_link.yaml
+Subject: Re: [PATCH bpf-next 3/3] selftests/bpf: Extend netkit tests to
+ validate set {head,tail}room
 To: Daniel Borkmann <daniel@iogearbox.net>, martin.lau@linux.dev
 Cc: pabeni@redhat.com, bpf@vger.kernel.org, netdev@vger.kernel.org
 References: <20241219173928.464437-1-daniel@iogearbox.net>
- <20241219173928.464437-2-daniel@iogearbox.net>
+ <20241219173928.464437-3-daniel@iogearbox.net>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241219173928.464437-2-daniel@iogearbox.net>
+In-Reply-To: <20241219173928.464437-3-daniel@iogearbox.net>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 12/19/24 19:39, Daniel Borkmann wrote:
-> Add netkit {head,tail}room attribute support to the rt_link.yaml spec file.
+> Extend the netkit selftests to specify and validate the {head,tail}room
+> on the netdevice:
 > 
-> Example:
-> 
->   # ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/rt_link.yaml \
->    --do getlink --json '{"ifname": "nk0"}' --output-json | jq
+>   # ./vmtest.sh -- ./test_progs -t netkit
 >   [...]
->   "linkinfo": {
->     "kind": "netkit",
->     "data": {
->     }
->   },
->   [...]
+>   ./test_progs -t netkit
+>   [    1.174147] bpf_testmod: loading out-of-tree module taints kernel.
+>   [    1.174585] bpf_testmod: module verification failed: signature and/or required key missing - tainting kernel
+>   [    1.422307] tsc: Refined TSC clocksource calibration: 3407.983 MHz
+>   [    1.424511] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x311fc3e5084, max_idle_ns: 440795359833 ns
+>   [    1.428092] clocksource: Switched to clocksource tsc
+>   #363     tc_netkit_basic:OK
+>   #364     tc_netkit_device:OK
+>   #365     tc_netkit_multi_links:OK
+>   #366     tc_netkit_multi_opts:OK
+>   #367     tc_netkit_neigh_links:OK
+>   #368     tc_netkit_pkt_type:OK
+>   #369     tc_netkit_scrub:OK
+>   Summary: 7/0 PASSED, 0 SKIPPED, 0 FAILED
 > 
 > Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 > Cc: Nikolay Aleksandrov <razor@blackwall.org>
 > ---
->  Documentation/netlink/specs/rt_link.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  .../selftests/bpf/prog_tests/tc_netkit.c      | 31 ++++++++++++-------
+>  .../selftests/bpf/progs/test_tc_link.c        | 15 +++++++++
+>  2 files changed, 35 insertions(+), 11 deletions(-)
 > 
-> diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-> index 9ffa13b77dcf..dbeae6b1c548 100644
-> --- a/Documentation/netlink/specs/rt_link.yaml
-> +++ b/Documentation/netlink/specs/rt_link.yaml
-> @@ -2166,6 +2166,12 @@ attribute-sets:
->          name: peer-scrub
->          type: u32
->          enum: netkit-scrub
-> +      -
-> +        name: headroom
-> +        type: u16
-> +      -
-> +        name: tailroom
-> +        type: u16
->  
->  sub-messages:
->    -
 
 Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
