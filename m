@@ -1,149 +1,195 @@
-Return-Path: <netdev+bounces-153850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4899B9F9D63
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 01:21:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468C79F9D72
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 01:51:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 542541890967
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 00:21:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE1FC7A3FC2
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 00:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69B71362;
-	Sat, 21 Dec 2024 00:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0AC1096F;
+	Sat, 21 Dec 2024 00:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="pnPXMmg6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I7uJk11h"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9033410E4;
-	Sat, 21 Dec 2024 00:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C660163
+	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 00:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734740488; cv=none; b=Hoshe3Gp3KKh7ut3aIR4yua7xuGWtD6uzi+YSPBoMgcvKjdGUoo2eqDooGgYDBhbAmpC6E+NspVQfxlEIcYmOi5gNhGTlSa1pRx3zz+zQPgageaf/EN1s99dmOstZec7dbWYo7VeWmcDua1kIEODvJqiXOWt/+vBuNRmWbGe29k=
+	t=1734742296; cv=none; b=dHgJ8kqTjUx4Qq9lNRNTOsVw85ODNDXKpt7peA5O+cxCasGAc12wcqTCQ6AUNKwMrDaS7ORtoooKfXrsv02In8qBTKAgWM6Ki2/Zqa21Ryz38SjQSwA3T0hp3BpNuUDaLaB5s1YJi2GRlMh6qmOxhRPrOHzBxwXDLpFVqbJ0hYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734740488; c=relaxed/simple;
-	bh=GGwqDms+SNf8TURcyOUaVLJc0I7ECAh1Y8shF1/ZEg0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dMI37UZqSIR8T6r2vKZfL507rdt3brU0AISQtxCsaiUNGk/8c1gGuLBwiBxcpvHlI2EiW1K2u+x5I9CEniU8LH5JqBeQvJFjKwB+YrgfhQubvYCAfNaYYLItmQ16ZB8P2vSNyXirjZVHRfD0Xx45bB+5ghAANxWTR8dElz0uJ+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=pnPXMmg6; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=K+nZfIkh+d773jKzbf4rPBeKd/KzrkARB65rKU6DBvc=; b=pnPXMmg678Cm+S1Kq8JCKdxTqm
-	MFqVw8+JfZ0vq8SYMgmLUDeeYlzgA7VsN4pazU9tXhg4rK3y203OeDTOYl4cE+XgDYBxvl7g645RZ
-	2aZzk8c7CO8ErZZM0BU5bTomr7NncsVFz6x2rT94FYLi3/h5jNF8Tcm476mYMn8UQl+bjmC9iYx80
-	8pVy9C8U2n1ql4Yu+4tDY8B5WgkPIeXEWs+C7fIjrKlblFgKHnFN2f+nntz7nhFeqyvfiv3nn5liI
-	+Zi/dKYLE5c7QZ17kcMKYd0Kpy8I174HbFAJFcBBp0IxkQCLf1/i9jT1frP/G6fsdttsigbU0wELK
-	EY4OYtZw==;
-Received: from 226.206.1.85.dynamic.cust.swisscom.net ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tOnFE-000MCq-7P; Sat, 21 Dec 2024 01:21:24 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: torvalds@linux-foundation.org
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@kernel.org
-Subject: [GIT PULL] bpf for v6.13-rc4
-Date: Sat, 21 Dec 2024 01:21:23 +0100
-Message-ID: <20241221002123.491623-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1734742296; c=relaxed/simple;
+	bh=FRENkPdw5MsSuos6hv3KfxF0ISP2Qe0RZAlvdgY5Q+0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SFWSBcTJUGD5sTElRydcooh1MLXDdf2BmnvKIXTLkdo0bj4dVQcB58oe633VzMCcdQPgvmd8vVaLqNNovcbW2ODamQIu0yyjMHqj9yP064TgBH5Ko2HsV8HKYA4LIkm+Lnf6jEG+qDwiCPa5O8CesBF6876PxhYdRipYn3Ji+QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I7uJk11h; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7289afa200aso2982279b3a.0
+        for <netdev@vger.kernel.org>; Fri, 20 Dec 2024 16:51:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734742294; x=1735347094; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yJnN7ZrxN0wnWRniinuaZCCRmMgcnMSCXct+QU5IKEI=;
+        b=I7uJk11hWHysVG2cJjFu7N6jWbQ5FeiKh+AbvSgWnPEX1814KzGy4eFTyB6Y8X8lJD
+         gLMjT1G6Qi33skl92zvmuVC3jaguwy1c/jYV6nPfbAYqIjaEYJHNjr8p5j64jv022xV8
+         QoSitZAr4dQ86RJMyqjJe1nrn0010KuCF36JrWWsXNvQJFkGydPwZgSS126nyo7MzV5e
+         9kv0qO5KMijtB0cbccMjrXU808cjgs+FIgk+mDyJGVcgb+qsljSRQUi2by0edDU+tQKx
+         DCVeDVi8wfJbWydcgC6KhTHov2QELx3U24ZADAoj9m1rKeExKkNGdbaTEXSKGygapa7V
+         xnWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734742294; x=1735347094;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yJnN7ZrxN0wnWRniinuaZCCRmMgcnMSCXct+QU5IKEI=;
+        b=hLXqxKyj5upCJHSN91zEabeictUs3xsXs7ZisHsRuLMdtZ5IdRjDx6Mc/caQZCiw6R
+         coOqcy/RryibifW3tnEghFWsVfkKCxysN2Dk/+RV336SsoTw/Bnw3CRdPv8x7qidWpXc
+         jSd3hMLidUMsfTPsKkPPIpfZxvVlIRLNKY1pjrcT0mc4n7t/nUY0HCKCIRdQMtWxbuub
+         xVcdeCYXYFKbaH5Ee5kBv3hxh0hVQLpYwhOL4c+R9QOeBWt75T9dfadhT1rSewidUDIB
+         CfhscSbQvd98fBEBxQh9fEjPBM4k0x/3pfhrhJbSVN1tsVqmQ0i4MABUVNLHhuQpHz6X
+         zkOg==
+X-Gm-Message-State: AOJu0Yy8Mk+4N/pt8AhWU1l1biRAShcgPoKA1DyT1eeKwbEiSbqlMiMi
+	I0GvusqJUCwTQHMb7R+sZU7SkrJS9eq0t0iZkH/GmwtSM9sjtGotaFn5NpLjE/CS0y//fqNvJZg
+	3DNUrQyC4+lt+FCf0y8ZEhKpHyPTNhjkq2cEg7GD1tq0eQ8m7LgdTAe2ugJna448vFxNYNDrlRw
+	FTWlqkruY9B9EggL+hns4DybtO2baqXIIQbaoJR6b5KIdqE+k/Sa3Lznmy0Ds=
+X-Google-Smtp-Source: AGHT+IFPPx0YiYiLnd8xNfIIbmIMwDB+OM3W+mCwV2V7dSBNzPOeeDA2h35zKUR6WA/aeA9SZXl5yVBt8+4OkZfrCg==
+X-Received: from pfms15.prod.google.com ([2002:aa7:828f:0:b0:72a:bcc3:4c9a])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1311:b0:728:e81c:2bf4 with SMTP id d2e1a72fcca58-72abddb1958mr6921748b3a.11.1734742294312;
+ Fri, 20 Dec 2024 16:51:34 -0800 (PST)
+Date: Sat, 21 Dec 2024 00:42:31 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27493/Fri Dec 20 10:46:49 2024)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241221004236.2629280-1-almasrymina@google.com>
+Subject: [PATCH RFC net-next v1 0/5] Device memory TCP TX
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, dw@davidwei.uk
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Linus,
+The TX path had been dropped from the Device Memory TCP patch series
+post RFCv1 [1], to make that series slightly easier to review. This
+series rebases the implementation of the TX path on top of the
+net_iov/netmem framework agreed upon and merged. The motivation for
+the feature is thoroughly described in the docs & cover letter of the
+original proposal, so I don't repeat the lengthy descriptions here, but
+they are available in [1].
 
-The following changes since commit 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8:
+Sending this series as RFC as the winder closure is immenient. I plan on
+reposting as non-RFC once the tree re-opens, addressing any feedback
+I receive in the meantime.
 
-  Linux 6.13-rc3 (2024-12-15 15:58:23 -0800)
+Full outline on usage of the TX path is detailed in the documentation
+added in the first patch.
 
-are available in the Git repository at:
+Test example is available via the kselftest included in the series as well.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
+The series is relatively small, as the TX path for this feature largely
+piggybacks on the existing MSG_ZEROCOPY implementation.
 
-for you to fetch changes up to 4a58963d10fa3cb654b859e3f9a8aecbcf9f4982:
+Patch Overview:
+---------------
 
-  selftests/bpf: Test bpf_skb_change_tail() in TC ingress (2024-12-20 23:13:31 +0100)
+1. Documentation & tests to give high level overview of the feature
+   being added.
 
-----------------------------------------------------------------
-BPF fixes:
+2. Add netmem refcounting needed for the TX path.
 
-- Fix inlining of bpf_get_smp_processor_id helper for !CONFIG_SMP
-  systems (Andrea Righi)
+3. Devmem TX netlink API.
 
-- Fix BPF USDT selftests helper code to use asm constraint "m"
-  for LoongArch (Tiezhu Yang)
+4. Devmem TX net stack implementation.
 
-- Fix BPF selftest compilation error in get_uprobe_offset when
-  PROCMAP_QUERY is not defined (Jerome Marchand)
+Testing:
+--------
 
-- Fix BPF bpf_skb_change_tail helper when used in context of
-  BPF sockmap to handle negative skb header offsets (Cong Wang)
+Testing is very similar to devmem TCP RX path. The ncdevmem test used
+for the RX path is now augemented with client functionality to test TX
+path.
 
-- Several fixes to BPF sockmap code, among others, in the area
-  of socket buffer accounting (Levi Zim, Zijian Zhang, Cong Wang)
+* Test Setup:
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Kernel: net-next with this RFC and memory provider API cherry-picked
+locally.
 
-----------------------------------------------------------------
-Andrea Righi (1):
-      bpf: Fix bpf_get_smp_processor_id() on !CONFIG_SMP
+Hardware: Google Cloud A3 VMs.
 
-Cong Wang (5):
-      tcp_bpf: Charge receive socket buffer in bpf_tcp_ingress()
-      bpf: Check negative offsets in __bpf_skb_min_len()
-      selftests/bpf: Add a BPF selftest for bpf_skb_change_tail()
-      selftests/bpf: Introduce socket_helpers.h for TC tests
-      selftests/bpf: Test bpf_skb_change_tail() in TC ingress
+NIC: GVE with header split & RSS & flow steering support.
 
-Jerome Marchand (1):
-      selftests/bpf: Fix compilation error in get_uprobe_offset()
+Performance results are not included with this version, unfortunately.
+I'm having issues running the dma-buf exporter driver against the
+upstream kernel on my test setup. The issues are specific to that
+dma-buf exporter and do not affect this patch series. I plan to follow
+up this series with perf fixes if the tests point to issues once they're
+up and running.
 
-Levi Zim (2):
-      skmsg: Return copied bytes in sk_msg_memcopy_from_iter
-      tcp_bpf: Fix copied value in tcp_bpf_sendmsg
+Special thanks to Stan who took a stab at rebasing the TX implementation
+on top of the netmem/net_iov framework merged. Parts of his proposal [2]
+that are reused as-is are forked off into their own patches to give full
+credit.
 
-Tiezhu Yang (1):
-      selftests/bpf: Use asm constraint "m" for LoongArch
+[1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@google.com/
+[2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
 
-Zijian Zhang (1):
-      tcp_bpf: Add sk_rmem_alloc related logic for tcp_bpf ingress redirection
+Cc: sdf@fomichev.me
+Cc: asml.silence@gmail.com
+Cc: dw@davidwei.uk
 
- include/linux/skmsg.h                              |  11 +-
- include/net/sock.h                                 |  10 +-
- kernel/bpf/verifier.c                              |   6 +-
- net/core/filter.c                                  |  21 +-
- net/core/skmsg.c                                   |  11 +-
- net/ipv4/tcp_bpf.c                                 |  14 +-
- .../selftests/bpf/prog_tests/socket_helpers.h      | 394 +++++++++++++++++++++
- .../selftests/bpf/prog_tests/sockmap_basic.c       |  51 +++
- .../selftests/bpf/prog_tests/sockmap_helpers.h     | 385 +-------------------
- .../selftests/bpf/prog_tests/tc_change_tail.c      |  62 ++++
- .../selftests/bpf/progs/test_sockmap_change_tail.c |  40 +++
- .../selftests/bpf/progs/test_tc_change_tail.c      | 106 ++++++
- tools/testing/selftests/bpf/sdt.h                  |   2 +
- tools/testing/selftests/bpf/trace_helpers.c        |   4 +
- 14 files changed, 712 insertions(+), 405 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/socket_helpers.h
- create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_change_tail.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_change_tail.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_tc_change_tail.c
+
+Mina Almasry (4):
+  net: add devmem TCP TX documentation
+  selftests: ncdevmem: Implement devmem TCP TX
+  net: add get_netmem/put_netmem support
+  net: devmem: Implement TX path
+
+Stanislav Fomichev (1):
+  net: devmem TCP tx netlink api
+
+ Documentation/netlink/specs/netdev.yaml       |  12 +
+ Documentation/networking/devmem.rst           | 140 +++++++++-
+ include/linux/skbuff.h                        |  13 +-
+ include/linux/skbuff_ref.h                    |   4 +-
+ include/net/netmem.h                          |   3 +
+ include/net/sock.h                            |   2 +
+ include/uapi/linux/netdev.h                   |   1 +
+ include/uapi/linux/uio.h                      |   5 +
+ net/core/datagram.c                           |  40 ++-
+ net/core/devmem.c                             | 101 ++++++-
+ net/core/devmem.h                             |  51 +++-
+ net/core/netdev-genl-gen.c                    |  13 +
+ net/core/netdev-genl-gen.h                    |   1 +
+ net/core/netdev-genl.c                        |  67 ++++-
+ net/core/skbuff.c                             |  38 ++-
+ net/core/sock.c                               |   9 +
+ net/ipv4/tcp.c                                |  36 ++-
+ net/vmw_vsock/virtio_transport_common.c       |   4 +-
+ tools/include/uapi/linux/netdev.h             |   1 +
+ .../selftests/drivers/net/hw/ncdevmem.c       | 261 +++++++++++++++++-
+ 20 files changed, 764 insertions(+), 38 deletions(-)
+
+-- 
+2.47.1.613.gc27f4b7a9f-goog
+
 
