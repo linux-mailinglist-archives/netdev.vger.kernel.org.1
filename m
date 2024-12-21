@@ -1,88 +1,68 @@
-Return-Path: <netdev+bounces-153884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 413E79F9F30
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:15:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F83F9F9F32
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 09:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50C15188AF94
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:15:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54BF5188B77C
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 08:16:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90251EC4CC;
-	Sat, 21 Dec 2024 08:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="PFxqLGig"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E651F0E27;
+	Sat, 21 Dec 2024 08:15:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E161E9B3C
-	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 08:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C511E9B0C
+	for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 08:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734768920; cv=none; b=Gv0Ff4Nb9CO2NvxrAslcsndJKgx+k1IEYA/5ELlvydL/Hx/X0bQhfc6mIH/QQSD0H1Om1bcRqy9CxU/bjIylH88d5yF87brGAz1/69s3Q83qEC0icM/ARX6qb3o68HJXpPAOLPytMF4ZjeUJnqkJN9+ER0GNJ2nRTxgdi6LomjQ=
+	t=1734768951; cv=none; b=LROpVRteXynHt+bI/mCxYeChdjVJpIegp9QM60CRNbheZdFw7wmq30pSmV5cD0qA0zZu/B5+br8RVJH/u+uWm8CuuWNvmlcJBi1X66dCPlWFv8FAqw0r5Sfkl1+oUbP7Bw7tIB9et1EulgCPOlgdHA91BkmewSzgDQUMd5p8R6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734768920; c=relaxed/simple;
-	bh=L5LPT3BWLfNdOAMNUUwasAlbHjTyGbJl42kz0zvbJCE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NPH6ygFOPJa+LdjbAskjMaHeIUIwM+Z31M7SXsOWU54pu2y3z5hNfn588v+mDqfM2XW8M2wQGHsdKx6BAEeJyKKLBKfHQCimfEBUNIVnHDkfR1PZSg6AiOcaezpUNch4iSHdyHTEocvowmvJpxBzcc98fTzHO8wPEDDZ/cLl4/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=PFxqLGig; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-728e81257bfso2344032b3a.2
-        for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 00:15:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734768918; x=1735373718; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=slTUwbxtcSMPK8G6S2IH/36OybBp8SgMfp9mnjaHTjQ=;
-        b=PFxqLGigmsIfk+K2wolNlSbAUcEcaeJQhyq5NPvxND9PxYH0MHX+I9cnIMgLk7IFb0
-         dH9oIUaVfLGKrxQqtCmYbZeZM4QEps751VSaMzUG9Dot+5MwxWKGA1i6zWRqPu8GzSUp
-         Cm7Q57/uRqcHnjtXT8Fh3tAk7sVQj8ZaHd3vt8regQVfe3JTrj84uXDFDhkaUDbSpT1J
-         +5yKHvrg4mNkaxVQZWmt0O6b6MqJV+eCGKAsoJPQ86Ahk73p4QZswOzckChRNoi4GGlb
-         3YMeg/gmDk11Hxp0+PYyCH367lOJKc8GJb9aMj52YmOdvMbmHEJrkQXaMf1HkXKGfUmC
-         DVUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734768918; x=1735373718;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=slTUwbxtcSMPK8G6S2IH/36OybBp8SgMfp9mnjaHTjQ=;
-        b=MA11Fyqh5mD4qavnC6mScotOpnDeQqerYxDgeY1d1G6nXXRZzXJPbKedsUB6t1tOMD
-         aUfj6UMFae2czQbQ3c+zVsTcyhCcpUnenD50evqL29hYR50sKJrr4R1qwEbF2wXmHVX2
-         F84LU2Nl05tXYFAer2PvD2zTbMKr1oncItgzKHc1NHoOGKYMufKSzNvX83GPGP8vhWOs
-         IV4M3+9CueIlcb87/i1nMBAev6ABGK3w0qk4yfV4sWtE4idVJxHr3+WA8bdb0Rkc4onj
-         iiSvWmL6DhE0x4V2EgMNINmcHMua8IdFLoySrOrUbIeZLEuR3CUTVzDlcRwYD2Cjy/gF
-         HUpg==
-X-Gm-Message-State: AOJu0Yxs6K3bkyLdtMIgOHDnCB3Xd9ej0/Vg5DcOPmcVbYaKCEatjXoX
-	/R4iPwFPc2pKo1a67ytoVeFsHXA2zcet1Bv0jp6fX7YQ0/vIlSGDlgB2atrIV0YTuhj7klvCtUi
-	AAEY=
-X-Gm-Gg: ASbGncv6uUEUN/EIkWHGJapkRfo1ZeXDrk8j6yy6wmh13Ed2rUqf5Zkvkeuzp43XoNU
-	7S8THr3xvIX/XJxnNZQw7C5yQa9aDJb6SGm+NUPgMQvTExToX45eK+TiUoBEW20Or9XjTg2Y5jC
-	typw9/EHMWccUp6fRcnxl/tT3IDRBvLSyuX/5wJYwroESP8CU2iLnqGRO+hZmercD4zydSiaTTf
-	xNFIzaQaN5ozhUWgVYs0qiP+tvOBWIphocKPz7QaQ7Md8VASc+FmqVzPnRn3Cibhdh7/36Poz2A
-	EiqGsLU2kmFiEJ7g79bBTc3LdH4kZwuunRmRwRlXpmU=
-X-Google-Smtp-Source: AGHT+IFbqCyDOdZTAUMikM7TTVxukkDPL7eL3KTKQklbmIvXNygbp0Rw61F9Y5Ky4vDJinIgIDD7xg==
-X-Received: by 2002:a05:6a00:2405:b0:725:aa5d:f217 with SMTP id d2e1a72fcca58-72abdd912fdmr7167929b3a.7.1734768918065;
-        Sat, 21 Dec 2024 00:15:18 -0800 (PST)
-Received: from localhost.localdomain (133-32-227-190.east.xps.vectant.ne.jp. [133.32.227.190])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad81622dsm4279093b3a.30.2024.12.21.00.15.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Dec 2024 00:15:17 -0800 (PST)
-From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-To: sebastian.hesselbarth@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-Subject: [PATCH net v4] net: mv643xx_eth: fix an OF node reference leak
-Date: Sat, 21 Dec 2024 17:14:48 +0900
-Message-Id: <20241221081448.3313163-1-joe@pf.is.s.u-tokyo.ac.jp>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1734768951; c=relaxed/simple;
+	bh=5/zeVG6zhz2RUTXu9PuGhV9qbyrvh+Ch2nkjQ+KaGCQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HOaUnyx+V1UiywAu9V5jDZssQUqMwI19MjNFQk1v9gRPTSpAtCNPgwR2MKwuk0OpM7g2yTGs9lbZD4dl9mEEra91Pdx90fInaAxGaOOjx5X+8vOHyXj1RG7SDxJtOytFb1BQ8uhk8Q1xGKRxd9OL2wygz1zEf+ubgknydyryIc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOue8-0000Qj-3p; Sat, 21 Dec 2024 09:15:36 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOue2-004Vdn-2k;
+	Sat, 21 Dec 2024 09:15:31 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tOue3-00CbSZ-1l;
+	Sat, 21 Dec 2024 09:15:31 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net-next v4 0/8] Introduce unified and structured PHY
+Date: Sat, 21 Dec 2024 09:15:22 +0100
+Message-Id: <20241221081530.3003900-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,73 +70,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Current implementation of mv643xx_eth_shared_of_add_port() calls
-of_parse_phandle(), but does not release the refcount on error. Call
-of_node_put() in the error path and in mv643xx_eth_shared_of_remove().
+This patch set introduces a unified and well-structured interface for
+reporting PHY statistics. Instead of relying on arbitrary strings in PHY
+drivers, this interface provides a consistent and structured way to
+expose PHY statistics to userspace via ethtool.
 
-This bug was found by an experimental verification tool that I am
-developing.
+The initial groundwork for this effort was laid by Jakub Kicinski, who
+contributed patches to plumb PHY statistics to drivers and added support
+for structured statistics in ethtool. Building on Jakub's work, I tested
+the implementation with several PHYs, addressed a few issues, and added
+support for statistics in two specific PHY drivers.
 
-Fixes: 76723bca2802 ("net: mv643xx_eth: add DT parsing support")
-Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
----
-Changes in v4:
-- Reorder the variable declaration to comply with the reverse xmax tree.
-- Add the target tree to the patch subject.
+changes are tracked in separate patches.
 
-Changes in v3:
-- Insert a NULL check for port_platdev[n].
+Jakub Kicinski (2):
+  net: ethtool: plumb PHY stats to PHY drivers
+  net: ethtool: add support for structured PHY statistics
 
-Changes in v2:
-- Insert a NULL check before accessing the platform data.
----
- drivers/net/ethernet/marvell/mv643xx_eth.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+Oleksij Rempel (6):
+  ethtool: linkstate: migrate linkstate functions to support multi-PHY
+    setups
+  Documentation: networking: update PHY error counter diagnostics in
+    twisted pair guide
+  net: phy: introduce optional polling interface for PHY statistics
+  ethtool: add helper to prevent invalid statistics exposure to
+    userspace
+  net: phy: dp83td510: add statistics support
+  net: phy: dp83tg720: add statistics support
 
-diff --git a/drivers/net/ethernet/marvell/mv643xx_eth.c b/drivers/net/ethernet/marvell/mv643xx_eth.c
-index a06048719e84..67a6ff07c83d 100644
---- a/drivers/net/ethernet/marvell/mv643xx_eth.c
-+++ b/drivers/net/ethernet/marvell/mv643xx_eth.c
-@@ -2704,9 +2704,15 @@ static struct platform_device *port_platdev[3];
- 
- static void mv643xx_eth_shared_of_remove(void)
- {
-+	struct mv643xx_eth_platform_data *pd;
- 	int n;
- 
- 	for (n = 0; n < 3; n++) {
-+		if (!port_platdev[n])
-+			continue;
-+		pd = dev_get_platdata(&port_platdev[n]->dev);
-+		if (pd)
-+			of_node_put(pd->phy_node);
- 		platform_device_del(port_platdev[n]);
- 		port_platdev[n] = NULL;
- 	}
-@@ -2769,8 +2775,10 @@ static int mv643xx_eth_shared_of_add_port(struct platform_device *pdev,
- 	}
- 
- 	ppdev = platform_device_alloc(MV643XX_ETH_NAME, dev_num);
--	if (!ppdev)
--		return -ENOMEM;
-+	if (!ppdev) {
-+		ret = -ENOMEM;
-+		goto put_err;
-+	}
- 	ppdev->dev.coherent_dma_mask = DMA_BIT_MASK(32);
- 	ppdev->dev.of_node = pnp;
- 
-@@ -2792,6 +2800,8 @@ static int mv643xx_eth_shared_of_add_port(struct platform_device *pdev,
- 
- port_err:
- 	platform_device_put(ppdev);
-+put_err:
-+	of_node_put(ppd.phy_node);
- 	return ret;
- }
- 
--- 
-2.34.1
+ .../twisted_pair_layer1_diagnostics.rst       |  39 +++--
+ Documentation/networking/ethtool-netlink.rst  |   1 +
+ drivers/net/phy/dp83td510.c                   | 112 ++++++++++++
+ drivers/net/phy/dp83tg720.c                   | 161 ++++++++++++++++++
+ drivers/net/phy/phy.c                         |  20 +++
+ include/linux/ethtool.h                       |  39 +++++
+ include/linux/phy.h                           |  97 +++++++++++
+ include/uapi/linux/ethtool.h                  |   2 +
+ include/uapi/linux/ethtool_netlink.h          |  14 ++
+ net/ethtool/linkstate.c                       |  25 ++-
+ net/ethtool/netlink.h                         |   1 +
+ net/ethtool/stats.c                           |  54 ++++++
+ net/ethtool/strset.c                          |   5 +
+ 13 files changed, 550 insertions(+), 20 deletions(-)
+
+--
+2.39.5
 
 
