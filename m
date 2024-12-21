@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-153936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F03B9FA1F8
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 19:44:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB3E19FA1FA
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 19:44:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B62AD16766A
-	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 18:44:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A7DF188E308
+	for <lists+netdev@lfdr.de>; Sat, 21 Dec 2024 18:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7B71925AC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC73419CC3A;
 	Sat, 21 Dec 2024 18:43:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="PF72OuVa"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="sIEJCMOj"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD44186284;
-	Sat, 21 Dec 2024 18:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310F318801A;
+	Sat, 21 Dec 2024 18:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734806588; cv=none; b=IyZXMfgQ9PDALnT9FtemWGdwgLdv34/a0GIeGxIsJSm25UAcCzlsvc2fCZxmhmzxVfIbTa7JPQtuLMg0r2fRe+UOsdGbrqR6/yrV9sx7RXCcx9aYNWMyBNvta4ZHbBq+c2XsIYEVrHC/wf/dopCUO+qT+BZKHvunVXqiwgAfE1g=
+	t=1734806588; cv=none; b=SOZyPmn6LzdC4qZpc1Kq7WhYt2drN2tVEoQ11siKRlJPJomaFV1gycznPEvnb516bjhUftIePkDYgDjF5p7D8K3B8qiMPBcoM2RcOvwub9Ma8UpmlhLsl9UlrmYxjDrfrhDhffh6KyGREBjhasYaHn7pT8tAVb7r8vjLrIAGRik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734806588; c=relaxed/simple;
-	bh=6D+qVXt+if69Ak1Tp7vDfLqm1tFNmkM4gIg9Y3dvZJo=;
+	bh=z+Q5Y1kWZlIGR9qgrDBLazhhhORiuKi4ZZf+9r7/IFY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t5ZtmBuuBHmSCZ90LzFeswn5U4rv1mEAcwKDTQ5hefVWOJIe6+VxHbEMpzjczpNHK+BG5DFgkfZftWFQ72atjjZcA1GgxG9Dw/sRQ/LhYRnd4MswvRsNHnfMTHdrxCzNz0byP7hTNcfiXiTL1dbUAHYwha/3QtqYnIbmkmdQvNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=PF72OuVa; arc=none smtp.client-ip=46.235.229.95
+	 MIME-Version; b=IRbbaDnUaABJpDmQqMMo6sSMzMeAoHXxxPTMEX75qPBOdNUZpPREhv3JxFuS4AcQ81Yuwe146f6m1If+OgIeGVnhOKxcERpzVdNc5op9LspprFzX+s+tgrgDxZaeFmQi/rfOsTDqCuRdXYZxricNRl5aprjQnI5w4A6hA/Tv7cY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=sIEJCMOj; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=VIOsW7CThUdxqZazplbAYuS4wCenu5gwxB082K8tTE8=; b=PF72OuVanmpzzvm/
-	0lKPOaUeS6WYnijmVfYz5Y0R9TCaqZZKCMKqIOhIl8Ve28OVnVVaJ8Xc7lD0ohNvz5VnscsYkYWBN
-	CCm7Bi/9lapNMWf93RmyAfSMQkJkpJiOHeRxySSZRD0D68mqAwdFY2wbonpin13Mk+drtmQW/4MGL
-	wHwW/3zttm9pLvuEon5obfRXN0Hi2430XNK5dyvgyfQjbLIuv1X+xlNEKaEGxP5UoIw/DMbsEf6n+
-	sQEaP9qiAVsXbt+2jGBE6gLHna+cCSLQHhWyZjqe4YSVOg0opIiZrP1/UeA6JoWZJvzkiO+3QRPzp
-	CWMFLUCuVMNkkgZNfA==;
+	:Subject; bh=FHOyfnH3rlGUJjO2RlOCqMv+WOTqlvg/BjenCsxYWAs=; b=sIEJCMOj/ZmNzxgU
+	8+7jpQNjG+gvEWPgOStarSSR7gJMeR9Yi265lR2nnGhF/T7xVPhbKaOByfWX/HMAECST4n47Hu1Sa
+	iDbQ2hSNEXPf0PET3IKKAkonJ1xyJpbH9DhyjeWJURwwsD+bMUVruD7y8GvkUYVXMu5IW1UbmB6TS
+	aSGutnkNEUTuIXH7KEdnS+AVaxrogI6Ivd7QN/fhSpE1HuFUlU886VsXa1EGZ2VzqvJgBSH7LXzwz
+	eh3jealcuFZ5cvd+kdG1N4AphiPE/UtPwxHM7Wd0N+KcedyhFbPgVT3hlq/6v6ktcsYf1Xkbmm/Pa
+	jvaVR+AKeg0yd8Xegw==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1tP4RB-006hEJ-13;
-	Sat, 21 Dec 2024 18:42:53 +0000
+	id 1tP4RC-006hEJ-2N;
+	Sat, 21 Dec 2024 18:42:54 +0000
 From: linux@treblig.org
 To: anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com,
@@ -56,9 +56,9 @@ To: anthony.l.nguyen@intel.com,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [RFC net-next 8/9] i40e: Remove unused i40e_asq_send_command_v2
-Date: Sat, 21 Dec 2024 18:42:46 +0000
-Message-ID: <20241221184247.118752-9-linux@treblig.org>
+Subject: [RFC net-next 9/9] i40e: Remove unused i40e_dcb_hw_get_num_tc
+Date: Sat, 21 Dec 2024 18:42:47 +0000
+Message-ID: <20241221184247.118752-10-linux@treblig.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241221184247.118752-1-linux@treblig.org>
 References: <20241221184247.118752-1-linux@treblig.org>
@@ -72,60 +72,54 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-i40e_asq_send_command_v2() was added in 2022 by
-commit 74073848b0d7 ("i40e: Add new versions of send ASQ command
-functions")
-but hasn't been used.
+The last useof i40e_dcb_hw_get_num_tc() was removed in 2022 by
+commit fe20371578ef ("Revert "i40e: Fix reset bw limit when DCB enabled
+with 1 TC"")
 
 Remove it.
 
-(The _atomic_v2 version of the function is used, so leave it).
-
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- drivers/net/ethernet/intel/i40e/i40e_adminq.c    | 10 ----------
- drivers/net/ethernet/intel/i40e/i40e_prototype.h |  7 -------
- 2 files changed, 17 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_dcb.c | 13 -------------
+ drivers/net/ethernet/intel/i40e/i40e_dcb.h |  1 -
+ 2 files changed, 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-index f73f5930fc58..175c1320c143 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-@@ -1016,16 +1016,6 @@ i40e_asq_send_command_atomic_v2(struct i40e_hw *hw,
- 	return status;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_dcb.c b/drivers/net/ethernet/intel/i40e/i40e_dcb.c
+index 8db1eb0c1768..352e957443fd 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_dcb.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_dcb.c
+@@ -1490,19 +1490,6 @@ void i40e_dcb_hw_set_num_tc(struct i40e_hw *hw, u8 num_tc)
+ 	wr32(hw, I40E_PRTDCB_GENC, reg);
  }
  
--int
--i40e_asq_send_command_v2(struct i40e_hw *hw, struct i40e_aq_desc *desc,
--			 void *buff, /* can be NULL */ u16  buff_size,
--			 struct i40e_asq_cmd_details *cmd_details,
--			 enum i40e_admin_queue_err *aq_status)
+-/**
+- * i40e_dcb_hw_get_num_tc
+- * @hw: pointer to the hw struct
+- *
+- * Returns number of traffic classes configured in HW
+- **/
+-u8 i40e_dcb_hw_get_num_tc(struct i40e_hw *hw)
 -{
--	return i40e_asq_send_command_atomic_v2(hw, desc, buff, buff_size,
--					       cmd_details, true, aq_status);
+-	u32 reg = rd32(hw, I40E_PRTDCB_GENC);
+-
+-	return FIELD_GET(I40E_PRTDCB_GENC_NUMTC_MASK, reg);
 -}
 -
  /**
-  *  i40e_fill_default_direct_cmd_desc - AQ descriptor helper function
-  *  @desc:     pointer to the temp descriptor (non DMA mem)
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_prototype.h b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-index ccb8af472cd7..099bb8ab7d70 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-@@ -27,13 +27,6 @@ i40e_asq_send_command(struct i40e_hw *hw, struct i40e_aq_desc *desc,
- 		      void *buff, /* can be NULL */ u16  buff_size,
- 		      struct i40e_asq_cmd_details *cmd_details);
- int
--i40e_asq_send_command_v2(struct i40e_hw *hw,
--			 struct i40e_aq_desc *desc,
--			 void *buff, /* can be NULL */
--			 u16  buff_size,
--			 struct i40e_asq_cmd_details *cmd_details,
--			 enum i40e_admin_queue_err *aq_status);
--int
- i40e_asq_send_command_atomic(struct i40e_hw *hw, struct i40e_aq_desc *desc,
- 			     void *buff, /* can be NULL */ u16  buff_size,
- 			     struct i40e_asq_cmd_details *cmd_details,
+  * i40e_dcb_hw_rx_ets_bw_config
+  * @hw: pointer to the hw struct
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_dcb.h b/drivers/net/ethernet/intel/i40e/i40e_dcb.h
+index d76497566e40..d5662c639c41 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_dcb.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_dcb.h
+@@ -253,7 +253,6 @@ void i40e_dcb_hw_rx_cmd_monitor_config(struct i40e_hw *hw,
+ void i40e_dcb_hw_pfc_config(struct i40e_hw *hw,
+ 			    u8 pfc_en, u8 *prio_tc);
+ void i40e_dcb_hw_set_num_tc(struct i40e_hw *hw, u8 num_tc);
+-u8 i40e_dcb_hw_get_num_tc(struct i40e_hw *hw);
+ void i40e_dcb_hw_rx_ets_bw_config(struct i40e_hw *hw, u8 *bw_share,
+ 				  u8 *mode, u8 *prio_type);
+ void i40e_dcb_hw_rx_up2tc_config(struct i40e_hw *hw, u8 *prio_tc);
 -- 
 2.47.1
 
