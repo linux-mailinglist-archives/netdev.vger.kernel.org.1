@@ -1,170 +1,160 @@
-Return-Path: <netdev+bounces-153954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D089FA33A
-	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 02:23:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C36D59FA476
+	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 08:05:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FE16188AD38
-	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 01:23:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68BBF188917F
+	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 07:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2D5646;
-	Sun, 22 Dec 2024 01:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TafEfkCp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5463E1547DE;
+	Sun, 22 Dec 2024 07:05:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8D525948C
-	for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 01:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDA319BBA
+	for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 07:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734830620; cv=none; b=gFyKmGZL93tKR0YGhf183ZaBzbvZsx7HVDXUb1WE+zufuKCTKNt1aAs4K7FeUQxJDPf2Yt/iO/Y5O+GVmP3xCc/HPUFVKgTawl2dY/2Yv85LY/yySudTVlLMYDvu8WJU6enkgB0gMr1GLFeb0ySp3hBFnItpDm3eA07KmhK05RE=
+	t=1734851124; cv=none; b=TRQu0pBQB5Bf00YTEPYGyJB70ES9O6mOcFUMT76WyGJzY9jSX1SabVhWxnh9vxGMfocB0BOjJ9Kqs4mEvKwUa3zEiE+9LfjgJfSUfZIoBVgiZLKXVPdtJukAO4sknshbrkILelt5mFaBH3S+7tMaWo7fntWwA6ZXDo+8GiVcA44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734830620; c=relaxed/simple;
-	bh=2mQOk3Ule0amGXjlRZK5chQr/0DO/Q966CoijfUichs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kQ6LU8TbmPWGcisJkmIR9pGp0nY3kLXKHzoKfwJG52s5lLpzmziNSMGwNkhMrjJvZXTYMf+eFABv8EiDxUrj3Du4b1aNqiplFy5uHXDxbi7cweuUfz752HFKLRLnzu9Y8BgbQ8GfeaSZgmYQkOdIkmbsCFso4gNX8sTwbMDIuwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jsperbeck.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TafEfkCp; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jsperbeck.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-728eda1754eso4247722b3a.2
-        for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 17:23:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734830618; x=1735435418; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+l9BoWLrhBAuCzd7c37WzGlNIO0V229/bnZinxzODSM=;
-        b=TafEfkCpDTZOK8FiAaHR8Zy7/X1uOriZgSx43o1AfvPnhEmxSSzP5oM9l2leUreVIn
-         gJJDphj8dT25+NJEG5fKySX2Xm26yWXSHBOGRpl2c2AneOoYWVLqo886/sHQlOZhnZYI
-         s6lKj5zMygo70WYzkCVV3afUmCORKBfR+kFW3BRaDYHcsIITdr4wnn3NuCvXJti+0ZpP
-         0+q8nxVjZqDkpKnmPi7G5JWCnK+bAAirWaeuhRZbJfnvEXEDs8PIlv/ziAbQvBJvDsr6
-         ocQ+ndhI6ps7AZtdnZ7Gw2u/hM344KRbmwkI6lvBgVc6HKlquhNSMjnUzRW1Fox1ZF9c
-         k14g==
+	s=arc-20240116; t=1734851124; c=relaxed/simple;
+	bh=PNegf3bFlJXcVlmlllcmWn2Muyqx6WbO8ikALr0GQFU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YM0MlK6v2k5XoNHsHaaHH1XHOZdJLwFWvl+K3tC7He7WezKKXmxgRMBFv4ljQUh1ap60c/cMy3YVOmycz8FnGOJqXUIdTMXCTU0QW55wCk4bO5p4gbugSf8pOkPGG6KgOjo5bAajTM5yuEFmoOs/lhRi97fWT1Ty4nMv7bEnZvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ac98b49e4dso29096015ab.1
+        for <netdev@vger.kernel.org>; Sat, 21 Dec 2024 23:05:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734830618; x=1735435418;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1734851122; x=1735455922;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+l9BoWLrhBAuCzd7c37WzGlNIO0V229/bnZinxzODSM=;
-        b=mQZR0KLn/qy9QuTutAtE5PU7zhfmgOA31diZxdSs5fnmtHRfWCMgK+lEdRlhDRq1ua
-         FMxwLG1fpc9C+DvpuWyz/DhYMtWEHSvLRAaMXZftBZyK5aAE4xrPdb4z7ia0wqUXYKg7
-         4Ghuyh0ic02k+lWTQP6mG2qyduO0EJX3hWnp/DL/xXwNdU0DWsmu9a5SU9BxtLbqPJsi
-         PQXRk0IyZZmnYdbTgSbda7UY42lqXsHf8TzlEIkPITH9eAWsHtXbsJn6/JnqJf/ZgF7z
-         kZ8WalwJZ9csplmOUH86LdctzUpbyP5n2nOi5M27uO+8c4WXhrrZ9R/fhakzl4J4UN7v
-         OxEg==
-X-Forwarded-Encrypted: i=1; AJvYcCXSXaaUkhyKm1EszHTjzuW/JxPR3eOEsTEyCT1XI70tugCHEDJzAfiuBpooza60i4Nk2CVWWLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhGrL8J72b3kQOVy49Mvu5/60/tye0mizX2dSvHlHhZRSw+cQU
-	qEt5uvKRWAlAZsbiHVyKXeos8hXZz99suejVAO7vDJQ9mA1y3wiORlnNvvVifmMEpwF1othLJ75
-	voMDOxvqKjRXE2Q==
-X-Google-Smtp-Source: AGHT+IF/URYA8sLQnwKaZ9edjm6Q2KfG4LYNW3ai6c/GyaoHer/DWgbznGk7FiVlqeRS3kh/H6wXEOppNdQ+e8Y=
-X-Received: from pfbdw23.prod.google.com ([2002:a05:6a00:3697:b0:728:e3af:6ba5])
- (user=jsperbeck job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:4c07:b0:72a:9ddf:55ab with SMTP id d2e1a72fcca58-72abdd9c06dmr12517674b3a.10.1734830618070;
- Sat, 21 Dec 2024 17:23:38 -0800 (PST)
-Date: Sat, 21 Dec 2024 17:23:34 -0800
+        bh=XmoCRLkY6I+jgLgj0zkUOOAsUGcwh8Ol0VulYvPl6FI=;
+        b=k+FgOv9OoiwqKMF1HBwb/y+T/C9klmu+cz28hFTX5GC41sqn8UTofAwfp1oYJ9vejK
+         Sl9+/srzYLMVzc3ptjSTF32cS9Vvqq4vvVY2nez9tNwqCS0mDzDbshRnonZ4eU8vHJKr
+         s4pS2z1IVJr5f/fWRw8DgYoeH8ooECumM+negfwtotpSo67oriN1gV4M/VO7x3Dywa8/
+         xjPJYiD4Lv7XsB68EVE+VHQFw95oT5AcJhtuwLfojV0dziZH22YEfty/o2bOpIeVHzcj
+         Ebn12HFAIbHFTTSB/wA1ROt2+PQyI/RXxtqN+w8n2NPQ0QohTQvZbgAYY0/gEn8tidS0
+         A9mg==
+X-Forwarded-Encrypted: i=1; AJvYcCVAJwxrSu8YMK0qaWGYQXSW6ubPpbYQfMAljA+D6FgRRbpwxvvrQg5qvn3BvGq6lIfi2vd0zAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQzt0/QctCq73Ujeavm35vqqX6M2uGZf/os671sMRzeyJ2pqNb
+	03C6bjaAUtDLU0kU6z+rP2/1SF3gyM3ziCYCV4YQN+WNJf1kuAzdWh4OlFRM6vPliNRSxf2qTGa
+	8QYLdP7rEUqk3W5LKyQP7IIockXmdyrF02Mpt8B5rIG+31cCEMlEJk64=
+X-Google-Smtp-Source: AGHT+IGzHgDt9/GFaGV3DI+15BlSA/J1KYG9eMziHH5AON43o13av5whl3lFrlAhFebxJDAwNPd6Pj+uqQzQiC1R7b0hf45HIFs1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241222012334.249021-1-jsperbeck@google.com>
-Subject: [PATCH] net: netpoll: ensure skb_pool list is always initialized
-From: John Sperbeck <jsperbeck@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>, Breno Leitao <leitao@debian.org>, 
-	John Sperbeck <jsperbeck@google.com>, linux-kernel@vger.kernel.org
+MIME-Version: 1.0
+X-Received: by 2002:a92:c24c:0:b0:3a7:fe8c:b004 with SMTP id
+ e9e14a558f8ab-3c2d2782c53mr60071215ab.11.1734851121855; Sat, 21 Dec 2024
+ 23:05:21 -0800 (PST)
+Date: Sat, 21 Dec 2024 23:05:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6767ba31.050a0220.25abdd.0138.GAE@google.com>
+Subject: [syzbot] [bluetooth?] WARNING in sco_conn_put
+From: syzbot <syzbot+b1f28526bea4dce0f04f@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-When __netpoll_setup() is called directly, instead of through
-netpoll_setup(), the np->skb_pool list head isn't initialized.
-If skb_pool_flush() is later called, then we hit a NULL pointer
-in skb_queue_purge_reason().  This can be seen with this repro,
-when CONFIG_NETCONSOLE is enabled as a module:
+Hello,
 
-    ip tuntap add mode tap tap0
-    ip link add name br0 type bridge
-    ip link set dev tap0 master br0
-    modprobe netconsole netconsole=4444@10.0.0.1/br0,9353@10.0.0.2/
-    rmmod netconsole
+syzbot found the following issue on:
 
-The backtrace is:
+HEAD commit:    d3c9510dc900 net: page_pool: rename page_pool_is_last_ref()
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=17efd730580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=87a291e9e8ffbb16
+dashboard link: https://syzkaller.appspot.com/bug?extid=b1f28526bea4dce0f04f
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-    BUG: kernel NULL pointer dereference, address: 0000000000000008
-    #PF: supervisor write access in kernel mode
-    #PF: error_code(0x0002) - not-present page
-    ... ... ...
-    Call Trace:
-     <TASK>
-     __netpoll_free+0xa5/0xf0
-     br_netpoll_cleanup+0x43/0x50 [bridge]
-     do_netpoll_cleanup+0x43/0xc0
-     netconsole_netdev_event+0x1e3/0x300 [netconsole]
-     unregister_netdevice_notifier+0xd9/0x150
-     cleanup_module+0x45/0x920 [netconsole]
-     __se_sys_delete_module+0x205/0x290
-     do_syscall_64+0x70/0x150
-     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Move the skb_pool list initialization into __netpoll_setup().  Also,
-have netpoll_setup() call this before allocating its initial pool of
-packets.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4e4dd3da989d/disk-d3c9510d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fd16db384609/vmlinux-d3c9510d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7903aba8a210/bzImage-d3c9510d.xz
 
-Fixes: 6c59f16f1770 ("net: netpoll: flush skb pool during cleanup")
-Signed-off-by: John Sperbeck <jsperbeck@google.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b1f28526bea4dce0f04f@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 8522 at kernel/workqueue.c:2257 __queue_work+0xcd3/0xf50 kernel/workqueue.c:2256
+Modules linked in:
+CPU: 1 UID: 0 PID: 8522 Comm: syz.1.688 Not tainted 6.13.0-rc2-syzkaller-00457-gd3c9510dc900 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/25/2024
+RIP: 0010:__queue_work+0xcd3/0xf50 kernel/workqueue.c:2256
+Code: ff e8 71 e8 37 00 90 0f 0b 90 e9 b2 fe ff ff e8 63 e8 37 00 eb 13 e8 5c e8 37 00 eb 0c e8 55 e8 37 00 eb 05 e8 4e e8 37 00 90 <0f> 0b 90 48 83 c4 60 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc
+RSP: 0018:ffffc9000485f888 EFLAGS: 00010087
+RAX: ffffffff816775e4 RBX: ffff88802abf1e00 RCX: 0000000000080000
+RDX: ffffc90005282000 RSI: 00000000000002f5 RDI: 00000000000002f6
+RBP: 0000000000000000 R08: ffffffff81676a44 R09: 0000000000000000
+R10: ffffc9000485f960 R11: fffff5200090bf2d R12: ffff88805a00d800
+R13: ffff88805a00d9c0 R14: dffffc0000000000 R15: 0000000000000008
+FS:  00007fbe34d8a6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c352926 CR3: 0000000028684000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ queue_delayed_work_on+0x1ca/0x390 kernel/workqueue.c:2552
+ sco_conn_free net/bluetooth/sco.c:91 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ sco_conn_put+0x145/0x210 net/bluetooth/sco.c:107
+ sco_chan_del+0xa3/0x180 net/bluetooth/sco.c:236
+ sco_sock_close net/bluetooth/sco.c:526 [inline]
+ sco_sock_release+0xb3/0x320 net/bluetooth/sco.c:1300
+ __sock_release net/socket.c:640 [inline]
+ sock_close+0xbc/0x240 net/socket.c:1419
+ __fput+0x23c/0xa50 fs/file_table.c:450
+ task_work_run+0x24f/0x310 kernel/task_work.c:239
+ get_signal+0x15f7/0x1750 kernel/signal.c:2790
+ arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0xce/0x340 kernel/entry/common.c:218
+ do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fbe33f85d29
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fbe34d8a038 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: fffffffffffffffc RBX: 00007fbe34175fa0 RCX: 00007fbe33f85d29
+RDX: 0000000000000008 RSI: 0000000020000000 RDI: 0000000000000004
+RBP: 00007fbe34001a20 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fbe34175fa0 R15: 00007ffe3e4f91f8
+ </TASK>
+
+
 ---
- net/core/netpoll.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 2e459b9d88eb..61662390414e 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -627,6 +627,8 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
- 	const struct net_device_ops *ops;
- 	int err;
- 
-+	skb_queue_head_init(&np->skb_pool);
-+
- 	if (ndev->priv_flags & IFF_DISABLE_NETPOLL) {
- 		np_err(np, "%s doesn't support polling, aborting\n",
- 		       ndev->name);
-@@ -681,8 +683,6 @@ int netpoll_setup(struct netpoll *np)
- 	struct in_device *in_dev;
- 	int err;
- 
--	skb_queue_head_init(&np->skb_pool);
--
- 	rtnl_lock();
- 	if (np->dev_name[0]) {
- 		struct net *net = current->nsproxy->net_ns;
-@@ -782,17 +782,16 @@ int netpoll_setup(struct netpoll *np)
- 		}
- 	}
- 
-+	err = __netpoll_setup(np, ndev);
-+	if (err)
-+		goto put;
-+
- 	/* fill up the skb queue */
- 	refill_skbs(np);
- 
--	err = __netpoll_setup(np, ndev);
--	if (err)
--		goto flush;
- 	rtnl_unlock();
- 	return 0;
- 
--flush:
--	skb_pool_flush(np);
- put:
- 	DEBUG_NET_WARN_ON_ONCE(np->dev);
- 	if (ip_overwritten)
--- 
-2.47.1.613.gc27f4b7a9f-goog
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
