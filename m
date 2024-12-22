@@ -1,143 +1,170 @@
-Return-Path: <netdev+bounces-153965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2287D9FA50C
-	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 10:48:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6F779FA52E
+	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 11:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36B1C188892D
-	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 09:48:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47B3516651C
+	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 10:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6826187555;
-	Sun, 22 Dec 2024 09:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="duT34jTQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EE6E18A6A3;
+	Sun, 22 Dec 2024 10:10:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD94632
-	for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 09:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23608189BAC
+	for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 10:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734860880; cv=none; b=kU2T7ZPLrbu8PMKWaofO1uHEt5irBJJNNC2Gw0Xhy/l+8Mx74Af3dYSyJdKhq0fJp5pLTIl3/TtY5G3hf7tpHySWpSv0yM5UCXz4H3jp/oRCxCmhfrHWZaCqnnWB3SOhTnolecplrD1KrRBc3LEucx3bLTBo8QODxCzpsF5LoQw=
+	t=1734862231; cv=none; b=boybrStv/B7Mz1c0LnWR+QTIYbc+W+VfDNgUloWw10YpDAegba0ipktuxBLi2AI2b6Al7EakzqMahLZHaAdM662g5wHhv/r9AN5gybSMtgoOpQ/qTufPzP3G0LAhJuqn/rIgthkQepY7i+H/nPUeS0hfrMYuVldCCxZxtq5HP9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734860880; c=relaxed/simple;
-	bh=96xyyFmwBHZS0vGuPUHDQfo6PiDu5wU9W5WNoD4FPm8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hyrENyafSJWXsoO3j1sCks0xVzEAcZTCPKclVlggZkn3uUBjsMnM5A5zBdw76wEuhw/ztjJO19QRlWkAocNOTNr3uGfKnIOkFtSLEzL7LBya8FPdDBABXp73CK52Wldv+Zlhz8ZYDrP0I/gpQXr4JuN9expuaFmgjAxfN8hQxrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=duT34jTQ; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4363ae65100so35428845e9.0
-        for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 01:47:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1734860877; x=1735465677; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jr9s/wEFXQFEgy5W79KAW8kmZ6yqcSTB1nkgsGLRiEg=;
-        b=duT34jTQOnogiFR/ho+hYnTdqrspArkN8ASwbWPRwGMWz/iJ/EpvOAPa1rP7OhYPiy
-         vf13ignDlGPASYqbqNXIdlaobD8yPBCWoiq9kBendRnLRkFdvGZCDJ10VwmDEWpaq5cH
-         BFlTXp6CQ2Hg2fPUANMdLV7DjJ+0N2sREC7eXCfzFQ2aso2I+vYGOMpzo3NjvIzjzNAE
-         lqY8CJLcAf1S923Z9ScwJhJmJ23SQTEHh4GOB6wUY+dv1b7APuCs3vHf1rMzEKbAXYaK
-         Os7Owjx2CCHc7DzE2PmA/6vLrpecxncY+gQmmn95vhpXjDEyTm3W7v3tTh03xQLPOTGL
-         Vf6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734860877; x=1735465677;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jr9s/wEFXQFEgy5W79KAW8kmZ6yqcSTB1nkgsGLRiEg=;
-        b=ms8muoVnLhF+lQGQhJrTUEHxXKrfzr+OLEhxPAljyfQfbR4yK6HNH2k3hBywlFBGX2
-         hH0G1mwXEw7xrwrhrymlWw99eFACJ3IGr0/m31CvWWbEim4dHEOeTjW/JDnOiLzgHCQF
-         xW1l/ciJwUFP3o3En9jhB9PCA8SzkV7TvfHb+u+7+3RMSL/NJKYXEiE47YhW/VxbNnxV
-         ptgwx6kz4k7ghpYMzGoGyUJfgBp4O+VFgBr7FVdp/JnOYd9Wq+g5JHxaKVUq9WfVR584
-         eXmQcn5S3P35Fek7DOY0bUfv3SWhNGJ6MX/eTncOtH7tl0HwlJBQYF9vwQ+BniDYg+Vp
-         wPXw==
-X-Forwarded-Encrypted: i=1; AJvYcCXyGKhTHHVtdI69EglNfivsI/Qdvotn6vAc4s1d3tARBOQuqnYAhRxQ9rjgNEWPOHf5BZBKKnQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxgk5LOUkDF8vZY55UXDowSJz2yjtUXBkeAblpO8HpHt481vB/o
-	AhPfYptF6k9IwdQJHvenV0QTGTKqA9t6n8RkCzTnryF1sYTMIoUHeC/zu+GB9QQ=
-X-Gm-Gg: ASbGncu8ugiaiT1BL72/nhKVYKdORV3YodIwt+D0F+qkJQQ7VgKs+t/GLYIFXHKOKzG
-	qR7AVqtTNaJUcXTciM0WzdGXP5llz1k27i7RIvWhBtExr0OKZL7S04s685ew8BGOW1Q2PQ0Yqpm
-	PDBymPO7/IxIHdbtGJbrXnfBgw1mSniBSWN/iltVMAaIerDtBVxbxBx2gbPOAu+MUtZuytcP0SM
-	vaXKU5c06OkkI3YY9pRhmKDz6Fw6y4n9HVGYNVWKnm7QZNvNPzAlaNqiiNMHw==
-X-Google-Smtp-Source: AGHT+IFFUPOD9lQGPcXbq8xd6zyf5wVbg0nk4IKmdVXabGHAOJsS3nuQKHcgAscr1l4qCavDSMQgRw==
-X-Received: by 2002:a05:600c:35cb:b0:436:1baa:de1c with SMTP id 5b1f17b1804b1-4366854c186mr76809865e9.13.1734860877429;
-        Sun, 22 Dec 2024 01:47:57 -0800 (PST)
-Received: from [192.168.0.105] ([109.160.72.197])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436612899f0sm99096085e9.38.2024.12.22.01.47.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Dec 2024 01:47:56 -0800 (PST)
-Message-ID: <41ac7bde-9760-44db-9287-dfcc986657c6@blackwall.org>
-Date: Sun, 22 Dec 2024 11:47:55 +0200
+	s=arc-20240116; t=1734862231; c=relaxed/simple;
+	bh=7cxod7YMtFZbl1nd7C03CZeqcHCX9KD/Uj/6Ti5dt2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mtx/Sw6RSVubto+Y4S5DC8JUX9HRNPsvdqsqYsUtFlurAAfdtgCq5A6cgwKgddm+rEnyHE3Quh4c0L+wiAYSG2PvB/fRfqIys4ukW5CCmZ9tIbkiybKV+FloLEKPl45GlUkFK6LOrR/wsaFisCmfTQL3v8XRDs12XMniRIWEmBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Date: Sun, 22 Dec 2024 11:10:25 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: hanhuihui <hanhuihui5@huawei.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+	stephen@networkplumber.org, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, kuba@kernel.org, yanan@huawei.com,
+	caowangbao@huawei.com, fengtao40@huawei.com
+Subject: Re: [PATCH] vrf: Revert:"run conntrack only in context of
+ lower/physdev for locally generated packets"
+Message-ID: <Z2flkWyQNwiClcUg@calendula>
+References: <20241221113308.1003995-1-hanhuihui5@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] bridge: multicast: per vlan query
- improvement when port or vlan state changes
-To: Yong Wang <yongwang@nvidia.com>, roopa@nvidia.com, davem@davemloft.net,
- edumazet@google.com, netdev@vger.kernel.org
-Cc: aroulin@nvidia.com, idosch@nvidia.com, nmiyar@nvidia.com
-References: <20241220220604.1430728-1-yongwang@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241220220604.1430728-1-yongwang@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-On 12/21/24 00:06, Yong Wang wrote:
-> The current implementation of br_multicast_enable_port() only operates on
-> port's multicast context, which doesn't take into account in case of vlan
-> snooping, one downside is the port's igmp query timer will NOT resume when
-> port state gets changed from BR_STATE_BLOCKING to BR_STATE_FORWARDING etc.
-> 
-> Such code flow will briefly look like:
-> 1.vlan snooping 
->   --> br_multicast_port_query_expired with per vlan port_mcast_ctx
->   --> port in BR_STATE_BLOCKING state --> then one-shot timer discontinued
-> 
-> The port state could be changed by STP daemon or kernel STP, taking mstpd
-> as example:
-> 
-> 2.mstpd --> netlink_sendmsg --> br_setlink --> br_set_port_state with non 
->   blocking states, i.e. BR_STATE_LEARNING or BR_STATE_FORWARDING
->   --> br_port_state_selection --> br_multicast_enable_port
->   --> enable multicast with port's multicast_ctx
-> 
-> Here for per vlan query, the port_mcast_ctx of each vlan should be used
-> instead of port's multicast_ctx. The first patch corrects such behavior.
-> 
-> Similarly, vlan state could also impact multicast behavior, the 2nd patch
-> adds function to update the corresponding multicast context when vlan state
-> changes.
-> 
-> 
-> Yong Wang (2):
->   net: bridge: multicast: re-implement port multicast enable/disable
->     functions
->   net: bridge: multicast: update multicast contex when vlan state gets
->     changed
-> 
->  net/bridge/br_mst.c       |  4 +-
->  net/bridge/br_multicast.c | 96 +++++++++++++++++++++++++++++++++++----
->  net/bridge/br_private.h   | 10 +++-
->  3 files changed, 99 insertions(+), 11 deletions(-)
-> 
-> 
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241221113308.1003995-1-hanhuihui5@huawei.com>
 
 Hi,
-It seems there will be another version (see kernel robot), can you
-please add selftests that verify the new and old behaviour?
 
-Thanks,
- Nik
+On Sat, Dec 21, 2024 at 07:33:08PM +0800, hanhuihui wrote:
+> In commit 8e0538d8, netfilter skips the NAT hook in the VRF context. This solves the problems mentioned in commit 
+> in 8c9c296 and d43b75f. Therefore, we no longer need to set "untracked" to avoid any conntrack 
+> participation in round 1.So maybe we can reverts commit 8c9c296a and d43b75fb because we don't need them now.
 
+Did you run netfilter selftests?
 
+> Fixes: 8c9c296 ("vrf: run conntrack only in context of lower/physdev for locally generated packets")
+> Fixes: d43b75f ("vrf: don't run conntrack on vrf with !dflt qdisc")
+
+These tags do not look fine.
+
+Thanks.
+
+> Signed-off-by: hanhuihui hanhuihui5@huawei.com
+> ---
+>  drivers/net/vrf.c | 28 ++++------------------------
+>  1 file changed, 4 insertions(+), 24 deletions(-)
+> 
+> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+> index b90dccdc2..7b0c35003 100644
+> --- a/drivers/net/vrf.c
+> +++ b/drivers/net/vrf.c
+> @@ -36,7 +36,6 @@
+>  #include <net/fib_rules.h>
+>  #include <net/sch_generic.h>
+>  #include <net/netns/generic.h>
+> -#include <net/netfilter/nf_conntrack.h>
+>  
+>  #define DRV_NAME	"vrf"
+>  #define DRV_VERSION	"1.1"
+> @@ -416,26 +415,12 @@ static int vrf_local_xmit(struct sk_buff *skb, struct net_device *dev,
+>  	return NETDEV_TX_OK;
+>  }
+>  
+> -static void vrf_nf_set_untracked(struct sk_buff *skb)
+> -{
+> -	if (skb_get_nfct(skb) == 0)
+> -		nf_ct_set(skb, NULL, IP_CT_UNTRACKED);
+> -}
+> -
+> -static void vrf_nf_reset_ct(struct sk_buff *skb)
+> -{
+> -	if (skb_get_nfct(skb) == IP_CT_UNTRACKED)
+> -		nf_reset_ct(skb);
+> -}
+> -
+>  #if IS_ENABLED(CONFIG_IPV6)
+>  static int vrf_ip6_local_out(struct net *net, struct sock *sk,
+>  			     struct sk_buff *skb)
+>  {
+>  	int err;
+>  
+> -	vrf_nf_reset_ct(skb);
+> -
+>  	err = nf_hook(NFPROTO_IPV6, NF_INET_LOCAL_OUT, net,
+>  		      sk, skb, NULL, skb_dst(skb)->dev, dst_output);
+>  
+> @@ -514,8 +499,6 @@ static int vrf_ip_local_out(struct net *net, struct sock *sk,
+>  {
+>  	int err;
+>  
+> -	vrf_nf_reset_ct(skb);
+> -
+>  	err = nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT, net, sk,
+>  		      skb, NULL, skb_dst(skb)->dev, dst_output);
+>  	if (likely(err == 1))
+> @@ -633,7 +616,8 @@ static void vrf_finish_direct(struct sk_buff *skb)
+>  		skb_pull(skb, ETH_HLEN);
+>  	}
+>  
+> -	vrf_nf_reset_ct(skb);
+> +	/* reset skb device */
+> +	nf_reset_ct(skb);
+>  }
+>  
+>  #if IS_ENABLED(CONFIG_IPV6)
+> @@ -647,7 +631,7 @@ static int vrf_finish_output6(struct net *net, struct sock *sk,
+>  	struct neighbour *neigh;
+>  	int ret;
+>  
+> -	vrf_nf_reset_ct(skb);
+> +	nf_reset_ct(skb);
+>  
+>  	skb->protocol = htons(ETH_P_IPV6);
+>  	skb->dev = dev;
+> @@ -778,8 +762,6 @@ static struct sk_buff *vrf_ip6_out(struct net_device *vrf_dev,
+>  	if (rt6_need_strict(&ipv6_hdr(skb)->daddr))
+>  		return skb;
+>  
+> -	vrf_nf_set_untracked(skb);
+> -
+>  	if (qdisc_tx_is_default(vrf_dev) ||
+>  	    IP6CB(skb)->flags & IP6SKB_XFRM_TRANSFORMED)
+>  		return vrf_ip6_out_direct(vrf_dev, sk, skb);
+> @@ -866,7 +848,7 @@ static int vrf_finish_output(struct net *net, struct sock *sk, struct sk_buff *s
+>  	struct neighbour *neigh;
+>  	bool is_v6gw = false;
+>  
+> -	vrf_nf_reset_ct(skb);
+> +	nf_reset_ct(skb);
+>  
+>  	/* Be paranoid, rather than too clever. */
+>  	if (unlikely(skb_headroom(skb) < hh_len && dev->header_ops)) {
+> @@ -1009,8 +991,6 @@ static struct sk_buff *vrf_ip_out(struct net_device *vrf_dev,
+>  	    ipv4_is_lbcast(ip_hdr(skb)->daddr))
+>  		return skb;
+>  
+> -	vrf_nf_set_untracked(skb);
+> -
+>  	if (qdisc_tx_is_default(vrf_dev) ||
+>  	    IPCB(skb)->flags & IPSKB_XFRM_TRANSFORMED)
+>  		return vrf_ip_out_direct(vrf_dev, sk, skb);
+> -- 
+> 2.43.0
+> 
+> 
 
