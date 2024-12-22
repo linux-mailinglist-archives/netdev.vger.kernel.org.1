@@ -1,128 +1,158 @@
-Return-Path: <netdev+bounces-153977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 111549FA839
-	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 22:05:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 389439FA871
+	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 23:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EE587A126B
-	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 21:05:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E6771886301
+	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 22:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDA2188CC9;
-	Sun, 22 Dec 2024 21:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mvb9mEt9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4301922ED;
+	Sun, 22 Dec 2024 22:32:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFE3259489;
-	Sun, 22 Dec 2024 21:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1F8155757
+	for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 22:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734901499; cv=none; b=qtKLRl6g5NI7VbSDbjVvFr59J3xVL6PB2u5cu8yKeE/iqf6UuBHrBXqecQbEwDdbBZa9TGdptw/4l/uMVlu3DMrYXOX4lKF52fY7+eAvkyc+9j03CvzNizajFSpgunvxrJ0CVwwZ1ov3gPNaP9B/anbypDXlWPeq2Hn3b3naZyg=
+	t=1734906749; cv=none; b=L3GLDPcCkT7o9EbO7KrDnVesnyLcNP2L7paSS+RDKopB1lEjuXTD9JjnrClFz3y9GTz/TErfRQV6eamxQT0Yrimpd6/LxIuB8N2uoltFdu/YTU40VKQqrovLxFPusASZCv5ehewSHnITxMO1hxQy+ueEXLyOyPdaE/hIQaZ7rbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734901499; c=relaxed/simple;
-	bh=Z4rhkVlVGQk354wSx8/JpdQqE6gsiWpqzQPNAZ2ApEw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qwEQsRibs6P78qyu8ulsUY6WhigbdmYYSDHJKrlZ4l/LV1kYpUdYnuQ15T0+lJWGg9do2K7niZ80MggBYAKw5jprOX/0iPt8sLCZuvQWlqPPOms0/kUbGh5ZFzsRtZyGTnBoTDFbEcaQbJXjAQsE+e7kvRlHAihmC4H6zRImMzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mvb9mEt9; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4367239aa86so17301255e9.3;
-        Sun, 22 Dec 2024 13:04:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734901497; x=1735506297; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w1oye4z15+lr2o1w+EQ1x0Cmk8LMpN4hRUXuCC9sKgc=;
-        b=mvb9mEt9vudkndxxuMkqP7e1ykG8zUdY5M1ysPA/4tuR412+vCAZlfhZoclmTvAaTi
-         UweNHJ/7YRDSTCckbN7WTU9TCHqJrfgiAOqBlRv5wl/Vt3CzqdWwjiF/d/UO1gAh+y9o
-         f5ieu8qPMdGQXnSbROlQMYQl+eW1727ypPlc0p/hA7AlYaRaaCzsb5wYUVAbfUcee0O5
-         MpKhLj9ipbRRis30MnlDYYm4aMRJjv7nNjkgp89stw1JRC9mIzPRIGwFEXYt6vCXK9Gd
-         qxaLGdCHrDhgoFaypjZSveRhAWh1SRdPY1G7rb+ugBq/6dZ3PJCC12KjunuB5n7Q297Z
-         yxpw==
+	s=arc-20240116; t=1734906749; c=relaxed/simple;
+	bh=WgLnk6IONhSPOz9x+JW0Gw/5twX/2CfUnm36GJ8/09c=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=ESSLCYyaXdl4vMH5o5lePcAhoFy9iqXT/fZPeNpNaQNvJomn61KK1MBcuRZ6l0vUzNKMlWxYKzy2T1nTySzTPIArU//G98RGurOWIoLMEn9zOEka/07btL7/zfXoGCxgxqnsVpOrji9etRw5yrVKd2gKNDZ2k/wtuzY8QxEKHcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-849d26dd331so5418439f.1
+        for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 14:32:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734901497; x=1735506297;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1734906747; x=1735511547;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w1oye4z15+lr2o1w+EQ1x0Cmk8LMpN4hRUXuCC9sKgc=;
-        b=gXteS84QTr+FFVoY1feNPplK0fe1J1TneY05XRefzJOfBI9BKyXG5IDbkqU2/UzmIT
-         EN+Gh+TQrt/2CxytCckQeLGSJ7CKVHMY4/90ioLYKr8TsInS4cMLy/Q46VVCbZQ9i/Xx
-         B5hV8a4el3ZNvOG8JrdNO8Eb+v6QicT6hEl2v3i1Ap/QPIPX3xByWF6v6GE4vWKWEj+A
-         5f/II52Xya7c7jm4UcVEnz+ATgPjPvQcNFf2GJuA5r3+N9AXtHQtwzq91M4Sj0YSUEme
-         rFdewFRfYFsBwdDG15Yi794RsXkmuRT0W/iqGjSxBux9sfeBcNNRG5oOYiwIZYNigmAU
-         VaXg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPg2cosl30+6M2qdXgpNqnGMEy8/Pkfp2QOYRgageQNWmy6UhcoWw6+v4jHJdy2a17yoIJlqs3XPUAjzvV@vger.kernel.org, AJvYcCVXPm5lVojZtm1sRD3giCF03xCUY4pfxwRaKdlXIbRZeZ3xlHUV+/+xE4qFZvCry+nGCOCqokShUgE=@vger.kernel.org, AJvYcCWDiOKretgVcqMQNBxerRhabZHGb9L97P4nzOzpGpw6ym9Yn1IV+W5hc1CMWr8aX9LU8zyXvDDh@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdO2mpJQZXt0LPsOxH79zT24Q5EDZc3IvCasQV1uydFrOyugLK
-	2yVSwSymQvbPBsKthtg+zIrzV5llAx/p+wLGGVl+LXXa6nTVtaVo
-X-Gm-Gg: ASbGncucA4HRmTH25nF72kh79GNFy2UtifnaESpXxeIplh5z+qVKYSaJdtffM1J3ZTr
-	XluIytsLPwMX0XZL5zxhBj/sqQza7kNzPkfDGjPb5tGskiITY2gUkuSZJvsaRA5PBRsLN23L17u
-	uitiYHmshlZnZ9hCThqoJV+MmYu3LD0Vy8Xc4RAhhRE+A3DudHDGB8LeV02bi0k8jXGsdIhcy9K
-	HkbDV+u6NNyZEfy/OU3d7MzSc4nJySQKOoTIFdny4a0HOdh86nrZfZPBQ==
-X-Google-Smtp-Source: AGHT+IHrVNOxvatH0wJahcvx8K9R6UCZia3C2mnXBs1VmInWx4bVumdXRL/+jSSx4T8TnEac1wlEhg==
-X-Received: by 2002:a05:600c:1c12:b0:434:f9e1:5cf8 with SMTP id 5b1f17b1804b1-4366aabbed2mr92183945e9.31.1734901496299;
-        Sun, 22 Dec 2024 13:04:56 -0800 (PST)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366127c508sm114539775e9.33.2024.12.22.13.04.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Dec 2024 13:04:55 -0800 (PST)
-Message-ID: <6d839f1a-9c38-46a9-aa3b-62afbd75cea7@gmail.com>
-Date: Sun, 22 Dec 2024 23:04:51 +0200
+        bh=FRsnKFAlPDwHsjYv8HbPpCEF4fsquGjuEp5r4rTRqZ8=;
+        b=IRK4aaPgfoOoWqXJ3caC6Y6kfp1/mm5wddcHVwaiImEj3brD3n9AUNDNQCHKYwxJjL
+         WDiXX1iv1+MGgUwULVRcVDuYNRde6dO/WRkvdwpbI5tKRd1yp+lAvVFMqOBzS3cxMsDi
+         zt9BG/1jMvMn69Rf8J47biQGM6fTZZ+iMj/v7VSO7NKxtPZbFjuUZAcQRMMjL5DYIPKy
+         LpmQrjGsaEBntZ4aegLgYJxtOX9xMe7lCf58iEyKppixyzEf8Ap7zZTolocIDIAGZ82I
+         J24Dp1+eeRwkiChrlrb01xXSCdEmTnkiAHXUfyxXWemhBTZ6Mgsb0aMNGFa4mALJ7RFf
+         wajw==
+X-Forwarded-Encrypted: i=1; AJvYcCXEN7cYE+vAnZRRoVBnz4t0UgorYguiTbC+ddb9I+518aw+Oc1Wfd9Cyj9n5zGhNHy6XZHyVz8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsMqOWH7mjGJkj8Glndnq8By4SQiihggrN7GS72YDrZ2r/3zdT
+	XQo8S9SWmXuJFsCun3qGdi9m0kEi7xgnaVFi0oGw2M1NWv/qTa6iaVZ8YPQxMrwjiQCRjZWDknX
+	3d0kqhNfmU1vf3Q8vsAn19QxNy/2f3e/nLciNiuDt629ymMzjFblD2Qo=
+X-Google-Smtp-Source: AGHT+IFtcXRT+A73PP4a4fssUvMPwH7z2yt+qGZoJpm9kTGJd4suarkBIP9s1HJlR5Sa26KW6j3/HNFTHQ3hhJXCRGq5wKDa4w+p
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net v2] net: wwan: t7xx: Fix FSM command timeout issue
-To: Jinjian Song <jinjian.song@fibocom.com>
-Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- haijun.liu@mediatek.com, ricardo.martinez@linux.intel.com,
- loic.poulain@linaro.org, andrew+netdev@lunn.ch,
- angelogioacchino.delregno@collabora.com, corbet@lwn.net,
- danielwinkler@google.com, helgaas@kernel.org, horms@kernel.org,
- korneld@google.com, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com,
- netdev@vger.kernel.org, johannes@sipsolutions.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-References: <20241213064720.122615-1-jinjian.song@fibocom.com>
- <20241220085027.7692-1-jinjian.song@fibocom.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20241220085027.7692-1-jinjian.song@fibocom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1e06:b0:3a7:cff5:16d6 with SMTP id
+ e9e14a558f8ab-3c2fe4458fbmr80462535ab.3.1734906746878; Sun, 22 Dec 2024
+ 14:32:26 -0800 (PST)
+Date: Sun, 22 Dec 2024 14:32:26 -0800
+In-Reply-To: <67425f74.050a0220.1cc393.0020.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6768937a.050a0220.226966.0033.GAE@google.com>
+Subject: Re: [syzbot] [kernel?] general protection fault in bnep_session
+From: syzbot <syzbot+6df45dd3d03e1a9aca96@syzkaller.appspotmail.com>
+To: gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, rafael@kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jinjian,
+syzbot has found a reproducer for the following issue on:
 
-On 20.12.2024 10:50, Jinjian Song wrote:
-> From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-> 
->>> Fixes: d785ed945de6 ("net: wwan: t7xx: PCIe reset rescan")
->>
->> The completion waiting was introduced in a different commit. I 
->> believe, the fix tag should be 13e920d93e37 ("net: wwan: t7xx: Add 
->> core components")
->>
-> 
-> Got it.
+HEAD commit:    bcde95ce32b6 Merge tag 'devicetree-fixes-for-6.13-1' of gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12b0fcf8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4f1586bab1323870
+dashboard link: https://syzkaller.appspot.com/bug?extid=6df45dd3d03e1a9aca96
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b90adf980000
 
-[...]
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-bcde95ce.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d1b2e8d294e3/vmlinux-bcde95ce.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/593ff4631acc/bzImage-bcde95ce.xz
 
-> Yes, the patch works fine, needs some minor modifications, could we 
-> feedback to the driver author to merge these changes.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6df45dd3d03e1a9aca96@syzkaller.appspotmail.com
 
-Looks like the drivers authors haven't enough time to maintain it. You 
-are the most active developer at the moment. Could formally resend the 
-updated patch with refcounter as V3? And, I believe, we can apply it.
+Oops: general protection fault, probably for non-canonical address 0xdffffc000000000b: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000058-0x000000000000005f]
+CPU: 0 UID: 0 PID: 6160 Comm: kbnepd bnep0 Not tainted 6.13.0-rc3-syzkaller-00301-gbcde95ce32b6 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:klist_put+0x4d/0x1b0 lib/klist.c:212
+Code: c1 ea 03 80 3c 02 00 0f 85 5f 01 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b 23 49 83 e4 fe 49 8d 7c 24 58 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 2e 01 00 00 4c 89 e7 4d 8b 74 24 58 e8 7c ce 0c
+RSP: 0018:ffffc900047e79c0 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: ffff888033468860 RCX: ffffffff8239c3fd
+RDX: 000000000000000b RSI: ffffffff8b1f72c5 RDI: 0000000000000058
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000b92 R12: 0000000000000000
+R13: 0000000000000001 R14: ffff88802426bb80 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88806a600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffabd6b5108 CR3: 000000003551a000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ device_del+0x1d9/0x9f0 drivers/base/core.c:3831
+ unregister_netdevice_many_notify+0x105d/0x1e60 net/core/dev.c:11562
+ unregister_netdevice_many net/core/dev.c:11590 [inline]
+ unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11462
+ unregister_netdevice include/linux/netdevice.h:3192 [inline]
+ unregister_netdev+0x1c/0x30 net/core/dev.c:11608
+ bnep_session+0x21b6/0x2ca0 net/bluetooth/bnep/core.c:525
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:klist_put+0x4d/0x1b0 lib/klist.c:212
+Code: c1 ea 03 80 3c 02 00 0f 85 5f 01 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b 23 49 83 e4 fe 49 8d 7c 24 58 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 2e 01 00 00 4c 89 e7 4d 8b 74 24 58 e8 7c ce 0c
+RSP: 0018:ffffc900047e79c0 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: ffff888033468860 RCX: ffffffff8239c3fd
+RDX: 000000000000000b RSI: ffffffff8b1f72c5 RDI: 0000000000000058
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000b92 R12: 0000000000000000
+R13: 0000000000000001 R14: ffff88802426bb80 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88806a700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fe5193ea718 CR3: 0000000024a3c000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	c1 ea 03             	shr    $0x3,%edx
+   3:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   7:	0f 85 5f 01 00 00    	jne    0x16c
+   d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  14:	fc ff df
+  17:	4c 8b 23             	mov    (%rbx),%r12
+  1a:	49 83 e4 fe          	and    $0xfffffffffffffffe,%r12
+  1e:	49 8d 7c 24 58       	lea    0x58(%r12),%rdi
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	0f 85 2e 01 00 00    	jne    0x162
+  34:	4c 89 e7             	mov    %r12,%rdi
+  37:	4d 8b 74 24 58       	mov    0x58(%r12),%r14
+  3c:	e8                   	.byte 0xe8
+  3d:	7c ce                	jl     0xd
+  3f:	0c                   	.byte 0xc
 
---
-Sergey
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
