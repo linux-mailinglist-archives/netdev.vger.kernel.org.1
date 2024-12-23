@@ -1,198 +1,137 @@
-Return-Path: <netdev+bounces-154015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 654F59FAC14
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 10:40:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF06D9FACD8
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 10:50:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74B287A2158
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 09:40:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD06218831E9
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 09:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4398A192B9D;
-	Mon, 23 Dec 2024 09:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F001A8F64;
+	Mon, 23 Dec 2024 09:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OVdK1X/i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wlPIQ+D0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0030A1714B4;
-	Mon, 23 Dec 2024 09:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B938199924
+	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 09:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734946805; cv=none; b=UbmZD6WauWWgn+HO2nr6fG2cazsawTzsUwxGI19WLnjDjp+S0CPVz3FzzmFSMZfaTJEI009NtGLMoaF3L04P8KjkR74KA6kgrb50ONgplwjjUfiCTotjfSSpF+l2u/qQehyCn4Al+ozQkDKBloW+8Y/F4nHv0DdMqw5u61FXp/4=
+	t=1734947219; cv=none; b=Fq8VF9XNLd/8GISdaSgxoA9Q2Y/qGmUA7wlNk/QcncDASX4MvUcfKcYtIpT+6A74lwEU8vBvIyDmEDL6QKDRTBzgw/wychI4bmF9Jzu5DsQn2cOQBackC2q8FYuVJ4Io4YTB1UvnB3K5PFr9Aey/DAoszqLgwE70/CD0wGoFYxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734946805; c=relaxed/simple;
-	bh=2omx7q+d9wt2CP8RSFFkgd8MZk41Pv7OsthACrhz1f8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ovIjpMVEsWtfuxwST79/tN2Lma9FfoBwbozDdjsJC8mnM9T37/ACbBoiEcg3IKclw3zj89FF9PFWP77A4wPhPn1kxUD/STs0Vp6O3rc/oUpr5KN58ws1R5qfWOGbeHFFSxVattKwzXMbNqfnPc8+xYEyEc0YZo2UcvSQa/4uQwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OVdK1X/i; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734946803; x=1766482803;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2omx7q+d9wt2CP8RSFFkgd8MZk41Pv7OsthACrhz1f8=;
-  b=OVdK1X/ioxluwre0Z9O4Fq8aVR0zkJcp6AzYABjokVubnbmETWK//2R4
-   DiMEIlG36olvm0Ng4id9YE9a9pLXQpLkR57rXEP+efc0VqTMFCmj4+OIp
-   9BjezwtSo9fvtlXTGQJ9vi3DIzeZw2OK5PbjwRSzn+cH+9Ow21qZ7sTFN
-   Z4xGNDE0kw8kSZkbPD2w7KYiLIrKYcPmTT0jJfb+1PGHNhTcBBLrpMbiB
-   9fqbDBe1242xKwHYGPrrJVRT9an5cYacr7T6mFbHT+cwTKlJN+4noUnUE
-   YGKJdmjpg/2S++f/bZrvEYB6kmD0cBGqjqZqUXLShyWhCUxGPfmvEUE9Y
-   w==;
-X-CSE-ConnectionGUID: ETUlHA7VTwe1YgAZj7xwjw==
-X-CSE-MsgGUID: S6hmrVd+S0OTHtQQE7iIwQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11294"; a="35545383"
-X-IronPort-AV: E=Sophos;i="6.12,256,1728975600"; 
-   d="scan'208";a="35545383"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2024 01:40:02 -0800
-X-CSE-ConnectionGUID: 29f3HbCCSKi3cAVBRgihfg==
-X-CSE-MsgGUID: Pqu9tHU8T52pPNZhFPYHMg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="100009050"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.22.166]) ([10.247.22.166])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2024 01:39:59 -0800
-Message-ID: <c9a5a458-6015-442f-988d-c4b830dabd01@linux.intel.com>
-Date: Mon, 23 Dec 2024 17:39:55 +0800
+	s=arc-20240116; t=1734947219; c=relaxed/simple;
+	bh=mu4qagGJN6FxX6LV8CsL3UN+YeIhrQ3BOxn2WE6b2Ps=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u/pyixdkCoNSeevhTWhPT9U5JSPpkFSevFonCQcroR3amzj2Cq5yNwIlGnwrsb/WO3iuhm0Fbucy2Hh+a6a2rvMGUjGZNg591tcQzpxFVrD/uusHnXgQRlsqfX+01p/K2KVub0veUp/7Eq3N6Ab1txlFXpa8sy/pfPrig42U6TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wlPIQ+D0; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d3e9f60bf4so6473894a12.3
+        for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 01:46:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734947214; x=1735552014; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mu4qagGJN6FxX6LV8CsL3UN+YeIhrQ3BOxn2WE6b2Ps=;
+        b=wlPIQ+D0y8yd6boNIbkKkvxdpw0gLadrUD0l8zhqGDVdc/z5Vj8cvd5JDIo7sWGdPA
+         5j9AzOkwg8Ydg3tWgpnbP3l1kpmscUE9z0+igrRT79FZuXDuNzb+aa2E8TMoIDJyBnrs
+         6E2X8rQrNzDSpA6Dv021/QSllnKpw+O+/XQoNgopJ7Ahr5f+sSkdDE6ntES/ZfY4g/Tu
+         dsDVPohAbFghalvlWNE9OJ7M1U+NzbDroDSNT3HiVnEHdLDXX1+7wNhEcQG4iPt3dLF/
+         sRrltdo/NkWbmLfnahUiDkD6jUjhMOAxmahfVwE5h/+PHbKgnqsBIzMfdOQeWo41zmOX
+         jWgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734947214; x=1735552014;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mu4qagGJN6FxX6LV8CsL3UN+YeIhrQ3BOxn2WE6b2Ps=;
+        b=MT/BTQ5CK0dk1mt2nKDaLpiDSCuYmdEmS1xtsy6Gampr7baV3GISLwlQwNq9Jhh8Ty
+         UrqfzpzPifxa+3iPKJMT4gdsHQr3XnIP7VMzqctwx35X+a2S2Kmh94o1mWYoxTOcm4V4
+         baEAuyT3y+slAXnHfB9JPs/gHm27MI7okIqPXazbDwOSRfftmqMXhqBKZVB5JKPxsj/Z
+         P+Riu/HR0ZIWo/IZr/mhMSH2ZVUsQUg2bOt2frDEpu+SvPGQafeoGTU0SQpeMfYmhX8c
+         UYl5makAWIdshI83ffQ6W6z6TRwqvXJddVCqK9KCktDU+5ae4xLTMnVDuJp7ZXvIZbh0
+         Qa0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXad5QNbEVAmCR73HZObw+hiy/hEaD1i0HHEeGMiSOnCM3L4p4aJZoyHymBNWYsKdrTvJM8y+o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyE7t8GoUqXP71Ptnc+ist1p1irhFJRDGqlYOri6MrGA1fTWxZe
+	RVLJvxSPPnq20cI0zvdpwa1T/l+Qsl8nBHJLgV6qyCvSzPagAW3SoNU7V7RqibYD/eDt3jYpIQ2
+	mOVHURD4P1T6AHShWbtLm+7s9j7GqIphwo9b5
+X-Gm-Gg: ASbGncswUMZBDy5qrf6rTAm9mgULd6pjvZgWaQMy9U7ZsFYDnBHoQMMPCP2/3tHHxx6
+	yXzPz3vlhhc4tocKfM06ztqkG1lQkgdXVtIftWQw=
+X-Google-Smtp-Source: AGHT+IH3+egfWLTE78YKlmwPqtWef5YTuB2kERtTaCX1dCwBHcNtCa+1pJDYxvd4T1CwOvzn7Bqjqihb96SfUcymHm0=
+X-Received: by 2002:a05:6402:270d:b0:5d0:bcdd:ffa8 with SMTP id
+ 4fb4d7f45d1cf-5d81dd83b92mr9613064a12.1.1734947214306; Mon, 23 Dec 2024
+ 01:46:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 8/9] igc: Add support to get MAC Merge data via
- ethtool
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20241216064720.931522-1-faizal.abdul.rahim@linux.intel.com>
- <20241216064720.931522-1-faizal.abdul.rahim@linux.intel.com>
- <20241216064720.931522-9-faizal.abdul.rahim@linux.intel.com>
- <20241216064720.931522-9-faizal.abdul.rahim@linux.intel.com>
- <20241217003501.ar3nk6utdjllqjbk@skbuf>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20241217003501.ar3nk6utdjllqjbk@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <025d9df8cde3c9a557befc47e9bc08fbbe3476e5.1734771049.git.pabeni@redhat.com>
+ <047cb3ef-f0c0-43e4-82e9-dc0073c8b953@kernel.org>
+In-Reply-To: <047cb3ef-f0c0-43e4-82e9-dc0073c8b953@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 23 Dec 2024 10:46:43 +0100
+Message-ID: <CANn89iKU8TwoiZHPwdEAy2w=RhmbDci3n6Wux=oM1YzrkfdzpQ@mail.gmail.com>
+Subject: Re: [PATCH net] mptcp: fix TCP options overflow.
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	mptcp@lists.linux.dev, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Dec 21, 2024 at 11:28=E2=80=AFAM Matthieu Baerts <matttbe@kernel.or=
+g> wrote:
+>
+> Hi Paolo,
+>
+> On 21/12/2024 09:51, Paolo Abeni wrote:
+> > Syzbot reported the following splat:
+>
+> (...)
+>
+> > Eric noted a probable shinfo->nr_frags corruption, which indeed
+> > occurs.
+> >
+> > The root cause is a buggy MPTCP option len computation in some
+> > circumstances: the ADD_ADDR option should be mutually exclusive
+> > with DSS since the blamed commit.
+> >
+> > Still, mptcp_established_options_add_addr() tries to set the
+> > relevant info in mptcp_out_options, if the remaining space is
+> > large enough even when DSS is present.
+> >
+> > Since the ADD_ADDR infos and the DSS share the same union
+> > fields, adding first corrupts the latter. In the worst-case
+> > scenario, such corruption increases the DSS binary layout,
+> > exceeding the computed length and possibly overwriting the
+> > skb shared info.
+> >
+> > Address the issue by enforcing mutual exclusion in
+> > mptcp_established_options_add_addr(), too.
+>
+> Thank you for the investigation and the fix, it looks good to me:
+>
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>
+> > Reported-by: syzbot+38a095a81f30d82884c1@syzkaller.appspotmail.com
+>
+> If you don't mind, can you please add these two tags when applying the
+> patches to help to track the backports?
+>
+> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/538
+> Cc: stable@vger.kernel.org
+>
 
+Thanks for the fix !
 
-On 17/12/2024 8:35 am, Vladimir Oltean wrote:
-> On Mon, Dec 16, 2024 at 01:47:19AM -0500, Faizal Rahim wrote:
->> Implement "ethtool --show-mm" callback for IGC.
->>
->> Tested with command:
->> $ ethtool --show-mm enp1s0.
->>    MAC Merge layer state for enp1s0:
->>    pMAC enabled: on
->>    TX enabled: on
->>    TX active: on
->>    TX minimum fragment size: 252
->>    RX minimum fragment size: 252
-> 
-> I'm going to ask "why so high?" and then I'm going to answer that I
-> suspect this is a positive feedback loop created by openlldp, because of
-> the driver incorrectly reporting:
-> 
-> - 60 as 68, ..., 252 as 260, and openlldp always (correctly) rounding up
->    these non-standard values to the closest upper multiple of an
->    addFragSize, which is all that can be advertised over LLDP
-> - on RX what was configured on TX (see below), which in turn makes the
->    link partner again want to readjust (increase) its TX, to satisfy the
->    new RX requirement
-> 
-> But I'm open to hearing the correct answer, coming from you :)
-> 
-
-Actually ... it was so high 252 ... because I mistakenly copied the result 
-from my past openlldp test that did:			
-sudo lldptool -T -i enp1s0 -V addEthCaps addFragSize=3
-Which sets is to 252 ..sorry causing confusion
-
-Without OpenLLDP, with just ethtool and with default tx min frag size, it 
-will look like:			
-user@localhost:~$ sudo ethtool --show-mm enp1s0
-MAC Merge layer state for enp1s0:
-pMAC enabled: off
-TX enabled: off
-TX active: off
-TX minimum fragment size: 68
-RX minimum fragment size: 68
-Verify enabled: off
-Verify time: 10
-Max verify time: 128
-Verification status: DISABLED
-
-When verify handshake is done with OpenLLDP, it will look like:
-user@localhost:~$ sudo lldptool -t -i enp1s0 -V addEthCaps
-Additional Ethernet Capabilities TLV
-         Preemption capability supported
-         Preemption capability enabled
-         Preemption capability active
-         Additional fragment size: 1 (124 octets)
-
-user@localhost:~$ sudo ethtool --show-mm enp1s0
-MAC Merge layer state for enp1s0:
-pMAC enabled: on
-TX enabled: on
-TX active: on
-TX minimum fragment size: 124
-RX minimum fragment size: 124
-Verify enabled: on
-Verify time: 128
-Max verify time: 128
-Verification status: SUCCEEDED
-
-Which makes sense, due to the rounding up 68 to the closest upper multiple 
-of addFragSize which is 124 octet in OpenLLDP, as what you mentioned.
-
-
->> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
->> index 7cde0e5a7320..16aa6e4e1727 100644
->> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
->> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
->> @@ -1782,6 +1782,25 @@ static int igc_ethtool_set_eee(struct net_device *netdev,
->>   	return 0;
->>   }
->>   
->> +static int igc_ethtool_get_mm(struct net_device *netdev,
->> +			      struct ethtool_mm_state *cmd)
->> +{
->> +	struct igc_adapter *adapter = netdev_priv(netdev);
->> +	struct fpe_t *fpe = &adapter->fpe;
->> +
->> +	cmd->tx_min_frag_size = fpe->tx_min_frag_size;
->> +	cmd->rx_min_frag_size = fpe->tx_min_frag_size;
-> 
-> This is most likely a mistake. rx_min_frag_size means what is the
-> smallest fragment size that the i225 can receive. Whereas tx_min_frag_size
-> means what minimum fragment size it is configured to transmit (based,
-> among others, on the link partner's minimum RX requirements).
-> To say that the i225's minimum RX fragment size depends on how small it
-> was configured to transmit seems wrong. I would expect a constant, or if
-> this is correct, an explanation. TI treats rx_min_frag_size != ETH_ZLEN
-> as errata.
-> 
-
-My bad.
-I got your point, it's clearly explained, thanks :).
-Just got to know i226 is able to handle any frag size for RX.
-Since standard for min TX is 60, I'll use 60 then.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
