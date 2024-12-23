@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-154082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08FF29FB3D1
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:10:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D803E9FB3D2
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:10:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95C56166783
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:10:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E39321668A7
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7F71C1AD4;
-	Mon, 23 Dec 2024 18:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4CB51C3BF0;
+	Mon, 23 Dec 2024 18:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MtC5JxZs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpKWtluU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A521C0DE2
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 18:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EE51C3BE7;
+	Mon, 23 Dec 2024 18:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734977417; cv=none; b=cBQ22IVyuO7/0cwTATnt74BuqJLSY88b4QYNJ/1fmbRcM+F+zSsN9We4nw7YjY2autOW9eKtVNCtLUB3z1KKY2l0f2wJqCJ0M6zXZq18FcaDKjo/Yxb6i5foWX0ku5ad2HZUEQjT5X3x9u3liVun/eGrSW0r0qHrC1XRMp+W7+U=
+	t=1734977418; cv=none; b=rtmmx8JYZVRFbglAQxPqWTPRgE49UchAP5zhAYZ0TTgam0g0FgUHV+WaXM7YOfBbA9qjvGbXvhp1KfK2MqFz6s/UhwlD4QwCalnvtf8LRxJtsDu/XUmohjAyFBB6wwPC4ZgTWImusUpHXF8xpMpwaJwIw02O6xd1J5EScdnFJvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734977417; c=relaxed/simple;
-	bh=iXI/smPbFYNx/DcVICCJ+70TL3GUEYIUm3GHSLcD9Cc=;
+	s=arc-20240116; t=1734977418; c=relaxed/simple;
+	bh=KJiNIh4OQ8lGKPrQdi0wcuPy97JBnl46/hHW1i4t3tY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MMpYwV8Y88ZoTmYPfW0AOPL+wSNlsVkXwRe2je+5yOCtDAzZ+h8UUEEPYHu/gWDn177jV1hHX2DANFjNlF1NJxtlJ1I18jSTlwC6oifq1ooH26ILH9YvWvWjqWK6RD06Ox62P25mwQlaCRxqx8lx81eIGv0zERs0/ecGjo/RUPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MtC5JxZs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4836DC4CED3;
-	Mon, 23 Dec 2024 18:10:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uVEqW8B9h4zyq6f2Lf1ncSYxnUHQgJhCst0pNbds8WCGL1Cj/ruU4UKHQozI+VgVcORJytTX9QWcWgYoGfzYilICksYRMbE8vpWLW1l4e2eVuWMsaqNDWZqTBKQOz9Q2NESMKArfLEbt6eXXbuH08EZ6wBaWS0RounHtbEmH3XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpKWtluU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 794E8C4CED3;
+	Mon, 23 Dec 2024 18:10:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734977417;
-	bh=iXI/smPbFYNx/DcVICCJ+70TL3GUEYIUm3GHSLcD9Cc=;
+	s=k20201202; t=1734977418;
+	bh=KJiNIh4OQ8lGKPrQdi0wcuPy97JBnl46/hHW1i4t3tY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MtC5JxZsZAjR4NVyg5pLvlMQu25Pk/6jbLnqaucEPwZKvN9L0XzxPsGs0STS4Oosu
-	 HorpnRAfDnTF63oQP/lhF7ZjkoP44uzyzemSSAVfNY3rkNGW1TtH+W5ix6KJ+svJEe
-	 jqc13PVCnApVcE/+LrOhidjJrPYbKdK5gGqh9FNUaTwsuZ20zp0xHs0tIaKQR+axqk
-	 s5EpsLYSRyPuFsiiXAVtgZP+STsE1fddoKbLsTvk2BP6FEvg7yEsSBAria1hWjzgby
-	 n+7rrZ0pA+bzP2MQfBbPdpYyJmH+l0V2hd3KFSKBdPKSmUZel3ww270wIfqioX6mm/
-	 ATE2tT41ZOb7g==
+	b=gpKWtluUlZGTHIrJPAmGB6U7rzyOHVeL/7+8jNTJR5TJk5+DSjc3wlD7SmqQQ/MR9
+	 jx3118rbCUufPPQ5XCcy20zPR+desvj+43nOn+SF3yUAswowI0Z7vec+Vhm3kOlysF
+	 qrFgd0OSVj6DAAS/SvAG4+mE4Qhh+1cJLXBDItyFuDxmofe4DsSsxgNTVquqGHUrj8
+	 QrVSv7AdqfuIETh1VqizuP8KmR6giW21JGhynWc2JNenJbfViqxBS7fvm8yYa0Tk0U
+	 mqPP9BDRqUNBHV0Qk8ADl2aCb/2uoQuEfSC4o1Y3GpI9uMgvlqa01tH9BEGPq8lkFN
+	 vAfpKCAzesZYg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBB403805DB2;
-	Mon, 23 Dec 2024 18:10:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E0E3805DB2;
+	Mon, 23 Dec 2024 18:10:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: Fix netns for ip_tunnel_init_flow()
+Subject: Re: [PATCH] netrom: check buffer length before accessing it
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173497743545.3921163.7394913074374940004.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Dec 2024 18:10:35 +0000
-References: <20241219130336.103839-1-shaw.leon@gmail.com>
-In-Reply-To: <20241219130336.103839-1-shaw.leon@gmail.com>
-To: Xiao Liang <shaw.leon@gmail.com>
-Cc: netdev@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org
+ <173497743701.3921163.18071428597161743809.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Dec 2024 18:10:37 +0000
+References: <20241219082308.3942-1-rabbelkin@mail.ru>
+In-Reply-To: <20241219082308.3942-1-rabbelkin@mail.ru>
+To: Ilya Shchipletsov <rabbelkin@mail.ru>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, hfggklm@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 19 Dec 2024 21:03:36 +0800 you wrote:
-> The device denoted by tunnel->parms.link resides in the underlay net
-> namespace. Therefore pass tunnel->net to ip_tunnel_init_flow().
+On Thu, 19 Dec 2024 08:23:07 +0000 you wrote:
+> Syzkaller reports an uninit value read from ax25cmp when sending raw message
+> through ieee802154 implementation.
 > 
-> Fixes: db53cd3d88dc ("net: Handle l3mdev in ip_tunnel_init_flow")
-> Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
-> ---
->  drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c | 3 +--
->  net/ipv4/ip_tunnel.c                                | 6 +++---
->  2 files changed, 4 insertions(+), 5 deletions(-)
+> =====================================================
+> BUG: KMSAN: uninit-value in ax25cmp+0x3a5/0x460 net/ax25/ax25_addr.c:119
+>  ax25cmp+0x3a5/0x460 net/ax25/ax25_addr.c:119
+>  nr_dev_get+0x20e/0x450 net/netrom/nr_route.c:601
+>  nr_route_frame+0x1a2/0xfc0 net/netrom/nr_route.c:774
+>  nr_xmit+0x5a/0x1c0 net/netrom/nr_dev.c:144
+>  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+>  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+>  xmit_one net/core/dev.c:3548 [inline]
+>  dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
+>  __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
+>  dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+>  raw_sendmsg+0x654/0xc10 net/ieee802154/socket.c:299
+>  ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg net/socket.c:745 [inline]
+>  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+>  __sys_sendmsg net/socket.c:2667 [inline]
+>  __do_sys_sendmsg net/socket.c:2676 [inline]
+>  __se_sys_sendmsg net/socket.c:2674 [inline]
+>  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> 
+> [...]
 
 Here is the summary with links:
-  - [net] net: Fix netns for ip_tunnel_init_flow()
-    https://git.kernel.org/netdev/net/c/b5a7b661a073
+  - netrom: check buffer length before accessing it
+    https://git.kernel.org/netdev/net/c/a4fd163aed2e
 
 You are awesome, thank you!
 -- 
