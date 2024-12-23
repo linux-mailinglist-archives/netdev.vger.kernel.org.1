@@ -1,144 +1,282 @@
-Return-Path: <netdev+bounces-154077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 386689FB38D
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:18:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A86F9FB38C
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:18:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2C591636C6
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 17:18:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9280F7A1C12
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 17:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1418A1B6CEF;
-	Mon, 23 Dec 2024 17:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4375C1AF0D7;
+	Mon, 23 Dec 2024 17:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="BXhZKUh9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jDnIdb7B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7330E1B4120
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 17:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734974310; cv=none; b=eyCiEF6m5EiGFSIrQ6a/Bt4W8pwuTvgT0RDiuE/OcwWc5eRcNkPq4NJkWIMCemNbpoiamo5/R8UTAOhFcXNQpjMCgeqkWL3VIgZUtRRYGjwwXgxT7dIOpH8YnYo3QN3SHOdUIZe/vTiyFN7MBvuUqMFSkIoewTu46JkJzZ1VfN8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734974310; c=relaxed/simple;
-	bh=ZFjtw8mVlMznxfdXZbC8x7yvA3bZktZPf3wIGguvL5I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WrYhsV1HYiYrPe36XeE04AEf/bOIXc4ZNxSuXTbFCLx88HDO/55Hviori3M5x57d1MRorLfPOvlIcwuZ8SDlkt+ak3FV2FzgtWruPaxr2hnVIR17CqtkSEmu7IzvN9j4szN5shsKO3iyCnrWSYzWxEPjRslMJxJBDIHjwdrhgHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=BXhZKUh9; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZFjtw8mVlMznxfdXZbC8x7yvA3bZktZPf3wIGguvL5I=; t=1734974308; x=1735838308; 
-	b=BXhZKUh92NvT4hJbYF/wJZYjMkDiMY43bt6U46rSbuzbuWVrCtTl28QKkq1ZSt/+fXuV0gKteCu
-	TFeFG394P07kDk90RqGZihJuHkYjdJumD0wSnWDJAV9qY1CKNKkmxsnbBmbMayXKuzj5n0bVgkyoh
-	2nHn/S3k+hohqZF1w8b50dSXXFh5/378vm9dv1xqtzH3JmPHyiI3UUhDnoCIeVfFGfYoifPCfzItq
-	JsNwIyQv5Btj31pS0jLAr1WdHGJ21u3uIwqTJ+NsIC3Ze2xISrt1bRlwFdLdOPMCvC5kYN9cR7xfE
-	2LpViLzJz3Q96WbYhUhe0qtvOMaof3yzc38A==;
-Received: from mail-oa1-f47.google.com ([209.85.160.47]:61458)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tPm4S-0005l6-VQ
-	for netdev@vger.kernel.org; Mon, 23 Dec 2024 09:18:22 -0800
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-2a01bcd0143so2941247fac.2
-        for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 09:18:20 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUalH3ZCQA9mRMekytmQ7Mli3yDHYwoo25QH6YZ9Uk7xLC9OdV2ikh0AE+NJISLIo/+FIXgwSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy22Y+nZ+I8FNwn9tEvRqLZkityO4AZ0IdF0SX72qYNP50++BuM
-	ZAcxbELWcTeveZStXuK40eWRsZVC9k7CQB/b8JG+tyz4xYTgwyKWlqciwdjhdoC6llkd5c2uigs
-	iBJ/7Qq5GLU//pv58+QqGYGuFDpA=
-X-Google-Smtp-Source: AGHT+IEE3jaC2ucf93fwI55SSQW+DS3K6j69v9PEtECB+2MiMak/iFFi1rlAjBV0soeTseGXHNIXyA9G7/x0JwqabPo=
-X-Received: by 2002:a05:6870:1592:b0:29e:7f8c:8f57 with SMTP id
- 586e51a60fabf-2a7fb4b7987mr8450299fac.27.1734974300375; Mon, 23 Dec 2024
- 09:18:20 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D00F17E015
+	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 17:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734974308; cv=fail; b=SOE2qXjXE8+rFcyNm/fK5KSg6ZgFw6+V3pdAUynmxcLHOMn/OYUD1/4XHzrPTbX7tLYYvL41BzPvjnuXohe9KExXtjxlDrNaM9R/3l4sszV47kkrfDjfI1Yml5LInAa7Osof5NtMW2/Q5S7grSCA8QTDfk8JaL5HbfRsUKfWBh8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734974308; c=relaxed/simple;
+	bh=yS5UxhBe6q2p3NOiuCO+VYjRpllE2XNHJ5B2t37bqeU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tS4K9OuDp0fs/KfCnUChhw2J++Yyi9W89wxzgovBugVhUXDFOw7AStmdbHuZejimPYcOTH/iQcIo5Ftnu83NbOjiP0/Lr8wyKgAVIi/EgLB4yEyjSl8FPwwmjtjQFXXFIVcn5TYGiekove/tyXno7DGxG3gzLrkJYYrpbblOAxY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jDnIdb7B; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734974307; x=1766510307;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=yS5UxhBe6q2p3NOiuCO+VYjRpllE2XNHJ5B2t37bqeU=;
+  b=jDnIdb7BY9I7S1z5FZgYUqOBzOWEyS9Cwgbn0Q42L9Z15SXbFEDA3gIv
+   PfI7ghtQS9ymMjpdg9jlcjSUY8uZf1ArXJTqMb0PN0v9aiZNAoIznpPxY
+   jtHTjLrT7OQ7SielvxeOPGjKYgR1h/LahOScbAjrqQ0N8jzWtrzdfWX6K
+   tkiWrnQPjMzDfRME4XgUOswJzYbnaIbQ7+I2RjKGW5pyuhaL+Gvu70j7z
+   RwaqAYxnX6OSWkQ4jxnKCQZNEyXZUE/Hj5zqUza4X9LB7/D7WrUG73Cf8
+   zKLghoFtZfrAJaxsRSSiDAjiyciGPZznEqE/tTJAZqFM5uOOpDL9OSaTP
+   g==;
+X-CSE-ConnectionGUID: MU2tIpD0Sg6g9itvoGNC2A==
+X-CSE-MsgGUID: RpouZLqDRpqQ+kA5TVE9Ig==
+X-IronPort-AV: E=McAfee;i="6700,10204,11295"; a="35341233"
+X-IronPort-AV: E=Sophos;i="6.12,257,1728975600"; 
+   d="scan'208";a="35341233"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2024 09:18:26 -0800
+X-CSE-ConnectionGUID: wPftDmV7So24DDsZy6iY9Q==
+X-CSE-MsgGUID: mMW9yP7fRNOfSIoSGKZtyg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,257,1728975600"; 
+   d="scan'208";a="99116079"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Dec 2024 09:18:26 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 23 Dec 2024 09:18:25 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Mon, 23 Dec 2024 09:18:25 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.47) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 23 Dec 2024 09:18:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mbqKjLYMzj//Yla9b/DIAVUdy4BBA8MV8tebQ46CIXxE5lUS2AJW/xZsqXOUcgBAhHghjespBbNM9zK5fvDS0AXWq1mIs5MKA/Bb7b9D/nGfn4Srnte4OymXmg9NIvhkb9jmWy6GSGroTGiQ9Rr4qndiMsuKrxiMR08soX0nOUassM43BXyTykyzYxlt1KgDIT0AhC3PJ6GSNepfUqhshNTGxQH0vsgepLXqA617kyTxSsPvJ2EMLdCEd9lDitB95Ae3l86za8XU1WYGBRJr5fgRTlCdAdqbWvpRShxcokVZwM/dMxOSjTjqmKdLh/lhoprGd1Qp+I0T8JC74aPIPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0jJnYFsOgUESWtiG548VkyjLmFo9CDH2hc0GMTTcdSk=;
+ b=uexk2nVUM3ZHoia14Ud0HCiy+dc7ppJQ9hE+ge1NEIQMoDtNnPX9bsFLiHJFvkaKcd7MiW4iqeh15CPsAoBWfhnONbW33EX8IjOOjzKSnKZvLLjy6HdK106E8BqPAObqs/Ek8NazgDKQoeQcTt8FmXRuFpBz9SLjesi/qLN3Ld0oSDN4RnKwoqt0c4E5xJeFhR1iYVOc6fvnM059QW2FrVCFzPoPvZAjyRUfGq2zAEfN0d6orE8oKbH/B03sLqePdaR8hb5P0oE5QTKuWUuv0R1M0HDKutxpdMovkveK3MAAhCVm44YVEYx9bT7X3AWKFt+dC2BOhjBx/lq+ub613g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by CY5PR11MB6187.namprd11.prod.outlook.com (2603:10b6:930:25::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.21; Mon, 23 Dec
+ 2024 17:18:03 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::90b0:6aad:5bb6:b3ae]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::90b0:6aad:5bb6:b3ae%6]) with mapi id 15.20.8272.013; Mon, 23 Dec 2024
+ 17:18:02 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: "Knitter, Konrad" <konrad.knitter@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
+	<edumazet@google.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "brett.creeley@amd.com"
+	<brett.creeley@amd.com>, "marcin.szycik@linux.intel.com"
+	<marcin.szycik@linux.intel.com>, "Knitter, Konrad" <konrad.knitter@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v4] ice: add fw and port health
+ reporters
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v4] ice: add fw and port
+ health reporters
+Thread-Index: AQHbS7qg4jYzMB33+kGTst5q0RsbRLLuo/LQ
+Date: Mon, 23 Dec 2024 17:18:02 +0000
+Message-ID: <IA1PR11MB624145EE61E5BEEE1DECAF2C8B022@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20241211110357.196167-1-konrad.knitter@intel.com>
+In-Reply-To: <20241211110357.196167-1-konrad.knitter@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|CY5PR11MB6187:EE_
+x-ms-office365-filtering-correlation-id: 9d081918-e5bb-41f6-ad25-08dd2375c201
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?8QM8lD3yb6KO7FLhBbqlJFm66gNmFLM8ge9XSD5Lby8webIxbRdQr2nYcSdp?=
+ =?us-ascii?Q?VsNjQuPpTVmoA1YCzptLfETk/Ml8FL6ZxYxQyBaCB6EAme+EGd4kJxbL6gqn?=
+ =?us-ascii?Q?mE2Y+HICoM/AeMBXVPU5w6oBrQ8X1B58b5UMvczTUxWK7ZDAfW4r8dtX+iN9?=
+ =?us-ascii?Q?6IKgcWEawOY8IVzANZgQ+mgYXeFY0KgKqLKjG02mBDDgEYXtDRrsGUMk+Kbj?=
+ =?us-ascii?Q?jNHEUNJo8mo6f9psw4oDWlSs+EbdPI3h2Cc4QmLluHVZj0bcHRgAs0dgHB4E?=
+ =?us-ascii?Q?eo75SYBtpLMnMmZKeguOOYuUYSLmPjqJvtYsrnbKnHXMGU0/7tCH7uc/T1ba?=
+ =?us-ascii?Q?t2dEFcXPmBDJ1wkqYQRYWC7MxaGU8z8MfloYwgEgas5Vre6pE86Cg1V6m5Vs?=
+ =?us-ascii?Q?QuSNFplXQ3NcbnG1qQZUPJepN1oLiFY5tWgoXPpyUUcIPNgSstYLh45MnDYF?=
+ =?us-ascii?Q?CMusnJsxcxgSORgeD9MpWS5vFwrHkn7n8+Y8A1S07xWs7rvasmjnKYciILfB?=
+ =?us-ascii?Q?+Nn4hLvlslzd31p9vYvWfKTSdE0bH383wmc7qiauuw4QF88maWvnPIElNRXH?=
+ =?us-ascii?Q?7QxwUwlhKg2kq9dq9/Zo8LrKMtYZqeOPw44ZmqRvvdZ2PHQxb3ASBt/97QZ1?=
+ =?us-ascii?Q?P5ST/+99vtqEaXlr4fCM/ndPfigN4DFwNTD3l4X4YZ3aGAJjXqCYpFjmwR+M?=
+ =?us-ascii?Q?mPyrjUl8wQFxNnBVmIx0kpubHVwbI+21t6QcVfOo1t7Oj+8aN5vGEbfWJPM2?=
+ =?us-ascii?Q?RSPbiRUfT4C0Jo1DR0+mUqVPxyR1aR4K4GPDgImKcUcaRNloGkm7c1u81v4q?=
+ =?us-ascii?Q?UgNstSpNhNSJa+/RQ5e4DuwuthotIKvXeO7+Fowd2xscvUz03/1xwf+D2glD?=
+ =?us-ascii?Q?Pme5g9yRAukz6xzos9hiVsZaoQexNI86VFyXjLq0cfDAXubHfBlzcsEAMLCH?=
+ =?us-ascii?Q?rlPa+ERiwF5whLj6iyqf7m4gIcEsliACL1oI9oCVfDWf4+ReKjg9t70IPC+2?=
+ =?us-ascii?Q?o7ce43ZPgTBxLcqvrzsx8kSy0zjjC0OOXOJxNMKKTPWcfatJ036cyG1cq+Ma?=
+ =?us-ascii?Q?oB1IQvIUS8haXn3yYoYz6ZIStepBC+i6OuwGhcQRWEXrAfiulZKpcrdLCm6y?=
+ =?us-ascii?Q?NZdtvEhXfHJg6nZPjsUpeaNC5eybjOydlnIafRVYOJqiCjVhjtNl9+Yy5sWr?=
+ =?us-ascii?Q?1bIyk5ev67dyfMpoPw9gOvo4cIAsS6dDR/XRpXmd2kDqSRsw5WhR9hPYXzaq?=
+ =?us-ascii?Q?HixSvnXRrDINweLsqGG+Fs5ItJso7aQrZwvY7WG0NcUzTxYEzrzljWLktqBW?=
+ =?us-ascii?Q?NidxGGYIPShjSrTockp5zFyFb1Isi36El72NU5lDTQp5akCabQrdTFdB25PY?=
+ =?us-ascii?Q?mh2MF973xmgSKo/b/AAThyXOlqAncbq2BgjGWhRYIirqZyOc+w=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?m7pNzmaFu1+n/oP/hFsB15w61k2jvnBBPJ4QgktCBFUnC/ZuGFXSngKnNwbr?=
+ =?us-ascii?Q?FgOdOjWHHc/qRRgj97MbnROZu5/E8p4Gefenm2Ye5gY0EmnXNoPe10OvIbdt?=
+ =?us-ascii?Q?zg1NLwPCMmx5XgIQ+mrBdyADOrwAFuEzUkXdgU6qcYQxrjI9WdaRU+fCHZ/l?=
+ =?us-ascii?Q?k3cV7g6/JW1RmcIMaXPnnvsBnsZjIxmzpeYIAzG11xVP0jETdFHyieWtFEHI?=
+ =?us-ascii?Q?MPBfn78zdD2K5SPbsM9wL1gCFgFxlXdiw9kEgHXLzVy8SD/SNRLYAR9VyRhC?=
+ =?us-ascii?Q?WOG0gwMhYspSFE7KBNh/ScUaDmommlTrKCGaCAmMETN5+V9FWeVJyI7K+QD3?=
+ =?us-ascii?Q?JyqCv0srDyleaM05Eh8iLeLvI8aO/Y3TW3zPsAX5MzJNMDXU7wdshcr8IEUm?=
+ =?us-ascii?Q?pzP53Q6zCMzZFtNLey/EwBllywZbb43+Pu9un3/GmoF8knlY1OLa5rVLtAf3?=
+ =?us-ascii?Q?7L6mJv0XSUwTRRaUnCz7F6wnL4iEev8tgexSM+SsPPo2wNDazIYeFcYDI9D8?=
+ =?us-ascii?Q?Wp6QCQf22nBMFAbHQeh6NBh72mHqxfMTxfGuqBTVjmtX1iifgmLDnl6epKuY?=
+ =?us-ascii?Q?fkku6OmAlt/8sa+joWaYKh7Grmjio5My8pFA4/hOvW3Knlzg9bGCPNlkPu75?=
+ =?us-ascii?Q?DFuYpZvVU4s5PAxus2QBFWWvsMfMuHJ2yzAmA4JUVA058ECd9/4/t3hU04Fj?=
+ =?us-ascii?Q?kw7mYFsZVe/rPblaU+m4tO2W1/+2Vd23XOVDtm3yYQHqKPn6uOGiwH41oYej?=
+ =?us-ascii?Q?juDlaOJn9aZOVL9rWyRdXH/A++SevzMq5UBb3MTsCwIj1GiaI38lej5+liTD?=
+ =?us-ascii?Q?9x7gmXTLfnSmSiuJt3twsNljsGkT4gzhgFtGzo17C4uA+OsJjqCd4j/U8Kiu?=
+ =?us-ascii?Q?tMXvxkRO1d0dujnkVp43JcB8scIt6OJaZ8zTdZ0Bwmp1XFEmwul4og/D5TWj?=
+ =?us-ascii?Q?nUOVv3qqkBJKfBUTTUJqzaW+bieD9RXb/ZnVbHO3lvU2S2+G9b7/pe7fkyoW?=
+ =?us-ascii?Q?ds9eBKO1cstptWCQZOb1wqI8hCVoneppQvIH1eYF/akbEdd2vPsBbLT5HO9L?=
+ =?us-ascii?Q?YaTN+sIzqF8K0A2R+SGPsckzaIqEEml7TanjW8X7iBL9wa0ZiJx10ZbgL8dH?=
+ =?us-ascii?Q?RcKyTDOD8bHx0LMVf8incZJXDOoci1cdAsCSB0MCnf0r8T0WrxgTIBW6IRYv?=
+ =?us-ascii?Q?WltTuyjJXv3daNlW/G+OSRhFcW4bhwTAE53m78AtGy7sD803sHKf8gsSGWfr?=
+ =?us-ascii?Q?Q+BOIKBT4Gc9ZiuK8GL9W7Rn6OsscyIyXye+ZOV8BfRcnDkBFZw0WimO3wdV?=
+ =?us-ascii?Q?ceTeGMd+zbN0GPqkbm2EW0zDubmwF/hYQse3Nd8iz4HlCnnqmqbQN0kRxIM6?=
+ =?us-ascii?Q?3U2Y7epPBkMxfFaO23RtdanXanr3jsLb9NWO7/0dn0LPtdY79YNsWRlvvxab?=
+ =?us-ascii?Q?ozkwJZL2KiJeErXEMQfEjxS4tVReYml9c0aWsITMbsxWNkuAJzjgMLguEBDv?=
+ =?us-ascii?Q?mNySej50dKYtp76NEv4fF/0Fdfwut+sVd3CJgadncEfhk1u2KEYaOmPPcYgf?=
+ =?us-ascii?Q?QVYdbXyhUxpP4p/JRUhYpdHLJzfoyo5AFSCItMfA?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241217000626.2958-1-ouster@cs.stanford.edu> <20241217000626.2958-2-ouster@cs.stanford.edu>
- <20241218174345.453907db@kernel.org> <CAGXJAmyGqMC=RC-X7T9U4DZ89K=VMpLc0=9MVX6ohs5doViZjg@mail.gmail.com>
- <20241219174109.198f7094@kernel.org> <CAGXJAmyW2Mnz1hwvTo7PKsXLVJO6dy_TK-ZtDW1E-Lrds6o+WA@mail.gmail.com>
- <20241220113150.26fc7b8f@kernel.org> <f1a91e78-8187-458e-942c-880b8792aa6d@app.fastmail.com>
- <CAGXJAmw6XpNoAt=tTPACsJVjPD+i9wwnouifk0ym5vDb-xf6MQ@mail.gmail.com> <728cebe2-6480-4b55-a6dd-858317810cff@app.fastmail.com>
-In-Reply-To: <728cebe2-6480-4b55-a6dd-858317810cff@app.fastmail.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 23 Dec 2024 09:17:44 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmxqk14LdwtxER24X4wuFO0SrjALabE3=t7SatugbLqOQg@mail.gmail.com>
-Message-ID: <CAGXJAmxqk14LdwtxER24X4wuFO0SrjALabE3=t7SatugbLqOQg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 01/12] inet: homa: define user-visible API for Homa
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 6890477ab20817755420d5b1edd0addc
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d081918-e5bb-41f6-ad25-08dd2375c201
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Dec 2024 17:18:02.8977
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eFSDb/KNqnCBrjRKjRJG7MRXMsfnx4+s6mJUH4e76y5KzyTNIrO7XV0gWEkR86eGS2ZMcYHMDs0MUIFqDKCzTQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6187
+X-OriginatorOrg: intel.com
 
-On Sat, Dec 21, 2024 at 5:43=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> wrote=
-:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+onrad Knitter
+> Sent: 11 December 2024 16:34
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <=
+przemyslaw.kitszel@intel.com>; netdev@vger.kernel.org; kuba@kernel.org; pab=
+eni@redhat.com; edumazet@google.com; davem@davemloft.net; andrew+netdev@lun=
+n.ch; brett.creeley@amd.com; marcin.szycik@linux.intel.com; Knitter, Konrad=
+ <konrad.knitter@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v4] ice: add fw and port healt=
+h reporters
 >
-> >> That probably also explains what type of memory the
-> >> __user buffer can point to, but I would like to make
-> >> sure that this has well-defined behavior e.g. if that
-> >> buffer is an mmap()ed file on NFS that was itself
-> >> mounted over a homa socket. Is there any guarantee that
-> >> this is either prohibited or is free of deadlocks and
-> >> recursion?
-> >
-> > Given the API incompatibilities between Homa and TCP, I don't think it
-> > is possible to have NFS mounted over a Homa socket. But you raise the
-> > issue of whether some kinds of addresses might not be suitable for
-> > Homa's buffer use this way. I don't know enough about the various
-> > possible kinds of memory to know what kinds of problems could occur.
-> > My assumption is that the buffer area will be a simple mmap()ed
-> > region. The only use Homa makes of the buffer address is to call
-> > import_ubuf with addresses in the buffer region, followed by
-> > skb_copy_datagram_iter with the resulting iov_iter.
+> Firmware generates events for global events or port specific events.
 >
-> Right, NFS was just an example, but there are other interesting
-> cases. You certainly have to deal with buffers in userspace
-> memory that are blocked indefinitely. Another interesting case
-> is memory that has additional constraints, e.g. the MMIO
-> space of a PCI device like a GPU, which may fault when writing
-> data into it, or which cannot be mapped into the DMA space
-> of a network device.
-
-Homa doesn't map the user receive buffers into DMA space, so this last
-issue won't come up.
-
-> > Is there some way I can check the "kind" of memory behind the buffer
-> > pointer, so Homa could reject anything other than the simple case?
+> Driver shall subscribe for health status events from firmware on supporte=
+d FW versions >=3D 1.7.6.
+> Driver shall expose those under specific health reporter, two new reporte=
+rs are introduced:
+> - FW health reporter shall represent global events (problems with the ima=
+ge, recovery mode);
+> - Port health reporter shall represent port-specific events (module failu=
+re).
 >
-> I don't think so. I still don't know what the exact constraints
-> are that you have here, but I suspect this would all be a lot
-> simpler if you could change the interface to not pass arbitrary
-> user addresses but instead have a single file descriptor that
-> backs the buffers, either by passing a tmpfs/hugetlbfs file into
-> the socket instead of a pointer, or by using mmap() on the
-> socket to map it into userspace like we do for packet sockets.
+> Firmware only reports problems when those are detected, it does not store=
+ active fault list.
+> Driver will hold only last global and last port-specific event.
+> Driver will report all events via devlink health report, so in case of mu=
+ltiple events of the same source they can be reviewed using devlink autodum=
+p feature.
+>=20
+> $ devlink health
+>
+> pci/0000:b1:00.3:
+> reporter fw
+>   state healthy error 0 recover 0 auto_dump true
+> reporter port
+>    state error error 1 recover 0 last_dump_date 2024-03-17
+>	last_dump_time 09:29:29 auto_dump true
+>
+> $ devlink health diagnose pci/0000:b1:00.3 reporter port
+>
+> Syndrome: 262
+> Description: Module is not present.
+> Possible Solution: Check that the module is inserted correctly.
+> Port Number: 0
+>
+> Tested on Intel Corporation Ethernet Controller E810-C for SFP
+>
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Co-developed-by: Sharon Haroni <sharon.haroni@intel.com>
+> Signed-off-by: Sharon Haroni <sharon.haroni@intel.com>
+> Co-developed-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
+> Signed-off-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
+> Co-developed-by: Brett Creeley <brett.creeley@intel.com>
+> Signed-off-by: Brett Creeley <brett.creeley@intel.com>
+> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
+>
+> ---
+> v4: Extended documentation to ice_is_fw_health_report_supported.
+> Comparing host byte order event_source.
+> v3: Changed patch title to add health reporters. Style fixes.
+> https://lore.kernel.org/intel-wired-lan/20241209093204.173817-1-konrad.kn=
+itter@intel.com/T/#u
+> v2: Removal of __VA_OPS__ usage. Style fixes.
+> https://lore.kernel.org/intel-wired-lan/20241209111359.GA2581@kernel.org/=
+T/#t
+> v1: Initial version
+> https://lore.kernel.org/intel-wired-lan/20241118104810.477794-1-konrad.kn=
+itter@intel.com/#t
+>
+> Depends-on: https://lore.kernel.org/netdev/20240930133724.610512-1-przemy=
+slaw.kitszel@intel.com/T/
+> ---
+> .../net/ethernet/intel/ice/devlink/health.c   | 295 +++++++++++++++++-
+> .../net/ethernet/intel/ice/devlink/health.h   |  14 +-
+> .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  87 ++++++
+> drivers/net/ethernet/intel/ice/ice_common.c   |  38 +++
+> drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+> drivers/net/ethernet/intel/ice/ice_main.c     |   3 +
+> drivers/net/ethernet/intel/ice/ice_type.h     |   5 +
+> 7 files changed, 436 insertions(+), 8 deletions(-)
+>
 
-After thinking about this some more, I don't think there should be any
-need for Homa to constrain the addresses passed into it. Homa's usage
-of buffer addresses is the same as TCP's; the only difference is that
-instead of receiving a buffer address in a recvmsg call, the address
-is passed in earlier in a setsockopt call. In either case, the
-application could pass in an arbitrary address. Assuming that TCP
-properly handles all of the possible variations in addresses that
-could be passed in, Homa should properly handle them as well, since it
-invokes the same underlying functions. Is there a specific example you
-have in mind of an address that would be problematic for Homa but not
-also problematic for TCP?
-
--John-
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
