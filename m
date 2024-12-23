@@ -1,94 +1,98 @@
-Return-Path: <netdev+bounces-154070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDA69FB349
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 17:47:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 241959FB353
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 17:50:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14877163D50
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 16:47:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76F461882105
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 16:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6881B415E;
-	Mon, 23 Dec 2024 16:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D4A19DFB4;
+	Mon, 23 Dec 2024 16:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WM6Djv83"
 X-Original-To: netdev@vger.kernel.org
-Received: from zenith.plouf.fr.eu.org (plouf.fr.eu.org [213.41.155.166])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CBD1B4152;
-	Mon, 23 Dec 2024 16:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.41.155.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F7F80038;
+	Mon, 23 Dec 2024 16:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734972260; cv=none; b=BvLivFw1tcXZVLl+1hi7pG9MJr5P3zwGnYkAf6APYPVXUDwU0OYZqdZVoCgzglGGl2aRBSgWHd3CRz6JYSsn20tU0FJ3uc4yS0AEqS3N8mnDQYB9cu29ezRxqcCyLKrElLq9EVpnZsxg/HUzKAIp+Ti6WH1QFqkIghCHqyq4yb8=
+	t=1734972635; cv=none; b=Yj2tlDxiJhr2pGrEBfGGgXc4BWJ/wzLg2Gfzwxw8yXWhN7G2hjM4k+j+csVQKIiQo/T87c/ypZH6kP5IRamxkmdlHc/iOSODPKk6mfNg9qEgI4ZeahQi++WzAW3vephPleQTpramaN3vhA2+SBeDL1BYbsJBPSr4KG5i48dTBQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734972260; c=relaxed/simple;
-	bh=wlMEeRIXYvr6fv4DgMY6C73FcM2dTkJcnfCa6aV7z4s=;
-	h=Message-ID:Date:MIME-Version:From:Subject:References:To:Cc:
-	 In-Reply-To:Content-Type; b=sSCHWp3biXijOWSbHtWewotebctXPfZLaZh4i2bxCzvnYe9RzeYafXP1kElMEqMcsHALpJg8SCjEs4g3bWk/1OUGOv6gqkr09XdQkYLTn60yVVzVDTn1cnFgAOc5RUINHx8Z/VHCjV4++K4hAct8oBJriO+zDRj8iXC4G/ntkBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plouf.fr.eu.org; spf=pass smtp.mailfrom=plouf.fr.eu.org; arc=none smtp.client-ip=213.41.155.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plouf.fr.eu.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=plouf.fr.eu.org
-Received: from [192.168.0.252]
-	by zenith.plouf.fr.eu.org with esmtp (Exim 4.89)
-	(envelope-from <pascal@plouf.fr.eu.org>)
-	id 1tPlXL-0002zy-6J; Mon, 23 Dec 2024 17:44:07 +0100
-Message-ID: <10165a62-99fb-4be6-8c64-84afd6234085@plouf.fr.eu.org>
-Date: Mon, 23 Dec 2024 17:44:01 +0100
+	s=arc-20240116; t=1734972635; c=relaxed/simple;
+	bh=1ICzWEYg/SjkAHesfsZYH1PIBuyI7JOU8lzjwZ72/nU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BgNdYluVQbzKkna4KNR1SC9UDikig5a2cNLRyZ1+uGIq3B6jL4RoMsiFOo7wUiL8y7fq1Km9NPk3/F+cPe4XG5wjXqKBmr+bPHbLjWiFfaYMpnlntXnDomYy2LfwYEy7Hs3XXKM07ee5aQkhL+XUazoYPUyilHisEqv6QlR+7Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WM6Djv83; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 631A4C4CED4;
+	Mon, 23 Dec 2024 16:50:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734972634;
+	bh=1ICzWEYg/SjkAHesfsZYH1PIBuyI7JOU8lzjwZ72/nU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WM6Djv83uHOx8hadDlR39Pf9KBY1yCY9se48fzkwqMwU3kLAJIKmqpavrHw0GdJ48
+	 f8it/EH/s4+kKbDKMSvkd4yPKvwNi/LMskJWfhRGb7gSBDlUAdpnjFiIonb9ABMu1P
+	 ukr8lM/OMuH9AOw8Xer9a+aGTjE6TKJRO/UggXUdPiiD8WgQKkgFE05yrcCKFGQAgK
+	 gb8NLJ10W8NcXCHJJRsed9gy+eOk5dZK9QcMxtYUY61BWOj2LZJygW+R62DAZlhpiv
+	 uOBL9Sef0HXeFrs42DIvrr8KUCq0JCdnygIeLUKGnWKYp3zqTrwCI/W+IWW/+t1+zZ
+	 huhRHvdV+pNOA==
+Date: Mon, 23 Dec 2024 08:50:33 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Soham Chakradeo
+ <sohamch.kernel@gmail.com>, Willem de Bruijn <willemb@google.com>,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ linux-kselftest@vger.kernel.org, Soham Chakradeo <sohamch@google.com>
+Subject: Re: [PATCH net-next 0/4] selftests/net: packetdrill: import
+ multiple tests
+Message-ID: <20241223085033.5926d1a6@kernel.org>
+In-Reply-To: <6768dd1289ee2_3cff202943a@willemb.c.googlers.com.notmuch>
+References: <20241217185203.297935-1-sohamch.kernel@gmail.com>
+	<20241218100013.0c698629@kernel.org>
+	<19df2c4d-c40c-40c5-8fec-bb3e63e65533@redhat.com>
+	<676474a0398f0_1f2e51294ad@willemb.c.googlers.com.notmuch>
+	<20241219180144.7cf5226c@kernel.org>
+	<6768dd1289ee2_3cff202943a@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Pascal Hambourg <pascal@plouf.fr.eu.org>
-Subject: [PATCH] sky2: Add device ID 11ab:4373 for Marvell 88E8075
-References: <4ba0418d-0e64-4685-a345-cc5b6bac3b61@plouf.fr.eu.org>
-Content-Language: en-US
-Organization: Plouf !
-To: netdev@vger.kernel.org
-Cc: Mirko Lindner <mlindner@marvell.com>,
- Stephen Hemminger <stephen@networkplumber.org>, linux-kernel@vger.kernel.org
-In-Reply-To: <4ba0418d-0e64-4685-a345-cc5b6bac3b61@plouf.fr.eu.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-A Marvell 88E8075 ethernet controller has this device ID instead of
-11ab:4370 and works fine with the sky2 driver.
+On Sun, 22 Dec 2024 22:46:26 -0500 Willem de Bruijn wrote:
+> Jakub Kicinski wrote:
+> > On Thu, 19 Dec 2024 14:31:44 -0500 Willem de Bruijn wrote:  
+> > > All three timestamping flakes are instances where the script expects
+> > > the timestamp to be taken essentially instantaneously after the send
+> > > call.
+> > > 
+> > > This is not the case, and the delay is outside even the 14K tolerance.
+> > > I see occurrences of 20K. At some point we cannot keep increasing the
+> > > tolerance, perhaps.  
+> > 
+> > I pinned the other services away and gave the packetdrill tester its
+> > own cores. Let's see how much of a difference this makes.
+> > The net-next-2024-12-20--03-00 branch will be the first to have this.  
+> 
+> Thanks. It does not seem to resolve the flakes.
+> 
+> At this point I think the best path is to run them in debug mode to
+> get coverage, but ignore errors. With the below draft patch, error
+> output is still logged. For instance:
+> 
+> # tcp_timestamping_partial.pkt:58: runtime error in recvmsg call: Bad timestamp 0 in scm_timestamping 0: expected=1734924748967958 (20000) actual=1734924748982069 (34111) start=1734924748947958
+> # ok 2 ipv6 # SKIP
 
-Signed-off-by: Pascal Hambourg <pascal@plouf.fr.eu.org>
-Cc: stable@vger.kernel.org
----
-On a laptop with such ethernet controller, the ethernet interface works
-fine after running the following commands:
-
-# modprobe sky2
-# echo 11ab 4373 > /sys/bus/pci/drivers/sky2/new_id
-# lspci -kd ::200
-02:00.0 Ethernet controller: Marvell Technology Group Ltd. Device 4373 
-(rev 10)
-    Subsystem: Samsung Electronics Co Ltd Device c102
-    Kernel driver in use: sky2
-    Kernel modules:
-
- drivers/net/ethernet/marvell/sky2.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/marvell/sky2.c b/drivers/net/ethernet/marvell/sky2.c
-index 3914cd9210d4..988fa28cfb5f 100644
---- a/drivers/net/ethernet/marvell/sky2.c
-+++ b/drivers/net/ethernet/marvell/sky2.c
-@@ -130,6 +130,7 @@ static const struct pci_device_id sky2_id_table[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x436C) }, /* 88E8072 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x436D) }, /* 88E8055 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4370) }, /* 88E8075 */
-+	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4373) }, /* 88E8075 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4380) }, /* 88E8057 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4381) }, /* 88E8059 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4382) }, /* 88E8079 */
--- 
-2.39.5
-
-
+Makes sense. Can we make this XFAIL instead of SKIP, tho?
+Not exactly accurate but we try to use SKIP for reporting env / setup
+problems like missing commands. We have FAIL_TO_XFAIL and
+xfail_on_slow() in the lib for netdev bash tests, already.
 
