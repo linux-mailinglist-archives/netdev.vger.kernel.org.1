@@ -1,95 +1,90 @@
-Return-Path: <netdev+bounces-154087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60EA39FB3ED
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:20:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA1B9FB3F1
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:22:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E935F7A1776
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:20:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E2441884D18
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106441B87CD;
-	Mon, 23 Dec 2024 18:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBCC1BBBFD;
+	Mon, 23 Dec 2024 18:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ky4Vv1AS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bkSMVUj0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07F638F82;
-	Mon, 23 Dec 2024 18:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55B038F82;
+	Mon, 23 Dec 2024 18:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734978014; cv=none; b=GjOF9yg6usxiyMUCJRoM7DjqRZAlbZFxVwNipuxAv9Rwc33DpxT+34S4kfMNhPJ+13iY4n/dBv2kok3+8x2BX4v6qNufv7Mu6Br8xz9K7pL2duE24v+RlIJrxmpZSOETM0sltTqt3fSWjo90BTzv0PV6ZR0eYZ+dJOQ+THZUrn0=
+	t=1734978149; cv=none; b=oIciBLVBD0B8LoWDvN0GuejSdkYZHgxuxHtMWtQq2FfqYMXiLqmxdZ66MSF/wjajN+0avPHmgLn5zlbrz3beLL4Up90qFpNhSjMK9BcG2jS2iotCp+DUxjumpSIg5NM/LIfNXDpGFDmWQXjwyS3d/1iFEwIu+ynCulB+zsnnwsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734978014; c=relaxed/simple;
-	bh=x8b2+EwkygP4Uk7vVtE8jxKJWFIXJhtbzkshEYALIsE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jrR/e7kN8lXgBs6siseL0TyigUnwqxsrnTqF14zorKKXlRiYST/TmAzn03tDJ66WENV/4awL2QA+nTyhETqKaRC2lTJmE6hEP5BoB5Fm3N+us63JA2ZhnudmXlgdt0mbjgebJBvcrWYzDfitqE3o9GZUgXdf1YgDk67UOQYktdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ky4Vv1AS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E62C4CED3;
-	Mon, 23 Dec 2024 18:20:14 +0000 (UTC)
+	s=arc-20240116; t=1734978149; c=relaxed/simple;
+	bh=FF7PzJvn7sDlwqSQQcQLyBEeHni4WaUfhYkI9VeAF3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PlTVFPRBaMUu0tC0sCoMbubqq5TnVuhBD24cUpDA4t/viXfMYtj4eyeYktErB0+IUwZY+AK9Vy1A9QRoZrRclGxu1puTisScFEoxznvWRqCvMNoX2dttwKFsZM/XWUN9/Ne8gNI1VZI1uoEvLKMb76lSW4yeT7fPZOgcN4fOqHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bkSMVUj0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AECEFC4CED3;
+	Mon, 23 Dec 2024 18:22:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734978014;
-	bh=x8b2+EwkygP4Uk7vVtE8jxKJWFIXJhtbzkshEYALIsE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ky4Vv1ASRcH2DLSbUJxcouDhwGg0Jca+5h8rsbJIPM7Y9CkbcPLXM7lavGssYOlK5
-	 GE+HxA6JTbXZRv7J5mpkpnEaCdOAAb4WsZ4lOW5VvOqkT/id4MvsMlbjxfGWjAUipy
-	 Rw287OAkeXoHIETB+oa7c+N8LP9EgC+OymPmA1eHl653jv86Mob0/92E+eaMPsX8k6
-	 0SZgz5ipczYMrvATysH/ByqBSSF/O3qM3fQlFRsRBh1ZjyQ9CrC7d+KqVPsA/tZM70
-	 6gHsns3OaLrQWoa1lH2XqXN/PDPuYceoIp1X+YLi8I1ub2I6CZJKAoY8ir2fa/yUcu
-	 kIqPebB9kh84g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADD43805DB2;
-	Mon, 23 Dec 2024 18:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1734978149;
+	bh=FF7PzJvn7sDlwqSQQcQLyBEeHni4WaUfhYkI9VeAF3w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bkSMVUj0V2fgfEA0mKOALw2ZNypn1x/GAVZfDrdk8v3ARf9YIpNDECu4UuFr4GmyC
+	 iL2zLHv1BATyAVjF1UThm5n/o01zacDf4YbwFSykchfyavvmn0Yx3CZKaS7SlRhSEH
+	 OhZV1DhYNM2cW7Kv6blkkXZqNHYu0GAiHK1X6zORY81mSAnXtlH79DA7kYQA2vBN+/
+	 XeFdM1aL14DzPXW5nu/EIePN175He0AjflJEFze/dzoc5OxsJJBIQ+SGbjrFtJFCuc
+	 4js4/Pdglz6JPNRhOULqSkf8gDPU73H2ezt+BRttOSz5XqB4b+NK+r9w+3DGVTYP9T
+	 yE1ExjJbNnpug==
+Date: Mon, 23 Dec 2024 10:22:27 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: <wojciech.drewek@intel.com>, <n.zhandarovich@fintech.ru>,
+ <aleksander.lobakin@intel.com>, <lukma@denx.de>, <m-malladi@ti.com>,
+ <diogo.ivo@siemens.com>, <horms@kernel.org>, <pabeni@redhat.com>,
+ <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+ <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, Larysa Zaremba
+ <larysa.zaremba@intel.com>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH net-next v2 0/3] Add Multicast Filtering support for
+ VLAN interface
+Message-ID: <20241223102227.0c4e68be@kernel.org>
+In-Reply-To: <20241223092557.2077526-1-danishanwar@ti.com>
+References: <20241223092557.2077526-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/sctp: Prevent autoclose integer overflow in
- sctp_association_init()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173497803275.3923395.9352566913708265576.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Dec 2024 18:20:32 +0000
-References: <20241219162114.2863827-1-kniv@yandex-team.ru>
-In-Reply-To: <20241219162114.2863827-1-kniv@yandex-team.ru>
-To: Nikolay Kuratov <kniv@yandex-team.ru>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-sctp@vger.kernel.org, marcelo.leitner@gmail.com, lucien.xin@gmail.com,
- xi.wang@gmail.com, nhorman@tuxdriver.com, vyasevich@gmail.com,
- stable@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 19 Dec 2024 19:21:14 +0300 you wrote:
-> While by default max_autoclose equals to INT_MAX / HZ, one may set
-> net.sctp.max_autoclose to UINT_MAX. There is code in
-> sctp_association_init() that can consequently trigger overflow.
+On Mon, 23 Dec 2024 14:55:54 +0530 MD Danish Anwar wrote:
+> This series adds Multicast filtering support for VLAN interfaces in dual
+> EMAC and HSR offload mode for ICSSG driver.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 9f70f46bd4c7 ("sctp: properly latch and use autoclose value from sock to association")
-> Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
-> 
-> [...]
+> Patch 1/3 - Adds support for VLAN in dual EMAC mode
+> Patch 2/3 - Adds MC filtering support for VLAN in dual EMAC mode
+> Patch 3/3 - Adds MC filtering support for VLAN in HSR mode
 
-Here is the summary with links:
-  - net/sctp: Prevent autoclose integer overflow in sctp_association_init()
-    https://git.kernel.org/netdev/net/c/4e86729d1ff3
+## Form letter - break
 
-You are awesome, thank you!
+Networking development is suspended for winter holidays, until Jan 2nd.
+We are currently accepting bug fixes only, see the announcements at:
+
+https://lore.kernel.org/20241211164022.6a075d3a@kernel.org
+https://lore.kernel.org/20241220182851.7acb6416@kernel.org
+
+RFC patches sent for review only are welcome at any time.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: defer
+pv-bot: closed
 
