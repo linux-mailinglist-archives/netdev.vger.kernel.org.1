@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-154095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 044559FB40F
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:40:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE66D9FB410
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:40:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 585FF188248B
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3059D164AFE
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E52B1BBBE3;
-	Mon, 23 Dec 2024 18:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3601B415B;
+	Mon, 23 Dec 2024 18:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="peD01YaP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YH34cGi7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C8C1B415B
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 18:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B761C3BF2;
+	Mon, 23 Dec 2024 18:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734979227; cv=none; b=Sm0txLd3/hz0Zb8EoBd1itgTl99hBXCUrLhkyRBp8A4TPK2yEe2bR4fwPTSrM0AjaodU876T3AiznYX4b79B1FnIUMaYBjlACM5l/wuS3qP5TjoqqI+MuTREaX8jvZYWfbOULabx5i4lQOE8ANKUcHTDKBxBl9mw7C6KXl+VPLI=
+	t=1734979228; cv=none; b=itcup0tYpebWrB+f7V355sQ/da2k3wRMUuBTVOj+GhO5V7f4A9jY3ZzhsVJFzOfQRAYZt8nspJgsT+cBw4bzXPLM2Qkt2GZg/j7hP6wj1nTxaGXwV3+6QtGTxECdkbnh09od9LIyB6M6XIZX/snS9Niz1V91FNkETuKRzD1GU0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734979227; c=relaxed/simple;
-	bh=o1Ba39dDUhzu+rf8UeXopx9HelJKET82J9K9ZqiKvWg=;
+	s=arc-20240116; t=1734979228; c=relaxed/simple;
+	bh=zc18PitYyNFj25E/Fh2M4NoFqTRafxGESx8OzhpScvY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NVj2hgNsm2UcYXAfrb7pFv+nSAJJ3+W4ykPnen7ThUlUF/tCUoQvUM13jVM7hHcBAi5bmsabLYw8pvjob4j4NKLHmP7sJAxNezgB0e1pv4BatilGWxRAX/uPE0knzoFLfuyoV1GfHSHu9PHonaFb/2biN+jLgoRIdVqcqp1CUtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=peD01YaP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E056C4CED3;
-	Mon, 23 Dec 2024 18:40:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cl5lig8CkjvZD1ks0mkzv5yIh1p5G+Hd7bI1xb/zzXrE9u+bhnEBMNB4XZ/iv3CecHExPQY/BBCWnSC3sFPvC+ZpWS84Qn5EeTzoGTZfsE85lwSTGEWvRouXl3bFsgKSUS+rqnKzugmjBxNtFTzTNEuEEWeUwyHAUTd7r+YfJeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YH34cGi7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06500C4CED3;
+	Mon, 23 Dec 2024 18:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734979226;
-	bh=o1Ba39dDUhzu+rf8UeXopx9HelJKET82J9K9ZqiKvWg=;
+	s=k20201202; t=1734979228;
+	bh=zc18PitYyNFj25E/Fh2M4NoFqTRafxGESx8OzhpScvY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=peD01YaP7iR4v3Z54vwt2aL5obSu13WX1v2Yt0+cFgI27ax2mKVIAsRDjIYTRvA5A
-	 NDzDKT7wl0iJAi6Qbs0EUigadmtjpG+8UCJNYmMr/Pse3GwkjKaLCvx4j5FY+KqDmb
-	 V/HEjh28RQaNnK0rxbgISiwjlMaAN4k+7AzGtnFof5N+PC7w0yweE/6uwMa2uj71Uo
-	 w6/G3XHCl3+DBEKIHANEe8suuWwnLzxaY0HYXx/nQ+tZUSqtDM6UylEt5fEOHQZFCw
-	 vET8oMG7KYOCpsCmxX+uEtcBqHDn2h58OzDj3jIIqZTq36b+wnwuWA7vS68qBR5rCU
-	 7jc31LBNX61XQ==
+	b=YH34cGi7LluNH7RL1ET1gG6aJslaiQaLAte1+UiW2Y2J4kIL+RO6w37n7FKfDGdbc
+	 szOh/7jxN0fzTU0VeHMuYckNGf4Z3TaPFxXXyPaDjocQ1YJ7aAjMQeS0roqmNgR/tA
+	 Qztuh6jOCuKeg17dK09oS3TmhCuHpNbx+1Ff/F7IFwiYOjFsQzeU+urMZJBqHIBA0u
+	 pMOf2+DHwyPTYHMbiSYoAO08VSVdSm5+oX5JkFouu+CBlM/bvQv47ssUwMxXcFzAM1
+	 Gp7riDhP2rltRgfZeWHrteVzzRE6GaAyZo60SmFBJcd4y/RWaNZDm/fDP0/PzuMgvP
+	 HcBZj2552G3Zw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34F6A3805DB2;
-	Mon, 23 Dec 2024 18:40:46 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE533805DB2;
+	Mon, 23 Dec 2024 18:40:47 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,59 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V4 00/11] mlx5 misc changes 2024-12-19
+Subject: Re: [PATCH net-next v3 0/2] net/bridge: Add skb drop reasons to the most
+ common drop points
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173497924501.3927205.16993887490244751404.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Dec 2024 18:40:45 +0000
-References: <20241219175841.1094544-1-tariqt@nvidia.com>
-In-Reply-To: <20241219175841.1094544-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com, mbloch@nvidia.com,
- przemyslaw.kitszel@intel.com
+ <173497924627.3927205.16787669909128619677.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Dec 2024 18:40:46 +0000
+References: <20241219163606.717758-1-rrendec@redhat.com>
+In-Reply-To: <20241219163606.717758-1-rrendec@redhat.com>
+To: Radu Rendec <rrendec@redhat.com>
+Cc: razor@blackwall.org, idosch@idosch.org, roopa@nvidia.com,
+ bridge@lists.linux.dev, netdev@vger.kernel.org, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 19 Dec 2024 19:58:30 +0200 you wrote:
-> Hi,
+On Thu, 19 Dec 2024 11:36:04 -0500 you wrote:
+> The bridge input code may drop frames for various reasons and at various
+> points in the ingress handling logic. Currently kfree_skb() is used
+> everywhere, and therefore no drop reason is specified. Add drop reasons
+> to the most common drop points.
 > 
-> The first two patches by Rongwei add support for multi-host LAG. The new
-> multi-host NICs provide each host with partial ports, allowing each host
-> to maintain its unique LAG configuration.
-> 
-> Patches 3-7 by Moshe, Mark and Yevgeny are enhancements and preparations
-> in fs_core and HW steering, in preparation for future patchsets.
+> The purpose of this series is to address the most common drop points on
+> the bridge ingress path. It does not exhaustively add drop reasons to
+> the entire bridge code. The intention here is to incrementally add drop
+> reasons to the rest of the bridge code in follow up patches.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,V4,01/11] net/mlx5: LAG, Refactor lag logic
-    https://git.kernel.org/netdev/net-next/c/ddbb5ddc43ad
-  - [net-next,V4,02/11] net/mlx5: LAG, Support LAG over Multi-Host NICs
-    https://git.kernel.org/netdev/net-next/c/60d01cc468fd
-  - [net-next,V4,03/11] net/mlx5: fs, add counter object to flow destination
-    https://git.kernel.org/netdev/net-next/c/95f68e06b41b
-  - [net-next,V4,04/11] net/mlx5: fs, add mlx5_fs_pool API
-    https://git.kernel.org/netdev/net-next/c/31d1356b8fdc
-  - [net-next,V4,05/11] net/mlx5: fs, retry insertion to hash table on EBUSY
-    https://git.kernel.org/netdev/net-next/c/586face88106
-  - [net-next,V4,06/11] net/mlx5: HWS, no need to expose mlx5hws_send_queues_open/close
-    https://git.kernel.org/netdev/net-next/c/9a0155a709fa
-  - [net-next,V4,07/11] net/mlx5: HWS, do not initialize native API queues
-    https://git.kernel.org/netdev/net-next/c/429776b6019b
-  - [net-next,V4,08/11] net/mlx5: DR, expand SWS STE callbacks and consolidate common structs
-    https://git.kernel.org/netdev/net-next/c/aa90a30804a5
-  - [net-next,V4,09/11] net/mlx5: DR, add support for ConnectX-8 steering
-    https://git.kernel.org/netdev/net-next/c/4d617b57574f
-  - [net-next,V4,10/11] net/mlx5: Remove PTM support log message
-    https://git.kernel.org/netdev/net-next/c/f440d69a21f7
-  - [net-next,V4,11/11] net/mlx5: fs, Add support for RDMA RX steering over IB link layer
-    https://git.kernel.org/netdev/net-next/c/ef1749d50669
+  - [net-next,v3,1/2] net: vxlan: rename SKB_DROP_REASON_VXLAN_NO_REMOTE
+    https://git.kernel.org/netdev/net-next/c/46e0ccfb88f0
+  - [net-next,v3,2/2] net: bridge: add skb drop reasons to the most common drop points
+    https://git.kernel.org/netdev/net-next/c/623e43c2f502
 
 You are awesome, thank you!
 -- 
