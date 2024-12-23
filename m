@@ -1,99 +1,98 @@
-Return-Path: <netdev+bounces-153991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E7A9FA9A8
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 04:10:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C479FA9AC
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 04:12:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ADE5162322
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 03:10:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3B8E16345D
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 03:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C79A7EF09;
-	Mon, 23 Dec 2024 03:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2458245003;
+	Mon, 23 Dec 2024 03:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FO20mbiy"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="G5JgC/cw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2671B59A
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 03:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC262941C
+	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 03:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734923449; cv=none; b=ISmQbbkWt3nlQgB6AB64r8LS0fcJO2jA330DN+t4jyu1ObWccLh5nISmtDWhZDCnBMDeo2Z1ueMG0c8kQNHEsIAAC/S/+NUwNU56jMSlO5J6lx32oQLMRlU21wYzcdXZ7C4vzRaFuYK/Evm/8gaHQ0geRTobupx0d/bIpqAaZ1k=
+	t=1734923527; cv=none; b=AOlowIcBsm8LZvN2YYYFO5eZQVCKov7XuGKs39jY+QSo3ASa2CMJKVJJ/xNZEUOM6g8pLTRkzfPu4yXKnR9ioDxDUB8DZOVAd0VMc/bPMFLEmtaAODs5MQLgIaDwUcfgUJLxw/wAJNM4SNcDEpYE4F+VlHfJ3l+mAPhW1Udfl78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734923449; c=relaxed/simple;
-	bh=6/tAKX+pbDv9rDWcHPc27rt3jtMfKd7gqB4X6E3BuIw=;
+	s=arc-20240116; t=1734923527; c=relaxed/simple;
+	bh=XT0hm6jtJM0D8YXeJmO7ZkRk2nV6B1EJj3/sEYK24q4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R/qAPIVn4giyouV+Z+lOfpSnm+TTCCh+CGA4vAIG8jEWdkUacihWry72QkjCZwu6kNSb/XaogMEOlnPct1K3tUHYtvOJbL6754NoaSmzLrORWBXQgaAkH7YfKr7oUsbmhxJbV+8CdN4NcItM1H8bFa0Ayt0Vfms1hBV6KbZ5MfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FO20mbiy; arc=none smtp.client-ip=209.85.208.51
+	 To:Cc:Content-Type; b=GarlwEat3t8HqagOp+w8DG9o47gFi7Vgeyhiu0iEGMp0p3KTuyYUsCrV6xHtvdk2VRVnGVF/9l5w9smlHTSELiiDahSxAHrunB8LW5WBpJlcrT9QAAJuXijATRJ8zsP4jkHDt7jAlxJmynRGAI6kqO9MyAtSmLMlZokFg+j0ndQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=G5JgC/cw; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d3dce16a3dso6699453a12.1
-        for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 19:10:47 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a9e44654ae3so592829566b.1
+        for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 19:12:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1734923446; x=1735528246; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1734923523; x=1735528323; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6/tAKX+pbDv9rDWcHPc27rt3jtMfKd7gqB4X6E3BuIw=;
-        b=FO20mbiyMYy6KdF4sENfB0vfOgHlA8V0B+FFZAl3cjROWIh1mIDvv1aur3gZ5oL+Mk
-         oYaZDwn7KBI4vWQSPfy+oGKj95KDRkdcH3tT14ocek0OUj1r1ct5jt+Y7gKQsDue7gyv
-         LIaLJBsWnL6GrD6uejfIpoe7XOOdEbfEO9nsQ=
+        bh=XT0hm6jtJM0D8YXeJmO7ZkRk2nV6B1EJj3/sEYK24q4=;
+        b=G5JgC/cw6KjiXXqLxdaVGXxX+4PebJWYDO38N5CQEjRFpuKpcPwjddmBvZENp0Bfsp
+         EyTsL6XG23rk8XOXvHdpMSdyt7xI0AT+XgGIJMXdQmV6Xq7KFu8EpWGw9LOnQvBjhCCK
+         v5wZKrsBWaEyIXtSZ/D3od5GxizJ+ri+g6aks=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734923446; x=1735528246;
+        d=1e100.net; s=20230601; t=1734923523; x=1735528323;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6/tAKX+pbDv9rDWcHPc27rt3jtMfKd7gqB4X6E3BuIw=;
-        b=evomWSwKpuC6HCHuYcGLNaSZ90iCmN25h3oTIGJSjokXk8nI6GNWg7DRUy9uWK7WPe
-         JZsacYGkAeUs0gfPKDj/WwwwRg2gfH68B2ynjJyQ02HN9Pz2UoK7aJuCD5BDdcHM5s0f
-         LGcABfcOlUAGNllKP6PReSE4T10rl27+RLXx5x+0w7rY0OiL8Tskgla5kxdRyU8dXZ4t
-         VWwd9pAVqjwADdQDPJ+ypXHV16bQtvcJE8nUYPTlB+UF0q5AOoVT3J2dGvpzn9R2AIq2
-         2Bf8uaTYbdXz8/ReEUUv5bji+cAplOKJNSKLHVwffvPqj/KWdb1QwgyQtQFb/aGe5hiq
-         rKWA==
-X-Forwarded-Encrypted: i=1; AJvYcCWxR2JO8eu2swDSUY1K5WgL1QolxwBaSYQzgdqbBMpawZ1nB48SQMY+lbO9+5Cddr2pUM08fXk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfT7vMDOoSU5ClL7/OLVLhb94VPfZx9c3isHwybPGgqvYkRtCZ
-	1vj9/jqJviV4mnMELA314jhhOJTNoiYqBF4RU40XosSPgcjmyqEEfjha66ZEXcnxVhEwO4e70Mu
-	r8id/SOzS+Og66sa1wkrdoUnViWGDhknkd+DE
-X-Gm-Gg: ASbGncsTDWVZLee4jXOQUNPcFhyx/Jk62lFLg10ep2qCnof18ybi5hb78x50hQgsrBm
-	40KGBgFp8uDmxAjUYvZ8MrQxUI9gtK1sVMzuULg==
-X-Google-Smtp-Source: AGHT+IHuw+hKz7c1y5zvIxErsZLHFpx6nJqsn8BpUslIWHydTCdfrsV4VUrOJQ7P8kDOmTUn6+DtXrtish/FOB/jGdY=
-X-Received: by 2002:a05:6402:42c3:b0:5d4:1c66:d783 with SMTP id
- 4fb4d7f45d1cf-5d81e335468mr9210305a12.0.1734923445823; Sun, 22 Dec 2024
- 19:10:45 -0800 (PST)
+        bh=XT0hm6jtJM0D8YXeJmO7ZkRk2nV6B1EJj3/sEYK24q4=;
+        b=PLD7zjytaf9Ui1ZtoR1Ed1HXB060umUDFz7C0KTAY4AcnA4aFHojLAojQRWE5np2tR
+         sS54HfM6ZKosNX4U0FpFJeIK8br5kvi45JcHg6pI4DjRh1/sjDod8bDrm2aLs2Ly0oOG
+         HDVyh4fdZN+NO8HLVXzwhxgrm0sAFQ5UuNqHhO/LjpUlq43bnoESFzEEHjbAV5xLVYTh
+         PxKNmzYClNZUTuqdkKfoBZRofD3DMXvmykHxMqc1lllfhWTc82PNjF0Da937RpLoo4aD
+         inmWV7VAUiV2pp0R22d9FOm3h4lVSK3kl2R27kA17VviLw8DmLC9sXKwrurGZSEXbWgV
+         IJHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXONCrbQtg+R0zFuz4wGqa+OYyN6s3neQBPKhc12lcXLLhbjl6pOURMYfG1/qqYRfhN7RIN6K8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMRz8bZw2iTKDuuDD1QqKuxFC+BiceH7xI3AaR8rvWfstFO4qA
+	gQ9/djWv7DTRSHrZrryXmm2i43tTYU/ievQo9wPuHyTsOe1SsXH3l3af7v5FiWg1QFQ2jdBFIkf
+	L+Zfzn2YzCGCqDA1roX5FaO5eD9GnfI+v1ZOW
+X-Gm-Gg: ASbGncvMs/7ufHC8wPARLxlKqna5kkdlUqksdls+tJHEbYRJcZfxw04WjhNwkVE7FTB
+	Kt0kf0dMzvRDR00Z96W+KgZmF5S/SJfTujtlv7w==
+X-Google-Smtp-Source: AGHT+IGETTEUZUrAAqZup4jIbErY150ourbMI3ud+Z4W8TdmbqH1y8DUI0JtYAAtnN+A9iY5TXLXRMLfhfPG7M8Jt9Y=
+X-Received: by 2002:a17:906:c10b:b0:aa6:9b02:7fd0 with SMTP id
+ a640c23a62f3a-aac2695a396mr1066801066b.0.1734923523660; Sun, 22 Dec 2024
+ 19:12:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241221184247.118752-1-linux@treblig.org> <20241221184247.118752-10-linux@treblig.org>
-In-Reply-To: <20241221184247.118752-10-linux@treblig.org>
+References: <20241221184247.118752-1-linux@treblig.org> <20241221184247.118752-6-linux@treblig.org>
+In-Reply-To: <20241221184247.118752-6-linux@treblig.org>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 23 Dec 2024 08:40:33 +0530
-Message-ID: <CAH-L+nPvNahmiinQVkZveidM4wbsRAP++8O-2pzuuHou-WNTQw@mail.gmail.com>
-Subject: Re: [RFC net-next 9/9] i40e: Remove unused i40e_dcb_hw_get_num_tc
+Date: Mon, 23 Dec 2024 08:41:51 +0530
+Message-ID: <CAH-L+nMHzkAxepmgg5EyyeJL6MjF-W1bGO5r4RWfpGcW+036Rg@mail.gmail.com>
+Subject: Re: [RFC net-next 5/9] i40e: Remove unused i40e_get_cur_guaranteed_fd_count
 To: linux@treblig.org
 Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
 	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
 	kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b8dabc0629e75716"
+	boundary="0000000000005bd19a0629e75c24"
 
---000000000000b8dabc0629e75716
+--0000000000005bd19a0629e75c24
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 22, 2024 at 12:15=E2=80=AFAM <linux@treblig.org> wrote:
+On Sun, Dec 22, 2024 at 12:13=E2=80=AFAM <linux@treblig.org> wrote:
 >
 > From: "Dr. David Alan Gilbert" <linux@treblig.org>
 >
-> The last useof i40e_dcb_hw_get_num_tc() was removed in 2022 by
-> commit fe20371578ef ("Revert "i40e: Fix reset bw limit when DCB enabled
-> with 1 TC"")
+> The last use of i40e_get_cur_guaranteed_fd_count() was removed in 2015 by
+> commit 04294e38a451 ("i40e: FD filters flush policy changes")
 >
 > Remove it.
 >
@@ -107,7 +106,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---000000000000b8dabc0629e75716
+--0000000000005bd19a0629e75c24
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -179,14 +178,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIDt57hYOWpqxidnGXlZ4Gle/ZNw6O+n0j8nAj74INWy+MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIyMzAzMTA0NlowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEINn4g0/+W0LTXNLddF2QShNmzfNwaTP9FsbjGcw0c6yiMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIyMzAzMTIwM1owaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAz7kDO/6o6
-WJIlQor06Rbk64EoWKqzArm88at5hQDbwAOy//BdigtrhZRX4JZMvVPFcL0BptNNEGSzopkyFLcv
-O8/XLcTcF8pKJQCbHMiiS8a/f54bgaiMeXpxKr6TwLcqjhbkq+iNonsz8XrKwTLq3/3zXgVfkJ/0
-mYThy7grDzaSMKnnqgXfI6UAUfnOOQ7yxOq7uGnerG2jyfR7V0E5bQ2BUYNhJ+VYW4XVE9OewIlU
-TrlklaIAAxGGJ6fA0rr7vp0IRN5giWdNt5iOXCLm9itM55VGtA7rnlKNm12KEngZQWlpkZbsCeFY
-w/qtixBNWaG6Ok9V9g20wPXionql
---000000000000b8dabc0629e75716--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCX2emzUj0e
+bGPSUpMycug3hAMV7JaLk1wie4UyrDhiJzlJ63+H+xRj3GrSSCwmvU5OK7kbKrgnVJFsESm4s/fL
+PNagyE323q0h+wdbee5p6J8dYWXms4+3eUeJMFCX9foeELGklXfIDXkFW4RmXouoJ7keqZ1Tdzoe
+77a4Ybesm7o3U/ubrxQvsFu5UvvSuwPo5mIpf5BCHZCklc/e91lIpWuVgScqOw9aSPAc+SFzU8pU
+/SsgZHP2VIB3L8BPieE0EjIHedm9jApKNaHqUd3hY5w0t0ih37vo0/6w9KDkLvUR1W3OoBn9NZ5i
+avzwAD6TdXsmFE0cUQQzBR0NwGWR
+--0000000000005bd19a0629e75c24--
 
