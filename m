@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-153980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A159B9FA8CE
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 01:59:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CAE99FA8D4
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 01:59:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B07416464E
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 00:59:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EA4F1885190
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 00:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443A76FC3;
-	Mon, 23 Dec 2024 00:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786C710940;
+	Mon, 23 Dec 2024 00:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YgX/yH7O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pu35CF37"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1683209;
-	Mon, 23 Dec 2024 00:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDED1F4E2;
+	Mon, 23 Dec 2024 00:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734915562; cv=none; b=DRGQeJ9xKI98dyd/Y+3p0ypg1RkVEcFM8BJQFwYXwK5uAXWkmOPCdx3uV6Y9kQAjMPk4y1kZpdux1wEX9p4uZ0upxRG29WbQD/jltqytLFP9U6zuC32OfF82F1N+Z4RNxyKhvdvDa6WzqJaIqx9CCY++HKSpTNproge78/TSKjc=
+	t=1734915566; cv=none; b=eAL2goKy3qcNxwcg884oynFc0CnDRCdnEwcUeWdnXHo3bl61YARmL6a6fKBsAhOnxZ4/x72c21ABAbiiQErlG/eGrqPiVu7ZzhfxZVZJOQVsjJePxW9QDRXWUctW+v8iJxtaNjplPu4OKM+mclFcU8KDZKACxtQ9B0xxIUjV3ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734915562; c=relaxed/simple;
-	bh=hgu//T+7YSAvIXT3VUGoYlGaahKbQUcLyt85jDFn+fQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TAB/iqjbk7gGRyHPoykRBgnXf7yv27vuadhZwrNpciBykLXe2xSF81UF8e479ilvWPBTIcz7FAwfKPLDATV0Upf9Ghb4eHl7/gz9Bk5wv1Eb/vw35ThsNECl16eIJBnDVVgICe/1WnnLs3QWzgz4BOt8Fr9s5FZRJc3XGPYTSk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YgX/yH7O; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1734915566; c=relaxed/simple;
+	bh=i3nUkXLpsqr/fJEuk3YUem+exM6C72muUCZwzlnuuas=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dySVcajTKt5ElC5P4Irw4wL/+c5l8ClwtQkhgxJtrslpbBtMyx6dstlk7QvXgH+itv0Xu7jCCR7IxNaGRoSeN3ho+9S3ucWwFXKKlKH2OzfWauCAOfWHNTVCeX12JjGq6g68TI0H/X7loASwQJkDxkp3yL8Ufk7eaITfpZ9sn/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pu35CF37; arc=none smtp.client-ip=209.85.219.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6dcf63155b0so17804556d6.1;
-        Sun, 22 Dec 2024 16:59:20 -0800 (PST)
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6dd1b895541so29055206d6.0;
+        Sun, 22 Dec 2024 16:59:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734915559; x=1735520359; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rZiA8+8cgK1p5p7ZdtgnD9VuQej6yYU4CGShpBV3y6M=;
-        b=YgX/yH7O62lI9EkvjmxV3rXkqPlZdFIqH2FcbLCOLsq7KqPEFFUy3BmddmVHqtLl3U
-         5AmHESCCflibSQyilzHAnvotqcX0drYu+S8EZGfvYcAApeo8NHg1WXExefNHwU2s9826
-         DmuKgvNzKp+fnpk+7s8WVuYOwjj3EpBrJe/UXicQ/tTd3R6/PEl6kxTFZGiFePmId/n3
-         l3N2PH6lKUBwUmcwUASBoxl6MF7Uxp7QLl8su4ivK4IJGpABkHOawEGmK7yFkmM+88V3
-         cZq4mm7YQpP4A8mzX/peagc8Hu9DoN/lwlbKtf2YX+TO4IeDmdX3zfUVv2CnMFAW13Jm
-         8WxA==
+        d=gmail.com; s=20230601; t=1734915564; x=1735520364; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jRWA/tM4Nlwg4+7MH+fMHivDiS7vd/AnzDx119oQ4ZA=;
+        b=Pu35CF37JHEQTmJiMGg3AyYcLEvGb/k2KvV39I1qT/TeRfY6vpExacm440+h/HjQS6
+         LHnEILwWAZ5ikuZjsT0ikjXTRXztoBSJfRi8cQhvnDfTeaqbiTGCt49PTmFSLx1kwrJt
+         cbvdITmTK3PKyzeg/fGek2A+N5nM9Eh5TAL4TL42/LnuGtnsNMmWZLLlZk6cjodDhoXQ
+         P0G0vJnmugZjN0eLV3rVdgdIjgV8xucpFctVUMzn/zL1rUSCG2AYI/lKKygVAZjtsrLx
+         M3OlJnsV4TRf8bPZdSNNqt3mahdkI6X6iqozvXvVeHs5njqLc0Vhyy0geh7AFvliYpd9
+         FWuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734915559; x=1735520359;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rZiA8+8cgK1p5p7ZdtgnD9VuQej6yYU4CGShpBV3y6M=;
-        b=X7zBUFuAgFe+4fsZc5aaU77FYakA1mi2NUFpTFQf4B1jifYSw5g05y/Gl1gVAweE3G
-         R2VXruZqg/RA0LeTE7kHhhnb5Z/9FLn9KBgryR6S7NmPNzzUezIfGnNXQvWrC4Th2Gva
-         D9FpC59t7sV5I7ABuIkHyK7oBDZZhlhKLajpLiHX9uiFf0j0P00va3x9tjEJSSB9BIit
-         G5toSwXT8bSjUCvwVpXZWPc6mr5lpSl4Kk7u+oiOFJnLsUuuIiwaTpafKZI6aUiYNSPw
-         ACqKWW9G2Yrc3i6snUy0+OIcEbJqsvenzSsHh7jEATx1UM1bqn6obXM0c5mi3SX8HUpT
-         jv8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUQEAHnFdHQ3wbtbfnsmQ85ZohSoyD9/L7DOPp5HR+uuJ3n41ABEvm2WAVMNEZZwSj+8OQm5AYKXAFw@vger.kernel.org, AJvYcCW+4f8JX7pm7+okpmJJVhruP+qwabL3W/CMEbHFO1P0+TN0ULlfy9UrwXX4e/gC9ZRasAP442jy@vger.kernel.org, AJvYcCWRGv5wfp2WQ3QMerCqOBY6hj8LLWMZSYGMYLFP5a59j1wM1rtDWI+ZDVXNk6mt1yqgR5KtjZPHS8+2u7ih@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq1WSKrUPt8hClygadSwcNVk9Qvls0dzVxvigkZzlO4Mqho0XK
-	jPoOqdp0NrRBfEbrzMibtMPRQxIeztb2NwIMFR9WBCRnXPpf5+AJ
-X-Gm-Gg: ASbGncsOArDmbqCDNy7VGQyVI6Za2MJSqpdeyefhdykDgZI0w4OkEbp6iY+ZaqxZpmX
-	hiuV6hi7nJyNrsCQyqalBmQEiN15pJcvPbClsVbLDjpM6NIKIMVWVtIkg+TcA+a1gXDSxnX2E2c
-	R1fyTmGzeNcpc+3b+IVIWV7ka5pV9O10lZ7YElSpkqVq/7igkFxSN7MnUyiwSeI8zRN0nvGIaSc
-	bu0X4FJZzEaTeY0ylBSy1eUeiohRfxj
-X-Google-Smtp-Source: AGHT+IHSkClTiIOMU6UV3EvrSaxtK6rioCiVEHPiLA/vc1hX5NvNNm2L1qNaUclIZVtTYbzu6LhDcw==
-X-Received: by 2002:ad4:5ae9:0:b0:6cb:ef8d:b10 with SMTP id 6a1803df08f44-6dd2339fb2cmr222084936d6.39.1734915559348;
-        Sun, 22 Dec 2024 16:59:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734915564; x=1735520364;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jRWA/tM4Nlwg4+7MH+fMHivDiS7vd/AnzDx119oQ4ZA=;
+        b=AqVlVTBLvZZCBBTlkUY4dUdgkYmv/yHYpITWO4792/I4ayEyvGMy1h7tgDu/cwtWyV
+         CqrxQQtBDo1GW6mFqbtq0HN5F1URIk0YBzCpmbMzQhME8PHEs40fSEwVx4ovKGYSTRs/
+         3bxU/HVnRBLnyVxsPBOIqxmrNavXiuVorcMehaMfAx066Da+ewwI18fSbZ7kh5UK3S7C
+         qbK/tayJJ+4CLu4msqhMNAXkerhCTzFrMHOrCml4QbqLAaUyvnzoSwLv7a8NUb/v1BNz
+         0ccSPDaKSKVQabXYZXss2ZT4EmIWNLKmixTbhQ4nOgNX7HCyd1BHV/HVEn/nq5UIgXPf
+         U1dA==
+X-Forwarded-Encrypted: i=1; AJvYcCVezuHUDxTfOmtwLRnEpNGjw53LSdwV2c9Ez8B3BuLSg2NQgE9FWlq1z9bRGYgMVHqpye68vKNj0oR6@vger.kernel.org, AJvYcCVx8fBdsWTTA2BV5HBdabdIlnM5nx/lZfjjcHRL/t0lbihIFQlSaONYJDDcQwusdxxPX4b+RiiCuX8haB7n@vger.kernel.org, AJvYcCWew+gO8p8icfPL14aczyn2GvGGec2buo1MaK8gZ/swTUB2xCaiR7/QVdCA2Y5MoA57OvUPeH1j@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEu5YFUbmJdWZJ/bTKFxc4sGcOc2xwU5QTvKcVs2tcZ34aZHDH
+	s2Gi93WJMbjpkLtqAhZe++hJ1aK9nD9Ng+Ta8TQBbyLp+1IVD6hjwu+Luw==
+X-Gm-Gg: ASbGncviL7+EVrPZrPZrkyGkYij4PO2oZXlbDR76RKi+2L7nFcqcKqs0zyKs0QDAkQg
+	IKvewWRxoSaBQe6fVpecX+SiazXCKg23lkpXCak90U8kkMD4sQG2MkERRhOjVFR8yQRMx1RNFz2
+	YBK4/QwsdGCBMm7INQd5KJVhq9QXhkvdYq2cnhXW/aPrqBHC6BCZZ/24RYHNXKBYVKM+bCjXlzs
+	ltobM945ZG0yFGv88/U5zDzmmrk9iMe
+X-Google-Smtp-Source: AGHT+IHN9d1bnlxRzzqRiDcadAYUGSNIOJpqNW2TaHPm8W5wc6dU1Ev4iY1D0s3G2OYKNDwOXlA05w==
+X-Received: by 2002:a05:6214:d89:b0:6d4:1ea3:981d with SMTP id 6a1803df08f44-6dd233a2bccmr164013606d6.43.1734915563662;
+        Sun, 22 Dec 2024 16:59:23 -0800 (PST)
 Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181bb4b1sm39250996d6.78.2024.12.22.16.59.17
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd180ea9d0sm39145406d6.7.2024.12.22.16.59.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Dec 2024 16:59:18 -0800 (PST)
+        Sun, 22 Dec 2024 16:59:22 -0800 (PST)
 From: Inochi Amaoto <inochiama@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -92,15 +94,17 @@ Cc: Inochi Amaoto <inochiama@gmail.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org,
 	linux-riscv@lists.infradead.org,
 	Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH net-next v3 0/3] riscv: sophgo: Add ethernet support for SG2044
-Date: Mon, 23 Dec 2024 08:58:36 +0800
-Message-ID: <20241223005843.483805-1-inochiama@gmail.com>
+	Longbin Li <looong.bin@gmail.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net-next v3 1/3] dt-bindings: net: Add support for Sophgo SG2044 dwmac
+Date: Mon, 23 Dec 2024 08:58:37 +0800
+Message-ID: <20241223005843.483805-2-inochiama@gmail.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241223005843.483805-1-inochiama@gmail.com>
+References: <20241223005843.483805-1-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,52 +113,181 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The ethernet controller of SG2044 is Synopsys DesignWare IP with
-custom clock. Add glue layer for it.
+The GMAC IP on SG2044 is almost a standard Synopsys DesignWare
+MAC (version 5.30a) with some extra clock.
 
-Since v2, these patch depends on that following patch that provides
-helper function to compute rgmii clock, As for now, this patch is merged
-in net/for-next
-https://lore.kernel.org/netdev/173380743727.355055.17303486442146316315.git-patchwork-notify@kernel.org/
+Add necessary compatible string for this device.
 
-Changed from RFC:
-- https://lore.kernel.org/netdev/20241101014327.513732-1-inochiama@gmail.com/
-1. patch 1: apply Krzysztof' tag
-
-Changed from v2:
-- https://lore.kernel.org/netdev/20241025011000.244350-1-inochiama@gmail.com/
-1. patch 1: merge the first and the second bindings patch to show the all
-            compatible change.
-2. patch 2: use of_device_compatible_match helper function to perform check.
-2. patch 3: remove unused include and sort the left.
-3. patch 3: fix wrong variable usage in sophgo_dwmac_fix_mac_speed
-4. patch 3: drop unused variable in the patch.
-
-Changed from v1:
-- https://lore.kernel.org/netdev/20241021103617.653386-1-inochiama@gmail.com/
-1. patch 2: remove sophgo,syscon as this mac delay is resolved.
-2. patch 2: apply all the properties unconditionally.
-3. patch 4: remove sophgo,syscon code as this mac delay is resolved.
-4. patch 4: use the helper function to compute rgmii clock.
-5. patch 4: use remove instead of remove_new for the platform driver.
-
-
-Inochi Amaoto (3):
-  dt-bindings: net: Add support for Sophgo SG2044 dwmac
-  net: stmmac: platform: Add snps,dwmac-5.30a IP compatible string
-  net: stmmac: Add glue layer for Sophgo SG2044 SoC
-
+Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
  .../devicetree/bindings/net/snps,dwmac.yaml   |   4 +
  .../bindings/net/sophgo,sg2044-dwmac.yaml     | 124 ++++++++++++++++++
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 105 +++++++++++++++
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  17 ++-
- 6 files changed, 257 insertions(+), 5 deletions(-)
+ 2 files changed, 128 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
 
---
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index eb1f3ae41ab9..cd112ef6b3bf 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -32,6 +32,7 @@ select:
+           - snps,dwmac-4.20a
+           - snps,dwmac-5.10a
+           - snps,dwmac-5.20
++          - snps,dwmac-5.30a
+           - snps,dwxgmac
+           - snps,dwxgmac-2.10
+ 
+@@ -97,8 +98,10 @@ properties:
+         - snps,dwmac-4.20a
+         - snps,dwmac-5.10a
+         - snps,dwmac-5.20
++        - snps,dwmac-5.30a
+         - snps,dwxgmac
+         - snps,dwxgmac-2.10
++        - sophgo,sg2044-dwmac
+         - starfive,jh7100-dwmac
+         - starfive,jh7110-dwmac
+         - thead,th1520-gmac
+@@ -630,6 +633,7 @@ allOf:
+                 - snps,dwmac-4.20a
+                 - snps,dwmac-5.10a
+                 - snps,dwmac-5.20
++                - snps,dwmac-5.30a
+                 - snps,dwxgmac
+                 - snps,dwxgmac-2.10
+                 - st,spear600-gmac
+diff --git a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+new file mode 100644
+index 000000000000..b7e4216ea45a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+@@ -0,0 +1,124 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/sophgo,sg2044-dwmac.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Sophgo SG2044 DWMAC glue layer
++
++maintainers:
++  - Inochi Amaoto <inochiama@gmail.com>
++
++select:
++  properties:
++    compatible:
++      contains:
++        enum:
++          - sophgo,sg2044-dwmac
++  required:
++    - compatible
++
++properties:
++  compatible:
++    items:
++      - const: sophgo,sg2044-dwmac
++      - const: snps,dwmac-5.30a
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: GMAC main clock
++      - description: PTP clock
++      - description: TX clock
++
++  clock-names:
++    items:
++      - const: stmmaceth
++      - const: ptp_ref
++      - const: tx
++
++  interrupts:
++    maxItems: 1
++
++  interrupt-names:
++    maxItems: 1
++
++  resets:
++    maxItems: 1
++
++  reset-names:
++    const: stmmaceth
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - interrupts
++  - interrupt-names
++  - resets
++  - reset-names
++
++allOf:
++  - $ref: snps,dwmac.yaml#
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/irq.h>
++
++    ethernet@30006000 {
++      compatible = "sophgo,sg2044-dwmac", "snps,dwmac-5.30a";
++      reg = <0x30006000 0x4000>;
++      clocks = <&clk 151>, <&clk 152>, <&clk 154>;
++      clock-names = "stmmaceth", "ptp_ref", "tx";
++      interrupt-parent = <&intc>;
++      interrupts = <296 IRQ_TYPE_LEVEL_HIGH>;
++      interrupt-names = "macirq";
++      resets = <&rst 30>;
++      reset-names = "stmmaceth";
++      snps,multicast-filter-bins = <0>;
++      snps,perfect-filter-entries = <1>;
++      snps,aal;
++      snps,tso;
++      snps,txpbl = <32>;
++      snps,rxpbl = <32>;
++      snps,mtl-rx-config = <&gmac0_mtl_rx_setup>;
++      snps,mtl-tx-config = <&gmac0_mtl_tx_setup>;
++      snps,axi-config = <&gmac0_stmmac_axi_setup>;
++      status = "disabled";
++
++      gmac0_mtl_rx_setup: rx-queues-config {
++        snps,rx-queues-to-use = <8>;
++        snps,rx-sched-wsp;
++        queue0 {};
++        queue1 {};
++        queue2 {};
++        queue3 {};
++        queue4 {};
++        queue5 {};
++        queue6 {};
++        queue7 {};
++      };
++
++      gmac0_mtl_tx_setup: tx-queues-config {
++        snps,tx-queues-to-use = <8>;
++        queue0 {};
++        queue1 {};
++        queue2 {};
++        queue3 {};
++        queue4 {};
++        queue5 {};
++        queue6 {};
++        queue7 {};
++      };
++
++      gmac0_stmmac_axi_setup: stmmac-axi-config {
++        snps,blen = <16 8 4 0 0 0 0>;
++        snps,wr_osr_lmt = <1>;
++        snps,rd_osr_lmt = <2>;
++      };
++    };
+-- 
 2.47.1
 
 
