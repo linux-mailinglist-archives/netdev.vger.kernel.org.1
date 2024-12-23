@@ -1,154 +1,231 @@
-Return-Path: <netdev+bounces-153989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCDB69FA946
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 03:16:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43BFB9FA957
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 03:25:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB8161885B65
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 02:16:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 545441885D9D
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 02:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C466F2AF14;
-	Mon, 23 Dec 2024 02:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF792BB13;
+	Mon, 23 Dec 2024 02:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bn+cKf+6"
+	dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b="IsI5tjdB"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from HK2PR02CU002.outbound.protection.outlook.com (mail-eastasiaazon11020081.outbound.protection.outlook.com [52.101.128.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C06632;
-	Mon, 23 Dec 2024 02:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734920168; cv=none; b=jhnrZ5bFp3J5lOzGpHF0JlJA5+o6dwL8CU2mrnHh4d94tRX3A4cAcvIleNyU9/foccjALN7AhpreROodDqAQ4n0fvOlTsBo/1jAcXp25HseBhLfWFKGkuftJ934XDAZ2aMnIN9+9tf9fhEp7xPx138ewjqp5jb0aVkztBVCfSFM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734920168; c=relaxed/simple;
-	bh=fYb8/eRsED0a5QPevVYXqFlTk81Xxf99AFlxwor7Bx4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RUnI4W1X0wnWmRiHjGQjLeYybXtVJj+ZYkFTkFt2zFskr+VtuRXR3PVcyCh0awz/YDCqO4kN83gdTlnYzeu+GZU5mapQ5/kO1D8T1Ui1oMKys7nBwZa84GBSu+ISYeNEn5jG59wKm8bKGXQkmbraAZDMqSRromxWvHkvGfGNs+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bn+cKf+6; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1734920161; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=X8L9prpbeK1sda734hduULb78ArRrtxowYpuEuW1bZM=;
-	b=bn+cKf+6jWnT90k7Mr6akem1g6VMseS2C7F/L/smAJ6fTPoqWn0qHbpVV1WPRZRBBMLGaAzuNQazGUFKuK5bFlVKukAtu0hXoFQCe7/wq/fzr7+dICUCapIoS5VSqQcHB+DAGLrolI1Q9YjlZpD8ZDJMmq7GTLuw0GBcu226Fuw=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WM-5smN_1734919836 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 23 Dec 2024 10:10:37 +0800
-Date: Mon, 23 Dec 2024 10:10:36 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
-	song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
-	edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org, Daniel Xu <dlxu@meta.com>
-Subject: Re: [PATCH bpf-next v3 4/5] libbpf: fix error when st-prefix_ops and
- ops from differ btf
-Message-ID: <20241223021036.GC36000@j66a10360.sqa.eu95>
-References: <20241218024422.23423-1-alibuda@linux.alibaba.com>
- <20241218024422.23423-5-alibuda@linux.alibaba.com>
- <2f56aca3-a27a-49b6-90de-7f1b2ff39df1@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28D518052;
+	Mon, 23 Dec 2024 02:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.128.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734920700; cv=fail; b=c2/rNyjmS8y5mgu6iX7CzXML3kY3eonBRk2QAN8Fzc3GK4+X5IRz23+SqapD6D0gOv1aWBa6dAGDGsNLBf13iw5rzq7a5k6THjKk9qYV0EqiuRSAMSnmZIjCukAiy9QT+lHpJ2WzZAGIJ+TgN9zCcZzXY1WyBGJBiexAdtX5JlY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734920700; c=relaxed/simple;
+	bh=2dcEuU7usy6VGF4YQu3pgbhbtSc98n5XJY6++hv5rxg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Br9DJCTfeok5rnY1K95ByUI0lVjlcOOX/p95eIUpnEBn2R/DNG5XvRlaj8Q9qczMmgSamc+cT+0Q0PkL4zqUE36AS2ALBqWB3fsA15dv7cGmC1uF0hrtQFQ7lXrMqdgLBu2bVEIBlrFBVNAgM1WyZzl0fkblMmcRfBOBWsXTems=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com; spf=pass smtp.mailfrom=fibocom.com; dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b=IsI5tjdB; arc=fail smtp.client-ip=52.101.128.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fibocom.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jImH/B9o/kEjFnAycJjzRjGdmk6m+04lnqF8jgceOFMB7Ww63h691sWyxAlO2Ch7YzhBVu22X77kM2V9EbfX6fL1q0Z7wuVe1JFY/YQUG6i+M1yi5GE/9zJVwUnwpfsbOVwrjf0INWQxDsxgdUIxCrekPw2+Tlde979rH5KVF9Gl5V2/J7R2T/byrTJFoKT7JsQ3K+B90jcdl8WH1KMsEsUOHweGmB3n597npV1i9BOsu0QWn7qOynb1BEeHQMOXFeO8cphmuU2XNdGd2ld8OPvwPqDKglGYz3WJQGS5bPdA/oME50Fob19n1V58uBuGv7RjXo4PC8tlxGna6NKRgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vPIuqAkEIhIc7SIxhIKtNTejNsj54ROHnT0uFQASbuc=;
+ b=UAb0AihRGt3afKUqS0UTbtaJbdAwdsWGIEADfPwGbM1bvpz8bpAw21AqrBc0zt98Vp4qNO0bke3yKbD5iUzHsCMm+Ve/iuPXCGyJlqGdDiwW0omP7ads0UFusYr/9m44oiE8cNM0Hv7fr8WJn1r/48dftnw98dg7B/Zrs6Sr5IA4mbDzwCZE2Laiv/NN/BuHPdFfWdNLLiU1DIc3KfSSPWFRr+WFV97Zk+cDbLMMJQvQuVhd4eRv//DCYPVEoFO4ERTvM7wJSIP/oSw5dGQKiZl1ltWyXEB/SP4tewrwF9znEiAfu9uQdttBK4VfnOXMugzNtNhbgrdMpw0maWFbDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fibocom.com; dmarc=pass action=none header.from=fibocom.com;
+ dkim=pass header.d=fibocom.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=fibocomcorp.onmicrosoft.com; s=selector1-fibocomcorp-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vPIuqAkEIhIc7SIxhIKtNTejNsj54ROHnT0uFQASbuc=;
+ b=IsI5tjdB7KY2PGeuenKCPRfGxuLtzG+CBPzPvYMDh0HCulO/5uYq0HzhypbtfPgMohLZlPY+CSnqMyV/1BxqOQWO1AD62LG73ljGIaQfSdkwn0AyZa73BN+EhymCbhW4EXq4qaGcGebGav2UPMN3Oq3bkoDLNwCzfpTY0Rl6wgo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fibocom.com;
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com (2603:1096:400:1b5::6)
+ by JH0PR02MB6849.apcprd02.prod.outlook.com (2603:1096:990:42::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.17; Mon, 23 Dec
+ 2024 02:24:52 +0000
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b]) by TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b%5]) with mapi id 15.20.8272.013; Mon, 23 Dec 2024
+ 02:24:51 +0000
+From: Jinjian Song <jinjian.song@fibocom.com>
+To: ryazanov.s.a@gmail.com,
+	Jinjian Song <jinjian.song@fibocom.com>
+Cc: andrew+netdev@lunn.ch,
+	angelogioacchino.delregno@collabora.com,
+	chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	corbet@lwn.net,
+	danielwinkler@google.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	haijun.liu@mediatek.com,
+	helgaas@kernel.org,
+	horms@kernel.org,
+	johannes@sipsolutions.net,
+	korneld@google.com,
+	kuba@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	loic.poulain@linaro.org,
+	matthias.bgg@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ricardo.martinez@linux.intel.com
+Subject: Re: [net v2] net: wwan: t7xx: Fix FSM command timeout issue
+Date: Mon, 23 Dec 2024 10:24:18 +0800
+Message-Id: <20241223022418.5795-1-jinjian.song@fibocom.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241220085027.7692-1-jinjian.song@fibocom.com>
+References: <20241213064720.122615-1-jinjian.song@fibocom.com> <20241220085027.7692-1-jinjian.song@fibocom.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR4P281CA0042.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:c7::12) To TY0PR02MB5766.apcprd02.prod.outlook.com
+ (2603:1096:400:1b5::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2f56aca3-a27a-49b6-90de-7f1b2ff39df1@linux.dev>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TY0PR02MB5766:EE_|JH0PR02MB6849:EE_
+X-MS-Office365-Filtering-Correlation-Id: f3c6d310-9e18-4d27-906c-08dd22f8faea
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|52116014|376014|366016|1800799024|7053199007|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?M3RycGpZME04YWJnMGJkSXZrTUo0L01SUU9nNjlHS05OeGpTaVFHbjQ3YzNV?=
+ =?utf-8?B?RTQvWHYvNnRkZU5USmZRaTYxSDVUa1ZTNXBUOHh3MW9tSWJEVHg2eUdIMm8x?=
+ =?utf-8?B?MnNGSDNmS0JVQ29GR29JNm9tb1VoSTdVRkhMd25NOWhtMkhnY2JPclB6ZXJ5?=
+ =?utf-8?B?c0I5TkxUMTZValBaeE1nZTFlMzdwN3pVSVhPbWJmOVFMbGdpZ2xqZ1lhbEdy?=
+ =?utf-8?B?MGtDSHRwcTNndmduNjlnWjdqbDJUYWZUMk9STUtjUTV3Y3Q4QS9IVCtzODA1?=
+ =?utf-8?B?cXhBZ3JwYTBreXpxeUJkSndkdHVBWGIyck5oRGdDejkyaHdHRlpFY1JIMGhj?=
+ =?utf-8?B?WlNmUDRCWWRCTk5oaGNZSjFFcm1GWG5KU1kyMkJhRjJZV2lYNjZYQnBxblJr?=
+ =?utf-8?B?MFJJaktQMmJ3K2RaNUZQbFFwQTFuTEJ1NXB5QUd6R2NQQ0NIeDFoOGhlMW5S?=
+ =?utf-8?B?cnIrUWlrWHBkbzczRmROclM5ZWk0VmJSejFOcDRTY3oybEFYTTBUZVVBMXBL?=
+ =?utf-8?B?Sk5PZkRlMDBrcFNHaXo5Z2JhOEIvaHVnUkE5VmRXMnBadFR5WjhZaWloUVVy?=
+ =?utf-8?B?VExsREhlaHpBZDZwNVRSQjRxZDlYMWtaeHh5bTdReWxqWG9VV05kdXdkQ1lF?=
+ =?utf-8?B?d2pxSzZvR3ozZk9jMUh5UVlwM21WM2crZ3FQbFM5WXV4bTg3a1FnOTRtYnQ3?=
+ =?utf-8?B?YWF5Y0FkY3JSYUdVMUNOcEVtMm9vYUo3aU5CTEFkMEFuQVpRN0dYRnBnT2tR?=
+ =?utf-8?B?MlE5RVVpNEFlNUFCS2Q0UXhzUjVJY1crZWE1T0x1MG8vVk9Oams4TGxMWVZN?=
+ =?utf-8?B?bGluNUYrN25WOEZER0dmVkJEYmFpNUNzMHduTmxrcDBSY0lLOGR1SlBPMTY2?=
+ =?utf-8?B?dVRiOGcrMjZ5a254a1FPNnRVOGYzbXRPaFdlQ292SEhyN0Z2b29NS0Y3MkhD?=
+ =?utf-8?B?V3N5UWl3cG03U3FPWGIrOU9RckRLVjV3ckg1ZlAvOGdzYmExS0wyQUJOalZ1?=
+ =?utf-8?B?ZGxpcUpNbTlaNXRvU21oSHZLZU1XdzBKbmZnMk5MNDZnR2MvbmJ6aEF5YzBL?=
+ =?utf-8?B?QUxYeStBejFzZi9zTGxVeTZaZnJ0ZStrTFhWcnNKR3BwU1IzUWxQRWkzbExZ?=
+ =?utf-8?B?Q3g2eWpyejg1eUsvdkoxeXA1VUR2N0d0L2lCMXpOcUZjZy9DVGY0MmFDTjBq?=
+ =?utf-8?B?MC9yVERucy9uOGNVV211NktEcFQvWjZrTU43eGEzY1lmUUZrdzRadDFQVDJs?=
+ =?utf-8?B?ejFWSU14V2pXcFFFZzAzUUhZMkVFRytXZ2RaYTVpS3FzajdKRGFiMVp5OWlI?=
+ =?utf-8?B?NVJBc3NIa1NvUXc4Vk9xK01NQ2ZmK0pVUS95TDFzNlM5R0pDL1prU0VDTjlt?=
+ =?utf-8?B?S081KzBuMVBHNGY3d1NOWFpUNGJuNVNIcldsMEFXOFkwR3lPZzVHbjRVaVh2?=
+ =?utf-8?B?bWxkVS9UZFgrZ2MyVWdUdWRUNDlDaGxmbXpLZzI1V041V211L3NwanMyMVhu?=
+ =?utf-8?B?cFdCTDZwOVdiRThBV0NtbXNYeGE4YlFsZXlpbUVJN0I1eVNaVytkczY0YytH?=
+ =?utf-8?B?NW1YdUZtQ3J1MXhrM29ZdFhlOGgwYmxpcFVuaXExZU1FQmlaOWFVdzV1ZTcy?=
+ =?utf-8?B?NXNwQ1NabXlnVnR4dzJSQmFDNmt4eXcwK3YyNDVhdlIrZ0x0ZENoeDFIL2Fn?=
+ =?utf-8?B?N2JMVlV4bThFQ0E4T0NuOHpuWFlEQzlCQko5WXJvY1o5NmxPL2FUSStuU09H?=
+ =?utf-8?B?a2lISkN3YlVUanBQWFFWOEEvcnhPL1FOczZ4K0h6cU92M3oyYW1NTGIraEZ6?=
+ =?utf-8?B?cVJ3K20zOVVUdzl5NlNDWmJQaTZzS2VwdHdvaFJNWVA0RzVKaE5QZjQ0Vi9S?=
+ =?utf-8?B?cklZVEVzczhzZ3A0RENlckVZZzhzcFBPNTRnSW1zTzQ1RnRxMlBGL2dUNk80?=
+ =?utf-8?Q?PI/5AqSvIuAR6IwG7kyBboLg3ypTnaGx?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY0PR02MB5766.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(52116014)(376014)(366016)(1800799024)(7053199007)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MG96bFN5UEJ5aVBET0dtR0FzcXRiL2xpR0VIMUpPWnp5MzB5bUdLcU5CejlH?=
+ =?utf-8?B?S1Mvell3NXFJS1QrK1JSREJlZGdNZXllWFYvUHhhUDBJcTN3TG1SM3Exenlh?=
+ =?utf-8?B?RTZ1Q0gxSXJJbWJCcXRLZjFBelZUeUNSelJUbEFKMlRyNy9rcUFPTzU1c213?=
+ =?utf-8?B?UU1leElsbmYzWkhEVHNoYjhGNFFMcU1NTXMzeFlkNThxVWVDT0pSUDZVYmZF?=
+ =?utf-8?B?L0ttVFNLWG9NOHBpdlZzQmZWdk9ZS1FRcXZwa1hlM0pvKzNCNURMdzh3QjIr?=
+ =?utf-8?B?d3dmSGMxRCtrVVBxeW41blRnTHVubEZGVjJoZ0dtOGpFaXhUK0Z2WmpqMk9z?=
+ =?utf-8?B?NWFGN0RXU0s2eDgzTHRDT1lidnQ2cCs1QXVpd2ttZk56QlpOZlI2U3lZUmdx?=
+ =?utf-8?B?ckZ0U1JOMmtvUmUyOHJUckxydmhEQytwNkc0anB0cnNteXdkeEpXd1A5aGV2?=
+ =?utf-8?B?cGdjNGl2bWpId0UxNEJWamVKNzc0dWN3SDB2MkhYRnZCTkZteHk2UWc1bm9I?=
+ =?utf-8?B?QlpEYlJpcm0xT09kUDBHTnJUTm5KSGZQaGZBT0U4cHBSRzFoOUp6YUVaaVlG?=
+ =?utf-8?B?dGxzaURUc2lDQ3Rid3BsanJnbm8vcS9hdzZLNzkrYTR1QWIyVHdFZkQ3czUy?=
+ =?utf-8?B?R05iRHFhWTBiTjlLZXdkQW4rcG9GTmc5TDl0SHJGdXpCTm40UWZwRC90aitV?=
+ =?utf-8?B?cHphYWFUMXRFd3ZoWElBUU5RaVh3QjY3ZEFkUE53REV5QkVFQlgwYmdTckhw?=
+ =?utf-8?B?Zi9iWldpei85MUFDRHIyQjRnUWw2NFVqT0xRMit0NTFTcjBBV1lVTmMvQm9T?=
+ =?utf-8?B?Umh1dy85U2FTQ2VsSkFtRS9FZ3hLVlc4Q3FnUWtkeWV6dCtCUEgrMHNNcDhB?=
+ =?utf-8?B?ZC9aSlRzZ05US0tSUGZZd1N1MTJpSUpwS09PSWNaODBJTllRTVlkUWVwSStM?=
+ =?utf-8?B?ZGoxb29jVUx0RDhubHdsNm9qdjB3cVN2ZmJKbHRrRU9waG9lTW9WNzRnZW1Q?=
+ =?utf-8?B?Q0dJSjl6aGRGL0l2bzV2cUlaczhIcHorM3RrQkNmTWR5RmUwUWxMeVZiWmJa?=
+ =?utf-8?B?K1lxaTVxeHp0eXA4RVp5M0FKbE12VEF3NytXODNXSWt2L05GOW1xQmtWMVor?=
+ =?utf-8?B?bkxjYjdTaExtYlg2QUZ6ZkNwajdrUUw2Sm5RN3FKYmJZUHp4WjhKcG82R3Qy?=
+ =?utf-8?B?TE14L0Y3cVZ0RmV3bDhBSnlpaytHQWJjb21GV2podHNyd2ZkQ0VHbnlPb3RR?=
+ =?utf-8?B?WUJiZzZlc0MwWFhWam5jWWczSmVqdWtHakxvWC9MQXNVa0haNGcwdkRtK2t2?=
+ =?utf-8?B?ZG9IS1o2Q0IvS0R0dXVtUmMxUExXKzBqUk9PaHFTVjBwT0dqalJHSXArNjNh?=
+ =?utf-8?B?VkxQbFRmamZYTkRsZjRsM0dhVm9qQU9rV1hmbEJicXhjeDBhRG15L0RBY1h2?=
+ =?utf-8?B?V0Q5Q0tJSFkvMVBhNmRPVytROTJQQkRkV0craVRnM2dNekpYRUxBNmlQQ0V1?=
+ =?utf-8?B?NHJ2UVA2Z2tUSHZoNFkrNUlqZ09UYXVNSktZSXB2YUMyOVZVeUZ4NllPbEY0?=
+ =?utf-8?B?bHRhYmkyd2tkLzUvRmpaVCtGMG9GWEs0MzJIcThxcmE4NUNEbGw2Z3ZsRlc1?=
+ =?utf-8?B?Zk05Y3BnejdMZTBZeERjNjUzYlcxUTF0bGNud0JGbURoblQrclREZGtUdGhn?=
+ =?utf-8?B?NE5zNURWbHpNeGNySUJ2bHdFYjNLcHRwcHFsWVhROFRIckZYa1ljWThSa3dY?=
+ =?utf-8?B?WG9tZy9lN0hqUWdBV2Z0d1RkR2JFRmY1RTYrS2FpOVhxdFl3WE5RVVA3VWZJ?=
+ =?utf-8?B?dWxWeGxiZnBVSlhJTGU2Zmp6V3FYOHB4RU5NUTVId2FCUUs2ZmJRSmxzK3lm?=
+ =?utf-8?B?TVd6c1BIOW1oZzB4MWhCYmNBelJhOStCUVlSQnllVjliaXBmT01kZjVxek55?=
+ =?utf-8?B?TlZVQzN4UnBPTHpPeCs4dm8zdEh1ZUgwU29uNHVXUEczT1dGUzBJMVBmTmZ0?=
+ =?utf-8?B?ODcyZFVsekJkclg2aFFsVnliQlhWdzJTN21CSmNJMml1djJDOGZnUmVkK2J4?=
+ =?utf-8?B?NjZwT0xFQ2o2VjY3RXA2bGNTb0xVKzVzQWxsOEVWa25OT25mUkZxRCtqR2d1?=
+ =?utf-8?B?dkw3cUFyVlpSNm5PbEhjNTJSVVM5WFZNM0JCQ3hpcVd2UTNicnZyWm40YXFi?=
+ =?utf-8?B?TlE9PQ==?=
+X-OriginatorOrg: fibocom.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3c6d310-9e18-4d27-906c-08dd22f8faea
+X-MS-Exchange-CrossTenant-AuthSource: TY0PR02MB5766.apcprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Dec 2024 02:24:51.8217
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 889bfe61-8c21-436b-bc07-3908050c8236
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ju/9YQ/aiECav1EkToWKgNL5t8ATYu1ZWuDtWv8NSbgdFz/g1D5/4Obhl79B/rANaZ9ffTl0AfDjVDOA/XR5iB6bVrX2siZ13JPacgiyb+U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR02MB6849
 
-On Thu, Dec 19, 2024 at 02:43:30PM -0800, Martin KaFai Lau wrote:
-> On 12/17/24 6:44 PM, D. Wythe wrote:
-> >Here are four possible case:
-> >
-> >+--------+-------------+-------------+---------------------------------+
-> >|        | st_opx_xxx  | xxx         |                                 |
-> >+--------+-------------+-------------+---------------------------------+
-> >| case 0 | btf_vmlinux | bft_vmlinux | be used and reg only in vmlinux |
-> >+--------+-------------+-------------+---------------------------------+
-> >| case 1 | btf_vmlinux | bpf_mod     | INVALID                         |
-> >+--------+-------------+-------------+---------------------------------+
-> >| case 2 | btf_mod     | btf_vmlinux | reg in mod but be used both in  |
-> >|        |             |             | vmlinux and mod.                |
-> >+--------+-------------+-------------+---------------------------------+
-> >| case 3 | btf_mod     | btf_mod     | be used and reg only in mod     |
-> >+--------+-------------+-------------+---------------------------------+
-> >
-> >At present, cases 0, 1, and 3 can be correctly identified, because
-> >st_ops_xxx is searched from the same btf with xxx. In order to
-> >handle case 2 correctly without affecting other cases, we cannot simply
-> >change the search method for st_ops_xxx from find_btf_by_prefix_kind()
-> >to find_ksym_btf_id(), because in this way, case 1 will not be
-> >recognized anymore.
-> >  	snprintf(tname, sizeof(tname), "%.*s",
-> >@@ -1020,17 +1021,25 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
-> >  	}
-> >  	kern_type = btf__type_by_id(btf, kern_type_id);
-> >+	ret = snprintf(stname, sizeof(stname), "%s%s", STRUCT_OPS_VALUE_PREFIX, tname);
-> 
-> How about always look for "struct bpf_struct_ops_smc_ops" first,
-> figure out the btf, and then look for "struct smc_ops", would it
-> work?
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
-I think this might not work, as the core issue lies in the fact that
-bpf_struct_ops_smc_ops and smc_ops are located on different btf.
-Searching for one fisrt cannot lead to the inference of the other.
+>Hi Jinjian,
+>
+>On 20.12.2024 10:50, Jinjian Song wrote:
+>> From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+>> 
+>>>> Fixes: d785ed945de6 ("net: wwan: t7xx: PCIe reset rescan")
+>>>
+>>> The completion waiting was introduced in a different commit. I 
+>>> believe, the fix tag should be 13e920d93e37 ("net: wwan: t7xx: Add 
+>>> core components")
+>>>
+>> 
+>> Got it.
+>
+>[...]
+>
+>> Yes, the patch works fine, needs some minor modifications, could we 
+>> feedback to the driver author to merge these changes.
+>
+>Looks like the drivers authors haven't enough time to maintain it. You 
+>are the most active developer at the moment. Could formally resend the 
+>updated patch with refcounter as V3? And, I believe, we can apply it.
 
-> 
-> If CONFIG_SMC=y instead of =m, this change cannot be tested?
-> 
+Hi Sergey,
 
-That is indeed a problem, but currently there is no better solution
-unless the CI can add a step to run 'make modules_install'.
+Yes, please let me resend the updated patch as suggested.
 
+Thanks.
 
-Best wishes,
-D. Wythe
-
-> >+	if (ret < 0 || ret >= sizeof(stname))
-> >+		return -ENAMETOOLONG;
-> >+
-> >  	/* Find the corresponding "map_value" type that will be used
-> >  	 * in map_update(BPF_MAP_TYPE_STRUCT_OPS).  For example,
-> >  	 * find "struct bpf_struct_ops_tcp_congestion_ops" from the
-> >  	 * btf_vmlinux.
-> >  	 */
-> >-	kern_vtype_id = find_btf_by_prefix_kind(btf, STRUCT_OPS_VALUE_PREFIX,
-> >-						tname, BTF_KIND_STRUCT);
-> >+	kern_vtype_id = btf__find_by_name_kind(btf, stname, BTF_KIND_STRUCT);
-> >  	if (kern_vtype_id < 0) {
-> >-		pr_warn("struct_ops init_kern: struct %s%s is not found in kernel BTF\n",
-> >-			STRUCT_OPS_VALUE_PREFIX, tname);
-> >-		return kern_vtype_id;
-> >+		if (kern_vtype_id == -ENOENT && !*mod_btf)
-> >+			kern_vtype_id = find_ksym_btf_id(obj, stname, BTF_KIND_STRUCT,
-> >+							 &btf, mod_btf);
-> >+		if (kern_vtype_id < 0) {
-> >+			pr_warn("struct_ops init_kern: struct %s is not found in kernel BTF\n",
-> >+				stname);
-> >+			return kern_vtype_id;
-> >+		}
-> >  	}
-> >  	kern_vtype = btf__type_by_id(btf, kern_vtype_id);
-> >@@ -1046,8 +1055,8 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
-> >  			break;
-> >  	}
-> >  	if (i == btf_vlen(kern_vtype)) {
-> >-		pr_warn("struct_ops init_kern: struct %s data is not found in struct %s%s\n",
-> >-			tname, STRUCT_OPS_VALUE_PREFIX, tname);
-> >+		pr_warn("struct_ops init_kern: struct %s data is not found in struct %s\n",
-> >+			tname, stname);
-> >  		return -EINVAL;
-> >  	}
+Jinjian,
+Best Regards.
 
