@@ -1,93 +1,129 @@
-Return-Path: <netdev+bounces-154126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A128F9FB738
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 23:29:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8316C9FB7DF
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 00:22:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 241B7163D82
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 22:29:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 136B8163A3C
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 23:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A541D61BB;
-	Mon, 23 Dec 2024 22:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71AB21C5F1C;
+	Mon, 23 Dec 2024 23:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QtWosel2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD39A198E60
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 22:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6D17462;
+	Mon, 23 Dec 2024 23:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734992945; cv=none; b=jPwlCwOnRQ0wLewIWjFv4EgqgcnFlnOHkcmcwnhOuorCH8KmRJsoWYB5/Aj75NSAWInC3c1B3Sj8NL0CnwegfZm3nQDuBteZSdVAjTgqlInbCugK8QkxK08aliOiVPBUwJnFcspEo7gmauxaKqqRZm9PAiDVT4hyryYO5ZNRpQw=
+	t=1734996165; cv=none; b=M0JWjCCTDeAEJqC9J05ZbXtzxIoyTuDI9nLAwLf/y8VI1CYFGPYrRfVzVu5ubuVPK8Byucfq5zsV7Jk2hxKx0b/t4gWq+joEVsb/ViEwFW31bLrcEuGMh+Zb04lv+aVSUjLa97kA/Ca+Nj2SOlyc3XP1aK+raAOUegXFvUW4sss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734992945; c=relaxed/simple;
-	bh=tbxROftgZUDZCPQS3dgHui9JtdKjojV/NV4pSLa7yLQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=ePPyR2gI7YRBLFTpwvwrFm6KbjmXXn7T/6NHY44j8imlQ3J36XruSv/YWDpgUluxzz+Wo0MaYP6OdNjhMMACw+ZEjdWZkrkTpHInZx9imhPgXspzOD/FEJB3DWkF26BwYE62MxpThwtLi/OIYIkefq3+HOUiAyXAehJ4U07YpBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a7d60252cbso39668185ab.0
-        for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 14:29:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734992943; x=1735597743;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WXFsWc3cBjQmAVXhERtP+fTViDwJmrmB4Hycvb0Vczo=;
-        b=EGOTESbdNSyP3t/P6hZ9lTMh/wcIMYT3Nij+ttZLU3ERAij4NPHbrVN1+EMXuarmvK
-         /QyKZLpZTOz6w+9gjKI4raANAZ+PZMVhpqfZwHm2IH+NunyIA1oprtI/n2hfgY/E29e8
-         PZYX1I/qQdOs9rr06PoTHwB3g+ttv1x+FiwZHyN86e3kNvRTgIkw9cTieUkt7a5WpmFl
-         eEQEL4xeKpPagTD/dCLui61ZZ+feRm5H9MjjVEpfcvDQfQvjGeStsozvO5Q8L5HVnSC2
-         pNWQAmOVoa/zVf/Or9ai4IYKmazs1m9sv2Lot+08+6o7w/cXlmTOABRDs6iLxhXvNerR
-         dEbA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9dca0SraqdLl7UtibXaicCcXJdIvxKYjW0dJk9sd3Scd/zTSJ2GEDe3s626+DNV1Xh9ZpdLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgDX5ICkDWKwaJ7SSkwrafwcsm6UJTffchlq+Zcm15RoeuZNJn
-	p6pH02PUOgQBdM6VbbkQMaJQzg+Ftl2NoeMgaNkHlggt4H8Zi/RHdPKgfxq/iBwf9w90JgyXEqp
-	paCp2PIbcVD9ksNGsePzBVpxU7L8Zt3ESL9licSRUovyY088Em9DbZUQ=
-X-Google-Smtp-Source: AGHT+IFr3QOdlGNNLXo40GG/X1v8nXNMTvNIdi2jExJyW6chvs4r6L+prLfUOcCLhtwD2aer2+8CRLfr3PGFBsbAKNcKCXStVZub
+	s=arc-20240116; t=1734996165; c=relaxed/simple;
+	bh=MUf3O2CuGvHUkRiStqT9EpSnNnkeEfGYf3wmtOYBB0c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YeW1rIObbu89LLYxwyUwulAg3wV33K6PIDMjXfV1rWaYeWjSH7BCyzVRJroFzrFw08sIHznecS7yF6o8gYx+nPOOJXcfqu0cai+XjYBsqPlLieIFZQxCSFJWcgrdGFiJ4bXS3EnYkO79dI3SASNMKRKEZ4MEvCqXO/1rsRZfK6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QtWosel2; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734996163; x=1766532163;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MUf3O2CuGvHUkRiStqT9EpSnNnkeEfGYf3wmtOYBB0c=;
+  b=QtWosel2ksVafXlIzWR7LHphpfguGtkRwt/uXWGYvIsTrDbHS0nPSadW
+   mf2xGWc+0siIiXAD0eHd0LiZJ/sg3Gki71L07tqgZPv96L9XmN8pKX752
+   gMtKymfBviKhtgYHSYRP7sc8tJZ3tKYDQ2SCdeDY/fMx61mVBc1lJmFX/
+   qmJGmIkfeVu8q+XDiVSfENiMx0xDCksDu9vF+4LvQjV398Dg/UO2xSbod
+   xwFsl5DI1mFLj8dfljoYXZnkQJRtLTp+7DM2KmQbKVEJfSEy3RGyRgTGu
+   12WvknnBfJ6IuzvdFEAFK9q5npBoOSzGC87Fe7DX0udHLypBN6dX9utJP
+   A==;
+X-CSE-ConnectionGUID: 4aIVPVRsT+CtLuCswRqZLQ==
+X-CSE-MsgGUID: YyPbkSExQqS8BXxbeVknRQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11295"; a="57928569"
+X-IronPort-AV: E=Sophos;i="6.12,258,1728975600"; 
+   d="scan'208";a="57928569"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2024 15:22:42 -0800
+X-CSE-ConnectionGUID: m69gGBCQRbyPUwO0x4NKdQ==
+X-CSE-MsgGUID: Iw/N6R7ZRja/Rrs1OsjxjQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="122594367"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 23 Dec 2024 15:22:36 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tPrkw-0000gd-0H;
+	Mon, 23 Dec 2024 23:22:34 +0000
+Date: Tue, 24 Dec 2024 07:22:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Lei Wei <quic_leiwei@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
+	quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
+	quic_linchen@quicinc.com, quic_luoj@quicinc.com,
+	quic_leiwei@quicinc.com, srinivas.kandagatla@linaro.org,
+	bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com,
+	john@phrozen.org
+Subject: Re: [PATCH net-next v3 2/5] net: pcs: Add PCS driver for Qualcomm
+ IPQ9574 SoC
+Message-ID: <202412240600.yT4YVoQ8-lkp@intel.com>
+References: <20241216-ipq_pcs_6-13_rc1-v3-2-3abefda0fc48@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3202:b0:3a7:cce2:d349 with SMTP id
- e9e14a558f8ab-3c3018aaef4mr96055575ab.8.1734992942934; Mon, 23 Dec 2024
- 14:29:02 -0800 (PST)
-Date: Mon, 23 Dec 2024 14:29:02 -0800
-In-Reply-To: <67251e01.050a0220.529b6.0162.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6769e42e.050a0220.226966.0047.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in l2cap_unregister_user
-From: syzbot <syzbot+14b6d57fb728e27ce23c@syzkaller.appspotmail.com>
-To: davem@davemloft.net, hdanton@sina.com, johan.hedberg@gmail.com, 
-	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241216-ipq_pcs_6-13_rc1-v3-2-3abefda0fc48@quicinc.com>
 
-syzbot has bisected this issue to:
+Hi Lei,
 
-commit c8992cffbe7411c6da4c4416d5eecfc6b78e0fec
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Wed Dec 1 18:55:05 2021 +0000
+kernel test robot noticed the following build errors:
 
-    Bluetooth: hci_event: Use of a function table to handle Command Complete
+[auto build test ERROR on 40384c840ea1944d7c5a392e8975ed088ecf0b37]
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14d538c4580000
-start commit:   30b981796b94 selftests: drv-net: test empty queue and NAPI..
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16d538c4580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12d538c4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6a2b862bf4a5409f
-dashboard link: https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12050adf980000
+url:    https://github.com/intel-lab-lkp/linux/commits/Lei-Wei/dt-bindings-net-pcs-Add-Ethernet-PCS-for-Qualcomm-IPQ9574-SoC/20241216-214452
+base:   40384c840ea1944d7c5a392e8975ed088ecf0b37
+patch link:    https://lore.kernel.org/r/20241216-ipq_pcs_6-13_rc1-v3-2-3abefda0fc48%40quicinc.com
+patch subject: [PATCH net-next v3 2/5] net: pcs: Add PCS driver for Qualcomm IPQ9574 SoC
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20241224/202412240600.yT4YVoQ8-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241224/202412240600.yT4YVoQ8-lkp@intel.com/reproduce)
 
-Reported-by: syzbot+14b6d57fb728e27ce23c@syzkaller.appspotmail.com
-Fixes: c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to handle Command Complete")
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412240600.yT4YVoQ8-lkp@intel.com/
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+ERROR: modpost: "__delay" [drivers/net/mdio/mdio-cavium.ko] undefined!
+>> ERROR: modpost: "devm_of_clk_add_hw_provider" [drivers/net/pcs/pcs-qcom-ipq9574.ko] undefined!
+>> ERROR: modpost: "devm_clk_hw_register" [drivers/net/pcs/pcs-qcom-ipq9574.ko] undefined!
+ERROR: modpost: "devm_of_clk_add_hw_provider" [drivers/media/i2c/tc358746.ko] undefined!
+ERROR: modpost: "devm_clk_hw_register" [drivers/media/i2c/tc358746.ko] undefined!
+ERROR: modpost: "of_clk_hw_simple_get" [drivers/media/i2c/tc358746.ko] undefined!
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
