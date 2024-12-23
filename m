@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-154093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32579FB400
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:25:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7589C9FB407
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:32:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16D46188526E
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:25:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD2481885173
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B915A1C07EB;
-	Mon, 23 Dec 2024 18:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF99418A924;
+	Mon, 23 Dec 2024 18:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eyJEz7Cf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bG7efAUR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9351F1C07C3
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 18:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99901FB4
+	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 18:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734978314; cv=none; b=V96HuMMJYEAPBy3XBgvhh20hkCvbwwpmR2gdi/Ydh3t6f6FJ6tmjITjAbs9jFHqJEFQOQvU6cq+yQVNCmy1mrNx1l2ja6fr3gKqZEa8RGpeH5IDyV3cxlynZbTLv/n331LepLWr7WCeFF7dOqfEPxLxr2P9+qmJap0E3+n4j5OI=
+	t=1734978723; cv=none; b=PGvS65qNYsJIaoq9yRA50FRos9ViA00Ajz143EytV0CskHXo1cs5gIZfmRloFpQuAOyw2XjJtSh1+EgyzOZPSsj64cCkMxJZd3xreEc0ugirFI+CUL1SIFPuFxZHU6PT+gL8l76osckFshBxX2wSM+gilruHsmc/G8lJg+NUpJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734978314; c=relaxed/simple;
-	bh=EvVGnqQzG1NqrMcQ0RZQcKfZGnDbmldzWPgkmLGi4MA=;
+	s=arc-20240116; t=1734978723; c=relaxed/simple;
+	bh=y9bJAsNGq6SAhO8pvPWsDPwViwj+lQJ0Cb0wnpwS5Ow=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gJ1a4i2kkAUKuEuVLlh8H7yeTpfS3FO5pmGgac6WlFKFtTjexwgGoCkON6+H+f83vbgnruPa0Gwh6cT236TRL9FQyar+RmVbTrevfnV5VAs3r7BS2J9ZGJIrg+eokzaI6Rffv5i5CUNQZBS1hW/V3nxuxOxsdHwOaSg6Sq+GME8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eyJEz7Cf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D9AFC4CED3;
-	Mon, 23 Dec 2024 18:25:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EG/THzmWu6xHkOUT3qHorAmvUMrbRn7kvdzVN0Tvnj5ZbEPqOcxB7NrRYgd/TrSCyrBcDP8+p5ITGRdcQyNuwMpDXlT56moyTDEq/EMQowe93aGmSPOiGegDtJKhHTwUutB8ZcWMG+BSXu116zGWVMU27i+kFVP8oJrzpz1AfH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bG7efAUR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C61EC4CED3;
+	Mon, 23 Dec 2024 18:32:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734978314;
-	bh=EvVGnqQzG1NqrMcQ0RZQcKfZGnDbmldzWPgkmLGi4MA=;
+	s=k20201202; t=1734978723;
+	bh=y9bJAsNGq6SAhO8pvPWsDPwViwj+lQJ0Cb0wnpwS5Ow=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eyJEz7Cfll8pyuQEj9k3RgYCKZjcLYEtXIn9+UDpEXivNgu/NVrDvWvqW1QfmVb3o
-	 msiqdBFpPf7Sf4O3qZasUEr5mJS0MPcl5UBTtcpFkNrtXZOTjVZB/zEz5k17z93tc9
-	 l7R2lCeT7XJSge1zcjjl3JGc8qPR6J9NJKvPyka5qpZcyPs4KK5GZ/BkKEphuP9jBw
-	 zaFDn0toXm7FaAsbbBnSs+87akFQbntw3KOdkL2MqsUg1jtOW12dob7371JUPsSW7j
-	 u6woERsyZ4CoOIaUxlFoWJbhibHcvIslBjIJf8aZs2V0g7GKrQwZJBBimqnmhHZGYO
-	 wcDeFUM+eWETA==
-Date: Mon, 23 Dec 2024 10:25:12 -0800
+	b=bG7efAURkDmhnG8iiAjBu45b4l/aVt+mE91rSVF/MBOmFdn27p/6CnnNTpvSIXnaz
+	 QSIZCHBH8AWjxvDRczxzneJpbNnvcenn7nD31PzmfgnPS2lOHj+yKE6H+mSmjrKugL
+	 5+GGa3cxX+q+SJnXt2rF2pckw3P1wZ80eUETyojvtCcFcTCXOurehnr2YLybyX2nlW
+	 KQggSvasf6gKq+5vKzfPR9Q2cNq24Gz2Gck3pDQ2zGhZW2G6ad2Zzz5shUB0gE/vHe
+	 9L4WgRDnoXFzJ4rm+l7wmgXDHBz/7RV+ppq7CzAFyyQXDduAnoei4aoiGNJnaYcK6p
+	 y3QyQMxS3koLQ==
+Date: Mon, 23 Dec 2024 10:32:01 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
- roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org,
- jimictw@google.com, prohr@google.com, liuhangbin@gmail.com,
- nicolas.dichtel@6wind.com, andrew@lunn.ch, pruddy@vyatta.att-mail.com,
- netdev@vger.kernel.org, "Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?="
- <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
-Subject: Re: [PATCH net-next, v3] netlink: support dumping IPv4 multicast
- addresses
-Message-ID: <20241223102512.68467ea3@kernel.org>
-In-Reply-To: <20241221063522.1839126-1-yuyanghuang@google.com>
-References: <20241221063522.1839126-1-yuyanghuang@google.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+ <leonro@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, "Rongwei Liu" <rongweil@nvidia.com>
+Subject: Re: [PATCH net-next V4 01/11] net/mlx5: LAG, Refactor lag logic
+Message-ID: <20241223103201.65a46a7a@kernel.org>
+In-Reply-To: <20241219175841.1094544-2-tariqt@nvidia.com>
+References: <20241219175841.1094544-1-tariqt@nvidia.com>
+	<20241219175841.1094544-2-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,23 +64,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 21 Dec 2024 15:35:22 +0900 Yuyang Huang wrote:
-> Extended RTM_GETMULTICAST to support dumping joined IPv4 multicast
-> addresses, in addition to the existing IPv6 functionality. This allows
-> userspace applications to retrieve both IPv4 and IPv6 multicast
-> addresses through similar netlink command and then monitor future
-> changes by registering to RTNLGRP_IPV4_MCADDR and RTNLGRP_IPV6_MCADDR.
+On Thu, 19 Dec 2024 19:58:31 +0200 Tariq Toukan wrote:
+> @@ -88,13 +86,13 @@ static int mlx5_lag_create_port_sel_table(struct mlx5_lag *ldev,
+>  								      &dest, 1);
+>  			if (IS_ERR(lag_definer->rules[idx])) {
+>  				err = PTR_ERR(lag_definer->rules[idx]);
+> -				do {
+> +				mlx5_ldev_for_each_reverse(k, i, 0, ldev) {
+>  					while (j--) {
+> -						idx = i * ldev->buckets + j;
+> +						idx = k * ldev->buckets + j;
+>  						mlx5_del_flow_rules(lag_definer->rules[idx]);
+>  					}
+>  					j = ldev->buckets;
+> -				} while (i--);
+> +				};
 
-## Form letter - winter-break
+stray semicolon, please follow up
 
-Networking development is suspended for winter holidays, until Jan 2nd.
-We are currently accepting bug fixes only, see the announcements at:
-
-https://lore.kernel.org/20241211164022.6a075d3a@kernel.org
-https://lore.kernel.org/20241220182851.7acb6416@kernel.org
-
-RFC patches sent for review only are welcome at any time.
--- 
-pw-bot: defer
-pv-bot: closed
+>  				goto destroy_fg;
+>  			}
 
