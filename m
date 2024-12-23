@@ -1,151 +1,145 @@
-Return-Path: <netdev+bounces-154024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4B3D9FAEEE
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 14:38:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D294A9FAEF0
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 14:40:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D7F0188291E
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 13:38:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22A5C1882E81
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 13:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C606194AF9;
-	Mon, 23 Dec 2024 13:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACC1199924;
+	Mon, 23 Dec 2024 13:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llT0C9+k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EDF8BEA
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 13:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A357190664;
+	Mon, 23 Dec 2024 13:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734961105; cv=none; b=iDwvKaUI+jUp7tUS3QLlVhoCyCq1xQGMFqKDypfFu9WMayWSoGCWxNFzrb97BQjI8JshnbFqlhsgwotrQ1YlF42UvTsl+rPEoQHPjMi4JmFvQs0i/wcyJXUJOMLSz8huztgqnRGBT8vtqbitUZC51qshR4B9I/VddjEYTpCpHUw=
+	t=1734961237; cv=none; b=TWEzwhfOudixJjtPksxa2P84oWGsSJputam/LCT7KTfR+nyOXUhhZDUOio9PxsrAFkX7yigby0d0iypLNGX64RjGgigfT2/nuBFGlx4/SQAmEd7n9TaqkJBCikemOJiGICOwYcilgoCiZ4FUO7sQ5ZnFjEYmK8W8BSAc4DZ3tq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734961105; c=relaxed/simple;
-	bh=YKwjGULf+DCKku+S3Wz5azWrZP/BLFDx4ZmebO9eHLs=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nCKE/tU96ir68U+y8S8NQGZKf+0vUiZ/2UBWXsG5qrVvVU40iXg48rpsSYkAv6UAzyYABXxh0rhbwBWfRipsMdTwuQVG8IUcCmdFnI8NfmblLIMyyEAbemwsMJgxcSmTCjT0C/j5FA0I+7hX04K0PWyldkfmHXlI/ZZY4HY5XTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3a9cefa1969so40643885ab.1
-        for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 05:38:23 -0800 (PST)
+	s=arc-20240116; t=1734961237; c=relaxed/simple;
+	bh=EgnJ/Tkh1C1LQYcKEaughP+rbf5J1jqLZWDAyyDB7yc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oNeQdz1g3/NoDdYThVo6IoH3xgdW8WsHKPUAaVa/wBgbkQ5hqC5KjyxR+dJHgVFo3H4U/B7QkekLF2trdg6iBliowsJjHKag2z+CWafHoxBjURVhr5P+INlSmsCMIrqiN/8oX5PdbgyvUGo8tkWbeeUoqypEXBYyAg7ch/zsq2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=llT0C9+k; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-844dae6a0caso123000339f.1;
+        Mon, 23 Dec 2024 05:40:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734961235; x=1735566035; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7mDKl6tzxVN4OlPSHKO5eWK8XZLJ0ANoR86UwcJiqUw=;
+        b=llT0C9+k9wA62sXD27N0j5ds8IXQ+6T77n++1THgyqfBApr9E5vY8KCtftOA9deKwp
+         o5Mv73ohbkHgzTkipOVQZhEORoEHjcgKzhClvgKy/ivKXO9RXQwi+CVPxD1NEOg/J9Iz
+         EWl+DK5RUSlDyUnMLyM7IuHOsZoGx4xxk+qA86J/xpaVSLI3vpizVa3SnwUpXZsjjbFZ
+         KAmiSLyz30fAj/p+XM29/AkvlbauctB0rBybq8EHo47nMpLmJJWBv1JoU3PzQ6sdKxuf
+         wtM5rgWPAXaBpZQTuG1J5xUzKaneiglsFP5pZ11qP98u6sY1+DkRG++phUK+C8w/AAUm
+         ATxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734961103; x=1735565903;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LIRUL1nyLCyGGsUcXpfxnJ1Leb7PKv/uIp31sy2Uxnw=;
-        b=gB3H2cSl3FX7fXT+YXfE1fmxTbLsmZWxw9QtVUnUSj46btqjpvzS+gOlBByq5Atm6M
-         SzUwMjYX30vo2drcaVd+8vpqWk3/77d5P64KSu9OEa4NuG0Z/16Brjk1N+mbvxzwSfH/
-         tXXD/LdtkkEqaYE7l0Yrg5Vxt4erWMK4g0NptUmJb/27CVk7JvhTC7vaGD1T/a+paEjo
-         dhfMk2j+fm2cIwKMNdXYZGaFahXCMTuvZdeRRGbI4xExRHHA1+I/ULIISjFFFxC8vS8L
-         ILGXvVR1TO9TSC9Huwu25vVCH5BN6b+XcLbqxn4rFetFM8Q61dS63Yc9fPPTygenCmba
-         utZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVL5FJAgfwTbChCDPYqqLmoCf9GOB/XXiB0sw+rZR97HL5sJfcOK4y2BY3umZWKb+lbOQE8YmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJjgqL9vUSPzg3zbo6JhBhfbxSJXy4LD6PIfhv7qSM8UEQZqnE
-	L25ViYaaBE1UiEMkX3KAS6AMj2HozHYfzMjS+CH+qSe6QhAzBb3j18MEZ7y1kPCmpSi/TSUL3Ak
-	EYhC2GDTctvUF4K/cy8vH/ts50G3hhybrQ15CebUtaE3Lhw30qeh50KA=
-X-Google-Smtp-Source: AGHT+IFFo3KOF35NvVbIm2q7w1H8veIcXArBjetVp8hGoMXG+86pf4WB9Va3FKf02Cnh10bASf2VeZ1PajHgeHirer8TyC2NlG7S
+        d=1e100.net; s=20230601; t=1734961235; x=1735566035;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7mDKl6tzxVN4OlPSHKO5eWK8XZLJ0ANoR86UwcJiqUw=;
+        b=iiVusM1I3LqknT7SklZLhKbQhhIC/svJ7T6hPe/arrwHG/+G5oPZFjHzSUt/BnD+T2
+         ymlBGbrYamdj7bvTEy/WE4z7bjE5GY+xz8K2VqkILPkm+eJoWz8W+PBekA3zy5hudSWU
+         OC8ERzPEH2pj8JF4Ww0GTn298UOWEKI1+VQ5nJEjP69Jcc3eB+qpIo/meE6YCPEG5FeJ
+         NRf5TLn0UGKAQzwgQK90Pw7QS6DDnWvMuA9Pykwvqo5ULmkkacIBkc24eVno66ggqC2w
+         1qXeS+4wLtmMQOfnjFLDnvlrgCP2bQCzRN+1puj0bk45o1EQy46/jNGjLNfbAcT3kODy
+         Y7og==
+X-Forwarded-Encrypted: i=1; AJvYcCXVlU6YDXs/U3g0k6G5dOEW6cPrGACtBqUB0oxtfwwc5atqKG0eVv/v59OIagbWtwiSDV9QZlhD04Tgpgo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkgYZfcbXqcmrnE+Ka08fa9aVHI4Gpfd7P4nRE/AkepWi1UaxR
+	Yr0lXRS2i13+o7EBRXZ24nE9cwwcVfEPcBDNtovYoO/SLQdaBWEeqBeAYozZ
+X-Gm-Gg: ASbGnctMwZ/NWm4Jt5wL/wr44LnTp0J7o5ZVYdhEvDtWLupVJHdxGg85XZ77nVaUfuJ
+	oGe2E3WWZ1VdIAB9QywsfwUvJDQEivveJGo49xTp8Fw25BpcuThST1/YeLcRgrpqeLM2LRf2ONu
+	3srHbL33P4kqHta5Ebx9V/x3Yygm6sNHCPGKwYaWJIKCtdhcAbSAk+BZAwn6EkL5ui7jzRYJFyv
+	EBo2dSxkIzrvfZXPp9w8boDgELhCud7Q4NezbfVpq7ihdtXkaSw4SZjgRW+Bro=
+X-Google-Smtp-Source: AGHT+IFmEtQrufWl2zv0bdenpCyUPipTz3HkTVVXserEvbD10EJhPMh3JV8wfAufs00Cy/zraLSc1Q==
+X-Received: by 2002:a05:6e02:1caf:b0:3a7:c5ff:e60b with SMTP id e9e14a558f8ab-3c2d1f74a78mr111562635ab.6.1734961234950;
+        Mon, 23 Dec 2024 05:40:34 -0800 (PST)
+Received: from T490s.eknapm ([174.93.21.120])
+        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4e68bf4f349sm2230059173.14.2024.12.23.05.40.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Dec 2024 05:40:34 -0800 (PST)
+From: Antonio Pastor <antonio.pastor@gmail.com>
+To: netdev@vger.kernel.org
+Cc: antonio.pastor@gmail.com,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] net: llc: explicitly set skb->transport_header
+Date: Mon, 23 Dec 2024 08:39:12 -0500
+Message-ID: <20241223133915.2333146-1-antonio.pastor@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241220142020.1131017-1-antonio.pastor@gmail.com>
+References: <20241220142020.1131017-1-antonio.pastor@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:349c:b0:3a7:fe8c:b015 with SMTP id
- e9e14a558f8ab-3c2d581a343mr22322165ab.24.1734961102781; Mon, 23 Dec 2024
- 05:38:22 -0800 (PST)
-Date: Mon, 23 Dec 2024 05:38:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <676967ce.050a0220.2f3838.0097.GAE@google.com>
-Subject: [syzbot] [wireguard?] WARNING: locking bug in wg_packet_decrypt_worker
- (2)
-From: syzbot <syzbot+c40f14a86aa820015153@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+802.2+LLC+SNAP frames received by napi_complete_done with GRO and DSA
+have skb->transport_header set two bytes short, or pointing 2 bytes
+before network_header & skb->data. As snap_rcv expects transport_header
+to point to SNAP header (OID:PID) after LLC processing advances offset
+over LLC header (llc_rcv & llc_fixup_skb), code doesn't find a match
+and packet is dropped.
 
-syzbot found the following issue on:
+Between napi_complete_done and snap_rcv, transport_header is not used
+until __netif_receive_skb_core, where originally it was being reset.
+Commit fda55eca5a33 ("net: introduce skb_transport_header_was_set()")
+only does so if not set, on the assumption the value was set correctly
+by GRO (and also on assumption that "network stacks usually reset the
+transport header anyway"). Afterwards it is moved forward by
+llc_fixup_skb.
 
-HEAD commit:    eabcdba3ad40 Merge tag 'for-6.13-rc3-tag' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10a41f44580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6a2b862bf4a5409f
-dashboard link: https://syzkaller.appspot.com/bug?extid=c40f14a86aa820015153
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Locally generated traffic shows up at __netif_receive_skb_core with no
+transport_header set and is processed without issue. On a setup with
+GRO but no DSA, transport_header and network_header are both set to
+point to skb->data which is also correct.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+As issue is LLC specific, to avoid impacting non-LLC traffic, and to
+follow up on original assumption made on previous code change,
+llc_fixup_skb to reset and advance the offset. llc_fixup_skb already
+assumes the LLC header is at skb->data, and by definition SNAP header
+immediately follows.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2be6996abd02/disk-eabcdba3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4e177f4e98c0/vmlinux-eabcdba3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/bbf1b6ecbf58/bzImage-eabcdba3.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c40f14a86aa820015153@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(1)
-WARNING: CPU: 0 PID: 5889 at kernel/locking/lockdep.c:232 hlock_class kernel/locking/lockdep.c:232 [inline]
-WARNING: CPU: 0 PID: 5889 at kernel/locking/lockdep.c:232 check_wait_context kernel/locking/lockdep.c:4850 [inline]
-WARNING: CPU: 0 PID: 5889 at kernel/locking/lockdep.c:232 __lock_acquire+0x564/0x2100 kernel/locking/lockdep.c:5176
-Modules linked in:
-CPU: 0 UID: 0 PID: 5889 Comm: kworker/0:5 Not tainted 6.13.0-rc3-syzkaller-00073-geabcdba3ad40 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/25/2024
-Workqueue: wg-crypt-wg2 wg_packet_decrypt_worker
-RIP: 0010:hlock_class kernel/locking/lockdep.c:232 [inline]
-RIP: 0010:check_wait_context kernel/locking/lockdep.c:4850 [inline]
-RIP: 0010:__lock_acquire+0x564/0x2100 kernel/locking/lockdep.c:5176
-Code: 00 00 83 3d 21 f4 9e 0e 00 75 23 90 48 c7 c7 00 96 0a 8c 48 c7 c6 00 99 0a 8c e8 67 5d e5 ff 48 ba 00 00 00 00 00 fc ff df 90 <0f> 0b 90 90 90 31 db 48 81 c3 c4 00 00 00 48 89 d8 48 c1 e8 03 0f
-RSP: 0018:ffffc9000488f450 EFLAGS: 00010046
-RAX: d0f6e83a7c789700 RBX: 0000000000001201 RCX: ffff88802ede3c00
-RDX: dffffc0000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000041201 R08: ffffffff81601a42 R09: 1ffff110170c519a
-R10: dffffc0000000000 R11: ffffed10170c519b R12: ffff88802ede46c4
-R13: 000000000000000a R14: 1ffff11005dbc8ea R15: ffff88802ede4750
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b30112ff8 CR3: 000000000e736000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- ptr_ring_consume_bh include/linux/ptr_ring.h:365 [inline]
- wg_packet_decrypt_worker+0xcf/0xd80 drivers/net/wireguard/receive.c:499
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa68/0x1840 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
+Fixes: fda55eca5a33 ("net: introduce skb_transport_header_was_set()")
+Signed-off-by: Antonio Pastor <antonio.pastor@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/llc/llc_input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/llc/llc_input.c b/net/llc/llc_input.c
+index 51bccfb00a9c..6f33ae9095f8 100644
+--- a/net/llc/llc_input.c
++++ b/net/llc/llc_input.c
+@@ -124,7 +124,7 @@ static inline int llc_fixup_skb(struct sk_buff *skb)
+ 	if (unlikely(!pskb_may_pull(skb, llc_len)))
+ 		return 0;
+ 
+-	skb->transport_header += llc_len;
++	skb_set_transport_header(skb, llc_len);
+ 	skb_pull(skb, llc_len);
+ 	if (skb->protocol == htons(ETH_P_802_2)) {
+ 		__be16 pdulen;
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
