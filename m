@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-154106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE76D9FB43A
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:51:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D05C9FB439
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:51:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 998A67A1EFB
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:51:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9343C1660E3
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4071C5F31;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A9A1CDA16;
 	Mon, 23 Dec 2024 18:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpi+774t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F7MZ+K4z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEB71C3BFE
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 18:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFFD1C3C0F;
+	Mon, 23 Dec 2024 18:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734979822; cv=none; b=H9YCvrQDdsT3pz5gxRNG0kuqyVaGrQkSZvOvfusMaQ1smph0an6+2dUeO/qBzjiFL8Icp9+tswlRMvDgqNmK4CVVuALJdug09j7622vLsrKJ0C1GQJY1SCKJRIRzPpV6Whzofik582pifopP4cUktrIC4wV5rNrri18ypF/VkV8=
+	t=1734979822; cv=none; b=UZF6XjxFmkmAtn4bnUvGdTK3xTv0yRexjgfmRPRbRaKad1D19pHVb2p8ncrasr0VWpgHO0sRxiaa94p29TB/Fc6ZdgzBu1xbdi5AF5ie0IHZo816o8k2X22YHrXy0hd6pTUEGbj+2BJ+8oi0g97xKMuf3Sa3FTKYuhprD62kkxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734979822; c=relaxed/simple;
-	bh=CvE9DcRN/4XD0JO/mX+XcI8G3UxI9t51U+0rJdVVvE4=;
+	bh=XLVV7fmygJG/ZwXO76vQqSy68dy8S10NlIe2GVy5f6s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SY5J/gDXBDDTA0vCg5GvhoF5sFWH9CleGLubxqfGR0wI2yLUHFAD2tI7PDbnXeg+S8L/skTdAEs3Qh1CYU0E8UW4fueqhU0v9OttlUGSK+WApXHSs6oQXEv2V9WsjY1J3MvqLihGosPGSWmN0aJ51pey8uC1kdSrtn+amKDjIW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpi+774t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79338C4CED3;
-	Mon, 23 Dec 2024 18:50:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bp19vQDprA4evZBVgP0cLjrPq2pXmXvGJj4/HCFaAhpdVuMYAgm5iMSkyFnAXHn+QuqxoOPAHQg4OyXkQ6l6bDN2z8XE0T8s5M3wGzLXTWjS29qxytB7vA/VdBH+AKxYDr74o63MVs3JkmlBRJzGRHgustPuwoAmoNgyKdBTIrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F7MZ+K4z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EAE3C4CED4;
+	Mon, 23 Dec 2024 18:50:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734979820;
-	bh=CvE9DcRN/4XD0JO/mX+XcI8G3UxI9t51U+0rJdVVvE4=;
+	s=k20201202; t=1734979822;
+	bh=XLVV7fmygJG/ZwXO76vQqSy68dy8S10NlIe2GVy5f6s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fpi+774tZPusKkDPqNA+sA6+tKgNhAaYZGMgMpMgKGicw0yJJuGcVZ2WdWL9Orb15
-	 usoFeb2Il3qy7Jzei8EI5Qq+lAgRaVicpuzWM9zMw8yVePh5+j7ifQgC/657dtuBHe
-	 0AvOD3AC/fJI9Ku5G4w14ZHdXpa6+jZv+aF+XV9BvRlLzz0iPkxRY2cRjLgAaWKQx6
-	 yEgGBfvOcTPmcZ0JEzFd47QIfjfBVn0+6xhlkeiHyi9NXEgcxqLcklIXtQBghZD1dR
-	 yF94GblaPek7Dlirwfi6X+zKekxyMMLa4NQY7eGeOnKmt3+EG7xGGIm/gZxUR/fmOv
-	 9+edRTCBCW9Vw==
+	b=F7MZ+K4zJI2Q/1hIWU+XKkl2dSYTSuSdREbnw3ACavIKumUF1D2/15wS5Fmid8wDH
+	 Y2WcvWdK2Q58dJNX/Nkz0S044St5l6pLvvcwJ5e/bACv3ajEbZW9RdwQsnJwMmdqhw
+	 E57UTSbAML9z28P4UnyncnVRflpthT257eiCv5sp6085pTtmGXo8aJvJP5H4Kt5Z57
+	 cPkLLZijeOXNQepz0kDCbGuQS9dzMlqYu14AfRdQs2XTCroXhd5NZW4oZnsoRjW/GM
+	 m7mNeZ1brqFeJF9DuSrPfSMBRjsEXg6al1l0kIYcbjeMYulbCk2JtE56840yq5SHtG
+	 YK2dEJYoFvxMw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CE43805DB2;
-	Mon, 23 Dec 2024 18:50:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE123805DB2;
+	Mon, 23 Dec 2024 18:50:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,62 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/10] eth: fbnic: support basic RSS config and
- setting channel count
+Subject: Re: [PATCH net-next v2] net: ethtool: Fix suspicious rcu_dereference
+ usage
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173497983874.3929264.15451655882754072854.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Dec 2024 18:50:38 +0000
-References: <20241220025241.1522781-1-kuba@kernel.org>
-In-Reply-To: <20241220025241.1522781-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com
+ <173497984025.3929264.1326704419746922009.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Dec 2024 18:50:40 +0000
+References: <20241220083741.175329-1-kory.maincent@bootlin.com>
+In-Reply-To: <20241220083741.175329-1-kory.maincent@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+a344326c05c98ba19682@syzkaller.appspotmail.com,
+ thomas.petazzoni@bootlin.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 19 Dec 2024 18:52:31 -0800 you wrote:
-> Add support for basic RSS config (indirection table, key get and set),
-> and changing the number of channels.
+On Fri, 20 Dec 2024 09:37:40 +0100 you wrote:
+> The __ethtool_get_ts_info function can be called with or without the
+> rtnl lock held. When the rtnl lock is not held, using rtnl_dereference()
+> triggers a warning due to the lack of lock context.
 > 
->   # ./ksft-net-drv/run_kselftest.sh -t drivers/net/hw:rss_ctx.py
->   TAP version 13
->   1..1
->   # timeout set to 0
->   # selftests: drivers/net/hw: rss_ctx.py
->   # KTAP version 1
->   # 1..15
->   # ok 1 rss_ctx.test_rss_key_indir
->   # ok 2 rss_ctx.test_rss_queue_reconfigure
->   # ok 3 rss_ctx.test_rss_resize
->   # ok 4 rss_ctx.test_hitless_key_update
+> Add an rcu_read_lock() to ensure the lock is acquired and to maintain
+> synchronization.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,01/10] eth: fbnic: reorder ethtool code
-    https://git.kernel.org/netdev/net-next/c/7d0bf493b135
-  - [net-next,02/10] eth: fbnic: support querying RSS config
-    https://git.kernel.org/netdev/net-next/c/7cb06a6a777c
-  - [net-next,03/10] eth: fbnic: don't reset the secondary RSS indir table
-    https://git.kernel.org/netdev/net-next/c/ef1c28817bf9
-  - [net-next,04/10] eth: fbnic: support setting RSS configuration
-    https://git.kernel.org/netdev/net-next/c/31ab733e999e
-  - [net-next,05/10] eth: fbnic: let user control the RSS hash fields
-    https://git.kernel.org/netdev/net-next/c/c23a1461bfee
-  - [net-next,06/10] eth: fbnic: store NAPIs in an array instead of the list
-    https://git.kernel.org/netdev/net-next/c/db7159c400ff
-  - [net-next,07/10] eth: fbnic: add IRQ reuse support
-    https://git.kernel.org/netdev/net-next/c/3a856ab34726
-  - [net-next,08/10] eth: fbnic: centralize the queue count and NAPI<>queue setting
-    https://git.kernel.org/netdev/net-next/c/557d02238e05
-  - [net-next,09/10] eth: fbnic: support ring channel get and set while down
-    https://git.kernel.org/netdev/net-next/c/3a481cc72673
-  - [net-next,10/10] eth: fbnic: support ring channel set while up
-    https://git.kernel.org/netdev/net-next/c/52dc722db0d9
+  - [net-next,v2] net: ethtool: Fix suspicious rcu_dereference usage
+    https://git.kernel.org/netdev/net-next/c/4c61d809cf60
 
 You are awesome, thank you!
 -- 
