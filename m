@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-154083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D803E9FB3D2
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:10:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 974239FB3D6
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:11:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E39321668A7
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:10:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B08D8166DD8
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4CB51C3BF0;
-	Mon, 23 Dec 2024 18:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD14D1C5CCA;
+	Mon, 23 Dec 2024 18:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpKWtluU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SK5wmFee"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EE51C3BE7;
-	Mon, 23 Dec 2024 18:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14AA86250;
+	Mon, 23 Dec 2024 18:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734977418; cv=none; b=rtmmx8JYZVRFbglAQxPqWTPRgE49UchAP5zhAYZ0TTgam0g0FgUHV+WaXM7YOfBbA9qjvGbXvhp1KfK2MqFz6s/UhwlD4QwCalnvtf8LRxJtsDu/XUmohjAyFBB6wwPC4ZgTWImusUpHXF8xpMpwaJwIw02O6xd1J5EScdnFJvM=
+	t=1734977423; cv=none; b=nJfiO6hzuQiCsj2F6eDZZFtGfrpXFlXPjfv0j/19sksuwDVD+6pEj4DmMnbvgJ9CPpH00VMotvWY8oFCvqv9XLaajOZX/t+KDEYznv1CTBxfBWBqoC69DMA1p7cqc4gLpnT5wjIQ4tB4ydfbvY5OXqrZUL7ezAFbaLWw9Sys358=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734977418; c=relaxed/simple;
-	bh=KJiNIh4OQ8lGKPrQdi0wcuPy97JBnl46/hHW1i4t3tY=;
+	s=arc-20240116; t=1734977423; c=relaxed/simple;
+	bh=kMBOYez1tgrB4tT5ZszAHyp+isWYUWXZYtFJFnk7aak=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uVEqW8B9h4zyq6f2Lf1ncSYxnUHQgJhCst0pNbds8WCGL1Cj/ruU4UKHQozI+VgVcORJytTX9QWcWgYoGfzYilICksYRMbE8vpWLW1l4e2eVuWMsaqNDWZqTBKQOz9Q2NESMKArfLEbt6eXXbuH08EZ6wBaWS0RounHtbEmH3XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpKWtluU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 794E8C4CED3;
-	Mon, 23 Dec 2024 18:10:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Hfwoj1EaE0IS1rV4/HAeix8hEQZstQ2zbF2cjGT+SDOKQYc8p073QfHqE/WZaMTagJJTZcZDX//m7aOKctV/O4xwyqwN6HMdDlu6MpfqX/ImKQcTmHOEHZ+9IDysebsnCacvVvRlElJ9KJlVATRMl0+zOHHETvpOeaLHMbUQ8hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SK5wmFee; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E08DC4CED3;
+	Mon, 23 Dec 2024 18:10:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734977418;
-	bh=KJiNIh4OQ8lGKPrQdi0wcuPy97JBnl46/hHW1i4t3tY=;
+	s=k20201202; t=1734977423;
+	bh=kMBOYez1tgrB4tT5ZszAHyp+isWYUWXZYtFJFnk7aak=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gpKWtluUlZGTHIrJPAmGB6U7rzyOHVeL/7+8jNTJR5TJk5+DSjc3wlD7SmqQQ/MR9
-	 jx3118rbCUufPPQ5XCcy20zPR+desvj+43nOn+SF3yUAswowI0Z7vec+Vhm3kOlysF
-	 qrFgd0OSVj6DAAS/SvAG4+mE4Qhh+1cJLXBDItyFuDxmofe4DsSsxgNTVquqGHUrj8
-	 QrVSv7AdqfuIETh1VqizuP8KmR6giW21JGhynWc2JNenJbfViqxBS7fvm8yYa0Tk0U
-	 mqPP9BDRqUNBHV0Qk8ADl2aCb/2uoQuEfSC4o1Y3GpI9uMgvlqa01tH9BEGPq8lkFN
-	 vAfpKCAzesZYg==
+	b=SK5wmFeeUb7ZPa1hbQlC/u2Kjhk9Nu4UNC8hvJ0KBGe6InIhyQazQyrAE2iv5G6gb
+	 seIWWTg1kmV9EkuyY4e8J9v0EbSzTIth8MySS0LEPZjarvwte2uRRGzH/s/W48W/he
+	 NxjuwC7Mm9hJVSmhXZSGRRkjSBH7umHAJLl4R/1cWgSO0g8bthq3C85C3WJlL5HRdq
+	 67mbU5gPZ3pimlwp2bgOFNO5BZAOwpDBMzOT0dM14MUVRPQAUujN3vhBBi8gm35Ode
+	 NXgFHlnLccj1l5L0Kc6rBs9mbhEJRwYRSZ1yt9xr2sT3sOnngKWv73/AGsB/ekeCqk
+	 zzWf7/fM2Sc4w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E0E3805DB2;
-	Mon, 23 Dec 2024 18:10:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33ED83805DB2;
+	Mon, 23 Dec 2024 18:10:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,58 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] netrom: check buffer length before accessing it
+Subject: Re: [PATCH v9 net-next 0/4] Add more feautues for ENETC v4 - round 1
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173497743701.3921163.18071428597161743809.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Dec 2024 18:10:37 +0000
-References: <20241219082308.3942-1-rabbelkin@mail.ru>
-In-Reply-To: <20241219082308.3942-1-rabbelkin@mail.ru>
-To: Ilya Shchipletsov <rabbelkin@mail.ru>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, hfggklm@gmail.com
+ <173497744174.3921163.12880978370301151615.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Dec 2024 18:10:41 +0000
+References: <20241219054755.1615626-1-wei.fang@nxp.com>
+In-Reply-To: <20241219054755.1615626-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, frank.li@nxp.com, horms@kernel.org,
+ idosch@idosch.org, aleksander.lobakin@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 19 Dec 2024 08:23:07 +0000 you wrote:
-> Syzkaller reports an uninit value read from ax25cmp when sending raw message
-> through ieee802154 implementation.
-> 
-> =====================================================
-> BUG: KMSAN: uninit-value in ax25cmp+0x3a5/0x460 net/ax25/ax25_addr.c:119
->  ax25cmp+0x3a5/0x460 net/ax25/ax25_addr.c:119
->  nr_dev_get+0x20e/0x450 net/netrom/nr_route.c:601
->  nr_route_frame+0x1a2/0xfc0 net/netrom/nr_route.c:774
->  nr_xmit+0x5a/0x1c0 net/netrom/nr_dev.c:144
->  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
->  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
->  xmit_one net/core/dev.c:3548 [inline]
->  dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
->  __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
->  dev_queue_xmit include/linux/netdevice.h:3134 [inline]
->  raw_sendmsg+0x654/0xc10 net/ieee802154/socket.c:299
->  ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg net/socket.c:745 [inline]
->  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
->  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
->  __sys_sendmsg net/socket.c:2667 [inline]
->  __do_sys_sendmsg net/socket.c:2676 [inline]
->  __se_sys_sendmsg net/socket.c:2674 [inline]
->  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+On Thu, 19 Dec 2024 13:47:51 +0800 you wrote:
+> Compared to ENETC v1 (LS1028A), ENETC v4 (i.MX95) adds more features, and
+> some features are configured completely differently from v1. In order to
+> more fully support ENETC v4, these features will be added through several
+> rounds of patch sets. This round adds these features, such as Tx and Rx
+> checksum offload, increase maximum chained Tx BD number and Large send
+> offload (LSO).
 > 
 > [...]
 
 Here is the summary with links:
-  - netrom: check buffer length before accessing it
-    https://git.kernel.org/netdev/net/c/a4fd163aed2e
+  - [v9,net-next,1/4] net: enetc: add Tx checksum offload for i.MX95 ENETC
+    https://git.kernel.org/netdev/net-next/c/d9a093d2d12a
+  - [v9,net-next,2/4] net: enetc: update max chained Tx BD number for i.MX95 ENETC
+    https://git.kernel.org/netdev/net-next/c/93c5d5a0ddf8
+  - [v9,net-next,3/4] net: enetc: add LSO support for i.MX95 ENETC PF
+    https://git.kernel.org/netdev/net-next/c/69797ff888d3
+  - [v9,net-next,4/4] net: enetc: add UDP segmentation offload support
+    https://git.kernel.org/netdev/net-next/c/c12e82c053f6
 
 You are awesome, thank you!
 -- 
