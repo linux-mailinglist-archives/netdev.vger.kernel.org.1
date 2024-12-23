@@ -1,80 +1,124 @@
-Return-Path: <netdev+bounces-154119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 859039FB58C
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 21:44:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA6759FB595
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 21:45:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 260D97A203C
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 20:44:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 655B5165162
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 20:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFC01C3F13;
-	Mon, 23 Dec 2024 20:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fesnKRlD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39FD1D54FA;
+	Mon, 23 Dec 2024 20:44:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73475188CDB;
-	Mon, 23 Dec 2024 20:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F391C3F01;
+	Mon, 23 Dec 2024 20:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734986673; cv=none; b=W4la8w5NLBrZPRev1K/3Z2grsSSb7RPa/WXiVuxPGFuYlS3/lhkdajH6T40CyGGP8Pt6dOFlKxb2J8gevbdkLZCAT7z6JbbTB7PkNLykjem/9Udl9iB9Pou58MM5ckCGW95prcrVyx4DG0o2j4Dyx1srJhq+0Fq3ZCM9rb3827A=
+	t=1734986699; cv=none; b=WDagT/TlbW20UPEULBQ53AdVgYvPvktI6oxQlU8I2MPmcK/W6kyooO1XVWcGt3w61+bl8NVmvZg4IRrjVD+qrcPA+XtZoI3ijqLqu3WPh6qyPfltZ43qvciGYqF4GspEBK1iuPv6GoN+qUTtAxuWuh/omGMIyIu6gKRfz5sfS8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734986673; c=relaxed/simple;
-	bh=/IHoBxSjsaCAQlSKqA2pfkH1SPJIuYj9VLfq79j+GTk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L7l7evnGRemejppKBcDQMCH8k3pjWLj2w4VhqDuBhfBWICwb+wwY/lYJ1pP2XP60calRs2Yec+aygUAiV6pBdINfmKLJ3ulV4Vtng9QC3O425OuThfMU8fgk9PldF9pjNre3ldTWBB/P+K3JEwC/MsERgBUuDKAkrrk2CqzCMt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fesnKRlD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B56F4C4CED3;
-	Mon, 23 Dec 2024 20:44:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734986673;
-	bh=/IHoBxSjsaCAQlSKqA2pfkH1SPJIuYj9VLfq79j+GTk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fesnKRlDWGVm7gY8QaNyRCVlvf0xEvTe5uS3bn3ZcmIf5ie1mTLDAtQqM1w5Aqd3K
-	 T0+HSmzfGibuUZ4jjPC7SLwsbE3+Gw84Ca7VM8hfIwlCrDs/CpHBTFAp12AWq9Quq8
-	 fI14QyQHdz/mdlFM11aAZFD31L3CzwbPkpQy/UNmwG4Epy6VOQm99k8YrbwiZfjYAs
-	 mfR3U0g58zCdBH3QuPSM31fHPLtENxfO5wchKIbPiOtS1/E2iEBaTc3XMBMR90Wafp
-	 DcixWqZeA+8CyXdTizAAt0JQcy2S1Gd5rhfZXmfg2jbHi4oMOjogCPx5Rrn9h45aW6
-	 nun0BvnVt99FQ==
-Date: Mon, 23 Dec 2024 12:44:31 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>, John
- Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 26/29] net/tls: use the new scatterwalk functions
-Message-ID: <20241223124431.1d34888f@kernel.org>
-In-Reply-To: <20241223194249.GB2032@quark.localdomain>
-References: <20241221091056.282098-1-ebiggers@kernel.org>
-	<20241221091056.282098-27-ebiggers@kernel.org>
-	<20241223074825.7c4c74a0@kernel.org>
-	<20241223194249.GB2032@quark.localdomain>
+	s=arc-20240116; t=1734986699; c=relaxed/simple;
+	bh=IWkoWlo6KqZQ7bM8Y4HXHrKl5qFkFAUQuAxCS3AXi/w=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jRVO9eVmD/GCSryIYyBO+17RvnBLkkmIeN8VtHsdAEA9c4VzC4JZthxOuQcuHR3b25u11eAGgyhbVNQYOfVd1jyi+wPyRVlpinPWu65YVgxzx2u9XLEORut9ZEre5WCKEK1lsb9XVnTU1XnebrdL8JFzk86tFGnAYyQbGy4perk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YH90J5wVhz6K5VT;
+	Tue, 24 Dec 2024 04:41:04 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id C7FFB140A70;
+	Tue, 24 Dec 2024 04:44:55 +0800 (CST)
+Received: from localhost (10.47.75.118) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 23 Dec
+ 2024 21:44:54 +0100
+Date: Mon, 23 Dec 2024 20:44:52 +0000
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Zijun Hu <zijun_hu@icloud.com>
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linus Walleij
+	<linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Uwe
+ =?ISO-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>, James Bottomley
+	<James.Bottomley@HansenPartnership.com>, Thomas =?ISO-8859-1?Q?Wei=DFschu?=
+ =?ISO-8859-1?Q?h?= <thomas@t-8ch.de>, <linux-kernel@vger.kernel.org>,
+	<nvdimm@lists.linux.dev>, <linux-sound@vger.kernel.org>,
+	<sparclinux@vger.kernel.org>, <linux-block@vger.kernel.org>,
+	<linux-cxl@vger.kernel.org>, <linux1394-devel@lists.sourceforge.net>,
+	<arm-scmi@vger.kernel.org>, <linux-efi@vger.kernel.org>,
+	<linux-gpio@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-hwmon@vger.kernel.org>,
+	<linux-media@vger.kernel.org>, <linux-pwm@vger.kernel.org>,
+	<linux-remoteproc@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+	<linux-usb@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: Re: [PATCH v4 07/11] slimbus: core: Remove of_slim_match_dev()
+Message-ID: <20241223204452.000067e6@huawei.com>
+In-Reply-To: <20241211-const_dfc_done-v4-7-583cc60329df@quicinc.com>
+References: <20241211-const_dfc_done-v4-0-583cc60329df@quicinc.com>
+	<20241211-const_dfc_done-v4-7-583cc60329df@quicinc.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Mon, 23 Dec 2024 11:42:49 -0800 Eric Biggers wrote:
-> > Acked-by: Jakub Kicinski <kuba@kernel.org>  
+On Wed, 11 Dec 2024 08:08:09 +0800
+Zijun Hu <zijun_hu@icloud.com> wrote:
+
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
 > 
-> Thanks.  FYI I will need to update this patch in the next version, as I did not
-> take into consideration what chain_to_walk() is doing.  This code seems to be a
-> bit unique in how it is using the scatterwalk functions.
+> static of_slim_match_dev() has same function as API device_match_of_node().
 > 
-> Also I think the second paragraph of my commit message is wrong, as the calls to
-> scatterwalk_done() in tls_enc_records() are the ones I thought were missing.
+> Remove the former and use the later instead.
+> 
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Nice tidy up given the current code is dance up and down containing structure to exactly
+the same device it started with.
 
-netdev@ only got CCed on this one patch so TBH I have trusted 
-the conversion :(
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> ---
+>  drivers/slimbus/core.c | 10 +---------
+>  1 file changed, 1 insertion(+), 9 deletions(-)
+> 
+> diff --git a/drivers/slimbus/core.c b/drivers/slimbus/core.c
+> index ab927fd077cb4fe1e29c004269fe52b2896c302f..005fa2ef100f526df5603d212b6334c06a366c94 100644
+> --- a/drivers/slimbus/core.c
+> +++ b/drivers/slimbus/core.c
+> @@ -385,21 +385,13 @@ struct slim_device *slim_get_device(struct slim_controller *ctrl,
+>  }
+>  EXPORT_SYMBOL_GPL(slim_get_device);
+>  
+> -static int of_slim_match_dev(struct device *dev, const void *data)
+> -{
+> -	const struct device_node *np = data;
+> -	struct slim_device *sbdev = to_slim_device(dev);
+> -
+> -	return (sbdev->dev.of_node == np);
+> -}
+> -
+>  static struct slim_device *of_find_slim_device(struct slim_controller *ctrl,
+>  					       struct device_node *np)
+>  {
+>  	struct slim_device *sbdev;
+>  	struct device *dev;
+>  
+> -	dev = device_find_child(ctrl->dev, np, of_slim_match_dev);
+> +	dev = device_find_child(ctrl->dev, np, device_match_of_node);
+>  	if (dev) {
+>  		sbdev = to_slim_device(dev);
+>  		return sbdev;
+> 
 
-FWIW tls has a relatively solid selftest:
-tools/testing/selftests/net/tls.c
 
