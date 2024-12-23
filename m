@@ -1,190 +1,164 @@
-Return-Path: <netdev+bounces-154003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A512B9FAB82
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 09:20:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 253869FAB87
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 09:30:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 147197A238B
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 08:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39931165B2C
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 08:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89331187342;
-	Mon, 23 Dec 2024 08:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F69218CC08;
+	Mon, 23 Dec 2024 08:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bVbQ7XWQ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RT4rAj27"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2050.outbound.protection.outlook.com [40.107.243.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0637462
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 08:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734942018; cv=none; b=SnU2CihILm2Ocn2vtlg7xGvvlu2e5mXfmj7Bnh933fcmYc5TL2VTsuYFcqB0XnXOmee77MA7fvY5pp6PIb/X2ssIZRNowlPaIGuhz1wyOaHTo7sED2TNwYSmyVY40MOVl1m7kssZexIXHxzT1/kPRhUn81Xv39k3X2soi0ZDXvw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734942018; c=relaxed/simple;
-	bh=axaF9dpKY8yR2fWQuuIExIfJe66HYYhMN9St+/v+8r0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mnFx+9KL2sxXOZqSFpRku5AtmsOwC3auGcZDK1bBwMqr1MjjjIur+Auch87uxi9tVP2BqUuxwlmnVxEDNSB6idfvPvPTwszyC7hICIhefniruxMW6yKNks9qIdfWRYgU8rI/HLyHUxRw//0jjFF1JXo7lP6wKYAVK31LzoIYWWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bVbQ7XWQ; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734942016; x=1766478016;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=axaF9dpKY8yR2fWQuuIExIfJe66HYYhMN9St+/v+8r0=;
-  b=bVbQ7XWQSgXDf8syLp4jYjCy8kuFKU/cTVmVlJjNe8k+FmhyvvsVS/3b
-   mVZM9oiaXIuH4/jtOJT2oOcxjMdewr2jvDTr+5Zn8GkhUxYdxB3zQvzTO
-   GR1Fxs/pElCkQNQWghpOGJS+Tt6PQEDkkLlcFRGCeAtbIuK1eJhrj2rZ+
-   02LwNBFv/kyAtQbFkNnNL5v6ciTm/zMMpU7yIVODnBGcwZqr9WykFpYVY
-   PYzZ0FgnWhUOfKjjFZEKW9x0S07pZ4rc0X8+OeQXnovYakLF4g/yQZOMX
-   kUcne6zwMObFZIuzjg4YFiaprINKKWqPPXB70Bpgw0sALrel7qlQpCpk4
-   A==;
-X-CSE-ConnectionGUID: He39GlLUQqm2pp2dX6bV2Q==
-X-CSE-MsgGUID: a1qgybx8QJWkf52JBimQWw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11294"; a="39180688"
-X-IronPort-AV: E=Sophos;i="6.12,256,1728975600"; 
-   d="scan'208";a="39180688"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2024 00:20:15 -0800
-X-CSE-ConnectionGUID: huNc4HPiTEiiIUBmHe9ruQ==
-X-CSE-MsgGUID: q47s8Ob+QISfK8d59ETGhw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,256,1728975600"; 
-   d="scan'208";a="98915654"
-Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 23 Dec 2024 00:20:12 -0800
-Received: from kbuild by a46f226878e0 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tPdfe-0003UJ-1D;
-	Mon, 23 Dec 2024 08:20:10 +0000
-Date: Mon, 23 Dec 2024 16:19:31 +0800
-From: kernel test robot <lkp@intel.com>
-To: John Daley <johndale@cisco.com>, benve@cisco.com, satishkh@cisco.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	John Daley <johndale@cisco.com>,
-	Nelson Escobar <neescoba@cisco.com>
-Subject: Re: [PATCH net-next 4/5] enic: Use the Page Pool API for RX when MTU
- is less than page size
-Message-ID: <202412231605.tOclyr7m-lkp@intel.com>
-References: <20241220215058.11118-5-johndale@cisco.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09C9187342
+	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 08:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734942598; cv=fail; b=jlstS5G7NroKEjGC16zbMKkYGVcDlFjuiWoOxNggNsClhHYHNfqTozI2Z3NNhB4rs/+6Uz96FcJ/3hmpjkyviFJgmAMpMBuMtGddXTTjwGpW++QEdZr6dOj1EgO+fLGeIF4NKFvi7jf2GgRpon9Gx27u9zz/snHz+MpL6Bt25/s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734942598; c=relaxed/simple;
+	bh=itk7EPhc8V+rndxTSJqAC+I5VcJZqmHM1/b3jB6S/V4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nmThxD9fgO/spAPhOgSvhsz202u7bQpMXHH7NmTc+B7zC0GGwlbMVUidMVP4Ds63RJtw1bHDeLb0RXD1LryqfnfjH8tuUc+e5FWoluvYIPdLhDbVVKGBaWtwc7rh1tuvlLiuMYsc5+nbT9ADMJrZEmDwOzjacoE2AujhyS8xo1I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RT4rAj27; arc=fail smtp.client-ip=40.107.243.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Xgk0ZFCbzTfDNIb5lxAVIHWwshbudqbeY1xYXZne3eJAdhnLfPW7s4Ms7H2O1G8jPxKFtDgJNk27cj0FqM4Fl+awfwBVmsKIl8L47RRWcGo0eneqdN++aBsD2WAPSgSRIb5Z6wq3qPxho3rDWO2ga27sVmFN6qdcdn8f22MoetdrLtpXMPGKMAy56AjNYK9z0MzELsk2VjIFckiLIcb3nOgowVzmmiiZN2R1kj++eyj9wDQ3UTvXHjGwqpEpU4Vcq2aBCCgPyruaWWhZAMykbfAUBgHhTNPsUemnppiIUlcZchQoIyyIYBPw12DhLRMfXim+KHmu4k6Z1frHSLSBGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mpCOsDZvU5BJ893wRameJLOdC2R86lInDQ5OSZN6y1o=;
+ b=tSbPSQEDG+7rqwuYgiheheSJiCFpe5HInNLc42yEi3Zhh35bKul5h96f+ttioGrwKLOWRJ+KMmauIXPTELYwWOJsUJyQaSGp/jKbxG+kokCAUBjDiztPXBJmkznz07V/ZNFXSVXcb9t59uDZwEZwV32x+tAcEHap/Vk5+rPo+g0QQn4ul7j4fsHFYHk0gqwIz4zUTK9kEIaT8p5Tn/fEQ4VJWfpYKtQSzySN9/St34Wu2A7WDFQJIXSuAJDDhDXk/2vb4UA9dV1dWnsHLNz5Jy9En23SjFtH69CT7fFUP1QtTwK0V6eVnfNG/Oq3E5eS0E2IGxB2u0m3DjhlXncd/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mpCOsDZvU5BJ893wRameJLOdC2R86lInDQ5OSZN6y1o=;
+ b=RT4rAj27xPvohu7qFvpLCg696zmnNZ7rwUXJuiNP4CBjGFfk3N+PzMVM2ysIhLsY3gm/04uaXB0Y4XbFno9Z6hQ00Y1ocSUzxqmK7eHyv8PXS4mTtXZQlTAeycqtjpeUqmvZZiCdLldKEKMLGF5p8WhtlcplVYjirCv5EecdJ+rre5ustnFNm3JnzX8DQNZ1e3UakQKrT7n+rfA0Ezjt+xaNRFfgnaGqP+bXgqYrxH00jW9yCB5S2GQgKtvDThidiAELaVyvfdqagI8QM6tPaVH2ymzryzYCrgnuzqWxdrLia9JcnnjowSZnOO4+GVUx2AREyGJbB+oo5TFpdsku1w==
+Received: from CH5PR04CA0018.namprd04.prod.outlook.com (2603:10b6:610:1f4::29)
+ by PH7PR12MB6420.namprd12.prod.outlook.com (2603:10b6:510:1fc::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.20; Mon, 23 Dec
+ 2024 08:29:49 +0000
+Received: from CH2PEPF00000144.namprd02.prod.outlook.com
+ (2603:10b6:610:1f4:cafe::2f) by CH5PR04CA0018.outlook.office365.com
+ (2603:10b6:610:1f4::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8272.20 via Frontend Transport; Mon,
+ 23 Dec 2024 08:29:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF00000144.mail.protection.outlook.com (10.167.244.101) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8293.12 via Frontend Transport; Mon, 23 Dec 2024 08:29:48 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 23 Dec
+ 2024 00:29:37 -0800
+Received: from shredder.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 23 Dec
+ 2024 00:29:35 -0800
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <dsahern@gmail.com>, <stephen@networkplumber.org>, <petrm@nvidia.com>,
+	<gnault@redhat.com>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH iproute2-next 0/3] Add flow label support to ip-rule and route get
+Date: Mon, 23 Dec 2024 10:26:39 +0200
+Message-ID: <20241223082642.48634-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241220215058.11118-5-johndale@cisco.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000144:EE_|PH7PR12MB6420:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b82a8df-6367-47c4-b20b-08dd232bf6c1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?5PQw2WZevDiOCR9A3G1pRzOSdj9RzuI0cT4KH2LOpZo729iK6zeTnchTA3qW?=
+ =?us-ascii?Q?GoIc0rd8Uq3dITJPqdMoaTY0lY6u4Q45AttG7vrncNwihRVRR9tMHIryuisI?=
+ =?us-ascii?Q?Lww79OCPrujKRDWgcJ3vz0mrWiap2RV1cz1aezmAbGmydlLVK9Pjigv/VfwG?=
+ =?us-ascii?Q?tDGCUgmYa64hUHJOvB/ugZAFpshRRX/Zg34YaDVuinTWRWVBOLcV3FUxW/FP?=
+ =?us-ascii?Q?f3hwvunJ9JuiOx/No5C0IKJcymu6r5hMAaUeo+vJu1Btqdr5jKnh4Sunu/sW?=
+ =?us-ascii?Q?YYYDnhCcytyGE4eIjtE+ecb0BMMKMwxMQHkVC9YmPrPyR+8RLzqZXHxD0X/j?=
+ =?us-ascii?Q?B2+GrqmKffEP/cgV4u/xPAK7UD4lQk4upBbS3WJw9p0h7nFzzaL5C3JXiFIy?=
+ =?us-ascii?Q?pVwk49ot4Kp1oZNeAhV+C6mRMMTi3W64HVGw2PKw+FCjm0yzxyxLx8HH7EqM?=
+ =?us-ascii?Q?bM/uKzStHBIWS+3DicgE/ei7tqxhL2JUwXCzu7bYqlMfrzx3jkkrvrrb2MkM?=
+ =?us-ascii?Q?URbW9AoXMql4I9Mi+7Y9Q+hJdTPIAE0NwKBgjT1hwefY7MAQmqUxnFjrTMm1?=
+ =?us-ascii?Q?4oX/6I0SucEOO22j5fevufSf/lMxygFXkx8mNTG4h3vfzaGeWH6KUNnDSzBN?=
+ =?us-ascii?Q?dylLicsfffYzhmFkz1DBMXt8iPEydWsApq8aOBCgQ9eV1HXrRjKoHmaM3WQu?=
+ =?us-ascii?Q?piBNQ33sCtfR/b3q7n4edCTR/sWrP8YCI4ePzNAA8AIvsv3BH02BomXSZUUT?=
+ =?us-ascii?Q?Ua7T1uiGX1UyMAciuAyUzPWb0VDC46dLVPsJf4r6qapuxkFtTONY6X7RpQCM?=
+ =?us-ascii?Q?5ytCf1a3EHWP5gQzDvzu1+PZQv7imKxmWfEyDEzpzKBongKyKYOCYfoe/Cfd?=
+ =?us-ascii?Q?ACnUjM6FVk+XiANSEku77Drp/8Xcb2emdRpHMLxfu019firV5O88qIpZx330?=
+ =?us-ascii?Q?Ewhxx5LAwyyJ5TOCRQBfGPd5kGe91N7rjrWhk2zjm8v05Vz586S9en13PI9c?=
+ =?us-ascii?Q?KT4LPNL0PSm/CSGOA8nVKna6xLhtMUi56JOuGDjj1j0bXbDFw7rMdqi9/BAS?=
+ =?us-ascii?Q?vuEOgXvYzP26HwMCnJ8B2QKD1zoPic8NmMwrMA9Z5Ac6RzDF11exDLaPI11h?=
+ =?us-ascii?Q?Qa/d0xw89iKJcgT5WlMWRWRIyWu24aUUUJPih0NtqBkgFWBVhhDp8xK2tza0?=
+ =?us-ascii?Q?Kcl3EhpRDdKsFfzL9FNTu+MX2Mka1NiuAEhwknssSV9L1RwGH8jvuv/nky2h?=
+ =?us-ascii?Q?9He+vvvj/xEGrH1OT58EDkRnGDCAQ86MobhOfrK2b97fCUdFtXVfBwFpoCTC?=
+ =?us-ascii?Q?FREtBXAU1AOWNFGTqyhA1psJntXFOaING0E1mAsm9IvXR/1RJcBpIDVvxUr7?=
+ =?us-ascii?Q?oC2D6mdW2RlGcW3UVD5GCFE6IGdFH+L65dbs3iEeDDSIWuH2bCTKnIJlPMvD?=
+ =?us-ascii?Q?99jN9Bm1x3mDJerc2S52jmbowNvXt0ADApJh2OHSbYrgQ+UmS0VrUejm0MzS?=
+ =?us-ascii?Q?pUS5vqEEqdG24/4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Dec 2024 08:29:48.5214
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b82a8df-6367-47c4-b20b-08dd232bf6c1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000144.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6420
 
-Hi John,
+Add IPv6 flow label support to ip-rule and route get requests following
+kernel support that was added in kernel commit 6b3099ebca13 ("Merge
+branch 'net-fib_rules-add-flow-label-selector-support'").
 
-kernel test robot noticed the following build warnings:
+Ido Schimmel (3):
+  Sync uAPI headers
+  ip: route: Add IPv6 flow label support
+  iprule: Add flow label support
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/John-Daley/enic-Refactor-RX-path-common-code-into-helper-functions/20241221-055423
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241220215058.11118-5-johndale%40cisco.com
-patch subject: [PATCH net-next 4/5] enic: Use the Page Pool API for RX when MTU is less than page size
-config: x86_64-kexec (https://download.01.org/0day-ci/archive/20241223/202412231605.tOclyr7m-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241223/202412231605.tOclyr7m-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412231605.tOclyr7m-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/cisco/enic/enic_rq.c:4:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2223:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/cisco/enic/enic_rq.c:214:30: warning: variable 'q_number' is uninitialized when used here [-Wuninitialized]
-     214 |                                      enic->netdev->name, q_number);
-         |                                                          ^~~~~~~~
-   include/linux/net.h:286:43: note: expanded from macro 'net_warn_ratelimited'
-     286 |         net_ratelimited_function(pr_warn, fmt, ##__VA_ARGS__)
-         |                                                  ^~~~~~~~~~~
-   include/linux/net.h:272:12: note: expanded from macro 'net_ratelimited_function'
-     272 |                 function(__VA_ARGS__);                          \
-         |                          ^~~~~~~~~~~
-   include/linux/printk.h:554:37: note: expanded from macro 'pr_warn'
-     554 |         printk(KERN_WARNING pr_fmt(fmt), ##__VA_ARGS__)
-         |                                            ^~~~~~~~~~~
-   include/linux/printk.h:501:60: note: expanded from macro 'printk'
-     501 | #define printk(fmt, ...) printk_index_wrap(_printk, fmt, ##__VA_ARGS__)
-         |                                                            ^~~~~~~~~~~
-   include/linux/printk.h:473:19: note: expanded from macro 'printk_index_wrap'
-     473 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
-         |                                 ^~~~~~~~~~~
-   drivers/net/ethernet/cisco/enic/enic_rq.c:204:14: note: initialize the variable 'q_number' to silence this warning
-     204 |         u16 q_number, completed_index, bytes_written, vlan_tci, checksum;
-         |                     ^
-         |                      = 0
-   5 warnings generated.
-
-
-vim +/q_number +214 drivers/net/ethernet/cisco/enic/enic_rq.c
-
-   189	
-   190	void enic_rq_indicate_page(struct vnic_rq *vrq, struct cq_desc *cq_desc,
-   191				   struct vnic_rq_buf *buf, int skipped, void *opaque)
-   192	{
-   193		struct enic *enic = vnic_dev_priv(vrq->vdev);
-   194		struct sk_buff *skb;
-   195		struct enic_rq *rq = &enic->rq[vrq->index];
-   196		struct enic_rq_stats *rqstats = &rq->stats;
-   197		struct vnic_cq *cq = &enic->cq[enic_cq_rq(enic, vrq->index)];
-   198		struct napi_struct *napi;
-   199		u8 type, color, eop, sop, ingress_port, vlan_stripped;
-   200		u8 fcoe, fcoe_sof, fcoe_fc_crc_ok, fcoe_enc_error, fcoe_eof;
-   201		u8 tcp_udp_csum_ok, udp, tcp, ipv4_csum_ok;
-   202		u8 ipv6, ipv4, ipv4_fragment, fcs_ok, rss_type, csum_not_calc;
-   203		u8 packet_error;
-   204		u16 q_number, completed_index, bytes_written, vlan_tci, checksum;
-   205		u32 rss_hash;
-   206	
-   207		if (skipped) {
-   208			rqstats->desc_skip++;
-   209			return;
-   210		}
-   211	
-   212		if (!buf || !buf->dma_addr) {
-   213			net_warn_ratelimited("%s[%u]: !buf || !buf->dma_addr!!\n",
- > 214					     enic->netdev->name, q_number);
+ include/uapi/linux/fib_rules.h |  2 ++
+ include/uapi/linux/rtnetlink.h |  1 +
+ ip/iproute.c                   | 10 +++++-
+ ip/iprule.c                    | 66 +++++++++++++++++++++++++++++++++-
+ man/man8/ip-route.8.in         |  8 ++++-
+ man/man8/ip-rule.8.in          |  8 ++++-
+ 6 files changed, 91 insertions(+), 4 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.1
+
 
