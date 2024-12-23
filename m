@@ -1,192 +1,157 @@
-Return-Path: <netdev+bounces-153994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD4A29FA9B2
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 04:14:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C194E9FA9D5
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 05:06:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308091637E8
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 03:14:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1306C1885546
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 04:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84FA91B59A;
-	Mon, 23 Dec 2024 03:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 715302B9A5;
+	Mon, 23 Dec 2024 04:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Iwc/lFy4"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="KEfuySRH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from va-2-39.ptr.blmpb.com (va-2-39.ptr.blmpb.com [209.127.231.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE73727735
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 03:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EBA64A
+	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 04:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734923664; cv=none; b=ltkiKZbtiQ66xW3fZ5TznUB7/awogw/IpyrpZrB8AUJZiHQh9/TD3KVZ0a6b7gWONclMHf++10rI3fO28dMJCva+At4ngMzUY2eTjwbfCA4xW9n+w9cjRsbE9pAUrxYQBPQ3JhcOZuo3wAXnFtQIU+BDcbVpIRlqMXoFzNYj+n8=
+	t=1734926768; cv=none; b=qc0u34h6litGKSwxelpnywDtF8DXHxXGkOG7vPkxfLFqeGF96eFvmNOSrQIyGPR5cx1n9yQt1bMihwKc4mTsp+gcgevkicabA4x/MSe+kH5STHRBkrahVDTkChgkTjxFxDk33SCBeD+DGQebTwU+QACG4C28u9W8oWieDGSzuWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734923664; c=relaxed/simple;
-	bh=o7zZ1FtzsuKBMK/70RCahXIw5Gkc8JDMsuaSHqIrZyA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EGsgVyAB+VNntr9LGHIQfZ3zgQxfFUx+XVCaMCWmmpCqOmdyuGizOmAAZwimRiC2HlelW6WMPOR/FM+miXDnXv95TK4q5af4qqEgIy8Tt5Xc+XA3lL6WhY7LWfKAAfT0uejvqrOoyEvC9un77irfEwkln3xymoQOSy4dbVFyqX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Iwc/lFy4; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d3e9f60bf4so6094330a12.3
-        for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 19:14:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1734923661; x=1735528461; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=o7zZ1FtzsuKBMK/70RCahXIw5Gkc8JDMsuaSHqIrZyA=;
-        b=Iwc/lFy4uk/S89ogdHf3VSLqY8EVEQ8wSLXkCzkL9mF0caacMczFU7oXUaPgv7F8A3
-         sYCvwARYAONVTof5DAXfNdQmb0mkpe/0tdn1XFb0vaSMQNsZJnxlhKXGKXsNwqk+tX8U
-         4sY11WMlTnWy1U92+U7OU/WI1PrHSCF32hczU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734923661; x=1735528461;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o7zZ1FtzsuKBMK/70RCahXIw5Gkc8JDMsuaSHqIrZyA=;
-        b=PUe9Bu5Es1stq3Cd0cxMmq325LYcAnFPX7rT0bq8sG6ZYf04FdzIM3N5sgQALI4wov
-         SWhPaJkBR9W05dgT33leUgg96zfvqwxDgagGNqB91/G0Slp1TM4eQRReu7I4yhVsk5vk
-         vKXDWS4BL0PTfwyRpVg/TCEBixL/0vrd4Mjyqr5ybZj+B3rsVl/+Nd54oLzxIhBvHTaE
-         xH7If7knws1jwIuwQXHJ0C2vjYr2rnWe4g3VVODuFKFAEj0q1A3V47eQF+l2EgzErLoF
-         XQKP1ptF9AIOP5KA6/XEGBd4fqzb4LWtiveEpWyptiolZPx0494qdA1QcU4Bp+jMQSdR
-         qieA==
-X-Forwarded-Encrypted: i=1; AJvYcCW4n5hg1j+WaMIf+ga0TLP7Ok0L9r4V1Om/6bddCdcxb/OBsQb1tz9FsRzVeKs09DJEYF1Lqz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yywol5pfYvGnsRU4PJprGHzZRpQCL6h10JRQBnOUjMJ7QDNzGeg
-	pWncfLlXnBhxF+6cULaPvGDwvD8JjLDv9Y674CALcn+dQGIcYgNW8xTiznf0u6LE/CmvRs7lxmd
-	6D778ONY/4qYzCpE9HJtNtYiPFub+H0LiQorU
-X-Gm-Gg: ASbGncuqeKGggQv1aMyyrqaPojBbONon7vUMlgQZL6h0/SCEpZqmrQUC1AIOa8vILh0
-	EVVuEZ8vRALurQ4kS1v+zBG1Cqn/EvQ4eABIQxA==
-X-Google-Smtp-Source: AGHT+IHxO77EM89XXu3+PrxJkyGU4aTzLyfi+ny6uVCmpZgAfclR4GYJRfKranc9rAdVc6ceU9IcbNSJIcHApHSvZL0=
-X-Received: by 2002:a05:6402:270d:b0:5d0:bcdd:ffa8 with SMTP id
- 4fb4d7f45d1cf-5d81dd83b92mr8932953a12.1.1734923661095; Sun, 22 Dec 2024
- 19:14:21 -0800 (PST)
+	s=arc-20240116; t=1734926768; c=relaxed/simple;
+	bh=OR2Sedhk219Jt8JI1P5JQjE3lOxuRMDPBKYTDvgsw0w=;
+	h=Date:Subject:From:Mime-Version:Message-Id:Cc:Content-Type:
+	 References:In-Reply-To:To; b=kj1UVTOC3pBvWXnhNgC43cLM/+6EcZcYK9YwjhncYpC1ksBGN6O5nxgxlLoouHzQBtaWrrWhVRsPGFDFXn4xHhq6uKPZeTE5l03pd5dOw3jgfACBzqGaCWmz44OiIR7idTw5GHHJLXK+FFieOrekCzAhHTDRf2fA0+y3RZfr/tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=KEfuySRH; arc=none smtp.client-ip=209.127.231.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1734924025; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=QoIRy9JxyB1MN/yPq4UDpPEerDUfOBGAg2UqYw6pBqs=;
+ b=KEfuySRHMWaP6CUfjBgp8nVQlJhwY2gqZv4ofMTLm+h8A+6S0AXMp/NBmgUdIbAbqW04dJ
+ xcmN+FzIULaPzEN0ozMU0ie7yNMNLgDcce+4kdAL/znqKLTPbMHVvSPAl+Ok7NKWeQ6efL
+ TaQERtJWvoEpYdzQ468eUsyQkEN1nuJNOyK4QCCIwpDJiRkYy+IyBS9x1guQWseQzoYvKR
+ 6W7zLBGErV3AZQlmskl7UFMd01GlhmbcKG1/Mlt3LeKf0pt8F5pAd7th2qXLbQkUBblEsQ
+ I3PY0ErYFE0j6oIEOSMfTBKMQMuF4KR//sJqCuspYW/ArmrXa1VF3iVK/IDyUA==
+Date: Mon, 23 Dec 2024 11:20:20 +0800
+Subject: Re: [PATCH v1 01/16] net-next/yunsilicon: Add xsc driver basic framework
+X-Lms-Return-Path: <lba+26768d6f7+8a7c90+vger.kernel.org+tianx@yunsilicon.com>
+Received: from [127.0.0.1] ([116.231.104.97]) by smtp.feishu.cn with ESMTPS; Mon, 23 Dec 2024 11:20:22 +0800
+From: "tianx" <tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241221184247.118752-1-linux@treblig.org> <20241221184247.118752-8-linux@treblig.org>
-In-Reply-To: <20241221184247.118752-8-linux@treblig.org>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 23 Dec 2024 08:44:08 +0530
-Message-ID: <CAH-L+nNkzX7419b3K24v_AzbiH5uc_tQ_hNSvVCZmps_LerUdA@mail.gmail.com>
-Subject: Re: [RFC net-next 7/9] i40e: Remove unused i40e_commit_partition_bw_setting
-To: linux@treblig.org
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000008dcb140629e7646c"
-
---0000000000008dcb140629e7646c
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Original-From: tianx <tianx@yunsilicon.com>
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <e219e106-72ef-4045-9fc0-db2639720aa6@yunsilicon.com>
+Cc: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
+	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>
+Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+References: <20241218105023.2237645-1-tianx@yunsilicon.com> <20241218105023.2237645-2-tianx@yunsilicon.com> <2792da0b-a1f8-4998-a7ea-f1978f97fc4a@lunn.ch>
+In-Reply-To: <2792da0b-a1f8-4998-a7ea-f1978f97fc4a@lunn.ch>
+To: "Andrew Lunn" <andrew@lunn.ch>
 
-On Sun, Dec 22, 2024 at 12:15=E2=80=AFAM <linux@treblig.org> wrote:
+On 2024/12/19 2:20, Andrew Lunn wrote:
+>> +enum {
+>> +	XSC_LOG_LEVEL_DBG	=3D 0,
+>> +	XSC_LOG_LEVEL_INFO	=3D 1,
+>> +	XSC_LOG_LEVEL_WARN	=3D 2,
+>> +	XSC_LOG_LEVEL_ERR	=3D 3,
+>> +};
+>> +
+>> +#define xsc_dev_log(condition, level, dev, fmt, ...)			\
+>> +do {									\
+>> +	if (condition)							\
+>> +		dev_printk(level, dev, dev_fmt(fmt), ##__VA_ARGS__);	\
+>> +} while (0)
+>> +
+>> +#define xsc_core_dbg(__dev, format, ...)				\
+>> +	xsc_dev_log(xsc_log_level <=3D XSC_LOG_LEVEL_DBG, KERN_DEBUG,	\
+>> +		&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,		\
+>> +		__func__, __LINE__, current->pid, ##__VA_ARGS__)
+>> +
+>> +#define xsc_core_dbg_once(__dev, format, ...)				\
+>> +	dev_dbg_once(&(__dev)->pdev->dev, "%s:%d:(pid %d): " format,	\
+>> +		     __func__, __LINE__, current->pid,			\
+>> +		     ##__VA_ARGS__)
+>> +
+>> +#define xsc_core_dbg_mask(__dev, mask, format, ...)			\
+>> +do {									\
+>> +	if ((mask) & xsc_debug_mask)					\
+>> +		xsc_core_dbg(__dev, format, ##__VA_ARGS__);		\
+>> +} while (0)
+> You where asked to throw all these away and just use the existing
+> methods.
 >
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> If you disagree with a comment, please reply and ask for more details,
+> understand the reason behind the comment, or maybe try to justify your
+> solution over what already exists.
 >
-> i40e_commit_partition_bw_setting() was added in 2017 by
-> commit 4fc8c6763957 ("i40e: genericize the partition bandwidth control")
-> but hasn't been used.
+> Maybe look at the ethtool .get_msglevel & .set_msglevel if you are not
+> already using them.
+
+Apologies for the delayed reply. Thank you for the feedback.
+
+Our driver suite consists of three modules: xsc_pci (which manages=20
+hardware resources and provides common services for the other two=20
+modules), xsc_eth (providing Ethernet functionality), and xsc_ib=20
+(offering RDMA functionality). The patch set we are submitting currently=20
+includes xsc_pci and xsc_eth.
+
+To ensure consistent and fine-grained log control for all modules, we=20
+have wrapped these logging=C2=A0functions for ease of use. The use of these=
+=20
+interfaces is strictly limited to our driver and does not impact other=20
+parts of the kernel. I believe this can be considered a small feature=20
+within our code. I=E2=80=99ve also observed similar implementations in othe=
+r=20
+drivers, such as in |drivers/net/ethernet/chelsio/common.h| and=20
+|drivers/net/ethernet/adaptec/starfire.c|.
+
+The |get_msglevel| and |set_msglevel| can only be used in the Ethernet=20
+driver, whereas we need to define a shared |log_level| in the PCI driver.
+
+Please let me know the main concerns of the community, and we will be=20
+happy to make any necessary adjustments.
+
+>> +unsigned int xsc_log_level =3D XSC_LOG_LEVEL_WARN;
+>> +module_param_named(log_level, xsc_log_level, uint, 0644);
+>> +MODULE_PARM_DESC(log_level,
+>> +		 "lowest log level to print: 0=3Ddebug, 1=3Dinfo, 2=3Dwarning, 3=3Der=
+ror. Default=3D1");
+> Module parameters are not liked. You will however find quite a few
+> drivers with something like:
 >
-> Remove it.
+> MODULE_PARM_DESC(debug, "Debug level (0=3Dnone,...,16=3Dall)");
 >
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> which is used to set the initial msglevel. That will probably be
+> accepted.
+got it.
+>> +EXPORT_SYMBOL(xsc_log_level);
+> I've not looked at your overall structure yet, but why export this?
+> Are there multiple modules involved?
+The two modules we are currently submitting (xsc_pci and xsc_eth) both=20
+need access to |xsc_log_level|, so it is being exported.
+>
+> 	Andrew
 
-LGTM,
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Thank you, Andrew. Looking forward to your reply.
 
+Best regards,
 
---=20
-Regards,
-Kalesh AP
-
---0000000000008dcb140629e7646c
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIJ4YtiwOcOUJJT8CdJOz//s2IL0MeYk5CeiKEGfgqATAMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIyMzAzMTQyMVowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC76v+K8PHP
-mTNjDxWTRCcXcruRVDu+rQp7+Pm2g0IDGGFqMUMxAHEy03yy2OtKkGSKhdNv3Dmbzn1FDhcNRFoW
-aNoaKu4okTQ4a0+RA9OpyuJgWykEByMdIAsbzYrX9ky0B4T9YKqUKjYq/3GWBR6ByUri1JJhAIlE
-FAx9k9jygpAxCl6zLeInxaet3lYOuO1U/IqKNjsC+nYN1ZK6/0Wkz/F2gbXgZGhPwe4OKzPoPWIZ
-khl7edcgsjjDcCHnI0AMQig3c4LVCceKVumtAxEn0GG63K2tBIJMs8khJ0yR+hZjAylkaZD4w+HB
-hULTjjUjRciTT8GUHoolD0m0b39N
---0000000000008dcb140629e7646c--
+Xin Tian
 
