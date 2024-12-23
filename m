@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-154109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 477179FB494
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 20:10:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B1F69FB495
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 20:10:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 017C67A2200
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:10:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BE0C165817
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4E51B6D18;
-	Mon, 23 Dec 2024 19:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D222D1C5CBD;
+	Mon, 23 Dec 2024 19:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgn0xysA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BhCQvYMB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849C7EAC5
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 19:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3AAA1C3C1C;
+	Mon, 23 Dec 2024 19:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734981021; cv=none; b=J2a71d+fDjPR+sl2o59QHs5KzJMmiDyXci3GAgR7PqHTleC9dXdVLssQCeMCzJmezWW7OOMisOGMZYl7og3rXoUsu9SDSsmm47zsO861d014DnUuUZHJYt3AIVBejjNdXDDbUDopNBUJTrJoXmuUFg6VyXaGBvruimBHpvtDgPA=
+	t=1734981022; cv=none; b=Q1Zrnu/SiiPvhSkaPPjximrvehOQT6uzyfD/jBuJH6LJojFLezk0qzwbEp7ibNUweMoqdTVFSJmMriloNmo14I3V5WtNqsL1omeiXrArdEYkgJc46vW3Q3ZwCOW5GTABgLVe+NCDsnPoVHPleCYd41Q2KkjHjllG4/BIijg+gF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734981021; c=relaxed/simple;
-	bh=U5XmyB9GEVfmRZIBoFV/Z/pweyokuk4H1KApLPoKh7w=;
+	s=arc-20240116; t=1734981022; c=relaxed/simple;
+	bh=22e0cf0mt6smWzc3GXJN29SgqDBF4lXxlE940Guk1RE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=drgFCBbvsuMkHaa3ofX4hwK4o09fTgdftr2cL0UmVswhKCngxNeSb6fhA62dOW0EfOj/cBK+ZJrlhMhL3dWWkSPuQLdapn8pGNDUgDk4bUXrPxvR+g5HJhSg0BYoBBXktSvVf/Xuv5CMsQudRa1tAzHk7pBZyZM2/Da68Q3UWiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mgn0xysA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04205C4CED3;
-	Mon, 23 Dec 2024 19:10:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=plJ4HiTtnewEZ6pelNLZMs7Z21BzXKoC57b7DeHHJ4rq1UUhqTTesYpyb4IsoOaG2cNhtHmrxKrDqwOEzV+3xju30mKmHEi70Zua+yONv7tSggnNva9O63QfzM3eaYmTROX8cjjTWlhBlrmQcWzgKoOQrE+n1Idinot+jC3bie4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BhCQvYMB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77258C4CED3;
+	Mon, 23 Dec 2024 19:10:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734981021;
-	bh=U5XmyB9GEVfmRZIBoFV/Z/pweyokuk4H1KApLPoKh7w=;
+	s=k20201202; t=1734981022;
+	bh=22e0cf0mt6smWzc3GXJN29SgqDBF4lXxlE940Guk1RE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mgn0xysAzU6RUz/20+2guuDihpwbeRuepRxmnab+VQqujyGp9cu1CaszhCEx3G+S5
-	 lORIzJdl6Iga2NGcuU7mJ4+e8cr6IOexZtk1ehCKXKWkhwXHoKIVL53fcG3MORA0oE
-	 +z7LgPlRDzyGvtJVzG2v/WZVWU6ofr48CtkS/SkeuYY79UhYF7+Za7+N5hFr4Yq5fS
-	 sF2YWL30foqsGC02Zri+yyTQojw5YXHVlPYVTsVgjnNYRhuTq5bLYXO43UD3hB982U
-	 0+yoQ4cmg+vcyKzHGdvywd2VxUV9/sUyy8cLrTzrtjDC/SONJHrbW9OYBKDWVygDyR
-	 YXamB8tXT88Cg==
+	b=BhCQvYMBrcl8bYr7S+fA9BVNl7tbEQiAN7gc+BUDHhjiF+NXS2jbb2YMac5Z8tdJB
+	 Kxj3+t1ofElWoskLWF/1w469IDGOj7iEegjXz+bCNEJKwT7Ex9qqg1N3XN38kzipG9
+	 LLNhsHHO553x0kId5TJyBkSutjUmBVlxRe4WEfjMc9ehWc+fKA8+7oic6tfI2PrU5V
+	 6+KCrisTIZQSoZzeg/8h7v3Z2UdwhaWgbMIp1EJ06kza2xWsWi6YdCrOTduCwGzwFv
+	 55hiPCgM/Pa0TmuuyASh2llQ5Tyo/9e/IEVyWoAXU9zBperO94yI0qWd5IHnyNtbjt
+	 JOfylLGYNRQ4g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFAA3805DB2;
-	Mon, 23 Dec 2024 19:10:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D7A3805DB2;
+	Mon, 23 Dec 2024 19:10:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,58 +52,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/10][pull request] ixgbe,
- ixgbevf: Add support for Intel(R) E610 device
+Subject: Re: [PATCH net-next v5 0/9] net: lan969x: add RGMII support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173498103949.3934211.3463776191601465643.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Dec 2024 19:10:39 +0000
-References: <20241220201521.3363985-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20241220201521.3363985-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- piotr.kwapulinski@intel.com, przemyslaw.kitszel@intel.com, horms@kernel.org
+ <173498104074.3934211.3884630987619297533.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Dec 2024 19:10:40 +0000
+References: <20241220-sparx5-lan969x-switch-driver-4-v5-0-fa8ba5dff732@microchip.com>
+In-Reply-To: <20241220-sparx5-lan969x-switch-driver-4-v5-0-fa8ba5dff732@microchip.com>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ lars.povlsen@microchip.com, Steen.Hegelund@microchip.com,
+ horatiu.vultur@microchip.com, linux@armlinux.org.uk,
+ jacob.e.keller@intel.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ robert.marko@sartura.hr, rmk+kernel@armlinux.org.uk
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 20 Dec 2024 12:15:05 -0800 you wrote:
-> Piotr Kwapulinski says:
+On Fri, 20 Dec 2024 14:48:39 +0100 you wrote:
+> == Description:
 > 
-> Add initial support for Intel(R) E610 Series of network devices. The E610
-> is based on X550 but adds firmware managed link, enhanced security
-> capabilities and support for updated server manageability.
-> ---
-> IWL:
-> ixgbe: https://lore.kernel.org/intel-wired-lan/20241205084450.4651-1-piotr.kwapulinski@intel.com/
-> ixgbevf: https://lore.kernel.org/intel-wired-lan/20241218131238.5968-1-piotr.kwapulinski@intel.com/
+> This series is the fourth of a multi-part series, that prepares and adds
+> support for the new lan969x switch driver.
+> 
+> The upstreaming efforts is split into multiple series (might change a
+> bit as we go along):
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,01/10] ixgbe: Add support for E610 FW Admin Command Interface
-    https://git.kernel.org/netdev/net-next/c/46761fd52a88
-  - [net-next,02/10] ixgbe: Add support for E610 device capabilities detection
-    https://git.kernel.org/netdev/net-next/c/7c3aa0fccb19
-  - [net-next,03/10] ixgbe: Add link management support for E610 device
-    https://git.kernel.org/netdev/net-next/c/23c0e5a16bcc
-  - [net-next,04/10] ixgbe: Add support for NVM handling in E610 device
-    https://git.kernel.org/netdev/net-next/c/d2483ebc9deb
-  - [net-next,05/10] ixgbe: Add support for EEPROM dump in E610 device
-    https://git.kernel.org/netdev/net-next/c/e5b132b4f4d9
-  - [net-next,06/10] ixgbe: Add ixgbe_x540 multiple header inclusion protection
-    https://git.kernel.org/netdev/net-next/c/a0834bd521ea
-  - [net-next,07/10] ixgbe: Clean up the E610 link management related code
-    https://git.kernel.org/netdev/net-next/c/34b415770771
-  - [net-next,08/10] ixgbe: Enable link management in E610 device
-    https://git.kernel.org/netdev/net-next/c/4600cdf9f5ac
-  - [net-next,09/10] PCI: Add PCI_VDEVICE_SUB helper macro
-    https://git.kernel.org/netdev/net-next/c/208fff3f567e
-  - [net-next,10/10] ixgbevf: Add support for Intel(R) E610 device
-    https://git.kernel.org/netdev/net-next/c/4c44b450c69b
+  - [net-next,v5,1/9] net: sparx5: do some preparation work
+    https://git.kernel.org/netdev/net-next/c/c71b59690aa1
+  - [net-next,v5,2/9] net: sparx5: add function for RGMII port check
+    https://git.kernel.org/netdev/net-next/c/dd2baee10840
+  - [net-next,v5,3/9] net: sparx5: use is_port_rgmii() throughout
+    https://git.kernel.org/netdev/net-next/c/05bda8a1bded
+  - [net-next,v5,4/9] net: sparx5: skip low-speed configuration when port is RGMII
+    https://git.kernel.org/netdev/net-next/c/d9450934f915
+  - [net-next,v5,5/9] net: sparx5: only return PCS for modes that require it
+    https://git.kernel.org/netdev/net-next/c/9b8d70ecfef7
+  - [net-next,v5,6/9] net: sparx5: verify RGMII speeds
+    https://git.kernel.org/netdev/net-next/c/95e467b85e69
+  - [net-next,v5,7/9] net: lan969x: add RGMII registers
+    https://git.kernel.org/netdev/net-next/c/fb6ac1829bb5
+  - [net-next,v5,8/9] net: lan969x: add RGMII implementation
+    https://git.kernel.org/netdev/net-next/c/010fe5dff164
+  - [net-next,v5,9/9] dt-bindings: net: sparx5: document RGMII delays
+    https://git.kernel.org/netdev/net-next/c/f0706c04721b
 
 You are awesome, thank you!
 -- 
