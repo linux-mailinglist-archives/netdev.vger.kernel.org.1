@@ -1,194 +1,106 @@
-Return-Path: <netdev+bounces-154017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 278DE9FACDC
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 10:52:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6292D9FACF9
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 11:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4115E188128F
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 09:52:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAC77163496
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 10:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80CC18FDB2;
-	Mon, 23 Dec 2024 09:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F93F19068E;
+	Mon, 23 Dec 2024 10:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j4/eE3cQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="meqrg3L9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D352F186E20;
-	Mon, 23 Dec 2024 09:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4847C2AF1D;
+	Mon, 23 Dec 2024 10:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734947566; cv=none; b=JAszQ8AX1D8w9vNnXs05qF5xxGtCq3EKG/+1gpaDRyD1zwoIaBvpoB/CCoBZdSIhY90pvbtd0AKjUk8LOV6uo10Po6Y/C6YqH8ArvCrarSA1UZD6LtReJjITkJGSM+sFZKeSJSd0HhfYFCzWoKHlYJP++0rFQkJS/fGSYFQc5Ns=
+	t=1734948510; cv=none; b=bzlFzbjLKkZ1x0FTxZ8eTfRSvA8r8AzMEO92FwELUMhVXgEhrMS4j0hn/EY4odb3jUSd5R1zPEl4pklXxHDdsJZKq/UHpy1lyv3rhuBRTO8X98eGAHkNKecEcS2Rehd9A0Baj2uySLH+YEtBwibefyoaIgufD3Y8ezvHmQs/QjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734947566; c=relaxed/simple;
-	bh=CYXT0R2h9iFmaHMvl1O1YlhVhXTSLB8bpr75ea7+Vqc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H4HB2DT8wvBY/4kluBUOHBAWsGe9ypRO2fvvk8yCrsEBnL9b5sckMEOY9OxlAbfRfUYKA2MD871kuTw752XVdkLo2hn/QSXkTC2FF9H0hi2ANhVeBfzjd5ncYKGdq3G57XtapANgMfn9l8gW6K+Je9eUyLIEkhKSGYiOugPgM0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j4/eE3cQ; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734947565; x=1766483565;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=CYXT0R2h9iFmaHMvl1O1YlhVhXTSLB8bpr75ea7+Vqc=;
-  b=j4/eE3cQKnuNuwAm5CAMJAno7H7VpysJVp2Z1Cu6p+gRVNnxlPSJxT/l
-   hSQ7tHJ4znbNSUdMt1ZlK2H/5Urpup97WeSdsqXngte7iQn5SnUlMYPX9
-   ziivp8P4SInsHbK2zyBoXYp9xLesiZADFsOhxoP74RR1KV6bKU7r1C5YA
-   p1AeftI0DeaqIaIgYpA9U8D/Xk30qDbhZgc98xBT+5Kv94DLeyqOQPSlQ
-   K5GRdyCkx3Lnz6BY/x0B5JkbKidds/mEiTFIjunosod/HXAvpTpO2NsK0
-   2iTuR87hxbZgDQik4KQclwuVv01+m1DZ7piTqNJIAlhPeJxjhwQL8gy7A
-   w==;
-X-CSE-ConnectionGUID: JhMfKbsCQ52ZF3WCCaFTnA==
-X-CSE-MsgGUID: m16QlAj9Q1STZb1VY/9iYA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11294"; a="35305435"
-X-IronPort-AV: E=Sophos;i="6.12,256,1728975600"; 
-   d="scan'208";a="35305435"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2024 01:52:44 -0800
-X-CSE-ConnectionGUID: DHhMlnesSSGucxM7jXt3PQ==
-X-CSE-MsgGUID: L/IlE5k/QWCySVIiYCfi4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="104229726"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.22.166]) ([10.247.22.166])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2024 01:52:40 -0800
-Message-ID: <57139951-daf7-42c3-b7a6-e4870a3f71fa@linux.intel.com>
-Date: Mon, 23 Dec 2024 17:52:37 +0800
+	s=arc-20240116; t=1734948510; c=relaxed/simple;
+	bh=w9k/XAILwSjvY+mzO+vcyPTCSKT8DFqBEj4aMr/XdmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ru/21jkIIwq3haoqu/nifqgn8QPKl9R3Y9QX0E++QjlVkgRF+ZADUqnPzMVynDrXvQVzfasZMutuqjSDelj5h3dbG2SPCLBB23Q+uFjCnuBvjuw5rRMhrC24ZJzmYeyG+drxrcZEEbLkNemAFHV5VG0/U7nL9iEI7WimLyC4TSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=meqrg3L9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE8E0C4CED4;
+	Mon, 23 Dec 2024 10:08:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734948510;
+	bh=w9k/XAILwSjvY+mzO+vcyPTCSKT8DFqBEj4aMr/XdmQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=meqrg3L9/7owPhFiT2QP3uLxZzOpzo9x67rAzqV30Gapwi6SaWp5KQcG+hiN68G4B
+	 ReyB0ESJRTFwrJ5QFt6AXT7RUhy4KVwDan/9sSUukp8ga+pdkqeUaZ8WWiKzEnJDUN
+	 rhRGVhqAnVEUEv5VWaj7G3shDJPOhXF7Htp7wJFMufogY+16dibPb+A3ZfUfwZ60I5
+	 BcEyy6C3jTUfc31enYym01LoiHRIAtqQikgmRVhdm1he3qt961Ng2vfqVUNujI/jMH
+	 sSOKLcgnTwO9YCc0r2rB88+n1cftosGPozz2IeIj2qbCLIDk3lBfnXsCXt2kOGOdxg
+	 jPcB8/SJ6bQKA==
+Date: Mon, 23 Dec 2024 10:08:23 +0000
+From: Lee Jones <lee@kernel.org>
+To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+Cc: "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>
+Subject: Re: (subset) [PATCH v2 2/4] dt-bindings: mfd: Add MDIO interface to
+ rtl9301-switch
+Message-ID: <20241223100823.GA7933@google.com>
+References: <20241216031346.2626805-1-chris.packham@alliedtelesis.co.nz>
+ <20241216031346.2626805-3-chris.packham@alliedtelesis.co.nz>
+ <173444803631.1901572.15614847167551978147.b4-ty@kernel.org>
+ <5f863db8-1c9b-4bed-ab14-f5aafbcc9378@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 9/9] igc: Add support to get frame preemption
- statistics via ethtool
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20241216064720.931522-1-faizal.abdul.rahim@linux.intel.com>
- <20241216064720.931522-10-faizal.abdul.rahim@linux.intel.com>
- <20241216160513.24i4ehroff47iwzi@skbuf>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20241216160513.24i4ehroff47iwzi@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <5f863db8-1c9b-4bed-ab14-f5aafbcc9378@alliedtelesis.co.nz>
 
+On Thu, 19 Dec 2024, Chris Packham wrote:
 
-
-On 17/12/2024 12:05 am, Vladimir Oltean wrote:
-> On Mon, Dec 16, 2024 at 01:47:20AM -0500, Faizal Rahim wrote:
->> Implemented "ethtool --include-statistics --show-mm" callback for IGC.
->>
->> Tested preemption scenario to check preemption statistics:
->> 1) Trigger verification handshake on both boards:
->>      $ sudo ethtool --set-mm enp1s0 pmac-enabled on
->>      $ sudo ethtool --set-mm enp1s0 tx-enabled on
->>      $ sudo ethtool --set-mm enp1s0 verify-enabled on
->> 2) Set preemptible or express queue in taprio for tx board:
->>      $ sudo tc qdisc replace dev enp1s0 parent root handle 100 taprio \
->>        num_tc 4 map 0 1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 \
->>        queues 1@0 1@1 1@2 1@3 base-time 0 sched-entry S F 100000 \
->>        fp E E P P
+> Hi Lee,
 > 
-> Hmm, the prio_tc_map pattern changed since the last time I looked at igc
-> examples? It was in decreasing order before? How do you handle backwards
-> compatibility with the Tx ring strict priority default configuration?
-> I haven't downloaded the entire set locally, will do so later.
-> 
+> On 18/12/2024 04:07, Lee Jones wrote:
+> > On Mon, 16 Dec 2024 16:13:44 +1300, Chris Packham wrote:
+> >> The MDIO controller is part of the switch on the RTL9300 family of
+> >> devices. Add a $ref to the mfd binding for these devices.
+> >>
+> >>
+> > Applied, thanks!
+> >
+> > [2/4] dt-bindings: mfd: Add MDIO interface to rtl9301-switch
+> >        commit: 1061081cbe930f97ad54e820ad1996f55d93c57f
+> >
+> > --
+> > Lee Jones [李琼斯]
+> Is it too late to drop this out? I think I'm probably going to change 
+> the MDIO binding a little which may change how it fits into the overall 
+> switch mfd.
 
-I tested like this for i226:
-     CMD=(
-         "tc qdisc replace dev $IFACE parent root handle 100 taprio "
-         "num_tc 4 "
-         "map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 "
-         "queues 1@0 1@1 1@2 1@3 "
-         "base-time $BASE "
-         "${SCHED_ENTRY[*]} "
-         "flags 0x1 "
-         "txtime-delay $TXTIME_DELAY "
-         "clockid CLOCK_TAI "
+Unapplied, thanks.
 
-But I mistakenly copied the mapping from a different scenario where socket 
-priority -> tc -> hw_queue mapping is not important to my test objective in 
-that scenario.
-
-I'll update the description to use decreasing order then.
-
->> +
->> +	return ooo_smdc + ooo_frame_cnt + ooo_frag_cnt + miss_frame_frag_cnt;
->> +}
->> +
->> +static void igc_ethtool_get_mm_stats(struct net_device *dev,
->> +				     struct ethtool_mm_stats *stats)
->> +{
->> +	struct igc_adapter *adapter = netdev_priv(dev);
->> +	struct igc_hw *hw = &adapter->hw;
->> +
->> +	stats->MACMergeFrameAssErrorCount = igc_ethtool_get_frame_ass_error(dev);
->> +	stats->MACMergeFrameSmdErrorCount = 0; /* Not available in IGC */
->> +	stats->MACMergeFrameAssOkCount = rd32(IGC_PRMPTDRCNT);
->> +	stats->MACMergeFragCountRx =  rd32(IGC_PRMEVNTRCNT);
->> +	stats->MACMergeFragCountTx = rd32(IGC_PRMEVNTTCNT);
->> +	stats->MACMergeHoldCount = 0; /* Not available in IGC */
-> 
-> Don't report counters as zero when in reality you don't know.
-> 
-> Just don't assign values to these. mm_prepare_data() -> ethtool_stats_init()
-> presets them to 0xffffffffffffffff (ETHTOOL_STAT_NOT_SET), and
-> mm_put_stats() -> mm_put_stat() detects whether they are still equal to
-> this value, and if they are, does not report netlink attributes for them.
-> 
-
-Got it.
-
-
->> diff --git a/drivers/net/ethernet/intel/igc/igc_regs.h b/drivers/net/ethernet/intel/igc/igc_regs.h
->> index 12ddc5793651..f40946cce35a 100644
->> --- a/drivers/net/ethernet/intel/igc/igc_regs.h
->> +++ b/drivers/net/ethernet/intel/igc/igc_regs.h
->> @@ -222,6 +222,25 @@
->>   
->>   #define IGC_FTQF(_n)	(0x059E0 + (4 * (_n)))  /* 5-tuple Queue Fltr */
->>   
->> +/* Time sync registers - preemption statistics */
->> +#define IGC_PRMEVNTTCNT		0x04298	/* TX Preemption event counter */
->> +#define IGC_PRMEVNTRCNT		0x0429C	/* RX Preemption event counter */
->> +#define IGC_PRMPTDRCNT		0x04284	/* Good RX Preempted Packets */
->> +
->> + /* Preemption Exception Counter */
->> +#define IGC_PRMEXPRCNT					0x042A0
->> +/* Received out of order packets with SMD-C and NOT ReumeRx */
->> +#define IGC_PRMEXPRCNT_OOO_SMDC 0x000000FF
->> +/* Received out of order packets with SMD-C and wrong Frame CNT */
->> +#define IGC_PRMEXPRCNT_OOO_FRAME_CNT			0x0000FF00
->> +#define IGC_PRMEXPRCNT_OOO_FRAME_CNT_SHIFT		8
->> +/* Received out of order packets with SMD-C and wrong Frag CNT */
->> +#define IGC_PRMEXPRCNT_OOO_FRAG_CNT			0x00FF0000
->> +#define IGC_PRMEXPRCNT_OOO_FRAG_CNT_SHIFT		16
->> +/* Received packets with SMD-S and ReumeRx */
-> 
-> What is ReumeRx?
-
-Resume receive. It’s a typo in the i226 documentation that I (shamelessly) 
-copied into the code without checking properly. It's meant to indicate that 
-an RX flag in the i226 firmware is set. I’ll remove the 'ResumeRX' part 
-since it adds confusion.
-
+-- 
+Lee Jones [李琼斯]
 
