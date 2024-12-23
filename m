@@ -1,123 +1,80 @@
-Return-Path: <netdev+bounces-154118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A6BF9FB584
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 21:41:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 859039FB58C
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 21:44:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DD0E7A0700
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 20:41:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 260D97A203C
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 20:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5585E1D63CE;
-	Mon, 23 Dec 2024 20:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFC01C3F13;
+	Mon, 23 Dec 2024 20:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fesnKRlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589DC1D435F;
-	Mon, 23 Dec 2024 20:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73475188CDB;
+	Mon, 23 Dec 2024 20:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734986462; cv=none; b=YADzhxaxKXhch2PFyMk18ELPSoeRBrrPHWoUlpwHFov0GzQ24TMyT7zXfC+VOf8ZjlqyBEqLEKLXSJwEN6AFJrTm8rPDHcGXta5HkRft88c3TgS8qz4/f/qLtCl0US72KwfVvf+9UaHW6Dt6z+H4MJHtl0ryP6jZDHTDuDhtaE8=
+	t=1734986673; cv=none; b=W4la8w5NLBrZPRev1K/3Z2grsSSb7RPa/WXiVuxPGFuYlS3/lhkdajH6T40CyGGP8Pt6dOFlKxb2J8gevbdkLZCAT7z6JbbTB7PkNLykjem/9Udl9iB9Pou58MM5ckCGW95prcrVyx4DG0o2j4Dyx1srJhq+0Fq3ZCM9rb3827A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734986462; c=relaxed/simple;
-	bh=lhQuTDAwMrcuQ0VuSuwjCJBKNUo6+ySBw73n368V6uQ=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LALGcHBQNkiax1IhNidBx5J8m+AHqQYHDpelR2ML7q/ulXHyJRaVz7AiSuJya5NylSIZeN2+9UQlePiCg8uau1RK30d/4JojGEYsSRGXlPWvJXjLlmsloZ+pM5abryXbHPhBD1xAE0al6ymY70WVa0tvQf2az+DaY8YXxUoTvis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YH8yn0rpCz67FbS;
-	Tue, 24 Dec 2024 04:39:45 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6AA56140A70;
-	Tue, 24 Dec 2024 04:40:57 +0800 (CST)
-Received: from localhost (10.47.75.118) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 23 Dec
- 2024 21:40:55 +0100
-Date: Mon, 23 Dec 2024 20:40:54 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Zijun Hu <zijun_hu@icloud.com>
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linus Walleij
-	<linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Uwe
- =?ISO-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Thomas =?ISO-8859-1?Q?Wei=DFschu?=
- =?ISO-8859-1?Q?h?= <thomas@t-8ch.de>, <linux-kernel@vger.kernel.org>,
-	<nvdimm@lists.linux.dev>, <linux-sound@vger.kernel.org>,
-	<sparclinux@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-cxl@vger.kernel.org>, <linux1394-devel@lists.sourceforge.net>,
-	<arm-scmi@vger.kernel.org>, <linux-efi@vger.kernel.org>,
-	<linux-gpio@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-hwmon@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <linux-pwm@vger.kernel.org>,
-	<linux-remoteproc@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-	<linux-usb@vger.kernel.org>, <linux-serial@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v4 06/11] driver core: Remove match_any()
-Message-ID: <20241223204054.000056db@huawei.com>
-In-Reply-To: <20241211-const_dfc_done-v4-6-583cc60329df@quicinc.com>
-References: <20241211-const_dfc_done-v4-0-583cc60329df@quicinc.com>
-	<20241211-const_dfc_done-v4-6-583cc60329df@quicinc.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1734986673; c=relaxed/simple;
+	bh=/IHoBxSjsaCAQlSKqA2pfkH1SPJIuYj9VLfq79j+GTk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L7l7evnGRemejppKBcDQMCH8k3pjWLj2w4VhqDuBhfBWICwb+wwY/lYJ1pP2XP60calRs2Yec+aygUAiV6pBdINfmKLJ3ulV4Vtng9QC3O425OuThfMU8fgk9PldF9pjNre3ldTWBB/P+K3JEwC/MsERgBUuDKAkrrk2CqzCMt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fesnKRlD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B56F4C4CED3;
+	Mon, 23 Dec 2024 20:44:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734986673;
+	bh=/IHoBxSjsaCAQlSKqA2pfkH1SPJIuYj9VLfq79j+GTk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fesnKRlDWGVm7gY8QaNyRCVlvf0xEvTe5uS3bn3ZcmIf5ie1mTLDAtQqM1w5Aqd3K
+	 T0+HSmzfGibuUZ4jjPC7SLwsbE3+Gw84Ca7VM8hfIwlCrDs/CpHBTFAp12AWq9Quq8
+	 fI14QyQHdz/mdlFM11aAZFD31L3CzwbPkpQy/UNmwG4Epy6VOQm99k8YrbwiZfjYAs
+	 mfR3U0g58zCdBH3QuPSM31fHPLtENxfO5wchKIbPiOtS1/E2iEBaTc3XMBMR90Wafp
+	 DcixWqZeA+8CyXdTizAAt0JQcy2S1Gd5rhfZXmfg2jbHi4oMOjogCPx5Rrn9h45aW6
+	 nun0BvnVt99FQ==
+Date: Mon, 23 Dec 2024 12:44:31 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>, John
+ Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 26/29] net/tls: use the new scatterwalk functions
+Message-ID: <20241223124431.1d34888f@kernel.org>
+In-Reply-To: <20241223194249.GB2032@quark.localdomain>
+References: <20241221091056.282098-1-ebiggers@kernel.org>
+	<20241221091056.282098-27-ebiggers@kernel.org>
+	<20241223074825.7c4c74a0@kernel.org>
+	<20241223194249.GB2032@quark.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- frapeml500008.china.huawei.com (7.182.85.71)
 
-On Wed, 11 Dec 2024 08:08:08 +0800
-Zijun Hu <zijun_hu@icloud.com> wrote:
-
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
+On Mon, 23 Dec 2024 11:42:49 -0800 Eric Biggers wrote:
+> > Acked-by: Jakub Kicinski <kuba@kernel.org>  
 > 
-> Static match_any() is exactly same as API device_match_any().
-is now exactly...
-
-perhaps to call out that it wasn't prior to this set!
-
-> Remove the former and use the later instead.
+> Thanks.  FYI I will need to update this patch in the next version, as I did not
+> take into consideration what chain_to_walk() is doing.  This code seems to be a
+> bit unique in how it is using the scatterwalk functions.
 > 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Also I think the second paragraph of my commit message is wrong, as the calls to
+> scatterwalk_done() in tls_enc_records() are the ones I thought were missing.
 
-> ---
->  drivers/base/core.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
-> 
-> diff --git a/drivers/base/core.c b/drivers/base/core.c
-> index 8116bc8dd6e9eba0653ca686a90c7008de9e2840..289f2dafa8f3831931d0f316d66ee12c2cb8a2e1 100644
-> --- a/drivers/base/core.c
-> +++ b/drivers/base/core.c
-> @@ -4114,11 +4114,6 @@ struct device *device_find_child_by_name(struct device *parent,
->  }
->  EXPORT_SYMBOL_GPL(device_find_child_by_name);
->  
-> -static int match_any(struct device *dev, const void *unused)
-> -{
-> -	return 1;
-> -}
-> -
->  /**
->   * device_find_any_child - device iterator for locating a child device, if any.
->   * @parent: parent struct device
-> @@ -4130,7 +4125,7 @@ static int match_any(struct device *dev, const void *unused)
->   */
->  struct device *device_find_any_child(struct device *parent)
->  {
-> -	return device_find_child(parent, NULL, match_any);
-> +	return device_find_child(parent, NULL, device_match_any);
->  }
->  EXPORT_SYMBOL_GPL(device_find_any_child);
->  
-> 
+netdev@ only got CCed on this one patch so TBH I have trusted 
+the conversion :(
 
+FWIW tls has a relatively solid selftest:
+tools/testing/selftests/net/tls.c
 
