@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-154100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 502189FB418
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:41:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BEA29FB41A
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 19:41:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB85A7A0297
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:41:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 762D91885A3E
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 18:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F08C1C5F25;
-	Mon, 23 Dec 2024 18:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8EC1CBEB9;
+	Mon, 23 Dec 2024 18:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iEdMXmpR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S2AUJZUY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371871C07F1
-	for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 18:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A901CBE95;
+	Mon, 23 Dec 2024 18:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734979234; cv=none; b=KRVWTQZt3hBapMmhcq1zxelgtbhQDzGBH9zxK58JGQG19ooC04OqpNrA7LBLCXH2UedkMMhkKZ5m2j9fKRLGCADed7MbGHdYUgV74GBiNwCvzNEJRFkvpBS7c/oSKhuBphl8nbeFCRzLF7xWAcRcwU2xYpbKtxuwCrbWPsU4/Rk=
+	t=1734979235; cv=none; b=gqNYcxBd+AtQHCfI3EC2OmwQcbgd8zcat+v0M4DNv4QkUA0TubYpzEByuawEf+3kEo4DWuKrBlxZCn/CWW5xwYQypUooXmYpeWbA2wUi976MYykyL0cKb9FAPeZHhLOJfQPZUx6Iwts+flZVY0W0dtb4Hvyj3WqmfRRvd95EgB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734979234; c=relaxed/simple;
-	bh=kJlnRTZRD68XQh0/p4FiKS/nLhHKE/wcfEiETtKn/mM=;
+	s=arc-20240116; t=1734979235; c=relaxed/simple;
+	bh=xlwCSKeqG/PSH+pI0nVyzi2+G2SFi0aYhf+kRkaf1n0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MqPdE5RtMKpulZXDW7n2kh7I62rtAsUWMuD7yZwss8Vv62HntKdhGMePmvyO8v3KVqlNF87hVMyESCAxEl4ltwg26iC2TvFoZtJaBJ0Ns2X2d8SBBKrndVN84c/czLvEp4wuuFLSuk/N7bLn9wpbpyzD/972nyNSo8DlGpqS2+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iEdMXmpR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCCA4C4CEE6;
-	Mon, 23 Dec 2024 18:40:33 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=KeyWtUvi558qIcdL6J9oEa0Rwpebg7uA9k2UralgsxUoBNRp0UvN2nPzZRtrjwpGDCH3zgFoYFQ1JU8L44dvHWcDJCS7h5DO8687lB+X0aBF77XYCONPYXZDEIALzt4+g+94PQK+T0+jnS1w5x6Wxk4KXOA1tRfjxpdMI+h+iYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S2AUJZUY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FABDC4CED4;
+	Mon, 23 Dec 2024 18:40:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734979233;
-	bh=kJlnRTZRD68XQh0/p4FiKS/nLhHKE/wcfEiETtKn/mM=;
+	s=k20201202; t=1734979235;
+	bh=xlwCSKeqG/PSH+pI0nVyzi2+G2SFi0aYhf+kRkaf1n0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iEdMXmpRYV/FGHhMBjt0fDu8zUj2Z5Af926Pbd4tJUafq4vUns4Sq48PykDDCDuv8
-	 LI4/cskCG88vc5n3GZH7nO53BnyDmA21GgZVrvQwU+/uyiX33sOyZ9jH2pPz71sshQ
-	 pCWnZzy7cNhFyOrY2O5L6iojrfPSPiQsBwzYwvmnscByrpZIHo52VL+/iZdU99o1+S
-	 NqWpP216JJ7QlXroiZZJgbPKLs6akfTeyfRFiwMVh7MGr1eO/tJ7krvg5wQgDBwMbQ
-	 8eZMt68/SXnSryPBppTDg63EDYBoeUv83hmTGEVqqTsT2zfIun0wjONjyV0Lob1VyM
-	 fEMQ2BInmGfWA==
+	b=S2AUJZUYPV5lgCOipPHlCaqeaKNuaEkvSW0uwYjJwSgEticbeGWjSg+Y5JrnNgXmp
+	 R4vjzBsEVV3xLv/QJssfuG/Sp3ZCDJJ+SEC8gmY6ZyRAMNOl0+rCVPwKa05mOjrZ0a
+	 sA+bDz1dzgC7p5slhZgFOS9xSkwiGZDzz6KJXBXQbbVtlSv+trZ9qCGSQUsz6/STmm
+	 eB/ZP6Gx7Mb0HOh9BvEwtgYdD8rqct5HQb8kayjaVhtCL5awhAEQYPRPCLCP3txsvc
+	 eNuBVHUJH98Wc+FmLTJnLe9SphPWgudjtlB8C1n0eW6/tFj3GNRQVSFuZUXfHbHjRB
+	 VSOlk6erFjYEA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710923805DB2;
-	Mon, 23 Dec 2024 18:40:53 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD093805DB2;
+	Mon, 23 Dec 2024 18:40:54 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next,
- v2] netlink: correct nlmsg size for multicast notifications
+Subject: Re: [PATCH net-next] selftests: drv-net: assume stats refresh is 0 if no
+ ethtool -c support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173497925226.3927205.12338609140853122005.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Dec 2024 18:40:52 +0000
-References: <20241221100007.1910089-1-yuyanghuang@google.com>
-In-Reply-To: <20241221100007.1910089-1-yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org,
- roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org,
- jimictw@google.com, prohr@google.com, liuhangbin@gmail.com,
- nicolas.dichtel@6wind.com, andrew@lunn.ch, pruddy@vyatta.att-mail.com,
- netdev@vger.kernel.org, maze@google.com, lorenzo@google.com
+ <173497925350.3927205.15548996926035826833.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Dec 2024 18:40:53 +0000
+References: <20241220003116.1458863-1-kuba@kernel.org>
+In-Reply-To: <20241220003116.1458863-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, willemb@google.com, petrm@nvidia.com,
+ linux-kselftest@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 21 Dec 2024 19:00:07 +0900 you wrote:
-> Corrected the netlink message size calculation for multicast group
-> join/leave notifications. The previous calculation did not account for
-> the inclusion of both IPv4/IPv6 addresses and ifa_cacheinfo in the
-> payload. This fix ensures that the allocated message size is
-> sufficient to hold all necessary information.
+On Thu, 19 Dec 2024 16:31:16 -0800 you wrote:
+> Tests using HW stats wait for them to stabilize, using data from
+> ethtool -c as the delay. Not all drivers implement ethtool -c
+> so handle the errors gracefully.
 > 
-> This patch also includes the following improvements:
-> * Uses GFP_KERNEL instead of GFP_ATOMIC when holding the RTNL mutex.
-> * Uses nla_total_size(sizeof(struct in6_addr)) instead of
->   nla_total_size(16).
-> * Removes unnecessary EXPORT_SYMBOL().
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: shuah@kernel.org
+> CC: willemb@google.com
+> CC: petrm@nvidia.com
+> CC: linux-kselftest@vger.kernel.org
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] netlink: correct nlmsg size for multicast notifications
-    https://git.kernel.org/netdev/net-next/c/aa4ad7c3f283
+  - [net-next] selftests: drv-net: assume stats refresh is 0 if no ethtool -c support
+    https://git.kernel.org/netdev/net-next/c/f288c7a1ba26
 
 You are awesome, thank you!
 -- 
