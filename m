@@ -1,148 +1,120 @@
-Return-Path: <netdev+bounces-154062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C18BA9FB097
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 16:14:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E319FB0A2
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 16:17:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F081A7A13AA
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 15:13:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B00118824B3
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 15:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F171B3932;
-	Mon, 23 Dec 2024 15:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7D01B3939;
+	Mon, 23 Dec 2024 15:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b="qDdoe5DD"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="oYWHFEge"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4022.proton.ch (mail-4022.proton.ch [185.70.40.22])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688621B219B;
-	Mon, 23 Dec 2024 15:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B872A13774D;
+	Mon, 23 Dec 2024 15:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734966831; cv=none; b=kQVeSeFBGJAbzoQl+dHm77ymonl4QqaD6p8RppnsiOGCxilSMgM2GSE3KHGzq7nAVTY5myXnJ7Ewniqm5qlQfRvZ34oX/q+RNuqxiiERD4+FJNKhrTOtCIcx437BqhQVDB/p/NbtXKv7D639t6//Wo7/IPN9FVlAGTMuy9F3kvI=
+	t=1734966989; cv=none; b=gR7+TqTQlsNGJxgp/IvzeMjev0zQBrTtNW4Y32/dge5ocuuSTMh6AptvV+std8TyAbGHv/2mXpBnPLGrK0CE6eKIYLtulPKxd9wlW/UOVeinR7DTwTtMGvtblW0fcAM5XrXJ7cfPb65v0vmv2+KlNTIiXDl3Ftl8gNPeXZRiOt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734966831; c=relaxed/simple;
-	bh=mMlSDAeSoPgdqaejBFmCcWDftovFIOcmKFg0+wEQisU=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=bhq9OoBrrpA89/RA7yPngFggOxM3ZKgI7wS5B41yi8JFI54qH/thur3X96A/dpvETaxcJUfMC0uvPCt61BDwleAvUooeZ8b+KFjYKW0/kK+rabIA38JD5QxKCVvn6FX9pGMhtpmPjUcUyGT88YL03z7yNB267xDfyvk4nYRPYzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com; spf=pass smtp.mailfrom=ethancedwards.com; dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b=qDdoe5DD; arc=none smtp.client-ip=185.70.40.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ethancedwards.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ethancedwards.com;
-	s=protonmail3; t=1734966826; x=1735226026;
-	bh=FnT8TeK83UXhjCnNXlL6bcROpP4xT/yyfLwm5pxmwfM=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
-	 List-Unsubscribe:List-Unsubscribe-Post;
-	b=qDdoe5DD7hnF4zNAlc+Lq5gWzVOQ9BfLmyKeZEEHpHILunuhpMHpoGma1DRA8tg6N
-	 BOtauDIKofHWvEPsVDA9CK9AtDAnXLxKe3SASIaCOEQVbH9vB194MEuQe1OjEbS56W
-	 zMVFturoXStOfhc3xf5SiwV0toyAkvVNdJu/X550ZRcsYJABFBBn9h9ck1lvUk/qg1
-	 E/jdesm7yCOH3DlFMx/LinQrfKNJh5MfhFCgAoA7eJiPZh2xKmiMS/CbCZSr8DSFmZ
-	 DurUTwzz6723AaEVHN5zoCD/IeOdZ+5mC5AN2gUbX5EZruOaEgCEBekEdOPhKGZw8V
-	 ivkl0y6Q748iw==
-Date: Mon, 23 Dec 2024 15:13:42 +0000
-To: "t.sailer@alumni.ethz.ch" <t.sailer@alumni.ethz.ch>
-From: Ethan Carter Edwards <ethan@ethancedwards.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: [PATCH] hamradio: baycom: replace strcpy() with strscpy()
-Message-ID: <bqKL4XKDGLWNih2jsEzZYpBSHG6Ux5mLZfDBIgHckEUxDq4l4pPgQPEXEqKRE7pUwMrXZBVeko9aYr1w_E5h5r_R_YFA46G8dGhV1id7zy4=@ethancedwards.com>
-Feedback-ID: 28410670:user:proton
-X-Pm-Message-ID: dd23b6971ab968f6fc2545da0a3df91760798541
+	s=arc-20240116; t=1734966989; c=relaxed/simple;
+	bh=MW45FBhLVmwRPmMRIL0HW17AQHDKkyJR47XdxpsB428=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CsVwR+yo9NNCxKGMekTy9lLqwxVo2+0J0Zq1SecZrIJRzutJ/I25+BIVOOwk8d6CrpsPrYRZwwlYte+6kAa2joPWtO/C9AJQfgDdOM1wqe2z9R9MYLm3xHsK5eag7USjIp77HRQySEqLxQSgw3MVNhydSWhKG1R/ttTTNA61wtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=oYWHFEge; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4BNFFtE0029151;
+	Mon, 23 Dec 2024 09:15:55 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1734966955;
+	bh=RZ3bqr04nq0KvhOIS+gUumh58sDmf7juaqfkgmz1GfI=;
+	h=From:To:CC:Subject:Date;
+	b=oYWHFEgeCFg8nTAlFpNfHpZNsL4pI6Mh0BfB+MC9in7UySczmzRmeU2qDeAHNU+qu
+	 juKfTzeDA2DTHe9mCmOpH2A9f8mjyoiF5UJPzj75Lo4kvA1Y/XZiRmVTNIEj3ktB5o
+	 ZPTMqUewu4ImCcUYzPnXSix+CvY9+M7y7A2pr3i8=
+Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4BNFFtJH083429;
+	Mon, 23 Dec 2024 09:15:55 -0600
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 23
+ Dec 2024 09:15:54 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 23 Dec 2024 09:15:54 -0600
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4BNFFsIp116891;
+	Mon, 23 Dec 2024 09:15:54 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 4BNFFrHn007379;
+	Mon, 23 Dec 2024 09:15:54 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <u.kleine-koenig@baylibre.com>, <robh@kernel.org>,
+        <matthias.schiffer@ew.tq-group.com>, <jan.kiszka@siemens.com>,
+        <dan.carpenter@linaro.org>, <m-malladi@ti.com>,
+        <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
+        <jacob.e.keller@intel.com>, <horms@kernel.org>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net v5 0/2] IEP clock module bug fixes
+Date: Mon, 23 Dec 2024 20:45:48 +0530
+Message-ID: <20241223151550.237680-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-The strcpy() function has been deprecated and replaced with strscpy().
-There is an effort to make this change treewide:
-https://github.com/KSPP/linux/issues/88.
+Hi All,
+This series has some bug fixes for IEP module needed by PPS and
+timesync operations.
 
-Signed-off-by: Ethan Carter Edwards <ethan@ethancedwards.com>
----
- drivers/net/hamradio/baycom_par.c     | 4 ++--
- drivers/net/hamradio/baycom_ser_fdx.c | 2 +-
- drivers/net/hamradio/baycom_ser_hdx.c | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+Patch 1/2 fixes firmware load sequence to run all the firmwares
+when either of the ethernet interfaces is up. Move all the code
+common for firmware bringup under common functions.
 
-diff --git a/drivers/net/hamradio/baycom_par.c b/drivers/net/hamradio/bayco=
-m_par.c
-index 00ebc25d0b22..47bc74d3ad8c 100644
---- a/drivers/net/hamradio/baycom_par.c
-+++ b/drivers/net/hamradio/baycom_par.c
-@@ -427,7 +427,7 @@ static int baycom_ioctl(struct net_device *dev, void __=
-user *data,
-                break;
+Patch 2/2 fixes distorted PPS signal when the ethernet interfaces
+are brough down and up. This patch also fixes enabling PPS signal
+after bringing the interface up, without disabling PPS.
 
-        case HDLCDRVCTL_GETMODE:
--               strcpy(hi->data.modename, bc->options ? "par96" : "picpar")=
-;
-+               strscpy(hi->data.modename, bc->options ? "par96" : "picpar"=
-, sizeof(hi->data.modename));
-                if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
-                        return -EFAULT;
-                return 0;
-@@ -439,7 +439,7 @@ static int baycom_ioctl(struct net_device *dev, void __=
-user *data,
-                return baycom_setmode(bc, hi->data.modename);
+MD Danish Anwar (1):
+  net: ti: icssg-prueth: Fix firmware load sequence.
 
-        case HDLCDRVCTL_MODELIST:
--               strcpy(hi->data.modename, "par96,picpar");
-+               strscpy(hi->data.modename, "par96,picpar", sizeof(hi->data.=
-modename));
-                if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
-                        return -EFAULT;
-                return 0;
-diff --git a/drivers/net/hamradio/baycom_ser_fdx.c b/drivers/net/hamradio/b=
-aycom_ser_fdx.c
-index 799f8ece7824..3dda6b215fe3 100644
---- a/drivers/net/hamradio/baycom_ser_fdx.c
-+++ b/drivers/net/hamradio/baycom_ser_fdx.c
-@@ -531,7 +531,7 @@ static int baycom_ioctl(struct net_device *dev, void __=
-user *data,
-                return baycom_setmode(bc, hi->data.modename);
+Meghana Malladi (1):
+  net: ti: icssg-prueth: Fix clearing of IEP_CMP_CFG registers during
+    iep_init
 
-        case HDLCDRVCTL_MODELIST:
--               strcpy(hi->data.modename, "ser12,ser3,ser24");
-+               strscpy(hi->data.modename, "ser12,ser3,ser24", sizeof(hi->d=
-ata.modename));
-                if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
-                        return -EFAULT;
-                return 0;
-diff --git a/drivers/net/hamradio/baycom_ser_hdx.c b/drivers/net/hamradio/b=
-aycom_ser_hdx.c
-index 5d1ab4840753..4f058f61659e 100644
---- a/drivers/net/hamradio/baycom_ser_hdx.c
-+++ b/drivers/net/hamradio/baycom_ser_hdx.c
-@@ -570,7 +570,7 @@ static int baycom_ioctl(struct net_device *dev, void __=
-user *data,
-                break;
+ drivers/net/ethernet/ti/icssg/icss_iep.c      |   8 +
+ drivers/net/ethernet/ti/icssg/icssg_common.c  |  25 --
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |  41 ++-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |   1 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 261 ++++++++++++------
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   5 +-
+ .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  |  24 +-
+ 7 files changed, 244 insertions(+), 121 deletions(-)
 
-        case HDLCDRVCTL_GETMODE:
--               strcpy(hi->data.modename, "ser12");
-+               strscpy(hi->data.modename, "ser12", sizeof(hi->data.modenam=
-e));
-                if (bc->opt_dcd <=3D 0)
-                        strcat(hi->data.modename, (!bc->opt_dcd) ? "*" : (b=
-c->opt_dcd =3D=3D -2) ? "@" : "+");
-                if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
-@@ -584,7 +584,7 @@ static int baycom_ioctl(struct net_device *dev, void __=
-user *data,
-                return baycom_setmode(bc, hi->data.modename);
 
-        case HDLCDRVCTL_MODELIST:
--               strcpy(hi->data.modename, "ser12");
-+               strscpy(hi->data.modename, "ser12", sizeof(hi->data.modenam=
-e));
-                if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
-                        return -EFAULT;
-                return 0;
---
-2.47.1
+base-commit: 92c932b9946c1e082406aa0515916adb3e662e24
+-- 
+2.25.1
 
 
