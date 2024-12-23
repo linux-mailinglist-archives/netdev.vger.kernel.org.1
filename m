@@ -1,148 +1,160 @@
-Return-Path: <netdev+bounces-153979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-153980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 890AF9FA8B3
-	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 00:55:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A159B9FA8CE
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 01:59:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDB8A7A01C8
-	for <lists+netdev@lfdr.de>; Sun, 22 Dec 2024 23:55:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B07416464E
+	for <lists+netdev@lfdr.de>; Mon, 23 Dec 2024 00:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317D918C031;
-	Sun, 22 Dec 2024 23:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443A76FC3;
+	Mon, 23 Dec 2024 00:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YgX/yH7O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFC71DFF8
-	for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 23:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1683209;
+	Mon, 23 Dec 2024 00:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734911723; cv=none; b=b0LrF0WnbMW2DGGNwDE9cTjOJ3OCclnKvwmE0Jp10XZqw1pxys6UXvcNSVAVSanPcEMuZ6Uq1+yA6VYH5tnqib9EoIJmAxFRpD56ewDFYYSJjuXWQ1nnJZU9DZzGaoYIDdRhbEQSy/WC/bCkeBFol+FqE51bgTxWuXAQvXQ4HeA=
+	t=1734915562; cv=none; b=DRGQeJ9xKI98dyd/Y+3p0ypg1RkVEcFM8BJQFwYXwK5uAXWkmOPCdx3uV6Y9kQAjMPk4y1kZpdux1wEX9p4uZ0upxRG29WbQD/jltqytLFP9U6zuC32OfF82F1N+Z4RNxyKhvdvDa6WzqJaIqx9CCY++HKSpTNproge78/TSKjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734911723; c=relaxed/simple;
-	bh=3jES76ghuwcKgjQWXl3znPXljQomYvXzFp2ea8SNS/4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hhEDhQAztMPIF0ghWnlaQbmR0M23OLN7z8RUsFN3hdQHWWqsKqDnE54DU6DMxph45wuphAWt7NG4SF6wM03tqW7AOwN7wft3mX1OLND6C51My6jhGABJa6oDEhx0u411x//cp/0B/Qslk6VsCfVeHLDtCGDBD+VpBg14rGXz84s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a78421a2e1so61238005ab.2
-        for <netdev@vger.kernel.org>; Sun, 22 Dec 2024 15:55:21 -0800 (PST)
+	s=arc-20240116; t=1734915562; c=relaxed/simple;
+	bh=hgu//T+7YSAvIXT3VUGoYlGaahKbQUcLyt85jDFn+fQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TAB/iqjbk7gGRyHPoykRBgnXf7yv27vuadhZwrNpciBykLXe2xSF81UF8e479ilvWPBTIcz7FAwfKPLDATV0Upf9Ghb4eHl7/gz9Bk5wv1Eb/vw35ThsNECl16eIJBnDVVgICe/1WnnLs3QWzgz4BOt8Fr9s5FZRJc3XGPYTSk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YgX/yH7O; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6dcf63155b0so17804556d6.1;
+        Sun, 22 Dec 2024 16:59:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734915559; x=1735520359; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rZiA8+8cgK1p5p7ZdtgnD9VuQej6yYU4CGShpBV3y6M=;
+        b=YgX/yH7O62lI9EkvjmxV3rXkqPlZdFIqH2FcbLCOLsq7KqPEFFUy3BmddmVHqtLl3U
+         5AmHESCCflibSQyilzHAnvotqcX0drYu+S8EZGfvYcAApeo8NHg1WXExefNHwU2s9826
+         DmuKgvNzKp+fnpk+7s8WVuYOwjj3EpBrJe/UXicQ/tTd3R6/PEl6kxTFZGiFePmId/n3
+         l3N2PH6lKUBwUmcwUASBoxl6MF7Uxp7QLl8su4ivK4IJGpABkHOawEGmK7yFkmM+88V3
+         cZq4mm7YQpP4A8mzX/peagc8Hu9DoN/lwlbKtf2YX+TO4IeDmdX3zfUVv2CnMFAW13Jm
+         8WxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734911721; x=1735516521;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4XEfUiCWTdjfEDBb+3Klu13mqoKYsVj++5zC5UiO6l4=;
-        b=o9sdtCujXnEXrri3ZqpVLvEDI2EAhR7pXDPaZZpLwnwG+rOOZ/A+7kB9Zz0riY0PQV
-         yPZ9YpkG55q2AWnyO/QEfUGdzYEzcNAj3vwOKtZf750/yLKlBCIleyjHgKFKl3K2eo0t
-         /ZitzWZb7Y2tTZdWWhQ25ihO6mUGFQGnffTvSKKaNqDCxac7ukmBEBYKfu9LJ6l7WIg6
-         chKUFBTDvSVROY43Pdu15EKxhnWs/K06DgYF21CUFIlvhjh4hyQAER00j9xbOUfa8RIo
-         HqN4tm8At2zLvXnNL4gkt3P0MkMBS5So+x2dcGVlm0iDoWnctx7Ipe0zk79gy8hU+Gtc
-         bvkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV64J5vhbZu8g5Jvf3LEm9kqcT9ksTebunkVgJV1HdoKFLa5VovBDZPoKzP3SCoZ3TwgMPkglo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEGLEYD+nkn1/H9l9D8QqvkFqt3Ckl6SRWfoGxtrcR0jlgBNCZ
-	0z5cxUusS/9/41EGqF+EoqsttmqZECcWG+kCnpI6jYqkVz+SQ9DYjJd8ImomU1iCPzH6wb5QvLs
-	IQH3i4qHMPV8MjM8HMeO8L0feq8pQsDCHLg8l2cFUrrrj/yEVVrFIK4I=
-X-Google-Smtp-Source: AGHT+IGCGcvwSUusj5gvGzq2GbdCO+sZdqqOlFIpC7HjMzw99X8rDSDme5f5SQnOH/5EKrbwIZfzXGCofVWCV3mMSlhZsJaBVIog
+        d=1e100.net; s=20230601; t=1734915559; x=1735520359;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rZiA8+8cgK1p5p7ZdtgnD9VuQej6yYU4CGShpBV3y6M=;
+        b=X7zBUFuAgFe+4fsZc5aaU77FYakA1mi2NUFpTFQf4B1jifYSw5g05y/Gl1gVAweE3G
+         R2VXruZqg/RA0LeTE7kHhhnb5Z/9FLn9KBgryR6S7NmPNzzUezIfGnNXQvWrC4Th2Gva
+         D9FpC59t7sV5I7ABuIkHyK7oBDZZhlhKLajpLiHX9uiFf0j0P00va3x9tjEJSSB9BIit
+         G5toSwXT8bSjUCvwVpXZWPc6mr5lpSl4Kk7u+oiOFJnLsUuuIiwaTpafKZI6aUiYNSPw
+         ACqKWW9G2Yrc3i6snUy0+OIcEbJqsvenzSsHh7jEATx1UM1bqn6obXM0c5mi3SX8HUpT
+         jv8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUQEAHnFdHQ3wbtbfnsmQ85ZohSoyD9/L7DOPp5HR+uuJ3n41ABEvm2WAVMNEZZwSj+8OQm5AYKXAFw@vger.kernel.org, AJvYcCW+4f8JX7pm7+okpmJJVhruP+qwabL3W/CMEbHFO1P0+TN0ULlfy9UrwXX4e/gC9ZRasAP442jy@vger.kernel.org, AJvYcCWRGv5wfp2WQ3QMerCqOBY6hj8LLWMZSYGMYLFP5a59j1wM1rtDWI+ZDVXNk6mt1yqgR5KtjZPHS8+2u7ih@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq1WSKrUPt8hClygadSwcNVk9Qvls0dzVxvigkZzlO4Mqho0XK
+	jPoOqdp0NrRBfEbrzMibtMPRQxIeztb2NwIMFR9WBCRnXPpf5+AJ
+X-Gm-Gg: ASbGncsOArDmbqCDNy7VGQyVI6Za2MJSqpdeyefhdykDgZI0w4OkEbp6iY+ZaqxZpmX
+	hiuV6hi7nJyNrsCQyqalBmQEiN15pJcvPbClsVbLDjpM6NIKIMVWVtIkg+TcA+a1gXDSxnX2E2c
+	R1fyTmGzeNcpc+3b+IVIWV7ka5pV9O10lZ7YElSpkqVq/7igkFxSN7MnUyiwSeI8zRN0nvGIaSc
+	bu0X4FJZzEaTeY0ylBSy1eUeiohRfxj
+X-Google-Smtp-Source: AGHT+IHSkClTiIOMU6UV3EvrSaxtK6rioCiVEHPiLA/vc1hX5NvNNm2L1qNaUclIZVtTYbzu6LhDcw==
+X-Received: by 2002:ad4:5ae9:0:b0:6cb:ef8d:b10 with SMTP id 6a1803df08f44-6dd2339fb2cmr222084936d6.39.1734915559348;
+        Sun, 22 Dec 2024 16:59:19 -0800 (PST)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181bb4b1sm39250996d6.78.2024.12.22.16.59.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Dec 2024 16:59:18 -0800 (PST)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@outlook.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: Inochi Amaoto <inochiama@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: [PATCH net-next v3 0/3] riscv: sophgo: Add ethernet support for SG2044
+Date: Mon, 23 Dec 2024 08:58:36 +0800
+Message-ID: <20241223005843.483805-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a2c:b0:3a7:6f5a:e5c7 with SMTP id
- e9e14a558f8ab-3c2d14d23d2mr88935825ab.4.1734911720791; Sun, 22 Dec 2024
- 15:55:20 -0800 (PST)
-Date: Sun, 22 Dec 2024 15:55:20 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6768a6e8.050a0220.2f3838.000f.GAE@google.com>
-Subject: [syzbot] [intel-wired-lan?] WARNING in e1000_rx_checksum
-From: syzbot <syzbot+1bd718f8eea824d2d157@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net, 
-	edumazet@google.com, intel-wired-lan@lists.osuosl.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	przemyslaw.kitszel@intel.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+The ethernet controller of SG2044 is Synopsys DesignWare IP with
+custom clock. Add glue layer for it.
 
-syzbot found the following issue on:
+Since v2, these patch depends on that following patch that provides
+helper function to compute rgmii clock, As for now, this patch is merged
+in net/for-next
+https://lore.kernel.org/netdev/173380743727.355055.17303486442146316315.git-patchwork-notify@kernel.org/
 
-HEAD commit:    c061cf420ded Merge tag 'trace-v6.13-rc3' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14dfc2df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4f1586bab1323870
-dashboard link: https://syzkaller.appspot.com/bug?extid=1bd718f8eea824d2d157
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Changed from RFC:
+- https://lore.kernel.org/netdev/20241101014327.513732-1-inochiama@gmail.com/
+1. patch 1: apply Krzysztof' tag
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Changed from v2:
+- https://lore.kernel.org/netdev/20241025011000.244350-1-inochiama@gmail.com/
+1. patch 1: merge the first and the second bindings patch to show the all
+            compatible change.
+2. patch 2: use of_device_compatible_match helper function to perform check.
+2. patch 3: remove unused include and sort the left.
+3. patch 3: fix wrong variable usage in sophgo_dwmac_fix_mac_speed
+4. patch 3: drop unused variable in the patch.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-c061cf42.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ac4941665683/vmlinux-c061cf42.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7d5addcac95a/bzImage-c061cf42.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1bd718f8eea824d2d157@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 29 at ./include/linux/skbuff.h:5126 skb_checksum_none_assert include/linux/skbuff.h:5126 [inline]
-WARNING: CPU: 1 PID: 29 at ./include/linux/skbuff.h:5126 e1000_rx_checksum.constprop.0+0x176/0x1e0 drivers/net/ethernet/intel/e1000/e1000_main.c:3954
-Modules linked in:
-CPU: 1 UID: 0 PID: 29 Comm: ksoftirqd/1 Not tainted 6.13.0-rc3-syzkaller-00062-gc061cf420ded #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:skb_checksum_none_assert include/linux/skbuff.h:5126 [inline]
-RIP: 0010:e1000_rx_checksum.constprop.0+0x176/0x1e0 drivers/net/ethernet/intel/e1000/e1000_main.c:3954
-Code: 00 00 00 00 fc ff df 80 3c 02 00 75 76 48 83 85 b0 04 00 00 01 5b 5d 41 5c 41 5d 41 5e 41 5f e9 20 7b 3b fb e8 1b 7b 3b fb 90 <0f> 0b 90 e9 e7 fe ff ff e8 0d 7b 3b fb 48 8d bd a8 04 00 00 48 b8
-RSP: 0018:ffffc900006878e0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000007 RCX: ffffffff865e991c
-RDX: ffff88801deb8000 RSI: ffffffff865e9a35 RDI: 0000000000000001
-RBP: ffff888108168d80 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000020 R11: 0000000000000000 R12: ffff88805120a140
-R13: 0000000000000020 R14: ffff88805120a1c0 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88806a700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffdcc27d098 CR3: 0000000046c5e000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- e1000_clean_jumbo_rx_irq+0xf3e/0x28c0 drivers/net/ethernet/intel/e1000/e1000_main.c:4275
- e1000_clean+0x9d6/0x2700 drivers/net/ethernet/intel/e1000/e1000_main.c:3807
- __napi_poll.constprop.0+0xb7/0x550 net/core/dev.c:6883
- napi_poll net/core/dev.c:6952 [inline]
- net_rx_action+0xa94/0x1010 net/core/dev.c:7074
- handle_softirqs+0x213/0x8f0 kernel/softirq.c:561
- run_ksoftirqd kernel/softirq.c:950 [inline]
- run_ksoftirqd+0x3a/0x60 kernel/softirq.c:942
- smpboot_thread_fn+0x661/0xa30 kernel/smpboot.c:164
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+Changed from v1:
+- https://lore.kernel.org/netdev/20241021103617.653386-1-inochiama@gmail.com/
+1. patch 2: remove sophgo,syscon as this mac delay is resolved.
+2. patch 2: apply all the properties unconditionally.
+3. patch 4: remove sophgo,syscon code as this mac delay is resolved.
+4. patch 4: use the helper function to compute rgmii clock.
+5. patch 4: use remove instead of remove_new for the platform driver.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Inochi Amaoto (3):
+  dt-bindings: net: Add support for Sophgo SG2044 dwmac
+  net: stmmac: platform: Add snps,dwmac-5.30a IP compatible string
+  net: stmmac: Add glue layer for Sophgo SG2044 SoC
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ .../devicetree/bindings/net/snps,dwmac.yaml   |   4 +
+ .../bindings/net/sophgo,sg2044-dwmac.yaml     | 124 ++++++++++++++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 105 +++++++++++++++
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |  17 ++-
+ 6 files changed, 257 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+--
+2.47.1
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
