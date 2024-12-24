@@ -1,154 +1,184 @@
-Return-Path: <netdev+bounces-154221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5765C9FC283
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 22:12:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFCF59FC2C4
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 00:03:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9F26164D70
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 21:12:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C5821644BA
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 23:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA68818FDD0;
-	Tue, 24 Dec 2024 21:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0B41922FB;
+	Tue, 24 Dec 2024 23:03:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="P1cU2TEj"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UastsdtV";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kEjkYiqJ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UastsdtV";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kEjkYiqJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from prime.voidband.net (prime.voidband.net [199.247.17.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547B7632;
-	Tue, 24 Dec 2024 21:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.247.17.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527B914901B;
+	Tue, 24 Dec 2024 23:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735074735; cv=none; b=KyXGcCBpZeGIG5HS2+wYrbqp6nerGmuXjT7uh8J6wS0OybK4uEo6FkQUQlrDKroE0wvI3oDixcImXZYd0mg3DmtZqU0Xi792lx8c9/BFHX0iKPArDPYON0sja5rdinaH29dell+XmdW6jZwyVKXYe6u0pesKDth5/5adJcu0hPI=
+	t=1735081381; cv=none; b=NmCWEgmaq8eL7DzE0MmQx24dYd/Ls93xdJH5yAlpiOWB2zMRXt4pfZbDmwMRi65hUVUocnimW/3lGdjPqCtj822rUkRm8XorOClsFiH339ZCrlaOrV4xZFvU9zNqXLlDXGlTvFWNOpilg3LrBNVd21Ifs9QPVe23YxBGHjmLt6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735074735; c=relaxed/simple;
-	bh=491cSF7LJvUawIvquQXMcEBfcNPtn2qI+rNChsFR/zI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bMmhQ8K2BiP7zXd0tmfn0G5hPLinpnE+njuzxuyHWSNvYnfLkRfHM8YK0PcA70SOf5PLYCUdtSOVckue2Z2VmIN/gPW9Dn3bbh6xDvRcSVZRB7VV7WUjPhnAkDEzDQQEBFpJ0Yvdy/Jtv6bqGDit5ih86886ZbvhIQ3hfwHSjgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name; spf=pass smtp.mailfrom=natalenko.name; dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b=P1cU2TEj; arc=none smtp.client-ip=199.247.17.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=natalenko.name
-Received: from spock.localnet (unknown [212.20.115.26])
+	s=arc-20240116; t=1735081381; c=relaxed/simple;
+	bh=Lw4NoN++ZJoMWZiseT3NVt8IBIZGBJWGAzuJtZO4X5E=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=UcS9hX2KRVNWbFYICAXLCAb2nxBjEGa/qOs2G/O5CFuQpoVXRzeQ5tkWzVC80YgxkHjham2M/0pMb0JT5DpZKFWSTeC3wotylPWZipOjjAJvjbtb/z41MFxnMjANN6JZpHJ7/2RvGazPGAbDNhAlIlEqua6F/GWrrdTHmAFV8tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=UastsdtV; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kEjkYiqJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=UastsdtV; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kEjkYiqJ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by prime.voidband.net (Postfix) with ESMTPSA id E3E44633BF6E;
-	Tue, 24 Dec 2024 22:05:06 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-	s=dkim-20170712; t=1735074307;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=taQm4XxtGduwWfvw/iGse424SuauPdikVpwQ4BIbPL8=;
-	b=P1cU2TEjofQahYFORMOe+i09VlwXUZoV28dIC6T3mj0AjhreBjT44uNGEYW3gHofWOYQV7
-	D1wF7pJOk5eIrtmE+JCh8uvFNWWq+y7bHaPQaESoNNuY0sBgaabFYYB1/JyWU4uBKvN9an
-	rzCLyA8lWbmmEsfjCinG/2ctQTfE+vY=
-From: Oleksandr Natalenko <oleksandr@natalenko.name>
-To: Neal Cardwell <ncardwell@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [bbr3] Suspicious use of bbr_param
-Date: Tue, 24 Dec 2024 22:04:53 +0100
-Message-ID: <4616579.LvFx2qVVIh@natalenko.name>
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 88C4420162;
+	Tue, 24 Dec 2024 22:54:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1735080851; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NSc8A8DsyKSICOfIB8T/zZ5Kt+I37ZOAN2GTAyX9U0w=;
+	b=UastsdtV/6FP+WH2grVYfhyEbOf2ypcyrIwDTb8Sb8lfq8V3ZSNUidYiQ+oZYOpMVJBavm
+	I1FM1CrGu/lW80ZgctuZYaexeRFIWJ7BgAMcu3vr+u2Q4Ffpe6uHdTHplOsRnujB63iQYH
+	h6XdxP5p7JILYFMYcHgKgt+Us0IUsdI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1735080851;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NSc8A8DsyKSICOfIB8T/zZ5Kt+I37ZOAN2GTAyX9U0w=;
+	b=kEjkYiqJghcEiluVgVuJSRzV32Ktk6PZjs1w+C+py6f/xLdm6PmvAGPZNsofVrxfB/jEMs
+	LyRa+Gt8CL3uDnCA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=UastsdtV;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=kEjkYiqJ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1735080851; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NSc8A8DsyKSICOfIB8T/zZ5Kt+I37ZOAN2GTAyX9U0w=;
+	b=UastsdtV/6FP+WH2grVYfhyEbOf2ypcyrIwDTb8Sb8lfq8V3ZSNUidYiQ+oZYOpMVJBavm
+	I1FM1CrGu/lW80ZgctuZYaexeRFIWJ7BgAMcu3vr+u2Q4Ffpe6uHdTHplOsRnujB63iQYH
+	h6XdxP5p7JILYFMYcHgKgt+Us0IUsdI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1735080851;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NSc8A8DsyKSICOfIB8T/zZ5Kt+I37ZOAN2GTAyX9U0w=;
+	b=kEjkYiqJghcEiluVgVuJSRzV32Ktk6PZjs1w+C+py6f/xLdm6PmvAGPZNsofVrxfB/jEMs
+	LyRa+Gt8CL3uDnCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A424913999;
+	Tue, 24 Dec 2024 22:54:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id jCojFo87a2evVgAAD6G6ig
+	(envelope-from <neilb@suse.de>); Tue, 24 Dec 2024 22:54:07 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart2349887.ElGaqSPkdT";
- micalg="pgp-sha256"; protocol="application/pgp-signature"
+From: "NeilBrown" <neilb@suse.de>
+To: "Yang Erkun" <yangerkun@huaweicloud.com>
+Cc: chuck.lever@oracle.com, jlayton@kernel.org, okorniev@redhat.com,
+ Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org, anna@kernel.org,
+ linux-nfs@vger.kernel.org, netdev@vger.kernel.org, yangerkun@huawei.com,
+ yangerkun@huaweicloud.com, yi.zhang@huawei.com
+Subject: Re: [RFC PATCH 0/5] nfsd/sunrpc: cleanup resource with sync mode
+In-reply-to: <20241216142156.4133267-1-yangerkun@huaweicloud.com>
+References: <20241216142156.4133267-1-yangerkun@huaweicloud.com>
+Date: Wed, 25 Dec 2024 09:53:55 +1100
+Message-id: <173508083549.11072.301112272697956815@noble.neil.brown.name>
+X-Rspamd-Queue-Id: 88C4420162
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
 
---nextPart2349887.ElGaqSPkdT
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Oleksandr Natalenko <oleksandr@natalenko.name>
-To: Neal Cardwell <ncardwell@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [bbr3] Suspicious use of bbr_param
-Date: Tue, 24 Dec 2024 22:04:53 +0100
-Message-ID: <4616579.LvFx2qVVIh@natalenko.name>
-MIME-Version: 1.0
+On Tue, 17 Dec 2024, Yang Erkun wrote:
+> From: Yang Erkun <yangerkun@huawei.com>
+> 
+> After f8c989a0c89a ("nfsd: release svc_expkey/svc_export with
+> rcu_work"), svc_export_put/expkey_put will call path_put with async
+> mode. This can lead some unexpected failure:
+> 
+> mkdir /mnt/sda
+> mkfs.xfs -f /dev/sda
+> echo "/ *(rw,no_root_squash,fsid=0)" > /etc/exports
+> echo "/mnt *(rw,no_root_squash,fsid=1)" >> /etc/exports
+> exportfs -ra
+> service nfs-server start
+> mount -t nfs -o vers=4.0 127.0.0.1:/mnt /mnt1
+> mount /dev/sda /mnt/sda
+> touch /mnt1/sda/file
+> exportfs -r
+> umount /mnt/sda # failed unexcepted
+> 
+> The touch above will finally call nfsd_cross_mnt, add refcount to mount,
+> and then add cache_head. Before this commit, exportfs -r will call
+> cache_flush to cleanup all cache_head, and path_put in
+> svc_export_put/expkey_put will be finished with sync mode. So, the
+> latter umount will always success. However, after this commit, path_put
+> will be called with async mode, the latter umount may failed, and if we
+> add some delay, umount will success too. Personally I think this bug and
+> should be fixed. We first revert before bugfix patch, and then fix the
+> original bug with a different way.
 
-Hello Neal.
+Thanks for these patches.  I think they are certainly a better approach
+to fixing the problem - well done.
 
-One of my users reports [1] that BBRv3 from [2] cannot be built with LLVM=1 and WERROR=y because of the following warnings:
+My only thought was that instead of changing how cache_check() works, we
+could introduce cache_check_rcu() which doesn't drop the ref.
+cache_check() would then just call that then optionally drop the ref.
+I'm not convinced that is better, so I'm just mentioning it in case
+anyone else wants to agree.  I'm happy for the patch set to be applied
+as-is.
 
-net/ipv4/tcp_bbr.c:1079:48: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
- 1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
-      |                                                       ^
- 1080 |             bbr_param(sk, ecn_factor) &&
-      |             ~~~~~~~~~~~~~~~~~~~~~~~~~
-net/ipv4/tcp_bbr.c:1079:48: note: use '&' for a bitwise operation
- 1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
-      |                                                       ^~
-      |                                                       &
-net/ipv4/tcp_bbr.c:1079:48: note: remove constant to silence this warning
- 1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
-      |                                                       ^~
- 1080 |             bbr_param(sk, ecn_factor) &&
-      |             ~~~~~~~~~~~~~~~~~~~~~~~~~
-net/ipv4/tcp_bbr.c:1187:24: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
- 1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
-      |                               ^  ~~~~~~~~~~~~~~~~~~~~~~~~~
-net/ipv4/tcp_bbr.c:1187:24: note: use '&' for a bitwise operation
- 1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
-      |                               ^~
-      |                               &
-net/ipv4/tcp_bbr.c:1187:24: note: remove constant to silence this warning
- 1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
-      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-net/ipv4/tcp_bbr.c:1385:24: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
- 1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
-      |                               ^  ~~~~~~~~~~~~~~~~~~~~~~~~~
-net/ipv4/tcp_bbr.c:1385:24: note: use '&' for a bitwise operation
- 1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
-      |                               ^~
-      |                               &
-net/ipv4/tcp_bbr.c:1385:24: note: remove constant to silence this warning
- 1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
-      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-3 warnings generated.
+ Reviewed-By: NeilBrown <neilb@suse.de>
 
-The usage of bbr_param() with ecn_thresh and ecn_factor here does indeed look suspicious. In both cases, the bbr_param() macro gets evaluated to `static const u32` values, and those get &&'ed in the if statements. The consts are positive, so they do not have any impact in the conditional expressions. FWIW, the sk argument is dropped by the macro altogether, so I'm not sure what was the intention here.
-
-Interestingly, unlike Clang, GCC stays silent.
-
-Could you please comment on this?
-
-Appreciate your time, and looking forward to your reply.
-
-Thank you.
-
-[1] https://codeberg.org/pf-kernel/linux/issues/11
-[2] https://github.com/google/bbr
-
--- 
-Oleksandr Natalenko, MSE
---nextPart2349887.ElGaqSPkdT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEZUOOw5ESFLHZZtOKil/iNcg8M0sFAmdrIfYACgkQil/iNcg8
-M0tUvhAAvH9vhE+m5NFQnz1waI/hMctv+xK22xR1DMDzhObQEMhj1F+5ljXcutbT
-MXX8A0br87BjFasYd/kaSrbxPXqoNk5dYKm+WyEOpMDrT2SSIrln61FgHRQIBrAU
-su8+8EALeJ4lnFgxGN6Wi9E4iLYVXN5VdJiwrcu3ks1b2JcPVkRWNSev/SObeA3e
-fuQdIb6A5rigvqiF93qTTtr+/Rgf/yRPlZ331HopVTMHIhGbcMoHYpQ2GHd3jgb3
-cnC8r+Ddo+209gBxPJs3Dyqous6Ujitm0b0O3nBclPyCqLclfcHYnlse/SCUA4Xe
-7xUjvoBnGSwQRVQdart9gm2cjGNpunJoIGY2qYZU6vlPh8HMx4rkGGk8xl6W6Ned
-bk963DJCr00FUG9d+pa/wXJD6Fx1KORZZd7o9vqiO0TluSmDxxNzvZZ6mdngX0Zc
-7OEQ0kfevqfQvo1Cg7cn0XAF1qVquzcIAxmGalWXI8vxLA+J4sMDrMziy6PpoGAs
-nAlw2B8f9g4NxYbfFXMDM2vsgEQ+tGDfti58iwl7dpUBYw69jHZ7CpZ8MPH1DBro
-+s3s4Usxr0AqaYQQgvXJ5zF+hb0HdauZwEd8OCs0R0C8TrLMcu8hY0nscxyJPGMS
-7HfDUNer9WjGegoAqyRdZwfJobEwYLTiOiGqOTeOJ1UUavu2+CY=
-=bHUW
------END PGP SIGNATURE-----
-
---nextPart2349887.ElGaqSPkdT--
-
-
-
+Thanks,
+NeilBrown
 
