@@ -1,214 +1,344 @@
-Return-Path: <netdev+bounces-154166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 891FB9FBD85
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:47:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D29F9FBD91
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:50:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD161188458A
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 12:47:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D17C8163806
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 12:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FBF1C3C1C;
-	Tue, 24 Dec 2024 12:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23ACB1B3954;
+	Tue, 24 Dec 2024 12:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="YFi9Zbs7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O/mcVMLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-zteg10011501.me.com (pv50p00im-zteg10011501.me.com [17.58.6.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0891B3935
-	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 12:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CD98836
+	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 12:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735044444; cv=none; b=lHv3ZjQW+HJjzE8PQJasHlD4oseFgQVc6poYqs64UBDnb09upCy1yNlP3KJStKGl3I9H5ZqkwBT8B8Yg3SAa+Hgn3Ag3/28oBxuqg/yGpN8U0xye0xdzejCvUyEhZuYFCgpgaqAbtnFd2Np0mYpeFwPx0fcUq5CO/JGYbgen6GM=
+	t=1735044652; cv=none; b=JUWh9NAwVFKJ+vifeodTft0Od36Qro4IUF2/X0FDdKt19UxcztZ/q3G69JsUW22ZoVuJH/DyYPRTmdKrptn/tKu7b+dEGHCNmG2+5figQ9yimBKQpVa3Y4WauqlFjbYTaegR0c/W0moo2QNprJ5rCxR/kVDCGOHB22ox4g1/99c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735044444; c=relaxed/simple;
-	bh=jz7QvJ+ABNYBcgbWnK7bmWteqlRX0MwhXNYUaRhTFq0=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=lxJSjMIobp1cWjSOFI/x+IO0Rucmmkq7+SbceiOFO9SJfavBhwQOvu3tgMrzLQVtKkU1zfNjxqEr/fY7oQmY2gyoZilVX+vtfBP8YZIR18q0zfwhc7NpsFVUuiWlSiRUy9j+RdUcDggT3Yw8g5FasXOr77O0XhKHEOR6tChQCC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=YFi9Zbs7; arc=none smtp.client-ip=17.58.6.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1735044441;
-	bh=aPJ6ydAdvdNnVcVpPHJYbUDApdothXqe1OmXEwX1GuM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type:
-	 x-icloud-hme;
-	b=YFi9Zbs7f4LygIMuRnfGAXJ8oAU/9NiGTlnsMwAwdl4a8TA148y4phA5sa53tvWn1
-	 wuyo3qCRvNidXq8BXE7SS6XZezmBPn36kbc9b4PlewqM4KmvENpNwql5lFJo8eLCM/
-	 rV7X0FHJAudDGIbDucP/wtt1tsqYh4IqQR8yDZm136vx5P9zlio1tRDO+usLuKn2Ji
-	 Oy2/Mosdtw1/XDgdas1WxNREnH2fDCfk4zeW4xz2HUVjbA2AnZAd0qugcGxt14mOB9
-	 r/wdDZ4qHr4sgJYQN0YxwRALPc+C4a8M9mVvJQwcNf0fN+FTNbWSRvCrQ2lTNJH4/l
-	 mvWeYVRv/tnmw==
-Received: from [192.168.1.25] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-zteg10011501.me.com (Postfix) with ESMTPSA id 48DE04A0324;
-	Tue, 24 Dec 2024 12:47:09 +0000 (UTC)
-Message-ID: <534318f9-b040-4839-b6dc-585810ad8362@icloud.com>
-Date: Tue, 24 Dec 2024 20:47:06 +0800
+	s=arc-20240116; t=1735044652; c=relaxed/simple;
+	bh=/txl0AtC3Ee2YVwk9Mlkb7bibIdExSGTfUgjqfhVdR8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GC4K7zjzAd0oRbjgM/klXbheipsztD5K4x37KA6v0wuDi8RerA0ne1DY1/doH98LoHYy6ZWMAhUVMBPdO5SvZ8hYozvuMWYsSQHWFiNOwLROot9RpsSigRONQyg8WjomFBDhFGMam/jOaL5l+Vod1OLSse6cdbe6mcDXjUCYpaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O/mcVMLH; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e3a0acba5feso4014400276.2
+        for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 04:50:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735044649; x=1735649449; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=93thr2Fkhs8J+WvRWFlnKgwOZGtiTbWQbLNkyOWAhxw=;
+        b=O/mcVMLHymVxWkfYX8422lGkSPQkWhx+LyqkhfFmafSWTc5k/o9DD1n9hMoWVg9DWy
+         YkcwlKNEbN10sb4svSBNW32+dXD9+rrEAT3Nocm0nZeINcbVi2KjRlrwj6aqVirJ19lM
+         Rx5gDX9UiZCBwU1EHBBgCiUzbu0k3wtnVQciZ3T/18xZQ53KLIS8nFyQoW3UpzKFtx0A
+         Wc406dlFhCXDbAyTvcc0bZoh3IBjEIUnevzie7r/1imnqnFzpdJ0Pr2NMNDe/HHmmRZI
+         yGIOMdJNrg/0hHN1tezKf12a8pINuEQOrUrW4a0lpWt1iCSYe01sgMP+T98MIfp6k6mS
+         BENQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735044649; x=1735649449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=93thr2Fkhs8J+WvRWFlnKgwOZGtiTbWQbLNkyOWAhxw=;
+        b=JM0290KT/g9NFxwydVslwVcF/PCxZo0oSubEkqZBZqS74+bCG3QVFeVB4qLRMu6UzL
+         BigUDg58vNCkr3uvzfAmIPdA3pRZSz4R94P9SPzV2bUx5aymi6Ja3zViBzJI6TLDc7N5
+         9EaUf3ovoIgJg+Za5UgtPokOgWvAZikRF+NbyV3tLdts0+4TCRnCZGgdsj0XneRfmNp7
+         p85GtkVRSllBkoAZFGfqr3s1fHjy3qEtqcKO8tBiLiL41eY++/wR9XDzG35V1fm56f+i
+         y9kuGAUgY2GVQ1U1YhSNAxdwkyyZIvMr07t27fuYpz7Iv7c2zPOfVr5K9NtAqhkwJnq3
+         zSOA==
+X-Gm-Message-State: AOJu0YwOUyhNWmN7kUq1L1BJ9AbaMOe20WFxOx9cV6sZme6A18DAJLwy
+	ihXCsk+Vg6ocDi5MbVEzm8hR7CSVqbN6Xc8Fn47dkJkVnFqKgCNgdz2NTGJP26bxk20HZGL+uFp
+	/+38+zasjKtgp/tuEyF6sjPoaib0=
+X-Gm-Gg: ASbGncvCSA7oHEm946aWb7Vstey2IpRNoC+ex4av97Zs1+6FS0w7eMSkGzoB/ZHlG3B
+	QfErE3f3otgAWEDb2XyCaXi//lSOT9jDERkNEWtIZ
+X-Google-Smtp-Source: AGHT+IECjU9Z7HwYD1PTFaHWmgW5UP5ero20TPyF8or++JBxs4NO0YNQgvb4KNvqXrVBlMPSgfvTLKEjp199VveBh0E=
+X-Received: by 2002:a25:6889:0:b0:e53:d870:76f6 with SMTP id
+ 3f1490d57ef6-e53d8707b26mr841855276.43.1735044649140; Tue, 24 Dec 2024
+ 04:50:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Zijun Hu <zijun_hu@icloud.com>
-Subject: Re: [PATCH v4 04/11] driver core: Constify API device_find_child()
- then adapt for various usages
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
- James Bottomley <James.Bottomley@HansenPartnership.com>,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
- linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
- linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
- linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
- linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-serial@vger.kernel.org, netdev@vger.kernel.org,
- Zijun Hu <quic_zijuhu@quicinc.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Takashi Sakamoto <o-takashi@sakamocchi.jp>
-References: <20241211-const_dfc_done-v4-0-583cc60329df@quicinc.com>
- <20241211-const_dfc_done-v4-4-583cc60329df@quicinc.com>
- <20241223203309.00004d51@huawei.com>
-Content-Language: en-US
-In-Reply-To: <20241223203309.00004d51@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: kDjRjbNqxndWcj5UTxaD9i644sdeCsbD
-X-Proofpoint-GUID: kDjRjbNqxndWcj5UTxaD9i644sdeCsbD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-24_04,2024-12-24_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0
- mlxlogscore=999 clxscore=1015 adultscore=0 bulkscore=0 mlxscore=0
- suspectscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2308100000 definitions=main-2412240110
+References: <CAA=kqWJWjEr36iZXZ+GFeaqxx35kXTO0WdGZXsL4Q7cvsT3GYg@mail.gmail.com>
+ <20241224120049.bjcxfqrwaaxazosw@skbuf>
+In-Reply-To: <20241224120049.bjcxfqrwaaxazosw@skbuf>
+From: sai kumar <skmr537@gmail.com>
+Date: Tue, 24 Dec 2024 18:20:38 +0530
+Message-ID: <CAA=kqW++FYvBfWU8c111pdYVFJk5=rhF5R5_N+wk5uUs=3fo=g@mail.gmail.com>
+Subject: Re: DSA Switch: query: Switch configuration, data plane doesn't work
+ whereas control plane works
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/12/24 04:33, Jonathan Cameron wrote:
-> On Wed, 11 Dec 2024 08:08:06 +0800
-> Zijun Hu <zijun_hu@icloud.com> wrote:
-> 
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>
->> Constify the following API:
->> struct device *device_find_child(struct device *dev, void *data,
->> 		int (*match)(struct device *dev, void *data));
->> To :
->> struct device *device_find_child(struct device *dev, const void *data,
->>                                  device_match_t match);
->> typedef int (*device_match_t)(struct device *dev, const void *data);
->> with the following reasons:
->>
->> - Protect caller's match data @*data which is for comparison and lookup
->>   and the API does not actually need to modify @*data.
->>
->> - Make the API's parameters (@match)() and @data have the same type as
->>   all of other device finding APIs (bus|class|driver)_find_device().
->>
->> - All kinds of existing device match functions can be directly taken
->>   as the API's argument, they were exported by driver core.
->>
->> Constify the API and adapt for various existing usages by simply making
->> various match functions take 'const void *' as type of match data @data.
-> 
-> There are a couple of places I noticed where you changed types
-> that aren't related to the specific change this is making.
-> They are almost certainly fine but I'd either like a specific note
-> on that in this patch description or just change the elements
-> that are directly affected by this change.
-> 
+Thanks Vladimir for your inputs.
 
-okay, will correct commit message in v5.
+I tried checking the statistics, the in_broadcasts count increases
+with respect to client dhcp discover broadcasts.
+But the same is not happening with external cpu port eth1, the eth1
+in_broadcasts and in_accepted are 0 , Observing the rx frame errors on
+eth1 but
+this count doesn't match to the clients broadcast packets count.
 
-v5 will mention these changes will bring extra code improvement as side
-effects during achieving main purpose.
-
->>
->> Reviewed-by: Alison Schofield <alison.schofield@intel.com>
->> Reviewed-by: Takashi Sakamoto <o-takashi@sakamocchi.jp>
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> 
->> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->> index d778996507984a759bbe84e7acac3774e0c7af98..bfecd71040c2f4373645380b4c31327d8b42d095 100644
->> --- a/drivers/cxl/core/region.c
->> +++ b/drivers/cxl/core/region.c
-> 
->> @@ -1722,10 +1722,12 @@ static struct cxl_port *next_port(struct cxl_port *port)
->>  	return port->parent_dport->port;
->>  }
->>  
->> -static int match_switch_decoder_by_range(struct device *dev, void *data)
->> +static int match_switch_decoder_by_range(struct device *dev,
->> +					 const void *data)
->>  {
->>  	struct cxl_switch_decoder *cxlsd;
->> -	struct range *r1, *r2 = data;
->> +	const struct range *r1, *r2 = data;
-> 
-> As below. I'd not touch type of things you don't need to touch.
-> 
-explained below.
-
->> +
->>  
->>  	if (!is_switch_decoder(dev))
->>  		return 0;
->> @@ -3176,9 +3178,10 @@ static int devm_cxl_add_dax_region(struct cxl_region *cxlr)
->>  	return rc;
->>  }
->>  
->> -static int match_root_decoder_by_range(struct device *dev, void *data)
->> +static int match_root_decoder_by_range(struct device *dev,
->> +				       const void *data)
->>  {
->> -	struct range *r1, *r2 = data;
->> +	const struct range *r1, *r2 = data;
-> 
-> From the point of view of keeping the patch to what it 'needs'
-> to touch, should leave type of r1 alone.
-> I've not looked at whether this causes any problems, just whether
-> it is relevant to this change.
-> 
-
-1) i have checked that will not cause problem, may have code improvement
-
-2) this change (2 lines) is simpler than below(3 lines)
-   -	struct range *r1, *r2 = data;
-   +    struct range *r1;
-   +    const struct range *r2 = data;
-
-3) r1 and r2 are used for range_contains() whose prototype was changed
-to takes 2 const pointers recently.
-
-4) make r1 & r2 keep the same type as original.
-
->>  	struct cxl_root_decoder *cxlrd;
->>  
->>  	if (!is_root_decoder(dev))
->> @@ -3189,11 +3192,11 @@ static int match_root_decoder_by_range(struct device *dev, void *data)
->>  	return range_contains(r1, r2);
->>  }
->>  
->> -static int match_region_by_range(struct device *dev, void *data)
->> +static int match_region_by_range(struct device *dev, const void *data)
->>  {
->>  	struct cxl_region_params *p;
->>  	struct cxl_region *cxlr;
->> -	struct range *r = data;
->> +	const struct range *r = data;
->>  	int rc = 0;
->>  
-> 
+ethtool -S lan1
+NIC statistics:
+     tx_packets: 7
+     tx_bytes: 626
+     rx_packets: 0
+     rx_bytes: 0
+     in_good_octets: 18112
+     in_bad_octets: 0
+     in_unicast: 0
+     in_broadcasts: 51
+     in_multicasts: 5
+     in_pause: 0
+     in_undersize: 0
+     in_fragments: 0
+     in_oversize: 0
+     in_jabber: 0
+     in_rx_error: 0
+     in_fcs_error: 0
+     out_octets: 7792
+     out_unicast: 0
+     out_broadcasts: 105
+     out_multicasts: 12
+     out_pause: 0
+     excessive: 0
+     collisions: 0
+     deferred: 0
+     single: 0
+     multiple: 0
+     out_fcs_error: 0
+     late: 0
+     hist_64bytes: 105
+     hist_65_127bytes: 17
+     hist_128_255bytes: 0
+     hist_256_511bytes: 51
+     hist_512_1023bytes: 0
+     hist_1024_max_bytes: 0
+     in_discards: 0
+     in_filtered: 0
+     in_accepted: 56
+     in_bad_accepted: 0
+     in_good_avb_class_a: 0
+     in_good_avb_class_b: 0
+     in_bad_avb_class_a: 0
+     in_bad_avb_class_b: 0
+     tcam_counter_0: 0
+     tcam_counter_1: 0
+     tcam_counter_2: 0
+     tcam_counter_3: 0
+     in_da_unknown: 5
+     in_management: 4
+     out_queue_0: 117
+     out_queue_1: 0
+     out_queue_2: 0
+     out_queue_3: 0
+     out_queue_4: 0
+     out_queue_5: 0
+     out_queue_6: 0
+     out_queue_7: 0
+     out_cut_through: 0
+     out_octets_a: 0
+     out_octets_b: 0
+     out_management: 0
+     atu_member_violation: 0
+     atu_miss_violation: 0
+     atu_full_violation: 0
+     vtu_member_violation: 0
+     vtu_miss_violation: 0
 
 
+ethtool -S eth1
+NIC statistics:
+     interrupts [CPU 0]: 12
+     interrupts [CPU 1]: 9
+     interrupts [CPU 2]: 5
+     interrupts [CPU 3]: 7
+     interrupts [TOTAL]: 33
+     rx packets [CPU 0]: 0
+     rx packets [CPU 1]: 0
+     rx packets [CPU 2]: 0
+     rx packets [CPU 3]: 0
+     rx packets [TOTAL]: 0
+     tx packets [CPU 0]: 2
+     tx packets [CPU 1]: 0
+     tx packets [CPU 2]: 12
+     tx packets [CPU 3]: 0
+     tx packets [TOTAL]: 14
+     tx recycled [CPU 0]: 0
+     tx recycled [CPU 1]: 0
+     tx recycled [CPU 2]: 0
+     tx recycled [CPU 3]: 0
+     tx recycled [TOTAL]: 0
+     tx confirm [CPU 0]: 6
+     tx confirm [CPU 1]: 3
+     tx confirm [CPU 2]: 2
+     tx confirm [CPU 3]: 3
+     tx confirm [TOTAL]: 14
+     tx S/G [CPU 0]: 0
+     tx S/G [CPU 1]: 0
+     tx S/G [CPU 2]: 0
+     tx S/G [CPU 3]: 0
+     tx S/G [TOTAL]: 0
+     rx S/G [CPU 0]: 0
+     rx S/G [CPU 1]: 0
+     rx S/G [CPU 2]: 0
+     rx S/G [CPU 3]: 0
+     rx S/G [TOTAL]: 0
+     tx error [CPU 0]: 0
+     tx error [CPU 1]: 0
+     tx error [CPU 2]: 0
+     tx error [CPU 3]: 0
+     tx error [TOTAL]: 0
+     rx error [CPU 0]: 6
+     rx error [CPU 1]: 6
+     rx error [CPU 2]: 3
+     rx error [CPU 3]: 4
+     rx error [TOTAL]: 19
+     bp count [CPU 0]: 128
+     bp count [CPU 1]: 128
+     bp count [CPU 2]: 128
+     bp count [CPU 3]: 128
+     bp count [TOTAL]: 512
+     rx dma error: 0
+     rx frame physical error: 2
+     rx frame size error: 17
+     rx header error: 0
+     rx csum error: 0
+     qman cg_tdrop: 0
+     qman wred: 0
+     qman error cond: 0
+     qman early window: 0
+     qman late window: 0
+     qman fq tdrop: 0
+     qman fq retired: 0
+     qman orp disabled: 0
+     congestion time (ms): 0
+     entered congestion: 0
+     congested (0/1): 0
+     p00_in_good_octets: 0
+     p00_in_bad_octets: 2
+     p00_in_unicast: 0
+     p00_in_broadcasts: 0
+     p00_in_multicasts: 0
+     p00_in_pause: 0
+     p00_in_undersize: 0
+     p00_in_fragments: 0
+     p00_in_oversize: 0
+     p00_in_jabber: 0
+     p00_in_rx_error: 1
+     p00_in_fcs_error: 0
+     p00_out_octets: 45440
+     p00_out_unicast: 0
+     p00_out_broadcasts: 312
+     p00_out_multicasts: 63
+     p00_out_pause: 0
+     p00_excessive: 0
+     p00_collisions: 0
+     p00_deferred: 0
+     p00_single: 0
+     p00_multiple: 0
+     p00_out_fcs_error: 0
+     p00_late: 0
+     p00_hist_64bytes: 0
+     p00_hist_65_127bytes: 306
+     p00_hist_128_255bytes: 8
+     p00_hist_256_511bytes: 61
+     p00_hist_512_1023bytes: 0
+     p00_hist_1024_max_bytes: 0
+     p00_in_discards: 0
+     p00_in_filtered: 0
+     p00_in_accepted: 0
+     p00_in_bad_accepted: 0
+     p00_in_good_avb_class_a: 0
+     p00_in_good_avb_class_b: 0
+     p00_in_bad_avb_class_a: 0
+     p00_in_bad_avb_class_b: 0
+     p00_tcam_counter_0: 0
+     p00_tcam_counter_1: 0
+     p00_tcam_counter_2: 0
+     p00_tcam_counter_3: 0
+     p00_in_da_unknown: 0
+     p00_in_management: 0
+     p00_out_queue_0: 373
+     p00_out_queue_1: 0
+     p00_out_queue_2: 0
+     p00_out_queue_3: 0
+     p00_out_queue_4: 0
+     p00_out_queue_5: 0
+     p00_out_queue_6: 2
+     p00_out_queue_7: 0
+     p00_out_cut_through: 0
+     p00_out_octets_a: 0
+     p00_out_octets_b: 0
+     p00_out_management: 11
+     p00_atu_member_violation: 0
+     p00_atu_miss_violation: 0
+     p00_atu_full_violation: 0
+     p00_vtu_member_violation: 0
+     p00_vtu_miss_violation: 0
+
+
+On Tue, Dec 24, 2024 at 5:30=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
+>
+> On Tue, Dec 24, 2024 at 03:00:17PM +0530, sai kumar wrote:
+> > Hi Team,
+> >
+> > This could be basic question related to DSA, if possible please help
+> > to share your feedback,. Thanks.
+> >
+> >
+> > External CPU eth1 ---RGMII---- Switch Port 0 (cpu port)
+> > Switch Port 1 (lan1) --- DHCP client
+> >
+> > I am using marvell 88E6390 evaluation board, modified the device tree
+> > to support MDIO control over USB.
+> > The switch control plane works, we are unable to dump registers and
+>
+> unable -> able, right?
+[SK] Yes, typo it was able.
+>
+> > see port status.
+> >
+> > The kernel version on board with external cpu is 6.1
+> >
+> > I have connected a dhcp client to port 1 of the switch and the
+> > discover packet is not reaching the cpu port (port 0) and external cpu
+> > interface eth1.
+> > Using the bridge without vlan to configure, able to see the client
+> > device mac addr in bridge fdb show
+> > with vlan id as 4095.
+> >
+> > tcpdump on external cpu port eth1 and bridge br0 to listen for
+> > incoming packets from the client . No discover packets are being
+> > received on those interfaces.
+> >
+> > Could you please let us know if any configuration is being missed for
+> > switch data plane to work ? Thanks.
+> >
+> >
+> > The below are the commands used to configure the bridge:
+>
+> I don't immediately see something obviously wrong. Could you run
+> ethtool -S on lan1 and on eth0, and try to find a positive correlation
+> between the DHCP requests and a certain packet counter incrementing in
+> the switch? We should determine whether there is packet loss in the
+> switch or whether there is some other reason for the lack of connectivity=
+.
 
