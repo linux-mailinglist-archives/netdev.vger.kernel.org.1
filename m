@@ -1,107 +1,142 @@
-Return-Path: <netdev+bounces-154187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 550189FBFB8
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 16:41:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E7D09FBFDA
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 16:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF1F7164729
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 15:41:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E921618850A3
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 15:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFE21D63FF;
-	Tue, 24 Dec 2024 15:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4821D63DE;
+	Tue, 24 Dec 2024 15:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6RkFbR//"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IgWgtgJd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB441BC3C;
-	Tue, 24 Dec 2024 15:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2BF1D90DC;
+	Tue, 24 Dec 2024 15:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735054912; cv=none; b=QroNPGvKQ3teKkhvVG/5funwzY08vWIZv4pGSKfkQIMbjD+TuD5IJ8vGe7Vn7eH1TB3BJoVPBXDjapOszGu+qQvwnnVcyfHyo9laLv697WOX0b62qMYAsyqWSiZR+zD8z3g6njCe69Yd9uLnqeHDFI5H0dowRBtvTfBm8Qx5bdc=
+	t=1735055982; cv=none; b=qeRLDwLPJEoiMSzYJcmKFOIOViWB+EQe5kuTumoID1PKA2NFexA2nGTO3I/8ogVXVhLXCm/ARAAEWtlxjnDNik1J4UtqHw1HL6Eczq4dLsEDmAroxRVUHJbjXKzNLOzwJeZgqeWBE4KYEmMVStasMHu3ZV07l71lwFIQTUgWyvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735054912; c=relaxed/simple;
-	bh=yOgkjKVNtaobqrUkNZRT8A8qmcVQEZTQucVKdcE7eRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=izrsMcxO90rxsNNxJteEPDo+Kpgpe5IbbyYtwVicsLq2APQNg/ESxj9wJCIf8KBprUr43bWfa4aBdob5L6EGAuq6uCtzx11Gp6PQGIvZTu5Ttt4N8Ze9KYiIrCV0xNX56UXxhxIGCn25dukDumAXEzJShiw0tarc63m9IeWyXuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6RkFbR//; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zMq0rP8PmA2bT7MNqp6i+Yh8RUZKOT3MQ++m1J8pGSI=; b=6RkFbR//fKYUmEMFj4hYgUvvHg
-	pqmDwnCX0VlOnJGHuB4+GJwxIhwGH293E+PjCikZrJVNnZmaNigswQMoJqVUK9ROlO8jyybkXNWT9
-	1kiXKU2NcPFBsI5vt33IHKmV//UdrsBt+2cEk3ivBy3QwTftjtzOCywRPo6YrBTFKWJo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tQ72O-00FsLg-Os; Tue, 24 Dec 2024 16:41:36 +0100
-Date: Tue, 24 Dec 2024 16:41:36 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
-Cc: Lei Wei <quic_leiwei@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
-	quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
-	quic_linchen@quicinc.com, quic_luoj@quicinc.com,
-	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
-	vsmuthu@qti.qualcomm.com, john@phrozen.org
-Subject: Re: [PATCH net-next v3 3/5] net: pcs: qcom-ipq9574: Add PCS
- instantiation and phylink operations
-Message-ID: <efb47edb-0229-46cc-a6cb-8fff8168a55e@lunn.ch>
-References: <20241216-ipq_pcs_6-13_rc1-v3-0-3abefda0fc48@quicinc.com>
- <20241216-ipq_pcs_6-13_rc1-v3-3-3abefda0fc48@quicinc.com>
- <d278ad9a-5d23-4cb8-9de7-5a51d838ba5d@quicinc.com>
+	s=arc-20240116; t=1735055982; c=relaxed/simple;
+	bh=7DyIlHjFebT6zDyVRgFUxZ6GijPPif5/KWh4Fb844mk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=IwPiA6Q+4FhtrVHOZUGjFuP+fEzlTAqkBqU2l/HOA1xu7qv+RWSyVES5bMrTJuhmGaHb5LYF2R3qxDNTOoOQ7Q5LCYsXiaHmAmEEBWnsxmEVqOgri1Wgvp3tyf2D92BkdA4XFhia4cJjWjJkXL0lNczyREqkXdbOT2/6AYscL2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IgWgtgJd; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6d8e773ad77so39097026d6.2;
+        Tue, 24 Dec 2024 07:59:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735055979; x=1735660779; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EsEj38Wc4+3p/n8Nt86B3Bu1A1OGSpRTG9YDhoxEV88=;
+        b=IgWgtgJdEwsajFRnwqZN1Uwo9TZcFyOqyYhbzYsCQN8kFxtFO8jA+aOXfCkYzSDI9X
+         fObfGg+9GokgvYeatZsvPxZe2Fo1SGDPNs/Cmjo82iemLUYEZBxlAUW5Kj6hjcit+Qc1
+         C8Hsr5RoOE3Eld7Fq1Kin9CLitOyYZVxvyZj8sq9RgqoFHSF9uQVVWfEgxqyyWEeZOaa
+         BejFKbgtJ32zlUbLaJ1PC1xug1cUdxIHQef3EJYtu6DNlLoWwaWRGneLNQm7pqrqFrCc
+         s6bwx66WjiWgnSQo9Yn31QPrwiGHm6aGc37uikNJfxajpOfa9qJM5yLVKWXHTcYGwatM
+         mNXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735055979; x=1735660779;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EsEj38Wc4+3p/n8Nt86B3Bu1A1OGSpRTG9YDhoxEV88=;
+        b=QWFEYSbeEawFx3vgEnNHMSnolzAyV8iAdizc52wOm/bRvhhBRu/QrXmtONIXhZcbOx
+         EdgtqCpD+m4G0exJ2LQAihXo650AM7fs8M8xmCZkmaPFOFdbyjoCmOak4hxy3bNelE0r
+         zH50G2hcyOfSbMPtgA2SEuSYYqQng+mrbumVK6gF981SCCIIEHbrH/ugkwRixpuD487L
+         hCX9BepSK6TpO6e4ZQpxpmJV6KrCu/t2qHndI3Vz0zYUJ6HG8OydWmHnw62oxmx7e4er
+         3GY+TdRUpi7c8l0mfXjjQRII7PL9CA9NdzDiqol89SrhYX2DNC5RoMPy9ygKGmQzBXYZ
+         W+Gg==
+X-Forwarded-Encrypted: i=1; AJvYcCWrvBTmnkIpEn0ZVMJYl1AJNSeFHrb23uKfyMQqMTdGbClOh+YAkrUFVNH6/Zbyq138kYYCDAi89bxWwer83Ek=@vger.kernel.org, AJvYcCXOb/5+tuoT5D251soDcncujQM+o8f7IXo/ASRLnbt8+5LEhZj5FkKM0Kv+MXeUWLB4OuxTTvFe@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPP41yOOT5WnSy5pxGioM8wTOlpVO69/ZDFRgS/vBoypsb6AwY
+	Ac8KV8Sw0jK9XXeQr42FHMR1+y3/qaPXwCHTulH7SwHOkQKfLl1a
+X-Gm-Gg: ASbGncsmP43vjlj9dNGG6z6JR2PCVe7lkKGh5jdjUIGZULPVhDoiJlLvUNNrGt4K6ZZ
+	+jkgIgjPJFmRmUdzkD6TfRhjRUjX2fP7BKCh+CrnmYrdyvSsVDRA6HGmpFeroHwM2rCprOgPoMu
+	H956Uf84AmVUUkrQHX9AEEaC6z2B5Ym1rb/pAyh7XmfIOvcYOCG53CqcNt69rTlo9EoYmgYIFft
+	aivBBsVZ/woG9w8qV2l5mXPT9PNYUFbspQDzz80ResExfkzvAbutlPZYK7HMkYBG/wq8k29Ck+M
+	DJ8nfO9HSH0JADCpz634zZ7F2uO6lF398w==
+X-Google-Smtp-Source: AGHT+IE5mT88U2Wl8oS8QkxtmWuijssZtkB7o5MwrCcB3QQmeGdC1zJ3aGAay9In5k9TFWdV3VSZhA==
+X-Received: by 2002:a05:6214:2242:b0:6d8:fa8a:af7e with SMTP id 6a1803df08f44-6dd23337bc0mr255685596d6.12.1735055979477;
+        Tue, 24 Dec 2024 07:59:39 -0800 (PST)
+Received: from localhost (96.206.236.35.bc.googleusercontent.com. [35.236.206.96])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181bb525sm53931386d6.97.2024.12.24.07.59.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Dec 2024 07:59:38 -0800 (PST)
+Date: Tue, 24 Dec 2024 10:59:38 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+ Soham Chakradeo <sohamch.kernel@gmail.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ linux-kselftest@vger.kernel.org, 
+ Soham Chakradeo <sohamch@google.com>
+Message-ID: <676ada6afb03_a069c294d6@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241223085033.5926d1a6@kernel.org>
+References: <20241217185203.297935-1-sohamch.kernel@gmail.com>
+ <20241218100013.0c698629@kernel.org>
+ <19df2c4d-c40c-40c5-8fec-bb3e63e65533@redhat.com>
+ <676474a0398f0_1f2e51294ad@willemb.c.googlers.com.notmuch>
+ <20241219180144.7cf5226c@kernel.org>
+ <6768dd1289ee2_3cff202943a@willemb.c.googlers.com.notmuch>
+ <20241223085033.5926d1a6@kernel.org>
+Subject: Re: [PATCH net-next 0/4] selftests/net: packetdrill: import multiple
+ tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d278ad9a-5d23-4cb8-9de7-5a51d838ba5d@quicinc.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-> > +static int ipq_pcs_create_miis(struct ipq_pcs *qpcs)
-> > +{
-> > +	struct device *dev = qpcs->dev;
-> > +	struct ipq_pcs_mii *qpcs_mii;
-> > +	struct device_node *mii_np;
-> > +	u32 index;
-> > +	int ret;
-> > +
-> > +	for_each_available_child_of_node(dev->of_node, mii_np) {
-> > +		ret = of_property_read_u32(mii_np, "reg", &index);
-> > +		if (ret) {
-> > +			dev_err(dev, "Failed to read MII index\n");
-> > +			of_node_put(mii_np);
+Jakub Kicinski wrote:
+> On Sun, 22 Dec 2024 22:46:26 -0500 Willem de Bruijn wrote:
+> > Jakub Kicinski wrote:
+> > > On Thu, 19 Dec 2024 14:31:44 -0500 Willem de Bruijn wrote:  
+> > > > All three timestamping flakes are instances where the script expects
+> > > > the timestamp to be taken essentially instantaneously after the send
+> > > > call.
+> > > > 
+> > > > This is not the case, and the delay is outside even the 14K tolerance.
+> > > > I see occurrences of 20K. At some point we cannot keep increasing the
+> > > > tolerance, perhaps.  
+> > > 
+> > > I pinned the other services away and gave the packetdrill tester its
+> > > own cores. Let's see how much of a difference this makes.
+> > > The net-next-2024-12-20--03-00 branch will be the first to have this.  
+> > 
+> > Thanks. It does not seem to resolve the flakes.
+> > 
+> > At this point I think the best path is to run them in debug mode to
+> > get coverage, but ignore errors. With the below draft patch, error
+> > output is still logged. For instance:
+> > 
+> > # tcp_timestamping_partial.pkt:58: runtime error in recvmsg call: Bad timestamp 0 in scm_timestamping 0: expected=1734924748967958 (20000) actual=1734924748982069 (34111) start=1734924748947958
+> > # ok 2 ipv6 # SKIP
 > 
-> Assume, the second child node failed here.
-> Returning without calling the first child node of_node_put().
-> 
-> Please clear the previous child nodes resources before return.
-> 
-> Thanks & Regards,
-> Manikanta.
+> Makes sense. Can we make this XFAIL instead of SKIP, tho?
+> Not exactly accurate but we try to use SKIP for reporting env / setup
+> problems like missing commands. We have FAIL_TO_XFAIL and
+> xfail_on_slow() in the lib for netdev bash tests, already.
 
+Sounds good. I'll add a ktap_test_xfail() to stay with that API.
+I see no clean way to make use of xfail_on_slow directly.
 
-Please always trim the text when reviewing. It can be hard to find the
-comments, and they can be missed when there is 300 lines of quoted
-text you need to page down/page down/page down...
-
-	Andrew
+When net-next reopens, unless the noisy dash is annoying.
 
