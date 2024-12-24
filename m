@@ -1,132 +1,155 @@
-Return-Path: <netdev+bounces-154163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 975239FBD0F
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:01:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4149FBD11
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:05:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2627F160E1D
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 12:00:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97161161BC4
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 12:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AF11B0F09;
-	Tue, 24 Dec 2024 12:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DI57d53n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A791B4F02;
+	Tue, 24 Dec 2024 12:05:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD9B1ADFE3
-	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 12:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8086A192D76;
+	Tue, 24 Dec 2024 12:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735041656; cv=none; b=MraH7Ebtnux/RjS/i83bwg1NYGN7xeOT8eAUzDJzwBsoSvPKlPMHdoy15z3zccajJLRvax5gnHWkw3a+0Lh8BdXzUwG9Sf3kg7etUNN09A0FZC6l5KxrXuFiU09tQZPrBij9bJHi/eTV7TkGL3T0Gz0WPV0c3YGAphpg1mZEuzg=
+	t=1735041940; cv=none; b=mwGRNq4lg5zHDbmprDsEtaGfQK3P4zGt3irri0YpZInK4V4ds312FmywZenjKgApB4ibhzgC+acWlJNFLIpxvbg6xKyrhLlcKSawMTx3mTarEr+FGvPuft+tKSdH+ujHobdlNWMmFx2hxrt2IK+6sFqqj8tIPMuFyLNcZcP/GpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735041656; c=relaxed/simple;
-	bh=rzUgSci6MLcH5WnpxsrIHb7mTai7P5inXEEpAyg9Mto=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l2oPLeHoQTN21wX32JW3pwiR/ez4cQgyeohgQzsc1dZ2Eei2tZEONEJf/uWNpZxfS38erF0h/jx4qgV4XnU1NGeKa/SnnIcetADmfmP8/eSOgLjIz7PEc9xQwS3CfKF8gB+/79s9UqA96xl190+7SWo/+iXSxDD/7e5zQwlUxPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DI57d53n; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa659775dd5so81719966b.0
-        for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 04:00:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735041653; x=1735646453; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kWkPBpZwLiRvjvyWPRonhFcrRz2XRbB4oTeo24ipE1g=;
-        b=DI57d53nsDtSj5bCsqNKNTV3lgZAFxNYKxTPDnUvMiAAkTh0rsjL+tPSyeaaMfvX9M
-         YQALfegP9fjDjQWvQKkDfZ/3Np41Hl1YSWtU7OKkyOGRHmdEg0rIRV9l+6kO7AhegrDH
-         1swqnRjFOH6W4jajFqxWvVzWH5syLZC8bbIo5EHpf2wJTKBp9mGsn6bgtMVsHLrcmhQh
-         TOmlj02mfckJg/rHhB+LBNqFOPQPXOUgstXx1qZsckzn9fR+0yf7WrRJqGmvtEhFHLX5
-         YWzt+vR5Q6BiIwCBCs5pW49obHJWEEBhatkUx+aPYjuU7fHG3jiLE1pabaQoTnSXsHdh
-         FcLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735041653; x=1735646453;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kWkPBpZwLiRvjvyWPRonhFcrRz2XRbB4oTeo24ipE1g=;
-        b=V2B3IGWgipj6F68rRdVJDrLlGPO1rgi0eJeKqeGn3TSmvEw5V3c/AEfTghaGADpPC+
-         g7q/xoyEx3YewYykhnLcPrAtkobxEDdZTQj5S25Cj18z/34IC8l/pD90Gi63R+pnXkME
-         ePGJnUq/QEcmmYmJr45xkW/X9w/+SaCUcuVDC9IzWZRcwOb+PBbBCjbPakNHLCjXz/TT
-         Cc7FEgYzi6f+pdJZtDk1VUfj0bECHpYL9k5oBkDiOSZCOoIeuHVc42gHH4hR4isZ7+NW
-         CiJY41xeozVjIUXr7BmamIqTKCnj0qUbF1PlRvampE2Y+WMi29dYEmrODvadWvnXJI3o
-         sycQ==
-X-Gm-Message-State: AOJu0Yx+M5xF7uhnhmCrLM0WQMIyXQMdtpwaHdKPzKYtUXKspBN3Sv9d
-	1a0AmkmUlPEmkntUzPdTntgxLdNlIHfbw57Ay+0pCjYu/VAtvff2aHSKonHU
-X-Gm-Gg: ASbGnctzqozjwCsqFY4N73UE4jFM2H+KWxltnRDqMyzn2fQXzaHqFpKr/DR9fBhjMhT
-	wH9JkE9vqrD39MHGafTyucSOuecsubvD0f4Wipy7Brc7MGiOxXINNAgNgHa4+3o/oFk3Nv4bmY4
-	gdmIOG7lzg0hDZETOWgEcmXryDb/uu3/Nx1sniJPJ+xcz4OE7LT6rPDN8uM6LW/loxvzlW7HdJo
-	ektEp2HkJWQTgqXIUqiklvHUykUVGTB+skqx6MZfIhZ
-X-Google-Smtp-Source: AGHT+IEKFl02auZ6AqcCXdOrSennMz1BfHElgRIT32XNyzzzvItgLNgzErpXIvXbeephiAkk/LWXYg==
-X-Received: by 2002:a17:907:7d93:b0:aa6:79e6:5b03 with SMTP id a640c23a62f3a-aac2adc60admr596242866b.6.1735041652801;
-        Tue, 24 Dec 2024 04:00:52 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e82f621sm645699566b.40.2024.12.24.04.00.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Dec 2024 04:00:51 -0800 (PST)
-Date: Tue, 24 Dec 2024 14:00:49 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: sai kumar <skmr537@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: DSA Switch: query: Switch configuration, data plane doesn't work
- whereas control plane works
-Message-ID: <20241224120049.bjcxfqrwaaxazosw@skbuf>
-References: <CAA=kqWJWjEr36iZXZ+GFeaqxx35kXTO0WdGZXsL4Q7cvsT3GYg@mail.gmail.com>
+	s=arc-20240116; t=1735041940; c=relaxed/simple;
+	bh=1185hR/sw9QFuR0LPlGGod23RCiTgVKzgsCuC3Ze98Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=IX3MVfm1LyhRbPiBPCSMKUrzjDXBa4qb2nA1swWVAUo7tmTBXTurmPXyBwIpw9o0gFUDR84QzFvBDlKT2GfTyi9ep1sh5sjqg4TYKIHlVMq4hCE8EOXwRZ8k6z+CB1Ah0b2urh2gqFkVO65zRB6DTLPnWq4zokNEzkwKZJMZCLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YHYRs0SV3zhZTs;
+	Tue, 24 Dec 2024 20:02:49 +0800 (CST)
+Received: from kwepemf100018.china.huawei.com (unknown [7.202.181.17])
+	by mail.maildlp.com (Postfix) with ESMTPS id BBD38180AEA;
+	Tue, 24 Dec 2024 20:05:27 +0800 (CST)
+Received: from [10.67.120.168] (10.67.120.168) by
+ kwepemf100018.china.huawei.com (7.202.181.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 24 Dec 2024 20:05:26 +0800
+Message-ID: <ea392da6-15e1-ea62-f5f0-78e3da0874ae@hisilicon.com>
+Date: Tue, 24 Dec 2024 20:05:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAA=kqWJWjEr36iZXZ+GFeaqxx35kXTO0WdGZXsL4Q7cvsT3GYg@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH RFC 00/12] RDMA: Support link status events dispatching in
+ ib_core
+Content-Language: en-US
+To: Leon Romanovsky <leon@kernel.org>
+CC: <jgg@ziepe.ca>, <selvin.xavier@broadcom.com>,
+	<chengyou@linux.alibaba.com>, <kaishen@linux.alibaba.com>,
+	<mustafa.ismail@intel.com>, <tatyana.e.nikolova@intel.com>,
+	<yishaih@nvidia.com>, <benve@cisco.com>, <neescoba@cisco.com>,
+	<bryan-bt.tan@broadcom.com>, <vishnu.dasa@broadcom.com>,
+	<zyjzyj2000@gmail.com>, <bmt@zurich.ibm.com>, <linux-rdma@vger.kernel.org>,
+	<linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>,
+	<tangchengchang@huawei.com>, <liyuyu6@huawei.com>, linux-netdev
+	<netdev@vger.kernel.org>
+References: <20241122105308.2150505-1-huangjunxian6@hisilicon.com>
+ <20241224103224.GF171473@unreal>
+From: Junxian Huang <huangjunxian6@hisilicon.com>
+In-Reply-To: <20241224103224.GF171473@unreal>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemf100018.china.huawei.com (7.202.181.17)
 
-On Tue, Dec 24, 2024 at 03:00:17PM +0530, sai kumar wrote:
-> Hi Team,
-> 
-> This could be basic question related to DSA, if possible please help
-> to share your feedback,. Thanks.
-> 
-> 
-> External CPU eth1 ---RGMII---- Switch Port 0 (cpu port)
-> Switch Port 1 (lan1) --- DHCP client
-> 
-> I am using marvell 88E6390 evaluation board, modified the device tree
-> to support MDIO control over USB.
-> The switch control plane works, we are unable to dump registers and
 
-unable -> able, right?
 
-> see port status.
+On 2024/12/24 18:32, Leon Romanovsky wrote:
+> On Fri, Nov 22, 2024 at 06:52:56PM +0800, Junxian Huang wrote:
+>> This series is to integrate a common link status event handler in
+>> ib_core as this functionality is needed by most drivers and
+>> implemented in very similar patterns. This is not a new issue but
+>> a restart of the previous work of our colleagues from several years
+>> ago, please see [1] and [2].
+>>
+>> [1]: https://lore.kernel.org/linux-rdma/1570184954-21384-1-git-send-email-liweihang@hisilicon.com/
+>> [2]: https://lore.kernel.org/linux-rdma/20200204082408.18728-1-liweihang@huawei.com/
+>>
+>> With this series, ib_core can handle netdev events of link status,
+>> i.e. NETDEV_UP, NETDEV_DOWN and NETDEV_CHANGE, and dispatch ib port
+>> events to ULPs instead of drivers. However some drivers currently
+>> have some private processing in their handler, rather than simply
+>> dispatching events. For these drivers, this series provides a new
+>> ops report_port_event(). If this ops is set, ib_core will call it
+>> and the events will still be handled in the driver.
+>>
+>> Events of LAG devices are also not handled in ib_core as currently
+>> there is no way to obtain ibdev from upper netdev in ib_core. This
+>> can be a TODO work after the core have more support for LAG. For
+>> now mlx5 is the only driver that supports RoCE LAG, and the events
+>> handling of mlx5 RoCE LAG will remain in mlx5 driver.
+>>
+>> In this series:
+>>
+>> Patch #1 adds a new helper to query the port num of a netdev
+>> associated with an ibdev. This is used in the following patch.
+>>
+>> Patch #2 adds support for link status events dispatching in ib_core.
+>>
+>> Patch #3-#7 removes link status event handler in several drivers.
+>> The port state setting in erdma, rxe and siw are replaced with
+>> ib_get_curr_port_state(), so their handler can be totally removed.
+>>
+>> Patch #8-#10 add support for report_port_event() ops in usnic, mlx4
+>> and pvrdma as their current handler cannot be perfectly replaced by
+>> the ib_core handler in patch #2.
+>>
+>> Patch #11 adds a check in mlx5 that only events of RoCE LAG will be
+>> handled in mlx5 driver.
+>>
+>> Patch #12 adds a fast path for link-down events dispatching in hns by
+>> getting notified from hns3 nic driver directly.
+>>
+>> Yuyu Li (12):
+>>   RDMA/core: Add ib_query_netdev_port() to query netdev port by IB
+>>     device.
+>>   RDMA/core: Support link status events dispatching
+>>   RDMA/bnxt_re: Remove deliver net device event
+>>   RDMA/erdma: Remove deliver net device event
+>>   RDMA/irdma: Remove deliver net device event
+>>   RDMA/rxe: Remove deliver net device event
+>>   RDMA/siw: Remove deliver net device event
+>>   RDMA/usnic: Support report_port_event() ops
+>>   RDMA/mlx4: Support report_port_event() ops
+>>   RDMA/pvrdma: Support report_port_event() ops
+>>   RDMA/mlx5: Handle link status event only for LAG device
+>>   RDMA/hns: Support fast path for link-down events dispatching
 > 
-> The kernel version on board with external cpu is 6.1
+> I took the series as it is good thing to remove code duplication
+> and we waited enough.
 > 
-> I have connected a dhcp client to port 1 of the switch and the
-> discover packet is not reaching the cpu port (port 0) and external cpu
-> interface eth1.
-> Using the bridge without vlan to configure, able to see the client
-> device mac addr in bridge fdb show
-> with vlan id as 4095.
-> 
-> tcpdump on external cpu port eth1 and bridge br0 to listen for
-> incoming packets from the client . No discover packets are being
-> received on those interfaces.
-> 
-> Could you please let us know if any configuration is being missed for
-> switch data plane to work ? Thanks.
-> 
-> 
-> The below are the commands used to configure the bridge:
 
-I don't immediately see something obviously wrong. Could you run
-ethtool -S on lan1 and on eth0, and try to find a positive correlation
-between the DHCP requests and a certain packet counter incrementing in
-the switch? We should determine whether there is packet loss in the
-switch or whether there is some other reason for the lack of connectivity.
+Thanks Leon.
+
+The kernel test robot has reported one warning and one error for
+this series:
+
+https://lore.kernel.org/oe-kbuild-all/202411251625.VrcLuTRx-lkp@intel.com/
+https://lore.kernel.org/oe-kbuild-all/202411251727.RFxtcpiI-lkp@intel.com/
+
+I was planning to fix them when I could send the formal patches,
+but since you have applied these RFC patches，could you please
+fix them on your wip branch, or should I send separate patches
+to fix them?
+
+Junxian
 
