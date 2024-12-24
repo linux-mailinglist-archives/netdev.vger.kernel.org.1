@@ -1,151 +1,225 @@
-Return-Path: <netdev+bounces-154184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2359F9FBEBF
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 14:39:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D04D9FBECC
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 14:40:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D2847A1D13
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:39:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 742EC188117C
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEEC1D958E;
-	Tue, 24 Dec 2024 13:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4851DD9AC;
+	Tue, 24 Dec 2024 13:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="k8l3k7jp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TOsG3tRn"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59E11C5F3D;
-	Tue, 24 Dec 2024 13:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5583E1D9350;
+	Tue, 24 Dec 2024 13:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735047504; cv=none; b=Y7lffC6o5JS+kj5t0DxKE+MqPkObMLiy6z/dRw0QB8cQyGjQFA59lGJAIwMDpJa8QdoC3sY+q2NMK5ixEcGoGU0WS5QWBBiA65fLxoCOI1h0L5WnLqccCzuQi45XAS6b51LSuBPiyVuHtmtaN6KI1+7//66E9mIoqFXspqUFZds=
+	t=1735047542; cv=none; b=VY1juIvinOxRrAx+XikNYjDcw9tvGRkv3740sr7D+SKcKZqR6GRj2i1gAcN0trfc9lUDSrgVrV1frLycJ99PIPFUvqpftkVEunuf1i7xC7jYeW2sYtcS+YC4qOjs+W2Me4GNDFjOyUaej8yf3ogc7914KlN0sgF557sads4Sxx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735047504; c=relaxed/simple;
-	bh=Np9DxG6lhp5f+BD4bT9ivbfljPDJZWbA0YKs51oy7tA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ulKMBIXCim23HiUh+EkDX7TBT3EPACvwe1vKZEQ1XIZkA8OLOMxIpMTWWqHLVH1+1gWtqnSgfplUsHXw+QUP0GKuvJpnFGY444ecMJIDU1LMqVUGfLL9itQWxTglAxRnan61lxWtn9riWXihRccuqI4bq/wzITyFW8UdL9RpYZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=k8l3k7jp; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=MHnOFXXSXIdENXt5HTUAoLwLeJZTiiq+wvPscmOY3b8=; b=k8l3k7jpBE9PzGG4UmjN9g+Rvt
-	WJPzZlvPRgIVkVdIEi49UMoblb14R8ITJAiF/A8YcDLjFTfZCoPZI3/MfvM48SBB+kpQcks+O21++
-	w5lhUBV/89JFrRITbCBWBGE58W9Aa2l2HzDPXIgXqCCKmbcubVFYhVzvyhJncNgbICuoC5nT0fVWO
-	+VEr3gGapOGGSdjRSM+1KfteB7GDGXScC0rGNIfd6qMvzmqpeSq4127Fec0lg3dFBxo0RVAVSV8+H
-	/cO1ncqkzwkewLlW17NbYxRaDfILeQ2ZCKYOyYteiwVol/9WoqYoTxnQ+DEJ3iPp1SbGGmHuFcDRB
-	kH+0Ytzw==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tQ56z-000FSg-ON; Tue, 24 Dec 2024 14:38:13 +0100
-Received: from [194.230.160.170] (helo=[172.20.10.7])
-	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tQ56z-000Pe3-0S;
-	Tue, 24 Dec 2024 14:38:13 +0100
-Message-ID: <2224e5ac-4b9d-4ffc-bc36-27a4f0b20a65@iogearbox.net>
-Date: Tue, 24 Dec 2024 14:38:09 +0100
+	s=arc-20240116; t=1735047542; c=relaxed/simple;
+	bh=XKcFUzG8vxeMmdr2SPk5lZ5wyXWvT/+2RPKtGQtlpOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cQz8xh0bzZ5GBEE19EBhrvPx6+gtI9lAfh7OpoqzucWE2K1mpDZXY5pFsoLLL9DoTdyWKOMkn4hcbY7gxeLvLBY1vyi6kQdaDMgy4QFewsSSxiKpeWxl4Rj4jQml1dlR7i+DtMqdir196OEzRaq2o9AWrQqThB9e0+dInWk3oao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TOsG3tRn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 286F5C4CED0;
+	Tue, 24 Dec 2024 13:39:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735047541;
+	bh=XKcFUzG8vxeMmdr2SPk5lZ5wyXWvT/+2RPKtGQtlpOQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TOsG3tRnJWxoGCod7z9R02sQlM1NQX1BSfxxkavyNsRSOZ3E5YeUheYVR0Iks3KCM
+	 XhE0DOU/uir9hFxOhmM8DLAAO16NLx8ZhO6T2JetGbQHem2K1rni8KuElXbrnRZhIt
+	 RNzv74BzCXse7PYEX3WN1TJVfVGB9oHbWpTKYswWoz2rIoIPcrRvSid6Kn4GkrHS78
+	 Ujjz7IFfvf7vDZLuwQib4HLLC5+YsVI5KhMQfMuYMk1sHl7YDW5UsREyCNt31nFKBL
+	 KeeB8sDJkz22n5YF8CWCGTFxjfe8k8hEAPD+H5svYXO/1b3Esfkt5Foss8UPoNaaf8
+	 E4v4+O4ocg6BQ==
+Date: Tue, 24 Dec 2024 15:38:56 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Junxian Huang <huangjunxian6@hisilicon.com>
+Cc: jgg@ziepe.ca, selvin.xavier@broadcom.com, chengyou@linux.alibaba.com,
+	kaishen@linux.alibaba.com, mustafa.ismail@intel.com,
+	tatyana.e.nikolova@intel.com, yishaih@nvidia.com, benve@cisco.com,
+	neescoba@cisco.com, bryan-bt.tan@broadcom.com,
+	vishnu.dasa@broadcom.com, zyjzyj2000@gmail.com, bmt@zurich.ibm.com,
+	linux-rdma@vger.kernel.org, linuxarm@huawei.com,
+	linux-kernel@vger.kernel.org, tangchengchang@huawei.com,
+	liyuyu6@huawei.com, linux-netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH RFC 00/12] RDMA: Support link status events dispatching
+ in ib_core
+Message-ID: <20241224133856.GG171473@unreal>
+References: <20241122105308.2150505-1-huangjunxian6@hisilicon.com>
+ <20241224103224.GF171473@unreal>
+ <ea392da6-15e1-ea62-f5f0-78e3da0874ae@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] bpf for v6.13-rc4
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, alexei.starovoitov@gmail.com,
- andrii@kernel.org, martin.lau@kernel.org
-References: <20241221002123.491623-1-daniel@iogearbox.net>
- <CAHk-=whmQSiZzQuUMLHf7jn5eS1=PEhpPdTNVq8LX0qBk31w0A@mail.gmail.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <CAHk-=whmQSiZzQuUMLHf7jn5eS1=PEhpPdTNVq8LX0qBk31w0A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27497/Tue Dec 24 10:44:06 2024)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ea392da6-15e1-ea62-f5f0-78e3da0874ae@hisilicon.com>
 
-Hi Linus,
-
-On 12/21/24 8:23 PM, Linus Torvalds wrote:
-> On Fri, 20 Dec 2024 at 16:21, Daniel Borkmann <daniel@iogearbox.net> wrote:
->>
->> - Fix inlining of bpf_get_smp_processor_id helper for !CONFIG_SMP
->>    systems (Andrea Righi)
+On Tue, Dec 24, 2024 at 08:05:26PM +0800, Junxian Huang wrote:
 > 
-> LOL.
 > 
-> However, it strikes me that this only handles the x86-64 case.
+> On 2024/12/24 18:32, Leon Romanovsky wrote:
+> > On Fri, Nov 22, 2024 at 06:52:56PM +0800, Junxian Huang wrote:
+> >> This series is to integrate a common link status event handler in
+> >> ib_core as this functionality is needed by most drivers and
+> >> implemented in very similar patterns. This is not a new issue but
+> >> a restart of the previous work of our colleagues from several years
+> >> ago, please see [1] and [2].
+> >>
+> >> [1]: https://lore.kernel.org/linux-rdma/1570184954-21384-1-git-send-email-liweihang@hisilicon.com/
+> >> [2]: https://lore.kernel.org/linux-rdma/20200204082408.18728-1-liweihang@huawei.com/
+> >>
+> >> With this series, ib_core can handle netdev events of link status,
+> >> i.e. NETDEV_UP, NETDEV_DOWN and NETDEV_CHANGE, and dispatch ib port
+> >> events to ULPs instead of drivers. However some drivers currently
+> >> have some private processing in their handler, rather than simply
+> >> dispatching events. For these drivers, this series provides a new
+> >> ops report_port_event(). If this ops is set, ib_core will call it
+> >> and the events will still be handled in the driver.
+> >>
+> >> Events of LAG devices are also not handled in ib_core as currently
+> >> there is no way to obtain ibdev from upper netdev in ib_core. This
+> >> can be a TODO work after the core have more support for LAG. For
+> >> now mlx5 is the only driver that supports RoCE LAG, and the events
+> >> handling of mlx5 RoCE LAG will remain in mlx5 driver.
+> >>
+> >> In this series:
+> >>
+> >> Patch #1 adds a new helper to query the port num of a netdev
+> >> associated with an ibdev. This is used in the following patch.
+> >>
+> >> Patch #2 adds support for link status events dispatching in ib_core.
+> >>
+> >> Patch #3-#7 removes link status event handler in several drivers.
+> >> The port state setting in erdma, rxe and siw are replaced with
+> >> ib_get_curr_port_state(), so their handler can be totally removed.
+> >>
+> >> Patch #8-#10 add support for report_port_event() ops in usnic, mlx4
+> >> and pvrdma as their current handler cannot be perfectly replaced by
+> >> the ib_core handler in patch #2.
+> >>
+> >> Patch #11 adds a check in mlx5 that only events of RoCE LAG will be
+> >> handled in mlx5 driver.
+> >>
+> >> Patch #12 adds a fast path for link-down events dispatching in hns by
+> >> getting notified from hns3 nic driver directly.
+> >>
+> >> Yuyu Li (12):
+> >>   RDMA/core: Add ib_query_netdev_port() to query netdev port by IB
+> >>     device.
+> >>   RDMA/core: Support link status events dispatching
+> >>   RDMA/bnxt_re: Remove deliver net device event
+> >>   RDMA/erdma: Remove deliver net device event
+> >>   RDMA/irdma: Remove deliver net device event
+> >>   RDMA/rxe: Remove deliver net device event
+> >>   RDMA/siw: Remove deliver net device event
+> >>   RDMA/usnic: Support report_port_event() ops
+> >>   RDMA/mlx4: Support report_port_event() ops
+> >>   RDMA/pvrdma: Support report_port_event() ops
+> >>   RDMA/mlx5: Handle link status event only for LAG device
+> >>   RDMA/hns: Support fast path for link-down events dispatching
+> > 
+> > I took the series as it is good thing to remove code duplication
+> > and we waited enough.
+> > 
 > 
-> The other cases (arm64, RISC-V) may not have the pcpu_hot crash, but
-> they still generate silly code to load off the thread pointer. Does
-> that even exist (or get initialized) in UP?
+> Thanks Leon.
 > 
-> End result: I think you should have done the UP case separately and
-> outside the CONFIG_X86_64.. And why do this only for the
-> "verifier_inlines_helper_call()" case rather than just do it
-> unconditionally?
+> The kernel test robot has reported one warning and one error for
+> this series:
+> 
+> https://lore.kernel.org/oe-kbuild-all/202411251625.VrcLuTRx-lkp@intel.com/
+> https://lore.kernel.org/oe-kbuild-all/202411251727.RFxtcpiI-lkp@intel.com/
+> 
+> I was planning to fix them when I could send the formal patches,
+> but since you have applied these RFC patches，could you please
+> fix them on your wip branch, or should I send separate patches
+> to fix them?
 
-All makes sense, I'll look into following up on your above suggestion
-once back from travel!
+This is how I fixed it. Is it ok?
 
-> Anyway, I obviously pulled this, but it does seem silly.
+diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
+index 4286fd4a9324..b886fe2922ae 100644
+--- a/drivers/infiniband/hw/bnxt_re/main.c
++++ b/drivers/infiniband/hw/bnxt_re/main.c
+@@ -822,17 +822,6 @@ static void bnxt_re_disassociate_ucontext(struct ib_ucontext *ibcontext)
+ }
+ 
+ /* Device */
+-
+-static struct bnxt_re_dev *bnxt_re_from_netdev(struct net_device *netdev)
+-{
+-	struct ib_device *ibdev =
+-		ib_device_get_by_netdev(netdev, RDMA_DRIVER_BNXT_RE);
+-	if (!ibdev)
+-		return NULL;
+-
+-	return container_of(ibdev, struct bnxt_re_dev, ibdev);
+-}
+-
+ static ssize_t hw_rev_show(struct device *device, struct device_attribute *attr,
+ 			   char *buf)
+ {
+diff --git a/drivers/infiniband/hw/usnic/usnic_ib_main.c b/drivers/infiniband/hw/usnic/usnic_ib_main.c
+index 5ad7fe7e662f..4ddcd5860e0f 100644
+--- a/drivers/infiniband/hw/usnic/usnic_ib_main.c
++++ b/drivers/infiniband/hw/usnic/usnic_ib_main.c
+@@ -192,10 +192,12 @@ static void usnic_ib_handle_usdev_event(struct usnic_ib_dev *us_ibdev,
+ 
+ static void usnic_ib_handle_port_event(struct ib_device *ibdev,
+ 				       struct net_device *netdev,
+-				       unsigned long event);
++				       unsigned long event)
+ {
+ 	struct usnic_ib_dev *us_ibdev =
+ 			container_of(ibdev, struct usnic_ib_dev, ib_dev);
++	struct ib_event ib_event;
++
+ 	mutex_lock(&us_ibdev->usdev_lock);
+ 	switch (event) {
+ 	case NETDEV_UP:
+diff --git a/drivers/infiniband/sw/siw/siw_verbs.c b/drivers/infiniband/sw/siw/siw_verbs.c
+index 137819184b3b..6b24438df917 100644
+--- a/drivers/infiniband/sw/siw/siw_verbs.c
++++ b/drivers/infiniband/sw/siw/siw_verbs.c
+@@ -172,6 +172,7 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
+ 		   struct ib_port_attr *attr)
+ {
+ 	struct siw_device *sdev = to_siw_dev(base_dev);
++	struct net_device *ndev;
+ 	int rv;
+ 
+ 	memset(attr, 0, sizeof(*attr));
+@@ -183,7 +184,12 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
+ 	attr->max_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+ 	attr->active_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+ 	attr->port_cap_flags = IB_PORT_CM_SUP | IB_PORT_DEVICE_MGMT_SUP;
+-	attr->state = ib_get_curr_port_state(sdev->ndev);
++	ndev = ib_device_get_netdev(base_dev, port);
++	if (ndev)
++		attr->state = ib_get_curr_port_state(ndev);
++	else
++		attr->state = IB_PORT_DOWN;
++	dev_put(ndev);
+ 	attr->phys_state = attr->state == IB_PORT_ACTIVE ?
+ 		IB_PORT_PHYS_STATE_LINK_UP : IB_PORT_PHYS_STATE_DISABLED;
+ 	/*
 
-Thanks & Merry Xmas,
-Daniel
+
+> 
+> Junxian
 
