@@ -1,155 +1,107 @@
-Return-Path: <netdev+bounces-154164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4149FBD11
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:05:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E6799FBD75
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:38:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97161161BC4
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 12:05:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77BC8165414
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 12:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A791B4F02;
-	Tue, 24 Dec 2024 12:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7751C5CB8;
+	Tue, 24 Dec 2024 12:37:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="NFw8nGV4"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from pv50p00im-ztdg10021201.me.com (pv50p00im-ztdg10021201.me.com [17.58.6.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8086A192D76;
-	Tue, 24 Dec 2024 12:05:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81BD1B4148
+	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 12:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735041940; cv=none; b=mwGRNq4lg5zHDbmprDsEtaGfQK3P4zGt3irri0YpZInK4V4ds312FmywZenjKgApB4ibhzgC+acWlJNFLIpxvbg6xKyrhLlcKSawMTx3mTarEr+FGvPuft+tKSdH+ujHobdlNWMmFx2hxrt2IK+6sFqqj8tIPMuFyLNcZcP/GpE=
+	t=1735043829; cv=none; b=QpytKgEUy3v00PH7LuXR5RwnPz1RSDuwznTgPlsKvYalJC0Q8B5iu7fhCiwHevu+/MsbgRw+1fCVQnpZKVU9VKJfitptiWDOqx7ZOTXIfqdXMqOvgbNTiRKMjiIZP5D4pBRebSBUQHEWcrcNbLHBS+X83ds22jR5H3RQIRzoFIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735041940; c=relaxed/simple;
-	bh=1185hR/sw9QFuR0LPlGGod23RCiTgVKzgsCuC3Ze98Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=IX3MVfm1LyhRbPiBPCSMKUrzjDXBa4qb2nA1swWVAUo7tmTBXTurmPXyBwIpw9o0gFUDR84QzFvBDlKT2GfTyi9ep1sh5sjqg4TYKIHlVMq4hCE8EOXwRZ8k6z+CB1Ah0b2urh2gqFkVO65zRB6DTLPnWq4zokNEzkwKZJMZCLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YHYRs0SV3zhZTs;
-	Tue, 24 Dec 2024 20:02:49 +0800 (CST)
-Received: from kwepemf100018.china.huawei.com (unknown [7.202.181.17])
-	by mail.maildlp.com (Postfix) with ESMTPS id BBD38180AEA;
-	Tue, 24 Dec 2024 20:05:27 +0800 (CST)
-Received: from [10.67.120.168] (10.67.120.168) by
- kwepemf100018.china.huawei.com (7.202.181.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 24 Dec 2024 20:05:26 +0800
-Message-ID: <ea392da6-15e1-ea62-f5f0-78e3da0874ae@hisilicon.com>
-Date: Tue, 24 Dec 2024 20:05:26 +0800
+	s=arc-20240116; t=1735043829; c=relaxed/simple;
+	bh=Y2aWjrUlygVLOASMCiCstQK+MExRxhb4eTy19Yziwd8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jGSeCOrvMHx8dYG61uMrYhQEdFBM2litqG8jDcG9aiYJQ6TTJ+l0I5GSXQ6DcHdU6M+zguxbedId/kP8Jvgyh+L1hMKAxr1PItuJ3iaoPKtSY8tBWALPukXOQhXCv5xsH+G9cuGnYFehUjZmsl8b8C8fOcxPm8uEa5GNIAa0RJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=NFw8nGV4; arc=none smtp.client-ip=17.58.6.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1735043825;
+	bh=Gc2WCxVDa+xL90LnfPEoTmxwnPsFBGQJFu6/HAU7lKY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=NFw8nGV4mMSulnri61yzK+qJGcy9/Ch+dsuJHrKfVwVsiimtCnAG3h8rFHRxp+Uyz
+	 upQRA6wkcAq6UoCdHY35JVRQ8fAMwi0fFRWx45ifLIDKIpYYNfnCXbGxhfEOaQYXsR
+	 1vp17v6CL5aedV5Ya9jk+HyrT7k0UWB64khbCMphdv/pxVqrNG01HpV70G71hkXLci
+	 t2DsBn5eAui7bmqHM/lylU/XqVzY8Fkjio57aPrnWpZ6YDIPQmlxL9eysloKkBj+Wn
+	 CHNdKt4EUe+nfzoaAy+0w9w20JbbblWFRe+AQzyMxBHNEYMWVIIso0RplKSOHi0f8w
+	 fzQi63k6MyURg==
+Received: from [192.168.1.25] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-ztdg10021201.me.com (Postfix) with ESMTPSA id 14C393118B4A;
+	Tue, 24 Dec 2024 12:36:26 +0000 (UTC)
+Message-ID: <b69310bb-0e95-4706-a43d-569e4a1b104e@icloud.com>
+Date: Tue, 24 Dec 2024 20:36:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH RFC 00/12] RDMA: Support link status events dispatching in
- ib_core
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 03/11] bus: fsl-mc: Constify fsl_mc_device_match()
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
+ linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-serial@vger.kernel.org, netdev@vger.kernel.org,
+ Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241211-const_dfc_done-v4-0-583cc60329df@quicinc.com>
+ <20241211-const_dfc_done-v4-3-583cc60329df@quicinc.com>
+ <20241223202635.00005a0a@huawei.com>
 Content-Language: en-US
-To: Leon Romanovsky <leon@kernel.org>
-CC: <jgg@ziepe.ca>, <selvin.xavier@broadcom.com>,
-	<chengyou@linux.alibaba.com>, <kaishen@linux.alibaba.com>,
-	<mustafa.ismail@intel.com>, <tatyana.e.nikolova@intel.com>,
-	<yishaih@nvidia.com>, <benve@cisco.com>, <neescoba@cisco.com>,
-	<bryan-bt.tan@broadcom.com>, <vishnu.dasa@broadcom.com>,
-	<zyjzyj2000@gmail.com>, <bmt@zurich.ibm.com>, <linux-rdma@vger.kernel.org>,
-	<linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>,
-	<tangchengchang@huawei.com>, <liyuyu6@huawei.com>, linux-netdev
-	<netdev@vger.kernel.org>
-References: <20241122105308.2150505-1-huangjunxian6@hisilicon.com>
- <20241224103224.GF171473@unreal>
-From: Junxian Huang <huangjunxian6@hisilicon.com>
-In-Reply-To: <20241224103224.GF171473@unreal>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemf100018.china.huawei.com (7.202.181.17)
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <20241223202635.00005a0a@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 2024/12/24 18:32, Leon Romanovsky wrote:
-> On Fri, Nov 22, 2024 at 06:52:56PM +0800, Junxian Huang wrote:
->> This series is to integrate a common link status event handler in
->> ib_core as this functionality is needed by most drivers and
->> implemented in very similar patterns. This is not a new issue but
->> a restart of the previous work of our colleagues from several years
->> ago, please see [1] and [2].
->>
->> [1]: https://lore.kernel.org/linux-rdma/1570184954-21384-1-git-send-email-liweihang@hisilicon.com/
->> [2]: https://lore.kernel.org/linux-rdma/20200204082408.18728-1-liweihang@huawei.com/
->>
->> With this series, ib_core can handle netdev events of link status,
->> i.e. NETDEV_UP, NETDEV_DOWN and NETDEV_CHANGE, and dispatch ib port
->> events to ULPs instead of drivers. However some drivers currently
->> have some private processing in their handler, rather than simply
->> dispatching events. For these drivers, this series provides a new
->> ops report_port_event(). If this ops is set, ib_core will call it
->> and the events will still be handled in the driver.
->>
->> Events of LAG devices are also not handled in ib_core as currently
->> there is no way to obtain ibdev from upper netdev in ib_core. This
->> can be a TODO work after the core have more support for LAG. For
->> now mlx5 is the only driver that supports RoCE LAG, and the events
->> handling of mlx5 RoCE LAG will remain in mlx5 driver.
->>
->> In this series:
->>
->> Patch #1 adds a new helper to query the port num of a netdev
->> associated with an ibdev. This is used in the following patch.
->>
->> Patch #2 adds support for link status events dispatching in ib_core.
->>
->> Patch #3-#7 removes link status event handler in several drivers.
->> The port state setting in erdma, rxe and siw are replaced with
->> ib_get_curr_port_state(), so their handler can be totally removed.
->>
->> Patch #8-#10 add support for report_port_event() ops in usnic, mlx4
->> and pvrdma as their current handler cannot be perfectly replaced by
->> the ib_core handler in patch #2.
->>
->> Patch #11 adds a check in mlx5 that only events of RoCE LAG will be
->> handled in mlx5 driver.
->>
->> Patch #12 adds a fast path for link-down events dispatching in hns by
->> getting notified from hns3 nic driver directly.
->>
->> Yuyu Li (12):
->>   RDMA/core: Add ib_query_netdev_port() to query netdev port by IB
->>     device.
->>   RDMA/core: Support link status events dispatching
->>   RDMA/bnxt_re: Remove deliver net device event
->>   RDMA/erdma: Remove deliver net device event
->>   RDMA/irdma: Remove deliver net device event
->>   RDMA/rxe: Remove deliver net device event
->>   RDMA/siw: Remove deliver net device event
->>   RDMA/usnic: Support report_port_event() ops
->>   RDMA/mlx4: Support report_port_event() ops
->>   RDMA/pvrdma: Support report_port_event() ops
->>   RDMA/mlx5: Handle link status event only for LAG device
->>   RDMA/hns: Support fast path for link-down events dispatching
+On 2024/12/24 04:26, Jonathan Cameron wrote:
+> On Wed, 11 Dec 2024 08:08:05 +0800
+> Zijun Hu <zijun_hu@icloud.com> wrote:
 > 
-> I took the series as it is good thing to remove code duplication
-> and we waited enough.
+>> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>>
+>> fsl_mc_device_match() does not modify caller's inputs.
+>>
+>> Constify it by simply changing its parameter types to const pointer.
+>>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> Similar to previous patch, I'd say why you are making this change.
+> There are may places in the kernel where pointers are constant but
+> not marked so. Why does this one matter?  
 > 
 
-Thanks Leon.
+thank you for code review.
+make sense.
+will correct comment message for this and previous patch in v5.
 
-The kernel test robot has reported one warning and one error for
-this series:
+> With that info added
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-https://lore.kernel.org/oe-kbuild-all/202411251625.VrcLuTRx-lkp@intel.com/
-https://lore.kernel.org/oe-kbuild-all/202411251727.RFxtcpiI-lkp@intel.com/
-
-I was planning to fix them when I could send the formal patches,
-but since you have applied these RFC patches，could you please
-fix them on your wip branch, or should I send separate patches
-to fix them?
-
-Junxian
 
