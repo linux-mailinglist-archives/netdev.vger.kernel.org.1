@@ -1,225 +1,136 @@
-Return-Path: <netdev+bounces-154185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D04D9FBECC
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 14:40:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68F739FBF79
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 16:12:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 742EC188117C
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:40:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B840E1885B08
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 15:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4851DD9AC;
-	Tue, 24 Dec 2024 13:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1481D89F5;
+	Tue, 24 Dec 2024 15:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TOsG3tRn"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="MHqG886M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5583E1D9350;
-	Tue, 24 Dec 2024 13:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7C94C80
+	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 15:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735047542; cv=none; b=VY1juIvinOxRrAx+XikNYjDcw9tvGRkv3740sr7D+SKcKZqR6GRj2i1gAcN0trfc9lUDSrgVrV1frLycJ99PIPFUvqpftkVEunuf1i7xC7jYeW2sYtcS+YC4qOjs+W2Me4GNDFjOyUaej8yf3ogc7914KlN0sgF557sads4Sxx4=
+	t=1735053114; cv=none; b=OUl2H5nYTHfWWgyrjxAtRTI3S6ewHuoYZh6cq6MyB1Q9HMvJgKEapqd38WteX+R7gcCo/QaLHE8k/gGG9TMfy4FqYcmDEMhSJ6CuI0BldyS7URrlJX2gbdYZ79fFpLmip4ytzatbewPr6D2GCVypaNsmOSm+NfjYrObpNsDhN18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735047542; c=relaxed/simple;
-	bh=XKcFUzG8vxeMmdr2SPk5lZ5wyXWvT/+2RPKtGQtlpOQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cQz8xh0bzZ5GBEE19EBhrvPx6+gtI9lAfh7OpoqzucWE2K1mpDZXY5pFsoLLL9DoTdyWKOMkn4hcbY7gxeLvLBY1vyi6kQdaDMgy4QFewsSSxiKpeWxl4Rj4jQml1dlR7i+DtMqdir196OEzRaq2o9AWrQqThB9e0+dInWk3oao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TOsG3tRn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 286F5C4CED0;
-	Tue, 24 Dec 2024 13:39:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735047541;
-	bh=XKcFUzG8vxeMmdr2SPk5lZ5wyXWvT/+2RPKtGQtlpOQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TOsG3tRnJWxoGCod7z9R02sQlM1NQX1BSfxxkavyNsRSOZ3E5YeUheYVR0Iks3KCM
-	 XhE0DOU/uir9hFxOhmM8DLAAO16NLx8ZhO6T2JetGbQHem2K1rni8KuElXbrnRZhIt
-	 RNzv74BzCXse7PYEX3WN1TJVfVGB9oHbWpTKYswWoz2rIoIPcrRvSid6Kn4GkrHS78
-	 Ujjz7IFfvf7vDZLuwQib4HLLC5+YsVI5KhMQfMuYMk1sHl7YDW5UsREyCNt31nFKBL
-	 KeeB8sDJkz22n5YF8CWCGTFxjfe8k8hEAPD+H5svYXO/1b3Esfkt5Foss8UPoNaaf8
-	 E4v4+O4ocg6BQ==
-Date: Tue, 24 Dec 2024 15:38:56 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Junxian Huang <huangjunxian6@hisilicon.com>
-Cc: jgg@ziepe.ca, selvin.xavier@broadcom.com, chengyou@linux.alibaba.com,
-	kaishen@linux.alibaba.com, mustafa.ismail@intel.com,
-	tatyana.e.nikolova@intel.com, yishaih@nvidia.com, benve@cisco.com,
-	neescoba@cisco.com, bryan-bt.tan@broadcom.com,
-	vishnu.dasa@broadcom.com, zyjzyj2000@gmail.com, bmt@zurich.ibm.com,
-	linux-rdma@vger.kernel.org, linuxarm@huawei.com,
-	linux-kernel@vger.kernel.org, tangchengchang@huawei.com,
-	liyuyu6@huawei.com, linux-netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH RFC 00/12] RDMA: Support link status events dispatching
- in ib_core
-Message-ID: <20241224133856.GG171473@unreal>
-References: <20241122105308.2150505-1-huangjunxian6@hisilicon.com>
- <20241224103224.GF171473@unreal>
- <ea392da6-15e1-ea62-f5f0-78e3da0874ae@hisilicon.com>
+	s=arc-20240116; t=1735053114; c=relaxed/simple;
+	bh=32/9jeUNR5xGHENJqi0kWpsE0A2dJmVIom3XcizqMnI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bvjVGf5Ki5f+nV4faqRFCZyAdA5QCsYS69cAgA29xNjpGBGXoNkNjniQQtZzWGGjjdbUkDEwL03Ob3ETbHlABl7vmgmcFJZX14nuHa7BxpARlbfUOEwI6AWLCgrQFBTzq9WTJ/T8laIQb1VBLuFb66im+CfD0TxemaQvhSRFMMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=MHqG886M; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a7d690479eso39453745ab.0
+        for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 07:11:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ieee.org; s=google; t=1735053110; x=1735657910; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S995D1BChvz9yt5vmAm3xdZROw5Z6dy8WVoLnD9/Eb4=;
+        b=MHqG886MUISbgp2iauEfyh5fk5/bV1L4fxEmCOQPAkMSdnf2m7Beo6O+Xy0z6KXV8y
+         TWGjOZQ/2F0tANLyhwN9dNHJm0KxbxLu19rn9igiJPvIqrzwcHLvp8MDgC/Xrj0ezTI7
+         SELK74pIeqFhZQgAF+RPw9l9nRV7fY48FOLuw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735053110; x=1735657910;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S995D1BChvz9yt5vmAm3xdZROw5Z6dy8WVoLnD9/Eb4=;
+        b=JVUWpDNtxcRHn6SOZ2EcN3HuKCZ8zcslsjHySZBbkQbQnRjK3MuIW+5Spz8mk2627U
+         +/L27FMiFjQie/OI5ZJVPqAOfeiI8R+lvngBrxhDU5PtYb8p7vzbhj1HJjwSApOKDwG0
+         Z9cQhqDhZCzoCB3Z5sAqB4PIQjEQtarbGFShgsSGvx4IRtbi/v0xWwMsE+uDEcijv4Yg
+         LaJVhk/HYXSXJ3uaVDSQyY3WeBP4PSwdbJc0kMipuWTL3AIK+j1iHJ3skZmE1q8TXoYL
+         ALXH8gFc91czBXdzbq42L/Dj6zaayTwxroT1+AeUtyk2V6Tlo629ihsxRK/dNioPbUoC
+         RvdA==
+X-Forwarded-Encrypted: i=1; AJvYcCW8IIdza4Rq8ntAdeBN6qfeadjBpaWIDvGkZkf0JWdz16u96jJo0wxkXmo/Z6Rjgbhs/7H0ELM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4nKebN0a6CAN/YMZDQ4sAf/sXOjbpY9gKD/ws5VskA7QYP8oy
+	2e+LqHlP0wCbZI9vDyCMIprdWOEHTlWa89+y+JTd7k7OTIs1eMqeirUYuMt5Hg==
+X-Gm-Gg: ASbGncvgryLbAe0vi8qQZyCvHsgcpgqJkASq1iQOKHyFwrIN2wXoy6xztV3m/zOXpsM
+	HSdFvKnmFuYb4cSpzGiMZO1g+dqWZfInUi/xLlmVD/24zfl3VwsfUfkVeUrKftP85poV3oumIxs
+	scDuzraiwzJ0ZFaS4dKDPmjY2tIGo7ni588tzfG9SKkg1aVREisqjJujYmX6duXCOVgjYno2Z2J
+	DrkzjZo9qnBAfxBsLhjvqxIeu+SIZw5BK/34HToleU/lAybvocrOv96p90NszVKkDae91NKH7Jj
+	h76jGhCtXV43qlQ=
+X-Google-Smtp-Source: AGHT+IHYBdH6ARXM6tUUvPqIK0NxZwNMF8S16az3nUFWcrObDtSmLMzvDHtVGdTyt0YZcWxtyapJOg==
+X-Received: by 2002:a05:6e02:2481:b0:3a7:2204:c83e with SMTP id e9e14a558f8ab-3c2d2782867mr184228015ab.10.1735053110487;
+        Tue, 24 Dec 2024 07:11:50 -0800 (PST)
+Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
+        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4e68bf4f4b9sm2733308173.26.2024.12.24.07.11.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Dec 2024 07:11:49 -0800 (PST)
+Message-ID: <503786f9-588c-4661-8126-37ce70fc8be0@ieee.org>
+Date: Tue, 24 Dec 2024 09:11:48 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ea392da6-15e1-ea62-f5f0-78e3da0874ae@hisilicon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: net: qcom,ipa: document qcm2290
+ compatible
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Wojciech Slenska <wojciech.slenska@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20241220073540.37631-1-wojciech.slenska@gmail.com>
+ <20241220073540.37631-2-wojciech.slenska@gmail.com>
+ <7d33eed7-92ba-4cbb-89b0-9b7e894f1c94@oss.qualcomm.com>
+Content-Language: en-US
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <7d33eed7-92ba-4cbb-89b0-9b7e894f1c94@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 24, 2024 at 08:05:26PM +0800, Junxian Huang wrote:
+On 12/20/24 7:25 AM, Konrad Dybcio wrote:
+> On 20.12.2024 8:35 AM, Wojciech Slenska wrote:
+>> Document that ipa on qcm2290 uses version 4.2, the same
+>> as sc7180.
+>>
+>> Signed-off-by: Wojciech Slenska <wojciech.slenska@gmail.com>
+>> ---
 > 
-> 
-> On 2024/12/24 18:32, Leon Romanovsky wrote:
-> > On Fri, Nov 22, 2024 at 06:52:56PM +0800, Junxian Huang wrote:
-> >> This series is to integrate a common link status event handler in
-> >> ib_core as this functionality is needed by most drivers and
-> >> implemented in very similar patterns. This is not a new issue but
-> >> a restart of the previous work of our colleagues from several years
-> >> ago, please see [1] and [2].
-> >>
-> >> [1]: https://lore.kernel.org/linux-rdma/1570184954-21384-1-git-send-email-liweihang@hisilicon.com/
-> >> [2]: https://lore.kernel.org/linux-rdma/20200204082408.18728-1-liweihang@huawei.com/
-> >>
-> >> With this series, ib_core can handle netdev events of link status,
-> >> i.e. NETDEV_UP, NETDEV_DOWN and NETDEV_CHANGE, and dispatch ib port
-> >> events to ULPs instead of drivers. However some drivers currently
-> >> have some private processing in their handler, rather than simply
-> >> dispatching events. For these drivers, this series provides a new
-> >> ops report_port_event(). If this ops is set, ib_core will call it
-> >> and the events will still be handled in the driver.
-> >>
-> >> Events of LAG devices are also not handled in ib_core as currently
-> >> there is no way to obtain ibdev from upper netdev in ib_core. This
-> >> can be a TODO work after the core have more support for LAG. For
-> >> now mlx5 is the only driver that supports RoCE LAG, and the events
-> >> handling of mlx5 RoCE LAG will remain in mlx5 driver.
-> >>
-> >> In this series:
-> >>
-> >> Patch #1 adds a new helper to query the port num of a netdev
-> >> associated with an ibdev. This is used in the following patch.
-> >>
-> >> Patch #2 adds support for link status events dispatching in ib_core.
-> >>
-> >> Patch #3-#7 removes link status event handler in several drivers.
-> >> The port state setting in erdma, rxe and siw are replaced with
-> >> ib_get_curr_port_state(), so their handler can be totally removed.
-> >>
-> >> Patch #8-#10 add support for report_port_event() ops in usnic, mlx4
-> >> and pvrdma as their current handler cannot be perfectly replaced by
-> >> the ib_core handler in patch #2.
-> >>
-> >> Patch #11 adds a check in mlx5 that only events of RoCE LAG will be
-> >> handled in mlx5 driver.
-> >>
-> >> Patch #12 adds a fast path for link-down events dispatching in hns by
-> >> getting notified from hns3 nic driver directly.
-> >>
-> >> Yuyu Li (12):
-> >>   RDMA/core: Add ib_query_netdev_port() to query netdev port by IB
-> >>     device.
-> >>   RDMA/core: Support link status events dispatching
-> >>   RDMA/bnxt_re: Remove deliver net device event
-> >>   RDMA/erdma: Remove deliver net device event
-> >>   RDMA/irdma: Remove deliver net device event
-> >>   RDMA/rxe: Remove deliver net device event
-> >>   RDMA/siw: Remove deliver net device event
-> >>   RDMA/usnic: Support report_port_event() ops
-> >>   RDMA/mlx4: Support report_port_event() ops
-> >>   RDMA/pvrdma: Support report_port_event() ops
-> >>   RDMA/mlx5: Handle link status event only for LAG device
-> >>   RDMA/hns: Support fast path for link-down events dispatching
-> > 
-> > I took the series as it is good thing to remove code duplication
-> > and we waited enough.
-> > 
-> 
-> Thanks Leon.
-> 
-> The kernel test robot has reported one warning and one error for
-> this series:
-> 
-> https://lore.kernel.org/oe-kbuild-all/202411251625.VrcLuTRx-lkp@intel.com/
-> https://lore.kernel.org/oe-kbuild-all/202411251727.RFxtcpiI-lkp@intel.com/
-> 
-> I was planning to fix them when I could send the formal patches,
-> but since you have applied these RFC patches，could you please
-> fix them on your wip branch, or should I send separate patches
-> to fix them?
+> FWIW this needs some more work on the Linux side, the IPA driver
+> currently hardcodes a reference to IMEM, which has a different
+> base between these two SoCs.
 
-This is how I fixed it. Is it ok?
+I have only glanced at this so far.  At the moment I don't
+know whether this device uses a different range in IMEM, but
+Konrad's message suggests it does.  And if so, he's correct:
+the IMEM range needs to be defined differently (perhaps in
+Device Tree) so that different SoCs using the same version
+of IPA but different IMEM ranges can function correctly.
 
-diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
-index 4286fd4a9324..b886fe2922ae 100644
---- a/drivers/infiniband/hw/bnxt_re/main.c
-+++ b/drivers/infiniband/hw/bnxt_re/main.c
-@@ -822,17 +822,6 @@ static void bnxt_re_disassociate_ucontext(struct ib_ucontext *ibcontext)
- }
- 
- /* Device */
--
--static struct bnxt_re_dev *bnxt_re_from_netdev(struct net_device *netdev)
--{
--	struct ib_device *ibdev =
--		ib_device_get_by_netdev(netdev, RDMA_DRIVER_BNXT_RE);
--	if (!ibdev)
--		return NULL;
--
--	return container_of(ibdev, struct bnxt_re_dev, ibdev);
--}
--
- static ssize_t hw_rev_show(struct device *device, struct device_attribute *attr,
- 			   char *buf)
- {
-diff --git a/drivers/infiniband/hw/usnic/usnic_ib_main.c b/drivers/infiniband/hw/usnic/usnic_ib_main.c
-index 5ad7fe7e662f..4ddcd5860e0f 100644
---- a/drivers/infiniband/hw/usnic/usnic_ib_main.c
-+++ b/drivers/infiniband/hw/usnic/usnic_ib_main.c
-@@ -192,10 +192,12 @@ static void usnic_ib_handle_usdev_event(struct usnic_ib_dev *us_ibdev,
- 
- static void usnic_ib_handle_port_event(struct ib_device *ibdev,
- 				       struct net_device *netdev,
--				       unsigned long event);
-+				       unsigned long event)
- {
- 	struct usnic_ib_dev *us_ibdev =
- 			container_of(ibdev, struct usnic_ib_dev, ib_dev);
-+	struct ib_event ib_event;
-+
- 	mutex_lock(&us_ibdev->usdev_lock);
- 	switch (event) {
- 	case NETDEV_UP:
-diff --git a/drivers/infiniband/sw/siw/siw_verbs.c b/drivers/infiniband/sw/siw/siw_verbs.c
-index 137819184b3b..6b24438df917 100644
---- a/drivers/infiniband/sw/siw/siw_verbs.c
-+++ b/drivers/infiniband/sw/siw/siw_verbs.c
-@@ -172,6 +172,7 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
- 		   struct ib_port_attr *attr)
- {
- 	struct siw_device *sdev = to_siw_dev(base_dev);
-+	struct net_device *ndev;
- 	int rv;
- 
- 	memset(attr, 0, sizeof(*attr));
-@@ -183,7 +184,12 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
- 	attr->max_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
- 	attr->active_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
- 	attr->port_cap_flags = IB_PORT_CM_SUP | IB_PORT_DEVICE_MGMT_SUP;
--	attr->state = ib_get_curr_port_state(sdev->ndev);
-+	ndev = ib_device_get_netdev(base_dev, port);
-+	if (ndev)
-+		attr->state = ib_get_curr_port_state(ndev);
-+	else
-+		attr->state = IB_PORT_DOWN;
-+	dev_put(ndev);
- 	attr->phys_state = attr->state == IB_PORT_ACTIVE ?
- 		IB_PORT_PHYS_STATE_LINK_UP : IB_PORT_PHYS_STATE_DISABLED;
- 	/*
+Downstream code should be consulted to determine this, and
+as of now I have not done that.
 
+					-Alex
 
+> The IMEM region doesn't seem to be used as of current, but things
+> will explode the second it is.
 > 
-> Junxian
+> A long overdue update would be to make the IPA driver consume
+> a syscon/memory-region-like property pointing to IMEM (or a slice
+> of it, maybe Alex knows what it was supposed to be used for).
+> 
+> Konrad
+
 
