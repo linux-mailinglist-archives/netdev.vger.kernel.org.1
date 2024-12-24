@@ -1,165 +1,143 @@
-Return-Path: <netdev+bounces-154145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297B79FBA1B
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 08:15:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 662959FBA50
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 08:56:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D86C1884713
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 07:15:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D00FD188548F
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 07:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81D814E2C2;
-	Tue, 24 Dec 2024 07:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7634B18DF86;
+	Tue, 24 Dec 2024 07:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tITeap0A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TD/bUWCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DC23EA69
-	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 07:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DFF16DEB3;
+	Tue, 24 Dec 2024 07:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735024521; cv=none; b=gtZvarsY4Mh01Y+Pi6HPxNxZ/cVZ/cRRMojHxTggpjiSKmGR5qELCeeYhNkNKkUwlf1pXFlxvIFDx6GcYzjOC2zokfvtnIPCxtreIYKDEpcH8KD8RqMw9/WoQApIN6mDlHSdHaYrdSPChBjtt9ANGbE0Dfyo9F/2P/3PIVK73ig=
+	t=1735026970; cv=none; b=TyYWNk/Tr0fDO3FDw8OxJwE7Ih/QgQTmWkultZCx4/TfI4E52XRdFT4Ca7OUb8gCwvMJLGO903F8J8VVWX3wPcrYhR6jNbXY+dQZNJ6bpmO4X2R0Wzl6Ax1T/lZ2ts5mr7U7COa4XBn0FJvuWOpAk349y+5JlAfbGClH46Qc5uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735024521; c=relaxed/simple;
-	bh=YHJSI4t/qgGEI2FEsSHGesZLQnLP+7ZOWpEdS9vfwdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eXcsG+6eVEI4cKOQjNZA+xSW6JDh4T/RUNV1kcLxyZWcSw4Ytc1P8gozonz2VxY8c4RBVoVSOXgh9E5gBS1XJTztLsW6rD0pgjeazr6yfRRb+VN1ar0lXkYBByL0SDKlqwtC8u3ppEOZ1y5UB/qMzJcxfP9vUM1mYUy2XTzeD6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tITeap0A; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5401d3ea5a1so5079070e87.3
-        for <netdev@vger.kernel.org>; Mon, 23 Dec 2024 23:15:19 -0800 (PST)
+	s=arc-20240116; t=1735026970; c=relaxed/simple;
+	bh=DYfPZ39MyRj475906l0HgxSRj//ePs6qi2xtnlendVw=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=o6ugxPzdkJFhAoMG5WRPKnuECq//RuJ6gLjnezTdrZteY4D49D+Gig6LEglDe9Wzr8uXXzTCm5XJo2tCscIlif+0142Nmrah+hx5XzddFGeJjvXZAJ0pILDfAXpOti0rgHMXSv4d4AlxjX+Z/xrZ8IXOvueDg3cu5zXSJjSKIV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TD/bUWCL; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d84179ef26so3974025a12.3;
+        Mon, 23 Dec 2024 23:56:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1735024518; x=1735629318; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yWUlsCwdGlYVoLTTlNmK9JqyX+ELLJR/XrPbGHFiz4o=;
-        b=tITeap0ANTmSnrBxgskwGtsZYTnzP4g3R+f0MD+PSSDYR5a9HBvNLHJ3RqhohaAiUF
-         1p2mQdVqcKD+Eqhx98Cq9FY8gwY1q2G9d8cbH/sLRCs9MA8jdWpcSrsyYEU/pPDJi5ZN
-         1Wc9xE0/vI9Jm3w/lfNWls9yrx99bzbNsB0aEFdmA5ISZhWnF7uQHgFgVQXzhg9qlQmy
-         9AlVDjihFS2JAfprjmGKMekpthO744FKfZPrYqNMmhGeB51gXisSU18S0DpjLyqKbngZ
-         D3+dvSIzAPj/X+tXgKN0Q4H63+2ZNN7PFdxEeZdcyc5bNnUwP9eE7cLJV+iFrRoxTjwe
-         Q2Nw==
+        d=gmail.com; s=20230601; t=1735026967; x=1735631767; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DYfPZ39MyRj475906l0HgxSRj//ePs6qi2xtnlendVw=;
+        b=TD/bUWCLKHO74Hfg9y0e1TcVym8We7HD1LdXLfWRyfzWGCl7J4NUDoeFNidm/ebLjo
+         3vpmKMRGkzei7lnoHUgY2MaTEZJqSZ1yMVnGPEoUXH+jLS22WD8nNLjiaG3KmoTQBhc8
+         qRXlKvXyuTlixuODiz8x1lBPEj+pz6sGdHspR5ZYKTByNyVjaEsMKYl+v4ncViN5/91g
+         xFvS3U/v3AQ0gXMh3ecFrwcKvbS+K+09m9TAoV5S1DeMwFyRnxEUWsvVFVGuh0ei6Jcf
+         nvtT7aUmMaJe8vHd0akDyRClTm4qq2osAFl/2MvZdxcVvmTlGmKavBzq+xpiADOQIRIR
+         /S3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735024518; x=1735629318;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yWUlsCwdGlYVoLTTlNmK9JqyX+ELLJR/XrPbGHFiz4o=;
-        b=i9S2rdmVNTU9X4+PhedcYA48TGs0YDnmelQZUa9RvUV9FvdmVUhUUTrVZlKqPdu6My
-         uoLbrmCfsw1OcAASRGAUQQ4gx3sEC4589dzxzc1fFg7YTiU1fzJJ7Sf7g8q3/Lg5Eoeg
-         47Mg7MBnBxvR7zu/OQZvC7S4Fv67nCHBJ5eYcoDlmkjqMULMF34RdzDhB/9fU35qXrmB
-         fad9rUOAF4zm0Emqha19D31Pcm11FtmglhY84N4s8Mh/nWNrz8Dy5kcm1LY+LL0fidUY
-         oqcXXmaYwQFyPgCB794gGdTjRtAretj60milfuiS+vaUDvmHubMcdA/XbgJTuOnHW2Xg
-         Zg2g==
-X-Forwarded-Encrypted: i=1; AJvYcCWGnu2qQP2VYBx+u0OBdR0kGdUF6fEcIS6mKdeVsWVr1hMqEDhp95rh1bZzAA01H6XDUClugng=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxsn6lLDeB5F4VOAjXCpkkYBKmqee5LBWFCF25gwMW7HLyzNoie
-	Ij/XlSGpWMF0iVHqPw7Qoyfsdi1isWllZP8f/L/gWHDQxCZ4YWXZaAwCcUzADeg=
-X-Gm-Gg: ASbGncuZ2uch+5Z5phQV1IpqyQD8DYUPUh30hs/0zIt4OVimcNM22Bx9Tg0CalUh0kt
-	nUkgvKeYMrk1sKbvNJ/WU14cdoZswFZoQSVIbnJSfpOFqdn5Tv1KaxIfGaANUVvsqWVtxQKXJu2
-	5/B3KDcynDOqELmvWXBULpbV/d3YveLAON4GbJUwwvA1+LHRHd/7dtlEYHXMlCRgLOrWZ7B8bcB
-	daScKnAXAYeyezsy6jspaWtLRJkKbQvj4lCf1uNp10qBGwhs3KCHEDZHib5DyNcaTpH4bysds+l
-	8BtNk/nceJtndOPftIF3LAQFtdpkj4kegAa6
-X-Google-Smtp-Source: AGHT+IEKTeNBvQTu9YRBoejIqf1EgZ3qzhUiijhRn6wPkG9McwpCWPDfTiwpc8nJ3zhgXTioKcIefA==
-X-Received: by 2002:a05:6512:3e2a:b0:540:2311:28c5 with SMTP id 2adb3069b0e04-5422956c4c7mr4452369e87.57.1735024517908;
-        Mon, 23 Dec 2024 23:15:17 -0800 (PST)
-Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-542238138c3sm1507194e87.140.2024.12.23.23.15.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Dec 2024 23:15:16 -0800 (PST)
-Date: Tue, 24 Dec 2024 09:15:14 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
-Cc: Lei Wei <quic_leiwei@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com, quic_pavir@quicinc.com, 
-	quic_linchen@quicinc.com, quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org, 
-	bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com, john@phrozen.org
-Subject: Re: [PATCH net-next v3 3/5] net: pcs: qcom-ipq9574: Add PCS
- instantiation and phylink operations
-Message-ID: <yfh7kghxy5hjblnzlapcpzj54chep45pjkgpvelzbp4ijuq7ci@e6te6c36mkxc>
-References: <20241216-ipq_pcs_6-13_rc1-v3-0-3abefda0fc48@quicinc.com>
- <20241216-ipq_pcs_6-13_rc1-v3-3-3abefda0fc48@quicinc.com>
- <d278ad9a-5d23-4cb8-9de7-5a51d838ba5d@quicinc.com>
+        d=1e100.net; s=20230601; t=1735026967; x=1735631767;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DYfPZ39MyRj475906l0HgxSRj//ePs6qi2xtnlendVw=;
+        b=vtj85CvJQgzNnyvHTrZQbEKKXklUeVr5NzXTMboC+YTK1J4wRrf3IIMK0iZ0I4oXW8
+         b3t2qeMoxKZ7URQ294+ekZELkzud/72XOqw1uPGGg5G4E+W7VtFNWzVDu74oWPuff4QD
+         sTqxItJS5ZdG89U14HPByFH3uIMdu+ZA1xEW99MDbJhP8PxT+FVcg/wXX6ClDTguhZIW
+         lEkwH0MYIqJ/ADB+IjZ//CjBYOlq9as2n3Aol4AR1VJW/fFwlDt3JXgP0WMwT6QEXUtP
+         VmViDMbKA/a5MGOvwShgIP5njfxovi1nEBaW5b1z8FUgQA+xOCNEL7cUs88oFMGSmVbM
+         CzDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcPpfsEzlbvbQDCEOeHDv7TsxRHAFXVd7eO9oQDgGLtcBbt0WZVKbnfWSwLExDgEZx0C2zszuQ@vger.kernel.org, AJvYcCWkObdZiuvWLIHOvzL2Uyco92yKTszn65HzgMxLjSZYuix5CnqDh09mf20Y/7v8m4Boeg8mtApoN4A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAPJjm4x8+f/qZJO7YWS181/hX8P8gt85V8jvAF5pZMGTl8Xq0
+	Rze+ovEtnIs0SLnf9ITiD0r5eaGVBm9cOx4B5xjOdoBradBwcnfE
+X-Gm-Gg: ASbGncsK6aCKVqlknEGzwEoNpdJ5GhU//e+DdK0hK83pWUT7PYYCx4CotwzPqsjL0SJ
+	g/k/3k7a+fQHz/nvu9onkhAawCVbCtsbRULFa8OkAXBz0iKl6o4cWeCG4DGtbxXZ/QHODWf4zz/
+	JOt9pZ17Czs+zSv9Xhzu1w1OsEEZ5Ds607uQurOgMNRtDw83+CbEyz0Pf3jFFuHoj5fe/6+iGyN
+	wfx+phnLptaBS4ljRIiHyctjYGqfPhUcLCFEFVpJ/rJg4TA+fF+l3qnSQ==
+X-Google-Smtp-Source: AGHT+IH3nULCTvzYbryqDPG24PJWH+1wwHyXoPc9vgdNt1AHig0ol6/zEmoM9ghe6monEtsb9DhNhA==
+X-Received: by 2002:a05:6402:50d2:b0:5d3:d917:dd90 with SMTP id 4fb4d7f45d1cf-5d81dd642e4mr13413925a12.6.1735026966591;
+        Mon, 23 Dec 2024 23:56:06 -0800 (PST)
+Received: from [127.0.0.1] ([82.102.65.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d80675a6d0sm5864804a12.14.2024.12.23.23.56.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Dec 2024 23:56:05 -0800 (PST)
+Date: Tue, 24 Dec 2024 09:55:00 +0200
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+To: Jinjian Song <jinjian.song@fibocom.com>, chandrashekar.devegowda@intel.com,
+ chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
+ m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
+ loic.poulain@linaro.org, johannes@sipsolutions.net, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+CC: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, angelogioacchino.delregno@collabora.com,
+ linux-arm-kernel@lists.infradead.org, matthias.bgg@gmail.com, corbet@lwn.net,
+ linux-mediatek@lists.infradead.org, helgaas@kernel.org,
+ danielwinkler@google.com, korneld@google.com, andrew+netdev@lunn.ch,
+ horms@kernel.org
+Subject: Re: [net v3] net: wwan: t7xx: Fix FSM command timeout issue
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20241224041552.8711-1-jinjian.song@fibocom.com>
+References: <20241224041552.8711-1-jinjian.song@fibocom.com>
+Message-ID: <CA4E0537-84FE-4E1A-8BB6-7636D3799E39@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d278ad9a-5d23-4cb8-9de7-5a51d838ba5d@quicinc.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 24, 2024 at 12:29:56PM +0530, Manikanta Mylavarapu wrote:
-> 
-> 
-> On 12/16/2024 7:10 PM, Lei Wei wrote:
-> > This patch adds the following PCS functionality for the PCS driver
-> > for IPQ9574 SoC:
-> > 
-> > a.) Parses PCS MII DT nodes and instantiate each MII PCS instance.
-> > b.) Exports PCS instance get and put APIs. The network driver calls
-> > the PCS get API to get and associate the PCS instance with the port
-> > MAC.
-> > c.) PCS phylink operations for SGMII/QSGMII interface modes.
-> > 
-> > Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
-> > ---
-> >  drivers/net/pcs/pcs-qcom-ipq9574.c   | 463 +++++++++++++++++++++++++++++++++++
-> >  include/linux/pcs/pcs-qcom-ipq9574.h |  16 ++
-> >  2 files changed, 479 insertions(+)
-> > 
+On December 24, 2024 6:15:52 AM GMT+02:00, Jinjian Song <jinjian=2Esong@fib=
+ocom=2Ecom> wrote:
+>When driver processes the internal state change command, it use an
+>asynchronous thread to process the command operation=2E If the main
+>thread detects that the task has timed out, the asynchronous thread
+>will panic when executing the completion notification because the
+>main thread completion object has been released=2E
+>
+>BUG: unable to handle page fault for address: fffffffffffffff8
+>PGD 1f283a067 P4D 1f283a067 PUD 1f283c067 PMD 0
+>Oops: 0000 [#1] PREEMPT SMP NOPTI
+>RIP: 0010:complete_all+0x3e/0xa0
+>[=2E=2E=2E]
+>Call Trace:
+> <TASK>
+> ? __die_body+0x68/0xb0
+> ? page_fault_oops+0x379/0x3e0
+> ? exc_page_fault+0x69/0xa0
+> ? asm_exc_page_fault+0x22/0x30
+> ? complete_all+0x3e/0xa0
+> fsm_main_thread+0xa3/0x9c0 [mtk_t7xx (HASH:1400 5)]
+> ? __pfx_autoremove_wake_function+0x10/0x10
+> kthread+0xd8/0x110
+> ? __pfx_fsm_main_thread+0x10/0x10 [mtk_t7xx (HASH:1400 5)]
+> ? __pfx_kthread+0x10/0x10
+> ret_from_fork+0x38/0x50
+> ? __pfx_kthread+0x10/0x10
+> ret_from_fork_asm+0x1b/0x30
+> </TASK>
+>[=2E=2E=2E]
+>CR2: fffffffffffffff8
+>---[ end trace 0000000000000000 ]---
+>
+>Use the reference counter to ensure safe release as Sergey suggests:
+>https://lore=2Ekernel=2Eorg/all/da90f64c-260a-4329-87bf-1f9ff20a5951@gmai=
+l=2Ecom/
+>
+>Fixes: 13e920d93e37 ("net: wwan: t7xx: Add core components")
+>Signed-off-by: Jinjian Song <jinjian=2Esong@fibocom=2Ecom>
 
-> > +
-> > +/* Parse the PCS MII DT nodes which are child nodes of the PCS node,
-> > + * and instantiate each MII PCS instance.
-> > + */
-> > +static int ipq_pcs_create_miis(struct ipq_pcs *qpcs)
-> > +{
-> > +	struct device *dev = qpcs->dev;
-> > +	struct ipq_pcs_mii *qpcs_mii;
-> > +	struct device_node *mii_np;
-> > +	u32 index;
-> > +	int ret;
-> > +
-> > +	for_each_available_child_of_node(dev->of_node, mii_np) {
-> > +		ret = of_property_read_u32(mii_np, "reg", &index);
-> > +		if (ret) {
-> > +			dev_err(dev, "Failed to read MII index\n");
-> > +			of_node_put(mii_np);
-> 
-> Assume, the second child node failed here.
-> Returning without calling the first child node of_node_put().
-> 
-> Please clear the previous child nodes resources before return.
-
-s/clear child nodes/put OF nodes/
-
-Note, for_each_available_child_of_node() handles refcounting for
-the nodes that we looped through. So, I don't think the comment is
-valid. If I missed something, please expand your comment.
-
-P.S. Please also trim your messages. There is no need to resend the
-whole patch if you are commenting a single function.
-
-> 
-> Thanks & Regards,
-> Manikanta.
-> 
-> > +			return ret;
-> > +		}
-> > +
-
--- 
-With best wishes
-Dmitry
+Acked-by: Sergey Ryazanov <ryazanov=2Es=2Ea@gmail=2Ecom>
 
