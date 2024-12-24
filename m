@@ -1,53 +1,63 @@
-Return-Path: <netdev+bounces-154152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D20BE9FBAE9
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 10:05:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE22E9FBB0B
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 10:17:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 363C1166B1E
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 09:04:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45692188591F
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 09:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B90E18FDD5;
-	Tue, 24 Dec 2024 09:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8511B0F19;
+	Tue, 24 Dec 2024 09:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="P+lMinXO"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SDiO5VY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AD218C903
-	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 09:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBD417B502;
+	Tue, 24 Dec 2024 09:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735031050; cv=none; b=cil+D3auEw2fXS+NMzfKChtwGHoVic/cgi6NbRU+fiqzFaaHIKTvu/YT9PxgkQzGm/Zhz9ljUvIkKioXd18YdBQw0rUnuO7O51/Y6SuABynlyUKR7vGBkYMthvbimFYFyBh1HNUBjQuhc/zPO0ORI78u63SfB/+jGrZN9eIjVi8=
+	t=1735031845; cv=none; b=n1YK3BCJKKA0URfV7ZK1m93rgo/Nh9NNctVbVSm2Uh4eoMJ8mwXyLpiAnNgmyV1tdRMEhnYFCObtlWL50n022igpys964YNuMHKT7Bl+QI2QWrY2umXF7kLcpmbVCLkGTcqCp/z5wkM6t6vZAQa39HMXofZv+OxoPg/Km5GLcvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735031050; c=relaxed/simple;
-	bh=dR3J2AO7c6sZEVZYUFLwld1S6Z3ZBTYtkfqqtrwEmb8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LZBcpWuKnw25sQC6nNkxEuNuzafhhqoLoOIWVaaSxWyxDblb5Qe/8iNVi2UwFXLZ9rZ8TexiePMVssNQLzBeFco9YapvcF7A2u/RhzlQA8U5moHAEv+pcKY/uDpiwhLU60wD/YgXfkRJUIpEVd49bs626ZTfahwBd9MUE1JJYnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=P+lMinXO; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1735030936;
-	bh=pnRVptCir55iRN6tACq8biJmBmLFjYWt0eJCtl4slZk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=P+lMinXOiThCQiKcOQOGiyQDlg4ZKTuBdXLODby06XtRVA+Z4Sl/ki8Wr0hGhtJMU
-	 erZ1LrC6YOjriwM/0/qz+RXPaFvINtcHZ3wVwEccbJvfcNNSKRkaTR0AmixmZyRcE7
-	 5c77dalEE2jhUIgsL6RPt8zy26QKiNM4utLonco0=
-X-QQ-mid: bizesmtpip4t1735030894tk5g8f5
-X-QQ-Originating-IP: 96GmDbkbkKRgISxbB+698YkwYAo3Wyh+yJTBMgPP/c4=
-Received: from [IPV6:240e:668:120a::253:10f] ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 24 Dec 2024 17:01:28 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 9337975073141793265
-Message-ID: <EA91BB1E8AC92ED0+6715c92f-3b3b-4a86-82bf-4704c3b9f36a@uniontech.com>
-Date: Tue, 24 Dec 2024 17:01:28 +0800
+	s=arc-20240116; t=1735031845; c=relaxed/simple;
+	bh=r3LnchZt5jiUFC/pRAo2XnQFUmzjbmH3/bh/08GwTGI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MpMgg0zpPUrohHUL6BJ89VNIB0pTQfkLQEoBgyAICATyl6slEGJToiVokZrlIQmy2WDrh2xR8LRJC06dQh7qF2R+wrmWMiVKxGq2Vehd4jzumtPkk4TMQm+nIBujReI1GolGlekxRtBUnW04XkGfxz78PiDuRh1glb6/M75aFUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SDiO5VY2; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BNJt0SX029914;
+	Tue, 24 Dec 2024 09:17:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	4aMx8dzF99zpwMjEq3djGBe4XE2DbTVdqlX8oyPwli8=; b=SDiO5VY2wTSxGHwJ
+	xgPMITu7vyRMj+KPTOmJnIu3Ew9lu8SL6cOQo7+yxIMuG84siCrrRU6wmftKDmHt
+	qw6TxDP4Imjd2iavX8MWcBeF2M/LXN6/o2KChdhFyE/6aBSUWEFVbKlbwQigdv77
+	4yqJswTXxVEO2ka9J0QDXmUpq5hnyBrnVgdniYifKSUZ76OAC1gGle27Q7AF2+kW
+	pvLEoAi7v14JF3vk5SapiUUunzDWGtia3jxyQLbROWYlb4woI3vGDKPG/trOMtTD
+	pNZeVhSsQUE0LSZvJiWz9sK6N/Dbs/17CLQbdcCwE5LH3RN4jCIvNaZJpu2sl+EJ
+	e/medQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43qee0j8f6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Dec 2024 09:17:05 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BO9H4m1014212
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Dec 2024 09:17:04 GMT
+Received: from [10.152.195.140] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 24 Dec
+ 2024 01:16:55 -0800
+Message-ID: <db61cf6e-24a9-4b99-b4f0-4871f7fefae8@quicinc.com>
+Date: Tue, 24 Dec 2024 14:46:52 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,96 +65,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND. PATCH] mt76: mt76u_vendor_request: Do not print error
- messages when -EPROTO
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Kalle Valo <kvalo@kernel.org>
-Cc: nbd@nbd.name, lorenzo@kernel.org, ryder.lee@mediatek.com,
- shayne.chen@mediatek.com, sean.wang@mediatek.com, kvalo@kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
- gregkh@linuxfoundation.org, rodrigo.vivi@intel.com,
- linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- raoxu@uniontech.com, guanwentao@uniontech.com, zhanjun@uniontech.com,
- cug_yangyuancong@hotmail.com, lorenzo.bianconi@redhat.com,
- kvalo@codeaurora.org, sidhayn@gmail.com, lorenzo.bianconi83@gmail.com,
- sgruszka@redhat.com, keescook@chromium.org, markus.theil@tu-ilmenau.de,
- gustavoars@kernel.org, stf_xl@wp.pl, romain.perier@gmail.com,
- apais@linux.microsoft.com, mrkiko.rs@gmail.com, oliver@neukum.org,
- woojung.huh@microchip.com, helmut.schaa@googlemail.com,
- mailhol.vincent@wanadoo.fr, dokyungs@yonsei.ac.kr, deren.wu@mediatek.com,
- daniel@makrotopia.org, sujuan.chen@mediatek.com,
- mikhail.v.gavrilov@gmail.com, stern@rowland.harvard.edu,
- linux-usb@vger.kernel.org, leitao@debian.org, dsahern@kernel.org,
- weiwan@google.com, netdev@vger.kernel.org, horms@kernel.org, andrew@lunn.ch,
- leit@fb.com, wang.zhao@mediatek.com, chui-hao.chiu@mediatek.com,
- lynxis@fe80.eu, mingyen.hsieh@mediatek.com, yn.chen@mediatek.com,
- quan.zhou@mediatek.com, dzm91@hust.edu.cn, gch981213@gmail.com,
- git@qrsnap.io, jiefeng_li@hust.edu.cn, nelson.yu@mediatek.com,
- rong.yan@mediatek.com, Bo.Jiao@mediatek.com, StanleyYP.Wang@mediatek.com
-References: <1E6ABDEA91ADAB1A+20241218090833.140045-1-wangyuli@uniontech.com>
- <a2bbdfb4-19ed-461e-a14b-e91a5636cc77@intel.com>
- <5DB5DA2260D540B9+359f8cbf-e560-495d-8afe-392573f1171b@uniontech.com>
- <531681bd-30f5-4a70-a156-bf8754b8e072@intel.com>
+Subject: Re: [PATCH net-next v3 3/5] net: pcs: qcom-ipq9574: Add PCS
+ instantiation and phylink operations
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: Lei Wei <quic_leiwei@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <vsmuthu@qti.qualcomm.com>, <john@phrozen.org>
+References: <20241216-ipq_pcs_6-13_rc1-v3-0-3abefda0fc48@quicinc.com>
+ <20241216-ipq_pcs_6-13_rc1-v3-3-3abefda0fc48@quicinc.com>
+ <d278ad9a-5d23-4cb8-9de7-5a51d838ba5d@quicinc.com>
+ <yfh7kghxy5hjblnzlapcpzj54chep45pjkgpvelzbp4ijuq7ci@e6te6c36mkxc>
 Content-Language: en-US
-From: WangYuli <wangyuli@uniontech.com>
-Autocrypt: addr=wangyuli@uniontech.com; keydata=
- xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
- IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
- qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
- 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
- 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
- VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
- DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
- o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
-In-Reply-To: <531681bd-30f5-4a70-a156-bf8754b8e072@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+In-Reply-To: <yfh7kghxy5hjblnzlapcpzj54chep45pjkgpvelzbp4ijuq7ci@e6te6c36mkxc>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MZQHZNohqAr1ySumv8rKqCLq2N9jhH+RgB/6fBsMx78mVjsVlTw8EviR
-	9EC4j7yBQUHaq/slMyoMN070kRYJM33CUSpMKaydBzBrB8ysAz/Bf5V3aKUiMtwk2Dn/N+a
-	jUD5OmJFI8ETCl6/yHo1+a5ptUTbFAZT0beS1CXaGeT0oroUlozvKZWWH25QzV96Wfh83Jg
-	pPfyLVhwzkxI0z3Gsz/mwxLGGnEcnmon8jiLohh1qi7Htq4Iy7svdALJdI282wkG3trDM5W
-	+t+Rhr2HSfPXnEQK/zd/eaezB3Pds1HiboetSnaUFaduyCcM5Vg4fd47r/BnGUJi+b/rOOZ
-	n2fV4ngL4QefO/jE6bbnd8K8998vzbI4Ve5piYJWtjfTTdGH3bInMQU/vyLhf544ms9IIQ0
-	Iq0fc6KrU/x2577yHtqV47wI/ljuOmvugmQauoO8uEt8RrBMjTE032WSadewRzSFCZa1Dc8
-	tx02FlWEJbphZN6gdX2/JO4+efnKmz6w8dTGb6HGvM6Gh8P0anH5Bj9PoLRoQveyqdHuh5G
-	9Ra0JL1dmPFdvrGOHJw0N9WjOOe8YbwR6YjrD6uyQ6jgmfIBtJTCIZP+XaLnSgFdNx7Q/FP
-	5mS/j+OX4ebaVIr88DbGA3oHF7TNu+YLqrR9PiqMvZfg9mC4XcublZarzsrk09cBUyjGDA6
-	+uVS0DlTKS1xh5yZmRmRPDNEOLe9iTGKC4MIi0zTyoFOMwNOhABheZzkAP5Pp5cPEp+dcQf
-	dVwH+DJkesXfO6Yw7lPIXgB01UZ+MgkJo7IuRy0MURWKu55/+FN0gK6K1ue6rFKxKk+S14Q
-	10jgsJMWtcL5TzRX+oXuYauPyuiLu5tAO8mA+rup+NG0BCjFYPLEu7MhVVoqfqC6L0kXkEm
-	hFUVbsPkS2ioqFlgZp9K5KU+D6L/wcq0BNN9Qq8VqJat+mZhGuNETI1KtYN9k+hm1W2uHhU
-	PwKqs90l1YY2QxjrB3+68Iim0uRk2JlCHnnJ4GbWlN5/f6PnyA+L8jYVCNBJCp9iVIgfNtN
-	iYu7+iu9y5UxFHQYO4
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 37VCoxNVgZKIElLSVId1cePEXBARo0vS
+X-Proofpoint-GUID: 37VCoxNVgZKIElLSVId1cePEXBARo0vS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ clxscore=1015 priorityscore=1501 bulkscore=0 spamscore=0 phishscore=0
+ mlxscore=0 malwarescore=0 mlxlogscore=686 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412240078
 
 
-On 2024/12/19 23:23, Alexander Lobakin wrote:
-> So you need to add the correct tree and/or subject prefix and specify
-> "Fixes:" tag with the commit this change fixes.
->
->> ...
-> I'm not a wireless expert, from my PoV sounds good. Just describe
-> everything in details in the commit message, so that it will be clear
-> for everyone.
 
-Hi, I have attached the new patch as requested for your review.
+On 12/24/2024 12:45 PM, Dmitry Baryshkov wrote:
+> On Tue, Dec 24, 2024 at 12:29:56PM +0530, Manikanta Mylavarapu wrote:
+>>
+>>
+>> On 12/16/2024 7:10 PM, Lei Wei wrote:
+>>> This patch adds the following PCS functionality for the PCS driver
+>>> for IPQ9574 SoC:
+>>>
+>>> a.) Parses PCS MII DT nodes and instantiate each MII PCS instance.
+>>> b.) Exports PCS instance get and put APIs. The network driver calls
+>>> the PCS get API to get and associate the PCS instance with the port
+>>> MAC.
+>>> c.) PCS phylink operations for SGMII/QSGMII interface modes.
+>>>
+>>> Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
+>>> ---
+>>>  drivers/net/pcs/pcs-qcom-ipq9574.c   | 463 +++++++++++++++++++++++++++++++++++
+>>>  include/linux/pcs/pcs-qcom-ipq9574.h |  16 ++
+>>>  2 files changed, 479 insertions(+)
+>>>
+> 
+>>> +
+>>> +/* Parse the PCS MII DT nodes which are child nodes of the PCS node,
+>>> + * and instantiate each MII PCS instance.
+>>> + */
+>>> +static int ipq_pcs_create_miis(struct ipq_pcs *qpcs)
+>>> +{
+>>> +	struct device *dev = qpcs->dev;
+>>> +	struct ipq_pcs_mii *qpcs_mii;
+>>> +	struct device_node *mii_np;
+>>> +	u32 index;
+>>> +	int ret;
+>>> +
+>>> +	for_each_available_child_of_node(dev->of_node, mii_np) {
+>>> +		ret = of_property_read_u32(mii_np, "reg", &index);
+>>> +		if (ret) {
+>>> +			dev_err(dev, "Failed to read MII index\n");
+>>> +			of_node_put(mii_np);
+>>
+>> Assume, the second child node failed here.
+>> Returning without calling the first child node of_node_put().
+>>
+>> Please clear the previous child nodes resources before return.
+> 
+> s/clear child nodes/put OF nodes/
+> 
+> Note, for_each_available_child_of_node() handles refcounting for
+> the nodes that we looped through. So, I don't think the comment is
+> valid. If I missed something, please expand your comment.
+> 
 
-Link: 
-https://lore.kernel.org/all/BA065B146422EE5B+20241224085244.629015-1-wangyuli@uniontech.com/ 
+Yes, you are correct. for_each_available_child_of_node() handles the
+refcount. I am dropping my comment.
 
+> P.S. Please also trim your messages. There is no need to resend the
+> whole patch if you are commenting a single function.
+> 
 
-Please let me know if you have any questions.
+Got it. Thank you for your input.
 
-
-Thanks,
-
--- 
-
-WangYuli
+Thanks & Regards,
+Manikanta.
 
