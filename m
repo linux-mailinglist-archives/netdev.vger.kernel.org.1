@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-154150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B14DF9FBAE2
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 10:03:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B6B29FBAE8
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 10:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7198C16269F
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 09:02:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7120162AF5
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 09:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2792B1AF0C8;
-	Tue, 24 Dec 2024 09:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A66B1AB528;
+	Tue, 24 Dec 2024 09:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KYnEAfAZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MC/f6Nh/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3B918C33B
-	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 09:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0822518C03B
+	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 09:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735030946; cv=none; b=pOucZZb57o688bFjzppM4x4LLGFOQTW9wHE2im9l1ZlrNNWjxpWL428GOTEgyl8qpdmlJZ5hujMenoFiyjqYgRzzoHl+uuJFVTyC94frNchgbYso9QS7iQO01D5Aq3wkTriYIXjCfIyMibZdtqJEOcjMXxPcZHBUK97nLIrxSig=
+	t=1735031038; cv=none; b=K4gO8j5TKCTKf52Dls/nTReGq/NGPyaLVKAQfR49KYMdg6aCPlfvxsU1VDnG3U+Pf8OhTPUKE/lQIgEhZtZCdt5MZoxuvAVGHLMQS/7KxKnidDZBIWqyOinHWp91+v3ANSed7hHrQqUaur79IRlE44s1QwoYv4GV4v8Umbduc+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735030946; c=relaxed/simple;
-	bh=gSoT9CVaoJwBZDjeIeye2Xw8oj02DWXFADqKpE40gdo=;
+	s=arc-20240116; t=1735031038; c=relaxed/simple;
+	bh=XVANS7F/Xw4Z8WCtDEP8nZReVbCeyFH5yTQDQD0wYzQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pC3ZEEB0Yl+vB30cWQ0ngxs3TY1QcrVj+qxWt/G1MvYyEDifm3fJ3JEd6LfA0M+RklWAS2Z47QqDk3b6eI+AZxl1ohOGrcQg9BPFfEdQCc7QsUllTNyxYBZTW1mxQhbtn+vcDMnP8SP65UWyWKcVrxx3arCYtF4gvTAKCpe5giU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KYnEAfAZ; arc=none smtp.client-ip=209.85.218.49
+	 In-Reply-To:Content-Type; b=AH8ZZCN3yGDgfVBNvgh7DgEXoYs6KF2EKx4usBlA5CgUwQh32H85ff9tHRm3tBQdVVr44Ik/Hs7lff1gVRfFT9zJVcNENv2W0XPemuJ/ZUW7RRbqv1e4K5I9k5DM081pFzHc2TRqzwU1xJqrhE/Jd1fDGW9Spf1/d+iYuZZ8rIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MC/f6Nh/; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aa551d5dd72so95800766b.3
-        for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 01:02:23 -0800 (PST)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aa6a38e64e4so100472766b.0
+        for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 01:03:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1735030942; x=1735635742; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1735031033; x=1735635833; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rqjl308OuNRMbWugA4jzjOfqs1qN28qDlrGRi1lmlOA=;
-        b=KYnEAfAZeE6vOaSAR4hONbF9DgolWRVjaAY44iz0+jIXaWHear7Udb5jrD5sLcDAAR
-         9JsocFJr8zJgbGlrHajUkp1fpktwMN8WiPamNiS8+SiQouJKV1TR2Pq0LTSN0SeLnTde
-         4z8LbNLkS9+X9L50+mXsZsypuWQkaKRwrWnGap4NSZAtcsalkJln764zcA3u/bu1mbmN
-         V8LAXZD/FSyN3GVgO6Qzu7K3ftPtT9NICjpa014DgdPLysoOeEMTi2iuZRRPas+Wxh14
-         3m3PoZpdMqzqTcuosA7kAZLfOBaF6aER3WNjn5nkZ9dD4+CAZoRcBQYp2xVybCHNyZ3P
-         /4Kg==
+        bh=z0IZpYux0PQ21H1xi7uGwUCeGViaLFCCBjvWm749ZIg=;
+        b=MC/f6Nh/SjXxk5LpG1tnhFZleCVJCw6UOaliWUoqjdQF23mvjoFoUV50jXV1XRX7F4
+         2Itxv8QUykC2IXFFl1zKoe3VYWG0amdsm+v6vgYtV6jMh1xXLXIfTNKUbMBhOkfKlbnM
+         y9YBVq0QHPh78AFIW3VPYblFVg6EboXf4kVtpfHcOCvKz34sadbvKhzgtRjyFoDsY+/x
+         Zz10YPrtG8NpB41T1pC0267HUxD64TRX0mtIYsBbdtKL07hvGdBFfB9ycbBY6YwWYyt8
+         MIzxNViy7MG0WsjxudaO5MWqwzQeh6h8IVeUDAqp1Us5Mth/vH1CZIuSKMuh2qFJlqUQ
+         vGCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735030942; x=1735635742;
+        d=1e100.net; s=20230601; t=1735031033; x=1735635833;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rqjl308OuNRMbWugA4jzjOfqs1qN28qDlrGRi1lmlOA=;
-        b=a7AMQhVMFHISSq82t7mdlZN8tZsDjksh11Vtc6DOJOFGOJSUKbKPEDl7oFW4Jnlbdy
-         GjFSWbAR6fmNPR0puZXW3dFexqEOCCYXgFpuVMWZXqUJlvEN/2+AwygOhi7H6ZvBqyrr
-         c24pkEjTkcOhfIwkAYDI7RWE4MVwvkIBSxjcLy27CkYR2n1Bwsy6wCA0fXIEwv9NkMU5
-         k4FIKyOMdgC1NseyiNj+JN21fo6+1z4Mpu6tP8mAkAT/YGK4AOugRkyYQE3fsuMvUu2+
-         vxRAvT4bg16/biNMUxvCc8rDwXNXMXNMk5MTr7YQsCz8BmKdrndhBp1zNy3s6C0i9u/9
-         mCUQ==
-X-Gm-Message-State: AOJu0YzJ1aUqSt99ZZid4XYSYvfjUSKDF3iWMaYgOy0/taIk75nOTYFn
-	xo5aF+w6fD8DRqUPBklaMj9ah7ZLt4E8hsM1i7MBo75ynpOWBS///QqIRxEy+A8=
-X-Gm-Gg: ASbGncv9tx4g0KMwFfSIKHRPMKFDDdtQg27Pl+b8satOgZ5ytQTOIGxvfjApF+1TYVT
-	WegHCdEZUujD9HSSdu9mhToEQi/pgAe7K5gPedcEc5KMmhGlGCIqOdVKmXLCNExz58tjI+mYhQa
-	PIDU5H4RgU3kRwjAJbo2zopf+fmmTylvKu8HV4XlK8qGiyJGy9J/zI9Pjd6HokWqgCIKAcHYksu
-	Ajc31KPwvKaa0FfjbdOrvs9lz0SWhJlIGxg06L6q3Y3teO3AHivb1k1DEj7XE0TzmR/Ddqcn2RW
-	uiwnZDuUcfvwG2wwvutR2sK2tx0iHDghc8M=
-X-Google-Smtp-Source: AGHT+IGykTi7JHcE7u3RIbhw9nHMoGJBAN6VL/xBiSZ3UlC0+Pn4XzS4kF3dFtZfJ0nP0IfLmC2iOA==
-X-Received: by 2002:a17:907:2683:b0:a9a:8216:2f4d with SMTP id a640c23a62f3a-aac2714a5ecmr510447666b.3.1735030941539;
-        Tue, 24 Dec 2024 01:02:21 -0800 (PST)
+        bh=z0IZpYux0PQ21H1xi7uGwUCeGViaLFCCBjvWm749ZIg=;
+        b=rf68dLCozu5uFP6VeSuNIdvoMbYck03KLvi7y2NLjz6Ymaq8Vj8EdCbtzME221sMSi
+         qyZF+u1iY1kz1k4bNiR4OrQ7m0u/iok/ETAHsvkL3XOmWR47H2xcNdpS/fe17Lq8TXHB
+         XrDeSqAYh8RikwnRcAaqScUMszBQcUw9CSzZuZat1p/VDzWi2cBSNw2euwBilfmPIdeJ
+         0YynXJ2nElzpAwHdBQ00H1faTmrpyQ3BbY+LJ9wTxyB9wqEo+PMFoLqb9ki1jeUVDKGu
+         YcRRD07ljzAf3VHjVWVT76W40TuJVdWuk8PIpB5HlgthhcawHqIVlc2C1/heoNDs1X9x
+         qFXQ==
+X-Gm-Message-State: AOJu0YzkZALlOMQM7FDygSQOav+jjZwWqm1lngvYs2EHq9mnAU/Bds56
+	6T/98kdG830t9p8MpHkc8Xt8fuzPsLI3zM1wt86k63GAplNXQ9sFusnkaiO45E8=
+X-Gm-Gg: ASbGncvgz7en5tGy1qWQl1p5B1WhUyf/aft7X8+NCTxnA90c4yLobkEYn0Croz/aEia
+	enrXCgqd89NDOOmLv1kfoUOaGoFCdJAAy+4AGfrCi+QLVgSe3qD7nixaZslTT3i3fdlD6v++KV2
+	rdHtQS9ztEtTbb5EaP/GERK7ebanpdpre7DZ/Z5DHoWzNh1/hn1WBbfl2FpzvoeeCHl/99MfWnF
+	B3WDtG1WLAk7dEikvVWWXASLi/JH8o9pUtncqH1Dne3xESEaxz4z+TGR/bsCknssokok4ZUUDr8
+	+osX/P8SSN8yxx6R/iVtPla/xZi5x5iRVFg=
+X-Google-Smtp-Source: AGHT+IGww99qrBBuovvVWKdRBOFSplKcqorPH8QQi3151rHPzuzT+tIstiqWmsZPCGiK7Ga5fpjAnw==
+X-Received: by 2002:a17:907:9621:b0:aa6:a9a4:7bd6 with SMTP id a640c23a62f3a-aac2adb6962mr589868266b.6.1735031033293;
+        Tue, 24 Dec 2024 01:03:53 -0800 (PST)
 Received: from [192.168.0.18] (78-11-220-99.static.ip.netia.com.pl. [78.11.220.99])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0efe4b6bsm630137966b.93.2024.12.24.01.02.19
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0efe4c55sm624557866b.130.2024.12.24.01.03.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Dec 2024 01:02:19 -0800 (PST)
-Message-ID: <7813f2b0-e76a-463c-91f9-c0bd50da1f0a@linaro.org>
-Date: Tue, 24 Dec 2024 10:02:18 +0100
+        Tue, 24 Dec 2024 01:03:52 -0800 (PST)
+Message-ID: <b0e8a58f-530b-485a-81fb-208fa7840980@linaro.org>
+Date: Tue, 24 Dec 2024 10:03:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,8 +81,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: qcom,ethqos: Drop fallback
- compatible for qcom,qcs615-ethqos
+Subject: Re: [PATCH v2 2/3] dt-bindings: net: snps,dwmac: add description for
+ qcs615
 To: Yijie Yang <quic_yijiyang@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -99,7 +99,7 @@ Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org
 References: <20241224-schema-v2-0-000ea9044c49@quicinc.com>
- <20241224-schema-v2-1-000ea9044c49@quicinc.com>
+ <20241224-schema-v2-2-000ea9044c49@quicinc.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Content-Language: en-US
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
@@ -146,27 +146,20 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20241224-schema-v2-1-000ea9044c49@quicinc.com>
+In-Reply-To: <20241224-schema-v2-2-000ea9044c49@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 24/12/2024 04:07, Yijie Yang wrote:
-> The core version of EMAC on qcs615 has minor differences compared to that
-> on sm8150. During the bring-up routine, the loopback bit needs to be set,
-> and the Power-On Reset (POR) status of the registers isn't entirely
-> consistent with sm8150 either.
-> Therefore, it should be treated as a separate entity rather than a
-> fallback option.
-
-... and explanation of ABI impact? You were asked about this last time,
-so this is supposed to end up here.
-
+> Add the necessary compatible entries for qcs615 to ensure its validation.
 > 
-> Fixes: 32535b9410b8 ("dt-bindings: net: qcom,ethqos: add description for qcs615")
 > Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
 > ---
->  Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+This should be squashed with previous, otherwise patchset is not bisectable.
+
 Best regards,
 Krzysztof
 
