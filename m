@@ -1,94 +1,162 @@
-Return-Path: <netdev+bounces-154161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8AD9FBCBA
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 11:48:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B6C59FBCE6
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 12:18:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D60B1688F7
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 10:45:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF4AA1881719
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 11:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2A21B219D;
-	Tue, 24 Dec 2024 10:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12D11B4F08;
+	Tue, 24 Dec 2024 11:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nYP1+T0O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30844193409;
-	Tue, 24 Dec 2024 10:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DE71990A2
+	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 11:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735037070; cv=none; b=a6iuZKpqO/dV51c7FLIeMHmxJXGL9a5PiCUfxFE2sP5jPfI232U2LIE5Wx+A4XdEm0y8sVy/sCTrxCEV5Pg62JaW/Roi8Ne81kqbQ3oT0BfwYEZb3mm83SgIUDbeTbgIwfixfyqXWIq22AGx81qUC8TivTEEnKRfsTMm5xKaxM0=
+	t=1735039089; cv=none; b=EWWyqBEMRlgJEGtSSTPAIwbSkrlMGPxRdlPoi9kmXqgq+GndvKX3am3SqIZz8+Ggwfq5+cjiMYPBQY7uJMt6JFDgxh2A6428alaSd3el3POd4Jofyg5PKZV2m96RGIAjbZQ+8F3OLMZ9gUzjapWcvi5hINxhxAs6bY/1AJ0V40U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735037070; c=relaxed/simple;
-	bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+	s=arc-20240116; t=1735039089; c=relaxed/simple;
+	bh=cD5rUdco79iyVWIzmdcPzjzRo+I2kPeHFhx2WOhYDv0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KzWhr2C3bZlLWL7n+Y7Z4CJBtpgj/+gskB4IaIs7JdVLXha6ghR72G/QJ3DNrez6g3BgxkdeaMDjpFc0R8lwqDAtDO03PwAh5UHbCWk6hbVsm1RnIBGJxL5WHi6e8cmMjkfXo5re6JpUxd4AeH1hMdAYta3Y5RksPBK14F4XoFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43618283d48so36934035e9.1;
-        Tue, 24 Dec 2024 02:44:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735037067; x=1735641867;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=TFHGpDpHOYWirYFSDDp7RZmTrpnTugdGQb644NNm2JG+fOLTRNaGJQsDuowJ07gvNt
-         0r9YCnYOAp3Vz7/DbpZKJKpflOFo7wJprHikhJQuUfdUUbJEONO2aa1BUfoWXPyRARHc
-         VL66AtnRiRvWN1gWH2PZRuCFo5494WscY24Lk8yDy1ojn1tFsFhXuqYcbZS5cfs3daCh
-         gvbF2Xxd6Zt65ZLXsMC3xotrw1bnMkJnUycCnYD4KwOuNrPG10mxpi0hummDuaMtSqDq
-         JmQYvKYr8PEDrbnKI6rFA6mkuPL5rBsVTKT0sVE5CX3UyoZVt/r0+VGDd/I4c4TPGkwb
-         aRfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWn6oEshrCt6/sAOnYRTLZlmg9c+zNH/pQLjYwJknbf0nDBkNZzMb9FQb8ihM8UYAEqM6632CAIHluvuhv8OM=@vger.kernel.org, AJvYcCUf6+fPIjuQEnMCYnXN/PR3oUzpruCixVcHyyogf8c2hZO+oZURnuGEXRzSTNxyhCfVIZzNJgVrkkNJwOZc@vger.kernel.org, AJvYcCWrmcvPqzlP5TbQpOqik/+iWqYqh2qS1HMoZnRxb+dfDS7ykErrrlQJQOJbImX5qE9zw1vNNwTZfRH5tT25@vger.kernel.org, AJvYcCXZqK14tTrykui+BldsS+8YKPp2uXpgPKe5aljHBZpthwKiGbAXFTeR8ST++bSGCUgvMtf6tSAg@vger.kernel.org, AJvYcCXtnvXj0y5ViqhqeIlt8EVLohRpQiEX9l8R+p7M3RVIDpnBV0kVOR2fF8X1/Ye0dYAda9RNmuTMRhmG2g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJlDbLfzB4hzK+xBPzvl073NLk1Yw94xYdgmw9EFOjHLPFmSh7
-	sloM2wLJf8vrcrn4z8I9DUOPZ1Sb4krJUmnji2FQxPCXDBKhYbbC
-X-Gm-Gg: ASbGnctRxHDEEXpi3HWF+uhAuaUxd5qxsYoqHc/FMjjs04MKVPLIwHHWrxYF6mQB75F
-	T5M6H8czcJ38KBGsYSwKuMRKrtQ2znkVz8matBEfTvU1VyZwPZjhUUnIasTHOFgiYGz9MZmu9B6
-	u8NsTTJ0AL9KtSrAhvG/ueFEr06Uq5HSvOLTuzpQCuxfOwz62Ewel7BWUrCiewzBcCYxUTUvWO2
-	IiFqeT9l2b+Ii1Uyh0hGmYt8YPNjxMbsr4CZc1Bjv1TFgoH1DWfcEJrwb7t5PO9u2wMIU/uUEOv
-	szzx+ULJhBWAeT4WFHYDO0k=
-X-Google-Smtp-Source: AGHT+IHxq/iA5grijNAymPWay23D0iFdsFNkmhYOlxQbOIIanspFe78QUP99gU/SefByF5UHbl8HKg==
-X-Received: by 2002:a05:6000:144f:b0:385:f271:a22c with SMTP id ffacd0b85a97d-38a2240e20bmr15043579f8f.59.1735037067445;
-        Tue, 24 Dec 2024 02:44:27 -0800 (PST)
-Received: from [10.50.4.206] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366127c4d7sm163226825e9.34.2024.12.24.02.44.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Dec 2024 02:44:27 -0800 (PST)
-Message-ID: <47f88e5d-e262-40e5-87bc-ea2e30ec8bc9@grimberg.me>
-Date: Tue, 24 Dec 2024 12:44:24 +0200
+	 In-Reply-To:Content-Type; b=byJlEFo1Zg2vj4rxa4bnRIftfS+vcWPxsBXSSSu7HmBHIE/WHiDUQfQSAGjKVStshVoIhDHkg8+2MJmo2gCIeWUOW+hoPlz9GRRJ7QxzHrsT/3JjIigWzXopCgAnUnUYcODRN8VGCiuG8eF3XnDgNK8vYsGexvEKS/bWcZFV5e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nYP1+T0O; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a9842ec6-a7c4-4d17-98e2-c59b4d0ec3af@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1735039081;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q6KqOsvDuYgxtKncUsMawtgjKb2hqKRcrK+zi0ZnUiU=;
+	b=nYP1+T0OGOvLUZPv/gDMHrxfkGJedPH3SPQlSY7UT3r2YsBsq5fkiS64MkpH+0aP5xR99A
+	7Z3dZXSLcNZk8KuMCn/zQjGYkwkOhz+fCXrG7rMlRlWksrbg2fpZAuSry6930YH4u0AE/2
+	bzMh9pVeHyUr4OUSdB/XESrQklJzo64=
+Date: Tue, 24 Dec 2024 11:17:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: core: Convert inet_addr_is_any() to sockaddr_storage
-To: Kees Cook <kees@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Mike Christie <michael.christie@oracle.com>,
- Max Gurtovoy <mgurtovoy@nvidia.com>, Maurizio Lombardi
- <mlombard@redhat.com>, Dmitry Bogdanov <d.bogdanov@yadro.com>,
- Mingzhe Zou <mingzhe.zou@easystack.cn>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Simon Horman <horms@kernel.org>, "Dr. David Alan Gilbert"
- <linux@treblig.org>, linux-nvme@lists.infradead.org,
- linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
- netdev@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20241217012618.work.323-kees@kernel.org>
+Subject: Re: [PATCH net-next] ptp: ocp: constify 'struct bin_attribute'
+To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241222-sysfs-const-bin_attr-ptp-v1-1-5c1f3ee246fb@weissschuh.net>
 Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20241217012618.work.323-kees@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241222-sysfs-const-bin_attr-ptp-v1-1-5c1f3ee246fb@weissschuh.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On 22/12/2024 20:08, Thomas Weißschuh wrote:
+> The sysfs core now allows instances of 'struct bin_attribute' to be
+> moved into read-only memory. Make use of that to protect them against
+> accidental or malicious modifications.
+> 
+> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+
+Thanks!
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+
+> ---
+>   drivers/ptp/ptp_ocp.c | 16 ++++++++--------
+>   1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index 5feecaadde8e05a2a2bb462094434e47e5336400..7f08c70d81230530fda459eefa9b7098dcbba79f 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
+> @@ -3692,7 +3692,7 @@ DEVICE_FREQ_GROUP(freq4, 3);
+>   
+>   static ssize_t
+>   disciplining_config_read(struct file *filp, struct kobject *kobj,
+> -			 struct bin_attribute *bin_attr, char *buf,
+> +			 const struct bin_attribute *bin_attr, char *buf,
+>   			 loff_t off, size_t count)
+>   {
+>   	struct ptp_ocp *bp = dev_get_drvdata(kobj_to_dev(kobj));
+> @@ -3727,7 +3727,7 @@ disciplining_config_read(struct file *filp, struct kobject *kobj,
+>   
+>   static ssize_t
+>   disciplining_config_write(struct file *filp, struct kobject *kobj,
+> -			  struct bin_attribute *bin_attr, char *buf,
+> +			  const struct bin_attribute *bin_attr, char *buf,
+>   			  loff_t off, size_t count)
+>   {
+>   	struct ptp_ocp *bp = dev_get_drvdata(kobj_to_dev(kobj));
+> @@ -3750,11 +3750,11 @@ disciplining_config_write(struct file *filp, struct kobject *kobj,
+>   
+>   	return err;
+>   }
+> -static BIN_ATTR_RW(disciplining_config, OCP_ART_CONFIG_SIZE);
+> +static const BIN_ATTR_RW(disciplining_config, OCP_ART_CONFIG_SIZE);
+>   
+>   static ssize_t
+>   temperature_table_read(struct file *filp, struct kobject *kobj,
+> -		       struct bin_attribute *bin_attr, char *buf,
+> +		       const struct bin_attribute *bin_attr, char *buf,
+>   		       loff_t off, size_t count)
+>   {
+>   	struct ptp_ocp *bp = dev_get_drvdata(kobj_to_dev(kobj));
+> @@ -3789,7 +3789,7 @@ temperature_table_read(struct file *filp, struct kobject *kobj,
+>   
+>   static ssize_t
+>   temperature_table_write(struct file *filp, struct kobject *kobj,
+> -			struct bin_attribute *bin_attr, char *buf,
+> +			const struct bin_attribute *bin_attr, char *buf,
+>   			loff_t off, size_t count)
+>   {
+>   	struct ptp_ocp *bp = dev_get_drvdata(kobj_to_dev(kobj));
+> @@ -3812,7 +3812,7 @@ temperature_table_write(struct file *filp, struct kobject *kobj,
+>   
+>   	return err;
+>   }
+> -static BIN_ATTR_RW(temperature_table, OCP_ART_TEMP_TABLE_SIZE);
+> +static const BIN_ATTR_RW(temperature_table, OCP_ART_TEMP_TABLE_SIZE);
+>   
+>   static struct attribute *fb_timecard_attrs[] = {
+>   	&dev_attr_serialnum.attr,
+> @@ -3867,7 +3867,7 @@ static struct attribute *art_timecard_attrs[] = {
+>   	NULL,
+>   };
+>   
+> -static struct bin_attribute *bin_art_timecard_attrs[] = {
+> +static const struct bin_attribute *const bin_art_timecard_attrs[] = {
+>   	&bin_attr_disciplining_config,
+>   	&bin_attr_temperature_table,
+>   	NULL,
+> @@ -3875,7 +3875,7 @@ static struct bin_attribute *bin_art_timecard_attrs[] = {
+>   
+>   static const struct attribute_group art_timecard_group = {
+>   	.attrs = art_timecard_attrs,
+> -	.bin_attrs = bin_art_timecard_attrs,
+> +	.bin_attrs_new = bin_art_timecard_attrs,
+>   };
+>   
+>   static const struct ocp_attr_group art_timecard_groups[] = {
+> 
+> ---
+> base-commit: bcde95ce32b666478d6737219caa4f8005a8f201
+> change-id: 20241222-sysfs-const-bin_attr-ptp-7aec7d5332a8
+> 
+> Best regards,
+
 
