@@ -1,189 +1,151 @@
-Return-Path: <netdev+bounces-154183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 637A79FBE79
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 14:25:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2359F9FBEBF
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 14:39:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7C63165505
-	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:16:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D2847A1D13
+	for <lists+netdev@lfdr.de>; Tue, 24 Dec 2024 13:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655981DDC2C;
-	Tue, 24 Dec 2024 13:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEEC1D958E;
+	Tue, 24 Dec 2024 13:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="AxVPJ8xE"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="k8l3k7jp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-tydg10011801.me.com (pv50p00im-tydg10011801.me.com [17.58.6.52])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83EDC1D90AC
-	for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 13:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59E11C5F3D;
+	Tue, 24 Dec 2024 13:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735045813; cv=none; b=Y6pWEVGq/Y8B6DtbBSEdNAyTmyginFXKDJcqWli+0wRpH9zV6jZ3JlC3tIz5RLiz7iLmqO58tJ3gkEVBWiejnl4niTS89vKjKJHVUpmnvuNPibhWcl0ujGVa359VFTfaRHbwovCmlp17yW3K4FPm9p7diJTd/DMpcCDwXnrC9vU=
+	t=1735047504; cv=none; b=Y7lffC6o5JS+kj5t0DxKE+MqPkObMLiy6z/dRw0QB8cQyGjQFA59lGJAIwMDpJa8QdoC3sY+q2NMK5ixEcGoGU0WS5QWBBiA65fLxoCOI1h0L5WnLqccCzuQi45XAS6b51LSuBPiyVuHtmtaN6KI1+7//66E9mIoqFXspqUFZds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735045813; c=relaxed/simple;
-	bh=d3RWbfmtjm10GAZA1NaOSKX3f3hNp1vr+fuyWoNuJcw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=t7pWAp6eWv2ixtXFMiYrH1A88btaN3/rIZXlhgxj/fOME2fJuQz++lA/o1Z2B10RuBeUaEH1ToK/BcB4R/pok6OrjJkpPVk+fqKxSWIxVl7XcA/Cqi1jxEC7nFq2rrLgAzllsmj6ZBUUrL6rfNOBYdecO70OPb+oXWMP6N5nSbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=AxVPJ8xE; arc=none smtp.client-ip=17.58.6.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1735045809;
-	bh=+P6kTmCwDbC0RwMmjYjZfzPZ5o9SCTkxH8bGJ/DVcdQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:
-	 x-icloud-hme;
-	b=AxVPJ8xE7IiWw6cbo3S5ZKZH3z7Hi9BUCVDPv3Qac/bUNw+Uy7la0cfvpXstl+R4k
-	 d3OR2kxsnE9TSpGo7hvUmbo4QD9z8W53buY16wxOWexw8kdAhCGZVYEdCZpZubHHBV
-	 FY/SiAYUWqLyNhjNdzpmG1NQAJtyxSptm6XdXCGRH5Z+qqIzZuu8our/KH95GMqI+4
-	 XrQBTucyWATdZwbvxuwF251RmjTy3jciENN89GtSSAxwZNLsAzmepoHHTKruasMtEb
-	 OZHtDY4ufCWqDFkuZR/Iwudf2DFvbXwAEBZQhombPvvzSSH6bbnpLli7EPmNjXwGmD
-	 2UufvwkDZOHLw==
-Received: from [192.168.1.25] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-tydg10011801.me.com (Postfix) with ESMTPSA id C8CD58001A5;
-	Tue, 24 Dec 2024 13:09:34 +0000 (UTC)
-From: Zijun Hu <zijun_hu@icloud.com>
-Date: Tue, 24 Dec 2024 21:05:11 +0800
-Subject: [PATCH v5 12/12] usb: typec: class: Remove both cable_match() and
- partner_match()
+	s=arc-20240116; t=1735047504; c=relaxed/simple;
+	bh=Np9DxG6lhp5f+BD4bT9ivbfljPDJZWbA0YKs51oy7tA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ulKMBIXCim23HiUh+EkDX7TBT3EPACvwe1vKZEQ1XIZkA8OLOMxIpMTWWqHLVH1+1gWtqnSgfplUsHXw+QUP0GKuvJpnFGY444ecMJIDU1LMqVUGfLL9itQWxTglAxRnan61lxWtn9riWXihRccuqI4bq/wzITyFW8UdL9RpYZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=k8l3k7jp; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=MHnOFXXSXIdENXt5HTUAoLwLeJZTiiq+wvPscmOY3b8=; b=k8l3k7jpBE9PzGG4UmjN9g+Rvt
+	WJPzZlvPRgIVkVdIEi49UMoblb14R8ITJAiF/A8YcDLjFTfZCoPZI3/MfvM48SBB+kpQcks+O21++
+	w5lhUBV/89JFrRITbCBWBGE58W9Aa2l2HzDPXIgXqCCKmbcubVFYhVzvyhJncNgbICuoC5nT0fVWO
+	+VEr3gGapOGGSdjRSM+1KfteB7GDGXScC0rGNIfd6qMvzmqpeSq4127Fec0lg3dFBxo0RVAVSV8+H
+	/cO1ncqkzwkewLlW17NbYxRaDfILeQ2ZCKYOyYteiwVol/9WoqYoTxnQ+DEJ3iPp1SbGGmHuFcDRB
+	kH+0Ytzw==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1tQ56z-000FSg-ON; Tue, 24 Dec 2024 14:38:13 +0100
+Received: from [194.230.160.170] (helo=[172.20.10.7])
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1tQ56z-000Pe3-0S;
+	Tue, 24 Dec 2024 14:38:13 +0100
+Message-ID: <2224e5ac-4b9d-4ffc-bc36-27a4f0b20a65@iogearbox.net>
+Date: Tue, 24 Dec 2024 14:38:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] bpf for v6.13-rc4
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, alexei.starovoitov@gmail.com,
+ andrii@kernel.org, martin.lau@kernel.org
+References: <20241221002123.491623-1-daniel@iogearbox.net>
+ <CAHk-=whmQSiZzQuUMLHf7jn5eS1=PEhpPdTNVq8LX0qBk31w0A@mail.gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <CAHk-=whmQSiZzQuUMLHf7jn5eS1=PEhpPdTNVq8LX0qBk31w0A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241224-const_dfc_done-v5-12-6623037414d4@quicinc.com>
-References: <20241224-const_dfc_done-v5-0-6623037414d4@quicinc.com>
-In-Reply-To: <20241224-const_dfc_done-v5-0-6623037414d4@quicinc.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>, 
- Bartosz Golaszewski <brgl@bgdev.pl>, 
- =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>, 
- James Bottomley <James.Bottomley@HansenPartnership.com>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>, 
- Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org, 
- nvdimm@lists.linux.dev, linux-sound@vger.kernel.org, 
- sparclinux@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-cxl@vger.kernel.org, linux1394-devel@lists.sourceforge.net, 
- arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org, 
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- linux-mediatek@lists.infradead.org, linux-hwmon@vger.kernel.org, 
- linux-media@vger.kernel.org, linux-pwm@vger.kernel.org, 
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
- linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, 
- netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-X-Mailer: b4 0.14.2
-X-Proofpoint-GUID: eTLCtiKK8Fgfs3nYwpfa688b2JqfTn65
-X-Proofpoint-ORIG-GUID: eTLCtiKK8Fgfs3nYwpfa688b2JqfTn65
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-24_05,2024-12-24_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 clxscore=1015 mlxscore=0
- spamscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2412240114
-X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27497/Tue Dec 24 10:44:06 2024)
 
-From: Zijun Hu <quic_zijuhu@quicinc.com>
+Hi Linus,
 
-cable_match(), as matching function of device_find_child(), matches
-a device with device type @typec_cable_dev_type, and its task can be
-simplified by the recently introduced API device_match_type().
+On 12/21/24 8:23 PM, Linus Torvalds wrote:
+> On Fri, 20 Dec 2024 at 16:21, Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>
+>> - Fix inlining of bpf_get_smp_processor_id helper for !CONFIG_SMP
+>>    systems (Andrea Righi)
+> 
+> LOL.
+> 
+> However, it strikes me that this only handles the x86-64 case.
+> 
+> The other cases (arm64, RISC-V) may not have the pcpu_hot crash, but
+> they still generate silly code to load off the thread pointer. Does
+> that even exist (or get initialized) in UP?
+> 
+> End result: I think you should have done the UP case separately and
+> outside the CONFIG_X86_64.. And why do this only for the
+> "verifier_inlines_helper_call()" case rather than just do it
+> unconditionally?
 
-partner_match() is similar with cable_match() but with a different
-device type @typec_partner_dev_type.
+All makes sense, I'll look into following up on your above suggestion
+once back from travel!
 
-Remove both functions and use the API plus respective device type instead.
+> Anyway, I obviously pulled this, but it does seem silly.
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
- drivers/usb/typec/class.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/usb/typec/class.c b/drivers/usb/typec/class.c
-index 601a81aa1e1024265f2359393dee531a7779c6ea..3a4e0bd0131774afd0d746d2f0a306190219feec 100644
---- a/drivers/usb/typec/class.c
-+++ b/drivers/usb/typec/class.c
-@@ -1282,11 +1282,6 @@ const struct device_type typec_cable_dev_type = {
- 	.release = typec_cable_release,
- };
- 
--static int cable_match(struct device *dev, const void *data)
--{
--	return is_typec_cable(dev);
--}
--
- /**
-  * typec_cable_get - Get a reference to the USB Type-C cable
-  * @port: The USB Type-C Port the cable is connected to
-@@ -1298,7 +1293,8 @@ struct typec_cable *typec_cable_get(struct typec_port *port)
- {
- 	struct device *dev;
- 
--	dev = device_find_child(&port->dev, NULL, cable_match);
-+	dev = device_find_child(&port->dev, &typec_cable_dev_type,
-+				device_match_type);
- 	if (!dev)
- 		return NULL;
- 
-@@ -2028,16 +2024,12 @@ const struct device_type typec_port_dev_type = {
- /* --------------------------------------- */
- /* Driver callbacks to report role updates */
- 
--static int partner_match(struct device *dev, const void *data)
--{
--	return is_typec_partner(dev);
--}
--
- static struct typec_partner *typec_get_partner(struct typec_port *port)
- {
- 	struct device *dev;
- 
--	dev = device_find_child(&port->dev, NULL, partner_match);
-+	dev = device_find_child(&port->dev, &typec_partner_dev_type,
-+				device_match_type);
- 	if (!dev)
- 		return NULL;
- 
-@@ -2170,7 +2162,9 @@ void typec_set_pwr_opmode(struct typec_port *port,
- 	sysfs_notify(&port->dev.kobj, NULL, "power_operation_mode");
- 	kobject_uevent(&port->dev.kobj, KOBJ_CHANGE);
- 
--	partner_dev = device_find_child(&port->dev, NULL, partner_match);
-+	partner_dev = device_find_child(&port->dev,
-+					&typec_partner_dev_type,
-+					device_match_type);
- 	if (partner_dev) {
- 		struct typec_partner *partner = to_typec_partner(partner_dev);
- 
-@@ -2334,7 +2328,9 @@ int typec_get_negotiated_svdm_version(struct typec_port *port)
- 	enum usb_pd_svdm_ver svdm_version;
- 	struct device *partner_dev;
- 
--	partner_dev = device_find_child(&port->dev, NULL, partner_match);
-+	partner_dev = device_find_child(&port->dev,
-+					&typec_partner_dev_type,
-+					device_match_type);
- 	if (!partner_dev)
- 		return -ENODEV;
- 
-@@ -2361,7 +2357,8 @@ int typec_get_cable_svdm_version(struct typec_port *port)
- 	enum usb_pd_svdm_ver svdm_version;
- 	struct device *cable_dev;
- 
--	cable_dev = device_find_child(&port->dev, NULL, cable_match);
-+	cable_dev = device_find_child(&port->dev, &typec_cable_dev_type,
-+				      device_match_type);
- 	if (!cable_dev)
- 		return -ENODEV;
- 
-
--- 
-2.34.1
-
+Thanks & Merry Xmas,
+Daniel
 
