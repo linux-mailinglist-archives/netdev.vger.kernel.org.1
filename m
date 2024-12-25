@@ -1,129 +1,135 @@
-Return-Path: <netdev+bounces-154227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C71E09FC320
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 02:24:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D84B59FC327
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 02:33:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50BF116400F
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 01:24:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A94D164D9E
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 01:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5043C2C9;
-	Wed, 25 Dec 2024 01:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="bPCfM0oa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7854310F4;
+	Wed, 25 Dec 2024 01:33:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BB0182;
-	Wed, 25 Dec 2024 01:24:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92AD1A41;
+	Wed, 25 Dec 2024 01:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735089885; cv=none; b=UPeLAhBX6vScYijX8gmOf3SG5buWfO5KxD+QAP3JR2qB1oX74qaEpPZ3rf+qeAMMTvFcTAeazEAUXTncj/zw7/x/xHvQLUKFSGPGFsP74c+EE1ixshTwc+7uj1KMBKX5+Vc4E8UU/TcAELoz08QqWXKsn/07wQ11KlyLvzyVl3I=
+	t=1735090411; cv=none; b=ewG8y14KrYomFHVhZSmDj/yRDo3dek1bxjopRrmYwPLIsYcFps3rpI8U8IzRjHlxm+bpDQlSyhkWre8KcX6b+D5PpHUFDpdoEA7O9fnczbDeidBRcN0UZ6HRaBbFQIQA6eDYqkaSCEiS/Gd+az2qcnByqu9+4EC5nTXmSbJexio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735089885; c=relaxed/simple;
-	bh=hKaf7lIuqNPc3ZB9WeQq9vNqcHXHsrVNlgn6L7OdGdo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lXz+/gHYk01Q+hvm2SZyVN0DndOe77/An/bLbM0uNYBs/zVAPknyANYuLF8Gg/L+o+A1PltVmfGkuZohPbk1XpQ0HrRq/yMPtfLkpotHo75+gaHaBVb31Pf/7queb8l7bRKiizFac/OyLFnkeh+n7VEhmEn4tPWalwWyyQDjurs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=bPCfM0oa; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=MTGyQnrnGUuBrgjv5kbsHz5k8pWZRa+UBdMpaL41sqw=; b=bPCfM0oadqAG3mne
-	kmXngdlKed61OG7qP9UWCRTebyYLZauJgqsFZ/IG432UuSfC2G3E3lZ3j3YJi9vfubNj9I19vGDwt
-	+fGnYBgDAeHW9bWTF7rqSdKuPJ72TZJaW4Xlc7aNUlQS3dcajGBFnsH7CHF2x4aAgd5UkBlIYUzx9
-	i2fDjlKHyWaLhrMwJ8Bl83QhaGe/GqHlh2M+H0/SIuBOIXHDXlym355seh+xmLc9T2Xh2bTxXhDa1
-	17L/eLKwVabOOhaNzn240kWU1q0Kwrn83+hg3Trr3MgO5EmoL8KWErMilYlky0IGHl+buUYDwLZSQ
-	Z8FRFPTZejw1lq4dYA==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tQG8N-0073eA-2t;
-	Wed, 25 Dec 2024 01:24:23 +0000
-From: linux@treblig.org
-To: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [RFC net-next] net: mac802154: Remove unused ieee802154_mlme_tx_one
-Date: Wed, 25 Dec 2024 01:24:23 +0000
-Message-ID: <20241225012423.439229-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1735090411; c=relaxed/simple;
+	bh=iO3KjTNyOTHXeSojKi/vXYUrZmcdxZnrolpcKNNfSwE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I17vvHRFyOQ0bqlOf5FaRKYrxkcz/b4wFpb30v8p9f2d/5KW9hmVj4NfEGr5VEgz4ca0dpqqzLTBFJEdh+GZJ8jTCQuQ33Y3h0qjorYEWSaqTLQow8+pnwpowL2le6sI42MeyUs+C/g84fa4glEDuouMpMMPLYLmiKR8MtSH21E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YHvQq72vXz4f3jqq;
+	Wed, 25 Dec 2024 09:33:07 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 979091A018D;
+	Wed, 25 Dec 2024 09:33:22 +0800 (CST)
+Received: from [10.174.177.210] (unknown [10.174.177.210])
+	by APP4 (Coremail) with SMTP id gCh0CgBHI4fgYGtnVV46Fg--.22008S3;
+	Wed, 25 Dec 2024 09:33:22 +0800 (CST)
+Message-ID: <19f1211e-01fe-f2c4-ca3b-c4231e11508c@huaweicloud.com>
+Date: Wed, 25 Dec 2024 09:33:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [RFC PATCH 0/5] nfsd/sunrpc: cleanup resource with sync mode
+To: NeilBrown <neilb@suse.de>
+Cc: chuck.lever@oracle.com, jlayton@kernel.org, okorniev@redhat.com,
+ Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org, anna@kernel.org,
+ linux-nfs@vger.kernel.org, netdev@vger.kernel.org, yangerkun@huawei.com,
+ yi.zhang@huawei.com
+References: <20241216142156.4133267-1-yangerkun@huaweicloud.com>
+ <173508083549.11072.301112272697956815@noble.neil.brown.name>
+From: yangerkun <yangerkun@huaweicloud.com>
+In-Reply-To: <173508083549.11072.301112272697956815@noble.neil.brown.name>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBHI4fgYGtnVV46Fg--.22008S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF4fKF15Aw4xuFy3ZF1xuFg_yoW8ZF4rpF
+	WIvFZrKw4kJFyIkw4vvayUXa4rKr9YyryxA3WrXw42y34rWrn7W3s0yF4qg34qqrn5Gay2
+	vry0va45CF1DAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU92b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x07UAwIDUUUUU=
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-ieee802154_mlme_tx_one() was added in 2022 by
-commit ddd9ee7cda12 ("net: mac802154: Introduce a synchronous API for MLME
-commands") but has remained unused.
 
-Remove it.
+在 2024/12/25 6:53, NeilBrown 写道:
+> On Tue, 17 Dec 2024, Yang Erkun wrote:
+>> From: Yang Erkun <yangerkun@huawei.com>
+>>
+>> After f8c989a0c89a ("nfsd: release svc_expkey/svc_export with
+>> rcu_work"), svc_export_put/expkey_put will call path_put with async
+>> mode. This can lead some unexpected failure:
+>>
+>> mkdir /mnt/sda
+>> mkfs.xfs -f /dev/sda
+>> echo "/ *(rw,no_root_squash,fsid=0)" > /etc/exports
+>> echo "/mnt *(rw,no_root_squash,fsid=1)" >> /etc/exports
+>> exportfs -ra
+>> service nfs-server start
+>> mount -t nfs -o vers=4.0 127.0.0.1:/mnt /mnt1
+>> mount /dev/sda /mnt/sda
+>> touch /mnt1/sda/file
+>> exportfs -r
+>> umount /mnt/sda # failed unexcepted
+>>
+>> The touch above will finally call nfsd_cross_mnt, add refcount to mount,
+>> and then add cache_head. Before this commit, exportfs -r will call
+>> cache_flush to cleanup all cache_head, and path_put in
+>> svc_export_put/expkey_put will be finished with sync mode. So, the
+>> latter umount will always success. However, after this commit, path_put
+>> will be called with async mode, the latter umount may failed, and if we
+>> add some delay, umount will success too. Personally I think this bug and
+>> should be fixed. We first revert before bugfix patch, and then fix the
+>> original bug with a different way.
+> 
+> Thanks for these patches.  I think they are certainly a better approach
+> to fixing the problem - well done.
+> 
+> My only thought was that instead of changing how cache_check() works, we
+> could introduce cache_check_rcu() which doesn't drop the ref.
+> cache_check() would then just call that then optionally drop the ref.
+> I'm not convinced that is better, so I'm just mentioning it in case
+> anyone else wants to agree.  I'm happy for the patch set to be applied
+> as-is.
+> 
+>   Reviewed-By: NeilBrown <neilb@suse.de>
+> 
 
-Note, there's still a ieee802154_mlme_tx_one_locked()
-variant that is used.
+Thanks a lot for your review!
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- net/mac802154/ieee802154_i.h |  3 ---
- net/mac802154/tx.c           | 13 -------------
- 2 files changed, 16 deletions(-)
+Yeah, keep cache_check and give a separate function cache_check_rcu will 
+make code more clean. Thanks for your advise!
 
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 08dd521a51a5..8f2bff268392 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -194,9 +194,6 @@ int ieee802154_mlme_tx_locked(struct ieee802154_local *local,
- 			      struct ieee802154_sub_if_data *sdata,
- 			      struct sk_buff *skb);
- void ieee802154_mlme_op_post(struct ieee802154_local *local);
--int ieee802154_mlme_tx_one(struct ieee802154_local *local,
--			   struct ieee802154_sub_if_data *sdata,
--			   struct sk_buff *skb);
- int ieee802154_mlme_tx_one_locked(struct ieee802154_local *local,
- 				  struct ieee802154_sub_if_data *sdata,
- 				  struct sk_buff *skb);
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 337d6faf0d2a..4d13f18f6f2c 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -178,19 +178,6 @@ void ieee802154_mlme_op_post(struct ieee802154_local *local)
- 	ieee802154_release_queue(local);
- }
- 
--int ieee802154_mlme_tx_one(struct ieee802154_local *local,
--			   struct ieee802154_sub_if_data *sdata,
--			   struct sk_buff *skb)
--{
--	int ret;
--
--	ieee802154_mlme_op_pre(local);
--	ret = ieee802154_mlme_tx(local, sdata, skb);
--	ieee802154_mlme_op_post(local);
--
--	return ret;
--}
--
- int ieee802154_mlme_tx_one_locked(struct ieee802154_local *local,
- 				  struct ieee802154_sub_if_data *sdata,
- 				  struct sk_buff *skb)
--- 
-2.47.1
+> Thanks,
+> NeilBrown
 
 
