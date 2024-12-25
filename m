@@ -1,98 +1,137 @@
-Return-Path: <netdev+bounces-154238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C26F59FC3D3
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 07:55:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E8939FC3DC
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 08:03:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF48E7A17F3
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 06:55:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4ABC71883585
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 07:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9CD143C7E;
-	Wed, 25 Dec 2024 06:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F5B1494A3;
+	Wed, 25 Dec 2024 07:02:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5F149644
-	for <netdev@vger.kernel.org>; Wed, 25 Dec 2024 06:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2370C5A7B8;
+	Wed, 25 Dec 2024 07:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735109705; cv=none; b=Kqa40XlgZLUI3ZUfDxTcSn7WJj4rKvFBwou5XPM+o9SN526Z0ZH9WUxHC7UlKfJWwSbSx4RhKCzI6cyaNbUCUyDxc/pEMFBJ7ZWNI3ox7gBmkHFJsX7XaVm2WHSKIPMNYMSdMfaJtsU7B413RyoDT6At6v37wEpP7DDJd8Dz9eg=
+	t=1735110174; cv=none; b=lz28zMdmm4VLivmicFdd3THrn1MRePXX0gJDBXYpak4r1RuNFutCdsLRtEY4idsE14i8Wq5jz1mkdMN2hmuf7xZtS+QIDQ0cJZY9PGpQGXj9qQgNJUUvAyfdktCXkWDHePOX30qC0fhFE9+vIydE2w4fUk64UQkQO+AXXeE4tQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735109705; c=relaxed/simple;
-	bh=vCtH0xKpkMLyYyOdDBDic+pLd6WKYQiYK6ZqajPoAa4=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=QawNQszNzSBfL9TR81d7fEjX8ARZ22oC0OWFdgxgQ8GUmx7l/SqPGmGBGSMtOS9NnKFi6iZpNBds41+8tiLGNBTYb6iZ8OHsROTr4PTgVs8hRRNwPjFki7A44t4RkxMEjoRKPY4tyIjRiazGjChbBkhfNDXZVkkdx9zp813lsEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-844d5c4a27fso1009673239f.0
-        for <netdev@vger.kernel.org>; Tue, 24 Dec 2024 22:55:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735109703; x=1735714503;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ta082uJJhcNZbV4mjW5xLMJwbMmb81o4pqVkiCohDVw=;
-        b=VWbd77ElHrxMnalGF4cWIgH0eWdznnLax6kSdPNVQTUm9Bv6yEHSfjFSQjSz6bUyuF
-         ZnGXT7M1KhxXQF5naFSv3LVqLKk9o3K5M0ULzVg61C44BGLXHitkqMx3zbWRqWlQrASw
-         lOFqWLGPI5SK/GezGL1MBGcDE/xSYwdybNbIasGKPybCHTw3CTzN8a7TNmEK6eAgJgO0
-         sTXZMV4Zw2rbTNfbrcxCZ322Sxj9N50kMP7ZNLoo28S2up0RQJ0YcOsjRBpThYAZNo8e
-         So9GPnr95MMqK3FkUDQg7hkKVI5xtTkbb5+BG9fK4eLzSJWUmnNl/EhdybVzSILdsvnd
-         sfZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkPNsN1UinRkd2ogi33LmzPGOA5NaxUs4PPb1JO/EwSB0JtFQyCWIK5thSVMAos4o1L6/bYa8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzE26rFTpsOifGBWfD9n0+8+44Jb1zzvtskBgaTb4Inxdc8qq/z
-	aRELyYrzR2hCsoxUdnW25oDo5sGBTX4KMby7/NS1BQaJvzpMNH8RDAkiQFM5JQ1I5RBaz7999BY
-	vFAfF2fArURyDMJ58fFkbYzXIcLHlK+X+N6IdzCO0kGZ38nIFnusfSQk=
-X-Google-Smtp-Source: AGHT+IGo/mB++g9H0Iiix3YzJTvrTK6q3jZQ68x3nvhK+kwg0PaPNtGL6q+kyKROY1b4wvaDfpyggNUdRK7wtTg93xxG8D6obP0W
+	s=arc-20240116; t=1735110174; c=relaxed/simple;
+	bh=6c7GZt2h5/0/ohqsz3xC8bwG3+4ZKfAA/p0od79IWzc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X5rcFofwPM4BKGkp6zDlpKOq5ILpcyYB9wS/Et+pbjrxp4ZzvXjYH+9+5rPL+W0juvbDsTbZdDiyjqqTs4M4D1dNny4T7jlMIvrlLE8+eM7q6rfCO0ALlgr5esACOos23PKlrcJr0Hb/pJIA4x0vS4g2H4jMkAZQXtT2ikZD+E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YJ2kp3gL0z4f3lDN;
+	Wed, 25 Dec 2024 15:02:26 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 4C1BB1A0197;
+	Wed, 25 Dec 2024 15:02:47 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.112.188])
+	by APP4 (Coremail) with SMTP id gCh0CgAHL4MRrmtnO8dPFg--.38269S4;
+	Wed, 25 Dec 2024 15:02:46 +0800 (CST)
+From: Yang Erkun <yangerkun@huawei.com>
+To: chuck.lever@oracle.com,
+	jlayton@kernel.org,
+	neilb@suse.de,
+	okorniev@redhat.com,
+	Dai.Ngo@oracle.com,
+	tom@talpey.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	yangerkun@huawei.com,
+	yangerkun@huaweicloud.com,
+	liumingrui@huawei.com
+Subject: [PATCH v2 0/4] nfsd/sunrpc: cleanup resource with sync mode
+Date: Wed, 25 Dec 2024 14:59:04 +0800
+Message-ID: <20241225065908.1547645-1-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20e9:b0:3a3:4175:79da with SMTP id
- e9e14a558f8ab-3c2d2d5164bmr159902725ab.13.1735109702902; Tue, 24 Dec 2024
- 22:55:02 -0800 (PST)
-Date: Tue, 24 Dec 2024 22:55:02 -0800
-In-Reply-To: <000000000000e7765006072e9591@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <676bac46.050a0220.2f3838.02c0.GAE@google.com>
-Subject: Re: [syzbot] [bpf?] [trace?] possible deadlock in task_fork_fair
-From: syzbot <syzbot+1a93ee5d329e97cfbaff@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, brauner@kernel.org, 
-	daniel@iogearbox.net, elic@nvidia.com, haoluo@google.com, 
-	jakub@cloudflare.com, jasowang@redhat.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	mathieu.desnoyers@efficios.com, mhiramat@kernel.org, mst@redhat.com, 
-	netdev@vger.kernel.org, parav@nvidia.com, rostedt@goodmis.org, sdf@google.com, 
-	song@kernel.org, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAHL4MRrmtnO8dPFg--.38269S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF4rWF18uFWxCFy8CryxuFg_yoW8Ar1UpF
+	Z3ArZxKr4kWFWakan3Ca1UXFyrWrZYyw1xJ3Z2qw4Fvw1rur18Gwn0yF40934qqFyrG3y2
+	qr10qFy5CF1DAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0aVACjI8F5VA0II8E6IAqYI8I648v4I1l
+	FIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr4
+	1l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
+	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MI
+	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
+	14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JV
+	WxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU0sq
+	XJUUUUU==
+Sender: yangerkun@huaweicloud.com
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-syzbot suspects this issue was fixed by commit:
+After f8c989a0c89a ("nfsd: release svc_expkey/svc_export with
+rcu_work"), svc_export_put/expkey_put will call path_put with async
+mode. This can lead some unexpected failure:
 
-commit ff91059932401894e6c86341915615c5eb0eca48
-Author: Jakub Sitnicki <jakub@cloudflare.com>
-Date:   Tue Apr 2 10:46:21 2024 +0000
+mkdir /mnt/sda
+mkfs.xfs -f /dev/sda
+echo "/ *(rw,no_root_squash,fsid=0)" > /etc/exports
+echo "/mnt *(rw,no_root_squash,fsid=1)" >> /etc/exports
+exportfs -ra
+service nfs-server start
+mount -t nfs -o vers=4.0 127.0.0.1:/mnt /mnt1
+mount /dev/sda /mnt/sda
+touch /mnt1/sda/file
+exportfs -r
+umount /mnt/sda # failed unexcepted
 
-    bpf, sockmap: Prevent lock inversion deadlock in map delete elem
+The touch above will finally call nfsd_cross_mnt, add refcount to mount,
+and then add cache_head. Before this commit, exportfs -r will call
+cache_flush to cleanup all cache_head, and path_put in
+svc_export_put/expkey_put will be finished with sync mode. So, the
+latter umount will always success. However, after this commit, path_put
+will be called with async mode, the latter umount may failed, and if we
+add some delay, umount will success too. Personally I think this bug and
+should be fixed. We first revert before bugfix patch, and then fix the
+original bug with a different way.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16e922f8580000
-start commit:   fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aef2a55903e5791c
-dashboard link: https://syzkaller.appspot.com/bug?extid=1a93ee5d329e97cfbaff
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=128b2d33180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10fe01eb180000
+v1->v2:
 
-If the result looks correct, please mark the issue as fixed by replying with:
+1. do not change cache_check, instead add cache_check_rcu and use it in
+c_show/e_show
+2. the first patch has been applied
 
-#syz fix: bpf, sockmap: Prevent lock inversion deadlock in map delete elem
+Yang Erkun (4):
+  SUNRPC: introduce cache_check_rcu to help check in rcu context
+  nfsd: no need get cache ref when protected by rcu
+  SUNRPC: no need get cache ref when protected by rcu
+  nfsd: fix UAF when access ex_uuid or ex_stats
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+ fs/nfsd/export.c             | 25 ++++++++++-------
+ include/linux/sunrpc/cache.h |  2 ++
+ net/sunrpc/cache.c           | 53 ++++++++++++++++++++----------------
+ 3 files changed, 46 insertions(+), 34 deletions(-)
+
+-- 
+2.46.1
+
 
