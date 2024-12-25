@@ -1,146 +1,113 @@
-Return-Path: <netdev+bounces-154253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771749FC526
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 12:38:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 145479FC53B
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 13:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FF061634EB
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 11:38:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A15CF163C94
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 12:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2A618E764;
-	Wed, 25 Dec 2024 11:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAjBamkJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1328C167DB7;
+	Wed, 25 Dec 2024 12:50:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.itouring.de (mail.itouring.de [85.10.202.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA0713B7BC;
-	Wed, 25 Dec 2024 11:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03FD17993;
+	Wed, 25 Dec 2024 12:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.202.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735126679; cv=none; b=BgINyf2NUfU7vS0YIkfacZI8yjr3D45/NaTBeCvB0ltvW+OCu0+1VfM3jtEZ2Rf/XjTq7HlTrn/ttZl5IYpsXR1EMwsoY/8y4el5vmUCw6AgtPHdJX4hX2eNK0tsbyjVjlNPemL0FlG3QM3i+DYnQ1AdLNgjj8sRWWSmRk0Nvok=
+	t=1735131027; cv=none; b=nTC+cK9uO0fHuYVG4xbz+Ake8Iszb1srHLfFDzgjz7xFRLga8fv6lO3NQaj01ziucxAfaRDN+j82+1P7ZV+72P6nDTSTo/MNjbLOC5tO0Muh3zDMY5HYC/LAAezaPaDHkKchhoNCL5t27kJn+Fl1/sdXAOTBWhyr82slyvzPpoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735126679; c=relaxed/simple;
-	bh=yPj5JJ2j/NjJDCn1E4CRja9jwjLI5LrHbp07IpZnL0A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N1MvUrohcwo09QjTBwdvzQmeyNi3nSPOjxTsJfzqV37IdKC/ks/BFwozsuFM6J4tbMbjysgHFVsrYJ5cOGm9xpPRFLEf6LOy2HjHrwhKywXg0JhoObEvZWKkDJrTi3G2DZBXePYEojH+cgj/DyTvLRFb3baAT6itv3N8WHgKKfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QAjBamkJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ED93C4CECD;
-	Wed, 25 Dec 2024 11:37:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735126679;
-	bh=yPj5JJ2j/NjJDCn1E4CRja9jwjLI5LrHbp07IpZnL0A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QAjBamkJHdfT0C/jM7kxSM+W5Jr/3J3+8paAznwBJzWR/hHaSk8bTG/7+0ZU57Hnk
-	 65RTPvMzYCN3r8C+avjDRJ5t/nCYFFvRECCQt+fXEa3AKQkfwDxVVKOBVLEVVAdSmF
-	 pIuN6TNtghjMalxcN3m2MB9re824uMGo9BTHaj+29MAQdgGMGNoFd0N6SuhYtrDT7q
-	 wpB3zDDmpwxcWwZfjl++A1IR1yG1B+/GBlhlNclDiXH+aOslkwS7xua4hivPG0qMN2
-	 GIfZjhs1CBh/XB5TOYHK+dICmpxdmaq8a0+XDiH0/O6by6O3Rt9QeVCmREMfsh+VDE
-	 BUslYNkCksFgQ==
-Message-ID: <4b4ef1c1-a20b-4b65-ad37-b9aabe074ae1@kernel.org>
-Date: Wed, 25 Dec 2024 12:37:52 +0100
+	s=arc-20240116; t=1735131027; c=relaxed/simple;
+	bh=md9henrb++nlnxxKMr+DbB9p8KksrXQXlvv0y61YA/4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=quIhchIYLOVliEd9BVNmjxDoY6FmkWkrcPdA0zqk35vUySMV/iqr5lFnezGQ2Tmr1EJPihOgovGO8KbSELYI3G6s5L5XTZkxyQbkFULV9smoQOZ+RB+foklHj/Qew8VIcgI5GZW9M1xHRip26bF7nuDxEd9DCp5/WzA6mbobqYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com; spf=pass smtp.mailfrom=applied-asynchrony.com; arc=none smtp.client-ip=85.10.202.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=applied-asynchrony.com
+Received: from tux.applied-asynchrony.com (p5ddd71dc.dip0.t-ipconnect.de [93.221.113.220])
+	by mail.itouring.de (Postfix) with ESMTPSA id 49DFD11DD44;
+	Wed, 25 Dec 2024 13:40:30 +0100 (CET)
+Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
+	by tux.applied-asynchrony.com (Postfix) with ESMTP id E9EF060191736;
+	Wed, 25 Dec 2024 13:40:29 +0100 (CET)
+Subject: Re: [bbr3] Suspicious use of bbr_param
+To: Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Neal Cardwell <ncardwell@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <4616579.LvFx2qVVIh@natalenko.name>
+From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Organization: Applied Asynchrony, Inc.
+Message-ID: <4ea88dcb-6328-233f-eddc-1fe49313c3ab@applied-asynchrony.com>
+Date: Wed, 25 Dec 2024 13:40:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] net: stmmac: qcom-ethqos: Enable RX programmable swap
- on qcs615
-To: Yijie Yang <quic_yijiyang@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
- <20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+In-Reply-To: <4616579.LvFx2qVVIh@natalenko.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 25/12/2024 11:04, Yijie Yang wrote:
+On 2024-12-24 22:04, Oleksandr Natalenko wrote:
+> Hello Neal.
+> 
+> One of my users reports [1] that BBRv3 from [2] cannot be built with LLVM=1 and WERROR=y because of the following warnings:
+> 
+> net/ipv4/tcp_bbr.c:1079:48: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
+>   1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
+>        |                                                       ^
+>   1080 |             bbr_param(sk, ecn_factor) &&
+>        |             ~~~~~~~~~~~~~~~~~~~~~~~~~
+> net/ipv4/tcp_bbr.c:1079:48: note: use '&' for a bitwise operation
+>   1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
+>        |                                                       ^~
+>        |                                                       &
+> net/ipv4/tcp_bbr.c:1079:48: note: remove constant to silence this warning
+>   1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
+>        |                                                       ^~
+>   1080 |             bbr_param(sk, ecn_factor) &&
+>        |             ~~~~~~~~~~~~~~~~~~~~~~~~~
+> net/ipv4/tcp_bbr.c:1187:24: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
+>   1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
+>        |                               ^  ~~~~~~~~~~~~~~~~~~~~~~~~~
+> net/ipv4/tcp_bbr.c:1187:24: note: use '&' for a bitwise operation
+>   1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
+>        |                               ^~
+>        |                               &
+> net/ipv4/tcp_bbr.c:1187:24: note: remove constant to silence this warning
+>   1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
+>        |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> net/ipv4/tcp_bbr.c:1385:24: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
+>   1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
+>        |                               ^  ~~~~~~~~~~~~~~~~~~~~~~~~~
+> net/ipv4/tcp_bbr.c:1385:24: note: use '&' for a bitwise operation
+>   1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
+>        |                               ^~
+>        |                               &
+> net/ipv4/tcp_bbr.c:1385:24: note: remove constant to silence this warning
+>   1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
+>        |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 3 warnings generated.
+> 
+> The usage of bbr_param() with ecn_thresh and ecn_factor here does indeed look suspicious. In both cases, the bbr_param() macro gets evaluated to `static const u32` values, and those get &&'ed in the if statements. The consts are positive, so they do not have any impact in the conditional expressions. FWIW, the sk argument is dropped by the macro altogether, so I'm not sure what was the intention here.
+> 
+> Interestingly, unlike Clang, GCC stays silent.
 
->  static int qcom_ethqos_probe(struct platform_device *pdev)
->  {
-> -	struct device_node *np = pdev->dev.of_node;
-> +	struct device_node *np = pdev->dev.of_node, *root;
->  	const struct ethqos_emac_driver_data *data;
->  	struct plat_stmmacenet_data *plat_dat;
->  	struct stmmac_resources stmmac_res;
-> @@ -810,6 +805,15 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->  	ret = of_get_phy_mode(np, &ethqos->phy_mode);
->  	if (ret)
->  		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
-> +
-> +	root = of_find_node_by_path("/");
-> +	if (root && of_device_is_compatible(root, "qcom,sa8540p-ride"))
+This looks a lot like https://github.com/llvm/llvm-project/issues/75199
 
+Judging by the number of related issues and PRs this seems to be a known problem,
+and to me it looks like clang's complaint is "technically correct" while going
+against "common in reality" usage.
 
-Nope, your drivers are not supposed to poke root compatibles. Drop and
-fix your driver to behave correctly for all existing devices.
+Many projects seem to use -Wno-constant-logical-operand to work around this.
 
-> +		ethqos->needs_rx_prog_swap = true;
-> +	else
-> +		ethqos->needs_rx_prog_swap =
-Best regards,
-Krzysztof
+cheers
+Holger
 
