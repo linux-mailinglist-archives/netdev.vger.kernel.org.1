@@ -1,113 +1,128 @@
-Return-Path: <netdev+bounces-154255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145479FC53B
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 13:50:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D3D9FC536
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 13:43:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A15CF163C94
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 12:50:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81E10188382C
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 12:43:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1328C167DB7;
-	Wed, 25 Dec 2024 12:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D700218E373;
+	Wed, 25 Dec 2024 12:43:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.itouring.de (mail.itouring.de [85.10.202.141])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03FD17993;
-	Wed, 25 Dec 2024 12:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.202.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30802257D;
+	Wed, 25 Dec 2024 12:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735131027; cv=none; b=nTC+cK9uO0fHuYVG4xbz+Ake8Iszb1srHLfFDzgjz7xFRLga8fv6lO3NQaj01ziucxAfaRDN+j82+1P7ZV+72P6nDTSTo/MNjbLOC5tO0Muh3zDMY5HYC/LAAezaPaDHkKchhoNCL5t27kJn+Fl1/sdXAOTBWhyr82slyvzPpoQ=
+	t=1735130621; cv=none; b=RR4/yOaIGyLpGjpmsKSAvVPwLkCV/ee2hZS251G/V88Wo4lLcuyIBw/vtOlbu6St43ngkahKVePLi7feLHocwMb/26f4S15IVjqkPKp37hVi6BtZyt1grUGUCr4rf8ULqweItisNvHUZDVyn6pzN2sH5CvDQ6cxhwi2T0XkTxRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735131027; c=relaxed/simple;
-	bh=md9henrb++nlnxxKMr+DbB9p8KksrXQXlvv0y61YA/4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=quIhchIYLOVliEd9BVNmjxDoY6FmkWkrcPdA0zqk35vUySMV/iqr5lFnezGQ2Tmr1EJPihOgovGO8KbSELYI3G6s5L5XTZkxyQbkFULV9smoQOZ+RB+foklHj/Qew8VIcgI5GZW9M1xHRip26bF7nuDxEd9DCp5/WzA6mbobqYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com; spf=pass smtp.mailfrom=applied-asynchrony.com; arc=none smtp.client-ip=85.10.202.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=applied-asynchrony.com
-Received: from tux.applied-asynchrony.com (p5ddd71dc.dip0.t-ipconnect.de [93.221.113.220])
-	by mail.itouring.de (Postfix) with ESMTPSA id 49DFD11DD44;
-	Wed, 25 Dec 2024 13:40:30 +0100 (CET)
-Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
-	by tux.applied-asynchrony.com (Postfix) with ESMTP id E9EF060191736;
-	Wed, 25 Dec 2024 13:40:29 +0100 (CET)
-Subject: Re: [bbr3] Suspicious use of bbr_param
-To: Oleksandr Natalenko <oleksandr@natalenko.name>,
- Neal Cardwell <ncardwell@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <4616579.LvFx2qVVIh@natalenko.name>
-From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Organization: Applied Asynchrony, Inc.
-Message-ID: <4ea88dcb-6328-233f-eddc-1fe49313c3ab@applied-asynchrony.com>
-Date: Wed, 25 Dec 2024 13:40:29 +0100
+	s=arc-20240116; t=1735130621; c=relaxed/simple;
+	bh=6aHKffAeNMdgEx5yJwsThmx1+qZzNlpIGlLP2u8KM4s=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V/SD1hri8NljaDdL68aVAiD/gZauFIbJEygNrUL4NCMeyXXvmJdrCOlMcQFmuhoYPe1CVvBlsq30XNBnOG6md5PfR2uyk7hW16Z6s0lhkHuC8gSts98txMjPpbKzdNQSd3ZjTK6RfCZArcOa/r+LEarZUFodwq4CHQFFqJBZb8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YJBCw5DhLz6K8bK;
+	Wed, 25 Dec 2024 20:39:40 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6F62A140AE5;
+	Wed, 25 Dec 2024 20:43:36 +0800 (CST)
+Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 25 Dec
+ 2024 13:43:26 +0100
+From: Gur Stavi <gur.stavi@huawei.com>
+To: <kuba@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
+	<davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
+	<guoxin09@huawei.com>, <gur.stavi@huawei.com>, <helgaas@kernel.org>,
+	<horms@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <meny.yossefi@huawei.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shenchenyang1@hisilicon.com>,
+	<shijing34@huawei.com>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>
+Subject: Re: [PATCH net-next v01 1/1] hinic3: module initialization and tx/rx logic
+Date: Wed, 25 Dec 2024 14:56:49 +0200
+Message-ID: <20241225125649.2595970-1-gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20241223073955.52da7539@kernel.org>
+References: <20241223073955.52da7539@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <4616579.LvFx2qVVIh@natalenko.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-On 2024-12-24 22:04, Oleksandr Natalenko wrote:
-> Hello Neal.
-> 
-> One of my users reports [1] that BBRv3 from [2] cannot be built with LLVM=1 and WERROR=y because of the following warnings:
-> 
-> net/ipv4/tcp_bbr.c:1079:48: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
->   1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
->        |                                                       ^
->   1080 |             bbr_param(sk, ecn_factor) &&
->        |             ~~~~~~~~~~~~~~~~~~~~~~~~~
-> net/ipv4/tcp_bbr.c:1079:48: note: use '&' for a bitwise operation
->   1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
->        |                                                       ^~
->        |                                                       &
-> net/ipv4/tcp_bbr.c:1079:48: note: remove constant to silence this warning
->   1079 |         if (!bbr->ecn_eligible && bbr_can_use_ecn(sk) &&
->        |                                                       ^~
->   1080 |             bbr_param(sk, ecn_factor) &&
->        |             ~~~~~~~~~~~~~~~~~~~~~~~~~
-> net/ipv4/tcp_bbr.c:1187:24: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
->   1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
->        |                               ^  ~~~~~~~~~~~~~~~~~~~~~~~~~
-> net/ipv4/tcp_bbr.c:1187:24: note: use '&' for a bitwise operation
->   1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
->        |                               ^~
->        |                               &
-> net/ipv4/tcp_bbr.c:1187:24: note: remove constant to silence this warning
->   1187 |             bbr->ecn_eligible && bbr_param(sk, ecn_thresh)) {
->        |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> net/ipv4/tcp_bbr.c:1385:24: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
->   1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
->        |                               ^  ~~~~~~~~~~~~~~~~~~~~~~~~~
-> net/ipv4/tcp_bbr.c:1385:24: note: use '&' for a bitwise operation
->   1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
->        |                               ^~
->        |                               &
-> net/ipv4/tcp_bbr.c:1385:24: note: remove constant to silence this warning
->   1385 |         if (bbr->ecn_in_round && bbr_param(sk, ecn_factor)) {
->        |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 3 warnings generated.
-> 
-> The usage of bbr_param() with ecn_thresh and ecn_factor here does indeed look suspicious. In both cases, the bbr_param() macro gets evaluated to `static const u32` values, and those get &&'ed in the if statements. The consts are positive, so they do not have any impact in the conditional expressions. FWIW, the sk argument is dropped by the macro altogether, so I'm not sure what was the intention here.
-> 
-> Interestingly, unlike Clang, GCC stays silent.
+> > > On Thu, 19 Dec 2024 11:21:55 +0200 Gur Stavi wrote:
+> > > > +config HINIC3
+> > > > +	tristate "Huawei Intelligent Network Interface Card 3rd"
+> > > > +	# Fields of HW and management structures are little endian and will not
+> > > > +	# be explicitly converted
+> > >
+> > > This is a PCIe device, users may plug it into any platform.
+> > > Please annotate the endian of the data structures and use appropriate
+> > > conversion helpers.
+> >
+> > This is basically saying that all drivers MUST support all architectures
+> > which is not a currently documented requirement.
+> > As I said before, both Amazon and Microsoft have this dependency.
+> > They currently do not sell their HW so users cannot choose where to plug
+> > it, but they could start selling it whenever they want and the driver will
+> > remain the same.
+> > The primary goal of this driver is for VMs in Huawei cloud, just like
+> > Amazon and Microsoft. Whether users can actually buy it in the future is
+> > unknown.
+> >
+> > for the record, we did start at some point to change all integer members
+> > in management structures to __leXX and use cpu_to_le and le_to_cpu.
+> > There are hundreds of these and it made the code completely unreadable.
+> >
+> > And since we do not plan to test the driver on POWER or ARM big endian I
+> > really don't see the point.
+>
+> I understand. But I'm concerned about the self-assured tone of the
+> "it's not supported" message, that's very corporate verbiage. Annotating
+> endian is standard practice of writing upstream drivers. It makes me
+> doubt if you have any developers with upstream experience on your team
+> if you don't know that. That and the fact that Huawei usually tops
+> the list of net-negative review contributors in netdev.
 
-This looks a lot like https://github.com/llvm/llvm-project/issues/75199
+The most popular combination in the last 3 decades was little endian
+CPUs with big endian device interfaces. Endianity conversion was a
+necessity and therefore endian annotation became standard practice.
+But it was never symmetric, conversion to/from BE was more common than
+conversion to/from LE.
 
-Judging by the number of related issues and PRs this seems to be a known problem,
-and to me it looks like clang's complaint is "technically correct" while going
-against "common in reality" usage.
+As the pendulum moved from horizontal market to vertical market and major
+companies started to develop both hw and sw, the hw engineers transformed
+proprietary parts of the interface to little endian to save extra work in
+the sw. AWS did it. Azure did it. Huawei did it. These vertical companies
+do not care about endianity of CPUs they do not use.
+This is not "corporate verbiage" this is a real market shift.
 
-Many projects seem to use -Wno-constant-logical-operand to work around this.
+The necessity for endian conversion is gone (or just halved). Will the
+standard practice remain? There is not a single __le annotation in Amazon
+and Microsoft code. Not in Mellanox code either. Maybe their hw is fully
+BE (have to wonder about their DPUs). Amazingly, Intel that only creates
+little endian CPUs has lots of __le annotations. But they are the flag
+barer of horizontal market.
 
-cheers
-Holger
+Interesting how both Amazon and Microsoft started with:
+depends on X86
+Thus evaded demand for adding __le annotations to the code.
+Later, both sneaked in quiet small patches with replacement to:
+depends on !CPU_BIG_ENDIAN
+Maybe that is the true meaning of "upstream experience".
 
