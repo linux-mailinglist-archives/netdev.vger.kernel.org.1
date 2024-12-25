@@ -1,170 +1,139 @@
-Return-Path: <netdev+bounces-154256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9DB69FC544
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 14:02:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5EDD9FC5A8
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 14:48:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00FD4163CA2
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 13:02:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E9A91883E66
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 13:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54D518E373;
-	Wed, 25 Dec 2024 13:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0C41B21B7;
+	Wed, 25 Dec 2024 13:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mtoU01Yw"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="murXgnlm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A2F14AD1A
-	for <netdev@vger.kernel.org>; Wed, 25 Dec 2024 13:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6199B75809;
+	Wed, 25 Dec 2024 13:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735131742; cv=none; b=ucNIRKJ813Pyjy400AFA7VIJfTdNNe+v2vLyl2JI3qT9OeB7fbn7I7aGlF1LleW3jZYtuP+aZoLX8opUMQ/cNI7mb3Y/a3JEYwh93GG/tOx3KQO/V+p3/4aV5pmfeuA03jk7BIpBCRm8otLaQceHEQddKxQ30nhtNkSadU25O60=
+	t=1735134486; cv=none; b=aE8mNV0oL4/1vVT1VzCy91gBTE+u4XVzOrd9iiRLlLHsrO+nw/j5M6YCIj4hFg1dKCw+ZyRe5LTZmmqkJAbDTCZHV7n+JI/tAlWjbnqfrTO2wktgJMnHdMQy67OMsCATj6wjnPdFqeA1d3oeXYhk3MJhdN7QRtDkYecMMp+ShOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735131742; c=relaxed/simple;
-	bh=EVo1/chTj+XW7R2AlgQpXBNFX2ODe38tSPHJirwHYq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fh57fIcHxjaNzF22aLupAZqTmjxb9b1Czn28CBp24nh/O74FK6nMIDSYJMeBG8oPFNG1xtndQ09G2ChzBv1SLxQxJMVj55IYLFl+r7bRmkkWB87927KmJB2bIzv93Z+yTseCpJSUYONbIuGCNmvd9qg+3czTDyHY3JvbgFzjiGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mtoU01Yw; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1735131741; x=1766667741;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EVo1/chTj+XW7R2AlgQpXBNFX2ODe38tSPHJirwHYq0=;
-  b=mtoU01Ywjg9iKBI004jqGqdfFqg17oIu6l8x51sW21B3qG6B/yVIy/5H
-   QHrzUii0ZyFSm5mi1rjW5Q3+CcpgVvRo+DxLP5ttApzjk1gWhwSbKNYIT
-   yHDLRskMTkkKrL1mBQQ3jXq0V2z2jsv7Bl+lY9HTUlhaL1miO+agBRqvz
-   nYboyoGCkkimIwJvgqBFZFYGGUOIkg2weClBEwf7RBWzNwqZ0dHDD7KG4
-   eGWxyYHYEoYFG+pDXBiXTNlnMIAGfIzM6JPo0Qho423883BDzEzBLtXRY
-   tyLH1kGOSB34FpeXk3TTU5zSWkQaVXZm8oqe1GpQTILBDk8TJMwnDeCfZ
-   g==;
-X-CSE-ConnectionGUID: vmJ4zxDcTGe+1MN5ryB4MA==
-X-CSE-MsgGUID: qVKen2snTY+bkSv9ICxzPw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11296"; a="35289390"
-X-IronPort-AV: E=Sophos;i="6.12,263,1728975600"; 
-   d="scan'208";a="35289390"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2024 05:02:20 -0800
-X-CSE-ConnectionGUID: GCQ7BFBTRcOSbGDJLVY0sw==
-X-CSE-MsgGUID: EQJ0TTcORoiG/DVZsYSyYQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,263,1728975600"; 
-   d="scan'208";a="99564861"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 25 Dec 2024 05:02:14 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tQR1g-0001q3-03;
-	Wed, 25 Dec 2024 13:02:12 +0000
-Date: Wed, 25 Dec 2024 21:02:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yong Wang <yongwang@nvidia.com>, razor@blackwall.org, roopa@nvidia.com,
-	davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, aroulin@nvidia.com,
-	idosch@nvidia.com, nmiyar@nvidia.com
-Subject: Re: [PATCH net-next 1/2] net: bridge: multicast: re-implement port
- multicast enable/disable functions
-Message-ID: <202412251623.8huquaZx-lkp@intel.com>
-References: <20241220220604.1430728-2-yongwang@nvidia.com>
+	s=arc-20240116; t=1735134486; c=relaxed/simple;
+	bh=DP2h0qRc32Xl2kiYPEc31Daz3KtJxze7Mr5CabqZm/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HqEgSw3x2VeFQn95+KHpynMzxnL1t1hTtGYThlxb1CxQXtuoiwoj5hT+ok8llqoQbUN61Vj8X5scVG6KBGc1CZrrXGwpcivvyv6B+4vSZ9ivqDBg2fWowdtKq1aGFuSdTOr9sxrdLiTWbUQVjoXhxl0K3FYUeRlDHqbwN9FDMm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=murXgnlm; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BP3mpr7017731;
+	Wed, 25 Dec 2024 13:47:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	8TvsoDUDT28S03vubGDR2Ts4f2dC1mpWCCCrOigUjTw=; b=murXgnlm6yTxe3kp
+	2dYDc+lPoZA/TXRnRN2XOkw9Yj6WX/D9oExmL5FPECV4KmXZH6qvXDVoLGQsrxWu
+	rp43stD/p4TbHAHdYbRIvV2eXTNqR+EpvJR26y3UrD9l5eYenDHFz+iuHKTUjyCJ
+	zqPlYY09thNlYoDlG+KO44GPMjZE+OfKDW4ymf56HS4um5TotETelT0lo9x1L2aC
+	Bu6twAjTnPKSFlrpDbg9iM4mmVl6kxP0cYSGkOXVOEVkYzsgdse7HVdI7cLPW8sI
+	uc9BaApGtamxHZp3VcdxzUn5Zs2d02NLBj5/MoKIQVs6gTLd1XFEdYoeSigTFH3E
+	3PSvtA==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43rafqj6fg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Dec 2024 13:47:48 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BPDllZi015118
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Dec 2024 13:47:47 GMT
+Received: from [10.253.13.63] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 25 Dec
+ 2024 05:47:42 -0800
+Message-ID: <f9e6c68d-0515-4680-b9cf-c0728bdf7703@quicinc.com>
+Date: Wed, 25 Dec 2024 21:47:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241220220604.1430728-2-yongwang@nvidia.com>
-
-Hi Yong,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on 3272040790eb4b6cafe6c30ec05049e9599ec456]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Yong-Wang/net-bridge-multicast-re-implement-port-multicast-enable-disable-functions/20241221-060848
-base:   3272040790eb4b6cafe6c30ec05049e9599ec456
-patch link:    https://lore.kernel.org/r/20241220220604.1430728-2-yongwang%40nvidia.com
-patch subject: [PATCH net-next 1/2] net: bridge: multicast: re-implement port multicast enable/disable functions
-config: i386-randconfig-011-20241225 (https://download.01.org/0day-ci/archive/20241225/202412251623.8huquaZx-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241225/202412251623.8huquaZx-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412251623.8huquaZx-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from net/bridge/br_multicast.c:10:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2223:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> net/bridge/br_multicast.c:2178:14: error: call to undeclared function 'br_vlan_state_allowed'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    2178 |                         if (on && br_vlan_state_allowed(br_vlan_get_state(vlan), true))
-         |                                   ^
->> net/bridge/br_multicast.c:2178:36: error: call to undeclared function 'br_vlan_get_state'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    2178 |                         if (on && br_vlan_state_allowed(br_vlan_get_state(vlan), true))
-         |                                                         ^
-   net/bridge/br_multicast.c:2178:36: note: did you mean 'br_vlan_get_stats'?
-   include/trace/events/../../../net/bridge/br_private.h:1792:20: note: 'br_vlan_get_stats' declared here
-    1792 | static inline void br_vlan_get_stats(const struct net_bridge_vlan *v,
-         |                    ^
-   1 warning and 2 errors generated.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 4/5] net: pcs: qcom-ipq9574: Add USXGMII
+ interface mode support
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King
+	<linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <vsmuthu@qti.qualcomm.com>, <john@phrozen.org>
+References: <20241216-ipq_pcs_6-13_rc1-v3-0-3abefda0fc48@quicinc.com>
+ <20241216-ipq_pcs_6-13_rc1-v3-4-3abefda0fc48@quicinc.com>
+ <20241220134941.370d3357@kernel.org>
+Content-Language: en-US
+From: Lei Wei <quic_leiwei@quicinc.com>
+In-Reply-To: <20241220134941.370d3357@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: FtUgJm8VIUz9rt6hqPxK1ktTvfZfFm-G
+X-Proofpoint-GUID: FtUgJm8VIUz9rt6hqPxK1ktTvfZfFm-G
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 mlxscore=0 suspectscore=0
+ mlxlogscore=975 malwarescore=0 spamscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412250122
 
 
-vim +/br_vlan_state_allowed +2178 net/bridge/br_multicast.c
 
-  2159	
-  2160	static void br_multicast_toggle_port(struct net_bridge_port *port, bool on)
-  2161	{
-  2162		struct net_bridge *br = port->br;
-  2163	
-  2164		if (br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED)) {
-  2165			struct net_bridge_vlan_group *vg;
-  2166			struct net_bridge_vlan *vlan;
-  2167	
-  2168			rcu_read_lock();
-  2169			vg = nbp_vlan_group_rcu(port);
-  2170			if (!vg) {
-  2171				rcu_read_unlock();
-  2172				return;
-  2173			}
-  2174	
-  2175			/* iterate each vlan of the port, toggle port_mcast_ctx per vlan */
-  2176			list_for_each_entry_rcu(vlan, &vg->vlan_list, vlist) {
-  2177				/* enable port_mcast_ctx when vlan is LEARNING or FORWARDING */
-> 2178				if (on && br_vlan_state_allowed(br_vlan_get_state(vlan), true))
-  2179					br_multicast_enable_port_ctx(&vlan->port_mcast_ctx);
-  2180				else
-  2181					br_multicast_disable_port_ctx(&vlan->port_mcast_ctx);
-  2182			}
-  2183			rcu_read_unlock();
-  2184		} else {
-  2185			/* use the port's multicast context when vlan snooping is disabled */
-  2186			if (on)
-  2187				br_multicast_enable_port_ctx(&port->multicast_ctx);
-  2188			else
-  2189				br_multicast_disable_port_ctx(&port->multicast_ctx);
-  2190		}
-  2191	}
-  2192	
+On 12/21/2024 5:49 AM, Jakub Kicinski wrote:
+> On Mon, 16 Dec 2024 21:40:26 +0800 Lei Wei wrote:
+>> +static int ipq_pcs_config_usxgmii(struct ipq_pcs *qpcs)
+>> +{
+>> +	int ret;
+>> +
+>> +	/* Configure the XPCS for USXGMII mode if required */
+>> +	if (qpcs->interface != PHY_INTERFACE_MODE_USXGMII) {
+> 
+> nit:
+> 
+> 	if (qpcs->interface == PHY_INTERFACE_MODE_USXGMII)
+> 		return 0;
+> 
+> And then the entire function doesn't have to be indented.
+> 
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+OK.
+
+> Please fix this and repost, it'd be great to get a review tag from
+> Russell or someone with more phylink knowledge.. Please be mindful of:
+> https://lore.kernel.org/all/20241211164022.6a075d3a@kernel.org/
+
+Sure, I will post the update once net-next reopens. Thanks.
 
