@@ -1,199 +1,250 @@
-Return-Path: <netdev+bounces-154243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823639FC3E3
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 08:03:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30A959FC423
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 09:30:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5EB3164AF7
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 07:03:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBE84164A5E
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 08:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32CEA15383C;
-	Wed, 25 Dec 2024 07:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D5814EC73;
+	Wed, 25 Dec 2024 08:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Li58NxR5"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC44145FFF;
-	Wed, 25 Dec 2024 07:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A02347B4;
+	Wed, 25 Dec 2024 08:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735110177; cv=none; b=WbA375fWWgliY9QgQjzzIb+FhCGWN+LWuGDwQxsOqbixxoa8iP2YKP+hfsEKUaDOdvwaesGu/nNSWgt/w9gyXmdCJl+B16sdyvvESxRKBwTpYGTFBYQFqB2qLqJdlFbRyQ4/CA1SMPWd3LYCctFPfa56IigMkv4Z3aNCOSdI+2k=
+	t=1735115442; cv=none; b=kMUk/xy6+PhcGmetirqltk7xWxBwgSbfNQx1Ln5m47Y4tjcSPUZ8f2NFo/qXNBodR/OKFDMqVGMjN4bvRyN2DelX3vtgSWgxwnsitNzabQjmEYDTBimjUMUU9k7WNYLklSC4S5h6rrt6Z7NA0XiS+ZIPIzf5dhMztNuwpwu8+6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735110177; c=relaxed/simple;
-	bh=Yyjz2J7ZGAJ0mIRmPMOtulZnv0T+LazP7gUqsED1r4U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wxx9n5UI0sIygNcNdqb9w07eXALW93+4I/3UViREYoNwvVkQQ5UYSE07Zuv3eRk0Jt2TrF0yeRGM/Zq0U5/FBE8Zpxr1ti0GrzW7ok2VXlPiJu9ARRJviCik+kZ/ARunfW9ERiireHCZ6bf7VT62KiSjAsvXm7UY05GQhQTdrvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YJ2kz3bFkz4f3jqq;
-	Wed, 25 Dec 2024 15:02:35 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 229761A06E6;
-	Wed, 25 Dec 2024 15:02:50 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.112.188])
-	by APP4 (Coremail) with SMTP id gCh0CgAHL4MRrmtnO8dPFg--.38269S8;
-	Wed, 25 Dec 2024 15:02:49 +0800 (CST)
-From: Yang Erkun <yangerkun@huawei.com>
-To: chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	neilb@suse.de,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	yangerkun@huawei.com,
-	yangerkun@huaweicloud.com,
-	liumingrui@huawei.com
-Subject: [PATCH v2 4/4] nfsd: fix UAF when access ex_uuid or ex_stats
-Date: Wed, 25 Dec 2024 14:59:08 +0800
-Message-ID: <20241225065908.1547645-5-yangerkun@huawei.com>
-X-Mailer: git-send-email 2.46.1
-In-Reply-To: <20241225065908.1547645-1-yangerkun@huawei.com>
-References: <20241225065908.1547645-1-yangerkun@huawei.com>
+	s=arc-20240116; t=1735115442; c=relaxed/simple;
+	bh=3TBNn+WACJoXKOFYWAEq9x0N7dbOfaINIDDImH1/oUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GsBv2npTh6Phg99ejAW1nmOksdgUNIL/XQXMxqZwAgJ97RwZmi/zlhrCaS7XI5pc7egr/uRVqTYlY6HyvjvVddjAUIr1oz5Tbw0hDh4fDh8mGrsBBRrl7Jf8zeITs66w4M0wfBlx8qX53Adpa6h/sjVbyJ0aH55CTr9g7psbeso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Li58NxR5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10841C4CED6;
+	Wed, 25 Dec 2024 08:30:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735115441;
+	bh=3TBNn+WACJoXKOFYWAEq9x0N7dbOfaINIDDImH1/oUQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Li58NxR5prZ/mqzyC5e/X7Hqu7tvW4q0LcYBzbNl6s+iS3+hHuUpBcVtB4UyrCub9
+	 pH2BHevTPx69NmbsCk7b9wVBcMHXe6+bSIJPzrdj2tb1QeYwYbmQH24JowNA2rSU7i
+	 RXNqSf8A1R4xrPxM3JVozWzmXttHsxP/FJKOAIVeG0uYt+xPBaEDECv6lcWpepErID
+	 8Z2L43B3ivUBpnbHdgrSoZsIiTYZR9AsXGG4tNc1Zqkk3eXNzdqdMy63AyDdidn7nk
+	 dJaG+hciW1qqfbSHbKEYODgvDTkg1ZAPrHgzM5YfK0sRtA3pWl5A+Ft8nK237p3DN/
+	 niH6HqJoYvKEA==
+Date: Wed, 25 Dec 2024 10:30:35 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Junxian Huang <huangjunxian6@hisilicon.com>
+Cc: jgg@ziepe.ca, selvin.xavier@broadcom.com, chengyou@linux.alibaba.com,
+	kaishen@linux.alibaba.com, mustafa.ismail@intel.com,
+	tatyana.e.nikolova@intel.com, yishaih@nvidia.com, benve@cisco.com,
+	neescoba@cisco.com, bryan-bt.tan@broadcom.com,
+	vishnu.dasa@broadcom.com, zyjzyj2000@gmail.com, bmt@zurich.ibm.com,
+	linux-rdma@vger.kernel.org, linuxarm@huawei.com,
+	linux-kernel@vger.kernel.org, tangchengchang@huawei.com,
+	liyuyu6@huawei.com, linux-netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH RFC 00/12] RDMA: Support link status events dispatching
+ in ib_core
+Message-ID: <20241225083035.GJ171473@unreal>
+References: <20241122105308.2150505-1-huangjunxian6@hisilicon.com>
+ <20241224103224.GF171473@unreal>
+ <ea392da6-15e1-ea62-f5f0-78e3da0874ae@hisilicon.com>
+ <20241224133856.GG171473@unreal>
+ <4e68fb45-667c-988e-9f6d-fc29858ff782@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHL4MRrmtnO8dPFg--.38269S8
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF1fWFy8Kw43Ar13GFWfXwb_yoW5tFWrpa
-	4kAayxJrykJFyUArsFy3Wjqw1ftanavr1I9rn2kw4a9F13tr18CFy5Zryq9ryjkrW8Cayx
-	u3WjyFs8Gw4FywUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUHSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
-	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7Iv64x0x7Aq67IIx4CEVc8vx2IErcIFxwACI4
-	02YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCF
-	04k20xvEw4C26cxK6c8Ij28IcwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU0sXo7
-	UUUUU==
-Sender: yangerkun@huaweicloud.com
-X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
+In-Reply-To: <4e68fb45-667c-988e-9f6d-fc29858ff782@hisilicon.com>
 
-We can access exp->ex_stats or exp->ex_uuid in rcu context(c_show and
-e_show). All these resources should be released using kfree_rcu. Fix this
-by using call_rcu, clean them all after a rcu grace period.
+On Wed, Dec 25, 2024 at 02:12:58PM +0800, Junxian Huang wrote:
+> 
+> 
+> On 2024/12/24 21:38, Leon Romanovsky wrote:
+> > On Tue, Dec 24, 2024 at 08:05:26PM +0800, Junxian Huang wrote:
+> >>
+> >>
+> >> On 2024/12/24 18:32, Leon Romanovsky wrote:
+> >>> On Fri, Nov 22, 2024 at 06:52:56PM +0800, Junxian Huang wrote:
+> >>>> This series is to integrate a common link status event handler in
+> >>>> ib_core as this functionality is needed by most drivers and
+> >>>> implemented in very similar patterns. This is not a new issue but
+> >>>> a restart of the previous work of our colleagues from several years
+> >>>> ago, please see [1] and [2].
+> >>>>
+> >>>> [1]: https://lore.kernel.org/linux-rdma/1570184954-21384-1-git-send-email-liweihang@hisilicon.com/
+> >>>> [2]: https://lore.kernel.org/linux-rdma/20200204082408.18728-1-liweihang@huawei.com/
+> >>>>
+> >>>> With this series, ib_core can handle netdev events of link status,
+> >>>> i.e. NETDEV_UP, NETDEV_DOWN and NETDEV_CHANGE, and dispatch ib port
+> >>>> events to ULPs instead of drivers. However some drivers currently
+> >>>> have some private processing in their handler, rather than simply
+> >>>> dispatching events. For these drivers, this series provides a new
+> >>>> ops report_port_event(). If this ops is set, ib_core will call it
+> >>>> and the events will still be handled in the driver.
+> >>>>
+> >>>> Events of LAG devices are also not handled in ib_core as currently
+> >>>> there is no way to obtain ibdev from upper netdev in ib_core. This
+> >>>> can be a TODO work after the core have more support for LAG. For
+> >>>> now mlx5 is the only driver that supports RoCE LAG, and the events
+> >>>> handling of mlx5 RoCE LAG will remain in mlx5 driver.
+> >>>>
+> >>>> In this series:
+> >>>>
+> >>>> Patch #1 adds a new helper to query the port num of a netdev
+> >>>> associated with an ibdev. This is used in the following patch.
+> >>>>
+> >>>> Patch #2 adds support for link status events dispatching in ib_core.
+> >>>>
+> >>>> Patch #3-#7 removes link status event handler in several drivers.
+> >>>> The port state setting in erdma, rxe and siw are replaced with
+> >>>> ib_get_curr_port_state(), so their handler can be totally removed.
+> >>>>
+> >>>> Patch #8-#10 add support for report_port_event() ops in usnic, mlx4
+> >>>> and pvrdma as their current handler cannot be perfectly replaced by
+> >>>> the ib_core handler in patch #2.
+> >>>>
+> >>>> Patch #11 adds a check in mlx5 that only events of RoCE LAG will be
+> >>>> handled in mlx5 driver.
+> >>>>
+> >>>> Patch #12 adds a fast path for link-down events dispatching in hns by
+> >>>> getting notified from hns3 nic driver directly.
+> >>>>
+> >>>> Yuyu Li (12):
+> >>>>   RDMA/core: Add ib_query_netdev_port() to query netdev port by IB
+> >>>>     device.
+> >>>>   RDMA/core: Support link status events dispatching
+> >>>>   RDMA/bnxt_re: Remove deliver net device event
+> >>>>   RDMA/erdma: Remove deliver net device event
+> >>>>   RDMA/irdma: Remove deliver net device event
+> >>>>   RDMA/rxe: Remove deliver net device event
+> >>>>   RDMA/siw: Remove deliver net device event
+> >>>>   RDMA/usnic: Support report_port_event() ops
+> >>>>   RDMA/mlx4: Support report_port_event() ops
+> >>>>   RDMA/pvrdma: Support report_port_event() ops
+> >>>>   RDMA/mlx5: Handle link status event only for LAG device
+> >>>>   RDMA/hns: Support fast path for link-down events dispatching
+> >>>
+> >>> I took the series as it is good thing to remove code duplication
+> >>> and we waited enough.
+> >>>
+> >>
+> >> Thanks Leon.
+> >>
+> >> The kernel test robot has reported one warning and one error for
+> >> this series:
+> >>
+> >> https://lore.kernel.org/oe-kbuild-all/202411251625.VrcLuTRx-lkp@intel.com/
+> >> https://lore.kernel.org/oe-kbuild-all/202411251727.RFxtcpiI-lkp@intel.com/
+> >>
+> >> I was planning to fix them when I could send the formal patches,
+> >> but since you have applied these RFC patches，could you please
+> >> fix them on your wip branch, or should I send separate patches
+> >> to fix them?
+> > 
+> > This is how I fixed it. Is it ok?
+> > 
+> > diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
+> > index 4286fd4a9324..b886fe2922ae 100644
+> > --- a/drivers/infiniband/hw/bnxt_re/main.c
+> > +++ b/drivers/infiniband/hw/bnxt_re/main.c
+> > @@ -822,17 +822,6 @@ static void bnxt_re_disassociate_ucontext(struct ib_ucontext *ibcontext)
+> >  }
+> >  
+> >  /* Device */
+> > -
+> > -static struct bnxt_re_dev *bnxt_re_from_netdev(struct net_device *netdev)
+> > -{
+> > -	struct ib_device *ibdev =
+> > -		ib_device_get_by_netdev(netdev, RDMA_DRIVER_BNXT_RE);
+> > -	if (!ibdev)
+> > -		return NULL;
+> > -
+> > -	return container_of(ibdev, struct bnxt_re_dev, ibdev);
+> > -}
+> > -
+> >  static ssize_t hw_rev_show(struct device *device, struct device_attribute *attr,
+> >  			   char *buf)
+> >  {
+> > diff --git a/drivers/infiniband/hw/usnic/usnic_ib_main.c b/drivers/infiniband/hw/usnic/usnic_ib_main.c
+> > index 5ad7fe7e662f..4ddcd5860e0f 100644
+> > --- a/drivers/infiniband/hw/usnic/usnic_ib_main.c
+> > +++ b/drivers/infiniband/hw/usnic/usnic_ib_main.c
+> > @@ -192,10 +192,12 @@ static void usnic_ib_handle_usdev_event(struct usnic_ib_dev *us_ibdev,
+> >  
+> >  static void usnic_ib_handle_port_event(struct ib_device *ibdev,
+> >  				       struct net_device *netdev,
+> > -				       unsigned long event);
+> > +				       unsigned long event)
+> >  {
+> >  	struct usnic_ib_dev *us_ibdev =
+> >  			container_of(ibdev, struct usnic_ib_dev, ib_dev);
+> > +	struct ib_event ib_event;
+> > +
+> >  	mutex_lock(&us_ibdev->usdev_lock);
+> >  	switch (event) {
+> >  	case NETDEV_UP:
+> > diff --git a/drivers/infiniband/sw/siw/siw_verbs.c b/drivers/infiniband/sw/siw/siw_verbs.c
+> > index 137819184b3b..6b24438df917 100644
+> > --- a/drivers/infiniband/sw/siw/siw_verbs.c
+> > +++ b/drivers/infiniband/sw/siw/siw_verbs.c
+> > @@ -172,6 +172,7 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
+> >  		   struct ib_port_attr *attr)
+> >  {
+> >  	struct siw_device *sdev = to_siw_dev(base_dev);
+> > +	struct net_device *ndev;
+> >  	int rv;
+> >  
+> >  	memset(attr, 0, sizeof(*attr));
+> > @@ -183,7 +184,12 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
+> >  	attr->max_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+> >  	attr->active_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+> >  	attr->port_cap_flags = IB_PORT_CM_SUP | IB_PORT_DEVICE_MGMT_SUP;
+> > -	attr->state = ib_get_curr_port_state(sdev->ndev);
+> > +	ndev = ib_device_get_netdev(base_dev, port);
+> > +	if (ndev)
+> > +		attr->state = ib_get_curr_port_state(ndev);
+> > +	else
+> > +		attr->state = IB_PORT_DOWN;
+> > +	dev_put(ndev);
+> 
+> I think this is a simpler way:
+> 
+> attr->state = ib_get_curr_port_state(sdev->netdev);
+> 
+> But overall LGTM, thanks.
+> 
+> BTW, it seems the kernel test robot has reported some more warnings
+> after you applied these patches (and solved the conflicts I guess?)
 
-==================================================================
-BUG: KASAN: slab-use-after-free in svc_export_show+0x362/0x430 [nfsd]
-Read of size 1 at addr ff11000010fdc120 by task cat/870
+I'll fix them, this is why we have wip/* branches :). 
 
-CPU: 1 UID: 0 PID: 870 Comm: cat Not tainted 6.12.0-rc3+ #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.16.1-2.fc37 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x53/0x70
- print_address_description.constprop.0+0x2c/0x3a0
- print_report+0xb9/0x280
- kasan_report+0xae/0xe0
- svc_export_show+0x362/0x430 [nfsd]
- c_show+0x161/0x390 [sunrpc]
- seq_read_iter+0x589/0x770
- seq_read+0x1e5/0x270
- proc_reg_read+0xe1/0x140
- vfs_read+0x125/0x530
- ksys_read+0xc1/0x160
- do_syscall_64+0x5f/0x170
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Thanks
 
-Allocated by task 830:
- kasan_save_stack+0x20/0x40
- kasan_save_track+0x14/0x30
- __kasan_kmalloc+0x8f/0xa0
- __kmalloc_node_track_caller_noprof+0x1bc/0x400
- kmemdup_noprof+0x22/0x50
- svc_export_parse+0x8a9/0xb80 [nfsd]
- cache_do_downcall+0x71/0xa0 [sunrpc]
- cache_write_procfs+0x8e/0xd0 [sunrpc]
- proc_reg_write+0xe1/0x140
- vfs_write+0x1a5/0x6d0
- ksys_write+0xc1/0x160
- do_syscall_64+0x5f/0x170
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-Freed by task 868:
- kasan_save_stack+0x20/0x40
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3b/0x60
- __kasan_slab_free+0x37/0x50
- kfree+0xf3/0x3e0
- svc_export_put+0x87/0xb0 [nfsd]
- cache_purge+0x17f/0x1f0 [sunrpc]
- nfsd_destroy_serv+0x226/0x2d0 [nfsd]
- nfsd_svc+0x125/0x1e0 [nfsd]
- write_threads+0x16a/0x2a0 [nfsd]
- nfsctl_transaction_write+0x74/0xa0 [nfsd]
- vfs_write+0x1a5/0x6d0
- ksys_write+0xc1/0x160
- do_syscall_64+0x5f/0x170
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-Fixes: ae74136b4bb6 ("SUNRPC: Allow cache lookups to use RCU protection rather than the r/w spinlock")
-Reviewed-by: NeilBrown <neilb@suse.de>
-Signed-off-by: Yang Erkun <yangerkun@huawei.com>
----
- fs/nfsd/export.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
-
-diff --git a/fs/nfsd/export.c b/fs/nfsd/export.c
-index c6168bccfb6c..0363720280d4 100644
---- a/fs/nfsd/export.c
-+++ b/fs/nfsd/export.c
-@@ -355,16 +355,25 @@ static void export_stats_destroy(struct export_stats *stats)
- 					    EXP_STATS_COUNTERS_NUM);
- }
- 
--static void svc_export_put(struct kref *ref)
-+static void svc_export_release(struct rcu_head *rcu_head)
- {
--	struct svc_export *exp = container_of(ref, struct svc_export, h.ref);
--	path_put(&exp->ex_path);
--	auth_domain_put(exp->ex_client);
-+	struct svc_export *exp = container_of(rcu_head, struct svc_export,
-+			ex_rcu);
-+
- 	nfsd4_fslocs_free(&exp->ex_fslocs);
- 	export_stats_destroy(exp->ex_stats);
- 	kfree(exp->ex_stats);
- 	kfree(exp->ex_uuid);
--	kfree_rcu(exp, ex_rcu);
-+	kfree(exp);
-+}
-+
-+static void svc_export_put(struct kref *ref)
-+{
-+	struct svc_export *exp = container_of(ref, struct svc_export, h.ref);
-+
-+	path_put(&exp->ex_path);
-+	auth_domain_put(exp->ex_client);
-+	call_rcu(&exp->ex_rcu, svc_export_release);
- }
- 
- static int svc_export_upcall(struct cache_detail *cd, struct cache_head *h)
--- 
-2.46.1
-
+> 
+> Thanks,
+> Junxian
+> 
+> >  	attr->phys_state = attr->state == IB_PORT_ACTIVE ?
+> >  		IB_PORT_PHYS_STATE_LINK_UP : IB_PORT_PHYS_STATE_DISABLED;
+> >  	/*
+> > 
+> > 
+> >>
+> >> Junxian
+> > 
 
