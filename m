@@ -1,152 +1,235 @@
-Return-Path: <netdev+bounces-154265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E4DC9FC672
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 20:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EE849FC676
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 21:22:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B99C1881E6D
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 19:53:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FCDE1882EF3
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 20:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF02A14264A;
-	Wed, 25 Dec 2024 19:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A57136C;
+	Wed, 25 Dec 2024 20:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G6snIM/8"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFC614A08E
-	for <netdev@vger.kernel.org>; Wed, 25 Dec 2024 19:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6432419258B;
+	Wed, 25 Dec 2024 20:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735156366; cv=none; b=qB2XFH1btoL7HRE7ikca3r9o4rc6+HZwP3IxGAgcnX3l5kiXXQKBibec9GZ00Km5/tT5LLAWdR/i4IiC4EUY+tkCnBFZuYFIHoNypGXvLYnI2cZ/opIbhzUyez5iTlYUV/MydcnonQvuQ0XuQj4V3tkNjXITIcCMmRovzu1yek8=
+	t=1735158126; cv=none; b=osXSyzt4NCSJqO1mZwL4PcAYNcTASdbJrQIKEmZ8fm95D+GQwqpjz8gEW1klGtxUzH52y90GUzPH/ycGbpL/sMrEmUj/tBUoT2fXwHRGsHSmRF94YsDOoc/PqYhGsztnBbU8PNqp5XY1XTlBtZIk03kds5/OIX69zfC9fnxe+i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735156366; c=relaxed/simple;
-	bh=jpxqY2qTgsVEdyu7+bAB+CgPNnEQItGMPkbq/nKHwQE=;
+	s=arc-20240116; t=1735158126; c=relaxed/simple;
+	bh=FAhwDFaOLN+9a+xH6yZJXC2FCUU8+PrdVP9u5Ao6KDc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tBmkXj5yorZP8q6jEujF8gBijZw4Ro7sX2Nan06BQuZXR8buby7RTxcSWS2xrZ4Cs3Wwuk55+4bTf1TodDWviEAwWMNOuKLZGuSW89m8bUWIE4W/PNNw5FI6EVfqU5C+OrhZSYWnlaNfPQxVBagk+b2Ddebm19RMSUbdCU7H//Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tQXQD-0000Jn-19; Wed, 25 Dec 2024 20:51:57 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tQXQ6-005EvM-35;
-	Wed, 25 Dec 2024 20:51:51 +0100
-Received: from pengutronix.de (2a02-8206-2430-9d00-8f68-253a-4589-f451.dynamic.ewe-ip-backbone.de [IPv6:2a02:8206:2430:9d00:8f68:253a:4589:f451])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 61711394F8A;
-	Wed, 25 Dec 2024 19:50:18 +0000 (UTC)
-Date: Wed, 25 Dec 2024 20:50:17 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Markus Schneider-Pargmann <msp@baylibre.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, 
-	Vishal Mahaveer <vishalm@ti.com>, Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>, 
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v6 1/7] dt-bindings: can: m_can: Add wakeup properties
-Message-ID: <20241225-singing-passionate-antelope-88e154-mkl@pengutronix.de>
-References: <20241219-topic-mcan-wakeup-source-v6-12-v6-0-1356c7f7cfda@baylibre.com>
- <20241219-topic-mcan-wakeup-source-v6-12-v6-1-1356c7f7cfda@baylibre.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HSteonfQkl9liOvqTgrjMD7RULCgf/vGVW88/ofAOJ1UKwY88m0l/XvUWIz/TQD6f6XDalHE/dJ6vDm2khsx6UpusmsgXIzt52zrlZM6FT+vJr2HjU7mr6cmPpc/Z3xVuE0nmH243R1sHM33vOhXzmqjgLAaSjnHWXdyArbIY74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G6snIM/8; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1735158122; x=1766694122;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FAhwDFaOLN+9a+xH6yZJXC2FCUU8+PrdVP9u5Ao6KDc=;
+  b=G6snIM/8/gOKUBy3H+baQ3OVqYNVIel7GzM24pG7e3jNl+rV/AmQnS0e
+   75KaABHABqlqe2NofH259iELbuwONcvOuND+bc2lVwo0ymtvBXxFcH4W0
+   swdaiormpnztb/yTluwN4l145KBiiyJnyVKwjiT0x9uoLvNh+QokDJ+nv
+   BXCYr+C5EkwXxqyjcUL6fW3F3QGnspgV7odeCL7yh/N4gO+abijVemYF7
+   JsAAIvs0bbUYP0xw8J//d9yxb+Vf9ROVZA9IDuMWzEC0vStiH3+xdGAuU
+   fK0xtT0R6UogB6M4SnEDWFJe4CZCcj7lg4uIpYcEDxuPiQpJLmvsBa4G5
+   g==;
+X-CSE-ConnectionGUID: x8yKXfliSBG2Z0q/I7SNdw==
+X-CSE-MsgGUID: 1Rn9kOJKS62N14H3CwslMA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11296"; a="60974601"
+X-IronPort-AV: E=Sophos;i="6.12,264,1728975600"; 
+   d="scan'208";a="60974601"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2024 12:22:01 -0800
+X-CSE-ConnectionGUID: 33aUnnuJToyKvs5vQvDpXw==
+X-CSE-MsgGUID: SwLU9jH3SIioxF89jx3j/A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="100600011"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 25 Dec 2024 12:21:58 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tQXtD-000282-11;
+	Wed, 25 Dec 2024 20:21:55 +0000
+Date: Thu, 26 Dec 2024 04:21:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+	netdev@vger.kernel.org, dan.j.williams@intel.com,
+	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	dave.jiang@intel.com
+Cc: oe-kbuild-all@lists.linux.dev, Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v8 16/27] sfc: obtain root decoder with enough HPA free
+ space
+Message-ID: <202412260415.oH9bfTi0-lkp@intel.com>
+References: <20241216161042.42108-17-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="srwhw2v5uya67a3g"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241219-topic-mcan-wakeup-source-v6-12-v6-1-1356c7f7cfda@baylibre.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20241216161042.42108-17-alejandro.lucero-palau@amd.com>
+
+Hi,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on fac04efc5c793dccbd07e2d59af9f90b7fc0dca4]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/alejandro-lucero-palau-amd-com/cxl-add-type2-device-basic-support/20241217-001923
+base:   fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+patch link:    https://lore.kernel.org/r/20241216161042.42108-17-alejandro.lucero-palau%40amd.com
+patch subject: [PATCH v8 16/27] sfc: obtain root decoder with enough HPA free space
+config: x86_64-randconfig-071-20241225 (https://download.01.org/0day-ci/archive/20241226/202412260415.oH9bfTi0-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241226/202412260415.oH9bfTi0-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412260415.oH9bfTi0-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: drivers/net/ethernet/sfc/efx_cxl.o: in function `efx_cxl_init':
+>> drivers/net/ethernet/sfc/efx_cxl.c:107: undefined reference to `cxl_get_hpa_freespace'
 
 
---srwhw2v5uya67a3g
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v6 1/7] dt-bindings: can: m_can: Add wakeup properties
-MIME-Version: 1.0
+vim +107 drivers/net/ethernet/sfc/efx_cxl.c
 
-On 19.12.2024 20:57:52, Markus Schneider-Pargmann wrote:
-> m_can can be a wakeup source on some devices. Especially on some of the
-> am62* SoCs pins, connected to m_can in the mcu, can be used to wakeup
-> the SoC.
->=20
-> The wakeup-source property defines on which devices m_can can be used
-> for wakeup and in which power states.
->=20
-> The pins associated with m_can have to have a special configuration to
-> be able to wakeup the SoC. This configuration is described in the wakeup
-> pinctrl state while the default state describes the default
-> configuration.
->=20
-> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+    20	
+    21	int efx_cxl_init(struct efx_probe_data *probe_data)
+    22	{
+    23		struct efx_nic *efx = &probe_data->efx;
+    24		DECLARE_BITMAP(expected, CXL_MAX_CAPS);
+    25		DECLARE_BITMAP(found, CXL_MAX_CAPS);
+    26		resource_size_t max_size;
+    27		struct pci_dev *pci_dev;
+    28		struct efx_cxl *cxl;
+    29		struct resource res;
+    30		u16 dvsec;
+    31		int rc;
+    32	
+    33		pci_dev = efx->pci_dev;
+    34		probe_data->cxl_pio_initialised = false;
+    35	
+    36		dvsec = pci_find_dvsec_capability(pci_dev, PCI_VENDOR_ID_CXL,
+    37						  CXL_DVSEC_PCIE_DEVICE);
+    38		if (!dvsec)
+    39			return 0;
+    40	
+    41		pci_dbg(pci_dev, "CXL_DVSEC_PCIE_DEVICE capability found\n");
+    42	
+    43		cxl = kzalloc(sizeof(*cxl), GFP_KERNEL);
+    44		if (!cxl)
+    45			return -ENOMEM;
+    46	
+    47		cxl->cxlds = cxl_accel_state_create(&pci_dev->dev);
+    48		if (IS_ERR(cxl->cxlds)) {
+    49			pci_err(pci_dev, "CXL accel device state failed");
+    50			rc = -ENOMEM;
+    51			goto err_state;
+    52		}
+    53	
+    54		cxl_set_dvsec(cxl->cxlds, dvsec);
+    55		cxl_set_serial(cxl->cxlds, pci_dev->dev.id);
+    56	
+    57		res = DEFINE_RES_MEM(0, EFX_CTPIO_BUFFER_SIZE);
+    58		if (cxl_set_resource(cxl->cxlds, res, CXL_RES_DPA)) {
+    59			pci_err(pci_dev, "cxl_set_resource DPA failed\n");
+    60			rc = -EINVAL;
+    61			goto err_resource_set;
+    62		}
+    63	
+    64		res = DEFINE_RES_MEM_NAMED(0, EFX_CTPIO_BUFFER_SIZE, "ram");
+    65		if (cxl_set_resource(cxl->cxlds, res, CXL_RES_RAM)) {
+    66			pci_err(pci_dev, "cxl_set_resource RAM failed\n");
+    67			rc = -EINVAL;
+    68			goto err_resource_set;
+    69		}
+    70	
+    71		rc = cxl_pci_accel_setup_regs(pci_dev, cxl->cxlds);
+    72		if (rc) {
+    73			pci_err(pci_dev, "CXL accel setup regs failed");
+    74			goto err_resource_set;
+    75		}
+    76	
+    77		bitmap_clear(expected, 0, CXL_MAX_CAPS);
+    78		bitmap_set(expected, CXL_DEV_CAP_HDM, 1);
+    79		bitmap_set(expected, CXL_DEV_CAP_RAS, 1);
+    80	
+    81		if (!cxl_pci_check_caps(cxl->cxlds, expected, found)) {
+    82			pci_err(pci_dev,
+    83				"CXL device capabilities found(%08lx) not as expected(%08lx)",
+    84				*found, *expected);
+    85			rc = -EIO;
+    86			goto err_resource_set;
+    87		}
+    88	
+    89		rc = cxl_request_resource(cxl->cxlds, CXL_RES_RAM);
+    90		if (rc) {
+    91			pci_err(pci_dev, "CXL request resource failed");
+    92			goto err_resource_set;
+    93		}
+    94	
+    95		/* We do not have the register about media status. Hardware design
+    96		 * implies it is ready.
+    97		 */
+    98		cxl_set_media_ready(cxl->cxlds);
+    99	
+   100		cxl->cxlmd = devm_cxl_add_memdev(&pci_dev->dev, cxl->cxlds);
+   101		if (IS_ERR(cxl->cxlmd)) {
+   102			pci_err(pci_dev, "CXL accel memdev creation failed");
+   103			rc = PTR_ERR(cxl->cxlmd);
+   104			goto err_memdev;
+   105		}
+   106	
+ > 107		cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd,
+   108						   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
+   109						   &max_size);
+   110	
+   111		if (IS_ERR(cxl->cxlrd)) {
+   112			pci_err(pci_dev, "cxl_get_hpa_freespace failed\n");
+   113			rc = PTR_ERR(cxl->cxlrd);
+   114			goto err_memdev;
+   115		}
+   116	
+   117		if (max_size < EFX_CTPIO_BUFFER_SIZE) {
+   118			pci_err(pci_dev, "%s: not enough free HPA space %pap < %u\n",
+   119				__func__, &max_size, EFX_CTPIO_BUFFER_SIZE);
+   120			rc = -ENOSPC;
+   121			goto err_memdev;
+   122		}
+   123	
+   124		probe_data->cxl = cxl;
+   125	
+   126		return 0;
+   127	
+   128	err_memdev:
+   129		cxl_release_resource(cxl->cxlds, CXL_RES_RAM);
+   130	err_resource_set:
+   131		kfree(cxl->cxlds);
+   132	err_state:
+   133		kfree(cxl);
+   134		return rc;
+   135	}
+   136	
 
-The DTBS check fails:
-
-| $ make CHECK_DTBS=3Dy ti/k3-am625-beagleplay.dtb
-|   DTC [C] arch/arm64/boot/dts/ti/k3-am625-beagleplay.dtb
-| arch/arm64/boot/dts/ti/k3-am625-beagleplay.dtb: can@4e08000: wakeup-sourc=
-e: 'oneOf' conditional failed, one must be fixed:
-|         ['suspend', 'poweroff'] is not of type 'boolean'
-|         ['suspend', 'poweroff'] is too long
-|         from schema $id: http://devicetree.org/schemas/net/can/bosch,m_ca=
-n.yaml#
-| arch/arm64/boot/dts/ti/k3-am625-beagleplay.dtb: can@4e08000: wakeup-sourc=
-e: ['suspend', 'poweroff'] is not of type 'boolean'
-|         from schema $id: http://devicetree.org/schemas/wakeup-source.yaml#
-| arch/arm64/boot/dts/ti/k3-am625-beagleplay.dtb: can@4e18000: wakeup-sourc=
-e: 'oneOf' conditional failed, one must be fixed:
-|         ['suspend', 'poweroff'] is not of type 'boolean'
-|         ['suspend', 'poweroff'] is too long
-|         from schema $id: http://devicetree.org/schemas/net/can/bosch,m_ca=
-n.yaml#
-| arch/arm64/boot/dts/ti/k3-am625-beagleplay.dtb: can@4e18000: wakeup-sourc=
-e: ['suspend', 'poweroff'] is not of type 'boolean'
-|         from schema $id: http://devicetree.org/schemas/wakeup-source.yaml#
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---srwhw2v5uya67a3g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmdsYfYACgkQKDiiPnot
-vG8yoQf/TvollExLSNWWJR9S7tKurNCmxmlPYket9IZbscYEr9zwGB4CG9v6q/K/
-ee5jRaJ7ck8hiUEkIQpHwz8Ek+jq84GAJEQYWDjIT5dZSLwkQsZS54/Nv4wPgrbH
-3BPxTlMdkDiFHqlxSX/yOTyTbGD8sc3VU2pXx7DfFBl6C4f7bhup19guLiLosUr1
-1Nh8jnttzV2pSiG/YzsMQCuj5SuiCYnFpJnJzgUMRPSm4+WEZHlecq5BnszfWeS3
-hqZII3Wg1aCdm+CstUvAw+jIfa1InbNjtS2drU5kOsiawKcK0gzdCzQ0cBvvylaf
-bpK/ypEN0QZZxuSAkpBmm6+xF1hAyQ==
-=WQRL
------END PGP SIGNATURE-----
-
---srwhw2v5uya67a3g--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
