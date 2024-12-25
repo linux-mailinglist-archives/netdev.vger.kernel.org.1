@@ -1,138 +1,246 @@
-Return-Path: <netdev+bounces-154236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D17EC9FC3A4
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 06:18:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ABFE9FC3C4
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 07:13:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 036B81884CCF
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 05:17:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D773216416B
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 06:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610F31474BC;
-	Wed, 25 Dec 2024 05:17:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="e7npYA5a"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DA7145A19;
+	Wed, 25 Dec 2024 06:13:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC4413AA2B;
-	Wed, 25 Dec 2024 05:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C982633DF;
+	Wed, 25 Dec 2024 06:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735103828; cv=none; b=NM7Da7yIS3xoQ4FiGk39seTakd3j7pOMs/VKeRb0PcVfs7D7KcsdlFKT3UB3zbRYAI+E0RtUawsgNdo7s/Leg3rYJRCdXvl/QgfCKmYZkp5rwLNhqfCuQqo/nb3pe4fOlPpJtl1hgIOb/HqQYmXlSu2h2mmksFjzYsNQBvZ5tUY=
+	t=1735107189; cv=none; b=H//G9KIOgouhoR0TWNLHXg8ZXhJ/c7a655+8T2Kd+h7IdFzWjuajtqcRSlKEo0aZNrxXPxyVc6naPSA3q2aOdZLGYUPBGR0tQN1V6hVUkQ6frtG1NBR/Nhdtw0sf34BWY5zC3/atkfSDYdVa8MXzmwDLQFjVQo8orNBTxP48Pjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735103828; c=relaxed/simple;
-	bh=zaViJNomEckKKcjjBSRQLLpChjsOyScVQjvRS2k5bAM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jypKrJxLyJVXBhMgb/6SC8kWEuF0AfpS8yiZmLVbWfMpmzyGYicS7km/vFoA6wrM1KOPvVHkh+R8IsfWb4gU6Je+ITyTBZJGW/KnhhPOxge4SOTZ4Hgm98u5gvlNmFjt3vcEvXipwSCqaA9TM6XUwer8ihgbr0RVKameE7mQFKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=e7npYA5a; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BP3PxkL004751;
-	Wed, 25 Dec 2024 05:16:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2023-11-20; bh=ZFYCl
-	pbOYCw+0yUTOUOfc8jYTx/JcRzMVv7MjxoNwKI=; b=e7npYA5amjF6uDjFKuRBd
-	s0UYDDHsa2POEBa+nNMk1cAEDwJqHA6909AvIuqpJXbPjFIQjs1X5N92orv3DJTr
-	O+4LYictDYwHTlAah/RuLJksE3nabBSC12X6oUWzZCEvIL15Ln8rmlPuOoGZ8kWz
-	dp9MpSfgflmODUcLyYo09WjEEKAPkyUG8bawdIrMCdcx2G3d+Y9O+67PNaEQdq4q
-	w/6yPC/mIGiV7jKYqztv+m2kkC54OF0ZKYioxl1ooXfR4y17tKpUTcjwly1UVRPw
-	T7k1XcVr8sFx4EK0VQLTZFUH4bP62SYThJH1ENkwVVNi3C5HQAAMWOpnVWzyqbg3
-	g==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 43nqd5n14w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Dec 2024 05:16:29 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4BP4vUM5000936;
-	Wed, 25 Dec 2024 05:16:28 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 43pk8ucjry-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Dec 2024 05:16:28 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4BP5GPgC035712;
-	Wed, 25 Dec 2024 05:16:27 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 43pk8ucjr2-5;
-	Wed, 25 Dec 2024 05:16:27 +0000
-From: Harshvardhan Jha <harshvardhan.j.jha@oracle.com>
-To: davem@davemloft.net, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org,
-        kuba@kernel.org
-Cc: harshvardhan.j.jha@oracle.com, netdev@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: [PATCH 5.4.y 5.10.y 4/4] ipv6: fix possible UAF in ip6_finish_output2()
-Date: Tue, 24 Dec 2024 21:16:24 -0800
-Message-ID: <20241225051624.127745-5-harshvardhan.j.jha@oracle.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241225051624.127745-1-harshvardhan.j.jha@oracle.com>
-References: <20241225051624.127745-1-harshvardhan.j.jha@oracle.com>
+	s=arc-20240116; t=1735107189; c=relaxed/simple;
+	bh=iCq7PTbBtpdm7C2nY1QXhZ7d1rxeIteL3j5HgbRM29I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JRoYSdEzEsuq8VDrBUrPZEFKTcdsThh2NSnQOQ4EEhK6MRrmvRvR2+agYDnvB8b9RE3oenTdpnLGmITFP4PwaiiRLVIO9m7TNGdjX9CWzxryh7Xl/fKo8hvTgzjiHpeaI9mPgOKPABd8675dFyBSsYM0w4Lwc7+R5LEwaaQLnfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4YJ1f73Jv1z20mbf;
+	Wed, 25 Dec 2024 14:13:19 +0800 (CST)
+Received: from kwepemf100018.china.huawei.com (unknown [7.202.181.17])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9D44F1400F4;
+	Wed, 25 Dec 2024 14:12:59 +0800 (CST)
+Received: from [10.67.120.168] (10.67.120.168) by
+ kwepemf100018.china.huawei.com (7.202.181.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 25 Dec 2024 14:12:58 +0800
+Message-ID: <4e68fb45-667c-988e-9f6d-fc29858ff782@hisilicon.com>
+Date: Wed, 25 Dec 2024 14:12:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH RFC 00/12] RDMA: Support link status events dispatching in
+ ib_core
+Content-Language: en-US
+To: Leon Romanovsky <leon@kernel.org>
+CC: <jgg@ziepe.ca>, <selvin.xavier@broadcom.com>,
+	<chengyou@linux.alibaba.com>, <kaishen@linux.alibaba.com>,
+	<mustafa.ismail@intel.com>, <tatyana.e.nikolova@intel.com>,
+	<yishaih@nvidia.com>, <benve@cisco.com>, <neescoba@cisco.com>,
+	<bryan-bt.tan@broadcom.com>, <vishnu.dasa@broadcom.com>,
+	<zyjzyj2000@gmail.com>, <bmt@zurich.ibm.com>, <linux-rdma@vger.kernel.org>,
+	<linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>,
+	<tangchengchang@huawei.com>, <liyuyu6@huawei.com>, linux-netdev
+	<netdev@vger.kernel.org>
+References: <20241122105308.2150505-1-huangjunxian6@hisilicon.com>
+ <20241224103224.GF171473@unreal>
+ <ea392da6-15e1-ea62-f5f0-78e3da0874ae@hisilicon.com>
+ <20241224133856.GG171473@unreal>
+From: Junxian Huang <huangjunxian6@hisilicon.com>
+In-Reply-To: <20241224133856.GG171473@unreal>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-25_01,2024-12-24_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
- malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2411120000 definitions=main-2412250044
-X-Proofpoint-GUID: -k21lX0dPkK94p2TMCvH-i78C820-tZ5
-X-Proofpoint-ORIG-GUID: -k21lX0dPkK94p2TMCvH-i78C820-tZ5
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemf100018.china.huawei.com (7.202.181.17)
 
-From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit e891b36de161fcd96f12ff83667473e5067b9037 ]
 
-If skb_expand_head() returns NULL, skb has been freed
-and associated dst/idev could also have been freed.
+On 2024/12/24 21:38, Leon Romanovsky wrote:
+> On Tue, Dec 24, 2024 at 08:05:26PM +0800, Junxian Huang wrote:
+>>
+>>
+>> On 2024/12/24 18:32, Leon Romanovsky wrote:
+>>> On Fri, Nov 22, 2024 at 06:52:56PM +0800, Junxian Huang wrote:
+>>>> This series is to integrate a common link status event handler in
+>>>> ib_core as this functionality is needed by most drivers and
+>>>> implemented in very similar patterns. This is not a new issue but
+>>>> a restart of the previous work of our colleagues from several years
+>>>> ago, please see [1] and [2].
+>>>>
+>>>> [1]: https://lore.kernel.org/linux-rdma/1570184954-21384-1-git-send-email-liweihang@hisilicon.com/
+>>>> [2]: https://lore.kernel.org/linux-rdma/20200204082408.18728-1-liweihang@huawei.com/
+>>>>
+>>>> With this series, ib_core can handle netdev events of link status,
+>>>> i.e. NETDEV_UP, NETDEV_DOWN and NETDEV_CHANGE, and dispatch ib port
+>>>> events to ULPs instead of drivers. However some drivers currently
+>>>> have some private processing in their handler, rather than simply
+>>>> dispatching events. For these drivers, this series provides a new
+>>>> ops report_port_event(). If this ops is set, ib_core will call it
+>>>> and the events will still be handled in the driver.
+>>>>
+>>>> Events of LAG devices are also not handled in ib_core as currently
+>>>> there is no way to obtain ibdev from upper netdev in ib_core. This
+>>>> can be a TODO work after the core have more support for LAG. For
+>>>> now mlx5 is the only driver that supports RoCE LAG, and the events
+>>>> handling of mlx5 RoCE LAG will remain in mlx5 driver.
+>>>>
+>>>> In this series:
+>>>>
+>>>> Patch #1 adds a new helper to query the port num of a netdev
+>>>> associated with an ibdev. This is used in the following patch.
+>>>>
+>>>> Patch #2 adds support for link status events dispatching in ib_core.
+>>>>
+>>>> Patch #3-#7 removes link status event handler in several drivers.
+>>>> The port state setting in erdma, rxe and siw are replaced with
+>>>> ib_get_curr_port_state(), so their handler can be totally removed.
+>>>>
+>>>> Patch #8-#10 add support for report_port_event() ops in usnic, mlx4
+>>>> and pvrdma as their current handler cannot be perfectly replaced by
+>>>> the ib_core handler in patch #2.
+>>>>
+>>>> Patch #11 adds a check in mlx5 that only events of RoCE LAG will be
+>>>> handled in mlx5 driver.
+>>>>
+>>>> Patch #12 adds a fast path for link-down events dispatching in hns by
+>>>> getting notified from hns3 nic driver directly.
+>>>>
+>>>> Yuyu Li (12):
+>>>>   RDMA/core: Add ib_query_netdev_port() to query netdev port by IB
+>>>>     device.
+>>>>   RDMA/core: Support link status events dispatching
+>>>>   RDMA/bnxt_re: Remove deliver net device event
+>>>>   RDMA/erdma: Remove deliver net device event
+>>>>   RDMA/irdma: Remove deliver net device event
+>>>>   RDMA/rxe: Remove deliver net device event
+>>>>   RDMA/siw: Remove deliver net device event
+>>>>   RDMA/usnic: Support report_port_event() ops
+>>>>   RDMA/mlx4: Support report_port_event() ops
+>>>>   RDMA/pvrdma: Support report_port_event() ops
+>>>>   RDMA/mlx5: Handle link status event only for LAG device
+>>>>   RDMA/hns: Support fast path for link-down events dispatching
+>>>
+>>> I took the series as it is good thing to remove code duplication
+>>> and we waited enough.
+>>>
+>>
+>> Thanks Leon.
+>>
+>> The kernel test robot has reported one warning and one error for
+>> this series:
+>>
+>> https://lore.kernel.org/oe-kbuild-all/202411251625.VrcLuTRx-lkp@intel.com/
+>> https://lore.kernel.org/oe-kbuild-all/202411251727.RFxtcpiI-lkp@intel.com/
+>>
+>> I was planning to fix them when I could send the formal patches,
+>> but since you have applied these RFC patches，could you please
+>> fix them on your wip branch, or should I send separate patches
+>> to fix them?
+> 
+> This is how I fixed it. Is it ok?
+> 
+> diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
+> index 4286fd4a9324..b886fe2922ae 100644
+> --- a/drivers/infiniband/hw/bnxt_re/main.c
+> +++ b/drivers/infiniband/hw/bnxt_re/main.c
+> @@ -822,17 +822,6 @@ static void bnxt_re_disassociate_ucontext(struct ib_ucontext *ibcontext)
+>  }
+>  
+>  /* Device */
+> -
+> -static struct bnxt_re_dev *bnxt_re_from_netdev(struct net_device *netdev)
+> -{
+> -	struct ib_device *ibdev =
+> -		ib_device_get_by_netdev(netdev, RDMA_DRIVER_BNXT_RE);
+> -	if (!ibdev)
+> -		return NULL;
+> -
+> -	return container_of(ibdev, struct bnxt_re_dev, ibdev);
+> -}
+> -
+>  static ssize_t hw_rev_show(struct device *device, struct device_attribute *attr,
+>  			   char *buf)
+>  {
+> diff --git a/drivers/infiniband/hw/usnic/usnic_ib_main.c b/drivers/infiniband/hw/usnic/usnic_ib_main.c
+> index 5ad7fe7e662f..4ddcd5860e0f 100644
+> --- a/drivers/infiniband/hw/usnic/usnic_ib_main.c
+> +++ b/drivers/infiniband/hw/usnic/usnic_ib_main.c
+> @@ -192,10 +192,12 @@ static void usnic_ib_handle_usdev_event(struct usnic_ib_dev *us_ibdev,
+>  
+>  static void usnic_ib_handle_port_event(struct ib_device *ibdev,
+>  				       struct net_device *netdev,
+> -				       unsigned long event);
+> +				       unsigned long event)
+>  {
+>  	struct usnic_ib_dev *us_ibdev =
+>  			container_of(ibdev, struct usnic_ib_dev, ib_dev);
+> +	struct ib_event ib_event;
+> +
+>  	mutex_lock(&us_ibdev->usdev_lock);
+>  	switch (event) {
+>  	case NETDEV_UP:
+> diff --git a/drivers/infiniband/sw/siw/siw_verbs.c b/drivers/infiniband/sw/siw/siw_verbs.c
+> index 137819184b3b..6b24438df917 100644
+> --- a/drivers/infiniband/sw/siw/siw_verbs.c
+> +++ b/drivers/infiniband/sw/siw/siw_verbs.c
+> @@ -172,6 +172,7 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
+>  		   struct ib_port_attr *attr)
+>  {
+>  	struct siw_device *sdev = to_siw_dev(base_dev);
+> +	struct net_device *ndev;
+>  	int rv;
+>  
+>  	memset(attr, 0, sizeof(*attr));
+> @@ -183,7 +184,12 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
+>  	attr->max_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+>  	attr->active_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+>  	attr->port_cap_flags = IB_PORT_CM_SUP | IB_PORT_DEVICE_MGMT_SUP;
+> -	attr->state = ib_get_curr_port_state(sdev->ndev);
+> +	ndev = ib_device_get_netdev(base_dev, port);
+> +	if (ndev)
+> +		attr->state = ib_get_curr_port_state(ndev);
+> +	else
+> +		attr->state = IB_PORT_DOWN;
+> +	dev_put(ndev);
 
-We need to hold rcu_read_lock() to make sure the dst and
-associated idev are alive.
+I think this is a simpler way:
 
-Fixes: 5796015fa968 ("ipv6: allocate enough headroom in ip6_finish_output2()")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Vasily Averin <vasily.averin@linux.dev>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Link: https://patch.msgid.link/20240820160859.3786976-3-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-(cherry picked from commit e891b36de161fcd96f12ff83667473e5067b9037)
-Signed-off-by: Harshvardhan Jha <harshvardhan.j.jha@oracle.com>
----
- net/ipv6/ip6_output.c | 4 ++++
- 1 file changed, 4 insertions(+)
+attr->state = ib_get_curr_port_state(sdev->netdev);
 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index a8475848d0382..48f926157ef8c 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -69,11 +69,15 @@ static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *
- 
- 	/* Be paranoid, rather than too clever. */
- 	if (unlikely(hh_len > skb_headroom(skb)) && dev->header_ops) {
-+		/* Make sure idev stays alive */
-+		rcu_read_lock();
- 		skb = skb_expand_head(skb, hh_len);
- 		if (!skb) {
- 			IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
-+			rcu_read_unlock();
- 			return -ENOMEM;
- 		}
-+		rcu_read_unlock();
- 	}
- 
- 	hdr = ipv6_hdr(skb);
--- 
-2.46.0
+But overall LGTM, thanks.
 
+BTW, it seems the kernel test robot has reported some more warnings
+after you applied these patches (and solved the conflicts I guess?)
+
+Thanks,
+Junxian
+
+>  	attr->phys_state = attr->state == IB_PORT_ACTIVE ?
+>  		IB_PORT_PHYS_STATE_LINK_UP : IB_PORT_PHYS_STATE_DISABLED;
+>  	/*
+> 
+> 
+>>
+>> Junxian
+> 
 
