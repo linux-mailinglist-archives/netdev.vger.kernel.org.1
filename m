@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-154263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19169FC62F
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 18:49:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B499FC633
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 18:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFA747A108E
-	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 17:49:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF9521881BC8
+	for <lists+netdev@lfdr.de>; Wed, 25 Dec 2024 17:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF5380C0C;
-	Wed, 25 Dec 2024 17:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0295F12C499;
+	Wed, 25 Dec 2024 17:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YJoq34KN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FkrMXA/h"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9801DA21;
-	Wed, 25 Dec 2024 17:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF99C133
+	for <netdev@vger.kernel.org>; Wed, 25 Dec 2024 17:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735148961; cv=none; b=kvaLs82b2BxDAEy9rXCEYmVO+JUa0WES5y0wfzk28EbWwQ8/3563DFoXEf0BlCUQuFayIY3QUJvBPStm4ppUZBeVizsakejSxv68UL+kc/kHHq6Tk5FWV6hG6jF+Z1yPjte/iBx72kjqNC6okd/h0XXf54KxNRjnC1oiZJ13+Os=
+	t=1735149189; cv=none; b=Z3cFExUi+ybAfpaKkBDAmKIyS8yv7JcsWa/HaChux5koXbDR8W8hB/2CNpSkqhyO8bpTlaEYai+Q5OKbogw+Da1VojajPRoUegougo24YwKD6K8kBOMvFb0dDbwPg5a8sVqflGqYwesEJN5bIac9Kyz5l7SC1tMXT47P9Cqomkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735148961; c=relaxed/simple;
-	bh=y5PYsydG1igDU8Yg8aoBFjC9tb+E0FuE8joHiUCAVdo=;
+	s=arc-20240116; t=1735149189; c=relaxed/simple;
+	bh=JGaEtHAkFKbnYFHAlENjjiYKxBIdJOlKYnzRLPpy0jQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rzOEfDsX8z5Q6tkeVNe22jhyU20aaKwhER76gyaiWSBFIU6v9He8YpKHZLMxMGM0hnwIJn+NkamvUuiiFIi3g6vQIt8MrbCfmZmClQ8yXxyQePhnKJzf0qNakeWQb2SWgZgZ8zNMGREmsFPcNDEeNP0FE0LzUA5wPeJkHw/WQx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YJoq34KN; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=aRxKMOuK402oHgr27y0t8JTbq+MEto4eOnsrl32+VB61FBOCS2tJ3zgQnt19ajHnaPXwJQH3sIXU6VVNKRJY7MFqtDzy5/NG6FuXnLWCkJz/jjwH6jEEVLpAdkDNlVFGar4hgOvfd10h+GK/GRp6dc6IcPUQG06NoJLSx1s8MIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FkrMXA/h; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,34 +36,20 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7zaH4j7WopmuTe39LdIt9zVEEoEXcU6yeHbphF4jg2w=; b=YJoq34KNP2+1yE2R1bC3Z857m7
-	rfpQM73OR8kzfsg3OVDTB601+xgq6RysfZwZduP/8V9OiO+ry/C+UX/EcJX4SWUU2NlAzz4fZ6eka
-	GYSliQW+wBPLL91KDsIvnf250jzDQU+RDIJ+mxpPV9G5jipTdWl5MVD5lVdUuOQrfy84=;
+	bh=4Pj9gMa6ICN7xJkTvEpvpy3InrjyJVr+bZ/N7lw5OUs=; b=FkrMXA/hADlsNlmcI0UXBZthiL
+	wGXDVDDNReQVYGy7HOgHw34wp6VfCvgbtG63x1iuwcpatgwCqGgMKDlSjTTU2wZm5mGAqK6B9IEAs
+	G4iTEtVgb+Qou7VJyuuVEdW2rvEfxK7g2GAeA5DKAJpb/CnVTPEmnAEBsWBNerJD9LtU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tQVVL-00GA3K-A7; Wed, 25 Dec 2024 18:49:07 +0100
-Date: Wed, 25 Dec 2024 18:49:07 +0100
+	id 1tQVZC-00GA7D-Id; Wed, 25 Dec 2024 18:53:06 +0100
+Date: Wed, 25 Dec 2024 18:53:06 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Yijie Yang <quic_yijiyang@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 0/3] Support tuning the RX sampling swap of the MAC.
-Message-ID: <6dcfdb0b-c1ec-49f7-927e-531b20264d68@lunn.ch>
-References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
+To: sai kumar <skmr537@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: DSA Switch: query: Switch configuration, data plane doesn't work
+ whereas control plane works
+Message-ID: <25d02ea3-02f3-4699-99eb-ac49aef917e6@lunn.ch>
+References: <CAA=kqWJWjEr36iZXZ+GFeaqxx35kXTO0WdGZXsL4Q7cvsT3GYg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,26 +58,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
+In-Reply-To: <CAA=kqWJWjEr36iZXZ+GFeaqxx35kXTO0WdGZXsL4Q7cvsT3GYg@mail.gmail.com>
 
-On Wed, Dec 25, 2024 at 06:04:44PM +0800, Yijie Yang wrote:
-> The Ethernet MAC requires precise sampling times at Rx, but signals on the
-> Rx side after transmission on the board may vary due to different hardware
-> layouts. The RGMII_CONFIG2_RX_PROG_SWAP can be used to switch the sampling
-> occasion between the rising edge and falling edge of the clock to meet the
-> sampling requirements.
+On Tue, Dec 24, 2024 at 03:00:17PM +0530, sai kumar wrote:
+> Hi Team,
+> 
+> This could be basic question related to DSA, if possible please help
+> to share your feedback,. Thanks.
+> 
+> 
+> External CPU eth1 ---RGMII---- Switch Port 0 (cpu port)
 
-The RGMII specification says that RD[3:0] pins are sampled on the
-rising edge for bits 3:0 and falling edge for bits 7:4.
+How do you have your RGMII delays configured?
 
-Given this is part of the standard, why would you want to do anything
-else?
-
-Is this maybe another symptom of having the RGMII delays messed up?
-
-Anyway, i don't see a need for this property, unless you are working
-with a PHY which breaks the RGMII standard, and has its clock
-reversed?
-
-	Andrew
+    Andrew
 
