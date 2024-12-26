@@ -1,237 +1,222 @@
-Return-Path: <netdev+bounces-154283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601A99FC9F5
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 10:34:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 849609FC9F7
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 10:36:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 721BB7A14A3
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 09:34:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD918188281B
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 09:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87A41B412A;
-	Thu, 26 Dec 2024 09:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62971C0DF0;
+	Thu, 26 Dec 2024 09:35:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F175314A609
-	for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 09:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F4414A609;
+	Thu, 26 Dec 2024 09:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735205661; cv=none; b=CqBRVgy1qEGaWdbM8rAj737TMFZdt2yxb7KVjrWmFlOoqwiuCwK7VvOato/U6q1X7Kkv4Fiq5UT7s/rNtmB/+Q5puLPzVNQ83Gv6+5Keyu/tw6MQGuSAS1vDVIrq47uXtXss/7AQFJ2atr7H9t6FOQZTqhO/0IgA3GJ5ISzBkjI=
+	t=1735205756; cv=none; b=nJh6fDZOmqeFadFLVUVxcn382BYz8wbz+T9Jt4AcAxEby5ZctyqXZLAOOcX75rrMszkokSmd6wIwwgMGgUCPZYgaj0cJ1/3abF2vCLxGXXSgrkHfIt5eiL/K8bJFbxk/d+wfH/cBUZSOjGVpWZyZ74lBKeeJ+fl3bofJ77CvCeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735205661; c=relaxed/simple;
-	bh=gFfUvaRVld8uYZ0dTZOyHx7wCAtqLo0nnuvaR3D2PW4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=W2sc/Gq6R5oDdPX3HgmrogD5XriEE5JWpD9Q6e2kaeeffoUnrima2R9IxlxlWDNJ7X8QJ/euSu3GjJsspc/uqEnKvxV15X5gzOaoUeZNv731fmV1qBiJvJgpzdT9YnbBz98/KeXtpn2Un8I+VL+34fku3TSb/djvLhP1Avxm8AQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3a819a4e83dso67849185ab.1
-        for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 01:34:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735205659; x=1735810459;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3gjJ2QZw+GbxH4wnXccbKsjuxiOWvyR2BCJd7KMG1QU=;
-        b=xD5H8KqQjnKgcz/LvdZ1Z4rcI7+rK9uMeUr+0R+D/hMFNQXgNayJc+iPEVQdlPaZ5z
-         a01u2RN8WpU5MV7IPB0NyyBpVcYb953WpmDXa8ID9Ic2/JCvMbtThiLQCtGGTOatzmf+
-         m5zn3qs+vJNNpz6zx4eMUHcLMrHK/HrtVauDQOwpTQ0hLs+4/18UrJ+PjfIFCbjV6H/z
-         Y8rh0FpkmlnXAJl8J3/ob+zUMTvIVaGN8w0J+9O9b29m1w/1/Nuv/1+PBuPpkienwszz
-         9tFFSdGZxC5kc9lzUBwJaNxXthu0sbAEdF0t5tcXuc7M6PEKAlkfuBwhzAXhW6I+i1iU
-         UjWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJctwYVrcUMMTDveYk/wHU10wO7UJBRO5vxzNiPWmI9XkpaKZiEdbKJuYe2XL32tpWKtgoy/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWYL4kxOFEAB+AFtzXl4xrm7lTP+hYkKgSKI+Y5Bzovllp46YA
-	3fXtElUUU0PWReCrhmkYVdjDfvdENBTntuAwfA1RaU428maSNpRqEHIiGDf1w6GyobvEwBFDjPa
-	ihRIriSz1ox4qW6wUh2i2xKwcWTsPSVC5YDW7fvhIneCFfXsUPu4HfhM=
-X-Google-Smtp-Source: AGHT+IH2JGz6zMCsjB8yNcW292U7het1atzGt31jrG27q519eU9MdoItwDUXVurfmlxmum82foPuiarQOl+DAhLX65NMIRkjiau+
+	s=arc-20240116; t=1735205756; c=relaxed/simple;
+	bh=XYXVH4OdfHPdjRT8KCnpv6D9St3IvuOLXlMdUl3rHkI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cINHUU5XD9cCRe7ZjSB4p3ZApC6fqButOY8FER/6/Ra8HinYyEqoHDn6UN2N10zMj2f0O44gwQYptdz0Fug9HGxGToj2+jLmcApbz9uF91k1jIHV5sZVr0W+pmitxYKX8/k89kLZUs3cWxucH6PPks1ARyT4VJ46W95AHrfeLhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (188.234.32.57) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 26 Dec
+ 2024 12:35:46 +0300
+From: d.privalov <d.privalov@omp.ru>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Gustavo Padovan
+	<gustavo.padovan@collabora.co.uk>, Jaganath Kanakkassery
+	<jaganath.k@samsung.com>, <linux-bluetooth@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>, <stable@vger.kernel.org>,
+	<syzbot+c12e2f941af1feb5632c@syzkaller.appspotmail.com>, Luiz Augusto von
+ Dentz <luiz.von.dentz@intel.com>, Dmitriy Privalov <d.privalov@omp.ru>
+Subject: [PATCH 5.10 1/1] Bluetooth: L2CAP: Fix uaf in l2cap_connect
+Date: Thu, 26 Dec 2024 12:35:39 +0300
+Message-ID: <20241226093539.44806-1-d.privalov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3201:b0:3a7:e286:a560 with SMTP id
- e9e14a558f8ab-3c2d1aa30b7mr175254905ab.2.1735205659100; Thu, 26 Dec 2024
- 01:34:19 -0800 (PST)
-Date: Thu, 26 Dec 2024 01:34:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <676d231b.050a0220.2f3838.0461.GAE@google.com>
-Subject: [syzbot] [net?] INFO: task hung in lock_sock_nested (5)
-From: syzbot <syzbot+6ac73b3abf1b598863fa@syzkaller.appspotmail.com>
-To: borisp@nvidia.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sd@queasysnail.net, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 12/26/2024 08:49:16
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 190069 [Dec 26 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.1.7
+X-KSE-AntiSpam-Info: Envelope from: d.privalov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 49 0.3.49
+ 28b3b64a43732373258a371bd1554adb2caa23cb
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_one_url, url3}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 188.234.32.57 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	syzkaller.appspot.com:7.1.1,5.0.1;127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 188.234.32.57
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/26/2024 08:52:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/26/2024 7:26:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hello,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-syzbot found the following issue on:
+commit 333b4fd11e89b29c84c269123f871883a30be586 upstream.
 
-HEAD commit:    9268abe611b0 Merge branch 'net-lan969x-add-rgmii-support'
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1760eadf980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b087c24b921cdc16
-dashboard link: https://syzkaller.appspot.com/bug?extid=6ac73b3abf1b598863fa
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122f74c4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=155c0018580000
+[Syzbot reported]
+BUG: KASAN: slab-use-after-free in l2cap_connect.constprop.0+0x10d8/0x1270 net/bluetooth/l2cap_core.c:3949
+Read of size 8 at addr ffff8880241e9800 by task kworker/u9:0/54
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8274f60b0163/disk-9268abe6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f7b3fde537e7/vmlinux-9268abe6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/db4cccf7caae/bzImage-9268abe6.xz
-
-The issue was bisected to:
-
-commit 47069594e67e882ec5c1d8d374f6aab037511509
-Author: Sabrina Dubroca <sd@queasysnail.net>
-Date:   Thu Dec 12 15:36:05 2024 +0000
-
-    tls: implement rekey for TLS1.3
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13da8018580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=103a8018580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17da8018580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6ac73b3abf1b598863fa@syzkaller.appspotmail.com
-Fixes: 47069594e67e ("tls: implement rekey for TLS1.3")
-
-INFO: task syz-executor309:5851 blocked for more than 143 seconds.
-      Not tainted 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor309 state:D stack:28496 pid:5851  tgid:5846  ppid:5845   flags:0x00004006
+CPU: 0 UID: 0 PID: 54 Comm: kworker/u9:0 Not tainted 6.11.0-rc6-syzkaller-00268-g788220eee30d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+Workqueue: hci2 hci_rx_work
 Call Trace:
  <TASK>
- context_switch kernel/sched/core.c:5369 [inline]
- __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
- __schedule_loop kernel/sched/core.c:6833 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6848
- __lock_sock+0x1cd/0x330 net/core/sock.c:3079
- lock_sock_nested+0x9e/0x100 net/core/sock.c:3647
- lock_sock include/net/sock.h:1618 [inline]
- sockopt_lock_sock net/core/sock.c:1133 [inline]
- sk_setsockopt+0xebc/0x3290 net/core/sock.c:1290
- do_sock_setsockopt+0x2fb/0x720 net/socket.c:2320
- __sys_setsockopt net/socket.c:2349 [inline]
- __do_sys_setsockopt net/socket.c:2355 [inline]
- __se_sys_setsockopt net/socket.c:2352 [inline]
- __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2352
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f75d98ee4a9
-RSP: 002b:00007f75d9888218 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007f75d9978318 RCX: 00007f75d98ee4a9
-RDX: 0000000000000007 RSI: 0000000000000001 RDI: 0000000000000003
-RBP: 00007f75d9978310 R08: 0000000000000004 R09: 0000000000000000
-R10: 0000000020000040 R11: 0000000000000246 R12: 00007f75d997831c
-R13: 00007f75d9945074 R14: 506710fe2170a2df R15: bad24a4ac38a3241
- </TASK>
-
-Showing all locks held in the system:
-1 lock held by khungtaskd/30:
- #0: ffffffff8e937ae0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff8e937ae0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff8e937ae0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6744
-2 locks held by getty/5592:
- #0: ffff888031a650a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: ffffc900032fb2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
-1 lock held by syz-executor309/5847:
-1 lock held by syz-executor309/5851:
- #0: ffff888025a18fd8 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1618 [inline]
- #0: ffff888025a18fd8 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sockopt_lock_sock net/core/sock.c:1133 [inline]
- #0: ffff888025a18fd8 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sk_setsockopt+0xebc/0x3290 net/core/sock.c:1290
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:234 [inline]
- watchdog+0xff6/0x1040 kernel/hung_task.c:397
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ __dump_stack lib/dump_stack.c:93 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:119
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0xc3/0x620 mm/kasan/report.c:488
+ kasan_report+0xd9/0x110 mm/kasan/report.c:601
+ l2cap_connect.constprop.0+0x10d8/0x1270 net/bluetooth/l2cap_core.c:3949
+ l2cap_connect_req net/bluetooth/l2cap_core.c:4080 [inline]
+ l2cap_bredr_sig_cmd net/bluetooth/l2cap_core.c:4772 [inline]
+ l2cap_sig_channel net/bluetooth/l2cap_core.c:5543 [inline]
+ l2cap_recv_frame+0xf0b/0x8eb0 net/bluetooth/l2cap_core.c:6825
+ l2cap_recv_acldata+0x9b4/0xb70 net/bluetooth/l2cap_core.c:7514
+ hci_acldata_packet net/bluetooth/hci_core.c:3791 [inline]
+ hci_rx_work+0xaab/0x1610 net/bluetooth/hci_core.c:4028
+ process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3231
+ process_scheduled_works kernel/workqueue.c:3312 [inline]
+ worker_thread+0x6c8/0xed0 kernel/workqueue.c:3389
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 5847 Comm: syz-executor309 Not tainted 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:check_kcov_mode kernel/kcov.c:185 [inline]
-RIP: 0010:write_comp_data kernel/kcov.c:246 [inline]
-RIP: 0010:__sanitizer_cov_trace_const_cmp1+0x2f/0x90 kernel/kcov.c:300
-Code: 8b 04 24 65 48 8b 14 25 00 d6 03 00 65 8b 05 00 5f 64 7e 25 00 01 ff 00 74 10 3d 00 01 00 00 75 5b 83 ba 1c 16 00 00 00 74 52 <8b> 82 f8 15 00 00 83 f8 03 75 47 48 8b 8a 00 16 00 00 44 8b 8a fc
-RSP: 0018:ffffc9000404fb50 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88807eeb3c00
-RDX: ffff88807eeb3c00 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc9000404fd70 R08: ffffffff8a5765c4 R09: ffffffff898aa128
-R10: 000000000000002e R11: ffffffff8a576560 R12: dffffc0000000000
-R13: ffff888025a18d80 R14: ffff888025a18d80 R15: ffff888027ebac00
-FS:  00007f75d98a96c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055831e406600 CR3: 0000000031a76000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- tls_write_space+0x64/0x120 net/tls/tls_main.c:305
- sk_setsockopt+0x2142/0x3290 net/core/sock.c:1328
- do_sock_setsockopt+0x2fb/0x720 net/socket.c:2320
- __sys_setsockopt net/socket.c:2349 [inline]
- __do_sys_setsockopt net/socket.c:2355 [inline]
- __se_sys_setsockopt net/socket.c:2352 [inline]
- __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2352
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f75d98ee4a9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f75d98a9218 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007f75d9978308 RCX: 00007f75d98ee4a9
-RDX: 0000000000000007 RSI: 0000000000000001 RDI: 0000000000000003
-RBP: 00007f75d9978300 R08: 0000000000000004 R09: 0000000000000000
-R10: 0000000020000040 R11: 0000000000000246 R12: 00007f75d997830c
-R13: 00007f75d9945074 R14: 506710fe2170a2df R15: bad24a4ac38a3241
- </TASK>
+...
 
+Freed by task 5245:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
+ poison_slab_object+0xf7/0x160 mm/kasan/common.c:240
+ __kasan_slab_free+0x32/0x50 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2256 [inline]
+ slab_free mm/slub.c:4477 [inline]
+ kfree+0x12a/0x3b0 mm/slub.c:4598
+ l2cap_conn_free net/bluetooth/l2cap_core.c:1810 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ l2cap_conn_put net/bluetooth/l2cap_core.c:1822 [inline]
+ l2cap_conn_del+0x59d/0x730 net/bluetooth/l2cap_core.c:1802
+ l2cap_connect_cfm+0x9e6/0xf80 net/bluetooth/l2cap_core.c:7241
+ hci_connect_cfm include/net/bluetooth/hci_core.h:1960 [inline]
+ hci_conn_failed+0x1c3/0x370 net/bluetooth/hci_conn.c:1265
+ hci_abort_conn_sync+0x75a/0xb50 net/bluetooth/hci_sync.c:5583
+ abort_conn_sync+0x197/0x360 net/bluetooth/hci_conn.c:2917
+ hci_cmd_sync_work+0x1a4/0x410 net/bluetooth/hci_sync.c:328
+ process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3231
+ process_scheduled_works kernel/workqueue.c:3312 [inline]
+ worker_thread+0x6c8/0xed0 kernel/workqueue.c:3389
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
 
+Reported-by: syzbot+c12e2f941af1feb5632c@syzkaller.appspotmail.com
+Tested-by: syzbot+c12e2f941af1feb5632c@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=c12e2f941af1feb5632c
+Fixes: 7b064edae38d ("Bluetooth: Fix authentication if acl data comes before remote feature evt")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Dmitriy Privalov <d.privalov@omp.ru>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/bluetooth/hci_core.c   | 2 ++
+ net/bluetooth/hci_event.c  | 2 +-
+ net/bluetooth/l2cap_core.c | 9 ---------
+ 3 files changed, 3 insertions(+), 10 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 9787a4c55113..c4c86407b920 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4769,6 +4769,8 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	hci_dev_lock(hdev);
+ 	conn = hci_conn_hash_lookup_handle(hdev, handle);
++	if (conn && hci_dev_test_flag(hdev, HCI_MGMT))
++		mgmt_device_connected(hdev, conn, 0, NULL, 0);
+ 	hci_dev_unlock(hdev);
+ 
+ 	if (conn) {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 58c029958759..634b12b19b32 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3245,7 +3245,7 @@ static void hci_remote_features_evt(struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
+-	if (!ev->status && !test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
++	if (!ev->status) {
+ 		struct hci_cp_remote_name_req cp;
+ 		memset(&cp, 0, sizeof(cp));
+ 		bacpy(&cp.bdaddr, &conn->dst);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 23fc03f7bf31..cad0e535ff81 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4272,18 +4272,9 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ static int l2cap_connect_req(struct l2cap_conn *conn,
+ 			     struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
+ {
+-	struct hci_dev *hdev = conn->hcon->hdev;
+-	struct hci_conn *hcon = conn->hcon;
+-
+ 	if (cmd_len < sizeof(struct l2cap_conn_req))
+ 		return -EPROTO;
+ 
+-	hci_dev_lock(hdev);
+-	if (hci_dev_test_flag(hdev, HCI_MGMT) &&
+-	    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &hcon->flags))
+-		mgmt_device_connected(hdev, hcon, 0, NULL, 0);
+-	hci_dev_unlock(hdev);
+-
+ 	l2cap_connect(conn, cmd, data, L2CAP_CONN_RSP, 0);
+ 	return 0;
+ }
+-- 
+2.34.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
