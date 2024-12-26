@@ -1,184 +1,186 @@
-Return-Path: <netdev+bounces-154287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5740B9FCA74
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 12:17:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA389FCA79
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 12:23:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD5891629C8
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 11:16:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D45927A1091
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 11:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CA01CEEB4;
-	Thu, 26 Dec 2024 11:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1A81CEADA;
+	Thu, 26 Dec 2024 11:23:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.40])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EF479CD;
-	Thu, 26 Dec 2024 11:16:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA721CEE97;
+	Thu, 26 Dec 2024 11:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735211815; cv=none; b=lGGrqTkmN/gkAF/lPjrUBr6DhrrQn7ZedQfy1Wo6SjepmGynBqpG9gzXAiVX611kPLj/hhsNMH4ZGhUCtL9dUE7UgE2Fjrh1MfZaQj1UaWVax5UMIS5nJtIHtBXBfUo802StIvGuKdt3/evcTtvyqFv4J/T3Q7OiENSfHAh0kMw=
+	t=1735212206; cv=none; b=LBDRQ+PBAfMxaxbffvMFUmgLENQcxpayEYZm2p0BAC5B2Evsygmtg1rWMHT32z+MB8txmNdY+WrRlDWtBzJyhCn1wMnx5Ve2SUtAEggu9kgqU2BwBlE0+7ZYjmZQXxzpMcJciXtm2fxiu1+gbP6CmjeIP37b/nxU33EbJZC55pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735211815; c=relaxed/simple;
-	bh=VSZ70DPzOrnME7a/vnumVDpaKk2n7CiOZnBxCL3RX5o=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=oHlyxSraDFbBMdSRM0so336GPH9JgbFbH9KiXS3dvDYX8k1He/ocWptA/PfIWUj3jggGap5ClctyEEeeT9BAqqaldiXsxoNXYfNFk4xZjbNJkg+RdKeM3KZ6/y0SVl1p3HWsEcnmp9SpBWEJhesCfbu8SvSj0pLVoXw93AwID/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4YJmKj2fzjz8R041;
-	Thu, 26 Dec 2024 19:16:41 +0800 (CST)
-Received: from njy2app04.zte.com.cn ([10.40.12.64])
-	by mse-fl2.zte.com.cn with SMTP id 4BQBGewD069598;
-	Thu, 26 Dec 2024 19:16:40 +0800 (+08)
-	(envelope-from jiang.kun2@zte.com.cn)
-Received: from mapi (njy2app04[null])
-	by mapi (Zmail) with MAPI id mid204;
-	Thu, 26 Dec 2024 19:16:43 +0800 (CST)
-Date: Thu, 26 Dec 2024 19:16:43 +0800 (CST)
-X-Zmail-TransId: 2afc676d3b1b66f-aacfa
-X-Mailer: Zmail v1.0
-Message-ID: <202412261916435469rfyTVNfO8PtKWbw6X51-@zte.com.cn>
+	s=arc-20240116; t=1735212206; c=relaxed/simple;
+	bh=DqmJzU+bCDBqntp6PuyKWAwD78+400G67euyAWhCB1w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LWFKXzHOlm88Ls5eBFkTJY+PD/VO1Lo2EGOgQIhOCAJB1R/lNUKf0oAwlyw+JcmXTk8yPBpuvgYsvRPhstAtsd25KPbymSXcDCoKFeXvt8blmB9JjlL9S4vGY4NRnCJOAa3n8NmoGkHgov73sSrw1Y2ruBD2iF/oCPKDxygObjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YJmSm3DShz6K6M1;
+	Thu, 26 Dec 2024 19:22:48 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 48808140C98;
+	Thu, 26 Dec 2024 19:23:14 +0800 (CST)
+Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 26 Dec
+ 2024 12:23:04 +0100
+From: Gur Stavi <gur.stavi@huawei.com>
+To: Gur Stavi <gur.stavi@huawei.com>, gongfan <gongfan1@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
+	<helgaas@kernel.org>, Cai Huoqing <cai.huoqing@linux.dev>, Xin Guo
+	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>
+Subject: [PATCH net-next v02 0/1] net: hinic3: Add a driver for Huawei 3rd gen NIC
+Date: Thu, 26 Dec 2024 13:36:19 +0200
+Message-ID: <cover.1735206602.git.gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <jiang.kun2@zte.com.cn>
-To: <andrew@lunn.ch>, <vivien.didelot@gmail.com>, <f.fainelli@gmail.com>,
-        <olteanv@gmail.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
-Cc: <he.peilin@zte.com.cn>, <xu.xin16@zte.com.cn>, <fan.yu9@zte.com.cn>,
-        <qiu.yutan@zte.com.cn>, <wang.yaxin@zte.com.cn>,
-        <tu.qiang35@zte.com.cn>, <yang.yang29@zte.com.cn>,
-        <ye.xingchen@zte.com.cn>, <zhang.yunkai@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIHN0YWJsZSA1LjE1XSBuZXQ6ZHNhOmZpeCB0aGUgZHNhX3B0ciBudWxsIHBvaW50ZXIgZGVyZWZlcmVuY2U=?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 4BQBGewD069598
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 676D3B19.000/4YJmKj2fzjz8R041
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-From: Peilin He<he.peilin@zte.com.cn>
+This is the 1/3 patch of the patch-set described below.
 
-Upstream commit 6c24a03a61a2 ("net: dsa: improve shutdown sequence")
+The patch-set contains driver for Huawei's 3rd generation HiNIC
+Ethernet device that will be available in the future.
 
-Issue
-=====
-Repeatedly accessing the DSA Ethernet controller via the ethtool command,
-followed by a system reboot, may trigger a DSA null pointer dereference,
-causing a kernel panic and preventing the system from rebooting properly.
-This can lead to data loss or denial-of-service, resulting in serious
-consequences.
+This is an SRIOV device, designed for data centers.
+Initially, the driver only supports VFs.
 
-The following is the panic log:
-[  172.523467] Unable to handle kernel NULL pointer dereference at virtual
-address 0000000000000020
-[  172.706923] Call trace:
-[  172.709371]  dsa_master_get_sset_count+0x24/0xa4
-[  172.714000]  ethtool_get_drvinfo+0x8c/0x210
-[  172.718193]  dev_ethtool+0x780/0x2120
-[  172.721863]  dev_ioctl+0x1b0/0x580
-[  172.725273]  sock_do_ioctl+0xc0/0x100
-[  172.728944]  sock_ioctl+0x130/0x3c0
-[  172.732440]  __arm64_sys_ioctl+0xb4/0x100
-[  172.736460]  invoke_syscall+0x50/0x120
-[  172.740219]  el0_svc_common.constprop.0+0x4c/0xf4
-[  172.744936]  do_el0_svc+0x2c/0xa0
-[  172.748257]  el0_svc+0x20/0x60
-[  172.751318]  el0t_64_sync_handler+0xe8/0x114
-[  172.755599]  el0t_64_sync+0x180/0x184
-[  172.759271] Code: a90153f3 2a0103f4 a9025bf5 f9418015 (f94012b6)
-[  172.765383] ---[ end trace 0000000000000002 ]---
+Following the discussion over RFC01, the code will be submitted in
+separate smaller patches where until the last patch the driver is
+non-functional. The RFC02 submission contains overall view of the entire
+driver but every patch will be posted as a standalone submission.
 
-Root Cause
-==========
-Based on analysis of the Linux 5.15 stable version, the function
-dsa_master_get_sset_count() accesses members of the structure pointed
-to by cpu_dp without checking for a null pointer.  If cpu_dp is a
-null pointer, this will cause a kernel panic.
+Changes:
 
-	static int dsa_master_get_sset_count(struct net_device *dev, int sset)
-	{
-		struct dsa_port *cpu_dp = dev->dsa_ptr;
-		const struct ethtool_ops *ops = cpu_dp->orig_ethtool_ops;
-		struct dsa_switch *ds = cpu_dp->ds;
-		...
-	}
+RFC V01: https://lore.kernel.org/netdev/cover.1730290527.git.gur.stavi@huawei.com
 
-dev->dsa_ptr is set to NULL in the dsa_switch_shutdown() or
-dsa_master_teardown() functions. When the DSA module unloads,
-dsa_master_ethtool_teardown(dev) restores the original copy of
-the DSA device's ethtool_ops using "dev->ethtool_ops =
-cpu_dp->orig_ethtool_ops;" before setting dev->dsa_ptr to NULL.
-This ensures that ethtool_ops remains accessible after DSA unloads.
-However, dsa_switch_shutdown does not restore the original copy of
-the DSA device's ethtool_ops, potentially leading to a null pointer
-dereference of dsa_ptr and causing a system panic.  Essentially,
-when we set master->dsa_ptr to NULL, we need to ensure that
-no user ports are making requests to the DSA driver.
+RFC V02: https://lore.kernel.org/netdev/cover.1733990727.git.gur.stavi@huawei.com
+* Reduce overall line of code by removing optional functionality.
+* Break down into smaller patches.
 
-Solution
-========
-The addition of the netif_device_detach() function is to ensure that
-ioctls, rtnetlinks and ethtool requests on the user ports no longer
-propagate down to the driver - we're no longer prepared to handle them.
+PATCH 01 V01: https://lore.kernel.org/netdev/cover.1734599672.git.gur.stavi@huawei.com
+* Documentation style and consistency fixes (from Bjorn Helgaas)
+* Use ipoll instead of custom code (from Andrew Lunn)
+* Move dev_set_drvdata up in initialization order (from Andrew Lunn)
+* Use netdev's max_mtu, min_mtu (from Andrew Lunn)
+* Fix variable 'xxx' set but not used warnings (from Linux patchwork)
 
-Fixes: ee534378f005 ("net: dsa: fix panic when DSA master device unbinds on shutdown")
-Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Peilin He <he.peilin@zte.com.cn>
-Reviewed-by: xu xin <xu.xin16@zte.com.cn>
-Signed-off-by: Kun Jiang <jiang.kun2@zte.com.cn>
-Cc: Fan Yu <fan.yu9@zte.com.cn>
-Cc: Yutan Qiu <qiu.yutan@zte.com.cn>
-Cc: Yaxin Wang <wang.yaxin@zte.com.cn>
-Cc: tuqiang <tu.qiang35@zte.com.cn>
-Cc: Yang Yang <yang.yang29@zte.com.cn>
-Cc: ye xingchen <ye.xingchen@zte.com.cn>
-Cc: Yunkai Zhang <zhang.yunkai@zte.com.cn>
----
- net/dsa/dsa2.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+PATCH 01 V02:
+* Add comment regarding usage of random MAC. (Andrew Lunn)
+* Add COMPILE_TEST to Kconfig (Jakub Kicinski)
 
-diff --git a/net/dsa/dsa2.c b/net/dsa/dsa2.c
-index 543834e31298..bf384b30ec0a 100644
---- a/net/dsa/dsa2.c
-+++ b/net/dsa/dsa2.c
-@@ -1656,6 +1656,7 @@ EXPORT_SYMBOL_GPL(dsa_unregister_switch);
- void dsa_switch_shutdown(struct dsa_switch *ds)
- {
- 	struct net_device *master, *slave_dev;
-+	LIST_HEAD(close_list);
- 	struct dsa_port *dp;
+gongfan (1):
+  hinic3: module initialization and tx/rx logic
 
- 	mutex_lock(&dsa2_mutex);
-@@ -1665,6 +1666,11 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
+ .../device_drivers/ethernet/huawei/hinic3.rst | 137 ++++
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/huawei/Kconfig           |   1 +
+ drivers/net/ethernet/huawei/Makefile          |   1 +
+ drivers/net/ethernet/huawei/hinic3/Kconfig    |  17 +
+ drivers/net/ethernet/huawei/hinic3/Makefile   |  21 +
+ .../ethernet/huawei/hinic3/hinic3_common.c    |  53 ++
+ .../ethernet/huawei/hinic3/hinic3_common.h    |  27 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    |  30 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |  58 ++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  37 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  13 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   |  85 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  24 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.h |  82 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  |  15 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  50 ++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   | 410 +++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.h   |  20 +
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  | 421 +++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  |  17 +
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  |  16 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |  13 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 111 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         |  77 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 254 +++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  45 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   | 100 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    |  21 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    | 117 +++
+ .../huawei/hinic3/hinic3_queue_common.c       |  65 ++
+ .../huawei/hinic3/hinic3_queue_common.h       |  51 ++
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   |  24 +
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  12 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 401 ++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  91 +++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 691 ++++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    | 129 ++++
+ .../net/ethernet/huawei/hinic3/hinic3_wq.c    |  29 +
+ .../net/ethernet/huawei/hinic3/hinic3_wq.h    |  75 ++
+ 40 files changed, 3848 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/huawei/hinic3.rst
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Kconfig
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Makefile
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_main.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.h
 
- 	rtnl_lock();
 
-+	dsa_switch_for_each_cpu_port(dp, ds)
-+		list_add(&dp->master->close_list, &close_list);
-+
-+	dev_close_many(&close_list, true);
-+
- 	list_for_each_entry(dp, &ds->dst->ports, list) {
- 		if (dp->ds != ds)
- 			continue;
-@@ -1675,6 +1681,7 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
- 		master = dp->cpu_dp->master;
- 		slave_dev = dp->slave;
-
-+		netif_device_detach(slave_dev);
- 		netdev_upper_dev_unlink(master, slave_dev);
- 	}
-
+base-commit: 9268abe611b09edc975aa27e6ce829f629352ff4
 -- 
-2.25.1
+2.45.2
+
 
