@@ -1,99 +1,93 @@
-Return-Path: <netdev+bounces-154281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE2B29FC9DF
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 10:01:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A13A9FC9EC
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 10:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49DF316307E
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 09:01:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8C8A161EE9
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 09:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99121D1730;
-	Thu, 26 Dec 2024 09:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174AC1D0E27;
+	Thu, 26 Dec 2024 09:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLluwXju"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B0B15A85A
-	for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 09:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA64154BEA;
+	Thu, 26 Dec 2024 09:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735203691; cv=none; b=Qli3FSX+gnFPPd8kO4smA8F3V37lI2f3G9Mfwa9rAY4V29opTM1fXMqRIpsHGEpAIoVPCg9jkEIFP92i4bimYBA5wTmhNF56/tSUiIZGSx59kGIBW0jB1Ro6gxM7djWxmtHW2kG/DSXcHllLcRSe+Om/S3lBSA61hUuUKDiQtQ4=
+	t=1735205151; cv=none; b=dIrdSFxYAYbXiJ9a1Vx0JQVONZmOkw1KsmO+z6dwX5LMlEk4y5u7JS3GoSocthUbwh8uVL8a5viF23SIo+heh6jxEzjP0t+G7ALc5EBTS3ZaYjuFYAN4LDuwm99ZC5aa/sFgEjFWyZgrIBhGXHdSHevcsbXNsxVHFvEn9oxBKhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735203691; c=relaxed/simple;
-	bh=1n2kv7SMgwvHUd51D3IJmhRKQ9EZM247BVEQrJC+mCg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ponBJyAZmI+JaTuM0BycitT2lh7jlT7MJ+k+6kDDvSjnn61eiwOzwY/GW3CafgEe83bWxblsu+ti1ODNrpLuXp7jZf0/uH2E8aj0sA+YA+wD5hJsff0+utozHLd3/8V0dAmxyFAFXlPvQdXUXIjJywOleRKIi4WwXar1vdNMitg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a81684bac0so131005475ab.0
-        for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 01:01:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735203689; x=1735808489;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Bp9tKkCAuQ/mUk82Cee4vQoXoncTsTYSSaG8UciEk5U=;
-        b=M/AqCJei3v6CJrDFbM6RFqZsnJbRcAgy6SZZ3TXOIXSxc4IM/1fAF7X9gNxbMLvw4i
-         BWu2UVgt35QoC1v0Kisvk3Qh2/t1tZeGMVZj2Dz7z7k/EjeoybmyAQIeie/9Ij3CiDTy
-         mrAYxIQ+5FHlKlvCLk80v1dzU9dkOmDIC4/enWCViAJid3A4wMRUztebhR17AUlqR4Rc
-         DQnLSoyCJ1ADLPBpBJuFPcpCoaiYciAFUXEn6VDDgLxvu3t5vJtarT57upKonZq879Tp
-         ivUE9uNs8I6sr1eiqEsd3U2ly0NMye0/QM+v3FFwDCF4OnNFsuB//cyct1zvd05GtuFz
-         amZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1pmMmUTtjEQQdtcHu0CiiFMOQjTGPz44dNg/ghz98PULs9UjNwFjVfVPsM0l/9WcL/xuwy1Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzngvGeKyskm8NzmT1G3fcWQiGpWW0Mhbndm+hWE1mpG+Z2M+t1
-	VOgWhKTZfYSLR6FG6hZGqnyr6dEMmYepNIBI3qe4uhFPqtihe92O9RrorDYiWTdPyUWtUXGibQU
-	HTLbQZjbnwVM/oCQjoG4OFhFFUmLie6/WcVJ3ivSl58lG0VZTuTe2xVU=
-X-Google-Smtp-Source: AGHT+IHdTuf04TZ07cOEb7uzjG5uOMY425hqGzSFm/TphbmDrUUYrbdL0ySBLKSKwqxl8hqwMXDOstAHnkwyauM4UD6T8tYlXB8U
+	s=arc-20240116; t=1735205151; c=relaxed/simple;
+	bh=Ul6bUTCa3anx9Wsnv9cjUsR1k1LIwb47nD82Zrb+90A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RkU/Qon7dux63ki1EEOQAJTX5PgkG7d1MInxJSxfeYA6CwHU3frUDIl0xQgbJzAIoQLBZiP6QtH2IqdQMjzKixgBQDRXY7cXuDIEOy5lQs08x6nuXtDNoqnBhrY2Vpsyeho8lniXzrvJlXjLFs6kqD3Msu4+UtaTnvwMCBp6CP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLluwXju; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 364A2C4CED1;
+	Thu, 26 Dec 2024 09:25:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735205151;
+	bh=Ul6bUTCa3anx9Wsnv9cjUsR1k1LIwb47nD82Zrb+90A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lLluwXjuwtXtZVjo2UTLBoDjVUHYRXrees11Ics8rqLZHHhN/sssRbt4AwUEws5PA
+	 wl9bl1PBbJdZeRnzY1F5asz8PsC4yYaDFeemoS4FG8UAEj6FezyV6/PLjcwLcOEc5b
+	 a3X/KTR8xQsnNyo4CZo8Cr1qMhDI6EWB6ZddPoqY6fEJSyr8l6n92TELfeK/YQJdOO
+	 NVox0I603bOxzn3N+yu3st/PKq4cIyLCPDofyl5/vIf6cn11jrMZ7E2e0do0vvqkY7
+	 fWREmyJysf1TT+d+op7KWAhv52eszQQNCfMAxObrx4WP3ZD+ooGZ+5CKDLdtx8zq/q
+	 o+Iqo6NE5ePrg==
+Date: Thu, 26 Dec 2024 10:25:44 +0100
+From: Andi Shyti <andi.shyti@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH v3 3/7] i2c: Add Nuvoton NCT6694 I2C support
+Message-ID: <bjgcaxdlkqiujbyjazjprvoup3r2ctgjr5fcvzyyr46vea5icc@ao5axgffufbw>
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com>
+ <20241210104524.2466586-4-tmyu0@nuvoton.com>
+ <qe7rucm65tixgnlendfdlr6iemrvs2ecun7odlbl3csofj7qjj@sl6vypb66awz>
+ <CAOoeyxX475tHNqoejX=DcY2ow2+rPc=_qXuX0O5AGumLPFoQGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:1948:0:b0:3cb:f2e6:5590 with SMTP id
- e9e14a558f8ab-3cbf2e65718mr26619235ab.0.1735203689309; Thu, 26 Dec 2024
- 01:01:29 -0800 (PST)
-Date: Thu, 26 Dec 2024 01:01:29 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <676d1b69.050a0220.226966.007e.GAE@google.com>
-Subject: [syzbot] Monthly wireguard report (Dec 2024)
-From: syzbot <syzbot+listbcd07c53ebf03869ffc2@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOoeyxX475tHNqoejX=DcY2ow2+rPc=_qXuX0O5AGumLPFoQGA@mail.gmail.com>
 
-Hello wireguard maintainers/developers,
+Hi Ming,
 
-This is a 31-day syzbot report for the wireguard subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireguard
+> > > +static struct platform_driver nct6694_i2c_driver = {
+> > > +     .driver = {
+> > > +             .name   = "nct6694-i2c",
+> > > +     },
+> > > +     .probe          = nct6694_i2c_probe,
+> > > +     .remove         = nct6694_i2c_remove,
+> > > +};
+> > > +
+> > > +module_platform_driver(nct6694_i2c_driver);
+> >
+> > what I meant in v1 is to try using module_auxiliary_driver().
+> > Check, e.g., i2c-ljca.c or i2c-keba.c.
+> 
+> I think the NCT6694  is an MCU-based device, and the current
+> implementation is as an MFD driver. Are you suggesting it should
+> instead be implemented as an auxiliary device driver? If so, would
+> that mean all related drivers need to be revised accordingly?
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 7 issues are still open and 19 have already been fixed.
+No worries, module_platform_driver() is also fine.
 
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 345     No    INFO: task hung in wg_netns_pre_exit (5)
-                  https://syzkaller.appspot.com/bug?extid=f2fbf7478a35a94c8b7c
-<2> 98      No    INFO: task hung in netdev_run_todo (4)
-                  https://syzkaller.appspot.com/bug?extid=894cca71fa925aabfdb2
-<3> 2       No    general protection fault in wg_packet_receive (2)
-                  https://syzkaller.appspot.com/bug?extid=c0f4a2553a2527b3fc1f
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Andi
 
