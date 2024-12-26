@@ -1,105 +1,60 @@
-Return-Path: <netdev+bounces-154268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 546D59FC702
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 01:42:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8C0F9FC70B
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 01:43:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B45911882FAA
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 00:42:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4661F162921
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 00:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0624A3E;
-	Thu, 26 Dec 2024 00:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3603C133;
+	Thu, 26 Dec 2024 00:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQbiXify"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUjTK965"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7E1139E;
-	Thu, 26 Dec 2024 00:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D436139E;
+	Thu, 26 Dec 2024 00:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735173742; cv=none; b=J4+JAsAltGCTKpBg2zfgSdlrJxxE8perD2hkxK3EoSqavD2+SlkS57iS7950mNkNHn7dHD5el59E6h+viKLMgLPdn4ifB0f8P++ZdYWuE+acNTWB8QlVrxEke49Fg/xcw1Zt63rnh6vwdYTZJA+04qL2XhiLy70dQBUW8YhQhn0=
+	t=1735173796; cv=none; b=sSx5+P5++FIjYno0Jl5Bto9/shAfuTnx4d2J/LCHuxe14jZ2gyQ6WZHhCadvpphsUuq9WDokReM0AJCteqfEs6vouWJXBo7TxxbZ92+6deQzYkiahX0VK1pth4nvwQMsJVdX8I+yD/tK3eYVk9jSbomEdjhV4GBwNfRsvbdfaVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735173742; c=relaxed/simple;
-	bh=TMTD3KOO7Bw7eUixgoeGme5wThACykG5nhmVHwj4r24=;
+	s=arc-20240116; t=1735173796; c=relaxed/simple;
+	bh=79SfWQyy0Ns0evUnqLPgOQsgkHfyQiB7aLKDBzlwdBM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ObmVxSjhaGLQFApFBILj1TtBcGRr6roDRQRY92LmqlA5V4mybjtbyTAHOSx4VA2WI+u7ZGOaud4AvFhzRkUfz9dBo/nfxgaobrQuZDNwpUgTxMoO24ZY84rcJL+KogqdK79rx416ixGP5lFw3fsub2DnfNR4DQUiFo/0TBEN4MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZQbiXify; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-385f06d0c8eso3396625f8f.0;
-        Wed, 25 Dec 2024 16:42:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735173739; x=1735778539; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a+tM814QAYMJ9xpVBh1o3P7ADY//NXbn+HbvIqF1jAY=;
-        b=ZQbiXifygx8M58xglyUmd9ItIY74Bck5d+4GYP24Xbea7owRwLs626/UiMi8vAOnTU
-         YOgnJbYmjuFpMmf6r1HZJUE7wtfcFrYhf3uVhzntJGfxK7H7DIrfB7YMaxZbpHot9jlx
-         SRgmmLV/gcpVx5mMM7GIAWXelnsLfXGKmF1UQwXjaXrOp/6urgp/NtXOOCfhuhYl0mcZ
-         4Y78j0XCNSEK+w27ZrkTMOyo77Fjprm1JlsYodrGzEXmKqNxqqcHhx+KOSTv/Easdx2v
-         eivJdK6MqdXBwuYQl8FcUZBbxYmTX1KavhioD9BqN2GYCTg4+80Wen11Lq/4ZAhQT4Pm
-         FqZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735173739; x=1735778539;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a+tM814QAYMJ9xpVBh1o3P7ADY//NXbn+HbvIqF1jAY=;
-        b=NFGd2YlQcDOp8XZToHmd46PhWE4Y18FwgWqR1Pmn4/8YTQK6PqMipv57w/SAfkWyOa
-         hvrobWXTxl3g9XO8fKPnicEx3wRpD7HK8zpPS6ZpwyKjKcheQqMmkKCbVrwfeEl7qvfW
-         7AG9jO5HIDwx4LSLlPiT/ioz8Sge1f3Dn/qZWx4dEi+ZCxKIDLORY+v2CG0YfT7MRSQA
-         NJF6cDM51LijLYZJRWjg33Un9TccOPRnzUphJkPZRkW6C1fvcE4rOA722l+ibeWqC+7P
-         IxEKlZdYuK1puu30rzbjWUr0UjLf6UKfcnNFIlhyO9hixky7XF261MI3u9SHIXpMlZIa
-         zgmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW8VefhAzpjK3XNPf1E55gaKDVINc4MzTu1o8MS0RBSw4RpJJCFFtiEKX4b8fcskNXJkMXNMxNc4bg=@vger.kernel.org, AJvYcCXaGVeKrpRYSiv3k0RMhxwE1h21UcZuII7JEb3n8bMTdc0Z0u8OJu0/wNOKOLlfzpAlI1Tn+ySR@vger.kernel.org, AJvYcCXhh5XsXFoBCEP44rFMCFEQUjSXZWWf8OWP96iv8MTTtfn93qSRiIxF1arMLik+VEJLESEVpB6rBMBLcpNg9aec@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywd/aTMJnLdRyWqUpAFoQU0ZShRHe3khv3iB3L/QCGcYphSwPvc
-	zXuUWlHt9FVu4kuz7BZtUDlqWPRiDBR6E2ul0dSTFvM6PhTxOIPl
-X-Gm-Gg: ASbGncsEMSafDAiD7ZmcBkZj9ZCZC5P4wozFittvIeRcct5IjK82aya92M9vgAHPA5B
-	hRhPrIFsIw+56c+0llX0xN/gQ7+kGP9LxRwQ/KEmaAg19V+Ahfi9ubMWBytg9ZZCICzLkkRarLW
-	ybrI5mSjRQIsQHLdJyN42g4YNkvN5MDmhAvbxNG7VIOvaUBRibLeya5raVPBE/M87sVSUbWaXSY
-	JIM+cCllsNe3A77wiIYvtlK9gl/1YxsJ2+KJYIWXRPIfIYjge8cUG/fkNWMW45RI0j2nqPkBrX5
-	cwyE5YBjXvSu+zJ/jsoCsRbL6q1k
-X-Google-Smtp-Source: AGHT+IF79E7qNVt5omQB4N+mfTI57BdyjPEsWNaWLJn83SOWA5s9pwX8QgXP0UEnoPT1F9Ng0+UaHg==
-X-Received: by 2002:a05:6000:184e:b0:385:de67:2269 with SMTP id ffacd0b85a97d-38a223ffaafmr16672215f8f.36.1735173738766;
-        Wed, 25 Dec 2024 16:42:18 -0800 (PST)
-Received: from hoboy.vegasvil.org (91-133-84-221.stat.cablelink.at. [91.133.84.221])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656b3b207sm248044245e9.32.2024.12.25.16.42.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Dec 2024 16:42:18 -0800 (PST)
-Date: Wed, 25 Dec 2024 16:42:14 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Peter Hilber <quic_philber@quicinc.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	virtio-dev@lists.linux.dev, netdev@vger.kernel.org,
-	Trilok Soni <quic_tsoni@quicinc.com>,
-	Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	linux-kselftest@vger.kernel.org, linux-api@vger.kernel.org,
-	David Woodhouse <dwmw2@infradead.org>,
-	"Ridoux, Julien" <ridouxj@amazon.com>,
-	John Stultz <jstultz@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [RFC PATCH 1/2] ptp: add PTP_SYS_OFFSET_STAT for xtstamping with
- status
-Message-ID: <Z2ymZuiFqY8mxihJ@hoboy.vegasvil.org>
-References: <20241219204208.3160-1-quic_philber@quicinc.com>
- <20241219204208.3160-2-quic_philber@quicinc.com>
- <Z2WLGHRdlsRpT6BL@hoboy.vegasvil.org>
- <wcxdbqhoe4cppukyy5rvkq5am4ht6wk5u6d6g2k2swqhidjw7i@6nar5vuusm35>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VvQvQ4gckoORlZBp0brJbjSCUnU/sBqKURUzddJaQZi1U3m4UZdQglsix+NWDe33YjtbgOqS1wb083KceQHAtz01Xo1pFZAOcZQZWu5C3IuIoOGdv2lk9oj8bleehdvV7C9dMDix1+ZOto+jVuxEFKu6r3gQQ76IDdM47TsfSH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUjTK965; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AFCBC4CECD;
+	Thu, 26 Dec 2024 00:43:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735173796;
+	bh=79SfWQyy0Ns0evUnqLPgOQsgkHfyQiB7aLKDBzlwdBM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nUjTK965hYSXrp2XAshLLNcE8akpZBVdBnYiL7fmuFS60ukegSKxuEfdkvqJ9rSOx
+	 dRksivwAQxAX9upZo3LQveptEL5FsT/SltJdhrHP8QmP5GN1uvuHSF54QIsAUWQCNI
+	 NgOxSIRQuz6xvci7NX/iwEMTljx2qXhilnhBkNTPEOJZHCnqXXvkJtlfnrlFntK4Ia
+	 3ISgGpYL75VPrBwEWF2iEbGDsbv5udM2vdaSqSr1eH7g5PBEWLP2xAt/ZjWAOSOmMG
+	 +2rxHio9DzvDFpwMH4TNGhXY7soLup9iID69hRrVfp1NGY4HXTQxUGlwZzxjJRz1i8
+	 Cbwmnq7Rpe4pQ==
+Date: Thu, 26 Dec 2024 01:43:10 +0100
+From: Andi Shyti <andi.shyti@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH v3 3/7] i2c: Add Nuvoton NCT6694 I2C support
+Message-ID: <qe7rucm65tixgnlendfdlr6iemrvs2ecun7odlbl3csofj7qjj@sl6vypb66awz>
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com>
+ <20241210104524.2466586-4-tmyu0@nuvoton.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,53 +63,149 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <wcxdbqhoe4cppukyy5rvkq5am4ht6wk5u6d6g2k2swqhidjw7i@6nar5vuusm35>
+In-Reply-To: <20241210104524.2466586-4-tmyu0@nuvoton.com>
 
-On Mon, Dec 23, 2024 at 07:13:46PM +0100, Peter Hilber wrote:
+Hi Ming,
 
-> The precise synchronization of the VM guest with its immediate
-> environment can also be important; a VM guest may depend the decision
-> about leap second smearing on its environment.
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Nuvoton NCT6694 I2C adapter driver based on USB interface.
+> + *
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + */
+> +
+> +#include <linux/i2c.h>
+> +#include <linux/kernel.h>
+> +#include <linux/mfd/core.h>
+> +#include <linux/mfd/nct6694.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +
+> +/* Host interface */
 
-I thought that the whole point of using a VM is to isolate the guests
-from each other and the host.  What you describe is a promiscuous
-coupling between guest and host, and the kernel shouldn't be in
-the business of supporting such behavior.
+What does it mean "Host interface"?
 
-> Also, the administrative
-> configuration choice may change over the lifetime of a system.
+> +#define NCT6694_I2C_MOD		0x03
+> +
+> +/* Message Channel*/
+> +/* Command 00h */
 
-Right, which is why we should keep those choices out of kernel space.
-Kernel provides mechanism, not policy.
- 
-> The intent is to also support (embedded) VM clients which are themselves
-> not necessarily internetworked, which do not get a lot of maintenance,
-> and which are not guaranteed to get an update within the typically less
-> than 6 months between leap second announcement and occurrence.
+This comments are meaningless, either make them clearer or remove
+them.
 
-Again, I don't think the kernel should be the solution to guests that
-lack networking.  Instead, the place to fix the problem is at the
-root, namely in the guests.
+> +#define NCT6694_I2C_CMD0_OFFSET	0x0000	/* OFFSET = SEL|CMD */
 
-> I agree that a device driver should not determine clock quality metrics.
-> The intent is that the driver forwards metrics, if such are advertised
-> by the device. These metrics should describe the accuracy etc. of the
-> device itself.
+I find this comment quite meaningless. Can you please make it
+clearer?
 
-Overall, I don't trust devices to tell the truth about their
-qualities.  But putting that aside, we would need to see some kind of
-commonality in hardware implementation to advertise their metrics.
-However, AFAICT there is no such industry practice on the market.
+> +#define NCT6694_I2C_CMD0_LEN	0x90
+> +
+> +enum i2c_baudrate {
+> +	I2C_BR_25K = 0,
+> +	I2C_BR_50K,
+> +	I2C_BR_100K,
+> +	I2C_BR_200K,
+> +	I2C_BR_400K,
+> +	I2C_BR_800K,
+> +	I2C_BR_1M
+> +};
+> +
+> +struct __packed nct6694_i2c_cmd0 {
+> +	u8 port;
+> +	u8 br;
+> +	u8 addr;
+> +	u8 w_cnt;
+> +	u8 r_cnt;
+> +	u8 rsv[11];
+> +	u8 write_data[0x40];
+> +	u8 read_data[0x40];
+> +};
+> +
+> +struct nct6694_i2c_data {
+> +	struct nct6694 *nct6694;
+> +	struct i2c_adapter adapter;
+> +	unsigned char *xmit_buf;
 
-> The patch message should document this more clearly. The
-> metrics can be determined e.g. by virtualization host user space
-> software. The device driver would just expose the device metrics to user
-> space.
+why isn't this a nct6694_i2c_cmd0 type?
 
-Again, host user space shouldn't misuse the kernel to share random
-metrics with guest user space.  Isn't there another way to share such
-info from host to guest?
+> +	unsigned char port;
+> +	unsigned char br;
+> +};
+> +
+> +static int nct6694_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
+> +{
+> +	struct nct6694_i2c_data *data = adap->algo_data;
+> +	struct nct6694_i2c_cmd0 *cmd = (struct nct6694_i2c_cmd0 *)data->xmit_buf;
+> +	int ret, i;
+> +
+> +	for (i = 0; i < num ; i++) {
+> +		struct i2c_msg *msg_temp = &msgs[i];
+> +
+> +		memset(data->xmit_buf, 0, sizeof(struct nct6694_i2c_cmd0));
+> +
+> +		if (msg_temp->len > 64)
+> +			return -EPROTO;
+> +		cmd->port = data->port;
+> +		cmd->br = data->br;
+> +		cmd->addr = i2c_8bit_addr_from_msg(msg_temp);
+> +		if (msg_temp->flags & I2C_M_RD) {
+> +			cmd->r_cnt = msg_temp->len;
+> +			ret = nct6694_write_msg(data->nct6694, NCT6694_I2C_MOD,
+> +						NCT6694_I2C_CMD0_OFFSET,
+> +						NCT6694_I2C_CMD0_LEN,
+> +						cmd);
+> +			if (ret < 0)
+> +				return 0;
 
-Thanks,
-Richard
+why not return ret?
+
+> +
+> +			memcpy(msg_temp->buf, cmd->read_data, msg_temp->len);
+> +		} else {
+> +			cmd->w_cnt = msg_temp->len;
+> +			memcpy(cmd->write_data, msg_temp->buf, msg_temp->len);
+> +			ret = nct6694_write_msg(data->nct6694, NCT6694_I2C_MOD,
+> +						NCT6694_I2C_CMD0_OFFSET,
+> +						NCT6694_I2C_CMD0_LEN,
+> +						cmd);
+> +			if (ret < 0)
+> +				return 0;
+> +		}
+> +	}
+> +
+> +	return num;
+> +}
+> +
+> +static u32 nct6694_func(struct i2c_adapter *adapter)
+> +{
+> +	return (I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL);
+
+parenthesis are not needed.
+
+> +}
+
+...
+
+> +static struct platform_driver nct6694_i2c_driver = {
+> +	.driver = {
+> +		.name	= "nct6694-i2c",
+> +	},
+> +	.probe		= nct6694_i2c_probe,
+> +	.remove		= nct6694_i2c_remove,
+> +};
+> +
+> +module_platform_driver(nct6694_i2c_driver);
+
+what I meant in v1 is to try using module_auxiliary_driver().
+Check, e.g., i2c-ljca.c or i2c-keba.c.
+
+Andi
+
+> +MODULE_DESCRIPTION("USB-I2C adapter driver for NCT6694");
+> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> +MODULE_LICENSE("GPL");
+> +MODULE_ALIAS("platform:nct6694-i2c");
+> -- 
+> 2.34.1
+> 
 
