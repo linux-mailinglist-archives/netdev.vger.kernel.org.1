@@ -1,192 +1,94 @@
-Return-Path: <netdev+bounces-154293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22BAC9FCB08
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 14:03:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22F959FCB0A
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 14:05:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B6E81882E39
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 13:03:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8D1D16242B
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 13:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BB31BC063;
-	Thu, 26 Dec 2024 13:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7Cjnz/c"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C131D47CB;
+	Thu, 26 Dec 2024 13:05:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE903182D7;
-	Thu, 26 Dec 2024 13:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072E31D151F
+	for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 13:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735218188; cv=none; b=rKYf3KnU8YpqrPE8f9LtTbI/N5SVDEpogCghFkkuADnWeNGEGM9vqvQeqovN6pPFaKEhmZ42tWnmaZc8ot13qQubr5wz+lEZWF2xdFwWjNQAW0l3qbpC7NwL/kpTiTGJ0+DarjejDVTsVWLNusKTBVqDstHc1cPNTLytwQxeHn4=
+	t=1735218304; cv=none; b=hqZPwjVqzG59ron4nKLprhaDspIm0nVoxQpDTVaENcV/6Ff8m8FqtZtuWyO3MB6/gesaxXWKS5VfMCRexbdkVOovhO7JR9uRoIv1eCy88utg5LPr5WP9p1++EvOiKqIKd787DDvJ0iuae6sgXr/68x0zIjkAZ4daryOAY2X7h1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735218188; c=relaxed/simple;
-	bh=pirU5BDdIyjCf71XqStimG+MKWHAwc1Cd5J85B0PrJw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QsSMUQDFPsUGjJPljgjKQuPPPCBPLoLjbhr0V5tjuwf4f54MkeVRO2vSiBfyxW/YiQTjLDcM18UpzCtLgG5MtDR9RB/uctkBehm5hP7pUnfYH6j0NA/hieZngYPy18iae1VX10AQRXzZAp8+FFoMIwJSeDAakQaCzdGbzNAutEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7Cjnz/c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C5EC4CED1;
-	Thu, 26 Dec 2024 13:03:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735218187;
-	bh=pirU5BDdIyjCf71XqStimG+MKWHAwc1Cd5J85B0PrJw=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=c7Cjnz/caRNaa9riVzaxurWOPpmDjS0x9aO3PC80vqoV9iQtiWI7EoJCLU7KZHCjq
-	 Gn69cpuf2YIwJzvjcJLbpJKhvcWz1/ioBNvCg5+uoEQsRj6JtjKtghqRO7rOGsZ58d
-	 A+GmGtnI5Urid1Q6CdO1/IjUUwToaP+bBNkMgM/aUG9i3crhOkZPaqx3TQl9U0Hu+I
-	 w3/Q/zonQ6bXXJL48NQGSKyJxJWRUli6mVxRS9bDZtY+CnAnAmB8uQL72CZicVc3m/
-	 xjKTt63B7KnJrVI4Du/QPa+v/Jc7JV3ZQWc5ZQS4mtOd3/v50fyE6wXygHwVjdLckG
-	 9LT2il2kg/TuQ==
-Message-ID: <def9a2309ee77f58945c5aa65ab1c6b0e333d04b.camel@kernel.org>
-Subject: Re: [PATCH v2 0/4] nfsd/sunrpc: cleanup resource with sync mode
-From: Jeff Layton <jlayton@kernel.org>
-To: Yang Erkun <yangerkun@huawei.com>, chuck.lever@oracle.com,
- neilb@suse.de, 	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
- trondmy@kernel.org, 	anna@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, 	pabeni@redhat.com, horms@kernel.org
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
-	yangerkun@huaweicloud.com, liumingrui@huawei.com
-Date: Thu, 26 Dec 2024 08:03:04 -0500
-In-Reply-To: <20241225065908.1547645-1-yangerkun@huawei.com>
-References: <20241225065908.1547645-1-yangerkun@huawei.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
+	s=arc-20240116; t=1735218304; c=relaxed/simple;
+	bh=ojuoVsWI7D2MehUHk81iFoc6zeavGNHJ2AvCOakoohw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=rUYT0B4/dkKHx2AgcecukEaQ9cZ4txMw+5qxuys7F2qM2njoqSPNvqPf6JXKe9izwX1x3Wg8CVj/aFvlh2GvlvAKQ47St0qMur0jdRlj/i77r7XZqRKiCU1AVCWgHQLh3Bf+qrYjWc2XVzpgAeOWf9IYl8ClMP5x2FLIz/D1//Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a9d303a5ccso132504805ab.3
+        for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 05:05:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735218302; x=1735823102;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vfZAw6nkkopPycDGHxqbXAsiMVaMBshiMpUf9RRGGKA=;
+        b=d7ggq8QTq4Yv+W7Y8Aq4H0LWoqInSSn96B5sZaWAJEhaODnD74LvKMrX4b5BhPZZjI
+         atq6yIqdgO6r7RJW77e43iAezIADjctF393UatWV2rocBJUMvNpvyIBSvUfedcJSb6g9
+         2c/p/XZ7iMBaI6mptRhLWHGpjq+ZODLjDQCSJY0Oi7L8mZkHfiwrpZZl4DdKiEKmP0C5
+         hIiuh6zE1ooijfdYZkZLeCPa7OhxcX1n1/gzH2nbEQe9ypP5z2lEHCN6/soV3Y+cQUbC
+         COsvcpu3LbiZ9bxL5eKaTBTZyVRkurDaM1RXarD31hZjYSt/SZV29bwCz7VSo2mocM94
+         75+w==
+X-Forwarded-Encrypted: i=1; AJvYcCW8zTl6+mwh95d9aIRQgmYHtMGuNzVOYKG5WzFx0n2D8W33xM06cfsWH+iZIAErfti3/wu4/IM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6TduTjUlT8ujBZkd8S6y9/ojYzb6Z0aHWKZWmz6OsOJgDVsn4
+	8i1C2WRgIL2wH9iYVc4JWFjf1t3QKxndSnWtOEoD4JKvFsgq3HO4lI8qwD2426SgP39VAucMRCp
+	N1lbqWUvQp+DN6d+YG3UFMlQwIJLgphY6se1CJaDJH6q2Z/gNRcUQ3U4=
+X-Google-Smtp-Source: AGHT+IFsClCwKKxNjh2qy8IFlSdR86iJ6l6Rnz/rbCrEuCBbR90dTtUbE0c3fjildTbFNKcL6denTgyepBX/r2SPgRUFPEzxJQUJ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1889:b0:3a7:5cda:2769 with SMTP id
+ e9e14a558f8ab-3c2d2f3b65emr177346025ab.12.1735218302197; Thu, 26 Dec 2024
+ 05:05:02 -0800 (PST)
+Date: Thu, 26 Dec 2024 05:05:02 -0800
+In-Reply-To: <672efa7e.050a0220.138bd5.0039.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <676d547e.050a0220.226966.0084.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] INFO: task hung in hci_cmd_sync_clear (3)
+From: syzbot <syzbot+217e3f1283cafe80586e@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, iulia.tanasescu@nxp.com, 
+	johan.hedberg@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 2024-12-25 at 14:59 +0800, Yang Erkun wrote:
-> After f8c989a0c89a ("nfsd: release svc_expkey/svc_export with
-> rcu_work"), svc_export_put/expkey_put will call path_put with async
-> mode. This can lead some unexpected failure:
->=20
-> mkdir /mnt/sda
-> mkfs.xfs -f /dev/sda
-> echo "/ *(rw,no_root_squash,fsid=3D0)" > /etc/exports
-> echo "/mnt *(rw,no_root_squash,fsid=3D1)" >> /etc/exports
-> exportfs -ra
-> service nfs-server start
-> mount -t nfs -o vers=3D4.0 127.0.0.1:/mnt /mnt1
-> mount /dev/sda /mnt/sda
-> touch /mnt1/sda/file
-> exportfs -r
-> umount /mnt/sda # failed unexcepted
->=20
-> The touch above will finally call nfsd_cross_mnt, add refcount to mount,
-> and then add cache_head. Before this commit, exportfs -r will call
-> cache_flush to cleanup all cache_head, and path_put in
-> svc_export_put/expkey_put will be finished with sync mode. So, the
-> latter umount will always success. However, after this commit, path_put
-> will be called with async mode, the latter umount may failed, and if we
-> add some delay, umount will success too. Personally I think this bug and
-> should be fixed. We first revert before bugfix patch, and then fix the
-> original bug with a different way.
->=20
-> v1->v2:
->=20
-> 1. do not change cache_check, instead add cache_check_rcu and use it in
-> c_show/e_show
-> 2. the first patch has been applied
->=20
-> Yang Erkun (4):
->   SUNRPC: introduce cache_check_rcu to help check in rcu context
->   nfsd: no need get cache ref when protected by rcu
->   SUNRPC: no need get cache ref when protected by rcu
->   nfsd: fix UAF when access ex_uuid or ex_stats
->=20
->  fs/nfsd/export.c             | 25 ++++++++++-------
->  include/linux/sunrpc/cache.h |  2 ++
->  net/sunrpc/cache.c           | 53 ++++++++++++++++++++----------------
->  3 files changed, 46 insertions(+), 34 deletions(-)
->=20
+syzbot has bisected this issue to:
 
-A much nicer fix. My only minor nit is that it might be nice to add a
-kerneldoc header over cache_check_rcu, so that it's clear that it
-doesn't touch the cache_head refcount like cache_check does.
+commit a0bfde167b506423111ddb8cd71930497a40fc54
+Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Date:   Tue May 30 14:21:59 2023 +0000
 
-Either way, you can add:
+    Bluetooth: ISO: Add support for connecting multiple BISes
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11845adf980000
+start commit:   0a9b9d17f3a7 Merge tag 'pm-6.12-rc8' of git://git.kernel.o..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13845adf980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15845adf980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=327b6119dd928cbc
+dashboard link: https://syzkaller.appspot.com/bug?extid=217e3f1283cafe80586e
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1094e1a7980000
+
+Reported-by: syzbot+217e3f1283cafe80586e@syzkaller.appspotmail.com
+Fixes: a0bfde167b50 ("Bluetooth: ISO: Add support for connecting multiple BISes")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
