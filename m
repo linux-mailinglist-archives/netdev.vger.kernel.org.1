@@ -1,253 +1,171 @@
-Return-Path: <netdev+bounces-154312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0E569FCD62
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 20:44:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B314A9FCDF4
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 22:25:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 686CF1632CD
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 19:44:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26F0218833BE
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 21:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53E51531E3;
-	Thu, 26 Dec 2024 19:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76F01BA86C;
+	Thu, 26 Dec 2024 21:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Uy4xpuD6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cjF48+92"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC7D1EEF9
-	for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 19:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D8D19007E;
+	Thu, 26 Dec 2024 21:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735242270; cv=none; b=BKUixc9d2V4GegqpXzD6nYtlHDHLmAmSHhmW5NTPOKw9yFveAnoQQax/SyFwccmbryY0EdTEGIgA0MOpGOX9UjK2N5y3q8/rsoYup1wshWpwiJxyjUSlO8CSrxB/uLbLd2cbV6fZSbMCKmeH/ZR3Jm8BzsOV8UFT8VJwuUk6pzU=
+	t=1735248257; cv=none; b=O5NpWakoUFckVCcB6a3UQyfI85chiEQT260o39I5P9j8FgN1G9PA1A8cmZFmBGXZSAvnCfMtZVJf/JBFQRG1vaB+yRwtwEBx7IfVgMxKhhlHFAbI8uxo4DRxIFitcXtGvHuMkYLEgIDZZcRmj86nI/hawKKv4N55L0rsGyA6S/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735242270; c=relaxed/simple;
-	bh=qh8YiLQEPm6J01WJ9vgmIlVgUj0wrARDiQk6bRITLXI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hbTOhdS5VgcnKKxGFBtBvFma/1502Q3cPQAdue06s7j+FsWlpfp2rysEPl2ax38mpKwL9PLr6OPak5rQnzAuUj/DlJoWZOaZRB4IGRDZXPOdjHcsA9xRj5NW9ai0nICulD++AftMxO6QJVsVvFSaeKlG2f6EGjM+MhLRSKc64rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Uy4xpuD6; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <525a2714-f8b0-4fdb-9cfb-d8a913c43c8e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1735242265;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gu5R6izyMs3ousa/yHvXEfFiqdro8Nj/rTjNjqWOmIY=;
-	b=Uy4xpuD6ViYbGZcyD8rjCgxHglxuthWxr5sRakF6dtTdTOBazmoLcKHpBgdnUz6/y4JkXs
-	YZbHmRy34XEz4wfs/ktbX5Y/qcLRfp2gN+GELvMmms5c4LN3E87gBart3ihtYEcqY9ChAE
-	gov2L4b8wSnRM2RLhDlzAQ2hp/cXjCI=
-Date: Thu, 26 Dec 2024 20:44:20 +0100
+	s=arc-20240116; t=1735248257; c=relaxed/simple;
+	bh=UtPtkiMC9aMLooraJK0OO9y9CL0h+3uSLW06oAagplA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=PSCjA/r+mN/7ugwr3Ea6C61dI6sBOiooXVuF28peAyEe+rrvD/4qa5S5l+u64g0wl3npsrYj+6DxokEGvWaWUrekG2p3ezcFUrwlll52DKCTVZyJT74VE2fOYxaNPjQILnhz7402N4JNt+w3y7UWwqMQAKUVOnKTAH+/Un4xMRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cjF48+92; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-467a3c85e11so40999061cf.2;
+        Thu, 26 Dec 2024 13:24:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735248255; x=1735853055; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VfeX401MSHvmmCPqi6qpPfC5xzDKFLL9ih2D1zIAmnc=;
+        b=cjF48+92PZartOlLbr+Vjr4c6qGQ0shy3gGxZylDaRZr6zy2GpUqpycVeUNjsbvk7H
+         grDS/pfxCUAyuU6bCYjN5AUgxJF4Pf6IgYfJyqdpqBfJUn0AKjGOh3RRzwJY2SgykN13
+         D/hDXB2bR9bogAbHBFHlw/K+1ziecf5jilKhXow7DJxEGdcexMJkrAuHEtDEz/NuIbrr
+         d5sOeU0e2S9SO/NbQk/wjNu+FH1157jO8auXrL0jMSBSZjsz1cMnEFsEKkaEU3c7aQuN
+         +FRMyNv52H8xMVPYmmpcLMjTC5BHjQKCpkQ/vcaFnyFXMd2XGOrKW3d7ylHrwj4JbaZN
+         yRZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735248255; x=1735853055;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VfeX401MSHvmmCPqi6qpPfC5xzDKFLL9ih2D1zIAmnc=;
+        b=fIu6mp/uIp4pw0ee4vXzBpP0jFp3u9h30u20RCF0HPBHMrJz7FCqwdTbHj5Yo0ZbOy
+         iZpLYH+CqbEk08Ih46yF+/jmuChNLJOc+J/C3guLM/nJ2LTbGHnBPIypljRQsTRyzknq
+         Siiz7c7BG255m1gTL8LDY+mWeBCNxpkGtiL8KBH3AnJBBADzrFLcooSIYOibadMsqEmI
+         HmxAZGK6fGAoFVcZGkITwXM3S6GLCRGtvsN81DlB1rSiYk1KTOivA0qE8/LEuMSN0/fb
+         4n01d5r7N8z4b1oXJGsc65uPxbMLtZpi7KsfqGfRy/Uv1jD8kl0cyfhwoX/DpFANn2x+
+         fN6A==
+X-Forwarded-Encrypted: i=1; AJvYcCV2Mh7fd79uDo8vg6h1DHg7u9Kkki5YeBREB8FuzoOcPGOpdwnPYsFOO57NvSLl2Vqh7ynXVkAxgAW/wyoJ@vger.kernel.org, AJvYcCVPxp3Un73vWlPuB9oN4zrbC0VOSmgj7+RkNvrml7X0dpNVsWiBMcp7O4kjfg/voeg8eIYN+6qztcn+hp7Hu22Y@vger.kernel.org, AJvYcCWenZHyvsXznoA9fMM4IFNDwJ4jbB6Y1IHHBr79vzKQ2wo5pZafbRv3MkHwDwD1MtKW7gBYC7DN@vger.kernel.org, AJvYcCXSHUqf76voIY/nK5EmiO0Ohl8mc+PgsczTRg5zzoXvGGhFUhn0YE/5geRLhip1+ezUvWg=@vger.kernel.org, AJvYcCXTn3tx+g3MJrZUaKikGIAuwW/C3YduRAVc2Kf3FdZUy+JKVxYgIAOhbJpegAFB0sGeJMTHZQo9Q547@vger.kernel.org
+X-Gm-Message-State: AOJu0YypjsqfNhWuWtuRFQGXi8jEXiwrEuRE3EylV9v1aCZfe15H/PEK
+	BJj5EhXfHp1BJxjKoXwhlcNvaIeCPTFZuWxJbWTd/O5xSfGm87aB
+X-Gm-Gg: ASbGncs6jVnf9kgvwYsw8zc+GmEUS17Y06hp5feCIyY1P9A9wryakHFNB3NWv+ukx4s
+	5pLsTS6UkNpUHWM0J6IPO/ew5YYcbaNc2f7itCeOeKlhrh6xG2bTSQcZ8ZfKzP5rNaQSI0Az0K6
+	iJUsHa84Wj+IlXVOWth+FAujRwT8wsymVwkDc4R0QbP1kuUDkq4b6ZBaKes5FhvrvvKjXAMtKc2
+	iB60YRSsZ3Uy/ZZIahvbfoBbHbzTqH3U/TnDAk1BM9vMfAn1xBlrL6laD5PwTmcRnTXOxp1o1+v
+	UvyweMsI6KX6VflwcCLWKgKYO9wuCD0A4Q==
+X-Google-Smtp-Source: AGHT+IHU4gOFbrplgEWifYfJdFaG1u/QGgASBA2M+5ivbCzO+XzXulwv1NBgHR7vrK85NZx/bB/gig==
+X-Received: by 2002:a05:622a:13d0:b0:467:6c18:9855 with SMTP id d75a77b69052e-46a4a8ebb04mr484623951cf.27.1735248254929;
+        Thu, 26 Dec 2024 13:24:14 -0800 (PST)
+Received: from localhost (96.206.236.35.bc.googleusercontent.com. [35.236.206.96])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3e6553e8sm73991201cf.11.2024.12.26.13.24.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Dec 2024 13:24:13 -0800 (PST)
+Date: Thu, 26 Dec 2024 16:24:13 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Mina Almasry <almasrymina@google.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, 
+ virtualization@lists.linux.dev, 
+ kvm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Donald Hunter <donald.hunter@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ David Ahern <dsahern@kernel.org>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?UTF-8?B?RXVnZW5pbyBQw6lyZXo=?= <eperezma@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Kaiyuan Zhang <kaiyuanz@google.com>, 
+ Pavel Begunkov <asml.silence@gmail.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Samiullah Khawaja <skhawaja@google.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Joe Damato <jdamato@fastly.com>, 
+ dw@davidwei.uk
+Message-ID: <676dc97d7c311_1d346b29456@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241221004236.2629280-3-almasrymina@google.com>
+References: <20241221004236.2629280-1-almasrymina@google.com>
+ <20241221004236.2629280-3-almasrymina@google.com>
+Subject: Re: [PATCH RFC net-next v1 2/5] selftests: ncdevmem: Implement devmem
+ TCP TX
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 3/5] net/smc: bpf: register smc_ops info
- struct_ops
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com,
- yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com,
- kpsingh@kernel.org, jolsa@kernel.org, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org
-References: <20241218024422.23423-1-alibuda@linux.alibaba.com>
- <20241218024422.23423-4-alibuda@linux.alibaba.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20241218024422.23423-4-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-在 2024/12/18 3:44, D. Wythe 写道:
-> To implement injection capability for smc via struct_ops, so that
-> user can make their own smc_ops to modify the behavior of smc stack.
+Mina Almasry wrote:
+> Add support for devmem TX in ncdevmem.
 > 
-> Currently, user can write their own implememtion to choose whether to
-> use SMC or not before TCP 3rd handshake to be comleted. In the future,
-> users can implement more complex functions on smc by expanding it.
+> This is a combination of the ncdevmem from the devmem TCP series RFCv1
+> which included the TX path, and work by Stan to include the netlink API
+> and refactored on top of his generic memory_provider support.
 > 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 > ---
->   net/smc/af_smc.c  | 10 +++++
->   net/smc/smc_ops.c | 99 +++++++++++++++++++++++++++++++++++++++++++++++
->   net/smc/smc_ops.h |  2 +
->   3 files changed, 111 insertions(+)
+>  .../selftests/drivers/net/hw/ncdevmem.c       | 261 +++++++++++++++++-
+>  1 file changed, 259 insertions(+), 2 deletions(-)
 > 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 9d76e902fd77..6adedae2986d 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -55,6 +55,7 @@
->   #include "smc_sysctl.h"
->   #include "smc_loopback.h"
->   #include "smc_inet.h"
-> +#include "smc_ops.h"
->   
->   static DEFINE_MUTEX(smc_server_lgr_pending);	/* serialize link group
->   						 * creation on server
-> @@ -3576,8 +3577,17 @@ static int __init smc_init(void)
->   		pr_err("%s: smc_inet_init fails with %d\n", __func__, rc);
->   		goto out_ulp;
->   	}
-> +
-> +	rc = smc_bpf_struct_ops_init();
-> +	if (rc) {
-> +		pr_err("%s: smc_bpf_struct_ops_init fails with %d\n", __func__, rc);
-> +		goto out_inet;
-> +	}
-> +
->   	static_branch_enable(&tcp_have_smc);
->   	return 0;
-> +out_inet:
-> +	smc_inet_exit();
->   out_ulp:
->   	tcp_unregister_ulp(&smc_ulp_ops);
->   out_lo:
-> diff --git a/net/smc/smc_ops.c b/net/smc/smc_ops.c
-> index 0fc19cadd760..0f07652f4837 100644
-> --- a/net/smc/smc_ops.c
-> +++ b/net/smc/smc_ops.c
-> @@ -10,6 +10,10 @@
->    *  Author: D. Wythe <alibuda@linux.alibaba.com>
->    */
->   
-> +#include <linux/bpf_verifier.h>
-> +#include <linux/bpf.h>
-> +#include <linux/btf.h>
-> +
->   #include "smc_ops.h"
->   
->   static DEFINE_SPINLOCK(smc_ops_list_lock);
-> @@ -49,3 +53,98 @@ struct smc_ops *smc_ops_find_by_name(const char *name)
->   	}
->   	return NULL;
->   }
-> +
-> +static int __bpf_smc_stub_set_tcp_option(struct tcp_sock *tp) { return 1; }
-> +static int __bpf_smc_stub_set_tcp_option_cond(const struct tcp_sock *tp,
-> +					      struct inet_request_sock *ireq)
-> +{
-> +	return 1;
-> +}
-> +
-> +static struct smc_ops __bpf_smc_bpf_ops = {
-> +	.set_option		= __bpf_smc_stub_set_tcp_option,
-> +	.set_option_cond	= __bpf_smc_stub_set_tcp_option_cond,
-> +};
-> +
-> +static int smc_bpf_ops_init(struct btf *btf) { return 0; }
-> +
-> +static int smc_bpf_ops_reg(void *kdata, struct bpf_link *link)
-> +{
-> +	return smc_ops_reg(kdata);
-> +}
-> +
-> +static void smc_bpf_ops_unreg(void *kdata, struct bpf_link *link)
-> +{
-> +	smc_ops_unreg(kdata);
-> +}
-> +
-> +static int smc_bpf_ops_init_member(const struct btf_type *t,
-> +				   const struct btf_member *member,
-> +				   void *kdata, const void *udata)
-> +{
-> +	const struct smc_ops *u_ops;
-> +	struct smc_ops *k_ops;
-> +	u32 moff;
-> +
-> +	u_ops = (const struct smc_ops *)udata;
-> +	k_ops = (struct smc_ops *)kdata;
-> +
-> +	moff = __btf_member_bit_offset(t, member) / 8;
-> +	switch (moff) {
-> +	case offsetof(struct smc_ops, name):
-> +		if (bpf_obj_name_cpy(k_ops->name, u_ops->name,
-> +				     sizeof(u_ops->name)) <= 0)
-> +			return -EINVAL;
-> +		return 1;
-> +	case offsetof(struct smc_ops, flags):
-> +		if (u_ops->flags & ~SMC_OPS_ALL_FLAGS)
-> +			return -EINVAL;
-> +		k_ops->flags = u_ops->flags;
-> +		return 1;
-> +	default:
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int smc_bpf_ops_check_member(const struct btf_type *t,
-> +				    const struct btf_member *member,
-> +				    const struct bpf_prog *prog)
-> +{
-> +	u32 moff = __btf_member_bit_offset(t, member) / 8;
-> +
-> +	switch (moff) {
-> +	case offsetof(struct smc_ops, name):
-> +	case offsetof(struct smc_ops, flags):
-> +	case offsetof(struct smc_ops, set_option):
-> +	case offsetof(struct smc_ops, set_option_cond):
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct bpf_verifier_ops smc_bpf_verifier_ops = {
-> +	.get_func_proto		= bpf_base_func_proto,
-> +	.is_valid_access	= bpf_tracing_btf_ctx_access,
-> +};
-> +
-> +static struct bpf_struct_ops bpf_smc_bpf_ops = {
-> +	.name		= "smc_ops",
-> +	.init		= smc_bpf_ops_init,
-> +	.reg		= smc_bpf_ops_reg,
-> +	.unreg		= smc_bpf_ops_unreg,
-> +	.cfi_stubs	= &__bpf_smc_bpf_ops,
-> +	.verifier_ops	= &smc_bpf_verifier_ops,
-> +	.init_member	= smc_bpf_ops_init_member,
-> +	.check_member	= smc_bpf_ops_check_member,
-> +	.owner		= THIS_MODULE,
-> +};
-> +
-> +int smc_bpf_struct_ops_init(void)
-> +{
-> +	return register_bpf_struct_ops(&bpf_smc_bpf_ops, smc_ops);
-> +}
-> diff --git a/net/smc/smc_ops.h b/net/smc/smc_ops.h
-> index 214f4c99efd4..f4e50eae13f6 100644
-> --- a/net/smc/smc_ops.h
-> +++ b/net/smc/smc_ops.h
-> @@ -22,8 +22,10 @@
->    * Note: Caller MUST ensure it's was invoked under rcu_read_lock.
->    */
->   struct smc_ops *smc_ops_find_by_name(const char *name);
-> +int smc_bpf_struct_ops_init(void);
->   #else
->   static inline struct smc_ops *smc_ops_find_by_name(const char *name) { return NULL; }
-> +static inline int smc_bpf_struct_ops_init(void) { return 0; }
 
-Both smc_ops_find_by_name and smc_bpf_struct_ops_init seem to be dead 
-codes. Enabling/Disabling CONFIG_SMC_OPS, the above 2 inline functions 
-will not be called. The 2 functions should be removed.
+> +static unsigned long gettimeofday_ms(void)
+> +{
+> +	struct timeval tv;
+> +
+> +	gettimeofday(&tv, NULL);
+> +	return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+> +}
 
-Zhu Yanjun
+Consider uint64_t and 1000ULL to avoid overflow on 32-bit platforms in
+2034 (currently at 1.7^10^9 usec since start of epoch).
 
->   #endif /* CONFIG_SMC_OPS*/
->   
->   #endif /* __SMC_OPS */
+Or use clock_gettime CLOCK_MONOTONIC.
 
+> +
+> +static int do_poll(int fd)
+> +{
+> +	struct pollfd pfd;
+> +	int ret;
+> +
+> +	pfd.events = POLLERR;
+> +	pfd.revents = 0;
+
+Not important but since demonstrator code:
+no need to set POLLERR on events. Errors cannot be masked.
+
+> +	pfd.fd = fd;
+> +
+> +	ret = poll(&pfd, 1, waittime_ms);
+> +	if (ret == -1)
+> +		error(1, errno, "poll");
+> +
+> +	return ret && (pfd.revents & POLLERR);
+> +}
 
