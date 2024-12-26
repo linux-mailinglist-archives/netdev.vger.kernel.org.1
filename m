@@ -1,168 +1,339 @@
-Return-Path: <netdev+bounces-154297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBCB69FCB27
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 14:25:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 020979FCB2A
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 14:26:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D45F57A13C4
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 13:25:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AB25161F62
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 13:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83AB21D5AD4;
-	Thu, 26 Dec 2024 13:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF171D5CD3;
+	Thu, 26 Dec 2024 13:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gCRQH9g5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="2GacGl7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD36F1B6CEB
-	for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 13:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D2C38DF9;
+	Thu, 26 Dec 2024 13:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735219500; cv=none; b=LJipMY35+IL/g2JQdDCIeTMA7EE9dEzi8kIy0ahzukeRbjJpGhjbhm55D/OvP668JD9OIY5jzNDBW6uq3ySyNx/VdzCLVueiVg9DCnmK+6xcue772B5ZXc7w1QT/TvKfktjVkmizL85C/8WwTcPwnBAGqifMTpKdW0U2QAKlaPI=
+	t=1735219575; cv=none; b=I1hcqo+P4QhPzkIcEhAXtd9mvUzg1wLQmNTcHB3hq5GvqxkGCCuPwOumhRzC/D9xLwTEnjE77CtWo6gqygorbTqN/2mApbO8bDR3Nl8nHA6rJF0bMK6wZZ1DjzVRdv0aL0tdBw0yMAt6irq1Kaug9HZuxM1qXkCB8M3Rrz57CMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735219500; c=relaxed/simple;
-	bh=fzr/y0By52LMwmidEnSfUqA91KlKWxY1fKTryC75b/8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=gklQq2vJ/iRyVXRlhltBfYX+4f9PTw2isbEUDPxZtBgEdhnbH1z1lN1sRCRQUZt/5r7oljJ8lGw8ZevwsFj+aMiBUORCqdYq8dzmWxh2mhb0QYOUqaOoMQ/Cz/TFik6+L2L1ICnE/4E3vnD0GeBtDVjPKIvQ54OOjbRc+RqDmiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gCRQH9g5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735219497;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XT1lRnhXlXD21/E0zejBEol4+u5gRnt3P8KO+08FkPg=;
-	b=gCRQH9g5VlX3za8hsEXl+Q2wK7FeQtRcUrL1OeYVXvqwHfzBr9PGykxce0DjXXrQWSW8AM
-	lpzsbnHY7yACH/cOU7PDRhMxiL4f0dx8u9KkrbcXRYfc8j4PEEFpEOb08CFfhRSlnaihvP
-	SzR7W67LeYVL3iltDnGrpfpXg/yNUWE=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-161-DHc8DfwiOyabwU9HYP_R5g-1; Thu, 26 Dec 2024 08:24:56 -0500
-X-MC-Unique: DHc8DfwiOyabwU9HYP_R5g-1
-X-Mimecast-MFC-AGG-ID: DHc8DfwiOyabwU9HYP_R5g
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ef9864e006so11838013a91.2
-        for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 05:24:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735219495; x=1735824295;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XT1lRnhXlXD21/E0zejBEol4+u5gRnt3P8KO+08FkPg=;
-        b=wI4yqH7VMLeYnwWCTRh9FdbSi9ydFTDkbgjpETsxwnGu+f6VDY5EaL/2mFY8yfvUCg
-         k0GJGmZSU8zt6q77b+yfpSHoAjwzBs5787mo+4AuC8FrQXN0sVATZwMOxVu4slM40G+X
-         YBURL+5U4AGzqbGIYos7tIO+euBG25ZluXezOLZrx6lD8qU4em8tJ0lZrbotnSUpFK9s
-         mYMyVbUO99eFA/VPkwjzgVXjNtBvR52Mhb6j4Ahn6V1yGjhCc7jqX9IR6GWIYfETPQQ0
-         0hK0Vu91MGO4U1hVkOv+yKxJUczoRDqaVTDx9+rqG1GIcfHpIbyjtAH2iOphXaUsIACQ
-         CpRw==
-X-Forwarded-Encrypted: i=1; AJvYcCXbNoVuVpUcoUvCpUEEavNMludSA0kJs0sgTBx6Jp84gzWs/dS7aVp55cVWbyMLtpWtafMnWq0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1wFTlwz/o5JClNCVEW5sUn8yWzsI6zT415CAE4t8Bjl28GV6z
-	jgqsvOuXlf5xg/H3HrDo7r7sUvwFAk/1v0Q3oQrSC/U9N0jivSXLoaAyCtFBDFfPJujOvAki4Fv
-	UPN7R9uBS9uFT1oDaacXASezIPnoeqrPN02i+ZE0z5u9knNovz5A4OfoOYWvI3jPAJTcOJtJY6+
-	1jzoXLYtvbO+08r2CrehCNegWmC6kI
-X-Gm-Gg: ASbGncsTsx+JyQHZQW63JddOvLfn+dfq3dv5fVRHKKZcNoMVkRyB2kjhY1592wndOU6
-	yU8Ia67vKBsUrwezrNG8XvODjlr8FTX/Edo0EAQ==
-X-Received: by 2002:a17:90b:534b:b0:2ee:c91a:acf7 with SMTP id 98e67ed59e1d1-2f452dfccdcmr34514439a91.4.1735219495482;
-        Thu, 26 Dec 2024 05:24:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGu5/eqaIpVwwwa50DqmMKrB39NKhlZwdLHtsYGthsNbvbf6Td7aNviqn3EUtwWhqMcPArYWUXX5P9Nsr3evBk=
-X-Received: by 2002:a17:90b:534b:b0:2ee:c91a:acf7 with SMTP id
- 98e67ed59e1d1-2f452dfccdcmr34514409a91.4.1735219495183; Thu, 26 Dec 2024
- 05:24:55 -0800 (PST)
+	s=arc-20240116; t=1735219575; c=relaxed/simple;
+	bh=KP4fUOEUtc0PXacnjYyr9G3RvMNfRDjkA3oHWmw2ARQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oTz2BKOhpoHXAESfouDLsN4z3y8VNsAQhWXESakIOKT1TAGlxbKS6ehYYsbnPhpUEhHDCksYyee2Nk0eTatAZQNWD17qiAm/8Ale+hhHR86zsJmJKLfPHAAsUrx0noCtIQsoIBVt7qlLtPyEbkRJDJDBwEgUEy6USB3523UCaaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=2GacGl7w; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cwjSRK3r/Hud4AZdAdsLSZywHfwIlBbaz7OhAgb8JlI=; b=2GacGl7w+C2PvwqEHEQPUaOGB3
+	A9PpZTXZbXoMrlzMOmM8dNpfNKODj6sPG5FbHISdLfgU1rqrBhjtLhS/RUK6LDEozo7aOKfrEmUFH
+	wzbOBr58fb3kCAVH4kvHi6c8nULzdgRWc6kqtpKEXlNki5RmN/fXjUTwR78Gtz1DLdwKst6bS77n+
+	znSTzAx6yMIMQ+36htyQUPc4jPx5DB/dFbKjmtjqigqj0bkRwujxdIvCzANET7XdB67GlTUWJAlhq
+	ZYMktfTfGnuulU3WXEirY8q32C33ntS5exFeM0z+Wkiumokor7SZ/TeqOtxJgMD+tIO+vJcG0DoIX
+	M3ckBmfg==;
+Received: from i5e860d12.versanet.de ([94.134.13.18] helo=phil.localnet)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1tQnsL-00048C-RU; Thu, 26 Dec 2024 14:26:05 +0100
+From: Heiko Stuebner <heiko@sntech.de>
+To: Kever Yang <kever.yang@rock-chips.com>
+Cc: linux-rockchip@lists.infradead.org, David Wu <david.wu@rock-chips.com>,
+ Kever Yang <kever.yang@rock-chips.com>, Jose Abreu <joabreu@synopsys.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ linux-stm32@st-md-mailman.stormreply.com, Eric Dumazet <edumazet@google.com>,
+ linux-arm-kernel@lists.infradead.org
+Subject:
+ Re: [PATCH 2/3] ethernet: stmmac: dwmac-rk: Add gmac support for rk3562
+Date: Thu, 26 Dec 2024 14:26:04 +0100
+Message-ID: <8703908.NyiUUSuA9g@phil>
+In-Reply-To: <20241224094124.3816698-2-kever.yang@rock-chips.com>
+References:
+ <20241224094124.3816698-1-kever.yang@rock-chips.com>
+ <20241224094124.3816698-2-kever.yang@rock-chips.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204114229.21452-1-wander@redhat.com>
-In-Reply-To: <20241204114229.21452-1-wander@redhat.com>
-From: Wander Lairson Costa <wander@redhat.com>
-Date: Thu, 26 Dec 2024 10:24:43 -0300
-Message-ID: <CAAq0SUmVn57F5hc=iJkS1-8WPrguOcEYrirZ7hFgiFxhcTCowQ@mail.gmail.com>
-Subject: Re: [PATCH iwl-net 0/4] igb: fix igb_msix_other() handling for PREEMPT_RT
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Jeff Garzik <jgarzik@redhat.com>, 
-	Auke Kok <auke-jan.h.kok@intel.com>, 
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Dec 4, 2024 at 8:43=E2=80=AFAM Wander Lairson Costa <wander@redhat.=
-com> wrote:
->
-> This is the second attempt at fixing the behavior of igb_msix_other()
-> for PREEMPT_RT. The previous attempt [1] was reverted [2] following
-> concerns raised by Sebastian [3].
->
-> The initial approach proposed converting vfs_lock to a raw_spinlock,
-> a minor change intended to make it safe. However, it became evident
-> that igb_rcv_msg_from_vf() invokes kcalloc with GFP_ATOMIC,
-> which is unsafe in interrupt context on PREEMPT_RT systems.
->
-> To address this, the solution involves splitting igb_msg_task()
-> into two parts:
->
->     * One part invoked from the IRQ context.
->     * Another part called from the threaded interrupt handler.
->
-> To accommodate this, vfs_lock has been restructured into a double
-> lock: a spinlock_t and a raw_spinlock_t. In the revised design:
->
->     * igb_disable_sriov() locks both spinlocks.
->     * Each part of igb_msg_task() locks the appropriate spinlock for
->     its execution context.
->
-> It is worth noting that the double lock mechanism is only active under
-> PREEMPT_RT. For non-PREEMPT_RT builds, the additional raw_spinlock_t
-> field is ommited.
->
-> If the extra raw_spinlock_t field can be tolerated under
-> !PREEMPT_RT (even though it remains unused), we can eliminate the
-> need for #ifdefs and simplify the code structure.
->
-> I will be on vacation from December 7th to Christmas and will address
-> review comments upon my return.
->
-> If possible, I kindly request the Intel team to perform smoke tests
-> on both stock and realtime kernels to catch any potential issues with
-> this patch series.
->
-> Cheers,
-> Wander
->
-> [1] https://lore.kernel.org/all/20240920185918.616302-2-wander@redhat.com=
-/
-> [2] https://lore.kernel.org/all/20241104124050.22290-1-wander@redhat.com/
-> [3] https://lore.kernel.org/all/20241104110708.gFyxRFlC@linutronix.de/
->
->
-> Wander Lairson Costa (4):
->   igb: narrow scope of vfs_lock in SR-IOV cleanup
->   igb: introduce raw vfs_lock to igb_adapter
->   igb: split igb_msg_task()
->   igb: fix igb_msix_other() handling for PREEMPT_RT
->
->  drivers/net/ethernet/intel/igb/igb.h      |   4 +
->  drivers/net/ethernet/intel/igb/igb_main.c | 160 +++++++++++++++++++---
->  2 files changed, 148 insertions(+), 16 deletions(-)
->
-> --
-> 2.47.0
->
+Am Dienstag, 24. Dezember 2024, 10:41:23 CET schrieb Kever Yang:
+> From: David Wu <david.wu@rock-chips.com>
+> 
+> Add constants and callback functions for the dwmac on RK3562 soc.
+> As can be seen, the base structure is the same.
+> 
+> Signed-off-by: David Wu <david.wu@rock-chips.com>
+> Signed-off-by: Kever Yang <kever.yang@rock-chips.com>
 
-I had requested Red Hat Network QA to run regression tests on this,
-and they recently reported that no issues were found.
+Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+
+> ---
+> 
+>  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 207 +++++++++++++++++-
+>  1 file changed, 205 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 8cb374668b74..2ce38bf205d4 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -2,8 +2,7 @@
+>  /**
+>   * DOC: dwmac-rk.c - Rockchip RK3288 DWMAC specific glue layer
+>   *
+> - * Copyright (C) 2014 Chen-Zhi (Roger Chen)
+> - *
+> + * Copyright (c) 2014 Rockchip Electronics Co., Ltd.
+>   * Chen-Zhi (Roger Chen)  <roger.chen@rock-chips.com>
+>   */
+>  
+> @@ -91,6 +90,16 @@ struct rk_priv_data {
+>  	(((tx) ? soc##_GMAC_TXCLK_DLY_ENABLE : soc##_GMAC_TXCLK_DLY_DISABLE) | \
+>  	 ((rx) ? soc##_GMAC_RXCLK_DLY_ENABLE : soc##_GMAC_RXCLK_DLY_DISABLE))
+>  
+> +#define DELAY_VALUE(soc, tx, rx) \
+> +	((((tx) >= 0) ? soc##_GMAC_CLK_TX_DL_CFG(tx) : 0) | \
+> +	 (((rx) >= 0) ? soc##_GMAC_CLK_RX_DL_CFG(rx) : 0))
+> +
+> +#define GMAC_RGMII_CLK_DIV_BY_ID(soc, id, div) \
+> +		(soc##_GMAC##id##_CLK_RGMII_DIV##div)
+> +
+> +#define GMAC_RMII_CLK_DIV_BY_ID(soc, id, div) \
+> +		(soc##_GMAC##id##_CLK_RMII_DIV##div)
+> +
+>  #define PX30_GRF_GMAC_CON1		0x0904
+>  
+>  /* PX30_GRF_GMAC_CON1 */
+> @@ -1013,6 +1022,199 @@ static const struct rk_gmac_ops rk3399_ops = {
+>  	.set_rmii_speed = rk3399_set_rmii_speed,
+>  };
+>  
+> +/* sys_grf */
+> +#define RK3562_GRF_SYS_SOC_CON0			0X0400
+> +#define RK3562_GRF_SYS_SOC_CON1			0X0404
+> +
+> +#define RK3562_GMAC0_CLK_RMII_MODE		GRF_BIT(5)
+> +#define RK3562_GMAC0_CLK_RGMII_MODE		GRF_CLR_BIT(5)
+> +
+> +#define RK3562_GMAC0_CLK_RMII_GATE		GRF_BIT(6)
+> +#define RK3562_GMAC0_CLK_RMII_NOGATE		GRF_CLR_BIT(6)
+> +
+> +#define RK3562_GMAC0_CLK_RMII_DIV2		GRF_BIT(7)
+> +#define RK3562_GMAC0_CLK_RMII_DIV20		GRF_CLR_BIT(7)
+> +
+> +#define RK3562_GMAC0_CLK_RGMII_DIV1		\
+> +				(GRF_CLR_BIT(7) | GRF_CLR_BIT(8))
+> +#define RK3562_GMAC0_CLK_RGMII_DIV5		\
+> +				(GRF_BIT(7) | GRF_BIT(8))
+> +#define RK3562_GMAC0_CLK_RGMII_DIV50		\
+> +				(GRF_CLR_BIT(7) | GRF_BIT(8))
+> +
+> +#define RK3562_GMAC0_CLK_RMII_DIV2		GRF_BIT(7)
+> +#define RK3562_GMAC0_CLK_RMII_DIV20		GRF_CLR_BIT(7)
+> +
+> +#define RK3562_GMAC0_CLK_SELET_CRU		GRF_CLR_BIT(9)
+> +#define RK3562_GMAC0_CLK_SELET_IO		GRF_BIT(9)
+> +
+> +#define RK3562_GMAC1_CLK_RMII_GATE		GRF_BIT(12)
+> +#define RK3562_GMAC1_CLK_RMII_NOGATE		GRF_CLR_BIT(12)
+> +
+> +#define RK3562_GMAC1_CLK_RMII_DIV2		GRF_BIT(13)
+> +#define RK3562_GMAC1_CLK_RMII_DIV20		GRF_CLR_BIT(13)
+> +
+> +#define RK3562_GMAC1_RMII_SPEED100		GRF_BIT(11)
+> +#define RK3562_GMAC1_RMII_SPEED10		GRF_CLR_BIT(11)
+> +
+> +#define RK3562_GMAC1_CLK_SELET_CRU		GRF_CLR_BIT(15)
+> +#define RK3562_GMAC1_CLK_SELET_IO		GRF_BIT(15)
+> +
+> +/* ioc_grf */
+> +#define RK3562_GRF_IOC_GMAC_IOFUNC0_CON0	0X10400
+> +#define RK3562_GRF_IOC_GMAC_IOFUNC0_CON1	0X10404
+> +#define RK3562_GRF_IOC_GMAC_IOFUNC1_CON0	0X00400
+> +#define RK3562_GRF_IOC_GMAC_IOFUNC1_CON1	0X00404
+> +
+> +#define RK3562_GMAC_RXCLK_DLY_ENABLE		GRF_BIT(1)
+> +#define RK3562_GMAC_RXCLK_DLY_DISABLE		GRF_CLR_BIT(1)
+> +#define RK3562_GMAC_TXCLK_DLY_ENABLE		GRF_BIT(0)
+> +#define RK3562_GMAC_TXCLK_DLY_DISABLE		GRF_CLR_BIT(0)
+> +
+> +#define RK3562_GMAC_CLK_RX_DL_CFG(val)		HIWORD_UPDATE(val, 0xFF, 8)
+> +#define RK3562_GMAC_CLK_TX_DL_CFG(val)		HIWORD_UPDATE(val, 0xFF, 0)
+> +
+> +#define RK3562_GMAC0_IO_EXTCLK_SELET_CRU	GRF_CLR_BIT(2)
+> +#define RK3562_GMAC0_IO_EXTCLK_SELET_IO		GRF_BIT(2)
+> +
+> +#define RK3562_GMAC1_IO_EXTCLK_SELET_CRU	GRF_CLR_BIT(3)
+> +#define RK3562_GMAC1_IO_EXTCLK_SELET_IO		GRF_BIT(3)
+> +
+> +static void rk3562_set_to_rgmii(struct rk_priv_data *bsp_priv,
+> +				int tx_delay, int rx_delay)
+> +{
+> +	struct device *dev = &bsp_priv->pdev->dev;
+> +
+> +	if (IS_ERR(bsp_priv->grf) || IS_ERR(bsp_priv->php_grf)) {
+> +		dev_err(dev, "Missing rockchip,grf or rockchip,php_grf property\n");
+> +		return;
+> +	}
+> +
+> +	if (bsp_priv->id > 0)
+> +		return;
+> +
+> +	regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0,
+> +		     RK3562_GMAC0_CLK_RGMII_MODE);
+> +
+> +	regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC0_CON1,
+> +		     DELAY_ENABLE(RK3562, tx_delay, rx_delay));
+> +	regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC0_CON0,
+> +		     DELAY_VALUE(RK3562, tx_delay, rx_delay));
+> +
+> +	regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC1_CON1,
+> +		     DELAY_ENABLE(RK3562, tx_delay, rx_delay));
+> +	regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC1_CON0,
+> +		     DELAY_VALUE(RK3562, tx_delay, rx_delay));
+> +}
+> +
+> +static void rk3562_set_to_rmii(struct rk_priv_data *bsp_priv)
+> +{
+> +	struct device *dev = &bsp_priv->pdev->dev;
+> +
+> +	if (IS_ERR(bsp_priv->grf)) {
+> +		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
+> +		return;
+> +	}
+> +
+> +	if (!bsp_priv->id)
+> +		regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0,
+> +			     RK3562_GMAC0_CLK_RMII_MODE);
+> +}
+> +
+> +static void rk3562_set_gmac_speed(struct rk_priv_data *bsp_priv, int speed)
+> +{
+> +	struct device *dev = &bsp_priv->pdev->dev;
+> +	unsigned int val = 0, offset, id = bsp_priv->id;
+> +
+> +	switch (speed) {
+> +	case 10:
+> +		if (bsp_priv->phy_iface == PHY_INTERFACE_MODE_RMII) {
+> +			if (id > 0) {
+> +				val = GMAC_RMII_CLK_DIV_BY_ID(RK3562, 1, 20);
+> +				regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0,
+> +					     RK3562_GMAC1_RMII_SPEED10);
+> +			} else {
+> +				val = GMAC_RMII_CLK_DIV_BY_ID(RK3562, 0, 20);
+> +			}
+> +		} else {
+> +			val = GMAC_RGMII_CLK_DIV_BY_ID(RK3562, 0, 50);
+> +		}
+> +		break;
+> +	case 100:
+> +		if (bsp_priv->phy_iface == PHY_INTERFACE_MODE_RMII) {
+> +			if (id > 0) {
+> +				val = GMAC_RMII_CLK_DIV_BY_ID(RK3562, 1, 2);
+> +				regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0,
+> +					     RK3562_GMAC1_RMII_SPEED100);
+> +			} else {
+> +				val = GMAC_RMII_CLK_DIV_BY_ID(RK3562, 0, 2);
+> +			}
+> +		} else {
+> +			val = GMAC_RGMII_CLK_DIV_BY_ID(RK3562, 0, 5);
+> +		}
+> +		break;
+> +	case 1000:
+> +		if (bsp_priv->phy_iface != PHY_INTERFACE_MODE_RMII)
+> +			val = GMAC_RGMII_CLK_DIV_BY_ID(RK3562, 0, 1);
+> +		else
+> +			goto err;
+> +		break;
+> +	default:
+> +		goto err;
+> +	}
+> +
+> +	offset = (bsp_priv->id > 0) ? RK3562_GRF_SYS_SOC_CON1 :
+> +					  RK3562_GRF_SYS_SOC_CON0;
+> +	regmap_write(bsp_priv->grf, offset, val);
+> +
+> +	return;
+> +err:
+> +	dev_err(dev, "unknown speed value for GMAC speed=%d", speed);
+> +}
+> +
+> +static void rk3562_set_clock_selection(struct rk_priv_data *bsp_priv, bool input,
+> +				       bool enable)
+> +{
+> +	struct device *dev = &bsp_priv->pdev->dev;
+> +	unsigned int value;
+> +
+> +	if (IS_ERR(bsp_priv->grf) || IS_ERR(bsp_priv->php_grf)) {
+> +		dev_err(dev, "Missing rockchip,grf or rockchip,php_grf property\n");
+> +		return;
+> +	}
+> +
+> +	if (!bsp_priv->id) {
+> +		value = input ? RK3562_GMAC0_CLK_SELET_IO :
+> +				RK3562_GMAC0_CLK_SELET_CRU;
+> +		value |= enable ? RK3562_GMAC0_CLK_RMII_NOGATE :
+> +				  RK3562_GMAC0_CLK_RMII_GATE;
+> +		regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0, value);
+> +
+> +		value = input ? RK3562_GMAC0_IO_EXTCLK_SELET_IO :
+> +				RK3562_GMAC0_IO_EXTCLK_SELET_CRU;
+> +		regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC0_CON1, value);
+> +		regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC1_CON1, value);
+> +	} else {
+> +		value = input ? RK3562_GMAC1_CLK_SELET_IO :
+> +				RK3562_GMAC1_CLK_SELET_CRU;
+> +		value |= enable ? RK3562_GMAC1_CLK_RMII_NOGATE :
+> +				 RK3562_GMAC1_CLK_RMII_GATE;
+> +		regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON1, value);
+> +
+> +		value = input ? RK3562_GMAC1_IO_EXTCLK_SELET_IO :
+> +				RK3562_GMAC1_IO_EXTCLK_SELET_CRU;
+> +		regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC1_CON1, value);
+> +	}
+> +}
+> +
+> +static const struct rk_gmac_ops rk3562_ops = {
+> +	.set_to_rgmii = rk3562_set_to_rgmii,
+> +	.set_to_rmii = rk3562_set_to_rmii,
+> +	.set_rgmii_speed = rk3562_set_gmac_speed,
+> +	.set_rmii_speed = rk3562_set_gmac_speed,
+> +	.set_clock_selection = rk3562_set_clock_selection,
+> +};
+> +
+>  #define RK3568_GRF_GMAC0_CON0		0x0380
+>  #define RK3568_GRF_GMAC0_CON1		0x0384
+>  #define RK3568_GRF_GMAC1_CON0		0x0388
+> @@ -2062,6 +2264,7 @@ static const struct of_device_id rk_gmac_dwmac_match[] = {
+>  	{ .compatible = "rockchip,rk3366-gmac", .data = &rk3366_ops },
+>  	{ .compatible = "rockchip,rk3368-gmac", .data = &rk3368_ops },
+>  	{ .compatible = "rockchip,rk3399-gmac", .data = &rk3399_ops },
+> +	{ .compatible = "rockchip,rk3562-gmac", .data = &rk3562_ops },
+>  	{ .compatible = "rockchip,rk3568-gmac", .data = &rk3568_ops },
+>  	{ .compatible = "rockchip,rk3576-gmac", .data = &rk3576_ops },
+>  	{ .compatible = "rockchip,rk3588-gmac", .data = &rk3588_ops },
+> 
+
+
+
 
 
