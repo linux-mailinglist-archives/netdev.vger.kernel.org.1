@@ -1,152 +1,138 @@
-Return-Path: <netdev+bounces-154275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3C4C9FC7BF
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 03:59:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03E8E9FC7BE
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 03:58:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BD8D1621D3
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 02:59:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CF477A120F
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 02:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F7D28DD0;
-	Thu, 26 Dec 2024 02:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSBACtSc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA481E507;
+	Thu, 26 Dec 2024 02:58:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA7417C77;
-	Thu, 26 Dec 2024 02:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A1BC133
+	for <netdev@vger.kernel.org>; Thu, 26 Dec 2024 02:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735181947; cv=none; b=iq9qo9SEahwIteFZb2PIZFynkuNZ5PXrauQDnXotV5i3mM9Ox5BsQ8pU4LbUUM7x9TFNVRj/UTCTzwbwgrzsC3oZH0Fx5StzfhK4pCUDqs+7M5ICv7rayLvvmJtcZ6H5ixKxCZwPEwcXltkgCX2tJd+qPxAUsnnXCg7jX9MOn9E=
+	t=1735181922; cv=none; b=cEZvJ1oncSOjRxqOmJ264+e7Zr/BvN2+aKrpFpO8dsKgS1EXRyIshPQYJuDNnw7WE6DUFbFurwHcT0uKMj/4Y2Wu7PWDrPhs3PlUbIzteljjOA6l1KDu+7YYRMUOj2zSDLm7kMcCG+jJyBDFPYuQbN/g8yAj+PhpmVMpjtJfrYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735181947; c=relaxed/simple;
-	bh=SX7fG+4ct7xmQUjmLm01ARQJbwHNjskjGmKj5a0zJi0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=iFUExuiBuSlBBDjdjExhg0bo9OZI02QQV2GGDkjkzZ7WhMk0B3UURTfDeweHZBSfHyFff0ULvDysQM9l+EkuC9++5NfClf0//4mVGwdJ9gdujNOzrI1JiRMaXq6H76GBOyfFaL4qbzScEwXj+3+ZTwUyvVyb0UvnXlI34uzc3RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSBACtSc; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21644e6140cso72319935ad.1;
-        Wed, 25 Dec 2024 18:59:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735181944; x=1735786744; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=V5Fnrp1f1JlDdT/D5esy9KCV1pUpCmiwpWEZqSEq1K0=;
-        b=JSBACtScPjY2XxbkDSYyF4FQSbUsI48PJyau6CsORL9wxPM3dlXHM56R8Xf0cB91Cs
-         4CkXPe5SvB9kfsmCfqPRgVhg7/eOTOsRo/b2Y8FaONcEMT2KJrzlb6SpXqPyC/jXxDrf
-         vITu2suTEBlBCSRQrbxEDwgHpXImkKY06mUWD0DGxbZTNUvKm/UQMMdsDE7hiLD/ok4g
-         X1x2QOBPpqNiCI5ejGu7T46wxYOfvS6jH0qbV/EXhQRgkQVKRxhZExjZjsjXzD5RbejI
-         wT7UovvlVFYTJcoQ0q5panlxUYXczi+eznc5dumGRZHkCwMyPScxl8CxX5M48HDAN+1g
-         jubA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735181944; x=1735786744;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V5Fnrp1f1JlDdT/D5esy9KCV1pUpCmiwpWEZqSEq1K0=;
-        b=rp+g7K6CIv5oaxxWsQPSB92GMRlH3rpEqRpAgHPN7ivIgOKLX9yUMZoa1Dwd32WxSe
-         IqbZI+ikOEFC+ytAY9Lwlfpxp0rZocPK1G1ttVNiwEfxjJCQF/RztSZocIPvFAi0bZiN
-         LtwxNOaQXNDvtjHjobBegJbIEAHHcxI5m/dW8MAiWx8aBtQjkY++AqxzjvMuSDR7JQcL
-         7eCkMxAyRy0jGw7nlr3XUxIZcHA/6kNiMIbiFhXXOV5OcQvsGGZLYhOfpBSslWHcEiLH
-         cggfKzL/CJ9bUSXMmvl/pmJQC0U5eSAhiAnn8FzhhB/y8x2FodjGqxQIYjLQ2h9Pn5k1
-         wCSA==
-X-Forwarded-Encrypted: i=1; AJvYcCUENt99ITP526Eboj6lJVI9PYr7VvI1b4NZXQsJI5UEoi467/rH2DX/k5vijhiYa+okDRhgGlopORAm4Ew=@vger.kernel.org, AJvYcCWLXT2ZrUVYLZApDJ3lYDgle9rq5UTy2joArzrdaDX09dIobFMkjXhs2d08/umJhI9LW6SMh/Eh@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqncQwsawoOUHVuX5EIuUORxG5WPEf//xJ94aDBA1loRiNF8oW
-	QkVNoNXH2KvHQCP+hSaVKZf89ap9yDeWQGmDNiZdOy7vGzZ0qj8K
-X-Gm-Gg: ASbGncv9Z7Wcsp3KvDc6pJCTqiyUwMJ9oNQ+DU5ndLK3IfUusETCDZIsvcltT2MWuMR
-	79sRXQIGW6h3IKtFg6jS/+RhlfHjB03vjdYuEXEr8Q2BWnuAnCFp8aCMMw+G+x+x0M/JeScgETR
-	Eg2dfM4TbVio9+vJBD6ICRzCh/sPJvn2sJUCwwWLhf0nIPyeG4r8BddkqoKw+W1JdOc/vN8JFcm
-	908eCuIEseGz7SEBGSph3iNqzCB/igejuG+2+K8ZUg4KtRogr83AYBJYNbThPQRRb8qIF+qYA7F
-	PVaFHPZWxV749UfHgcrus8nAIW66jyGs2o30
-X-Google-Smtp-Source: AGHT+IH+n9nsHCIIOzxQphdVwadS6NK75QI0/XG7wNQ6rq7g50ixS3vO8soHVH9sw1PT6opM+o7TmQ==
-X-Received: by 2002:a17:902:f68f:b0:215:63a0:b58c with SMTP id d9443c01a7336-219e6f25f6bmr309864695ad.46.1735181943959;
-        Wed, 25 Dec 2024 18:59:03 -0800 (PST)
-Received: from leo-pc.tail3f5402.ts.net (61-220-246-151.hinet-ip.hinet.net. [61.220.246.151])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dca0282fsm110470435ad.259.2024.12.25.18.59.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Dec 2024 18:59:03 -0800 (PST)
-From: Leo Yang <leo.yang.sy0@gmail.com>
-X-Google-Original-From: Leo Yang <Leo-Yang@quantatw.com>
-To: jk@codeconstruct.com.au,
-	matt@codeconstruct.com.au,
-	andrew+netdev@lunn.ch,
+	s=arc-20240116; t=1735181922; c=relaxed/simple;
+	bh=FdbddyW9EcF6ERtma4qc/cqrkATrsZ0n5S3x9AMNszQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PRVwhhCx/nYQD+Koj45Jgy2yUK+Fo8HBjb6lnYYUu32jwV0QgIO1hrdBHaxlpstc8ekhbdCTB9TgPYpC1sUWj5I8vah9HZa1i4sM9nbLOP/MLGHV6ESgHSKx1s9NRU7Dacs1k6xM9UI6bZOcc1t7L72WpU3vJa5uUrTHQ66c8RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtpsz5t1735181809tsf8lax
+X-QQ-Originating-IP: S+tyynb6c0RbDyQr8/fxAmfwkMWhxh1wYSy+6tUPF0A=
+Received: from wxdbg.localdomain.com ( [36.24.116.64])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 26 Dec 2024 10:56:41 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 1231702645064501310
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Leo Yang <Leo-Yang@quantatw.com>
-Subject: [PATCH net] mctp i3c: fix MCTP I3C driver multi-thread issue
-Date: Thu, 26 Dec 2024 10:53:19 +0800
-Message-Id: <20241226025319.1724209-1-Leo-Yang@quantatw.com>
-X-Mailer: git-send-email 2.39.2
+	horms@kernel.org,
+	rmk+kernel@armlinux.org.uk,
+	netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net] net: libwx: fix firmware mailbox abnormal return
+Date: Thu, 26 Dec 2024 11:18:10 +0800
+Message-Id: <20241226031810.1872443-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: M0vknKB9I1DpFGhJJ2sfhaF/cMxPkfJ2Z4k8VwzohGEwempxiwPrQgcT
+	Ze+bA/MuzjsBBld0jDynSvTudGSoSeiiv4/7EnnTgmM41L/akme0YB3o5EQXKkGbPF0NzDJ
+	zfmnVsYNLUbE9ize3EoZbh09Ahl4v6t/2pbsFVYiW2cxvYS//VyDtN3quO/1LldJjGn7cfA
+	2jDWacJxbS/BbVRntwqfrxBwX8GDK7QcanSvCXyIK3MGmdztO1vNlZS1cPTLoKcng7wP1kR
+	QB0POLv/ex4CT41J4QO69Z4LQvUaf+xrGr7loei582eaHLiO9xsKEJh1qwLbLPt7vKXvl4m
+	UiV71Gtqf1+s8Urw8PsHjNhM4BpNeyKVf0u6i1nkvpy1gLt+MBGerYRpotoxUemajL/uBwb
+	tJ3D0qgvQe/YzVukKRArZMbz6euzUnlCBOEKPibfQrwpHwGyP79jni2ignsFnN4ZvSjWfWh
+	YINeYQLLaNmM5JJINvWnnOsZm27k/CooDseZxps7PkZShAEmQiWcmNJhkA+xjy/FfokjQJu
+	bwuIuMvqmga5K/SoyTPvQMHEv7s9Xe0FRH74nPXQg+nG0BGdOCIE5cjVg6F//CY0hST8rmo
+	wYZ/H+VCU3ehgPixMr1Lz0i7uhfNLkqE0gwOQcxKjuwx0zpEGxBmPN0mD9rgROnCYiI4P8y
+	Q1ucM1WQojgK1qkOtM0KDeO/3WAZbYftaC0QFVRlrfR4fB7Cf46bpYzZ9s4acVukWwOybCH
+	XNq+Q10QSPH3t8o8Ri0RHWOn0mq0fq2hoL7eUdESTB8OCeu2phqSme6+ovTgpjP6gnHMkd7
+	i0WAUoophDNEMiAbIAKOSa/KbzoAh+htLPlPow1z7ZnspziTSc5yf7iAZH9kObmStCuDAKU
+	Mv4oX8QsJ05QhmyKYq6DTNLL7tZ+Iaso4LGJe9jaacCJB3efO9WHvgDzx0SYco0IPMV2gno
+	K2hwOKlHv7D1X7f6EVSa98RvsSu4RI0oiy2ELQHF1BkcY9A==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-We found a timeout problem with the pldm command on our system.  The
-reason is that the MCTP-I3C driver has a race condition when receiving
-multiple-packet messages in multi-thread, resulting in a wrong packet
-order problem.
+Firmware writes back 'firmware ready' and 'unknown command' in the mailbox
+message if there is an unknown command sent by driver. It tends to happen
+with the use of custom firmware. So move the check for 'unknown command'
+out of the poll timeout for 'firmware ready'. And adjust the debug log so
+that mailbox messages are always printed when commands timeout.
 
-We identified this problem by adding a debug message to the
-mctp_i3c_read function.
-
-According to the MCTP spec, a multiple-packet message must be composed
-in sequence, and if there is a wrong sequence, the whole message will be
-discarded and wait for the next SOM.
-For example, SOM → Pkt Seq #2 → Pkt Seq #1 → Pkt Seq #3 → EOM.
-
-Therefore, we try to solve this problem by adding a mutex to the
-mctp_i3c_read function.  Before the modification, when a command
-requesting a multiple-packet message response is sent consecutively, an
-error usually occurs within 100 loops.  After the mutex, it can go
-through 40000 loops without any error, and it seems to run well.
-
-But I'm a little worried about the performance of mutex in high load
-situation (as spec seems to allow different endpoints to respond at the
-same time), do you think this is a feasible solution?
-
-Signed-off-by: Leo Yang <Leo-Yang@quantatw.com>
+Fixes: 1efa9bfe58c5 ("net: libwx: Implement interaction with firmware")
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/mctp/mctp-i3c.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/mctp/mctp-i3c.c b/drivers/net/mctp/mctp-i3c.c
-index 9adad59b8676..0d625b351ebd 100644
---- a/drivers/net/mctp/mctp-i3c.c
-+++ b/drivers/net/mctp/mctp-i3c.c
-@@ -125,6 +125,7 @@ static int mctp_i3c_read(struct mctp_i3c_device *mi)
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index 1bf9c38e4125..7059e0100c7c 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -334,27 +334,25 @@ int wx_host_interface_command(struct wx *wx, u32 *buffer,
+ 	status = read_poll_timeout(rd32, hicr, hicr & WX_MNG_MBOX_CTL_FWRDY, 1000,
+ 				   timeout * 1000, false, wx, WX_MNG_MBOX_CTL);
  
- 	xfer.data.in = skb_put(skb, mi->mrl);
- 
-+	mutex_lock(&mi->lock);
- 	rc = i3c_device_do_priv_xfers(mi->i3c, &xfer, 1);
- 	if (rc < 0)
- 		goto err;
-@@ -166,8 +167,10 @@ static int mctp_i3c_read(struct mctp_i3c_device *mi)
- 		stats->rx_dropped++;
++	buf[0] = rd32(wx, WX_MNG_MBOX);
++	if ((buf[0] & 0xff0000) >> 16 == 0x80) {
++		wx_dbg(wx, "It's unknown cmd.\n");
++		status = -EINVAL;
++		goto rel_out;
++	}
++
+ 	/* Check command completion */
+ 	if (status) {
+ 		wx_dbg(wx, "Command has failed with no status valid.\n");
+-
+-		buf[0] = rd32(wx, WX_MNG_MBOX);
+-		if ((buffer[0] & 0xff) != (~buf[0] >> 24)) {
+-			status = -EINVAL;
+-			goto rel_out;
+-		}
+-		if ((buf[0] & 0xff0000) >> 16 == 0x80) {
+-			wx_dbg(wx, "It's unknown cmd.\n");
+-			status = -EINVAL;
+-			goto rel_out;
+-		}
+-
+ 		wx_dbg(wx, "write value:\n");
+ 		for (i = 0; i < dword_len; i++)
+ 			wx_dbg(wx, "%x ", buffer[i]);
+ 		wx_dbg(wx, "read value:\n");
+ 		for (i = 0; i < dword_len; i++)
+ 			wx_dbg(wx, "%x ", buf[i]);
++		wx_dbg(wx, "check: %x %x\n", buffer[0] & 0xff, ~buf[0] >> 24);
++		if ((buffer[0] & 0xff) != (~buf[0] >> 24))
++			goto rel_out;
  	}
  
-+	mutex_unlock(&mi->lock);
- 	return 0;
- err:
-+	mutex_unlock(&mi->lock);
- 	kfree_skb(skb);
- 	return rc;
- }
+ 	if (!return_data)
 -- 
-2.39.2
+2.27.0
 
 
