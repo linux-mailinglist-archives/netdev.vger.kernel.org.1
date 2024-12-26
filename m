@@ -1,443 +1,255 @@
-Return-Path: <netdev+bounces-154314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 216619FCE29
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 22:52:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DBA49FCF1B
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 00:15:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9428718834F8
-	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 21:52:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8607F188333E
+	for <lists+netdev@lfdr.de>; Thu, 26 Dec 2024 23:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5228F19992C;
-	Thu, 26 Dec 2024 21:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472CF18C02E;
+	Thu, 26 Dec 2024 23:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3ZehT+c"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FdJtVIDP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="F6zLdIny";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FdJtVIDP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="F6zLdIny"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA521684B0;
-	Thu, 26 Dec 2024 21:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CF613D893;
+	Thu, 26 Dec 2024 23:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735249960; cv=none; b=HB4Y9eRuxMp6hGrdv4k7snNfVSseullgIOt2GhvNweFCMdh6AZYfssVPWwgxZDHfFUxt1qeMNGypkJn13542P6RNx0b6IC74EJO1Ek+ec1jkUJgwPEfkOo5UOU0vq9Am2W1qkVK7AT24oRP5+C2YMSgkuNm+dATEJFyU//KCAIw=
+	t=1735254927; cv=none; b=DfkTl5jqo+ZHmbqnXEqbXn9HN3TWfjaQKeJ9Ngt54f2Iw0Zv2SeUQheNXECjPuquiJFx426r8YLumSyEvM7sur9gFxZ7xlmFX24bA4Ffwvyf6G9Ao3r0bhIM0WzVi+S7RbYBx/N3JnULb7nrtAnJhnsPqbcjPCHFQ6aVmtdyX4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735249960; c=relaxed/simple;
-	bh=f0g+9TpEftpkkRVmtnHw291rFkWzuN6lKnMDT0w0rTw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=XjpSzzfywJ4JNd11on3FNHnUsHcSgb5E3b1wE+5hy36/WPHe1uLX0Jgz9XHzoVv9YRh0cgENygibmBMSGy511h/UHDHlf74RxqdOViNCzGg8mzAlRcS02g4ei8psp+shb3tn8HvBC8VBZc5d+PVrmaVaQxrIKMJkYaEOjgV0RzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O3ZehT+c; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7b9e2c1e3baso236165585a.3;
-        Thu, 26 Dec 2024 13:52:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735249956; x=1735854756; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5skAppR4fNztbvfmLBwOHnkr1eseDSJEMLlqTr/k3KU=;
-        b=O3ZehT+cGIh5i9qxAMS72AS8wCyYAzM9WdRpU8MTCU3DLg806ZUprLI+fZTJNjxxEl
-         3kyZkEAWQ+2e1X+sfWQemDu2ZU44zrGHfcSEdWqPOoJAX2D30s1uIAJYEYKEvXWb7IDx
-         hJFA62J0ok2BMevhIayNAtGGXjuXNnyF8JDoCqcYtZpCsjnML+0p2R/6XXApLNl8zUlV
-         xfrEvR1lBhf1BVOLQlHxsF7c/++ZFGCR2h/ZnmMZUUt6DNMoHeQsTL9+zKqoizupAz5g
-         667+BHIicNCjwd/Lo1x9ZxVCHBambnRre5PiqZzxbqLXaG0eoExDtpTOUrf9wUIR7OK3
-         JsOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735249956; x=1735854756;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5skAppR4fNztbvfmLBwOHnkr1eseDSJEMLlqTr/k3KU=;
-        b=c7nd44O0TOpUx3o+7ptO325H5yhw7dy5qG0+IPUzJ9+NeJSeqJcb/XLROpzidglxwq
-         dHmQOoKh/wgaw2vxyN+SleU/joUYYI5BgvtrCuG/y+Uvcf4uCjBR74TMLUo8hyTFmTeS
-         a0asBRFoq2w7mWhdNZVrPE7/YEe/WRVoYpzHzqQ2vY+6jMFQsYGmkj/6VXJcZ8Bjp0fu
-         ldt+VV6pj4vRRt6F+TCKArYf7qb8kdAOpIMfaprNtvPNGSeiBc55jdpi7TxxyYi2wsaI
-         EWsQjYdYBcWWgPP8AWcKH0vpzWKW1e0BMcDBK4AEOizNaWQDjhX9sfa/KrvfIeTLz5cR
-         xMZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUq+ziuwsMKVw760ymOaHjo4zPUfJJuGGx6pojyo0B/YMy2SdSPdnIhsYlQP1J6vjN2xXrxeW2DAFdRZhp5@vger.kernel.org, AJvYcCW/1IfhM/EJt4yod6rSutan2UouFred/0bGRJtsDsCUrF7CxN62UsTu/HJGf4grn/shRlE=@vger.kernel.org, AJvYcCW3he9tylbynODkDBmdJbaJneC8NUX+XwWGtsYsUC/fpxj+uiHdTMYjL3utGFd/vgERoGRd3c7fwzQM3MXN6wUF@vger.kernel.org, AJvYcCWans+Kkjf1HDuOvT7PBdc2Dh4baXPrymhWlS+M5hS1lk8p03eFEbqefxwJJrs54FVHn2jwTmeq3oEW@vger.kernel.org, AJvYcCWopEh1F3xj+g9Ssy5pfO5SAh8ziOzr0VZVxfzEB3oP7LdqlFq/ny92AdUvCwnuIeceD9X/VnKB@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSBcf1Izk/aM8j6fp22H9XMYWrp2Z1KsCJXt6jPGlr9DgqcuSG
-	Ysh76bv/WM8ouHjNlFCoMQB7kZML0aV+AFxyfg1+reuwLzgm7AO0oFZh8A==
-X-Gm-Gg: ASbGnctU1nbbou1OD04LTmUe+BeszeEqFxpRp5r7I3qNy+o6w/3jndkhrf5kFvVtUzg
-	7EwGtxMIqfbKQdbgeLpUBcU9hYuC+N9p4Cn51dDgTlYUJjl7ssZBB0YQtlfGl+e6nIfjOWTs3rP
-	WC5cn3loXmS1ttgSdiTLjis+ql46yx9RiMIMtkQ4TOa0b/fzjaBXVBWa+AwNlkbqajRW6K5EaM1
-	MIuhgxsQMUwTQutxejdYZmAb5ZUaIXxj53LZ4M16drIf9bu2bCdobum72tkvRPvzRS/IJOU/hm3
-	al39cjit7bYgTb80cbQOxxpR2uuHAj7Vew==
-X-Google-Smtp-Source: AGHT+IFaZ98AGT4ItA96YaK7A/6hrexLBSr8q1i1ics39770GhB9RyM9ZoJ876sVuq+UmZz8G5NF6Q==
-X-Received: by 2002:a05:620a:4045:b0:7b6:c543:7e54 with SMTP id af79cd13be357-7b9ba75c1aamr3705501285a.22.1735249956410;
-        Thu, 26 Dec 2024 13:52:36 -0800 (PST)
-Received: from localhost (96.206.236.35.bc.googleusercontent.com. [35.236.206.96])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac2bbfc5sm650803285a.1.2024.12.26.13.52.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Dec 2024 13:52:35 -0800 (PST)
-Date: Thu, 26 Dec 2024 16:52:34 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Mina Almasry <almasrymina@google.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, 
- virtualization@lists.linux.dev, 
- kvm@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- David Ahern <dsahern@kernel.org>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?UTF-8?B?RXVnZW5pbyBQw6lyZXo=?= <eperezma@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, 
- Stefano Garzarella <sgarzare@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, 
- Kaiyuan Zhang <kaiyuanz@google.com>, 
- Pavel Begunkov <asml.silence@gmail.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Samiullah Khawaja <skhawaja@google.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Joe Damato <jdamato@fastly.com>, 
- dw@davidwei.uk
-Message-ID: <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241221004236.2629280-6-almasrymina@google.com>
-References: <20241221004236.2629280-1-almasrymina@google.com>
- <20241221004236.2629280-6-almasrymina@google.com>
-Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
+	s=arc-20240116; t=1735254927; c=relaxed/simple;
+	bh=Vg67eyNzHcCGKRWjI65uIV6Vg/VMsjWn2LyaPMpbY5w=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=kTpodJ541sgVW6k/uS5oN5QbTNOY+64GKv56mFWaJxcYkSa+wdPDxbBX8Q6bFV+Yf6JYRq9fjgLtrl0hd9wk2b54TRrTVJcFMSjL6coggyb2n2xD+r6X2nIsPVuxZZtnC9C/J2eUTAPLvno3D0FE1yW21I4aPxUMhmj37LdgwI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FdJtVIDP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=F6zLdIny; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FdJtVIDP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=F6zLdIny; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5BD61337B3;
+	Thu, 26 Dec 2024 23:15:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1735254923; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ssQ1HAGCvoPKQRFEfOf4wrDlDMGZ60HHjbt1BaV4xS4=;
+	b=FdJtVIDPVRzdvecnJPJOOf2J1Oj26UOc20T0CiHuwvzYg5+BaoBizL1dbt91N1Yp3tAAR6
+	FiKjyQT9aQy59079EerJHfP5Arp60A2XIQRlu/DNvV4OfKDOZJFcm5pUT3p8+0cfUyPKe0
+	WNGFusaGS2HfrWkqG0H3PJshA6Cleok=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1735254923;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ssQ1HAGCvoPKQRFEfOf4wrDlDMGZ60HHjbt1BaV4xS4=;
+	b=F6zLdInyJTJFsgdT1x6JJPDHN6gx9AhIGeoF4UdP+AqTY0la/Sx9DupDDwzua3zW7ag88G
+	r7iKtVxoiiQQ+KDA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1735254923; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ssQ1HAGCvoPKQRFEfOf4wrDlDMGZ60HHjbt1BaV4xS4=;
+	b=FdJtVIDPVRzdvecnJPJOOf2J1Oj26UOc20T0CiHuwvzYg5+BaoBizL1dbt91N1Yp3tAAR6
+	FiKjyQT9aQy59079EerJHfP5Arp60A2XIQRlu/DNvV4OfKDOZJFcm5pUT3p8+0cfUyPKe0
+	WNGFusaGS2HfrWkqG0H3PJshA6Cleok=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1735254923;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ssQ1HAGCvoPKQRFEfOf4wrDlDMGZ60HHjbt1BaV4xS4=;
+	b=F6zLdInyJTJFsgdT1x6JJPDHN6gx9AhIGeoF4UdP+AqTY0la/Sx9DupDDwzua3zW7ag88G
+	r7iKtVxoiiQQ+KDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E5A5E1351A;
+	Thu, 26 Dec 2024 23:15:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id SNLnJYXjbWeKPgAAD6G6ig
+	(envelope-from <neilb@suse.de>); Thu, 26 Dec 2024 23:15:17 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+From: "NeilBrown" <neilb@suse.de>
+To: "Yang Erkun" <yangerkun@huawei.com>
+Cc: chuck.lever@oracle.com, jlayton@kernel.org, okorniev@redhat.com,
+ Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org, anna@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ yangerkun@huawei.com, yangerkun@huaweicloud.com, liumingrui@huawei.com
+Subject: Re: [PATCH v2 4/4] nfsd: fix UAF when access ex_uuid or ex_stats
+In-reply-to: <20241225065908.1547645-5-yangerkun@huawei.com>
+References: <20241225065908.1547645-1-yangerkun@huawei.com>,
+ <20241225065908.1547645-5-yangerkun@huawei.com>
+Date: Fri, 27 Dec 2024 10:15:14 +1100
+Message-id: <173525491450.11072.2429748630003567820@noble.neil.brown.name>
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Mina Almasry wrote:
-> Augment dmabuf binding to be able to handle TX. Additional to all the RX
-> binding, we also create tx_vec and tx_iter needed for the TX path.
-> 
-> Provide API for sendmsg to be able to send dmabufs bound to this device:
-> 
-> - Provide a new dmabuf_tx_cmsg which includes the dmabuf to send from,
->   and the offset into the dmabuf to send from.
-> - MSG_ZEROCOPY with SCM_DEVMEM_DMABUF cmsg indicates send from dma-buf.
-> 
-> Devmem is uncopyable, so piggyback off the existing MSG_ZEROCOPY
-> implementation, while disabling instances where MSG_ZEROCOPY falls back
-> to copying.
-> 
-> We additionally look up the dmabuf to send from by id, then pipe the
-> binding down to the new zerocopy_fill_skb_from_devmem which fills a TX skb
-> with net_iov netmems instead of the traditional page netmems.
-> 
-> We also special case skb_frag_dma_map to return the dma-address of these
-> dmabuf net_iovs instead of attempting to map pages.
-> 
-> Based on work by Stanislav Fomichev <sdf@fomichev.me>. A lot of the meat
-> of the implementation came from devmem TCP RFC v1[1], which included the
-> TX path, but Stan did all the rebasing on top of netmem/net_iov.
-> 
-> Cc: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
+On Wed, 25 Dec 2024, Yang Erkun wrote:
+> We can access exp->ex_stats or exp->ex_uuid in rcu context(c_show and
+> e_show). All these resources should be released using kfree_rcu. Fix this
+> by using call_rcu, clean them all after a rcu grace period.
+>=20
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KASAN: slab-use-after-free in svc_export_show+0x362/0x430 [nfsd]
+> Read of size 1 at addr ff11000010fdc120 by task cat/870
+>=20
+> CPU: 1 UID: 0 PID: 870 Comm: cat Not tainted 6.12.0-rc3+ #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> 1.16.1-2.fc37 04/01/2014
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x53/0x70
+>  print_address_description.constprop.0+0x2c/0x3a0
+>  print_report+0xb9/0x280
+>  kasan_report+0xae/0xe0
+>  svc_export_show+0x362/0x430 [nfsd]
+>  c_show+0x161/0x390 [sunrpc]
+>  seq_read_iter+0x589/0x770
+>  seq_read+0x1e5/0x270
+>  proc_reg_read+0xe1/0x140
+>  vfs_read+0x125/0x530
+>  ksys_read+0xc1/0x160
+>  do_syscall_64+0x5f/0x170
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>=20
+> Allocated by task 830:
+>  kasan_save_stack+0x20/0x40
+>  kasan_save_track+0x14/0x30
+>  __kasan_kmalloc+0x8f/0xa0
+>  __kmalloc_node_track_caller_noprof+0x1bc/0x400
+>  kmemdup_noprof+0x22/0x50
+>  svc_export_parse+0x8a9/0xb80 [nfsd]
+>  cache_do_downcall+0x71/0xa0 [sunrpc]
+>  cache_write_procfs+0x8e/0xd0 [sunrpc]
+>  proc_reg_write+0xe1/0x140
+>  vfs_write+0x1a5/0x6d0
+>  ksys_write+0xc1/0x160
+>  do_syscall_64+0x5f/0x170
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>=20
+> Freed by task 868:
+>  kasan_save_stack+0x20/0x40
+>  kasan_save_track+0x14/0x30
+>  kasan_save_free_info+0x3b/0x60
+>  __kasan_slab_free+0x37/0x50
+>  kfree+0xf3/0x3e0
+>  svc_export_put+0x87/0xb0 [nfsd]
+>  cache_purge+0x17f/0x1f0 [sunrpc]
+>  nfsd_destroy_serv+0x226/0x2d0 [nfsd]
+>  nfsd_svc+0x125/0x1e0 [nfsd]
+>  write_threads+0x16a/0x2a0 [nfsd]
+>  nfsctl_transaction_write+0x74/0xa0 [nfsd]
+>  vfs_write+0x1a5/0x6d0
+>  ksys_write+0xc1/0x160
+>  do_syscall_64+0x5f/0x170
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>=20
+> Fixes: ae74136b4bb6 ("SUNRPC: Allow cache lookups to use RCU protection rat=
+her than the r/w spinlock")
+> Reviewed-by: NeilBrown <neilb@suse.de>
+> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 > ---
->  include/linux/skbuff.h                  | 13 +++-
->  include/net/sock.h                      |  2 +
->  include/uapi/linux/uio.h                |  5 ++
->  net/core/datagram.c                     | 40 ++++++++++-
->  net/core/devmem.c                       | 91 +++++++++++++++++++++++--
->  net/core/devmem.h                       | 40 +++++++++--
->  net/core/netdev-genl.c                  | 65 +++++++++++++++++-
->  net/core/skbuff.c                       |  8 ++-
->  net/core/sock.c                         |  9 +++
->  net/ipv4/tcp.c                          | 36 +++++++---
->  net/vmw_vsock/virtio_transport_common.c |  4 +-
->  11 files changed, 281 insertions(+), 32 deletions(-)
-> 
-
-> +static int zerocopy_fill_skb_from_devmem(struct sk_buff *skb,
-> +					 struct msghdr *msg,
-> +					 struct iov_iter *from, int length)
-> +{
-> +	int i = skb_shinfo(skb)->nr_frags;
-> +	int orig_length = length;
-> +	netmem_ref netmem;
-> +	size_t size;
+>  fs/nfsd/export.c | 19 ++++++++++++++-----
+>  1 file changed, 14 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/fs/nfsd/export.c b/fs/nfsd/export.c
+> index c6168bccfb6c..0363720280d4 100644
+> --- a/fs/nfsd/export.c
+> +++ b/fs/nfsd/export.c
+> @@ -355,16 +355,25 @@ static void export_stats_destroy(struct export_stats =
+*stats)
+>  					    EXP_STATS_COUNTERS_NUM);
+>  }
+> =20
+> -static void svc_export_put(struct kref *ref)
+> +static void svc_export_release(struct rcu_head *rcu_head)
+>  {
+> -	struct svc_export *exp =3D container_of(ref, struct svc_export, h.ref);
+> -	path_put(&exp->ex_path);
+> -	auth_domain_put(exp->ex_client);
+> +	struct svc_export *exp =3D container_of(rcu_head, struct svc_export,
+> +			ex_rcu);
 > +
-> +	while (length && iov_iter_count(from)) {
-> +		if (i == MAX_SKB_FRAGS)
-> +			return -EMSGSIZE;
-> +
-> +		size = min_t(size_t, iter_iov_len(from), length);
-> +		if (!size)
-> +			return -EFAULT;
-
-On error, should caller skb_zerocopy_iter_stream rewind from, rather
-than (or as well as) msg->msg_iter?
-> +
-> +		netmem = net_iov_to_netmem(iter_iov(from)->iov_base);
-> +		get_netmem(netmem);
-> +		skb_add_rx_frag_netmem(skb, i, netmem, from->iov_offset, size,
-> +				       PAGE_SIZE);
-> +
-> +		iov_iter_advance(from, size);
-> +		length -= size;
-> +		i++;
-> +	}
-> +
-> +	iov_iter_advance(&msg->msg_iter, orig_length);
-
-What does this do if sendmsg is called with NULL as buffer?
-> +
-> +	return 0;
+>  	nfsd4_fslocs_free(&exp->ex_fslocs);
+>  	export_stats_destroy(exp->ex_stats);
+>  	kfree(exp->ex_stats);
+>  	kfree(exp->ex_uuid);
+> -	kfree_rcu(exp, ex_rcu);
+> +	kfree(exp);
 > +}
 > +
->  int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
->  			    struct sk_buff *skb, struct iov_iter *from,
-> -			    size_t length)
-> +			    size_t length, bool is_devmem)
->  {
->  	unsigned long orig_size = skb->truesize;
->  	unsigned long truesize;
-> @@ -702,6 +736,8 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
->  
->  	if (msg && msg->msg_ubuf && msg->sg_from_iter)
->  		ret = msg->sg_from_iter(skb, from, length);
-> +	else if (unlikely(is_devmem))
-> +		ret = zerocopy_fill_skb_from_devmem(skb, msg, from, length);
->  	else
->  		ret = zerocopy_fill_skb_from_iter(skb, from, length);
->  
-> @@ -735,7 +771,7 @@ int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *from)
->  	if (skb_copy_datagram_from_iter(skb, 0, from, copy))
->  		return -EFAULT;
->  
-> -	return __zerocopy_sg_from_iter(NULL, NULL, skb, from, ~0U);
-> +	return __zerocopy_sg_from_iter(NULL, NULL, skb, from, ~0U, NULL);
->  }
->  EXPORT_SYMBOL(zerocopy_sg_from_iter);
-
->  struct net_iov *
->  net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_binding *binding)
-> @@ -109,6 +112,13 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
->  	unsigned long xa_idx;
->  	unsigned int rxq_idx;
->  
-> +	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> +
-> +	/* Ensure no tx net_devmem_lookup_dmabuf() are in flight after the
-> +	 * erase.
-> +	 */
-> +	synchronize_net();
-> +
-
-What precisely does this protect?
-
-synchronize_net() ensures no packet is in flight inside an rcu
-readside section. But a packet can still be in flight, such as posted
-to the device or queued in a qdisc.
-
->  	if (binding->list.next)
->  		list_del(&binding->list);
->  
-> @@ -122,8 +132,6 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
->  		WARN_ON(netdev_rx_queue_restart(binding->dev, rxq_idx));
->  	}
->  
-> -	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> -
->  	net_devmem_dmabuf_binding_put(binding);
->  }
->  
-> @@ -174,8 +182,9 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
->  }
->  
->  struct net_devmem_dmabuf_binding *
-> -net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
-> -		       struct netlink_ext_ack *extack)
-> +net_devmem_bind_dmabuf(struct net_device *dev,
-> +		       enum dma_data_direction direction,
-> +		       unsigned int dmabuf_fd, struct netlink_ext_ack *extack)
->  {
->  	struct net_devmem_dmabuf_binding *binding;
->  	static u32 id_alloc_next;
-> @@ -183,6 +192,7 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
->  	struct dma_buf *dmabuf;
->  	unsigned int sg_idx, i;
->  	unsigned long virtual;
-> +	struct iovec *iov;
->  	int err;
->  
->  	dmabuf = dma_buf_get(dmabuf_fd);
-> @@ -218,13 +228,19 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
->  	}
->  
->  	binding->sgt = dma_buf_map_attachment_unlocked(binding->attachment,
-> -						       DMA_FROM_DEVICE);
-> +						       direction);
->  	if (IS_ERR(binding->sgt)) {
->  		err = PTR_ERR(binding->sgt);
->  		NL_SET_ERR_MSG(extack, "Failed to map dmabuf attachment");
->  		goto err_detach;
->  	}
->  
-> +	if (!binding->sgt || binding->sgt->nents == 0) {
-> +		err = -EINVAL;
-> +		NL_SET_ERR_MSG(extack, "Empty dmabuf attachment");
-> +		goto err_detach;
-> +	}
-> +
->  	/* For simplicity we expect to make PAGE_SIZE allocations, but the
->  	 * binding can be much more flexible than that. We may be able to
->  	 * allocate MTU sized chunks here. Leave that for future work...
-> @@ -236,6 +252,19 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
->  		goto err_unmap;
->  	}
->  
-> +	if (direction == DMA_TO_DEVICE) {
-> +		virtual = 0;
-> +		for_each_sgtable_dma_sg(binding->sgt, sg, sg_idx)
-> +			virtual += sg_dma_len(sg);
-> +
-> +		binding->tx_vec = kcalloc(virtual / PAGE_SIZE + 1,
-
-instead of open coding this computation repeatedly, consider a local
-variable. And parentheses and maybe round_up().
-
-> +					  sizeof(struct iovec), GFP_KERNEL);
-> +		if (!binding->tx_vec) {
-> +			err = -ENOMEM;
-> +			goto err_unmap;
-> +		}
-> +	}
-> +
->  	virtual = 0;
->  	for_each_sgtable_dma_sg(binding->sgt, sg, sg_idx) {
->  		dma_addr_t dma_addr = sg_dma_address(sg);
-> @@ -277,11 +306,21 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
->  			niov->owner = owner;
->  			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
->  						      net_devmem_get_dma_addr(niov));
-> +
-> +			if (direction == DMA_TO_DEVICE) {
-> +				iov = &binding->tx_vec[virtual / PAGE_SIZE + i];
-
-why does this start counting at virtual / PAGE_SIZE, rather than 0?
-
-> +				iov->iov_base = niov;
-> +				iov->iov_len = PAGE_SIZE;
-> +			}
->  		}
->  
->  		virtual += len;
->  	}
->  
-> +	if (direction == DMA_TO_DEVICE)
-> +		iov_iter_init(&binding->tx_iter, WRITE, binding->tx_vec,
-> +			      virtual / PAGE_SIZE + 1, virtual);
-> +
->  	return binding;
->  
->  err_free_chunks:
-> @@ -302,6 +341,21 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
->  	return ERR_PTR(err);
->  }
->  
-> +struct net_devmem_dmabuf_binding *net_devmem_lookup_dmabuf(u32 id)
+> +static void svc_export_put(struct kref *ref)
 > +{
-> +	struct net_devmem_dmabuf_binding *binding;
+> +	struct svc_export *exp =3D container_of(ref, struct svc_export, h.ref);
 > +
-> +	rcu_read_lock();
-> +	binding = xa_load(&net_devmem_dmabuf_bindings, id);
-> +	if (binding) {
-> +		if (!net_devmem_dmabuf_binding_get(binding))
-> +			binding = NULL;
-> +	}
-> +	rcu_read_unlock();
-> +
-> +	return binding;
-> +}
-> +
->  void dev_dmabuf_uninstall(struct net_device *dev)
->  {
->  	struct net_devmem_dmabuf_binding *binding;
-> @@ -332,6 +386,33 @@ void net_devmem_put_net_iov(struct net_iov *niov)
->  	net_devmem_dmabuf_binding_put(niov->owner->binding);
+> +	path_put(&exp->ex_path);
+> +	auth_domain_put(exp->ex_client);
+> +	call_rcu(&exp->ex_rcu, svc_export_release);
 >  }
->  
-> +struct net_devmem_dmabuf_binding *
-> +net_devmem_get_sockc_binding(struct sock *sk, struct sockcm_cookie *sockc)
-> +{
-> +	struct net_devmem_dmabuf_binding *binding;
-> +	int err = 0;
-> +
-> +	binding = net_devmem_lookup_dmabuf(sockc->dmabuf_id);
+> =20
 
-This lookup is from global xarray net_devmem_dmabuf_bindings.
+I think that ip_map_put() needs to be fixed for the same reason that
+svc_export_put() needed to be fixed.
 
-Is there a check that the socket is sending out through the device
-to which this dmabuf was bound with netlink? Should there be?
-(e.g., SO_BINDTODEVICE).
+ip_map_put() calls auth_domain_put() in ->im_client immediately, but
+ip_map_show() accesses ->im_client.
+So ip_map_put() needs to delay the auth_domain_put() using rcu.
 
-> +	if (!binding || !binding->tx_vec) {
-> +		err = -EINVAL;
-> +		goto out_err;
-> +	}
-> +
-> +	if (sock_net(sk) != dev_net(binding->dev)) {
-> +		err = -ENODEV;
-> +		goto out_err;
-> +	}
-> +
-> +	iov_iter_advance(&binding->tx_iter, sockc->dmabuf_offset);
-> +	return binding;
-> +
-> +out_err:
-> +	if (binding)
-> +		net_devmem_dmabuf_binding_put(binding);
-> +
-> +	return ERR_PTR(err);
-> +}
-> +
->  /*** "Dmabuf devmem memory provider" ***/
->  
+These two fixes should really be *before* patch 3/4 as without these
+fixes 3/4 introduces a bug.
 
-> @@ -1063,6 +1064,15 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
->  
->  	flags = msg->msg_flags;
->  
-> +	sockcm_init(&sockc, sk);
-> +	if (msg->msg_controllen) {
-> +		err = sock_cmsg_send(sk, msg, &sockc);
-> +		if (unlikely(err)) {
-> +			err = -EINVAL;
-> +			goto out_err;
-> +		}
-> +	}
-> +
->  	if ((flags & MSG_ZEROCOPY) && size) {
->  		if (msg->msg_ubuf) {
->  			uarg = msg->msg_ubuf;
-> @@ -1080,6 +1090,15 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
->  			else
->  				uarg_to_msgzc(uarg)->zerocopy = 0;
->  		}
-> +
-> +		if (sockc.dmabuf_id != 0) {
-> +			binding = net_devmem_get_sockc_binding(sk, &sockc);
-> +			if (IS_ERR(binding)) {
-> +				err = PTR_ERR(binding);
-> +				binding = NULL;
-> +				goto out_err;
-> +			}
-> +		}
+Thanks,
+NeilBrown
+
+Thanks,=20
 
