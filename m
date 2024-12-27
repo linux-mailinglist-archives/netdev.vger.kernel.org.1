@@ -1,93 +1,98 @@
-Return-Path: <netdev+bounces-154386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 324D79FD780
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 20:23:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007FD9FD785
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 20:30:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEFDF1881322
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 19:23:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A6221883490
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 19:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E22A1F8692;
-	Fri, 27 Dec 2024 19:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86ADC13C3D5;
+	Fri, 27 Dec 2024 19:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJHJKmnc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vJSwEEnM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72ACE433D9;
-	Fri, 27 Dec 2024 19:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CB71F8AF3;
+	Fri, 27 Dec 2024 19:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735327386; cv=none; b=NY59rrkSumq9gxGtn4NZGy8ILs0voimfpaVTLpnB9qOUojm44VwafZmZ8e6HoSmHPgvDgtPF4Ligaqpa3YTNodkC1X4fw9Om0Ftd7AOUk+ALzMgTINZZfy8i+/UZN89SxaqfP2TA8S8hWcfk4bxh++vo8o19SADVCJ1ipeuUhPM=
+	t=1735327813; cv=none; b=loiLxqJZWuD2YTp5b5n9Kkh/+iKmq7mIdtjdTtUoxw4FxmpYGNgp6aUXs7B/Iut28BZ9rL9ag7CkIDVfdAYmjwlJ+RMw30uLcrGA6uph7llyFitj1MD+OZ3yZMx3iWt353jiIxt35sDWUeP3zRgaNOVVyHeXscMz4/zX9OOEyyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735327386; c=relaxed/simple;
-	bh=TB3R6A9GdrG0tsGUXNH7POvpBtw6uAWDlM4LOyZuXzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D/mYS7P2a4eiiLO/smKJai9FHSbd9cxKajlyMxRR7JIS+AdzdpIQ4JlZWUWuMRwd9R836AMbZkxYPjOL381PyjBzk7Dg1U2f54M0f6zBt3EjwGIb02FR93yJagEUACLiEEVvB4I/BGQffWci8uN3+FZs8bXnbOeu7Wg3TBXO8HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJHJKmnc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F408EC4CED0;
-	Fri, 27 Dec 2024 19:23:04 +0000 (UTC)
+	s=arc-20240116; t=1735327813; c=relaxed/simple;
+	bh=QAQcu0WRZ3ePW3JDQly6Lnvr7DD08UKWzYy47eQyZJk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZJnwiWTTE2qiBh6YOBzd8AnTAtXAetnmqWbA/agrqIGJbj0a3RvVHY2atbmndUcEF/hNRBAFmshaw+xI5c7bna9/2fdCUWhzC61/1YQRWfRY4HwLKxYCfucrJlWxn87R7DHsLcW0FdPTIgeh64k+dWEoJ3yDNBPVvRpk/pQ7H8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vJSwEEnM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BED82C4CED0;
+	Fri, 27 Dec 2024 19:30:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735327386;
-	bh=TB3R6A9GdrG0tsGUXNH7POvpBtw6uAWDlM4LOyZuXzc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MJHJKmncdPY3+hC7Qx1VCE4cFi5wzpCNFSy7waCbsN98GTl+FW0BE104zPKV0C7Rv
-	 d/rnNeiAHMtiRMYgEVqBhHonsUkvKxfIICXMkH2dXtqWttO2kem7toK+NQnq2N0sZA
-	 epVAkUAdA48sM48NmlZytTrbmyBPPk+9gX8fGhkyPu8qibKX2cv9Ldna0/bv9Vw5Ge
-	 xsK7mJT3cQBVHcrCM/G3GjTj2XFp0xnWpAzISwON5ke02+5Y9Zkoc5HC4/ktwI6RGY
-	 LaYdNCznfkxCSp7ayV4mQiA+PIHxeTslD772mNHqmaLPGpIvkd6okn6h4r5Gz9IaIr
-	 qO5O6ocmh5CpA==
-Date: Fri, 27 Dec 2024 11:23:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, davem@davemloft.net,
- edumazet@google.com, dsahern@kernel.org, pabeni@redhat.com,
- joel.granados@kernel.org, andrew+netdev@lunn.ch, horms@kernel.org,
- pablo@netfilter.org, kadlec@netfilter.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, shenjian15@huawei.com, salil.mehta@huawei.com,
- shaojijie@huawei.com, saeedm@nvidia.com, tariqt@nvidia.com, mst@redhat.com,
- jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- virtualization@lists.linux.dev, ij@kernel.org, ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
-Subject: Re: [PATCH v6 net-next 00/14] AccECN protocol preparation patch
- series
-Message-ID: <20241227112304.0c1a7b1b@kernel.org>
-In-Reply-To: <20241227191211.12485-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20241227191211.12485-1-chia-yu.chang@nokia-bell-labs.com>
+	s=k20201202; t=1735327812;
+	bh=QAQcu0WRZ3ePW3JDQly6Lnvr7DD08UKWzYy47eQyZJk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=vJSwEEnM994JBQWan5e+RdD2q8JTWT4r0vo9ZO1N9WK/Ma/zlZdrAR5p3FDaXLSWX
+	 yLtqV42w0wxfyrjdVEYjA+EluPbH5pg2SeONFoElj38jmod9PSwNtlnNPKYM1LoToe
+	 j1OsMEy/3zN7r+TOTpWnRmKHNUpX2dOt28J6qrk1oGT4nJvBq0KwH9mVHjaNqhUw8Y
+	 7nGV+zK8iRyafTZ7HTdlyimBfOSYyFzRtFkHYrt4YqRO4kiaAliWdcwQZtLlBU2Skw
+	 NBcDZ/324fqliT+uGAEaOzbjgMlKPKcbDpMw/B7JeQiHbTMoPG+tpWenGulWOU9P5o
+	 9zbWbZ3cmlwlQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34064380A955;
+	Fri, 27 Dec 2024 19:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 0/3] netlink: specs: mptcp: fixes for some
+ descriptions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173532783201.575952.5509666590486709337.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Dec 2024 19:30:32 +0000
+References: <20241221-net-mptcp-netlink-specs-pm-doc-fixes-v2-0-e54f2db3f844@kernel.org>
+In-Reply-To: <20241221-net-mptcp-netlink-specs-pm-doc-fixes-v2-0-e54f2db3f844@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ dcaratti@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, 27 Dec 2024 20:11:57 +0100 chia-yu.chang@nokia-bell-labs.com
-wrote:
-> Hello
+Hello:
 
-Hello.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Someone may still review, but:
+On Sat, 21 Dec 2024 12:09:13 +0100 you wrote:
+> When looking at the MPTCP PM Netlink specs rendered version [1], a few
+> small issues have been found with the descriptions, and fixed here:
+> 
+> - Patch 1: add a missing attribute for two events. For >= v5.19.
+> 
+> - Patch 2: clearly mention the attributes. For >= v6.7.
+> 
+> [...]
 
-## Form letter - winter-break
+Here is the summary with links:
+  - [net,v2,1/3] netlink: specs: mptcp: add missing 'server-side' attr
+    https://git.kernel.org/netdev/net/c/6b830c6a023f
+  - [net,v2,2/3] netlink: specs: mptcp: clearly mention attributes
+    https://git.kernel.org/netdev/net/c/bea87657b5ee
+  - [net,v2,3/3] netlink: specs: mptcp: fix missing doc
+    https://git.kernel.org/netdev/net/c/4f363fe9f6b2
 
-Networking development is suspended for winter holidays, until Jan 2nd.
-We are currently accepting bug fixes only, see the announcements at:
-
-https://lore.kernel.org/20241211164022.6a075d3a@kernel.org
-https://lore.kernel.org/20241220182851.7acb6416@kernel.org
-
-RFC patches sent for review only are welcome at any time.
+You are awesome, thank you!
 -- 
-pw-bot: defer
-pv-bot: closed
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
