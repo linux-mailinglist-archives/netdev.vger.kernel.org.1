@@ -1,163 +1,318 @@
-Return-Path: <netdev+bounces-154331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 367799FD0B6
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 08:03:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1669FD0BD
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 08:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB46A18837D8
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 07:03:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 256AD161DE0
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 07:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58AE513D619;
-	Fri, 27 Dec 2024 07:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD47F13D244;
+	Fri, 27 Dec 2024 07:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6KvYNQJ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JmrwFxnc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2046.outbound.protection.outlook.com [40.107.244.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A3F13BC39;
-	Fri, 27 Dec 2024 07:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735283004; cv=none; b=MFzMEqncBRCrQ6R6TSu7NnXrXkjFRTdaIG633cVAJOjEsj92qALWVOdzDRbNFscGt15xRS5Jbt6U+F5G7IH5INnh54plgFmAZpl1H+ObGe0TgaoteiczzOJJzWBeZH63S5uWMz6QE2ACiC8P2nBccvv6jUM5l9d1lcW3S9769hQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735283004; c=relaxed/simple;
-	bh=+7ck8eAbEdbMq4FfV8jX2AlQfAJ1DVeuk+4RvANLiyw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c6OiHTB68lZbH2tDCkqBe+eCZ7+cAWF0j3deWaI/rfV7GpDwGSmgGQEQb3JYDtxVwMmOOEWeGmPnR/KwHcwC1ZbjuIPE5jFH9GG/ZA0DEj1eTCsYtqXUAENqqS3IHkOo1pZFg4ok1bzBVnzz1i719KcEIWmEsTr7q19tFIViCU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r6KvYNQJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C9DBC4CED0;
-	Fri, 27 Dec 2024 07:03:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735283003;
-	bh=+7ck8eAbEdbMq4FfV8jX2AlQfAJ1DVeuk+4RvANLiyw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=r6KvYNQJk2bTM+Lwx3TNBJUSgFN7bCJfYRhow8KY3L4fvo5mTd81stGiWryv4UxU7
-	 mQEvICFXIPeiyI3BKWoMS/AbdxyM08xZBi2XQrnucorQCdY2cy+Lzr/pIvHWbcoiPA
-	 tuWj0Vj2GHqKzYBgm7t4WQEJq4XLJNN1OeNkn5gt1oMAOIJjiVpV6kaeAj1ufhNb7w
-	 bfrzhAKq1mqfm5kYCrQv7llX7LFRcskyYgeh7qCHfaTmqsrlRdNoRqHxFpqZ0tkrC/
-	 t7+yt8cNiRZZxNGuiFKbAw6CQ/vEi2LUV+hmoimfGZknma1dTzQXYek6RHyiolamb0
-	 dg/w9deH6ulvQ==
-Message-ID: <df1e2fbd-7fae-4910-9908-10fdb78e4299@kernel.org>
-Date: Fri, 27 Dec 2024 08:03:15 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152B21E495;
+	Fri, 27 Dec 2024 07:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735283293; cv=fail; b=vDlCIn/ULDCNGnpufU4hBN+PE3nk9xrZ7+gfOiXaSv/mUW0hOsNWZb+Iv+P0Cg020HmTqzdsYcbGVwbe2J0zbLkQfy/7f09E/mDg6kV9wEWnisjpb+2BCQy1wXbPR+Ohht+few5QGltfM/FwRCzt0DOHDhT2TSecypSMcNReCUo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735283293; c=relaxed/simple;
+	bh=4uaoNvydhbdgp22Vs4pdeBkZ6y3rw0DyUlGNHFHXr/w=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KwkvVWzIBWXxUUh9AkjhE8Mf5Ft/W5UzO/98WsMnQNktOT0J/JjMQHlXb5RKVfb/bPSP9aOiK4KxZnY/RBRGoioaXHBLyX+X576U6iNkaOTFvResh61aIDbiN3tmsmd5nQ+fq07VZ+EnxucA3Fl+N3H8uskFtQymGQOP7s7OyKA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JmrwFxnc; arc=fail smtp.client-ip=40.107.244.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Tg4JIfaTOKgqu4UZb8oYQttimZHRgZKA4IxYL41+U94zxmV7oHI3PMbi2h/0iQVkpnVWwkYquWGs3iJAK/T5OuHKKStL4elxgUdJ/8lDM56/O23OG4ljGavFdZcYkPxGhKy2A3eBj6ZcWNTmhtEh8Qz8RG9SHRUynoSWtne+/xmbDBrQf2BzaWvXQDPjwux1J/SNXQX64AIbs92pGpGXBXHz61E3Zv04Wn7hL02Kok24l+DTfVpPM5nguJsAQqQArGXOpNc490388LLlazmpVpV7yxDpQAe3cHeRuhUPM4tn+Ne2cRy66c4frCcu8D6bZX6a5EENggQLxc7urozewg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q5aGCaZIMOZIYMOax5nHjwmXjxo44BhRKU/6h/XyGNQ=;
+ b=ESJB5HzNwL2kCfr9KvBLuMwbfDQjm0+I4AC0ti7v39QLR3ZSSY/r6URAKV1J9A3NnP9haXyylkzwLD2NzQwXbIEw99G/Vjnrs4v63Hq+He8VxmC3vf3T4lxgJlt2UswXsmcGj22m+L9eD9ddQRHOynPpbIhWWjB7daTb/lYo8dscAxBdQ/Cebrk81VW9SmDrY4xnrbsrHcy4EZ0XxeSBm6u7gcYhOItd9zGaoZVIFRofHlA56z+mm8aywad6OECrME37j3cWqhxNoJa/h4tC6z2emK73eblyKi2a8dlR+KaC1MQozB2abhJ6CoHDO5n0+he1kHLDl4ZvVeXRYJO4Kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q5aGCaZIMOZIYMOax5nHjwmXjxo44BhRKU/6h/XyGNQ=;
+ b=JmrwFxnctZs2GgAg3wVycGaU0iHuBQAbHS38y5x3fOK5IXAPogKWi6SRFTri9y1OnNmc7CGGILoE5diJaVvLQT8wlHSYWyQRFZV2fVl5zJozWhrRzW4cY5lPHv7o2QhSaEhrazd+LhgN5d5Z455oW8BDEhRk2fzMUFwB/wfVndw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by DM6PR12MB4170.namprd12.prod.outlook.com (2603:10b6:5:219::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.16; Fri, 27 Dec
+ 2024 07:08:06 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8293.000; Fri, 27 Dec 2024
+ 07:08:06 +0000
+Message-ID: <81786f5a-42b0-2e5a-c2d6-bfd93b366d97@amd.com>
+Date: Fri, 27 Dec 2024 07:07:59 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v8 03/27] cxl: add capabilities field to cxl_dev_state and
+ cxl_port
+Content-Language: en-US
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, dave.jiang@intel.com
+References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
+ <20241216161042.42108-4-alejandro.lucero-palau@amd.com>
+ <20241224170855.0000295c@huawei.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20241224170855.0000295c@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MR2P264CA0059.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:500:31::23) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] net: stmmac: qcom-ethqos: Enable RX programmable swap
- on qcs615
-To: Yijie Yang <quic_yijiyang@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
- <20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com>
- <4b4ef1c1-a20b-4b65-ad37-b9aabe074ae1@kernel.org>
- <278de6e8-de8f-458a-a4b9-92b3eb81fa77@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <278de6e8-de8f-458a-a4b9-92b3eb81fa77@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DM6PR12MB4170:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0718f55c-10f4-4a7e-7bb8-08dd26453621
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NWpvZXNkUlJvK1NvSVVVUEJDRWt0OUJTclZvT1VHV014cklLMElnRDRIdHls?=
+ =?utf-8?B?emxMZTVUM1ZZVnVaaWNocldtYnVVcTlBcW9qU2RndzhSY2RqMHpIcW5adlFu?=
+ =?utf-8?B?aDJOemlQa1NrcDZNQXBDcE9qai9PTkJaZ2tRQXgxWnZrUGYvK2FQSWFaZEZv?=
+ =?utf-8?B?blFmY0F1eW1kUVZnQ2pUTlF5UVVSbXpjRHcrZlBYZFBGYWRQMyt3Z3pwWG14?=
+ =?utf-8?B?Y1I4aXo0ZE8ySERwdG9LdjIvYWhIRytJYXhFdFpINUNpaHJZcHFOM0I5MHNv?=
+ =?utf-8?B?WERSWTVQd0tiQVlZNmpkaFpDdk1VM3p0UkRjc01BclgybjgvcEwzZFhTUEpQ?=
+ =?utf-8?B?S1N5eWYwNFRmcWYxSzI0Uzl0WEpNdllVMjFJRlVYbE14SUhIN3hpNjlUWDRD?=
+ =?utf-8?B?YjM3emJXdDVMOHRFdE5pWGNiZzlMWGFLR1F2SHFGRFR6ZldZRy8wWnVEWTlX?=
+ =?utf-8?B?MWd3K1VDU21KVjZheVdMYk1BWmZTRkZDMmI3dzVvR3hZRDgwUzIzbjR3Tnd2?=
+ =?utf-8?B?SHpUbjkzeGF2Y3cyMlBicm9YQitUQk5VMk9EYURKdUMvWnlaZm1uTHV4MlUr?=
+ =?utf-8?B?MmZoY2dTRXhNOURxZGh1ZEoycTVmVElIeVF0R1k4cnY3bWQzVndjVi96bzI5?=
+ =?utf-8?B?T1lXYmx6WUdoZ1hFUDNDZHhYYVVGWlhjQ2hHTWpMZHNGUE5FSVljUkJhb1Ft?=
+ =?utf-8?B?c05vVEVGR1AvMDFDV0FpcGNKVWt0cjFtZ2FQc3pwc3lGQ3VXVUJCQUp2Q1VU?=
+ =?utf-8?B?NTVuSGZqaEkyVTFzL0ZuMHlGM2tqVTZNT2Z4UlZDRk5idnJoT1R4OGRpU2Fu?=
+ =?utf-8?B?L3p2L1lwOVZ4dkV0bnJhazZUdXY4bEZFSEo2NWI0dmdKK2RVaEFIYmxVL0dZ?=
+ =?utf-8?B?QkI1blNFa1J1S0tsQnZhbWc3c21pMmVSWWZVT2d5bGw0VDBZWjBjWk5oM2Yx?=
+ =?utf-8?B?azByL3AyNjljUXR4QUZTUVRXS2Q4Z0tYNTNBYjljTm5BVm9TK2loVmxKTkgw?=
+ =?utf-8?B?WUc5RzE1QVJyZ0lqNnB6ajNGVWJaN1Bob3BuN0llVXNDV3V6SUdWdmJHVVZm?=
+ =?utf-8?B?Rjd1dDlDR2JqcHhBU0NXbzZmZkRaNXBzRk1BbW8wTFlURXpzcmh2MXBEQVRG?=
+ =?utf-8?B?YWZpdVRUdGYvcTRHaFYycFRGakhYdEVtZ1NDbXRLQTBITk9mdVpVbCtBZzhh?=
+ =?utf-8?B?Q3Zma2w0RmRuaHBtemxpRVlsS2FvcUdpcVFhYk9Vak5zSllhaGRmS3pXTFFx?=
+ =?utf-8?B?TzFQOVg5RHhldkpLTURpTkZmSkhJTEh6dkVxV2dRUVNIZ3NlRDRVRFBTWENI?=
+ =?utf-8?B?Z1MxdHowaVVrdEJYL2VwTXI0TkRxYW9DenBxbldrc0thVjZuNk5JQXJMdG9k?=
+ =?utf-8?B?YlZJNVU5UVIyT1RiNVR4SmhYZlU4V0FYdXdzbkVVbXhJVEdyRTFwWmhoSDdo?=
+ =?utf-8?B?STdFTzExUGpjUFhIWlRhREdkMGxRejZ6R05oUEY3dTdIZ251UWpPQXRyYmhI?=
+ =?utf-8?B?VDM4cTVhVG5IdDQ0SklVbGE3bVZPck1ONkNlNzBnbWxPd3o4QjQ5Z056d3ZJ?=
+ =?utf-8?B?YjNnRUJLbWREZkVFZ254ci9YZUt2NHBRSUFlaHpSMmM0NW9EQnZHSlU0Nzd2?=
+ =?utf-8?B?SWE1L0pLTkNsN2doWTJxcUsyazZCRDY3Y3VHcXRxTjQ3NWRMb0JRNnVSVG0w?=
+ =?utf-8?B?OXdiRVFBN25VU2l5SXc3R0h6MGlXakZqc0ZqdUhyYnJWZloxOXF0dXlGeVpk?=
+ =?utf-8?B?TkRkbStYeU54K0taZzQ2VC9FT1VaMXFUdmxUU0svN3lCVzhaRWh3cDJDZUt1?=
+ =?utf-8?B?UkoyWk5wSzR5Z2JUOGRIV0podGhCV1FHRXBJNkMxayt0Rkg2OXVVRERMeFJL?=
+ =?utf-8?Q?5IupG/LfgDBVd?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WVRiVGdCRlV5Rkw5Q1lvV0tzMW1jNTFqQkYxdmpMOEVuSmd0TkhRZmdsUUl0?=
+ =?utf-8?B?eGF4eVR0QVlhUmRTSzZ3S29leFEwOUg0QUZ6TEVRL2ltN0F6SXhmUVFzWHla?=
+ =?utf-8?B?M05pSlJ1WGFYSzlLb2tHZDVqbjlCRWY5S1Nnek1jYU5FUnJMbUxvT1ZtbzUx?=
+ =?utf-8?B?UzlPRGN3MUpBbVZmUkJqcnB2MDIwajhkSlVBcmU3SmUxaUlsWDVsMC9rNUhq?=
+ =?utf-8?B?Y1k5NFNxejdnc0lDRzluZ3p0dCtHY2F1RDBpSElHVytnQjlyK3FZMDVCYm9P?=
+ =?utf-8?B?bndDQ3ZKVmg4ODk2dXRFR3pIQVg3R2pwZ1dWaTNwU0VTZXNFdzM0bjBwRTVH?=
+ =?utf-8?B?MVc0NitIcm4wY1FySEZ1NWJkUktMUDZidW01bjk5MW9kcHVpRi8wcWZCaUtO?=
+ =?utf-8?B?OWNJai9pWDZrTjZzcXNtTzI2b1o3cG1pRjRNTHk5aTRra0ozTE10OG5DajAz?=
+ =?utf-8?B?QVRNRDE4ZXFpa2RzUUVDMVFjWXA3RkFWb3BsRmtrdVVEVVpEeDEwNWRiSEw0?=
+ =?utf-8?B?c01rTlB1eVBVQWtQS2dCNkhpbldoTzlJOExWMXlJbnhGYW5uRk9JTDI1Y1BH?=
+ =?utf-8?B?c1pvcFF1bG9sYnVBcThJTlNBRmk5QWhXNEova0tneXFMa1p5bGZnV1FMa1VB?=
+ =?utf-8?B?QlJOMGJpeWFQdS9EUU9xYmlBMUhWTDM2d1BOL01UNmJOeEl3VGdoaE1HVFRx?=
+ =?utf-8?B?Sit4MFhYVTJGYTFrOGN6N3FpZnB6SE5nZkVVWXB6L0pzcHNIeXJERTAxMGQw?=
+ =?utf-8?B?K2JObkN0aFVSN2M2MU1VMUhMMmNvMXhERGsyUnNvaTJtVFFZQTAyQVdpd0dv?=
+ =?utf-8?B?cThucHpkZFp5QVc4Y1VRZkVSSWJqa3JFZmY2dGdYRklPb2JNdXFLRjRFbzJY?=
+ =?utf-8?B?V2FmRXprR0VKaTM3S0YyMm9rODQ2MVJUczF1TWk1c043YzlmLzU1Tkw3ckV1?=
+ =?utf-8?B?cUplWjJpWDVpbk9xbDF5enduTElPRGZpclJkOUo1Vm1idWh1SFRUTWlVbjJr?=
+ =?utf-8?B?dWltZVBSZXJWaU5qV2xXQTRwWk9kWWR6cjRNb2t3R3hmc29lbmxuNStuUjRZ?=
+ =?utf-8?B?UmU2UktNVmkrQVVDWENoT1hYUkxMTzgrOUxnSGxsU3YyR2xZS1hPbDl3b3dy?=
+ =?utf-8?B?VFdNcEkxRk5BMUt2MlFSZWdUYnBQRTl1TEMxZHhjOWt3aDlPUkg1UmN6NDdZ?=
+ =?utf-8?B?bXNZL3BzVTNGVHRDekYrVFl5V1lkYjByMmtYSFdERytWa2RDbmlwWi9iRzBq?=
+ =?utf-8?B?RjA0VWtTSmswekRiQTM0NnkxYkJURHp4RmdPRDVueXRhWSs3WUgxSGJ5U0Q2?=
+ =?utf-8?B?bGEzMVRUU0NBaHN0VUQxSDNHZjlxRW9ycXE2OE1KaHlLZkRlNmRFNHRJbUN2?=
+ =?utf-8?B?ajlSQlFRUzZyR1IwQnhGbWtrM0V4YTV2NDA4cC9TOWZ2NlRxVFJudkREVXMy?=
+ =?utf-8?B?S3pWNWdsYjFFeFloQnREdjFlY3MwTnRsNS9QTmlCVGtBSC9RamFmS0kvRDQ1?=
+ =?utf-8?B?NHZXOWVLNDRTSnhkOHFGekk2NXJSbk9SbGI3NTJkcVVTTm8ycXkxWTRQaDVw?=
+ =?utf-8?B?VGoyWHlyNmZzNGIyTExVbXNRRUpuMjdtNFhqbTdvUzgvcHhOYzZMczZmaXZ1?=
+ =?utf-8?B?M1ZYbXlRU1JiclgxSzhMcHhBZ0RRdWdTNFNjb0xqMmwrUkx3azJMek5LNGM1?=
+ =?utf-8?B?TXI4a0FIanpvOUpBcUJSYnZtN1NWUE5kOEFFclA2dXhlY2RJK1pNMSszd2FE?=
+ =?utf-8?B?VVdLbnJUT2JoL2NzZzBUMUFiMzNvanRNVGN4TU92aTFWQ3dZSG11NUtPeEZu?=
+ =?utf-8?B?bFBCaTZvaEJ4OU1wTjNJODMybGRubG9ZeW9JZHc0RWgybmM2UldMS2pCZFFj?=
+ =?utf-8?B?L0QrM1VLR2xiU0dCdWhqMGpadi9jVmlFUXJxV00wOXBORE1BMTUxRXRpcjht?=
+ =?utf-8?B?UFFVTXJGeDB3ZzBKNytXU0RXOUw4eWtBQk01NkVNSFZ1c1owcWVvdE5PUHhp?=
+ =?utf-8?B?dUVzSnJEUldGWXB0bGorN2l3eVBUV1FHbHhxRWRGWkd1WG1zYkhMU2tkejdv?=
+ =?utf-8?B?YkxaR3IzdVZVampzZjQrSitoclp5UldDTVZEYUh0OW5WSG9oU0pUMytZSGlR?=
+ =?utf-8?Q?Cuvxpo+44N+g3aTPldly5hOeI?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0718f55c-10f4-4a7e-7bb8-08dd26453621
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Dec 2024 07:08:06.1408
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EcCNdNHWsfp1jYObQosjzOPmIirrTSPHNj0FBkveQ/RQaqX+6wLJ6/AgE/thFgy/rg1HY9XcXYPa/qTK26369Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4170
 
-On 26/12/2024 03:29, Yijie Yang wrote:
-> 
-> 
-> On 2024-12-25 19:37, Krzysztof Kozlowski wrote:
->> On 25/12/2024 11:04, Yijie Yang wrote:
+
+On 12/24/24 17:08, Jonathan Cameron wrote:
+> On Mon, 16 Dec 2024 16:10:18 +0000
+> <alejandro.lucero-palau@amd.com> wrote:
+>
+>> From: Alejandro Lucero <alucerop@amd.com>
 >>
->>>   static int qcom_ethqos_probe(struct platform_device *pdev)
->>>   {
->>> -	struct device_node *np = pdev->dev.of_node;
->>> +	struct device_node *np = pdev->dev.of_node, *root;
->>>   	const struct ethqos_emac_driver_data *data;
->>>   	struct plat_stmmacenet_data *plat_dat;
->>>   	struct stmmac_resources stmmac_res;
->>> @@ -810,6 +805,15 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>>   	ret = of_get_phy_mode(np, &ethqos->phy_mode);
->>>   	if (ret)
->>>   		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
->>> +
->>> +	root = of_find_node_by_path("/");
->>> +	if (root && of_device_is_compatible(root, "qcom,sa8540p-ride"))
+>> Type2 devices have some Type3 functionalities as optional like an mbox
+>> or an hdm decoder, and CXL core needs a way to know what an CXL accelerator
+>> implements.
 >>
+>> Add a new field to cxl_dev_state for keeping device capabilities as
+>> discovered during initialization. Add same field to cxl_port as registers
+>> discovery is also used during port initialization.
 >>
->> Nope, your drivers are not supposed to poke root compatibles. Drop and
->> fix your driver to behave correctly for all existing devices.
->>
-> 
-> Since this change introduces a new flag in the DTS, we must maintain ABI 
-> compatibility with the kernel. The new flag is specific to the board, so 
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+>> Reviewed-by: Fan Ni <fan.ni@samsung.com>
+> Use set_bit() not dereference and |= to set the bits in the bitmap
+> At that point you can void need to force the length of the bitmap.
+>
+> Jonathan
+>
+>> diff --git a/drivers/cxl/core/regs.c b/drivers/cxl/core/regs.c
+>> index 59cb35b40c7e..ac3a27c6e442 100644
+>> --- a/drivers/cxl/core/regs.c
+>> +++ b/drivers/cxl/core/regs.c
+>> @@ -113,11 +118,12 @@ EXPORT_SYMBOL_NS_GPL(cxl_probe_component_regs, "CXL");
+>>    * @dev: Host device of the @base mapping
+>>    * @base: Mapping of CXL 2.0 8.2.8 CXL Device Register Interface
+>>    * @map: Map object describing the register block information found
+>> + * @caps: capabilities to be set when discovered
+>>    *
+>>    * Probe for device register information and return it in map object.
+>>    */
+>>   void cxl_probe_device_regs(struct device *dev, void __iomem *base,
+>> -			   struct cxl_device_reg_map *map)
+>> +			   struct cxl_device_reg_map *map, unsigned long *caps)
+>>   {
+>>   	int cap, cap_count;
+>>   	u64 cap_array;
+>> @@ -146,10 +152,12 @@ void cxl_probe_device_regs(struct device *dev, void __iomem *base,
+>>   		case CXLDEV_CAP_CAP_ID_DEVICE_STATUS:
+>>   			dev_dbg(dev, "found Status capability (0x%x)\n", offset);
+>>   			rmap = &map->status;
+>> +			*caps |= BIT(CXL_DEV_CAP_DEV_STATUS);
+>>   			break;
+>>   		case CXLDEV_CAP_CAP_ID_PRIMARY_MAILBOX:
+>>   			dev_dbg(dev, "found Mailbox capability (0x%x)\n", offset);
+>>   			rmap = &map->mbox;
+>> +			*caps |= BIT(CXL_DEV_CAP_MAILBOX_PRIMARY);
+>>   			break;
+>>   		case CXLDEV_CAP_CAP_ID_SECONDARY_MAILBOX:
+>>   			dev_dbg(dev, "found Secondary Mailbox capability (0x%x)\n", offset);
+>> @@ -157,6 +165,7 @@ void cxl_probe_device_regs(struct device *dev, void __iomem *base,
+>>   		case CXLDEV_CAP_CAP_ID_MEMDEV:
+>>   			dev_dbg(dev, "found Memory Device capability (0x%x)\n", offset);
+>>   			rmap = &map->memdev;
+>> +			*caps |= BIT(CXL_DEV_CAP_MEMDEV);
+> Ah. That would will be why the 64 below. use set_bit() for these, not a dereference.
+>
 
-It's not, I don't see it specific to the board in the bindings.
+Makes sense.
 
-> I need to ensure root nodes are matched to allow older boards to 
-> continue functioning as before. I'm happy to adopt that approach if 
-> there are any more elegant solutions.
-
-I don't think you understood the problem. Why you are not handling this
-for my board, sa8775p-rideX and sa8225-pre-ride-yellow-shrimp?
+I'll do it.
 
 
-Best regards,
-Krzysztof
+>>   			break;
+>>   		default:
+>>   			if (cap_id >= 0x8000)
+>> @@ -421,7 +430,7 @@ static void cxl_unmap_regblock(struct cxl_register_map *map)
+>>   	map->base = NULL;
+>>   }
+>>   
+>> -static int cxl_probe_regs(struct cxl_register_map *map)
+>> +static int cxl_probe_regs(struct cxl_register_map *map, unsigned long *caps)
+>>   {
+>>   	struct cxl_component_reg_map *comp_map;
+>>   	struct cxl_device_reg_map *dev_map;
+>> @@ -431,12 +440,12 @@ static int cxl_probe_regs(struct cxl_register_map *map)
+>>   	switch (map->reg_type) {
+>>   	case CXL_REGLOC_RBI_COMPONENT:
+>>   		comp_map = &map->component_map;
+>> -		cxl_probe_component_regs(host, base, comp_map);
+>> +		cxl_probe_component_regs(host, base, comp_map, caps);
+>>   		dev_dbg(host, "Set up component registers\n");
+>>   		break;
+>>   	case CXL_REGLOC_RBI_MEMDEV:
+>>   		dev_map = &map->device_map;
+>> -		cxl_probe_device_regs(host, base, dev_map);
+>> +		cxl_probe_device_regs(host, base, dev_map, caps);
+>>   		if (!dev_map->status.valid || !dev_map->mbox.valid ||
+>>   		    !dev_map->memdev.valid) {
+>>   			dev_err(host, "registers not found: %s%s%s\n",
+>> @@ -455,7 +464,7 @@ static int cxl_probe_regs(struct cxl_register_map *map)
+>>   	return 0;
+>>   }
+>> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+>> index 19e5d883557a..f656fcd4945f 100644
+>> --- a/include/cxl/cxl.h
+>> +++ b/include/cxl/cxl.h
+>> @@ -12,6 +12,25 @@ enum cxl_resource {
+>>   	CXL_RES_PMEM,
+>>   };
+>>   
+>> +/* Capabilities as defined for:
+>> + *
+>> + *	Component Registers (Table 8-22 CXL 3.1 specification)
+>> + *	Device Registers (8.2.8.2.1 CXL 3.1 specification)
+>> + *
+>> + * and currently being used for kernel CXL support.
+>> + */
+>> +
+>> +enum cxl_dev_cap {
+>> +	/* capabilities from Component Registers */
+>> +	CXL_DEV_CAP_RAS,
+>> +	CXL_DEV_CAP_HDM,
+>> +	/* capabilities from Device Registers */
+>> +	CXL_DEV_CAP_DEV_STATUS,
+>> +	CXL_DEV_CAP_MAILBOX_PRIMARY,
+>> +	CXL_DEV_CAP_MEMDEV,
+>> +	CXL_MAX_CAPS = 64
+> Why set it to 64?  All the bitmaps etc will autosize so
+> you just need to ensure you use correct set_bit() and test_bit()
+> that are happy dealing with bitmaps of multiple longs.
+>
+
+Initially it was set to 32, but DECLARE_BITMAP uses unsigned long, so 
+for initializing/zeroing the locally allocated bitmap in some functions, 
+bitmap_clear had to use sizeof for the size, and I was suggested to 
+define CXL_MAX_CAPS to 64 and use it instead, what seems cleaner.
+
+
+
+>> +};
+>> +
+>>   struct cxl_dev_state *cxl_accel_state_create(struct device *dev);
+>>   
+>>   void cxl_set_dvsec(struct cxl_dev_state *cxlds, u16 dvsec);
 
