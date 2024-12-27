@@ -1,207 +1,150 @@
-Return-Path: <netdev+bounces-154359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BCA69FD504
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 14:44:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3C59FD587
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 16:19:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF47E1883013
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 13:44:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50902168495
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 15:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D43A1F3D3F;
-	Fri, 27 Dec 2024 13:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6511F754F;
+	Fri, 27 Dec 2024 15:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRzyLXVm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BWDZ8i3C"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8041F3D2D
-	for <netdev@vger.kernel.org>; Fri, 27 Dec 2024 13:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3C31B6CFB;
+	Fri, 27 Dec 2024 15:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735307065; cv=none; b=MmVOKKt10vupANcNcX5HzegAVVVDY2scPSwcFz2BIyLuJ4bn7O3sSyq16JL6beOTolyMRnqveh5s5xIrM5kRcW4jRJSwroLHMCvbjdnjOkZZsNfbY2IbCS7xQ98izaevs54GFDYuwy3QL9VFP+ugsxcntzZl1YsZkrz1I5tIYE0=
+	t=1735312732; cv=none; b=MAr+hffb2zcveG93ZA8upTI3qU2DYy2ONsWFwNaZ2YYT0Pdo68BP/33AIAOJTvJMrPIa/QIbuDUH3AnKq703eDvxuDungtwa5XExVRwJq8UN40d+2PDC5qy0gTt4lLdxa46ST75TVYxrHKoQia6ZtqWl2xfWkK5R4z8i52CO2Sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735307065; c=relaxed/simple;
-	bh=4zzYeNm0G4x5an1ENK8T8ax8KmpB59TZG1+p2SFmR4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IYjtKatAmyDHuCDflrv88k3KGHGtH740xWRtl13t0cYoBX2v297VC0JrzNRWrEVxLYQ6obiwkfbxRqiBiebt4FwJmxc6mANHx6B8kwPHGKqRyGmKgqbnCzUewmUybZbpn4ZsnayxUt2Q1mlg+ROV5boBsaqjhIDfXB8nzit+L8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DRzyLXVm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735307062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pkRABZZKzYakdwICymJuZ/C6pfybaqvIa9Xu1kFl1Eo=;
-	b=DRzyLXVm9nHJ1cWKWQ3XH+Nkvoo1BsvpzNFGfmGzAdeNtCcVvI5V/6auBefCkDVERWvmpb
-	KrYe0St3udSRaOLoLOtRHhiee8AvjTvs4BTtfL3B4Cp4t6Ad9dsv7V1yKfWcXBGoEBMEV6
-	r0oBd26GvU+sSK3WSZc48lH8aWlVvGs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-158-dn0v2B_VNxOl71m9xv4YhA-1; Fri, 27 Dec 2024 08:44:21 -0500
-X-MC-Unique: dn0v2B_VNxOl71m9xv4YhA-1
-X-Mimecast-MFC-AGG-ID: dn0v2B_VNxOl71m9xv4YhA
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43582d49dacso53665195e9.2
-        for <netdev@vger.kernel.org>; Fri, 27 Dec 2024 05:44:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735307060; x=1735911860;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pkRABZZKzYakdwICymJuZ/C6pfybaqvIa9Xu1kFl1Eo=;
-        b=aVG/tfpHCnFXk5LOxdIFrV2GjS733CWX+LC7+Cds7Ef5O0Z2KnsmHFOBCwY/jESGBU
-         jzhz/eEIMdEFZuMioST8aJmpG7DxJj26Ndna9PmqW0jO3hqa6cBu4n+EULpJ92JfW25b
-         E5WWeqDBmb8UXBfcSR/GcFvzKl6ASQZG6fJkqd948naa6X+O14TO2MGLyps80kThoGxf
-         CVcWHVJ/kSum72W5dMRRLb8S4+U5zVyb2ZqRz3WkTThJwUiTfjBxB1QchbdLSx2tuWTA
-         W4sobVbK4gtrPTUb0VZ9k0vbW5eNuJ8GpWnpUbT6WKUO6zBdTBlSJum6If4RQxCC7oIr
-         y2Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCWK/KA2zECHpCiRZeYtZr4Jod7JXaVR22DYMKPqbBR6mvDYZz23qrFU0JuFa357pAdp/Kxiemg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFfhyAN0cR/xoGxIB2c6s/A7idO6cG9Q7+R79DXr5ZAtqLN4xP
-	9Xz6+hlfb1t9Wm0H7HeigbWKXyomhCzsjY1xxg3wIdpv8HA6Uap+tRTEwDzAmkRn3ZeUXh9pMCa
-	EKgjHut27/aGefkhl69Thdzl0OAP3iux81eWENnmihrIpzCbHoa5YQA==
-X-Gm-Gg: ASbGncvwlV0L5C4qqUpxgdLlWdktfaR6ENCN54QnQNGNTn4gy+BrciM9zFkfjTOXweR
-	U36y3c17C+57Wlyjtty7Wi1j0USg8XEXyNmUPtDAunSqzcaB6uk9e03bNFVub5U/kpxGKl++5tn
-	x6vCkKTPEA3+W2eLNKS2FGU7k243zy0CDNqhYgc7UpPFSyFzv/O0WWWmjlSAF9pT4OYWxGjL7IC
-	IFUbq85BmYsbBLlDMM65UaMe+I9IO/cBMhTiWu54JojDPHRVis=
-X-Received: by 2002:a05:600c:350c:b0:434:a5d1:9905 with SMTP id 5b1f17b1804b1-43668b78641mr208446295e9.26.1735307059833;
-        Fri, 27 Dec 2024 05:44:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHMBCH5XUAoqBvte6a9jZzUG4oYDe/byrgsu79u/bNlDM1cNL3Mq9Ew3V/u/ELxCrULVT1bWQ==
-X-Received: by 2002:a05:600c:350c:b0:434:a5d1:9905 with SMTP id 5b1f17b1804b1-43668b78641mr208446135e9.26.1735307059443;
-        Fri, 27 Dec 2024 05:44:19 -0800 (PST)
-Received: from redhat.com ([2a02:14f:1ef:ad82:417b:4826:408d:ef87])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366127c4d7sm265112715e9.34.2024.12.27.05.44.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Dec 2024 05:44:18 -0800 (PST)
-Date: Fri, 27 Dec 2024 08:44:13 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/net: Set num_buffers for virtio 1.0
-Message-ID: <20241227084256-mutt-send-email-mst@kernel.org>
-References: <20240915-v1-v1-1-f10d2cb5e759@daynix.com>
- <20241106035029-mutt-send-email-mst@kernel.org>
- <CACGkMEt0spn59oLyoCwcJDdLeYUEibePF7gppxdVX1YvmAr72Q@mail.gmail.com>
- <20241226064215-mutt-send-email-mst@kernel.org>
- <CACGkMEug-83KTBQjJBEKuYsVY86-mCSMpuGgj-BfcL=m2VFfvA@mail.gmail.com>
- <cd4a2384-33e9-4efd-915a-dd6fee752638@daynix.com>
+	s=arc-20240116; t=1735312732; c=relaxed/simple;
+	bh=F6s7hJRFnqwtVpl84yOmcA6diAh5+fNZK0zM5H7eyqs=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=Gw2V6/jW9MRWZ5cN8dH4B8oJwxC4YiqecqSrJD4tdWkrrSGobgm/QAs1AABRweid6it0rUVRixshR/9LB747pBrN/ovFhyCSnbXeT2Xdymqgsm2y6/Cj77M1/nofe+IwL3P5yF94bsvoy/Vo01l3Ixsdcf5Xm0IqMjPl0gRgvoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BWDZ8i3C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EF17C4CED0;
+	Fri, 27 Dec 2024 15:18:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735312731;
+	bh=F6s7hJRFnqwtVpl84yOmcA6diAh5+fNZK0zM5H7eyqs=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=BWDZ8i3CdANnV79TD8EM84ZfwN0Zwea5YPdowKbjMxJrMt8oiows+rIzPaTUbc/ji
+	 7NaK1dfG6JqBXsInpl2+sg6gCmONa4jakyaxG8ImXLKcEem1hkGGQdbuWzE4fDIp7W
+	 ddTYzTvZ0I8c3W9ZelEAVz84VaoA9pN4vX1beYbukijsCaTwYPmv8vkhT1QGQ2jmgK
+	 dxLjdA/i0MOyiHhTTw0cDAAmJT4MzLcU3QJnganUy4KGq+rzRxVyPjZoyWVH6yqXUG
+	 6rgvpr+GpD4u3zgbxlud7WQtqeSgMU+JKLJK8I1wCD6WLKmMrT/1ZoYeVhlakPIea1
+	 DIoK12JxfphjQ==
+Date: Fri, 27 Dec 2024 09:18:49 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cd4a2384-33e9-4efd-915a-dd6fee752638@daynix.com>
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Konrad Dybcio <konradybcio@kernel.org>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, Vinod Koul <vkoul@kernel.org>, 
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, linux-arm-kernel@lists.infradead.org, 
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ Eric Dumazet <edumazet@google.com>, Bjorn Andersson <andersson@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+To: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
+References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
+Message-Id: <173531253248.3886388.7160234857723146083.robh@kernel.org>
+Subject: Re: [PATCH 0/3] Support tuning the RX sampling swap of the MAC.
 
-On Fri, Dec 27, 2024 at 01:34:10PM +0900, Akihiko Odaki wrote:
-> On 2024/12/27 10:29, Jason Wang wrote:
-> > 
-> > 
-> > On Thu, Dec 26, 2024 at 7:54 PM Michael S. Tsirkin <mst@redhat.com
-> > <mailto:mst@redhat.com>> wrote:
-> > 
-> >     On Mon, Nov 11, 2024 at 09:27:45AM +0800, Jason Wang wrote:
-> >      > On Wed, Nov 6, 2024 at 4:54 PM Michael S. Tsirkin <mst@redhat.com
-> >     <mailto:mst@redhat.com>> wrote:
-> >      > >
-> >      > > On Sun, Sep 15, 2024 at 10:35:53AM +0900, Akihiko Odaki wrote:
-> >      > > > The specification says the device MUST set num_buffers to 1 if
-> >      > > > VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
-> >      > > >
-> >      > > > Fixes: 41e3e42108bc ("vhost/net: enable virtio 1.0")
-> >      > > > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com
-> >     <mailto:akihiko.odaki@daynix.com>>
-> >      > >
-> >      > > True, this is out of spec. But, qemu is also out of spec :(
-> >      > >
-> >      > > Given how many years this was out there, I wonder whether
-> >      > > we should just fix the spec, instead of changing now.
-> >      > >
-> >      > > Jason, what's your take?
-> >      >
-> >      > Fixing the spec (if you mean release the requirement) seems to be
-> >     less risky.
-> >      >
-> >      > Thanks
-> > 
-> >     I looked at the latest spec patch.
-> >     Issue is, if we relax the requirement in the spec,
-> >     it just might break some drivers.
-> > 
-> >     Something I did not realize at the time.
-> > 
-> >     Also, vhost just leaves it uninitialized so there really is no chance
-> >     some driver using vhost looks at it and assumes 0.
-> > >
-> > So it also has no chance to assume it for anything specific value.
-> 
-> Theoretically, there could be a driver written according to the
-> specification and tested with other device implementations that set
-> num_buffers to one.
-> 
-> Practically, I will be surprised if there is such a driver in reality.
-> 
-> But I also see few reasons to relax the device requirement now; if we used
-> to say it should be set to one and there is no better alternative value, why
-> don't stick to one?
-> 
-> I sent v2 for the virtio-spec change that retains the device requirement so
-> please tell me what you think about it:
-> https://lore.kernel.org/virtio-comment/20241227-reserved-v2-1-de9f9b0a808d@daynix.com/T/#u
-> 
-> > 
-> > 
-> >     There is another thing out of spec with vhost at the moment:
-> >     it is actually leaving this field in the buffer
-> >     uninitialized. Which is out of spec, length supplied by device
-> >     must be initialized by device.
-> > 
-> > 
-> > What do you mean by "length" here?
-> > 
-> > 
-> > 
-> >     We generally just ask everyone to follow spec.
-> > 
-> > 
-> > Spec can't cover all the behaviour, so there would be some leftovers.
-> > 
-> >        So now I'm inclined to fix
-> >     it, and make a corresponding qemu change.
-> > 
-> > 
-> >     Now, about how to fix it - besides a risk to non-VM workloads, I dislike
-> >     doing an extra copy to user into buffer. So maybe we should add an ioctl
-> >     to teach tun to set num bufs to 1.
-> >     This way userspace has control.
-> > 
-> > 
-> > I'm not sure I will get here. TUN has no knowledge of the mergeable
-> > buffers if I understand it correctly.
-> 
-> I rather want QEMU and other vhost_net users automatically fixed instead of
-> opting-in the fix.
 
-qemu can be automatic. kernel I am not sure.
+On Wed, 25 Dec 2024 18:04:44 +0800, Yijie Yang wrote:
+> The Ethernet MAC requires precise sampling times at Rx, but signals on the
+> Rx side after transmission on the board may vary due to different hardware
+> layouts. The RGMII_CONFIG2_RX_PROG_SWAP can be used to switch the sampling
+> occasion between the rising edge and falling edge of the clock to meet the
+> sampling requirements. Consequently, the configuration of this bit in the
+> Ethernet MAC can vary between boards, even if they are of the same version.
+> It should be adjustable rather than simply determined by the version. For
+> example, the MAC version is less than 3, but it needs to enable this bit.
+> Therefore, this patch set introduces a new flag for each board to control
+> whether to open it.
+> The dependency patch set detailed below has introduced and enabled an
+> Ethernet node that supports 1G speed on qcs615. The current patch set now
+> allows tuning of the MAC's RX swap, thereby supporting 10M and 100M speeds.
+> 
+> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+> ---
+> This patch series depends on below patch series:
+> https://lore.kernel.org/all/20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com/
+> 
+> ---
+> Yijie Yang (3):
+>       dt-bindings: net: stmmac: Tune rx sampling occasion
+>       net: stmmac: qcom-ethqos: Enable RX programmable swap on qcs615
+>       arm64: dts: qcom: qcs615-ride: Enable RX programmable swap on qcs615-ride
+> 
+>  .../devicetree/bindings/net/qcom,ethqos.yaml       |  6 ++++
+>  arch/arm64/boot/dts/qcom/qcs615-ride.dts           |  1 +
+>  .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 36 ++++++++++++----------
+>  3 files changed, 27 insertions(+), 16 deletions(-)
+> ---
+> base-commit: 532900dbb7c1be5c9e6aab322d9af3a583888f25
+> change-id: 20241217-support_10m100m-16239916fa12
+> prerequisite-message-id: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
+> prerequisite-patch-id: ab55582f3bfce00f051fddd75bb66b2ef5e0677d
+> prerequisite-patch-id: 514acd303f0ef816ff6e61e59ecbaaff7f1b06ec
+> 
+> Best regards,
+> --
+> Yijie Yang <quic_yijiyang@quicinc.com>
+> 
+> 
+> 
 
-> The extra copy overhead can be almost eliminated if we initialize the field
-> in TUN/TAP; they already writes other part of the header so we can simply
-> add two bytes there. But I wonder if it's worthwhile.
 
-Try?
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
-> Regards,
-> Akihiko Odaki
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
+
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
+
+  pip3 install dtschema --upgrade
+
+
+New warnings running 'make CHECK_DTBS=y qcom/qcs615-ride.dtb' for 20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com:
+
+arch/arm64/boot/dts/qcom/qcs615-ride.dtb: ethernet@20000: compatible: ['qcom,qcs615-ethqos'] does not contain items matching the given schema
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/qcs615-ride.dtb: ethernet@20000: snps,tso: False schema does not allow True
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/qcs615-ride.dtb: ethernet@20000: compatible: 'oneOf' conditional failed, one must be fixed:
+	['qcom,qcs615-ethqos'] is too short
+	'qcom,qcs615-ethqos' is not one of ['qcom,qcs8300-ethqos']
+	'qcom,qcs615-ethqos' is not one of ['qcom,qcs404-ethqos', 'qcom,sa8775p-ethqos', 'qcom,sc8280xp-ethqos', 'qcom,sm8150-ethqos']
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/qcs615-ride.dtb: ethernet@20000: Unevaluated properties are not allowed ('compatible', 'max-speed', 'mdio', 'phy-handle', 'phy-mode', 'power-domains', 'resets', 'rx-fifo-depth', 'rx-queues-config', 'snps,mtl-rx-config', 'snps,mtl-tx-config', 'snps,pbl', 'snps,tso', 'tx-fifo-depth', 'tx-queues-config' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+
+
+
+
 
 
