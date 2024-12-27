@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-154365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896689FD6EC
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 19:31:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 628659FD706
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 19:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EFA43A204F
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 18:31:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A8FC3A20B1
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 18:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D301F7086;
-	Fri, 27 Dec 2024 18:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A7D1F8925;
+	Fri, 27 Dec 2024 18:41:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8cXIzIw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MK9UEz1J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6EA45005;
-	Fri, 27 Dec 2024 18:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E9345005;
+	Fri, 27 Dec 2024 18:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735324296; cv=none; b=KJ+tB73XJj6k8tN03XZBSz1zmF0Ofs1p327+PD02jj8+MXeQSwvZ/5pGuxF44EPM7OA4L6kmz9YEm20StUhUsvd+9WR2m0f59+2a8ikwcav23SKCVmXSUtPAFg6UpowXkaW/9PnozN5E+bLH3NQ/ZlAjMZhzB6C5w+YPuD1b3gE=
+	t=1735324892; cv=none; b=opl0VQHBpjS7ZcCQHccRHeg5kkRIcJn9KtcUa7Uo/eNf0CBG7I3uAXfw01xc7YBEgErC49mHk+NPZx9+EJOZL4Fr7OFKZM6cquB64VXgqaidmhHQYjAnVblAyO/Sw+YZv9Ek3eXdBbQVYwcoMliKSbwPb/GMB2sqzwkPHTrkJcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735324296; c=relaxed/simple;
-	bh=utigrWpY3Dvby5cQbgGg+unB6OhBi5DsrEDYQJ+Hocc=;
+	s=arc-20240116; t=1735324892; c=relaxed/simple;
+	bh=CzowpDg7vD/IHfkVEGqV4EfJUag5ZgNX4RwbtwxMFu0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pfwy5icmt3c664cqX9kwlddbyv4pj6miCXwO1L3/3iHna4iXnl4T07ik3c5vqvC/BYaCoWeXG1h5bLz0o5PIeUGQUxAOT/EvFiQvyWvxSyfm2eP02h2n7E9mXRdvAXV7BPwOkIdmGBILNCi2hEuOmRl1Ntp7bFOCQDWwn+wa4+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8cXIzIw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D786EC4CED0;
-	Fri, 27 Dec 2024 18:31:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=lfcil8/FNF3gUz0NgeDZ98jSuMf01nhwvAkbCzwWxlXe/GAtGiu8qXSm74wzXfwvju0v5n+x1On3WFxe49mZ1Y9UVtbtv+FA9EXHkWRvPbyDjOCany1NNnwukeO7VJU1zPLVVM2qeXcmjtEJ8JUY6iPSeRbV6WE3fq74sN3miMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MK9UEz1J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 303EBC4CED0;
+	Fri, 27 Dec 2024 18:41:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735324295;
-	bh=utigrWpY3Dvby5cQbgGg+unB6OhBi5DsrEDYQJ+Hocc=;
+	s=k20201202; t=1735324891;
+	bh=CzowpDg7vD/IHfkVEGqV4EfJUag5ZgNX4RwbtwxMFu0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=R8cXIzIw2NLYknuXZ2nWH1duHIe8BRAabKI1O3qK5OI3S9J2HrA8U5nKLn7caVC9v
-	 wNSb22FUanVuRa9rLwA6yJ9UsC3PKW4tPX64ZDxnZkeF/w6QkcvL86QGRSAoFiTy1O
-	 DNVoUwIO67s5UNXxMPJXeGXbRwrW/ZaKpl4uYlWVul/M76qGOMd3rwr8kIfdhSFmDG
-	 Z3N/wy1fskE4yETYR3m6BItozyPWjKTdMxyoU3ShkzEs/g3DR7rCiG4cjqnVhHyPgb
-	 CYknHXtMoTuaKeXWRxIzRqhUvq6/Ovi7F/BQ3Itbq5YG7SXGeSjFj8W97X1gf8pZZm
-	 ASlO8kKthwkow==
-Date: Fri, 27 Dec 2024 10:31:34 -0800
+	b=MK9UEz1JfqTGoB/6wmRsia3l2hKYdNYJJB5hJALnSJYtxOO1gEZR4WvGpQpKeOVLo
+	 NO/7ypklxq2wJ1pDMmU9hkM1sLWHZgcJJ5GBh5pC3DKfCcPP651fCZjPMFLSn359TP
+	 zW0lpLkPY9Dl4h8jTqDMOvU3jI06RT2rcLuYF+1pgx4aaG46tEC8JcR1iJQsYdaWzN
+	 +9Xi751f2JmO/KADWZ7YN2rvYUdW1E2MMk7OiGoxKmDiBVrJ7RYH/x/Onc5+nyDXKA
+	 8BIj00m15dABDI8rAfva/EWbjcr/uWuKXHVmCNSKEPyOIQvMneynh/NE3V7VgH9lX8
+	 A1D6xVRHjKNMQ==
+Date: Fri, 27 Dec 2024 10:41:30 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
- <davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
- <guoxin09@huawei.com>, <helgaas@kernel.org>, <horms@kernel.org>,
- <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <meny.yossefi@huawei.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
- <shenchenyang1@hisilicon.com>, <shijing34@huawei.com>,
- <wulike1@huawei.com>, <zhoushuai28@huawei.com>
-Subject: Re: [PATCH net-next v01 1/1] hinic3: module initialization and
- tx/rx logic
-Message-ID: <20241227103134.21168df3@kernel.org>
-In-Reply-To: <20241225125649.2595970-1-gur.stavi@huawei.com>
-References: <20241223073955.52da7539@kernel.org>
-	<20241225125649.2595970-1-gur.stavi@huawei.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Soham Chakradeo
+ <sohamch.kernel@gmail.com>, Willem de Bruijn <willemb@google.com>,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ linux-kselftest@vger.kernel.org, Soham Chakradeo <sohamch@google.com>
+Subject: Re: [PATCH net-next 0/4] selftests/net: packetdrill: import
+ multiple tests
+Message-ID: <20241227104130.78b4a961@kernel.org>
+In-Reply-To: <676ada6afb03_a069c294d6@willemb.c.googlers.com.notmuch>
+References: <20241217185203.297935-1-sohamch.kernel@gmail.com>
+	<20241218100013.0c698629@kernel.org>
+	<19df2c4d-c40c-40c5-8fec-bb3e63e65533@redhat.com>
+	<676474a0398f0_1f2e51294ad@willemb.c.googlers.com.notmuch>
+	<20241219180144.7cf5226c@kernel.org>
+	<6768dd1289ee2_3cff202943a@willemb.c.googlers.com.notmuch>
+	<20241223085033.5926d1a6@kernel.org>
+	<676ada6afb03_a069c294d6@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,43 +69,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 25 Dec 2024 14:56:49 +0200 Gur Stavi wrote:
-> > I understand. But I'm concerned about the self-assured tone of the
-> > "it's not supported" message, that's very corporate verbiage. Annotating
-> > endian is standard practice of writing upstream drivers. It makes me
-> > doubt if you have any developers with upstream experience on your team
-> > if you don't know that. That and the fact that Huawei usually tops
-> > the list of net-negative review contributors in netdev.  
+On Tue, 24 Dec 2024 10:59:38 -0500 Willem de Bruijn wrote:
+> > > Thanks. It does not seem to resolve the flakes.
+> > > 
+> > > At this point I think the best path is to run them in debug mode to
+> > > get coverage, but ignore errors. With the below draft patch, error
+> > > output is still logged. For instance:
+> > > 
+> > > # tcp_timestamping_partial.pkt:58: runtime error in recvmsg call: Bad timestamp 0 in scm_timestamping 0: expected=1734924748967958 (20000) actual=1734924748982069 (34111) start=1734924748947958
+> > > # ok 2 ipv6 # SKIP  
+> > 
+> > Makes sense. Can we make this XFAIL instead of SKIP, tho?
+> > Not exactly accurate but we try to use SKIP for reporting env / setup
+> > problems like missing commands. We have FAIL_TO_XFAIL and
+> > xfail_on_slow() in the lib for netdev bash tests, already.  
 > 
-> The most popular combination in the last 3 decades was little endian
-> CPUs with big endian device interfaces. Endianity conversion was a
-> necessity and therefore endian annotation became standard practice.
-> But it was never symmetric, conversion to/from BE was more common than
-> conversion to/from LE.
-> 
-> As the pendulum moved from horizontal market to vertical market and major
-> companies started to develop both hw and sw, the hw engineers transformed
-> proprietary parts of the interface to little endian to save extra work in
-> the sw. AWS did it. Azure did it. Huawei did it. These vertical companies
-> do not care about endianity of CPUs they do not use.
-> This is not "corporate verbiage" this is a real market shift.
+> Sounds good. I'll add a ktap_test_xfail() to stay with that API.
+> I see no clean way to make use of xfail_on_slow directly.
 
-Don't misquote me. You did it in your previous reply, now you're doing
-it again.
+Ack.
 
-If you don't understand what I'm saying you can ask for clarifications.
+> When net-next reopens, unless the noisy dash is annoying.
 
-> The necessity for endian conversion is gone (or just halved). Will the
-> standard practice remain? There is not a single __le annotation in Amazon
-> and Microsoft code. Not in Mellanox code either. Maybe their hw is fully
-> BE (have to wonder about their DPUs). Amazingly, Intel that only creates
-> little endian CPUs has lots of __le annotations. But they are the flag
-> barer of horizontal market.
-> 
-> Interesting how both Amazon and Microsoft started with:
-> depends on X86
-> Thus evaded demand for adding __le annotations to the code.
-> Later, both sneaked in quiet small patches with replacement to:
-> depends on !CPU_BIG_ENDIAN
-> Maybe that is the true meaning of "upstream experience".
+No huge rush, once we mark the test as ignored it's not very annoying.
+As long as we have a fix before the next merge window we'll be good.
 
