@@ -1,98 +1,97 @@
-Return-Path: <netdev+bounces-154362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 466019FD5C3
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 16:59:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B9029FD6DF
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 19:19:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5414166071
-	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 15:59:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32C9918813A2
+	for <lists+netdev@lfdr.de>; Fri, 27 Dec 2024 18:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFB371F2387;
-	Fri, 27 Dec 2024 15:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C691F8699;
+	Fri, 27 Dec 2024 18:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EXCIO7wJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNfW+dR5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD20F1FB3
-	for <netdev@vger.kernel.org>; Fri, 27 Dec 2024 15:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0548B1F7087
+	for <netdev@vger.kernel.org>; Fri, 27 Dec 2024 18:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735315195; cv=none; b=d1DjUrByFpcGlt20OhOu4I/ssd5GZmBiq3LjTIcsd1jIlJzmGchiW+MLu4A7+eEc4TeeWDyHtrRCkkg+Nt+d1vNO16nCjwVm1YSQ/3p8P1xTLXOaJ7JIrfBa3ePGoinPSefGunaVmVmfGgVO1juri+pqI1Cbjf7degmdXH3mxn4=
+	t=1735323568; cv=none; b=nHEVJ3jJDBVxShYjdeIKzrdHfB2X3YdJG2OGuXc3XfXSRhEcrzYreolG3LJox3mpXnK/Wle2rleENpSCXcvMb1qkh7tZqVyzYKtBbkNYNaUud7lyvetO4p8ACkbQSjbC+fGuxZVCZROM5SDm64XCrzdF3dwWLBqhr5efoScz84I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735315195; c=relaxed/simple;
-	bh=edsWHuQYalxwusa+dNTf9N9wUI1NNCWDsD8Q/uNhhaY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vGH9YmJNlLIdxZ5DiFzKPjJWnjrU8Tak3luR5XEQYPvEFT79r75ybn4ACjmked6EGft0ZSpxsvBrfo9rO5SLxyRalwyvmRva/+pjdnHsyBpmTdCTRdUSky14SW8o8SFqMWhOgVHySu4bMqt44FO9sTtBxmGjYMrW1qYJjMSxXt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EXCIO7wJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9mQJexijBETVV0nBfChdCBJVbf+nCnCstV7osj4NmNE=; b=EXCIO7wJLPdQo9l8wlqOApUc/A
-	k7lvf6Qnr2GatKUc1BbPQua3c/4u88GUPfP0wru1NGrpWCs4ertRWh2r8clvuyGvR11FGUtaVf9q3
-	3tpxwgjhCQyb7v0WFohc12GKYWBCNEZ7m3gEAUnpmON7kdgCeGPCZ/tcYaI+031ut1AU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tRCkY-00Gkx5-Bb; Fri, 27 Dec 2024 16:59:42 +0100
-Date: Fri, 27 Dec 2024 16:59:42 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: John Daley <johndale@cisco.com>
-Cc: benve@cisco.com, satishkh@cisco.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	Nelson Escobar <neescoba@cisco.com>
-Subject: Re: [PATCH net-next v2 5/5] enic: Obtain the Link speed only after
- the link comes up
-Message-ID: <c476e255-586a-45e7-9b86-39c127bacd37@lunn.ch>
-References: <20241227031410.25607-1-johndale@cisco.com>
- <20241227031410.25607-6-johndale@cisco.com>
+	s=arc-20240116; t=1735323568; c=relaxed/simple;
+	bh=GSCeC0PZFzssyUn7faQeGdWZcGDJLNR9dwUOHB+f3uY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LmnOeRq4rYJNwW6RQASN8adN1I9kEXF9+bRs/rp05+BzyKGBqUMEf3q0DcGJnilTNtcsE5akcuJT1Pya4GuTmqQ2arjXDnLj3+7rjODTRM2sx2mv7olt6JChFRcAWRGelim8Unqy1ivookAq5mRd5pFpmhbmyUPpxGYF8NVYcyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNfW+dR5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D952C4CED0;
+	Fri, 27 Dec 2024 18:19:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735323565;
+	bh=GSCeC0PZFzssyUn7faQeGdWZcGDJLNR9dwUOHB+f3uY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pNfW+dR5K9fzVgC8cMTaNr1sfN9eXXqXU+2ltkueG4lRXYJ6rF4rQRkmWETo7ai2F
+	 ovHbIPna3ICb3DLuzHQe9l4w4m/k1F6eDKeTIGgcQ4oQt5g7FHDvqgYGz/++NsiiNX
+	 v0VXZUXWH0DM5E3l6RyC92f+E6H4Klx8D2GpD2+GHnp4gd7tW2w9Z2yt+qYaO9JbdD
+	 zeu+lcCncs0g4pVJmUHfMwGtrGIp+GmBi92HN1uNSCsEPjb4Xf3JS/H/T00HbgTdNh
+	 7wOw8PIOBnReHVQNsJU2q7U2DI1Ynin49U1DRel27rgk8xl7Q9hD+rkY0qA3TE+FF2
+	 Ct680Kkev4h8Q==
+Date: Fri, 27 Dec 2024 10:19:24 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Parav Pandit <parav@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jiri@resnulli.us"
+ <jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>, Shay Drori
+ <shayd@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Jiri Pirko
+ <jiri@nvidia.com>
+Subject: Re: [PATCH net-next] devlink: Improve the port attributes
+ description
+Message-ID: <20241227101924.48a12733@kernel.org>
+In-Reply-To: <PH8PR12MB72088C3633116EA320A55B5FDC032@PH8PR12MB7208.namprd12.prod.outlook.com>
+References: <20241219150158.906064-1-parav@nvidia.com>
+	<20241223100955.54ceca21@kernel.org>
+	<PH8PR12MB72088C3633116EA320A55B5FDC032@PH8PR12MB7208.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241227031410.25607-6-johndale@cisco.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 26, 2024 at 07:14:10PM -0800, John Daley wrote:
-> The link speed that is used to index the table of minimum RX adaptive
-> coalescing values is incorrect because the link speed was being checked
-> before the link was up. Change the adaptive RX coalescing setup function
-> to run after the Link comes up.
+On Tue, 24 Dec 2024 03:40:34 +0000 Parav Pandit wrote:
+> > On Thu, 19 Dec 2024 17:01:58 +0200 Parav Pandit wrote:  
+> > > Improve the description of devlink port attributes PF, VF and SF
+> > > numbers.  
+> > 
+> > Please provide more context. It's not obvious why you remove PF from
+> > descriptions but not VF or SF.  
 > 
-> There could be a minor bandwidth impact when adaptive interrupts were
-> enabled. The low end of the adaptive interrupt range was being set to 0
-> for all packets instead of 3us for packets less the 1000 bytes and 6us
-> for larger packet for link speeds greater
+> 'PF number' was vague and source of confusion. Some started thinking that it is some kind of index like how VF number is an index.
+> So 'PF number' is rewritten to bring the clarity that it's the function number of the PCI device which is very will described in the PCI spec.
 
-There are two changes here, so please break it into two patches.
+Just to make sure I understand - you're trying to emphasize that 
+the PF number is just an arbitrary ID of the PCIe PF within the chip, 
+not necessarily related to any BDF numbering sequence?
 
-> +++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-> @@ -84,6 +84,8 @@ MODULE_AUTHOR("Scott Feldman <scofeldm@cisco.com>");
->  MODULE_LICENSE("GPL");
->  MODULE_DEVICE_TABLE(pci, enic_id_table);
->  
-> +static void enic_set_rx_coal_setting(struct enic *enic);
-> +
+If that's the case I think the motivation makes sense. But IMHO
+the execution is not ideal, I offer the fact we're having this
+exchange as a proof of the point not getting across :(
 
-Please don't add forward declarations. Move the code around
-instead. You can add a preparation patch which does the move, and in
-the commit message say there is no functional change. That makes is
-quick and easy to review.
+May be better to explain this in a couple of sentences somewhere
+(actually I get the feeling we already have such an explanation
+but I can't find it. Perhaps it was just talked about on the list)
+and then just point to that longer explanation in the attr kdocs?
 
-      
-    Andrew
+> For VF number, the description is added describing it's an index starting from 0 (unlike pci spec where vf number starts from 1).
+> SF number is user supplied number so nothing to remove there.
 
----
-pw-bot: cr
+nit: -EOUTLOOK.. please wrap the lines in your replies at 80 chars.
 
