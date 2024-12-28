@@ -1,112 +1,156 @@
-Return-Path: <netdev+bounces-154435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6484B9FDC65
-	for <lists+netdev@lfdr.de>; Sat, 28 Dec 2024 23:34:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 348829FDCB0
+	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 00:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A3A160FA5
-	for <lists+netdev@lfdr.de>; Sat, 28 Dec 2024 22:33:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF34218829DB
+	for <lists+netdev@lfdr.de>; Sat, 28 Dec 2024 23:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31EC522612;
-	Sat, 28 Dec 2024 22:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35DE1474B9;
+	Sat, 28 Dec 2024 23:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1/3C6wf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CM508kJj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CF778F29
-	for <netdev@vger.kernel.org>; Sat, 28 Dec 2024 22:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10FD79F2;
+	Sat, 28 Dec 2024 23:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735425238; cv=none; b=Tir4Fi8CU5LZQ0UWjHbHLoRGEm88Cy5b65vdnjgDjcNkyuQ8p7y3CKFWlIypDfkJltC6VsOBMmB0ix07TiNYykoC5Z7K+f++gE/qGpycyegmkvsEdm9tfctC4fZTK28hdRC131rcHg78Rf9aNH/5aX+4LWe6fmuxhkdR8UfGuH8=
+	t=1735428777; cv=none; b=IcJZu9ceirzmPDUfyFJ9JGUYxUUqRSkM4weOXIj+YVtmuOh0/iBKz8jhsQEvjnXldEHjnctjSFZEWtB3Yrg14xvEJYJxCpt8qHFpYU/TANUl2QUGPixHwqwcTLnv7rDMgfbelADNAv41FVg3Yllf1tJfOUoG4HasntMgVsBWz8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735425238; c=relaxed/simple;
-	bh=wAilquljEfoKTwDm86E3RZLfj5HcODaDL8PphQwLxHg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fmoihz83HD+371t16neq9CafEza9p648h3n7G+lpSIU2O147LEawNVGDEjET2p2VvYKSXd0DoclkxrPrCh54fwqQW0GI1MTlghfJft0r1FE8LlG5hoBxWV50DLAY3jFRYQsYmxBlDurfs4cY1WWmc2kdo6phzDD1y7AEjLyG9xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1/3C6wf; arc=none smtp.client-ip=209.85.219.181
+	s=arc-20240116; t=1735428777; c=relaxed/simple;
+	bh=giHUQnI8ap63UVqjMPzoWtpyquzmfVZTDzUG6P1RK5Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Ad+q39d6w3h6oK041Y55jefRIvXK3etAdOnfh9gaKOj5DihEnUcXRJ+R3RIBLbQahTPU8B5UxpcYyl+RrE5K/5RsNu5eZKkiB++xY2RK9yP0N7VDuqBfMW/563wUkqq5+Ojmo3SFhsu/dKNn1dIKnqIoqCRzqvMt78ntgPB67gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CM508kJj; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e5390ed85a1so8772631276.1
-        for <netdev@vger.kernel.org>; Sat, 28 Dec 2024 14:33:56 -0800 (PST)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-38789e5b6a7so4239971f8f.1;
+        Sat, 28 Dec 2024 15:32:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735425235; x=1736030035; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ONf6Z1d2yilza4D9jyG+gZOIh5GH7ub/Yhwixk/hI0g=;
-        b=I1/3C6wfHSJbxDwEW7Lcb/Zqev/BHYbgkAhZgQlGtHeZ2mdpy8Dhk0Cd+3DBMiT0ay
-         mL1/HUFKO4aFXmkjpO5qroWq7ryWepI6Xa/Zcfo/9RsbPKj+t8ewh0hPe5e5HUjNHyxG
-         IBblYhJMCKLluSE9hdOI33tSnT+0ftWiDDqNExXEJMt81cSEWRa2T+Zky1mNydrts+y6
-         i3ESQvU5BsplNZG6sjY1Icm+sQxWq1uTH9HkzlxexM3JtOV13o0w2CaAlDGdKW9bnkDn
-         Kqya1g2jkJKZxbril3o7oG9EGRa6gvZ+tIGeFxiCE3MQ8RwsvCCM9LRpYoH+zYRqYKWD
-         sv0Q==
+        d=gmail.com; s=20230601; t=1735428774; x=1736033574; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yp6YLaS3wbdHHh56yyPBMz3HOcQbYn0L1NBzbosE89U=;
+        b=CM508kJjNjXIsAXSgtZ6AO+zM4k6oahUSTYUUgOGZO4+VMUhkLv2JgvLE3LN8jDss3
+         WtG0sE/OEWmOCMa21VvwQ7XhPAUUX8CsjlV2Pqw9TrPyhybcN8WXundE2R8rsFkJriZ4
+         pEmW56RnSqg0/0qm0upljdx77ynB5piNOcuLvrengMDLJUUh5UZs8qZhmzciIWRfuViY
+         TLv8ImOqb+/kSduJq5pXVC2XG0G6QVBI21IRC5CzeeHDRqcw3TSLz4K0QkiAiPEo3hI2
+         vbRvHRf++LIlEKDZkafqOac6Lc6Re1dhsv/2TtVjAbWtBY7LicGQp5sN0xCLyK0zmRnF
+         FXdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735425235; x=1736030035;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1735428774; x=1736033574;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ONf6Z1d2yilza4D9jyG+gZOIh5GH7ub/Yhwixk/hI0g=;
-        b=CF3ZxNzNDfZsdd8uQx3+Yk3h8y3LJ7qpC9TuaygYDMh+aifsm61ojfAHFSQEhklKXV
-         cI6+Ni3cWN6FX+gip0afrsBhghp/7g/60Cu5wmuNARUzKKWjM1VtLVV7zgMzLpNfRGFW
-         mb0Zv4UsWnAsRHxevkXgIuQ7eauv4W+0LntJL7V/+0VLT7saetBW0WdkEdYXTDyKggQL
-         Ub1dAo8mkhtItApzsvnrf2kKOpHfMPJPNB9VEHbsbnQ6vFy8JQflQybyWHOnvRqyCCKD
-         ruYexHAw/EgiGXStCQkP8A7qqZNoyJPPTAfRSkgEK28GhopqnG0qmg8YCzUXJCvFqPTi
-         gmiQ==
-X-Gm-Message-State: AOJu0Yzh+VOrVzQd+Gc+CdvfMVAXdNK+/Vm5dsZ2Yv2V3XTyjUH5d9X2
-	lE3IgQUgjRobOtWXVaPmLJzr/l2/9RE+jIRbeaqE7cyA6kQgspxkUngygM2eVjs=
-X-Gm-Gg: ASbGncsh00alwFALP7Udh4wosXDQziu+OqnibZe6zsOJVE8K8FjK0v7nt4LPo5IaGS/
-	EwG6V2+zZy3TR8Cmt5diqfWMfxqX5+RnqalLkaD/LXhHyTd2AIuz7kaJXd4wX6NH+P0O61qSEcn
-	q0QtP6jSNT4G90DQ7NzLYSCXP/k83tfMnzmJzS8tu2HrCPiwPBrrMShrI1oWVKT5tCBthp+HnyX
-	OzpMPe8HlKFxGq+fRzGbRd0Fh9KqLu5LGwPyFDg5SHhg+NQOxaBQjxNhMnhhMc69VgldwhMoRP5
-	CJk=
-X-Google-Smtp-Source: AGHT+IHQznPng0dPO7dQD+1Z84iTUh6TShAg8cJm4dsyCJEgDqk3uLDOD+QkloWxTPaGslw52M0hKg==
-X-Received: by 2002:a05:690c:6605:b0:6ef:57f9:ec4 with SMTP id 00721157ae682-6f3f80de947mr216711377b3.5.1735425235423;
-        Sat, 28 Dec 2024 14:33:55 -0800 (PST)
-Received: from localhost.localdomain ([2603:6080:4502:9259:76d8:3eff:fe5e:180c])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f3e7837ff7sm49066057b3.110.2024.12.28.14.33.54
+        bh=yp6YLaS3wbdHHh56yyPBMz3HOcQbYn0L1NBzbosE89U=;
+        b=oNJAh2cNTsjW9E5+HanRgyasOmsD/HzKWz0RvK2GtStxjQb23sif19R1RoyPN5Dc0C
+         Llll45nu4Vc1VLZjpK/Ej+vX7bG6wOyr/VjVUU5nyokPrT7JjbsONIm1OtDXDsGtVRVD
+         t9rKQyIGLf0fjMBxaDNIIvxaoA5pbzqO+2UIJidPxH9xLPxgInFfhPh4vrxmnl9F/+Lh
+         KR9O+bcXDbEbVrvvhmCccm3+iea51TlBMmIaYs7EveoAyeOYdCl/7AI5ObiakWvge8Wt
+         Y0lLY9jIqIizNARUWm9jARA/W98T/2SVw1pAVLW1s08H0mb5zDbH+FsrDj9k+QG3WFkE
+         ryYA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7TEil1wXEHBbOmGgCjYEz7uGQfE8KO4wMgKAAFlOwqHfxQ+FU3hJSlmruoTEoGjatpsyEIIaECAs=@vger.kernel.org, AJvYcCUuedyLS/caQwNO0bZpR3Sd689ATTqe67cp8KG4pvPoFL/65namBqGZ32QxRQT3h+XiciGo8B9+ZQys4MFM@vger.kernel.org, AJvYcCVTz7muUy2XRKVvdsfigWWrbbCGUVNkgTZ4DCp+PNTKUOoO9hcvdjw9y3nX11qm7u59VaSfO2SZkdZN@vger.kernel.org, AJvYcCWZ1egePwwQJRL/jqWqFANVXKb9PFKQmZLjZ02L8KGticaoILdIepXupHfrHwAkD1hWhOAT1JG8CcTA@vger.kernel.org, AJvYcCWZw5rY01j9IQa9CGwFYBOAT452xMZWgkpV3BBTFLhvwgjvOwFQC/FWQcGdrmd24mZRHMz32v5V@vger.kernel.org, AJvYcCWiFbfGMCfPRGqR0k2RzHp0psc/Y3Z9u1d3qN70dsBKWtAiVNM+Nw+N/5/XGZwBb1EigodQOsS96ePL@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKc5QgUnCbzCNz/kB9156uF8l0yJmsDzHzCOqQkYfZZ1Rr3rQw
+	rOOnb42KkGmhBXgUrgGxdt+wI4Aab4AirkcsLIqZu/gl3o+jKaTl
+X-Gm-Gg: ASbGncvdkSnKjPrmtcidmoI3y3Y0E240Nk472hd/79i9QTiylxtS3+AJBJlxVBINMMJ
+	g1SRe0hLi1YxTpnswc7axoU+1n3L1LrxzW89o5jVivGmNnlcUOKBhlAq8/JA7mFC0kreqSGvnm0
+	8I6pGanxqoWGP3a0WXSbZo8gVMBq64wKeL5RJDIqG/DCKbJZ+ftNCybgiSts+14Y3GfZqL4LNu4
+	9cy9MBoe7iqdJMQCePHLV6SUp8IIb2TV9UdbNxFBpWg6Hz0vEx15JxzAg==
+X-Google-Smtp-Source: AGHT+IH9Pxly1KkOAngXtmnCTp49btuhnhudeYM8IucjVtpMMTrprdVjqVAvd4Ltow0b92P3+UAzuA==
+X-Received: by 2002:adf:ab0a:0:b0:38a:50fa:d582 with SMTP id ffacd0b85a97d-38a50faf3cemr1893012f8f.59.1735428774217;
+        Sat, 28 Dec 2024 15:32:54 -0800 (PST)
+Received: from localhost ([2a01:e0a:d9a:4c20:d6da:7147:f20e:31de])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8474c2sm25616331f8f.55.2024.12.28.15.32.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Dec 2024 14:33:55 -0800 (PST)
-From: Neil Svedberg <neil.svedberg@gmail.com>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	Neil Svedberg <neil.svedberg@gmail.com>
-Subject: [PATCH] iproute2: Fix grammar in duplicate argument error message
-Date: Sat, 28 Dec 2024 17:33:46 -0500
-Message-ID: <20241228223346.369003-1-neil.svedberg@gmail.com>
-X-Mailer: git-send-email 2.47.1
+        Sat, 28 Dec 2024 15:32:53 -0800 (PST)
+From: Raphael Gallais-Pou <rgallaispou@gmail.com>
+Subject: [PATCH 0/6] Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
+Date: Sun, 29 Dec 2024 00:32:39 +0100
+Message-Id: <20241229-update_pm_macro-v1-0-c7d4c4856336@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJeKcGcC/x3MQQqAIBBA0avIrBPKFKSrRIjpVLPQRCuC6O5Jy
+ 7f4/4GCmbDAwB7IeFGhPVZ0DQO32bgiJ18NohWyE0LzM3l7oEnBBOvyzlEqrWa0i+97qFXKuND
+ 9H8fpfT9Zpv3sYQAAAA==
+X-Change-ID: 20241228-update_pm_macro-e4585beafd33
+To: Patrice Chotard <patrice.chotard@foss.st.com>, 
+ Thinh Nguyen <Thinh.Nguyen@synopsys.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Adrian Hunter <adrian.hunter@intel.com>, 
+ Ulf Hansson <ulf.hansson@linaro.org>, 
+ Miquel Raynal <miquel.raynal@bootlin.com>, 
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
+ Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Mark Brown <broonie@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-usb@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
+ linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-spi@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1358; i=rgallaispou@gmail.com;
+ h=from:subject:message-id; bh=giHUQnI8ap63UVqjMPzoWtpyquzmfVZTDzUG6P1RK5Q=;
+ b=owEBbQKS/ZANAwAIAechimjUEsK1AcsmYgBncIqaIFUIX99U52dYXyKTHv3kUYpiB1NgWDXmQ
+ fbeWDg8/+6JAjMEAAEIAB0WIQQgmXv2E+fvbV/9ui/nIYpo1BLCtQUCZ3CKmgAKCRDnIYpo1BLC
+ tcMtEACBJ0gPdEh3A9kQDku4xnQ3prDDj0BroWFCemcZ3uDele37akkQ207mrAPUnUAf9Zjo6nc
+ lFC566Wdx1jXko5eOVPaPJ/edqebt3W2r4sk2Y3mZcT6m2+MeO43BR2XfjjNXzSxDSYp6zSh0QM
+ R0urFraGthT4o2d/WeZBebYnfPMfCemp8aA5KA3NDlRTDs0AdY8BNKiLKl2eaRuZno4DUuK2ibI
+ zw8rWXkJHld/dOAL+sm+Z4L5PnkRFnUCDk/IXDiJuHWiYlKzwX7G2FP1s1r/fAIFg4rtm2x8wCo
+ guwnv5TNvItP1xk1dOqmdxOqboQdx7O6Zxg6aE0iz/LFB0oU/cV0tTZJQaI1mg9LSJQqjF9tFiD
+ ws0ugN8G4DLBVUJotARGmqBcWIyIzHZpP1u0UBpnM58l87bG1qK+9CLt2EnCUELhVgdz+QOqtfm
+ mU6LioIYAoEFxMPlYDjFTK++GHJ28PO9vOfanD8WFpAIHbUrJJyWXXyI28hKfcBLOXPuxN5kmny
+ YUc+xSr1t+hM1ger7KHjGW4dpzEpAOtWwYvYzk+WgMOn1vYeBqWC6x8LaEeN/qOGS+4ajhwrqj1
+ c3PTO7zspLoPoHi7uMoGHkGtePff2MI9uzzYdWnKAQW3+iftKa3RtY8hFgxDar0iu0ldblZHZnB
+ sISlnpXRGIpbxKw==
+X-Developer-Key: i=rgallaispou@gmail.com; a=openpgp;
+ fpr=20997BF613E7EF6D5FFDBA2FE7218A68D412C2B5
 
-Change "is a garbage" to "is garbage". Because garbage is a collective
-noun, it does not need the indefinite article.
+Prevent the use of macros, and rely instead on kernel configuration for
+power management.
 
-Signed-off-by: Neil Svedberg <neil.svedberg@gmail.com>
+This series makes the same change over six different drivers:
+usb-st-dwc3, sdhci-st, st-spi-fsm, ahci_st, sti-dwmac, spi-st.
+
+Signed-off-by: Raphael Gallais-Pou <rgallaispou@gmail.com>
 ---
- lib/utils.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Raphael Gallais-Pou (6):
+      usb: dwc3: st: Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
+      mmc: sdhci-st: Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
+      mtd: st_spi_fsm: Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
+      ahci: st: Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
+      net: stmmac: sti: Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
+      spi: st: Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
 
-diff --git a/lib/utils.c b/lib/utils.c
-index aea4e8b7..be2ce0fe 100644
---- a/lib/utils.c
-+++ b/lib/utils.c
-@@ -812,7 +812,7 @@ void duparg(const char *key, const char *arg)
- void duparg2(const char *key, const char *arg)
- {
- 	fprintf(stderr,
--		"Error: either \"%s\" is duplicate, or \"%s\" is a garbage.\n",
-+		"Error: either \"%s\" is duplicate, or \"%s\" is garbage.\n",
- 		key, arg);
- 	exit(-1);
- }
+ drivers/ata/ahci_st.c                           | 6 ++----
+ drivers/mmc/host/sdhci-st.c                     | 6 ++----
+ drivers/mtd/devices/st_spi_fsm.c                | 6 ++----
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c | 8 +++-----
+ drivers/spi/spi-st-ssc4.c                       | 6 +-----
+ drivers/usb/dwc3/dwc3-st.c                      | 6 ++----
+ 6 files changed, 12 insertions(+), 26 deletions(-)
+---
+base-commit: 8155b4ef3466f0e289e8fcc9e6e62f3f4dceeac2
+change-id: 20241228-update_pm_macro-e4585beafd33
+
+Best regards,
 -- 
-2.47.1
+Raphael Gallais-Pou <rgallaispou@gmail.com>
 
 
