@@ -1,94 +1,93 @@
-Return-Path: <netdev+bounces-154448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6E7A9FDED3
-	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 13:38:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8789FDFEF
+	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 17:47:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FB233A17F2
-	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 12:38:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1317B1882587
+	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 16:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A79C1E521;
-	Sun, 29 Dec 2024 12:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4B316F288;
+	Sun, 29 Dec 2024 16:47:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us.icdsoft.com (us.icdsoft.com [192.252.146.184])
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C46259482
-	for <netdev@vger.kernel.org>; Sun, 29 Dec 2024 12:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.252.146.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4FDEEDE;
+	Sun, 29 Dec 2024 16:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735475894; cv=none; b=CP1dRpOgBB59Febz9qqq5h5l4PFTEZdC35UuJ3YTL7+gP+T9qmy9PFKy/BhU4Ku2EvO4FCMvmsyALV+1zSf1pl2tqeWIwgmNwpJ0Q+GAvlI993xyx+3JvDj+FH9+QJcsnDy/Gm+8tNJkbDoUkQJ2pH52bweTDrBtbvFsvLt5Xxo=
+	t=1735490836; cv=none; b=uKX0MW3UeMo9pPiPouvfSrcmMD1hmPixRVF7v198YC4TQi6pO2PaSA7rT8+1BJoOTsnCWelzsNOlo22Q/Bjf4MrTLweUnm7OyLtBlNsasPWieFgeSmarNQqSO2JEn+8gpybwyuPnhmYG//GgAGrID2r9WDZF2YBq3OFd5lc7Uis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735475894; c=relaxed/simple;
-	bh=ZiOAyDZSI/hRqm5Qjqd3a8iMvKP2Tf+81RX/lKR4Czg=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=jfVPE/8xZxAnLlISW4DJAKtdfjhKGjOZV9sudtbeMC0jVi21bPhtRKpR4OQKCiu9wZArOXJ0n9BCelqejh9lNO2LdcbwKyIj1YznMq1qExbFbmZGrgqKY+JXm5HT0oOB5nezeUDL4PgSKp33rvbVLQa/pjCWhG/KI9nhXhfDDy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icdsoft.com; spf=pass smtp.mailfrom=icdsoft.com; arc=none smtp.client-ip=192.252.146.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icdsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icdsoft.com
-Received: (qmail 4446 invoked by uid 1001); 29 Dec 2024 12:31:28 -0000
-Received: from unknown (HELO ?94.155.37.179?) (zimage@icdsoft.com@94.155.37.179)
-  by us.icdsoft.com with ESMTPA; 29 Dec 2024 12:31:28 -0000
-Message-ID: <e831515a-3756-40f6-a254-0f075e19996f@icdsoft.com>
-Date: Sun, 29 Dec 2024 14:31:27 +0200
+	s=arc-20240116; t=1735490836; c=relaxed/simple;
+	bh=ORFAZjjvwqS1zhpBWWulyEKLzVsdbsch1hq5qm3rHAY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u7bbS7VJoexuvtnFGW3oz7vo3xAyeXjE7OGKkxYxWpB7QlyAE9a9ahBVN9FAAUFoEQ7KupByR+VGK8fptjpe+2Aeuy+YNJ17PtNM0m4f3yriygNiIVOBtNKavHk1Znm7V4tPG6qgtmoE1F/fW+rJML3L3DC75cKyY2I3rP2Hx+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1tRwRW-00000004nnT-2Rim;
+	Sun, 29 Dec 2024 17:47:06 +0100
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To: M Chetan Kumar <m.chetan.kumar@intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] net: wwan: iosm: Properly check for valid exec stage in ipc_mmio_init()
+Date: Sun, 29 Dec 2024 17:46:58 +0100
+Message-ID: <8b19125a825f9dcdd81c667c1e5c48ba28d505a6.1735490770.git.mail@maciej.szmigiero.name>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org
-From: Teodor Milkov <zimage@icdsoft.com>
-Subject: Download throttling with kernel 6.6 (in KVM guests)
-Organization: ICDSoft Ltd
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Sender: mhej@vps-ovh.mhejs.net
 
-Hello,
+ipc_mmio_init() used the post-decrement operator in its loop continuing
+condition of "retries" counter being "> 0", which meant that when this
+condition caused loop exit "retries" counter reached -1.
 
-We've encountered a regression affecting downloads in KVM guests after 
-upgrading to Linux kernel 6.6. The issue is not present in kernel 5.15 
-or the stock Debian 6.6 kernel on hosts (not guests) but manifests 
-consistently in kernels 6.6 and later, including 6.6.58 and even 6.13-rc.
+But the later valid exec stage failure check only tests for "retries"
+counter being exactly zero, so it didn't trigger in this case (but
+would wrongly trigger if the code reaches a valid exec stage in the
+very last loop iteration).
 
-Steps to Reproduce:
-1. Perform multiple sequential downloads, perhaps on a link with higher 
-BDP (USA -> EU 120ms in our case).
-2. Look at download speeds in scenarios with varying sleep intervals 
-between the downloads.
+Fix this by using the pre-decrement operator instead, so the loop counter
+is exactly zero on valid exec stage failure.
 
-Observations:
-- Kernel 5.15: Reaches maximum throughput (~23 MB/s) consistently.
-- Kernel 6.6:
-   - The first download achieves maximum throughput (~23 MB/s).
-   - Subsequent downloads are throttled to ~16 MB/s unless a sleep 
-interval ≥ 0.3 seconds is introduced between them.
+Fixes: dc0514f5d828 ("net: iosm: mmio scratchpad")
+Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+---
+ drivers/net/wwan/iosm/iosm_ipc_mmio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reproducer Script:
-for _ in 1 2; do  curl http://example.com/1000MB.bin --max-time 8 -o 
-/dev/null -w '(%{speed_download} B/s)\n'; sleep 0.1   ;done
-
-
-Tried various sysctl settings, changing qdiscs, tcp congestion algo 
-(e.g. from bbr to cubic), but the problem persists.
-
-git bisect traced the regression to commit dfa2f0483360 ("tcp: get rid 
-of sysctl_tcp_adv_win_scale"). While a similar issue described by 
-Netflix in 
-https://netflixtechblog.com/investigation-of-a-cross-regional-network-performance-issue-422d6218fdf1 
-and was supposedly fixed in kernels 6.6.33 and 6.10, the problem remains 
-in 6.6.58 and even 6.13-rc for our case.
-
-Could this behavior be a side effect of `tcp_adv_win_scale` removal, or 
-is it indicative of something else?
-
-We would appreciate any insights or guidance how to further investigate 
-this regression.
-
-Best regards!
-
+diff --git a/drivers/net/wwan/iosm/iosm_ipc_mmio.c b/drivers/net/wwan/iosm/iosm_ipc_mmio.c
+index 63eb08c43c05..6764c13530b9 100644
+--- a/drivers/net/wwan/iosm/iosm_ipc_mmio.c
++++ b/drivers/net/wwan/iosm/iosm_ipc_mmio.c
+@@ -104,7 +104,7 @@ struct iosm_mmio *ipc_mmio_init(void __iomem *mmio, struct device *dev)
+ 			break;
+ 
+ 		msleep(20);
+-	} while (retries-- > 0);
++	} while (--retries > 0);
+ 
+ 	if (!retries) {
+ 		dev_err(ipc_mmio->dev, "invalid exec stage %X", stage);
 
