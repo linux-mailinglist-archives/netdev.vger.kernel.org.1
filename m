@@ -1,156 +1,94 @@
-Return-Path: <netdev+bounces-154447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D599FDE2B
-	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 10:11:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6E7A9FDED3
+	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 13:38:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FCF87A1185
-	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 09:11:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FB233A17F2
+	for <lists+netdev@lfdr.de>; Sun, 29 Dec 2024 12:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C643778F38;
-	Sun, 29 Dec 2024 09:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A79C1E521;
+	Sun, 29 Dec 2024 12:38:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us.icdsoft.com (us.icdsoft.com [192.252.146.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291FC7083F
-	for <netdev@vger.kernel.org>; Sun, 29 Dec 2024 09:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C46259482
+	for <netdev@vger.kernel.org>; Sun, 29 Dec 2024 12:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.252.146.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735463481; cv=none; b=XWfkfkm3ky6yEhQgvZ9SZRh0RR0kSkkuVGR36pp3+WDsshUPJSurfVfVRN9gPaqOLlYg/xp3GIud8qNVVof7+ib9JUAHurk0fpadcy2GjpNZaVDQtTDp3GPpqd/KGeFTY4zcuzD4gsxCoFsIwHrBDFRhdvfIMAI1YGVh8ioeBUM=
+	t=1735475894; cv=none; b=CP1dRpOgBB59Febz9qqq5h5l4PFTEZdC35UuJ3YTL7+gP+T9qmy9PFKy/BhU4Ku2EvO4FCMvmsyALV+1zSf1pl2tqeWIwgmNwpJ0Q+GAvlI993xyx+3JvDj+FH9+QJcsnDy/Gm+8tNJkbDoUkQJ2pH52bweTDrBtbvFsvLt5Xxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735463481; c=relaxed/simple;
-	bh=bf3Ov7+YwJhN8+acTRCvdtSEBLpfnoDTHLxQMgVtWRo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pxFAhHMmXxEYNOp4XaF9IVTZqc3wwStt9vOC4CVVMOM8Y8/wJulBciGsEN9yJzx/S7UoTfTdcAbBI4iQPM9GWQDMnb4/dMwzuLeSezQ69ohHtwuFgxkRaZwEFXNEmXr+7702wn9uew5SpSmK5NLdBdEsLevTmwvjlinZHX0/4lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-844e8b6a786so1550947139f.3
-        for <netdev@vger.kernel.org>; Sun, 29 Dec 2024 01:11:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735463479; x=1736068279;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Qn8krfBYhXMOLabcnXH490lsbAGUeZIj+8EHZb1G0n0=;
-        b=OMYZ/ypf+SlJ0DqYsYKfHp3Wiiu96DROXEhyW5q/apL0s/KCeF1KxTh87lzcqzo72w
-         gJS0W0sHuHYbGtVa1Pj6y2nrPk308X14fM6K9U1hqV65N1uskLwb3SCpqYxWimDvWLsT
-         /MFsdjC//AvRRNHhy4crnkbOy9yhDC+lAUrKkYV99KVif29VBDbg449eArXusS8sDk0v
-         K7gX3p5kRD4KlUdi6W6KcJbrtjHpOYrV+fL+Mp/jD1UpesK+8ZOEohMOCY00/xJNYXVv
-         F8a5YF7/pBQfDvUb7PiO4keE0BclBH9wsmoUn+D1fm4OCNKJ/9yipCNeFRsM3gy6siUr
-         5f4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVLpBgnzkr/GNNq34UUPzMl/a15Hp7rVm+qJ72+rxlQpQck2VVRBQ5tV4D3pC415CKvXxWpBZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEAkYAm3qb+qrM3vXlEVfEV1sJjuKe12GArP7a59loWu5HyoTY
-	gj3TKqVZ3h7noUs1LRoQB+aQfXKRkDGfEj6nuUuUCAKN/h242QrB9sDHYWtPD125lHWpsJRe0NV
-	nBwrgHzjm45V8LNDg5J9L+/LC/AIs12QNqAfT/RI+bjX0akL7BJtyFfU=
-X-Google-Smtp-Source: AGHT+IFzpzRr7auEnk9HHt8csPE0+StQIDgkc92LF0hHJEaIsSJ3jNI1Pteb4UB7vxvsH/oTI8FdyzEWvFZJJe4MzA/po0GqvqW+
+	s=arc-20240116; t=1735475894; c=relaxed/simple;
+	bh=ZiOAyDZSI/hRqm5Qjqd3a8iMvKP2Tf+81RX/lKR4Czg=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=jfVPE/8xZxAnLlISW4DJAKtdfjhKGjOZV9sudtbeMC0jVi21bPhtRKpR4OQKCiu9wZArOXJ0n9BCelqejh9lNO2LdcbwKyIj1YznMq1qExbFbmZGrgqKY+JXm5HT0oOB5nezeUDL4PgSKp33rvbVLQa/pjCWhG/KI9nhXhfDDy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icdsoft.com; spf=pass smtp.mailfrom=icdsoft.com; arc=none smtp.client-ip=192.252.146.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icdsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icdsoft.com
+Received: (qmail 4446 invoked by uid 1001); 29 Dec 2024 12:31:28 -0000
+Received: from unknown (HELO ?94.155.37.179?) (zimage@icdsoft.com@94.155.37.179)
+  by us.icdsoft.com with ESMTPA; 29 Dec 2024 12:31:28 -0000
+Message-ID: <e831515a-3756-40f6-a254-0f075e19996f@icdsoft.com>
+Date: Sun, 29 Dec 2024 14:31:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12ca:b0:3a7:fede:7113 with SMTP id
- e9e14a558f8ab-3c2d5247c76mr319800925ab.18.1735463479145; Sun, 29 Dec 2024
- 01:11:19 -0800 (PST)
-Date: Sun, 29 Dec 2024 01:11:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67711237.050a0220.2f3838.04a8.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in drv_unassign_vif_chanctx (2)
-From: syzbot <syzbot+25ce0caba1e325c6f224@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org
+From: Teodor Milkov <zimage@icdsoft.com>
+Subject: Download throttling with kernel 6.6 (in KVM guests)
+Organization: ICDSoft Ltd
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 Hello,
 
-syzbot found the following issue on:
+We've encountered a regression affecting downloads in KVM guests after 
+upgrading to Linux kernel 6.6. The issue is not present in kernel 5.15 
+or the stock Debian 6.6 kernel on hosts (not guests) but manifests 
+consistently in kernels 6.6 and later, including 6.6.58 and even 6.13-rc.
 
-HEAD commit:    9b2ffa6148b1 Merge tag 'mtd/fixes-for-6.13-rc5' of git://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12df6adf980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c078001e66e4a17e
-dashboard link: https://syzkaller.appspot.com/bug?extid=25ce0caba1e325c6f224
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
+Steps to Reproduce:
+1. Perform multiple sequential downloads, perhaps on a link with higher 
+BDP (USA -> EU 120ms in our case).
+2. Look at download speeds in scenarios with varying sleep intervals 
+between the downloads.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Observations:
+- Kernel 5.15: Reaches maximum throughput (~23 MB/s) consistently.
+- Kernel 6.6:
+   - The first download achieves maximum throughput (~23 MB/s).
+   - Subsequent downloads are throttled to ~16 MB/s unless a sleep 
+interval ≥ 0.3 seconds is introduced between them.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-9b2ffa61.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3bcb43c77ce7/vmlinux-9b2ffa61.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ef51b0b811d5/bzImage-9b2ffa61.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+25ce0caba1e325c6f224@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-syzkaller0: Failed check-sdata-in-driver check, flags: 0x0
-WARNING: CPU: 0 PID: 1134 at net/mac80211/driver-ops.c:360 drv_unassign_vif_chanctx+0x247/0x860 net/mac80211/driver-ops.c:360
-Modules linked in:
-CPU: 0 UID: 0 PID: 1134 Comm: kworker/u32:5 Not tainted 6.13.0-rc4-syzkaller-00012-g9b2ffa6148b1 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: netns cleanup_net
-RIP: 0010:drv_unassign_vif_chanctx+0x247/0x860 net/mac80211/driver-ops.c:360
-Code: 74 24 10 48 81 c6 20 01 00 00 48 89 74 24 10 e8 0f 4f 0c f7 8b 54 24 04 48 c7 c7 c0 fc 9d 8c 48 8b 74 24 10 e8 3a 15 cd f6 90 <0f> 0b 90 90 e8 f0 4e 0c f7 4c 89 ea 48 b8 00 00 00 00 00 fc ff df
-RSP: 0018:ffffc9000677f5d8 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: ffff88806a928d80 RCX: ffffffff815a1729
-RDX: ffff888024f52440 RSI: ffffffff815a1736 RDI: 0000000000000001
-RBP: ffff8880710e8e40 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000005 R12: ffff88806a92aa28
-R13: ffff88806a929728 R14: ffff88806a92a9d0 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88802b400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000569e04c0 CR3: 000000000db7e000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_assign_link_chanctx+0x158/0xd80 net/mac80211/chan.c:885
- __ieee80211_link_release_channel+0x273/0x4b0 net/mac80211/chan.c:1859
- ieee80211_link_release_channel+0xda/0x1b0 net/mac80211/chan.c:2130
- unregister_netdevice_many_notify+0xf77/0x1e60 net/core/dev.c:11548
- unregister_netdevice_many net/core/dev.c:11590 [inline]
- unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11462
- unregister_netdevice include/linux/netdevice.h:3192 [inline]
- _cfg80211_unregister_wdev+0x64b/0x830 net/wireless/core.c:1255
- ieee80211_remove_interfaces+0x36d/0x760 net/mac80211/iface.c:2307
- ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1671
- mac80211_hwsim_del_radio+0x268/0x370 drivers/net/wireless/virtual/mac80211_hwsim.c:5625
- hwsim_exit_net+0x33f/0x6d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6505
- ops_exit_list+0xb0/0x180 net/core/net_namespace.c:172
- cleanup_net+0x5b7/0xbd0 net/core/net_namespace.c:648
- process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+Reproducer Script:
+for _ in 1 2; do  curl http://example.com/1000MB.bin --max-time 8 -o 
+/dev/null -w '(%{speed_download} B/s)\n'; sleep 0.1   ;done
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Tried various sysctl settings, changing qdiscs, tcp congestion algo 
+(e.g. from bbr to cubic), but the problem persists.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+git bisect traced the regression to commit dfa2f0483360 ("tcp: get rid 
+of sysctl_tcp_adv_win_scale"). While a similar issue described by 
+Netflix in 
+https://netflixtechblog.com/investigation-of-a-cross-regional-network-performance-issue-422d6218fdf1 
+and was supposedly fixed in kernels 6.6.33 and 6.10, the problem remains 
+in 6.6.58 and even 6.13-rc for our case.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Could this behavior be a side effect of `tcp_adv_win_scale` removal, or 
+is it indicative of something else?
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+We would appreciate any insights or guidance how to further investigate 
+this regression.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Best regards!
 
-If you want to undo deduplication, reply with:
-#syz undup
 
