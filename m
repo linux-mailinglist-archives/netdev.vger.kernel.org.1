@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-154459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6181B9FE124
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 01:16:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C529FE12D
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 01:17:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D67FC1618CE
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 00:16:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BD983A21D7
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 00:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5A627453;
-	Mon, 30 Dec 2024 00:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB60E13AA3E;
+	Mon, 30 Dec 2024 00:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="emALD3YB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZNsQSLB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA9518EB0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9F71C6BE;
 	Mon, 30 Dec 2024 00:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735517760; cv=none; b=i7PZaUsd6EV60wDV6kUX7+rTBty/myUFvlGAslSxvG3hJ+xIF5MGdygMRhT0sCLm5Il2SkESQsPR38wLD2PvYG6iiagMRJ4xJSrEIbmOtQqIR46qKMAaJbcxnOc3wmfjjSCBi9uESY/JDIknToZajDm7adA/Q4oBBZHv9bwfqEA=
+	t=1735517760; cv=none; b=h8EPMTux2OhWAfkjIR3ug0S/7SxIOwKVadQ8MJqre90Tk8VmDDu5UKz7KkYkuxB1M8+UgmZ103DySWT6yU0vf74RxHBDIWKGZ26Q7Q2/grBBj5F19b3B2G0+3viUkaASKL5wQDXLxsMjaDyh+6Zbd1Ci55UX1mC4aKdCo98pRTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735517760; c=relaxed/simple;
-	bh=7uVm3CYoqa7+cTgqCe8InwCLob5UXrzsedA8gOn7b/Y=;
+	bh=+GPayxh5RqGj7KlYP7lL3+3fPmB0J8TTLnx1xFmFjIM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UMzVNbetNR8/FuUolU4Q70VK6Vgboi3LKgZ4eABWswtSO2BiIFbqqQChcpdT9lYtm37AIE61ML90LVwnSdzJPo1vBIVP76eJNpPx1O4oqH4srSFlpWw2N1cI6IblKGgriOKIJpYvcEWbw886s+meMWEQPf8wCcVGipkc+Ht2mqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=emALD3YB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26C31C4CEDD;
+	 MIME-Version; b=TRXEYUNT59oAN9wwc/sjiYBXjnNHtnceRsVAbpATaET/j2hGGleDFPhesz/PiHOuDQhScCPRGpQBvJp0I64jp+MPev46cJB33xWEfLSnTw02SR5pu+1qPEHD6NlJaqF8Eejiw2ByMksglh09ll0s9zx7uZ8oiK0NbRAYsvFQayw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZNsQSLB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4C8C4AF09;
 	Mon, 30 Dec 2024 00:16:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1735517760;
-	bh=7uVm3CYoqa7+cTgqCe8InwCLob5UXrzsedA8gOn7b/Y=;
+	bh=+GPayxh5RqGj7KlYP7lL3+3fPmB0J8TTLnx1xFmFjIM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=emALD3YB1G99ePmpruIuIykcrGHRoLeNnePWIthGG5XfZMHencEMweAYsuv1Eb/VY
-	 kRX+xXxkrhmAtDE6+HzyZdxDsSvhCg/Og3egnfeQtOihHODmxJap8ay0N9EOfJl+xK
-	 X6v5gi3tYb40L6uwfT64na66vsa0fODtzsVadrNaWJGzEU2w1S4yL8CY3wVAgv5UGN
-	 gb0AiJ3NTeZ5XHOzkhca9bkcZ12dgVEQY621eSd9YUpIO8Gx30Dfih6iFNsbATaU56
-	 JblOuvnIG2ppcNxlLnQLzi+V12CTkxJKNBpHDnoqkgvrFW/lURjjc5JPi+l9OjzEuB
-	 7krS+qPes5mCA==
+	b=dZNsQSLBEhtVtXsdQNpvzY+pSL2sa2YCHygrnL583zTqrCQ6hNp7S7db+DOeNoTGW
+	 QE+9H4IHjMVIFjsTUO0xTHpUU8ycs8XKQQiW36cnClsoOVNw4YMYmJUN3LHwAcGzjO
+	 NpwpWVxnRZzoe5H4JE1rZ2gjMjeGVGdl0oaZde8R/nfvfHip+clVSK7Hcjkbtfiy6H
+	 eaY25PT/Li0So3MOPPII+/V5RbTVoGEadBXOM5tsjSsKXI/eclSk7EItGGSW0PK9Al
+	 NgZszWkFaMu4ecH7gmTJfJlkWvGRmsof5OkG/8hsRCThwkQsG47WIV9/9w/xKCNg1H
+	 uwaMg10ij62cA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 04/29] crypto: skcipher - remove redundant check for SKCIPHER_WALK_SLOW
-Date: Sun, 29 Dec 2024 16:13:53 -0800
-Message-ID: <20241230001418.74739-5-ebiggers@kernel.org>
+Subject: [PATCH v2 05/29] crypto: skcipher - fold skcipher_walk_skcipher() into skcipher_walk_virt()
+Date: Sun, 29 Dec 2024 16:13:54 -0800
+Message-ID: <20241230001418.74739-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241230001418.74739-1-ebiggers@kernel.org>
 References: <20241230001418.74739-1-ebiggers@kernel.org>
@@ -61,33 +61,73 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-In skcipher_walk_done(), remove the check for SKCIPHER_WALK_SLOW because
-it is always true.  All other flags (and lack thereof) were checked
-earlier in the function, leaving SKCIPHER_WALK_SLOW as the only
-remaining possibility.
+Fold skcipher_walk_skcipher() into skcipher_walk_virt() which is its
+only remaining caller.  No change in behavior.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/skcipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/skcipher.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
 diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index c627e267b125..98606def1bf9 100644
+index 98606def1bf9..17f4bc79ca8b 100644
 --- a/crypto/skcipher.c
 +++ b/crypto/skcipher.c
-@@ -118,11 +118,11 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
- 		goto unmap_src;
- 	} else if (walk->flags & SKCIPHER_WALK_COPY) {
- 		skcipher_map_dst(walk);
- 		memcpy(walk->dst.virt.addr, walk->page, n);
- 		skcipher_unmap_dst(walk);
--	} else if (unlikely(walk->flags & SKCIPHER_WALK_SLOW)) {
-+	} else { /* SKCIPHER_WALK_SLOW */
- 		if (res > 0) {
- 			/*
- 			 * Didn't process all bytes.  Either the algorithm is
- 			 * broken, or this was the last step and it turned out
- 			 * the message wasn't evenly divisible into blocks but
+@@ -304,23 +304,26 @@ static int skcipher_walk_first(struct skcipher_walk *walk)
+ 	walk->page = NULL;
+ 
+ 	return skcipher_walk_next(walk);
+ }
+ 
+-static int skcipher_walk_skcipher(struct skcipher_walk *walk,
+-				  struct skcipher_request *req)
++int skcipher_walk_virt(struct skcipher_walk *walk,
++		       struct skcipher_request *req, bool atomic)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
++	int err = 0;
++
++	might_sleep_if(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP);
+ 
+ 	walk->total = req->cryptlen;
+ 	walk->nbytes = 0;
+ 	walk->iv = req->iv;
+ 	walk->oiv = req->iv;
+ 
+ 	if (unlikely(!walk->total))
+-		return 0;
++		goto out;
+ 
+ 	scatterwalk_start(&walk->in, req->src);
+ 	scatterwalk_start(&walk->out, req->dst);
+ 
+ 	walk->flags &= ~SKCIPHER_WALK_SLEEP;
+@@ -334,22 +337,12 @@ static int skcipher_walk_skcipher(struct skcipher_walk *walk,
+ 	if (alg->co.base.cra_type != &crypto_skcipher_type)
+ 		walk->stride = alg->co.chunksize;
+ 	else
+ 		walk->stride = alg->walksize;
+ 
+-	return skcipher_walk_first(walk);
+-}
+-
+-int skcipher_walk_virt(struct skcipher_walk *walk,
+-		       struct skcipher_request *req, bool atomic)
+-{
+-	int err;
+-
+-	might_sleep_if(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP);
+-
+-	err = skcipher_walk_skcipher(walk, req);
+-
++	err = skcipher_walk_first(walk);
++out:
+ 	walk->flags &= atomic ? ~SKCIPHER_WALK_SLEEP : ~0;
+ 
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(skcipher_walk_virt);
 -- 
 2.47.1
 
