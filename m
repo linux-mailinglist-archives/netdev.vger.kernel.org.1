@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-154567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F7119FEA76
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 20:48:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8439B9FEAB9
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 21:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F3CA16140F
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 19:48:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43BD7188263E
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 20:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685DD198A37;
-	Mon, 30 Dec 2024 19:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C545319C540;
+	Mon, 30 Dec 2024 20:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nAv4wNJW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jCkHCIx9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE13A197A8F
-	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 19:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309F319ABA3
+	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 20:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735588085; cv=none; b=H9Fv76R+JmDGnTnhxLHrgsFRv7zvjg4hT9yBcAY2FcaNbqzjw7FT6djt/NF3B18PlzR0u4XsoZIcqzIpkK7zL6NJuCwwAp4xAb3lzyGj8+QdHQZ7Iq6FYn8g1x/oZqzpqAfBlZwAkZpDn+oXDOHbNxP2Dg6dPbpgS2S/X/I+Ggo=
+	t=1735592212; cv=none; b=Se/LGltE5+U0YPq6TFoUVB/ps7TuQLVCchCwShEg5PG5rih21EKMi08hcdFd8TNOMqAmRWxfqSM0pTD4OArFvZb+HUPztB0N3Far5xC6E4Sr1NxFKQ5Y/+UeLSbtcDp1Qbv3Viq6Yq4tOxHUWsfgimkM/IxTnka6B/1aesd6uLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735588085; c=relaxed/simple;
-	bh=B3EJZ/S/esoATUjqEdl8TDYWwEgcBPsSzHzXW4OYIC8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WF4hR6Rz1D2OZnik4BbBUI7kCDJSQ4sRQZLb2XP46DSLNzQ1zUNgWBFEZLfuU7uEI7snpV7beMlw9ulOAYe9+zLyjfCWxikIJvPd4Z9ZBMjnhPu1mc6OXkwbACCE7vCrG3onTV1Mkz70+/EwCPFxWlOrM4R+2ShAI5l91wg8ftI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nAv4wNJW; arc=none smtp.client-ip=209.85.222.201
+	s=arc-20240116; t=1735592212; c=relaxed/simple;
+	bh=j2D52kuKVc8PdXh5iBwWE6iH872br4xYjeDlPKjkWlo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hI3FrnwdRwqpXR+LYrBfv9qgTbGtCD/OHewRXcKTvxD2vcfW9uFCSuplDFR0+RjLv2pqQWX40Nvnbmz9vySaAjEsvqodWmDbqNhxNnfOL7mWeONurCszhlogyuRpcSjVL4Jh3lcq8ZcEbJE67Sjyd7aOegAb9+AAbA6Pa9vHFhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jCkHCIx9; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b6eeef7cb8so531538185a.2
-        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 11:48:03 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef80d30df1so12474776a91.1
+        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 12:56:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735588082; x=1736192882; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1735592210; x=1736197010; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=1Ry3mIuEm7lREFg97VQTiVZrVyCsSvlQWDWsMAl3ycU=;
-        b=nAv4wNJWgHz5Ha7Yl3Ivu5DOlaNu0Z1c964gyC1n/Gz1/KN6hizxFZwO9IrTHntlDT
-         9y74cY+V79B2mrBynsYXQKu5mnMKb/GLPG3W5Ph/tZOkaHUaAYXNtpi5QvBWB1yAtKJy
-         mnttxQYGqp8vFbSydHNXv49FbveF8j0cW1cEwusufJzKM/+MJu7QXudjTahULRMd0uU5
-         I/BdoN6WsEqhKrnwXbDlxwT+vQPVpgauOmnb+1LiU1orL+hPAsWjN7QREc9Ni0XvIccv
-         PDV1LWE8rYjVGIVimEWiM7eOvE3VvBPdUeHqztGEZrY+9SSfh9ShN/qOnH78UjPwn1rH
-         DLcg==
+        bh=/IJ3/vDz1j4Lld4GkSUwDYnIdXaW9w4G+aljgcCdr/s=;
+        b=jCkHCIx96l2pJpUQM026lA00A4d7m/82smzmro4OO3rEBGy1G7tPd5BXu0SDKs928r
+         ll/SBLBkEZb/AF5eDHnS8PxU9ELQm5qrqQU/6+Bv03/S3nNSVa6CffD3ut7e+w3QSllH
+         8V4xXlO7TuDXX1UoM4yVbFW6aC1+dMza3TLIoN7Po9xv01/37VGM82Vmt68UdSSZe++u
+         xkhG1HqW/w5rnDJ415lBHyQD5kccLHETmH5+xAKKSoz/J29vd7UOKO0CVtMs4AvKMs5H
+         OcYf8GoAG/TrViDkOhD7Tnu+0JAr0Fuc/u5ZGkvW81xpBKH+EeI7kfgH7bS3XYMxltLD
+         YZdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735588082; x=1736192882;
+        d=1e100.net; s=20230601; t=1735592210; x=1736197010;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Ry3mIuEm7lREFg97VQTiVZrVyCsSvlQWDWsMAl3ycU=;
-        b=phEC3If88/V4igLrUOwo3eP3dutPaCnGBT0uWtfpK97JyjjfFT7eXSQ8HV6YxVdg8/
-         mkCHbdV83PwwAq33YMw3hbTBRchQc/2zQlwPArrBwHrOsoOkHTvKHhRAUfTP9yniIhLS
-         VRdLPAxKVHcDoGuMRp7X42f0eiQEtpLQclYc6yz4gzR1WS/m/1gwTRQ3zuwTwtUADwFW
-         hfn1grPNKSh+ORWuqLdHr074rgYBwIuGerM6Kfxnk2DCuxQRatpQdHrUSjG0cYUmpqN+
-         95+41zJ4qUtsHn9CYzXHEChcyrvDDd4VGZIYMVV/POEXRZng204AQjUhxomj0hcDRS1n
-         k8yw==
-X-Forwarded-Encrypted: i=1; AJvYcCWtZg+ypasquNi6grj/frWwsI0+zOKeR8S9spYygo9rs0eta4vT4c87Fhcg6wGoTkK2iVqLCu8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc6Mw4t3DDEnQSjjr/MsepXGf2abo0e6DfDJ31NL6sF5jF1d7j
-	3LUKgLxVJDtD69PJGE6BvVl56ZvDuoF7X4zTDp6HaNjrOLJ9WDhCyfcSaWEtB/rMUFJO7Y1XNzO
-	HXjYz77rtiw==
-X-Google-Smtp-Source: AGHT+IHnmqWtyNlrV1Cr0Caj9omA/ZYj7wZFKf+cE9I6zDyTyJ+ATsDSfn9l3O6m3zuBhLIYGyucrzKcycH2Zw==
-X-Received: from qtxz7.prod.google.com ([2002:a05:622a:1247:b0:467:64d0:3f08])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:650a:b0:7b6:d6dd:8826 with SMTP id af79cd13be357-7b9ba834079mr6738202885a.55.1735588082752;
- Mon, 30 Dec 2024 11:48:02 -0800 (PST)
-Date: Mon, 30 Dec 2024 19:47:57 +0000
+        bh=/IJ3/vDz1j4Lld4GkSUwDYnIdXaW9w4G+aljgcCdr/s=;
+        b=F8a/m/aVHT+XMYI/h6Y0tRFa1IJEJK4y+WTuN33OM3bYw4aECcTM6LwDWcD9d+Nm6p
+         I0IsbBSszn1WaHy+BS6vDQAklmpHZ2uVH9CPf9/YkO+467+ajl/qFY5sFwEhHqexWshL
+         GxSFYNB41Bx0eLZtqzajull5m91wbgnabddjHFSpRhC2hq8GnChdUGbwEI4PixbC+FZ4
+         O70YYwms2F1YlUQkK/30wHAjnhYsNT4v9o6Obx862FyymelTZkfmY41LgkG9Q1dm2Ocm
+         mQwwLBW8PKNJ+NwQhC1Me8eAUFsHTm13Vt0XMsbn+HaV6kA4aregxhAcRsuNYI+FLB7B
+         OrUw==
+X-Forwarded-Encrypted: i=1; AJvYcCWqCeKGiQ84RtVkF9tJbOmJkq9ZLqfMwxHc0FnPVdoz7ES+VZ7ONMKRz64cazqX09+FWm7uIb0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtWgxdI2Pf8Pwo/nUx6Icda3IWEmdCW7bY3a2X01ocyMfb2mzu
+	29sns1YrWscYUrXHuLmZX2kD6Vd2nznmuIuibzM67zKChui3M2w5LZnWik8q28tqJyhoBBgBmw=
+	=
+X-Google-Smtp-Source: AGHT+IF5HVePXx7H1XYt5kF2mZaNS4QrN6LbuVQU7CzeAeke4kol4AbvvUXUDS62JGg0lGG5PwhM+TL1NA==
+X-Received: from pjbse14.prod.google.com ([2002:a17:90b:518e:b0:2e5:8726:a956])
+ (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:538b:b0:2ee:5bc9:75b5
+ with SMTP id 98e67ed59e1d1-2f452dfccf6mr54068211a91.4.1735592210415; Mon, 30
+ Dec 2024 12:56:50 -0800 (PST)
+Date: Mon, 30 Dec 2024 12:56:47 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,102 +71,119 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241230194757.3153840-1-edumazet@google.com>
-Subject: [PATCH iproute2] tc: fq: add support for TCA_FQ_OFFLOAD_HORIZON attribute
-From: Eric Dumazet <edumazet@google.com>
-To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Message-ID: <20241230205647.1338900-1-tavip@google.com>
+Subject: [PATCH net-next] team: prevent adding a device which is already a
+ team device lower
+From: Octavian Purdila <tavip@google.com>
+To: jiri@resnulli.us, andrew+netdev@lunn.ch
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, Octavian Purdila <tavip@google.com>, 
+	syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-In linux-6.13, we added the ability to offload pacing on
-capable devices.
+Prevent adding a device which is already a team device lower,
+e.g. adding veth0 if vlan1 was already added and veth0 is a lower of
+vlan1.
 
-tc qdisc add ... fq ... offload_horizon 100ms
+This is not useful in practice and can lead to recursive locking:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+$ ip link add veth0 type veth peer name veth1
+$ ip link set veth0 up
+$ ip link set veth1 up
+$ ip link add link veth0 name veth0.1 type vlan protocol 802.1Q id 1
+$ ip link add team0 type team
+$ ip link set veth0.1 down
+$ ip link set veth0.1 master team0
+team0: Port device veth0.1 added
+$ ip link set veth0 down
+$ ip link set veth0 master team0
+
+============================================
+WARNING: possible recursive locking detected
+6.13.0-rc2-virtme-00441-ga14a429069bb #46 Not tainted
+--------------------------------------------
+ip/7684 is trying to acquire lock:
+ffff888016848e00 (team->team_lock_key){+.+.}-{4:4}, at: team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+
+but task is already holding lock:
+ffff888016848e00 (team->team_lock_key){+.+.}-{4:4}, at: team_add_slave (drivers/net/team/team_core.c:1147 drivers/net/team/team_core.c:1977)
+
+other info that might help us debug this:
+Possible unsafe locking scenario:
+
+CPU0
+----
+lock(team->team_lock_key);
+lock(team->team_lock_key);
+
+*** DEADLOCK ***
+
+May be due to missing lock nesting notation
+
+2 locks held by ip/7684:
+
+stack backtrace:
+CPU: 3 UID: 0 PID: 7684 Comm: ip Not tainted 6.13.0-rc2-virtme-00441-ga14a429069bb #46
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Call Trace:
+<TASK>
+dump_stack_lvl (lib/dump_stack.c:122)
+print_deadlock_bug.cold (kernel/locking/lockdep.c:3040)
+__lock_acquire (kernel/locking/lockdep.c:3893 kernel/locking/lockdep.c:5226)
+? netlink_broadcast_filtered (net/netlink/af_netlink.c:1548)
+lock_acquire.part.0 (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5851)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+? trace_lock_acquire (./include/trace/events/lock.h:24 (discriminator 2))
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+? lock_acquire (kernel/locking/lockdep.c:5822)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+__mutex_lock (kernel/locking/mutex.c:587 kernel/locking/mutex.c:735)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+? fib_sync_up (net/ipv4/fib_semantics.c:2167)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+notifier_call_chain (kernel/notifier.c:85)
+call_netdevice_notifiers_info (net/core/dev.c:1996)
+__dev_notify_flags (net/core/dev.c:8993)
+? __dev_change_flags (net/core/dev.c:8975)
+dev_change_flags (net/core/dev.c:9027)
+vlan_device_event (net/8021q/vlan.c:85 net/8021q/vlan.c:470)
+? br_device_event (net/bridge/br.c:143)
+notifier_call_chain (kernel/notifier.c:85)
+call_netdevice_notifiers_info (net/core/dev.c:1996)
+dev_open (net/core/dev.c:1519 net/core/dev.c:1505)
+team_add_slave (drivers/net/team/team_core.c:1219 drivers/net/team/team_core.c:1977)
+? __pfx_team_add_slave (drivers/net/team/team_core.c:1972)
+do_set_master (net/core/rtnetlink.c:2917)
+do_setlink.isra.0 (net/core/rtnetlink.c:3117)
+
+Reported-by: syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
+Fixes: 3d249d4ca7d0 ("net: introduce ethernet teaming device")
+Signed-off-by: Octavian Purdila <tavip@google.com>
 ---
- tc/q_fq.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+ drivers/net/team/team_core.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tc/q_fq.c b/tc/q_fq.c
-index f549be20f19f474acbc6c609bd99dbe543df48de..51a43122bd5705f9cdf59c5974e995d8bc38f245 100644
---- a/tc/q_fq.c
-+++ b/tc/q_fq.c
-@@ -32,7 +32,8 @@ static void explain(void)
- 		"		[ timer_slack TIME]\n"
- 		"		[ ce_threshold TIME ]\n"
- 		"		[ horizon TIME ]\n"
--		"		[ horizon_{cap|drop} ]\n");
-+		"		[ horizon_{cap|drop} ]\n"
-+		"		[ offload_horizon TIME ]\n");
- }
- 
- static unsigned int ilog2(unsigned int val)
-@@ -64,6 +65,7 @@ static int fq_parse_opt(const struct qdisc_util *qu, int argc, char **argv,
- 	unsigned int ce_threshold;
- 	unsigned int timer_slack;
- 	unsigned int horizon;
-+	unsigned int offload_horizon;
- 	__u8 horizon_drop = 255;
- 	bool set_plimit = false;
- 	bool set_flow_plimit = false;
-@@ -79,6 +81,7 @@ static int fq_parse_opt(const struct qdisc_util *qu, int argc, char **argv,
- 	bool set_horizon = false;
- 	bool set_priomap = false;
- 	bool set_weights = false;
-+	bool set_offload_horizon = false;
- 	int weights[FQ_BANDS];
- 	int pacing = -1;
- 	struct rtattr *tail;
-@@ -155,6 +158,13 @@ static int fq_parse_opt(const struct qdisc_util *qu, int argc, char **argv,
- 				return -1;
- 			}
- 			set_horizon = true;
-+		} else if (strcmp(*argv, "offload_horizon") == 0) {
-+			NEXT_ARG();
-+			if (get_time(&offload_horizon, *argv)) {
-+				fprintf(stderr, "Illegal \"offload_horizon\"\n");
-+				return -1;
-+			}
-+			set_offload_horizon = true;
- 		} else if (strcmp(*argv, "defrate") == 0) {
- 			NEXT_ARG();
- 			if (strchr(*argv, '%')) {
-@@ -333,6 +343,9 @@ static int fq_parse_opt(const struct qdisc_util *qu, int argc, char **argv,
- 	if (set_weights)
- 		addattr_l(n, 1024, TCA_FQ_WEIGHTS,
- 			  weights, sizeof(weights));
-+	if (set_offload_horizon)
-+		addattr_l(n, 1024, TCA_FQ_OFFLOAD_HORIZON,
-+			  &offload_horizon, sizeof(offload_horizon));
- 	addattr_nest_end(n, tail);
- 	return 0;
- }
-@@ -348,6 +361,7 @@ static int fq_print_opt(const struct qdisc_util *qu, FILE *f, struct rtattr *opt
- 	unsigned int orphan_mask;
- 	unsigned int ce_threshold;
- 	unsigned int timer_slack;
-+	__u32 offload_horizon;
- 	unsigned int horizon;
- 	__u8 horizon_drop;
- 
-@@ -487,6 +501,14 @@ static int fq_print_opt(const struct qdisc_util *qu, FILE *f, struct rtattr *opt
- 			print_null(PRINT_ANY, "horizon_drop", "horizon_drop ", NULL);
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index c7690adec8db..dc7cbd6a9798 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -1175,6 +1175,13 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 		return -EBUSY;
  	}
  
-+	if (tb[TCA_FQ_OFFLOAD_HORIZON] &&
-+	    RTA_PAYLOAD(tb[TCA_FQ_OFFLOAD_HORIZON]) >= sizeof(__u32)) {
-+		offload_horizon = rta_getattr_u32(tb[TCA_FQ_OFFLOAD_HORIZON]);
-+		print_uint(PRINT_JSON, "offload_horizon", NULL, offload_horizon);
-+		print_string(PRINT_FP, NULL, "offload_horizon %s ",
-+			     sprint_time(offload_horizon, b1));
++	if (netdev_has_upper_dev(port_dev, dev)) {
++		NL_SET_ERR_MSG(extack, "Device is already a lower device of the team interface");
++		netdev_err(dev, "Device %s is already a lower device of the team interface\n",
++			   portname);
++		return -EBUSY;
 +	}
 +
- 	return 0;
- }
- 
+ 	if (port_dev->features & NETIF_F_VLAN_CHALLENGED &&
+ 	    vlan_uses_dev(dev)) {
+ 		NL_SET_ERR_MSG(extack, "Device is VLAN challenged and team device has VLAN set up");
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
