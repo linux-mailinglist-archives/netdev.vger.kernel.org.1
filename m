@@ -1,109 +1,88 @@
-Return-Path: <netdev+bounces-154545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20E119FE7B0
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 16:39:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E22EE9FE8D9
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 17:01:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21FAC3A22C5
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 15:39:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D558E1882A1B
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 16:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E5D1AAA37;
-	Mon, 30 Dec 2024 15:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XuvWJtEE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B573919F424;
+	Mon, 30 Dec 2024 16:01:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4FE154BE4;
-	Mon, 30 Dec 2024 15:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8511F95A;
+	Mon, 30 Dec 2024 16:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735573183; cv=none; b=VbjHB7Dv4TRSJ1xvmA5Tt3yuUEta96ZVwi1ZpjGCxjcdA1GiM6b6j/CVyvgBIQjELceRVxzKm/ULQ9UO9y8+cqJonVniR7Bk8bzo65/LmyWo1WFEo6vcxLJAZcWlsX6G7Z1IE29nm24ofgVB8TkO0699JW7pikr3jcMzTYXD5ok=
+	t=1735574512; cv=none; b=rES/nX1EzX+JqGHMKtN72qKSgIkHRX9/c3qnuc4yyoYKXepA4KTWzmmoa/Allz1YWsygRsaDf8s/Dkc6+wbXRyr8srVsCsB9xpzZM7X+uVwuIOlirPZScNA9DkUYLy7utCkecZ+YFppAlAFhl/CyhvXCJewN59Vfzzw5on6EyzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735573183; c=relaxed/simple;
-	bh=z95nvnR0IBfFZgmgFKAM139dJRdkSORpd/LIl6jgSDI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TjqIVPNLZJwkbM9ku79OKmpRmhZAOeAbx+tqIyaYUJ/2ABgd9UC3MvTnl56VigNtJgptVwcyVOCX7PNVJm60IH/BxImazUCMJsLg9YT+t897c/wrjhWQphuq8lg0/6cUjlxtVX71/4ROs+8uwSnMuk4EArywgrq2K6MTYNy4yes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XuvWJtEE; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3C90E1C0002;
-	Mon, 30 Dec 2024 15:39:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1735573178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hA6CvsCmERwL792aXpdy/ULlGDIdsXDMPmDFIsJtA6E=;
-	b=XuvWJtEE0++XLT3rjMf9QjyWRB1g9h7vnqPO7uWmXBjocxq+NoCycynxsGKJmKQlDfH9Yx
-	1ilV8yt4k+8YgHIF9ToR+BZ6BTDhk/q1w37IAJYbJAodKEVUuzdeulTaOIoA4s6Z0ihmw4
-	sRkOi7lOxe30lAVxPMk+2ArnorH0JvtorS92rVthXDsL9+DWX64KZpPNsoWqSinnlfxDDt
-	4HmfgAvft3IdMa9U+q2i5XrPI3/K2KZkpmRnHOGIkX76XWqBB6uHPxiSToobxC2KNkZh08
-	vAGwy1jwSp7IWTxgauhY3nNw40B+bqmn6IeJSMURelKCAGbwdErgEnq2vtXnMQ==
-Date: Mon, 30 Dec 2024 16:39:36 +0100
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org,
-	brgl@bgdev.pl, andi.shyti@kernel.org, mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
-	jdelvare@suse.com, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v4 7/7] rtc: Add Nuvoton NCT6694 RTC support
-Message-ID: <2024123015393681ee26a3@mail.local>
-References: <20241227095727.2401257-1-a0282524688@gmail.com>
- <20241227095727.2401257-8-a0282524688@gmail.com>
+	s=arc-20240116; t=1735574512; c=relaxed/simple;
+	bh=upE6mmLGUYBFCCrc5ClABB9Do+//eEgHWdQ0CkA32jo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G63xCFxiOpFzFBbKPr71ytOZIzkT8CchW82bCZfsVmvrT8yh7BiG44OIcsDwg4T7m2fE+1E+0G8Nm+az8TLU6ZhEmfUCTIIRbuDOssUPkhKGeA2qQAbcuWB5G+fooIxZGS5svMVmRt3O8rzh7P0GiF0AzmbINNiX00cEP2CxLEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from localhost.localdomain (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@sostec.de)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id C1434C07D3;
+	Mon, 30 Dec 2024 16:54:15 +0100 (CET)
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+To: alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux@treblig.org
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next] net: mac802154: Remove unused ieee802154_mlme_tx_one
+Date: Mon, 30 Dec 2024 16:53:52 +0100
+Message-ID: <173557391812.3760501.8550596228761441624.b4-ty@datenfreihafen.org>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241225012423.439229-1-linux@treblig.org>
+References: <20241225012423.439229-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241227095727.2401257-8-a0282524688@gmail.com>
-X-GND-Sasl: alexandre.belloni@bootlin.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On 27/12/2024 17:57:27+0800, Ming Yu wrote:
-> +	ret = devm_rtc_register_device(data->rtc);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret, "Failed to register rtc\n");
+Hello linux@treblig.org.
 
-There is no error path where the error is silent in
-devm_rtc_register_device, the message is unnecessary .
-
-> +
-> +	device_init_wakeup(&pdev->dev, true);
-> +	return 0;
-> +}
-> +
-> +static struct platform_driver nct6694_rtc_driver = {
-> +	.driver = {
-> +		.name	= "nct6694-rtc",
-> +	},
-> +	.probe		= nct6694_rtc_probe,
-> +};
-> +
-> +module_platform_driver(nct6694_rtc_driver);
-> +
-> +MODULE_DESCRIPTION("USB-RTC driver for NCT6694");
-> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
-> +MODULE_LICENSE("GPL");
-> +MODULE_ALIAS("platform:nct6694-rtc");
-> -- 
-> 2.34.1
+On Wed, 25 Dec 2024 01:24:23 +0000, linux@treblig.org wrote:
+> ieee802154_mlme_tx_one() was added in 2022 by
+> commit ddd9ee7cda12 ("net: mac802154: Introduce a synchronous API for MLME
+> commands") but has remained unused.
 > 
+> Remove it.
+> 
+> Note, there's still a ieee802154_mlme_tx_one_locked()
+> variant that is used.
+> 
+> [...]
 
--- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Applied to wpan/wpan-next.git, thanks!
+
+[1/1] net: mac802154: Remove unused ieee802154_mlme_tx_one
+      https://git.kernel.org/wpan/wpan-next/c/bddfe23be8f8
+
+regards,
+Stefan Schmidt
 
