@@ -1,346 +1,311 @@
-Return-Path: <netdev+bounces-154506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BEDE9FE3FE
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 10:00:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E812D9FE400
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 10:01:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0134F7A0836
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 08:59:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A28C9188097E
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 09:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D9C1A23A8;
-	Mon, 30 Dec 2024 08:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA9A199254;
+	Mon, 30 Dec 2024 09:01:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CZdtrAoY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XLDjXk3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2079.outbound.protection.outlook.com [40.107.244.79])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C600B1A239E
-	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 08:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71482C80;
+	Mon, 30 Dec 2024 09:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.85
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735549182; cv=fail; b=KSAtCwYBVQAUMMaV4xFJ4erHj7C2JzaDhQg9WtU6cc/DrzSNJn2zaM1PZl1y0BJHs2BrYGsWTY8qxErDrK8fNP1OmGFHbzflJcZoTh7+EGq56epDNm26P8Zyuuk9wYj15sNX+odDKGN60WDew23u+qarbAkgE6dczuAENYYUyI0=
+	t=1735549277; cv=fail; b=kelb1f0c0Ntlb43NYjH1OD0ll5ekfhKrTSHdFCdBTpLEn8gZfziGkg5ThI+I5vdfG9jrbkgtF5dvmRSUhvJwzI2D5BSEUUY+v9iu3SijyN++a3i1LLKjcsH3Y65TFgVpJCab76WO6MI+k7Av5XxXpVlzVKCr0uZ9FrS4+NSxUVs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735549182; c=relaxed/simple;
-	bh=cFzJbgkEeg2c9r21Ub61Xbr3XWVZmzxzJbLCgd5PXmU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ey8dw3j4LCcKuy2J6oEH8kYP5/WQdCyjTodAZx0COt6kQ41yC5ltZpAdYJRs4X5v/QNe1/rzBsOdaE0MxHYmwhaLlFcYnMShaavBRlahC33qx4XpSTlu2eXRaHxstV636MM/AKCtJ5Nr5e1m+PNZDnqMBe5uYhHeul6SfwQCK/8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CZdtrAoY; arc=fail smtp.client-ip=40.107.244.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1735549277; c=relaxed/simple;
+	bh=Um50fJC9dX7i5PSNeiFPg0fbR40jQ4S2a9Qj3Myqk/s=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XK8MCMB2X4uF5T/wUHJE6ffvyu0v2J0bWFyqOkLn2WzD2bxHxeejMprhc61KfRi4rXbcibWa1d6DsfSOTigp/he5TJUhTCzRSrFJCuODYXo5oQmvJXpz/tGx492IOh96lhpp6hkg7R6rFUkLopp4JRHIq0N3FPHO7+Zsl6pFYo0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XLDjXk3G; arc=fail smtp.client-ip=40.107.220.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SLr4ecxBbMWcaqxWP+TWmuJ2s7LIiL9I58YnYpZSWb1dSs4TfuVAkO1fYFZaznzwe5F19nGvfzSnHdpOuvfDqwbzsp6AowtP8K049Ccw02ONUWhhcg7chKMOX4jTCoPrptU/aqrdnNxW0Pgz0OaK5JNjBp12Ptr3BhxTI3cfzB5sOYt8lVOR3NnqlmDE7lyrw062eOgFACun2gSevEFCWJutZlWnjtRtICpqOWlRx/tYgD1H2RuhfCfRRLgI20WtvF/DsIUVb4GZuE5PxYNRCXk9tUfinoBf4avwU9Z/1fMlFmrV66hF4/+iYD7Za8n/uNQfuDes70Besd+1IMUFbg==
+ b=g18UyAGraD4NlypTcoh91eUTIgABoKrl6qJ07xaHvuEGj+Cc2OXkdAYnrrvOOBr+z0zpYRfxo08PZ8/TJnnAoxLd8QliKSXKCxf/6C7eK9RpYYyyfsOypiZuOLxEYN//Nk+U6YAkP/WV8vK/VWvbvCCZ7lquvZ4Z4fjn9RQZ+31BQc6OQwQd+j4/7eBlmPzJQUFNo9jqxwGQvcbCzLdRV01I8NGENiT8NVzw6fieddavD9MiLs8pVnZKZ25nt+kWij+iTjeEAukGB26HO/ci7fsO0yLW30Nm8U31WHvP+PbrUmI6L8KHJ1+fMCgJz9l06CxOGWp25195xf9bFQPYvQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+lEyPvPXUhOzictXE4A+CSqPmZUcmArk8LelsmVHiXY=;
- b=gzesNDM2i2G3PEYqyLFwcxdq8GNRZIC+uASYCz0NLgbMPlmrquGENVHBz9D6b4wP7WR/e9gjSh6c0wK4pERQ5ON9XOfYNaMnuUmqtbvRelK+GKx15uldoeHVyhFnFMA2q33vgzXT5I72AkU4zBYFJpUTIo8praWEKkBum+N8gLLZLTgNsACrUbTkDfTN0GucOYhMnEavGS6seD/HlNPJ1h6Ql0M0qnfKpDBvk5hy3q/Kw+PmOexTjZm68ARGsV4Tpcn4sqxbNmVgDLnXtChy/fSJYBfEpJ//GBOLHTp4Nxki3J4aFPFd4nzoiAjzhsZ/lZcgTFAebsGtj/S+LOHGXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=pPTaarM1o47mwhO2+dU8zQ1XRkHngB+YJKO1wiCYveM=;
+ b=Gu7+P61RzOLwYmsLIq86rOJvZ0BaXWETW+Z+fSUoFV5Q8pEJplXNEefgzivVjvzIuKYMY+hvu5Ag6eoIhejYi2zGMhYvHpLlp/T0tjAzlTGMiIMwJQShFKK2QqnarQHTcoqRRvJhzFOhGg7LMTtIkX0MBbIc7xp9ser+teOoBFGlBvqmJEYJxYF+6zpkfAHX73nlNJBg1O4jkFdlLqtqDcFiY0KMH+2iZ7KIhEIjLM59XaIRi6y6mLxtw34hCl7U/yW9KrdvdsVekpdbwHAVI8yLVZNjVmA9mf2mYZ9WvnL0LNaTnXDGOwEwPOr7MGUCh3qF2kAVD5TiywcqUWUlng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+lEyPvPXUhOzictXE4A+CSqPmZUcmArk8LelsmVHiXY=;
- b=CZdtrAoYzuyVu+m06O5p7cfNetuvFVZb16Mg1q8FC+tgUhFotcnbdK7uS56bquycNrxUFLQztEapTZUK+Wbj7rm/lgj08GtQo0Ml6MRMB7qCbJlTE0ltuTYqy+nxYxecbLLQx+oh1Uow6FbQtHdn8LaLPhrdfqAweREYf9vBDlVFUrgwcGR5pszVh30HDFita0QJUcaXOuhj/R7YdIBnMNd66lq+kn61KpmgIvlJcFtcxkQtRQWUi4imgjyobpYEU8d+iTHhE12ndvV6uuWkSI5JIEw67+UlzUptTPcdy2RM9P2uNHLYq5hcfs3o+NyYThALrXYXDHsG8/p+A+rNjA==
-Received: from BN0PR02CA0014.namprd02.prod.outlook.com (2603:10b6:408:e4::19)
- by MN0PR12MB6002.namprd12.prod.outlook.com (2603:10b6:208:37e::10) with
+ bh=pPTaarM1o47mwhO2+dU8zQ1XRkHngB+YJKO1wiCYveM=;
+ b=XLDjXk3GkUoS+llyZvzxYWRt+O5F3lWtndwi3Fio/yKTMHKikuI/nB9n1m74Bko41xoxHESQbJGlR+JlZVCmU95XC+HkwMnPHdShRW3IeJR1/yqHHlq9oFSWRLqLFnSy6UVmbZDmM5ftsa6lW5tlRPruPMOgMsN+PpXDXbyMfuw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by MN2PR12MB4271.namprd12.prod.outlook.com (2603:10b6:208:1d7::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.19; Mon, 30 Dec
- 2024 08:59:33 +0000
-Received: from BL6PEPF00020E62.namprd04.prod.outlook.com
- (2603:10b6:408:e4:cafe::e8) by BN0PR02CA0014.outlook.office365.com
- (2603:10b6:408:e4::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8293.19 via Frontend Transport; Mon,
- 30 Dec 2024 08:59:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BL6PEPF00020E62.mail.protection.outlook.com (10.167.249.23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8314.11 via Frontend Transport; Mon, 30 Dec 2024 08:59:32 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 30 Dec
- 2024 00:59:17 -0800
-Received: from shredder.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 30 Dec
- 2024 00:59:14 -0800
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <dsahern@gmail.com>, <stephen@networkplumber.org>, <petrm@nvidia.com>,
-	<gnault@redhat.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH iproute2-next v2 3/3] iprule: Add flow label support
-Date: Mon, 30 Dec 2024 10:58:10 +0200
-Message-ID: <20241230085810.87766-4-idosch@nvidia.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241230085810.87766-1-idosch@nvidia.com>
-References: <20241230085810.87766-1-idosch@nvidia.com>
+ 2024 09:01:09 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8293.020; Mon, 30 Dec 2024
+ 09:01:09 +0000
+Message-ID: <5e25e3a5-cf28-a3b3-0309-d21593eca75b@amd.com>
+Date: Mon, 30 Dec 2024 09:01:04 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v8 06/27] cxl: add function for type2 cxl regs setup
+Content-Language: en-US
+From: Alejandro Lucero Palau <alucerop@amd.com>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, dave.jiang@intel.com
+References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
+ <20241216161042.42108-7-alejandro.lucero-palau@amd.com>
+ <20241224172236.00007c6c@huawei.com>
+ <e814e5f4-a48f-cb12-1d00-3367f5355d93@amd.com>
+In-Reply-To: <e814e5f4-a48f-cb12-1d00-3367f5355d93@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DB7PR05CA0046.eurprd05.prod.outlook.com
+ (2603:10a6:10:2e::23) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00020E62:EE_|MN0PR12MB6002:EE_
-X-MS-Office365-Filtering-Correlation-Id: faefd1db-6425-4bd4-6282-08dd28b04725
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|MN2PR12MB4271:EE_
+X-MS-Office365-Filtering-Correlation-Id: dd316aa1-de7d-46d8-65bc-08dd28b08074
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?aa/C2Gab+96ljRJQU3AkojBv8ePHDGNefMoMOpghPnUCFAVWAC3BGgSFVSC8?=
- =?us-ascii?Q?3iM8iCKd9QDw1eTuUx5w9wKlMr0y0zsdTvxifYqPk/eJoBmNMobsyvm/+heo?=
- =?us-ascii?Q?uuzrR1pXLlseQE0R3USMASyTEmDv9bt6fIecI0ypWobKOD/vXimKhvETImJe?=
- =?us-ascii?Q?o8che2K9SL7l4H4CUrJiMjf8rY86xbpX1GzRG3+YfmO8t9hvOD8317bvvtj0?=
- =?us-ascii?Q?N/eHbFI4Z3X6b133tfjT/tIrCV/ewUOHHYZZOpGwDrVUFC6C7+X9OaDyjQsj?=
- =?us-ascii?Q?NxazogwkiBiNOsC8nj4q1F31tChLWHrNJ71CpbVp8X232b5iEDTLOqdji/yy?=
- =?us-ascii?Q?dOPQEuzx0ir+biynPtmLIdW7L6SJSRqz7fq8ruxiA5jJy93GZ/ys1RckTcCA?=
- =?us-ascii?Q?MLFv1p4l1H7JzQkxP/ISPPLsblpJyKp7xuB2TqBS2B1+BcCA4Sh53R/efBMG?=
- =?us-ascii?Q?BHJyIqg5Ik/Qd9gZT9mTOd/jgCH7znFG5LG4O00YFzRN+Xo2XqUu/WldCpZn?=
- =?us-ascii?Q?Kntvi8Q+5lNlO44qrOf6ZaKVamt/CE6RI5OO8nKuze+vDe2nKh9oKAEru0zI?=
- =?us-ascii?Q?lbvT3crfDvbswD56rTE5qqzO7BH2C2B+8gwiTFgnSp1GCzCSiF40Xl1ZecUd?=
- =?us-ascii?Q?kSiKTviEo5OL56972cnysNGkCHrbqkDwxe2wMcxWkdD3m9D405VcBUbL7Jqe?=
- =?us-ascii?Q?YdA4bW5xaXG2DgCGBoipwBAk8DlV6tIS1Q9csbYLFLWABjju43HAlQip3XAJ?=
- =?us-ascii?Q?/lA4x31+bG1jgARKaaS0p+zdcRTpbRNaRcV9s7lfWoPBw49VwRoq0wkKg4/W?=
- =?us-ascii?Q?RnDU+WMUsgm2YQah4XQF73bNwy6KgDE7nqhxgxRAI1XM1RF/9nHMyf+Jxyvp?=
- =?us-ascii?Q?RYqqwlKJgjmvrB6rjUwyrofG214sGRtpsD3xJPxhtaAimqE7dedc5VcD2j3B?=
- =?us-ascii?Q?iR46K2A5+KOirlDfL3k6pL5ILbDwBHVyvhq7WhSuyPQyW5cgdSSU2o0bJ8ce?=
- =?us-ascii?Q?DF5SnblDWNOO3k2PnoCGCX+4Rmd3RuTwYs4BIQktAGuV0uAAaK/PJF7zwCSM?=
- =?us-ascii?Q?9rL9sXCx3NGQtIcfOqkMkKOFKjKuAmfKPbKMDgSCw4RigV9xePxvgY0dXq4B?=
- =?us-ascii?Q?gk9rojcq/oH0cSaALUJta/pElcXgzp9oSG+f0VXYU8w5izOFUwP7qhfHu760?=
- =?us-ascii?Q?HY4+oNjKCGj3mdrtLQYgHH22Dijy5rya6VWmZCKOSZRZeHpsSz2AabGO354U?=
- =?us-ascii?Q?GuAbIGsezWFy5NZsKKE0vstr7WkJYF19Tc7O+vzP+q8f1sDUlk28PA71oEYv?=
- =?us-ascii?Q?KhJigTHsczKzqykGddbHLN/fJHgAyy1G2ZmW2wzTsEG7DTdRPJECuXmhy7gD?=
- =?us-ascii?Q?Db6uQoE0vWLlG8AoeqNOMuMKvrE351YvThD7YDZOx1o8asBu/Jr3kMYMevZS?=
- =?us-ascii?Q?KSOMjD6E3YmuIQqS9dQsi0SlwfHNymuu5k6KxfhM6TQzZKp5qEMJfCW/EdfH?=
- =?us-ascii?Q?Vrs53/bz60IWBmk=3D?=
+	=?utf-8?B?N2tDZ0FQOXRFUkhRR3RzdnJWdktFVS9odWxpazNTc1dGN3MwMjZVR3ltSlRv?=
+ =?utf-8?B?d0ptK0hMRnIyNmVDdXQ1RW5mSHpYa3B3cUdXdFh5cHl2YTRuNG5nOG9xUmx5?=
+ =?utf-8?B?SW8vMURkd1ZRT0NqVUxQT3NpSGpXY1czNHQ3VmRxZUV3YjNxSmwwNkE5bkFI?=
+ =?utf-8?B?S2hkTk5QOGVYbVFmMW56bnI0OFRSazAwVjNqeXNaeEpVSXNBZEowNnJ5RGpG?=
+ =?utf-8?B?Tm9FWXRZRjZWK0NUeFUxbU5vRFVXRkJvSVNTOWNJb2xVeUwrUXVQTEw3UFVy?=
+ =?utf-8?B?aDU4OU54eVh3UVdVbVg4c3hPT25mcWpUd08zSVV5RG0vUEIzVnVNVWpyOTg2?=
+ =?utf-8?B?YUk3TlVDNGFJa002QzVNcmlCakxXWkJMK2EyMWFKTTczZEpnang3V1JmSGlR?=
+ =?utf-8?B?RWtHOEYyY1EwNmJqY2QyZDBMSUN5OG9RM2kybFV0MXFqSnBRYi9xQmpYOUNI?=
+ =?utf-8?B?TXVWWHhQWVo0b2dzaWxsZEVwdzdEdWsrcGdqeW9XTVZ0MENDaE50ZlBUbnho?=
+ =?utf-8?B?WHl5QjRXMzI3V1hoOTUvVFlxak9kU2VJaVNrWkZuM3F6L0daOGNIcHFUNzI4?=
+ =?utf-8?B?eThkUDFFRmgweXRieE9xbGJha0hFV0kyOWlJVjZGZUV5NXNVM3lBL2JzeElZ?=
+ =?utf-8?B?VDgyZUVPd0JEKzhaWEF4SWNMaTVJaFdOOWdnVXFFV2xGdzU3L2hVM0ZNaWNx?=
+ =?utf-8?B?N09oc2NNQlB5c3dOQ2w2QnR1R3Q5MEgwbFNQU2JrcVYvZnk4WTNRUU40bXph?=
+ =?utf-8?B?ODNSNkVMVERUbUM3am5zUzRKSGttY3JNL0MwdWJaVFZRRVZhd3lnREdiSGlY?=
+ =?utf-8?B?eitrclh2TlloR0xtVE5yMUtQQWp4dXd0SWpxbXgvcVFXdE96VDdJUFNjQkp1?=
+ =?utf-8?B?Si8wUFN4RExnMWc1WlQ4OVVqclRLamtKT0dyMzhJTDNUUDZtOVJkVEtvZ3V0?=
+ =?utf-8?B?dGM3cXdjN0FjU1p3dGJid1l3a3N6ZjM3ajA5bTNOcVQyeW1uaEJRRlAvVFQ3?=
+ =?utf-8?B?dStoZ05vR3NITGttanZDOGxhZjFva0Q0U0ZWclNuOUxQVkxodWRVUDFFNnZj?=
+ =?utf-8?B?NDFTWDMvUmxoWHR0WjNDdWRHaE9KZTM0SStTT1VwUGNqNTNBTUthd0Z5TGZi?=
+ =?utf-8?B?U0o4RW9iRlpGNUdhTFpxYnI3ZllMUDRwYzZEUDdxc25xUnUvcjVEamNrMk1J?=
+ =?utf-8?B?ZHNhbW9nZE5vbXdPcnZaYlpNNGxxTFR0RjNFZTcvUXRqRG82NzVrVGowT0lU?=
+ =?utf-8?B?OUJsa2dPVXh0R1k1UXBnMVlESW1hRThzZUl0TkV6em5GeUtuYmprWk1YdHRl?=
+ =?utf-8?B?T1IxOEJmeUJ1QjlubFFsQlNRM0VxZkJKbkM3NUZINVpoKzFNT3huS2dLMVBR?=
+ =?utf-8?B?eEkvWWpYblpCdzBoRElpcWt0enRhSkZCQUdQNXRaOVl3eWdkb2dpWWU2Umg4?=
+ =?utf-8?B?T0FtaFpiL0k4aS8wMHE0akJmZkV4YUNnckZwUklKUUQyNVZxanE0TWpQQjIy?=
+ =?utf-8?B?WmE4MVgzdzNvbGt2bzFjUFU0dGxFZUx1Z0FBbHpsTW80WVppbWpKdnBUTlpJ?=
+ =?utf-8?B?UkZzV2NIZFdVY01ZR1l6dXFJTkZYeVFoSkxabFkwZnUvWThmU3NXUEZTK1I5?=
+ =?utf-8?B?N0RlWWRCZk0yUHFLd2FkVHZpb2RzZHVVOW1YUXcrcmZQVEJES1NuQXFBeHRL?=
+ =?utf-8?B?TkRBUGZIZmtHMWFjQkNyK3RKWmVsQnN5d3RyTE5ibmFuSHRSaHdIM3N2ZFJx?=
+ =?utf-8?B?WnkyOVRmb0NHaFRlazVFRU5SM1VJWnFWUkcvcVlaaXRUVEJzUTVHcjlibDRJ?=
+ =?utf-8?B?MjQ5dmpRdEcwaXV0RlNnUDJJa0Fxa3B1OEg1RnVUcFdXUis0VERBeDVwcFI2?=
+ =?utf-8?Q?V3EIxETMdYZf+?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2024 08:59:32.7434
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UXU2dGNMT1Rxa3E0UDBuQWFnTzBuZGtpNXJFSCthSWN1MjhkS3ZrU0lFYjRD?=
+ =?utf-8?B?Z3NaMVhhaWtSR1FXcTA4dDg0VFF6TXVqRU51V1JNSlVKeVVsRW8ySEgvUXJp?=
+ =?utf-8?B?WmdPTFBnb0JpRjhhbUdVa1ZiSkxMMWp0Skd4U0sxMlZlWmJSQ0MxVy9BSjh4?=
+ =?utf-8?B?WkRaOHdQNlhzMDljQitmWkwyQUZramVwVGF2YlgvOHZsNHBDTUNDSVRoSWxt?=
+ =?utf-8?B?Qk1sUVZEeXo1WEJSZFZjRzVoNmhXN3lPeGtwSk9ERHNHcENaM0p6WlptYUIx?=
+ =?utf-8?B?ZGxxby9FOXA5U3lHK2JUYzcvcnptdTYrQXovVitYQThuZzg2alNpWmlUNzFM?=
+ =?utf-8?B?MDFFL0ZEVlpYVStvdFVRMDR4dU9rZjZzQllBVGdVQmRqWWZ1bDVSbVBieG5S?=
+ =?utf-8?B?Y0VDWm5oL2luL0kvSUlsNXIrVGZSU1d4NitqYy9ZMllyRjlHajNFTk1YWVJJ?=
+ =?utf-8?B?QXJOR3hMQ1RKaVRQMzVmUHBkMzc0bkNWUWpRQjA2YUUxZE5zaWllVk8vaUZS?=
+ =?utf-8?B?YmxFM05YZXJnS1RzWndMVSs4bEtTSXkwUlJOSEdIMjVFM1pNbVA0ZHJObHl2?=
+ =?utf-8?B?UTNOR1RpZ05zL1plVklKRkp1OXpQenJ2TUVSZVZHWmtxeVF6M3VVWDlMMVFQ?=
+ =?utf-8?B?TVFKRjhjRUNRQ1dhU0pGdDd6aTJObWRuRkoyU1NUdER0TU5jRTdGcHFuQ29D?=
+ =?utf-8?B?eDJEWUY0UEFvZXo2NmdlVGRSWU10bFpmbDkxa0tNNGxkRWlTTDl5Z3BSTkJq?=
+ =?utf-8?B?N3lUT3orSTh5KzFtZzc5VGU2bDJRdVNkc1NEWE5VWmJIT1lLVFMxbDdZYmtZ?=
+ =?utf-8?B?ajZKaU9IejB0Q1llYzdGK1gyeUtTbVh1S2ErM2dkeVdoODFIL3BiNHhYNTVH?=
+ =?utf-8?B?b1RkOW4xMlMwZFplWXA1WmxoR3doeWRQUWdET1pxSlluai80STZwOXlhVFR6?=
+ =?utf-8?B?R0xIQlArWldneFBER01xaHdvOWd6UnQ4RHpJSmpkNUFkaHZWalByN215MmVq?=
+ =?utf-8?B?Y2J6Zm41cGt4SkhGOVRBZ2lPWmlsTlo1NlFrVXJXZXJldWdMcDE5NFppR1Br?=
+ =?utf-8?B?TTJmOU92RUN3Y2hxblRNdlNocXJKWGM3SVZKdUNRV0NYNVNGcTVtS2FaSi9F?=
+ =?utf-8?B?dFRTckJySzNKT3BrQ2FWdEJYY2FjeTYxOEdiZWhUZXM3TDRMcCt5c1hkZlEv?=
+ =?utf-8?B?VFRJUWFxZzlyYzJaM1NPSUdNVnBaNkpBZmgyS0F4UStabmRmd2tMaTZIa2ND?=
+ =?utf-8?B?ZUNqZWN3N3dVL3RSZU03cldHaGZIWHJHNEZLeXpnOUhxVVcyTll2aGZ6TFRH?=
+ =?utf-8?B?S1dQbms5Ti96ZFFCMDk4cU9vV3pjaHo1blVkUHNxNVZlQU5yWkhQUFlyT2Z4?=
+ =?utf-8?B?Z1I0TEJKU04xN05qbnkzRnFqVDNpVXh4YlBkaHEvTk5DemdIcktjVHIxeC83?=
+ =?utf-8?B?WVV3Y3FTNGxMT1E4UUVYL2lTT09OYkJOeTdYVnR4clJTVEZ4ZFNQNkd0amlh?=
+ =?utf-8?B?ZUczUUlkRWV3ZGxsd08zcW1HK2RiU2owZlFhb0d2WlhrZ2ZtWWpBc0hvTDYy?=
+ =?utf-8?B?OTJFTXVYeHNHRzFJQnAvS0tNQ3FTSVg3NGRjaU5sWXJBNXRFSitXZHRkSkZy?=
+ =?utf-8?B?aENmY242TTVOM1MvWHpyRmdGeXJzWnNFb1cvRFlnT0Mxd2pOU0xGaHFUN0ZU?=
+ =?utf-8?B?VW11NnpaZW5veDlTRkhPak5yVEZGc0pDVWhoa2RrQVMrM2wvLzdkSmg1aUMy?=
+ =?utf-8?B?WHR1cWw4UWl0ZnZPTjZ0YzNYbWdwaUZMR2dmUVZ1RFQydEF6VVVmTUpHYXRN?=
+ =?utf-8?B?S1J1N0RxM2dVV0RqV25PZVhVc1lYamFDL2tlYUhPeklic2M3Qk1IRHQ0aEVY?=
+ =?utf-8?B?TmoyK3NYYWxyTTZYdGtoVFYxU2pTNjhjbitiVWx3Mk8vbHNCNnRXNUgxME5H?=
+ =?utf-8?B?K2tUS3c3OUdqTkg5Z0ZpSkpYWUVwODYyQ1UwZmF4b3N6aDYvQ2RpenpmRVps?=
+ =?utf-8?B?cVZUank1TFNIRWxMY3AzMnBEUkRjRmpxNXR1RG55RG1lZkdtUXpycklMUkNI?=
+ =?utf-8?B?MElzSk1pcTBtRlQ3L1crUFB5TkM2dENFVThrZVY5TUkzSnFMZlEvVWcrRE9J?=
+ =?utf-8?Q?s4hITt/WCBHE1YVaCq8d94AFh?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd316aa1-de7d-46d8-65bc-08dd28b08074
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2024 09:01:09.2969
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: faefd1db-6425-4bd4-6282-08dd28b04725
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00020E62.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6002
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FkaVuj2bFzupedmObNm5vP596l69VWYDjnrQQQsSL5rw4NrNi1Rp2PpcVx03/dFDrFXeld1m74Sqijqnggno+w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4271
 
-Add support for 'flowlabel' selector in ip-rule.
 
-Rules can be added with or without a mask in which case exact match is
-used:
+On 12/27/24 08:04, Alejandro Lucero Palau wrote:
+>
+> On 12/24/24 17:22, Jonathan Cameron wrote:
+>> On Mon, 16 Dec 2024 16:10:21 +0000
+>> alejandro.lucero-palau@amd.com wrote:
+>>
+>>> From: Alejandro Lucero <alucerop@amd.com>
+>>>
+>>> Create a new function for a type2 device initialising
+>>> cxl_dev_state struct regarding cxl regs setup and mapping.
+>>>
+>>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+>>> Reviewed-by: Fan Ni <fan.ni@samsung.com>
+>> Comments below.
+>>
+>> J
+>>> ---
+>>>   drivers/cxl/core/pci.c | 47 
+>>> ++++++++++++++++++++++++++++++++++++++++++
+>>>   include/cxl/cxl.h      |  2 ++
+>>>   2 files changed, 49 insertions(+)
+>>>
+>>> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
+>>> index 3cca3ae438cd..0b578ff14cc3 100644
+>>> --- a/drivers/cxl/core/pci.c
+>>> +++ b/drivers/cxl/core/pci.c
+>>> @@ -1096,6 +1096,53 @@ int cxl_pci_setup_regs(struct pci_dev *pdev, 
+>>> enum cxl_regloc_type type,
+>>>   }
+>>>   EXPORT_SYMBOL_NS_GPL(cxl_pci_setup_regs, "CXL");
+>>>   +static int cxl_pci_setup_memdev_regs(struct pci_dev *pdev,
+>>> +                     struct cxl_dev_state *cxlds)
+>>> +{
+>>> +    struct cxl_register_map map;
+>>> +    int rc;
+>>> +
+>>> +    rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map,
+>>> +                cxlds->capabilities);
+>>> +    /*
+>>> +     * This call returning a non-zero value is not considered an 
+>>> error since
+>> Error code perhaps rather than non-zero value?
+>
+>
+> Makes sense.
+>
 
- # ip -6 rule add flowlabel 0x12345 table 100
- # ip -6 rule add flowlabel 0x11/0xff table 200
- # ip -6 rule add flowlabel 0x54321 table 300
- # ip -6 rule del flowlabel 0x54321 table 300
+I think the right way to solve this is to have a check for rc being 
+-ENODEV and returning 0 for that specific case, then returning rc for 
+any other error.
 
-Dump output:
+I'll add such rationale in the comment as well for v9.
 
- $ ip -6 rule show
- 0:      from all lookup local
- 32764:  from all lookup 200 flowlabel 0x11/0xff
- 32765:  from all lookup 100 flowlabel 0x12345
- 32766:  from all lookup main
 
-Dump can be filtered by flow label value and mask:
-
- $ ip -6 rule show flowlabel 0x12345
- 32765:  from all lookup 100 flowlabel 0x12345
- $ ip -6 rule show flowlabel 0x11/0xff
- 32764:  from all lookup 200 flowlabel 0x11/0xff
-
-JSON output:
-
- $ ip -6 -j -p rule show flowlabel 0x12345
- [ {
-         "priority": 32765,
-         "src": "all",
-         "table": "100",
-         "flowlabel": "0x12345",
-         "flowlabel_mask": "0xfffff"
-     } ]
- $ ip -6 -j -p rule show flowlabel 0x11/0xff
- [ {
-         "priority": 32764,
-         "src": "all",
-         "table": "200",
-         "flowlabel": "0x11",
-         "flowlabel_mask": "0xff"
-     } ]
-
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
----
- ip/iprule.c           | 66 ++++++++++++++++++++++++++++++++++++++++++-
- man/man8/ip-rule.8.in |  8 +++++-
- 2 files changed, 72 insertions(+), 2 deletions(-)
-
-diff --git a/ip/iprule.c b/ip/iprule.c
-index ae067c72a66d..ea30d418712c 100644
---- a/ip/iprule.c
-+++ b/ip/iprule.c
-@@ -46,7 +46,7 @@ static void usage(void)
- 		"            [ ipproto PROTOCOL ]\n"
- 		"            [ sport [ NUMBER | NUMBER-NUMBER ]\n"
- 		"            [ dport [ NUMBER | NUMBER-NUMBER ] ]\n"
--		"            [ dscp DSCP ]\n"
-+		"            [ dscp DSCP ] [ flowlabel FLOWLABEL[/MASK] ]\n"
- 		"ACTION := [ table TABLE_ID ]\n"
- 		"          [ protocol PROTO ]\n"
- 		"          [ nat ADDRESS ]\n"
-@@ -69,6 +69,7 @@ static struct
- 	unsigned int pref, prefmask;
- 	unsigned int fwmark, fwmask;
- 	unsigned int dscp, dscpmask;
-+	__u32 flowlabel, flowlabel_mask;
- 	uint64_t tun_id;
- 	char iif[IFNAMSIZ];
- 	char oif[IFNAMSIZ];
-@@ -232,6 +233,19 @@ static bool filter_nlmsg(struct nlmsghdr *n, struct rtattr **tb, int host_len)
- 		}
- 	}
- 
-+	if (filter.flowlabel_mask) {
-+		__u32 flowlabel, flowlabel_mask;
-+
-+		if (!tb[FRA_FLOWLABEL] || !tb[FRA_FLOWLABEL_MASK])
-+			return false;
-+		flowlabel = rta_getattr_be32(tb[FRA_FLOWLABEL]);
-+		flowlabel_mask = rta_getattr_be32(tb[FRA_FLOWLABEL_MASK]);
-+
-+		if (filter.flowlabel != flowlabel ||
-+		    filter.flowlabel_mask != flowlabel_mask)
-+			return false;
-+	}
-+
- 	table = frh_get_table(frh, tb);
- 	if (filter.tb > 0 && filter.tb ^ table)
- 		return false;
-@@ -489,6 +503,23 @@ int print_rule(struct nlmsghdr *n, void *arg)
- 			     rtnl_dscp_n2a(dscp, b1, sizeof(b1)));
- 	}
- 
-+	/* The kernel will either provide both attributes, or none */
-+	if (tb[FRA_FLOWLABEL] && tb[FRA_FLOWLABEL_MASK]) {
-+		__u32 flowlabel, flowlabel_mask;
-+
-+		flowlabel = rta_getattr_be32(tb[FRA_FLOWLABEL]);
-+		flowlabel_mask = rta_getattr_be32(tb[FRA_FLOWLABEL_MASK]);
-+
-+		print_0xhex(PRINT_ANY, "flowlabel", " flowlabel %#llx",
-+			    flowlabel);
-+		if (flowlabel_mask == LABEL_MAX_MASK)
-+			print_0xhex(PRINT_JSON, "flowlabel_mask", NULL,
-+				    flowlabel_mask);
-+		else
-+			print_0xhex(PRINT_ANY, "flowlabel_mask", "/%#llx",
-+				    flowlabel_mask);
-+	}
-+
- 	print_string(PRINT_FP, NULL, "\n", "");
- 	close_json_object();
- 	fflush(fp);
-@@ -569,6 +600,24 @@ static int flush_rule(struct nlmsghdr *n, void *arg)
- 	return 0;
- }
- 
-+static void iprule_flowlabel_parse(char *arg, __u32 *flowlabel,
-+				   __u32 *flowlabel_mask)
-+{
-+	char *slash;
-+
-+	slash = strchr(arg, '/');
-+	if (slash != NULL)
-+		*slash = '\0';
-+	if (get_u32(flowlabel, arg, 0))
-+		invarg("invalid flowlabel", arg);
-+	if (slash) {
-+		if (get_u32(flowlabel_mask, slash + 1, 0))
-+			invarg("invalid flowlabel mask", slash + 1);
-+	} else {
-+		*flowlabel_mask = LABEL_MAX_MASK;
-+	}
-+}
-+
- static int iprule_list_flush_or_save(int argc, char **argv, int action)
- {
- 	rtnl_filter_t filter_fn;
-@@ -726,6 +775,11 @@ static int iprule_list_flush_or_save(int argc, char **argv, int action)
- 				invarg("invalid dscp\n", *argv);
- 			filter.dscp = dscp;
- 			filter.dscpmask = 1;
-+		} else if (strcmp(*argv, "flowlabel") == 0) {
-+			NEXT_ARG();
-+
-+			iprule_flowlabel_parse(*argv, &filter.flowlabel,
-+					       &filter.flowlabel_mask);
- 		} else {
- 			if (matches(*argv, "dst") == 0 ||
- 			    matches(*argv, "to") == 0) {
-@@ -1011,6 +1065,16 @@ static int iprule_modify(int cmd, int argc, char **argv)
- 			if (rtnl_dscp_a2n(&dscp, *argv))
- 				invarg("invalid dscp\n", *argv);
- 			addattr8(&req.n, sizeof(req), FRA_DSCP, dscp);
-+		} else if (strcmp(*argv, "flowlabel") == 0) {
-+			__u32 flowlabel, flowlabel_mask;
-+
-+			NEXT_ARG();
-+			iprule_flowlabel_parse(*argv, &flowlabel,
-+					       &flowlabel_mask);
-+			addattr32(&req.n, sizeof(req), FRA_FLOWLABEL,
-+				  htonl(flowlabel));
-+			addattr32(&req.n, sizeof(req), FRA_FLOWLABEL_MASK,
-+				  htonl(flowlabel_mask));
- 		} else {
- 			int type;
- 
-diff --git a/man/man8/ip-rule.8.in b/man/man8/ip-rule.8.in
-index 51f3050ae8f8..6fc741d4f470 100644
---- a/man/man8/ip-rule.8.in
-+++ b/man/man8/ip-rule.8.in
-@@ -58,7 +58,9 @@ ip-rule \- routing policy database management
- .IR NUMBER " | "
- .IR NUMBER "-" NUMBER " ] ] [ "
- .B  tun_id
--.IR TUN_ID " ]"
-+.IR TUN_ID " ] [ "
-+.B  flowlabel
-+.IR FLOWLABEL\fR[\fB/\fIMASK "] ]"
- .BR
- 
- 
-@@ -322,6 +324,10 @@ In the last case the router does not translate the packets, but
- masquerades them to this address.
- Using map-to instead of nat means the same thing.
- 
-+.TP
-+.BI flowlabel " FLOWLABEL\fR[\fB/\fIMASK\fR]"
-+select the IPv6 flow label to match with an optional mask.
-+
- .B Warning:
- Changes to the RPDB made with these commands do not become active
- immediately. It is assumed that after a script finishes a batch of
--- 
-2.47.1
-
+>
+>>
+>>> +     * these regs are not mandatory for Type2. If they do exist 
+>>> then mapping
+>>> +     * them should not fail.
+>>> +     */
+>>> +    if (rc)
+>>> +        return 0;
+>>> +
+>>> +    return cxl_map_device_regs(&map, &cxlds->regs.device_regs);
+>>> +}
+>>> +
+>>> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct 
+>>> cxl_dev_state *cxlds)
+>>> +{
+>>> +    int rc;
+>>> +
+>>> +    rc = cxl_pci_setup_memdev_regs(pdev, cxlds);
+>>> +    if (rc)
+>>> +        return rc;
+>>> +
+>>> +    rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
+>>> +                &cxlds->reg_map, cxlds->capabilities);
+>>> +    if (rc) {
+>>> +        dev_warn(&pdev->dev, "No component registers (%d)\n", rc);
+>>> +        return rc;
+>>> +    }
+>>> +
+>>> +    if (!test_bit(CXL_CM_CAP_CAP_ID_RAS, cxlds->capabilities))
+>> rc is 0.  I doubt that's the intent - if it is, return 0;
+>
+>
+> Well, if the conditional is true, it is the end of the function, and 
+> we know there is no errors,so yes, return 0 will make it.
+>
+>
+>>
+>>
+>>> +        return rc;
+>>> +
+>>> +    rc = cxl_map_component_regs(&cxlds->reg_map,
+>>> +                    &cxlds->regs.component,
+>>> +                    BIT(CXL_CM_CAP_CAP_ID_RAS));
+>>> +    if (rc)
+>>> +        dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
+>>> +
+>>> +    return rc;
+>>> +}
+>>> +EXPORT_SYMBOL_NS_GPL(cxl_pci_accel_setup_regs, "CXL");
+>>> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+>>> index 05f06bfd2c29..18fb01adcf19 100644
+>>> --- a/include/cxl/cxl.h
+>>> +++ b/include/cxl/cxl.h
+>>> @@ -5,6 +5,7 @@
+>>>   #define __CXL_H
+>>>     #include <linux/ioport.h>
+>>> +#include <linux/pci.h>
+>> Use a forwards def if all you need is
+>> struct pci_dev;
+>>
+>
+> I'll do.
+>
+> Thanks
+>
+>
+>>>     enum cxl_resource {
+>>>       CXL_RES_DPA,
+>>> @@ -40,4 +41,5 @@ int cxl_set_resource(struct cxl_dev_state *cxlds, 
+>>> struct resource res,
+>>>   bool cxl_pci_check_caps(struct cxl_dev_state *cxlds,
+>>>               unsigned long *expected_caps,
+>>>               unsigned long *current_caps);
+>>> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct 
+>>> cxl_dev_state *cxlds);
+>>>   #endif
 
