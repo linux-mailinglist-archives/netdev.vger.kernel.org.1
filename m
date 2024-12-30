@@ -1,147 +1,278 @@
-Return-Path: <netdev+bounces-154564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 948BA9FEA44
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 20:15:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A18019FEA4C
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 20:22:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56E8A1608D2
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 19:15:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47DC87A150D
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 19:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA2219ABB6;
-	Mon, 30 Dec 2024 19:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UWvMK43D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286D7183CA9;
+	Mon, 30 Dec 2024 19:22:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3661632D3
-	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 19:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D799EAD0
+	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 19:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735586104; cv=none; b=RW0al7EePLBhnzWHkTNwJDSz4/nC1/tom/NF/yzzPK5n69ZQFLt09QlW2gDX8ZNmxI8VcnbQMbW7K/FMD3RUpAroROrP6RpE2dRAZjz5XMdNNV5vgmkO7L6xdnoE59PN9PkyFwlAmSi+aFZUyc8UnZ3i/Ym1oW7lRjaxNrr+Bn8=
+	t=1735586551; cv=none; b=qiJmAdLtyzxhY8T5wwPSys3o+kDbxtdqWRxMtxevIY4csPqD6p06DCg//Qs8S1lW8m4VILAzOrmISkvqA1v9aNoGFcNC0UdV6qMYGI1rOh0XF4wwDDofqFwOb/sKsc0FnlwyhvArlmm09xKkPd9nSSPAE6EKAd+n8tRkeyApacw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735586104; c=relaxed/simple;
-	bh=E7xxv/vz7qB/rYnuiDxw+yNsovsvxN/qhh7P/94mMzI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MH6ZI9m5BwqXph+REHdzrx4I4mUqIm2+u4OMOI/Xkcg/Ki01nqaWjdihkQdx5J4gyzu9RPcGsjHKe0d1cM3e3IShKxp07FojyrZ7nqjjvrOJ8GvjtJ/P98iTUXYgqxLb14bevTiOQVE/aVj/fjzsphWyw5DtNmjefSHi3kGXMSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=UWvMK43D; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7b6f8524f23so1033883385a.2
-        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 11:15:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1735586101; x=1736190901; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zm3EFGlcVZnoWV5O4DTN/k0dxpU/beXPAmj834H5Qsg=;
-        b=UWvMK43D2tu9hAsW+xaNYyejXEZIRSbklTh7fuYsigEfUyO1Wh7V1fYtf3Uk8v8amo
-         0kbAMqduY9+E7XsS+5R+MFAOmbWFuyGE/wLTyVX9gNNm77gp3XYfat3lyE7eKvf++SBb
-         rArauDjwRd6LVVcytvJoqzbXj71GIqmQpp3WU=
+	s=arc-20240116; t=1735586551; c=relaxed/simple;
+	bh=2sLMSxs07qoy5gkEOddmV8PJEfgSDW2cGiwUMFxnI9I=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JeHIQJSJICOBsbbSXE+16vXAVihNOJQ2cApL6MYUBfRzRUGwYObuwTFmeMObqTXk4u/9bba6HPmbPpUNN7eUx/In/F+sZWIMjJidOo6XTwmn+gFXdLNsspsKGoGNyQjBH2RBWLyKM4W7oMuW3JzRqO54QtEo3idovWhok1pOskY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3a9cc5c246bso85836045ab.2
+        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 11:22:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735586101; x=1736190901;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zm3EFGlcVZnoWV5O4DTN/k0dxpU/beXPAmj834H5Qsg=;
-        b=IvLQb4W0DpkozFaofFZyewCTzBl8buB4InEBFCEiUtiiS2l9Ktyr+LORHSInMVc697
-         25UYZjbetoLWXhCRuXrobIeJSJCH4O90YK6tVRUsdgBjyXLydXTuNco3K5KIkMRY1BnK
-         mKCPOs6dzUY6OEASBP/9Z/Rp38FQ9dZlnXvlqkXL3A63fATYvWLAbdmufFmo4Dccxv0d
-         ObyVnkmbgxudMVjlCCQ8AbKuLjV0LgedvR17lYUw5ARJVM/4CEPMowIMYej/U4WPfZjS
-         gRO7KGXiiGlCuexXU4k0lanLGpiF5UnwSHa1J4yETMX7CAhRcI0+Vt7yOW/SESAV2TOj
-         33nA==
-X-Forwarded-Encrypted: i=1; AJvYcCX9OwQ3ETmIOCCXCjoX3efx+AWnMVEuM6F9UP6rmFMmmmQiXenTCSSgxV6DITZLx/PShq0hosA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVTSJn5SlAaYQH+awaWGLZ+HrmwhfsJhXcsknNkTcxegKuGC47
-	hdGyJaEODPq3xnc5j0LYtgbWSzwR9Kg4HYWW/7+NJ+5KD00heC/630mq7Tj+NA==
-X-Gm-Gg: ASbGncuwxhN7yCuoSZNiVhBQK5coPEBAQmWRYLG7nSlpfFhzG1RvN80OP7zkj8+yXsA
-	Rkes2VXw7TPwnrDQWaZLO8x9GP1wsc/SwkigHUsZZgllP2lnrqfpldTQJr2Gw62JGJH38dLei/H
-	jJq/qbXPqCN6iIAh1yF0l7C+8cCWMjUV61Vk6JULcP87CXM0WXQVgoBe648bLDAxmaPRtByGLOc
-	t/SNz/XBPcHc6aClh/jHj/0Yuynb+XjpKcsJup1lrgX/jDAkKvmfX1WpbYbZZFfcJXWqC3R6+py
-	77KZpp6EArdmnl2UIUfV
-X-Google-Smtp-Source: AGHT+IE0IcSsm2SyHAfU/YYYoK9D1FX6QPfeaWrQZciCcYAom2TZRVDGMZZ1f5WYgKBwCPFhQebD1A==
-X-Received: by 2002:a05:620a:2447:b0:7b6:da21:7531 with SMTP id af79cd13be357-7b9ba717e7amr5595620785a.4.1735586101388;
-        Mon, 30 Dec 2024 11:15:01 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac2bc4b7sm945828485a.12.2024.12.30.11.14.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Dec 2024 11:15:00 -0800 (PST)
-Message-ID: <629cb86f-0484-4ce3-8847-06abaa9c41ab@broadcom.com>
-Date: Mon, 30 Dec 2024 11:14:57 -0800
+        d=1e100.net; s=20230601; t=1735586548; x=1736191348;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XZbk8DAAKvdGDfTKY/w3xdcQsaMwtxLDdwTUaKLkUEU=;
+        b=QQRbCm3NaIwqbKpjt28A5kMy/Wl5OiLNCCAFqCinhfWTqFzxIp3JyoM+m30ftEUTtT
+         llEdqxloE36ykirWpCvMcVD9uvu1+/mV55/pvFJI+ROIC9josDi4PS9P7cEG7zlFeso1
+         c30h6Qbn0WPiIDCgYFSr3N58WkiAZq3VI08Ah28xF0ri03XQgBhKUp8ZUFbZ0NGo9Tu4
+         wmb9CTnqsz5DV/BxU8vvc8ZXJFW9qM+XIQ1Y/qG2NKa62p4jHI9lKupeR12cs8qMgtEP
+         m8Zd2JlVD5sZ9dBcFbXiSVTIgVhNH+TJYA/Sg/BoSA+OWouqA+8vUNxKlApTZcwH8yXN
+         HBPw==
+X-Forwarded-Encrypted: i=1; AJvYcCUivW1lHebtzPuPZXncmi36KAsMP404a5xAmQtcjl0xPKWCCeCs2ntOSsKdSadL7/YjeoGYlgI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgSQezjcB39G50bZijlbyLB9pkRmzJ2q4jxAkXRPGl0o7c/0jU
+	KLBy2HRQhAHk2y9f1pc+4uzMJDrM2+KpGCN9g9HB3OYUGNKAlzYEgDd7FyLJq20InZOBGPukQ5N
+	p2dWkAwlz2h+OIoJ2J6MHRd0VQAzH1IdZrQbOZbgf3MwI6ILhZty29u0=
+X-Google-Smtp-Source: AGHT+IGIlbq6Ff2T6yYwCq+KHsjNUjnU0fHb+Oe6kaEC5noBFmwlNZepHSto0crBLqwJmWX+YEFYE1JF+8EfyVaBXnrmIo0RIN9k
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net]: bcmsysport: fix call balance of priv->clk handling
- routines
-To: Vitalii Mordan <mordan@ispras.ru>
-Cc: Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Fedor Pchelkin <pchelkin@ispras.ru>,
- Alexey Khoroshilov <khoroshilov@ispras.ru>, Vadim Mutilin <mutilin@ispras.ru>
-References: <20241227123007.2333397-1-mordan@ispras.ru>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20241227123007.2333397-1-mordan@ispras.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1d0d:b0:3a7:dec1:de40 with SMTP id
+ e9e14a558f8ab-3c2d1b9ba3emr272435595ab.5.1735586548511; Mon, 30 Dec 2024
+ 11:22:28 -0800 (PST)
+Date: Mon, 30 Dec 2024 11:22:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6772f2f4.050a0220.2f3838.04cb.GAE@google.com>
+Subject: [syzbot] [crypto?] BUG: sleeping function called from invalid context
+ in crypto_put_default_null_skcipher
+From: syzbot <syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/27/24 04:30, Vitalii Mordan wrote:
-> Check the return value of clk_prepare_enable to ensure that priv->clk has
-> been successfully enabled.
-> 
-> If priv->clk was not enabled during bcm_sysport_probe, bcm_sysport_resume,
-> or bcm_sysport_open, it must not be disabled in any subsequent execution
-> paths.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with Klever.
-> 
-> Fixes: 31bc72d97656 ("net: systemport: fetch and use clock resources")
-> Signed-off-by: Vitalii Mordan <mordan@ispras.ru>
+Hello,
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+syzbot found the following issue on:
+
+HEAD commit:    a024e377efed net: llc: reset skb->transport_header
+git tree:       net
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=15c7f0b0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6a2b862bf4a5409f
+dashboard link: https://syzkaller.appspot.com/bug?extid=b3e02953598f447d4d2a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14bce818580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12bce818580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f2ea524d69fe/disk-a024e377.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b39d227b097d/vmlinux-a024e377.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8ee66636253f/bzImage-a024e377.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com
+
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:562
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 0, name: swapper/0
+preempt_count: 101, expected: 0
+RCU nest depth: 0, expected: 0
+1 lock held by swapper/0/0:
+ #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2561 [inline]
+ #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_core+0xa37/0x17a0 kernel/rcu/tree.c:2823
+Preemption disabled at:
+[<ffffffff8bc9a85d>] schedule_preempt_disabled+0x1d/0x30 kernel/sched/core.c:6906
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.13.0-rc3-syzkaller-00174-ga024e377efed #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ __might_resched+0x5d4/0x780 kernel/sched/core.c:8758
+ __mutex_lock_common kernel/locking/mutex.c:562 [inline]
+ __mutex_lock+0x131/0xee0 kernel/locking/mutex.c:735
+ crypto_put_default_null_skcipher+0x18/0x70 crypto/crypto_null.c:179
+ aead_release+0x3d/0x50 crypto/algif_aead.c:489
+ alg_do_release crypto/af_alg.c:118 [inline]
+ alg_sock_destruct+0x86/0xc0 crypto/af_alg.c:502
+ __sk_destruct+0x58/0x5f0 net/core/sock.c:2260
+ rcu_do_batch kernel/rcu/tree.c:2567 [inline]
+ rcu_core+0xaaa/0x17a0 kernel/rcu/tree.c:2823
+ handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
+ __do_softirq kernel/softirq.c:595 [inline]
+ invoke_softirq kernel/softirq.c:435 [inline]
+ __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
+RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:92 [inline]
+RIP: 0010:acpi_safe_halt+0x21/0x30 drivers/acpi/processor_idle.c:112
+Code: 90 90 90 90 90 90 90 90 90 65 48 8b 04 25 00 d6 03 00 48 f7 00 08 00 00 00 75 10 66 90 0f 00 2d 15 c1 a0 00 f3 0f 1e fa fb f4 <fa> c3 cc cc cc cc 66 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90
+RSP: 0018:ffffffff8e607ca8 EFLAGS: 00000246
+RAX: ffffffff8e6965c0 RBX: ffff888140ee4064 RCX: 000000000001ace9
+RDX: 0000000000000001 RSI: ffff888140ee4000 RDI: ffff888140ee4064
+RBP: 000000000003a9f8 R08: ffff8880b8637cdb R09: 1ffff110170c6f9b
+R10: dffffc0000000000 R11: ffffffff8bc8bc80 R12: ffff88814628d000
+R13: 0000000000000001 R14: 0000000000000001 R15: ffffffff8f1217a0
+ acpi_idle_enter+0xe4/0x140 drivers/acpi/processor_idle.c:699
+ cpuidle_enter_state+0x109/0x470 drivers/cpuidle/cpuidle.c:268
+ cpuidle_enter+0x5d/0xa0 drivers/cpuidle/cpuidle.c:389
+ call_cpuidle kernel/sched/idle.c:155 [inline]
+ cpuidle_idle_call kernel/sched/idle.c:230 [inline]
+ do_idle+0x372/0x5c0 kernel/sched/idle.c:325
+ cpu_startup_entry+0x42/0x60 kernel/sched/idle.c:423
+ rest_init+0x2dc/0x300 init/main.c:747
+ start_kernel+0x47f/0x500 init/main.c:1102
+ x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
+ x86_64_start_kernel+0x9f/0xa0 arch/x86/kernel/head64.c:488
+ common_startup_64+0x13e/0x147
+ </TASK>
+
+=============================
+[ BUG: Invalid wait context ]
+6.13.0-rc3-syzkaller-00174-ga024e377efed #0 Tainted: G        W         
+-----------------------------
+swapper/0/0 is trying to lock:
+ffffffff8f035d88 (crypto_default_null_skcipher_lock){+.+.}-{4:4}, at: crypto_put_default_null_skcipher+0x18/0x70 crypto/crypto_null.c:179
+other info that might help us debug this:
+context-{3:3}
+1 lock held by swapper/0/0:
+ #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2561 [inline]
+ #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_core+0xa37/0x17a0 kernel/rcu/tree.c:2823
+stack backtrace:
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G        W          6.13.0-rc3-syzkaller-00174-ga024e377efed #0
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4826 [inline]
+ check_wait_context kernel/locking/lockdep.c:4898 [inline]
+ __lock_acquire+0x15a8/0x2100 kernel/locking/lockdep.c:5176
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+ __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+ __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
+ crypto_put_default_null_skcipher+0x18/0x70 crypto/crypto_null.c:179
+ aead_release+0x3d/0x50 crypto/algif_aead.c:489
+ alg_do_release crypto/af_alg.c:118 [inline]
+ alg_sock_destruct+0x86/0xc0 crypto/af_alg.c:502
+ __sk_destruct+0x58/0x5f0 net/core/sock.c:2260
+ rcu_do_batch kernel/rcu/tree.c:2567 [inline]
+ rcu_core+0xaaa/0x17a0 kernel/rcu/tree.c:2823
+ handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
+ __do_softirq kernel/softirq.c:595 [inline]
+ invoke_softirq kernel/softirq.c:435 [inline]
+ __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
+RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:92 [inline]
+RIP: 0010:acpi_safe_halt+0x21/0x30 drivers/acpi/processor_idle.c:112
+Code: 90 90 90 90 90 90 90 90 90 65 48 8b 04 25 00 d6 03 00 48 f7 00 08 00 00 00 75 10 66 90 0f 00 2d 15 c1 a0 00 f3 0f 1e fa fb f4 <fa> c3 cc cc cc cc 66 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90
+RSP: 0018:ffffffff8e607ca8 EFLAGS: 00000246
+RAX: ffffffff8e6965c0 RBX: ffff888140ee4064 RCX: 000000000001ace9
+RDX: 0000000000000001 RSI: ffff888140ee4000 RDI: ffff888140ee4064
+RBP: 000000000003a9f8 R08: ffff8880b8637cdb R09: 1ffff110170c6f9b
+R10: dffffc0000000000 R11: ffffffff8bc8bc80 R12: ffff88814628d000
+R13: 0000000000000001 R14: 0000000000000001 R15: ffffffff8f1217a0
+ acpi_idle_enter+0xe4/0x140 drivers/acpi/processor_idle.c:699
+ cpuidle_enter_state+0x109/0x470 drivers/cpuidle/cpuidle.c:268
+ cpuidle_enter+0x5d/0xa0 drivers/cpuidle/cpuidle.c:389
+ call_cpuidle kernel/sched/idle.c:155 [inline]
+ cpuidle_idle_call kernel/sched/idle.c:230 [inline]
+ do_idle+0x372/0x5c0 kernel/sched/idle.c:325
+ cpu_startup_entry+0x42/0x60 kernel/sched/idle.c:423
+ rest_init+0x2dc/0x300 init/main.c:747
+ start_kernel+0x47f/0x500 init/main.c:1102
+ x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
+ x86_64_start_kernel+0x9f/0xa0 arch/x86/kernel/head64.c:488
+ common_startup_64+0x13e/0x147
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	90                   	nop
+   1:	90                   	nop
+   2:	90                   	nop
+   3:	90                   	nop
+   4:	90                   	nop
+   5:	90                   	nop
+   6:	90                   	nop
+   7:	90                   	nop
+   8:	90                   	nop
+   9:	65 48 8b 04 25 00 d6 	mov    %gs:0x3d600,%rax
+  10:	03 00
+  12:	48 f7 00 08 00 00 00 	testq  $0x8,(%rax)
+  19:	75 10                	jne    0x2b
+  1b:	66 90                	xchg   %ax,%ax
+  1d:	0f 00 2d 15 c1 a0 00 	verw   0xa0c115(%rip)        # 0xa0c139
+  24:	f3 0f 1e fa          	endbr64
+  28:	fb                   	sti
+  29:	f4                   	hlt
+* 2a:	fa                   	cli <-- trapping instruction
+  2b:	c3                   	ret
+  2c:	cc                   	int3
+  2d:	cc                   	int3
+  2e:	cc                   	int3
+  2f:	cc                   	int3
+  30:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+  37:	00 00
+  39:	90                   	nop
+  3a:	90                   	nop
+  3b:	90                   	nop
+  3c:	90                   	nop
+  3d:	90                   	nop
+  3e:	90                   	nop
+  3f:	90                   	nop
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
