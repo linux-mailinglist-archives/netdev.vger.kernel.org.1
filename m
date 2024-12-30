@@ -1,290 +1,154 @@
-Return-Path: <netdev+bounces-154542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7FEB9FE721
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 15:33:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBE699FE740
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 15:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E6111882C6C
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 14:33:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E34D3A222A
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 14:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8641E1AA1DC;
-	Mon, 30 Dec 2024 14:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C401A7044;
+	Mon, 30 Dec 2024 14:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="J/APm32F"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="VkpdyxL8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C5E1A9B49
-	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 14:31:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF67156653
+	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 14:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735569089; cv=none; b=REP5ZQeSC0nZWs0OjogrRKfjc5FLXjg0Pbw4Mboh1OgFNN4rvoxDgJePg8L+cnl5y9rkUCCSyT6/E3aIrYM9XLgkJjf+5U2a4QYw14dI0MvttHiqbRv0LoBwRdFK9aeixps/blCtgpwGdAQemK4WixryCbRondoqSomMFMeMX34=
+	t=1735570088; cv=none; b=uOrYyFGMbo1JxySHK/USJSquVHgD+91zQyOTzbfjDw2MDFaJrJ57nmxUJtjxBuuuKCc5wozRVcLmEF98JclzwtuSNaKhxr2qxealzocAtea5dg8h2UExIxQViLBizryRtDgChTBpaAxb09yIirlt2WSUdG1deykkEEPiy2wsfHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735569089; c=relaxed/simple;
-	bh=DzcdSK4Fbjvsk9GyTH4M7MGUMxmfuEMWS7vM5YmOw7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jrDfZflr9WkXx3eBUmyCqVSoh+y5RwAD3hnLJzWm9HOarg55IXwZHAZPtavGUgbaCLHpXUt9UKvudzgHOdDQv3nNRjr/lv7hxcza3XlBD7Ocw0+XZTF8CrCvAuuVBbO3YDC9OTMK7P0h4HnGeidSYnH3HW929ezXeh30ZKAUk+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=J/APm32F; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6d88cb85987so75269436d6.1
-        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 06:31:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1735569086; x=1736173886; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aZ0qh5CvDNrWXK/tQQvVpQ5E5ArB37lBngu63gu7KW8=;
-        b=J/APm32Fezcc/NBzQxat8iksR8O3TIZIrDs1LMImXd5pjWPjoaekUOaMTuNyR7gQ6H
-         JgTpltfcsIq1MUf83RNw/TMSyFeUq6svdySnOaUjfJvMikClmoVtijDdxuAjmKD7SZjZ
-         nQznCWfCYWsgrRoVjW/gAxAyDR9IXUBFm8cvQ=
+	s=arc-20240116; t=1735570088; c=relaxed/simple;
+	bh=KjWCVNt+b9S7o3s1KA8w6AF2X1h/VQpygP/lXVopERo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HcGq4dFaIdQD6N0TWMjk154y7EoTvQCOwGVreHXyjefI7uBr9jSvrHqzO6EBmgJm+llowfQgJ1uMzwcudtEi3F36ZwsUkn/ujs8i2ZzEzGk8dYNARtuc1cD5piRj++vZJV6oq9ppeJOIDQKGTRR93FyBukXXB3WVC8uVZpBbzQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=VkpdyxL8; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BU9Krcn024464
+	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 14:48:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	+3guYso3Coq0RBvgr3ogOEivDxl1AcdY4CDUyBo/O3M=; b=VkpdyxL8OuULFCJ/
+	W0WeSsPXDtCBW2IewX5kXkTjqN+d63vIb+QsUKsCo+QIbLuz2HnXb7n4H9O6WhuJ
+	V20FEMIY569IyfhilwKFu4jDdQaHu387K8WExIgODNnH1D4KuChJa0qJsi9MLjHb
+	cCycIjsLD3btxa/VysQT9nyd5DzZLEj2AyitLfYLwjlSeWJrSz+9ZCkkmH1odFXM
+	bTsRbgRh5d8iKxcRm5bhrLh9PHtlvegacGmoix0TCFyg5Z+q8XJ/LRaHRIgUn565
+	cCRHC7W7gI0DjI0CLRPYMoLCAk4dy04qFlp9jR5crdDyqfx3s2/zF0YgC1olq/EE
+	MHI0jg==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43urt88ntn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 14:48:06 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7b6ee03d7d9so51431085a.0
+        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 06:48:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735569086; x=1736173886;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1735570085; x=1736174885;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aZ0qh5CvDNrWXK/tQQvVpQ5E5ArB37lBngu63gu7KW8=;
-        b=VLCh7lp3QA2pcAKyu0yGlK8Cw8YkOheWDdseRFJaRcmteYatq8DONT8s9/aR7WsDAw
-         s0O5tYkCAomZIzpTVJoIyCqL1mQqIKE8NIBg9uHy1pjZE0hft6jFaS6JsP5bUYE5d0N6
-         WfCXcTaNBtP3ChRJTUlejx9IK+4f6GDFFOFForMXk4ZeiI1v7j8xdrSiLyadiNLvSjjJ
-         s6jUzTitFC5qLvOzkjS+CiQLiISiZQG9KwIXFp8IluKBBQA+ku8k48hMXFdWjL8RUSJi
-         BrCUx7CNIgToOEeAhvQ0KgRsRZ2YuP7ecXfWyRxcylXDUUQG0qyuUu0elAkSWJbkAM8u
-         1TdA==
-X-Forwarded-Encrypted: i=1; AJvYcCV0YSCwvXg6kR46CrosFkSMJHyY32OOmwobMgdRiBMXOjklot9fZjbt1aBmiXEwuYp9TBI/E2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmnR4jeNvlFxSoELt7P66w2ODFjR3TeeZI3H0TvfCGXPzc9HE6
-	/E6fUax9dPrLHo/7wOzle6VzVqBilfhQzubUqx/ihc6xW4GlUFyF5tyJVawNCgM=
-X-Gm-Gg: ASbGncuYA+ixOWrMGJqqGk4Sl78MVcnTRDmTNrjHDqeA97XRqZCF1bNyo8N2v0+E9eR
-	Sj57vlM1ChzAfKy9jxQl/MMWm936LSu+qnUDo8pg2XaLtFs5P19R6KonzZ5lJJVArN7tzj5ihw9
-	BSsu41igv3B8DM6+dDOD4xP7abgBgT2uhK7wKp4xt6q4TIo4yJzMkpmodgOgYRe6CwtBwJxMnKi
-	rAr9nbodkFoLnwD06L1wHYIu5yVuiSgn6oKIMYQStbR3qjHNXLoZ0R8BxDF5kxhNJG0NFteaIc2
-	dq9JaG1Qmls62X5G9d4=
-X-Google-Smtp-Source: AGHT+IFhhaSR9avGcVQrR2u/7A1pOVupmdwRVmvYVv11neW65aqnZNqInNc4kMN4KbFRYCDE54xu3A==
-X-Received: by 2002:a05:6214:29ef:b0:6d4:1c27:e9b1 with SMTP id 6a1803df08f44-6dd23631f97mr591874976d6.23.1735569086295;
-        Mon, 30 Dec 2024 06:31:26 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181d3169sm102799846d6.102.2024.12.30.06.31.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Dec 2024 06:31:25 -0800 (PST)
-Date: Mon, 30 Dec 2024 09:31:23 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Alex Lazar <alazar@nvidia.com>
-Cc: "aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
-	"almasrymina@google.com" <almasrymina@google.com>,
-	"amritha.nambiar@intel.com" <amritha.nambiar@intel.com>,
-	"bigeasy@linutronix.de" <bigeasy@linutronix.de>,
-	"bjorn@rivosinc.com" <bjorn@rivosinc.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, Dan Jurgens <danielj@nvidia.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"johannes.berg@intel.com" <johannes.berg@intel.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"leitao@debian.org" <leitao@debian.org>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"lorenzo@kernel.org" <lorenzo@kernel.org>,
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
-	"mkarsten@uwaterloo.ca" <mkarsten@uwaterloo.ca>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"skhawaja@google.com" <skhawaja@google.com>,
-	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	Gal Pressman <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
-	Dror Tennenbaum <drort@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [net-next v6 0/9] Add support for per-NAPI config via netlink
-Message-ID: <Z3Kuu44L0ZcnavQF@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Alex Lazar <alazar@nvidia.com>,
-	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
-	"almasrymina@google.com" <almasrymina@google.com>,
-	"amritha.nambiar@intel.com" <amritha.nambiar@intel.com>,
-	"bigeasy@linutronix.de" <bigeasy@linutronix.de>,
-	"bjorn@rivosinc.com" <bjorn@rivosinc.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, Dan Jurgens <danielj@nvidia.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"johannes.berg@intel.com" <johannes.berg@intel.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"leitao@debian.org" <leitao@debian.org>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"lorenzo@kernel.org" <lorenzo@kernel.org>,
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
-	"mkarsten@uwaterloo.ca" <mkarsten@uwaterloo.ca>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"skhawaja@google.com" <skhawaja@google.com>,
-	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	Gal Pressman <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
-	Dror Tennenbaum <drort@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-References: <DM8PR12MB5447837576EA58F490D6D4BFAD052@DM8PR12MB5447.namprd12.prod.outlook.com>
- <Z2MBqrc2FM2rizqP@LQ3V64L9R2>
- <Z2WsJtaBpBqJFXeO@LQ3V64L9R2>
- <550af81b-6d62-4fc3-9df3-2d74989f4ca0@nvidia.com>
+        bh=+3guYso3Coq0RBvgr3ogOEivDxl1AcdY4CDUyBo/O3M=;
+        b=M+mdWgOIq6ybfjAoZvhciXUELkTiMT+EELGDZIXWDAXdJp5qgfMw4WZU2KFMtLcYj2
+         PJJtA0V2cQZW4VtQ3G4FbFh25faKGWfWEpQOsvidHRi34GtxMXvvJbpWeZkDvMmsrl7M
+         1HHWAXRbBYJabaJ0EDon1ByZFJ9E9c8Be9rY2/LuQWu47Po4VWKY/sjeJjFY3sSBowbS
+         wVNPnvCDyn+imV0+mu7Lu50P6hwssMqDjfH6HvU/l4E4YG8l02MvxFosBC0noxwHoRgt
+         IwSwa3iZG6oEuSnnpFtvRxBp/zlLnWcK6kYhr/fzrFA/qSaQtButT/hBlZDfmo3P5Xmx
+         y4iw==
+X-Forwarded-Encrypted: i=1; AJvYcCXZ2r8uh0oj0Y5jm7ccMd2/J/dj/K3TgeiFBsroaC70KhmAG3n+fUnJ1stPz9q+S+kHmXrHWtE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0xIappJJAcL19DLoWzMSFuMIQ+UcrQ6SNEd8obsTYB2wwMw2J
+	bcxdcc4ntlrCI++xyX/6N9KFAO++eLK5cunPgXt6U/UPg+z8vjy908CveauZuquZ7Gvx28J4piH
+	wjm1ap/dL+Lpgn5bmSD45DtI+BLj57TFs6OP4WYX9SB4/jtoKmP3qe1M=
+X-Gm-Gg: ASbGncsPSq9jZeqLL5qP+pvmFyattsk/Z68JbqP+q3Pn+N2YRVnUNlNMTP71CYkWCpC
+	fly/8FlicNRFgp3ONAaJ1Xgw44A0Gjy26TDWfdKNF/7KpsAU8r2spk5uojGlBrlYt2651+lmfcE
+	UDP9I4rxjyWZxDEDAIfUlhfPMCCcIJRCltE36tQ/MprYuKlZkA/iH3sqf7TJGrPYzQb7bSVGeZV
+	PJzyrC+T0pzntW+IWVeEs98BFHnGKqhRIqUhgGq54ZjClGHeJSEFC40WQqbVN1mFn65L58jdwfq
+	6p3nvjUrwcuFy4D+cKPLUSG74yRTpiSqMiA=
+X-Received: by 2002:a05:620a:4053:b0:7b6:7031:e15e with SMTP id af79cd13be357-7b9ba7eab6cmr2092907485a.16.1735570083753;
+        Mon, 30 Dec 2024 06:48:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFBDKqMftM4nCBgeB53pdAJZx4SAkQGmWBfeiR7UkWSQ67bAd/6KEwCNArMS45Msy6+U2XZnA==
+X-Received: by 2002:a05:620a:4053:b0:7b6:7031:e15e with SMTP id af79cd13be357-7b9ba7eab6cmr2092903785a.16.1735570083354;
+        Mon, 30 Dec 2024 06:48:03 -0800 (PST)
+Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0f015b53sm1470383566b.163.2024.12.30.06.48.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Dec 2024 06:48:02 -0800 (PST)
+Message-ID: <befd6574-b9f0-4483-a767-684a729cfde0@oss.qualcomm.com>
+Date: Mon, 30 Dec 2024 15:48:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <550af81b-6d62-4fc3-9df3-2d74989f4ca0@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 5/7] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
+To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: andersson@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+        robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+        konradybcio@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+        p.zabel@pengutronix.de, richardcochran@gmail.com,
+        geert+renesas@glider.be, angelogioacchino.delregno@collabora.com,
+        neil.armstrong@linaro.org, arnd@arndb.de, nfraprado@collabora.com,
+        quic_anusha@quicinc.com, linux-arm-msm@vger.kernel.org,
+        linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        netdev@vger.kernel.org, quic_srichara@quicinc.com,
+        quic_varada@quicinc.com
+References: <20241025035520.1841792-1-quic_mmanikan@quicinc.com>
+ <20241025035520.1841792-6-quic_mmanikan@quicinc.com>
+ <jhykmuvgltvuqf74evvenbagmftam2gaeoknuq5msxop4mkh65@dya6vvqytfcx>
+ <21365836-aa06-4269-885c-591f43e2e5fc@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <21365836-aa06-4269-885c-591f43e2e5fc@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: 5XxO5iRRmevhtfMhm0qSzKeW8f4Qw7Wg
+X-Proofpoint-ORIG-GUID: 5XxO5iRRmevhtfMhm0qSzKeW8f4Qw7Wg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ priorityscore=1501 mlxscore=0 impostorscore=0 bulkscore=0 mlxlogscore=673
+ phishscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2412300128
 
-On Mon, Dec 23, 2024 at 08:17:08AM +0000, Alex Lazar wrote:
+On 28.10.2024 7:25 AM, Manikanta Mylavarapu wrote:
 > 
 > 
-> On 20/12/2024 19:40, Joe Damato wrote:
-> > On Wed, Dec 18, 2024 at 09:08:58AM -0800, Joe Damato wrote:
-> >> On Wed, Dec 18, 2024 at 11:22:33AM +0000, Alex Lazar wrote:
-> >>> Hi Joe and all,
-> >>>
-> >>> I am part of the NVIDIA Eth drivers team, and we are experiencing a problem,
-> >>> sibesced to this change: commit 86e25f40aa1e ("net: napi: Add napi_config")
-> >>>
-> >>> The issue occurs when sending packets from one machine to another.
-> >>> On the receiver side, we have XSK (XDPsock) that receives the packet and sends it
-> >>> back to the sender.
-> >>> At some point, one packet (packet A) gets "stuck," and if we send a new packet
-> >>> (packet B), it "pushes" the previous one. Packet A is then processed by the NAPI
-> >>> poll, and packet B gets stuck, and so on.
-> >>>
-> >>> Your change involves moving napi_hash_del() and napi_hash_add() from
-> >>> netif_napi_del() and netif_napi_add_weight() to napi_enable() and napi_disable().
-> >>> If I move them back to netif_napi_del() and netif_napi_add_weight(),
-> >>> the issue is resolved (I moved the entire if/else block, not just the napi_hash_del/add).
-> >>>
-> >>> This issue occurs with both the new and old APIs (netif_napi_add/_config).
-> >>> Moving the napi_hash_add() and napi_hash_del() functions resolves it for both.
-> >>> I am debugging this, no breakthrough so far.
-> >>>
-> >>> I would appreciate if you could look into this.
-> >>> We can provide more details per request.
-> >>
-> >> I appreciate your report, but there is not a lot in your message to
-> >> help debug the issue.
-> >>
-> >> Can you please:
-> >>
-> >> 1.) Verify that the kernel tree you are testing on has commit
-> >> cecc1555a8c2 ("net: Make napi_hash_lock irq safe") included ? If it
-> >> does not, can you pull in that commit and re-run your test and
-> >> report back if that fixes your problem?
+> On 10/25/2024 11:21 AM, Dmitry Baryshkov wrote:
+>> On Fri, Oct 25, 2024 at 09:25:18AM +0530, Manikanta Mylavarapu wrote:
+>>> From: Devi Priya <quic_devipriy@quicinc.com>
+>>>
+>>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
+>>> devices.
+>>>
+>>> Reported-by: kernel test robot <lkp@intel.com>
+>>> Closes: https://lore.kernel.org/oe-kbuild-all/202410101431.tjpSRNTY-lkp@intel.com/
+>>
+>> These tags are incorrect. Please read the text of the email that you've
+>> got.
 > 
-> I verified that the kernel tree includes commit cecc1555a8c2 ("net: Make 
-> napi_hash_lock irq safe"), but the issue still occurs.
+> Added these tags since the dependent patch [1] was included in v8.
+> Please let me know if this should be removed.
 
-OK, thanks for verifying that.
- 
-> >>
-> >> 2.) If (1) does not fix your problem, can you please reply with at
-> >> least the following information:
-> >>    - Specify what device this is happening on (in case I have access
-> >>      to one)
-> 
-> We are using two ConnectX-5 cards connected back-to-back.
-> 
-> >>    - Which driver is affected
-> 
-> The affected driver is the MLX5 driver.
-> 
-> >>    - Which upstream kernel SHA you are building your test kernel from
-> 
-> The upstream kernel SHA we are building is 9163b05eca1d ("Merge branch 
-> 'add-support-for-so_priority-cmsg'").
+These tags are useful when you submit a faulty patch, it gets merged
+quickly, and only then the robot reports it. In that situation, you
+would be expected to send a fix, including these tags to credit the
+robot for catching the issue.
 
-I have access to ConnectX-5 Ex EN MCX516A-CDAT NICs and can build a
-kernel based on the upstream SHA you mentioned.
+Here, your patches haven't been merged yet, so it's not applicable.
 
-> >>    - The reproducer program(s) with clear instructions on how exactly
-> >>      to run it/them in order to reproduce the issue
-> 
-> Test setup/configuration:
-> On one side, we use a Python script with the scapy.all library to create 
-> UDP packets of size 1024, using port 19017 and the MAC/IP of the other side.
-> On the other side, we define an n-tuple filter (ethtool --config-ntuple 
-> eth2 flow-type udp4 dst-port 19017 action 4) and run xdpsock (xdpsock -i 
-> eth2 -N -q 4 --l2fwd -z -B).
-> In the test, we send a single packet each time, which is received and 
-> sent back to the sender.
-> As part of the validation, we check the statistics on the other side and 
-> notice a discrepancy between what xdpsock shows and what we see in the 
-> driver (ethtool -S eth2 | grep "tx_xsk_xmit").
-
-1. Can you please be much more specific when you say "notice a
-   discrepancy" and substitute that for specific data? What,
-   exactly, is a single run of the experiment that results in a lost
-   or delayed packet? Do you have tcpdump output? What is the
-   expected output and what is the actual output?
-
-2. Can you provide the full source code? Both the reproducer and the
-   script to check the values?
-
-   You can feel free to create a github gist and link to it, then I
-   can git clone it and run it.
-
-   In the gist you can create a README.md that shows exactly what
-   commands I need to run to reproduce, the expected output from the
-   script, and the actual output.
-
-   Since I have access to this hardware, I should be able to
-   reproduce.
-
-   Ideally, I'll git clone your gist, run something like "make test"
-   (or similar) and reproduce the issue and get either "Test
-   succeeded" or Test failed; expected %d packets but received %d".
-
-3. If this issue is with napi_disable/napi_enable, can you think of
-   a simpler reproducer? For example, wouldn't changing the queue
-   count cause the same issue without needing to involve xdp at all?
-
-   What about a simpler experiment with UDPing [1] and an ntuple
-   filter? Does it reproduce with plain old NAPI processing or is it
-   XDP specific?
-
-> > 
-> > I didn't hear back on the above, but wanted to let you know that
-> > I'll be out of the office soon, so my responses/bandwidth for
-> > helping to debug this will be limited over the next week or two.
-> 
-> Hi Joe,
-> 
-> Thanks for the quick response.
-> Comments inline, If you need more details or further clarification, 
-> please let me know.
-
-As mentioned above and in my previous emails: please provide lot
-more detail and make it as easy as possible for me to reproduce this
-issue with the simplest reproducer possible and a much more detailed
-explanation.
-
-Please note: I will be out of the office until Jan 9 so my responses
-will be limited until then.
+Konrad
 
