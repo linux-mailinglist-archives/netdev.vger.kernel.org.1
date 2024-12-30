@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-154468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47CE69FE137
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 01:18:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58A029FE143
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 01:19:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CB5F3A1F94
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 00:18:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C4203A2790
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 00:18:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D6719B5A7;
-	Mon, 30 Dec 2024 00:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3D719DF77;
+	Mon, 30 Dec 2024 00:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mqsgrDXN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HN3jGOPl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B7819AD93;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC7F19D8A3;
 	Mon, 30 Dec 2024 00:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735517763; cv=none; b=a+4+y4vF5RLgkPdrl1vWzJmbQO2aU4fvyUnL8WhfIXmXlxZ0lPBqfGOTYm9K51uwnX5L7tBW3lXhMQ5znjOmd8xuBSgi0cdGtfgpHgE4Uzno4BYAxjhiMRzikCaUEfMiMsc3sdhZ7BlRc7tN8B7b2Kig7aLFfzxMYiqv2MYtaEE=
+	t=1735517765; cv=none; b=n5GWdFZUxVjMMwKZHcdVDDqYn4czffmMuhQM+M7KgQtpIgGoRTlxeHIYx5iX9CW0rHLsciDjRgvQ3RxpAMF1aTv/D+Sb+l0cAlDnaEkuoRnsA0VBLnw4OZ129ArGh47wCZ8hTFo66YRkPOeqGSkpAL78OAP8pWxQ5m83hXuWNe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735517763; c=relaxed/simple;
-	bh=gxWz7ItVuXZh7ZMr8mOrMUU9vut7iYem6KQDBMBsI2Q=;
+	s=arc-20240116; t=1735517765; c=relaxed/simple;
+	bh=lWRQiUFYe2vQoQj3axJpxeip5NuLznrPRnr+KRPRjGQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m3QT+BrGGPMwwfFV2xo9ea84kkFB7RzdR99OBHb3RbwtMMSV0mYIlcnzirCxxTiNfiV9mQMKKLXpUlItaMDmQRfAdwRN+w1kNvc0MefyFU/ABvc2Q+3y+tvNh+EYh6ZEInuLQdTdublOAFKSwSwEg86fSwCsxwJB392jjDjQn98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mqsgrDXN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F120EC4CED1;
-	Mon, 30 Dec 2024 00:16:02 +0000 (UTC)
+	 MIME-Version; b=YUpH7A264XNlR8MA7dDBLUyB1SXLBGowAQy+yP2fJWsOAtB7RzfyikagLk6p37NX4EZ53l7qOdPvymP82GuVBl2QUMQQi09BihSDi1r+PfiDhDgLCJQyz+N29d0HZQjmpIP/gxKOyGT99oxDdR7vOKvmfXx17FIYdDNAui/0JgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HN3jGOPl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72157C4CED4;
+	Mon, 30 Dec 2024 00:16:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1735517763;
-	bh=gxWz7ItVuXZh7ZMr8mOrMUU9vut7iYem6KQDBMBsI2Q=;
+	bh=lWRQiUFYe2vQoQj3axJpxeip5NuLznrPRnr+KRPRjGQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mqsgrDXN20s8Fr17gpRjswtOcmwmPwp48qmCUjmftKxDXucDgA7zMbDojvTfGePJR
-	 2ulGDs/k/VXAZpxixAvCBo3i72LbT03V+pzzqSEylr5W4cypx9R1T+RcbRKVYN44oO
-	 mlKjj64YSrwJCZK0gwcnutdv3DmtOTSwrshOXupGc0IHxV4qjw3n10rYTVD8wlr+fO
-	 IZWkuCbfZR/fOIeUNZ/cTrqZ+Tqo0D+yNFtSJF3RvGCGwDKe+ENnM3KtnVqGNvZY8U
-	 H070vgD/IS6rJkxkWAWwSltDR9uiPMoN3xTTOE93BnDJ+/8kXhAOQR0tqsFEqMJKzU
-	 TKd/OwN29+92g==
+	b=HN3jGOPlJ/NCbL/SElFId+z7QwSQKWcfJvmSbQRczmZLUhAPg4lKgF6qs4ZfAchj+
+	 QxOXj/ptURI6s5xbNFI7P7Hmtx57C5wj0dgZOHRc3DOm2MCrcJht1TNqBHx00JNXct
+	 huT1kYYDIqQscFvgTvXp+pxJGytlFCsqiNJsfb3ZaLBYj6N/+BKo64aIjPYSIjf3x6
+	 eA//STf+IqeX7T4Qpb4su767HiP+ft/gHMb8oyb8yqP1qHwVM1M9Q5skgs479Cb+/R
+	 sfn0UmARj6Ukie9SWo7FFNWgP0OqZV6Cvzp44MAf4TxfNtmosthoiKs7I86wMc//dR
+	 nmz27sytmV0bA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 13/29] crypto: scatterwalk - add new functions for iterating through data
-Date: Sun, 29 Dec 2024 16:14:02 -0800
-Message-ID: <20241230001418.74739-14-ebiggers@kernel.org>
+Subject: [PATCH v2 14/29] crypto: scatterwalk - add new functions for copying data
+Date: Sun, 29 Dec 2024 16:14:03 -0800
+Message-ID: <20241230001418.74739-15-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241230001418.74739-1-ebiggers@kernel.org>
 References: <20241230001418.74739-1-ebiggers@kernel.org>
@@ -61,142 +61,157 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Add scatterwalk_next() which consolidates scatterwalk_clamp() and
-scatterwalk_map().  Also add scatterwalk_done_src() and
-scatterwalk_done_dst() which consolidate scatterwalk_unmap(),
-scatterwalk_advance(), and scatterwalk_done() or scatterwalk_pagedone().
-A later patch will remove scatterwalk_done() and scatterwalk_pagedone().
+Add memcpy_from_sglist() and memcpy_to_sglist() which are more readable
+versions of scatterwalk_map_and_copy() with the 'out' argument 0 and 1
+respectively.  They follow the same argument order as memcpy_from_page()
+and memcpy_to_page() from <linux/highmem.h>.  Note that in the case of
+memcpy_from_sglist(), this also happens to be the same argument order
+that scatterwalk_map_and_copy() uses.
 
-The new code eliminates the error-prone 'more' parameter.  Advancing to
-the next sg entry now only happens just-in-time in scatterwalk_next().
+The new code is also faster, mainly because it builds the scatter_walk
+directly without creating a temporary scatterlist.  E.g., a 20%
+performance improvement is seen for copying the AES-GCM auth tag.
 
-The new code also pairs the dcache flush more closely with the actual
-write, similar to memcpy_to_page().  Previously it was paired with
-advancing to the next page.  This is currently causing bugs where the
-dcache flush is incorrectly being skipped, usually due to
-scatterwalk_copychunks() being called without a following
-scatterwalk_done().  The dcache flush may have been placed where it was
-in order to not call flush_dcache_page() redundantly when visiting a
-page more than once.  However, that case is rare in practice, and most
-architectures either do not implement flush_dcache_page() anyway or
-implement it lazily where it just clears a page flag.
+Make scatterwalk_map_and_copy() be a wrapper around memcpy_from_sglist()
+and memcpy_to_sglist().  Callers of scatterwalk_map_and_copy() should be
+updated to call memcpy_from_sglist() or memcpy_to_sglist() directly, but
+there are a lot of them so they aren't all being updated right away.
 
-Another limitation of the old code was that by the time the flush
-happened, there was no way to tell if more than one page needed to be
-flushed.  That has been sufficient because the code goes page by page,
-but I would like to optimize that on !HIGHMEM platforms.  The new code
-makes this possible, and a later patch will implement this optimization.
+Also add functions memcpy_from_scatterwalk() and memcpy_to_scatterwalk()
+which are similar but operate on a scatter_walk instead of a
+scatterlist.  These will replace scatterwalk_copychunks() with the 'out'
+argument 0 and 1 respectively.  Their behavior differs slightly from
+scatterwalk_copychunks() in that they automatically take care of
+flushing the dcache when needed, making them easier to use.
+
+scatterwalk_copychunks() itself is left unchanged for now.  It will be
+removed after its callers are updated to use other functions instead.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- include/crypto/scatterwalk.h | 69 ++++++++++++++++++++++++++++++++----
- 1 file changed, 63 insertions(+), 6 deletions(-)
+ crypto/scatterwalk.c         | 59 ++++++++++++++++++++++++++++++------
+ include/crypto/scatterwalk.h | 24 +++++++++++++--
+ 2 files changed, 72 insertions(+), 11 deletions(-)
 
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index af436ad02e3f..2e7a532152d6 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -65,26 +65,67 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
+ 		scatterwalk_pagedone(walk, out & 1, 1);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(scatterwalk_copychunks);
+ 
+-void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+-			      unsigned int start, unsigned int nbytes, int out)
++inline void memcpy_from_scatterwalk(void *buf, struct scatter_walk *walk,
++				    unsigned int nbytes)
++{
++	do {
++		const void *src_addr;
++		unsigned int to_copy;
++
++		src_addr = scatterwalk_next(walk, nbytes, &to_copy);
++		memcpy(buf, src_addr, to_copy);
++		scatterwalk_done_src(walk, src_addr, to_copy);
++		buf += to_copy;
++		nbytes -= to_copy;
++	} while (nbytes);
++}
++EXPORT_SYMBOL_GPL(memcpy_from_scatterwalk);
++
++inline void memcpy_to_scatterwalk(struct scatter_walk *walk, const void *buf,
++				  unsigned int nbytes)
++{
++	do {
++		void *dst_addr;
++		unsigned int to_copy;
++
++		dst_addr = scatterwalk_next(walk, nbytes, &to_copy);
++		memcpy(dst_addr, buf, to_copy);
++		scatterwalk_done_dst(walk, dst_addr, to_copy);
++		buf += to_copy;
++		nbytes -= to_copy;
++	} while (nbytes);
++}
++EXPORT_SYMBOL_GPL(memcpy_to_scatterwalk);
++
++void memcpy_from_sglist(void *buf, struct scatterlist *sg,
++			unsigned int start, unsigned int nbytes)
+ {
+ 	struct scatter_walk walk;
+-	struct scatterlist tmp[2];
+ 
+-	if (!nbytes)
++	if (unlikely(nbytes == 0)) /* in case sg == NULL */
+ 		return;
+ 
+-	sg = scatterwalk_ffwd(tmp, sg, start);
++	scatterwalk_start_at_pos(&walk, sg, start);
++	memcpy_from_scatterwalk(buf, &walk, nbytes);
++}
++EXPORT_SYMBOL_GPL(memcpy_from_sglist);
++
++void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
++		      const void *buf, unsigned int nbytes)
++{
++	struct scatter_walk walk;
++
++	if (unlikely(nbytes == 0)) /* in case sg == NULL */
++		return;
+ 
+-	scatterwalk_start(&walk, sg);
+-	scatterwalk_copychunks(buf, &walk, nbytes, out);
+-	scatterwalk_done(&walk, out, 0);
++	scatterwalk_start_at_pos(&walk, sg, start);
++	memcpy_to_scatterwalk(&walk, buf, nbytes);
+ }
+-EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
++EXPORT_SYMBOL_GPL(memcpy_to_sglist);
+ 
+ struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
+ 				     struct scatterlist *src,
+ 				     unsigned int len)
+ {
 diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 5c7765f601e0..8e83c43016c9 100644
+index 8e83c43016c9..1689ecd7ddaf 100644
 --- a/include/crypto/scatterwalk.h
 +++ b/include/crypto/scatterwalk.h
-@@ -62,16 +62,10 @@ static inline unsigned int scatterwalk_clamp(struct scatter_walk *walk,
- 	if (walk->offset >= walk->sg->offset + walk->sg->length)
- 		scatterwalk_start(walk, sg_next(walk->sg));
- 	return min(nbytes, scatterwalk_pagelen(walk));
- }
- 
--static inline void scatterwalk_advance(struct scatter_walk *walk,
--				       unsigned int nbytes)
--{
--	walk->offset += nbytes;
--}
--
- static inline struct page *scatterwalk_page(struct scatter_walk *walk)
- {
- 	return sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
- }
- 
-@@ -84,10 +78,28 @@ static inline void *scatterwalk_map(struct scatter_walk *walk)
- {
- 	return kmap_local_page(scatterwalk_page(walk)) +
- 	       offset_in_page(walk->offset);
- }
- 
-+/**
-+ * scatterwalk_next() - Get the next data buffer in a scatterlist walk
-+ * @walk: the scatter_walk
-+ * @total: the total number of bytes remaining, > 0
-+ * @nbytes_ret: (out) the next number of bytes available, <= @total
-+ *
-+ * Return: A virtual address for the next segment of data from the scatterlist.
-+ *	   The caller must call scatterwalk_done_src() or scatterwalk_done_dst()
-+ *	   when it is done using this virtual address.
-+ */
-+static inline void *scatterwalk_next(struct scatter_walk *walk,
-+				     unsigned int total,
-+				     unsigned int *nbytes_ret)
-+{
-+	*nbytes_ret = scatterwalk_clamp(walk, total);
-+	return scatterwalk_map(walk);
-+}
-+
- static inline void scatterwalk_pagedone(struct scatter_walk *walk, int out,
- 					unsigned int more)
- {
- 	if (out) {
- 		struct page *page;
-@@ -106,10 +118,55 @@ static inline void scatterwalk_done(struct scatter_walk *walk, int out,
- 	if (!more || walk->offset >= walk->sg->offset + walk->sg->length ||
- 	    !(walk->offset & (PAGE_SIZE - 1)))
- 		scatterwalk_pagedone(walk, out, more);
- }
- 
-+static inline void scatterwalk_advance(struct scatter_walk *walk,
-+				       unsigned int nbytes)
-+{
-+	walk->offset += nbytes;
-+}
-+
-+/**
-+ * scatterwalk_done_src() - Finish one step of a walk of source scatterlist
-+ * @walk: the scatter_walk
-+ * @vaddr: the address returned by scatterwalk_next()
-+ * @nbytes: the number of bytes processed this step, less than or equal to the
-+ *	    number of bytes that scatterwalk_next() returned.
-+ *
-+ * Use this if the @vaddr was not written to, i.e. it is source data.
-+ */
-+static inline void scatterwalk_done_src(struct scatter_walk *walk,
-+					const void *vaddr, unsigned int nbytes)
-+{
-+	scatterwalk_unmap((void *)vaddr);
-+	scatterwalk_advance(walk, nbytes);
-+}
-+
-+/**
-+ * scatterwalk_done_dst() - Finish one step of a walk of destination scatterlist
-+ * @walk: the scatter_walk
-+ * @vaddr: the address returned by scatterwalk_next()
-+ * @nbytes: the number of bytes processed this step, less than or equal to the
-+ *	    number of bytes that scatterwalk_next() returned.
-+ *
-+ * Use this if the @vaddr may have been written to, i.e. it is destination data.
-+ */
-+static inline void scatterwalk_done_dst(struct scatter_walk *walk,
-+					void *vaddr, unsigned int nbytes)
-+{
-+	scatterwalk_unmap(vaddr);
-+	/*
-+	 * Explicitly check ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE instead of just
-+	 * relying on flush_dcache_page() being a no-op when not implemented,
-+	 * since otherwise the BUG_ON in sg_page() does not get optimized out.
-+	 */
-+	if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE)
-+		flush_dcache_page(scatterwalk_page(walk));
-+	scatterwalk_advance(walk, nbytes);
-+}
-+
+@@ -168,12 +168,32 @@ static inline void scatterwalk_done_dst(struct scatter_walk *walk,
  void scatterwalk_skip(struct scatter_walk *walk, unsigned int nbytes);
  
  void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
  			    size_t nbytes, int out);
+ 
+-void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+-			      unsigned int start, unsigned int nbytes, int out);
++void memcpy_from_scatterwalk(void *buf, struct scatter_walk *walk,
++			     unsigned int nbytes);
++
++void memcpy_to_scatterwalk(struct scatter_walk *walk, const void *buf,
++			   unsigned int nbytes);
++
++void memcpy_from_sglist(void *buf, struct scatterlist *sg,
++			unsigned int start, unsigned int nbytes);
++
++void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
++		      const void *buf, unsigned int nbytes);
++
++/* In new code, please use memcpy_{from,to}_sglist() directly instead. */
++static inline void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
++					    unsigned int start,
++					    unsigned int nbytes, int out)
++{
++	if (out)
++		memcpy_to_sglist(sg, start, buf, nbytes);
++	else
++		memcpy_from_sglist(buf, sg, start, nbytes);
++}
+ 
+ struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
+ 				     struct scatterlist *src,
+ 				     unsigned int len);
  
 -- 
 2.47.1
