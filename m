@@ -1,57 +1,153 @@
-Return-Path: <netdev+bounces-154541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8A0D9FE711
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 15:30:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7FEB9FE721
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 15:33:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 793E31625CE
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 14:30:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E6111882C6C
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 14:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BED1A9B45;
-	Mon, 30 Dec 2024 14:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8641E1AA1DC;
+	Mon, 30 Dec 2024 14:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="JnxELWNa"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="J/APm32F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3593E1A38E1;
-	Mon, 30 Dec 2024 14:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C5E1A9B49
+	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 14:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735569008; cv=none; b=b1vFBcqY1UNkj9lLJ6LlDkSuDelZpmTLUj6thvGKpLSFULe9q4ANwY6KxcDfkO9SJyIVyYUtKjoLBfHmlCJPy6NxCyZS8gFH+7oNcVNoXXss218bEfoCUy07jBtebx9KUhf+7suX6Y/7FfRRQeSC6hI+MjIczP5DVTTojULRObk=
+	t=1735569089; cv=none; b=REP5ZQeSC0nZWs0OjogrRKfjc5FLXjg0Pbw4Mboh1OgFNN4rvoxDgJePg8L+cnl5y9rkUCCSyT6/E3aIrYM9XLgkJjf+5U2a4QYw14dI0MvttHiqbRv0LoBwRdFK9aeixps/blCtgpwGdAQemK4WixryCbRondoqSomMFMeMX34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735569008; c=relaxed/simple;
-	bh=AnT1KVJBfqYTVHmxRL7iPnwJYQrJXaEiBQ9mnWV6kDw=;
+	s=arc-20240116; t=1735569089; c=relaxed/simple;
+	bh=DzcdSK4Fbjvsk9GyTH4M7MGUMxmfuEMWS7vM5YmOw7w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YS7Yni1lQZmcoxMq3IOQ8IDSh7H77MnyBC2Rg1THae7loTDJQlBcaRD8oaInzeoKA7qZKZDnjMoEBdueCGBKgaF/m9+1/3ry4sDs6Z1Citd/ag4L08yVhrLL/Wub1I+Bugl0bhY06WOFPA8e0GTSUzoR6rGPlw1uvSl4Tz39eWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=JnxELWNa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A4F9C4CED0;
-	Mon, 30 Dec 2024 14:30:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1735569007;
-	bh=AnT1KVJBfqYTVHmxRL7iPnwJYQrJXaEiBQ9mnWV6kDw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JnxELWNaJom0miyHT4j0orYbD+v+uujWD4w49k422AlVaQirRuvrb/luY/N8n6C0p
-	 xkDQonUFzTqF3bnwJDqB3II+RxCsFmFefquWvHj3BPlYV8u6zAo45ZSecuf+XdD8nD
-	 7kDrHEqpQMyE/fE+1NwYwONqB/lSqy3+EESiiG+k=
-Date: Mon, 30 Dec 2024 15:30:04 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: jiang.kun2@zte.com.cn
-Cc: andrew@lunn.ch, vivien.didelot@gmail.com, f.fainelli@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, kuba@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, he.peilin@zte.com.cn, xu.xin16@zte.com.cn,
-	fan.yu9@zte.com.cn, qiu.yutan@zte.com.cn, wang.yaxin@zte.com.cn,
-	tu.qiang35@zte.com.cn, yang.yang29@zte.com.cn,
-	ye.xingchen@zte.com.cn, zhang.yunkai@zte.com.cn
-Subject: Re: [PATCH stable 5.15] net:dsa:fix the dsa_ptr null pointer
- dereference
-Message-ID: <2024123054-matrix-surprise-f5c1@gregkh>
-References: <202412261916435469rfyTVNfO8PtKWbw6X51-@zte.com.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jrDfZflr9WkXx3eBUmyCqVSoh+y5RwAD3hnLJzWm9HOarg55IXwZHAZPtavGUgbaCLHpXUt9UKvudzgHOdDQv3nNRjr/lv7hxcza3XlBD7Ocw0+XZTF8CrCvAuuVBbO3YDC9OTMK7P0h4HnGeidSYnH3HW929ezXeh30ZKAUk+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=J/APm32F; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6d88cb85987so75269436d6.1
+        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 06:31:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1735569086; x=1736173886; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aZ0qh5CvDNrWXK/tQQvVpQ5E5ArB37lBngu63gu7KW8=;
+        b=J/APm32Fezcc/NBzQxat8iksR8O3TIZIrDs1LMImXd5pjWPjoaekUOaMTuNyR7gQ6H
+         JgTpltfcsIq1MUf83RNw/TMSyFeUq6svdySnOaUjfJvMikClmoVtijDdxuAjmKD7SZjZ
+         nQznCWfCYWsgrRoVjW/gAxAyDR9IXUBFm8cvQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735569086; x=1736173886;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aZ0qh5CvDNrWXK/tQQvVpQ5E5ArB37lBngu63gu7KW8=;
+        b=VLCh7lp3QA2pcAKyu0yGlK8Cw8YkOheWDdseRFJaRcmteYatq8DONT8s9/aR7WsDAw
+         s0O5tYkCAomZIzpTVJoIyCqL1mQqIKE8NIBg9uHy1pjZE0hft6jFaS6JsP5bUYE5d0N6
+         WfCXcTaNBtP3ChRJTUlejx9IK+4f6GDFFOFForMXk4ZeiI1v7j8xdrSiLyadiNLvSjjJ
+         s6jUzTitFC5qLvOzkjS+CiQLiISiZQG9KwIXFp8IluKBBQA+ku8k48hMXFdWjL8RUSJi
+         BrCUx7CNIgToOEeAhvQ0KgRsRZ2YuP7ecXfWyRxcylXDUUQG0qyuUu0elAkSWJbkAM8u
+         1TdA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0YSCwvXg6kR46CrosFkSMJHyY32OOmwobMgdRiBMXOjklot9fZjbt1aBmiXEwuYp9TBI/E2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmnR4jeNvlFxSoELt7P66w2ODFjR3TeeZI3H0TvfCGXPzc9HE6
+	/E6fUax9dPrLHo/7wOzle6VzVqBilfhQzubUqx/ihc6xW4GlUFyF5tyJVawNCgM=
+X-Gm-Gg: ASbGncuYA+ixOWrMGJqqGk4Sl78MVcnTRDmTNrjHDqeA97XRqZCF1bNyo8N2v0+E9eR
+	Sj57vlM1ChzAfKy9jxQl/MMWm936LSu+qnUDo8pg2XaLtFs5P19R6KonzZ5lJJVArN7tzj5ihw9
+	BSsu41igv3B8DM6+dDOD4xP7abgBgT2uhK7wKp4xt6q4TIo4yJzMkpmodgOgYRe6CwtBwJxMnKi
+	rAr9nbodkFoLnwD06L1wHYIu5yVuiSgn6oKIMYQStbR3qjHNXLoZ0R8BxDF5kxhNJG0NFteaIc2
+	dq9JaG1Qmls62X5G9d4=
+X-Google-Smtp-Source: AGHT+IFhhaSR9avGcVQrR2u/7A1pOVupmdwRVmvYVv11neW65aqnZNqInNc4kMN4KbFRYCDE54xu3A==
+X-Received: by 2002:a05:6214:29ef:b0:6d4:1c27:e9b1 with SMTP id 6a1803df08f44-6dd23631f97mr591874976d6.23.1735569086295;
+        Mon, 30 Dec 2024 06:31:26 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181d3169sm102799846d6.102.2024.12.30.06.31.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Dec 2024 06:31:25 -0800 (PST)
+Date: Mon, 30 Dec 2024 09:31:23 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Alex Lazar <alazar@nvidia.com>
+Cc: "aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
+	"almasrymina@google.com" <almasrymina@google.com>,
+	"amritha.nambiar@intel.com" <amritha.nambiar@intel.com>,
+	"bigeasy@linutronix.de" <bigeasy@linutronix.de>,
+	"bjorn@rivosinc.com" <bjorn@rivosinc.com>,
+	"corbet@lwn.net" <corbet@lwn.net>, Dan Jurgens <danielj@nvidia.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"hawk@kernel.org" <hawk@kernel.org>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"johannes.berg@intel.com" <johannes.berg@intel.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"leitao@debian.org" <leitao@debian.org>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"lorenzo@kernel.org" <lorenzo@kernel.org>,
+	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
+	"mkarsten@uwaterloo.ca" <mkarsten@uwaterloo.ca>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"skhawaja@google.com" <skhawaja@google.com>,
+	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	Gal Pressman <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
+	Dror Tennenbaum <drort@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [net-next v6 0/9] Add support for per-NAPI config via netlink
+Message-ID: <Z3Kuu44L0ZcnavQF@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Alex Lazar <alazar@nvidia.com>,
+	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
+	"almasrymina@google.com" <almasrymina@google.com>,
+	"amritha.nambiar@intel.com" <amritha.nambiar@intel.com>,
+	"bigeasy@linutronix.de" <bigeasy@linutronix.de>,
+	"bjorn@rivosinc.com" <bjorn@rivosinc.com>,
+	"corbet@lwn.net" <corbet@lwn.net>, Dan Jurgens <danielj@nvidia.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"hawk@kernel.org" <hawk@kernel.org>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"johannes.berg@intel.com" <johannes.berg@intel.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"leitao@debian.org" <leitao@debian.org>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"lorenzo@kernel.org" <lorenzo@kernel.org>,
+	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
+	"mkarsten@uwaterloo.ca" <mkarsten@uwaterloo.ca>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"skhawaja@google.com" <skhawaja@google.com>,
+	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	Gal Pressman <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
+	Dror Tennenbaum <drort@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+References: <DM8PR12MB5447837576EA58F490D6D4BFAD052@DM8PR12MB5447.namprd12.prod.outlook.com>
+ <Z2MBqrc2FM2rizqP@LQ3V64L9R2>
+ <Z2WsJtaBpBqJFXeO@LQ3V64L9R2>
+ <550af81b-6d62-4fc3-9df3-2d74989f4ca0@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,86 +156,135 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202412261916435469rfyTVNfO8PtKWbw6X51-@zte.com.cn>
+In-Reply-To: <550af81b-6d62-4fc3-9df3-2d74989f4ca0@nvidia.com>
 
-On Thu, Dec 26, 2024 at 07:16:43PM +0800, jiang.kun2@zte.com.cn wrote:
-> From: Peilin He<he.peilin@zte.com.cn>
+On Mon, Dec 23, 2024 at 08:17:08AM +0000, Alex Lazar wrote:
 > 
-> Upstream commit 6c24a03a61a2 ("net: dsa: improve shutdown sequence")
 > 
-> Issue
-> =====
-> Repeatedly accessing the DSA Ethernet controller via the ethtool command,
-> followed by a system reboot, may trigger a DSA null pointer dereference,
-> causing a kernel panic and preventing the system from rebooting properly.
-> This can lead to data loss or denial-of-service, resulting in serious
-> consequences.
+> On 20/12/2024 19:40, Joe Damato wrote:
+> > On Wed, Dec 18, 2024 at 09:08:58AM -0800, Joe Damato wrote:
+> >> On Wed, Dec 18, 2024 at 11:22:33AM +0000, Alex Lazar wrote:
+> >>> Hi Joe and all,
+> >>>
+> >>> I am part of the NVIDIA Eth drivers team, and we are experiencing a problem,
+> >>> sibesced to this change: commit 86e25f40aa1e ("net: napi: Add napi_config")
+> >>>
+> >>> The issue occurs when sending packets from one machine to another.
+> >>> On the receiver side, we have XSK (XDPsock) that receives the packet and sends it
+> >>> back to the sender.
+> >>> At some point, one packet (packet A) gets "stuck," and if we send a new packet
+> >>> (packet B), it "pushes" the previous one. Packet A is then processed by the NAPI
+> >>> poll, and packet B gets stuck, and so on.
+> >>>
+> >>> Your change involves moving napi_hash_del() and napi_hash_add() from
+> >>> netif_napi_del() and netif_napi_add_weight() to napi_enable() and napi_disable().
+> >>> If I move them back to netif_napi_del() and netif_napi_add_weight(),
+> >>> the issue is resolved (I moved the entire if/else block, not just the napi_hash_del/add).
+> >>>
+> >>> This issue occurs with both the new and old APIs (netif_napi_add/_config).
+> >>> Moving the napi_hash_add() and napi_hash_del() functions resolves it for both.
+> >>> I am debugging this, no breakthrough so far.
+> >>>
+> >>> I would appreciate if you could look into this.
+> >>> We can provide more details per request.
+> >>
+> >> I appreciate your report, but there is not a lot in your message to
+> >> help debug the issue.
+> >>
+> >> Can you please:
+> >>
+> >> 1.) Verify that the kernel tree you are testing on has commit
+> >> cecc1555a8c2 ("net: Make napi_hash_lock irq safe") included ? If it
+> >> does not, can you pull in that commit and re-run your test and
+> >> report back if that fixes your problem?
 > 
-> The following is the panic log:
-> [  172.523467] Unable to handle kernel NULL pointer dereference at virtual
-> address 0000000000000020
-> [  172.706923] Call trace:
-> [  172.709371]  dsa_master_get_sset_count+0x24/0xa4
-> [  172.714000]  ethtool_get_drvinfo+0x8c/0x210
-> [  172.718193]  dev_ethtool+0x780/0x2120
-> [  172.721863]  dev_ioctl+0x1b0/0x580
-> [  172.725273]  sock_do_ioctl+0xc0/0x100
-> [  172.728944]  sock_ioctl+0x130/0x3c0
-> [  172.732440]  __arm64_sys_ioctl+0xb4/0x100
-> [  172.736460]  invoke_syscall+0x50/0x120
-> [  172.740219]  el0_svc_common.constprop.0+0x4c/0xf4
-> [  172.744936]  do_el0_svc+0x2c/0xa0
-> [  172.748257]  el0_svc+0x20/0x60
-> [  172.751318]  el0t_64_sync_handler+0xe8/0x114
-> [  172.755599]  el0t_64_sync+0x180/0x184
-> [  172.759271] Code: a90153f3 2a0103f4 a9025bf5 f9418015 (f94012b6)
-> [  172.765383] ---[ end trace 0000000000000002 ]---
-> 
-> Root Cause
-> ==========
-> Based on analysis of the Linux 5.15 stable version, the function
-> dsa_master_get_sset_count() accesses members of the structure pointed
-> to by cpu_dp without checking for a null pointer.  If cpu_dp is a
-> null pointer, this will cause a kernel panic.
-> 
-> 	static int dsa_master_get_sset_count(struct net_device *dev, int sset)
-> 	{
-> 		struct dsa_port *cpu_dp = dev->dsa_ptr;
-> 		const struct ethtool_ops *ops = cpu_dp->orig_ethtool_ops;
-> 		struct dsa_switch *ds = cpu_dp->ds;
-> 		...
-> 	}
-> 
-> dev->dsa_ptr is set to NULL in the dsa_switch_shutdown() or
-> dsa_master_teardown() functions. When the DSA module unloads,
-> dsa_master_ethtool_teardown(dev) restores the original copy of
-> the DSA device's ethtool_ops using "dev->ethtool_ops =
-> cpu_dp->orig_ethtool_ops;" before setting dev->dsa_ptr to NULL.
-> This ensures that ethtool_ops remains accessible after DSA unloads.
-> However, dsa_switch_shutdown does not restore the original copy of
-> the DSA device's ethtool_ops, potentially leading to a null pointer
-> dereference of dsa_ptr and causing a system panic.  Essentially,
-> when we set master->dsa_ptr to NULL, we need to ensure that
-> no user ports are making requests to the DSA driver.
-> 
-> Solution
-> ========
-> The addition of the netif_device_detach() function is to ensure that
-> ioctls, rtnetlinks and ethtool requests on the user ports no longer
-> propagate down to the driver - we're no longer prepared to handle them.
-> 
-> Fixes: ee534378f005 ("net: dsa: fix panic when DSA master device unbinds on shutdown")
-> Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Peilin He <he.peilin@zte.com.cn>
-> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
-> Signed-off-by: Kun Jiang <jiang.kun2@zte.com.cn>
-> Cc: Fan Yu <fan.yu9@zte.com.cn>
-> Cc: Yutan Qiu <qiu.yutan@zte.com.cn>
-> Cc: Yaxin Wang <wang.yaxin@zte.com.cn>
-> Cc: tuqiang <tu.qiang35@zte.com.cn>
-> Cc: Yang Yang <yang.yang29@zte.com.cn>
-> Cc: ye xingchen <ye.xingchen@zte.com.cn>
-> Cc: Yunkai Zhang <zhang.yunkai@zte.com.cn>
+> I verified that the kernel tree includes commit cecc1555a8c2 ("net: Make 
+> napi_hash_lock irq safe"), but the issue still occurs.
 
-You dropped all the original signed-off-by lines :(
+OK, thanks for verifying that.
+ 
+> >>
+> >> 2.) If (1) does not fix your problem, can you please reply with at
+> >> least the following information:
+> >>    - Specify what device this is happening on (in case I have access
+> >>      to one)
+> 
+> We are using two ConnectX-5 cards connected back-to-back.
+> 
+> >>    - Which driver is affected
+> 
+> The affected driver is the MLX5 driver.
+> 
+> >>    - Which upstream kernel SHA you are building your test kernel from
+> 
+> The upstream kernel SHA we are building is 9163b05eca1d ("Merge branch 
+> 'add-support-for-so_priority-cmsg'").
+
+I have access to ConnectX-5 Ex EN MCX516A-CDAT NICs and can build a
+kernel based on the upstream SHA you mentioned.
+
+> >>    - The reproducer program(s) with clear instructions on how exactly
+> >>      to run it/them in order to reproduce the issue
+> 
+> Test setup/configuration:
+> On one side, we use a Python script with the scapy.all library to create 
+> UDP packets of size 1024, using port 19017 and the MAC/IP of the other side.
+> On the other side, we define an n-tuple filter (ethtool --config-ntuple 
+> eth2 flow-type udp4 dst-port 19017 action 4) and run xdpsock (xdpsock -i 
+> eth2 -N -q 4 --l2fwd -z -B).
+> In the test, we send a single packet each time, which is received and 
+> sent back to the sender.
+> As part of the validation, we check the statistics on the other side and 
+> notice a discrepancy between what xdpsock shows and what we see in the 
+> driver (ethtool -S eth2 | grep "tx_xsk_xmit").
+
+1. Can you please be much more specific when you say "notice a
+   discrepancy" and substitute that for specific data? What,
+   exactly, is a single run of the experiment that results in a lost
+   or delayed packet? Do you have tcpdump output? What is the
+   expected output and what is the actual output?
+
+2. Can you provide the full source code? Both the reproducer and the
+   script to check the values?
+
+   You can feel free to create a github gist and link to it, then I
+   can git clone it and run it.
+
+   In the gist you can create a README.md that shows exactly what
+   commands I need to run to reproduce, the expected output from the
+   script, and the actual output.
+
+   Since I have access to this hardware, I should be able to
+   reproduce.
+
+   Ideally, I'll git clone your gist, run something like "make test"
+   (or similar) and reproduce the issue and get either "Test
+   succeeded" or Test failed; expected %d packets but received %d".
+
+3. If this issue is with napi_disable/napi_enable, can you think of
+   a simpler reproducer? For example, wouldn't changing the queue
+   count cause the same issue without needing to involve xdp at all?
+
+   What about a simpler experiment with UDPing [1] and an ntuple
+   filter? Does it reproduce with plain old NAPI processing or is it
+   XDP specific?
+
+> > 
+> > I didn't hear back on the above, but wanted to let you know that
+> > I'll be out of the office soon, so my responses/bandwidth for
+> > helping to debug this will be limited over the next week or two.
+> 
+> Hi Joe,
+> 
+> Thanks for the quick response.
+> Comments inline, If you need more details or further clarification, 
+> please let me know.
+
+As mentioned above and in my previous emails: please provide lot
+more detail and make it as easy as possible for me to reproduce this
+issue with the simplest reproducer possible and a much more detailed
+explanation.
+
+Please note: I will be out of the office until Jan 9 so my responses
+will be limited until then.
 
