@@ -1,291 +1,134 @@
-Return-Path: <netdev+bounces-154495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FBD79FE34F
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 08:35:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AF29FE378
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 08:52:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F2033A1C35
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 07:35:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86AFB188248D
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 07:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BD019F487;
-	Mon, 30 Dec 2024 07:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8CF19F43A;
+	Mon, 30 Dec 2024 07:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="tXsxrocw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H0i9Mg4y"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-72.smtpout.orange.fr [193.252.22.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7EC15B99E;
-	Mon, 30 Dec 2024 07:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45354155345
+	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 07:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735544115; cv=none; b=n9QuJNM8AQkn6yHKFH3vjyt7qcViHd7eYHis3YoIsA1WT1zN209FB0PazVrMydXLoWLES0arYKLpM4Y05he3hn80YKQ88kPuWb21Kknx25jr0/y8SwY9oWQ40sHAyIy2LwqyckIXE1YEz2i0ivZr/FNrBH9G59p3pdbVP6cqisg=
+	t=1735545118; cv=none; b=KWFHRsHXvQDfnJ5jmvRx1GEjg8SDY1WGIMiMP3nTDenVXGuTphnwBLJc9yn7JQHkFs9xkivBTJUKeT+DjFXLl4SCXNnfnNm6ZbFWtllKFFXFTBAaapBSa+X9IU3zQqsjjcSV97vDRJug9xYlU2Bvj/rMIDyYhPsGfJ79PlKk8HE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735544115; c=relaxed/simple;
-	bh=EsPHsJlnM9Dp3TxVYK/FBB3CX1RQjJ+GuiS8X2Tsi2A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H/qk+M6e4Tidlw4SPiONEFBlFMgkNbCoQKgMGxIx4VrbQy3x6E9uvImBt4c0s6Wm56nsQQQm7SYTcBQ/yY1UXrkxf2KGICsLp5llAba1rVSqoxPqVLLIYuQW9VgZzO+rsokJ02IR6A1YfGcgDKAsHifKTEAnSjbqeG/bosjRHp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=tXsxrocw; arc=none smtp.client-ip=193.252.22.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id SAHYtYPoNXLq1SAHdtcmQ8; Mon, 30 Dec 2024 08:34:02 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1735544042;
-	bh=VEyfH/JEAYVF3BrV81XXT2vuoUN9T4Udc6Ff5Lo1nJI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=tXsxrocwc/006lfFpghXxEiUsXPJ6W7R8U5B86iw+UXRFvk2Q7hMC6yafHJwNlkIl
-	 ZO81l98+Cbrg8k3C3f6YTqWS8A0+HL+8blAiEMK1bKyM8UEnMHCe4VYr0xk6IdBFds
-	 QxwNImIqUaS+M9vmgDUcvOpokLE4W4rvc6glyQrBShx0fhHadJwXjiNR+JxPnpEKM3
-	 MK6v9lpaVEJDo1Iy2ReBe3ywK56fzkpoiB/YkTidIuy4Z3WNXiXDVyoYhQhRU7blpw
-	 TuCSijLPhmVvfkwSBi8bc9xSWKy3EZu99zeQsZH6iSHpGRG6NQ9CkFxQK04hWRCpVw
-	 7ggJPwK/zWXkA==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 30 Dec 2024 08:34:02 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <d52fbacd-cd07-4ccd-9a46-9e8ca650fc26@wanadoo.fr>
-Date: Mon, 30 Dec 2024 16:33:43 +0900
+	s=arc-20240116; t=1735545118; c=relaxed/simple;
+	bh=Ty0odp3SjgUTqexMbjUfQ7REoC5DutDQisZcBKmlUUs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hdibpM80UfA0Di5nH2Y8rMXV3iAnrst9tKsVSKDktmh7Ik9sd4frq+TmSsK+hTq/Z4w8hwW1xjHAt03tdaVCZGeGR6Bnbsh4qNEVv0QJuLLH6QEDs7226ooAw2p5Xsyk3mD9/00PWizSnTr/wPwSO0kae5+P4qGriD8GtIyKjaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H0i9Mg4y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735545115;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0J0AYhxmNDrE+hV/0WPbQ41cTnDC3xZnCg8iwgLqFn4=;
+	b=H0i9Mg4yA0miPbw3d9UsHgDmZqS2pnMhBqGarKWxGBPc7ZQ1gsramiUjDLtBIcEIzAVVQE
+	iydxYqtcQUaTaxztu29sTxqeWZHzmtHxdyKHmet1NyaPOiC8px7+8q99yaOwkmhT7mVvOA
+	RFGRV6j8pdJGEWMaiatsI1pq7DpX+WU=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-679-Xk0zmB3RNpKB3CBocajkdA-1; Mon, 30 Dec 2024 02:51:54 -0500
+X-MC-Unique: Xk0zmB3RNpKB3CBocajkdA-1
+X-Mimecast-MFC-AGG-ID: Xk0zmB3RNpKB3CBocajkdA
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ef6ef9ba3fso12366601a91.2
+        for <netdev@vger.kernel.org>; Sun, 29 Dec 2024 23:51:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735545113; x=1736149913;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0J0AYhxmNDrE+hV/0WPbQ41cTnDC3xZnCg8iwgLqFn4=;
+        b=Z9WLhgsdhsIBi56NBZVOjpB/1J2xLdiUfVvT25wN8qlNHQNhoDuS9/tjVICyCP7C3O
+         C27s3X9HzM/M9ZXPywhLhIor6bd054a0wJ7HEotWrsJH/dmt4KWHozQZra5Rbek9vLo9
+         eDNVpIZr28dHAECS1NZkSW9fzAODvoMcA+wRGI+2r5fdIY4Hem3vzxtcDSiiU0tEcP+x
+         ESKT3GkP/AERdJMW/G+vhG2s1won4bxTozFWV2XfXnzaVd5AqIHZBheC5S001/J26z7R
+         VAf57re66wBmG536ogwQqnX12I/8o/186cki39r4ML2rqWL6Ru83avuTXmAMNKs6BF30
+         2uJg==
+X-Gm-Message-State: AOJu0Yy9953gVe8zOlqSytnBWGoun947hrHxqKLkIDNbt72cZwEhyPbU
+	v+UUHjSOw9Oy9LC6agFYUZ9oS2ojq1iZu6KAABxKpEZkjIbymxJea+Cf/eqBWbcpOJXK20NTRZG
+	05NgX6FQ99HH1TDVUMKIP9LbpMQQp4Ll96bnjNeZ5BaZxItwr0hWnDLz89hdNz8JsFSw7j2rDcD
+	QylmhO1sjd5mH/45YT1edWdUp93ecd
+X-Gm-Gg: ASbGncvFDO1MAJzsq5r0zfBVyz7iMAWOtP3njY3oaX4/cjb0tUIjPIxJMoQzte2sfiM
+	rgBrOELgQfbYKX0Deddt/wQ3u3srgrLkA/Szx
+X-Received: by 2002:a05:6a00:4391:b0:728:927b:7de2 with SMTP id d2e1a72fcca58-72abdd7cbaemr60529602b3a.8.1735545112947;
+        Sun, 29 Dec 2024 23:51:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGrRn8WcYwv283lLqZw/U9xGQjtM/ypQuHSDfUoQ2eSZRdU4bKS9WRvBDuEhHDV4a2t6IovfqPmrMjsRDPQDxs=
+X-Received: by 2002:a05:6a00:4391:b0:728:927b:7de2 with SMTP id
+ d2e1a72fcca58-72abdd7cbaemr60529579b3a.8.1735545112567; Sun, 29 Dec 2024
+ 23:51:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/7] mfd: Add core driver for Nuvoton NCT6694
-To: Ming Yu <a0282524688@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, tmyu0@nuvoton.com,
- lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl,
- andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
- jdelvare@suse.com, alexandre.belloni@bootlin.com, linux-usb@vger.kernel.org
-References: <20241227095727.2401257-1-a0282524688@gmail.com>
- <20241227095727.2401257-2-a0282524688@gmail.com>
- <b1c5b18d-efe1-41f8-9825-2a3e090c47f5@wanadoo.fr>
- <CAOoeyxU5nM4BZhgqcRxVHVVDxzLFzVS0+z7Yi_YGpvWc87mAbQ@mail.gmail.com>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-In-Reply-To: <CAOoeyxU5nM4BZhgqcRxVHVVDxzLFzVS0+z7Yi_YGpvWc87mAbQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241227191211.12485-1-chia-yu.chang@nokia-bell-labs.com> <20241227191211.12485-12-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20241227191211.12485-12-chia-yu.chang@nokia-bell-labs.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 30 Dec 2024 15:51:41 +0800
+Message-ID: <CACGkMEu990O+2Sedj+ASv0P5TnZR9THiOdHmx=L0hOxQRXPcsg@mail.gmail.com>
+Subject: Re: [PATCH v6 net-next 11/14] virtio_net: Accurate ECN flag in virtio_net_hdr
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, dsahern@kernel.org, pabeni@redhat.com, 
+	joel.granados@kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch, 
+	horms@kernel.org, pablo@netfilter.org, kadlec@netfilter.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	shenjian15@huawei.com, salil.mehta@huawei.com, shaojijie@huawei.com, 
+	saeedm@nvidia.com, tariqt@nvidia.com, mst@redhat.com, 
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	virtualization@lists.linux.dev, ij@kernel.org, ncardwell@google.com, 
+	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
+	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
+	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
+	vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 30/12/2024 at 15:32, Ming Yu wrote:
-> Dear Vincent,
-> 
-> Thank you for your comments,
-> 
-> Vincent Mailhol <mailhol.vincent@wanadoo.fr> 於 2024年12月27日 週五 下午11:34寫道：
+On Sat, Dec 28, 2024 at 3:13=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.com>=
+ wrote:
+>
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+>
+> Unlike RFC 3168 ECN, accurate ECN uses the CWR flag as part of the ACE
+> field to count new packets with CE mark; however, it will be corrupted
+> by the RFC 3168 ECN-aware TSO. Therefore, fallback shall be applied by
+> seting NETIF_F_GSO_ACCECN to ensure that the CWR flag should not be
+> changed within a super-skb.
+>
+> To apply the aforementieond new AccECN GSO for virtio, new featue bits
+> for host and guest are added for feature negotiation between driver and
+> device. And the translation of Accurate ECN GSO flag between
+> virtio_net_hdr and skb header for NETIF_F_GSO_ACCECN is also added to
+> avoid CWR flag corruption due to RFC3168 ECN TSO.
+>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> ---
+>  drivers/net/virtio_net.c        | 14 +++++++++++---
+>  drivers/vdpa/pds/debugfs.c      |  6 ++++++
+>  include/linux/virtio_net.h      | 16 ++++++++++------
+>  include/uapi/linux/virtio_net.h |  5 +++++
+>  4 files changed, 32 insertions(+), 9 deletions(-)
 
-(...)
+Is there a link to the spec patch? It needs to be accepted first.
 
->>>  obj-$(CONFIG_MFD_MC13XXX)    += mc13xxx-core.o
->>>  obj-$(CONFIG_MFD_MC13XXX_SPI)        += mc13xxx-spi.o
->>>  obj-$(CONFIG_MFD_MC13XXX_I2C)        += mc13xxx-i2c.o
->>> diff --git a/drivers/mfd/nct6694.c b/drivers/mfd/nct6694.c
->>> new file mode 100644
->>> index 000000000000..0f31489ef9fa
->>> --- /dev/null
->>> +++ b/drivers/mfd/nct6694.c
->>
->> If I understand correctly, your device is an USB device, so shouldn't it
->> be under
->>
->>   drivers/usb/mfd/nct6694.c
->>
->> ?
-> 
-> I understand, but there is no drivers/usb/mfd/ directory, I believe my
-> device is similar to dln2.c and viperboard.c, which is why I placed it
-> under drivers/mfd/
-
-Well, at the end, this is not my tree. Maybe I am saying something silly
-here? I am fine to defer this problem to the more relevant people. If
-the maintainers from the linux-usb mailing list are happy like you did,
-then so am I.
-
->> At the moment, I see no USB maintainers in CC (this is why I added
->> linux-usb myself). By putting it in the correct folder, the
->> get_maintainers.pl will give you the correct list of persons to put in copy.
->>
-> 
-> Okay, I will add CC to linux-usb from now on.
-
-Ack.
-
->> The same comment applies to the other modules. For example, I would
->> expect to see the CAN module under:
->>
->>   drivers/net/can/usb/nct6694_canfd.c
->>
-> 
-> Understood! I will move the can driver to drivers/net/can/usb/ in v5.
-
-Ack.
-
-(...)
-
->>> +int nct6694_read_msg(struct nct6694 *nct6694, u8 mod, u16 offset,
->>> +                  u16 length, void *buf)
->>> +{
->>> +     union nct6694_usb_msg *msg = nct6694->usb_msg;
->>> +     int tx_len, rx_len, ret;
->>> +
->>> +     guard(mutex)(&nct6694->access_lock);
->>> +
->>> +     memset(msg, 0, sizeof(*msg));
->>> +
->>> +     /* Send command packet to USB device */
->>> +     msg->cmd_header.mod = mod;
->>> +     msg->cmd_header.cmd = offset & 0xFF;
->>> +     msg->cmd_header.sel = (offset >> 8) & 0xFF;
->>
->> In the other modules, you have some macros to combine together the cmd
->> and the sel (selector, I guess?). For example from nct6694_canfd.c:
->>
->>   #define NCT6694_CAN_DELIVER(buf_cnt)  \
->>         ((((buf_cnt) & 0xFF) << 8) | 0x10)      /* CMD|SEL */
->>
->> And here, you split them again. So what was the point to combine those
->> together in the first place?
->>
-> 
-> Due to these two bytes may used to OFFSET in report channel for other
-> modules(gpio, hwmon), I will modify them below...
-> 
->> Can't you just pass both the cmd and the sel as two separate argument?
->> Those cmd and sel concatenation macros are too confusing.
->>
->> Also, if you are worried of having too many arguments in
->> nct6694_read_msg(), you may just directly pass a pointer to a struct
->> nct6694_cmd_header instead of all the arguments separately.
->>
-> 
-> ...
-> in mfd/nct6694.c
-> inline struct nct6694_cmd_header nct6694_init_cmd(u8 mod, u8 cmd, u8 sel,
->                                                   u16 offset, u16 length)
-> {
->         struct nct6694_cmd_header header;
-> 
->         header.mod = mod;
->         header.cmd = cmd;
->         header.sel = sel;
->         header.offset = cpu_to_le16(offset);
-
-I am not sure how this is supposed to work. If the both the offset and
-the cmd/sel pair occupies the same slot in memory, then the offset would
-just overwrite what you just put in the cmd and sel fields.
-
->         header.len = cpu_to_le16(length);
-> 
->         return header;
-> }
-> EXPORT_SYMBOL(nct6694_init_cmd);
-> 
-> int nct6694_read_msg(struct nct6694 *nct6694, struct nct6694_cmd_header *header,
->                      void *buf)
-> {
->         union nct6694_usb_msg *msg = nct6694->usb_msg;
->         ...
->         msg->cmd_header.mod = header->mod;
->         msg->cmd_header.hctrl = NCT6694_HCTRL_GET;
->         msg->cmd_header.len = header->len;
->         if (msg->cmd_header.mod == 0xFF) {
->                 msg->cmd_header.offset = header->offset;
->         } else {
->                 msg->cmd_header.cmd = header->cmd;
->                 msg->cmd_header.sel = header->sel;
->         }
->         ...
-> }
-> (also apply to nct6694_write_msg)
-> 
-> in other drivers, for example: gpio-nct6694.c
->         struct nct6694_cmd_header cmd;
->         int ret;
-> 
->         guard(mutex)(&data->lock);
-> 
->         cmd = nct6694_init_cmd(NCT6694_GPIO_MOD, 0, 0,
->                                NCT6694_GPO_DIR + data->group,
->                                sizeof(data->reg_val));
-> 
->         ret = nct6694_read_msg(data->nct6694, &cmd, &data->reg_val);
->         if (ret < 0)
->                 return ret;
-> 
-> Do you think this approach would be better?
-
-If the two bytes may be used separately or in combination, then I think
-it is better to describe this in your structure. Something like this:
-
-  struct nct6694_cmd_header {
-  	u8 rsv1;
-  	u8 mod;
-  	union {
-  		__le16 offset;
-  		struct {
-  			u8 cmd;
-  			u8 sel;
-  		}; __packed
-  	} __packed;
-  	u8 hctrl;
-  	u8 rsv2;
-  	__le16 len;
-  } __packed;
-
-Then, your prototype becomes:
-
-  int nct6694_read_msg(struct nct6694 *nct6694,
-  		       struct nct6694_cmd_header *cmd_hd,
-  		       void *buf)
-
-If the caller needs to pass an offset:
-
-  void foo(struct nct6694 *nct6694, u8 mod, u16 offset, u16 length)
-  {
-  	struct nct6694_cmd_header cmd_hd = { 0 };
-
-  	cmd_hd.mod = mod;
-  	cmd_hd.offset = cpu_to_le16(offset);
-  	cmd_hd.len = cpu_to_le16(length);
-
-  	nct6694_read_msg(nct6694, &cmd_hd, NULL);
-  }
-
-If the caller needs to pass a cmd and sel pair:
-
-  void foo(struct nct6694 *nct6694, u8 mod, u8 cmd, u8 sel, u16 length)
-  {
-  	struct nct6694_cmd_header cmd_hd = { 0 };
-
-  	cmd_hd.mod = mod;
-  	cmd_hd.cmd = cmd;
-  	cmd_hd.sel = sel;
-  	cmd_hd.len = cpu_to_le16(length);
-
-  	nct6694_read_msg(nct6694, &cmd_hd, NULL);
-  }
-
-This way, no more cmd and sel concatenation/deconcatenation and no
-conditional if/else logic.
-
-cmd_hd.hctrl (and other similar fields which are common to everyone) may
-be set in nct6694_read_msg().
-
-(...)
-
-
-Yours sincerely,
-Vincent Mailhol
+Thanks
 
 
