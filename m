@@ -1,105 +1,104 @@
-Return-Path: <netdev+bounces-154555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB919FE922
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 17:52:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 072BE9FE971
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 18:45:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 585867A13C7
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 16:52:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0350318819B1
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 17:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03561AAA2C;
-	Mon, 30 Dec 2024 16:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28971B0410;
+	Mon, 30 Dec 2024 17:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EdOtk+Xs"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="qLYhqdaL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC4F18C31;
-	Mon, 30 Dec 2024 16:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A8D1ACECF;
+	Mon, 30 Dec 2024 17:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735577571; cv=none; b=qWGPDPzCjBvadOlAGG8Fbp3Owbhe+SJD/eKzqOsSHLXpGSMkjMpeB+p5j57jbJX3EB75/orS7JcSCaIZO0Lo7JAv5oBXl32VbEsRzSoSKNU9sYNAO6V6Vqp8UMkrvBUqCHs+At35BEXbf6JUTpFHwT1IRyTOJKC8/q9vy1K43Js=
+	t=1735580706; cv=none; b=q7GJ/Poa6YMCrpO0b9dy4B/zATkc7RF8IQSaD7mYBvwk3Jn/gd9rZVaZL2l75psMHTEM3XU6zOlBpVsl2MMTlx+zVjiGxuzjfIEBqeSDKJmfzEh64uUSr3ZCTjfA2OV+fNyeZ3yuLHqKpNKnqv6s6rilNM+63q6OLySJ/q0NJgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735577571; c=relaxed/simple;
-	bh=+T98hUKL0uN2wtcho15mudm4zA3YNCHO9D3dBBsnwm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dlr0ES26iFgSjhMf5wn1RFW+crj5/1JgbePpDnf4cA3pFAmARA0i4snArP8xI4AwCgLoOq2AjdZ+HqTIHrFx5uYf1aXOEf0qcm59lqlK1vXZMGzhOfSWBF3x+WLhGrLI+HC6BjYFbAUm8DXN+GCpgKouw9gck5IkBGWreOkUajw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EdOtk+Xs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F1C5C4CED0;
-	Mon, 30 Dec 2024 16:52:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735577570;
-	bh=+T98hUKL0uN2wtcho15mudm4zA3YNCHO9D3dBBsnwm4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EdOtk+XsXBnCbq84XKtOOgdyTzbiVuQlA+llheunQyrflfp8HqZ2A9R1SapNL9s1o
-	 gZfnm8PX8rm9uGRayrp41LNkBuEj6Aw4HL5b9lAW08F7Oh7ooHmR3PZp3uQRxFSEAJ
-	 VorkZItSN6e805KSQfN3rnt9NbsegoAteGBr0N4EcmM0pLcvVBG665s3VlWxU586nM
-	 w0OeQo3lp9j0QNTNUGdsZCbst6apTBTIjMnnTcNt/ejt7Oba0/pJ6Eh0/6OkIjIF6l
-	 c/NfBU48YFC0q3sp5EQvEwOM7zcr+oy6GgfQjiV/Gh+YK557BCfJ8rGqxUz8/1aZzv
-	 EKx7BoZ0XE6hw==
-Date: Mon, 30 Dec 2024 08:52:49 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Su Hui <suhui@nfschina.com>, alexanderduyck@fb.com,
- kernel-team@meta.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- mohsin.bashr@gmail.com, sanmanpradhan@meta.com,
- kalesh-anakkur.purayil@broadcom.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2] eth: fbnic: Avoid garbage value in
- fbnic_mac_get_sensor_asic()
-Message-ID: <20241230085249.4aa68872@kernel.org>
-In-Reply-To: <Z3JTFJgbzX4XGHwG@mev-dev.igk.intel.com>
-References: <20241230014242.14562-1-suhui@nfschina.com>
-	<Z3JTFJgbzX4XGHwG@mev-dev.igk.intel.com>
+	s=arc-20240116; t=1735580706; c=relaxed/simple;
+	bh=nZ8yUYKWBFyZrBaTwMEzkA8yOQODSfdrlruxZ10PyeE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z9q4rURAu0tZQVRkxkbaXLUFx5z9MB6g6G9Iz5xsTTrkMhwavrPcga+5KIUMKFAwrsqpNy7jt/RSg9QTmuD0DTYqNUufpq+ZwnsYhZuiNmWdEJ+J8S7BCIbpltnfuSfRKPn4aateBEKvaa0ghRfl2xhhUKlawwkK234/Kx9GQYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=qLYhqdaL; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=dxNaadebLcYgh8ljzhaVbQ2Fy3vBArbY2oXDgs3g14A=; b=qLYhqdaLWl7kduTN
+	HBBv9La91skewY+++9osuGWbXqA2zz0cHHsPK4a2nuwsv3VR60gExM36VWWTZdyiW6kOyUl+0y6jt
+	UASBdJmSezpj2XholC9FMef+O1GppYZBKoLW2D4kPNsDPTsfzJIRgcdCp8/MMKTB0kqsc6p7BhOuO
+	6TqOizx7IRZ7lVKf5Ohffi1LflhXG+zTvGbX+l+y/B+1H3J1hIDW84s56c5aICIcQYhabvLrzCWe7
+	X1WG7ArfN/5GUBB40ckQtlJyMSgfRfBPx16FNXie9FSIw6m5HFJ8g82v8ptA8f1ZOGmqysCqr8o72
+	tTcT/bhM8GyDhvi8wQ==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1tSJou-007ebC-0q;
+	Mon, 30 Dec 2024 17:44:48 +0000
+Date: Mon, 30 Dec 2024 17:44:48 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: alex.aring@gmail.com, miquel.raynal@bootlin.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next] net: mac802154: Remove unused
+ ieee802154_mlme_tx_one
+Message-ID: <Z3LcEIO8cRAHUUsG@gallifrey>
+References: <20241225012423.439229-1-linux@treblig.org>
+ <173557391812.3760501.8550596228761441624.b4-ty@datenfreihafen.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <173557391812.3760501.8550596228761441624.b4-ty@datenfreihafen.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 17:44:18 up 236 days,  4:58,  1 user,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-On Mon, 30 Dec 2024 09:00:20 +0100 Michal Swiatkowski wrote:
-> > @@ -688,23 +688,7 @@ fbnic_mac_get_eth_mac_stats(struct fbnic_dev *fbd, bool reset,
-> >  
-> >  static int fbnic_mac_get_sensor_asic(struct fbnic_dev *fbd, int id, long *val)
-> >  {
-> > -	struct fbnic_fw_completion fw_cmpl;  
-> Probably it should be:
-> *fw_cmpl = fbd->cmpl_data
-> but it is also never initialized.
-
-The other way around, the completion declared on the stack should be
-the thing that gets assigned to the pointer in fbd :S
-
-> > -	s32 *sensor;
-> > -
-> > -	switch (id) {
-> > -	case FBNIC_SENSOR_TEMP:
-> > -		sensor = &fw_cmpl.tsene.millidegrees;
-> > -		break;
-> > -	case FBNIC_SENSOR_VOLTAGE:
-> > -		sensor = &fw_cmpl.tsene.millivolts;
-> > -		break;
-> > -	default:
-> > -		return -EINVAL;
-> > -	}
-> > -
-> > -	*val = *sensor;
-> > -
-> > -	return 0;
-> > +	return -EOPNOTSUPP;  
+* Stefan Schmidt (stefan@datenfreihafen.org) wrote:
+> Hello linux@treblig.org.
 > 
-> It is more like removing broken functionality than fixing (maybe whole
-> commit should be reverted). Anyway returning not support is also fine.
+> On Wed, 25 Dec 2024 01:24:23 +0000, linux@treblig.org wrote:
+> > ieee802154_mlme_tx_one() was added in 2022 by
+> > commit ddd9ee7cda12 ("net: mac802154: Introduce a synchronous API for MLME
+> > commands") but has remained unused.
+> > 
+> > Remove it.
+> > 
+> > Note, there's still a ieee802154_mlme_tx_one_locked()
+> > variant that is used.
+> > 
+> > [...]
+> 
+> Applied to wpan/wpan-next.git, thanks!
 
-I defer to other maintainers. The gaps are trivial to fill in, we'll 
-do so as soon as this patch makes it to net-next (this patch needs to
-target net).
+Thanks! I'd been thinking I had to wait for net-next to reopen.
+
+Dave
+
+> [1/1] net: mac802154: Remove unused ieee802154_mlme_tx_one
+>       https://git.kernel.org/wpan/wpan-next/c/bddfe23be8f8
+> 
+> regards,
+> Stefan Schmidt
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
