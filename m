@@ -1,173 +1,117 @@
-Return-Path: <netdev+bounces-154491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8449FE223
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 04:03:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ABC89FE2B9
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 06:56:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5FF13A1933
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 03:02:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95D217A11A2
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 05:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540B6143744;
-	Mon, 30 Dec 2024 03:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF9F178CC8;
+	Mon, 30 Dec 2024 05:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="j6IRiyX7"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-69.smtpout.orange.fr [193.252.22.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5440740BF5;
-	Mon, 30 Dec 2024 03:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB0AD530;
+	Mon, 30 Dec 2024 05:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735527775; cv=none; b=ImsRIlGbnT7B4VJmceOQiRYmvyZAXd1chymjTgY1sVB9UDPbTWFLvPiFtka+Tz6VaWFQ9kFxFjVu9bz+E4LjPD8fEU6ny7w+r+SCaQz1GW4I4YgKv6qN2JyA+h7rYrcymqlsf9PTWdpNMan8y1XQxoOKlDQUx5+oUTW3uZWQ5Tg=
+	t=1735538198; cv=none; b=Z2DyuAnMS8xBl855be1PZ+NG1Gr1AcuD9mROx7tR+Rge62vMerXMSH79NvEVYTBoGC86GvTgddxPMKZj7dLXMZ8jpICJ6HLp/591fhoMvdTH1alx6QPAnZeydM4RwlUx2dyOKFpoF/ooR3GLtftTUIS0Mtaozi6/Jl+QQppeAE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735527775; c=relaxed/simple;
-	bh=QaXejW6rcRxfG31NAo512yz4AQGMHU0p3awoME3GMQI=;
-	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=qBQRde+05o5RjnVP3i00IQ5zLnWw+Jnisc++wptWexzxgb7oolLidvvmTM+CjTGoV8f20BTB8uDlTPKcTJV4fiPrjbfBF6tZy8unI/2VXdLnIxKCqIt3Ei07/Gh1Cy7XNIo2pSk8Rj85Ld69+vkPY4jsqali1Bx2APhD/kRpL6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YM15r5LzBz11NZQ;
-	Mon, 30 Dec 2024 10:59:12 +0800 (CST)
-Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id BDF2714022E;
-	Mon, 30 Dec 2024 11:02:42 +0800 (CST)
-Received: from [10.174.179.93] (10.174.179.93) by
- kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 30 Dec 2024 11:02:38 +0800
-Subject: Re: [PATCH v4 -next 13/15] x86: vdso: move the sysctl to
- arch/x86/entry/vdso/vdso32-setup.c
-To: Brian Gerst <brgerst@gmail.com>
-References: <20241228145746.2783627-1-yukaixiong@huawei.com>
- <20241228145746.2783627-14-yukaixiong@huawei.com>
- <CAMzpN2hf-CFpO6x58aDK_FX_6C2MBKh1g7PdV4Y=ypaeUNVfRw@mail.gmail.com>
-CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
-	<ysato@users.sourceforge.jp>, <dalias@libc.org>,
-	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<hpa@zytor.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-	<jack@suse.cz>, <kees@kernel.org>, <j.granados@samsung.com>,
-	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
-	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
-	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
-	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<linux-sh@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
-	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
-	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
-	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
-	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
-	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
-	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
-	<wangkefeng.wang@huawei.com>
-From: yukaixiong <yukaixiong@huawei.com>
-Message-ID: <5b7530d9-a593-4365-718f-afdd46bdcb31@huawei.com>
-Date: Mon, 30 Dec 2024 11:02:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+	s=arc-20240116; t=1735538198; c=relaxed/simple;
+	bh=Caw9X8c/AOtLaoZfOjcBP14dg+I4hMHOLVkb6e9X5yY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n/KHpsSWUoKi9RbvN4MTzG5ZtsKNNUpA3OaNwa3g8X/oehcCmnqel1isRNEnTmrBDHP4yvizoXGx+t0MWnLiG236NYonhr7vX7NgugzSshEFE34/9JabuB8dl3F+aV6BAPQyWBZfGqhbvgqpHKzRNj04+v7tUA4gR01uhMFs3jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=j6IRiyX7; arc=none smtp.client-ip=193.252.22.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id S8l8tkZLcoTrQS8lDt2Yra; Mon, 30 Dec 2024 06:56:28 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1735538188;
+	bh=Q9QNz/+pHQJbKYhMRfdFe0lkRXf4CyHO3rSJeyUsCU0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=j6IRiyX71wSiQDpGnqShqQc0icg8rLYcWvDOXoDTPpUWjIFNOGxgGxr4C2xf8O/53
+	 MO8dLaRaz7RLLZhnIk53tQzBB9hwzB+CqWrRtIQMSEGwCOLP2cj1Z3/F8Jfsrel2wc
+	 x/BqcB2mypIZUadkNHT+h7Znwc0ljChfm0ru739Tahb6PzU1h2uuhK7WL3Lq1CQVd4
+	 3DAQzGlqowTjLzSoAByShXybbGw6aK48Ms0H4MSIpuigkvlf7byIKp0RnEONpkskgJ
+	 fmlCY3gHCCRYzUdMDXcRqKWIEqx87Bsb4c7B3gcW1tk7Cf1mnctatwW5NSVj27J9w2
+	 1/7v1skZDoxYw==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Mon, 30 Dec 2024 06:56:28 +0100
+X-ME-IP: 124.33.176.97
+Message-ID: <41f77d39-bce3-4e3b-98c8-f248b723a24c@wanadoo.fr>
+Date: Mon, 30 Dec 2024 14:56:09 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMzpN2hf-CFpO6x58aDK_FX_6C2MBKh1g7PdV4Y=ypaeUNVfRw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggpeml100007.china.huawei.com (7.185.36.28) To
- kwepemh100016.china.huawei.com (7.202.181.102)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 4/7] can: Add Nuvoton NCT6694 CAN support
+To: Ming Yu <a0282524688@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, tmyu0@nuvoton.com,
+ lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl,
+ andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+ jdelvare@suse.com, alexandre.belloni@bootlin.com
+References: <20241227095727.2401257-1-a0282524688@gmail.com>
+ <20241227095727.2401257-5-a0282524688@gmail.com>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+In-Reply-To: <20241227095727.2401257-5-a0282524688@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 27/12/2024 at 18:57, Ming Yu wrote:
+> This driver supports Socket CANfd functionality for NCT6694 MFD
+> device based on USB interface.
+> 
+> Signed-off-by: Ming Yu <a0282524688@gmail.com>
+> ---
 
+(...)
 
-On 2024/12/30 7:05, Brian Gerst wrote:
-> On Sat, Dec 28, 2024 at 10:17 AM Kaixiong Yu <yukaixiong@huawei.com> wrote:
->> When CONFIG_X86_32 is defined and CONFIG_UML is not defined,
->> vdso_enabled belongs to arch/x86/entry/vdso/vdso32-setup.c.
->> So, move it into its own file.
->>
->> Before this patch, vdso_enabled was allowed to be set to
->> a value exceeding 1 on x86_32 architecture. After this patch is
->> applied, vdso_enabled is not permitted to set the value more than 1.
->> It does not matter, because according to the function load_vdso32(),
->> only vdso_enabled is set to 1, VDSO would be enabled. Other values
->> all mean "disabled". The same limitation could be seen in the
->> function vdso32_setup().
->>
->> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
->> Reviewed-by: Kees Cook <kees@kernel.org>
->> ---
->> v4:
->>   - const qualify struct ctl_table vdso_table
->> ---
->> ---
->>   arch/x86/entry/vdso/vdso32-setup.c | 16 +++++++++++-----
->>   kernel/sysctl.c                    |  8 +-------
->>   2 files changed, 12 insertions(+), 12 deletions(-)
->>
->> diff --git a/arch/x86/entry/vdso/vdso32-setup.c b/arch/x86/entry/vdso/vdso32-setup.c
->> index 76e4e74f35b5..f71625f99bf9 100644
->> --- a/arch/x86/entry/vdso/vdso32-setup.c
->> +++ b/arch/x86/entry/vdso/vdso32-setup.c
->> @@ -51,15 +51,17 @@ __setup("vdso32=", vdso32_setup);
->>   __setup_param("vdso=", vdso_setup, vdso32_setup, 0);
->>   #endif
->>
->> -#ifdef CONFIG_X86_64
->>
->>   #ifdef CONFIG_SYSCTL
->> -/* Register vsyscall32 into the ABI table */
->>   #include <linux/sysctl.h>
->>
->> -static struct ctl_table abi_table2[] = {
->> +static const struct ctl_table vdso_table[] = {
->>          {
->> +#ifdef CONFIG_X86_64
->>                  .procname       = "vsyscall32",
->> +#elif (defined(CONFIG_X86_32) && !defined(CONFIG_UML))
-> vdso32-setup,.c is not used when building UML, so this can be reduced
-> to "#else".
-I will take your advice.
+> +config CAN_NCT6694
+> +	tristate "Nuvoton NCT6694 Socket CANfd support"
+> +	depends on MFD_NCT6694
 
-Thanks.
->> +               .procname       = "vdso_enabled",
->> +#endif
->>                  .data           = &vdso32_enabled,
->>                  .maxlen         = sizeof(int),
->>                  .mode           = 0644,
->> @@ -71,10 +73,14 @@ static struct ctl_table abi_table2[] = {
->>
->>   static __init int ia32_binfmt_init(void)
->>   {
->> -       register_sysctl("abi", abi_table2);
->> +#ifdef CONFIG_X86_64
->> +       /* Register vsyscall32 into the ABI table */
->> +       register_sysctl("abi", vdso_table);
->> +#elif (defined(CONFIG_X86_32) && !defined(CONFIG_UML))
-> Same as above.
->
->
-I will take your advice.
+I think it would be better to do a
 
-Thanks.
->> +       register_sysctl_init("vm", vdso_table);
->> +#endif
->>          return 0;
->>   }
->>   __initcall(ia32_binfmt_init);
->>   #endif /* CONFIG_SYSCTL */
->>
->> -#endif /* CONFIG_X86_64 */
->
-> Brian Gerst
-> .
->
+	select MFD_NCT6694
+
+here.
+
+Then, make MFD_NCT6694 an hidden configuration in a similar fashion as
+MFD_CORE. Alone, CONFIG_MFD_NCT6694 does nothing, so better to hide it
+from the end user.
+
+The comment also applies to the other patches.
+
+> +	help
+> +	  If you say yes to this option, support will be included for Nuvoton
+> +	  NCT6694, a USB device to socket CANfd controller.
+> +
+> +	  This driver can also be built as a module. If so, the module will
+> +	  be called nct6694_canfd.
+> +
+
+(...)
+
+Yours sincerely,
+Vincent Mailhol
 
 
