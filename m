@@ -1,255 +1,587 @@
-Return-Path: <netdev+bounces-154514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8188D9FE50C
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 10:51:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB99B9FE53B
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 11:17:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 313A17A1435
-	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 09:51:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94A5F161DAE
+	for <lists+netdev@lfdr.de>; Mon, 30 Dec 2024 10:17:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0071A2C0B;
-	Mon, 30 Dec 2024 09:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55EA91A265E;
+	Mon, 30 Dec 2024 10:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="grJzUaQJ"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="GU0kEnrs"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2043.outbound.protection.outlook.com [40.107.21.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-48.ptr.blmpb.com (va-2-48.ptr.blmpb.com [209.127.231.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236811A238D;
-	Mon, 30 Dec 2024 09:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735552269; cv=fail; b=hLsMe8pFQ9Sdm7DFOV/qosjM9llHsvygL7rtA8OLwU7xPouZ0NlCcWYmjgKB1Zppb+lq5uiM1XHDX+ZAkpPDiieVi1Z6e+x43bmhl8mneVaryXEdINUg9uk7OlVDO3hZlZqSI56pffTZP24lsYiOxXAC25oDqzXsQrw3KcDyx2k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735552269; c=relaxed/simple;
-	bh=nsscWX9UHF0UwBpKJ7Ugwg+yOuqZDkpLxCKn/DjCuEA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=aFXV2F3WTH8R1OnVQ+kkKH9lpxBvjcp9Ndwq4a2M4hYyTeQORz2C2NHeGkkAxOfywtmBVQ2OPJ5OFUFDs/swhbc+NW1hHqR8HfTmlEhPrawIAwQy+7viJRR1c0CPbeso9MmBakkB+BZSqepgf43bzV9iT4Yz7DINXF/xHlmBmdI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=grJzUaQJ; arc=fail smtp.client-ip=40.107.21.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=E//Qs3/ppjEAvjG8yz/ZHXHA2Qy/cCdIzejof8ZJFDT4XrcE2izn8y2KSl1JnMEoiMbfKSfQCjgThzZxLXnwGtQJ4J7E58Maq3gAUt+qwdj3o0JzsK2pKpcDvOz0fnwUiBr246ql0poPXLrDQ23B+VXRidzSXPA4dYufNO7+tUXeuPzKE19/Egp8OjkGwpHWmzTYjhEOzVdPE/MLdLuiLdWX5vs+ba11XxXdhw+xDVtzZrD8hIn1Cmbu68lQWEvHaDrt3OP4ClCvD5LWTWoJXSp3qr0UYxJ9NWT+dKfnuaD+vEhs+HTBKMEXVv74bHUn/Z52H+rfPFMoI7no69N/fA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nsscWX9UHF0UwBpKJ7Ugwg+yOuqZDkpLxCKn/DjCuEA=;
- b=Gwebq6Sw/YYDLi4xkabBMMBtZpFu4KCir0SnGvGcBQ3Z8Z+z8qeoZbV8K2ZF+gdP7bYbD90tRnAjQ+YPMqd6s/myR5Yj9eJcnscCYWRdxU59/btoFN/bNRFNgHUQhETpCr+lkeUY2XMRlO0nOG2INS/zoNFCtJZjybPo/eToae08ne/fMhyhheNZLOpPYHM9O5JkFQkcoEvbEit1a7i1aoOhJwZqYVX+s68UzwHqww2r3szisqdSCkVEHsNjcrco9wWPxQ4aU8CfoImHl1OUvuQROR/9sA+AL085vJ7F8ABwRCIT2zFCLKfavfQzkqjez6ZGUDDUYdw43GXf4k6eAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
- header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nsscWX9UHF0UwBpKJ7Ugwg+yOuqZDkpLxCKn/DjCuEA=;
- b=grJzUaQJXaS+E5QN04JMIeFBBldcXkmCycDJagqaOEGLvmYPR081KIGmzrh0nr0eqgiKOGGYPEd8qBxLnWxh/uHSUOpOZCBvWb7hCNKnnYy1SsQvQKq1M9TyOda4PpdTSxNnmHNK7RqAAf8K76uCD7RCao8N0/bNoPt0uhl9IeZLvY4RsPQvswkCrH/FKwfHtu4FoFqLLaG5Xs0TVsWWyUQ/YUsF1aehpMgaa+IHHUEK+2FO0WosmkU2wDvfNKmixCASkur9GMPz/MW/OTKtYw11BWDgw9dRrZkQbCEQ+WSWc+vy8A4JzQX+soCArCqHltS+ul3fvSyLCGvbY1pEww==
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
- by PAWPR07MB9791.eurprd07.prod.outlook.com (2603:10a6:102:390::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.18; Mon, 30 Dec
- 2024 09:50:59 +0000
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56%6]) with mapi id 15.20.8293.000; Mon, 30 Dec 2024
- 09:50:59 +0000
-From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-To: Jason Wang <jasowang@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "dsahern@gmail.com"
-	<dsahern@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "dsahern@kernel.org"
-	<dsahern@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"joel.granados@kernel.org" <joel.granados@kernel.org>, "kuba@kernel.org"
-	<kuba@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"horms@kernel.org" <horms@kernel.org>, "pablo@netfilter.org"
-	<pablo@netfilter.org>, "kadlec@netfilter.org" <kadlec@netfilter.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-	"coreteam@netfilter.org" <coreteam@netfilter.org>, "shenjian15@huawei.com"
-	<shenjian15@huawei.com>, "salil.mehta@huawei.com" <salil.mehta@huawei.com>,
-	"shaojijie@huawei.com" <shaojijie@huawei.com>, "saeedm@nvidia.com"
-	<saeedm@nvidia.com>, "tariqt@nvidia.com" <tariqt@nvidia.com>,
-	"mst@redhat.com" <mst@redhat.com>, "xuanzhuo@linux.alibaba.com"
-	<xuanzhuo@linux.alibaba.com>, "eperezma@redhat.com" <eperezma@redhat.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
-	<ncardwell@google.com>, "Koen De Schepper (Nokia)"
-	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
-	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
-	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
-	<mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
-	<Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
-Subject: RE: [PATCH v6 net-next 11/14] virtio_net: Accurate ECN flag in
- virtio_net_hdr
-Thread-Topic: [PATCH v6 net-next 11/14] virtio_net: Accurate ECN flag in
- virtio_net_hdr
-Thread-Index: AQHbWJNWUY8AUXN8qUKyr3sYVzL95LL+biyAgAAc8gA=
-Date: Mon, 30 Dec 2024 09:50:59 +0000
-Message-ID:
- <PAXPR07MB79849952690901A50688EFEDA3092@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20241227191211.12485-1-chia-yu.chang@nokia-bell-labs.com>
- <20241227191211.12485-12-chia-yu.chang@nokia-bell-labs.com>
- <CACGkMEu990O+2Sedj+ASv0P5TnZR9THiOdHmx=L0hOxQRXPcsg@mail.gmail.com>
-In-Reply-To:
- <CACGkMEu990O+2Sedj+ASv0P5TnZR9THiOdHmx=L0hOxQRXPcsg@mail.gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|PAWPR07MB9791:EE_
-x-ms-office365-filtering-correlation-id: e33a3f65-3059-41ba-084e-08dd28b7770f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?Q05FZmE4ejIybno1dlYvY3l0WmZua3ZuWTRUbEtKM2dGczIwS0VpbzRCOE1T?=
- =?utf-8?B?VDY2aVFLNkZQRGdFV000NjdxZk1adS96YzFibnp4WXY4M0d4MGgxM3NselNL?=
- =?utf-8?B?ZmxiS3huY1paWkdiWjc4OXlJYUxDZlMwZzBwWXBqclloTExyS3dDbWV0S2Jy?=
- =?utf-8?B?V1N0cGRrL0FsSVdyNFhYU3kzNTdxaXBzK2ZjaytDN0o5VVBNcUc0eDlObHNz?=
- =?utf-8?B?bnFtSUwxN3hNeEE4Sm5WRHFIOCszTGpXb0xETU43VHdzd0RVd015OCsybVB6?=
- =?utf-8?B?cGxKcHVnL2hCdGtiTEMrVnFhMzJQVkorelNnR1V2NDZYUDRnd2NHOENVbnRY?=
- =?utf-8?B?WVZaTVQ4QkpoM0JseHQyUE5md2pueitnMUE0UmFhVEk3bVppZGlpV1JXUkZa?=
- =?utf-8?B?V09KTWp6UFJtRHZEVVBiMzN1UnIwS1VhR201dk45aG1lakV4V1QrOEJrR0Q3?=
- =?utf-8?B?bGhhSmJnWTUvWUY3QUtjOG5TZTA4WUJoNGNid3FZZk41ZHo2SzN3bno3KytY?=
- =?utf-8?B?aytNcG5ucFpLWmFVNDRjV1ZKTnJUbWxEZEJRd1FWOXgwWGNzdklQYWhrSkpz?=
- =?utf-8?B?WjIzN2djcDE5YmJkeksrQWRuUTRuLy95K3dBQTY2MHFFWS84VXkvMllvd2Rv?=
- =?utf-8?B?NDlxTHdaeHc5RkNJV0lqTHM4QUVQOXhjMlE2SGg4KzdpNEdoeXpxWnlQbmJG?=
- =?utf-8?B?UlJ1djhTVHN6YXZyNnFBbVlLR0JTQUxabFgvMlhPWW15VTluS3pJTWZ6MUNy?=
- =?utf-8?B?MkhPajZlenBnMWRReG1ZUTFURFNXR01ET05iWnErS05OZjhBbTlFZlhDdEh1?=
- =?utf-8?B?WnRkTDNKMDhNV1NOQmgreEZNV1VDNnlNWUdIbWMrcm9MVEdQbmI1aVkxbnRV?=
- =?utf-8?B?V21tbVhjTlNmVXZSU3JSbTBmTFhicVk5ODVyVS94ek5ENmZrZ28rNCs1cEQ3?=
- =?utf-8?B?WXFrQXNXYWUwN3RjcVJDS1ZsTXNLczE2YzkveGNWbTBaSzA0K0pqVUMwd09h?=
- =?utf-8?B?S2FIcXp6UGhwUWJGQ1dwcHZGUUdDTnJiSkxaajdUalNRckNKd2VnbXBhQTU3?=
- =?utf-8?B?cHJ6RHBnaGtUQmJicTZRWm5UNkxUVmdOcXZvMmRtY2dJVmEwT0wwQmM0UWN3?=
- =?utf-8?B?cHJ2RUFGV3AvSlN0c3JFYUJaUC9wQnUvWGoxTndoY1FRTnYwZzNWb0tSbWFk?=
- =?utf-8?B?NHNjRCtLNUg3LzZYMll0RndCZUkvN3lLTWpjb2hHWWJUQ0I3TDZuejNCRHEx?=
- =?utf-8?B?SlU0NEZNTFNraENrVzI3TTRYUjhuL3c4ZEJsM2E4eU15dzdMMHBKS1ljcVRU?=
- =?utf-8?B?Ynhxb3YzejFudzA4UU1Uc1ZBUGhsQXZ0SGw0UERjc3p2RFpDQjBBdU1yY2Mr?=
- =?utf-8?B?SURELzVNYVBTcWJraUZrQThGamxVSTJIdGZ1TlhCTHdiR2gvVVZHaUZsMW1z?=
- =?utf-8?B?dyt0K2RWclZRS0YxZUxtdkovS0oxRmZmMUJEQlZHUmtWYkg0ZnhXMldOQTRD?=
- =?utf-8?B?eHcrOFY3N05pcm05cWE4YW5RekV4b3RVZUJySHJpbEFudCtEMjZ1R0xZb042?=
- =?utf-8?B?Wko4aUFBZFZ0WVJxNG95alFiOUdnajdrZFJTeUh6a3ZhcEVTOGR2ZDdqM2RK?=
- =?utf-8?B?d20wMkZNT2lEMFlzUHVGaVFTNGtxb2hXa1pOaGg3SkZ6YjVpNnF1a29iVGR6?=
- =?utf-8?B?NmVtK0kvYUlYN0NLU1R3YWFYZWF3c2YrZ3VGQ0VHa2dDNnVlUUt3M0RjNjdy?=
- =?utf-8?B?aENLUDJBMmlnTkFoUnNwWWV2YWswelloa2p5RkxJOE9KWWZmbGlHcStKSkRW?=
- =?utf-8?B?TXptc2Z6TUZIMTYrSHYvSCtEaTRGSjBtN0hzMVRvOGVQbW9zYk1TYXd4Wmp2?=
- =?utf-8?B?eHNXVGtsQ0RwR1piR2NhQ1FMcjdEY2dZcGwzK2hQcENuMHc9PQ==?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?eDlEdmhYN1dVRjNLUXlsK1hQQnBaeFRNZnY5bFV1cXZiSlNTUWlEbzc4R21w?=
- =?utf-8?B?Uy9ZcmRsbVc1NmJqMUFTUzQzZzFCYlBVRUwzSHd3eHRvejRyWXNOSnYwL00x?=
- =?utf-8?B?R2Fnem9QdHhDcm93UGdGR3g5TWNzeTdQZEEyOXJoK0dSaUdDSFlEM0krNU5E?=
- =?utf-8?B?Y1Z0MUlDL0poOFVsalA5djJ2LzNwRFV6ZlN0VlludDJhLzBTNXZ3RVRnUTZ6?=
- =?utf-8?B?MVJEYXJoa01NNEhmT1NxQ0dGQU0yNHJBblhxbFFhRUJWdGY1NXc2c2lvQnNJ?=
- =?utf-8?B?a0M1UjdNVmtpQ2cwcHpTZTA3cXAzZjdueithaG9scW84NEhqeEh0T0M2RFFH?=
- =?utf-8?B?TVZWQnNJWW5YL2FWdDl2dVRSeU9MZnoxUWJIbFZaZENUekZIQW9tMmdxaWJu?=
- =?utf-8?B?QW84ZzNXNEUxNktTVlUrbTVjVW1GOGhRdGQyM2luVFYxN09va280TjhNNzZZ?=
- =?utf-8?B?aE5XaVNhTTdOZzZ3MFN1QXdlSUVPY1kzeFBLbTVkS3JrdFRIalpjNFpnZFNU?=
- =?utf-8?B?QnBISzZBVktnR1hNMjBxTFJyR2pTc0pTOFB1TW5rL2lwNld4d2J6cUhjc29P?=
- =?utf-8?B?TTN5cisxa2ZQWGMraUdZM0hLVThsQUwyWFFvdk44ZEl4MDVua3MrbStaMExx?=
- =?utf-8?B?SzJyYlhlc24yMXYrTDRhQkRGRTEyVEdMazIvc2FEY0FRWllZZFord0JCY0tI?=
- =?utf-8?B?b1BDL0NpOTNmZkU2MGNiSHFzRm5KN3p3M0hMckttWXNTcDhPUXhxSE9aQVUx?=
- =?utf-8?B?NGFPNWRKd2YyWUlLUHRpZ2tiZ0ozdWh1ZTRubERaaW9LTDZJcG50elE4Y1py?=
- =?utf-8?B?WlJITnlaVEkzVmxLdFJkZEEyUytTbGVLK2twWXFOTTJhV0hpNjV4N0p2a1FU?=
- =?utf-8?B?L01DeUdsOHdUSE9JRzZYVkxrR0c1dkRET2pGNk11UmVYRDk5OXQxREVPcWMr?=
- =?utf-8?B?MHN3cGxXTXBlcFNtVnVjS1ZwaHBSbXlSYnNWMmYvLzZaaXlHOWJzUzNtM3Jz?=
- =?utf-8?B?U0hZV1BzK3JzSVZ0enZOeDJnMnJydVR2YzlEUi9YZFRvZ3dGVWpaRHNKaGI4?=
- =?utf-8?B?VEtqcm11MXpLRjNyNGxJdGpiMFM3aUswWFVtSzRvV1ZEenpmSmlsWFluSmlM?=
- =?utf-8?B?ZHdob05odERhL1lIb3FtTFFXSDE0QVNiVTY3Z281SjJ4RkNPMEpzc0x4dzNz?=
- =?utf-8?B?enFuc0dKKzJCSy9LUk9pSjdjdXE4RFZuOXl2TWRlb3crOGRUejhuSmRRYVRk?=
- =?utf-8?B?ZmxIQ0lkWnMrdkFSUVE2d25HUXY2d3E3cVE3Znh5cEtCak5qVDltN3JMOTRF?=
- =?utf-8?B?Q29TZnhFa3hadmZiOW5GendNRXhnSnVMZDJNc2VDcThONEFCamtjSTE3UWV2?=
- =?utf-8?B?ckt2YWxHRlpTZ2VqS0hMVHM5YUg3WnhVY29ZSHJPZXkwRkltTURIOER5WjFC?=
- =?utf-8?B?NUptKzNoZk8zS1Znbmg1a0NkVEk4cTZOeFdVOWJrNFFYck5pREN6bHB1c2p6?=
- =?utf-8?B?bTdQbzdFN0c4RFFmTlNVWVVzaVpVQlJHVW5UdGpQUnF4QjRVd0NLWGlNTmZj?=
- =?utf-8?B?LytLUHZRRWZnb2NQU21FMThxSGpDQ1hhMkoyakJjdUZUQjN3OXM4QVVXeG1k?=
- =?utf-8?B?a212a09QelF1L0NLL3RDc0pDR0lmVTA2U2pHQUd6T21RT1VCc0ZxN3VMZEN4?=
- =?utf-8?B?SXo0aGQrZmdKaUpkVVc1VHdPck5xeXFPKzAvTnBuR0lRMjdPNTBrdTJwaWdE?=
- =?utf-8?B?UWExOXNnWHBDcFhxUW9Wb2QzaGt0a0U2MHd4ZEI5T2VHREIrQjJzVUhOYWJO?=
- =?utf-8?B?QW41ZzBjTFBvOS9pV05oYTJXUFlnSUk1WWtxVFlNRzJ2SEJad3lNaXNmQjI4?=
- =?utf-8?B?RG5lSWw4amxNRnVTdEVoWVU4a2NuTkh2S1dBUkg5U3A1TTJBUnN4bkl0S2dO?=
- =?utf-8?B?dTFnT2Z6ZkhnS3VhY3VPeWdCWWYxcUZyMUNoTzZSK2V4OFJ6N01KWFVyMWs1?=
- =?utf-8?B?YW5Ud05NeEFzYVk0SUNJOE5yT2ZUK1RRZXcrd3puWm5STjBZL0FwaVY4MExw?=
- =?utf-8?B?K1RRTmFKbExjMWZ0dWw2eEJqcUJNYUorWTRENnMyODQ0dHZlWk5iNnB3bjBu?=
- =?utf-8?B?a3JjNzdUaGZibUJpa0RjT29qWWRVVzF6dHp5ZnpRemtqYUxUVnp4OUVjMFBx?=
- =?utf-8?B?c3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D341A3A80
+	for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 10:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735553865; cv=none; b=A7+BijgE39PB4FxpVwI0wSkfH8UkUnkcRk8rg6i1Xbsrl1q7yAShGbJBmtp7nHmTqWNrNdJ/zl/qtDyLT+r7XOtLgHG3tEkR2o3yYppl7T18pNUGXJG7KgSmUKa0t3IvQEb6gYmEruR+Rb4YMzGZsCExFUadSy1EIF4FCV+oUik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735553865; c=relaxed/simple;
+	bh=5dzk4QL/kVR5BQ1fUlVlHxWw90JAjGkLKKgfoGnP7Yw=;
+	h=Subject:Date:Message-Id:References:From:Cc:Mime-Version:
+	 Content-Type:In-Reply-To:To; b=ZW2Wvo74ZjFKZKAWO30xGpR13RXaoIQ1sASfYbvxiOB6qX9D/7wON1xQc+nRtJYzqkSYzFmRjYBZAe1PEU13minaAF9FKLyqJfdvEcV9z4PR+3dA0nl/Nsi2q83cKiI1K3oqCDyhzhMXwiRuophlUyeMe9est2RLHmSoMwjDJrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=GU0kEnrs; arc=none smtp.client-ip=209.127.231.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1735553716; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=hXFkffv6JsiT2f0cUY6r0r47rXLaBCLmJpbQsLVrTJw=;
+ b=GU0kEnrslUu7wpKvudMQCKgAyVeJCAFsABhc2gfFoW9CbYBRsCk+WO3J08H+Lk2s46Rw9w
+ rXaU7UhSsPSQwpyd4roEhIX8s6Hzl6Knh7iW4fAHU4/mxuLvd8qfpRlWrNBVnFMYXmaztn
+ U7NYJUBTEGmcYoGFu23/nZy1pKZyWkG7n9QyG9EY874ML0DkZy9pZqlBVDgwi2UN0TUWN5
+ woupzj1SeNSj0syR713lvUhcJOZrZcg2C+zCZpzGgbXJGImYln1KH6azEKb55xKpS1T0rA
+ H3Y6kZh48n38g8RyfPs31rgGnqtgajIPTtganJvuOxOy1gbUAzenNIlavpaxBQ==
+Subject: [PATCH v2 01/14] net-next/yunsilicon: Add xsc driver basic framework
+Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Mon, 30 Dec 2024 18:15:14 +0800
+X-Mailer: git-send-email 2.25.1
+Date: Mon, 30 Dec 2024 18:15:14 +0800
+Message-Id: <20241230101513.3836531-2-tianx@yunsilicon.com>
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
+X-Lms-Return-Path: <lba+2677272b2+bb6581+vger.kernel.org+tianx@yunsilicon.com>
+References: <20241230101513.3836531-1-tianx@yunsilicon.com>
+From: "Xin Tian" <tianx@yunsilicon.com>
+Cc: <andrew+netdev@lunn.ch>, <kuba@kernel.org>, <pabeni@redhat.com>, 
+	<edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e33a3f65-3059-41ba-084e-08dd28b7770f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Dec 2024 09:50:59.7461
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WC0L4fADqJSrKd5FtivLJq6PIm3bORB1NDawWw1v0eI1iFmMUD1XcW7XaZBUoGCvM8LevPJKaCzJhu18ilWtSbpRVn6CYh/kT0qmPsWzosbPzrY5l2lb5f7vsEUAi1xp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR07MB9791
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20241230101513.3836531-1-tianx@yunsilicon.com>
+Content-Transfer-Encoding: 7bit
+To: <netdev@vger.kernel.org>
 
-PkZyb206IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+IA0KPlNlbnQ6IE1vbmRheSwg
-RGVjZW1iZXIgMzAsIDIwMjQgODo1MiBBTQ0KPlRvOiBDaGlhLVl1IENoYW5nIChOb2tpYSkgPGNo
-aWEteXUuY2hhbmdAbm9raWEtYmVsbC1sYWJzLmNvbT4NCj5DYzogbmV0ZGV2QHZnZXIua2VybmVs
-Lm9yZzsgZHNhaGVybkBnbWFpbC5jb207IGRhdmVtQGRhdmVtbG9mdC5uZXQ7IGVkdW1hemV0QGdv
-b2dsZS5jb207IGRzYWhlcm5Aa2VybmVsLm9yZzsgcGFiZW5pQHJlZGhhdC5jb207IGpvZWwuZ3Jh
-bmFkb3NAa2VybmVsLm9yZzsga3ViYUBrZXJuZWwub3JnOyBhbmRyZXcrbmV0ZGV2QGx1bm4uY2g7
-IGhvcm1zQGtlcm5lbC5vcmc7IHBhYmxvQG5ldGZpbHRlci5vcmc7IGthZGxlY0BuZXRmaWx0ZXIu
-b3JnOyBuZXRmaWx0ZXItZGV2ZWxAdmdlci5rZXJuZWwub3JnOyBjb3JldGVhbUBuZXRmaWx0ZXIu
-b3JnOyBzaGVuamlhbjE1QGh1YXdlaS5jb207IHNhbGlsLm1laHRhQGh1YXdlaS5jb207IHNoYW9q
-aWppZUBodWF3ZWkuY29tOyBzYWVlZG1AbnZpZGlhLmNvbTsgdGFyaXF0QG52aWRpYS5jb207IG1z
-dEByZWRoYXQuY29tOyB4dWFuemh1b0BsaW51eC5hbGliYWJhLmNvbTsgZXBlcmV6bWFAcmVkaGF0
-LmNvbTsgdmlydHVhbGl6YXRpb25AbGlzdHMubGludXguZGV2OyBpakBrZXJuZWwub3JnOyBuY2Fy
-ZHdlbGxAZ29vZ2xlLmNvbTsgS29lbiBEZSBTY2hlcHBlciAoTm9raWEpIDxrb2VuLmRlX3NjaGVw
-cGVyQG5va2lhLWJlbGwtbGFicy5jb20+OyBnLndoaXRlQGNhYmxlbGFicy5jb207IGluZ2VtYXIu
-cy5qb2hhbnNzb25AZXJpY3Nzb24uY29tOyBtaXJqYS5rdWVobGV3aW5kQGVyaWNzc29uLmNvbTsg
-Y2hlc2hpcmVAYXBwbGUuY29tOyBycy5pZXRmQGdteC5hdDsgSmFzb25fTGl2aW5nb29kQGNvbWNh
-c3QuY29tOyB2aWRoaV9nb2VsQGFwcGxlLmNvbQ0KPlN1YmplY3Q6IFJlOiBbUEFUQ0ggdjYgbmV0
-LW5leHQgMTEvMTRdIHZpcnRpb19uZXQ6IEFjY3VyYXRlIEVDTiBmbGFnIGluIHZpcnRpb19uZXRf
-aGRyDQo+DQo+W1lvdSBkb24ndCBvZnRlbiBnZXQgZW1haWwgZnJvbSBqYXNvd2FuZ0ByZWRoYXQu
-Y29tLiBMZWFybiB3aHkgdGhpcyBpcyBpbXBvcnRhbnQgYXQgaHR0cHM6Ly9ha2EubXMvTGVhcm5B
-Ym91dFNlbmRlcklkZW50aWZpY2F0aW9uIF0NCj4NCj5DQVVUSU9OOiBUaGlzIGlzIGFuIGV4dGVy
-bmFsIGVtYWlsLiBQbGVhc2UgYmUgdmVyeSBjYXJlZnVsIHdoZW4gY2xpY2tpbmcgbGlua3Mgb3Ig
-b3BlbmluZyBhdHRhY2htZW50cy4gU2VlIHRoZSBVUkwgbm9rLml0L2V4dCBmb3IgYWRkaXRpb25h
-bCBpbmZvcm1hdGlvbi4NCj4NCj4NCj4NCj5PbiBTYXQsIERlYyAyOCwgMjAyNCBhdCAzOjEz4oCv
-QU0gPGNoaWEteXUuY2hhbmdAbm9raWEtYmVsbC1sYWJzLmNvbT4gd3JvdGU6DQo+Pg0KPj4gRnJv
-bTogQ2hpYS1ZdSBDaGFuZyA8Y2hpYS15dS5jaGFuZ0Bub2tpYS1iZWxsLWxhYnMuY29tPg0KPj4N
-Cj4+IFVubGlrZSBSRkMgMzE2OCBFQ04sIGFjY3VyYXRlIEVDTiB1c2VzIHRoZSBDV1IgZmxhZyBh
-cyBwYXJ0IG9mIHRoZSBBQ0UgDQo+PiBmaWVsZCB0byBjb3VudCBuZXcgcGFja2V0cyB3aXRoIENF
-IG1hcms7IGhvd2V2ZXIsIGl0IHdpbGwgYmUgY29ycnVwdGVkIA0KPj4gYnkgdGhlIFJGQyAzMTY4
-IEVDTi1hd2FyZSBUU08uIFRoZXJlZm9yZSwgZmFsbGJhY2sgc2hhbGwgYmUgYXBwbGllZCBieSAN
-Cj4+IHNldGluZyBORVRJRl9GX0dTT19BQ0NFQ04gdG8gZW5zdXJlIHRoYXQgdGhlIENXUiBmbGFn
-IHNob3VsZCBub3QgYmUgDQo+PiBjaGFuZ2VkIHdpdGhpbiBhIHN1cGVyLXNrYi4NCj4+DQo+PiBU
-byBhcHBseSB0aGUgYWZvcmVtZW50aWVvbmQgbmV3IEFjY0VDTiBHU08gZm9yIHZpcnRpbywgbmV3
-IGZlYXR1ZSBiaXRzIA0KPj4gZm9yIGhvc3QgYW5kIGd1ZXN0IGFyZSBhZGRlZCBmb3IgZmVhdHVy
-ZSBuZWdvdGlhdGlvbiBiZXR3ZWVuIGRyaXZlciANCj4+IGFuZCBkZXZpY2UuIEFuZCB0aGUgdHJh
-bnNsYXRpb24gb2YgQWNjdXJhdGUgRUNOIEdTTyBmbGFnIGJldHdlZW4gDQo+PiB2aXJ0aW9fbmV0
-X2hkciBhbmQgc2tiIGhlYWRlciBmb3IgTkVUSUZfRl9HU09fQUNDRUNOIGlzIGFsc28gYWRkZWQg
-dG8gDQo+PiBhdm9pZCBDV1IgZmxhZyBjb3JydXB0aW9uIGR1ZSB0byBSRkMzMTY4IEVDTiBUU08u
-DQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQ2hpYS1ZdSBDaGFuZyA8Y2hpYS15dS5jaGFuZ0Bub2tp
-YS1iZWxsLWxhYnMuY29tPg0KPj4gLS0tDQo+PiAgZHJpdmVycy9uZXQvdmlydGlvX25ldC5jICAg
-ICAgICB8IDE0ICsrKysrKysrKysrLS0tDQo+PiAgZHJpdmVycy92ZHBhL3Bkcy9kZWJ1Z2ZzLmMg
-ICAgICB8ICA2ICsrKysrKw0KPj4gIGluY2x1ZGUvbGludXgvdmlydGlvX25ldC5oICAgICAgfCAx
-NiArKysrKysrKysrLS0tLS0tDQo+PiAgaW5jbHVkZS91YXBpL2xpbnV4L3ZpcnRpb19uZXQuaCB8
-ICA1ICsrKysrDQo+PiAgNCBmaWxlcyBjaGFuZ2VkLCAzMiBpbnNlcnRpb25zKCspLCA5IGRlbGV0
-aW9ucygtKQ0KPg0KPklzIHRoZXJlIGEgbGluayB0byB0aGUgc3BlYyBwYXRjaD8gSXQgbmVlZHMg
-dG8gYmUgYWNjZXB0ZWQgZmlyc3QuDQo+DQo+VGhhbmtzDQoNCkhpIEphc29uLA0KDQpUaGFua3Mg
-Zm9yIHRoZSBmZWVkYmFjaywgSSBmb3VuZCB0aGUgdmlydGlvLXNwZWMgaW4gZ2l0aHViOiBodHRw
-czovL2dpdGh1Yi5jb20vb2FzaXMtdGNzL3ZpcnRpby1zcGVjIGJ1dCBub3QgYWJsZSB0byBmaW5k
-IHRoZSBwcm9jZWR1cmUgdG8gcHJvcG9zZS4NCkNvdWxkIHlvdSBoZWxwIHRvIHNoYXJlIHRoZSBw
-cm9jZWR1cmUgdG8gcHJvcG9zZSBzcGVjIHBhdGNoPyBUaGFua3MuDQoNCi0tDQpDaGlhLVl1DQo=
+Add yunsilicon xsc driver basic framework, including xsc_pci driver
+and xsc_eth driver
+
+Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+---
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/yunsilicon/Kconfig       |  26 ++
+ drivers/net/ethernet/yunsilicon/Makefile      |   8 +
+ .../ethernet/yunsilicon/xsc/common/xsc_core.h |  65 +++++
+ .../net/ethernet/yunsilicon/xsc/net/Kconfig   |  17 ++
+ .../net/ethernet/yunsilicon/xsc/net/Makefile  |   9 +
+ .../net/ethernet/yunsilicon/xsc/pci/Kconfig   |  16 ++
+ .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   9 +
+ .../net/ethernet/yunsilicon/xsc/pci/main.c    | 264 ++++++++++++++++++
+ 10 files changed, 416 insertions(+)
+ create mode 100644 drivers/net/ethernet/yunsilicon/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index 0baac25db..aa6016597 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -82,6 +82,7 @@ source "drivers/net/ethernet/i825xx/Kconfig"
+ source "drivers/net/ethernet/ibm/Kconfig"
+ source "drivers/net/ethernet/intel/Kconfig"
+ source "drivers/net/ethernet/xscale/Kconfig"
++source "drivers/net/ethernet/yunsilicon/Kconfig"
+ 
+ config JME
+ 	tristate "JMicron(R) PCI-Express Gigabit Ethernet support"
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index c03203439..c16c34d4b 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -51,6 +51,7 @@ obj-$(CONFIG_NET_VENDOR_INTEL) += intel/
+ obj-$(CONFIG_NET_VENDOR_I825XX) += i825xx/
+ obj-$(CONFIG_NET_VENDOR_MICROSOFT) += microsoft/
+ obj-$(CONFIG_NET_VENDOR_XSCALE) += xscale/
++obj-$(CONFIG_NET_VENDOR_YUNSILICON) += yunsilicon/
+ obj-$(CONFIG_JME) += jme.o
+ obj-$(CONFIG_KORINA) += korina.o
+ obj-$(CONFIG_LANTIQ_ETOP) += lantiq_etop.o
+diff --git a/drivers/net/ethernet/yunsilicon/Kconfig b/drivers/net/ethernet/yunsilicon/Kconfig
+new file mode 100644
+index 000000000..ff57fedf8
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/Kconfig
+@@ -0,0 +1,26 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon driver configuration
++#
++
++config NET_VENDOR_YUNSILICON
++	bool "Yunsilicon devices"
++	default y
++	depends on PCI
++	depends on ARM64 || X86_64
++	help
++	  If you have a network (Ethernet) device belonging to this class,
++	  say Y.
++
++	  Note that the answer to this question doesn't directly affect the
++	  kernel: saying N will just cause the configurator to skip all
++	  the questions about Yunsilicon cards. If you say Y, you will be asked
++	  for your specific card in the following questions.
++
++if NET_VENDOR_YUNSILICON
++
++source "drivers/net/ethernet/yunsilicon/xsc/net/Kconfig"
++source "drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig"
++
++endif # NET_VENDOR_YUNSILICON
+diff --git a/drivers/net/ethernet/yunsilicon/Makefile b/drivers/net/ethernet/yunsilicon/Makefile
+new file mode 100644
+index 000000000..6fc8259a7
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/Makefile
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Makefile for the Yunsilicon device drivers.
++#
++
++# obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc/net/
++obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc/pci/
+\ No newline at end of file
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+new file mode 100644
+index 000000000..8cdb82d8d
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+@@ -0,0 +1,65 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++ * All rights reserved.
++ */
++
++#ifndef __XSC_CORE_H
++#define __XSC_CORE_H
++
++#include <linux/kernel.h>
++#include <linux/pci.h>
++
++#define XSC_PCI_VENDOR_ID		0x1f67
++
++#define XSC_MC_PF_DEV_ID		0x1011
++#define XSC_MC_VF_DEV_ID		0x1012
++#define XSC_MC_PF_DEV_ID_DIAMOND	0x1021
++
++#define XSC_MF_HOST_PF_DEV_ID		0x1051
++#define XSC_MF_HOST_VF_DEV_ID		0x1052
++#define XSC_MF_SOC_PF_DEV_ID		0x1053
++
++#define XSC_MS_PF_DEV_ID		0x1111
++#define XSC_MS_VF_DEV_ID		0x1112
++
++#define XSC_MV_HOST_PF_DEV_ID		0x1151
++#define XSC_MV_HOST_VF_DEV_ID		0x1152
++#define XSC_MV_SOC_PF_DEV_ID		0x1153
++
++enum {
++	XSC_MAX_NAME_LEN = 32,
++};
++
++struct xsc_dev_resource {
++	struct mutex alloc_mutex;	/* protect buffer alocation according to numa node */
++};
++
++enum xsc_pci_state {
++	XSC_PCI_STATE_DISABLED,
++	XSC_PCI_STATE_ENABLED,
++};
++
++struct xsc_priv {
++	char			name[XSC_MAX_NAME_LEN];
++	struct list_head	dev_list;
++	struct list_head	ctx_list;
++	spinlock_t		ctx_lock;	/* protect ctx_list */
++	int			numa_node;
++};
++
++struct xsc_core_device {
++	struct pci_dev		*pdev;
++	struct device		*device;
++	struct xsc_priv		priv;
++	struct xsc_dev_resource	*dev_res;
++
++	void __iomem		*bar;
++	int			bar_num;
++
++	struct mutex		pci_state_mutex;	/* protect pci_state */
++	enum xsc_pci_state	pci_state;
++	struct mutex		intf_state_mutex;	/* protect intf_state */
++	unsigned long		intf_state;
++};
++
++#endif
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+new file mode 100644
+index 000000000..de743487e
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+@@ -0,0 +1,17 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon driver configuration
++#
++
++config YUNSILICON_XSC_ETH
++	tristate "Yunsilicon XSC ethernet driver"
++	default n
++	depends on YUNSILICON_XSC_PCI
++	depends on NET
++	help
++	  This driver provides ethernet support for
++	  Yunsilicon XSC devices.
++
++	  To compile this driver as a module, choose M here. The module
++	  will be called xsc_eth.
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Makefile b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+new file mode 100644
+index 000000000..2811433af
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++
++ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
++
++obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc_eth.o
++
++xsc_eth-y := main.o
+\ No newline at end of file
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+new file mode 100644
+index 000000000..2b6d79905
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+@@ -0,0 +1,16 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon PCI configuration
++#
++
++config YUNSILICON_XSC_PCI
++	tristate "Yunsilicon XSC PCI driver"
++	default n
++	select PAGE_POOL
++	help
++	  This driver is common for Yunsilicon XSC
++	  ethernet and RDMA drivers.
++
++	  To compile this driver as a module, choose M here. The module
++	  will be called xsc_pci.
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+new file mode 100644
+index 000000000..709270df8
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++
++ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
++
++obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc_pci.o
++
++xsc_pci-y := main.o
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/main.c b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+new file mode 100644
+index 000000000..817d251e6
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+@@ -0,0 +1,264 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++ * All rights reserved.
++ */
++
++#include "common/xsc_core.h"
++
++static const struct pci_device_id xsc_pci_id_table[] = {
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID_DIAMOND) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MF_HOST_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MF_SOC_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MS_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MV_HOST_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MV_SOC_PF_DEV_ID) },
++	{ 0 }
++};
++
++static int set_dma_caps(struct pci_dev *pdev)
++{
++	int err;
++
++	err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
++	if (err)
++		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
++	else
++		err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
++
++	if (!err)
++		dma_set_max_seg_size(&pdev->dev, SZ_2G);
++
++	return err;
++}
++
++static int xsc_pci_enable_device(struct xsc_core_device *xdev)
++{
++	struct pci_dev *pdev = xdev->pdev;
++	int err = 0;
++
++	mutex_lock(&xdev->pci_state_mutex);
++	if (xdev->pci_state == XSC_PCI_STATE_DISABLED) {
++		err = pci_enable_device(pdev);
++		if (!err)
++			xdev->pci_state = XSC_PCI_STATE_ENABLED;
++	}
++	mutex_unlock(&xdev->pci_state_mutex);
++
++	return err;
++}
++
++static void xsc_pci_disable_device(struct xsc_core_device *xdev)
++{
++	struct pci_dev *pdev = xdev->pdev;
++
++	mutex_lock(&xdev->pci_state_mutex);
++	if (xdev->pci_state == XSC_PCI_STATE_ENABLED) {
++		pci_disable_device(pdev);
++		xdev->pci_state = XSC_PCI_STATE_DISABLED;
++	}
++	mutex_unlock(&xdev->pci_state_mutex);
++}
++
++static int xsc_pci_init(struct xsc_core_device *xdev, const struct pci_device_id *id)
++{
++	struct pci_dev *pdev = xdev->pdev;
++	void __iomem *bar_base;
++	int bar_num = 0;
++	int err;
++
++	mutex_init(&xdev->pci_state_mutex);
++	xdev->priv.numa_node = dev_to_node(&pdev->dev);
++
++	err = xsc_pci_enable_device(xdev);
++	if (err) {
++		pci_err(pdev, "failed to enable PCI device: err=%d\n", err);
++		goto err_ret;
++	}
++
++	err = pci_request_region(pdev, bar_num, KBUILD_MODNAME);
++	if (err) {
++		pci_err(pdev, "failed to request %s pci_region=%d: err=%d\n",
++			KBUILD_MODNAME, bar_num, err);
++		goto err_disable;
++	}
++
++	pci_set_master(pdev);
++
++	err = set_dma_caps(pdev);
++	if (err) {
++		pci_err(pdev, "failed to set DMA capabilities mask: err=%d\n", err);
++		goto err_clr_master;
++	}
++
++	bar_base = pci_ioremap_bar(pdev, bar_num);
++	if (!bar_base) {
++		pci_err(pdev, "failed to ioremap %s bar%d\n", KBUILD_MODNAME, bar_num);
++		goto err_clr_master;
++	}
++
++	err = pci_save_state(pdev);
++	if (err) {
++		pci_err(pdev, "pci_save_state failed: err=%d\n", err);
++		goto err_io_unmap;
++	}
++
++	xdev->bar_num = bar_num;
++	xdev->bar = bar_base;
++
++	return 0;
++
++err_io_unmap:
++	pci_iounmap(pdev, bar_base);
++err_clr_master:
++	pci_clear_master(pdev);
++	pci_release_region(pdev, bar_num);
++err_disable:
++	xsc_pci_disable_device(xdev);
++err_ret:
++	return err;
++}
++
++static void xsc_pci_fini(struct xsc_core_device *xdev)
++{
++	struct pci_dev *pdev = xdev->pdev;
++
++	if (xdev->bar)
++		pci_iounmap(pdev, xdev->bar);
++	pci_clear_master(pdev);
++	pci_release_region(pdev, xdev->bar_num);
++	xsc_pci_disable_device(xdev);
++}
++
++static int xsc_priv_init(struct xsc_core_device *xdev)
++{
++	struct xsc_priv *priv = &xdev->priv;
++
++	strscpy(priv->name, dev_name(&xdev->pdev->dev), XSC_MAX_NAME_LEN);
++
++	INIT_LIST_HEAD(&priv->ctx_list);
++	spin_lock_init(&priv->ctx_lock);
++	mutex_init(&xdev->intf_state_mutex);
++
++	return 0;
++}
++
++static int xsc_dev_res_init(struct xsc_core_device *xdev)
++{
++	struct xsc_dev_resource *dev_res;
++
++	dev_res = kvzalloc(sizeof(*dev_res), GFP_KERNEL);
++	if (!dev_res)
++		return -ENOMEM;
++
++	xdev->dev_res = dev_res;
++	mutex_init(&dev_res->alloc_mutex);
++
++	return 0;
++}
++
++static void xsc_dev_res_cleanup(struct xsc_core_device *xdev)
++{
++	kfree(xdev->dev_res);
++}
++
++static int xsc_core_dev_init(struct xsc_core_device *xdev)
++{
++	int err;
++
++	xsc_priv_init(xdev);
++
++	err = xsc_dev_res_init(xdev);
++	if (err) {
++		pci_err(xdev->pdev, "xsc dev res init failed %d\n", err);
++		goto out;
++	}
++
++	return 0;
++out:
++	return err;
++}
++
++static void xsc_core_dev_cleanup(struct xsc_core_device *xdev)
++{
++	xsc_dev_res_cleanup(xdev);
++}
++
++static int xsc_pci_probe(struct pci_dev *pci_dev,
++			 const struct pci_device_id *id)
++{
++	struct xsc_core_device *xdev;
++	int err;
++
++	xdev = kzalloc(sizeof(*xdev), GFP_KERNEL);
++	if (!xdev)
++		return -ENOMEM;
++
++	xdev->pdev = pci_dev;
++	xdev->device = &pci_dev->dev;
++
++	pci_set_drvdata(pci_dev, xdev);
++	err = xsc_pci_init(xdev, id);
++	if (err) {
++		pci_err(pci_dev, "xsc_pci_init failed %d\n", err);
++		goto err_unset_pci_drvdata;
++	}
++
++	err = xsc_core_dev_init(xdev);
++	if (err) {
++		pci_err(pci_dev, "xsc_core_dev_init failed %d\n", err);
++		goto err_pci_fini;
++	}
++
++	return 0;
++err_pci_fini:
++	xsc_pci_fini(xdev);
++err_unset_pci_drvdata:
++	pci_set_drvdata(pci_dev, NULL);
++	kfree(xdev);
++
++	return err;
++}
++
++static void xsc_pci_remove(struct pci_dev *pci_dev)
++{
++	struct xsc_core_device *xdev = pci_get_drvdata(pci_dev);
++
++	xsc_core_dev_cleanup(xdev);
++	xsc_pci_fini(xdev);
++	pci_set_drvdata(pci_dev, NULL);
++	kfree(xdev);
++}
++
++static struct pci_driver xsc_pci_driver = {
++	.name		= "xsc-pci",
++	.id_table	= xsc_pci_id_table,
++	.probe		= xsc_pci_probe,
++	.remove		= xsc_pci_remove,
++};
++
++static int __init xsc_init(void)
++{
++	int err;
++
++	err = pci_register_driver(&xsc_pci_driver);
++	if (err) {
++		pr_err("failed to register pci driver\n");
++		goto out;
++	}
++	return 0;
++
++out:
++	return err;
++}
++
++static void __exit xsc_fini(void)
++{
++	pci_unregister_driver(&xsc_pci_driver);
++}
++
++module_init(xsc_init);
++module_exit(xsc_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Yunsilicon Xsc PCI driver");
+-- 
+2.43.0
 
