@@ -1,182 +1,181 @@
-Return-Path: <netdev+bounces-154615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 107959FED0A
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 06:52:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 292459FED6C
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 08:13:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38AEA3A2ACB
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 05:52:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC111161C74
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 07:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371ED1607A4;
-	Tue, 31 Dec 2024 05:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E061714A5;
+	Tue, 31 Dec 2024 07:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XB1Lh4T7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cs6iEDnc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2088.outbound.protection.outlook.com [40.107.101.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9940A14A088
-	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 05:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735624350; cv=none; b=C22WuXhzjmvhW7BmK4GHI5CzYitIa/RYGoOSceY/2CYUCTyBBG2DkIITeEi6T/lEuOasaPbFEh7snD2tVdYBnwB7kHadJQiC2EdhW8H+oMveotlcF20S9t64CBroQm04kGgpP5qrXfh6oN9HwvyOm9UImK+9Bk1QP89N/sT09Ts=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735624350; c=relaxed/simple;
-	bh=vvNleVMhSdxjsgoYbs5epPk1Svx9RdPZpGsfwqdDkbE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dDdrfItCEUcN6+NlqaAUirSOHJTVeCvo6IL0QLG7q/PWd51oPBEYE3ashYDgXEVgdDX15OfF54qY4MjVBVXdBJ444vVwS1WtTApDm4HnpMTtJLzdbZlfJmqJo8vZrV8bHjC8aoBayVQH7bHJ1q4NAWVovTK3o1VKWrhH6yQflL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XB1Lh4T7; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21644aca3a0so35419935ad.3
-        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 21:52:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735624347; x=1736229147; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X3BlMCTrPLUswA7xJw49Cs5Xb1aWcbAn5FALsmHN0Ic=;
-        b=XB1Lh4T70YEvxbUTORMEWosmEjL8o3/I6Xvuamz3GOI7DOlmuhQ0jxZMVw4Nea0vEm
-         y44PwqbDGjfS9Z+6F0kukbQ09iLLG3gP/znu9uim1ysq+/KWN/RlyDVu6QboscfHKjbY
-         Y7N8K5ciXPPf0Nan24bcmedFLyzixknwbv+pb5sNzsRIq1TPk9qNcX+dbibPFE3ZRGdU
-         YPRtMkv5oCY1xkq2j6r3GFVAiruiCyLYuQ5CR+KNUa5FQEmKJlZLlOClxTUYovUoP2gG
-         1mjZewowlDb7DG1K+uL5X7cpSiuq8QoV2hnR44eQI3F/UvRx2kg9IEGhGY56lPrrgCLr
-         kEzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735624347; x=1736229147;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X3BlMCTrPLUswA7xJw49Cs5Xb1aWcbAn5FALsmHN0Ic=;
-        b=Er1McwlVthUsFYOJRgxeGvfyLOAYhAWeYWKroc2nlWSl16FqijwLZUJX74gCZyyHTP
-         zJtEHZiKex93YctIXCyFtLjtrga/wSi1zBpkyaTkr5vS7LrMy5rqRvXl8JpBH/rNttCF
-         9ijLTwSqivW8ey+fq0pXMAHIFm3om4d8Zy3ZA/qagb0WF9xYJ2ETNzkcXtiKbDZqoeYi
-         CKglg6+uRH7rPuwWRdScLO2latrfUhnUxBKIeG+ucP9WrO2e1byHRlPVD6/YKLLu6Z4p
-         Lg1RiIksacvIf5kz480ThX6HQxcag+B3mepfkRhif+iWD7vPiE7XdO3YMawWpYePyco+
-         VBgw==
-X-Gm-Message-State: AOJu0Yz/d61H+79SF4t+iobxmWSpessf/I0eIMicmgmz4TBpL75QUhYi
-	oVuLcGxQa8UYxs6hokfJ4W/geDVrk9qauC/nTl8ZBvOI9iPJO/dc
-X-Gm-Gg: ASbGnctHakocgLsuKO4IjtPHEcUk43srWNOpO/aDx8v2/fWBM0ZMwgrotghWh4DJCT6
-	TB+bOjn5e6QmnhveO8F0lOws5EhlOpFQU6lOuwq5mKAFaNv3qmJHCyVoBswoadRZDBQdJeGOqDF
-	vgPcO6hZHYvSc2T8fI0uBti1sW37p743jnno8aM41q23iFdPsVBlhxUHqTTBTayjuxj/5ZpQKU5
-	LTqKocVCsIObvqsfxbMLi4W5aWY2+Otf8XivIXw4W3sBa6ASSjbXzdM+ADPfYkmscKr1K+jomch
-	wOJM+oXq/M8f
-X-Google-Smtp-Source: AGHT+IH2Jg7mFJdFg7MhA6U4p0FvYQM4qd+4LKaSyvfh0mv4jTcwbNPicnPeSvpgHTRxWY0RfOqe0Q==
-X-Received: by 2002:a05:6a20:7347:b0:1e3:da8c:1e07 with SMTP id adf61e73a8af0-1e5e0458ea2mr63030356637.7.1735624346772;
-        Mon, 30 Dec 2024 21:52:26 -0800 (PST)
-Received: from localhost.localdomain ([180.159.118.224])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8dbc01sm20779426b3a.125.2024.12.30.21.52.22
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 30 Dec 2024 21:52:26 -0800 (PST)
-From: Yafang Shao <laoar.shao@gmail.com>
-To: edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	Yafang Shao <laoar.shao@gmail.com>
-Subject: [PATCH net-next] net: tcp: Define tcp_listendrop() as noinline
-Date: Tue, 31 Dec 2024 13:52:07 +0800
-Message-Id: <20241231055207.9208-1-laoar.shao@gmail.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC82029A9
+	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 07:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735629204; cv=fail; b=KFYUVZXMUPiB5cIjTYfEViuj90vXp10BD9VzZpjx0OUvby+who6qKj1vGXOvgpGkQuYbi7kOjrGCSu20KJj0nsYZ3aEn798Mqx1NxLXAq5ugQElbAHp6U2VCwMCMuoWOpDICganLWYF2FxCJh/qoW9x22xLkyQAK4H3M2Kx3TqQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735629204; c=relaxed/simple;
+	bh=c4BebXDxzmsw72mfp6xKeaQ5mSg/AY4hw5GVkb50mRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=rRsyrXbTbQLVGxo6IrOULUXuZoT7xuoGFTXdTI0nJ+C8ZgSyrfXHWSx5EnbEw8kCKDcHo3q8imBiNV6W5zOjIPRYFETq38fhlZWojL+JuMWSmVwUSo4RzvF1gEAHR3jeJ5rnoj1pvLHzVdeWH6aJp6gApaOWZ7TFuu/ZsbIHGdo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cs6iEDnc; arc=fail smtp.client-ip=40.107.101.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Xfr289wVpC098sJ5hl6yzyJAD2zlUJc7mZdmwljYX4s0saNrxzEJYXW0z4Af8azvRWRRvb/WQYYQZz7xsp+bMo8nf8Y7ugqRTMauYxviD2KSjZgFRZrAtng6POyByans9G1HoiF611pXc4rALDSSzaCCmV6C8/HVJnQy8LDHQz0NrI75+Z7BE+rq2IQZQG/m28RMgqeovFt33aR/F3ya9tTyEMr6csRgghEMezwPtB659/9thx52+9lqehEU2ubAJ9Hr37mZBnkQpeK0e8u58uQhT7YiCVCEAbxKBbTtr2HBMbYCL6PdbT6QSu3P0fF2cCA+vcucTU8SKCxc2VFkvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mdNu8KGZeFsW7Npe04YoE2oWVvFFMr6SxacD4tt4o8w=;
+ b=PgHGc0erAgZ/GOpd2cG6zbHMDMJWDZi3hNWe9a2V/A1k84CABqcVcfa98OKvDudX2lHvC6vmCheVmWYcDeroqzGB2eS6Gwz1af3Hu7AqYcwjZplUs1fxQ8aKklFdwaXZ9/ENj6DhrvRGwVg9Dr3yhTgM3BwGPmG3aR3pdyIL9Ju7WpZocM0RZcvCPkZDxLZ3KOAAZ18rj680nATAE7n9QiFFzw+np9UCWKGN6Xt/A2RBqMrWUtcQeh6rjfG8yrWKgndP+lQszGL0fB1WiIXFQoXG29oR5sqWEQT9sRTyO6NiHibzl80jJod/QolywctKZd5LQIHPX9Q2ZuOOZJmpMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mdNu8KGZeFsW7Npe04YoE2oWVvFFMr6SxacD4tt4o8w=;
+ b=cs6iEDncUg2yjb0kBEAT8fynABKj4T3tL4e8s+b8yO3KBtYAbCX1Pc3wClGZkSalhcIDtC7nbzUhdlQieE9/+5o6trD+3Ye5c81EZOO3wFqtzUbFAICvEsh/LL1lQ/Y/lf9BHrBWoSqaPMGupg0Bt2rKdhcxxr8XhzWGym/noMJiJK/yS6P8oh0ZdMfLRk0YWKe1O42cH+UVgwXDWQpB2t3qDvcXLzIMYaTX6mPMEW9wDWLhGZxFhzBQeeSdwQ0hFX9puP8H+T+P50uyfBXwIRkQB1F/Xj1AeoHbmPhs4cLCUqJbCcanjm42VmYOyRdof2Bgj7U+WxjUwitij3ohSg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by DS0PR12MB8219.namprd12.prod.outlook.com (2603:10b6:8:de::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.18; Tue, 31 Dec
+ 2024 07:13:16 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%4]) with mapi id 15.20.8293.000; Tue, 31 Dec 2024
+ 07:13:16 +0000
+Date: Tue, 31 Dec 2024 09:13:06 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, petrm@nvidia.com,
+	gnault@redhat.com
+Subject: Re: [PATCH iproute2-next v2 2/3] ip: route: Add IPv6 flow label
+ support
+Message-ID: <Z3OZgsoGjFLiCxXH@shredder>
+References: <20241230085810.87766-1-idosch@nvidia.com>
+ <20241230085810.87766-3-idosch@nvidia.com>
+ <20241230164958.5f99eb90@pi5>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241230164958.5f99eb90@pi5>
+X-ClientProxiedBy: TLZP290CA0013.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:9::6)
+ To SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS0PR12MB8219:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5450f04c-a90c-4bca-a83b-08dd296a98f8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?AplhV3CsoIwWR6zPHjPM62BBuBSYcyy/9DZUcQnueyMYwPhgQyjgyA7D4hLN?=
+ =?us-ascii?Q?c52R25cdf6wjipHhB5Yza0WxBdBluytl2p6BdLhtJd0qA/CFrQx1QyG6dC7M?=
+ =?us-ascii?Q?UCmsfyfWBXswm0UJBulVpq3yVcdlgNe9uS2jCTN08IEBCmNlDUzsgH/Jx7Pg?=
+ =?us-ascii?Q?gzQwA4W58CZB09p3YoR6Toq16D/eFXIggNCghrix/7wSTxg3kh0/jCbOdyS/?=
+ =?us-ascii?Q?db9YhaR78iR8kQwObZ4QFAMncaktJBmRgZrqBJay4PblnYZDCem/lb8/Rq0i?=
+ =?us-ascii?Q?ROBCvfS5kMsmEwT8UAIbSaBqjvx5aoC2G2TrGESX4v2HaU0Pz9I+kw/V++UT?=
+ =?us-ascii?Q?Z23+litpqlNsEDTEsZx5pv2xMtU+M9iUs+EjMlcP+ftxjhQSW8eiTaKjhePK?=
+ =?us-ascii?Q?zHM8LGlNJZH3ZGKq1FcMcfwv3yiJEyaqUf3HEVYiOsXMb/3tKdG40cD3aS2J?=
+ =?us-ascii?Q?7l8zSCTFiSmSWmYr2PRxsGcKTp3tvAV93YgflpLfoGcW5KzQArWjTgjeprJB?=
+ =?us-ascii?Q?LsyvdTIMkod1igmKBswaBReeLWhPxWmzhGyr2O7VkVHGrZxTmpLMoK4SrzWn?=
+ =?us-ascii?Q?+6BBaXe2F4h54RLKjtPK5xjOkUgGNwLnAe7HhIwEI12UkaZlDRSRbdLEifi2?=
+ =?us-ascii?Q?pFMzQvNIR7PAhP8jLgv0YeHrmqUOSyUyWQgjSuFO0NbtJuS9i2EK1BKNLSKd?=
+ =?us-ascii?Q?X+MOvRB8dhBKVHW+JbcZ3ftLiQKDuvr8C7qtbrtLy3VYc28qVKn5xxosJ32C?=
+ =?us-ascii?Q?CpByMxkbTm82j6w0clRjtVHDUWwdET8m+vZigMWDciBFj5EnsDcWcyw2cNnm?=
+ =?us-ascii?Q?LsJAXZcXe0e4ILJ8Ir/bbkQCGfZBpIozf5Sm4yozYElMD6RAUC1WM+udDRWB?=
+ =?us-ascii?Q?l54Nv5dUWz+fsoNKzA9MLKZRJaOW1p2ZoZQXz0N+QaiZ5neALabB9+Xrajbj?=
+ =?us-ascii?Q?6pz3wEi9nJJe/1lccX2lrJ3N26t6ghiYTfYAwTuz7GZovoJ1iJRH/IoTyVom?=
+ =?us-ascii?Q?9PTWqEbwO4s2Jg1qEV+0cwoBPvA/TwN94bz1472bQ04m13ntLyMLKZ6klBSC?=
+ =?us-ascii?Q?T2j5IGY8BuPo7sY+soyvVDCFp4WP2HfUOxr+N4ulEziDe33L7/ql1vrre8WF?=
+ =?us-ascii?Q?9Mbg/RJSEcgeqK1XQRGUv/FK+nYdh5aRO//e9dSiKGoHdg4+fi7nJxxjjp32?=
+ =?us-ascii?Q?QVzmAEpSQNUhhiq1tqkoctTwKYFbxx+fqMRejcoc5+e7UHDCgMbGMdfRUkwL?=
+ =?us-ascii?Q?Nr66X7RAaZ0jhF0j9lhSnxm0DDPQ3adaNG+slq7jmYqT1yTjj7VIGnTOpLKH?=
+ =?us-ascii?Q?zV4CyYJi+XUEcQREXjyM2AAnJyzWQKQjnZT5enYM8r+Rc2fMnsK3Fy1OUuup?=
+ =?us-ascii?Q?4IZhvMPNSeNy4Kv5Q5m/Y2XT1zZd?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?8VKn4E5puuoyu9I3FTyNFMesXLt3MTnjMzhiuFWNONx8vuZm4XuB3bX06o9W?=
+ =?us-ascii?Q?2euajY5DDbooJbiIPyTYZ/O5h4nK6rV5ZOYANNPdt37k93BWgZRwKYxbySlv?=
+ =?us-ascii?Q?oxXHLKVbrRdwSrFtk6hftll+KspWk2Xlp+8yOcVxDi8a0byrqE8PBkuMNQZb?=
+ =?us-ascii?Q?lFjZofFnHcF4dFuiavY8Utqg9KlkGfvcHIF1a7NGRWWoNkP7t+TH6rGLJ3xh?=
+ =?us-ascii?Q?3f0Shz93Mel3DR+selcPaAIIFg3E41Xybrv2RsrnSFWRlvUvTRsFiW3UYeDg?=
+ =?us-ascii?Q?sFXdaibBBjnDArZCc5r3WkSWlyliFJUw/NJGE+m5/pxW/40/cdPBoaACOrUU?=
+ =?us-ascii?Q?oDGJSyOl+KIBMS+vVqFychewvSey2YDS6v/vKcL5OR0XvW58AotTOOTfoZQ/?=
+ =?us-ascii?Q?9fx4ofPP5s+ZETiOoDf64TfN1Wrh7jhjppkQMQvKfe2cK48g6sSV8oeR8u+x?=
+ =?us-ascii?Q?qaIb4h+tPHTTFjf8mRIuKLQNvRuX/wPBHRwcH5wwfEyicLrksbVjAHqwlPms?=
+ =?us-ascii?Q?h5rAkH1/Rk4NyG8RmTKonQjnYh+w4o3XnRj4YrvEJiJqZs9mBCXbF3Q1lhIS?=
+ =?us-ascii?Q?oubksPG3WNSqanWTtFpj+F9nemzOqbO+DtFTE9Hu6BW5Hw4oNyOIcCqnV37j?=
+ =?us-ascii?Q?lG85D0bswKZt6U0VI5BVUTajSv2K/AKwT5QO+9twGJKKyNActq9OqrSdplWt?=
+ =?us-ascii?Q?MkGGlB2kpHP6/h4EBnYA00oQ1dTBcgwkLUaG+jB6+01OhboGQKyI3MANHyhu?=
+ =?us-ascii?Q?VXQF523O6Ih0O0Uu3co+cQrUpW32qxJKKgPbd0WZq0GPUjRsIII4q1tSVrnP?=
+ =?us-ascii?Q?B19CnrZW9QEBSAhdCdk6il57uET2tnf/Ss75GDXXdQ9zxl7ykoAJnNvd3ZMc?=
+ =?us-ascii?Q?nQpArkBvk3f4EfBPqhgHfAZuUBbIJ/SMSsANic6C/pkPUV02KZCnqbe7vVh0?=
+ =?us-ascii?Q?O+EUZdhtvFeXCfL1NGhqMWjI0njk0UQX5PEB8R8ZLGbVHcRDfnonah1rXgDv?=
+ =?us-ascii?Q?4gMjGYsaeK/nalmSbESdPO3BjgTwjSDMGJG3ZaM+1hu/KwmBM2q8jYW4bPiV?=
+ =?us-ascii?Q?q+WBFo8z93yvgqIFtswoqceK+MTEz91T6KF4jCqNRd/nq9V3Zs2N+mfA7fSB?=
+ =?us-ascii?Q?tUvrst0kqLqZb4rui9zieCcZd68T1wGn76w5z7tOLqfbgWLp40wAsMZxycSS?=
+ =?us-ascii?Q?nn0J+F/PRdrboPtbRcxhirGnJlTDqywgQgNyCYllOtsX8T3nWnlrjGbm3t2o?=
+ =?us-ascii?Q?A3mfaB4YBnXGtgDPQtaToCe9Vy75Br+jJKZsA2b9oJ9VtwXU0juDtgdxPrAP?=
+ =?us-ascii?Q?OMC0D1Gep1V5wLie8HAfFTz3EaEqjXEfgNHzaglPI2jvsL9SIvWAaQBB0+PW?=
+ =?us-ascii?Q?YJK1Mxv4Gt0r3+0O/Cnj8+rCzt7mK0pKuOlJrONxDZzlfPiq6jyZaMPoNVHw?=
+ =?us-ascii?Q?TGAK9hTCgHe1n9IOagtX/MtedLRaQnlEx/Hmmj1IOHcSzIwQhq5t2fDrSp3s?=
+ =?us-ascii?Q?qEltzfg+Lo/BBYlBfHMly7OTEV7dDM3UTvMIhhgwOeVo8ikWri3Y4Emk2qMZ?=
+ =?us-ascii?Q?CYEmpYqr5t5WXPO/MRD8d9hFVUBfRA1hSQtQfFT8?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5450f04c-a90c-4bca-a83b-08dd296a98f8
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Dec 2024 07:13:16.7297
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KJJxBjGoVIv/nAhwZiV5aXH9PKGQ30MGw3RrAmgdEqsSa9cOmP0JZNxM7fFXTqdoaFlZSwPOwbyPL6vTkbRWKw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8219
 
-The LINUX_MIB_LISTENDROPS counter can be incremented for several reasons,
-such as:
-- A full SYN backlog queue
-- SYN flood attacks
-- Memory exhaustion
-- Other resource constraints
+On Mon, Dec 30, 2024 at 04:49:58PM -0800, Stephen Hemminger wrote:
+> On Mon, 30 Dec 2024 10:58:09 +0200
+> Ido Schimmel <idosch@nvidia.com> wrote:
+> 
+> > @@ -2129,6 +2129,14 @@ static int iproute_get(int argc, char **argv)
+> >  				invarg("Invalid \"ipproto\" value\n",
+> >  				       *argv);
+> >  			addattr8(&req.n, sizeof(req), RTA_IP_PROTO, ipproto);
+> > +		} else if (strcmp(*argv, "flowlabel") == 0) {
+> > +			__be32 flowlabel;
+> > +
+> > +			NEXT_ARG();
+> > +			if (get_be32(&flowlabel, *argv, 0))
+> > +				invarg("invalid flowlabel", *argv);
+> > +			addattr32(&req.n, sizeof(req), RTA_FLOWLABEL,
+> > +				  flowlabel);
+> >  		} else {
+> >  			inet_prefix addr;
+> >  
+> 
+> What about displaying flow label with the ip route command?
 
-Recently, one of our services experienced frequent ListenDrops. While
-attempting to trace the root cause, we discovered that tracing the function
-tcp_listendrop() was not straightforward because it is currently inlined.
-To overcome this, we had to create a livepatch that defined a non-inlined
-version of the function, which we then traced using BPF programs.
-
-  $ grep tcp_listendrop /proc/kallsyms
-  ffffffffc093fba0 t tcp_listendrop_x     [livepatch_tmp]
-
-Through this process, we eventually determined that the ListenDrops were
-caused by SYN attacks.
-
-Since tcp_listendrop() is not part of the critical path, defining it as
-noinline would make it significantly easier to trace and diagnose issues
-without requiring workarounds such as livepatching. This function can be
-used by kernel modules like smc, so export it with EXPORT_SYMBOL_GPL().
-
-After that change, the result is as follows,
-
-  $ grep tcp_listendrop /proc/kallsyms
-  ffffffffb718eaa0 T __pfx_tcp_listendrop
-  ffffffffb718eab0 T tcp_listendrop
-  ffffffffb7e636b8 r __ksymtab_tcp_listendrop
-
-Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
----
- include/net/tcp.h    | 13 +------------
- net/ipv4/tcp_input.c | 14 ++++++++++++++
- 2 files changed, 15 insertions(+), 12 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index e9b37b76e894..65e6357e893b 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2537,18 +2537,7 @@ static inline void tcp_segs_in(struct tcp_sock *tp, const struct sk_buff *skb)
- 		WRITE_ONCE(tp->data_segs_in, tp->data_segs_in + segs_in);
- }
- 
--/*
-- * TCP listen path runs lockless.
-- * We forced "struct sock" to be const qualified to make sure
-- * we don't modify one of its field by mistake.
-- * Here, we increment sk_drops which is an atomic_t, so we can safely
-- * make sock writable again.
-- */
--static inline void tcp_listendrop(const struct sock *sk)
--{
--	atomic_inc(&((struct sock *)sk)->sk_drops);
--	__NET_INC_STATS(sock_net(sk), LINUX_MIB_LISTENDROPS);
--}
-+void tcp_listendrop(const struct sock *sk);
- 
- enum hrtimer_restart tcp_pace_kick(struct hrtimer *timer);
- 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 5bdf13ac26ef..0fcea815860b 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -7174,6 +7174,20 @@ u16 tcp_get_syncookie_mss(struct request_sock_ops *rsk_ops,
- }
- EXPORT_SYMBOL_GPL(tcp_get_syncookie_mss);
- 
-+/*
-+ * TCP listen path runs lockless.
-+ * We forced "struct sock" to be const qualified to make sure
-+ * we don't modify one of its field by mistake.
-+ * Here, we increment sk_drops which is an atomic_t, so we can safely
-+ * make sock writable again.
-+ */
-+void tcp_listendrop(const struct sock *sk)
-+{
-+	atomic_inc(&((struct sock *)sk)->sk_drops);
-+	__NET_INC_STATS(sock_net(sk), LINUX_MIB_LISTENDROPS);
-+}
-+EXPORT_SYMBOL_GPL(tcp_listendrop);
-+
- int tcp_conn_request(struct request_sock_ops *rsk_ops,
- 		     const struct tcp_request_sock_ops *af_ops,
- 		     struct sock *sk, struct sk_buff *skb)
--- 
-2.43.5
-
+The flow label is not a route attribute and it is not present in
+RTM_NEWROUTE messages. It is provided as an input to the route lookup
+process in RTM_GETROUTE messages.
 
