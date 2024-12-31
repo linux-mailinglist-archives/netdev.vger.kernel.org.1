@@ -1,157 +1,165 @@
-Return-Path: <netdev+bounces-154641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909009FF077
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 17:05:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F021B9FF138
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 19:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEFF53A2DC9
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 16:05:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 954427A1611
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 18:33:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44EF71534F7;
-	Tue, 31 Dec 2024 16:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8862719AD48;
+	Tue, 31 Dec 2024 18:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gE7yNmFv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/x0cIZs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935BF1C683
-	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 16:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5D1182D9
+	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 18:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735661132; cv=none; b=WC5f9qJLJ1FzVERna3ERiZ17zB8P/mADJs84s20aSBw9AkmYJ5lSYFexuNqqizE+FxPjPWYln6deVbhgpi6o7FZRSYtVL3Spv9nvTtvTY9IjsmZz/Qn86cOYHBvnWaAJYXhP/VVSmvfK1eEqdaL1Wst5AkbnWwR5zcRpyKr7xRk=
+	t=1735670024; cv=none; b=eiW/dB6s7OauqepLCyABPCefDdHc2r52Tq+t07O6DqzW2iM+510nikGGa96f1WvVJbW5Y5CQvsLqQUxnKCAOMu7Q70v4BZU3dMdJOeoP1sLH1FYjk5i0FngUrWTnx51J/Md0WW4QCnTBjOA9wEpUXlTaS7wwh1c8a797dxEcvEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735661132; c=relaxed/simple;
-	bh=9BF6+mVgbLwbRfrrsR8Ig2aGffBiHXQcMifcw2dEIJ4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZF2rVqDhjDQCAIDeOX7+38OhVpK+yw2XwlUt/NKMj2c0dlBqvTV+QahvAZpM7CdUv32hXhgXMz0YhHz9z8KXOqHyQLRdjj0RRU0FNfFe/RNAaF3zvEtH/jdePptim1dKmu8zk+L90GWiv2cART72uQxB83Xqv0UqboQTT9/j9iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gE7yNmFv; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-467c08e67easo210257291cf.1
-        for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 08:05:30 -0800 (PST)
+	s=arc-20240116; t=1735670024; c=relaxed/simple;
+	bh=YqDuTMsvsgnfwyS47P72D+A3NQO/L+5t/+aVuGk36ng=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hUUf92NMSapY3nrTVUu8QfJbc2/hcZ8xAVp0ZBiPj9ns/7Pd/smbK5Y6JxSD4OZNSaikGFs0dL981nJUinq52IVdmU1wTXhkQzY/mzAtC0HZYD0AdRl0PQM+dldtB+R9K0PUMLsWTBePbDwPklBhE5mauUfHHwDIF7m/qCSZeeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/x0cIZs; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3862a921123so6964927f8f.3
+        for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 10:33:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735661129; x=1736265929; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8+KWGhYHufCMpBqQljEZY5YV4xW5ixPmDySwfbiCNhY=;
-        b=gE7yNmFv9hclrpVyfK0qpPBQ2SJ/2XFNA404rcE7w0K5p0Q/0iE3NYqisgfID5ehe6
-         6nH5K8676ESbOiADR/PwHIYUdPmODvycvlUjQo/0bpEkuFBazReG5wCYqLsy4nwE9f1G
-         zefkr5eDFMQSCxKT8If67DTwyRDLoGVLZu73stmznCRb8+/IOdCGmBPnV5WApZ5Su7bM
-         pGX9QTtmX/ZIDHGstJvbxqkvYd7ZZEGZee6x4HYN3S++szylQd28OguJ4clLge4Vt6ZG
-         dY5yvSwSc1j33J/+lnJ3cRj2YNTwS2FKTBVjoBn+Rm82UakozObfELVsQ5Xci4Mwdrqc
-         GscA==
+        d=gmail.com; s=20230601; t=1735670021; x=1736274821; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C2OGPBMKU1WoKNyQ4pzVSQVikkWah/utYrM+vJeWPpI=;
+        b=a/x0cIZsvuNJUkL8hJSxiFRjZOF3LE9qdeNn88sHu9D7lU+bmtYoTPnifi6A1+hlDb
+         BQATQxg9EK5PJkDRlRBVwK+YC9pxOkdrUER3UUlFOkW19yYQqvc2PeDB1jnHJmCmpeu3
+         YtD2XlpMYh2MqU1QwoDs0EjBCrnqzT3/kl8uVR2j/wsqj2+Nv1ENRaGW6wnp5b2+SDtY
+         Jr2dDrkDatVE4e4T/MLBSISxz/Yg4HX7QQ2PI9/bM0leDmavo4Ul7JwD30zav8amLHAV
+         RpzgW3M9VGDoYhRN7XMT/7hcK3hqow6kXhH4ok64tKx6XN99nmPDkRw6eFHFeKN6yfAs
+         0xqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735661129; x=1736265929;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8+KWGhYHufCMpBqQljEZY5YV4xW5ixPmDySwfbiCNhY=;
-        b=FmxGWaWUAzz6fUEq6JCVOYIu15gYlxnRBRwh8Q5GfCmzklJTp+6lmQDKNy+TSCoZB0
-         Lei0kO1sCMMWEPKBtMQNlmMNJLMVmkqmIEAUoWcz4GIsMdbqG28FMTBWsmjZwooBS39e
-         wcsV2ndSfx3JfcaW4q3eHmBODGayPXyBHZourAf4GZm1vOJ6Jxw2+iwZ3FmZBBKwRgPc
-         +V4vgUESwIZShWA7XFnJwpdUi59573oDrPwE6ztvVJVxcrmDTAReh9AeRCZUFVgO1zdF
-         MeRsHjcQrUVtBmWjl8JrWigd6xWSdeIHPW40uYPkrgregdG6d7QVZ9OhDuUglWtkv1HE
-         ng2Q==
-X-Gm-Message-State: AOJu0YzX53/HV9INw6PR6eym7rPdVJvvRNJKDP/+FiwO0PaW17L/F9QK
-	p5sBetL6OPwlIfWKETs1240oJp1Gkv7xTXFwi3koM4b0KxNRaJ9mydzYaK97O3k5sMP6SlhtM4R
-	VE00SbkehBA==
-X-Google-Smtp-Source: AGHT+IEedflulgXONWWdbCOKxMRD1Sx+fWe94/rpzlj/Rib7s7ui4K1YVI/QGv2LR0Euedcsr4itz494eefyoQ==
-X-Received: from qtbbq17.prod.google.com ([2002:a05:622a:1c11:b0:467:71c0:3902])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7fd3:0:b0:466:77d0:5941 with SMTP id d75a77b69052e-46a4a8b4ee1mr707690361cf.10.1735661129056;
- Tue, 31 Dec 2024 08:05:29 -0800 (PST)
-Date: Tue, 31 Dec 2024 16:05:27 +0000
+        d=1e100.net; s=20230601; t=1735670021; x=1736274821;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C2OGPBMKU1WoKNyQ4pzVSQVikkWah/utYrM+vJeWPpI=;
+        b=euHVYEjToL/lBT142mlaCKVGTf6ynyve/64hmR+PBRdeRedBVQrwpj8DtOOcvvmfck
+         I+RS5S+NFmq1xVmuLxZaRTPhYNuNIQLikZmEa2VYzl9v8GqzGATHgq/ghhCDSbC2iOEe
+         pTBHT/w1HJwmHSY5swuyZhUNTapovZQXSt3zM7JB9S6xvXE5DveAQnilEA9vggt7JgOq
+         LHabfHD4+Jw2V3xkdy1lQe5P1a4KuZBSycqP7gdK1cGtlsYOMaduG8OSsZA1oq9ynvi3
+         JLGC+8NtB3JL1GCtLpIkrtQo9N2TjP2xLhOj4kfK6faa7qzQ/WbtinIQQXfsTpC3pLao
+         yLXw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7Ky5z6zUcBQgtz4QEPjYscjX3gGjSU+/HV7gCMR/orU0NtQvs4TLXnT8bafB4YSW3hDN9w1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzgm3P6H7zU2BTco1XBV0lXb/1BCvpP/uKc2SmWyTWAcUEcEw1/
+	po+0zbxNJoDG8YfnJjqoCbALrt7bOZlbEX0nRBkHiXyuMuw2yRhK
+X-Gm-Gg: ASbGncv+VPjzkjSwFVtu4+wJCAyb1QouF7neUL/Zvfy10QBvELY6ZiYs8ximE99jufW
+	8yMSn+LmyA5e7sne0CAd5jwcgihYzBcePbH/ch3OGUS4s7fk4X2bUYuv+Zf3MUy2cn9TDZ4F49f
+	q3N2K4MfFN/NPrUmMzIs6vbEGZtUmiG7WoxafP7T5Nxe2j2XQyO+01XdeeydJS9KNbj6+M9SO9I
+	Sw3jUT1UUoMkjlnf4D7yRFUhzo0OIPhvvwIcEK61xvHVPw+n3h0xkNVs8xjJJ5X9oFOrM3x1Do3
+	TItEjH2TLoHg+iVaDtBivkQ=
+X-Google-Smtp-Source: AGHT+IGDkrS3B0UY+BJqensP8j2URpWxSfHSCUUrYODgTEcp/0xSZ8xIJfY2OkVWcrQ2MV9SDo85hg==
+X-Received: by 2002:a05:6000:18a8:b0:385:f7d2:7e29 with SMTP id ffacd0b85a97d-38a221ea539mr32400447f8f.15.1735670020636;
+        Tue, 31 Dec 2024 10:33:40 -0800 (PST)
+Received: from dsl-u17-10 (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c89e2d2sm33956181f8f.71.2024.12.31.10.33.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 31 Dec 2024 10:33:39 -0800 (PST)
+Date: Tue, 31 Dec 2024 18:33:39 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com,
+ syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com, Martin KaFai Lau
+ <kafai@fb.com>
+Subject: Re: [PATCH net] net: restrict SO_REUSEPORT to TCP, UDP and SCTP
+ sockets
+Message-ID: <20241231183339.6ee59b64@dsl-u17-10>
+In-Reply-To: <20241230193430.3148259-1-edumazet@google.com>
+References: <20241230193430.3148259-1-edumazet@google.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241231160527.3994168-1-edumazet@google.com>
-Subject: [PATCH v2 net] net: restrict SO_REUSEPORT to inet sockets
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com, 
-	Martin KaFai Lau <kafai@fb.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-After blamed commit, crypto sockets could accidentally be destroyed
-from RCU call back, as spotted by zyzbot [1].
+On Mon, 30 Dec 2024 19:34:30 +0000
+Eric Dumazet <edumazet@google.com> wrote:
 
-Trying to acquire a mutex in RCU callback is not allowed.
+> After blamed commit, crypto sockets could accidentally be destroyed
+> from RCU callback, as spotted by zyzbot [1].
+> 
+> Trying to acquire a mutex in RCU callback is not allowed.
+> 
+> Restrict SO_REUSEPORT socket option to TCP, UDP and SCTP sockets.
+> 
+...
+> 
+> Fixes: 8c7138b33e5c ("net: Unpublish sk from sk_reuseport_cb before call_rcu")
+> Reported-by: syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6772f2f4.050a0220.2f3838.04cb.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Martin KaFai Lau <kafai@fb.com>
+> ---
+>  include/net/sock.h | 7 +++++++
+>  net/core/sock.c    | 6 +++++-
+>  2 files changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 7464e9f9f47c..4010fd759e2a 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -2730,6 +2730,13 @@ static inline bool sk_is_tcp(const struct sock *sk)
+>  	       sk->sk_protocol == IPPROTO_TCP;
+>  }
+>  
+> +static inline bool sk_is_sctp(const struct sock *sk)
+> +{
+> +	return sk_is_inet(sk) &&
+> +	       sk->sk_type == SOCK_STREAM &&
+> +	       sk->sk_protocol == IPPROTO_SCTP;
+> +}
 
-Restrict SO_REUSEPORT socket option to inet sockets.
+Isn't SCTP SOCK_SEQPACKET ?
+In any case the sk_type test is redundant (for inet sockets).
 
-v1 of this patch supported TCP, UDP and SCTP sockets,
-but fcnal-test.sh test needed RAW and ICMP support.
+If support is needed for raw (ip) sockets is it enough to just
+check sk_is_inet() ?
 
-[1]
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:562
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 24, name: ksoftirqd/1
-preempt_count: 100, expected: 0
-RCU nest depth: 0, expected: 0
-1 lock held by ksoftirqd/1/24:
-  #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
-  #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2561 [inline]
-  #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_core+0xa37/0x17a0 kernel/rcu/tree.c:2823
-Preemption disabled at:
- [<ffffffff8161c8c8>] softirq_handle_begin kernel/softirq.c:402 [inline]
- [<ffffffff8161c8c8>] handle_softirqs+0x128/0x9b0 kernel/softirq.c:537
-CPU: 1 UID: 0 PID: 24 Comm: ksoftirqd/1 Not tainted 6.13.0-rc3-syzkaller-00174-ga024e377efed #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
-  __dump_stack lib/dump_stack.c:94 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
-  __might_resched+0x5d4/0x780 kernel/sched/core.c:8758
-  __mutex_lock_common kernel/locking/mutex.c:562 [inline]
-  __mutex_lock+0x131/0xee0 kernel/locking/mutex.c:735
-  crypto_put_default_null_skcipher+0x18/0x70 crypto/crypto_null.c:179
-  aead_release+0x3d/0x50 crypto/algif_aead.c:489
-  alg_do_release crypto/af_alg.c:118 [inline]
-  alg_sock_destruct+0x86/0xc0 crypto/af_alg.c:502
-  __sk_destruct+0x58/0x5f0 net/core/sock.c:2260
-  rcu_do_batch kernel/rcu/tree.c:2567 [inline]
-  rcu_core+0xaaa/0x17a0 kernel/rcu/tree.c:2823
-  handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
-  run_ksoftirqd+0xca/0x130 kernel/softirq.c:950
-  smpboot_thread_fn+0x544/0xa30 kernel/smpboot.c:164
-  kthread+0x2f0/0x390 kernel/kthread.c:389
-  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+	David
 
-Fixes: 8c7138b33e5c ("net: Unpublish sk from sk_reuseport_cb before call_rcu")
-Reported-by: syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6772f2f4.050a0220.2f3838.04cb.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Martin KaFai Lau <kafai@fb.com>
----
- net/core/sock.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 74729d20cd0099e748f4c4fe0be42a2d2d47e77a..be84885f9290a6ada1e0a3f987273a017a524ece 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1295,7 +1295,10 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 		sk->sk_reuse = (valbool ? SK_CAN_REUSE : SK_NO_REUSE);
- 		break;
- 	case SO_REUSEPORT:
--		sk->sk_reuseport = valbool;
-+		if (valbool && !sk_is_inet(sk))
-+			ret = -EOPNOTSUPP;
-+		else
-+			sk->sk_reuseport = valbool;
- 		break;
- 	case SO_DONTROUTE:
- 		sock_valbool_flag(sk, SOCK_LOCALROUTE, valbool);
--- 
-2.47.1.613.gc27f4b7a9f-goog
+> +
+>  static inline bool sk_is_udp(const struct sock *sk)
+>  {
+>  	return sk_is_inet(sk) &&
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 74729d20cd00..56e8517da8dc 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -1295,7 +1295,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+>  		sk->sk_reuse = (valbool ? SK_CAN_REUSE : SK_NO_REUSE);
+>  		break;
+>  	case SO_REUSEPORT:
+> -		sk->sk_reuseport = valbool;
+> +		if (valbool && !sk_is_tcp(sk) && !sk_is_udp(sk) &&
+> +		    !sk_is_sctp(sk))
+> +			ret = -EOPNOTSUPP;
+> +		else
+> +			sk->sk_reuseport = valbool;
+>  		break;
+>  	case SO_DONTROUTE:
+>  		sock_valbool_flag(sk, SOCK_LOCALROUTE, valbool);
 
 
