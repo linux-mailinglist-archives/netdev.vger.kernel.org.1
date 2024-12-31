@@ -1,94 +1,95 @@
-Return-Path: <netdev+bounces-154627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E089FEEF9
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 11:56:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C0C9FEEFA
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 11:56:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32F0E3A2811
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 10:56:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 626F416237C
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 10:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399D0193402;
-	Tue, 31 Dec 2024 10:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3001946A2;
+	Tue, 31 Dec 2024 10:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TfzPfeXi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iCkjp2/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F62718E377
-	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 10:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B3818BC0F;
+	Tue, 31 Dec 2024 10:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735642570; cv=none; b=Swc1u1wgtwDAZso4FbmBXOBbuB/wvZC8FPlsCR4qU9E6GjE0qBYAK5CGDZgDsy06G+TuwHgm3LgcX15HetkPryt+wJETYriQLhyXVQyXOTMHMrOdH6lTHYh0EIxd8Q66aoydoeYBGSat+KGq2L7Xu6nqzg90ztzFcRDuo6yn5qM=
+	t=1735642614; cv=none; b=NUcPQOk/kqJcEBVdZyvyvUapOu4k+BHMZbGnZCdB5Iq01MaxM1EEvF6Viz8qSrO7dAvcv7mUyTtVp+9t382BNMV8+1OafWywSMaehlYnlBlshk8MiuQHBDz3ZSU382FHigJKYoFUYIdlIkYsq47mP7MPUXk83bq0HLNdx1l2erQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735642570; c=relaxed/simple;
-	bh=G7H3nSEYhfU88xeBEgpAwFAqVeR1hBBRPXdi4X38epw=;
+	s=arc-20240116; t=1735642614; c=relaxed/simple;
+	bh=6IhOFFBGVlGon7xFcUmHUtcry4bDwU0DjD7sRV8cVeY=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=UcocOyc6cTl7G2RfSOcIKCH5MvzEbdJuCw5ZphjgBhX3nJ9sL0HsJOXAEv08bpia5MGQBd8/3NLxay7GATAybtAA2ylIjOysXMJs+/4XvLncyDRSGPzwG5+lyASO44Y/TI3sedBnSX3VIm3VsLo4qxnYrN6+aubUBH93+eKOpjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TfzPfeXi; arc=none smtp.client-ip=209.85.222.174
+	 Mime-Version:Content-Type; b=IDgoqYyhE7nkKrwTx/ksyPnjydJAJ76CJmIbfXPO+Jns32BmZAJSAt1xv2T2GuViq6mcgxnKjwxYCCM9s6rqpoX2ceG9Qzw21dZmXfbPn+BW002mOFSM87tcSptddszBNEQQGsopCTM+eXK1zPZkr2kYt4/oRnNsW/WXl6Kvb8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iCkjp2/v; arc=none smtp.client-ip=209.85.219.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7b6c3629816so491489585a.1
-        for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 02:56:08 -0800 (PST)
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6dd15d03eacso90061086d6.0;
+        Tue, 31 Dec 2024 02:56:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735642567; x=1736247367; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1735642611; x=1736247411; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=68d+F6fn/HNxbUGdpXBaqtiO0lEsh81W9uHm7RXTDgM=;
-        b=TfzPfeXiK4eyAyWqs0lzixkJkQJCIVbpntVYhr5es47GZ8tRe8wVK/OIcleOgHyidV
-         w+hBnek4DUEQVmlDx55PDoK9MVugD1vOx6vjeMSlS0FF7OyHFKi+MOqVSFM7b78Dbg65
-         FUYA2VTGEvWn4wQXSMWm0l2Hymcyu3uw6lnWQsM0WWrqRreOtHdpsT2q3gKfF/a6DGJO
-         6pcTKCLLPA2GJhJF1py/y9c1oBxCptYZVJ1emRzDNvNuUJyFJxVYqUe2rQYJWLrISM42
-         RyLQ3x0YNStKGHM0qdU+p9mzRSkvhvgNwrWFHMrAYHdGC6EFoKySoS6njuQUBz6/vSk+
-         fP3g==
+        bh=eVf9BtSaYL/ucUiPbEF/cspxkDHYtLRGbWK/7ik53dg=;
+        b=iCkjp2/vMhQsyT3Thp53DR1HExahzmSBxVCx3s41pYZq6ttQGjVkmeHNyIHUIOPgn3
+         0U81gfL6S7GMKkxo4KP6P9Wov8Fp081mWHxJJGjl+rxLa4CnNr7m5jmumtDcmZ+Dm0FK
+         BuEQasaUrkSGF5b0qyNuXJx10kPDsuBv/3V6oouvtnyhAZFzoKNAS/4rCh5gPO99PW1m
+         EIC6E/BoWPOKKxCxY9jwIiJy5CHsa5OlNRVWdUMUHMw0xs3dEkkg5Rpqi14TjlR9eysk
+         joo40vz/2IHAPeKG+kfxihVVEaIhhHC1Zng8Po/i2/Vxdl8OaWcTPShCjPCMfaN1Pr6a
+         3SMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735642567; x=1736247367;
+        d=1e100.net; s=20230601; t=1735642611; x=1736247411;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=68d+F6fn/HNxbUGdpXBaqtiO0lEsh81W9uHm7RXTDgM=;
-        b=oON+Ws+m7qWScwEvhnttmoNugeDYhDRtGF/s1JNDpoRSID7feYkA3Wa24CGghy2DFk
-         VpUA0OziFUCUQGgYTJeyncfWi2+jaEpKzoCqCd6mjCICtl/GSFaYsuUKnhZzv9qEM2kC
-         1Iujl0aLC0XadOdh8kIvuxtHxK/CcV0JBWKLrjVSIiASNWq/EYb1IB+Q1C1ah2cJNLW2
-         1+BgOHXDEW62bvgs1/f9PoOK4jqgzhyOaEVRfHGg4c/0AA8YfxfaAfMvLThrJYUQL8li
-         kdGP5wcaAf0kPbNW+LEdziqb20WViAuCwhM/s5VIfQ0kjCi24fUEYrN2u2qrX58SkvBh
-         LJyw==
-X-Gm-Message-State: AOJu0YyER7m9M36GoQDYmM7b98a4IY4tyrchHfy7pH0D0Xi99GCrbbh6
-	GHKYRf9oYwNFWsbDJ/gfff3Kq+l6MMYkYn3wMGmVyAtP/b6y81wr
-X-Gm-Gg: ASbGncs7tQDeMRvty+j9VOcFFOmQwCxfwbgm5UObiCJRWXSEFaRXgegvko04gqsEnp4
-	NrcvlfhM3KGqprQSaD7XxhgydaL5IAWfXLP2IphX52gzSPww+lJYS6gBDYVCCFgxA7jgxVfo7DF
-	NiWh4t0LIA9aUcVfInPulWIXlcPNh5X0SUc6TdIaFD+hXlbZf6UPpVLgLiX45hmAWDLVtXs4Cpv
-	wT4H8Jnah67av1n0pgbH8DRz2V2W63S7KlC44RGCKqrz2g3dHLVAP0CkOffcQesWd7CtexyWpi0
-	6wO8T8mXjM7f4QmoQilyAAigFo7Qmw3SWA==
-X-Google-Smtp-Source: AGHT+IEcuKbFKVmKkF3m9w9e5PAeoMWjBFFLKpycp3R+ptm/imbQft5dogLCu31+UzZPzeGXnofGOQ==
-X-Received: by 2002:ac8:7fc2:0:b0:467:6505:e3c with SMTP id d75a77b69052e-46a4a8ea571mr680759901cf.24.1735642567474;
-        Tue, 31 Dec 2024 02:56:07 -0800 (PST)
+        bh=eVf9BtSaYL/ucUiPbEF/cspxkDHYtLRGbWK/7ik53dg=;
+        b=m3wk8NO3HtDAIWQUMkct+vUMgZnYwZERVMHvBX/ahANtNQqyd+dwWwxj7tg+YylIq5
+         OjaWhbastKFpqOwqs7/xBJ8EunX2vT1RWRJMAL57kgbLOxPj23rhqar9UG4BYoCqPEAD
+         ta64taVfa+S/BAGquFlpWx/vz5AVgD8UvI1UB3m3KCDGNWVzEV6eJvk0kOXjCRmcwT1Q
+         BWxjooPWSVZdVkMQj1bx+pBqDBy0zOwploHt3ISFsbFxd07nSDTVvO+viUfdLNIROgN3
+         Wk+YahcZVpQG7V8eEvm+o+eKIbtPT81qXexDr5o6ju4xWJgRr4BAbKv8csOg7sm06f4I
+         ncYA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1GrT7MgFoQlV1bcfKlt1btlscNU/j14BwB0oaedQvqLJ2CyUK9gDdJbiJH9bzhw0wx6NHW9TD@vger.kernel.org, AJvYcCUDnv2HWoX7kh2rTyHl8yyTPK7qNCciRuhR+WdpIOOPM0/c870AiQDxGLyP04V2O3mSiMZIYKNie50m5h0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPcgD1UJIQfXT4ayIQXCaj1M2LC1jhHc46UfnicS49DTxcmp2w
+	Lx3Jtk9RTgrCmx3XbLDPyEiQ+f0e/vLOjZKtXqushx83YYHxxNbS
+X-Gm-Gg: ASbGncseJmLieZyVCCfQcrmDgP6r5HXQANMR61RPpVm2WamdwPU1LizY9vQY4tD5Eem
+	ksA+LyBx2Lczq5ey61m/ViMXI9biJOpvWAFMWrYeVb0ayW7zvahSYkwKAUBHmn2dhzFj1gU9gJf
+	qu5KoeIp5FUdpSwCG5GdkNVqHDPdD4Wqc/pWoXlppB70z1kWiugxPv/On0CXLhDS9aBN/tud0Mg
+	Z+niryLcYejgAYsLtflg0hZ1rO6AI9u3CBEuPQ9ube6rqQ2/P7CGwuC2WCp7h3oHuhU63dMU8IT
+	PLtQLjUPHvBsvCvNtSoxxxbqVreM0qyNug==
+X-Google-Smtp-Source: AGHT+IFzmfVvlz56sdEQxjptOgpGuRk6qpG8s4MK0r22Cnh9LPdGmkP2V0xeiEAI234ok3HBHGgFpw==
+X-Received: by 2002:a05:6214:2586:b0:6d8:8283:4466 with SMTP id 6a1803df08f44-6dd155d058fmr670574456d6.18.1735642611609;
+        Tue, 31 Dec 2024 02:56:51 -0800 (PST)
 Received: from localhost (96.206.236.35.bc.googleusercontent.com. [35.236.206.96])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3eb336a9sm114534231cf.80.2024.12.31.02.56.06
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181d5638sm110263246d6.117.2024.12.31.02.56.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Dec 2024 02:56:06 -0800 (PST)
-Date: Tue, 31 Dec 2024 05:56:06 -0500
+        Tue, 31 Dec 2024 02:56:50 -0800 (PST)
+Date: Tue, 31 Dec 2024 05:56:50 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
+ =?UTF-8?B?QmVub8OudCBNb25pbg==?= <benoit.monin@gmx.fr>
+Cc: "David S. Miller" <davem@davemloft.net>, 
  Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>, 
- syzbot+74f70bb1cb968bf09e4f@syzkaller.appspotmail.com, 
- Chengen Du <chengen.du@canonical.com>
-Message-ID: <6773cdc68ea38_534e22949a@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241230161004.2681892-2-edumazet@google.com>
-References: <20241230161004.2681892-1-edumazet@google.com>
- <20241230161004.2681892-2-edumazet@google.com>
-Subject: Re: [PATCH net] af_packet: fix vlan_get_protocol_dgram() vs MSG_PEEK
+ Paolo Abeni <pabeni@redhat.com>, 
+ Jiri Pirko <jiri@resnulli.us>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <6773cdf25a15a_534e22946f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CANn89iK1hdC3Nt8KPhOtTF8vCPc1AHDCtse_BTNki1pWxAByTQ@mail.gmail.com>
+References: <5fbeecfc311ea182aa1d1c771725ab8b4cac515e.1729778144.git.benoit.monin@gmx.fr>
+ <CANn89iK1hdC3Nt8KPhOtTF8vCPc1AHDCtse_BTNki1pWxAByTQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net] net: skip offload for NETIF_F_IPV6_CSUM if ipv6
+ header contains extension
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,62 +98,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
 Eric Dumazet wrote:
-> Blamed commit forgot MSG_PEEK case, allowing a crash [1] as found
-> by syzbot.
-> 
-> Rework vlan_get_protocol_dgram() to not touch skb at all,
-> so that it can be used from many cpus on the same skb.
-> 
-> Add a const qualifier to skb argument.
-> 
-> [1]
-> skbuff: skb_under_panic: text:ffffffff8a8ccd05 len:29 put:14 head:ffff88807fc8e400 data:ffff88807fc8e3f4 tail:0x11 end:0x140 dev:<NULL>
-> ------------[ cut here ]------------
->  kernel BUG at net/core/skbuff.c:206 !
-> Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-> CPU: 1 UID: 0 PID: 5892 Comm: syz-executor883 Not tainted 6.13.0-rc4-syzkaller-00054-gd6ef8b40d075 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
->  RIP: 0010:skb_panic net/core/skbuff.c:206 [inline]
->  RIP: 0010:skb_under_panic+0x14b/0x150 net/core/skbuff.c:216
-> Code: 0b 8d 48 c7 c6 86 d5 25 8e 48 8b 54 24 08 8b 0c 24 44 8b 44 24 04 4d 89 e9 50 41 54 41 57 41 56 e8 5a 69 79 f7 48 83 c4 20 90 <0f> 0b 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3
-> RSP: 0018:ffffc900038d7638 EFLAGS: 00010282
-> RAX: 0000000000000087 RBX: dffffc0000000000 RCX: 609ffd18ea660600
-> RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
-> RBP: ffff88802483c8d0 R08: ffffffff817f0a8c R09: 1ffff9200071ae60
-> R10: dffffc0000000000 R11: fffff5200071ae61 R12: 0000000000000140
-> R13: ffff88807fc8e400 R14: ffff88807fc8e3f4 R15: 0000000000000011
-> FS:  00007fbac5e006c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fbac5e00d58 CR3: 000000001238e000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->   skb_push+0xe5/0x100 net/core/skbuff.c:2636
->   vlan_get_protocol_dgram+0x165/0x290 net/packet/af_packet.c:585
->   packet_recvmsg+0x948/0x1ef0 net/packet/af_packet.c:3552
->   sock_recvmsg_nosec net/socket.c:1033 [inline]
->   sock_recvmsg+0x22f/0x280 net/socket.c:1055
->   ____sys_recvmsg+0x1c6/0x480 net/socket.c:2803
->   ___sys_recvmsg net/socket.c:2845 [inline]
->   do_recvmmsg+0x426/0xab0 net/socket.c:2940
->   __sys_recvmmsg net/socket.c:3014 [inline]
->   __do_sys_recvmmsg net/socket.c:3037 [inline]
->   __se_sys_recvmmsg net/socket.c:3030 [inline]
->   __x64_sys_recvmmsg+0x199/0x250 net/socket.c:3030
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Fixes: 79eecf631c14 ("af_packet: Handle outgoing VLAN packets without hardware offloading")
-> Reported-by: syzbot+74f70bb1cb968bf09e4f@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/6772c485.050a0220.2f3838.04c5.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Chengen Du <chengen.du@canonical.com>
-> Cc: Willem de Bruijn <willemb@google.com>
+> On Thu, Oct 24, 2024 at 4:01=E2=80=AFPM Beno=C3=AEt Monin <benoit.monin=
+@gmx.fr> wrote:
+> >
+> > As documented in skbuff.h, devices with NETIF_F_IPV6_CSUM capability
+> > can only checksum TCP and UDP over IPv6 if the IP header does not
+> > contains extension.
+> >
+> > This is enforced for UDP packets emitted from user-space to an IPv6
+> > address as they go through ip6_make_skb(), which calls
+> > __ip6_append_data() where a check is done on the header size before
+> > setting CHECKSUM_PARTIAL.
+> >
+> > But the introduction of UDP encapsulation with fou6 added a code-path=
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> > where it is possible to get an skb with a partial UDP checksum and an=
+
+> > IPv6 header with extension:
+> > * fou6 adds a UDP header with a partial checksum if the inner packet
+> > does not contains a valid checksum.
+> > * ip6_tunnel adds an IPv6 header with a destination option extension
+> > header if encap_limit is non-zero (the default value is 4).
+> >
+> > The thread linked below describes in more details how to reproduce th=
+e
+> > problem with GRE-in-UDP tunnel.
+> >
+> > Add a check on the network header size in skb_csum_hwoffload_help() t=
+o
+> > make sure no IPv6 packet with extension header is handed to a network=
+
+> > device with NETIF_F_IPV6_CSUM capability.
+> >
+> > Link: https://lore.kernel.org/netdev/26548921.1r3eYUQgxm@benoit.monin=
+/T/#u
+> > Fixes: aa3463d65e7b ("fou: Add encap ops for IPv6 tunnels")
+> > Signed-off-by: Beno=C3=AEt Monin <benoit.monin@gmx.fr>
+> > ---
+> > changelog
+> > * v2:
+> >     - patch against net instead of net-next
+> >     - clarify documentation of NETIF_F_IPV6_CSUM
+> >     - add link to thread describing the problem
+> >     - add fixes tag
+> >     - use vlan_get_protocol to check for IPv6
+> > * v1:
+> >     - https://lore.kernel.org/netdev/0dc0c2af98e96b1df20bd36aeaed4eb4=
+e27d507e.1728056028.git.benoit.monin@gmx.fr/T/#u
+> > ---
+> >  net/core/dev.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index ea5fbcd133ae..8453e14d301b 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -3639,6 +3639,9 @@ int skb_csum_hwoffload_help(struct sk_buff *skb=
+,
+> >                 return 0;
+> >
+> >         if (features & (NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM)) {
+> > +               if (vlan_get_protocol(skb) =3D=3D htons(ETH_P_IPV6) &=
+&
+> > +                   skb_network_header_len(skb) !=3D sizeof(struct ip=
+v6hdr))
+> > +                       goto sw_checksum;
+> >                 switch (skb->csum_offset) {
+> >                 case offsetof(struct tcphdr, check):
+> >                 case offsetof(struct udphdr, check):
+> > @@ -3646,6 +3649,7 @@ int skb_csum_hwoffload_help(struct sk_buff *skb=
+,
+> >                 }
+> >         }
+> >
+> > +sw_checksum:
+> >         return skb_checksum_help(skb);
+> >  }
+> >  EXPORT_SYMBOL(skb_csum_hwoffload_help);
+> =
+
+> =
+
+> FYI, this patch broke BIG TCP over IPv6.
+> =
+
+> [  239.698598] Oops skb_network_header_len()=3D48 skb->len=3D67210
+> [  239.704122] skb len=3D67210 headroom=3D162 headlen=3D94 tailroom=3D0=
+
+>                mac=3D(162,14) mac_len=3D0 net=3D(176,48) trans=3D224
+>                shinfo(txflags=3D0 nr_frags=3D3 gso(size=3D1428 type=3D1=
+6 segs=3D47))
+>                csum(0x1000e0 start=3D224 offset=3D16 ip_summed=3D3
+> complete_sw=3D0 valid=3D0 level=3D0)
+>                hash(0xadf29e31 sw=3D0 l4=3D1) proto=3D0x86dd pkttype=3D=
+0 iif=3D0
+>                priority=3D0x18020 mark=3D0x0 alloc_cpu=3D46 vlan_all=3D=
+0x0
+>                encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=3D0=
+,
+
+I'm looking into the following fix
+
++++ b/net/core/dev.c
+@@ -3642,7 +3642,8 @@ int skb_csum_hwoffload_help(struct sk_buff *skb,
+ =
+
+        if (features & (NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM)) {
+                if (vlan_get_protocol(skb) =3D=3D htons(ETH_P_IPV6) &&
+-                   skb_network_header_len(skb) !=3D sizeof(struct ipv6hd=
+r))
++                   skb_network_header_len(skb) !=3D sizeof(struct ipv6hd=
+r) &&
++                   !ipv6_has_hopopt_jumbo(skb))
+                        goto sw_checksum;
 
