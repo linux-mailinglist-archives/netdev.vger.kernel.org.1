@@ -1,130 +1,111 @@
-Return-Path: <netdev+bounces-154611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A691C9FEC6A
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 03:37:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8439FEC7D
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 04:23:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCD063A29C4
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 02:37:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EE507A1584
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 03:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6236C44C94;
-	Tue, 31 Dec 2024 02:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F43F7DA88;
+	Tue, 31 Dec 2024 03:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jO5bHsX8"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja5ljk3lje4ms43mwaa.icoremail.net (zg8tmja5ljk3lje4ms43mwaa.icoremail.net [209.97.181.73])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97CD33C9
-	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 02:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.181.73
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B0A28E7;
+	Tue, 31 Dec 2024 03:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735612646; cv=none; b=lLdrMaSb7GtFZeLwXPTC2C9vqxsrXllz58/U9QJCzAi8iicG7x3XhxA4rmQMolgRcVGvJy2JHcvv2PtXTz/fjAStwctMCvFx0PwFKbwCLo13cbjkJNMiqZJ15NdKsbWQG4Yb5RVgzgafC9DsJBkv9L9rQ59M97gG8eX/oND6abQ=
+	t=1735615409; cv=none; b=LOTEjnxdSMJ7ryX+Lq1V635TBZFvpAYofISfN6FGA7/YjOUOxvV4lwhN4CfGZ0IDsz/Tot4qRpoydtDkhHDyOx9GikBxoQnyXrnRB52EvDwORckZ3m7oVwekbCFjucXZQa/qLsvBx9CCGaBzhE9U8AkbHYXy5ekqL3wf+Eyc5HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735612646; c=relaxed/simple;
-	bh=IDV/9wDnuOtLIBM41tT4dIeoGc1psv3ryfgfD6h8rms=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OYd7fMIz8pUcYL4OxH+4ggBYKzHBqnSIknXi/dvZHs54nKvCzVaDjMNH3cGCvqaHSXitYN8lr+JpGPAYjG4zNOMauhygYmm1e8BoOyqaDcRc2RYzjbrtJRyct0VxUo5Fp6HJub3byf8hm6y5eIs3L9EnLbvWmG5tC0JWLzCEUSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernelsoft.com; spf=pass smtp.mailfrom=kernelsoft.com; arc=none smtp.client-ip=209.97.181.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernelsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernelsoft.com
-Received: from localhost.localdomain (unknown [183.69.133.42])
-	by mail (Coremail) with SMTP id AQAAfwDHQt3gV3NnHE++Ag--.4054S2;
-	Tue, 31 Dec 2024 10:33:04 +0800 (CST)
-From: tianyu2 <tianyu2@kernelsoft.com>
-To: pabeni@redhat.com,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org
-Subject: [PATCH v3 net-next] ipv4: remove useless arg
-Date: Tue, 31 Dec 2024 10:36:10 +0800
-Message-Id: <20241231023610.1657926-1-tianyu2@kernelsoft.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1735615409; c=relaxed/simple;
+	bh=1BMCC/ejG0uVeQt4XhOANsrsiI4+TzlWT5g18YHtsXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kLe3dejqdxykvHCVatcdUs5fuwaydcqWZtjdhJ29lD900f7R0JU1BxqP7aSSXa3iblFPKH8eD6TqjrN7H4pBvznnPJ9+RByuo6nCYQae4ChExy78qKuw7j0s0De8z9d0GBItzD8LAErszdfw92TitoPGG8JImN/FNI+bdJDBXS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jO5bHsX8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82D4FC4CED0;
+	Tue, 31 Dec 2024 03:23:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735615408;
+	bh=1BMCC/ejG0uVeQt4XhOANsrsiI4+TzlWT5g18YHtsXg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jO5bHsX8N3FWzmo67rXJ6Y5zvqNRVNTetasfEKgBtJXmwBDyRT4xBSIme057mr5oJ
+	 3pSiJAqW0gG1/MgOZl5nR4lDwMiY9cAhtjTLAa+SJN9CMVgwBY0wcdJ7mOmZhm6MIQ
+	 ckC1X+WEWXsKOWE7X6LgA+eaGDwQLUDZSfpTW90llao9GHvOsaeJTUz4E59NblNfrp
+	 eNiYIpnIXD3y1Q0LA1a8WH4klJkMWOptcOj/dENrcoFhV+SqPP5KqOEm1e915oFMZf
+	 UDQkULYP2aOgb0TX+GpsrmDZz5YRGhQ3T9DP5ni1Qdmljc1Uaoz6KiUW+KiqMNtQgM
+	 oaTJEQI1gG7xw==
+Date: Mon, 30 Dec 2024 19:23:26 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
+ <davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
+ <guoxin09@huawei.com>, <helgaas@kernel.org>, <horms@kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <meny.yossefi@huawei.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+ <shenchenyang1@hisilicon.com>, <shijing34@huawei.com>,
+ <wulike1@huawei.com>, <zhoushuai28@huawei.com>
+Subject: Re: [PATCH net-next v01 1/1] hinic3: module initialization and
+ tx/rx logic
+Message-ID: <20241230192326.384fd21d@kernel.org>
+In-Reply-To: <20241230141435.2817079-1-gur.stavi@huawei.com>
+References: <20241227103134.21168df3@kernel.org>
+	<20241230141435.2817079-1-gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAfwDHQt3gV3NnHE++Ag--.4054S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw43Xw1xZw1ftw13try5Arb_yoW8tFykpF
-	W5Ka98ArWDWr48Wws2yFZrC34ayw1rWFyak3y5C343Kw1DKr40gFWDtFWYyr15KrWxW3W2
-	qFy29w43Gw4xAFJanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUk0b7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJw
-	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc2xSY4AK67AK6r4UMxAIw28I
-	cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
-	IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUXVWUAwCIc40Y0x0EwIxGrwCI
-	42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
-	IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280
-	aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUgdHjUUUUU
-X-CM-SenderInfo: xwld05zxs6yvxuqhz2xriwhudrp/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Yu Tian <tianyu2@kernelsoft.com>
+On Mon, 30 Dec 2024 16:14:35 +0200 Gur Stavi wrote:
+> > > The most popular combination in the last 3 decades was little endian
+> > > CPUs with big endian device interfaces. Endianity conversion was a
+> > > necessity and therefore endian annotation became standard practice.
+> > > But it was never symmetric, conversion to/from BE was more common than
+> > > conversion to/from LE.
+> > >
+> > > As the pendulum moved from horizontal market to vertical market and major
+> > > companies started to develop both hw and sw, the hw engineers transformed
+> > > proprietary parts of the interface to little endian to save extra work in
+> > > the sw. AWS did it. Azure did it. Huawei did it. These vertical companies
+> > > do not care about endianity of CPUs they do not use.
+> > > This is not "corporate verbiage" this is a real market shift.  
+> >
+> > Don't misquote me. You did it in your previous reply, now you're doing
+> > it again.
+> >
+> > If you don't understand what I'm saying you can ask for clarifications.
+> 
+> We studied previous submissions and followed their example.
+> Were the maintainers wrong to approve Amazon and Microsoft drivers?
 
-The "struct sock *sk" parameter in ip_rcv_finish_core is unused, which
-leads the compiler to optimize it out. As a result, the
-"struct sk_buff *skb" parameter is passed using x1. And this make kprobe
-hard to use.
+It's not a right or wrong question, more a cost/benefit question.
+I'm not sure the community benefits from merging every single company's
+paravirt driver, when virtio exists. I'd say having those drivers
+upstream is somewhere around neutral.
 
-Signed-off-by: Yu Tian <tianyu2@kernelsoft.com>
----
- net/ipv4/ip_input.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+BTW very often guidance for new drivers is set by problems with already
+merged drivers. Not that it's necessarily the case here, just sharing
+some general knowledge about the upstream process.
 
-diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
-index f0a4dda246ab..30a5e9460d00 100644
---- a/net/ipv4/ip_input.c
-+++ b/net/ipv4/ip_input.c
-@@ -314,7 +314,7 @@ static bool ip_can_use_hint(const struct sk_buff *skb, const struct iphdr *iph,
- 
- int tcp_v4_early_demux(struct sk_buff *skb);
- int udp_v4_early_demux(struct sk_buff *skb);
--static int ip_rcv_finish_core(struct net *net, struct sock *sk,
-+static int ip_rcv_finish_core(struct net *net,
- 			      struct sk_buff *skb, struct net_device *dev,
- 			      const struct sk_buff *hint)
- {
-@@ -442,7 +442,7 @@ static int ip_rcv_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
- 	if (!skb)
- 		return NET_RX_SUCCESS;
- 
--	ret = ip_rcv_finish_core(net, sk, skb, dev, NULL);
-+	ret = ip_rcv_finish_core(net, skb, dev, NULL);
- 	if (ret != NET_RX_DROP)
- 		ret = dst_input(skb);
- 	return ret;
-@@ -589,8 +589,7 @@ static struct sk_buff *ip_extract_route_hint(const struct net *net,
- 	return skb;
- }
- 
--static void ip_list_rcv_finish(struct net *net, struct sock *sk,
--			       struct list_head *head)
-+static void ip_list_rcv_finish(struct net *net, struct list_head *head)
- {
- 	struct sk_buff *skb, *next, *hint = NULL;
- 	struct dst_entry *curr_dst = NULL;
-@@ -607,7 +606,7 @@ static void ip_list_rcv_finish(struct net *net, struct sock *sk,
- 		skb = l3mdev_ip_rcv(skb);
- 		if (!skb)
- 			continue;
--		if (ip_rcv_finish_core(net, sk, skb, dev, hint) == NET_RX_DROP)
-+		if (ip_rcv_finish_core(net, skb, dev, hint) == NET_RX_DROP)
- 			continue;
- 
- 		dst = skb_dst(skb);
-@@ -633,7 +632,7 @@ static void ip_sublist_rcv(struct list_head *head, struct net_device *dev,
- {
- 	NF_HOOK_LIST(NFPROTO_IPV4, NF_INET_PRE_ROUTING, net, NULL,
- 		     head, dev, NULL, ip_rcv_finish);
--	ip_list_rcv_finish(net, NULL, head);
-+	ip_list_rcv_finish(net, head);
- }
- 
- /* Receive a list of IP packets */
--- 
-2.27.0
+> I don't understand what the problem is. Please clarify.
 
+Primarily the fact that you keep arguing as if joining the community
+was done by winning a fight. If annotating HW structures with endian
+is beyond your / your teams capabilities, that's okay, just replace
+the "will not be converted" with "are currently not converted" in 
+the comment.
+
+For your reference here are the development stats showing that
+Huawei is the biggest net-taker of code reviews in networking:
+https://lore.kernel.org/all/20241119191608.514ea226@kernel.org/
 
