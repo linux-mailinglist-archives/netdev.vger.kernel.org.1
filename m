@@ -1,121 +1,146 @@
-Return-Path: <netdev+bounces-154621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207019FEE4E
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 10:19:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F0C9FEE54
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 10:26:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E7617A1168
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 09:19:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EFB91882B7B
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 09:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A61C189915;
-	Tue, 31 Dec 2024 09:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE5F18E056;
+	Tue, 31 Dec 2024 09:26:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nXzeqw9/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j7tse4mo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63B9136E
-	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 09:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295FF18893C
+	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 09:26:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735636746; cv=none; b=B3RKNtVNc25C64SfJED5XYtjuj+pRaW4KjlNabftBcagA77/TrYWwi6QhEj0oFU3agyyvS2biXdnghcdmzq1OmqghPhVM+rLsjZ0miZQJryqVHcQFWp2szQsYN1hD3vme6IrGw8P/5aUVNEXLLENel+dD/LHUtMjixAT3CQ5Ytw=
+	t=1735637184; cv=none; b=YPuJUvtZCZsKVnA1EXRQpEZr9fyYoK2jcj+QVj3mVhcmfwt3EX35sfJweTmvEiCipq5LkwqDXIq4DkFPavX6ZCXt+XIjo6Pjgs5KdG3GOazqLpU33NPiZqWF4CW7imgMTPFcAw2Uigv5dTrSOFu0sxGbE3SR0sEcs2nYPu3UtKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735636746; c=relaxed/simple;
-	bh=H/DpE4eEMZpxgmbL96rSE6tUrsSMZ6Net8ZU1kK1Mgk=;
+	s=arc-20240116; t=1735637184; c=relaxed/simple;
+	bh=ywfmuqBmXRPqF0Q7AOsbWBgoEgRiXpFq7xv1uMDz3lI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mrS9MtFSH0tcWVSvEqkShcPPHaBxJVNf5fBUAHd17gw0cNXwUAhWzhIB9A+nbdsFQkBE/Z7jC9/SmU3U7l6IgHfCdyKXzpkGcATVOnUkEzw30OOYuj6ajNraJecZNFNCBTUrhsLkQ43Gh7QKUjKdwEw+SpHnjFa16zWiAvm5XfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nXzeqw9/; arc=none smtp.client-ip=209.85.208.52
+	 To:Cc:Content-Type; b=i1PetpRUHlsHzzCBxCNN+IQ0xBA/pWCNtPKWQbBAu3wVoL8yw+HG6bKH854qLaLNDHb8LCbtCkuphUy0ZEX0XTp+icQkzeUmQWC46ufSULaHoUYsaHySxcPiStN+UJv0HsBqqkDlfWXM9Tukiu6U8aB7iIKTXMHZ8mgg56QoSBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j7tse4mo; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5d7e3f1fdafso20087183a12.0
-        for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 01:19:04 -0800 (PST)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d3f28881d6so14079266a12.1
+        for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 01:26:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735636743; x=1736241543; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1735637181; x=1736241981; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Z28ITegE2MMH3jdCqG0rTlzcVDFy5oyc7gC5AwJYBiI=;
-        b=nXzeqw9/9OqhEoPu0g4aqTWkxpiYS/dydxO/swIizFN0aNMFEVNQEfa9HrreA4nRnK
-         TXuJ3gCvy4JVU55p2KfR3T9utXg6902CPSDWB3eSMfXjSJv1eNr0xUumR8w8TogMZnTt
-         K/VwxmvDyDIoIg6boTiwByuKq/eHWCvnxzcUnFlD/G/OwYjmw+89jEO4lKaRSC+zhpLe
-         yBAMqPyuYkcMaj29dpUDW24ip9NZdeRMDPPU/3k0Hw79BMoR6AdGFMgA/tI9vnzYies2
-         6x61Bt2lWnkg5U33YE0GNJ5cPeykJBs4ZIRMdsGgjy4x3bmV5z2CUZg+P5xXCboMIPGh
-         toTQ==
+        bh=Y5SXkBAsp8F9VQm+SK8XeFii/r51RJYtN2Lc7kbZ254=;
+        b=j7tse4moYXiUoHYHaBOq4f8TX+kEgt3YbygI8Fh9xCczfvh/9rZEYLd6euPl6zcBt7
+         WrIi7drh81+eVtjLQ7UBfC72T8RP0vn+5KR+F5HJcnbHyg0B+CEP2x+5jvn71Wy1H1t6
+         irrGOTGaCMT0ROvy6l4LccjjC+PFzzsODwNAkDlM+tUBMfmz5vMkO3X7uiktqrr4+uOR
+         gG+fvT5ps/txu9O1r7TByMgatCarAapIIMxlkNK+51A/SSh3eajPUn5u5wfuwkAX0C3A
+         G10CZMXDkJIgpvkUO6E470LRHudtfHtu/QfM1RhDOR2mY+plQot29tQrOOTewv6B0HV6
+         eSBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735636743; x=1736241543;
+        d=1e100.net; s=20230601; t=1735637181; x=1736241981;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Z28ITegE2MMH3jdCqG0rTlzcVDFy5oyc7gC5AwJYBiI=;
-        b=vx78SkJJ7UihOgsJexBHymxYtsvZ1ftjvSyaLi3qEVOkBfW8vb6DBP/YsNm9Fm401W
-         KGh5YSPCghc+bXFBClUaBZQjDx3DFMD+fiVlc9rlrKGYPzqAZ1is7sbs7i9m4Z55Kiw4
-         NRss3egnQucBHvSltirurK7cG5n0lobg7d4OId5Q4P5+zmubMzyLOQoO4LGNk9ktI78r
-         a5a5T0ZonK/xK39vxBjczJqI9loBWe5pDdwvEWvWB+Ua4eAcsWoW7lhV+bR6AWgsVBVt
-         njSBdElcotsa5Ddj87BkIeVd1oRrT0U2bf2dmCEA/6bc2RL1dbiDjD2hH294b+ITx+ka
-         2ecg==
-X-Gm-Message-State: AOJu0Yxk3NWjAh+yOfXfmIMsifN4f6EXWdVzLEr/AcJuxc9Du6r90pu2
-	c/+I2m/wZSEhPDGZh0hqZX8e8e49RYRJj15XoAZ8c++0K0+Kb6MdGQtKJOM3zLQTJEvI/YUiS7b
-	oHP4uuAvBLfdPRFnMqeuRAzDUmY9Tlk/faZ2sK6lCa7c2wVk+/A==
-X-Gm-Gg: ASbGnctAKJM8rLqf4jYZOkNfGEApfgNNMMmuXzRnazoo5kHbl1J9ofwJnv4Yfawya9b
-	oi5MHQCh8vGj1Q0pNsUNpELCm5tRSaXtITZvM
-X-Google-Smtp-Source: AGHT+IGZJfTF4PVVZEZ0sxAt8EylnWIZbznQlHvLkIhHX1fRLtQ1Gumojlo3QZDQ8mUXbCw90EpPs05BG00j26Iv7YM=
-X-Received: by 2002:a05:6402:2347:b0:5d0:cca6:233a with SMTP id
- 4fb4d7f45d1cf-5d81dd9cc7fmr39162074a12.10.1735636742923; Tue, 31 Dec 2024
- 01:19:02 -0800 (PST)
+        bh=Y5SXkBAsp8F9VQm+SK8XeFii/r51RJYtN2Lc7kbZ254=;
+        b=wUWs7Te3HQxQM8GLJb//SpHKLfaaHuGKVnv7/3G8a2axipfgfEATHAfYDluU33zFv4
+         H+2MV2kg4WioFZCkGyD6m4dELGP76F+Aay0Z2XirAPkTZDgzh18U/T7ibVo1U4bGZBdQ
+         ZioDlUY2wZknQvJZ9ifM1EBMbpsvHkpbFxH14LviJ9ueP33N5JgvYxd4RNM85KdXB6XO
+         qByWeRd57bg16lBTSr4DQa+e8qrIuelO0Lmb1M3x8C0sVIrOYS65snS2dEJ/T5v+SI8T
+         l4jv3YfW81lsssKP3guH3+PcWyXdVpHu1OR2gokcf7fHgLC4E28pNVxzCq9bG7lCo30I
+         NjGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTHEQFCLK8dGPW3CUsJyqChWq4CfbeaInT4FE5es7AZ+CmieH5QgEloctmvbPkG46eSTyVVqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybZS532vHBDHTjydgmrYRgaRrntHwkP+YvrFt+lKY9KWzSdWDN
+	VcaYaG9VVkoWVdSpAE2xTLN7LWOt1/Vz+XJlNwV5YTioehCGke7bhwSC15M+l1d8vnZPtZBSbTK
+	mqxKwm9+cZvZbS96EHiXyOmGHQ6DLgxwH8YdR
+X-Gm-Gg: ASbGncsTPHwV05rAajwkgELi/eO4HJweY2sLGuLJ3wnAoIX+1XGNOyxq1wC7Lvg74UB
+	pSaDe0dBInfgSeAwqt6BExJ/L09DwbyeJx9XW
+X-Google-Smtp-Source: AGHT+IEbOs5TVSlh5kiCq2cQ8aj1KD8xP1fK7v0bA5f+Jylbm4FmGScfUsHnEwmd1OD2CIN32IlRIeFp7xb5rCxtl+E=
+X-Received: by 2002:a05:6402:210f:b0:5d0:cfad:f71 with SMTP id
+ 4fb4d7f45d1cf-5d81de1c921mr88324415a12.32.1735637179824; Tue, 31 Dec 2024
+ 01:26:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFmV8Nc758FDNK3FNSLQui4RmE3-TQr7d2tM_tOM6bC=OfEDwQ@mail.gmail.com>
-In-Reply-To: <CAFmV8Nc758FDNK3FNSLQui4RmE3-TQr7d2tM_tOM6bC=OfEDwQ@mail.gmail.com>
+References: <20241231055207.9208-1-laoar.shao@gmail.com>
+In-Reply-To: <20241231055207.9208-1-laoar.shao@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 31 Dec 2024 10:18:52 +0100
-Message-ID: <CANn89i++A224Of5B+Eu+qfiQO1mXfXVfzuejuXyfCwtK1rmMDA@mail.gmail.com>
-Subject: Re: perhaps inet_csk_reqsk_queue_is_full should also allow zero backlog
-To: Zhongqiu Duan <dzq.aishenghu0@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com
+Date: Tue, 31 Dec 2024 10:26:08 +0100
+Message-ID: <CANn89iL2qZwc7YQLFC8FQzrn_doD4o13+Bk-0+63aGEFFo_7xA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: tcp: Define tcp_listendrop() as noinline
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 31, 2024 at 9:24=E2=80=AFAM Zhongqiu Duan <dzq.aishenghu0@gmail=
-.com> wrote:
+On Tue, Dec 31, 2024 at 6:52=E2=80=AFAM Yafang Shao <laoar.shao@gmail.com> =
+wrote:
 >
-> Hi all,
+> The LINUX_MIB_LISTENDROPS counter can be incremented for several reasons,
+> such as:
+> - A full SYN backlog queue
+> - SYN flood attacks
+> - Memory exhaustion
+> - Other resource constraints
 >
-> We use a proprietary library in our product, it passes hardcoded zero
-> as the backlog of listen().
-> It works fine when syncookies is enabled, but when we disable syncookies
-> by business requirement, no connection can be made.
+> Recently, one of our services experienced frequent ListenDrops. While
+> attempting to trace the root cause, we discovered that tracing the functi=
+on
+> tcp_listendrop() was not straightforward because it is currently inlined.
+> To overcome this, we had to create a livepatch that defined a non-inlined
+> version of the function, which we then traced using BPF programs.
 >
-> After some investigation, the problem is focused on the
-> inet_csk_reqsk_queue_is_full().
+>   $ grep tcp_listendrop /proc/kallsyms
+>   ffffffffc093fba0 t tcp_listendrop_x     [livepatch_tmp]
 >
-> static inline int inet_csk_reqsk_queue_is_full(const struct sock *sk)
-> {
->         return inet_csk_reqsk_queue_len(sk) >=3D
-> READ_ONCE(sk->sk_max_ack_backlog);
-> }
+> Through this process, we eventually determined that the ListenDrops were
+> caused by SYN attacks.
 >
-> I noticed that the stories happened to sk_acceptq_is_full() about this
-> in the past, like
-> the commit c609e6a (Revert "net: correct sk_acceptq_is_full()").
+> Since tcp_listendrop() is not part of the critical path, defining it as
+> noinline would make it significantly easier to trace and diagnose issues
+> without requiring workarounds such as livepatching. This function can be
+> used by kernel modules like smc, so export it with EXPORT_SYMBOL_GPL().
 >
-> Perhaps we can also avoid the problem by using ">" in the decision
-> condition like
-> `inet_csk_reqsk_queue_len(sk) > READ_ONCE(sk->sk_max_ack_backlog)`.
+> After that change, the result is as follows,
 >
-> Best regards,
-> Zhongqiu
+>   $ grep tcp_listendrop /proc/kallsyms
+>   ffffffffb718eaa0 T __pfx_tcp_listendrop
+>   ffffffffb718eab0 T tcp_listendrop
+>   ffffffffb7e636b8 r __ksymtab_tcp_listendrop
+>
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> --
 
-Not sure I understand the issue you have, it seems to Work As Intended ?
+Are we going to accept one patch at a time to un-inline all TCP
+related functions in the kernel ?
 
-If you do not post a RFC patch, it is hard to follow what is the suggestion=
-.
+My understanding is that current tools work fine. You may need to upgrade y=
+ours.
+
+# perf probe -a tcp_listendrop
+Added new events:
+  probe:tcp_listendrop (on tcp_listendrop)
+  probe:tcp_listendrop (on tcp_listendrop)
+  probe:tcp_listendrop (on tcp_listendrop)
+  probe:tcp_listendrop (on tcp_listendrop)
+  probe:tcp_listendrop (on tcp_listendrop)
+  probe:tcp_listendrop (on tcp_listendrop)
+  probe:tcp_listendrop (on tcp_listendrop)
+  probe:tcp_listendrop (on tcp_listendrop)
+
+You can now use it in all perf tools, such as:
+
+perf record -e probe:tcp_listendrop -aR sleep 1
 
