@@ -1,77 +1,46 @@
-Return-Path: <netdev+bounces-154618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E3F39FED7D
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 08:42:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327479FED8B
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 08:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADCAC3A2A52
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 07:42:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D0C57A1439
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 07:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1882C18BC0F;
-	Tue, 31 Dec 2024 07:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF88188704;
+	Tue, 31 Dec 2024 07:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="QsKlaobR"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fVbpqz5h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC02188580
-	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 07:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F842A1D7
+	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 07:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735630941; cv=none; b=FymASvDFOe7bKU8huvIWAeIjqvGl2ZvRzsiySMehBYoeXExfgUx+DdHBbVao3cJHeqxt6HIVzymFROcWdQD7/fPQIZM2hJFWE+o0J/24K1ZgwpTB5zPG9K6aZB78cH4COx3VWTrzG7FUyznHonW2gokwj0htvLAD0dNsdZawj50=
+	t=1735631754; cv=none; b=K7/zXnspWODNnfYNQBODRw20nC5nlEWRYh9A4IIZUTlTAKr1QJKbCVOk61O1V8BB/7tMYdyFLk5xC2EQ1iYX2nMymHhcmdOFSAih45I7fKXft13Xh7IVuavJ8Tj48z7u5smfFk0UlQxhdhgZxKQfJ9MUlmxztH6+e54AUIfzskI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735630941; c=relaxed/simple;
-	bh=OIIIHvRIxIHxEBMmDuGdkER/XB9yAK9pRHFHJSHH2Nk=;
+	s=arc-20240116; t=1735631754; c=relaxed/simple;
+	bh=aAoXvraYYtABXdrWPmEoAQTlXKpy/6sCKrijSrQZN5k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tlbjeWlRKpDIAYG7wk9s1UamtlIUN53fXQRQVlcp2k9eD594SCbM8xb+NC4u6RGFtlqrxmgIMlyWR7yPp2iu0iA3DCyFMPQpwQFxXwWgBGluaSsSlG/fgSW2Ggyz9wkgceJ5F1mRdyVHgm6LuFQwyuUl/u6q+h+9TpYc3/UGwKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=QsKlaobR; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-aaf3c3c104fso478537666b.1
-        for <netdev@vger.kernel.org>; Mon, 30 Dec 2024 23:42:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1735630935; x=1736235735; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SUQ/117o2pVOfsQwHm9Em7LXO/LveElAMhz4OgmXTrM=;
-        b=QsKlaobRqW5WfgOLJhs3QcoRm+6VquQKBWzay6xhNFGXTR/J8tRL5fHdZXwS6n6ssu
-         ob4lTP/qIo8breSwvXl5AKNPmLpgSlDU2ndSA41l7rajEVgsfHqMsBgN1xyPchfVwyQZ
-         13B07bRIq4h79LY9QxF1/VcRBL3nruIOZTvyAIY7tdmJofoJ7g+6imCdGI/plziHJkTZ
-         NLBrso+YDg8dVzCrVtNlIgbUOdZ5yK0jxHYnZ+YvMMPMfricNI6pAonwwKZLBO3glz0s
-         Rq5kt+Q2w1oaWyIGj8Vsjz6mlIMbd80sgreGa4+x1wRsnFp48uCOfT1Ifh+rC4ho1/3d
-         YR8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735630935; x=1736235735;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SUQ/117o2pVOfsQwHm9Em7LXO/LveElAMhz4OgmXTrM=;
-        b=pFJ/JL7qyZm/Ex3PqVDHBv8oSqOLJ6eVt3q9clbhM117LtvOjEtNDKzW/w+rz2lhBC
-         UxGbrAmzR2SAoffUWfiJpnOWv669gbCahEc+49Dzl/V2RX8IfVypWfVSazojJYfD4uzl
-         Z7YAWnL2ChL64118M6MwVG69ESfBSAPhB5THIfcr1pFCVVFcRvxyW+rwH4AkR6P6jlv0
-         0qkPRlR9EEPqUdfPymvPgrMFMNVNxfBX6ArCugumGcGulFbU78NRdHNEYMOovFc07jud
-         E2VziaTN7Ttq8vcHLvGOeJQWqg2RbNd4WWDYwwWaH0Xmi6kQRk8VHWD6+uiHcs5Bu0TP
-         3oUQ==
-X-Gm-Message-State: AOJu0YzOG8sV+73rr4c89W6aHKjKeuGSjw6mR8oihhHNbDtVyynBlQN5
-	3m9w2IO2ho9RW6S0Fh1JE6WuiGkqtMnoIYAraHkj7HWWcRRAb9p3JcWJ5H8/nfI=
-X-Gm-Gg: ASbGnctrhVYcdCO8285EJgEuwQGhHY67fmj1Q4mgU/Ph6cNDzL7bCRmKYmdgxNSJmQn
-	Ps64NmC9OqxpYYrhI3rCovH3pm1ilIF7r5bG/oXQ/fbPyrnz8Rx78FhLWJAFW+PakPHOIknwVn1
-	As/ijUJedDohrIyyKx8Mi1wa0yQUbGJCrrPDZC+IOzhTEDYF/JRr05/kg4rS7aaxrOToc6lAg7C
-	wxRQEG7qv13JSLH97mW2JPo+A+FJvZLxoTojwspY+f0Qt8H1RCox4zqpcsVUNq5Hg==
-X-Google-Smtp-Source: AGHT+IHJ3LZn/dw6Q3RdklojRoLZ4JYqxGeF/O2KsycT1HvQOXnJk5lDUSk8vRMOcWtIAvIoEXjYaQ==
-X-Received: by 2002:a17:907:7f8e:b0:aa6:995d:9ee8 with SMTP id a640c23a62f3a-aac2702ae5cmr3305806366b.5.1735630935342;
-        Mon, 30 Dec 2024 23:42:15 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1000::1001? ([2001:67c:2fbc:1000::1001])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e89490dsm1538233666b.45.2024.12.30.23.42.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Dec 2024 23:42:14 -0800 (PST)
-Message-ID: <97f8ebf1-bdea-4084-aadd-360d02d00d85@openvpn.net>
-Date: Tue, 31 Dec 2024 08:42:11 +0100
+	 In-Reply-To:Content-Type; b=c3ZqLiUr7rRPZSBwHenprpCQCa5v/v9Koe/TC2wpt6yjXSSGRiZ01AUF8rXdGWi094RZNiAuPF4MUX410GQjVT0QPleCmwNqm2oJUkxmbMTHsN8/AUqjM51qJ4OwXMzqjgBy+VTlvWiEcZu1c6zxNB+vxnfp7v9+Jcffy3pQ8Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fVbpqz5h; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1735631743; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=rJz/U5gIYA6bBbkhs9mwrZtPLkx3bcgkfkdwlensV4M=;
+	b=fVbpqz5hWxMOLfB/yCKMDnAZWTprnx7TJxVsVr/Bf9B02h4LZELLDbQ5fidLUly+OXEZH+45bIUOuJZ+22fB0CKEepf8cyL0l+yhnWvELnxW5mzSz57ZTdMdBdzSx3IR0S8a1BRoXvghS/HzwSQH5C6UStuEotiBgn6prizLNkE=
+Received: from 30.221.144.94(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WMdGB4o_1735631741 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 31 Dec 2024 15:55:42 +0800
+Message-ID: <febf62f6-7439-4628-ad47-041ebbb86ede@linux.alibaba.com>
+Date: Tue, 31 Dec 2024 15:55:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,57 +48,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v16 26/26] testing/selftests: add test tool and
- scripts for ovpn module
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Xiao Liang <shaw.leon@gmail.com>, Shuah Khan <skhan@linuxfoundation.org>
-References: <20241219-b4-ovpn-v16-0-3e3001153683@openvpn.net>
- <20241219-b4-ovpn-v16-26-3e3001153683@openvpn.net>
- <20241219200222.4b0365b7@kernel.org>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-In-Reply-To: <20241219200222.4b0365b7@kernel.org>
+Subject: Re: [PATCH net] udp: fix l4 hash after reconnect
+To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Fred Chen <fred.cc@alibaba-inc.com>,
+ Cambda Zhu <cambda@linux.alibaba.com>, Willem de Bruijn
+ <willemb@google.com>, Stefano Brivio <sbrivio@redhat.com>
+References: <4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com>
+ <CANn89i+aKNhzYKo3H3gx5Uhy4iPQ4p=6WDDF-0brGyR=PzJqjQ@mail.gmail.com>
+ <CANn89i+k11E9XeJZwvgZ7VO0yr1nWge8+U-ESw2GLYDq7-sdBw@mail.gmail.com>
+ <b46a7757-f311-4656-a114-68381d9856e3@redhat.com>
+ <a4085013-daaf-4141-af56-cd438bf8b4c9@linux.alibaba.com>
+ <63b0f262-066a-4f7b-b55a-a7f0ed4aa7f4@redhat.com>
+From: Philo Lu <lulie@linux.alibaba.com>
+In-Reply-To: <63b0f262-066a-4f7b-b55a-a7f0ed4aa7f4@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 20/12/24 05:02, Jakub Kicinski wrote:
-> On Thu, 19 Dec 2024 02:42:20 +0100 Antonio Quartulli wrote:
->> +uint64_t nla_get_uint(struct nlattr *attr)
->> +{
->> +	if (nla_len(attr) == sizeof(uint32_t))
->> +		return nla_get_u32(attr);
->> +	else
->> +		return nla_get_u64(attr);
->> +}
-> 
-> Fedora 41 has: libnl3 3.11.0
-> which already defines nla_get_uint()
-> 
-> ovpn-cli.c:46:10: error: conflicting types for ‘nla_get_uint’; have ‘uint64_t(struct nlattr *)’ {aka ‘long unsigned int(struct nlattr *)’}
->     46 | uint64_t nla_get_uint(struct nlattr *attr)
->        |          ^~~~~~~~~~~~
-> In file included from /usr/include/libnl3/netlink/msg.h:11,
->                   from /usr/include/libnl3/netlink/genl/genl.h:10,
->                   from ovpn-cli.c:26:
-> /usr/include/libnl3/netlink/attr.h:126:25: note: previous declaration of ‘nla_get_uint’ with type ‘uint64_t(const struct nlattr *)’ {aka ‘long unsigned int(const struct nlattr *)’}
->    126 | extern uint64_t         nla_get_uint(const struct nlattr *);
->        |                         ^~~~~~~~~~~~
+Hi Paolo, hi Eric,
 
-dang!
-I guess I will just rename this function to avoid the clash for the time 
-being.
+On 2024/12/10 16:32, Paolo Abeni wrote:
+> On 12/7/24 03:34, Philo Lu wrote:
+>> On 2024/12/7 00:23, Paolo Abeni wrote:
+>>> On 12/6/24 17:01, Eric Dumazet wrote:
+>>>> BTW, it seems that udp_lib_rehash() does the udp_rehash4()
+>>>> only if the hash2 has changed.
+>>>
+>>> Oh, you are right, that requires a separate fix.
+>>>
+>>> @Philo: could you please have a look at that? basically you need to
+>>> check separately for hash2 and hash4 changes.
+>>
+>> This is a good question. IIUC, the only affected case is when trying to
+>> re-connect another remote address with the same local address
+> 
+> AFAICS, there is also another case: when re-connection using a different
+> local addresses with the same l2 hash...
+> 
+>> (i.e.,
+>> hash2 unchanged). And this will be handled by udp_lib_hash4(). So in
+>> udp_lib_rehash() I put rehash4() inside hash2 checking, which means a
+>> passive rehash4 following rehash2.
+> 
+> ... but even the latter case should be covered from the above.
+> 
+>> So I think it's more about the convention for rehash. We can choose the
+>> better one.
+> 
+> IIRC a related question raised during code review for the udp L4 hash
+> patches. Perhaps refactoring the code slightly to let udp_rehash()
+> really doing the re-hashing and udp_hash really doing only the hashing
+> could be worth.
+> 
+
+I'm trying to unify rehash() for both hash2 and hash4 in 
+__ip4_datagram_connect, when I noticed the inet_rcv_saddr checking 
+before calling rehash():
+
+```
+if (!inet->inet_rcv_saddr) {
+	inet->inet_rcv_saddr = fl4->saddr;
+	if (sk->sk_prot->rehash)
+		sk->sk_prot->rehash(sk);
+}
+```
+This means inet_rcv_saddr is reset at most once no matter how many times 
+connect() is called. I'm not sure if this is by-design for some reason? 
+Or can I remove this checking? like:
+
+--- a/net/ipv4/datagram.c
++++ b/net/ipv4/datagram.c
+@@ -67,11 +67,9 @@ int __ip4_datagram_connect(struct sock *sk, struct 
+sockaddr *uaddr, int addr_len
+         inet->inet_dport = usin->sin_port;
+         if (!inet->inet_saddr)
+                 inet->inet_saddr = fl4->saddr;
+-       if (!inet->inet_rcv_saddr) {
+-               inet->inet_rcv_saddr = fl4->saddr;
+-               if (sk->sk_prot->rehash)
+-                       sk->sk_prot->rehash(sk);
+-       }
++       inet->inet_rcv_saddr = fl4->saddr;
++       if (sk->sk_prot->rehash)
++               sk->sk_prot->rehash(sk);
+         reuseport_has_conns_set(sk);
+         sk->sk_state = TCP_ESTABLISHED;
+         sk_set_txhash(sk);
+
 
 Thanks.
-
-Regards,
-
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+Philo
 
 
