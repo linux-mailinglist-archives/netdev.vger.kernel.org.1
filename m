@@ -1,144 +1,107 @@
-Return-Path: <netdev+bounces-154619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 327479FED8B
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 08:56:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E52ED9FEDF3
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 09:24:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D0C57A1439
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 07:55:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E825C18818FA
+	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 08:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF88188704;
-	Tue, 31 Dec 2024 07:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5FF18B482;
+	Tue, 31 Dec 2024 08:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fVbpqz5h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZhQDqlY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F842A1D7
-	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 07:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91FFE7346D
+	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 08:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735631754; cv=none; b=K7/zXnspWODNnfYNQBODRw20nC5nlEWRYh9A4IIZUTlTAKr1QJKbCVOk61O1V8BB/7tMYdyFLk5xC2EQ1iYX2nMymHhcmdOFSAih45I7fKXft13Xh7IVuavJ8Tj48z7u5smfFk0UlQxhdhgZxKQfJ9MUlmxztH6+e54AUIfzskI=
+	t=1735633485; cv=none; b=tTG0ISG+/zPunSGZ4qmfQ7tlmdrQTaV6wyOeTDCCJxUek9f4BOvHSEu5inD/HSLk9wm5jiflNIIzMtc93WGJgPLnz/10mpabrsZfyNj1KMHnHO+V5mLjZS/Q+dEYfSJeFQaZFATd82tBmH3kGE64NJidg7Q4aqcUOrUAv/q7eoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735631754; c=relaxed/simple;
-	bh=aAoXvraYYtABXdrWPmEoAQTlXKpy/6sCKrijSrQZN5k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c3ZqLiUr7rRPZSBwHenprpCQCa5v/v9Koe/TC2wpt6yjXSSGRiZ01AUF8rXdGWi094RZNiAuPF4MUX410GQjVT0QPleCmwNqm2oJUkxmbMTHsN8/AUqjM51qJ4OwXMzqjgBy+VTlvWiEcZu1c6zxNB+vxnfp7v9+Jcffy3pQ8Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fVbpqz5h; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1735631743; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=rJz/U5gIYA6bBbkhs9mwrZtPLkx3bcgkfkdwlensV4M=;
-	b=fVbpqz5hWxMOLfB/yCKMDnAZWTprnx7TJxVsVr/Bf9B02h4LZELLDbQ5fidLUly+OXEZH+45bIUOuJZ+22fB0CKEepf8cyL0l+yhnWvELnxW5mzSz57ZTdMdBdzSx3IR0S8a1BRoXvghS/HzwSQH5C6UStuEotiBgn6prizLNkE=
-Received: from 30.221.144.94(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WMdGB4o_1735631741 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 31 Dec 2024 15:55:42 +0800
-Message-ID: <febf62f6-7439-4628-ad47-041ebbb86ede@linux.alibaba.com>
-Date: Tue, 31 Dec 2024 15:55:39 +0800
+	s=arc-20240116; t=1735633485; c=relaxed/simple;
+	bh=boAkVgwDkDq86GrtDZcXNju34b+vULme4fgGVvQ3IKg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=VFeKdwN+T3Hoy1ydssst8OhrhZ12pyRw5bF9XwJdkPG+pxg0irD2rMOCFdTNLQLmEK5otFTjps8VahYZIg3pxooQg7KURKCQRzV1KsnDIDgutM6VssvWAHAmhtBhV5CKO8dG1pBHUXrZcjuVLNIALQHF2MqtT8OAx1/I93LadJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DZhQDqlY; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6dcd4f1aaccso13593736d6.2
+        for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 00:24:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735633482; x=1736238282; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cpnSDAjRDy6pJCC9eyTbrQpSlLZuHJWfxitQ0oNeIFE=;
+        b=DZhQDqlYWxEVoI38cWD0lKlhjbrw51MnTzqZhB3sanCafO2DuEEfYmWp3aleCT5e0S
+         n+SrbnRcnRsSgCFdVH4kAoarXZzXCTwjq72Vhy+Y3LgDEU/wtT6JvdFMxUeUEn7jRye+
+         EHBNMZ6VL3ztBJpLK9i04VtJOFVay5kR96eNZB2p8VI3RpDTg0EJZCv2KaN7/lqr87B3
+         DOjSPPBZjbS9sKAwWrOAvyZwYi5b7C2tC7T+0z1WltWgTUIuUBOdcT7/SfxYSCblJNSB
+         HNh9a1Zv/lLknk9LFEq7/c0HsbHElOmWezpnOUKBZ5nGanbo7xg2ZTHHnM5Z4ppUVVPn
+         3xqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735633482; x=1736238282;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cpnSDAjRDy6pJCC9eyTbrQpSlLZuHJWfxitQ0oNeIFE=;
+        b=faHMJqri5HsGlKGkC2BmLrpvfrOdDYbg22tcdkBUBppPwxNExd3zD8/HJDzp/WATU4
+         5PwpZg1SF68mK7cSwsCmOmVcMefvSOyC8NE/alTjxiF6Nl9LXj+g9TvK/t/yQiyuFagi
+         he0lU6iz1FxIN92ZB7DHaYYnAQB1j5YRd4PcRoXorEpYpZ2TlsGdpFXANsN5bebnFtAq
+         8Gy+wFBP7SHt1tdqVFAi4bXTIWwENwHUaneQNAlLCUF7sSwI/6NP0d6yD5laHl2+lBa6
+         WWApx0zLTl27aXdN7ZWpiBdl73SLj9loc66vlhD9iQY/A2PgdwlUNOkMwJeauMxBbhTN
+         W6Mw==
+X-Gm-Message-State: AOJu0Yx4vxEuAs2lVRaC9jJWAXIDCNgLhFBsTlr7Hg7XxSf5DuiYxod7
+	kFAbUf2lRpZGIftkmAjeFPJM2Rh+x8UXIIB8tMbMOd9MbiMefftHfp5qTqvY6RWVWXoTOYIEcHB
+	ZjjYgIffP0q6EdKhC3ZoZPItHIE0O48QucXQ=
+X-Gm-Gg: ASbGncvzJ2iGtaxTRsnwtS5/VV+FU82K09HVr184qt4H9FKPCDIGJrSLl/kQHDLJShY
+	u94HLAmhlhgRb/XrS1sPTRjNLiWu+opEttEmgXA==
+X-Google-Smtp-Source: AGHT+IHbw+qWbNzIjeVcFllVI01+Re70nM6qbcEXiS1YYOcH1w5p1aJRH1u8q8IwjzPYUueznJ6thW2j8Jss9UbBSJg=
+X-Received: by 2002:a05:6214:519a:b0:6d8:9be9:7d57 with SMTP id
+ 6a1803df08f44-6dd2338c77emr576645706d6.37.1735633482445; Tue, 31 Dec 2024
+ 00:24:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] udp: fix l4 hash after reconnect
-To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Fred Chen <fred.cc@alibaba-inc.com>,
- Cambda Zhu <cambda@linux.alibaba.com>, Willem de Bruijn
- <willemb@google.com>, Stefano Brivio <sbrivio@redhat.com>
-References: <4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com>
- <CANn89i+aKNhzYKo3H3gx5Uhy4iPQ4p=6WDDF-0brGyR=PzJqjQ@mail.gmail.com>
- <CANn89i+k11E9XeJZwvgZ7VO0yr1nWge8+U-ESw2GLYDq7-sdBw@mail.gmail.com>
- <b46a7757-f311-4656-a114-68381d9856e3@redhat.com>
- <a4085013-daaf-4141-af56-cd438bf8b4c9@linux.alibaba.com>
- <63b0f262-066a-4f7b-b55a-a7f0ed4aa7f4@redhat.com>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <63b0f262-066a-4f7b-b55a-a7f0ed4aa7f4@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Zhongqiu Duan <dzq.aishenghu0@gmail.com>
+Date: Tue, 31 Dec 2024 16:24:31 +0800
+Message-ID: <CAFmV8Nc758FDNK3FNSLQui4RmE3-TQr7d2tM_tOM6bC=OfEDwQ@mail.gmail.com>
+Subject: perhaps inet_csk_reqsk_queue_is_full should also allow zero backlog
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Paolo, hi Eric,
+Hi all,
 
-On 2024/12/10 16:32, Paolo Abeni wrote:
-> On 12/7/24 03:34, Philo Lu wrote:
->> On 2024/12/7 00:23, Paolo Abeni wrote:
->>> On 12/6/24 17:01, Eric Dumazet wrote:
->>>> BTW, it seems that udp_lib_rehash() does the udp_rehash4()
->>>> only if the hash2 has changed.
->>>
->>> Oh, you are right, that requires a separate fix.
->>>
->>> @Philo: could you please have a look at that? basically you need to
->>> check separately for hash2 and hash4 changes.
->>
->> This is a good question. IIUC, the only affected case is when trying to
->> re-connect another remote address with the same local address
-> 
-> AFAICS, there is also another case: when re-connection using a different
-> local addresses with the same l2 hash...
-> 
->> (i.e.,
->> hash2 unchanged). And this will be handled by udp_lib_hash4(). So in
->> udp_lib_rehash() I put rehash4() inside hash2 checking, which means a
->> passive rehash4 following rehash2.
-> 
-> ... but even the latter case should be covered from the above.
-> 
->> So I think it's more about the convention for rehash. We can choose the
->> better one.
-> 
-> IIRC a related question raised during code review for the udp L4 hash
-> patches. Perhaps refactoring the code slightly to let udp_rehash()
-> really doing the re-hashing and udp_hash really doing only the hashing
-> could be worth.
-> 
+We use a proprietary library in our product, it passes hardcoded zero
+as the backlog of listen().
+It works fine when syncookies is enabled, but when we disable syncookies
+by business requirement, no connection can be made.
 
-I'm trying to unify rehash() for both hash2 and hash4 in 
-__ip4_datagram_connect, when I noticed the inet_rcv_saddr checking 
-before calling rehash():
+After some investigation, the problem is focused on the
+inet_csk_reqsk_queue_is_full().
 
-```
-if (!inet->inet_rcv_saddr) {
-	inet->inet_rcv_saddr = fl4->saddr;
-	if (sk->sk_prot->rehash)
-		sk->sk_prot->rehash(sk);
+static inline int inet_csk_reqsk_queue_is_full(const struct sock *sk)
+{
+        return inet_csk_reqsk_queue_len(sk) >=
+READ_ONCE(sk->sk_max_ack_backlog);
 }
-```
-This means inet_rcv_saddr is reset at most once no matter how many times 
-connect() is called. I'm not sure if this is by-design for some reason? 
-Or can I remove this checking? like:
 
---- a/net/ipv4/datagram.c
-+++ b/net/ipv4/datagram.c
-@@ -67,11 +67,9 @@ int __ip4_datagram_connect(struct sock *sk, struct 
-sockaddr *uaddr, int addr_len
-         inet->inet_dport = usin->sin_port;
-         if (!inet->inet_saddr)
-                 inet->inet_saddr = fl4->saddr;
--       if (!inet->inet_rcv_saddr) {
--               inet->inet_rcv_saddr = fl4->saddr;
--               if (sk->sk_prot->rehash)
--                       sk->sk_prot->rehash(sk);
--       }
-+       inet->inet_rcv_saddr = fl4->saddr;
-+       if (sk->sk_prot->rehash)
-+               sk->sk_prot->rehash(sk);
-         reuseport_has_conns_set(sk);
-         sk->sk_state = TCP_ESTABLISHED;
-         sk_set_txhash(sk);
+I noticed that the stories happened to sk_acceptq_is_full() about this
+in the past, like
+the commit c609e6a (Revert "net: correct sk_acceptq_is_full()").
 
+Perhaps we can also avoid the problem by using ">" in the decision
+condition like
+`inet_csk_reqsk_queue_len(sk) > READ_ONCE(sk->sk_max_ack_backlog)`.
 
-Thanks.
--- 
-Philo
-
+Best regards,
+Zhongqiu
 
