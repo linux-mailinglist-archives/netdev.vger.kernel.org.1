@@ -1,91 +1,62 @@
-Return-Path: <netdev+bounces-154642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F021B9FF138
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 19:33:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B2D89FF2AA
+	for <lists+netdev@lfdr.de>; Wed,  1 Jan 2025 01:42:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 954427A1611
-	for <lists+netdev@lfdr.de>; Tue, 31 Dec 2024 18:33:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABDD93A2E36
+	for <lists+netdev@lfdr.de>; Wed,  1 Jan 2025 00:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8862719AD48;
-	Tue, 31 Dec 2024 18:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21371FA4;
+	Wed,  1 Jan 2025 00:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/x0cIZs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oVvQSp0W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5D1182D9
-	for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 18:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABAD2366
+	for <netdev@vger.kernel.org>; Wed,  1 Jan 2025 00:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735670024; cv=none; b=eiW/dB6s7OauqepLCyABPCefDdHc2r52Tq+t07O6DqzW2iM+510nikGGa96f1WvVJbW5Y5CQvsLqQUxnKCAOMu7Q70v4BZU3dMdJOeoP1sLH1FYjk5i0FngUrWTnx51J/Md0WW4QCnTBjOA9wEpUXlTaS7wwh1c8a797dxEcvEY=
+	t=1735692122; cv=none; b=NG/qQfaIFGZDEN0w/Lq182rA1iAlut/WF2iW0N+lvDuUdbzycdiKevpg3YOTkUMSc4F4pZ+E2rJ1WDT/q3CDsnh2cqnu4heUEnJ/08cccgW3VVWGiAkYsQbYybHeYhB1J0Jn2LKSq2gu9NwWcQN9Y2p6mvTbG6BkpwrmaiwTgqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735670024; c=relaxed/simple;
-	bh=YqDuTMsvsgnfwyS47P72D+A3NQO/L+5t/+aVuGk36ng=;
+	s=arc-20240116; t=1735692122; c=relaxed/simple;
+	bh=Rxzn41NWH+o9X/E5aYIW+SRs3jvyU7BqhmOy8qIcoMk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hUUf92NMSapY3nrTVUu8QfJbc2/hcZ8xAVp0ZBiPj9ns/7Pd/smbK5Y6JxSD4OZNSaikGFs0dL981nJUinq52IVdmU1wTXhkQzY/mzAtC0HZYD0AdRl0PQM+dldtB+R9K0PUMLsWTBePbDwPklBhE5mauUfHHwDIF7m/qCSZeeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/x0cIZs; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3862a921123so6964927f8f.3
-        for <netdev@vger.kernel.org>; Tue, 31 Dec 2024 10:33:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735670021; x=1736274821; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C2OGPBMKU1WoKNyQ4pzVSQVikkWah/utYrM+vJeWPpI=;
-        b=a/x0cIZsvuNJUkL8hJSxiFRjZOF3LE9qdeNn88sHu9D7lU+bmtYoTPnifi6A1+hlDb
-         BQATQxg9EK5PJkDRlRBVwK+YC9pxOkdrUER3UUlFOkW19yYQqvc2PeDB1jnHJmCmpeu3
-         YtD2XlpMYh2MqU1QwoDs0EjBCrnqzT3/kl8uVR2j/wsqj2+Nv1ENRaGW6wnp5b2+SDtY
-         Jr2dDrkDatVE4e4T/MLBSISxz/Yg4HX7QQ2PI9/bM0leDmavo4Ul7JwD30zav8amLHAV
-         RpzgW3M9VGDoYhRN7XMT/7hcK3hqow6kXhH4ok64tKx6XN99nmPDkRw6eFHFeKN6yfAs
-         0xqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735670021; x=1736274821;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C2OGPBMKU1WoKNyQ4pzVSQVikkWah/utYrM+vJeWPpI=;
-        b=euHVYEjToL/lBT142mlaCKVGTf6ynyve/64hmR+PBRdeRedBVQrwpj8DtOOcvvmfck
-         I+RS5S+NFmq1xVmuLxZaRTPhYNuNIQLikZmEa2VYzl9v8GqzGATHgq/ghhCDSbC2iOEe
-         pTBHT/w1HJwmHSY5swuyZhUNTapovZQXSt3zM7JB9S6xvXE5DveAQnilEA9vggt7JgOq
-         LHabfHD4+Jw2V3xkdy1lQe5P1a4KuZBSycqP7gdK1cGtlsYOMaduG8OSsZA1oq9ynvi3
-         JLGC+8NtB3JL1GCtLpIkrtQo9N2TjP2xLhOj4kfK6faa7qzQ/WbtinIQQXfsTpC3pLao
-         yLXw==
-X-Forwarded-Encrypted: i=1; AJvYcCV7Ky5z6zUcBQgtz4QEPjYscjX3gGjSU+/HV7gCMR/orU0NtQvs4TLXnT8bafB4YSW3hDN9w1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzgm3P6H7zU2BTco1XBV0lXb/1BCvpP/uKc2SmWyTWAcUEcEw1/
-	po+0zbxNJoDG8YfnJjqoCbALrt7bOZlbEX0nRBkHiXyuMuw2yRhK
-X-Gm-Gg: ASbGncv+VPjzkjSwFVtu4+wJCAyb1QouF7neUL/Zvfy10QBvELY6ZiYs8ximE99jufW
-	8yMSn+LmyA5e7sne0CAd5jwcgihYzBcePbH/ch3OGUS4s7fk4X2bUYuv+Zf3MUy2cn9TDZ4F49f
-	q3N2K4MfFN/NPrUmMzIs6vbEGZtUmiG7WoxafP7T5Nxe2j2XQyO+01XdeeydJS9KNbj6+M9SO9I
-	Sw3jUT1UUoMkjlnf4D7yRFUhzo0OIPhvvwIcEK61xvHVPw+n3h0xkNVs8xjJJ5X9oFOrM3x1Do3
-	TItEjH2TLoHg+iVaDtBivkQ=
-X-Google-Smtp-Source: AGHT+IGDkrS3B0UY+BJqensP8j2URpWxSfHSCUUrYODgTEcp/0xSZ8xIJfY2OkVWcrQ2MV9SDo85hg==
-X-Received: by 2002:a05:6000:18a8:b0:385:f7d2:7e29 with SMTP id ffacd0b85a97d-38a221ea539mr32400447f8f.15.1735670020636;
-        Tue, 31 Dec 2024 10:33:40 -0800 (PST)
-Received: from dsl-u17-10 (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c89e2d2sm33956181f8f.71.2024.12.31.10.33.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 31 Dec 2024 10:33:39 -0800 (PST)
-Date: Tue, 31 Dec 2024 18:33:39 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com,
- syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com, Martin KaFai Lau
- <kafai@fb.com>
-Subject: Re: [PATCH net] net: restrict SO_REUSEPORT to TCP, UDP and SCTP
- sockets
-Message-ID: <20241231183339.6ee59b64@dsl-u17-10>
-In-Reply-To: <20241230193430.3148259-1-edumazet@google.com>
-References: <20241230193430.3148259-1-edumazet@google.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=gKbBIaahU/HYIhAKCd7Jg2BgNh0EjPnZIc9Jwj2bEayUQue3cpT4VjbGbCLH0DsOxIJW3yb653o6BhyWnqH1gwH9+sIYbx/ddqASu5gdSFPZKUb39C4AEKK0KmbujQmVMvdUhY4Tg/NandcyjBQMeuaPoaXKo3hM9ibEJlCrVEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oVvQSp0W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97A50C4CED2;
+	Wed,  1 Jan 2025 00:42:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735692122;
+	bh=Rxzn41NWH+o9X/E5aYIW+SRs3jvyU7BqhmOy8qIcoMk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oVvQSp0WOSzypqUJdCHbT9n+ohZfeVZQqA7pYh05xyYWPXzbszAxshYLcCNKXTvRs
+	 tRYZM7iSNIp8s8kuxOZ+CxvHkhl8v2IjocuB7LMXv0TAWzyNqMmnHUYCmuY6p9/dyR
+	 T01vXYnN7HIlOvUk2ClZPfYF0y9FJTD8JxATTPw1j4TQaOwucqIaX+uw+L2Plo8ros
+	 WKavjj8Lyw0io+hhF3eXWWBKeFzURI9ecdppyfpy6tK256//gZBea80ruIRYBG+AwF
+	 vsoAecyDx5NVO1YU1j1Nq4b+snserg4b0W4nYca9CqRwOvbfmS6cdmvlEvx7/cvU5b
+	 NgMkwQ8lv8DTg==
+Date: Tue, 31 Dec 2024 16:42:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: John Daley <johndale@cisco.com>, <benve@cisco.com>,
+ <satishkh@cisco.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ Nelson Escobar <neescoba@cisco.com>
+Subject: Re: [PATCH net-next v3 4/6] enic: Use the Page Pool API for RX when
+ MTU is less than page size
+Message-ID: <20241231164200.3364e18b@kernel.org>
+In-Reply-To: <731d74c2-7cc6-4d60-a2a4-c451d399e442@huawei.com>
+References: <20241228001055.12707-1-johndale@cisco.com>
+	<20241228001055.12707-5-johndale@cisco.com>
+	<ef5266a0-6d7a-4327-be7c-11f46f8d1074@huawei.com>
+	<20241230084449.545b746f@kernel.org>
+	<731d74c2-7cc6-4d60-a2a4-c451d399e442@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,71 +66,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 30 Dec 2024 19:34:30 +0000
-Eric Dumazet <edumazet@google.com> wrote:
-
-> After blamed commit, crypto sockets could accidentally be destroyed
-> from RCU callback, as spotted by zyzbot [1].
+On Tue, 31 Dec 2024 19:37:12 +0800 Yunsheng Lin wrote:
+> >> It seems the above has a similar problem of not using
+> >> page_pool_put_full_page() when page_pool_dev_alloc() API is used and
+> >> page_pool is created with PP_FLAG_DMA_SYNC_DEV flags.
+> >>
+> >> It seems like a common mistake that a WARN_ON might be needed to catch
+> >> this kind of problem.  
+> > 
+> > Agreed. Maybe also add an alias to page_pool_put_full_page() called
+> > something like page_pool_dev_put_page() to correspond to the alloc
+> > call? I suspect people don't understand the internals and "releasing
+> > full page" feels wrong when they only allocated a portion..  
 > 
-> Trying to acquire a mutex in RCU callback is not allowed.
+> Yes, I guess so too.
+> But as all the alloc APIs have the 'dev' version of API:
+> page_pool_dev_alloc
+> page_pool_dev_alloc_frag
+> page_pool_dev_alloc_pages
+> page_pool_dev_alloc_va
 > 
-> Restrict SO_REUSEPORT socket option to TCP, UDP and SCTP sockets.
-> 
-...
-> 
-> Fixes: 8c7138b33e5c ("net: Unpublish sk from sk_reuseport_cb before call_rcu")
-> Reported-by: syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/6772f2f4.050a0220.2f3838.04cb.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Martin KaFai Lau <kafai@fb.com>
-> ---
->  include/net/sock.h | 7 +++++++
->  net/core/sock.c    | 6 +++++-
->  2 files changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 7464e9f9f47c..4010fd759e2a 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -2730,6 +2730,13 @@ static inline bool sk_is_tcp(const struct sock *sk)
->  	       sk->sk_protocol == IPPROTO_TCP;
->  }
->  
-> +static inline bool sk_is_sctp(const struct sock *sk)
-> +{
-> +	return sk_is_inet(sk) &&
-> +	       sk->sk_type == SOCK_STREAM &&
-> +	       sk->sk_protocol == IPPROTO_SCTP;
-> +}
+> Only adding 'dev' does not seem to clear the confusion from API naming
+> perspective.
 
-Isn't SCTP SOCK_SEQPACKET ?
-In any case the sk_type test is redundant (for inet sockets).
-
-If support is needed for raw (ip) sockets is it enough to just
-check sk_is_inet() ?
-
-	David
-
-> +
->  static inline bool sk_is_udp(const struct sock *sk)
->  {
->  	return sk_is_inet(sk) &&
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 74729d20cd00..56e8517da8dc 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -1295,7 +1295,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
->  		sk->sk_reuse = (valbool ? SK_CAN_REUSE : SK_NO_REUSE);
->  		break;
->  	case SO_REUSEPORT:
-> -		sk->sk_reuseport = valbool;
-> +		if (valbool && !sk_is_tcp(sk) && !sk_is_udp(sk) &&
-> +		    !sk_is_sctp(sk))
-> +			ret = -EOPNOTSUPP;
-> +		else
-> +			sk->sk_reuseport = valbool;
->  		break;
->  	case SO_DONTROUTE:
->  		sock_valbool_flag(sk, SOCK_LOCALROUTE, valbool);
-
+page_pool_free_page()? We already have page_pool_free_va()
 
