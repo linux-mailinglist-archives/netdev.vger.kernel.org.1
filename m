@@ -1,165 +1,173 @@
-Return-Path: <netdev+bounces-154655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 493E49FF4A1
-	for <lists+netdev@lfdr.de>; Wed,  1 Jan 2025 17:49:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 501A49FF4C3
+	for <lists+netdev@lfdr.de>; Wed,  1 Jan 2025 19:41:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2614C3A2801
-	for <lists+netdev@lfdr.de>; Wed,  1 Jan 2025 16:49:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B403A2746
+	for <lists+netdev@lfdr.de>; Wed,  1 Jan 2025 18:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1546B1E2007;
-	Wed,  1 Jan 2025 16:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B181E1C30;
+	Wed,  1 Jan 2025 18:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhrWZ7B4"
+	dkim=pass (2048-bit key) header.d=unrealasia-net.20230601.gappssmtp.com header.i=@unrealasia-net.20230601.gappssmtp.com header.b="zevC39gF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E532942A
-	for <netdev@vger.kernel.org>; Wed,  1 Jan 2025 16:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8465517C21C
+	for <netdev@vger.kernel.org>; Wed,  1 Jan 2025 18:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735750157; cv=none; b=I+S7+ZeChyWjTp9pbw4hbkJ8u5aurgMjmWCWcQb0gf5o7hA/TnyTRDY6VpqTGQ9K1i3ZdaXNFofoM0a4VZMHc+6zGdXN8TTuKxy9ooWw0IzPhp/f+e9TC61p6bwG6rdh6H1EBZhzt34jLUTz7AbsHPW0/aHKPR7Tq1QJtvT1/Hc=
+	t=1735756864; cv=none; b=Ztj0gwhtGjmFgNRfybSqRYvcNvLghD1+DlsulvoCC+X9mRI7ZY9Y8kv6pQXQ8e67OO2ZQU/HRFu2nJZSSP2M60clTr1Pp/6FbECd8l0k9vvUjjjxD9so5INzwMmyhjn9Hh5g0HPXyBsF83fZOfc0Goy1ZPMdgko3h0dmzpIz3yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735750157; c=relaxed/simple;
-	bh=tZyWw7xwEtiBL0b3CVSNCWhqefbflEF125wSjMHAzK8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N2j8YIGzFhSICl8qz/YjPjhIhODhZeAjuIceTW4vVWaCRBTy2jQgXarRJezLmTDSVz4SGeqSNIa2DIUOkVI7Nf/66NKs1p1hAOqwwDcd3XcvUzDWlk0EcrHtEiY4taIqGmsHkOxW0YLC4+UX19Vh4AGrsGIfMhitVICbQ9P8d3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dhrWZ7B4; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6d92e457230so104490166d6.1
-        for <netdev@vger.kernel.org>; Wed, 01 Jan 2025 08:49:15 -0800 (PST)
+	s=arc-20240116; t=1735756864; c=relaxed/simple;
+	bh=LU3G7wVy+RttZT3KWyNpCn8FF/RWmWVyw+isdgQlwcc=;
+	h=Date:From:Subject:To:Cc:Message-Id:MIME-Version:Content-Type; b=aUNL0EMYREJvZDZN6wtucEr0V7qseB/JI3Y3vdbHqjZQkT3rEETH/cIPc608+V1Wuwb9ctztImfbAqq/VNnKqNTBYlBM3DBbu5Of56fKou7HOEI/SMBeEVBRZ0PYxc7AYdAeME+yhykGtvvvWrILLANOj3XjavtZQWXRC4CyOW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unrealasia.net; spf=pass smtp.mailfrom=unrealasia.net; dkim=pass (2048-bit key) header.d=unrealasia-net.20230601.gappssmtp.com header.i=@unrealasia-net.20230601.gappssmtp.com header.b=zevC39gF; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unrealasia.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unrealasia.net
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2efb17478adso14516369a91.1
+        for <netdev@vger.kernel.org>; Wed, 01 Jan 2025 10:41:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735750154; x=1736354954; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jffnTO7DJJ2mWyK6ssB59qij5hj2LlXR59zVUQmfKJs=;
-        b=dhrWZ7B4zfbC2ml5s2V60IRcfA+VugQpdXozIRczgSEDZ5PdKSyBlRkkcBq2A2wIGY
-         s5bh1VtbUKiveJUbqsKWfO8S4Fx4cE/2t6kzxdEBxKRz5xNLTuPgGVsiMIm0jXZTxSsa
-         XJz9Jao8nNNmusaTBetr5cwdvjurR/Sf7B+TieGMHWK2cYYkyg9eWptHc1MoFnW1aqEJ
-         tJ/VyvK7BmldOHBCZb0UYX7qr7P/cl6Qr1F/e5Jy2v0PjhXsE5mC2fYjRFcGG/1c8NQu
-         pzo5jdXbNYO4MtwBNGebA2kbGRNxAKyS09kpQqMc/iQjRQQubjU4LELmLiQaCJo4W85f
-         BoYQ==
+        d=unrealasia-net.20230601.gappssmtp.com; s=20230601; t=1735756861; x=1736361661; darn=vger.kernel.org;
+        h=mime-version:message-id:cc:to:subject:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=V9ANSMwBXQIw9fPQUhhtEY8uNvGZwuLxXrj3cDGzSWA=;
+        b=zevC39gFJXTcA+74H5Uxzp9vB6Yd74MzP6tVqhpB1m9vUOJpsUCSDgJxTyrCNqe0ZZ
+         5koHaUxk+jy92H/PHqx1brhN2BEomFIqtDCj/NTelFIulJUoSH7PA9mLQ+y9ub/AQvy9
+         VyrEwMDf6F/T+faHYTR3a1JZfOocGdlzNp2RXO9jOWkPn6000K+uSYrByMmuGTxKZ97T
+         HbEcuDLMlJXR+N1ww8mDe7xafLGLyc5aorI/EFiWdCy91wEw6T2gYzEjqe6gQd0+MUN6
+         7rZms/UM5v19wzRkkwc7PipSXeQ5caGRGfiwxXX2ypeUNGgFpadVhjv9JyjXJfw3PYvu
+         META==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735750154; x=1736354954;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jffnTO7DJJ2mWyK6ssB59qij5hj2LlXR59zVUQmfKJs=;
-        b=OvjKQlsfnKcuMkf3ItCMb2f3oF4lBvo81/yLUbocr8/0zaeLd+Ss/ufh2KCuLDNS16
-         kl4xTeDTHiuRBOR+3THi2ImCb3VkGM/Wj8/E+33G3TZfZ9Ju2m6iykrHQNApinbLEYyf
-         GaP3fAVAjxhGjJG6qlASfYpfsdlOqHz2G4KWosjE0+1MAe60UETXpNOpLuP+QM03UNBP
-         aAPvecBIFmKWic60JGRc03TwBHwA35zsYIrOVh6uQUaUje3B7xZxmf2RhtZjzdik3N6i
-         okRFpKAA17eKSGad+sstiCm7ZwO8nwIezPQkY/AzaJK43RWrF1EWawkfGYUhhzpj1WYz
-         lP4Q==
-X-Gm-Message-State: AOJu0Yzpx0yvJYiHxwRWG2BquVi2ameyUNjZHEjnUmCxwM1KTf4VqHLD
-	JDpp1O9ZNxDdPuis2QpU5Pst9lC+oStAKuZz1qbAvRJ8B3YPdhKNGV76TlJD
-X-Gm-Gg: ASbGncsWaPJYPFH7biHj32RSQGBXnMySjspJ5dWcTchuyvuWWhwviok74MmYiYxdWJ4
-	ARj1ncrRh4HOMS6kjZZPmJIoJeDw0QSm/cUCE/wEXrN5hvj57202NwJc7HD23lXucHbGUmWJlgG
-	rI92rcDQW/KS5eJ8UnLn/+QCMVKp1YWq/dVw0laYZfCzPvlowo9eViftEOPswCxznQJHSocMk+E
-	6hXy2KDhLQhMgVBSFNET6QtE5dl7XuR6uifajamo4dudJjXwJz2GdyytYG0jAbRPOHYw7uvEwYr
-	9ahbvVfiSFopgJEhIULS4fjMQ9hhE1MnNpK4w3VoN9ZEx6R8fxBEOm/8
-X-Google-Smtp-Source: AGHT+IEHVlv20jiVqdahbXYy8RGYlyzoqN9wDIS4xeoaRvaHTBG3V3/VaH3wJ/YL9yettWngGiUp7A==
-X-Received: by 2002:a05:6214:c4b:b0:6d8:7d6b:cb78 with SMTP id 6a1803df08f44-6dd233af5dfmr751567376d6.47.1735750154237;
-        Wed, 01 Jan 2025 08:49:14 -0800 (PST)
-Received: from willemb.c.googlers.com.com (96.206.236.35.bc.googleusercontent.com. [35.236.206.96])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd18137285sm123119926d6.66.2025.01.01.08.49.12
+        d=1e100.net; s=20230601; t=1735756861; x=1736361661;
+        h=mime-version:message-id:cc:to:subject:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V9ANSMwBXQIw9fPQUhhtEY8uNvGZwuLxXrj3cDGzSWA=;
+        b=VdsxaDY9xTgGVZlS3BHMrL3YnccHbn9llSXNoeLytibDt7+6t0G6Cw8c2ykZT3D+Ur
+         AW8PhNq/rvAQX4g2a5KaUsnKxBgJtIlXhqhwvBxpxNZzttkAai77RS/y+oJvNe+jV4Mj
+         s14C37MINeQm2/USDvDBuJjmnqU7r1RFnqJNrlaeLqCWe57xIKKCK6BUW3B0F26Vxc80
+         DhDVvy440MoFg4j82oWjnyBRUjaT7ZHZz3hDnARP3QR1KrW6k4V32bB77D49fNQ86scH
+         qiRPsB1amP/IGOjb6SleWrayFRRzJJQ5hNslx9OoKyyVTdU9Qy+AjmtK53/8vf9PIW9b
+         FtFQ==
+X-Gm-Message-State: AOJu0YzeGE8gau/8/qRwX0Ei1s/SBOg5emY2QAXC25mHQf1R/HGJMdFb
+	7ya847/GpFoZRPsNycLYy2eY/IQMK4fhXI+wU2oVTKmEkvtiT/JkxuNPqlmGtAMMK3VYc/53Upt
+	1tZsBTQ==
+X-Gm-Gg: ASbGncti47Evt83CvVLB3WlWQsQLtbw5juFMJoxiqq+mDQZf7uDoy9gLGT6LGofqBYn
+	1OGNMCYiGZZwcxyxxZr/3BVEHFJUxCpt7USxl7UFTPZWvr89U6rIiHXBS3bVQ0ulw+84GQ3qyyP
+	bj4uTxSiC6yJKxgucmLVUUwoVNhlCXIhp+gx2D9vAZjeTQK6A8/HBLI3HFNW4TsbDFB86/znUhQ
+	dHGMLOfPuimWTJsTlIfcRJ8m5EF+9qcov/0nB6ZBfA2PSc8MyXk+t3VDhxtBKA=
+X-Google-Smtp-Source: AGHT+IFE0bD3Ch5DK/YWmtdL6RDV1VMmTCn9McSg1J5iWgWQQuuToJPMCRHTGOSxY/IYGFFoV9L9pg==
+X-Received: by 2002:a17:90b:2b8b:b0:2ee:7862:1b10 with SMTP id 98e67ed59e1d1-2f452e2256bmr63405306a91.11.1735756861015;
+        Wed, 01 Jan 2025 10:41:01 -0800 (PST)
+Received: from [10.23.230.78] ([175.143.24.165])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f4da93a04esm2033428a91.11.2025.01.01.10.40.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jan 2025 08:49:13 -0800 (PST)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+        Wed, 01 Jan 2025 10:41:00 -0800 (PST)
+Date: Thu, 02 Jan 2025 02:34:03 +0800
+From: Muhammad Nuzaihan <zaihan@unrealasia.net>
+Subject: [PATCH] Add NMEA GPS character device for PCIe MHI Quectel Module to
+ read NMEA statements.
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	benoit.monin@gmx.fr,
-	Willem de Bruijn <willemb@google.com>,
-	syzbot <syzkaller@googlegroups.com>
-Subject: [PATCH net] net: reenable NETIF_F_IPV6_CSUM offload for BIG TCP packets
-Date: Wed,  1 Jan 2025 11:47:40 -0500
-Message-ID: <20250101164909.1331680-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Cc: Loic Poulain <loic.poulain@linaro.org>, Sergey Ryazanov
+	<ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>
+Message-Id: <R8AFPS.THYVK2DKSEE83@unrealasia.net>
+X-Mailer: geary/40.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="=-0Yt3WiEz0b8aOe6aH34X"
 
-From: Willem de Bruijn <willemb@google.com>
+--=-0Yt3WiEz0b8aOe6aH34X
+Content-Type: text/plain; charset=us-ascii; format=flowed
 
-The blamed commit disabled hardware offoad of IPv6 packets with
-extension headers on devices that advertise NETIF_F_IPV6_CSUM,
-based on the definition of that feature in skbuff.h:
+Hi netdev,
 
- *   * - %NETIF_F_IPV6_CSUM
- *     - Driver (device) is only able to checksum plain
- *       TCP or UDP packets over IPv6. These are specifically
- *       unencapsulated packets of the form IPv6|TCP or
- *       IPv6|UDP where the Next Header field in the IPv6
- *       header is either TCP or UDP. IPv6 extension headers
- *       are not supported with this feature. This feature
- *       cannot be set in features for a device with
- *       NETIF_F_HW_CSUM also set. This feature is being
- *       DEPRECATED (see below).
+I am using a Quectel RM520N-GL *PCIe* (not USB) module which uses the 
+MHI interface.
 
-The change causes skb_warn_bad_offload to fire for BIG TCP
-packets.
+In /devices/pci0000:00/0000:00:1c.6/0000:08:00.0/mhi0 i can see 
+"mhi0_NMEA" but the actual NMEA device is missing in /dev and needs a 
+character device to be useful with tty programs.
 
-[  496.310233] WARNING: CPU: 13 PID: 23472 at net/core/dev.c:3129 skb_warn_bad_offload+0xc4/0xe0
+NMEA statements are a stream of GPS information which is used to tell 
+the current device location in the console (like minicom).
 
-[  496.310297]  ? skb_warn_bad_offload+0xc4/0xe0
-[  496.310300]  skb_checksum_help+0x129/0x1f0
-[  496.310303]  skb_csum_hwoffload_help+0x150/0x1b0
-[  496.310306]  validate_xmit_skb+0x159/0x270
-[  496.310309]  validate_xmit_skb_list+0x41/0x70
-[  496.310312]  sch_direct_xmit+0x5c/0x250
-[  496.310317]  __qdisc_run+0x388/0x620
+Attached is the patch to ensure a device is registered (as 
+/dev/wwan0nmea0) so this device will stream GPS NMEA statements and can 
+be used to be read by popular GPS tools like gpsd and then tracking 
+with cgps, xgps, QGIS, etc.
 
-BIG TCP introduced an IPV6_TLV_JUMBO IPv6 extension header to
-communicate packet length, as this is an IPv6 jumbogram. But, the
-feature is only enabled on devices that support BIG TCP TSO. The
-header is only present for PF_PACKET taps like tcpdump, and not
-transmitted by physical devices.
+Regards,
+Muhammad Nuzaihan
 
-For this specific case of extension headers that are not
-transmitted, return to the situation before the blamed commit
-and support hardware offload.
+Signed-off-by: Muhammad Nuzaihan Bin Kamal Luddin 
+<zaihan@unrealasia.net>
 
-ipv6_has_hopopt_jumbo() tests not only whether this header is present,
-but also that it is the only extension header before a terminal (L4)
-header.
 
-Fixes: 04c20a9356f2 ("net: skip offload for NETIF_F_IPV6_CSUM if ipv6 header contains extension")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Reported-by: Eric Dumazet <edumazet@google.com>
-Closes: https://lore.kernel.org/netdev/CANn89iK1hdC3Nt8KPhOtTF8vCPc1AHDCtse_BTNki1pWxAByTQ@mail.gmail.com/
-Signed-off-by: Willem de Bruijn <willemb@google.com>
----
- net/core/dev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+--=-0Yt3WiEz0b8aOe6aH34X
+Content-Type: text/x-patch
+Content-Disposition: attachment; filename=quectel-nmea-gps-port-interface.patch
+Content-Transfer-Encoding: base64
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 45a8c3dd4a64..faa23042df38 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3642,8 +3642,10 @@ int skb_csum_hwoffload_help(struct sk_buff *skb,
- 
- 	if (features & (NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM)) {
- 		if (vlan_get_protocol(skb) == htons(ETH_P_IPV6) &&
--		    skb_network_header_len(skb) != sizeof(struct ipv6hdr))
-+		    skb_network_header_len(skb) != sizeof(struct ipv6hdr) &&
-+		    !ipv6_has_hopopt_jumbo(skb))
- 			goto sw_checksum;
-+
- 		switch (skb->csum_offset) {
- 		case offsetof(struct tcphdr, check):
- 		case offsetof(struct udphdr, check):
--- 
-2.47.1.613.gc27f4b7a9f-goog
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3d3YW4vaW9zbS9pb3NtX2lwY19jaG5sX2NmZy5jIGIv
+ZHJpdmVycy9uZXQvd3dhbi9pb3NtL2lvc21faXBjX2NobmxfY2ZnLmMKaW5kZXggYmNmYmM2YjNk
+NjE3Li40ZDRmYzM4MTNjODYgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbmV0L3d3YW4vaW9zbS9pb3Nt
+X2lwY19jaG5sX2NmZy5jCisrKyBiL2RyaXZlcnMvbmV0L3d3YW4vaW9zbS9pb3NtX2lwY19jaG5s
+X2NmZy5jCkBAIC02MCw2ICs2MCwxMCBAQCBzdGF0aWMgc3RydWN0IGlwY19jaG5sX2NmZyBtb2Rl
+bV9jZmdbXSA9IHsKIAl7IElQQ19NRU1fQ1RSTF9DSExfSURfNiwgSVBDX01FTV9QSVBFXzEyLCBJ
+UENfTUVNX1BJUEVfMTMsCiAJICBJUENfTUVNX01BWF9URFNfTUJJTSwgSVBDX01FTV9NQVhfVERT
+X01CSU0sCiAJICBJUENfTUVNX01BWF9ETF9NQklNX0JVRl9TSVpFLCBXV0FOX1BPUlRfTUJJTSB9
+LAorCS8qIE5NRUEgKi8KKwl7IElQQ19NRU1fQ1RSTF9DSExfSURfNywgSVBDX01FTV9QSVBFXzE0
+LCBJUENfTUVNX1BJUEVfMTUsCisJICBJUENfTUVNX01BWF9URFNfQVQsIElQQ19NRU1fTUFYX1RE
+U19BVCwgSVBDX01FTV9NQVhfRExfQVRfQlVGX1NJWkUsCisJICBXV0FOX1BPUlRfTk1FQSB9LAog
+CS8qIEZsYXNoIENoYW5uZWwvQ29yZWR1bXAgQ2hhbm5lbCAqLwogCXsgSVBDX01FTV9DVFJMX0NI
+TF9JRF83LCBJUENfTUVNX1BJUEVfMCwgSVBDX01FTV9QSVBFXzEsCiAJICBJUENfTUVNX01BWF9U
+RFNfRkxBU0hfVUwsIElQQ19NRU1fTUFYX1REU19GTEFTSF9ETCwKZGlmZiAtLWdpdCBhL2RyaXZl
+cnMvbmV0L3d3YW4vbWhpX3d3YW5fY3RybC5jIGIvZHJpdmVycy9uZXQvd3dhbi9taGlfd3dhbl9j
+dHJsLmMKaW5kZXggZTlmOTc5ZDJkODUxLi5lMTNjMGIwNzgxNzUgMTAwNjQ0Ci0tLSBhL2RyaXZl
+cnMvbmV0L3d3YW4vbWhpX3d3YW5fY3RybC5jCisrKyBiL2RyaXZlcnMvbmV0L3d3YW4vbWhpX3d3
+YW5fY3RybC5jCkBAIC0yNjMsNiArMjYzLDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBtaGlfZGV2
+aWNlX2lkIG1oaV93d2FuX2N0cmxfbWF0Y2hfdGFibGVbXSA9IHsKIAl7IC5jaGFuID0gIlFNSSIs
+IC5kcml2ZXJfZGF0YSA9IFdXQU5fUE9SVF9RTUkgfSwKIAl7IC5jaGFuID0gIkRJQUciLCAuZHJp
+dmVyX2RhdGEgPSBXV0FOX1BPUlRfUUNETSB9LAogCXsgLmNoYW4gPSAiRklSRUhPU0UiLCAuZHJp
+dmVyX2RhdGEgPSBXV0FOX1BPUlRfRklSRUhPU0UgfSwKKwl7IC5jaGFuID0gIk5NRUEiLCAuZHJp
+dmVyX2RhdGEgPSBXV0FOX1BPUlRfTk1FQSB9LAogCXt9LAogfTsKIE1PRFVMRV9ERVZJQ0VfVEFC
+TEUobWhpLCBtaGlfd3dhbl9jdHJsX21hdGNoX3RhYmxlKTsKZGlmZiAtLWdpdCBhL2RyaXZlcnMv
+bmV0L3d3YW4vd3dhbl9jb3JlLmMgYi9kcml2ZXJzL25ldC93d2FuL3d3YW5fY29yZS5jCmluZGV4
+IGE1MWUyNzU1OTkxYS4uMDEzMWQ5Nzk1ZDZjIDEwMDY0NAotLS0gYS9kcml2ZXJzL25ldC93d2Fu
+L3d3YW5fY29yZS5jCisrKyBiL2RyaXZlcnMvbmV0L3d3YW4vd3dhbl9jb3JlLmMKQEAgLTM0Miw2
+ICszNDIsMTAgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCB7CiAJCS5uYW1lID0gIk1JUEMiLAogCQku
+ZGV2c3VmID0gIm1pcGMiLAogCX0sCisJW1dXQU5fUE9SVF9OTUVBXSA9IHsKKwkJLm5hbWUgPSAi
+Tk1FQSIsCisJCS5kZXZzdWYgPSAibm1lYSIsCisJfSwKIH07CiAKIHN0YXRpYyBzc2l6ZV90IHR5
+cGVfc2hvdyhzdHJ1Y3QgZGV2aWNlICpkZXYsIHN0cnVjdCBkZXZpY2VfYXR0cmlidXRlICphdHRy
+LApAQCAtODc2LDcgKzg4MCw4IEBAIHN0YXRpYyBsb25nIHd3YW5fcG9ydF9mb3BzX2lvY3RsKHN0
+cnVjdCBmaWxlICpmaWxwLCB1bnNpZ25lZCBpbnQgY21kLAogCXN0cnVjdCB3d2FuX3BvcnQgKnBv
+cnQgPSBmaWxwLT5wcml2YXRlX2RhdGE7CiAJaW50IHJlczsKIAotCWlmIChwb3J0LT50eXBlID09
+IFdXQU5fUE9SVF9BVCkgewkvKiBBVCBwb3J0IHNwZWNpZmljIElPQ1RMcyAqLworCWlmIChwb3J0
+LT50eXBlID09IFdXQU5fUE9SVF9BVCB8fAorCQkJV1dBTl9QT1JUX05NRUEpIHsJLyogQVQgb3Ig
+Tk1FQSBwb3J0IHNwZWNpZmljIElPQ1RMcyAqLwogCQlyZXMgPSB3d2FuX3BvcnRfZm9wc19hdF9p
+b2N0bChwb3J0LCBjbWQsIGFyZyk7CiAJCWlmIChyZXMgIT0gLUVOT0lPQ1RMQ01EKQogCQkJcmV0
+dXJuIHJlczsKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvd3dhbi5oIGIvaW5jbHVkZS9saW51
+eC93d2FuLmgKaW5kZXggNzljNzgxODc1YzA5Li45ZTc5NGZjNTNhN2UgMTAwNjQ0Ci0tLSBhL2lu
+Y2x1ZGUvbGludXgvd3dhbi5oCisrKyBiL2luY2x1ZGUvbGludXgvd3dhbi5oCkBAIC0xOSw2ICsx
+OSw3IEBACiAgKiBAV1dBTl9QT1JUX0ZBU1RCT09UOiBGYXN0Ym9vdCBwcm90b2NvbCBjb250cm9s
+CiAgKiBAV1dBTl9QT1JUX0FEQjogQURCIHByb3RvY29sIGNvbnRyb2wKICAqIEBXV0FOX1BPUlRf
+TUlQQzogTVRLIE1JUEMgZGlhZ25vc3RpYyBpbnRlcmZhY2UKKyAqIEBXV0FOX1BPUlRfTk1FQTog
+Tk1FQSBHUFMgc3RhdGVtZW50cyBpbnRlcmZhY2UKICAqCiAgKiBAV1dBTl9QT1JUX01BWDogSGln
+aGVzdCBzdXBwb3J0ZWQgcG9ydCB0eXBlcwogICogQFdXQU5fUE9SVF9VTktOT1dOOiBTcGVjaWFs
+IHZhbHVlIHRvIGluZGljYXRlIGFuIHVua25vd24gcG9ydCB0eXBlCkBAIC0zNCw2ICszNSw3IEBA
+IGVudW0gd3dhbl9wb3J0X3R5cGUgewogCVdXQU5fUE9SVF9GQVNUQk9PVCwKIAlXV0FOX1BPUlRf
+QURCLAogCVdXQU5fUE9SVF9NSVBDLAorCVdXQU5fUE9SVF9OTUVBLAogCiAJLyogQWRkIG5ldyBw
+b3J0IHR5cGVzIGFib3ZlIHRoaXMgbGluZSAqLwogCg==
+
+--=-0Yt3WiEz0b8aOe6aH34X--
 
 
