@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-154788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AAA39FFCD3
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:37:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C5269FFCD4
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:37:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84FD03A2F42
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:37:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 423C916297D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2399F1865F0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446CC187325;
 	Thu,  2 Jan 2025 17:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="LJvD+N+c"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="OSjf4fzz"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB14165EFC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB5817ADE8;
 	Thu,  2 Jan 2025 17:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735839462; cv=none; b=cylGw2jrl59huiA9Em3W3B/LBXi+c+D4jsl0OrbnwrNAGS16mglm8s5um86EwVZQRAFakQ7WTQMZy17aBf4Ik+xkUrSuJ1Hq96rN1LC6ei6rPBh/QaFe6Tod+pn3uPMiZmx/VCIDniML+uE5XEoU4UDDw1Mv1dIN7AVyIfrcm7U=
+	t=1735839462; cv=none; b=h/yK1njp7MDedrXTH1zgBWkllvzCqWHrzzjXLaq+J/NQ/K+ilrThXVm0dAbDsiPZm8Wdr+N9MY3arvsaqAi+YAoal0dPrIcaKNVT64eynmEdb3+Ysn/uEMzFDhIwDcQxHX+IHGQxJ55C+B5cF/on0dJKPdoSNg+N0pf6zxkH0yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735839462; c=relaxed/simple;
-	bh=y5nsRiUgPYgh8AAUFzUWMtxYlBmmeazEtoG6wRvTtg0=;
+	bh=ruog4s5wIgIydvItGwT3ldGP5Sv5dLwI3IdUpHjbmr4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K0X47T5Ga0iqWWVOKDDMGvvo7EKa564pzPRSOb3LRmyCu45NWvvdOHSY/0EiWkJyFKmEIJE+966q9f2VGNeJ1YB1sh7Cag3w5F53XKeN6jlIltdvxyx2lRLCb7uUS5zAbIu0fx4UBO1a80LiLZjH86NoXKHLhOioCZ4AevPD7u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=LJvD+N+c; arc=none smtp.client-ip=46.235.229.95
+	 MIME-Version; b=lQ9WOh9NhXC4S56ZAkFNUf/YVzETYc8QL3/2R3BZmw9ZJ/7JTvrkKFtLP0htADeTFll8NdX9IwheTBjWam88Dcxh8CMRNkvFlBAaOi/kcyE9iBzOCe3uDehPw+Wu+Haj1cEzZiSP2tcovzvZ2xrLjgJrcWNvMXEJyH96soYQoZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=OSjf4fzz; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=garTpmgVCRsiT24Y9HEp7HK8vg0zYHqQEomkjWoz8/w=; b=LJvD+N+cGlGEHL10
-	dpF6XU9k2B6ugTVwkhcwdtvS+eVCYztU5plVhwTWat3NsshQRfahvkDMCtVqqL5ISr4FT5q1yw5YW
-	KpdIt6KugsQMSHXQqn8HVEldeRJvoa5jcndNuSwXWw0vKdIibs3tO4Z+vHoX+gzkaN3r0FiB4oXuf
-	sYb4u1K/1JxBSygbdKoE85zLD/ReyP7W5bQ2ImyB5lmR0uE2DP3rhYNshis5sbEeJt6SMg9ZrVGiP
-	FzOJanMeAU8XlYa4ntJbT8LjkEtIr2f4vHxW80LY5e0m+4LkuuIR472eE/xN6WJ2t2W2LSPF6H5aw
-	3hS8jzbWb8o/DIdsxg==;
+	:Subject; bh=vpcbQJY6Oq4fkBAvvq9ChAzoM28r4d2DnCB/aDMi6d0=; b=OSjf4fzzWukoFUkJ
+	LODNSKi4VA3VTUduaUi/8SVjDJDXcKeFJTpR1B7Iwwt8pSUbCiuo1FZ4GS2MlD3b0hc7iFsQ91zT9
+	bGXxIGTm8BBrKCAjdvlGpf8bdH/d5XrGxe7HeWR3JOp9QYOTUeARSEjergy5kWzodo+d6mBHBKMLQ
+	ochBjK8Dey5jo6B6rLYVenvf2+LoAj8XQtiThxcY9swEzL2wJopw/t1QN0mxKqKToibvYMY2x1HY0
+	QloDkzGJK7X3kJhuYWjxMO5hnZQfLdGdRpck/PS3jOzBZn11a8pxtBIeU78yDCehxrGxgLGASZM7w
+	vAS8FrSXcBqoqCDe1Q==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1tTP8N-007tod-31;
+	id 1tTP8O-007tod-1a;
 	Thu, 02 Jan 2025 17:37:24 +0000
 From: linux@treblig.org
 To: anthony.l.nguyen@intel.com,
@@ -55,10 +55,11 @@ To: anthony.l.nguyen@intel.com,
 	intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next 6/9] i40e: Remove unused i40e_del_filter
-Date: Thu,  2 Jan 2025 17:37:14 +0000
-Message-ID: <20250102173717.200359-7-linux@treblig.org>
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net-next 7/9] i40e: Remove unused i40e_commit_partition_bw_setting
+Date: Thu,  2 Jan 2025 17:37:15 +0000
+Message-ID: <20250102173717.200359-8-linux@treblig.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250102173717.200359-1-linux@treblig.org>
 References: <20250102173717.200359-1-linux@treblig.org>
@@ -72,80 +73,125 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-The last use of i40e_del_filter() was removed in 2016 by
-commit 9569a9a4547d ("i40e: when adding or removing MAC filters, correctly
-handle VLANs")
+i40e_commit_partition_bw_setting() was added in 2017 by
+commit 4fc8c6763957 ("i40e: genericize the partition bandwidth control")
+but hasn't been used.
 
 Remove it.
 
-Fix up a comment that referenced it.
-
-Note: The __ version of this function is still used.
-
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 ---
  drivers/net/ethernet/intel/i40e/i40e.h      |  1 -
- drivers/net/ethernet/intel/i40e/i40e_main.c | 28 ++-------------------
- 2 files changed, 2 insertions(+), 27 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 83 ---------------------
+ 2 files changed, 84 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 5d9738b746f4..399a5dbf3506 100644
+index 399a5dbf3506..ce63a7cfe955 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e.h
 +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -1196,7 +1196,6 @@ void i40e_set_ethtool_ops(struct net_device *netdev);
- struct i40e_mac_filter *i40e_add_filter(struct i40e_vsi *vsi,
- 					const u8 *macaddr, s16 vlan);
- void __i40e_del_filter(struct i40e_vsi *vsi, struct i40e_mac_filter *f);
--void i40e_del_filter(struct i40e_vsi *vsi, const u8 *macaddr, s16 vlan);
- int i40e_sync_vsi_filters(struct i40e_vsi *vsi);
- struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
- 				u16 uplink, u32 param1);
+@@ -1311,7 +1311,6 @@ int i40e_update_adq_vsi_queues(struct i40e_vsi *vsi, int vsi_offset);
+ int i40e_is_vsi_uplink_mode_veb(struct i40e_vsi *vsi);
+ int i40e_get_partition_bw_setting(struct i40e_pf *pf);
+ int i40e_set_partition_bw_setting(struct i40e_pf *pf);
+-int i40e_commit_partition_bw_setting(struct i40e_pf *pf);
+ void i40e_print_link_message(struct i40e_vsi *vsi, bool isup);
+ 
+ void i40e_set_fec_in_flags(u8 fec_cfg, unsigned long *flags);
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 83ba1effe8ba..276dde0bc1d4 100644
+index 276dde0bc1d4..8a333d0e2218 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -1666,9 +1666,8 @@ struct i40e_mac_filter *i40e_add_filter(struct i40e_vsi *vsi,
-  * @vsi: VSI to remove from
-  * @f: the filter to remove from the list
-  *
-- * This function should be called instead of i40e_del_filter only if you know
-- * the exact filter you will remove already, such as via i40e_find_filter or
-- * i40e_find_mac.
-+ * This function requires you've found * the exact filter you will remove
-+ * already, such as via i40e_find_filter or i40e_find_mac.
-  *
-  * NOTE: This function is expected to be called with mac_filter_hash_lock
-  * being held.
-@@ -1697,29 +1696,6 @@ void __i40e_del_filter(struct i40e_vsi *vsi, struct i40e_mac_filter *f)
- 	set_bit(__I40E_MACVLAN_SYNC_PENDING, vsi->back->state);
+@@ -12576,89 +12576,6 @@ int i40e_set_partition_bw_setting(struct i40e_pf *pf)
+ 	return status;
  }
  
 -/**
-- * i40e_del_filter - Remove a MAC/VLAN filter from the VSI
-- * @vsi: the VSI to be searched
-- * @macaddr: the MAC address
-- * @vlan: the VLAN
-- *
-- * NOTE: This function is expected to be called with mac_filter_hash_lock
-- * being held.
-- * ANOTHER NOTE: This function MUST be called from within the context of
-- * the "safe" variants of any list iterators, e.g. list_for_each_entry_safe()
-- * instead of list_for_each_entry().
+- * i40e_commit_partition_bw_setting - Commit BW settings for this PF partition
+- * @pf: board private structure
 - **/
--void i40e_del_filter(struct i40e_vsi *vsi, const u8 *macaddr, s16 vlan)
+-int i40e_commit_partition_bw_setting(struct i40e_pf *pf)
 -{
--	struct i40e_mac_filter *f;
+-	/* Commit temporary BW setting to permanent NVM image */
+-	enum i40e_admin_queue_err last_aq_status;
+-	u16 nvm_word;
+-	int ret;
 -
--	if (!vsi || !macaddr)
--		return;
+-	if (pf->hw.partition_id != 1) {
+-		dev_info(&pf->pdev->dev,
+-			 "Commit BW only works on partition 1! This is partition %d",
+-			 pf->hw.partition_id);
+-		ret = -EOPNOTSUPP;
+-		goto bw_commit_out;
+-	}
 -
--	f = i40e_find_filter(vsi, macaddr, vlan);
--	__i40e_del_filter(vsi, f);
+-	/* Acquire NVM for read access */
+-	ret = i40e_acquire_nvm(&pf->hw, I40E_RESOURCE_READ);
+-	last_aq_status = pf->hw.aq.asq_last_status;
+-	if (ret) {
+-		dev_info(&pf->pdev->dev,
+-			 "Cannot acquire NVM for read access, err %pe aq_err %s\n",
+-			 ERR_PTR(ret),
+-			 i40e_aq_str(&pf->hw, last_aq_status));
+-		goto bw_commit_out;
+-	}
+-
+-	/* Read word 0x10 of NVM - SW compatibility word 1 */
+-	ret = i40e_aq_read_nvm(&pf->hw,
+-			       I40E_SR_NVM_CONTROL_WORD,
+-			       0x10, sizeof(nvm_word), &nvm_word,
+-			       false, NULL);
+-	/* Save off last admin queue command status before releasing
+-	 * the NVM
+-	 */
+-	last_aq_status = pf->hw.aq.asq_last_status;
+-	i40e_release_nvm(&pf->hw);
+-	if (ret) {
+-		dev_info(&pf->pdev->dev, "NVM read error, err %pe aq_err %s\n",
+-			 ERR_PTR(ret),
+-			 i40e_aq_str(&pf->hw, last_aq_status));
+-		goto bw_commit_out;
+-	}
+-
+-	/* Wait a bit for NVM release to complete */
+-	msleep(50);
+-
+-	/* Acquire NVM for write access */
+-	ret = i40e_acquire_nvm(&pf->hw, I40E_RESOURCE_WRITE);
+-	last_aq_status = pf->hw.aq.asq_last_status;
+-	if (ret) {
+-		dev_info(&pf->pdev->dev,
+-			 "Cannot acquire NVM for write access, err %pe aq_err %s\n",
+-			 ERR_PTR(ret),
+-			 i40e_aq_str(&pf->hw, last_aq_status));
+-		goto bw_commit_out;
+-	}
+-	/* Write it back out unchanged to initiate update NVM,
+-	 * which will force a write of the shadow (alt) RAM to
+-	 * the NVM - thus storing the bandwidth values permanently.
+-	 */
+-	ret = i40e_aq_update_nvm(&pf->hw,
+-				 I40E_SR_NVM_CONTROL_WORD,
+-				 0x10, sizeof(nvm_word),
+-				 &nvm_word, true, 0, NULL);
+-	/* Save off last admin queue command status before releasing
+-	 * the NVM
+-	 */
+-	last_aq_status = pf->hw.aq.asq_last_status;
+-	i40e_release_nvm(&pf->hw);
+-	if (ret)
+-		dev_info(&pf->pdev->dev,
+-			 "BW settings NOT SAVED, err %pe aq_err %s\n",
+-			 ERR_PTR(ret),
+-			 i40e_aq_str(&pf->hw, last_aq_status));
+-bw_commit_out:
+-
+-	return ret;
 -}
 -
  /**
-  * i40e_add_mac_filter - Add a MAC filter for all active VLANs
-  * @vsi: the VSI to be searched
+  * i40e_is_total_port_shutdown_enabled - read NVM and return value
+  * if total port shutdown feature is enabled for this PF
 -- 
 2.47.1
 
