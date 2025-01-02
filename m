@@ -1,130 +1,139 @@
-Return-Path: <netdev+bounces-154687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E9B29FF731
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:04:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B73D9FF748
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:09:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 717481881E9A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 09:04:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FEBA188067D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 09:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6CE194AE8;
-	Thu,  2 Jan 2025 09:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0091993A3;
+	Thu,  2 Jan 2025 09:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="to/xHWBC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="L4pPXnCQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-67.smtpout.orange.fr [193.252.22.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761333D68;
-	Thu,  2 Jan 2025 09:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126A5199938;
+	Thu,  2 Jan 2025 09:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735808663; cv=none; b=U97s+8IMLWPqow0ZbXopnoSIxNxubu5ZZzDq1+GQ+qn1EyAaCQEXeZrEJtL72dxcT51YTQMz0Qt/gkIX0wAkSUku9y+SKDlL7ghnupOg6Eiio9Ybb1PT/JpXH1tjNIQUrJ8O/OLKkT4GxXdrU7Zm6ZiionrosO1BPB2JsCDI/i0=
+	t=1735808938; cv=none; b=mHe2hJsLtd1qrUgaopoou5Xn93yENj5gJDSrIIhtaNp5VWsI1oKCpkRLa0qJdFDqYRWKbSuKmKDBOfy9gWI2VfeS14LY0ikFlXNTDeXX3BmlvL37zJpu82nlGY1MXHVpWL7esCXWD/QV0ZEYzwB9JoqeYfErZRWfAwMq9i4ZaK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735808663; c=relaxed/simple;
-	bh=zghEmGBMc39NZbTdkZhdcwAKGgolK8rFK+hu7TmAzP0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jkvJfshkbABCa1Gn+GcwnWt4K2GkIUAWzWpMkLMtU5Wncd9RcEVLQOBfNpFLKX4LsrftcjkwKkphISAZ6q03BiNrldNsn8icYlRhuIGGwKgb+Nzf329dshRk3qNQ6BgRyyAaWQdeWmg8nAfX9Qk/7YgrJThCo+lHR9FFltwiQhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=to/xHWBC; arc=none smtp.client-ip=193.252.22.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id TH7UtHho2v8EoTH7ZtzYi9; Thu, 02 Jan 2025 10:04:12 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1735808652;
-	bh=39nmaAXlbtXxpI44yh3hY9JN+QCD/Pdn8DUS9Q3fxLI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=to/xHWBCunZGAPM3qDXj2KMhg9rv0ZHaJ9AdPbNG69HGM5jyjIW6/U9/+NxQuQcmq
-	 Mz7JqqlYDWn/3hGN4UpLLODWsA5EG1Vk3PmG47guje3kKKO/OSw/y+TO4L+xpgjk6D
-	 Iv2lUKbd5rCILZwyx1qtyf8cfzzaKbNomR52QHcdi5hwBYJhIAhRyx3jrRBafaTYEq
-	 4UjYgMVhsEVw64d3/dyX/ip/+RyUHACZ9swuz4zBl5SEg2BtYCcq9EYR0PzkAnU30m
-	 KAgb6kFrgroBU9ZgR8LiUYXpqyaEUZfydeyDcUAALrzeBWfQX2aAcSm++Ee20nwO92
-	 m78dDF/2o2tew==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 02 Jan 2025 10:04:12 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <1fdb892b-a1e9-4199-a538-d5b98f283096@wanadoo.fr>
-Date: Thu, 2 Jan 2025 18:03:55 +0900
+	s=arc-20240116; t=1735808938; c=relaxed/simple;
+	bh=md0UAgdCit3t5nBhaHpl9cl7CWVXVeVXnf7Ky1+Ih08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gXi6DYaam39kRrD6WbR2/IP4AXGqBnvjOGHy+vdgsBrPq0g7OSeZBCHHkkLiiV6a0hKziGN6si6BQZed9PCqV9hEzf6URcqCZnt5h/gF46F9j/oO6GORpXo/td2Yzn2ypxZEXimie4ch3Q2jB1Y0UcK6Ixz2746N7PUUH0vgI8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=L4pPXnCQ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=N2/lJMrShdKFF/LCN9VGIHz6yfGl2Ad/fJkiczIYxJk=; b=L4pPXnCQ9/MJcPrdVq87EETWV0
+	YDKENkOXhbSxIPBk+Fja0LuH8yLVErcGMrtKbOeNwLJrx0Q1b1cVhgbCsdctxHwteht7k98Ox7cLK
+	MoRfX66zRHw7bblH1gYjqVZYzwdvk0Gj4o/vArejDnQkzany+qP73vcTOikSRfaME3xbZR7kxP0pw
+	soBjvplC+RcHJpTBAxSoixRJaUArYlSYFBFjx1INgvnf6nBptKYRysgz0dkMaqUF5tukvPeVtAAmL
+	Enhth10wOgC4RkuAx5idJIPV/id+reUcAeYsNI709XYEVelZVerZKiQABcdZZ3Uw/GIpbH+lcf0Y8
+	yT9odH4Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43370)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tTHC9-0001nF-0g;
+	Thu, 02 Jan 2025 09:08:45 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tTHC5-00008P-0K;
+	Thu, 02 Jan 2025 09:08:41 +0000
+Date: Thu, 2 Jan 2025 09:08:40 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 5/5] net: stmmac: use PCS supported_interfaces
+Message-ID: <Z3ZXmAIAHmYVbdbl@shell.armlinux.org.uk>
+References: <Z1yJQikqneoFNJT4@shell.armlinux.org.uk>
+ <E1tMBRQ-006vat-7F@rmk-PC.armlinux.org.uk>
+ <20241217141912.34cdd5ae@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/7] can: Add Nuvoton NCT6694 CAN support
-To: Ming Yu <a0282524688@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, tmyu0@nuvoton.com,
- lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl,
- andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
- jdelvare@suse.com, alexandre.belloni@bootlin.com
-References: <20241227095727.2401257-1-a0282524688@gmail.com>
- <20241227095727.2401257-5-a0282524688@gmail.com>
- <41f77d39-bce3-4e3b-98c8-f248b723a24c@wanadoo.fr>
- <CAOoeyxU0ex9_-a-uWda9hFbQa3MkFtNdAFan8C-899Z2pGYy7g@mail.gmail.com>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <CAOoeyxU0ex9_-a-uWda9hFbQa3MkFtNdAFan8C-899Z2pGYy7g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241217141912.34cdd5ae@fedora.home>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 02/01/2025 at 14:40, Ming Yu wrote:
-> Dear Vincent,
+On Tue, Dec 17, 2024 at 02:19:12PM +0100, Maxime Chevallier wrote:
+> Hi Russell,
 > 
-> Thank you for your comments,
+> On Fri, 13 Dec 2024 19:35:12 +0000
+> "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
 > 
-> Vincent Mailhol <mailhol.vincent@wanadoo.fr> 於 2024年12月30日 週一 下午1:56寫道：
->>
->>> +config CAN_NCT6694
->>> +     tristate "Nuvoton NCT6694 Socket CANfd support"
->>> +     depends on MFD_NCT6694
->>
->> I think it would be better to do a
->>
->>         select MFD_NCT6694
->>
->> here.
->>
->> Then, make MFD_NCT6694 an hidden configuration in a similar fashion as
->> MFD_CORE. Alone, CONFIG_MFD_NCT6694 does nothing, so better to hide it
->> from the end user.
->>
->> The comment also applies to the other patches.
->>
+> > Use the PCS' supported_interfaces member to build the MAC level
+> > supported_interfaces bitmap.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++++++++--
+> >  1 file changed, 9 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index d45fd7a3acd5..0e45c4a48bb5 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -1206,6 +1206,7 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+> >  	struct stmmac_mdio_bus_data *mdio_bus_data;
+> >  	int mode = priv->plat->phy_interface;
+> >  	struct fwnode_handle *fwnode;
+> > +	struct phylink_pcs *pcs;
+> >  	struct phylink *phylink;
+> >  
+> >  	priv->phylink_config.dev = &priv->dev->dev;
+> > @@ -1227,8 +1228,14 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+> >  
+> >  	/* If we have an xpcs, it defines which PHY interfaces are supported. */
+> >  	if (priv->hw->xpcs)
+> > -		xpcs_get_interfaces(priv->hw->xpcs,
+> > -				    priv->phylink_config.supported_interfaces);
+> > +		pcs = xpcs_to_phylink_pcs(priv->hw->xpcs);
+> > +	else
+> > +		pcs = priv->hw->phylink_pcs;
+> > +
+> > +	if (pcs)
+> > +		phy_interface_or(priv->phylink_config.supported_interfaces,
+> > +				 priv->phylink_config.supported_interfaces,
+> > +				 pcs->supported_interfaces);
+> >  
+> >  	fwnode = priv->plat->port_node;
+> >  	if (!fwnode)
 > 
-> I understand, but I noticed that in the Kconfig files of other
-> modules, the dependency is written in the form:
-> config CAN_NCT6694
->         tristate "Nuvoton NCT6694 Socket CANfd support"
->         depends on MFD_NCT6694
-> (e.g. CAN_JANZ_ICAN3, GPIO_DLN2, ...)
-> Do you think changing it to select MFD_NCT6694 would be better?
+> I think that we could even make xpcs_get_interfaces a static
+> non-exported function now :) But this can be done in a subsequent patch.
 
-That's a fair point. Looking at the examples you provided, your approach
-makes sense. Please ignore my comment here.
+Yes, that can definitely be done. I already have a patch for this.
 
+Thanks.
 
-Yours sincerely,
-Vincent Mailhol
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
