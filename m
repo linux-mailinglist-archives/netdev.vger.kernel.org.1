@@ -1,131 +1,141 @@
-Return-Path: <netdev+bounces-154675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0DD49FF653
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 06:41:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 745179FF67E
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 07:44:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79C4016215A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 05:41:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E88E3A25CD
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 06:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C54C190696;
-	Thu,  2 Jan 2025 05:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BAE18FC70;
+	Thu,  2 Jan 2025 06:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e60WxBbY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J17R9Ihj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C548D54F8C;
-	Thu,  2 Jan 2025 05:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDEF2AF1D
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 06:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735796467; cv=none; b=b1BcidgEz+zSmzli++nh7ScNinjOodkTzYFC9oW2GE0ldqhiSqZv+FHwMR/B61D1JT7wTBQmDYrAk2ai1VBpx3WKI7UURlsn6SOFVAb2mntP3DNlaEe3S7+SHxxWNAklVCF9hGNX4C/+5LDEy/nkHAyClf7zHgwBb8R7Fqu4x2E=
+	t=1735800279; cv=none; b=VDWbqOqQtUz2G3ui0OCn2DFgAdTfRWk5LShwZyJGve2V5rp6IjemSlIw7Rdu/mXqiGCl207KZDfq6Ls6v6lcNiIYq05RHjhu2TqjS/QfQzv4/XzT0e6ZSDSpx61lb0piJJmFuw8ZVa1oX72CoRUtSFcuU58RKzI3G5hK4tE3m1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735796467; c=relaxed/simple;
-	bh=x0GqOPflz3JU1F/JYbbkfOfzkYbLKZumeQJnrDyofl4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BE3f6hQWZP7CiB4A8639kWR0j/9hwG0FAhXhyQEXMJUmZzLV3mQsUq7DsLfrem2Wp8fr3HTQvZnMMcbO3MAYBH0dsY2H1n38/ykPK93leGehLIcyn0F1X+hXmi/R7hpQqbn8N4Tqy8QiyvdXfVLlx07J7EuwLWhn5nw8ogmRzd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e60WxBbY; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e3f78f5fc07so11327449276.2;
-        Wed, 01 Jan 2025 21:41:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735796465; x=1736401265; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ASYw2YvvCKSoHOSnhWWZWXnYT66q6f5Arwrbz5nE6n0=;
-        b=e60WxBbY2J/XD/sTMG+GUy13XQ5pFmkdpOY+OpllbgZ81S48CdnttZzjED37XjlxNn
-         pxBEa7psZ/mMwIq49UMmV4n8sq86cMbSv6dDe2Gl2iVFhkeAxzfRxsPMaqkvVT3OOUXI
-         eQ3szalg4n5qZETB0eFhm5yKaJe6EdDWg71CZytvy2rJ4vFEx5V0mwmswVkQb7ySfugp
-         89L+qPCmadAqYnWO9z3VTYH8qVmO0EvwMWxu88CyPA/PK6HLENMWH931dGovWWABrsxP
-         8BgV7g5D/FuuK2lPaVA9zBCHriE80XTVy0qAeEce+L54iV2bUbOEhak0uLZHHiV6GxK2
-         O+dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735796465; x=1736401265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ASYw2YvvCKSoHOSnhWWZWXnYT66q6f5Arwrbz5nE6n0=;
-        b=VTlpjWSmCWoHjbqqd8zB3ajM8Cj9wxXUK+Dp4tDkEOTJdYvn42cDoCWSth2/3NDw1t
-         IbGDe/glviKd/JjALafYj6WTSL7MwXIL2rsb6gkGbCQK3UtOsEEkOwNS1WVkzv3jnIC3
-         1z1Uul20hYlec/5Nf9KRv6gWcPO1tpedKgLuv80eyJQbzJp91/NsSBBWpXgD3tM+oeZH
-         Dim2QAoSbPwFpc7xCiOiW09ecFwGnv80siQsfQ+czq/LtO95nVsjNOkmBQgLQSbkheYk
-         kkyFFPDjcWEGwbSJHPf8j6m5EZ74u78ktvSVKxEW5zw53TPTcwV4fS9XwZT8v6xwbGYY
-         OKQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJQyEU4snbIVEk1KEK9Nw+h4rEQrXtcSxYQkjr3KF1xavKSRrEju8rBgRzn9Zy2/+kSoTx3HwnW2Q8Tw==@vger.kernel.org, AJvYcCUPplk9C6on+5MtOlvdjLn6Ynlo9bsfPqIbndfcmgG/m0Y5mzVDjhtbcyfIX6c1sUvSbcv3WLCm/hKoW7s=@vger.kernel.org, AJvYcCUd5i+IB6aI10OefpRc+K0MRdc8VQ43qY6xzYfzpztwQOgZnHvBNUcrH1KopQluY91Tun8sH/oJSsuVZKzcU+Q=@vger.kernel.org, AJvYcCVmy1+Qob+GA+QFS/WzeZ5b+GtpUP1gM3rF74GJOaJ4twc7GtiYy/6DO226xVI2feHBlcluNMlfjMg=@vger.kernel.org, AJvYcCW6Z+N6gZ8CeiTxlFi/YaWRwm6EPaIksyDi0mL5UsxNW8t8/JwEizwd9dJsrMh8r6xEt8vJhv9WGWGP@vger.kernel.org, AJvYcCWuqS5G6rgypeJoCtxMmeVVkndBQmDe+FUStQKDZ0EKx1gObT6yO/fOB+H0qXR081J6GV3Suwwn@vger.kernel.org, AJvYcCXPl24bJwendWlV+6pBKor5cUDA8tm9hXgN7axmK/nL/71yAJfjrHGebsWk6dzmV4xlO2R3qzbur6ES@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW76Qpdioc070fz2MUL47nTW/qsfpWb6bU0IuOxCpmQa2WbH+H
-	fHTWZ3NwmQus9Kry8C4NmeduJZkZNOOgwmD4oxqHY7uABQvFgaEi75H249bdl3cJdnlG6rTElzk
-	Q0DY6cEx4beRnjjZnuf9ZcbPatdA=
-X-Gm-Gg: ASbGnctnZqDXeMIA8sDbBoWnMqMkLDKsVcjOzjjMCUVxLnksLOetTHOcRqFIbr2PG2K
-	t3iAAQp9FlISyDaBn6pyAk0ff+AuoZK4CShPz7PXxMuzauy4pygqKyYMxq2KfpRRGJyWGnmpM
-X-Google-Smtp-Source: AGHT+IH4op97zYxM0yElb80n1mWB5vje2idEq4j1aO+EgRYFQsMF+lHBsn3B3CF0kwlTajDY4BtnNpv7SKTe7hWMtDQ=
-X-Received: by 2002:a05:690c:3502:b0:6ef:799c:955b with SMTP id
- 00721157ae682-6f3f8242796mr265511177b3.41.1735796464603; Wed, 01 Jan 2025
- 21:41:04 -0800 (PST)
+	s=arc-20240116; t=1735800279; c=relaxed/simple;
+	bh=geOnRNQ3Qtavp0m1Yc8+qBkg2cu607vROJKrQgPFj54=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZRuPev3R3pmm8mMRnnR8fouV+V/S5eX5D89vAGM9aTHefkIJjNGWOQ+OQKoegiOGOt/Jp/j1NdRdGjIJCNkvv+M2RAP+xVVItJJSLLgqff1+svhfk9ky4IgRnLIjvbjyVOejua3Z3UMcoAzsPVbRmMMopo9jjklB6zk1mZ+gh3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J17R9Ihj; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1735800277; x=1767336277;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=geOnRNQ3Qtavp0m1Yc8+qBkg2cu607vROJKrQgPFj54=;
+  b=J17R9IhjI29haitHLaA6B5MzpGxuhqM6v14zAfBFLWZJINIHtI3eJ2OP
+   Ksx/7DgLe7lG47JBpfVO/i8dKhoYG4VaJznD2aDHOloEBuLOnmU6PktaV
+   vN31VOLB0vVkLSnwy6MCwhD9p9lAMXWKPIcHM1vFzCGKvZQslEgCtLOVp
+   SjqxHnm2PTBhHX0kVlJbk60GnBG58V0jy7xI5Wlb2bZ1RKeBN9bOmzsXp
+   Lon8jlQdmdbsqcdTbMjMciul4+dBTXsiPbQ97kwwkaZVz+US5XeP6sLTB
+   q78QaI5nJ3uz0SxPhiKMT9JVLqEenMIRg1egxGv2h5hO0QkVuPvbqtw+l
+   A==;
+X-CSE-ConnectionGUID: Pw1QC6QQTUmSuFr0ivaJ5g==
+X-CSE-MsgGUID: K+HKNwF7SZCLU0kEO5jYog==
+X-IronPort-AV: E=McAfee;i="6700,10204,11302"; a="36185544"
+X-IronPort-AV: E=Sophos;i="6.12,284,1728975600"; 
+   d="scan'208";a="36185544"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jan 2025 22:44:36 -0800
+X-CSE-ConnectionGUID: r8b08wThQVqDfAzLwiPYCg==
+X-CSE-MsgGUID: fnwxhpjpRmq/Y4AqIahmyQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="106432577"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jan 2025 22:44:35 -0800
+Date: Thu, 2 Jan 2025 07:41:19 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] ice: remove invalid
+ parameter of equalizer
+Message-ID: <Z3Y1D1LRPUR6gT0Z@mev-dev.igk.intel.com>
+References: <20241231095044.433940-1-mateusz.polchlopek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241227095727.2401257-1-a0282524688@gmail.com>
- <20241227095727.2401257-5-a0282524688@gmail.com> <41f77d39-bce3-4e3b-98c8-f248b723a24c@wanadoo.fr>
-In-Reply-To: <41f77d39-bce3-4e3b-98c8-f248b723a24c@wanadoo.fr>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Thu, 2 Jan 2025 13:40:53 +0800
-Message-ID: <CAOoeyxU0ex9_-a-uWda9hFbQa3MkFtNdAFan8C-899Z2pGYy7g@mail.gmail.com>
-Subject: Re: [PATCH v4 4/7] can: Add Nuvoton NCT6694 CAN support
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, tmyu0@nuvoton.com, lee@kernel.org, 
-	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
-	mkl@pengutronix.de, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241231095044.433940-1-mateusz.polchlopek@intel.com>
 
-Dear Vincent,
+On Tue, Dec 31, 2024 at 10:50:44AM +0100, Mateusz Polchlopek wrote:
+> It occurred that in the commit 70838938e89c ("ice: Implement driver
+> functionality to dump serdes equalizer values") the invalid DRATE parameter
+> for reading has been added. The output of the command:
+> 
+>   $ ethtool -d <ethX>
+> 
+> returns the garbage value in the place where DRATE value should be
+> stored.
+> 
+> Remove mentioned parameter to prevent return of corrupted data to
+> userspace.
+> 
+> Fixes: 70838938e89c ("ice: Implement driver functionality to dump serdes equalizer values")
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_adminq_cmd.h | 1 -
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c    | 1 -
+>  drivers/net/ethernet/intel/ice/ice_ethtool.h    | 1 -
+>  3 files changed, 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> index 3bf05b135b35..73756dbfc77f 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> @@ -1498,7 +1498,6 @@ struct ice_aqc_dnl_equa_param {
+>  #define ICE_AQC_RX_EQU_POST1 (0x12 << ICE_AQC_RX_EQU_SHIFT)
+>  #define ICE_AQC_RX_EQU_BFLF (0x13 << ICE_AQC_RX_EQU_SHIFT)
+>  #define ICE_AQC_RX_EQU_BFHF (0x14 << ICE_AQC_RX_EQU_SHIFT)
+> -#define ICE_AQC_RX_EQU_DRATE (0x15 << ICE_AQC_RX_EQU_SHIFT)
+>  #define ICE_AQC_RX_EQU_CTLE_GAINHF (0x20 << ICE_AQC_RX_EQU_SHIFT)
+>  #define ICE_AQC_RX_EQU_CTLE_GAINLF (0x21 << ICE_AQC_RX_EQU_SHIFT)
+>  #define ICE_AQC_RX_EQU_CTLE_GAINDC (0x22 << ICE_AQC_RX_EQU_SHIFT)
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> index 3072634bf049..f241493a6ac8 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> @@ -710,7 +710,6 @@ static int ice_get_tx_rx_equa(struct ice_hw *hw, u8 serdes_num,
+>  		{ ICE_AQC_RX_EQU_POST1, rx, &ptr->rx_equ_post1 },
+>  		{ ICE_AQC_RX_EQU_BFLF, rx, &ptr->rx_equ_bflf },
+>  		{ ICE_AQC_RX_EQU_BFHF, rx, &ptr->rx_equ_bfhf },
+> -		{ ICE_AQC_RX_EQU_DRATE, rx, &ptr->rx_equ_drate },
+>  		{ ICE_AQC_RX_EQU_CTLE_GAINHF, rx, &ptr->rx_equ_ctle_gainhf },
+>  		{ ICE_AQC_RX_EQU_CTLE_GAINLF, rx, &ptr->rx_equ_ctle_gainlf },
+>  		{ ICE_AQC_RX_EQU_CTLE_GAINDC, rx, &ptr->rx_equ_ctle_gaindc },
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.h b/drivers/net/ethernet/intel/ice/ice_ethtool.h
+> index 8f2ad1c172c0..23b2cfbc9684 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.h
+> @@ -15,7 +15,6 @@ struct ice_serdes_equalization_to_ethtool {
+>  	int rx_equ_post1;
+>  	int rx_equ_bflf;
+>  	int rx_equ_bfhf;
+> -	int rx_equ_drate;
+>  	int rx_equ_ctle_gainhf;
+>  	int rx_equ_ctle_gainlf;
+>  	int rx_equ_ctle_gaindc;
+> -- 
+> 2.38.1
 
-Thank you for your comments,
-
-Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2024=E5=B9=B412=E6=
-=9C=8830=E6=97=A5 =E9=80=B1=E4=B8=80 =E4=B8=8B=E5=8D=881:56=E5=AF=AB=E9=81=
-=93=EF=BC=9A
->
-> > +config CAN_NCT6694
-> > +     tristate "Nuvoton NCT6694 Socket CANfd support"
-> > +     depends on MFD_NCT6694
->
-> I think it would be better to do a
->
->         select MFD_NCT6694
->
-> here.
->
-> Then, make MFD_NCT6694 an hidden configuration in a similar fashion as
-> MFD_CORE. Alone, CONFIG_MFD_NCT6694 does nothing, so better to hide it
-> from the end user.
->
-> The comment also applies to the other patches.
->
-
-I understand, but I noticed that in the Kconfig files of other
-modules, the dependency is written in the form:
-config CAN_NCT6694
-        tristate "Nuvoton NCT6694 Socket CANfd support"
-        depends on MFD_NCT6694
-(e.g. CAN_JANZ_ICAN3, GPIO_DLN2, ...)
-Do you think changing it to select MFD_NCT6694 would be better?
-
-Best regards,
-Ming
+Thanks for fixing
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
