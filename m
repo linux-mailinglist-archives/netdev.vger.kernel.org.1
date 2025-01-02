@@ -1,156 +1,165 @@
-Return-Path: <netdev+bounces-154703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488E59FF846
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:35:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 190E59FF85D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:48:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2571162B40
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:35:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE8E13A064D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:48:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD481A8408;
-	Thu,  2 Jan 2025 10:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F8343166;
+	Thu,  2 Jan 2025 10:48:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d31alXSk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PVWZLdhN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAC51AC88B
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 10:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B7A17C68;
+	Thu,  2 Jan 2025 10:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735814082; cv=none; b=lARs/WDvJg/J1D8cyTa4YxG3FtPZCHitlGT7uFAId1k/3XsyWrJxfc66Yk8IuxUz2dR+X3m29vKWMpRYdEvPLxkQ2cm4TQZR7AgJzh7fZagK7o8P5iVyiDVoEWPT7JmyTcyj9Wp2h6bsbi6SbG2GMLAcW8y2QoBJT61WZpl8/O8=
+	t=1735814897; cv=none; b=G3GOZVYRFzkfXV4iF+emd97IsfO2zM61mWX9xqMsCm1Y+crVdNQuc1rwdCLv4vlHcAwyMGgQW5a1xoZBGwxlzUyEFxAGqDbEEt4qkseFDY+v8pshF1edhk5SfQOnhjoiEdByFCdEL//ClWAccf3Xr12pn9k0dNT3yznm8T65r+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735814082; c=relaxed/simple;
-	bh=ElrQSrfAo4NnIHqCBIL7YhgBC1VfGfuSsFxvwvVMkjg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Las+bPncycFFuk43aKOqIgFT7d5dAdY2FfhAOAJ0xPfTsv5hJCmQyKbeEq5tsjoZztb/6m82UEq/8f36/18VL1breTracKisNqPa+oXYEXkRxQfkKCqyI9MNXBx9kVCkpEbfIOqm39fO7g7pftpq90DGv1cr3AJuCbC5Vgg4eK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d31alXSk; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5d3f65844deso18423966a12.0
-        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 02:34:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735814079; x=1736418879; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sks17qciHddqHWfnM40Qn+F3GdiHrxZMi6A0V5O0rPY=;
-        b=d31alXSk9qVDc9zqBv3Sn0gAv538fl3fLCPlmFv47v5f9E5JBUVP2nV55Pxqg0lTBz
-         jZND1xeGNQwL+UXQH/1Pi3Op7cJkhHpC7d9hbi8T3Z8448p4NJCaHj+/Jkeuxl/Wy6LP
-         yrxSi5kzBedCQfFOyuYHSpu+RSCnNao3bkN6rD37QfrE3ENZqdQW0Hl/F1c3QGeTxrDI
-         VhFQaGAiQIiJns+9VUFigGXJyz/l/q1r0sUKeAQqcd2EGXKX+vkgwTVDCNSPlQYsq6z7
-         r7QQt0N+PAwfg862S40Fi57sYG5v8H98KqlI/jA3iaAW9Kg2d3zDC8Pp2AzXfh8QFFya
-         6HAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735814079; x=1736418879;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sks17qciHddqHWfnM40Qn+F3GdiHrxZMi6A0V5O0rPY=;
-        b=fHOixiRKUfRhnFKUuaDQztzQCwE9qM3EfW6zuqB1fJ6S08uUU5MBhiVoJfuQQW+s8B
-         BZd2bYYJGxeBxC+wnGflOgCfQVC7GF65WG/PMu3ZYFV3Cv6w9huGhgLmmrmO3fKbX7yp
-         zuLXpZxEDqpx26fCVuvh4HLExpP6B3ALxaWc3H0W71xygRE06Pzq9py8INlViesbGslj
-         uicT+qEDqvc9eNqk6MIgUvdzLO7hu42gyYuWWbMdUG9TwEjm5aePokR7kiiduJVnO5iZ
-         CzHTIi+JYHDcmKSFlY1okRpejuoaku+2sjIAm2GRCsNLbiT09Uiii6Uw+AWk8Bv1H6Y+
-         Aa5w==
-X-Forwarded-Encrypted: i=1; AJvYcCW0l+YrTZLdA+A4ZP18m2ARVSzP/0WPZ+5beXBkwpZgp+iBBtFcuSMLFqZaKCRiILMWsQcud8s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWbBsYb2IE2NxG7wbHs9Z3rcHimD3nFiUBJeYlc5Oc/Mwkbn+W
-	6/gvnPxz3zNva09KMKsL/4mm1T5xqw2nTNg8r3ExsX68IfsXLtlPaP9kCsb0kpbtvqiKyjxNou0
-	kvyMKjX2U0KvuOrCODqa6anVelqK1Lb5VJgd8
-X-Gm-Gg: ASbGncuy2LwDo2YZJ2P4HftPyGKL6lKA7btk1jf8GW46Z+0kYd8tPB93VUnWnJqgfEw
-	IFM56wREI1X6pE+jaEsO6tm2p4Ij4t79p9zg=
-X-Google-Smtp-Source: AGHT+IGgQHIubZz9WKPEN01Itgy6ZOa0RLc/RmUbuVXnyvSBqUOgs3feFnquGIhI1nDuR/S+wXVSu36GHKEraNevemY=
-X-Received: by 2002:a17:907:9805:b0:aaf:117f:1918 with SMTP id
- a640c23a62f3a-aaf117f1d51mr2433837866b.5.1735814078395; Thu, 02 Jan 2025
- 02:34:38 -0800 (PST)
+	s=arc-20240116; t=1735814897; c=relaxed/simple;
+	bh=BqpiFfm91u09BIUEJssEo3ml/muq8BVcNPDMRh1Jwl0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=StzeCuprZaXP5QKfbQXj63kQ5JGjqgN+1WBJmwiPg9NLL2E8MrAKr/A9eMX2eDR0TSHTWn9Npjd8PnVPJuIVWysc48OoxK5x/Qm3hoi4vMYfc1lLN9LzzYnoicQINC/xd0OMSz/bERwP94VcqsReUetT6Y9IgT8exnx2+DYkLl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PVWZLdhN; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rcRUFlTpm8Zh2F0emtR0r0UVSpkNddkhpcAlUKtjSko=; b=PVWZLdhNQm0ngzeRCuyoqKxsgP
+	f3gQSl+IyaZvM2gs5B7vdKrr6G/M8lsgHwgxLJMZtDdgvl0f70wPBxEbYtbLeMjwuEdthMvOYCGC4
+	QYIiMdID1Iq3wIuVH6xP/Ibm38M7XhqZbsSVs8UBwfsv6KuzBewWVNG/DxpHzyrHq7a7OGubuASdA
+	1S9zdy6kyq9nb9SbXb9guy1oEUB4gdotsVG3761+um1LHl5ZVI9Zd3bhTo3iGcS7d2o1HvebnzS4u
+	7+RnvDjZfFjGXxBhmXsnCSouMOw6P7+StQiVjfpFGi8Ph43Yi+MIR1mScQB9JLYyDcMaiaJkL6m1y
+	nzaqr32Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39980)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tTIkK-0001tV-1o;
+	Thu, 02 Jan 2025 10:48:08 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tTIkH-0000DB-1o;
+	Thu, 02 Jan 2025 10:48:05 +0000
+Date: Thu, 2 Jan 2025 10:48:05 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>
+Subject: Re: [PATCH net-next RFC 0/5] net: phy: Introduce a port
+ representation
+Message-ID: <Z3Zu5ZofHqy4vGoG@shell.armlinux.org.uk>
+References: <20241220201506.2791940-1-maxime.chevallier@bootlin.com>
+ <Z2g3b_t3KwMFozR8@pengutronix.de>
+ <Z2hgbdeTXjqWKa14@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <da83df12-d7e2-41fe-a303-290640e2a4a4@shopee.com>
- <CANn89iKVVS=ODm9jKnwG0d_FNUJ7zdYxeDYDyyOb74y3ELJLdA@mail.gmail.com> <c2c94aa3-c557-4a74-82fc-d88821522a8f@shopee.com>
-In-Reply-To: <c2c94aa3-c557-4a74-82fc-d88821522a8f@shopee.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 2 Jan 2025 11:34:27 +0100
-Message-ID: <CANn89iLZQOegmzpK5rX0p++utV=XaxY8S-+H+zdeHzT3iYjXWw@mail.gmail.com>
-Subject: =?UTF-8?Q?Re=3A_=5BQuestion=5D_ixgbe=EF=BC=9AMechanism_of_RSS?=
-To: Haifeng Xu <haifeng.xu@shopee.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z2hgbdeTXjqWKa14@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Jan 2, 2025 at 9:43=E2=80=AFAM Haifeng Xu <haifeng.xu@shopee.com> w=
-rote:
->
->
->
-> On 2025/1/2 16:13, Eric Dumazet wrote:
-> > On Thu, Jan 2, 2025 at 4:53=E2=80=AFAM Haifeng Xu <haifeng.xu@shopee.co=
-m> wrote:
-> >>
-> >> Hi masters,
-> >>
-> >>         We use the Intel Corporation 82599ES NIC in our production env=
-ironment. And it has 63 rx queues, every rx queue interrupt is processed by=
- a single cpu.
-> >>         The RSS configuration can be seen as follow:
-> >>
-> >>         RX flow hash indirection table for eno5 with 63 RX ring(s):
-> >>         0:      0     1     2     3     4     5     6     7
-> >>         8:      8     9    10    11    12    13    14    15
-> >>         16:      0     1     2     3     4     5     6     7
-> >>         24:      8     9    10    11    12    13    14    15
-> >>         32:      0     1     2     3     4     5     6     7
-> >>         40:      8     9    10    11    12    13    14    15
-> >>         48:      0     1     2     3     4     5     6     7
-> >>         56:      8     9    10    11    12    13    14    15
-> >>         64:      0     1     2     3     4     5     6     7
-> >>         72:      8     9    10    11    12    13    14    15
-> >>         80:      0     1     2     3     4     5     6     7
-> >>         88:      8     9    10    11    12    13    14    15
-> >>         96:      0     1     2     3     4     5     6     7
-> >>         104:      8     9    10    11    12    13    14    15
-> >>         112:      0     1     2     3     4     5     6     7
-> >>         120:      8     9    10    11    12    13    14    15
-> >>
-> >>         The maximum number of RSS queues is 16. So I have some questio=
-ns about this. Will other cpus except 0~15 receive the rx interrupts?
-> >>
-> >>         In our production environment, cpu 16~62 also receive the rx i=
-nterrupts. Was our RSS misconfigured?
-> >
-> > It really depends on which cpus are assigned to each IRQ.
-> >
->
-> Hi Eric,
->
-> Each irq was assigned to a single cpu, for exapmle:
->
-> irq     cpu
->
-> 117      0
-> 118      1
->
-> ......
->
-> 179      62
->
-> All cpus trigger interrupts not only cpus 0~15.
-> It seems that the result is inconsistent with the RSS hash value.
->
->
+On Sun, Dec 22, 2024 at 07:54:37PM +0100, Oleksij Rempel wrote:
+> Here is updated version:
+> 
+> ports {
+>     /* 1000BaseT Port with Ethernet and simple PoE */
+>     port0: ethernet-port@0 {
+>         reg = <0>; /* Port index */
+>         label = "ETH0"; /* Physical label on the device */
+>         connector = "RJ45"; /* Connector type */
+>         supported-modes = <10BaseT 100BaseTX 1000BaseT>; /* Supported modes */
+> 
+>         transformer {
+>             model = "ABC123"; /* Transformer model number */
+>             manufacturer = "TransformerCo"; /* Manufacturer name */
+> 
+>             pairs {
+>                 pair@0 {
+>                     name = "A"; /* Pair A */
+>                     pins = <1 2>; /* Connector pins */
+>                     phy-mapping = <PHY_TX0_P PHY_TX0_N>; /* PHY pin mapping */
+>                     center-tap = "CT0"; /* Central tap identifier */
+>                     pse-negative = <PSE_GND>; /* CT0 connected to GND */
+>                 };
+>                 pair@1 {
+>                     name = "B"; /* Pair B */
+>                     pins = <3 6>; /* Connector pins */
+>                     phy-mapping = <PHY_RX0_P PHY_RX0_N>;
+>                     center-tap = "CT1"; /* Central tap identifier */
+>                     pse-positive = <PSE_OUT0>; /* CT1 connected to PSE_OUT0 */
+>                 };
+>                 pair@2 {
+>                     name = "C"; /* Pair C */
+>                     pins = <4 5>; /* Connector pins */
+>                     phy-mapping = <PHY_TXRX1_P PHY_TXRX1_N>; /* PHY connection only */
+>                     center-tap = "CT2"; /* Central tap identifier */
+>                     /* No power connection to CT2 */
+>                 };
+>                 pair@3 {
+>                     name = "D"; /* Pair D */
+>                     pins = <7 8>; /* Connector pins */
+>                     phy-mapping = <PHY_TXRX2_P PHY_TXRX2_N>; /* PHY connection only */
+>                     center-tap = "CT3"; /* Central tap identifier */
+>                     /* No power connection to CT3 */
+>                 };
+>             };
+>         };
 
-I misread your report, I thought you had 16 receive queues.
+I'm sorry, but... what is the point of giving this much detail in the DT
+description. How much of this actually would get used by *any* code?
 
-Why don't you change "ethtool -L eno5 rx 16", instead of trying to
-configure RSS manually ?
+Why does it matter what transformer is used - surely 802.3 defines the
+characteristics of the signal at the RJ45 connector and it's up to the
+hardware designer to ensure that those characteristics are met. That
+will depend on the transformer, connector and board layout.
+
+What does it matter what connector pins are used? This is standardised.
+
+You also at one point had a description for a SFP cage (I'm sorry, I
+can't be bothered to find it in the 3000+ emails that I've missed over
+the Christmas period), using pin numbers 1, 2, 3, and 4. That's
+nonsense, those aren't the pin numbers for the data pairs. You also
+are effectively redefining what already exists for SFP cages - we
+already have a DT description for that, and it's based around the
+standardised connector. Why do we need a new description for SFP
+cages?
+
+Are we going to start converting schematics into DT representations,
+including any resistors and capacitors that may be present in the
+data path?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
