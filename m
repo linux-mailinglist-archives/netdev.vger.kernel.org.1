@@ -1,482 +1,226 @@
-Return-Path: <netdev+bounces-154715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B60A9FF8E7
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:36:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B41E79FF8EF
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:47:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF8C61882D64
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:36:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCCB01881DFB
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61A31AF0B4;
-	Thu,  2 Jan 2025 11:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164BA190051;
+	Thu,  2 Jan 2025 11:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jqshaQOb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PO+BhgnD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFA5A95E;
-	Thu,  2 Jan 2025 11:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2FC13C9A3
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 11:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735817789; cv=none; b=Q1PjxMTW09V832OfFQGW9SDjG7HtNu4q+dc3ByU76k2r2pNrsERHe7LGgSJsLW+eolV5vGiCCHwUrSZpXfB/1K0GRW7hbbROfysK/s3H3x+xZPLPssAqzOTB9Y2QZjL1oL00rMw0aL0SZy+tA8gvZ1wTXsWKEZ0cu2Os0SW9EpE=
+	t=1735818427; cv=none; b=XmtFLUoMD3Es9eh5McEdApGDy4AJJWJDPcalpiGsQHWCeOqn4vjoeqBfxV4qMIIV3fu1t47tO69bwrfh4+LqxwkLHK3A1W9gUSDVlBMrR5uWu2VqYft3YNJesNR1XxQdXvuArm+9L0OPbJ/gxY98vxhHp7YfhX1VKVQdefB6nas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735817789; c=relaxed/simple;
-	bh=ppGDMEb+m27awcR8mcuKL5QE0e253ExWJlInEelY84Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tEptSjJmQpjb63QujiQCprt0yEqA48nJmhSd563yc8zJMmjG1vMNwjQIy6EPuMts6qNMaa+bcIniILQUkuXZ1g+Suk08oNfOAFP2j0KM1O3OImGZgxGwfV7Gi7ah7EVdhWPq2QGfM1GRZ44HcuFTHps++JkP3XNx60IashGzBsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jqshaQOb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 087A9C4CED0;
-	Thu,  2 Jan 2025 11:36:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735817789;
-	bh=ppGDMEb+m27awcR8mcuKL5QE0e253ExWJlInEelY84Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jqshaQObjGwRYxwXEIo1uGKBdNFiRpm/Mks0poY5YINiK8/HO+oPpCtu8Y6vJiC/K
-	 2Qhqm2OKfz4yR6NOPhmHsCZOkb0MaAHorLuUGNmuCZlpWtWWRqsb8JixN5mcp8TaHe
-	 OBVq7iAwO3gE16I0YSZGBaML/pxk5iy0G7D9P0IeBuQwL/rSJSKjIsG2lar+WoruAY
-	 7owRlxq5h12+Htpk5gTJJVqLWIosq7R9OF5Tnfa7IY/LsQGJ94kj3GVdsMKWzqSLG6
-	 rFsGlZW7XaJ3/IKbaJyyNUdBlaFgNsaxS4qHmaX/hoDG7PeosT4k2O2TM9ftEnBcfV
-	 YGQEPFRI7qCaA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Patrisious Haddad <phaddad@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-rdma@vger.kernel.org,
-	Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH mlx5-next 2/3] net/mlx5: fs, add RDMA TRANSPORT steering domain support
-Date: Thu,  2 Jan 2025 13:36:06 +0200
-Message-ID: <27799a1503e49643e07fc74ce45d047e950922e8.1735817449.git.leon@kernel.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <cover.1735817449.git.leon@kernel.org>
-References: <cover.1735817449.git.leon@kernel.org>
+	s=arc-20240116; t=1735818427; c=relaxed/simple;
+	bh=sF+g00QEE/+9JFZEew+k5/vn8HmjvxLQn5G8Vw1SHOo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vym2lGS12SgFYeXtYa9BRSeTmx5HEQC63GhEE1MPSBMBBSfU7meLQEtqLx2NlsaYgTno9tLC2z+/O2BocKBCUu79XCnb5h3yR8CJIhCIyCLzbxEJt6DuepmbwQRIMvH33BHmLYTwBk0nwLkP4kSOsbIG8NWlN+X3BYI3Qro/H2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PO+BhgnD; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aae81f4fdc4so1740284566b.0
+        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 03:47:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1735818423; x=1736423223; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s0YMxFvTR89OUfZaD3QYFUwk+Kdex/zYhmYqlBBl7SY=;
+        b=PO+BhgnDtTMNLbJNnxgtmPi4ksUSunooK1u3XXCbEL3GVXFYtkj7TCmu9MFSFBoQCV
+         WBbMqmVEvFceIDe1FXS40lC8Vgn1rnCRRlUgvvGfuXrLZxrbMH+vYqP5dHbAPQo4Pwyf
+         c2ZxzXy04HHaBcnOsyrlCli/Y5p/AC7YTA/fliUrFr5pbC8Mg0NvKJvT1D82AvT6zXrx
+         6ojrptpVd1EGENN2dN0Cpn4zt3ksPEK/V6GlJn6XOadpGG9qGcQPy2fRh+vb69enN+/O
+         mmjh7sh5x596YoN8LCCVpSEOevRpCiVB2dPjBHc9ThPXp9BUts97A9yNyx04cqOKK8Fk
+         6pOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735818423; x=1736423223;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s0YMxFvTR89OUfZaD3QYFUwk+Kdex/zYhmYqlBBl7SY=;
+        b=PI7bYENhraR1NAY7/zbKkZX6uC7h5KCDOLO/l2yzJErVXUB1j2GfBcV5Lxf9vpGXWP
+         cezxhobWI0R3lsfiO9oUXLbYeGCz8xZ5OuwoBbvxAD4mucppzexWMDzpMAoaa+rFJ+Mm
+         Qr4IAJ6p7R35G761wDgJyN5btMGmv12BriQajw6VRo9EdsWVpW4TE/vPbDESGZ8izjHI
+         Qu9LAWwPAS3/UT17AlgqPc5ob3qudxE/kmqjkPik6A166uKvLTSmt7wCvQhPlxDcMl9B
+         O1EG1OePiqdyZk91SmAse/1PSyk2cc9PE2uFCPHCXFBo0dQeiRyHZ7MFLb1H0wdM+yHR
+         Ny2w==
+X-Forwarded-Encrypted: i=1; AJvYcCVbs/5SFc7O/ffKRwqiYfOyb6YwtZ89hjhHHO2A2ZwrlZvnWkT+4oWHlTX5tS3HxM0+Rb4Ouu8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQPWTMqBl3qRiUA5Cw/ODLrrRgtfR5OQmJqFbnIHa28Bozp0MJ
+	16nFxRPolg+8MsVxtXgGeucx5mP/gPqS0cvEo36vJVPvRq/FtTzrZjEGwMP80LOtsnevP3NpToT
+	OxvJdY0j9Ndr1VEp7E1lSwrb36vcO+dWmTmt5
+X-Gm-Gg: ASbGncvYj3PH50MIYlQPRwdmkacPXdEIeI2KzxhDWbtTriXbX8oh6qsN++7emH1BsU7
+	UbyyJQMPXFPXi0uKL3XU538HLnrQsyXsnNexBNQ==
+X-Google-Smtp-Source: AGHT+IHMS6327aM/I7sq/DNSg6+ALjDW+MpVCLsUrouDMM8e9gYTaMP3053qoEqS0wE3FMlpumzaE2t4mVs39VPasJc=
+X-Received: by 2002:a17:907:7286:b0:aa6:79fa:b487 with SMTP id
+ a640c23a62f3a-aac28a2ab8fmr4149628866b.10.1735818423359; Thu, 02 Jan 2025
+ 03:47:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <da83df12-d7e2-41fe-a303-290640e2a4a4@shopee.com>
+ <CANn89iKVVS=ODm9jKnwG0d_FNUJ7zdYxeDYDyyOb74y3ELJLdA@mail.gmail.com>
+ <c2c94aa3-c557-4a74-82fc-d88821522a8f@shopee.com> <CANn89iLZQOegmzpK5rX0p++utV=XaxY8S-+H+zdeHzT3iYjXWw@mail.gmail.com>
+ <b9c88c0f-7909-43a3-8229-2b0ce7c68c10@shopee.com>
+In-Reply-To: <b9c88c0f-7909-43a3-8229-2b0ce7c68c10@shopee.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 2 Jan 2025 12:46:52 +0100
+Message-ID: <CANn89iLbC3qkeptG9xv1nZyWHUTdtXBf4w3LGaisRGc7xj4pMw@mail.gmail.com>
+Subject: =?UTF-8?Q?Re=3A_=5BQuestion=5D_ixgbe=EF=BC=9AMechanism_of_RSS?=
+To: Haifeng Xu <haifeng.xu@shopee.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Patrisious Haddad <phaddad@nvidia.com>
+On Thu, Jan 2, 2025 at 12:23=E2=80=AFPM Haifeng Xu <haifeng.xu@shopee.com> =
+wrote:
+>
+>
+>
+> On 2025/1/2 18:34, Eric Dumazet wrote:
+> > On Thu, Jan 2, 2025 at 9:43=E2=80=AFAM Haifeng Xu <haifeng.xu@shopee.co=
+m> wrote:
+> >>
+> >>
+> >>
+> >> On 2025/1/2 16:13, Eric Dumazet wrote:
+> >>> On Thu, Jan 2, 2025 at 4:53=E2=80=AFAM Haifeng Xu <haifeng.xu@shopee.=
+com> wrote:
+> >>>>
+> >>>> Hi masters,
+> >>>>
+> >>>>         We use the Intel Corporation 82599ES NIC in our production e=
+nvironment. And it has 63 rx queues, every rx queue interrupt is processed =
+by a single cpu.
+> >>>>         The RSS configuration can be seen as follow:
+> >>>>
+> >>>>         RX flow hash indirection table for eno5 with 63 RX ring(s):
+> >>>>         0:      0     1     2     3     4     5     6     7
+> >>>>         8:      8     9    10    11    12    13    14    15
+> >>>>         16:      0     1     2     3     4     5     6     7
+> >>>>         24:      8     9    10    11    12    13    14    15
+> >>>>         32:      0     1     2     3     4     5     6     7
+> >>>>         40:      8     9    10    11    12    13    14    15
+> >>>>         48:      0     1     2     3     4     5     6     7
+> >>>>         56:      8     9    10    11    12    13    14    15
+> >>>>         64:      0     1     2     3     4     5     6     7
+> >>>>         72:      8     9    10    11    12    13    14    15
+> >>>>         80:      0     1     2     3     4     5     6     7
+> >>>>         88:      8     9    10    11    12    13    14    15
+> >>>>         96:      0     1     2     3     4     5     6     7
+> >>>>         104:      8     9    10    11    12    13    14    15
+> >>>>         112:      0     1     2     3     4     5     6     7
+> >>>>         120:      8     9    10    11    12    13    14    15
+> >>>>
+> >>>>         The maximum number of RSS queues is 16. So I have some quest=
+ions about this. Will other cpus except 0~15 receive the rx interrupts?
+> >>>>
+> >>>>         In our production environment, cpu 16~62 also receive the rx=
+ interrupts. Was our RSS misconfigured?
+> >>>
+> >>> It really depends on which cpus are assigned to each IRQ.
+> >>>
+> >>
+> >> Hi Eric,
+> >>
+> >> Each irq was assigned to a single cpu, for exapmle:
+> >>
+> >> irq     cpu
+> >>
+> >> 117      0
+> >> 118      1
+> >>
+> >> ......
+> >>
+> >> 179      62
+> >>
+> >> All cpus trigger interrupts not only cpus 0~15.
+> >> It seems that the result is inconsistent with the RSS hash value.
+> >>
+> >>
+> >
+> > I misread your report, I thought you had 16 receive queues.
+> >
+> > Why don't you change "ethtool -L eno5 rx 16", instead of trying to
+> > configure RSS manually ?
+>
+> Hi Eric,
+>
+> We want to make full use of cpu resources to receive packets. So
+> we enable 63 rx queues. But we found the rate of interrupt growth
+> on cpu 0~15 is faster than other cpus(almost twice). I don't know
+> whether it is related to RSS configuration. We didn't make any changes
+> on the RSS configration after the server is up.
+>
+>
+>
+> FYI, on another server, we use Mellanox Technologies MT27800 NIC.
+> The rate of interrupt growth on cpu 0~63 seems have little gap.
+>
+> It's RSS configration can be seen as follow:
+>
+> RX flow hash indirection table for ens2f0np0 with 63 RX ring(s):
+>     0:      0     1     2     3     4     5     6     7
+>     8:      8     9    10    11    12    13    14    15
+>    16:     16    17    18    19    20    21    22    23
+>    24:     24    25    26    27    28    29    30    31
+>    32:     32    33    34    35    36    37    38    39
+>    40:     40    41    42    43    44    45    46    47
+>    48:     48    49    50    51    52    53    54    55
+>    56:     56    57    58    59    60    61    62     0
+>    64:      1     2     3     4     5     6     7     8
+>    72:      9    10    11    12    13    14    15    16
+>    80:     17    18    19    20    21    22    23    24
+>    88:     25    26    27    28    29    30    31    32
+>    96:     33    34    35    36    37    38    39    40
+>   104:     41    42    43    44    45    46    47    48
+>   112:     49    50    51    52    53    54    55    56
+>   120:     57    58    59    60    61    62     0     1
+>   128:      2     3     4     5     6     7     8     9
+>   136:     10    11    12    13    14    15    16    17
+>   144:     18    19    20    21    22    23    24    25
+>   152:     26    27    28    29    30    31    32    33
+>   160:     34    35    36    37    38    39    40    41
+>   168:     42    43    44    45    46    47    48    49
+>   176:     50    51    52    53    54    55    56    57
+>   184:     58    59    60    61    62     0     1     2
+>   192:      3     4     5     6     7     8     9    10
+>   200:     11    12    13    14    15    16    17    18
+>   208:     19    20    21    22    23    24    25    26
+>   216:     27    28    29    30    31    32    33    34
+>   224:     35    36    37    38    39    40    41    42
+>   232:     43    44    45    46    47    48    49    50
+>   240:     51    52    53    54    55    56    57    58
+>   248:     59    60    61    62     0     1     2     3
+>
+>
+> I am confused that why ixgbe NIC can dispatch the packets
+> to the rx queues that not specified in RSS configuration.
 
-Add RX and TX RDMA_TRANSPORT flow table namespace, and the ability
-to create flow tables in those namespaces.
+Perhaps make sure to change RX flow hash indirection table on the
+Intel NIC then...
 
-The RDMA_TRANSPORT RX and TX are per vport.
+Maybe you changed the default configuration.
 
-Packets will traverse through RDMA_TRANSPORT_RX after RDMA_RX and through
-RDMA_TRANSPORT_TX before RDMA_TX, ensuring proper control and management.
-
-RDMA_TRANSPORT domains are managed by the vport group manager.
-
-Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- .../mellanox/mlx5/core/esw/acl/helper.c       |   2 +-
- .../mellanox/mlx5/core/eswitch_offloads.c     |   6 +-
- .../net/ethernet/mellanox/mlx5/core/fs_cmd.c  |   2 +
- .../net/ethernet/mellanox/mlx5/core/fs_core.c | 178 ++++++++++++++++--
- .../net/ethernet/mellanox/mlx5/core/fs_core.h |  12 +-
- include/linux/mlx5/device.h                   |   6 +
- include/linux/mlx5/fs.h                       |  11 +-
- 7 files changed, 196 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/acl/helper.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/acl/helper.c
-index d599e50af346b..3ce455c2535c4 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/esw/acl/helper.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/acl/helper.c
-@@ -27,7 +27,7 @@ esw_acl_table_create(struct mlx5_eswitch *esw, struct mlx5_vport *vport, int ns,
- 	esw_debug(dev, "Create vport[%d] %s ACL table\n", vport_num,
- 		  ns == MLX5_FLOW_NAMESPACE_ESW_INGRESS ? "ingress" : "egress");
- 
--	root_ns = mlx5_get_flow_vport_acl_namespace(dev, ns, vport->index);
-+	root_ns = mlx5_get_flow_vport_namespace(dev, ns, vport->index);
- 	if (!root_ns) {
- 		esw_warn(dev, "Failed to get E-Switch root namespace for vport (%d)\n",
- 			 vport_num);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index d5b42b3a19fdf..fdbb79a83c900 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -2831,9 +2831,9 @@ static int esw_set_master_egress_rule(struct mlx5_core_dev *master,
- 	if (IS_ERR(vport))
- 		return PTR_ERR(vport);
- 
--	egress_ns = mlx5_get_flow_vport_acl_namespace(master,
--						      MLX5_FLOW_NAMESPACE_ESW_EGRESS,
--						      vport->index);
-+	egress_ns = mlx5_get_flow_vport_namespace(master,
-+						  MLX5_FLOW_NAMESPACE_ESW_EGRESS,
-+						  vport->index);
- 	if (!egress_ns)
- 		return -EINVAL;
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-index 676005854dad4..86f9c0fbed928 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-@@ -1141,6 +1141,8 @@ const struct mlx5_flow_cmds *mlx5_fs_cmd_get_default(enum fs_flow_table_type typ
- 	case FS_FT_RDMA_RX:
- 	case FS_FT_RDMA_TX:
- 	case FS_FT_PORT_SEL:
-+	case FS_FT_RDMA_TRANSPORT_RX:
-+	case FS_FT_RDMA_TRANSPORT_TX:
- 		return mlx5_fs_cmd_get_fw_cmds();
- 	default:
- 		return mlx5_fs_cmd_get_stub_cmds();
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-index 2eabfcc247c6a..879c36a88a26c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-@@ -1449,7 +1449,7 @@ mlx5_create_auto_grouped_flow_table(struct mlx5_flow_namespace *ns,
- 	struct mlx5_flow_table *ft;
- 	int autogroups_max_fte;
- 
--	ft = mlx5_create_flow_table(ns, ft_attr);
-+	ft = mlx5_create_vport_flow_table(ns, ft_attr, ft_attr->vport);
- 	if (IS_ERR(ft))
- 		return ft;
- 
-@@ -2756,9 +2756,9 @@ struct mlx5_flow_namespace *mlx5_get_flow_namespace(struct mlx5_core_dev *dev,
- }
- EXPORT_SYMBOL(mlx5_get_flow_namespace);
- 
--struct mlx5_flow_namespace *mlx5_get_flow_vport_acl_namespace(struct mlx5_core_dev *dev,
--							      enum mlx5_flow_namespace_type type,
--							      int vport)
-+struct mlx5_flow_namespace *
-+mlx5_get_flow_vport_namespace(struct mlx5_core_dev *dev,
-+			      enum mlx5_flow_namespace_type type, int vport_idx)
- {
- 	struct mlx5_flow_steering *steering = dev->priv.steering;
- 
-@@ -2767,25 +2767,43 @@ struct mlx5_flow_namespace *mlx5_get_flow_vport_acl_namespace(struct mlx5_core_d
- 
- 	switch (type) {
- 	case MLX5_FLOW_NAMESPACE_ESW_EGRESS:
--		if (vport >= steering->esw_egress_acl_vports)
-+		if (vport_idx >= steering->esw_egress_acl_vports)
- 			return NULL;
- 		if (steering->esw_egress_root_ns &&
--		    steering->esw_egress_root_ns[vport])
--			return &steering->esw_egress_root_ns[vport]->ns;
-+		    steering->esw_egress_root_ns[vport_idx])
-+			return &steering->esw_egress_root_ns[vport_idx]->ns;
- 		else
- 			return NULL;
- 	case MLX5_FLOW_NAMESPACE_ESW_INGRESS:
--		if (vport >= steering->esw_ingress_acl_vports)
-+		if (vport_idx >= steering->esw_ingress_acl_vports)
- 			return NULL;
- 		if (steering->esw_ingress_root_ns &&
--		    steering->esw_ingress_root_ns[vport])
--			return &steering->esw_ingress_root_ns[vport]->ns;
-+		    steering->esw_ingress_root_ns[vport_idx])
-+			return &steering->esw_ingress_root_ns[vport_idx]->ns;
-+		else
-+			return NULL;
-+	case MLX5_FLOW_NAMESPACE_RDMA_TRANSPORT_RX:
-+		if (vport_idx >= steering->rdma_transport_rx_vports)
-+			return NULL;
-+		if (steering->rdma_transport_rx_root_ns &&
-+		    steering->rdma_transport_rx_root_ns[vport_idx])
-+			return &steering->rdma_transport_rx_root_ns[vport_idx]->ns;
-+		else
-+			return NULL;
-+	case MLX5_FLOW_NAMESPACE_RDMA_TRANSPORT_TX:
-+		if (vport_idx >= steering->rdma_transport_tx_vports)
-+			return NULL;
-+
-+		if (steering->rdma_transport_tx_root_ns &&
-+		    steering->rdma_transport_tx_root_ns[vport_idx])
-+			return &steering->rdma_transport_tx_root_ns[vport_idx]->ns;
- 		else
- 			return NULL;
- 	default:
- 		return NULL;
- 	}
- }
-+EXPORT_SYMBOL(mlx5_get_flow_vport_namespace);
- 
- static struct fs_prio *_fs_create_prio(struct mlx5_flow_namespace *ns,
- 				       unsigned int prio,
-@@ -3191,6 +3209,127 @@ static int init_rdma_tx_root_ns(struct mlx5_flow_steering *steering)
- 	return err;
- }
- 
-+static int
-+init_rdma_transport_rx_root_ns_one(struct mlx5_flow_steering *steering,
-+				   int vport_idx)
-+{
-+	struct fs_prio *prio;
-+
-+	steering->rdma_transport_rx_root_ns[vport_idx] =
-+		create_root_ns(steering, FS_FT_RDMA_TRANSPORT_RX);
-+	if (!steering->rdma_transport_rx_root_ns[vport_idx])
-+		return -ENOMEM;
-+
-+	/* create 1 prio*/
-+	prio = fs_create_prio(&steering->rdma_transport_rx_root_ns[vport_idx]->ns,
-+			      MLX5_RDMA_TRANSPORT_BYPASS_PRIO, 1);
-+	return PTR_ERR_OR_ZERO(prio);
-+}
-+
-+static int
-+init_rdma_transport_tx_root_ns_one(struct mlx5_flow_steering *steering,
-+				   int vport_idx)
-+{
-+	struct fs_prio *prio;
-+
-+	steering->rdma_transport_tx_root_ns[vport_idx] =
-+		create_root_ns(steering, FS_FT_RDMA_TRANSPORT_TX);
-+	if (!steering->rdma_transport_tx_root_ns[vport_idx])
-+		return -ENOMEM;
-+
-+	/* create 1 prio*/
-+	prio = fs_create_prio(&steering->rdma_transport_tx_root_ns[vport_idx]->ns,
-+			      MLX5_RDMA_TRANSPORT_BYPASS_PRIO, 1);
-+	return PTR_ERR_OR_ZERO(prio);
-+}
-+
-+static int init_rdma_transport_rx_root_ns(struct mlx5_flow_steering *steering)
-+{
-+	struct mlx5_core_dev *dev = steering->dev;
-+	int total_vports;
-+	int err;
-+	int i;
-+
-+	/* In case eswitch not supported and working in legacy mode */
-+	total_vports = mlx5_eswitch_get_total_vports(dev) ?: 1;
-+
-+	steering->rdma_transport_rx_root_ns =
-+			kcalloc(total_vports,
-+				sizeof(*steering->rdma_transport_rx_root_ns),
-+				GFP_KERNEL);
-+	if (!steering->rdma_transport_rx_root_ns)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < total_vports; i++) {
-+		err = init_rdma_transport_rx_root_ns_one(steering, i);
-+		if (err)
-+			goto cleanup_root_ns;
-+	}
-+	steering->rdma_transport_rx_vports = total_vports;
-+	return 0;
-+
-+cleanup_root_ns:
-+	while (i--)
-+		cleanup_root_ns(steering->rdma_transport_rx_root_ns[i]);
-+	kfree(steering->rdma_transport_rx_root_ns);
-+	steering->rdma_transport_rx_root_ns = NULL;
-+	return err;
-+}
-+
-+static int init_rdma_transport_tx_root_ns(struct mlx5_flow_steering *steering)
-+{
-+	struct mlx5_core_dev *dev = steering->dev;
-+	int total_vports;
-+	int err;
-+	int i;
-+
-+	/* In case eswitch not supported and working in legacy mode */
-+	total_vports = mlx5_eswitch_get_total_vports(dev) ?: 1;
-+
-+	steering->rdma_transport_tx_root_ns =
-+			kcalloc(total_vports,
-+				sizeof(*steering->rdma_transport_tx_root_ns),
-+				GFP_KERNEL);
-+	if (!steering->rdma_transport_tx_root_ns)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < total_vports; i++) {
-+		err = init_rdma_transport_tx_root_ns_one(steering, i);
-+		if (err)
-+			goto cleanup_root_ns;
-+	}
-+	steering->rdma_transport_tx_vports = total_vports;
-+	return 0;
-+
-+cleanup_root_ns:
-+	while (i--)
-+		cleanup_root_ns(steering->rdma_transport_tx_root_ns[i]);
-+	kfree(steering->rdma_transport_tx_root_ns);
-+	steering->rdma_transport_tx_root_ns = NULL;
-+	return err;
-+}
-+
-+static void cleanup_rdma_transport_roots_ns(struct mlx5_flow_steering *steering)
-+{
-+	int i;
-+
-+	if (steering->rdma_transport_rx_root_ns) {
-+		for (i = 0; i < steering->rdma_transport_rx_vports; i++)
-+			cleanup_root_ns(steering->rdma_transport_rx_root_ns[i]);
-+
-+		kfree(steering->rdma_transport_rx_root_ns);
-+		steering->rdma_transport_rx_root_ns = NULL;
-+	}
-+
-+	if (steering->rdma_transport_tx_root_ns) {
-+		for (i = 0; i < steering->rdma_transport_tx_vports; i++)
-+			cleanup_root_ns(steering->rdma_transport_tx_root_ns[i]);
-+
-+		kfree(steering->rdma_transport_tx_root_ns);
-+		steering->rdma_transport_tx_root_ns = NULL;
-+	}
-+}
-+
- /* FT and tc chains are stored in the same array so we can re-use the
-  * mlx5_get_fdb_sub_ns() and tc api for FT chains.
-  * When creating a new ns for each chain store it in the first available slot.
-@@ -3607,6 +3746,7 @@ void mlx5_fs_core_cleanup(struct mlx5_core_dev *dev)
- 	cleanup_root_ns(steering->rdma_rx_root_ns);
- 	cleanup_root_ns(steering->rdma_tx_root_ns);
- 	cleanup_root_ns(steering->egress_root_ns);
-+	cleanup_rdma_transport_roots_ns(steering);
- 
- 	devl_params_unregister(priv_to_devlink(dev), mlx5_fs_params,
- 			       ARRAY_SIZE(mlx5_fs_params));
-@@ -3677,6 +3817,18 @@ int mlx5_fs_core_init(struct mlx5_core_dev *dev)
- 			goto err;
- 	}
- 
-+	if (MLX5_CAP_FLOWTABLE_RDMA_TRANSPORT_RX(dev, ft_support)) {
-+		err = init_rdma_transport_rx_root_ns(steering);
-+		if (err)
-+			goto err;
-+	}
-+
-+	if (MLX5_CAP_FLOWTABLE_RDMA_TRANSPORT_TX(dev, ft_support)) {
-+		err = init_rdma_transport_tx_root_ns(steering);
-+		if (err)
-+			goto err;
-+	}
-+
- 	return 0;
- 
- err:
-@@ -3827,8 +3979,10 @@ mlx5_get_root_namespace(struct mlx5_core_dev *dev, enum mlx5_flow_namespace_type
- 	struct mlx5_flow_namespace *ns;
- 
- 	if (ns_type == MLX5_FLOW_NAMESPACE_ESW_EGRESS ||
--	    ns_type == MLX5_FLOW_NAMESPACE_ESW_INGRESS)
--		ns = mlx5_get_flow_vport_acl_namespace(dev, ns_type, 0);
-+	    ns_type == MLX5_FLOW_NAMESPACE_ESW_INGRESS ||
-+	    ns_type == MLX5_FLOW_NAMESPACE_RDMA_TRANSPORT_TX ||
-+	    ns_type == MLX5_FLOW_NAMESPACE_RDMA_TRANSPORT_RX)
-+		ns = mlx5_get_flow_vport_namespace(dev, ns_type, 0);
- 	else
- 		ns = mlx5_get_flow_namespace(dev, ns_type);
- 	if (!ns)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
-index bad2df0715ecc..6da60e679dcb4 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
-@@ -112,7 +112,9 @@ enum fs_flow_table_type {
- 	FS_FT_PORT_SEL		= 0X9,
- 	FS_FT_FDB_RX		= 0xa,
- 	FS_FT_FDB_TX		= 0xb,
--	FS_FT_MAX_TYPE = FS_FT_FDB_TX,
-+	FS_FT_RDMA_TRANSPORT_RX	= 0xd,
-+	FS_FT_RDMA_TRANSPORT_TX	= 0xe,
-+	FS_FT_MAX_TYPE = FS_FT_RDMA_TRANSPORT_TX,
- };
- 
- enum fs_flow_table_op_mod {
-@@ -154,6 +156,10 @@ struct mlx5_flow_steering {
- 	struct mlx5_flow_root_namespace	*port_sel_root_ns;
- 	int esw_egress_acl_vports;
- 	int esw_ingress_acl_vports;
-+	struct mlx5_flow_root_namespace **rdma_transport_rx_root_ns;
-+	struct mlx5_flow_root_namespace **rdma_transport_tx_root_ns;
-+	int rdma_transport_rx_vports;
-+	int rdma_transport_tx_vports;
- };
- 
- struct fs_node {
-@@ -382,7 +388,9 @@ struct mlx5_flow_root_namespace *find_root(struct fs_node *node);
- 	(type == FS_FT_PORT_SEL) ? MLX5_CAP_FLOWTABLE_PORT_SELECTION(mdev, cap) :      \
- 	(type == FS_FT_FDB_RX) ? MLX5_CAP_ESW_FLOWTABLE_FDB(mdev, cap) :      \
- 	(type == FS_FT_FDB_TX) ? MLX5_CAP_ESW_FLOWTABLE_FDB(mdev, cap) :      \
--	(BUILD_BUG_ON_ZERO(FS_FT_FDB_TX != FS_FT_MAX_TYPE))\
-+	(type == FS_FT_RDMA_TRANSPORT_RX) ? MLX5_CAP_FLOWTABLE_RDMA_TRANSPORT_RX(mdev, cap) :      \
-+	(type == FS_FT_RDMA_TRANSPORT_TX) ? MLX5_CAP_FLOWTABLE_RDMA_TRANSPORT_TX(mdev, cap) :      \
-+	(BUILD_BUG_ON_ZERO(FS_FT_RDMA_TRANSPORT_TX != FS_FT_MAX_TYPE))\
- 	)
- 
- #endif
-diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index da5bcde853da3..e33ea22463424 100644
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@ -1344,6 +1344,12 @@ enum mlx5_qcam_feature_groups {
- #define MLX5_CAP_FLOWTABLE_RDMA_TX(mdev, cap) \
- 	MLX5_CAP_FLOWTABLE(mdev, flow_table_properties_nic_transmit_rdma.cap)
- 
-+#define MLX5_CAP_FLOWTABLE_RDMA_TRANSPORT_RX(mdev, cap) \
-+	MLX5_CAP_ADV_RDMA(mdev, rdma_transport_rx_flow_table_properties.cap)
-+
-+#define MLX5_CAP_FLOWTABLE_RDMA_TRANSPORT_TX(mdev, cap) \
-+	MLX5_CAP_ADV_RDMA(mdev, rdma_transport_tx_flow_table_properties.cap)
-+
- #define MLX5_CAP_ESW_FLOWTABLE(mdev, cap) \
- 	MLX5_GET(flow_table_eswitch_cap, \
- 		 mdev->caps.hca[MLX5_CAP_ESWITCH_FLOW_TABLE]->cur, cap)
-diff --git a/include/linux/mlx5/fs.h b/include/linux/mlx5/fs.h
-index 438db888bde0d..45c60a9ae8de3 100644
---- a/include/linux/mlx5/fs.h
-+++ b/include/linux/mlx5/fs.h
-@@ -40,6 +40,8 @@
- 
- #define MLX5_SET_CFG(p, f, v) MLX5_SET(create_flow_group_in, p, f, v)
- 
-+#define MLX5_RDMA_TRANSPORT_BYPASS_PRIO 0
-+
- enum mlx5_flow_destination_type {
- 	MLX5_FLOW_DESTINATION_TYPE_NONE,
- 	MLX5_FLOW_DESTINATION_TYPE_VPORT,
-@@ -108,6 +110,8 @@ enum mlx5_flow_namespace_type {
- 	MLX5_FLOW_NAMESPACE_RDMA_TX_IPSEC,
- 	MLX5_FLOW_NAMESPACE_RDMA_RX_MACSEC,
- 	MLX5_FLOW_NAMESPACE_RDMA_TX_MACSEC,
-+	MLX5_FLOW_NAMESPACE_RDMA_TRANSPORT_RX,
-+	MLX5_FLOW_NAMESPACE_RDMA_TRANSPORT_TX,
- };
- 
- enum {
-@@ -192,9 +196,9 @@ struct mlx5_flow_namespace *
- mlx5_get_flow_namespace(struct mlx5_core_dev *dev,
- 			enum mlx5_flow_namespace_type type);
- struct mlx5_flow_namespace *
--mlx5_get_flow_vport_acl_namespace(struct mlx5_core_dev *dev,
--				  enum mlx5_flow_namespace_type type,
--				  int vport);
-+mlx5_get_flow_vport_namespace(struct mlx5_core_dev *dev,
-+			      enum mlx5_flow_namespace_type type,
-+			      int vport_idx);
- 
- struct mlx5_flow_table_attr {
- 	int prio;
-@@ -202,6 +206,7 @@ struct mlx5_flow_table_attr {
- 	u32 level;
- 	u32 flags;
- 	u16 uid;
-+	u16 vport;
- 	struct mlx5_flow_table *next_ft;
- 
- 	struct {
--- 
-2.47.1
-
+ethtool -X eno5 equal 64
+Or
+ethtool -X eno5 default
 
