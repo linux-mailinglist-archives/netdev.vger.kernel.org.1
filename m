@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-154796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A43E9FFCEA
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:40:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB7799FFCE1
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:39:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20795162A7B
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:40:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B546E1881415
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00569188904;
-	Thu,  2 Jan 2025 17:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB7D1B4F23;
+	Thu,  2 Jan 2025 17:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="G/wxJMXO"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="FhJT2JN/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13022188587;
-	Thu,  2 Jan 2025 17:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AFE1B4121;
+	Thu,  2 Jan 2025 17:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735839474; cv=none; b=oFl/eFUP0bjwd5hhzJ9iabCZohRr2xRm0aT/A/BgS0Et8D2O9tmKKsiGzBUvoSwHEcxMf1rUH8p+OesWhey8hmOFMpmKoQ/yLoR5vs/5g2w/TAOvtwrZJmsiALSVqMooQryv7f77/I4ehp6AeH0NH0uY+OJZGN/e21UKSnEPPlo=
+	t=1735839466; cv=none; b=mJ5uT0T0s8qvAW6qEoCRgGXIOBAEU1qnNHCnDzj4NJSk3MU8pHN7ha+31l8VvC/+sFH3CX6KdsO6WIu1Vpzmeu+p54RBypYtchKuHn59qMY0zmbiZc8yY6n0Hueg1Ubb79USWtmtdGttel7muGXW3w7knAIXGt/s/+MeX35dnSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735839474; c=relaxed/simple;
-	bh=xUjMR8E/oB7ectCizWxE8cp7aytblS1UCtWrZAqZ+U8=;
+	s=arc-20240116; t=1735839466; c=relaxed/simple;
+	bh=ZpLbs8G4b/CfoPAXsSFSWGB6YncnYJDKCOKcfpnpyfE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mU0OFP58OzL1JBBpm0rbtzBVt3pfbaifNaJwc+Oown64t6lA5mvo8hJUsXHjLk5IyMusTqmXxVRCplK6XyXuTv5f7kVD55yzjCyC/U17FRwILRjspkLkoFDCHW0MtfU/toDBJmEmL575DDcXs1zDtRmBdTOA5KNSVLUbF7fSPVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=G/wxJMXO; arc=none smtp.client-ip=46.235.229.95
+	 MIME-Version; b=A/g+DjPaUEzn/6gx5YnGpgbiJwmLFUl4YZCp6DSJbsc3ce5lqimFcYfYQtE6nqScBX+UObQNDpgE6gs0PlgR+x4mNTUT6soYSMK4BKNV1+58ziayp/nZTHXajW2MfHQxLRN9RUip1dYiedvs22RgNzFK1sh7g/hUw1X3IGkpK0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=FhJT2JN/; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=7DIlELWgzNGvwf4ldWAU2dlgWl8Sx9HJfUGOtuYL0nc=; b=G/wxJMXOnwSiyXLm
-	/jhG9ErKR7SQM/1v/z4Sb9UOGec54mTBIhfqwXhb72NJw6WP4ZYli1i2O1yHtduJ884uXnF/lZYNK
-	TnOGmPrqrQzRyn2WJquxVVjDNpWi0mMjCFy1QSpPxu/ICyHuGqRLHY6Uoe42XjmvymVmFW1odUmy6
-	vIBaXVq6MhDP6LdDu8kVVC0aHAUpg+x3tGVNk2Qx9Bl6/veu8ADyCgZUXwrVCgSYkjfyzJ5tjCOcP
-	XjchSFfYT4jSXvyJx4vk+7Cm1fYjpUFSvIyD/KstGUNDL4SGn+mo+p+FPeRLTHfPa8tWQMYMZomPl
-	c4upQ6hKrIrbPv6UYw==;
+	:Subject; bh=AHVpFzSjHV15hL40UVEK2lfc9SE8GqU1vNkl27mvewE=; b=FhJT2JN/FtzReiV6
+	cBJEkAuerFCXxuN0L/SpkbPn+AMeTKlaZbawGVPtDPqPb/18SkogYgoSSKwu6zUh1t7RwYDsiNuGx
+	981kp/Zyts96MQ+FzWDDCvPbYwzRDSuoRan/qrilyXMG0+1HFDUzHVqIx1HmwLBBbu1Oc6gfWJx7Y
+	Sk6CLk3dmzl5XchbOzVEkgTkvw8e2eL95G63SPItqMaX5yqSU6id/Bxm2QLnOe1FCwLTQ4uTIOx/D
+	CqnCORodMcLalYMqAn08JjGqtTnALVo44OIq8sRc+ilEwb6revwCvMl6A0wKpQjogGiVtM3dyU42X
+	5SGb/9lfyn6Co1XKGg==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1tTP8M-007tod-0P;
+	id 1tTP8M-007tod-2I;
 	Thu, 02 Jan 2025 17:37:22 +0000
 From: linux@treblig.org
 To: anthony.l.nguyen@intel.com,
@@ -56,9 +56,9 @@ To: anthony.l.nguyen@intel.com,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next 3/9] i40e: Remove unused i40e_(read|write)_phy_register
-Date: Thu,  2 Jan 2025 17:37:11 +0000
-Message-ID: <20250102173717.200359-4-linux@treblig.org>
+Subject: [PATCH net-next 4/9] i40e: Deadcode profile code
+Date: Thu,  2 Jan 2025 17:37:12 +0000
+Message-ID: <20250102173717.200359-5-linux@treblig.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250102173717.200359-1-linux@treblig.org>
 References: <20250102173717.200359-1-linux@treblig.org>
@@ -72,128 +72,137 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-i40e_read_phy_register() and i40e_write_phy_register() were added in
-2016 by
-commit f62ba91458b5 ("i40e: Add functions which apply correct PHY access
-method for read and write operation")
+i40e_add_pinfo_to_list() was added in 2017 by
+commit 1d5c960c5ef5 ("i40e: new AQ commands")
 
-but haven't been used.
+i40e_find_section_in_profile() was added in 2019 by
+commit cdc594e00370 ("i40e: Implement DDP support in i40e driver")
+
+Neither have been used.
 
 Remove them.
 
-(There are more specific _clause* variants of these functions
-that are still used.)
-
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- drivers/net/ethernet/intel/i40e/i40e_common.c | 78 -------------------
- .../net/ethernet/intel/i40e/i40e_prototype.h  |  4 -
- 2 files changed, 82 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 72 -------------------
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |  8 ---
+ 2 files changed, 80 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
-index ba780a949a47..6779e281a648 100644
+index 6779e281a648..370b4bddee44 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_common.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
-@@ -4335,84 +4335,6 @@ int i40e_write_phy_register_clause45(struct i40e_hw *hw,
+@@ -4882,39 +4882,6 @@ i40e_find_segment_in_package(u32 segment_type,
+ #define I40E_SECTION_HEADER(profile, offset)				\
+ 	(struct i40e_profile_section_header *)((u8 *)(profile) + (offset))
+ 
+-/**
+- * i40e_find_section_in_profile
+- * @section_type: the section type to search for (i.e., SECTION_TYPE_NOTE)
+- * @profile: pointer to the i40e segment header to be searched
+- *
+- * This function searches i40e segment for a particular section type. On
+- * success it returns a pointer to the section header, otherwise it will
+- * return NULL.
+- **/
+-struct i40e_profile_section_header *
+-i40e_find_section_in_profile(u32 section_type,
+-			     struct i40e_profile_segment *profile)
+-{
+-	struct i40e_profile_section_header *sec;
+-	struct i40e_section_table *sec_tbl;
+-	u32 sec_off;
+-	u32 i;
+-
+-	if (profile->header.type != SEGMENT_TYPE_I40E)
+-		return NULL;
+-
+-	I40E_SECTION_TABLE(profile, sec_tbl);
+-
+-	for (i = 0; i < sec_tbl->section_count; i++) {
+-		sec_off = sec_tbl->section_offset[i];
+-		sec = I40E_SECTION_HEADER(profile, sec_off);
+-		if (sec->section.type == section_type)
+-			return sec;
+-	}
+-
+-	return NULL;
+-}
+-
+ /**
+  * i40e_ddp_exec_aq_section - Execute generic AQ for DDP
+  * @hw: pointer to the hw struct
+@@ -5137,45 +5104,6 @@ i40e_rollback_profile(struct i40e_hw *hw, struct i40e_profile_segment *profile,
  	return status;
  }
  
 -/**
-- * i40e_write_phy_register
-- * @hw: pointer to the HW structure
-- * @page: registers page number
-- * @reg: register address in the page
-- * @phy_addr: PHY address on MDIO interface
-- * @value: PHY register value
+- * i40e_add_pinfo_to_list
+- * @hw: pointer to the hardware structure
+- * @profile: pointer to the profile segment of the package
+- * @profile_info_sec: buffer for information section
+- * @track_id: package tracking id
 - *
-- * Writes value to specified PHY register
-- **/
--int i40e_write_phy_register(struct i40e_hw *hw,
--			    u8 page, u16 reg, u8 phy_addr, u16 value)
+- * Register a profile to the list of loaded profiles.
+- */
+-int
+-i40e_add_pinfo_to_list(struct i40e_hw *hw,
+-		       struct i40e_profile_segment *profile,
+-		       u8 *profile_info_sec, u32 track_id)
 -{
--	int status;
+-	struct i40e_profile_section_header *sec = NULL;
+-	struct i40e_profile_info *pinfo;
+-	u32 offset = 0, info = 0;
+-	int status = 0;
 -
--	switch (hw->device_id) {
--	case I40E_DEV_ID_1G_BASE_T_X722:
--		status = i40e_write_phy_register_clause22(hw, reg, phy_addr,
--							  value);
--		break;
--	case I40E_DEV_ID_1G_BASE_T_BC:
--	case I40E_DEV_ID_5G_BASE_T_BC:
--	case I40E_DEV_ID_10G_BASE_T:
--	case I40E_DEV_ID_10G_BASE_T4:
--	case I40E_DEV_ID_10G_BASE_T_BC:
--	case I40E_DEV_ID_10G_BASE_T_X722:
--	case I40E_DEV_ID_25G_B:
--	case I40E_DEV_ID_25G_SFP28:
--		status = i40e_write_phy_register_clause45(hw, page, reg,
--							  phy_addr, value);
--		break;
--	default:
--		status = -EIO;
--		break;
--	}
+-	sec = (struct i40e_profile_section_header *)profile_info_sec;
+-	sec->tbl_size = 1;
+-	sec->data_end = sizeof(struct i40e_profile_section_header) +
+-			sizeof(struct i40e_profile_info);
+-	sec->section.type = SECTION_TYPE_INFO;
+-	sec->section.offset = sizeof(struct i40e_profile_section_header);
+-	sec->section.size = sizeof(struct i40e_profile_info);
+-	pinfo = (struct i40e_profile_info *)(profile_info_sec +
+-					     sec->section.offset);
+-	pinfo->track_id = track_id;
+-	pinfo->version = profile->version;
+-	pinfo->op = I40E_DDP_ADD_TRACKID;
+-	memcpy(pinfo->name, profile->name, I40E_DDP_NAME_SIZE);
 -
--	return status;
--}
--
--/**
-- * i40e_read_phy_register
-- * @hw: pointer to the HW structure
-- * @page: registers page number
-- * @reg: register address in the page
-- * @phy_addr: PHY address on MDIO interface
-- * @value: PHY register value
-- *
-- * Reads specified PHY register value
-- **/
--int i40e_read_phy_register(struct i40e_hw *hw,
--			   u8 page, u16 reg, u8 phy_addr, u16 *value)
--{
--	int status;
--
--	switch (hw->device_id) {
--	case I40E_DEV_ID_1G_BASE_T_X722:
--		status = i40e_read_phy_register_clause22(hw, reg, phy_addr,
--							 value);
--		break;
--	case I40E_DEV_ID_1G_BASE_T_BC:
--	case I40E_DEV_ID_5G_BASE_T_BC:
--	case I40E_DEV_ID_10G_BASE_T:
--	case I40E_DEV_ID_10G_BASE_T4:
--	case I40E_DEV_ID_10G_BASE_T_BC:
--	case I40E_DEV_ID_10G_BASE_T_X722:
--	case I40E_DEV_ID_25G_B:
--	case I40E_DEV_ID_25G_SFP28:
--		status = i40e_read_phy_register_clause45(hw, page, reg,
--							 phy_addr, value);
--		break;
--	default:
--		status = -EIO;
--		break;
--	}
+-	status = i40e_aq_write_ddp(hw, (void *)sec, sec->data_end,
+-				   track_id, &offset, &info, NULL);
 -
 -	return status;
 -}
 -
  /**
-  * i40e_get_phy_address
-  * @hw: pointer to the HW structure
+  * i40e_aq_add_cloud_filters
+  * @hw: pointer to the hardware structure
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_prototype.h b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-index c0a4bd53501c..bfebe18c0041 100644
+index bfebe18c0041..ccb8af472cd7 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_prototype.h
 +++ b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-@@ -439,10 +439,6 @@ int i40e_read_phy_register_clause45(struct i40e_hw *hw,
- 				    u8 page, u16 reg, u8 phy_addr, u16 *value);
- int i40e_write_phy_register_clause45(struct i40e_hw *hw,
- 				     u8 page, u16 reg, u8 phy_addr, u16 value);
--int i40e_read_phy_register(struct i40e_hw *hw, u8 page, u16 reg,
--			   u8 phy_addr, u16 *value);
--int i40e_write_phy_register(struct i40e_hw *hw, u8 page, u16 reg,
--			    u8 phy_addr, u16 value);
- u8 i40e_get_phy_address(struct i40e_hw *hw, u8 dev_num);
- int i40e_aq_write_ddp(struct i40e_hw *hw, void *buff,
- 		      u16 buff_size, u32 track_id,
+@@ -452,20 +452,12 @@ int i40e_aq_get_ddp_list(struct i40e_hw *hw, void *buff,
+ struct i40e_generic_seg_header *
+ i40e_find_segment_in_package(u32 segment_type,
+ 			     struct i40e_package_header *pkg_header);
+-struct i40e_profile_section_header *
+-i40e_find_section_in_profile(u32 section_type,
+-			     struct i40e_profile_segment *profile);
+ int
+ i40e_write_profile(struct i40e_hw *hw, struct i40e_profile_segment *i40e_seg,
+ 		   u32 track_id);
+ int
+ i40e_rollback_profile(struct i40e_hw *hw, struct i40e_profile_segment *i40e_seg,
+ 		      u32 track_id);
+-int
+-i40e_add_pinfo_to_list(struct i40e_hw *hw,
+-		       struct i40e_profile_segment *profile,
+-		       u8 *profile_info_sec, u32 track_id);
+-
+ /* i40e_ddp */
+ int i40e_ddp_flash(struct net_device *netdev, struct ethtool_flash *flash);
+ 
 -- 
 2.47.1
 
