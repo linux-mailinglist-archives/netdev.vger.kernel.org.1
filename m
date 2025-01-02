@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-154789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5269FFCD4
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:37:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEDA69FFCD1
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:37:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 423C916297D
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:37:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA04D3A2E65
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446CC187325;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1832F1865E9;
 	Thu,  2 Jan 2025 17:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="OSjf4fzz"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="cjgLBWE+"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB5817ADE8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D53817CA1D;
 	Thu,  2 Jan 2025 17:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735839462; cv=none; b=h/yK1njp7MDedrXTH1zgBWkllvzCqWHrzzjXLaq+J/NQ/K+ilrThXVm0dAbDsiPZm8Wdr+N9MY3arvsaqAi+YAoal0dPrIcaKNVT64eynmEdb3+Ysn/uEMzFDhIwDcQxHX+IHGQxJ55C+B5cF/on0dJKPdoSNg+N0pf6zxkH0yI=
+	t=1735839462; cv=none; b=MnRhXf4nRrDcqhC5vQQlgVpFKF+Aw7VwL/3s+t6P6zWLxu8+C1GslYE0NxL6rACC8BkuXYyXPGLVm4dj2ydZK3VTHBYFkpFZOxGGiN434ftTSMxtaAJBZ5XLmNoWRGMAcbr13O1rvw1RpKmeUrX1UonCz+YCpZJNtb2jxHKDN6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735839462; c=relaxed/simple;
-	bh=ruog4s5wIgIydvItGwT3ldGP5Sv5dLwI3IdUpHjbmr4=;
+	bh=6D+qVXt+if69Ak1Tp7vDfLqm1tFNmkM4gIg9Y3dvZJo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lQ9WOh9NhXC4S56ZAkFNUf/YVzETYc8QL3/2R3BZmw9ZJ/7JTvrkKFtLP0htADeTFll8NdX9IwheTBjWam88Dcxh8CMRNkvFlBAaOi/kcyE9iBzOCe3uDehPw+Wu+Haj1cEzZiSP2tcovzvZ2xrLjgJrcWNvMXEJyH96soYQoZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=OSjf4fzz; arc=none smtp.client-ip=46.235.229.95
+	 MIME-Version; b=jLjJ5JJ4DEvVXg02CcdaNA9CdTFY0RtDsBdBFqE2v9+dR/YafARXwOFhhPLSWTZBwkxPzb9U3GPNBljIRGU9h4sFFVbkX2u4xFr8aLWkaIMGdsoFShz21eHdeB2dUxofnDsfc0YmO4X8n8LFnn0O4Ad92PbvlxqBnqQVSGYOfY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=cjgLBWE+; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=vpcbQJY6Oq4fkBAvvq9ChAzoM28r4d2DnCB/aDMi6d0=; b=OSjf4fzzWukoFUkJ
-	LODNSKi4VA3VTUduaUi/8SVjDJDXcKeFJTpR1B7Iwwt8pSUbCiuo1FZ4GS2MlD3b0hc7iFsQ91zT9
-	bGXxIGTm8BBrKCAjdvlGpf8bdH/d5XrGxe7HeWR3JOp9QYOTUeARSEjergy5kWzodo+d6mBHBKMLQ
-	ochBjK8Dey5jo6B6rLYVenvf2+LoAj8XQtiThxcY9swEzL2wJopw/t1QN0mxKqKToibvYMY2x1HY0
-	QloDkzGJK7X3kJhuYWjxMO5hnZQfLdGdRpck/PS3jOzBZn11a8pxtBIeU78yDCehxrGxgLGASZM7w
-	vAS8FrSXcBqoqCDe1Q==;
+	:Subject; bh=VIOsW7CThUdxqZazplbAYuS4wCenu5gwxB082K8tTE8=; b=cjgLBWE+AQGwouVE
+	S5vDwc9ZaGxooRFqKMUjY4+++UEKig701HZLmcI8O0QBQP2TlKUi8bYtelzl7KlmcXWFHhVX2JBP0
+	6oHlvI7kl0W2fti64GLzmrIxv8POg0xcbNaibJ967G8tuySRt45SaMGbzYoc7UbrD9XHrnMCyPD/n
+	hgdg/bxJ3qnE++npjxllU0FEG4YB5QjMLHR/nJJslEUx1GDViPuH+AbFA9s2B4OPuAf8YdybLk+L3
+	L3lvR39p44H/rH81uF2TenLyc8VRhif9ppBTzEB7glsxbo1Kqf2ClLCnmAFIU9XK0obcywgDbkNUc
+	UdIzLCC0hkgnVhjSsw==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1tTP8O-007tod-1a;
-	Thu, 02 Jan 2025 17:37:24 +0000
+	id 1tTP8P-007tod-0F;
+	Thu, 02 Jan 2025 17:37:25 +0000
 From: linux@treblig.org
 To: anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com,
@@ -55,11 +55,10 @@ To: anthony.l.nguyen@intel.com,
 	intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next 7/9] i40e: Remove unused i40e_commit_partition_bw_setting
-Date: Thu,  2 Jan 2025 17:37:15 +0000
-Message-ID: <20250102173717.200359-8-linux@treblig.org>
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next 8/9] i40e: Remove unused i40e_asq_send_command_v2
+Date: Thu,  2 Jan 2025 17:37:16 +0000
+Message-ID: <20250102173717.200359-9-linux@treblig.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250102173717.200359-1-linux@treblig.org>
 References: <20250102173717.200359-1-linux@treblig.org>
@@ -73,125 +72,60 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-i40e_commit_partition_bw_setting() was added in 2017 by
-commit 4fc8c6763957 ("i40e: genericize the partition bandwidth control")
+i40e_asq_send_command_v2() was added in 2022 by
+commit 74073848b0d7 ("i40e: Add new versions of send ASQ command
+functions")
 but hasn't been used.
 
 Remove it.
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h      |  1 -
- drivers/net/ethernet/intel/i40e/i40e_main.c | 83 ---------------------
- 2 files changed, 84 deletions(-)
+(The _atomic_v2 version of the function is used, so leave it).
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 399a5dbf3506..ce63a7cfe955 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -1311,7 +1311,6 @@ int i40e_update_adq_vsi_queues(struct i40e_vsi *vsi, int vsi_offset);
- int i40e_is_vsi_uplink_mode_veb(struct i40e_vsi *vsi);
- int i40e_get_partition_bw_setting(struct i40e_pf *pf);
- int i40e_set_partition_bw_setting(struct i40e_pf *pf);
--int i40e_commit_partition_bw_setting(struct i40e_pf *pf);
- void i40e_print_link_message(struct i40e_vsi *vsi, bool isup);
- 
- void i40e_set_fec_in_flags(u8 fec_cfg, unsigned long *flags);
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 276dde0bc1d4..8a333d0e2218 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -12576,89 +12576,6 @@ int i40e_set_partition_bw_setting(struct i40e_pf *pf)
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ drivers/net/ethernet/intel/i40e/i40e_adminq.c    | 10 ----------
+ drivers/net/ethernet/intel/i40e/i40e_prototype.h |  7 -------
+ 2 files changed, 17 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
+index f73f5930fc58..175c1320c143 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
+@@ -1016,16 +1016,6 @@ i40e_asq_send_command_atomic_v2(struct i40e_hw *hw,
  	return status;
  }
  
--/**
-- * i40e_commit_partition_bw_setting - Commit BW settings for this PF partition
-- * @pf: board private structure
-- **/
--int i40e_commit_partition_bw_setting(struct i40e_pf *pf)
+-int
+-i40e_asq_send_command_v2(struct i40e_hw *hw, struct i40e_aq_desc *desc,
+-			 void *buff, /* can be NULL */ u16  buff_size,
+-			 struct i40e_asq_cmd_details *cmd_details,
+-			 enum i40e_admin_queue_err *aq_status)
 -{
--	/* Commit temporary BW setting to permanent NVM image */
--	enum i40e_admin_queue_err last_aq_status;
--	u16 nvm_word;
--	int ret;
--
--	if (pf->hw.partition_id != 1) {
--		dev_info(&pf->pdev->dev,
--			 "Commit BW only works on partition 1! This is partition %d",
--			 pf->hw.partition_id);
--		ret = -EOPNOTSUPP;
--		goto bw_commit_out;
--	}
--
--	/* Acquire NVM for read access */
--	ret = i40e_acquire_nvm(&pf->hw, I40E_RESOURCE_READ);
--	last_aq_status = pf->hw.aq.asq_last_status;
--	if (ret) {
--		dev_info(&pf->pdev->dev,
--			 "Cannot acquire NVM for read access, err %pe aq_err %s\n",
--			 ERR_PTR(ret),
--			 i40e_aq_str(&pf->hw, last_aq_status));
--		goto bw_commit_out;
--	}
--
--	/* Read word 0x10 of NVM - SW compatibility word 1 */
--	ret = i40e_aq_read_nvm(&pf->hw,
--			       I40E_SR_NVM_CONTROL_WORD,
--			       0x10, sizeof(nvm_word), &nvm_word,
--			       false, NULL);
--	/* Save off last admin queue command status before releasing
--	 * the NVM
--	 */
--	last_aq_status = pf->hw.aq.asq_last_status;
--	i40e_release_nvm(&pf->hw);
--	if (ret) {
--		dev_info(&pf->pdev->dev, "NVM read error, err %pe aq_err %s\n",
--			 ERR_PTR(ret),
--			 i40e_aq_str(&pf->hw, last_aq_status));
--		goto bw_commit_out;
--	}
--
--	/* Wait a bit for NVM release to complete */
--	msleep(50);
--
--	/* Acquire NVM for write access */
--	ret = i40e_acquire_nvm(&pf->hw, I40E_RESOURCE_WRITE);
--	last_aq_status = pf->hw.aq.asq_last_status;
--	if (ret) {
--		dev_info(&pf->pdev->dev,
--			 "Cannot acquire NVM for write access, err %pe aq_err %s\n",
--			 ERR_PTR(ret),
--			 i40e_aq_str(&pf->hw, last_aq_status));
--		goto bw_commit_out;
--	}
--	/* Write it back out unchanged to initiate update NVM,
--	 * which will force a write of the shadow (alt) RAM to
--	 * the NVM - thus storing the bandwidth values permanently.
--	 */
--	ret = i40e_aq_update_nvm(&pf->hw,
--				 I40E_SR_NVM_CONTROL_WORD,
--				 0x10, sizeof(nvm_word),
--				 &nvm_word, true, 0, NULL);
--	/* Save off last admin queue command status before releasing
--	 * the NVM
--	 */
--	last_aq_status = pf->hw.aq.asq_last_status;
--	i40e_release_nvm(&pf->hw);
--	if (ret)
--		dev_info(&pf->pdev->dev,
--			 "BW settings NOT SAVED, err %pe aq_err %s\n",
--			 ERR_PTR(ret),
--			 i40e_aq_str(&pf->hw, last_aq_status));
--bw_commit_out:
--
--	return ret;
+-	return i40e_asq_send_command_atomic_v2(hw, desc, buff, buff_size,
+-					       cmd_details, true, aq_status);
 -}
 -
  /**
-  * i40e_is_total_port_shutdown_enabled - read NVM and return value
-  * if total port shutdown feature is enabled for this PF
+  *  i40e_fill_default_direct_cmd_desc - AQ descriptor helper function
+  *  @desc:     pointer to the temp descriptor (non DMA mem)
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_prototype.h b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
+index ccb8af472cd7..099bb8ab7d70 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_prototype.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
+@@ -27,13 +27,6 @@ i40e_asq_send_command(struct i40e_hw *hw, struct i40e_aq_desc *desc,
+ 		      void *buff, /* can be NULL */ u16  buff_size,
+ 		      struct i40e_asq_cmd_details *cmd_details);
+ int
+-i40e_asq_send_command_v2(struct i40e_hw *hw,
+-			 struct i40e_aq_desc *desc,
+-			 void *buff, /* can be NULL */
+-			 u16  buff_size,
+-			 struct i40e_asq_cmd_details *cmd_details,
+-			 enum i40e_admin_queue_err *aq_status);
+-int
+ i40e_asq_send_command_atomic(struct i40e_hw *hw, struct i40e_aq_desc *desc,
+ 			     void *buff, /* can be NULL */ u16  buff_size,
+ 			     struct i40e_asq_cmd_details *cmd_details,
 -- 
 2.47.1
 
