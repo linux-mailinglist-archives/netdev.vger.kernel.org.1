@@ -1,84 +1,122 @@
-Return-Path: <netdev+bounces-154852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AF81A0013A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 23:36:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36870A00147
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 23:47:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 676FE1883C92
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 22:36:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E842162730
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 22:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F672AF1D;
-	Thu,  2 Jan 2025 22:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877DE1B87FF;
+	Thu,  2 Jan 2025 22:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JwSwLAJ1"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SDNGaaw3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E58ADDC1
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 22:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9EF1B6D0F;
+	Thu,  2 Jan 2025 22:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735857409; cv=none; b=KBMex0GLJnX8PxsmwqYlP0bP4D9k91wAtiNYT+iWD3HwhdB4EkHq4WfTu3XW+f9W0xBmixFrz8w+Pc/KNFxbPlS8lJqBCSfM5fuZr258HZUND5lRmswAF+arh8gJIzBd2ZRwuHODzeGlgEQIsKpanffxNmh/pph2AT40aYDsq5Y=
+	t=1735858062; cv=none; b=XNLQu//UgqjsccuwR1qboTY6Nx8WpV81a4IQNmFBQRLVKPLJoYZoAPiAKYih9MgjUjG/5HAfTehy8D6Z8HrtBs1gIvMDg0alxCC9An9RFrd9ezYkGpARYe/SCnJuucCmjM78ZM4V/Mdx6KYuvVx/AZXwodGrOoHN3UHElJP3dlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735857409; c=relaxed/simple;
-	bh=ocaRHi59zpGnTRXE9GIhf/VGujjxdQjnIcymJYvU5LI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pmzifuSQMTlittogud75D34G42mQjcIFtmzsFCuvPR/JAMgbzkUdMadbYZJeiFimQ8R/V2BD8n6hJZYyyNBgaGiU03Vw9wU1n1YP01LDB+JUTnmMyNaAiVdaLRemJmJGXS/Wux+G+TRShPtDUnyDFVzAWNwpqPawMVGovqcqPCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JwSwLAJ1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77123C4CED0;
-	Thu,  2 Jan 2025 22:36:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735857408;
-	bh=ocaRHi59zpGnTRXE9GIhf/VGujjxdQjnIcymJYvU5LI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JwSwLAJ1xPIRdbyoIwlj+HPFrfy2yEEcbz6w5Do4mLo2v3DVdwO0PEU36LE2VshoN
-	 EyIgZoEqL6AhVCGRijVxbi3Prx8c0Fjfsb89/jhygm7JhT9zGCt+tqATV/org71vLM
-	 6Ed2bWCLzECSu4JKiCb2Du8kUxFBW4VPLqD8Z058hKUPNLGmc6PZEWXUXZF3HAAdg4
-	 Fres/tcWC+6kXssiXH5nPuwwD9mfghfoIGXDfpMyYhhKHkEih4FV5S8uzHNRNhFgTn
-	 3U71I4ypcZOK0+itvSa5Xz2IRWnXk21gaQQH9OXaMH5vmXx1brmsFnSV/3KYTWPoXz
-	 Sq2GEQ4KQ38Ow==
-Date: Thu, 2 Jan 2025 14:36:47 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, gregkh@linuxfoundation.org, mhocko@suse.com,
- stephen@networkplumber.org
-Subject: Re: [RFC PATCH net-next 1/4] net-sysfs: remove rtnl_trylock from
- device attributes
-Message-ID: <20250102143647.7963cbfd@kernel.org>
-In-Reply-To: <20231018154804.420823-2-atenart@kernel.org>
-References: <20231018154804.420823-1-atenart@kernel.org>
-	<20231018154804.420823-2-atenart@kernel.org>
+	s=arc-20240116; t=1735858062; c=relaxed/simple;
+	bh=DSsgKLf1vbtZiKK9KqlWW0egQ9/9VEQqsppWlI2aGHE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QAMsdOwYE7XJov1ief47hh/twqDEAOziMHB2EiemldzLZ4wNFo7aQQH8V51LFlQTl2WTdD2Qn0Izoqv5CoXuXnuXPFF+DN1uX/XtMVP/uZ7CldUokMwy2GYBgSobxzLpE4+AA1dIjEUX0neHuPCUcbQC6EcbHpbYdYU67bd1w+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=SDNGaaw3; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 502KfuJ3015265;
+	Thu, 2 Jan 2025 22:47:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=U7tnL0OGsltMWpN+/Pzxk8lgQVrxvWRSVUe9cvOe/ig=; b=
+	SDNGaaw3XbUj1S6QFvLVC5139scD7TWpEhyd5yis3wIKVV6VSOVbHlNrcbCU66nl
+	NVdhDYFwYbqv6NS8bkpwAdaWyyh3tOIF8bz+UkBWocmCmuLpmxfbG2TIOeUWP7Fm
+	c0Mr8tuTzNrtw2S8YuCEO6OKQ7bn/zWvrMUEOfeJZvZBQn5bhslrSBXfLkFbFRgH
+	3ZGgYVRJoa3WOTDSDSQp5gklzoOx67mGwJvrTZWdw0xTcyS0le6eFMWLDsNP7fbH
+	slppSPpJ40jmikDZS+DjCfLcNOHahqZEymWZn0Ds0I5cEeEtVBlV00WHVXLQ+9DR
+	0X2p9LQ1ZP8OY3huRPh0sg==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 43t88a7d86-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 02 Jan 2025 22:47:14 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 502LaiUr008778;
+	Thu, 2 Jan 2025 22:47:13 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 43t7s93nwu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 02 Jan 2025 22:47:13 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 502MlAtf004461;
+	Thu, 2 Jan 2025 22:47:12 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 43t7s93nuq-2;
+	Thu, 02 Jan 2025 22:47:12 +0000
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+        decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, James.Bottomley@HansenPartnership.com,
+        mhkelley58@gmail.com
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>, iommu@lists.linux.dev,
+        netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: (subset) [PATCH 0/5] hyper-v: Don't assume cpu_possible_mask is dense
+Date: Thu,  2 Jan 2025 17:46:38 -0500
+Message-ID: <173583977795.171606.8906239465384373872.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.46.2
+In-Reply-To: <20241003035333.49261-1-mhklinux@outlook.com>
+References: <20241003035333.49261-1-mhklinux@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-02_03,2025-01-02_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 mlxscore=0
+ suspectscore=0 phishscore=0 mlxlogscore=983 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2411120000
+ definitions=main-2501020199
+X-Proofpoint-GUID: e6Ywwye_omB8U1gOZ8hmAB14_FT6wkJA
+X-Proofpoint-ORIG-GUID: e6Ywwye_omB8U1gOZ8hmAB14_FT6wkJA
 
-On Wed, 18 Oct 2023 17:47:43 +0200 Antoine Tenart wrote:
-> We have an ABBA deadlock between net device unregistration and sysfs
-> files being accessed[1][2]. To prevent this from happening all paths
-> taking the rtnl lock after the sysfs one (actually kn->active refcount)
-> use rtnl_trylock and return early (using restart_syscall)[3] which can
-> make syscalls to spin for a long time when there is contention on the
-> rtnl lock[4].
+On Wed, 02 Oct 2024 20:53:28 -0700, mhkelley58@gmail.com wrote:
 
-Hi Antoine!
+> Code specific to Hyper-V guests currently assumes the cpu_possible_mask
+> is "dense" -- i.e., all bit positions 0 thru (nr_cpu_ids - 1) are set,
+> with no "holes". Therefore, num_possible_cpus() is assumed to be equal
+> to nr_cpu_ids.
+> 
+> Per a separate discussion[1], this assumption is not valid in the
+> general case. For example, the function setup_nr_cpu_ids() in
+> kernel/smp.c is coded to assume cpu_possible_mask may be sparse,
+> and other patches have been made in the past to correctly handle
+> the sparseness. See bc75e99983df1efd ("rcu: Correctly handle sparse
+> possible cpu") as noted by Mark Rutland.
+> 
+> [...]
 
-I was looking at the sysfs locking, and ended up going down a very
-similar path. Luckily lore search for sysfs_break_active_protection()
-surfaced this thread so I can save myself some duplicated work :)
+Applied to 6.14/scsi-queue, thanks!
 
-Is there any particular reason why you haven't pursued this solution
-further? I think it should work.
+[4/5] scsi: storvsc: Don't assume cpu_possible_mask is dense
+      https://git.kernel.org/mkp/scsi/c/6cb7063feb2e
 
-My version, FWIW:
-https://github.com/kuba-moo/linux/commit/2724bb7275496a254b001fe06fe20ccc5addc9d2
+-- 
+Martin K. Petersen	Oracle Linux Engineering
 
