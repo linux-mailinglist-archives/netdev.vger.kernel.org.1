@@ -1,94 +1,175 @@
-Return-Path: <netdev+bounces-154692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 343869FF78A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:40:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CAD19FF7A6
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:48:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F74318823DE
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 09:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8966B3A1017
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 09:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF6F192D98;
-	Thu,  2 Jan 2025 09:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12CA019149F;
+	Thu,  2 Jan 2025 09:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="G53OiJWa"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="SZM9ivaZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76FD41799B;
-	Thu,  2 Jan 2025 09:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2122618F2DB;
+	Thu,  2 Jan 2025 09:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735810825; cv=none; b=G9vhnfDP8bhwAjcHKzbNHcyrVQUw+z55EDN3pUOKSqZkntmg/azyCH5vePhhd5ZUsAR2m9ZehhEtDkVh0cbZHDDvi95dROk78YqKSGzUYmXnJVv4mSfnbVkVKAujl/DRrjqLNMYN1Gdu/SQ7Okda/gMhU5EF8aPEREvDVe6zlbg=
+	t=1735811312; cv=none; b=JajRPIVZuSw/5UW/IrssYTwRxOlcJQeBuBmrKgb7fyP8VU7+H2W20k2XfPOEMlR+OaBe8A+DVZIRa/Lt7erzVYJYZsb2enMsuMq4QjjrcnVcAy5wGbE9jTmCk0A+op1hInCZo7a1MWuzmkNEqa/XrtwX/ag+EGadq08jSXOlCms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735810825; c=relaxed/simple;
-	bh=Ak0oZch98TKGi+IQoRb3IrXskE4FYCAcdWJhtipzk0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S2PzNsSZgejDVLj5QR3oAEc3B+O5/lI7EFxQRuO118LqLiJAhY7xvwwYVMhi/CZdNOfchVfqrqeMMx93wwJ6qJ/yWIJ9oO4i0cPr8YZM36JJOvrfNO4URszSnmKt40Ve0gnlKeKTPiFwFSjUQprsTSBwmgy/Q5WQlMVvWc16Ojw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=G53OiJWa; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jR56E1dHEnAiWTO++f+VHBMrVMh2JggszBAmTWsKimg=; b=G53OiJWan994izEORyy49NXI5O
-	9+vhSwApqo2gWZkzd0iqtClXxZ1CrAGVaw+s9CLkQb0EKwwpa+me8yEVVwVksJfys6VezCMhf1E2W
-	qAs7nTmrPktslPGvq1URFl3QS4/YCHCJWfalctBE3RecXPsrLgmQPAX67E0rcFfJO1LlfUlK2Finz
-	GTdcaU4LC/47z0Cfj60wQ2ZBVg0PHEzQ/mI3KUWXRwxOI63yb02iCw9pGYFnNjRbvX7lLe4mAaXaG
-	nHLVRIHU5GOs21y9leCfoRi17rHTbtF2BvZAVazBSP6XhTjcOgr+SrVRWpyWTpzSeL39XX2ubrm08
-	rW3ylGMw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57002)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tTHgi-0001pZ-0g;
-	Thu, 02 Jan 2025 09:40:20 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tTHgg-0000Av-2N;
-	Thu, 02 Jan 2025 09:40:18 +0000
-Date: Thu, 2 Jan 2025 09:40:18 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mdio_bus: change the bus name to mdio
-Message-ID: <Z3ZfAvjQAglkN1_W@shell.armlinux.org.uk>
-References: <20241219065855.1377069-1-yajun.deng@linux.dev>
+	s=arc-20240116; t=1735811312; c=relaxed/simple;
+	bh=vv/Rb6O6fRI1lZSRWbxJ6X8FCwdoLrCnMuyXbHeNuWI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q3Z3P554snjnTnrp43rA6T3Zl4ViA4DrFbPOoPPOpyCquw4aP3BMP+ogjZkGM2farNxORbt7FCNr52c0kucnN3lHps3TpicoTOdPwTYS4iopB5T+y00XMoSWqdB0s7TTxqCW9+Ad5FJOxP3X1+oX4zR/V+EBJEZRXV9KKPoHuFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=SZM9ivaZ; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: b0703182c8ee11efbd192953cf12861f-20250102
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=kaRy8hvQiwVBlFWG9ZlYPjmGDHZFPf/6Z415OdGfZlw=;
+	b=SZM9ivaZiBX/M0nU1SfdVHj3aa6vbnBi/J4KeQFuRqGhNNIOKT/PrWnvI3falGC9LYO9GdccshDO8xfIpJfYf9eeFC5rY5E/K8yOeERjEKY1ASQJiVJbgy60G41jbeB6kOLS/uXnU+nXPk2hgmqQ6qRSh+3Xg+SO7PQwu1iNjO4=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.46,REQID:2c799766-d2dc-4c86-b7fb-10c6b6d91827,IP:0,U
+	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:60aa074,CLOUDID:601a3919-ec44-4348-86ee-ebcff634972b,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: b0703182c8ee11efbd192953cf12861f-20250102
+Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 132933589; Thu, 02 Jan 2025 17:48:15 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 2 Jan 2025 17:48:14 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Thu, 2 Jan 2025 17:48:13 +0800
+From: shiming cheng <shiming.cheng@mediatek.com>
+To: <willemdebruijn.kernel@gmail.com>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <matthias.bgg@gmail.com>,
+	<angelogioacchino.delregno@collabora.com>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: <netdev@vger.kernel.org>, <lena.wang@mediatek.com>, shiming cheng
+	<shiming.cheng@mediatek.com>
+Subject: [PATCH]  ipv6: socket SO_BINDTODEVICE lookup routing fail without IPv6 rule.
+Date: Thu, 2 Jan 2025 17:51:11 +0800
+Message-ID: <20250102095114.25860-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241219065855.1377069-1-yajun.deng@linux.dev>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
-On Thu, Dec 19, 2024 at 02:58:55PM +0800, Yajun Deng wrote:
-> Since all directories under the /sys/bus are bus, we don't need to add a
-> bus suffix to mdio.
-> 
-> Change the bus name to mdio.
-> 
-> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+     When using socket IPv6 with SO_BINDTODEVICE, if IPv6 rule is not
+        matched, it will return ENETUNREACH. In fact, IPv4 does not behave
+        this way. IPv4 prioritizes looking up IP rules for routing and
+        forwarding, if not matched it will use socket-bound out interface
+        to send packets. The modification here is to make IPv6 behave the
+        same as IPv4. If IP rule is not found, it will also use
+        socket-bound out interface to send packts.
 
-No. Just no. This is a user ABI breaking change. There needs to be
-_very_ good reasons to make this change, and there needs to have been
-research into whether anything in userspace breaks - and all that needs
-to be documented in the commit message.
+Signed-off-by: shiming cheng <shiming.cheng@mediatek.com>
+---
+ include/net/ip6_route.h |  2 ++
+ net/ipv6/ip6_output.c   |  6 +++++-
+ net/ipv6/route.c        | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 41 insertions(+), 1 deletion(-)
 
-I think you sent a v2, which received similar feedback (I'm catching up)
-but if not, I've stated my position on this.
-
+diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
+index 6dbdf60b342f..0625597def6f 100644
+--- a/include/net/ip6_route.h
++++ b/include/net/ip6_route.h
+@@ -214,6 +214,8 @@ void rt6_multipath_rebalance(struct fib6_info *f6i);
+ 
+ void rt6_uncached_list_add(struct rt6_info *rt);
+ void rt6_uncached_list_del(struct rt6_info *rt);
++struct rt6_info *ip6_create_rt_oif_rcu(struct net *net, const struct sock *sk,
++		struct flowi6 *fl6, int flags);
+ 
+ static inline const struct rt6_info *skb_rt6_info(const struct sk_buff *skb)
+ {
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index f7b4608bb316..ed162ac3cb31 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1156,7 +1156,11 @@ static int ip6_dst_lookup_tail(struct net *net, const struct sock *sk,
+ 		*dst = ip6_route_output_flags(net, sk, fl6, flags);
+ 
+ 	err = (*dst)->error;
+-	if (err)
++	if (err && (flags & RT6_LOOKUP_F_IFACE)) {
++		*dst = (struct dst_entry *)ip6_create_rt_oif_rcu(net, sk, fl6, flags);
++		if (!*dst)
++			goto out_err_release;
++	} else if (err) {
+ 		goto out_err_release;
+ 
+ #ifdef CONFIG_IPV6_OPTIMISTIC_DAD
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 67ff16c04718..7d7450fab44f 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -1214,6 +1214,40 @@ static struct rt6_info *ip6_create_rt_rcu(const struct fib6_result *res)
+ 	return nrt;
+ }
+ 
++struct rt6_info *ip6_create_rt_oif_rcu(struct net *net, const struct sock *sk,
++				       struct flowi6 *fl6, int flags)
++{
++	struct rt6_info *rt;
++	unsigned int prefs;
++	int err;
++	struct net_device *dev = dev_get_by_index_rcu(net, fl6->flowi6_oif);
++
++	if (!dev)
++		return NULL;
++	rt = ip6_dst_alloc(dev_net(dev), dev, flags);
++
++	if (!rt)
++		return NULL;
++	rt->dst.error = 0;
++	rt->dst.output = ip6_output;
++	rt->dst.lastuse = jiffies;
++	prefs = sk ? inet6_sk(sk)->srcprefs : 0;
++	err = ipv6_dev_get_saddr(net, dev, &fl6->daddr, prefs, &fl6->saddr);
++
++	if (err) {
++		dst_release(&rt->dst);
++		return NULL;
++	}
++	rt->rt6i_dst.addr = fl6->daddr;
++	rt->rt6i_dst.plen = 128;
++	rt->rt6i_src.addr = fl6->saddr;
++	rt->rt6i_dst.plen = 128;
++	rt->rt6i_idev = in6_dev_get(dev);
++	rt->rt6i_flags = flags;
++	return rt;
++}
++EXPORT_SYMBOL_GPL(ip6_create_rt_oif_rcu);
++
+ INDIRECT_CALLABLE_SCOPE struct rt6_info *ip6_pol_route_lookup(struct net *net,
+ 					     struct fib6_table *table,
+ 					     struct flowi6 *fl6,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.45.2
+
 
