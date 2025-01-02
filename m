@@ -1,58 +1,71 @@
-Return-Path: <netdev+bounces-154740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289719FFA49
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:13:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 929029FFA50
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2160C3A1D9E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 14:13:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 894A33A2227
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 14:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FED1A9B53;
-	Thu,  2 Jan 2025 14:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D328A1A2632;
+	Thu,  2 Jan 2025 14:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="y7FTpKHA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FvzPjtUS"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F49E1ABEAC
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 14:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490C7192D70
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 14:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735827202; cv=none; b=VJbNt2us5aLZ4KSAm4MbYRNX0p5dNYZbbFZD+vVsiXhz5EGst/tLIrU5ZPgRkPZ3OeFDhzDGxtVTx1MKTTxsaBD3wUdbErP4QvO/PJz7djwNSiJPrMxQkt2FKVb8IZy3Ja9/DVZ2afrjLCUu/74INxg2C8TLdUlEYXxxLUpSx4M=
+	t=1735827432; cv=none; b=me6AjD6azjxgIYFhKoYcKMdJQuti3dV3owJTRoHXA3IVA9g/XWV2UVqQXKFpd77WvLBk84RT+L5gkHENYR0D0uRO4xYAuuhpWHWuyu9winVSQS6gDw7u09EnPqc5kWUShMyclrjQA34lwe9r9xTtR8UHawYctX57GRIpuekyjP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735827202; c=relaxed/simple;
-	bh=fITeMT9fqxUZqou58LTcPZPuUuLldyOrCAcXBH5XkHU=;
+	s=arc-20240116; t=1735827432; c=relaxed/simple;
+	bh=1EXu8p0MVErak0M/pugkG67/Oe5jhEkJvRGJafHRY2o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WDs8CZTavWbl0qrBmYVuzMIAqwjftMEHX3+v5kXLimOF297419oRCB8OcuvNWUKInllTV3nOjiCqiiws30GbUKxf63O1hMxkDKjIvltQMZrVbFgk3U+xRo+62MN0VUBDdSHuaQJ0eGzmqKNldU72Lm7WiZr7wdtXxbOsaHxuV3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=y7FTpKHA; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NgTabLLSEsVC+79FFkPuZFAOPeLfz0fSbmTvURBUA50=; b=y7FTpKHA7XkF5JvcICSz04D0hh
-	CmHhk9G36E3Zd+7t9WHs10ScrSRl5ycIRcgfFBfXEaYhJf3/jA0IkfGjLvtIkAFNRb/6vAsNCPiEH
-	V+lYqw9IJtl3nXB7VK6lLNoAiEH4VelJ9kHFDUSoxGAOxgnyHoG1+5CrqX1khp28QNcs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tTLwf-000kzb-H0; Thu, 02 Jan 2025 15:13:05 +0100
-Date: Thu, 2 Jan 2025 15:13:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
-	linux@armlinux.org.uk, horms@kernel.org, jacob.e.keller@intel.com,
-	netdev@vger.kernel.org, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
-Message-ID: <ab140807-2e49-4782-a58c-2b8d60da5556@lunn.ch>
-References: <20250102103026.1982137-1-jiawenwu@trustnetic.com>
- <20250102103026.1982137-2-jiawenwu@trustnetic.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=htptaIJk5HJfS00prFFVtr6F+qi0R3HrwTYyX4VrnRiG4HdUjvIfkpvrHilu/F6Ap+EbC0ZhtbVGr2M4YPdUvZPqVtJkElyxu3YIJ/SEnbpvJ3bS47NPuS6A96ixUwZZ12uxIZu18UdZklDYsAJVj8mBQWOxaiLgyCXBdKW6aqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FvzPjtUS; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1735827431; x=1767363431;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1EXu8p0MVErak0M/pugkG67/Oe5jhEkJvRGJafHRY2o=;
+  b=FvzPjtUSKDkUM9pAkl763+5TnxzOATqAEC5Gcn4ATn8BWQCvI9DiylJ+
+   8hFUxaxUFxoozbfczF8gy3d+ZODH6jzMhPv1BjOthFxAhPV5uRRnpMV5O
+   gwXfCJrz+jly8mZjdfTp947nY9K5ayIMuxJ1VlooBZRL77/bvSa4y50Li
+   sOSMre6PhybQc/R40IRFwODeI7QhRV8B9biZUpfORar9V6Ap34F+MUxB8
+   XsSsCu147UpU23ymMKiBmb++y9l+vXFB46h+BsNZ+/CR2x5fLGcJGORzH
+   8ye3HTNoBBEjht1IwQvKqM+W++MS42iw57ffEwRffhNHR8gWXmOVBbuxq
+   g==;
+X-CSE-ConnectionGUID: O3jg0MVvTciHvMTrU9ny8A==
+X-CSE-MsgGUID: fNh1R2i6Tki7+ruaaIUlYQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11302"; a="61436728"
+X-IronPort-AV: E=Sophos;i="6.12,285,1728975600"; 
+   d="scan'208";a="61436728"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2025 06:17:10 -0800
+X-CSE-ConnectionGUID: QAxi8C0RS46FjoFSxTBlPA==
+X-CSE-MsgGUID: 1CgV45B3S6e+p0NIgfi46Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="106565859"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2025 06:17:09 -0800
+Date: Thu, 2 Jan 2025 15:13:53 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Anumula Murali Mohan Reddy <anumula@chelsio.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	andrew+netdev@lunn.ch, pabeni@redhat.com, bharat@chelsio.com
+Subject: Re: [PATCH net] cxgb4: Avoid removal of uninserted tid
+Message-ID: <Z3afIWnNJ/IAB8OJ@mev-dev.igk.intel.com>
+References: <20250102121018.868745-1-anumula@chelsio.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,87 +74,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250102103026.1982137-2-jiawenwu@trustnetic.com>
+In-Reply-To: <20250102121018.868745-1-anumula@chelsio.com>
 
-> +static int wx_tx_map(struct wx_ring *tx_ring,
-> +		     struct wx_tx_buffer *first,
-> +		     const u8 hdr_len)
->  {
->  	struct sk_buff *skb = first->skb;
->  	struct wx_tx_buffer *tx_buffer;
-> @@ -1013,6 +1023,8 @@ static void wx_tx_map(struct wx_ring *tx_ring,
+On Thu, Jan 02, 2025 at 05:40:18PM +0530, Anumula Murali Mohan Reddy wrote:
+> During ARP failure, tid is not inserted but _c4iw_free_ep()
+> attempts to remove tid which results in error.
+> This patch fixes the issue by avoiding removal of uninserted tid.
+> 
+
+You need a fixes tag. Like here for example
+https://lore.kernel.org/netdev/CANn89iJP4unWmk2T36t1LiFrchy+DSGkbZWz_i42mb1eCDXyeg@mail.gmail.com/T/#m197e95ef4948a30732c1f6a046d3f0f7af163826
+
+> Signed-off-by: Anumula Murali Mohan Reddy <anumula@chelsio.com>
+> Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
+> ---
+>  drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+> index bc3af0054406..604dcfd49aa4 100644
+> --- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+> +++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+> @@ -1799,7 +1799,10 @@ void cxgb4_remove_tid(struct tid_info *t, unsigned int chan, unsigned int tid,
+>  	struct adapter *adap = container_of(t, struct adapter, tids);
+>  	struct sk_buff *skb;
 >  
->  	netdev_tx_sent_queue(wx_txring_txq(tx_ring), first->bytecount);
+> -	WARN_ON(tid_out_of_range(&adap->tids, tid));
+> +	if (tid_out_of_range(&adap->tids, tid)) {
+> +		dev_err(adap->pdev_dev, "tid %d out of range\n", tid);
+> +		return;
+> +	}
+
+Fix looks fine, thanks
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
 >  
-> +	/* set the timestamp */
-> +	first->time_stamp = jiffies;
->  	skb_tx_timestamp(skb);
->  
->  	/* Force memory writes to complete before letting h/w know there
-> @@ -1038,7 +1050,7 @@ static void wx_tx_map(struct wx_ring *tx_ring,
->  	if (netif_xmit_stopped(wx_txring_txq(tx_ring)) || !netdev_xmit_more())
->  		writel(i, tx_ring->tail);
->  
-> -	return;
-> +	return 0;
->  dma_error:
->  	dev_err(tx_ring->dev, "TX DMA map failed\n");
->  
-> @@ -1062,6 +1074,8 @@ static void wx_tx_map(struct wx_ring *tx_ring,
->  	first->skb = NULL;
->  
->  	tx_ring->next_to_use = i;
-> +
-> +	return -EPERM;
-
-       EPERM           Operation not permitted (POSIX.1-2001).
-
-This is normally about restricted access because of security
-settings. So i don't think this is the correct error code here. What
-is the reason the function is exiting with an error? Once we
-understand that, maybe we can suggest a better error code.
-
-> +static int wx_ptp_adjfine(struct ptp_clock_info *ptp, long ppb)
-> +{
-> +	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
-> +	u64 incval, mask;
-> +
-> +	smp_mb(); /* Force any pending update before accessing. */
-> +	incval = READ_ONCE(wx->base_incval);
-> +	incval = adjust_by_scaled_ppm(incval, ppb);
-> +
-> +	mask = (wx->mac.type == wx_mac_em) ? 0x7FFFFFF : 0xFFFFFF;
-> +	if (incval > mask)
-> +		dev_warn(&wx->pdev->dev,
-> +			 "PTP ppb adjusted SYSTIME rate overflowed!\n");
-
-There is no return here, you just keep going. What happens if there is
-an overflow?
-
-> +/**
-> + * wx_ptp_tx_hwtstamp_work
-> + * @work: pointer to the work struct
-> + *
-> + * This work item polls TSYNCTXCTL valid bit to determine when a Tx hardware
-> + * timestamp has been taken for the current skb. It is necessary, because the
-> + * descriptor's "done" bit does not correlate with the timestamp event.
-> + */
-
-Are you saying the "done" bit can be set, but the timestamp is not yet
-in place? I've not read the whole patch, but do you start polling once
-"done" is set, or as soon at the skbuff is queues for transmission?
-
->  static void ngbe_mac_link_down(struct phylink_config *config,
->  			       unsigned int mode, phy_interface_t interface)
->  {
-> +	struct wx *wx = phylink_to_wx(config);
-> +
-> +	wx->speed = SPEED_UNKNOWN;
-> +	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
-> +		wx_ptp_start_cyclecounter(wx);
-
-This is probably a naming issue, but it seems odd to call a _start_
-function on link down. 
-
-	Andrew
+>  	if (t->tid_tab[tid - adap->tids.tid_base]) {
+>  		t->tid_tab[tid - adap->tids.tid_base] = NULL;
+> -- 
+> 2.39.3
+> 
 
