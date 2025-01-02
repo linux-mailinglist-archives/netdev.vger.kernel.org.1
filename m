@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-154723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEA439FF971
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 13:45:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4491B9FF95A
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 13:32:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89A981621FA
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:45:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBE6E7A019B
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3044D1B140D;
-	Thu,  2 Jan 2025 12:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AEB171E49;
+	Thu,  2 Jan 2025 12:32:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5162F1B0F0A
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 12:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8472944E
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 12:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735821913; cv=none; b=Fe3BwKUNg9Bmzzu+7wvczS0J3swHaqoOAZerZ9RcCneEf2w5EdQ1A9zubZPaoyxOosnsTIflAc8Ir9yFK2U8+F30RsP23OjTgXY4969fjm//FRLQE3jxhgHioPeOaSQR8m+Z4dxecouCYv53B0yfxJNGZlgP00Wu8KKc2jzk9pI=
+	t=1735821156; cv=none; b=kxOC2tEz73/w3N4i3prrPYy0jBlBm6WZHOgfVwgy3Xn3fVR+G9/odnK3yF3ZBFEE3D/68w5TpH3wi4NNHqwAipynvIaAlGiCsVuqD+OeaXOWmWimV3Oy99Af/du8dMPEPpXomcoZBGUpigGKbHfAO6hJvjVd4E1kOPIUv7UF5b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735821913; c=relaxed/simple;
-	bh=h6fEkAXO9Z2ToW0L4BvTCUD9rjpPirPTPYcZ5OLU2Bc=;
+	s=arc-20240116; t=1735821156; c=relaxed/simple;
+	bh=MzV4F5nhygRTD4nOv9UuNlnNuLi+wVJpdUo2sM6rDLE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CVJ2eEDY4XFzy71G6SR+7SHFL4tAfV1M2bwj2f/N1yeiYGNC9+YMFS4jFJjTFulQQwUenMBs9hKRVylafM1LT5z2kN1zlcV+OnN2pDSGcCnvAyCJVWEXWsXioBVOCD+n9OpWKLY0NWdh51JrRGIIoDW5Ii0bvql5lhDL+F6SWwY=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tv+mIQeJCYFVjcyLqi6nnEYeoGVf1hkd5RRGuSKtW6zTIIaR70l3hFWkYlfBY/Wv6p5V9JntxoVftYENR4r4KzvocPXw1AztmQ5NP4cNrXePXSSE+JGOf57XHO5fwcv37O0RxX7meEbaW/jTiYXL+BrzdvmvlS5ufzmn3kuBgBc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,12 +33,13 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1tTKI6-000000007DY-3PLl;
-	Thu, 02 Jan 2025 12:27:06 +0000
-Date: Thu, 2 Jan 2025 12:26:52 +0000
+	id 1tTKNI-000000007GL-0FWk;
+	Thu, 02 Jan 2025 12:32:28 +0000
+Date: Thu, 2 Jan 2025 12:32:17 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+Cc: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Alexander Couzens <lynxis@fe80.eu>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -49,11 +50,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	linux-mediatek@lists.infradead.org
 Subject: Re: [PATCH net-next 2/3] net: pcs: pcs-mtk-lynxi: implement
  pcs_inband_caps() method
-Message-ID: <Z3aGDHU2TLV_YtZW@pidgin.makrotopia.org>
+Message-ID: <Z3aHUYOxCEGf9S_H@pidgin.makrotopia.org>
 References: <Z1F1b8eh8s8T627j@shell.armlinux.org.uk>
  <E1tJ8NR-006L5P-E3@rmk-PC.armlinux.org.uk>
- <Z1UMEnlZ_ivTsru5@pidgin.makrotopia.org>
- <Z1VjJ8ago-HetCxi@shell.armlinux.org.uk>
+ <e1e271e3-b684-46d2-879d-e3481d25a712@gmail.com>
+ <Z3ZVYeT0vD85Srsd@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,14 +63,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z1VjJ8ago-HetCxi@shell.armlinux.org.uk>
+In-Reply-To: <Z3ZVYeT0vD85Srsd@shell.armlinux.org.uk>
 
-On Sun, Dec 08, 2024 at 09:13:11AM +0000, Russell King (Oracle) wrote:
-> On Sun, Dec 08, 2024 at 03:01:38AM +0000, Daniel Golle wrote:
-> > On Thu, Dec 05, 2024 at 09:42:29AM +0000, Russell King (Oracle) wrote:
+On Thu, Jan 02, 2025 at 08:59:13AM +0000, Russell King (Oracle) wrote:
+> On Tue, Dec 17, 2024 at 08:49:58AM +0100, Eric Woudstra wrote:
+> > On 12/5/24 10:42 AM, Russell King (Oracle) wrote:
 > > > Report the PCS in-band capabilities to phylink for the LynxI PCS.
 > > > 
 > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > Reviewed-by: Daniel Golle <daniel@makrotopia.org>
 > > > ---
 > > >  drivers/net/pcs/pcs-mtk-lynxi.c | 16 ++++++++++++++++
 > > >  1 file changed, 16 insertions(+)
@@ -88,29 +90,23 @@ On Sun, Dec 08, 2024 at 09:13:11AM +0000, Russell King (Oracle) wrote:
 > > > +	switch (interface) {
 > > > +	case PHY_INTERFACE_MODE_1000BASEX:
 > > > +	case PHY_INTERFACE_MODE_2500BASEX:
-> > > +	case PHY_INTERFACE_MODE_SGMII:
-> > > +	case PHY_INTERFACE_MODE_QSGMII:
 > > 
-> > QSGMII is not supported by this PCS.
+> > Isn't this the place now where to report to phylink, that this PCS does
+> > not support in-band at 2500base-x?
 > 
-> Well...
-> - lynx_pcs_get_state(), lynx_pcs_config(), and lynx_pcs_link_up()
->   include QSGMII in their case statements.
-> - lynx_pcs_config_giga() refers to QSGMII in a comment, grouping it
->   with SGMII configuration.
-
-These functions are in pcs-lynx.c and not in pcs-mtk-lynxi.c.
-There is no reference to QSGMII anywhere in pcs-mtk-lynxi.c, what made
-you assume it would be supported?
-
+> No - look at the arguments to this function. What arguments would this
+> function make a decision whether in-band is supported in any interface
+> mode?
 > 
-> I think if the hardware doesn't support QSGMII, these references to it
-> should be removed?
-> 
-> I also think that adding a .pcs_validate() method would be a good idea
-> to reject interface modes that the PCS does not support.
+> The correct place is the .pcs_inband_caps(), which from reading the
+> code, I understood that in-band can be used at 2500base-X with this
+> PCS. See
+> https://patch.msgid.link/E1tJ8NR-006L5P-E3@rmk-PC.armlinux.org.uk
+> which was merged at the beginning of December, and if you are correct,
+> the patch was wrong.
 
-I can add the pcs_validate function and send the patch doing that to be
-included in net-next.
+Yes, that patch was wrong. Neither is QSGMII supported at all by the
+LynxI hardware, nor can in-band-status be used in 2500Base-X mode.
+I will send a patch to fix that.
 
 
