@@ -1,197 +1,170 @@
-Return-Path: <netdev+bounces-154844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D867A000FE
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 23:02:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2F89A0012E
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 23:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25C9160992
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 22:02:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C145163081
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 22:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C013019048F;
-	Thu,  2 Jan 2025 22:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34A51B423B;
+	Thu,  2 Jan 2025 22:26:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Qyy2Ezke"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="fXBSfWwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from alln-iport-4.cisco.com (alln-iport-4.cisco.com [173.37.142.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11DD13CF82
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 22:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBBF192B8C
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 22:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735855374; cv=none; b=HMuyHQOtGlGc6WVlby5e/THSJXCPzMGJRjakORRnLCdeb8qHDEieXmB3DcppP84DGxG58B1iL1wK39okkS+4MOCaFEmI1EZbDjAqKwy/pLBgfzIzesiKdlNm/kQQiqbn3xsS6m6BLKB47FGZk33o3T1tXx2+jt2AK+whQIM01ak=
+	t=1735856782; cv=none; b=K+A9SjogrLjV9nHmHHQe/7h8WX8lKQiULnjnmEgkdneOzjOc9OHIB4+v3hDyJ9JHS/zlW7fN0YHMcaQi1CWhRKobPBQeZl3pLV/GsJhgOYnaPe7HgGkClF8I425r9Pg0XWblFv87hVS91iNDa3vVNSildxP+4klUO0kkdQNG8/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735855374; c=relaxed/simple;
-	bh=SmDWOWTF4hdBe8hr4Ra9W/oom3mIAnmvG02pf9hOiJg=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mEfFKO9XVx00JbcnGvq0E5o5OEKc8BAdb0QNv5ByIJrDO5jECF1PbwfqWihcRAr8N6GFHLIdAy3AuIhGngMXsj22OQWFEq8ogQ+ixyINyyw7aAt3WbcZEwwCg8CZDmsXT5wQgXvlkyMF59PJq38aneybAF3MJIH6OSXYwN2M4SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Qyy2Ezke; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:To:From:Date:Reply-To:Cc:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=flhDoTWszixGfZPN6AOG1Kbft1s/lql3hbGGxPrleY8=; b=Qyy2EzkeztfaArvMkfHife79Ug
-	9mQxwcT2GZuEs9PnDjVTD4WeTUQJCrRpPLvtvgYR19N+827e2vvXLvaLiV4etpXf/AYhSeE6bb/oz
-	YSQP7e3uiC9+62RHteTzoLkBq3S6NeeTMku8Fgxbg0C+6XwfGUMQWC6PMmiw1P74J4G+Y9/PhTLrT
-	oA73aILo0VoMwypPccrltiS0J4qmszRBCr2wYbir7YCiU6FU8gqkmlRB2lgGzMEt3Rj7htCV/Iz43
-	hei0v+MieMRXrRU/BJ7k7yqTpbCyHqos1rQ6+yAK3luur6S1DaFLurb0G/SdPh0CsB+r0Knuglo8X
-	nAJ3p0bw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49174)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tTTH5-0002Qh-0q;
-	Thu, 02 Jan 2025 22:02:39 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tTTH1-0000e4-0k;
-	Thu, 02 Jan 2025 22:02:35 +0000
-Date: Thu, 2 Jan 2025 22:02:35 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 2/7] net: stmmac: move tx_lpi_timer tracking to
- phylib
-Message-ID: <Z3cM-5tShVza0M58@shell.armlinux.org.uk>
-References: <Z1r3MWZOt36SgGxf@shell.armlinux.org.uk>
- <E1tLkSX-006qfS-Rx@rmk-PC.armlinux.org.uk>
- <Z1wTqh-BnvPYLqU8@shell.armlinux.org.uk>
- <Z1yTviYUZ8sbNOsK@shell.armlinux.org.uk>
+	s=arc-20240116; t=1735856782; c=relaxed/simple;
+	bh=RORmIHOPK0kcdA4FF5ZN7f/vgZqCcBGRgD73Rn7lHHU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AqkDdmYqMxKThe5cewmW64M5EQM9pDeV+K51/LbYxNIV6WA9frS37EkW8GLobulHMa1mW3MhDDoe0V11f3653lyVUuyHszzt5gOKCGeuVtDjhEfpw44t4dCOTwvXCkvPSZfPU5ENW3KyxTZyWz2PV0v6Sv3pVh7tbbLWGEQOKl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=fXBSfWwW; arc=none smtp.client-ip=173.37.142.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=cisco.com; i=@cisco.com; l=2580; q=dns/txt; s=iport;
+  t=1735856781; x=1737066381;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=JgaQjsnXXe04jy52YeskEwBquLcoaHkw0vFrNptWWrE=;
+  b=fXBSfWwWCyyKgEqoYV0jRq7PeHJj9QwEZ3/ocpxVeWzkniZAjCiEr+hR
+   vocYcvi2oHvwlR9VPzurOQj6FNJOCrgD+y56m0Hw2YHjXy3FBj80l/MGI
+   95k6hXW/It7BCAlI+gcDQQcPtldgJ3JwBs3prbP7mwXVFoW0R4hKo/6cl
+   k=;
+X-CSE-ConnectionGUID: OcWeyPGSRwKy/N4BC9xQYg==
+X-CSE-MsgGUID: lNXFRfQhRBmKTAEgaF5DvQ==
+X-IPAS-Result: =?us-ascii?q?A0AkAQBsEXdnj4wQJK1aHgEBCxIMgggLhBpDSI1RiHKeG?=
+ =?us-ascii?q?xSBEQNWDwEBAQ9EBAEBhQeKcQImNAkOAQIEAQEBAQMCAwEBAQEBAQEBAQEBC?=
+ =?us-ascii?q?wEBBQEBAQIBBwUUAQEBAQEBOQUOO4YIhl02AUaBDDISgwGCZQOzHoIsgQHeM?=
+ =?us-ascii?q?4FtgUiFa4dfcIR3JxuBSUSEDm+EKWeFdwSCHBeBJYFAg3CdV0iBIQNZLAFVE?=
+ =?us-ascii?q?w0KCwcFgTk6AyILCwwLFBwVAoEagQIUBhUEgQtFPYJIaUk3Ag0CNoIgJFiCK?=
+ =?us-ascii?q?4RdhEeEVoJJVYJIghd8gRqCKkADCxgNSBEsNwYOGwY+bgebeTyDboEOARNoK?=
+ =?us-ascii?q?x1RFD4CEZMhkhWhA4QkgWOfYxozqlKYfCKjbTeEZoFnOoFbMxoIGxWDIlIZD?=
+ =?us-ascii?q?44tDQmwcyUyPAIHCwEBAwmPWQaBdwEB?=
+IronPort-Data: A9a23:YBThjKt+q2UVLwTmNuHtnloyJOfnVLNeMUV32f8akzHdYApBsoF/q
+ tZmKWzTOPqIZWX0KYh0aIizo0IO7cTcmt5rTQE++y5jE3wRgMeUXt7xwmUckM+xwmwvaGo9s
+ q3yv/GZdJhcokf0/0nrav656yEhjclkf5KkYMbcICd9WAR4fykojBNnioYRj5Vh6TSDK1vlV
+ eja/YuGYjdJ5xYuajhJs/vb8ks01BjPkGpwUmIWNKgjUGD2zxH5PLpHTYmtIn3xRJVjH+LSb
+ 47r0LGj82rFyAwmA9Wjn6yTWhVirmn6ZFXmZtJ+AsBOszAazsAA+v9T2Mk0NS+7vw60c+VZk
+ 72hg3AfpTABZcUgkMxFO/VR/roX0aduoNcrKlDn2SCfItGvn3bEm51T4E8K0YIw3e1IDHB22
+ sciNxMcKTbfrcnn0IuKRbw57igjBJGD0II3s3Vky3TdSP0hW52GG/6M7t5D1zB2jcdLdRrcT
+ 5NGMnw0MlKZPVsWZg9/5JEWxI9EglH9dD1epFuRqII84nPYy0p6172F3N/9JoTVGZgNwxvCz
+ o7A12DfMj8gOuWf8xCA0U6Fq+DGs37XRrtHQdVU8dYx3QXMnTZMYPEMbnO3qOe0j2ayUsxSL
+ kgT9DZoq6UunGSmQsT4Vg+1vFaLuRkTX9cWGOo/gCmO16DdywWUHG4JSnhGctNOnMYwSSYny
+ RyPks/lCCJHtKCTTzSW9t+8tTq4NC4UBXUPaS8NUU0O5NyLiIc+kh7CUP59H6OvyN74Azf9x
+ 3aNtidWulkIpccP06P++RXMhCih48CSCAU0/Q7QGGmi62uVebJJeaSP4mfW/M5vF7yGbUjGm
+ iQusJmO1dEBWMTleDO2fM0BG7Sg5vCgOTLagEJyE5RJy9hL0yD4FWy3yG8iTHqFIvo5lSnVj
+ Fg/UD69BaO/3lP3NMebgKroV6zGKJQM8/y+B5g4ifIVOfBMmPevpn0GWKJp9zmFfLIQua8+I
+ 4yHVs2nEGwXD69qpBLvGLxAjuJ1nXxllDyJLXwe8/hB+efPDJJyYepUWGZikshjt8toXS2Mq
+ Y8GbJrQo/mheLChPnePmWLsEbz6BSNmXc+t8ZM/mh+rKQt9E2ZpEO7K3b4kYMRkma8T/tokD
+ VnjMnK0PGHX3CWdQS3TMygLQOq2Af5X8ylhVQRyZgnA5pTWSdr0hEvpX8dsJeF/nAGipNYoJ
+ 8Q4lzKoW60eGmmeqm1HPfEQbuVKLXyWuO5HBAL9CBBXQnKqb1WhFgPMFuc3yBQzMw==
+IronPort-HdrOrdr: A9a23:Mh5K46P2kmPKTcBcTsqjsMiBIKoaSvp037Dk7S9MoHtuA6mlfq
+ +V/cjzuSWYtN9zYgBDpTn/Asm9qBrnnPYfi7X5Vo3NYOCJggeVxflZnOjfK/mKIVyYygabvp
+ 0QF5RDNA==
+X-Talos-CUID: 9a23:txOftG3emQTDlcHy7tS5qrxfPcsaf2zl40zqPGypTkA1YpbEWWah9/Yx
+X-Talos-MUID: =?us-ascii?q?9a23=3AySHt1w4mUeyQbv8Q2RXx1PDXxoxsxZSAMk40ka8?=
+ =?us-ascii?q?svuq4HAF/MhnAoCqOF9o=3D?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.12,286,1728950400"; 
+   d="scan'208";a="407450552"
+Received: from alln-l-core-03.cisco.com ([173.36.16.140])
+  by alln-iport-4.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 02 Jan 2025 22:25:12 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by alln-l-core-03.cisco.com (Postfix) with ESMTP id 49BB6180001D3;
+	Thu,  2 Jan 2025 22:25:12 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id 18CD920F2003; Thu,  2 Jan 2025 14:25:12 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: benve@cisco.com,
+	satishkh@cisco.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: John Daley <johndale@cisco.com>
+Subject: [PATCH net-next v4 0/6] enic: Use Page Pool API for receiving packets
+Date: Thu,  2 Jan 2025 14:24:21 -0800
+Message-Id: <20250102222427.28370-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1yTviYUZ8sbNOsK@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: alln-l-core-03.cisco.com
 
-On Fri, Dec 13, 2024 at 08:06:22PM +0000, Russell King (Oracle) wrote:
-> On Fri, Dec 13, 2024 at 10:59:54AM +0000, Russell King (Oracle) wrote:
-> > On Thu, Dec 12, 2024 at 02:46:33PM +0000, Russell King (Oracle) wrote:
-> > > @@ -1092,6 +1092,7 @@ static void stmmac_mac_link_up(struct phylink_config *config,
-> > >  			phy_init_eee(phy, !(priv->plat->flags &
-> > >  				STMMAC_FLAG_RX_CLK_RUNS_IN_LPI)) >= 0;
-> > >  		priv->eee_enabled = stmmac_eee_init(priv);
-> > > +		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
-> > >  		priv->tx_lpi_enabled = priv->eee_enabled;
-> > >  		stmmac_set_eee_pls(priv, priv->hw, true);
-> > >  	}
-> > 
-> > While looking deeper at stmmac, there's a bug in the above hunk -
-> > stmmac_eee_init() makes use of priv->tx_lpi_timer, so this member
-> > needs to be set before calling this function. I'll post a v2 shortly.
-> 
-> I'm going to hold off v2, there's a lot more that can be cleaned up
-> here - the EEE code is rather horrid in stmmac, and there's definitely
-> one race, and one logical error in it (e.g. why mark software EEE mode
-> *enabled* when EEE mode is being disabled - which can lead to the EEE
-> timer being added back onto the timer list.)
-> 
-> There's also weirdness with dwmac4's EEE register fiddling.
-> 
-> The stmmac driver uses hardware timed LPI entry if the timer is small
-> enough to be programmed into hardware, otherwise it uses software mode.
-> 
-> When software mode wants to enter LPI mode, it sets both:
-> 
-> 	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
-> 	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
-> 
-> When software mode wants to exit LPI mode, it clears both of these
-> two bits.
-> 
-> In hardware mode, when enabling LPI generation, we set the hardware LPI
-> entry timer (separate register) to a non-zero value, and then set:
-> 
-> 	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
-> 	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
-> 	GMAC4_LPI_CTRL_STATUS_LPIATE (LPI Timer enable)
-> 
-> That seems logical. However, in hardware mode, when we want to then
-> disable hardware LPI generation, we set the hardware LPI entry timer to
-> zero, the following bits:
-> 
-> 	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
-> 	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
-> 
-> and clear:
-> 
-> 	GMAC4_LPI_CTRL_STATUS_LPIATE (LPI Timer enable)
-> 
-> So, hardware mode, disabled, ends up setting the same bits as
-> software mode wanting to generate LPI state on the transmit side.
-> This makes no sense to me, and looks like another bug in this driver.
+When the MTU is less than PAGE_SIZE, use the Page Pool API for RX.
 
-I've found a document that describes the GMAC:
+The Page Pool API improves bandwidth and CPU overhead by recycling
+pages instead of allocating new buffers in the driver. Also, page
+pool fragment allocation for smaller MTUs allow multiple packets
+to share a page.
 
-https://www.st.com/resource/en/reference_manual/rm0441-stm32mp151-advanced-armbased-32bit-mpus-stmicroelectronics.pdf
+Since older hardware does not support receiving packets into
+multiple discontiguous pages, the original RX path where
+netdev_alloc_skb_ip_align() is used for buffer allocation is now
+used only when MTU > PAGE_SIZE. Function pointers are used to select
+functions based on the MTU. Some refactoring was done so that common
+code can be shared. The refactored functions and the new functions
+using page pool are in a new file called enic_rq.c.
 
-Page 3302 gives the definitions for the ETH_MACLCSR, which is this
-register.
+Fixed bug in the RX adaptive coalescing and did a minor cleanup.
 
-LPITE (bit 20) - allows the ETH_MACLETR register to define how long to
-wait before the TX path enters LPI. Requires LPITXA and LPIEN to both
-be set. LPIEN is *not* automatically cleared when the TX path exits
-LPI.
+Signed-off-by: John Daley <johndale@cisco.com>
 
-LPITXA (bit 19) - if this and LPIEN are set, then LPI is entered once
-all outstanding packets have been transmitted, and exits when there's
-a packet to be transmitted or the Tx FIFO is flushed. When it exits,
-it clears the LPIEN bit (making this a one-shot LPI enter-exit.)
+---
+Changes in v2:
+- Fixed a valid warning found by build_clang where a variable was used
+  before it was initialized. The warnings in include/linux/mm.h were not
+  addressed since they do not appear to be realated to this patchset.
 
-PLS (bit 17) needs to be programmed to reflect the PHY link status,
-and is used to hold off LPI state for the LS timer.
+Changes in v3:
+- Moved a function to before where is was called and removed the forward
+  declaration. Reworded a commit message. No functional changes.
 
-LPIEN (bit 16) instructs the MAC to enter (when set) or exit (when
-cleared) LPI state. It doesn't say what the behaviour of this bit is
-if LPITXA is clear.
+Changes in v4:
+- Replaced call to page_pool_put_page() with page_pool_put_full_page()
+  since page_pool_dev_alloc() API is used and page_pool is created with
+  PP_FLAG_DMA_SYNC_DEV flag.
+- Reworded final commit message one more time to try to make it clear
+  that there is just one fix for the commit.
 
-So:
+John Daley (6):
+  enic: Refactor RX path common code into helper functions
+  enic: Remove an unnecessary parameter from function enic_queue_rq_desc
+  enic: Use function pointers for buf alloc, free and RQ service
+  enic: Use the Page Pool API for RX when MTU is less than page size
+  enic: Move RX coalescing set function
+  enic: Obtain the Link speed only after the link comes up
 
-LPIEN	LPITXA	LPITE	Effect
-0	x	x	No LPI, or LPI exited if active
-1	0	0	Undocumented
-1	1	0	Tx LPI entered if PLS has been set for the LS
-			timer, and once all packets have been sent.
-			LPIEN clears when Tx LPI exits.
-1	1	1	Tx LPI entered if PLS has been set for the LS
-			timer, and transmitter has been idle for
-			ETH_MACLETR. Exits do not clear LPIEN, allowing
-			for subsequent idle periods to enter LPI.
-
-Therefore, given this description, I believe the code to be wrong.
-In the case where we've set LPIEN=1 LPITXA=1 LPITE=1, and we want
-to exit/disable LPI, we should not be clearing LPIATE and leaving
-LPIEN and LPITXA as they were. According to my reading, this would
-cause LPI to remain active until there is a packet to be sent or the
-TX FIFO is flushed. At that point, Tx LPI will be exited, causing
-LPIEN to be cleared - but the code is wanting to disable Tx LPI
-(e.g. because the user configured through ethtool for LPI to be
-disabled.)
-
-The question is... does this get fixed? Is there anyone who can test
-this (beyond the "patch doesn't seem to cause regressions" but can
-actually confirm entry/exit from LPI state?)
+ drivers/net/ethernet/cisco/enic/Makefile      |   2 +-
+ drivers/net/ethernet/cisco/enic/enic.h        |  15 +
+ .../net/ethernet/cisco/enic/enic_ethtool.c    |   1 +
+ drivers/net/ethernet/cisco/enic/enic_main.c   | 229 ++++++---------
+ drivers/net/ethernet/cisco/enic/enic_res.h    |  10 +-
+ drivers/net/ethernet/cisco/enic/enic_rq.c     | 260 ++++++++++++++++++
+ drivers/net/ethernet/cisco/enic/enic_rq.h     |  27 ++
+ drivers/net/ethernet/cisco/enic/vnic_rq.h     |   2 +
+ 8 files changed, 400 insertions(+), 146 deletions(-)
+ create mode 100644 drivers/net/ethernet/cisco/enic/enic_rq.c
+ create mode 100644 drivers/net/ethernet/cisco/enic/enic_rq.h
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.35.2
+
 
