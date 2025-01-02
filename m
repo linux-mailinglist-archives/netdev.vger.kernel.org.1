@@ -1,225 +1,96 @@
-Return-Path: <netdev+bounces-154698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 431C39FF7D6
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:11:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C92239FF7DE
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 495931882E71
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:11:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60A33A1670
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219231A4F2F;
-	Thu,  2 Jan 2025 10:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cs/HaRUz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA751A8F9B;
+	Thu,  2 Jan 2025 10:15:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E112F1A76D0
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 10:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E311D1AB52F;
+	Thu,  2 Jan 2025 10:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735812690; cv=none; b=Hmn0coxm6VBc64bI+zmYFJWR8qWDZCcIx9DV9K4kytwvk25+64VykNqxA87scVKHz/HgtTszcf8aXZSZFZmyezhn97VDHZgOKxrQ6rcUf53SKNV04sAa9TpGRON8Ihj3mtNfXJT97uxJvVPgZTVbXYqSNPLmihzUi0Ww/C7C/Lo=
+	t=1735812944; cv=none; b=di9pybHnAgDyLinnM++8tcye+u1oxsFAnLbo20Nd7OS9uoyJjs8cHLtRWMUxLgL/UBaWWQ36UorVg5Zme6WZchANWr+gYVBJZx7xY9izJA10LfKOcK5OHhd+SwmAScuLpYnhpVUlYx0HXq1XmrvY+ayCDCkfzxaIYg2pClNkqPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735812690; c=relaxed/simple;
-	bh=+zcVhl/5r56s3nd3af/rDf3WbIC8gWlgNLuDFcgPbkA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wiuv4PIx9nZ1G0a9nKz03eaffZs++c9uOl9OICqrvUBWcSmU+3ZfAGa1+fKJi7MiYH/18MgwxoSy8qT+mXaERMWcbfC6fplhSGg6Qt5ir3/XRRH3gcdObXoXS9TwAxjJrRdwOuxnaYzFJR8khDIcXuD115FAFnjVShkBGGpSBso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cs/HaRUz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F401C4CED0;
-	Thu,  2 Jan 2025 10:11:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735812689;
-	bh=+zcVhl/5r56s3nd3af/rDf3WbIC8gWlgNLuDFcgPbkA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Cs/HaRUzqHB6rzgUgdRkP2uydbNRC4W7dhIc2pVPYIHr9V2NpxtUWt1cDMqAGBvX0
-	 ltdwUSfbdvMEt7NaCq8tlJw4LW9mi27D+Fy6evxps1heJDR2AtlEh3XSdQhLyR/SeR
-	 vAtVMKU3bTQJ9PNuNlGlNwKGa291OwXFHCbuR0c9JxBcJ4VKqiIuInY5yexpfv/j6o
-	 vS8MFIZ8Y+JD1F0zrvKLzxBXpwMhwar32T3/u1OdOe26DJLmihgFDiveUtVoh05a5g
-	 qwuU9nQRzqOc+l+n6mATkN76MuC8jrJqQCyjCQHYLq6kEdAeIGrRc5L77IfG5elSMr
-	 oK0mmZeL8QqGw==
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Alexandre Cassen <acassen@corp.free.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Raed Salem <raeds@nvidia.com>
-Subject: [PATCH ipsec-rc] xfrm: delete intermediate secpath entry in packet offload mode
-Date: Thu,  2 Jan 2025 12:11:11 +0200
-Message-ID: <f417e151bc753428b66f4ca4762a78203623f83d.1735812447.git.leon@kernel.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1735812944; c=relaxed/simple;
+	bh=IqD1rYgJ3ch66LuKzrsna8MYtfPYqytfe3biHukTTjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OPQAVGJgX9A2wVvwBLTD8ssL6WVFR7Wcmy1d08fVo+Gyt+fq4CvBUCraa5kCiEaKVQs5LthJz6Yd2QAv/DZm98ZRDfrNguTmckha19cIQx/DNSeNep9z4EQ2kseZgcGvpVz46Z1/IsFOel9RxZh+0r2VEfnePmQS+vtLs7HmOI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aaeec07b705so1046853566b.2;
+        Thu, 02 Jan 2025 02:15:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735812940; x=1736417740;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sg5x3HXKSUeq0O4d13HngJWLVCRPQW+x685IF1QbjE8=;
+        b=L70pFhBctZT7ZnfoQEzMdIorQ9pQy1Srhk6KgAa4cKT4pnHWO8FEYD2SoqLq+gYoHL
+         lt1Awerf7QeNqJ9pet76S5TIpbMYLU0BH+FoTs09crW+coUCJnGpss1P5L29FQS14s2o
+         yh50EZoWeqFVUbJTiZxDStoDTz3xj83oqa1dCjy50xymM7oUVQGO22aGoJbDlwiNpK2c
+         dCoVQpdYzCobwzSJSxrmj+Bqq324vxfLqmNmgfcFkSwIskAddS1gaQalcPbw/79vAq7Q
+         +f8DVrWUyYw7dF/XqkUhyHaNdp00AtSp7Viz72mxFuWMLpw69LbaBfK2+aZzb0khvnqn
+         vccg==
+X-Forwarded-Encrypted: i=1; AJvYcCURZ728PIJcxZQG+8K6o/Uq1RyEDkPEixZFmz2YL+CpPFniy+eLmH+eGbbk11PNyhcMp7GR3G+D@vger.kernel.org, AJvYcCVqSGqOyCTrKYjTn7vqyzTcZZO+8XIVCiFZi9qlyyC/pWPTA84heQO3sMruN7HYIKN245D8NMe2L0Vtx8A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7ouyErKTRWiSff3Powu3KwoVupByrunr2SET2QKK0ApYAJZrw
+	4MIBekkJn3oMxsQpU5Bhrv3I7IbnRt0OckcFE1ffRXDfv2RGCk+h
+X-Gm-Gg: ASbGnctg5hurCXZ754Fs5ZZuTmCjHETLQc/Gv2VEQ4FlUVgJ8eulUW02n2TncqlUc+Q
+	VIjlwo6NkM9/Okfady1Neu3yZWAC5/pQfaCQsllI0a/7OaZ7njx5nNJzm+fvNaBpkYO/GNSR9Kq
+	0h3aalJoaO0XXfEKHkFiYwn5R3ApC5ieRsLYWAkRY4GKDVdtWdc1hvrIxNOMgE8qGky4Ks3Irfy
+	SEC6U8jtlrLfnHi9YAdW2Sh2jZ3nytHVsoS2W2jSA5c41Q=
+X-Google-Smtp-Source: AGHT+IGrcMZgPYpxhNzW3fJtDo4W6awVXN3qOJhoZQMhpuKeyZFtdRrgep7r2aPICudw8LGsR/r5hg==
+X-Received: by 2002:a17:907:96a1:b0:aa6:7cf3:c6ef with SMTP id a640c23a62f3a-aac2ad88f9fmr4729536566b.15.1735812939648;
+        Thu, 02 Jan 2025 02:15:39 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e895372sm1757453866b.58.2025.01.02.02.15.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 02:15:39 -0800 (PST)
+Date: Thu, 2 Jan 2025 02:15:33 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+	Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
+	Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
+ schedule_work outside lock
+Message-ID: <20250102-daffy-vanilla-boar-6e1a61@leitao>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
+ <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
+ <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
 
-From: Alexandre Cassen <acassen@corp.free.fr>
+On Sat, Dec 21, 2024 at 05:06:55PM +0800, Herbert Xu wrote:
+> On Thu, Dec 12, 2024 at 08:33:31PM +0800, Herbert Xu wrote:
+> >
+> > The growth check should stay with the atomic_inc.  Something like
+> > this should work:
+> 
+> OK I've applied your patch with the atomic_inc move.
 
-Packets handled by hardware have added secpath as a way to inform XFRM
-core code that this path was already handled. That secpath is not needed
-at all after policy is checked and it is removed later in the stack.
+Sorry, I was on vacation, and I am back now. Let me know if you need
+anything further.
 
-However, in the case of IP forwarding is enabled (/proc/sys/net/ipv4/ip_forward),
-that secpath is not removed and packets which already were handled are reentered
-to the driver TX path with xfrm_offload set.
-
-The following kernel panic is observed in mlx5 in such case:
-
- mlx5_core 0000:04:00.0 enp4s0f0np0: Link up
- mlx5_core 0000:04:00.1 enp4s0f1np1: Link up
- Initializing XFRM netlink socket
- IPsec XFRM device driver
- BUG: kernel NULL pointer dereference, address: 0000000000000000
- #PF: supervisor instruction fetch in kernel mode
- #PF: error_code(0x0010) - not-present page
- PGD 0 P4D 0
- Oops: Oops: 0010 [#1] PREEMPT SMP
- CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.13.0-rc1-alex #3
- Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.13.0-1ubuntu1.1 04/01/2014
- RIP: 0010:0x0
- Code: Unable to access opcode bytes at 0xffffffffffffffd6.
- RSP: 0018:ffffb87380003800 EFLAGS: 00010206
- RAX: ffff8df004e02600 RBX: ffffb873800038d8 RCX: 00000000ffff98cf
- RDX: ffff8df00733e108 RSI: ffff8df00521fb80 RDI: ffff8df001661f00
- RBP: ffffb87380003850 R08: ffff8df013980000 R09: 0000000000000010
- R10: 0000000000000002 R11: 0000000000000002 R12: ffff8df001661f00
- R13: ffff8df00521fb80 R14: ffff8df00733e108 R15: ffff8df011faf04e
- FS:  0000000000000000(0000) GS:ffff8df46b800000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: ffffffffffffffd6 CR3: 0000000106384000 CR4: 0000000000350ef0
- Call Trace:
-  <IRQ>
-  ? show_regs+0x63/0x70
-  ? __die_body+0x20/0x60
-  ? __die+0x2b/0x40
-  ? page_fault_oops+0x15c/0x550
-  ? do_user_addr_fault+0x3ed/0x870
-  ? exc_page_fault+0x7f/0x190
-  ? asm_exc_page_fault+0x27/0x30
-  mlx5e_ipsec_handle_tx_skb+0xe7/0x2f0 [mlx5_core]
-  mlx5e_xmit+0x58e/0x1980 [mlx5_core]
-  ? __fib_lookup+0x6a/0xb0
-  dev_hard_start_xmit+0x82/0x1d0
-  sch_direct_xmit+0xfe/0x390
-  __dev_queue_xmit+0x6d8/0xee0
-  ? __fib_lookup+0x6a/0xb0
-  ? internal_add_timer+0x48/0x70
-  ? mod_timer+0xe2/0x2b0
-  neigh_resolve_output+0x115/0x1b0
-  __neigh_update+0x26a/0xc50
-  neigh_update+0x14/0x20
-  arp_process+0x2cb/0x8e0
-  ? __napi_build_skb+0x5e/0x70
-  arp_rcv+0x11e/0x1c0
-  ? dev_gro_receive+0x574/0x820
-  __netif_receive_skb_list_core+0x1cf/0x1f0
-  netif_receive_skb_list_internal+0x183/0x2a0
-  napi_complete_done+0x76/0x1c0
-  mlx5e_napi_poll+0x234/0x7a0 [mlx5_core]
-  __napi_poll+0x2d/0x1f0
-  net_rx_action+0x1a6/0x370
-  ? atomic_notifier_call_chain+0x3b/0x50
-  ? irq_int_handler+0x15/0x20 [mlx5_core]
-  handle_softirqs+0xb9/0x2f0
-  ? handle_irq_event+0x44/0x60
-  irq_exit_rcu+0xdb/0x100
-  common_interrupt+0x98/0xc0
-  </IRQ>
-  <TASK>
-  asm_common_interrupt+0x27/0x40
- RIP: 0010:pv_native_safe_halt+0xb/0x10
- Code: 09 c3 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 0f 22
- 0f 1f 84 00 00 00 00 00 90 eb 07 0f 00 2d 7f e9 36 00 fb
-40 00 83 ff 07 77 21 89 ff ff 24 fd 88 3d a1 bd 0f 21 f8
- RSP: 0018:ffffffffbe603de8 EFLAGS: 00000202
- RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000f92f46680
- RDX: 0000000000000037 RSI: 00000000ffffffff RDI: 00000000000518d4
- RBP: ffffffffbe603df0 R08: 000000cd42e4dffb R09: ffffffffbe603d70
- R10: 0000004d80d62680 R11: 0000000000000001 R12: ffffffffbe60bf40
- R13: 0000000000000000 R14: 0000000000000000 R15: ffffffffbe60aff8
-  ? default_idle+0x9/0x20
-  arch_cpu_idle+0x9/0x10
-  default_idle_call+0x29/0xf0
-  do_idle+0x1f2/0x240
-  cpu_startup_entry+0x2c/0x30
-  rest_init+0xe7/0x100
-  start_kernel+0x76b/0xb90
-  x86_64_start_reservations+0x18/0x30
-  x86_64_start_kernel+0xc0/0x110
-  ? setup_ghcb+0xe/0x130
-  common_startup_64+0x13e/0x141
-  </TASK>
- Modules linked in: esp4_offload esp4 xfrm_interface
-xfrm6_tunnel tunnel4 tunnel6 xfrm_user xfrm_algo binfmt_misc
-intel_rapl_msr intel_rapl_common kvm_amd ccp kvm input_leds serio_raw
-qemu_fw_cfg sch_fq_codel dm_multipath scsi_dh_rdac scsi_dh_emc
-scsi_dh_alua efi_pstore ip_tables x_tables autofs4 raid10 raid456
-async_raid6_recov async_memcpy async_pq raid6_pq async_xor xor async_tx
-libcrc32c raid1 raid0 mlx5_core crct10dif_pclmul crc32_pclmul
-polyval_clmulni polyval_generic ghash_clmulni_intel sha256_ssse3
-sha1_ssse3 ahci mlxfw i2c_i801 libahci i2c_mux i2c_smbus psample
-virtio_rng pci_hyperv_intf aesni_intel crypto_simd cryptd
- CR2: 0000000000000000
- ---[ end trace 0000000000000000 ]---
- RIP: 0010:0x0
- Code: Unable to access opcode bytes at 0xffffffffffffffd6.
- RSP: 0018:ffffb87380003800 EFLAGS: 00010206
- RAX: ffff8df004e02600 RBX: ffffb873800038d8 RCX: 00000000ffff98cf
- RDX: ffff8df00733e108 RSI: ffff8df00521fb80 RDI: ffff8df001661f00
- RBP: ffffb87380003850 R08: ffff8df013980000 R09: 0000000000000010
- R10: 0000000000000002 R11: 0000000000000002 R12: ffff8df001661f00
- R13: ffff8df00521fb80 R14: ffff8df00733e108 R15: ffff8df011faf04e
- FS:  0000000000000000(0000) GS:ffff8df46b800000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: ffffffffffffffd6 CR3: 0000000106384000 CR4: 0000000000350ef0
- Kernel panic - not syncing: Fatal exception in interrupt
- Kernel Offset: 0x3b800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
- ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
-
-Fixes: 5958372ddf62 ("xfrm: add RX datapath protection for IPsec packet offload mode")
-Signed-off-by: Alexandre Cassen <acassen@corp.free.fr>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- include/net/xfrm.h | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 32c09e85a64ce..2c4eda6a85966 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -1224,9 +1224,19 @@ static inline int __xfrm_policy_check2(struct sock *sk, int dir,
- 
- 	if (xo) {
- 		x = xfrm_input_state(skb);
--		if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET)
--			return (xo->flags & CRYPTO_DONE) &&
--			       (xo->status & CRYPTO_SUCCESS);
-+		if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
-+			bool check = (xo->flags & CRYPTO_DONE) &&
-+				     (xo->status & CRYPTO_SUCCESS);
-+
-+			/* The packets here are plain ones and secpath was
-+			 * needed to indicate that hardware already handled
-+			 * them and there is no need to do nothing in addition.
-+			 *
-+			 * Consume secpath which was set by drivers.
-+			 */
-+			secpath_reset(skb);
-+			return check;
-+		}
- 	}
- 
- 	return __xfrm_check_nopolicy(net, skb, dir) ||
--- 
-2.47.1
-
+Thanks for fixing it,
+--breno
 
