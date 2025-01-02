@@ -1,153 +1,147 @@
-Return-Path: <netdev+bounces-154726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 522FD9FF983
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 13:50:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327FF9FF8F8
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:51:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 002627A1767
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:50:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 628A718829AD
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FE11AC456;
-	Thu,  2 Jan 2025 12:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85B413D51E;
+	Thu,  2 Jan 2025 11:51:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bHZx5obM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF56199FBA;
-	Thu,  2 Jan 2025 12:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D43A95E
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 11:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735822205; cv=none; b=fpZo0CcDVRLahgxgPSXSjyxh4mvFqcvVVtKrHvYqznuMoNNPBJwdY4QAm1dmlqTHl6F89kTqOELh8eiTCac1z7fXSqOAIk7UGgDpcL44HDWi2SZkanvuGvppCBFte1G8Q0bPw1eXmA2dVLpsGcrjWSSRQmuMMzcAKiQM8G/KWUI=
+	t=1735818674; cv=none; b=O36RzS9I82Ii5pdaW1rRe8i/Avx2no+gFV3K6YxVi6jMZ3GV6bFW2m7RyNrMhIKYBWw2ndACEsMC7IP+05pQaO7JWkyuzFvKBGSpvnV0Hl4vh6WCkbtRbgeQB+KI8tnYnag7cg4Tb+vrutDuBl4Eupp7T4F5LZ6xtgLqmHz32gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735822205; c=relaxed/simple;
-	bh=6ZPOzpvYsAqlz7hdFo+/nt9VXVrrtsVFa6L3sxM17J0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ip8+vdNnBxBqUsnIWmP0r7wDM3HFcqX4Jr/3RgyW2ZAyOw7r4vPgAFNycdxbVMk/jqWNfZ0ZZ5ioVQf/fGNRR4LnDMVR1e+kuQ+B4AbBWwUgpJhoi/MVyno2oAxQ9ejk7KYTMV9esV1u7GzDG9zaEenymO6z5bP2qWv+/ZWUSKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4YP4lv3gC6z9shx;
-	Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qCix7nZ6SYKj; Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4YP4lv2m0zz9shw;
-	Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 4E98E8B767;
-	Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id Oius1QCwqKti; Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-Received: from [192.168.232.97] (unknown [192.168.232.97])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id BDC3E8B763;
-	Thu,  2 Jan 2025 12:50:50 +0100 (CET)
-Message-ID: <ec3515f1-f93a-4520-a9da-6ad14f9a6fe0@csgroup.eu>
-Date: Thu, 2 Jan 2025 12:50:50 +0100
+	s=arc-20240116; t=1735818674; c=relaxed/simple;
+	bh=cNaYHTAOZoeR/twTUzggyo1IE3ZhxN5JJeKSUuHJgLU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JYJTjhjVUE+LlagpCGj9vG4avF8WiUvuQ7vuGvLaTGvbbETJIHUvJHy/iuJ9r3fM3dOU7kdcBmYPRB8jO7BnZMx2e2VFBGljEntJuqrEQ1k31QdOWBBEo1pZ/4/Mevx1E8zpNaWm0KT3js1qWr8QsXZNyuR6n35pTUYTWxpnp9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bHZx5obM; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso13771214a12.0
+        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 03:51:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1735818671; x=1736423471; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TU3KDcWlMCobf4fcpB1Q0kWJ/13iIsNKoDqoM2RYIr0=;
+        b=bHZx5obMCbpwsaPWVfEcEADppTs1l9nkXLXsZaCG1JD5jhbmH+WiTqQvUWwzxQxodX
+         WU3flM8oGIG+BOFgkevVSshBDIlgyV0IFeAALNngV5lw/T86ukIJhde3g4pC4Pabad9V
+         N6UB8LbPNERxrTEZiMSewgRvK+wy0AA/oF85zCzo3QmRk6FiBX/DRfQkD/aqPGzgGO5+
+         4Wg2Q/vMdU9Ml+vDJa4l7DlGMYLPOiJ02jk4O4oiqXygKNm/ajzVlNYGrvc1CCADh6ek
+         XSHUbbj+GpBFZNQIb0KaokbcXpkVkSE61VXN8CdxTTVGluR32sJf4TerXUu1bTY34cL+
+         cjAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735818671; x=1736423471;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TU3KDcWlMCobf4fcpB1Q0kWJ/13iIsNKoDqoM2RYIr0=;
+        b=giMSkKKxkjJtzHpbJkcxbtr7Ya2U37GApjp4pDJmjy2rjm/KddzcbGzwrE8uKi/q1p
+         ubk4bQLIsd+I1g5SJD0EWa4eqTjve8buod7dUNNvg6KL8O6x3Vl0aesTtxgIoToJn0mJ
+         XYj5HWGViA1wo53c+4lJSR6jafC9fvegVgFeiFYYCCaFaBWplqdeKdB1lkK9/xKJn3vQ
+         HHglxNWrfASZiXbv/eWX/kPoB9oSwT5cBz37WDGPSf0tQMrCWKIcy+URttdxG5HLZ1GB
+         DpysIrKZarn0SvIIyNumqbkgOfebVIoAwbc1ezp5YlGahP9AW0XMrRZA1vzMf9Kvi7Wp
+         Lyqg==
+X-Gm-Message-State: AOJu0Yzg/MjX2igHWn9l9QS8YwU8KBEDuw/kkVZ6iCxMRFbyIqase+lt
+	/pj/2uAniQ25PS4/WXQhbVz7Jv+FP4H9+3Qdf3EPs9xoyoDSlJMSx+KrABTdHJPwjh4jD+fnpDH
+	VB1M4AXtUQuP//YexjTf9hCRuZ5IKCnUtaJvC
+X-Gm-Gg: ASbGncssupbnB0Rg5VylhHnt16wohaSZZ+OzQ5jxAS6NtDSXg0G0Vp4NtUo36NWg3EE
+	aKqa8esdKMoG76iIBW0xLdSiyiYXUportyLFsnQ==
+X-Google-Smtp-Source: AGHT+IEQh8U7vOgFqrxkmkgucPPKZaJussRisSbpRbaFF+9JM6pAxkiCU+q4UYOi3eJDnbm6H0/DMPtGVCiAFYeCG/M=
+X-Received: by 2002:a05:6402:3581:b0:5d3:bc1d:e56d with SMTP id
+ 4fb4d7f45d1cf-5d81de086afmr39086567a12.31.1735818671076; Thu, 02 Jan 2025
+ 03:51:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/29] crypto: powerpc/p10-aes-gcm - simplify handling
- of linear associated data
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Danny Tsen <dtsen@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Naveen N Rao <naveen@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
- linuxppc-dev@lists.ozlabs.org
-References: <20241230001418.74739-1-ebiggers@kernel.org>
- <20241230001418.74739-11-ebiggers@kernel.org>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20241230001418.74739-11-ebiggers@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250101164909.1331680-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20250101164909.1331680-1-willemdebruijn.kernel@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 2 Jan 2025 12:51:00 +0100
+Message-ID: <CANn89iJP4unWmk2T36t1LiFrchy+DSGkbZWz_i42mb1eCDXyeg@mail.gmail.com>
+Subject: Re: [PATCH net] net: reenable NETIF_F_IPV6_CSUM offload for BIG TCP packets
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, benoit.monin@gmx.fr, Willem de Bruijn <willemb@google.com>, 
+	syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jan 1, 2025 at 5:49=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> From: Willem de Bruijn <willemb@google.com>
+>
+> The blamed commit disabled hardware offoad of IPv6 packets with
+> extension headers on devices that advertise NETIF_F_IPV6_CSUM,
+> based on the definition of that feature in skbuff.h:
+>
+>  *   * - %NETIF_F_IPV6_CSUM
+>  *     - Driver (device) is only able to checksum plain
+>  *       TCP or UDP packets over IPv6. These are specifically
+>  *       unencapsulated packets of the form IPv6|TCP or
+>  *       IPv6|UDP where the Next Header field in the IPv6
+>  *       header is either TCP or UDP. IPv6 extension headers
+>  *       are not supported with this feature. This feature
+>  *       cannot be set in features for a device with
+>  *       NETIF_F_HW_CSUM also set. This feature is being
+>  *       DEPRECATED (see below).
+>
+> The change causes skb_warn_bad_offload to fire for BIG TCP
+> packets.
+>
+> [  496.310233] WARNING: CPU: 13 PID: 23472 at net/core/dev.c:3129 skb_war=
+n_bad_offload+0xc4/0xe0
+>
+> [  496.310297]  ? skb_warn_bad_offload+0xc4/0xe0
+> [  496.310300]  skb_checksum_help+0x129/0x1f0
+> [  496.310303]  skb_csum_hwoffload_help+0x150/0x1b0
+> [  496.310306]  validate_xmit_skb+0x159/0x270
+> [  496.310309]  validate_xmit_skb_list+0x41/0x70
+> [  496.310312]  sch_direct_xmit+0x5c/0x250
+> [  496.310317]  __qdisc_run+0x388/0x620
+>
+> BIG TCP introduced an IPV6_TLV_JUMBO IPv6 extension header to
+> communicate packet length, as this is an IPv6 jumbogram. But, the
+> feature is only enabled on devices that support BIG TCP TSO. The
+> header is only present for PF_PACKET taps like tcpdump, and not
+> transmitted by physical devices.
+>
+> For this specific case of extension headers that are not
+> transmitted, return to the situation before the blamed commit
+> and support hardware offload.
+>
+> ipv6_has_hopopt_jumbo() tests not only whether this header is present,
+> but also that it is the only extension header before a terminal (L4)
+> header.
+>
+> Fixes: 04c20a9356f2 ("net: skip offload for NETIF_F_IPV6_CSUM if ipv6 hea=
+der contains extension")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Reported-by: Eric Dumazet <edumazet@google.com>
+> Closes: https://lore.kernel.org/netdev/CANn89iK1hdC3Nt8KPhOtTF8vCPc1AHDCt=
+se_BTNki1pWxAByTQ@mail.gmail.com/
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
 
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-Le 30/12/2024 à 01:13, Eric Biggers a écrit :
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> p10_aes_gcm_crypt() is abusing the scatter_walk API to get the virtual
-> address for the first source scatterlist element.  But this code is only
-> built for PPC64 which is a !HIGHMEM platform, and it can read past a
-> page boundary from the address returned by scatterwalk_map() which means
-> it already assumes the address is from the kernel's direct map.  Thus,
-> just use sg_virt() instead to get the same result in a simpler way.
-> 
-> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Cc: Danny Tsen <dtsen@linux.ibm.com>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Naveen N Rao <naveen@kernel.org>
-> Cc: Nicholas Piggin <npiggin@gmail.com>
-> Cc: linuxppc-dev@lists.ozlabs.org
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
-> 
-> This patch is part of a long series touching many files, so I have
-> limited the Cc list on the full series.  If you want the full series and
-> did not receive it, please retrieve it from lore.kernel.org.
-> 
->   arch/powerpc/crypto/aes-gcm-p10-glue.c | 8 ++------
->   1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> index f37b3d13fc53..2862c3cf8e41 100644
-> --- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> +++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> @@ -212,11 +212,10 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
->   	struct p10_aes_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
->   	u8 databuf[sizeof(struct gcm_ctx) + PPC_ALIGN];
->   	struct gcm_ctx *gctx = PTR_ALIGN((void *)databuf, PPC_ALIGN);
->   	u8 hashbuf[sizeof(struct Hash_ctx) + PPC_ALIGN];
->   	struct Hash_ctx *hash = PTR_ALIGN((void *)hashbuf, PPC_ALIGN);
-> -	struct scatter_walk assoc_sg_walk;
->   	struct skcipher_walk walk;
->   	u8 *assocmem = NULL;
->   	u8 *assoc;
->   	unsigned int cryptlen = req->cryptlen;
->   	unsigned char ivbuf[AES_BLOCK_SIZE+PPC_ALIGN];
-> @@ -232,12 +231,11 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
->   	memset(ivbuf, 0, sizeof(ivbuf));
->   	memcpy(iv, riv, GCM_IV_SIZE);
->   
->   	/* Linearize assoc, if not already linear */
->   	if (req->src->length >= assoclen && req->src->length) {
-> -		scatterwalk_start(&assoc_sg_walk, req->src);
-> -		assoc = scatterwalk_map(&assoc_sg_walk);
-> +		assoc = sg_virt(req->src); /* ppc64 is !HIGHMEM */
->   	} else {
->   		gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
->   			      GFP_KERNEL : GFP_ATOMIC;
->   
->   		/* assoc can be any length, so must be on heap */
-> @@ -251,13 +249,11 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
->   
->   	vsx_begin();
->   	gcmp10_init(gctx, iv, (unsigned char *) &ctx->enc_key, hash, assoc, assoclen);
->   	vsx_end();
->   
-> -	if (!assocmem)
-> -		scatterwalk_unmap(assoc);
-> -	else
-> +	if (assocmem)
->   		kfree(assocmem);
-
-kfree() accepts a NULL pointer, you can call kfree(assocmem) without 'if 
-(assocmem)'
-
-
->   
->   	if (enc)
->   		ret = skcipher_walk_aead_encrypt(&walk, req, false);
->   	else
-
+Thanks Willem !
 
