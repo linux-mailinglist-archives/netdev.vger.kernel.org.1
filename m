@@ -1,96 +1,168 @@
-Return-Path: <netdev+bounces-154700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C92239FF7DE
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:15:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ADB79FF7EA
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:21:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60A33A1670
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:15:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25E643A1A8E
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA751A8F9B;
-	Thu,  2 Jan 2025 10:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857821917CD;
+	Thu,  2 Jan 2025 10:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=valla.it header.i=@valla.it header.b="BDHw4tXv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from delivery.antispam.mailspamprotection.com (delivery.antispam.mailspamprotection.com [185.56.87.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E311D1AB52F;
-	Thu,  2 Jan 2025 10:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735812944; cv=none; b=di9pybHnAgDyLinnM++8tcye+u1oxsFAnLbo20Nd7OS9uoyJjs8cHLtRWMUxLgL/UBaWWQ36UorVg5Zme6WZchANWr+gYVBJZx7xY9izJA10LfKOcK5OHhd+SwmAScuLpYnhpVUlYx0HXq1XmrvY+ayCDCkfzxaIYg2pClNkqPI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735812944; c=relaxed/simple;
-	bh=IqD1rYgJ3ch66LuKzrsna8MYtfPYqytfe3biHukTTjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OPQAVGJgX9A2wVvwBLTD8ssL6WVFR7Wcmy1d08fVo+Gyt+fq4CvBUCraa5kCiEaKVQs5LthJz6Yd2QAv/DZm98ZRDfrNguTmckha19cIQx/DNSeNep9z4EQ2kseZgcGvpVz46Z1/IsFOel9RxZh+0r2VEfnePmQS+vtLs7HmOI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aaeec07b705so1046853566b.2;
-        Thu, 02 Jan 2025 02:15:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735812940; x=1736417740;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sg5x3HXKSUeq0O4d13HngJWLVCRPQW+x685IF1QbjE8=;
-        b=L70pFhBctZT7ZnfoQEzMdIorQ9pQy1Srhk6KgAa4cKT4pnHWO8FEYD2SoqLq+gYoHL
-         lt1Awerf7QeNqJ9pet76S5TIpbMYLU0BH+FoTs09crW+coUCJnGpss1P5L29FQS14s2o
-         yh50EZoWeqFVUbJTiZxDStoDTz3xj83oqa1dCjy50xymM7oUVQGO22aGoJbDlwiNpK2c
-         dCoVQpdYzCobwzSJSxrmj+Bqq324vxfLqmNmgfcFkSwIskAddS1gaQalcPbw/79vAq7Q
-         +f8DVrWUyYw7dF/XqkUhyHaNdp00AtSp7Viz72mxFuWMLpw69LbaBfK2+aZzb0khvnqn
-         vccg==
-X-Forwarded-Encrypted: i=1; AJvYcCURZ728PIJcxZQG+8K6o/Uq1RyEDkPEixZFmz2YL+CpPFniy+eLmH+eGbbk11PNyhcMp7GR3G+D@vger.kernel.org, AJvYcCVqSGqOyCTrKYjTn7vqyzTcZZO+8XIVCiFZi9qlyyC/pWPTA84heQO3sMruN7HYIKN245D8NMe2L0Vtx8A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7ouyErKTRWiSff3Powu3KwoVupByrunr2SET2QKK0ApYAJZrw
-	4MIBekkJn3oMxsQpU5Bhrv3I7IbnRt0OckcFE1ffRXDfv2RGCk+h
-X-Gm-Gg: ASbGnctg5hurCXZ754Fs5ZZuTmCjHETLQc/Gv2VEQ4FlUVgJ8eulUW02n2TncqlUc+Q
-	VIjlwo6NkM9/Okfady1Neu3yZWAC5/pQfaCQsllI0a/7OaZ7njx5nNJzm+fvNaBpkYO/GNSR9Kq
-	0h3aalJoaO0XXfEKHkFiYwn5R3ApC5ieRsLYWAkRY4GKDVdtWdc1hvrIxNOMgE8qGky4Ks3Irfy
-	SEC6U8jtlrLfnHi9YAdW2Sh2jZ3nytHVsoS2W2jSA5c41Q=
-X-Google-Smtp-Source: AGHT+IGrcMZgPYpxhNzW3fJtDo4W6awVXN3qOJhoZQMhpuKeyZFtdRrgep7r2aPICudw8LGsR/r5hg==
-X-Received: by 2002:a17:907:96a1:b0:aa6:7cf3:c6ef with SMTP id a640c23a62f3a-aac2ad88f9fmr4729536566b.15.1735812939648;
-        Thu, 02 Jan 2025 02:15:39 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:4::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e895372sm1757453866b.58.2025.01.02.02.15.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jan 2025 02:15:39 -0800 (PST)
-Date: Thu, 2 Jan 2025 02:15:33 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
-	Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
-	Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
- schedule_work outside lock
-Message-ID: <20250102-daffy-vanilla-boar-6e1a61@leitao>
-References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
- <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
- <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C4D125D6
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 10:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.56.87.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735813314; cv=pass; b=Rr3VGNsQTCOM2SCW+ekkGVQRg5TElcmW7f+I1DSfr+/V+ibB1VY7SO8r295J6Rjrgbuyouc2xLzMAAiFUJir3Ftqq/C6+twfkt3DrnimsTdBRUMTTcaIoR/+LO8n2FqK0XoXAh8sv/wGlbykxOC66oBJCqrI8fqq8P4TJdcdT4I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735813314; c=relaxed/simple;
+	bh=ddQggaBUrIoq2iXDgGAYv5PKccyzP4WT2pX+n0sFHdY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UUeCCCwRLwbnROdG4qKFRmx0C1wMn2btW9uhwc+DYMChjSuBuZvLXqxKTm09a+iWfE1yY+k3kk0L7taVfzDVDiBP/rBgYE8g+mm4SjPQjbxrBVy2/Su+LA99oMkEwuwn9wDaiTYCxMkj8RUOLvLUY0zQiXDj05pd3Qpcij2YQeg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it; spf=pass smtp.mailfrom=valla.it; dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b=BDHw4tXv; arc=pass smtp.client-ip=185.56.87.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valla.it
+ARC-Seal: i=1; cv=none; a=rsa-sha256; d=instance-europe-west4-jwcv.prod.antispam.mailspamprotection.com; s=arckey; t=1735813311;
+	 b=EZadLLB1gUbAqb+WiuPeVebtfWDKx7jIaLbS30PFJq1uggwYuDvAoHj1Xs85lDFaPt51otzxf8
+	  Jnr5SiLmUv9JiChXyQq+hX4pokm/ZSJv0FCCtdiqAoAd8pBVZePX6A4EkZr1mlMn3fFkFDhQkE
+	  LejfESD+F7rKeC9dcrT5Nd8uOAaJPdQqv1P+yN9HLJVeTuMAdnAOmPUrUsX+NVZmT8VSZv1WTZ
+	  7pBq5Nn/sry1FUtPxf+UC4BxIVZsxG6rYFvDUi+AaN98Idjrvi03EbYOw+ZcAwyOEXGmp5YFfg
+	  LPwD5SpadRo4MTmzQchrOfjOnKLfCcUa/JYzO8rzWv55XQ==;
+ARC-Authentication-Results: i=1; instance-europe-west4-jwcv.prod.antispam.mailspamprotection.com; smtp.remote-ip=35.214.173.214;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=instance-europe-west4-jwcv.prod.antispam.mailspamprotection.com; s=arckey; t=1735813311;
+	bh=ddQggaBUrIoq2iXDgGAYv5PKccyzP4WT2pX+n0sFHdY=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	  Message-ID:Date:Subject:Cc:To:From:DKIM-Signature;
+	b=SCR8Yr6H0l0ZTbQfrhnQCM5g7R66EF5YmTte/DcbS5vx1oZ39yMdD7fe8nqNwjzNRSI65NpP2w
+	  j+OG7X7B+GGKN1xNuZpsVcq96Bui02WHnI1O9aEhrMPmMMr1YKAsYNft3wymXOL5kFYdiLfdOP
+	  PKNXBnoSdBZ3t7iLMZH6+ypArTazpAEEPooaSZtLZvkUqxYC6OLNO7qE+Sk1v4cyT5PV7z2Ufn
+	  CbZ7R55gC1jwMHMdNtajVirUKStKzdvRbgVZFvNLWdlI02RpVUHIx1YjS9CCqhN5CCk/NeB7pC
+	  emWvNiEN09GKQRXTbSChIqDphkL+TLXFr/Wgl8n51AGmSQ==;
+Received: from 214.173.214.35.bc.googleusercontent.com ([35.214.173.214] helo=esm19.siteground.biz)
+	by instance-europe-west4-jwcv.prod.antispam.mailspamprotection.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <francesco@valla.it>)
+	id 1tTIKj-00000003xaU-33nQ
+	for netdev@vger.kernel.org;
+	Thu, 02 Jan 2025 10:21:43 +0000
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=valla.it;
+	s=default; h=Date:Subject:Cc:To:From:list-help:list-unsubscribe:
+	list-subscribe:list-post:list-owner:list-archive;
+	bh=RWehvsqxatKsF85L2FEj68SM7Yahzg+1xC89M9swkoY=; b=BDHw4tXvdVUu50q/bxEy7LDGcP
+	koqDuJuXrmQPrm7On5WUfpHGiodUmnkO9GuQ6SBTvA1zCxbn86ddJsfwD8nz7bDQtRKcLAyf1fbSA
+	7jRQyAAHxsBuGmbHRJZev62lLoQ2VUIn3bqpjfg6fDj/EoJblA2xc119gVMY0RWr5Dgk=;
+Received: from [87.11.41.26] (port=59993 helo=fedora.fritz.box)
+	by esm19.siteground.biz with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <francesco@valla.it>)
+	id 1tTIKe-00000000MPZ-2jRQ;
+	Thu, 02 Jan 2025 10:21:36 +0000
+From: Francesco Valla <francesco@valla.it>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Suman Ghosh <sumang@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Russell King <linux@armlinux.org.uk>
+Subject:
+ Re: [EXTERNAL] [PATCH] net: phy: don't issue a module request if a driver is
+ available
+Date: Thu, 02 Jan 2025 11:21:36 +0100
+Message-ID: <4771715.vXUDI8C0e8@fedora.fritz.box>
+In-Reply-To:
+ <SJ0PR18MB5216590A9FD664CF63993E95DB142@SJ0PR18MB5216.namprd18.prod.outlook.com>
+References:
+ <20250101235122.704012-1-francesco@valla.it>
+ <SJ0PR18MB5216590A9FD664CF63993E95DB142@SJ0PR18MB5216.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - esm19.siteground.biz
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - valla.it
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-SGantispam-id: 0f1ae3a7698d30643e14a2239f46a688
+AntiSpam-DLS: false
+AntiSpam-DLSP: 
+AntiSpam-DLSRS: 
+AntiSpam-TS: 1.0
+Authentication-Results: instance-europe-west4-jwcv.prod.antispam.mailspamprotection.com;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
 
-On Sat, Dec 21, 2024 at 05:06:55PM +0800, Herbert Xu wrote:
-> On Thu, Dec 12, 2024 at 08:33:31PM +0800, Herbert Xu wrote:
+Hi Suman,
+
+On Thursday, 2 January 2025 at 10:35:40 Suman Ghosh <sumang@marvell.com> wrote:
+> > 	mutex_init(&dev->lock);
+> > 	INIT_DELAYED_WORK(&dev->state_queue, phy_state_machine);
 > >
-> > The growth check should stay with the atomic_inc.  Something like
-> > this should work:
+> >-	/* Request the appropriate module unconditionally; don't
+> >-	 * bother trying to do so only if it isn't already loaded,
+> >-	 * because that gets complicated. A hotplug event would have
+> >-	 * done an unconditional modprobe anyway.
+> >-	 * We don't do normal hotplug because it won't work for MDIO
+> >+	/* We don't do normal hotplug because it won't work for MDIO
+> > 	 * -- because it relies on the device staying around for long
+> > 	 * enough for the driver to get loaded. With MDIO, the NIC
+> > 	 * driver will get bored and give up as soon as it finds that @@ -
+> >724,7 +745,8 @@ struct phy_device *phy_device_create(struct mii_bus
+> >*bus, int addr, u32 phy_id,
+> > 		int i;
+> >
+> > 		for (i = 1; i < num_ids; i++) {
+> >-			if (c45_ids->device_ids[i] == 0xffffffff)
+> >+			if (c45_ids->device_ids[i] == 0xffffffff ||
+> >+			    phy_driver_exists(c45_ids->device_ids[i]))
+> > 				continue;
+> >
+> > 			ret = phy_request_driver_module(dev, @@ -732,7 +754,7 @@
+> >struct phy_device *phy_device_create(struct mii_bus *bus, int addr, u32
+> >phy_id,
+> > 			if (ret)
+> > 				break;
+> > 		}
+> >-	} else {
+> >+	} else if (!phy_driver_exists(phy_id)) {
+> [Suman] Can we add this phy_driver_exists() API call before the if/else check?
 > 
-> OK I've applied your patch with the atomic_inc move.
 
-Sorry, I was on vacation, and I am back now. Let me know if you need
-anything further.
+Not really, as in case of C45 PHYs we have to check for drivers using (multiple)
+IDs, which are different from phy_id.
 
-Thanks for fixing it,
---breno
+> > 		ret = phy_request_driver_module(dev, phy_id);
+> > 	}
+> >
+> 
+
+
+Thank you!
+
+Regards,
+Francesco
+
+
+
+
 
