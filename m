@@ -1,292 +1,221 @@
-Return-Path: <netdev+bounces-154670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4D79FF5C9
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 04:33:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B76FF9FF5CC
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 04:34:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28CFE3A322E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 03:33:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B638E3A3211
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 03:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AF42BB15;
-	Thu,  2 Jan 2025 03:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBE031758B;
+	Thu,  2 Jan 2025 03:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YT/g0KTf"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fqoFUtW5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2088.outbound.protection.outlook.com [40.107.93.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B99383
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 03:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735788799; cv=none; b=NRxVJ1GLey/oOTdF0YwUgdyandfICPAYlZzOAHoUjyuoocRhGPPtkyUXjNaVyIyuFlLhwvHoMgRxpQsZwH53P1f6f4cIVlSx+oHs5Fr9EPgLQ24txAG7U5zNTh7URqU6gH5zkU+uk3mNcz75FPcmE1x9OsjWKDI/86QFc8trne8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735788799; c=relaxed/simple;
-	bh=8UPwYJRsztniqz2DZoYaOHrAI87CM8RMohG/bh2PQ9A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bdluISBB2dxBZiJxNlIYU0cJPGaVmuPRBqp0hURLqW7vlIXIzqnGV3riSlq8gFQFy3/y0swy2HfxfN2rnizOPBtmbKOx+/jdHsC6HTByjpHOWxCqTLPO5/J9exF/kYa4uc9uT7hglSCj9UZ6TJLF6ohLSh2MfBf4BkmNupt+p9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YT/g0KTf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735788794;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zwi/cEGzVsTuOsP+zDgdSCie/y22AEKtZAKDaSUvUoU=;
-	b=YT/g0KTfpNaOgrtkrFvoJZuNpzzFEmsMPh3WG6KCyZ4esNAgs86BQL6AFVKfgX8d2/DhBN
-	GGcw3RZlciANknakcYn2VawBznPn/0w71MUNW++MgC2bz2k4ligfc/Dj9LeHXOGhe6AQ3q
-	eYz5pLHUmFA+FScUNpY2wHw9OKYgR00=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-157-nCr1_M9zPuyTFxKz5bQ8WA-1; Wed, 01 Jan 2025 22:33:13 -0500
-X-MC-Unique: nCr1_M9zPuyTFxKz5bQ8WA-1
-X-Mimecast-MFC-AGG-ID: nCr1_M9zPuyTFxKz5bQ8WA
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2ef79403c5eso22760296a91.0
-        for <netdev@vger.kernel.org>; Wed, 01 Jan 2025 19:33:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735788792; x=1736393592;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zwi/cEGzVsTuOsP+zDgdSCie/y22AEKtZAKDaSUvUoU=;
-        b=hfxXwL0sbFKp0OklXmU/B4zTcP9a5siCDwQNZm1hAdHBy1gyS2ZRlmk8hNy91Ybsze
-         VqikY+lBrhaCmiyMt6VjLLGfxNkzflcGu+7r5MZNqTs+qOY0EA+d8Ub6xhI3WEf+OUpD
-         lXXvfRuQHFhuQ+U8CqC5Ntwjq5SfAjOYAuVKIXFzMQnJ5hcXK2RZH9x5MUlAlyIsygg8
-         0brdQd6Nw37dS+2Ea5LuBbiAnt3RcdeygECguqdyTJO5sspWYsSkpfKM+MjbdMevhIeV
-         h9AgjTp0nd+FmCeVxawHzNPqGabDh6vG/kITq8S47/jcyuJnRryvUlUrt5p8kRtkQ9Hh
-         sCTA==
-X-Forwarded-Encrypted: i=1; AJvYcCXi5AcBA+Ht01ljFZfjCHxflsWWxt16WQyYrXUi3l75Md52JsuKGevv8avtQUA7btKEFRqYZJs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKicApDl1cXFirbyz4aN5q+zfyH6dTO5eCs3Y+1G52ysQMoV4D
-	1foj0C8tW+B64V2e6F13rHPBbKIY6l9rRLeJzXIyFgd5fDXefLfQPCKZZhq6fDSKcgzYuCVBgOl
-	WmnRGK4T5dlaWBP582yLjMa3ZlQJJjKxZqIZYU8rFAbM1C6FcZ4NTsnr7OqTx9aLLKsgxX+JvnN
-	WWVVxjwdgOogs5/x8cSPIYyySrZRRo
-X-Gm-Gg: ASbGncvK7s5j1fKd9MCyO0DsgCZ08ACYjfzOuTvwy0y+W2+VQxmeZMZWpPFy030Q6C/
-	+zrd9gsluVOPYcwE89IKHA8GT5BFBanqNH3rFwqY=
-X-Received: by 2002:a05:6a00:6f0b:b0:725:ab14:6249 with SMTP id d2e1a72fcca58-72abdd20f0emr65838262b3a.2.1735788792242;
-        Wed, 01 Jan 2025 19:33:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHLVIYdDgn70wDLrrgDEW/j8nHxOPS5L6zrTTVrhEd03L8ZoOgY4WUhHJEGakRnMQvpVDlp4g4SeZBSbLlkRaI=
-X-Received: by 2002:a05:6a00:6f0b:b0:725:ab14:6249 with SMTP id
- d2e1a72fcca58-72abdd20f0emr65838239b3a.2.1735788791727; Wed, 01 Jan 2025
- 19:33:11 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35D7B652;
+	Thu,  2 Jan 2025 03:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735788838; cv=fail; b=ED77Sikd4CP+nAflF25BZ/RiX9j7pycsSuh6N6vFvvoWsTs3aIrIsj+6rvH49QsPL0FDULsZVkmP/QUh6fKf+LdpNXQt72EilYX7o8LCEt8223S7Qx9mnNDu/QUcUgWZzKQsPkQKVr3CNd22ZijKRbpYuix8vVyAjIC6YmpA60Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735788838; c=relaxed/simple;
+	bh=aTst4+TJ6HMik9BbQrbtdCn7YEV3H/8XnorW0wHchUc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=N8OETqqy//l/MEo/BUidRSveyTpQRCmP8NltjVO/xyrCraAZtSqPNWKf0hMYkTo6c5QkGxezo538cnP+rsbURJV8z8r6dm82lUZThNNmF7oG5dTH1IiEYvDh1VUJ5WeSJQ4o6K0mVCjiPFH/RCFEbzB1JD92h54mQ+3ASZXBw24=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fqoFUtW5; arc=fail smtp.client-ip=40.107.93.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ciwKkWRTjfzcm3hEwI6lm5l0S2/eYw+5A2Sbgl0hqAN8a7IMIqm3xwH3fXuR+uMUjmgpqvXpDyZu9bcW2l4Ldh0B8jS2Z9nTXsGa51nRLSZ1lpsJcb3BAhxwl9kgbAmgrJKSJYQAlc++U2aO482nZTW6bcQw7Ff7urI5Gjhuj8oZnYXsdUaMcOu7Apn5IOlzoVzYEx0AH2cMzlD5ndKaR1/Y3M4TwYiZ2Yy6Zee3yEpsbLOfOLm6otqmB9Gy/cMbaN1MoLLv2DZHe8L5uFdo8nE+V7KfoyW2IIMSsS3sm4uRdnO6pN3e72smZM4OldrzvXZdUuvBYpHVjnzpc1zyKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FO285xg+o5Atvvw8XsDyRUaX50+Jj75H/b6kVPLuTDY=;
+ b=LqUJN3uHUiHRYlS0owl9yeTAQYRBK2SK3LFhhRWnlwhkt1YkukZaPYdE+O7wx+GgVVp3JfjJmmORm5/I/IqQFBwL4P8LmfZixYM1FIU3Xg1gWwlEkZGN6UERDyItTmZPEPEsDWpeT3bTKtIbsg3bj4cNOI9Nl0xnlhiWkhFgfyjAHDmP47EDVUAE4/yXzg+la5ZBr09hP09/JWAIe/w0W29wO+UzzOgJ6xj3gHyqWN0Kwpx5mBQDvHCWtKn2N4/3u7faA3Ttou45QvGUTo3vayeLghGTpSxz85CHmFVOJ5EzO/v+wTf3WPKBp0B/bSMvCcebY4uNC3A2nCcMCTYDCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FO285xg+o5Atvvw8XsDyRUaX50+Jj75H/b6kVPLuTDY=;
+ b=fqoFUtW5MIonHq3+PJ3RTYEkcdTrEwz6EGaVRueTej68jBj6lov2Be6CNTr4OCBQbYgfvvKub/imniJkARhQlj8RVQOlX0R00lCanF6oMuEQv5VdgwNoZzCm8yXQ2liNgKZXCGG8R0rXzs7noWDi0Q3j1X922/WWaEMiCZWcR5HTf3CBN6IiEEj+0avVYRqX5xyH1CnD8vLtfaCwWJche40qaznYGjWwTjV9h5uDLViWwEvlEa1udxkrF3S500FJzh47ijHxnA/wBPUplufqoncOT0qM9SEfl9d4oHYgUxVf2EzjlEtFr69eZLY7zC65Q9LdAmPfiQThuCcJOEn7TQ==
+Received: from SJ0PR13CA0155.namprd13.prod.outlook.com (2603:10b6:a03:2c7::10)
+ by SN7PR12MB6816.namprd12.prod.outlook.com (2603:10b6:806:264::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.12; Thu, 2 Jan
+ 2025 03:33:49 +0000
+Received: from SJ5PEPF000001CF.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c7:cafe::90) by SJ0PR13CA0155.outlook.office365.com
+ (2603:10b6:a03:2c7::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8335.5 via Frontend Transport; Thu, 2
+ Jan 2025 03:33:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ5PEPF000001CF.mail.protection.outlook.com (10.167.242.43) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8314.11 via Frontend Transport; Thu, 2 Jan 2025 03:33:49 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 1 Jan 2025
+ 19:33:38 -0800
+Received: from [10.19.163.254] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 1 Jan 2025
+ 19:33:34 -0800
+Message-ID: <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
+Date: Thu, 2 Jan 2025 11:33:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241230124445.1850997-1-lulu@redhat.com> <20241230124445.1850997-5-lulu@redhat.com>
-In-Reply-To: <20241230124445.1850997-5-lulu@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 2 Jan 2025 11:33:00 +0800
-Message-ID: <CACGkMEtq3yRB=7r54=rdPC1TPrz00ayEkt+L1n=dQTTTTD58FA@mail.gmail.com>
-Subject: Re: [PATCH v5 4/6] vhost: Add worker related functions to support kthread
-To: Cindy Lu <lulu@redhat.com>
-Cc: mst@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
+To: Hangbin Liu <liuhangbin@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek
+	<andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Nikolay Aleksandrov
+	<razor@blackwall.org>, Simon Horman <horms@kernel.org>, Tariq Toukan
+	<tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan
+	<shuah@kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20241211071127.38452-1-liuhangbin@gmail.com>
+ <20241212062734.182a0164@kernel.org> <Z1vfsAyuxcohT7th@fedora>
+ <20241213193127.4c31ef80@kernel.org> <Z3X9pfu12GUOBUY6@fedora>
+Content-Language: en-US
+From: Jianbo Liu <jianbol@nvidia.com>
+In-Reply-To: <Z3X9pfu12GUOBUY6@fedora>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CF:EE_|SN7PR12MB6816:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74fcc55a-1fc3-4992-29cc-08dd2ade45a0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|1800799024|36860700013|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZitvRGxzMWpIWGpteWZOZEZmcGlEZ3RzajV4ckNBaHBqb0xPSzdHSlhCY1NV?=
+ =?utf-8?B?YmVoUk5MZUwxaU9LRElxbnF2ZHZyOUwzUGo0ZTBIL29sN1hPdjJ5Q051RzBm?=
+ =?utf-8?B?R25SRkxUSWdpblczSFRuUnpLa1l2Q1ZYaC9WRElSdWlQam5QL1k1MzBkVVBm?=
+ =?utf-8?B?M0gzcW5VTjBSVE1tL2s1UllmdWtMWkxnSEpkeVRNcnA0ODZqZmJJTzFHdVU3?=
+ =?utf-8?B?aDZMVTJrVWgrZ2hxb2IzaDZ5VlhxcWxRYi9WZTZHWjI2WjFURU91N1BrcTg5?=
+ =?utf-8?B?S2xheklvb2NCVDlMSG54R3ZkaGNXa1l0cjBrWDZWRkEwMU5QcktUZlhhZGJK?=
+ =?utf-8?B?SzFyakM1K2l4b0ZNV0lSTVVvWGtZemxaY3BIVEtIby9LOGt2bFFNVlNaZlE3?=
+ =?utf-8?B?b2pRTnFCNjAvTDAvR05mKzY5djY3ckg5RnZqRVB0OENHcnE0cFpTTGovMUhB?=
+ =?utf-8?B?cExrT3N5c2lnd0RpdUhrWEQ3NzBqazR3ZjlZcFpYRFE3N3pIU2l2bythRm1Z?=
+ =?utf-8?B?NWs0dVJOdDRnY1JCQ0lzZUNSckQ0YlZKWis0MERTWlNWQ1gwRzVhby9lOS9I?=
+ =?utf-8?B?UXAxdlgvL2xYQnZqU0tYTTU0MUZzeU45cnRLbEFvRkNacWNiL24rMVlZaVhR?=
+ =?utf-8?B?OWZrS29KMWMrRVZaOE1xWWNLYVZvSyt5c2xQZzNMWDR1Ly9XZDlMZlQyVW5C?=
+ =?utf-8?B?N084RW42OGhFTCtGaE0xMVF6Znh6V242aEwwK2doZGJFS0dXUjhsMXRLR091?=
+ =?utf-8?B?UUlmRHpTTDlad09udmFoMVFLV1hyL0Y4a2YxSzZkbTVJMDVlYUprczdJWS8y?=
+ =?utf-8?B?c0Z2aXNaY2R2Z0xqS1dGNmtocHdmOEZlU25LaVQvdm1Nbkpha3h6Zis0WU12?=
+ =?utf-8?B?KzY3YVhJNzNXU2VnSlEvSUczOTFRQXR6THhzeVBlSExsNFN0WGY3UjNTQjBT?=
+ =?utf-8?B?VDVSamtKRWdKY0JxZXova3dKcjI2VzNIaDRKRlNXZVdQanFjblAzeXhGeXhr?=
+ =?utf-8?B?Q3MrZ2ZTclM1THE1WmpKUE5pOU10clVENThRalRkUmpjV3VGZTJxOFVBZ21u?=
+ =?utf-8?B?Sk54bDM1di9VdkJ2SEplbUtvN0lnOHlPWDdlek0vbkxlMmI5c2M5b3k2Nk9F?=
+ =?utf-8?B?b3F4UWZLcm4zaG5NZ0ZhOUhyZ09qZ3NuZ2xSRXQzclJJaW5rQWNMZ2cxMG9o?=
+ =?utf-8?B?RlluOFRwMnR3b0I2MTE2YmVLUzdELytxaStyZVBJMzJwVWpja09zYUVUcDNq?=
+ =?utf-8?B?cThZTzNURTlhc0F6NkRxQ0QrM3lyd04rV3ZVRmVSSkdjdG4zUTdieHRoSjRx?=
+ =?utf-8?B?KzBHbVJjNWplNWZ6QWkvdTBXMXRXdEw1Z2tXZWwyajQ1UXVUVTludEl3eFhN?=
+ =?utf-8?B?UmtsUmNhVzEyaTBVa0F3eFNOczRpN0pqWklSL1hTK2ZPYVJXejZ6K3BuYmNL?=
+ =?utf-8?B?UytuWG5aTHFaRTRZSENRWUN5bDJQQUZ1a3A4dGZjRW5qbytKRy9YOFF5NWU2?=
+ =?utf-8?B?REJFQVZWVlgvTGRIeXQzLzBLeUlMRld1RUoyMjRnVUk4U2tGYUN3WkdEdE80?=
+ =?utf-8?B?RVMyRUVvRUJhc0IzNW1Qbm10eTR4bEhOZnV4K2doU252dW42bG14Z2dSQTZw?=
+ =?utf-8?B?SHBPZVBiRVg2UVNrb2RuME03Ui9wWnlQTWd3QUhqUkZMTW5PWU54RmtZWjRy?=
+ =?utf-8?B?VGdxandwMWdwR2V5bGFBMTlTcmRzdlNYdzFDUjhTdXlxWFlRelJGK0E5U09Y?=
+ =?utf-8?B?WWxEZUZLRTZwdW9IUTFZditWKzB3TEVmWmdqNmh5NkVxMG04MnlOYUtvR1NO?=
+ =?utf-8?B?d204WWhQbHdEWU5aY3grVmh0Z2ViZCtRT3h5dVNSZkZsckZIYVlrMFZSWTM4?=
+ =?utf-8?B?ZjJlaEZiMkgyaG1mSzV2VE8yRVZuS1d6MjlOOHRlZVRmMGI3bkRCaXRrYnFY?=
+ =?utf-8?B?Y0VxWHRIZ2tHR3I2UU5mWlhuQU5Eb3JMYno4RHRQUThnb0l2MTVEeWRUOVgz?=
+ =?utf-8?Q?o+B2Rv4Bdqk/sxWESVpCazTFPIAtuY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2025 03:33:49.4459
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74fcc55a-1fc3-4992-29cc-08dd2ade45a0
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001CF.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6816
 
-On Mon, Dec 30, 2024 at 8:45=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
->
-> Restore the previously removed functions kthread_wakeup and
-> kthread_stop, and add two new function pointers to wake up and stop
-> the workers. The function vhost_worker_create will initialize these
-> pointers based on the value of inherit_owner.
->
-> The functions vhost_worker_queue() and vhost_worker_destroy() will
-> use the function pointer in vhost_worker, which is initialized
-> according to the inherit_owner value.
 
-I'd suggest using "vhost: introduce worker ops to support multiple
-thread models" as the title.
 
->
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  drivers/vhost/vhost.c | 84 ++++++++++++++++++++++++++++++++++---------
->  drivers/vhost/vhost.h |  3 ++
->  2 files changed, 71 insertions(+), 16 deletions(-)
->
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 812dfd218bc2..ff17c42e2d1a 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -243,7 +243,7 @@ static void vhost_worker_queue(struct vhost_worker *w=
-orker,
->                  * test_and_set_bit() implies a memory barrier.
->                  */
->                 llist_add(&work->node, &worker->work_list);
-> -               vhost_task_wake(worker->vtsk);
-> +               worker->worker_wakeup(worker);
->         }
->  }
->
-> @@ -698,7 +698,7 @@ static void vhost_worker_destroy(struct vhost_dev *de=
-v,
->
->         WARN_ON(!llist_empty(&worker->work_list));
->         xa_erase(&dev->worker_xa, worker->id);
-> -       vhost_task_stop(worker->vtsk);
-> +       worker->worker_stop(worker);
->         kfree(worker);
->  }
->
-> @@ -721,14 +721,36 @@ static void vhost_workers_free(struct vhost_dev *de=
-v)
->         xa_destroy(&dev->worker_xa);
->  }
->
-> +static void vhost_task_wakeup_fn(struct vhost_worker *worker)
-> +{
-> +       return vhost_task_wake(worker->vtsk);
-> +}
-> +
-> +static void vhost_kthread_wakeup_fn(struct vhost_worker *worker)
-> +{
-> +       wake_up_process(worker->kthread_task);
-> +}
-> +
-> +static void vhost_task_stop_fn(struct vhost_worker *worker)
-> +{
-> +       return vhost_task_stop(worker->vtsk);
-> +}
-> +
-> +static void vhost_kthread_stop_fn(struct vhost_worker *worker)
-> +{
-> +       kthread_stop(worker->kthread_task);
-> +}
-> +
->  static struct vhost_worker *vhost_worker_create(struct vhost_dev *dev)
->  {
->         struct vhost_worker *worker;
-> -       struct vhost_task *vtsk;
-> +       struct vhost_task *vtsk =3D NULL;
-> +       struct task_struct *task =3D NULL;
->         char name[TASK_COMM_LEN];
->         int ret;
->         u32 id;
->
-> +       /* Allocate resources for the worker */
->         worker =3D kzalloc(sizeof(*worker), GFP_KERNEL_ACCOUNT);
->         if (!worker)
->                 return NULL;
-> @@ -736,27 +758,57 @@ static struct vhost_worker *vhost_worker_create(str=
-uct vhost_dev *dev)
->         worker->dev =3D dev;
->         snprintf(name, sizeof(name), "vhost-%d", current->pid);
->
-> -       vtsk =3D vhost_task_create(vhost_run_work_list, vhost_worker_kill=
-ed,
-> -                                worker, name);
-> -       if (!vtsk)
-> -               goto free_worker;
-> -
->         mutex_init(&worker->mutex);
->         init_llist_head(&worker->work_list);
->         worker->kcov_handle =3D kcov_common_handle();
-> -       worker->vtsk =3D vtsk;
-> +    /*
-> +     * If inherit_owner is true we use vhost_tasks to create
-> +     * the worker so all settings/limits like cgroups, NPROC,
-> +     * scheduler, etc are inherited from the owner.
-> +     * If false,we use kthreads and only attach to the same
-> +     * cgroups as the owner for compat with older kernels.
-> +     */
-> +       if (dev->inherit_owner) {
-> +               vtsk =3D vhost_task_create(vhost_run_work_list,
-> +                                        vhost_worker_killed, worker, nam=
-e);
-> +               if (!vtsk)
-> +                       goto free_worker;
-> +
-> +               worker->vtsk =3D vtsk;
-> +               worker->worker_wakeup =3D vhost_task_wakeup_fn;
-> +               worker->worker_stop =3D vhost_task_stop_fn;
-> +
-> +               vhost_task_start(vtsk);
-> +               ret =3D xa_alloc(&dev->worker_xa, &id, worker, xa_limit_3=
-2b,
-> +                              GFP_KERNEL);
-> +               if (ret < 0)
-> +                       goto stop_worker;
+On 1/2/2025 10:44 AM, Hangbin Liu wrote:
+> On Fri, Dec 13, 2024 at 07:31:27PM -0800, Jakub Kicinski wrote:
+>> On Fri, 13 Dec 2024 07:18:08 +0000 Hangbin Liu wrote:
+>>> On Thu, Dec 12, 2024 at 06:27:34AM -0800, Jakub Kicinski wrote:
+>>>> On Wed, 11 Dec 2024 07:11:25 +0000 Hangbin Liu wrote:
+>>>>> The first patch fixes the xfrm offload feature during setup active-backup
+>>>>> mode. The second patch add a ipsec offload testing.
+>>>>
+>>>> Looks like the test is too good, is there a fix pending somewhere for
+>>>> the BUG below? We can't merge the test before that:
+>>>
+>>> This should be a regression of 2aeeef906d5a ("bonding: change ipsec_lock from
+>>> spin lock to mutex"). As in xfrm_state_delete we called spin_lock_bh(&x->lock)
+>>> for the xfrm state delete.
+>>>
+>>> But I'm not sure if it's proper to release the spin lock in bond code.
+>>> This seems too specific.
+>>>
+>>> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+>>> index 7daeab67e7b5..69563bc958ca 100644
+>>> --- a/drivers/net/bonding/bond_main.c
+>>> +++ b/drivers/net/bonding/bond_main.c
+>>> @@ -592,6 +592,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+>>>   	real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
+>>>   out:
+>>>   	netdev_put(real_dev, &tracker);
+>>> +	spin_unlock_bh(&xs->lock);
+>>>   	mutex_lock(&bond->ipsec_lock);
+>>>   	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+>>>   		if (ipsec->xs == xs) {
+>>> @@ -601,6 +602,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+>>>   		}
+>>>   	}
+>>>   	mutex_unlock(&bond->ipsec_lock);
+>>> +	spin_lock_bh(&xs->lock);
+>>>   }
+>>>   
+>>>
+>>> What do you think?
+>>
+>> Re-locking doesn't look great, glancing at the code I don't see any
+>> obvious better workarounds. Easiest fix would be to don't let the
+>> drivers sleep in the callbacks and then we can go back to a spin lock.
+>> Maybe nvidia people have better ideas, I'm not familiar with this
+>> offload.
+> 
+> I don't know how to disable bonding sleeping since we use mutex_lock now.
+> Hi Jianbo, do you have any idea?
+> 
 
-Let's simply have a new ops like worker_create to avoid the if/else here.
+I think we should allow drivers to sleep in the callbacks. So, maybe 
+it's better to move driver's xdo_dev_state_delete out of state's spin lock.
 
-> +       } else {
-> +               task =3D kthread_create(vhost_run_work_kthread_list, work=
-er,
-> +                                     "vhost-%d", current->pid);
-> +               if (IS_ERR(task)) {
-> +                       ret =3D PTR_ERR(task);
-> +                       goto free_worker;
-> +               }
-> +               worker->kthread_task =3D task;
-> +               worker->worker_wakeup =3D vhost_kthread_wakeup_fn;
-> +               worker->worker_stop =3D vhost_kthread_stop_fn;
->
-> -       vhost_task_start(vtsk);
-> +               wake_up_process(task);
-> +               ret =3D xa_alloc(&dev->worker_xa, &id, worker, xa_limit_3=
-2b,
-> +                              GFP_KERNEL);
-> +               if (ret < 0)
-> +                       goto stop_worker;
->
-> -       ret =3D xa_alloc(&dev->worker_xa, &id, worker, xa_limit_32b, GFP_=
-KERNEL);
-> -       if (ret < 0)
-> -               goto stop_worker;
-> -       worker->id =3D id;
-> +               ret =3D vhost_attach_task_to_cgroups(worker);
-> +               if (ret)
-> +                       goto stop_worker;
-> +       }
->
-> +       worker->id =3D id;
->         return worker;
-> -
->  stop_worker:
-> -       vhost_task_stop(vtsk);
-> +       worker->worker_stop(worker);
->  free_worker:
->         kfree(worker);
->         return NULL;
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index c650c4506c70..63b1da08a2b0 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -27,6 +27,7 @@ struct vhost_work {
->  };
->
->  struct vhost_worker {
-> +       struct task_struct *kthread_task;
->         struct vhost_task       *vtsk;
->         struct vhost_dev        *dev;
->         /* Used to serialize device wide flushing with worker swapping. *=
-/
-> @@ -36,6 +37,8 @@ struct vhost_worker {
->         u32                     id;
->         int                     attachment_cnt;
->         bool                    killed;
-> +       void (*worker_wakeup)(struct vhost_worker *worker);
-> +       void (*worker_stop)(struct vhost_worker *worker);
-
-Let's use a dedicated ops structure for this.
-
-Thanks
-
->  };
->
->  /* Poll a file (eventfd or socket) */
-> --
-> 2.45.0
->
+Thanks!
+Jianbo
 
 
