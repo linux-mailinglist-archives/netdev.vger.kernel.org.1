@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-154704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 190E59FF85D
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:48:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA7839FF874
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:54:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE8E13A064D
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:48:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1476F18822E7
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F8343166;
-	Thu,  2 Jan 2025 10:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3738F199237;
+	Thu,  2 Jan 2025 10:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PVWZLdhN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QPcYWPj6"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B7A17C68;
-	Thu,  2 Jan 2025 10:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894BF2CA9;
+	Thu,  2 Jan 2025 10:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735814897; cv=none; b=G3GOZVYRFzkfXV4iF+emd97IsfO2zM61mWX9xqMsCm1Y+crVdNQuc1rwdCLv4vlHcAwyMGgQW5a1xoZBGwxlzUyEFxAGqDbEEt4qkseFDY+v8pshF1edhk5SfQOnhjoiEdByFCdEL//ClWAccf3Xr12pn9k0dNT3yznm8T65r+o=
+	t=1735815264; cv=none; b=eSPJYkutA5mFreBQohU0smsAMs8/qrZBa6x4TExXVdghKMNzFaAYnatgLTABT3A0vdBs+/Aj3OvsRbCY0jFMLwcTIl1kmG2DcyaBDmXIDCRBAmn1481aPERc1B6gJ7OubP2Mhvl/vWsyjw+M4MZ+WKo+d69BnKPtOt1Ecem6uck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735814897; c=relaxed/simple;
-	bh=BqpiFfm91u09BIUEJssEo3ml/muq8BVcNPDMRh1Jwl0=;
+	s=arc-20240116; t=1735815264; c=relaxed/simple;
+	bh=0Rpt7yMFe9eWHazP+kDrk6aUELB1oKw7sDcRPv+Owqg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=StzeCuprZaXP5QKfbQXj63kQ5JGjqgN+1WBJmwiPg9NLL2E8MrAKr/A9eMX2eDR0TSHTWn9Npjd8PnVPJuIVWysc48OoxK5x/Qm3hoi4vMYfc1lLN9LzzYnoicQINC/xd0OMSz/bERwP94VcqsReUetT6Y9IgT8exnx2+DYkLl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PVWZLdhN; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=I1wPxtI4vRG3ozcNQvn5Avac5llJAE8IbSCjQkMRHQcR87bC7k/Co/mW3C74mgZLQPQ51Yg5cbp0y8ADW2G8xPbiLjVLuIff0g7clyXL9jNW1ZW0VQ7g7IruzYBmV4KTNKN2rJydCwoS2LHxc7Igc5bYM+6rsQe7VVC8DFZM1h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QPcYWPj6; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,47 +37,44 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rcRUFlTpm8Zh2F0emtR0r0UVSpkNddkhpcAlUKtjSko=; b=PVWZLdhNQm0ngzeRCuyoqKxsgP
-	f3gQSl+IyaZvM2gs5B7vdKrr6G/M8lsgHwgxLJMZtDdgvl0f70wPBxEbYtbLeMjwuEdthMvOYCGC4
-	QYIiMdID1Iq3wIuVH6xP/Ibm38M7XhqZbsSVs8UBwfsv6KuzBewWVNG/DxpHzyrHq7a7OGubuASdA
-	1S9zdy6kyq9nb9SbXb9guy1oEUB4gdotsVG3761+um1LHl5ZVI9Zd3bhTo3iGcS7d2o1HvebnzS4u
-	7+RnvDjZfFjGXxBhmXsnCSouMOw6P7+StQiVjfpFGi8Ph43Yi+MIR1mScQB9JLYyDcMaiaJkL6m1y
-	nzaqr32Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39980)
+	bh=sY0n+f+Bbc7kIzhzPEFT5STJFSdVmTvk9y+TqH5KuEQ=; b=QPcYWPj6Fr/2Of9KbSlYgSc/XY
+	89JslaJOFR5f5ca9V4yEnjmbtNhDV6E9Za10jBHVA2H8n83tYPznXlJuTujhWADzRtxoXEB9cw7Jt
+	IoXWICqMNtXePEDt3G7zEX48ROL6urMrBU0rZ8q42rmlpi8u1bzMxCa8boZbQn/J3r7qyLg/YHiIr
+	1u8I/uTaRS1FzGcKiX8CPkvMr5+BIVnmMTaWJpbOrW89VnVc3jMPaVlyABdh/KhvIg9drdmwXDal0
+	8hsN6E8DxqE5U5zSr03bNUkkXqzBEdn9AxzPO+Kj50zETFFkq1upwziYoV4xwKeDyeLHos+ojaXii
+	5sxNNxOQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41680)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1tTIkK-0001tV-1o;
-	Thu, 02 Jan 2025 10:48:08 +0000
+	id 1tTIqC-0001uL-09;
+	Thu, 02 Jan 2025 10:54:12 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tTIkH-0000DB-1o;
-	Thu, 02 Jan 2025 10:48:05 +0000
-Date: Thu, 2 Jan 2025 10:48:05 +0000
+	id 1tTIq9-0000DL-11;
+	Thu, 02 Jan 2025 10:54:09 +0000
+Date: Thu, 2 Jan 2025 10:54:09 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next RFC 0/5] net: phy: Introduce a port
- representation
-Message-ID: <Z3Zu5ZofHqy4vGoG@shell.armlinux.org.uk>
-References: <20241220201506.2791940-1-maxime.chevallier@bootlin.com>
- <Z2g3b_t3KwMFozR8@pengutronix.de>
- <Z2hgbdeTXjqWKa14@pengutronix.de>
+To: Lei Wei <quic_leiwei@quicinc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
+	quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
+	quic_linchen@quicinc.com, quic_luoj@quicinc.com,
+	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
+	vsmuthu@qti.qualcomm.com, john@phrozen.org
+Subject: Re: [PATCH net-next v3 3/5] net: pcs: qcom-ipq9574: Add PCS
+ instantiation and phylink operations
+Message-ID: <Z3ZwURgIErzpzpEr@shell.armlinux.org.uk>
+References: <20241216-ipq_pcs_6-13_rc1-v3-0-3abefda0fc48@quicinc.com>
+ <20241216-ipq_pcs_6-13_rc1-v3-3-3abefda0fc48@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,78 +83,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z2hgbdeTXjqWKa14@pengutronix.de>
+In-Reply-To: <20241216-ipq_pcs_6-13_rc1-v3-3-3abefda0fc48@quicinc.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sun, Dec 22, 2024 at 07:54:37PM +0100, Oleksij Rempel wrote:
-> Here is updated version:
-> 
-> ports {
->     /* 1000BaseT Port with Ethernet and simple PoE */
->     port0: ethernet-port@0 {
->         reg = <0>; /* Port index */
->         label = "ETH0"; /* Physical label on the device */
->         connector = "RJ45"; /* Connector type */
->         supported-modes = <10BaseT 100BaseTX 1000BaseT>; /* Supported modes */
-> 
->         transformer {
->             model = "ABC123"; /* Transformer model number */
->             manufacturer = "TransformerCo"; /* Manufacturer name */
-> 
->             pairs {
->                 pair@0 {
->                     name = "A"; /* Pair A */
->                     pins = <1 2>; /* Connector pins */
->                     phy-mapping = <PHY_TX0_P PHY_TX0_N>; /* PHY pin mapping */
->                     center-tap = "CT0"; /* Central tap identifier */
->                     pse-negative = <PSE_GND>; /* CT0 connected to GND */
->                 };
->                 pair@1 {
->                     name = "B"; /* Pair B */
->                     pins = <3 6>; /* Connector pins */
->                     phy-mapping = <PHY_RX0_P PHY_RX0_N>;
->                     center-tap = "CT1"; /* Central tap identifier */
->                     pse-positive = <PSE_OUT0>; /* CT1 connected to PSE_OUT0 */
->                 };
->                 pair@2 {
->                     name = "C"; /* Pair C */
->                     pins = <4 5>; /* Connector pins */
->                     phy-mapping = <PHY_TXRX1_P PHY_TXRX1_N>; /* PHY connection only */
->                     center-tap = "CT2"; /* Central tap identifier */
->                     /* No power connection to CT2 */
->                 };
->                 pair@3 {
->                     name = "D"; /* Pair D */
->                     pins = <7 8>; /* Connector pins */
->                     phy-mapping = <PHY_TXRX2_P PHY_TXRX2_N>; /* PHY connection only */
->                     center-tap = "CT3"; /* Central tap identifier */
->                     /* No power connection to CT3 */
->                 };
->             };
->         };
+Hi,
 
-I'm sorry, but... what is the point of giving this much detail in the DT
-description. How much of this actually would get used by *any* code?
+On Mon, Dec 16, 2024 at 09:40:25PM +0800, Lei Wei wrote:
+> +static int ipq_pcs_config_sgmii(struct ipq_pcs *qpcs,
+> +				int index,
+> +				unsigned int neg_mode,
+> +				phy_interface_t interface)
+> +{
+> +	int ret;
+> +
+> +	/* Access to PCS registers such as PCS_MODE_CTRL which are
+> +	 * common to all MIIs, is lock protected and configured
+> +	 * only once.
+> +	 */
+> +	mutex_lock(&qpcs->config_lock);
+> +
+> +	if (qpcs->interface != interface) {
+> +		ret = ipq_pcs_config_mode(qpcs, interface);
+> +		if (ret) {
+> +			mutex_unlock(&qpcs->config_lock);
+> +			return ret;
+> +		}
+> +	}
+> +
+> +	mutex_unlock(&qpcs->config_lock);
 
-Why does it matter what transformer is used - surely 802.3 defines the
-characteristics of the signal at the RJ45 connector and it's up to the
-hardware designer to ensure that those characteristics are met. That
-will depend on the transformer, connector and board layout.
+Phylink won't make two concurrent calls to this function (it's protected
+by phylink's state_lock). Since this looks to me like "qpcs" is per PCS,
+the lock does nothing that phylink doesn't already do.
 
-What does it matter what connector pins are used? This is standardised.
+> +static const struct phylink_pcs_ops ipq_pcs_phylink_ops = {
+> +	.pcs_validate = ipq_pcs_validate,
 
-You also at one point had a description for a SFP cage (I'm sorry, I
-can't be bothered to find it in the 3000+ emails that I've missed over
-the Christmas period), using pin numbers 1, 2, 3, and 4. That's
-nonsense, those aren't the pin numbers for the data pairs. You also
-are effectively redefining what already exists for SFP cages - we
-already have a DT description for that, and it's based around the
-standardised connector. Why do we need a new description for SFP
-cages?
-
-Are we going to start converting schematics into DT representations,
-including any resistors and capacitors that may be present in the
-data path?
+I would also like to see the recently added .pcs_inband_caps() method
+implemented too, so that phylink gets to know whether inband can be
+supported by the PCS.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
