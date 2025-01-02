@@ -1,281 +1,729 @@
-Return-Path: <netdev+bounces-154778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C6AF9FFC7B
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:04:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D097B9FFC8D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:07:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34096188303E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:04:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95054161F6C
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDEC15381A;
-	Thu,  2 Jan 2025 17:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C499515534D;
+	Thu,  2 Jan 2025 17:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ki7trcHq"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C34C2C8
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 17:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FF7171CD
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 17:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735837451; cv=none; b=kmSOyzsj7MZSz+2GFrXg/4JT5s7wTBDhZ5LSMeoZ6hS5x4jwYve7aVdbLT4Z85K4JpEG0aBZyzikLzEUcr+us7MZ9LeUZFy7yp3bvIWSJ3MLaqw/ZTdGUc2dNXUixxGA17GIZ49nndWQLphN3Iklve8xRDNGIyqL0wHzRkwSz7M=
+	t=1735837669; cv=none; b=m1GFD9bz+Gd85HOD3undsnsJBGlJ80f320ii20mlJkZ6hNBVd11Y2w93M/i2GBX0JBK9bneo5SviOmNIMJOoYbkNDNqv3xbCRA5RvpWdh0+NGCd3i+80LtfewWB+NZ9P31MVY2xF8xAhfPbpeDe9N3me9Q987khX8C8nANe1QpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735837451; c=relaxed/simple;
-	bh=vJ7Ij4Tk1kHtfvqTXImRd0PJZ/evd+K2c/pKH2CakmY=;
+	s=arc-20240116; t=1735837669; c=relaxed/simple;
+	bh=TuvKzyQ+3SpkBIYQUp/wNFGvui+YP1CDH3q6s+owH/A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HPYOKvBKVpaevAgWEUMJ62sIDHqrp0CncoESKUaPzb7oQkc6wg6t6X4eFgpWwaCfY1nSeFLCYryPqA5Li5jxz6Sd+ynX2fEwvfm5dQxPVCW/1GD/3SnI2gPK8dEUmK0YZ1aBLmL63acUm1jAhnyxxCHyJfF8xwI6i3oonGL/+fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tTOby-0003jY-Ce; Thu, 02 Jan 2025 18:03:54 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tTObv-006X4d-1G;
-	Thu, 02 Jan 2025 18:03:52 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tTObw-0008kv-09;
-	Thu, 02 Jan 2025 18:03:52 +0100
-Date: Thu, 2 Jan 2025 18:03:52 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next RFC 0/5] net: phy: Introduce a port
- representation
-Message-ID: <Z3bG-B0E2l47znkE@pengutronix.de>
-References: <20241220201506.2791940-1-maxime.chevallier@bootlin.com>
- <Z2g3b_t3KwMFozR8@pengutronix.de>
- <Z2hgbdeTXjqWKa14@pengutronix.de>
- <Z3Zu5ZofHqy4vGoG@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=N7lAwoSmSglLzus7ryyhuTZ1KVYWQYQbcpuvcJDlzMPaCmqJ/j3OyDYGc8IFc19TjZrEDYL2nvvrbqGp6JpIjxIEiHoXNjX2ARHTfjKlLVp0QvyQJC/gvMherhtxevP1TH86LxBfrJJkdkWWmeMJwuCy46ZlvRo5dnQOx3WzS8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ki7trcHq; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-218c8aca5f1so197172815ad.0
+        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 09:07:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1735837666; x=1736442466; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o1I7wk15wRvO/zojjjgalbdlLqOx9NB1sPLwkJhiddk=;
+        b=Ki7trcHq5FkQUdKmO8JvwiHDeZLRZxFdFKFdeSJjMk/1I3eeC5B7KgcoT6PvGoyBQy
+         Mzv1rC7ECwU21Ec/rav4ORCpO5ZtIjhLUZ01+/8pPzzUv4jdDWF5fp2r9PI3r3y/sbe5
+         JXAQH6my0/SaG2LDVkWZ1nLLEIIQHIrjLUB/WBygMsDaZlhhvIjW5r1oYySl1baZExgW
+         v8hi78dQFKZkH3Bzf2tRg3ioz7AtXW/p00oSv/gNosI5lTpcjAG+WCcEkiT27IsRI/gQ
+         VPcFlqZGF9IYfqyP9NOlCnIf0nJBb/kvfijTJLV/zmZrqmQlIIPYtKMRywldqeT51p2V
+         Aatw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735837666; x=1736442466;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o1I7wk15wRvO/zojjjgalbdlLqOx9NB1sPLwkJhiddk=;
+        b=Km5NFqO4bSNv71aY0Axf/6JWVmTlFtTwTA9cE5yYu+8fYaW7eyuNTCRoPX6TumDcsN
+         d7XNjwEqA27RISQQoMmM/OQ6nUKbVzeCHDmazkWuRBUfI1eWDmYVu9Ryun4XhbAnql8T
+         K1CYVDQhIA3I1KOTZMxd4j6jxdCqoRTwJW8x3zbMRWKwZ7POWtUvCFeJAuMSlrMvxIfK
+         Fjm4ZSAVIN4SsjOP3QU0ZVt8hasGaHobbBZZS7bRcuSz+3MC2AGVYcqeFXJHsbTVYXxF
+         zKue95Nez1Q8eN/EMhVHa/+OULWY0zKJcYOyjxsID9lR8pg/lAWf1fm5HyhrEQKIEdiZ
+         XjEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWiooxr84MwI6uwZirJycYLaXIrjn2JdTcPiyQRS16tvX1EfkCVn1FAdi7YjMKntFy87hlIJRw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJP/jSiusLoiDKCR/qwNNFU1iwy8VqbeEfxK8zbuqO/X2xBCnK
+	F8aJCKzsctSYoGQuTyclgAOXE4hk58HjSIjFFqME4iMY4XzB4anH6Aonbpi9KVzEbrCyiQCT0ut
+	e
+X-Gm-Gg: ASbGncvIf3AOb5Zt/vbOjpnC63HBMN+HeYh+5vspJUJxw7BXvfC+PHGpBDWc3xLsxQZ
+	tXYqUwAz70DWAootINgldkp9VL8SQ2zHufhqatGk679e4x5AU36TYxAG58/vcsuSr2sQ5nKyrWo
+	gdQCNOxQsC8Yfp1dV5atMBhSKl1Js2YpUkVsv0DHLN38hTvUuN3la8UnRLu4oD5XwAQiqDu0hq4
+	tnJjWcLIN3zvYV9Z773gOLEbMJv2Ii8VwBVTmofHIFuMxuKYiDL3F4QtjWR
+X-Google-Smtp-Source: AGHT+IHE8PlcerGfpsLeItgzh1PNUW59Fh7GldU5PFGYGPWG3HIlVB3bhO4rSkf0AY6wN6xXj5nfAw==
+X-Received: by 2002:a05:6a00:b51:b0:726:f7c9:7b28 with SMTP id d2e1a72fcca58-72abdd7c2aemr68833922b3a.8.1735837665771;
+        Thu, 02 Jan 2025 09:07:45 -0800 (PST)
+Received: from p14s ([2604:3d09:148c:c800:e54b:c134:3ca6:8a60])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8dbaf1sm24557135b3a.112.2025.01.02.09.07.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 09:07:45 -0800 (PST)
+Date: Thu, 2 Jan 2025 10:07:40 -0700
+From: Mathieu Poirier <mathieu.poirier@linaro.org>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas@t-8ch.de>,
+	linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+	linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
+	linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+	linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-serial@vger.kernel.org, netdev@vger.kernel.org,
+	Zijun Hu <quic_zijuhu@quicinc.com>,
+	Alison Schofield <alison.schofield@intel.com>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>
+Subject: Re: [PATCH v4 04/11] driver core: Constify API device_find_child()
+ then adapt for various usages
+Message-ID: <Z3bH3MzyEzC1/GLi@p14s>
+References: <20241211-const_dfc_done-v4-0-583cc60329df@quicinc.com>
+ <20241211-const_dfc_done-v4-4-583cc60329df@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <Z3Zu5ZofHqy4vGoG@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20241211-const_dfc_done-v4-4-583cc60329df@quicinc.com>
 
-On Thu, Jan 02, 2025 at 10:48:05AM +0000, Russell King (Oracle) wrote:
-> On Sun, Dec 22, 2024 at 07:54:37PM +0100, Oleksij Rempel wrote:
-> > Here is updated version:
-> >=20
-> > ports {
-> >     /* 1000BaseT Port with Ethernet and simple PoE */
-> >     port0: ethernet-port@0 {
-> >         reg =3D <0>; /* Port index */
-> >         label =3D "ETH0"; /* Physical label on the device */
-> >         connector =3D "RJ45"; /* Connector type */
-> >         supported-modes =3D <10BaseT 100BaseTX 1000BaseT>; /* Supported=
- modes */
-> >=20
-> >         transformer {
-> >             model =3D "ABC123"; /* Transformer model number */
-> >             manufacturer =3D "TransformerCo"; /* Manufacturer name */
-> >=20
-> >             pairs {
-> >                 pair@0 {
-> >                     name =3D "A"; /* Pair A */
-> >                     pins =3D <1 2>; /* Connector pins */
-> >                     phy-mapping =3D <PHY_TX0_P PHY_TX0_N>; /* PHY pin m=
-apping */
-> >                     center-tap =3D "CT0"; /* Central tap identifier */
-> >                     pse-negative =3D <PSE_GND>; /* CT0 connected to GND=
- */
-> >                 };
-> >                 pair@1 {
-> >                     name =3D "B"; /* Pair B */
-> >                     pins =3D <3 6>; /* Connector pins */
-> >                     phy-mapping =3D <PHY_RX0_P PHY_RX0_N>;
-> >                     center-tap =3D "CT1"; /* Central tap identifier */
-> >                     pse-positive =3D <PSE_OUT0>; /* CT1 connected to PS=
-E_OUT0 */
-> >                 };
-> >                 pair@2 {
-> >                     name =3D "C"; /* Pair C */
-> >                     pins =3D <4 5>; /* Connector pins */
-> >                     phy-mapping =3D <PHY_TXRX1_P PHY_TXRX1_N>; /* PHY c=
-onnection only */
-> >                     center-tap =3D "CT2"; /* Central tap identifier */
-> >                     /* No power connection to CT2 */
-> >                 };
-> >                 pair@3 {
-> >                     name =3D "D"; /* Pair D */
-> >                     pins =3D <7 8>; /* Connector pins */
-> >                     phy-mapping =3D <PHY_TXRX2_P PHY_TXRX2_N>; /* PHY c=
-onnection only */
-> >                     center-tap =3D "CT3"; /* Central tap identifier */
-> >                     /* No power connection to CT3 */
-> >                 };
-> >             };
-> >         };
->=20
-> I'm sorry, but... what is the point of giving this much detail in the DT
-> description. How much of this actually would get used by *any* code?
->=20
-> Why does it matter what transformer is used - surely 802.3 defines the
-> characteristics of the signal at the RJ45 connector and it's up to the
-> hardware designer to ensure that those characteristics are met. That
-> will depend on the transformer, connector and board layout.
->=20
-> What does it matter what connector pins are used? This is standardised.
->=20
-> You also at one point had a description for a SFP cage (I'm sorry, I
-> can't be bothered to find it in the 3000+ emails that I've missed over
-> the Christmas period), using pin numbers 1, 2, 3, and 4. That's
-> nonsense, those aren't the pin numbers for the data pairs. You also
-> are effectively redefining what already exists for SFP cages - we
-> already have a DT description for that, and it's based around the
-> standardised connector. Why do we need a new description for SFP
-> cages?
->=20
-> Are we going to start converting schematics into DT representations,
-> including any resistors and capacitors that may be present in the
-> data path?
+On Wed, Dec 11, 2024 at 08:08:06AM +0800, Zijun Hu wrote:
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> Constify the following API:
+> struct device *device_find_child(struct device *dev, void *data,
+> 		int (*match)(struct device *dev, void *data));
+> To :
+> struct device *device_find_child(struct device *dev, const void *data,
+>                                  device_match_t match);
+> typedef int (*device_match_t)(struct device *dev, const void *data);
+> with the following reasons:
+> 
+> - Protect caller's match data @*data which is for comparison and lookup
+>   and the API does not actually need to modify @*data.
+> 
+> - Make the API's parameters (@match)() and @data have the same type as
+>   all of other device finding APIs (bus|class|driver)_find_device().
+> 
+> - All kinds of existing device match functions can be directly taken
+>   as the API's argument, they were exported by driver core.
+> 
+> Constify the API and adapt for various existing usages by simply making
+> various match functions take 'const void *' as type of match data @data.
+> 
+> Reviewed-by: Alison Schofield <alison.schofield@intel.com>
+> Reviewed-by: Takashi Sakamoto <o-takashi@sakamocchi.jp>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  arch/sparc/kernel/vio.c                |  6 +++---
+>  drivers/base/core.c                    |  6 +++---
+>  drivers/block/sunvdc.c                 |  6 +++---
+>  drivers/bus/fsl-mc/dprc-driver.c       |  4 ++--
+>  drivers/cxl/core/pci.c                 |  4 ++--
+>  drivers/cxl/core/pmem.c                |  2 +-
+>  drivers/cxl/core/region.c              | 21 ++++++++++++---------
+>  drivers/firewire/core-device.c         |  4 ++--
+>  drivers/firmware/arm_scmi/bus.c        |  4 ++--
+>  drivers/firmware/efi/dev-path-parser.c |  4 ++--
+>  drivers/gpio/gpio-sim.c                |  2 +-
+>  drivers/gpu/drm/mediatek/mtk_drm_drv.c |  2 +-
+>  drivers/hwmon/hwmon.c                  |  2 +-
+>  drivers/media/pci/mgb4/mgb4_core.c     |  4 ++--
+>  drivers/nvdimm/bus.c                   |  2 +-
+>  drivers/pwm/core.c                     |  2 +-
+>  drivers/rpmsg/rpmsg_core.c             |  4 ++--
 
-First of all, Happy New Year! :)
+Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
 
-I also apologize for the SFP example provided earlier - it was vague, uncle=
-ar,
-and wasted your time. The purpose was not to redefine existing standards bu=
-t to
-demonstrate that even SFP might require separate consideration if we ever m=
-ove
-towards more detailed descriptions. My current focus, however, is on twisted
-pair-based Ethernet**, and I=E2=80=99d like to discuss that further if you=
-=E2=80=99re open to
-it.
-
-### Why Describe Pair Layouts?
-
-While Ethernet ports often work seamlessly even with misaligned pair layouts
-due to PHY auto-correction mechanisms like **MDI-X** or **CD pair swap
-correction**, these misalignments can affect diagnostics. =20
-
-If pairs are misaligned but still functional in automatic mode, the diagnos=
-tic
-interface may fail to provide meaningful or accurate data. For example: =20
-- MDI/MDI-X Detection: Misaligned pairs can lead to unexpected results,
-such as both sides reporting the same status when using a non-crossover cab=
-le. =20
-- Debugging Pair Issues: Without proper correction data in the DT, it
-becomes challenging to identify and validate pair swaps (e.g., A<>B or C<>D)
-during diagnostics. =20
-
-Including pair layout information in the DT ensures that the diagnostic
-interface can apply necessary corrections, making diagnostics usable.
-
-### Why Address Polarity? =20
-
-Polarity detection and correction are mandatory, and all modern PHYs handle=
- it
-seamlessly. However, Open Alliance standards require polarity indication
-and the ability for manual correction, particularly for automotive-grade
-PHYs (e.g., 1000BaseT1, 100BaseT1). =20
-(See: 6.4 Polarity Detection and Correction (POL))
-https://opensig.org/wp-content/uploads/2024/01/Advanced_PHY_features_for_au=
-tomotive_Ethernet_V1.0.pdf
-(Example of non-automotive PHYs supporting polarity indication and disablin=
-g of
-auto correction)
-https://ww1.microchip.com/downloads/en/DeviceDoc/VMDS-10242.pdf
-
-When polarity within the pair becomes relevant for diagnostics, proper PCB
-layout becomes crucial. It=E2=80=99s not uncommon for the PCB connection to=
- differ from
-the expected polarity at the physical port. Including polarity details in t=
-he
-DT allows for better alignment between hardware and software diagnostics,
-ensuring issues can be detected and corrected efficiently. =20
-
-### Why Mention Shielding?
-
-Shielding impacts EMI performance and compatibility, and knowing the shield=
-ing
-type (e.g., grounded, floating, capacitive) helps in: =20
-
-- Cable Selection: Ensures compatibility between shielded/unshielded cables
-  and port design. =20
-- EMI Troubleshooting: Identifies issues in noisy environments or mismatched
-  configurations. =20
-- System Design: Prevents ground loops and ensures compliance with EMC
-  standards. =20
-
-Even though this information should ideally be part of the product
-documentation, having it accessible through the interface makes
-software-supported diagnostics much more convenient. For example, software
-could guide users by stating:  "This controller has floating shielding. Ens=
-ure
-the cable is unshielded, or if shielded, it must be properly terminated at
-least on one side." =20
-
-### Why Mention Magnetics (Transformers)? =20
-
-We have to deal with different types of connections: with or without magnet=
-ics.
-Magnetics themselves come in various types and can be classified by their
-common-mode rejection elements, number of cores, and other
-characteristics. =20
-
-=46rom a software or user perspective, knowing the type and model of the
-magnetics is useful for several reasons. For example: =20
-
-- The transformer model do affect Time Domain Reflectometry offsets, someti=
-mes
-  resulting in discrepancies of several meters.
-  (See: TDR Offset Calibration)
-  https://www.analog.com/en/resources/app-notes/an-2553.html
-  https://ww1.microchip.com/downloads/en/Appnotes/VPPD-01740.pdf
-
-- Transformers influence insertion loss and exhibit varying noise
-  characteristics, both of which impact the analog properties of signals. =
-=20
-
-- Some PHYs support tuning their analog characteristics (e.g., VoD swing,
-  impedance matching) based on the attached magnetics. Advanced PHYs with s=
-uch
-  capabilities are often found in industrial-grade PHYs.
-  (See: How to Tune DP83825 VoD Swing)
-  https://www.ti.com/lit/an/snla266a/snla266a.pdf
- =20
-Best regards, =20
-Oleksij
---=20
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+>  drivers/scsi/qla4xxx/ql4_os.c          |  3 ++-
+>  drivers/scsi/scsi_transport_iscsi.c    | 10 +++++-----
+>  drivers/slimbus/core.c                 |  8 ++++----
+>  drivers/thunderbolt/retimer.c          |  2 +-
+>  drivers/thunderbolt/xdomain.c          |  2 +-
+>  drivers/tty/serial/serial_core.c       |  4 ++--
+>  drivers/usb/typec/class.c              |  8 ++++----
+>  include/linux/device.h                 |  4 ++--
+>  include/scsi/scsi_transport_iscsi.h    |  4 ++--
+>  net/dsa/dsa.c                          |  2 +-
+>  tools/testing/cxl/test/cxl.c           |  2 +-
+>  28 files changed, 66 insertions(+), 62 deletions(-)
+> 
+> diff --git a/arch/sparc/kernel/vio.c b/arch/sparc/kernel/vio.c
+> index 07933d75ac815160a2580dce39fde7653a9502e1..1a1a9d6b8f2e8dfedefafde846315a06a167fbfb 100644
+> --- a/arch/sparc/kernel/vio.c
+> +++ b/arch/sparc/kernel/vio.c
+> @@ -419,13 +419,13 @@ struct vio_remove_node_data {
+>  	u64 node;
+>  };
+>  
+> -static int vio_md_node_match(struct device *dev, void *arg)
+> +static int vio_md_node_match(struct device *dev, const void *arg)
+>  {
+>  	struct vio_dev *vdev = to_vio_dev(dev);
+> -	struct vio_remove_node_data *node_data;
+> +	const struct vio_remove_node_data *node_data;
+>  	u64 node;
+>  
+> -	node_data = (struct vio_remove_node_data *)arg;
+> +	node_data = (const struct vio_remove_node_data *)arg;
+>  
+>  	node = vio_vdev_node(node_data->hp, vdev);
+>  
+> diff --git a/drivers/base/core.c b/drivers/base/core.c
+> index 94865c9d8adcf5f2ce5002ffd7bf0ef4fc85e4d7..bc3b523a4a6366080c3c9fd190e54c7fd13c8ded 100644
+> --- a/drivers/base/core.c
+> +++ b/drivers/base/core.c
+> @@ -4079,8 +4079,8 @@ EXPORT_SYMBOL_GPL(device_for_each_child_reverse_from);
+>   *
+>   * NOTE: you will need to drop the reference with put_device() after use.
+>   */
+> -struct device *device_find_child(struct device *parent, void *data,
+> -				 int (*match)(struct device *dev, void *data))
+> +struct device *device_find_child(struct device *parent, const void *data,
+> +				 device_match_t match)
+>  {
+>  	struct klist_iter i;
+>  	struct device *child;
+> @@ -4125,7 +4125,7 @@ struct device *device_find_child_by_name(struct device *parent,
+>  }
+>  EXPORT_SYMBOL_GPL(device_find_child_by_name);
+>  
+> -static int match_any(struct device *dev, void *unused)
+> +static int match_any(struct device *dev, const void *unused)
+>  {
+>  	return 1;
+>  }
+> diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
+> index 2d38331ee66793402e803ec0cc82e9e71c991c84..386643ceed59921203828844aa070833c44c67fb 100644
+> --- a/drivers/block/sunvdc.c
+> +++ b/drivers/block/sunvdc.c
+> @@ -918,12 +918,12 @@ struct vdc_check_port_data {
+>  	char	*type;
+>  };
+>  
+> -static int vdc_device_probed(struct device *dev, void *arg)
+> +static int vdc_device_probed(struct device *dev, const void *arg)
+>  {
+>  	struct vio_dev *vdev = to_vio_dev(dev);
+> -	struct vdc_check_port_data *port_data;
+> +	const struct vdc_check_port_data *port_data;
+>  
+> -	port_data = (struct vdc_check_port_data *)arg;
+> +	port_data = (const struct vdc_check_port_data *)arg;
+>  
+>  	if ((vdev->dev_no == port_data->dev_no) &&
+>  	    (!(strcmp((char *)&vdev->type, port_data->type))) &&
+> diff --git a/drivers/bus/fsl-mc/dprc-driver.c b/drivers/bus/fsl-mc/dprc-driver.c
+> index 11c8fadcf85148b4e4ea6b97b7efb6d4ddf22d3c..52053f7c6d9a654ba46c6579c6a3c5c3faaa75c1 100644
+> --- a/drivers/bus/fsl-mc/dprc-driver.c
+> +++ b/drivers/bus/fsl-mc/dprc-driver.c
+> @@ -112,9 +112,9 @@ void dprc_remove_devices(struct fsl_mc_device *mc_bus_dev,
+>  }
+>  EXPORT_SYMBOL_GPL(dprc_remove_devices);
+>  
+> -static int __fsl_mc_device_match(struct device *dev, void *data)
+> +static int __fsl_mc_device_match(struct device *dev, const void *data)
+>  {
+> -	struct fsl_mc_obj_desc *obj_desc = data;
+> +	const struct fsl_mc_obj_desc *obj_desc = data;
+>  	struct fsl_mc_device *mc_dev = to_fsl_mc_device(dev);
+>  
+>  	return fsl_mc_device_match(mc_dev, obj_desc);
+> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
+> index 9d58ab9d33c554e05ddfa2610269e6d08bfaa8e9..a3c57f96138a28c9f30562d554c42cb5224bcf4b 100644
+> --- a/drivers/cxl/core/pci.c
+> +++ b/drivers/cxl/core/pci.c
+> @@ -252,9 +252,9 @@ static int devm_cxl_enable_mem(struct device *host, struct cxl_dev_state *cxlds)
+>  }
+>  
+>  /* require dvsec ranges to be covered by a locked platform window */
+> -static int dvsec_range_allowed(struct device *dev, void *arg)
+> +static int dvsec_range_allowed(struct device *dev, const void *arg)
+>  {
+> -	struct range *dev_range = arg;
+> +	const struct range *dev_range = arg;
+>  	struct cxl_decoder *cxld;
+>  
+>  	if (!is_root_decoder(dev))
+> diff --git a/drivers/cxl/core/pmem.c b/drivers/cxl/core/pmem.c
+> index b3378d3f6acb4c9e3601683119754e3cd6329df2..a8473de24ebfd92f12f47e0556e28b81a29cff7c 100644
+> --- a/drivers/cxl/core/pmem.c
+> +++ b/drivers/cxl/core/pmem.c
+> @@ -57,7 +57,7 @@ bool is_cxl_nvdimm_bridge(struct device *dev)
+>  }
+>  EXPORT_SYMBOL_NS_GPL(is_cxl_nvdimm_bridge, "CXL");
+>  
+> -static int match_nvdimm_bridge(struct device *dev, void *data)
+> +static int match_nvdimm_bridge(struct device *dev, const void *data)
+>  {
+>  	return is_cxl_nvdimm_bridge(dev);
+>  }
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index d778996507984a759bbe84e7acac3774e0c7af98..bfecd71040c2f4373645380b4c31327d8b42d095 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -792,7 +792,7 @@ static int check_commit_order(struct device *dev, const void *data)
+>  	return 0;
+>  }
+>  
+> -static int match_free_decoder(struct device *dev, void *data)
+> +static int match_free_decoder(struct device *dev, const void *data)
+>  {
+>  	struct cxl_port *port = to_cxl_port(dev->parent);
+>  	struct cxl_decoder *cxld;
+> @@ -824,9 +824,9 @@ static int match_free_decoder(struct device *dev, void *data)
+>  	return 1;
+>  }
+>  
+> -static int match_auto_decoder(struct device *dev, void *data)
+> +static int match_auto_decoder(struct device *dev, const void *data)
+>  {
+> -	struct cxl_region_params *p = data;
+> +	const struct cxl_region_params *p = data;
+>  	struct cxl_decoder *cxld;
+>  	struct range *r;
+>  
+> @@ -1722,10 +1722,12 @@ static struct cxl_port *next_port(struct cxl_port *port)
+>  	return port->parent_dport->port;
+>  }
+>  
+> -static int match_switch_decoder_by_range(struct device *dev, void *data)
+> +static int match_switch_decoder_by_range(struct device *dev,
+> +					 const void *data)
+>  {
+>  	struct cxl_switch_decoder *cxlsd;
+> -	struct range *r1, *r2 = data;
+> +	const struct range *r1, *r2 = data;
+> +
+>  
+>  	if (!is_switch_decoder(dev))
+>  		return 0;
+> @@ -3176,9 +3178,10 @@ static int devm_cxl_add_dax_region(struct cxl_region *cxlr)
+>  	return rc;
+>  }
+>  
+> -static int match_root_decoder_by_range(struct device *dev, void *data)
+> +static int match_root_decoder_by_range(struct device *dev,
+> +				       const void *data)
+>  {
+> -	struct range *r1, *r2 = data;
+> +	const struct range *r1, *r2 = data;
+>  	struct cxl_root_decoder *cxlrd;
+>  
+>  	if (!is_root_decoder(dev))
+> @@ -3189,11 +3192,11 @@ static int match_root_decoder_by_range(struct device *dev, void *data)
+>  	return range_contains(r1, r2);
+>  }
+>  
+> -static int match_region_by_range(struct device *dev, void *data)
+> +static int match_region_by_range(struct device *dev, const void *data)
+>  {
+>  	struct cxl_region_params *p;
+>  	struct cxl_region *cxlr;
+> -	struct range *r = data;
+> +	const struct range *r = data;
+>  	int rc = 0;
+>  
+>  	if (!is_cxl_region(dev))
+> diff --git a/drivers/firewire/core-device.c b/drivers/firewire/core-device.c
+> index a99fe35f1f0d1a2e585ac49b86cc6fd0807cffb6..ec3e21ad202520dda745064b954c853a26d03e3d 100644
+> --- a/drivers/firewire/core-device.c
+> +++ b/drivers/firewire/core-device.c
+> @@ -988,7 +988,7 @@ int fw_device_set_broadcast_channel(struct device *dev, void *gen)
+>  	return 0;
+>  }
+>  
+> -static int compare_configuration_rom(struct device *dev, void *data)
+> +static int compare_configuration_rom(struct device *dev, const void *data)
+>  {
+>  	const struct fw_device *old = fw_device(dev);
+>  	const u32 *config_rom = data;
+> @@ -1039,7 +1039,7 @@ static void fw_device_init(struct work_struct *work)
+>  	//
+>  	// serialize config_rom access.
+>  	scoped_guard(rwsem_read, &fw_device_rwsem) {
+> -		found = device_find_child(card->device, (void *)device->config_rom,
+> +		found = device_find_child(card->device, device->config_rom,
+>  					  compare_configuration_rom);
+>  	}
+>  	if (found) {
+> diff --git a/drivers/firmware/arm_scmi/bus.c b/drivers/firmware/arm_scmi/bus.c
+> index 157172a5f2b577ce4f04425f967f548230c1ebed..a3386bf36de508d312e2c4fa2e27ba62ba3776a0 100644
+> --- a/drivers/firmware/arm_scmi/bus.c
+> +++ b/drivers/firmware/arm_scmi/bus.c
+> @@ -238,10 +238,10 @@ static int scmi_dev_match(struct device *dev, const struct device_driver *drv)
+>  	return 0;
+>  }
+>  
+> -static int scmi_match_by_id_table(struct device *dev, void *data)
+> +static int scmi_match_by_id_table(struct device *dev, const void *data)
+>  {
+>  	struct scmi_device *sdev = to_scmi_dev(dev);
+> -	struct scmi_device_id *id_table = data;
+> +	const struct scmi_device_id *id_table = data;
+>  
+>  	return sdev->protocol_id == id_table->protocol_id &&
+>  		(id_table->name && !strcmp(sdev->name, id_table->name));
+> diff --git a/drivers/firmware/efi/dev-path-parser.c b/drivers/firmware/efi/dev-path-parser.c
+> index 937be269fee86d5d71256758aed94741e794431c..13ea141c0defb5e80d5af43cca73cf527444a238 100644
+> --- a/drivers/firmware/efi/dev-path-parser.c
+> +++ b/drivers/firmware/efi/dev-path-parser.c
+> @@ -47,9 +47,9 @@ static long __init parse_acpi_path(const struct efi_dev_path *node,
+>  	return 0;
+>  }
+>  
+> -static int __init match_pci_dev(struct device *dev, void *data)
+> +static int __init match_pci_dev(struct device *dev, const void *data)
+>  {
+> -	unsigned int devfn = *(unsigned int *)data;
+> +	unsigned int devfn = *(const unsigned int *)data;
+>  
+>  	return dev_is_pci(dev) && to_pci_dev(dev)->devfn == devfn;
+>  }
+> diff --git a/drivers/gpio/gpio-sim.c b/drivers/gpio/gpio-sim.c
+> index f387dad81f2960b5ec3c1b5fd04081ee501cc75b..370b71513bdb529112e157fa22a5451e02502a17 100644
+> --- a/drivers/gpio/gpio-sim.c
+> +++ b/drivers/gpio/gpio-sim.c
+> @@ -413,7 +413,7 @@ static int gpio_sim_setup_sysfs(struct gpio_sim_chip *chip)
+>  	return devm_add_action_or_reset(dev, gpio_sim_sysfs_remove, chip);
+>  }
+>  
+> -static int gpio_sim_dev_match_fwnode(struct device *dev, void *data)
+> +static int gpio_sim_dev_match_fwnode(struct device *dev, const void *data)
+>  {
+>  	return device_match_fwnode(dev, data);
+>  }
+> diff --git a/drivers/gpu/drm/mediatek/mtk_drm_drv.c b/drivers/gpu/drm/mediatek/mtk_drm_drv.c
+> index 0829ceb9967ca5d03509c52a559494d58776077b..4aeb393b58e636225ba3b529e4529f3028219e62 100644
+> --- a/drivers/gpu/drm/mediatek/mtk_drm_drv.c
+> +++ b/drivers/gpu/drm/mediatek/mtk_drm_drv.c
+> @@ -359,7 +359,7 @@ static const struct of_device_id mtk_drm_of_ids[] = {
+>  };
+>  MODULE_DEVICE_TABLE(of, mtk_drm_of_ids);
+>  
+> -static int mtk_drm_match(struct device *dev, void *data)
+> +static int mtk_drm_match(struct device *dev, const void *data)
+>  {
+>  	if (!strncmp(dev_name(dev), "mediatek-drm", sizeof("mediatek-drm") - 1))
+>  		return true;
+> diff --git a/drivers/hwmon/hwmon.c b/drivers/hwmon/hwmon.c
+> index bbb9cc44e29fbc635706db5bed21f3b8a1cd4987..6552ee5186896e9290658a26d8f230849aacafa6 100644
+> --- a/drivers/hwmon/hwmon.c
+> +++ b/drivers/hwmon/hwmon.c
+> @@ -341,7 +341,7 @@ static int hwmon_attr_base(enum hwmon_sensor_types type)
+>  
+>  static DEFINE_MUTEX(hwmon_pec_mutex);
+>  
+> -static int hwmon_match_device(struct device *dev, void *data)
+> +static int hwmon_match_device(struct device *dev, const void *data)
+>  {
+>  	return dev->class == &hwmon_class;
+>  }
+> diff --git a/drivers/media/pci/mgb4/mgb4_core.c b/drivers/media/pci/mgb4/mgb4_core.c
+> index bc63dc81bcae0d20924174be74b93a2139d5879f..697d50bedfe285d74c702efde61e510df87c1229 100644
+> --- a/drivers/media/pci/mgb4/mgb4_core.c
+> +++ b/drivers/media/pci/mgb4/mgb4_core.c
+> @@ -123,7 +123,7 @@ static const struct hwmon_chip_info temp_chip_info = {
+>  };
+>  #endif
+>  
+> -static int match_i2c_adap(struct device *dev, void *data)
+> +static int match_i2c_adap(struct device *dev, const void *data)
+>  {
+>  	return i2c_verify_adapter(dev) ? 1 : 0;
+>  }
+> @@ -139,7 +139,7 @@ static struct i2c_adapter *get_i2c_adap(struct platform_device *pdev)
+>  	return dev ? to_i2c_adapter(dev) : NULL;
+>  }
+>  
+> -static int match_spi_adap(struct device *dev, void *data)
+> +static int match_spi_adap(struct device *dev, const void *data)
+>  {
+>  	return to_spi_device(dev) ? 1 : 0;
+>  }
+> diff --git a/drivers/nvdimm/bus.c b/drivers/nvdimm/bus.c
+> index 2237715e42eb32a14a4134746739a0df5ca27414..0ccf4a9e523a52ef52a96a339ecff0bcb51b214b 100644
+> --- a/drivers/nvdimm/bus.c
+> +++ b/drivers/nvdimm/bus.c
+> @@ -1212,7 +1212,7 @@ enum nd_ioctl_mode {
+>  	DIMM_IOCTL,
+>  };
+>  
+> -static int match_dimm(struct device *dev, void *data)
+> +static int match_dimm(struct device *dev, const void *data)
+>  {
+>  	long id = (long) data;
+>  
+> diff --git a/drivers/pwm/core.c b/drivers/pwm/core.c
+> index 675b252d9c8ce74705ef245faae42e2c1330ed15..14144d0fa38e0c4e0bc34b9c929e127f1b2e96b6 100644
+> --- a/drivers/pwm/core.c
+> +++ b/drivers/pwm/core.c
+> @@ -1276,7 +1276,7 @@ static int pwm_export_child(struct device *pwmchip_dev, struct pwm_device *pwm)
+>  	return 0;
+>  }
+>  
+> -static int pwm_unexport_match(struct device *pwm_dev, void *data)
+> +static int pwm_unexport_match(struct device *pwm_dev, const void *data)
+>  {
+>  	return pwm_from_dev(pwm_dev) == data;
+>  }
+> diff --git a/drivers/rpmsg/rpmsg_core.c b/drivers/rpmsg/rpmsg_core.c
+> index 712c06c02696663821c8c884bcbd83036098899b..207b64c0a2fe9ccdb03b4ed66d1cee81e6f4c1ae 100644
+> --- a/drivers/rpmsg/rpmsg_core.c
+> +++ b/drivers/rpmsg/rpmsg_core.c
+> @@ -377,9 +377,9 @@ EXPORT_SYMBOL(rpmsg_get_mtu);
+>   * this is used to make sure we're not creating rpmsg devices for channels
+>   * that already exist.
+>   */
+> -static int rpmsg_device_match(struct device *dev, void *data)
+> +static int rpmsg_device_match(struct device *dev, const void *data)
+>  {
+> -	struct rpmsg_channel_info *chinfo = data;
+> +	const struct rpmsg_channel_info *chinfo = data;
+>  	struct rpmsg_device *rpdev = to_rpmsg_device(dev);
+>  
+>  	if (chinfo->src != RPMSG_ADDR_ANY && chinfo->src != rpdev->src)
+> diff --git a/drivers/scsi/qla4xxx/ql4_os.c b/drivers/scsi/qla4xxx/ql4_os.c
+> index d91f54a6e752f2feb68da69f474375f1415f33a2..133f36457b283a53b4dca29adf081f385a371368 100644
+> --- a/drivers/scsi/qla4xxx/ql4_os.c
+> +++ b/drivers/scsi/qla4xxx/ql4_os.c
+> @@ -7189,7 +7189,8 @@ static void qla4xxx_build_new_nt_list(struct scsi_qla_host *ha,
+>   *	1: if flashnode entry is non-persistent
+>   *	0: if flashnode entry is persistent
+>   **/
+> -static int qla4xxx_sysfs_ddb_is_non_persistent(struct device *dev, void *data)
+> +static int qla4xxx_sysfs_ddb_is_non_persistent(struct device *dev,
+> +					       const void *data)
+>  {
+>  	struct iscsi_bus_flash_session *fnode_sess;
+>  
+> diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
+> index fde7de3b1e55381f7cd468ad308a3e4ee9417c8c..0d474de2d960a865c52c9e7253f173d70ddd8f16 100644
+> --- a/drivers/scsi/scsi_transport_iscsi.c
+> +++ b/drivers/scsi/scsi_transport_iscsi.c
+> @@ -1324,7 +1324,7 @@ EXPORT_SYMBOL_GPL(iscsi_create_flashnode_conn);
+>   *  1 on success
+>   *  0 on failure
+>   */
+> -static int iscsi_is_flashnode_conn_dev(struct device *dev, void *data)
+> +static int iscsi_is_flashnode_conn_dev(struct device *dev, const void *data)
+>  {
+>  	return dev->bus == &iscsi_flashnode_bus;
+>  }
+> @@ -1335,7 +1335,7 @@ static int iscsi_destroy_flashnode_conn(struct iscsi_bus_flash_conn *fnode_conn)
+>  	return 0;
+>  }
+>  
+> -static int flashnode_match_index(struct device *dev, void *data)
+> +static int flashnode_match_index(struct device *dev, const void *data)
+>  {
+>  	struct iscsi_bus_flash_session *fnode_sess = NULL;
+>  	int ret = 0;
+> @@ -1344,7 +1344,7 @@ static int flashnode_match_index(struct device *dev, void *data)
+>  		goto exit_match_index;
+>  
+>  	fnode_sess = iscsi_dev_to_flash_session(dev);
+> -	ret = (fnode_sess->target_id == *((int *)data)) ? 1 : 0;
+> +	ret = (fnode_sess->target_id == *((const int *)data)) ? 1 : 0;
+>  
+>  exit_match_index:
+>  	return ret;
+> @@ -1389,8 +1389,8 @@ iscsi_get_flashnode_by_index(struct Scsi_Host *shost, uint32_t idx)
+>   *  %NULL on failure
+>   */
+>  struct device *
+> -iscsi_find_flashnode_sess(struct Scsi_Host *shost, void *data,
+> -			  int (*fn)(struct device *dev, void *data))
+> +iscsi_find_flashnode_sess(struct Scsi_Host *shost, const void *data,
+> +			  device_match_t fn)
+>  {
+>  	return device_find_child(&shost->shost_gendev, data, fn);
+>  }
+> diff --git a/drivers/slimbus/core.c b/drivers/slimbus/core.c
+> index b5d5bbb9fdb6614ffd578f5754226b50e394f0df..ab927fd077cb4fe1e29c004269fe52b2896c302f 100644
+> --- a/drivers/slimbus/core.c
+> +++ b/drivers/slimbus/core.c
+> @@ -337,9 +337,9 @@ static bool slim_eaddr_equal(const struct slim_eaddr *a,
+>  		a->instance == b->instance);
+>  }
+>  
+> -static int slim_match_dev(struct device *dev, void *data)
+> +static int slim_match_dev(struct device *dev, const void *data)
+>  {
+> -	struct slim_eaddr *e_addr = data;
+> +	const struct slim_eaddr *e_addr = data;
+>  	struct slim_device *sbdev = to_slim_device(dev);
+>  
+>  	return slim_eaddr_equal(&sbdev->e_addr, e_addr);
+> @@ -385,9 +385,9 @@ struct slim_device *slim_get_device(struct slim_controller *ctrl,
+>  }
+>  EXPORT_SYMBOL_GPL(slim_get_device);
+>  
+> -static int of_slim_match_dev(struct device *dev, void *data)
+> +static int of_slim_match_dev(struct device *dev, const void *data)
+>  {
+> -	struct device_node *np = data;
+> +	const struct device_node *np = data;
+>  	struct slim_device *sbdev = to_slim_device(dev);
+>  
+>  	return (sbdev->dev.of_node == np);
+> diff --git a/drivers/thunderbolt/retimer.c b/drivers/thunderbolt/retimer.c
+> index 89d2919d0193e8f5c68e669d054f3efc7abf78c8..21d2902c6102f0f593fb0c6d645acaff31ebb274 100644
+> --- a/drivers/thunderbolt/retimer.c
+> +++ b/drivers/thunderbolt/retimer.c
+> @@ -461,7 +461,7 @@ struct tb_retimer_lookup {
+>  	u8 index;
+>  };
+>  
+> -static int retimer_match(struct device *dev, void *data)
+> +static int retimer_match(struct device *dev, const void *data)
+>  {
+>  	const struct tb_retimer_lookup *lookup = data;
+>  	struct tb_retimer *rt = tb_to_retimer(dev);
+> diff --git a/drivers/thunderbolt/xdomain.c b/drivers/thunderbolt/xdomain.c
+> index 11a50c86a1e4302968f44dafeab47977bac01dd5..b0630e6d94726f9069c20017876ec7e212071686 100644
+> --- a/drivers/thunderbolt/xdomain.c
+> +++ b/drivers/thunderbolt/xdomain.c
+> @@ -1026,7 +1026,7 @@ static int remove_missing_service(struct device *dev, void *data)
+>  	return 0;
+>  }
+>  
+> -static int find_service(struct device *dev, void *data)
+> +static int find_service(struct device *dev, const void *data)
+>  {
+>  	const struct tb_property *p = data;
+>  	struct tb_service *svc;
+> diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
+> index 74fa02b237729931928b2ae4902c699ec017af94..8e0aa2c76d4037047a16f6c631eccaa066d8f230 100644
+> --- a/drivers/tty/serial/serial_core.c
+> +++ b/drivers/tty/serial/serial_core.c
+> @@ -2365,9 +2365,9 @@ struct uart_match {
+>  	struct uart_driver *driver;
+>  };
+>  
+> -static int serial_match_port(struct device *dev, void *data)
+> +static int serial_match_port(struct device *dev, const void *data)
+>  {
+> -	struct uart_match *match = data;
+> +	const struct uart_match *match = data;
+>  	struct tty_driver *tty_drv = match->driver->tty_driver;
+>  	dev_t devt = MKDEV(tty_drv->major, tty_drv->minor_start) +
+>  		match->port->line;
+> diff --git a/drivers/usb/typec/class.c b/drivers/usb/typec/class.c
+> index 4b3047e055a3737d3eb841e00fc976a70f8c9c3e..601a81aa1e1024265f2359393dee531a7779c6ea 100644
+> --- a/drivers/usb/typec/class.c
+> +++ b/drivers/usb/typec/class.c
+> @@ -229,10 +229,10 @@ static const char * const usb_modes[] = {
+>  /* ------------------------------------------------------------------------- */
+>  /* Alternate Modes */
+>  
+> -static int altmode_match(struct device *dev, void *data)
+> +static int altmode_match(struct device *dev, const void *data)
+>  {
+>  	struct typec_altmode *adev = to_typec_altmode(dev);
+> -	struct typec_device_id *id = data;
+> +	const struct typec_device_id *id = data;
+>  
+>  	if (!is_typec_altmode(dev))
+>  		return 0;
+> @@ -1282,7 +1282,7 @@ const struct device_type typec_cable_dev_type = {
+>  	.release = typec_cable_release,
+>  };
+>  
+> -static int cable_match(struct device *dev, void *data)
+> +static int cable_match(struct device *dev, const void *data)
+>  {
+>  	return is_typec_cable(dev);
+>  }
+> @@ -2028,7 +2028,7 @@ const struct device_type typec_port_dev_type = {
+>  /* --------------------------------------- */
+>  /* Driver callbacks to report role updates */
+>  
+> -static int partner_match(struct device *dev, void *data)
+> +static int partner_match(struct device *dev, const void *data)
+>  {
+>  	return is_typec_partner(dev);
+>  }
+> diff --git a/include/linux/device.h b/include/linux/device.h
+> index 667cb6db9019349c9db0233acf9e78ff6a6d9625..0e0bc9bfe0d15a8734bf3d34106300f4df6b5364 100644
+> --- a/include/linux/device.h
+> +++ b/include/linux/device.h
+> @@ -1081,8 +1081,8 @@ int device_for_each_child_reverse(struct device *dev, void *data,
+>  int device_for_each_child_reverse_from(struct device *parent,
+>  				       struct device *from, const void *data,
+>  				       int (*fn)(struct device *, const void *));
+> -struct device *device_find_child(struct device *dev, void *data,
+> -				 int (*match)(struct device *dev, void *data));
+> +struct device *device_find_child(struct device *dev, const void *data,
+> +				 device_match_t match);
+>  struct device *device_find_child_by_name(struct device *parent,
+>  					 const char *name);
+>  struct device *device_find_any_child(struct device *parent);
+> diff --git a/include/scsi/scsi_transport_iscsi.h b/include/scsi/scsi_transport_iscsi.h
+> index bd1243657c019962853849b07fc2ae190ec3b557..4d3baf324900f4b2b1ff3a5724b7ca7d122dc468 100644
+> --- a/include/scsi/scsi_transport_iscsi.h
+> +++ b/include/scsi/scsi_transport_iscsi.h
+> @@ -497,8 +497,8 @@ extern void iscsi_destroy_all_flashnode(struct Scsi_Host *shost);
+>  extern int iscsi_flashnode_bus_match(struct device *dev,
+>  				     const struct device_driver *drv);
+>  extern struct device *
+> -iscsi_find_flashnode_sess(struct Scsi_Host *shost, void *data,
+> -			  int (*fn)(struct device *dev, void *data));
+> +iscsi_find_flashnode_sess(struct Scsi_Host *shost, const void *data,
+> +			  device_match_t fn);
+>  extern struct device *
+>  iscsi_find_flashnode_conn(struct iscsi_bus_flash_session *fnode_sess);
+>  
+> diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
+> index 5a7c0e565a894545ee14f0e0186ed3c46b809b16..e827775baf2ee1d0e1c0ce5807c2cca5c372fc75 100644
+> --- a/net/dsa/dsa.c
+> +++ b/net/dsa/dsa.c
+> @@ -1367,7 +1367,7 @@ static int dsa_switch_parse_of(struct dsa_switch *ds, struct device_node *dn)
+>  	return dsa_switch_parse_ports_of(ds, dn);
+>  }
+>  
+> -static int dev_is_class(struct device *dev, void *class)
+> +static int dev_is_class(struct device *dev, const void *class)
+>  {
+>  	if (dev->class != NULL && !strcmp(dev->class->name, class))
+>  		return 1;
+> diff --git a/tools/testing/cxl/test/cxl.c b/tools/testing/cxl/test/cxl.c
+> index d0337c11f9ee675b0c461c8ae28e50957dc644ce..cc8948f49117a98086b3ef2ea7a8de0ce1ec36a5 100644
+> --- a/tools/testing/cxl/test/cxl.c
+> +++ b/tools/testing/cxl/test/cxl.c
+> @@ -725,7 +725,7 @@ static void default_mock_decoder(struct cxl_decoder *cxld)
+>  	cxld->reset = mock_decoder_reset;
+>  }
+>  
+> -static int first_decoder(struct device *dev, void *data)
+> +static int first_decoder(struct device *dev, const void *data)
+>  {
+>  	struct cxl_decoder *cxld;
+>  
+> 
+> -- 
+> 2.34.1
+> 
+> 
 
