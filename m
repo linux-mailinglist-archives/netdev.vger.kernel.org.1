@@ -1,115 +1,161 @@
-Return-Path: <netdev+bounces-154828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19B19FFEB0
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:43:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 900879FFF3C
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 20:04:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 694CB18806D5
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:43:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7E1A163F67
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DA201B218C;
-	Thu,  2 Jan 2025 18:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61621BEF64;
+	Thu,  2 Jan 2025 19:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="05VvvzlB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="aiRrqYGi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out.freemail.hu (fmfe04.freemail.hu [46.107.16.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A420019340B
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 18:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB5A1BD000;
+	Thu,  2 Jan 2025 19:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735843416; cv=none; b=KhAVVCFy0Lsumz40JFIX1RQB+09ANqnvlku943hGdzW29LSlYSM7r2wJvuWCSBbU17c+rpPLtw2JJXBhd0vwCpfDWvCwUFWFFLBiXbxrKFvQ+3iMLL6/v4y7ZmsLgu2iDdn6wr2j3y6NjikX/FfsUo9JDin2vDdAlh85I56xgoU=
+	t=1735844554; cv=none; b=OBHYf1i03zAMHx9ZnnTPZYlxT57XpuHus0fV/pHJe+vHVNJ9q/XzMo+RSlRTVhVty7vb/Q9FZvIj0ZVLi7jOrhzXqd9Rgme7F+K1axkqYWow0hpMNX9kvnGCUlFi0thh5QRdte6CKkb1pr7GzXUsU/cyMF/3+9oswtiFZ0SLpG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735843416; c=relaxed/simple;
-	bh=eiml2yjpmOszRDlSCn6XV9ArVvimnR2tz8b95UUvfR8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sAry/OObeM8Pw9SpmOrpCOAXK3Dn1x1xT6BHYvxGhjxJD5qT6Mpibz8FXrJ/emE5XCnlBqdw7Rqia684BnqwlgFgiF4nxvowQ/s18DtO+TxqAIGuE2bcjzQZojp6mJujHe4jxG+ngo5WkAC9aUzMOe5tiGtqqClIV0VKJ9lGbEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=05VvvzlB; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6d92cd1e811so107550866d6.1
-        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 10:43:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735843413; x=1736448213; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eiml2yjpmOszRDlSCn6XV9ArVvimnR2tz8b95UUvfR8=;
-        b=05VvvzlBImTVfWoF+IKInLEEpnshPPdwh8HxISJVnMz5jnOEdW+MgcPXiT7Fwqg+Ct
-         dE48JYCjKkhtGWBvZudc+yAuUP3z+MuiYePm/N1nIkf5QLBmaQwmD9Emx878y5QITGtn
-         XgSqXGsheeNLvty627Cc4Chz0nAups9jbzcgZAOvdL0WDSIhOy97pJ785EO7IA0onxP6
-         8kWaLnpTaZjb5cBjbNufhkCBJp4m8DTdXW1GhYB9i14D/nErYthIw6shB0shxR8s/dPO
-         fy2WYD7vYSpgtbIqO7v3eQi5inA39UGwL+YP26sYuFvgqQrrA5VeOkYIGSB3bpTmEPQH
-         Av6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735843413; x=1736448213;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eiml2yjpmOszRDlSCn6XV9ArVvimnR2tz8b95UUvfR8=;
-        b=mZqB4QFkrlBHC6DBP5NLc8IBbrgWgRzFxQ98pJ3vHPhr5mFxl6Cwq9gby967Sfv0lH
-         1GBaEN9XM7PeNH9CGD2pQeUC+7wLCfIcvs15+bFniGloZpWVvz3j66XTjszKoD+4zJ5L
-         LBknPP48//oV6u6HVWaoluK/u+b1x2uTdUSOGfxSCfZ7pofMob2sJ204Zh3/XLaNd9Vh
-         iMzLyA9sCuduAZdn4McekdDBNQpLeNACpwS7tTQgb7EGfgITht0lCEi45/EyTTovVHun
-         zi+BihwjzhFN9U+IaXoynjl2zkBZ7Xj2wLge4g7JPV1hvQN/++wZv7JLsyskpcINzgYm
-         Quow==
-X-Forwarded-Encrypted: i=1; AJvYcCXpuii4kekfVe+YMptwqfvoHOE7Reqy99Cobcs7sA4EYf2BqvvtgUUvge42ZoiQqggGvbz501k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ/VxcGFuk+Hd4ByF9N/xCQTGe3pRZfCnr6EVKjLJkleZOle7x
-	YfQa84HpoJRQ3ZUjxqyKbnFPH5gghHUVOyzAyDwbtMfvaFntpgTKrXJ3MfWQhnQK+RbuGBvuoFS
-	uzFeif901ZDptkASDlH8J57fhnXZBT2ZiMZ62
-X-Gm-Gg: ASbGncs/ddJTeSO0plw5z1xQBct/Nrhv3unZwQZlmBKXlaH6mkY6JW/VwvxHTi+FZyp
-	rqQlxjlZjEqYqStydB9ujSoLq86wIT1cHSciu
-X-Google-Smtp-Source: AGHT+IF2tZXZGzK4SR62kPfJyDlYZjAffFvMlSMw7+NG+gQt+geLbrrGjOcGHqDzqV0Ly6l7e8fT7ZNqEBaPAWkEaVw=
-X-Received: by 2002:a05:6214:5bc7:b0:6d8:8a0b:db25 with SMTP id
- 6a1803df08f44-6dd23618b5bmr751231406d6.21.1735843413422; Thu, 02 Jan 2025
- 10:43:33 -0800 (PST)
+	s=arc-20240116; t=1735844554; c=relaxed/simple;
+	bh=MFAChTCWnc4powJqPNhWIqRo1yBpNbyay9OeDGMt0MI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RM0B/jbHAKrY7lMr90xCjz3/FL0TaQX/M19EnhRafJWI2picYCb7garYLYNQdkO87DQl5BPoZ86YkxPOdNukU5FTadSg1naP7FJiV0THXuUEfCXM6VanLasKs3xrkAhMwbkgp96jrKYVRWFCyO8nNUpV0k30XenJxOOjVIb5hUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=aiRrqYGi reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YPG846MfwzKNf;
+	Thu, 02 Jan 2025 19:53:56 +0100 (CET)
+Message-ID: <90b238e6-65d8-4a1d-b59b-e10445e4c61c@freemail.hu>
+Date: Thu, 2 Jan 2025 19:53:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218133415.3759501-1-pkaligineedi@google.com>
- <20241218133415.3759501-3-pkaligineedi@google.com> <3ad7bdd2-80d2-4d73-b86f-4c0aeeee5bf1@intel.com>
-In-Reply-To: <3ad7bdd2-80d2-4d73-b86f-4c0aeeee5bf1@intel.com>
-From: Joshua Washington <joshwash@google.com>
-Date: Thu, 2 Jan 2025 10:43:21 -0800
-X-Gm-Features: AbW1kvYJhRQu9jWJ1-H0lGB_jEU0IWP-wY0jRAO_aZNMsIq7HMjjdk9-3POyjeg
-Message-ID: <CALuQH+W3TK4Kvgbf1d+eFjR8W45_84M7T=aD0BeAdbGQdm5koQ@mail.gmail.com>
-Subject: Re: [PATCH net 2/5] gve: guard XDP xmit NDO on existence of xdp queues
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org, 
-	Jeroen de Borst <jeroendb@google.com>, Shailend Chand <shailend@google.com>, 
-	Willem de Bruijn <willemb@google.com>, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, horms@kernel.org, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Ziwei Xiao <ziweixiao@google.com>, 
-	open list <linux-kernel@vger.kernel.org>, bpf@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] netfilter: uapi: Merge xt_*.h/c and ipt_*.h which has
+ same name.
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
+ daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
+ kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250102172115.41626-1-egyszeregy@freemail.hu>
+ <6eab8f06-3f65-42cb-b42e-6ba13f209660@lunn.ch>
+Content-Language: hu
+From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
+In-Reply-To: <6eab8f06-3f65-42cb-b42e-6ba13f209660@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1735844037;
+	s=20181004; d=freemail.hu;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	l=3770; bh=pd7Epz5kInMqfCmFFe9kT7Ku2czQtdZ0efDTT061zoI=;
+	b=aiRrqYGiiOKrXfnsGjuwiKy2Ih8vtHxz2/dQ9n4C5DgwpgSMlKzcRURjeHBjdDl2
+	vQ6adgH31DLDYsofutjsiJt7I6sJNbFp6yno5aypU+YHn8a/50v1UckLoMbmTrB3UbU
+	sWn/O7APq7BFxh70xvYBIndQA9lK9642wpDP3XIvchZPmcPSobxjmZpag1Ovt54zXGR
+	Y4z+w/OvaCi2z+XSJQmkYCI5psTp2gmLktjE4TeXR63qCTLLjrFv2vAZYSzMhFUgfhq
+	KdKphO14vlpOpd+9H7Bfc1GKUKAgqdsCE+ZiGk4RuebHtbbWLQ5vVyXKigqy2F/xOmO
+	/kLqtJj9Aw==
 
-> Wouldn't synchronize_rcu() be enough, have you checked?
+2025. 01. 02. 18:39 keltezéssel, Andrew Lunn írta:
+> On Thu, Jan 02, 2025 at 06:21:15PM +0100, egyszeregy@freemail.hu wrote:
+>> From: Benjamin Szőke <egyszeregy@freemail.hu>
+>>
+>> Merge and refactoring xt_*.h, xt_*.c and ipt_*.h files which has the same
+>> name in upper and lower case format. Combining these modules should provide
+>> some decent memory savings.
+> 
+> Numbers please. We don't normally accept optimisations without some
+> form of benchmark showing there is an improvement.
+>   
 
-I based usage of synchronize_net() instead of synchronize_rcu() based on other
-drivers deciding to use it due to synchronize_rcu_expedited() when holding
-rtnl_lock() being more performant.
+Some of you mentioned in a reply e-mail, that is a good benefits in merging the 
+codes. I do not have test result about it and i will no provide it.
 
-ICE: https://lore.kernel.org/all/20240529112337.3639084-4-maciej.fijalkowski@intel.com/
-Mellanox: https://lore.kernel.org/netdev/20210212025641.323844-8-saeed@kernel.org/
+>> The goal is to fix Linux repository for case-insensitive filesystem,
+>> to able to clone it and editable on any operating systems.
+> 
+> This needs a much stronger argument, since as i already pointed out,
+> how many case-insenstive file systems are still in use? Please give
+> real world examples of why this matters.
+> 
 
-> You need to use xdp_features_{set,clear}_redirect_target() when you
-install/remove XDP prog to notify the kernel that ndo_start_xmit is now
-available / not available anymore.
+All of MacOS and Windows platform are case-insensitive. So it means, who like to 
+edit Linux kernel code on them, then build it in a remote SSH solution, there 
+are lot of them.
 
-Thank you for the suggestion. Given that the fix has gone in, I was planning
-to make this change as part of a future net-next release with other XDP changes.
-Would it make sense to make those changes there, given that the patches as
-they went up, while not completely correct, should at least cover the
-vulnerability?
+>>   delete mode 100644 include/uapi/linux/netfilter/xt_CONNMARK.h
+>>   delete mode 100644 include/uapi/linux/netfilter/xt_DSCP.h
+>>   delete mode 100644 include/uapi/linux/netfilter/xt_MARK.h
+>>   delete mode 100644 include/uapi/linux/netfilter/xt_RATEEST.h
+>>   delete mode 100644 include/uapi/linux/netfilter/xt_TCPMSS.h
+>>   delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_ECN.h
+>>   delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_TTL.h
+>>   delete mode 100644 include/uapi/linux/netfilter_ipv6/ip6t_HL.h
+> 
+> How did you verify that there is no user space code using these
+> includes?
+> 
+> We take ABI very seriously. You cannot break user space code.
+> 
+>      Andrew
 
-Thanks,
-Josh
+This is a minimal ABI change, which have to use lower case filenames for 
+example: xt_DSCP.h -> xt_dscp.h
+
+By the way this UAPI code part was changed 8-10 years ago last time. There are 
+many ugly codes, ugly styles in headers, there are no any consístent code style 
+and technical code/solution between the variouse header and soruce files (struct 
+names, const values etc...).
+
+Somebody used enum for bit mask defining, somebody else use macros for the same 
+scope. It is terrible to refactoring it without any ABI breaking change. Because 
+of the code quality is terrible wrong, it should be much better to take care 
+about to improve it with a heavy refactoring instead of just says ABI breaking 
+change is not possible. In this way, sooner or later the house of cards will 
+crumble. For long term maintainability shall need a big code changes here in 
+UAPI in order to provide a good and maintainable clean code. (independent from 
+case-insensitive, it should be needed)
+
+First sign of it which can not be solved without ABI issue:
+I think, "linux/include/uapi/linux/netfilter_ipv4
+/ipt_ecn.h" and "linux/include/uapi/linux/netfilter_ipv4
+/ipt_ECN.h" can not be merged without ABI breaking because "IPT_ECN_IP_MASK" is 
+implemented in both in a different technical way. (It should not have accepted 
++10 years ago in the codebase, and then our legs wouldn't be tremble now for an 
+ABI change)
+
+
+ipt_ecn.h: 
+https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+ipt_ECN.h: 
+https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
+
+
+In my merge i needed to drop "#define IPT_ECN_IP_MASK	(~XT_DSCP_MASK)" and i 
+hope it will be replaced well with the other enum definition in any code.
+
+merged ipt_ecn.h: 
+https://github.com/Livius90/linux/blob/uapi-work/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+
+> 
+> ---
+> pw-bot: cr
+
 
