@@ -1,73 +1,91 @@
-Return-Path: <netdev+bounces-154770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238439FFB89
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:26:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF949FFBCF
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:36:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57F5A18837E1
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:26:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AA0F1883ADF
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DDA85931;
-	Thu,  2 Jan 2025 16:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530C315B980;
+	Thu,  2 Jan 2025 16:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XmGLHJ8e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P4JEZ9qU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D73125D6
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 16:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0459818BBAE
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 16:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735835177; cv=none; b=IA8ufEkyuQNqwkffHI1zFN53kPJBFTC0u6QDpr8wElBhip+IpNXQgB3mPAouwBrf7BYGWA4mw36iRkTSWctPhP9xPnyS0D+P9eLGYh/EpYvdWOyaL7jzQ4Iu0TLOesTafB5tSPSL7CvZJzaXNs1nV4kfc4fSl3fF0QpJF4HOQHo=
+	t=1735835671; cv=none; b=HKLrqsseXzcUAtBYAADS8Lr5meJ1p0Z+3a0jNqgBMQ5yqwUAPzCtWWD5pY22iyEG9NxJ+6qYcWIESAZVLhu88X/qpFoY3FrDicq6M6XE0t6FGlyGdbDPccdzndSfp7eNtBwbscrEFtoEc6na4HSaEQwt59H8EWSNGIUy7Y+2Nr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735835177; c=relaxed/simple;
-	bh=d0lIwQKFK2YKg0OceXfJNkCxJdfV8BPySrMGb5xb3xE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ozkx5s7mDo6l2XLqtpON+ZlNMK4purYcHDEb3SolRgXBKdbx2MyRkjCx8L7UHV+6U1nng00/jm92Jih0bc2RkSfRhEZGR3gRvq+iEFChEyuxnUeNPw4WEMWS3hlfZuB/CRTY0fL6a5Oybj/nEnzdp71w4PsqZvSNy5d2c+obCEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XmGLHJ8e; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Q/dpMpJ3QkApJYgUd3f2JJMZZA51Gm/b0EDgIufTHCE=; b=XmGLHJ8eaoQOUwIwVA+j4He7zw
-	RCZcTj1s1Q3N7vy/0EDNunyw11OTla4TtlMWtiD9FRl7EWyFA3ZYJkQ7qqruTTl0YHFHshX+lvOj6
-	LVkJx8XcNUV3o1GG6hFXufERTFPGvXClxsO3zGuGL/QM/eSH2OPwCHMA0GFUqCywICLROVCar9T1o
-	0b3JJHETmwSUKLNcWguQj1WBTwgbG6jYiplLbqLIk1rf1IDRxzk+HXahZbAXsImnMPn82R36VZjcE
-	6cimktWHoPsDwDwNXNVEgxcT0DEnyQhjH1kY3on8e7Eyc6XhXUYG5+YBKjEaPkMRtibkLqxW51CIy
-	Lu6O1zgQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50026)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tTO1O-00029y-2V;
-	Thu, 02 Jan 2025 16:26:06 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tTO1M-0000Po-13;
-	Thu, 02 Jan 2025 16:26:04 +0000
-Date: Thu, 2 Jan 2025 16:26:04 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: mvpp2: tai: warn once if we fail to
- update our timestamp
-Message-ID: <Z3a-HOwAVyJGEg67@shell.armlinux.org.uk>
-References: <E1tM8cA-006t1i-KF@rmk-PC.armlinux.org.uk>
- <Z10UGg_osMZ6TZrc@hoboy.vegasvil.org>
+	s=arc-20240116; t=1735835671; c=relaxed/simple;
+	bh=hH2VHk5usEHWu2muac3LnMYM+2kmRkbt79tL6mJTEQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Vng545mbwBdZ/D4jufEdJDYDVlXl46QabtoFQpOSgYk+LmSUCF+iEyFiLP4OLWMWuu7Zr9cxLrNH4W8IMSUh0E35Qku0d7+8VXYQYksopCCWp5Hg2XBVzStFvqejrsjhLtQYRb9s9eTsi5NtX4tjxZWVvq0j63zBuFp8aBHa49M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P4JEZ9qU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735835663;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=ZTtTZ+Q7MWtFriTpa2LNQ3Z0EHdCKnkW+osilKQ7/NA=;
+	b=P4JEZ9qUl5zwFQA7fUpCOZxsvqTqSVnCBVqrR69jqCVdKH59nU7xHNrvq7YZOq0ISVH901
+	eRWm/c3+1dER7NWrFPFbzWZLIArwrvoJ9/T8kE2QOE7rax5Dr1QSMnGiHX5lblzM3rxrva
+	89UiFiWt3bf8pD3zL3sSbSJI5e0WpCE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-2r5dSUgqMte-O7OfPSsPSA-1; Thu, 02 Jan 2025 11:34:22 -0500
+X-MC-Unique: 2r5dSUgqMte-O7OfPSsPSA-1
+X-Mimecast-MFC-AGG-ID: 2r5dSUgqMte-O7OfPSsPSA
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385dcadffebso5660357f8f.0
+        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 08:34:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735835661; x=1736440461;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZTtTZ+Q7MWtFriTpa2LNQ3Z0EHdCKnkW+osilKQ7/NA=;
+        b=K9RXj4U2BTFlbSQMyORG8SKJlNJSPUSNIn408SDeG/mQQQN3asLiDy22cxDVQ7VSi9
+         FM7ANJUmmD44axXAO9s6xrC2Dj2vW8ElS3Wt1yq/Q7CtC9Zhib6g8aQAJ017hr8zV9D+
+         Umh7j0fSeYF+qVKbDAaV4KbV+HqE+xe/WVJtZzpAZelaPs0OMRL3Ianio/EBBtdpOXlI
+         VXheQ/VFah26jYtu8vm+s6QmruZGvk8pw9uyKAmr4T9UVz7ZXOcv5N7+/sV1une+QBlM
+         WK9zIpAZxyHzmyLb6hZpNsBpV08MRSIKTWyPoxMEXPhS8v9XA7VBYrUXaDG1h5ZitdT1
+         Ak/w==
+X-Gm-Message-State: AOJu0Yw4xio3PDDoDcvMRdUUFoIZYPPlntPyJh94qYjjnGNP4UcEG4Vu
+	jtqGvksGGmOwzycpIBkCMTVv0MU4qysmypHIeFUPy92iDLILJJSJDG6q0cZoQVhZiL8FfalD4xd
+	QzzCwN8qmGenox67pEegASLWRYaaMlxZ4LzDYebxzm2Vzm2XyyFZ6Pw==
+X-Gm-Gg: ASbGncvA/SEgkRpgLV4n9DCEiR7/x/6PF0FSqUtjyV6DQxoDfhGj/8Ox5xjK9xkGFKx
+	BKt9gRJSHWUChUpekPxVrrd5MhNrJtfghlof+AL8ugYQRwOgBzTVtoRftqElzP94ZahXTGJbppZ
+	rjykOL9SoELIzbmJ4nKXj0Bu7LBBKFU5Waj3cM4mGXFLr4h3jo+q74H2YDudOjGviiwJIzXREhI
+	j4JU39XszVpdPiw1bZfTd+B1uFoTMPuBgMKtWYPBlQvaUIWOe/PchWAM4msWxvbLoN1bS9UdeSS
+	ELs8New7ySM4kTCNe53HfFMWIoTF5o+nCoc=
+X-Received: by 2002:a05:6000:4012:b0:385:f195:2a8 with SMTP id ffacd0b85a97d-38a221f9fc9mr33164867f8f.30.1735835661102;
+        Thu, 02 Jan 2025 08:34:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE82nvsTgcC6Yh/J6pBWP+NUJFHG2DaGkuhdzr+X/l4tLv8nl1pe7JeaOJel4VOyRqm6REp2g==
+X-Received: by 2002:a05:6000:4012:b0:385:f195:2a8 with SMTP id ffacd0b85a97d-38a221f9fc9mr33164846f8f.30.1735835660757;
+        Thu, 02 Jan 2025 08:34:20 -0800 (PST)
+Received: from debian (2a01cb058918ce000d2a50ec66dd1898.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:d2a:50ec:66dd:1898])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c89e2eesm39088130f8f.80.2025.01.02.08.34.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 08:34:20 -0800 (PST)
+Date: Thu, 2 Jan 2025 17:34:18 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>, linux-sctp@vger.kernel.org,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net-next] sctp: Prepare sctp_v4_get_dst() to dscp_t
+ conversion.
+Message-ID: <1a645f4a0bc60ad18e7c0916642883ce8a43c013.1735835456.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,42 +94,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z10UGg_osMZ6TZrc@hoboy.vegasvil.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Dec 13, 2024 at 09:14:02PM -0800, Richard Cochran wrote:
-> On Fri, Dec 13, 2024 at 04:34:06PM +0000, Russell King wrote:
-> > The hardware timestamps for packets contain a truncated seconds field,
-> > only containing two bits of seconds. In order to provide the full
-> > number of seconds, we need to keep track of the full hardware clock by
-> > reading it every two seconds.
-> > 
-> > However, if we fail to read the clock, we silently ignore the error.
-> > Print a warning indicating that the PP2 TAI clock timestamps have
-> > become unreliable.
-> 
-> Rather than printing a warning that user space might not read, why not
-> set a flag and stop delivering time stamps until the upper bits are
-> available once again?
+Define inet_sk_dscp() to get a dscp_t value from struct inet_sock, so
+that sctp_v4_get_dst() can easily set ->flowi4_tos from a dscp_t
+variable. For the SCTP_DSCP_SET_MASK case, we can just use
+inet_dsfield_to_dscp() to get a dscp_t value.
 
-If we fail to read the clock, that will be because the hardware didn't
-respond to our request to read it, which means the hardware broke in
-some way. We could make mvpp22_tai_tstamp() fail and not provide
-timestamps until we have successfully read the HW clock, but we would
-still want to print a warning to explain why HW timestamps vanish.
+Then, when converting ->flowi4_tos from __u8 to dscp_t, we'll just have
+to drop the inet_dscp_to_dsfield() conversion function.
 
-However, if this happens, then it also means that the gettimex64 PTP
-clock ioctl will also fail, so I would suggest that the user would
-find out about it anyway.
+Signed-off-by: Guillaume Nault <gnault@redhat.com>
+---
+ include/net/inet_sock.h |  6 ++++++
+ net/sctp/protocol.c     | 10 +++++++---
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
-So, I don't think the extra complexity is worth doing.
-
-This is to catch a spurious failure that may only affects an occasoinal
-attempt to read the HW PTP time. Currently, we would never know,
-because the kernel is currently completely silent if that were to ever
-happen.
-
+diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+index 3ccbad881d74..1086256549fa 100644
+--- a/include/net/inet_sock.h
++++ b/include/net/inet_sock.h
+@@ -19,6 +19,7 @@
+ #include <linux/netdevice.h>
+ 
+ #include <net/flow.h>
++#include <net/inet_dscp.h>
+ #include <net/sock.h>
+ #include <net/request_sock.h>
+ #include <net/netns/hash.h>
+@@ -302,6 +303,11 @@ static inline unsigned long inet_cmsg_flags(const struct inet_sock *inet)
+ 	return READ_ONCE(inet->inet_flags) & IP_CMSG_ALL;
+ }
+ 
++static inline dscp_t inet_sk_dscp(const struct inet_sock *inet)
++{
++	return inet_dsfield_to_dscp(READ_ONCE(inet->tos));
++}
++
+ #define inet_test_bit(nr, sk)			\
+ 	test_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags)
+ #define inet_set_bit(nr, sk)			\
+diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
+index 8b9a1b96695e..29727ed1008e 100644
+--- a/net/sctp/protocol.c
++++ b/net/sctp/protocol.c
+@@ -43,6 +43,7 @@
+ #include <net/addrconf.h>
+ #include <net/inet_common.h>
+ #include <net/inet_ecn.h>
++#include <net/inet_sock.h>
+ #include <net/udp_tunnel.h>
+ #include <net/inet_dscp.h>
+ 
+@@ -427,16 +428,19 @@ static void sctp_v4_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
+ 	struct dst_entry *dst = NULL;
+ 	union sctp_addr *daddr = &t->ipaddr;
+ 	union sctp_addr dst_saddr;
+-	u8 tos = READ_ONCE(inet_sk(sk)->tos);
++	dscp_t dscp;
+ 
+ 	if (t->dscp & SCTP_DSCP_SET_MASK)
+-		tos = t->dscp & SCTP_DSCP_VAL_MASK;
++		dscp = inet_dsfield_to_dscp(t->dscp);
++	else
++		dscp = inet_sk_dscp(inet_sk(sk));
++
+ 	memset(&_fl, 0x0, sizeof(_fl));
+ 	fl4->daddr  = daddr->v4.sin_addr.s_addr;
+ 	fl4->fl4_dport = daddr->v4.sin_port;
+ 	fl4->flowi4_proto = IPPROTO_SCTP;
+ 	if (asoc) {
+-		fl4->flowi4_tos = tos & INET_DSCP_MASK;
++		fl4->flowi4_tos = inet_dscp_to_dsfield(dscp);
+ 		fl4->flowi4_scope = ip_sock_rt_scope(asoc->base.sk);
+ 		fl4->flowi4_oif = asoc->base.sk->sk_bound_dev_if;
+ 		fl4->fl4_sport = htons(asoc->base.bind_addr.port);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
 
