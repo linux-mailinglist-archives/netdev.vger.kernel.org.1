@@ -1,203 +1,266 @@
-Return-Path: <netdev+bounces-154766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A3419FFB63
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:12:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4E09FFB6B
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:17:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 098C63A317A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:11:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEBFF3A0838
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741491AF4C1;
-	Thu,  2 Jan 2025 16:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC15DDC1;
+	Thu,  2 Jan 2025 16:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GQracyhZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VcvNqtHT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA95079E1;
-	Thu,  2 Jan 2025 16:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D257DEEB3
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 16:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735834317; cv=none; b=WU/vnSgMoiCeLliQtfwZfCZmVcrfiCzSgZhlN1XjKW4OUz+3Ie7qLkbMeLG+09FzbgbRdynOhKcUV2CY6bKUp5ReUIGiqG+K81OAM5Ug3Z0/DAT3Iqad2fBVBr8Brudn+WgnTIZwDyJj57Mz6tFAX+MsXqoRV/TaTd2720CxGDw=
+	t=1735834616; cv=none; b=gFdRwzrGnqtzy/V9eo7GFpV5nso/3LLaE4eIgALqTLqwxhebRlfG3/lhbDwdXPONupv9AxKywlp4M741T5pPHO9EeWjXEs85DLQqC8p66ZD0yl7wyX99k3bkB+o2wRJ1RlBb7r/1AkC00cs1E6w6GlbZxU9CsW1zlzJ17i4Rglk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735834317; c=relaxed/simple;
-	bh=SkdBCFy4/NYiYeWlSPzQFSiysAAtTRucOg9v2ucffpU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qfYFtUTvnwEEYT3m4nR5u0wXrhiI89CNRegsYPmi2F/VAAs90hH9cM1ggNog032GowRCK++P9upc1RXHGMFR4kYqWWHV7yaDY5yy0GqXMHfZXPK0VBh01EvQlBYlRCJ+2CJYs1uVE9fB5qmydkJ3qpbIU/nWnKpoiMPYHImIBVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=GQracyhZ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 502G1LTs001672;
-	Thu, 2 Jan 2025 16:11:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=9lfWFz+UlOJFT1pVZfvVtOpg
-	IDbcrmg5DUrHytsFqfk=; b=GQracyhZ6MwHkhSB7WoQJ5Ton7uenYr2lz4hABem
-	HjdgWa84tVLGDVdtJbkkBzVxdS6U//kZ6jhYFJVrt775TtocRZ6TtkcjamTLEItf
-	Zb5W1fDU4ygzuI1CHmUuBczMgd4cuCps2juxFG9CNhSWAdBhrQx8OIF5NdmRdRNw
-	2WO2z9uvZzx39LlJvQg4J+XbyIDVC1FT6NiMg30JXNoaFHND2cFM8AO2gwbq+qlu
-	jj1PnSfJRqVKQSw9rolqEutHiWA4Orw9RTNbSB+oYb+4IQlNuyD/a6ROTAmtzuJq
-	ZD/qPASsH+6aK2v5+isiT0miNCe9+JtXGECZHUlR6Ubg2w==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43wrefgq0s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Jan 2025 16:11:19 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 502GBBYO015448
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 2 Jan 2025 16:11:11 GMT
-Received: from PHILBER.na.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 2 Jan 2025 08:11:04 -0800
-Date: Thu, 2 Jan 2025 17:11:01 +0100
-From: Peter Hilber <quic_philber@quicinc.com>
-To: Richard Cochran <richardcochran@gmail.com>
-CC: <linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
-        <virtio-dev@lists.linux.dev>, <netdev@vger.kernel.org>,
-        Trilok Soni
-	<quic_tsoni@quicinc.com>,
-        Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eugenio =?utf-8?B?UMOpcmV6?=
-	<eperezma@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Jason Wang <jasowang@redhat.com>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>,
-        <linux-kselftest@vger.kernel.org>, <linux-api@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "Ridoux,
- Julien" <ridouxj@amazon.com>,
-        John Stultz <jstultz@google.com>,
-        "Thomas
- Gleixner" <tglx@linutronix.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        "Anna-Maria
- Behnsen" <anna-maria@linutronix.de>
-Subject: Re: [RFC PATCH 1/2] ptp: add PTP_SYS_OFFSET_STAT for xtstamping with
- status
-Message-ID: <a352mltlizneonxazn4bffydn57fyudrc3zougii2rnatg3jga@3yagssaob5sb>
-References: <20241219204208.3160-1-quic_philber@quicinc.com>
- <20241219204208.3160-2-quic_philber@quicinc.com>
- <Z2WLGHRdlsRpT6BL@hoboy.vegasvil.org>
- <wcxdbqhoe4cppukyy5rvkq5am4ht6wk5u6d6g2k2swqhidjw7i@6nar5vuusm35>
- <Z2ymZuiFqY8mxihJ@hoboy.vegasvil.org>
+	s=arc-20240116; t=1735834616; c=relaxed/simple;
+	bh=MRVSix7MEuvTGNdsAmN9Ay8zQR/fCYDefQbTWsHFavA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=utGf/nzvAIrylcDqqPUxAKYVMtvC9AYWVJGho6+IZuEU2PRlAJgLGHydFRSmOgTdaahFWqxznFFdeIeWwjFdmz/4wT64ToEiszvCZzpm4Hjo4a2sHBCyKecRdWqb+HHD4LlHTdlny+3xZK2tD+6e8QtUqR49F03I2+IyXgeOaNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VcvNqtHT; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1735834615; x=1767370615;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MRVSix7MEuvTGNdsAmN9Ay8zQR/fCYDefQbTWsHFavA=;
+  b=VcvNqtHT2i3ZwNqB/hwANKDgwY7fc5Ye8cq04Idp0exdonKbL3f/jM/B
+   rWkxeL5UdVhpDjj4mjxDp4sGkBqD6XWrVKHZ4268b7aJi83zVpom5DuC/
+   swQU2MU4OUyJlcjalZ1SGwCZp6b3viA8n4GQ8SUT785BiSJ8cyNA75nfV
+   GiZP9l0mvZbJmluD6OhoJKP3tTiStOIj5y0A5MRPjqV0z6ZIqG0q80GuE
+   X2H1aHIMjpCHujZbWCIEBGRNFymzPt9WFpnL0cBUmN/wVk48C1mMZNYpx
+   VGz4uPWLhklNCSU+zYnlOFWyqCH3lCjqS7NbrKWm52rZqtyDxt1RkBvVL
+   w==;
+X-CSE-ConnectionGUID: tVEDauIyRA6lTUNxUY0g/g==
+X-CSE-MsgGUID: l1gsA7oDQKi3FjVRW4tOaQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11302"; a="39757989"
+X-IronPort-AV: E=Sophos;i="6.12,285,1728975600"; 
+   d="scan'208";a="39757989"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2025 08:16:54 -0800
+X-CSE-ConnectionGUID: faAVO2VrRnedw4eBxhOMuw==
+X-CSE-MsgGUID: yklNlrysQPCxrKWA4b3jAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="106597283"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 02 Jan 2025 08:16:51 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tTNsO-0008db-1X;
+	Thu, 02 Jan 2025 16:16:48 +0000
+Date: Fri, 3 Jan 2025 00:16:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com, linux@armlinux.org.uk,
+	horms@kernel.org, jacob.e.keller@intel.com, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	mengyuanlou@net-swift.com, Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: Re: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
+Message-ID: <202501022323.HDFZ6FVp-lkp@intel.com>
+References: <20250102103026.1982137-2-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z2ymZuiFqY8mxihJ@hoboy.vegasvil.org>
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 88onBiDbs699f8ZIpzTSAWzT212S52iY
-X-Proofpoint-ORIG-GUID: 88onBiDbs699f8ZIpzTSAWzT212S52iY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- lowpriorityscore=0 clxscore=1015 impostorscore=0 phishscore=0
- mlxlogscore=999 bulkscore=0 malwarescore=0 spamscore=0 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501020142
+In-Reply-To: <20250102103026.1982137-2-jiawenwu@trustnetic.com>
 
-On Wed, Dec 25, 2024 at 04:42:14PM -0800, Richard Cochran wrote:
-> On Mon, Dec 23, 2024 at 07:13:46PM +0100, Peter Hilber wrote:
-> 
-> > The precise synchronization of the VM guest with its immediate
-> > environment can also be important; a VM guest may depend the decision
-> > about leap second smearing on its environment.
-> 
-> I thought that the whole point of using a VM is to isolate the guests
-> from each other and the host.  What you describe is a promiscuous
-> coupling between guest and host, and the kernel shouldn't be in
-> the business of supporting such behavior.
-> 
+Hi Jiawen,
 
-Why? There is already ptp_kvm etc. in the kernel.
+kernel test robot noticed the following build warnings:
 
-Would it be more acceptable to just announce leap seconds, but not
-whether to smear?
+[auto build test WARNING on net-next/main]
 
-> > Also, the administrative
-> > configuration choice may change over the lifetime of a system.
-> 
-> Right, which is why we should keep those choices out of kernel space.
-> Kernel provides mechanism, not policy.
->  
+url:    https://github.com/intel-lab-lkp/linux/commits/Jiawen-Wu/net-wangxun-Add-support-for-PTP-clock/20250102-181338
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250102103026.1982137-2-jiawenwu%40trustnetic.com
+patch subject: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
+config: x86_64-buildonly-randconfig-004-20250102 (https://download.01.org/0day-ci/archive/20250102/202501022323.HDFZ6FVp-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250102/202501022323.HDFZ6FVp-lkp@intel.com/reproduce)
 
-As discussed, the policy would be forwarded, not determined, by the
-kernel.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501022323.HDFZ6FVp-lkp@intel.com/
 
-If the policy would be forwarded via NTP (by the NTP server smearing or
-not smearing leap seconds), this would have the following disadvantages:
+All warnings (new ones prefixed by >>):
 
-- need to use an NTP server just for announcing leap seconds
+   In file included from drivers/net/ethernet/wangxun/libwx/wx_ptp.c:4:
+   In file included from include/linux/ptp_classify.h:14:
+   In file included from include/linux/ip.h:16:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/x86/include/asm/cacheflush.h:5:
+   In file included from include/linux/mm.h:2223:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> drivers/net/ethernet/wangxun/libwx/wx_ptp.c:358:2: warning: unannotated fall-through between switch labels [-Wimplicit-fallthrough]
+     358 |         case HWTSTAMP_TX_ON:
+         |         ^
+   drivers/net/ethernet/wangxun/libwx/wx_ptp.c:358:2: note: insert 'break;' to avoid fall-through
+     358 |         case HWTSTAMP_TX_ON:
+         |         ^
+         |         break; 
+   2 warnings generated.
 
-- redundancy of serving time both via NTP and via PTP clocks (for better
-  precision)
 
-- no awareness about leap seconds in case of smearing.
+vim +358 drivers/net/ethernet/wangxun/libwx/wx_ptp.c
 
-> > The intent is to also support (embedded) VM clients which are themselves
-> > not necessarily internetworked, which do not get a lot of maintenance,
-> > and which are not guaranteed to get an update within the typically less
-> > than 6 months between leap second announcement and occurrence.
-> 
-> Again, I don't think the kernel should be the solution to guests that
-> lack networking.  Instead, the place to fix the problem is at the
-> root, namely in the guests.
-> 
+   315	
+   316	/**
+   317	 * wx_ptp_set_timestamp_mode - setup the hardware for the requested mode
+   318	 * @wx: the private board structure
+   319	 * @config: the hwtstamp configuration requested
+   320	 *
+   321	 * Returns 0 on success, negative on failure
+   322	 *
+   323	 * Outgoing time stamping can be enabled and disabled. Play nice and
+   324	 * disable it when requested, although it shouldn't cause any overhead
+   325	 * when no packet needs it. At most one packet in the queue may be
+   326	 * marked for time stamping, otherwise it would be impossible to tell
+   327	 * for sure to which packet the hardware time stamp belongs.
+   328	 *
+   329	 * Incoming time stamping has to be configured via the hardware
+   330	 * filters. Not all combinations are supported, in particular event
+   331	 * type has to be specified. Matching the kind of event packet is
+   332	 * not supported, with the exception of "all V2 events regardless of
+   333	 * level 2 or 4".
+   334	 *
+   335	 * Since hardware always timestamps Path delay packets when timestamping V2
+   336	 * packets, regardless of the type specified in the register, only use V2
+   337	 * Event mode. This more accurately tells the user what the hardware is going
+   338	 * to do anyways.
+   339	 *
+   340	 * Note: this may modify the hwtstamp configuration towards a more general
+   341	 * mode, if required to support the specifically requested mode.
+   342	 */
+   343	static int wx_ptp_set_timestamp_mode(struct wx *wx,
+   344					     struct hwtstamp_config *config)
+   345	{
+   346		u32 tsync_tx_ctl = WX_TSC_1588_CTL_ENABLED;
+   347		u32 tsync_rx_ctl = WX_PSR_1588_CTL_ENABLED;
+   348		DECLARE_BITMAP(flags, WX_PF_FLAGS_NBITS);
+   349		u32 tsync_rx_mtrl = PTP_EV_PORT << 16;
+   350		bool is_l2 = false;
+   351		u32 regval;
+   352	
+   353		memcpy(flags, wx->flags, sizeof(wx->flags));
+   354	
+   355		switch (config->tx_type) {
+   356		case HWTSTAMP_TX_OFF:
+   357			tsync_tx_ctl = 0;
+ > 358		case HWTSTAMP_TX_ON:
+   359			break;
+   360		default:
+   361			return -ERANGE;
+   362		}
+   363	
+   364		switch (config->rx_filter) {
+   365		case HWTSTAMP_FILTER_NONE:
+   366			tsync_rx_ctl = 0;
+   367			tsync_rx_mtrl = 0;
+   368			clear_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
+   369			clear_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
+   370			break;
+   371		case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+   372			tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_L4_V1;
+   373			tsync_rx_mtrl |= WX_PSR_1588_MSG_V1_SYNC;
+   374			set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
+   375			set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
+   376			break;
+   377		case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+   378			tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_L4_V1;
+   379			tsync_rx_mtrl |= WX_PSR_1588_MSG_V1_DELAY_REQ;
+   380			set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
+   381			set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
+   382			break;
+   383		case HWTSTAMP_FILTER_PTP_V2_EVENT:
+   384		case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
+   385		case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+   386		case HWTSTAMP_FILTER_PTP_V2_SYNC:
+   387		case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
+   388		case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+   389		case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+   390		case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
+   391		case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
+   392			tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_EVENT_V2;
+   393			is_l2 = true;
+   394			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
+   395			set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
+   396			set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
+   397			break;
+   398		default:
+   399			/* register RXMTRL must be set in order to do V1 packets,
+   400			 * therefore it is not possible to time stamp both V1 Sync and
+   401			 * Delay_Req messages unless hardware supports timestamping all
+   402			 * packets => return error
+   403			 */
+   404			clear_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, wx->flags);
+   405			clear_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, wx->flags);
+   406			config->rx_filter = HWTSTAMP_FILTER_NONE;
+   407			return -ERANGE;
+   408		}
+   409	
+   410		/* define ethertype filter for timestamping L2 packets */
+   411		if (is_l2)
+   412			wr32(wx, WX_PSR_ETYPE_SWC(WX_PSR_ETYPE_SWC_FILTER_1588),
+   413			     (WX_PSR_ETYPE_SWC_FILTER_EN | /* enable filter */
+   414			      WX_PSR_ETYPE_SWC_1588 | /* enable timestamping */
+   415			      ETH_P_1588)); /* 1588 eth protocol type */
+   416		else
+   417			wr32(wx, WX_PSR_ETYPE_SWC(WX_PSR_ETYPE_SWC_FILTER_1588), 0);
+   418	
+   419		/* enable/disable TX */
+   420		regval = rd32ptp(wx, WX_TSC_1588_CTL);
+   421		regval &= ~WX_TSC_1588_CTL_ENABLED;
+   422		regval |= tsync_tx_ctl;
+   423		wr32ptp(wx, WX_TSC_1588_CTL, regval);
+   424	
+   425		/* enable/disable RX */
+   426		regval = rd32(wx, WX_PSR_1588_CTL);
+   427		regval &= ~(WX_PSR_1588_CTL_ENABLED | WX_PSR_1588_CTL_TYPE_MASK);
+   428		regval |= tsync_rx_ctl;
+   429		wr32(wx, WX_PSR_1588_CTL, regval);
+   430	
+   431		/* define which PTP packets are time stamped */
+   432		wr32(wx, WX_PSR_1588_MSG, tsync_rx_mtrl);
+   433	
+   434		WX_WRITE_FLUSH(wx);
+   435	
+   436		/* configure adapter flags only when HW is actually configured */
+   437		memcpy(wx->flags, flags, sizeof(wx->flags));
+   438	
+   439		/* clear TX/RX timestamp state, just to be sure */
+   440		wx_ptp_clear_tx_timestamp(wx);
+   441		rd32(wx, WX_PSR_1588_STMPH);
+   442	
+   443		return 0;
+   444	}
+   445	
 
-I do not understand. Is the point that guests should decide through
-another channel about leap second smearing?
-
-> > I agree that a device driver should not determine clock quality metrics.
-> > The intent is that the driver forwards metrics, if such are advertised
-> > by the device. These metrics should describe the accuracy etc. of the
-> > device itself.
-> 
-> Overall, I don't trust devices to tell the truth about their
-> qualities.  But putting that aside, we would need to see some kind of
-> commonality in hardware implementation to advertise their metrics.
-> However, AFAICT there is no such industry practice on the market.
-> 
-
-I hope there will be some feedback from third parties (at least related
-to virtualization).
-
-> > The patch message should document this more clearly. The
-> > metrics can be determined e.g. by virtualization host user space
-> > software. The device driver would just expose the device metrics to user
-> > space.
-> 
-> Again, host user space shouldn't misuse the kernel to share random
-> metrics with guest user space.  Isn't there another way to share such
-> info from host to guest?
-> 
-
-For sure. But the aim of this proposal is to have an interoperable time
-synchronization solution for VMs through a Virtio device. So the idea is
-to include metrics, if a consensus on their usefulness can be reached.
-AFAIU it is difficult to bypass the kernel for Virtio devices.
-
-Thanks for the discussion,
-
-Peter
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
