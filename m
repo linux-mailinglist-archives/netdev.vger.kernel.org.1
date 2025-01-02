@@ -1,74 +1,59 @@
-Return-Path: <netdev+bounces-154693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CAD19FF7A6
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:48:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 431C39FF7D6
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8966B3A1017
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 09:48:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 495931882E71
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 10:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12CA019149F;
-	Thu,  2 Jan 2025 09:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219231A4F2F;
+	Thu,  2 Jan 2025 10:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="SZM9ivaZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cs/HaRUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2122618F2DB;
-	Thu,  2 Jan 2025 09:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E112F1A76D0
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 10:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735811312; cv=none; b=JajRPIVZuSw/5UW/IrssYTwRxOlcJQeBuBmrKgb7fyP8VU7+H2W20k2XfPOEMlR+OaBe8A+DVZIRa/Lt7erzVYJYZsb2enMsuMq4QjjrcnVcAy5wGbE9jTmCk0A+op1hInCZo7a1MWuzmkNEqa/XrtwX/ag+EGadq08jSXOlCms=
+	t=1735812690; cv=none; b=Hmn0coxm6VBc64bI+zmYFJWR8qWDZCcIx9DV9K4kytwvk25+64VykNqxA87scVKHz/HgtTszcf8aXZSZFZmyezhn97VDHZgOKxrQ6rcUf53SKNV04sAa9TpGRON8Ihj3mtNfXJT97uxJvVPgZTVbXYqSNPLmihzUi0Ww/C7C/Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735811312; c=relaxed/simple;
-	bh=vv/Rb6O6fRI1lZSRWbxJ6X8FCwdoLrCnMuyXbHeNuWI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q3Z3P554snjnTnrp43rA6T3Zl4ViA4DrFbPOoPPOpyCquw4aP3BMP+ogjZkGM2farNxORbt7FCNr52c0kucnN3lHps3TpicoTOdPwTYS4iopB5T+y00XMoSWqdB0s7TTxqCW9+Ad5FJOxP3X1+oX4zR/V+EBJEZRXV9KKPoHuFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=SZM9ivaZ; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: b0703182c8ee11efbd192953cf12861f-20250102
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=kaRy8hvQiwVBlFWG9ZlYPjmGDHZFPf/6Z415OdGfZlw=;
-	b=SZM9ivaZiBX/M0nU1SfdVHj3aa6vbnBi/J4KeQFuRqGhNNIOKT/PrWnvI3falGC9LYO9GdccshDO8xfIpJfYf9eeFC5rY5E/K8yOeERjEKY1ASQJiVJbgy60G41jbeB6kOLS/uXnU+nXPk2hgmqQ6qRSh+3Xg+SO7PQwu1iNjO4=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.46,REQID:2c799766-d2dc-4c86-b7fb-10c6b6d91827,IP:0,U
-	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-25
-X-CID-META: VersionHash:60aa074,CLOUDID:601a3919-ec44-4348-86ee-ebcff634972b,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
-	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: b0703182c8ee11efbd192953cf12861f-20250102
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
-	(envelope-from <shiming.cheng@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 132933589; Thu, 02 Jan 2025 17:48:15 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 2 Jan 2025 17:48:14 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Thu, 2 Jan 2025 17:48:13 +0800
-From: shiming cheng <shiming.cheng@mediatek.com>
-To: <willemdebruijn.kernel@gmail.com>, <davem@davemloft.net>,
-	<dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <matthias.bgg@gmail.com>,
-	<angelogioacchino.delregno@collabora.com>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-CC: <netdev@vger.kernel.org>, <lena.wang@mediatek.com>, shiming cheng
-	<shiming.cheng@mediatek.com>
-Subject: [PATCH]  ipv6: socket SO_BINDTODEVICE lookup routing fail without IPv6 rule.
-Date: Thu, 2 Jan 2025 17:51:11 +0800
-Message-ID: <20250102095114.25860-1-shiming.cheng@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1735812690; c=relaxed/simple;
+	bh=+zcVhl/5r56s3nd3af/rDf3WbIC8gWlgNLuDFcgPbkA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wiuv4PIx9nZ1G0a9nKz03eaffZs++c9uOl9OICqrvUBWcSmU+3ZfAGa1+fKJi7MiYH/18MgwxoSy8qT+mXaERMWcbfC6fplhSGg6Qt5ir3/XRRH3gcdObXoXS9TwAxjJrRdwOuxnaYzFJR8khDIcXuD115FAFnjVShkBGGpSBso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cs/HaRUz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F401C4CED0;
+	Thu,  2 Jan 2025 10:11:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735812689;
+	bh=+zcVhl/5r56s3nd3af/rDf3WbIC8gWlgNLuDFcgPbkA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Cs/HaRUzqHB6rzgUgdRkP2uydbNRC4W7dhIc2pVPYIHr9V2NpxtUWt1cDMqAGBvX0
+	 ltdwUSfbdvMEt7NaCq8tlJw4LW9mi27D+Fy6evxps1heJDR2AtlEh3XSdQhLyR/SeR
+	 vAtVMKU3bTQJ9PNuNlGlNwKGa291OwXFHCbuR0c9JxBcJ4VKqiIuInY5yexpfv/j6o
+	 vS8MFIZ8Y+JD1F0zrvKLzxBXpwMhwar32T3/u1OdOe26DJLmihgFDiveUtVoh05a5g
+	 qwuU9nQRzqOc+l+n6mATkN76MuC8jrJqQCyjCQHYLq6kEdAeIGrRc5L77IfG5elSMr
+	 oK0mmZeL8QqGw==
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Alexandre Cassen <acassen@corp.free.fr>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Raed Salem <raeds@nvidia.com>
+Subject: [PATCH ipsec-rc] xfrm: delete intermediate secpath entry in packet offload mode
+Date: Thu,  2 Jan 2025 12:11:11 +0200
+Message-ID: <f417e151bc753428b66f4ca4762a78203623f83d.1735812447.git.leon@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,100 +61,165 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
 
-     When using socket IPv6 with SO_BINDTODEVICE, if IPv6 rule is not
-        matched, it will return ENETUNREACH. In fact, IPv4 does not behave
-        this way. IPv4 prioritizes looking up IP rules for routing and
-        forwarding, if not matched it will use socket-bound out interface
-        to send packets. The modification here is to make IPv6 behave the
-        same as IPv4. If IP rule is not found, it will also use
-        socket-bound out interface to send packts.
+From: Alexandre Cassen <acassen@corp.free.fr>
 
-Signed-off-by: shiming cheng <shiming.cheng@mediatek.com>
+Packets handled by hardware have added secpath as a way to inform XFRM
+core code that this path was already handled. That secpath is not needed
+at all after policy is checked and it is removed later in the stack.
+
+However, in the case of IP forwarding is enabled (/proc/sys/net/ipv4/ip_forward),
+that secpath is not removed and packets which already were handled are reentered
+to the driver TX path with xfrm_offload set.
+
+The following kernel panic is observed in mlx5 in such case:
+
+ mlx5_core 0000:04:00.0 enp4s0f0np0: Link up
+ mlx5_core 0000:04:00.1 enp4s0f1np1: Link up
+ Initializing XFRM netlink socket
+ IPsec XFRM device driver
+ BUG: kernel NULL pointer dereference, address: 0000000000000000
+ #PF: supervisor instruction fetch in kernel mode
+ #PF: error_code(0x0010) - not-present page
+ PGD 0 P4D 0
+ Oops: Oops: 0010 [#1] PREEMPT SMP
+ CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.13.0-rc1-alex #3
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+ RIP: 0010:0x0
+ Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+ RSP: 0018:ffffb87380003800 EFLAGS: 00010206
+ RAX: ffff8df004e02600 RBX: ffffb873800038d8 RCX: 00000000ffff98cf
+ RDX: ffff8df00733e108 RSI: ffff8df00521fb80 RDI: ffff8df001661f00
+ RBP: ffffb87380003850 R08: ffff8df013980000 R09: 0000000000000010
+ R10: 0000000000000002 R11: 0000000000000002 R12: ffff8df001661f00
+ R13: ffff8df00521fb80 R14: ffff8df00733e108 R15: ffff8df011faf04e
+ FS:  0000000000000000(0000) GS:ffff8df46b800000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: ffffffffffffffd6 CR3: 0000000106384000 CR4: 0000000000350ef0
+ Call Trace:
+  <IRQ>
+  ? show_regs+0x63/0x70
+  ? __die_body+0x20/0x60
+  ? __die+0x2b/0x40
+  ? page_fault_oops+0x15c/0x550
+  ? do_user_addr_fault+0x3ed/0x870
+  ? exc_page_fault+0x7f/0x190
+  ? asm_exc_page_fault+0x27/0x30
+  mlx5e_ipsec_handle_tx_skb+0xe7/0x2f0 [mlx5_core]
+  mlx5e_xmit+0x58e/0x1980 [mlx5_core]
+  ? __fib_lookup+0x6a/0xb0
+  dev_hard_start_xmit+0x82/0x1d0
+  sch_direct_xmit+0xfe/0x390
+  __dev_queue_xmit+0x6d8/0xee0
+  ? __fib_lookup+0x6a/0xb0
+  ? internal_add_timer+0x48/0x70
+  ? mod_timer+0xe2/0x2b0
+  neigh_resolve_output+0x115/0x1b0
+  __neigh_update+0x26a/0xc50
+  neigh_update+0x14/0x20
+  arp_process+0x2cb/0x8e0
+  ? __napi_build_skb+0x5e/0x70
+  arp_rcv+0x11e/0x1c0
+  ? dev_gro_receive+0x574/0x820
+  __netif_receive_skb_list_core+0x1cf/0x1f0
+  netif_receive_skb_list_internal+0x183/0x2a0
+  napi_complete_done+0x76/0x1c0
+  mlx5e_napi_poll+0x234/0x7a0 [mlx5_core]
+  __napi_poll+0x2d/0x1f0
+  net_rx_action+0x1a6/0x370
+  ? atomic_notifier_call_chain+0x3b/0x50
+  ? irq_int_handler+0x15/0x20 [mlx5_core]
+  handle_softirqs+0xb9/0x2f0
+  ? handle_irq_event+0x44/0x60
+  irq_exit_rcu+0xdb/0x100
+  common_interrupt+0x98/0xc0
+  </IRQ>
+  <TASK>
+  asm_common_interrupt+0x27/0x40
+ RIP: 0010:pv_native_safe_halt+0xb/0x10
+ Code: 09 c3 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 0f 22
+ 0f 1f 84 00 00 00 00 00 90 eb 07 0f 00 2d 7f e9 36 00 fb
+40 00 83 ff 07 77 21 89 ff ff 24 fd 88 3d a1 bd 0f 21 f8
+ RSP: 0018:ffffffffbe603de8 EFLAGS: 00000202
+ RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000f92f46680
+ RDX: 0000000000000037 RSI: 00000000ffffffff RDI: 00000000000518d4
+ RBP: ffffffffbe603df0 R08: 000000cd42e4dffb R09: ffffffffbe603d70
+ R10: 0000004d80d62680 R11: 0000000000000001 R12: ffffffffbe60bf40
+ R13: 0000000000000000 R14: 0000000000000000 R15: ffffffffbe60aff8
+  ? default_idle+0x9/0x20
+  arch_cpu_idle+0x9/0x10
+  default_idle_call+0x29/0xf0
+  do_idle+0x1f2/0x240
+  cpu_startup_entry+0x2c/0x30
+  rest_init+0xe7/0x100
+  start_kernel+0x76b/0xb90
+  x86_64_start_reservations+0x18/0x30
+  x86_64_start_kernel+0xc0/0x110
+  ? setup_ghcb+0xe/0x130
+  common_startup_64+0x13e/0x141
+  </TASK>
+ Modules linked in: esp4_offload esp4 xfrm_interface
+xfrm6_tunnel tunnel4 tunnel6 xfrm_user xfrm_algo binfmt_misc
+intel_rapl_msr intel_rapl_common kvm_amd ccp kvm input_leds serio_raw
+qemu_fw_cfg sch_fq_codel dm_multipath scsi_dh_rdac scsi_dh_emc
+scsi_dh_alua efi_pstore ip_tables x_tables autofs4 raid10 raid456
+async_raid6_recov async_memcpy async_pq raid6_pq async_xor xor async_tx
+libcrc32c raid1 raid0 mlx5_core crct10dif_pclmul crc32_pclmul
+polyval_clmulni polyval_generic ghash_clmulni_intel sha256_ssse3
+sha1_ssse3 ahci mlxfw i2c_i801 libahci i2c_mux i2c_smbus psample
+virtio_rng pci_hyperv_intf aesni_intel crypto_simd cryptd
+ CR2: 0000000000000000
+ ---[ end trace 0000000000000000 ]---
+ RIP: 0010:0x0
+ Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+ RSP: 0018:ffffb87380003800 EFLAGS: 00010206
+ RAX: ffff8df004e02600 RBX: ffffb873800038d8 RCX: 00000000ffff98cf
+ RDX: ffff8df00733e108 RSI: ffff8df00521fb80 RDI: ffff8df001661f00
+ RBP: ffffb87380003850 R08: ffff8df013980000 R09: 0000000000000010
+ R10: 0000000000000002 R11: 0000000000000002 R12: ffff8df001661f00
+ R13: ffff8df00521fb80 R14: ffff8df00733e108 R15: ffff8df011faf04e
+ FS:  0000000000000000(0000) GS:ffff8df46b800000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: ffffffffffffffd6 CR3: 0000000106384000 CR4: 0000000000350ef0
+ Kernel panic - not syncing: Fatal exception in interrupt
+ Kernel Offset: 0x3b800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+ ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+
+Fixes: 5958372ddf62 ("xfrm: add RX datapath protection for IPsec packet offload mode")
+Signed-off-by: Alexandre Cassen <acassen@corp.free.fr>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- include/net/ip6_route.h |  2 ++
- net/ipv6/ip6_output.c   |  6 +++++-
- net/ipv6/route.c        | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 41 insertions(+), 1 deletion(-)
+ include/net/xfrm.h | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
-index 6dbdf60b342f..0625597def6f 100644
---- a/include/net/ip6_route.h
-+++ b/include/net/ip6_route.h
-@@ -214,6 +214,8 @@ void rt6_multipath_rebalance(struct fib6_info *f6i);
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 32c09e85a64ce..2c4eda6a85966 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -1224,9 +1224,19 @@ static inline int __xfrm_policy_check2(struct sock *sk, int dir,
  
- void rt6_uncached_list_add(struct rt6_info *rt);
- void rt6_uncached_list_del(struct rt6_info *rt);
-+struct rt6_info *ip6_create_rt_oif_rcu(struct net *net, const struct sock *sk,
-+		struct flowi6 *fl6, int flags);
- 
- static inline const struct rt6_info *skb_rt6_info(const struct sk_buff *skb)
- {
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index f7b4608bb316..ed162ac3cb31 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1156,7 +1156,11 @@ static int ip6_dst_lookup_tail(struct net *net, const struct sock *sk,
- 		*dst = ip6_route_output_flags(net, sk, fl6, flags);
- 
- 	err = (*dst)->error;
--	if (err)
-+	if (err && (flags & RT6_LOOKUP_F_IFACE)) {
-+		*dst = (struct dst_entry *)ip6_create_rt_oif_rcu(net, sk, fl6, flags);
-+		if (!*dst)
-+			goto out_err_release;
-+	} else if (err) {
- 		goto out_err_release;
- 
- #ifdef CONFIG_IPV6_OPTIMISTIC_DAD
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 67ff16c04718..7d7450fab44f 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -1214,6 +1214,40 @@ static struct rt6_info *ip6_create_rt_rcu(const struct fib6_result *res)
- 	return nrt;
- }
- 
-+struct rt6_info *ip6_create_rt_oif_rcu(struct net *net, const struct sock *sk,
-+				       struct flowi6 *fl6, int flags)
-+{
-+	struct rt6_info *rt;
-+	unsigned int prefs;
-+	int err;
-+	struct net_device *dev = dev_get_by_index_rcu(net, fl6->flowi6_oif);
+ 	if (xo) {
+ 		x = xfrm_input_state(skb);
+-		if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET)
+-			return (xo->flags & CRYPTO_DONE) &&
+-			       (xo->status & CRYPTO_SUCCESS);
++		if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
++			bool check = (xo->flags & CRYPTO_DONE) &&
++				     (xo->status & CRYPTO_SUCCESS);
 +
-+	if (!dev)
-+		return NULL;
-+	rt = ip6_dst_alloc(dev_net(dev), dev, flags);
-+
-+	if (!rt)
-+		return NULL;
-+	rt->dst.error = 0;
-+	rt->dst.output = ip6_output;
-+	rt->dst.lastuse = jiffies;
-+	prefs = sk ? inet6_sk(sk)->srcprefs : 0;
-+	err = ipv6_dev_get_saddr(net, dev, &fl6->daddr, prefs, &fl6->saddr);
-+
-+	if (err) {
-+		dst_release(&rt->dst);
-+		return NULL;
-+	}
-+	rt->rt6i_dst.addr = fl6->daddr;
-+	rt->rt6i_dst.plen = 128;
-+	rt->rt6i_src.addr = fl6->saddr;
-+	rt->rt6i_dst.plen = 128;
-+	rt->rt6i_idev = in6_dev_get(dev);
-+	rt->rt6i_flags = flags;
-+	return rt;
-+}
-+EXPORT_SYMBOL_GPL(ip6_create_rt_oif_rcu);
-+
- INDIRECT_CALLABLE_SCOPE struct rt6_info *ip6_pol_route_lookup(struct net *net,
- 					     struct fib6_table *table,
- 					     struct flowi6 *fl6,
++			/* The packets here are plain ones and secpath was
++			 * needed to indicate that hardware already handled
++			 * them and there is no need to do nothing in addition.
++			 *
++			 * Consume secpath which was set by drivers.
++			 */
++			secpath_reset(skb);
++			return check;
++		}
+ 	}
+ 
+ 	return __xfrm_check_nopolicy(net, skb, dir) ||
 -- 
-2.45.2
+2.47.1
 
 
