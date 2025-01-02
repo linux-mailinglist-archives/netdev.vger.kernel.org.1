@@ -1,145 +1,131 @@
-Return-Path: <netdev+bounces-154836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5329FFFAA
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 20:50:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 462699FFFF3
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 21:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45AC21630DF
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:50:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D57C162CD9
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 20:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078BB1B4120;
-	Thu,  2 Jan 2025 19:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CCF188904;
+	Thu,  2 Jan 2025 20:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CvFVOb1V"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="i0375h3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7EF192D80
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 19:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7629DBA3F;
+	Thu,  2 Jan 2025 20:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735847439; cv=none; b=q2R89Do4IT2BgRy+JXqR9amwvW+rLTklC0FtQQxpQMcrtIlV1WXqFPL0asZPD0bhrlKjXKTZ3HmMX7JkDVv0P42e61sRvsDpbBpYeRfWPaXGg81ai8/mzlz3IByZ4MhkORzQlBK0/k/I8jsPLzani71Vr2p4werhYzCAmiR1JCA=
+	t=1735849377; cv=none; b=CRfQs+prIF8wa47fs4y7OukdIL2xRr0MPEyOsmXXMa8oCUC0dXlptg/CdBKdZIi0Jqt4xPhqKM2uiYUdNc6zGavpCpowY1DQflIV3GS7yzyL55/oSIZxdP1V/OLB3nvi0ymgKQLOLrWcjaEahB9bVf2cgsqlv8b3ICzR0uEXE4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735847439; c=relaxed/simple;
-	bh=hikHaU5A6ZERCizzmF3olOcrYqnscpNgaZ1dFvv8t3E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NewxgbfOCjAyJnm/XelZ4VFZ8vS1dUwHszqr52+LF7lBRwXYdxZlH0aafHm4QL5MXiptsHtsbhiLYRQxuec0l64iRLxxu/3ZQy1sNOWo10jCrHXWe1+co/MT/5GmeRbtI5jGj19VmKk/iUF354CWmsG3twm9Qnj0QhE6nOTDWAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CvFVOb1V; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5d0c939ab78so1450a12.0
-        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 11:50:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735847436; x=1736452236; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dQqcwEznfH4dIyWsmbuWUw21A7/GsyTNz1t3yoxE5oM=;
-        b=CvFVOb1V4iSRgh9b2zdIthPYjc5k5WKHPFXos9y9uFwr0QPX6sLANNLjXlK3hUTFMI
-         zO1piyqv35TMtR9QdfLL0NbyTjFitXlOxdYqUXgJ2ip0b90xlZSpPwXs6sBav1mYRxum
-         73zHKQWL6WtgZZPuvfXKmJrluE94l+HZ/5xe2ZExKNE5/bQ+e3B1xquMIgzGQ1RAH3fr
-         BHez8tJb8b6r+g2SJebMc7cjeaP+CTztw1dsGPV+EPJ8ujlAvK3ITcpQsv0c37iIpTnP
-         Wo7f/6FmzGsth/IUezMFoapoInU9HyiK1KMVUdTxkxfLNnrc6/dnRHQBRwJKxxmBjzmf
-         jX9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735847436; x=1736452236;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dQqcwEznfH4dIyWsmbuWUw21A7/GsyTNz1t3yoxE5oM=;
-        b=JBEb/Te0sZeT+oJIQh0cHQfbOugMK2GlGMwuOzChYIIN3EB2Xqph71hTmNs+fqqLUo
-         BwvtxK4L8lMMgUpeg1XmZjztoDLmAKzjuvNzOGknEIK5ZM5Se3QdgeEnwR+i/FpxAScU
-         F72Z83UPQvE0ajhmX9R6s09m5Ca25tERgb0c5zDdjRCt8WV1QfBeFXNq/5f/VLXVnqTg
-         A/DIxJO4VmHym7E6vX83iYL541MAVUL3sQPh8DYyVJ8qCoe+PAO0lTMlee2T8K2ub84Y
-         +FMGNNKXDYnQbEICV/qkn4MNEX8CRS31nzsF7xJguCsnPK/7iHTTUL+SuENdPJEH4+SO
-         aVXg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2ZJ9fgvftptBvySjUxQ5PhV1N9cQMBWkw0OeWqShtJji4veq+TrRagLN1euiQmk/IWBjxVBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywyo2dpWkp1DLXFg4EFVV36jPoUqS2zCgteCOaC156dXIppx6Gc
-	GmV+FScifEsrBhBFqr6HaFoS2QA8hGJBlkqK708yuN0jXYmnR5pY0EVbxCHPPU76QB6lrmx+V83
-	eMLKAiIecNNUGONe7nUiAf+lABL0KE5Z3vScI
-X-Gm-Gg: ASbGncs1+D99LwZcgWG9/ji7Dy0y6bsCPczk7xD/f734fE7vCOSWgMcz/Otqc4ZWlHd
-	CCKh0b/pUuOeffH27vL+kwOzl02O6Fsb10KdQBiKGI5v6ZcJ2wLZJfWLDFScL8PMCuuwtARM=
-X-Google-Smtp-Source: AGHT+IF+W6308MNLm8eqRpg8VwO6Ko7WhFt2khTSToJXESq2dKiSq70a8A77kbshJahFIXNs2YSVh4OSTBHjOF7pVT4=
-X-Received: by 2002:aa7:cd13:0:b0:5d0:dfe4:488a with SMTP id
- 4fb4d7f45d1cf-5d9157a2789mr8800a12.2.1735847436406; Thu, 02 Jan 2025 11:50:36
- -0800 (PST)
+	s=arc-20240116; t=1735849377; c=relaxed/simple;
+	bh=ojcTt5fJCV6SoZNl+Fa5IUb2QcDR8+cfZ2lmRqYsep0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yt7zaj2BuhbBpSh8FiwX3uESCl9QOw2e30VOWvI1Rc798V8uVnfJSkURC1lqxjbKuLxwaQEdZWyu9uVjSkvFY7YAei2ol3L2ixve5w4tOOtatzS+8BqPJXbQIJz6jLCdQ8jvvpal/BiqU4beT3kafV+EJqgKwgsoX5ugu7Fod/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=i0375h3w; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=5D8bYBBPFdzLKKCivcl0oXCDtAPlg07m4t75xRJ+CZo=; b=i0
+	375h3wNs3zigUyzwpZdfPwojmG6w0TdVEPnkyENdiRlVEaxJahyQpXApVfOnHsInpO0g/e5MuMzRe
+	2Dm+tGwHHqTaCNJaRCaumyW5C9oPHbs4N8vp9cABx2WT2SMXUjI96YhvJgzePjmyqG4d7kkiq+iqw
+	cf3zVQmzKAAjvl8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tTRiE-000qBT-TP; Thu, 02 Jan 2025 21:22:34 +0100
+Date: Thu, 2 Jan 2025 21:22:34 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?utf-8?B?U3rFkWtl?= Benjamin <egyszeregy@freemail.hu>
+Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
+	daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
+	kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2] netfilter: uapi: Merge xt_*.h/c and ipt_*.h which has
+ same name.
+Message-ID: <31331e58-bc0a-427b-8528-52448764a91e@lunn.ch>
+References: <20250102172115.41626-1-egyszeregy@freemail.hu>
+ <6eab8f06-3f65-42cb-b42e-6ba13f209660@lunn.ch>
+ <90b238e6-65d8-4a1d-b59b-e10445e4c61c@freemail.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241230205647.1338900-1-tavip@google.com> <Z3ZTWxLe5Js1B-zp@fedora>
- <Z3ZUFq7dyiRHrdmi@fedora>
-In-Reply-To: <Z3ZUFq7dyiRHrdmi@fedora>
-From: Octavian Purdila <tavip@google.com>
-Date: Thu, 2 Jan 2025 11:50:25 -0800
-Message-ID: <CAGWr4cQNhd2UQn33F_JJUE5tFrQgRHe0BZs-kGO4cno4uZ6HnA@mail.gmail.com>
-Subject: Re: [PATCH net-next] team: prevent adding a device which is already a
- team device lower
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: jiri@resnulli.us, andrew+netdev@lunn.ch, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <90b238e6-65d8-4a1d-b59b-e10445e4c61c@freemail.hu>
 
-On Thu, Jan 2, 2025 at 12:53=E2=80=AFAM Hangbin Liu <liuhangbin@gmail.com> =
-wrote:
->
-> On Thu, Jan 02, 2025 at 08:50:42AM +0000, Hangbin Liu wrote:
-> > On Mon, Dec 30, 2024 at 12:56:47PM -0800, Octavian Purdila wrote:
-> > > Prevent adding a device which is already a team device lower,
-> > > e.g. adding veth0 if vlan1 was already added and veth0 is a lower of
-> > > vlan1.
-> > >
-> > > This is not useful in practice and can lead to recursive locking:
-> > >
-> > > $ ip link add veth0 type veth peer name veth1
-> > > $ ip link set veth0 up
-> > > $ ip link set veth1 up
-> > > $ ip link add link veth0 name veth0.1 type vlan protocol 802.1Q id 1
-> > > $ ip link add team0 type team
-> > > $ ip link set veth0.1 down
-> > > $ ip link set veth0.1 master team0
-> > > team0: Port device veth0.1 added
-> > > $ ip link set veth0 down
-> > > $ ip link set veth0 master team0
-> > >
->
-> I didn't test, what if enslave veth0 first and then add enslave veth0.1 l=
-ater.
->
+On Thu, Jan 02, 2025 at 07:53:36PM +0100, Szőke Benjamin wrote:
+> 2025. 01. 02. 18:39 keltezéssel, Andrew Lunn írta:
+> > On Thu, Jan 02, 2025 at 06:21:15PM +0100, egyszeregy@freemail.hu wrote:
+> > > From: Benjamin Szőke <egyszeregy@freemail.hu>
+> > > 
+> > > Merge and refactoring xt_*.h, xt_*.c and ipt_*.h files which has the same
+> > > name in upper and lower case format. Combining these modules should provide
+> > > some decent memory savings.
+> > 
+> > Numbers please. We don't normally accept optimisations without some
+> > form of benchmark showing there is an improvement.
+> 
+> Some of you mentioned in a reply e-mail, that is a good benefits in merging
+> the codes. I do not have test result about it and i will no provide it.
 
-Hi Hangbin,
+Try looking at the man page of size(1).
 
-Thanks for the review!
+> > > The goal is to fix Linux repository for case-insensitive filesystem,
+> > > to able to clone it and editable on any operating systems.
+> > 
+> > This needs a much stronger argument, since as i already pointed out,
+> > how many case-insenstive file systems are still in use? Please give
+> > real world examples of why this matters.
+> > 
+> 
+> All of MacOS and Windows platform are case-insensitive.
 
-I was not able to reproduce the crash with this scenario. I think this
-is because adding veth0.1 does not affect the link state for veth0,
-while in the original scenario bringing up veth0 would also bring up
-veth0.1.
+Windows is generally case magic, not case insensitive. When opening a
+file it will first try to be case sensitive, if that fails, it tries
+case insensitive, in order to be backwards compatible with FAT.
 
-Regardless, allowing this setup seems risky and syzkaller may find
-other ways to trigger it, so maybe a more generic check like below
-would be better?
+> > >   delete mode 100644 include/uapi/linux/netfilter/xt_CONNMARK.h
+> > >   delete mode 100644 include/uapi/linux/netfilter/xt_DSCP.h
+> > >   delete mode 100644 include/uapi/linux/netfilter/xt_MARK.h
+> > >   delete mode 100644 include/uapi/linux/netfilter/xt_RATEEST.h
+> > >   delete mode 100644 include/uapi/linux/netfilter/xt_TCPMSS.h
+> > >   delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_ECN.h
+> > >   delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_TTL.h
+> > >   delete mode 100644 include/uapi/linux/netfilter_ipv6/ip6t_HL.h
+> > 
+> > How did you verify that there is no user space code using these
+> > includes?
+> > 
+> > We take ABI very seriously. You cannot break user space code.
+> > 
+> >      Andrew
+> 
+> This is a minimal ABI change, which have to use lower case filenames for
+> example: xt_DSCP.h -> xt_dscp.h
 
-        list_for_each_entry(tmp, &team->port_list, list) {
-                if (netdev_has_upper_dev(tmp->dev, port_dev) ||
-                        netdev_has_upper_dev(port_dev, tmp->dev)) {
-                        NL_SET_ERR_MSG(extack, "Device is a lower or
-upper of an enslaved device");
-                        netdev_err(dev, "Device %s is a lower or upper
-device of enslaved device %s\n",
-                                   portname, tmp->dev->name);
-                        return -EBUSY;
-                }
-        }
+You are not listening.
 
-Although I am not sure if there are legitimate use-cases that this may rest=
-rict?
+You cannot break user space code.
+
+That is the end of it. No exceptions. It does not matter how bad the
+API is. You cannot break it.
+
+    Andrew
 
