@@ -1,131 +1,197 @@
-Return-Path: <netdev+bounces-154843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B386A000EC
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 22:57:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D867A000FE
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 23:02:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29BE37A1CAB
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 21:56:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25C9160992
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 22:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26821A9B53;
-	Thu,  2 Jan 2025 21:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C013019048F;
+	Thu,  2 Jan 2025 22:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qw+OWWXt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Qyy2Ezke"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFADC18801A
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 21:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11DD13CF82
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 22:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735855007; cv=none; b=oFqc1xECVP+1fEAYcTmMsPXjjJniZsDgQ9jqolY/QwQrd0ZtV7hdme5Se6IQNuA1GcRgHLuoWw3gEBGubfJeFhLkzeky9yIxG9wo0N4E4KW8zENNqzR7LvBM913jKYE+3bXZgvySnsC8xtdMkPSi8f1PNwskggHuZlVBa5gUqIM=
+	t=1735855374; cv=none; b=HMuyHQOtGlGc6WVlby5e/THSJXCPzMGJRjakORRnLCdeb8qHDEieXmB3DcppP84DGxG58B1iL1wK39okkS+4MOCaFEmI1EZbDjAqKwy/pLBgfzIzesiKdlNm/kQQiqbn3xsS6m6BLKB47FGZk33o3T1tXx2+jt2AK+whQIM01ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735855007; c=relaxed/simple;
-	bh=QFLyxBJafmtDGw8ld0+IP+1jlpAL7/4pM+5ypnE8sVI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UvoGwhXNFos3OAtB0G0QNZEnX2sGYj+Y26DpNGhPKM668PGSua/4fRg0mj9kSfW1daY2f8ZhlHSriVrAJMAqzDY1lxYLVxLHmK02aaX+M0IbnV6TKWLBpcHJYbdkQNxqE+chqoo7wYa++mfdy1mSH7BfAN698kqyZiCqL2+Wt1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qw+OWWXt; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-436637e8c8dso119475135e9.1
-        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 13:56:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735855004; x=1736459804; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YV5urj80tLHXnBBiz5L3/BcvjVmRKuhPsIYUO3wONvU=;
-        b=Qw+OWWXtcPaKqB2Ag5LCD90+3DX/BinjcM6ib0vmA8AJD41vfM8rUdCFoNcgI5C51r
-         wKalTPSKelzPjkC4dQhRBI0FLUBHVF0oKCxlpuP1DMG3MkAdfT+Tyb5AmVK0ir9KP4i9
-         1DrhYjI7D4tfZjbhojwfsho/3zGsC7v/R2dEHJUQgEgLmljs/DYypLJ16aajV48w/TPB
-         xAHq2Ss9VOlpa2kkgmmRyBjgLiUqQ6GzTcWuZSsKZ0IgFR4YbcDnW6ESGNVJ9w3o+O+I
-         ZKxqPltD36y8JJS3/4c1i78Nq/YCw63kFIIJbu9cri1K62TBHCFiagaB5KGt/riPWv5w
-         o0Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735855004; x=1736459804;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YV5urj80tLHXnBBiz5L3/BcvjVmRKuhPsIYUO3wONvU=;
-        b=tb2okXCEktRlg0UNWqEWgKyqC8kaToPt+0VjwreZahFIvAPFCLyGthUZddpmV/B5yS
-         GjT1+uJo5Gz4iKsgyQLoedqWXyXDgFaiUkoOgjoBoEWKEkLtbR6vm3mlOgRCVqnIn/Bu
-         9m8K27+j3KnauYRseHYYJMBFXXYTRhHSBw9IBNz4rtuF4Yxw/D5pRxil59Q5BAW3QP4v
-         x8e66K6zFI14S99Pmk1sQWcG+YkdWMsCQwqgkk0v7l187rXIB2K+RJ5iE4d1JmpA+u5+
-         BmGHwSgALR6le4Vri2WnjQtgIkGnQf7c8ZTxo/GsYiReXkmI8rFVUAZBrWX2Ly9inj1c
-         cFcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWp6bNoaq6LXJYiUJePrzShmQybNqE9G0eybqtZ7blNpV9WX+NeIyo0pq9t0SDs/04sJTCWwU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy380/UsRu/mHlyY076ycPUnDUmVpwt7YqDmhWCa8X1FVe05bw8
-	RSw8QeT9DkNhH2b/Sa43EtZv9O986BYqmjy8y5fz03JRSgCamOf3
-X-Gm-Gg: ASbGncvZhXoF6fGZJpy9xEb5q5abLsUs6yNTYvuTbO+39ZJjYGBb5xOnHhmGHQDhXHS
-	sAfxVCbjpbUKhn85JeqB9PKDruEqDZlGPzgWf+nIXyQKh0uJz3MEsoSANK4NCpVkPcb9oNaZFS4
-	kMC/JUznYtoZPa6sbTJHRJMYvnj0h75ySjShgageo5FcCtOeQd8eVbOU8rLDxD1l1Zaww3d40YM
-	OEvtlstRWhiZNpADN02ccL7QAL57qp7lhd61ddm8gwFmq79H+In0hztn/zOPScee0/sY1mry3Kx
-	x3IifRQNo3pbwbuMRWiA0A8=
-X-Google-Smtp-Source: AGHT+IGkN1xxozwID0cTTI3Jo16J8TSiFCrtAtZ5iDp+6JOIT9zkpHJgfssb79cR29DkxgdnM3b1oQ==
-X-Received: by 2002:a05:6000:1561:b0:385:e013:73f0 with SMTP id ffacd0b85a97d-38a22405c97mr41230404f8f.59.1735855004020;
-        Thu, 02 Jan 2025 13:56:44 -0800 (PST)
-Received: from dsl-u17-10 (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8474b6sm39138787f8f.51.2025.01.02.13.56.43
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 02 Jan 2025 13:56:43 -0800 (PST)
-Date: Thu, 2 Jan 2025 21:56:42 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller "
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] Add support to do threaded napi busy poll
-Message-ID: <20250102215642.21da3755@dsl-u17-10>
-In-Reply-To: <20250102191227.2084046-1-skhawaja@google.com>
-References: <20250102191227.2084046-1-skhawaja@google.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1735855374; c=relaxed/simple;
+	bh=SmDWOWTF4hdBe8hr4Ra9W/oom3mIAnmvG02pf9hOiJg=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mEfFKO9XVx00JbcnGvq0E5o5OEKc8BAdb0QNv5ByIJrDO5jECF1PbwfqWihcRAr8N6GFHLIdAy3AuIhGngMXsj22OQWFEq8ogQ+ixyINyyw7aAt3WbcZEwwCg8CZDmsXT5wQgXvlkyMF59PJq38aneybAF3MJIH6OSXYwN2M4SY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Qyy2Ezke; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:To:From:Date:Reply-To:Cc:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=flhDoTWszixGfZPN6AOG1Kbft1s/lql3hbGGxPrleY8=; b=Qyy2EzkeztfaArvMkfHife79Ug
+	9mQxwcT2GZuEs9PnDjVTD4WeTUQJCrRpPLvtvgYR19N+827e2vvXLvaLiV4etpXf/AYhSeE6bb/oz
+	YSQP7e3uiC9+62RHteTzoLkBq3S6NeeTMku8Fgxbg0C+6XwfGUMQWC6PMmiw1P74J4G+Y9/PhTLrT
+	oA73aILo0VoMwypPccrltiS0J4qmszRBCr2wYbir7YCiU6FU8gqkmlRB2lgGzMEt3Rj7htCV/Iz43
+	hei0v+MieMRXrRU/BJ7k7yqTpbCyHqos1rQ6+yAK3luur6S1DaFLurb0G/SdPh0CsB+r0Knuglo8X
+	nAJ3p0bw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49174)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tTTH5-0002Qh-0q;
+	Thu, 02 Jan 2025 22:02:39 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tTTH1-0000e4-0k;
+	Thu, 02 Jan 2025 22:02:35 +0000
+Date: Thu, 2 Jan 2025 22:02:35 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/7] net: stmmac: move tx_lpi_timer tracking to
+ phylib
+Message-ID: <Z3cM-5tShVza0M58@shell.armlinux.org.uk>
+References: <Z1r3MWZOt36SgGxf@shell.armlinux.org.uk>
+ <E1tLkSX-006qfS-Rx@rmk-PC.armlinux.org.uk>
+ <Z1wTqh-BnvPYLqU8@shell.armlinux.org.uk>
+ <Z1yTviYUZ8sbNOsK@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z1yTviYUZ8sbNOsK@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu,  2 Jan 2025 19:12:24 +0000
-Samiullah Khawaja <skhawaja@google.com> wrote:
-
-> Extend the already existing support of threaded napi poll to do continuous
-> busypolling.
+On Fri, Dec 13, 2024 at 08:06:22PM +0000, Russell King (Oracle) wrote:
+> On Fri, Dec 13, 2024 at 10:59:54AM +0000, Russell King (Oracle) wrote:
+> > On Thu, Dec 12, 2024 at 02:46:33PM +0000, Russell King (Oracle) wrote:
+> > > @@ -1092,6 +1092,7 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+> > >  			phy_init_eee(phy, !(priv->plat->flags &
+> > >  				STMMAC_FLAG_RX_CLK_RUNS_IN_LPI)) >= 0;
+> > >  		priv->eee_enabled = stmmac_eee_init(priv);
+> > > +		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
+> > >  		priv->tx_lpi_enabled = priv->eee_enabled;
+> > >  		stmmac_set_eee_pls(priv, priv->hw, true);
+> > >  	}
+> > 
+> > While looking deeper at stmmac, there's a bug in the above hunk -
+> > stmmac_eee_init() makes use of priv->tx_lpi_timer, so this member
+> > needs to be set before calling this function. I'll post a v2 shortly.
 > 
-> This is used for doing continuous polling of napi to fetch descriptors from
-> backing RX/TX queues for low latency applications. Allow enabling of threaded
-> busypoll using netlink so this can be enabled on a set of dedicated napis for
-> low latency applications.
+> I'm going to hold off v2, there's a lot more that can be cleaned up
+> here - the EEE code is rather horrid in stmmac, and there's definitely
+> one race, and one logical error in it (e.g. why mark software EEE mode
+> *enabled* when EEE mode is being disabled - which can lead to the EEE
+> timer being added back onto the timer list.)
 > 
-> Currently threaded napi is only enabled at device level using sysfs. Add
-> support to enable/disable threaded mode for a napi individually. This can be
-> done using the netlink interface. Add `set_threaded` op in netlink spec that
-> allows setting the `threaded` attribute of a napi.
+> There's also weirdness with dwmac4's EEE register fiddling.
 > 
-> Extend the threaded attribute in napi struct to add an option to enable
-> continuous busy polling. Extend the netlink and sysfs interface to allow
-> enabled/disabling threaded busypolling at device or individual napi level.
+> The stmmac driver uses hardware timed LPI entry if the timer is small
+> enough to be programmed into hardware, otherwise it uses software mode.
 > 
-> Once threaded busypoll on a napi is enabled, depending on the application
-> requirements the polling thread can be moved to dedicated cores. We used this
-> for AF_XDP usecases to fetch packets from RX queues to reduce latency.
+> When software mode wants to enter LPI mode, it sets both:
+> 
+> 	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
+> 	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
+> 
+> When software mode wants to exit LPI mode, it clears both of these
+> two bits.
+> 
+> In hardware mode, when enabling LPI generation, we set the hardware LPI
+> entry timer (separate register) to a non-zero value, and then set:
+> 
+> 	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
+> 	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
+> 	GMAC4_LPI_CTRL_STATUS_LPIATE (LPI Timer enable)
+> 
+> That seems logical. However, in hardware mode, when we want to then
+> disable hardware LPI generation, we set the hardware LPI entry timer to
+> zero, the following bits:
+> 
+> 	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
+> 	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
+> 
+> and clear:
+> 
+> 	GMAC4_LPI_CTRL_STATUS_LPIATE (LPI Timer enable)
+> 
+> So, hardware mode, disabled, ends up setting the same bits as
+> software mode wanting to generate LPI state on the transmit side.
+> This makes no sense to me, and looks like another bug in this driver.
 
-I think it would be more generally useful to be able to set the priority
-of the NAPI thread.
-'busypolling' is just an extreme version of a high priority thread.
+I've found a document that describes the GMAC:
 
-We've had to use threaded NAPI and a low SCHED_FIFO priority in order to
-clear the RX queues without the softint code locking out a other SCHED_FIFO
-user threads for 20ms+.
-That is currently rather a pain to setup.
+https://www.st.com/resource/en/reference_manual/rm0441-stm32mp151-advanced-armbased-32bit-mpus-stmicroelectronics.pdf
 
-	David
+Page 3302 gives the definitions for the ETH_MACLCSR, which is this
+register.
 
+LPITE (bit 20) - allows the ETH_MACLETR register to define how long to
+wait before the TX path enters LPI. Requires LPITXA and LPIEN to both
+be set. LPIEN is *not* automatically cleared when the TX path exits
+LPI.
 
+LPITXA (bit 19) - if this and LPIEN are set, then LPI is entered once
+all outstanding packets have been transmitted, and exits when there's
+a packet to be transmitted or the Tx FIFO is flushed. When it exits,
+it clears the LPIEN bit (making this a one-shot LPI enter-exit.)
+
+PLS (bit 17) needs to be programmed to reflect the PHY link status,
+and is used to hold off LPI state for the LS timer.
+
+LPIEN (bit 16) instructs the MAC to enter (when set) or exit (when
+cleared) LPI state. It doesn't say what the behaviour of this bit is
+if LPITXA is clear.
+
+So:
+
+LPIEN	LPITXA	LPITE	Effect
+0	x	x	No LPI, or LPI exited if active
+1	0	0	Undocumented
+1	1	0	Tx LPI entered if PLS has been set for the LS
+			timer, and once all packets have been sent.
+			LPIEN clears when Tx LPI exits.
+1	1	1	Tx LPI entered if PLS has been set for the LS
+			timer, and transmitter has been idle for
+			ETH_MACLETR. Exits do not clear LPIEN, allowing
+			for subsequent idle periods to enter LPI.
+
+Therefore, given this description, I believe the code to be wrong.
+In the case where we've set LPIEN=1 LPITXA=1 LPITE=1, and we want
+to exit/disable LPI, we should not be clearing LPIATE and leaving
+LPIEN and LPITXA as they were. According to my reading, this would
+cause LPI to remain active until there is a packet to be sent or the
+TX FIFO is flushed. At that point, Tx LPI will be exited, causing
+LPIEN to be cleared - but the code is wanting to disable Tx LPI
+(e.g. because the user configured through ethtool for LPI to be
+disabled.)
+
+The question is... does this get fixed? Is there anyone who can test
+this (beyond the "patch doesn't seem to cause regressions" but can
+actually confirm entry/exit from LPI state?)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
