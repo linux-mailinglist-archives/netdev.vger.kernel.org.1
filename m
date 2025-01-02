@@ -1,117 +1,251 @@
-Return-Path: <netdev+bounces-154841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFDFA000A8
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 22:30:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC4CA000C7
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 22:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5FC41883C40
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 21:30:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13BA67A1AB3
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 21:38:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043F91BBBCC;
-	Thu,  2 Jan 2025 21:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796451B4120;
+	Thu,  2 Jan 2025 21:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fO9gX4MA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BWYKIAIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475011BAEFD
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 21:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735853425; cv=none; b=a6lYSJuAuK/wPFyzdGRVeGk2g0rC6jvjqQQHlzl7LZq1o1aL50Z6l27X4E7nuBRHeqQGOqy9fXjmAuJPO/yRH3BssSi8w+mK6AaasIbvOKrJPt30dq6sZqo/ASFGLGYdWYj8TjwPq+zl/pjBy0oj3OjH6X5hTK8lfkdnkvozrmQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735853425; c=relaxed/simple;
-	bh=t/wgynbdonBC7UykvAxzCAUjGHKmcGxPLZrx8J/Zl/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ksrg6ss4XZk1AQsshSSTqMWC1cQh7+obJigMEPD7s8ArYRkrnXHXZk7hTzar8htlyZIT2jA59NuY3EVMN+kEyTJvwK2jaBF+3WDhtOlx4jorV8TGXs8VWXIX37v+rcWzWmY/4O4RQXTJDhUipkpuMRY2CYXKHmHl/3E/Vr9HhRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fO9gX4MA; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21634338cfdso231723915ad.2
-        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 13:30:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735853422; x=1736458222; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=h7f0/KPKImTPD1G/iJOzNoVm29n327ncegcXJvE3JJ0=;
-        b=fO9gX4MAIsVqi+QS4xRqNgtIormADI0qxqeeLw7AoGrTOBTbZ9DsFvKH/QssrbCqkS
-         1QQwrmBsN8gQzQkIURAV0d7hmSIZRUsOp1xBN6YXG8ZvDUyXO7Ahh7fB6901M2G8aXpD
-         67YhuVYmFnzk6sn4n1BFGY+ws6zahco7eDRseqiD61Di16VoJqlmXkGvvfV7PtHXAD/8
-         qr7MUXmuod9NDX5EqDZjE+D52C+gxboTHxSLbHVBGJKDWozbpv1D0lVhI3l3o/MYTpKG
-         VgkalZ0zSZZkM04limD+Mkrv+l7eM3b7a9XsnKsw7XoAmitv+e50yttrwp8A3iIEDoCm
-         S5qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735853422; x=1736458222;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h7f0/KPKImTPD1G/iJOzNoVm29n327ncegcXJvE3JJ0=;
-        b=YGEVVzulW+F9i+uFmsTE/0V/MyH20taYmWqxXCuLAqyLIKasn7RV6EGWu2aceNuKrQ
-         f6QuwKb0U81Z4no0zP8sWtKegB3v/AbevKTYngMph619FYyAEV2j7rgQ2BboSiXBAuvv
-         EADJX0+snrw3VQW6G8F+UxNJ17D/HSjQJ7dtQQbgJJmZLWH5nquLirUFG8sZfzjoaNu0
-         cDhH8eySG9wd3rCjUAGdlkf3JK8z8SE10CZAuWhX3lYQnUNJ55D1L9DJFo7MEVDii/1O
-         o5bD1xIzE+3t763MiqdbHsHbCdOEUfcHi678SrMZ9nAn5GLuQibf5Pne/mXTvfwOIbYy
-         wPtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW13bm5LIPaqgLXUc3wsiofVqSnyKRn6uigWJMiLG2JuiyIdAXsDEYsI8C+ZsrAjp3AspHUzhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn3S3jqDIpD4/88BoCLO2ddXeyd7hLMDxCp0i+8slZ8cDav1L9
-	ZXq8J455kzRwi3x3r8dOq+b5FVrVDJzDLz/F5v39d4hPZFMmA8s=
-X-Gm-Gg: ASbGncvW24X9NwntU8G8JGPfIwS6Q8d/bj3v0vECKOWLJkcTHq5oOLi3Pd4HGMLOiJ7
-	m0Brl274RKMfHCAqj77ZdT4eSP4pA7HXqazjQeY7cRnqpDRtnjUSs/nDkaTVU19hq0eWzqNCoZF
-	V5scPT5Plu2fCQ3xnsgYb3AmTzxU2RyZmUJs1gz2QR6Ur2uOZjXW4Zcpchzboqpi+y8m4pZjFmv
-	rOYnW9d/yu2HfcffmaP58DU52kKblbpgwdBVhr+2WDwlTxqJ1M4fOxX
-X-Google-Smtp-Source: AGHT+IGXBzNsfhzwixQ4g/C6ot9GfT5eOvyX7BHsBfZHXVhoGH4fIuimhW1MigOgU46lVSohyZWUKQ==
-X-Received: by 2002:a17:902:ce01:b0:215:97c5:52b4 with SMTP id d9443c01a7336-219e6f2601emr731939385ad.39.1735853422096;
-        Thu, 02 Jan 2025 13:30:22 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc96312asm232128575ad.21.2025.01.02.13.30.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jan 2025 13:30:21 -0800 (PST)
-Date: Thu, 2 Jan 2025 13:30:21 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller " <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, jdamato@fastly.com
-Subject: Re: [PATCH net-next 0/3] Add support to do threaded napi busy poll
-Message-ID: <Z3cFbdjD4OtSwB44@mini-arch>
-References: <20250102191227.2084046-1-skhawaja@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF7013AA2A
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 21:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735853906; cv=fail; b=XhEf2THTHUbIyecZRgZrnWZbKTk4In03IeFxAmeFao4hQFa86guDZKQXrVovaePeTgY8XUf6FdFZTXLDTsmLan+4Ik9p0d4iL60Owo1fiBg8W0zvo37zCsWxGpYv/dPpl92zeFAXHZ3nnOPTJXtY+hZYjwNjfUMIPwh9EWlqLMk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735853906; c=relaxed/simple;
+	bh=rZTi5eFTl1y67KiW5CCVG+xhqv2Du8JdGQ445I1bosY=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oyj8JU/y/5zpMedLJFon/pTVc08Fy0BDBDS6PjZcZ4n3iYWwcJevgJa8lem9SwhXwF/KyKw0c9eL0KrGAm0McENG9gBUubbyCthfPhjG0wHPX0tQns8uW8QZyx372EqcUL/+tWa4/jrzm7ErgD72llcqefv7W8pfOSi5jrtdyuI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BWYKIAIp; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1735853905; x=1767389905;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=rZTi5eFTl1y67KiW5CCVG+xhqv2Du8JdGQ445I1bosY=;
+  b=BWYKIAIpysuitgLf6M7/HgqbLWT6x9RCpIpIWJcnX3pqXQZ4WOr9w8zU
+   aM09k3Ohiq2103TafnIUtqodsNVQGsm4EO5OezCBbdmANYq3iDYLjDaUM
+   r3DNRRQ5AMHrHPZJYp0E4U5H0KWZITLN2Ey8T4xymT0/WOWcSbyd0ilXU
+   Zo8e/NurRN0xUB8YN3tHrRIuHF8862SKXUs7a+9o9BNXaufXbrrh+/deW
+   QKzFKphXJ7siMrGRIKiTTZspobqoquD+E90/qVWOFIPheLZ5SDzbn+jXr
+   KOT8/jVUtR0nzvBwxlEcfVt1Nw161gPoCOq9fHwEVvWieYRTVeo/I8LJm
+   A==;
+X-CSE-ConnectionGUID: D3wexHtkRSaBv1IzdhdXpQ==
+X-CSE-MsgGUID: aGG2UtwtRViCYWGHvRQVsA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11303"; a="46775172"
+X-IronPort-AV: E=Sophos;i="6.12,286,1728975600"; 
+   d="scan'208";a="46775172"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2025 13:38:24 -0800
+X-CSE-ConnectionGUID: RyC2upJkQfuvNVVs91aqNw==
+X-CSE-MsgGUID: 0v8bmDfYTbicOCCeRhx7Ew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="102480897"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Jan 2025 13:38:24 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 2 Jan 2025 13:38:23 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 2 Jan 2025 13:38:23 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 2 Jan 2025 13:38:22 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nVw2UouQX+UAtThWn9K1s3W/DtItGP3Nd0gxA4ra8YVUoAU+CYpldmn06R6LcRBQyOy/WdWkLKtYaot5geVGlLeH3xaug0WzfIE8iqDchybTTL9MW0dvXxNf16jqHc4l7IJpKp1HX2L9ceK31q84RxUrT8bF2PVXOSy7QyZ+4FYjuYVuEbZ5em/TUoiQiRgNKB596jKZlgdXl7X981ybho5mxEdvTJDxGgg4bDZ68DpT8NT/oSkmz6shb21IoJ84nIHVZI4jtZYrsimxJS3XsoxlIsSix5z7TGkzS8hTL6awFexLvR2jEF1IAdYN7NY6sn8kj5b/S189jLcxsEMVUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yVkLOkEP6iaELizZWo6TppEHO2s2qAfq66pNzTdlgXU=;
+ b=DgR5FZEPJWbcVjrOkI3hCKo27GZ2FwVsQMOZIyrZo/o1cAegBpVJ172i+/uZaQoiQk6XpTC1TknOqT9hbJnVoMRoASUWGt/d1bQzh0vr5FhY5r32g5tmVOxjSjHJ8hb+vEgUBjnNbCA3FKM1nF9k39whUHfcPx/1b5734cuFFs+YtQJ2Ck/Isznf8nrtQ1IwlFZl7fGKa6Dy63rjA0AfLxpVRW9XA0XwvOtNM9NG+cUpnJ+Hx8eYDEu1Q/oZL8tl9A7pQZs9biqOLr027/2GnPsYZbkvLJH+yHB64Fv1ufzhAPizi/xF6FCcgZnBdTGCczeb4fzxMzkWUgTus59PbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
+ by CH3PR11MB7895.namprd11.prod.outlook.com (2603:10b6:610:12f::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.20; Thu, 2 Jan
+ 2025 21:38:15 +0000
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f%7]) with mapi id 15.20.8314.012; Thu, 2 Jan 2025
+ 21:38:15 +0000
+Message-ID: <3fc25f04-1562-4ad9-a8b4-8b85847e91fb@intel.com>
+Date: Thu, 2 Jan 2025 14:38:06 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/8] net: napi: add CPU affinity to
+ napi->config
+To: Shay Drori <shayd@nvidia.com>, <netdev@vger.kernel.org>
+CC: <intel-wired-lan@lists.osuosl.org>, <andrew+netdev@lunn.ch>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<davem@davemloft.net>, <michael.chan@broadcom.com>, <tariqt@nvidia.com>,
+	<anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<jdamato@fastly.com>, <akpm@linux-foundation.org>
+References: <20241218165843.744647-1-ahmed.zaki@intel.com>
+ <58e58bb6-730f-4167-9f86-92ea8ec17019@nvidia.com>
+Content-Language: en-US
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+In-Reply-To: <58e58bb6-730f-4167-9f86-92ea8ec17019@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MW4PR03CA0096.namprd03.prod.outlook.com
+ (2603:10b6:303:b7::11) To SN7PR11MB7420.namprd11.prod.outlook.com
+ (2603:10b6:806:328::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250102191227.2084046-1-skhawaja@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|CH3PR11MB7895:EE_
+X-MS-Office365-Filtering-Correlation-Id: 34043fc0-6651-4500-a1a0-08dd2b75c388
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?bFZCR2tQT3NITjZXejZUREY3R0pLM1NNbmZMQ3NXSVhQeW1Od0dQLzVhbUFy?=
+ =?utf-8?B?U2cwbGwwU3pQV1dNOUxJZ1pneU9NNm13MUdQek1YTTMwLyszV1QxU21iY3VC?=
+ =?utf-8?B?YmNIcStZSXJocHR6TW93c2xOZkRQcnY4MWhOVGhYcE9BZFYzRDBhUVZ0Y2Y0?=
+ =?utf-8?B?Z1lHQXY4WjVaUFBHaTNVMGFVZmpGOHdxNU9BT0tvdG1weUU4dGxnRVpJNWl0?=
+ =?utf-8?B?S2owZnVXUkFkMHhmYVdxazJwcWNSdHRaSUNjdGppUzVYU1ptNjc4YytabUJ3?=
+ =?utf-8?B?b0JFUENWSkZNcjF1RlBadWh3UzVFaVV5dVltRks0L09QK3pGQ3BDdFdyM0xp?=
+ =?utf-8?B?NWFKRHFvRUdjVmw4SHUyb1pjcEFKd0JrV0VybVhYR3F2aDBwU05xSnV3dC8r?=
+ =?utf-8?B?Vjd1dVlNSm1YQk4zeDYzOXJVam5zdzhVd3ZEZ21EOXNWKzFBNHdqUmV1dFVG?=
+ =?utf-8?B?aVZmeHB2STZCb2hyaHRJWUNJTzBONTlHNWhwaGdSQ2ZEc1c4eTlKUzQ4M1g1?=
+ =?utf-8?B?OFhVUkVhdHRRaGtld1VTM3R2VzlQMDBSTmtjdU8rZHZRblFMUWVGcXZFNWN0?=
+ =?utf-8?B?a1V4bTRrU3ZiaW1MYjlCdVZFRXBUUVhFUDhlajdjVU1ITWFNck5uSWJiMURo?=
+ =?utf-8?B?QjgrdkxiQmFzWlY5dmx4YnduT2R6VVQ5UjFCa0NEU1dXQ085R2duQzVtbFBu?=
+ =?utf-8?B?aURwSGRzUDNEME1jWWVSaGNPUVBCYTBFbVc3T2pXbm5Cb0FvQUthNzdITGlC?=
+ =?utf-8?B?dE93eWs1VERuMzc1UVBJSXVkc202TzBmaVkrS3JQd3NMZjlHUDUzSWF5K0sx?=
+ =?utf-8?B?blRQcHRVanFTaEJiWGlCRDdkUEd5NHovT1hCejV5dFN1K3pJV3VkN1dxdFhh?=
+ =?utf-8?B?Z0JLbGExaWxSaVJFTTdDTEozcnBPTW03eHIwS05SRHBMZW15S0ZLQzZJdlRZ?=
+ =?utf-8?B?Ui9kSG5pdnpUOFVNR2VVRVZtYlZIZGdlbGI2YVEvUXVEY3BXUy90WlVOaWlL?=
+ =?utf-8?B?ZkRJSS91bkNZaE5MQlJpSUg3QUNpVC9EQUdTbUdXbkJ5enB0aTRleUEwdDRw?=
+ =?utf-8?B?WExoQ1FWZHhRbDZVSC9kQkZhWmdsOE16TVNBTXNQWjNKa2NrS25sQXI5aWRO?=
+ =?utf-8?B?K3BISWZyeUgrbjZrcGdXTUpSNUNsckhRbktKeWJOWkNNRE1wdjVJUkVMc3hI?=
+ =?utf-8?B?SmZrYXZMRzVrcUgvWE1nUUhib25hQ284YmZ3b2pJeDlIRXRVUmM2N1laUFdO?=
+ =?utf-8?B?NmZPR251b2h4NDREUHBJRTlHelAxTUl4WVVSVjR6cDVUQVJwYWkrNlZQeEN2?=
+ =?utf-8?B?YndqL0ZhdGN4b1l1RGhXZlJ5OVovNjZYNWloKzltSlRoTSs2eGhCdlVWS242?=
+ =?utf-8?B?RlYwQjhGc0ZBb0J1TEJDMUFGM0pIdURkeEJkczlyVkZjcHB2TTQwdEVtMmF2?=
+ =?utf-8?B?cGtoV1dmZlIyWWpnZVBQeGJqOWtndE8yQkdsVmNUY2wyMEU1WHo5VHlrQ0x2?=
+ =?utf-8?B?am9qZHdrakJkdlgzUGZBY2xiSVBkZEU5TzlkSVpmblduc2lXRklNYytXcGRD?=
+ =?utf-8?B?Ymh1Kzhxb3BTcE11ZDh1dVpVYTBrVGhua003UENMUTJ4QXE2ejFROGx6SGJw?=
+ =?utf-8?B?cENxdk9tcGwyY2cyREZoUUJMdi9Ua3gvWWJTOWIyaXkzTUJZZ2Zhei9FQ2hI?=
+ =?utf-8?B?bFBZOFVGdlNsbHk3ZWJDdnFnOFZZcFZEalE4U0J4NGNOZlYyWWIyYjlKWlMz?=
+ =?utf-8?B?bzNqTnZsMThTU0VMUFdGY0lkRlFURVdRK0J0WStrMzlQaGhNRnVGckJHbjlW?=
+ =?utf-8?B?cjhlc1NLMTV2eStUNGJyREp4dGVwWHY2a0J3YW1TdGY3VGFrWmFIZGYyTFky?=
+ =?utf-8?Q?kGB1SOisbYkBH?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MlNmcUFPWUk1N2VrWFM5ZS8yVFdaOXk5QkU5UUk4WnNDNTFEOFY4cCt1ZUpP?=
+ =?utf-8?B?eVQrTk0yVFhuTjlqWlFxN0F2ODFER2lRM0cvU3VjMlhRMHJVR0hEUHdRWUNo?=
+ =?utf-8?B?ckYwSHRLN2lhdXovRTgrUFMxTENXbmliNGxjN3pZZUhzdjVhTFhpRkNGbnNN?=
+ =?utf-8?B?VEkvREZoaHJiNkJmS29FUDRlQ2VES0lvbmVtUGMzUEg0ZkwvSzhQQ1pjQUx5?=
+ =?utf-8?B?VDQ5YXNNaXNwWE9FWlJiYzZJZ1BHVEVwOTFWZi9pQWtMK0l4aUhqRGl6Sk53?=
+ =?utf-8?B?V1R1UW9tWW5JNi9KQ04rUkdnQU1RUTlXM1c3bGxRVWpZdnNHMk9NTzRDeHYy?=
+ =?utf-8?B?aSt6V05KK2JSYm1JNzRjUlV1VFpnaFBSWkJmdG5lVkw4UytQYTkzNzg5eFIv?=
+ =?utf-8?B?UjNQbmlDOFMydDM0dHNaVGRFNGp4ZEZwLzIxMUUxMXdZazkvak5ScG9xWitI?=
+ =?utf-8?B?bnRXWHhCSXp5ZEUrdm9Ic0hoY1A1WjhXSXF5N25NUzZSV1pnZXUxYVM0aGJE?=
+ =?utf-8?B?WUtqRHFpOVZHNmFjVCtFaDZTenhya0pMcEQxR2VxM2Q3NkxKSkNPNC93Rk5J?=
+ =?utf-8?B?ditiNUZsaS9mbU9OKzFYa0E4dGxyT2Ivc1RwcnZjNUdNbWhGbm9pTjVNUGlP?=
+ =?utf-8?B?eERWYXpUWWdlcDI0dXM3NVF4d3ZKWkc2d2ZNS05PcHdwVlp1SnpvNlQ1YnBq?=
+ =?utf-8?B?SEJjZnRUTzF0R1N3Y0EwRFIzY0srcHFManNpR0VKbm5hRkRLTGJBMWNoaU0x?=
+ =?utf-8?B?NlB0V1krT0xqbWRyb3dqczlpMXU5YWk0bWEyb3A2UWlkRXhWOHNWR1BVb1B6?=
+ =?utf-8?B?alNCVXg1SmRnc09WZXZFTHMxNnV3MTZ0YzBOaW5RN0c2dDFmNFlEK05OWFZY?=
+ =?utf-8?B?RlFXcEtKZnJlRHYzazdrQXQxdkNLa2t1YmZYL0R2dWFhK2cxZ000aXJFblM3?=
+ =?utf-8?B?R1M0TGZyY3NNbjJVdXBaZnpDWnNJcGlKdURYTHB2cVptMXZxSVhrNlJ1QWgy?=
+ =?utf-8?B?MFQyV3lyQUR0UDdBZWtiRmQ4bytCQVZwaFJKR0dFMisyOWoxQ1p5K09aRlNB?=
+ =?utf-8?B?Z0h2Q25VMjhOdmE4K0JZMjlWNUY1bk1wMEJCSW54bEFJeVVWNDhNcFBpOVky?=
+ =?utf-8?B?VlZ5SkRIU040a0VTZmtVbXBwOS9vZWRVOGVzZVdYcDFvVzlaMU1wUU80Q2oy?=
+ =?utf-8?B?TkNlQTVEV1cyaG5LLzkva3E2MmV2ZEQwNFo3K0diOGtQKzlBN09kQ1FYUGN2?=
+ =?utf-8?B?RmhNVTJubGVxVUZVbEUzVWwrRFd4L25MZms1MWFrMkVuQlM3dWdjeWFCWHJu?=
+ =?utf-8?B?bEVneWNydTQvSEdhbFoxcm1MUzJBT2xGYjZwdEdUMGFqVTJJYjdWSUhFMUlk?=
+ =?utf-8?B?L3RUNTRpU3BwOER5ZVBTdEg5Q3RHUmZqcGlnS2IrUTdnQ0V0Z0graHE1Yy85?=
+ =?utf-8?B?RVo4MHJFTGhkSVM0UDNWUFg4dXBDcjEzZW9OeEh4YWhZSFhyQnlqYzVKQndn?=
+ =?utf-8?B?d1kyVkZlU01xRGFpOWcvaStpU1BIVUdkcVRBVk50dmVKU1BaYmxCQSthUk01?=
+ =?utf-8?B?TXpvU2ExNGdYbjRiNU1LRzRQS1pCYjFnc3JWS1pRUEFreFhtZjRSZlJDNDEv?=
+ =?utf-8?B?eHY4YXdpQjFQSnRPcGxjMlJFYVRwaDNjckZ2UFlJb1FJVm1QNDNuUWN6NjJP?=
+ =?utf-8?B?RjU2b09rZlZvNENKSWlWNnc0Wm1hNWxyNW9wTzB5WFdJdzJTTENxeXJsUmJD?=
+ =?utf-8?B?a0NLVzJKeDFPckhobU1VQ0FIeW1VNVFNYmNKQ0I3WS9DdkVRN1gwcFdLQTlW?=
+ =?utf-8?B?ekVIMVpDejIwK2VLRG5LSy9KckxzMGkrYjZEbXlQYStNU1o0ekdVcjFwT0N3?=
+ =?utf-8?B?WDhKdWxPSHNJaWxOcEVBSUJWQ2JRa2k3WUhjT0I2K0RVT2hYSXBrU3NRMHA1?=
+ =?utf-8?B?bTNxeVZFNWNSeXc0UGFzcU1FRDhWN1M4K2hzZHdzOTZJYkJoUkI1cEM3K1k0?=
+ =?utf-8?B?QU1JV2RVamU1Rk9oSUhzWlNrNUF5VnM1dnhrdlF5SnNMYzlRRHZxc0RsMDJU?=
+ =?utf-8?B?S3V5cjFKSzRsNFJzQXZNdWdLZkN5MlVEdk00KytrRkFZZUVoYWlSZE9LSnF0?=
+ =?utf-8?Q?LV0yL82Sd9A36A9rXF0HmIGvX?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34043fc0-6651-4500-a1a0-08dd2b75c388
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2025 21:38:15.0094
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: M7UMTiZ0Eo3vzh+O4ACCv7Mv0QvO1TFmEBhm3hDgORp3Hd+W/WPiIWXi6Cd67YSLn6NV6QVnoiOrMqb/ZgS27g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7895
+X-OriginatorOrg: intel.com
 
-On 01/02, Samiullah Khawaja wrote:
-> Extend the already existing support of threaded napi poll to do continuous
-> busypolling.
-> 
-> This is used for doing continuous polling of napi to fetch descriptors from
-> backing RX/TX queues for low latency applications. Allow enabling of threaded
-> busypoll using netlink so this can be enabled on a set of dedicated napis for
-> low latency applications.
-> 
-> Currently threaded napi is only enabled at device level using sysfs. Add
-> support to enable/disable threaded mode for a napi individually. This can be
-> done using the netlink interface. Add `set_threaded` op in netlink spec that
-> allows setting the `threaded` attribute of a napi.
-> 
-> Extend the threaded attribute in napi struct to add an option to enable
-> continuous busy polling. Extend the netlink and sysfs interface to allow
-> enabled/disabling threaded busypolling at device or individual napi level.
-> 
-> Once threaded busypoll on a napi is enabled, depending on the application
-> requirements the polling thread can be moved to dedicated cores. We used this
-> for AF_XDP usecases to fetch packets from RX queues to reduce latency.
 
-Joe recently added tools/testing/selftests/net/busy_poller.c, should we
-extend it to cover your new threaded/non-thread busy/non-busy napi modes?
+
+On 2024-12-22 2:23 a.m., Shay Drori wrote:
+> 
+> 
+> On 18/12/2024 18:58, Ahmed Zaki wrote:
+>> External email: Use caution opening links or attachments
+>>
+>>
+>> Move the IRQ affinity management to the napi struct. All drivers that are
+>> already using netif_napi_set_irq() are modified to the new API. Except
+>> mlx5 because it is implementing IRQ pools and moving to the new API does
+>> not seem trivial.
+>>
+>> Tested on bnxt, ice and idpf.
+>> ---
+>> Opens: is cpu_online_mask the best default mask? drivers do this 
+>> differently
+> 
+> cpu_online_mask is not the best default mask for IRQ affinity management.
+> Here are two reasons:
+> - Performance Gains from Driver-Specific CPU Assignment: Many drivers
+>    assign different CPUs to each IRQ to optimize performance. This plays
+> a crucial role in CPU utilization.
+> - Impact of NUMA Node Distance on Traffic Performance: NUMA topology
+>    plays a crucial role in IRQ performance. Assigning IRQs to CPUs on
+>    the same NUMA node as the associated device minimizes latency caused
+>    by remote memory access.[1]
+> 
+> [1]
+> for more details on NUMA preference, you can look at commit 
+> 2acda57736de1e486036b90a648e67a3599080a1
+> 
+
+Thanks for replying.
+
+I will use cpumask_local_spread() (which now considers NUMA distances) 
+in the next iteration.
+
+
+
 
