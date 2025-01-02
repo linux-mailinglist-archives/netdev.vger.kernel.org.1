@@ -1,235 +1,217 @@
-Return-Path: <netdev+bounces-154808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8159FFD5C
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:05:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24F239FFD95
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:15:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5ECF1882B6E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:05:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 286071882C65
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699C017A5BE;
-	Thu,  2 Jan 2025 18:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F4122199234;
+	Thu,  2 Jan 2025 18:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unrealasia-net.20230601.gappssmtp.com header.i=@unrealasia-net.20230601.gappssmtp.com header.b="Wb/e4jpb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZgGGpRoP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2045.outbound.protection.outlook.com [40.107.94.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623BF1DFD1
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 18:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735841131; cv=none; b=ZZ5Mceqwxg0LXL5KvSL1NYJeYfw/XcEUqumsbRiJ2UZFmtPBgAXBZbuxnDu/X2v0V53aQaL+ucbKZzk+bGyev4q/uFyAvClKN/2y9T5gAh7bf9XNZJwI1iuQL8F1qWNVuAQlO4ljtBdD0+P1DEJs9snmktvlk74UM91MgTLk3Vo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735841131; c=relaxed/simple;
-	bh=/jPEgfEu3GFzMVRi+9V9FslZO/+QuFgHwrc3xATIJoQ=;
-	h=Date:From:Subject:To:Cc:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lOQvSBwtX5FI68VtlFIQQYx28Bqwal/uUQgOI9a0wINaxddEjhOV3HL8pMP1fNkvSSnRvyETOW8HiByFrqn55Omdrf/f2zRvrxezEIBX58kDbDErgpfmTdA03kFPqtY6q2esSToDVK53ytLDta7Gk5iUERkzO/G64yA135Pxqv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unrealasia.net; spf=pass smtp.mailfrom=unrealasia.net; dkim=pass (2048-bit key) header.d=unrealasia-net.20230601.gappssmtp.com header.i=@unrealasia-net.20230601.gappssmtp.com header.b=Wb/e4jpb; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unrealasia.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unrealasia.net
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-21669fd5c7cso160628995ad.3
-        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 10:05:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=unrealasia-net.20230601.gappssmtp.com; s=20230601; t=1735841128; x=1736445928; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:cc:to:subject:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cHfmL1j5U1EnudMBqnhlnT1yaVVEpOA39jRj2MMuM1A=;
-        b=Wb/e4jpbo1EzpiZKoH/5zJnsjIEOmVhRcd3fkQrtM4pEPm7lVFVXFI4rKnTPiaY4CP
-         nG1JhHuU3jyjA6r/868hy9dCInQss6yxxg2fBqni+M6XbN7jBCT3cgYpi/lUQcfky3fI
-         oeq6ycAjFQ2R+m+kvRFIgRbInhuYdg3JEPcHqyhInOoeXdAah04xBtsSiHE3/meLNPvi
-         tPqk11I4qY+UaHsuZSGI/M5fc1ngT5L0i0E1YPEFANuWg5RnppZLHXtXqOdWHtHQePZa
-         U+Jz7+eJzPUwyv+xiRB28qK1iNWiDLwOzg02Mb6sa20Hi9AD7BV6jqHgl32zpbCaSa4n
-         bLHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735841128; x=1736445928;
-        h=mime-version:references:in-reply-to:message-id:cc:to:subject:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cHfmL1j5U1EnudMBqnhlnT1yaVVEpOA39jRj2MMuM1A=;
-        b=wZDjzwOCQTmqfOlvko6/bPIggEhFzZmXD6AXKYfqIqSUpM8zHYaOBlWUCDqZrH1gtC
-         KtMTWIfOtucSrYPnzbbz6N9DlupJieHg2Qd3CsvquAMg+ThufC+sq5KhM/gozkuAl6bW
-         1S1d0Fpnb5eh5oDfcPOKjioVsgtYBnmfRFm29hMnYY5YYmF2xr4586qOvBCyYcugR7mW
-         prfluytiCWc9sDBdWhOrDswo/M3i1LSaiHQucchr+W/TN5JGRd6taqN/whFbLY9JDTxf
-         VtMje0usHYDN9hX6GeNX5FKzV1UkN+PQ66s5B+RvyqGzl9BHsF66EuTvEtBeNcY2vxfd
-         zYqQ==
-X-Gm-Message-State: AOJu0Yyw7Ega+kp/woLCh8IOgU93nuKYsu+BTANqL7SzWMhX2tGyfwzZ
-	uuT5X4GduVUI4AXrbNEAQeK9m5vGtKO5xPSHN68pPVN66dnVUTJxYwp68KNDCWE=
-X-Gm-Gg: ASbGncuBEi4fXoC8SIs4q9H4lv1A/nP1Kvfof4YG5IDzK7mMyJyphJEe7hHV9AI+3RE
-	E3BoysaTC3IUtw6tD+Ip13PhOYNbwN4wmIdmdCGUM6Bpo5XOY3sOSFldnLqcdtaDpYXkkOJS6mg
-	1FSvEdQA5CvgAl7IZZcM/WC2JeTaQOJVHxwYSpZMY3nE5wnAukDL4/kx2m3k6EN2C080XvhiGfI
-	3C6XAr4dAZHg++xtlDX6nyxk8WSzydUUGlkkxGY2973U99iSm6ufXeWZmjXRk7mOvMD
-X-Google-Smtp-Source: AGHT+IHuw62LLZ5iWQCffcpU25vNIPQ3BL3dILOyC5dyfyjInG4gi4DEeFfqlWHT4Wp4ip+wOqMPbQ==
-X-Received: by 2002:a05:6a20:c79a:b0:1dc:37a:8dc0 with SMTP id adf61e73a8af0-1e5e048b223mr68308151637.21.1735841128534;
-        Thu, 02 Jan 2025 10:05:28 -0800 (PST)
-Received: from muhammads-ThinkPad ([2001:e68:5473:b14:5c5:4698:43ff:2f5b])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad836d22sm24664284b3a.77.2025.01.02.10.05.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jan 2025 10:05:28 -0800 (PST)
-Date: Fri, 03 Jan 2025 02:05:19 +0800
-From: Muhammad Nuzaihan <zaihan@unrealasia.net>
-Subject: Re: [PATCH] Add NMEA GPS character device for PCIe MHI Quectel Module
- to read NMEA statements.
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: netdev@vger.kernel.org, Loic Poulain <loic.poulain@linaro.org>,
-	Johannes Berg <johannes@sipsolutions.net>, Andrew Lunn <andrew@lunn.ch>,
-	Slark Xiao <slark_xiao@163.com>
-Message-Id: <VK3HPS.SZBNRWNH78611@unrealasia.net>
-In-Reply-To: <aea78599-0d3f-42d9-8f3e-0e90c37a31b8@gmail.com>
-References: <R8AFPS.THYVK2DKSEE83@unrealasia.net>
-	<5LHFPS.G3DNPFBCDKCL2@unrealasia.net>
-	<aea78599-0d3f-42d9-8f3e-0e90c37a31b8@gmail.com>
-X-Mailer: geary/40.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C141B4120
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 18:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735841721; cv=fail; b=rzL8LENxydQncxraDw8DzGxQP6IFtM+1DztnNoERZs/ytlWal65TzdGOfo3oMTTHDHRQc3EzlZvtTKGMbq//fGJowEH3yY73rSXd0Zd9rLAcOW52+lQaQ6uM7wt834hF+5ty+XeR951N8mGN24tR1a2zXWxUUjuITHCSeYwpORQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735841721; c=relaxed/simple;
+	bh=9xz3qiA2OyfzfVWixHta0c2R32/m8SqwE+iArawR8iw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RgaU0w4J4+AGo23RgkImiLZkCfW/k0oQlzsPMy/rz0s9iP35ddueX7O3w1ODkVZCiTHJpH6DJR5nN3kRfs611tqvpbYFGWVtryCSy5c3pOoN/L72DkxRQlaEVZG2Ug0z1SKrFTvr+AFwrjeZzUt3j4bG3+77toLrbLmAQ+0uBlc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZgGGpRoP; arc=fail smtp.client-ip=40.107.94.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QEU3dRnVS2tN6znJnY3U6np69y/dMczZKH1tVCuNpJ75++yeViGYklhK/qoOEht2VYVoGpHOl+LKTwrO2fA0wpBL9TkbKWhuzCibkViS8ZrGfnCAlM8JJaNK+7cXrP0lfHdDkIOiq+DxJQFRAMG7K2GHLrEuxAU7urnol0bCH518WmcTPV7XJwwlRW3y/9h2E0RVscSvtWgeVGd/EE5X1YlUC1S9WK/faKItR8ie5k+P+G01PgViecvbkLEiiDzgKRkSwzUDCsQzbDbo3VsnHUCndYyKa96Aj7pOouhqj/YJ+gRznH+Mqj3nEnYqsDoBHcxe5tXftyWssSQuvm0nXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zBGLLlYl8guUDfpxcz1qdPlVqkLict8JWL+cq31MtYo=;
+ b=e1onlt03c3TL0YuiQO3+VUJ6M8WLgPBFtoZ7lIwtDcItkYSZGVnZN5ar38IDwQahrRxKWlPPQ21Gobp9JgI3UHO5uvUqdawNLgSog+HTY71Uz/0PG0ltyNBNLBL4EicQMrvUdhQcgn/YVRtnL40ekfiKfmrsDLcesq782jXHr/JYWQqjkZi7W2r10Ig6BJQ/I77LUMCFEdKkgO07/67AGyKODjFiqGRIMW3wOZ+PL8IJBRE8rjcS0uj/rbxWOnCyOBahDH56TG8acr1sE22SWnTotVV6Y3Z8iiBtPOEATEpFxqpiDjDkWFKIK4YpjhxX0+l0I5E7ioqpOB1D47oocA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zBGLLlYl8guUDfpxcz1qdPlVqkLict8JWL+cq31MtYo=;
+ b=ZgGGpRoPg9+CWrscui2fJzoGIdgmyuB/Sufru6K93SZXZK38Z3OB76Xg5KMDSHSmB2fjESrREDoMC07iZw1N/kr2f2O2n+CWOFEXm9i0uXgMcWCYvhLAfXmP9ayg3iAV5B5sp64eUr/WjREvfzLf/+9h5VREiB04CSlfCO0EKo5luVnb/Ev/TztPOLSVe4MD9EMbqaIGpR/B862q7X7hPbf7OdAnQgDee7RPmVMv/+TKjKARnWll4MxP1/iaLBnJZxouU1FmW3gdxfj+EAmHkzahnx/C+6V0WF034NqtNyx0XP3+9I6lfTHgiuue58IcsnlGl7zU/qgVtBCIpFDXyA==
+Received: from MN2PR22CA0015.namprd22.prod.outlook.com (2603:10b6:208:238::20)
+ by CH3PR12MB7522.namprd12.prod.outlook.com (2603:10b6:610:142::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.12; Thu, 2 Jan
+ 2025 18:15:10 +0000
+Received: from MN1PEPF0000F0E1.namprd04.prod.outlook.com
+ (2603:10b6:208:238:cafe::e) by MN2PR22CA0015.outlook.office365.com
+ (2603:10b6:208:238::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8314.12 via Frontend Transport; Thu,
+ 2 Jan 2025 18:15:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MN1PEPF0000F0E1.mail.protection.outlook.com (10.167.242.39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8314.11 via Frontend Transport; Thu, 2 Jan 2025 18:15:09 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 2 Jan 2025
+ 10:14:57 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 2 Jan 2025
+ 10:14:57 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Thu, 2 Jan
+ 2025 10:14:53 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Yevgeny Kliteynik
+	<kliteyn@nvidia.com>, Vlad Dogaru <vdogaru@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net-next 00/15] mlx5 Hardware Steering part 2
+Date: Thu, 2 Jan 2025 20:13:59 +0200
+Message-ID: <20250102181415.1477316-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E1:EE_|CH3PR12MB7522:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e695234-deef-43b8-8606-08dd2b5964ae
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?9hbxFde+nD1lipg4ibPjOw8p3gizYNq2B09U5eczbAIwTk0DnTwIZ4DaJz68?=
+ =?us-ascii?Q?9glZfiQYOK5IAltsqKAgCFpV4O3wDwKVvhKg0PjKj+N6J57mrBzypK9Yt3cq?=
+ =?us-ascii?Q?CkAkiyPi4Cd0SobkZt1ITQpnpgmGOhucmdQvzcZwnjZkyLZiaJt6AQ6snJMe?=
+ =?us-ascii?Q?Anjp+O/ackzBp+CD2mhPf0MrIEPZ32IFLDqfzksbZkyH+MqWQTOMFNrr9pQh?=
+ =?us-ascii?Q?RW2VbJwmo2FU/v+ARxI4vJyrt0giAwzKSYySBAX4SamDCNC/HvG/64EHW4t+?=
+ =?us-ascii?Q?zM2jXLyCNU3kBpvWI6p5F1Lg+VO49XkVtqnpwchZipGC/U65A5KLStU7wQ+o?=
+ =?us-ascii?Q?X5qksSjTV4wQOyvVKdGPl5syEg8sL42ubdqjbS7/1Abnj+l9Hs8mMx/YOb+f?=
+ =?us-ascii?Q?XXXoA7Z8Ozta8/WF53Wkq+jTcNlWu0ZcjQkyl4fjzLaKOcpKTY/vmKSsh7la?=
+ =?us-ascii?Q?ksfqA8Adi1bSEA4aT7H0NkgMLxNPmtPbX2qw4dKkgNvx+a/F4tZg0JvrBGx/?=
+ =?us-ascii?Q?zh/BIw1jD5TXecTGNfhOA4kUY52m2LrsZWEwgLoDg2bRUYgEg2a8A0Vqebjv?=
+ =?us-ascii?Q?ikqxIqikBp4lxBi2qep/BboHvo9OGx+LCy9ploPZ12UTq7MoUDjT8DSY8eI3?=
+ =?us-ascii?Q?ey41fPOW5m5Dad93wUVzQyXnPJofK/Emlab1vMff7ul0QHyNt7T5oVTuyd5k?=
+ =?us-ascii?Q?ELSsQ/NWVYrldkb6MtCxwevhTGFSMQmFpUdaYi1c6hCJ17OPXZeVzKjRd87H?=
+ =?us-ascii?Q?fxlYhp5Vsnb/flAw3IC6HQkEMfCP4LXYKfkJfznWOMh/RzLvPj3DdPO0sytK?=
+ =?us-ascii?Q?9S0Oc/hqpTe+zhZNOSKYVu77kWo9OBp1AtpxBp6c6z/OXa9Lx488IAHa+5U4?=
+ =?us-ascii?Q?DNOh5O/jDOvbV6OogrSIbtA9ITFL1Y6Jd9agsbm6qnrO3kPBAc6SOf/hACwf?=
+ =?us-ascii?Q?jpp6ifknVd+LW4CvVw2qy9j1esQ7PS3Mqt1tXt1aMIVKdOvXNGcDYp1YbhKg?=
+ =?us-ascii?Q?6Z043IigyAJGD+v9pAjYVplDhIaZS8prHRuHKU7r/ijLfNjOkl79K9BWLUsR?=
+ =?us-ascii?Q?uW00BZbriJ1EfVdd8O0upx1vU4K9VZp5EUDdfFg8Tp5wF9Qm4G9OayinP+ru?=
+ =?us-ascii?Q?4oUzy2RQORvziie5qS2gOQUWJCAFAdWVhcgfeOzL6aCdqWMgQ5lRfafbVyMt?=
+ =?us-ascii?Q?841aPCK3FcxWqYDgdRePH1TMzsxR1Rr5gVonba3vpxS7QoXdt54Wp9V5JU08?=
+ =?us-ascii?Q?kZDn4uJ23VdafhXyKn2o/xGGWDv6nhLv049mXm3Efx9+saT6J7xVmuLfuY2/?=
+ =?us-ascii?Q?zJm2QE7boFZQLXc42gQNcf/g1pXbh20QDp2P3J8D8eswM0Uwh9b/ZrzLNh5v?=
+ =?us-ascii?Q?hzph+dX9XPv+eELg1XRXkPbpWJiTBev6HucFvY++kLoxbC4S7Xf+LywitBUI?=
+ =?us-ascii?Q?EWQkp7W1Ri1JBqqRPl8nhbN7bQ1RAXPKyPJx6M1uL3Wfzu6M+qlUO62jsj/S?=
+ =?us-ascii?Q?Sx40IzKl7GL/ogg=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2025 18:15:09.5690
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e695234-deef-43b8-8606-08dd2b5964ae
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E1.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7522
 
-Hi Sergey,
+Hi,
 
-So there is a separate GNSS subsystem in the linux kernel. I'll check 
-that out.
+Happy new year!
 
-I went through a bit of research to get this working. Went to quectel 
-forums to figure out and quectel has their own set of drivers. They 
-showed me their own source code and they have their own implementation 
-of their NMEA interface in their driver with port at /dev/mhi_LOOPBACK.
+This series contain HWS code cleanups, enhancements, bug fixes, and
+additions. Note that some of these patches are fixing bugs in existing
+code, but we submit them without 'Fixes' tag to avoid the unnecessary
+burden for stable releases, as HWS still couldn't be enabled.
 
-But i was not quite happy because i have to use their connection 
-manager instead of ModemManager since i am using it for my Lenovo 
-laptop and not embedded which their software was designed for.
+Patches 1-5:
+HWS, various code cleanups and enhancements
 
-Went around /sys in the kernel and found:
+Patches 6-14:
+HWS, various bug fixes and additions
 
-root@muhammads-ThinkPad:/sys# find . -name 'mhi0*'
-./devices/pci0000:00/0000:00:1c.6/0000:08:00.0/mhi0
-./devices/pci0000:00/0000:00:1c.6/0000:08:00.0/mhi0/mhi0_DIAG
-./devices/pci0000:00/0000:00:1c.6/0000:08:00.0/mhi0/mhi0_IP_HW0_MBIM
-./devices/pci0000:00/0000:00:1c.6/0000:08:00.0/mhi0/mhi0_MBIM
-./devices/pci0000:00/0000:00:1c.6/0000:08:00.0/mhi0/mhi0_NMEA
-./devices/pci0000:00/0000:00:1c.6/0000:08:00.0/mhi0/mhi0_DUN
-./bus/mhi/devices/mhi0
-./bus/mhi/devices/mhi0_DIAG
-./bus/mhi/devices/mhi0_IP_HW0_MBIM
-./bus/mhi/devices/mhi0_MBIM
-./bus/mhi/devices/mhi0_NMEA
-./bus/mhi/devices/mhi0_DUN
-./bus/mhi/drivers/mhi_wwan_mbim/mhi0_IP_HW0_MBIM
-./bus/mhi/drivers/mhi_wwan_ctrl/mhi0_DIAG
-./bus/mhi/drivers/mhi_wwan_ctrl/mhi0_MBIM
-./bus/mhi/drivers/mhi_wwan_ctrl/mhi0_NMEA
-./bus/mhi/drivers/mhi_wwan_ctrl/mhi0_DUN
-
-So i figured it has mhi0_NMEA and that's how i thought of writing the 
-patch to expose mhi0_NMEA after reading some linaro guy's presentation 
-on MHI and his initial mhi0_QMI work with ModemManager.
-
-With my patch, on bootup, it doesn't automatically attach nmea0 port at 
-all, 5G works properly with modemmanager at boot but no nmea port.
-
-To get that nmea0 port i had to unload all mhi_* and wwan modules and 
-load them back again to ensure wwan0nmea0 gets attached to /dev.
-
-After that i run commands with quectel's own AT commands at wwan0at0 
-with AT+QGPS+1 and then AT+QGPSGNMEA="RMC" (also 
-AT+QGPSCFG="outport",usbnmea) and this starts the streaming of the NMEA 
-gps statements. If i don't run the AT commands, even 5G connectivity 
-with modemmananager do not work as well. After running it, all NMEA 
-streams starts to come and 5G connectivity works.
-
-After that i would only run gpsd to read /dev/wwan0nmea0 (the port can 
-only be use/locked by one program) and run cgps (client gps) to make 
-nmea values more easier to read.
-
-All this is stable, i have been running "cgps" program for hours 
-together with 5g on modemmanager and no issues. Just the above quirks 
-about unloading and loading of kernel modules and running AT commands 
-(i wrote a shell script to automate this)
-
-I can try to help out as much as i can.
-
-NMEA continous stream
----
-
-Welcome to minicom 2.8
-
-OPTIONS: I18n
-Port /dev/wwan0nmea0, 22:50:48
-
-Press CTRL-A Z for help on special keys
-
-$GPRMC,172551.00,A,0607.736155,N,10217.012565,E,0.0,,020125,0.4,W,A,V*74
-$GPRMC,172552.00,A,0607.736156,N,10217.012566,E,0.0,,020125,0.4,W,A,V*77
-$GPGGA,172553.00,0607.736156,N,10217.012566,E,1,07,0.4,15.0,M,-7.3,M,,*47
-$GPRMC,172553.00,A,0607.736156,N,10217.012566,E,0.0,,020125,0.4,W,A,V*76
-$GPGGA,172554.00,0607.736157,N,10217.012567,E,1,07,0.4,15.0,M,-7.3,M,,*40
-$GPRMC,172554.00,A,0607.736157,N,10217.012567,E,0.0,,020125,0.4,W,A,V*71
-... continuously
-
+Patch 15:
+HWS, setting timeout on polling
 
 Regards,
-Zaihan
+Tariq
 
-On Thu, Jan 2 2025 at 07:18:46 PM +0200, Sergey Ryazanov 
-<ryazanov.s.a@gmail.com> wrote:
-> Hi Muhammad and welcome to netdev,
-> 
-> On 01.01.2025 23:12, Muhammad Nuzaihan wrote:
->> Hi netdev,
->> 
->> I made a mistake in choosing AT mode IPC, which is incorrect. For 
->> NMEA streams it should use LOOPBACK for IPC. If it uses AT, i 
->> noticed that using gpsd will cause intermittent IOCTL errors which 
->> is caused when gpsd wants to write to the device.
->> 
->> Attached is the patch.
-> 
-> Do you had a chance to check this discussion: 
-> https://lore.kernel.org/all/CAMZdPi_MF=-AjTaBZ_HxtwpbQK5+WwR9eXsSvnvK_-O30ff+Tw@mail.gmail.com/
-> 
-> To summarize, an NMEA port suppose to be exported through the GNSS 
-> subsystem to properly indicate the device class. Still, the port 
-> needs to be exported through the WWAN subsystem to facilitate a 
-> corresponding control port discovery. Looks like that the WWAN 
-> changes going to be a bit more tricky.
-> 
->> Thank you.
->> 
->> Signed-off-by: Muhammad Nuzaihan Bin Kamal Luddin 
->> <zaihan@unrealasia.net>
->> 
->> On Thu, Jan 2 2025 at 02:34:03 AM +0800, Muhammad Nuzaihan 
->> <zaihan@unrealasia.net> wrote:
->>> Hi netdev,
->>> 
->>> I am using a Quectel RM520N-GL *PCIe* (not USB) module which uses 
->>> the MHI interface.
->>> 
->>> In /devices/pci0000:00/0000:00:1c.6/0000:08:00.0/mhi0 i can see 
->>> "mhi0_NMEA" but the actual NMEA device is missing in /dev and 
->>> needs a character device to be useful with tty programs.
->>> 
->>> NMEA statements are a stream of GPS information which is used to 
->>> tell the current device location in the console (like minicom).
->>> 
->>> Attached is the patch to ensure a device is registered (as /dev/ 
->>> wwan0nmea0) so this device will stream GPS NMEA statements and 
->>> can be used to be read by popular GPS tools like gpsd and then 
->>> tracking with cgps, xgps, QGIS, etc.
->>> 
->>> Regards,
->>> Muhammad Nuzaihan
->>> 
->>> Signed-off-by: Muhammad Nuzaihan Bin Kamal Luddin 
->>> <zaihan@unrealasia.net>
->>> 
->> 
-> 
+Vlad Dogaru (2):
+  net/mlx5: HWS, handle returned error value in pool alloc
+  net/mlx5: HWS, support flow sampler destination
 
+Yevgeny Kliteynik (13):
+  net/mlx5: HWS, remove the use of duplicated structs
+  net/mlx5: HWS, remove implementation of unused FW commands
+  net/mlx5: HWS, denote how refcounts are protected
+  net/mlx5: HWS, simplify allocations as we support only FDB
+  net/mlx5: HWS, add error message on failure to move rules
+  net/mlx5: HWS, change error flow on matcher disconnect
+  net/mlx5: HWS, remove wrong deletion of the miss table list
+  net/mlx5: HWS, reduce memory consumption of a matcher struct
+  net/mlx5: HWS, num_of_rules counter on matcher should be atomic
+  net/mlx5: HWS, separate SQ that HWS uses from the usual traffic SQs
+  net/mlx5: HWS, fix definer's HWS_SET32 macro for negative offset
+  net/mlx5: HWS, use the right size when writing arg data
+  net/mlx5: HWS, set timeout on polling for completion
+
+ .../mellanox/mlx5/core/steering/hws/action.c  | 159 +++++++++++-------
+ .../mellanox/mlx5/core/steering/hws/action.h  |   9 +-
+ .../mellanox/mlx5/core/steering/hws/bwc.c     |  54 ++++--
+ .../mellanox/mlx5/core/steering/hws/bwc.h     |  12 +-
+ .../mellanox/mlx5/core/steering/hws/cmd.c     |  95 ++---------
+ .../mellanox/mlx5/core/steering/hws/cmd.h     |  13 +-
+ .../mellanox/mlx5/core/steering/hws/context.c |  29 +---
+ .../mellanox/mlx5/core/steering/hws/context.h |   4 +-
+ .../mellanox/mlx5/core/steering/hws/debug.c   |  36 ++--
+ .../mellanox/mlx5/core/steering/hws/definer.c |   2 +-
+ .../mellanox/mlx5/core/steering/hws/definer.h |   2 +-
+ .../mellanox/mlx5/core/steering/hws/matcher.c |  36 ++--
+ .../mellanox/mlx5/core/steering/hws/pat_arg.c |   2 +-
+ .../mellanox/mlx5/core/steering/hws/pat_arg.h |   2 +-
+ .../mellanox/mlx5/core/steering/hws/pool.c    |   4 +-
+ .../mellanox/mlx5/core/steering/hws/prm.h     |  42 -----
+ .../mellanox/mlx5/core/steering/hws/rule.c    |   2 +-
+ .../mellanox/mlx5/core/steering/hws/send.c    |   1 +
+ .../mellanox/mlx5/core/steering/hws/table.c   |  22 +--
+ 19 files changed, 227 insertions(+), 299 deletions(-)
+
+
+base-commit: 9268abe611b09edc975aa27e6ce829f629352ff4
+-- 
+2.45.0
 
 
