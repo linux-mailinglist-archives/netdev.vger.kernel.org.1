@@ -1,115 +1,175 @@
-Return-Path: <netdev+bounces-154678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CEE79FF6A8
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 08:55:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF13E9FF6B6
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 09:03:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4A4716190C
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 07:55:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81DB07A1040
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 08:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788E6189B8D;
-	Thu,  2 Jan 2025 07:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0971918FDC8;
+	Thu,  2 Jan 2025 08:03:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MzGZZZF8"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="sr16UcBm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01CB7462;
-	Thu,  2 Jan 2025 07:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8FA43ABD
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 08:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735804507; cv=none; b=h2IkPSWjGtA5upviDhpdlWtFBmFBny2fWSKWCwAO8//IsXYmAodCmnX0ciVNQ1Z3a0hcDKdk1obiQ4r+pK6UOUvolhd5pw6Su21WdLlHVMDG4zQxEm8+0UJ/sWwM2dSBrFxcEMIlTaFwEZSLgBCP9HSsE4ad3n14yUTKuibqgsM=
+	t=1735805012; cv=none; b=WuU6fMgg3XZ0oqwkx57iZKJaaya90XrSwQGkSZShfvLpV8F6oFTI8Zb/2eHgCJ4Pfvj90IZk/JvNpr+vltehUfKVxFu0FgMH6qkCHGoQ0ZFMpGDdGVh6INz2LhA4Af09EVfJvBg1zgVl3hYAfWoJ9v4AHGaDURcJr6C6V3FRnY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735804507; c=relaxed/simple;
-	bh=NVFfblbS3lMcWK/GL8mdFjfUXmqxf9KDwkl4KTFviu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oUf6ELbD1tHJse4T/6OuZdpivtgMX6JClYLaika3qi67hD77hPapl4/pYOlq50Y4vv6K991DPtvHyEJZ9n6b2eT6GTclrzmB6oilKp60oA8sGXYA24KYpTxuByFTeARvgmVWavNa7A1+PR5rUPVkHjBoHRe7eBO6cGrj36TGGjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MzGZZZF8; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-385d7f19f20so4915726f8f.1;
-        Wed, 01 Jan 2025 23:55:05 -0800 (PST)
+	s=arc-20240116; t=1735805012; c=relaxed/simple;
+	bh=DR4wdnenOG8vHLkdyZnSN0AALnVlaywfGc5jqq5OiZA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TmrhtcBR0oh9Ga6JyRs52hfIQgeaUqLciuBgkQqJ3TgViOWOkm63mynu+459EoLbjr4Hk7vaTDIesVdSiOriEmm8MZZL6bqq/bTld7Rk23FaWj2DMfskA2gtKegowYUCHGzw3bwVAtcOQ5XbbS4Chk/YGKvaOYyKNVndvcD34hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=sr16UcBm; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735804504; x=1736409304; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=21PdAWMAUs+juBjbrgiF/HUrZBkf63En0qTbwNFDMII=;
-        b=MzGZZZF8cMiZNUBszhNK5wExr+UutVWoG1UrgXkKK5PXVcH7XWr3NDae10N3ZJjCD4
-         5Cbr2FvmM7riHv93t9ThBZqxs/M5tpg+yk0GnK9DeSU6a3ffcJ4yyMftS+BGTSpzqg7U
-         I0v8vK2z8uiA/fArdEYyiz8mZva2jboGqqn3LEXfz0VblfYOzqIM2ACIqVOUb1RGZXmR
-         jdoA4B1wQx76TNzWYXg1eizvPsb22kBYPh534nVGsp1OWYDHN4pLHORFkT8Xq3XBgWzW
-         6L/b8H9XChtZ0CflbdxLIXpHndOMJlD/orYzxOYxVVr9GZc4PMANnL/I6RBwGcruM3KQ
-         SSRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735804504; x=1736409304;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=21PdAWMAUs+juBjbrgiF/HUrZBkf63En0qTbwNFDMII=;
-        b=HOxoeT998ft8Cyll5e5iMGMLhNlx1JSn19noPjv02daoAuh1xs27TgqrGvrur4kjRf
-         oxPP+2GFCqWOOYZ8PxCBcwzppy1SoM+I+XvOPn9njIXI/1ZspfRCmzcRO4zSHf3ntGoR
-         JN/IdnyEzKxMvs2KLx1q/ZSu0mWeDH1XW5CIaekjqqJjRO8whn3Ihp63NwbBEDfVCA3B
-         gUVUK6xnF16bCl8YUOTDPYAuUoZ90nFjjTgQnC1+1N2tPR3j2WB/37fT3/5nMLZfT/G7
-         AObKQ4f0D3n7iEx/r7EqIdwsqD5J1nxPwIstCEKBvwi/x9Vvx1SKJj7+2B1TrCoThI2I
-         xDDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX57OVxlSWwkrvNHpD1p0vV+LXezZ7118JQ1ufvGuU1hmubmBw1J4M3+eaJ1jDeQG6y8cstrZ3f@vger.kernel.org, AJvYcCXGaEJLbUZwPp5ylLqINBp6dLI1UEYZ605P40X7uYQwyYs4vaTLQbhpGB87rqsRWhdrxu4nCSvVPOX33wk=@vger.kernel.org, AJvYcCXYTbxwvZXV1xs5d7MD76NlLU+t2VgmFjAkbPc2qphOeJAhNWTRek4rY/Z0JppaOOM1YdmmNfFHQTFHxqP+mw4s@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx43TjVFZYR94iRLps2QKFUnntSsKiuhmPVDsnZ1AO8jNOUEu4H
-	TqDmkebGAGi8S4VHpBslZL10pDTc0mFxCJ4MrKMvnrl7d/I0vcKF
-X-Gm-Gg: ASbGncthat9J6TFLIAFRBIxJqmUw6BSZtTQxuOyUnPRMyhXFP7bgMyWlW5AsagfEeJV
-	k/7DV8QI97f5l7F8S4OktCDQtdouAxqnGTrZjMrYvymuKDCUxQwpJlnR9ERxyaLHpYbg9AOcTDJ
-	5STVEIEA6pW/LGFVrkGZXNjHf/QsAaL9Zr664oBwBtnxzKeeNW45slfEhbAIHWmlbZK/M3Voef+
-	ahLV6D5xP2rk5RvBHt5LLucIuyUd5zrdLwxsL4gIwq9unWpW6JzS0ibk2uMa8aq42wJTsmxnCcm
-	bhwbUPAqrzm4ejyhQtuDVZ4=
-X-Google-Smtp-Source: AGHT+IFS3ftjCGfPxOh+oOILCCwBruzBoy47uyjrGLknOFy7mfJf06BTNHs52HcejXh2iAiLvau77g==
-X-Received: by 2002:adf:b30d:0:b0:38a:5122:5a07 with SMTP id ffacd0b85a97d-38a51225b64mr11240653f8f.15.1735804503927;
-        Wed, 01 Jan 2025 23:55:03 -0800 (PST)
-Received: from dsl-u17-10 (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c833280sm37575763f8f.40.2025.01.01.23.55.02
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 01 Jan 2025 23:55:03 -0800 (PST)
-Date: Thu, 2 Jan 2025 07:55:02 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: egyszeregy@freemail.hu, pablo@netfilter.org, lorenzo@kernel.org,
- daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
- kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] netfilter: uapi: Merge xt_*.h/c and ipt_*.h which has
- same name.
-Message-ID: <20250102075502.3b8fbc95@dsl-u17-10>
-In-Reply-To: <20250101224644.GA18527@breakpoint.cc>
-References: <20250101192015.1577-1-egyszeregy@freemail.hu>
-	<20250101224644.GA18527@breakpoint.cc>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1735805012; x=1767341012;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=vTdFBj5R34xDjaxAEwjE5WkscJhpe8Yv2EvjwqGM+qE=;
+  b=sr16UcBmaX1h6YRkJW5wdSIeK5dmgCW1TNReF1z23QHUqeLyEl53TsNb
+   y+f22mmMxIPQFotLFaE2Mg25maAg3q1wKmJuaCQyUdAbIODICd567AdGa
+   WcAtsOgWSqgoF4BlcEkWZB8TKW8+2gShuC5L1/XxmsL367I5mSOL54V2U
+   I=;
+X-IronPort-AV: E=Sophos;i="6.12,284,1728950400"; 
+   d="scan'208";a="455844596"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2025 08:03:12 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:38769]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.219:2525] with esmtp (Farcaster)
+ id 74d38b1e-fb68-4743-9f04-52dee7d2e846; Thu, 2 Jan 2025 08:03:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 74d38b1e-fb68-4743-9f04-52dee7d2e846
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 2 Jan 2025 08:03:11 +0000
+Received: from 6c7e67c6786f.amazon.com (10.119.0.24) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 2 Jan 2025 08:03:07 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <dzq.aishenghu0@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kerneljasonxing@gmail.com>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<kuniyu@amazon.com>
+Subject: Re: perhaps inet_csk_reqsk_queue_is_full should also allow zero backlog
+Date: Thu, 2 Jan 2025 17:02:58 +0900
+Message-ID: <20250102080258.53858-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <CAFmV8NffAhhBR74xiq6QmkmyDq00u9_GxORNk+0kbFHk9yNjcw@mail.gmail.com>
+References: <CAFmV8NffAhhBR74xiq6QmkmyDq00u9_GxORNk+0kbFHk9yNjcw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, 1 Jan 2025 23:46:44 +0100
-Florian Westphal <fw@strlen.de> wrote:
-
-> egyszeregy@freemail.hu <egyszeregy@freemail.hu> wrote:
-> >  /* match info */
-> > -struct xt_dscp_info {
-> > +struct xt_dscp_match_info {  
+From: Zhongqiu Duan <dzq.aishenghu0@gmail.com>
+Date: Wed, 1 Jan 2025 23:02:56 +0800
+> On Wed, Jan 1, 2025 at 9:53 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
+> >
+> > On Tue, Dec 31, 2024 at 4:24 PM Zhongqiu Duan <dzq.aishenghu0@gmail.com> wrote:
+> > >
+> > > Hi all,
+> > >
+> > > We use a proprietary library in our product, it passes hardcoded zero
+> > > as the backlog of listen().
+> > > It works fine when syncookies is enabled, but when we disable syncookies
+> > > by business requirement, no connection can be made.
+> >
+> > I'm not that sure that the problem you encountered is the same as
+> > mine. I manage to reproduce it locally after noticing your report:
+> > 1) write the simplest c code with passing 0 as the backlog
+> > 2) adjust the value of net.ipv4.tcp_syncookies to see the different results
+> >
+> > When net.ipv4.tcp_syncookies is set zero only, the connection will not
+> > be established.
+> >
 > 
-> To add to what Jan already pointed out, such renames
-> break UAPI, please don't do this.
+> Yes, that's the problem I want to describe.
+> 
+> > >
+> > > After some investigation, the problem is focused on the
+> > > inet_csk_reqsk_queue_is_full().
+> > >
+> > > static inline int inet_csk_reqsk_queue_is_full(const struct sock *sk)
+> > > {
+> > >         return inet_csk_reqsk_queue_len(sk) >=
+> > > READ_ONCE(sk->sk_max_ack_backlog);
+> > > }
+> > >
+> > > I noticed that the stories happened to sk_acceptq_is_full() about this
+> > > in the past, like
+> > > the commit c609e6a (Revert "net: correct sk_acceptq_is_full()").
+> > >
+> > > Perhaps we can also avoid the problem by using ">" in the decision
+> > > condition like
+> > > `inet_csk_reqsk_queue_len(sk) > READ_ONCE(sk->sk_max_ack_backlog)`.
+> >
+> > According to the experiment I conducted, I agree the above triggers
+> > the drop in tcp_conn_request(). When that sysctl is set to zero, the
+> > return value of tcp_syn_flood_action() is false, which leads to an
+> > immediate drop.
+> >
+> > Your changes in tcp_conn_request() can solve this issue, but you're
+> > solving a not that valid issue which can be handled in a decent way as
+> > below [1]. I can't see any good reason for passing zero as a backlog
+> > value in listen() since the sk_max_ack_backlog would be zero for sure.
+> >
+> > [1]
+> > I would also suggest trying the following two steps first like other people do:
+> > 1) pass a larger backlog number when calling listen().
+> > 2) adjust the sysctl net.core.somaxconn, say, a much larger one, like 40960
+> >
+> > Thanks,
+> > Jason
+> 
+> Even though only one connection is needed for this proprietary library
+> to work properly, I don't see any reason to set the backlog to zero
+> either. But it just happened. We simply bin patch the 3rd party
+> library to set a larger value for the backlog as a workaround.
 
-Doesn't the header file rename also break UAPI?
+A common technique is to specify -1 for listen() backlog.
 
-	David
+Then you even need not know somaxconn but can use it as the max
+backlog. (see __sys_listen_socket())
 
+This is especially useful in a container env where app is not
+allowed to read sysctl knobs.
+
+
+> 
+> Thanks for your suggestions, and I almost totally agree with you. I
+> just want to discuss whether it should and deserves to make some
+> changes in the kernel to keep the same behavior between
+> sk_acceptq_is_full() and inet_csk_reqsk_queue_is_full().
+
+I think you can post a patch to make it consistent with 64a146513f8f:
+
+---8<---
+commit 64a146513f8f12ba204b7bf5cb7e9505594ead42
+Author: David S. Miller <davem@sunset.davemloft.net>
+Date:   Tue Mar 6 11:21:05 2007 -0800
+
+    [NET]: Revert incorrect accept queue backlog changes.
+...
+    A backlog value of N really does mean allow "N + 1" connections
+    to queue to a listening socket.  This allows one to specify
+    "0" as the backlog and still get 1 connection.
+---8<---
 
