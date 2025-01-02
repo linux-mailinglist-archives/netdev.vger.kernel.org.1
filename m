@@ -1,117 +1,154 @@
-Return-Path: <netdev+bounces-154741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929029FFA50
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:17:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78B019FFAAC
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:00:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 894A33A2227
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 14:17:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87E421627A5
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D328A1A2632;
-	Thu,  2 Jan 2025 14:17:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D0E1B4128;
+	Thu,  2 Jan 2025 15:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FvzPjtUS"
+	dkim=pass (2048-bit key) header.d=unrealasia-net.20230601.gappssmtp.com header.i=@unrealasia-net.20230601.gappssmtp.com header.b="pjCLrNkS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490C7192D70
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 14:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326F01B3724
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 15:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735827432; cv=none; b=me6AjD6azjxgIYFhKoYcKMdJQuti3dV3owJTRoHXA3IVA9g/XWV2UVqQXKFpd77WvLBk84RT+L5gkHENYR0D0uRO4xYAuuhpWHWuyu9winVSQS6gDw7u09EnPqc5kWUShMyclrjQA34lwe9r9xTtR8UHawYctX57GRIpuekyjP4=
+	t=1735830011; cv=none; b=ul3RErg/7rNcqRpB6P1sduKM5GWluFLMesMMc0Fnv9Ppd5CS87p/ByWDvkxK7RNWWFuyYD8sto5AYLSwnnXOJg87gA/u+nrLVcbMQIBEdPJJWYwyjoBz9si234tqmrA3wU8pRxnzPJG6opDfPh5WAsaePUW//BU6z4IoV/D/7Nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735827432; c=relaxed/simple;
-	bh=1EXu8p0MVErak0M/pugkG67/Oe5jhEkJvRGJafHRY2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=htptaIJk5HJfS00prFFVtr6F+qi0R3HrwTYyX4VrnRiG4HdUjvIfkpvrHilu/F6Ap+EbC0ZhtbVGr2M4YPdUvZPqVtJkElyxu3YIJ/SEnbpvJ3bS47NPuS6A96ixUwZZ12uxIZu18UdZklDYsAJVj8mBQWOxaiLgyCXBdKW6aqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FvzPjtUS; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1735827431; x=1767363431;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1EXu8p0MVErak0M/pugkG67/Oe5jhEkJvRGJafHRY2o=;
-  b=FvzPjtUSKDkUM9pAkl763+5TnxzOATqAEC5Gcn4ATn8BWQCvI9DiylJ+
-   8hFUxaxUFxoozbfczF8gy3d+ZODH6jzMhPv1BjOthFxAhPV5uRRnpMV5O
-   gwXfCJrz+jly8mZjdfTp947nY9K5ayIMuxJ1VlooBZRL77/bvSa4y50Li
-   sOSMre6PhybQc/R40IRFwODeI7QhRV8B9biZUpfORar9V6Ap34F+MUxB8
-   XsSsCu147UpU23ymMKiBmb++y9l+vXFB46h+BsNZ+/CR2x5fLGcJGORzH
-   8ye3HTNoBBEjht1IwQvKqM+W++MS42iw57ffEwRffhNHR8gWXmOVBbuxq
-   g==;
-X-CSE-ConnectionGUID: O3jg0MVvTciHvMTrU9ny8A==
-X-CSE-MsgGUID: fNh1R2i6Tki7+ruaaIUlYQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11302"; a="61436728"
-X-IronPort-AV: E=Sophos;i="6.12,285,1728975600"; 
-   d="scan'208";a="61436728"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2025 06:17:10 -0800
-X-CSE-ConnectionGUID: QAxi8C0RS46FjoFSxTBlPA==
-X-CSE-MsgGUID: 1CgV45B3S6e+p0NIgfi46Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="106565859"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2025 06:17:09 -0800
-Date: Thu, 2 Jan 2025 15:13:53 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Anumula Murali Mohan Reddy <anumula@chelsio.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	andrew+netdev@lunn.ch, pabeni@redhat.com, bharat@chelsio.com
-Subject: Re: [PATCH net] cxgb4: Avoid removal of uninserted tid
-Message-ID: <Z3afIWnNJ/IAB8OJ@mev-dev.igk.intel.com>
-References: <20250102121018.868745-1-anumula@chelsio.com>
+	s=arc-20240116; t=1735830011; c=relaxed/simple;
+	bh=csej4I2UFTqPFljkqdH+u06HIdOpUkuSRuDuYgIjIA0=;
+	h=Date:From:Subject:To:Cc:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C7y+Fpc4q0gHFK19XTXRoKP5ZuAhHJFXx+aUBsBfzrLMrvPODBv2pAh96Hztj5JOfc1Rgw7o/ynUS37xLD88j2M3GGY1i06VmptDKIzX15WzAvni9cNY01zeM1aoI5toNYQJ9qlf0CeIcJQsTTK/I3jw8/MP3+lcvzAf+TnQD+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unrealasia.net; spf=pass smtp.mailfrom=unrealasia.net; dkim=pass (2048-bit key) header.d=unrealasia-net.20230601.gappssmtp.com header.i=@unrealasia-net.20230601.gappssmtp.com header.b=pjCLrNkS; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unrealasia.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unrealasia.net
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-21636268e43so68664725ad.2
+        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 07:00:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=unrealasia-net.20230601.gappssmtp.com; s=20230601; t=1735830008; x=1736434808; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:cc:to:subject:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dVWv1yG28Az/TllwbejOqQ1NzoDY8ivL6MBIugj2JQA=;
+        b=pjCLrNkSR0pWXhPZ6v5MEWRw+ILlJHL8rQb0YCP4fQsuYecI/i4fIa0evVE9WT5mlZ
+         pYsg757cC94QODJuJBHvi9mldSJPZS9aRJybqBHRgiJbA575r8qIAEgL4JjyxZ2gFdhH
+         fGG/OZ8YGsUIzAmgX7lwm4R6hO732CeRJJZYOWLXtRYl1jRHbWOR7qY4JssGnoJ9ev3H
+         b3lXNXXgIzWcOkQl0A7XeufzFp2TETybekziql9nwGeUPhWPRNzrphEmg0o2ccufHmhy
+         aDVtCUYuL1oLzPM6L9RPEozIDu75OEnkBYRSFw5NnY+DfPb8WyVrIG+l+D/YXklQGPto
+         XBVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735830008; x=1736434808;
+        h=mime-version:references:in-reply-to:message-id:cc:to:subject:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dVWv1yG28Az/TllwbejOqQ1NzoDY8ivL6MBIugj2JQA=;
+        b=oRTiBcP4PRAs4jLueBPvUKv7i6fatezhXcI2a/XC6yXWi769MN2mIxnGU7EqkADD2q
+         diO+qkzH5hbbbRBM+t7bD7ZfFXmRKtnbcUHc0GC6HC9vKE8i+aESdeth9BRnhW3icFPq
+         39yEcsYUI0IOIJLqmWdd+dXJmZudCis0QFA2rXQ7M/jnqXhCsnJ6C57Vo/v1yndlGfa0
+         mt3T6WOJagzS+RT6gt1XRMxiEzpOzwAeP2ZwYEcFikLyGnyV/HZYq+zaxhoQ2yGI7V31
+         ifxVdM+AriSRGquoGFLzCm+PEkfEDSOeHTpS3R48ADwNhoL8v0YcyKmM7Q/5myzW3CQj
+         RJhw==
+X-Gm-Message-State: AOJu0Yz+wCbsSktQI2uuf5bYqQBhNdj709vj7sr6SbG/46frxjD93prN
+	FJjL+sNMzlYwBAmic40/HwNY9Dq93G1RH6FvnZWgR/WXFVnkZkTlPr3Q41xYJiM=
+X-Gm-Gg: ASbGncstYxESAgr7arrVjSLRr9PMeVPUYMmu7J9UGN9QH5nbpzN8Zwmuh70hiwFOdgv
+	TS/VPXVQECqYXso3xbOQnOFf7YoyAd8HYwmBnwsDOdMzvBgHrRSXORekJpw5lzVTdwvyWFBn1hK
+	aFjnaoB6IXT2XrKSFYsTMopiphXTEM1pu9N8lXuiBZNWjl7VlLrN3GQwSf1TsEqAtrbLpwcjtwp
+	nycCK/4zVYIrgg9WQHBvzXmLZwiuU8/9eog27s+V9oXsE4VvG7mDq56lsQ3QokGl2DB
+X-Google-Smtp-Source: AGHT+IHdfKh9fsUR5Ni2yjx+vcQUvdBgpinqCPRVr5B9m2FPIjuYlnuF2MUvr1NG5+bGBP++X/BngQ==
+X-Received: by 2002:a05:6a20:12d2:b0:1e1:3970:d75a with SMTP id adf61e73a8af0-1e5e0458eadmr80010227637.9.1735830007949;
+        Thu, 02 Jan 2025 07:00:07 -0800 (PST)
+Received: from muhammads-ThinkPad ([2001:e68:5473:b14:5c5:4698:43ff:2f5b])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-842aba72f71sm22551306a12.9.2025.01.02.07.00.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 07:00:07 -0800 (PST)
+Date: Thu, 02 Jan 2025 22:20:23 +0800
+From: Muhammad Nuzaihan <zaihan@unrealasia.net>
+Subject: Re: [PATCH] Add NMEA GPS character device for PCIe MHI Quectel Module
+ to read NMEA statements.
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg
+	<johannes@sipsolutions.net>
+Message-Id: <Z5TGPS.PN2YJKFH2CDV@unrealasia.net>
+In-Reply-To: <4b576e34-ec43-4789-b18b-86d592f9d031@lunn.ch>
+References: <R8AFPS.THYVK2DKSEE83@unrealasia.net>
+	<5LHFPS.G3DNPFBCDKCL2@unrealasia.net>
+	<4b576e34-ec43-4789-b18b-86d592f9d031@lunn.ch>
+X-Mailer: geary/40.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250102121018.868745-1-anumula@chelsio.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 
-On Thu, Jan 02, 2025 at 05:40:18PM +0530, Anumula Murali Mohan Reddy wrote:
-> During ARP failure, tid is not inserted but _c4iw_free_ep()
-> attempts to remove tid which results in error.
-> This patch fixes the issue by avoiding removal of uninserted tid.
+Hi Andrew,
+
+I'm actually new to netdev and the main kernel.org documentation on 
+submitting patches 
+(https://www.kernel.org/doc/html/v4.17/process/submitting-patches.html) 
+was not clear on the commit message (or i've missed it).
+
+Thank you for pointing me to the netdev maintainer process page.
+
+Anyway, i will make a new v3 patch tomorrow on a new thread to address 
+the issues you mentioned. I'll follow the guidelines as you required.
+
+Sorry for the mess.
+
+Thank you,
+Muhammad Nuzaihan
+
+On Thu, Jan 2 2025 at 02:22:15 PM +0100, Andrew Lunn <andrew@lunn.ch> 
+wrote:
+> On Thu, Jan 02, 2025 at 05:12:41AM +0800, Muhammad Nuzaihan wrote:
+>>  Hi netdev,
+>> 
+>>  I made a mistake in choosing AT mode IPC, which is incorrect. For 
+>> NMEA
+>>  streams it should use LOOPBACK for IPC. If it uses AT, i noticed 
+>> that using
+>>  gpsd will cause intermittent IOCTL errors which is caused when gpsd 
+>> wants to
+>>  write to the device.
+>> 
+>>  Attached is the patch.
 > 
-
-You need a fixes tag. Like here for example
-https://lore.kernel.org/netdev/CANn89iJP4unWmk2T36t1LiFrchy+DSGkbZWz_i42mb1eCDXyeg@mail.gmail.com/T/#m197e95ef4948a30732c1f6a046d3f0f7af163826
-
-> Signed-off-by: Anumula Murali Mohan Reddy <anumula@chelsio.com>
-> Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
+> This is not my area, so i cannot do a full review, but a few things to
+> note.
+> 
+> Please start a new thread for each version of a patch, and wait at
+> lest 24 hours between each version.
+> 
+> The commit message should be formal, since it will be part of the
+> kernel history.
+> 
+> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+> 
+>>  @@ -876,7 +880,8 @@ static long wwan_port_fops_ioctl(struct file 
+>> *filp, unsigned int cmd,
+>>   	struct wwan_port *port = filp->private_data;
+>>   	int res;
+>> 
+>>  -	if (port->type == WWAN_PORT_AT) {	/* AT port specific IOCTLs */
+>>  +	if (port->type == WWAN_PORT_AT ||
+>>  +			WWAN_PORT_NMEA) {	/* AT or NMEA port specific IOCTLs */
+> 
+> This looks wrong. || WWAN_PORT_NMEA will always be true, assuming
+> WWAN_PORT_NMEA is not 0.
+> 
+>     Andrew
+> 
 > ---
->  drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-> index bc3af0054406..604dcfd49aa4 100644
-> --- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-> +++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-> @@ -1799,7 +1799,10 @@ void cxgb4_remove_tid(struct tid_info *t, unsigned int chan, unsigned int tid,
->  	struct adapter *adap = container_of(t, struct adapter, tids);
->  	struct sk_buff *skb;
->  
-> -	WARN_ON(tid_out_of_range(&adap->tids, tid));
-> +	if (tid_out_of_range(&adap->tids, tid)) {
-> +		dev_err(adap->pdev_dev, "tid %d out of range\n", tid);
-> +		return;
-> +	}
+> pw-bot: cr
 
-Fix looks fine, thanks
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
->  
->  	if (t->tid_tab[tid - adap->tids.tid_base]) {
->  		t->tid_tab[tid - adap->tids.tid_base] = NULL;
-> -- 
-> 2.39.3
-> 
 
