@@ -1,112 +1,115 @@
-Return-Path: <netdev+bounces-154706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5B009FF885
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:06:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3533B9FF8A8
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:23:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F01F18828F1
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:06:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6607B1882C9E
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 11:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD95218A6A3;
-	Thu,  2 Jan 2025 11:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9603719D086;
+	Thu,  2 Jan 2025 11:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KOzYWnvM"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="MoSq55us"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9330219FF
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 11:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EEE193419;
+	Thu,  2 Jan 2025 11:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735815983; cv=none; b=uQAkMbx9Wy6BwgkVegaKAohSdLb38zINoDQXvnEz0fCawX4CpCOxDoNvIxox3Xva5LACamiNr4C//Dr+ESii0MOXQxJDHeqRwx1l0i8wg0fDoUP1HaSbui1q0GYYhj1jpSrRHvGgG/Va7cODMbbmvHLgYw2H72hnhrWYn/nD+mA=
+	t=1735816994; cv=none; b=pfKDnKsiHnCQ+uimeB1HIGPZ8k3iCQmqjxqwlJKOtQKaDMIiOzK1bRyElqVm9/5NX24hkJn4wVhC8oFZmigmrGxsfKqqXVTIwYCTt9vYHrjoweT5vNf7AySjQpstS6Eu9U9P4L8l+MKO+Sz27eogpyjWcqY3isgGwRpklU189Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735815983; c=relaxed/simple;
-	bh=IgrWElfheCAEE9tNT1HXJIseKM8ymJil6ZDH3CCLPJI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gDTv4IqG0ma6ayRmFtLaBJItifQ+n4RSQ3FJPuEe8Cgb+U4gejR8hCbAQ7h3AhROu5nSSPH2yu1UJK253dZqnKVmPuZqCBsC6TRFKviaSh35EewI/crxvst5+8oTtXCRlP0ZlBO9fRk8c1p/GMsUefBLeKizcOYNP6ifQTLtr7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KOzYWnvM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fO04ue8aHvHksQ9Fmz2rG9zKFL71H+rPNAeoGotrvuE=; b=KOzYWnvM3bCke3rM178gp0MtvP
-	yakkSekDLrFdEG5NZLIdGSd8mJ72n17JATSzgcIEfhZ7vUivPsWyTopReglsq+EXqzmun3mFeW2Wx
-	8yyRAk68rUCATVs0VIr4E03y3ROubFarss8MmUI3EenP27yiOY8XdSxmzZJgoJ//fNYCqfDY3ZVTc
-	usMnN1+PX+WaHyIc7QtZZgSFDSnNrnZx709ls7SWTgx6nqOPek14LaQSj5ANsEnTeUUsSn17kS1B4
-	0ivH1ph6zofaOoyq2Mt6Hup8Z+9g3+zmZeOJWCC2fRGSAspkLVV+hlPiduT+51gCl0J8ILhpGp+Pr
-	a+3On8JQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37006)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tTJ1s-0001vQ-2g;
-	Thu, 02 Jan 2025 11:06:18 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tTJ1r-0000Dk-1I;
-	Thu, 02 Jan 2025 11:06:15 +0000
-Date: Thu, 2 Jan 2025 11:06:15 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Francesco Valla <francesco@valla.it>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: phy: don't issue a module request if a driver is
- available
-Message-ID: <Z3ZzJ3aUN5zrtqcx@shell.armlinux.org.uk>
-References: <20250101235122.704012-1-francesco@valla.it>
+	s=arc-20240116; t=1735816994; c=relaxed/simple;
+	bh=jGIwB3Lf+IKyPdMX7WIqXG0gElDUUGTtfN4JIacpt1E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gkt2X/mOak/9chdjzqo00FGao+lYVBLmpcOWU8Zxux6XRPiGGe9V0fTMUZS/4U+uZLXSH2Rh+b63iHCx+mRIOzGl9Rv9WzAiXjbSEbxVs/2uJUrln4JN6q1voWEBIUm5Bav1whZrj28K2GR/i+HtNXNjR0YdkIbktfDua53unhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=MoSq55us; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 502A9pQH000996;
+	Thu, 2 Jan 2025 03:22:58 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=298HlXVZl99kA0dPK0t71Hy
+	Dessm6KiIxdy1kcUQ5rE=; b=MoSq55usoxMbkmYvytyz81KM5U9Cu+byR/FDebk
+	EkDQgYVnI/uQnt5evdtS3WbtO56aY5X6po4f9DEod1+EmvCiUll7IrSPzypC5oXn
+	fn8ZVZatFYVESgu6NmQ0CTPHFRiIe/O1RiWvjhUkQJDuNtRqQ/Cfl4BnfBvb5HxU
+	UOJMMwqt2MT+J1XgrDyo/kaMd2S17cepX+LrjXnwJSK487XZFKWzrHsjktmN8367
+	l+4LXipw18x/L2uNQShDnfq8pWKNMJ0YCu+EcPMEQq19/ZkiYS+8com0ayu3CMPy
+	xGxwElDWy9dGZCK5J/1qYieCTmntQ6O3Sq6kAW5QQDTsjwg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 43wrt702w1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Jan 2025 03:22:58 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 2 Jan 2025 03:22:56 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 2 Jan 2025 03:22:55 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 654ED3F708C;
+	Thu,  2 Jan 2025 03:22:55 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
+        <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
+        <konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
+        "Shinas
+ Rasheed" <srasheed@marvell.com>
+Subject: [PATCH net v4 0/4] Fix race conditions in ndo_get_stats64
+Date: Thu, 2 Jan 2025 03:22:42 -0800
+Message-ID: <20250102112246.2494230-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250101235122.704012-1-francesco@valla.it>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: YGS7-StfUE8_hvX2QhMrnJNwmbNub0wW
+X-Proofpoint-ORIG-GUID: YGS7-StfUE8_hvX2QhMrnJNwmbNub0wW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
 
-On Thu, Jan 02, 2025 at 12:51:22AM +0100, Francesco Valla wrote:
-> Whenever a new PHY device is created, request_module() is called
-> unconditionally, without checking if a driver for the new PHY is already
-> available (either built-in or from a previous probe). This conflicts
-> with async probing of the underlying MDIO bus and always throws a
-> warning (because if a driver is loaded it _might_ cause a deadlock, if
-> in turn it calls async_synchronize_full()).
+Fix race conditions in ndo_get_stats64 by checking if netdev is running
+before per queue resources are accessed, and remove stats fetch from
+firmware which is currently unnecessary
 
-Why aren't any of the phylib maintainers seeing this warning? Where does
-the warning come from?
+Changes:
+V4:
+  - Check if netdev is running, as decision for accessing resources
+    rather than availing lock implementations, in ndo_get_stats64()
 
-> +static bool phy_driver_exists(u32 phy_id)
-> +{
-> +	bool found = false;
-> +	struct phy_drv_node *node;
-> +
-> +	down_read(&phy_drv_list_sem);
-> +	list_for_each_entry(node, &phy_drv_list, list) {
-> +		if (phy_id_compare(phy_id, node->drv->phy_id, node->drv->phy_id_mask)) {
-> +			found = true;
-> +			break;
-> +		}
-> +	}
-> +	up_read(&phy_drv_list_sem);
-> +
-> +	return found;
-> +}
-> +
+V3: https://lore.kernel.org/all/20241218115111.2407958-1-srasheed@marvell.com/
+  - Added warn log that happened due to rcu_read_lock in commit message
 
-Why do we need this, along with the associated additional memory
-allocations? What's wrong with bus_for_each_drv() which the core
-code provides?
+V2: https://lore.kernel.org/all/20241216075842.2394606-1-srasheed@marvell.com/
+  - Changed sync mechanism to fix race conditions from using an atomic
+    set_bit ops to a much simpler synchronize_net()
+
+V1: https://lore.kernel.org/all/20241203072130.2316913-1-srasheed@marvell.com/
+
+Shinas Rasheed (4):
+  octeon_ep: fix race conditions in ndo_get_stats64
+  octeon_ep: remove firmware stats fetch in ndo_get_stats64
+  octeon_ep_vf: fix race conditions in ndo_get_stats64
+  octeon_ep_vf: remove firmware stats fetch in ndo_get_stats64
+
+ .../net/ethernet/marvell/octeon_ep/octep_main.c    | 14 ++++----------
+ .../ethernet/marvell/octeon_ep_vf/octep_vf_main.c  | 12 ++++--------
+ 2 files changed, 8 insertions(+), 18 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
+
 
