@@ -1,106 +1,122 @@
-Return-Path: <netdev+bounces-154797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B799FFCF0
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:40:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D2499FFCED
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EC793A2EE5
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:40:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B68E41880857
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A0C187325;
-	Thu,  2 Jan 2025 17:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4CC214BF8F;
+	Thu,  2 Jan 2025 17:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b/8fUCCj"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="UGBNNMY5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF8317DE2D;
-	Thu,  2 Jan 2025 17:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCACB133987;
+	Thu,  2 Jan 2025 17:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735839609; cv=none; b=PmtGiDeI5HrRkearOCgGTt94comU28H3+vzicKmZTWu/Ek8fRqcfZRq+tIrTKBjU0IOoXdxHhTBzZQ6PmjhgHtTdPUzuP15kDXmENaH/kgZ5JLnIX7zMkW3Ds5Wsq8iYKJuA4gR/yEp7aK18nVylh0b+8BfNndqaB89kwVK7wKM=
+	t=1735839612; cv=none; b=Mx94YwMJjK2X3isnICkmilYUXvFmKiC7NipzmaRiw/78/FDTTSm4X0pvyp36rctrFBsnVi6KBwlNDbPiDneUN7qDWUXhWUItyHXg2UohvTY4dzT3JhKXaB93fr5m4ID5oLpIceESHZXMkJw3/NL+hZXYTqO1R5tHTgy4uCVFYyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735839609; c=relaxed/simple;
-	bh=LIvqTH+wl6w6hCR6IT1PddWop634LZbTE2mgDqO/5wg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ciR2XgXhZRYoLMNiXbHN+LPSZgoXIOFeG2h8Xhvj6Sa1mAevD6hafZ7yrYxDjZUfvIpMUI7I3PiORxrCNR8P3NAb0LC86MVMUYMHPg+A8hjOU6uG32EngeKh+yZc3yeKJVow2HlKsbfpHAe2gA79ar6YogPDa9n4NuuJIurEIsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b/8fUCCj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=vG8zV0iSeZ9UhdPoxEVXLWK29ZKO026Z7LJWnTAlLpM=; b=b/
-	8fUCCjlMcGxckrVRXP7R4mPJN45Hzlj76ZiryGW5LAZaghB1oWdRRTUfGyPrDoRs9w1tzh+us3Ixh
-	tXFzSQL5zdQizpxMRJpfNOJhflbWq6T9ZUjRwV/4w4SObuUY/sjJA3NuwnvbQ8I58LQ8rueBFvt5m
-	G5XEc03kuHrXhzQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tTPAd-000o0n-Ax; Thu, 02 Jan 2025 18:39:43 +0100
-Date: Thu, 2 Jan 2025 18:39:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: egyszeregy@freemail.hu
-Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
-	daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
-	kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2] netfilter: uapi: Merge xt_*.h/c and ipt_*.h which has
- same name.
-Message-ID: <6eab8f06-3f65-42cb-b42e-6ba13f209660@lunn.ch>
-References: <20250102172115.41626-1-egyszeregy@freemail.hu>
+	s=arc-20240116; t=1735839612; c=relaxed/simple;
+	bh=BJzrw74EndrPPXS4tjkut+DXSBdGyJ0cd+6p2kSCjHY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CU901BYrKCDoyRgHP/3FonvxQxVpAiQn1+B8L2npIwk3hmMZthON0/L2SzD5mRG04ReZvTfxHXt1aMATVi3vKuquKqxNvpFs8EGK70Pbe61ULQkf9idhT5n+shMrwvRI/K8wAz23fkSgZxPm8GuXyKQKDMwS5vZh+RhIRCdmQFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=UGBNNMY5; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=kNbPgneaX7GZilz8mvKDzcGBDi52SBp2xJS4zJPPs40=; b=UGBNNMY5S2N65FfU
+	VuLFvGVF9UjUbk9MztliPzB4Wtoij4RwOQpPAByMJPyFrKngzigb9sFVmL1M3oSb7s/CzhOxgoCzz
+	BWMxHlK2W1xqbI2Bv2fz66oEXLLd3kGa1aRoVFP76Z6SVEw61ZNFAxMIiYxr4/w6FUdjWe2iup4jH
+	fMMYaGTk13QstT/IW3gBbK0so0Wz5H/ZcwG6bRFq7GQ309UF+p/NqFyV5cQdRRwrmRGCl5Bgahb57
+	7cPX27akYtIeDNb13grTcSOcLfwLiF/qWNNaKcuThdZHDreKQjTImoSRp8seWdCN5mT1HPZURmDUK
+	dpEQbGrkwDt7PIQGzQ==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tTPAx-007ty0-28;
+	Thu, 02 Jan 2025 17:40:03 +0000
+From: linux@treblig.org
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+Date: Thu,  2 Jan 2025 17:40:02 +0000
+Message-ID: <20250102174002.200538-1-linux@treblig.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250102172115.41626-1-egyszeregy@freemail.hu>
 
-On Thu, Jan 02, 2025 at 06:21:15PM +0100, egyszeregy@freemail.hu wrote:
-> From: Benjamin Szőke <egyszeregy@freemail.hu>
-> 
-> Merge and refactoring xt_*.h, xt_*.c and ipt_*.h files which has the same
-> name in upper and lower case format. Combining these modules should provide
-> some decent memory savings.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Numbers please. We don't normally accept optimisations without some
-form of benchmark showing there is an improvement.
- 
-> The goal is to fix Linux repository for case-insensitive filesystem,
-> to able to clone it and editable on any operating systems.
+The const struct ixgbevf_hv_mbx_ops was added in 2016 as part of
+commit c6d45171d706 ("ixgbevf: Support Windows hosts (Hyper-V)")
 
-This needs a much stronger argument, since as i already pointed out,
-how many case-insenstive file systems are still in use? Please give
-real world examples of why this matters.
+but has remained unused.
 
->  delete mode 100644 include/uapi/linux/netfilter/xt_CONNMARK.h
->  delete mode 100644 include/uapi/linux/netfilter/xt_DSCP.h
->  delete mode 100644 include/uapi/linux/netfilter/xt_MARK.h
->  delete mode 100644 include/uapi/linux/netfilter/xt_RATEEST.h
->  delete mode 100644 include/uapi/linux/netfilter/xt_TCPMSS.h
->  delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_ECN.h
->  delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_TTL.h
->  delete mode 100644 include/uapi/linux/netfilter_ipv6/ip6t_HL.h
+The functions it references are still referenced elsewhere.
 
-How did you verify that there is no user space code using these
-includes?
+Remove it.
 
-We take ABI very seriously. You cannot break user space code.
-
-    Andrew
-
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
-pw-bot: cr
+ drivers/net/ethernet/intel/ixgbevf/ixgbevf.h |  1 -
+ drivers/net/ethernet/intel/ixgbevf/mbx.c     | 12 ------------
+ 2 files changed, 13 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
+index 130cb868774c..a43cb500274e 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
++++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
+@@ -439,7 +439,6 @@ extern const struct ixgbevf_info ixgbevf_82599_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_X540_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_X550_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_hv_info;
+-extern const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops;
+ 
+ /* needed by ethtool.c */
+ extern const char ixgbevf_driver_name[];
+diff --git a/drivers/net/ethernet/intel/ixgbevf/mbx.c b/drivers/net/ethernet/intel/ixgbevf/mbx.c
+index a55dd978f7ca..24d0237e7a99 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/mbx.c
++++ b/drivers/net/ethernet/intel/ixgbevf/mbx.c
+@@ -505,15 +505,3 @@ const struct ixgbe_mbx_operations ixgbevf_mbx_ops_legacy = {
+ 	.check_for_ack	= ixgbevf_check_for_ack_vf,
+ 	.check_for_rst	= ixgbevf_check_for_rst_vf,
+ };
+-
+-/* Mailbox operations when running on Hyper-V.
+- * On Hyper-V, PF/VF communication is not through the
+- * hardware mailbox; this communication is through
+- * a software mediated path.
+- * Most mail box operations are noop while running on
+- * Hyper-V.
+- */
+-const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops = {
+-	.init_params	= ixgbevf_init_mbx_params_vf,
+-	.check_for_rst	= ixgbevf_check_for_rst_vf,
+-};
+-- 
+2.47.1
+
 
