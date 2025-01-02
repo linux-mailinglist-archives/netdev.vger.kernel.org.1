@@ -1,107 +1,73 @@
-Return-Path: <netdev+bounces-154769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33B779FFB77
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:21:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238439FFB89
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:26:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 099681627E1
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:21:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57F5A18837E1
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981E35914C;
-	Thu,  2 Jan 2025 16:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DDA85931;
+	Thu,  2 Jan 2025 16:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihEo5MD9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XmGLHJ8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5382D627;
-	Thu,  2 Jan 2025 16:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D73125D6
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 16:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735834877; cv=none; b=r9abrYhT2CjVAs5WXQXY1nFkWisY8uIUKaZARJPtvbWGt44FyRTeT4eFzKXIKcbDlJhYG4e0CpFs6MqZv2JwXaMllbJa4s2EzrgtjlJQQNDDlqGjpl868y59fgJBjIRaY9QTyNM81A62A1Y3NFiN/WWmyttVglu5cu6j5G8Xr58=
+	t=1735835177; cv=none; b=IA8ufEkyuQNqwkffHI1zFN53kPJBFTC0u6QDpr8wElBhip+IpNXQgB3mPAouwBrf7BYGWA4mw36iRkTSWctPhP9xPnyS0D+P9eLGYh/EpYvdWOyaL7jzQ4Iu0TLOesTafB5tSPSL7CvZJzaXNs1nV4kfc4fSl3fF0QpJF4HOQHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735834877; c=relaxed/simple;
-	bh=dSJv3kAsx4e/jI21sZlJ4yX2VorXsrGLdIC+nkDYCUM=;
+	s=arc-20240116; t=1735835177; c=relaxed/simple;
+	bh=d0lIwQKFK2YKg0OceXfJNkCxJdfV8BPySrMGb5xb3xE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qF6/TKWxwkyCDllS65jMM3y6bMNg0K/ygv7R0OieZhets9GErbXdZhVjiiEVDZbLkb7wxnw5dWdKLe+wCy3FVMNHZboXm3u+jIJghz92Eo/TxXYCSWmaMHqz67PaIPsGubTrLd/4pUhsEJZf0/eQzuxnAM22lrLF42kcQHGuVHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihEo5MD9; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-38a25d4b9d4so4048528f8f.0;
-        Thu, 02 Jan 2025 08:21:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735834874; x=1736439674; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EFwagoQckg1x48oSlTADI+AZ0xM8gKp36cMYG8nIBr0=;
-        b=ihEo5MD9vpiRMALBaevwR3lxVROk6hHEF1rjz3cn/s+1Us7jAAeuLenXABrnB2vXNZ
-         64RJOuKO22d6grnxywnFW0BM94udvvQ0P7xLHJZaLz3lOyPcOcXGUPUUyBAMTcq2re5j
-         a1h04+FnpFiYwBrDhoo5ho0RTUlSwCWpGdVOLIToEQ+PxiDlmjjIt39h0R/NcZaWNK1L
-         ldjVIlq85Ns+ZCIMD8KTM4XPwSsC00SgG/v1nazOs7nC3ZHAo7oscJujRp32nmr0RD2x
-         PfpUD7TP0KfA9CqGq7bJtsVdR+/MM89i0Jy7m3h9C2KaHwOoy8NsPI8W78ox2Mxr0g7o
-         SpJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735834874; x=1736439674;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EFwagoQckg1x48oSlTADI+AZ0xM8gKp36cMYG8nIBr0=;
-        b=X/fwVzON7t914fyK1ydRA9DrwDlQYRIE0OdbF74tACdnLpbNWYM3PX5HiRNYAsn413
-         SgMy8by+WAKS2bRnydZql9kEMagz7U0FOHNfKG+O06gCt3bLfu0KcD5I+u2kjzHGlvRt
-         hIZKZDK1Z/kNoEu/ARp75p8PnvjNkl7wATTI+YWMgguj31CElPcvLPY+AsXq0/T0pk/F
-         D/kSdx/N4CuTh67chqJATyO+bUU29KDRn84Bx22jA0ZJ4udYRyjxDbvFUSSEh2CmPabA
-         4Rlyc9WaKoIyuRWBOMgApFnD2jAhIJhBTBDobJ/r85AxMTJC5aQofb34VXmHGJG5gyDC
-         T1PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU1J5px9WBl4/wrbN7wg3mIcMS1O9uUNPKHLzYk7hUNGZPzT2PBx1TmgkNS+pzanvtXJ+61q9qI@vger.kernel.org, AJvYcCVc2y120Ivl2S/DIhFgA4hheDOfZc+nYKdQ5ox9M9wjk45CEDllbDHFlLlzdmump8oEn95cT7G0e4s=@vger.kernel.org, AJvYcCVkCOPwm0RPwZDqs9XpOKyqUGUzaL2Y623iYntZN6HpoZ/pv7ukQVd42vT3Ty4P0/MupfXVWFFDH877aI4R6LZr@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDphCOi53+rO6e2L7U/ycqKmqPv4TP8tSZDt9qZ3Shn+DFPci7
-	9dp9Jf8tD/jpsWA9+/EPzybr7BonrgPp7lAXNCfpjimI1iV/aCjK
-X-Gm-Gg: ASbGncusSbQN49KqvBCwLD/xPBIAMBqGGkj/vw01RxjI82rWyCB+aDwOYHoxHhvL4Xt
-	qrLizVmbiMM3uoNcZJjwJRH5X6QEvTTIBWLk/8tZMS4T7nvQ24P2kuQpy4RdODYmE0F5jwgLlb3
-	tSorOWiBawDR3DzZA/4Eh0PS9pWEl1kLZhiEBNL8L63vmHCUOBW1R4F3T7ZTgttoauFdlnYyu6e
-	df3JMWHQY4wEsOSbMT5s+sZSrZTDd1kZQ2qdaRO85fedCQvGMv0sdASPEf/P4+vzinPHXPMuFva
-	AdDIWi5OvRpqTaimkzUO
-X-Google-Smtp-Source: AGHT+IG0AunmMSQFcstGX2xexmsNqbQEnotP3JgjDGhHiAOcDSrfECwecZI3LFYSIzW+tk7K7kLpPg==
-X-Received: by 2002:a05:6000:1a8a:b0:385:df84:8496 with SMTP id ffacd0b85a97d-38a221f2ef4mr40402238f8f.3.1735834874159;
-        Thu, 02 Jan 2025 08:21:14 -0800 (PST)
-Received: from hoboy.vegasvil.org (89-26-16-1.stat.cablelink.at. [89.26.16.1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c848a47sm38031656f8f.62.2025.01.02.08.21.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jan 2025 08:21:13 -0800 (PST)
-Date: Thu, 2 Jan 2025 08:21:11 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Peter Hilber <quic_philber@quicinc.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	virtio-dev@lists.linux.dev, netdev@vger.kernel.org,
-	Trilok Soni <quic_tsoni@quicinc.com>,
-	Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ozkx5s7mDo6l2XLqtpON+ZlNMK4purYcHDEb3SolRgXBKdbx2MyRkjCx8L7UHV+6U1nng00/jm92Jih0bc2RkSfRhEZGR3gRvq+iEFChEyuxnUeNPw4WEMWS3hlfZuB/CRTY0fL6a5Oybj/nEnzdp71w4PsqZvSNy5d2c+obCEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XmGLHJ8e; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Q/dpMpJ3QkApJYgUd3f2JJMZZA51Gm/b0EDgIufTHCE=; b=XmGLHJ8eaoQOUwIwVA+j4He7zw
+	RCZcTj1s1Q3N7vy/0EDNunyw11OTla4TtlMWtiD9FRl7EWyFA3ZYJkQ7qqruTTl0YHFHshX+lvOj6
+	LVkJx8XcNUV3o1GG6hFXufERTFPGvXClxsO3zGuGL/QM/eSH2OPwCHMA0GFUqCywICLROVCar9T1o
+	0b3JJHETmwSUKLNcWguQj1WBTwgbG6jYiplLbqLIk1rf1IDRxzk+HXahZbAXsImnMPn82R36VZjcE
+	6cimktWHoPsDwDwNXNVEgxcT0DEnyQhjH1kY3on8e7Eyc6XhXUYG5+YBKjEaPkMRtibkLqxW51CIy
+	Lu6O1zgQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50026)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tTO1O-00029y-2V;
+	Thu, 02 Jan 2025 16:26:06 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tTO1M-0000Po-13;
+	Thu, 02 Jan 2025 16:26:04 +0000
+Date: Thu, 2 Jan 2025 16:26:04 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	linux-kselftest@vger.kernel.org, linux-api@vger.kernel.org,
-	David Woodhouse <dwmw2@infradead.org>,
-	"Ridoux, Julien" <ridouxj@amazon.com>,
-	John Stultz <jstultz@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [RFC PATCH 1/2] ptp: add PTP_SYS_OFFSET_STAT for xtstamping with
- status
-Message-ID: <Z3a892mBOSRl6BlN@hoboy.vegasvil.org>
-References: <20241219204208.3160-1-quic_philber@quicinc.com>
- <20241219204208.3160-2-quic_philber@quicinc.com>
- <Z2WLGHRdlsRpT6BL@hoboy.vegasvil.org>
- <wcxdbqhoe4cppukyy5rvkq5am4ht6wk5u6d6g2k2swqhidjw7i@6nar5vuusm35>
- <Z2ymZuiFqY8mxihJ@hoboy.vegasvil.org>
- <a352mltlizneonxazn4bffydn57fyudrc3zougii2rnatg3jga@3yagssaob5sb>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: mvpp2: tai: warn once if we fail to
+ update our timestamp
+Message-ID: <Z3a-HOwAVyJGEg67@shell.armlinux.org.uk>
+References: <E1tM8cA-006t1i-KF@rmk-PC.armlinux.org.uk>
+ <Z10UGg_osMZ6TZrc@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,41 +76,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a352mltlizneonxazn4bffydn57fyudrc3zougii2rnatg3jga@3yagssaob5sb>
+In-Reply-To: <Z10UGg_osMZ6TZrc@hoboy.vegasvil.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Jan 02, 2025 at 05:11:01PM +0100, Peter Hilber wrote:
-> Would it be more acceptable to just announce leap seconds, but not
-> whether to smear?
+On Fri, Dec 13, 2024 at 09:14:02PM -0800, Richard Cochran wrote:
+> On Fri, Dec 13, 2024 at 04:34:06PM +0000, Russell King wrote:
+> > The hardware timestamps for packets contain a truncated seconds field,
+> > only containing two bits of seconds. In order to provide the full
+> > number of seconds, we need to keep track of the full hardware clock by
+> > reading it every two seconds.
+> > 
+> > However, if we fail to read the clock, we silently ignore the error.
+> > Print a warning indicating that the PP2 TAI clock timestamps have
+> > become unreliable.
+> 
+> Rather than printing a warning that user space might not read, why not
+> set a flag and stop delivering time stamps until the upper bits are
+> available once again?
 
-Up until now, leap second announcements were handled in user space,
-and the kernel played no role.
+If we fail to read the clock, that will be because the hardware didn't
+respond to our request to read it, which means the hardware broke in
+some way. We could make mvpp22_tai_tstamp() fail and not provide
+timestamps until we have successfully read the HW clock, but we would
+still want to print a warning to explain why HW timestamps vanish.
 
-> I do not understand. Is the point that guests should decide through
-> another channel about leap second smearing?
+However, if this happens, then it also means that the gettimex64 PTP
+clock ioctl will also fail, so I would suggest that the user would
+find out about it anyway.
 
-Yes, that would make more sense to me.
+So, I don't think the extra complexity is worth doing.
 
-> I hope there will be some feedback from third parties (at least related
-> to virtualization).
+This is to catch a spurious failure that may only affects an occasoinal
+attempt to read the HW PTP time. Currently, we would never know,
+because the kernel is currently completely silent if that were to ever
+happen.
 
-+1
-
-I'm no VM expert, but I'd like to avoid tacking things onto the kernel
-PTP layer, unless there is a really strong justification.
-
-> For sure. But the aim of this proposal is to have an interoperable time
-> synchronization solution for VMs through a Virtio device. So the idea is
-> to include metrics, if a consensus on their usefulness can be reached.
-> AFAIU it is difficult to bypass the kernel for Virtio devices.
-
-Providing clock metrics only makes sense when there is some choice to
-be made based on those metrics.  If the "limited" VM guests don't even
-have networking, then they have no choice but to accept the time from
-the VM host, right?  In which case, the metrics do not provide any
-benefit to the guest.
-
-Or what am I missing?
-
-Thanks,
-Richard
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
