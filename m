@@ -1,78 +1,48 @@
-Return-Path: <netdev+bounces-154762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19ECB9FFB2E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:53:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF0B9FFB3D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DD111881B6C
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:53:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFB8A18839A7
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63631AB6FA;
-	Thu,  2 Jan 2025 15:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3283A1B0425;
+	Thu,  2 Jan 2025 15:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZaS75PDz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWQA/5if"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09D0189B8D;
-	Thu,  2 Jan 2025 15:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B8540BF2;
+	Thu,  2 Jan 2025 15:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735833221; cv=none; b=Sgz83Awc7LcugyeT9/9lfye6KVOBGYf2TiuMLPZuPZd4HzlY4QHBnz9dYaaeHNg1GtPn4+EmtbVffjcywkoKIssykRTgOqtiiDkyo7xZvLngONweV0pr4AhGJNtNESQjGTyeALs6+r4oO2Pup1jC1eDlBJ6LR0qJ0QtQ6uiaMIU=
+	t=1735833440; cv=none; b=FvqdFh8U13zI2yGJz7BqaLDz/hR6XWNY0YbjOmR5FM7GdE19bfBKwqkB3XQDiHpxjEkcGQYSTzl2JIO+xcCzkWAi+fe80jXvSNmR11w54/caZTOjzg6pILlWpAT+EMXCOIwu7bDmM0/JsnzDvPxCcXkLJEMxCTqisQailNZK/yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735833221; c=relaxed/simple;
-	bh=4bW3Hs1kl8owelWIk3KD/ZOeoeSitiV6sBEKxMuPnys=;
+	s=arc-20240116; t=1735833440; c=relaxed/simple;
+	bh=l9krntIFJFgGFkmtKhs3ubXfoLYdo1dGd3fujb63qS0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pLQHP1byzM6f6Xy/41I+Rs9AkmbUcflGEtJtjYiYKdZJVQTsvisXIAptRj6IfOS6szM+8J7+VR6G6+CVhBztR6pInlro7UKpiE0Ln47GjPZMGOYI26RSaRdcfTzvJMsnuFacKmZ66Ms9WBSa1VI0yzMm80OKaxt19QZIDQWwsT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZaS75PDz; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aaf900cc7fbso179757266b.3;
-        Thu, 02 Jan 2025 07:53:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735833218; x=1736438018; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rrPOTO/QeXBP8E7EdYRGi7iZOWqbSgEVztnQmjBKmmA=;
-        b=ZaS75PDzaP6Hj1vR85+ibxiLzpyFoceanu10vrs/km21Vc/dASS1IQTVo0xG5cLqdl
-         NIyY7yPO1+0jy2YbcyYfnECajeHSKaXXSlpegiFxPynhhaQtogEmHcOeE4TLIexyY9ZA
-         QdTtXFz7nmHPtRiEutf2vhPTPI7W2GKNkfeEzRpiz7vhrTaUio3lDbQmBum4yhwkTFJf
-         D5mxydxjIxsQW10qv5T+/R9ILpJ0SzWyv4JNQwWfYHxFTuXDAiX8K73LTYXvor7FbIO2
-         Q6j5cz4BD9vYhnMi88DSjXoiCQV059JON+Q5+AJUz1VZWEReasxwzmL5j5Vw729JPTHB
-         +Rbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735833218; x=1736438018;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rrPOTO/QeXBP8E7EdYRGi7iZOWqbSgEVztnQmjBKmmA=;
-        b=X9A4R4mtFGORfRdaIqjMXMyQqQ0KIR8JYMMNJMlFZJXfrqqe0Nc/fQSjObKHpmFt6Z
-         jViiF54F/J0eDsec/aiaDfvXJxqWMjJDkkgaj6EEIYq16MUYYu1b7WRL2GkVgPLAOufc
-         b4ZO1kbWsrs2Yiih8uIujfyuPNerufNLQiWRyNm9gvbgk7CIa0ub4zYUs1YZCB6on5Rh
-         NQQmiVXHwCN8AWZ3kEQj1FKEfCm+SaY4SRgkDwRaV/EXTMSeRSVrfa7liH8wEvv2wRhC
-         9zTtJm3JSPJs02uCkyLz0SQoU2K8w6mS+uwkiVsq3ICFe8zxjNfOkekWHwYtxMp7Iy3B
-         saQA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgy1M1ffABLb1nszD4n2EGkgRMx4DaYrP8IRNCTbi7NdRHlN3YswaHqZ5klLNfbYp8PSIgg9TW@vger.kernel.org, AJvYcCX/5WXnsQQMnvsijUAzgAss+j1x+t1Gh2JmSSGbqpXB14tcq+4IkAJvVrLOmxu/YaeCYhglG3KFag==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHPPh+PZRg/W0HmPiq21UCFVtV+R+cDDVe7yCS/YT6ru9QtPMv
-	FfX4UYBG6jCAiyP8AzO2rB1vvUz5h7OPKxk/QjpK9c3DGcCgONc+
-X-Gm-Gg: ASbGncupKQ4REf/3xcq3ySRZ09Mu9/17O4q7eRL0uYXmlFtzYBygHNzY1FEJRYDefcq
-	sms6HkJhokTaomOVItilG1cgpLZOhSYWOzz517Dww+brWC97pr+iTe4yv/e0hketGWarkNunqdj
-	FH1IHUwCC6chKK9UCQdUPEFsjTSc0JPUzqky9smjrLQXgdVH9wdid/xP1mAW0BKAC75dexUQrpP
-	UORHHGfuQtkHv61bHko6bCZMbh/aNQQBjMncrqsKasU1hkJkf02adrnDOb/mdTQ3EDE
-X-Google-Smtp-Source: AGHT+IGASDqM4UAhCOprInoPw233sev4vAgxtns86XCl4E+Hkq8QA0WJEYcNfETSsECKrDC56bCEKA==
-X-Received: by 2002:a17:907:c082:b0:aae:93aa:9ac7 with SMTP id a640c23a62f3a-aae93aa9bcemr3082825966b.50.1735833217982;
-        Thu, 02 Jan 2025 07:53:37 -0800 (PST)
-Received: from [192.168.42.201] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e830d9dsm1784738466b.5.2025.01.02.07.53.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jan 2025 07:53:37 -0800 (PST)
-Message-ID: <72b271d4-c2c0-4d54-81a0-13d0c5640e50@gmail.com>
-Date: Thu, 2 Jan 2025 15:54:32 +0000
+	 In-Reply-To:Content-Type; b=PdFoIMMAhimgq4EHKGStZQVZfiGhqVSoYMdKrnIcj3obucJwgPKSyDZVuJ68/HSakRdJUXhKPOknnFVDeVY89BELkN0gejREsRY+NbBF/pQ7HEvpmBZ7q2uDL5ogGEqbCVmbji5zhSnR9B2f/zmPWlJiWOhaPPnKkKaxKr5h/HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWQA/5if; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9958C4CED0;
+	Thu,  2 Jan 2025 15:57:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735833439;
+	bh=l9krntIFJFgGFkmtKhs3ubXfoLYdo1dGd3fujb63qS0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GWQA/5ifHfAmW52ebrzWPjPHWHUb8Loa0cT4PsfsmvUVhRjgfv/ZpWcPVVV44iIHC
+	 bKsRoUCZPiDbMC83ImLbuFqmKm6mstitNOepgNr5aA+HsdQQ5C/tA6NY4h6OXMmJ+q
+	 6IBkszDnPvup/cfBcTL0bFgCGnvypTjtSYHpBaz56PotKjtai449QiPJG7IsNBAzQA
+	 20e2CC1lJfbpujiBtIWZ89nDEcmL5mhMym77NPlIVjh1KL9i/L1jZH2JVeIw2IVZrS
+	 BUwMKBBJaezhcfg3jXKBCIaQleuhDPZmtL04RUNxi9PR43T3d18hHd98xRuG9UMC8O
+	 wiAdixR9p92dQ==
+Message-ID: <dfd37ca0-14c6-4cc1-8fae-f1aa2d23e148@kernel.org>
+Date: Thu, 2 Jan 2025 08:57:17 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,44 +50,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 04/20] net: page_pool: create hooks for custom
- page providers
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241218003748.796939-1-dw@davidwei.uk>
- <20241218003748.796939-5-dw@davidwei.uk>
+Subject: Re: [PATCH] ipv6: socket SO_BINDTODEVICE lookup routing fail without
+ IPv6 rule.
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20241218003748.796939-5-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: shiming cheng <shiming.cheng@mediatek.com>,
+ willemdebruijn.kernel@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Cc: netdev@vger.kernel.org, lena.wang@mediatek.com
+References: <20250102095114.25860-1-shiming.cheng@mediatek.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250102095114.25860-1-shiming.cheng@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/18/24 00:37, David Wei wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
+On 1/2/25 2:51 AM, shiming cheng wrote:
+>      When using socket IPv6 with SO_BINDTODEVICE, if IPv6 rule is not
+>         matched, it will return ENETUNREACH. In fact, IPv4 does not behave
+>         this way. IPv4 prioritizes looking up IP rules for routing and
+>         forwarding, if not matched it will use socket-bound out interface
+>         to send packets. The modification here is to make IPv6 behave the
+>         same as IPv4. If IP rule is not found, it will also use
+>         socket-bound out interface to send packts.
 > 
-> The page providers which try to reuse the same pages will
-> need to hold onto the ref, even if page gets released from
-> the pool - as in releasing the page from the pp just transfers
-> the "ownership" reference from pp to the provider, and provider
-> will wait for other references to be gone before feeding this
-> page back into the pool.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-My apologies, seems it lost a note that it's a derivative patch
-with changes not explicitly confirmed by the author.
+Please create test cases for IPv4 and IPv6 showing the problem - what
+you are configuring and the expected result.
 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-
--- 
-Pavel Begunkov
+Also, commit messages should align with first column unless there is a
+reason for an indentation.
 
 
