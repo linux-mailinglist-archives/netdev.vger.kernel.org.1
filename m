@@ -1,116 +1,98 @@
-Return-Path: <netdev+bounces-154721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87839FF962
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 13:36:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AC769FF96A
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 13:41:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB18F3A2D2E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:36:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C56A3A2C69
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 12:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65121A4E9E;
-	Thu,  2 Jan 2025 12:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84F319258A;
+	Thu,  2 Jan 2025 12:41:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C1E4A18;
-	Thu,  2 Jan 2025 12:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0464C3FE4;
+	Thu,  2 Jan 2025 12:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735821377; cv=none; b=fTXWvF28e0wl/x1JlZYNE5qQt2MRYlVd/fgnn/+WA90fgoQp+beLslJE61vP9ijzDEMlVDWawyqmQWzLy+Ib/R8VMADfLc8wjJ1/7xLR6hkHpXRL/4sDyDVT1a1kLSD7Uw0BSh11uhz/zcCXtBcev1mUFfp1ovvH/VKLnDNtB7o=
+	t=1735821707; cv=none; b=d40hFy+jdSSz6i/PBFDlpd8Cev2D3HdqOxhWcNdpLcSKUrg6uG0QB4Vh1EZXgC3q6GwHlVe02YotDC2Mcx56Hb9tAXUMPAtQkdbviWu/AChk7ecb4oUIwivkf8XrV1NtswKXd4RHM48zt0EqtDEguq9ID3YzOl7PxuTXfwNGo7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735821377; c=relaxed/simple;
-	bh=pp6pQk1Pdfs0Vb4mkIADroQb9HTc81pXv5/P4zS9Oss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LtFWVy5HkKJPaLRksAr4kwmT6iS34OZPxz/Y2fMW6iYak2ZnsJUwxXiSEve5m3KKBtsWXCm9NCOWIk7N1xrVBneIQ0UdsGgqmJ8LGhbyLp5Yeb38859+/Yl6r+oGZl0JlVBWPpeXXzhrVCpKjVT5V0+RQF4ZoUFye3a1xMczWJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1tTKQe-0000x5-UZ; Thu, 02 Jan 2025 13:35:56 +0100
-Date: Thu, 2 Jan 2025 13:35:56 +0100
-From: Florian Westphal <fw@strlen.de>
-To: =?utf-8?B?U3rFkWtl?= Benjamin <egyszeregy@freemail.hu>
-Cc: Florian Westphal <fw@strlen.de>, pablo@netfilter.org,
-	lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org,
-	amiculas@cisco.com, kadlec@netfilter.org, davem@davemloft.net,
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] netfilter: uapi: Merge xt_*.h/c and ipt_*.h which has
- same name.
-Message-ID: <20250102123556.GC3344@breakpoint.cc>
-References: <20250101192015.1577-1-egyszeregy@freemail.hu>
- <20250101224644.GA18527@breakpoint.cc>
- <4ad8fb04-b2d6-493b-978c-7dea46fdc623@freemail.hu>
+	s=arc-20240116; t=1735821707; c=relaxed/simple;
+	bh=0gXpUzHDkjStrBONH3A2q3pKD0geXFPCLkiK9DDL/0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=sjvCjHScVfVPTehznb4SRfizQ9sWZIKrCOklDaz5a9yuw9lV3zP6sfADtm2KG0gHsDgX4rS3NMje8lxq0bZ1JCtGEgxz+BNZRUNsVyjD2VzV982CSSR+yIi1xZqB/AWUQfE5sBaQd+/kDTwsj9pgGfXkXbRA1HdFQf6OXmhdA4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tTKWE-000000007Jn-1li5;
+	Thu, 02 Jan 2025 12:41:42 +0000
+Date: Thu, 2 Jan 2025 12:41:21 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Daniel Golle <daniel@makrotopia.org>,
+	Alexander Couzens <lynxis@fe80.eu>
+Cc: Russell King <rmk+kernel@armlinux.org.uk>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next] net: pcs: pcs-mtk-lynxi: correctly report in-band
+ status capabilities
+Message-ID: <Z3aJccb1vW14aukg@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4ad8fb04-b2d6-493b-978c-7dea46fdc623@freemail.hu>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Szőke Benjamin <egyszeregy@freemail.hu> wrote:
-> 2025. 01. 01. 23:46 keltezéssel, Florian Westphal írta:
-> > egyszeregy@freemail.hu <egyszeregy@freemail.hu> wrote:
-> > >   /* match info */
-> > > -struct xt_dscp_info {
-> > > +struct xt_dscp_match_info {
-> > 
-> > To add to what Jan already pointed out, such renames
-> > break UAPI, please don't do this.
-> > 
-> > It could be done with compat ifdef'ry but I think its rather ugly,
-> > better to keep all uapi structure names as-is.
-> 
-> If i keep the original, maybe one of them will be in conflict between
-> "match" and "target" structs name if i remember well (they go the same
-> text).
+Neither does the LynxI PCS support QSGMII, nor is in-band-status supported
+in 2500Base-X mode. Fix the pcs_inband_caps() method accordingly.
 
-Did not find an example.  Can you please point me to one?
+Fixes: 520d29bdda86 ("net: pcs: pcs-mtk-lynxi: implement pcs_inband_caps() method")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+drivers/net/pcs/pcs-mtk-lynxi.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> By the way original structs name are absolutely not following any
-> good clean coding, they will be still ugly and they are hard to understand
-> quickly in the code, what goes for "target" and what goes fot "match" codes.
-> Why is it bad to step forward and accept a breaking change to gets a better
-> clean code?
+diff --git a/drivers/net/pcs/pcs-mtk-lynxi.c b/drivers/net/pcs/pcs-mtk-lynxi.c
+index 7de804535229..ed91cd7a406a 100644
+--- a/drivers/net/pcs/pcs-mtk-lynxi.c
++++ b/drivers/net/pcs/pcs-mtk-lynxi.c
+@@ -93,11 +93,12 @@ static unsigned int mtk_pcs_lynxi_inband_caps(struct phylink_pcs *pcs,
+ {
+ 	switch (interface) {
+ 	case PHY_INTERFACE_MODE_1000BASEX:
+-	case PHY_INTERFACE_MODE_2500BASEX:
+ 	case PHY_INTERFACE_MODE_SGMII:
+-	case PHY_INTERFACE_MODE_QSGMII:
+ 		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
+ 
++	case PHY_INTERFACE_MODE_2500BASEX:
++		return LINK_INBAND_DISABLE;
++
+ 	default:
+ 		return 0;
+ 	}
+-- 
+2.47.1
 
-Breaking changes are not acceptable.
-
-> > >   MODULE_LICENSE("GPL");
-> > >   MODULE_AUTHOR("Marc Boucher <marc@mbsi.ca>");
-> > > -MODULE_DESCRIPTION("Xtables: TCP MSS match");
-> > > +MODULE_DESCRIPTION("Xtables: TCP Maximum Segment Size (MSS) adjustment/match");
-> > >   MODULE_ALIAS("ipt_tcpmss");
-> > >   MODULE_ALIAS("ip6t_tcpmss");
-> > > +MODULE_ALIAS("ipt_TCPMSS");
-> > > +MODULE_ALIAS("ip6t_TCPMSS");
-> > 
-> > I think you should add MODULE_ALIAS("xt_TCPMSS") just in case, same
-> > for all other merged (== 'removed') module names, to the respective
-> > match (preserved) modules.
-> 
-> Do you mean in all of xt_*.c source, it can be appended by its own
-> MODULE_ALIAS("xt_TCPMSS"), MODULE_ALIAS("xt_RATEEST") ... and so on? Can be
-> kept old MODULE_ALIAS() names  or they can be removed?
-
-'modprobe xt_FOO' should continue to work, so if xt_FOO was merged into
-xt_foo, then 'modprobe xt_FOO' should load xt_foo.
-
-Makes sense?
-
-Same reason as why we have the ipt_tcpmss etc. aliases, it should load
-the xt_ module which does provide the relevant functionality.
-
-So yes, please keep all existing aliases.
 
