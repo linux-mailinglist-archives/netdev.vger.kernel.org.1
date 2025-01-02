@@ -1,156 +1,202 @@
-Return-Path: <netdev+bounces-154683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE799FF706
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 09:43:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAE7D9FF71C
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 09:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAE4E1616B7
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 08:43:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3B6A3A0428
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 08:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B5D192D7C;
-	Thu,  2 Jan 2025 08:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CED192B82;
+	Thu,  2 Jan 2025 08:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="CvdrKFGw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDtAEUO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D14A95E
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 08:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A8A18C932
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 08:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735807405; cv=none; b=mAD6UapzbhzKAXXx+VVGTpOAW930LTUXoJrazuru5+7CJAE7Eg1rqYeDPeQb35ED6jR1NCAEGpnIB8rgYF82GN7JgDD2VL/vnMXzfMjWS4tOJXQD6sDAafcnKsW/he9RoNu6m0FrQ6zeuf/NoONLMH9quMTqoJp2f45HM6rqgNw=
+	t=1735807844; cv=none; b=rs8XlbABnvDatOypnK8kTgHhCXrkGD4fICyzLJyjN42w0BqJu2q7uBGFzpF33xalk/cRY3X1cshr6Te8xCZJXpZ2zGFKIei0UV3gTAtH1bH9w0lzrkkEzAF28sipZAVwV42ryp1wo8iIXI6grvD7f4VK45Lor27494VMlAjDsYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735807405; c=relaxed/simple;
-	bh=idBudSH9VEhOH7c2b627druTjHPf2xAKroCaCAuqPHU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XqhWjGqCY+xgN3fl02SbT7khJ8NNQxtYEu9522hLhOiiXXAPHjQGD/syTkC3fbSNwos0YtPMTZL2fi5mUiZl7K2nPqkYGEQJptXDy6/WWgKiV/5M9Bo0N3P67AnJnZncJpsPTg+hB49cvH73eXo9t7HW7Ko173826TNMzrsa3oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=CvdrKFGw; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2162c0f6a39so158886645ad.0
-        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 00:43:23 -0800 (PST)
+	s=arc-20240116; t=1735807844; c=relaxed/simple;
+	bh=PDkWUvP7kaJxnZPnQAgt5xBave6gK2+Ina1BdxnONaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YS3uJc7z4LQ14aKA7yd2/XabNrDFmZHEVsL+Dq6QKo+c1u45GB5c2YDUCD3ahEKYs7ImoftjaXxM1tFBKLlUFF03WanLB9lVdM/cEjA/xoy9HcYx8jxeGyfGtOS0Y7Acf5C+oJ63GQPailvf9fCCtByZcjhizmjvs4z9kKDV7jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iDtAEUO+; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ee50ffcf14so13735372a91.0
+        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 00:50:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1735807403; x=1736412203; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ONF0KLB8jTWoJqOoJVre/hdtr5usKsOw9G8OfagGSbo=;
-        b=CvdrKFGwt80i38t62SWDxTLe7MtyC8haxR55WuHPonYqO3oiO5ijGNYK1Tsgv8bpgX
-         bochQgwZLwCoZ1gkpAWupqEwX/NJWI6WBZ852CtlFq3Vu7r28IYiJxZq4pKu0CgoFxXh
-         sjWCkDskUhQOES/pL1HnW0MFO4787hZzwzLOuWBYLUKafEUEkqfwkuuS9K5UyQRccMvg
-         wlAQ0V5hpuUybV5PZfGNHy31lI2MGXm/BPagR+quPW8YiWs1H8ywa6sX44lPbJjLqftQ
-         USHX6H76Dj0ZrgMvmpxKecll5OUJHkrywfRL7r8B+gf7BizKhpLCOwzPmsBA7OCBLPRR
-         4wPQ==
+        d=gmail.com; s=20230601; t=1735807842; x=1736412642; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fVUP2XR0J+zdUj+0noNV4pVkEDlFvsaE8mHMt2HEe3s=;
+        b=iDtAEUO+UKsnJugtluyAZH8el1Ya6NohM6Ime0uiyYCShuXpZLxD+UDYB8o3vQ6J+9
+         UlB3qWAp87xeGstMECQlmjfaaZFF5po+qNKFwVABuzTkpcp0+CDi5mPV3bRVteO6fu83
+         kVasVN5Ku45C3eoPKB4J/upBfLekTys/qDN2dELJUYPajgdIa3QerLuYae6bwcK5gXYL
+         JyPltReg1KUnIuFSzTSJDJu8WQy5YU1n4DDx323b+ZMn3j0nM/tdR1qBbe/y9ZgogCfC
+         zaoB0z07EyOMJxMluOvWsnc8PJabE43zByVBz46K1zBkaHWKLzBZ59GvPiBZ4F2r0ih8
+         SddA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735807403; x=1736412203;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ONF0KLB8jTWoJqOoJVre/hdtr5usKsOw9G8OfagGSbo=;
-        b=hs4nwgmNO4C5QnpqaK3hl3Fzxx2A2z2mOfGbgP+jFKxSmPdTIcrI3q21XXPvCE6gkL
-         DDtC2cggMCBOHyHj10hsPAHYDW8mSI7LZyNEALQ7g7/jzwcFDRDF8rr7++cCXaxvtLzw
-         W0SOlnwZvkbmW2O7qBoViimexthZVNysul4+BHvMNG03K9kKtgZ+7QKgmzaYkSxML4tC
-         PoByQ2Lk2RAaOCCgEcd9Ufuvt/VTqqSrVxWVuh+kQDElDMvxad6npUo0estjBDsLs+7M
-         XFQaV3ZBdDHHlZ7VVmCfCZAz9EIf5AlNkqQB1LVeKP4REKuPeOj3Jz/g3sjPgsEtxPEA
-         hZQg==
-X-Forwarded-Encrypted: i=1; AJvYcCW08yNxZM8DlhW0KEbDlkoICXLH1rnspyPliz0P6Ept6iIRZFt4uFHOxKJjKJZiyDgOyf33oeI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdKLDJEQtzHOvVhXulhhEqBopsJ44M3rUK4xSN9QsO7p9sls9R
-	9A5/XsYQcDCIVNSi3ki8fexJsI4ZkvCn56ff9Z0cFgkHWih18AbFbnotED3BZCI=
-X-Gm-Gg: ASbGncsIP5gEeSAX+qZQhNpsSiN70NVXey/3SspaMTiG8PQceHF+SZFApZGvUbyIXMS
-	QQnyEPMyNz/5t6a29HNHErBpzLtGnxlAsLqDMqGstcIPq3bITo8dKH6Y6I3pWMQyHr7AmDRgZ5l
-	GQLXmZ9BsNTHvIyPsTkrUFGhGVndbluuWYEk/SDjCRJzl5knAIJPHm2Pau9SawnJUNDsm4VS/+7
-	EZVs67q05PrTupIFnnl2lNHmLMaiHNw+Uz94JozzBB8VhaL8grYQACRhxzUKjPHeb5fhXFT1fZS
-	vNh/4FyWb5rnnCp1Vx8Zvg59b3PSFEYWwGSMYFmH
-X-Google-Smtp-Source: AGHT+IH7Lu5G4PLy5eUlGX4y+me42DxYsY+XwbXTrn5GV+CYxwrLSLjZv8CM42PQIV0m1+E6UMoW/Q==
-X-Received: by 2002:a05:6a20:7488:b0:1e1:a789:1b4d with SMTP id adf61e73a8af0-1e5e1f57c97mr59944805637.15.1735807403083;
-        Thu, 02 Jan 2025 00:43:23 -0800 (PST)
-Received: from [10.54.24.59] (static-ip-148-99-134-202.rev.dyxnet.com. [202.134.99.148])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72b5bde56f8sm3606447b3a.162.2025.01.02.00.43.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jan 2025 00:43:22 -0800 (PST)
-Message-ID: <c2c94aa3-c557-4a74-82fc-d88821522a8f@shopee.com>
-Date: Thu, 2 Jan 2025 16:43:18 +0800
+        d=1e100.net; s=20230601; t=1735807842; x=1736412642;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fVUP2XR0J+zdUj+0noNV4pVkEDlFvsaE8mHMt2HEe3s=;
+        b=lvzKcDlnGwaxQ2+may8LF2Xaco9DNhgoteqqoGxx0FgkekmYOkGJjvmsWAQGsDrE3G
+         eydvhqmSSIIzJyWRA0tae+X/CxUreGIe77M9mJ3N65ZYI5GRoQQEIGgSjuTcTmeHpfKx
+         HMia1LvFBdTc7lQJPJWHdZJQ/dixNuo2thvxC0zmeg4pHGMpua44NDFlWVvSslxiPgdf
+         18c1bstxcUBqsmnH72SyKUMfaeu31QWGP777Q9YmZzys8XOiaGTKYf1iCv1h4oAewUAq
+         hnVuill+jJLs2oqEbfIviK1wV4wIfd7IHlLKipAEK9EYkMgAVY1k4vkDTY6/Ys+ss+Mi
+         vF8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWX219IcuU+BZkCzzBqF2p9PU4td0rJF5qQvRdkNGnNTUTEbhp9uwWsWLZBwZCg8uH+KK37BIc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxe5EgHB0F54ItEGoIb0d5zo608hb04ZHCJA97t4uJ4klqc3qr8
+	HQOxFVoqiQ12TBOwbBhkuUu5EN17OoP8aZP2shv7hTvlEzOsLiZ4
+X-Gm-Gg: ASbGnctqaO7QXZ7KzPBNtAyImu9ic3GQMvNQY+LKCh+tBf2+7kfIVo70aJmjJZDqvkO
+	PieUk7UDv9vifM/wjSs4X71Qf0a+JHuazlYTtbSeFb69P6ZiTEjP1C38KAalBCVtwniyh6wfEnT
+	d3GpwN2+Zwso91f3bXKHDD17nqYd+52bcy/Z1E15TBTwHdrbmzANUYiI0Dwa/SiXwqep7dmmsDf
+	UTNqygVoy3dFpkq9YYs5aqy88BxkHcgIPxdYuVEhwWKDhZh+5uqSftl6s+HPA==
+X-Google-Smtp-Source: AGHT+IEkEQS8qdTh3sSfZ9ZE6AdDj2sN3h9AkIAa1RZ1LtP6WrXXZTEIDI5ntirReODG/gULG89S3A==
+X-Received: by 2002:a17:90b:3d44:b0:2ee:5a82:433a with SMTP id 98e67ed59e1d1-2f4536ee700mr64893299a91.17.1735807842112;
+        Thu, 02 Jan 2025 00:50:42 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f447882910sm25566127a91.32.2025.01.02.00.50.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 00:50:41 -0800 (PST)
+Date: Thu, 2 Jan 2025 08:50:35 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Octavian Purdila <tavip@google.com>
+Cc: jiri@resnulli.us, andrew+netdev@lunn.ch, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com
+Subject: Re: [PATCH net-next] team: prevent adding a device which is already
+ a team device lower
+Message-ID: <Z3ZTWxLe5Js1B-zp@fedora>
+References: <20241230205647.1338900-1-tavip@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?Q?Re=3A_=5BQuestion=5D_ixgbe=EF=BC=9AMechanism_of_RSS?=
-To: Eric Dumazet <edumazet@google.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-References: <da83df12-d7e2-41fe-a303-290640e2a4a4@shopee.com>
- <CANn89iKVVS=ODm9jKnwG0d_FNUJ7zdYxeDYDyyOb74y3ELJLdA@mail.gmail.com>
-From: Haifeng Xu <haifeng.xu@shopee.com>
-In-Reply-To: <CANn89iKVVS=ODm9jKnwG0d_FNUJ7zdYxeDYDyyOb74y3ELJLdA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241230205647.1338900-1-tavip@google.com>
 
-
-
-On 2025/1/2 16:13, Eric Dumazet wrote:
-> On Thu, Jan 2, 2025 at 4:53 AM Haifeng Xu <haifeng.xu@shopee.com> wrote:
->>
->> Hi masters,
->>
->>         We use the Intel Corporation 82599ES NIC in our production environment. And it has 63 rx queues, every rx queue interrupt is processed by a single cpu.
->>         The RSS configuration can be seen as follow:
->>
->>         RX flow hash indirection table for eno5 with 63 RX ring(s):
->>         0:      0     1     2     3     4     5     6     7
->>         8:      8     9    10    11    12    13    14    15
->>         16:      0     1     2     3     4     5     6     7
->>         24:      8     9    10    11    12    13    14    15
->>         32:      0     1     2     3     4     5     6     7
->>         40:      8     9    10    11    12    13    14    15
->>         48:      0     1     2     3     4     5     6     7
->>         56:      8     9    10    11    12    13    14    15
->>         64:      0     1     2     3     4     5     6     7
->>         72:      8     9    10    11    12    13    14    15
->>         80:      0     1     2     3     4     5     6     7
->>         88:      8     9    10    11    12    13    14    15
->>         96:      0     1     2     3     4     5     6     7
->>         104:      8     9    10    11    12    13    14    15
->>         112:      0     1     2     3     4     5     6     7
->>         120:      8     9    10    11    12    13    14    15
->>
->>         The maximum number of RSS queues is 16. So I have some questions about this. Will other cpus except 0~15 receive the rx interrupts?
->>
->>         In our production environment, cpu 16~62 also receive the rx interrupts. Was our RSS misconfigured?
+On Mon, Dec 30, 2024 at 12:56:47PM -0800, Octavian Purdila wrote:
+> Prevent adding a device which is already a team device lower,
+> e.g. adding veth0 if vlan1 was already added and veth0 is a lower of
+> vlan1.
 > 
-> It really depends on which cpus are assigned to each IRQ.
+> This is not useful in practice and can lead to recursive locking:
+> 
+> $ ip link add veth0 type veth peer name veth1
+> $ ip link set veth0 up
+> $ ip link set veth1 up
+> $ ip link add link veth0 name veth0.1 type vlan protocol 802.1Q id 1
+> $ ip link add team0 type team
+> $ ip link set veth0.1 down
+> $ ip link set veth0.1 master team0
+> team0: Port device veth0.1 added
+> $ ip link set veth0 down
+> $ ip link set veth0 master team0
+> 
+> ============================================
+> WARNING: possible recursive locking detected
+> 6.13.0-rc2-virtme-00441-ga14a429069bb #46 Not tainted
+> --------------------------------------------
+> ip/7684 is trying to acquire lock:
+> ffff888016848e00 (team->team_lock_key){+.+.}-{4:4}, at: team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+> 
+> but task is already holding lock:
+> ffff888016848e00 (team->team_lock_key){+.+.}-{4:4}, at: team_add_slave (drivers/net/team/team_core.c:1147 drivers/net/team/team_core.c:1977)
+> 
+> other info that might help us debug this:
+> Possible unsafe locking scenario:
+> 
+> CPU0
+> ----
+> lock(team->team_lock_key);
+> lock(team->team_lock_key);
+> 
+> *** DEADLOCK ***
+> 
+> May be due to missing lock nesting notation
+> 
+> 2 locks held by ip/7684:
+> 
+> stack backtrace:
+> CPU: 3 UID: 0 PID: 7684 Comm: ip Not tainted 6.13.0-rc2-virtme-00441-ga14a429069bb #46
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+> Call Trace:
+> <TASK>
+> dump_stack_lvl (lib/dump_stack.c:122)
+> print_deadlock_bug.cold (kernel/locking/lockdep.c:3040)
+> __lock_acquire (kernel/locking/lockdep.c:3893 kernel/locking/lockdep.c:5226)
+> ? netlink_broadcast_filtered (net/netlink/af_netlink.c:1548)
+> lock_acquire.part.0 (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5851)
+> ? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+> ? trace_lock_acquire (./include/trace/events/lock.h:24 (discriminator 2))
+> ? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+> ? lock_acquire (kernel/locking/lockdep.c:5822)
+> ? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+> __mutex_lock (kernel/locking/mutex.c:587 kernel/locking/mutex.c:735)
+> ? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+> ? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+> ? fib_sync_up (net/ipv4/fib_semantics.c:2167)
+> ? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+> team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+> notifier_call_chain (kernel/notifier.c:85)
+> call_netdevice_notifiers_info (net/core/dev.c:1996)
+> __dev_notify_flags (net/core/dev.c:8993)
+> ? __dev_change_flags (net/core/dev.c:8975)
+> dev_change_flags (net/core/dev.c:9027)
+> vlan_device_event (net/8021q/vlan.c:85 net/8021q/vlan.c:470)
+> ? br_device_event (net/bridge/br.c:143)
+> notifier_call_chain (kernel/notifier.c:85)
+> call_netdevice_notifiers_info (net/core/dev.c:1996)
+> dev_open (net/core/dev.c:1519 net/core/dev.c:1505)
+> team_add_slave (drivers/net/team/team_core.c:1219 drivers/net/team/team_core.c:1977)
+> ? __pfx_team_add_slave (drivers/net/team/team_core.c:1972)
+> do_set_master (net/core/rtnetlink.c:2917)
+> do_setlink.isra.0 (net/core/rtnetlink.c:3117)
+> 
+> Reported-by: syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
+> Fixes: 3d249d4ca7d0 ("net: introduce ethernet teaming device")
+> Signed-off-by: Octavian Purdila <tavip@google.com>
+> ---
+>  drivers/net/team/team_core.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+> index c7690adec8db..dc7cbd6a9798 100644
+> --- a/drivers/net/team/team_core.c
+> +++ b/drivers/net/team/team_core.c
+> @@ -1175,6 +1175,13 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+>  		return -EBUSY;
+>  	}
+>  
+> +	if (netdev_has_upper_dev(port_dev, dev)) {
+> +		NL_SET_ERR_MSG(extack, "Device is already a lower device of the team interface");
+> +		netdev_err(dev, "Device %s is already a lower device of the team interface\n",
+> +			   portname);
+> +		return -EBUSY;
+> +	}
+> +
+>  	if (port_dev->features & NETIF_F_VLAN_CHALLENGED &&
+>  	    vlan_uses_dev(dev)) {
+>  		NL_SET_ERR_MSG(extack, "Device is VLAN challenged and team device has VLAN set up");
+> -- 
+> 2.47.1.613.gc27f4b7a9f-goog
 > 
 
-Hi Eric,
-
-Each irq was assigned to a single cpu, for exapmle:
-
-irq	cpu
-
-117      0
-118      1
-
-......
-
-179      62
-
-All cpus trigger interrupts not only cpus 0~15. 
-It seems that the result is inconsistent with the RSS hash value.
-
-
-Thanks!
-
-> Look at /proc/irq/{IRQ_NUM}/smp_affinity
-> 
-> Also you can have some details in Documentation/networking/scaling.rst
-
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
