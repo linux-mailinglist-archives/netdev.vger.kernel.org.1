@@ -1,205 +1,119 @@
-Return-Path: <netdev+bounces-154764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA5D9FFB3F
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:57:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D68599FFB49
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 17:01:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CE673A375A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:57:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AA187A12AD
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7801AE876;
-	Thu,  2 Jan 2025 15:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029B71B415D;
+	Thu,  2 Jan 2025 16:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XXSzYTVV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lurMbOuV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A061ADFE0
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 15:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D191B4144;
+	Thu,  2 Jan 2025 16:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735833452; cv=none; b=YZgrV2HiTvHmxi6EeIIMeIUM6WwK3wWfQ4EZVJaSMtAGJMXVYgmyNJaqbUfjPs+ZX0HK4GOqnQY0/QD3GN4Kfvit1aOhRZMYV96atxe2So75t1SoYCrqNcC3AjAB/7GaHrjb3mI3kn0yvzj6OQILZxGhe+3tUQ43J/3+WAPZqWU=
+	t=1735833683; cv=none; b=Q3xjtcwW3GNu7svjKry7ajr4PLqTWjFUziTH7s6DWphGcyzAzvRql8TvoPX2XES/FRK6G62lbr9OyD7f46SWXgCl8Y9a4m8JdQZVYaatAImlmVJBrQ5af5hilw0MRu58mNkXGrz9t9XleGU2/GB5ym1VWYtug93nrKpt0IkNOk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735833452; c=relaxed/simple;
-	bh=hSF/gFT+7oCtGF/jqYkMV+u/e+GFqRaaslIIj5mjOWM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u5hbJg1VoB8cqFFel5zGqj2oQF4dR78bhRBthhss8edD6o86/u/C/hSHNFttc+XWLYqR6+OR/VGgMBwi+HrxKyRIyhPxjNMFjYwQuvIwQ/1kI7DsDKLoFX8ZKTZ2Z8XX7ndcRMoFWnrnfFH1U3lpdXI5jCT7P6TwHkyeaCxCEYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XXSzYTVV; arc=none smtp.client-ip=209.85.160.174
+	s=arc-20240116; t=1735833683; c=relaxed/simple;
+	bh=VjDvxsly0BH4NzT+IRTvfxPmn4b6Bp8DG9daG17H8I4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=O8YlZwdTfb1elK1om8IZ2ctwee/S2PN1gosw5W7AO1kOdm/tpjzmRMSV6nd/eQU9pgg6zyw6wMZc42CtwHi69QGPN1N/iyPv1DbdUZznrXWVbcqf37rkBhieAJwO7Ious0SHJPDjuKoocd2rXdJYqRsxbDWZT8x6t5iKTrK5858=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lurMbOuV; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-467a6781bc8so82560031cf.2
-        for <netdev@vger.kernel.org>; Thu, 02 Jan 2025 07:57:30 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43618283d48so83673725e9.1;
+        Thu, 02 Jan 2025 08:01:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735833450; x=1736438250; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5f8hlL9BRDkOZu56JhLd5dFau8J6UXbtNH8q4mFqnZU=;
-        b=XXSzYTVVbPHKqVpW4iD/V5W+p5YZKS/ZzTwvkN3Kva6Qp375N1xGc4xamONB8uAnOb
-         HP1t4KUVz8/+gbl/I49S/AGxfnZGsQ/onsTOHDwNBDfGbwXf5jRtDFQzK502MzvvdrKh
-         f/RvdBQ9a+yBgPedfdv4c2xqaCLsPz4F1hAIZd2io/d+APcbffYjGlwN5akL2xQXKEZD
-         iZqN71o4iWFYf49ESzYv7FN1nyX+j4IeiKvUTlMxTnJtdZR08uQKbkAtctpcMrixrrI2
-         B9nEhlWPEVMSURG9CViEXy0vRAwcCpgGcnLzei/68zUQfHfF4gq1Ydtgps2tYqGMki+a
-         bRMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735833450; x=1736438250;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1735833680; x=1736438480; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5f8hlL9BRDkOZu56JhLd5dFau8J6UXbtNH8q4mFqnZU=;
-        b=uBrGtCdILO1XkuWM5juVL3sQG/w13fT8PqahJATYt84OGXXT0dihfuyvIRoYWbNcjy
-         5iF3UW80ySUHmCUBKU45DrZaBGsU0F997wdyQziM7bJCBmffZ16bJq+xWpeWgfREbuU/
-         qBZk7jsPPzR/3iWf12mGwZEfAPSmnyAe39KToiyODM1QyZl4PcLJ5yOGQc2FKwRDAtpn
-         cNRQgTnHLIcS06S4Po8YpmxYdSvCgHbBI6YkDR0VoBmAKKIU439RUIB1Goe9i2tfCRN8
-         FakdlY43YRcbBX5cVlRaLWDE6XtoTpJQnz/XmLOGGPzDrGLIZe7zBB6bQfPO8kPpegRB
-         kWBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDjTa8xvPhiz2GbbgR8yRRuDJ/gDRe8S8ECOSidjjENpYpq8EdyRbM7J4WvgVwt/kGUyioN+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyjy3+h1M2+ibEYu0PssOUtcDvr+ShfZzcnnlIYTE3L9UZSCM3h
-	MyqT2v1vuxhYYs/ktIgHSwiOD3K3P9ohKjJpEbmLK45Tv+vPOjii7R2/9lIKv/TnRlyzkK+Lr+d
-	peLXHNlKZF/+aZNYHdM446/kuCGA=
-X-Gm-Gg: ASbGnctnmQrFmryu8aLWOYvKD/7mfDzVsctrW7F0FkmX+35w4W1EEq9lzWmTQxVC1Fg
-	vsDyjzWdNFSKHvMyeo2pn5Oh6CSbEvtrV50cMEQ==
-X-Google-Smtp-Source: AGHT+IGWWG/8FknTiGM5IWIK5/t2GJB7a770QBe6q6N0FyVn3StVfGZrpChLuqCSSJ9KfwEYNnxDL1XsdTMcFBwSmlA=
-X-Received: by 2002:ac8:5acc:0:b0:462:e827:c11a with SMTP id
- d75a77b69052e-46a4a8cb0c6mr751458321cf.19.1735833449819; Thu, 02 Jan 2025
- 07:57:29 -0800 (PST)
+        bh=VjDvxsly0BH4NzT+IRTvfxPmn4b6Bp8DG9daG17H8I4=;
+        b=lurMbOuVjtuuFpOnKZXah2oWtpYZhJdi+P/dy1TNg0nP69cNGUHyb/3fHJL48EGUWS
+         Ekk0rB2cioyB3Ozacdj7Jia7sQgiWYpDGHVnjUM4Jpk7EdDlWaK9Z2x0U6NbyxXCFpGR
+         cBTsJg4a1fQShP+JEoV0q4d8bScHdjlfGPut6de0MIuqJpWpX2EA6+Wkc6KCrUa0DyVQ
+         kVIiay01TJwKO8xnx1jOcm5TlbF+CfTeFRAnRcMIjxq4thWUzKdBFhEz5L42LelUFmYl
+         qQUIAYDgo6c+uIJCgE/RXN+qfgIwI3Kwpi3juJcMFPu0Qz/g0FNSRXFZy/HCMGQeM3Zw
+         lH8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735833680; x=1736438480;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VjDvxsly0BH4NzT+IRTvfxPmn4b6Bp8DG9daG17H8I4=;
+        b=OcurN+l10uPci/Usgzu3TkCphQysSuFdcBmjzjEzk6Va696aF89fX4vZr5obmDVzlu
+         hYEpvFSZ0TfkpPDkA+yyS/Glc8RzGrKQo2oOKlpDtjHKJCLjrQa9ByTp+g77vVuOpJuo
+         z9PY//8N+O/4njW4CZqAdY+vySqtwTuGp7Ud5bmEZ7UNg4R1INKNm1II8xL0cNBqaAr5
+         LsapEr37SCvdVSqfT6ZGerlsxa53M0wCwwULlbrnq4p6AQON0jmg/CKOTUHC9Fl9sXGV
+         iCHqX2K5xdI1IwDPazzD1q1LSdqNS0D+6SEpI4y0VSUJy6eMpOXwzkjt0mVB5byMiROY
+         eVpg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjXXGCJzwUqqN4q/HMe2sOUQgf2fAtVPZLvCXnqP7e8W92ZngtzKATh4eSQN/vewRQYbMKa01SJ80EyWY=@vger.kernel.org, AJvYcCVsKpToq1hg7SCtahKRrzqPy6ZOrcDsuddc4YJaxOHSXUiQIlXdjPO5VEStDG2yu3YmF5ckxc16@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPz3DzlEU8flWpa9fH4mhYcNJd5CsPNEyEqdnirVrPlKL+aTju
+	kkRA9hAEINebh2IpKiUJHCR9AnZvOl+A8wbgA+hgj/6hTO36tG65
+X-Gm-Gg: ASbGncttszoODFJIWQ/Bn86NKascg4+c0Bm6W7wHS0UjbpBxSTFUOWuoYxUmev5DfUL
+	PViH5zI1av2yI4bldU90WTNr1OWH6i1PjBF6cw9zRnMlal9nN8OY/QiIs+qWSzXDd52uI74DC4u
+	TuNFXzGJypWgilCUULG2DUPdpFuykQTUveMBK0oz6D7Y06Xs4ASVeewGOiuLs++XG3zf7Sh+Twf
+	WwdVgFfZx5TGxoGqdCeMAR5YCTxy0s1ifcPthKE7yyaApHYvfgYY4zYFduvzwxEg3aRgcp6fnxb
+	7xdTHUHHFUg4VX8o6td+JI3+Srj+i0JXt/mTax8lhATd
+X-Google-Smtp-Source: AGHT+IGhMQp+xDDDjLTohY2Xyoz9SB3saaToYRCcSeHcyJLBvMiZYJC+z03YraYzEiVsqOynkppX6A==
+X-Received: by 2002:a05:600c:1d1d:b0:431:5044:e388 with SMTP id 5b1f17b1804b1-43668b5e172mr371349245e9.22.1735833679939;
+        Thu, 02 Jan 2025 08:01:19 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656b013e1sm484963135e9.12.2025.01.02.08.01.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Jan 2025 08:01:19 -0800 (PST)
+Subject: =?UTF-8?Q?Re=3a_=5bQuestion=5d_ixgbe=ef=bc=9aMechanism_of_RSS?=
+To: Haifeng Xu <haifeng.xu@shopee.com>, Eric Dumazet <edumazet@google.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+References: <da83df12-d7e2-41fe-a303-290640e2a4a4@shopee.com>
+ <CANn89iKVVS=ODm9jKnwG0d_FNUJ7zdYxeDYDyyOb74y3ELJLdA@mail.gmail.com>
+ <c2c94aa3-c557-4a74-82fc-d88821522a8f@shopee.com>
+ <CANn89iLZQOegmzpK5rX0p++utV=XaxY8S-+H+zdeHzT3iYjXWw@mail.gmail.com>
+ <b9c88c0f-7909-43a3-8229-2b0ce7c68c10@shopee.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <87e945f6-2811-0ddb-1666-06accd126efb@gmail.com>
+Date: Thu, 2 Jan 2025 16:01:18 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFmV8NffAhhBR74xiq6QmkmyDq00u9_GxORNk+0kbFHk9yNjcw@mail.gmail.com>
- <20250102080258.53858-1-kuniyu@amazon.com>
-In-Reply-To: <20250102080258.53858-1-kuniyu@amazon.com>
-From: Zhongqiu Duan <dzq.aishenghu0@gmail.com>
-Date: Thu, 2 Jan 2025 23:57:19 +0800
-Message-ID: <CAFmV8NdMqfajmq1W=zAPpeJ28tCwekfi6-7jy6wunYDZXKRVUw@mail.gmail.com>
-Subject: Re: perhaps inet_csk_reqsk_queue_is_full should also allow zero backlog
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kerneljasonxing@gmail.com, 
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <b9c88c0f-7909-43a3-8229-2b0ce7c68c10@shopee.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 2, 2025 at 4:03=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
-> wrote:
->
-> From: Zhongqiu Duan <dzq.aishenghu0@gmail.com>
-> Date: Wed, 1 Jan 2025 23:02:56 +0800
-> > On Wed, Jan 1, 2025 at 9:53=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> > >
-> > > On Tue, Dec 31, 2024 at 4:24=E2=80=AFPM Zhongqiu Duan <dzq.aishenghu0=
-@gmail.com> wrote:
-> > > >
-> > > > Hi all,
-> > > >
-> > > > We use a proprietary library in our product, it passes hardcoded ze=
-ro
-> > > > as the backlog of listen().
-> > > > It works fine when syncookies is enabled, but when we disable synco=
-okies
-> > > > by business requirement, no connection can be made.
-> > >
-> > > I'm not that sure that the problem you encountered is the same as
-> > > mine. I manage to reproduce it locally after noticing your report:
-> > > 1) write the simplest c code with passing 0 as the backlog
-> > > 2) adjust the value of net.ipv4.tcp_syncookies to see the different r=
-esults
-> > >
-> > > When net.ipv4.tcp_syncookies is set zero only, the connection will no=
-t
-> > > be established.
-> > >
-> >
-> > Yes, that's the problem I want to describe.
-> >
-> > > >
-> > > > After some investigation, the problem is focused on the
-> > > > inet_csk_reqsk_queue_is_full().
-> > > >
-> > > > static inline int inet_csk_reqsk_queue_is_full(const struct sock *s=
-k)
-> > > > {
-> > > >         return inet_csk_reqsk_queue_len(sk) >=3D
-> > > > READ_ONCE(sk->sk_max_ack_backlog);
-> > > > }
-> > > >
-> > > > I noticed that the stories happened to sk_acceptq_is_full() about t=
-his
-> > > > in the past, like
-> > > > the commit c609e6a (Revert "net: correct sk_acceptq_is_full()").
-> > > >
-> > > > Perhaps we can also avoid the problem by using ">" in the decision
-> > > > condition like
-> > > > `inet_csk_reqsk_queue_len(sk) > READ_ONCE(sk->sk_max_ack_backlog)`.
-> > >
-> > > According to the experiment I conducted, I agree the above triggers
-> > > the drop in tcp_conn_request(). When that sysctl is set to zero, the
-> > > return value of tcp_syn_flood_action() is false, which leads to an
-> > > immediate drop.
-> > >
-> > > Your changes in tcp_conn_request() can solve this issue, but you're
-> > > solving a not that valid issue which can be handled in a decent way a=
-s
-> > > below [1]. I can't see any good reason for passing zero as a backlog
-> > > value in listen() since the sk_max_ack_backlog would be zero for sure=
-.
-> > >
-> > > [1]
-> > > I would also suggest trying the following two steps first like other =
-people do:
-> > > 1) pass a larger backlog number when calling listen().
-> > > 2) adjust the sysctl net.core.somaxconn, say, a much larger one, like=
- 40960
-> > >
-> > > Thanks,
-> > > Jason
-> >
-> > Even though only one connection is needed for this proprietary library
-> > to work properly, I don't see any reason to set the backlog to zero
-> > either. But it just happened. We simply bin patch the 3rd party
-> > library to set a larger value for the backlog as a workaround.
->
-> A common technique is to specify -1 for listen() backlog.
->
-> Then you even need not know somaxconn but can use it as the max
-> backlog. (see __sys_listen_socket())
->
-> This is especially useful in a container env where app is not
-> allowed to read sysctl knobs.
->
->
+On 02/01/2025 11:23, Haifeng Xu wrote:
+> We want to make full use of cpu resources to receive packets. So
+> we enable 63 rx queues. But we found the rate of interrupt growth
+> on cpu 0~15 is faster than other cpus(almost twice).
+...
+> I am confused that why ixgbe NIC can dispatch the packets
+> to the rx queues that not specified in RSS configuration.
 
-Thanks for sharing this information I do not know.
+Hypothesis: it isn't doing so, RX is only happening on cpus (and
+ queues) 0-15, but the other CPUs are still sending traffic and
+ thus getting TX completion interrupts from their TX queues.
+`ethtool -S` output has per-queue traffic stats which should
+ confirm this.
 
-> >
-> > Thanks for your suggestions, and I almost totally agree with you. I
-> > just want to discuss whether it should and deserves to make some
-> > changes in the kernel to keep the same behavior between
-> > sk_acceptq_is_full() and inet_csk_reqsk_queue_is_full().
->
-> I think you can post a patch to make it consistent with 64a146513f8f:
->
-> ---8<---
-> commit 64a146513f8f12ba204b7bf5cb7e9505594ead42
-> Author: David S. Miller <davem@sunset.davemloft.net>
-> Date:   Tue Mar 6 11:21:05 2007 -0800
->
->     [NET]: Revert incorrect accept queue backlog changes.
-> ...
->     A backlog value of N really does mean allow "N + 1" connections
->     to queue to a listening socket.  This allows one to specify
->     "0" as the backlog and still get 1 connection.
-> ---8<---
-
-Okay, I will post a patch later.
-
-Best regards,
-Zhongqiu
+(But Eric is right that if you _want_ RX to use every CPU you
+ should just change the indirection table.)
 
