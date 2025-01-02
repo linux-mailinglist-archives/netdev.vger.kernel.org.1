@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-154826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD889FFDBF
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:18:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163D89FFE23
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:28:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 143353A02DC
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:18:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0F2416197D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 18:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224F126281;
-	Thu,  2 Jan 2025 18:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE5618F2FD;
+	Thu,  2 Jan 2025 18:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Uz9D0mPz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yYgJxp3U"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0445F1C36
-	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 18:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327A62114;
+	Thu,  2 Jan 2025 18:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735841903; cv=none; b=nCZaxZbX7PzWC9IqPKEEIBR9OYXpE3I7ml6eQUr5qnxTEj4o8bWWoa+WjdmIROwo8eu9Y1//98YP/s6KiN7JkR7mhjKyihDQvlCwDhyq2kR4r1tz6zCnXNJ808s6nn8kJNZUiBUSFAVNoAd/miZvaO8mcLHWXfgpHs3kxHqnkr4=
+	t=1735842524; cv=none; b=J/zvNjEJfq9biZl5s6f5cC8DUQMPTffpSr+VMfKXXGPc0xHYlK6l8AfHAkjil4u5yqTRJPy5t9gXnPqqnEDJ7lnnIr02n2+Y5MjT68/+ZuhO9b3lvDbX4fRTajy+9PI8LBRUSlwMGcvF9rPopRJe2HBW4TeT+WwVYep2cJgW1Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735841903; c=relaxed/simple;
-	bh=eGzq4qeyEsxYhheiFXVbV6vBt+yp5lOUpZmGPoZWD+o=;
+	s=arc-20240116; t=1735842524; c=relaxed/simple;
+	bh=hcNUR2oevSHlDg7p90wSbtprvFqp0at8SHKVYOtIR0U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hXtJt5dBoBRvI02xVSV31xnjCpzN3430NW2E/AZqnhxMYP1d+JvN5sKGYWqL++9B0EgmHi+3uFgyvAQa6omHaYAU/f/iNGXF8n6jY/ZkakRPZfciNnOyfQUTdOugZUHDYIaQ4++k6d6tLbvFiqZBl8TDYwK4+/FHcW2N7+nbVaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Uz9D0mPz; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=iUICATGI9/EG9UvmNr/ZiOKbafcKlIR+/59ocxCcTrniC1ue2RjbxPRGn89cRKiBrcxpijDOsKenyMuggbOOIH1iz2DBX0WTtDmqCxi0QDXy9vb6e9DL/OxQy9BBfzt79WKi9woCLOY6+Z3pzEb9sYiU13uiJt1VKSatCsQyIC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=yYgJxp3U; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,37 +37,47 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gEnr+2xd5FErp9UakbV+HDM8/IklJy2kSrzBVoTsHpQ=; b=Uz9D0mPzgKQlm5vqoBpZ+tFMMM
-	L/TlnAj0baIo9BDQBoR+WVcbN25WtKhco9o3xTRO4yQjz7Xfc+O2P2lVqlpq+Hx36MlyXAq7r9hwj
-	u1SwiOP0FtAMXcYlllbOdBMRaqt8YrQtArZTgimITgkgOnxmFENKSX13DHs8JhGXPNd5TPHWvddYe
-	mZHkq3AyE1yxUYrAl+VYQEhU5JdeLuRYEFq5sgVNo4JyRPNnywtoqfe261kuewkHr83exvk46eE/j
-	OySYT9V+VHmPYCutn1ynNbYWD1y5DsmYlRlWcHm9NSari4aCt5FbrciPxJ9NAVugU/IcUgAONuKJG
-	IKlY3znw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33266)
+	bh=It1pIuzXXjaoHWAah3S1bbwQ/XzdNgxVc9Nj989B/0A=; b=yYgJxp3UHzE1HCMzXuaRpMTSuG
+	0ZsSzPo52ovb168QOFTHnjUXSiXvePHovCmVFLSxcf4iNR01pqUCPENHuMYCX9BejwB3/ZFi/Gsxt
+	NJrX3Mc8C/F5tHQ1Wxbm+fTqzpcb7Hk+qZn1pjkEM9XisWPZCTc0zhBhnmTenah97UudizuS6bBnC
+	sGxuCDHf3DVX8edeHt6NecGkTANb883BX/GDPwNMayUoIF6JYbq27a2QvHP753dhb/IxMlT1UB5fS
+	zXV4E9naJxQkG/H+0bk9s0Fk2i0wQknUIqfxlAH1TBLc4vK8ze2LBXACqCjEIInbE+kk5cvnQWZBG
+	8RSSRdRg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37086)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1tTPlv-0002HQ-31;
-	Thu, 02 Jan 2025 18:18:16 +0000
+	id 1tTPvs-0002Hy-02;
+	Thu, 02 Jan 2025 18:28:32 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tTPlt-0000Ub-35;
-	Thu, 02 Jan 2025 18:18:13 +0000
-Date: Thu, 2 Jan 2025 18:18:13 +0000
+	id 1tTPvq-0000Uo-0q;
+	Thu, 02 Jan 2025 18:28:30 +0000
+Date: Thu, 2 Jan 2025 18:28:30 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	UNGLinuxDriver@microchip.com,
-	Woojung Huh <woojung.huh@microchip.com>
-Subject: Re: [PATCH RFC net-next 0/7] net: dsa: cleanup EEE (part 2)
-Message-ID: <Z3bYZZu8Ip8it0RZ@shell.armlinux.org.uk>
-References: <Z1hPaLFlR4TW_YCr@shell.armlinux.org.uk>
- <20241212194853.7b2bic2vchuqprxz@skbuf>
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] net: phy: Move callback comments from
+ struct to kernel-doc section
+Message-ID: <Z3bazqZkXwVqJ8Nf@shell.armlinux.org.uk>
+References: <20241206113952.406311-1-o.rempel@pengutronix.de>
+ <e6a812ba-b7ea-4f8a-8bdd-1306921c318f@redhat.com>
+ <Z1hJ4Wopr_4BJzan@shell.armlinux.org.uk>
+ <20241210063704.09c0ac8a@kernel.org>
+ <Z2AbBilPf2JRXNzH@pengutronix.de>
+ <20241216175316.6df45645@kernel.org>
+ <Z2EO45xuUkzlw-Uy@pengutronix.de>
+ <Z3bFWDjtGNqSGfdD@shell.armlinux.org.uk>
+ <87seq1xffx.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,75 +86,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241212194853.7b2bic2vchuqprxz@skbuf>
+In-Reply-To: <87seq1xffx.fsf@trenco.lwn.net>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Dec 12, 2024 at 09:48:53PM +0200, Vladimir Oltean wrote:
-> On Tue, Dec 10, 2024 at 02:25:44PM +0000, Russell King (Oracle) wrote:
-> > This is part 2 of the DSA EEE cleanups, and is being sent out becaues it
-> > is relevant for the review of part 1, but would make part 1 too large.
-> > 
-> > Patch 1 removes the useless setting of tx_lpi parameters in the
-> > ksz driver.
-> > 
-> > Patch 2 removes the DSA core code that calls the get_mac_eee() operation.
-> > This needs to be done before removing the implementations because doing
-> > otherwise would cause dsa_user_get_eee() to return -EOPNOTSUPP.
-> > 
-> > Patches 3..6 remove the trivial get_mac_eee() implementations from DSA
-> > drivers.
-> > 
-> > Patch 7 finally removes the get_mac_eee() method from struct
-> > dsa_switch_ops.
+On Thu, Jan 02, 2025 at 11:01:54AM -0700, Jonathan Corbet wrote:
+> "Russell King (Oracle)" <linux@armlinux.org.uk> writes:
 > 
-> I appreciate the splitting of the get_mac_eee() removal into multiple
-> patches per driver and 2 for the DSA framework. It should help BSP
-> backporters which target only a subset of DSA drivers. Monolithic
-> patches are harder to digest, and may have trivial context conflicts due
-> to unrelated changes.
+> > This is the fundamental problem with kernel-doc, when it's missing
+> > something that really should already be there. It's not like we're
+> > the first to use function pointers in structs - that's a thing that
+> > the kernel has been doing for decades.
 > 
-> The set looks good, please don't forget to also update the documentation.
+> Unfortunately, kernel-doc is a gnarly collection of Perl regexes that
+> first appeared in 2.3.52pre1 some 25 years ago and has only grown more
+> gnarly since.
+> 
+> > I also have no desire to attempt to fix kernel-doc -
+> 
+> Neither does anybody else.  There are a few of us who will mount an
+> expedition into those dark woods on occasion to fix something, but there
+> is little desire on any part to make significant improvements, including
+> adding things that should already be there.  It's just barely
+> maintainable.
+> 
+> The proper solution is to reimplement kernel-doc in a language that
+> people actually want to deal with, cleaning out 25 years of cruft in the
+> process.  One way to do that would be to bring that functionality
+> directly into our Sphinx extension, rewriting it in Python.  An
+> alternative I have been considering, as a learning project that would
+> make me One Of The Cool Kids again, would be to do it in Rust instead.
+> 
+> For the time being, though, I wouldn't hold my breath for getting this
+> kind of improvement into kernel-doc.  I wish I could say otherwise.
 
-Sorry, but which documentation are you referring to?
+Right, so we're at logger-heads. Someone needs to give.
 
-$ grep get_mac_eee Documentation/networking/ drivers/net include/ net/ -r
-$ 
+Either:
 
-No references to get_mac_eee() anywhere (except in the mt7530 driver
-which I've missed - patches now included, will be in v2.)
+1) kernel-doc gets fixed
 
-Even looking for "et_mac_eee" in case of Documentation using
-[sg]et_mac_eee() reveals nothing.
+2) we accept that we have to work around kernel-doc to decently document
+   function pointers, and while it may not be great, it gives _full_ and
+   complete documentation of the function pointer.
 
-So, I don't think there's any documentation that these patches change.
+3) we don't document function pointers at all (which leads to users not
+   having something to read when implementing those methods, and
+   reviewers having to post boiler plate explanations of the function
+   pointers when reviewing patches... or just give up with trying to
+   get people to implement the methods sanely.)
 
-There is this in Documentation/networking/dsa/dsa.rst:
+I'll leave it to others to decide which they want to do, but I'm
+intending to continue with (2) for phylink, because I believe that has
+the most benefit to the community, even though it is sub-optimal.
 
-- ``get_eee``: ethtool function which is used to query a switch port EEE settings,
-  this function should return the EEE state of the switch port MAC controller
-  and data-processing logic as well as query the PHY for its currently configured
-  EEE settings
+If one looks at:
 
-First, realise that my patch set actually changes nothing - all these
-implementations were entirely useless because everything they have been
-doing has been overwritten by phylib since phylib's EEE support was
-changed. Therefore, the above as wrong both before and after this
-patch set.
+https://kernel.org/doc/html/v6.13-rc5/networking/kapi.html#c.phylink_mac_ops
 
-Second, when phylink managed EEE gets merged, the above becomes true
-again.
-
-Think of the current phylib behaviour as a user visible regression
-(because that's exactly what it is), and this patch set is part of a
-move towards resolving that regression.
-
-IMHO, phylib managed EEE support should never have been merged - not
-in the way it was. There should have been either a way to transition
-drivers to it without causing all this breakage, or there should have
-been a commitment to getting this fixed in a timely manner (in the
-same cycle that it was merged.)
-
-What we have right now is a total trainwreck.
+then one can see there is a _heck_ of a lot of valuable detail
+documented against each of the function pointers - and I have no
+intention what so ever to get rid of that.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
