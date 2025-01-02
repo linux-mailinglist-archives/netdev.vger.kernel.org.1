@@ -1,161 +1,182 @@
-Return-Path: <netdev+bounces-154829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900879FFF3C
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 20:04:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1833F9FFF3E
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 20:05:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7E1A163F67
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:04:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E81A818817BC
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 19:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61621BEF64;
-	Thu,  2 Jan 2025 19:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025A5192D87;
+	Thu,  2 Jan 2025 19:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="aiRrqYGi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SHsBWYez"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.freemail.hu (fmfe04.freemail.hu [46.107.16.197])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB5A1BD000;
-	Thu,  2 Jan 2025 19:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5264C1A2632
+	for <netdev@vger.kernel.org>; Thu,  2 Jan 2025 19:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735844554; cv=none; b=OBHYf1i03zAMHx9ZnnTPZYlxT57XpuHus0fV/pHJe+vHVNJ9q/XzMo+RSlRTVhVty7vb/Q9FZvIj0ZVLi7jOrhzXqd9Rgme7F+K1axkqYWow0hpMNX9kvnGCUlFi0thh5QRdte6CKkb1pr7GzXUsU/cyMF/3+9oswtiFZ0SLpG0=
+	t=1735844658; cv=none; b=ZPLZUYcsPiG/Ed/OPvodcVBnnWfDKMyX/mTtJj/jVCAcCB6QgSJxrKFNX95PL0bgwRDm2UXrYFSGXq/UI9ATwRni0169SbLYJzUjdYwMUsWzaDvYHH0GpgMoVxWqnL2IESjBNfH6ZGOu1r89v5R+mVNDk1PQ3ZV8J1YSo+QiKR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735844554; c=relaxed/simple;
-	bh=MFAChTCWnc4powJqPNhWIqRo1yBpNbyay9OeDGMt0MI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RM0B/jbHAKrY7lMr90xCjz3/FL0TaQX/M19EnhRafJWI2picYCb7garYLYNQdkO87DQl5BPoZ86YkxPOdNukU5FTadSg1naP7FJiV0THXuUEfCXM6VanLasKs3xrkAhMwbkgp96jrKYVRWFCyO8nNUpV0k30XenJxOOjVIb5hUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=aiRrqYGi reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
-Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YPG846MfwzKNf;
-	Thu, 02 Jan 2025 19:53:56 +0100 (CET)
-Message-ID: <90b238e6-65d8-4a1d-b59b-e10445e4c61c@freemail.hu>
-Date: Thu, 2 Jan 2025 19:53:36 +0100
+	s=arc-20240116; t=1735844658; c=relaxed/simple;
+	bh=dQtlI0STkRC2aJGltzLuuXjG6WT1FUsuLiTVb/iXk8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jsxWOgXJZnPkQaPhdsv6vnaL8gQVPd1coY8pnYR4L6wl2wfUgrTy+3hakS/81dTodqc+PjvM83hmKcG2AYTKhZaC/57eYRVZ9pVNEeGOcE2mnSMZzf28CzpnvZeFIM5NtlGucmCKAqZsvh1Vhiwvq3tO3C+/lUI4rHO8lP8tKok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SHsBWYez; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1735844656; x=1767380656;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=dQtlI0STkRC2aJGltzLuuXjG6WT1FUsuLiTVb/iXk8s=;
+  b=SHsBWYezCd5I7+ba/7rDMe8v+T3GHVviqZ87NpDted92vUP6OWAYgX+q
+   dFBSBlL/n1YnNvkuT2t42JmqP1syN+h9U0MOm68YdXPcXDfrY/g8uO6X4
+   cntlmKUHpZN0zC8HJtPXdT/AqR6uqQHzH8kyfjo7/HErT0nVygZ0P63e+
+   MIPdnTVEgetHvC8yjK/Id1gW33phRtcrmEVDaOmjhT5NY3r6yohDgu0Ge
+   d+SyGmbc/Wsg43T1qFXR0r+8jOIvNemO7yj3zKuD4mWq1xhYUuP8GuI9D
+   N7Fb8xBnVnmp1H9Yt6myMNBXv59wtuNE/hQkWwMXtMXx/SUBn3h5uBfzs
+   Q==;
+X-CSE-ConnectionGUID: WkRnMxQCQdu/ZLHDaL8nOQ==
+X-CSE-MsgGUID: bEI3kkvoRwuXY5l5Y5AX5Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11303"; a="40019449"
+X-IronPort-AV: E=Sophos;i="6.12,286,1728975600"; 
+   d="scan'208";a="40019449"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2025 11:04:16 -0800
+X-CSE-ConnectionGUID: Y3NyWuBmRJGvJxsIpf//hA==
+X-CSE-MsgGUID: ThdaegfGTGWQjhR7osT41A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,286,1728975600"; 
+   d="scan'208";a="106449225"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa004.fm.intel.com with ESMTP; 02 Jan 2025 11:04:14 -0800
+Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2BCD32FC57;
+	Thu,  2 Jan 2025 19:04:13 +0000 (GMT)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-net] ice: Fix switchdev slow-path in LAG
+Date: Thu,  2 Jan 2025 20:07:52 +0100
+Message-ID: <20250102190751.7691-2-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] netfilter: uapi: Merge xt_*.h/c and ipt_*.h which has
- same name.
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
- daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
- kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250102172115.41626-1-egyszeregy@freemail.hu>
- <6eab8f06-3f65-42cb-b42e-6ba13f209660@lunn.ch>
-Content-Language: hu
-From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
-In-Reply-To: <6eab8f06-3f65-42cb-b42e-6ba13f209660@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1735844037;
-	s=20181004; d=freemail.hu;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	l=3770; bh=pd7Epz5kInMqfCmFFe9kT7Ku2czQtdZ0efDTT061zoI=;
-	b=aiRrqYGiiOKrXfnsGjuwiKy2Ih8vtHxz2/dQ9n4C5DgwpgSMlKzcRURjeHBjdDl2
-	vQ6adgH31DLDYsofutjsiJt7I6sJNbFp6yno5aypU+YHn8a/50v1UckLoMbmTrB3UbU
-	sWn/O7APq7BFxh70xvYBIndQA9lK9642wpDP3XIvchZPmcPSobxjmZpag1Ovt54zXGR
-	Y4z+w/OvaCi2z+XSJQmkYCI5psTp2gmLktjE4TeXR63qCTLLjrFv2vAZYSzMhFUgfhq
-	KdKphO14vlpOpd+9H7Bfc1GKUKAgqdsCE+ZiGk4RuebHtbbWLQ5vVyXKigqy2F/xOmO
-	/kLqtJj9Aw==
 
-2025. 01. 02. 18:39 keltezéssel, Andrew Lunn írta:
-> On Thu, Jan 02, 2025 at 06:21:15PM +0100, egyszeregy@freemail.hu wrote:
->> From: Benjamin Szőke <egyszeregy@freemail.hu>
->>
->> Merge and refactoring xt_*.h, xt_*.c and ipt_*.h files which has the same
->> name in upper and lower case format. Combining these modules should provide
->> some decent memory savings.
-> 
-> Numbers please. We don't normally accept optimisations without some
-> form of benchmark showing there is an improvement.
->   
+Ever since removing switchdev control VSI and using PF for port
+representor Tx/Rx, switchdev slow-path has been working improperly after
+failover in SR-IOV LAG. LAG assumes that the first uplink to be added to
+the aggregate will own VFs and have switchdev configured. After
+failing-over to the other uplink, representors are still configured to
+Tx through the uplink they are set up on, which fails because that
+uplink is now down.
 
-Some of you mentioned in a reply e-mail, that is a good benefits in merging the 
-codes. I do not have test result about it and i will no provide it.
+On failover, update all PRs on primary uplink to use the currently
+active uplink for Tx. Call netif_keep_dst(), as the secondary uplink
+might not be in switchdev mode. Also make sure to call
+ice_eswitch_set_target_vsi() if uplink is in LAG.
 
->> The goal is to fix Linux repository for case-insensitive filesystem,
->> to able to clone it and editable on any operating systems.
-> 
-> This needs a much stronger argument, since as i already pointed out,
-> how many case-insenstive file systems are still in use? Please give
-> real world examples of why this matters.
-> 
+On the Rx path, representors are already working properly, because
+default Tx from VFs is set to PF owning the eswitch. After failover the
+same PF is receiving traffic from VFs, even though link is down.
 
-All of MacOS and Windows platform are case-insensitive. So it means, who like to 
-edit Linux kernel code on them, then build it in a remote SSH solution, there 
-are lot of them.
+Fixes: defd52455aee ("ice: do Tx through PF netdev in slow-path")
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_lag.c  | 27 +++++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_txrx.c |  4 +++-
+ 2 files changed, 30 insertions(+), 1 deletion(-)
 
->>   delete mode 100644 include/uapi/linux/netfilter/xt_CONNMARK.h
->>   delete mode 100644 include/uapi/linux/netfilter/xt_DSCP.h
->>   delete mode 100644 include/uapi/linux/netfilter/xt_MARK.h
->>   delete mode 100644 include/uapi/linux/netfilter/xt_RATEEST.h
->>   delete mode 100644 include/uapi/linux/netfilter/xt_TCPMSS.h
->>   delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_ECN.h
->>   delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_TTL.h
->>   delete mode 100644 include/uapi/linux/netfilter_ipv6/ip6t_HL.h
-> 
-> How did you verify that there is no user space code using these
-> includes?
-> 
-> We take ABI very seriously. You cannot break user space code.
-> 
->      Andrew
-
-This is a minimal ABI change, which have to use lower case filenames for 
-example: xt_DSCP.h -> xt_dscp.h
-
-By the way this UAPI code part was changed 8-10 years ago last time. There are 
-many ugly codes, ugly styles in headers, there are no any consístent code style 
-and technical code/solution between the variouse header and soruce files (struct 
-names, const values etc...).
-
-Somebody used enum for bit mask defining, somebody else use macros for the same 
-scope. It is terrible to refactoring it without any ABI breaking change. Because 
-of the code quality is terrible wrong, it should be much better to take care 
-about to improve it with a heavy refactoring instead of just says ABI breaking 
-change is not possible. In this way, sooner or later the house of cards will 
-crumble. For long term maintainability shall need a big code changes here in 
-UAPI in order to provide a good and maintainable clean code. (independent from 
-case-insensitive, it should be needed)
-
-First sign of it which can not be solved without ABI issue:
-I think, "linux/include/uapi/linux/netfilter_ipv4
-/ipt_ecn.h" and "linux/include/uapi/linux/netfilter_ipv4
-/ipt_ECN.h" can not be merged without ABI breaking because "IPT_ECN_IP_MASK" is 
-implemented in both in a different technical way. (It should not have accepted 
-+10 years ago in the codebase, and then our legs wouldn't be tremble now for an 
-ABI change)
-
-
-ipt_ecn.h: 
-https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
-ipt_ECN.h: 
-https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
-
-
-In my merge i needed to drop "#define IPT_ECN_IP_MASK	(~XT_DSCP_MASK)" and i 
-hope it will be replaced well with the other enum definition in any code.
-
-merged ipt_ecn.h: 
-https://github.com/Livius90/linux/blob/uapi-work/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
-
-> 
-> ---
-> pw-bot: cr
+diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
+index 1ccb572ce285..22371011c249 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lag.c
++++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+@@ -1000,6 +1000,28 @@ static void ice_lag_link(struct ice_lag *lag)
+ 	netdev_info(lag->netdev, "Shared SR-IOV resources in bond are active\n");
+ }
+ 
++/**
++ * ice_lag_config_eswitch - configure eswitch to work with LAG
++ * @lag: lag info struct
++ * @netdev: active network interface device struct
++ *
++ * Updates all port representors in eswitch to use @netdev for Tx.
++ *
++ * Configures the netdev to keep dst metadata (also used in representor Tx).
++ * This is required for an uplink without switchdev mode configured.
++ */
++static void ice_lag_config_eswitch(struct ice_lag *lag,
++				   struct net_device *netdev)
++{
++	struct ice_repr *repr;
++	unsigned long id;
++
++	xa_for_each(&lag->pf->eswitch.reprs, id, repr)
++		repr->dst->u.port_info.lower_dev = netdev;
++
++	netif_keep_dst(netdev);
++}
++
+ /**
+  * ice_lag_unlink - handle unlink event
+  * @lag: LAG info struct
+@@ -1021,6 +1043,9 @@ static void ice_lag_unlink(struct ice_lag *lag)
+ 			ice_lag_move_vf_nodes(lag, act_port, pri_port);
+ 		lag->primary = false;
+ 		lag->active_port = ICE_LAG_INVALID_PORT;
++
++		/* Config primary's eswitch back to normal operation. */
++		ice_lag_config_eswitch(lag, lag->netdev);
+ 	} else {
+ 		struct ice_lag *primary_lag;
+ 
+@@ -1419,6 +1444,7 @@ static void ice_lag_monitor_active(struct ice_lag *lag, void *ptr)
+ 				ice_lag_move_vf_nodes(lag, prim_port,
+ 						      event_port);
+ 			lag->active_port = event_port;
++			ice_lag_config_eswitch(lag, event_netdev);
+ 			return;
+ 		}
+ 
+@@ -1428,6 +1454,7 @@ static void ice_lag_monitor_active(struct ice_lag *lag, void *ptr)
+ 		/* new active port */
+ 		ice_lag_move_vf_nodes(lag, lag->active_port, event_port);
+ 		lag->active_port = event_port;
++		ice_lag_config_eswitch(lag, event_netdev);
+ 	} else {
+ 		/* port not set as currently active (e.g. new active port
+ 		 * has already claimed the nodes and filters
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 5d2d7736fd5f..f1c06c227dc5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -2368,7 +2368,9 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
+ 					ICE_TXD_CTX_QW1_CMD_S);
+ 
+ 	ice_tstamp(tx_ring, skb, first, &offload);
+-	if (ice_is_switchdev_running(vsi->back) && vsi->type != ICE_VSI_SF)
++	if ((ice_is_switchdev_running(vsi->back) ||
++	     ice_lag_is_switchdev_running(vsi->back)) &&
++	    vsi->type != ICE_VSI_SF)
+ 		ice_eswitch_set_target_vsi(skb, &offload);
+ 
+ 	if (offload.cd_qw1 & ICE_TX_DESC_DTYPE_CTX) {
+-- 
+2.45.0
 
 
