@@ -1,119 +1,100 @@
-Return-Path: <netdev+bounces-154758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C998D9FFB0A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:37:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BEFE9FFB1A
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 16:46:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1FC918833F3
-	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:37:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC9341882165
+	for <lists+netdev@lfdr.de>; Thu,  2 Jan 2025 15:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE08719D071;
-	Thu,  2 Jan 2025 15:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzn1F0NK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7F51B413A;
+	Thu,  2 Jan 2025 15:46:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE31E8BE5;
-	Thu,  2 Jan 2025 15:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2061B3944;
+	Thu,  2 Jan 2025 15:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735832217; cv=none; b=kRbBqmtJZqkP1yPUAd5iLDTlsmXhCW8up6FmsSHi6PN8gPmlOhR/OH7u1iRoezGcVjsyjIdfz8Fh4zu83SoKKkABcuTDIHKiX0ubRD11oh5biv7iW+8Jyi0QdMfhMSMrfyjbv74ZLi0upvmajpycspL+ePJe4HR7nmFgk+0UWcQ=
+	t=1735832760; cv=none; b=d+BRTpQEe5gkR6MxdosVXdFnRwC/S5/jtaphxIeY1qiyVjEFdwOyoICvbdcI0oVv0tAKMahQkzhmlJj5Wncj/6HDSFvTIbDcIGDmlpbbLdnfHakSqzCHyhQ56cMtvi+eY3A8wrI9DC8p0+W3vWqtLd2hWj/oZ1cpqa9TC7YbCj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735832217; c=relaxed/simple;
-	bh=f38aPYAmhszBuFj6KTOhnppFbnb4JjDmJ3z3JQ61iAI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Ow/e3PyeW0YUysT3ZJAubFt91goNHo/1alCUcSc6uEl0IDdoIjBiwTmiuUBlaSxkIGDH/PC3w8CCo6/6wWVP1v95VMPaamxaDDD6PLzahSOgWZGOSauB1l225VSnjaUILqd9eJ4aZfGQQGXwR8BA0LFZT5UIP3pZ6BLaKbLcNqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzn1F0NK; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1735832760; c=relaxed/simple;
+	bh=Gt9IgQcdS6zTtWyLM76yOke5d3ktR6jtS0PEnFYEGhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IKYZZZiVDqtko/MdoHbouoM9Nh0U6Yn5Idzz1dyz8gf3tFFe14JGr2QzZv2hmzqVSnVKsXxBDaGwJcyxEx7mWTc8iOJqaGTAKxt6gca3gu8bwQgAJHVt5eJjC/hGe1UQ/0/toBYxjHHIjl38OEtJwzbQRsr227QeCIQONy5FT0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4368a293339so77082015e9.3;
-        Thu, 02 Jan 2025 07:36:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735832214; x=1736437014; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W30DC7OaNqvJnSZnaaNsRvXcLsLHeYQX3Ko5/d2qxm8=;
-        b=hzn1F0NKtg63P3svkFm4NZgr8eNc83lh7zD51gUqJojDWlwEvwFU78WTjyO1mGArcz
-         7aH1fYhHvjWFN9I4NEUEDNvSgypjZb2BNt8RvvHrtOWq5ni5okvIwTKjHTL8fKvW8fx/
-         BYLpPvCozZir0RzJKSZ+v/hT7iatohtHzSUY1jlrD7GW6fVwIscrgtsasXX+H0EQCxOq
-         ypWet7EihBtTfZz/bvOiRAZ4zZGLC8PtKJiw/XQB0Yjhl8VoWmftzZ4GOlclTlNZqpd9
-         3Gm9PlXkwqdlhwqO/CGg/7DLsYm0yYldIdf5uFwCC9PhaBSmD9hdnWyiQAZ/4ttRwrVv
-         PSrA==
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aa6a92f863cso1936283366b.1;
+        Thu, 02 Jan 2025 07:45:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735832214; x=1736437014;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W30DC7OaNqvJnSZnaaNsRvXcLsLHeYQX3Ko5/d2qxm8=;
-        b=QRpm3dM6M6hUJrvGx8TIo+98avFQpZgnYrDWdclCPW3amyh9BDWrIj4FrLwt+rW6L0
-         E5QGnHYM0MvdpK1mGQmGGVpE557zIb0G2cu8ho9SV5jgIEB0LaQVPr4uVeL64d78q2kG
-         x/pxuPY4n4vEdMCocC/+uwr3BlZMaCzdDUoBgI3HJ/6tAKWD8OZjh3JStWdQEcb0XrF2
-         HoAjvy1zyphcuF7gEXpRieC77lIj8lpZdSQOVsZpNkSWlcZeawgMQ29UVI0zVAM1akjR
-         QdtytToaGtPJSiJjENkqP1yNGr7SlL9r9sJQbnRrWXQhmspuEEnKtwNaT2ge0kDOByiE
-         /8Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFQmHCD2c4DRDNuN5wc/LhKDIfQmRgv+SG1HgnSZqw/B7iJLm54joyXKxUuyYMbWEY9T1ztg5m@vger.kernel.org, AJvYcCVDHpsBVEjD/S+8O2oCgCjNRT+hSIblRAsUithuSHyrBGkw+ZIN8aUyJg8omGfKZRPZEyyjwdM9lqGSWHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQZC4iGKSCMRiwkvW4I551kUdvi7ZAtu+jmb4lwdDpmH3HV0rJ
-	wrm+fAb/Uvs1KaxFOky12eht5p1pq2aHWZGacnrhSPQ8p3pQoc6I
-X-Gm-Gg: ASbGncsbh0rPViQoit9r3EyEL0O7QffNv/FeTZatK0lXEA0a9XsWnM2PqIvNTBNzefA
-	Y+t/iTlfjCAucBoNJYN7hWnVzli7/oayxdywesppZCPwdRsK1KVvnaous7ij+AO1tn15lcdDNZ8
-	NS4n0zA7OLYR+ILoOuaHW21So1rRCJDJYdeEfRJP+7Ce/BRZU6BxxY9tlJWStUfd1hGNmV4O1Lx
-	Y2yhhSrzKwECooa7gR1k+9Q1kj6N3BSuYmmJOD7plMEPtF0HdxRlLohDEj3lAz4QSoVYzbNztaU
-	rq9V8Z+pIdFk1/omQ4LuONofIi/7l8IQpe5NUpir52iz
-X-Google-Smtp-Source: AGHT+IHzZSpkNaxW88jjdEhhyUTHTOVLRbadoqT9hVMKSlcgLUk/E0ZQV1REBYbeKKKUG+KlcVjtNg==
-X-Received: by 2002:a5d:59af:0:b0:385:deca:f7cf with SMTP id ffacd0b85a97d-38a221e1ff0mr36324252f8f.8.1735832213789;
-        Thu, 02 Jan 2025 07:36:53 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656b3b2a4sm489959975e9.27.2025.01.02.07.36.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jan 2025 07:36:53 -0800 (PST)
-Subject: Re: [PATCH net] net: sfc: Correct key_len for
- efx_tc_ct_zone_ht_params
-To: Liang Jie <buaajxlj@163.com>, kuba@kernel.org
-Cc: habetsm.xilinx@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- pieter.jansen-van-vuuren@amd.com, netdev@vger.kernel.org,
- linux-net-drivers@amd.com, linux-kernel@vger.kernel.org,
- Liang Jie <liangjie@lixiang.com>
-References: <20241230093709.3226854-1-buaajxlj@163.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <2ad890a7-7035-881e-8613-3ca830e0e7c6@gmail.com>
-Date: Thu, 2 Jan 2025 15:36:52 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1735832756; x=1736437556;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h2g0ivZyP4Gq3elbBwKgtWXwEWLwxdsNB8Grs3eMANo=;
+        b=E/UmTHqmunWD5mgrCEqRL4Qo7UMv3IaAXGGMZHlXftcUfWo+J9XBZllAR0w0fI3EBI
+         2zmLsenR+PrFwdx8PoWNfNyWCkI+cdkvsEnWrRVu9XgZ5s2B8N23CWUpgKlz54QGlcGq
+         V7qg1qs4T/0t0BpKAQ3CCSPd6bbJghv6GfkvFNNOwI+RR9a/FV6DJ+7XX8rSoMtfoVoB
+         iOD6hWHrwTiDo16JZB9XhxjQOK3NSti7TToVO9Yj66pNErbBkdlFLGS0hI4CQX3R3XRl
+         fEBSpGaqovFdXyLGIthQND689rzPbk4ln854M8lUdWnOn8pilsv5hfPjMHfrfH6+ZsGe
+         FT/w==
+X-Forwarded-Encrypted: i=1; AJvYcCVcO7dSqGJfmS3VKiOf76lRC71IW63qt4PAEijjkAc57p+/nMLrR1WhTr5a13+xc3IvThXovOrcx22/OVM=@vger.kernel.org, AJvYcCXwCGIPj9bPfKl/b3Ih5QtscWkm/26LLqM4a20IWH+XUtyeIG8IO0KASC4LsPcIaRVVMb2OHoBQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqX/+IdZOwRjWfBvMQzSs8amqDGeRSD5zBLV+Z4uSqeqJ05q1V
+	I3SNEt2HdfIEHAQ7+E5Ga41EGgsfGSP8nXu1RXquFB3n1Xsbx4yoiJz7AQ==
+X-Gm-Gg: ASbGncvs2Eff/HEnYK0v1eyEzCzr7CAKlbvB7591Hwe1tTsVjbeWFY3J8C1ItQC1Ifn
+	Jh7NUAE4gxD007nMNHIF/yvId+Hir6752qqcN8abfKX4NpUBk4BruU6rSE4+s26pFEUnL8cdIO7
+	wQVNlpv62RCXm5NTvWradCaIosZu2JFLnrEThxJshxrE54SxAZy6ywJJp2L+klCDpkz7kZXtUq2
+	O9N5MSkoIHgbHv7fOFG1+7rkZtm4BesgERPDINKxSEYT0EI
+X-Google-Smtp-Source: AGHT+IF9Opy0LyTeLf+WcovwqPhZVqY0yducz1jeXl63C6Qhux/jKU7KQXgPiT1DvlqzIjf2tKzdQQ==
+X-Received: by 2002:a17:907:961f:b0:aa6:abe2:5cba with SMTP id a640c23a62f3a-aac27026cfemr4744580766b.2.1735832755949;
+        Thu, 02 Jan 2025 07:45:55 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:70::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0f06629esm1800682366b.189.2025.01.02.07.45.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 07:45:55 -0800 (PST)
+Date: Thu, 2 Jan 2025 07:45:53 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Tejun Heo <tj@kernel.org>, kernel test robot <oliver.sang@intel.com>,
+	oe-lkp@lists.linux.dev, lkp@intel.com, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [herbert-cryptodev-2.6:master] [rhashtable]  e1d3422c95:
+ stress-ng.syscall.ops_per_sec 98.9% regression
+Message-ID: <20250102-bizarre-griffin-of-attraction-c1f728@leitao>
+References: <202412271017.cad7675-lkp@intel.com>
+ <Z3HTN1gvVE9tfa4Y@slm.duckdns.org>
+ <Z3XndzXUa9KYYz9f@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241230093709.3226854-1-buaajxlj@163.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z3XndzXUa9KYYz9f@gondor.apana.org.au>
 
-On 30/12/2024 09:37, Liang Jie wrote:
-> From: Liang Jie <liangjie@lixiang.com>
+On Thu, Jan 02, 2025 at 09:10:15AM +0800, Herbert Xu wrote:
+> On Sun, Dec 29, 2024 at 12:54:47PM -1000, Tejun Heo wrote:
+> >
+> > Hmm... the only meaningful behavior difference would be that after the
+> > patch, rht_grow_above_75() test is done regardless of the return value while
+> > before it was done only when the return value is zero. Breno, can you please
+> > look into whether this report is valid and whether restoring the NULL check
+> > makes it go away?
 > 
-> In efx_tc_ct_zone_ht_params, the key_len was previously set to
-> offsetof(struct efx_tc_ct_zone, linkage). This calculation is incorrect
-> because it includes any padding between the zone field and the linkage
-> field due to structure alignment, which can vary between systems.
-> 
-> This patch updates key_len to use sizeof_field(struct efx_tc_ct_zone, zone)
-> , ensuring that the hash table correctly uses the zone as the key. This fix
-> prevents potential hash lookup errors and improves connection tracking
-> reliability.
-> 
-> Fixes: c3bb5c6acd4e ("sfc: functions to register for conntrack zone offload")
-> Signed-off-by: Liang Jie <liangjie@lixiang.com>
+> Actually I fixed that when committing the patch.  It should be
+> conditional on whether the insertion succeeds or not.
 
 Thanks.
 
-Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+I am finally back from vacation. I will try to reproduce the issue
+reported in this report, and double-check the regression.
+
+--breno
 
