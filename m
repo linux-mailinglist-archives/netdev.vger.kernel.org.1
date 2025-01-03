@@ -1,186 +1,134 @@
-Return-Path: <netdev+bounces-155031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82026A00B92
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:36:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71147A00B95
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:37:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47ABA164154
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 15:36:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F07A163520
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 15:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE48192593;
-	Fri,  3 Jan 2025 15:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC9A1FA8EF;
+	Fri,  3 Jan 2025 15:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DioZ2SdT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BA1PMRrv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD94EEBB;
-	Fri,  3 Jan 2025 15:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0AD1FA8E9
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 15:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735918569; cv=none; b=l8vFRA0Jvs+KSrb+NCsyX0i41fK6ICV6CzIo0dU7C38MjEFBVubf0ZFHczMm1EAfZhOUoO1stHc51OxfunRpkXqMkmbdHlZj68Sz8o1JBkrPoNSJW8ZxOPEa8KIJZKYPadDho0YOWWZe0xA1P+oJzTJW24GEeNKHC8pMDcc8vJU=
+	t=1735918660; cv=none; b=quZHgbYTloQlam9+i3BMlfl/obWk/NnJ0Rb41Kwi6ziIm9f3uCnIhfU7D3iGbzKa4+JZgs4UMw1QzFQqA+LQqmAvj30FStflqKAE91N+wA4yNwOJoot1op8wiWEDaLLh1HK6j7vPI/t7A7/RUVxi0F+E2cde+fZAiX8fkeeFlIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735918569; c=relaxed/simple;
-	bh=BP57r48by4OEYie9Qo8+k9Xp0WXIh7qmhsh31IIUX7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fmt8SqAF/kEkoyQrvBo12SbnuicnCgM5AfR8SnH+VBVR11RWCx2zaiP63GM+RbvrDK2L1/cA7DvWjJFtB1aSHPog3tZtHIQfvVOYseSzV7R4IrVd3PQs4vV8f6uSgiEm869+S580dXp+IhQLE/zU7hgRXs5myUISC8xGftZjEQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DioZ2SdT; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-844d67eb693so992824439f.3;
-        Fri, 03 Jan 2025 07:36:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735918566; x=1736523366; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m5aoFzxt3ammeH1Kyflvq1OY39O6WB2KH3gw979wCWA=;
-        b=DioZ2SdTO2zqMHEeJeNhSvEq9uKoYfLBbiNJOPIZafMYNXFOF67bVeqHMPge30jV43
-         7ljOJ+wauQ6X9wn2Ct6m5b0zzTX4P6XNNksKSgKDybAzdSiJbmqODrQJ3xZc78SGvOAX
-         gRkFKrOcFuhtCkUA7lNFVzC0U9wcIw5Y34cjUFvy6UjVqOyP5Hw0AVFvPSXCFbN5ecyK
-         i2zyH8MOGMiss4pdW3Dn4zF8DXgX/dSxG3PwK9TKUxvTegWG+TtEnp6lX8a47pPKofA5
-         joePg5KhpfjeTb8tpOHAfZwx/j0yxNOVjFODp6RHl+Da0dQZ8vjiIZeZBC2H/i4E0aam
-         wDZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735918566; x=1736523366;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m5aoFzxt3ammeH1Kyflvq1OY39O6WB2KH3gw979wCWA=;
-        b=LE7pcFLm9GZh/tJyAl9d+mYbnc40HoTBcJ4ToR8QuADL/muw0pzulHYRLcYiabcRww
-         yDLvXDcrTzdMDJEfGbiuE3appwru1msQ3VDT04fVUqDURO9A9YShNA30xDqV6iQmeNZg
-         WkJNFpf/RjD9bjxqfuhGGFXkNQbDVNZUG608fXtFmu8xwuzlZRDvQ9luiu9UMcpn8OOd
-         26bZV5gWlgqxWDlohS4z5TsicMfN3fW1ZkNQzk9pAzgbLtBX0+os/WAzVu78FQFuYByz
-         trQr3lxeUpn7o4XEN5qvR0FdUXEkCzol0NZHJy9zxBPkYfPGBeM9Mr9PbNNxRTP209mA
-         dqhA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNEw0SsNkFIgNQ1BIiP9iEYmEN5Fgqete0tr8ToF72eXl7MpX+/KHpzekuctEdqd1i7YovyrOnonk3@vger.kernel.org, AJvYcCXweFmC4CARxHDdTpY7DI1TvSuQoEOy8lRXBnexFBBp2Ch4yDR8bR4PLgGuj2EZlg2dDYZ5XpKD@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoWjiCgfAZcs0BPpP9xJVimOuZP5YTU5u1w6XFGtuxvsC2Bnf1
-	RUmvwDZ3BNlHlj3yc6k+qMw9FHqZNR8lPmsHfRGEOIoLoqVrBadT2cHk4rbgqQuLPRzaTLjKdnF
-	UcE1+6L0bx/BWJvPqFi510tlLwRQ=
-X-Gm-Gg: ASbGncsZySXV7e6F9ngnO6qDhqwLg5hYt4OCR5OAn4UJ0vsHB0Ft097QhVyCJxaMBhG
-	34OUod0uX6BsUVXspVpga6pFfc1BjKHpL8dZge4o=
-X-Google-Smtp-Source: AGHT+IGjlzjnKrvqXUywDcLjWtiJd1TMgtN9g0YS3sb3QRClaBXzLYHIJLhy0b6D9yy1UNtP3KsgEcZSKpLgOiluUmU=
-X-Received: by 2002:a05:6e02:3201:b0:3a7:e0c0:5f25 with SMTP id
- e9e14a558f8ab-3c2d1b98ac9mr386005915ab.4.1735918566347; Fri, 03 Jan 2025
- 07:36:06 -0800 (PST)
+	s=arc-20240116; t=1735918660; c=relaxed/simple;
+	bh=IQw9pJ228eTZvbjFpEWokRyegaCkYhFIlI8zbKGcOOs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ogY6ji7kutkiOj7Re9LFszMO3DSNckP9XI3IqAs59DvmjMQF0uH5+rZ84H8cGZTX9gW7rYGxl5oH404sXlfM6XXR9/hV6NYGgU/DO4YtpR9m+xv7SBg1XQnIif5g4BjQ6YSu5iCMVnMPQretD945uASPh1UkD5U1DgW/qo8gP+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BA1PMRrv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=JSd33bkwaveu8S8e0mibGgJ6kNdOWbqWpVO1trXKPTU=; b=BA1PMRrvHImqNiiDSWBDu84GEX
+	p8IvwmoGxhJ3A9V1F+J8rSYJsAEDTM9a6gSbqN3qtL/7FLZSNJOCUfQ3Tm28eR0+LcUJMIt6/fpbJ
+	jXHFO25H0FXk4ltQf9Q01PhmtcQdkfDdrEnWnWp4c5GAa2srlIck0Nqo6xvdZWg60KMo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tTjjx-0014iJ-7r; Fri, 03 Jan 2025 16:37:33 +0100
+Date: Fri, 3 Jan 2025 16:37:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Niklas Cassel <cassel@kernel.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Francesco Valla <francesco@valla.it>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	Anand Moon <linux.amoon@gmail.com>,
+	Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH] net: phy: don't issue a module request if a driver is
+ available
+Message-ID: <1898857d-d580-4fa5-8f19-6e91114975a1@lunn.ch>
+References: <20250101235122.704012-1-francesco@valla.it>
+ <Z3ZzJ3aUN5zrtqcx@shell.armlinux.org.uk>
+ <7103704.9J7NaK4W3v@fedora.fritz.box>
+ <d5bbf98e-7dff-436e-9759-0d809072202f@lunn.ch>
+ <Z3fJQEVV4ACpvP3L@ryzen>
+ <Z3fTS5hOGawu18aH@shell.armlinux.org.uk>
+ <Z3fc2jiJJDzbCHLu@ryzen>
+ <cff14918-0143-4309-9317-675c18ad3a8f@lunn.ch>
+ <Z3f1coRBcuKd1Eao@ryzen>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1a645f4a0bc60ad18e7c0916642883ce8a43c013.1735835456.git.gnault@redhat.com>
-In-Reply-To: <1a645f4a0bc60ad18e7c0916642883ce8a43c013.1735835456.git.gnault@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 3 Jan 2025 10:35:55 -0500
-Message-ID: <CADvbK_fsM_EfoNjhybKJr92ojqFo6OdnuA2WiFJyi6Y1=rX4Gw@mail.gmail.com>
-Subject: Re: [PATCH net-next] sctp: Prepare sctp_v4_get_dst() to dscp_t conversion.
-To: Guillaume Nault <gnault@redhat.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	Simon Horman <horms@kernel.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, linux-sctp@vger.kernel.org, 
-	Ido Schimmel <idosch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z3f1coRBcuKd1Eao@ryzen>
 
-On Thu, Jan 2, 2025 at 11:34=E2=80=AFAM Guillaume Nault <gnault@redhat.com>=
- wrote:
->
-> Define inet_sk_dscp() to get a dscp_t value from struct inet_sock, so
-> that sctp_v4_get_dst() can easily set ->flowi4_tos from a dscp_t
-> variable. For the SCTP_DSCP_SET_MASK case, we can just use
-> inet_dsfield_to_dscp() to get a dscp_t value.
->
-> Then, when converting ->flowi4_tos from __u8 to dscp_t, we'll just have
-> to drop the inet_dscp_to_dsfield() conversion function.
-With inet_dsfield_to_dscp() && inet_dsfield_to_dscp(), the logic
-looks like: tos(dsfield) -> dscp_t -> tos(dsfield)
-It's a bit confusing, but it has been doing that all over routing places.
+On Fri, Jan 03, 2025 at 03:34:26PM +0100, Niklas Cassel wrote:
+> On Fri, Jan 03, 2025 at 03:12:14PM +0100, Andrew Lunn wrote:
+> > > FWIW, the patch in $subject does make the splat go away for me.
+> > > (I have the PHY driver built as built-in).
+> > > 
+> > > The patch in $subject does "Add a list of registered drivers and check
+> > > if one is already available before resorting to call request_module();
+> > > in this way, if the PHY driver is already there, the MDIO bus can perform
+> > > the async probe."
+> > 
+> > Lets take a step backwards.
+> > 
+> > How in general should module loading work with async probe? Lets
+> > understand that first.
+> > 
+> > Then we can think about what is special about PHYs, and how we can fit
+> > into the existing framework.
+> 
+> I agree that it might be a good idea, if possible, for request_module()
+> itself to see if the requested module is already registered, and then do
+> nothing.
+> 
+> Adding Luis (modules maintainer) to CC.
+> 
+> Luis, phylib calls request_module() unconditionally, regardless if there
+> is a driver registered already (phy driver built as built-in).
+> 
+> This causes the splat described here to be printed:
+> https://lore.kernel.org/netdev/7103704.9J7NaK4W3v@fedora.fritz.box/T/#u
+> 
+> But as far as I can tell, this is a false positive, since the call cannot
+> possibly load any module (since the driver is built as built-in and not
+> as a module).
 
-In sctp_v4_xmit(), there's the similar tos/dscp thing, although it's not
-for fl4.flowi4_tos.
+Please be careful here. Just because it is built in for your build
+does not mean it is built in for everybody. The code needs to be able
+to load the module if it is not built in.
 
-Also, I'm curious there are still a few places under net/ using:
+Also, i've seen broken builds where the driver is both built in and
+exists as a module. User space will try to load the module, and the
+linker will then complain about duplicate symbols and the load fails.
+So it is not a false positive. There is also the question of what
+exactly causes the deadlock. Is simply calling user space to load a
+module which does not exist sufficient to cause the deadlock? That is
+what is happening in your system, with built in modules.
 
-  fl4.flowi4_tos =3D tos & INET_DSCP_MASK;
+Also, the kernel probably has no idea if the module has already been
+loaded nor not when request_module() is called. What we pass to the
+request_module() is not the name of the module, but a string which
+represents one of the IDs the PHY has. It is then userspace that maps
+that string to a kernel module via modules.alias. And there is a many
+to one mapping, many IDs map to one module. So it could be the module
+has already been loaded due to some other string.
 
-Will you consider changing all of them with
-inet_dsfield_to_dscp() && inet_dsfield_to_dscp() as well?
+So, back to my original question. How should module loading work with
+async probe?
 
-Thanks.
->
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
-> ---
->  include/net/inet_sock.h |  6 ++++++
->  net/sctp/protocol.c     | 10 +++++++---
->  2 files changed, 13 insertions(+), 3 deletions(-)
->
-> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-> index 3ccbad881d74..1086256549fa 100644
-> --- a/include/net/inet_sock.h
-> +++ b/include/net/inet_sock.h
-> @@ -19,6 +19,7 @@
->  #include <linux/netdevice.h>
->
->  #include <net/flow.h>
-> +#include <net/inet_dscp.h>
->  #include <net/sock.h>
->  #include <net/request_sock.h>
->  #include <net/netns/hash.h>
-> @@ -302,6 +303,11 @@ static inline unsigned long inet_cmsg_flags(const st=
-ruct inet_sock *inet)
->         return READ_ONCE(inet->inet_flags) & IP_CMSG_ALL;
->  }
->
-> +static inline dscp_t inet_sk_dscp(const struct inet_sock *inet)
-> +{
-> +       return inet_dsfield_to_dscp(READ_ONCE(inet->tos));
-> +}
-> +
->  #define inet_test_bit(nr, sk)                  \
->         test_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags)
->  #define inet_set_bit(nr, sk)                   \
-> diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
-> index 8b9a1b96695e..29727ed1008e 100644
-> --- a/net/sctp/protocol.c
-> +++ b/net/sctp/protocol.c
-> @@ -43,6 +43,7 @@
->  #include <net/addrconf.h>
->  #include <net/inet_common.h>
->  #include <net/inet_ecn.h>
-> +#include <net/inet_sock.h>
->  #include <net/udp_tunnel.h>
->  #include <net/inet_dscp.h>
->
-> @@ -427,16 +428,19 @@ static void sctp_v4_get_dst(struct sctp_transport *=
-t, union sctp_addr *saddr,
->         struct dst_entry *dst =3D NULL;
->         union sctp_addr *daddr =3D &t->ipaddr;
->         union sctp_addr dst_saddr;
-> -       u8 tos =3D READ_ONCE(inet_sk(sk)->tos);
-> +       dscp_t dscp;
->
->         if (t->dscp & SCTP_DSCP_SET_MASK)
-> -               tos =3D t->dscp & SCTP_DSCP_VAL_MASK;
-> +               dscp =3D inet_dsfield_to_dscp(t->dscp);
-> +       else
-> +               dscp =3D inet_sk_dscp(inet_sk(sk));
-> +
->         memset(&_fl, 0x0, sizeof(_fl));
->         fl4->daddr  =3D daddr->v4.sin_addr.s_addr;
->         fl4->fl4_dport =3D daddr->v4.sin_port;
->         fl4->flowi4_proto =3D IPPROTO_SCTP;
->         if (asoc) {
-> -               fl4->flowi4_tos =3D tos & INET_DSCP_MASK;
-> +               fl4->flowi4_tos =3D inet_dscp_to_dsfield(dscp);
->                 fl4->flowi4_scope =3D ip_sock_rt_scope(asoc->base.sk);
->                 fl4->flowi4_oif =3D asoc->base.sk->sk_bound_dev_if;
->                 fl4->fl4_sport =3D htons(asoc->base.bind_addr.port);
-> --
-> 2.39.2
->
+      Andrew
 
