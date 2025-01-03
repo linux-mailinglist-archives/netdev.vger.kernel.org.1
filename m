@@ -1,216 +1,126 @@
-Return-Path: <netdev+bounces-154979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75B1CA008B0
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:32:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B3F3A008C8
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 929851884F37
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:32:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF0D41884B41
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7851FA156;
-	Fri,  3 Jan 2025 11:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ew+0hrnB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F121D61AC;
+	Fri,  3 Jan 2025 11:41:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32461CDA2F;
-	Fri,  3 Jan 2025 11:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CC11BEF85;
+	Fri,  3 Jan 2025 11:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735903910; cv=none; b=HjntnqjhH+wshMgTs7B8KM1aiwHcAg8/MtY2oUm5E3oO3YnTlZ4bJ2RREvDT2yQLyxO5LVpjuC0gVrRygl4itT11VytOQJ1gmoX9kc4tc9sDW2uTxYXoiaZTb9Rkk18BLHveYW/x3FGtqUyosSxHo+h+XRdddIqtcmcyjRvu0h4=
+	t=1735904470; cv=none; b=hQVVBEgaQaaH3aHcAhOIYL6rDaAPJda69ziUwKJTO+HPVD5q/BzhGIk53xMo9z9SUaV4Z3/zEmhw0Orc+uY4kWrrs6GPhX376Y/Xzv3lc16O3NhtgropVnSIA7+l/2Fcn+aBSghW9x6QAn/AB5xsA5N1cBMDkt38l0EzbgqyZqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735903910; c=relaxed/simple;
-	bh=5OjME6BSm/Atzhp4f5AdGJUG6pQDE6dzaH0awQrddjk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MBP3ZbnBDJC0dgZoMiz538UM+iW2J9a0rjmb0U0TBS19m++KPmRqjkyfi221p0ra78r1DZ4Tk/RGmX1rLchCBZ67A09/PNwRVhcU21sfZwz5LeoRri/jUiPCqk/0dAQv7n30dDEy7kJwMijQrm84ySpwM9ekTTe3qsSWlv+CGwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ew+0hrnB; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6d8f99cb0d9so96804256d6.0;
-        Fri, 03 Jan 2025 03:31:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735903906; x=1736508706; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ys2oJFhfKDPHWIzvxKVUVfTyMPCWohwYzSs7v5VHzo=;
-        b=ew+0hrnByR8a+fEM3haVvibYOAZZZv0NU/tSqu0ptzAtJwS1yyHSvgKinzeYPUzcIx
-         qYAqxM6IsukX48hevfPtJwcq4oRoBB9MGJBG5xj6uUdfEBl8tx2M71dyFb44XOjR2wvy
-         MyS7q287swM9GBP8FnA1g+uSKtbYTyjraT3wIVWoc29GhksQQLNf32F98nWtZ5vF77zd
-         AyN2NCczP7nJAeCqUco3yaiB1WTKytR3SpZR1cOHpb6xZ0/MURbELLeC1tf/HT6ijAMJ
-         LAGBXQp3KH2GAPWu0HHZD3/ThGxEjgJ0d9leBKgymYXa6uZCbhlcl4L5l1nUtm/RL/S4
-         jxDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735903906; x=1736508706;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8ys2oJFhfKDPHWIzvxKVUVfTyMPCWohwYzSs7v5VHzo=;
-        b=YVlMNkrkd5pk+3CXQUdDZ1MGXHtjtxP8tZ9Mabi8TL9eYsFjBV9gTt/gXTgHz/DpHY
-         hGTU5jfI+S21APhkS8XQyJGJ0K4Zyt5l2YvRxuMlNltCIIyJbimzBB2xOTnAH9/m6hbM
-         fd2cqMXdqxAsCa54nh9n7LXVo6NKXgFLKApXaSthJw+2ACuIZ1Hj7extO05hkNDIChJB
-         UC120iBDFtS7ChKf3gb3SrZFn/+BZ2XIobRCnMoSVhuaNnHKWByn9EcWnegU9Uuef0eu
-         6qYh5y140nVZCBQRP3uU+6ux0LyG8Et70ENNNZMtJtne4MwvLzVJhCtsUffbbLJRWq+l
-         rcJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWHAhlUWXDPHdQmQzIqpm1rTgza8MHd31/IlvC9WTVpkDyWpdHKNom79VSWx2k2Kq5KAd6VaAqB+rlf+PzmrgY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPx4lw4aOAnzLA9lAh13ThlXGdF7GLYC9JL/aD6/iwiKPNs8KR
-	VUGITF9ME/OxoDq3eHr9Did/6C8+Vejfgf0HLeUGqc4/VvA1FCLi0g46iFZgcjs=
-X-Gm-Gg: ASbGncvKXM6DeFTsRHr3fwN9IWuxVAhlb0U0gq4cGfcHk5fH9tCPYBaiiE3WPGi0nKn
-	3ReVz98ckVxTIRGv3Wv4Nrl6Ym0fehjnL1DqsQKk4w0IwifgSZy3VVVtS6EG3lw8tEZZBQ0NRX2
-	LkFrQSUmdFK4H+BgSkf/d5MSUm7Aw26Ys5Q0nmDyMATFZwpUsMHfmIE/mtIGe61ecYdfDgP1oAX
-	ClZLsMnaCqdbPDL1Gy/0ywoNIYhJBT7INl/bbK7ticT0nRHywMFjhO1Vd8AztqryHa/fXVr2HhL
-	sAauYVR0foMX5ld9jjSf7QY5TEQasbNlRPWsohBw0QMZom9cPu8=
-X-Google-Smtp-Source: AGHT+IHVm6imLAd/tpOMb1+qa4nnH103Eu2aIZO1ILl9wLFBNX61gx73eC9oYaf3grk2eoaB6lJVlQ==
-X-Received: by 2002:a05:6214:1d21:b0:6d1:9e72:596a with SMTP id 6a1803df08f44-6dd2339dcc5mr726878596d6.37.1735903906175;
-        Fri, 03 Jan 2025 03:31:46 -0800 (PST)
-Received: from willemb.c.googlers.com.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd18e3c3ffsm140117566d6.13.2025.01.03.03.31.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jan 2025 03:31:45 -0800 (PST)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	sohamch@google.com,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next] selftests/net: packetdrill: report benign debug flakes as xfail
-Date: Fri,  3 Jan 2025 06:31:14 -0500
-Message-ID: <20250103113142.129251-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+	s=arc-20240116; t=1735904470; c=relaxed/simple;
+	bh=r0+bPk+18OLFPNZOyzIFvNO34XF2I50Yma4ohzN75aA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XQ7b1eJK7bZQ9YSsxpQywN2RFgvxZqGwAKue68Zv98PR+/0YET7m3bQDgaeBKwuvGdQrJF9yE/jtxzkL4AW8SmdXh0r6vsixyTZi9hWrZoBdJB9mmyyBzWt84Yj0cqOU5xmGlPHqibiZApr2ghLcd0GbmVftHuXFGoI/3UVu08Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tTg36-000000005et-3d5p;
+	Fri, 03 Jan 2025 11:41:04 +0000
+Date: Fri, 3 Jan 2025 11:40:52 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Stanislaw Gruszka <stf_xl@wp.pl>
+Cc: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	Kalle Valo <kvalo@kernel.org>,
+	Tomislav =?utf-8?Q?Po=C5=BEega?= <pozega.tomislav@gmail.com>
+Subject: Re: [PATCH 1/2] rt2x00: Remove unusued value
+Message-ID: <Z3fMxD2mAVsVl58h@pidgin.makrotopia.org>
+References: <20241221124445.1094460-1-ariel.otilibili-anieli@eurecom.fr>
+ <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
+ <20250103085540.GA94204@wp.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250103085540.GA94204@wp.pl>
 
-From: Willem de Bruijn <willemb@google.com>
+On Fri, Jan 03, 2025 at 09:55:40AM +0100, Stanislaw Gruszka wrote:
+> On Sat, Dec 21, 2024 at 01:39:32PM +0100, Ariel Otilibili wrote:
+> > Coverity-ID: 1525307
+> > Signed-off-by: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
+> > ---
+> >  drivers/net/wireless/ralink/rt2x00/rt2800lib.c | 6 ------
+> >  1 file changed, 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/wireless/ralink/rt2x00/rt2800lib.c b/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
+> > index 60c2a12e9d5e..e5f553a1ea24 100644
+> > --- a/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
+> > +++ b/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
+> > @@ -8882,13 +8882,10 @@ static void rt2800_rxiq_calibration(struct rt2x00_dev *rt2x00dev)
+> >  
+> >  	for (ch_idx = 0; ch_idx < 2; ch_idx = ch_idx + 1) {
+> >  		if (ch_idx == 0) {
+> > -			rfval = rfb0r1 & (~0x3);
+> >  			rfval = rfb0r1 | 0x1;
+> 
+> I wonder if intention here was different, for example:
+> 
+>  			rfval = rfb0r1 & (~0x3);
+>   			rfval = rfval | 0x1;
+> 
+> For me the patch looks ok - it does not change existing behaviour,
+> since rfval is overwritten by second line anyway.
 
-A few recently added packetdrill tests that are known time sensitive
-(e.g., because testing timestamping) occasionally fail in debug mode:
-https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg
+I agree with the likely intention here, however, the vendor driver
+also comes with the dead code, see
+https://github.com/lixuande/rt2860v2/blob/master/files/rt2860v2/common/cmm_rf_cal.c#L2690
 
-These failures are well understood. Correctness of the tests is
-verified in non-debug mode. Continue running in debug mode also, to
-keep coverage with debug instrumentation.
+So this is certainly a bug in the vendor driver as well which got ported
+bug-by-bug to rt2x00... Not sure what is the best thing to do in this
+case.
 
-But, only in debug mode, mark these tests with well understood
-timing issues as XFAIL (known failing) rather than FAIL when failing.
-
-Introduce an allow list xfail_list with known cases.
-
-Expand the ktap infrastructure with XFAIL support.
-
-Fixes: eab35989cc37 ("selftests/net: packetdrill: import tcp/fast_recovery, tcp/nagle, tcp/timestamping")
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/netdev/20241218100013.0c698629@kernel.org/
-Signed-off-by: Willem de Bruijn <willemb@google.com>
----
- .../selftests/kselftest/ktap_helpers.sh       | 15 ++++++++++--
- .../selftests/net/packetdrill/ksft_runner.sh  | 23 +++++++++++++++----
- 2 files changed, 31 insertions(+), 7 deletions(-)
-
-diff --git a/tools/testing/selftests/kselftest/ktap_helpers.sh b/tools/testing/selftests/kselftest/ktap_helpers.sh
-index 79a125eb24c2..05a461890671 100644
---- a/tools/testing/selftests/kselftest/ktap_helpers.sh
-+++ b/tools/testing/selftests/kselftest/ktap_helpers.sh
-@@ -7,6 +7,7 @@
- KTAP_TESTNO=1
- KTAP_CNT_PASS=0
- KTAP_CNT_FAIL=0
-+KTAP_CNT_XFAIL=0
- KTAP_CNT_SKIP=0
- 
- KSFT_PASS=0
-@@ -69,6 +70,16 @@ ktap_test_skip() {
- 	KTAP_CNT_SKIP=$((KTAP_CNT_SKIP+1))
- }
- 
-+ktap_test_xfail() {
-+	description="$1"
-+
-+	result="ok"
-+	directive="XFAIL"
-+	__ktap_test "$result" "$description" "$directive"
-+
-+	KTAP_CNT_XFAIL=$((KTAP_CNT_XFAIL+1))
-+}
-+
- ktap_test_fail() {
- 	description="$1"
- 
-@@ -99,7 +110,7 @@ ktap_exit_fail_msg() {
- ktap_finished() {
- 	ktap_print_totals
- 
--	if [ $((KTAP_CNT_PASS + KTAP_CNT_SKIP)) -eq "$KSFT_NUM_TESTS" ]; then
-+	if [ $((KTAP_CNT_PASS + KTAP_CNT_SKIP + KTAP_CNT_XFAIL)) -eq "$KSFT_NUM_TESTS" ]; then
- 		exit "$KSFT_PASS"
- 	else
- 		exit "$KSFT_FAIL"
-@@ -107,5 +118,5 @@ ktap_finished() {
- }
- 
- ktap_print_totals() {
--	echo "# Totals: pass:$KTAP_CNT_PASS fail:$KTAP_CNT_FAIL xfail:0 xpass:0 skip:$KTAP_CNT_SKIP error:0"
-+	echo "# Totals: pass:$KTAP_CNT_PASS fail:$KTAP_CNT_FAIL xfail:$KTAP_CNT_XFAIL xpass:0 skip:$KTAP_CNT_SKIP error:0"
- }
-diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-index 4071c133f29e..ff989c325eef 100755
---- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-+++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-@@ -23,7 +23,7 @@ if [ $# -ne 1 ]; then
- 	ktap_exit_fail_msg "usage: $0 <script>"
- 	exit "$KSFT_FAIL"
- fi
--script="$1"
-+script="$(basename $1)"
- 
- if [ -z "$(which packetdrill)" ]; then
- 	ktap_skip_all "packetdrill not found in PATH"
-@@ -31,16 +31,29 @@ if [ -z "$(which packetdrill)" ]; then
- fi
- 
- declare -a optargs
-+failfunc=ktap_test_fail
-+
- if [[ -n "${KSFT_MACHINE_SLOW}" ]]; then
- 	optargs+=('--tolerance_usecs=14000')
-+
-+	# xfail tests that are known flaky with dbg config, not fixable.
-+	# still run them for coverage (and expect 100% pass without dbg).
-+	declare -ar xfail_list=(
-+		"tcp_fast_recovery_prr-ss.*.pkt"
-+		"tcp_timestamping.*.pkt"
-+		"tcp_user_timeout_user-timeout-probe.pkt"
-+		"tcp_zerocopy_epoll_.*.pkt"
-+	)
-+	readonly xfail_regex="^($(printf '%s|' "${xfail_list[@]}"))$"
-+	[[ "$script" =~ ${xfail_regex} ]] && failfunc=ktap_test_xfail
- fi
- 
- ktap_print_header
- ktap_set_plan 2
- 
--unshare -n packetdrill ${ipv4_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
--	&& ktap_test_pass "ipv4" || ktap_test_fail "ipv4"
--unshare -n packetdrill ${ipv6_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
--	&& ktap_test_pass "ipv6" || ktap_test_fail "ipv6"
-+unshare -n packetdrill ${ipv4_args[@]} ${optargs[@]} $script > /dev/null \
-+	&& ktap_test_pass "ipv4" || $failfunc "ipv4"
-+unshare -n packetdrill ${ipv6_args[@]} ${optargs[@]} $script > /dev/null \
-+	&& ktap_test_pass "ipv6" || $failfunc "ipv6"
- 
- ktap_finished
--- 
-2.47.1.613.gc27f4b7a9f-goog
-
+> 
+> Acked-by: Stanislaw Gruszka <stf_xl@wp.pl>
+> 
+> But Tomislav and Daniel, please check if this code is correct.
+> 
+> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 1, rfval);
+> > -			rfval = rfb0r2 & (~0x33);
+> >  			rfval = rfb0r2 | 0x11;
+> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 2, rfval);
+> > -			rfval = rfb0r42 & (~0x50);
+> >  			rfval = rfb0r42 | 0x10;
+> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 42, rfval);
+> >  
+> > @@ -8901,13 +8898,10 @@ static void rt2800_rxiq_calibration(struct rt2x00_dev *rt2x00dev)
+> >  
+> >  			rt2800_bbp_dcoc_write(rt2x00dev, 1, 0x00);
+> >  		} else {
+> > -			rfval = rfb0r1 & (~0x3);
+> >  			rfval = rfb0r1 | 0x2;
+> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 1, rfval);
+> > -			rfval = rfb0r2 & (~0x33);
+> >  			rfval = rfb0r2 | 0x22;
+> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 2, rfval);
+> > -			rfval = rfb0r42 & (~0x50);
+> >  			rfval = rfb0r42 | 0x40;
+> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 42, rfval);
+> >  
+> > -- 
+> > 2.47.1
+> > 
+> 
 
