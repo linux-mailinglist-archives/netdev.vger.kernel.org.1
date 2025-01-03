@@ -1,180 +1,139 @@
-Return-Path: <netdev+bounces-154994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B9AFA0097A
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:49:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 586F0A00982
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:54:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54F123A4090
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:49:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B4A4188464F
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F1481ACA;
-	Fri,  3 Jan 2025 12:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22F71FA16B;
+	Fri,  3 Jan 2025 12:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DoXJRa+p"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AXKxr+Gw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14B117FE
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 12:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE391F9AB5;
+	Fri,  3 Jan 2025 12:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735908574; cv=none; b=NmBtNyQqOazMqwi8mcikEypqBG3C+mB272oeNkmivk3SdROQyvIb43BCCskpU1Dxp2IeusObps2TsfX7NpDv/Kja0x55FOyePuBQYpkuaZ4J+Rn0o+8Va9mAu2EUIayiOksPnxsNQo4typxV+xbHvq3BBDAhPOxj9czZVzjBrbA=
+	t=1735908849; cv=none; b=Wl9t8kYpb36JK+jyawZTZr4NbWjeTSWFRxNILX20XDwjfHeugPQsDiOOv/tZSfBc/LiQJZOf3yAyr9Uj9sGCxqJnzTQZpPCNzNxzekBn+7NgT7dzFyTnSN1wgywfHky2T+3BoL0ObAx0JGVKPBRbd7eNegYynQmpDpuVCcoVQ1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735908574; c=relaxed/simple;
-	bh=7MRQJGBiUBCzLqnvCFabIBG8fZhV46yIYuerOdSsBuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hDncOZrKzRbEn0Pl6cuxMd6KD8Rw8cdoTHrYkGJLEX5ARkObRxVrX9np3AAe1zK18O+IfF9NZCLhz4FAUR+vwMHURh+sbOYbL72IhTi8z6bBDcDZWCQ6PfN4LWwd+IwlTU4TbumMgTSb+VbP4fr8d6ulxPNBTT2fNn1CzkmOeQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DoXJRa+p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6BB3C4CEDD;
-	Fri,  3 Jan 2025 12:49:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735908574;
-	bh=7MRQJGBiUBCzLqnvCFabIBG8fZhV46yIYuerOdSsBuk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DoXJRa+pU6CHt2lK8th/jEIOoCYCm7wYTRLN7Isp5pDmCWLNnwPbsMBZPcmzm4Q97
-	 4QGTYV5FiA89ZqRdPJUiOGgXf5e3LSdDBCjVNmKx07fDP/BZiKxzU0KjvR6OfrgL3q
-	 zeALEj10hSgxqiFaae5aUKrfmKgArm5SL+YxBawU0qUzlQKlZbvavGM53+bkPgvb26
-	 Cf/eK8PGkkWOS7tfnq5OZl/VOoRaAWyTKVbur8r1fPbjj3r5yjA5GgMKX4SKDoNdm+
-	 lsdJbecDvo762SrObd6KijNACdEPVxeRnP1yRKMreXRJ2IXE/FXhy/hS+6XL6entrd
-	 kSzAA2vBD495Q==
-Date: Fri, 3 Jan 2025 13:49:30 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Francesco Valla <francesco@valla.it>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	Anand Moon <linux.amoon@gmail.com>
-Subject: Re: [PATCH] net: phy: don't issue a module request if a driver is
- available
-Message-ID: <Z3fc2jiJJDzbCHLu@ryzen>
-References: <20250101235122.704012-1-francesco@valla.it>
- <Z3ZzJ3aUN5zrtqcx@shell.armlinux.org.uk>
- <7103704.9J7NaK4W3v@fedora.fritz.box>
- <d5bbf98e-7dff-436e-9759-0d809072202f@lunn.ch>
- <Z3fJQEVV4ACpvP3L@ryzen>
- <Z3fTS5hOGawu18aH@shell.armlinux.org.uk>
+	s=arc-20240116; t=1735908849; c=relaxed/simple;
+	bh=DokGVZAo+UUlU+hYOCt41gahFKtvvzU+qiTRiI/6lOo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WNlPNLfE5jRirRrT2qJzT5AXpy3YE45rR8vo6TIMbKr+SSxA9xKlBgILLPYrAvIFEAgEKo5Yybmphl3lZ+81DMqwNAd87Z9bgOiFy8OPqvB0N0/E1jES2+WdOlyqOb9mG3BBE5SuXDD81EPFuGZN8S+BM4pqqcvO/s6gHZ3XQn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AXKxr+Gw; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D8CAB40004;
+	Fri,  3 Jan 2025 12:54:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1735908845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SrP471C2ngogmcSn0oE7jqDyzd1g7ACgc1oMTOJHdMA=;
+	b=AXKxr+GwEwJu/GQ5aWiYySvcHNa+qUcLgRh14jeGg2k2oj+Q47a7vkeFxJgdxQg7g1qlrF
+	gF9HRLW64zofeSaYhVR/PFeGPxLqDfaKTuLPaWGPaQOOnN3XPcrSAEBvK1g/5bfBHskW6U
+	TcT7p/PK5iCGY/Qa7Vlfd++DmBsRT7uvtC4qSFzVEK0TXs6ZPF9U2DgTqm26z6tWyodmKg
+	OHdRe4ODBozI9Va1iwjp/4Yv0hugHQ3EKgVq8Cdx843mLNim2ZZArVxK0DcHqdVmLYRKCG
+	IsW1n9jZf2B7N3kdTnwVXmbJWlKnjGyg9FcYRPPzLSZ/yxmcM1Im/FH1rutKeA==
+Message-ID: <c7ff7788-d3af-4867-8b13-57a0bf1f529a@bootlin.com>
+Date: Fri, 3 Jan 2025 13:54:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z3fTS5hOGawu18aH@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] selftests/bpf: Migrate test_xdp_redirect.sh to
+ xdp_do_redirect.c
+To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250103-xdp_redirect-v1-0-e93099f59069@bootlin.com>
+ <20250103-xdp_redirect-v1-2-e93099f59069@bootlin.com>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20250103-xdp_redirect-v1-2-e93099f59069@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Fri, Jan 03, 2025 at 12:08:43PM +0000, Russell King (Oracle) wrote:
-> On Fri, Jan 03, 2025 at 12:25:52PM +0100, Niklas Cassel wrote:
-> > I'm trying to enable async probe for my PCIe controller (pcie-dw-rockchip),
-> > which on the radxa rock5b has a RTL8125 NIC connected to it.
-> > 
-> > By enabling async probe for the PCIe driver I get the same splat as Francesco.
-> > 
-> > Looking at the prints, it is trying to load a module for PHY ID: 0x1cc840
-> > This PHY ID is defined in: drivers/net/phy/realtek.c.
-> > 
-> > Looking at my .config I have:
-> > CONFIG_REALTEK_PHY=y
-> > 
-> > So this is not built as a module, so I am a bit surprised to see this
-> > splat (since the driver is built as built-in).
-> > 
-> > 
-> > I think it would be nice if the phylib core could be fixed so that
-> > it does not try to load modules for drivers which are built as built-in.
-> > 
-> > 
-> > Also see this old thread that tries to enable async probe by default on
-> > DT systems:
-> > https://lore.kernel.org/linux-kernel//d5796286-ec24-511a-5910-5673f8ea8b10@samsung.com/T/#u
-> > 
-> > AFAICT, it seems that the phylib core is one of the biggest blockers from
-> > being able to enable async probe by default on DT systems.
-> 
-> Yes, we accept that phylib is incompatible with async probing. I don't
-> think that's going to change, because it's fundamentally baked in with
-> the way the whole fallback driver stuff works.
-> 
-> We *certainly* don't want to move the request_module() into
-> phy_attach*() (which is the point where we require the driver to be
-> bound or we fallback to the generic feature-reduced driver). First,
-> that *will* break SFP modules, no ifs or buts.
-> 
-> Second, moving it there would mean calling request_module() in many
-> cases with the RTNL held, which blocks things like new connections
-> network establishing while the module is requested (I've run into this
-> problem when the TI Wilink driver locks up holding the RTNL lock making
-> the platform impossible to remotely resolve if there isn't an already
-> open SSH connection.) We certainly don't want userspace to be doing
-> stuff while holding the "big" RTNL that affects much of networking.
-> 
-> Third, I suspect phylib already has a race between the PHY driver /
-> driver core binding the appropriate driver and phy_attach_direct()
-> attaching the fallback generic driver to the driverless PHY device,
-> and making this more "async" is going to open that race possibly to
-> the point where it becomes a problem. (At the moment, it doesn't
-> seem to cause any issue, so is theoretical right now - but if one
-> reads the code, it's obvious that there is no locking that prevents
-> a race there.)
-> 
-> What saves phylib right now is that by issueing the request_module(),
-> that will wait for the module to be loaded and initialised. The
-> initialisation function will register the PHY drivers in this module.
-> As this is synchronous, it will happen before request_module() returns,
-> and thus before phy_device_create() returns. Thus, if there is a module
-> available for the PHY, it will be loaded and available to be bound
-> to the PHY device by the time phy_device_register() is called. This
-> ensures that - in the case of an auto-loaded module, the race will
-> never happen.
-> 
-> Yes, it's weak. A scenario that could trigger this is loading PHY
-> driver modules in parallel with a call to the phy_attach*() functions,
-> e.g. when bringing up a network interface where the network driver
-> calls through to phy_attach*() from its .ndo_open() method. If we
-> simply make phylib's request_module() async, then this race will be
-> opened for auto-loaded modules as well.
-> 
-> Closing this race to give consistent results is impossible, even if
-> we add locking. If phy_attach*() were to complete first, the generic
-> driver would be used despite the PHY specific driver module being
-> loaded. Alternatively, if the PHY specific driver module finishes
-> being loaded before phy_attach*() is called, then the PHY specific
-> driver will be used for the device. So... it needs to be synchronous.
-> 
-> I also don't think "make a list of built-in drivers and omit the
-> request module" is an acceptable workaround - it's a sticky plaster
-> for the problem. If the PHY driver isn't built-in, then you have the
-> same problem with request_module() being issued. You could work around
-> that by ensuring that the PHY driver is built-in, but then we're
-> relying on multiple different things all being correct in diverse
-> areas, which is fragile.
+Hi Bastien,
 
-FWIW, the patch in $subject does make the splat go away for me.
-(I have the PHY driver built as built-in).
+On 1/3/25 11:10, Bastien Curutchet (eBPF Foundation) wrote:
 
-The patch in $subject does "Add a list of registered drivers and check
-if one is already available before resorting to call request_module();
-in this way, if the PHY driver is already there, the MDIO bus can perform
-the async probe."
+[...]
 
-Personally, I think this solution is better than keeping the status-quo.
+> +		SYS(fail, "ip link add veth%d index %d%d%d type veth peer name veth0 netns %s",
+> +		    i, i, i, i, ns_name);
 
-If we take a buildroot kernel config for a specific board as an example,
-they are very careful to always mark the NIC driver for the specific board
-as built-in, such that the board can use nfsroot.
-(Same logic can be applied to phylib driver.)
+nit: since you have to run an ip command through SYS anyway, you can reduce the
+open ns/run command/close ns dance (and all the resulting error checks) by
+running directly `SYS("ip netns exec %s ip link add [...]", NS0, [...])`
 
-Having a solution similar to what is suggested in $subject would certainly
-improve things for DT based systems.
+[...]
 
-Also note that arch/arm64/configs/defconfig marks a bunch of phylib drivers
-as built-in.
+> +	ret = bpf_xdp_attach(if_nametoindex("veth2"),
+> +			     bpf_program__fd(prog_to_111),
+> +			     data->xdp_flags, NULL);
 
+nit: since we are setting static if index at veth creation (which looks needed
+for this test), the if_nametoindex could be replaced by the corresponding index,
+which could be directly a define
 
-Kind regards,
-Niklas
+> +	if (!ASSERT_GE(ret, 0, "bpf_xdp_attach"))
+> +		goto close;
+> +
+> +	ret = bpf_xdp_attach(if_nametoindex("veth1"),
+> +			     bpf_program__fd(prog_to_222),
+> +			     data->xdp_flags, NULL);
+> +	if (!ASSERT_GE(ret, 0, "bpf_xdp_attach"))
+> +		goto close;
+> +
+> +	close_netns(nstoken);
+> +
+> +	nstoken = open_netns(NS1);
+> +	if (!ASSERT_OK_PTR(nstoken, "open NS1"))
+> +		goto close;
+> +
+> +	SYS(close, "ping -c 1 %s.2", IPV4_NETWORK);
+> +
+> +	close_netns(nstoken);
+> +
+> +	nstoken = open_netns(NS2);
+> +	if (!ASSERT_OK_PTR(nstoken, "open NS2"))
+> +		goto close;
+> +
+> +	SYS(close, "ping -c 1 %s.1", IPV4_NETWORK);
+
+Is it really useful to check ping originating from both interfaces, isn´t a
+single ping able to stimulate programs attached to both veth0 ?
+
+Aside from those minor points, LGTM :)
+
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
