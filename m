@@ -1,103 +1,146 @@
-Return-Path: <netdev+bounces-155099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DEEFA00FCD
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:25:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 760D7A00FF6
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84C311886A17
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:23:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B05C21883E70
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0E51C243D;
-	Fri,  3 Jan 2025 21:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D197DA95;
+	Fri,  3 Jan 2025 21:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RWNE9reb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="uZk81Uo/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out.freemail.hu (fmfe07.freemail.hu [46.107.16.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AB41C07EA;
-	Fri,  3 Jan 2025 21:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5ED33DF;
+	Fri,  3 Jan 2025 21:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735939119; cv=none; b=Z255Z2p0D/qHgLQ/h/Wwsngql96P8a6+NGrpjduNkKwSMIz2IynQBk/Z6+6WCSxnmNmZgwYx3j7mOTjh6BYbtkTtSSLn+0Ay3TmORJi9M58O5KgVxco6sqHpcrXicfU5KKRlPkpkxETQSOeR23vBodRHYPwXIbFB1sMB5Krto90=
+	t=1735940890; cv=none; b=gggS0GqAZbVRVZxMk2yuZrPOJQfFYY41VtloUHkb1Q0+IqxbWvNzp1Rt68vKyI/YmmtwJl59CuNpZmuOsPINYu2TKtjI7bO5XkuNSV4EobZna0mi98wIwzJUkSypQerJd76VVkuvYSD94EadATmE6yQcq3sas+VfiFmAP2W3kwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735939119; c=relaxed/simple;
-	bh=Yrk/YsSXzP/Nte+IkBreXUjv1UblDRgdvIS1lIKOFlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=lYDVZor/s29Hxe5OLFLOuTVkT5mGJGzbp8BkMpAQNlRHYyHE1+ji3t3zebAnGV5ekrZvUvLUkdIDHw7YoTqy45WGpowWlGWe+9riXBFgA6kAVJnGsl14QYKCjGHKiFf/y1HVeEhAOo4Vncw+LZh66q7JvURp8h2VPZZEZl/H8mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RWNE9reb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB28EC4CECE;
-	Fri,  3 Jan 2025 21:18:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735939119;
-	bh=Yrk/YsSXzP/Nte+IkBreXUjv1UblDRgdvIS1lIKOFlQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=RWNE9rebV2LC7ARtdr8jkr7nAmAorBFtJDVOiISUnTZqAv6n8qGXKayukW9c/uZS1
-	 Nqnt5ea2nvL8batQ8UXS4A4AZRiEU7Dt5MWBCd8azQ0H72IMwbb5uXpkdSCjhyYQ8M
-	 zk85osVZaCMDBa+2qY5v7M6aaReOy8lzjgpk7zBLznq0PyxVHo3FCUhfmQnrvv0L9m
-	 usddZB7kENa8J09L+kIW0kcF3dt1/EKL7dQgrnOy4QSTVi24+1bvM5tRz3plBk/rPp
-	 Yv3kq3+etWSFIBRGk+9kp+HdOYEO7Pet5c6dUS6JvkAW9qJOoEGjri2iRe+FH6Njk5
-	 i065sT9FBLPGQ==
-Date: Fri, 3 Jan 2025 15:18:37 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Patrick Wildt <patrick@blueri.se>
-Cc: Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Andy Gross <agross@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Steev Klimaszewski <steev@kali.org>, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: x1e80100-yoga: add wifi
- calibration variant
-Message-ID: <20250103211837.GA4406@bhelgaas>
+	s=arc-20240116; t=1735940890; c=relaxed/simple;
+	bh=hR+6zQWBJsXnenEuboEy9Ua3VpOk3gzfeBnbGXrfmQI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UzOvdvDEIz15CJ3F6M6/ijLoozN9iPq0AS6lZYfruwqsAGm97JF2wxPWt6Rjw4EnZg4E+OOD4LYa0+Zbvh33cq/WxDD21RbExECZVB83SKUqbfR6e7PGuYCxaLi5TY8mSbhb5mkAzk2P5rVPrrrKNp4+EWnqHyihAq1m5ftvzC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=uZk81Uo/ reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YPxnc5RpvzJwr;
+	Fri, 03 Jan 2025 22:40:20 +0100 (CET)
+Message-ID: <19509642-1bef-4573-a4fe-d3cb16e97fb2@freemail.hu>
+Date: Fri, 3 Jan 2025 22:39:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZpV7OeGNIGGpqNC0@windev.fritz.box>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] netfilter: uapi: Merge xt_*.h/c and ipt_*.h which has
+ same name.
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
+ daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
+ kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250102172115.41626-1-egyszeregy@freemail.hu>
+ <6eab8f06-3f65-42cb-b42e-6ba13f209660@lunn.ch>
+ <90b238e6-65d8-4a1d-b59b-e10445e4c61c@freemail.hu>
+ <31331e58-bc0a-427b-8528-52448764a91e@lunn.ch>
+Content-Language: hu
+From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
+In-Reply-To: <31331e58-bc0a-427b-8528-52448764a91e@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1735940421;
+	s=20181004; d=freemail.hu;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	l=2813; bh=OzTD4sULtZqsy2WlPu2w6i+mUdi8x06ZYJNkLWquh9M=;
+	b=uZk81Uo/YapNllD2hPVp/y2YX0hK6EU68bhxv72jAoQkqlK/LzV7ilWK7Jr29xFU
+	ilmnyqBdAqOwq6bb325iU/XWeqTwW6M/BBNC05BTArCo/K5KDVr3FPLD6qlmhFf7R2P
+	6yTOGAjjPvrBzruD/nJJWfpV1pfOakOLqT0oQsLnswWhj2xhcUBzv+0y2GrzSDJvLwH
+	ev8Yd+/plsPnQuwIgBkXQIMd/l81Ny4aDDfOVaEfdpHBrZjehTy0Rclks7s8NfiIJK0
+	XwfJ0ULQ443pEUZyZiZReniZgfbBdQ6mp9HaS/5KM0rpEqNSlpfNw7kf52ieYsT1bsr
+	NVo80k7Eag==
 
-On Mon, Jul 15, 2024 at 09:40:41PM +0200, Patrick Wildt wrote:
-> Describe the bus topology for PCIe domain 4 and add the ath12k
-> calibration variant so that the board file (calibration data) can be
-> loaded.
-
-> +++ b/arch/arm64/boot/dts/qcom/x1e80100.dtsi
-> @@ -3085,6 +3085,16 @@ &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
->  			phy-names = "pciephy";
->  
->  			status = "disabled";
-> +
-> +			pcie4_port0: pcie@0 {
-> +				device_type = "pci";
-> +				reg = <0x0 0x0 0x0 0x0 0x0>;
-> +				bus-range = <0x01 0xff>;
-
-Hi Patrick, what's the purpose of this bus-range?  IIUC this describes
-a Root Port, where we can read and configure the secondary/subordinate
-bus numbers from the RP config space, so it seems like we don't need
-to describe them here.
-
-> +				#address-cells = <3>;
-> +				#size-cells = <2>;
-> +				ranges;
-> +			};
->  		};
->  
->  		pcie4_phy: phy@1c0e000 {
-> -- 
-> 2.45.2
+2025. 01. 02. 21:22 keltezéssel, Andrew Lunn írta:
+> On Thu, Jan 02, 2025 at 07:53:36PM +0100, Szőke Benjamin wrote:
+>> 2025. 01. 02. 18:39 keltezéssel, Andrew Lunn írta:
+>>> On Thu, Jan 02, 2025 at 06:21:15PM +0100, egyszeregy@freemail.hu wrote:
+>>>> From: Benjamin Szőke <egyszeregy@freemail.hu>
+>>>>
+>>>> Merge and refactoring xt_*.h, xt_*.c and ipt_*.h files which has the same
+>>>> name in upper and lower case format. Combining these modules should provide
+>>>> some decent memory savings.
+>>>
+>>> Numbers please. We don't normally accept optimisations without some
+>>> form of benchmark showing there is an improvement.
+>>
+>> Some of you mentioned in a reply e-mail, that is a good benefits in merging
+>> the codes. I do not have test result about it and i will no provide it.
 > 
+> Try looking at the man page of size(1).
+> 
+>>>> The goal is to fix Linux repository for case-insensitive filesystem,
+>>>> to able to clone it and editable on any operating systems.
+>>>
+>>> This needs a much stronger argument, since as i already pointed out,
+>>> how many case-insenstive file systems are still in use? Please give
+>>> real world examples of why this matters.
+>>>
+>>
+>> All of MacOS and Windows platform are case-insensitive.
+> 
+> Windows is generally case magic, not case insensitive. When opening a
+> file it will first try to be case sensitive, if that fails, it tries
+> case insensitive, in order to be backwards compatible with FAT.
+> 
+>>>>    delete mode 100644 include/uapi/linux/netfilter/xt_CONNMARK.h
+>>>>    delete mode 100644 include/uapi/linux/netfilter/xt_DSCP.h
+>>>>    delete mode 100644 include/uapi/linux/netfilter/xt_MARK.h
+>>>>    delete mode 100644 include/uapi/linux/netfilter/xt_RATEEST.h
+>>>>    delete mode 100644 include/uapi/linux/netfilter/xt_TCPMSS.h
+>>>>    delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_ECN.h
+>>>>    delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_TTL.h
+>>>>    delete mode 100644 include/uapi/linux/netfilter_ipv6/ip6t_HL.h
+>>>
+>>> How did you verify that there is no user space code using these
+>>> includes?
+>>>
+>>> We take ABI very seriously. You cannot break user space code.
+>>>
+>>>       Andrew
+>>
+>> This is a minimal ABI change, which have to use lower case filenames for
+>> example: xt_DSCP.h -> xt_dscp.h
+> 
+> You are not listening.
+> 
+> You cannot break user space code.
+> 
+> That is the end of it. No exceptions. It does not matter how bad the
+> API is. You cannot break it.
+> 
+>      Andrew
+
+It should not break the API:
+[PATCH v3] netfilter: x_tables: Merge xt_*.c source files which has same name.
+https://lore.kernel.org/lkml/20250103140158.69041-1-egyszeregy@freemail.hu/
+
+If you prefere more a human readable format: 
+https://github.com/Livius90/linux/commit/8ff73d36125f9a48eac98fd17b51b11d8f73f5a0
+
+
 
