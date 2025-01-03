@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-155062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE02AA00E27
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 20:00:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77827A00E28
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 20:00:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89A491884B5B
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:00:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF3EF7A05DD
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B441B1FC7E8;
-	Fri,  3 Jan 2025 19:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098531FCCE9;
+	Fri,  3 Jan 2025 19:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S5dF5NOz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l7gUAA2v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C21B1FC7DF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D483D1FC7EE
 	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 19:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735930800; cv=none; b=WuOZCK4qnHerOVljv/qr/rZ0NDN/u/4kQBj3CfAJmgWRfy4Pl1+L6jsWOW641tWZP7IA+jn1m86/8Fjj6P6NzFnZ31UgiVvfrkUubNDQQ8ze4IEytjpurRABPkFpcDmSRNOzmqNGxPi2UZj/h9kC2UxsVKATlLrmvXdXiIDUSEk=
+	t=1735930800; cv=none; b=jXxQYvA3YCBP8DetWUF29CCgh5H9z0I3DWZGZg4svl351xlk6PZ5jAo/TChi9Y/fnsenVhLhUbVwIxqntY/uWoJd+wMC1QeifLUasLJVSY2OZGrf4/T8Xzqzy6plEA7j73yroVnXMMH2c9aemKx6YIOUiBnzVAM89xRJdJ3If6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735930800; c=relaxed/simple;
-	bh=sOmE9/sMV0g5Q2kmkrnlKjdUKpmYLt+d0ahRY+RFwi0=;
+	bh=tV5zLWFMk8yMVzcMw10uFwKyi2eIAuQKaTNRMYjBWm0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gWKhdkwQ7Y6Rz+hgl5jQSyYgXX8qAMy3bJMyZ8p8qeJwsp/JnqmEpJYBegDCNOjGj7hHIkjgi1rxcrH2md4mrIxNhBzpWmsH92s0GKRhCBdYLqYqEBA4n7A+0i31cDBVy1CPEuhMBW3aRQDXOA7V2w8r3+jaAMPPb0x9VL3pR/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S5dF5NOz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB36CC4CEDE;
-	Fri,  3 Jan 2025 18:59:59 +0000 (UTC)
+	 MIME-Version; b=nMQHOTA3Ei1vpTgDBac06hkhgdaMkL+qRCzatWBVvBU9oXpky717pJoY+9Mvvm1tvGs5NO3O7HSTYIeAyicv+XiVB/q55eOov7JipoJkjTu9Rsl6QLhQVgGSXjhGIwmADkjUYzmfiyhNUJpPF5+MDAujfAp23L5dfT/QNGJJX3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l7gUAA2v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4763BC4CED7;
+	Fri,  3 Jan 2025 19:00:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1735930800;
-	bh=sOmE9/sMV0g5Q2kmkrnlKjdUKpmYLt+d0ahRY+RFwi0=;
+	bh=tV5zLWFMk8yMVzcMw10uFwKyi2eIAuQKaTNRMYjBWm0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=S5dF5NOzHkVQ3t8b6JOnVa76IqpnBdcb5ScdE15DX0vSBDejxjqpRH6t5amEbp1tW
-	 2wttXiwNf8vI1wl2MwRoftYbBz14UHtaPqUaU0rou5RR1C/6GfhmGuAdJbzU/nlqk2
-	 fgMxlkZSE9QGReS8JBj8Vpw/P55E+H6+RxIzJeIftoheuQR6iN0teTqlaj5aUTiQXI
-	 b3C7osc+KkvQrXjtfnt2AncQrskdUX6XxR1HcY/U9LgfDbdOHh4jarkxTpGgy35mKz
-	 LkFdg1IbPszYfIryW8XFf6ykIDR7x4dNpMtDY70YDACUHneMmxu+AlqsTYhLD5MC4d
-	 NDycvhc20C6rA==
+	b=l7gUAA2v87H4oZ1lM5rk0Ttv53daGpVzh4SJS+eaThmYRPdRPPm4mTrsku/vePSSL
+	 TQSgumoFkFaX5mFcaTorOkh34JV6SraPvhygyXYCTGdCJsACm6N4oPtgE08FHXh1TQ
+	 n4n2rlOo2gZaYGXfpKOxL+xb9Fgg1t6MKkym3eQlNIRFjtgLNLGD+5ib6c2V4ilGMw
+	 guAzZ8x8i/DVvx+zGblDJ3iXqozdYHSKRG8MIwQ1GFdLztjvjg7yRPc/mrBHaG4SMg
+	 MfugaYvnrHJrQ6RijoAVeSVlf2vqmM2sXsPSw5q2QSLh4rbAARBAk011+92xlTvKeb
+	 JTfa8L9i9ubDA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	almasrymina@google.com,
 	jdamato@fastly.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/8] netdev: define NETDEV_INTERNAL
-Date: Fri,  3 Jan 2025 10:59:47 -0800
-Message-ID: <20250103185954.1236510-3-kuba@kernel.org>
+Subject: [PATCH net-next 3/8] netdevsim: support NAPI config
+Date: Fri,  3 Jan 2025 10:59:48 -0800
+Message-ID: <20250103185954.1236510-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250103185954.1236510-1-kuba@kernel.org>
 References: <20250103185954.1236510-1-kuba@kernel.org>
@@ -64,49 +64,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Linus suggested during one of past maintainer summits (in context of
-a DMA_BUF discussion) that symbol namespaces can be used to prevent
-unwelcome but in-tree code from using all exported functions.
-Create a namespace for netdev.
-
-Export netdev_rx_queue_restart(), drivers may want to use it since
-it gives them a simple and safe way to restart a queue to apply
-config changes. But it's both too low level and too actively developed
-to be used outside netdev.
+Link the NAPI instances to their configs. This will be needed to test
+that NAPI config doesn't break list ordering.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/networking/netdevices.rst | 10 ++++++++++
- net/core/netdev_rx_queue.c              |  1 +
- 2 files changed, 11 insertions(+)
+ drivers/net/netdevsim/netdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 857c9784f87e..1d37038e9fbe 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -297,3 +297,13 @@ struct napi_struct synchronization rules
- 	Context:
- 		 softirq
- 		 will be called with interrupts disabled by netconsole.
-+
-+NETDEV_INTERNAL symbol namespace
-+================================
-+
-+Symbols exported as NETDEV_INTERNAL can only be used in networking
-+core and drivers which exclusively flow via the main networking list and trees.
-+Note that the inverse is not true, most symbols outside of NETDEV_INTERNAL
-+are not expected to be used by random code outside netdev either.
-+Symbols may lack the designation because they predate the namespaces,
-+or simply due to an oversight.
-diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
-index e217a5838c87..db82786fa0c4 100644
---- a/net/core/netdev_rx_queue.c
-+++ b/net/core/netdev_rx_queue.c
-@@ -79,3 +79,4 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index e068a9761c09..a4aacd372cdd 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -390,7 +390,7 @@ static int nsim_init_napi(struct netdevsim *ns)
+ 	for (i = 0; i < dev->num_rx_queues; i++) {
+ 		rq = &ns->rq[i];
  
- 	return err;
- }
-+EXPORT_SYMBOL_NS_GPL(netdev_rx_queue_restart, "NETDEV_INTERNAL");
+-		netif_napi_add(dev, &rq->napi, nsim_poll);
++		netif_napi_add_config(dev, &rq->napi, nsim_poll, i);
+ 	}
+ 
+ 	for (i = 0; i < dev->num_rx_queues; i++) {
 -- 
 2.47.1
 
