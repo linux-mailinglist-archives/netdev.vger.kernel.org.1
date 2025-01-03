@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-155021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19239A00B0C
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:04:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC355A00B0E
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:04:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 350FA16404C
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 15:04:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D884163FAC
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 15:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183301FA84F;
-	Fri,  3 Jan 2025 15:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090321FA8F1;
+	Fri,  3 Jan 2025 15:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hdOceuwI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G8y7hgGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6421FA156;
-	Fri,  3 Jan 2025 15:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AAF1FA851;
+	Fri,  3 Jan 2025 15:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735916657; cv=none; b=DWzAaMyPeSw+UuCT4ff04rjrSy9B+TuuFL8qb/rZo5cfH336oDB1ZKDqohFNLWOjd/lUTSVT0MkHqob1983Yuk81maHG4KapVQjBb2clOrVwq1C9W0wMdb4cuKKTExyG/oXs0IP+QBYlz0a2Mic3na4X138ZfTKkdts/qjvZn2o=
+	t=1735916665; cv=none; b=ESqBIk2cgdVkwCen3Sjyjbp0muyonceurRou9EKtS4c93jLsiEhLiLmnG1maO0QR9uKNaGK0mKMF7Oii9ap/y6eVrZ2KSxJSLt/nY0wiETd+u/MQD0Q3p3B44h+iWCS1vn4pw1gXDGOg0znBtOw10qUTDd6Ch9gJRq3jImQOnWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735916657; c=relaxed/simple;
-	bh=hTM4fY+CEchNJukG0pdAy3y7/+l6QgwDz2y9uH7R7Bo=;
+	s=arc-20240116; t=1735916665; c=relaxed/simple;
+	bh=BKQDlt0s1wORrdqRTBkoVwnxnuGA5YRsNvdq0RF/qEY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=n3ikYqfyQuVrPq8sQhhQqzdzuq3juU7ea3HGAtBICmkm7308sSqN5Y9/PBeRlpvAm+ce0Q6DznigHEOPwdR4X/pQs466epCfraqorA/2U9bLi7PaJ0Xg5nNViJsg1Q7m0YJEsEce53Yp4KY8UwfoQuBewRSpRAMuQ/r+a19hdR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hdOceuwI; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=PH+X35XfuC8olont8P1naGum0XYS87ueA2yYC4vDZuBiS26TtlAmOwk4cfdysF7BUWDNQG+vaFb+ZnwZxBr2lez4IxQN+mVgirf+pRDJGUZn+D+H3zHzRa3pJgwz0vqwJhthSJsmOnx4x4jcXX9Vyp7c0RTiz9IW8QuwvrpFET8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G8y7hgGD; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21669fd5c7cso174498945ad.3;
-        Fri, 03 Jan 2025 07:04:15 -0800 (PST)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2156e078563so149276215ad.2;
+        Fri, 03 Jan 2025 07:04:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735916655; x=1736521455; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1735916663; x=1736521463; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uiVDEzJGRG7GNszOmxw0+7tPL+XUGWUYLAewIjAaUDY=;
-        b=hdOceuwIdkc1aQXJu9cvPi9h3tXYFlf0whXR/FVgdEHaj5SWJZ2KkYe2s2TNG/NyHw
-         W5/EMNW0C/Qj666MwoBTe+dDWptHVZYKOGLsKzTwVLV0V4SrMOoURAsMRexfVd3avZ20
-         GT1MYd1xtenSx7wd0TxAKfGuaWMnJDkfQ6fwSWw7yssYs3cg7X8FERNEjZ39iMnJK0sl
-         KpyO+9UulwFpI3vTgarUcKDEqx3JMl5EEstGT1DpIMAORJQpg0n66IIclT4fK0SYbyEF
-         9ysW4u1u44XKpb37ozrjbgsBa2jqYFtK1I5Xt8LjqPnyHYa/KXERB3wfOMI8AqZMxoIE
-         mw/w==
+        bh=VlCsNZhi+pyCRlJI1oGA5APrS8t1ogGMgB2J84mRRbM=;
+        b=G8y7hgGDVj++0Ri1YCDrblmv28m0elouhQWpDwJk82fHOTUm8NsTOpY+96/EwidJn9
+         XLZZHUyVu/OW/jyT8l4shQLOWxcQCvjxBr04PvXwva5bjhBY3BowoBn1Coif+PyyuN8s
+         NF0oL+2GHBfZBXlv3gn209PtVqIEeiucxXSdEyTag03rSkQHDAflbFwI2BX9GkcCRupi
+         rQ5QYIsUZeH+dnc6R1p//SgwYhMU+AhZoTI10WY+pr1sEZbRUCt74r8bm92q3uq1pO6c
+         pk7K0oLLw5WBXUWg9nktkIt4clEcqyQeqBwzGsQMq41LSFGWAeyPHiUNUXdcgtfN7Xmd
+         0HUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735916655; x=1736521455;
+        d=1e100.net; s=20230601; t=1735916663; x=1736521463;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uiVDEzJGRG7GNszOmxw0+7tPL+XUGWUYLAewIjAaUDY=;
-        b=OruGjUB2H+2KxlKGVRWqf4MgCzj70P3yZz9vn+Bg4zuJ06rFcsVbzs6ykBwQG2t1bF
-         Y/w7zMIoPg4MWvJ6x1r9lijt5j2593AJT3y6e65XUPufP+d3JVlHYEOKKG7UX544NM68
-         DvpRyG1CzJYKzAasKH2i2oOMZPzmUMLqqgvTCkCqwzG+j2Z9LrlabSSDtcIta2pYhkcC
-         4j5IfNLnzkuhIgi549hvqDLi31YabAOWEgNEjZRwDyTnjsdKCVLgXekSO+RviJwNzDdJ
-         NgSmxOhhLFFppLQRUU4lUiiSA1Md5pT847Y7mTZbb/8b30YOCm9tCWmTzj0QwtD5Uz6+
-         zx/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUa+qiiaJMoH/R7ZSUOkSJaCyPbjDuFtyzvj8G4Afur7Rbd7JygcEgXNu6kc6UGZqzHWxG7NKvy@vger.kernel.org, AJvYcCWz8K1wg5E6QXmpQIC/Fp2P/aWWu06bbwsHc5ECenDEDTV/MaQ9mgx7FftXzOR3IQqTwJfcma9wEP4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxU6t/3YWnSbifJIR8dNw72vNy2nxw6WTIlRwWF4L+dLm0jIUyN
-	8CW1pnkAah+TzNVB7Pcgg5I0DK9rsX3AwC57gHkpCFLWkaTueOJG
-X-Gm-Gg: ASbGnct7kmwuPZJRorRk6R0ScHhl10rbm8vlIWdBgfefwY47pdig9F5FRk6yjJbOC01
-	77Xl+8E14ad55iQMyRimomhVmL0EZ2/JLMqdb99RyU10dqdq7Tgiglmo6AuxYH5D7W2ZRwOlH5I
-	g42yaV0SK45aGE7mEhloCBDRYciyIM33cr5G8+fkDLGyiuS+eUNzYSnc8/1vO6Q5YcqKSFjmShj
-	26XLbWWSq937JCTAfBc9TNu1tHSd0vc/xZYrtqVD2w8Iw==
-X-Google-Smtp-Source: AGHT+IGBrlHa1J1iboiih9dgBvP7s9cGnNOd2xYQbbtLPyR+HgUG/VcODg5fd6JwTzoXBXRLwTGLxg==
-X-Received: by 2002:a17:903:1209:b0:216:36ff:ba33 with SMTP id d9443c01a7336-219e6ebcfc7mr648739525ad.26.1735916654653;
-        Fri, 03 Jan 2025 07:04:14 -0800 (PST)
+        bh=VlCsNZhi+pyCRlJI1oGA5APrS8t1ogGMgB2J84mRRbM=;
+        b=RyUF3ChoYb83ks6QIxQBpWGWfEa8/F9OoXFyV/1MGAJ7hA6wJshyh2WdDxOYFFFxg0
+         e+lvmmyTOsfvVhwg4NdEbc8OSpCmom/plLO7bBU7a5F1v0hliEGoBYskqiSxa7CmN8cr
+         butguqUpS8yizn5tDAz9AwRY8ykWNuqGny0xUnVdyvpgVhGaxx6mz9jvwfhEkqEB6XF2
+         NjULUB7mVo5k67xOvdisFyJ2DkqOV7zlsxLDTyqlzeBwAauNOCMYhE6lhBKny8miLX1D
+         4NaXyRwGp0L6lzyRf9jPusyzNmVZA3Zp1A96eO+7fEyIRhG1csgyHu6+/sFJ9vpwFDoD
+         RHmA==
+X-Forwarded-Encrypted: i=1; AJvYcCV/U92TOdZxGCdtIh99UzToFukg4oJs3Ve5M6RC5U1taT1slYhzEK2wcsXu4k2ecmwtLJlQ4veKP4w=@vger.kernel.org, AJvYcCXOSpxTOxZdHKPKrYdOJ9cZcP7mbiQH30NK5GUFgjbAgBkIi3Rn38rpFuKMloVnh+p1zCkzD32u@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNl4LClNEBvnNK+yCvp0T3qpc4DJDeMvIyyuDC2DuzeDvaRhO0
+	wwCT2HeKqDxbrPYTfcIldttLurX2nXqXIHagc8RxuxevyKWwSttl
+X-Gm-Gg: ASbGncua+Ck+kPa9STAXk44yflsEnGvRmi7Qq1sGY5XdsIu2JuFp9GkKYQ5W54Mek5t
+	NOz63KrZJx33sp2KVpQV2w2qySB3bv4SYuKmBlR8Rma+axvl6BZRQEXCpDYO5n3z3bVQxnwkowE
+	XvL/M7NUv8oBQHUUMxknzQQZ0j7cvtaw1sXqwhZ9JzUeq6gZQBBRWwIt2cAt/PCI9DxfLEgQru1
+	nsWv1HYbLQsGum4oaYW7wDo/QPj39Y3cpyu37MGIn4+vQ==
+X-Google-Smtp-Source: AGHT+IGfiw8U2ntfb0cmk8qGAK/jhkvSutFKJwRC8AXPD47pNpyfLh/Cp2mlK+pgO/KKIoyrYlP8Jw==
+X-Received: by 2002:a17:902:db0f:b0:215:9379:4650 with SMTP id d9443c01a7336-219e6f10958mr780001455ad.42.1735916663318;
+        Fri, 03 Jan 2025 07:04:23 -0800 (PST)
 Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9629d0sm247047255ad.41.2025.01.03.07.04.06
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9629d0sm247047255ad.41.2025.01.03.07.04.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jan 2025 07:04:13 -0800 (PST)
+        Fri, 03 Jan 2025 07:04:22 -0800 (PST)
 From: Taehee Yoo <ap420073@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -111,9 +111,9 @@ Cc: kory.maincent@bootlin.com,
 	willemb@google.com,
 	daniel.zahka@gmail.com,
 	ap420073@gmail.com
-Subject: [PATCH net-next v7 04/10] net: ethtool: add ring parameter filtering
-Date: Fri,  3 Jan 2025 15:03:19 +0000
-Message-Id: <20250103150325.926031-5-ap420073@gmail.com>
+Subject: [PATCH net-next v7 05/10] net: disallow setup single buffer XDP when tcp-data-split is enabled.
+Date: Fri,  3 Jan 2025 15:03:20 +0000
+Message-Id: <20250103150325.926031-6-ap420073@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250103150325.926031-1-ap420073@gmail.com>
 References: <20250103150325.926031-1-ap420073@gmail.com>
@@ -125,60 +125,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-While the devmem is running, the tcp-data-split and
-hds-thresh configuration should not be changed.
-If user tries to change tcp-data-split and threshold value while the
-devmem is running, it fails and shows extack message.
+When a single buffer XDP is attached, NIC should guarantee only single
+page packets will be received.
+tcp-data-split feature splits packets into header and payload. single
+buffer XDP can't handle it properly.
+So attaching single buffer XDP should be disallowed when tcp-data-split
+is enabled.
 
-Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-Reviewed-by: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v7:
- - Use dev->ethtool->hds members instead of calling ->get_ring_param().
+ - Do not check XDP_SETUP_PROG_HW.
 
 v6:
- - No changes.
-
-v5:
- - Add Review tag from Mina.
-
-v4:
- - Check condition before __netif_get_rx_queue().
- - Separate condition check.
- - Add Test tag from Stanislav.
-
-v3:
  - Patch added.
 
- net/ethtool/rings.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ net/core/dev.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
-index 9236de041271..bbb43322845f 100644
---- a/net/ethtool/rings.c
-+++ b/net/ethtool/rings.c
-@@ -252,6 +252,19 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
- 		return -EINVAL;
- 	}
+diff --git a/net/core/dev.c b/net/core/dev.c
+index bc98f4920e12..2e0a5272f466 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -92,6 +92,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
++#include <linux/ethtool_netlink.h>
+ #include <linux/skbuff.h>
+ #include <linux/kthread.h>
+ #include <linux/bpf.h>
+@@ -9497,6 +9498,14 @@ int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
+ 	if (!dev->netdev_ops->ndo_bpf)
+ 		return -EOPNOTSUPP;
  
-+	if (dev_get_min_mp_channel_count(dev)) {
-+		if (kernel_ringparam.tcp_data_split !=
-+		    ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
-+			NL_SET_ERR_MSG(info->extack,
-+				       "can't disable tcp-data-split while device has memory provider enabled");
-+			return -EINVAL;
-+		} else if (kernel_ringparam.hds_thresh) {
-+			NL_SET_ERR_MSG(info->extack,
-+				       "can't set non-zero hds_thresh while device is memory provider enabled");
-+			return -EINVAL;
-+		}
++	if (dev->ethtool->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
++	    bpf->command == XDP_SETUP_PROG &&
++	    bpf->prog && !bpf->prog->aux->xdp_has_frags) {
++		NL_SET_ERR_MSG(bpf->extack,
++			       "unable to propagate XDP to device using tcp-data-split");
++		return -EBUSY;
 +	}
 +
- 	/* ensure new ring parameters are within limits */
- 	if (ringparam.rx_pending > ringparam.rx_max_pending)
- 		err_attr = tb[ETHTOOL_A_RINGS_RX];
+ 	if (dev_get_min_mp_channel_count(dev)) {
+ 		NL_SET_ERR_MSG(bpf->extack, "unable to propagate XDP to device using memory provider");
+ 		return -EBUSY;
+@@ -9534,6 +9543,12 @@ static int dev_xdp_install(struct net_device *dev, enum bpf_xdp_mode mode,
+ 	struct netdev_bpf xdp;
+ 	int err;
+ 
++	if (dev->ethtool->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
++	    prog && !prog->aux->xdp_has_frags) {
++		NL_SET_ERR_MSG(extack, "unable to install XDP to device using tcp-data-split");
++		return -EBUSY;
++	}
++
+ 	if (dev_get_min_mp_channel_count(dev)) {
+ 		NL_SET_ERR_MSG(extack, "unable to install XDP to device using memory provider");
+ 		return -EBUSY;
 -- 
 2.34.1
 
