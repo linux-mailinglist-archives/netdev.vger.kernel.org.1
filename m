@@ -1,140 +1,127 @@
-Return-Path: <netdev+bounces-155057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69893A00DB4
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:41:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34A41A00E0C
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40B233A3F12
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 18:41:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E29D3A06A4
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 18:49:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1361FBCB6;
-	Fri,  3 Jan 2025 18:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038A31B412B;
+	Fri,  3 Jan 2025 18:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="avb6MoDp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jvp6idgm"
 X-Original-To: netdev@vger.kernel.org
-Received: from rcdn-iport-2.cisco.com (rcdn-iport-2.cisco.com [173.37.86.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7241FBEA3
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 18:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33070155C82
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 18:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735929701; cv=none; b=Rw0pAeajW1YRq4wrFRsodNIPKQOHfjHUP/UVvVSTqS6tsdLVRmJLkKhamGZtRubKESLKNn+rUsvG7FOgmLT7hiir9LRE2odHii72nidOAieVNlL6UBxVeif3zyvLdJkxYfazC8KPlR69ZtE9ODK4R/+yeVvEyprepuTOXVOYfzs=
+	t=1735930157; cv=none; b=VfyGeUjefdWEpyH/i3hD+FBI5BosR7VOB3u2mTbIztm1ioh0hIcCJUz7tY9jjkstWKEiOIFOZbA6ODFJPY3kBt3tq29tjLtTkOpQ3+xsJqEYbvXJHWj4yyoi3r4mygQB8GERbqtqlgiN25hSOkqasNBlmpldbb1JflkTXnEVHNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735929701; c=relaxed/simple;
-	bh=MTltBdWiBtglJfuE1CqV+1oFBpZZg33vtsAIYHHQXK8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UQdsi9qqOy+wkLkU2GlgXMGhjVOVx3d+ZAXJH+8Y9txiiJ/qXZeTlA9bNf6bC1X7KOmTRtKrEaThbV8CFt3ynTv5OdNLQ45yIGVb2PlTDHkaxp6EWRDz2cwXlozuWTnwIOqXt9a+wH/JuBu721MZVLJbz2AISH7OBW7xVcwecr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=avb6MoDp; arc=none smtp.client-ip=173.37.86.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+	s=arc-20240116; t=1735930157; c=relaxed/simple;
+	bh=Qm2GI8eKvHzeSTXrz8DN9UOA66LyyHqIPo1x9xMd9d8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TO4vU3bjK5gribeIn6fMbvxphyFIx7wvdNjE504qoM6ngACcQJXL4qjh2AGyuMVJ4gzWxXoUf0vaPYOjdRf19opKZOmdxGqWHGYf+J6N0nyg1qyXox4Nfb1DDP357uIbU7RcEHTKqlkw+aY26cj+0ckatTvn4be9eIgUC5KnYsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jvp6idgm; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e9f60bf4so21926292a12.3
+        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 10:49:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=1212; q=dns/txt; s=iport;
-  t=1735929699; x=1737139299;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S/IH1fUcRPa7xsGzfjg3y3/cA5i/6sVja5+yP2O1pi8=;
-  b=avb6MoDpgRg3e650packP8NKHG93qYDg4VCLdFxfpZGq0LjBulmSAAlG
-   qWFgLxKrkJwGKjnXr159wR9SvU3ylXsKj41upw5fVMtoxT3wRnBkAMU6S
-   emPz16z17LIyMkMqffZCWioNC/JymJSLIbnoKv9EiU7TF1idA33ORp7xx
-   k=;
-X-CSE-ConnectionGUID: wQk29jNhSE2YcgTLvY7QOQ==
-X-CSE-MsgGUID: oKOW2F+PTjiDjETkVVFhSQ==
-X-IPAS-Result: =?us-ascii?q?A0BfAwBgLnhn/43/Ja1aglyCS4FPQ44ZiHWeGIF+DwEBA?=
- =?us-ascii?q?Q9EBAEBhQcCinACJjQJDgECBAEBAQEDAgMBAQEBAQEBAQEBAQsBAQUBAQECA?=
- =?us-ascii?q?QcFgQ4ThgiGWwEBAQMyAUYQCxguKyuDGoJlA7EggiyBAd4zgW2BSIVrh19wh?=
- =?us-ascii?q?HcnG4FJRIQOMT6FEIV3BIQsg0GdQkgKgRcDWSwBVRMNCgsHBYEpHysDOAwLM?=
- =?us-ascii?q?BUnEIEoBTUKOTqCDmlJNwINAjaCH3yCK4Ihgj2ER4RVhWaCF4FrAwMWEgGCO?=
- =?us-ascii?q?kADCxgNSBEsNxQbBj5uB557gXCBFqY/oQOEJYFjn2MaM6pTmHykR4RmgWc8g?=
- =?us-ascii?q?VkzGggbFYMjURkPjlmwMiVuAgcLAQEDCZIFAQE?=
-IronPort-Data: A9a23:eu9I66JdwmHfOx7RFE+R65QlxSXFcZb7ZxGr2PjKsXjdYENSg2BSz
- DQeXjiHa/bfZzemKtpzbdy+px4C65aHx4BjT1Yd+CA2RRqmiyZq6fd1j6vUF3nPRiEWZBs/t
- 63yUvGZcoZsCCea/kr1WlTYhSEU/bmSQbbhA/LzNCl0RAt1IA8skhsLd9QR2uaEuvDnRVrX0
- T/Oi5eHYgL9gmYuajl8B5+r8XuDgtyj4Fv0gXRmDRx7lAe2v2UYCpsZOZawIxPQKqFIHvS3T
- vr017qw+GXU5X8FUrtJRZ6iLyXm6paLVeS/oiI+t5qK23CulQRuukoPD8fwXG8M49m/c3+d/
- /0W3XC4YV9B0qQhA43xWTEAe811FfUuFLMqvRFTvOTLp3AqfUcAzN1xNUJsbI8++t1aW1BF+
- sA8NgFSVze60rfeLLKTEoGAh+w5J8XteYdasXZ6wHSBUbAtQIvIROPB4towMDUY358VW62BI
- ZBENHw2ME2ojx5nYj/7DLo8m+euinD7fhVTqUmeouw85G27IAlZiui9aIOPIoTSLSlTtkG7g
- V2c0SfBPhMbGN6y9Tm7zFysvdaayEsXX6pXTtVU7MVCjFSNy2k7BBQIWF6/pvelzEizR7p3J
- kAJ/yM8oLQa+0usQd3wGRa/pRasuh8aSsdWCO037g6lyrfd/AuYQGMDS1Zpa8Esvec1SCYs2
- 1vPmMnmbRRmtrGPRG3e8LqIoT6sESwIK2lEbi9sZRMM6dTloakpgx7PR8olG6mw5vXzFC38z
- i6isicznfMQgNQN2qH9+krI6w9AvbDTRQIzowGSVWW/40YhOMiuZpej7h7Q6vMowJulc2Rtd
- UMsw6C2hN3ix7nX/MBRaI3hxI2U2ss=
-IronPort-HdrOrdr: A9a23:xW1mE66wchh1tRyPYwPXwM/XdLJyesId70hD6qm+c3Nom6uj5q
- eTdZsgtCMc5Ax9ZJhko6HjBEDiewK5yXcK2+ks1N6ZNWGM0ldAbrsSiLcKqAePJ8SRzIJgPN
- 9bAstD4BmaNykCsS48izPIdeod/A==
-X-Talos-CUID: =?us-ascii?q?9a23=3Ah4hwg2im5X9cMB5gTXCN9an+4zJubUTelibSBU+?=
- =?us-ascii?q?DJDxYQ7KpbUGhp5pDqp87?=
-X-Talos-MUID: 9a23:ueCLigoBxXu/qokNtdAezzZBE/gyzeeWNEIMvZcrh8q6CwJwAA7I2Q==
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.12,286,1728950400"; 
-   d="scan'208";a="288012000"
-Received: from rcdn-l-core-04.cisco.com ([173.37.255.141])
-  by rcdn-iport-2.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 03 Jan 2025 18:40:31 +0000
-Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
-	by rcdn-l-core-04.cisco.com (Postfix) with ESMTP id EF73C1800019C;
-	Fri,  3 Jan 2025 18:40:30 +0000 (GMT)
-Received: by cisco.com (Postfix, from userid 392789)
-	id B781220F2003; Fri,  3 Jan 2025 10:40:30 -0800 (PST)
-From: John Daley <johndale@cisco.com>
-To: kuba@kernel.org
-Cc: andrew+netdev@lunn.ch,
-	benve@cisco.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	johndale@cisco.com,
-	linyunsheng@huawei.com,
-	neescoba@cisco.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	satishkh@cisco.com
-Subject: Re: [PATCH net-next v3 4/6] enic: Use the Page Pool API for RX when MTU is less than page size
-Date: Fri,  3 Jan 2025 10:40:30 -0800
-Message-Id: <20250103184030.5808-1-johndale@cisco.com>
-X-Mailer: git-send-email 2.35.2
-In-Reply-To: <20241231164200.3364e18b@kernel.org>
-References: <20241231164200.3364e18b@kernel.org>
+        d=google.com; s=20230601; t=1735930154; x=1736534954; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aTcVLIJ74PxU1fTS0H3rfnT+JSeKqq4DP3qwUoq2k9I=;
+        b=jvp6idgmO6XiFzeyD9zSl2BdJNg6GYco1v41GxhYWs7vCcECHfy+GWhXJfyeDnyJP7
+         LmunMwxnIJZmKUL3/OKZbP69zlgOZ8mgYgzcVuhM6FXrJtaeC7mU3s5TavQQDTDlNMrD
+         wR79INjFWbP66Uynf9B9HV7uH4M362YBoGpzxMUmdvpReN3p2hfDtWRX7WLYwkc0WwZB
+         3LgrZClQeOFft0g85HB0+yEJL9sGZp05ghrFPCAK5i8KruaHbaM3VPHKjYI81w7fSgx9
+         gb2+96Bncicow9S5bDZqr8ej4WE82UvKqzzQ575zGxfQHCAirWAu3384HAxU4wI5pGXY
+         a5pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735930154; x=1736534954;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aTcVLIJ74PxU1fTS0H3rfnT+JSeKqq4DP3qwUoq2k9I=;
+        b=TtRqIwqhf1z0W11Y2Bt/IpI5+lfgb3xFzFgPNz/gIBPkf++x71FnOmIcam8qxd2ugY
+         Dti+mgTWb4tbZ1qrYROa2ciPH5uap3Y+fq8cSNgUrIXxdkHVNtF1SoDIXBk31MiaCIX7
+         xZ/OtZiPxRZ/m3/+bd3itm5k4l74USaiIsxfITXwG4LUdoe9BZfPi8maGA/rBOzIPv0T
+         zKPAf5b4CoYG0kklQNoWyRENlEysJ9IlyPxFJhZkNRKi8ei814JniYg5zebFmLM3GNoC
+         tRTJf+qnSQok7Dx7TXdctBwjKmh7gV65pYoIMqCWyHiQnzATxDnKfyQ2tpOXwJ2tbmAE
+         BYKA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuhHF863ikuiyh//qkSJmbknJFg+QfitPFceZTRAEZxrm534SeEdjksyBdyLtODKEb/efd7V8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbf7bkSDtI4AxpsQi+BCuX0zcDkTUItPXdtZ62lOIcx+zsy4XU
+	41j2At9lvwOoEb5MfuTTpPL8mLrdFYtZ515WzpzvamtBB3r/rdoEQcODKcwevK9pRISYOaXScoN
+	ecQ6ybVyc7ZWJBlOQr519bNpMIS11+u8bvSiL
+X-Gm-Gg: ASbGncsUZhrcIvPqPW2xWeTKX0kyP8wUfMJiQLC8uHTw0fMH8IgSkEciqawpLegVMC2
+	KpWiH+HHJ3sGTFK9iTL00nLw51D4afKMZISeavQ==
+X-Google-Smtp-Source: AGHT+IEbLEExJ2JQjtuwLVLY6Di2pqvorwo/QQtScoZJP10Wltqbc2JwCR0qbk8x+mXLv/UejZK5BMwULOGtEfLLQ1U=
+X-Received: by 2002:a50:cc46:0:b0:5d9:a59:854a with SMTP id
+ 4fb4d7f45d1cf-5d90a59945bmr4740573a12.13.1735930152985; Fri, 03 Jan 2025
+ 10:49:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
-X-Outbound-Node: rcdn-l-core-04.cisco.com
+References: <6742badd.050a0220.1cc393.0034.GAE@google.com> <CANn89iJbfy890gJuqAU-tY76ZSGS0W130KO7=9jvtHYUVzdSmQ@mail.gmail.com>
+ <Z3fOdnotJMKWjCNe@calendula>
+In-Reply-To: <Z3fOdnotJMKWjCNe@calendula>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 3 Jan 2025 19:49:02 +0100
+Message-ID: <CANn89i+NNUFqOyFo0M1J=goz_jK7=zVNYh2jo47eUYWFr-ovow@mail.gmail.com>
+Subject: Re: [syzbot] [netfilter?] INFO: task hung in htable_put (2)
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: syzbot <syzbot+013daa7966d4340a8b8f@syzkaller.appspotmail.com>, 
+	coreteam@netfilter.org, davem@davemloft.net, horms@kernel.org, 
+	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->On Tue, 31 Dec 2024 19:37:12 +0800 Yunsheng Lin wrote:
->> >> It seems the above has a similar problem of not using
->> >> page_pool_put_full_page() when page_pool_dev_alloc() API is used and
->> >> page_pool is created with PP_FLAG_DMA_SYNC_DEV flags.
->> >>
->> >> It seems like a common mistake that a WARN_ON might be needed to catch
->> >> this kind of problem.  
->> > 
->> > Agreed. Maybe also add an alias to page_pool_put_full_page() called
->> > something like page_pool_dev_put_page() to correspond to the alloc
->> > call? I suspect people don't understand the internals and "releasing
->> > full page" feels wrong when they only allocated a portion..  
-
-That is true in my case. I think if there was a page_pool_dev_put_page()
-it would have caught my eye and I would have used it.
-
-I made a v4 patchset uses page_pool_put_full_page().
-
->> 
->> Yes, I guess so too.
->> But as all the alloc APIs have the 'dev' version of API:
->> page_pool_dev_alloc
->> page_pool_dev_alloc_frag
->> page_pool_dev_alloc_pages
->> page_pool_dev_alloc_va
->> 
->> Only adding 'dev' does not seem to clear the confusion from API naming
->> perspective.
+On Fri, Jan 3, 2025 at 12:48=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.=
+org> wrote:
 >
->page_pool_free_page()? We already have page_pool_free_va()
+> Hi Eric,
+>
+> On Fri, Jan 03, 2025 at 10:52:54AM +0100, Eric Dumazet wrote:
+> > On Sun, Nov 24, 2024 at 6:34=E2=80=AFAM syzbot
+> > <syzbot+013daa7966d4340a8b8f@syzkaller.appspotmail.com> wrote:
+> > >
+> > > Hello,
+> > >
+> > > syzbot found the following issue on:
+> > >
+> > > HEAD commit:    cfaaa7d010d1 Merge tag 'net-6.12-rc8' of git://git.ke=
+rnel...
+> > > git tree:       upstream
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=3D13fd6b5f9=
+80000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dd2aeec8c0=
+b2e420c
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=3D013daa7966d=
+4340a8b8f
+> > > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for=
+ Debian) 2.40
+> > >
+> [...]
+> > I do not think I got any feedback from
+> > https://lore.kernel.org/netdev/20241206113839.3421469-1-edumazet@google=
+.com/T/
+> >
+> > Should  I repost this patch ?
+>
+> No need to, I will add this to nf-next now as you requested.
+
+Thanks Pablo !
 
