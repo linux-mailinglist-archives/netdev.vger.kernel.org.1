@@ -1,93 +1,72 @@
-Return-Path: <netdev+bounces-155035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95370A00BCC
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 17:01:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5A97A00BD9
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 17:06:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71DBA16447F
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:01:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91DE93A31CC
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E621FBC89;
-	Fri,  3 Jan 2025 16:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E6B1F8F09;
+	Fri,  3 Jan 2025 16:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DK6LKclS"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA9F1FAC58;
-	Fri,  3 Jan 2025 16:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F62146D6A
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 16:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735920065; cv=none; b=HUvRAT60Bquszg3lHt46Izs+pcF4SP0e3AX4jOK9FWy7PwQjHjlBzX38NxROHt2yIrv7ASl8rX+qJ/E44WOD+lyqvH2Xc4AxpBD1my6FueaYMRZkwr57eLxU/MdHFwyqdkyvJ7nv5j4ng58PK4XRL2hdwnoGANxF7Y0kdp32Nk8=
+	t=1735920408; cv=none; b=JmXMGS9b/WXd0XolKias2v2PyUoURylEcDuYcmFVZzmb4MWGjyiqA6AFCApXssO+8p3p285J+K3jH6fsChLP3GP7abLDZKJcKfWIioCh/h22oyr9Up4Lo+NU7lN8/ucJgQvxHp+AFowJXp2gD1ts7g3eli0W3SPeYFOU56wvaow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735920065; c=relaxed/simple;
-	bh=RO1b86wjNFiGUM6WmNhgPpDkASh7S95QG/goixmSfhg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p7UytT9pLtTmiZbMJw8STi7CP6PV8R4hLXQejx6XqVDFKMe31KAb8vzDUsHs2gBx+gwCYPc2S/7/hLZYB8AwPZieXMw68ZssD7fGF3JikUXsyRmkJmDToS/8jgXpa15LyOCqBDvSK9yMpCAfUW+hWY/zIhD3klBzdTLlvgKXW0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from localhost.localdomain (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@sostec.de)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id D2F0CC07D3;
-	Fri,  3 Jan 2025 17:01:00 +0100 (CET)
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-wpan@vger.kernel.org,
-	alex.aring@gmail.com,
-	miquel.raynal@bootlin.com,
-	netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2025-01-03
-Date: Fri,  3 Jan 2025 17:00:46 +0100
-Message-ID: <20250103160046.469363-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1735920408; c=relaxed/simple;
+	bh=qyVTeFfwzDvd/Of1fQkgJ3i9n5qkTNBLhD5o+Me8GDY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mMXS9rI2gJ3GpXmwZKsCyiX+wcn5eDCQI9+6ntoYW0Sa+L0mDHJwlsog7b3Zw48Z8ZkdbJ6gV6kyOL1gfOkll04ObD8/KlwdOZhhsqfDaCtI7W1SsTj7I5rWobbFauDcXSoguoxcxQLkYDQXh6iY6doNTt1YxjUvbqrCf0e0u/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DK6LKclS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4D30C4CECE;
+	Fri,  3 Jan 2025 16:06:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735920407;
+	bh=qyVTeFfwzDvd/Of1fQkgJ3i9n5qkTNBLhD5o+Me8GDY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DK6LKclSY0VqEqOAxOIaenaDM0jOn/IjjanLR08IdW9RXCmnDBCr2eMEKhz9xNvWD
+	 jOuFwgPzH+QVwQXxYWabMHs50H9hkojIiNnU25E1t4cKSmUhzPZDzp5BpLd17sDTHm
+	 oQmkT9t4nTHap/xOJUIsFl6ytBPNb1MJhdRl/DPd1PQUEIJ0KU/f+gtBgqYR4iWGhp
+	 QNb/e/Qq4P5NyAMhZrTmPNHdWXBY6cFjuoc+qMNrUbUxNGp15wctFetgrAxpGoSWhc
+	 ZaFckUFqkRv+zFfwdU0BdpmHtUagSgua3leUWJBz8TwxvO6qOAlE0Z68yRPfhx/2SL
+	 rhE6m5Qw5o9uA==
+Date: Fri, 3 Jan 2025 08:06:45 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Kuniyuki
+ Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>, syzkaller
+ <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v2 net] ipvlan: Fix use-after-free in
+ ipvlan_get_iflink().
+Message-ID: <20250103080645.5129915b@kernel.org>
+In-Reply-To: <20250103140813.79819-1-kuniyu@amazon.com>
+References: <20250103140813.79819-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello Dave, Jakub, Paolo.
+On Fri, 3 Jan 2025 23:08:13 +0900 Kuniyuki Iwashima wrote:
+> +		if (dev->reg_state <= NETREG_UNREGISTERED)
 
-An update from ieee802154 for your *net* tree:
-
-Keisuke Nishimura provided a fix to check for kfifo_alloc() in the ca8210
-driver.
-
-Lizhi Xu provided a fix a corrupted list, found by syzkaller, by checking local
-interfaces first.
-
-regards
-Stefan Schmidt
-
-The following changes since commit 66418447d27b7f4c027587582a133dd0bc0a663b:
-
-  Merge branch 'bpf-fix-recursive-lock-and-add-test' (2024-11-18 19:40:01 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2025-01-03
-
-for you to fetch changes up to eb09fbeb48709fe66c0d708aed81e910a577a30a:
-
-  mac802154: check local interfaces before deleting sdata list (2024-11-19 10:54:17 +0100)
-
-----------------------------------------------------------------
-Keisuke Nishimura (1):
-      ieee802154: ca8210: Add missing check for kfifo_alloc() in ca8210_probe()
-
-Lizhi Xu (1):
-      mac802154: check local interfaces before deleting sdata list
-
- drivers/net/ieee802154/ca8210.c | 6 +++++-
- net/mac802154/iface.c           | 4 ++++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+s/UN//
+-- 
+pw-bot: cr
 
