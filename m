@@ -1,235 +1,260 @@
-Return-Path: <netdev+bounces-154923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50DCCA00598
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 09:16:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E56A3A005BA
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 09:24:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DE3A162C36
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 08:16:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4FC23A31F1
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 08:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F88D1CBE87;
-	Fri,  3 Jan 2025 08:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9161C9B97;
+	Fri,  3 Jan 2025 08:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SBDtlJ1u"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vW54RHQq"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2047.outbound.protection.outlook.com [40.107.96.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54B81B2186;
-	Fri,  3 Jan 2025 08:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735892194; cv=fail; b=TrMHRRNRRXcEB0Ct3VQUA+R+Jibv6tYvocqbP2XkMHh8ZncgSTzlA3xxfzlLuaMpe9uNHaL6YORdNzxN0Xbqu0l9KPtcG1/HAFH6eXYUK1Ta8YzqmMOmsqHu8eiW4R/MfXEZEVQbLnboCV3ukSvFTUJa2DuM6t3gV6dmCE/X8E8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735892194; c=relaxed/simple;
-	bh=9v+J1pV8NFJES/QAkPA2p6Zyadyn8pamMgp0IRHcQ6I=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eGkoy/ugJyWY7RzS/RHbvlvfRgcqJqt6cWlKKUZ6QFAYx6tKYGS7Tkz3jvLM2SQektDHC4ixXEvK0sccRBsmRvA0uVG0r3/x+luQqIg9QK23Yba9IYaqR8QVU8rAQi1c8z5cDytWW4yd9VlfWGH9CUlyGHFObo/LeJNmuUC8h8A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SBDtlJ1u; arc=fail smtp.client-ip=40.107.96.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Xb4Sd0QVHx6ppKofjlXTjVVH+enyFhVSCE4npFAzNN+1Csyq+kSEc8RSiBjWr9jWldWeYi2htO5fE51x7N54pX4CzltPHc1AZFxI+5CvZOJ+kSZ7KrU9v/Fw7szbnqMKEYpGBt5W3l2OX9LuqP7LGpzJP614OoEHQIVzXDuKYEJfj/P3lnDmVZdAvzmkneZldSPKA3XowMCGChVTFJAYiKq1Cjwko8IBsmR0bnVD9qXYiJ64DRJh1DOcj0Ehcct85E3HZ5cUC1E95VzIr/0SGSYAejsINyJvt0ySg9M5iopOaWwzCOQMoAscytHDPgYLN4pIdk5aZ0gOROJgD9UOGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h5IVNphm4zrbkq1rmzP3wJD1rNBD02RWOGFTzHwJvgc=;
- b=t0xv43ZJCFapyHbExTgI+rpwTzFX16NSdaXFo3/j31asSH6hkvX5CsUsiVAP0WMYLrXxcwY51iO7Bf81fZS7Csl1Z4unk6Dsc5y3HC2uXIvZLTZ0qK3M5FC/X+2qilsybeXeDzk/geHqTWLJ3xqUXpHZj3pwuLTNz8jJyZ8Q+5Fw5hDutdgtKxlAHspZT222wrqYya49x9gp+Fyq6Cr2KDCJhzqFV80KViUkuMQbQ0OtOD0L4jwWpibxGQuV+S0jeg0kDByepZx1TQX838ODV+37eP9LmIQ51aylGylCxmC9f7I2eNsqV07ZRbkFTOqcDw+BENjbU9xfBu386yvOrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h5IVNphm4zrbkq1rmzP3wJD1rNBD02RWOGFTzHwJvgc=;
- b=SBDtlJ1uaW+YDYM/61udL1cv0MBjdQknitbRVFVEVyk6s21NvnPGTN8AmaKv3dAufESopOvzFMW+fUTLe7Zryas244HFVPM0fZFie2yDrOtn6m6UNU2v9FfUTxsynDnHO0dYChVt2PMNLOqs1lsrJClevwZe7b+Qlm1BKSbeS4A=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SA1PR12MB8857.namprd12.prod.outlook.com (2603:10b6:806:38d::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.12; Fri, 3 Jan
- 2025 08:16:19 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%6]) with mapi id 15.20.8314.013; Fri, 3 Jan 2025
- 08:16:19 +0000
-Message-ID: <eb7409c3-d0fc-fe43-446f-3401f379392b@amd.com>
-Date: Fri, 3 Jan 2025 08:16:08 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v9 22/27] cxl: allow region creation by type2 drivers
-Content-Language: en-US
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20241230214445.27602-1-alejandro.lucero-palau@amd.com>
- <20241230214445.27602-23-alejandro.lucero-palau@amd.com>
- <20250102152243.00006b59@huawei.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <20250102152243.00006b59@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DO3P289CA0007.QATP289.PROD.OUTLOOK.COM
- (2603:1096:790:1f::19) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B771C5F0F
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 08:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735892638; cv=none; b=nvjul9YanzFxRXTjrZV0RZm2x5O+5eQKwV524bqyZql4ee5GwBaEmxB4NtpsQ2REkxrLpWjpfhHiMdswoPHbklNtbkgk+HJHwhKzwDp6lxlTgZN8PSBSFSlkoWLLsJabg4Z4KTFBxsV3Egut4H3ZJXvQpymwe0jfzfXK+Z379AM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735892638; c=relaxed/simple;
+	bh=rQApIdZMfZl1tJAtEWWt6ewM8soSr8Giz/P3TRvSh3Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UviJl3nFFEEHTy1DZtgRxS/ZzKeLaIcWF4E/So4l+CTMDHff5SSLo5s+laesrlbHo/zFjbKoT6MPR8OWyhtpnRzJzpEawd4oSJHdjLIqjPCZSxFZXpwuZAHv0hwWF4E7HrqNeGs8W4zUvKi4DyJv2BLkY3vp5+Men99lkdB/8YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vW54RHQq; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e9a88793so21551799a12.1
+        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 00:23:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1735892634; x=1736497434; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1/SDUJZSkltF1zZ3HwAgpGWxggp7V8WJu8Q/xXPNIYk=;
+        b=vW54RHQqzror/DO1KdHOx7JJKyAHd1RUCsvMzh0ny8URaETjJW8qzku1zhHU/jLCMb
+         YI3kRBFEbEWp4wLCncWwk5nCXXpUc0fnqxHSIL9wK47EGVNoUHdW7g+jePYIyadcyH6w
+         3j5PKl+juDy5MxefltIxVt+Atcibc/oC9X3FtuS8c8xsrqMC6P5pjyK6yhG91Vb/6/dV
+         Gb+hPfrrjAB4rS9IrDpxM0ve6KK1J+wAo/cBE9/klpFCs8IONFa8n3Cu6jEd762Uk8Z4
+         KWy0Vzf4Q59SyMX3kPU8TuBy7KK+EsyVDRKeLVkR47KspCckMHJLlTDw7LsP3noxMZWW
+         qZBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735892634; x=1736497434;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1/SDUJZSkltF1zZ3HwAgpGWxggp7V8WJu8Q/xXPNIYk=;
+        b=M4iEYjyIgUobYIfYw6ORMer9k2IawDqOdhDCt7U64hdlBWikHIen2XyURU2UXul3Gi
+         J1MZ/zhxWaY50tizr3xosd1iLBKjrgHp9hB9QrtytRy2lX1VxzPG2u8D+nGLJBW/R4Vo
+         SRjE/wYDRop88d0leyu/dATGyiFqGCjP5gkB38PwF/MbIJ9yNeWCUL+XrVS39pe3gUaA
+         AskS/F62meLnrhNoAFkb0Dp3x9j0xCDD2HrP0UOsPoWxQRNTejnyBzs+to2adeS07VLv
+         W0GD+zv6pvJ2gNBuKbUqhtOd5u5hPK9QWcraBRyNoENUq6Gouy6AhWvNra0tbBOOxyVE
+         dnwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXPW+9yvoaKLnCQn1BcoN3cIlXjC9z62HOw1T8fWqKy9ANn/q6ySbZFbXYOT2Nz44MWLRv46QY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY4/cfiV1Ox9eUchWB2Po8zzIzx6fhpCc1iVE0OxwHy2Fog7va
+	+uMVlB6CXdGpjUApiob/4CDR3uW4uqlbj4ShXqgu1U8v1dSxLkgnY71nCpuCYSfMejlIjclVGuF
+	pWpCzu4/3YNXXFLR8Mm3fewVu4KDkNQI/6ZqZ
+X-Gm-Gg: ASbGncsDLyqv1fqI++uwkne0xC7vE95PPfgXNKwziFkZBlaez2Dmjq14fREVAnKa0zW
+	nleYDN3WGgMuxk+CTv/So+Qa/1PXjFjFnox9Nj5Q=
+X-Google-Smtp-Source: AGHT+IHFYqtRI0Bh9byOq0ZaWcMVuoisuvCbmaXRLi3bxeLKIHgg7blRfT22xldaftUV/JX4U1+w8e59JaAq71Omzqo=
+X-Received: by 2002:a05:6402:354c:b0:5d4:35c7:cd7c with SMTP id
+ 4fb4d7f45d1cf-5d81ddfd836mr39551035a12.26.1735892634420; Fri, 03 Jan 2025
+ 00:23:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SA1PR12MB8857:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6696a0b4-757d-4d6b-2c97-08dd2bcee6ca
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cUhaRFFlMFBQSTZuS0VQUUZCNFZSS3pPcTdqdW9HenU5NHZka2pjZDE4cE9R?=
- =?utf-8?B?UFJiTEVndUdTUnFoQkswRlkzaGlUL2JrVEhEQ3F5T3NUcXdjYzYrd3ROdGdF?=
- =?utf-8?B?OHRFTnZjdjdmZkVZZyszY3dwOGVmZDZsUFpMTDRNRGlxUFJJamRMTjZNK003?=
- =?utf-8?B?dEpyNWdON3pCWExOa2t4eFcrWWhWRW5hRllCWS9KM0M0ZmVWeDcvd0d4SzBh?=
- =?utf-8?B?M1lzU2tTWklMSW01M2NhZEdFbmxFN0R1M3ZPUkVQSHhHRkdOUGY0dWlLM0NP?=
- =?utf-8?B?VzVzOEJCTGIrVUpHZWN0SnM4T0NSSjhZVElBRmgwOXlwTkZFNGMxMmUwUDlM?=
- =?utf-8?B?ZS9SWitFYlZsZE1ybzBoK1FIZloxcGVEckpGVXNQSGZVQjlSV0tnTCttM2lC?=
- =?utf-8?B?RFA0UEgyWkc2UEZVNDBvcjdhS29nMHRQUGR1TUZoNm04L2ZGTGdsa2x4OEN1?=
- =?utf-8?B?NXpEOWxzQmJnVmtOTFI3RkZzNnZxQXJycmxqZjNocjIvWXRDdFlSWUJ4QWlv?=
- =?utf-8?B?VHpnaGpJVnBTc094UDJ4akpkWldTMmhmN3JkZ1FzdDBiUk9NNnVtalNBblJz?=
- =?utf-8?B?NXgyM0thSDlaM09EczhhNml3SVcwUkV6czd5a3BsNUpKYlkwVjhsOG93MXlH?=
- =?utf-8?B?U0ZrM0lhTUMzZ1VITkFMUDVJbzdSWTAwVGJDakJGMXMyR2x0cEh6VEJLdXpN?=
- =?utf-8?B?UGlTNThFVjY3RjM1bGJlUnlXSU1BZFdObnRXcERJWXNkc3gvYUpzQmZuY1VD?=
- =?utf-8?B?cG1nYUVZZ2tpVC93L3FXUzNXRC9IZ2xkTEg0dUZSY2RBSGMzckJYYkViV2Zw?=
- =?utf-8?B?clp1bjBidHplSDZkMk5LL1RLd0dicVRFMTJRbjNSY2p6N0JLYmVzR1kyT2tn?=
- =?utf-8?B?T0gwQ3l4Q0dEd0t0bWt3enR4c0VoWlE5UVVnUW40dWE2YUYyZXFHdTg3M3pk?=
- =?utf-8?B?WE1NLy9kMGw4MFl2SkJ4SExZcHhBQ2dOanRqcUFqU2JxZFdFSi9tVFhhWnpG?=
- =?utf-8?B?b0Uxcm13SXFaODlmYVNQSFIxOE01T2dIajUvOVlzS01KY2tLM043Q2UwU0xF?=
- =?utf-8?B?ZHNIMTkwVGtTYjhqVC8zZnlmVlJnTjRVc2tBUEs2dFFxdGptT2ZjYlpSOUNQ?=
- =?utf-8?B?WmtyOUYwS3daVlljWG13TTdTNk1QMGxMeTg3Yk53YWlTRGM1L0Yvelh4UXU1?=
- =?utf-8?B?WXB3RlVMTjY1YzZXdHprOEJucUdITkVBTXdFdEpKQTcyczVvRUtneTN2TGp0?=
- =?utf-8?B?d1k3YkJkK3lnbzVQTjJidGp3TEh3OFArM29OYVhrRnZKcVBIUXRBdmJlZ3k5?=
- =?utf-8?B?ajgveTViZ0pUa3g5M2dkVHJxTlM5d21lVWJYM2xYMDdFcDAyRUFIeFhFcW1u?=
- =?utf-8?B?MTMxdEtCb29Ca1RoV1VsOVhnSTN1K3d6WTdhTWFxdWczcmg3ZkUzTFkvblJL?=
- =?utf-8?B?c0FiRUdYMzY0ODRlUzdhVUxPRTRNTmxrN0Zkd0dTRTdEU0hLbDFJQVFmZTdG?=
- =?utf-8?B?dTNFc0VkOWFaVlZvWHRCNVhWMjU1QUdWSUk1cXd3S2xHdEZmbWN6TlA5QWF4?=
- =?utf-8?B?RTlWNDA0Z0lVMFNLNjZHMWhsTnFTa0pWamNabzZ2TnMwS0hQYTg4T0Z6Z1lk?=
- =?utf-8?B?UHRLdm0veTJsNkozakpEblNTYjdhb0JIblVZTTlXL2JRQ0hucjZkYk12Z3R1?=
- =?utf-8?B?Tkx5Y3BIQk92NmJnT1pOYWFBT2YzSEg3OGJCWEdRSkZmakZVTnNlMVpLTlZS?=
- =?utf-8?B?SnJtT211RzRrRjhFVFZ6ZFpKYTlONGl4cGpXMitPeHY1Qmg2Uk1lK25DSnZx?=
- =?utf-8?B?V0NvM25sb3lTMGI1LzE0d2NNMGJEc2RLbzh4MEFmTnFZRjhVN1Jqa0FDdTJ3?=
- =?utf-8?Q?pXQ83jZ4X0SVw?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZzBCODNlNGphQ3dqdjlFU2NUNjBwNGVpQkJhQ0ltbWpGQXRFc1Myb2R2WXUw?=
- =?utf-8?B?NE8rWFJEVndFaXN6Vnh6WHhYdVBGM0R4RW82MGJ6YUhkUWwreGxOOXV5MHZt?=
- =?utf-8?B?RS9pNmlkdFc3T3liNzVSWkdTaW4xWGE4QUVPbGRSdjFkei9jNlUvUkU1cjJv?=
- =?utf-8?B?MjhQTndhZVhadU1wNUd1Mm80RlE5YlNEWHUwL3ZXdEljNkp0VUcwanlxcXkw?=
- =?utf-8?B?NXRwazRlU0o0YnMrcUdpVXFMWllGZnQ2d21wZ3k1NmtYZmdvc0Z1UGR4eVVh?=
- =?utf-8?B?Tmk3bXZ0TFNNRVA5SjZ6NnlGanBna1F6bnh5MnlObnNFOEJKT012dmgzOTZp?=
- =?utf-8?B?OUd6TXMzNXN5WDlaSXRoOGZSYnc4OVdabVhJVllyTWhiWGk5UUJlNEk1R29S?=
- =?utf-8?B?eUZMT0h0RmZJUmpwZjlGMXNSNWdzbUhPcjdIZ2xqVTdOWUpRaDdUZ0QzcXRJ?=
- =?utf-8?B?cGJwcW5pMHVEZmorc050L2RPclFQNXhkRGU4c1BPL2lLSlE4eFEzMyt6cVdE?=
- =?utf-8?B?Zm1xRDFGVmpxZk1uQnhCVVAwMGpYdjNXVG0vTmJYNDlSaDlPWFNLQ0JjeEtj?=
- =?utf-8?B?RzdSMnZvRVh6TmFUY1VYa0FuS0VUNjBJWmVXaHc3Y3BnclNNZ3o2ZmozeFBC?=
- =?utf-8?B?cStCb0NKNnF1OEx2emkrbFZoS3QzQUlaS2hRL292enNFWkNZaDBGMmZkRnVp?=
- =?utf-8?B?cFNzRUdWVVJOV0p0VGNidXFOYlgvUUxzVXJOakxRRW16Q0xDMWxzc0FFY1dB?=
- =?utf-8?B?ZEJDcGEwa3ExNlZmaVJjSHVDRHdXSUJZanRyN2JXdVpYayt6bVZnZVBZbWdI?=
- =?utf-8?B?RFF2QmFMcmlueWdMUUlIcG5GcXBWWWZyczJJY3BTTHBadzNFMjRtY3psQlds?=
- =?utf-8?B?bmN6eC9reGh2dzVYcWppOG5lZmlTNW05U1pUY0piREhSZEFxVkh1bjNLN0hN?=
- =?utf-8?B?VzVTY2lPNitONktNdnVPT1E4UDVLM3RHVnJYenluZVhCQXdqNXB2WDM0cE1T?=
- =?utf-8?B?dXhQNjVVYnFlakF3Q1J3Z2VWM0FVREhtZW9tV29sTEtSRUcxRlVpbkJ6OVZ1?=
- =?utf-8?B?R2xtZm1TMm8wait3UnJ2dHNaT2UrSGd6TktoKzRsUmx2RTQ4SjcxU0ZJaitJ?=
- =?utf-8?B?NmxaZ0pGY0NMZVVMMS9tU0tsTElScDJCMnowTUQ5bUM3S3FPellFTDNJV2Fs?=
- =?utf-8?B?SVBqOEQveEdEQ1pRK0lSU2pDUlkxOUZIMDNERjB3dTJrUUo2MXUzUTFyOVRZ?=
- =?utf-8?B?VGdrSHVWblg0SVRGNXFacEhIdXpsZmFNQjZCRnZkUDhIUC9HS3dDSnV0Z3hv?=
- =?utf-8?B?bUN0YkQ3d1VFUzNmNitZcERFMFBYOG00YVRCSjA2Rm9TR0NjcG5RcUVVdTc4?=
- =?utf-8?B?Y0hybjZCczQ5b25Tek9IcFlJTmtrRUVKMzBTWmxLSklacmU2Qm5TTHFxSEZJ?=
- =?utf-8?B?WmNRU0hzOFBOZ3F6MnZTNWZUdmo3VmpzRlNFVEdCWDlzQ1N3Tml1aUhTMnhD?=
- =?utf-8?B?NGtDYW9pRHZudm1COWxydzA4MytGZWZka3Y1RFRuYXc4MlIvTEdJRVRzSUMw?=
- =?utf-8?B?b2d3WjRMTVIyNkp0OU1veTU2Y2lobGVMUGpaM1FDbStWWmRqa1lQY3hvckpk?=
- =?utf-8?B?Y3dzQVZEeUpiWGtwajRnVi85dEg5d3RxYmdRbGpFeFhkY2N5MkJnK21LMGNO?=
- =?utf-8?B?bXl0Yi9xVTJoQ1hNNGc0dzY3RjJCUXZQQWhBNlIxbW42V2dudlRjZHN2QjV1?=
- =?utf-8?B?SGZVRGozLzNFZjVGL05QTTNQWXltQ0tUdGZadStTVUNjdXFMeFVwT0RQajRk?=
- =?utf-8?B?MHVmYWVYOGJWZlZPSVZoc1RkaE5MaTNIUHJpdUVUdmxWc2JsZlFXOGtqeWhU?=
- =?utf-8?B?MzNSUURwTXYwV1RZRC9BL3lCWEtSa0F1UFFGc2YzTktGSjl1NmFNcXlHMXVu?=
- =?utf-8?B?Q3dyM2FISFcwbTlUdWRXQ0Q0MmFEZVhWREhiMlNwYldHTk1rVnhsYVk1MklU?=
- =?utf-8?B?dDZqWGhZUDVIcFdtTUh5ZTMzU3BUam05LzZ1bEIxanRUUTdycmtsazQzOHN2?=
- =?utf-8?B?NzZsUW9MTXRNV2dERGtHaEhzOVo5SlNYQUFML3I5eGN2amVpamY2V2MvWDZU?=
- =?utf-8?Q?G+gF6xX8F4f019xo8BrzYS/dy?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6696a0b4-757d-4d6b-2c97-08dd2bcee6ca
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2025 08:16:19.5603
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YXW4i2rTojMgddKSCfEVfKa3X4mf4aIEYKt2akWzebb2qUdZaSaMynqpqliVqn6b0sz1h8Y4gbFZVup12jZeNA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8857
+References: <CAKHoSAt_KtBEBHoc3ucdCdMVy89unQPBCKrM3oTA=Kz4Nqpjjw@mail.gmail.com>
+In-Reply-To: <CAKHoSAt_KtBEBHoc3ucdCdMVy89unQPBCKrM3oTA=Kz4Nqpjjw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 3 Jan 2025 09:23:43 +0100
+Message-ID: <CANn89iLr7-2utF1TbiS+ddHNWvBFhf-q3rDVt3g4B5xuz987HA@mail.gmail.com>
+Subject: Re: "KASAN: null-ptr-deref Read in ipv6_renew_options" in Linux
+ kernel version 6.13.0-rc2
+To: cheung wall <zzqq0103.hey@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On 1/2/25 15:22, Jonathan Cameron wrote:
-> On Mon, 30 Dec 2024 21:44:40 +0000
-> alejandro.lucero-palau@amd.com wrote:
+On Fri, Jan 3, 2025 at 8:16=E2=80=AFAM cheung wall <zzqq0103.hey@gmail.com>=
+ wrote:
 >
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Creating a CXL region requires userspace intervention through the cxl
->> sysfs files. Type2 support should allow accelerator drivers to create
->> such cxl region from kernel code.
->>
->> Adding that functionality and integrating it with current support for
->> memory expanders.
->>
->> Based on https://lore.kernel.org/linux-cxl/168592159835.1948938.1647215579839222774.stgit@dwillia2-xfh.jf.intel.com/
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
->> Reviewed-by: Zhi Wang <zhiw@nvidia.com>
-> Trivial comment inline. Either way
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Hello,
 >
->> ---
->>   drivers/cxl/core/region.c | 145 ++++++++++++++++++++++++++++++++++----
->>   drivers/cxl/cxlmem.h      |   2 +
->>   drivers/cxl/port.c        |   5 +-
->>   include/cxl/cxl.h         |   4 ++
->>   4 files changed, 141 insertions(+), 15 deletions(-)
->>
->> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->> index 1b1d45c44b52..a2b92162edbd 100644
->> --- a/drivers/cxl/core/region.c
->> +++ b/drivers/cxl/core/region.c
->> @@ -2270,6 +2270,18 @@ static int cxl_region_detach(struct cxl_endpoint_decoder *cxled)
->>   	return rc;
->>   }
->>   
->> +int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled)
->> +{
->> +	int rc;
->> +
->> +	down_write(&cxl_region_rwsem);
-> Could use a guard here so you can return directly.
-
-
-Interesting. Not familiar with this automatic cleanups, but I'll use as 
-it is already being used inside kernel cxl core.
-
-Thanks!
-
-
->> +	cxled->mode = CXL_DECODER_DEAD;
->> +	rc = cxl_region_detach(cxled);
->> +	up_write(&cxl_region_rwsem);
->> +	return rc;
->> +}
->> +EXPORT_SYMBOL_NS_GPL(cxl_accel_region_detach, "CXL");
+> I am writing to report a potential vulnerability identified in the
+> Linux Kernel version 6.13.0-rc2. This issue was discovered using our
+> custom vulnerability discovery tool.
 >
+> HEAD commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4 (tag: v6.13-rc2)
+>
+> Affected File: net/ipv6/exthdrs.c
+>
+> File: net/ipv6/exthdrs.c
+>
+> Function: ipv6_renew_options
+>
+> Detailed Call Stack:
+>
+> ------------[ cut here begin]------------
+>
+> netlink: 'syz.0.3890': attribute type 4 has an invalid length.
+> TCP: request_sock_TCPv6: Possible SYN flooding on port 20002. Sending
+> cookies. Check SNMP counters.
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KASAN: null-ptr-deref in instrument_atomic_read
+> include/linux/instrumented.h:71 [inline]
+> BUG: KASAN: null-ptr-deref in atomic_read
+> include/linux/atomic/atomic-instrumented.h:27 [inline]
+> BUG: KASAN: null-ptr-deref in sock_kmalloc+0x4a/0x100 net/core/sock.c:242=
+5
+> Read of size 4 at addr 0000000000000270 by task syz.0.3891/24197
+>
+> CPU: 3 PID: 24197 Comm: syz.0.3891 Not tainted 5.15.169 #1
+> Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), BIOS
+> 1.16.3-debian-1.16.3-2 04/01/2014
+> Call Trace:
+> <IRQ>
+> __dump_stack lib/dump_stack.c:88 [inline]
+> dump_stack_lvl+0x8b/0xb3 lib/dump_stack.c:106
+> __kasan_report mm/kasan/report.c:438 [inline]
+> kasan_report.cold+0x116/0x11b mm/kasan/report.c:451
+> check_region_inline mm/kasan/generic.c:183 [inline]
+> kasan_check_range+0xfd/0x1f0 mm/kasan/generic.c:189
+> instrument_atomic_read include/linux/instrumented.h:71 [inline]
+> atomic_read include/linux/atomic/atomic-instrumented.h:27 [inline]
+> sock_kmalloc+0x4a/0x100 net/core/sock.c:2425
+> ipv6_renew_options+0x275/0x960 net/ipv6/exthdrs.c:1310
+> calipso_req_setattr+0x131/0x2e0 net/ipv6/calipso.c:1207
+> calipso_req_setattr+0x52/0x80 net/netlabel/netlabel_calipso.c:596
+> netlbl_req_setattr+0x18c/0x580 net/netlabel/netlabel_kapi.c:1224
+> selinux_netlbl_inet_conn_request+0x1fe/0x330 security/selinux/netlabel.c:=
+337
+> selinux_inet_conn_request+0x1cc/0x2a0 security/selinux/hooks.c:5583
+> security_inet_conn_request+0x56/0xb0 security/security.c:2344
+> tcp_v6_route_req+0x24f/0x520 net/ipv6/tcp_ipv6.c:858
+> tcp_conn_request+0xaa4/0x3120 net/ipv4/tcp_input.c:6995
+> tcp_v6_conn_request net/ipv6/tcp_ipv6.c:1218 [inline]
+> tcp_v6_conn_request+0x24c/0x420 net/ipv6/tcp_ipv6.c:1205
+> tcp_rcv_state_process+0x9e5/0x47c0 net/ipv4/tcp_input.c:6512
+> tcp_v6_do_rcv+0x438/0x16b0 net/ipv6/tcp_ipv6.c:1551
+> tcp_v6_rcv+0x32d4/0x3620 net/ipv6/tcp_ipv6.c:1755
+> ip6_protocol_deliver_rcu+0x2f5/0x1800 net/ipv6/ip6_input.c:425
+> ip6_input_finish+0x64/0x1b0 net/ipv6/ip6_input.c:466
+> NF_HOOK include/linux/netfilter.h:302 [inline]
+> NF_HOOK include/linux/netfilter.h:296 [inline]
+> ip6_input+0x9c/0xd0 net/ipv6/ip6_input.c:475
+> dst_input include/net/dst.h:453 [inline]
+> ip6_rcv_finish net/ipv6/ip6_input.c:79 [inline]
+> ip6_rcv_finish net/ipv6/ip6_input.c:69 [inline]
+> NF_HOOK include/linux/netfilter.h:302 [inline]
+> NF_HOOK include/linux/netfilter.h:296 [inline]
+> ipv6_rcv+0x155/0x520 net/ipv6/ip6_input.c:300
+> __netif_receive_skb_one_core+0x12e/0x1f0 net/core/dev.c:5489
+> __netif_receive_skb+0x24/0x1b0 net/core/dev.c:5603
+> process_backlog+0x222/0x820 net/core/dev.c:6480
+> __napi_poll+0xb9/0x5b0 net/core/dev.c:7039
+> napi_poll net/core/dev.c:7106 [inline]
+> net_rx_action+0x8b1/0xbb0 net/core/dev.c:7196
+> handle_softirqs+0x1bd/0x6e0 kernel/softirq.c:558
+> do_softirq kernel/softirq.c:459 [inline]
+> do_softirq+0xad/0xe0 kernel/softirq.c:446
+> </IRQ>
+> <TASK>
+> __local_bh_enable_ip+0xd7/0x100 kernel/softirq.c:383
+> local_bh_enable include/linux/bottom_half.h:32 [inline]
+> rcu_read_unlock_bh include/linux/rcupdate.h:809 [inline]
+> ip6_finish_output2+0xb71/0x1d00 net/ipv6/ip6_output.c:131
+> __ip6_finish_output.part.0+0x509/0xc10 net/ipv6/ip6_output.c:201
+> __ip6_finish_output net/ipv6/ip6_output.c:186 [inline]
+> ip6_finish_output net/ipv6/ip6_output.c:211 [inline]
+> NF_HOOK_COND include/linux/netfilter.h:291 [inline]
+> ip6_output+0x30b/0x9f0 net/ipv6/ip6_output.c:234
+> dst_output include/net/dst.h:443 [inline]
+> NF_HOOK include/linux/netfilter.h:302 [inline]
+> NF_HOOK include/linux/netfilter.h:296 [inline]
+> ip6_xmit+0x1053/0x1d50 net/ipv6/ip6_output.c:338
+> inet6_csk_xmit+0x36d/0x6f0 net/ipv6/inet6_connection_sock.c:135
+> __tcp_transmit_skb+0x18d8/0x35a0 net/ipv4/tcp_output.c:1402
+> tcp_transmit_skb net/ipv4/tcp_output.c:1420 [inline]
+> tcp_send_syn_data net/ipv4/tcp_output.c:3851 [inline]
+> tcp_connect+0x23b0/0x4600 net/ipv4/tcp_output.c:3890
+> tcp_v6_connect+0x1419/0x1c40 net/ipv6/tcp_ipv6.c:337
+> __inet_stream_connect+0x8d8/0xe70 net/ipv4/af_inet.c:674
+> tcp_sendmsg_fastopen net/ipv4/tcp.c:1195 [inline]
+> tcp_sendmsg_locked+0x2004/0x2ce0 net/ipv4/tcp.c:1237
+> tcp_sendmsg+0x2b/0x50 net/ipv4/tcp.c:1457
+> inet6_sendmsg+0xb5/0x140 net/ipv6/af_inet6.c:669
+> sock_sendmsg_nosec net/socket.c:704 [inline]
+> __sock_sendmsg+0xf2/0x190 net/socket.c:716
+> __sys_sendto+0x21c/0x320 net/socket.c:2063
+> __do_sys_sendto net/socket.c:2075 [inline]
+> __se_sys_sendto net/socket.c:2071 [inline]
+> __x64_sys_sendto+0xdd/0x1b0 net/socket.c:2071
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x33/0x80 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x6c/0xd6
+> RIP: 0033:0x2b4da5fe19c9
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48
+> 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+> 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00002b4da7f5e038 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 00002b4da61fdf80 RCX: 00002b4da5fe19c9
+> RDX: fffffffffffffedd RSI: 0000000020000280 RDI: 0000000000000004
+> RBP: 00002b4da608e1b6 R08: 0000000020000080 R09: 000000000000001c
+> R10: 0000000020000004 R11: 0000000000000246 R12: 0000000000000000
+> R13: 0000000000000000 R14: 00002b4da61fdf80 R15: 00007ffed7f48918
+>
+> ------------[ cut here end]------------
+>
+> Root Cause:
+>
+> The crash is caused by a null pointer dereference detected by
+> KernelAddressSANitizer (KASAN) within the sock_kmalloc function of the
+> Linux networking stack. Specifically, the atomic_read operation in
+> sock_kmalloc is attempting to access memory at address 0x270, which is
+> invalid or uninitialized. This issue likely arises from an improperly
+> handled or uninitialized socket structure, leading the kernel to
+> attempt to read from a null or corrupted pointer. The problem occurs
+> during the processing of IPv6 connections, involving multiple layers
+> of the networking and security (SELinux) subsystems. As a result, the
+> kernel crashes when it tries to access or manipulate this invalid
+> memory address during socket allocation.
+>
+
+Yeah, the 'root cause' section seems to be AI generated, you are
+rephrasing the report.
+
+I have an idea of the root cause, I had a syzbot report for the same
+issue in my queue.
+
+A similar bug was fixed in
+
+commit eedcad2f2a371786f8a32d0046794103dadcedf3
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Tue Nov 26 14:59:11 2024 +0000
+
+    selinux: use sk_to_full_sk() in selinux_ip_output()
+
+
+
+Thanks.
+
+> Thank you for your time and attention.
+>
+> Best regards
+>
+> Wall
 
