@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-155079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 752B1A00F66
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:16:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 403F2A00F6E
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:17:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A162188348D
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:16:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3E76165251
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0421FA262;
-	Fri,  3 Jan 2025 21:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BF31FBEBE;
+	Fri,  3 Jan 2025 21:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ut57PD0A"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SUcFrW4S"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E371CEE93;
-	Fri,  3 Jan 2025 21:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21371FBC90;
+	Fri,  3 Jan 2025 21:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735938846; cv=none; b=d+I2H7CKJDuUgL12JFuQBvbQ7wt3wL3llXMq7da0PJDKFICvEJfqzHdTEuNb5wieWrzWMikfhjQaf1E/QuMGeTQnGLZWnJTCEmo/Ev87FHvyYU4BqlsLS43JxMrdiUB6j2JgJz61SH22TXe+GtUeXJWU40OfTZyAwuqBVSt6M5Y=
+	t=1735938850; cv=none; b=qIcf5rdCARr/MRGt6J5c65qRjuM0QzxJJSr70hmvG2AnW3rsSbsEUm9BnFTOhoykapS9Wfry1leGomLMU9wm5Wx+GX6zq3aflzw5/BOAUR8Y+t6Uu3mSIKpYIM08uJvEOePpmq9dhv3F1X3DD7YIlE1fL+PnmAgT+Jn0v2vhX/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735938846; c=relaxed/simple;
-	bh=pyx3ITPlmGXw/W3sYnBM8cwDcc3Py4Wk3Of+Oi63s0g=;
+	s=arc-20240116; t=1735938850; c=relaxed/simple;
+	bh=PEObNQ2V3MUmxEER3BFmP8L8SBJC5YlJApWCb3rCu4M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nKFiVAkInMCKaQuKNUreQoHMgnzEZwsASSn1aqc30SKdyRPmz0Ddys+lTpM54mo7yMwcpyFOD56F5Lc+YDCQwsJCcrfPEt4tFOjtorOdgh5CQnEv1k/l5jwR8HFMb1v9hlXpiGhl6p9A4a7vBF4liGn68ixdq0KqAeSiQdTiMpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ut57PD0A; arc=none smtp.client-ip=217.70.183.199
+	 In-Reply-To:To:Cc; b=WLcSwQuXuSBf7DBuCjdYHIV5dyyNJlUIKVXDeAME5p76fzSbBzfCRV5xereTGGhhREbNWoamLt9+ktHxR0B9hFNGz/+ktvd+ItF8XY2+D0POXMLsQ/LqB6WAG/HC+3AP/d+QQpLBfp9nzr04effhpcyrnZSeBowl9Cd8IAIUMBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SUcFrW4S; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C385FF804;
-	Fri,  3 Jan 2025 21:13:59 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A412EFF805;
+	Fri,  3 Jan 2025 21:14:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1735938842;
+	t=1735938845;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DBLTQco78xGUPuwuDi7PAAZH/+o3f0fFG8ip6t+bH+U=;
-	b=Ut57PD0AqZxXUqYOs6JnBWdrma1wJFXxUmqwdvLt+8wxaLiLitxcLRuK+0VsR0kGReUNoB
-	aI/qhedz4DiIWMV+sByrSfHKQ2mfrH7fj51pocxr7EUpc/z7lhAesvrrR8BeT6Te33rIS0
-	cEyOIh5MyvoG5aHn9JyRIVpBDWtJBh3StvgDYX58HeTd9YgwtPgwCEO4TFlbtCStlcPdLd
-	xkdBneC7V56c6NDZNcCfiXS8l4a61iAxCo2g7RdjA8gMwFTDRWmgDNwg6hQU8ohUVk8V+t
-	zS2qoX/Eq9ovYsUhFex9GpWXNiVrdcN3jtUbvO90KxaomHtE3xkwDHwy+dt1/g==
+	bh=RKhVgq4tToq0KvqCA9o7k2lt80u2OoQQ2me4jldQdMs=;
+	b=SUcFrW4SnC30ou/WhpXAhIAk6Qb7pZkSTia+TjD0H1vj0KN5Jcyx27dtETSU1T7gyA5V+/
+	M0xLDbJ/XveVjXnupfGLjXdbnhqdzmXN+ok799p/dBUJXTJ0PVpKMdzFlZ23AyfoUx4qzP
+	ZJpSqhuDBZzeEQvfRhIN1wvGC2hTXK0sEryvzCqwnJ6WiruEgGBR35wmpu+zHkUxJ/KBOv
+	d/3D3ztnvnMfqVvwLWIwojtnk/mH7/34plN+gmLArie6D8pgGNNvl17mFC5kp8H+SDu8Yn
+	+m9VCeHkH+fSG+i3LNqngSPgS2hDOHRgOsghRkKi5FzvRVuak4MoDYDoqnQRgA==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 03 Jan 2025 22:13:00 +0100
-Subject: [PATCH net-next v4 11/27] net: pse-pd: Add support for PSE device
- index
+Date: Fri, 03 Jan 2025 22:13:01 +0100
+Subject: [PATCH net-next v4 12/27] net: ethtool: Add support for new PSE
+ device index description
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250103-feature_poe_port_prio-v4-11-dc91a3c0c187@bootlin.com>
+Message-Id: <20250103-feature_poe_port_prio-v4-12-dc91a3c0c187@bootlin.com>
 References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
 In-Reply-To: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -80,152 +80,115 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Add support for a PSE device index to report the PSE controller index to
-the user through ethtool. This will be useful for future support of power
-domains and port priority management.
+Add functionality to report the newly introduced PSE device index to
+the user, enabling better identification and management of PSE devices.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
-
-Changes in v3:
-- Use u32 for all variables.
 
 Changes in v2:
 - new patch.
 ---
- drivers/net/pse-pd/pse_core.c | 24 +++++++++++++++++++-----
- include/linux/ethtool.h       |  2 ++
- include/linux/pse-pd/pse.h    |  2 ++
- 3 files changed, 23 insertions(+), 5 deletions(-)
+ Documentation/netlink/specs/ethtool.yaml       | 5 +++++
+ Documentation/networking/ethtool-netlink.rst   | 4 ++++
+ include/uapi/linux/ethtool_netlink.h           | 1 -
+ include/uapi/linux/ethtool_netlink_generated.h | 1 +
+ net/ethtool/pse-pd.c                           | 4 ++++
+ 5 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 887a477197a6..830e8d567d4d 100644
---- a/drivers/net/pse-pd/pse_core.c
-+++ b/drivers/net/pse-pd/pse_core.c
-@@ -13,6 +13,7 @@
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 60f85fbf4156..cc26a9dfa8f7 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -1357,6 +1357,10 @@ attribute-sets:
+         type: nest
+         multi-attr: true
+         nested-attributes: c33-pse-pw-limit
++      -
++        name: pse-id
++        type: u32
++        name-prefix: ethtool-a-
+   -
+     name: rss
+     attr-cnt-name: __ethtool-a-rss-cnt
+@@ -2162,6 +2166,7 @@ operations:
+             - c33-pse-ext-substate
+             - c33-pse-avail-pw-limit
+             - c33-pse-pw-limit-ranges
++            - pse-id
+       dump: *pse-get-op
+     -
+       name: pse-set
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index a7ba6368a4d5..6f5a880d8df2 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -1771,6 +1771,7 @@ Kernel response contents:
+                                                       limit of the PoE PSE.
+   ``ETHTOOL_A_C33_PSE_PW_LIMIT_RANGES``       nested  Supported power limit
+                                                       configuration ranges.
++  ``ETHTOOL_A_PSE_ID``                           u32  Index of the PSE
+   ==========================================  ======  =============================
  
- static DEFINE_MUTEX(pse_list_mutex);
- static LIST_HEAD(pse_controller_list);
-+static DEFINE_IDA(pse_ida);
+ When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` attribute identifies
+@@ -1844,6 +1845,9 @@ identifies the C33 PSE power limit ranges through
+ If the controller works with fixed classes, the min and max values will be
+ equal.
  
- /**
-  * struct pse_control - a PSE control
-@@ -448,6 +449,10 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
- 
- 	mutex_init(&pcdev->lock);
- 	INIT_LIST_HEAD(&pcdev->pse_control_head);
-+	ret = ida_alloc_max(&pse_ida, INT_MAX, GFP_KERNEL);
-+	if (ret < 0)
-+		return ret;
-+	pcdev->id = ret;
- 
- 	if (!pcdev->nr_lines)
- 		pcdev->nr_lines = 1;
-@@ -461,12 +466,12 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
- 
- 	ret = of_load_pse_pis(pcdev);
- 	if (ret)
--		return ret;
-+		goto free_pse_ida;
- 
- 	if (pcdev->ops->setup_pi_matrix) {
- 		ret = pcdev->ops->setup_pi_matrix(pcdev);
- 		if (ret)
--			return ret;
-+			goto free_pse_ida;
- 	}
- 
- 	/* Each regulator name len is pcdev dev name + 7 char +
-@@ -483,15 +488,17 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
- 			continue;
- 
- 		reg_name = devm_kzalloc(pcdev->dev, reg_name_len, GFP_KERNEL);
--		if (!reg_name)
--			return -ENOMEM;
-+		if (!reg_name) {
-+			ret = -ENOMEM;
-+			goto free_pse_ida;
-+		}
- 
- 		snprintf(reg_name, reg_name_len, "pse-%s_pi%d",
- 			 dev_name(pcdev->dev), i);
- 
- 		ret = devm_pse_pi_regulator_register(pcdev, reg_name, i);
- 		if (ret)
--			return ret;
-+			goto free_pse_ida;
- 	}
- 
- 	mutex_lock(&pse_list_mutex);
-@@ -499,6 +506,10 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
- 	mutex_unlock(&pse_list_mutex);
- 
- 	return 0;
++The ``ETHTOOL_A_PSE_ID`` attribute identifies the index of the PSE
++controller.
 +
-+free_pse_ida:
-+	ida_free(&pse_ida, pcdev->id);
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(pse_controller_register);
+ PSE_SET
+ =======
  
-@@ -509,6 +520,7 @@ EXPORT_SYMBOL_GPL(pse_controller_register);
- void pse_controller_unregister(struct pse_controller_dev *pcdev)
- {
- 	pse_release_pis(pcdev);
-+	ida_free(&pse_ida, pcdev->id);
- 	mutex_lock(&pse_list_mutex);
- 	list_del(&pcdev->list);
- 	mutex_unlock(&pse_list_mutex);
-@@ -771,6 +783,8 @@ int pse_ethtool_get_status(struct pse_control *psec,
- 
- 	pcdev = psec->pcdev;
- 	ops = pcdev->ops;
-+	status->pse_id = pcdev->id;
-+
- 	mutex_lock(&pcdev->lock);
- 	ret = ops->pi_get_admin_state(pcdev, psec->id, &admin_state);
- 	if (ret)
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 2bdf7e72ee50..d5d13a3d4447 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -1327,6 +1327,7 @@ struct ethtool_c33_pse_pw_limit_range {
- /**
-  * struct ethtool_pse_control_status - PSE control/channel status.
-  *
-+ * @pse_id: index number of the PSE.
-  * @podl_admin_state: operational state of the PoDL PSE
-  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
-  * @podl_pw_status: power detection status of the PoDL PSE.
-@@ -1348,6 +1349,7 @@ struct ethtool_c33_pse_pw_limit_range {
-  *	ranges
-  */
- struct ethtool_pse_control_status {
-+	u32 pse_id;
- 	enum ethtool_podl_pse_admin_state podl_admin_state;
- 	enum ethtool_podl_pse_pw_d_status podl_pw_status;
- 	enum ethtool_c33_pse_admin_state c33_admin_state;
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index 09e62d8c3271..8780a4160d3c 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -172,6 +172,7 @@ struct pse_pi {
-  * @types: types of the PSE controller
-  * @pi: table of PSE PIs described in this controller device
-  * @no_of_pse_pi: flag set if the pse_pis devicetree node is not used
-+ * @id: Index of the PSE
-  */
- struct pse_controller_dev {
- 	const struct pse_controller_ops *ops;
-@@ -185,6 +186,7 @@ struct pse_controller_dev {
- 	enum ethtool_pse_types types;
- 	struct pse_pi *pi;
- 	bool no_of_pse_pi;
-+	u32 id;
+diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
+index 9c909ce733a5..335127b895fe 100644
+--- a/include/uapi/linux/ethtool_netlink.h
++++ b/include/uapi/linux/ethtool_netlink.h
+@@ -193,7 +193,6 @@ enum {
+ 	ETHTOOL_A_STATS_RMON_MAX = (__ETHTOOL_A_STATS_RMON_CNT - 1)
  };
  
- #if IS_ENABLED(CONFIG_PSE_CONTROLLER)
+-
+ /* generic netlink info */
+ #define ETHTOOL_GENL_NAME "ethtool"
+ #define ETHTOOL_GENL_VERSION 1
+diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
+index 43993a2d68e5..b3c928c71ca3 100644
+--- a/include/uapi/linux/ethtool_netlink_generated.h
++++ b/include/uapi/linux/ethtool_netlink_generated.h
+@@ -630,6 +630,7 @@ enum {
+ 	ETHTOOL_A_C33_PSE_EXT_SUBSTATE,
+ 	ETHTOOL_A_C33_PSE_AVAIL_PW_LIMIT,
+ 	ETHTOOL_A_C33_PSE_PW_LIMIT_RANGES,
++	ETHTOOL_A_PSE_ID,
+ 
+ 	__ETHTOOL_A_PSE_CNT,
+ 	ETHTOOL_A_PSE_MAX = (__ETHTOOL_A_PSE_CNT - 1)
+diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
+index 2819e2ba6be2..6cfdfaa47c1c 100644
+--- a/net/ethtool/pse-pd.c
++++ b/net/ethtool/pse-pd.c
+@@ -83,6 +83,7 @@ static int pse_reply_size(const struct ethnl_req_info *req_base,
+ 	const struct ethtool_pse_control_status *st = &data->status;
+ 	int len = 0;
+ 
++	len += nla_total_size(sizeof(u32)); /* _PSE_ID */
+ 	if (st->podl_admin_state > 0)
+ 		len += nla_total_size(sizeof(u32)); /* _PODL_PSE_ADMIN_STATE */
+ 	if (st->podl_pw_status > 0)
+@@ -148,6 +149,9 @@ static int pse_fill_reply(struct sk_buff *skb,
+ 	const struct pse_reply_data *data = PSE_REPDATA(reply_base);
+ 	const struct ethtool_pse_control_status *st = &data->status;
+ 
++	if (nla_put_u32(skb, ETHTOOL_A_PSE_ID, st->pse_id))
++		return -EMSGSIZE;
++
+ 	if (st->podl_admin_state > 0 &&
+ 	    nla_put_u32(skb, ETHTOOL_A_PODL_PSE_ADMIN_STATE,
+ 			st->podl_admin_state))
 
 -- 
 2.34.1
