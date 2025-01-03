@@ -1,116 +1,119 @@
-Return-Path: <netdev+bounces-154927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B27A005DC
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 09:41:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB42CA00632
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 09:45:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAC8E16132D
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 08:41:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D72F188684D
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 08:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAAB21C878E;
-	Fri,  3 Jan 2025 08:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622BF1CEE9B;
+	Fri,  3 Jan 2025 08:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m69lxsqN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CH6qv1t2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32454C62
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 08:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E941CEE8A
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 08:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735893694; cv=none; b=jYLcnjmgJT8OYkTOs8pgOXANFyPpSROC63FPKUR/fjXXvMCmqD0P/eADpWaxuoE+8YGgF6EKO7xVJHcd2rn1YC0EC0Xud435wbfPVBTVk5m5vw8MNPuO/U1MB2fAYoTUq4BZoQmp43cIK/PgJ7muLfmX3Rihq+kpT+0xTjCranU=
+	t=1735893843; cv=none; b=ettGLvE8BZEoFnTy4/x0XYXz6gK0OX6J06Crw5uYLqRn9HmQWshvxwviM34LIRznI3uVBs92gWZputuyhKn9h9W0Iv806XB3o7Rj79Sia1ckAvmBIG3boZOx/8Vcabhk5/OW7DZARb1YaXPm+kp6ZCN/p/XBvFXlF21jbbpip9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735893694; c=relaxed/simple;
-	bh=Ey/yrmib8/yU1C3yahwIPlmK5F1B0jPWLyFaguH5zmU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AWJEbH1HnqKQcCQxLwEYgW52VeRUc/v9nu31YjjnQvL3sg6Cc0QcoaPsEbBIVd5j2x1P8ugONMtVIUWywIaBR7fGmIt6AYQ53Kod2wciLyjKVPccPF70xsh/NL1Yjw5fCsJtDF4MlFCVSuiGHYsVzg03p7iiFE/mUEPwMUS4Ct0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m69lxsqN; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d3d479b1e6so16868924a12.2
-        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 00:41:32 -0800 (PST)
+	s=arc-20240116; t=1735893843; c=relaxed/simple;
+	bh=KCOPKFQkr8RHPl//0vQqXxbJRYK6TGRHsmCfWBHzNTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=prEJzAWMi2KBbz4bvCjKylzHmjsTbQbdeQh+HP99DzFXGarsZG8qnt0HpwGEcsMbK7uHpcSGBamTkn7DTal/b2s6mvf+YNUVYIujzHfzLuCDEnJ585M+jSfUgh1/DUEcEEzV6FRP7mXuYn+Kigmax+9KhDX6ZbKCPcUSYUoxrfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CH6qv1t2; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3862d16b4f5so7493403f8f.0
+        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 00:44:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735893691; x=1736498491; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ey/yrmib8/yU1C3yahwIPlmK5F1B0jPWLyFaguH5zmU=;
-        b=m69lxsqNV1/i3LbXL21MO3xeVYquuAt+RQULkNlb7ZKJgo7MQaMb2jyy+ZmTVdPD2k
-         iA0tAShCOhd2C/h3r+hnQ6ohbZCCo52KktuxOEKPoQrrtAZXDVO5WtrJxZWfRK0vwOm5
-         QcqEaPMMLkcfeHJ9g3a+T6Sobb6QwhERo3qwn0UtsqIRiX9NvdSIuP8Gepp96SqEA3SQ
-         QKfKafwiKAIxNT6BbjpHRnuSDuQLHgbENi02RragQEtHMAUTPSSgcWwELEZD5gUEI5r0
-         BnSByTm4dlJ0dTYbcI9OzIFC6nf3KKmmewtUm12nUii7DfT4IZovFLkMOv8I3kJBdb5C
-         Z3Ag==
+        d=gmail.com; s=20230601; t=1735893840; x=1736498640; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KCOPKFQkr8RHPl//0vQqXxbJRYK6TGRHsmCfWBHzNTM=;
+        b=CH6qv1t2599eA4krJXz/99OlFapgqJ7DyXiOUOXLRx2OVYfqXUQDWs+Ai5DK2iRVZw
+         Af3PkiyALqYvfgIEtxrRFxPM8mI80H4Sx93vNR3ZfNrkrnk2LP9qM6jkrmdGpPHZ/cng
+         T5Dubl7cdntEWFUTp4VYEmW/SbTu2SmxldcbK/YPOk5C+AYTgZ9dd0wNdWt5/taEFn1M
+         dnS2ZPe/tXEWeSeBkTd1i47+dCwDDQhBIKCJHy0YAVCun2ype0NETzKZ1nl/od+68Skb
+         KcXt3NFrdBnbklHMFNmK+mOPTI9bFLCD8p58NSf/+fje2GBY85eY8+2tncSj6yF+a9J1
+         v20Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735893691; x=1736498491;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ey/yrmib8/yU1C3yahwIPlmK5F1B0jPWLyFaguH5zmU=;
-        b=EFWfksZgRH5Xj6Vg/XsZyhu0+8Z4tkbFgtPdksf08lOOun5MALwFAioU2Y+NQThBhh
-         pVWiEDiJFIoTYKhBXfeqv2lceGubM/IYd9LoyxJJewXcZ2XR8lm8z4eE0/ib8mIXAysi
-         NR8kLYyRgYMq6yM5EHj2hNClaVLUgSicTN5QA02/GbNLu4p87j0HxnwJYOb2kKnRWx00
-         TUItYskImcUOUFvL9Dc4vKXbpkSq+d1CbTPzklDzFCgTjdFr5QfFuH8YLYCqiZn2SaDG
-         x+8XN6aJ5gDNAYPMSEv5aibSJIu4dCq0su4+U4EJFDfvEOjZO+S+WP6tzxlvymyTsCHA
-         VQPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUTbDgpA/zYH/zS45VRaEfSUmFLmqdmXkKlS7VmBnizr3W6w3TFfOdhI9Lyeb+HSE9+gSnqm6s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYEP5UW+z971gAewycmTma1fkbzyR5Nj7ifI8M/DHzC1aaxvcD
-	nnRlmB7D15ez+zfHHxlJVNzQkw69Uk+OsxjCYNGfxCsH8894uEOhsxpCfIXIKEWI3fEVrfNYtjV
-	n7YXgjr3/qhq+SQNRrzQJzgbPNEBaLnc1DVGW
-X-Gm-Gg: ASbGncvdszXM6dKwijOjCHbfPlUs4LIThTJebokeUa8o0ZzfQKgQ7JPDWyoWdDp4UQo
-	6ZscSX6axGzda/aUXWkJ/J9RJcC6fMoZ6jeXrZdE=
-X-Google-Smtp-Source: AGHT+IG2kbNOgSuFD8ASaK7qseKqN+UNI2UmlawEOFlUkYnTnTXS8gfvGmBRJksucTqAQ+SWovWcs38BIDYYwkAcg3M=
-X-Received: by 2002:a05:6402:210f:b0:5d0:cfad:f71 with SMTP id
- 4fb4d7f45d1cf-5d81de1c921mr110050342a12.32.1735893691001; Fri, 03 Jan 2025
- 00:41:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1735893840; x=1736498640;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KCOPKFQkr8RHPl//0vQqXxbJRYK6TGRHsmCfWBHzNTM=;
+        b=b7U7iaT3NwQAL/t2h0w94rFkkAPExtDFBVAKeOmQcCdW0dLT/jI+utrI5nr63Fs4lL
+         1rxZ3qd+8FzeEopvd58Kwr4ESbcIeTLEVZw13UqGvKID01Ngrbvq4pg5ikh4sNdH/iCD
+         DfZbMnWckyIMEZy8ePpAE8eHp+Fv9T2pEoyKalXllVpmpQSVjAWjsCGspdFbDLTyku8m
+         PfjtI8ENO3oeS9vabFYa/oFxl9Hi1PMHSMGrqncGjqggEWJld7Z22W4rBusfZJOaCEKZ
+         fn+98CrhupwfVsS/n7fBzNdq80wfKD47NpyyABXtdgpaNdJFvqTSVAotDkiKE5kaQr5B
+         SGew==
+X-Forwarded-Encrypted: i=1; AJvYcCU9yQkWX4HaV5HQlixqknDcbYsMFxYW4oz1/d8VDOhwz4VMvDwI8O40Hpns0U8q4FKpY3vRKn0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuHv3yP9FTmtuxQ4p9kOgXXukyBtIeZZ0+oI51GUwv5if4SkD4
+	auXilIuA9YfBxQNzOKklBi39jQRF7iz/9wSbAcPTrIUsJE7OLCnQ
+X-Gm-Gg: ASbGncuT+K2Wz557G+8cZDeEZ3SpzU7Ig5eqXoZe6sNqiJAJrnJclbs6kYbHnev+jRS
+	ZtSFJxaqs6OSXhD6H138Rf1M72LIH4tdE1dkSIWe/dQq2dBYAsSfZDm9uEXu/prEAzxoKqVbhzF
+	ob/aXjT/8+W6tZw/O8094ha+VkFMJD9cRSdCv3fUvjj7ZeJqB0Jj2Vj/WvRpDAq5RhjaYPJeZtk
+	yTqyBFWBJRuQMBbjnm5302usK2Zw9QtAWWEtJeyL06XIv4V/khbfmf/L8I3VfRszx5XpDgkwbAj
+	v5sEHctr76FSGp9J32ph
+X-Google-Smtp-Source: AGHT+IGcYEZSMWSm62hgRGJ80m5kLjtPnqz2o/+bjN4+sv8KPPexzs5juAeHCPEaX4S+0ZHOftDnIQ==
+X-Received: by 2002:a05:6000:2a5:b0:386:3d27:b4f0 with SMTP id ffacd0b85a97d-38a1a221da1mr42749358f8f.14.1735893839574;
+        Fri, 03 Jan 2025 00:43:59 -0800 (PST)
+Received: from hoboy.vegasvil.org (89-26-16-1.stat.cablelink.at. [89.26.16.1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656b119d7sm509321295e9.20.2025.01.03.00.43.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jan 2025 00:43:58 -0800 (PST)
+Date: Fri, 3 Jan 2025 00:43:56 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: mvpp2: tai: warn once if we fail to
+ update our timestamp
+Message-ID: <Z3ejTGIpl8nF1Ku8@hoboy.vegasvil.org>
+References: <E1tM8cA-006t1i-KF@rmk-PC.armlinux.org.uk>
+ <Z10UGg_osMZ6TZrc@hoboy.vegasvil.org>
+ <Z3a-HOwAVyJGEg67@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231018154804.420823-1-atenart@kernel.org> <20231018154804.420823-2-atenart@kernel.org>
- <20250102143647.7963cbfd@kernel.org>
-In-Reply-To: <20250102143647.7963cbfd@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 3 Jan 2025 09:41:20 +0100
-Message-ID: <CANn89iJ0BMu3jDOmQCkiiOe_1Fc7bZuj-p7CZcL5RC53=-MDFQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 1/4] net-sysfs: remove rtnl_trylock from
- device attributes
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Antoine Tenart <atenart@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
-	netdev@vger.kernel.org, gregkh@linuxfoundation.org, mhocko@suse.com, 
-	stephen@networkplumber.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z3a-HOwAVyJGEg67@shell.armlinux.org.uk>
 
-On Thu, Jan 2, 2025 at 11:36=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 18 Oct 2023 17:47:43 +0200 Antoine Tenart wrote:
-> > We have an ABBA deadlock between net device unregistration and sysfs
-> > files being accessed[1][2]. To prevent this from happening all paths
-> > taking the rtnl lock after the sysfs one (actually kn->active refcount)
-> > use rtnl_trylock and return early (using restart_syscall)[3] which can
-> > make syscalls to spin for a long time when there is contention on the
-> > rtnl lock[4].
->
-> Hi Antoine!
->
-> I was looking at the sysfs locking, and ended up going down a very
-> similar path. Luckily lore search for sysfs_break_active_protection()
-> surfaced this thread so I can save myself some duplicated work :)
->
-> Is there any particular reason why you haven't pursued this solution
-> further? I think it should work.
->
-> My version, FWIW:
-> https://github.com/kuba-moo/linux/commit/2724bb7275496a254b001fe06fe20ccc=
-5addc9d2
+On Thu, Jan 02, 2025 at 04:26:04PM +0000, Russell King (Oracle) wrote:
 
-Indeed, this would probably remove a lot of syzbot reports.
+> If we fail to read the clock, that will be because the hardware didn't
+> respond to our request to read it, which means the hardware broke in
+> some way. We could make mvpp22_tai_tstamp() fail and not provide
+> timestamps until we have successfully read the HW clock, but we would
+> still want to print a warning to explain why HW timestamps vanish.
+
+Sure, keep the warning, but also block time stamp delivery.
+
+> This is to catch a spurious failure that may only affects an occasoinal
+> attempt to read the HW PTP time. Currently, we would never know,
+> because the kernel is currently completely silent if that were to ever
+> happen.
+
+Is the failure spurious, or is the hardware broken and won't recover?
+
+Thanks,
+Richard
 
