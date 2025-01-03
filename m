@@ -1,93 +1,52 @@
-Return-Path: <netdev+bounces-155034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B83A00BC8
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:59:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95370A00BCC
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 17:01:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 436A91884D4F
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:00:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71DBA16447F
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AD41FA8E3;
-	Fri,  3 Jan 2025 15:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XksFYb1Z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E621FBC89;
+	Fri,  3 Jan 2025 16:01:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93ECD1A8F9A;
-	Fri,  3 Jan 2025 15:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA9F1FAC58;
+	Fri,  3 Jan 2025 16:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735919995; cv=none; b=WCjsYC7Xoihvuz6kGIcm+Gp+DNx+N0oM6BDLir++OgeF6M4RD0xO01podmU4mxjJx7VR6mKsoJwvZEMB466/JsBPoMjiWHl+vf1FI4RFQodCUvBQVnmYn4uKjbM4ehl/8cVARDbIRlRLBn5UbqlPGyttgJFUlod7gthiDs1BqPg=
+	t=1735920065; cv=none; b=HUvRAT60Bquszg3lHt46Izs+pcF4SP0e3AX4jOK9FWy7PwQjHjlBzX38NxROHt2yIrv7ASl8rX+qJ/E44WOD+lyqvH2Xc4AxpBD1my6FueaYMRZkwr57eLxU/MdHFwyqdkyvJ7nv5j4ng58PK4XRL2hdwnoGANxF7Y0kdp32Nk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735919995; c=relaxed/simple;
-	bh=BY4XzCp/Xpc4l1+JHQf/V8lGcV8TSYShSIamjcrkwu0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=usLHDEQIlpmvpiI6ykOx5K8W9glEnQXUiDPzBtjIPnFfxpG2b/C19wF6NXGyt0GNxHHYaOhas7SGlmyrZ1tP935saLVOsVHQtcjPSjFerAqrdodeMyHCrN+C+1iRTVSqvcr2OtzZnGA63NKM+eJFwJeJNWUbPkJ2Wnb0HmH2kJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XksFYb1Z; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ef6ee55225so2515787a91.0;
-        Fri, 03 Jan 2025 07:59:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735919993; x=1736524793; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+gV4JrXnngCdUeIcGvdTNDUANNvqICigqrTQBMLPkFk=;
-        b=XksFYb1ZUWuvlfKn+RX2tV7R6QKwzCmbKugcqXXbVwTheX6jH8Sb8vl1bEN06IHJVE
-         TMvAUDvj2nz4tzf3yUyd27LrRrAemogz20wP1VJuvInB1epvAjF/X4LrJMogZymylNLZ
-         c76iPaDwULa5B4jyw7OMYAEuJeDA1oZ4b3yOWBbEI4kMDqkWWoMsMb2qR8Mr8uQYUs/5
-         mL9NoAlixe9tnqeeP9Tz7rBxaqEcPMQY1knXDXTme42IOp6QYJY/VG7QEbMtKN8maPQB
-         fGRKaHBqqv8Xe9SEC/SD/54hvBwwFMf7RZK2ua/HUXfx2urFrXql9BzLGmzbRIU/uRl6
-         bNEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735919993; x=1736524793;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+gV4JrXnngCdUeIcGvdTNDUANNvqICigqrTQBMLPkFk=;
-        b=oUJ0gVkp/YJlS+SQxmfXrJLcGyNdCz5UJEqJhlNpNTCwjcQWXFIT072xaqH3e1cijU
-         OGgFTvT0XdoDW1/AB4CUNdT6xHtAwI505woZ6By7MxancoGQ/A4vvroqx/UE3Jst5d7M
-         vMUeSsQ6nK68GlKF196mNi8ZSKQ5J8XRc7Hgx3Wnycvmim3BcMr8pmbwWU+iDvnS2FuY
-         pwXzE3vQI0L4qLJta/ljuYV/Mc5dHwHlNWWOMJ/i5oO69i8XzbM0goaEfogJ0xwuUofg
-         NB7CTTPpoKRXSFXGvI/CgAsV8GvH9z1vZO3A3aOC5fMH5XyHI1B96U/5ZF7Bs1y8UP7q
-         TNBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEo+s1yOuTUxfQidHPzmPDFhOnwPF0diAjbrbQNeN+uizwofYt/OdAFQqvIWltzxHbDXAClKCY@vger.kernel.org, AJvYcCVry6GyKXWYa4hKPrP5IKXzDKvz/CVyIz0B6JeZqUcrBCC2KYmFFZ4fciKnsrCrD02Oadp1PqTF0t4LtoQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEOWjf6PKdFOUnSid11Y5abwwy4Vteko+nNlOx1b/MNSAba9Wg
-	KWUGjHIiVwHum1TDtWVRXjfMrmqt5Cfc+HUa4Fj/opOMyx6bcF5P
-X-Gm-Gg: ASbGncvq0YEkINy4K5oeUvUk7xSna0x3h/er+EKvn4jauboqwrQwqL7KT01Guy+rnfh
-	8IYycsfMFOOYw8hsHMt8Gz3TUaydfwmGd3GzF+Hjw5BQ43H7uTjauaRP55PRMWBJ08XykpPSmGx
-	BA7io+uISWk5o3Pa0uL38EJZCPA+DF1Cs57ccJcl9ks+OQp2OdGkkXMp+s4OcDH1WYQL7HcceoY
-	ejlrzCF4Hk5XbQyZUNcdQ8WrnOnF0fI7s10faAmNvwvKE8Y3CKpBQ==
-X-Google-Smtp-Source: AGHT+IGzgwdYjzESvFQtWckEGUzHKryn0ey7FziwWyTcpxYolLVaEcex9fW9p251ExnR7NtJ8uaV+A==
-X-Received: by 2002:a17:90a:c2c7:b0:2ee:d372:91bd with SMTP id 98e67ed59e1d1-2f452debc95mr27082913a91.2.1735919992740;
-        Fri, 03 Jan 2025 07:59:52 -0800 (PST)
-Received: from ice.. ([171.76.87.83])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2ed52cf40sm33581706a91.1.2025.01.03.07.59.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jan 2025 07:59:52 -0800 (PST)
-From: Nihar Chaithanya <niharchaithanya@gmail.com>
-To: sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
+	s=arc-20240116; t=1735920065; c=relaxed/simple;
+	bh=RO1b86wjNFiGUM6WmNhgPpDkASh7S95QG/goixmSfhg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p7UytT9pLtTmiZbMJw8STi7CP6PV8R4hLXQejx6XqVDFKMe31KAb8vzDUsHs2gBx+gwCYPc2S/7/hLZYB8AwPZieXMw68ZssD7fGF3JikUXsyRmkJmDToS/8jgXpa15LyOCqBDvSK9yMpCAfUW+hWY/zIhD3klBzdTLlvgKXW0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from localhost.localdomain (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@sostec.de)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id D2F0CC07D3;
+	Fri,  3 Jan 2025 17:01:00 +0100 (CET)
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+To: davem@davemloft.net,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	sd@queasysnail.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: skhan@linuxfoundation.org,
-	Nihar Chaithanya <niharchaithanya@gmail.com>
-Subject: [PATCH] octeontx2-pf: mcs: Remove dead code and semi-colon from rsrc_name()
-Date: Fri,  3 Jan 2025 21:28:26 +0530
-Message-Id: <20250103155824.131285-1-niharchaithanya@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2025-01-03
+Date: Fri,  3 Jan 2025 17:00:46 +0100
+Message-ID: <20250103160046.469363-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,39 +55,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The switch-block has a default branch. Thus, the return statement at the
-end of the function can never be reached. The semi-colon is not required 
-after switch-block.
+Hello Dave, Jakub, Paolo.
 
-Remove the semi-colon after the switch-block's curly braces and the return
-statement at the end of the function.
+An update from ieee802154 for your *net* tree:
 
-This issue was reported by Coverity Scan.
-Report:
-CID 1516236: (#1 of 1): Structurally dead code (UNREACHABLE)
-unreachable: This code cannot be reached: return "Unknown";.
+Keisuke Nishimura provided a fix to check for kfifo_alloc() in the ca8210
+driver.
 
-Signed-off-by: Nihar Chaithanya <niharchaithanya@gmail.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Lizhi Xu provided a fix a corrupted list, found by syzkaller, by checking local
+interfaces first.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-index 6cc7a78968fc..f3b9daffaec3 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-@@ -133,9 +133,7 @@ static const char *rsrc_name(enum mcs_rsrc_type rsrc_type)
- 		return "SA";
- 	default:
- 		return "Unknown";
--	};
--
--	return "Unknown";
-+	}
- }
- 
- static int cn10k_mcs_alloc_rsrc(struct otx2_nic *pfvf, enum mcs_direction dir,
--- 
-2.34.1
+regards
+Stefan Schmidt
 
+The following changes since commit 66418447d27b7f4c027587582a133dd0bc0a663b:
+
+  Merge branch 'bpf-fix-recursive-lock-and-add-test' (2024-11-18 19:40:01 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2025-01-03
+
+for you to fetch changes up to eb09fbeb48709fe66c0d708aed81e910a577a30a:
+
+  mac802154: check local interfaces before deleting sdata list (2024-11-19 10:54:17 +0100)
+
+----------------------------------------------------------------
+Keisuke Nishimura (1):
+      ieee802154: ca8210: Add missing check for kfifo_alloc() in ca8210_probe()
+
+Lizhi Xu (1):
+      mac802154: check local interfaces before deleting sdata list
+
+ drivers/net/ieee802154/ca8210.c | 6 +++++-
+ net/mac802154/iface.c           | 4 ++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
