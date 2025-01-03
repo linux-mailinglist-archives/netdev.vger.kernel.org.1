@@ -1,155 +1,216 @@
-Return-Path: <netdev+bounces-154978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E397DA00898
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:29:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75B1CA008B0
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:32:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B89AD1644E4
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:28:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 929851884F37
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279211F9EA7;
-	Fri,  3 Jan 2025 11:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7851FA156;
+	Fri,  3 Jan 2025 11:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JxoM2NR5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ew+0hrnB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489C81F9437;
-	Fri,  3 Jan 2025 11:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32461CDA2F;
+	Fri,  3 Jan 2025 11:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735903735; cv=none; b=ehjNzelMTVXjHylpdU3vmwnFXm3jwcuN3ybk8kiKo0US8Ik1uj8y4qGDwJLKLK/BVcQ9FRHER35WU4fP4I8/+UJ2UDRJUnw9nBnYd3p+PLQMdXOwEQ2dKyzqMGpqVQwu9Alr2VOEY1R45H5WKYkMrWLE9jRYL94uIOqSdgOO0/E=
+	t=1735903910; cv=none; b=HjntnqjhH+wshMgTs7B8KM1aiwHcAg8/MtY2oUm5E3oO3YnTlZ4bJ2RREvDT2yQLyxO5LVpjuC0gVrRygl4itT11VytOQJ1gmoX9kc4tc9sDW2uTxYXoiaZTb9Rkk18BLHveYW/x3FGtqUyosSxHo+h+XRdddIqtcmcyjRvu0h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735903735; c=relaxed/simple;
-	bh=U17cwY5+L9na4uLSzjw/cPO+Dtv1+qbGErw3xlcP9co=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GC+hIrOY3suwp91Z6uNgn9QYHXmbmVvCWMk4xsduuYDJ2tHHriQn1LtKQZamHUaEpzioUnJ99y9Xph4P6EPHh8/H8kGGkZy0sjZ5Cx6krmKtulhoQL/vnV4lQSyEhkQyg5wv9UxztZchXi4kWtXAWcQbEPWSXAEENWJqZX2TDsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JxoM2NR5; arc=none smtp.client-ip=209.85.208.46
+	s=arc-20240116; t=1735903910; c=relaxed/simple;
+	bh=5OjME6BSm/Atzhp4f5AdGJUG6pQDE6dzaH0awQrddjk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MBP3ZbnBDJC0dgZoMiz538UM+iW2J9a0rjmb0U0TBS19m++KPmRqjkyfi221p0ra78r1DZ4Tk/RGmX1rLchCBZ67A09/PNwRVhcU21sfZwz5LeoRri/jUiPCqk/0dAQv7n30dDEy7kJwMijQrm84ySpwM9ekTTe3qsSWlv+CGwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ew+0hrnB; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d437235769so1411731a12.2;
-        Fri, 03 Jan 2025 03:28:53 -0800 (PST)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6d8f99cb0d9so96804256d6.0;
+        Fri, 03 Jan 2025 03:31:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735903731; x=1736508531; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=32PWNC7r6rHdSHh0MVozKUaF4TAx+dkDRht1Ruk2YR0=;
-        b=JxoM2NR55d31Jiq1jHwkO1D900qmt4DWdsjSG8PsPxdw86mgO1j/shBHkgNVBBH5LI
-         nUgG0y5vzJCFQ8xBDpEkXHm/3lk3XFhP2ZSSCv1huvTn4PjEltQOjVkXsQxM8pEGSC9z
-         NOkRS7QqzUR+6cfIfU83X3CUJlhckbySqT40WgTQM8/1+QVnGEPK5YNJ0fT7Y9WK0488
-         zfmSxm1KsJ5U+JmSawy4ZejBBAKurCDiRloifEO5Vuz9YTTkL1bJO1k9GMpLVnD4a7Vt
-         UXSq93x7v4zBlZlzGXv7rTE/CDhNBlCH13dTdgAyqzJH1gryKZDX4YZEue3ljkHdYmLu
-         rYVw==
+        d=gmail.com; s=20230601; t=1735903906; x=1736508706; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ys2oJFhfKDPHWIzvxKVUVfTyMPCWohwYzSs7v5VHzo=;
+        b=ew+0hrnByR8a+fEM3haVvibYOAZZZv0NU/tSqu0ptzAtJwS1yyHSvgKinzeYPUzcIx
+         qYAqxM6IsukX48hevfPtJwcq4oRoBB9MGJBG5xj6uUdfEBl8tx2M71dyFb44XOjR2wvy
+         MyS7q287swM9GBP8FnA1g+uSKtbYTyjraT3wIVWoc29GhksQQLNf32F98nWtZ5vF77zd
+         AyN2NCczP7nJAeCqUco3yaiB1WTKytR3SpZR1cOHpb6xZ0/MURbELLeC1tf/HT6ijAMJ
+         LAGBXQp3KH2GAPWu0HHZD3/ThGxEjgJ0d9leBKgymYXa6uZCbhlcl4L5l1nUtm/RL/S4
+         jxDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735903731; x=1736508531;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=32PWNC7r6rHdSHh0MVozKUaF4TAx+dkDRht1Ruk2YR0=;
-        b=bMKtgFax6zpKAxL7BEg0FhwKm5lkuDD0Jqzn8IltGD7CAQnsX9l6VTSf/ei7BrpZ/s
-         e2EDY+BlK2Cehm8r9tYoSKqsuHrnULqI7+MuywMEYuca00pAtaCk7NHTPPzndKBLI+Fm
-         hZj3YA9owSePnqy96Srh/RiiYzrDzPIoYl4WcUaTIEVTIOyVwy5n3zHc/AyPDeIwH51U
-         YaUsaLutfC69EWHtTZoV9610dXCZUldCthdMPnUtOFf61OwM/4VuNijP/ENVgPEhfhFl
-         qjy4YQvrwWIWnPbTTD+cBm43CtUE8lF4XHFWE38HVACMnSVeTdNuQJmUed40+ECZyg2P
-         mptg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJd4j8Ulrnu747UkXivixPWz953vrZX8GuFC5hIXiUNKHIFo73sO8g4PZZN+Un2JiFw1RK32nl@vger.kernel.org, AJvYcCVP86vQeZlKXrKtBTc98xvwOuX0J/e9icJoB1ImCtCsydQVpxdE4cu44Fb3m7Hhfr6cTQvd24Hgmna13dQ8bFQ=@vger.kernel.org, AJvYcCWS28j/pp15ck2h98AYhxv2LHCG7OfzXmHCGFG7PFjCNVYYlIsHeqBShFPubtnhP4uH899I3hv0+2YQ+vE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZ5LFAW5XDajHUoWceillRO3HqT/AFXdW7Po9GHMHI1CANV4eA
-	0n3VHpnHHBv84UdFAGiaoQdIdjBt4hMxsGEGpEqEN3gBw6vLLJS/
-X-Gm-Gg: ASbGncvHwevjz5XemrgGtTA2s/gf1izn/5R5JR0Y43q87rAvoDM3GzW0g13r9cN1c+6
-	JxHg/4jGgSl7RHEwUebnl2ZEfkCTDAwnFXeVQvzQ4SYl6cutRJ06EKtx69nS3iwP0+WC7vW7HHd
-	nW+mrfaaquLprNrfF6CksDd86WjbyoUYUPMiiVMsQ0NA6ejs12Mfvb0d41OA2Hu6pl0TvqhNgqs
-	SwIh8QPEhFELAaTIIuixlSIf/z4SQvZz8Qq0g1KLJqaZ+QE5RoigppLYczibBYML2zbzecmRK1c
-	p6czltN0bKQY0P6+xz+IVsW2Ukj+Q++DCOvIAdFX
-X-Google-Smtp-Source: AGHT+IHEcdLqUHL2H3ucyXJoB8McZg4PpIJmWOrwxm+YDc8ziukB1qD/VdAnjm5hkaddAJsOcvw6OA==
-X-Received: by 2002:a05:6402:2809:b0:5d1:2377:5b07 with SMTP id 4fb4d7f45d1cf-5d81dd4ef8emr43942219a12.6.1735903731101;
-        Fri, 03 Jan 2025 03:28:51 -0800 (PST)
-Received: from ?IPV6:2a02:3033:600:7448:4613:e00c:fbb7:1d60? ([2a02:3033:600:7448:4613:e00c:fbb7:1d60])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d80701abc6sm19336866a12.75.2025.01.03.03.28.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Jan 2025 03:28:50 -0800 (PST)
-Message-ID: <9e7e5b13-ece0-462b-bfa9-21a395612354@gmail.com>
-Date: Fri, 3 Jan 2025 12:28:48 +0100
+        d=1e100.net; s=20230601; t=1735903906; x=1736508706;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8ys2oJFhfKDPHWIzvxKVUVfTyMPCWohwYzSs7v5VHzo=;
+        b=YVlMNkrkd5pk+3CXQUdDZ1MGXHtjtxP8tZ9Mabi8TL9eYsFjBV9gTt/gXTgHz/DpHY
+         hGTU5jfI+S21APhkS8XQyJGJ0K4Zyt5l2YvRxuMlNltCIIyJbimzBB2xOTnAH9/m6hbM
+         fd2cqMXdqxAsCa54nh9n7LXVo6NKXgFLKApXaSthJw+2ACuIZ1Hj7extO05hkNDIChJB
+         UC120iBDFtS7ChKf3gb3SrZFn/+BZ2XIobRCnMoSVhuaNnHKWByn9EcWnegU9Uuef0eu
+         6qYh5y140nVZCBQRP3uU+6ux0LyG8Et70ENNNZMtJtne4MwvLzVJhCtsUffbbLJRWq+l
+         rcJA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHAhlUWXDPHdQmQzIqpm1rTgza8MHd31/IlvC9WTVpkDyWpdHKNom79VSWx2k2Kq5KAd6VaAqB+rlf+PzmrgY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPx4lw4aOAnzLA9lAh13ThlXGdF7GLYC9JL/aD6/iwiKPNs8KR
+	VUGITF9ME/OxoDq3eHr9Did/6C8+Vejfgf0HLeUGqc4/VvA1FCLi0g46iFZgcjs=
+X-Gm-Gg: ASbGncvKXM6DeFTsRHr3fwN9IWuxVAhlb0U0gq4cGfcHk5fH9tCPYBaiiE3WPGi0nKn
+	3ReVz98ckVxTIRGv3Wv4Nrl6Ym0fehjnL1DqsQKk4w0IwifgSZy3VVVtS6EG3lw8tEZZBQ0NRX2
+	LkFrQSUmdFK4H+BgSkf/d5MSUm7Aw26Ys5Q0nmDyMATFZwpUsMHfmIE/mtIGe61ecYdfDgP1oAX
+	ClZLsMnaCqdbPDL1Gy/0ywoNIYhJBT7INl/bbK7ticT0nRHywMFjhO1Vd8AztqryHa/fXVr2HhL
+	sAauYVR0foMX5ld9jjSf7QY5TEQasbNlRPWsohBw0QMZom9cPu8=
+X-Google-Smtp-Source: AGHT+IHVm6imLAd/tpOMb1+qa4nnH103Eu2aIZO1ILl9wLFBNX61gx73eC9oYaf3grk2eoaB6lJVlQ==
+X-Received: by 2002:a05:6214:1d21:b0:6d1:9e72:596a with SMTP id 6a1803df08f44-6dd2339dcc5mr726878596d6.37.1735903906175;
+        Fri, 03 Jan 2025 03:31:46 -0800 (PST)
+Received: from willemb.c.googlers.com.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd18e3c3ffsm140117566d6.13.2025.01.03.03.31.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jan 2025 03:31:45 -0800 (PST)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	sohamch@google.com,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next] selftests/net: packetdrill: report benign debug flakes as xfail
+Date: Fri,  3 Jan 2025 06:31:14 -0500
+Message-ID: <20250103113142.129251-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ethernet: toshiba: ps3_gelic_wireless: Remove driver
- using deprecated API wext
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Geoff Levand <geoff@infradead.org>, Simon Horman <horms@kernel.org>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kalle Valo <kvalo@kernel.org>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jeff Johnson <quic_jjohnson@quicinc.com>,
- Larry Finger <Larry.Finger@lwfinger.net>,
- Nicolas Ferre <nicolas.ferre@microchip.com>, Pavel Machek <pavel@ucw.cz>,
- Stanislaw Gruszka <stf_xl@wp.pl>,
- linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-staging@lists.linux.dev,
- linux-wireless@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- Stefan Lippers-Hollmann <s.l-h@gmx.de>, Christoph Hellwig <hch@lst.de>
-References: <20241224080755.194508-1-philipp.g.hortmann@gmail.com>
- <b811d4af6a634d61389dfefacd49853c0e77f1d7.camel@sipsolutions.net>
- <39256db9-3d73-4e86-a49b-300dfd670212@gmail.com>
- <CAMuHMdVGdpVqkdvoFxu84YgBh_0fsAKeBhWFEg+nDyGLwbruig@mail.gmail.com>
- <8dfe122d-ce0e-4a1d-9a2f-f7585036b989@gmail.com>
- <CAMuHMdX_P9WGBiShm6Dp64Y9GRvESH-Nn=b=rRrsGbwza81VeA@mail.gmail.com>
-Content-Language: en-US
-From: Philipp Hortmann <philipp.g.hortmann@gmail.com>
-In-Reply-To: <CAMuHMdX_P9WGBiShm6Dp64Y9GRvESH-Nn=b=rRrsGbwza81VeA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 03.01.25 12:16, Geert Uytterhoeven wrote:
-> Hi Philipp,
-> 
-> On Fri, Jan 3, 2025 at 12:02 PM Philipp Hortmann
-> <philipp.g.hortmann@gmail.com> wrote:
->> On 03.01.25 09:53, Geert Uytterhoeven wrote:
->>> Care to tell us where the fix is?
->>
->> please find all patches for T2 on this page:
->> https://wiki.t2linux.org/guides/kernel/
->> More exact here:
->> git clone --depth=1 https://github.com/t2linux/linux-t2-patches patches
-> 
-> Thanks, but I cannot find a ps3disk fix there?
-> 
-> Gr{oetje,eeting}s,
-> 
->                          Geert
-> 
+From: Willem de Bruijn <willemb@google.com>
 
-He Geert,
+A few recently added packetdrill tests that are known time sensitive
+(e.g., because testing timestamping) occasionally fail in debug mode:
+https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg
 
-I think there are some regarding PS3 and also Sparc, not only ps3disk.
-You can leave this to me. I will go through it. If anybody else is doing 
-this please CC me so we do not do the work twice.
+These failures are well understood. Correctness of the tests is
+verified in non-debug mode. Continue running in debug mode also, to
+keep coverage with debug instrumentation.
 
-I am OOO so it will take some days.
+But, only in debug mode, mark these tests with well understood
+timing issues as XFAIL (known failing) rather than FAIL when failing.
 
-Thanks for your support.
+Introduce an allow list xfail_list with known cases.
 
-Bye Philipp
+Expand the ktap infrastructure with XFAIL support.
 
+Fixes: eab35989cc37 ("selftests/net: packetdrill: import tcp/fast_recovery, tcp/nagle, tcp/timestamping")
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Closes: https://lore.kernel.org/netdev/20241218100013.0c698629@kernel.org/
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+---
+ .../selftests/kselftest/ktap_helpers.sh       | 15 ++++++++++--
+ .../selftests/net/packetdrill/ksft_runner.sh  | 23 +++++++++++++++----
+ 2 files changed, 31 insertions(+), 7 deletions(-)
 
-
-
-
-
-
+diff --git a/tools/testing/selftests/kselftest/ktap_helpers.sh b/tools/testing/selftests/kselftest/ktap_helpers.sh
+index 79a125eb24c2..05a461890671 100644
+--- a/tools/testing/selftests/kselftest/ktap_helpers.sh
++++ b/tools/testing/selftests/kselftest/ktap_helpers.sh
+@@ -7,6 +7,7 @@
+ KTAP_TESTNO=1
+ KTAP_CNT_PASS=0
+ KTAP_CNT_FAIL=0
++KTAP_CNT_XFAIL=0
+ KTAP_CNT_SKIP=0
+ 
+ KSFT_PASS=0
+@@ -69,6 +70,16 @@ ktap_test_skip() {
+ 	KTAP_CNT_SKIP=$((KTAP_CNT_SKIP+1))
+ }
+ 
++ktap_test_xfail() {
++	description="$1"
++
++	result="ok"
++	directive="XFAIL"
++	__ktap_test "$result" "$description" "$directive"
++
++	KTAP_CNT_XFAIL=$((KTAP_CNT_XFAIL+1))
++}
++
+ ktap_test_fail() {
+ 	description="$1"
+ 
+@@ -99,7 +110,7 @@ ktap_exit_fail_msg() {
+ ktap_finished() {
+ 	ktap_print_totals
+ 
+-	if [ $((KTAP_CNT_PASS + KTAP_CNT_SKIP)) -eq "$KSFT_NUM_TESTS" ]; then
++	if [ $((KTAP_CNT_PASS + KTAP_CNT_SKIP + KTAP_CNT_XFAIL)) -eq "$KSFT_NUM_TESTS" ]; then
+ 		exit "$KSFT_PASS"
+ 	else
+ 		exit "$KSFT_FAIL"
+@@ -107,5 +118,5 @@ ktap_finished() {
+ }
+ 
+ ktap_print_totals() {
+-	echo "# Totals: pass:$KTAP_CNT_PASS fail:$KTAP_CNT_FAIL xfail:0 xpass:0 skip:$KTAP_CNT_SKIP error:0"
++	echo "# Totals: pass:$KTAP_CNT_PASS fail:$KTAP_CNT_FAIL xfail:$KTAP_CNT_XFAIL xpass:0 skip:$KTAP_CNT_SKIP error:0"
+ }
+diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+index 4071c133f29e..ff989c325eef 100755
+--- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
++++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+@@ -23,7 +23,7 @@ if [ $# -ne 1 ]; then
+ 	ktap_exit_fail_msg "usage: $0 <script>"
+ 	exit "$KSFT_FAIL"
+ fi
+-script="$1"
++script="$(basename $1)"
+ 
+ if [ -z "$(which packetdrill)" ]; then
+ 	ktap_skip_all "packetdrill not found in PATH"
+@@ -31,16 +31,29 @@ if [ -z "$(which packetdrill)" ]; then
+ fi
+ 
+ declare -a optargs
++failfunc=ktap_test_fail
++
+ if [[ -n "${KSFT_MACHINE_SLOW}" ]]; then
+ 	optargs+=('--tolerance_usecs=14000')
++
++	# xfail tests that are known flaky with dbg config, not fixable.
++	# still run them for coverage (and expect 100% pass without dbg).
++	declare -ar xfail_list=(
++		"tcp_fast_recovery_prr-ss.*.pkt"
++		"tcp_timestamping.*.pkt"
++		"tcp_user_timeout_user-timeout-probe.pkt"
++		"tcp_zerocopy_epoll_.*.pkt"
++	)
++	readonly xfail_regex="^($(printf '%s|' "${xfail_list[@]}"))$"
++	[[ "$script" =~ ${xfail_regex} ]] && failfunc=ktap_test_xfail
+ fi
+ 
+ ktap_print_header
+ ktap_set_plan 2
+ 
+-unshare -n packetdrill ${ipv4_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
+-	&& ktap_test_pass "ipv4" || ktap_test_fail "ipv4"
+-unshare -n packetdrill ${ipv6_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
+-	&& ktap_test_pass "ipv6" || ktap_test_fail "ipv6"
++unshare -n packetdrill ${ipv4_args[@]} ${optargs[@]} $script > /dev/null \
++	&& ktap_test_pass "ipv4" || $failfunc "ipv4"
++unshare -n packetdrill ${ipv6_args[@]} ${optargs[@]} $script > /dev/null \
++	&& ktap_test_pass "ipv6" || $failfunc "ipv6"
+ 
+ ktap_finished
+-- 
+2.47.1.613.gc27f4b7a9f-goog
 
 
