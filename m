@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-154973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47FE4A0087F
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:17:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D4DA00881
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:17:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C44A97A1229
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:17:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCC25161C2A
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE84B1F941C;
-	Fri,  3 Jan 2025 11:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C291F9F5A;
+	Fri,  3 Jan 2025 11:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gOefpy8x"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="P7wgdPrI"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E5B1F9F61
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 11:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D52F1E00B6
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 11:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735903030; cv=none; b=nTi2PNhGNIGvj9kwwO4KHrljxZBPRnoY1Yuxa0k99WRRFcP+ism2ZGBk90XOom4ZOX+GWN9xBLzZbFp3XPKPuo59U4QyJ3cleuPPLClUe7jklp29D6jEP7vShrrt8eYvoOA8DN8o/Dq4GGuceMweW7okvxkdyR27+g2qmA5cfYg=
+	t=1735903038; cv=none; b=Z8n9Gs2CdsbX1cQNlQT0r7EDpbfUVSQuMCtcCDTfz753vxNQsj7IbaMzq5I/q9d04iX28P4KtK6BweP2ADiKOLxMUmvPZWNVeO78R/MhMnpBmb0Yf3MhxtdZhI2PlVYgNV/7Ihgwy0C2gma45UGfN2ocqFapUkx1oduXEbBz0QE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735903030; c=relaxed/simple;
-	bh=NKj6sffVv1j95XX7EjHNIn9LNv9+aZipHpCrib03IA8=;
+	s=arc-20240116; t=1735903038; c=relaxed/simple;
+	bh=6PaK1/XeyGsW5Y/kkbKKS+wBHQ+2vv4jjl0jFinFRMA=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=qvEs00CQZnW5lHy9Mq/mX2QzWeylwzWmK7LzIjWtuCXX/t0ou1BGuCzw6mXjrkImE7jBGqPZh2MeXoc2fPf3w2rGbrPAr/sFWlF6UfyHNw0FFKl0QXGS75QUpLbcjBj3kfTgEFKII9S7qzBAl4H5Hup75ocx+KahopVIZ3UO2m0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gOefpy8x; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=Wpxf8OR2kO3dnVoaVe9MTgVixK2HtqkwiDTIDBB/7o1D218I5byVpvxkznUiiJbfF23Qt+9f3L7sCi3jhDId2Jk4bD3T1ZdkL+Gc56dFRtJ9ze6ipEOXqKX5ubkyV7KTXZYk1gPQ1EgcLsuqru/wLGUySqMP6HK41Ecl3VJUA1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=P7wgdPrI; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3fPVeRok7tYyHKGOJNHqGUAhct3mDxnPXluFsW2qsWM=; b=gOefpy8xxs5g/L1BY+Zh8RPhQj
-	v9KfDZSN/ifIgCYkqe781yncGB0YH4fGoElH1eC5LYFFI9M2MOf6DAGXcmDfGLooBdkujx5X1XBOi
-	tqOKjWrTLKzx+8/FB6B18Y3o7ICKFHioYewNNR0KdPC/wjOLne5MnMloOeujheh+51WK/18y5hUc+
-	V8kwKQ6mzN/FsYHidfWMW67ooW4EppvxiUiZCxhqH9n+QWahTgSgDznMDQcOAv3e9zDRDAmdl5Ua4
-	mhEC7/GoL07FAZA8+OH8tjwu+DR6Euq+BzoCOZeI94cM3vRJEZHyHy6U9kwkp6aGSQoyPq23aQF0q
-	/42PUrSA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:50410 helo=rmk-PC.armlinux.org.uk)
+	bh=4s396obXaI1f8Yz3z+7hU/+8e3s2TBg9V0/XcDUux8s=; b=P7wgdPrI4AcqfEfWWuDx1a/tNT
+	0Ax1clrro5GRgNFgLC8VP3GtrZYGo/YJNafuQ01+Lgv6h+TC4LRtbGfBunbBWoEXzV/2KoggfwLiv
+	vwD/IHr0bV/PVYwuhdIeTG9jn4q4zxkOemjdPO0SLtPXymx4W8tEc3dBKRPr0XPU4IPRBK+W/LEOf
+	tbwCumzIj9YiwFyYiKT8B3f0k/sK9OGW98C+ZCEReksBwvdTd3RoJD9VNpvQLkiFxv/QqAF2wcC7q
+	/cLRRUFbHMIbpVPX3o9AiUubFdmaMScAPhUYMH0aAx68R83LfavnW39ixzTxTK0c0/QJdt/iDPcfv
+	EDLSZ1iw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38368 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tTffd-00030z-1d;
-	Fri, 03 Jan 2025 11:16:49 +0000
+	id 1tTffj-00031K-0s;
+	Fri, 03 Jan 2025 11:16:55 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tTffa-007RoV-Bo; Fri, 03 Jan 2025 11:16:46 +0000
+	id 1tTfff-007Roc-Ff; Fri, 03 Jan 2025 11:16:51 +0000
 In-Reply-To: <Z3fG9oTY9F9fCYHv@shell.armlinux.org.uk>
 References: <Z3fG9oTY9F9fCYHv@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -76,7 +76,7 @@ Cc: Alexander Couzens <lynxis@fe80.eu>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 4/6] net: pcs: lynx: fill in PCS supported_interfaces
+Subject: [PATCH net-next 5/6] net: stmmac: use PCS supported_interfaces
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,53 +86,48 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tTffa-007RoV-Bo@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tTfff-007Roc-Ff@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 03 Jan 2025 11:16:46 +0000
+Date: Fri, 03 Jan 2025 11:16:51 +0000
 
-Fill in the new PCS supported_interfaces member with the interfaces
-that Lynx supports.
+Use the PCS' supported_interfaces member to build the MAC level
+supported_interfaces bitmap.
 
 Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/pcs/pcs-lynx.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
-index 767a8c0714ac..6457190ec6e7 100644
---- a/drivers/net/pcs/pcs-lynx.c
-+++ b/drivers/net/pcs/pcs-lynx.c
-@@ -334,9 +334,19 @@ static const struct phylink_pcs_ops lynx_pcs_phylink_ops = {
- 	.pcs_link_up = lynx_pcs_link_up,
- };
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 6bc10ffe7a2b..fcb5649fb738 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1203,6 +1203,7 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+ 	struct stmmac_mdio_bus_data *mdio_bus_data;
+ 	int mode = priv->plat->phy_interface;
+ 	struct fwnode_handle *fwnode;
++	struct phylink_pcs *pcs;
+ 	struct phylink *phylink;
  
-+static const phy_interface_t lynx_interfaces[] = {
-+	PHY_INTERFACE_MODE_SGMII,
-+	PHY_INTERFACE_MODE_QSGMII,
-+	PHY_INTERFACE_MODE_1000BASEX,
-+	PHY_INTERFACE_MODE_2500BASEX,
-+	PHY_INTERFACE_MODE_10GBASER,
-+	PHY_INTERFACE_MODE_USXGMII,
-+};
+ 	priv->phylink_config.dev = &priv->dev->dev;
+@@ -1224,8 +1225,14 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+ 
+ 	/* If we have an xpcs, it defines which PHY interfaces are supported. */
+ 	if (priv->hw->xpcs)
+-		xpcs_get_interfaces(priv->hw->xpcs,
+-				    priv->phylink_config.supported_interfaces);
++		pcs = xpcs_to_phylink_pcs(priv->hw->xpcs);
++	else
++		pcs = priv->hw->phylink_pcs;
 +
- static struct phylink_pcs *lynx_pcs_create(struct mdio_device *mdio)
- {
- 	struct lynx_pcs *lynx;
-+	int i;
++	if (pcs)
++		phy_interface_or(priv->phylink_config.supported_interfaces,
++				 priv->phylink_config.supported_interfaces,
++				 pcs->supported_interfaces);
  
- 	lynx = kzalloc(sizeof(*lynx), GFP_KERNEL);
- 	if (!lynx)
-@@ -348,6 +358,9 @@ static struct phylink_pcs *lynx_pcs_create(struct mdio_device *mdio)
- 	lynx->pcs.neg_mode = true;
- 	lynx->pcs.poll = true;
- 
-+	for (i = 0; i < ARRAY_SIZE(lynx_interfaces); i++)
-+		__set_bit(lynx_interfaces[i], lynx->pcs.supported_interfaces);
-+
- 	return lynx_to_phylink_pcs(lynx);
- }
- 
+ 	fwnode = priv->plat->port_node;
+ 	if (!fwnode)
 -- 
 2.30.2
 
