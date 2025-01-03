@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-155018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11D96A00B06
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:03:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD208A00B09
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:04:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4445163F43
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 15:03:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4ED93A4284
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 15:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA681F9A81;
-	Fri,  3 Jan 2025 15:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 656191FA8C0;
+	Fri,  3 Jan 2025 15:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U3EqT//s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7UGeKcs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4CC442C;
-	Fri,  3 Jan 2025 15:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435611CCB4B;
+	Fri,  3 Jan 2025 15:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735916631; cv=none; b=CfmH3V0JeBk0OwHtHOzhS0h87ue1/omTCmXEuegTx7OtvsG9leGsb06YlGmCz63oNC9KZrOkxixPpKEFDrfUORvT+fHig//PkuGr1FOgWFUpyzQgQOQ0xqYbs3vPNqPC5t7AypG3aJJ1HKh7wvEPwCWS2yd6O3VbCN8Dpud4Ipk=
+	t=1735916641; cv=none; b=qG1397/X+oupWBXWUkY/kZqLCdwxIfXuL33Ldyi4SGh+KfZasHqKVPELTiutkQQumqEPPBMhQGwrq1vPcY5El01rasp6cxN70KydtiGdH36ojDUEZ3m+NRE538vCw0fcMcvuL9a/yfY2qf1hMPPh03z0CQKsQ4fGOi9HSbiOFaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735916631; c=relaxed/simple;
-	bh=7WlBGENIy2oPZVIfFIEmJXuBuP8Ivq681Nkvtdqy9sA=;
+	s=arc-20240116; t=1735916641; c=relaxed/simple;
+	bh=pD1ulSZCWHUXH2UcLaSHF9kAONDuYEHjcJ/vQNXwcLs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mDjgfj+rSMf+QrztcaaP+bcE4/9qG+1dtn6+G94P6a5qrTTtoZs4zDG8cD1ruy63untGvbQ2rfbfFQIiCN6Apv+0PhBmpBCLx10cbNALKxW9Tpj2V1raTEpiUsCg3xfvQPpBFoyRv/yTrnEcfz0EPuf6VCnWP7X0S6xKyokjoyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U3EqT//s; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=FMA1O8vRbOdWAg1MazKbMnRM3cAXuxB+HF/fUywWcUqv287XqzPWdKjtoFxAoYmSVCjCeYHZhVT4vduE3o1jmRhOPjNSXIKRIvBOTNnbkHNUwzPzRCRC6+QiAMJZYC7kJwgvfyQdvoIBP/M8cRU89LnYoCquAmwdhJmDPGRCV3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c7UGeKcs; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21670dce0a7so94692895ad.1;
-        Fri, 03 Jan 2025 07:03:49 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21636268e43so88679505ad.2;
+        Fri, 03 Jan 2025 07:03:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735916629; x=1736521429; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1735916638; x=1736521438; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qURv+YWuHhVC9usfYzqIZMJoKHODK3qRvWWEegQVoXI=;
-        b=U3EqT//s91tqH2aV4Wa2ma4aDB+wKmA4M6evE8V2pDuORk+8XqYFlYkFa6WID18F1p
-         LsN70ieqi33dwPEEgSe0Y+iApU+qeJ6T0OY3PpgcFADLTF1Iq54eV3yOWG/MtCOidGIE
-         nPWJTeY61TMx3NYXn7Hfdl4WzCbrjf4ApiEPmvLmJ6LHGIwYXjF3yf72zsvGqNWCj7d5
-         i08G+gDWUBYdHnD1ewtltGs9v2B6kXRsJSMcKCf0bmsUwfa404E+YokVjGSFrfJ3yEtb
-         NSJgv4CuO1xH/VC4EsXnJKz7yTPxVOJjD8wg28NXuykvfwBzSJny95KW1eNmnhJfy1lk
-         pZrg==
+        bh=WzfA2V84zuxacl6AnAvtutrNr3hbcEFs/i1nlzzkSfo=;
+        b=c7UGeKcs/m6MhZZf+EEDM4zNjX7hEb+admbqIdIgUxWvQE5En/CS/ykbHLpXHh6+OZ
+         VtzTn22Z+D+v36Rz/ITaZDcOMY98BWR1x2l1FrrWtvbFNOQVZ/FhPuGzyNOOXcrnSsOD
+         2/Dtrwe223hAMZr+G/ofOsZH01Z/o65qatWAFd1WpvltCPvnH7My9veaR//D1mPAYPKM
+         H9XwqZNJOvlVw15BFHtp+HuCSysHasI7adizJvjQLl3n9oo54aZ72CnKLOYYTXNbfqwW
+         Qhq1MpFEUHuraG5p31vKpXP0f/rwqOGuBJxdl9GosafcGb5S5aHoMxp/2uplPdJYrUnx
+         HHHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735916629; x=1736521429;
+        d=1e100.net; s=20230601; t=1735916638; x=1736521438;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qURv+YWuHhVC9usfYzqIZMJoKHODK3qRvWWEegQVoXI=;
-        b=ZT1S1dGo+f82oFNt3nGgmxTJDXAo0JgWJ7fgyT8M3yU/8HLwpKEYztG/AxumUF+k8S
-         iB/uzpSX9cb0Tw+CQYlNVqjur38LKj+kCHYBZ+N3XSKGyUh6KFEEwO11tOPeiZzZosNQ
-         RXzZwdIsGBPGpflt4lfcPJTqwz5+ftwd22Jt/tCtn27Au+PSYEqNRgsjk6VqJ+6Ml/WL
-         z+rz1veKObFixQ0SkAN0QexL5ds8U7EB3WkaX3aBtYzyqKQ9Ea3eiHfH3VJovpTBM6ki
-         N7d5dRSpa7n9QLExwe2vQPFnOjJVHbd6nNkeYm32a6QeDOItiC7DhoAo1N5MF4cpwiM+
-         1jMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0Qwl4n/D77slV52TGKM1G5PwaniTBYGHeH0hN7VHCz3GWmWzBo+GlstjbIy9Jw0JHcQdJcnM4@vger.kernel.org, AJvYcCW6ui4Mmzo7Aqt3PK8++S4FV5NY1pvMUQ+xj/XKOKAlbC/OVt0QRV+2k7qlMDe/JSigQwT53vGa1iA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYJrMCiUOva//XXl0wNiFmfTxg5pDVPwTdFf2OjiikrD6s4elH
-	UXu9YzPwuUjoA9VERxQJZH5gZo52xImnsMeTxlSxoagMn/l0QyLM
-X-Gm-Gg: ASbGncvNhCkHPf39+A/p9SZk6Bc/hY4EO5ZMm7P2WK48prVrw6bR8tDZbIo0ODiDAi9
-	8kxybu2JwOQAWZCYlXqzlO2q7mLDWuDocdV1qkg1b1qrqs39XiUonRuWcNvTEHokCxpISg1frgj
-	nIQ4qQclArghU+gaas3bRRclaWOYV3sIURLGpUuIpA4WQOg3sUVRr7xYsYBhrSz9HYVxuOilUyr
-	WuSV+tZOxcaMkA8nkubVq+UwnvjLdzcU+97qyyXGMKCkw==
-X-Google-Smtp-Source: AGHT+IEKbKSiMUJ711ZK8IL+7z7h3fbU8nBtMpx9rbNPnFsaEiA/bR0ady7uNzOW0h6l2O5/0knKLw==
-X-Received: by 2002:a17:902:e809:b0:215:603e:2141 with SMTP id d9443c01a7336-219e6ea0218mr745619905ad.19.1735916628490;
-        Fri, 03 Jan 2025 07:03:48 -0800 (PST)
+        bh=WzfA2V84zuxacl6AnAvtutrNr3hbcEFs/i1nlzzkSfo=;
+        b=ar9C1J9T0Hj2p0gyUb9G7d+yBvpHn8kCa9XK3VeikC2xQ8V7Zz2J6XU7OqK86BlEYe
+         YWZTMI//Jw1ON0XsFKx5geTDz3sDpavlkpV6Zyc1LWNOQAmN4G0LOCTtsaIg5l76jrPM
+         EYSWFcBHp42LScF+l7bw7d0DX/SgINVJJD+1tJJQRpO/cihrompMjlgCPTg2Usjd1R3w
+         B/zBQmrYYGzF+8N+28/aM5NCSkz6Yk2gFldnorQYHobiyGP5K1uDWuV0r+BADI4XzKXf
+         VEp/mWptqshxRN4qC0SZ9a0pE5h3QyCj3pSKLylvKBWBBBwQ0Bn1y0E1wmKjOYwJ0fYG
+         JAPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWEKS/GohA+WWpwtBlr1+caB5wjbvCTJF09R25BXmf4PSSIS7j8cJ0FTW260Z2oZQwCulx6G/WX@vger.kernel.org, AJvYcCXtDpbBStPxMtp29sMfKU8VMHthEJDEWyRZeJIkKKDsQt3Y5xvjGgI9O0x/A3oZst8jgCf3U9nZBnY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJLDEaGmhde9WC/YjsXiO4Khyey7kVMOjgmYYYDF9mg3JgIDPI
+	ojxxtqXfum+I5jD8RWVu0+gXSJl/Pk9KRqaHI1maQo8PL5EVYfEk
+X-Gm-Gg: ASbGncsJ9HqZ6FkC3ch7+4PNPstW4S/vmK9Mbf8j8cioUXLQxgjioYAdl6ajpsgL26X
+	+tfOzJHaq3LxwjyLNQ16BQHmlDxLmL1VHar7MwG1QKqLn2/q3WmY5Dt/tbEFwlyNisNPOHOF9Vg
+	Oo8/HtC5EWhMmisMhZsrorOAlb8P89XNv5+4EolH4XDxpOnOwSIBtXINlcC9PqEAZh3yyJXlPkD
+	j7MghnXvIrLmMoC80ACr90lTSlqzJXB799IdcKPZ0Baew==
+X-Google-Smtp-Source: AGHT+IHLKtMfojgIUEDdLWtjVYURPCJKK+xU8AP9DpnUFwZPG4htVN5TnXGBvGBpYojfHKF4Q5WOoA==
+X-Received: by 2002:a17:903:2cc:b0:216:4e9f:4ed4 with SMTP id d9443c01a7336-219e6f11809mr738439585ad.36.1735916637268;
+        Fri, 03 Jan 2025 07:03:57 -0800 (PST)
 Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9629d0sm247047255ad.41.2025.01.03.07.03.40
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9629d0sm247047255ad.41.2025.01.03.07.03.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jan 2025 07:03:47 -0800 (PST)
+        Fri, 03 Jan 2025 07:03:56 -0800 (PST)
 From: Taehee Yoo <ap420073@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -111,9 +111,9 @@ Cc: kory.maincent@bootlin.com,
 	willemb@google.com,
 	daniel.zahka@gmail.com,
 	ap420073@gmail.com
-Subject: [PATCH net-next v7 01/10] net: ethtool: add hds_config member in ethtool_netdev_state
-Date: Fri,  3 Jan 2025 15:03:16 +0000
-Message-Id: <20250103150325.926031-2-ap420073@gmail.com>
+Subject: [PATCH net-next v7 02/10] net: ethtool: add support for configuring hds-thresh
+Date: Fri,  3 Jan 2025 15:03:17 +0000
+Message-Id: <20250103150325.926031-3-ap420073@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250103150325.926031-1-ap420073@gmail.com>
 References: <20250103150325.926031-1-ap420073@gmail.com>
@@ -125,144 +125,291 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When tcp-data-split is UNKNOWN mode, drivers arbitrarily handle it.
-For example, bnxt_en driver automatically enables if at least one of
-LRO/GRO/JUMBO is enabled.
-If tcp-data-split is UNKNOWN and LRO is enabled, a driver returns
-ENABLES of tcp-data-split, not UNKNOWN.
-So, `ethtool -g eth0` shows tcp-data-split is enabled.
+The hds-thresh option configures the threshold value of
+the header-data-split.
+If a received packet size is larger than this threshold value, a packet
+will be split into header and payload.
+The header indicates TCP and UDP header, but it depends on driver spec.
+The bnxt_en driver supports HDS(Header-Data-Split) configuration at
+FW level, affecting TCP and UDP too.
+So, If hds-thresh is set, it affects UDP and TCP packets.
 
-The problem is in the setting situation.
-In the ethnl_set_rings(), it first calls get_ringparam() to get the
-current driver's config.
-At that moment, if driver's tcp-data-split config is UNKNOWN, it returns
-ENABLE if LRO/GRO/JUMBO is enabled.
-Then, it sets values from the user and driver's current config to
-kernel_ethtool_ringparam.
-Last it calls .set_ringparam().
-The driver, especially bnxt_en driver receives
-ETHTOOL_TCP_DATA_SPLIT_ENABLED.
-But it can't distinguish whether it is set by the user or just the
-current config.
+Example:
+   # ethtool -G <interface name> hds-thresh <value>
 
-When user updates ring parameter, the new hds_config value is updated
-and current hds_config value is stored to old_hdsconfig.
-Driver's .set_ringparam() callback can distinguish a passed
-tcp-data-split value is came from user explicitly.
-If .set_ringparam() is failed, hds_config is rollbacked immediately.
+   # ethtool -G enp14s0f0np0 tcp-data-split on hds-thresh 256
+   # ethtool -g enp14s0f0np0
+   Ring parameters for enp14s0f0np0:
+   Pre-set maximums:
+   ...
+   HDS thresh:  1023
+   Current hardware settings:
+   ...
+   TCP data split:         on
+   HDS thresh:  256
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+The default/min/max values are not defined in the ethtool so the drivers
+should define themself.
+The 0 value means that all TCP/UDP packets' header and payload
+will be split.
+
+Tested-by: Stanislav Fomichev <sdf@fomichev.me>
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v7:
- - Add review tag from Jakub.
- - Add dev_xdp_sb_prog_count().
+ - Do not export dev_xdp_sb_prog_count().
+ - Remove dev_xdp_sb_prog_count().
+ - Use NL_SET_ERR_MSG_ATTR() instead of NL_SET_ERR_MSG().
+ - Change location of hds-thresh size check logic.
 
 v6:
- - use hds_config instead of using tcp_data_split_mod.
+ - Update ethtool_netlink_generated.h
+ - Use "HDS" instead of "HEADER_DATA_SPLIT"
+ - Add Test tag from Andy.
 
 v5:
+ - No changes.
+
+v4:
+ - Fix 80 charactor wrap.
+ - Rename from tcp-data-split-thresh to header-data-split-thresh
+ - Add description about overhead of HDS.
+ - Add ETHTOOL_RING_USE_HDS_THRS flag.
+ - Add dev_xdp_sb_prog_count() helper.
+ - Add Test tag from Stanislav.
+
+v3:
+ - Fix documentation and ynl
+ - Update error messages
+ - Validate configuration of tcp-data-split and tcp-data-split-thresh
+
+v2:
  - Patch added.
 
- include/linux/ethtool.h   |  2 ++
- include/linux/netdevice.h |  1 +
- net/core/dev.c            | 12 ++++++++++++
- net/ethtool/rings.c       | 12 ++++++++++++
- 4 files changed, 27 insertions(+)
+ Documentation/netlink/specs/ethtool.yaml      |  8 +++++++
+ Documentation/networking/ethtool-netlink.rst  | 10 ++++++++
+ include/linux/ethtool.h                       |  8 +++++++
+ .../uapi/linux/ethtool_netlink_generated.h    |  2 ++
+ net/ethtool/netlink.h                         |  2 +-
+ net/ethtool/rings.c                           | 24 +++++++++++++++++--
+ 6 files changed, 51 insertions(+), 3 deletions(-)
 
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 60f85fbf4156..66be04013048 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -332,6 +332,12 @@ attribute-sets:
+       -
+         name: tx-push-buf-len-max
+         type: u32
++      -
++        name: hds-thresh
++        type: u32
++      -
++        name: hds-thresh-max
++        type: u32
+ 
+   -
+     name: mm-stat
+@@ -1777,6 +1783,8 @@ operations:
+             - rx-push
+             - tx-push-buf-len
+             - tx-push-buf-len-max
++            - hds-thresh
++            - hds-thresh-max
+       dump: *ring-get-op
+     -
+       name: rings-set
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index a7ba6368a4d5..ef1d1750f960 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -899,6 +899,10 @@ Kernel response contents:
+   ``ETHTOOL_A_RINGS_RX_PUSH``               u8      flag of RX Push mode
+   ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``       u32     size of TX push buffer
+   ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX``   u32     max size of TX push buffer
++  ``ETHTOOL_A_RINGS_HDS_THRESH``            u32     threshold of
++                                                    header / data split
++  ``ETHTOOL_A_RINGS_HDS_THRESH_MAX``        u32     max threshold of
++                                                    header / data split
+   =======================================   ======  ===========================
+ 
+ ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT`` indicates whether the device is usable with
+@@ -941,10 +945,12 @@ Request contents:
+   ``ETHTOOL_A_RINGS_RX_JUMBO``          u32     size of RX jumbo ring
+   ``ETHTOOL_A_RINGS_TX``                u32     size of TX ring
+   ``ETHTOOL_A_RINGS_RX_BUF_LEN``        u32     size of buffers on the ring
++  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT``    u8      TCP header / data split
+   ``ETHTOOL_A_RINGS_CQE_SIZE``          u32     Size of TX/RX CQE
+   ``ETHTOOL_A_RINGS_TX_PUSH``           u8      flag of TX Push mode
+   ``ETHTOOL_A_RINGS_RX_PUSH``           u8      flag of RX Push mode
+   ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``   u32     size of TX push buffer
++  ``ETHTOOL_A_RINGS_HDS_THRESH``        u32     threshold of header / data split
+   ====================================  ======  ===========================
+ 
+ Kernel checks that requested ring sizes do not exceed limits reported by
+@@ -961,6 +967,10 @@ A bigger CQE can have more receive buffer pointers, and in turn the NIC can
+ transfer a bigger frame from wire. Based on the NIC hardware, the overall
+ completion queue size can be adjusted in the driver if CQE size is modified.
+ 
++``ETHTOOL_A_RINGS_HDS_THRESH`` specifies the threshold value of
++header / data split feature. If a received packet size is larger than this
++threshold value, header and data will be split.
++
+ CHANNELS_GET
+ ============
+ 
 diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index f711bfd75c4d..4e451084d58a 100644
+index 4e451084d58a..8bab30e91022 100644
 --- a/include/linux/ethtool.h
 +++ b/include/linux/ethtool.h
-@@ -1134,12 +1134,14 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
+@@ -78,6 +78,8 @@ enum {
+  * @cqe_size: Size of TX/RX completion queue event
+  * @tx_push_buf_len: Size of TX push buffer
+  * @tx_push_buf_max_len: Maximum allowed size of TX push buffer
++ * @hds_thresh: Threshold value of header-data-split-thresh
++ * @hds_thresh_max: Maximum supprted threshold of header-data-split-thresh
+  */
+ struct kernel_ethtool_ringparam {
+ 	u32	rx_buf_len;
+@@ -87,6 +89,8 @@ struct kernel_ethtool_ringparam {
+ 	u32	cqe_size;
+ 	u32	tx_push_buf_len;
+ 	u32	tx_push_buf_max_len;
++	u32	hds_thresh;
++	u32	hds_thresh_max;
+ };
+ 
+ /**
+@@ -97,6 +101,7 @@ struct kernel_ethtool_ringparam {
+  * @ETHTOOL_RING_USE_RX_PUSH: capture for setting rx_push
+  * @ETHTOOL_RING_USE_TX_PUSH_BUF_LEN: capture for setting tx_push_buf_len
+  * @ETHTOOL_RING_USE_TCP_DATA_SPLIT: capture for setting tcp_data_split
++ * @ETHTOOL_RING_USE_HDS_THRS: capture for setting header-data-split-thresh
+  */
+ enum ethtool_supported_ring_param {
+ 	ETHTOOL_RING_USE_RX_BUF_LEN		= BIT(0),
+@@ -105,6 +110,7 @@ enum ethtool_supported_ring_param {
+ 	ETHTOOL_RING_USE_RX_PUSH		= BIT(3),
+ 	ETHTOOL_RING_USE_TX_PUSH_BUF_LEN	= BIT(4),
+ 	ETHTOOL_RING_USE_TCP_DATA_SPLIT		= BIT(5),
++	ETHTOOL_RING_USE_HDS_THRS		= BIT(6),
+ };
+ 
+ #define __ETH_RSS_HASH_BIT(bit)	((u32)1 << (bit))
+@@ -1134,6 +1140,7 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
   * @rss_ctx:		XArray of custom RSS contexts
   * @rss_lock:		Protects entries in @rss_ctx.  May be taken from
   *			within RTNL.
-+ * @hds_config:		HDS value from userspace.
++ * @hds_thresh:		HDS Threshold value.
+  * @hds_config:		HDS value from userspace.
   * @wol_enabled:	Wake-on-LAN is enabled
   * @module_fw_flash_in_progress: Module firmware flashing is in progress.
-  */
+@@ -1141,6 +1148,7 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
  struct ethtool_netdev_state {
  	struct xarray		rss_ctx;
  	struct mutex		rss_lock;
-+	u8			hds_config;
++	u32			hds_thresh;
+ 	u8			hds_config;
  	unsigned		wol_enabled:1;
  	unsigned		module_fw_flash_in_progress:1;
- };
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 2593019ad5b1..2b06450cacd4 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4084,6 +4084,7 @@ struct sk_buff *dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev,
- int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog);
- u8 dev_xdp_prog_count(struct net_device *dev);
- int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf);
-+u8 dev_xdp_sb_prog_count(struct net_device *dev);
- u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode);
+diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
+index 43993a2d68e5..2e17ff348f89 100644
+--- a/include/uapi/linux/ethtool_netlink_generated.h
++++ b/include/uapi/linux/ethtool_netlink_generated.h
+@@ -155,6 +155,8 @@ enum {
+ 	ETHTOOL_A_RINGS_RX_PUSH,
+ 	ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN,
+ 	ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX,
++	ETHTOOL_A_RINGS_HDS_THRESH,
++	ETHTOOL_A_RINGS_HDS_THRESH_MAX,
  
- u32 dev_get_min_mp_channel_count(const struct net_device *dev);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index c7f3dea3e0eb..bc98f4920e12 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9480,6 +9480,18 @@ u8 dev_xdp_prog_count(struct net_device *dev)
- }
- EXPORT_SYMBOL_GPL(dev_xdp_prog_count);
- 
-+u8 dev_xdp_sb_prog_count(struct net_device *dev)
-+{
-+	u8 count = 0;
-+	int i;
-+
-+	for (i = 0; i < __MAX_XDP_MODE; i++)
-+		if (dev->xdp_state[i].prog &&
-+		    !dev->xdp_state[i].prog->aux->xdp_has_frags)
-+			count++;
-+	return count;
-+}
-+
- int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
- {
- 	if (!dev->netdev_ops->ndo_bpf)
+ 	__ETHTOOL_A_RINGS_CNT,
+ 	ETHTOOL_A_RINGS_MAX = (__ETHTOOL_A_RINGS_CNT - 1)
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 0a09298fff92..c523b763efa3 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -456,7 +456,7 @@ extern const struct nla_policy ethnl_features_set_policy[ETHTOOL_A_FEATURES_WANT
+ extern const struct nla_policy ethnl_privflags_get_policy[ETHTOOL_A_PRIVFLAGS_HEADER + 1];
+ extern const struct nla_policy ethnl_privflags_set_policy[ETHTOOL_A_PRIVFLAGS_FLAGS + 1];
+ extern const struct nla_policy ethnl_rings_get_policy[ETHTOOL_A_RINGS_HEADER + 1];
+-extern const struct nla_policy ethnl_rings_set_policy[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX + 1];
++extern const struct nla_policy ethnl_rings_set_policy[ETHTOOL_A_RINGS_HDS_THRESH_MAX + 1];
+ extern const struct nla_policy ethnl_channels_get_policy[ETHTOOL_A_CHANNELS_HEADER + 1];
+ extern const struct nla_policy ethnl_channels_set_policy[ETHTOOL_A_CHANNELS_COMBINED_COUNT + 1];
+ extern const struct nla_policy ethnl_coalesce_get_policy[ETHTOOL_A_COALESCE_HEADER + 1];
 diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
-index b7865a14fdf8..b2a2586b241f 100644
+index b2a2586b241f..9236de041271 100644
 --- a/net/ethtool/rings.c
 +++ b/net/ethtool/rings.c
-@@ -203,6 +203,7 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+@@ -61,7 +61,9 @@ static int rings_reply_size(const struct ethnl_req_info *req_base,
+ 	       nla_total_size(sizeof(u8))  +	/* _RINGS_TX_PUSH */
+ 	       nla_total_size(sizeof(u8))) +	/* _RINGS_RX_PUSH */
+ 	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX_PUSH_BUF_LEN */
+-	       nla_total_size(sizeof(u32));	/* _RINGS_TX_PUSH_BUF_LEN_MAX */
++	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX_PUSH_BUF_LEN_MAX */
++	       nla_total_size(sizeof(u32)) +	/* _RINGS_HDS_THRESH */
++	       nla_total_size(sizeof(u32));	/* _RINGS_HDS_THRESH_MAX*/
+ }
  
- 	dev->ethtool_ops->get_ringparam(dev, &ringparam,
- 					&kernel_ringparam, info->extack);
-+	kernel_ringparam.tcp_data_split = dev->ethtool->hds_config;
+ static int rings_fill_reply(struct sk_buff *skb,
+@@ -108,7 +110,12 @@ static int rings_fill_reply(struct sk_buff *skb,
+ 	     (nla_put_u32(skb, ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX,
+ 			  kr->tx_push_buf_max_len) ||
+ 	      nla_put_u32(skb, ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN,
+-			  kr->tx_push_buf_len))))
++			  kr->tx_push_buf_len))) ||
++	    ((supported_ring_params & ETHTOOL_RING_USE_HDS_THRS) &&
++	     (nla_put_u32(skb, ETHTOOL_A_RINGS_HDS_THRESH,
++			  kr->hds_thresh) ||
++	      nla_put_u32(skb, ETHTOOL_A_RINGS_HDS_THRESH_MAX,
++			  kr->hds_thresh_max))))
+ 		return -EMSGSIZE;
  
- 	ethnl_update_u32(&ringparam.rx_pending, tb[ETHTOOL_A_RINGS_RX], &mod);
- 	ethnl_update_u32(&ringparam.rx_mini_pending,
-@@ -225,6 +226,14 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+ 	return 0;
+@@ -130,6 +137,7 @@ const struct nla_policy ethnl_rings_set_policy[] = {
+ 	[ETHTOOL_A_RINGS_TX_PUSH]		= NLA_POLICY_MAX(NLA_U8, 1),
+ 	[ETHTOOL_A_RINGS_RX_PUSH]		= NLA_POLICY_MAX(NLA_U8, 1),
+ 	[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN]	= { .type = NLA_U32 },
++	[ETHTOOL_A_RINGS_HDS_THRESH]		= { .type = NLA_U32 },
+ };
+ 
+ static int
+@@ -155,6 +163,14 @@ ethnl_set_rings_validate(struct ethnl_req_info *req_info,
+ 		return -EOPNOTSUPP;
+ 	}
+ 
++	if (tb[ETHTOOL_A_RINGS_HDS_THRESH] &&
++	    !(ops->supported_ring_params & ETHTOOL_RING_USE_HDS_THRS)) {
++		NL_SET_ERR_MSG_ATTR(info->extack,
++				    tb[ETHTOOL_A_RINGS_HDS_THRESH],
++				    "setting hds-thresh is not supported");
++		return -EOPNOTSUPP;
++	}
++
+ 	if (tb[ETHTOOL_A_RINGS_CQE_SIZE] &&
+ 	    !(ops->supported_ring_params & ETHTOOL_RING_USE_CQE_SIZE)) {
+ 		NL_SET_ERR_MSG_ATTR(info->extack,
+@@ -223,6 +239,8 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+ 			tb[ETHTOOL_A_RINGS_RX_PUSH], &mod);
+ 	ethnl_update_u32(&kernel_ringparam.tx_push_buf_len,
+ 			 tb[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN], &mod);
++	ethnl_update_u32(&kernel_ringparam.hds_thresh,
++			 tb[ETHTOOL_A_RINGS_HDS_THRESH], &mod);
  	if (!mod)
  		return 0;
  
-+	if (kernel_ringparam.tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
-+	    dev_xdp_sb_prog_count(dev)) {
-+		NL_SET_ERR_MSG_ATTR(info->extack,
-+				    tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT],
-+				    "tcp-data-split can not be enabled with single buffer XDP");
-+		return -EINVAL;
-+	}
-+
- 	/* ensure new ring parameters are within limits */
- 	if (ringparam.rx_pending > ringparam.rx_max_pending)
- 		err_attr = tb[ETHTOOL_A_RINGS_RX];
-@@ -252,6 +261,9 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
- 
- 	ret = dev->ethtool_ops->set_ringparam(dev, &ringparam,
- 					      &kernel_ringparam, info->extack);
-+	if (!ret)
-+		dev->ethtool->hds_config = kernel_ringparam.tcp_data_split;
-+
- 	return ret < 0 ? ret : 1;
- }
- 
+@@ -243,6 +261,8 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+ 		err_attr = tb[ETHTOOL_A_RINGS_RX_JUMBO];
+ 	else if (ringparam.tx_pending > ringparam.tx_max_pending)
+ 		err_attr = tb[ETHTOOL_A_RINGS_TX];
++	else if (kernel_ringparam.hds_thresh > kernel_ringparam.hds_thresh_max)
++		err_attr = tb[ETHTOOL_A_RINGS_HDS_THRESH];
+ 	else
+ 		err_attr = NULL;
+ 	if (err_attr) {
 -- 
 2.34.1
 
