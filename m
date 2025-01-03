@@ -1,129 +1,138 @@
-Return-Path: <netdev+bounces-155007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 400D6A009FB
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 14:41:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FD0A009FD
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 14:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3C987A1824
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:41:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87D481882967
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89D21F866F;
-	Fri,  3 Jan 2025 13:41:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="fz7rDcDC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8581FA168;
+	Fri,  3 Jan 2025 13:42:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255B813AD0;
-	Fri,  3 Jan 2025 13:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11FC01F9423;
+	Fri,  3 Jan 2025 13:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735911670; cv=none; b=D6O+Itu62wR/wpRm7Y2J+FXhpK+31wqj47D2j0WncmlBKX8PZRDNYT1++dY5zeFnP8Px3oSR9H46dNNZgQPmsPqL9wVU4S45RjcjaVFTUV/UTDSiLFn2/pr9GhMcO0keLxF3PnyvC8osStFazpCyUhs0qy/WjOnF1Pokaspgz8w=
+	t=1735911722; cv=none; b=NejAckHcpvvbImMTNlqkqTEOwDshcOBA70GcgwsYxcrgIqN4ZTcGJmwJQZpPuW70kcNcgu5tEL6VSgo6qF63f2yuSIO+vN6SST2GlFuKgCYE5XrLCRIbqn4f06kQMKC7m6bDB5maSwBvNwvBR8D9qI8uhmYe+KGl/Ppuo8Nwq8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735911670; c=relaxed/simple;
-	bh=2LoD89fr0gA0mToAdYXNti+rZqJbFVeRGGzGfWKuLW8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=s99pHM2KjvbFqMDWdAgUm6pT1sLHfqW71JEvlBRMrfvr1aUz/GSP08W72KtkfbVk3dgfqj4Z9fMLiJ8dByap9JaVKqlDs4haHLbmqvMPWcVuGkAHlrE0ENi7j+Z+3Vuxvt/qNYSEP/HJdYqNXbs2xGcTjLvu6gjHWZ/IExgcpuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=fz7rDcDC; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1735911655;
-	bh=2LoD89fr0gA0mToAdYXNti+rZqJbFVeRGGzGfWKuLW8=;
-	h=From:Date:Subject:To:Cc:From;
-	b=fz7rDcDCq6lsjCCc0Uy4EYINp8j+vfO0ZOujqppZ3Bo6eYQm77elD7VEDtOROkmRC
-	 pMcp6p5+XI/ZxRH3zwHMNzeq/bweAfHnts1/TJ2cnq71Qtls1rbZXn0MgOyDmzNck9
-	 sMSI8uLKfu4UDqj1Zb76YakDAGzE7Gof5B3yGM+Y=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Fri, 03 Jan 2025 14:40:49 +0100
-Subject: [PATCH net] ptp: limit number of virtual clocks per physical clock
+	s=arc-20240116; t=1735911722; c=relaxed/simple;
+	bh=YwzmqaD7Gv6N8nEsMEN1t1XBhXgQYBpPgx60QOsjJq8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZpAQRqIuQaZ6nio4d+xOLmJ1kwIhgKEr52/mbVirc7cg2w5tXNaYQZnANYsKNbTIH6tJT+g0DImvzUUhMRvKTcrEJQ1PkJWKg2U74r9/ogt7jH75790BjYF9MWz7wdckA557TQCelDxBbmF/K+nZy0xY9/S3mSMUnNxQv4hC3cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aa67ac42819so1730152366b.0;
+        Fri, 03 Jan 2025 05:42:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735911719; x=1736516519;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dB07t4o4mu+ZjNcnROOEP8UVbxrHyYf1oPcMLyNVXss=;
+        b=c8RK27MATyXWbd5mq8o2bV/C0s7OgKbagypmlbauSDKLI1jLsACRWIA/n1C13GCyNQ
+         gXTuPRpvKqJIGWX+QZv4MEroDX8buorWqkk5rmj1GL733QrUzMadCRGik1Yu+GmZJPQ/
+         GAtHr0l8N+L0BOQdk5ZRYDo8d23/WKP6RwgSdP934WiZf8rxNfN3NGMJIU9ldKKmYQdw
+         FSqVuG6kCoTTxc+XOuNzZCe760iSlCvm+vnAprdjRiLDc1zY4n5OJ42EOL6Ldoxe1FI0
+         Wi7IceWjL4gkL+VjXA5dtzooo/G4xb04sCoeDqoV2aWlbqpC76A6VZYlsYGYfVLM3+eq
+         e0aQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWe+QDNMoyIQp9+sPY67Pv2qsLazZ9hSd68KRse+dYYCz7LrLiYq3k2mgAv0QpuI9D7pNez/Om2@vger.kernel.org, AJvYcCWsShhzv6XzMw9SWHJzaPklDVUdORzTQZDQHLxaWJuzuBYlPN1pZuFkQA5bOBwe0aXcm+zJm/X9XrcaMjA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3C8+qourPYhLe0xnrupdnQuDV6xRR2Bb0jmwWy+B25px7xBXt
+	LD9fU6y3p0ufoKNQuMk1bCoT/qQ5NMxshPX3xbfuMKtdkXET69aS
+X-Gm-Gg: ASbGncu2mygIYilEWOneY9a74hD8sGMuvWh+iGQ+vEmtY0JmijNeOfRtArJrTDBLB3g
+	6YKTnrZMvdGVzgGwTOsqd6uoKTFlV4SK2c35nB7CuZ3+NSp1r3SlqBh4fJKBkY4NjNXtlnNCuQj
+	9OU9vowvvRzFGptyWeeyfRGGKCxsS2xbuxqceyZhPgSAqJQF9CDqwuIDA/0vq/KfXgIaUKXIV9v
+	xHtbxi4wSdu/IlW4bg17Bu6qDtQVUEve7BaXBE6GXHfdM4=
+X-Google-Smtp-Source: AGHT+IFtHssCSogTuYAP8cFKox2R3LGjnNMokBmM8CQ7u2W64Yu1xN7FqCsmh0WDx/JTFNHhAmE+Kg==
+X-Received: by 2002:a17:907:7da5:b0:aa6:8781:9909 with SMTP id a640c23a62f3a-aac2d32837amr4634971866b.29.1735911719057;
+        Fri, 03 Jan 2025 05:41:59 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:9::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0efe46a6sm1891039566b.116.2025.01.03.05.41.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jan 2025 05:41:58 -0800 (PST)
+Date: Fri, 3 Jan 2025 05:41:56 -0800
+From: Breno Leitao <leitao@debian.org>
+To: kernel test robot <oliver.sang@intel.com>, lkp@intel.com,
+	oe-lkp@lists.linux.dev
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>, Tejun Heo <tj@kernel.org>,
+	netdev@vger.kernel.org
+Subject: Re: [herbert-cryptodev-2.6:master] [rhashtable]  e1d3422c95:
+ stress-ng.syscall.ops_per_sec 98.9% regression
+Message-ID: <20250103-singing-crow-of-fantasy-fd061f@leitao>
+References: <202412271017.cad7675-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250103-ptp-max_vclocks-v1-1-2406b8eade97@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAODod2cC/x3MTQqAIBBA4avIrBOmpBZdJSL8mWqoTFQiiO6et
- PwW7z2QKDIl6MUDkS5OfPqCuhJgV+0XkuyKocGmxRqVDDnIQ9/TZffTbkmi06Y1qAxiB6UKkWa
- +/+MAnjKM7/sBqssLWWYAAAA=
-X-Change-ID: 20250103-ptp-max_vclocks-0dab5b03b006
-To: Richard Cochran <richardcochran@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Yangbo Lu <yangbo.lu@nxp.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, cheung wall <zzqq0103.hey@gmail.com>, 
- stable@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1735911655; l=1977;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=2LoD89fr0gA0mToAdYXNti+rZqJbFVeRGGzGfWKuLW8=;
- b=w82DqGyX9o/stC4bGVg2KUYn5zlZeQZvDY1lfm/JUFQnLu/r+9NcwaF1fAB1fe/Zo+w2UIZMt
- ebrO0q5mVsCDbVW6TzL7I2m6tQRraepBXxwFTHUEE9ulAKwSgL6d1Qd
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202412271017.cad7675-lkp@intel.com>
 
-The sysfs interface can be used to trigger arbitrarily large memory
-allocations. This can induce pressure on the VM layer to satisfy the
-request only to fail anyways.
+Hello "kernel robot" team,
 
-Reported-by: cheung wall <zzqq0103.hey@gmail.com>
-Closes: https://lore.kernel.org/lkml/20250103091906.GD1977892@ZenIV/
-Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
-The limit is completely made up, let me know if there is something
-better.
+First of all, thank you very much for running these tests against the
+linux kernel.
 
-I'm also wondering about the point of the max_vclocks sysfs attribute.
-It could easily be removed and all its logic moved into the n_vclocks
-attribute, simplifying the UAPI.
----
- drivers/ptp/ptp_private.h | 1 +
- drivers/ptp/ptp_sysfs.c   | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+I am trying to reproduce this report, and I would appreciate some help
+to understand what is being measured, and try to reproduce the reported
+problem.
 
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index 18934e28469ee6e3bf9c9e6d1a1adb82808d88e6..07003339795e9c0fb813887e47eaee4ba0e20064 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -22,6 +22,7 @@
- #define PTP_MAX_TIMESTAMPS 128
- #define PTP_BUF_TIMESTAMPS 30
- #define PTP_DEFAULT_MAX_VCLOCKS 20
-+#define PTP_MAX_VCLOCKS_LIMIT 2048
- #define PTP_MAX_CHANNELS 2048
- 
- struct timestamp_event_queue {
-diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
-index 6b1b8f57cd9510f269c86dd89a7a74f277f6916b..200eaf50069681eecc87d63c0e0440f28cccab77 100644
---- a/drivers/ptp/ptp_sysfs.c
-+++ b/drivers/ptp/ptp_sysfs.c
-@@ -284,7 +284,7 @@ static ssize_t max_vclocks_store(struct device *dev,
- 	size_t size;
- 	u32 max;
- 
--	if (kstrtou32(buf, 0, &max) || max == 0)
-+	if (kstrtou32(buf, 0, &max) || max == 0 || max > PTP_MAX_VCLOCKS_LIMIT)
- 		return -EINVAL;
- 
- 	if (max == ptp->max_vclocks)
+On Fri, Dec 27, 2024 at 11:10:11AM +0800, kernel test robot wrote:
+> kernel test robot noticed a 98.9% regression of stress-ng.syscall.ops_per_sec on:
 
----
-base-commit: 582ef8a0c406e0b17030b0773392595ec331a0d2
-change-id: 20250103-ptp-max_vclocks-0dab5b03b006
+Is this metric coming from `bogo ops/s` from stress-ng?
 
-Best regards,
--- 
-Thomas Weißschuh <linux@weissschuh.net>
+I am trying to reproduce this problem, running the following script:
+https://download.01.org/0day-ci/archive/20241227/202412271017.cad7675-lkp@intel.com/repro-script
 
+And I see the output like the one below, but, it is unclear to me what
+metric regressed stress-ng.syscall.ops_per_sec means exactly.  Would you
+mind helping me to understand what is stress-ng.syscall.ops_per_sec and
+how it maps to stress-ng metrics?
+
+Output of `stress-ng --timeout 60 --times --verify --metrics --no-rand-seed --syscall 224`:
+
+	stress-ng: info:  [59621] setting to a 1 min, 0 secs run per stressor
+	stress-ng: info:  [59621] dispatching hogs: 224 syscall
+	stress-ng: info:  [59647] syscall: using method 'fast75'
+	stress-ng: info:  [59647] syscall: 292 system call tests, 219 (75.0%) fastest non-failing tests fully exercised
+	stress-ng: info:  [59647] syscall: Top 10 fastest system calls (timings in nanosecs):
+	stress-ng: info:  [59647] syscall:               System Call   Avg (ns)   Min (ns)   Max (ns)
+	stress-ng: info:  [59647] syscall:                  pkey_get      156.0        127        185
+	stress-ng: info:  [59647] syscall:                      time      212.5        195        230
+	stress-ng: info:  [59647] syscall:                  pkey_set      235.5        193        278
+	stress-ng: info:  [59647] syscall:              gettimeofday      282.5        255        310
+	stress-ng: info:  [59647] syscall:                    getcpu      457.0        388        526
+	stress-ng: info:  [59647] syscall:           set_robust_list      791.5        745        838
+	stress-ng: info:  [59647] syscall:                    getgid     1137.0        974       1300
+	stress-ng: info:  [59647] syscall:                 setresuid     1146.0       1070       1222
+	stress-ng: info:  [59647] syscall:                    getuid     1162.5        902       1423
+	stress-ng: info:  [59647] syscall:                 setresgid     1211.5       1159       1264
+	stress-ng: metrc: [59621] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
+	stress-ng: metrc: [59621]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
+	stress-ng: metrc: [59621] syscall          114464     86.78      1.27    364.05      1318.95         313.33         1.88          4500
+	stress-ng: info:  [59621] for a 98.30s run time:
+	stress-ng: info:  [59621]    3538.93s available CPU time
+	stress-ng: info:  [59621]       1.26s user time   (  0.04%)
+	stress-ng: info:  [59621]     366.66s system time ( 10.36%)
+	stress-ng: info:  [59621]     367.92s total time  ( 10.40%)
+	stress-ng: info:  [59621] load average: 80.45 43.94 20.82
+	stress-ng: info:  [59621] skipped: 0
+	stress-ng: info:  [59621] passed: 224: syscall (224)
+	stress-ng: info:  [59621] failed: 0
+	stress-ng: info:  [59621] metrics untrustworthy: 0
+	stress-ng: info:  [59621] successful run completed in 1 min, 38.30 secs
+
+Thank you!
+--breno
 
