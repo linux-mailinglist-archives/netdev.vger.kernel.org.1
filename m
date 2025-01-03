@@ -1,166 +1,147 @@
-Return-Path: <netdev+bounces-154960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 661A8A007F8
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:43:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D950A00805
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:45:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76FCC1883D5A
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 10:43:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3286416380D
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 10:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3F21CEE82;
-	Fri,  3 Jan 2025 10:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE9F1CEE82;
+	Fri,  3 Jan 2025 10:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rvEMQD6l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA27E1B0F10
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 10:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26541F9A91
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 10:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735901003; cv=none; b=C2yf/Dk7N3zE38YOpFVAEt9tpn3oi4zGQmiF7tnbkAhfr0fY8oaG+N6shfuL2qrU60fsUunTFErgWSYCr2drEQ1Kxsv9mAHKsJDEjk/adFV7VaYE+dixzh6Uo53g3x90kgZg4erkV7C7SpLuAYvu1mcaExIlTgzp+YK6OXAXZM4=
+	t=1735901150; cv=none; b=a0G14xjdVMyvmDpg7RKkMukagfjVNb7YEphBjWXvXTqPIydl6GHFrv2BDIoT1/57QH3VBs+L2pb+Cbb/7txxycgKJwqs6hUgdIMv6PDJR4vi8klWsbltQZdG5hwCBNzofxrv54kKJA5WnsenDodZrgcgw0ZEhiPkag46a7pYYbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735901003; c=relaxed/simple;
-	bh=pziRtZ7hlaYg+XzIO68q5bU4H2A/ucvPYkpa8CroKSM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nSIRMW6KN2XkJu4c5sziOHpl8Xyx9IY693cj9QtAUNX+JN8Anj4dOGSxMaKXmNsKtXuEH94J1iJknDxYvHpywuUuetyvGetY0kz1Qn7WF0ztk3QqqkB3Hl9v30Xr8CMbISnYtwr1bj0Kr89syRxTAJWfmxTPf0pEUmUJsUU02lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3a9cefa1969so120668385ab.1
-        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 02:43:21 -0800 (PST)
+	s=arc-20240116; t=1735901150; c=relaxed/simple;
+	bh=j8vOKcBecWWFxiCV8eCzd7F8CWx9eTV85qSOBIjdPrc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ebICAMf6Bj2aV2TfBkfjUgEeKCo2/82yBEyCDR9age7vCWVT1eHYnLZ2bHTjEdltXItAkWSRhPqtDRO6n66ocHjvZxbG8/1XEtZx53Xmc3ueAsaKi4IfBeM7HBK0tw+d0CUYAsAQGPIMnPZSl+gcHXkcaDW4LYkFU/Z+iWYnTgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rvEMQD6l; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b9f0bc7123so1190692485a.1
+        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 02:45:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1735901148; x=1736505948; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uVKmH1UrFQLoeO4s5/1bgEeCaRFjYDvmIRx8LNEk/YM=;
+        b=rvEMQD6l97/ffrh7fcXDIlUQmXNT5KDTGKWaT7KDMOnRCQ2ej3WARVON16RJAyIbC7
+         cxnxZ71oGL66dAJjYrQLQo6UMZJs0smhD0ciRAXPiOyPczT1UVqbRpb6KSdwoTjG7smO
+         VUjFogZfe5f3GvBWcINmlXrgasZOeb/0V7B9s1JUaQgopMzVoybVshCai66sEFfUOSeO
+         HDJQxmjNhNcV8YbQa1Bvoys6nEr/6jWSzKq98PXafZ0qetsVx4ONpFkmV80M0UJrCX+D
+         0W94Jx/B5kX9pFhhtYxQ/Pdge0FIyYEFo9gvKjxpjf3RvfhOaSLXjAyck2JFiptFk6nk
+         jhUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735901001; x=1736505801;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1735901148; x=1736505948;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=o41Fjl6hkNtY0kx62Q+YAuvs3iA6koqM2Y6qO7z9ehU=;
-        b=uzVcwEafjmMF71g2osHXb+UZ8D1Eskjczh7I2ZXeizsFFT68mX+EPSYD2QjhUqJO//
-         p8CVqUPmIdirixg76nvo0SC4IKcJQJ2T4EARzHVDUvlK2a9hVSeU874lQg4SRMFCXZmQ
-         WAILD/V3I7SMfiU3VjTc26cLkbwA9Oyjf4CIgBgd1A/wLNjb2IyxaRPaL2BBXBrcZjtq
-         1+7YBndHsV73sb60l2OXn/s9AqHaB+PiZ4c+J6K451V/0Sr3mzp0TL8+g//btHH9FJmW
-         WoGC3S8YGZXxgR1Spa9orQSnE74Kc8RU03JB1bRmAqc/OMILOspURVdxgOTq8eIx6ahl
-         g/Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCVRIW2chmuiN+mWmCiAD4Z9PzGwz5yviy3lSeA6r2DZ83h92ouY2VPNQypSeWxecgBCHH8k8tU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhBcvUnLW5kVbtIdqNP0JLeEdxF0jPEr5yF3t7vpXSP8mgKmRc
-	vXqFLjpOqPcP7DaAHjKtRb8xJTTWSNoH+Kg6MJptlEO95M10TQt2OVlRpQwcxeeyzZJIf+CU8Ny
-	bde7eSqNtlQwSlnE7f4v+rAAtyjdd8mLzJmxGLjyv074hlv76qGftpjE=
-X-Google-Smtp-Source: AGHT+IHCADwRdrGMD48RP+vKGj2qOEUv27FLRgDVHvNdnBcz5amS4pH9rGBvcmbGSEcymGmTJWFiGx1YoC+rFZzSf69QPUy7MuyR
+        bh=uVKmH1UrFQLoeO4s5/1bgEeCaRFjYDvmIRx8LNEk/YM=;
+        b=xE38rAGETLdvMtoOWE2fTgQoRLXD0/gd7ezWMW8PfiCT4fMsjKDMYqaHpn86KC5M8O
+         gSuO7fgM6vYc4XCtTjChRzjLzTixFFICQo9T8fxdcZ+NLv6t2nfXSM3AD8Mekqck58lW
+         3jkemrshGN9BOpKcnvruhPQpWusYinHtVe9X58gYTrM5z1sDwODXKMiHXWKwYt8ELLlK
+         x4AR8gu1A0tZtb4yR9pl+InKCJX1/kZhwOG71wlemdYKtoyKO6Hz60gnpfkoySmqHrat
+         boglTGqdsbUrJEHn+1lsneL++7MRtBYJLm2aVuw7JqmL6T8Y7LMnUjg6SBvEoOGfpw2Z
+         Zd1A==
+X-Forwarded-Encrypted: i=1; AJvYcCXk3Cy7L3xWp9/MCtDWHy+ybDv1rTb1Q1J/AYhja/xxpl3RJkuEQjvJMWiKZ4rCdIRFzxAlrT8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy462dq6RkkCXqvKi+fzRA/5e3isbAcHCva/nNs7PLkQCCaExDx
+	HYFXBFdjEjZwG1UjvWOZBgP5BrfkTsFIhIgm1vT0N6KYcoy6ver0Tc7TD8z+/vaSi/yYOYeVgDO
+	Znwpuh9Rk9A==
+X-Google-Smtp-Source: AGHT+IGAI231LYSh7ibu905DB/ANilLdPHmiKNGVHTN3b3yVly09KM3QmrgNPbEb6mKz39qBIsj3njHq98psWA==
+X-Received: from qknqt5.prod.google.com ([2002:a05:620a:8a05:b0:7b6:d4b7:ec60])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4551:b0:7b6:eb2b:b49e with SMTP id af79cd13be357-7b9ba6fd8c9mr8091584785a.6.1735901147790;
+ Fri, 03 Jan 2025 02:45:47 -0800 (PST)
+Date: Fri,  3 Jan 2025 10:45:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3284:b0:3a7:8208:b847 with SMTP id
- e9e14a558f8ab-3c2d58197b4mr352640465ab.22.1735901001025; Fri, 03 Jan 2025
- 02:43:21 -0800 (PST)
-Date: Fri, 03 Jan 2025 02:43:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6777bf49.050a0220.178762.0040.GAE@google.com>
-Subject: [syzbot] [net?] UBSAN: shift-out-of-bounds in flow_classify
-From: syzbot <syzbot+1dbb57d994e54aaa04d2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20250103104546.3714168-1-edumazet@google.com>
+Subject: [PATCH net] net_sched: cls_flow: validate TCA_FLOW_RSHIFT attribute
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot+1dbb57d994e54aaa04d2@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot found that TCA_FLOW_RSHIFT attribute was not validated.
+Right shitfing a 32bit integer is undefined for large shift values.
 
-syzbot found the following issue on:
-
-HEAD commit:    4f619d518db9 net: wwan: t7xx: Fix FSM command timeout issue
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=171cb6df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6a2b862bf4a5409f
-dashboard link: https://syzkaller.appspot.com/bug?extid=1dbb57d994e54aaa04d2
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=131abaf8580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12227818580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c7833c741299/disk-4f619d51.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d5ca349f6388/vmlinux-4f619d51.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d85b222c4799/bzImage-4f619d51.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1dbb57d994e54aaa04d2@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
 UBSAN: shift-out-of-bounds in net/sched/cls_flow.c:329:23
 shift exponent 9445 is too large for 32-bit type 'u32' (aka 'unsigned int')
-CPU: 0 UID: 0 PID: 11 Comm: kworker/u8:0 Not tainted 6.13.0-rc3-syzkaller-00180-g4f619d518db9 #0
+CPU: 1 UID: 0 PID: 54 Comm: kworker/u8:3 Not tainted 6.13.0-rc3-syzkaller-00180-g4f619d518db9 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
 Workqueue: ipv6_addrconf addrconf_dad_work
 Call Trace:
  <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- ubsan_epilogue lib/ubsan.c:231 [inline]
- __ubsan_handle_shift_out_of_bounds+0x3c8/0x420 lib/ubsan.c:468
- flow_classify+0x24d5/0x25b0 net/sched/cls_flow.c:329
- tc_classify include/net/tc_wrapper.h:197 [inline]
- __tcf_classify net/sched/cls_api.c:1771 [inline]
- tcf_classify+0x420/0x1160 net/sched/cls_api.c:1867
- sfb_classify net/sched/sch_sfb.c:260 [inline]
- sfb_enqueue+0x3ad/0x18b0 net/sched/sch_sfb.c:318
- dev_qdisc_enqueue+0x4b/0x290 net/core/dev.c:3793
- __dev_xmit_skb net/core/dev.c:3889 [inline]
- __dev_queue_xmit+0xf0e/0x3f50 net/core/dev.c:4400
- dev_queue_xmit include/linux/netdevice.h:3168 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip_finish_output2+0xd41/0x1390 net/ipv4/ip_output.c:236
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- udp_tunnel_xmit_skb+0x262/0x3b0 net/ipv4/udp_tunnel_core.c:173
- geneve_xmit_skb drivers/net/geneve.c:916 [inline]
- geneve_xmit+0x21dc/0x2d00 drivers/net/geneve.c:1039
- __netdev_start_xmit include/linux/netdevice.h:5002 [inline]
- netdev_start_xmit include/linux/netdevice.h:5011 [inline]
- xmit_one net/core/dev.c:3590 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3606
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4434
- neigh_output include/net/neighbour.h:539 [inline]
- ip6_finish_output2+0x12c7/0x17b0 net/ipv6/ip6_output.c:141
- ip6_finish_output+0x41e/0x840 net/ipv6/ip6_output.c:226
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ndisc_send_skb+0xb30/0x1450 net/ipv6/ndisc.c:511
- ndisc_send_ns+0xcc/0x160 net/ipv6/ndisc.c:669
- addrconf_dad_work+0xb45/0x16f0 net/ipv6/addrconf.c:4303
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
----[ end trace ]---
+  __dump_stack lib/dump_stack.c:94 [inline]
+  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+  ubsan_epilogue lib/ubsan.c:231 [inline]
+  __ubsan_handle_shift_out_of_bounds+0x3c8/0x420 lib/ubsan.c:468
+  flow_classify+0x24d5/0x25b0 net/sched/cls_flow.c:329
+  tc_classify include/net/tc_wrapper.h:197 [inline]
+  __tcf_classify net/sched/cls_api.c:1771 [inline]
+  tcf_classify+0x420/0x1160 net/sched/cls_api.c:1867
+  sfb_classify net/sched/sch_sfb.c:260 [inline]
+  sfb_enqueue+0x3ad/0x18b0 net/sched/sch_sfb.c:318
+  dev_qdisc_enqueue+0x4b/0x290 net/core/dev.c:3793
+  __dev_xmit_skb net/core/dev.c:3889 [inline]
+  __dev_queue_xmit+0xf0e/0x3f50 net/core/dev.c:4400
+  dev_queue_xmit include/linux/netdevice.h:3168 [inline]
+  neigh_hh_output include/net/neighbour.h:523 [inline]
+  neigh_output include/net/neighbour.h:537 [inline]
+  ip_finish_output2+0xd41/0x1390 net/ipv4/ip_output.c:236
+  iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
+  udp_tunnel_xmit_skb+0x262/0x3b0 net/ipv4/udp_tunnel_core.c:173
+  geneve_xmit_skb drivers/net/geneve.c:916 [inline]
+  geneve_xmit+0x21dc/0x2d00 drivers/net/geneve.c:1039
+  __netdev_start_xmit include/linux/netdevice.h:5002 [inline]
+  netdev_start_xmit include/linux/netdevice.h:5011 [inline]
+  xmit_one net/core/dev.c:3590 [inline]
+  dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3606
+  __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4434
 
-
+Fixes: e5dfb815181f ("[NET_SCHED]: Add flow classifier")
+Reported-by: syzbot+1dbb57d994e54aaa04d2@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/6777bf49.050a0220.178762.0040.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/sched/cls_flow.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/sched/cls_flow.c b/net/sched/cls_flow.c
+index 5502998aace74157320efed71faf40afd196fac4..5c2580a07530e4e0615a7df7ff9d0a35ae9e94b4 100644
+--- a/net/sched/cls_flow.c
++++ b/net/sched/cls_flow.c
+@@ -356,7 +356,8 @@ static const struct nla_policy flow_policy[TCA_FLOW_MAX + 1] = {
+ 	[TCA_FLOW_KEYS]		= { .type = NLA_U32 },
+ 	[TCA_FLOW_MODE]		= { .type = NLA_U32 },
+ 	[TCA_FLOW_BASECLASS]	= { .type = NLA_U32 },
+-	[TCA_FLOW_RSHIFT]	= { .type = NLA_U32 },
++	[TCA_FLOW_RSHIFT]	= NLA_POLICY_MAX(NLA_U32,
++						 31 /* BITS_PER_U32 - 1 */),
+ 	[TCA_FLOW_ADDEND]	= { .type = NLA_U32 },
+ 	[TCA_FLOW_MASK]		= { .type = NLA_U32 },
+ 	[TCA_FLOW_XOR]		= { .type = NLA_U32 },
+-- 
+2.47.1.613.gc27f4b7a9f-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
