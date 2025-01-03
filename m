@@ -1,142 +1,107 @@
-Return-Path: <netdev+bounces-155005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A6B5A009F6
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 14:38:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D597A009F7
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 14:39:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C975418845C4
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFA063A3F0D
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11171EE7C5;
-	Fri,  3 Jan 2025 13:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2E71A8F9A;
+	Fri,  3 Jan 2025 13:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WXmpR9TI"
+	dkim=pass (1024-bit key) header.d=eurecom.fr header.i=@eurecom.fr header.b="ot4gsJDs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from smtp.eurecom.fr (smtp.eurecom.fr [193.55.113.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED978158553
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 13:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E05E17FE;
+	Fri,  3 Jan 2025 13:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.55.113.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735911489; cv=none; b=mHL5t8DBdCoOSJBbva6M9IWD7hKcRJ9Mrm9VAoOo0RlbyH5zUzqLC/rEap9DzQ2Ze2tTuhJwbVXGuUkGC9Yyvg8p5fR446v6SPgdxA996nzjgD0976cIKbbJcNtx3BWiFC1fXs5vAcmSf1bnOd4SSAiBIlnuE3kU3Z9aZQDpPNo=
+	t=1735911567; cv=none; b=eQxLrlXlvTKa4mtcaawyg8KFMAx87SY6IsVJOU87YBPy9ls6AZ1208s6Hos5h4WWXui6fzFy+NV6tjEg3agL6gMwDC/IdwA+gTYL6HHXZwiteikDXO1POlbt9yxTUx3HDyx6FizsTPWj2yjcyJJsaU3u7eIwCw0yeL6ATJrL/04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735911489; c=relaxed/simple;
-	bh=TUy/v2Lp8c08e+iOiygORE2hr6sS4hrPyjpbAv5RL3I=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TWZehtnwhtif42zf1KXGV6k6h7iDZNXamXdj0ygX9cYQzs7S7YWTOIPSIZYjo/t6awoROzmJ5hFmi6+ZUhfaXcabfD9LnTSotoLBHuEyQPeCVdAh/Hav1ToLvU0mbsdJvR9l69V3b8bnK/egGJ40B2eduIbgJpB+SMHDAN2Ytc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WXmpR9TI; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1735911487; x=1767447487;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=cFOhUp6fdFM2tBRc5o39pXNPmAOP9HIA75ACqW2pBQs=;
-  b=WXmpR9TISdrvxIDdn4QV7uAjzGLA2igoYF5iQ/YC7f7EdSidDEYJyIK+
-   Vx5dm62cVIVSncNIXPCkg4X765LlEjLbgL3V3lqmMeBdxBtgvvXapTjzj
-   q8UQ7K9Z89wEFYrybzZ5VJaaNLJuMYvig83k0yUs9l6iKvZgEfuX2rlcx
-   s=;
-X-IronPort-AV: E=Sophos;i="6.12,286,1728950400"; 
-   d="scan'208";a="708237824"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2025 13:38:03 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:41844]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.144:2525] with esmtp (Farcaster)
- id 3725e560-2227-44a3-8a37-3a5f90488cf2; Fri, 3 Jan 2025 13:38:04 +0000 (UTC)
-X-Farcaster-Flow-ID: 3725e560-2227-44a3-8a37-3a5f90488cf2
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 3 Jan 2025 13:38:02 +0000
-Received: from 6c7e67c6786f.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 3 Jan 2025 13:37:58 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<maheshb@google.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzkaller@googlegroups.com>
-Subject: Re: [PATCH v1 net] ipvlan: Fix use-after-free in ipvlan_get_iflink().
-Date: Fri, 3 Jan 2025 22:37:49 +0900
-Message-ID: <20250103133749.76202-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250102174400.085fd8ac@kernel.org>
-References: <20250102174400.085fd8ac@kernel.org>
+	s=arc-20240116; t=1735911567; c=relaxed/simple;
+	bh=uY9i3M++jCJt8rk9Hjj58keMZJPyTpRD7BeOq8KwkpU=;
+	h=From:In-Reply-To:Content-Type:References:Date:Cc:To:MIME-Version:
+	 Message-ID:Subject; b=snHK0vwaojmBWL4khmDClijT63UPAlJpANQP0fz49cUhaMLdf7q/Pge7mEsHRDutxxlkJ9aU1aHWJJu72q7ck9616f8psvPXM/xO0YgpaqDQLzwS8n0G+ioVp7ANklwXTbJ6CvBWxTBAx01NFfb70mlq55doFTMJ1Nf87qBlDyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eurecom.fr; spf=pass smtp.mailfrom=eurecom.fr; dkim=pass (1024-bit key) header.d=eurecom.fr header.i=@eurecom.fr header.b=ot4gsJDs; arc=none smtp.client-ip=193.55.113.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eurecom.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eurecom.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=eurecom.fr; i=@eurecom.fr; q=dns/txt; s=default;
+  t=1735911564; x=1767447564;
+  h=from:in-reply-to:references:date:cc:to:mime-version:
+   message-id:subject:content-transfer-encoding;
+  bh=uY9i3M++jCJt8rk9Hjj58keMZJPyTpRD7BeOq8KwkpU=;
+  b=ot4gsJDsLzNN3/DD2cKt2QEyt0P3bx/CVPLXsRSUZ6J9qUE8lg7jBL3Q
+   NZ7AJIAz7ZKbMWfXQa4LIREqeMeQWOj04g1XqwUNEMdS0XuEvg013Sufi
+   fcDfz7763hNOmKhecMWGUkm0ub3D5UlKkTxfj9krF86AXqj1VFxyeAzv0
+   A=;
+X-CSE-ConnectionGUID: M8Z/I3T9Q6acm6eI01JcAQ==
+X-CSE-MsgGUID: 7Oea3LqbRS2SuXX2Fdgx6g==
+X-IronPort-AV: E=Sophos;i="6.12,286,1728943200"; 
+   d="scan'208";a="28365752"
+Received: from quovadis.eurecom.fr ([10.3.2.233])
+  by drago1i.eurecom.fr with ESMTP; 03 Jan 2025 14:39:21 +0100
+From: "Ariel Otilibili-Anieli" <Ariel.Otilibili-Anieli@eurecom.fr>
+In-Reply-To: <20250103131002.GA100011@wp.pl>
+Content-Type: text/plain; charset="utf-8"
+X-Forward: 88.183.119.157
+References: <20241221124445.1094460-1-ariel.otilibili-anieli@eurecom.fr>
+ <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
+ <20250103085540.GA94204@wp.pl>
+ <Z3fMxD2mAVsVl58h@pidgin.makrotopia.org> <20250103131002.GA100011@wp.pl>
+Date: Fri, 03 Jan 2025 14:39:21 +0100
+Cc: "Daniel Golle" <daniel@makrotopia.org>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, "Kalle Valo" <kvalo@kernel.org>, =?utf-8?q?Tomislav_Po=C5=BEega?= <pozega.tomislav@gmail.com>
+To: "Stanislaw Gruszka" <stf_xl@wp.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Message-ID: <2f7a83-6777e880-a451-5cf12280@99910178>
+Subject: =?utf-8?q?Re=3A?= [PATCH 1/2] =?utf-8?q?rt2x00=3A?= Remove unusued value
+User-Agent: SOGoMail 5.11.1
+Content-Transfer-Encoding: quoted-printable
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Thu, 2 Jan 2025 17:44:00 -0800
-> On Wed, 1 Jan 2025 18:10:08 +0900 Kuniyuki Iwashima wrote:
-> > syzbot presented a use-after-free report [0] regarding ipvlan and
-> > linkwatch.
-> > 
-> > ipvlan does not hold a refcnt of the lower device.
-> > 
-> > When the linkwatch work is triggered for the ipvlan dev, the lower
-> > dev might have already been freed.
-> > 
-> > Let's hold the lower dev's refcnt in dev->netdev_ops->ndo_init()
-> > and release it in dev->priv_destructor() as done for vlan and macvlan.
-> 
-> Hmmm, random ndo calls after unregister_netdevice() has returned 
-> are very error prone, if we can address this in the core - I think
-> that's better.
-> 
-> Perhaps we could take Eric's commit 750e51603395 ("net: avoid potential
-> UAF in default_operstate()") even further?
-> 
-> If the device is unregistering we can just assume DOWN. And we can use
-> RCU protection to make sure the unregistration doesn't race with us?
+Hello Stanislaw, hello Daniel; happy new year,
 
-Sounds good to me.
+On Friday, January 03, 2025 14:10 CET, Stanislaw Gruszka <stf=5Fxl@wp.p=
+l> wrote:
 
-Will post v2, thanks!
+> On Fri, Jan 03, 2025 at 11:40:52AM +0000, Daniel Golle wrote:
+> > On Fri, Jan 03, 2025 at 09:55:40AM +0100, Stanislaw Gruszka wrote:
+> >=20
+> > I agree with the likely intention here, however, the vendor driver
+> > also comes with the dead code, see
+> > https://github.com/lixuande/rt2860v2/blob/master/files/rt2860v2/com=
+mon/cmm=5Frf=5Fcal.c#L2690
+> >=20
+> > So this is certainly a bug in the vendor driver as well which got p=
+orted
+> > bug-by-bug to rt2x00... Not sure what is the best thing to do in th=
+is
+> > case.
+>=20
+> As this was already tested and match vendor driver I would prefer
+> not to change behavior even if it looks suspicious.
 
+Thanks for having looked into this; I much appreciate your feedback.
 
-> Just to give the idea (not even compile tested):
-> 
-> diff --git a/net/core/link_watch.c b/net/core/link_watch.c
-> index 1b4d39e38084..985273bc7c0d 100644
-> --- a/net/core/link_watch.c
-> +++ b/net/core/link_watch.c
-> @@ -42,14 +42,20 @@ static unsigned int default_operstate(const struct net_device *dev)
->  	 * first check whether lower is indeed the source of its down state.
->  	 */
->  	if (!netif_carrier_ok(dev)) {
-> -		int iflink = dev_get_iflink(dev);
->  		struct net_device *peer;
-> +		int iflink;
->  
->  		/* If called from netdev_run_todo()/linkwatch_sync_dev(),
->  		 * dev_net(dev) can be already freed, and RTNL is not held.
->  		 */
-> -		if (dev->reg_state == NETREG_UNREGISTERED ||
-> -		    iflink == dev->ifindex)
-> +		rcu_read_lock();
-> +		if (dev->reg_state <= NETREG_REGISTERED)
-> +			iflink = dev_get_iflink(dev);
-> +		else
-> +			iflink = dev->ifindex;
-> +		rcu_read_unlock();
-> +
-> +		if (iflink == dev->ifindex)
->  			return IF_OPER_DOWN;
->  
->  		ASSERT_RTNL();
+From what you two said, I understand that the patch should remove the d=
+uplicate code, and not change the logic behind.
+
+Is this right?
+
+If so; then, I have nothing else to do.
+>=20
+> Regards
+> Stanislaw
+>
+
 
