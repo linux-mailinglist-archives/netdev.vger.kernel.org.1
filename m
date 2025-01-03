@@ -1,199 +1,90 @@
-Return-Path: <netdev+bounces-155101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83CECA0103A
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 23:25:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76E3CA0104F
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 23:44:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 027B03A41EE
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:25:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C32AA1883972
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52C91C07D8;
-	Fri,  3 Jan 2025 22:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A738719F411;
+	Fri,  3 Jan 2025 22:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hg8poIm0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HgTT/mlk"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613D21BD51B
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 22:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBB628E8
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 22:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735943151; cv=none; b=SnFpGP5fGboJkFhl+EJ51gBx/eOtlOUBsMsS6xYAqdQo0Stkpmm3fBohy0iofejmnSKZhkxEA+6IBSMzAlMRB5YNdb46CAy38FQ627hMWlaWJRSnjaGwYK9j6jh9uuVtkOO3rjoKCV+w0ze3yhgXdyDslPGjSK+hqy3z/9lHr38=
+	t=1735944284; cv=none; b=ZX5uwDbNMhEyqMCA0fMJ30Aq7YzBC4tcWaeUWxveaJAT1PlOlPvyj4OSCKrTIqOj8ReTTxMA2e0oa4MQ9ZdR4SRIMy7aOCeP9KgRUSrnahUdG0PXB8F162jSikqELQ6YdEznXmw2I0W3HQWuR4UutAlqsfZwxoB601WIky+8OhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735943151; c=relaxed/simple;
-	bh=nTYfNGUXwYm8UtySRXGdzrXLBE6xU82oBDsk7x+HUpg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kNlxwB1vfjuF64ss4R9oa57b1/FEmMk0LBRLdTh5k5FX5RK+Nl5Lc8IU8b6u+BRqR33q1iE7bKz3TZRCr5ouQ+NVYCRenSPttx6tLVzALQuVKRCq+Dx9qsksYh0cNvQFYcDPHGdMnh5dfOr8/gkzwcy9nkWsXM2aLP5PLhoeHfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hg8poIm0; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6c9730b3-b35d-47d9-9cd6-ec2e05e4e8e5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1735943146;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ysrMqZaaTuXeA/dUUuop2a52EXcx5SGD0Nmx8mj9xM4=;
-	b=Hg8poIm0FcFETGwdAOjbk8KCkQxfmctTvsDugO+xD1oNWjfeJLBGxKNH+T/qTiHOdqcH50
-	JNhQCV0y/zMAkpuX2zyjuJbfRAKQZ9BfOlCgdxdWhARVNRdv27G2JELLwBGs6/Nr+7E+ZA
-	xp0Qw+kzHTBZ7cpA9JgzJhU/MrTRHTc=
-Date: Fri, 3 Jan 2025 22:25:44 +0000
+	s=arc-20240116; t=1735944284; c=relaxed/simple;
+	bh=Xdysxq/qIhjODGb3TuHPJY4Gse8uDrwMLaUZT+6yl1s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T+O942Xwy0lCJJ/71lPtKHcrqtL72jxf0VHuKftgNuJH1XKlUAHTzkqDJK35YI3E9hAg6cvHxCN2BR31clKyFWx68vEUbgfJxShTLQ4qtJD+0NQK1OYnN0+TqqMfqxDqqSZlPwcSHLk5bxiFZkjqHo73TwZ9WmfiF8HrCJHFd9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HgTT/mlk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TYb4EVw66eFgqXF6Tn680xcobIKnl8hXMw/P0sf476w=; b=HgTT/mlkcWu/bQBF4yf7rsUfoK
+	IX+2MRAxuIKjglLa4YemYOixyNP0wDA+AuG5/tM1LkOOWNFJYB4AZYWDcG45px3K2SQe/8Ozo1/I7
+	CXw1JXfrK/sbJZxVjXRYAmaGia4iuUXKzqWy2IhOsqEaLUIC2E50Q6q4aQAUMnQ8r/2o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tTqOn-001AB3-BZ; Fri, 03 Jan 2025 23:44:09 +0100
+Date: Fri, 3 Jan 2025 23:44:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 3/6] net: pcs: mtk-lynxi: fill in PCS
+ supported_interfaces
+Message-ID: <86d264c5-73fb-45ee-ad11-4a2517a12cfa@lunn.ch>
+References: <Z3fG9oTY9F9fCYHv@shell.armlinux.org.uk>
+ <E1tTffV-007RoP-8D@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net/mlx5: use do_aux_work for PHC overflow
- checks
-To: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>
-Cc: Carolina Jubran <cjubran@nvidia.com>, Bar Shapira <bshapira@nvidia.com>,
- netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Dragos Tatulea
- <dtatulea@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
- Gal Pressman <gal@nvidia.com>
-References: <20241217195738.743391-1-vadfed@meta.com>
- <D6IAG0OM4BCI.1SCL62SCI2UAY@nvidia.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <D6IAG0OM4BCI.1SCL62SCI2UAY@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tTffV-007RoP-8D@rmk-PC.armlinux.org.uk>
 
-On 22/12/2024 14:10, Dragos Tatulea wrote:
-> On Tue Dec 17, 2024 at 8:57 PM CET, Vadim Fedorenko wrote:
->> The overflow_work is using system wq to do overflow checks and updates
->> for PHC device timecounter, which might be overhelmed by other tasks.
->> But there is dedicated kthread in PTP subsystem designed for such
->> things. This patch changes the work queue to proper align with PTP
->> subsystem and to avoid overloading system work queue.
->> The adjfine() function acts the same way as overflow check worker,
->> we can postpone ptp aux worker till the next overflow period after
->> adjfine() was called.
->>
->> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
->> ---
->>   .../ethernet/mellanox/mlx5/core/lib/clock.c   | 25 +++++++++++--------
->>   include/linux/mlx5/driver.h                   |  1 -
->>   2 files changed, 14 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
->> index 4822d01123b4..ff3780331273 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
->> @@ -322,17 +322,16 @@ static void mlx5_pps_out(struct work_struct *work)
->>   	}
->>   }
->>   
->> -static void mlx5_timestamp_overflow(struct work_struct *work)
->> +static long mlx5_timestamp_overflow(struct ptp_clock_info *ptp_info)
->>   {
->> -	struct delayed_work *dwork = to_delayed_work(work);
->>   	struct mlx5_core_dev *mdev;
->>   	struct mlx5_timer *timer;
->>   	struct mlx5_clock *clock;
->>   	unsigned long flags;
->>   
->> -	timer = container_of(dwork, struct mlx5_timer, overflow_work);
->> -	clock = container_of(timer, struct mlx5_clock, timer);
->> +	clock = container_of(ptp_info, struct mlx5_clock, ptp_info);
->>   	mdev = container_of(clock, struct mlx5_core_dev, clock);
->> +	timer = &clock->timer;
->>   
->>   	if (mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR)
->>   		goto out;
->> @@ -343,7 +342,7 @@ static void mlx5_timestamp_overflow(struct work_struct *work)
->>   	write_sequnlock_irqrestore(&clock->lock, flags);
->>   
->>   out:
->> -	schedule_delayed_work(&timer->overflow_work, timer->overflow_period);
->> +	return timer->overflow_period;
->>   }
->>   
->>   static int mlx5_ptp_settime_real_time(struct mlx5_core_dev *mdev,
->> @@ -517,6 +516,7 @@ static int mlx5_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
->>   	timer->cycles.mult = mult;
->>   	mlx5_update_clock_info_page(mdev);
->>   	write_sequnlock_irqrestore(&clock->lock, flags);
->> +	ptp_schedule_worker(clock->ptp, timer->overflow_period);
->>   
->>   	return 0;
->>   }
->> @@ -852,6 +852,7 @@ static const struct ptp_clock_info mlx5_ptp_clock_info = {
->>   	.settime64	= mlx5_ptp_settime,
->>   	.enable		= NULL,
->>   	.verify		= NULL,
->> +	.do_aux_work	= mlx5_timestamp_overflow,
->>   };
->>   
->>   static int mlx5_query_mtpps_pin_mode(struct mlx5_core_dev *mdev, u8 pin,
->> @@ -1052,12 +1053,12 @@ static void mlx5_init_overflow_period(struct mlx5_clock *clock)
->>   	do_div(ns, NSEC_PER_SEC / HZ);
->>   	timer->overflow_period = ns;
->>   
->> -	INIT_DELAYED_WORK(&timer->overflow_work, mlx5_timestamp_overflow);
->> -	if (timer->overflow_period)
->> -		schedule_delayed_work(&timer->overflow_work, 0);
->> -	else
->> +	if (!timer->overflow_period) {
->> +		timer->overflow_period = HZ;
->>   		mlx5_core_warn(mdev,
->> -			       "invalid overflow period, overflow_work is not scheduled\n");
->> +			       "invalid overflow period,"
->> +			       "overflow_work is scheduled once per second\n");
->> +	}
->>   
->>   	if (clock_info)
->>   		clock_info->overflow_period = timer->overflow_period;
->> @@ -1172,6 +1173,9 @@ void mlx5_init_clock(struct mlx5_core_dev *mdev)
->>   
->>   	MLX5_NB_INIT(&clock->pps_nb, mlx5_pps_event, PPS_EVENT);
->>   	mlx5_eq_notifier_register(mdev, &clock->pps_nb);
->> +
->> +	if (clock->ptp)
->> +		ptp_schedule_worker(clock->ptp, 0);
->>   }
->>   
->>   void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
->> @@ -1188,7 +1192,6 @@ void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
->>   	}
->>   
->>   	cancel_work_sync(&clock->pps_info.out_work);
->> -	cancel_delayed_work_sync(&clock->timer.overflow_work);
->>   
->>   	if (mdev->clock_info) {
->>   		free_page((unsigned long)mdev->clock_info);
->> diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
->> index fc7e6153b73d..3ac2fc1b52cf 100644
->> --- a/include/linux/mlx5/driver.h
->> +++ b/include/linux/mlx5/driver.h
->> @@ -690,7 +690,6 @@ struct mlx5_timer {
->>   	struct timecounter         tc;
->>   	u32                        nominal_c_mult;
->>   	unsigned long              overflow_period;
->> -	struct delayed_work        overflow_work;
->>   };
->>   
->>   struct mlx5_clock {
+On Fri, Jan 03, 2025 at 11:16:41AM +0000, Russell King (Oracle) wrote:
+> Fill in the new PCS supported_interfaces member with the interfaces
+> that the Mediatek LynxI supports.
 > 
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Hi Saeed, Tariq, Leon!
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-We need explicit Ack-by from official mlx5 maintainer here to let this
-patch go directly to net-next. Could you please check it?
-
-Thanks,
-Vadim
-
+    Andrew
 
