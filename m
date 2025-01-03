@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-154876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B358BA002DF
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 03:50:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF9EA002E0
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 03:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A0277A0690
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 02:50:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 601AD1883F2C
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 02:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D25E193073;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC8619D06E;
 	Fri,  3 Jan 2025 02:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E0w75b79"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UwZvtXzi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEFFA47;
-	Fri,  3 Jan 2025 02:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70AD195B33
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 02:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735872618; cv=none; b=cYoDTSkrA07t4m9TNGi7TX6S55TlONVjPjZBFUqYvKzC/jSEJ4O/mGa5qWxfEl+842WpONmprrzSa8KONns6TDRA/yhvXdcqH8xWEEAVmcaAnH0P4noyM/NF3xTZ4ByXneRnm4icy4MT9aAD3enUMZ3rhrs9JTsFkpUKuDYjJHM=
+	t=1735872618; cv=none; b=o17TyzzhLjqc73E5ra8tMtW4idzhT3gfwsbzq30DnoI47TeeoaGoqA1IEE9LreBhmhpq1DDec9uuuJhx5/HK/GDBdL5eiDI6ujjxj20hsVwIclM18nNZcFwPbGaWDppFFj0GdMxUWYK1Z71mb6eu3osfyGbWYekdtiGuJ16yHUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735872618; c=relaxed/simple;
-	bh=EpqeTAKnKBOlOLZyIFj5hBNbt83/nCCAOatv4ujyfng=;
+	bh=DjLjn/zKZu7hr1ifxKsnSJub/2mXavze7SDS7JdqNEI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TLYnxtmM/lTxs++VMEGc9UZsCUC4vQvdreTG4G+Y2ohrx/hwfCLgt3NHd2pf535NDBO2JV/uRbD7T65cjCWxAEbLJ7NVCyHUkHIrO5BtD5Y47CcL67anNCK+v5ONq+BmxXWO8V5ogk6S0U/Rhade1WYA3qpxy3oD3K3O3Z7FkG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E0w75b79; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE674C4CED1;
-	Fri,  3 Jan 2025 02:50:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=FbIntBB52084aRtFIiEugHYKuESm9MwmAJ3z6sNQcGKyuvI7SeR2I1cQXa7GxRzB22+W4JdpStoCsnd/S2tD+clkkYal/rBAtnQ+Ee9xTuG2mgHjvhPq6dBjYlzJkPNEfR/ptcQUClJTvlsVLWyAAFNDlkTShoKdtfll9s6fm6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UwZvtXzi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4324FC4CED0;
+	Fri,  3 Jan 2025 02:50:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735872616;
-	bh=EpqeTAKnKBOlOLZyIFj5hBNbt83/nCCAOatv4ujyfng=;
+	s=k20201202; t=1735872618;
+	bh=DjLjn/zKZu7hr1ifxKsnSJub/2mXavze7SDS7JdqNEI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=E0w75b79oZwKxpVuSlqXSLRd9+K/Ve+GUgyLbvp67FHNPzc3dCokNgUxoPOSfOn0W
-	 iizP7CTjQSJAsVllsXxox09Gn/hiDetV+x964QG3j48eo4aYaUxgQSUdS2I2Eaw86H
-	 VYVDlxRqmCQwSG2ibPMgYpAPKzlDTYZKJRlCbAFxWG79bIfK1ADKx2fIQ2O09f6My+
-	 YIzxvd2hx/x8yK5JM+MwMviwhgvBwC0eOzKkVxDlFmn9ZfmjfOrWFwWCDScY2oiTFL
-	 AXA2HCTFU0Ay9tocHaNjlI5ZJqZ0OwyZ/6u9sAbqj4+jsFZeOspq/YQVG5XRBSE4Dj
-	 aNH9eCczlTbnA==
+	b=UwZvtXzivfC2z5vk/rm5MIcOm+5x1EYWMyUfC3cxUiBss09be4RJDYkBYy53j469Y
+	 hFS1c17WTQv3zDiXxrpF48AgoEQSkUN5b7T6hF2mFp3I9+tEyS53UVGbHYKFQJSokE
+	 cCclDxvVU3Wa3GyQqFwp5Mv1pwOcjv1p0QGjvBNBhLxsDgoLZZhpqAVhCeFv+JI94J
+	 IDd8VdttTFRbxhMJkGnc3iutP0mtsCmuCIkxDpesp0lrKqhJSc0PCv3i+MBByiML6s
+	 Mt8MFDcnyYf7AALOQ5zY/YYW6cO+P6q3I+0615CPhmf/go+B854zvgPhN4bz3vaXgS
+	 l/G+17Ug0KnAQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71D46380A964;
-	Fri,  3 Jan 2025 02:50:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB022380A964;
+	Fri,  3 Jan 2025 02:50:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] mptcp: rx path fixes
+Subject: Re: [PATCH net] af_packet: fix vlan_get_tci() vs MSG_PEEK
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173587263701.2091902.3534187243855965377.git-patchwork-notify@kernel.org>
-Date: Fri, 03 Jan 2025 02:50:37 +0000
-References: <20241230-net-mptcp-rbuf-fixes-v1-0-8608af434ceb@kernel.org>
-In-Reply-To: <20241230-net-mptcp-rbuf-fixes-v1-0-8608af434ceb@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+ <173587263851.2091902.4288494842181064874.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Jan 2025 02:50:38 +0000
+References: <20241230161004.2681892-1-edumazet@google.com>
+In-Reply-To: <20241230161004.2681892-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, horms@kernel.org, willemb@google.com,
+ eric.dumazet@gmail.com,
+ syzbot+8400677f3fd43f37d3bc@syzkaller.appspotmail.com,
+ chengen.du@canonical.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 30 Dec 2024 19:12:29 +0100 you wrote:
-> Here are 3 different fixes, all related to the MPTCP receive buffer:
+On Mon, 30 Dec 2024 16:10:03 +0000 you wrote:
+> Blamed commit forgot MSG_PEEK case, allowing a crash [1] as found
+> by syzbot.
 > 
-> - Patch 1: fix receive buffer space when recvmsg() blocks after
->   receiving some data. For a fix introduced in v6.12, backported to
->   v6.1.
+> Rework vlan_get_tci() to not touch skb at all,
+> so that it can be used from many cpus on the same skb.
 > 
-> - Patch 2: mptcp_cleanup_rbuf() can be called when no data has been
->   copied. For 5.11.
+> Add a const qualifier to skb argument.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] mptcp: fix recvbuffer adjust on sleeping rcvmsg
-    https://git.kernel.org/netdev/net/c/449e6912a252
-  - [net,2/3] mptcp: don't always assume copied data in mptcp_cleanup_rbuf()
-    https://git.kernel.org/netdev/net/c/551844f26da2
-  - [net,3/3] mptcp: prevent excessive coalescing on receive
-    https://git.kernel.org/netdev/net/c/56b824eb49d6
+  - [net] af_packet: fix vlan_get_tci() vs MSG_PEEK
+    https://git.kernel.org/netdev/net/c/77ee7a6d16b6
 
 You are awesome, thank you!
 -- 
