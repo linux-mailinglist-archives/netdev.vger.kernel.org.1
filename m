@@ -1,90 +1,79 @@
-Return-Path: <netdev+bounces-155103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FFFDA01052
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 23:45:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF44BA010E7
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 00:21:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ED981620D3
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:45:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66ACC162799
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 23:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E871C2DC8;
-	Fri,  3 Jan 2025 22:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1FC81B0F15;
+	Fri,  3 Jan 2025 23:21:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0iXk5yj/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o0kVc4D8"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F681B3955
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 22:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A88226AD0;
+	Fri,  3 Jan 2025 23:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735944331; cv=none; b=Qe4yLiT/v58B/yx9EPBlYN9oAu7rR7EVk0qlGW9i++qp/eUJkCpvCFXjLvs8N6bRBZOt3b8gDGtvdmM62pcaN9MFJF70aUdGER2CsRRS5nmIzn8gslPjXgLr3ICdUl8Dr8ppYSXuoKYuQ5tMcedhouCiYAXAjYO9KItraxSeq0o=
+	t=1735946514; cv=none; b=lSw8ebzNMNBHgaw9gXFqeFnnphKvfVeQ0zqIT2yJXSd6gdov1kyzYpnXhWFdFUx8odvMyihMDA/6SWubw+wji5scbLkfEYLb7mMqfWXkijFJVxX6dn3ybSqJjpMGLaJr71LNOmQbqZwYRLVr7uzVorsZjrzmlfAv4kjTMmG1lcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735944331; c=relaxed/simple;
-	bh=4Zx7cRkju1Qj2OburovcA27OIFyDm8aP+xix7/RaDuA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ze4YS6zAFCZxVJ27q5SKZB97TEasztqh6o/4TJU6EWfkbdNgPfg836x8zHXW39ogj9A0JcKAHL7tUAubB0db52XkY4xtXCdMGIuYjR7bLIheaAWpR1d1BhDD6HUEEuNdBfIf4p0wicEPafW9TYOmOBCtB4LavIv5cPVCYlZvVis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0iXk5yj/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nC4xRGziK9g9aVt6fSkQ1/i2c6tieWGRAMPkl5BbmQQ=; b=0iXk5yj/N9X5BChmvUoExXBHij
-	7nlr0oqp4aoFuCc+m92c6aDBPqBR+DgPwhvjnQ1puqPVQEKkXm4wSVtk1dCvzFbqzruEPpdAq8KWS
-	+qjTPN9RIeiX8PG/phNYYSfA2HV+zWM5PiBQR5Z56DNS63bGI5dxUTERm9+Bj48OW+MQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tTqPn-001ACo-P8; Fri, 03 Jan 2025 23:45:11 +0100
-Date: Fri, 3 Jan 2025 23:45:11 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 6/6] net: pcs: xpcs: make xpcs_get_interfaces()
- static
-Message-ID: <7da95b85-f16e-4082-ae6b-12da27875750@lunn.ch>
-References: <Z3fG9oTY9F9fCYHv@shell.armlinux.org.uk>
- <E1tTffk-007Roi-JM@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1735946514; c=relaxed/simple;
+	bh=b9+XYSrMoLOUXJ5COkIwXeIovbR3q3601rmFAulbRn8=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=FuLKK0Bsch27Cdry1CQ/qFbOsM4nne2cMz1VZPWUwhvguu82kS5VbK2gVcqYw9TzHlTpmtMCQr3TrgetGGzVfS48AUtnyyIaYTnASwgZK0Z6K6Wzo8tM+Xk0u27LZFTHBV8AmwmZVoO+ShXIR5kRCyN/jsYeCqkp0zM/JGomh70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o0kVc4D8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 572A5C4CEDD;
+	Fri,  3 Jan 2025 23:21:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735946514;
+	bh=b9+XYSrMoLOUXJ5COkIwXeIovbR3q3601rmFAulbRn8=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=o0kVc4D8KQWydZulfaHuq3GxgEjFXKYmAUqIifpIW/l+MXH6QmqGvu6KpQ4kFLsj2
+	 s86GOjux2UgbjgOHUubfaPfTglz42Gl82BofdTyauBSdRQyv0GJxU6i5J47u0BjVi7
+	 RzQVBPBMWXGXHla8ZrU4yuHIgQcxkw9gk8JyIzZl+m8PlDtYomvI0ocrhWYkuArYBC
+	 gpopcvCNf2cm1dOy5kmDdxGiOM0gdfk4BlDIz64YJa5BJEawsZFhNuG5JfnhHsFj4I
+	 uBD85tpImw0ailcL7fnd5TLWf6ugcpGavmSmGTT3ypQQnZ+bMAOy2wNvNxnsr2izXz
+	 sK4nmXdlFmwxQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FFA380A974;
+	Fri,  3 Jan 2025 23:22:16 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.13-rc6
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250103171551.2999961-1-kuba@kernel.org>
+References: <20250103171551.2999961-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250103171551.2999961-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc6
+X-PR-Tracked-Commit-Id: ce21419b55d8671b886ae780ef15734843a6f668
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: aba74e639f8d76d29b94991615e33319d7371b63
+Message-Id: <173594653472.2324745.11678348684162817308.pr-tracker-bot@kernel.org>
+Date: Fri, 03 Jan 2025 23:22:14 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tTffk-007Roi-JM@rmk-PC.armlinux.org.uk>
 
-On Fri, Jan 03, 2025 at 11:16:56AM +0000, Russell King (Oracle) wrote:
-> xpcs_get_interfaces() should no longer be used outside of the XPCS
-> code, so make it static.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+The pull request you sent on Fri,  3 Jan 2025 09:15:51 -0800:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc6
 
-    Andrew
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/aba74e639f8d76d29b94991615e33319d7371b63
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
