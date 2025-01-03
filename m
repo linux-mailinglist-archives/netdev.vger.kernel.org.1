@@ -1,52 +1,73 @@
-Return-Path: <netdev+bounces-154980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B3F3A008C8
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:41:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68523A008CA
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF0D41884B41
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:41:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3623716211C
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F121D61AC;
-	Fri,  3 Jan 2025 11:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBB31F941B;
+	Fri,  3 Jan 2025 11:41:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CC11BEF85;
-	Fri,  3 Jan 2025 11:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CBD31B87F3
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 11:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735904470; cv=none; b=hQVVBEgaQaaH3aHcAhOIYL6rDaAPJda69ziUwKJTO+HPVD5q/BzhGIk53xMo9z9SUaV4Z3/zEmhw0Orc+uY4kWrrs6GPhX376Y/Xzv3lc16O3NhtgropVnSIA7+l/2Fcn+aBSghW9x6QAn/AB5xsA5N1cBMDkt38l0EzbgqyZqg=
+	t=1735904487; cv=none; b=OeU5WAJ7hmSJLh546dicHhCUj44r8E3optKVTA6B25D0yfpVna8zT9O7rte5H8blouMg7P1MMoF+f1DYVW/TweJdYA+HsVT9aZl4TUMGs9zDWuqV7hS/502ElNoEXlbxbrdjyyf38OX6XNYAtxXhl/zi9ucVUri7CX3NWQtdxck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735904470; c=relaxed/simple;
-	bh=r0+bPk+18OLFPNZOyzIFvNO34XF2I50Yma4ohzN75aA=;
+	s=arc-20240116; t=1735904487; c=relaxed/simple;
+	bh=tbHx2sZ9HwC4VuBmxauxzHxHl87uINyCB2nyxHLw8FI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XQ7b1eJK7bZQ9YSsxpQywN2RFgvxZqGwAKue68Zv98PR+/0YET7m3bQDgaeBKwuvGdQrJF9yE/jtxzkL4AW8SmdXh0r6vsixyTZi9hWrZoBdJB9mmyyBzWt84Yj0cqOU5xmGlPHqibiZApr2ghLcd0GbmVftHuXFGoI/3UVu08Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1tTg36-000000005et-3d5p;
-	Fri, 03 Jan 2025 11:41:04 +0000
-Date: Fri, 3 Jan 2025 11:40:52 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Stanislaw Gruszka <stf_xl@wp.pl>
-Cc: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	Kalle Valo <kvalo@kernel.org>,
-	Tomislav =?utf-8?Q?Po=C5=BEega?= <pozega.tomislav@gmail.com>
-Subject: Re: [PATCH 1/2] rt2x00: Remove unusued value
-Message-ID: <Z3fMxD2mAVsVl58h@pidgin.makrotopia.org>
-References: <20241221124445.1094460-1-ariel.otilibili-anieli@eurecom.fr>
- <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
- <20250103085540.GA94204@wp.pl>
+	 Content-Type:Content-Disposition:In-Reply-To; b=U6jTWrWBtgPoKgk2cgHhU1OOagJrf7bDI17RMW2WNPFLyyAPVlxRwnzFmMtYwLDVz2LCyrek0BUmgsW1z8+BJgMDQGMcNDmUfFHvA5Fhz4Oz50gBRDg0t6as+SoTF3OGkqHsKe4sAfqDPY3rWlwV1rnTLHialopFOZPpV4QsqsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d7e527becaso20131286a12.3
+        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 03:41:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735904480; x=1736509280;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TipG4wrwzpQ5zjZebGL+fg83+D4HToB3QQ5DA7PZrr8=;
+        b=YPgERaZX7P96MWCBIxhuzV+CWgloB0L9S/YxXuvhDwINpjborZBOIBIbGwkI55DZuu
+         z6oJAMpk/+MeIWOT0yqy5JnsamOSPWZaqYUooS1jxY0RYVNrylimhM4ui4q0RLSdlBYP
+         +FuiqtPDp439aiHVv3oKrD1QCwjHA0u4fMVx72POYTBAJ3TRlPdzf96eMgc2BJP1/NDG
+         uug8mgLQ7mBrtiY7EMIhBAJzEZixypX2sQL7YqMh5PyM4LJ/Y4ZNWL1uxvxoPtaE3Ogz
+         T5o3WrREWZBt0K9fwOh6T5fmWjscuvQxcMMWMqhFVvS883eU5zwiwwUNOaNnv6Mvt9GA
+         hU9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUSZcJ3K7KUq69mmBFUjHCyh67mV47n2II+6PsZ/Uw6Jk53U6Td3lQdDgbmCz1p7xeT7pmnoVc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy496V5VcJ4TdxK5TBMZUN0D/5cBO0ODTAbIzO52Qwcmnpsn9oA
+	Csj/uOfKutpCKzNiQnnguZcZwbNuQx2NvNXEqp/d4wp9tTdoR7Bq
+X-Gm-Gg: ASbGncuK9KeZTHduZdUedOABODpSzzsdgqwTJyBfBOCPu71FYpocojVcHVk1pLTN4gD
+	dLdyq7oJyCkGrZ55DmYq9hSPjiUd9wagJfHLENsNm14+5Q6YRQETmbznrysz7psq1D+Go5DghJc
+	d29/9wQT/lUiB6O0zf2sTqAUGQGSKpkbpNrovg3sKV0xBLiHd337RLhkHG3g4WI+MKQp0l+Qv1Z
+	ueXfuNy7jdEO9aBOffTyv+j7DUtsly39o9D5hpC1fqWiXU=
+X-Google-Smtp-Source: AGHT+IF1S2f5vFfMZdpiAdJ/JCNUPkTXnMlVxIuzIygCfUfwXXbrV8S9HCFakqvLIHnrsPdsG7FV7w==
+X-Received: by 2002:a50:cc48:0:b0:5d3:cf89:bd3e with SMTP id 4fb4d7f45d1cf-5d81de1c92cmr92960385a12.30.1735904480035;
+        Fri, 03 Jan 2025 03:41:20 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e894b60sm1914772666b.68.2025.01.03.03.41.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jan 2025 03:41:19 -0800 (PST)
+Date: Fri, 3 Jan 2025 03:41:17 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH] netconsole: allow selection of egress interface via MAC
+ address
+Message-ID: <20250103-loutish-heavy-caracal-1dfb5d@leitao>
+References: <20241211021851.1442842-1-ushankar@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,72 +76,159 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250103085540.GA94204@wp.pl>
+In-Reply-To: <20241211021851.1442842-1-ushankar@purestorage.com>
 
-On Fri, Jan 03, 2025 at 09:55:40AM +0100, Stanislaw Gruszka wrote:
-> On Sat, Dec 21, 2024 at 01:39:32PM +0100, Ariel Otilibili wrote:
-> > Coverity-ID: 1525307
-> > Signed-off-by: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
-> > ---
-> >  drivers/net/wireless/ralink/rt2x00/rt2800lib.c | 6 ------
-> >  1 file changed, 6 deletions(-)
-> > 
-> > diff --git a/drivers/net/wireless/ralink/rt2x00/rt2800lib.c b/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
-> > index 60c2a12e9d5e..e5f553a1ea24 100644
-> > --- a/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
-> > +++ b/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
-> > @@ -8882,13 +8882,10 @@ static void rt2800_rxiq_calibration(struct rt2x00_dev *rt2x00dev)
-> >  
-> >  	for (ch_idx = 0; ch_idx < 2; ch_idx = ch_idx + 1) {
-> >  		if (ch_idx == 0) {
-> > -			rfval = rfb0r1 & (~0x3);
-> >  			rfval = rfb0r1 | 0x1;
-> 
-> I wonder if intention here was different, for example:
-> 
->  			rfval = rfb0r1 & (~0x3);
->   			rfval = rfval | 0x1;
-> 
-> For me the patch looks ok - it does not change existing behaviour,
-> since rfval is overwritten by second line anyway.
+Hello Uday,
 
-I agree with the likely intention here, however, the vendor driver
-also comes with the dead code, see
-https://github.com/lixuande/rt2860v2/blob/master/files/rt2860v2/common/cmm_rf_cal.c#L2690
+On Tue, Dec 10, 2024 at 07:18:52PM -0700, Uday Shankar wrote:
+> Currently, netconsole has two methods of configuration - kernel command
+> line parameter and configfs. The former interface allows for netconsole
+> activation earlier during boot, so it is preferred for debugging issues
+> which arise before userspace is up/the configfs interface can be used.
+> The kernel command line parameter syntax requires specifying the egress
+> interface name. This requirement makes it hard to use for a couple
+> reasons:
+> - The egress interface name can be hard or impossible to predict. For
+>   example, installing a new network card in a system can change the
+>   interface names assigned by the kernel.
+> - When constructing the kernel parameter, one may have trouble
+>   determining the original (kernel-assigned) name of the interface
+>   (which is the name that should be given to netconsole) if some stable
+>   interface naming scheme is in effect. A human can usually look at
+>   kernel logs to determine the original name, but this is very painful
+>   if automation is constructing the parameter.
 
-So this is certainly a bug in the vendor driver as well which got ported
-bug-by-bug to rt2x00... Not sure what is the best thing to do in this
-case.
+Agree, and I think this might be a real problem. Thanks for addressing it.
 
-> 
-> Acked-by: Stanislaw Gruszka <stf_xl@wp.pl>
-> 
-> But Tomislav and Daniel, please check if this code is correct.
-> 
-> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 1, rfval);
-> > -			rfval = rfb0r2 & (~0x33);
-> >  			rfval = rfb0r2 | 0x11;
-> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 2, rfval);
-> > -			rfval = rfb0r42 & (~0x50);
-> >  			rfval = rfb0r42 | 0x10;
-> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 42, rfval);
-> >  
-> > @@ -8901,13 +8898,10 @@ static void rt2800_rxiq_calibration(struct rt2x00_dev *rt2x00dev)
-> >  
-> >  			rt2800_bbp_dcoc_write(rt2x00dev, 1, 0x00);
-> >  		} else {
-> > -			rfval = rfb0r1 & (~0x3);
-> >  			rfval = rfb0r1 | 0x2;
-> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 1, rfval);
-> > -			rfval = rfb0r2 & (~0x33);
-> >  			rfval = rfb0r2 | 0x22;
-> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 2, rfval);
-> > -			rfval = rfb0r42 & (~0x50);
-> >  			rfval = rfb0r42 | 0x40;
-> >  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 42, rfval);
-> >  
-> > -- 
-> > 2.47.1
-> > 
-> 
+> For these reasons, allow selection of the egress interface via MAC
+> address. To maintain parity between interfaces, the local_mac entry in
+> configfs is also made read-write and can be used to select the local
+> interface, though this use case is less interesting than the one
+> highlighted above.
+
+This will change slightly local_mac meaning. At the same time, I am not
+sure local_mac is a very useful field as-is. The configuration might be
+a bit confusing using `local_mac` to define the target interface. I am
+wondering if creating a new field might be more appropriate. Maybe
+`dev_mac`? (I am not super confident this approach is better TBH, but, it
+seems easier to reason about).
+
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index 4ea44a2f48f7..865c43a97f70 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+
+> @@ -211,6 +211,8 @@ static struct netconsole_target *alloc_and_init(void)
+> +	/* the "don't use" or N/A value for this field */
+
+This comment is not very clear. What do you mean exactly?
+
+> +	eth_broadcast_addr(nt->np.local_mac);
+
+Why not just memzeroing the memory?
+
+> diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+> index 2e459b9d88eb..485093387b9f 100644
+> --- a/net/core/netpoll.c
+> +++ b/net/core/netpoll.c
+> @@ -501,7 +501,8 @@ void netpoll_print_options(struct netpoll *np)
+>  		np_info(np, "local IPv6 address %pI6c\n", &np->local_ip.in6);
+>  	else
+>  		np_info(np, "local IPv4 address %pI4\n", &np->local_ip.ip);
+> -	np_info(np, "interface '%s'\n", np->dev_name);
+> +	np_info(np, "interface name '%s'\n", np->dev_name);
+> +	np_info(np, "local ethernet address '%pM'\n", np->local_mac);
+>  	np_info(np, "remote port %d\n", np->remote_port);
+>  	if (np->ipv6)
+>  		np_info(np, "remote IPv6 address %pI6c\n", &np->remote_ip.in6);
+> @@ -570,11 +571,20 @@ int netpoll_parse_options(struct netpoll *np, char *opt)
+>  	cur++;
+>  
+>  	if (*cur != ',') {
+> -		/* parse out dev name */
+> +		/* parse out dev_name or local_mac */
+>  		if ((delim = strchr(cur, ',')) == NULL)
+>  			goto parse_failed;
+>  		*delim = 0;
+> -		strscpy(np->dev_name, cur, sizeof(np->dev_name));
+
+nit: You can reset np->dev_name and np->dev_name and just overwrite one of
+them depending on what was set. Something as:
+
+	eth_broadcast_addr(np->local_mac);
+	np->dev_name[0] = '\0';
+
+	if (!strchr(cur, ':'))
+		strscpy(np->dev_name, cur, sizeof(np->dev_name));
+	else {
+		if (!mac_pton(cur, np->local_mac))
+			goto parse_failed.
+
+
+> +		if (!strchr(cur, ':')) {
+> +			strscpy(np->dev_name, cur, sizeof(np->dev_name));
+> +			eth_broadcast_addr(np->local_mac);
+> +		} else {
+> +			if (!mac_pton(cur, np->local_mac)) {
+> +				goto parse_failed;
+> +			}
+> +			/* force use of local_mac for device lookup */
+> +			np->dev_name[0] = '\0';
+> +		}
+>  		cur = delim;
+
+> @@ -674,29 +685,46 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+>  }
+>  EXPORT_SYMBOL_GPL(__netpoll_setup);
+>  
+> +/* upper bound on length of %pM output */
+> +#define MAX_MAC_ADDR_LEN (4 * ETH_ALEN)
+> +
+> +static char *local_dev(struct netpoll *np, char *buf)
+> +{
+> +	if (np->dev_name[0]) {
+> +		return np->dev_name;
+
+nit: You don't need the {} here.
+
+> +	}
+> +
+> +	snprintf(buf, MAX_MAC_ADDR_LEN, "%pM", np->local_mac);
+> +	return buf;
+> +}
+> +
+>  int netpoll_setup(struct netpoll *np)
+>  {
+>  	struct net_device *ndev = NULL;
+>  	bool ip_overwritten = false;
+>  	struct in_device *in_dev;
+>  	int err;
+> +	char buf[MAX_MAC_ADDR_LEN];
+
+nit: keep the revert XMAS tree format here. Also renaming it to
+local_dev_mac or something similar might be a good idea.
+
+>  	skb_queue_head_init(&np->skb_pool);
+>  
+>  	rtnl_lock();
+> +	struct net *net = current->nsproxy->net_ns;
+
+Does this need to be done inside the rtnl lock? I tried to search, and
+it seems you can get it outside of the lock.
+
+nit: You can move declaration of `*net` to the top of the function.
+
+>  	if (np->dev_name[0]) {
+> -		struct net *net = current->nsproxy->net_ns;
+>  		ndev = __dev_get_by_name(net, np->dev_name);
+> +	} else if (is_valid_ether_addr(np->local_mac)) {
+> +		ndev = dev_getbyhwaddr_rcu(net, ARPHRD_ETHER, np->local_mac);
+>  	}
+
+nit: You can get rid of all braces above.
+
+I haven't run the code yet, but, I will be doing it new week.
+
+Thanks for addressing this limitation,
+--breno
 
