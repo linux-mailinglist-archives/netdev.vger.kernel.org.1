@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-155066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB399A00E2B
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 20:00:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52145A00E2C
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 20:00:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 381817A02FA
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:00:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E06957A07E5
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E19D1FCFC5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6484E1FCFCE;
 	Fri,  3 Jan 2025 19:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RrUZ2hbv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e6ipKp5O"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2930D1FCF7D
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 19:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E191FC7DF
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 19:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735930802; cv=none; b=Z8Db6blLwlWB7wvBzn+FGt/k1xqeqHzK5s5dlW6R8AcEiXvbJWY7gtSzavhscEkYxxCzEbOB3HACmEmkiRztUqHrCjz3OKO901+7D6GzvR4r+xuwxb4Wbp7N0iumNSUJMG0IlmsRi6kGVzArL8EDB2Di2OzL/ff6BlE6e7oJEq8=
+	t=1735930802; cv=none; b=qYphnkQoSYTaJj1ZsB2ehKAppHOTJYBdBX26cVJECkDROvDAahulqHKPpGc4dbZcS5+f8bOU9AFMd0mD3pRIgi/5AtxEc18uvfkYzV8C9NRkhccE7QnShHb91c5uWjG37CTPe99OsRPxYTk3OW0ddudytvNGZyLXt5EO7g8Sok4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735930802; c=relaxed/simple;
-	bh=GB8er5N5aTfpvBvUiPDisLOcyXBV9UmnYw5M58Mqxm8=;
+	bh=WAw6OslHeff7CgXJrV3yhDAtX/gjSDBfWLnZ5jRR0No=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FpRhtaKYwKtAVn3l2xl5gZMtZ77Cy/znJV8S0QwhQ3dw7r79WOU3/w3uJdF3WcKuP7G1BsG3xyjHN7SxMV+Z/yLwCPwb9R/ROke+DiUtCowaCNlt91eeTnOZA1SdDo1WWfHagWl1p1pGWNBCUMz3l6LzMMLb7qiPjEd6XguwugY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RrUZ2hbv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 700C8C4CED2;
+	 MIME-Version; b=Dv3TJAPRxELLpD8kpUlPDi7K4BTVx7O6Ur3EFE/WCIRI47bSN9z1DjGtYJb7IWuopDzu6MV5pPG1QO2UsqEwRPzd5+rRZFe7LChlokjhrsjG9W8vp35IXiwlz/WzpsILv4DHYU1YOBHM4fv+lHuOqMXIBOo1ydbXrcWouw/joLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e6ipKp5O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D01C7C4CEDF;
 	Fri,  3 Jan 2025 19:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735930801;
-	bh=GB8er5N5aTfpvBvUiPDisLOcyXBV9UmnYw5M58Mqxm8=;
+	s=k20201202; t=1735930802;
+	bh=WAw6OslHeff7CgXJrV3yhDAtX/gjSDBfWLnZ5jRR0No=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RrUZ2hbvd4FKwJZhecauxtaR54xSD8HBB4RrBhNfXFeKBMl5StYOvSB/uvvZ+VwIT
-	 FpTGXbuHwb5T909aKcLWkGlEn/OKy8ahX1VQEHqrvwciXzMfk/8OIfTBltX3mvaYRT
-	 AKJrihzXeUMM5rCNG+wfwzFvXZg/ofdxHvXzvSd39KNkUlhqg5qRvehFKcWQmM+F92
-	 PtWGS/k7owFF+iXdcnvmcmHqV60zor4c5Tkq/0O0MHpvLJ5ZYj+wX6CkWqeM+NTUvY
-	 2/9SbxsUXW4hP0ehOsfYJanKkQSZtb0QWmxt8diqIqiJr1RcOrIkOKJjeZyiNpReLl
-	 bUl9G4vmGpK4w==
+	b=e6ipKp5OuVBXVz/GV8cIaKd0BbRrAUgPgQeGLl8X8goZD8aMFdQ6kbZLzxa4hM2Bn
+	 3q1tVvQR8Y8Gt99Wuf9nHw1jeP2qCI4tJmbRAN+v+rqZiMO96JF7tLNsNF31BoYq0x
+	 fyZ3ul1IB487yy1OEPSChTrRwzBp8D7e+HXiSSH1BbPnbB/nYQX8cJzl4Bm4sOMpwr
+	 P5q2gMLITTe/duRwrAVOrBy/0wkdMsonOEDbVpjDodhXIV+1eOHdfc6kwEdUqL70v0
+	 FPadY065pNSj5xVwDuu1gNbwfhQbJ32DgBwXCkkOyB67s/UQMyyCxk5TzmAqJXN7qd
+	 FekKWhLsS2PDQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	almasrymina@google.com,
 	jdamato@fastly.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 6/8] netdevsim: add queue management API support
-Date: Fri,  3 Jan 2025 10:59:51 -0800
-Message-ID: <20250103185954.1236510-7-kuba@kernel.org>
+Subject: [PATCH net-next 7/8] netdevsim: add debugfs-triggered queue reset
+Date: Fri,  3 Jan 2025 10:59:52 -0800
+Message-ID: <20250103185954.1236510-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250103185954.1236510-1-kuba@kernel.org>
 References: <20250103185954.1236510-1-kuba@kernel.org>
@@ -64,204 +64,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add queue management API support. We need a way to reset queues
-to test NAPI reordering, the queue management API provides a
-handy scaffolding for that.
+Support triggering queue reset via debugfs for an upcoming test.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/netdevsim/netdev.c    | 135 +++++++++++++++++++++++++++---
- drivers/net/netdevsim/netdevsim.h |   2 +
- 2 files changed, 125 insertions(+), 12 deletions(-)
+ drivers/net/netdevsim/netdev.c    | 55 +++++++++++++++++++++++++++++++
+ drivers/net/netdevsim/netdevsim.h |  1 +
+ 2 files changed, 56 insertions(+)
 
 diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index e1bd3c1563b7..86614292314a 100644
+index 86614292314a..65605d2eb943 100644
 --- a/drivers/net/netdevsim/netdev.c
 +++ b/drivers/net/netdevsim/netdev.c
-@@ -359,25 +359,24 @@ static int nsim_poll(struct napi_struct *napi, int budget)
- 	return done;
- }
+@@ -20,6 +20,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/slab.h>
+ #include <net/netdev_queues.h>
++#include <net/netdev_rx_queue.h>
+ #include <net/page_pool/helpers.h>
+ #include <net/netlink.h>
+ #include <net/net_shaper.h>
+@@ -29,6 +30,8 @@
  
--static int nsim_create_page_pool(struct nsim_rq *rq)
-+static int nsim_create_page_pool(struct page_pool **p, struct napi_struct *napi)
- {
--	struct page_pool_params p = {
-+	struct page_pool_params params = {
- 		.order = 0,
- 		.pool_size = NSIM_RING_SIZE,
- 		.nid = NUMA_NO_NODE,
--		.dev = &rq->napi.dev->dev,
--		.napi = &rq->napi,
-+		.dev = &napi->dev->dev,
-+		.napi = napi,
- 		.dma_dir = DMA_BIDIRECTIONAL,
--		.netdev = rq->napi.dev,
-+		.netdev = napi->dev,
- 	};
-+	struct page_pool *pool;
+ #include "netdevsim.h"
  
--	rq->page_pool = page_pool_create(&p);
--	if (IS_ERR(rq->page_pool)) {
--		int err = PTR_ERR(rq->page_pool);
-+	pool = page_pool_create(&params);
-+	if (IS_ERR(pool))
-+		return PTR_ERR(pool);
- 
--		rq->page_pool = NULL;
--		return err;
--	}
-+	*p = pool;
- 	return 0;
- }
- 
-@@ -396,7 +395,7 @@ static int nsim_init_napi(struct netdevsim *ns)
- 	for (i = 0; i < dev->num_rx_queues; i++) {
- 		rq = ns->rq[i];
- 
--		err = nsim_create_page_pool(rq);
-+		err = nsim_create_page_pool(&rq->page_pool, &rq->napi);
- 		if (err)
- 			goto err_pp_destroy;
- 	}
-@@ -613,6 +612,117 @@ static void nsim_queue_free(struct nsim_rq *rq)
- 	kfree(rq);
- }
- 
-+/* Queue reset mode is controled by ns->rq_reset_mode.
-+ * - normal - new NAPI new pool (old NAPI enabled when new added)
-+ * - mode 1 - allocate new pool (NAPI is only disabled / enabled)
-+ * - mode 2 - new NAPI new pool (old NAPI removed before new added)
-+ * - mode 3 - new NAPI new pool (old NAPI disabled when new added)
-+ */
-+struct nsim_queue_mem {
-+	struct nsim_rq *rq;
-+	struct page_pool *pp;
-+};
++MODULE_IMPORT_NS("NETDEV_INTERNAL");
 +
-+static int
-+nsim_queue_mem_alloc(struct net_device *dev, void *per_queue_mem, int idx)
+ #define NSIM_RING_SIZE		256
+ 
+ static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
+@@ -723,6 +726,54 @@ static const struct netdev_queue_mgmt_ops nsim_queue_mgmt_ops = {
+ 	.ndo_queue_stop		= nsim_queue_stop,
+ };
+ 
++static ssize_t
++nsim_qreset_write(struct file *file, const char __user *data,
++		  size_t count, loff_t *ppos)
 +{
-+	struct nsim_queue_mem *qmem = per_queue_mem;
-+	struct netdevsim *ns = netdev_priv(dev);
-+	int err;
++	struct netdevsim *ns = file->private_data;
++	unsigned int queue, mode;
++	char buf[32];
++	ssize_t ret;
 +
-+	if (ns->rq_reset_mode > 3)
++	if (count >= sizeof(buf))
++		return -EINVAL;
++	if (copy_from_user(buf, data, count))
++                return -EFAULT;
++        buf[count] = '\0';
++
++	ret = sscanf(buf, "%u %u", &queue, &mode);
++	if (ret != 2)
 +		return -EINVAL;
 +
-+	if (ns->rq_reset_mode == 1)
-+		return nsim_create_page_pool(&qmem->pp, &ns->rq[idx]->napi);
-+
-+	qmem->rq = nsim_queue_alloc();
-+	if (!qmem->rq)
-+		return -ENOMEM;
-+
-+	err = nsim_create_page_pool(&qmem->rq->page_pool, &qmem->rq->napi);
-+	if (err)
-+		goto err_free;
-+
-+	if (!ns->rq_reset_mode)
-+		netif_napi_add_config(dev, &qmem->rq->napi, nsim_poll, idx);
-+
-+	return 0;
-+
-+err_free:
-+	nsim_queue_free(qmem->rq);
-+	return err;
-+}
-+
-+static void nsim_queue_mem_free(struct net_device *dev, void *per_queue_mem)
-+{
-+	struct nsim_queue_mem *qmem = per_queue_mem;
-+	struct netdevsim *ns = netdev_priv(dev);
-+
-+	if (qmem->pp)
-+		page_pool_destroy(qmem->pp);
-+	if (qmem->rq) {
-+		if (!ns->rq_reset_mode)
-+			netif_napi_del(&qmem->rq->napi);
-+		page_pool_destroy(qmem->rq->page_pool);
-+		nsim_queue_free(qmem->rq);
-+	}
-+}
-+
-+static int
-+nsim_queue_start(struct net_device *dev, void *per_queue_mem, int idx)
-+{
-+	struct nsim_queue_mem *qmem = per_queue_mem;
-+	struct netdevsim *ns = netdev_priv(dev);
-+
-+	if (ns->rq_reset_mode == 1) {
-+		ns->rq[idx]->page_pool = qmem->pp;
-+		napi_enable(&ns->rq[idx]->napi);
-+		return 0;
++	rtnl_lock();
++	if (!netif_running(ns->netdev)) {
++		ret = -ENETDOWN;
++		goto exit_unlock;
 +	}
 +
-+	/* netif_napi_add()/_del() should normally be called from alloc/free,
-+	 * here we want to test various call orders.
-+	 */
-+	if (ns->rq_reset_mode == 2) {
-+		netif_napi_del(&ns->rq[idx]->napi);
-+		netif_napi_add_config(dev, &qmem->rq->napi, nsim_poll, idx);
-+	} else if (ns->rq_reset_mode == 3) {
-+		netif_napi_add_config(dev, &qmem->rq->napi, nsim_poll, idx);
-+		netif_napi_del(&ns->rq[idx]->napi);
++	if (queue >= ns->netdev->real_num_rx_queues) {
++		ret = -EINVAL;
++		goto exit_unlock;
 +	}
 +
-+	ns->rq[idx] = qmem->rq;
-+	napi_enable(&ns->rq[idx]->napi);
++	ns->rq_reset_mode = mode;
++	ret = netdev_rx_queue_restart(ns->netdev, queue);
++	ns->rq_reset_mode = 0;
++	if (ret)
++		goto exit_unlock;
 +
-+	return 0;
++	ret = count;
++exit_unlock:
++	rtnl_unlock();
++	return ret;
 +}
 +
-+static int nsim_queue_stop(struct net_device *dev, void *per_queue_mem, int idx)
-+{
-+	struct nsim_queue_mem *qmem = per_queue_mem;
-+	struct netdevsim *ns = netdev_priv(dev);
-+
-+	napi_disable(&ns->rq[idx]->napi);
-+
-+	if (ns->rq_reset_mode == 1) {
-+		qmem->pp = ns->rq[idx]->page_pool;
-+		page_pool_disable_direct_recycling(qmem->pp);
-+	} else {
-+		qmem->rq = ns->rq[idx];
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct netdev_queue_mgmt_ops nsim_queue_mgmt_ops = {
-+	.ndo_queue_mem_size	= sizeof(struct nsim_queue_mem),
-+	.ndo_queue_mem_alloc	= nsim_queue_mem_alloc,
-+	.ndo_queue_mem_free	= nsim_queue_mem_free,
-+	.ndo_queue_start	= nsim_queue_start,
-+	.ndo_queue_stop		= nsim_queue_stop,
++static const struct file_operations nsim_qreset_fops = {
++	.open = simple_open,
++	.write = nsim_qreset_write,
++	.owner = THIS_MODULE,
 +};
 +
  static ssize_t
  nsim_pp_hold_read(struct file *file, char __user *data,
  		  size_t count, loff_t *ppos)
-@@ -739,6 +849,7 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
- 	ns->phc = phc;
- 	ns->netdev->netdev_ops = &nsim_netdev_ops;
- 	ns->netdev->stat_ops = &nsim_stat_ops;
-+	ns->netdev->queue_mgmt_ops = &nsim_queue_mgmt_ops;
+@@ -935,6 +986,9 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
  
- 	err = nsim_udp_tunnels_info_create(ns->nsim_dev, ns->netdev);
- 	if (err)
+ 	ns->pp_dfs = debugfs_create_file("pp_hold", 0600, nsim_dev_port->ddir,
+ 					 ns, &nsim_pp_hold_fops);
++	ns->qr_dfs = debugfs_create_file("queue_reset", 0600,
++					 nsim_dev_port->ddir, ns,
++					 &nsim_qreset_fops);
+ 
+ 	return ns;
+ 
+@@ -949,6 +1003,7 @@ void nsim_destroy(struct netdevsim *ns)
+ 	struct netdevsim *peer;
+ 
+ 	debugfs_remove(ns->pp_dfs);
++	debugfs_remove(ns->qr_dfs);
+ 
+ 	rtnl_lock();
+ 	peer = rtnl_dereference(ns->peer);
 diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index 80fde64f4a7a..8c50969b1240 100644
+index 8c50969b1240..a70f62af4c88 100644
 --- a/drivers/net/netdevsim/netdevsim.h
 +++ b/drivers/net/netdevsim/netdevsim.h
-@@ -103,6 +103,8 @@ struct netdevsim {
- 	struct mock_phc *phc;
- 	struct nsim_rq **rq;
+@@ -136,6 +136,7 @@ struct netdevsim {
  
-+	int rq_reset_mode;
-+
- 	u64 tx_packets;
- 	u64 tx_bytes;
- 	u64 tx_dropped;
+ 	struct page *page;
+ 	struct dentry *pp_dfs;
++	struct dentry *qr_dfs;
+ 
+ 	struct nsim_ethtool ethtool;
+ 	struct netdevsim __rcu *peer;
 -- 
 2.47.1
 
