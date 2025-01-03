@@ -1,97 +1,109 @@
-Return-Path: <netdev+bounces-155044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583DDA00C7B
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 18:00:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D8B3A00C80
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 18:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DF273A0499
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 17:00:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 403141636DF
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 17:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A292F1FBE8E;
-	Fri,  3 Jan 2025 17:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136C61FC100;
+	Fri,  3 Jan 2025 17:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="glXM2uBz"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="TaJDmglc";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aP3Lz1Uo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF20B14F9CC
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 17:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DAD1FBCAA;
+	Fri,  3 Jan 2025 17:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735923602; cv=none; b=F0PQy0zFxKSJDofIX0xAah9ejBHh2WkbnH95OryCO4XXLHn3lMjKrHH6Rxr82vVmtL64ihAWC2I2JuAigF4+Tm/7IPXBAk/JF3Sw7pRqWT/5xjfub+287njsleCs32lbrzGe2t4vryK6jQXa05j0W17jNvTtE0Z7jQZdDD3WsCc=
+	t=1735923643; cv=none; b=Efkhp1jcldYcogEmAv7Fm6sltcJ+GV1uhRnYsdtJLqjsyPHByc35g3k+BH8HYKRL4C58aMGG+S7h+5/tsnpZ8gUMJYW+B+3s/duf+2cUfqaG9a7U+Vf9L5kvOyugTxSxGsQ5/SBeNUvPOX+wjOACEYHd3jGLXZnx/8DxoM/2ESo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735923602; c=relaxed/simple;
-	bh=Hw4GTu34YXSFDWu6CElfpVBvfdvcBcohLY6hEYoxp5Y=;
+	s=arc-20240116; t=1735923643; c=relaxed/simple;
+	bh=ohJQE+kFTnvf341Hc2fu8YtRxKrOXKg+uSuvKebbJAI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nSOo2yXm5QTl9WLLAqLDDKig5hRFA/Q00MouhFkxyyoMB5i1k9RQxxB4BsAQsB6OnIGsmXR7/TrhKQ+YYq9EhJZaFSHGDUVbrWRSdX2ejzwqvez341OPy+IJyxhiCsIn+9OWMJ6UQ6rinH+O/LP2dNHpdPpU7yd6IOrnDXYMJz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=glXM2uBz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735923599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8XfUlWD9Hczq6KcSfqzg4iPKW3lwUVkATrJJ+x5WCxM=;
-	b=glXM2uBz+FnNU5WE0//Rbvi4lSg5/9uU7U4gbWJIipp0WhtV9VI1rTCjIxy6ELTSns/OfP
-	KHBkkKpepW1QoV17It4MwF7cX6ULQnjBsechCi1KPgghgV0sHa/64WFbM3OQEPFa2HlR7u
-	mNywVk6c9+n+NnkalQrk0DmehnTIZTo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-534-DQK-yhfAMj-qMM_V-A57Sg-1; Fri, 03 Jan 2025 11:59:57 -0500
-X-MC-Unique: DQK-yhfAMj-qMM_V-A57Sg-1
-X-Mimecast-MFC-AGG-ID: DQK-yhfAMj-qMM_V-A57Sg
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4361a8fc3bdso66163815e9.2
-        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 08:59:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735923596; x=1736528396;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8XfUlWD9Hczq6KcSfqzg4iPKW3lwUVkATrJJ+x5WCxM=;
-        b=qSQXBXI/xntGptEgElFvXZxjSaQdrguf0+wQUA+EbI3rNzF06dKkxLnpXlTgmbb9WQ
-         S+/GNIAW+gYjYsXHkc3JizVPdt8eGP3L5hjKOKgR/ss6XqNPFlOZ/455lTBea9qV44yH
-         9iV4H8jEaH8LsvGBTpv6rZV7dmDA2dQv4k62lGK+mxAkHhWQsiOj761KWcxAg2RGZ6qZ
-         HAJjBTmTpLb8UioOPMnf29OB5ghvhGoeQP4GEHk6UYdbWh2EbQwARFVldQk3VJrCi+em
-         JF/TMTwYHmBpu64PmAycnMJGaRLliSG4Qu2VQC60iYVZH2kTLHJLi8u6tmjAzPFfa0vv
-         bbGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVDSt0NRmxpMGkWdR4Vp1tG2TORxQlsku3yGhMY6iWX2Yut/RVpB4WD/fXK50GOo9269skbSwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7UAoHNEn6scz+q6oKPpdfOy5axndqFNE6OA2togjUTSK7rXfw
-	5NuzUHm6IFuUGfy3jAxlR6BEtciFf0PQrsTDpQuLmt/3gm6U4Xb7SQRkvPQ8Mdf+PwqZw4pRuTw
-	kS1OFmOLO4QVop4vI5bHW+HhVF2DvpzFC5CW15lcIyoWjiCkzFpfbKg==
-X-Gm-Gg: ASbGncvflpi2mcE2v5jE4RVYBqOD4Cj3d3D19s4whLPJfcGNavltS1QGcsne85fS95G
-	cZ1tVao5f3CDQcPHERh2iHmGjXkiWYG2UNSiOuPYYlhuTgTSKw3aimbvrjtBueSScxXePbvDV2p
-	jLoPP4fIIpMQ/MLWOFh7QA9cvXbIlxGoC5fNbzi2gJu7mZbftPA5h43M2N03UaIEWaEYrwpU8ad
-	FPqQXlNULxQuBXIgb6zHOjAEfUOXzeKjckOOO+tSAy6tjClI1lGVTe7kN28s4hctJc//u0yKXLb
-	gRL+s29H+8BC9OY1of8wpq5G8iPP/Q2tivK5
-X-Received: by 2002:a05:600c:46c7:b0:434:a4b3:5ebe with SMTP id 5b1f17b1804b1-43668b5e244mr382242065e9.24.1735923596158;
-        Fri, 03 Jan 2025 08:59:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG3+VowO+yJ4mAQNn3qzywn/HFa+7FG3OUT+ALv2b7BPPq9p++XlOKrnfrcWNjr2Uj0C6LzbQ==
-X-Received: by 2002:a05:600c:46c7:b0:434:a4b3:5ebe with SMTP id 5b1f17b1804b1-43668b5e244mr382241875e9.24.1735923595799;
-        Fri, 03 Jan 2025 08:59:55 -0800 (PST)
-Received: from debian (2a01cb058918ce0019efe14cc4985863.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:19ef:e14c:c498:5863])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656a0b361sm521357635e9.0.2025.01.03.08.59.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jan 2025 08:59:55 -0800 (PST)
-Date: Fri, 3 Jan 2025 17:59:53 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	linux-sctp@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [PATCH net-next] sctp: Prepare sctp_v4_get_dst() to dscp_t
- conversion.
-Message-ID: <Z3gXieFRj+xqozJE@debian>
-References: <1a645f4a0bc60ad18e7c0916642883ce8a43c013.1735835456.git.gnault@redhat.com>
- <CADvbK_fsM_EfoNjhybKJr92ojqFo6OdnuA2WiFJyi6Y1=rX4Gw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZVJRZYFKdZMhotbtzJdgaf5A8Ub4gzN7jAYCsbfhshbYKcxFpJjnAnG1MfKnkh9v+H8W1tPp+yN1749rC0SY3+lhrnV1dHM33913uf9XMvJdoAgHQ21r6UaRSlO0+OEDA+9ruNxfhy5CRNpY75yJkbVi105Jyb0jvSg2kwzp2tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=TaJDmglc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aP3Lz1Uo; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 2323B1140264;
+	Fri,  3 Jan 2025 12:00:38 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Fri, 03 Jan 2025 12:00:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1735923638; x=
+	1736010038; bh=sGvx2u03+QbmNTX8zDpPuiAikIJPFGN89aJNoG9Sgi0=; b=T
+	aJDmglcOFKAyIHLycHlStNg42Kwaya8EC6/xAm95190B0y7PCVxXga7eztFyKjpm
+	cYqjyvaHgwLCoeTi22fuebG2fTG1I57DIaFsRk4VRtfwxSgVgAPXnk8BInAHTRDO
+	dWUdPXn3Od6Fo9aiL8wCgt0JmwOyeDnK9/uSoFYdyxyin7QWyI/66W599R4MlCJH
+	Ic4DtodRV76V/ApTdaUVc8Aq3VpJJ+52+rV1mGl6VVFoUbA5Pc7yRbPo3KFj2e1A
+	7xQ4P/fHVvLonkct0fOESPTJ/mz84JrfUcn5DzY9GReP2+K7SRuVV9+TrMeYl+Uw
+	jttvfDJC6flnt+zhb0hzA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1735923638; x=1736010038; bh=sGvx2u03+QbmNTX8zDpPuiAikIJPFGN89aJ
+	NoG9Sgi0=; b=aP3Lz1UorIy71IZbEDwbvufwzAsjZa0AQjlKtEU1GYfHfk+DQJc
+	d7uG+WTd9/H3BJ2hoBx4pJsqI7FJvg792/LxuxRtcEG/FDHlBLcuHoH8uBJieefC
+	R+Q3e+dDGUMFYz84Hxv/S2u04VADMTT0iUXycAGB76b+OZokx82kTB4ytZ1Y4tbo
+	//gcyof188L2JEwPtQCtxTzzafbDwt+RBneeq6JRUPsTMjM7rYHhZPEppFE/pwua
+	LOZtmTa3VxQb+oI3Odg95dCQRnEKofjdtAyI/iIdX6suNLYoIz09ZNpZRfpaXP7w
+	LX5tlqo+IUA37NYSNB/Vr/OnB+BVy5po4qQ==
+X-ME-Sender: <xms:tRd4Z-XW9jUC3pZZ4T9rZSubyDArTGRh6TZPOMO1Smqhv29mBmRIfg>
+    <xme:tRd4Z6lZPbhAr1kEIyQwdgKt5FZEA4YfIr_2xQ8kWsGcZr3czCe-rqZ_EjgGsfc9W
+    dNE1A4bGfWXOO3fgv4>
+X-ME-Received: <xmr:tRd4ZyZb2b0NxKniEQqhCYkdvFmFjXBngcdq_kXDvkhshFvWfkt-Igp5F_k3>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudefgedgleehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepveejheeugfeutddufffggeejfeelkedu
+    heegvdejhffgudehtdevuedvjefffeejnecuffhomhgrihhnpehskhgptggsrdhskhenuc
+    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhu
+    vggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudegpdhmohguvgepshhmth
+    hpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvghtpdhrtghp
+    thhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvg
+    guuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtph
+    htthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohep
+    shhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhihrgiirghnohhvrdhsrd
+    grsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhu
+    nhhnrdgthh
+X-ME-Proxy: <xmx:tRd4Z1VfW10NiiZOjTuSe4NbZhy41r4kLxwiofgxSVHatdQfPH63Qg>
+    <xmx:tRd4Z4m5LazTX9xuQQJOiolLhPli1FfiAa5hllguoHUPhGhZ3-FAuQ>
+    <xmx:tRd4Z6exW70xT1r_qkkXjl2_ulYQWeBrGBul5M4UNkUWwyq0H7w1OA>
+    <xmx:tRd4Z6E_OAyFjdiXf3tCvqUKKAs_gatUYeldVg3xKMLaDnvKyBYNkg>
+    <xmx:thd4Z9_tlBulJ6_KVlGtA0EXeask5QtLe7_wqAFNSp2x_hVT_-8ldC6o>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 3 Jan 2025 12:00:36 -0500 (EST)
+Date: Fri, 3 Jan 2025 18:00:35 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+	willemdebruijn.kernel@gmail.com
+Subject: Re: [PATCH net-next v16 07/26] ovpn: introduce the ovpn_socket object
+Message-ID: <Z3gXs65jjYc-g2iw@hog>
+References: <20241219-b4-ovpn-v16-0-3e3001153683@openvpn.net>
+ <20241219-b4-ovpn-v16-7-3e3001153683@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,80 +112,154 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADvbK_fsM_EfoNjhybKJr92ojqFo6OdnuA2WiFJyi6Y1=rX4Gw@mail.gmail.com>
+In-Reply-To: <20241219-b4-ovpn-v16-7-3e3001153683@openvpn.net>
 
-On Fri, Jan 03, 2025 at 10:35:55AM -0500, Xin Long wrote:
-> On Thu, Jan 2, 2025 at 11:34 AM Guillaume Nault <gnault@redhat.com> wrote:
-> >
-> > Define inet_sk_dscp() to get a dscp_t value from struct inet_sock, so
-> > that sctp_v4_get_dst() can easily set ->flowi4_tos from a dscp_t
-> > variable. For the SCTP_DSCP_SET_MASK case, we can just use
-> > inet_dsfield_to_dscp() to get a dscp_t value.
-> >
-> > Then, when converting ->flowi4_tos from __u8 to dscp_t, we'll just have
-> > to drop the inet_dscp_to_dsfield() conversion function.
-> With inet_dsfield_to_dscp() && inet_dsfield_to_dscp(), the logic
-> looks like: tos(dsfield) -> dscp_t -> tos(dsfield)
-> It's a bit confusing, but it has been doing that all over routing places.
+Hello Antonio,
 
-The objective is to have DSCP values stored in dscp_t variables in the
-kernel and keep __u8 values in user space APIs and packet headers. In
-practice this means using inet_dscp_to_dsfield() and
-inet_dsfield_to_dscp() at boundaries with user space or networking.
+2024-12-19, 02:42:01 +0100, Antonio Quartulli wrote:
+> +static void ovpn_socket_release_kref(struct kref *kref)
+> +	__releases(sock->sock->sk)
+> +{
+> +	struct ovpn_socket *sock = container_of(kref, struct ovpn_socket,
+> +						refcount);
+> +
 
-However, since core kernel functions and structures are getting updated
-incrementally, some inet_dscp_to_dsfield() and inet_dsfield_to_dscp()
-conversions are temporarily needed between already converted and not yet
-converted parts of the stack.
+[extend with bits of patch 9]
+>	/* UDP sockets are detached in this kref callback because
+>	 * we now know for sure that all concurrent users have
+>	 * finally gone (refcounter dropped to 0).
+>	 *
+>	 * Moreover, detachment is performed under lock to prevent
+>	 * a concurrent ovpn_socket_new() call with the same socket
+>	 * to find the socket still attached but with refcounter 0.
 
-> In sctp_v4_xmit(), there's the similar tos/dscp thing, although it's not
-> for fl4.flowi4_tos.
+I'm not convinced this really works, because ovpn_socket_new() doesn't
+use the same lock. lock_sock and bh_lock_sock both "lock the socket"
+in some sense, but they're not mutually exclusive (we talked about
+that around the TCP patch).
 
-The sctp_v4_xmit() case is special because its dscp variable, despite
-its name, doesn't only carry a DSCP value, but also ECN bits.
-Converting it to a dscp_t variable would lose the ECN information.
+Are you fundamentally opposed to making attach permanent? ie, once
+a UDP or TCP socket is assigned to an ovpn instance, it can't be
+detached and reused. I think it would be safer, simpler, and likely
+sufficient (I don't know openvpn much, but I don't see a use case for
+moving a socket from one ovpn instance to another, or using it without
+encap).
 
-To be more precise, this is only the case if the SCTP_DSCP_SET_MASK
-flag is not set. That is, when the "dscp" variable is set using
-inet->tos. Since inet->tos contains both DSCP and ECN bits, this allows
-the socket owner to manage ECN. I don't know if that's intented by the
-SCTP code. If that isn't, and the ECN bits aren't supposed to be taken
-into account here, then I'm happy to send a patch to convert
-sctp_v4_xmit() to dscp_t too.
+Rough idea:
+ - ovpn_socket_new is pretty much unchanged (locking still needed to
+   protect against another simultaneous attach attempt, EALREADY case
+   becomes a bit easier)
+ - ovpn_peer_remove doesn't do anything socket-related
+ - use ->encap_destroy/ovpn_tcp_close() to clean up sk_user_data
+ - no more refcounting on ovpn_socket (since the encap can't be
+   removed, the lifetime to ovpn_socket is tied to its socket)
 
-> Also, I'm curious there are still a few places under net/ using:
-> 
->   fl4.flowi4_tos = tos & INET_DSCP_MASK;
-> 
-> Will you consider changing all of them with
-> inet_dsfield_to_dscp() && inet_dsfield_to_dscp() as well?
+What do you think?
 
-Yes, I have a few more cases to convert. But some of them will have to
-stay. For example, in net/ipv4/ip_output.c, __ip_queue_xmit() has
-"fl4->flowi4_tos = tos & INET_DSCP_MASK;", but we can't just convert
-that "tos" variable to dscp_t because it carries both DSCP and ECN
-values. Although ->flowi4_tos isn't concerned with ECN, these ECN bits
-are used later to set the IP header.
+I'm trying to poke holes into this idea now. close() vs attach worries
+me a bit.
 
-There are other cases that I'm not planning to convert, for example
-because the value is read from a UAPI structure that can't be updated.
-For example the "fl4.flowi4_tos = params->tos & INET_DSCP_MASK;" case
-in bpf_ipv4_fib_lookup(), where "params" is a struct bpf_fib_lookup,
-exported in UAPI.
 
-To summarise, the plan is to incrementally convert most ->flowi4_tos
-assignments, so that we have a dscp_t variable at hand. Then I'll send
-a patch converting all ->flowi4_tos users at once. Most of it should
-consist of trivial inet_dscp_to_dsfield() removals, thanks to the
-previous dscp_t conversions. The cases that won't follow that pattern
-will be explained in the commit message, but the idea is to have as few
-of them as possible.
+>	 */
+>	if (sock->sock->sk->sk_protocol == IPPROTO_UDP)
+>		ovpn_udp_socket_detach(sock->sock);
 
-BTW, the reason for this work is to avoid having ECN bits interfering
-with route lookups. We had several such issues and regressions in the
-past because of ->flowi4_tos having ECN bits set in specific scenarios.
 
-> Thanks.
+> +	bh_unlock_sock(sock->sock->sk);
+> +	sockfd_put(sock->sock);
+> +	kfree_rcu(sock, rcu);
+> +}
 
+[...]
+> +struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
+> +{
+> +	struct ovpn_socket *ovpn_sock;
+> +	int ret;
+> +
+> +	lock_sock(sock->sk);
+> +
+> +	ret = ovpn_socket_attach(sock, peer);
+> +	if (ret < 0 && ret != -EALREADY)
+> +		goto err_release;
+> +
+> +	/* if this socket is already owned by this interface, just increase the
+> +	 * refcounter and use it as expected.
+> +	 *
+> +	 * Since UDP sockets can be used to talk to multiple remote endpoints,
+> +	 * openvpn normally instantiates only one socket and shares it among all
+> +	 * its peers. For this reason, when we find out that a socket is already
+> +	 * used for some other peer in *this* instance, we can happily increase
+> +	 * its refcounter and use it normally.
+> +	 */
+> +	if (ret == -EALREADY) {
+> +		/* caller is expected to increase the sock refcounter before
+> +		 * passing it to this function. For this reason we drop it if
+> +		 * not needed, like when this socket is already owned.
+> +		 */
+> +		ovpn_sock = ovpn_socket_get(sock);
+> +		release_sock(sock->sk);
+> +		sockfd_put(sock);
+> +		return ovpn_sock;
+> +	}
+> +
+> +	ovpn_sock = kzalloc(sizeof(*ovpn_sock), GFP_KERNEL);
+> +	if (!ovpn_sock) {
+> +		ret = -ENOMEM;
+> +		goto err_detach;
+> +	}
+> +
+> +	ovpn_sock->ovpn = peer->ovpn;
+> +	ovpn_sock->sock = sock;
+> +	kref_init(&ovpn_sock->refcount);
+> +
+> +	rcu_assign_sk_user_data(sock->sk, ovpn_sock);
+> +	release_sock(sock->sk);
+> +
+> +	return ovpn_sock;
+> +err_detach:
+> +	if (sock->sk->sk_protocol == IPPROTO_UDP)
+> +		ovpn_udp_socket_detach(sock);
+
+This would leave the TCP socket half-attached, and if userspace tries
+to attach the same socket again (I don't think the ovpn module would
+prevent that since sk_user_data is still unset), both ->sk_data_ready
+and tcp.sk_cb.sk_data_ready will be set to ovpn's (same for
+sk_write_space with ovpn_tcp_write_space which will recurse into
+itself when called).
+
+I think it'd be easier to do the alloc first, then attach. Handling a
+failure to attach would be a simple kfree, while handling a failure to
+alloc is a detach (or part of a detach) which is not as easy.
+
+
+
+> +int ovpn_udp_socket_attach(struct socket *sock, struct ovpn_priv *ovpn)
+> +{
+> +	struct ovpn_socket *old_data;
+> +	int ret = 0;
+> +
+> +	/* make sure no pre-existing encapsulation handler exists */
+> +	rcu_read_lock();
+> +	old_data = rcu_dereference_sk_user_data(sock->sk);
+> +	if (!old_data) {
+> +		/* socket is currently unused - we can take it */
+> +		rcu_read_unlock();
+> +		return 0;
+> +	}
+> +
+> +	/* socket is in use. We need to understand if it's owned by this ovpn
+> +	 * instance or by something else.
+> +	 * In the former case, we can increase the refcounter and happily
+> +	 * use it, because the same UDP socket is expected to be shared among
+> +	 * different peers.
+> +	 *
+> +	 * Unlikely TCP, a single UDP socket can be used to talk to many remote
+
+nit: s/Unlikely/Unlike/
+
+> +	 * hosts and therefore openvpn instantiates one only for all its peers
+> +	 */
+
+-- 
+Sabrina
 
