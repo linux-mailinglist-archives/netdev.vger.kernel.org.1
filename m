@@ -1,180 +1,124 @@
-Return-Path: <netdev+bounces-154967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC310A00842
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:11:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06778A0086C
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:16:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7A5A1884799
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:11:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3264162127
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 11:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A881F9EB0;
-	Fri,  3 Jan 2025 11:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D7D1F9EA7;
+	Fri,  3 Jan 2025 11:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="omu4oSb2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E23F13C690;
-	Fri,  3 Jan 2025 11:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685671F9A8B
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 11:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735902690; cv=none; b=OIGZgmUezg7sAzO/wxiVQh8LDu/oqu3TvpE74pAHcODdBCfOh5vtmuWwTNzf8HcP80Iy1H3FX3dYsJoM76DTNB47MxXtuRhnGLlqpa9qKjl07lDO8GPk6BHfKZDUOs85Ox+akhydEl6TCHgW/ryaJd3b/G01969g+ZoWWGd4aKw=
+	t=1735902995; cv=none; b=ufODCBbbAWdphPkYTIqUyRCTuPLmHi5N5na7V+IU4Z7k4IKACqFSmL5lDE1aGJTYCX0atul0HKJwjWaKEC0f+LW7c4SqcmdHtPV3yAXkDfknjLYX1AX228uKibxLx4Xt41T3VC08rwSRapKQU7I6hOJPojZMpms0Wt1QWGkHjww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735902690; c=relaxed/simple;
-	bh=bCnUqPW+uaZqwgWS/Af5xf2SIMOWjYh+L074grMjMtQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zwt6W6WSFk3fexg6AQkhNOe8tgGkGwC4cxkIYNQvLRDBu9ZeX8YRmkZfOF4JSsv95WWa2ewIJ/2l+KtJuK+cN6ju4sJ0+zTj6s+jzvCAQPIqoJMQj/lbmMSOMCUldEl9kb3puYYW3kARHhmhLK9bh81SQIfaeOGk/7tDteiz/nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-85b83479f45so1754690241.0;
-        Fri, 03 Jan 2025 03:11:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735902683; x=1736507483;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HDFVJ3n3kKrw5RCyDZC9551byJLb/mR9RzkqrgJ1y6U=;
-        b=TtiPRiusmPWPKtU0y4yV26Ay1IEZUoE/vuDJu2F5vG8XUT7EZ1CfiRZ6bTMU+Kg7wD
-         FpFxyV82leJWclVCsOY4Oabxck1mbyKbiXL8sfF+ErupnNB2/Sq58qTFH3FZ4QcV98HC
-         /nv3ozxGmPCW7pG4i8hMDfqccFjrqbq7SjdwzuvdXgTXSA6BU+AT6HOqWBmqyyiGvFv2
-         3IlIdBN5j7O/j8/DoLrCgJWbK1b+rFreRHN8P5mKhKq2RX5tGbaT0QCXI9+lQGdaZnNA
-         O8R3M5nAwhNA9T7i7CV6q2SygisK4JfWQIq653gLuJpC8JVfa6g2Kb3Zt4CGUMrdNaKR
-         jEvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0lK1QasnIVgPEsCZiNhR9gMPG6VUHj7+UUdTF5NnsQGdIB4PkpXeFFngOVBAU/ml2s9V2Mbad+v57DcIH@vger.kernel.org, AJvYcCUBEnMEu7rxPUON770KqwJVO3yzap38bTeoKC94VGN3UzFgGiHKFUym5N0ve+89VwADwwaCguzWbnt4bxB5@vger.kernel.org, AJvYcCVaLyDpQcsJCFKKI7R8qSFHHcGSHccFKHROZfExHXQZtqVgx/MIYITLfx6izStEmY6XC4erO0LnFAFcGmirJFvi7Qq1OxmD@vger.kernel.org, AJvYcCVljOt4THpT1n2/qDKSp1u7G2XgVDDD/z2JS6pAqEim9tVfSNYTEFIG5SU2YmHUqo6sgVz3bCh9lis=@vger.kernel.org, AJvYcCX58Rzw7ifXMNEX8I3OzgOep/PkYTnQteIbvda+WYXfObHY9V15QN99yPM5cowsmf6lAqkBruuuKXND@vger.kernel.org, AJvYcCX89VkY1XBhkzupmdplZcdHpxvS3Ivoz9B8UNO4Cb7aJTtlIT0fnNJQK/YR01hud8E2IJFE8M7u@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiMb6NfSvpfw9CmQsFMr2iNfR2r/HALwDoy5gZ9rTv0jOz8sB0
-	rFBvhXnn9KiNjhJ34LB76GBWZmRqcMF/bXekceSNOpzYY0g7h8xrHjTxinP/GGQ=
-X-Gm-Gg: ASbGncugmAnT34zrc9lt8o9Hu3HfmD8/XejaHqULbhybbAqS1HbhBAcngXh0/alN2oS
-	VySeVVR03JxxmT7aYcXdwEp9GE7UG/rfj77R4G9MFikf1PZCa2usQRO2PLi2zEY/4fePsUT7c1p
-	yMk0znUUDRRloESYtw06Gfl0FgGigRvuHsLmxYF6t1WTwcGksMxhE4i/4mXnvQHhgUfmogeJBm7
-	SzdFBQLCAJP4XJQ7hvXOia4NMV6E2apFOS8bYorx8/TQ7YSvhR4ITSc0zoY7lwA95Qyalu9ePz5
-	XnaGnQFdahyLp3C3TVs=
-X-Google-Smtp-Source: AGHT+IGJElzszDxwg2WWNvqLHzeq3BtZcReGe9oXqn/yhvlxUQOrqYgoDEx91rLiGitn46LiYyO2Zg==
-X-Received: by 2002:a05:6102:dca:b0:4b2:af93:4313 with SMTP id ada2fe7eead31-4b2cc462517mr34277364137.17.1735902682656;
-        Fri, 03 Jan 2025 03:11:22 -0800 (PST)
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com. [209.85.222.48])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b2bf98d122sm5479527137.7.2025.01.03.03.11.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Jan 2025 03:11:21 -0800 (PST)
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-85c4b4cf73aso1865916241.2;
-        Fri, 03 Jan 2025 03:11:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU/QIIfkxYFBMHtPtTYKWe3ANyRfjQKHkHkJybqfXLIoFkBNWN09FtxtO1bmdOhpmOudmoGY1TCN+VsHK4e@vger.kernel.org, AJvYcCUjVSapyoJ8JTrw9je29jjz5NLeolVDuxGtUVdnYnQghJuf8U0xF0PVz++Riptx5epDEMmGYB1c@vger.kernel.org, AJvYcCWMuELEGyVui5bUQnSeBZ95zndIG1v3g9mM3n3bPF5gKJrsfBzRllADphpGk7DOksrk9kTmD6Z56lxSmhaW@vger.kernel.org, AJvYcCXDsQyJUK1Zu57NJhw3OVDF42ijqjhlge158RwgpFtlJ77D5Sn+dT0/9G46KQawJg8c7/F931/CmO4=@vger.kernel.org, AJvYcCXJn3r0JzBfW777cVWWS8KdLX6eRIBPMcD/e5oW+WLt5IhxfnYS3fd9ak2ZWK6Gi6fDw6pUtEYxAjb9mDeBFYMF/JVmTlTx@vger.kernel.org, AJvYcCXOBHGoI+WCymbPSLgrbTY9ik/lsTuOIgTsd0BY3wMQnouHh6zclzvzEODaOcqD8KYs2wWsv9qElT9x@vger.kernel.org
-X-Received: by 2002:a05:6102:5684:b0:4b1:130f:9fc0 with SMTP id
- ada2fe7eead31-4b2cc3808a4mr38937534137.16.1735902681279; Fri, 03 Jan 2025
- 03:11:21 -0800 (PST)
+	s=arc-20240116; t=1735902995; c=relaxed/simple;
+	bh=vAIVECYjFh7YV0hfWsBwfPI2sPBAS2AlLB+1OpFiCkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qs7KuVjhvVaMBm8IvHcoNtUOAaKeWp+aWhEs9k5npf1ugByF+leMKELlbsiSjxmZsJEyBznOeYngaarNvUlIOjV9iIDh6xSHQkwd7mWWlsY2IU3nOWkVarvrlXVlvAgEsZc6QL1bDTPEB+2ymKdhrX2XZPI0qnEWKYsWkO4cewg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=omu4oSb2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=KnnKr1tOZVG12cK+LLFuxnU9SlvnnOfbe1CXtqwo2co=; b=omu4oSb2n/Rx3anVtN7y8fsq6W
+	ILbT06ESY8/18a0G6Ad4YiG8uXgbgd8tbeEuBBkTzg9YBJD6H/UkK/6vmh9BhGmWeWg5pDxeBoO+r
+	EmcLWybCYb+EcQCxZKg0O/KOhAklMJgpzc7kc6eMm2yDrHmsLA6dWTJrQnmjhYFs0J7a3xkTp3v0b
+	7ZwaxxwEJFfvNiD6ifORIUJnEUixetrKN8hGBATpO4Kk5ajHUf8lerm1RZMzyQ4y6Qs7v/u485vsS
+	2phrRtLXhA8QRs9kPW4ke7a1I5gNa6M+icLSRRmZwdPF8Vh8d4vzqgXUrXJBK+ZglEUaE4H5ua5XA
+	qmVOteUw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38220)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tTff2-0002zj-35;
+	Fri, 03 Jan 2025 11:16:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tTfew-0001H9-1H;
+	Fri, 03 Jan 2025 11:16:06 +0000
+Date: Fri, 3 Jan 2025 11:16:06 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexander Couzens <lynxis@fe80.eu>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 0/6] net: pcs: add supported_interfaces bitmap for
+ PCS
+Message-ID: <Z3fG9oTY9F9fCYHv@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241228145746.2783627-1-yukaixiong@huawei.com> <20241228145746.2783627-15-yukaixiong@huawei.com>
-In-Reply-To: <20241228145746.2783627-15-yukaixiong@huawei.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 3 Jan 2025 12:11:09 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVHD+AhMpcyxndTno-ocatS1tRP5uRrKNFL6Z=j3KX8og@mail.gmail.com>
-Message-ID: <CAMuHMdVHD+AhMpcyxndTno-ocatS1tRP5uRrKNFL6Z=j3KX8og@mail.gmail.com>
-Subject: Re: [PATCH v4 -next 14/15] sh: vdso: move the sysctl to arch/sh/kernel/vsyscall/vsyscall.c
-To: Kaixiong Yu <yukaixiong@huawei.com>
-Cc: akpm@linux-foundation.org, mcgrof@kernel.org, ysato@users.sourceforge.jp, 
-	dalias@libc.org, glaubitz@physik.fu-berlin.de, luto@kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, jack@suse.cz, kees@kernel.org, j.granados@samsung.com, 
-	willy@infradead.org, Liam.Howlett@oracle.com, vbabka@suse.cz, 
-	lorenzo.stoakes@oracle.com, trondmy@kernel.org, anna@kernel.org, 
-	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, paul@paul-moore.com, 
-	jmorris@namei.org, linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-nfs@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	dhowells@redhat.com, haifeng.xu@shopee.com, baolin.wang@linux.alibaba.com, 
-	shikemeng@huaweicloud.com, dchinner@redhat.com, bfoster@redhat.com, 
-	souravpanda@google.com, hannes@cmpxchg.org, rientjes@google.com, 
-	pasha.tatashin@soleen.com, david@redhat.com, ryan.roberts@arm.com, 
-	ying.huang@intel.com, yang@os.amperecomputing.com, zev@bewilderbeest.net, 
-	serge@hallyn.com, vegard.nossum@oracle.com, wangkefeng.wang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Kaixiong,
+Hi,
 
-On Sat, Dec 28, 2024 at 4:07=E2=80=AFPM Kaixiong Yu <yukaixiong@huawei.com>=
- wrote:
-> When CONFIG_SUPERH and CONFIG_VSYSCALL are defined,
-> vdso_enabled belongs to arch/sh/kernel/vsyscall/vsyscall.c.
-> So, move it into its own file. After this patch is applied,
-> all sysctls of vm_table would be moved. So, delete vm_table.
->
-> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
-> Reviewed-by: Kees Cook <kees@kernel.org>
-> ---
-> v4:
->  - const qualify struct ctl_table vdso_table
+This series adds supported_interfaces for PCS, which gives MAC code a
+way to determine the interface modes that the PCS supports without
+having to implement functions such as xpcs_get_interfaces(), or
+workarounds such as in
 
-Thanks for your patch!
+https://lore.kernel.org/r/20241213090526.71516-3-maxime.chevallier@bootlin.com
 
-I gave this a try on landisk, and /proc/sys/vm/vdso_enabled
-disappeared.
+Patch 1 adds the new bitmask to struct phylink_pcs, and code within
+phylink to validate that the PCS returned by the MAC driver supports
+the interface mode - but only if this bitmask is non-empty.
 
-> --- a/arch/sh/kernel/vsyscall/vsyscall.c
-> +++ b/arch/sh/kernel/vsyscall/vsyscall.c
-> @@ -55,6 +67,8 @@ int __init vsyscall_init(void)
->                &vsyscall_trapa_start,
->                &vsyscall_trapa_end - &vsyscall_trapa_start);
->
-> +       register_sysctl_init("vm", vdso_table);
+Patch 2 through 4 fills in the interface modes for XPCS, Mediatek LynxI
+and Lynx PCS.
 
-    "failed when register_sysctl_sz vdso_table to vm"
+Patch 5 adds support to stmmac to make use of this bitmask when filling
+in phylink_config.supported_interfaces, eliminating the call to
+xpcs_get_interfaces.
 
-Adding some debug prints shows that kzalloc() in
-__register_sysctl_table() fails, presumably because it is called too
-early in the boot process.
+As xpcs_get_interfaces() is now unused outside of pcs-xpcs.c, patch 6
+makes this function static and removes it from the header file.
 
-> +
->         return 0;
->  }
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++++++++--
+ drivers/net/pcs/pcs-lynx.c                        | 13 +++++++++++++
+ drivers/net/pcs/pcs-mtk-lynxi.c                   |  4 ++++
+ drivers/net/pcs/pcs-xpcs.c                        |  5 +++--
+ drivers/net/phy/phylink.c                         | 11 +++++++++++
+ include/linux/pcs/pcs-xpcs.h                      |  1 -
+ include/linux/phylink.h                           |  3 +++
+ 7 files changed, 43 insertions(+), 5 deletions(-)
 
-Moving the call to register_sysctl_init() into its own fs_initcall(),
-like the gmail-whitespace-damaged patch below, fixes that.
-
---- a/arch/sh/kernel/vsyscall/vsyscall.c
-+++ b/arch/sh/kernel/vsyscall/vsyscall.c
-@@ -67,11 +67,17 @@ int __init vsyscall_init(void)
-               &vsyscall_trapa_start,
-               &vsyscall_trapa_end - &vsyscall_trapa_start);
-
--       register_sysctl_init("vm", vdso_table);
-+       return 0;
-+}
-
-+static int __init vm_sysctl_init(void)
-+{
-+       register_sysctl_init("vm", vdso_table);
-        return 0;
- }
-
-+fs_initcall(vm_sysctl_init);
-+
- /* Setup a VMA at program startup for the vsyscall page */
- int arch_setup_additional_pages(struct linux_binprm *bprm, int uses_interp=
-)
- {
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
