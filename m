@@ -1,100 +1,140 @@
-Return-Path: <netdev+bounces-155056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C494A00DAE
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:35:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69893A00DB4
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:41:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BC101884AFC
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 18:35:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40B233A3F12
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 18:41:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EC31FC7CC;
-	Fri,  3 Jan 2025 18:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1361FBCB6;
+	Fri,  3 Jan 2025 18:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SrDmrANg"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="avb6MoDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from rcdn-iport-2.cisco.com (rcdn-iport-2.cisco.com [173.37.86.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83181FC105
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 18:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7241FBEA3
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 18:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735929323; cv=none; b=f1XMbAnn5ZO/v8KpXux6m6zY5KYH/bnwHbXq3f6B6e4fIN+s+KsL+xH5DXpz31zPyEqOtdUdBPcsH+5aJOH15ibQX8jB/+a3joRBCqqGb8mcoFA3C58sLaDEgOnZV/SDXNj6EaDGMCrlye+tXxErxnnMuAkxMdzFR4cXskq5TnU=
+	t=1735929701; cv=none; b=Rw0pAeajW1YRq4wrFRsodNIPKQOHfjHUP/UVvVSTqS6tsdLVRmJLkKhamGZtRubKESLKNn+rUsvG7FOgmLT7hiir9LRE2odHii72nidOAieVNlL6UBxVeif3zyvLdJkxYfazC8KPlR69ZtE9ODK4R/+yeVvEyprepuTOXVOYfzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735929323; c=relaxed/simple;
-	bh=QaOJp7HJHHdPaRMU0X9pZcayUF+tNiAnvQkPGvNtOFw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sZc9AF3++mxrk2L3FAyS86Mk0jzRLPXq7+ND5PrCxMleDzG8OIAg3Wnim17SA+2ivwiYNklUXcl/hYTq3WytbtmxCBJbEf1FFmvjXgfSlSM1t340ArN5Ni7FvwsnQ+PHPUUd+1/tzALZb7Q9bCgakCGF8n+NOxFRV8FltjR+HRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SrDmrANg; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d3dce16a3dso21970605a12.1
-        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 10:35:21 -0800 (PST)
+	s=arc-20240116; t=1735929701; c=relaxed/simple;
+	bh=MTltBdWiBtglJfuE1CqV+1oFBpZZg33vtsAIYHHQXK8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=UQdsi9qqOy+wkLkU2GlgXMGhjVOVx3d+ZAXJH+8Y9txiiJ/qXZeTlA9bNf6bC1X7KOmTRtKrEaThbV8CFt3ynTv5OdNLQ45yIGVb2PlTDHkaxp6EWRDz2cwXlozuWTnwIOqXt9a+wH/JuBu721MZVLJbz2AISH7OBW7xVcwecr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=avb6MoDp; arc=none smtp.client-ip=173.37.86.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735929320; x=1736534120; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QaOJp7HJHHdPaRMU0X9pZcayUF+tNiAnvQkPGvNtOFw=;
-        b=SrDmrANg7bq7XatCTkHKwPS69xZ5LSrV1dCtFu5IYgNafX308iHdM25dLyTip2Uwo7
-         Mk/IAs9mO3qjdu+itm4a4+Crs+egeCV8O6ml77OnLTqDgZv9eqDmVh/Ezjwr7XcE5r9J
-         gJJ6HQa2WEzahZb0no3Y+xJKh2bR2slc61RSstB74BccLgROHKw+a+xVGGWOFNmAb9C5
-         ywwhbNMcZ7Z/a0hnu6ZZXjIkNzFWLlCpbiiSJYVPz/W5KJ42APre/Saatx4QJE4ogF1P
-         WMTc1cQT8MXR1A8azwekDOWa/n9dYUqb52DgpAM62vR0sXl7l+E2SL9S5dd5l8Uzr0xl
-         SIBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735929320; x=1736534120;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QaOJp7HJHHdPaRMU0X9pZcayUF+tNiAnvQkPGvNtOFw=;
-        b=Af0wRmOrB7fEIFU1k7EZzQRSikJHLnPEgDbqIAuw7ivHE1UuLWQTDqyRWtiK/6dhUH
-         BGPGUqBZ2zkEg8Sb6tYCPZdjkbiof7ReSYybGjZ3iJVJgGwDY+MBa/zbbv/dd46T16WK
-         s02zUwvAKu66e06+XM1BPiY5uaYOdeW7SaO8ymv4K2K0j0lAAYj/EDVUB32u2U5DS2bN
-         96cT6GtbB+jmlWa8p8SdNPJSt7CJS9ID9jJ+uMgswBXoS+tKtzd/jwb83mEhLi2ICWKb
-         1BRD6Sv1xB2gEjlkn9DH74nq9hVV9yEodzi2IdLl6/WinzQw3RyDkBLJrpPOQVuqSRnt
-         l/Iw==
-X-Gm-Message-State: AOJu0YxnkY7rFskGb/rcJp44oy+pCrU0bAq++ICDjVy26tqj/ZAj681R
-	OoG0L3tygdd4BTck+ISCns+6K7dZHXd+2Qgo6WGDQnIo5h9eqMj27xkqAUjuh81egIrncJCJ+4j
-	VjhNxCLNFTVCe49EJBCUzejfN2QSOcm+SULxhMrjBXrzsEPOFlg==
-X-Gm-Gg: ASbGncuwPDP2Oie3ORKgvHji3ou5bIT66yoFKHuuQUNz3GlGLCtzfrlRSxfGHBom7Rz
-	CtDXYXXzrlQ+4g+3QV1971xaRCeI4PJyhHRW8lA==
-X-Google-Smtp-Source: AGHT+IFb9aRY0DVrCM919IVThtD+cuQpRatmwe2KgRjXI1yw5UOYd+sHnm4XRiC0Xok2nGQctE2vtiWzgpKQdzLC68I=
-X-Received: by 2002:a05:6402:268c:b0:5d0:d2b1:6831 with SMTP id
- 4fb4d7f45d1cf-5d81e8c1309mr47104018a12.14.1735929319710; Fri, 03 Jan 2025
- 10:35:19 -0800 (PST)
+  d=cisco.com; i=@cisco.com; l=1212; q=dns/txt; s=iport;
+  t=1735929699; x=1737139299;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=S/IH1fUcRPa7xsGzfjg3y3/cA5i/6sVja5+yP2O1pi8=;
+  b=avb6MoDpgRg3e650packP8NKHG93qYDg4VCLdFxfpZGq0LjBulmSAAlG
+   qWFgLxKrkJwGKjnXr159wR9SvU3ylXsKj41upw5fVMtoxT3wRnBkAMU6S
+   emPz16z17LIyMkMqffZCWioNC/JymJSLIbnoKv9EiU7TF1idA33ORp7xx
+   k=;
+X-CSE-ConnectionGUID: wQk29jNhSE2YcgTLvY7QOQ==
+X-CSE-MsgGUID: oKOW2F+PTjiDjETkVVFhSQ==
+X-IPAS-Result: =?us-ascii?q?A0BfAwBgLnhn/43/Ja1aglyCS4FPQ44ZiHWeGIF+DwEBA?=
+ =?us-ascii?q?Q9EBAEBhQcCinACJjQJDgECBAEBAQEDAgMBAQEBAQEBAQEBAQsBAQUBAQECA?=
+ =?us-ascii?q?QcFgQ4ThgiGWwEBAQMyAUYQCxguKyuDGoJlA7EggiyBAd4zgW2BSIVrh19wh?=
+ =?us-ascii?q?HcnG4FJRIQOMT6FEIV3BIQsg0GdQkgKgRcDWSwBVRMNCgsHBYEpHysDOAwLM?=
+ =?us-ascii?q?BUnEIEoBTUKOTqCDmlJNwINAjaCH3yCK4Ihgj2ER4RVhWaCF4FrAwMWEgGCO?=
+ =?us-ascii?q?kADCxgNSBEsNxQbBj5uB557gXCBFqY/oQOEJYFjn2MaM6pTmHykR4RmgWc8g?=
+ =?us-ascii?q?VkzGggbFYMjURkPjlmwMiVuAgcLAQEDCZIFAQE?=
+IronPort-Data: A9a23:eu9I66JdwmHfOx7RFE+R65QlxSXFcZb7ZxGr2PjKsXjdYENSg2BSz
+ DQeXjiHa/bfZzemKtpzbdy+px4C65aHx4BjT1Yd+CA2RRqmiyZq6fd1j6vUF3nPRiEWZBs/t
+ 63yUvGZcoZsCCea/kr1WlTYhSEU/bmSQbbhA/LzNCl0RAt1IA8skhsLd9QR2uaEuvDnRVrX0
+ T/Oi5eHYgL9gmYuajl8B5+r8XuDgtyj4Fv0gXRmDRx7lAe2v2UYCpsZOZawIxPQKqFIHvS3T
+ vr017qw+GXU5X8FUrtJRZ6iLyXm6paLVeS/oiI+t5qK23CulQRuukoPD8fwXG8M49m/c3+d/
+ /0W3XC4YV9B0qQhA43xWTEAe811FfUuFLMqvRFTvOTLp3AqfUcAzN1xNUJsbI8++t1aW1BF+
+ sA8NgFSVze60rfeLLKTEoGAh+w5J8XteYdasXZ6wHSBUbAtQIvIROPB4towMDUY358VW62BI
+ ZBENHw2ME2ojx5nYj/7DLo8m+euinD7fhVTqUmeouw85G27IAlZiui9aIOPIoTSLSlTtkG7g
+ V2c0SfBPhMbGN6y9Tm7zFysvdaayEsXX6pXTtVU7MVCjFSNy2k7BBQIWF6/pvelzEizR7p3J
+ kAJ/yM8oLQa+0usQd3wGRa/pRasuh8aSsdWCO037g6lyrfd/AuYQGMDS1Zpa8Esvec1SCYs2
+ 1vPmMnmbRRmtrGPRG3e8LqIoT6sESwIK2lEbi9sZRMM6dTloakpgx7PR8olG6mw5vXzFC38z
+ i6isicznfMQgNQN2qH9+krI6w9AvbDTRQIzowGSVWW/40YhOMiuZpej7h7Q6vMowJulc2Rtd
+ UMsw6C2hN3ix7nX/MBRaI3hxI2U2ss=
+IronPort-HdrOrdr: A9a23:xW1mE66wchh1tRyPYwPXwM/XdLJyesId70hD6qm+c3Nom6uj5q
+ eTdZsgtCMc5Ax9ZJhko6HjBEDiewK5yXcK2+ks1N6ZNWGM0ldAbrsSiLcKqAePJ8SRzIJgPN
+ 9bAstD4BmaNykCsS48izPIdeod/A==
+X-Talos-CUID: =?us-ascii?q?9a23=3Ah4hwg2im5X9cMB5gTXCN9an+4zJubUTelibSBU+?=
+ =?us-ascii?q?DJDxYQ7KpbUGhp5pDqp87?=
+X-Talos-MUID: 9a23:ueCLigoBxXu/qokNtdAezzZBE/gyzeeWNEIMvZcrh8q6CwJwAA7I2Q==
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.12,286,1728950400"; 
+   d="scan'208";a="288012000"
+Received: from rcdn-l-core-04.cisco.com ([173.37.255.141])
+  by rcdn-iport-2.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 03 Jan 2025 18:40:31 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by rcdn-l-core-04.cisco.com (Postfix) with ESMTP id EF73C1800019C;
+	Fri,  3 Jan 2025 18:40:30 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id B781220F2003; Fri,  3 Jan 2025 10:40:30 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: kuba@kernel.org
+Cc: andrew+netdev@lunn.ch,
+	benve@cisco.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	johndale@cisco.com,
+	linyunsheng@huawei.com,
+	neescoba@cisco.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	satishkh@cisco.com
+Subject: Re: [PATCH net-next v3 4/6] enic: Use the Page Pool API for RX when MTU is less than page size
+Date: Fri,  3 Jan 2025 10:40:30 -0800
+Message-Id: <20250103184030.5808-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
+In-Reply-To: <20241231164200.3364e18b@kernel.org>
+References: <20241231164200.3364e18b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250103104546.3714168-1-edumazet@google.com> <20250103182458.1213486-1-kuba@kernel.org>
-In-Reply-To: <20250103182458.1213486-1-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 3 Jan 2025 19:35:08 +0100
-Message-ID: <CANn89i+oLRQmAeXq9wCfg6E3-_dEZRJtd1tn4W1OxpcKnwFefA@mail.gmail.com>
-Subject: Re: [PATCH net] selftests: tc-testing: reduce rshift value
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com, 
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	shuah@kernel.org, karansanghvi98@gmail.com, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: rcdn-l-core-04.cisco.com
 
-On Fri, Jan 3, 2025 at 7:25=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+>On Tue, 31 Dec 2024 19:37:12 +0800 Yunsheng Lin wrote:
+>> >> It seems the above has a similar problem of not using
+>> >> page_pool_put_full_page() when page_pool_dev_alloc() API is used and
+>> >> page_pool is created with PP_FLAG_DMA_SYNC_DEV flags.
+>> >>
+>> >> It seems like a common mistake that a WARN_ON might be needed to catch
+>> >> this kind of problem.  
+>> > 
+>> > Agreed. Maybe also add an alias to page_pool_put_full_page() called
+>> > something like page_pool_dev_put_page() to correspond to the alloc
+>> > call? I suspect people don't understand the internals and "releasing
+>> > full page" feels wrong when they only allocated a portion..  
+
+That is true in my case. I think if there was a page_pool_dev_put_page()
+it would have caught my eye and I would have used it.
+
+I made a v4 patchset uses page_pool_put_full_page().
+
+>> 
+>> Yes, I guess so too.
+>> But as all the alloc APIs have the 'dev' version of API:
+>> page_pool_dev_alloc
+>> page_pool_dev_alloc_frag
+>> page_pool_dev_alloc_pages
+>> page_pool_dev_alloc_va
+>> 
+>> Only adding 'dev' does not seem to clear the confusion from API naming
+>> perspective.
 >
-> After previous change rshift >=3D 32 is no longer allowed.
-> Modify the test to use 31, the test doesn't seem to send
-> any traffic so the exact value shouldn't matter.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Thanks !
-
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+>page_pool_free_page()? We already have page_pool_free_va()
 
