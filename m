@@ -1,103 +1,156 @@
-Return-Path: <netdev+bounces-154908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F33A004B2
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 08:02:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 049CAA004C4
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 08:09:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 255A118839FD
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 07:02:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D884A3A3976
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 07:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9523819CC0A;
-	Fri,  3 Jan 2025 07:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE4E1BEF84;
+	Fri,  3 Jan 2025 07:09:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227D1101E6;
-	Fri,  3 Jan 2025 07:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41510191F94;
+	Fri,  3 Jan 2025 07:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735887761; cv=none; b=IiTm53qfdsbz2a4emKWbh8wHy4mD/cUcvd6LDc2NA3aaOt1RRkYts5BOlg3X7SInFM3BvUKfzR3FhETbU1sfEo+/a0ECs6iZM4h6t92Hz9oAgn5w6W1ztBKjnkeubBQ2JW29nq4DsoOSMt7rXQ/kyd8nzYDAz+rdNq0oK4Nvc4c=
+	t=1735888146; cv=none; b=P2ooeKzBuFjuAbi5x6VcQlJnwGTIZCL0+nr4UcHvKr1FUE5ou+yGsR8cPktHnXTZpk+1PNUYMu9xPZsT5lRzkDRIqLRAESHGGvf8H/G36bbI/cntxrRWPTlekUcGXrkm5VRHObq2weQZx8Jo8udrafl6lbcwe89np72vdYDEtYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735887761; c=relaxed/simple;
-	bh=SPZEWfN/R4Rj4I3RGMZkVlSC7prs5DAi1smJJ+I+hYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sXqKlfjK1AQb8UO4bbVzG4lYI3OLa4oOe9GbStKZihPt/6ydgk3CBNoo1nY2s6mylPvpTweJhXkcv+D2r4GGOCl2JkKrhMpaQV4+pz+4YNp1gPezSVYY3hzJWJ/DpNMCIpeAiszmu9Ow9kHtOnIS9O8r609UWmo1jTm6LPRLgrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1D09668C7B; Fri,  3 Jan 2025 08:02:30 +0100 (CET)
-Date: Fri, 3 Jan 2025 08:02:29 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	James Smart <james.smart@broadcom.com>,
-	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Matt Wu <wuqiang.matt@bytedance.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Greg Kurz <groug@kaod.org>, Peter Xu <peterx@redhat.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>
-Subject: Re: [PATCH 00/14] cpumask: cleanup cpumask_next_wrap()
- implementation and usage
-Message-ID: <20250103070229.GC28303@lst.de>
-References: <20241228184949.31582-1-yury.norov@gmail.com>
+	s=arc-20240116; t=1735888146; c=relaxed/simple;
+	bh=tcwuV8DNG5BvZ4goWl16goBLNE53PVBtzFmN0SX0QI4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XaIhAFRLaBphcWgnfa/cyCBLtnKvz1qQr3VB6TkgglMMOCKixLlxLLgjik4xmm5TREhQQMRnQDOU7H40ffLUseljl76wYGMk+eB06gUlBKy9qkoknLIggpnVY3YAnqnrIx78W0t2l+w6+Z6p4Z7oztrLVHOTwppaPGYH9nkKUK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5036i1Cb018839;
+	Fri, 3 Jan 2025 07:08:44 GMT
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 43t6j0mxbq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Fri, 03 Jan 2025 07:08:43 +0000 (GMT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Thu, 2 Jan 2025 23:08:42 -0800
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Thu, 2 Jan 2025 23:08:39 -0800
+From: <jianqi.ren.cn@windriver.com>
+To: <stable@vger.kernel.org>
+CC: <cratiu@nvidia.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <roid@nvidia.com>, <netdev@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH 6.6.y] net/mlx5e: Don't call cleanup on profile rollback failure
+Date: Fri, 3 Jan 2025 15:08:38 +0800
+Message-ID: <20250103070838.355022-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241228184949.31582-1-yury.norov@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=V7KH0fni c=1 sm=1 tr=0 ts=67778cfb cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=VdSt8ZQiCzkA:10 a=Ikd4Dj_1AAAA:8 a=20KFwNOVAAAA:8 a=t7CeM3EgAAAA:8 a=Ba9Sw2FB-nAdYA35_e8A:9 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-ORIG-GUID: hhKakaa4K52zgbFFGPOMjMYDdlzLAwbk
+X-Proofpoint-GUID: hhKakaa4K52zgbFFGPOMjMYDdlzLAwbk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-02_03,2025-01-02_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 priorityscore=1501 malwarescore=0 bulkscore=0 phishscore=0
+ clxscore=1015 impostorscore=0 adultscore=0 spamscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.21.0-2411120000 definitions=main-2501030060
 
-You've sent me less than a handfull of 14 patches, there's no way
-to properly review this.
+From: Cosmin Ratiu <cratiu@nvidia.com>
+
+[ Upstream commit 4dbc1d1a9f39c3711ad2a40addca04d07d9ab5d0 ]
+
+When profile rollback fails in mlx5e_netdev_change_profile, the netdev
+profile var is left set to NULL. Avoid a crash when unloading the driver
+by not calling profile->cleanup in such a case.
+
+This was encountered while testing, with the original trigger that
+the wq rescuer thread creation got interrupted (presumably due to
+Ctrl+C-ing modprobe), which gets converted to ENOMEM (-12) by
+mlx5e_priv_init, the profile rollback also fails for the same reason
+(signal still active) so the profile is left as NULL, leading to a crash
+later in _mlx5e_remove.
+
+ [  732.473932] mlx5_core 0000:08:00.1: E-Switch: Unload vfs: mode(OFFLOADS), nvfs(2), necvfs(0), active vports(2)
+ [  734.525513] workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+ [  734.557372] mlx5_core 0000:08:00.1: mlx5e_netdev_init_profile:6235:(pid 6086): mlx5e_priv_init failed, err=-12
+ [  734.559187] mlx5_core 0000:08:00.1 eth3: mlx5e_netdev_change_profile: new profile init failed, -12
+ [  734.560153] workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+ [  734.589378] mlx5_core 0000:08:00.1: mlx5e_netdev_init_profile:6235:(pid 6086): mlx5e_priv_init failed, err=-12
+ [  734.591136] mlx5_core 0000:08:00.1 eth3: mlx5e_netdev_change_profile: failed to rollback to orig profile, -12
+ [  745.537492] BUG: kernel NULL pointer dereference, address: 0000000000000008
+ [  745.538222] #PF: supervisor read access in kernel mode
+<snipped>
+ [  745.551290] Call Trace:
+ [  745.551590]  <TASK>
+ [  745.551866]  ? __die+0x20/0x60
+ [  745.552218]  ? page_fault_oops+0x150/0x400
+ [  745.555307]  ? exc_page_fault+0x79/0x240
+ [  745.555729]  ? asm_exc_page_fault+0x22/0x30
+ [  745.556166]  ? mlx5e_remove+0x6b/0xb0 [mlx5_core]
+ [  745.556698]  auxiliary_bus_remove+0x18/0x30
+ [  745.557134]  device_release_driver_internal+0x1df/0x240
+ [  745.557654]  bus_remove_device+0xd7/0x140
+ [  745.558075]  device_del+0x15b/0x3c0
+ [  745.558456]  mlx5_rescan_drivers_locked.part.0+0xb1/0x2f0 [mlx5_core]
+ [  745.559112]  mlx5_unregister_device+0x34/0x50 [mlx5_core]
+ [  745.559686]  mlx5_uninit_one+0x46/0xf0 [mlx5_core]
+ [  745.560203]  remove_one+0x4e/0xd0 [mlx5_core]
+ [  745.560694]  pci_device_remove+0x39/0xa0
+ [  745.561112]  device_release_driver_internal+0x1df/0x240
+ [  745.561631]  driver_detach+0x47/0x90
+ [  745.562022]  bus_remove_driver+0x84/0x100
+ [  745.562444]  pci_unregister_driver+0x3b/0x90
+ [  745.562890]  mlx5_cleanup+0xc/0x1b [mlx5_core]
+ [  745.563415]  __x64_sys_delete_module+0x14d/0x2f0
+ [  745.563886]  ? kmem_cache_free+0x1b0/0x460
+ [  745.564313]  ? lockdep_hardirqs_on_prepare+0xe2/0x190
+ [  745.564825]  do_syscall_64+0x6d/0x140
+ [  745.565223]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ [  745.565725] RIP: 0033:0x7f1579b1288b
+
+Fixes: 3ef14e463f6e ("net/mlx5e: Separate between netdev objects and mlx5e profiles initialization")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 6e431f587c23..b34f57ab9755 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -6110,7 +6110,9 @@ static void mlx5e_remove(struct auxiliary_device *adev)
+ 	mlx5e_dcbnl_delete_app(priv);
+ 	unregister_netdev(priv->netdev);
+ 	mlx5e_suspend(adev, state);
+-	priv->profile->cleanup(priv);
++	/* Avoid cleanup if profile rollback failed. */
++	if (priv->profile)
++		priv->profile->cleanup(priv);
+ 	mlx5e_destroy_netdev(priv);
+ 	mlx5e_devlink_port_unregister(mlx5e_dev);
+ 	mlx5e_destroy_devlink(mlx5e_dev);
+-- 
+2.25.1
 
 
