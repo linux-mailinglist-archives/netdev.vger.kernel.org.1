@@ -1,112 +1,142 @@
-Return-Path: <netdev+bounces-155004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69751A009E1
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 14:24:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6B5A009F6
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 14:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 481B13A4026
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:24:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C975418845C4
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA7B1F9F7D;
-	Fri,  3 Jan 2025 13:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11171EE7C5;
+	Fri,  3 Jan 2025 13:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WXmpR9TI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B5D14EC73;
-	Fri,  3 Jan 2025 13:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED978158553
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 13:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735910671; cv=none; b=QNPa4ilTecJGy1pHLlwFVeA0cPyFk6oORgYpU0gYu7XjaQfPD25iP8st004XloFvHjcoxNQGcomzUt0SSMV5enHg7Bn822wVw3HoPhLrGilOFsKwejOzXqrOb0TQ7LDhSzoBOEm1I1qsE82NH8IAj3aWnH9qpKlDrDpYw+Ccfbo=
+	t=1735911489; cv=none; b=mHL5t8DBdCoOSJBbva6M9IWD7hKcRJ9Mrm9VAoOo0RlbyH5zUzqLC/rEap9DzQ2Ze2tTuhJwbVXGuUkGC9Yyvg8p5fR446v6SPgdxA996nzjgD0976cIKbbJcNtx3BWiFC1fXs5vAcmSf1bnOd4SSAiBIlnuE3kU3Z9aZQDpPNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735910671; c=relaxed/simple;
-	bh=5mosSW1GQgZZpo2i7DEPinZwWzekIYiJeoitfDrejDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R70KcLVcbxasvP2FXwW9KVpy/mrhMp9SXlxeilGaKndUQfTcrtTA7OcZIyk2uNsAqneZl2gFZv5BtwA7KLBHZaCCPwGUcAYqaY1oP+fyyE9yBoxBskNZSvzzqryFa3QVpQD9mGaKuaLowjMssTxXUC5GrHSUnof/FrxZzzLc0XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aaedd529ba1so1232492066b.1;
-        Fri, 03 Jan 2025 05:24:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735910666; x=1736515466;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ii4Mx9K10izgFBAK7vrCyOL6NunbY8j95Pq8dx+ja4A=;
-        b=PpaoJr9MJTbhjP3i6DZZRDXsFb1DxIUFhAHuFr1JVsHpwawcPcib9oFJdk/ve7oOaD
-         bveHO0XERBogiTyRAT+4KJXvQaPMHL/cVO1K4+fbh9kOgNhlv0XfPKLhFD+UqVgMOF9k
-         qYdL/9nM5EAu1L7FxZ4bM9FWEIVryMzM2fGktCYAKqp45W2r4v9cVuaB7yvQ1Jsyke7D
-         rM63nIxNYBM1inZpJwDSCI4e0x71BwTEwek0A0Vvw2ZcN7ciyrarcowePj3/xWLF8y7S
-         yv4m4btayHY2IVhAX4w3QKPSn7os0BNi0uV/gai9t2CzntpqBWXt03UGPUnudPUbEF5s
-         XyVg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2Xf64JMoHJ1Qo3zlFeBoL+f8h1aGSNJE7/FmHJrBwu8HhEeLpya1q0UimmTx7OAkEsWg/4PQo79Ki714=@vger.kernel.org, AJvYcCWgwJN4Uz70ClbnoV4+R2rK0NIldFtfjsG2YZbCGYvb1O2XhfezXYsF7srjBAWNPHpIfU4vwfwo@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOARhdScg/tBCLEezvo8IXVtFyuPBaSuGDufJbIeNSJhwmnovt
-	ThFptxHUbc+ZrHwjSTOXw8XnUGo7Yis2T8oQ3Zd3Q4dWkoHV0Hoz
-X-Gm-Gg: ASbGncvcBN4wDfBDxcz9cJaaxKNw7vH/3yqfSrTk0S72lJns3Q8VzZRegO/YJfGZBaq
-	EgYmNvc11BPlZHQOWqswKmKW2mrP7U7+mgLv6/g0HOky95FjuPFqGN42ODwya8uqEQgPHiUr8Q3
-	UesgVyLWBx2oSV3g4CLVGjWCMlNZknHKI8vL8f3wfvIbiXGk4eh+7tbwG0gkjtNUWTpOGL0xPaf
-	5DKQVOU0bHMiQhJS9EMc47/K/lT9IV7gtQwBBtO+3VIm+k=
-X-Google-Smtp-Source: AGHT+IEsKEO0m272u/gjUvVEqepoFc2Ef3nYK/nUsVaQ6TKpjg97McLRHEVz6tIUsL6l1/+1e69spg==
-X-Received: by 2002:a05:6402:50d3:b0:5d0:9054:b119 with SMTP id 4fb4d7f45d1cf-5d81de06605mr101048634a12.21.1735910665548;
-        Fri, 03 Jan 2025 05:24:25 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:8::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0eae3b3dsm1893328466b.82.2025.01.03.05.24.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jan 2025 05:24:24 -0800 (PST)
-Date: Fri, 3 Jan 2025 05:24:22 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>, jsperbeck@google.com
-Cc: John Sperbeck <jsperbeck@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: netpoll: ensure skb_pool list is always initialized
-Message-ID: <20250103-passionate-mighty-seagull-29cebe@leitao>
-References: <20241222012334.249021-1-jsperbeck@google.com>
- <20241230175707.5e18ae96@kernel.org>
+	s=arc-20240116; t=1735911489; c=relaxed/simple;
+	bh=TUy/v2Lp8c08e+iOiygORE2hr6sS4hrPyjpbAv5RL3I=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TWZehtnwhtif42zf1KXGV6k6h7iDZNXamXdj0ygX9cYQzs7S7YWTOIPSIZYjo/t6awoROzmJ5hFmi6+ZUhfaXcabfD9LnTSotoLBHuEyQPeCVdAh/Hav1ToLvU0mbsdJvR9l69V3b8bnK/egGJ40B2eduIbgJpB+SMHDAN2Ytc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WXmpR9TI; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1735911487; x=1767447487;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=cFOhUp6fdFM2tBRc5o39pXNPmAOP9HIA75ACqW2pBQs=;
+  b=WXmpR9TISdrvxIDdn4QV7uAjzGLA2igoYF5iQ/YC7f7EdSidDEYJyIK+
+   Vx5dm62cVIVSncNIXPCkg4X765LlEjLbgL3V3lqmMeBdxBtgvvXapTjzj
+   q8UQ7K9Z89wEFYrybzZ5VJaaNLJuMYvig83k0yUs9l6iKvZgEfuX2rlcx
+   s=;
+X-IronPort-AV: E=Sophos;i="6.12,286,1728950400"; 
+   d="scan'208";a="708237824"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2025 13:38:03 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:41844]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.144:2525] with esmtp (Farcaster)
+ id 3725e560-2227-44a3-8a37-3a5f90488cf2; Fri, 3 Jan 2025 13:38:04 +0000 (UTC)
+X-Farcaster-Flow-ID: 3725e560-2227-44a3-8a37-3a5f90488cf2
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 3 Jan 2025 13:38:02 +0000
+Received: from 6c7e67c6786f.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 3 Jan 2025 13:37:58 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<maheshb@google.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzkaller@googlegroups.com>
+Subject: Re: [PATCH v1 net] ipvlan: Fix use-after-free in ipvlan_get_iflink().
+Date: Fri, 3 Jan 2025 22:37:49 +0900
+Message-ID: <20250103133749.76202-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250102174400.085fd8ac@kernel.org>
+References: <20250102174400.085fd8ac@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241230175707.5e18ae96@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Dec 30, 2024 at 05:57:07PM -0800, Jakub Kicinski wrote:
-> On Sat, 21 Dec 2024 17:23:34 -0800 John Sperbeck wrote:
-> > Move the skb_pool list initialization into __netpoll_setup().  Also,
-> > have netpoll_setup() call this before allocating its initial pool of
-> > packets.
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 2 Jan 2025 17:44:00 -0800
+> On Wed, 1 Jan 2025 18:10:08 +0900 Kuniyuki Iwashima wrote:
+> > syzbot presented a use-after-free report [0] regarding ipvlan and
+> > linkwatch.
 > > 
-> > Fixes: 6c59f16f1770 ("net: netpoll: flush skb pool during cleanup")
+> > ipvlan does not hold a refcnt of the lower device.
+> > 
+> > When the linkwatch work is triggered for the ipvlan dev, the lower
+> > dev might have already been freed.
+> > 
+> > Let's hold the lower dev's refcnt in dev->netdev_ops->ndo_init()
+> > and release it in dev->priv_destructor() as done for vlan and macvlan.
 > 
-> The fixes tag seems to be off by one? Wasn't the problem was introduced
-> by commit 221a9c1df790 ("net: netpoll: Individualize the skb pool") ?
+> Hmmm, random ndo calls after unregister_netdevice() has returned 
+> are very error prone, if we can address this in the core - I think
+> that's better.
+> 
+> Perhaps we could take Eric's commit 750e51603395 ("net: avoid potential
+> UAF in default_operstate()") even further?
+> 
+> If the device is unregistering we can just assume DOWN. And we can use
+> RCU protection to make sure the unregistration doesn't race with us?
 
-You are correct. The regression was caused by 221a9c1df790 ("net:
-netpoll: Individualize the skb pool"), when I mistakenly moved
-skb_queue_head_init() out of netpoll_init() into netpoll_setup().
+Sounds good to me.
 
-> Since __netpoll_setup() can be called by other drivers, shouldn't 
-> we move refill in there? Since the pool is per np?
+Will post v2, thanks!
 
-I'd say so.
 
-It is not a big deal to have it in netpoll_setup(), since find_skb()
-will refill the SKBs in the very first message being transmitted
-(which will undesirably delay the very first netconsole TX).
-
-On the other side, having it in refill_skbs() in the __netpoll_setup(),
-as Jakub suggested, will avoid this extra delay in the very first TX,
-and make the workflow cohesive.
-
-Anyway, thanks John for spotting this regression and working in the fix,
---breno
+> Just to give the idea (not even compile tested):
+> 
+> diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+> index 1b4d39e38084..985273bc7c0d 100644
+> --- a/net/core/link_watch.c
+> +++ b/net/core/link_watch.c
+> @@ -42,14 +42,20 @@ static unsigned int default_operstate(const struct net_device *dev)
+>  	 * first check whether lower is indeed the source of its down state.
+>  	 */
+>  	if (!netif_carrier_ok(dev)) {
+> -		int iflink = dev_get_iflink(dev);
+>  		struct net_device *peer;
+> +		int iflink;
+>  
+>  		/* If called from netdev_run_todo()/linkwatch_sync_dev(),
+>  		 * dev_net(dev) can be already freed, and RTNL is not held.
+>  		 */
+> -		if (dev->reg_state == NETREG_UNREGISTERED ||
+> -		    iflink == dev->ifindex)
+> +		rcu_read_lock();
+> +		if (dev->reg_state <= NETREG_REGISTERED)
+> +			iflink = dev_get_iflink(dev);
+> +		else
+> +			iflink = dev->ifindex;
+> +		rcu_read_unlock();
+> +
+> +		if (iflink == dev->ifindex)
+>  			return IF_OPER_DOWN;
+>  
+>  		ASSERT_RTNL();
 
