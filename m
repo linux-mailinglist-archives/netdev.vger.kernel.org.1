@@ -1,210 +1,180 @@
-Return-Path: <netdev+bounces-154993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBDB9A0096F
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:44:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B9AFA0097A
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:49:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CAD23A3F4E
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:44:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54F123A4090
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 12:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0E61F9EC1;
-	Fri,  3 Jan 2025 12:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F1481ACA;
+	Fri,  3 Jan 2025 12:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="PvcGIoGa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DoXJRa+p"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD83A13AD0;
-	Fri,  3 Jan 2025 12:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14B117FE
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 12:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735908267; cv=none; b=gcI4JQ8ZgJB2m2zaENiZyJMsGgfJR3gqTEzxzURkheVGamSGDp/1ChoiU3cqv5LjEMm2BbtdwJ5ZpzWVqGQ0xdgR8de8fkFS/SHKG96kP7Mu/lEEnn0NlI4S6Wh4Fxd1knsbxW03qx9wQhBD9EqvYLbpFiSpQJfFTFHF3c1MyqU=
+	t=1735908574; cv=none; b=NmBtNyQqOazMqwi8mcikEypqBG3C+mB272oeNkmivk3SdROQyvIb43BCCskpU1Dxp2IeusObps2TsfX7NpDv/Kja0x55FOyePuBQYpkuaZ4J+Rn0o+8Va9mAu2EUIayiOksPnxsNQo4typxV+xbHvq3BBDAhPOxj9czZVzjBrbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735908267; c=relaxed/simple;
-	bh=krDGRjayoOsoh5XjM6GvGjIYFJHqDr9v4Qe04+FHShk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qeaQpWHDnFRSVNH2tO/i3ZI3ECqc8Jo7k9KZgAOFqLL2JzmzJsOx3b2ujr8peYukOfyPe8xSzZ77KyZnXhA6ve2cLeFaRSUCHRQTk1K4+Q8tXb5pSz2j3StQ+0cjbpZd1C4LWBRwHQZMf82yG0YhjhbHsY9DHd1OcmIvaJPJRMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=PvcGIoGa; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=sFSHBiXr+7Q7NZLBB84wQqXg2IVnkZZZFm8HrX7/q20=;
-	t=1735908265; x=1737117865; b=PvcGIoGafjfAoktHT6R6jlCSYxnImTLOhEn71xB8dYxQFHX
-	gUgaWU6FQzggrzBXE4GPuDNDoquGe9Wze3T/TSv+KvthS882uRgyDQZmNPzsUeFkUTRuLiuzYTT/S
-	456RPCZty3GpmONO9br3jEOg0V2MLZAGmGwgtKlJq41iF5u/xpYRqLNIZuzT/0kLsdmLNUlAFn5lT
-	AnAySiNJiPKU6UemJ8YxkZ/VFr1FI0OFHMSF5UHjbv+hrSpjDxhgmAgJ7FF8QQz4hzsK/To18y7B/
-	5QpbHtV49Pa6UonmpKAtiPomN80+lmeqyDhz1Dvm4FOaWtIVn3Ia78T41k+VvzJg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tTh29-00000002YNn-36Sj;
-	Fri, 03 Jan 2025 13:44:09 +0100
-Message-ID: <8414fd0c552de87b3471468665f7fc540b9bfa69.camel@sipsolutions.net>
-Subject: Re: [PATCH] net: ethernet: toshiba: ps3_gelic_wireless: Remove
- driver using deprecated API wext
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Philipp Hortmann <philipp.g.hortmann@gmail.com>, Andrew Lunn	
- <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet	 <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni	 <pabeni@redhat.com>, Geoff Levand <geoff@infradead.org>, Simon
- Horman	 <horms@kernel.org>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, 	netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Kalle Valo <kvalo@kernel.org>, Alexandre Belloni	
- <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-  Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Jeff Johnson	 <quic_jjohnson@quicinc.com>,
- Larry Finger <Larry.Finger@lwfinger.net>,  Nicolas Ferre
- <nicolas.ferre@microchip.com>, Pavel Machek <pavel@ucw.cz>, Stanislaw
- Gruszka <stf_xl@wp.pl>,  Gregory Greenman <gregory.greenman@intel.com>,
- linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, 
-	linux-staging@lists.linux.dev, linux-wireless@vger.kernel.org, Arnd
- Bergmann	 <arnd@arndb.de>, Stefan Lippers-Hollmann <s.l-h@gmx.de>
-Date: Fri, 03 Jan 2025 13:44:08 +0100
-In-Reply-To: <39256db9-3d73-4e86-a49b-300dfd670212@gmail.com>
-References: <20241224080755.194508-1-philipp.g.hortmann@gmail.com>
-	 <b811d4af6a634d61389dfefacd49853c0e77f1d7.camel@sipsolutions.net>
-	 <39256db9-3d73-4e86-a49b-300dfd670212@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
+	s=arc-20240116; t=1735908574; c=relaxed/simple;
+	bh=7MRQJGBiUBCzLqnvCFabIBG8fZhV46yIYuerOdSsBuk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hDncOZrKzRbEn0Pl6cuxMd6KD8Rw8cdoTHrYkGJLEX5ARkObRxVrX9np3AAe1zK18O+IfF9NZCLhz4FAUR+vwMHURh+sbOYbL72IhTi8z6bBDcDZWCQ6PfN4LWwd+IwlTU4TbumMgTSb+VbP4fr8d6ulxPNBTT2fNn1CzkmOeQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DoXJRa+p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6BB3C4CEDD;
+	Fri,  3 Jan 2025 12:49:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735908574;
+	bh=7MRQJGBiUBCzLqnvCFabIBG8fZhV46yIYuerOdSsBuk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DoXJRa+pU6CHt2lK8th/jEIOoCYCm7wYTRLN7Isp5pDmCWLNnwPbsMBZPcmzm4Q97
+	 4QGTYV5FiA89ZqRdPJUiOGgXf5e3LSdDBCjVNmKx07fDP/BZiKxzU0KjvR6OfrgL3q
+	 zeALEj10hSgxqiFaae5aUKrfmKgArm5SL+YxBawU0qUzlQKlZbvavGM53+bkPgvb26
+	 Cf/eK8PGkkWOS7tfnq5OZl/VOoRaAWyTKVbur8r1fPbjj3r5yjA5GgMKX4SKDoNdm+
+	 lsdJbecDvo762SrObd6KijNACdEPVxeRnP1yRKMreXRJ2IXE/FXhy/hS+6XL6entrd
+	 kSzAA2vBD495Q==
+Date: Fri, 3 Jan 2025 13:49:30 +0100
+From: Niklas Cassel <cassel@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Francesco Valla <francesco@valla.it>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	Anand Moon <linux.amoon@gmail.com>
+Subject: Re: [PATCH] net: phy: don't issue a module request if a driver is
+ available
+Message-ID: <Z3fc2jiJJDzbCHLu@ryzen>
+References: <20250101235122.704012-1-francesco@valla.it>
+ <Z3ZzJ3aUN5zrtqcx@shell.armlinux.org.uk>
+ <7103704.9J7NaK4W3v@fedora.fritz.box>
+ <d5bbf98e-7dff-436e-9759-0d809072202f@lunn.ch>
+ <Z3fJQEVV4ACpvP3L@ryzen>
+ <Z3fTS5hOGawu18aH@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z3fTS5hOGawu18aH@shell.armlinux.org.uk>
 
-On Fri, 2025-01-03 at 07:44 +0100, Philipp Hortmann wrote:
->=20
-> One of my big fears is the hand over to the next generation maintainers=
-=20
-> and developers. The less code and the less exceptions due to old=20
-> interfaces the easier it will be. We loose maintainers and developers=20
-> for many reasons, like: retirement, burnout, embargos or simply because=
-=20
-> they are not paid and need to earn money. After giving some support on=
-=20
-> the staging subsystem I cannot see at all that we can attract so many=20
-> talented people as required for a save future beyond 7 years...
+On Fri, Jan 03, 2025 at 12:08:43PM +0000, Russell King (Oracle) wrote:
+> On Fri, Jan 03, 2025 at 12:25:52PM +0100, Niklas Cassel wrote:
+> > I'm trying to enable async probe for my PCIe controller (pcie-dw-rockchip),
+> > which on the radxa rock5b has a RTL8125 NIC connected to it.
+> > 
+> > By enabling async probe for the PCIe driver I get the same splat as Francesco.
+> > 
+> > Looking at the prints, it is trying to load a module for PHY ID: 0x1cc840
+> > This PHY ID is defined in: drivers/net/phy/realtek.c.
+> > 
+> > Looking at my .config I have:
+> > CONFIG_REALTEK_PHY=y
+> > 
+> > So this is not built as a module, so I am a bit surprised to see this
+> > splat (since the driver is built as built-in).
+> > 
+> > 
+> > I think it would be nice if the phylib core could be fixed so that
+> > it does not try to load modules for drivers which are built as built-in.
+> > 
+> > 
+> > Also see this old thread that tries to enable async probe by default on
+> > DT systems:
+> > https://lore.kernel.org/linux-kernel//d5796286-ec24-511a-5910-5673f8ea8b10@samsung.com/T/#u
+> > 
+> > AFAICT, it seems that the phylib core is one of the biggest blockers from
+> > being able to enable async probe by default on DT systems.
+> 
+> Yes, we accept that phylib is incompatible with async probing. I don't
+> think that's going to change, because it's fundamentally baked in with
+> the way the whole fallback driver stuff works.
+> 
+> We *certainly* don't want to move the request_module() into
+> phy_attach*() (which is the point where we require the driver to be
+> bound or we fallback to the generic feature-reduced driver). First,
+> that *will* break SFP modules, no ifs or buts.
+> 
+> Second, moving it there would mean calling request_module() in many
+> cases with the RTNL held, which blocks things like new connections
+> network establishing while the module is requested (I've run into this
+> problem when the TI Wilink driver locks up holding the RTNL lock making
+> the platform impossible to remotely resolve if there isn't an already
+> open SSH connection.) We certainly don't want userspace to be doing
+> stuff while holding the "big" RTNL that affects much of networking.
+> 
+> Third, I suspect phylib already has a race between the PHY driver /
+> driver core binding the appropriate driver and phy_attach_direct()
+> attaching the fallback generic driver to the driverless PHY device,
+> and making this more "async" is going to open that race possibly to
+> the point where it becomes a problem. (At the moment, it doesn't
+> seem to cause any issue, so is theoretical right now - but if one
+> reads the code, it's obvious that there is no locking that prevents
+> a race there.)
+> 
+> What saves phylib right now is that by issueing the request_module(),
+> that will wait for the module to be loaded and initialised. The
+> initialisation function will register the PHY drivers in this module.
+> As this is synchronous, it will happen before request_module() returns,
+> and thus before phy_device_create() returns. Thus, if there is a module
+> available for the PHY, it will be loaded and available to be bound
+> to the PHY device by the time phy_device_register() is called. This
+> ensures that - in the case of an auto-loaded module, the race will
+> never happen.
+> 
+> Yes, it's weak. A scenario that could trigger this is loading PHY
+> driver modules in parallel with a call to the phy_attach*() functions,
+> e.g. when bringing up a network interface where the network driver
+> calls through to phy_attach*() from its .ndo_open() method. If we
+> simply make phylib's request_module() async, then this race will be
+> opened for auto-loaded modules as well.
+> 
+> Closing this race to give consistent results is impossible, even if
+> we add locking. If phy_attach*() were to complete first, the generic
+> driver would be used despite the PHY specific driver module being
+> loaded. Alternatively, if the PHY specific driver module finishes
+> being loaded before phy_attach*() is called, then the PHY specific
+> driver will be used for the device. So... it needs to be synchronous.
+> 
+> I also don't think "make a list of built-in drivers and omit the
+> request module" is an acceptable workaround - it's a sticky plaster
+> for the problem. If the PHY driver isn't built-in, then you have the
+> same problem with request_module() being issued. You could work around
+> that by ensuring that the PHY driver is built-in, but then we're
+> relying on multiple different things all being correct in diverse
+> areas, which is fragile.
 
-I wouldn't say that's necessarily a wrong sentiment, but I feel future
-maintainers can also make that decision, and if it's "years" in the
-future the relevance will only go down anyway.
+FWIW, the patch in $subject does make the splat go away for me.
+(I have the PHY driver built as built-in).
 
-We just started putting some pressure into the system for removal of
-wext and nl80211 support (with WiFi7 devices no longer supporting wext)
-so chances are at least here the situation will change, and anyway wext
-stuff will become less relevant, perhaps to the point that other tools
-will drop support for it anyway. Not wpa_supplicant though, I suppose :)
+The patch in $subject does "Add a list of registered drivers and check
+if one is already available before resorting to call request_module();
+in this way, if the PHY driver is already there, the MDIO bus can perform
+the async probe."
 
-> People who evolved with the kernel development do not have a good sense=
-=20
-> how difficult it can be to join nowadays.
->=20
-> A friend just bought two servers. One with a paid OS and one planned=20
-> with Linux as OS. The difference was over 12000 =E2=82=AC due to licenses=
-. What=20
-> would be the price when we do not have a choice? Do not feel save=20
-> because of today. We need to fight for tomorrow.
+Personally, I think this solution is better than keeping the status-quo.
 
-Not sure I see how that's related. This stuff really isn't in the way
-now. If it were, I might have killed it already like the staging
-driver(s).
+If we take a buildroot kernel config for a specific board as an example,
+they are very careful to always mark the NIC driver for the specific board
+as built-in, such that the board can use nfsroot.
+(Same logic can be applied to phylib driver.)
 
-> Where do you want to invest your time? Into the new technologies to keep=
-=20
-> up at the front edge or to keep old stuff running that is not productive=
-=20
-> anymore. But there might be someone who can pull the hardware once every=
-=20
-> two month out of the shelf and ask why this is not working. Should this=
-=20
-> really stop us from progress?
+Having a solution similar to what is suggested in $subject would certainly
+improve things for DT based systems.
 
-Again, I don't see the correlation, much less causation. Keeping the
-wext stuff working for now is a promise for stable APIs for existing
-things anyway. IMHO progress isn't achieved by removing old things
-gratuitously but by offering better ways and moving things over. Which
-_is_ happening, just that this particular driver is a hold-out because
-progress happened in a direction that didn't add support for it.
-
-> Partial, for me more important was the try to remove all wext drivers in=
-=20
-> October 2023 by Arnd Bergmann.
-> [PATCH] [RFC] wireless: move obsolete drivers to staging
-> https://lore.kernel.org/linux-staging/20231010155444.858483-1-arnd@kernel=
-.org/
-
-I don't think this was really all that much about "remove wext" rather
-than "remove obsolete stuff".
-
-> I was not able to use the WLAN on T2 Linux. I just tested the Ethernet=
-=20
-> connection as I know that the developer of T2 is using it. The reason=20
-> why I bought the PS3 is to see if Linux on it is really a use case. But=
-=20
-> all I found is that it is only a test vehicle to say T2 is working on=20
-> Power PC architecture.
-
-Power is vastly more than PS3, the SPU/cell architecture was more the
-interesting part of PS3 rather than anything else.
-
-> At the time the PS3 WLAN driver was added to the mainline kernel it was=
-=20
-> really cool stuff. But nowadays it is just a high Power consuming device=
-=20
-> with a noisy fan and not enough RAM to do anything (256MB). The=20
-> powerfull GPU is not supported by the kernel.
->=20
-> Do I need to find out why the WLAN is not working under T2 on PS3 to=20
-> convince you? The WLAN is working under redribbon Linux with Kernel 3.5=
-=20
-> on the PS3.
-
-That's a whole different argument, so you're saying it wasn't working
-_anyway_? Your whole original patch/argument seemed to be centered
-around a whole lot of other things, but if it's not working anyway and=20
-
-> T2 is working but to make this happen the T2 Author has an own repo for=
-=20
-> patches to apply. In the following video he publishes his view on how=20
-> well the ps3disk is maintained and tested by the linux kernel community.=
-=20
-> My impression of this is that ps3disk is not tested on hardware at all.
-> You can find this in a youtube video: =E2=80=9CI can't believe VIP Linux =
-kernel=20
-> developer BROKE PS3 support=E2=80=9D but watch out that you are in a good=
- mood=20
-> otherwise it is pulling you down like me...
-
-That's on him, things get broken all the time. I guess rants sell better
-*shrug*.
-
-> The following points are also in the list of reasons:
-> - This driver has a maximum 54MBit/s as it supports only 802.11 b/g.
-> - Using this hardware is security wise not state of the art as WPA3 is
->    not supported.
-
-Neither of those is really all that relevant, there are plenty other
-11g-only drivers and/or without WPA3, and WPA3 anyway isn't all that
-critical. Crypto in WPA2 isn't broken (in fact it's mostly the same as
-WPA3), it's just (slightly) less susceptible to DOS attacks due to MFP.
+Also note that arch/arm64/configs/defconfig marks a bunch of phylib drivers
+as built-in.
 
 
-Anyway ... if it's broken it _would_ be nice to know why, just to know
-how long ago that was I guess, but we can also remove it with that
-argument. I just think that's a completely different argument ("it's
-broken and nobody cared in a few years") than what your patch now
-implies ("it's working but too old".)
-
-johannes
+Kind regards,
+Niklas
 
