@@ -1,127 +1,96 @@
-Return-Path: <netdev+bounces-154933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5ACAA00666
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 10:02:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDBA2A00676
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 10:09:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1676E1883340
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 09:02:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C061A3A3490
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 09:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9B21CB9E2;
-	Fri,  3 Jan 2025 09:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A691CDFC2;
+	Fri,  3 Jan 2025 09:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="J9ozDVkk"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SQ2IWdKk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565B81CDFAE
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 09:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C151CD210;
+	Fri,  3 Jan 2025 09:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735894945; cv=none; b=Gwan9uecGs6FT0YaT4P7iApu2FrN0iXc4vYEF+vpEZqkh5yE14peFUCoekfc2BFxS8BY2sKbZRiaA+rl0/9yx2SW8627DCmW3enrnmVAmb+kfHq+ZAIgdrrFHs4Hu8XTwsX2nC+6sDwPxMuRBH6FOQGaWx9w8Fijdq+Gmsbb7a4=
+	t=1735895335; cv=none; b=PegnzUxZdN1PrAKms02f0347l3lIm3R1UhgVuT92FgaXNaoyhlQTO45+mix80TOT/L1t8kvSjnk5trog9GpFtestntsm7kONRf9J99jBNKjUXPeDBxoxUrbYIESztlG1/DlUcU6nFjlig04Wgt2FZcL4gmXEMdBv/4+CQ3rbLbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735894945; c=relaxed/simple;
-	bh=CtpIcZ+uMgp832pH13wtr03ahZTx/KGoTuQTpC1vyBw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OXQszwfGYvib3a2kj/s7nAmXvk0/NPRPOR1+6BdLc63jKSsX+3/3gC/BGX1wJ23djofy1UkTP4WBN7YwSMgGwl0+RcUNycFMTNbyEgDStHzorh6CPk48iWN3EVauy0OUPDH/pccWPG5i2T0Bnyip39+41PE/P23ULrXlqM8patA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=J9ozDVkk; arc=none smtp.client-ip=212.77.101.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 9744 invoked from network); 3 Jan 2025 09:55:41 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1735894541; bh=kR8u14G55mBiCvnHB6XuasmXPZ+aNP3XsvXhAil8rPw=;
-          h=From:To:Cc:Subject;
-          b=J9ozDVkk4KHNttDggHRV9979z02xHORMkpWeqz1XVdTzQUXm1d2HScRCKev0zr01I
-           Z1wGCkYilM9StMyOCkGElIDYrG1MfK4qgWtGqFqrs6tUNScd7lD+7cBTj1B8yYPQMG
-           DQc+RlcVFTNZIIMzKw3dIdkzGjP1kvPVGii7vhTy5pVXbRVL93FA9O/bw2aZqGGJE4
-           JpytIgQ+VIEpSH3GNfzAUyApabsOW4vtngbW0oPBWCM8U1ClLr5wQoVpoOyL3+mP74
-           AfZYw9WBKCWVfJ5GDsaF1tQ4EDqvxVxLoUIQF/lPc90Q7a0Qz6M9JtpwMFcCCjkekd
-           O1Sc5V1k7et6Q==
-Received: from 89-64-0-140.dynamic.chello.pl (HELO localhost) (stf_xl@wp.pl@[89.64.0.140])
-          (envelope-sender <stf_xl@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <ariel.otilibili-anieli@eurecom.fr>; 3 Jan 2025 09:55:41 +0100
-Date: Fri, 3 Jan 2025 09:55:40 +0100
-From: Stanislaw Gruszka <stf_xl@wp.pl>
-To: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	Kalle Valo <kvalo@kernel.org>,
-	Tomislav =?utf-8?Q?Po=C5=BEega?= <pozega.tomislav@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH 1/2] rt2x00: Remove unusued value
-Message-ID: <20250103085540.GA94204@wp.pl>
-References: <20241221124445.1094460-1-ariel.otilibili-anieli@eurecom.fr>
- <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
+	s=arc-20240116; t=1735895335; c=relaxed/simple;
+	bh=Cy2jESlnYyuwXA7sssXsvJzc2f/h9kpIy8cZpD/RbZw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PidP8ntD24pthN5AIBqpuhDOcjgFdAM7zmiJXrL5Z9ehKnQIbcT1m4dRJ+cLv3KqQuZLQg+ysClg9hNgcCxH90gIqflBsUryjnghbLB/UoMjeSarNZrkKYPGLON+2EijoRfJxwS5m80gmD3l/y54Cgt3bd/7itYlMcYbtGXX1Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SQ2IWdKk; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1735895333; x=1767431333;
+  h=from:to:subject:date:message-id:mime-version;
+  bh=Cy2jESlnYyuwXA7sssXsvJzc2f/h9kpIy8cZpD/RbZw=;
+  b=SQ2IWdKkTZBD6Gsb77XDE9usyH2KKcRvIZYuZyRxkMHYeHoSOOlZfozx
+   pN/uTHQ5kAzFG4G7FvlqwHNlkHxUNtAPRqMPWvg4tsO28JinREPwbhGL3
+   VC4X8bD/U5ioGVRslb3r7XK7clh29TCgia57jQ9MI8KTXYxgn8lpsDRdP
+   trVV3oZPjsQfRUESDFGEEa+8Jb9IITve9QbBlAS5BZ1ov1fsfPGgn7D4A
+   RefLqedv95BOPwvjoJ90BJHfvM6+35MlWOc8pqc1s5BE5VoTQ12VK1EIH
+   TrG1+SUhsPaGubIbcReSjVpfszutdCTHBSspVrDYee7Iu8JprDOTp5vUD
+   A==;
+X-CSE-ConnectionGUID: mw4tOLDUT3aREIdU5k9GYA==
+X-CSE-MsgGUID: 9SOwS3vFQ7mVWgjQiEA4Jw==
+X-IronPort-AV: E=Sophos;i="6.12,286,1728975600"; 
+   d="scan'208";a="267389301"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Jan 2025 02:07:43 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 3 Jan 2025 02:07:31 -0700
+Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 3 Jan 2025 02:07:27 -0700
+From: Divya Koppera <divya.koppera@microchip.com>
+To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
+	<vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next 0/3] Add PEROUT library for RDS PTP supported phys
+Date: Fri, 3 Jan 2025 14:37:28 +0530
+Message-ID: <20250103090731.1355-1-divya.koppera@microchip.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
-X-WP-MailID: cc7567f25501454dd1d5e2b154d29223
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [kQMk]                               
+Content-Type: text/plain
 
-On Sat, Dec 21, 2024 at 01:39:32PM +0100, Ariel Otilibili wrote:
-> Coverity-ID: 1525307
-> Signed-off-by: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
-> ---
->  drivers/net/wireless/ralink/rt2x00/rt2800lib.c | 6 ------
->  1 file changed, 6 deletions(-)
-> 
-> diff --git a/drivers/net/wireless/ralink/rt2x00/rt2800lib.c b/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
-> index 60c2a12e9d5e..e5f553a1ea24 100644
-> --- a/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
-> +++ b/drivers/net/wireless/ralink/rt2x00/rt2800lib.c
-> @@ -8882,13 +8882,10 @@ static void rt2800_rxiq_calibration(struct rt2x00_dev *rt2x00dev)
->  
->  	for (ch_idx = 0; ch_idx < 2; ch_idx = ch_idx + 1) {
->  		if (ch_idx == 0) {
-> -			rfval = rfb0r1 & (~0x3);
->  			rfval = rfb0r1 | 0x1;
+Adds support for PEROUT library, where phys can generate
+periodic output signals on supported GPIO pins.
 
-I wonder if intention here was different, for example:
+Divya Koppera (3):
+  net: phy: microchip_rds_ptp: Header file library changes for PEROUT
+  net: phy: microchip_t1: Enable GPIO pins specific to lan887x phy for
+    PEROUT signals
+  net: phy: microchip_rds_ptp : Add PEROUT feature library for RDS PTP
+    supported phys
 
- 			rfval = rfb0r1 & (~0x3);
-  			rfval = rfval | 0x1;
+ drivers/net/phy/microchip_rds_ptp.c | 320 ++++++++++++++++++++++++++++
+ drivers/net/phy/microchip_rds_ptp.h |  47 ++++
+ drivers/net/phy/microchip_t1.c      |  18 ++
+ 3 files changed, 385 insertions(+)
 
-For me the patch looks ok - it does not change existing behaviour,
-since rfval is overwritten by second line anyway.
+-- 
+2.17.1
 
-Acked-by: Stanislaw Gruszka <stf_xl@wp.pl>
-
-But Tomislav and Daniel, please check if this code is correct.
-
->  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 1, rfval);
-> -			rfval = rfb0r2 & (~0x33);
->  			rfval = rfb0r2 | 0x11;
->  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 2, rfval);
-> -			rfval = rfb0r42 & (~0x50);
->  			rfval = rfb0r42 | 0x10;
->  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 42, rfval);
->  
-> @@ -8901,13 +8898,10 @@ static void rt2800_rxiq_calibration(struct rt2x00_dev *rt2x00dev)
->  
->  			rt2800_bbp_dcoc_write(rt2x00dev, 1, 0x00);
->  		} else {
-> -			rfval = rfb0r1 & (~0x3);
->  			rfval = rfb0r1 | 0x2;
->  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 1, rfval);
-> -			rfval = rfb0r2 & (~0x33);
->  			rfval = rfb0r2 | 0x22;
->  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 2, rfval);
-> -			rfval = rfb0r42 & (~0x50);
->  			rfval = rfb0r42 | 0x40;
->  			rt2800_rfcsr_write_bank(rt2x00dev, 0, 42, rfval);
->  
-> -- 
-> 2.47.1
-> 
 
