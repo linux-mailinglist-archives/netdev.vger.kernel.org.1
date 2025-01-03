@@ -1,215 +1,115 @@
-Return-Path: <netdev+bounces-154906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A22FA00479
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 07:44:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C152A00490
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 07:54:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 412AA162551
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 06:44:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31D953A35EA
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 06:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E6B71B4130;
-	Fri,  3 Jan 2025 06:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642F81714C0;
+	Fri,  3 Jan 2025 06:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m/LQrtw7"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="o3O0hx5z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989FB1B21B5;
-	Fri,  3 Jan 2025 06:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11ABF18E3F;
+	Fri,  3 Jan 2025 06:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735886679; cv=none; b=KbBF60MYmwh7xDjsYc5QFFjc8lwFVsB7FnkffsbsGHSgd+r7v2r/FK5v2fz+HKAQ1H2RI6MkECHlQZeMjFCAhtDWbzxo1ICAidS6zyE/UD1wixor5OxN3eMGbsmEMMerLAkiBtPF2wA1an4Qq1w1yJvQEpq9fOuPn/TrWcWmls0=
+	t=1735887263; cv=none; b=Xryejvjr3RM9trfiEkw8WVmOs6S1t2tmmulqo9MR4ORAxWupczr3trvQDt+B+/p6suMJIAhaZug7ppL+TIzDwlETkAmNrlUXL8+h/LATziH5LvnkS3OqVGaY41G9IfM6+X4BgI5nJoUOwMvEWcL5KYNFS2SiSG1oU/hFvomRBjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735886679; c=relaxed/simple;
-	bh=3KP0nCS6lvOsicuamKMU2eVXmaOYVs8MJvEzz0z93VM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R4kFrAN0e6cbRHNvxyoJ9iPXq1XjYasrmjPvlptnt1xFqoVwR0XbZHFwBZjhzXc4A2szvkzOw5/Gj4bT3YmOHHUVNDLuPkrSt+S3a4puPo2rKH3rpig2HoS68C6SJsBmAMX+FtAROHDld5olAk8P5gVuHvtGajFr0yD0cREJPU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m/LQrtw7; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3862b364538so6837117f8f.1;
-        Thu, 02 Jan 2025 22:44:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735886676; x=1736491476; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ABL1p7nta/CRl8BsVQhOmjXI/HpJhPxNL3TKYtG8RXE=;
-        b=m/LQrtw7A6fkyS+dLafLI+0rJIhmMcW1O1pbzrdJLJNNNCzPX3G2t9vtwKgiGDSVT1
-         LrT6/zTFxSGipfsjMLnZUvqjBlLVbrodQp71dp03ayVVuOTsZTHa2MkEavwteD/mykQn
-         w3EFxAwcvwZGi5eEl7WjVIFo75ZJ7R4U5daWfOjZpKSn9V870Cw0WUpkg7gDQmZw/l92
-         FbrV9+MjzrMJDvNGHY7zIbXcMgmIAwJ7OXsWET0vt9nB8FJUSRW6tBaIeKK793EEImn3
-         EQH440SFLgsVEPwDVIAPKRelWf0X64Un0MwEL0v5GVqgTs+AoJ1QWTPH6dj0Hhrvg25T
-         jrbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735886676; x=1736491476;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ABL1p7nta/CRl8BsVQhOmjXI/HpJhPxNL3TKYtG8RXE=;
-        b=P7Hg4K+5WWGZJ3rAVVEgAzPukEhJTx3shC5nBhoHyidiQS2uaJOzOUDwR/9ZmJJsc6
-         dFBmTeTLsJfp59ORGy0IvMtk8lPMRwTuddYDwVx/EjzkMqlqi1Bvdgmtz7czWvdlC+M0
-         6eoQwrLt0utrJhWXTNr7ICIJL5AXuq3itk5a5lfbAMlK7nsoApwt0glg5IYzAaflrvxZ
-         6ioh68xk6WuNQn3KX+vY1pmjhgXYoIyaCEq5hZkVX0pRcwja8yeWjUFbT9U+xjUVpZqs
-         bVv6ZhbibaicwwsB6p1LI4BuleH7DXjpsGTjpOt8yGnyE00hCWcSTlu645tmbbYCNDfo
-         snFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUSi4XwT67M5LuKcNuwXKOt8rDHp8tgSsDZ92voBXPOwoIw2CB4tKDNitd0wRjmwd1mXI/+G3n8/9zxDs94zc=@vger.kernel.org, AJvYcCUxL5ASMv/frbvjkB/NCikmPKbYoYOs11SqlLHqjgoz8f4QuEzChtm+cEXktbMbENPk0GDL1K1SpYCLK7w=@vger.kernel.org, AJvYcCX8Y3riVXTAWejhT1T5x1lZH3WJHrEC4RTf/IEwEF1RaqawYNzNd0yURVsXawZHPOXVnDKkuN/v@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx6YF54eobhIQuHkaPnSF5aYXg9nq+Wo5v3Wdc8Ls4PWLUABC1
-	UsruvFo9Sw68nMqQD1Cqg4PTaxuU+MULiCikaogqQdIxehmPkQ1Z
-X-Gm-Gg: ASbGncvzZe6qBZa6/aeiobyZ/rZE8TPfzVv0s4uJFFqDbvNz4PycZHBQGLEUkkYYszG
-	3zrTeQ0SxtU3waARZoT8x5snh22f74M6kmcCGQPpPq/Rb0W7ohbmcbq4x9Y+wUmDE00cSPORSfX
-	eLYoUxC56mZDYjtuVHjj+zRO/m4GqTYWDWMZ+cnORh3bFTqVGdeDJcVYu3kquLBHoEf9bLIgXro
-	uvQutVB3a7HBAUminawyY4ob4m/uuJ/zvz2cZdGSMFJN8RT+GyP4f7KBxz2JD4dlKaQa6OaoEnw
-	7Nq/cJRjuSv/hwUrGsam75JFCBU=
-X-Google-Smtp-Source: AGHT+IGAa139yx3LH2QxpRgTHdKaVEYWhB6ijI8gOCJypp9phUqVp1ost3xXdpx7HlRS9Snm1/kE5w==
-X-Received: by 2002:a05:6000:2af:b0:388:ce0c:9f19 with SMTP id ffacd0b85a97d-38a1a177e24mr44534740f8f.0.1735886675749;
-        Thu, 02 Jan 2025 22:44:35 -0800 (PST)
-Received: from [192.168.2.105] (p57935577.dip0.t-ipconnect.de. [87.147.85.119])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366128a44fsm471876805e9.43.2025.01.02.22.44.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jan 2025 22:44:35 -0800 (PST)
-Message-ID: <39256db9-3d73-4e86-a49b-300dfd670212@gmail.com>
-Date: Fri, 3 Jan 2025 07:44:32 +0100
+	s=arc-20240116; t=1735887263; c=relaxed/simple;
+	bh=PJpgzKeezNgC+5hejlcAZIEUZi3MXPTqwoKcVqJHGak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rqg7EBQ8rRaoIBClH6qyXrRvmY1rg2qmxuXIEcPWiMz87hZMM+aVMdBGafP56dPCUlntZzAk3mkQK76SFQ2bbjecEpvM04a5Vkf9tuvV7vEz4U6IPYorHVdmMjzb0v14QPgUt8nuTEQCOEYjj8L/qhLZKrNqik5O+iVKGVg6RuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=o3O0hx5z; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1735887251; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=Z4LkRbGR3D2V2xL7xVxfuLn4xv2XaiQ/dik6t3ApoyA=;
+	b=o3O0hx5z2dGFEA/LeAwT5NWQ8dx2by1r+oqkibQTs3TvO9P4Oh5Qr27TR8JI5W7LjvyxRsSUz5V8ezPioocGvLIAtSWcMZo/BCnb5ax645AiUrnFTGD1evTVhoX0Keh/w9BYBkAjC4Euo6nf4HVSC+E+2q8vtO3whlz1nRnux1s=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WMsLtr9_1735887249 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 03 Jan 2025 14:54:09 +0800
+Date: Fri, 3 Jan 2025 14:54:09 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	pabeni@redhat.com, song@kernel.org, sdf@google.com,
+	haoluo@google.com, yhs@fb.com, edumazet@google.com,
+	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
+	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 3/5] net/smc: bpf: register smc_ops info
+ struct_ops
+Message-ID: <20250103065409.GA70746@j66a10360.sqa.eu95>
+References: <20241218024422.23423-1-alibuda@linux.alibaba.com>
+ <20241218024422.23423-4-alibuda@linux.alibaba.com>
+ <525a2714-f8b0-4fdb-9cfb-d8a913c43c8e@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ethernet: toshiba: ps3_gelic_wireless: Remove driver
- using deprecated API wext
-To: Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Geoff Levand <geoff@infradead.org>, Simon Horman <horms@kernel.org>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Kalle Valo <kvalo@kernel.org>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jeff Johnson <quic_jjohnson@quicinc.com>,
- Larry Finger <Larry.Finger@lwfinger.net>,
- Nicolas Ferre <nicolas.ferre@microchip.com>, Pavel Machek <pavel@ucw.cz>,
- Stanislaw Gruszka <stf_xl@wp.pl>,
- Gregory Greenman <gregory.greenman@intel.com>,
- linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-staging@lists.linux.dev,
- linux-wireless@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- Stefan Lippers-Hollmann <s.l-h@gmx.de>
-References: <20241224080755.194508-1-philipp.g.hortmann@gmail.com>
- <b811d4af6a634d61389dfefacd49853c0e77f1d7.camel@sipsolutions.net>
-Content-Language: en-US
-From: Philipp Hortmann <philipp.g.hortmann@gmail.com>
-In-Reply-To: <b811d4af6a634d61389dfefacd49853c0e77f1d7.camel@sipsolutions.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <525a2714-f8b0-4fdb-9cfb-d8a913c43c8e@linux.dev>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On 30.12.24 09:22, Johannes Berg wrote:
-> On Tue, 2024-12-24 at 09:07 +0100, Philipp Hortmann wrote:
->> Driver was contributed in 2008.
->>
->> The following reasons lead to the removal:
->> - This driver generates maintenance workload for itself and for API wext
+On Thu, Dec 26, 2024 at 08:44:20PM +0100, Zhu Yanjun wrote:
+> 在 2024/12/18 3:44, D. Wythe 写道:
+> >To implement injection capability for smc via struct_ops, so that
+> >user can make their own smc_ops to modify the behavior of smc stack.
+> >
+> >Currently, user can write their own implememtion to choose whether to
+> >use SMC or not before TCP 3rd handshake to be comleted. In the future,
+> >users can implement more complex functions on smc by expanding it.
+> >
+> >Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> >---
+> >  net/smc/af_smc.c  | 10 +++++
+> >  net/smc/smc_ops.c | 99 +++++++++++++++++++++++++++++++++++++++++++++++
+> >  net/smc/smc_ops.h |  2 +
+> >  3 files changed, 111 insertions(+)
+> >
+> >diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> >index 9d76e902fd77..6adedae2986d 100644
+> >--- a/net/smc/af_smc.c
+> >+++ b/net/smc/af_smc.c
+> >@@ -55,6 +55,7 @@
+> >  #include "smc_sysctl.h"
+> >  #include "smc_loopback.h"
+> >  #include "smc_inet.h"
+> >+static struct bpf_struct_ops bpf_smc_bpf_ops = {
+> >  #else
+> >  static inline struct smc_ops *smc_ops_find_by_name(const char *name) { return NULL; }
+> >+static inline int smc_bpf_struct_ops_init(void) { return 0; }
 > 
-> So I've been wondering, why are you so concerned about this? And in
-> particular, more concerned about it than the people actually doing the
-> maintenance? :)
-
-One of my big fears is the hand over to the next generation maintainers 
-and developers. The less code and the less exceptions due to old 
-interfaces the easier it will be. We loose maintainers and developers 
-for many reasons, like: retirement, burnout, embargos or simply because 
-they are not paid and need to earn money. After giving some support on 
-the staging subsystem I cannot see at all that we can attract so many 
-talented people as required for a save future beyond 7 years...
-
-People who evolved with the kernel development do not have a good sense 
-how difficult it can be to join nowadays.
-
-A friend just bought two servers. One with a paid OS and one planned 
-with Linux as OS. The difference was over 12000 € due to licenses. What 
-would be the price when we do not have a choice? Do not feel save 
-because of today. We need to fight for tomorrow.
-
-Where do you want to invest your time? Into the new technologies to keep 
-up at the front edge or to keep old stuff running that is not productive 
-anymore. But there might be someone who can pull the hardware once every 
-two month out of the shelf and ask why this is not working. Should this 
-really stop us from progress?
-
+> Both smc_ops_find_by_name and smc_bpf_struct_ops_init seem to be
+> dead codes. Enabling/Disabling CONFIG_SMC_OPS, the above 2 inline
+> functions will not be called. The 2 functions should be removed.
 > 
-> We got here because I removed a *staging* driver that was in the way of
-> some wext cleanups, but that had a thousand other reasons to never go
-> anywhere anyway.
+> Zhu Yanjun
 > 
 
-Partial, for me more important was the try to remove all wext drivers in 
-October 2023 by Arnd Bergmann.
-[PATCH] [RFC] wireless: move obsolete drivers to staging
-https://lore.kernel.org/linux-staging/20231010155444.858483-1-arnd@kernel.org/
+Good catch. I will fix this in the next version. 
 
->> - wext is deprecated and only used by two wireless drivers in
->>    mainline kernel
-> 
-> true
-> 
->> - no progress changing to mac80211
-> 
-> It fundamentally cannot be converted to mac80211, it has a whole
-> different model. In fact it cannot even be converted to cfg80211 because
-> some APIs it uses just never existed there, and likely never will.
-> 
->> Tested a rebased version of this patch on the Playstation 3. Used
->> T2 Linux with Kernel 6.12.5 to test the Ethernet connection.
->>
-> 
-> Arguably that's a pretty strong argument for *not* removing it, if it's
-> actually relatively simple today to bring up the latest kernel on a PS3.
+Thanks,
+D. Wythe
 
-I was not able to use the WLAN on T2 Linux. I just tested the Ethernet 
-connection as I know that the developer of T2 is using it. The reason 
-why I bought the PS3 is to see if Linux on it is really a use case. But 
-all I found is that it is only a test vehicle to say T2 is working on 
-Power PC architecture.
-
-At the time the PS3 WLAN driver was added to the mainline kernel it was 
-really cool stuff. But nowadays it is just a high Power consuming device 
-with a noisy fan and not enough RAM to do anything (256MB). The 
-powerfull GPU is not supported by the kernel.
-
-Do I need to find out why the WLAN is not working under T2 on PS3 to 
-convince you? The WLAN is working under redribbon Linux with Kernel 3.5 
-on the PS3.
-
-T2 is working but to make this happen the T2 Author has an own repo for 
-patches to apply. In the following video he publishes his view on how 
-well the ps3disk is maintained and tested by the linux kernel community. 
-My impression of this is that ps3disk is not tested on hardware at all.
-You can find this in a youtube video: “I can't believe VIP Linux kernel 
-developer BROKE PS3 support” but watch out that you are in a good mood 
-otherwise it is pulling you down like me...
-
-The commit that is breaking the function is:
-commit a7f18b74dbe171625afc2751942a92f71a4dd4ba
-
-This fixes are not in Mainline up to today. So who beside T2 Linux is 
-using this? You can find more of those breaking patches... and videos...
-
-The following points are also in the list of reasons:
-- This driver has a maximum 54MBit/s as it supports only 802.11 b/g.
-- Using this hardware is security wise not state of the art as WPA3 is
-   not supported.
-
-Thanks for your patience.
-
-Bye Philipp
-
-
+> >  #endif /* CONFIG_SMC_OPS*/
+> >  #endif /* __SMC_OPS */
 
