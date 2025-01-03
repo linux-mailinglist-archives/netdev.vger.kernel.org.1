@@ -1,94 +1,102 @@
-Return-Path: <netdev+bounces-154869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-154870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 012C0A002AB
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 03:20:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50563A002C3
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 03:34:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41A953A2A34
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 02:20:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 818AE1883D4F
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 02:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDFCC19D8BB;
-	Fri,  3 Jan 2025 02:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B22F2535D8;
+	Fri,  3 Jan 2025 02:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYfwrlfQ"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="fWYWv9Qm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71F61A8F71;
-	Fri,  3 Jan 2025 02:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5824C62;
+	Fri,  3 Jan 2025 02:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735870815; cv=none; b=ub6g1+Xb06mfYeZYA9ywJenvqLsvIyTi+D/Qim4ELmeXXU6OHYshfpGg3l1EAzlk0WG5YFfvfNcyCxZSOQYrqbFIn0tTsb4Fq22pft5wp1iNz0pDzvIqeNuFE+DWQNm2LKEW3DNv4/MVcm1ipZ7XB6mOnRroECehK6uzr0VuUoI=
+	t=1735871671; cv=none; b=kQifFiDVx2aewW1SF51dFtyw9Ki+MB6+NVUbB/y5LSTWDod1LcplFvn5+lItIyeND+lwyWzB1e16GgjQShhZG2henJCdCwESkO+yCVUuNyqbw2blVFsAqOSQOtE6MPsPdT2c1vVnz0d5+fBuR21A+TxsApcOZUmxX3y2pkWJqL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735870815; c=relaxed/simple;
-	bh=XDkpfgONqQGzNctYF51Adls5Q9jT3Kw2bccLl384cnY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jgWKTpm0KbZQSAYtrv3I7JaFNfNzO1G7cj6fuBaN+3LklaFT5pvDY9y5HMg/NQPdy0Gf94t9qDkmQ0cBnZ1WbAJq3kfltjnt7U1wIyeRc3Wk7F3NyuFxaK5o3j3OwFUmKLJURBt/OHR3uyPkgFeNtJCOwGOq/UsliNQvdK8TSpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYfwrlfQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D630C4CED0;
-	Fri,  3 Jan 2025 02:20:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735870815;
-	bh=XDkpfgONqQGzNctYF51Adls5Q9jT3Kw2bccLl384cnY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TYfwrlfQupE3da5cg1hSHmOtm6mLq0wMKZpFkvt6Yuhf41MxzSXHdx4mVMJ8E7c6M
-	 OiyCdBuHsq5dsTbXfbp11KBWEcscyKf4eqWF+m6vI935TCyZeNsrH2jSuqOFdLapTf
-	 HNuoQmTxE5KfWSi9rpNi4e/Yl4oU5CCVB6Jllkkl/Ym9/6ULn0RnRyHY0bOW3ITTHm
-	 ddxfxNG+0kTxa9xYZ7FMKfG3fmML5w1XZP5l8p3vDnv7KiFFaa0Xnd8faNWL1UxSKi
-	 Bms7MfM7M4vO40H40z+cL8/CF2Q9sJJ9/RtiH0JEn8tnmpFW+SJ/ZOeiWAsLs08LZR
-	 CLqiRWU6g6DNw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADAC380A964;
-	Fri,  3 Jan 2025 02:20:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1735871671; c=relaxed/simple;
+	bh=k4DKjaxylVD2Dy0qcgZQhL7qY15Od6kWOVUFe+F3dgU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ti1I601V+fyEvhGJ1MejvNMf0e4bElU0s5zRuJ0QY3ROcOFBOaSuWhgDZiVcefppWSS7EwRqwg/JtPdwKbedc2awXgXgCQBLdnyTLoXRpxa+ZL3wo4/XyCdfBNQ2HHArqDFyAY62HG7caUeJYBtEAzpJ2wokUX5FZ5dZFp1xM2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=fWYWv9Qm; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1735871298;
+	bh=npwYGYBLEEb9ljEYtqpcdKTmoM+HqCHl2SO9CVvzdW0=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=fWYWv9QmlNUkvtfL1SvL7xnUf9P2n4YPSDMEyx6sQBvGYzKNaGRHffQOq/WEUUaIv
+	 4sUDNYf+zS49ft2EUP7TKm+/F2Z45tJlkZn1fR4o+2+XPi4egu1p5LWoYd6jnPU2WX
+	 AY3G6/BfEQL6HcXIIK6IWw1q4YRV6PNu/le5G+0F0STKYEEBsmk2qgoPaOLIlVLE47
+	 aGgTlBuhKBzIXKJUICjlT9aZWUGDXsN1+bymiFTE44Nry8JBvusnOuOTRW6OYVWTJY
+	 gQiYfWf3udDY8BPm5FOCvCZjY9he8t/hXRMTz/1in5PGf8TaoZ/4TYLT2rd3Pr3jWa
+	 XYm4+kLN8THXA==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 9FE157028E;
+	Fri,  3 Jan 2025 10:28:17 +0800 (AWST)
+Message-ID: <b0e373986f3dad8e79266b09b225d126af8ae981.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net] mctp i3c: fix MCTP I3C driver multi-thread issue
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Leo Yang <leo.yang.sy0@gmail.com>, matt@codeconstruct.com.au, 
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org,  pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Leo Yang <Leo-Yang@quantatw.com>
+Date: Fri, 03 Jan 2025 10:28:17 +0800
+In-Reply-To: <20241226025319.1724209-1-Leo-Yang@quantatw.com>
+References: <20241226025319.1724209-1-Leo-Yang@quantatw.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: sfc: Correct key_len for efx_tc_ct_zone_ht_params
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173587083550.2085646.14776562837941838078.git-patchwork-notify@kernel.org>
-Date: Fri, 03 Jan 2025 02:20:35 +0000
-References: <20241230093709.3226854-1-buaajxlj@163.com>
-In-Reply-To: <20241230093709.3226854-1-buaajxlj@163.com>
-To: Liang Jie <buaajxlj@163.com>
-Cc: kuba@kernel.org, ecree.xilinx@gmail.com, habetsm.xilinx@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, pieter.jansen-van-vuuren@amd.com,
- netdev@vger.kernel.org, linux-net-drivers@amd.com,
- linux-kernel@vger.kernel.org, liangjie@lixiang.com
 
-Hello:
+Hi Leo,
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> We found a timeout problem with the pldm command on our system.=C2=A0 The
+> reason is that the MCTP-I3C driver has a race condition when receiving
+> multiple-packet messages in multi-thread, resulting in a wrong packet
+> order problem.
+>=20
+> We identified this problem by adding a debug message to the
+> mctp_i3c_read function.
 
-On Mon, 30 Dec 2024 17:37:09 +0800 you wrote:
-> From: Liang Jie <liangjie@lixiang.com>
-> 
-> In efx_tc_ct_zone_ht_params, the key_len was previously set to
-> offsetof(struct efx_tc_ct_zone, linkage). This calculation is incorrect
-> because it includes any padding between the zone field and the linkage
-> field due to structure alignment, which can vary between systems.
-> 
-> [...]
+Mostly out of curiosity, could you share a little detail about what you
+were observing with that read behaviour? Were the IBIs being handed by
+different CPUs in that case?
 
-Here is the summary with links:
-  - [net] net: sfc: Correct key_len for efx_tc_ct_zone_ht_params
-    https://git.kernel.org/netdev/net/c/a8620de72e56
+I assume that you were seeing the netif_rx() out of sequence with the
+skbs populated from i3c_device_do_priv_xfers(), is that right?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> Therefore, we try to solve this problem by adding a mutex to the
+> mctp_i3c_read function.
+
+Just to clarify the intent here, and if I'm correct with the assumption
+above, it would be good to a comment on what this lock is serialising.
+If you're re-rolling with Jakub's Fixes request, can you add a comment
+too? Something like:
+
+       /* ensure that we netif_rx() in the same order as the i3c reads */
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mutex_lock(&mi->lock);
+
+Otherwise, all looks good. Thanks for the contribution!
+
+Cheers,
 
 
+Jeremy
 
