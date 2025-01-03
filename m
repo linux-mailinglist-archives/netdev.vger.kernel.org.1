@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-155064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20879A00E29
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 20:00:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E800A00E2A
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 20:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F214F1884B87
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:00:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 762B116424B
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8320A1FCD13;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF28B1FCF55;
 	Fri,  3 Jan 2025 19:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nk1UHclc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oe0Ts7x8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2161FCD04
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF6B1FCD16
 	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 19:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735930801; cv=none; b=KbkYScUNpHQGxQdGR82L7gJ1lEAN4s3uahAMR/69Cr4P7HcXg+k/sCj2Z7sJii9WwFlyRcxkdz3EExo8WVjR0NoLhHbR8Pj7251wL4mTTYUSVajaJU97rC5xA7plnbrU4pVrIjlj+DEAshfsroApB8KW/YpdNle6w9foyGSGa8M=
+	t=1735930801; cv=none; b=BLhpElNTUxacuW9sh42uvJl9qxkspErdHpSradHqUPpbnNKz+Jvj25hWD2VFZasvy24NjBLMiCvCsYPiY2Pu/FKFIbzaa+7SVARTv6HFZtAr8tRJ5HKCuePZPE4uhDn2lVdfG70tIWv4lQzudm74oO/qT0+GUHq2XAHO+fDX3os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735930801; c=relaxed/simple;
-	bh=lWdqjdz3Q8Z/bU1gvZsxjA8UZ68ZbhNo/PSacBzpivI=;
+	bh=+QdaajbVH+JdcdBgna3omp4zm8NtLGUZk29mchUZBK0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fY+p2th9zqHR6f/aA+DMgFoVNQQwQ5usss36IcPur5GA7SyrTbiS9fDUezCNtrjrbOtXQZ6KyztnYGwo5cejLo1HqvzXXJzGcIoySoJd8P7auMmGlrYR3lq74sIh/TfGsd6p8URuZplA+jnKNhb/6dxaTlu6eirN4oPG1hO8SZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nk1UHclc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A564EC4CEE1;
-	Fri,  3 Jan 2025 19:00:00 +0000 (UTC)
+	 MIME-Version; b=ebpDqsSpzXZ8fB5KAbIq+a5jb7x9VebXU5ONM/1ZoXzi1Wmbo/8Qxa7KS8XRUVnhxRAzh6bMGuRfvcaOpOceV6iq+astDN8dtsPaOe7cuPC9MSsfFZQ70goZkZskTKNjWXEc/lTLMbTa0OwLhAVNHmuH4fErlrSBoF5m33BBumg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oe0Ts7x8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 100C3C4CEDC;
+	Fri,  3 Jan 2025 19:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735930800;
-	bh=lWdqjdz3Q8Z/bU1gvZsxjA8UZ68ZbhNo/PSacBzpivI=;
+	s=k20201202; t=1735930801;
+	bh=+QdaajbVH+JdcdBgna3omp4zm8NtLGUZk29mchUZBK0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nk1UHclcADbbLcCV6az8q4jhMqvESb/qDLpiZA/q8jSZjALlTxO17fZFoM22g6uvG
-	 ZLHRytO6VR7Sifc3ubLPxSr5g1/vTkA7psN7d0QO7/0TOoECz+2UKgV1usYIi6vtJE
-	 y9vew+iSenyTd1K69hsnkFImkA208JuJ2t1EJ7JaGPSbDQ0EW1VoqssoQ+QMMRG4Ti
-	 wLaVIei+QkM2Lsf+XWH7qUCwFyRpOjBn0uX/g4zbcUUoDSbHIcCw3xo6SeqUyqmklc
-	 5soK5QEoZwLCg6xPnFgTkCQcWMqA6ozsyGFt6Q+kMIUomzc+9a3ATRmYPae/eN7zYK
-	 vbRwXzP6KcSpA==
+	b=oe0Ts7x80G1j1O00E7OoH1YUDdJimoT0lMh5rZldDNWbuxI3/ogI7VgYjtQ77qoFn
+	 qYbkciZ6xm5IU2TXs5I4OnjnMJEa7/6fseBIKOSjWubcIaO97nFOPiYpu2Ocauy0E6
+	 niKI6Cfx6Ly8RaL0reWbrLZbjBx9gm/bwDti+HwoXqzqvRUQbc5cxb4HQXtRbO2p4I
+	 1eF9y0Mfz0loE0M/DNDM7BrgUfHpo03x4Su2wJsSrl4smdqw2CjJSLsaSXmovdGJh8
+	 BnbNONjlw0Cjh8doLFb3SIR4TOr1/gV7O/NQaQGtPJ0rrvdN7jzospvzFMkqkE7wP7
+	 /CHRrL7AAISlg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	almasrymina@google.com,
 	jdamato@fastly.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 4/8] netdevsim: allocate rqs individually
-Date: Fri,  3 Jan 2025 10:59:49 -0800
-Message-ID: <20250103185954.1236510-5-kuba@kernel.org>
+Subject: [PATCH net-next 5/8] netdevsim: add queue alloc/free helpers
+Date: Fri,  3 Jan 2025 10:59:50 -0800
+Message-ID: <20250103185954.1236510-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250103185954.1236510-1-kuba@kernel.org>
 References: <20250103185954.1236510-1-kuba@kernel.org>
@@ -64,149 +64,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make nsim->rqs an array of pointers and allocate them individually
-so that we can swap them out one by one.
+We'll need the code to allocate and free queues in the queue management
+API, factor it out.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/netdevsim/netdev.c    | 43 ++++++++++++++++++++-----------
- drivers/net/netdevsim/netdevsim.h |  2 +-
- 2 files changed, 29 insertions(+), 16 deletions(-)
+ drivers/net/netdevsim/netdev.c | 35 +++++++++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index a4aacd372cdd..7487697ac417 100644
+index 7487697ac417..e1bd3c1563b7 100644
 --- a/drivers/net/netdevsim/netdev.c
 +++ b/drivers/net/netdevsim/netdev.c
-@@ -69,7 +69,7 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	rxq = skb_get_queue_mapping(skb);
- 	if (rxq >= peer_dev->num_rx_queues)
- 		rxq = rxq % peer_dev->num_rx_queues;
--	rq = &peer_ns->rq[rxq];
-+	rq = peer_ns->rq[rxq];
+@@ -595,6 +595,24 @@ static const struct netdev_stat_ops nsim_stat_ops = {
+ 	.get_base_stats		= nsim_get_base_stats,
+ };
  
- 	skb_tx_timestamp(skb);
- 	if (unlikely(nsim_forward_skb(peer_dev, skb, rq) == NET_RX_DROP))
-@@ -388,13 +388,13 @@ static int nsim_init_napi(struct netdevsim *ns)
- 	int err, i;
- 
- 	for (i = 0; i < dev->num_rx_queues; i++) {
--		rq = &ns->rq[i];
-+		rq = ns->rq[i];
- 
- 		netif_napi_add_config(dev, &rq->napi, nsim_poll, i);
- 	}
- 
- 	for (i = 0; i < dev->num_rx_queues; i++) {
--		rq = &ns->rq[i];
-+		rq = ns->rq[i];
- 
- 		err = nsim_create_page_pool(rq);
- 		if (err)
-@@ -405,12 +405,12 @@ static int nsim_init_napi(struct netdevsim *ns)
- 
- err_pp_destroy:
- 	while (i--) {
--		page_pool_destroy(ns->rq[i].page_pool);
--		ns->rq[i].page_pool = NULL;
-+		page_pool_destroy(ns->rq[i]->page_pool);
-+		ns->rq[i]->page_pool = NULL;
- 	}
- 
- 	for (i = 0; i < dev->num_rx_queues; i++)
--		__netif_napi_del(&ns->rq[i].napi);
-+		__netif_napi_del(&ns->rq[i]->napi);
- 
- 	return err;
- }
-@@ -421,7 +421,7 @@ static void nsim_enable_napi(struct netdevsim *ns)
- 	int i;
- 
- 	for (i = 0; i < dev->num_rx_queues; i++) {
--		struct nsim_rq *rq = &ns->rq[i];
-+		struct nsim_rq *rq = ns->rq[i];
- 
- 		netif_queue_set_napi(dev, i, NETDEV_QUEUE_TYPE_RX, &rq->napi);
- 		napi_enable(&rq->napi);
-@@ -448,7 +448,7 @@ static void nsim_del_napi(struct netdevsim *ns)
- 	int i;
- 
- 	for (i = 0; i < dev->num_rx_queues; i++) {
--		struct nsim_rq *rq = &ns->rq[i];
-+		struct nsim_rq *rq = ns->rq[i];
- 
- 		napi_disable(&rq->napi);
- 		__netif_napi_del(&rq->napi);
-@@ -456,8 +456,8 @@ static void nsim_del_napi(struct netdevsim *ns)
- 	synchronize_net();
- 
- 	for (i = 0; i < dev->num_rx_queues; i++) {
--		page_pool_destroy(ns->rq[i].page_pool);
--		ns->rq[i].page_pool = NULL;
-+		page_pool_destroy(ns->rq[i]->page_pool);
-+		ns->rq[i]->page_pool = NULL;
- 	}
- }
- 
-@@ -628,7 +628,7 @@ nsim_pp_hold_write(struct file *file, const char __user *data,
- 	if (!netif_running(ns->netdev) && val) {
- 		ret = -ENETDOWN;
- 	} else if (val) {
--		ns->page = page_pool_dev_alloc_pages(ns->rq[0].page_pool);
-+		ns->page = page_pool_dev_alloc_pages(ns->rq[0]->page_pool);
- 		if (!ns->page)
- 			ret = -ENOMEM;
- 	} else {
-@@ -682,10 +682,21 @@ static int nsim_queue_init(struct netdevsim *ns)
- 	if (!ns->rq)
++static struct nsim_rq *nsim_queue_alloc(void)
++{
++	struct nsim_rq *rq;
++
++	rq = kzalloc(sizeof(*rq), GFP_KERNEL);
++	if (!rq)
++		return NULL;
++
++	skb_queue_head_init(&rq->skb_queue);
++	return rq;
++}
++
++static void nsim_queue_free(struct nsim_rq *rq)
++{
++	skb_queue_purge_reason(&rq->skb_queue, SKB_DROP_REASON_QUEUE_PURGE);
++	kfree(rq);
++}
++
+ static ssize_t
+ nsim_pp_hold_read(struct file *file, char __user *data,
+ 		  size_t count, loff_t *ppos)
+@@ -683,11 +701,9 @@ static int nsim_queue_init(struct netdevsim *ns)
  		return -ENOMEM;
  
--	for (i = 0; i < dev->num_rx_queues; i++)
--		skb_queue_head_init(&ns->rq[i].skb_queue);
-+	for (i = 0; i < dev->num_rx_queues; i++) {
-+		ns->rq[i] = kzalloc(sizeof(**ns->rq), GFP_KERNEL);
-+		if (!ns->rq[i])
-+			goto err_free_prev;
-+
-+		skb_queue_head_init(&ns->rq[i]->skb_queue);
-+	}
+ 	for (i = 0; i < dev->num_rx_queues; i++) {
+-		ns->rq[i] = kzalloc(sizeof(**ns->rq), GFP_KERNEL);
++		ns->rq[i] = nsim_queue_alloc();
+ 		if (!ns->rq[i])
+ 			goto err_free_prev;
+-
+-		skb_queue_head_init(&ns->rq[i]->skb_queue);
+ 	}
  
  	return 0;
-+
-+err_free_prev:
-+	while (i--)
-+		kfree(ns->rq[i]);
-+	kfree(ns->rq);
-+	return -ENOMEM;
+@@ -699,16 +715,13 @@ static int nsim_queue_init(struct netdevsim *ns)
+ 	return -ENOMEM;
  }
  
- static void nsim_queue_free(struct netdevsim *ns)
-@@ -693,9 +704,11 @@ static void nsim_queue_free(struct netdevsim *ns)
+-static void nsim_queue_free(struct netdevsim *ns)
++static void nsim_queue_uninit(struct netdevsim *ns)
+ {
  	struct net_device *dev = ns->netdev;
  	int i;
  
--	for (i = 0; i < dev->num_rx_queues; i++)
--		skb_queue_purge_reason(&ns->rq[i].skb_queue,
-+	for (i = 0; i < dev->num_rx_queues; i++) {
-+		skb_queue_purge_reason(&ns->rq[i]->skb_queue,
- 				       SKB_DROP_REASON_QUEUE_PURGE);
-+		kfree(ns->rq[i]);
-+	}
+-	for (i = 0; i < dev->num_rx_queues; i++) {
+-		skb_queue_purge_reason(&ns->rq[i]->skb_queue,
+-				       SKB_DROP_REASON_QUEUE_PURGE);
+-		kfree(ns->rq[i]);
+-	}
++	for (i = 0; i < dev->num_rx_queues; i++)
++		nsim_queue_free(ns->rq[i]);
  
  	kvfree(ns->rq);
  	ns->rq = NULL;
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index bf02efa10956..80fde64f4a7a 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -101,7 +101,7 @@ struct netdevsim {
- 	struct nsim_dev *nsim_dev;
- 	struct nsim_dev_port *nsim_dev_port;
- 	struct mock_phc *phc;
--	struct nsim_rq *rq;
-+	struct nsim_rq **rq;
- 
- 	u64 tx_packets;
- 	u64 tx_bytes;
+@@ -754,7 +767,7 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
+ 	nsim_macsec_teardown(ns);
+ 	nsim_bpf_uninit(ns);
+ err_rq_destroy:
+-	nsim_queue_free(ns);
++	nsim_queue_uninit(ns);
+ err_utn_destroy:
+ 	rtnl_unlock();
+ 	nsim_udp_tunnels_info_destroy(ns->netdev);
+@@ -836,7 +849,7 @@ void nsim_destroy(struct netdevsim *ns)
+ 		nsim_macsec_teardown(ns);
+ 		nsim_ipsec_teardown(ns);
+ 		nsim_bpf_uninit(ns);
+-		nsim_queue_free(ns);
++		nsim_queue_uninit(ns);
+ 	}
+ 	rtnl_unlock();
+ 	if (nsim_dev_port_is_pf(ns->nsim_dev_port))
 -- 
 2.47.1
 
