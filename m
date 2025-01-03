@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-155037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363F8A00BF8
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 17:20:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 381C9A00C05
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 17:25:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7366F1883DF7
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:20:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80BE618828EF
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 16:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B1A1FAC54;
-	Fri,  3 Jan 2025 16:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A32B1FAC23;
+	Fri,  3 Jan 2025 16:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QKkMte/r"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nNfH4Lh4"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0BB192B88;
-	Fri,  3 Jan 2025 16:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8CF1F9EA4;
+	Fri,  3 Jan 2025 16:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735921247; cv=none; b=HobN7Mrpdhn7fDSKNjE0ixtYUubDEwAY3gDCo9X4sYBcGIQey2k9owzmwnqCG8s3n8gq2/qYcmH/PYkG1FV4fZD1aO761IMbrQo/+vuAbex2Jn4i74yxN8cH/Q3J3aeZRFiwgYcTONzpq/qseioS8RyonS0OHkxxY5XSMDYwGko=
+	t=1735921521; cv=none; b=lILrYjjm2wVMeIq7g29fLXICiFPG2z1vbPfdz6AG3Vs7G+fT/EaQSxPOizvAjjQOamAt9R4Sff5eaCLVcsS5BzqyJnSnQn0JWNTXuUzbRVqjGJAkKakef/9EtNH1zk/MSHLzRGQ6+vu/y8fDohrUG/Y0HbCBRzO9cxa/331cIDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735921247; c=relaxed/simple;
-	bh=s/azmUCMfyDwbtYMhSXYBEe/qseumADYqEPrgpJX78A=;
+	s=arc-20240116; t=1735921521; c=relaxed/simple;
+	bh=sBdH//KuCPagBTrv+itcpCBNhY6HCWRqK2hHTlHWIQk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W2ZMhOyQ1Cd8Y8fHOt/gOajUPNXEhjVSERgt/yp1eMt3mW4aMy7LvwX6bjpCFkfxzcdl6Pxo0brEIrQz8g/uO4h4vvCKbvi9rMljqGMnR1r++xGAeFi517+xAVyL0rxGJ2GwQqQvuyWx9qstakc3qd6havT30vCG+Tfachqt1/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QKkMte/r; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=KkDYLaaXEryfdUodOK+7Lfy5MUY6AEcS0AT42JTS/ixSp4999udgj4roMGFc9QALAA1zgaTSUw1jvA4dVDnpXWKPUcv+BYJTv4ovHiv2qg/37gOuXj13plrhD5NUYT+benZOtndVaJ8K1QWe4yd9lC+oMActggmMsDO3evloCMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nNfH4Lh4; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=B2WYsGMPQpFANCHXxl2mkfQyQ24a8EKaADn28F99e5I=; b=QKkMte/rHHfXcBmU0nceXRubrn
-	iQeMg4csyJfv3OOg9qe1ys9p6TcH3O+Uf7s16qM+6WDAiPySZIRXwyfDVd+723zmFSHs2cCwFF1NX
-	kycyeuUZRyJC6CiabE2wIamZg+SUnhNRrzGWcz+ye5LemvpCn9yPnrtYm+GrJjRGMyYU=;
+	bh=unC2Fhn6EJ32Xsi2ODneZGcaNI6Y5JHf0QRbi/IbyPo=; b=nNfH4Lh4tOUqX+xZn1XjPeQHHF
+	gFsOfzz8PlpDhe8RzH1in7ekPJfClWgJcCj52YWEv/WO6PNBF7tbqOBmftkQ3r4ECsjthmIsNsklL
+	zb6MUEM8BF/DDwVkrTm1p7+QGspl2CRgzr414HmCNtSgZz6N3yjl/UgwZW6UvdIfmMvo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tTkPb-0015Hv-95; Fri, 03 Jan 2025 17:20:35 +0100
-Date: Fri, 3 Jan 2025 17:20:35 +0100
+	id 1tTkU4-0015M9-KI; Fri, 03 Jan 2025 17:25:12 +0100
+Date: Fri, 3 Jan 2025 17:25:12 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Wei Fang <wei.fang@nxp.com>
 Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
@@ -51,11 +51,11 @@ Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org,
 	imx@lists.linux.dev
-Subject: Re: [PATCH net-next 01/13] net: enetc: add initial netc-lib driver
- to support NTMP
-Message-ID: <829ccd93-8b4e-4dd9-bd15-58d345797aca@lunn.ch>
+Subject: Re: [PATCH net-next 05/13] net: enetc: add debugfs interface to dump
+ MAC filter
+Message-ID: <696fb436-40f6-4a9c-af0b-2851f8450bd1@lunn.ch>
 References: <20250103060610.2233908-1-wei.fang@nxp.com>
- <20250103060610.2233908-2-wei.fang@nxp.com>
+ <20250103060610.2233908-6-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,90 +64,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250103060610.2233908-2-wei.fang@nxp.com>
+In-Reply-To: <20250103060610.2233908-6-wei.fang@nxp.com>
 
-> +#define NTMP_FILL_CRD(crd, tblv, qa, ua) \
-> +({ \
-> +	typeof(crd) _crd = (crd); \
-> +	(_crd)->update_act = cpu_to_le16(ua); \
-> +	(_crd)->tblv_qact = NTMP_TBLV_QACT(tblv, qa); \
-> +})
-> +
-> +#define NTMP_FILL_CRD_EID(req, tblv, qa, ua, eid) \
-> +({ \
-> +	typeof(req) _req = (req); \
-> +	NTMP_FILL_CRD(&(_req)->crd, tblv, qa, ua); \
-> +	(_req)->entry_id = cpu_to_le32(eid); \
-> +})
+On Fri, Jan 03, 2025 at 02:06:01PM +0800, Wei Fang wrote:
+> ENETC's MAC filter consists of hash MAC filter and exact MAC filter. Hash
+> MAC filter is a 64-entry hash table consisting of two 32-bit registers.
+> Exact MAC filter is implemented by configuring MAC address filter table
+> through command BD ring. The table is stored in ENETC's internal memory
+> and needs to be read through command BD ring. In order to facilitate
+> debugging, added a debugfs interface to get the relevant information
+> about MAC filter.
 
+How do other drivers do this?
 
-These are pretty complex for #defines. Can they be made into
-functions? That will get you type checking, finding bugs where
-parameters are swapped.
+You should only use debugfs if there is no standard way to accomplish
+something. And if there is no standard way, you should be thinking is
+this a common feature other drivers will need, and if so, add a
+standard mechanism.
 
-> +int netc_setup_cbdr(struct device *dev, int cbd_num,
-> +		    struct netc_cbdr_regs *regs,
-> +		    struct netc_cbdr *cbdr)
-> +{
-> +	int size;
-> +
-> +	size = cbd_num * sizeof(union netc_cbd) + NTMP_BASE_ADDR_ALIGN;
-> +
-> +	cbdr->addr_base = dma_alloc_coherent(dev, size, &cbdr->dma_base,
-> +					     GFP_KERNEL);
-> +	if (!cbdr->addr_base)
-> +		return -ENOMEM;
-> +
-> +	cbdr->dma_size = size;
-> +	cbdr->bd_num = cbd_num;
-> +	cbdr->regs = *regs;
-> +
-> +	/* The base address of the Control BD Ring must be 128 bytes aligned */
-> +	cbdr->dma_base_align =  ALIGN(cbdr->dma_base,  NTMP_BASE_ADDR_ALIGN);
-> +	cbdr->addr_base_align = PTR_ALIGN(cbdr->addr_base,
-> +					  NTMP_BASE_ADDR_ALIGN);
-> +
-> +	cbdr->next_to_clean = 0;
-> +	cbdr->next_to_use = 0;
-> +	spin_lock_init(&cbdr->ring_lock);
-> +
-> +	/* Step 1: Configure the base address of the Control BD Ring */
-> +	netc_write(cbdr->regs.bar0, lower_32_bits(cbdr->dma_base_align));
-> +	netc_write(cbdr->regs.bar1, upper_32_bits(cbdr->dma_base_align));
-> +
-> +	/* Step 2: Configure the producer index register */
-> +	netc_write(cbdr->regs.pir, cbdr->next_to_clean);
-> +
-> +	/* Step 3: Configure the consumer index register */
-> +	netc_write(cbdr->regs.cir, cbdr->next_to_use);
-> +
-> +	/* Step4: Configure the number of BDs of the Control BD Ring */
-> +	netc_write(cbdr->regs.lenr, cbdr->bd_num);
-> +
-> +	/* Step 5: Enable the Control BD Ring */
-> +	netc_write(cbdr->regs.mr, NETC_CBDR_MR_EN);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(netc_setup_cbdr);
+You will get pushback for using debugfs as a bumping ground without
+adding some justification that debugfs is the only possible solution.
 
-I assume there is a version 3 in development, which will need a
-different library, or at least different symbols. Maybe you should
-think about the naming issues now?
-
-> diff --git a/include/linux/fsl/ntmp.h b/include/linux/fsl/ntmp.h
-> new file mode 100644
-> index 000000000000..7cf322a1c8e3
-> --- /dev/null
-> +++ b/include/linux/fsl/ntmp.h
-> @@ -0,0 +1,178 @@
-> +/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-> +/* Copyright 2025 NXP */
-> +#ifndef __NETC_NTMP_H
-> +#define __NETC_NTMP_H
-
-Does this header need to be global? What else will use it outside of
-drivers/net/ethernet/freescale/enetc?
-
-	Andrew
+	 Andrew
 
