@@ -1,146 +1,199 @@
-Return-Path: <netdev+bounces-155100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 760D7A00FF6
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:48:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83CECA0103A
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 23:25:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B05C21883E70
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:48:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 027B03A41EE
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D197DA95;
-	Fri,  3 Jan 2025 21:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52C91C07D8;
+	Fri,  3 Jan 2025 22:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="uZk81Uo/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hg8poIm0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.freemail.hu (fmfe07.freemail.hu [46.107.16.200])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5ED33DF;
-	Fri,  3 Jan 2025 21:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613D21BD51B
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 22:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735940890; cv=none; b=gggS0GqAZbVRVZxMk2yuZrPOJQfFYY41VtloUHkb1Q0+IqxbWvNzp1Rt68vKyI/YmmtwJl59CuNpZmuOsPINYu2TKtjI7bO5XkuNSV4EobZna0mi98wIwzJUkSypQerJd76VVkuvYSD94EadATmE6yQcq3sas+VfiFmAP2W3kwE=
+	t=1735943151; cv=none; b=SnFpGP5fGboJkFhl+EJ51gBx/eOtlOUBsMsS6xYAqdQo0Stkpmm3fBohy0iofejmnSKZhkxEA+6IBSMzAlMRB5YNdb46CAy38FQ627hMWlaWJRSnjaGwYK9j6jh9uuVtkOO3rjoKCV+w0ze3yhgXdyDslPGjSK+hqy3z/9lHr38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735940890; c=relaxed/simple;
-	bh=hR+6zQWBJsXnenEuboEy9Ua3VpOk3gzfeBnbGXrfmQI=;
+	s=arc-20240116; t=1735943151; c=relaxed/simple;
+	bh=nTYfNGUXwYm8UtySRXGdzrXLBE6xU82oBDsk7x+HUpg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UzOvdvDEIz15CJ3F6M6/ijLoozN9iPq0AS6lZYfruwqsAGm97JF2wxPWt6Rjw4EnZg4E+OOD4LYa0+Zbvh33cq/WxDD21RbExECZVB83SKUqbfR6e7PGuYCxaLi5TY8mSbhb5mkAzk2P5rVPrrrKNp4+EWnqHyihAq1m5ftvzC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=uZk81Uo/ reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
-Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YPxnc5RpvzJwr;
-	Fri, 03 Jan 2025 22:40:20 +0100 (CET)
-Message-ID: <19509642-1bef-4573-a4fe-d3cb16e97fb2@freemail.hu>
-Date: Fri, 3 Jan 2025 22:39:55 +0100
+	 In-Reply-To:Content-Type; b=kNlxwB1vfjuF64ss4R9oa57b1/FEmMk0LBRLdTh5k5FX5RK+Nl5Lc8IU8b6u+BRqR33q1iE7bKz3TZRCr5ouQ+NVYCRenSPttx6tLVzALQuVKRCq+Dx9qsksYh0cNvQFYcDPHGdMnh5dfOr8/gkzwcy9nkWsXM2aLP5PLhoeHfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hg8poIm0; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6c9730b3-b35d-47d9-9cd6-ec2e05e4e8e5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1735943146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ysrMqZaaTuXeA/dUUuop2a52EXcx5SGD0Nmx8mj9xM4=;
+	b=Hg8poIm0FcFETGwdAOjbk8KCkQxfmctTvsDugO+xD1oNWjfeJLBGxKNH+T/qTiHOdqcH50
+	JNhQCV0y/zMAkpuX2zyjuJbfRAKQZ9BfOlCgdxdWhARVNRdv27G2JELLwBGs6/Nr+7E+ZA
+	xp0Qw+kzHTBZ7cpA9JgzJhU/MrTRHTc=
+Date: Fri, 3 Jan 2025 22:25:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] netfilter: uapi: Merge xt_*.h/c and ipt_*.h which has
- same name.
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
- daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
- kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250102172115.41626-1-egyszeregy@freemail.hu>
- <6eab8f06-3f65-42cb-b42e-6ba13f209660@lunn.ch>
- <90b238e6-65d8-4a1d-b59b-e10445e4c61c@freemail.hu>
- <31331e58-bc0a-427b-8528-52448764a91e@lunn.ch>
-Content-Language: hu
-From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
-In-Reply-To: <31331e58-bc0a-427b-8528-52448764a91e@lunn.ch>
+Subject: Re: [PATCH net-next] net/mlx5: use do_aux_work for PHC overflow
+ checks
+To: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>
+Cc: Carolina Jubran <cjubran@nvidia.com>, Bar Shapira <bshapira@nvidia.com>,
+ netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Dragos Tatulea
+ <dtatulea@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Gal Pressman <gal@nvidia.com>
+References: <20241217195738.743391-1-vadfed@meta.com>
+ <D6IAG0OM4BCI.1SCL62SCI2UAY@nvidia.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <D6IAG0OM4BCI.1SCL62SCI2UAY@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1735940421;
-	s=20181004; d=freemail.hu;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	l=2813; bh=OzTD4sULtZqsy2WlPu2w6i+mUdi8x06ZYJNkLWquh9M=;
-	b=uZk81Uo/YapNllD2hPVp/y2YX0hK6EU68bhxv72jAoQkqlK/LzV7ilWK7Jr29xFU
-	ilmnyqBdAqOwq6bb325iU/XWeqTwW6M/BBNC05BTArCo/K5KDVr3FPLD6qlmhFf7R2P
-	6yTOGAjjPvrBzruD/nJJWfpV1pfOakOLqT0oQsLnswWhj2xhcUBzv+0y2GrzSDJvLwH
-	ev8Yd+/plsPnQuwIgBkXQIMd/l81Ny4aDDfOVaEfdpHBrZjehTy0Rclks7s8NfiIJK0
-	XwfJ0ULQ443pEUZyZiZReniZgfbBdQ6mp9HaS/5KM0rpEqNSlpfNw7kf52ieYsT1bsr
-	NVo80k7Eag==
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-2025. 01. 02. 21:22 keltezéssel, Andrew Lunn írta:
-> On Thu, Jan 02, 2025 at 07:53:36PM +0100, Szőke Benjamin wrote:
->> 2025. 01. 02. 18:39 keltezéssel, Andrew Lunn írta:
->>> On Thu, Jan 02, 2025 at 06:21:15PM +0100, egyszeregy@freemail.hu wrote:
->>>> From: Benjamin Szőke <egyszeregy@freemail.hu>
->>>>
->>>> Merge and refactoring xt_*.h, xt_*.c and ipt_*.h files which has the same
->>>> name in upper and lower case format. Combining these modules should provide
->>>> some decent memory savings.
->>>
->>> Numbers please. We don't normally accept optimisations without some
->>> form of benchmark showing there is an improvement.
+On 22/12/2024 14:10, Dragos Tatulea wrote:
+> On Tue Dec 17, 2024 at 8:57 PM CET, Vadim Fedorenko wrote:
+>> The overflow_work is using system wq to do overflow checks and updates
+>> for PHC device timecounter, which might be overhelmed by other tasks.
+>> But there is dedicated kthread in PTP subsystem designed for such
+>> things. This patch changes the work queue to proper align with PTP
+>> subsystem and to avoid overloading system work queue.
+>> The adjfine() function acts the same way as overflow check worker,
+>> we can postpone ptp aux worker till the next overflow period after
+>> adjfine() was called.
 >>
->> Some of you mentioned in a reply e-mail, that is a good benefits in merging
->> the codes. I do not have test result about it and i will no provide it.
-> 
-> Try looking at the man page of size(1).
-> 
->>>> The goal is to fix Linux repository for case-insensitive filesystem,
->>>> to able to clone it and editable on any operating systems.
->>>
->>> This needs a much stronger argument, since as i already pointed out,
->>> how many case-insenstive file systems are still in use? Please give
->>> real world examples of why this matters.
->>>
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>> ---
+>>   .../ethernet/mellanox/mlx5/core/lib/clock.c   | 25 +++++++++++--------
+>>   include/linux/mlx5/driver.h                   |  1 -
+>>   2 files changed, 14 insertions(+), 12 deletions(-)
 >>
->> All of MacOS and Windows platform are case-insensitive.
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> index 4822d01123b4..ff3780331273 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> @@ -322,17 +322,16 @@ static void mlx5_pps_out(struct work_struct *work)
+>>   	}
+>>   }
+>>   
+>> -static void mlx5_timestamp_overflow(struct work_struct *work)
+>> +static long mlx5_timestamp_overflow(struct ptp_clock_info *ptp_info)
+>>   {
+>> -	struct delayed_work *dwork = to_delayed_work(work);
+>>   	struct mlx5_core_dev *mdev;
+>>   	struct mlx5_timer *timer;
+>>   	struct mlx5_clock *clock;
+>>   	unsigned long flags;
+>>   
+>> -	timer = container_of(dwork, struct mlx5_timer, overflow_work);
+>> -	clock = container_of(timer, struct mlx5_clock, timer);
+>> +	clock = container_of(ptp_info, struct mlx5_clock, ptp_info);
+>>   	mdev = container_of(clock, struct mlx5_core_dev, clock);
+>> +	timer = &clock->timer;
+>>   
+>>   	if (mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR)
+>>   		goto out;
+>> @@ -343,7 +342,7 @@ static void mlx5_timestamp_overflow(struct work_struct *work)
+>>   	write_sequnlock_irqrestore(&clock->lock, flags);
+>>   
+>>   out:
+>> -	schedule_delayed_work(&timer->overflow_work, timer->overflow_period);
+>> +	return timer->overflow_period;
+>>   }
+>>   
+>>   static int mlx5_ptp_settime_real_time(struct mlx5_core_dev *mdev,
+>> @@ -517,6 +516,7 @@ static int mlx5_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+>>   	timer->cycles.mult = mult;
+>>   	mlx5_update_clock_info_page(mdev);
+>>   	write_sequnlock_irqrestore(&clock->lock, flags);
+>> +	ptp_schedule_worker(clock->ptp, timer->overflow_period);
+>>   
+>>   	return 0;
+>>   }
+>> @@ -852,6 +852,7 @@ static const struct ptp_clock_info mlx5_ptp_clock_info = {
+>>   	.settime64	= mlx5_ptp_settime,
+>>   	.enable		= NULL,
+>>   	.verify		= NULL,
+>> +	.do_aux_work	= mlx5_timestamp_overflow,
+>>   };
+>>   
+>>   static int mlx5_query_mtpps_pin_mode(struct mlx5_core_dev *mdev, u8 pin,
+>> @@ -1052,12 +1053,12 @@ static void mlx5_init_overflow_period(struct mlx5_clock *clock)
+>>   	do_div(ns, NSEC_PER_SEC / HZ);
+>>   	timer->overflow_period = ns;
+>>   
+>> -	INIT_DELAYED_WORK(&timer->overflow_work, mlx5_timestamp_overflow);
+>> -	if (timer->overflow_period)
+>> -		schedule_delayed_work(&timer->overflow_work, 0);
+>> -	else
+>> +	if (!timer->overflow_period) {
+>> +		timer->overflow_period = HZ;
+>>   		mlx5_core_warn(mdev,
+>> -			       "invalid overflow period, overflow_work is not scheduled\n");
+>> +			       "invalid overflow period,"
+>> +			       "overflow_work is scheduled once per second\n");
+>> +	}
+>>   
+>>   	if (clock_info)
+>>   		clock_info->overflow_period = timer->overflow_period;
+>> @@ -1172,6 +1173,9 @@ void mlx5_init_clock(struct mlx5_core_dev *mdev)
+>>   
+>>   	MLX5_NB_INIT(&clock->pps_nb, mlx5_pps_event, PPS_EVENT);
+>>   	mlx5_eq_notifier_register(mdev, &clock->pps_nb);
+>> +
+>> +	if (clock->ptp)
+>> +		ptp_schedule_worker(clock->ptp, 0);
+>>   }
+>>   
+>>   void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
+>> @@ -1188,7 +1192,6 @@ void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
+>>   	}
+>>   
+>>   	cancel_work_sync(&clock->pps_info.out_work);
+>> -	cancel_delayed_work_sync(&clock->timer.overflow_work);
+>>   
+>>   	if (mdev->clock_info) {
+>>   		free_page((unsigned long)mdev->clock_info);
+>> diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
+>> index fc7e6153b73d..3ac2fc1b52cf 100644
+>> --- a/include/linux/mlx5/driver.h
+>> +++ b/include/linux/mlx5/driver.h
+>> @@ -690,7 +690,6 @@ struct mlx5_timer {
+>>   	struct timecounter         tc;
+>>   	u32                        nominal_c_mult;
+>>   	unsigned long              overflow_period;
+>> -	struct delayed_work        overflow_work;
+>>   };
+>>   
+>>   struct mlx5_clock {
 > 
-> Windows is generally case magic, not case insensitive. When opening a
-> file it will first try to be case sensitive, if that fails, it tries
-> case insensitive, in order to be backwards compatible with FAT.
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 > 
->>>>    delete mode 100644 include/uapi/linux/netfilter/xt_CONNMARK.h
->>>>    delete mode 100644 include/uapi/linux/netfilter/xt_DSCP.h
->>>>    delete mode 100644 include/uapi/linux/netfilter/xt_MARK.h
->>>>    delete mode 100644 include/uapi/linux/netfilter/xt_RATEEST.h
->>>>    delete mode 100644 include/uapi/linux/netfilter/xt_TCPMSS.h
->>>>    delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_ECN.h
->>>>    delete mode 100644 include/uapi/linux/netfilter_ipv4/ipt_TTL.h
->>>>    delete mode 100644 include/uapi/linux/netfilter_ipv6/ip6t_HL.h
->>>
->>> How did you verify that there is no user space code using these
->>> includes?
->>>
->>> We take ABI very seriously. You cannot break user space code.
->>>
->>>       Andrew
->>
->> This is a minimal ABI change, which have to use lower case filenames for
->> example: xt_DSCP.h -> xt_dscp.h
-> 
-> You are not listening.
-> 
-> You cannot break user space code.
-> 
-> That is the end of it. No exceptions. It does not matter how bad the
-> API is. You cannot break it.
-> 
->      Andrew
 
-It should not break the API:
-[PATCH v3] netfilter: x_tables: Merge xt_*.c source files which has same name.
-https://lore.kernel.org/lkml/20250103140158.69041-1-egyszeregy@freemail.hu/
+Hi Saeed, Tariq, Leon!
 
-If you prefere more a human readable format: 
-https://github.com/Livius90/linux/commit/8ff73d36125f9a48eac98fd17b51b11d8f73f5a0
+We need explicit Ack-by from official mlx5 maintainer here to let this
+patch go directly to net-next. Could you please check it?
 
+Thanks,
+Vadim
 
 
