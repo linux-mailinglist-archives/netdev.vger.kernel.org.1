@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-155082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2939AA00F73
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:17:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EB34A00F7C
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:18:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 802AB3A50E4
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:16:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1EC2164A81
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA4E1FCF45;
-	Fri,  3 Jan 2025 21:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1061FCFCA;
+	Fri,  3 Jan 2025 21:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oHxvwmAJ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="I1MUQbPw"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB2F1FC7D5;
-	Fri,  3 Jan 2025 21:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C161FCF72;
+	Fri,  3 Jan 2025 21:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735938855; cv=none; b=nhp4ySoFn4qFyYvjvhqXYeDVafUAGH0qwYXBiy3C2kujqBDGFxeHDlmd+a74uRuo9R4uFUGWHsolzrQMxgU5B70pZIQfD46VDF6NdNZgpsvmpkjNgNldKhxposwKoE3yE292WKtxO3e9OCxDQWT5itj/mqtjFxCpFZ9fdHhW0I4=
+	t=1735938859; cv=none; b=dHzFLaE8EYFoB79dTTzN4pqz/Eb9JUXpP3S++wmoNxFdMplDI1w3V+bf81m4X6hyDq5NT7BYYkAXLwLwPTfxcZWdKnaTCJ2nmvK6OmS+aZtd+r3cCcduhPX7x8p8UIDbL1Jidso8eia4yI3E4k8ovUpecYAw1v1qiJJgjSgo7U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735938855; c=relaxed/simple;
-	bh=skjwdRPS2FYeN48f6qE1nqBcRNwQlTJRPbNFUqsGlD4=;
+	s=arc-20240116; t=1735938859; c=relaxed/simple;
+	bh=NHQ/lFZvz8hCOpVmHkcDxHSmkb87a519BmZJot22Xyo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DWNCL7AYp+O03R0c2k5nnGlU4gRNuzrw0ReHVBw87Hm/DJXgOQEAUZfbDQLMyY/wqKbkJe3y8FuV0LK5yLNhYhm/fFEZzP9a7aA2l+ONUbWPVq6b2bN8G9cVVM/GDcnrTaiPk3th4luGL9rvmwUeNTVeMYciRnIpJy0cy7GcFhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oHxvwmAJ; arc=none smtp.client-ip=217.70.183.199
+	 In-Reply-To:To:Cc; b=RmEaVhlNHucBMehn1EE5ettFGR8dhdWs8rot3z6LuppYPalfk5zjjeygwlEY7FIc8pxpzqhG3GK60WVP8quQia7ml7L5xJqjIrr4a/mmvGKUzSzbJH1fNfvKQDeSC7Th0fRPseXccWPPk0Ja9wZYWmBlPeEd+MAZ+w/mvzSTLyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=I1MUQbPw; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3CDD4FF804;
-	Fri,  3 Jan 2025 21:14:08 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 05D0AFF805;
+	Fri,  3 Jan 2025 21:14:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1735938850;
+	t=1735938854;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tNuEf9UdkibubAd66yR2KPbYOH0pRM+wk9zoIxb1GWQ=;
-	b=oHxvwmAJmzugCdO3Ezay2sgwe9FqhRRndbvFiv+YitZmJyuSQgNw2V5/Zvn8AfesXTbpW0
-	0errGz2CN0CRx2SV37/S5Uk3TDIc86r3DcRAURPSFaLLpUTqAeiXtYbgP0Uje/bgiD9y3d
-	1rGfpBSUqkdXKqjTy405DQd7wwXFy5pedSOzAfcv7dj8ksrfRViBYzQB+CC4Erqz/tbRUC
-	10T4MeZFDUTUVovRHOygsXlRQYyySLR7dezDKFykEZBlgBa4Gj1u3krLCU4zE8JGIRkTM+
-	3aImLtpjAJchbT5a9q47lhHQxESGCd4IJaaSmgM133X8gsxUXdMnB2nixJ4ESQ==
+	bh=lr366fsFTHJtEL1PYnhXdAZBFRFY/RGC8PZILp9xY0g=;
+	b=I1MUQbPwbl49/huSRVSgZj27rLB+N2/7qSwFFN359nfVCjT9r/FV1netuRyEvLoCCPSrlN
+	r+HadA6yp7UMY/PAs1c4cYsDZbLTVwjxWHh8V/jaWYlZYuGX43s1G5ZUoB7mMyC0W4sn6N
+	uY9dzD5UAE4djflSEzEN0nmKcHF6Pg7SUiXruYmoE+m60g1FFjz2xUwQtyc3btsnlhvMUb
+	CY7UmGgdauvK7IqF5TT5kfwZocfF1CVSsWH/YNZ1eywotZQCQEJhdxZirt4QhvwJFdHKHQ
+	pD+u4iYe4Og64X5X9/cpW30C09IKErUsO8zBX4wcWpdSZ0hl+fmPSoJmgBy5zg==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 03 Jan 2025 22:13:03 +0100
-Subject: [PATCH net-next v4 14/27] net: pse-pd: Add support for reporting
- events
+Date: Fri, 03 Jan 2025 22:13:04 +0100
+Subject: [PATCH net-next v4 15/27] net: pse-pd: tps23881: Add support for
+ PSE events and interrupts
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250103-feature_poe_port_prio-v4-14-dc91a3c0c187@bootlin.com>
+Message-Id: <20250103-feature_poe_port_prio-v4-15-dc91a3c0c187@bootlin.com>
 References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
 In-Reply-To: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -80,699 +80,254 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Add support for devm_pse_irq_helper() to register PSE interrupts. This aims
-to report events such as over-current or over-temperature conditions
-similarly to how the regulator API handles them but using a specific PSE
-ethtool netlink socket.
+Add support for PSE event reporting through interrupts. Set up the newly
+introduced devm_pse_irq_helper helper to register the interrupt. Events are
+reported for over-current and over-temperature conditions.
 
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
+
 Change in v4:
-- Fix netlink notification message issues.
-- Use netlink bitset in ethtool_pse_send_ntf.
-- Add kdoc.
+- Small rename of a function.
 
 Change in v3:
-- Remove C33 prefix when it is not in the standards.
-- Fix pse_to_regulator_notifs which could not report regulator events
-  together.
-- Fix deadlock issue.
-- Save interrupt in pcdev structure for later use.
+- Loop over interruption register to be sure the interruption pin is
+  freed before exiting the interrupt handler function.
+- Add exist variable to not report event for undescribed PIs.
+- Used helpers to convert the chan number to the PI port number.
 
 Change in v2:
-- Add support for PSE ethtool notification.
-- Saved the attached phy_device in the pse_control structure to know which
-  interface should have the notification.
-- Rethink devm_pse_irq_helper() without devm_regulator_irq_helper() call.
+- Remove support for OSS pin and TPC23881 specific port priority management
 ---
- Documentation/netlink/specs/ethtool.yaml       |  26 ++++
- Documentation/networking/ethtool-netlink.rst   |  19 +++
- drivers/net/mdio/fwnode_mdio.c                 |  26 ++--
- drivers/net/pse-pd/pse_core.c                  | 157 ++++++++++++++++++++++++-
- include/linux/ethtool_netlink.h                |   9 ++
- include/linux/pse-pd/pse.h                     |  24 +++-
- include/uapi/linux/ethtool.h                   |  17 +++
- include/uapi/linux/ethtool_netlink_generated.h |  10 ++
- net/ethtool/common.c                           |   6 +
- net/ethtool/common.h                           |   2 +
- net/ethtool/pse-pd.c                           |  53 +++++++++
- net/ethtool/strset.c                           |   5 +
- 12 files changed, 337 insertions(+), 17 deletions(-)
+ drivers/net/pse-pd/tps23881.c | 178 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 177 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index cc26a9dfa8f7..9aa62137166a 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1520,6 +1520,22 @@ attribute-sets:
-       -
-         name: hwtstamp-flags
-         type: u32
-+  -
-+    name: pse-ntf
-+    attr-cnt-name: __ethtool-a-pse-ntf-cnt
-+    attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: header
-+        type: nest
-+        nested-attributes: header
-+      -
-+        name: events
-+        type: nest
-+        nested-attributes: bitset
+diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
+index 5e9dda2c0eac..122666719297 100644
+--- a/drivers/net/pse-pd/tps23881.c
++++ b/drivers/net/pse-pd/tps23881.c
+@@ -17,6 +17,13 @@
  
- operations:
-   enum-model: directional
-@@ -2375,3 +2391,13 @@ operations:
-           attributes: *tsconfig
-         reply:
-           attributes: *tsconfig
-+    -
-+      name: pse-ntf
-+      doc: Notification for pse events.
-+
-+      attribute-set: pse-ntf
-+
-+      event:
-+        attributes:
-+          - header
-+          - events
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index 6f5a880d8df2..9d836fa670df 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -290,6 +290,7 @@ Kernel to userspace:
-   ``ETHTOOL_MSG_PHY_NTF``                  Ethernet PHY information change
-   ``ETHTOOL_MSG_TSCONFIG_GET_REPLY``       hw timestamping configuration
-   ``ETHTOOL_MSG_TSCONFIG_SET_REPLY``       new hw timestamping configuration
-+  ``ETHTOOL_MSG_PSE_NTF``                  PSE events notification
-   ======================================== =================================
+ #define TPS23881_MAX_CHANS 8
  
- ``GET`` requests are sent by userspace applications to retrieve device
-@@ -1883,6 +1884,24 @@ various existing products that document power consumption in watts rather than
- classes. If power limit configuration based on classes is needed, the
- conversion can be done in user space, for example by ethtool.
- 
-+PSE_NTF
-+=======
-+
-+Notify PSE events.
-+
-+Notification contents:
-+
-+  ===============================  ======  ========================
-+  ``ETHTOOL_A_PSE_HEADER``         nested  request header
-+  ``ETHTOOL_A_PSE_EVENTS``         bitset  PSE events
-+  ===============================  ======  ========================
-+
-+When set, the optional ``ETHTOOL_A_PSE_EVENTS`` attribute identifies the
-+PSE events.
-+
-+.. kernel-doc:: include/uapi/linux/ethtool.h
-+    :identifiers: ethtool_pse_events
-+
- RSS_GET
- =======
- 
-diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-index aea0f0357568..9b41d4697a40 100644
---- a/drivers/net/mdio/fwnode_mdio.c
-+++ b/drivers/net/mdio/fwnode_mdio.c
-@@ -18,7 +18,8 @@ MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
- 
- static struct pse_control *
--fwnode_find_pse_control(struct fwnode_handle *fwnode)
-+fwnode_find_pse_control(struct fwnode_handle *fwnode,
-+			struct phy_device *phydev)
- {
- 	struct pse_control *psec;
- 	struct device_node *np;
-@@ -30,7 +31,7 @@ fwnode_find_pse_control(struct fwnode_handle *fwnode)
- 	if (!np)
- 		return NULL;
- 
--	psec = of_pse_control_get(np);
-+	psec = of_pse_control_get(np, phydev);
- 	if (PTR_ERR(psec) == -ENOENT)
- 		return NULL;
- 
-@@ -128,15 +129,9 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 	u32 phy_id;
- 	int rc;
- 
--	psec = fwnode_find_pse_control(child);
--	if (IS_ERR(psec))
--		return PTR_ERR(psec);
--
- 	mii_ts = fwnode_find_mii_timestamper(child);
--	if (IS_ERR(mii_ts)) {
--		rc = PTR_ERR(mii_ts);
--		goto clean_pse;
--	}
-+	if (IS_ERR(mii_ts))
-+		return PTR_ERR(mii_ts);
- 
- 	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
- 	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
-@@ -169,6 +164,12 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 			goto clean_phy;
- 	}
- 
-+	psec = fwnode_find_pse_control(child, phy);
-+	if (IS_ERR(psec)) {
-+		rc = PTR_ERR(psec);
-+		goto unregister_phy;
-+	}
-+
- 	phy->psec = psec;
- 
- 	/* phy->mii_ts may already be defined by the PHY driver. A
-@@ -180,12 +181,13 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 
- 	return 0;
- 
-+unregister_phy:
-+	if (is_acpi_node(child) || is_of_node(child))
-+		phy_device_remove(phy);
- clean_phy:
- 	phy_device_free(phy);
- clean_mii_ts:
- 	unregister_mii_timestamper(mii_ts);
--clean_pse:
--	pse_control_put(psec);
- 
- 	return rc;
- }
-diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 830e8d567d4d..83689de4a5ab 100644
---- a/drivers/net/pse-pd/pse_core.c
-+++ b/drivers/net/pse-pd/pse_core.c
-@@ -6,6 +6,7 @@
- //
- 
- #include <linux/device.h>
-+#include <linux/ethtool_netlink.h>
- #include <linux/of.h>
- #include <linux/pse-pd/pse.h>
- #include <linux/regulator/driver.h>
-@@ -23,6 +24,7 @@ static DEFINE_IDA(pse_ida);
-  * @list: list entry for the pcdev's PSE controller list
-  * @id: ID of the PSE line in the PSE controller device
-  * @refcnt: Number of gets of this pse_control
-+ * @attached_phydev: PHY device pointer attached by the PSE control
-  */
- struct pse_control {
- 	struct pse_controller_dev *pcdev;
-@@ -30,6 +32,7 @@ struct pse_control {
- 	struct list_head list;
- 	unsigned int id;
- 	struct kref refcnt;
-+	struct phy_device *attached_phydev;
++#define TPS23881_REG_IT		0x0
++#define TPS23881_REG_IT_MASK	0x1
++#define TPS23881_REG_IT_IFAULT	BIT(5)
++#define TPS23881_REG_IT_SUPF	BIT(7)
++#define TPS23881_REG_FAULT	0x7
++#define TPS23881_REG_SUPF_EVENT	0xb
++#define TPS23881_REG_TSD	BIT(7)
+ #define TPS23881_REG_PW_STATUS	0x10
+ #define TPS23881_REG_OP_MODE	0x12
+ #define TPS23881_OP_MODE_SEMIAUTO	0xaaaa
+@@ -24,6 +31,7 @@
+ #define TPS23881_REG_DET_CLA_EN	0x14
+ #define TPS23881_REG_GEN_MASK	0x17
+ #define TPS23881_REG_NBITACC	BIT(5)
++#define TPS23881_REG_INTEN	BIT(7)
+ #define TPS23881_REG_PW_EN	0x19
+ #define TPS23881_REG_2PAIR_POL1	0x1e
+ #define TPS23881_REG_PORT_MAP	0x26
+@@ -51,6 +59,7 @@ struct tps23881_port_desc {
+ 	u8 chan[2];
+ 	bool is_4p;
+ 	int pw_pol;
++	bool exist;
  };
  
- static int of_load_single_pse_pi_pairset(struct device_node *node,
-@@ -567,6 +570,151 @@ int devm_pse_controller_register(struct device *dev,
- }
- EXPORT_SYMBOL_GPL(devm_pse_controller_register);
+ struct tps23881_priv {
+@@ -782,8 +791,10 @@ tps23881_write_port_matrix(struct tps23881_priv *priv,
+ 		hw_chan = port_matrix[i].hw_chan[0] % 4;
  
-+struct pse_irq {
-+	struct pse_controller_dev *pcdev;
-+	struct pse_irq_desc desc;
-+	unsigned long *notifs;
-+};
-+
-+/**
-+ * pse_to_regulator_notifs - Convert PSE notifications to Regulator
-+ *			     notifications
-+ * @notifs: PSE notifications
-+ *
-+ * Return: Regulator notifications
+ 		/* Set software port matrix for existing ports */
+-		if (port_matrix[i].exist)
++		if (port_matrix[i].exist) {
+ 			priv->port[pi_id].chan[0] = lgcl_chan;
++			priv->port[pi_id].exist = true;
++		}
+ 
+ 		/* Initialize power policy internal value */
+ 		priv->port[pi_id].pw_pol = -1;
+@@ -1017,6 +1028,165 @@ static int tps23881_flash_sram_fw(struct i2c_client *client)
+ 	return 0;
+ }
+ 
++/* Convert interrupt events to 0xff to be aligned with the chan
++ * number.
 + */
-+static unsigned long pse_to_regulator_notifs(unsigned long notifs)
++static u8 tps23881_irq_export_chans_helper(u16 reg_val, u8 field_offset)
 +{
-+	unsigned long rnotifs = 0;
++	u8 val;
 +
-+	if (notifs & ETHTOOL_PSE_EVENT_OVER_CURRENT)
-+		rnotifs |= REGULATOR_EVENT_OVER_CURRENT;
-+	if (notifs & ETHTOOL_PSE_EVENT_OVER_TEMP)
-+		rnotifs |= REGULATOR_EVENT_OVER_TEMP;
++	val = (reg_val >> (4 + field_offset) & 0xf0) |
++	      (reg_val >> field_offset & 0x0f);
 +
-+	return rnotifs;
++	return val;
 +}
 +
-+/**
-+ * pse_control_find_phy_by_id - Find PHY attached to the a pse control id
-+ * @pcdev: a pointer to the PSE
-+ * @id: index of the PSE control
-+ *
-+ * Return: PHY device pointer or NULL
-+ */
-+static struct phy_device *
-+pse_control_find_phy_by_id(struct pse_controller_dev *pcdev, int id)
++/* Convert chan number to port number */
++static void tps23881_set_notifs_helper(struct tps23881_priv *priv,
++				       u8 chans,
++				       unsigned long *notifs,
++				       unsigned long *notifs_mask,
++				       enum ethtool_pse_events event)
 +{
-+	struct pse_control *psec;
++	u8 chan;
++	int i;
 +
-+	mutex_lock(&pse_list_mutex);
-+	list_for_each_entry(psec, &pcdev->pse_control_head, list) {
-+		if (psec->id == id) {
-+			mutex_unlock(&pse_list_mutex);
-+			return psec->attached_phydev;
++	if (!chans)
++		return;
++
++	for (i = 0; i < TPS23881_MAX_CHANS; i++) {
++		if (!priv->port[i].exist)
++			continue;
++		/* No need to look at the 2nd channel in case of PoE4 as
++		 * both registers are set.
++		 */
++		chan = priv->port[i].chan[0];
++
++		if (BIT(chan) & chans) {
++			*notifs_mask |= BIT(i);
++			notifs[i] |= event;
 +		}
 +	}
-+	mutex_unlock(&pse_list_mutex);
-+
-+	return NULL;
 +}
 +
-+/**
-+ * pse_isr - IRQ handler for PSE
-+ * @irq: irq number
-+ * @data: pointer to user interrupt structure
-+ *
-+ * Return: irqreturn_t - status of IRQ
-+ */
-+static irqreturn_t pse_isr(int irq, void *data)
++static void tps23881_irq_event_over_temp(struct tps23881_priv *priv,
++					 u16 reg_val,
++					 unsigned long *notifs,
++					 unsigned long *notifs_mask)
 +{
-+	struct netlink_ext_ack extack = {};
-+	struct pse_controller_dev *pcdev;
-+	unsigned long notifs_mask = 0;
-+	struct pse_irq_desc *desc;
-+	struct pse_irq *h = data;
-+	int ret, i;
++	int i;
 +
-+	desc = &h->desc;
-+	pcdev = h->pcdev;
++	if (reg_val & TPS23881_REG_TSD) {
++		for (i = 0; i < TPS23881_MAX_CHANS; i++) {
++			if (!priv->port[i].exist)
++				continue;
 +
-+	/* Clear notifs mask */
-+	memset(h->notifs, 0, pcdev->nr_lines * sizeof(*h->notifs));
-+	mutex_lock(&pcdev->lock);
-+	ret = desc->map_event(irq, pcdev, h->notifs, &notifs_mask);
-+	mutex_unlock(&pcdev->lock);
-+	if (ret || !notifs_mask)
-+		return IRQ_NONE;
-+
-+	for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) {
-+		struct phy_device *phydev;
-+		unsigned long notifs, rnotifs;
-+
-+		/* Do nothing PI not described */
-+		if (!pcdev->pi[i].rdev)
-+			continue;
-+
-+		notifs = h->notifs[i];
-+		dev_dbg(h->pcdev->dev,
-+			"Sending PSE notification EVT 0x%lx\n", notifs);
-+
-+		phydev = pse_control_find_phy_by_id(pcdev, i);
-+		if (phydev)
-+			ethnl_pse_send_ntf(phydev, notifs, &extack);
-+		rnotifs = pse_to_regulator_notifs(notifs);
-+		regulator_notifier_call_chain(pcdev->pi[i].rdev, rnotifs,
-+					      NULL);
++			*notifs_mask |= BIT(i);
++			notifs[i] |= ETHTOOL_PSE_EVENT_OVER_TEMP;
++		}
 +	}
-+
-+	return IRQ_HANDLED;
 +}
 +
-+/**
-+ * devm_pse_irq_helper - Register IRQ based PSE event notifier
-+ *
-+ * @pcdev: a pointer to the PSE
-+ * @irq: the irq value to be passed to request_irq
-+ * @irq_flags: the flags to be passed to request_irq
-+ * @d: PSE interrupt description
-+ *
-+ * Return: 0 on success and failure value on error
-+ */
-+int devm_pse_irq_helper(struct pse_controller_dev *pcdev, int irq,
-+			int irq_flags, const struct pse_irq_desc *d)
++static void tps23881_irq_event_over_current(struct tps23881_priv *priv,
++					    u16 reg_val,
++					    unsigned long *notifs,
++					    unsigned long *notifs_mask)
 +{
-+	struct device *dev = pcdev->dev;
-+	struct pse_irq *h;
++	u8 chans;
++
++	chans = tps23881_irq_export_chans_helper(reg_val, 0);
++	if (chans)
++		tps23881_set_notifs_helper(priv, chans, notifs, notifs_mask,
++					   ETHTOOL_PSE_EVENT_OVER_CURRENT);
++}
++
++static int tps23881_irq_event_handler(struct tps23881_priv *priv, u16 reg,
++				      unsigned long *notifs,
++				      unsigned long *notifs_mask)
++{
++	struct i2c_client *client = priv->client;
 +	int ret;
 +
-+	if (!d || !d->map_event || !d->name)
-+		return -EINVAL;
++	/* The Supply event bit is repeated twice so we only need to read
++	 * the one from the first byte.
++	 */
++	if (reg & TPS23881_REG_IT_SUPF) {
++		ret = i2c_smbus_read_word_data(client, TPS23881_REG_SUPF_EVENT);
++		if (ret < 0)
++			return ret;
++		tps23881_irq_event_over_temp(priv, ret, notifs, notifs_mask);
++	}
 +
-+	h = devm_kzalloc(dev, sizeof(*h), GFP_KERNEL);
-+	if (!h)
-+		return -ENOMEM;
++	if (reg & (TPS23881_REG_IT_IFAULT | TPS23881_REG_IT_IFAULT << 8)) {
++		ret = i2c_smbus_read_word_data(client, TPS23881_REG_FAULT);
++		if (ret < 0)
++			return ret;
++		tps23881_irq_event_over_current(priv, ret, notifs, notifs_mask);
++	}
 +
-+	h->pcdev = pcdev;
-+	h->desc = *d;
-+	h->desc.name = devm_kstrdup(dev, d->name, GFP_KERNEL);
-+	if (!h->desc.name)
-+		return -ENOMEM;
-+
-+	h->notifs = devm_kcalloc(pcdev->dev, pcdev->nr_lines,
-+				 sizeof(*h->notifs), GFP_KERNEL);
-+	if (!h->notifs)
-+		return -ENOMEM;
-+
-+	ret = devm_request_threaded_irq(dev, irq, NULL, pse_isr,
-+					IRQF_ONESHOT | irq_flags,
-+					h->desc.name, h);
-+	if (ret)
-+		dev_err(pcdev->dev, "Failed to request IRQ %d\n", irq);
-+
-+	pcdev->irq = irq;
-+	return ret;
++	return 0;
 +}
-+EXPORT_SYMBOL_GPL(devm_pse_irq_helper);
 +
- /* PSE control section */
- 
- static void __pse_control_release(struct kref *kref)
-@@ -609,7 +757,8 @@ void pse_control_put(struct pse_control *psec)
- EXPORT_SYMBOL_GPL(pse_control_put);
- 
- static struct pse_control *
--pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index)
-+pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index,
-+			 struct phy_device *phydev)
++static int tps23881_irq_handler(int irq, struct pse_controller_dev *pcdev,
++				unsigned long *notifs,
++				unsigned long *notifs_mask)
++{
++	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
++	struct i2c_client *client = priv->client;
++	int ret, it_mask;
++
++	/* Get interruption mask */
++	ret = i2c_smbus_read_word_data(client, TPS23881_REG_IT_MASK);
++	if (ret < 0)
++		return ret;
++	it_mask = ret;
++
++	/* Read interrupt register until it frees the interruption pin. */
++	while (true) {
++		ret = i2c_smbus_read_word_data(client, TPS23881_REG_IT);
++		if (ret < 0)
++			return ret;
++
++		/* No more relevant interruption */
++		if (!(ret & it_mask))
++			return 0;
++
++		ret = tps23881_irq_event_handler(priv, (u16)ret, notifs,
++						 notifs_mask);
++		if (ret)
++			return ret;
++	}
++	return 0;
++}
++
++static int tps23881_setup_irq(struct tps23881_priv *priv, int irq)
++{
++	struct i2c_client *client = priv->client;
++	struct pse_irq_desc irq_desc = {
++		.name = "tps23881-irq",
++		.map_event = tps23881_irq_handler,
++	};
++	int ret;
++	u16 val;
++
++	val = TPS23881_REG_IT_IFAULT | TPS23881_REG_IT_SUPF;
++	val |= val << 8;
++	ret = i2c_smbus_write_word_data(client, TPS23881_REG_IT_MASK, val);
++	if (ret)
++		return ret;
++
++	ret = i2c_smbus_read_word_data(client, TPS23881_REG_GEN_MASK);
++	if (ret < 0)
++		return ret;
++
++	val = (u16)(ret | TPS23881_REG_INTEN | TPS23881_REG_INTEN << 8);
++	ret = i2c_smbus_write_word_data(client, TPS23881_REG_GEN_MASK, val);
++	if (ret < 0)
++		return ret;
++
++	return devm_pse_irq_helper(&priv->pcdev, irq, 0, &irq_desc);
++}
++
+ static int tps23881_i2c_probe(struct i2c_client *client)
  {
- 	struct pse_control *psec;
- 	int ret;
-@@ -648,6 +797,7 @@ pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index)
- 	psec->pcdev = pcdev;
- 	list_add(&psec->list, &pcdev->pse_control_head);
- 	psec->id = index;
-+	psec->attached_phydev = phydev;
- 	kref_init(&psec->refcnt);
- 
- 	return psec;
-@@ -703,7 +853,8 @@ static int psec_id_xlate(struct pse_controller_dev *pcdev,
- 	return pse_spec->args[0];
- }
- 
--struct pse_control *of_pse_control_get(struct device_node *node)
-+struct pse_control *of_pse_control_get(struct device_node *node,
-+				       struct phy_device *phydev)
- {
- 	struct pse_controller_dev *r, *pcdev;
- 	struct of_phandle_args args;
-@@ -753,7 +904,7 @@ struct pse_control *of_pse_control_get(struct device_node *node)
+ 	struct device *dev = &client->dev;
+@@ -1097,6 +1267,12 @@ static int tps23881_i2c_probe(struct i2c_client *client)
+ 				     "failed to register PSE controller\n");
  	}
  
- 	/* pse_list_mutex also protects the pcdev's pse_control list */
--	psec = pse_control_get_internal(pcdev, psec_id);
-+	psec = pse_control_get_internal(pcdev, psec_id, phydev);
- 
- out:
- 	mutex_unlock(&pse_list_mutex);
-diff --git a/include/linux/ethtool_netlink.h b/include/linux/ethtool_netlink.h
-index aba91335273a..0fa1d8f59cf2 100644
---- a/include/linux/ethtool_netlink.h
-+++ b/include/linux/ethtool_netlink.h
-@@ -43,6 +43,9 @@ void ethtool_aggregate_rmon_stats(struct net_device *dev,
- 				  struct ethtool_rmon_stats *rmon_stats);
- bool ethtool_dev_mm_supported(struct net_device *dev);
- 
-+void ethnl_pse_send_ntf(struct phy_device *phydev, unsigned long notif,
-+			struct netlink_ext_ack *extack);
-+
- #else
- static inline int ethnl_cable_test_alloc(struct phy_device *phydev, u8 cmd)
- {
-@@ -120,6 +123,12 @@ static inline bool ethtool_dev_mm_supported(struct net_device *dev)
- 	return false;
- }
- 
-+static inline void ethnl_pse_send_ntf(struct phy_device *phydev,
-+				      unsigned long notif,
-+				      struct netlink_ext_ack *extack)
-+{
-+}
-+
- #endif /* IS_ENABLED(CONFIG_ETHTOOL_NETLINK) */
- 
- static inline int ethnl_cable_test_result(struct phy_device *phydev, u8 pair,
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index 8780a4160d3c..b3f8d198c5a7 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -8,6 +8,7 @@
- #include <linux/ethtool.h>
- #include <linux/list.h>
- #include <uapi/linux/ethtool.h>
-+#include <linux/regulator/driver.h>
- 
- /* Maximum current in uA according to IEEE 802.3-2022 Table 145-1 */
- #define MAX_PI_CURRENT 1920000
-@@ -17,6 +18,19 @@
- struct phy_device;
- struct pse_controller_dev;
- 
-+/**
-+ * struct pse_irq_desc - notification sender description for IRQ based events.
-+ *
-+ * @name: the visible name for the IRQ
-+ * @map_event: driver callback to map IRQ status into PSE devices with events.
-+ */
-+struct pse_irq_desc {
-+	const char *name;
-+	int (*map_event)(int irq, struct pse_controller_dev *pcdev,
-+			 unsigned long *notifs,
-+			 unsigned long *notifs_mask);
-+};
-+
- /**
-  * struct pse_control_config - PSE control/channel configuration.
-  *
-@@ -173,6 +187,7 @@ struct pse_pi {
-  * @pi: table of PSE PIs described in this controller device
-  * @no_of_pse_pi: flag set if the pse_pis devicetree node is not used
-  * @id: Index of the PSE
-+ * @irq: PSE interrupt
-  */
- struct pse_controller_dev {
- 	const struct pse_controller_ops *ops;
-@@ -187,6 +202,7 @@ struct pse_controller_dev {
- 	struct pse_pi *pi;
- 	bool no_of_pse_pi;
- 	u32 id;
-+	int irq;
- };
- 
- #if IS_ENABLED(CONFIG_PSE_CONTROLLER)
-@@ -195,8 +211,11 @@ void pse_controller_unregister(struct pse_controller_dev *pcdev);
- struct device;
- int devm_pse_controller_register(struct device *dev,
- 				 struct pse_controller_dev *pcdev);
-+int devm_pse_irq_helper(struct pse_controller_dev *pcdev, int irq,
-+			int irq_flags, const struct pse_irq_desc *d);
- 
--struct pse_control *of_pse_control_get(struct device_node *node);
-+struct pse_control *of_pse_control_get(struct device_node *node,
-+				       struct phy_device *phydev);
- void pse_control_put(struct pse_control *psec);
- 
- int pse_ethtool_get_status(struct pse_control *psec,
-@@ -214,7 +233,8 @@ bool pse_has_c33(struct pse_control *psec);
- 
- #else
- 
--static inline struct pse_control *of_pse_control_get(struct device_node *node)
-+static inline struct pse_control *of_pse_control_get(struct device_node *node,
-+						     struct phy_device *phydev)
- {
- 	return ERR_PTR(-ENOENT);
- }
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index 7e1b3820f91f..33c8dc6c9ef6 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -681,6 +681,7 @@ enum ethtool_link_ext_substate_module {
-  * @ETH_SS_STATS_ETH_MAC: names of IEEE 802.3 MAC statistics
-  * @ETH_SS_STATS_ETH_CTRL: names of IEEE 802.3 MAC Control statistics
-  * @ETH_SS_STATS_RMON: names of RMON statistics
-+ * @ETH_SS_PSE_EVENTS: names of PSE events
-  *
-  * @ETH_SS_COUNT: number of defined string sets
-  */
-@@ -706,6 +707,7 @@ enum ethtool_stringset {
- 	ETH_SS_STATS_ETH_MAC,
- 	ETH_SS_STATS_ETH_CTRL,
- 	ETH_SS_STATS_RMON,
-+	ETH_SS_PSE_EVENTS,
- 
- 	/* add new constants above here */
- 	ETH_SS_COUNT
-@@ -998,6 +1000,21 @@ enum ethtool_c33_pse_pw_d_status {
- 	ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT,
- };
- 
-+/**
-+ * enum ethtool_pse_events - event list of the PSE controller.
-+ * @ETHTOOL_PSE_EVENT_OVER_CURRENT: PSE output current is too high.
-+ * @ETHTOOL_PSE_EVENT_OVER_TEMP: PSE in over temperature state.
-+ *
-+ * @ETHTOOL_PSE_EVENT_LAST: Last PSE event of the enum.
-+ */
-+
-+enum ethtool_pse_events {
-+	ETHTOOL_PSE_EVENT_OVER_CURRENT =	1 << 0,
-+	ETHTOOL_PSE_EVENT_OVER_TEMP =		1 << 1,
-+
-+	ETHTOOL_PSE_EVENT_LAST = ETHTOOL_PSE_EVENT_OVER_TEMP,
-+};
-+
- /**
-  * enum ethtool_podl_pse_admin_state - operational state of the PoDL PSE
-  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index b3c928c71ca3..7293592fd689 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -707,6 +707,15 @@ enum {
- 	ETHTOOL_A_TSCONFIG_MAX = (__ETHTOOL_A_TSCONFIG_CNT - 1)
- };
- 
-+enum {
-+	ETHTOOL_A_PSE_NTF_UNSPEC,
-+	ETHTOOL_A_PSE_NTF_HEADER,
-+	ETHTOOL_A_PSE_NTF_EVENTS,
-+
-+	__ETHTOOL_A_PSE_NTF_CNT,
-+	ETHTOOL_A_PSE_NTF_MAX = (__ETHTOOL_A_PSE_NTF_CNT - 1)
-+};
-+
- enum {
- 	ETHTOOL_MSG_USER_NONE = 0,
- 	ETHTOOL_MSG_STRSET_GET = 1,
-@@ -811,6 +820,7 @@ enum {
- 	ETHTOOL_MSG_PHY_NTF,
- 	ETHTOOL_MSG_TSCONFIG_GET_REPLY,
- 	ETHTOOL_MSG_TSCONFIG_SET_REPLY,
-+	ETHTOOL_MSG_PSE_NTF,
- 
- 	__ETHTOOL_MSG_KERNEL_CNT,
- 	ETHTOOL_MSG_KERNEL_MAX = (__ETHTOOL_MSG_KERNEL_CNT - 1)
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 2607aea1fbfb..d50b8292debd 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -470,6 +470,12 @@ const char udp_tunnel_type_names[][ETH_GSTRING_LEN] = {
- static_assert(ARRAY_SIZE(udp_tunnel_type_names) ==
- 	      __ETHTOOL_UDP_TUNNEL_TYPE_CNT);
- 
-+const char pse_event_names[][ETH_GSTRING_LEN] = {
-+	[const_ilog2(ETHTOOL_PSE_EVENT_OVER_CURRENT)] = "over-current",
-+	[const_ilog2(ETHTOOL_PSE_EVENT_OVER_TEMP)] = "over-temperature",
-+};
-+static_assert(ARRAY_SIZE(pse_event_names) == __PSE_EVENT_CNT);
-+
- /* return false if legacy contained non-0 deprecated fields
-  * maxtxpkt/maxrxpkt. rest of ksettings always updated
-  */
-diff --git a/net/ethtool/common.h b/net/ethtool/common.h
-index 850eadde4bfc..9f28e55a5040 100644
---- a/net/ethtool/common.h
-+++ b/net/ethtool/common.h
-@@ -13,6 +13,7 @@
- 	ETHTOOL_LINK_MODE_ ## speed ## base ## type ## _ ## duplex ## _BIT
- 
- #define __SOF_TIMESTAMPING_CNT (const_ilog2(SOF_TIMESTAMPING_LAST) + 1)
-+#define __PSE_EVENT_CNT (const_ilog2(ETHTOOL_PSE_EVENT_LAST) + 1)
- 
- struct link_mode_info {
- 	int				speed;
-@@ -39,6 +40,7 @@ extern const char sof_timestamping_names[][ETH_GSTRING_LEN];
- extern const char ts_tx_type_names[][ETH_GSTRING_LEN];
- extern const char ts_rx_filter_names[][ETH_GSTRING_LEN];
- extern const char udp_tunnel_type_names[][ETH_GSTRING_LEN];
-+extern const char pse_event_names[][ETH_GSTRING_LEN];
- 
- int __ethtool_get_link(struct net_device *dev);
- 
-diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-index 6cfdfaa47c1c..bbc9ae910e02 100644
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -12,6 +12,7 @@
- #include <linux/ethtool_netlink.h>
- #include <linux/ethtool.h>
- #include <linux/phy.h>
-+#include "bitset.h"
- 
- struct pse_req_info {
- 	struct ethnl_req_info base;
-@@ -319,3 +320,55 @@ const struct ethnl_request_ops ethnl_pse_request_ops = {
- 	.set			= ethnl_set_pse,
- 	/* PSE has no notification */
- };
-+
-+void ethnl_pse_send_ntf(struct phy_device *phydev, unsigned long notifs,
-+			struct netlink_ext_ack *extack)
-+{
-+	struct net_device *netdev = phydev->attached_dev;
-+	struct genl_info info;
-+	void *reply_payload;
-+	struct sk_buff *skb;
-+	int reply_len;
-+	int ret;
-+
-+	if (!netdev || !notifs)
-+		return;
-+
-+	ethnl_info_init_ntf(&info, ETHTOOL_MSG_PSE_NTF);
-+	info.extack = extack;
-+
-+	reply_len = ethnl_reply_header_size();
-+	/* _C33_PSE_NTF_EVENTS */
-+	ret = ethnl_bitset_size(&notifs, NULL, __PSE_EVENT_CNT,
-+				pse_event_names, 0);
-+	if (ret < 0)
-+		return;
-+
-+	reply_len += ret;
-+	skb = genlmsg_new(reply_len, GFP_KERNEL);
-+	reply_payload = ethnl_bcastmsg_put(skb, ETHTOOL_MSG_PSE_NTF);
-+	if (!reply_payload)
-+		goto err_skb;
-+
-+	ret = ethnl_fill_reply_header(skb, netdev,
-+				      ETHTOOL_A_PSE_NTF_HEADER);
-+	if (ret < 0)
-+		goto err_skb;
-+
-+	ret = ethnl_put_bitset(skb, ETHTOOL_A_PSE_NTF_EVENTS, &notifs,
-+			       NULL, __PSE_EVENT_CNT, pse_event_names, 0);
-+	if (ret) {
-+		WARN_ONCE(ret == -EMSGSIZE,
-+			  "calculated message payload length (%d) not sufficient\n",
-+			  reply_len);
-+		goto err_skb;
++	if (client->irq) {
++		ret = tps23881_setup_irq(priv, client->irq);
++		if (ret)
++			return ret;
 +	}
 +
-+	genlmsg_end(skb, reply_payload);
-+	ethnl_multicast(skb, netdev);
-+	return;
-+
-+err_skb:
-+	nlmsg_free(skb);
-+}
-+EXPORT_SYMBOL_GPL(ethnl_pse_send_ntf);
-diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
-index b3382b3cf325..8f81e05107f3 100644
---- a/net/ethtool/strset.c
-+++ b/net/ethtool/strset.c
-@@ -105,6 +105,11 @@ static const struct strset_info info_template[] = {
- 		.count		= __ETHTOOL_A_STATS_RMON_CNT,
- 		.strings	= stats_rmon_names,
- 	},
-+	[ETH_SS_PSE_EVENTS] = {
-+		.per_dev	= false,
-+		.count		= __PSE_EVENT_CNT,
-+		.strings	= pse_event_names,
-+	},
- };
+ 	return ret;
+ }
  
- struct strset_req_info {
 
 -- 
 2.34.1
