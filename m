@@ -1,165 +1,410 @@
-Return-Path: <netdev+bounces-155069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B6C0A00EA2
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 20:52:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D620A00F3E
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:05:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8419318849DF
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 19:52:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EEC47A05C9
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0855588E;
-	Fri,  3 Jan 2025 19:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2859A1B2186;
+	Fri,  3 Jan 2025 21:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="u4NjhArB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NMAN3bWS"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2053.outbound.protection.outlook.com [40.107.236.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D081C36
-	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 19:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735933943; cv=fail; b=QV5oD/pPCH8ooP1q2zufuWfTLRLu8BINNjfNMsy5GyYrsEH8xsGs9O/XbiKoKfFuhGxkiSxvTTyincweMzIoEnQvv5sMy0PhVfWicacGSpHF2R/AI+4QR0RlMhdf/a1n2cCLOX0N7BSWNc1kDS2FVGCCgBupK9SGNI1mhYRx0v8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735933943; c=relaxed/simple;
-	bh=bVnLmwkQ6DF2ij9CAEVFmoKww5wdpj29TY7rk7vaYfM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=X8E+D0HHI9Is9BNOqSTF/4QswdApgKpcwvVTUcaQeKsfEAMsLw8YFtCZDfZfBeV/XyefTLsdeJzUvxP2A7VuuPlhiyiTHYugfeJdefnKz4lxW1pR2bleT4jFciADcMlqmVOo8HguFlrQwS827/hZsvo6ek3EC7sm3VgQ+wySDNI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=u4NjhArB; arc=fail smtp.client-ip=40.107.236.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DBgyUmNHdTvm3cOn59NDtJlUx+5loIi6DJ3UqjIOY8kdXEXJ6D0FtccfzEiViOwEh2U6mWga1+xmodQAjUHEhIsgFPFqczs/b321tdQGEGlDi7E+tX7GUQUnwduTYE9d+x6NibYS3vQQ9e7EFf/73cxM6VeGZhUiZlBbBz/MHRinEub9jGtlpQTdxY28cm7RMJ20HwTUyK2kCj6g+Z9eKDzxGYu5FK+FoM3FToTQuM7vEfSZt2J+BUpCHUma/YeAxvobTaovfbKfP/pkUufLPcmTKQC4mdYHLEXRfQxLA97Jh+Gv0tRlp46+IlN2LbMD4Mn9IKWlAKmyOTXzirVbCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q3xYR9BB5wD/0qhLGhG9t/ua6avKF1xpG2LushLYRRk=;
- b=S+xjIk0lb6baGVyv/A1iZA6SfMft3QN2ekT5N+KYZLtNCi5ef9fIwqD9k4fbxuqJIO2O9F0pcGZIL2ZCCEk69yrxvr+Gw3Xc+To+7AHL27JGY/NsKyQ0mKv3tx/N7SSHjMiP7aRDET3ryXkDac3P8wJDzrTuoHOEoRQIrvvqiqpQzof8AFgWrfHFlogjZKMPA2abg/1UA4cqCRVm/sjHZmX/cWmc6NCjVIa2q4FsT7A0DBYGq4AvBipo5d4uWgAsFwAgU8t1yjgN0v0tBQhiMAHlccE/nNM2NrLx8fcNcgzDb/h14yjpKA6vdUR6ufPxUkQ2A+ELxiMdZTvXO8Z6ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q3xYR9BB5wD/0qhLGhG9t/ua6avKF1xpG2LushLYRRk=;
- b=u4NjhArBH2xHhA6KM2y7DK1SW0m8l4y2VkfQHZ8pMXAqJbwSKGLk40YyKoiV9XLITk3iv3205xrT/W5AseaAH32JTWMHN1fCNPf3YGXxZKujN2G8VJJkCSWi+IRalwGFtsek4Yl+4TkcAjcUcVEiOuxqEM9OwkxBeuc+7Po3das=
-Received: from MW4P221CA0021.NAMP221.PROD.OUTLOOK.COM (2603:10b6:303:8b::26)
- by DS0PR12MB6584.namprd12.prod.outlook.com (2603:10b6:8:d0::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8314.14; Fri, 3 Jan 2025 19:52:14 +0000
-Received: from SJ1PEPF00001CDD.namprd05.prod.outlook.com
- (2603:10b6:303:8b:cafe::e9) by MW4P221CA0021.outlook.office365.com
- (2603:10b6:303:8b::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8314.14 via Frontend Transport; Fri,
- 3 Jan 2025 19:52:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CDD.mail.protection.outlook.com (10.167.242.5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8335.7 via Frontend Transport; Fri, 3 Jan 2025 19:52:13 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 3 Jan
- 2025 13:52:12 -0600
-From: Shannon Nelson <shannon.nelson@amd.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<jacob.e.keller@intel.com>
-CC: <brett.creeley@amd.com>, Shannon Nelson <shannon.nelson@amd.com>
-Subject: [PATCH net] pds_core: limit loop over fw name list
-Date: Fri, 3 Jan 2025 11:51:47 -0800
-Message-ID: <20250103195147.7408-1-shannon.nelson@amd.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3082511CA0
+	for <netdev@vger.kernel.org>; Fri,  3 Jan 2025 21:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735938319; cv=none; b=gkDJ/Dzk2godBBQnnmqxMmOMr/DqHASfH7JYGrPDmopRjcjRP8WKyZKxaPV+C0YPejMta92FE1NXSDsb4Tm9McmnTh9acuzlyzAqD/YTjDT+orgKC/Ry8zuyjB2TWool/WBgRbsFyBA06Nk30Co3BCwGEAwTOkfbrhIt2zFkiIs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735938319; c=relaxed/simple;
+	bh=LkALG/hq+ZDSG3GWDHae32Ah8822JNIkphtxIANtpDM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RkKExvimgiAN4MGAwBABeIHyInSBvz6riPzPwtoyFMuMTDK76FAkHz4RLA5hnGz9q7qljj9Dw/Uinn5hzpR3N/KLIWOWTaRSIxdZCD7bgNAuvHhWP5gC+xLctikYFj9BrtM2YR0i+BE/ujvIVn8FU0WRPAorOz2c81Q0U4JHh/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NMAN3bWS; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6d88d56beb7so127014996d6.3
+        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 13:05:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1735938316; x=1736543116; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GB2BWoRHvvjrIJdViKiNZdIfN1ntxxIBjQFMgLQ3NLs=;
+        b=NMAN3bWSkMzpGCIY3OZjy4Cm0CG3Z1K4607L1Ko/H2VcDRZyUz3p33q3kNEQp0/Pof
+         9MnIrQ5iSPEFVvGte429bFLtD67M5dkReK4AQH3v5dMjZhZmEc/oIxBMtrWiIGz8q0Il
+         j7rTFXtZ1YZEFNBtpk/swFpVjw4Za6Ud+KOpyDZoE1NjF6nkPTKGrn2NBca/DV5YS3sd
+         ieMzGTYIRKFK0jts+N3AXtEu8v03bybPMvNoLq2W0XK4l0zjXSPeTedDPE+pgFFBBCpO
+         AwEybM0WLZTNgldk9k47DKzyHEg4faIh5hrvBzL9duGdfp5+pcx5DMwSwfqkecYepKx0
+         gSNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735938316; x=1736543116;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GB2BWoRHvvjrIJdViKiNZdIfN1ntxxIBjQFMgLQ3NLs=;
+        b=b7rwDFYHEkyS1fFnLqNWgpbb5D/iovbkHEmLzB/wcdtB61/sIUQ3/lYSRySVlvAsfG
+         IiFUo6sdDDd5VkreP4ZB4ZNmx7F8R6SL8NQCcmFCdLJLTyOSE3OlPLReDvdrFv+8/Mi7
+         XlfY+YP282+yxMR0zjgGJVTv26kYq/cQLTLzNs7Qd+15nr6plcNZhGm7tWMQ0wXguEqs
+         /TdLM6h0l5kYynqJncqnT2ivdb0Cw0vixKSMfhWfi4rlVdYg1E95ZJwAKFoG0ZxJYaVf
+         AyDTejBnEfWoKI6q6AMm5AXhRhtMpT4ZZiRZaH3w9xgY4BMVIgRufvtjqYLcPy2E+mQB
+         +wQA==
+X-Gm-Message-State: AOJu0Yx/kJbqsuE5/hxnG16CFJofvHwjfWE1JdROXNIA5g0j061IJrY1
+	RfA/qxASn7kqwEGBf75xxqmrj/URnQknM6W38bVIapTlh9j0GqU8JwhVWa73E6KzF5fzqI7joLW
+	pk9Qkx7A+fA==
+X-Google-Smtp-Source: AGHT+IGJVP0Qr6WGcHS1KWbImZ5298mVFDrm51tpYLE5EW2h77OLqZTJrWqT5JWWJonDOJRqqpWFt0l1JOk6mQ==
+X-Received: from qvwk9.prod.google.com ([2002:a05:6214:14e9:b0:6d8:aa06:d4bf])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:2264:b0:6d8:ae2c:503a with SMTP id 6a1803df08f44-6dd233af4f9mr783419726d6.48.1735938316106;
+ Fri, 03 Jan 2025 13:05:16 -0800 (PST)
+Date: Fri,  3 Jan 2025 21:05:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDD:EE_|DS0PR12MB6584:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce34b205-78e3-42c5-7b2e-08dd2c301e75
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Pc7ptM2R0WJmyBoMZ56CzednfqrqYToAnm9hpXWSFCkXEUF1K7c73KgwcOMl?=
- =?us-ascii?Q?K6p13ZwWXvEYTxqnYchwpoALZb6J0Yj2ALifBZ5O1xdLXAPAwfbRTpAAGcqV?=
- =?us-ascii?Q?NTTVgPrxcMYFPKZwfwRtMKHo0StjCFd/ttL4F+IkgkJiAW1Bji1t4V6vBBm6?=
- =?us-ascii?Q?lg/0IZ2slfrSWyO9zTAR1lnZjLzxLQD9to5jjyn2NF/7dUPrxv2Jpo1PVZmh?=
- =?us-ascii?Q?e9qsJiuMvM8uhK1/pJN6kk1zwviBQp8Ye4B4HB5lsVouWl59P894n8AYZwAI?=
- =?us-ascii?Q?BGxIPVxo1+kdJNSDI0C0GTR64mX/w1TmmxyriuLIzkKSRP5Jn63CLwr8+Ud+?=
- =?us-ascii?Q?GjXxWPqDXQUQSZpHG0jnQIQDQN0tmcuB5Q3JLHiGOTrrCRFSpNrdVSP5f6wz?=
- =?us-ascii?Q?BLUV678Y/dImiwY7AT8kRgmrnwK3TRvWYrFA+55AQdkRZZBc4fLtO3ENJqEz?=
- =?us-ascii?Q?O51j25gCTW2yYWn9zXOIMvOqg/5GQOK+AZSDZMC4cNZaqOF977ZcHSD4XWys?=
- =?us-ascii?Q?1JVOwv/9OOa/UYK/Lk40QFInAQ1v8ejJWbyJQ9NxMTGeYG6zH3/9hSf7Pznt?=
- =?us-ascii?Q?G348osxv64Kr+Xqyli6Vv6xo3wPnhcmA/4XTw/8y6mpJqnTHw2CKY/dbJmVm?=
- =?us-ascii?Q?AGTWMRlTV193SWvnMPt8K23NGMkmTDosT6z+Gl5MOubYIwB/myTFg0xc9qMM?=
- =?us-ascii?Q?uMlUYC83Va+HGAPrqGm1nSCiwVowG9JXHXbTL9MSMx/BJ543NojVrw1K3PTu?=
- =?us-ascii?Q?yG2OPJ9gsdWpKuzrx8u91jfjquJzjL9J9TojJ8BJyiOSZq2qHBUISeM4RqDl?=
- =?us-ascii?Q?8FzDct1AjlhPI5Cm0jjUcYzIkBIiHZjjkqEnwKcpUovcB5G6SKQBkb11gLra?=
- =?us-ascii?Q?fLg0M2C4Fc+zQ1XPClVVh89mtRApwYYVrkX3WlYu0vmyl7c/ipmR48bG5m1t?=
- =?us-ascii?Q?DhTEPS7tEDeJRVU8miXq3eu/AuRFM8cHm2Ikd8tesg68KHgZXeOni90mh0SP?=
- =?us-ascii?Q?LxsHh6jHypIEms4H/WLWcrZ9uZfuscI7AETAcJZIwU7PzNe0vvc0H5yFTQqe?=
- =?us-ascii?Q?uKgJXZuoosyfAkTDXrUkYORsWq394nKNpDg3599e35zSDWiLEGacu9cZlNw4?=
- =?us-ascii?Q?/XDnhwu2QFqiyybcIXN5fctvhc9mU2BbuSU5VaDo2ttiYVd+hmbYFDg4CGCA?=
- =?us-ascii?Q?QoEauSxkflbnFNYayK6W+AZWxuii5AQqi7MYzxHMsQFC7W2kke0dHBAh3w77?=
- =?us-ascii?Q?qsCvlSSfC+eBRtUkrzPmgzYYN1oIfO8jFIjIcNnA1WN6DiJna3HFbato6oL9?=
- =?us-ascii?Q?WE3OxraRK4ha5npOQ3qFaf4gD6zc/zzKxrm7R9s/07AOkcGntr+63VJSfK0T?=
- =?us-ascii?Q?XONTLwaYC8trx3AztzD4HsPo40cIuwebMm8wnTEu8WqXgEFVGSmFlU7xB5US?=
- =?us-ascii?Q?g2IrEDbf6dvfKNSQSJAAyO+VMO4p3qIlF5Xmrn8SDZBGxfYZvIqV26s7gLA2?=
- =?us-ascii?Q?a4ct61KXVitLODM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2025 19:52:13.5984
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce34b205-78e3-42c5-7b2e-08dd2c301e75
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CDD.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6584
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20250103210514.87290-1-edumazet@google.com>
+Subject: [PATCH net-next] ax25: rcu protect dev->ax25_ptr
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Add an array size limit to the for-loop to be sure we don't try
-to reference a fw_version string off the end of the fw info names
-array.  We know that our firmware only has a limited number
-of firmware slot names, but we shouldn't leave this unchecked.
+syzbot found a lockdep issue [1].
 
-Fixes: 45d76f492938 ("pds_core: set up device and adminq")
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+We should remove ax25 RTNL dependency in ax25_setsockopt()
+
+This should also fix a variety of possible UAF in ax25.
+
+[1]
+
+WARNING: possible circular locking dependency detected
+6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0 Not tainted
+------------------------------------------------------
+syz.5.1818/12806 is trying to acquire lock:
+ ffffffff8fcb3988 (rtnl_mutex){+.+.}-{4:4}, at: ax25_setsockopt+0xa55/0xe90 net/ax25/af_ax25.c:680
+
+but task is already holding lock:
+ ffff8880617ac258 (sk_lock-AF_AX25){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1618 [inline]
+ ffff8880617ac258 (sk_lock-AF_AX25){+.+.}-{0:0}, at: ax25_setsockopt+0x209/0xe90 net/ax25/af_ax25.c:574
+
+which lock already depends on the new lock.
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (sk_lock-AF_AX25){+.+.}-{0:0}:
+        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+        lock_sock_nested+0x48/0x100 net/core/sock.c:3642
+        lock_sock include/net/sock.h:1618 [inline]
+        ax25_kill_by_device net/ax25/af_ax25.c:101 [inline]
+        ax25_device_event+0x24d/0x580 net/ax25/af_ax25.c:146
+        notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
+       __dev_notify_flags+0x207/0x400
+        dev_change_flags+0xf0/0x1a0 net/core/dev.c:9026
+        dev_ifsioc+0x7c8/0xe70 net/core/dev_ioctl.c:563
+        dev_ioctl+0x719/0x1340 net/core/dev_ioctl.c:820
+        sock_do_ioctl+0x240/0x460 net/socket.c:1234
+        sock_ioctl+0x626/0x8e0 net/socket.c:1339
+        vfs_ioctl fs/ioctl.c:51 [inline]
+        __do_sys_ioctl fs/ioctl.c:906 [inline]
+        __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (rtnl_mutex){+.+.}-{4:4}:
+        check_prev_add kernel/locking/lockdep.c:3161 [inline]
+        check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+        validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
+        __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
+        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+        __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+        __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
+        ax25_setsockopt+0xa55/0xe90 net/ax25/af_ax25.c:680
+        do_sock_setsockopt+0x3af/0x720 net/socket.c:2324
+        __sys_setsockopt net/socket.c:2349 [inline]
+        __do_sys_setsockopt net/socket.c:2355 [inline]
+        __se_sys_setsockopt net/socket.c:2352 [inline]
+        __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2352
+        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(sk_lock-AF_AX25);
+                               lock(rtnl_mutex);
+                               lock(sk_lock-AF_AX25);
+  lock(rtnl_mutex);
+
+ *** DEADLOCK ***
+
+1 lock held by syz.5.1818/12806:
+  #0: ffff8880617ac258 (sk_lock-AF_AX25){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1618 [inline]
+  #0: ffff8880617ac258 (sk_lock-AF_AX25){+.+.}-{0:0}, at: ax25_setsockopt+0x209/0xe90 net/ax25/af_ax25.c:574
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 12806 Comm: syz.5.1818 Not tainted 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Call Trace:
+ <TASK>
+  __dump_stack lib/dump_stack.c:94 [inline]
+  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+  print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
+  check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
+  check_prev_add kernel/locking/lockdep.c:3161 [inline]
+  check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+  validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
+  __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
+  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+  __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+  __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
+  ax25_setsockopt+0xa55/0xe90 net/ax25/af_ax25.c:680
+  do_sock_setsockopt+0x3af/0x720 net/socket.c:2324
+  __sys_setsockopt net/socket.c:2349 [inline]
+  __do_sys_setsockopt net/socket.c:2355 [inline]
+  __se_sys_setsockopt net/socket.c:2352 [inline]
+  __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2352
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f7b62385d29
+
+Fixes: c433570458e4 ("ax25: fix a use-after-free in ax25_fillin_cb()")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/ethernet/amd/pds_core/devlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/netdevice.h |  2 +-
+ include/net/ax25.h        | 10 +++++-----
+ net/ax25/af_ax25.c        | 12 ++++++------
+ net/ax25/ax25_dev.c       |  4 ++--
+ net/ax25/ax25_ip.c        |  3 ++-
+ net/ax25/ax25_out.c       | 22 +++++++++++++++++-----
+ net/ax25/ax25_route.c     |  2 ++
+ 7 files changed, 35 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
-index 2681889162a2..44971e71991f 100644
---- a/drivers/net/ethernet/amd/pds_core/devlink.c
-+++ b/drivers/net/ethernet/amd/pds_core/devlink.c
-@@ -118,7 +118,7 @@ int pdsc_dl_info_get(struct devlink *dl, struct devlink_info_req *req,
- 	if (err && err != -EIO)
- 		return err;
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 2593019ad5b1614f3b8c037afb4ba4fa740c7d51..e84602e0226c1c520435f35bb22b1aaf36db2dd1 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2261,7 +2261,7 @@ struct net_device {
+ 	void 			*atalk_ptr;
+ #endif
+ #if IS_ENABLED(CONFIG_AX25)
+-	void			*ax25_ptr;
++	struct ax25_dev	__rcu	*ax25_ptr;
+ #endif
+ #if IS_ENABLED(CONFIG_CFG80211)
+ 	struct wireless_dev	*ieee80211_ptr;
+diff --git a/include/net/ax25.h b/include/net/ax25.h
+index cb622d84cd0cc4570705774036a843c8c075a328..4ee141aae0a29de4655c9f72be1f21910b89d4a3 100644
+--- a/include/net/ax25.h
++++ b/include/net/ax25.h
+@@ -231,6 +231,7 @@ typedef struct ax25_dev {
+ #endif
+ 	refcount_t		refcount;
+ 	bool device_up;
++	struct rcu_head		rcu;
+ } ax25_dev;
  
--	listlen = fw_list.num_fw_slots;
-+	listlen = min(fw_list.num_fw_slots, ARRAY_SIZE(fw_list.fw_names));
- 	for (i = 0; i < listlen; i++) {
- 		if (i < ARRAY_SIZE(fw_slotnames))
- 			strscpy(buf, fw_slotnames[i], sizeof(buf));
+ typedef struct ax25_cb {
+@@ -290,9 +291,8 @@ static inline void ax25_dev_hold(ax25_dev *ax25_dev)
+ 
+ static inline void ax25_dev_put(ax25_dev *ax25_dev)
+ {
+-	if (refcount_dec_and_test(&ax25_dev->refcount)) {
+-		kfree(ax25_dev);
+-	}
++	if (refcount_dec_and_test(&ax25_dev->refcount))
++		kfree_rcu(ax25_dev, rcu);
+ }
+ static inline __be16 ax25_type_trans(struct sk_buff *skb, struct net_device *dev)
+ {
+@@ -335,9 +335,9 @@ void ax25_digi_invert(const ax25_digi *, ax25_digi *);
+ extern spinlock_t ax25_dev_lock;
+ 
+ #if IS_ENABLED(CONFIG_AX25)
+-static inline ax25_dev *ax25_dev_ax25dev(struct net_device *dev)
++static inline ax25_dev *ax25_dev_ax25dev(const struct net_device *dev)
+ {
+-	return dev->ax25_ptr;
++	return rcu_dereference_rtnl(dev->ax25_ptr);
+ }
+ #endif
+ 
+diff --git a/net/ax25/af_ax25.c b/net/ax25/af_ax25.c
+index d6f9fae06a9d8139ec0505358327e3876af228ae..aa6c714892ec9dcaa5617fdc96e0174b0fbd1041 100644
+--- a/net/ax25/af_ax25.c
++++ b/net/ax25/af_ax25.c
+@@ -467,7 +467,7 @@ static int ax25_ctl_ioctl(const unsigned int cmd, void __user *arg)
+ 	goto out_put;
+ }
+ 
+-static void ax25_fillin_cb_from_dev(ax25_cb *ax25, ax25_dev *ax25_dev)
++static void ax25_fillin_cb_from_dev(ax25_cb *ax25, const ax25_dev *ax25_dev)
+ {
+ 	ax25->rtt     = msecs_to_jiffies(ax25_dev->values[AX25_VALUES_T1]) / 2;
+ 	ax25->t1      = msecs_to_jiffies(ax25_dev->values[AX25_VALUES_T1]);
+@@ -677,22 +677,22 @@ static int ax25_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
+-		rtnl_lock();
+-		dev = __dev_get_by_name(&init_net, devname);
++		rcu_read_lock();
++		dev = dev_get_by_name_rcu(&init_net, devname);
+ 		if (!dev) {
+-			rtnl_unlock();
++			rcu_read_unlock();
+ 			res = -ENODEV;
+ 			break;
+ 		}
+ 
+ 		ax25->ax25_dev = ax25_dev_ax25dev(dev);
+ 		if (!ax25->ax25_dev) {
+-			rtnl_unlock();
++			rcu_read_unlock();
+ 			res = -ENODEV;
+ 			break;
+ 		}
+ 		ax25_fillin_cb(ax25, ax25->ax25_dev);
+-		rtnl_unlock();
++		rcu_read_unlock();
+ 		break;
+ 
+ 	default:
+diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
+index 9efd6690b3443653a2f2ef421080aa48b214a8ba..3733c0254a50842fed496bfd983d9d5633ea8ea4 100644
+--- a/net/ax25/ax25_dev.c
++++ b/net/ax25/ax25_dev.c
+@@ -90,7 +90,7 @@ void ax25_dev_device_up(struct net_device *dev)
+ 
+ 	spin_lock_bh(&ax25_dev_lock);
+ 	list_add(&ax25_dev->list, &ax25_dev_list);
+-	dev->ax25_ptr     = ax25_dev;
++	rcu_assign_pointer(dev->ax25_ptr, ax25_dev);
+ 	spin_unlock_bh(&ax25_dev_lock);
+ 
+ 	ax25_register_dev_sysctl(ax25_dev);
+@@ -125,7 +125,7 @@ void ax25_dev_device_down(struct net_device *dev)
+ 		}
+ 	}
+ 
+-	dev->ax25_ptr = NULL;
++	RCU_INIT_POINTER(dev->ax25_ptr, NULL);
+ 	spin_unlock_bh(&ax25_dev_lock);
+ 	netdev_put(dev, &ax25_dev->dev_tracker);
+ 	ax25_dev_put(ax25_dev);
+diff --git a/net/ax25/ax25_ip.c b/net/ax25/ax25_ip.c
+index 36249776c021e725512e156c773aead2afea1d13..215d4ccf12b91319580b5af9f9a9abcbe565df49 100644
+--- a/net/ax25/ax25_ip.c
++++ b/net/ax25/ax25_ip.c
+@@ -122,6 +122,7 @@ netdev_tx_t ax25_ip_xmit(struct sk_buff *skb)
+ 	if (dev == NULL)
+ 		dev = skb->dev;
+ 
++	rcu_read_lock();
+ 	if ((ax25_dev = ax25_dev_ax25dev(dev)) == NULL) {
+ 		kfree_skb(skb);
+ 		goto put;
+@@ -202,7 +203,7 @@ netdev_tx_t ax25_ip_xmit(struct sk_buff *skb)
+ 	ax25_queue_xmit(skb, dev);
+ 
+ put:
+-
++	rcu_read_unlock();
+ 	ax25_route_lock_unuse();
+ 	return NETDEV_TX_OK;
+ }
+diff --git a/net/ax25/ax25_out.c b/net/ax25/ax25_out.c
+index 3db76d2470e954cc3de1a8a1f536cc2021cb0912..8bca2ace98e51b6bf79691406c3b9484ef6372f7 100644
+--- a/net/ax25/ax25_out.c
++++ b/net/ax25/ax25_out.c
+@@ -39,10 +39,14 @@ ax25_cb *ax25_send_frame(struct sk_buff *skb, int paclen, const ax25_address *sr
+ 	 * specified.
+ 	 */
+ 	if (paclen == 0) {
+-		if ((ax25_dev = ax25_dev_ax25dev(dev)) == NULL)
++		rcu_read_lock();
++		ax25_dev = ax25_dev_ax25dev(dev);
++		if (!ax25_dev) {
++			rcu_read_unlock();
+ 			return NULL;
+-
++		}
+ 		paclen = ax25_dev->values[AX25_VALUES_PACLEN];
++		rcu_read_unlock();
+ 	}
+ 
+ 	/*
+@@ -53,13 +57,19 @@ ax25_cb *ax25_send_frame(struct sk_buff *skb, int paclen, const ax25_address *sr
+ 		return ax25;		/* It already existed */
+ 	}
+ 
+-	if ((ax25_dev = ax25_dev_ax25dev(dev)) == NULL)
++	rcu_read_lock();
++	ax25_dev = ax25_dev_ax25dev(dev);
++	if (!ax25_dev) {
++		rcu_read_unlock();
+ 		return NULL;
++	}
+ 
+-	if ((ax25 = ax25_create_cb()) == NULL)
++	if ((ax25 = ax25_create_cb()) == NULL) {
++		rcu_read_unlock();
+ 		return NULL;
+-
++	}
+ 	ax25_fillin_cb(ax25, ax25_dev);
++	rcu_read_unlock();
+ 
+ 	ax25->source_addr = *src;
+ 	ax25->dest_addr   = *dest;
+@@ -358,7 +368,9 @@ void ax25_queue_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	unsigned char *ptr;
+ 
++	rcu_read_lock();
+ 	skb->protocol = ax25_type_trans(skb, ax25_fwd_dev(dev));
++	rcu_read_unlock();
+ 
+ 	ptr  = skb_push(skb, 1);
+ 	*ptr = 0x00;			/* KISS */
+diff --git a/net/ax25/ax25_route.c b/net/ax25/ax25_route.c
+index b7c4d656a94b7107aa93a62a0c6db569babab2ca..69de75db0c9c2155f81a1161b456f4c3864bb246 100644
+--- a/net/ax25/ax25_route.c
++++ b/net/ax25/ax25_route.c
+@@ -406,6 +406,7 @@ int ax25_rt_autobind(ax25_cb *ax25, ax25_address *addr)
+ 		ax25_route_lock_unuse();
+ 		return -EHOSTUNREACH;
+ 	}
++	rcu_read_lock();
+ 	if ((ax25->ax25_dev = ax25_dev_ax25dev(ax25_rt->dev)) == NULL) {
+ 		err = -EHOSTUNREACH;
+ 		goto put;
+@@ -442,6 +443,7 @@ int ax25_rt_autobind(ax25_cb *ax25, ax25_address *addr)
+ 	}
+ 
+ put:
++	rcu_read_unlock();
+ 	ax25_route_lock_unuse();
+ 	return err;
+ }
 -- 
-2.17.1
+2.47.1.613.gc27f4b7a9f-goog
 
 
