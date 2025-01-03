@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-155078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE79CA00F60
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:15:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 752B1A00F66
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 22:16:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F412F1882859
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:15:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A162188348D
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 21:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E7A1CDFBE;
-	Fri,  3 Jan 2025 21:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0421FA262;
+	Fri,  3 Jan 2025 21:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o54UYsFH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ut57PD0A"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C2B1C1AB4;
-	Fri,  3 Jan 2025 21:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E371CEE93;
+	Fri,  3 Jan 2025 21:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735938843; cv=none; b=jzNbBXMbut3xZKyMGStMxtONdkz233JgdMTTIa2VjaFTgIQ2GVopkSVuMDe9fn2CmgNDkuN0NxjbgYi07AuwuZy2xX559tKz+J3oWsc9el2RAFlYTQV/WQ+M+ehzzDlAV1HTTv2guFOUJAtfQQnDHXkIeqygdDtBXHyPQ/7vbnY=
+	t=1735938846; cv=none; b=d+I2H7CKJDuUgL12JFuQBvbQ7wt3wL3llXMq7da0PJDKFICvEJfqzHdTEuNb5wieWrzWMikfhjQaf1E/QuMGeTQnGLZWnJTCEmo/Ev87FHvyYU4BqlsLS43JxMrdiUB6j2JgJz61SH22TXe+GtUeXJWU40OfTZyAwuqBVSt6M5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735938843; c=relaxed/simple;
-	bh=hDr/CHjl1tTUS1G2mmEctoVmVwYuIT2XKUjqJQ9Ss5Q=;
+	s=arc-20240116; t=1735938846; c=relaxed/simple;
+	bh=pyx3ITPlmGXw/W3sYnBM8cwDcc3Py4Wk3Of+Oi63s0g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ns2SgmunkCDlfeLC3D29TG4vvw6En+e156WKPa6YYh+ASjPNnD3CfE1h496kcep3wUi1c69E0Jg/ZuXTVobCeZBH7TM2HTQX6l+vnYulfq/v/T/3QrVhjuasn/d2wCPK+AeQAS08ADlsVSOFoGz8kLcS7qOInt7CJ89B/qVfZ2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o54UYsFH; arc=none smtp.client-ip=217.70.183.199
+	 In-Reply-To:To:Cc; b=nKFiVAkInMCKaQuKNUreQoHMgnzEZwsASSn1aqc30SKdyRPmz0Ddys+lTpM54mo7yMwcpyFOD56F5Lc+YDCQwsJCcrfPEt4tFOjtorOdgh5CQnEv1k/l5jwR8HFMb1v9hlXpiGhl6p9A4a7vBF4liGn68ixdq0KqAeSiQdTiMpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ut57PD0A; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B0C6EFF807;
-	Fri,  3 Jan 2025 21:13:56 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C385FF804;
+	Fri,  3 Jan 2025 21:13:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1735938839;
+	t=1735938842;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kEhId1MCSNiBr9CCJafxVUoowwALvWI5Rj0eyRjDw5Y=;
-	b=o54UYsFHm5YhLg29eP2MQUhv5JuNP6qRCRSms/Oiil6o5ZPeC5Qy13nHWjfk3qjgEL+VE+
-	pktAnLXzf15w8FnYKxHSnqwUjoXavTOFge9PFyI6MhuyFcGlpnDDXewf/dC8BrPXq1ZH68
-	M3oo2yQYTAx3sqCi8YodBEpdQU4xl5o6oUZe+RAWmVi95GKqTjmn/QDLRvVIGx+JvZtxAK
-	C+m88C/l9Q8YganC+KTIFR3m3K5Boly6zgjf58xI80GYvq4rj874Wn+Xp2PC/ZYXAJ3wtF
-	7HO9EVOQFBiBucvwelUmKwpf8LkiZa9AFt3g0gHmFLnZUo25C3b3V+TXFSdPMA==
+	bh=DBLTQco78xGUPuwuDi7PAAZH/+o3f0fFG8ip6t+bH+U=;
+	b=Ut57PD0AqZxXUqYOs6JnBWdrma1wJFXxUmqwdvLt+8wxaLiLitxcLRuK+0VsR0kGReUNoB
+	aI/qhedz4DiIWMV+sByrSfHKQ2mfrH7fj51pocxr7EUpc/z7lhAesvrrR8BeT6Te33rIS0
+	cEyOIh5MyvoG5aHn9JyRIVpBDWtJBh3StvgDYX58HeTd9YgwtPgwCEO4TFlbtCStlcPdLd
+	xkdBneC7V56c6NDZNcCfiXS8l4a61iAxCo2g7RdjA8gMwFTDRWmgDNwg6hQU8ohUVk8V+t
+	zS2qoX/Eq9ovYsUhFex9GpWXNiVrdcN3jtUbvO90KxaomHtE3xkwDHwy+dt1/g==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 03 Jan 2025 22:12:59 +0100
-Subject: [PATCH net-next v4 10/27] net: pse-pd: tps23881: Add support for
- power limit and measurement features
+Date: Fri, 03 Jan 2025 22:13:00 +0100
+Subject: [PATCH net-next v4 11/27] net: pse-pd: Add support for PSE device
+ index
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250103-feature_poe_port_prio-v4-10-dc91a3c0c187@bootlin.com>
+Message-Id: <20250103-feature_poe_port_prio-v4-11-dc91a3c0c187@bootlin.com>
 References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
 In-Reply-To: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -80,350 +80,152 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Expand PSE callbacks to support the newly introduced
-pi_get/set_pw_limit() and pi_get_voltage() functions. These callbacks
-allow for power limit configuration in the TPS23881 controller.
+Add support for a PSE device index to report the PSE controller index to
+the user through ethtool. This will be useful for future support of power
+domains and port priority management.
 
-Additionally, the patch includes the pi_get_pw_class() the
-pi_get_actual_pw(), and the pi_get_pw_limit_ranges') callbacks providing
-more comprehensive PoE status reporting.
-
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
 
-Change in v4:
-- Several changes for better readibility and to avoid code duplicate.
-- Move on to the new callbacks.
+Changes in v3:
+- Use u32 for all variables.
 
-Change in v3:
-- NIT change, use tps23881_set_val helper to set the power limit
-  register value.
-- Add policy varaible internally to being able to reconfigure it after a
-  PWOFF call.
-
-Change in v2:
-- Use newly introduced helpers.
+Changes in v2:
+- new patch.
 ---
- drivers/net/pse-pd/tps23881.c | 258 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 256 insertions(+), 2 deletions(-)
+ drivers/net/pse-pd/pse_core.c | 24 +++++++++++++++++++-----
+ include/linux/ethtool.h       |  2 ++
+ include/linux/pse-pd/pse.h    |  2 ++
+ 3 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-index 340d70ee37fe..5e9dda2c0eac 100644
---- a/drivers/net/pse-pd/tps23881.c
-+++ b/drivers/net/pse-pd/tps23881.c
-@@ -25,20 +25,32 @@
- #define TPS23881_REG_GEN_MASK	0x17
- #define TPS23881_REG_NBITACC	BIT(5)
- #define TPS23881_REG_PW_EN	0x19
-+#define TPS23881_REG_2PAIR_POL1	0x1e
- #define TPS23881_REG_PORT_MAP	0x26
- #define TPS23881_REG_PORT_POWER	0x29
--#define TPS23881_REG_POEPLUS	0x40
-+#define TPS23881_REG_4PAIR_POL1	0x2a
-+#define TPS23881_REG_INPUT_V	0x2e
-+#define TPS23881_REG_CHAN1_A	0x30
-+#define TPS23881_REG_CHAN1_V	0x32
-+#define TPS23881_REG_FOLDBACK	0x40
- #define TPS23881_REG_TPON	BIT(0)
- #define TPS23881_REG_FWREV	0x41
- #define TPS23881_REG_DEVID	0x43
- #define TPS23881_REG_DEVID_MASK	0xF0
- #define TPS23881_DEVICE_ID	0x02
-+#define TPS23881_REG_CHAN1_CLASS	0x4c
- #define TPS23881_REG_SRAM_CTRL	0x60
- #define TPS23881_REG_SRAM_DATA	0x61
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 887a477197a6..830e8d567d4d 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -13,6 +13,7 @@
  
-+#define TPS23881_UV_STEP	3662
-+#define TPS23881_NA_STEP	70190
-+#define TPS23881_MW_STEP	500
-+#define TPS23881_MIN_PI_PW_LIMIT_MW	2000
-+
- struct tps23881_port_desc {
- 	u8 chan[2];
- 	bool is_4p;
-+	int pw_pol;
- };
+ static DEFINE_MUTEX(pse_list_mutex);
+ static LIST_HEAD(pse_controller_list);
++static DEFINE_IDA(pse_ida);
  
- struct tps23881_priv {
-@@ -102,6 +114,54 @@ static u16 tps23881_set_val(u16 reg_val, u8 chan, u8 field_offset,
- 	return reg_val;
- }
+ /**
+  * struct pse_control - a PSE control
+@@ -448,6 +449,10 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
  
-+static int
-+tps23881_pi_set_pw_pol_limit(struct tps23881_priv *priv, int id, u8 pw_pol,
-+			     bool is_4p)
-+{
-+	struct i2c_client *client = priv->client;
-+	int ret, reg;
-+	u16 val;
-+	u8 chan;
-+
-+	chan = priv->port[id].chan[0];
-+	if (!is_4p) {
-+		reg = TPS23881_REG_2PAIR_POL1 + (chan % 4);
-+	} else {
-+		/* One chan is enough to configure the 4p PI power limit */
-+		if ((chan % 4) < 2)
-+			reg = TPS23881_REG_4PAIR_POL1;
-+		else
-+			reg = TPS23881_REG_4PAIR_POL1 + 1;
-+	}
-+
-+	ret = i2c_smbus_read_word_data(client, reg);
+ 	mutex_init(&pcdev->lock);
+ 	INIT_LIST_HEAD(&pcdev->pse_control_head);
++	ret = ida_alloc_max(&pse_ida, INT_MAX, GFP_KERNEL);
 +	if (ret < 0)
 +		return ret;
-+
-+	val = tps23881_set_val(ret, chan, 0, 0xff, pw_pol);
-+	return i2c_smbus_write_word_data(client, reg, val);
-+}
-+
-+static int tps23881_pi_enable_manual_pol(struct tps23881_priv *priv, int id)
-+{
-+	struct i2c_client *client = priv->client;
-+	int ret;
-+	u8 chan;
-+	u16 val;
-+
-+	ret = i2c_smbus_read_byte_data(client, TPS23881_REG_FOLDBACK);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* No need to test if the chan is PoE4 as setting either bit for a
-+	 * 4P configured port disables the automatic configuration on both
-+	 * channels.
-+	 */
-+	chan = priv->port[id].chan[0];
-+	val = tps23881_set_val(ret, chan, 0, BIT(chan % 4), BIT(chan % 4));
-+	return i2c_smbus_write_byte_data(client, TPS23881_REG_FOLDBACK, val);
-+}
-+
- static int tps23881_pi_enable(struct pse_controller_dev *pcdev, int id)
- {
- 	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
-@@ -171,7 +231,21 @@ static int tps23881_pi_disable(struct pse_controller_dev *pcdev, int id)
- 				       BIT(chan % 4));
++	pcdev->id = ret;
+ 
+ 	if (!pcdev->nr_lines)
+ 		pcdev->nr_lines = 1;
+@@ -461,12 +466,12 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
+ 
+ 	ret = of_load_pse_pis(pcdev);
+ 	if (ret)
+-		return ret;
++		goto free_pse_ida;
+ 
+ 	if (pcdev->ops->setup_pi_matrix) {
+ 		ret = pcdev->ops->setup_pi_matrix(pcdev);
+ 		if (ret)
+-			return ret;
++			goto free_pse_ida;
  	}
  
--	return i2c_smbus_write_word_data(client, TPS23881_REG_DET_CLA_EN, val);
-+	ret = i2c_smbus_write_word_data(client, TPS23881_REG_DET_CLA_EN, val);
-+	if (ret)
-+		return ret;
-+
-+	/* No power policy */
-+	if (priv->port[id].pw_pol < 0)
-+		return 0;
-+
-+	ret = tps23881_pi_enable_manual_pol(priv, id);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Set power policy */
-+	return tps23881_pi_set_pw_pol_limit(priv, id, priv->port[id].pw_pol,
-+					    priv->port[id].is_4p);
- }
+ 	/* Each regulator name len is pcdev dev name + 7 char +
+@@ -483,15 +488,17 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
+ 			continue;
  
- static int
-@@ -246,6 +320,177 @@ tps23881_pi_get_pw_status(struct pse_controller_dev *pcdev, int id,
+ 		reg_name = devm_kzalloc(pcdev->dev, reg_name_len, GFP_KERNEL);
+-		if (!reg_name)
+-			return -ENOMEM;
++		if (!reg_name) {
++			ret = -ENOMEM;
++			goto free_pse_ida;
++		}
+ 
+ 		snprintf(reg_name, reg_name_len, "pse-%s_pi%d",
+ 			 dev_name(pcdev->dev), i);
+ 
+ 		ret = devm_pse_pi_regulator_register(pcdev, reg_name, i);
+ 		if (ret)
+-			return ret;
++			goto free_pse_ida;
+ 	}
+ 
+ 	mutex_lock(&pse_list_mutex);
+@@ -499,6 +506,10 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
+ 	mutex_unlock(&pse_list_mutex);
+ 
  	return 0;
++
++free_pse_ida:
++	ida_free(&pse_ida, pcdev->id);
++	return ret;
  }
+ EXPORT_SYMBOL_GPL(pse_controller_register);
  
-+static int tps23881_pi_get_voltage(struct pse_controller_dev *pcdev, int id)
-+{
-+	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
-+	struct i2c_client *client = priv->client;
-+	int ret;
-+	u64 uV;
-+
-+	ret = i2c_smbus_read_word_data(client, TPS23881_REG_INPUT_V);
-+	if (ret < 0)
-+		return ret;
-+
-+	uV = ret & 0x3fff;
-+	uV *= TPS23881_UV_STEP;
-+
-+	return (int)uV;
-+}
-+
-+static int
-+tps23881_pi_get_chan_current(struct tps23881_priv *priv, u8 chan)
-+{
-+	struct i2c_client *client = priv->client;
-+	int reg, ret;
-+	u64 tmp_64;
-+
-+	/* Registers 0x30 to 0x3d */
-+	reg = TPS23881_REG_CHAN1_A + (chan % 4) * 4 + (chan >= 4);
-+	ret = i2c_smbus_read_word_data(client, reg);
-+	if (ret < 0)
-+		return ret;
-+
-+	tmp_64 = ret & 0x3fff;
-+	tmp_64 *= TPS23881_NA_STEP;
-+	/* uA = nA / 1000 */
-+	tmp_64 = DIV_ROUND_CLOSEST_ULL(tmp_64, 1000);
-+	return (int)tmp_64;
-+}
-+
-+static int tps23881_pi_get_pw_class(struct pse_controller_dev *pcdev,
-+				    int id)
-+{
-+	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
-+	struct i2c_client *client = priv->client;
-+	int ret, reg;
-+	u8 chan;
-+
-+	chan = priv->port[id].chan[0];
-+	reg = TPS23881_REG_CHAN1_CLASS + (chan % 4);
-+	ret = i2c_smbus_read_word_data(client, reg);
-+	if (ret < 0)
-+		return ret;
-+
-+	return tps23881_calc_val(ret, chan, 4, 0x0f);
-+}
-+
-+static int
-+tps23881_pi_get_actual_pw(struct pse_controller_dev *pcdev, int id)
-+{
-+	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
-+	int ret, uV, uA;
-+	u64 tmp_64;
-+	u8 chan;
-+
-+	ret = tps23881_pi_get_voltage(&priv->pcdev, id);
-+	if (ret < 0)
-+		return ret;
-+	uV = ret;
-+
-+	chan = priv->port[id].chan[0];
-+	ret = tps23881_pi_get_chan_current(priv, chan);
-+	if (ret < 0)
-+		return ret;
-+	uA = ret;
-+
-+	if (priv->port[id].is_4p) {
-+		chan = priv->port[id].chan[1];
-+		ret = tps23881_pi_get_chan_current(priv, chan);
-+		if (ret < 0)
-+			return ret;
-+		uA += ret;
-+	}
-+
-+	tmp_64 = uV;
-+	tmp_64 *= uA;
-+	/* mW = uV * uA / 1000000000 */
-+	return DIV_ROUND_CLOSEST_ULL(tmp_64, 1000000000);
-+}
-+
-+static int
-+tps23881_pi_get_pw_limit_chan(struct tps23881_priv *priv, u8 chan)
-+{
-+	struct i2c_client *client = priv->client;
-+	int ret, reg;
-+	u16 val;
-+
-+	reg = TPS23881_REG_2PAIR_POL1 + (chan % 4);
-+	ret = i2c_smbus_read_word_data(client, reg);
-+	if (ret < 0)
-+		return ret;
-+
-+	val = tps23881_calc_val(ret, chan, 0, 0xff);
-+	return val * TPS23881_MW_STEP;
-+}
-+
-+static int tps23881_pi_get_pw_limit(struct pse_controller_dev *pcdev, int id)
-+{
-+	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
-+	int ret, mW;
-+	u8 chan;
-+
-+	chan = priv->port[id].chan[0];
-+	ret = tps23881_pi_get_pw_limit_chan(priv, chan);
-+	if (ret < 0)
-+		return ret;
-+
-+	mW = ret;
-+	if (priv->port[id].is_4p) {
-+		chan = priv->port[id].chan[1];
-+		ret = tps23881_pi_get_pw_limit_chan(priv, chan);
-+		if (ret < 0)
-+			return ret;
-+		mW += ret;
-+	}
-+
-+	return mW;
-+}
-+
-+static int tps23881_pi_set_pw_limit(struct pse_controller_dev *pcdev,
-+				    int id, int max_mW)
-+{
-+	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
-+	u8 pw_pol;
-+	int ret;
-+
-+	if (max_mW < TPS23881_MIN_PI_PW_LIMIT_MW || MAX_PI_PW < max_mW) {
-+		dev_err(&priv->client->dev,
-+			"power limit %d out of ranges [%d,%d]",
-+			max_mW, TPS23881_MIN_PI_PW_LIMIT_MW, MAX_PI_PW);
-+		return -ERANGE;
-+	}
-+
-+	ret = tps23881_pi_enable_manual_pol(priv, id);
-+	if (ret < 0)
-+		return ret;
-+
-+	pw_pol = DIV_ROUND_CLOSEST_ULL(max_mW, TPS23881_MW_STEP);
-+
-+	/* Save power policy to reconfigure it after a disabled call */
-+	priv->port[id].pw_pol = pw_pol;
-+	return tps23881_pi_set_pw_pol_limit(priv, id, pw_pol,
-+					    priv->port[id].is_4p);
-+}
-+
-+static int
-+tps23881_pi_get_pw_limit_ranges(struct pse_controller_dev *pcdev, int id,
-+				struct pse_pw_limit_ranges *pw_limit_ranges)
-+{
-+	struct ethtool_c33_pse_pw_limit_range *c33_pw_limit_ranges;
-+
-+	c33_pw_limit_ranges = kzalloc(sizeof(*c33_pw_limit_ranges),
-+				      GFP_KERNEL);
-+	if (!c33_pw_limit_ranges)
-+		return -ENOMEM;
-+
-+	c33_pw_limit_ranges->min = TPS23881_MIN_PI_PW_LIMIT_MW;
-+	c33_pw_limit_ranges->max = MAX_PI_PW;
-+	pw_limit_ranges->c33_pw_limit_ranges = c33_pw_limit_ranges;
-+
-+	/* Return the number of ranges */
-+	return 1;
-+}
-+
- /* Parse managers subnode into a array of device node */
- static int
- tps23881_get_of_channels(struct tps23881_priv *priv,
-@@ -540,6 +785,9 @@ tps23881_write_port_matrix(struct tps23881_priv *priv,
- 		if (port_matrix[i].exist)
- 			priv->port[pi_id].chan[0] = lgcl_chan;
+@@ -509,6 +520,7 @@ EXPORT_SYMBOL_GPL(pse_controller_register);
+ void pse_controller_unregister(struct pse_controller_dev *pcdev)
+ {
+ 	pse_release_pis(pcdev);
++	ida_free(&pse_ida, pcdev->id);
+ 	mutex_lock(&pse_list_mutex);
+ 	list_del(&pcdev->list);
+ 	mutex_unlock(&pse_list_mutex);
+@@ -771,6 +783,8 @@ int pse_ethtool_get_status(struct pse_control *psec,
  
-+		/* Initialize power policy internal value */
-+		priv->port[pi_id].pw_pol = -1;
+ 	pcdev = psec->pcdev;
+ 	ops = pcdev->ops;
++	status->pse_id = pcdev->id;
 +
- 		/* Set hardware port matrix for all ports */
- 		val |= hw_chan << (lgcl_chan * 2);
- 
-@@ -665,6 +913,12 @@ static const struct pse_controller_ops tps23881_ops = {
- 	.pi_disable = tps23881_pi_disable,
- 	.pi_get_admin_state = tps23881_pi_get_admin_state,
- 	.pi_get_pw_status = tps23881_pi_get_pw_status,
-+	.pi_get_pw_class = tps23881_pi_get_pw_class,
-+	.pi_get_actual_pw = tps23881_pi_get_actual_pw,
-+	.pi_get_voltage = tps23881_pi_get_voltage,
-+	.pi_get_pw_limit = tps23881_pi_get_pw_limit,
-+	.pi_set_pw_limit = tps23881_pi_set_pw_limit,
-+	.pi_get_pw_limit_ranges = tps23881_pi_get_pw_limit_ranges,
+ 	mutex_lock(&pcdev->lock);
+ 	ret = ops->pi_get_admin_state(pcdev, psec->id, &admin_state);
+ 	if (ret)
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index 2bdf7e72ee50..d5d13a3d4447 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -1327,6 +1327,7 @@ struct ethtool_c33_pse_pw_limit_range {
+ /**
+  * struct ethtool_pse_control_status - PSE control/channel status.
+  *
++ * @pse_id: index number of the PSE.
+  * @podl_admin_state: operational state of the PoDL PSE
+  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
+  * @podl_pw_status: power detection status of the PoDL PSE.
+@@ -1348,6 +1349,7 @@ struct ethtool_c33_pse_pw_limit_range {
+  *	ranges
+  */
+ struct ethtool_pse_control_status {
++	u32 pse_id;
+ 	enum ethtool_podl_pse_admin_state podl_admin_state;
+ 	enum ethtool_podl_pse_pw_d_status podl_pw_status;
+ 	enum ethtool_c33_pse_admin_state c33_admin_state;
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 09e62d8c3271..8780a4160d3c 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -172,6 +172,7 @@ struct pse_pi {
+  * @types: types of the PSE controller
+  * @pi: table of PSE PIs described in this controller device
+  * @no_of_pse_pi: flag set if the pse_pis devicetree node is not used
++ * @id: Index of the PSE
+  */
+ struct pse_controller_dev {
+ 	const struct pse_controller_ops *ops;
+@@ -185,6 +186,7 @@ struct pse_controller_dev {
+ 	enum ethtool_pse_types types;
+ 	struct pse_pi *pi;
+ 	bool no_of_pse_pi;
++	u32 id;
  };
  
- static const char fw_parity_name[] = "ti/tps23881/tps23881-parity-14.bin";
+ #if IS_ENABLED(CONFIG_PSE_CONTROLLER)
 
 -- 
 2.34.1
