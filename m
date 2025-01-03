@@ -1,99 +1,112 @@
-Return-Path: <netdev+bounces-155003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89A16A009D6
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 14:19:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69751A009E1
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 14:24:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65E981641F2
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:19:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 481B13A4026
+	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 13:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4611F9EB4;
-	Fri,  3 Jan 2025 13:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f2p3Khft"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA7B1F9F7D;
+	Fri,  3 Jan 2025 13:24:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CAD847B;
-	Fri,  3 Jan 2025 13:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B5D14EC73;
+	Fri,  3 Jan 2025 13:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735910345; cv=none; b=d7G1SrRP+wvw8v5e5khelzvxec+ssNsa4W3kAg7T5110zqzMQBeygSmvuGkjyAvqjsf7t5nX9xZtvUlxJ8aeE2HlBUbqoutGRVoKeSHuYDFL+cz6NHdA77sLXxOpgtWS7a68aae958VKz2HVoICbdHlBNfexb+5UXtiJy7EhfCc=
+	t=1735910671; cv=none; b=QNPa4ilTecJGy1pHLlwFVeA0cPyFk6oORgYpU0gYu7XjaQfPD25iP8st004XloFvHjcoxNQGcomzUt0SSMV5enHg7Bn822wVw3HoPhLrGilOFsKwejOzXqrOb0TQ7LDhSzoBOEm1I1qsE82NH8IAj3aWnH9qpKlDrDpYw+Ccfbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735910345; c=relaxed/simple;
-	bh=WKGtEvg/p5Wn4jEJ+kAHCcFEJdCYkHW9bgEWdhUg9eQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f0t5LZ7/avoyVMMZy5CzhcHnZYjX3UZpsiWpF524n3g3mIIxoXu/WS14vbyJ6GZiyr4r5ZlGCylgsoNcPOh4gPiDvtu56+5n3jHSGjESjK2FhYapg49Le9ixzuW23n6ULOBI5uko1kO8tBdnnqe7BPfJvpIzChwg02IqaOlB9HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f2p3Khft; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B3D08E0003;
-	Fri,  3 Jan 2025 13:18:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1735910335;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/OhRHMZBqtEyjsqClXtT6Rub61ZPkxxqlIv0XRyJpuk=;
-	b=f2p3KhftF2vjBWhFT9b/qQV7AP8JFqWbwPbKovckR9XHpbtd5w441W/xHiuGxOaJQBWT95
-	PRObxL8RbZw5jGeCi9PxZd4gHS/PfIemh74YsxfayD/kmojMAFO0CxkJh+N57/kT2B0F57
-	AELtjBMFQC/QXwt30RmESyDh/in8C8JGHoS5+TF9QvyC5wmMta8u2E5pU4tAK9CUkMyBzY
-	EQSF/JNSZ9E8cp+Snx8LSoxCondGVYK9HZoxWxJ3+lLe0TsBcWexoTr98Oy4fSlKqXEY5H
-	C2+nbXSJHizRphHyX1XrKAnZaC0yoFV67VFdGv62/0rCxbgCQl6FwQ0kQfB8/w==
-Message-ID: <c469a6f3-489f-4455-933a-c1c8399403be@bootlin.com>
-Date: Fri, 3 Jan 2025 14:18:53 +0100
+	s=arc-20240116; t=1735910671; c=relaxed/simple;
+	bh=5mosSW1GQgZZpo2i7DEPinZwWzekIYiJeoitfDrejDA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R70KcLVcbxasvP2FXwW9KVpy/mrhMp9SXlxeilGaKndUQfTcrtTA7OcZIyk2uNsAqneZl2gFZv5BtwA7KLBHZaCCPwGUcAYqaY1oP+fyyE9yBoxBskNZSvzzqryFa3QVpQD9mGaKuaLowjMssTxXUC5GrHSUnof/FrxZzzLc0XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aaedd529ba1so1232492066b.1;
+        Fri, 03 Jan 2025 05:24:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735910666; x=1736515466;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ii4Mx9K10izgFBAK7vrCyOL6NunbY8j95Pq8dx+ja4A=;
+        b=PpaoJr9MJTbhjP3i6DZZRDXsFb1DxIUFhAHuFr1JVsHpwawcPcib9oFJdk/ve7oOaD
+         bveHO0XERBogiTyRAT+4KJXvQaPMHL/cVO1K4+fbh9kOgNhlv0XfPKLhFD+UqVgMOF9k
+         qYdL/9nM5EAu1L7FxZ4bM9FWEIVryMzM2fGktCYAKqp45W2r4v9cVuaB7yvQ1Jsyke7D
+         rM63nIxNYBM1inZpJwDSCI4e0x71BwTEwek0A0Vvw2ZcN7ciyrarcowePj3/xWLF8y7S
+         yv4m4btayHY2IVhAX4w3QKPSn7os0BNi0uV/gai9t2CzntpqBWXt03UGPUnudPUbEF5s
+         XyVg==
+X-Forwarded-Encrypted: i=1; AJvYcCW2Xf64JMoHJ1Qo3zlFeBoL+f8h1aGSNJE7/FmHJrBwu8HhEeLpya1q0UimmTx7OAkEsWg/4PQo79Ki714=@vger.kernel.org, AJvYcCWgwJN4Uz70ClbnoV4+R2rK0NIldFtfjsG2YZbCGYvb1O2XhfezXYsF7srjBAWNPHpIfU4vwfwo@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOARhdScg/tBCLEezvo8IXVtFyuPBaSuGDufJbIeNSJhwmnovt
+	ThFptxHUbc+ZrHwjSTOXw8XnUGo7Yis2T8oQ3Zd3Q4dWkoHV0Hoz
+X-Gm-Gg: ASbGncvcBN4wDfBDxcz9cJaaxKNw7vH/3yqfSrTk0S72lJns3Q8VzZRegO/YJfGZBaq
+	EgYmNvc11BPlZHQOWqswKmKW2mrP7U7+mgLv6/g0HOky95FjuPFqGN42ODwya8uqEQgPHiUr8Q3
+	UesgVyLWBx2oSV3g4CLVGjWCMlNZknHKI8vL8f3wfvIbiXGk4eh+7tbwG0gkjtNUWTpOGL0xPaf
+	5DKQVOU0bHMiQhJS9EMc47/K/lT9IV7gtQwBBtO+3VIm+k=
+X-Google-Smtp-Source: AGHT+IEsKEO0m272u/gjUvVEqepoFc2Ef3nYK/nUsVaQ6TKpjg97McLRHEVz6tIUsL6l1/+1e69spg==
+X-Received: by 2002:a05:6402:50d3:b0:5d0:9054:b119 with SMTP id 4fb4d7f45d1cf-5d81de06605mr101048634a12.21.1735910665548;
+        Fri, 03 Jan 2025 05:24:25 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0eae3b3dsm1893328466b.82.2025.01.03.05.24.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jan 2025 05:24:24 -0800 (PST)
+Date: Fri, 3 Jan 2025 05:24:22 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>, jsperbeck@google.com
+Cc: John Sperbeck <jsperbeck@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: netpoll: ensure skb_pool list is always initialized
+Message-ID: <20250103-passionate-mighty-seagull-29cebe@leitao>
+References: <20241222012334.249021-1-jsperbeck@google.com>
+ <20241230175707.5e18ae96@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] selftests/bpf: test_xdp_redirect: Rename BPF sections
-To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250103-xdp_redirect-v1-0-e93099f59069@bootlin.com>
- <20250103-xdp_redirect-v1-1-e93099f59069@bootlin.com>
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20250103-xdp_redirect-v1-1-e93099f59069@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241230175707.5e18ae96@kernel.org>
 
-On 1/3/25 11:10, Bastien Curutchet (eBPF Foundation) wrote:
-> SEC("redirect_to_111") and SEC("redirect_to_222") can't be loaded by the
-> __load() helper.
+On Mon, Dec 30, 2024 at 05:57:07PM -0800, Jakub Kicinski wrote:
+> On Sat, 21 Dec 2024 17:23:34 -0800 John Sperbeck wrote:
+> > Move the skb_pool list initialization into __netpoll_setup().  Also,
+> > have netpoll_setup() call this before allocating its initial pool of
+> > packets.
+> > 
+> > Fixes: 6c59f16f1770 ("net: netpoll: flush skb pool during cleanup")
 > 
-> Rename both sections SEC("xdp") so it can be interpreted by the __load()
-> helper in upcoming patch.
-> Update the test_xdp_redirect.sh to use the program name instead of the
-> section name to load the BPF program.
-> 
-> Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+> The fixes tag seems to be off by one? Wasn't the problem was introduced
+> by commit 221a9c1df790 ("net: netpoll: Individualize the skb pool") ?
 
-LGTM :)
-Reviewed-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
+You are correct. The regression was caused by 221a9c1df790 ("net:
+netpoll: Individualize the skb pool"), when I mistakenly moved
+skb_queue_head_init() out of netpoll_init() into netpoll_setup().
 
--- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+> Since __netpoll_setup() can be called by other drivers, shouldn't 
+> we move refill in there? Since the pool is per np?
+
+I'd say so.
+
+It is not a big deal to have it in netpoll_setup(), since find_skb()
+will refill the SKBs in the very first message being transmitted
+(which will undesirably delay the very first netconsole TX).
+
+On the other side, having it in refill_skbs() in the __netpoll_setup(),
+as Jakub suggested, will avoid this extra delay in the very first TX,
+and make the workflow cohesive.
+
+Anyway, thanks John for spotting this regression and working in the fix,
+--breno
 
