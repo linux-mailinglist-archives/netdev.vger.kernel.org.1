@@ -1,54 +1,53 @@
-Return-Path: <netdev+bounces-155203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B920EA01723
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 23:29:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39369A01725
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 23:29:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 355F1188468B
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 22:29:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9BB11884A47
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 22:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48D51D63D4;
-	Sat,  4 Jan 2025 22:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE031D63F6;
+	Sat,  4 Jan 2025 22:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MCPB+Ubo"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bZGlPGoe"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D19217108A;
-	Sat,  4 Jan 2025 22:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266A21D5CD9;
+	Sat,  4 Jan 2025 22:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736029732; cv=none; b=lo5/cHxfK5Af6FiBGnlWnaNOS5haTNJLfiNOnST41FL5FwVDoXDqxy+NJ6H24IiI92g20jEzeOUcnxJvcRsZi0fsORNP5M5wnEfETe3aq8Gq/svh7QISgQnczW4GtvVyErZq+yldRng2vvLyMbEMHjSQR2B4/uy+GtD1oMAZ7Xc=
+	t=1736029733; cv=none; b=Qtl8KfYkLARhrrk3HhVGiR5R4xoMJlDVTq9YW/KuDDoLv1IxngnrsJvBgK8h8KjU83IjnLbvn2tsovZWsfaEIKoQHCUmoMQkOw+7+LR6TAgAxFIm85oJhxSzLh+lY/Ut3ZcXJM6wgUoRvbGackFY4HpGNhm/RoW4RW9SzR1BK2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736029732; c=relaxed/simple;
-	bh=qGKPCHioDvLHPUjL/zHqUrz1EMkwJ08EwHPVFoKw+xc=;
+	s=arc-20240116; t=1736029733; c=relaxed/simple;
+	bh=EGF2XBjDW8Awwg0TvF7irUc+FKwZ1gZh75vwlba8OpE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bTVGv28NmnW+JpS3ij1AUdfbc7BVs+VZRS/MiaS0HWzK5XD0IT3BknCa5xNM0YYoGdAd8G6qAWv0miUliYQF0hhOaNwzG67cDvJUnIMH6sG3W8EH6qX2FiUWW77Wo0lKdk2DUZo3yGjeAbanWSrAsqK70ZUhb7s9HF8mFyuObp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MCPB+Ubo; arc=none smtp.client-ip=217.70.183.194
+	 In-Reply-To:To:Cc; b=kRxcx09dPv8axH5ejzaGhOYmTz8VMeVTQDvmgdK7fD2e7O19Lmn+ApLolaXUTNyPActjZpuTw1qrQoNk2YJEWZSIW4eEKHpuUr8jZjJnTRhUIIhhcVx8lu8umq+JDVtn9+4U7YifHH+yIFi6DdZgxFZSlJc47dlGCT2y0PHAlq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bZGlPGoe; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A98EE40004;
-	Sat,  4 Jan 2025 22:28:47 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9D88040005;
+	Sat,  4 Jan 2025 22:28:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736029728;
+	t=1736029729;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Le+YyCmBg3uz++l7dEhGwDiEuYWQBPGztF5A5qpeEqw=;
-	b=MCPB+Ubo8qygZULGh3Z1DjflMhHupXbJEG6Un7SBYR4qkTHFU2/y+tirm226rJCQL4Selc
-	9VHEIiZGkWqynCiucDlgZACi1+ThqoxkMX2a5PZImlPTurNnskcwSKB9SNI76M9vvRszv7
-	huEeVU3sVOhzmtXrp5b+kib47tEbwGPVR8bxOWS+iOfCYn2+/+xrl45l/rXa8cVX/WBQxp
-	wsQWhkkB2dvezNnKDeS5l/ka52NCNIrz0pAQ1J97gmJh8CLc6lYIX7OM/iCnqsnE3afAV4
-	GK3ip0a037llkd4mJtcpNplvH/07Q/b6raDUludux5s7UTpgPN1nQ8JKWWJqdg==
+	bh=+g+gzoMaoPkSJtDI4tWVLE+Mf/2uUCxQvYzgSnTXlNQ=;
+	b=bZGlPGoeeYf81LizMUm/e35qbpNwmK/yKzqp48qt90U5SdKS+6kBPHIpLx9OjJkk1D3rT7
+	9NyDODCtsor8ZX9mnYSMF6cDmDOJ3deW/9z4GcpJ5MwmSKRfYYG2CEg6MvxUmnBH57fRWt
+	3oLPVFq38XryRhr0v7bi5oGt3v6ndh1iZwP9rw54D7ho9sjgx1XgX/RZ+NlH0o7oUQbZoG
+	EXYfYdlitEYtOelZK/QpThF7XLhdGHPR9qePVSuo+E/tdx+JI5s3LH0id7csnF4zhNQbiw
+	AdJxgAttlYSFctmOMuAFPHCrP5A5pnn1Cd/AMKL5AqNUV2JiWDJ7wbmJRZEMgg==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Sat, 04 Jan 2025 23:27:27 +0100
-Subject: [PATCH net-next 02/14] net: pse-pd: Avoid setting max_uA in
- regulator constraints
+Date: Sat, 04 Jan 2025 23:27:28 +0100
+Subject: [PATCH net-next 03/14] net: pse-pd: Add power limit check
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250104-b4-feature_poe_arrange-v1-2-92f804bd74ed@bootlin.com>
+Message-Id: <20250104-b4-feature_poe_arrange-v1-3-92f804bd74ed@bootlin.com>
 References: <20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com>
 In-Reply-To: <20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -78,46 +77,45 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Setting the max_uA constraint in the regulator API imposes a current
-limit during the regulator registration process. This behavior conflicts
-with preserving the maximum PI power budget configuration across reboots.
+Checking only the current limit is not sufficient. According to the
+standard, voltage can reach up to 57V and current up to 1.92A, which
+exceeds the power limit described in the standard (99.9W). Add a power
+limit check to prevent this.
 
-Instead, compare the desired current limit to MAX_PI_CURRENT in the
-pse_pi_set_current_limit() function to ensure proper handling of the
-power budget.
-
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- drivers/net/pse-pd/pse_core.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/net/pse-pd/pse_core.c | 3 +++
+ include/linux/pse-pd/pse.h    | 2 ++
+ 2 files changed, 5 insertions(+)
 
 diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 2906ce173f66..9fee4dd53515 100644
+index 9fee4dd53515..432b6c2c04f8 100644
 --- a/drivers/net/pse-pd/pse_core.c
 +++ b/drivers/net/pse-pd/pse_core.c
-@@ -357,6 +357,9 @@ static int pse_pi_set_current_limit(struct regulator_dev *rdev, int min_uA,
- 	if (!ops->pi_set_current_limit)
- 		return -EOPNOTSUPP;
+@@ -877,6 +877,9 @@ int pse_ethtool_set_pw_limit(struct pse_control *psec,
+ 	int uV, uA, ret;
+ 	s64 tmp_64;
  
-+	if (max_uA > MAX_PI_CURRENT)
++	if (pw_limit > MAX_PI_PW)
 +		return -ERANGE;
 +
- 	id = rdev_get_id(rdev);
- 	mutex_lock(&pcdev->lock);
- 	ret = ops->pi_set_current_limit(pcdev, id, max_uA);
-@@ -403,11 +406,9 @@ devm_pse_pi_regulator_register(struct pse_controller_dev *pcdev,
+ 	ret = regulator_get_voltage(psec->ps);
+ 	if (!ret) {
+ 		NL_SET_ERR_MSG(extack,
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 85a08c349256..bc5addccbf32 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -11,6 +11,8 @@
  
- 	rinit_data->constraints.valid_ops_mask = REGULATOR_CHANGE_STATUS;
+ /* Maximum current in uA according to IEEE 802.3-2022 Table 145-1 */
+ #define MAX_PI_CURRENT 1920000
++/* Maximum power in mW according to IEEE 802.3-2022 Table 145-16 */
++#define MAX_PI_PW 99900
  
--	if (pcdev->ops->pi_set_current_limit) {
-+	if (pcdev->ops->pi_set_current_limit)
- 		rinit_data->constraints.valid_ops_mask |=
- 			REGULATOR_CHANGE_CURRENT;
--		rinit_data->constraints.max_uA = MAX_PI_CURRENT;
--	}
- 
- 	rinit_data->supply_regulator = "vpwr";
- 
+ struct phy_device;
+ struct pse_controller_dev;
 
 -- 
 2.34.1
