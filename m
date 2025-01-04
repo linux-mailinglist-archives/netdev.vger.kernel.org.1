@@ -1,543 +1,162 @@
-Return-Path: <netdev+bounces-155117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AB69A01226
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 04:55:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B0DA0123B
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 05:16:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC4881641AA
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 03:55:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A1D07A1E9A
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 04:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1213D1474D3;
-	Sat,  4 Jan 2025 03:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF3B1482E7;
+	Sat,  4 Jan 2025 04:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="F8yru7BF"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="GMEMyQYA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="E7DvbuOG"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2099.outbound.protection.outlook.com [40.107.237.99])
+Received: from flow-a7-smtp.messagingengine.com (flow-a7-smtp.messagingengine.com [103.168.172.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E863686252;
-	Sat,  4 Jan 2025 03:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.99
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735962892; cv=fail; b=IoI0vyLsVtSjQ6i1WYDCvQiDpBkI+d0DhfwF/RZa2XCTjo7THI2zM7x0RErAQcnp9y/K/AYK+VIU/osZW0cJXphHNyJ4vv0Hnan04tQpupP2t56g7JX6VHpNnwxFeXczabO+ebKpn/pWhG8XRDLU3aQFLTSJ15xxRBp7h2XHYwc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735962892; c=relaxed/simple;
-	bh=bYWwSwVCyVr4xhXEb4VuTN9V0H86VS1DEbpUb63b5bc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ijouk4KrX0ab7Ga7suJVXH60IJy+/R5LvGbM0BiyqfOuU75IqaiO9oBjRGWmyOvs37YNLN2udVZEbmy1iSmvg38xl9nv6y8Kf07rh/cJjGnnaXSzAiicGxa03x6bOXUcu+i1a/77f3BN1Ij5sRwzM+k77UQywBqb9udqgm2UXVQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=F8yru7BF; arc=fail smtp.client-ip=40.107.237.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bUQU7vzrGIJ9RGKPyJmQwgc+pI+MFesLUBmuTuwTd3216jm5QQ96LFO3Rb5FwsWXAmkD8BFGd3VDN5aHeb71tLrO+JPDojvOGjm7DnmeYB9OPqe9dQ2/oPDFfE+PDw/Wff6qMXoAksz0MvFItNkn21bob8b2SI68FA4I0gQWvHotCyaUStfXYdugYCbMsUF3oanL6NYCYNxFb5otadsXbwj1d6Ki1HubGNzdkZgRJWGhBQ0qPu/g+qLbpWO0XG7kc0uY1Wsvy9vbmkyXBVI/3sjiwZL3VBu4jb6rIVyOyYpWlw0C2tVBj57kJ1Op1fKwefMGWGaMJ/zKg7QyhMICUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ong3syvmC54qm887GjwTxX2r45D0SsJT3xlRDu0BVqc=;
- b=UEHCQZgUxUJ5bivMXYXXIPvWhVrd3KMN/olAg+S8GTPkZZSjJpSvQb2QoSX+2oJKfPw0NdQyNPQJJJ3T6LaCOiAyjKFCInyA6GgOFUDOJjpYKdvT/RMkPVmbBpCTvh7v1RPkpdKNHo6LRUbdbKNITb0KbBCkaDBl7z1+RsqLXCX+cZzp6u78oEdSG9krh8KBepj0YHezKb2g9yt1zTOTc6M0/xAoSFiTY6aIf3avSJhxGOyt+9uPdH5fN9/9/MZ5ek5OWwGs+TXAKMMMRQd+tZTHZ6HAShlnIV225p3pWIRyEFMYRFp+JQA9JNBZhgFfT6j/cGw7/ezL4IvKbCcBQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ong3syvmC54qm887GjwTxX2r45D0SsJT3xlRDu0BVqc=;
- b=F8yru7BFutPSyHhvObWfZKyHbzy/WeanVHH8Jly3bpaKuFOo/DqbGDum2BCAVTmDR8soPiLC3V04QTUrY7thFy3gHwCiswY0EhPcp/N+XWoxFmuuXZngySmldX9SkuMB8FnxVBEIpIwphfdWQlTR8XjWZI1Alo4Oonivz6s4AkA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
- CH0PR01MB6891.prod.exchangelabs.com (2603:10b6:610:104::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8314.12; Sat, 4 Jan 2025 03:54:43 +0000
-Received: from SA0PR01MB6171.prod.exchangelabs.com
- ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
- ([fe80::b0e5:c494:81a3:5e1d%6]) with mapi id 15.20.8314.001; Sat, 4 Jan 2025
- 03:54:43 +0000
-From: admiyo@os.amperecomputing.com
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Huisong Li <lihuisong@huawei.com>
-Subject: [PATCH v11 1/1] mctp pcc: Implement MCTP over PCC Transport
-Date: Fri,  3 Jan 2025 22:54:29 -0500
-Message-ID: <20250104035430.625147-2-admiyo@os.amperecomputing.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250104035430.625147-1-admiyo@os.amperecomputing.com>
-References: <20250104035430.625147-1-admiyo@os.amperecomputing.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BY3PR04CA0013.namprd04.prod.outlook.com
- (2603:10b6:a03:217::18) To SA0PR01MB6171.prod.exchangelabs.com
- (2603:10b6:806:e5::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07349145346;
+	Sat,  4 Jan 2025 04:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.142
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735964166; cv=none; b=UiZozhjsHWaQL0A0WXk/3kJ16CSwTOqwkrEJEjX2YosSIq8pN2eg9vXD4/+XSH6WO47l32JawKi32cQLxCHLmzPlfOHLQJWQ7o4xAngrmRIxlfN4ewtNBs4+K1fY34tHJOZFGhUv+/84xp4S58GA1LXdbLz+IB10OTb6bia/2eU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735964166; c=relaxed/simple;
+	bh=O9ct9DYfSIHYg2SR5g8KPcK0nY8vSZ2qC+E03Lq7V7Q=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=aXau/0iuEBQ8/OynCtyGkMjwAqBf9SM4FjYgw/kuufExFkUSl1y76gmENVsYrwFqkA96CJnqAr3Tzl7MtosHzwswk1Ueq8I0sAcR63QApBxegJlkD/Gsr1IIIMs190LCjsaNnddRtne4ULrsjEsTtCNjpnBSlxaocBPc6I1eRdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=GMEMyQYA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=E7DvbuOG; arc=none smtp.client-ip=103.168.172.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailflow.phl.internal (Postfix) with ESMTP id AC616200B16;
+	Fri,  3 Jan 2025 23:16:00 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-10.internal (MEProxy); Fri, 03 Jan 2025 23:16:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1735964160;
+	 x=1735971360; bh=DIwzYoQakaoN0iG+JoxRQfAa6GbWsfiZ3NXHQ7aMpA0=; b=
+	GMEMyQYAFSaSUwWygS2vECgDVuP7zSrNouAJs3qm8a0NFQuITjSdl+z2twIBgx/Z
+	FUdFOlQI+GemGfdQRRKF6Ef3VAjXDmy0OODq0hEQOgGMDG7kDHyz9rwtGERbZfxl
+	waIO0DQabDFsiJqBSIqtrF+HA0bgp8vYHCHKGKc+Fis3GVPbMPtpKm2mYNdlM6M5
+	90IPJOsZgmWhw1nCD/8ofZAp0I0Mc88NDljDvpNkn90YJZCsJIOPJ28MeuUBvC8d
+	omo8Bs8YiEO/y0pIQrrYkHB4x8bkAONZ0ldxv1rEpneDkS8B4TLuwRqvqCAp6FkM
+	yIKOTax/ppHaoAyhnbyVfQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1735964160; x=
+	1735971360; bh=DIwzYoQakaoN0iG+JoxRQfAa6GbWsfiZ3NXHQ7aMpA0=; b=E
+	7DvbuOGySklujsR/gjBzIQphQOIqqnzbTzir/05VZONXaU7z0TgtWAXqAMuWiv+n
+	GcDjbQlM4YODM2Sh1o9aKY2v00lzC3QfUftTRRvKg+5+9hFCFIWYoblo6k3Ex2kT
+	Y3C8C8GRgvE0Hrqy9OJsEWuxGun4v/KXs5VG1vWK0Xsottr7rwH26IU2p4XGeeow
+	xJ1FCyeiuZBmWLTtNH0wZ351H5FLHwrLk9veqUsj0DjV9j1B5HSm6zRgWGOPrhvi
+	McxCuYgI2NgVFmAST5EJtC7dsmDoGpRQfeVAib4gmXsGwLHdJyRpAN4Ivxb8u2zd
+	bKKOnYS9qD3eVguW0uI2A==
+X-ME-Sender: <xms:_7V4Z45PUDOtgfZb6EVQs313heRmVpXrRhI8NbWpGCDS3UhyMeZK4g>
+    <xme:_7V4Z56PicMtWYAzT-PnZGddshlIDVLH5ooSJ377wGdn1UyzwoiHfFF0JeG-Z1dAY
+    wfXoDlLxe_52DyASiM>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudefhedgieelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
+    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
+    guvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefg
+    gfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepvdej
+    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrlhgvgigrnhgurhgvrdgsvghllh
+    honhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhl
+    ohhfthdrnhgvthdprhgtphhtthhopehphhhilhhiphhprdhgrdhhohhrthhmrghnnhesgh
+    hmrghilhdrtghomhdprhgtphhtthhopehsrdhlqdhhsehgmhigrdguvgdprhgtphhtthho
+    pegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepghgvohhffhesih
+    hnfhhrrgguvggrugdrohhrghdprhgtphhtthhopegrlhgvkhhsrghnuggvrhdrlhhosggr
+    khhinhesihhnthgvlhdrtghomhdprhgtphhtthhopehgrhgvghhorhihrdhgrhgvvghnmh
+    grnhesihhnthgvlhdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhr
+    gh
+X-ME-Proxy: <xmx:_7V4Z3dyojkJ9ODKVdYcVuqNfigKRzv8PnDKtuHQTCn-Ar7xXkF2aw>
+    <xmx:_7V4Z9ISmXm-gEtKrCtUEbBJYl-V0GKc4EGVWjifIQQ8_GJ42zOkdQ>
+    <xmx:_7V4Z8Jz8f6nkDCcC-179FaK57zPH3EK3fbOCRESQ2TJXuectB3oCg>
+    <xmx:_7V4Z-wxje4mDrPVVyIRYkPsMfDddCpkSjBLlmspmhAwfkZcs9BKkw>
+    <xmx:ALZ4Z5amlO25XqjN_HFsMeoazF3Sd-ZMtpY_PAJZUZKZF8zXVs8CU9m0>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id EAAF32220072; Fri,  3 Jan 2025 23:15:58 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|CH0PR01MB6891:EE_
-X-MS-Office365-Filtering-Correlation-Id: bbd33cab-c68d-49bc-5d93-08dd2c7385e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|52116014|366016|10070799003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eRJzBuB6sF8Fv9U6m4qwmaCj3Ql4slw8YPiDNdB20XXEzY6c3YqLvXyDpJiS?=
- =?us-ascii?Q?WUoKU1RJisupUmR0UgzNYi7hRPv0/EOm3p2ah7lhrS4bIDZBotNFoVX8uyyT?=
- =?us-ascii?Q?pMfd/D6cimuop3FJChcpXOZO6XAnJedEnPbPmcT92RkjZ1iM8q2+I3GYZHFl?=
- =?us-ascii?Q?TJg3jJZCkx25eKPTAU4YJSZKCo2eBFZwtpAgwce7QcO2SGi92WptE0hGGsCb?=
- =?us-ascii?Q?91HGxNLXjOJUHhu0Mnc0fx9vsvxkB3/UNRqRJNuIi2p9hujZJUgEiEqDweH+?=
- =?us-ascii?Q?v/l4ckUuFgC2KLsARMSW7LEhZaK9bneon6ckfj7HfbzU9/Wn1QZXValLgqbN?=
- =?us-ascii?Q?zudlRPHDaT3ImGqCbt/TvE8mQax2BmQtMPYwx8XFUsrbywadXsZjuoG+5TIN?=
- =?us-ascii?Q?Zg7hDnG0235BHUW5dAuZDsbmT0y63hT2z/V5/cz8QMyojDapb8dsbdrm5Ojt?=
- =?us-ascii?Q?zw1G7wtm84FpIGp+l+pGhg/wM4+GcI3kwHNkFIGxvcTUZwt3YW72pOz49eqR?=
- =?us-ascii?Q?LBdrHak94LV4zTgGGKvQZjcpDNpguOxsEdB71Ir/EfqZOCe6vTNlu9Y8YFHn?=
- =?us-ascii?Q?UWA/iMd0UkBP9d5pk7qLQABmDua77zVhiWGondEXAlaifvOZy12SKRY6mrlN?=
- =?us-ascii?Q?LSS2dlZ/FVlPFc8m0JrPf3tEX0etxh4QpbHFIsY2eei4iLIxmwcqlMqHci+e?=
- =?us-ascii?Q?7lyGZHGKB5RETlzLG14kxTaEbRpi6GX+5M1Px3PfWv+oRTMXDPp4OIqb+0PV?=
- =?us-ascii?Q?JUTQTxVEjyRSEEFe+PNOgurbg7qcEVakE08UKCFXVna7gmD9+gVCiVbuQh4O?=
- =?us-ascii?Q?NIQYiT1ys7a6O9cljF4xJSb2PA/d5OGXLy0ZscGM52uX15Ce82Gh/MXYAPsU?=
- =?us-ascii?Q?XPyRs6EplLetO7sxO6qr0MKM9ItQtoIyNSH+cg2t51iBe0WD/pIL96DL8gHi?=
- =?us-ascii?Q?2khC5mdBkMMZlDbUlt047s4p4I6/hO4IP7nzkUFh5YvYZrdmYzc5hFwMl4C2?=
- =?us-ascii?Q?q5j49s/6EbrjUkBO/mhoagHEulQa3ok4rUMhkpFu3G1xJLmHMUXtxJG0EQUp?=
- =?us-ascii?Q?U8XqxrnGxEineqTTmb7AGLt8yoAhgojrgOMSnpA2h3qWBDM0svotumuzUatx?=
- =?us-ascii?Q?qvd0TO2XqygBj4HuZm4gdMoAxWevMrEQUEHDImnzFtIdlFULuH1I3NaE2nRH?=
- =?us-ascii?Q?suJU+Y6LEN0WLkswv03AflXJH9YHCxOmMeTApqz+jrew504W4O3jPxg7EUnW?=
- =?us-ascii?Q?ywocw6NQ3hs+nuy4PvZYh0CGl2yqgCv+3eHe/O+Fbzo2hjthrhDmuyQPye/B?=
- =?us-ascii?Q?g/u4DGEILOHWmLttwc1t+eczXeOakWMMFk6Eaqpwhs6ljp+ZVF1/9FZuZ5oQ?=
- =?us-ascii?Q?7gKMDUFpo1HfUlFZBXsv7EuwpI3m?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(52116014)(366016)(10070799003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LSAJfrnI1SlnM0oX+MFHBhN7J7SBtEySk++g7ev/UwRWozADb/lGRxf8tnSF?=
- =?us-ascii?Q?Dgwxfkcgm+fdPsTqB6Avt12Ryt8pyI8UxzVuvCxY+68UL3XQdnQnNtU92we2?=
- =?us-ascii?Q?erPYCYIwnwrjFcXbMEfFeoiItoUZ92XUk8LGe6cRSvF55J3YGABZ7fJ1+Y2j?=
- =?us-ascii?Q?pmxEIC+B+qZx7YlYUz5jFE26yF09qWDaDymS0ieozne0OAe4DpqlgVu9YtxQ?=
- =?us-ascii?Q?/qgGFEVi+/j/yCLF9JbFbsUcECoG5wLIBiIwJAwwHrNa+pAn/FoNm4njbYVL?=
- =?us-ascii?Q?Vdwy4XViX3qzDBTG0APp8mFCv8MEka2ZOJa3FSHL6sLCDi5rHkenlfJi1JUV?=
- =?us-ascii?Q?FxjdR4cHmEAmkVgpAsTH+HIuBJ6ncVBj6A9+1qNjg0zeSI7ZojSMxP/K4XLr?=
- =?us-ascii?Q?fXIX6pl0BUzGXGTXuh5Tge0O32BP802z03+hsmpDIDuuOe450XKgGyL5VUOL?=
- =?us-ascii?Q?Vyzli19yBmc+5cAcq0HzuwCvzXcXNtwMzn5ZBXP+or++OwMhYBvN1mCxaps2?=
- =?us-ascii?Q?fvNUNVMZaxFg9OBt5+X/6EqfBJLNsP/dgp7e75FWsOWxzoni9Jqi4vr13G8B?=
- =?us-ascii?Q?I9t1/BzJLW04JmcnGEMRJsJfwnlfmCfbb04srtNPAQVVaLfawmXtB9HZIWoJ?=
- =?us-ascii?Q?whDbgUiybhstxE6qSmYdH6SXrZvq65bk/kRXY2DyIIRrr47ur7Cu1ApRHtmk?=
- =?us-ascii?Q?UpwZxoJ+vCipK9NrX++OuPWDks2nLins3mxPRnocK3adz7axHoOOuqiNnp4O?=
- =?us-ascii?Q?TOXLXS434xloajX9s82VJdCmGGLR0EfiVP1Sp14z6117E8AZXpGb3kHpn8/y?=
- =?us-ascii?Q?eiDaK943qoevPU5UNOylSy/hVc+WDfK+Izbe1JuXIQ4ak9XWzVcGPHct1U3/?=
- =?us-ascii?Q?8ll2XAev1PpPNCzax8ujTQ1fpwBt6F/IX0MGpbcdpZzJtplNH/HkVhHthE+U?=
- =?us-ascii?Q?LT9WDKydR7Pt+N2tiqJjsVbH3a2SgcuiPmd3CVL4kWGrPfIvwfEUUYLH7l7l?=
- =?us-ascii?Q?6scWRT1UFsuoBKn10l1CQXM4udgbnEmuCZifgv9sPDrWeN4X7rY4HYZ6Aeci?=
- =?us-ascii?Q?ehlGhqaRFUZqupSa5u5nswZ596ppmn7PTstI+qUOVtAbe2+/icoynRxhXtwZ?=
- =?us-ascii?Q?6JeLQ+oIat7C7DJ+d9ofDv9t/tP3xAGeVLuFWnhUlrdjN14HXKtJPiygYsfl?=
- =?us-ascii?Q?xJNthv15TnOg26LbazZEeU4QU3FrfZD5KHHVmL6T1VVGTANlP0+hznCZgrVe?=
- =?us-ascii?Q?l96Jiu4vnRU80yNZXaVOj9DERTyRsLkpXQucPVjuzh67r8bHHlIfbLpSQDzN?=
- =?us-ascii?Q?olFQQWfoZGVYWDMKColYhWbo2d1e/EW/zdkx+OJFs4vV1rIRzWCKoYDMR2ZD?=
- =?us-ascii?Q?oiR66HgRixiHvS2VTxyS5Nc42tgyXZbJViDOKTHODtooUqIIpHwl68jc4zFV?=
- =?us-ascii?Q?MrsBKHH324ehi5eqbd5GomHlKwwS9ArEI/LLJwJvkxHi18okAGvPXHCXTRQc?=
- =?us-ascii?Q?TCA4CLaJ+/vZYS4pnXAbwO9nbDWtG3z5/3WTbUfkrTYACQLIMOhcqhD8WPRz?=
- =?us-ascii?Q?A7N5MHIjTcsUiLuibbBOeddTYZCr3deMC3z1xl3aWQyXFIEiFCfv2E6MKRsN?=
- =?us-ascii?Q?tW27DTZ3NZYmlg52d7IJuBCdmLNOWYoLulQQHRF7rj6bgaWBQFXOX2K0VmxX?=
- =?us-ascii?Q?m53O5u5ioAFTCTLj/KLGiru+AHE=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbd33cab-c68d-49bc-5d93-08dd2c7385e0
-X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2025 03:54:43.7445
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mov23hx9PdvNcgBcoGsHcy1pZfiX0zzJWprnwHDJlKr8mnYF3CWkWVhmyF9NEu6Bkn0sZ8PF2eSKIgPCZwg0lSKkHwYXUxoEX6FCapMcTeYECH7MF8BRZsvhCMn+Wiok
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR01MB6891
+Date: Sat, 04 Jan 2025 05:15:38 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Johannes Berg" <johannes@sipsolutions.net>,
+ "Philipp Hortmann" <philipp.g.hortmann@gmail.com>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Geoff Levand" <geoff@infradead.org>,
+ "Simon Horman" <horms@kernel.org>,
+ "Alexander Lobakin" <aleksander.lobakin@intel.com>,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Cc: "Kalle Valo" <kvalo@kernel.org>,
+ "Alexandre Belloni" <alexandre.belloni@bootlin.com>,
+ "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
+ "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Jeff Johnson" <quic_jjohnson@quicinc.com>,
+ "Larry Finger" <Larry.Finger@lwfinger.net>,
+ "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Pavel Machek" <pavel@ucw.cz>,
+ "Stanislaw Gruszka" <stf_xl@wp.pl>,
+ "Gregory Greenman" <gregory.greenman@intel.com>,
+ linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-staging@lists.linux.dev,
+ linux-wireless@vger.kernel.org, "Stefan Lippers-Hollmann" <s.l-h@gmx.de>
+Message-Id: <cecd584c-46c0-4c0b-b3fb-b5cee4bbfd12@app.fastmail.com>
+In-Reply-To: 
+ <8414fd0c552de87b3471468665f7fc540b9bfa69.camel@sipsolutions.net>
+References: <20241224080755.194508-1-philipp.g.hortmann@gmail.com>
+ <b811d4af6a634d61389dfefacd49853c0e77f1d7.camel@sipsolutions.net>
+ <39256db9-3d73-4e86-a49b-300dfd670212@gmail.com>
+ <8414fd0c552de87b3471468665f7fc540b9bfa69.camel@sipsolutions.net>
+Subject: Re: [PATCH] net: ethernet: toshiba: ps3_gelic_wireless: Remove driver using
+ deprecated API wext
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-From: Adam Young <admiyo@os.amperecomputing.com>
+On Fri, Jan 3, 2025, at 13:44, Johannes Berg wrote:
+> On Fri, 2025-01-03 at 07:44 +0100, Philipp Hortmann wrote:
+>> 
+>> One of my big fears is the hand over to the next generation maintainers 
+>> and developers. The less code and the less exceptions due to old 
+>> interfaces the easier it will be. We loose maintainers and developers 
+>> for many reasons, like: retirement, burnout, embargos or simply because 
+>> they are not paid and need to earn money. After giving some support on 
+>> the staging subsystem I cannot see at all that we can attract so many 
+>> talented people as required for a save future beyond 7 years...
+>
+> I wouldn't say that's necessarily a wrong sentiment, but I feel future
+> maintainers can also make that decision, and if it's "years" in the
+> future the relevance will only go down anyway.
+>
+> We just started putting some pressure into the system for removal of
+> wext and nl80211 support (with WiFi7 devices no longer supporting wext)
+> so chances are at least here the situation will change, and anyway wext
+> stuff will become less relevant, perhaps to the point that other tools
+> will drop support for it anyway. Not wpa_supplicant though, I suppose :)
 
-Implementation of network driver for
-Management Control Transport Protocol(MCTP) over
-Platform Communication Channel(PCC)
+I would assume that once removing CFG80211_WEXT becomes an option, we
+can just put the remaining parts of net/wireless/wext-*.c into both
+ps3_gelic and ipw2x00, duplicating and then simplifying the
+implementation. As far as I can tell, there is very little that is
+actually shared between the two anyway.
 
-DMTF DSP:0292
-https://www.dmtf.org/sites/default/files/standards/documents/DSP0292_1.0.0WIP50.pdf
-
-MCTP devices are specified by entries in DSDT/SDST and
-reference channels specified in the PCCT.
-
-Communication with other devices use the PCC based
-doorbell mechanism.
-
-Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
----
- drivers/net/mctp/Kconfig    |  13 ++
- drivers/net/mctp/Makefile   |   1 +
- drivers/net/mctp/mctp-pcc.c | 311 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 325 insertions(+)
- create mode 100644 drivers/net/mctp/mctp-pcc.c
-
-diff --git a/drivers/net/mctp/Kconfig b/drivers/net/mctp/Kconfig
-index 15860d6ac39f..073eb2a21841 100644
---- a/drivers/net/mctp/Kconfig
-+++ b/drivers/net/mctp/Kconfig
-@@ -47,6 +47,19 @@ config MCTP_TRANSPORT_I3C
- 	  A MCTP protocol network device is created for each I3C bus
- 	  having a "mctp-controller" devicetree property.
- 
-+config MCTP_TRANSPORT_PCC
-+	tristate "MCTP PCC transport"
-+	depends on ACPI
-+	help
-+	  Provides a driver to access MCTP devices over PCC transport,
-+	  A MCTP protocol network device is created via ACPI for each
-+	  entry in the DST/SDST that matches the identifier. The Platform
-+	  communication channels are selected from the corresponding
-+	  entries in the PCCT.
-+
-+	  Say y here if you need to connect to MCTP endpoints over PCC. To
-+	  compile as a module, use m; the module will be called mctp-pcc.
-+
- endmenu
- 
- endif
-diff --git a/drivers/net/mctp/Makefile b/drivers/net/mctp/Makefile
-index e1cb99ced54a..492a9e47638f 100644
---- a/drivers/net/mctp/Makefile
-+++ b/drivers/net/mctp/Makefile
-@@ -1,3 +1,4 @@
-+obj-$(CONFIG_MCTP_TRANSPORT_PCC) += mctp-pcc.o
- obj-$(CONFIG_MCTP_SERIAL) += mctp-serial.o
- obj-$(CONFIG_MCTP_TRANSPORT_I2C) += mctp-i2c.o
- obj-$(CONFIG_MCTP_TRANSPORT_I3C) += mctp-i3c.o
-diff --git a/drivers/net/mctp/mctp-pcc.c b/drivers/net/mctp/mctp-pcc.c
-new file mode 100644
-index 000000000000..4cd66c0ded85
---- /dev/null
-+++ b/drivers/net/mctp/mctp-pcc.c
-@@ -0,0 +1,311 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * mctp-pcc.c - Driver for MCTP over PCC.
-+ * Copyright (c) 2024, Ampere Computing LLC
-+ */
-+
-+/* Implementation of MCTP over PCC DMTF Specification DSP0256
-+ * https://www.dmtf.org/sites/default/files/standards/documents/DSP0256_2.0.0WIP50.pdf
-+ */
-+
-+#include <linux/acpi.h>
-+#include <linux/if_arp.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/netdevice.h>
-+#include <linux/platform_device.h>
-+#include <linux/string.h>
-+
-+#include <acpi/acpi_bus.h>
-+#include <acpi/acpi_drivers.h>
-+#include <acpi/acrestyp.h>
-+#include <acpi/actbl.h>
-+#include <net/mctp.h>
-+#include <net/mctpdevice.h>
-+#include <acpi/pcc.h>
-+
-+#define MCTP_PAYLOAD_LENGTH     256
-+#define MCTP_CMD_LENGTH         4
-+#define MCTP_PCC_VERSION        0x1 /* DSP0253 defines a single version: 1 */
-+#define MCTP_SIGNATURE          "MCTP"
-+#define MCTP_SIGNATURE_LENGTH   (sizeof(MCTP_SIGNATURE) - 1)
-+#define MCTP_HEADER_LENGTH      12
-+#define MCTP_MIN_MTU            68
-+#define PCC_MAGIC               0x50434300
-+#define PCC_HEADER_FLAG_REQ_INT 0x1
-+#define PCC_HEADER_FLAGS        PCC_HEADER_FLAG_REQ_INT
-+#define PCC_DWORD_TYPE          0x0c
-+
-+struct mctp_pcc_hdr {
-+	u32 signature;
-+	u32 flags;
-+	u32 length;
-+	char mctp_signature[MCTP_SIGNATURE_LENGTH];
-+};
-+
-+struct mctp_pcc_mailbox {
-+	u32 index;
-+	struct pcc_mbox_chan *chan;
-+	struct mbox_client client;
-+};
-+
-+/* The netdev structure. One of these per PCC adapter. */
-+struct mctp_pcc_ndev {
-+	/* spinlock to serialize access to PCC outbox buffer and registers
-+	 * Note that what PCC calls registers are memory locations, not CPU
-+	 * Registers.  They include the fields used to synchronize access
-+	 * between the OS and remote endpoints.
-+	 *
-+	 * Only the Outbox needs a spinlock, to prevent multiple
-+	 * sent packets triggering multiple attempts to over write
-+	 * the outbox.  The Inbox buffer is controlled by the remote
-+	 * service and a spinlock would have no effect.
-+	 */
-+	spinlock_t lock;
-+	struct mctp_dev mdev;
-+	struct acpi_device *acpi_device;
-+	struct mctp_pcc_mailbox inbox;
-+	struct mctp_pcc_mailbox outbox;
-+};
-+
-+static void mctp_pcc_client_rx_callback(struct mbox_client *c, void *buffer)
-+{
-+	struct mctp_pcc_ndev *mctp_pcc_ndev;
-+	struct mctp_pcc_hdr mctp_pcc_hdr;
-+	struct mctp_skb_cb *cb;
-+	struct sk_buff *skb;
-+	void *skb_buf;
-+	u32 data_len;
-+
-+	mctp_pcc_ndev = container_of(c, struct mctp_pcc_ndev, inbox.client);
-+	memcpy_fromio(&mctp_pcc_hdr, mctp_pcc_ndev->inbox.chan->shmem,
-+		      sizeof(struct mctp_pcc_hdr));
-+	data_len = mctp_pcc_hdr.length + MCTP_HEADER_LENGTH;
-+	if (data_len > mctp_pcc_ndev->mdev.dev->mtu) {
-+		dev_dstats_rx_dropped(mctp_pcc_ndev->mdev.dev);
-+		return;
-+	}
-+
-+	skb = netdev_alloc_skb(mctp_pcc_ndev->mdev.dev, data_len);
-+	if (!skb) {
-+		dev_dstats_rx_dropped(mctp_pcc_ndev->mdev.dev);
-+		return;
-+	}
-+	dev_dstats_rx_add(mctp_pcc_ndev->mdev.dev, data_len);
-+
-+	skb->protocol = htons(ETH_P_MCTP);
-+	skb_buf = skb_put(skb, data_len);
-+	memcpy_fromio(skb_buf, mctp_pcc_ndev->inbox.chan->shmem, data_len);
-+
-+	skb_reset_mac_header(skb);
-+	skb_pull(skb, sizeof(struct mctp_pcc_hdr));
-+	skb_reset_network_header(skb);
-+	cb = __mctp_cb(skb);
-+	cb->halen = 0;
-+	netif_rx(skb);
-+}
-+
-+static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
-+{
-+	struct mctp_pcc_ndev *mpnd = netdev_priv(ndev);
-+	struct mctp_pcc_hdr  *mctp_pcc_header;
-+	void __iomem *buffer;
-+	unsigned long flags;
-+	int len = skb->len;
-+
-+	dev_dstats_tx_add(ndev, len);
-+
-+	spin_lock_irqsave(&mpnd->lock, flags);
-+	mctp_pcc_header = skb_push(skb, sizeof(struct mctp_pcc_hdr));
-+	buffer = mpnd->outbox.chan->shmem;
-+	mctp_pcc_header->signature = PCC_MAGIC | mpnd->outbox.index;
-+	mctp_pcc_header->flags = PCC_HEADER_FLAGS;
-+	memcpy(mctp_pcc_header->mctp_signature, MCTP_SIGNATURE,
-+	       MCTP_SIGNATURE_LENGTH);
-+	mctp_pcc_header->length = len + MCTP_SIGNATURE_LENGTH;
-+
-+	memcpy_toio(buffer, skb->data, skb->len);
-+	mpnd->outbox.chan->mchan->mbox->ops->send_data(mpnd->outbox.chan->mchan,
-+						    NULL);
-+	spin_unlock_irqrestore(&mpnd->lock, flags);
-+
-+	dev_consume_skb_any(skb);
-+	return NETDEV_TX_OK;
-+}
-+
-+static const struct net_device_ops mctp_pcc_netdev_ops = {
-+	.ndo_start_xmit = mctp_pcc_tx,
-+};
-+
-+static const struct mctp_netdev_ops mctp_netdev_ops = {
-+	NULL
-+};
-+
-+static void mctp_pcc_setup(struct net_device *ndev)
-+{
-+	ndev->type = ARPHRD_MCTP;
-+	ndev->hard_header_len = 0;
-+	ndev->tx_queue_len = 0;
-+	ndev->flags = IFF_NOARP;
-+	ndev->netdev_ops = &mctp_pcc_netdev_ops;
-+	ndev->needs_free_netdev = true;
-+	ndev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
-+}
-+
-+struct mctp_pcc_lookup_context {
-+	int index;
-+	u32 inbox_index;
-+	u32 outbox_index;
-+};
-+
-+static acpi_status lookup_pcct_indices(struct acpi_resource *ares,
-+				       void *context)
-+{
-+	struct mctp_pcc_lookup_context *luc = context;
-+	struct acpi_resource_address32 *addr;
-+
-+	switch (ares->type) {
-+	case PCC_DWORD_TYPE:
-+		break;
-+	default:
-+		return AE_OK;
-+	}
-+
-+	addr = ACPI_CAST_PTR(struct acpi_resource_address32, &ares->data);
-+	switch (luc->index) {
-+	case 0:
-+		luc->outbox_index = addr[0].address.minimum;
-+		break;
-+	case 1:
-+		luc->inbox_index = addr[0].address.minimum;
-+		break;
-+	}
-+	luc->index++;
-+	return AE_OK;
-+}
-+
-+static void mctp_cleanup_netdev(void *data)
-+{
-+	struct net_device *ndev = data;
-+
-+	mctp_unregister_netdev(ndev);
-+}
-+
-+static void mctp_cleanup_channel(void *data)
-+{
-+	struct pcc_mbox_chan *chan = data;
-+
-+	pcc_mbox_free_channel(chan);
-+}
-+
-+static int mctp_pcc_initialize_mailbox(struct device *dev,
-+				       struct mctp_pcc_mailbox *box, u32 index)
-+{
-+	int ret;
-+
-+	box->index = index;
-+	box->chan = pcc_mbox_request_channel(&box->client, index);
-+	if (IS_ERR(box->chan))
-+		return PTR_ERR(box->chan);
-+	devm_add_action_or_reset(dev, mctp_cleanup_channel, box->chan);
-+	ret = pcc_mbox_ioremap(box->chan->mchan);
-+	if (ret)
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static int mctp_pcc_driver_add(struct acpi_device *acpi_dev)
-+{
-+	struct mctp_pcc_lookup_context context = {0, 0, 0};
-+	struct mctp_pcc_ndev *mctp_pcc_ndev;
-+	struct device *dev = &acpi_dev->dev;
-+	struct net_device *ndev;
-+	acpi_handle dev_handle;
-+	acpi_status status;
-+	int mctp_pcc_mtu;
-+	char name[32];
-+	int rc;
-+
-+	dev_dbg(dev, "Adding mctp_pcc device for HID %s\n",
-+		acpi_device_hid(acpi_dev));
-+	dev_handle = acpi_device_handle(acpi_dev);
-+	status = acpi_walk_resources(dev_handle, "_CRS", lookup_pcct_indices,
-+				     &context);
-+	if (!ACPI_SUCCESS(status)) {
-+		dev_err(dev, "FAILURE to lookup PCC indexes from CRS\n");
-+		return -EINVAL;
-+	}
-+
-+	//inbox initialization
-+	snprintf(name, sizeof(name), "mctpipcc%d", context.inbox_index);
-+	ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_ENUM,
-+			    mctp_pcc_setup);
-+	if (!ndev)
-+		return -ENOMEM;
-+
-+	mctp_pcc_ndev = netdev_priv(ndev);
-+	rc = devm_add_action_or_reset(dev, mctp_cleanup_netdev, ndev);
-+	if (rc)
-+		goto cleanup_netdev;
-+	spin_lock_init(&mctp_pcc_ndev->lock);
-+
-+	rc = mctp_pcc_initialize_mailbox(dev, &mctp_pcc_ndev->inbox,
-+					 context.inbox_index);
-+	if (rc)
-+		goto cleanup_netdev;
-+	mctp_pcc_ndev->inbox.client.rx_callback = mctp_pcc_client_rx_callback;
-+
-+	//outbox initialization
-+	rc = mctp_pcc_initialize_mailbox(dev, &mctp_pcc_ndev->outbox,
-+					 context.outbox_index);
-+	if (rc)
-+		goto cleanup_netdev;
-+
-+	mctp_pcc_ndev->acpi_device = acpi_dev;
-+	mctp_pcc_ndev->inbox.client.dev = dev;
-+	mctp_pcc_ndev->outbox.client.dev = dev;
-+	mctp_pcc_ndev->mdev.dev = ndev;
-+	acpi_dev->driver_data = mctp_pcc_ndev;
-+
-+	/* There is no clean way to pass the MTU to the callback function
-+	 * used for registration, so set the values ahead of time.
-+	 */
-+	mctp_pcc_mtu = mctp_pcc_ndev->outbox.chan->shmem_size -
-+		sizeof(struct mctp_pcc_hdr);
-+	ndev->mtu = MCTP_MIN_MTU;
-+	ndev->max_mtu = mctp_pcc_mtu;
-+	ndev->min_mtu = MCTP_MIN_MTU;
-+
-+	/* ndev needs to be freed before the iomemory (mapped above) gets
-+	 * unmapped,  devm resources get freed in reverse to the order they
-+	 * are added.
-+	 */
-+	rc = mctp_register_netdev(ndev, &mctp_netdev_ops, MCTP_PHYS_BINDING_PCC);
-+	return rc;
-+cleanup_netdev:
-+	free_netdev(ndev);
-+	return rc;
-+}
-+
-+static const struct acpi_device_id mctp_pcc_device_ids[] = {
-+	{ "DMT0001"},
-+	{}
-+};
-+
-+static struct acpi_driver mctp_pcc_driver = {
-+	.name = "mctp_pcc",
-+	.class = "Unknown",
-+	.ids = mctp_pcc_device_ids,
-+	.ops = {
-+		.add = mctp_pcc_driver_add,
-+	},
-+};
-+
-+module_acpi_driver(mctp_pcc_driver);
-+
-+MODULE_DEVICE_TABLE(acpi, mctp_pcc_device_ids);
-+
-+MODULE_DESCRIPTION("MCTP PCC ACPI device");
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Adam Young <admiyo@os.amperecomputing.com>");
--- 
-2.43.0
-
+     Arnd
 
