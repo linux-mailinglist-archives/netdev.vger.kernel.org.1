@@ -1,112 +1,135 @@
-Return-Path: <netdev+bounces-155137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4002BA0134A
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 09:35:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D1BA0134C
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 09:39:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 807A5188423A
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 08:35:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CDD93A4292
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 08:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61D614F108;
-	Sat,  4 Jan 2025 08:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EF514D29D;
+	Sat,  4 Jan 2025 08:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1r1SdLC0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WsBl0GFm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAEA1E507
-	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 08:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8E914A4C7
+	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 08:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735979731; cv=none; b=q4hVuwbxE+ANf68l3p3wGiLQM/P+UaQx3G6LG7lqCxGcDhk2fLKQWYXZQYGPrz+aAtj7slpOVh7Y0a2QgnChOcCRkQcNTwryDQGoQ7HYhk8/cLNHTe7DQd3r1JMAhcT3UuXT8GAGqPsDu0fZLVSVlYNIGDXxNe1n1UOV6tbHOT4=
+	t=1735979962; cv=none; b=SqFZddjSVQzycNLkJ57ZBOfkshoDTZaZ97+DrBZRcrRzG9lJAdqQXaL3eu4NXgCpQj26QAmLQCXVfpHTS166qAuWsxCElmWI67P9TlZIWijqcLFO+FUT0WE/bkG/ue2ZzZFDjiPczWfD2jEjlhoPTmerhIAyqbdyhkjO48CShJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735979731; c=relaxed/simple;
-	bh=mczWY6x/Br+sV6hHlfvuv/eTsFu4HIZUPq7fYqR3iss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=spQAJffEZVzES5IPNwY/E9bnWlN8OfwiSwZgnHi8n4M26pcSHIEDTaZeNxkQT1K5+MnbzkjvCXax3oH07dxoeJupuD0nC9KriWZ8CMRlMEqUgkIYe7Boun9k02+Jz0jpfPrSoTUrsnnFZuKrswEkfKM1fXt0Xzt6RowtrYEy+xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1r1SdLC0; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d84179ef26so19604236a12.3
-        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 00:35:26 -0800 (PST)
+	s=arc-20240116; t=1735979962; c=relaxed/simple;
+	bh=NXan8oxIYy/ZmaOV0exlIOxUNFHEgCAh9/q/86ZqEQU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o8Ly+l+TmKUY1/SVHk03pbz5c2jIVBfq31PWob2JxaEqnwNYjfMPYIV7K9LTPVdK356ZWANHizn5HCgDE09Vr6eT/HwNX1IJC2LRku1VKhFI6rP0UvaygeHY80nUZu+KVmj/y0PDD+2F5uQQyv+9lu+9P7wiIG07gt38OIpV81c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WsBl0GFm; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-71df1f45b0cso6332166a34.1
+        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 00:39:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735979725; x=1736584525; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mczWY6x/Br+sV6hHlfvuv/eTsFu4HIZUPq7fYqR3iss=;
-        b=1r1SdLC052c0doQbYdcsQlraQAgHAQEFMa8B3j947DPFJH6u3wyJzQPuLNftA0zivx
-         sVd2A8gWPhhW2tnz1xhLsJldw+/h0r2zpuK4soQIwNgcpN5crzRva9sA0+t/MpVieMtC
-         E7IMvyUJ3i6HoAxr5ozAEznayHuL/2OoAFKkSNKJbHUocu+nbcsqc7yYsJVpJ7WXdP4e
-         FeCKOl69cE4EY8+XLh2ic4paTulUB0pPj5yk4dync79WDX7mkVKzgnZpH7WaLjngiTHe
-         TUySqzzIjdw1k7C1O8XA6WglvrFKnGwjavbsX9op33//Ta+bs8nTLdO0vMaJ7hT8tQII
-         NqjQ==
+        d=gmail.com; s=20230601; t=1735979959; x=1736584759; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4ms578HFiFMJZleG0QpTq+Vnu+FBkWfD/5q38w3RYJo=;
+        b=WsBl0GFmezuasKVDQJFqtFr24RZnLxGiS6e7S52aHblPyk94mCNICA8NVtdjBI7mIn
+         szSNQAKv/t+rm+qoIqDbj/2wI6X3v4OZQvOt6rsNVtetr8fqUKkIg9vTOegbvfIwii1c
+         zE8yu6VSYHG/Nk9FkpaTQdpWogXIjNg/mIx9ewSxfR/FSV139wD34po0LC5AeL6bE2QT
+         3a7Tm+S6g71S1PIjXYcLlSTS3ERlarfPQpT8D/68cw0gP57uQ+z4yZAtlYsalj80T61I
+         pJvX/6bciXVoZm30fCuNrW78PVLjfBN/ByEMzjzUcSFHd42F53zovOYRT8WfoahvdPFr
+         epXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735979725; x=1736584525;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mczWY6x/Br+sV6hHlfvuv/eTsFu4HIZUPq7fYqR3iss=;
-        b=CWn82WWGNdEi8g3hAa6mxHpuOpCujRgrrxsK/deNGQbejwjPFsJyCtp8VOdFlYsAHM
-         gUzvlR25zqTY3F9Onn1osGieuqeV5xQB5bVN9WWcIwCWepw1dHGaK1LEDpbpJczvnErW
-         1PC5BtN39o53ItQc7BPI1eSruKtJ8ulxk8s8covJj+8lUEszxpLdGPgQO6z8QTlrbUIM
-         alN4mJ5GqdDxrSOvtJo1sP71O3uN63WYsX/lE5tLWKx/9hKKHYinz4j8WKTIrBahhhfb
-         GxlMqPnh8h4NLh7UBkdwpUlpwVEXNdhg2QYjGP7WOavsJfSyo27+rVPw2W8K07RSys5X
-         69Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCXglnMGNpEAVwS8N6GPXP+V9ZFi/O/bDSXjtzBCD05nzsnBA4n3TPn7nwfGbXq4SUudTjcWxzc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCXtNVZOFIMBw5bOLDNBTHmpMr9i2ZKjeBC6WrItQAS1REICfN
-	bPnHov7aznQLAndT0dNs6NIUTsuNDpon8ACp0gqzqEx6FbaAgMZEXOJjmXXYUflKZmuxcGNUPBB
-	Psli+OWuIZ0k0RrDQ7QPdqR7rXgaNxoe62iCzC8hlOjvWMF7WpA==
-X-Gm-Gg: ASbGncuehzW4I3DhDreegOgCEE+F3Sz99okxZFllPgfVf5euebDikShBiaKuXIdkVRD
-	sMoKRhdozktBHn133Uu3BSrvVj7aB6kgvRDvqBnQ=
-X-Google-Smtp-Source: AGHT+IH3McdPQkG4vDnAp/l2l13eLiYhYxXoyiiPzZ1cDQF019K74EkXrCU9/ELv+2r/5bf/84BYJoonDjrKot0x5qw=
-X-Received: by 2002:a05:6402:1e8e:b0:5d0:8359:7a49 with SMTP id
- 4fb4d7f45d1cf-5d81dc74098mr41036309a12.0.1735979725216; Sat, 04 Jan 2025
- 00:35:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1735979959; x=1736584759;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4ms578HFiFMJZleG0QpTq+Vnu+FBkWfD/5q38w3RYJo=;
+        b=OAPGmHiDCqw9YPQ61l1pFwyY2sWaE74BMFQ8RHr4Y2qddMAdW32Vk0cBGaSN+VUFys
+         O8Vo6TPqSWEiyz234IfkjCHiyxSG8M8PCo9nqP1yJa0Ji7lRTz9TeqFzmNdwl6xv1RfO
+         /I58tf9DgH39XGcqK54u9nZQkLUf7lPt8F2L557X/JsQF7p8t8fAHd/qWh23lILMeTaT
+         B+xDCPBGVRRVxiXM700DeolHFakSjbfVQRGPnpn8ME4mMXgxorGZl4pXbFzxv0OG1eFd
+         QbctDRLUefuiPAfEp8eIj7pmWZdzA0UGptONGAflAa4so7SrGaRHR2+t9LZGfdI/dEIh
+         5Fxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUaZ3sgxYDb+QShtR9Z/Kww6VTmtKBSY9S5NBgBK4FpyjJi2OFCBkV+0l8KGjH9kMBtXWCfIkA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZytNcPOpDRqK8u7tMrGDx/DBA1Hz3NRckYRM7Og5qsG2EJvZ+
+	q3wxl5VgucmRuXRudEx063CN7uSHdgmlGfSSHH5ONkgSnlg3eWk=
+X-Gm-Gg: ASbGncv7h26swAU2CKLLHig5XoFEacHeP/ux2wfyVlsGx6euY4HypJATODCzjCAkcez
+	2/N/UksbiQv573U+7ncXJirjOtUdQxBeOb7MGXyeoq8TxQ2ZIEc87uJ5WACaXaSYy+WY0QkRQaU
+	jZVw+KrMf4QEyVg2B9wKP8WIXWjPqJmgUUzlsetpSeR5sWq7nDqLkUtDDBflCk1KyT43IXPddYE
+	vmD2GTmlt4bT+UD4jimiBnE6X7eOmw3HA5ZHMbF9oUel+MLg7N+CseeqFY=
+X-Google-Smtp-Source: AGHT+IE/5GwGUtvKwqDS7wa3/g82WNA44zDDcQRhUiRtgY4gcX9Y36mSnYtthXDEmg6XMg1KFXCvZQ==
+X-Received: by 2002:a05:6870:b28c:b0:29e:7629:1466 with SMTP id 586e51a60fabf-2a7d113f93amr29344927fac.7.1735979959636;
+        Sat, 04 Jan 2025 00:39:19 -0800 (PST)
+Received: from ted-dallas.. ([2001:19f0:6401:18f2:5400:4ff:fe20:62f])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2a7d77f0a69sm10305427fac.45.2025.01.04.00.39.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Jan 2025 00:39:19 -0800 (PST)
+From: Ted Chen <znscnchen@gmail.com>
+To: roopa@nvidia.com,
+	razor@blackwall.org
+Cc: bridge@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Ted Chen <znscnchen@gmail.com>
+Subject: [PATCH net-next v2] bridge: Make br_is_nd_neigh_msg() accept pointer to "const struct sk_buff"
+Date: Sat,  4 Jan 2025 16:38:46 +0800
+Message-Id: <20250104083846.71612-1-znscnchen@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250102171426.915276-1-dzq.aishenghu0@gmail.com> <CAL+tcoDoE27q4Wus_9rtQDqTezejZdNQ0V-9ynCoN0KZTiqg_g@mail.gmail.com>
-In-Reply-To: <CAL+tcoDoE27q4Wus_9rtQDqTezejZdNQ0V-9ynCoN0KZTiqg_g@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 4 Jan 2025 09:35:13 +0100
-Message-ID: <CANn89i+cr3+k4_Q9=xtQX3rhL34b+2UvqCCzm+wwAHXrxmgCSA@mail.gmail.com>
-Subject: Re: [PATCH] tcp/dccp: allow a connection when sk_max_ack_backlog is zero
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Zhongqiu Duan <dzq.aishenghu0@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jan 4, 2025 at 2:23=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> On Fri, Jan 3, 2025 at 1:14=E2=80=AFAM Zhongqiu Duan <dzq.aishenghu0@gmai=
-l.com> wrote:
-> >
-> > If the backlog of listen() is set to zero, sk_acceptq_is_full() allows
-> > one connection to be made, but inet_csk_reqsk_queue_is_full() does not.
-> > When the net.ipv4.tcp_syncookies is zero, inet_csk_reqsk_queue_is_full(=
-)
-> > will cause an immediate drop before the sk_acceptq_is_full() check in
-> > tcp_conn_request(), resulting in no connection can be made.
-> >
-> > This patch tries to keep consistent with 64a146513f8f ("[NET]: Revert
-> > incorrect accept queue backlog changes.").
-> >
-> > Link: https://lore.kernel.org/netdev/20250102080258.53858-1-kuniyu@amaz=
-on.com/
-> > Fixes: ef547f2ac16b ("tcp: remove max_qlen_log")
-> > Signed-off-by: Zhongqiu Duan <dzq.aishenghu0@gmail.com>
->
-> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+The skb_buff struct in br_is_nd_neigh_msg() is never modified. Mark it as
+const.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Ted Chen <znscnchen@gmail.com>
+---
+v2:
+- Rebased to net-next (Nicolay)
+- Wrapped commit message lines to be within 75 characters. (Nicolay)
+- Added net-next to patch subject. (Nicolay)
+
+v1:
+https://lore.kernel.org/all/20250103070900.70014-1-znscnchen@gmail.com
+---
+ net/bridge/br_arp_nd_proxy.c | 2 +-
+ net/bridge/br_private.h      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
+index c7869a286df4..115a23054a58 100644
+--- a/net/bridge/br_arp_nd_proxy.c
++++ b/net/bridge/br_arp_nd_proxy.c
+@@ -229,7 +229,7 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+ #endif
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
+-struct nd_msg *br_is_nd_neigh_msg(struct sk_buff *skb, struct nd_msg *msg)
++struct nd_msg *br_is_nd_neigh_msg(const struct sk_buff *skb, struct nd_msg *msg)
+ {
+ 	struct nd_msg *m;
+ 
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index 29d6ec45cf41..1054b8a88edc 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -2299,6 +2299,6 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+ 			      u16 vid, struct net_bridge_port *p);
+ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+ 		       u16 vid, struct net_bridge_port *p, struct nd_msg *msg);
+-struct nd_msg *br_is_nd_neigh_msg(struct sk_buff *skb, struct nd_msg *m);
++struct nd_msg *br_is_nd_neigh_msg(const struct sk_buff *skb, struct nd_msg *m);
+ bool br_is_neigh_suppress_enabled(const struct net_bridge_port *p, u16 vid);
+ #endif
+-- 
+2.39.2
+
 
