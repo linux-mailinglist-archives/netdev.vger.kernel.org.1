@@ -1,135 +1,140 @@
-Return-Path: <netdev+bounces-155138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D1BA0134C
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 09:39:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BC4A0135D
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 09:46:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CDD93A4292
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 08:39:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48135163E63
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 08:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EF514D29D;
-	Sat,  4 Jan 2025 08:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E470D165F1A;
+	Sat,  4 Jan 2025 08:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WsBl0GFm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DC3HcEGv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8E914A4C7
-	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 08:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1312170A15
+	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 08:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735979962; cv=none; b=SqFZddjSVQzycNLkJ57ZBOfkshoDTZaZ97+DrBZRcrRzG9lJAdqQXaL3eu4NXgCpQj26QAmLQCXVfpHTS166qAuWsxCElmWI67P9TlZIWijqcLFO+FUT0WE/bkG/ue2ZzZFDjiPczWfD2jEjlhoPTmerhIAyqbdyhkjO48CShJ8=
+	t=1735980373; cv=none; b=s4Ou7zLCDsB82TAkJJbpng0mpvUNG4cam1uc/JILbNqppt8C4+ntEKppFyNZ/D0YZPZP4sy9wSKJ0lT1nHoka0l/AejnQkG7XOu++8E47Lx3cqOs18neUwiuWk6mEGAxaSnGLNKPNjufw7qBdtVqhTlmwIf6RiA97ceJh2+idFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735979962; c=relaxed/simple;
-	bh=NXan8oxIYy/ZmaOV0exlIOxUNFHEgCAh9/q/86ZqEQU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o8Ly+l+TmKUY1/SVHk03pbz5c2jIVBfq31PWob2JxaEqnwNYjfMPYIV7K9LTPVdK356ZWANHizn5HCgDE09Vr6eT/HwNX1IJC2LRku1VKhFI6rP0UvaygeHY80nUZu+KVmj/y0PDD+2F5uQQyv+9lu+9P7wiIG07gt38OIpV81c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WsBl0GFm; arc=none smtp.client-ip=209.85.210.41
+	s=arc-20240116; t=1735980373; c=relaxed/simple;
+	bh=rXjsdc+U0xRvMvZ3QLwKQ9eNTcQFSgkNHad92O7Eevw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bq7MxEsjcsYmJgHxfjp5pShJq7Lpu9Y9/y79WXATl8FMDJOtBgYFJHExhxOXrVDA0rSxfhJA+aYP7txLuFEen4k1+Th1tAcOIyWjZhBOI2DcrSj5ZF0HM5rfhCL+lile9zjCR+T3xqLe6UbWusTNrAevMjCY64XNhAFa8eWc1wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DC3HcEGv; arc=none smtp.client-ip=209.85.167.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-71df1f45b0cso6332166a34.1
-        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 00:39:20 -0800 (PST)
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3eb3c143727so7050275b6e.1
+        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 00:46:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735979959; x=1736584759; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ms578HFiFMJZleG0QpTq+Vnu+FBkWfD/5q38w3RYJo=;
-        b=WsBl0GFmezuasKVDQJFqtFr24RZnLxGiS6e7S52aHblPyk94mCNICA8NVtdjBI7mIn
-         szSNQAKv/t+rm+qoIqDbj/2wI6X3v4OZQvOt6rsNVtetr8fqUKkIg9vTOegbvfIwii1c
-         zE8yu6VSYHG/Nk9FkpaTQdpWogXIjNg/mIx9ewSxfR/FSV139wD34po0LC5AeL6bE2QT
-         3a7Tm+S6g71S1PIjXYcLlSTS3ERlarfPQpT8D/68cw0gP57uQ+z4yZAtlYsalj80T61I
-         pJvX/6bciXVoZm30fCuNrW78PVLjfBN/ByEMzjzUcSFHd42F53zovOYRT8WfoahvdPFr
-         epXw==
+        d=gmail.com; s=20230601; t=1735980368; x=1736585168; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wl+Ir+W4Tc150TI86Xl3owY10X0QmL5Q3ZTgg7AzqP8=;
+        b=DC3HcEGvxFGn6J9Jl14s/hETLXnpjZIlR3aq/ZWOkMkC6yBfBompVF8pdyYO7ZTuuL
+         6A+5nT5iPS7PUfEJAOn6+BAlidlwvdCexVSuhWnitkYh8POSebLKE4ExaFNzxhX5rjD+
+         TPCTS9iT39O1E8FDfboZlfJO503N5/f1c/MThpUQ2U/Ibe9hpAVTIY4NAempYIssaF5U
+         LOMMbwNjVUqpmM3yGtMwFMXoLJyqlWN9IebsrTlI+pEu5wD8XTLbUTbQbxP3ppYKDmW6
+         BjZJHpkd8CtJoqhDqWJARmKiqVA+pnUo+q+7xTL4KhwJvhv2oR2nPh5BDfz1G464A8uO
+         dcQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735979959; x=1736584759;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ms578HFiFMJZleG0QpTq+Vnu+FBkWfD/5q38w3RYJo=;
-        b=OAPGmHiDCqw9YPQ61l1pFwyY2sWaE74BMFQ8RHr4Y2qddMAdW32Vk0cBGaSN+VUFys
-         O8Vo6TPqSWEiyz234IfkjCHiyxSG8M8PCo9nqP1yJa0Ji7lRTz9TeqFzmNdwl6xv1RfO
-         /I58tf9DgH39XGcqK54u9nZQkLUf7lPt8F2L557X/JsQF7p8t8fAHd/qWh23lILMeTaT
-         B+xDCPBGVRRVxiXM700DeolHFakSjbfVQRGPnpn8ME4mMXgxorGZl4pXbFzxv0OG1eFd
-         QbctDRLUefuiPAfEp8eIj7pmWZdzA0UGptONGAflAa4so7SrGaRHR2+t9LZGfdI/dEIh
-         5Fxw==
-X-Forwarded-Encrypted: i=1; AJvYcCUaZ3sgxYDb+QShtR9Z/Kww6VTmtKBSY9S5NBgBK4FpyjJi2OFCBkV+0l8KGjH9kMBtXWCfIkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZytNcPOpDRqK8u7tMrGDx/DBA1Hz3NRckYRM7Og5qsG2EJvZ+
-	q3wxl5VgucmRuXRudEx063CN7uSHdgmlGfSSHH5ONkgSnlg3eWk=
-X-Gm-Gg: ASbGncv7h26swAU2CKLLHig5XoFEacHeP/ux2wfyVlsGx6euY4HypJATODCzjCAkcez
-	2/N/UksbiQv573U+7ncXJirjOtUdQxBeOb7MGXyeoq8TxQ2ZIEc87uJ5WACaXaSYy+WY0QkRQaU
-	jZVw+KrMf4QEyVg2B9wKP8WIXWjPqJmgUUzlsetpSeR5sWq7nDqLkUtDDBflCk1KyT43IXPddYE
-	vmD2GTmlt4bT+UD4jimiBnE6X7eOmw3HA5ZHMbF9oUel+MLg7N+CseeqFY=
-X-Google-Smtp-Source: AGHT+IE/5GwGUtvKwqDS7wa3/g82WNA44zDDcQRhUiRtgY4gcX9Y36mSnYtthXDEmg6XMg1KFXCvZQ==
-X-Received: by 2002:a05:6870:b28c:b0:29e:7629:1466 with SMTP id 586e51a60fabf-2a7d113f93amr29344927fac.7.1735979959636;
-        Sat, 04 Jan 2025 00:39:19 -0800 (PST)
-Received: from ted-dallas.. ([2001:19f0:6401:18f2:5400:4ff:fe20:62f])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2a7d77f0a69sm10305427fac.45.2025.01.04.00.39.18
+        d=1e100.net; s=20230601; t=1735980368; x=1736585168;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wl+Ir+W4Tc150TI86Xl3owY10X0QmL5Q3ZTgg7AzqP8=;
+        b=OQn14TK0yH7zpadPCtt3BgqnTGiJ0x3fanQ89FYwAKjfJeBt4N6n6xuzNODN6TRx2q
+         RiwFLFwSrrAyPR6m1LTdhNdUfRJqutW8/K8j9M0ZFmfH3FgjHaQw+shtN7FIlIi8zaXd
+         r3YyNtur8KixSaGmz7/qxyFH2VrMfAI+VRn+f7wLLLpx+wRIvpTZojl1QysjvTCf8I/H
+         gfndErZd8VXfLX2v2qmMKD07Y3LT2CX3sKj6QuRdHr4eKl6Ys/d3/+i+ybZLfnOy0jkK
+         4tK/R12fiXI0DPPhStWTGC49cCKNOqjO3VwYImFY/iyN1nTxA21mKc31pmcEZKBqFDMJ
+         0XCA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnA6TGnmSwBtWRJcJ3mt1qkvG2z2WVyXg8wF9IJ4avv0xvkIHvDBDsdQakbbcp7x4RGGI6b5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPwWAP82NSjW5N8t8+n0gYEjZ0dKPGlPZ9lJGEvAdKX3LXPauk
+	ldgWL8rw9dZhPWIsjmyzSuS7K/lFGhnwmdLyokWatDoQHtc/KdiwRKf4g6U=
+X-Gm-Gg: ASbGncum4p5CBD4p5/TdlINwed7hak8iMYm8y7TwUUcW0CyNgfAGnVrf7itZD80lhzP
+	qREfIf4ZU51Om1YcnPvgeYOWCe1BNjZCfr2yN/WumTuE6iZISZi9E9ke3/XZpSnOBcOn+X/7/oL
+	wmzt9YhB/Jc5Fc/ju7Au3kkmdjse/jhPx8R6cP/fnN8Qc5RqlZqtr3oD4CjEBFByIiFg1xVhiyJ
+	4K5yt3CatLVAukskW9243DIZXz4vZKnaoscHGD6N112YEPpHoZu1RE6
+X-Google-Smtp-Source: AGHT+IHSg75soj0PM2nULXoIjrLDnLFqZJlojY/MCnWC55e+vBBNVcMlwjwjjlKj84zfL1TUry7fFQ==
+X-Received: by 2002:a05:6808:138a:b0:3eb:615a:eccf with SMTP id 5614622812f47-3ed88f79fd7mr32551549b6e.10.1735980368187;
+        Sat, 04 Jan 2025 00:46:08 -0800 (PST)
+Received: from ted-dallas ([2001:19f0:6401:18f2:5400:4ff:fe20:62f])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3ece244e2b7sm8829599b6e.9.2025.01.04.00.46.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jan 2025 00:39:19 -0800 (PST)
+        Sat, 04 Jan 2025 00:46:07 -0800 (PST)
+Date: Sat, 4 Jan 2025 16:46:06 +0800
 From: Ted Chen <znscnchen@gmail.com>
-To: roopa@nvidia.com,
-	razor@blackwall.org
-Cc: bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Ted Chen <znscnchen@gmail.com>
-Subject: [PATCH net-next v2] bridge: Make br_is_nd_neigh_msg() accept pointer to "const struct sk_buff"
-Date: Sat,  4 Jan 2025 16:38:46 +0800
-Message-Id: <20250104083846.71612-1-znscnchen@gmail.com>
-X-Mailer: git-send-email 2.34.1
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: roopa@nvidia.com, bridge@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH] bridge: Make br_is_nd_neigh_msg() accept pointer to
+ "const struct sk_buff"
+Message-ID: <Z3j1Tp428cuIHUzs@ted-dallas>
+References: <20250103070900.70014-1-znscnchen@gmail.com>
+ <e7a27b5f-a4fc-4eaa-b215-d7a1bb7fc234@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e7a27b5f-a4fc-4eaa-b215-d7a1bb7fc234@blackwall.org>
 
-The skb_buff struct in br_is_nd_neigh_msg() is never modified. Mark it as
-const.
+On Fri, Jan 03, 2025 at 11:59:45AM +0200, Nikolay Aleksandrov wrote:
+> On 1/3/25 09:09, Ted Chen wrote:
+> > The skb_buff struct in br_is_nd_neigh_msg() is never modified. Mark it as const.
+> > 
+> > Signed-off-by: Ted Chen <znscnchen@gmail.com>
+> > ---
+> >  net/bridge/br_arp_nd_proxy.c | 2 +-
+> >  net/bridge/br_private.h      | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
+> > index c7869a286df4..115a23054a58 100644
+> > --- a/net/bridge/br_arp_nd_proxy.c
+> > +++ b/net/bridge/br_arp_nd_proxy.c
+> > @@ -229,7 +229,7 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+> >  #endif
+> >  
+> >  #if IS_ENABLED(CONFIG_IPV6)
+> > -struct nd_msg *br_is_nd_neigh_msg(struct sk_buff *skb, struct nd_msg *msg)
+> > +struct nd_msg *br_is_nd_neigh_msg(const struct sk_buff *skb, struct nd_msg *msg)
+> >  {
+> >  	struct nd_msg *m;
+> >  
+> > diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+> > index 9853cfbb9d14..3fe432babfdf 100644
+> > --- a/net/bridge/br_private.h
+> > +++ b/net/bridge/br_private.h
+> > @@ -2290,6 +2290,6 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+> >  			      u16 vid, struct net_bridge_port *p);
+> >  void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+> >  		       u16 vid, struct net_bridge_port *p, struct nd_msg *msg);
+> > -struct nd_msg *br_is_nd_neigh_msg(struct sk_buff *skb, struct nd_msg *m);
+> > +struct nd_msg *br_is_nd_neigh_msg(const struct sk_buff *skb, struct nd_msg *m);
+> >  bool br_is_neigh_suppress_enabled(const struct net_bridge_port *p, u16 vid);
+> >  #endif
+> 
+> Hi,
+> This should be targeted at net-next (subject should be PATCH net-next).
+> Also please try to keep commit message lines shorter, checkpatch flags
+> this one as over 75 characters. You should wait 24 hours before posting
+> v2 of the patch.
+> 
+> Other than that the patch is ok.
+> 
+Thank you for your kindly guidance!
+v2 is at: https://lore.kernel.org/all/20250104083846.71612-1-znscnchen@gmail.com
 
-Signed-off-by: Ted Chen <znscnchen@gmail.com>
----
-v2:
-- Rebased to net-next (Nicolay)
-- Wrapped commit message lines to be within 75 characters. (Nicolay)
-- Added net-next to patch subject. (Nicolay)
-
-v1:
-https://lore.kernel.org/all/20250103070900.70014-1-znscnchen@gmail.com
----
- net/bridge/br_arp_nd_proxy.c | 2 +-
- net/bridge/br_private.h      | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
-index c7869a286df4..115a23054a58 100644
---- a/net/bridge/br_arp_nd_proxy.c
-+++ b/net/bridge/br_arp_nd_proxy.c
-@@ -229,7 +229,7 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
- #endif
- 
- #if IS_ENABLED(CONFIG_IPV6)
--struct nd_msg *br_is_nd_neigh_msg(struct sk_buff *skb, struct nd_msg *msg)
-+struct nd_msg *br_is_nd_neigh_msg(const struct sk_buff *skb, struct nd_msg *msg)
- {
- 	struct nd_msg *m;
- 
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 29d6ec45cf41..1054b8a88edc 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -2299,6 +2299,6 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
- 			      u16 vid, struct net_bridge_port *p);
- void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
- 		       u16 vid, struct net_bridge_port *p, struct nd_msg *msg);
--struct nd_msg *br_is_nd_neigh_msg(struct sk_buff *skb, struct nd_msg *m);
-+struct nd_msg *br_is_nd_neigh_msg(const struct sk_buff *skb, struct nd_msg *m);
- bool br_is_neigh_suppress_enabled(const struct net_bridge_port *p, u16 vid);
- #endif
--- 
-2.39.2
-
+Ted
 
