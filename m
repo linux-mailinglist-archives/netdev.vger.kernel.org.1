@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-155205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D78F7A01729
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 23:29:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C71A0172B
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 23:30:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD6EE1630DA
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 22:29:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0158162E7C
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 22:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A021D79BE;
-	Sat,  4 Jan 2025 22:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4AAD1D88BF;
+	Sat,  4 Jan 2025 22:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VKXKMhEH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="h21cudQN"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1291D61BC;
-	Sat,  4 Jan 2025 22:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248231D63ED;
+	Sat,  4 Jan 2025 22:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736029734; cv=none; b=eaU1RvhW4sjCLFpW1we0O2CY7gT38lvR8G4URAdBlGRVED6ASiKYCB6fXyATyAtFTeLzaUxAhKbhHByA8YnyLI4Ewqs8MWVkytEddwwblktie8zHQFRnn0FNT16Yq6nec7s6JLL8k/XhKDTxAN8h9nq6fo9gbZpOap8lwPd+zH0=
+	t=1736029735; cv=none; b=J7G4dbeA8ZvHwMs/eMzfEOjlB6drm1Ohn3yCoBXQktyPgqmHubmFWbbz7aH0lu7szKW3g9J1gAWtpLTBy8y9HupTjnsr3C3wZzjOhhVoxH9mk6SJuPuwrDw60fYqX2Rsw8x3PhTtPjUp96FyZPRuMScMnkTur8XzAsZU9pClYwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736029734; c=relaxed/simple;
-	bh=ZNOJWzG45K3PkGpWZb3B1v809ET4LGuEapuaErb7AFI=;
+	s=arc-20240116; t=1736029735; c=relaxed/simple;
+	bh=WXwWa8GTjrbTlam82IoPDq1c9ryzrmVFyKCaT/qmZLM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cluTXzRDrfSkF2wir6TYkRG0Apvayh8W+CfOSmCjB6eXDxq5BAqjHbZGk4W24KLoqJAeq5uBeFqDHbuVQ+lEV4vVdndfGtLm9CGUEeyByJkGWrXRhGkEvWXv8Gx+Ay40hgGjcg4XjUKPwkx2/gslEdm9mTMIxipLdagZfMybWoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VKXKMhEH; arc=none smtp.client-ip=217.70.183.194
+	 In-Reply-To:To:Cc; b=rk0u7E7uBfROlYRVV7ZWoneJlsrRhmDkueHDW/OTl1iO3FCK11QU0q1mzktsDl0MVZQFzJyFRpLi1vNyBojpCj8aQyZN/y2MRhkyUESfZtdMliGVjSVTdFWyE8OeSE1mlIEyg9JSATqS1hz6jgM9uKcfdX7MTCCLMPQSOgcxXVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=h21cudQN; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8D3C440007;
-	Sat,  4 Jan 2025 22:28:49 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A905840008;
+	Sat,  4 Jan 2025 22:28:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736029730;
+	t=1736029731;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0Vn1YDTOSEvolzDDe1a94IM3ahhU/7Y1fvtCiu8SO9M=;
-	b=VKXKMhEHUfgegoIStA9yCnJTI+/h5gha9kbEJZzj+5IQTR1eelmC1t+/GOpJ58tld56aAj
-	eN7UYrpkVAxd6dNxaKgtnD20DOIGxAEepHTi+E1/HdK99er1aY7VJ1Dq4JojXsHM52tHck
-	wYtMKQHn5EBdYgDeW6RAGZp2C06BiFDVCCcvynbEbgeu0D/X6gKFaZn34fCtlPJNIKHWEW
-	QQdvPGL3P42/iqBXPWkUZ7yZDR1mTIui5ayuXno2eXKjBKq9wplsooufFM2tB8mvcBM+ZN
-	0bwjcptJ96hC+Yw8slc2at5q/9vRGdDQMc1C7OZhijmKRfvKjxi5GP1ZVE1Fog==
+	bh=0WcXunjLzXnWwlVeDb4DV4cyfRw8E90Ue5a4FKdwS5Q=;
+	b=h21cudQNslYj0oZFsudv501rCXDtbsjMIWiPluCJ1EMYNf52dk3EPtR9fVBXKJt5K01kpO
+	UxGfkh7J73u4DW4nfjL7Oc7zVJjf0/Pm7KI4F0ZltUd2Wawf4uxZ1Wl0ubpyjm5bpC6jX6
+	82uA046yZVNsI8fdZYPSr348U4jusEOwrtM2ptUn+7UtqHvUeSkG1/4DZmRociBb6yGuva
+	/mtXBLiUH8Y6TkIM+zTADRZcVk55C6x3GLmHT2bUU23O6QPrVNIsoXmY5wjoFVkKkOfrMO
+	2qzHAhoQN0QbprbeTKwzRW/lJkHgEBTIAUvAcfgjgDa5RF9bxrWM0rcygzDBtg==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Sat, 04 Jan 2025 23:27:29 +0100
-Subject: [PATCH net-next 04/14] net: pse-pd: tps23881: Simplify function
- returns by removing redundant checks
+Date: Sat, 04 Jan 2025 23:27:30 +0100
+Subject: [PATCH net-next 05/14] net: pse-pd: tps23881: Use helpers to
+ calculate bit offset for a channel
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250104-b4-feature_poe_arrange-v1-4-92f804bd74ed@bootlin.com>
+Message-Id: <20250104-b4-feature_poe_arrange-v1-5-92f804bd74ed@bootlin.com>
 References: <20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com>
 In-Reply-To: <20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -72,119 +72,197 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
  Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
  Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>
+ Kory Maincent <kory.maincent@bootlin.com>
 X-Mailer: b4 0.15-dev-8cb71
 X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Cleaned up several functions in tps23881 by removing redundant checks on
-return values at the end of functions. These check has been removed, and
-the return statement now directly returns the function result, reducing
-the code's complexity and making it more concise.
+This driver frequently follows a pattern where two registers are read or
+written in a single operation, followed by calculating the bit offset for
+a specific channel.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Introduce helpers to streamline this process and reduce code redundancy,
+making the codebase cleaner and more maintainable.
+
 Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Kyle Swenson <kyle.swenson@est.tech>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- drivers/net/pse-pd/tps23881.c | 34 ++++++----------------------------
- 1 file changed, 6 insertions(+), 28 deletions(-)
+ drivers/net/pse-pd/tps23881.c | 107 +++++++++++++++++++++++++++---------------
+ 1 file changed, 69 insertions(+), 38 deletions(-)
 
 diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-index 8797ca1a8a21..a3507520ff87 100644
+index a3507520ff87..4a75206b2de6 100644
 --- a/drivers/net/pse-pd/tps23881.c
 +++ b/drivers/net/pse-pd/tps23881.c
-@@ -59,7 +59,6 @@ static int tps23881_pi_enable(struct pse_controller_dev *pcdev, int id)
- 	struct i2c_client *client = priv->client;
- 	u8 chan;
- 	u16 val;
--	int ret;
+@@ -53,6 +53,55 @@ static struct tps23881_priv *to_tps23881_priv(struct pse_controller_dev *pcdev)
+ 	return container_of(pcdev, struct tps23881_priv, pcdev);
+ }
  
- 	if (id >= TPS23881_MAX_CHANS)
++/*
++ * Helper to extract a value from a u16 register value, which is made of two
++ * u8 registers. The function calculates the bit offset based on the channel
++ * and extracts the relevant bits using a provided field mask.
++ *
++ * @param reg_val: The u16 register value (composed of two u8 registers).
++ * @param chan: The channel number (0-7).
++ * @param field_offset: The base bit offset to apply (e.g., 0 or 4).
++ * @param field_mask: The mask to apply to extract the required bits.
++ * @return: The extracted value for the specific channel.
++ */
++static u16 tps23881_calc_val(u16 reg_val, u8 chan, u8 field_offset,
++			     u16 field_mask)
++{
++	if (chan >= 4)
++		reg_val >>= 8;
++
++	return (reg_val >> field_offset) & field_mask;
++}
++
++/*
++ * Helper to combine individual channel values into a u16 register value.
++ * The function sets the value for a specific channel in the appropriate
++ * position.
++ *
++ * @param reg_val: The current u16 register value.
++ * @param chan: The channel number (0-7).
++ * @param field_offset: The base bit offset to apply (e.g., 0 or 4).
++ * @param field_mask: The mask to apply for the field (e.g., 0x0F).
++ * @param field_val: The value to set for the specific channel (masked by
++ *                   field_mask).
++ * @return: The updated u16 register value with the channel value set.
++ */
++static u16 tps23881_set_val(u16 reg_val, u8 chan, u8 field_offset,
++			    u16 field_mask, u16 field_val)
++{
++	field_val &= field_mask;
++
++	if (chan < 4) {
++		reg_val &= ~(field_mask << field_offset);
++		reg_val |= (field_val << field_offset);
++	} else {
++		reg_val &= ~(field_mask << (field_offset + 8));
++		reg_val |= (field_val << (field_offset + 8));
++	}
++
++	return reg_val;
++}
++
+ static int tps23881_pi_enable(struct pse_controller_dev *pcdev, int id)
+ {
+ 	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
+@@ -64,17 +113,12 @@ static int tps23881_pi_enable(struct pse_controller_dev *pcdev, int id)
  		return -ERANGE;
-@@ -78,11 +77,7 @@ static int tps23881_pi_enable(struct pse_controller_dev *pcdev, int id)
- 			val |= BIT(chan + 4);
+ 
+ 	chan = priv->port[id].chan[0];
+-	if (chan < 4)
+-		val = BIT(chan);
+-	else
+-		val = BIT(chan + 4);
++	val = tps23881_set_val(0, chan, 0, BIT(chan % 4), BIT(chan % 4));
+ 
+ 	if (priv->port[id].is_4p) {
+ 		chan = priv->port[id].chan[1];
+-		if (chan < 4)
+-			val |= BIT(chan);
+-		else
+-			val |= BIT(chan + 4);
++		val = tps23881_set_val(val, chan, 0, BIT(chan % 4),
++				       BIT(chan % 4));
  	}
  
--	ret = i2c_smbus_write_word_data(client, TPS23881_REG_PW_EN, val);
--	if (ret)
--		return ret;
--
--	return 0;
-+	return i2c_smbus_write_word_data(client, TPS23881_REG_PW_EN, val);
- }
- 
- static int tps23881_pi_disable(struct pse_controller_dev *pcdev, int id)
-@@ -91,7 +86,6 @@ static int tps23881_pi_disable(struct pse_controller_dev *pcdev, int id)
- 	struct i2c_client *client = priv->client;
- 	u8 chan;
- 	u16 val;
--	int ret;
- 
- 	if (id >= TPS23881_MAX_CHANS)
+ 	return i2c_smbus_write_word_data(client, TPS23881_REG_PW_EN, val);
+@@ -91,17 +135,12 @@ static int tps23881_pi_disable(struct pse_controller_dev *pcdev, int id)
  		return -ERANGE;
-@@ -110,11 +104,7 @@ static int tps23881_pi_disable(struct pse_controller_dev *pcdev, int id)
- 			val |= BIT(chan + 8);
+ 
+ 	chan = priv->port[id].chan[0];
+-	if (chan < 4)
+-		val = BIT(chan + 4);
+-	else
+-		val = BIT(chan + 8);
++	val = tps23881_set_val(0, chan, 4, BIT(chan % 4), BIT(chan % 4));
+ 
+ 	if (priv->port[id].is_4p) {
+ 		chan = priv->port[id].chan[1];
+-		if (chan < 4)
+-			val |= BIT(chan + 4);
+-		else
+-			val |= BIT(chan + 8);
++		val = tps23881_set_val(val, chan, 4, BIT(chan % 4),
++				       BIT(chan % 4));
  	}
  
--	ret = i2c_smbus_write_word_data(client, TPS23881_REG_PW_EN, val);
--	if (ret)
--		return ret;
--
--	return 0;
-+	return i2c_smbus_write_word_data(client, TPS23881_REG_PW_EN, val);
- }
- 
- static int tps23881_pi_is_enabled(struct pse_controller_dev *pcdev, int id)
-@@ -480,7 +470,7 @@ tps23881_write_port_matrix(struct tps23881_priv *priv,
+ 	return i2c_smbus_write_word_data(client, TPS23881_REG_PW_EN, val);
+@@ -113,6 +152,7 @@ static int tps23881_pi_is_enabled(struct pse_controller_dev *pcdev, int id)
  	struct i2c_client *client = priv->client;
- 	u8 pi_id, lgcl_chan, hw_chan;
- 	u16 val = 0;
--	int i, ret;
-+	int i;
+ 	bool enabled;
+ 	u8 chan;
++	u16 val;
+ 	int ret;
  
- 	for (i = 0; i < port_cnt; i++) {
- 		pi_id = port_matrix[i].pi_id;
-@@ -511,11 +501,7 @@ tps23881_write_port_matrix(struct tps23881_priv *priv,
- 	}
- 
- 	/* Write hardware ports matrix */
--	ret = i2c_smbus_write_word_data(client, TPS23881_REG_PORT_MAP, val);
--	if (ret)
--		return ret;
--
--	return 0;
-+	return i2c_smbus_write_word_data(client, TPS23881_REG_PORT_MAP, val);
- }
- 
- static int
-@@ -564,11 +550,7 @@ tps23881_set_ports_conf(struct tps23881_priv *priv,
- 			val |= BIT(port_matrix[i].lgcl_chan[1]) |
- 			       BIT(port_matrix[i].lgcl_chan[1] + 4);
- 	}
--	ret = i2c_smbus_write_word_data(client, TPS23881_REG_DET_CLA_EN, val);
--	if (ret)
--		return ret;
--
--	return 0;
-+	return i2c_smbus_write_word_data(client, TPS23881_REG_DET_CLA_EN, val);
- }
- 
- static int
-@@ -594,11 +576,7 @@ tps23881_set_ports_matrix(struct tps23881_priv *priv,
- 	if (ret)
+ 	ret = i2c_smbus_read_word_data(client, TPS23881_REG_PW_STATUS);
+@@ -120,17 +160,13 @@ static int tps23881_pi_is_enabled(struct pse_controller_dev *pcdev, int id)
  		return ret;
  
--	ret = tps23881_set_ports_conf(priv, port_matrix);
--	if (ret)
--		return ret;
--
--	return 0;
-+	return tps23881_set_ports_conf(priv, port_matrix);
- }
+ 	chan = priv->port[id].chan[0];
+-	if (chan < 4)
+-		enabled = ret & BIT(chan);
+-	else
+-		enabled = ret & BIT(chan + 4);
++	val = tps23881_calc_val(ret, chan, 0, BIT(chan % 4));
++	enabled = !!(val);
  
- static int tps23881_setup_pi_matrix(struct pse_controller_dev *pcdev)
+ 	if (priv->port[id].is_4p) {
+ 		chan = priv->port[id].chan[1];
+-		if (chan < 4)
+-			enabled &= !!(ret & BIT(chan));
+-		else
+-			enabled &= !!(ret & BIT(chan + 4));
++		val = tps23881_calc_val(ret, chan, 0, BIT(chan % 4));
++		enabled &= !!(val);
+ 	}
+ 
+ 	/* Return enabled status only if both channel are on this state */
+@@ -146,6 +182,7 @@ static int tps23881_ethtool_get_status(struct pse_controller_dev *pcdev,
+ 	struct i2c_client *client = priv->client;
+ 	bool enabled, delivering;
+ 	u8 chan;
++	u16 val;
+ 	int ret;
+ 
+ 	ret = i2c_smbus_read_word_data(client, TPS23881_REG_PW_STATUS);
+@@ -153,23 +190,17 @@ static int tps23881_ethtool_get_status(struct pse_controller_dev *pcdev,
+ 		return ret;
+ 
+ 	chan = priv->port[id].chan[0];
+-	if (chan < 4) {
+-		enabled = ret & BIT(chan);
+-		delivering = ret & BIT(chan + 4);
+-	} else {
+-		enabled = ret & BIT(chan + 4);
+-		delivering = ret & BIT(chan + 8);
+-	}
++	val = tps23881_calc_val(ret, chan, 0, BIT(chan % 4));
++	enabled = !!(val);
++	val = tps23881_calc_val(ret, chan, 4, BIT(chan % 4));
++	delivering = !!(val);
+ 
+ 	if (priv->port[id].is_4p) {
+ 		chan = priv->port[id].chan[1];
+-		if (chan < 4) {
+-			enabled &= !!(ret & BIT(chan));
+-			delivering &= !!(ret & BIT(chan + 4));
+-		} else {
+-			enabled &= !!(ret & BIT(chan + 4));
+-			delivering &= !!(ret & BIT(chan + 8));
+-		}
++		val = tps23881_calc_val(ret, chan, 0, BIT(chan % 4));
++		enabled &= !!(val);
++		val = tps23881_calc_val(ret, chan, 4, BIT(chan % 4));
++		delivering &= !!(val);
+ 	}
+ 
+ 	/* Return delivering status only if both channel are on this state */
 
 -- 
 2.34.1
