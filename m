@@ -1,195 +1,98 @@
-Return-Path: <netdev+bounces-155132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B544A012D9
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 07:59:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D55A01342
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 09:17:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D627163E48
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 06:59:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A738B1884D26
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 08:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE501494AD;
-	Sat,  4 Jan 2025 06:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345A214A639;
+	Sat,  4 Jan 2025 08:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EwZg6T/j"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aoJiDAzo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AD2137742
-	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 06:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8155414A0A4
+	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 08:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735973980; cv=none; b=eat4kY/hVE+58ZuoZn7H0oSsb5jUFA5/wwp658fHKIoeJaetstrR35A4Iw4v0razdyuQvzTMwxmv3qrXAJuiIGyx3md1V1cYbdICIMi7oMegTNMXCQLYKD35fl5gjoEegdgEEKlyz+kpaoBjryTYGMHwLUtX0YYhr/UhE6PFZ5M=
+	t=1735978664; cv=none; b=HjZGITS2h/h7vXl/Tx2blvszR+LXSAK084HJEIJtpTY0neoh4I9FT5ccUJjUHJWVR4gA2i9oRyZHSolerx6k6mujZGh5dWV0ZTK7eYIM71cSM/00brZyIjjsAF/JnIFhEdelQEWs+Jm/DnwnkLIRsMo87sFedScCOGiuSoE/r20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735973980; c=relaxed/simple;
-	bh=k+udYg0sBqjczaPyHi0f3ORjOtLaRm7z4VPDloTPRq4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E5kbcQWi8Enj4JMj3BOC9BgOXb5vYLW8pKvNFd7vdhtvpiSU6BK6qZSj7NNL7a1BxvZl79m0g8ZR621CEl6ctSfdtllWx76lW7FfUNnyjmyG3PRlhcnSpvgThIdFrR4TD0RWZQ+smveelv+vPJYxIq6zU67WndVPdvux6+QbLpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EwZg6T/j; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1735978664; c=relaxed/simple;
+	bh=fJmy6+OdBKu96okZfe0z5Ep4NFQpHMt4wicWf/ty8M8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U0mhkGZZsV4JcCNldAH/br6zgpQcJ9n1xw1WBqa03mEiahVKy7a1ddIVKpHPdR+cyT//fSJ1moqwvH/OwH5dHxAXTX1EmDEsdQJdXxgiRCiRLx9JsNmjprqk0XZYn0liIhXef8pW6YU88Jbpx+nX1Syqwc+0/sGmC9YuJqeRxAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aoJiDAzo; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5d122cf8dd1so22266794a12.2
+        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 00:17:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1735973976; x=1767509976;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=w8IRhRXNKgF4H4yCZQqnEzlQLYIeQv+A6MVg9aj+5pM=;
-  b=EwZg6T/jhQJCbe9C4nBKgrt2kPeJ+xAGZnQBugVWTX9VMB32Lwl40888
-   oY9C0+13vhZa6EhGwu7xB26cZFimjySxzOkn/pGx7WeWUtRP3nrhX38qW
-   OcypSwebnbQT54dL3o2fN/XnTVMz5w3g2E2GvEGo6g2iZ5+JUtR+UFlk7
-   k=;
-X-IronPort-AV: E=Sophos;i="6.12,288,1728950400"; 
-   d="scan'208";a="451646892"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2025 06:59:32 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:58219]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.39.3:2525] with esmtp (Farcaster)
- id 66853eff-ffda-4b76-8d5b-58adf11c2c74; Sat, 4 Jan 2025 06:59:34 +0000 (UTC)
-X-Farcaster-Flow-ID: 66853eff-ffda-4b76-8d5b-58adf11c2c74
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Sat, 4 Jan 2025 06:59:33 +0000
-Received: from 6c7e67c6786f.amazon.com (10.119.9.250) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Sat, 4 Jan 2025 06:59:28 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net-next] ax25: rcu protect dev->ax25_ptr
-Date: Sat, 4 Jan 2025 15:59:11 +0900
-Message-ID: <20250104065911.39876-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250103210514.87290-1-edumazet@google.com>
-References: <20250103210514.87290-1-edumazet@google.com>
+        d=google.com; s=20230601; t=1735978661; x=1736583461; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fJmy6+OdBKu96okZfe0z5Ep4NFQpHMt4wicWf/ty8M8=;
+        b=aoJiDAzosEPNQlL5hu9OKY5s2Ed4rIfuCoaeVucChwOs1XZUZMmM9D4Oz+ZZPugU9i
+         wnYq2aVrmLTEtztuG6rxYyEBbOL2TH/tP/o8/kYBeHS8MUUlWYJXfyGcU/iNnLHzejfb
+         rsCdatq7yZNMIVoJ+UUFnVWrP1hFEnDOAHcGWBxBC8FlkCv3KMUZdkY6F1Ns4xoLvf0M
+         RTCG2XqZdPugRgk9JiVDyP46PYxRsPGcTXeKCtHYXEvX7KIH1BRVasHOcM4gV0zv4/tO
+         JlTTjVDpBJaszO65JUXz5ZZ79QoeD0t8A0pDkmmhktv4/V0ro5FHktZ0Vchx/8bBRNoZ
+         MWGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735978661; x=1736583461;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fJmy6+OdBKu96okZfe0z5Ep4NFQpHMt4wicWf/ty8M8=;
+        b=MqYMpjxVU8nrRijPmn2l1D/umn0LmtehNV/6wmhoEwYAJXN6v5MOrUd2qlz2qb6nDX
+         EpElxzao9935mLefJm8S5vE6XytrI7UsxLHYY3NKHdIzglfnIU9Iqcl3tCqpZOPt50RI
+         vsiWr8aEda0Ko9+SsFx7+zktSY1Vk6H3vdhhv0bvEO6HttuX+RcDnHIU2mv/e/QNHi93
+         fFj0f6SqRnJ1YsIvDq0pYsqUfN/RG22aF4CJsILqQQJmmDjdJcq45+An4RoJXasmhmia
+         lYZFhGEj2L/S8qioVJFEevKY3MYRsEcCVfZHF1IW57KeAVvOoA78vJmHzP5dWIPXbc3F
+         7k0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWXQHMor48wwMebHgsln482cYZxl0Gy/PNYluPXVhXGwEGZJ+cW9bn/H/6emHaJI2E8sGUtM9A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4D/KYW80Iyyv5qqtclnu3zBFmJ3gms7OH42xrWsUjPZyUI5KT
+	gJZpVhtsTuzCmDZZhFONLcq56aBym55kjE2SPFJoYBQTqIriZm80R9AGgDcYRjPJXjSIp6U5zYv
+	1r15gk6qGxevmyIP9qOCPG2w6iKkOHxXHl4E4
+X-Gm-Gg: ASbGnct8Nz2/r2vMUfkAPXCklk+4i0GXlUNm5bV3reWo+qm7XHCPVZMWuAyk0rGrgtP
+	CL5IqegsK9m7+MqW5BjDU6Crh3/WQk0f+Fwd1yvc=
+X-Google-Smtp-Source: AGHT+IGpmpQqsqR7A4GGxVGhIsME6ZZimyk4Sy1FCbPhmv5tVTAoXcH/eOrWdGCfxxyutW4sCGaNNyhy9re2Hiar1FA=
+X-Received: by 2002:a05:6402:2809:b0:5d1:2677:b047 with SMTP id
+ 4fb4d7f45d1cf-5d81de2dc3emr54185575a12.28.1735978660250; Sat, 04 Jan 2025
+ 00:17:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWB003.ant.amazon.com (10.13.139.168) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-
+References: <20250103210514.87290-1-edumazet@google.com> <20250104065911.39876-1-kuniyu@amazon.com>
+In-Reply-To: <20250104065911.39876-1-kuniyu@amazon.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri,  3 Jan 2025 21:05:14 +0000
-> syzbot found a lockdep issue [1].
-> 
-> We should remove ax25 RTNL dependency in ax25_setsockopt()
-> 
-> This should also fix a variety of possible UAF in ax25.
-> 
-> [1]
-> 
-> WARNING: possible circular locking dependency detected
-> 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0 Not tainted
-> ------------------------------------------------------
-> syz.5.1818/12806 is trying to acquire lock:
->  ffffffff8fcb3988 (rtnl_mutex){+.+.}-{4:4}, at: ax25_setsockopt+0xa55/0xe90 net/ax25/af_ax25.c:680
-> 
-> but task is already holding lock:
->  ffff8880617ac258 (sk_lock-AF_AX25){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1618 [inline]
->  ffff8880617ac258 (sk_lock-AF_AX25){+.+.}-{0:0}, at: ax25_setsockopt+0x209/0xe90 net/ax25/af_ax25.c:574
-> 
-> which lock already depends on the new lock.
-> 
-> the existing dependency chain (in reverse order) is:
-> 
-> -> #1 (sk_lock-AF_AX25){+.+.}-{0:0}:
->         lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
->         lock_sock_nested+0x48/0x100 net/core/sock.c:3642
->         lock_sock include/net/sock.h:1618 [inline]
->         ax25_kill_by_device net/ax25/af_ax25.c:101 [inline]
->         ax25_device_event+0x24d/0x580 net/ax25/af_ax25.c:146
->         notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
->        __dev_notify_flags+0x207/0x400
->         dev_change_flags+0xf0/0x1a0 net/core/dev.c:9026
->         dev_ifsioc+0x7c8/0xe70 net/core/dev_ioctl.c:563
->         dev_ioctl+0x719/0x1340 net/core/dev_ioctl.c:820
->         sock_do_ioctl+0x240/0x460 net/socket.c:1234
->         sock_ioctl+0x626/0x8e0 net/socket.c:1339
->         vfs_ioctl fs/ioctl.c:51 [inline]
->         __do_sys_ioctl fs/ioctl.c:906 [inline]
->         __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
->         do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->         do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #0 (rtnl_mutex){+.+.}-{4:4}:
->         check_prev_add kernel/locking/lockdep.c:3161 [inline]
->         check_prevs_add kernel/locking/lockdep.c:3280 [inline]
->         validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
->         __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
->         lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
->         __mutex_lock_common kernel/locking/mutex.c:585 [inline]
->         __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
->         ax25_setsockopt+0xa55/0xe90 net/ax25/af_ax25.c:680
->         do_sock_setsockopt+0x3af/0x720 net/socket.c:2324
->         __sys_setsockopt net/socket.c:2349 [inline]
->         __do_sys_setsockopt net/socket.c:2355 [inline]
->         __se_sys_setsockopt net/socket.c:2352 [inline]
->         __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2352
->         do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->         do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> other info that might help us debug this:
-> 
->  Possible unsafe locking scenario:
-> 
->        CPU0                    CPU1
->        ----                    ----
->   lock(sk_lock-AF_AX25);
->                                lock(rtnl_mutex);
->                                lock(sk_lock-AF_AX25);
->   lock(rtnl_mutex);
-> 
->  *** DEADLOCK ***
-> 
-> 1 lock held by syz.5.1818/12806:
->   #0: ffff8880617ac258 (sk_lock-AF_AX25){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1618 [inline]
->   #0: ffff8880617ac258 (sk_lock-AF_AX25){+.+.}-{0:0}, at: ax25_setsockopt+0x209/0xe90 net/ax25/af_ax25.c:574
-> 
-> stack backtrace:
-> CPU: 1 UID: 0 PID: 12806 Comm: syz.5.1818 Not tainted 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-> Call Trace:
->  <TASK>
->   __dump_stack lib/dump_stack.c:94 [inline]
->   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
->   print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
->   check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
->   check_prev_add kernel/locking/lockdep.c:3161 [inline]
->   check_prevs_add kernel/locking/lockdep.c:3280 [inline]
->   validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
->   __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
->   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
->   __mutex_lock_common kernel/locking/mutex.c:585 [inline]
->   __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
->   ax25_setsockopt+0xa55/0xe90 net/ax25/af_ax25.c:680
->   do_sock_setsockopt+0x3af/0x720 net/socket.c:2324
->   __sys_setsockopt net/socket.c:2349 [inline]
->   __do_sys_setsockopt net/socket.c:2355 [inline]
->   __se_sys_setsockopt net/socket.c:2352 [inline]
->   __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2352
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f7b62385d29
-> 
-> Fixes: c433570458e4 ("ax25: fix a use-after-free in ax25_fillin_cb()")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+Date: Sat, 4 Jan 2025 09:17:29 +0100
+Message-ID: <CANn89i+tdqN-e7pQRy0p8VWz5oiyThRMZ=ik4y86UmeX+sXTJQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] ax25: rcu protect dev->ax25_ptr
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Not sure if net-next is intentional, but whichever is fine to me :)
+On Sat, Jan 4, 2025 at 7:59=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Not sure if net-next is intentional, but whichever is fine to me :)
+
+This was intentional, it will reach stable trees soon enough.
+
+>
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
