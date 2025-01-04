@@ -1,83 +1,99 @@
-Return-Path: <netdev+bounces-155181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A22E7A015FB
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 17:48:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCE12A01607
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 18:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 840DC163781
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 16:48:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8F1316377B
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 17:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B741BC3F;
-	Sat,  4 Jan 2025 16:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796751C5F0D;
+	Sat,  4 Jan 2025 17:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPWy/0MJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="POtR+4Ov"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8041C01;
-	Sat,  4 Jan 2025 16:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A461CCB4B;
+	Sat,  4 Jan 2025 17:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736009328; cv=none; b=NrgVlhmZyrbUrQQudWFBgoQ92TPXo3LD3oriQKGtNHj2e31NSb2xLog5mbcbxtCONfcUxZg48tMmq4nn0iLa0ndc3SAtXKSesRYEWkSCwTFfXvwlVrgijsRqNK2Z0R7GmILBVrHqT0yqmqjKkaY8KSAcGiN4it8usqOtvRhGcNE=
+	t=1736010012; cv=none; b=mypQl0V9ITOg7yQ3gSLLuzpkSCbqPnvGLwYz77yFIu2E6tdxmHyrzbSRezyaB4aOnSV5kweR3ztYXi4m4eDfwA2ZWv7qvrNFuK/1q5m2ExUKc90PnA3jE7VCb9oc47WRv5dbW0tI8d/X3o3PoLX8Nt4/FiDhOQ+RyGu3pe361F0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736009328; c=relaxed/simple;
-	bh=YG+HE+5SUJVdKAF7re/W7k+jrto776dXKEVx3Cj8bRA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GrLDJpK74OxDUNZyeCLaFpq12tLyuOM/I+A8BiiZ6ajyyEvXebATTgLGSNF15b0/57H6iyLtzO9VV80UYto4TRTWgG3GgwjDjcynKFRrBNFC0KOX3ZEFQ48tEQR9CWa+dafpMMgTDl8eIthb0PqLx7n9zLfEvWJN2AmMPCBLPsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPWy/0MJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29C8FC4CED1;
-	Sat,  4 Jan 2025 16:48:47 +0000 (UTC)
+	s=arc-20240116; t=1736010012; c=relaxed/simple;
+	bh=bPraCC+bgEAm/jheHxfJI082nXX0861z1zf4a7pt3Pg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NOO9sjkCNJapQxPdy+o3fuaD277jDsOu1vVEMzzXXJGFQkFOKIuU7pRIy2/M+fNct99wP20+QPzcJfSONDWixLnJnmvzjPSGhOyBYJIcu1t2rxbxnzopQTaDGTX8GcepAFLdLKYPMLMjjJejZy7ZzIs5wYOKvA9VRtQ/L1aUhPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=POtR+4Ov; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5471C4CED1;
+	Sat,  4 Jan 2025 17:00:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736009327;
-	bh=YG+HE+5SUJVdKAF7re/W7k+jrto776dXKEVx3Cj8bRA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TPWy/0MJe6+B3FgMTxhEiyVrx/ncE/Ccg8XMNGrX+ghe9SR1+JJ952RhajJzgbBag
-	 sZydyJ1J0CIZQ3hT7G//aTA4j7PeQPXtCvFLuiQIk4krVWpKpyl5Lsj5MyvvMkgFBb
-	 s3Xxq1jv7VrbomsXnZPDW6JK47EH0BcZqrIN/8o1DyTEr9fUcrkAYJMflul/8a9thc
-	 IzYwcijeEBKiOV2F0DmUbI9GmlrrmzmfSO8PkM03fET0EGyidqLCIf2kl0wWbKjgSJ
-	 3rKv4j8veu2UIoYxj6xL1PlrxCjPT84ZmR/4y0y5KY9EW3RElNWNOKBCyOPGnVL60G
-	 LP8jupbZqhlxg==
-Date: Sat, 4 Jan 2025 08:48:46 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc: M Chetan Kumar <m.chetan.kumar@intel.com>, Loic Poulain
- <loic.poulain@linaro.org>, Sergey Ryazanov <ryazanov.s.a@gmail.com>,
- Johannes Berg <johannes@sipsolutions.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: wwan: iosm: Fix hibernation by re-binding the
- driver around it
-Message-ID: <20250104084846.300455d4@kernel.org>
-In-Reply-To: <ea5c805559e842077734a6c7695dd60467c1ef12.1735490770.git.mail@maciej.szmigiero.name>
-References: <8b19125a825f9dcdd81c667c1e5c48ba28d505a6.1735490770.git.mail@maciej.szmigiero.name>
-	<ea5c805559e842077734a6c7695dd60467c1ef12.1735490770.git.mail@maciej.szmigiero.name>
+	s=k20201202; t=1736010011;
+	bh=bPraCC+bgEAm/jheHxfJI082nXX0861z1zf4a7pt3Pg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=POtR+4Ovx+acmwN715Nw57kdG68NjIeMHrsyjoIhbtz6n5Zq8cYelghErDvh22ewT
+	 +59IkPlKz58lHlfYfmLvwoSGI90DFt3IUmb4a+3u3l54Jle7O/ThZ7zRapthTt7Bcv
+	 WfQ4DSOejjZQTlVNMGQtmLo/Eud1K/WxcMpmCq/sV/QPcG3p5MEftXQG4R7OSAu2af
+	 HN8vHPRVYeEaYwDlXa/oz6jiAOJhOXraFyyEKmf0ezaQOgPsH/16aGAkQ7FQHiDaov
+	 K6+yPXH+Ksax4qqR2PO3/guGPzMXTY3qTQWeRVOZhpYe3NM+EVWk/3aCVO0T8RlAai
+	 SCnrml3FUHx/w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF28380A96F;
+	Sat,  4 Jan 2025 17:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: tc-testing: reduce rshift value
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173601003258.2470506.15418875241946232841.git-patchwork-notify@kernel.org>
+Date: Sat, 04 Jan 2025 17:00:32 +0000
+References: <20250103182458.1213486-1-kuba@kernel.org>
+In-Reply-To: <20250103182458.1213486-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: edumazet@google.com, netdev@vger.kernel.org, davem@davemloft.net,
+ pabeni@redhat.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, shuah@kernel.org, karansanghvi98@gmail.com,
+ linux-kselftest@vger.kernel.org
 
-On Sun, 29 Dec 2024 17:46:59 +0100 Maciej S. Szmigiero wrote:
-> +	if (pci_registered)
-> +		pci_unregister_driver(&iosm_ipc_driver);
-> +
-> +	unregister_pm_notifier(&pm_notifier);
+Hello:
 
-The ordering here should be inverted so that you're sure notifier can't
-run in parallel.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-But I think the notifier is an overkill, there's gotta be an op that
-runs. pci_driver::shutdown ? dev_pm_ops::freeze / thaw ?
+On Fri,  3 Jan 2025 10:24:58 -0800 you wrote:
+> After previous change rshift >= 32 is no longer allowed.
+> Modify the test to use 31, the test doesn't seem to send
+> any traffic so the exact value shouldn't matter.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: jhs@mojatatu.com
+> CC: xiyou.wangcong@gmail.com
+> CC: jiri@resnulli.us
+> CC: shuah@kernel.org
+> CC: karansanghvi98@gmail.com
+> CC: linux-kselftest@vger.kernel.org
+> 
+> [...]
 
-If you repost please make sure to CC the PCI list, folks there will
-know how hibernation is supposed to be handled for sure. Note that
-patch 1 is already in Linus's tree so repost just patch 2.
+Here is the summary with links:
+  - [net] selftests: tc-testing: reduce rshift value
+    https://git.kernel.org/netdev/net/c/e95274dfe864
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
