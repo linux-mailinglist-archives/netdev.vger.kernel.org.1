@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-155192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37FBA01682
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 20:12:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28532A01684
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 20:12:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7C02163232
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 19:12:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFF8E7A1347
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 19:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7C41CD21C;
-	Sat,  4 Jan 2025 19:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13FF1D5CE7;
+	Sat,  4 Jan 2025 19:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LoLr2n48"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pAugcU2E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13E31BC3F;
-	Sat,  4 Jan 2025 19:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B464E1BC3F;
+	Sat,  4 Jan 2025 19:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736017929; cv=none; b=H8ZeOjPhf+1GcMySrj0VAUNkaEQlgkOQnkrog5gSgKTWHio0KaUPU3cTGOKFs10iGxrfpl+faugutVw8bUkPC5cG+OeDHzgFAPEzEDfvJ4UTO73ZJhGgo20hMXs3lzPWi1tDhZcrBQqqup1Rwvue6Zs0yDzQBPBqd2aMql2ZYLE=
+	t=1736017933; cv=none; b=AwXHi3NLeEcTBnpuAl0KmVy1FRImone1ZZqLQcroqdOQ7zzrEJ7D43R4aI//TQE9m9dsvt0trW4MN/eqH12NmvBmqiv1XadSA9VP8YTmJafuIJ4W1pwr0UlvrMr2C225pJLxKLXEGPS2LyPsnwn0Hl5RZqXriDcKetqjTCMvP2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736017929; c=relaxed/simple;
-	bh=rbX9EVSPSbD8hn2BPSCYBBPQHpXdNSPv81XLu4fO4qQ=;
+	s=arc-20240116; t=1736017933; c=relaxed/simple;
+	bh=G12AAJbTUQuK0i7GcwN3nHo4gA75DHLBsTZ4FAswhs4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JnR9G2t8F+Bkw47K/PhhF9AtWEjPeC8tokPbs7tLR4dYqttf5qrhPH0LkqxcL16OUOpE994dms+pNQ4p7mjkn0Ty9ep5u4Ce35EekK9fjfxBT3f6+XWiFbpHNtl0PJvlBOLWT+56jUOcECYnC5oJNq0QMzyCl3CH+NhJXTtjM9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LoLr2n48; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED166C4CED1;
-	Sat,  4 Jan 2025 19:12:04 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=trRwrbtOKL6qliDTLhCik6HnPL0DjCdUfk8mDEB09PBQjH6A/qrNz58+Nzd3StcuX4VvO0IW2ZQAlRibYJMyXxTLLY2aAHz2mgKqDxh+ZcArmHf8vLdyT3JemmfPgKVGj+7TLyH8j5V4DzhL/m6Tf28nP/Ez1pd8+M0rxMZHo5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pAugcU2E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE0E0C4CEDE;
+	Sat,  4 Jan 2025 19:12:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736017928;
-	bh=rbX9EVSPSbD8hn2BPSCYBBPQHpXdNSPv81XLu4fO4qQ=;
+	s=k20201202; t=1736017933;
+	bh=G12AAJbTUQuK0i7GcwN3nHo4gA75DHLBsTZ4FAswhs4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LoLr2n48Kp9x4wGIPy/fCOzZcyfSXKtp4+15hkEPNQ5FJ9SWfa7nChHtFgel1SeOm
-	 VS3zsRcmwAohD0XKYgVC8XIPsfZsW97X5PZxd+Wk/WlMgVHhj8oCPYRq1H1gVNDQP8
-	 mLX7/0I0i4uryuL4rg5BxokONSWo760PGja16AhExJpTIS727E5D2AKpMTjnZbvTou
-	 6Mq68R5uoSoXR2ti8XNYDLzuwP17souZyA1VaP+b0IHtYexIvrmWwg05wyuzpB40Lr
-	 BLtzy0eQ2Y0UB+IFMldJixtrCd678xpe2MgGb5mNGT7l2sFhUrIsmW9HlhSO4NC5GP
-	 cLi2hq8HNJWKg==
-Message-ID: <89c2208c-fe23-43eb-89ef-876e55731a50@kernel.org>
-Date: Sat, 4 Jan 2025 20:11:49 +0100
+	b=pAugcU2Eo963MGiM5mjx6gh4mayup8diNcOjJ3cfyOKx2vBXQkfafZoPW0o4fRAh3
+	 J5VK18ltVSjrSRI45YVj3Ufp2szPfghe2LnrH6z2ykKhiP8GGrudI8ukWvvwkN8xS1
+	 mBI2eOwrUD6p+SFUKtQ/gqVyUvefjYkAccEkKh8huxDP4ZTChcVSi+gktfPxHbmvm8
+	 5unHEPdOjlmnW0ItEIKVn3HOQugIwkSpg0taAPTPpPYipO3KeGNemBWpD1qxnu1Z2g
+	 YRGxjxaiVrf6b2gCIV9ToR5jy8QoX0Bp25UO9+RXwEax0OHkyfLgA9qItT6yYhv75n
+	 +iOLbXj3yIDoQ==
+Message-ID: <7927eae8-4d26-4340-852a-b93fcf1eba89@kernel.org>
+Date: Sat, 4 Jan 2025 20:11:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,17 +52,17 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
 Subject: Re: [syzbot] [mptcp?] general protection fault in proc_scheduler
 Content-Language: en-GB
-To: Al Viro <viro@zeniv.linux.org.uk>, Eric Dumazet <edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
 Cc: davem@davemloft.net, geliang@kernel.org, horms@kernel.org,
  kuba@kernel.org, linux-kernel@vger.kernel.org, martineau@kernel.org,
  mptcp@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com,
  syzkaller-bugs@googlegroups.com,
- syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>
+ syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>,
+ Al Viro <viro@zeniv.linux.org.uk>, Joel Granados <joel.granados@kernel.org>
 References: <67769ecb.050a0220.3a8527.003f.GAE@google.com>
  <CANn89iKVTgzr8kt2sScrfoSbBSGMtLLqEwmA+WFFYUfV-PS--w@mail.gmail.com>
  <cf187558-63d0-4375-8fb2-2cfa8bb8fa03@kernel.org>
  <CANn89iJEMGYt4YVdGkyb-q81TQU+UBOQaX7jH-2zOqv-4SjZGg@mail.gmail.com>
- <20250104190010.GF1977892@ZenIV>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -108,40 +108,185 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20250104190010.GF1977892@ZenIV>
+In-Reply-To: <CANn89iJEMGYt4YVdGkyb-q81TQU+UBOQaX7jH-2zOqv-4SjZGg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Al, Eric,
+Hi Eric,
 
-On 04/01/2025 20:00, Al Viro wrote:
-> On Sat, Jan 04, 2025 at 07:53:22PM +0100, Eric Dumazet wrote:
+(+cc Joel)
+
+Thank you for your reply!
+
+On 04/01/2025 19:53, Eric Dumazet wrote:
+> On Sat, Jan 4, 2025 at 7:38 PM Matthieu Baerts <matttbe@kernel.org> wrote:
+>>
+>> Hi Eric,
+>>
+>> Thank you for the bug report!
+>>
+>> On 02/01/2025 16:21, Eric Dumazet wrote:
+>>> On Thu, Jan 2, 2025 at 3:12 PM syzbot
+>>> <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com> wrote:
+>>>>
+>>>> Hello,
+>>>>
+>>>> syzbot found the following issue on:
+>>>>
+>>>> HEAD commit:    ccb98ccef0e5 Merge tag 'platform-drivers-x86-v6.13-4' of g..
+>>>> git tree:       upstream
+>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=128f6ac4580000
+>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=86dd15278dbfe19f
+>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=e364f774c6f57f2c86d1
+>>>> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1245eaf8580000
+>>>>
+>>>> Downloadable assets:
+>>>> disk image: https://storage.googleapis.com/syzbot-assets/d24eb225cff7/disk-ccb98cce.raw.xz
+>>>> vmlinux: https://storage.googleapis.com/syzbot-assets/dd81532f8240/vmlinux-ccb98cce.xz
+>>>> kernel image: https://storage.googleapis.com/syzbot-assets/18b08e4bbf40/bzImage-ccb98cce.xz
+>>>>
+>>>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>>>> Reported-by: syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com
+>>>>
+>>>> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000005: 0000 [#1] PREEMPT SMP KASAN PTI
+>>>> KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
+>>>> CPU: 1 UID: 0 PID: 5924 Comm: syz-executor Not tainted 6.13.0-rc5-syzkaller-00004-gccb98ccef0e5 #0
+>>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+>>>> RIP: 0010:proc_scheduler+0xc6/0x3c0 net/mptcp/ctrl.c:125
+>>>> Code: 03 42 80 3c 38 00 0f 85 fe 02 00 00 4d 8b a4 24 08 09 00 00 48 b8 00 00 00 00 00 fc ff df 49 8d 7c 24 28 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 cc 02 00 00 4d 8b 7c 24 28 48 8d 84 24 c8 00 00
+>>>> RSP: 0018:ffffc900034774e8 EFLAGS: 00010206
+>>>>
+>>>> RAX: dffffc0000000000 RBX: 1ffff9200068ee9e RCX: ffffc90003477620
+>>>> RDX: 0000000000000005 RSI: ffffffff8b08f91e RDI: 0000000000000028
+>>>> RBP: 0000000000000001 R08: ffffc90003477710 R09: 0000000000000040
+>>>> R10: 0000000000000040 R11: 00000000726f7475 R12: 0000000000000000
+>>>> R13: ffffc90003477620 R14: ffffc90003477710 R15: dffffc0000000000
+>>>> FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> CR2: 00007fee3cd452d8 CR3: 000000007d116000 CR4: 00000000003526f0
+>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>>> Call Trace:
+>>>>  <TASK>
+>>>>  proc_sys_call_handler+0x403/0x5d0 fs/proc/proc_sysctl.c:601
+>>>>  __kernel_write_iter+0x318/0xa80 fs/read_write.c:612
+>>>>  __kernel_write+0xf6/0x140 fs/read_write.c:632
+>>>>  do_acct_process+0xcb0/0x14a0 kernel/acct.c:539
+>>>>  acct_pin_kill+0x2d/0x100 kernel/acct.c:192
+>>>>  pin_kill+0x194/0x7c0 fs/fs_pin.c:44
+>>>>  mnt_pin_kill+0x61/0x1e0 fs/fs_pin.c:81
+>>>>  cleanup_mnt+0x3ac/0x450 fs/namespace.c:1366
+>>>>  task_work_run+0x14e/0x250 kernel/task_work.c:239
+>>>>  exit_task_work include/linux/task_work.h:43 [inline]
+>>>>  do_exit+0xad8/0x2d70 kernel/exit.c:938
+>>>>  do_group_exit+0xd3/0x2a0 kernel/exit.c:1087
+>>>>  get_signal+0x2576/0x2610 kernel/signal.c:3017
+>>>>  arch_do_signal_or_restart+0x90/0x7e0 arch/x86/kernel/signal.c:337
+>>>>  exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+>>>>  exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+>>>>  __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+>>>>  syscall_exit_to_user_mode+0x150/0x2a0 kernel/entry/common.c:218
+>>>>  do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
+>>>>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>>> RIP: 0033:0x7fee3cb87a6a
+>>>> Code: Unable to access opcode bytes at 0x7fee3cb87a40.
+>>>> RSP: 002b:00007fffcccac688 EFLAGS: 00000202 ORIG_RAX: 0000000000000037
+>>>> RAX: 0000000000000000 RBX: 00007fffcccac710 RCX: 00007fee3cb87a6a
+>>>> RDX: 0000000000000041 RSI: 0000000000000000 RDI: 0000000000000003
+>>>> RBP: 0000000000000003 R08: 00007fffcccac6ac R09: 00007fffcccacac7
+>>>> R10: 00007fffcccac710 R11: 0000000000000202 R12: 00007fee3cd49500
+>>>> R13: 00007fffcccac6ac R14: 0000000000000000 R15: 00007fee3cd4b000
+>>>>  </TASK>
+>>>> Modules linked in:
+>>>> ---[ end trace 0000000000000000 ]---
+>>>> RIP: 0010:proc_scheduler+0xc6/0x3c0 net/mptcp/ctrl.c:125
+>>>> Code: 03 42 80 3c 38 00 0f 85 fe 02 00 00 4d 8b a4 24 08 09 00 00 48 b8 00 00 00 00 00 fc ff df 49 8d 7c 24 28 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 cc 02 00 00 4d 8b 7c 24 28 48 8d 84 24 c8 00 00
+>>>> RSP: 0018:ffffc900034774e8 EFLAGS: 00010206
+>>>> RAX: dffffc0000000000 RBX: 1ffff9200068ee9e RCX: ffffc90003477620
+>>>> RDX: 0000000000000005 RSI: ffffffff8b08f91e RDI: 0000000000000028
+>>>> RBP: 0000000000000001 R08: ffffc90003477710 R09: 0000000000000040
+>>>> R10: 0000000000000040 R11: 00000000726f7475 R12: 0000000000000000
+>>>> R13: ffffc90003477620 R14: ffffc90003477710 R15: dffffc0000000000
+>>>> FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> CR2: 00007fee3cd452d8 CR3: 000000007d116000 CR4: 00000000003526f0
+>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>>> ----------------
+>>>> Code disassembly (best guess), 1 bytes skipped:
+>>>>    0:   42 80 3c 38 00          cmpb   $0x0,(%rax,%r15,1)
+>>>>    5:   0f 85 fe 02 00 00       jne    0x309
+>>>>    b:   4d 8b a4 24 08 09 00    mov    0x908(%r12),%r12
+>>>>   12:   00
+>>>>   13:   48 b8 00 00 00 00 00    movabs $0xdffffc0000000000,%rax
+>>>>   1a:   fc ff df
+>>>>   1d:   49 8d 7c 24 28          lea    0x28(%r12),%rdi
+>>>>   22:   48 89 fa                mov    %rdi,%rdx
+>>>>   25:   48 c1 ea 03             shr    $0x3,%rdx
+>>>> * 29:   80 3c 02 00             cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+>>>>   2d:   0f 85 cc 02 00 00       jne    0x2ff
+>>>>   33:   4d 8b 7c 24 28          mov    0x28(%r12),%r15
+>>>>   38:   48                      rex.W
+>>>>   39:   8d                      .byte 0x8d
+>>>>   3a:   84 24 c8                test   %ah,(%rax,%rcx,8)
+>>
+>> (...)
+>>
+>>> I thought acct(2) was only allowing regular files.
+>>>
+>>> acct_on() indeed has :
+>>>
+>>> if (!S_ISREG(file_inode(file)->i_mode)) {
+>>>     kfree(acct);
+>>>     filp_close(file, NULL);
+>>>     return -EACCES;
+>>> }
+>>>
+>>> It seems there are other ways to call do_acct_process() targeting a sysfs file ?
+>>
+>> Just to be sure I'm not misunderstanding your comment: do you mean that
+>> here, the issue is *not* in MPTCP code where we get the 'struct net'
+>> pointer via 'current->nsproxy->net_ns', but in the FS part, right?
+>>
+>> Here, we have an issue because 'current->nsproxy' is NULL, but is it
+>> normal? Or should we simply exit with an error if it is the case because
+>> we are in an exiting phase?
+>>
+>> I'm just a bit confused, because it looks like 'net' is retrieved from
+>> different places elsewhere when dealing with sysfs: some get it from
+>> 'current' like us, some assign 'net' to 'table->extra2', others get it
+>> from 'table->data' (via a container_of()), etc. Maybe we should not use
+>> 'current->nsproxy->net_ns' here then?
 > 
->> I do think this is a bug in process accounting, not in networking.
->>
->> It might make sense to output a record on a regular file, but probably
->> not on any other files.
->>
->> diff --git a/kernel/acct.c b/kernel/acct.c
->> index 179848ad33e978a557ce695a0d6020aa169177c6..a211305cb930f6860d02de7f45ebd260ae03a604
->> 100644
->> --- a/kernel/acct.c
->> +++ b/kernel/acct.c
->> @@ -495,6 +495,9 @@ static void do_acct_process(struct bsd_acct_struct *acct)
->>         const struct cred *orig_cred;
->>         struct file *file = acct->file;
->>
->> +       if (S_ISREG(file_inode(file)->i_mode))
->> +               return;
+> I do think this is a bug in process accounting, not in networking.
 > 
-> ... won't help, since the file in question *is* a regular file.  IOW, it's
-> a wrong predicate here.
+> It might make sense to output a record on a regular file, but probably
+> not on any other files.
+> 
+> diff --git a/kernel/acct.c b/kernel/acct.c
+> index 179848ad33e978a557ce695a0d6020aa169177c6..a211305cb930f6860d02de7f45ebd260ae03a604
+> 100644
+> --- a/kernel/acct.c
+> +++ b/kernel/acct.c
+> @@ -495,6 +495,9 @@ static void do_acct_process(struct bsd_acct_struct *acct)
+>         const struct cred *orig_cred;
+>         struct file *file = acct->file;
+> 
+> +       if (S_ISREG(file_inode(file)->i_mode))
+> +               return;
+> +
+>         /*
+>          * Accounting records are not subject to resource limits.
+>          */
 
-On my side, it looks like I'm not able to reproduce the issue with this
-patch. Without it, it is very easy to reproduce it. (But I don't know if
-there are other consequences that would avoid the issue to happen: when
-looking at the logs, with the patch, I don't have heaps of "Process
-accounting resumed" messages that I had before.)
+OK, thank you, that's clearer.
+
+So this is then more a question for Joel, right?
+
+Do you plan to send this patch to him?
+
+#syz set subsystems: fs
 
 Cheers,
 Matt
