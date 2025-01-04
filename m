@@ -1,115 +1,115 @@
-Return-Path: <netdev+bounces-155169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3705BA0157D
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 16:30:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 666BDA01591
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 16:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DD6C1884020
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 15:30:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EB7E1638BB
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 15:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622AE1C1AAA;
-	Sat,  4 Jan 2025 15:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A681CBE8C;
+	Sat,  4 Jan 2025 15:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KrwksU5a"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oLfKtMkz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A7A18FDAF
-	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 15:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C37136A;
+	Sat,  4 Jan 2025 15:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736004596; cv=none; b=LS2saDs+ijzMzkr0gtqhig9qWZIIaNpVhbtBCvU5QjjlntQX8iEXusA/vXocTvWqicYUi38SVJwkc/1EzN9mlk1EL2lQKOhGqOVGif4QZrpB3xT3Yy0xZI1eiJXnKc6vAn15NUNpmY5+yLBQErdaLlo6y7Ry4CnUdieZPRLzSXc=
+	t=1736005063; cv=none; b=PjJ7gHiEOG9EBTYoG8RFsyoMckwdRfE4UxP3tyN3+zSu3C5n75wq370RSDaOZzd9hpDKUMLlUZY35yiiBtyLLmgnwFlVRtVAjlj/Oe9Jp51K4QaE6rfkMdXiBiimcPxSHmEB6+6RL7w7EYz/UlWZcRjqMG2jNxro9O1BtTBPFMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736004596; c=relaxed/simple;
-	bh=U57buj9G2siMfW2sXnigbwSKDilrkriOtcFdMRkwtZI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RSWatT6VtionzpTU+s2yQFKEuOEZw4xw7ekkhiTu6WfTk5MFagto8N1qgvi5ctUVBKztcT1fTM6d+isaSZB6FVxm0B5iHqAcJajVu3aYJXrsODkZx/wqCyoyJKWh/jbQcBDfmiIn930Y7PkBIOuU/hMc/I4cFHxYNZ18KnpKMcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KrwksU5a; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736004593;
+	s=arc-20240116; t=1736005063; c=relaxed/simple;
+	bh=G/IYv+zQTBPz+2viGf2a3G8QEY6mYv35VRJNa5p+8kA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JCCiGOBvpbi36JdUfgPWZ8P0w/NPJRWkl7CGPg1TGju2qyemn5mZQjrqjUHvK6GqomxNmuek5WhG3f+aSYz4mr9qKHxoi9pX2FYIb4Fbztgz17H6jgCI0A35N0uQ+H/eB9f4Cc+5WKJriOmwN5wYnh/OAY5wR4/+xJoKZCyqexg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oLfKtMkz; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A7628FF802;
+	Sat,  4 Jan 2025 15:37:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1736005057;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5QfsSW0/w50mw5rP1A7sUS5Wbk8ld/K3Kku0dCFploI=;
-	b=KrwksU5adGNJB4a/+RMV/8xPPbx6CLVkg+nwXTcmhiOZDG0mM0r07XTcTizUPKBn/794b/
-	RMErCbeOCLe8rRQ61nefjTHdhU4YEvxaoRZg+GKFlReQMMexs3E6703g4/cE9M/pRvJFZS
-	9Y7h1AxSh9wIGntD1vZRjIIR1dUXJo4=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-jgxWK_AaP4-b5GuROFefkA-1; Sat,
- 04 Jan 2025 10:29:50 -0500
-X-MC-Unique: jgxWK_AaP4-b5GuROFefkA-1
-X-Mimecast-MFC-AGG-ID: jgxWK_AaP4-b5GuROFefkA
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DBE0919560A5;
-	Sat,  4 Jan 2025 15:29:48 +0000 (UTC)
-Received: from bcodding.csb.redhat.com (unknown [10.22.76.8])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 72002195608A;
-	Sat,  4 Jan 2025 15:29:46 +0000 (UTC)
-From: Benjamin Coddington <bcodding@redhat.com>
-To: Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-nfs@vger.kernel.org
-Subject: [PATCH] tls: Fix tls_sw_sendmsg error handling
-Date: Sat,  4 Jan 2025 10:29:45 -0500
-Message-ID: <9594185559881679d81f071b181a10eb07cd079f.1736004079.git.bcodding@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G/IYv+zQTBPz+2viGf2a3G8QEY6mYv35VRJNa5p+8kA=;
+	b=oLfKtMkzLF9+wmmdvGiH+Iw/BxtSt1o3sDZ6pijIfp/gqgiw5dTrBfd5OTgba4geN7YmMo
+	uCrIOgi5bp8KpLyqbxMPtakysxt/LJzVTJvSXPzvH4qNugIBrSYpN5q9KRZYCfBd2EuPR5
+	g1EJ+3YXizyjrC4g1mugcsxKoWcu6RAHz2DY9S9fsCDM/ltDvHEnto0PFq8VhFQuPfX80S
+	MUWJ7XKB+lVKXXNbnOJ8Vxp9zOTGktW85+HrRh5/K+zQ7zfvGW9WRTFBByZQ+ImtO+F+mK
+	9JNy+7sjO+CL4++lboO3veoVmgkAgikxaN6RarWxyE55EDyX3FveOVwZ2bJ9YA==
+Date: Sat, 4 Jan 2025 16:37:34 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
+ kernel@pengutronix.de, Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v4 18/27] regulator: dt-bindings: Add
+ regulator-power-budget property
+Message-ID: <20250104163734.57a1613c@kmaincent-XPS-13-7390>
+In-Reply-To: <sxan73paedcp3jm2y3uchnl7c5qgbasgjt4tjv5pobamzxgqf6@ldx3hor6wrzx>
+References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
+	<20250103-feature_poe_port_prio-v4-18-dc91a3c0c187@bootlin.com>
+	<sxan73paedcp3jm2y3uchnl7c5qgbasgjt4tjv5pobamzxgqf6@ldx3hor6wrzx>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-We've noticed that NFS can hang when using RPC over TLS on an unstable
-connection, and investigation shows that the RPC layer is stuck in a tight
-loop attempting to transmit, but forever getting -EBADMSG back from the
-underlying network.  The loop begins when tcp_sendmsg_locked() returns
--EPIPE to tls_tx_records(), but that error is converted to -EBADMSG when
-calling the socket's error reporting handler.
+On Sat, 4 Jan 2025 10:43:25 +0100
+Krzysztof Kozlowski <krzk@kernel.org> wrote:
 
-Instead of converting errors from tcp_sendmsg_locked(), let's pass them
-along in this path.  The RPC layer handles -EPIPE by reconnecting the
-transport, which prevents the endless attempts to transmit on a broken
-connection.
+> On Fri, Jan 03, 2025 at 10:13:07PM +0100, Kory Maincent wrote:
+> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> >=20
+> > Introduce a new property to describe the power budget of the regulator.
+> > This property will allow power management support for regulator consume=
+rs
+> > like PSE controllers, enabling them to make decisions based on the
+> > available power capacity.
+> >=20
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com> =20
+>=20
+> Please use same SoB as From. You might need to configure your Git
+> correctly, first of all.
 
-Signed-off-by: Benjamin Coddington <bcodding@redhat.com>
----
- net/tls/tls_sw.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+That was not an issue in the previous series. Net maintainers and you were =
+ok
+with this:
+https://lore.kernel.org/linux-doc/20240417-feature_poe-v9-11-242293fd1900@b=
+ootlin.com/
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index bbf26cc4f6ee..7bcc9b4408a2 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -458,7 +458,7 @@ int tls_tx_records(struct sock *sk, int flags)
- 
- tx_err:
- 	if (rc < 0 && rc != -EAGAIN)
--		tls_err_abort(sk, -EBADMSG);
-+		tls_err_abort(sk, rc);
- 
- 	return rc;
- }
+Does it bother you now?
+If so I will fix it.
 
-base-commit: 0bc21e701a6ffacfdde7f04f87d664d82e8a13bf
--- 
-2.47.0
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
