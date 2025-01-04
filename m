@@ -1,248 +1,130 @@
-Return-Path: <netdev+bounces-155122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26978A0124A
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 05:47:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A73DA01255
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 05:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E683162AAC
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 04:47:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24B5A163122
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 04:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDBE13AD26;
-	Sat,  4 Jan 2025 04:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755EE13FD83;
+	Sat,  4 Jan 2025 04:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J1n1fXfh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CA155896
-	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 04:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A4182488;
+	Sat,  4 Jan 2025 04:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735966049; cv=none; b=KlZ4FTHRZnZyryzU9r+gV0r/v17Hb5+A+dAQymg5OX+x3BdyYQ3WYXcrDyt0PvgjD31yycmRKCGzZaHAFoDW2V+HPCKGPkzoGfkljMkjtJdR0tIDqMi1bo9cLGfCghYug+HQxEsBp2ooA+cE9Sr2lZsVt/Dmg3WmdQGSMeq6FMw=
+	t=1735966325; cv=none; b=u3lqdmBN1xnjYeM4Tv3A1ZEqo+XCG6nEWeRxv/TjqrFR1mfKOi4PCP8XjU07S+GSJ+e/53XfhJUK8RdAobwS0BdhhSZurJSHGfddPW/CH5zvrg/OjAgre6OOQMj8Eo2KZpUGLIUPguaVe1/oCVd1TO5wSM5wnRaF5+OiuhS/UeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735966049; c=relaxed/simple;
-	bh=33iJw/+mKmoNd1FMSMdxB9ds4KFOMtRynQYrqUIC/Yc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AUt2WYuXnf3Wr9RryUp+PyKjxbM8UvVSvFqPa6OjbZd454zCYPBOzfjyw8iUKDkJFsKRPf5S/eQtP4ERd3Nysnny2rvYSrEHKyEZ8UvHkNEnX/TjVwpokIBiukekBjGrSwTqJDWllkbuhGb+tUllOyyocIz3YTqmfk5vq/WA6MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-844e619a122so1118849139f.3
-        for <netdev@vger.kernel.org>; Fri, 03 Jan 2025 20:47:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735966047; x=1736570847;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w+eAegMw/zFe577Wn3cNUiojLlobGznPJZ85zO5qI1s=;
-        b=OYJrv5Sjm39O4lbQlG/Kl+bfnHxHxu87zQCXCTyHfDF3cHVq7C5aziJ/OuWLu0fx43
-         KAulP6ZdDBvtmgfNnyLuJ0TN8Q+/RWLoKq4Ewk0ppaPMhG2ufyb2GnGfSMxh9o9Np5TN
-         c2hJcs3QARPl7RSCM3G9Jk/TpdeSWXzdY48zK2ifRoqct4jIc1qAL696A6b1qBKoTw/3
-         rFXzU3Xl+5lXQKxmuAof327kN8SRpkHnuZXcPpYa4VPUeX7ot/Gmk5ImaX/EmbKU+wHu
-         MCbKKE9U9CkiWssqNVOwvFr6mJ5CtGkk29WE4uHJYKFWMRZtbDfN9Xhe9v1dfmAeaHPY
-         iiPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxNUOotgWH21ddADGiCS7EEvIq1EE9TI+N5DA+i9opnDnY7JFz1/imPIDU6frMMnmLGHYK5CM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJGN6krU/hju8DhZvRtDD112qI59zvolZh6U57Y0We1k4YkAAz
-	+VH+04x4QNRb7t+HqPB/wjLrLpWbEF+jOMTxDQ/AD/+5fxyoNHto/4YhTfAGw/2OikdRBT03jDz
-	3PvO2rm+tyXstwEt9vmBix1CrHjjz4lg8ja+ZQrVja6GePI9o+jiOMTc=
-X-Google-Smtp-Source: AGHT+IH2e/1eJ/6nRj86OcNKHNruaqYPQZnrYPAkC5mBe7zARWHlpKlAkcr91thYMU0BbBg1/5drYNCiLpbWYyPkwb3aLpkUPRF7
+	s=arc-20240116; t=1735966325; c=relaxed/simple;
+	bh=XtPmeWVkebOoMdkHg3hOLrL0p5OFrWmqRjAi0s+IH2A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MH9YWuDuCoCCexmXFPgqBiwwZPp+llDRXaCiJeqf/ahx/k+u5UPMH7i+h9+mNi83IipkG5niCJVB4gc/JLO0zCt/J7IHeb9ODYr8DWqeYECePUOZFAosarHBaQOs9tfY7C9aymSJe1N9q60W9MArHJpjBs6uHuJctrUltT2/WrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J1n1fXfh; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1735966323; x=1767502323;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XtPmeWVkebOoMdkHg3hOLrL0p5OFrWmqRjAi0s+IH2A=;
+  b=J1n1fXfhJHigBZaGGRr0zHSB4Iopm8nHX3irBAa8hb3n1GKLzGl8fCWz
+   qx9zQUy6iU8VMhNeq1xh02Gi35bu/tXZC8L3ZNVCys4yVOeW7B0I/K0Ao
+   dx2/mUZUyNua04DV1beCf1QyWl9Hmy509h3Zkw2VrGmgcHZTPFcj0ZBdU
+   pvloOB5MN8Dxc3Ogm+qOBNZsj6nmc7fqCBgo/ihnK5kqU73W9zRXXlEbF
+   d+N84uf/twHbk3/kf4wIZa9OVpy8KlRLpF/wL839cqJsaVPLKIIlHrP5/
+   Q4RvBaztirvL6AkQuaT60sV696BGyce7bSGCaJmYGxF6/n6/tmGR4ONbZ
+   Q==;
+X-CSE-ConnectionGUID: mrSAz270RXST2K2qF8xWAw==
+X-CSE-MsgGUID: s0hCtHb8Qg+weP94cMOjxA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11304"; a="46701212"
+X-IronPort-AV: E=Sophos;i="6.12,288,1728975600"; 
+   d="scan'208";a="46701212"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2025 20:52:03 -0800
+X-CSE-ConnectionGUID: Ra75Vt6/RB+Ueyz3adysHw==
+X-CSE-MsgGUID: fs6xALnoT7elwTJ3yN+1YA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="102446466"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 03 Jan 2025 20:51:58 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tTw8h-000AcV-2u;
+	Sat, 04 Jan 2025 04:51:55 +0000
+Date: Sat, 4 Jan 2025 12:51:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: egyszeregy@freemail.hu, fw@strlen.de, pablo@netfilter.org,
+	lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org,
+	amiculas@cisco.com, kadlec@netfilter.org, davem@davemloft.net,
+	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, jengelh@medozas.de,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev,
+	Benjamin =?utf-8?B?U3rFkWtl?= <egyszeregy@freemail.hu>
+Subject: Re: [PATCH v3] netfilter: x_tables: Merge xt_*.c source files which
+ has same name.
+Message-ID: <202501041223.aaw6sh0q-lkp@intel.com>
+References: <20250103140158.69041-1-egyszeregy@freemail.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3210:b0:3a0:9c99:32d6 with SMTP id
- e9e14a558f8ab-3c2d54349admr404716935ab.24.1735966047297; Fri, 03 Jan 2025
- 20:47:27 -0800 (PST)
-Date: Fri, 03 Jan 2025 20:47:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6778bd5f.050a0220.7f35c.0001.GAE@google.com>
-Subject: [syzbot] [mm?] INFO: rcu detected stall in task_numa_work (2)
-From: syzbot <syzbot+06d48cbf3e767907cec2@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250103140158.69041-1-egyszeregy@freemail.hu>
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build warnings:
 
-HEAD commit:    9268abe611b0 Merge branch 'net-lan969x-add-rgmii-support'
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=156e88b0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b087c24b921cdc16
-dashboard link: https://syzkaller.appspot.com/bug?extid=06d48cbf3e767907cec2
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10651818580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1202eac4580000
+[auto build test WARNING on netfilter-nf/main]
+[also build test WARNING on linus/master v6.13-rc5 next-20241220]
+[cannot apply to nf-next/master horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8274f60b0163/disk-9268abe6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f7b3fde537e7/vmlinux-9268abe6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/db4cccf7caae/bzImage-9268abe6.xz
+url:    https://github.com/intel-lab-lkp/linux/commits/egyszeregy-freemail-hu/netfilter-x_tables-Merge-xt_-c-source-files-which-has-same-name/20250103-221402
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
+patch link:    https://lore.kernel.org/r/20250103140158.69041-1-egyszeregy%40freemail.hu
+patch subject: [PATCH v3] netfilter: x_tables: Merge xt_*.c source files which has same name.
+config: nios2-kismet-CONFIG_NETFILTER_XT_DSCP-CONFIG_NETFILTER_XT_MATCH_DSCP-0-0 (https://download.01.org/0day-ci/archive/20250104/202501041223.aaw6sh0q-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20250104/202501041223.aaw6sh0q-lkp@intel.com/reproduce)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+06d48cbf3e767907cec2@syzkaller.appspotmail.com
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501041223.aaw6sh0q-lkp@intel.com/
 
-bridge0: received packet on bridge_slave_0 with own address as source address (addr:aa:aa:aa:aa:aa:1b, vlan:0)
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P5865/2:b..l
-rcu: 	(detected by 0, t=10503 jiffies, g=7645, q=122 ncpus=2)
-task:syz-executor118 state:R  running task     stack:19936 pid:5865  tgid:5865  ppid:5860   flags:0x00004002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5369 [inline]
- __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
- preempt_schedule_irq+0xfb/0x1c0 kernel/sched/core.c:7078
- irqentry_exit+0x5e/0x90 kernel/entry/common.c:354
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:lock_acquire+0x264/0x550 kernel/locking/lockdep.c:5853
-Code: 2b 00 74 08 4c 89 f7 e8 9a 23 8b 00 f6 44 24 61 02 0f 85 85 01 00 00 41 f7 c7 00 02 00 00 74 01 fb 48 c7 44 24 40 0e 36 e0 45 <4b> c7 44 25 00 00 00 00 00 43 c7 44 25 09 00 00 00 00 43 c7 44 25
-RSP: 0018:ffffc9000408f3c0 EFLAGS: 00000206
-RAX: 0000000000000001 RBX: 1ffff92000811e84 RCX: ffff88807ef5c6d8
-RDX: dffffc0000000000 RSI: ffffffff8c0aa960 RDI: ffffffff8c5faee0
-RBP: ffffc9000408f510 R08: ffffffff942bc887 R09: 1ffffffff2857910
-R10: dffffc0000000000 R11: fffffbfff2857911 R12: 1ffff92000811e80
-R13: dffffc0000000000 R14: ffffc9000408f420 R15: 0000000000000246
- rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- rcu_read_lock include/linux/rcupdate.h:849 [inline]
- is_bpf_text_address+0x46/0x2a0 kernel/bpf/core.c:772
- kernel_text_address+0xa7/0xe0 kernel/extable.c:125
- __kernel_text_address+0xd/0x40 kernel/extable.c:79
- unwind_get_return_address+0x4d/0x90 arch/x86/kernel/unwind_orc.c:369
- arch_stack_walk+0xfd/0x150 arch/x86/kernel/stacktrace.c:26
- stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
- save_stack+0xfb/0x1f0 mm/page_owner.c:156
- __reset_page_owner+0x76/0x430 mm/page_owner.c:297
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1127 [inline]
- free_unref_page+0xd3f/0x1010 mm/page_alloc.c:2657
- discard_slab mm/slub.c:2688 [inline]
- __put_partials+0x160/0x1c0 mm/slub.c:3157
- put_cpu_partial+0x17c/0x250 mm/slub.c:3232
- __slab_free+0x290/0x380 mm/slub.c:4483
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x9a/0x140 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
- __kasan_kmalloc+0x23/0xb0 mm/kasan/common.c:385
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __kmalloc_cache_noprof+0x243/0x390 mm/slub.c:4329
- kmalloc_noprof include/linux/slab.h:901 [inline]
- kzalloc_noprof include/linux/slab.h:1037 [inline]
- task_numa_work+0xad5/0x14b0 kernel/sched/fair.c:3407
- task_work_run+0x24f/0x310 kernel/task_work.c:239
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0x13f/0x340 kernel/entry/common.c:218
- do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7faf0e7f728a
-RSP: 002b:00007ffc20bea148 EFLAGS: 00000286
- ORIG_RAX: 0000000000000106
-RAX: 0000000000000000 RBX: 000000000000004a RCX: 00007faf0e7f728a
-RDX: 00007ffc20bea170 RSI: 00007ffc20bea200 RDI: 00000000ffffff9c
-RBP: 00007ffc20bea200 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000100 R11: 0000000000000286 R12: 00007ffc20beb270
-R13: 000055557d6a56c0 R14: 00007ffc20beb2b0 R15: 000000000000000d
- </TASK>
-rcu: rcu_preempt kthread starved for 7869 jiffies! g7645 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:26264 pid:17    tgid:17    ppid:2      flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5369 [inline]
- __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
- __schedule_loop kernel/sched/core.c:6833 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6848
- schedule_timeout+0x15a/0x290 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x2df/0x1330 kernel/rcu/tree.c:2045
- rcu_gp_kthread+0xa7/0x3b0 kernel/rcu/tree.c:2247
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:get_current arch/x86/include/asm/current.h:49 [inline]
-RIP: 0010:__sanitizer_cov_trace_pc+0x8/0x70 kernel/kcov.c:216
-Code: 8b 3d 74 8f 8f 0c 48 89 de 5b e9 63 f0 5a 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 48 8b 04 24 <65> 48 8b 0c 25 00 d6 03 00 65 8b 15 00 62 64 7e 81 e2 00 01 ff 00
-RSP: 0018:ffffc90000156db8 EFLAGS: 00000246
-RAX: ffffffff8a91fc9d RBX: 00000000000048e0 RCX: ffff88801cad5a00
-RDX: ffff88801cad5a00 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffff8880b203a173 R08: ffffffff8a91fc92 R09: ffffffff8a91fa99
-R10: 0000000000000003 R11: ffff88801cad5a00 R12: 0000000000000000
-R13: ffff8881426b0800 R14: ffff888034f80e08 R15: ffff8881426b0818
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fcd0e05e580 CR3: 000000000e736000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- </IRQ>
- <TASK>
- br_flood+0x2cd/0x680 net/bridge/br_forward.c:232
- br_handle_frame_finish+0x18d2/0x2000 net/bridge/br_input.c:220
- br_nf_hook_thresh+0x472/0x590
- br_nf_pre_routing_finish_ipv6+0xaa0/0xdd0
- NF_HOOK include/linux/netfilter.h:314 [inline]
- br_nf_pre_routing_ipv6+0x379/0x770 net/bridge/br_netfilter_ipv6.c:184
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_bridge_pre net/bridge/br_input.c:282 [inline]
- br_handle_frame+0x9f3/0x1530 net/bridge/br_input.c:433
- __netif_receive_skb_core+0x14eb/0x4690 net/core/dev.c:5566
- __netif_receive_skb_one_core net/core/dev.c:5670 [inline]
- __netif_receive_skb+0x12f/0x650 net/core/dev.c:5785
- process_backlog+0x662/0x15b0 net/core/dev.c:6117
- __napi_poll+0xcb/0x490 net/core/dev.c:6883
- napi_poll net/core/dev.c:6952 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:7074
- handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
- run_ksoftirqd+0xca/0x130 kernel/softirq.c:950
- smpboot_thread_fn+0x544/0xa30 kernel/smpboot.c:164
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-bridge0: received packet on bridge_slave_0 with own address as source address (addr:aa:aa:aa:aa:aa:1b, vlan:0)
-bridge0: received packet on bridge_slave_0 with own address as source address (addr:aa:aa:aa:aa:aa:0c, vlan:0)
-bridge0: received packet on bridge_slave_0 with own address as source address (addr:aa:aa:aa:aa:aa:0c, vlan:0)
-bridge0: received packet on bridge_slave_0 with own address as source address (addr:aa:aa:aa:aa:aa:1b, vlan:0)
-bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:aa:aa:aa:aa:0c, vlan:0)
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for NETFILTER_XT_DSCP when selected by NETFILTER_XT_MATCH_DSCP
+   WARNING: unmet direct dependencies detected for NETFILTER_XT_HL
+     Depends on [n]: NET [=y] && INET [=y] && NETFILTER [=y] && NETFILTER_XTABLES [=y] && (IP_NF_MANGLE [=n] || IP6_NF_MANGLE [=n] || NFT_COMPAT [=n]) && NETFILTER_ADVANCED [=y]
+     Selected by [y]:
+     - NETFILTER_XT_MATCH_HL [=y] && NET [=y] && INET [=y] && NETFILTER [=y] && NETFILTER_XTABLES [=y] && NETFILTER_ADVANCED [=y]
+   
+   WARNING: unmet direct dependencies detected for NETFILTER_XT_DSCP
+     Depends on [n]: NET [=y] && INET [=y] && NETFILTER [=y] && NETFILTER_XTABLES [=y] && (IP_NF_MANGLE [=n] || IP6_NF_MANGLE [=n] || NFT_COMPAT [=n]) && NETFILTER_ADVANCED [=y]
+     Selected by [y]:
+     - NETFILTER_XT_MATCH_DSCP [=y] && NET [=y] && INET [=y] && NETFILTER [=y] && NETFILTER_XTABLES [=y] && NETFILTER_ADVANCED [=y]
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
