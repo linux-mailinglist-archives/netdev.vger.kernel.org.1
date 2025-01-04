@@ -1,79 +1,108 @@
-Return-Path: <netdev+bounces-155104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF44BA010E7
-	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 00:21:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327A3A01135
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 01:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66ACC162799
-	for <lists+netdev@lfdr.de>; Fri,  3 Jan 2025 23:21:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B07697A205A
+	for <lists+netdev@lfdr.de>; Sat,  4 Jan 2025 00:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1FC81B0F15;
-	Fri,  3 Jan 2025 23:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o0kVc4D8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8199A8F77;
+	Sat,  4 Jan 2025 00:03:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail114-240.sinamail.sina.com.cn (mail114-240.sinamail.sina.com.cn [218.30.114.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A88226AD0;
-	Fri,  3 Jan 2025 23:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36BA64C9D
+	for <netdev@vger.kernel.org>; Sat,  4 Jan 2025 00:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.114.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735946514; cv=none; b=lSw8ebzNMNBHgaw9gXFqeFnnphKvfVeQ0zqIT2yJXSd6gdov1kyzYpnXhWFdFUx8odvMyihMDA/6SWubw+wji5scbLkfEYLb7mMqfWXkijFJVxX6dn3ybSqJjpMGLaJr71LNOmQbqZwYRLVr7uzVorsZjrzmlfAv4kjTMmG1lcQ=
+	t=1735949001; cv=none; b=NWvwwE88dndDx95snXyQgnq3EX/U4rY+EHpJIM3H1OLFnZPcqPGH7AD48Segpew6A+no2XvgzxNO6zjELoUyichIwRH2gwa/QW6nBEiohDS8cmPVxmK1xPRq6raUDSRQnL8+akdofmBUkOeP1rMbwwgU3R2D+MAm3UOyPi070ZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735946514; c=relaxed/simple;
-	bh=b9+XYSrMoLOUXJ5COkIwXeIovbR3q3601rmFAulbRn8=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=FuLKK0Bsch27Cdry1CQ/qFbOsM4nne2cMz1VZPWUwhvguu82kS5VbK2gVcqYw9TzHlTpmtMCQr3TrgetGGzVfS48AUtnyyIaYTnASwgZK0Z6K6Wzo8tM+Xk0u27LZFTHBV8AmwmZVoO+ShXIR5kRCyN/jsYeCqkp0zM/JGomh70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o0kVc4D8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 572A5C4CEDD;
-	Fri,  3 Jan 2025 23:21:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735946514;
-	bh=b9+XYSrMoLOUXJ5COkIwXeIovbR3q3601rmFAulbRn8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=o0kVc4D8KQWydZulfaHuq3GxgEjFXKYmAUqIifpIW/l+MXH6QmqGvu6KpQ4kFLsj2
-	 s86GOjux2UgbjgOHUubfaPfTglz42Gl82BofdTyauBSdRQyv0GJxU6i5J47u0BjVi7
-	 RzQVBPBMWXGXHla8ZrU4yuHIgQcxkw9gk8JyIzZl+m8PlDtYomvI0ocrhWYkuArYBC
-	 gpopcvCNf2cm1dOy5kmDdxGiOM0gdfk4BlDIz64YJa5BJEawsZFhNuG5JfnhHsFj4I
-	 uBD85tpImw0ailcL7fnd5TLWf6ugcpGavmSmGTT3ypQQnZ+bMAOy2wNvNxnsr2izXz
-	 sK4nmXdlFmwxQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FFA380A974;
-	Fri,  3 Jan 2025 23:22:16 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.13-rc6
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250103171551.2999961-1-kuba@kernel.org>
-References: <20250103171551.2999961-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250103171551.2999961-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc6
-X-PR-Tracked-Commit-Id: ce21419b55d8671b886ae780ef15734843a6f668
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: aba74e639f8d76d29b94991615e33319d7371b63
-Message-Id: <173594653472.2324745.11678348684162817308.pr-tracker-bot@kernel.org>
-Date: Fri, 03 Jan 2025 23:22:14 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1735949001; c=relaxed/simple;
+	bh=iL+QhY2jGfSA1QdIPfyZCmOe9KlDNCylLsaSMZgAp24=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RumECiu8TWZVo6A1jUUWNmaidL+D5wvXUnQ5YPMQRrBeRIc3DkMaldBGtn2ed+15YBH7KJEY2Kj7617smmSRQyqSjLodE/jiVRvNxQeiF2ssfAWb9f+3/wvdDCD6L7denIQaKyKJmYmU7cugJX+EfdpPsnvf6O5JcFRdwKMczLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.114.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.88.50.58])
+	by sina.com (10.185.250.23) with ESMTP
+	id 67787A2B00003212; Sat, 4 Jan 2025 08:00:46 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 5457368913392
+X-SMAIL-UIID: 3FDCAF96B6FE48F9873ED17E530CF1E0-20250104-080046-1
+From: Hillf Danton <hdanton@sina.com>
+To: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+Cc: syzbot <syzbot+882589c97d51a9de68eb@syzkaller.appspotmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lorenzo.stoakes@oracle.com,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [mm?] INFO: rcu detected stall in mas_preallocate (2)
+Date: Sat,  4 Jan 2025 08:00:33 +0800
+Message-ID: <20250104000035.1356-1-hdanton@sina.com>
+In-Reply-To: <p5ych35cl5ofdzvoobk6uxu4s7f5h3joogy6wee2sq3g4m4mxb@py7tzqwueh74>
+References: <6756b479.050a0220.a30f1.0196.GAE@google.com> <6777334a.050a0220.3a8527.0058.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Fri,  3 Jan 2025 09:15:51 -0800:
+On Fri, 3 Jan 2025 10:20:34 -0500 "Liam R. Howlett" <Liam.Howlett@oracle.com>
+> * syzbot <syzbot+882589c97d51a9de68eb@syzkaller.appspotmail.com> [250102 19:47]:
+> > syzbot has bisected this issue to:
+> > 
+> > commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
+> > Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> > Date:   Sat Sep 29 00:59:43 2018 +0000
+> > 
+> >     tc: Add support for configuring the taprio scheduler
+> > 
+> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=117df818580000
+> > start commit:   feffde684ac2 Merge tag 'for-6.13-rc1-tag' of git://git.ker..
+> > git tree:       upstream
+> > final oops:     https://syzkaller.appspot.com/x/report.txt?x=137df818580000
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=157df818580000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=50c7a61469ce77e7
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=882589c97d51a9de68eb
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10e8a8df980000
+> > 
+> > Reported-by: syzbot+882589c97d51a9de68eb@syzkaller.appspotmail.com
+> > Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
+> > 
+> > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> > 
+> 
+> This looks wrong, if this is a bug (which looks like it is since it has
+> a syzbot reproducer?), then it's different than the previous two reports
+> and probably not related.
+> 
+In case you missed it, take a look at
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fb66df20a720
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc6
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/aba74e639f8d76d29b94991615e33319d7371b63
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> 
+> Vinicius,
+> 
+> Looking at the patch, it seems you missed some users of -1 vs
+> TAPRIO_ALL_GATES_OPEN in taprio_peek().  The comment in taprio_dequeue()
+> is useful - maybe the gate_mask rcu lock/unlock could be a function and
+> have that comment live in a static inline function?
+> 
+> Thanks,
+> Liam
 
