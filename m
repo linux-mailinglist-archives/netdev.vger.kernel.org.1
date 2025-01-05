@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-155260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF919A018BF
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 10:05:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF65A018C3
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 10:06:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E1F73A2742
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 09:05:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEAAB7A14B9
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 09:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2EF126C0D;
-	Sun,  5 Jan 2025 09:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12F113CA8A;
+	Sun,  5 Jan 2025 09:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPu5jJOw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKXsY95T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D391DFEF;
-	Sun,  5 Jan 2025 09:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF1B3D3B3;
+	Sun,  5 Jan 2025 09:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736067902; cv=none; b=YexVJkkncvLkD9cpanz7kDPl1ih9JFjN8QaQnYiIPHs+cLNFmgpuXBCUinSL5DjH6PjLJGSnwBrjyMsdiFmynqAmqCYT26z6+QXjDkndiNbVQO3+WqibOepKz1lxN2zlJG1hIrN9+Y2axYGD7F19AbeqdBqtQfMRBUwj7WZJQW0=
+	t=1736067997; cv=none; b=VbKrGJn7KCeNukkiB1SqAKRimQICA61QuoHFHJZs1I97dO6pHSV+1Xu7mFUxq15y5qPG+zPqhdyIsUFUJTpMuMoRzS1QU5HG1bXS1izZSCt98xd7nQqk4r1XBfbIodofqrEjQ2wOkVfti3HRkIvgH96jzHhzlrKk1G2Tonq3TnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736067902; c=relaxed/simple;
-	bh=GLDWFreQP0FMgPilbrgFj14jGiPfhRijzfZNktaK/yI=;
+	s=arc-20240116; t=1736067997; c=relaxed/simple;
+	bh=QHEtrtWehZrXxi4O0ZwprOmoYuiHhgDbbAm2XllazSk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U1za1JnzXEGQ+4DtAShoHZ3VJv2L+hOjudRwPP7St+MXbFp/u1jz925C9abW6+fjDRx171D5OThYNe94W1sUBZW7AdgNmjOJKLNbTHQ6Kjy2lOuqbuxjzfswOXFFPx918RsINwTryPJ9XtoWxRlu6DzIjhlt3vOGOH06b0VQvbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WPu5jJOw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2A94C4CED0;
-	Sun,  5 Jan 2025 09:04:53 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=CsP4n5WWhf9bkYZ4sU8F2b4KlhKpNyxyLTqQxgsndkNuuJzalGDYKb0k98maFWePMexLGRlth/9Pw9uYU2s9po43LaZbpH0ZxWRmZD5RavDlZwWtkj9wGCib5Iuwuzrl7e5tx426Ebl9IQPHxl65fDTWPMoAtlrBmD3/10UxwbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKXsY95T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FAC3C4CED0;
+	Sun,  5 Jan 2025 09:06:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736067902;
-	bh=GLDWFreQP0FMgPilbrgFj14jGiPfhRijzfZNktaK/yI=;
+	s=k20201202; t=1736067997;
+	bh=QHEtrtWehZrXxi4O0ZwprOmoYuiHhgDbbAm2XllazSk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WPu5jJOwzaeWgNjZGd8X1RASQ+gFYBoLNGa7pev9j0ynpZ0tRp1VVHExxasiuwtZZ
-	 ukyvFfrn5KqliNSltnImAFuOsJxxql40fpFzuqu+Lfx15MNVPpBAYvvIEyqgydKDwS
-	 eTxHsWrMILTn5S0RYFHeUisR0AMoBNbWwQwYEM3sKER195mSBb6IammRmceAPXvALz
-	 8fM91SlD/xwSEZgyiftylR+y0e5dIVojwgy72yZCsQjBWXPI+/BcHv1XCQYGOqEXv9
-	 d4aceCzkSxiF5IbxD2+z6dpEAN5bfZffnqa5hr3cw9wW/a6TP9pTNMLCtXJvNACk/Z
-	 dhfbvNvJxmwLA==
-Message-ID: <44be28f8-9b3f-4308-8b9c-0e89f2e46525@kernel.org>
-Date: Sun, 5 Jan 2025 10:04:51 +0100
+	b=kKXsY95TEAsopYp9HoWUdjVZqubBr7zrSF+kpXGL7zI8b5ssakBN7djodVKlbPig2
+	 2RkASTA5et5vqACsHk82s6DVx7LnO/1MzTJkFs0NIdgM6GiqXLinpjCSm6OmkQMAg9
+	 YtlZEHBGW++cK574MNiZqqNZgd6J9No/Apb4aW+accN73KRFUhpGCflcOSZCDbVsOn
+	 pRFDvvms7MiUmtGSQH6NdEaN+BvpflWsa1UPDYa8YRc0Uv2J6ZdBSpiJ7LklRRJ7P5
+	 lCqreYhSM4wQAqWVT/b/OL0NVeSbxFbu8JhiwtvqdiB1207/71ncIjrOmvFXT3ieed
+	 UXSSuICpJBArw==
+Message-ID: <c47cdecb-a618-4e7b-8334-5892170f012b@kernel.org>
+Date: Sun, 5 Jan 2025 10:06:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,8 +69,8 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
  Maxime Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org
 References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
  <20250103-feature_poe_port_prio-v4-18-dc91a3c0c187@bootlin.com>
- <sxan73paedcp3jm2y3uchnl7c5qgbasgjt4tjv5pobamzxgqf6@ldx3hor6wrzx>
- <20250104163734.57a1613c@kmaincent-XPS-13-7390>
+ <mjtwntmupclvy2dvc66zxxob3py47lew47vq37hfi6v6pmbpne@nr62lnuilzya>
+ <20250104165056.749da353@kmaincent-XPS-13-7390>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -116,12 +116,12 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250104163734.57a1613c@kmaincent-XPS-13-7390>
+In-Reply-To: <20250104165056.749da353@kmaincent-XPS-13-7390>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 04/01/2025 16:37, Kory Maincent wrote:
-> On Sat, 4 Jan 2025 10:43:25 +0100
+On 04/01/2025 16:50, Kory Maincent wrote:
+> On Sat, 4 Jan 2025 10:42:32 +0100
 > Krzysztof Kozlowski <krzk@kernel.org> wrote:
 > 
 >> On Fri, Jan 03, 2025 at 10:13:07PM +0100, Kory Maincent wrote:
@@ -132,23 +132,44 @@ On 04/01/2025 16:37, Kory Maincent wrote:
 >>> like PSE controllers, enabling them to make decisions based on the
 >>> available power capacity.
 >>>
->>> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>  
+>>> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+>>> ---
+>>>
+>>> Changes in v3:
+>>> - Add type.
+>>> - Add unit in the name.
+>>>
+>>> Changes in v2:
+>>> - new patch.
+>>> ---
+>>>  Documentation/devicetree/bindings/regulator/regulator.yaml | 5 +++++
+>>>  1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/regulator/regulator.yaml
+>>> b/Documentation/devicetree/bindings/regulator/regulator.yaml index
+>>> 1ef380d1515e..c5a6b24ebe7b 100644 ---
+>>> a/Documentation/devicetree/bindings/regulator/regulator.yaml +++
+>>> b/Documentation/devicetree/bindings/regulator/regulator.yaml @@ -34,6
+>>> +34,11 @@ properties: regulator-input-current-limit-microamp:
+>>>      description: maximum input current regulator allows
+>>>  
+>>> +  regulator-power-budget-miniwatt:  
 >>
->> Please use same SoB as From. You might need to configure your Git
->> correctly, first of all.
+>> What sort of quantity prefix is a "mini"? How much is a mini?
 > 
-> That was not an issue in the previous series. Net maintainers and you were ok
-> with this:
-> https://lore.kernel.org/linux-doc/20240417-feature_poe-v9-11-242293fd1900@bootlin.com/
+> Oops, that is a brain fart sorry for this. Of course it is milliwatt.
 > 
-> Does it bother you now?
-> If so I will fix it.
-I don't think I paid attention to it before and I am not sure whether it
-matters, but I just don't want to wonder about it in the first place. I
-am not a lawyer and my knowledge on this topic is rather amateurish, so
-why would we even need to consider legal implications of different SoB
-from "From", if you could just fix it and make it
-simple/obvious/explicit/un-doubtful?
+>>
+>>> +    description: power budget of the regulator
+>>> +    $ref: /schemas/types.yaml#/definitions/uint32  
+>>
+>> This should not be needed. Use proper unit from dtschema.
+> 
+> Ok, I was mistaken. There are bindings with this ref in this file, so I thought
+> it was needed. I will remove it.
+If the unit is not in the property-units of dtschema, you will have a
+warning, but then please send a pull request (patch could work as well
+probably) to dtschema adding it... but I am sure that milliwatt is there.
 
 Best regards,
 Krzysztof
