@@ -1,146 +1,285 @@
-Return-Path: <netdev+bounces-155289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44001A01BD8
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 21:51:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDA69A01BF4
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 22:13:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C72D162927
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 20:51:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D7BF3A3D89
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 21:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9334974068;
-	Sun,  5 Jan 2025 20:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124C41465BA;
+	Sun,  5 Jan 2025 21:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="q5rStHMR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="mED5+lZl"
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp-out.freemail.hu (fmfe25.freemail.hu [46.107.16.230])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FE925949A;
-	Sun,  5 Jan 2025 20:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5012111CA9;
+	Sun,  5 Jan 2025 21:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.230
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736110261; cv=none; b=R9/aNYvXD4it7c/xk7m8c7dmKpiAFhFyz0gAMJIgdDNhk5yBYqSRDilFwOYqNiKJ+QeI0sHODioEDH0In/VyxTbEkvDTF0d+xXOHvlqGxhHoRC3w2QJJw9hcKRT52MBIZz8YpOmy/pu7PKb86tzzuMtCB4LxMibn5K+1fCMTpFY=
+	t=1736111623; cv=none; b=qUHNb0talRMvxlNzCBQIpEZuvQyDZktfWnLZqXXC7/Omz35mM+jVff/zU4sx86ciWx0l7ZmL0DST9PIz+LJ7UGqzXpgcignxVdlvV7GFAJ3hsqwDTFevJivsxI6Cr0zFRBLl3aZHwSt0Iol/Mo3BITtWY6eEm3redvYztdcLL7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736110261; c=relaxed/simple;
-	bh=EPse042UUeIfh1/Xk0/Dus/IQzUwU0c9AFKwBDtxl+o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b5C5mXryfnQuD4pjAYNT7QLWgsdJYiUpdsyMxel5PsXds2EWBdQDXh+ictU+p6j/SCtpZRJjxwERH1iM3YezF1VBk4rdTeHE4AV8zifRMoj8gAELVPaHKFzXlrj4JUsprz4qCvFHxfNeYZNUu7lJNteVdQBODc1+sNSTghgRr/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=q5rStHMR; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=odL/7VRs88UUO8RamaqZ8On3HuXIHSZ9pipNRIAADSk=; b=q5rStHMREdsvCZFXwb5JOyEqwa
-	IpBpVDUvAlbl6q/TqsjHRAswsZTXUe2SDe+mb93WoSc7Laqg5aeb9wtPQTYRxtnkLpibrNop6J4ML
-	IsyaHs4m62leraKm/7ufXoCZa9DSYvkGtEn/Z/5NSqKBZWXyWtrF88EyU59hQROcu1anASsqyTRTV
-	bGOIEOoPgAGG6DxD3dRE8u/RifXASzOcKVXbTH8ItnaANEqY1XEGji+kzOX/zVriTC/QoEhs5RrC7
-	BbgF68okKauAMTqHGI38VrAGiQ10DGHbgnu3aYxCfc6U6T9tTJxG/POmHQP/LwSiw62GRZ9KhX5nH
-	QJiC22+A==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tUXaK-0000000FkHb-1Wht;
-	Sun, 05 Jan 2025 20:50:56 +0000
-Date: Sun, 5 Jan 2025 20:50:56 +0000
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, davem@davemloft.net,
-	geliang@kernel.org, horms@kernel.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, martineau@kernel.org,
-	mptcp@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>
-Subject: Re: [syzbot] [mptcp?] general protection fault in proc_scheduler
-Message-ID: <20250105205056.GK1977892@ZenIV>
-References: <CANn89iKVTgzr8kt2sScrfoSbBSGMtLLqEwmA+WFFYUfV-PS--w@mail.gmail.com>
- <cf187558-63d0-4375-8fb2-2cfa8bb8fa03@kernel.org>
- <CANn89iJEMGYt4YVdGkyb-q81TQU+UBOQaX7jH-2zOqv-4SjZGg@mail.gmail.com>
- <20250104190010.GF1977892@ZenIV>
- <89c2208c-fe23-43eb-89ef-876e55731a50@kernel.org>
- <20250104202126.GH1977892@ZenIV>
- <CANn89i+GUGLQSFp3a2qwH+zOsR-46CyWevjhAQQMmO5K9tmkUg@mail.gmail.com>
- <20250105112948.GI1977892@ZenIV>
- <CANn89i+L619t94EybXKsGFGQjPS7k-Qra_vXG-AcLJ=oiU2yYQ@mail.gmail.com>
- <20250105195434.GJ1977892@ZenIV>
+	s=arc-20240116; t=1736111623; c=relaxed/simple;
+	bh=0LP3xnzpAovJIxiGwNM8OVJnjOJlM0D+YgdycP+YY5M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uVtXQuCG+wnWlyJYvwCfdPVzzNHkVk8VgcHFcvcR2Q3LRtnoS22mcv3w7i6qltFouJhXT49NEgLuFM/abEztqKEL26Ad97ZiIrT6UHOnuKktG+8HUr6M/KPSiaF1YOoP2zxXxV3SvFoNhuyQAf2rIdWvG6tJPOUMVMxDsncrVaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=mED5+lZl reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.230
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YR8tQ1wMLzMs6;
+	Sun, 05 Jan 2025 22:03:42 +0100 (CET)
+Message-ID: <fc5f6a8f-06f4-47bc-a659-82f5c0e2455b@freemail.hu>
+Date: Sun, 5 Jan 2025 22:03:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250105195434.GJ1977892@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] netfilter: x_tables: Merge xt_*.c source files which
+ has same name.
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
+ daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
+ kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ kernel test robot <lkp@intel.com>
+References: <20250104174155.611323-1-egyszeregy@freemail.hu>
+ <83d71044-449a-4421-97b9-fc2dfcf3f283@lunn.ch>
+Content-Language: hu
+From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
+In-Reply-To: <83d71044-449a-4421-97b9-fc2dfcf3f283@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736111024;
+	s=20181004; d=freemail.hu;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	l=7909; bh=8OQwVzGdrZu1/x9Tm8ry8OqO9k0cOMOMDhDl0ve11yk=;
+	b=mED5+lZlOItCoPlaw8poWyNZ3BlaeHk5aVikj/nzxAGg6rtUo0z08RxITMrQLckX
+	PYVNwWxf+aWAd9yVfBJGriU0GKqD3Zst6gLdZeBsnlCE8zi4k49wT/Mt+/c7mbPja/S
+	y3QTPCYjUt8YnC162wCra3wvTjtAz4FIbao8zhk84Bsm+12Ka5Hc8OHIuuX5UJQyajS
+	TERO+elA0WDQLKU7pV9QyxjOAPvq7pHoIxv3XQwau5x4Zoif+2/yAzV2MPLHVp34cIy
+	l45U1ry4TkOMCAQ6XjF0JoAuN+a02j4lC/MGCp110mCdTSe3zuoPQyVZ+y/Bx5z1x5k
+	k745ZJHogA==
 
-On Sun, Jan 05, 2025 at 07:54:34PM +0000, Al Viro wrote:
-
-> So I suspect that current->nsproxy->netns shouldn't be used in
-> per-netns sysctls for consistency sake (note that it can get more
-> serious than just consistency, if you have e.g. a spinlock taken
-> in something hanging off current netns to protect access to
-> something table->data points to).
+2025. 01. 04. 23:24 keltezéssel, Andrew Lunn írta:
+> On Sat, Jan 04, 2025 at 06:41:55PM +0100, egyszeregy@freemail.hu wrote:
+>> From: Benjamin Szőke <egyszeregy@freemail.hu>
+>>
+>> Merge and refactoring xt_*.h, ipt_*.h and ip6t_*.h header and xt_*.c
+>> source files, which has same upper and lower case name format. Combining
+>> these modules should provide some decent code size and memory savings.
+>>
+>> test-build:
+>> $ mkdir build
+>> $ wget -O ./build/.config https://pastebin.com/raw/teShg1sp
+>> $ make O=./build/ ARCH=x86 -j 16
+>>
+>> x86_64-before:
+>> -rw-rw-r-- 1 user users 5120 jan 3 13.52 xt_dscp.o
+>> -rw-rw-r-- 1 user users 5984 jan 3 13.52 xt_DSCP.o
+>> -rw-rw-r-- 1 user users 4584 jan 3 13.52 xt_hl.o
+>> -rw-rw-r-- 1 user users 5304 jan 3 13.52 xt_HL.o
+>> -rw-rw-r-- 1 user users 5744 jan 3 13.52 xt_rateest.o
+>> -rw-rw-r-- 1 user users 10080 jan 3 13.52 xt_RATEEST.o
+>> -rw-rw-r-- 1 user users 4640 jan 3 13.52 xt_tcpmss.o
+>> -rw-rw-r-- 1 user users 9504 jan 3 13.52 xt_TCPMSS.o
+>> total size: 50960 bytes
+>>
+>> x86_64-after:
+>> -rw-rw-r-- 1 user users 8000 jan 3 14.09 xt_dscp.o
+>> -rw-rw-r-- 1 user users 6736 jan 3 14.09 xt_hl.o
+>> -rw-rw-r-- 1 user users 12536 jan 3 14.09 xt_rateest.o
+>> -rw-rw-r-- 1 user users 10992 jan 3 14.09 xt_tcpmss.o
+>> total size: 38264 bytes
+>>
+>> Code size reduced by 24.913%.
 > 
-> As for the mitigation in fs/proc/proc_sysctl.c... might be useful,
-> if it comes with a clear comment about the reasons it's there.
+> The .o file is a lot more than code. It contains symbol tables, debug
+> information etc. That is why i suggested size(1).
+> 
+> So in general, i'm sceptical about these changes. But we can keep
+> going, in the end we might get to something which is mergable.
+> 
+> This patch is too big, and i think you can easily split it up. We want
+> lots of simple patches which are obviously correct and easy to review,
+> not one huge patch.
 
-FWIW, looks like we have two such in mptcp (with sysctls next to
-those definitely accessing the netns of opener rather than reader/writer),
-two in rds (both inconsistent on the write side -
-        struct net *net = current->nsproxy->net_ns;
-        int err;
+New patch series can be found here (split in 3 parts):
+https://lore.kernel.org/lkml/20250105203452.101067-1-egyszeregy@freemail.hu/
 
-        err = proc_dointvec_minmax(ctl, write, buffer, lenp, fpos);
-        if (err < 0) {
-                pr_warn("Invalid input. Must be >= %d\n",
-                        *(int *)(ctl->extra1));
-                return err;
-        }
-        if (write)
-                rds_tcp_sysctl_reset(net);
-will modify ctl->data, which points to &rtn->{snd,rcv}buf_size, with
-rtn == net_generic(net, rds_tcp_netid) and net being for opener's netns
-and then call rds_tcp_sysctl_reset(net) with net being the writer's
-netns) and 6 in sctp.  At least some of sctp ones are also inconsistent
-on the write side; e.g.
-static int proc_sctp_do_rto_min(const struct ctl_table *ctl, int write,
-                                void *buffer, size_t *lenp, loff_t *ppos)
-{
-        struct net *net = current->nsproxy->net_ns;
-        unsigned int min = *(unsigned int *) ctl->extra1;
-        unsigned int max = *(unsigned int *) ctl->extra2;
-        struct ctl_table tbl;
-        int ret, new_value;
+If you like to see it in a human readable format you can found the diff in this 
+link also:
+https://github.com/torvalds/linux/compare/master...Livius90:linux:uapi
 
-        memset(&tbl, 0, sizeof(struct ctl_table));
-        tbl.maxlen = sizeof(unsigned int);
+> 
+> Also, this patch is doing two different things, merging some files,
+> and addressing case insensitive filesystems. You should split these
+> changes into two patchsets. Please first produce a patchset for
+> merging files. Once that has been merged we can look at case
+> insensitive files.
+> 
+> FYI:
+> 
+> ~/linux$ find . -name "*[A-Z]*.[ch]" | wc
+>      214     214    9412
+> 
+> This is a much bigger issue than just a couple of networking files. Do
+> you plan to submit patches for over 200 files?
+> 
 
-        if (write)
-                tbl.data = &new_value;
-        else
-                tbl.data = &net->sctp.rto_min;
+In case-insensitive filesystem porblem can be caused by only files which has the 
+same name but one of written in lower case and other one written in upper case. 
+So, not need to fix 200+ files.
 
-        ret = proc_dointvec(&tbl, write, buffer, lenp, ppos);
-        if (write && ret == 0) {
-                if (new_value > max || new_value < min)
-                        return -EINVAL;
+These are the files which cause the problem in the repo (it is reported by git 
+client):
 
-                net->sctp.rto_min = new_value;
-        }
+warning: the following paths have collided (e.g. case-sensitive paths
+on a case-insensitive filesystem) and only one from the same
+colliding group is in the working tree:
 
-        return ret;
-}
-has max taken from ctl->extra2, which is &net->sctp.rto_max of the
-opener's netns, but the value capped by that in stored into
-net->sctp.rto_min of *writer's* netns.  So the logics that is supposed
-to prevent rto_min > rto_max can be bypassed; no idea how much can that
-escalate to, but it's clearly not what the code intends.
+   'include/uapi/linux/netfilter/xt_CONNMARK.h'
+   'include/uapi/linux/netfilter/xt_connmark.h'
+   'include/uapi/linux/netfilter/xt_DSCP.h'
+   'include/uapi/linux/netfilter/xt_dscp.h'
+   'include/uapi/linux/netfilter/xt_MARK.h'
+   'include/uapi/linux/netfilter/xt_mark.h'
+   'include/uapi/linux/netfilter/xt_RATEEST.h'
+   'include/uapi/linux/netfilter/xt_rateest.h'
+   'include/uapi/linux/netfilter/xt_TCPMSS.h'
+   'include/uapi/linux/netfilter/xt_tcpmss.h'
+   'include/uapi/linux/netfilter_ipv4/ipt_ECN.h'
+   'include/uapi/linux/netfilter_ipv4/ipt_ecn.h'
+   'include/uapi/linux/netfilter_ipv4/ipt_TTL.h'
+   'include/uapi/linux/netfilter_ipv4/ipt_ttl.h'
+   'include/uapi/linux/netfilter_ipv6/ip6t_HL.h'
+   'include/uapi/linux/netfilter_ipv6/ip6t_hl.h'
+   'net/netfilter/xt_DSCP.c'
+   'net/netfilter/xt_dscp.c'
+   'net/netfilter/xt_HL.c'
+   'net/netfilter/xt_hl.c'
+   'net/netfilter/xt_RATEEST.c'
+   'net/netfilter/xt_rateest.c'
+   'net/netfilter/xt_TCPMSS.c'
+   'net/netfilter/xt_tcpmss.c'
+   'tools/memory-model/litmus-tests/Z6.0+pooncelock+poonceLock+pombonce.litmus'
+   'tools/memory-model/litmus-tests/Z6.0+pooncelock+pooncelock+pombonce.litmus'
 
-So I'd rather document the "don't assume that current->nsproxy->netns will
-point to the same netns this ctl is for" and fix those 10 instances - at
-least some smell seriously fishy.  It's not just the acct(2) weirdness and
-the damage may be worse than an oops...
+>> -#endif /*_XT_CONNMARK_H_target*/
+>> +#pragma message("xt_CONNMARK.h header is deprecated. Use xt_connmark.h instead.")
+>> +
+>> +#endif /* _XT_CONNMARK_TARGET_H */
+>> diff --git a/include/uapi/linux/netfilter/xt_DSCP.h b/include/uapi/linux/netfilter/xt_DSCP.h
+>> index 223d635e8b6f..bd550292803d 100644
+>> --- a/include/uapi/linux/netfilter/xt_DSCP.h
+>> +++ b/include/uapi/linux/netfilter/xt_DSCP.h
+>> @@ -1,27 +1,9 @@
+>>   /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> -/* x_tables module for setting the IPv4/IPv6 DSCP field
+>> - *
+>> - * (C) 2002 Harald Welte <laforge@gnumonks.org>
+>> - * based on ipt_FTOS.c (C) 2000 by Matthew G. Marsh <mgm@paktronix.com>
+>> - * This software is distributed under GNU GPL v2, 1991
+> 
+> Removing copyright notices will not make lawyers happy. Are you really
+> removing this, or just moving it somewere else.
+> 
+>> - *
+>> - * See RFC2474 for a description of the DSCP field within the IP Header.
+>> - *
+>> - * xt_DSCP.h,v 1.7 2002/03/14 12:03:13 laforge Exp
+>> -*/
+>>   #ifndef _XT_DSCP_TARGET_H
+>>   #define _XT_DSCP_TARGET_H
+>> -#include <linux/netfilter/xt_dscp.h>
+>> -#include <linux/types.h>
+>>   
+>> -/* target info */
+>> -struct xt_DSCP_info {
+>> -	__u8 dscp;
+>> -};
+>> +#include <linux/netfilter/xt_dscp.h>
+>>   
+>> -struct xt_tos_target_info {
+>> -	__u8 tos_value;
+>> -	__u8 tos_mask;
+>> -};
+>> +#pragma message("xt_DSCP.h header is deprecated. Use xt_dscp.h instead.")
+>>   
+>>   #endif /* _XT_DSCP_TARGET_H */
+>> diff --git a/include/uapi/linux/netfilter/xt_MARK.h b/include/uapi/linux/netfilter/xt_MARK.h
+>> index f1fe2b4be933..9f6c03e26c96 100644
+>> --- a/include/uapi/linux/netfilter/xt_MARK.h
+>> +++ b/include/uapi/linux/netfilter/xt_MARK.h
+>> @@ -1,7 +1,9 @@
+>>   /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> -#ifndef _XT_MARK_H_target
+>> -#define _XT_MARK_H_target
+>> +#ifndef _XT_MARK_H_TARGET_H
+>> +#define _XT_MARK_H_TARGET_H
+>>   
+>>   #include <linux/netfilter/xt_mark.h>
+>>   
+>> -#endif /*_XT_MARK_H_target */
+>> +#pragma message("xt_MARK.h header is deprecated. Use xt_mark.h instead.")
+>> +
+>> +#endif /* _XT_MARK_H_TARGET_H */
+>> diff --git a/include/uapi/linux/netfilter/xt_RATEEST.h b/include/uapi/linux/netfilter/xt_RATEEST.h
+>> index 2b87a71e6266..ec3d68f67b2f 100644
+>> --- a/include/uapi/linux/netfilter/xt_RATEEST.h
+>> +++ b/include/uapi/linux/netfilter/xt_RATEEST.h
+>> @@ -2,16 +2,8 @@
+>>   #ifndef _XT_RATEEST_TARGET_H
+>>   #define _XT_RATEEST_TARGET_H
+>>   
+>> -#include <linux/types.h>
+>> -#include <linux/if.h>
+>> +#include <linux/netfilter/xt_rateest.h>
+>>   
+>> -struct xt_rateest_target_info {
+>> -	char			name[IFNAMSIZ];
+>> -	__s8			interval;
+>> -	__u8		ewma_log;
+>> -
+>> -	/* Used internally by the kernel */
+>> -	struct xt_rateest	*est __attribute__((aligned(8)));
+>> -};
+>> +#pragma message("xt_RATEEST.h header is deprecated. Use xt_rateest.h instead.")
+> 
+> If you look througth include/uapi, how many instances of pragma
+> message do you find? If you are doing something nobody else does, you
+> are probably doing something wrong.
+> 
+
+#pragma message was already used in the kernel in other parts. This is the only 
+way to tell customers, what is sustainable to use in the future, then for 
+example 5 years later this ugly duplication can be removed in a real API 
+breaking change which was tell and advertised in the codes nicely before. As 
+other SW products handle it also.
+
+>>   struct xt_tcpmss_match_info {
+>> -    __u16 mss_min, mss_max;
+>> -    __u8 invert;
+>> +	__u16 mss_min, mss_max;
+>> +	__u8 invert;
+>> +};
+> 
+> If you want to change whitespacing, please do that in a separate
+> patch, with an explanation why.
+> 
+> 	Andrew
+
 
