@@ -1,101 +1,146 @@
-Return-Path: <netdev+bounces-155257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A409A0187C
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 09:15:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B42CA01883
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 09:32:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92BAB1883403
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 08:15:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC2111882E7C
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 08:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A9513C9D9;
-	Sun,  5 Jan 2025 08:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A0438FA3;
+	Sun,  5 Jan 2025 08:32:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t2/Xw35C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h/nq3b3d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3352B38FA3
-	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 08:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBC01DA21
+	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 08:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736064915; cv=none; b=tJ06OpPgpjRoBvpXoEnLoNV4mfzazzD1V3AXKV7JwGEpYbBEfKS29VJKD9Aw+IbgyTIO/j8CJGynfPOBZr8cjnUzsNCb7TFUaooH3htbavY+VuKlL6ZKrS4yt3GHxVFYdhqnERJFLsN6KItw568KXCTgMASGSgr11lJRj6s6ob0=
+	t=1736065970; cv=none; b=cXho/OWT7e3U7ECse/0J24yuDcmYAsfvFmFOtIeWG8vxn5AFT2k7Si6t72Bv63S/38IAWP1g5wouQuM9NrYErMKDwuZEIt5RuRc56hdsNC4dVlUOqM4EQXFsHNpOd1shLrkX/URI4sbFTAJBpBvi0iEVStLcevmgoUZY8c2zwjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736064915; c=relaxed/simple;
-	bh=T5NJXp+ZwwSk3CtektKFXWCm71Q0aZL4BglyNE9k7bc=;
+	s=arc-20240116; t=1736065970; c=relaxed/simple;
+	bh=FKhLkLaZUareZFduZSPJ/xQrSRZu2qocVNeIWlOCBy4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EgeZ4i0JSN3S+ValCaEvVQiOqnGuofXVgVmXeV8BP+RIoT6EuIswd7e266G1J1aj3QTpFolTRLbYRuFUTSw+rBNB9nOoXB0JPymTCr+8vYAV0Nmf5LqlWVF34+QLlZYRm0lDK36U42KE4T8X2RL1fjclJRHtpP28Nvj/6dvAjRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t2/Xw35C; arc=none smtp.client-ip=209.85.208.52
+	 To:Cc:Content-Type; b=EsmU9WCSSQCUv3tEWqRWQdcy/SoG3aOOKSJKh7iddVQ5I1nhn66J/TqhainIVoR0RoPdhnNFQ/WrKkaVBOMxEcKAid41cJQRL1m4KC6oNKD9+cKNK+rO/XU0DRq/Z6x8TFJrBi/mmTt1Pip3jPFG5rg/coa5uLrJ8OZB/EwYfpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h/nq3b3d; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5d90a5581fcso4773042a12.1
-        for <netdev@vger.kernel.org>; Sun, 05 Jan 2025 00:15:12 -0800 (PST)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5d7e527becaso22646381a12.3
+        for <netdev@vger.kernel.org>; Sun, 05 Jan 2025 00:32:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736064911; x=1736669711; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736065967; x=1736670767; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5SZjxMLQhQsvR+61eZqi7biFucTvFfuBFc4OhmGjUWc=;
-        b=t2/Xw35CiPCttP2Hl9eZC1aAnSGr+o5kdFBJh9W8Rxwhsgsa5zyjZtBcl3z1uLYDdR
-         A5xT7JfWIJa6ToMHCU+P634/4Z8FT0sqnnGOg4ZXA+oG5zW104PpEa7FS7cv7F9mPnFs
-         LUm0N4bSj6U1oHNQ2Dkp0bOSI7YPDR4g53+NtEQ0+enVkdUmDstmC2tFfsNiHyoPtr5C
-         35ImwvMr9VIURIYYpDdjbbfftjAAcbOP1T8aBW8aPEvPg1QvPr6buTi4Juc+OmjCjMpf
-         ShWzgLcEwP7tsYJHedCLbLkINT7vuoRqiwAxIU8J9CFHhjYhroXYtrKlbWdTuC6QJT1l
-         JQOQ==
+        bh=feky3fOQIBZBCqyXt7+3X9e4oX7Q5OHhgwGJckV1gq0=;
+        b=h/nq3b3dfZLNaEZg2Qkk/RBWRx93En5cBs92fyI4dmtdz1OsJxxQ2K9BhfaNbjEvZQ
+         axXEH0tAbM//nK3CX9NLbk1dNWZ69E8DtgYs6F93I/GnneOitAwNsfc+yJXBod3Z4Uxk
+         DZwlsdTFIlK9xiocj5pKdgUX1kuy3O4y4pw02NAUzxlo6PhjPxwkFsj5R2xzvc6rco3i
+         2K8E/qFUc2amUOuLh9AoxBNNpuDCPyMey3r+/J1r0/ci0vZZYd9IV25QIsqifC1zYFZy
+         BfT/C5NHXou3OD9PK+1ErxD7LBhy2CWq5e6PsDCg1UU9iDjLcGgFQJTJO8qJbMY0eGkf
+         ovNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736064911; x=1736669711;
+        d=1e100.net; s=20230601; t=1736065967; x=1736670767;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5SZjxMLQhQsvR+61eZqi7biFucTvFfuBFc4OhmGjUWc=;
-        b=wk1FoJaMfzBNksPMkLa4HKoyd+610c00kiYGhWExZjEwQzlA0wS9mtSXXoQMWXEALq
-         ArqGNJYA7hB7BYhFcpk8iuIrNE+gBho6wXHEgDRCuDsqZIae/J2eZ7cegrjfGTaCKnFw
-         BN4OB+ai0KO8H/74cray3gb+OlEdEOcKhK5EO3ByDDvM7Jobp8EshpWCtA/4t29VBz6Q
-         ydrXRHoncJVHw6M+YErvT7Nj+k0tYoBJlSuP9xvnYTow+yxk6LsXUPBju7/dnsa0uuee
-         WGTBvwOESdfA4znwLWp4P2GTXvcN+W8CnuZdy3s8xEeJTVW2vuyXdY9xjQjuL8s2s+pt
-         4NRw==
-X-Forwarded-Encrypted: i=1; AJvYcCWi1FVj/hpqcd+Js4PVAyylJGZr/hytuTQGXgxWsh5CGkR4DSccD+9BcSnhSmldQg6cQ9DLQig=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxpw+VZELYbHUwNlkBPcdTtoailTHuJ688+vvHH70KY1vKxTi56
-	6zItaL5xawwHxxk63VqRYpBS+pVuL7Ndkogj+btA01yqqFxs4YF76kxC06jDarbUBqTOL8Z4DWs
-	oNQ2mPAm4B4RTMdrjuyBPxsITvv2snS5B1o3N
-X-Gm-Gg: ASbGncvmED1J4cc/HfJ0iML07UIjjVMKxylUlBBjSugLBpW/ybYDfoB1Cvi25St7r2j
-	LfgfpY/yODVhHpROMXU3fuRzdub5VlXsR4cXzwVo=
-X-Google-Smtp-Source: AGHT+IHw94L9pYn4JSzFh8kcYSrnpzrST6+Nefws/gMJJJD4tSICcjS9ICp2poUuYb4I7Kb10rf4O5VWYI9hHD77cCk=
-X-Received: by 2002:a05:6402:3512:b0:5d1:2534:57bf with SMTP id
- 4fb4d7f45d1cf-5d81de162b7mr45171330a12.32.1736064911440; Sun, 05 Jan 2025
- 00:15:11 -0800 (PST)
+        bh=feky3fOQIBZBCqyXt7+3X9e4oX7Q5OHhgwGJckV1gq0=;
+        b=sbueFSVkf9hNlv802Shi0ZoYkHvE1B7R20P3mWcBV7R5xgT6ODwNsFtlWL4tzKtDqo
+         B/+4+n3x2PHU1QzgIzNdSdMk/AX9yaclNc9M1w/xxCrPCChJ/FxNFVYBlcY2KDgtmpWD
+         HQUcygl4QaoMgr9NgaKOj9C3roBehLUrkHzo+cct8Y9MjIbK2s7RWVnED5mU1GMMgPTi
+         zCSKuau6mag+AnsJW3DXvzKxpFRUnuOeqBLvHHs48zux0MAz2MHOGX8aHcSi5lKBFpzE
+         fHelGmYjrystcGT9ZJ7+zl3RbVxEIFu5h3txyWhqUeJUO1t6/qEA1DHE/wkduqBHIBnf
+         19BA==
+X-Forwarded-Encrypted: i=1; AJvYcCW8tXpxsayChy33gWJfLeza+yUQV/vAyWM2CB3NFyyTZooSdkWviJRiwlwfWyqsxBQZuJ4FBn0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTF8xIpGQqNqHDiwo8vqrgFFVsI/rd6KePbdm1V/zWMq/hAr+4
+	p9kNTxaOPuLcitXNr46XBUB42QCi2Xahnl34bw7bzatkhgbaJphN4PdmMJcZDv3ft7d3uu9wSdI
+	Dic3TNVl511qX2QpHve1iYIx1CsyJpl+ICKQ2IlIwAttfuqN3JxUy
+X-Gm-Gg: ASbGncuyhUbSGpfUmvRvH7hZ3C78U7QrHCeuKmwxkn7qe29act/MRuRkKARU7FwWFHT
+	1DhULKLPeGB4hgChCNXL0zSweXThEUinn2ciufwQ=
+X-Google-Smtp-Source: AGHT+IGxTAgQM1VW1kke0fyltXylhZqkT4C5ZvsfUhJY238xnt5+cxsJ2MB3kfttHW/OBdAMBhnYzQL89o/Vv7ojjkw=
+X-Received: by 2002:a05:6402:5245:b0:5d3:ba42:e9fa with SMTP id
+ 4fb4d7f45d1cf-5d81ddc01a0mr133299931a12.16.1736065966986; Sun, 05 Jan 2025
+ 00:32:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250105003813.1222118-1-champetier.etienne@gmail.com>
-In-Reply-To: <20250105003813.1222118-1-champetier.etienne@gmail.com>
+References: <67769ecb.050a0220.3a8527.003f.GAE@google.com> <CANn89iKVTgzr8kt2sScrfoSbBSGMtLLqEwmA+WFFYUfV-PS--w@mail.gmail.com>
+ <cf187558-63d0-4375-8fb2-2cfa8bb8fa03@kernel.org> <CANn89iJEMGYt4YVdGkyb-q81TQU+UBOQaX7jH-2zOqv-4SjZGg@mail.gmail.com>
+ <20250104190010.GF1977892@ZenIV> <89c2208c-fe23-43eb-89ef-876e55731a50@kernel.org>
+ <20250104202126.GH1977892@ZenIV>
+In-Reply-To: <20250104202126.GH1977892@ZenIV>
 From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 5 Jan 2025 09:15:00 +0100
-Message-ID: <CANn89iKb+T3cZLJUwRNZah6hKHn3XbUyw29PsEAif5LC96NRoA@mail.gmail.com>
-Subject: Re: [PATCH] ipvlan: Support bonding events
-To: Etienne Champetier <champetier.etienne@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Date: Sun, 5 Jan 2025 09:32:36 +0100
+Message-ID: <CANn89i+GUGLQSFp3a2qwH+zOsR-46CyWevjhAQQMmO5K9tmkUg@mail.gmail.com>
+Subject: Re: [syzbot] [mptcp?] general protection fault in proc_scheduler
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Matthieu Baerts <matttbe@kernel.org>, davem@davemloft.net, geliang@kernel.org, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 5, 2025 at 1:43=E2=80=AFAM Etienne Champetier
-<champetier.etienne@gmail.com> wrote:
+On Sat, Jan 4, 2025 at 9:21=E2=80=AFPM Al Viro <viro@zeniv.linux.org.uk> wr=
+ote:
 >
-> This allows ipvlan to function properly on top of
-> bonds using active-backup mode.
-> This was implemented for macvlan in 2014 in commit
-> 4c9912556867 ("macvlan: Support bonding events").
+> On Sat, Jan 04, 2025 at 08:11:49PM +0100, Matthieu Baerts wrote:
+> > >> +       if (S_ISREG(file_inode(file)->i_mode))
+>                 ^^^^^^^^^
+> > >> +               return;
+> > >
+> > > ... won't help, since the file in question *is* a regular file.  IOW,=
+ it's
+> > > a wrong predicate here.
+> >
+> > On my side, it looks like I'm not able to reproduce the issue with this
+> > patch. Without it, it is very easy to reproduce it. (But I don't know i=
+f
+> > there are other consequences that would avoid the issue to happen: when
+> > looking at the logs, with the patch, I don't have heaps of "Process
+> > accounting resumed" messages that I had before.)
 >
-> Signed-off-by: Etienne Champetier <champetier.etienne@gmail.com>
+> Unsurprisingly so, since it rejects all regular files due to a typo;
+> fix that and you'll see that the oops is still there.
+>
+> The real issue (and the one that affects more than just this scenario) is
+> the use of current->nsproxy->net to get to the damn thing.
 
-Which tree are you targeting ?
+According to grep, we have many other places directly reading
+current->nsproxy->net_ns
+For instance in net/sctp/sysctl.c
+Should we change them all ?
 
-Please look at Documentation/process/maintainer-netdev.rst  for reference.
+Perhaps an alternative would be to add a generic check in
+proc_sys_call_handler()
+
+diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+index 27a283d85a6e7df1a7edbfb513ce75832363e2e6..84968b10ce86e7fd88c6e3c43f5=
+2b601394b056f
+100644
+--- a/fs/proc/proc_sysctl.c
++++ b/fs/proc/proc_sysctl.c
+@@ -576,6 +576,8 @@ static ssize_t proc_sys_call_handler(struct kiocb
+*iocb, struct iov_iter *iter,
+        error =3D -EINVAL;
+        if (!table->proc_handler)
+                goto out;
++       if (unlikely(current->flags & PF_EXITING))
++               goto out;
+
+        /* don't even try if the size is too large */
+        error =3D -ENOMEM;
+
+
+Thanks.
 
