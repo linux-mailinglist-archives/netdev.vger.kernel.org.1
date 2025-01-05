@@ -1,169 +1,200 @@
-Return-Path: <netdev+bounces-155243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D8BA01802
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 05:08:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B66BA0184F
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 07:40:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50DE57A14CF
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 04:08:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60B21188380E
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 06:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B461DA21;
-	Sun,  5 Jan 2025 04:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E8935957;
+	Sun,  5 Jan 2025 06:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="S6QbZZh6"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Rsz33b8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9383442F;
-	Sun,  5 Jan 2025 04:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362D51D6AA
+	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 06:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736050084; cv=none; b=sGafD9MelqTPFtqYgWGdIbsom/Cd+8eHPKzgOC7AP8CFnWlxd9d39+zC55nLgux2CmCG769C1XBaKyaKENmkWaL8D/XOE9dWvRQiJ0CSSkglWd2vgxvhLvGPgENiagRZcfMROWz6fTzN12SciDrRG+4pYwAPOmoP8yRFXgbTgP0=
+	t=1736059202; cv=none; b=Ts4jb4ssq0mjwMrx+U2iGyb2HMcTgi1ZZMcpr66+cr0EsQ8GPd81iWX7vmQcKY67CRVwxbkk2hGrfVBSICt7t9eUlPdqVf/jvN0VWNYtotYlf65EKKeb5c8aosyjOljbnF5USyNnRtdsV9rEWSAi4T/qyHsQOr2q2lJjYAfY4bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736050084; c=relaxed/simple;
-	bh=90+x2RjiN0d1WTwTmBN4pZjkDM0LElpAVBWh3nmtQAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jIyl7sDIXHoXRP3/CeFrVypMQ0/1P8qt14pUV8mD6/Ic1mLdXGPDdow9nYqOGWQuevaZxSJn4A4XtOl9/xJyFSdQFgBTmcPdN8ODwFMGdRjgo0IK65dZHRYZ2s4/I8FaPm4h0r3aKKowmFXTtbHpfRa7Hoq/F1Yl93UeCQG9+ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=S6QbZZh6; arc=none smtp.client-ip=52.59.177.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1736050017;
-	bh=hlFS13odVb55GccO5hmoQYgmewqIs0Q10x0eG5VUCq8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=S6QbZZh6+2/v+OtWdm65JKqeiTrBIEDkBYxpEZzMnVXw9irQPf2grj3z/WrG3MGGt
-	 ktvenTxzB8vn8PDsbsWQTOWOu7XcbA+1cwDO+N4s35Z5w9q8ZxE2JzODNpXmoj0jyL
-	 nQO7nQ462+qHztzjh9owCE8nRaVQhu2xRH5vA5rM=
-X-QQ-mid: bizesmtpip3t1736049974t9n3jgf
-X-QQ-Originating-IP: r3BhvYPkQ0Z7fN4+I8N2dlayxH2rSIzco4OOtcliAm8=
-Received: from avenger-OMEN-by-HP-Gaming-Lapto ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 05 Jan 2025 12:06:10 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 12459793524915979078
-From: WangYuli <wangyuli@uniontech.com>
-To: nbd@nbd.name,
-	lorenzo@kernel.org,
-	ryder.lee@mediatek.com,
-	shayne.chen@mediatek.com,
-	sean.wang@mediatek.com,
-	kvalo@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	deren.wu@mediatek.com,
-	mingyen.hsieh@mediatek.com,
-	chui-hao.chiu@mediatek.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	raoxu@uniontech.com,
-	guanwentao@uniontech.com,
-	zhanjun@uniontech.com,
-	cug_yangyuancong@hotmail.com,
-	lorenzo.bianconi@redhat.com,
-	kvalo@codeaurora.org,
-	aleksander.lobakin@intel.com,
-	michal.pecio@gmail.com,
-	dzm91@hust.edu.cn,
-	jiefeng_li@hust.edu.cn,
-	WangYuli <wangyuli@uniontech.com>
-Subject: [RESEND PATCH] wifi: mt76: mt76u_vendor_request: Do not print error messages when -EPROTO
-Date: Sun,  5 Jan 2025 12:06:07 +0800
-Message-ID: <D4B9CC1FFC0CBAC3+20250105040607.154706-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1736059202; c=relaxed/simple;
+	bh=FTi9BSK8IKFJV1Y0vyCtNNIY5qy/IKN+a8sbU0GhX2o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LvDJgNmEVqqAXofOaJOrUua1ulyrZpY+FKTQzEcXQVV7zoX3pJ5TwceItetAu1yttqmUfJilUhCt0K3gBvHlMPAK9ipkS+AD0TG9TBuqzt0PO4QP6jwgSXIpr10D8EbiMMFTvKg3w1OzZzkPDN4lIfX3ISFnJSvkqGlfGw56mQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Rsz33b8o; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso16737435a12.0
+        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 22:39:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1736059198; x=1736663998; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FTi9BSK8IKFJV1Y0vyCtNNIY5qy/IKN+a8sbU0GhX2o=;
+        b=Rsz33b8o6YOse+lEzP2PmNVnrMbQ/d6qA3K7XB/htMhg+tmY1NO2w+xD897cNsJFHO
+         i20Z/M2uUTkAes0VW2o6BEnUABFoS+G0bL0T/qn/xCgH4wmuG6wVU8fipsdD2+sw42gT
+         j6NbHCN7UYXomD3f7M0Tis+X+SRHfetMQ+/pc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736059198; x=1736663998;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FTi9BSK8IKFJV1Y0vyCtNNIY5qy/IKN+a8sbU0GhX2o=;
+        b=NItBGwbtOv4vL3Bm9Dfg0lFdZPQoN1fmBP9Nr443+qBe9onPNOm0Slzkf5jAH4FvPu
+         LTjE7eauxe4Q6JrQv9FmIRakbUBPEBONKlPCQ2ukN1Np/qyMByGXFfiCDKapWwBhz4XQ
+         nxxMwUkyWvY7Spp0bcg+Vz/4u+ECPPR7b4b46SewXsPSMA3rrfLfKd7/exE06He8a0Zn
+         yOn5o7733TMvU3G+WCCvzYJm9QpCeBoFSJI6f5mreLayaL7t4j32Gi2vT1Rjenh5SXDO
+         yDSYkdnAYlXdNSKTSRzwgTTUGfOI+YDwy4moIIgdPVXhD7ilPPpAW/BVPOA2ykqFC78y
+         gK1A==
+X-Gm-Message-State: AOJu0Yz2cnDmTTrLC0zpy2ITV4/BPtga6vRExKWQSnhCdd9yJfStfOqj
+	OUkdQXNVnJia/CLzdy+qzyLq+IocvmNGCdlOmth2W1cV0sMmTWVXg7sAXh3B0fbpQOsyCh8m9wW
+	MxphUJI3WiIze8cqj+uGXXvzWE5qFpkt6iV9u
+X-Gm-Gg: ASbGnct9izcc+cDiyca6tbLAYmY1h3riIytG9C0+aIlHRNsaFOqV5MbacVzrGQ/sZqa
+	dPhF4M5qfOT/SsIedyYBAUqYXPZt5h3b8Gkq2
+X-Google-Smtp-Source: AGHT+IEIbV0BCihtn6repW6jzmnxvORvPR3hoykPbVVGlzP8uNxyZvHxBTsKzuObsQ7OwZCPZ72BhmbmSKi/e1xu+Dc=
+X-Received: by 2002:a05:6402:4402:b0:5cf:e9d6:cc8a with SMTP id
+ 4fb4d7f45d1cf-5d81dda9256mr49785513a12.20.1736059197954; Sat, 04 Jan 2025
+ 22:39:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N4ZILu3POr3O5rZq/TjewF2i6XEMk/wSLT1i5iBLaDCBMNXTVo/TgVHO
-	cB/+PIlqLfXHyZnUDe85e7uY1PL71h9kVKmTnXVF/HS49g+475BGQGs4T+0mXHDHJ+Ik7b4
-	V4x3h6aNkLd0Gdq8++si9GytujjwQuK3/TnyJLO0nTP7wbCJ1ZpTuxQyWivsR2jQNAFtGU0
-	5VrCOEPzCvhc6CwYYylQujPRDnTwpRRt/e6PutNMN/1yCptNk2YCBJMppkCKEdtxFoHRlQZ
-	Nb96sxjhYOWXX9MqJPmjrgYpYL+dfgdwONVdydM08vrV96D016X7je6PX7YoP39X7u0jVxX
-	MxSWXWYuH+bpKrFjCSWDW7itkXW8TbZlSasEKaDxXe1DgGD64cV26TH7IViYBDRtbPj4Jto
-	sKavLN9hMpvfeW3kRFBvRQUT9DtfuSAheVQswfGQe4muHouygZAS00bbzaqtwL3/nBMVnMy
-	FGTkm87LjNyXSE5TFC3AIDt6CzDjCm0Ie+b3YRov9VVVAFxIpwuBHDRS3A1cuGwl/HpjK/J
-	i0xYCAC9/NsIDGQ5GylSz+Eoh5EBNhWyq5NjraWOnnaYwgCQqJ/TETgvliV2xtgOGWfPDn5
-	/pKBmBYNvaNSEVTdDjSyJZ3py9f0Qkt/60YfwWyYg8hPr5CNBE2qHzDh4NPJz6CkNUKWHgd
-	BT36teTv65i5t4XnYa9mn9BTBApQ7IDAtkKuACXlm8ah+krsKWseDNUKybIV929IhOEEB9d
-	V9JUmXLKev6U6i4qaZB8JFGmMWKPo8MpCB8fiNLYJVQS1sPiiOGhKtd/j/VMlvD6dTE42i2
-	KeAdP27O8SB+6JDhtuD6MqKXHeoP7SYmlkRCBkhfz1z8FK20bTCuwBnzbv94aIEwxKClFDV
-	qBzJMgpfwU64Mi6WK2VpEUXpzEItv3LvnMY55HDYw4iudqxFK/vQKbMQ7koDtOt4Vt7cG/G
-	0FPvvjiSAYoMBRU4+7SBvzS4A9oT5z/B3166sBkFPfL/eiul+CoX6yzV93sYC0d+ZWVc1cx
-	VbYGnMTRYOVLWptE/Ths0KnkQpPes=
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+References: <20250104015316.3192946-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20250104015316.3192946-1-mohsin.bashr@gmail.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Sun, 5 Jan 2025 12:09:45 +0530
+Message-ID: <CAH-L+nO5WbTyc+y8c-fmumn5bc5ucpanLeX5Q5RtLfrf3AaN5Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] eth: fbnic: update fbnic_poll return value
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org, 
+	andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, vadim.fedorenko@linux.dev, 
+	damato@fastly.com, brett.creeley@amd.com, kernel-team@meta.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000dabfde062aefc7e8"
 
-When initializing the network card, unplugging the device will
-trigger an -EPROTO error, resulting in a flood of error messages
-being printed frantically.
+--000000000000dabfde062aefc7e8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The exception is printed as follows：
+On Sat, Jan 4, 2025 at 7:23=E2=80=AFAM Mohsin Bashir <mohsin.bashr@gmail.co=
+m> wrote:
+>
+> In cases where the work done is less than the budget, `fbnic_poll` is
+> returning 0. This affects the tracing of `napi_poll`. Following is a
+> snippet of before and after result from `napi_poll` tracepoint. Instead,
+> returning the work done improves the manual tracing.
+>
+> Before:
+> @[10]: 1
+> ...
+> @[64]: 208175
+> @[0]: 2128008
+>
+> After:
+> @[56]: 86
+> @[48]: 222
+> ...
+> @[5]: 1885756
+> @[6]: 1933841
+>
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+LGTM,
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-         mt76x2u 2-2.4:1.0: vendor request req:47 off:9018 failed:-71
-         mt76x2u 2-2.4:1.0: vendor request req:47 off:9018 failed:-71
-         ...
+--=20
+Regards,
+Kalesh AP
 
-It will continue to print more than 2000 times for about 5 minutes,
-causing the usb device to be unable to be disconnected. During this
-period, the usb port cannot recognize the new device because the old
-device has not disconnected.
+--000000000000dabfde062aefc7e8
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-There may be other operating methods that cause -EPROTO, but -EPROTO is
-a low-level hardware error. It is unwise to repeat vendor requests
-expecting to read correct data. It is a better choice to treat -EPROTO
-and -ENODEV the same way。
-
-Similar to commit 9b0f100c1970 ("mt76: usb: process URBs with status
-EPROTO properly") do no schedule rx_worker for urb marked with status
-set  -EPROTO. I also reproduced this situation when plugging and
-unplugging the device, and this patch is effective.
-
-Just do not vendor request again for urb marked with status set -EPROTO.
-
-Link: https://lore.kernel.org/all/531681bd-30f5-4a70-a156-bf8754b8e072@intel.com/
-Fixes: b40b15e1521f ("mt76: add usb support to mt76 layer")
-Co-developed-by: Xu Rao <raoxu@uniontech.com>
-Signed-off-by: Xu Rao <raoxu@uniontech.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
- drivers/net/wireless/mediatek/mt76/usb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/wireless/mediatek/mt76/usb.c b/drivers/net/wireless/mediatek/mt76/usb.c
-index 58ff06823389..f9e67b8c3b3c 100644
---- a/drivers/net/wireless/mediatek/mt76/usb.c
-+++ b/drivers/net/wireless/mediatek/mt76/usb.c
-@@ -33,9 +33,9 @@ int __mt76u_vendor_request(struct mt76_dev *dev, u8 req, u8 req_type,
- 
- 		ret = usb_control_msg(udev, pipe, req, req_type, val,
- 				      offset, buf, len, MT_VEND_REQ_TOUT_MS);
--		if (ret == -ENODEV)
-+		if (ret == -ENODEV || ret == -EPROTO)
- 			set_bit(MT76_REMOVED, &dev->phy.state);
--		if (ret >= 0 || ret == -ENODEV)
-+		if (ret >= 0 || ret == -ENODEV || ret == -EPROTO)
- 			return ret;
- 		usleep_range(5000, 10000);
- 	}
--- 
-2.45.2
-
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIDcDpb0rm2LbWF7WBS3g3EnXBtW824s/GF6l2eEHA0JaMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwNTA2Mzk1OFowaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDAVnciGm3J
+vbi3CtqljB+WEglj3YYOEIzptwAxKvD3/ZdhGGDfYoV2iXkz2dq+8djBRuLbQuvzJ+Gm0kZV1X4S
+iU2t+r6AeR7Mz9LpnNLOkDyVY7K/nvbNdgXRmtm4QnMzKSZ7k8s1lFDXVfJeFJiBYmEvIsIz7i8w
+1wMsJQV9AtiZfQP+l0zAY6+R8g7aApMHqIBCdUOMVXNhlyVE/D7lj17Vc7jo1VzWzfoUbzZcr7xm
+aJoyBb713l7FJoqEGc60Xs7+uXAUVHH8TwwmGACvQfDD1aotcdSUdUbIUAUaR+kobxXRtJDcGVX9
+MXXnBeV7CKm4jg02rexrYTdI/RmU
+--000000000000dabfde062aefc7e8--
 
