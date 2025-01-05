@@ -1,140 +1,192 @@
-Return-Path: <netdev+bounces-155282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B5AEA01ABD
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:09:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C0A0A01B02
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:39:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A9F8161892
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:08:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33810161FF1
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EC6149C7B;
-	Sun,  5 Jan 2025 17:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y6xJ4W9Z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7B8155CA5;
+	Sun,  5 Jan 2025 17:39:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3595336D;
-	Sun,  5 Jan 2025 17:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04D31487DD;
+	Sun,  5 Jan 2025 17:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736096930; cv=none; b=oq8T42uuPEOJACcuOGkt4IFpvH+i6Rko7KGh9lP3FS4sqfRBjb2Sx7Kh0wHsm9/yCSYj1y2AwXuROWD0K6px96Nr6cILKtixHJ//eBPBz4DZIPCgxdPXf9qM/zUmHsk2bVneWWqzNhJUh468aYgip5TtLuaYIlFXkhgtN5goFLA=
+	t=1736098792; cv=none; b=ZuvzNgeQuOfiPooHHayqedxHHij052qmh6HDDttCNFgcgSTENEAsJDuTRCr42ilJsMiPaz7K4L7IRKVOBi2gwGDmM7fGrRn/DijLIEOThEe00Rb/DqFIaMmNZXiLB+LT0XfEhBe8C5BtJcptpfkq420SX3AA9rZgtLbuIsrDXcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736096930; c=relaxed/simple;
-	bh=b0yXdcl0FQhRZaXYWfu7p7+U1eeapTWa74uhZ7KKUts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UdUMshoerKh18ZBBDsP8YgAkWA6u9pmFmT5wrhTIMBiXhQfREm5SGa/rXWtzJY3XkdJekwc1rmSE9kCMTt9G3RmdpIr3Jyxtzuqq9mY9fFmGBRPDvhk2GMKX0dssTJQ9VB0Co+xbBuRHjhqna5Pn2f9bnnf21rv4iFbs/wJc/nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y6xJ4W9Z; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=HGE42t/8NMJxHFUNmxXVqxt8ki1wLwBn/OH6YlViYJA=; b=Y6
-	xJ4W9ZQodTJ7DVSV0KYGQjUBAokfLaihrBo1ehZDqN6s9nJduIpl5iA309a5l5WUsio8CvAz9QtJQ
-	bFZvNjkv/j7G0hqlqtN2Ztd1zBjMeQaKbta0CbKGLnfsNs9+9sN2dKoWG4ygti8vIKUI38V7pxUE2
-	SaYzk3aOo7nCdbQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tUU7C-001cpQ-Qe; Sun, 05 Jan 2025 18:08:38 +0100
-Date: Sun, 5 Jan 2025 18:08:38 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?J=F6rg?= Sommer <joerg@jo-so.de>
-Cc: Christian Eggers <ceggers@arri.de>, Jakub Kicinski <kuba@kernel.org>,
-	Tristram Ha <tristram.ha@microchip.com>,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>,
-	Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org,
-	linux-spi@vger.kernel.org
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-Message-ID: <f26f526c-cb43-4170-8dd4-b7cf6c0d1d5d@lunn.ch>
-References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
- <5708326.ZASKD2KPVS@n9w6sw14>
- <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
- <2675613.fDdHjke4Dd@n9w6sw14>
- <sqsslcr7fsgqi7fvjpy5xnarhlm76atvatczkzwpn37e7gnsu6@tuy7an7t4gdg>
- <cnmv4ahgyblej7aoknhhb3xyvb67j7t24tug7uoxxtl5s4pjy3@wd3copbtdiec>
+	s=arc-20240116; t=1736098792; c=relaxed/simple;
+	bh=X+1xcx4Om+gi05BkXXVgtrIr7bwQ44ulDNRrNrc2cxU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L41fFciuw0yBZ0dS5t5BuB8WzCkRGdp6JqnsZTObQC7rs1Q5+jjJ+eygnqTD34GeBRoZaUY/711IuWIfsx75AC9A4C9+VHjp7qAG2Yl4JLLK8sHUCasR+J1J66VTQeisl8jBcDGTRdcE/SKk8G+RCklatBk5PHMpdr3hMNRM/Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1tUUb4-00000005F7Y-34Am;
+	Sun, 05 Jan 2025 18:39:30 +0100
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To: M Chetan Kumar <m.chetan.kumar@intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] net: wwan: iosm: Fix hibernation by re-binding the driver around it
+Date: Sun,  5 Jan 2025 18:39:24 +0100
+Message-ID: <0bf3266a7c6e42e5e19ed2040e6a8feb88202703.1736098238.git.mail@maciej.szmigiero.name>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <cnmv4ahgyblej7aoknhhb3xyvb67j7t24tug7uoxxtl5s4pjy3@wd3copbtdiec>
+Sender: mhej@vps-ovh.mhejs.net
 
-On Sun, Jan 05, 2025 at 05:33:38PM +0100, Jörg Sommer wrote:
-> Hi everyone,
-> 
-> I've added you to the list of recipients, because you where somehow involved
-> in changes of the KSZ-SPI switch code.
-> 
-> We are debating the SPI mode setting for the microchip ksz8795 and ksz9477
-> and possibly others. Since the commit
-> 8c4599f49841dd663402ec52325dc2233add1d32 the SPI mode gets fixed to mode 3
-> in the code. But at least my ksz8795 works also with mode 0 and shows better
-> initialization behaviour with mode 0.
-> 
-> The big question is: can both (or all ksz) chips work with both modes?
-> Should this setting stay in code or moved to the device tree?
-> 
-> The specs are here, but I found no evidence about the supported/recommended
-> SPI modes:
-> 
-> https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS00002419D.pdf
+Currently, the driver is seriously broken with respect to the
+hibernation (S4): after image restore the device is back into
+IPC_MEM_EXEC_STAGE_BOOT (which AFAIK means bootloader stage) and needs
+full re-launch of the rest of its firmware, but the driver restore
+handler treats the device as merely sleeping and just sends it a
+wake-up command.
 
-Don't trust what i say, i'm not an SPI expert, but i can use grep.
+This wake-up command times out but device nodes (/dev/wwan*) remain
+accessible.
+However attempting to use them causes the bootloader to crash and
+enter IPC_MEM_EXEC_STAGE_CD_READY stage (which apparently means "a crash
+dump is ready").
 
-https://www.kernel.org/doc/Documentation/spi/spi-summary says:
+It seems that the device cannot be re-initialized from this crashed
+stage without toggling some reset pin (on my test platform that's
+apparently what the device _RST ACPI method does).
 
+While it would theoretically be possible to rewrite the driver to tear
+down the whole MUX / IPC layers on hibernation (so the bootloader does
+not crash from improper access) and then re-launch the device on
+restore this would require significant refactoring of the driver
+(believe me, I've tried), since there are quite a few assumptions
+hard-coded in the driver about the device never being partially
+de-initialized (like channels other than devlink cannot be closed,
+for example).
+Probably this would also need some programming guide for this hardware.
 
-I'm confused.  What are these four SPI "clock modes"?
------------------------------------------------------
-It's easy to be confused here, and the vendor documentation you'll
-find isn't necessarily helpful.  The four modes combine two mode bits:
+Considering that the driver seems orphaned [1] and other people are
+hitting this issue too [2] fix it by simply unbinding the PCI driver
+before hibernation and re-binding it after restore, much like
+USB_QUIRK_RESET_RESUME does for USB devices that exhibit a similar
+problem.
 
- - CPOL indicates the initial clock polarity.  CPOL=0 means the
-   clock starts low, so the first (leading) edge is rising, and
-   the second (trailing) edge is falling.  CPOL=1 means the clock
-   starts high, so the first (leading) edge is falling.
+Tested on XMM7360 in HP EliteBook 855 G7 both with s2idle (which uses
+the existing suspend / resume handlers) and S4 (which uses the new code).
 
- - CPHA indicates the clock phase used to sample data; CPHA=0 says
-   sample on the leading edge, CPHA=1 means the trailing edge.
+[1]: https://lore.kernel.org/all/c248f0b4-2114-4c61-905f-466a786bdebb@leemhuis.info/
+[2]:
+https://github.com/xmm7360/xmm7360-pci/issues/211#issuecomment-1804139413
 
-   Since the signal needs to stablize before it's sampled, CPHA=0
-   implies that its data is written half a clock before the first
-   clock edge.  The chipselect may have made it become available.
+Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+---
 
-Chip specs won't always say "uses SPI mode X" in as many words,
-but their timing diagrams will make the CPOL and CPHA modes clear.
+Changes from v1:
+* Un-register the PM-notifier and PCI driver in iosm_ipc_driver_exit()
+in the reverse order of their registration in iosm_ipc_driver_init().
 
-In the SPI mode number, CPOL is the high order bit and CPHA is the
-low order bit.  So when a chip's timing diagram shows the clock
-starting low (CPOL=0) and data stabilized for sampling during the
-trailing clock edge (CPHA=1), that's SPI mode 1.
+* CC the PCI supporter and PCI mailing list in case there's some better
+way to fix/implement all of this.
 
-And in the datasheet it says:
+ drivers/net/wwan/iosm/iosm_ipc_pcie.c | 57 ++++++++++++++++++++++++++-
+ 1 file changed, 56 insertions(+), 1 deletion(-)
 
-  SCL is expected to stay low when SPI operation is idle.
-  
-  Input data on SDI is latched on the rising edge of serial clock
-  SCL. Output data on SDO is clocked on the falling edge of SCL.
-
-My interpretation of this is that the initial clock priority is low,
-so CPOL=0. The rising edge will be the leading edge, so CPHA=0. So
-that makes the mode = 0.
-
-Can you hard code this in the driver? I guess that depends on if you
-want to support a PCB that puts in a line driver which adds a NOT gate
-to the clock?  Does that ever happen? I don't know. The real SPI
-experts should answer that.
-
-	Andrew
+diff --git a/drivers/net/wwan/iosm/iosm_ipc_pcie.c b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+index 04517bd3325a..3ca81864a2fd 100644
+--- a/drivers/net/wwan/iosm/iosm_ipc_pcie.c
++++ b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+@@ -6,6 +6,7 @@
+ #include <linux/acpi.h>
+ #include <linux/bitfield.h>
+ #include <linux/module.h>
++#include <linux/suspend.h>
+ #include <net/rtnetlink.h>
+ 
+ #include "iosm_ipc_imem.h"
+@@ -448,7 +449,61 @@ static struct pci_driver iosm_ipc_driver = {
+ 	},
+ 	.id_table = iosm_ipc_ids,
+ };
+-module_pci_driver(iosm_ipc_driver);
++
++static bool pci_registered;
++
++static int pm_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
++{
++	if (mode == PM_HIBERNATION_PREPARE || mode == PM_RESTORE_PREPARE) {
++		if (pci_registered) {
++			pci_unregister_driver(&iosm_ipc_driver);
++			pci_registered = false;
++		}
++	} else if (mode == PM_POST_HIBERNATION || mode == PM_POST_RESTORE) {
++		if (!pci_registered) {
++			int ret;
++
++			ret = pci_register_driver(&iosm_ipc_driver);
++			if (ret) {
++				pr_err(KBUILD_MODNAME ": unable to re-register PCI driver: %d\n",
++				       ret);
++			} else {
++				pci_registered = true;
++			}
++		}
++	}
++
++	return 0;
++}
++
++static struct notifier_block pm_notifier = {
++	.notifier_call = pm_notify,
++};
++
++static int __init iosm_ipc_driver_init(void)
++{
++	int ret;
++
++	ret = pci_register_driver(&iosm_ipc_driver);
++	if (ret)
++		return ret;
++
++	pci_registered = true;
++
++	register_pm_notifier(&pm_notifier);
++
++	return 0;
++}
++module_init(iosm_ipc_driver_init);
++
++static void __exit iosm_ipc_driver_exit(void)
++{
++	unregister_pm_notifier(&pm_notifier);
++
++	if (pci_registered)
++		pci_unregister_driver(&iosm_ipc_driver);
++}
++module_exit(iosm_ipc_driver_exit);
+ 
+ int ipc_pcie_addr_map(struct iosm_pcie *ipc_pcie, unsigned char *data,
+ 		      size_t size, dma_addr_t *mapping, int direction)
 
