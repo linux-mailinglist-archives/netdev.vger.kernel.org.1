@@ -1,154 +1,169 @@
-Return-Path: <netdev+bounces-155242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D7FA017ED
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 04:12:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0D8BA01802
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 05:08:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78D6E162DA1
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 03:12:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50DE57A14CF
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 04:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0081B2BAF4;
-	Sun,  5 Jan 2025 03:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B461DA21;
+	Sun,  5 Jan 2025 04:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unrealasia-net.20230601.gappssmtp.com header.i=@unrealasia-net.20230601.gappssmtp.com header.b="1zt+pIGg"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="S6QbZZh6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1AE79C4
-	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 03:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9383442F;
+	Sun,  5 Jan 2025 04:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736046722; cv=none; b=S0tBxcd7ET9hnMBmVuRfDw3ZyUGgXvX1tK6S2RnqOIypQ5WcY+8yQboOER3pmX32Ism0WFDN+axmxR5079LYClzegBts6fnIJuWWAGNsof7yejbQ7fNCj/3rm5dOqfwE0XocnIGqlszYulUGkKsptjg9UpOJa8bD946OsgBMuWU=
+	t=1736050084; cv=none; b=sGafD9MelqTPFtqYgWGdIbsom/Cd+8eHPKzgOC7AP8CFnWlxd9d39+zC55nLgux2CmCG769C1XBaKyaKENmkWaL8D/XOE9dWvRQiJ0CSSkglWd2vgxvhLvGPgENiagRZcfMROWz6fTzN12SciDrRG+4pYwAPOmoP8yRFXgbTgP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736046722; c=relaxed/simple;
-	bh=M3afHnIhzsUhE8ReudXne5D0ZCeB+7ZH4XgZGQ+Usyk=;
-	h=Date:From:Subject:To:Cc:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nI9SXMQwoFNlC0BHlubDz5diB3LzfMMFIdKZpUl1UfXcewIxIWTRiB1gGSQ7SGzS4f1mWT6B+S0Gp2+/OeIgIZIgOaQ++H5gMQSFRQ2/a+Lke4Uexc9SPNSRJ6i8FsoLaK9SV+pewMQEtAPwGFyaruHREg+up2fkBVEPgmnoyEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unrealasia.net; spf=pass smtp.mailfrom=unrealasia.net; dkim=pass (2048-bit key) header.d=unrealasia-net.20230601.gappssmtp.com header.i=@unrealasia-net.20230601.gappssmtp.com header.b=1zt+pIGg; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unrealasia.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unrealasia.net
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-21636268e43so199215ad.2
-        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 19:12:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=unrealasia-net.20230601.gappssmtp.com; s=20230601; t=1736046720; x=1736651520; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:cc:to:subject:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDR3T6pH6nRTD/JerXo9CJlXcHOXM/PRMjal/6KsAz4=;
-        b=1zt+pIGgSZPyuAYEhb87NsD4svGxRrDegWxc6ophFf6v2E9/Tsi/N+Jwvn7BQ9Jtvq
-         o5ALB2bssTsd/ZZM+X/In4OwHPER78KmuY12vyJ+WdBXBDBgzsvbmzi9Q0Ot+V/J3h7c
-         VnBcO5T5V1MhTupqcLnmQF8d+iWd33EbdGgLAQF/NHntoRlaX9z0Vds0C70yrGLhPACh
-         WsUZ5xybto1XZ15suuwOengmXA3cbtFUdz90B/54mVV7FxxOkQH21kZ83Nutzeqw5Fp8
-         w4/ncgkVXzewBQTlQiFLWQTUDEuzAA9Bt4fcE//QTKdUf3Smwpv4q9GCHzqt3aD4X73G
-         dRUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736046720; x=1736651520;
-        h=mime-version:references:in-reply-to:message-id:cc:to:subject:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDR3T6pH6nRTD/JerXo9CJlXcHOXM/PRMjal/6KsAz4=;
-        b=vmgs4YHtPT9ye8ByHv2ExASqqeHnH3r+/RsbzD+P7FfCtcgvj2MWSygRONt+I8a5hg
-         5VLvi98FMIshuQDAeJEMFK8SL4qAHjLriTzYVae4ZsnZPhQbNxO5LgSnB6rhLum7rSc+
-         LTfaOIiRS3HhX8uHOOAqVWvlN2PgRmtGbYbNIeCsV310qB/9xnj6KEBcA0YaXc6pMNLI
-         y95DpypZP5yIF+TT9VOp1MqICdQb0ezlDFy8V0pyqrSwMsjqto1ECLraCqWXRVok88tZ
-         j1lyB4CP1YO5O2pSsFTuQxZT+czj7BfnXfsDhxcmwzHtMxDRYIrzrcwJF73C9xH22x07
-         SM5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWRJ9FzqrAMNM7izeZrt0WAvKjOnrcWFBiB8Jdx2g9viD98jukaBHnRU7F/cd9JIyq2Ni0OLOY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaNhDf8jdPWhWEp6v9wpI/oQShfDx8WCHUYqW9qBN2mlMrYQOO
-	ahS23dUs6LJPWGzvefHB9a5vt5sDFq5hgM4wev6WInCXAgcuk7Lkpr8w5iJeLMY=
-X-Gm-Gg: ASbGncvcb+yVA7kQS8DZKwmiAjjeYCUpeJQn8IrbsPng3i0qtbJIvmiWxKyZz58/ZB7
-	+zVn3x4uzYixXyCWkPTR9Hz/vi/a+05Y65LPOg+M9ObLN0LRpNTKXNP+1JrS+LeWCqrczcjsl4G
-	rnM0Prz1SMLEScpr4GFZtQB26NOhNgBY8dVIyWXo1djLybfbHHf1L6aASRZDIUwjQHNcfCG0NGG
-	2CGJZlUIcDXp8co+RqGcrfoQYbMDPlH4Oeu9R+l92pg4G66XoF2VmemBhzAj509ujCDzA==
-X-Google-Smtp-Source: AGHT+IFVOq+5ZpJK8KCyjSLukqdk4uPWLm20OWriSYxw1WaFF6Ex6pHYezqhg7QlXtseajdHi+Oo0g==
-X-Received: by 2002:a05:6a21:158c:b0:1e1:faa:d8cf with SMTP id adf61e73a8af0-1e5e0845137mr88336792637.40.1736046719754;
-        Sat, 04 Jan 2025 19:11:59 -0800 (PST)
-Received: from muhammads-ThinkPad ([2001:e68:5473:b14:e251:cb33:f243:5e25])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8dbaa6sm28703502b3a.91.2025.01.04.19.11.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jan 2025 19:11:59 -0800 (PST)
-Date: Sun, 05 Jan 2025 11:11:48 +0800
-From: Muhammad Nuzaihan <zaihan@unrealasia.net>
-Subject: Re: [PATCH net-next v3] dev: Add NMEA port for MHI WWAN device.
- (mhi0_NMEA)
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg
-	<johannes@sipsolutions.net>, Loic Poulain <loic.poulain@linaro.org>,
-	netdev@vger.kernel.org
-Message-Id: <O7ILPS.XTBPHMHF1UMO@unrealasia.net>
-In-Reply-To: <c8817188-00d0-410b-bfc0-c89fb4784b84@lunn.ch>
-References: <PVOKPS.9BTDD92U5KK72@unrealasia.net>
-	<c8817188-00d0-410b-bfc0-c89fb4784b84@lunn.ch>
-X-Mailer: geary/40.0
+	s=arc-20240116; t=1736050084; c=relaxed/simple;
+	bh=90+x2RjiN0d1WTwTmBN4pZjkDM0LElpAVBWh3nmtQAE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jIyl7sDIXHoXRP3/CeFrVypMQ0/1P8qt14pUV8mD6/Ic1mLdXGPDdow9nYqOGWQuevaZxSJn4A4XtOl9/xJyFSdQFgBTmcPdN8ODwFMGdRjgo0IK65dZHRYZ2s4/I8FaPm4h0r3aKKowmFXTtbHpfRa7Hoq/F1Yl93UeCQG9+ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=S6QbZZh6; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1736050017;
+	bh=hlFS13odVb55GccO5hmoQYgmewqIs0Q10x0eG5VUCq8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=S6QbZZh6+2/v+OtWdm65JKqeiTrBIEDkBYxpEZzMnVXw9irQPf2grj3z/WrG3MGGt
+	 ktvenTxzB8vn8PDsbsWQTOWOu7XcbA+1cwDO+N4s35Z5w9q8ZxE2JzODNpXmoj0jyL
+	 nQO7nQ462+qHztzjh9owCE8nRaVQhu2xRH5vA5rM=
+X-QQ-mid: bizesmtpip3t1736049974t9n3jgf
+X-QQ-Originating-IP: r3BhvYPkQ0Z7fN4+I8N2dlayxH2rSIzco4OOtcliAm8=
+Received: from avenger-OMEN-by-HP-Gaming-Lapto ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 05 Jan 2025 12:06:10 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 12459793524915979078
+From: WangYuli <wangyuli@uniontech.com>
+To: nbd@nbd.name,
+	lorenzo@kernel.org,
+	ryder.lee@mediatek.com,
+	shayne.chen@mediatek.com,
+	sean.wang@mediatek.com,
+	kvalo@kernel.org,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	deren.wu@mediatek.com,
+	mingyen.hsieh@mediatek.com,
+	chui-hao.chiu@mediatek.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org,
+	raoxu@uniontech.com,
+	guanwentao@uniontech.com,
+	zhanjun@uniontech.com,
+	cug_yangyuancong@hotmail.com,
+	lorenzo.bianconi@redhat.com,
+	kvalo@codeaurora.org,
+	aleksander.lobakin@intel.com,
+	michal.pecio@gmail.com,
+	dzm91@hust.edu.cn,
+	jiefeng_li@hust.edu.cn,
+	WangYuli <wangyuli@uniontech.com>
+Subject: [RESEND PATCH] wifi: mt76: mt76u_vendor_request: Do not print error messages when -EPROTO
+Date: Sun,  5 Jan 2025 12:06:07 +0800
+Message-ID: <D4B9CC1FFC0CBAC3+20250105040607.154706-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: N4ZILu3POr3O5rZq/TjewF2i6XEMk/wSLT1i5iBLaDCBMNXTVo/TgVHO
+	cB/+PIlqLfXHyZnUDe85e7uY1PL71h9kVKmTnXVF/HS49g+475BGQGs4T+0mXHDHJ+Ik7b4
+	V4x3h6aNkLd0Gdq8++si9GytujjwQuK3/TnyJLO0nTP7wbCJ1ZpTuxQyWivsR2jQNAFtGU0
+	5VrCOEPzCvhc6CwYYylQujPRDnTwpRRt/e6PutNMN/1yCptNk2YCBJMppkCKEdtxFoHRlQZ
+	Nb96sxjhYOWXX9MqJPmjrgYpYL+dfgdwONVdydM08vrV96D016X7je6PX7YoP39X7u0jVxX
+	MxSWXWYuH+bpKrFjCSWDW7itkXW8TbZlSasEKaDxXe1DgGD64cV26TH7IViYBDRtbPj4Jto
+	sKavLN9hMpvfeW3kRFBvRQUT9DtfuSAheVQswfGQe4muHouygZAS00bbzaqtwL3/nBMVnMy
+	FGTkm87LjNyXSE5TFC3AIDt6CzDjCm0Ie+b3YRov9VVVAFxIpwuBHDRS3A1cuGwl/HpjK/J
+	i0xYCAC9/NsIDGQ5GylSz+Eoh5EBNhWyq5NjraWOnnaYwgCQqJ/TETgvliV2xtgOGWfPDn5
+	/pKBmBYNvaNSEVTdDjSyJZ3py9f0Qkt/60YfwWyYg8hPr5CNBE2qHzDh4NPJz6CkNUKWHgd
+	BT36teTv65i5t4XnYa9mn9BTBApQ7IDAtkKuACXlm8ah+krsKWseDNUKybIV929IhOEEB9d
+	V9JUmXLKev6U6i4qaZB8JFGmMWKPo8MpCB8fiNLYJVQS1sPiiOGhKtd/j/VMlvD6dTE42i2
+	KeAdP27O8SB+6JDhtuD6MqKXHeoP7SYmlkRCBkhfz1z8FK20bTCuwBnzbv94aIEwxKClFDV
+	qBzJMgpfwU64Mi6WK2VpEUXpzEItv3LvnMY55HDYw4iudqxFK/vQKbMQ7koDtOt4Vt7cG/G
+	0FPvvjiSAYoMBRU4+7SBvzS4A9oT5z/B3166sBkFPfL/eiul+CoX6yzV93sYC0d+ZWVc1cx
+	VbYGnMTRYOVLWptE/Ths0KnkQpPes=
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+X-QQ-RECHKSPAM: 0
 
-Hi Andrew,
+When initializing the network card, unplugging the device will
+trigger an -EPROTO error, resulting in a flood of error messages
+being printed frantically.
 
-Yes, i was using geary client to send out the patch. Will send out 
-using git send-email
+The exception is printed as follows：
 
-On Sat, Jan 4 2025 at 06:35:06 PM +0100, Andrew Lunn <andrew@lunn.ch> 
-wrote:
-> On Sun, Jan 05, 2025 at 12:38:13AM +0800, Muhammad Nuzaihan wrote:
->>  Based on the earlier v2 and v1 patches. This patch is a cleanup 
->> from v2.
->> 
->>  Removed unnecessary code added to "iosm" and "AT IOCTL" which is not
->>  relevant.
->> 
->>  Tested this change on a new kernel and module built and now device 
->> NMEA
->>  (mhi0_NMEA) statements are available through /dev/wwan0nmea0 port 
->> on bootup.
->> 
->>  Signed-off-by: Muhammad Nuzaihan Bin Kamal Luddin 
->> <zaihan@unrealasia.net>
->>  ---
->>  v3:
->>  - Rebased to net-next main branch
->>  - Removed earlier patches that added unnecessary iosm (unrelated) 
->> and AT
->>  IOCTL code.
->>  v2: 
->> https://lore.kernel.org/netdev/5LHFPS.G3DNPFBCDKCL2@unrealasia.net/
->>  v1: 
->> https://lore.kernel.org/netdev/R8AFPS.THYVK2DKSEE83@unrealasia.net/
->>  ---
->> 
->>  drivers/net/wwan/mhi_wwan_ctrl.c | 1 +
->>  drivers/net/wwan/wwan_core.c | 4 ++++
->>  include/linux/wwan.h | 2 ++
->>  3 files changed, 7 insertions(+)
->> 
->>  diff --git a/drivers/net/wwan/mhi_wwan_ctrl.c
->>  b/drivers/net/wwan/mhi_wwan_ctrl.c
->>  index e9f979d2d851..e13c0b078175 100644
->>  --- a/drivers/net/wwan/mhi_wwan_ctrl.c
->>  +++ b/drivers/net/wwan/mhi_wwan_ctrl.c
->>  @@ -263,6 +263,7 @@ static const struct mhi_device_id
->>  mhi_wwan_ctrl_match_table[] = {
->>         { .chan = "QMI", .driver_data = WWAN_PORT_QMI },
->>         { .chan = "DIAG", .driver_data = WWAN_PORT_QCDM },
->>         { .chan = "FIREHOSE", .driver_data = WWAN_PORT_FIREHOSE },
->>  +	{ .chan = "NMEA", .driver_data = WWAN_PORT_NMEA },
-> 
-> The indentation is all messed up in this patch. It looks like a tab to
-> space conversion has happened somewhere?
-> 
-> Did you use git send-email?
-> 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+         mt76x2u 2-2.4:1.0: vendor request req:47 off:9018 failed:-71
+         mt76x2u 2-2.4:1.0: vendor request req:47 off:9018 failed:-71
+         ...
 
+It will continue to print more than 2000 times for about 5 minutes,
+causing the usb device to be unable to be disconnected. During this
+period, the usb port cannot recognize the new device because the old
+device has not disconnected.
+
+There may be other operating methods that cause -EPROTO, but -EPROTO is
+a low-level hardware error. It is unwise to repeat vendor requests
+expecting to read correct data. It is a better choice to treat -EPROTO
+and -ENODEV the same way。
+
+Similar to commit 9b0f100c1970 ("mt76: usb: process URBs with status
+EPROTO properly") do no schedule rx_worker for urb marked with status
+set  -EPROTO. I also reproduced this situation when plugging and
+unplugging the device, and this patch is effective.
+
+Just do not vendor request again for urb marked with status set -EPROTO.
+
+Link: https://lore.kernel.org/all/531681bd-30f5-4a70-a156-bf8754b8e072@intel.com/
+Fixes: b40b15e1521f ("mt76: add usb support to mt76 layer")
+Co-developed-by: Xu Rao <raoxu@uniontech.com>
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ drivers/net/wireless/mediatek/mt76/usb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wireless/mediatek/mt76/usb.c b/drivers/net/wireless/mediatek/mt76/usb.c
+index 58ff06823389..f9e67b8c3b3c 100644
+--- a/drivers/net/wireless/mediatek/mt76/usb.c
++++ b/drivers/net/wireless/mediatek/mt76/usb.c
+@@ -33,9 +33,9 @@ int __mt76u_vendor_request(struct mt76_dev *dev, u8 req, u8 req_type,
+ 
+ 		ret = usb_control_msg(udev, pipe, req, req_type, val,
+ 				      offset, buf, len, MT_VEND_REQ_TOUT_MS);
+-		if (ret == -ENODEV)
++		if (ret == -ENODEV || ret == -EPROTO)
+ 			set_bit(MT76_REMOVED, &dev->phy.state);
+-		if (ret >= 0 || ret == -ENODEV)
++		if (ret >= 0 || ret == -ENODEV || ret == -EPROTO)
+ 			return ret;
+ 		usleep_range(5000, 10000);
+ 	}
+-- 
+2.45.2
 
 
