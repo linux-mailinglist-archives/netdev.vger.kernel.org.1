@@ -1,250 +1,135 @@
-Return-Path: <netdev+bounces-155230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF59AA017AA
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 02:15:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB76CA017AC
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 02:16:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 591D03A38C4
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 01:15:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11EBA1883F67
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 01:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C8A481AF;
-	Sun,  5 Jan 2025 01:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2C635976;
+	Sun,  5 Jan 2025 01:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ath7H3MY"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="QhwkUx6H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EFF43AA9;
-	Sun,  5 Jan 2025 01:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D2835963;
+	Sun,  5 Jan 2025 01:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736039739; cv=none; b=RVvSW5nbSkP+/Nn/qjY15gz8tXtNaNRQzIOUxQHPHM8KSK5nnn+xy5fU1C5Z1T3MvqPIfM9RoCyryJNLoutQCwaxTHrVepdoc5jaS2h31WQ24yLyHkuYz+b1MgFuGFqxwYNDED/amClbmnF8rbQktO7x9QPfdSrMBf7SBodmQ0w=
+	t=1736039807; cv=none; b=m7JuqASmbFb/gXU92dIpcVOKilOn7EL4QEU6ymBgZIS4KinhSUkYd4Bww//k0ogkA1JvWY+PsUVomSfPP9lzLYPzYil9/cy9O6JpYQHa2AcHvN5OPoE6/GWIUxPfGPfa8MmfA5KGuHqcd6bQzcH6IhjZqaJ8sVSVZU8DMVDIzsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736039739; c=relaxed/simple;
-	bh=vkgR1MygQk6r8sEA+qf0oBjWRT4+t7Ar6oNBpL2pnKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cwwM0VuWM5ox/IppFIvmSdH+z5Rs6kYwCF1v115ulG/DlENZWJnY65UF06d7L2sBuvaLP2H5QhKf2I/+fCOmrdYQwLAQySVl3wk4Bc374gIyR+qocH16r9drc6YJaf7NwcCmeeernMCi9KinQ5kld5OdtOT6+pokk4a76Xisnlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ath7H3MY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 232C9C4CED1;
-	Sun,  5 Jan 2025 01:15:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736039738;
-	bh=vkgR1MygQk6r8sEA+qf0oBjWRT4+t7Ar6oNBpL2pnKI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Ath7H3MY02APj0mHRHFGBCpi2eOWkSyf1EddR+59PZUpc6e34greu5/Rz7LyUJgL5
-	 B8PX0Rx12yR7jeXZkGhwPmPmXZX2blR1/OeZb6+BkE/9uapvixVah+fIXolf0sTj98
-	 i4cDAYiG1x39uc/lFgJEuUXdL+jlcqGm0rG3ijOxoZlfFlEW6v6kDwb9dgfXwlkbNn
-	 TqxzZdlweeQKse3/LSAKiT6BPttySbIevQ3gx8qCHZQbacWmc5dDEfXzJujP6OvYs4
-	 OBb2u+LIw/4oIgfPMMi4egc4etZ2HAprInXLtEnkufgksYd2NMHKbdVCTIveZj7irs
-	 jT9i6MGNe61DQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	willemb@google.com,
-	petrm@nvidia.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: drv-net: test drivers sleeping in ndo_get_stats64
-Date: Sat,  4 Jan 2025 17:15:25 -0800
-Message-ID: <20250105011525.1718380-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736039807; c=relaxed/simple;
+	bh=9u29+Tp1uKONLXkhssW7L/0nSghsMGKnRSx1xHrCcQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jRIoVANjJ0lR4ZbQQaBo4GuANeu/UKekf6S7srhaGhmMyIDvJUhUi/C+b8NQ3S0YnGhwpbF6NaRAitFTxyZAbYKMj8hTmS7Zi7lmfVHgWVglSlMDqocH5nd2EUFtzru9nhjgVxEKpWRnPHPAu64c2IdVPARvPFEzPvQJshF5Hng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=QhwkUx6H; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=/PXMx0aYm3p77AOabnQSJYxJRLSAjD5vIBHkByO2LPE=; b=QhwkUx6HBWLdPZiN
+	NJQpIbL3Y5K800+KUDVsQ6/0vN9x2SpA67PhsVrGt01RwFpEc48Jobbc5q7X4WmlRT6rTA5u3pc/h
+	Zv+uUO3SmNCrfEIFiwA34S/QvIHG9+MaDjzxPBKIoTdrtEsO6JYDrYfGTtfAKqIy/e4fJui1sfVm9
+	6IeUtyYVelUU3Mwv9aLSa2c6hEW33PR0btxQv+6I6exqbKQRA2pPlG9WThFsZISxfZKizCy+MTZ1Q
+	z9CIqnup2mUBY6wxOqcQwS7XFsygvZwUKFBNAFp7HqMSwHGI7bmi/R1xK09KgmdImTuQ3b7Dsos5d
+	H0iWMZXPvWNi0udu5w==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1tUFFn-008Bvs-2t;
+	Sun, 05 Jan 2025 01:16:31 +0000
+Date: Sun, 5 Jan 2025 01:16:31 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+Message-ID: <Z3ndbw-GcldRgilg@gallifrey>
+References: <20250102174002.200538-1-linux@treblig.org>
+ <20250104081532.3af26fa1@kernel.org>
+ <Z3muiBPv30Dsp8m5@gallifrey>
+ <20250104165440.080a9c7b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20250104165440.080a9c7b@kernel.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 01:15:08 up 241 days, 12:29,  1 user,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-Most of our tests use rtnetlink to read device stats, so they
-don't expose the drivers much to paths in which device stats
-are read under RCU. Add tests which hammer profcs reads to
-make sure drivers:
- - don't sleep while reporting stats,
- - can handle parallel reads,
- - can handle device going down while reading.
+* Jakub Kicinski (kuba@kernel.org) wrote:
+> On Sat, 4 Jan 2025 21:56:24 +0000 Dr. David Alan Gilbert wrote:
+> > > This one doesn't apply, reportedly.  
+> > 
+> > Hmm, do you have a link to that report, or to which tree I should try
+> > applying it to.
+> 
+> net-next, the tree in the subject prefix:
+> 
+> $ git checkout net-next/main
 
-Set ifname on the env class in NetDrvEnv, we already do that
-in NetDrvEpEnv.
+Thanks
 
-  KTAP version 1
-  1..7
-  ok 1 stats.check_pause
-  ok 2 stats.check_fec
-  ok 3 stats.pkt_byte_sum
-  ok 4 stats.qstat_by_ifindex
-  ok 5 stats.check_down
-  ok 6 stats.procfs_hammer
-  # completed up/down cycles: 6
-  ok 7 stats.procfs_downup_hammer
-  # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
+> $ wget 'https://lore.kernel.org/all/20250102174002.200538-1-linux@treblig.org/raw'
+> Saving 'raw'
+> $ git am raw
+> Applying: ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+> error: patch failed: drivers/net/ethernet/intel/ixgbevf/ixgbevf.h:439
+> error: drivers/net/ethernet/intel/ixgbevf/ixgbevf.h: patch does not apply
+> Patch failed at 0001 ixgbevf: Remove unused ixgbevf_hv_mbx_ops
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: willemb@google.com
-CC: petrm@nvidia.com
-CC: linux-kselftest@vger.kernel.org
----
- .../selftests/drivers/net/lib/py/env.py       |  1 +
- tools/testing/selftests/drivers/net/stats.py  | 94 ++++++++++++++++++-
- tools/testing/selftests/net/lib/py/ksft.py    |  5 +
- 3 files changed, 97 insertions(+), 3 deletions(-)
+Oh I see, it's the e610 patch that crept in and just changed the context
+and moved the lines down a bit; not built it yet, but I'll cut a new version.
 
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index fea343f209ea..987e452d3a45 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -48,6 +48,7 @@ from .remote import Remote
-         else:
-             self._ns = NetdevSimDev(**kwargs)
-             self.dev = self._ns.nsims[0].dev
-+        self.ifname = self.dev['ifname']
-         self.ifindex = self.dev['ifindex']
+See below.
+
+Dave
+
+diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
+index 9b37f354d78c..4384e892f967 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
++++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
+@@ -443,7 +443,6 @@ extern const struct ixgbevf_info ixgbevf_X540_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_X550_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_e610_vf_hv_info;
+-extern const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops;
  
-     def __enter__(self):
-diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
-index 031ac9def6c0..55d647c006ed 100755
---- a/tools/testing/selftests/drivers/net/stats.py
-+++ b/tools/testing/selftests/drivers/net/stats.py
-@@ -2,12 +2,15 @@
- # SPDX-License-Identifier: GPL-2.0
+ /* needed by ethtool.c */
+ extern const char ixgbevf_driver_name[];
+
+vs
+
+diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
+index 130cb868774c..a43cb500274e 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
++++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
+@@ -439,7 +439,6 @@ extern const struct ixgbevf_info ixgbevf_82599_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_X540_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_X550_vf_hv_info;
+ extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_hv_info;
+-extern const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops;
  
- import errno
-+import subprocess
-+import time
- from lib.py import ksft_run, ksft_exit, ksft_pr
--from lib.py import ksft_ge, ksft_eq, ksft_in, ksft_true, ksft_raises, KsftSkipEx, KsftXfailEx
-+from lib.py import ksft_ge, ksft_eq, ksft_is, ksft_in, ksft_lt, ksft_true, ksft_raises
-+from lib.py import KsftSkipEx, KsftXfailEx
- from lib.py import ksft_disruptive
- from lib.py import EthtoolFamily, NetdevFamily, RtnlFamily, NlError
- from lib.py import NetDrvEnv
--from lib.py import ip, defer
-+from lib.py import cmd, ip, defer
- 
- ethnl = EthtoolFamily()
- netfam = NetdevFamily()
-@@ -174,10 +177,95 @@ rtnl = RtnlFamily()
-     netfam.qstats_get({"ifindex": cfg.ifindex, "scope": "queue"}, dump=True)
- 
- 
-+def __run_inf_loop(body):
-+    body = body.strip()
-+    if body[-1] != ';':
-+        body += ';'
-+
-+    return subprocess.Popen(f"while true; do {body} done", shell=True,
-+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-+
-+
-+def __stats_increase_sanely(old, new) -> None:
-+    for k in old.keys():
-+        ksft_ge(new[k], old[k])
-+        ksft_lt(new[k] - old[k], 1 << 31, comment="likely wrapping error")
-+
-+
-+def procfs_hammer(cfg) -> None:
-+    """
-+    Reading stats via procfs only holds the RCU lock, which is not an exclusive
-+    lock, make sure drivers can handle parallel reads of stats.
-+    """
-+    one = __run_inf_loop("cat /proc/net/dev")
-+    defer(one.kill)
-+    two = __run_inf_loop("cat /proc/net/dev")
-+    defer(two.kill)
-+
-+    time.sleep(1)
-+    # Make sure the processes are running
-+    ksft_is(one.poll(), None)
-+    ksft_is(two.poll(), None)
-+
-+    rtstat1 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
-+    time.sleep(2)
-+    rtstat2 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
-+    __stats_increase_sanely(rtstat1, rtstat2)
-+    # defers will kill the loops
-+
-+
-+@ksft_disruptive
-+def procfs_downup_hammer(cfg) -> None:
-+    """
-+    Reading stats via procfs only holds the RCU lock, drivers often try
-+    to sleep when reading the stats, or don't protect against races.
-+    """
-+    # Max out the queues, we'll flip between max an 1
-+    channels = ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    if channels['combined-count'] == 0:
-+        rx_type = 'rx'
-+    else:
-+        rx_type = 'combined'
-+    cur_queue_cnt = channels[f'{rx_type}-count']
-+    max_queue_cnt = channels[f'{rx_type}-max']
-+
-+    cmd(f"ethtool -L {cfg.ifname} {rx_type} {max_queue_cnt}")
-+    defer(cmd, f"ethtool -L {cfg.ifname} {rx_type} {cur_queue_cnt}")
-+
-+    # Real test stats
-+    stats = __run_inf_loop("cat /proc/net/dev")
-+    defer(stats.kill)
-+
-+    ipset = f"ip link set dev {cfg.ifname}"
-+    defer(ip, f"link set dev {cfg.ifname} up")
-+    # The "echo -n 1" lets us count iterations below
-+    updown = f"{ipset} down; sleep 0.05; {ipset} up; sleep 0.05; " + \
-+             f"ethtool -L {cfg.ifname} {rx_type} 1; " + \
-+             f"ethtool -L {cfg.ifname} {rx_type} {max_queue_cnt}; " + \
-+              "echo -n 1"
-+    updown = __run_inf_loop(updown)
-+    kill_updown = defer(updown.kill)
-+
-+    time.sleep(1)
-+    # Make sure the processes are running
-+    ksft_is(stats.poll(), None)
-+    ksft_is(updown.poll(), None)
-+
-+    rtstat1 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
-+    # We're looking for crashes, give it extra time
-+    time.sleep(9)
-+    rtstat2 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
-+    __stats_increase_sanely(rtstat1, rtstat2)
-+
-+    kill_updown.exec()
-+    stdout, _ = updown.communicate(timeout=5)
-+    ksft_pr("completed up/down cycles:", len(stdout.decode('utf-8')))
-+
-+
- def main() -> None:
-     with NetDrvEnv(__file__, queue_count=100) as cfg:
-         ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex,
--                  check_down],
-+                  check_down, procfs_hammer, procfs_downup_hammer],
-                  args=(cfg, ))
-     ksft_exit()
- 
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index 477ae76de93d..3efe005436cd 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -71,6 +71,11 @@ KSFT_DISRUPTIVE = True
-         _fail("Check failed", a, "not in", b, comment)
- 
- 
-+def ksft_is(a, b, comment=""):
-+    if a is not b:
-+        _fail("Check failed", a, "is not", b, comment)
-+
-+
- def ksft_ge(a, b, comment=""):
-     if a < b:
-         _fail("Check failed", a, "<", b, comment)
+ /* needed by ethtool.c */
+ extern const char ixgbevf_driver_name[];
+
 -- 
-2.47.1
-
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
