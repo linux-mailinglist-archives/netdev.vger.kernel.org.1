@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-155280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B475A01AB8
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:03:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6D2A01ABA
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:04:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17EF23A1E9A
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:03:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6C757A164A
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2886C13C807;
-	Sun,  5 Jan 2025 17:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CD319066D;
+	Sun,  5 Jan 2025 17:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4hEgGKA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWvmD8bL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD2811CA9;
-	Sun,  5 Jan 2025 17:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB1D18A6AE;
+	Sun,  5 Jan 2025 17:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736096622; cv=none; b=fbIvU/7uGtUvW0c3zW1GRuE+pH+ZZ9k+Pine42ZE9zER0SFcanaHPfOgWpEV5O/ar/Fdv9ejRZ4Gx+8RM9Txd60KeNtqeQv1Zp0qyV6ElfAovTV6e/018udWAqzPsb9tvxeE+eWSg0FnIxhUg/1KFpBImodw05eNXV1rsPaRFDM=
+	t=1736096625; cv=none; b=ILr368Ltz4H5sCf3aw1xmvufsgiCL5STXCQEhhH8c42ZpZehJV/QVl3tt3y5K574WH8SpG0ZeJFldFowG8Bvm3ekxJvgkg7OVeUHmSfCdbbRZ1VfK5SzW3cKuAfw3ftL4xGfOgvYo+yL0gETXgnEAYTZByoYCSn0JhkwsAJS6Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736096622; c=relaxed/simple;
-	bh=9rYdjRehcjOr1ganzcwiG4dpxJXAatIR2dezUPUw8BM=;
+	s=arc-20240116; t=1736096625; c=relaxed/simple;
+	bh=q0apx07cMntN8BWEq7bhHzKWgpHs84QlVF0Wjwnq3Yk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MC3bDrlovejDlNyweYj/EOTf5acKictabEsAQ3+dilBFoKM5cwCykmFkd22ByGMcPRJhkFO/cC2BDYrFFf5V3g0KTQxOYvzixWYpuDvmNkW62nydx3tg0u+BOZZOrvay2k5/fxX9MeaROETiAtm3gx1z6fSdW5+MJP2U9my/fmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4hEgGKA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0C7EC4CED0;
-	Sun,  5 Jan 2025 17:03:37 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=C7aWoq4GC+WTEVLp634eLPVQNXQLIwOCb6FjdFu6acTkb6+aPKbd9zr3IieuQu6Ne3o41lExUWNgMPJnuFA4PsD0qsKgfE1xG0UHDkjfAigJSv+H8FlrjHugJutUbp1JRV+TTLFMaUong3HuEataaOqDgea7PAb3KycrUrfJWEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CWvmD8bL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3220C4CEE4;
+	Sun,  5 Jan 2025 17:03:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736096621;
-	bh=9rYdjRehcjOr1ganzcwiG4dpxJXAatIR2dezUPUw8BM=;
+	s=k20201202; t=1736096624;
+	bh=q0apx07cMntN8BWEq7bhHzKWgpHs84QlVF0Wjwnq3Yk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=M4hEgGKA8SPzm4LGjqOhDUa/oREirIQ5Ayre9PGZxW11zeW0452+mKd9HspKtucKY
-	 Qg4gDStkdmGWiuvGBGZMmUYu6K/v2p5ZfZ4SggxmDUgwgwECAEhIfjSwp11qRcPW0B
-	 VIY4wk9ozYAXaavWqwADHS5zgnJ92CGypEjMElZGvjNzd054mQr/MXKtXKGV5wHrQk
-	 jcalgGjYsiPQL0rdY3CHBOUWEfyjryVI+qIzOkLH2mQvvD6IJz2oJgz3DeEpBRBG3C
-	 wv6bGSmsODGdF4085yWi9/XpAXFELGZZ1zmO+XFb+yn0Jz6xxSzwnHxdjb83C033Bf
-	 KBBANWhx3lKVg==
-Message-ID: <163dbb5c-124c-4942-9b97-542ea97faa2a@kernel.org>
-Date: Sun, 5 Jan 2025 18:03:36 +0100
+	b=CWvmD8bLO3nuBwd/CUpdJUGjaFyuyMWh9TyvsDly+i7J4RxCLijI4wT24e4gSjWxt
+	 hEJ2XyPk/Wi+DhnOGchUMncRedVrBYf8ed9HWqM+pXAxbQ7k9wEWLReDWLC3l7io4S
+	 YZKYzSfzpVKOIIH+Ts63DTKPXEhwEOZeor4WT3FFFyZgMLOAbBEsQMhhMI9/Q91jO3
+	 TuSATvyVP1RBYUg7L+g/0qZPP8F0aRQVXs/4DFz92UljihVchxx0r0nyWnCG5ZFqel
+	 LawLZlDHHRHa4HWWI+IIrXlibsFIeU6PUGLKFOTHOMIeYhSYxOCPc6QlyrtJOGbXUm
+	 saKiQVw0D4EAg==
+Message-ID: <95a51b11-cc3c-4282-8069-4549f9fcc321@kernel.org>
+Date: Sun, 5 Jan 2025 18:03:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,11 +52,11 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
 Subject: Re: [syzbot] [mptcp?] general protection fault in proc_scheduler
 Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>, Al Viro <viro@zeniv.linux.org.uk>
-Cc: davem@davemloft.net, geliang@kernel.org, horms@kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, martineau@kernel.org,
- mptcp@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com,
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+ geliang@kernel.org, horms@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, martineau@kernel.org, mptcp@lists.linux.dev,
+ netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
  syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>
 References: <67769ecb.050a0220.3a8527.003f.GAE@google.com>
  <CANn89iKVTgzr8kt2sScrfoSbBSGMtLLqEwmA+WFFYUfV-PS--w@mail.gmail.com>
@@ -65,9 +65,6 @@ References: <67769ecb.050a0220.3a8527.003f.GAE@google.com>
  <20250104190010.GF1977892@ZenIV>
  <89c2208c-fe23-43eb-89ef-876e55731a50@kernel.org>
  <20250104202126.GH1977892@ZenIV>
- <CANn89i+GUGLQSFp3a2qwH+zOsR-46CyWevjhAQQMmO5K9tmkUg@mail.gmail.com>
- <20250105112948.GI1977892@ZenIV>
- <CANn89i+L619t94EybXKsGFGQjPS7k-Qra_vXG-AcLJ=oiU2yYQ@mail.gmail.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -113,43 +110,27 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <CANn89i+L619t94EybXKsGFGQjPS7k-Qra_vXG-AcLJ=oiU2yYQ@mail.gmail.com>
+In-Reply-To: <20250104202126.GH1977892@ZenIV>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Eric,
+Hi Al,
 
-On 05/01/2025 17:52, Eric Dumazet wrote:
-> On Sun, Jan 5, 2025 at 12:29 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
->>
->> On Sun, Jan 05, 2025 at 09:32:36AM +0100, Eric Dumazet wrote:
->>
->>> According to grep, we have many other places directly reading
->>> current->nsproxy->net_ns
->>> For instance in net/sctp/sysctl.c
->>> Should we change them all ?
->>
->> Depends - do you want their contents match the netns of opener (as,
->> AFAICS, for ipv4 sysctls) or that of the reader?
+On 04/01/2025 21:21, Al Viro wrote:
+> The real issue (and the one that affects more than just this scenario) is
+> the use of current->nsproxy->net to get to the damn thing.
 > 
-> I am only worried that a malicious user could crash the host with
-> current kernels,
-> not about this MPTP crash, but all unaware users of current->nsproxy
-> in sysctl handlers.
-> 
-> Back to MPTCP :
-> 
-> Using the convention used in other mptcp sysctls like (enabled,
-> add_addr_timeout,
-> checksum_enabled, allow_join_initial_addr_port...) is better for consistency.
+> Why not something like
 
-Indeed, I can do the modifications to stop using current->nsproxy in
-MPTCP. I can do the same in SCTP.
+(...)
 
-Do you plan to send your patch modifying proc_sysctl.c? It is just to
-know if I should mark my patches as fixes, and split them to ease the
-backports -- each helper using current->nsproxy has been introduced in
-different commits -- or if I can send them to net-next instead.
+> seeing that the data object you really want to access is
+> mptcp_get_pernet(net)->scheduler and you have that pointer
+> stored in table->data at the registration time?
+
+Good point, thank you for the suggestion! :)
+
+I will do this modification.
 
 Cheers,
 Matt
