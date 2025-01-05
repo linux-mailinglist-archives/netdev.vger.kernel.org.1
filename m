@@ -1,128 +1,192 @@
-Return-Path: <netdev+bounces-155265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08BDEA01924
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 12:06:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E67DAA0193B
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 12:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E45471628D2
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 11:06:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94C8A3A363D
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 11:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00CF5126C0D;
-	Sun,  5 Jan 2025 11:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FB914AD29;
+	Sun,  5 Jan 2025 11:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="giHzQki8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541361DA21
-	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 11:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9596C148FF6;
+	Sun,  5 Jan 2025 11:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736075188; cv=none; b=vCkcutI/Yc500J9jXxNtAYkNOEmGJ8C0uf0jD5El4toS8JeRdhr7ldXI7Dc4K877D0T9VyoRsIQW94Y0VkwcLhrc4uCaTP14ihWhlVFDzuZocv5a1xjAYBe9SqF8geMe8CgQdzu1H2Zi9LNBo4i/5+ZKxH/LONVggK8IZ45HfxY=
+	t=1736076618; cv=none; b=YV6aF8jq/ZVJ+QMjajh0bOYzdThT0i5NygdQhWUDHexC6wJjo9rmm10iEoAq69sVNvxO7E8hWf4zoqEZkO12AnuIUZevDmYnl356xqv9S3JGi5TS5Fzc5Ij1XG6OMbX+cJ0flh5OWJyMbnjjdLJldg3ybil6m2YtiHtBVis3tFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736075188; c=relaxed/simple;
-	bh=M+hyUBGCb9zAbHFHwy6LxvoR24ECard84HuXfXjwtVw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=ey0phy2P72VQaPAfVmn/vD92edrJV5FPn1nlVWnjuSqBAUzY+1hSzEDuVrbaV7PrXC9KoUHiCsDcczu8GLBDDY8uUBTbQT+n+9Zz3sTl97SULNkbyfPKO+5QXYMrfuWWyquWKZpbkJplHbNv23HbXy6WXqLFv31vFb1u/SDP8+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3a7d85ab308so132104775ab.3
-        for <netdev@vger.kernel.org>; Sun, 05 Jan 2025 03:06:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736075185; x=1736679985;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EZBGNpHam0AzUR5+sMhqnkIQU6qgmO8Mms//N3JFtyA=;
-        b=IHo/1ficCLTWenZrGnusLfedQPB80E+Ql4c3Wan65Xpsg5coG2oEk6ax0G51aWZMHX
-         KQMwRNfHcvlGk15IfORQnM+eI6J70stBcMhk0mz7mki1uiL/FBr8aSID9bV9MFPNZY22
-         oK6fb9EUcqY9rTItxdLXEBiPkI0MJGIK3VD7bX+0lBzElv1ssXAQ/AAX7yZxHSaES7Fs
-         uqGu75IUhdMiesk6WH7OggyNoknkNXhAsbEvYM7vUl5LKYHHgpat1X1NiIjPOboWIu8r
-         T8mgox/dqBYHVIdYxaRBB/2Hwi6sQpgyvQI2VSBJRbHv7o80Uje4/w/D7oMI4Axxt6ag
-         DLag==
-X-Forwarded-Encrypted: i=1; AJvYcCXPDinzgB1bgKs5J9TltSY1qjYspWXFMCVegDZoj82F7GK6UadSg2oZXoDqWnzm6xJKxjfCYwQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoX3NZs+GWPboK21Bku/qS+6GeSwSoxtARqv4xX70Fu6c3ZspO
-	SGbuj3uk4LprwpyXrxUMCoDqyUF8dqT7Q0lBfa6P0IlEMzZnldSisKToHWw25taNQ3LkU7l0Oy6
-	jt3o3uvSCgGDjS60zgcAEBN1tBT3PV+lr+KQU0kYIwvselUh9pChp4YA=
-X-Google-Smtp-Source: AGHT+IGa7pmYpmUu08FFyn8XBPRjawz5IWvpXCqhqWcu67N2Thj+F3II7u9f2ea7jfC7Isi3uXA2DUo6HQ+/STREq/Y5ItQte9eo
+	s=arc-20240116; t=1736076618; c=relaxed/simple;
+	bh=yLbbSxJ8rOCZV34Ppdmdr/BcVBls3TYQ0BnZjPUlHaQ=;
+	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:
+	 In-Reply-To:References:Date; b=ozbw4tcOJHGIHnga3TB2byYMPlY4uLp+oy6tsGRzCSNYNGO8F5pPsbrUtl47p/bc9oS8hI2ndOeCKFdtQTlVerRs6D2CiFbFrCZ5pXrhpjyP/VaYtMbMc/KeB0R6+/kjb6hdx5lHe5R/CEwOczhz4qAXnAdspz5PjEEep39yxcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=giHzQki8; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
+	s=s31663417; t=1736076580; x=1736681380; i=frank-w@public-files.de;
+	bh=yLbbSxJ8rOCZV34Ppdmdr/BcVBls3TYQ0BnZjPUlHaQ=;
+	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
+	 Content-Type:In-Reply-To:References:Date:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=giHzQki8mwpHL1X1Upv9XAD2p7y7qccymTqilRNIKRYCF2r7HH/RgxDfKQH0GtvP
+	 Z5Cl1CIPWQoRf5+ahJGDl+GgsBg4BlcTQvnaeiQPkbnF10CTF5clv13vCJpsW46WF
+	 +gRxRKAn+eNRuJTDt6R7axU1NQVqBXJL8j3J6ql7BcBDJJ96cAALj4RCoef2HdCGj
+	 BwL3kcwfhItF2Fa8y5NU8bdI6NDLH+guPDGuqvomGCC0s1CjKamtWQY7KhYKbVgNr
+	 IRWwtzhHKUEHTk80WLjsMCpOJw7wZEjeuLib9zOqQZi5/cOG1C9Cvt776I4r0+Ke/
+	 mrE1r81U/K9b+GJKNg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [80.245.79.38] ([80.245.79.38]) by
+ trinity-msg-rest-gmx-gmx-live-548599f845-nqxpf (via HTTP); Sun, 5 Jan 2025
+ 11:29:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1448:b0:3a7:7a68:44e2 with SMTP id
- e9e14a558f8ab-3c2d48a3763mr421606935ab.15.1736075185430; Sun, 05 Jan 2025
- 03:06:25 -0800 (PST)
-Date: Sun, 05 Jan 2025 03:06:25 -0800
-In-Reply-To: <00000000000062a2960621a49519@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <677a67b1.050a0220.380ff0.000f.GAE@google.com>
-Subject: Re: [syzbot] [wireless?] WARNING in ieee80211_rx_list (3)
-From: syzbot <syzbot+b4aa2b672b18f1d4dc5f@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <trinity-80459cab-e571-4699-b3f0-d73a00fe0858-1736076576826@trinity-msg-rest-gmx-gmx-live-548599f845-nqxpf>
+From: Frank Wunderlich <frank-w@public-files.de>
+To: linux@armlinux.org.uk
+Cc: angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, chunfeng.yun@mediatek.com, vkoul@kernel.org,
+ kishon@kernel.org, nbd@nbd.name, john@phrozen.org, sean.wang@mediatek.com,
+ Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, lynxis@fe80.eu, dqfext@gmail.com,
+ SkyLake.Huang@mediatek.com, p.zabel@pengutronix.de, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-phy@lists.infradead.org, daniel@makrotopia.org
+Subject: Aw: Re: Aw: Re: [RFC PATCH net-next v3 3/8] net: pcs:
+ pcs-mtk-lynxi: add platform driver for MT7988
+Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <Zv_9HuaHqtgIA4Et@shell.armlinux.org.uk>
+Importance: normal
+References: <cover.1702352117.git.daniel@makrotopia.org>
+ <8aa905080bdb6760875d62cb3b2b41258837f80e.1702352117.git.daniel@makrotopia.org>
+ <ZXnV/Pk1PYxAm/jS@shell.armlinux.org.uk> <ZcLc7vJ4fPmRyuxn@makrotopia.org>
+ <ZiaPHWXU-82QMrMt@makrotopia.org>
+ <89bd21ac-78f3-4ee4-9899-83f03169e647@public-files.de>
+ <trinity-af6fdd0b-b72c-42a9-bbae-af45c02f539f-1728051457848@3c-app-gmx-bs32>
+ <Zv_9HuaHqtgIA4Et@shell.armlinux.org.uk>
+Date: Sun, 5 Jan 2025 11:29:40 +0000
+Sensitivity: Normal
+X-Priority: 3
+X-UI-CLIENT-META-MAIL-DROP: W10=
+X-Provags-ID: V03:K1:cPQBleyjsF3yVX6DIROFzgJoSZ9+njddCvA1Zg7Q0R7NQ3dqksbmDt8KviNuosx6RZ3R7
+ ZmKOd3Nxj7ouB2aML4I7GDumerwX9UpoEH2jmlzOqRGe6hH7yHOlD6OHk8Q/+wvf7PqpwaBjkm0/
+ OTvI4KebYTP3IfIxkFVmiFzwAJ724X8J5wmwp7wVttDfaSCIw+Vuhe0R2CxsJQlmmBI+LfzU4VUF
+ GTp2GZLQnn3BRGh+pJbUurUUP92izBY7teDFQ5DvC/Ux8hYb2dqx18+y2FAhkWy90nIJb/pjRfgN
+ ntMvlyZUag83U3fB2L+QStyIoMPNMzrNgKN3Kd3FB4zuHwHAx2gBK1Zn0WwVtXb7mE=
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:i8+cRb5wjRU=;tWzo9G7VqNUGJNBYvFdykWxunF4
+ qcUYRTAgNtkuNzjEZbxWZYdTk2FXK+/bm8WeM+rQ4PvNgb2xROin0VDwLRqA3IcdsdQ6WHqk5
+ quD0Bzg1/xxsmCzgQ4V5usPTXEudYQhbZbjofMbHikFi2u5Dn2eunjeeP7OPGX5drWKFHRhQ/
+ V0I5egqb/CFj1a3N2iPBcycKJ2S2y8+CRY32m+IAQODjhyJAaEO8eu+3OWoXBllehnQUmYN2A
+ WBb+LHQ4OJrAwOxbbXvBy1o8KKo1V9auiPHii+38kOQnZRaNIdOoVaG9ts3aZmR9CRhVQ2FTr
+ sHCGuXBtlgter6DQIMYC3mJTCSGuYQQLbbwaobvivJPnV6bk27Sxm7Kwt1IwJjIFIxXTI/CkI
+ Z1SGjkIzfN3uYXT9mOgyw6sqJZCECObxtBmnYSxzw6eCqqildFPm0i/PVVjRZQH6nw/ckKBOr
+ 7w/f4GujwrLbAmLmTP8TFjk+bjLbeH1bCeIdqfwxDfRLsiZBQsyqeC/NlqtdEa7RqRhYBqU9y
+ DwEPyFI0y62+Ljqc1nJJtgG8sjBGbKWaRRmu9Gfku0ZRKKGFGbb9SDbM6SqqbvGjjsrbI6xaD
+ DoJePLR5fiLfEvncocIrtEnCqi2U08eikELOBwpAbHrtRn+mmPlL5vK9e63hhX/TVhfjU/kXa
+ ZgQrAQta2XzbdY62Uj5EowS8zRVwTLnj2cetG5VbHrCjfhSC8J5Jj1Slq/BFqa/vhjPhhgpZP
+ ll/EPQm6/XNinwPcLaer24ocz5rC/A8X82hQGmqniM0q63BF0+m2Thws2vLOIb8SvR3R2ID3K
+ RMUQevL0/fJOjuKBno0bmq8d4vqygfL7EzRErAZZDI3dDLydUO5ihSX0urwfxH3zYQcrsybTG
+ AJheBTIfNPDoMCBhPkB+GWMa4/G05mQgCws8=
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has found a reproducer for the following issue on:
+Hi Russel,
 
-HEAD commit:    ab75170520d4 Merge tag 'linux-watchdog-6.13-rc6' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17cf96f8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dc863cc90857c683
-dashboard link: https://syzkaller.appspot.com/bug?extid=b4aa2b672b18f1d4dc5f
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1773aedf980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127a5418580000
+> Gesendet: Freitag, 4. Oktober 2024 um 16:35
+> Von: "Russell King (Oracle)" <linux@armlinux.org.uk>
+> Betreff: Re: Aw: Re: [RFC PATCH net-next v3 3/8] net: pcs: pcs-mtk-lynxi=
+: add platform driver for MT7988
+>
+> Hi Frank,
+>
+> Sorry, but I've not been able to look at this, and I've completely lost
+> all context now. I was diverted onto a high priority work issue for a
+> while (was it from April to end of June) so didn't have much time
+> available for mainline work. I then had a much needed holiday (three
+> weeks) in July. I then had a clear week where I did look at mainline.
+> Since then, I've had two cataract operations that have made being on the
+> computer somewhat difficult, and it is only recently that I'm
+> effectively "back" after what is approximately six months of not having
+> a lot of bandwidth. I've seen the cataract consultant this morning, and
+> just found out that my optometrist appointment for Tuesday is too soon
+> after the cataract operation, and needs to be moved two weeks. The
+> optometrist doesn't have availability then, so it's going to be another
+> four weeks. FFS... I wish I'd known, then I could've made an
+> arrangement with the optometrist months ago for the correct date.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-ab751705.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c985fcba8fed/vmlinux-ab751705.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3aa019bd3c16/bzImage-ab751705.xz
+How are you? I hope you're feeling better now....
+I see you were more active on the Mailinglist in last time :)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b4aa2b672b18f1d4dc5f@syzkaller.appspotmail.com
+> Now, XPCS has introduced a hack in a similar way to what you're trying
+> to do, but I wasn't able to review it, so it went in. We're heading
+> towards the situation where every PCS driver is going to have its own
+> way to look up a PCS registered as a device. This is not going to scale.
+>
+> We need something better than this - and at the moment that's all I can
+> say because I haven't given it any more thought beyond that so far.
 
-------------[ cut here ]------------
-WARNING: CPU: 3 PID: 34 at net/mac80211/rx.c:5382 ieee80211_rx_list+0x15e0/0x2970 net/mac80211/rx.c:5382
-Modules linked in:
-CPU: 3 UID: 0 PID: 34 Comm: ksoftirqd/3 Not tainted 6.13.0-rc5-syzkaller-00163-gab75170520d4 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:ieee80211_rx_list+0x15e0/0x2970 net/mac80211/rx.c:5382
-Code: f6 51 5b fe 48 85 c0 0f 85 0a 01 00 00 e8 68 8c f0 f6 48 89 df e8 c0 f4 5a fe e8 5b 8c f0 f6 e9 d1 ee ff ff e8 51 8c f0 f6 90 <0f> 0b 90 e9 d8 ee ff ff e8 43 8c f0 f6 44 89 ef e8 db 69 d3 ff 31
-RSP: 0018:ffffc900006dfb18 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff8aa97661
-RDX: ffff88801defc880 RSI: ffffffff8aa989bf RDI: 0000000000000001
-RBP: ffff88802e33eb40 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffff888030b1b0c8
-R13: ffff88802e33ec18 R14: ffff888030b18e40 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88806a900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055555b88c6c8 CR3: 000000002ceaa000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_rx_napi+0xdd/0x400 net/mac80211/rx.c:5492
- ieee80211_rx include/net/mac80211.h:5166 [inline]
- ieee80211_handle_queued_frames+0xd5/0x130 net/mac80211/main.c:441
- tasklet_action_common+0x251/0x3f0 kernel/softirq.c:811
- handle_softirqs+0x213/0x8f0 kernel/softirq.c:561
- run_ksoftirqd kernel/softirq.c:950 [inline]
- run_ksoftirqd+0x3a/0x60 kernel/softirq.c:942
- smpboot_thread_fn+0x661/0xa30 kernel/smpboot.c:164
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+Have you found some time (and were you able) to look a bit into this ([1])=
+?
 
+How would be the right way here? Daniel posted generic infrastructure for =
+standalone
+pcs drivers [2] similar to phy to have a generic base which all drivers ca=
+n use and
+which can be extended if needed.
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+There was some discussion about how pcs should handle if the underlaying d=
+evice is removed...
+unlikely on SoC, but possible on external bus devices like mdio or pcie. I=
+mho this could be
+a callback in common code handled by vendor driver (query information from=
+ mac driver or for
+SoC simply return fixed value).
+
+How should the subsystems talk with each other (callbacks, shared memory, =
+...)?
+
+DT maintainers want to avoid syscon compatibles which are widely used for =
+nodes representing only
+a register range that is used from different subsystems. As we are current=
+ly upstreaming mt7988
+(e.g. ethernet), there are some of these "devices" which currently have no=
+ own driver and only
+handled by syscon driver to get the regmap. Should we really write differe=
+nt drivers with additional
+compatibles (duplicate code!) only to handle exchange of the regmap betwee=
+n subsystems? For mt7988
+which can have up to 7 syscon devices it is maybe better to have substruct=
+ures like phy, pcs and so on
+packed into an own driver to have a better overview in devicetree. But for=
+ some functional blocks
+imho it makes not much sense (when really only a regmap has to be exchange=
+d between different devices).
+
+Daniel needs an answer to his questions in [1] (and [2]) on how to proceed=
+. So please help to get the
+pcs-part into the right shape.
+
+regards Frank
+
+[1] https://patchwork.kernel.org/project/netdevbpf/patch/8aa905080bdb67608=
+75d62cb3b2b41258837f80e.1702352117.git.daniel@makrotopia.org/
+[2] https://patchwork.kernel.org/project/netdevbpf/patch/ba4e359584a6b3bc4=
+b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org/
 
