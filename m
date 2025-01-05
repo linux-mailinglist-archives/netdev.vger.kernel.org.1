@@ -1,119 +1,159 @@
-Return-Path: <netdev+bounces-155279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B68CBA01AB0
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:52:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B475A01AB8
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:03:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3BF2162BCC
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 16:52:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17EF23A1E9A
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F936155359;
-	Sun,  5 Jan 2025 16:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2886C13C807;
+	Sun,  5 Jan 2025 17:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="davCCZ/l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4hEgGKA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D380414D2A7
-	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 16:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD2811CA9;
+	Sun,  5 Jan 2025 17:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736095954; cv=none; b=SYI+0WbssrNE/9a7/EXDqnTbTWLlUMQmgfVvtqFmQQNdisK9ZlzXiR3MgRpQ2gAGEUzvXIqcJpl4afnswrUaRcD9juinZqp118pmCHYlVN3H0+S82e0aFbRextUxzv5MtlHbx5tFllN6tN+Zs9sl3P9M3dys3Mcr/GKimFm0h0g=
+	t=1736096622; cv=none; b=fbIvU/7uGtUvW0c3zW1GRuE+pH+ZZ9k+Pine42ZE9zER0SFcanaHPfOgWpEV5O/ar/Fdv9ejRZ4Gx+8RM9Txd60KeNtqeQv1Zp0qyV6ElfAovTV6e/018udWAqzPsb9tvxeE+eWSg0FnIxhUg/1KFpBImodw05eNXV1rsPaRFDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736095954; c=relaxed/simple;
-	bh=Dtugm41CHFmw25wsp1PeXN9gbITuWzhW/lNcqTncoqg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OgJxOT7d6ptKmGI/SOgjDKXiudZAFv181EnU4KXpg6u6lpfrp/KIfnCC3DsWoveGqZ9FPKMrXr8sEhbv/9Nx8tPWoSwZ2I6wlxavqziOpXqgbAv7eQGBOuCBUIfjt0M9MOIveHQJuQhsdJezlIidCW/qu7YUpx8JPpxlQRtp1LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=davCCZ/l; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aaec61d0f65so2277771566b.1
-        for <netdev@vger.kernel.org>; Sun, 05 Jan 2025 08:52:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736095951; x=1736700751; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dtugm41CHFmw25wsp1PeXN9gbITuWzhW/lNcqTncoqg=;
-        b=davCCZ/lZHd0EvLWNMtzQnDbaD/CHvEY6hRu5ojfSe0W1W8zyLU98ycrz3IRabSjP4
-         dvchcWUqOIhSfWBpXcfakmNG+Nu+bGikgbm8vBbhGVMX32OE2NjdsucXL5NAI53RVBCZ
-         s+xsGGVaWl+F/3UcqiDTPp67++bJUvxqjDVJr/0sU5kvdXgRKa2UaYcwpSdFFmILg5yC
-         ksMCtwkZVN3dd/t2IWMkKpmfxGtdClNwoNUAmOBhO9nOPCpsB9+UoCyCJ11uvzFhNiZl
-         3naXf0T0kdmSP4RDgs7Ka3Gs1MHay5uCdG3t3JONZ1JU6yMIFF5WopxzL/+Oxhkrqygm
-         HbsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736095951; x=1736700751;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dtugm41CHFmw25wsp1PeXN9gbITuWzhW/lNcqTncoqg=;
-        b=UeCDOMfjQGugy/Y0huaA0Ypnroxmqb0B3HP9dy2ctRNMt32GWMFlW/ME2YFf+sLi83
-         VripXUYZTwgs0Yke/ww2cKp4A2D9qjs714Av5relLRfU+tmGrb/OF1sWr+dxeheZbojz
-         onOPcYKJWhTZKt8rrbmSQINgyh/IHUUsf2jZ9psV7JnPTbytLyUll/xu49u70q4CQouL
-         rQyGpOTeYfTqhf6NkfajFzJ7XFb2kcAY5zacWcjbaJ/VZy6FSGDKs6EnMTWrYDfDNBHK
-         fq1SYq2VtYLUJ/LCxpaMBgx5w7HLC+LINn+5O2jp5yqp2soFlfg3NkSv/uikTbH7bNSs
-         X0GQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVAn61qrS5B+GJhXYz+j69Yi8YDZMLwbvCnXgXtn03LRWONIhddYOpX53/jJWHlVpZcWWAuwPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGrvpjzUJmPdgMzVdHLwKcJNnQ+W7EKEnxLHAAW0FF72wGDx6h
-	X/7qbjIm0VDy7qjJ7ECM4yZ/dRB/nqQLko68ABD1OPLWna5C9df7Bew64BVIeDJcZL1QRbfqDN+
-	v62O2SSnse/CXAkxVdR/L7Q38T6nYSBdT67v9
-X-Gm-Gg: ASbGncsWuYgPDaKMlEXyPw0nA0oNmzZ9W0YhLtT5s2IK4taK4gFTRWJyCdZpClwcXO/
-	RAxcl7D3VIowiJwO5hvrah+E7agqO1ic/z7U6
-X-Google-Smtp-Source: AGHT+IFpVe57pf6uqdx1jNk+2HFr/fDmVd030sEXi/vTLW2PwQOIIktibZHMK/bEEbPc0zMwr/a5yGRXKHTGw866Yxw=
-X-Received: by 2002:a17:906:7311:b0:aac:278:98fd with SMTP id
- a640c23a62f3a-aac2ad80073mr5265928566b.17.1736095950991; Sun, 05 Jan 2025
- 08:52:30 -0800 (PST)
+	s=arc-20240116; t=1736096622; c=relaxed/simple;
+	bh=9rYdjRehcjOr1ganzcwiG4dpxJXAatIR2dezUPUw8BM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MC3bDrlovejDlNyweYj/EOTf5acKictabEsAQ3+dilBFoKM5cwCykmFkd22ByGMcPRJhkFO/cC2BDYrFFf5V3g0KTQxOYvzixWYpuDvmNkW62nydx3tg0u+BOZZOrvay2k5/fxX9MeaROETiAtm3gx1z6fSdW5+MJP2U9my/fmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4hEgGKA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0C7EC4CED0;
+	Sun,  5 Jan 2025 17:03:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736096621;
+	bh=9rYdjRehcjOr1ganzcwiG4dpxJXAatIR2dezUPUw8BM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=M4hEgGKA8SPzm4LGjqOhDUa/oREirIQ5Ayre9PGZxW11zeW0452+mKd9HspKtucKY
+	 Qg4gDStkdmGWiuvGBGZMmUYu6K/v2p5ZfZ4SggxmDUgwgwECAEhIfjSwp11qRcPW0B
+	 VIY4wk9ozYAXaavWqwADHS5zgnJ92CGypEjMElZGvjNzd054mQr/MXKtXKGV5wHrQk
+	 jcalgGjYsiPQL0rdY3CHBOUWEfyjryVI+qIzOkLH2mQvvD6IJz2oJgz3DeEpBRBG3C
+	 wv6bGSmsODGdF4085yWi9/XpAXFELGZZ1zmO+XFb+yn0Jz6xxSzwnHxdjb83C033Bf
+	 KBBANWhx3lKVg==
+Message-ID: <163dbb5c-124c-4942-9b97-542ea97faa2a@kernel.org>
+Date: Sun, 5 Jan 2025 18:03:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <67769ecb.050a0220.3a8527.003f.GAE@google.com> <CANn89iKVTgzr8kt2sScrfoSbBSGMtLLqEwmA+WFFYUfV-PS--w@mail.gmail.com>
- <cf187558-63d0-4375-8fb2-2cfa8bb8fa03@kernel.org> <CANn89iJEMGYt4YVdGkyb-q81TQU+UBOQaX7jH-2zOqv-4SjZGg@mail.gmail.com>
- <20250104190010.GF1977892@ZenIV> <89c2208c-fe23-43eb-89ef-876e55731a50@kernel.org>
- <20250104202126.GH1977892@ZenIV> <CANn89i+GUGLQSFp3a2qwH+zOsR-46CyWevjhAQQMmO5K9tmkUg@mail.gmail.com>
- <20250105112948.GI1977892@ZenIV>
-In-Reply-To: <20250105112948.GI1977892@ZenIV>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 5 Jan 2025 17:52:19 +0100
-Message-ID: <CANn89i+L619t94EybXKsGFGQjPS7k-Qra_vXG-AcLJ=oiU2yYQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird Beta
 Subject: Re: [syzbot] [mptcp?] general protection fault in proc_scheduler
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Matthieu Baerts <matttbe@kernel.org>, davem@davemloft.net, geliang@kernel.org, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	martineau@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-GB
+To: Eric Dumazet <edumazet@google.com>, Al Viro <viro@zeniv.linux.org.uk>
+Cc: davem@davemloft.net, geliang@kernel.org, horms@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, martineau@kernel.org,
+ mptcp@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com,
+ syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>
+References: <67769ecb.050a0220.3a8527.003f.GAE@google.com>
+ <CANn89iKVTgzr8kt2sScrfoSbBSGMtLLqEwmA+WFFYUfV-PS--w@mail.gmail.com>
+ <cf187558-63d0-4375-8fb2-2cfa8bb8fa03@kernel.org>
+ <CANn89iJEMGYt4YVdGkyb-q81TQU+UBOQaX7jH-2zOqv-4SjZGg@mail.gmail.com>
+ <20250104190010.GF1977892@ZenIV>
+ <89c2208c-fe23-43eb-89ef-876e55731a50@kernel.org>
+ <20250104202126.GH1977892@ZenIV>
+ <CANn89i+GUGLQSFp3a2qwH+zOsR-46CyWevjhAQQMmO5K9tmkUg@mail.gmail.com>
+ <20250105112948.GI1977892@ZenIV>
+ <CANn89i+L619t94EybXKsGFGQjPS7k-Qra_vXG-AcLJ=oiU2yYQ@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CANn89i+L619t94EybXKsGFGQjPS7k-Qra_vXG-AcLJ=oiU2yYQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jan 5, 2025 at 12:29=E2=80=AFPM Al Viro <viro@zeniv.linux.org.uk> w=
-rote:
->
-> On Sun, Jan 05, 2025 at 09:32:36AM +0100, Eric Dumazet wrote:
->
-> > According to grep, we have many other places directly reading
-> > current->nsproxy->net_ns
-> > For instance in net/sctp/sysctl.c
-> > Should we change them all ?
->
-> Depends - do you want their contents match the netns of opener (as,
-> AFAICS, for ipv4 sysctls) or that of the reader?
+Hi Eric,
 
-I am only worried that a malicious user could crash the host with
-current kernels,
-not about this MPTP crash, but all unaware users of current->nsproxy
-in sysctl handlers.
+On 05/01/2025 17:52, Eric Dumazet wrote:
+> On Sun, Jan 5, 2025 at 12:29 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+>>
+>> On Sun, Jan 05, 2025 at 09:32:36AM +0100, Eric Dumazet wrote:
+>>
+>>> According to grep, we have many other places directly reading
+>>> current->nsproxy->net_ns
+>>> For instance in net/sctp/sysctl.c
+>>> Should we change them all ?
+>>
+>> Depends - do you want their contents match the netns of opener (as,
+>> AFAICS, for ipv4 sysctls) or that of the reader?
+> 
+> I am only worried that a malicious user could crash the host with
+> current kernels,
+> not about this MPTP crash, but all unaware users of current->nsproxy
+> in sysctl handlers.
+> 
+> Back to MPTCP :
+> 
+> Using the convention used in other mptcp sysctls like (enabled,
+> add_addr_timeout,
+> checksum_enabled, allow_join_initial_addr_port...) is better for consistency.
 
-Back to MPTCP :
+Indeed, I can do the modifications to stop using current->nsproxy in
+MPTCP. I can do the same in SCTP.
 
-Using the convention used in other mptcp sysctls like (enabled,
-add_addr_timeout,
-checksum_enabled, allow_join_initial_addr_port...) is better for consistenc=
-y.
+Do you plan to send your patch modifying proc_sysctl.c? It is just to
+know if I should mark my patches as fixes, and split them to ease the
+backports -- each helper using current->nsproxy has been introduced in
+different commits -- or if I can send them to net-next instead.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
