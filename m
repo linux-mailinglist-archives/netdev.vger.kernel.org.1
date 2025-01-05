@@ -1,123 +1,105 @@
-Return-Path: <netdev+bounces-155269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59C39A0195F
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 13:29:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55681A01962
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 13:29:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44554162713
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 12:29:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B992F18835DB
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 12:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0013E148310;
-	Sun,  5 Jan 2025 12:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371A413D244;
+	Sun,  5 Jan 2025 12:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="V7KHXts3"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="RT38Wv/+"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19D913C67E;
-	Sun,  5 Jan 2025 12:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB8D35959;
+	Sun,  5 Jan 2025 12:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736080144; cv=none; b=PBgtMx6UFKfS31nZwr6KEKtkbPX7Frf/sHZmGQU3QPDdCA3UMrdxwBGgTtuMjKBbTu3CbovQCCr/09mYuTDvfAcqEoKaZcWGbPDXKMJTm6vCFBTnVrnDFV8fzOQ7hLqaHDGcbXEDrKiUR+7G5guOu32pSMCMrnT6olkFJUWz2kQ=
+	t=1736080189; cv=none; b=u8vWsFQ8lNLHuakGbLFxZ6n9CzOW6iQj/nC8Tr9TpZbmGkmpIbX1xskYmvx8b6av+SkjsHubrjTyuSZSzPvPWpchawk6fl6CBLJ9USPq5cih4xElZbriDzMqlDEo3dt9RXweQDRupFPzNmjUepsUiC8KxQRHHD9bJg1srB0Ernk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736080144; c=relaxed/simple;
-	bh=+aCilyzQBYQU+nI1w+foCW+lZCbodq8YAcIfHx5aa1I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l2Veh3VTN6QukhRAgNBK6r1U2oNerdTn9HDVgb+v4v8yQ8wP/GGZpgiFVf7w8cTeahWjCMQYF9vivHECOAFLEKlgNliUTtUMNDhrnrbUttshTiNRmBW3Xc4kOcSmdvoFQ7VkUFxu389aK8vbyC2ajKBsKUEn9MdYkMJ5lXgAs1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=V7KHXts3; arc=none smtp.client-ip=46.235.229.95
+	s=arc-20240116; t=1736080189; c=relaxed/simple;
+	bh=TAjQfCdZ/FJT3DXIKIhAVl0OxkdP6KSsOcc7vBHPTlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZbcdPWbCYuLO+2GYNdtaOGYjTbJ6mpyP+iaSpShp8lNmC8i1angL7NeIHcAYOjOZMeRWAh1R75vlvV7WJRGPSqEaFIy938+Ev3PIz95QDo/X9dWTwalDjzcmyoxqZYqbVRmMZ3hxuutWVQ++GyiHm2vLP4QRFs2+xhsD4Q4lEOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=RT38Wv/+; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=kcui1YFlovpQ1x2BkMAS53C/vo7CjqHBMemv//uHBFU=; b=V7KHXts378VGKH0M
-	RnBxCEbkOPio4oWuMoJXxDstN4/j8JFvzJxRuZ6bEH7y5WoyfINhTnYA/vVhrkDEaBhvhCJE32DI0
-	+oTAe3VQ0Dg8GxQ0R8W8aORZ6LIqwghm3s1pRZDMhjtsuyYwdzMWvZFgbcwS/8Vs0F1EPjVB1ERRh
-	1J1CovdvR6N8Trwt9vkO550F9nV2Wi2xEV974fwPeuX5bnIDyv/tZlDMjBsPX3i6momp42Cj/HcpA
-	U2x4xBGK6IfYESkrQhEMeKpdZJUtL+LyHEzOwyR0eEy6JsRnEgYS11QUTADZd1S0KwtSHGOGEjQyF
-	zxIxinPqaptGz5VzJQ==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tUPkO-008DTD-1h;
-	Sun, 05 Jan 2025 12:28:48 +0000
-From: linux@treblig.org
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kys@microsoft.com,
-	intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next v2] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
-Date: Sun,  5 Jan 2025 12:28:47 +0000
-Message-ID: <20250105122847.27341-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=hJaegaA4URsS9dJNooiDBvKtyhjiY7wAcR6BnE5DN4Y=; b=RT38Wv/+pIhkwVsh
+	TztEav7fSMMaGGEapV+WZLY09llb2RyHeaauQtQXaJO3Iqvt0LC70sb0LbGaljMuNaP0KGOllUqQx
+	ItI+7jZIhybussrp3Yvo2Nc8OLrptPA/3eaDp/UmBxJiF+hgaJFdVigEsCN0aQ6aa2E30aKFgOBEz
+	fLSTQXk6c6QPzRt+7zgVPvxh5c2IzgpRdwLIozzC3BSNt1vAmUxGl/V8SMPn6zSj87aYyZOzXbeDQ
+	FifaaTMmkdZ8PDhsxAvq0EYdHoSpSdgkmHqp1J9X7vovFl2DTV+5yoQLljAelYLklaAJ9+XpsbngU
+	O247T9IS7ScYGFO+LA==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1tUPlE-008DUi-0O;
+	Sun, 05 Jan 2025 12:29:40 +0000
+Date: Sun, 5 Jan 2025 12:29:40 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+Message-ID: <Z3p7NDKTrMpm0Y_-@gallifrey>
+References: <20250102174002.200538-1-linux@treblig.org>
+ <20250104081532.3af26fa1@kernel.org>
+ <Z3muiBPv30Dsp8m5@gallifrey>
+ <20250104165440.080a9c7b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20250104165440.080a9c7b@kernel.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 12:29:05 up 241 days, 23:43,  1 user,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+* Jakub Kicinski (kuba@kernel.org) wrote:
+> On Sat, 4 Jan 2025 21:56:24 +0000 Dr. David Alan Gilbert wrote:
+> > > This one doesn't apply, reportedly.  
+> > 
+> > Hmm, do you have a link to that report, or to which tree I should try
+> > applying it to.
+> 
+> net-next, the tree in the subject prefix:
+> 
+> $ git checkout net-next/main
+> $ wget 'https://lore.kernel.org/all/20250102174002.200538-1-linux@treblig.org/raw'
+> Saving 'raw'
+> $ git am raw
+> Applying: ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+> error: patch failed: drivers/net/ethernet/intel/ixgbevf/ixgbevf.h:439
+> error: drivers/net/ethernet/intel/ixgbevf/ixgbevf.h: patch does not apply
+> Patch failed at 0001 ixgbevf: Remove unused ixgbevf_hv_mbx_ops
 
-The const struct ixgbevf_hv_mbx_ops was added in 2016 as part of
-commit c6d45171d706 ("ixgbevf: Support Windows hosts (Hyper-V)")
+Just sent:
+Subject: [PATCH net-next v2] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+Message-ID: <20250105122847.27341-1-linux@treblig.org>
 
-but has remained unused.
+on top of a few hour old net-next.
 
-The functions it references are still referenced elsewhere.
+Dave
 
-Remove it.
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- drivers/net/ethernet/intel/ixgbevf/ixgbevf.h |  1 -
- drivers/net/ethernet/intel/ixgbevf/mbx.c     | 12 ------------
- 2 files changed, 13 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-index 9b37f354d78c..4384e892f967 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-@@ -443,7 +443,6 @@ extern const struct ixgbevf_info ixgbevf_X540_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X550_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_e610_vf_hv_info;
--extern const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops;
- 
- /* needed by ethtool.c */
- extern const char ixgbevf_driver_name[];
-diff --git a/drivers/net/ethernet/intel/ixgbevf/mbx.c b/drivers/net/ethernet/intel/ixgbevf/mbx.c
-index a55dd978f7ca..24d0237e7a99 100644
---- a/drivers/net/ethernet/intel/ixgbevf/mbx.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/mbx.c
-@@ -505,15 +505,3 @@ const struct ixgbe_mbx_operations ixgbevf_mbx_ops_legacy = {
- 	.check_for_ack	= ixgbevf_check_for_ack_vf,
- 	.check_for_rst	= ixgbevf_check_for_rst_vf,
- };
--
--/* Mailbox operations when running on Hyper-V.
-- * On Hyper-V, PF/VF communication is not through the
-- * hardware mailbox; this communication is through
-- * a software mediated path.
-- * Most mail box operations are noop while running on
-- * Hyper-V.
-- */
--const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops = {
--	.init_params	= ixgbevf_init_mbx_params_vf,
--	.check_for_rst	= ixgbevf_check_for_rst_vf,
--};
 -- 
-2.47.1
-
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
