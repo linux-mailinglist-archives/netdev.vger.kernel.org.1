@@ -1,176 +1,216 @@
-Return-Path: <netdev+bounces-155261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF65A018C3
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 10:06:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F22AA018C6
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 10:09:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEAAB7A14B9
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 09:06:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 478447A1477
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 09:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12F113CA8A;
-	Sun,  5 Jan 2025 09:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336215336D;
+	Sun,  5 Jan 2025 09:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKXsY95T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sMBCJwym"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF1B3D3B3;
-	Sun,  5 Jan 2025 09:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1C73596B
+	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 09:09:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736067997; cv=none; b=VbKrGJn7KCeNukkiB1SqAKRimQICA61QuoHFHJZs1I97dO6pHSV+1Xu7mFUxq15y5qPG+zPqhdyIsUFUJTpMuMoRzS1QU5HG1bXS1izZSCt98xd7nQqk4r1XBfbIodofqrEjQ2wOkVfti3HRkIvgH96jzHhzlrKk1G2Tonq3TnU=
+	t=1736068169; cv=none; b=cwE7rs9NrYTR8bp5h7FTzA0hRtWlgYA91sLuPK1WAoMJrlQ+ICcqvonMNaYtGPoMs9SpcUYMwW59QEoQqTNo9Y6Bes0ZqssQfbE0s+dxC9oNze8iyVahM7cn3R4GUMFK5jFCCU5dwhvOJV16TUxi1G90ZuZDF9aIL8X6eorWjf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736067997; c=relaxed/simple;
-	bh=QHEtrtWehZrXxi4O0ZwprOmoYuiHhgDbbAm2XllazSk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CsP4n5WWhf9bkYZ4sU8F2b4KlhKpNyxyLTqQxgsndkNuuJzalGDYKb0k98maFWePMexLGRlth/9Pw9uYU2s9po43LaZbpH0ZxWRmZD5RavDlZwWtkj9wGCib5Iuwuzrl7e5tx426Ebl9IQPHxl65fDTWPMoAtlrBmD3/10UxwbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKXsY95T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FAC3C4CED0;
-	Sun,  5 Jan 2025 09:06:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736067997;
-	bh=QHEtrtWehZrXxi4O0ZwprOmoYuiHhgDbbAm2XllazSk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kKXsY95TEAsopYp9HoWUdjVZqubBr7zrSF+kpXGL7zI8b5ssakBN7djodVKlbPig2
-	 2RkASTA5et5vqACsHk82s6DVx7LnO/1MzTJkFs0NIdgM6GiqXLinpjCSm6OmkQMAg9
-	 YtlZEHBGW++cK574MNiZqqNZgd6J9No/Apb4aW+accN73KRFUhpGCflcOSZCDbVsOn
-	 pRFDvvms7MiUmtGSQH6NdEaN+BvpflWsa1UPDYa8YRc0Uv2J6ZdBSpiJ7LklRRJ7P5
-	 lCqreYhSM4wQAqWVT/b/OL0NVeSbxFbu8JhiwtvqdiB1207/71ncIjrOmvFXT3ieed
-	 UXSSuICpJBArw==
-Message-ID: <c47cdecb-a618-4e7b-8334-5892170f012b@kernel.org>
-Date: Sun, 5 Jan 2025 10:06:27 +0100
+	s=arc-20240116; t=1736068169; c=relaxed/simple;
+	bh=/xnNO9TISs+yVenEk0v7gT15iZl/b8BbM5ViCal019M=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uEm2hlWG+Oe3XoMGgnDQ5cf+Ncb+Oba5yYoAg7S+TTl1NvPauxaJPVqQ+R64KL2xTBBuQLoH5+EdngU/UcXN2GNIR5Cwv/gjGZo5c6MrE6prCva+SU5BW4WxVZR6LUec/VJNsPabb26n+Hy1Qq0b5YCMfuY/MOvmrs8eX4+LaSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sMBCJwym; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6d92efa9ff4so218625766d6.2
+        for <netdev@vger.kernel.org>; Sun, 05 Jan 2025 01:09:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736068166; x=1736672966; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dI0nUrl2pcJCuKnnBYgOFpX8d+4DDDeKXbJGIhURel8=;
+        b=sMBCJwymDLppO4u/HUuHsecbSAnP8wUUVpADNCkuJ4EZP7cNN+xOeijYdVx2WsVYkx
+         JgpRgejLUoTp7ab6S0Ar8KBXf8Px7uOqqY9cqnrzKwg+T2bGOqZvsZ1whTFddPV3qPke
+         v++jxhsisA7NruPr+IGHczDh1DzO5ma+3WngA+PH5+U7z3swMLOXfDR5vKMbjvc8yk1r
+         fs6YWe/E9Q/8HeF94x9WQ2/ejfjpA2YO7yU8NWdCsK85lc4H/9I7hNeb44pBNeAH24Z3
+         wDdOsiRdqNGVV3e0bAZIP5Npd/mOGZgc38khaSwUkHcrN1LTFKq3j9TH7KXjYw2a54F5
+         aKKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736068166; x=1736672966;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dI0nUrl2pcJCuKnnBYgOFpX8d+4DDDeKXbJGIhURel8=;
+        b=O1xwlW34hMk+H+ZacA2SalRTabeNLPo2i94foF4xCZF+f2aK96dy2+mhHVpqibaOyA
+         qwdv0kkAtPk7h+fC/lTmyiqcO1v8yE3Wc5Xl95FYeviGkUxCIc91QBgxAFyA9cW/nzqT
+         IYbQTqHEfUXXkBVCHrGxHi2aCjQS8hFGpUNSc607OqDRkTccBHdo2Kxsus+0V4tSepqe
+         K9GMcXe5W+xZr1MZxhf5AOY6AiKl9UmsY8t25iupHepNltgtaYqhklFfnZ2kpMdH8lM6
+         VJVDFyzTpaRpJmrnv44j6oNkKd2yUDweNSzX3CUK2UPIhxHdYNMlyzP3fJIB7rlDN35N
+         ugsQ==
+X-Gm-Message-State: AOJu0YyWw2mrCfOGV4caOuz+AhAJ8gs3sWMkDVe9wH0HxiPhTlGdHgI5
+	ZLD3MnEOh1ODgEP3iDPLMLhXE/KFmoD8i1R4wGrVF+IKBtxY++dYUrbY444abGcptcQ1lxrM5KS
+	EOxiRIDkJow==
+X-Google-Smtp-Source: AGHT+IHy34lkewUo5IuVEzJVmY9LA6RfOw+YGY2bXQyKdJOv5/xhTX2CZIt2Lmosq9qCSLSrGldD4VgkkXq0fw==
+X-Received: from qtei11.prod.google.com ([2002:a05:622a:8cb:b0:467:7c6d:5bba])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ad4:5ce8:0:b0:6d8:8d16:7cec with SMTP id 6a1803df08f44-6dd23397b76mr735273536d6.37.1736068166369;
+ Sun, 05 Jan 2025 01:09:26 -0800 (PST)
+Date: Sun,  5 Jan 2025 09:09:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 18/27] regulator: dt-bindings: Add
- regulator-power-budget property
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>,
- Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
- Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org
-References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
- <20250103-feature_poe_port_prio-v4-18-dc91a3c0c187@bootlin.com>
- <mjtwntmupclvy2dvc66zxxob3py47lew47vq37hfi6v6pmbpne@nr62lnuilzya>
- <20250104165056.749da353@kmaincent-XPS-13-7390>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250104165056.749da353@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20250105090924.1661822-1-edumazet@google.com>
+Subject: [PATCH net-next] net: watchdog: rename __dev_watchdog_up() and dev_watchdog_down()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 
-On 04/01/2025 16:50, Kory Maincent wrote:
-> On Sat, 4 Jan 2025 10:42:32 +0100
-> Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> 
->> On Fri, Jan 03, 2025 at 10:13:07PM +0100, Kory Maincent wrote:
->>> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
->>>
->>> Introduce a new property to describe the power budget of the regulator.
->>> This property will allow power management support for regulator consumers
->>> like PSE controllers, enabling them to make decisions based on the
->>> available power capacity.
->>>
->>> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
->>> ---
->>>
->>> Changes in v3:
->>> - Add type.
->>> - Add unit in the name.
->>>
->>> Changes in v2:
->>> - new patch.
->>> ---
->>>  Documentation/devicetree/bindings/regulator/regulator.yaml | 5 +++++
->>>  1 file changed, 5 insertions(+)
->>>
->>> diff --git a/Documentation/devicetree/bindings/regulator/regulator.yaml
->>> b/Documentation/devicetree/bindings/regulator/regulator.yaml index
->>> 1ef380d1515e..c5a6b24ebe7b 100644 ---
->>> a/Documentation/devicetree/bindings/regulator/regulator.yaml +++
->>> b/Documentation/devicetree/bindings/regulator/regulator.yaml @@ -34,6
->>> +34,11 @@ properties: regulator-input-current-limit-microamp:
->>>      description: maximum input current regulator allows
->>>  
->>> +  regulator-power-budget-miniwatt:  
->>
->> What sort of quantity prefix is a "mini"? How much is a mini?
-> 
-> Oops, that is a brain fart sorry for this. Of course it is milliwatt.
-> 
->>
->>> +    description: power budget of the regulator
->>> +    $ref: /schemas/types.yaml#/definitions/uint32  
->>
->> This should not be needed. Use proper unit from dtschema.
-> 
-> Ok, I was mistaken. There are bindings with this ref in this file, so I thought
-> it was needed. I will remove it.
-If the unit is not in the property-units of dtschema, you will have a
-warning, but then please send a pull request (patch could work as well
-probably) to dtschema adding it... but I am sure that milliwatt is there.
+In commit d7811e623dd4 ("[NET]: Drop tx lock in dev_watchdog_up")
+dev_watchdog_up() became a simple wrapper for __netdev_watchdog_up()
 
-Best regards,
-Krzysztof
+Herbert also said : "In 2.6.19 we can eliminate the unnecessary
+__dev_watchdog_up and replace it with dev_watchdog_up."
+
+This patch consolidates things to have only two functions, with
+a common prefix.
+
+- netdev_watchdog_up(), exported for the sake of one freescale driver.
+  This replaces __netdev_watchdog_up() and dev_watchdog_up().
+
+- netdev_watchdog_down(), static to net/sched/sch_generic.c
+  This replaces dev_watchdog_down().
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ drivers/net/ethernet/freescale/ucc_geth.c |  2 +-
+ include/linux/netdevice.h                 |  2 +-
+ net/core/dev.c                            |  2 +-
+ net/sched/sch_generic.c                   | 33 ++++++++++-------------
+ 4 files changed, 17 insertions(+), 22 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+index f47f8177a93b46e4456388d33e03b0098d6afa22..88510f822759607b34d99e03225a2621fe3039d4 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -1434,7 +1434,7 @@ static void ugeth_activate(struct ucc_geth_private *ugeth)
+ 
+ 	/* allow to xmit again  */
+ 	netif_tx_wake_all_queues(ugeth->ndev);
+-	__netdev_watchdog_up(ugeth->ndev);
++	netdev_watchdog_up(ugeth->ndev);
+ }
+ 
+ /* Initialize TBI PHY interface for communicating with the
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 2593019ad5b1614f3b8c037afb4ba4fa740c7d51..7f9d14c549c81ccf6d5acf97dffc3b724e3efdce 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4295,7 +4295,7 @@ static inline bool netif_carrier_ok(const struct net_device *dev)
+ 
+ unsigned long dev_trans_start(struct net_device *dev);
+ 
+-void __netdev_watchdog_up(struct net_device *dev);
++void netdev_watchdog_up(struct net_device *dev);
+ 
+ void netif_carrier_on(struct net_device *dev);
+ void netif_carrier_off(struct net_device *dev);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e7223972b9aafea345ea55c576231be3bf1cef02..54a90f7942932679a76c7be1aa5966f6798784fa 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3233,7 +3233,7 @@ void netif_device_attach(struct net_device *dev)
+ 	if (!test_and_set_bit(__LINK_STATE_PRESENT, &dev->state) &&
+ 	    netif_running(dev)) {
+ 		netif_tx_wake_all_queues(dev);
+-		__netdev_watchdog_up(dev);
++		netdev_watchdog_up(dev);
+ 	}
+ }
+ EXPORT_SYMBOL(netif_device_attach);
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 8874ae6680952a0531cc5175e1de8510e55914ea..bb7dd351bd651d4aa16945816ee26df3c4a48645 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -551,25 +551,20 @@ static void dev_watchdog(struct timer_list *t)
+ 		netdev_put(dev, &dev->watchdog_dev_tracker);
+ }
+ 
+-void __netdev_watchdog_up(struct net_device *dev)
+-{
+-	if (dev->netdev_ops->ndo_tx_timeout) {
+-		if (dev->watchdog_timeo <= 0)
+-			dev->watchdog_timeo = 5*HZ;
+-		if (!mod_timer(&dev->watchdog_timer,
+-			       round_jiffies(jiffies + dev->watchdog_timeo)))
+-			netdev_hold(dev, &dev->watchdog_dev_tracker,
+-				    GFP_ATOMIC);
+-	}
+-}
+-EXPORT_SYMBOL_GPL(__netdev_watchdog_up);
+-
+-static void dev_watchdog_up(struct net_device *dev)
++void netdev_watchdog_up(struct net_device *dev)
+ {
+-	__netdev_watchdog_up(dev);
++	if (!dev->netdev_ops->ndo_tx_timeout)
++		return;
++	if (dev->watchdog_timeo <= 0)
++		dev->watchdog_timeo = 5*HZ;
++	if (!mod_timer(&dev->watchdog_timer,
++		       round_jiffies(jiffies + dev->watchdog_timeo)))
++		netdev_hold(dev, &dev->watchdog_dev_tracker,
++			    GFP_ATOMIC);
+ }
++EXPORT_SYMBOL_GPL(netdev_watchdog_up);
+ 
+-static void dev_watchdog_down(struct net_device *dev)
++static void netdev_watchdog_down(struct net_device *dev)
+ {
+ 	netif_tx_lock_bh(dev);
+ 	if (del_timer(&dev->watchdog_timer))
+@@ -591,7 +586,7 @@ void netif_carrier_on(struct net_device *dev)
+ 		atomic_inc(&dev->carrier_up_count);
+ 		linkwatch_fire_event(dev);
+ 		if (netif_running(dev))
+-			__netdev_watchdog_up(dev);
++			netdev_watchdog_up(dev);
+ 	}
+ }
+ EXPORT_SYMBOL(netif_carrier_on);
+@@ -1267,7 +1262,7 @@ void dev_activate(struct net_device *dev)
+ 
+ 	if (need_watchdog) {
+ 		netif_trans_update(dev);
+-		dev_watchdog_up(dev);
++		netdev_watchdog_up(dev);
+ 	}
+ }
+ EXPORT_SYMBOL(dev_activate);
+@@ -1366,7 +1361,7 @@ void dev_deactivate_many(struct list_head *head)
+ 			dev_deactivate_queue(dev, dev_ingress_queue(dev),
+ 					     &noop_qdisc);
+ 
+-		dev_watchdog_down(dev);
++		netdev_watchdog_down(dev);
+ 	}
+ 
+ 	/* Wait for outstanding qdisc-less dev_queue_xmit calls or
+-- 
+2.47.1.613.gc27f4b7a9f-goog
+
 
