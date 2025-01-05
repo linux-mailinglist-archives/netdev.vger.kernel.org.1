@@ -1,122 +1,82 @@
-Return-Path: <netdev+bounces-155217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38860A01787
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 01:43:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4559CA01789
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 01:54:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7823E7A13F0
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 00:43:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB00E1883E7E
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 00:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A6A4C6D;
-	Sun,  5 Jan 2025 00:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EE22C9A;
+	Sun,  5 Jan 2025 00:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q3sLApVB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="svPSzJwk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69CB320B
-	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 00:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF763184F;
+	Sun,  5 Jan 2025 00:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736037823; cv=none; b=hcOiHO7yiLwK7OD40ZrlhdbmuY2lSb1hnPnm1dAw6f1uY6egjOccbIr4BVuH35F6NuJDmCmKyL/kat4yRixBTsfkz+nqkKbhAEGoBiqlhaHiAaNPsYmHvz2lLwCuU2USB/pRejTVQxB5tmln4EVD+dyGjPkGPGWjn2jIwGzPVFk=
+	t=1736038482; cv=none; b=Ga+3kHD+7ENe3uySndj0dDSvrhDpQq1aZ1Yi5lgYN6QIwDvUeARgvV+oeVrFEzHv+WU3hIdl9EMo2zJjB3DmVa89pRiYgMulC/CA04cN0EQcLOKT5tjjCcgmYL0zFFs/3JoqYevFG+GYRLXRZTf8IgjxpI1CWM4DLIscxrc1/9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736037823; c=relaxed/simple;
-	bh=1CvGJBdfsQrSZP0bq41YTjTW80fDNBCU6ihC5Tvay2s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AVrKEDnzXkM58KjQsxUY3RXiYHKkX29e4yCW/cQhC7as9fz7Iuu02WT2qkK0snAdG/Nh7xXr8TzN9mOG5pGzEB7zj5aLYcL6k+w6zMAP1eLJZuVZyJHgwqbZ0F40tsSfolnDtRHzf4yf4xd7Oo6D0KGO/+318xyMtFNdKCfxWC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q3sLApVB; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b9bc648736so1093192385a.1
-        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 16:43:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736037820; x=1736642620; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jXzhdavCNuMsnLueA0771kqTUjEAV7QKi1FIGuZMdYk=;
-        b=Q3sLApVBSJ864/XJIJ74jNLQHzS+R9PwgNDtjskvu4MrotnUUsDTxExozqmG9a/pI1
-         045tnx9KoKwQbvFsTdTscGGVt6YsEpN5cDGBUtuJ6SzzhJvOFHU9qlpS2l3Js1Wsc/0C
-         f5Fi9lkMyJQXXqo4IZPvO4tieYQvM9YZq7NZDWOxKztzpz33PWoItkmpYO/DExnLPVQd
-         Kg4p6+wYDfEUv89yrojULjtda6lZnf41SLY6uwXkszgee0YCR/elliY12FBvk0RSDqlB
-         LA603i8UOtWwvYOqxXXWC0YoIz2n9nzWjysZQ042yEn8vcDCg2QaNeRvNBImRLfVf/CZ
-         +VTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736037820; x=1736642620;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jXzhdavCNuMsnLueA0771kqTUjEAV7QKi1FIGuZMdYk=;
-        b=R1udF+xcOUZCpMmj/YrwySb7MG1374GOIqoByXHITxzgqoBS5Nbk2XQaT22QV/rr8t
-         ukzi0kQAYAHU2UgfOKIlUo04iQYsW47v+5zLZIZukRISaiftJNa1FX7xKCxX6330qwGY
-         RkaFVCmePqFi7rOqjAYEAtGX8Lpt+bvAv/1+29DeABPRoZEOY4XxiEvhpARBORiDzIxj
-         /r1COxjjIP5ksQ72yuy1QzkmVyRAxJUXkVGY9Q+NmuusPqMkNMWr6pPnFhHViNwz2k1r
-         k5QH41O+7MnS+/s9D6NPm+u4aCE5m+Ca/0Bc5XHUUf4e9iWjjmqIGxQ66m2UyMwdkU/f
-         5H5g==
-X-Forwarded-Encrypted: i=1; AJvYcCXTiBH7fFEyU45nB/yVyhxnYtQqbNKxfoktQoB7bBtN87AM0/n0QTTI02CmNjQgHncWRnKk5sQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8qPi3R/X3bhK3HQoivwFbxm4dzjT3zH6WrCKG1MNPU7zcKgja
-	Fgq/g75IWgWL7sTNEDmLRzzig4uRExN+4coXCKFZB+KC4ku9PR98
-X-Gm-Gg: ASbGncs1320Fs8CURUFFYcRu09AQqHYjSfrYPpxpis9ACn2MWaOrtB+FZHzwT1KEpnn
-	SoOWAkgKM34+IxkTHAXw2CVjaYoNDf2PWAep1rGbIeAAkO65iAkMiG3jyH78A2oN0jYOA1fWlbf
-	IlrayNWqPzTpwHzDx/SI4Z+xZKCRT7y/fONg8LebEGcMYdQnmMcAf2Rq69u700n8K/2p2gSwoDg
-	P8EFKdXLM8ZVIxS+wVShj0toiCGBJ/TwH+CVuceYSTdVTeHNLMfA3cmuw==
-X-Google-Smtp-Source: AGHT+IEcxJWl2wjr7Id04LiuND3cEErMf6d3XzvYGaToZw8fdUG64cKqpBg0mtrwSY0BwA6gNoW8qQ==
-X-Received: by 2002:a05:620a:4805:b0:7b6:6701:7a4a with SMTP id af79cd13be357-7b9ba82198fmr8616113885a.53.1736037820477;
-        Sat, 04 Jan 2025 16:43:40 -0800 (PST)
-Received: from echampetier.lan ([2607:fea8:1b9f:c5b0::4c4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3e653f52sm160765281cf.16.2025.01.04.16.43.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jan 2025 16:43:40 -0800 (PST)
-From: Etienne Champetier <champetier.etienne@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Etienne Champetier <champetier.etienne@gmail.com>
-Subject: [PATCH] ipvlan: Support bonding events
-Date: Sat,  4 Jan 2025 19:36:19 -0500
-Message-ID: <20250105003813.1222118-1-champetier.etienne@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736038482; c=relaxed/simple;
+	bh=veIroVZ6s7mitoVTEozq0rmdy+aNoxJCwz2i5kV2nJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tH0XQb15n0eucYbSR3AiFkyV7kgaIMR+26fgsn3Ye5aQlop077RfBA69WFiC/frmUUWyyTtw+rgr8ZjbYGOvP7agG8twhncXC/g8lsLdoGmvL2FI5rMExqEWMpCtHdHnoKZDYWWnQLa0mQHVq6UoGc0VcFYdUYdBa7jmNi3LaOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=svPSzJwk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1726C4CED1;
+	Sun,  5 Jan 2025 00:54:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736038482;
+	bh=veIroVZ6s7mitoVTEozq0rmdy+aNoxJCwz2i5kV2nJ8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=svPSzJwk0s0RTmGcLanFNqQQyQ2v6PHTSUDo3EUIaV4p2UY/+VzQ0Xa330ZKigx9C
+	 ibjwV+lTM1lmt0noJfwr5jDWXM2Kyj72QH0QwKWynuN7DiVJth39E53DoGuI9L8T6B
+	 DqZ7wAfh7hhJj86CookGXgoI1i0IggISU+VXZ/O3aSaxtZlwThSHe8K7am8dwZkPVL
+	 DoVbrxmWld+kG9tDcMNmkth0W13k+XxbF+kzHXO00gojEeEW8ERw7y1vRKgg5EXRrh
+	 MdSQtG8Ww8kmdqpct0kavOBjs3A/Zv4nAB0wFV051Aes2aGuW8G5ezBA1KM4PKRA//
+	 716BKCEwWUsfg==
+Date: Sat, 4 Jan 2025 16:54:40 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+Message-ID: <20250104165440.080a9c7b@kernel.org>
+In-Reply-To: <Z3muiBPv30Dsp8m5@gallifrey>
+References: <20250102174002.200538-1-linux@treblig.org>
+	<20250104081532.3af26fa1@kernel.org>
+	<Z3muiBPv30Dsp8m5@gallifrey>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-This allows ipvlan to function properly on top of
-bonds using active-backup mode.
-This was implemented for macvlan in 2014 in commit
-4c9912556867 ("macvlan: Support bonding events").
+On Sat, 4 Jan 2025 21:56:24 +0000 Dr. David Alan Gilbert wrote:
+> > This one doesn't apply, reportedly.  
+> 
+> Hmm, do you have a link to that report, or to which tree I should try
+> applying it to.
 
-Signed-off-by: Etienne Champetier <champetier.etienne@gmail.com>
----
- drivers/net/ipvlan/ipvlan_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+net-next, the tree in the subject prefix:
 
-diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-index ee2c3cf4df36..da3a97a65507 100644
---- a/drivers/net/ipvlan/ipvlan_main.c
-+++ b/drivers/net/ipvlan/ipvlan_main.c
-@@ -799,6 +799,12 @@ static int ipvlan_device_event(struct notifier_block *unused,
- 	case NETDEV_PRE_TYPE_CHANGE:
- 		/* Forbid underlying device to change its type. */
- 		return NOTIFY_BAD;
-+
-+	case NETDEV_NOTIFY_PEERS:
-+	case NETDEV_BONDING_FAILOVER:
-+	case NETDEV_RESEND_IGMP:
-+		list_for_each_entry(ipvlan, &port->ipvlans, pnode)
-+			call_netdevice_notifiers(event, ipvlan->dev);
- 	}
- 	return NOTIFY_DONE;
- }
--- 
-2.47.1
-
+$ git checkout net-next/main
+$ wget 'https://lore.kernel.org/all/20250102174002.200538-1-linux@treblig.org/raw'
+Saving 'raw'
+$ git am raw
+Applying: ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+error: patch failed: drivers/net/ethernet/intel/ixgbevf/ixgbevf.h:439
+error: drivers/net/ethernet/intel/ixgbevf/ixgbevf.h: patch does not apply
+Patch failed at 0001 ixgbevf: Remove unused ixgbevf_hv_mbx_ops
 
