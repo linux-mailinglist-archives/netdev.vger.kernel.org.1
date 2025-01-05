@@ -1,140 +1,140 @@
-Return-Path: <netdev+bounces-155281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E6D2A01ABA
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:04:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B5AEA01ABD
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:09:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6C757A164A
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:03:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A9F8161892
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:08:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CD319066D;
-	Sun,  5 Jan 2025 17:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EC6149C7B;
+	Sun,  5 Jan 2025 17:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWvmD8bL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y6xJ4W9Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB1D18A6AE;
-	Sun,  5 Jan 2025 17:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3595336D;
+	Sun,  5 Jan 2025 17:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736096625; cv=none; b=ILr368Ltz4H5sCf3aw1xmvufsgiCL5STXCQEhhH8c42ZpZehJV/QVl3tt3y5K574WH8SpG0ZeJFldFowG8Bvm3ekxJvgkg7OVeUHmSfCdbbRZ1VfK5SzW3cKuAfw3ftL4xGfOgvYo+yL0gETXgnEAYTZByoYCSn0JhkwsAJS6Ic=
+	t=1736096930; cv=none; b=oq8T42uuPEOJACcuOGkt4IFpvH+i6Rko7KGh9lP3FS4sqfRBjb2Sx7Kh0wHsm9/yCSYj1y2AwXuROWD0K6px96Nr6cILKtixHJ//eBPBz4DZIPCgxdPXf9qM/zUmHsk2bVneWWqzNhJUh468aYgip5TtLuaYIlFXkhgtN5goFLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736096625; c=relaxed/simple;
-	bh=q0apx07cMntN8BWEq7bhHzKWgpHs84QlVF0Wjwnq3Yk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C7aWoq4GC+WTEVLp634eLPVQNXQLIwOCb6FjdFu6acTkb6+aPKbd9zr3IieuQu6Ne3o41lExUWNgMPJnuFA4PsD0qsKgfE1xG0UHDkjfAigJSv+H8FlrjHugJutUbp1JRV+TTLFMaUong3HuEataaOqDgea7PAb3KycrUrfJWEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CWvmD8bL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3220C4CEE4;
-	Sun,  5 Jan 2025 17:03:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736096624;
-	bh=q0apx07cMntN8BWEq7bhHzKWgpHs84QlVF0Wjwnq3Yk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CWvmD8bLO3nuBwd/CUpdJUGjaFyuyMWh9TyvsDly+i7J4RxCLijI4wT24e4gSjWxt
-	 hEJ2XyPk/Wi+DhnOGchUMncRedVrBYf8ed9HWqM+pXAxbQ7k9wEWLReDWLC3l7io4S
-	 YZKYzSfzpVKOIIH+Ts63DTKPXEhwEOZeor4WT3FFFyZgMLOAbBEsQMhhMI9/Q91jO3
-	 TuSATvyVP1RBYUg7L+g/0qZPP8F0aRQVXs/4DFz92UljihVchxx0r0nyWnCG5ZFqel
-	 LawLZlDHHRHa4HWWI+IIrXlibsFIeU6PUGLKFOTHOMIeYhSYxOCPc6QlyrtJOGbXUm
-	 saKiQVw0D4EAg==
-Message-ID: <95a51b11-cc3c-4282-8069-4549f9fcc321@kernel.org>
-Date: Sun, 5 Jan 2025 18:03:40 +0100
+	s=arc-20240116; t=1736096930; c=relaxed/simple;
+	bh=b0yXdcl0FQhRZaXYWfu7p7+U1eeapTWa74uhZ7KKUts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UdUMshoerKh18ZBBDsP8YgAkWA6u9pmFmT5wrhTIMBiXhQfREm5SGa/rXWtzJY3XkdJekwc1rmSE9kCMTt9G3RmdpIr3Jyxtzuqq9mY9fFmGBRPDvhk2GMKX0dssTJQ9VB0Co+xbBuRHjhqna5Pn2f9bnnf21rv4iFbs/wJc/nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y6xJ4W9Z; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=HGE42t/8NMJxHFUNmxXVqxt8ki1wLwBn/OH6YlViYJA=; b=Y6
+	xJ4W9ZQodTJ7DVSV0KYGQjUBAokfLaihrBo1ehZDqN6s9nJduIpl5iA309a5l5WUsio8CvAz9QtJQ
+	bFZvNjkv/j7G0hqlqtN2Ztd1zBjMeQaKbta0CbKGLnfsNs9+9sN2dKoWG4ygti8vIKUI38V7pxUE2
+	SaYzk3aOo7nCdbQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tUU7C-001cpQ-Qe; Sun, 05 Jan 2025 18:08:38 +0100
+Date: Sun, 5 Jan 2025 18:08:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?J=F6rg?= Sommer <joerg@jo-so.de>
+Cc: Christian Eggers <ceggers@arri.de>, Jakub Kicinski <kuba@kernel.org>,
+	Tristram Ha <tristram.ha@microchip.com>,
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>,
+	Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org,
+	linux-spi@vger.kernel.org
+Subject: Re: KSZ8795 not detected at start to boot from NFS
+Message-ID: <f26f526c-cb43-4170-8dd4-b7cf6c0d1d5d@lunn.ch>
+References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
+ <5708326.ZASKD2KPVS@n9w6sw14>
+ <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
+ <2675613.fDdHjke4Dd@n9w6sw14>
+ <sqsslcr7fsgqi7fvjpy5xnarhlm76atvatczkzwpn37e7gnsu6@tuy7an7t4gdg>
+ <cnmv4ahgyblej7aoknhhb3xyvb67j7t24tug7uoxxtl5s4pjy3@wd3copbtdiec>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [syzbot] [mptcp?] general protection fault in proc_scheduler
-Content-Language: en-GB
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
- geliang@kernel.org, horms@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, martineau@kernel.org, mptcp@lists.linux.dev,
- netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
- syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>
-References: <67769ecb.050a0220.3a8527.003f.GAE@google.com>
- <CANn89iKVTgzr8kt2sScrfoSbBSGMtLLqEwmA+WFFYUfV-PS--w@mail.gmail.com>
- <cf187558-63d0-4375-8fb2-2cfa8bb8fa03@kernel.org>
- <CANn89iJEMGYt4YVdGkyb-q81TQU+UBOQaX7jH-2zOqv-4SjZGg@mail.gmail.com>
- <20250104190010.GF1977892@ZenIV>
- <89c2208c-fe23-43eb-89ef-876e55731a50@kernel.org>
- <20250104202126.GH1977892@ZenIV>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250104202126.GH1977892@ZenIV>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cnmv4ahgyblej7aoknhhb3xyvb67j7t24tug7uoxxtl5s4pjy3@wd3copbtdiec>
 
-Hi Al,
-
-On 04/01/2025 21:21, Al Viro wrote:
-> The real issue (and the one that affects more than just this scenario) is
-> the use of current->nsproxy->net to get to the damn thing.
+On Sun, Jan 05, 2025 at 05:33:38PM +0100, Jörg Sommer wrote:
+> Hi everyone,
 > 
-> Why not something like
+> I've added you to the list of recipients, because you where somehow involved
+> in changes of the KSZ-SPI switch code.
+> 
+> We are debating the SPI mode setting for the microchip ksz8795 and ksz9477
+> and possibly others. Since the commit
+> 8c4599f49841dd663402ec52325dc2233add1d32 the SPI mode gets fixed to mode 3
+> in the code. But at least my ksz8795 works also with mode 0 and shows better
+> initialization behaviour with mode 0.
+> 
+> The big question is: can both (or all ksz) chips work with both modes?
+> Should this setting stay in code or moved to the device tree?
+> 
+> The specs are here, but I found no evidence about the supported/recommended
+> SPI modes:
+> 
+> https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS00002419D.pdf
 
-(...)
+Don't trust what i say, i'm not an SPI expert, but i can use grep.
 
-> seeing that the data object you really want to access is
-> mptcp_get_pernet(net)->scheduler and you have that pointer
-> stored in table->data at the registration time?
+https://www.kernel.org/doc/Documentation/spi/spi-summary says:
 
-Good point, thank you for the suggestion! :)
 
-I will do this modification.
+I'm confused.  What are these four SPI "clock modes"?
+-----------------------------------------------------
+It's easy to be confused here, and the vendor documentation you'll
+find isn't necessarily helpful.  The four modes combine two mode bits:
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+ - CPOL indicates the initial clock polarity.  CPOL=0 means the
+   clock starts low, so the first (leading) edge is rising, and
+   the second (trailing) edge is falling.  CPOL=1 means the clock
+   starts high, so the first (leading) edge is falling.
 
+ - CPHA indicates the clock phase used to sample data; CPHA=0 says
+   sample on the leading edge, CPHA=1 means the trailing edge.
+
+   Since the signal needs to stablize before it's sampled, CPHA=0
+   implies that its data is written half a clock before the first
+   clock edge.  The chipselect may have made it become available.
+
+Chip specs won't always say "uses SPI mode X" in as many words,
+but their timing diagrams will make the CPOL and CPHA modes clear.
+
+In the SPI mode number, CPOL is the high order bit and CPHA is the
+low order bit.  So when a chip's timing diagram shows the clock
+starting low (CPOL=0) and data stabilized for sampling during the
+trailing clock edge (CPHA=1), that's SPI mode 1.
+
+And in the datasheet it says:
+
+  SCL is expected to stay low when SPI operation is idle.
+  
+  Input data on SDI is latched on the rising edge of serial clock
+  SCL. Output data on SDO is clocked on the falling edge of SCL.
+
+My interpretation of this is that the initial clock priority is low,
+so CPOL=0. The rising edge will be the leading edge, so CPHA=0. So
+that makes the mode = 0.
+
+Can you hard code this in the driver? I guess that depends on if you
+want to support a PCB that puts in a line driver which adds a NOT gate
+to the clock?  Does that ever happen? I don't know. The real SPI
+experts should answer that.
+
+	Andrew
 
