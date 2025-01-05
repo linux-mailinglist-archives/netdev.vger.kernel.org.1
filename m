@@ -1,121 +1,198 @@
-Return-Path: <netdev+bounces-155244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B66BA0184F
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 07:40:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C8AA01850
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 07:43:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60B21188380E
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 06:40:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89744162747
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 06:43:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E8935957;
-	Sun,  5 Jan 2025 06:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D15F1BC3F;
+	Sun,  5 Jan 2025 06:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Rsz33b8o"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="R3IPCnKV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362D51D6AA
-	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 06:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0C779C4
+	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 06:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736059202; cv=none; b=Ts4jb4ssq0mjwMrx+U2iGyb2HMcTgi1ZZMcpr66+cr0EsQ8GPd81iWX7vmQcKY67CRVwxbkk2hGrfVBSICt7t9eUlPdqVf/jvN0VWNYtotYlf65EKKeb5c8aosyjOljbnF5USyNnRtdsV9rEWSAi4T/qyHsQOr2q2lJjYAfY4bw=
+	t=1736059379; cv=none; b=p40MC+Eupa0BQ9ZioPSnRKD3yDvEMvCohw8yKD54azRBgiyDRTEyCf9eIBJuA6yTY6F0EO1Br6hrk/pOYWwi0H9xXhE66FqNPb+XWSVa0CJphdmfnX2AMJD+3TawAuzc9BYZs4AA5bHcGxwPTMgt52FS4LtaZECdLpDpP6E/lEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736059202; c=relaxed/simple;
-	bh=FTi9BSK8IKFJV1Y0vyCtNNIY5qy/IKN+a8sbU0GhX2o=;
+	s=arc-20240116; t=1736059379; c=relaxed/simple;
+	bh=xu/PjnNTvkJM46vRzfcOA1Br2lq960R0MhAHKBqYMyQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LvDJgNmEVqqAXofOaJOrUua1ulyrZpY+FKTQzEcXQVV7zoX3pJ5TwceItetAu1yttqmUfJilUhCt0K3gBvHlMPAK9ipkS+AD0TG9TBuqzt0PO4QP6jwgSXIpr10D8EbiMMFTvKg3w1OzZzkPDN4lIfX3ISFnJSvkqGlfGw56mQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Rsz33b8o; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=V76lmQ8iDRmFxAVpTS+4OLWD6ntudV4/m0QPAkW5CCDDvmuF/z+APK04WnBJ93JtjnXxbJ1SVe7HLiajMALNu4Fk+GWDQtPUgd17BURsGGIEZFUAk++Stg/h+aBKcprd8WAfoDUI+qDzjP3QyvyL8phUcWm+43dYmpb3IfgmVYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=R3IPCnKV; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso16737435a12.0
-        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 22:39:59 -0800 (PST)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5d88c355e0dso4601945a12.0
+        for <netdev@vger.kernel.org>; Sat, 04 Jan 2025 22:42:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736059198; x=1736663998; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736059376; x=1736664176; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FTi9BSK8IKFJV1Y0vyCtNNIY5qy/IKN+a8sbU0GhX2o=;
-        b=Rsz33b8o6YOse+lEzP2PmNVnrMbQ/d6qA3K7XB/htMhg+tmY1NO2w+xD897cNsJFHO
-         i20Z/M2uUTkAes0VW2o6BEnUABFoS+G0bL0T/qn/xCgH4wmuG6wVU8fipsdD2+sw42gT
-         j6NbHCN7UYXomD3f7M0Tis+X+SRHfetMQ+/pc=
+        bh=mxsvZoYVWCAOG1b2yobpEwIW6CDH3OtVMsFYZux3hgA=;
+        b=R3IPCnKVoVgkwcuMd0qD+YKHzuh0OCKrflgUbDOmICBWgl7KLhT6soQyUwNNWMwAoG
+         gQthMfKfSuRyDfbVVbE3BjtZRY6ro5Ns7tO2zZrpTXXaIDe+IXB9yXQJSOeskjVGayat
+         YZE7gJPHorLXIDLPYorxX49XMwRTRjzbkEixo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736059198; x=1736663998;
+        d=1e100.net; s=20230601; t=1736059376; x=1736664176;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FTi9BSK8IKFJV1Y0vyCtNNIY5qy/IKN+a8sbU0GhX2o=;
-        b=NItBGwbtOv4vL3Bm9Dfg0lFdZPQoN1fmBP9Nr443+qBe9onPNOm0Slzkf5jAH4FvPu
-         LTjE7eauxe4Q6JrQv9FmIRakbUBPEBONKlPCQ2ukN1Np/qyMByGXFfiCDKapWwBhz4XQ
-         nxxMwUkyWvY7Spp0bcg+Vz/4u+ECPPR7b4b46SewXsPSMA3rrfLfKd7/exE06He8a0Zn
-         yOn5o7733TMvU3G+WCCvzYJm9QpCeBoFSJI6f5mreLayaL7t4j32Gi2vT1Rjenh5SXDO
-         yDSYkdnAYlXdNSKTSRzwgTTUGfOI+YDwy4moIIgdPVXhD7ilPPpAW/BVPOA2ykqFC78y
-         gK1A==
-X-Gm-Message-State: AOJu0Yz2cnDmTTrLC0zpy2ITV4/BPtga6vRExKWQSnhCdd9yJfStfOqj
-	OUkdQXNVnJia/CLzdy+qzyLq+IocvmNGCdlOmth2W1cV0sMmTWVXg7sAXh3B0fbpQOsyCh8m9wW
-	MxphUJI3WiIze8cqj+uGXXvzWE5qFpkt6iV9u
-X-Gm-Gg: ASbGnct9izcc+cDiyca6tbLAYmY1h3riIytG9C0+aIlHRNsaFOqV5MbacVzrGQ/sZqa
-	dPhF4M5qfOT/SsIedyYBAUqYXPZt5h3b8Gkq2
-X-Google-Smtp-Source: AGHT+IEIbV0BCihtn6repW6jzmnxvORvPR3hoykPbVVGlzP8uNxyZvHxBTsKzuObsQ7OwZCPZ72BhmbmSKi/e1xu+Dc=
-X-Received: by 2002:a05:6402:4402:b0:5cf:e9d6:cc8a with SMTP id
- 4fb4d7f45d1cf-5d81dda9256mr49785513a12.20.1736059197954; Sat, 04 Jan 2025
- 22:39:57 -0800 (PST)
+        bh=mxsvZoYVWCAOG1b2yobpEwIW6CDH3OtVMsFYZux3hgA=;
+        b=TnGLuNHrLd4+HF3jVjd6MVMEOW1n4xbnyI7PW9bDAi/Tu/dyGTpcipNEaIK82meTnd
+         BJjPndUViQthXYW4CHB6Xr7H6xrsRmArD0B56ufa6Xx2vBqd7Dp17we7rImLLQqIeTmn
+         P6upIy9uL70uG0y+HEDBasge73blZmT5dOwUWUCX5qY+svFY6Xit5j/6kI99mwMM2LhG
+         TVHg9taQGdU9FMDJgoGhPsaFZJC9/SpJ0KPWMv1Mv3PQkRJ8Dpr0YPiiII55EkXdekcT
+         BvU2UsdU4Uj4AqEvK3WJqF+0NW0aXtV6gRNs3endznZXdxIRVbU011Xaobn4vmGeZqF9
+         kuUQ==
+X-Gm-Message-State: AOJu0YyvQgZzUXpxCU8U0fFFFi9fke6wgurnHff106kgVjOmgpIHaDgs
+	EpZDx3j0Hz5GgxayuJaa9uLlYAkkiK085Ul/pbPqgqo3KPtBOB+x81eUr9rMniI56S7Fne5t+kf
+	f79ODBdIvihyyAohUzEgi0RWPngmpIbpwdIoL
+X-Gm-Gg: ASbGnctYvf6CJdLd4V3ryDQGGdMTg48k0aUKMkHpndChzOKHE0bsmGdGb6P7B7HxpnZ
+	FAGoZ64G072h3lMWtWNBOEzESUxQlRf+LOSr3
+X-Google-Smtp-Source: AGHT+IHFjtkv/aViNiKbDylS/m+t0wVyOn1GHCKdz2I9E+Uaie2oP7CiBPqRZdBXX3YTMFcDlq3bDQ4w2aCr1bffA+U=
+X-Received: by 2002:a05:6402:3553:b0:5d0:fc80:c4d1 with SMTP id
+ 4fb4d7f45d1cf-5d81dd8087emr47910180a12.14.1736059376030; Sat, 04 Jan 2025
+ 22:42:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250104015316.3192946-1-mohsin.bashr@gmail.com>
-In-Reply-To: <20250104015316.3192946-1-mohsin.bashr@gmail.com>
+References: <20250104004314.208259-1-ahmed.zaki@intel.com> <20250104004314.208259-5-ahmed.zaki@intel.com>
+In-Reply-To: <20250104004314.208259-5-ahmed.zaki@intel.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Sun, 5 Jan 2025 12:09:45 +0530
-Message-ID: <CAH-L+nO5WbTyc+y8c-fmumn5bc5ucpanLeX5Q5RtLfrf3AaN5Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] eth: fbnic: update fbnic_poll return value
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org, 
-	andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, vadim.fedorenko@linux.dev, 
-	damato@fastly.com, brett.creeley@amd.com, kernel-team@meta.com
+Date: Sun, 5 Jan 2025 12:12:43 +0530
+Message-ID: <CAH-L+nOOwf9-MyMXHC0-aeF7YjU9qwoCq5SD=T0+6GBVNhjowA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 4/6] bnxt: use napi's irq affinity
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, michael.chan@broadcom.com, 
+	tariqt@nvidia.com, anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
+	jdamato@fastly.com, shayd@nvidia.com, akpm@linux-foundation.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000dabfde062aefc7e8"
+	boundary="0000000000006f6dfb062aefd2cd"
 
---000000000000dabfde062aefc7e8
+--0000000000006f6dfb062aefd2cd
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 4, 2025 at 7:23=E2=80=AFAM Mohsin Bashir <mohsin.bashr@gmail.co=
-m> wrote:
+On Sat, Jan 4, 2025 at 6:13=E2=80=AFAM Ahmed Zaki <ahmed.zaki@intel.com> wr=
+ote:
 >
-> In cases where the work done is less than the budget, `fbnic_poll` is
-> returning 0. This affects the tracing of `napi_poll`. Following is a
-> snippet of before and after result from `napi_poll` tracepoint. Instead,
-> returning the work done improves the manual tracing.
+> Delete the driver CPU affinity info and use the core's napi config
+> instead.
 >
-> Before:
-> @[10]: 1
-> ...
-> @[64]: 208175
-> @[0]: 2128008
+> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 26 ++++-------------------
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h |  2 --
+>  2 files changed, 4 insertions(+), 24 deletions(-)
 >
-> After:
-> @[56]: 86
-> @[48]: 222
-> ...
-> @[5]: 1885756
-> @[6]: 1933841
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
+rnet/broadcom/bnxt/bnxt.c
+> index cc3ca3440b0a..fcf230fde1ec 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -11193,14 +11193,8 @@ static void bnxt_free_irq(struct bnxt *bp)
+>                 int map_idx =3D bnxt_cp_num_to_irq_num(bp, i);
 >
-> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
-LGTM,
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+>                 irq =3D &bp->irq_tbl[map_idx];
+> -               if (irq->requested) {
+> -                       if (irq->have_cpumask) {
+> -                               irq_update_affinity_hint(irq->vector, NUL=
+L);
+> -                               free_cpumask_var(irq->cpu_mask);
+> -                               irq->have_cpumask =3D 0;
+> -                       }
+> +               if (irq->requested)
+>                         free_irq(irq->vector, bp->bnapi[i]);
+> -               }
+>
+>                 irq->requested =3D 0;
+>         }
+> @@ -11229,21 +11223,6 @@ static int bnxt_request_irq(struct bnxt *bp)
+>
+>                 netif_napi_set_irq(&bp->bnapi[i]->napi, irq->vector);
+>                 irq->requested =3D 1;
+> -
+> -               if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
+> -                       int numa_node =3D dev_to_node(&bp->pdev->dev);
+> -
+> -                       irq->have_cpumask =3D 1;
+> -                       cpumask_set_cpu(cpumask_local_spread(i, numa_node=
+),
+> -                                       irq->cpu_mask);
+> -                       rc =3D irq_update_affinity_hint(irq->vector, irq-=
+>cpu_mask);
+> -                       if (rc) {
+> -                               netdev_warn(bp->dev,
+> -                                           "Update affinity hint failed,=
+ IRQ =3D %d\n",
+> -                                           irq->vector);
+> -                               break;
+> -                       }
+> -               }
+>         }
+>         return rc;
+>  }
+> @@ -13292,6 +13271,7 @@ static int bnxt_set_features(struct net_device *d=
+ev, netdev_features_t features)
+>                                 bp->flags =3D old_flags;
+>                 }
+>         }
+> +
+This change looks unrelated, please remove.
+>         return rc;
+>  }
+>
+> @@ -16172,6 +16152,8 @@ static int bnxt_init_one(struct pci_dev *pdev, co=
+nst struct pci_device_id *ent)
+>         dev->xdp_features =3D NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIR=
+ECT |
+>                             NETDEV_XDP_ACT_RX_SG;
+>
+> +       netif_enable_irq_affinity(dev);
+> +
+>  #ifdef CONFIG_BNXT_SRIOV
+>         init_waitqueue_head(&bp->sriov_cfg_wait);
+>  #endif
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethe=
+rnet/broadcom/bnxt/bnxt.h
+> index 094c9e95b463..7be2f90d0c05 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -1228,9 +1228,7 @@ struct bnxt_irq {
+>         irq_handler_t   handler;
+>         unsigned int    vector;
+>         u8              requested:1;
+> -       u8              have_cpumask:1;
+>         char            name[IFNAMSIZ + BNXT_IRQ_NAME_EXTRA];
+> -       cpumask_var_t   cpu_mask;
+>  };
+>
+>  #define HWRM_RING_ALLOC_TX     0x1
+> --
+> 2.43.0
+>
+>
+
 
 --=20
 Regards,
 Kalesh AP
 
---000000000000dabfde062aefc7e8
+--0000000000006f6dfb062aefd2cd
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -187,14 +264,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIDcDpb0rm2LbWF7WBS3g3EnXBtW824s/GF6l2eEHA0JaMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwNTA2Mzk1OFowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIFoe2mgF5wKXtwBnwGrojpGrp/+HPiUHe7JLXAvrUsv5MBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwNTA2NDI1NlowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDAVnciGm3J
-vbi3CtqljB+WEglj3YYOEIzptwAxKvD3/ZdhGGDfYoV2iXkz2dq+8djBRuLbQuvzJ+Gm0kZV1X4S
-iU2t+r6AeR7Mz9LpnNLOkDyVY7K/nvbNdgXRmtm4QnMzKSZ7k8s1lFDXVfJeFJiBYmEvIsIz7i8w
-1wMsJQV9AtiZfQP+l0zAY6+R8g7aApMHqIBCdUOMVXNhlyVE/D7lj17Vc7jo1VzWzfoUbzZcr7xm
-aJoyBb713l7FJoqEGc60Xs7+uXAUVHH8TwwmGACvQfDD1aotcdSUdUbIUAUaR+kobxXRtJDcGVX9
-MXXnBeV7CKm4jg02rexrYTdI/RmU
---000000000000dabfde062aefc7e8--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBd8DJLtoC6
+lEs6/sPKQnVD20cPMtO7dEuvzgBRflAB8nGCq1QbFK10J5i9fPQ72/7LloDL0VkILFvgiMr8BBvA
+ExWeQoAxMFW6rcPb12M0L34rBexihnPvmzxdEg9z292/PZS1eyXDjV/CIZmDtJ0OTG01hHKhaGXq
+cCSyxjMAB6GWlajZUtNPM1/WJ1NcaWt+IJMFdVRUpu7eUJxflR3dUGlK3fLlN0WtQoyLQGiLlou5
+ymSq5E/M1Wj7oOfWyOx30AYqaGn4sN8qGozV4K9mZD/KxJEqPZiJ4aB117pssZrNxEwvJRTGHM/I
+17WGaLNSQi4iJSG0iXxGzQGWLcXs
+--0000000000006f6dfb062aefd2cd--
 
