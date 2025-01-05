@@ -1,192 +1,176 @@
-Return-Path: <netdev+bounces-155283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C0A0A01B02
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:39:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D4DA01B5E
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 19:28:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33810161FF1
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 17:39:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A56E161C89
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 18:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7B8155CA5;
-	Sun,  5 Jan 2025 17:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB3715573D;
+	Sun,  5 Jan 2025 18:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mdAgqThn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04D31487DD;
-	Sun,  5 Jan 2025 17:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BF879CD;
+	Sun,  5 Jan 2025 18:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736098792; cv=none; b=ZuvzNgeQuOfiPooHHayqedxHHij052qmh6HDDttCNFgcgSTENEAsJDuTRCr42ilJsMiPaz7K4L7IRKVOBi2gwGDmM7fGrRn/DijLIEOThEe00Rb/DqFIaMmNZXiLB+LT0XfEhBe8C5BtJcptpfkq420SX3AA9rZgtLbuIsrDXcw=
+	t=1736101710; cv=none; b=JWDDMW9a/Ng7Nwfjv77ddKymACxhFDIyesUR43VejnSZsrivSCYjIJG4TNXqjfFzJUGyDeMkE4EZMyiYRhdjVgB+CLNempZnkJrx40ZnU5L7DqCcTGfSG87GJbCB7cOVdtXw7QBkjR6xvxxP5qaGvTcRBOn7Am2ptpAjt2AsXvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736098792; c=relaxed/simple;
-	bh=X+1xcx4Om+gi05BkXXVgtrIr7bwQ44ulDNRrNrc2cxU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L41fFciuw0yBZ0dS5t5BuB8WzCkRGdp6JqnsZTObQC7rs1Q5+jjJ+eygnqTD34GeBRoZaUY/711IuWIfsx75AC9A4C9+VHjp7qAG2Yl4JLLK8sHUCasR+J1J66VTQeisl8jBcDGTRdcE/SKk8G+RCklatBk5PHMpdr3hMNRM/Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
-Received: from MUA
-	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98)
-	(envelope-from <mhej@vps-ovh.mhejs.net>)
-	id 1tUUb4-00000005F7Y-34Am;
-	Sun, 05 Jan 2025 18:39:30 +0100
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To: M Chetan Kumar <m.chetan.kumar@intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Bjorn Helgaas <bhelgaas@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net: wwan: iosm: Fix hibernation by re-binding the driver around it
-Date: Sun,  5 Jan 2025 18:39:24 +0100
-Message-ID: <0bf3266a7c6e42e5e19ed2040e6a8feb88202703.1736098238.git.mail@maciej.szmigiero.name>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736101710; c=relaxed/simple;
+	bh=T4bWzApkroQ25gJuFymme4H5pFKho0yEvxsdNGE9c4k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d/EIVqQFe6u5AMvXrlb4EFwnbnmFOIv2qgKpq7HRDAyPCr6QxTcQgWILB+ZgxO2H9hV10+CoJFtZKklWvrp76z6x9tylHgSTwXdKHvf6/xvLlfV+H7Y/cRlS+49zlUJsMZb/yJP1iSIvrlbFmgDOoTkjetLr5ZUOOOd0YDY1tCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mdAgqThn; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3c6b0be237cso105942075ab.2;
+        Sun, 05 Jan 2025 10:28:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736101706; x=1736706506; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RIJ1uoZcq3El37Epg4ECRzVlmxCiVAYQEwVu4xI6zkA=;
+        b=mdAgqThn9DLVWublVr06YnjmBKAVKMjyNj+f0U/HPwhqd20RDOb5xNIdrUbqGAzAFK
+         ovdRs060kubQwdXm4dwzWLRDSz+vRrP6S3Z5O1t60vhdOnPDiHazx0LUnontuQ+8VJPh
+         CcW2L52OifY3fLQVKgOD22oI1tUS5/HZtc9OWqiEGeYi8Rw0B3Eg/l6z0yD8FlUOX/U4
+         PCRdWjmjzL/CsTw+A4RHdiAH9jzrgqwORA3Re+JEoQy3acxeIg7g1cAji5eB6HJH0iNL
+         ob1DfEEr7AM79WNALTvnluS5js2tJXAMobpMZCw9JGl4LJ3xpYn6LKzZ2Cg79LWs0eU+
+         uyrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736101706; x=1736706506;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RIJ1uoZcq3El37Epg4ECRzVlmxCiVAYQEwVu4xI6zkA=;
+        b=fcXKkixvhyCBfJdEU1BWYtAT+fSrLGf2LgGJe1DkqyrG2hq1pddb/wWzTk3hnQVAo4
+         9gCzyVfilZJqbQDSWXMnSAPEejsYcgqIM2+DguCwhKsJ1zNkazGk712zjxqUZ6Np0UuR
+         2mFxHxZftenRK2oQZV7rJ/shF1mpKFdAnsQ86x2XiEigT+mbXPOaK8+YPUae6irVz7Hf
+         O3NlbXNhVSrlcjK2wytDcSdy09KdA+TVIxgNEvP4zflejaZMEJyzHnJ+Lmw33FuxBZdG
+         Bklnh4Xv5UsV8BnNXTcGkkydPNGlk5aV7pe40TtK1WSAfzSxqZs+zcwIN9u55aE15EK8
+         7XUA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmu9y8Crz22oETwPYfDZQaJUaonxIV5VAXdaixJkxEV0We4UkLvEBuxC2gZIkxaPSlAm+CUccX@vger.kernel.org, AJvYcCXrVppVUgMMH5mXZAbQgvs1ZVz0ALS5hvGvMEHAPspmK34dnm1TrH2o2rvT8kpv9HEWYENdSF7EtDqW@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywpfw5bcxwoGP8odmixpzlc0Ci1BYOJVBB5BGhVdR51gTYnNb5o
+	2mWcGFqnL7QRTdIDd/OSSgUi3PudRydQo1U/lsOvpVERmuoGnrdak/rhVyhCTA27WFfP3DVwlsD
+	Y3zRgm4+yKmjim8ARyk9ky4lcjws=
+X-Gm-Gg: ASbGncvERG5TfwM2/g8zCpFGWsg88vUl2WQyLv3dbo8fEfV2ZjgbpyuLjpVzuW22hLI
+	nXQydajZII4eOMTbO9K0SOK8C4yqSUSS1ED0IiKQ=
+X-Google-Smtp-Source: AGHT+IEig+7CQxOThACqzl3DXplD5w4wiM9ncxbPqGhnpi6Tsi99xuB6/kgzFPu4PkXo/knDdvy/9u+gVNscMIzk2Xk=
+X-Received: by 2002:a05:6e02:1a0b:b0:3a7:e0c0:5f27 with SMTP id
+ e9e14a558f8ab-3c2d1c915a9mr425555945ab.2.1736101706550; Sun, 05 Jan 2025
+ 10:28:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: mhej@vps-ovh.mhejs.net
+References: <1a645f4a0bc60ad18e7c0916642883ce8a43c013.1735835456.git.gnault@redhat.com>
+ <CADvbK_fsM_EfoNjhybKJr92ojqFo6OdnuA2WiFJyi6Y1=rX4Gw@mail.gmail.com> <Z3gXieFRj+xqozJE@debian>
+In-Reply-To: <Z3gXieFRj+xqozJE@debian>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sun, 5 Jan 2025 13:28:15 -0500
+X-Gm-Features: AbW1kvZAGyf9zajSgb0eV8lacVYh4ZPQ0aXBftrck1zLzFkMS7ZOH7W2Y_bnSDA
+Message-ID: <CADvbK_daHuittutNqWaiRR-GzaZ8g5iWw-WCEP5GNhiqFcwySg@mail.gmail.com>
+Subject: Re: [PATCH net-next] sctp: Prepare sctp_v4_get_dst() to dscp_t conversion.
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+	Simon Horman <horms@kernel.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, linux-sctp@vger.kernel.org, 
+	Ido Schimmel <idosch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Currently, the driver is seriously broken with respect to the
-hibernation (S4): after image restore the device is back into
-IPC_MEM_EXEC_STAGE_BOOT (which AFAIK means bootloader stage) and needs
-full re-launch of the rest of its firmware, but the driver restore
-handler treats the device as merely sleeping and just sends it a
-wake-up command.
+On Fri, Jan 3, 2025 at 11:59=E2=80=AFAM Guillaume Nault <gnault@redhat.com>=
+ wrote:
+>
+> On Fri, Jan 03, 2025 at 10:35:55AM -0500, Xin Long wrote:
+> > On Thu, Jan 2, 2025 at 11:34=E2=80=AFAM Guillaume Nault <gnault@redhat.=
+com> wrote:
+> > >
+> > > Define inet_sk_dscp() to get a dscp_t value from struct inet_sock, so
+> > > that sctp_v4_get_dst() can easily set ->flowi4_tos from a dscp_t
+> > > variable. For the SCTP_DSCP_SET_MASK case, we can just use
+> > > inet_dsfield_to_dscp() to get a dscp_t value.
+> > >
+> > > Then, when converting ->flowi4_tos from __u8 to dscp_t, we'll just ha=
+ve
+> > > to drop the inet_dscp_to_dsfield() conversion function.
+> > With inet_dsfield_to_dscp() && inet_dsfield_to_dscp(), the logic
+> > looks like: tos(dsfield) -> dscp_t -> tos(dsfield)
+> > It's a bit confusing, but it has been doing that all over routing place=
+s.
+>
+> The objective is to have DSCP values stored in dscp_t variables in the
+> kernel and keep __u8 values in user space APIs and packet headers. In
+> practice this means using inet_dscp_to_dsfield() and
+> inet_dsfield_to_dscp() at boundaries with user space or networking.
+>
+> However, since core kernel functions and structures are getting updated
+> incrementally, some inet_dscp_to_dsfield() and inet_dsfield_to_dscp()
+> conversions are temporarily needed between already converted and not yet
+> converted parts of the stack.
+>
+> > In sctp_v4_xmit(), there's the similar tos/dscp thing, although it's no=
+t
+> > for fl4.flowi4_tos.
+>
+> The sctp_v4_xmit() case is special because its dscp variable, despite
+> its name, doesn't only carry a DSCP value, but also ECN bits.
+> Converting it to a dscp_t variable would lose the ECN information.
+>
+> To be more precise, this is only the case if the SCTP_DSCP_SET_MASK
+> flag is not set. That is, when the "dscp" variable is set using
+> inet->tos. Since inet->tos contains both DSCP and ECN bits, this allows
+> the socket owner to manage ECN. I don't know if that's intented by the
+> SCTP code. If that isn't, and the ECN bits aren't supposed to be taken
+> into account here, then I'm happy to send a patch to convert
+> sctp_v4_xmit() to dscp_t too.
+From the beginning SCTP sends its packet via ip_queue_xmit() where it
+allows the socket owners to manage ECN, like TCP. So let's just leave it.
 
-This wake-up command times out but device nodes (/dev/wwan*) remain
-accessible.
-However attempting to use them causes the bootloader to crash and
-enter IPC_MEM_EXEC_STAGE_CD_READY stage (which apparently means "a crash
-dump is ready").
+>
+> > Also, I'm curious there are still a few places under net/ using:
+> >
+> >   fl4.flowi4_tos =3D tos & INET_DSCP_MASK;
+> >
+> > Will you consider changing all of them with
+> > inet_dsfield_to_dscp() && inet_dsfield_to_dscp() as well?
+>
+> Yes, I have a few more cases to convert. But some of them will have to
+> stay. For example, in net/ipv4/ip_output.c, __ip_queue_xmit() has
+> "fl4->flowi4_tos =3D tos & INET_DSCP_MASK;", but we can't just convert
+> that "tos" variable to dscp_t because it carries both DSCP and ECN
+> values. Although ->flowi4_tos isn't concerned with ECN, these ECN bits
+> are used later to set the IP header.
+>
+> There are other cases that I'm not planning to convert, for example
+> because the value is read from a UAPI structure that can't be updated.
+> For example the "fl4.flowi4_tos =3D params->tos & INET_DSCP_MASK;" case
+> in bpf_ipv4_fib_lookup(), where "params" is a struct bpf_fib_lookup,
+> exported in UAPI.
+>
+> To summarise, the plan is to incrementally convert most ->flowi4_tos
+> assignments, so that we have a dscp_t variable at hand. Then I'll send
+> a patch converting all ->flowi4_tos users at once. Most of it should
+> consist of trivial inet_dscp_to_dsfield() removals, thanks to the
+> previous dscp_t conversions. The cases that won't follow that pattern
+> will be explained in the commit message, but the idea is to have as few
+> of them as possible.
+>
+> BTW, the reason for this work is to avoid having ECN bits interfering
+> with route lookups. We had several such issues and regressions in the
+> past because of ->flowi4_tos having ECN bits set in specific scenarios.
+>
+Got it, thanks for the detailed explanation.
 
-It seems that the device cannot be re-initialized from this crashed
-stage without toggling some reset pin (on my test platform that's
-apparently what the device _RST ACPI method does).
-
-While it would theoretically be possible to rewrite the driver to tear
-down the whole MUX / IPC layers on hibernation (so the bootloader does
-not crash from improper access) and then re-launch the device on
-restore this would require significant refactoring of the driver
-(believe me, I've tried), since there are quite a few assumptions
-hard-coded in the driver about the device never being partially
-de-initialized (like channels other than devlink cannot be closed,
-for example).
-Probably this would also need some programming guide for this hardware.
-
-Considering that the driver seems orphaned [1] and other people are
-hitting this issue too [2] fix it by simply unbinding the PCI driver
-before hibernation and re-binding it after restore, much like
-USB_QUIRK_RESET_RESUME does for USB devices that exhibit a similar
-problem.
-
-Tested on XMM7360 in HP EliteBook 855 G7 both with s2idle (which uses
-the existing suspend / resume handlers) and S4 (which uses the new code).
-
-[1]: https://lore.kernel.org/all/c248f0b4-2114-4c61-905f-466a786bdebb@leemhuis.info/
-[2]:
-https://github.com/xmm7360/xmm7360-pci/issues/211#issuecomment-1804139413
-
-Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
----
-
-Changes from v1:
-* Un-register the PM-notifier and PCI driver in iosm_ipc_driver_exit()
-in the reverse order of their registration in iosm_ipc_driver_init().
-
-* CC the PCI supporter and PCI mailing list in case there's some better
-way to fix/implement all of this.
-
- drivers/net/wwan/iosm/iosm_ipc_pcie.c | 57 ++++++++++++++++++++++++++-
- 1 file changed, 56 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/wwan/iosm/iosm_ipc_pcie.c b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
-index 04517bd3325a..3ca81864a2fd 100644
---- a/drivers/net/wwan/iosm/iosm_ipc_pcie.c
-+++ b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
-@@ -6,6 +6,7 @@
- #include <linux/acpi.h>
- #include <linux/bitfield.h>
- #include <linux/module.h>
-+#include <linux/suspend.h>
- #include <net/rtnetlink.h>
- 
- #include "iosm_ipc_imem.h"
-@@ -448,7 +449,61 @@ static struct pci_driver iosm_ipc_driver = {
- 	},
- 	.id_table = iosm_ipc_ids,
- };
--module_pci_driver(iosm_ipc_driver);
-+
-+static bool pci_registered;
-+
-+static int pm_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
-+{
-+	if (mode == PM_HIBERNATION_PREPARE || mode == PM_RESTORE_PREPARE) {
-+		if (pci_registered) {
-+			pci_unregister_driver(&iosm_ipc_driver);
-+			pci_registered = false;
-+		}
-+	} else if (mode == PM_POST_HIBERNATION || mode == PM_POST_RESTORE) {
-+		if (!pci_registered) {
-+			int ret;
-+
-+			ret = pci_register_driver(&iosm_ipc_driver);
-+			if (ret) {
-+				pr_err(KBUILD_MODNAME ": unable to re-register PCI driver: %d\n",
-+				       ret);
-+			} else {
-+				pci_registered = true;
-+			}
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static struct notifier_block pm_notifier = {
-+	.notifier_call = pm_notify,
-+};
-+
-+static int __init iosm_ipc_driver_init(void)
-+{
-+	int ret;
-+
-+	ret = pci_register_driver(&iosm_ipc_driver);
-+	if (ret)
-+		return ret;
-+
-+	pci_registered = true;
-+
-+	register_pm_notifier(&pm_notifier);
-+
-+	return 0;
-+}
-+module_init(iosm_ipc_driver_init);
-+
-+static void __exit iosm_ipc_driver_exit(void)
-+{
-+	unregister_pm_notifier(&pm_notifier);
-+
-+	if (pci_registered)
-+		pci_unregister_driver(&iosm_ipc_driver);
-+}
-+module_exit(iosm_ipc_driver_exit);
- 
- int ipc_pcie_addr_map(struct iosm_pcie *ipc_pcie, unsigned char *data,
- 		      size_t size, dma_addr_t *mapping, int direction)
+Acked-by: Xin Long <lucien.xin@gmail.com>
 
