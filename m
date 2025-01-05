@@ -1,70 +1,58 @@
-Return-Path: <netdev+bounces-155290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBF6A01BF2
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 22:12:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 816B6A01BFB
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 22:21:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BBD53A287C
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 21:12:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB3E01884907
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 21:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF76C1CEE86;
-	Sun,  5 Jan 2025 21:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="p3XX0ywc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7138F12F59C;
+	Sun,  5 Jan 2025 21:21:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840337711F;
-	Sun,  5 Jan 2025 21:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2619EB658;
+	Sun,  5 Jan 2025 21:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736111523; cv=none; b=OS+6We/vbiiFVWhncpIYtDungpcc2gBerO27zgM6HBHgEutw88NhMXsODrCbZhwwasWGygBwVZ3QywKjwef8xL9oN9qYoLI0XemirHYOgycVSlbzuqM20RfRVHcWh3leXiWp6builtaJqS3J4eTevfpyygheH398lTNOeMMiP74=
+	t=1736112078; cv=none; b=rmZSb62f5UFVtk3L4FYHoqCrxpiCa0sOa/+uKf8/X7VpzJ8vZ2C7bJIWU7pk3mAmjJYnuCl+MiqCZxKH4UNB8hs6sgMcmdlpsOXnjpwKWjIXgtWE6hnVLMeD7A6lQrP3PIkSVHL0QNMQqfv9/MfPoBt9hrMOKbZ+2IzQ4IvGkOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736111523; c=relaxed/simple;
-	bh=ZhWfctKgj3qtiYBCml9s6phLQUjTI8M/o71PsEeqG+w=;
+	s=arc-20240116; t=1736112078; c=relaxed/simple;
+	bh=UOv6KGKi+F68hGpR1/6VE6ISisLVHZWtxb3hDTOk3Zw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QTRoVoKNXhIjlIZp6/t08mZui5f8LfOfylXG3+wg7sBvLiEIhoWE+62iAUgXhhsKF3CZO0b7KkqOP8qcuQdEHZ9H+v/Tb65Fm9nlpaPMRdobtcg5g8Hqs3JRWQ3AepV1v8grdAMNLTR+NtxnoDgtAzYGgZv46d1OqaxHikjlYzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=p3XX0ywc; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=xYbb/ENgYiAn0WyfxBAKuMrqKO3qIsDuoI9BH02tWmM=; b=p3XX0ywcuMGICeez8Wf/eWYfvM
-	j4dy75A2cZTmxJGJOuApqRgm+OGJ9mNAJPMqK5rAgWwilnWbDP6PAXuodBmhDZiDwEzJ2/5uQP78y
-	Si8VP0cXL9lkQ0NE5mu01Sibfs/p6Nt061Zr1WTfVphQKtyqXS6CtoLrACXwePlPj6RF6l5WYZEn5
-	jehDn4ADWEjo94ArKFlbuoYFmfQjavsesixe0Ztd59seKb/GsDUiaG+C/vdqK7dNQUkLteaqdTa7v
-	3kKgYGscY76VpErMGU78vg2i5Rw4raMxMdKsN/iY+jjubIYktX+rQbqej54E48KcCES5v4ti0ONGx
-	SKJEWhgQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tUXug-0000000FlaX-2Coe;
-	Sun, 05 Jan 2025 21:11:58 +0000
-Date: Sun, 5 Jan 2025 21:11:58 +0000
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, davem@davemloft.net,
-	geliang@kernel.org, horms@kernel.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, martineau@kernel.org,
-	mptcp@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	syzbot <syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com>
-Subject: Re: [syzbot] [mptcp?] general protection fault in proc_scheduler
-Message-ID: <20250105211158.GL1977892@ZenIV>
-References: <cf187558-63d0-4375-8fb2-2cfa8bb8fa03@kernel.org>
- <CANn89iJEMGYt4YVdGkyb-q81TQU+UBOQaX7jH-2zOqv-4SjZGg@mail.gmail.com>
- <20250104190010.GF1977892@ZenIV>
- <89c2208c-fe23-43eb-89ef-876e55731a50@kernel.org>
- <20250104202126.GH1977892@ZenIV>
- <CANn89i+GUGLQSFp3a2qwH+zOsR-46CyWevjhAQQMmO5K9tmkUg@mail.gmail.com>
- <20250105112948.GI1977892@ZenIV>
- <CANn89i+L619t94EybXKsGFGQjPS7k-Qra_vXG-AcLJ=oiU2yYQ@mail.gmail.com>
- <20250105195434.GJ1977892@ZenIV>
- <20250105205056.GK1977892@ZenIV>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pLpW+bXu1Izc0LQUmiZXNfvdAoM8YQAgv1MoTooAVBXPCvMMWeD4Dm3Mcn2tMGInj6DhRXY/0Lmk4/5Y7CGLhvUz79bgAYefrl+2j0qUUZCymR6tjmp6Ff0NkDSYBq8y9Jq4SRoObsoZyxLwIf8zYIIUoW4CC3SLhs95Tzh0314=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tUY3W-000000002z5-3YyZ;
+	Sun, 05 Jan 2025 21:21:06 +0000
+Date: Sun, 5 Jan 2025 21:21:03 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Ariel Otilibili-Anieli <Ariel.Otilibili-Anieli@eurecom.fr>
+Cc: Shiji Yang <yangshiji66@outlook.com>, Stanislaw Gruszka <stf_xl@wp.pl>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	Kalle Valo <kvalo@kernel.org>,
+	Tomislav =?utf-8?Q?Po=C5=BEega?= <pozega.tomislav@gmail.com>,
+	Linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] rt2x00: Remove unusued value
+Message-ID: <Z3r3vxy8cRRH6w1m@pidgin.makrotopia.org>
+References: <20241221124445.1094460-1-ariel.otilibili-anieli@eurecom.fr>
+ <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
+ <20250103085540.GA94204@wp.pl>
+ <Z3fMxD2mAVsVl58h@pidgin.makrotopia.org>
+ <20250103131002.GA100011@wp.pl>
+ <2f7a83-6777e880-a451-5cf12280@99910178>
+ <20250104103753.GA2228@wp.pl>
+ <2f7a8b-67792f00-52db-be99fc0@193911177>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,27 +61,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250105205056.GK1977892@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <2f7a8b-67792f00-52db-be99fc0@193911177>
 
-On Sun, Jan 05, 2025 at 08:50:56PM +0000, Al Viro wrote:
+H again,
 
-> has max taken from ctl->extra2, which is &net->sctp.rto_max of the
-> opener's netns, but the value capped by that in stored into
-> net->sctp.rto_min of *writer's* netns.  So the logics that is supposed
-> to prevent rto_min > rto_max can be bypassed; no idea how much can that
-> escalate to, but it's clearly not what the code intends.
 
-Speaking of which, the logics that tries to maintain rto_min <= rto_max is
-broken in another way.  There's no exclusion in those suckers.  IOW, if
-we have set rto_min to 1 and rto_max to 10000, two processes can try to
-write 1000 to rto_min and 10 to rto_max resp., with successful validations
-done against the original state in both, followed by actual stores.
-Result is rto_min == 1000 and rto_max == 10, which is probably not what
-one wants there...
+On Sat, Jan 04, 2025 at 01:51:25PM +0100, Ariel Otilibili-Anieli wrote:
+> Great, then; thanks for having acked the patch as such.
 
-IOW, the validation and stores should be atomic; the same goes for another
-pair (pf_retrans <= ps_retrans).  Again, I've no idea how severe it is,
-but result seems to be at least contrary to expectation of the code
-authors...
+I just noticed that Shiji Yang had posted a series of patches for
+OpenWrt which also addresses the same issue, however, instead of
+removing the augmented assignment, it fixes it to the supposedly
+originally intended way.
+
+See
+https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=package/kernel/mac80211/patches/rt2x00/621-04-rt2x00-fix-register-operation-on-RXIQ-calibration.patch;h=aa6f9c437c6447831490588b2cead6919accda58;hb=5d583901657bdfbbf9fad77d9247872427aa5c99
+
+I suppose this was tested together with the other changes of the same
+series, so we may want to pick that instead.
+
+
+Cheers
+
+
+Daniel
+
 
