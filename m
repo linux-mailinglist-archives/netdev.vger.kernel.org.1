@@ -1,96 +1,167 @@
-Return-Path: <netdev+bounces-155275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8071DA01A24
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 16:45:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C647A01A2A
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 16:55:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BAF3162A8D
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 15:45:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAF59188311F
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 15:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208EA15539A;
-	Sun,  5 Jan 2025 15:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64023149C7B;
+	Sun,  5 Jan 2025 15:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LU2Dppsq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5691547D5
-	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 15:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12EAF9C1;
+	Sun,  5 Jan 2025 15:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736091904; cv=none; b=gj+mIgJbPTMjPezVri0w2alDtJvjDe4s4KA+OEz3+sTaXJhhG8+lBX1O9LAKvJnVTlJoYD+wuNKGlCVBU4IRSdmcwdtMOf3fpUp+ftmFdQgcEl1bV8FZUAo4tKpy3S216oPdgSqLS4ZF2qKopgMjIlKX8o8ceMZH+kX1sdZIX8w=
+	t=1736092554; cv=none; b=Ede0YEXJZ6QgjkQrSG0e98oKkFgjRgOm7UVUq4Aq6sELaK7kim48SzaB/hoIV6TdOENonPgaz7gRSCYte7+QIeLrhkGDGzIj2dEJwFKSaJMMlASdSsxPw4eNaT8FtYwnPGqqi4odt4Wflk6vQUxJR2Q210Cge18cf3CSq4H+Cjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736091904; c=relaxed/simple;
-	bh=xLQhZr0EN5jjBoypeww7FvA9A7WyNgocWYq12D0zgAM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=AhwxvsnxBYcxu6iI5Zdcx3shJgAV+SJqt2xyvH0ebhoVVsryQIrQjdG1QSIRytQf40BSvUbmjV3kF6NJ43hBNZMf0442M7N4rFjerAOVClA79JgS6JSfH18KRqnsDMUyUYojWnGwCzcZcnU4JcfV3mU1uLOnVUPwlmUbISCZ2pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a9d57cff85so277146285ab.2
-        for <netdev@vger.kernel.org>; Sun, 05 Jan 2025 07:45:02 -0800 (PST)
+	s=arc-20240116; t=1736092554; c=relaxed/simple;
+	bh=vHiyfqbbiMv27ceQHkYUTpJyBV3Jr00owhby3UcZeA8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=biaOD9HIP2iC5WrPs6pvxdmI5dui+jKPsTp0jYCEoMowSGx+hXJQKacbR+8uYHKDHiIvyNBbcq4OCKgfnslD9oBtMutvGFbLgAtnfROioPKagFCIwbndcg5rebpX6WU27XcPFRuMjf1Kt6XSgw3ZJAAqAlnkvGtc5/GEokVZFxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LU2Dppsq; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b6c3629816so694749885a.1;
+        Sun, 05 Jan 2025 07:55:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736092551; x=1736697351; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QjBzssZLOeeCrtTzTNVMOIQiCtnHfR58sCjKytPf3C4=;
+        b=LU2Dppsq8jpZllcaLnjlD5TnbSHwMzdJImQTL83AP0dRD0YRW66GnEqvb/R10D7W4e
+         tVI90mvAUIijXo65Yf7UVS9I/OHjriqVd40IXIx4MSIehsnGVzqxEHi5914QSZ16k+Lu
+         6FEz+R/YAYjia6JqM+B0+5BbDXCrPdDzL3+vtw0ah6pGUWG96MDyWwTRH9HobP3bRdJ6
+         RLl4nqMq/Po7gXXSIT3wkn2mJ6TRGLYm+RoBh3LYgz63b4ojPR1oN8j03qqXiossNV/H
+         Csexk1wjzVi9qfoCuPFjO4+RKhwyrFvcRAvfs4NzzRzeATr7eSd/cyXKamJXLf1Enhgi
+         iFag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736091901; x=1736696701;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aYO2mT0l8UdFQloxr21510y8jZ+d6H783XFANJKB5e4=;
-        b=VANShloXhhw31lpdUI87iVSGoybwafq7iFvsZYk59suNhabjT3pwB5p16gTv5NJzJJ
-         ES47sz7rJ6VPRMhdw0fixL1A7GUEveje0IKK3Z58hTjMX5lmi4/Ak7FKK3ta4PIJ4lVQ
-         hWqoaFAVKWGrnaa9XBsNiZg1pcZNOi2cF9aCn83Vyku1LLCzyfgwW4rmWs3cTrN4Qb/9
-         XJPYjlqyej4hDGt8WTbFos7beNqyLJzJ/5AD4LusDX+LJlAuQo8wxbpPYrJIyTMZOgug
-         1MR4VYvLyWsCByqGkIf4kF8An/t6o9cpyDoUYobTNWByaYsUVPjJ2tDBLjAXGoq1QBz/
-         lM1g==
-X-Forwarded-Encrypted: i=1; AJvYcCXziTAGdy7S4LEH5xky9+4Jc1en10VjrTR3ZL6HnNpcsdA/NiVrlwGngxXF7LjsTNsmGIAw4ZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxz8k5tzdDYGLf7wY3qPrB190jqCmxethlroepVjr7FsXoaIikh
-	zzV4FjXo920zf1OpYHrm7fLot8ShEbrjeosyTyt566mjXuHo/4CtF68E6P2gE3M0vHljOcT+BO6
-	Xpj+EFPo8mcL2DHob0qnoy2p9dQnliMQb5V2FfqCSchRKTL6oUIKyuoE=
-X-Google-Smtp-Source: AGHT+IFwCap45szDJbgHItMrNynRyqPDv0rMUC6X/I/GFjB+cEFn4XLaNGO4GeV3q5BlT/r5RZH/dBDV6dduH0YJsOYQBW0UD/dB
+        d=1e100.net; s=20230601; t=1736092552; x=1736697352;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QjBzssZLOeeCrtTzTNVMOIQiCtnHfR58sCjKytPf3C4=;
+        b=FqpesMvLAiOD8OCQSaiUFSTCW/Sam/lfHW4uHYZ9ZD4Oo2bLXfsG2wgxq+zjFdTJIU
+         /NiiNUVhj4zquurm8s5z6UTkt+vo2tQe4mumnMfgkM4iyt043XuXaJt4776Ri+kwNihr
+         g8vaJXHt8QO9KkgIE0wAQ0b9TUQ1ydq3STtym7R01W2DWf6JedK77Tn/26ctxswc/lHJ
+         JPy3gCHszNdSmt18a2ojjp7I+CGgMHjhk1g2hoZL7f7L8FH1w1mGCIDTKfohpv+0U4Id
+         SYqIAFJhggPgAPJaOSiC9GqoN+0VbzjDCDC1Rtvj2sQc7xDvHB0n4WRcCpDrlj13f27N
+         ySYA==
+X-Forwarded-Encrypted: i=1; AJvYcCXQQ358/vsUnXDTRv0mzyUc7EY/QBLHYxZVja1QgZfH/R3QxzfihxvlgBv2YNMY5edhkoimCq9Nge3Fp/O00uM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRkSPI2TyXaASTp/wszINHpOQiUDMIoDB0qKLpSNlRQ4ZX+hdY
+	iox+qa5/kNun1fRHLWVh/Z3vLM9ykaVxDmgYyWu7ol/zW/Jk8uVz
+X-Gm-Gg: ASbGncsIt7IPK45XzNEUx/vkvKaNj93VNbgMyKjumcnU/CMuFraKIvLKTHF/weWcDEm
+	B1Pz9P7k0Cscuk0GmrOVpqXQXKWd1BEYeWQ1ooMzlzODVOcsJuGgyhE6rtXx5pVj3uj0g/WK49s
+	xn7Bmki797xs1+thYqfQUO+KWcMue2DQTD3J8DN8CDpa4AdNMC3ipnTkE22p73VlTi+tnJaghYC
+	sEDNv1ECS76WvCW/he4uLVLTIDMKJRdRKlcW6IuO5TWuMjvCo+7iEBfNExbEsEUZa2AJ9V5ub5y
+	x6M0brVs7O6KhKYL1kFQ+ciRDzJb
+X-Google-Smtp-Source: AGHT+IFInoUEVT+deoVMV6E0TFL9nHB+V+AsVTKQ5lXyd8G9Kp9J2jLwhlwPNfaXi3ek0nQxTAwIkQ==
+X-Received: by 2002:a05:620a:1911:b0:7b6:ce4c:69d2 with SMTP id af79cd13be357-7b9ba7abfa9mr10459220885a.36.1736092551613;
+        Sun, 05 Jan 2025 07:55:51 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac30e816sm1433833885a.64.2025.01.05.07.55.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jan 2025 07:55:50 -0800 (PST)
+Date: Sun, 05 Jan 2025 10:55:50 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ shuah@kernel.org, 
+ willemb@google.com, 
+ petrm@nvidia.com, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <677aab862c9b3_15102629427@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250105011525.1718380-1-kuba@kernel.org>
+References: <20250105011525.1718380-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next] selftests: drv-net: test drivers sleeping in
+ ndo_get_stats64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d94:b0:3a7:e047:733f with SMTP id
- e9e14a558f8ab-3c2d1e7f8f0mr533683665ab.1.1736091901794; Sun, 05 Jan 2025
- 07:45:01 -0800 (PST)
-Date: Sun, 05 Jan 2025 07:45:01 -0800
-In-Reply-To: <000000000000bd671b06222de427@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <677aa8fd.050a0220.380ff0.0019.GAE@google.com>
-Subject: Re: [syzbot] [net] INFO: task hung in tun_chr_close (5)
-From: syzbot <syzbot+b0ae8f1abf7d891e0426@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, andrew@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, jason@zx2c4.com, jasowang@redhat.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	mail@country-targeted-traffic.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, vinicius.gomes@intel.com, 
-	willemdebruijn.kernel@gmail.com, wireguard@lists.zx2c4.com, 
-	xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+Jakub Kicinski wrote:
+> Most of our tests use rtnetlink to read device stats, so they
+> don't expose the drivers much to paths in which device stats
+> are read under RCU. Add tests which hammer profcs reads to
+> make sure drivers:
+>  - don't sleep while reporting stats,
+>  - can handle parallel reads,
+>  - can handle device going down while reading.
+> 
+> Set ifname on the env class in NetDrvEnv, we already do that
+> in NetDrvEpEnv.
+> 
+>   KTAP version 1
+>   1..7
+>   ok 1 stats.check_pause
+>   ok 2 stats.check_fec
+>   ok 3 stats.pkt_byte_sum
+>   ok 4 stats.qstat_by_ifindex
+>   ok 5 stats.check_down
+>   ok 6 stats.procfs_hammer
+>   # completed up/down cycles: 6
+>   ok 7 stats.procfs_downup_hammer
+>   # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
-Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Date:   Sat Sep 29 00:59:43 2018 +0000
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-    tc: Add support for configuring the taprio scheduler
+Two tiny comments, neither cause for respin.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11535418580000
-start commit:   7ed2d9158877 qed: fix possible uninit pointer read in qed_..
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13535418580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15535418580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fee25f93665c89ac
-dashboard link: https://syzkaller.appspot.com/bug?extid=b0ae8f1abf7d891e0426
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=112374f8580000
+> +@ksft_disruptive
+> +def procfs_downup_hammer(cfg) -> None:
+> +    """
+> +    Reading stats via procfs only holds the RCU lock, drivers often try
+> +    to sleep when reading the stats, or don't protect against races.
+> +    """
+> +    # Max out the queues, we'll flip between max an 1
 
-Reported-by: syzbot+b0ae8f1abf7d891e0426@syzkaller.appspotmail.com
-Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
+s/an/and/
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> +    channels = ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
+> +    if channels['combined-count'] == 0:
+> +        rx_type = 'rx'
+> +    else:
+> +        rx_type = 'combined'
+> +    cur_queue_cnt = channels[f'{rx_type}-count']
+> +    max_queue_cnt = channels[f'{rx_type}-max']
+> +
+> +    cmd(f"ethtool -L {cfg.ifname} {rx_type} {max_queue_cnt}")
+> +    defer(cmd, f"ethtool -L {cfg.ifname} {rx_type} {cur_queue_cnt}")
+> +
+> +    # Real test stats
+> +    stats = __run_inf_loop("cat /proc/net/dev")
+> +    defer(stats.kill)
+> +
+> +    ipset = f"ip link set dev {cfg.ifname}"
+> +    defer(ip, f"link set dev {cfg.ifname} up")
+
+unimportant: could reference ipset here too, as in below.
+
+> +    # The "echo -n 1" lets us count iterations below
+> +    updown = f"{ipset} down; sleep 0.05; {ipset} up; sleep 0.05; " + \
+> +             f"ethtool -L {cfg.ifname} {rx_type} 1; " + \
+> +             f"ethtool -L {cfg.ifname} {rx_type} {max_queue_cnt}; " + \
+> +              "echo -n 1"
 
