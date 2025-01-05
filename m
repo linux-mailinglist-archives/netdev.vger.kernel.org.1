@@ -1,91 +1,115 @@
-Return-Path: <netdev+bounces-155253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B922A01870
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 08:30:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8E13A01875
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 08:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 488443A35DE
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 07:30:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B2FF3A265A
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 07:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB0812FB1B;
-	Sun,  5 Jan 2025 07:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390CE13A25B;
+	Sun,  5 Jan 2025 07:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="zVgiNUKv"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0924C5336D;
-	Sun,  5 Jan 2025 07:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A3C80027;
+	Sun,  5 Jan 2025 07:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736062239; cv=none; b=WNmUPVwDDYZ18flOBmyN43SA7xYK7rrK3DOUHJ/SVaE33r8d3RF7Z94/IbxAQkn0O4JoATXfLwjAwx0HcG4rjDMsvF6Pz6Bafr3lOiek4wDcY/LKcwnWJuXfb0DtxaI9zvuRMWnIn9GBi66R9p5AwVykoIIlW30fxIIMvlONzDc=
+	t=1736063178; cv=none; b=hcFnjvQ9+g7w+q2dtUgNVhh+wIMnl/NoeJJsPWQ+ZOKM3PQRJYtzNmEDzJYCZjPvJqnVmcOrwAw9cuPbZhMlP3i+zoz9biCubsHYpxgOmPvXnWn0Av+HAui3v/mEBKtxQDKSosCwm+YVkW7/BAsxmGuz6qIDuWcGsJ6Ez8+QJAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736062239; c=relaxed/simple;
-	bh=HNe9BFiiNRFRW9DDoyrr+ZG8gM2e9MMFO6tgcFgwI5s=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=a/I/ZsoVz6WLKQCT+oRF+chEvCNzGwsFWREcJGol1j2wFezC2hlM3cL12Nt9atXpS9BolEras6yxNbmBXNX2lgA4Bpp7Hqjw/gHee6gDMJbC6ITosHprdSfNrjIxpl+CHytTTt9UJcAvrvRkbjF8Xmy89phbKZ3gAYkpp7eS5L4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YQppK0LQcz6M4MD;
-	Sun,  5 Jan 2025 15:28:57 +0800 (CST)
-Received: from frapeml100004.china.huawei.com (unknown [7.182.85.167])
-	by mail.maildlp.com (Postfix) with ESMTPS id 16852140B33;
-	Sun,  5 Jan 2025 15:30:27 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (7.182.85.13) by
- frapeml100004.china.huawei.com (7.182.85.167) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sun, 5 Jan 2025 08:30:26 +0100
-Received: from frapeml500005.china.huawei.com ([7.182.85.13]) by
- frapeml500005.china.huawei.com ([7.182.85.13]) with mapi id 15.01.2507.039;
- Sun, 5 Jan 2025 08:30:26 +0100
-From: Gur Stavi <gur.stavi@huawei.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "Gongfan (Eric, Chip)" <gongfan1@huawei.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>, Cai Huoqing
-	<cai.huoqing@linux.dev>, "Guoxin (D)" <guoxin09@huawei.com>, shenchenyang
-	<shenchenyang1@hisilicon.com>, "zhoushuai (A)" <zhoushuai28@huawei.com>,
-	"Wulike (Collin)" <wulike1@huawei.com>, "shijing (A)" <shijing34@huawei.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>
-Subject: RE: [PATCH net-next v03 0/1] net: hinic3: Add a driver for Huawei 3rd
- gen NIC
-Thread-Topic: [PATCH net-next v03 0/1] net: hinic3: Add a driver for Huawei
- 3rd gen NIC
-Thread-Index: AQHbXEvoj+6B8Sf7+0ymGQKWCbUo3LMDpHGAgAQozAA=
-Date: Sun, 5 Jan 2025 07:30:26 +0000
-Message-ID: <a8b81321186545708b8babf1805ae7ef@huawei.com>
-References: <cover.1735735608.git.gur.stavi@huawei.com>
- <20250102085351.3436779b@kernel.org>
-In-Reply-To: <20250102085351.3436779b@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1736063178; c=relaxed/simple;
+	bh=x2AKfZF9mrKKNFRFVOUAHFWR0s/hhv0GEwZQqQfLOqY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cT5nK0EdfELiISghCX1V/SmwoixHMO6gPafzlw2ybI36Xte7qd3Swy6SU2+pG2lNETRm/tkVuAteNFLwBMm3s69xKvT+pT85cLhaLFYKjt6LrST9+BfO07FroDEpZqNaEL3F6NV6YRHhjiRwhWEMGQI8QTxjChaWtJaZqDqzB88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=zVgiNUKv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B775FC4CED0;
+	Sun,  5 Jan 2025 07:46:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1736063177;
+	bh=x2AKfZF9mrKKNFRFVOUAHFWR0s/hhv0GEwZQqQfLOqY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=zVgiNUKvJMR+r/EtkmnaHaUM6FnIXm8uAb7Y2C+/VmQVO4x+AXaWVa5EPVIFJ7+OQ
+	 E7tIVKKiW6uh/xyJDP8qGVvFUhoe+Dk4aGG3ItswzpzRFAGeIQGeRTwNEhWUB6yrPh
+	 dPKvECiXerAuTsR63Uyp3gaHqpvkUbs1dEZyYpSA=
+Date: Sun, 5 Jan 2025 08:46:13 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Foster Snowhill <forst@pen.gy>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Georgi Valkov <gvalkov@gmail.com>, Simon Horman <horms@kernel.org>,
+	Oliver Neukum <oneukum@suse.com>, netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH net v4 6/7] usbnet: ipheth: fix DPE OoB read
+Message-ID: <2025010558-lining-paralysis-e618@gregkh>
+References: <20250105010121.12546-1-forst@pen.gy>
+ <20250105010121.12546-7-forst@pen.gy>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250105010121.12546-7-forst@pen.gy>
 
-PiBPbiBXZWQsIDEgSmFuIDIwMjUgMTU6MDQ6MzAgKzAyMDAgR3VyIFN0YXZpIHdyb3RlOg0KPiAN
-Cj4gOigNCj4gDQo+IFRoaXMgdHdvIGRvY3MgYXJlIHJlcXVpcmVkIHJlYWRpbmc6DQo+IA0KPiBo
-dHRwczovL2RvY3Mua2VybmVsLm9yZy9uZXh0L21haW50YWluZXIvZmVhdHVyZS1hbmQtZHJpdmVy
-LQ0KPiBtYWludGFpbmVycy5odG1sDQo+IGh0dHBzOi8vd3d3Lmtlcm5lbC5vcmcvZG9jL2h0bWwv
-bmV4dC9wcm9jZXNzL21haW50YWluZXItbmV0ZGV2Lmh0bWwNCj4gDQo+IFBsZWFzZSByZWFkIHRo
-ZSBtYWlsaW5nIGxpc3QuIFlvdSBwb3N0ZWQgdGhlIHBhdGNoZXMgd2hlbiBuZXQtbmV4dCB3YXMN
-Cj4gY2xvc2VkLg0KDQpPSy4gU29ycnkuDQpCdXQgdG9ydmFsZHMvbGludXguZ2l0IHdhcyBhdCBy
-YzUuDQpBbmQgbm93IGl0IGlzIGluZGljYXRlZCBhcyBvcGVuOiBodHRwczovL25ldGRldi5ib3Rz
-LmxpbnV4LmRldi9uZXQtbmV4dC5odG1sDQpXYXMgbmV0LW5leHQgY2xvc2VkIGZvciB0aGUgaG9s
-aWRheXM/DQoNCj4gLS0NCj4gcHctYm90OiBkZWZlcg0KPiBwdi1ib3Q6IGNsb3NlZA0K
+On Sun, Jan 05, 2025 at 02:01:20AM +0100, Foster Snowhill wrote:
+> Fix an out-of-bounds DPE read, limit the number of processed DPEs to
+> the amount that fits into the fixed-size NDP16 header.
+> 
+> Fixes: a2d274c62e44 ("usbnet: ipheth: add CDC NCM support")
+> Signed-off-by: Foster Snowhill <forst@pen.gy>
+> ---
+> v4:
+>     Split from "usbnet: ipheth: refactor NCM datagram loop, fix DPE OoB
+>     read" in v3. This commit is responsible for addressing the potential
+>     OoB read.
+> v3: https://lore.kernel.org/netdev/20241123235432.821220-5-forst@pen.gy/
+>     Split out from a monolithic patch in v2 as an atomic change.
+> v2: https://lore.kernel.org/netdev/20240912211817.1707844-1-forst@pen.gy/
+>     No code changes. Update commit message to further clarify that
+>     `ipheth` is not and does not aim to be a complete or spec-compliant
+>     CDC NCM implementation.
+> v1: https://lore.kernel.org/netdev/20240907230108.978355-1-forst@pen.gy/
+> ---
+>  drivers/net/usb/ipheth.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+
+Hi,
+
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
+
+You are receiving this message because of the following common error(s)
+as indicated below:
+
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
+
+thanks,
+
+greg k-h's patch email bot
 
