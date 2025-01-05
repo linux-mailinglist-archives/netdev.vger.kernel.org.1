@@ -1,113 +1,107 @@
-Return-Path: <netdev+bounces-155286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8EC9A01BC1
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 21:10:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFE84A01BC4
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 21:25:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 283797A1686
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 20:10:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E4AF16261F
+	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 20:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6BE156228;
-	Sun,  5 Jan 2025 20:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCEB14D29D;
+	Sun,  5 Jan 2025 20:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="losmFxUw"
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="QPN19M5T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04023DDD3
-	for <netdev@vger.kernel.org>; Sun,  5 Jan 2025 20:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56CD8F6C;
+	Sun,  5 Jan 2025 20:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736107830; cv=none; b=BWdUY/QYCabe75/nvYCBR+su+3sQTuv9mz81FGKPVWkm6ejT0tl7Ca3zHS3lO1hjAHw5PgHZhGSqSYOuwADTYdsVJSI+nWaQ+WRijEhnztRkTpBPiB7x3rljbc2Vh3j03kI3LwcsgbNpkbh4EJAQSa6xEHoqxkGDoStE36/0Piw=
+	t=1736108729; cv=none; b=ApJq4MwQg/lTNo6d9fXUZ/FuZj6SV1KycIIJDWSepuz8ktOKrJmL0mnShJL7gkF6UkEt6DmNxpW8xlxyBNCntUxtBmIjHw2Yope8+mTlhlG9dGuyTj6jdHACALVEzp1i6C2skhtbCJjAtDF2uLF0VmjsdRaXL/3spcTsePYr5ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736107830; c=relaxed/simple;
-	bh=tXFovJCQjdgQH1QFcWz3YNmT0SBvxs0AWlnTdPq5Cc8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YMML121ZLGzrSzmvY5v5KK2L3jk9QzZKy5u8S5LTkOV22JWlxlhK3xJR3lIpNFeiONdl5YziX+7yp5qGMNsYPiFU7yZ18eXiUoewWX2IpDfm/oxxfXXug0X2Js7KitJyrfv9f3XhDiIpEpYCvuKYcriUUyEhopiuUK56/uCc+f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=losmFxUw; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4679eacf25cso74629241cf.3
-        for <netdev@vger.kernel.org>; Sun, 05 Jan 2025 12:10:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736107828; x=1736712628; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w3LI8elsJDues6Jb5XTk/jq8UBUtSXF7KF7YPeO0rOw=;
-        b=losmFxUwfpCwEdYksarlrap3ayP/DNz/AfUYc1h+QEVTMGOD0icqNyBwRppgbPhXmH
-         pvBf7eb4jN1XvwbIlu/4eP+rKNEwBFc4ln7kvGbpfAiA2h0rkSN8p4bepvZaVNVoYXV9
-         hsgD4Nab1zErNRxTVroZERGiJwG/G6uuka3BIxkgVeEioeiQCtXvj8htmcxDz0Ppeoo6
-         nKdE/MMpGtUd+70XWarT/8BejqZLNtE/dLyFp8EqLYR6p65dNCS7mXzDO6mp59gLolEj
-         OvgfTj9GO8yXYZ+t0Aw558OqzMUJe/ocSgELL9k0WyQvu8XsHo7Pr5xFGScKRlmAOB0u
-         fCiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736107828; x=1736712628;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w3LI8elsJDues6Jb5XTk/jq8UBUtSXF7KF7YPeO0rOw=;
-        b=SxaY7IHJIbDga7Cn6xbVW/KhrvQAZXLA1L9T1X0wur5B+GpmEJ385mMEdp1CXAbkCY
-         Eo1OBXxnO0xe1aXwzGZtqymjrVLddGD9orD7eZJc+lKvlnTwCo5j7DRLJxGLNKkXMJZo
-         wtJlquSWROmKqtThreNeo/gx4Qhr7PrsMLDI2gMHZ9Le4QSjCKR3fsaaQ2Fu+vzl3QDE
-         3W7zJu3oMNxtxn1ixJmX4OL3a3QppD1bi/101nRO550DaR/KVj3TTsQxJLK9N3PqY6zR
-         bWDfpKt/dV0JysEy6sqADtLGazKZcdgL5WH5AhwGCcpgqtXbl0rcVGSLV1h8IfuTNCDu
-         ukjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3bcjvjzicMblwd04p0+cUfRGDmB0gSxaJdSSQ+0KDy3Z/6P95VwLMbT+HhLiFJFQJw865+iY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyC68bsFMg2/ePVy1ZZOoy5gcjBKEzOwp2T1U/CnnA1eQOeNpnj
-	M375HTD13xnhiYe+Ku0xbRqkBWG/nOFTDd4RYyVBDMzBgJmh6Uy5
-X-Gm-Gg: ASbGncvBSvzB4zknmDePrgxNo3eTHI5eYxdhR+EhWk1XDEwRChGwc/iTdDoPslGli76
-	LuE8k28URVEfi3e6egQPZxpNPXMMO5rBlL5I5ahRdQeRxm9/v+fi1raDnurGdA1r4G/qpxxegz3
-	H4LoFzrAMYylKhq5yx0IcxEBQQBe9F+wxxKlgwqwJUO6p3MY7fgfQxCQnybz0IlSd/x8RSBQYz8
-	GonR1FYUlnDtauaad7n51LJSQI+zVz7oSFSmxLrvbbtHkYArbScwm0wP5VHeZx5/hptHxcyyZqC
-	dFk=
-X-Google-Smtp-Source: AGHT+IHbNqJdZYUOyHVBJxjToMgWhLV96YMfjISh3rNJv7Mxm2Zi8DAYf7DgFzC439EhDT1ow2DE5A==
-X-Received: by 2002:a05:622a:341:b0:464:c8d3:30c0 with SMTP id d75a77b69052e-46a4a98a00fmr828191861cf.35.1736107827827;
-        Sun, 05 Jan 2025 12:10:27 -0800 (PST)
-Received: from ?IPV6:2607:fea8:1b9f:c5b0::4c4? ([2607:fea8:1b9f:c5b0::4c4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181c13b6sm162842086d6.96.2025.01.05.12.10.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Jan 2025 12:10:27 -0800 (PST)
-Message-ID: <85830760-63a2-46f5-b1f6-5f1233306497@gmail.com>
-Date: Sun, 5 Jan 2025 15:10:26 -0500
+	s=arc-20240116; t=1736108729; c=relaxed/simple;
+	bh=Hq2gKvA1CqesACN6IikgyuFGQvWRYxrMBEyLT1x635g=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=dEZfwaPb1vM00qe3Ahwsp+VkEk35X47cWWvD5innJ0JhnpFhh9mvexDelftOn/ufE8Ds/IbL9GAM1VZ/wtWzw+uhIVa8ShRcaVS0Pvpt50A4qviYRaa2oDQHmWqZJXrjzLlVgZHQdfisNAeW9FrB493Oh3rP9F4AfcXAtTuoJIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=QPN19M5T; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1736108716; bh=Hq2gKvA1CqesACN6IikgyuFGQvWRYxrMBEyLT1x635g=;
+	h=From:To:Subject:In-Reply-To:References:Date:From;
+	b=QPN19M5TazT5dYLJxXI/ac4snosyMAltEvKL/xccWR0ZKlNbrpDdw96PJbm6pyJrO
+	 3jmfmY4Xmh5/aFBwHe2g5Q2u1Vj6BgVSHABOKENtsl/JweNodsfhQGCCqSgGghI4qw
+	 sU26QHlB7jzErhLOkke7L2cCtp+gJ77L14xOoNJcGMsxMLBTMMo198YaVo6eOcJ9Ag
+	 uLEaxnAWTQIeXhyR1HF/Gm8V/Y6760PYl914QTi0Lvn7vMwdWSqaCpuvPqh8ViJjCX
+	 +W8Bt7kjOVFWPPBtTuLZEeDKYNF62FlVqZH4+3oYoC0Lwl7+wlnKKH6sttsnm34qHS
+	 IGaZaf3MH154w==
+To: syzbot <syzbot+e9b1ff41aa6a7ebf9640@syzkaller.appspotmail.com>,
+ kvalo@kernel.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, nbd@nbd.name, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [wireless?] INFO: task hung in
+ ath9k_hif_usb_firmware_cb (3)
+In-Reply-To: <676092c8.050a0220.37aaf.013e.GAE@google.com>
+References: <676092c8.050a0220.37aaf.013e.GAE@google.com>
+Date: Sun, 05 Jan 2025 21:25:16 +0100
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87cyh16mab.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipvlan: Support bonding events
-To: Eric Dumazet <edumazet@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20250105003813.1222118-1-champetier.etienne@gmail.com>
- <CANn89iKb+T3cZLJUwRNZah6hKHn3XbUyw29PsEAif5LC96NRoA@mail.gmail.com>
-Content-Language: en-US, fr-FR
-From: Etienne Champetier <champetier.etienne@gmail.com>
-In-Reply-To: <CANn89iKb+T3cZLJUwRNZah6hKHn3XbUyw29PsEAif5LC96NRoA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+syzbot <syzbot+e9b1ff41aa6a7ebf9640@syzkaller.appspotmail.com> writes:
 
-Le 05/01/2025 à 03:15, Eric Dumazet a écrit :
-> On Sun, Jan 5, 2025 at 1:43 AM Etienne Champetier
-> <champetier.etienne@gmail.com> wrote:
->> This allows ipvlan to function properly on top of
->> bonds using active-backup mode.
->> This was implemented for macvlan in 2014 in commit
->> 4c9912556867 ("macvlan: Support bonding events").
->>
->> Signed-off-by: Etienne Champetier <champetier.etienne@gmail.com>
-> Which tree are you targeting ?
+> syzbot has found a reproducer for the following issue on:
 >
-> Please look at Documentation/process/maintainer-netdev.rst  for reference.
+> HEAD commit:    78d4f34e2115 Linux 6.13-rc3
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10d10b44580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=6c532525a32eb57d
+> dashboard link: https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=166cb4f8580000
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/297b40bb0993/disk-78d4f34e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/e3ec807b99e0/vmlinux-78d4f34e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/226a54b87ab2/bzImage-78d4f34e.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+e9b1ff41aa6a7ebf9640@syzkaller.appspotmail.com
 
-Sorry about that, that would be net-next
+#syz test
 
+diff --git a/drivers/net/wireless/ath/ath9k/hif_usb.c b/drivers/net/wireless/ath/ath9k/hif_usb.c
+index fe9abe8cd268..1cdc723fe4f5 100644
+--- a/drivers/net/wireless/ath/ath9k/hif_usb.c
++++ b/drivers/net/wireless/ath/ath9k/hif_usb.c
+@@ -1153,17 +1153,9 @@ static void ath9k_hif_usb_dev_deinit(struct hif_device_usb *hif_dev)
+ static void ath9k_hif_usb_firmware_fail(struct hif_device_usb *hif_dev)
+ {
+ 	struct device *dev = &hif_dev->udev->dev;
+-	struct device *parent = dev->parent;
+ 
+ 	complete_all(&hif_dev->fw_done);
+-
+-	if (parent)
+-		device_lock(parent);
+-
+ 	device_release_driver(dev);
+-
+-	if (parent)
+-		device_unlock(parent);
+ }
+ 
+ static void ath9k_hif_usb_firmware_cb(const struct firmware *fw, void *context);
 
