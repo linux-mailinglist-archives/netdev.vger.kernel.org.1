@@ -1,132 +1,307 @@
-Return-Path: <netdev+bounces-155340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 369A0A02019
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:55:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 378D7A02011
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:52:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C05EF3A3C8D
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 07:55:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17A841636EC
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 07:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10BB1D5AD9;
-	Mon,  6 Jan 2025 07:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265F71D7E54;
+	Mon,  6 Jan 2025 07:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="BWyvDXSB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y+OW7TNf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.50])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568DF1946CC;
-	Mon,  6 Jan 2025 07:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736150151; cv=none; b=itnH7aDTc+1e0YWuf+wPCTBNavt+/fOFKJANmo6XoA6V+t3j5rsAPXYRUSB7i8EcIiQsEdcYaMmzh1s6Xdxh8B70GdDF/5at3lGrH8ISFTYUAdcWtVNPURtiFLTLY9TjIz0+EBxtqrZWiHuNGThyyr6QYGFto5AFNK99QEbci/Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736150151; c=relaxed/simple;
-	bh=ELMzeTQE8WIBydCunmd35FwZKzEyRplwBVRd00fPSvk=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=lzVlMNadiwSBoJsnuDVFEG2rVceTZdU5sHss9h3vtMVzIDTG6KbAPUd9h5nAxcCYpJhxKVA4pZbCKlcdnqp7q40ZxuCsrntwV9uEALmPXr/yjHi2K1Pyiki2cDSsp9k4n5R/SOb+RsSlwGybLcziHfLpxkL/0nZJGRxv5IBrkx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=BWyvDXSB; arc=none smtp.client-ip=148.6.0.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
-Received: from localhost (localhost [127.0.0.1])
-	by smtp1.kfki.hu (Postfix) with ESMTP id 26FA95C001C2;
-	Mon,  6 Jan 2025 08:48:38 +0100 (CET)
-Authentication-Results: smtp012.wigner.hu (amavis); dkim=pass (1024-bit key)
- reason="pass (just generated, assumed good)" header.d=blackhole.kfki.hu
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=mime-version:references:message-id
-	:in-reply-to:from:from:date:date:received:received:received
-	:received; s=20151130; t=1736149715; x=1737964116; bh=MI0J9Rqtux
-	2YcfZGbO6p6FvAFgAGG4cMPCCBqbT1Cpo=; b=BWyvDXSBvR9W1LMoPTZz0AawL+
-	BwOyhcgzknJP2HrwgHtQwdbzE/Sy2AcQ737vE9o4wvtuxEVsNxroY1hlJ/XsPlsx
-	1Az7L04FIpp7LKT+OoiFWHy7WONKN83COnerU3GaXtFhL7iQYDXm0Pq/JsRaUV/Q
-	0TNXPJYDxg/2VJnaw=
-X-Virus-Scanned: Debian amavis at smtp1.kfki.hu
-Received: from smtp1.kfki.hu ([127.0.0.1])
- by localhost (smtp1.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id 6FHFBcY7N0iG; Mon,  6 Jan 2025 08:48:35 +0100 (CET)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
-	by smtp1.kfki.hu (Postfix) with ESMTP id 1E6925C001BF;
-	Mon,  6 Jan 2025 08:48:34 +0100 (CET)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id E4D3A34316A; Mon,  6 Jan 2025 08:48:34 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id E2B53343169;
-	Mon,  6 Jan 2025 08:48:34 +0100 (CET)
-Date: Mon, 6 Jan 2025 08:48:34 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: =?ISO-8859-2?Q?Sz=F5ke_Benjamin?= <egyszeregy@freemail.hu>
-cc: Andrew Lunn <andrew@lunn.ch>, Florian Westphal <fw@strlen.de>, 
-    Pablo Neira Ayuso <pablo@netfilter.org>, lorenzo@kernel.org, 
-    daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com, 
-    kadlec@netfilter.org, David Miller <davem@davemloft.net>, 
-    dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
-    pabeni@redhat.com, horms@kernel.org, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, linux-kernel@vger.kernel.org, 
-    netdev@vger.kernel.org
-Subject: Re: [PATCH v5 1/3] netfilter: x_tables: Merge xt_*.h and ipt_*.h
- files which has same name.
-In-Reply-To: <defa70d2-0f0c-471e-88c0-d63f3f1cd146@freemail.hu>
-Message-ID: <ee78ed44-7eed-0a80-6525-61b5925df431@blackhole.kfki.hu>
-References: <20250105203452.101067-1-egyszeregy@freemail.hu> <43f658e7-b33e-4ac9-8152-42b230a416b7@lunn.ch> <defa70d2-0f0c-471e-88c0-d63f3f1cd146@freemail.hu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5A31D63F5;
+	Mon,  6 Jan 2025 07:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736149924; cv=fail; b=LhYMnwsBBP2vZr0NUNMKYHVIDl1+7e9+qcOPOW5nuJpsDA7w4NUCoYKCZtgP8ghPnL4ouhmp2x9171CgnwVPM1qgvEH3LhhE+55v4O4MKHc1XMxqYj8/3KM/oZrrlEXMWbbm1zmYI1VdB2VdxjASsvCt3Ln94J7aFHHhW6GelPY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736149924; c=relaxed/simple;
+	bh=RM8lIgRsfrqXt8yrtKVe1Ks7wFQQAiaz7l00gAIkbXk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=BUUwmhNcAB7OuT9YalIlZXBzcEIk2qNUZ8vVP82IK6+EoV7UcYmkgppV/zcrUih2/4AHu1SwdXfLJrXEkaIADIBvFikf41urQE0Seb3wTAlF415Bh5NK47EB2sLZcjgZzxM5XSiVF7MA+uHP482ix6LRtFE0mPOVHg8zfjJ2lzQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y+OW7TNf; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736149922; x=1767685922;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=RM8lIgRsfrqXt8yrtKVe1Ks7wFQQAiaz7l00gAIkbXk=;
+  b=Y+OW7TNf3QslLeid581iucd3Hc4rnOg4R7f/KL4uIXtiJ/raZfz9LH3i
+   kYUstSBzQDxMEAQd/vW5i1FecxnNOoOslSKMiIjIUh3IU8VlItfKHbxqb
+   PdxMVOY46yftFzAcYecc2RLDAL61TtqaRAns66ImrNS+AIBm6pv3pcJws
+   whSry+WSMYif+xT30hmk/giYQcBA0trPpXelgQRmeVURZR9mTml/r2IUE
+   8zDK/MYF9HiSD5gkbeJjdphuvQUwue/JVtEdVSnsVUqz7yRW95io8tCzX
+   qKSr9ZyBYEDFrhUAwLWPNLE7xARlLkaH/dlAOuNV7JnUxozjSF0u0jrdK
+   A==;
+X-CSE-ConnectionGUID: T69juGBmQmmsxb477RlCug==
+X-CSE-MsgGUID: 1siMeS37T3qyw7s2Mo/yWQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11306"; a="47277253"
+X-IronPort-AV: E=Sophos;i="6.12,292,1728975600"; 
+   d="scan'208";a="47277253"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2025 23:52:01 -0800
+X-CSE-ConnectionGUID: ywYe8WmgSsqhwq8ttoW2mA==
+X-CSE-MsgGUID: d22MjAMHSEqwiz71Cutxaw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,292,1728975600"; 
+   d="scan'208";a="102446446"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Jan 2025 23:52:00 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Sun, 5 Jan 2025 23:51:59 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Sun, 5 Jan 2025 23:51:59 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Sun, 5 Jan 2025 23:51:59 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ktx5fGlKzNWMCfuRPRHUug1ULUXBv6O6/Ve44dJBnACy9SPn6LauWt4znqLJq4nplYhc+BngvaGGBYnFb6dE5FYSp3/NkKMrnvOPijNskKvufRDfaTncUm1D7lxeIL5uIVd8P1gx3ABaC1a16Nro6YtSIUmPomXRV3xUY8xwvy02NLJbTR7KUyfjB0qzwtkt623aWtKkqs43Qi0JvuPiXFD1oaweWwcv835Mj2OJd/Apuk8dP+xqmVid0w2vl7tWcKtXM8JdYlUTUtEdi2UP4rray0yJ3qmKKm4Hgh9xLxu1tLgxxEYMIRmqQSx0/bBYXdIxUWGsnekZRqIxjVKN9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9U8kGni4m7WplI5anR6V/tl0LTC8s/lklK/+WnMShUI=;
+ b=ko0iLyr7M0zaYZqF44IPUauQtx1TaELfAkAKvMWwSNWZQYGOmuhdsJ7iYQ9c5QDkJS2CDlMbFYsszBOmf8YAcT0xPDQir4jJNmaWnKWVTo2HDaAcyxAzIyeI8y9wb/shfdgCmoZXlHAAVOW2Keyts4Awq9pt3buEnULBXbrAB7NPviLbXGVHVYzGdklcYtMqCjuHlkSIRzd9tPM3GeN3V1YaBhWZqKT4raWOKnHYcu8uBeDVmGjPuILf9hixKXDm7+lnz1JiMjSTlAqUcAL97U0CdjSSvX6hq04vfbtEeWBvys4LCWwIeDZOK2HtulKNdYP7zBmEjlgCtVKibJY2Sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by CY8PR11MB7924.namprd11.prod.outlook.com (2603:10b6:930:7a::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Mon, 6 Jan
+ 2025 07:51:40 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b%4]) with mapi id 15.20.8314.018; Mon, 6 Jan 2025
+ 07:51:40 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: "Zaremba, Larysa" <larysa.zaremba@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "Zaremba, Larysa" <larysa.zaremba@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "Eric
+ Dumazet" <edumazet@google.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: do not configure
+ destination override for switchdev
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: do not configure
+ destination override for switchdev
+Thread-Index: AQHbSkWYiVJxSFK2TEuslY1nnnuGU7MJiqcQ
+Date: Mon, 6 Jan 2025 07:51:40 +0000
+Message-ID: <PH0PR11MB5013488226F0A48B91CA7E1A96102@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20241209140856.277801-1-larysa.zaremba@intel.com>
+In-Reply-To: <20241209140856.277801-1-larysa.zaremba@intel.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|CY8PR11MB7924:EE_
+x-ms-office365-filtering-correlation-id: 696be277-8446-4a96-cbc7-08dd2e26f493
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7055299003|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?dY6Zb23YLYaDB+xw2uB500n20zOBdFil6pJ4b2k+R7XVE2t+YxN8s9KfJDYn?=
+ =?us-ascii?Q?hrRztOzfjWeb0A9VzeRxyl5l4fV2U1BDs34PDvwidY0ClwJZYFygeZC+1Ye4?=
+ =?us-ascii?Q?lbKqPmiwN24AY+ppxKcOVkWniP/H8/ThhOi0APdxfdNBoSS3/LRxUIVhGwR7?=
+ =?us-ascii?Q?69+Zpyjr5+eyPxWMfCcJRWPCURmustegm4bO1/YHcZ/5uLA24vTxCW5IcGYz?=
+ =?us-ascii?Q?G5FxlL1Nac/o/B2OTv6mjWyjxrgtsFHS6thwilB5ZHGYwaC8jPovhDeUTmBi?=
+ =?us-ascii?Q?UHyRF8oikYniYDuo1y8tcnbVfebdvhhKrfGzuSz4m2VVjplBclqU8BfNB9Ii?=
+ =?us-ascii?Q?zDEnbV+mguQazT28vh5odk4nRcSMbdnmd6e1OZG7W5eCC2Swo7uRN1ydgQhs?=
+ =?us-ascii?Q?I1JwRWRN1/rw0D+vXofFePJPjDEzyF+9i2P4tUDax1EtJ3rFJNEokzMeziqe?=
+ =?us-ascii?Q?VHT77buMIOrtOy1ivZZ18KTNb+12mCy2c02txTJHsczGS45IXPtYI92w7UDz?=
+ =?us-ascii?Q?PZyN1uxo8YzAUlb7jcq1VS5TrHFMKU1I7ORJ/DWSSr8D69i9wYKm5RMv0DZq?=
+ =?us-ascii?Q?WuVItgL12a/R5X8ZVctoFIcjzmP/OMom4ZLitxiKIPEKAFt3frvK6QPQOIH9?=
+ =?us-ascii?Q?RRASv9EXC00POdbqcv5YcFVTkp6iXkB2Y1ZAVrx8aiHsUj84rVwuFbKygw5O?=
+ =?us-ascii?Q?89DwmPkthb28g/fxLwTGnC+TM8KG+QsQSwJHF2ncYbY5Q8V/xRFS9fWuF3V0?=
+ =?us-ascii?Q?VJLJ9QDxqgXuc8zW0Wy9uLWvVfbOI0dMtN2T5pjqqTXgA38PyHaQ4PfTvh8i?=
+ =?us-ascii?Q?n3wfHmnnZmE+2/uWDzzeZChndzWky+3UM2XoPxHQt8X/x5F5yx7CN6oElCGU?=
+ =?us-ascii?Q?et+GLJ8lS+oA2tIoD6BlzotPGXKobxFqiDbikcqqTYb9H8d5gnAWkJTkucqr?=
+ =?us-ascii?Q?OPXx1kt77rR1Fvt9A98jENt4R2FvzpKrFRwBVqp2+7iz1gwNOjMZhUxsY5EQ?=
+ =?us-ascii?Q?uRSQhNbzfsMGIdjn1pjd5WtylKUmP37+HyIHOEmFEIrW5mcV4krNGxLeGiUp?=
+ =?us-ascii?Q?mZHRU8hJ75kHhrLQP3KFh79mM+Zkph4+NEXPYmc0T54i0HjyfX1hzOM6eFyx?=
+ =?us-ascii?Q?jYQF4eXZ6jtYeAoIOAijLGrVWxMEgEPMTW8fS5z6/i9eQyMNA+TIcF7+0wbq?=
+ =?us-ascii?Q?00fvarP7FEmSwZJho8Pakyp+z+/kygTudi+kNiUW3EYV6sZFqIlKtpiUXR0v?=
+ =?us-ascii?Q?vBxe2FwNolUxw4lZolsWbgseolX5sduTk7BflqZqe3QQlz+Ssqrvk42MOQ3l?=
+ =?us-ascii?Q?mgLELEmULJ9fVuaeAOBVp30xULfApeWm/+yAO3bzMuW7ssee1VVt0Z5nx6NW?=
+ =?us-ascii?Q?pisA7msVfQW3gHoLn8ayBsN6AkNDyhoL9fJX18xplcv/zTj/Pn//V7o1Yhip?=
+ =?us-ascii?Q?q5v3fCzScrupdY/Zjm7mQwA0bKEGx8pP4Tr8hFPlNDMrIYCR8nBGYQ=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7055299003)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?slXr0fX+KbUSH78pDUcp0KB3UgTaE2n8b6WgXu44w6uUrMFG/dE3XVxwhVcT?=
+ =?us-ascii?Q?Hq+khYycK192ZiD3bLFJ8nT3huipROWRQK9BJZI28ffDiTZ9VN8STZ3+Xbtw?=
+ =?us-ascii?Q?DdtXxEEyGj43XLga8O6Wbj5JA8l+KINAGUe9wJGE9iK7Azk+QepoSS0JYH8J?=
+ =?us-ascii?Q?bItwPmuNRAYdy+HXXzgE22kbCdLRxU2Rfj+xP0RvfjdUYfWDOo+3W2tY7IXq?=
+ =?us-ascii?Q?LhsVjlg+J5cLcqJ4Rrf1W6HB8FACXGv/TvVpoysFtsJbrKRaIM+MAieZZGMs?=
+ =?us-ascii?Q?rGDn5XFswMm9XEFvOylg+/9Khm/Ky6J+PHIC3kf+4HyaOgX29QCvGgliEgIn?=
+ =?us-ascii?Q?axcUYpYlQN8Mp8F6hlKD8prCznsj7gz5fFfb9bPS4atOjM1WyMUeSRtyF4n9?=
+ =?us-ascii?Q?zOQ/Vm994vcFNiO33lb9O/uYWFy76ehvU3Zj1SwfmPW5CIPKLffi3yjUNG7v?=
+ =?us-ascii?Q?3vfPKvWBO/kH4g0Uiejdq4KfEfH0kL0mN9rDlxoRCz5SF0oVrvi03jUnGKzV?=
+ =?us-ascii?Q?PQVsJ1/77pPl5Ps7SNm3Cs8Yl9pZP0dGIN53xgqiDZEjmUduSH6LX9t43AQt?=
+ =?us-ascii?Q?ejLGCUrGHqj/Y5C3dlJSskLK+G43D7mnkRCg3QygnBIre8W4CGT92AuNDLUY?=
+ =?us-ascii?Q?4Ye0Ov61aQXDZaNTazuLh3qZ35mPKvgUyM3HZU37qOt++bCnRMGFw+Z/nssJ?=
+ =?us-ascii?Q?rPmtKbEqrR7F5c9O81MMBPzwTC29z5VwQPtt3Shq+CruqfpaOOXjimWY3cyq?=
+ =?us-ascii?Q?L16B+Pj8q48G9aXh6iQJ9FthS2R4V/+CrXRJtcc6tsc2vlxXFbPva5FiWp4d?=
+ =?us-ascii?Q?TjV7eboqe601GPYctUxkbJiCC3tjsYOHWW6x2ivnueRDtCx2oaODTp+cTObf?=
+ =?us-ascii?Q?aI/VL198IDTN5DFjLyTjvSq47BKkTdgiTj+Ux8AZwLGh4knpYRpNe/bKzTvQ?=
+ =?us-ascii?Q?M6brbd90HoIiL3iAMvIgOLIYbIGQh+i4ZPKLM1NoV4zxAgkcAfnO8fn3CE9t?=
+ =?us-ascii?Q?R8IGHQRr37KC5R6Z4mKbfFkETkRv8vD3Vqe7ab4VAs+6LBb1ooYd0Smwwh9W?=
+ =?us-ascii?Q?EoJZXxjFswXxtWZQhZ6lYkZLum0asc5s+hlesRyzjV53rVDygRu/vr7MiRGM?=
+ =?us-ascii?Q?GJCw+Q//ZzyXbnKEvVZ2v3ByaHi6xGW94B10aDLMVxM1rvYH7OhNkiNbugzc?=
+ =?us-ascii?Q?8IPlSNvOYQF4OqzknPcwm54+yu6De2P3AunpYg5R5e1Dn9WbiDOGqspXCczr?=
+ =?us-ascii?Q?bR5DVTdQaCVpa4fhvwgpj8dcWm3qJq+VLsqO+5PkfFGMTL7qmsjp9B9h2Xbv?=
+ =?us-ascii?Q?+eukgQpbEy3clh/x0sLBQ0N0bWF3oNQhUP1r2HCR/yz+/253v7hddqqgg9nL?=
+ =?us-ascii?Q?GMSUTZ+BB1T04SmQGkdDISBpoONO/xN0pXPEAHg9Bakd4hxAS725HUdem4Gb?=
+ =?us-ascii?Q?l1/7WC+jMFHK0S1d0mkRRhGgPv3IY76BtcIXnpCgEvAWbqPB2hrQKIndhUOK?=
+ =?us-ascii?Q?nSEC6XIbgxBrn40B4KIq+aNekUfF8RrliH2jT+sPnjiqSCnp+qSt+kK9eJiY?=
+ =?us-ascii?Q?GTTyDhEO3CTwgJFEIej3c2gr52L+gpoGIAeXp+KhLFvpe28LrAnPhoC1/IQv?=
+ =?us-ascii?Q?Yw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="110363376-498301477-1736149714=:36632"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 696be277-8446-4a96-cbc7-08dd2e26f493
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jan 2025 07:51:40.3150
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: v6UKvleqXW/RA+1izzqo2QcDB1AfDFw2xhgoUtvlV10k5nsoQ5JaAUMpKCzgYO5yHDWsfw1UevoT1XmOQu+wa584qcp0KCXNANBVNVaVRyo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7924
+X-OriginatorOrg: intel.com
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Larysa Zaremba
+> Sent: Monday, December 9, 2024 7:39 PM
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; intel-wired-
+> lan@lists.osuosl.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.or=
+g
+> Cc: Zaremba, Larysa <larysa.zaremba@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
+> Eric Dumazet <edumazet@google.com>; Michal Swiatkowski
+> <michal.swiatkowski@linux.intel.com>; Jakub Kicinski <kuba@kernel.org>;
+> Paolo Abeni <pabeni@redhat.com>; David S. Miller <davem@davemloft.net>
+> Subject: [Intel-wired-lan] [PATCH iwl-net] ice: do not configure destinat=
+ion
+> override for switchdev
+>=20
+> After switchdev is enabled and disabled later, LLDP packets sending stops=
+,
+> despite working perfectly fine before and during switchdev state.
+> To reproduce (creating/destroying VF is what triggers the reconfiguration=
+):
+>=20
+> devlink dev eswitch set pci/<address> mode switchdev echo '2' >
+> /sys/class/net/<ifname>/device/sriov_numvfs
+> echo '0' > /sys/class/net/<ifname>/device/sriov_numvfs
+>=20
+> This happens because LLDP relies on the destination override functionalit=
+y.
+> It needs to 1) set a flag in the descriptor, 2) set the VSI permission to=
+ make it
+> valid. The permissions are set when the PF VSI is first configured, but
+> switchdev then enables it for the uplink VSI (which is always the PF) onc=
+e
+> more when configured and disables when deconfigured, which leads to
+> software-generated LLDP packets being blocked.
+>=20
+> Do not modify the destination override permissions when configuring
+> switchdev, as the enabled state is the default configuration that is neve=
+r
+> modified.
+>=20
+> Fixes: 1a1c40df2e80 ("ice: set and release switchdev environment")
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_eswitch.c |  6 ------
+>  drivers/net/ethernet/intel/ice/ice_lib.c     | 18 ------------------
+>  drivers/net/ethernet/intel/ice/ice_lib.h     |  4 ----
+>  3 files changed, 28 deletions(-)
+>=20
+Hi,
 
---110363376-498301477-1736149714=:36632
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Observing below call trace while creating VFs in Switchdev mode with this p=
+atch in net-queue.
 
-On Mon, 6 Jan 2025, Sz=C5=91ke Benjamin wrote:
+[  +0.000188] ice 0000:b1:00.0: Enabling 1 VFs with 17 vectors and 16 queue=
+s per VF
+[  +0.000062] list_add corruption. next->prev should be prev (ff1d7c830300c=
+6f0), but was ff282828ff282828. (next=3Dff1d7c5367d61330).
+[  +0.000015] ------------[ cut here ]------------
+[  +0.000001] kernel BUG at lib/list_debug.c:29!
+[  +0.000007] Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+[  +0.000004] CPU: 81 UID: 0 PID: 2758 Comm: bash Kdump: loaded Not tainted=
+ 6.13.0-rc3+ #1
+[  +0.000003] Hardware name: Dell Inc. PowerEdge R750/06V45N, BIOS 1.3.8 08=
+/31/2021
+[  +0.000002] RIP: 0010:__list_add_valid_or_report+0x61/0xa0
+[  +0.000008] Code: c7 c7 a8 97 b2 8f e8 7e e4 af ff 0f 0b 48 c7 c7 d0 97 b=
+2 8f e8 70 e4 af ff 0f 0b 4c 89 c1 48 c7 c7 f8 97 b2 8f e8 5f e4 af ff <0f>=
+ 0b 48 89 d1 4c 89 c6 4c 89 ca 48 c7 c7 50 98 b2 8f e8 48 e4 af
+[  +0.000002] RSP: 0018:ff5ebf3d22093d20 EFLAGS: 00010246
+[  +0.000003] RAX: 0000000000000075 RBX: ff1d7c54143a1330 RCX: 000000000000=
+0000
+[  +0.000002] RDX: 0000000000000000 RSI: ff1d7c81f06a0bc0 RDI: ff1d7c81f06a=
+0bc0
+[  +0.000001] RBP: ff1d7c83030097d8 R08: 0000000000000000 R09: ff5ebf3d2209=
+3bd8
+[  +0.000002] R10: ff5ebf3d22093bd0 R11: ffffffff901debc8 R12: ff1d7c5367d6=
+1330
+[  +0.000001] R13: ff1d7c830300c6f0 R14: 0000000000000000 R15: 000000000000=
+0000
+[  +0.000002] FS:  00007fea5e4e4740(0000) GS:ff1d7c81f0680000(0000) knlGS:0=
+000000000000000
+[  +0.000002] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  +0.000001] CR2: 0000562ef57c7608 CR3: 000000019037c002 CR4: 000000000077=
+3ef0
+[  +0.000002] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000000=
+0000
+[  +0.000001] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000000=
+0400
+[  +0.000001] PKRU: 55555554
+[  +0.000002] Call Trace:
+[  +0.000003]  <TASK>
+[  +0.000002]  ? die+0x37/0x90
+[  +0.000007]  ? do_trap+0xdd/0x100
+[  +0.000004]  ? __list_add_valid_or_report+0x61/0xa0
+[  +0.000003]  ? do_error_trap+0x65/0x80
+[  +0.000002]  ? __list_add_valid_or_report+0x61/0xa0
+[  +0.000003]  ? exc_invalid_op+0x52/0x70
+[  +0.000005]  ? __list_add_valid_or_report+0x61/0xa0
+[  +0.000002]  ? asm_exc_invalid_op+0x1a/0x20
+[  +0.000007]  ? __list_add_valid_or_report+0x61/0xa0
+[  +0.000005]  ice_mbx_init_vf_info+0x3c/0x60 [ice]
+[  +0.000076]  ice_initialize_vf_entry+0x99/0xa0 [ice]
 
-> 2025. 01. 05. 22:27 keltez=C3=A9ssel, Andrew Lunn =C3=ADrta:
->> On Sun, Jan 05, 2025 at 09:34:52PM +0100, egyszeregy@freemail.hu wrote=
-:
->>> From: Benjamin Sz=C5=91ke <egyszeregy@freemail.hu>
->>>=20
->>> Merge xt_*.h, ipt_*.h and ip6t_*.h header files, which has
->>> same upper and lower case name format.
->>>=20
->>> Add #pragma message about recommended to use
->>> header files with lower case format in the future.
->>=20
->> It looks like only patch 1/3 make it to the list.
->>=20
->> Also, with a patchset, please include a patch 0/X which gives the big
->> picture of what the patchset does. The text will be used for the merge
->> commit, so keep it formal. 'git format-patch --cover-letter' will
->> create the empty 0/X patch you can edit, or if you are using b4 prep,
->> you can use 'b4 prep --edit-cover' and then 'b4 send' will
->> automatically generate and send it.
->>=20
->> https://docs.kernel.org/process/maintainer-netdev.html
->> https://docs.kernel.org/process/submitting-patches.html
->>
->>      Andrew
->
-> https://lore.kernel.org/lkml/20250105233157.6814-1-egyszeregy@freemail.=
-hu/T/
->
-> It is terribly chaotic how slowly start to appear the full patch list i=
-n the=20
-> mailing list website. It's really time to replace 1990s dev technology =
-with=20
-> something like GitLab or GitHub developing style can provide in 2024.
+Regards,
+Sujai B
 
-No, it was your fault in the v5 series of your patches: you managed to=20
-send all the patches in a single email instead of separated ones.
-
-Best regards,
-Jozsef
---110363376-498301477-1736149714=:36632--
 
