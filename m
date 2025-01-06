@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-155556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61883A02F62
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:01:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5090CA02F6B
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:02:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8903A198B
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:01:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8FF718854A8
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8425E1DF27F;
-	Mon,  6 Jan 2025 18:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055FD1DF968;
+	Mon,  6 Jan 2025 18:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fGxxrFl8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N/bfSPn7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D7D1DF279;
-	Mon,  6 Jan 2025 18:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15AD19CC2A;
+	Mon,  6 Jan 2025 18:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736186501; cv=none; b=RbGXBSfyqrFdbrgQpSqUsv8RtMlJ+ZateEPhNGd1SrAc+imn4sCJbKfIVmorTHAy9mfounwCDOIezlYFiwCPgkvrbLz+kjknsqWYTMF6MEnVwcaKNwrQINocxDz7Pd6Xyrkrkb9Sy6QInVL5IWhSqZ8jwddMaDQLoHgnfw7DawA=
+	t=1736186533; cv=none; b=bIKh8q7yPRztFItTP6S/MlE3SXUQU6EnYBHPEg/ampWgPtj4Qqn76kS8K6hj8BnArIh0R/JX7fDHEn5FJXOFbgEmit9nSFQIhnMTfQEkihrlJle4fzHyrbmYaCooTyMgfFvWpXpRvcrPIcLAlcbu57lYr1sySxSLNzeOzLrHEKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736186501; c=relaxed/simple;
-	bh=ES3Hn8JKqH4OQ0VaEkExuR3ZULx5S4/3pNmynXMRrPs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EEVd4cDuQ6L9Ff38oMwsyHB0NeKx7Idja2gwFQmbyL0EabXvW84NvslQ3gyw45U6/PZGgiKwzxoiM+wEJj5nQ503SfDX7Xm4CgD8GwauZfW4SBY6ldpWV6OWXUVRGq0a6yYqBZkxjpyZ2owgxjN38EG+Xy7zXfH8gjaC+Cd+DEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGxxrFl8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520A9C4CEDF;
-	Mon,  6 Jan 2025 18:01:40 +0000 (UTC)
+	s=arc-20240116; t=1736186533; c=relaxed/simple;
+	bh=EKx8mGh4pzmtlwfchOsFoEQke59Ll1f8oRSb788RmEU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e8S9aaXs1Lkn0bZEpdLs2sC2f156UQZW/DwBw+3gWY/FS5+UyZIfL4hA7tNYOhjBuLXVKU6fHTULZho3Vrgoowm/4disuTqXr8douU3PjZrvW8EpZvMF8liKHLIr+MZDtmc0vgATidQ4XKjDnUVCCeWTLCDfBNwYojC/y7+txIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/bfSPn7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE346C4CED2;
+	Mon,  6 Jan 2025 18:02:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736186500;
-	bh=ES3Hn8JKqH4OQ0VaEkExuR3ZULx5S4/3pNmynXMRrPs=;
+	s=k20201202; t=1736186533;
+	bh=EKx8mGh4pzmtlwfchOsFoEQke59Ll1f8oRSb788RmEU=;
 	h=From:To:Cc:Subject:Date:From;
-	b=fGxxrFl8R37KxmbVgzKKpmGuhUkyNCnpYG2BryOl5k5UbjzcyBNE85NePOwJrgR7k
-	 JJpZofyk1u4Ytfzbz4pjIRxo/5NEiYeKtik+n01eFHQRPJiSZhuGxmJvUSOZfCcA7T
-	 Q8DGhhczF6wdX2nUdMEt7OfCsZEBOYbCrtAeM2LxBRD5kBDvlsarSFvNaDOImdY34L
-	 gUVvsAYJZCOjulaZETfy5G5EdPXSgOiGQ/AEmRMfk3RiOeAB9V86tsvXwKd7EofWj5
-	 7GS8c/ml+aw7uAvNTqU9P7fvO0tU3B6faBhv1VskC2AXTTBcoG3MmOMM1YgIVXwnDw
-	 pBrB0DBsLLmNw==
+	b=N/bfSPn7oJewj55KyLfLw9XEBdORQ0lV5WGTQwBrN1/wfPtirKI8VC13TVWTHVwBF
+	 zB/MA2k3mXFyGkfbFaZwovnJ5Kct1v5Q740MOdVbrJvJ5JNSaopeddwYW6PGjVWrmk
+	 2jStwaMfBnt87V298z7hroxiiHaUNaqfJu+1KWD5ynEDguNNg5we7KuNyg6Vsy49CJ
+	 QI47QpqLrSwy4UHBHq5FpWGLuIrAkpVtNEpn1/mg9pMP7/fXM7DBFyIQwduwymlkYz
+	 LHiMNAaiu4b6dwydSo/3lG5xPl2JBLS1FIRhpx4IUm+ijicw9lGfPher1tUAyUA4rh
+	 B+wc97mcQQ5Fg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	stable@vger.kernel.org,
-	jdamato@fastly.com,
-	almasrymina@google.com,
-	amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com
-Subject: [PATCH net] netdev: prevent accessing NAPI instances from another namespace
-Date: Mon,  6 Jan 2025 10:01:36 -0800
-Message-ID: <20250106180137.1861472-1-kuba@kernel.org>
+	jeroendb@google.com,
+	pkaligineedi@google.com,
+	shailend@google.com,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	willemb@google.com,
+	bpf@vger.kernel.org
+Subject: [PATCH net] eth: gve: use appropriate helper to set xdp_features
+Date: Mon,  6 Jan 2025 10:02:10 -0800
+Message-ID: <20250106180210.1861784-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,146 +65,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The NAPI IDs were not fully exposed to user space prior to the netlink
-API, so they were never namespaced. The netlink API must ensure that
-at the very least NAPI instance belongs to the same netns as the owner
-of the genl sock.
+Commit f85949f98206 ("xdp: add xdp_set_features_flag utility routine")
+added routines to inform the core about XDP flag changes.
+GVE support was added around the same time and missed using them.
 
-napi_by_id() can become static now, but it needs to move because of
-dev_get_by_napi_id().
+GVE only changes the flags on error recover or resume.
+Presumably the flags may change during resume if VM migrated.
+User would not get the notification and upper devices would
+not get a chance to recalculate their flags.
 
-Cc: stable@vger.kernel.org
-Fixes: 1287c1ae0fc2 ("netdev-genl: Support setting per-NAPI config values")
-Fixes: 27f91aaf49b3 ("netdev-genl: Add netlink framework functions for napi")
+Fixes: 75eaae158b1b ("gve: Add XDP DROP and TX support for GQI-QPL format")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-Splitting this into fix per-version is a bit tricky, because we need
-to replace the napi_by_id() helper with a better one. I'll send the
-stable versions manually.
-
-CC: jdamato@fastly.com
-CC: almasrymina@google.com
-CC: amritha.nambiar@intel.com
-CC: sridhar.samudrala@intel.com
+CC: jeroendb@google.com
+CC: pkaligineedi@google.com
+CC: shailend@google.com
+CC: hawk@kernel.org
+CC: john.fastabend@gmail.com
+CC: willemb@google.com
+CC: bpf@vger.kernel.org
 ---
- net/core/dev.c         | 43 +++++++++++++++++++++++++++++-------------
- net/core/dev.h         |  3 ++-
- net/core/netdev-genl.c |  6 ++----
- 3 files changed, 34 insertions(+), 18 deletions(-)
+ drivers/net/ethernet/google/gve/gve_main.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 7c63d97b13c1..e001df4cb486 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -753,6 +753,36 @@ int dev_fill_forward_path(const struct net_device *dev, const u8 *daddr,
- }
- EXPORT_SYMBOL_GPL(dev_fill_forward_path);
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 8a8f6ab12a98..533e659b15b3 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -2241,14 +2241,18 @@ static void gve_service_task(struct work_struct *work)
  
-+/* must be called under rcu_read_lock(), as we dont take a reference */
-+static struct napi_struct *napi_by_id(unsigned int napi_id)
-+{
-+	unsigned int hash = napi_id % HASH_SIZE(napi_hash);
-+	struct napi_struct *napi;
-+
-+	hlist_for_each_entry_rcu(napi, &napi_hash[hash], napi_hash_node)
-+		if (napi->napi_id == napi_id)
-+			return napi;
-+
-+	return NULL;
-+}
-+
-+/* must be called under rcu_read_lock(), as we dont take a reference */
-+struct napi_struct *netdev_napi_by_id(struct net *net, unsigned int napi_id)
-+{
-+	struct napi_struct *napi;
-+
-+	napi = napi_by_id(napi_id);
-+	if (!napi)
-+		return NULL;
-+
-+	if (WARN_ON_ONCE(!napi->dev))
-+		return NULL;
-+	if (!net_eq(net, dev_net(napi->dev)))
-+		return NULL;
-+
-+	return napi;
-+}
-+
- /**
-  *	__dev_get_by_name	- find a device by its name
-  *	@net: the applicable net namespace
-@@ -6293,19 +6323,6 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
- }
- EXPORT_SYMBOL(napi_complete_done);
- 
--/* must be called under rcu_read_lock(), as we dont take a reference */
--struct napi_struct *napi_by_id(unsigned int napi_id)
--{
--	unsigned int hash = napi_id % HASH_SIZE(napi_hash);
--	struct napi_struct *napi;
--
--	hlist_for_each_entry_rcu(napi, &napi_hash[hash], napi_hash_node)
--		if (napi->napi_id == napi_id)
--			return napi;
--
--	return NULL;
--}
--
- static void skb_defer_free_flush(struct softnet_data *sd)
+ static void gve_set_netdev_xdp_features(struct gve_priv *priv)
  {
- 	struct sk_buff *skb, *next;
-diff --git a/net/core/dev.h b/net/core/dev.h
-index aa91eed55a40..08812a025a9b 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -22,6 +22,8 @@ struct sd_flow_limit {
- 
- extern int netdev_flow_limit_table_len;
- 
-+struct napi_struct *netdev_napi_by_id(struct net *net, unsigned int napi_id);
++	xdp_features_t xdp_features;
 +
- #ifdef CONFIG_PROC_FS
- int __init dev_proc_init(void);
- #else
-@@ -269,7 +271,6 @@ void xdp_do_check_flushed(struct napi_struct *napi);
- static inline void xdp_do_check_flushed(struct napi_struct *napi) { }
- #endif
- 
--struct napi_struct *napi_by_id(unsigned int napi_id);
- void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu);
- 
- #define XMIT_RECURSION_LIMIT	8
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 125b660004d3..a3bdaf075b6b 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -167,8 +167,6 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
- 	void *hdr;
- 	pid_t pid;
- 
--	if (WARN_ON_ONCE(!napi->dev))
--		return -EINVAL;
- 	if (!(napi->dev->flags & IFF_UP))
- 		return 0;
- 
-@@ -234,7 +232,7 @@ int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	rtnl_lock();
- 	rcu_read_lock();
- 
--	napi = napi_by_id(napi_id);
-+	napi = netdev_napi_by_id(genl_info_net(info), napi_id);
- 	if (napi) {
- 		err = netdev_nl_napi_fill_one(rsp, napi, info);
+ 	if (priv->queue_format == GVE_GQI_QPL_FORMAT) {
+-		priv->dev->xdp_features = NETDEV_XDP_ACT_BASIC;
+-		priv->dev->xdp_features |= NETDEV_XDP_ACT_REDIRECT;
+-		priv->dev->xdp_features |= NETDEV_XDP_ACT_NDO_XMIT;
+-		priv->dev->xdp_features |= NETDEV_XDP_ACT_XSK_ZEROCOPY;
++		xdp_features = NETDEV_XDP_ACT_BASIC;
++		xdp_features |= NETDEV_XDP_ACT_REDIRECT;
++		xdp_features |= NETDEV_XDP_ACT_NDO_XMIT;
++		xdp_features |= NETDEV_XDP_ACT_XSK_ZEROCOPY;
  	} else {
-@@ -355,7 +353,7 @@ int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info)
- 	rtnl_lock();
- 	rcu_read_lock();
+-		priv->dev->xdp_features = 0;
++		xdp_features = 0;
+ 	}
++
++	xdp_set_features_flag(priv->dev, xdp_features);
+ }
  
--	napi = napi_by_id(napi_id);
-+	napi = netdev_napi_by_id(genl_info_net(info), napi_id);
- 	if (napi) {
- 		err = netdev_nl_napi_set_config(napi, info);
- 	} else {
+ static int gve_init_priv(struct gve_priv *priv, bool skip_describe_device)
 -- 
 2.47.1
 
