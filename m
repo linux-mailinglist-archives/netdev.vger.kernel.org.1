@@ -1,112 +1,83 @@
-Return-Path: <netdev+bounces-155536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2AEFA02E5F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:55:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 931BBA02E83
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:02:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 425AE3A60F0
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C179E7A182B
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E281DF244;
-	Mon,  6 Jan 2025 16:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3D43597B;
+	Mon,  6 Jan 2025 17:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nG6rcyki"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="48N32v4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8377A1DEFF3
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 16:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01E8C8DF
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 17:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736182470; cv=none; b=rBiCSztBB4BtPmS2+xy2pgPRj/CKIoWkktvy8gl2Yh3UAKd4J7umMN+6NPfC2xMCh6iK6mgZGszoN3XME7bMf1VvY0zbT2ZV7fWdKSj5Os8RCcBaLasMf+UQqewpVyPH1hZ80zjBmnv1sI98ziSHWDTuINq7P2eRuk9kUwo2XUk=
+	t=1736182944; cv=none; b=IUQg32wqq18McVrE4lkTiDz52Ec6j8TVCsEQqb9tsblOMEIkkxhCgsLlPAavWYSrgdOMGYOW0qiSyoWjTo2gtwJ21Ai2Kl60Desll0xr0VmXo6eoVgy2+T0LlC/T9iWKwtjTDUPSq4IYIVewH5tJa7UZHMYfBxZ+Wr++zro0nJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736182470; c=relaxed/simple;
-	bh=Hwn8mTXtB0panZbuQJAo3FZccxfMQsrHQj7DczTawOQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sXUeE5DXyKgFgPWSnvFouspmp40wrr+2pbIi5sWxulZlfAe7lt911u/UYphS0Z2yE9AHFwu+NqQKm3OMZOEboTQi+c+pOoDPWfnjbQ5rOIbo0ITNqOnKw1G0e2d087smTkGdx7ST3NBKgbrxZ/Gg/quVzhdw3CWlc2FNTWuoEYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nG6rcyki; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB538C4CEE6;
-	Mon,  6 Jan 2025 16:54:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736182470;
-	bh=Hwn8mTXtB0panZbuQJAo3FZccxfMQsrHQj7DczTawOQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nG6rcyki8blDc+5cA31iAyjk58bUj3l3gF/wLcWY3K9osm1fQCsyWd4wFO2pN6F0E
-	 Mdwmug6Zq3VeAq3cd7rXvnwo6n/sIFqiXQP9SIopsv6GE1Fe/BjIDZlSRfvf7oUddR
-	 5ITDzaEs59fXqYBCDA2K/xryfCbU+ohs2ENkoA2Ak2cr3oJ+HhI7GsDf0Mn+V/0/9w
-	 oXXeZPh+nUpfXfyn75x2aYkzDYs4/ushtYwAe5vOgqpa4enSSa6CD9g7ilVTEJFMuW
-	 XDzMPCC3HMlqnpEl7ozhtT0+YXEmPzw6I4rIEg6dIlFVZeXWXaAJqoQmlyOAcYPyvu
-	 2rhGiXtPa+BMw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	Jakub Kicinski <kuba@kernel.org>,
-	Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com,
-	lars.povlsen@microchip.com
-Subject: [PATCH net 8/8] MAINTAINERS: remove Lars Povlsen from Microchip Sparx5 SoC
-Date: Mon,  6 Jan 2025 08:54:04 -0800
-Message-ID: <20250106165404.1832481-9-kuba@kernel.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250106165404.1832481-1-kuba@kernel.org>
-References: <20250106165404.1832481-1-kuba@kernel.org>
+	s=arc-20240116; t=1736182944; c=relaxed/simple;
+	bh=M5BfNx6cbLsopr/zvmt8vFedE5KeJOVO3ZfYYjqXe9k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tSMsuDdEtlDOclG254DVz47yYaRgTCXffbzFDWai9tcSHBZMinRbnARe0soeNxyYEXbOinh5Gva4xkhXzZevAxE41X/IkTpP5ovOoW15pkZp1oaiNbMgkA+RoCq2M5Rxu3dyblwTDNp/52mgMJY1lID4a0pLlVMGOeDCUR48oAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=48N32v4m; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VS+0b0qDAmY2DVRpWtJdhv1Wj/jUpe1PN7cG2IVVK6s=; b=48N32v4mh61pgqdp728cPK8txe
+	rsVkq89Q+XfRbVFnYlfltPXT+2NRuPeZy0GIX3l5I0rLRzM+aAHGmPP1jr8gHI1fTfPbCEuwzAACy
+	S73OkkWiOP53ILosOVld/5x3N/GRDdMEhKzVmYmh65eRw/8AfEbG4CZO+MAwIUugONCw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tUqUT-001wHK-RT; Mon, 06 Jan 2025 18:02:09 +0100
+Date: Mon, 6 Jan 2025 18:02:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 09/17] net: stmmac: convert to use
+ phy_eee_rx_clock_stop()
+Message-ID: <a0fca6b4-9bf8-45dd-9ac5-0cc94cfe2195@lunn.ch>
+References: <Z3vLbRQ9Ctl-Rpdg@shell.armlinux.org.uk>
+ <E1tUmAj-007VXV-Lb@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tUmAj-007VXV-Lb@rmk-PC.armlinux.org.uk>
 
-We have not seen emails or tags from Lars in almost 4 years.
-Steen and Daniel are pretty active, but the review coverage
-isn't stellar (35% of changes go in without a review tag).
+On Mon, Jan 06, 2025 at 12:25:29PM +0000, Russell King (Oracle) wrote:
+> Convert stmmac to use phy_eee_rx_clock_stop() to set the PHY receive
+> clock stop in LPI setting, rather than calling the legacy
+> phy_init_eee() function.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Subsystem ARM/Microchip Sparx5 SoC support
-  Changes 28 / 79 (35%)
-  Last activity: 2024-11-24
-  Lars Povlsen <lars.povlsen@microchip.com>:
-  Steen Hegelund <Steen.Hegelund@microchip.com>:
-    Tags 6c7c4b91aa43 2024-04-08 00:00:00 15
-  Daniel Machon <daniel.machon@microchip.com>:
-    Author 48ba00da2eb4 2024-04-09 00:00:00 2
-    Tags f164b296638d 2024-11-24 00:00:00 6
-  Top reviewers:
-    [7]: horms@kernel.org
-    [1]: jacob.e.keller@intel.com
-    [1]: jensemil.schulzostergaard@microchip.com
-    [1]: horatiu.vultur@microchip.com
-  INACTIVE MAINTAINER Lars Povlsen <lars.povlsen@microchip.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: Steen.Hegelund@microchip.com
-CC: daniel.machon@microchip.com
-CC: lars.povlsen@microchip.com
----
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 009630fe014c..2dae9d68c9b9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2689,7 +2689,6 @@ N:	at91
- N:	atmel
- 
- ARM/Microchip Sparx5 SoC support
--M:	Lars Povlsen <lars.povlsen@microchip.com>
- M:	Steen Hegelund <Steen.Hegelund@microchip.com>
- M:	Daniel Machon <daniel.machon@microchip.com>
- M:	UNGLinuxDriver@microchip.com
--- 
-2.47.1
-
+    Andrew
 
