@@ -1,118 +1,81 @@
-Return-Path: <netdev+bounces-155453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 844DFA02625
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 14:08:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7243CA0264A
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 14:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1490E1885930
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:08:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74EEE3A605A
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B811DD87C;
-	Mon,  6 Jan 2025 13:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6641DC98D;
+	Mon,  6 Jan 2025 13:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUDeXyN1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KmYXhxuy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BA827726;
-	Mon,  6 Jan 2025 13:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B434B1DB362;
+	Mon,  6 Jan 2025 13:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736168899; cv=none; b=KUy1X2zf3QMINTwHUfi9h77hi664qKnHXqYEKkHx05TErijOZkWhv1BxHUefPNGIHfdYH0C1wAjlxqmzz193kGRtDaLiXtLqO64htc1vGS48dhf0DkWMpFBysollnHxdan7KbwJCwWCL40XCQw4EJvvvPeD+GSnxC5dKfuRkHH8=
+	t=1736169104; cv=none; b=g4n0qZULKX4JDS4CousWCAhjfvd10k5S+BLsRFx3D/IwiPDNbQTggYnJLhh0OgaXbK9G/gwa7LVQPQIZBQ9evH2bH1k7eWcHnQePpBa9sB6wlID4exs6Lo1FQmlk3WwP3/2W1G//TrQ2yTm5K73s1Ph+uaUnFcQ7k7fQf3s7k8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736168899; c=relaxed/simple;
-	bh=Odx9Mi78CnBl/areN0tvg+kryNXSjlbRYjIftgM5H8c=;
+	s=arc-20240116; t=1736169104; c=relaxed/simple;
+	bh=znXx1vBzSeFX/v04A2pBxldDMCIVvWraxlI9GGnBFS8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BWhRb14iTNUKnpkNl3cCTgzHEFOXOhiIilvx9GZZ0Hx2rcIFjUT0q4E7VteadJO2b1fEos5e4qNwHlXdodw/899ZWWpJNHT6HLOqvrqgCW2Cr0mGCIhtDAjApLBKvNvORTQ7v6TRLkXn5De2cCeCrTAr00cPJzT/5k86QUJC/0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUDeXyN1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 997E8C4CED2;
-	Mon,  6 Jan 2025 13:08:12 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=rPEkkaciqnLGe8ga5CMHAJHBwOKegtW8ksw0W8AiIXAWrrl5bshrIbYcUqA7EmWauwk1kwazw93XzuwOhoHn5OvP39nP45iHZXOVgp2q8drNxzig9A0jGvJJBecL2qFspcaq3W3xGNtOdbsM4KqN1v7heu3k0lY9SdbWwSFSd0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KmYXhxuy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AB47C4CED2;
+	Mon,  6 Jan 2025 13:11:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736168897;
-	bh=Odx9Mi78CnBl/areN0tvg+kryNXSjlbRYjIftgM5H8c=;
+	s=k20201202; t=1736169104;
+	bh=znXx1vBzSeFX/v04A2pBxldDMCIVvWraxlI9GGnBFS8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RUDeXyN1Jlhl/AxkbRlfAf2u8WA31or+eOCr5Y7MMHiOuy80W6WA+gJjc14yb/dAR
-	 jI8DFjz03bz/c3f6SivfQuByjI3oOnbsG8TTlZc0nyos/TjyLu57qMMbs35e/mdor2
-	 EU2DaplKu0ygrgNvJw4wXAfqU8teWx7y6WapfRtfU8vSQ9duGGrjTTZPc/6b1v5/+B
-	 mQjBpjmqRR99R1DWkCZhtnyDrJfO9TMRHSCDdUy/ANsEZym7aOAlBbDIMZxWcsMl44
-	 oDjFCT6tfN169qJdVEJu0ezMiXe0E/Wdgh01/WAieVnqtUh2OilVLu7egU3i1RnXN9
-	 4/nBKZmMrd5TQ==
-Date: Mon, 6 Jan 2025 13:08:09 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Raphael Gallais-Pou <rgallaispou@gmail.com>
-Cc: Patrice Chotard <patrice.chotard@foss.st.com>,
-	Thinh Nguyen <Thinh.Nguyen@synopsys.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-spi@vger.kernel.org
-Subject: Re: [PATCH 0/6] Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
-Message-ID: <eec9caa0-0029-4774-842e-af1d1290ad97@sirena.org.uk>
-References: <20241229-update_pm_macro-v1-0-c7d4c4856336@gmail.com>
+	b=KmYXhxuyiSPJe4a6bbV3UUgMGunnWtXC4tIWCe/N5e5UmZPXytEz69M7HDZdhoVkh
+	 O7JHjjLr7IKis7UTq1cG3v0faxQfuOO+5AI09mbLzjW6YBaR2OZ2FDbBBeFjn1Bk+D
+	 gQgZrQ3hIaadbsNwgiXLfbQ0tk8QrfByYVkbZ1ZvyhgmqqH5XU6sX/EM+cXhcoqLLX
+	 bEViFiXcszAyYusxnuNn4TMD+F09twpv75jRdljIL80M9teILh25cODGUKWjN+AgqY
+	 djxZR51HaXoiox2SAEk0DV6KY5aPPX7PGOOjbYtIiPgcV0jvN2ca5Sh48SSRYJQyH3
+	 niJ2TZTjWRH1A==
+Date: Mon, 6 Jan 2025 13:11:40 +0000
+From: Simon Horman <horms@kernel.org>
+To: linux@treblig.org
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+Message-ID: <20250106131140.GJ4068@kernel.org>
+References: <20241226140923.85717-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="emAp2yveWLVSOdEe"
-Content-Disposition: inline
-In-Reply-To: <20241229-update_pm_macro-v1-0-c7d4c4856336@gmail.com>
-X-Cookie: Do not pick the flowers.
-
-
---emAp2yveWLVSOdEe
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20241226140923.85717-1-linux@treblig.org>
 
-On Sun, Dec 29, 2024 at 12:32:39AM +0100, Raphael Gallais-Pou wrote:
-> Prevent the use of macros, and rely instead on kernel configuration for
-> power management.
->=20
-> This series makes the same change over six different drivers:
-> usb-st-dwc3, sdhci-st, st-spi-fsm, ahci_st, sti-dwmac, spi-st.
+On Thu, Dec 26, 2024 at 02:09:23PM +0000, linux@treblig.org wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> The const struct ixgbevf_hv_mbx_ops was added in 2016 as part of
+> commit c6d45171d706 ("ixgbevf: Support Windows hosts (Hyper-V)")
+> 
+> but has remained unused.
+> 
+> The functions it references are still referenced elsewhere.
+> 
+> Remove it.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-Is there any actual interaction between these changes?  In general you
-shouldn't combine patches for multiple subsystems into a single series
-unless there's some dependency or other interaction since it just
-complicates management of the patches.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
---emAp2yveWLVSOdEe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmd71bkACgkQJNaLcl1U
-h9AGHwf/V/ekmXWwVL15xDEBbZZ+uqPpz0aLMa1v6gvSRA3S9ugHT9vW0elxEGf0
-2+0EU7GuIo88DOYxKpOYDd1XHk6xkBI7Whic7ijl1+LK8Kq6Rec0zpzlsv7Rcja1
-TmoHi68uCDrHguH5BH94YBKZVfT2U0gSc20ljleO66MKEJQEYob46c3649Gbpxwl
-UPiwHVuWa6eMXfzJsS+vZgMEE58Q57GLiVmbZcN0u0FC1QM83kVDExYTCXuTtwx0
-g5fiTrBVg4O93cd003jWflIlqao9U/nMREgX5M9/CytGX32MeXIPLlt73A15itVF
-DQJXk1CapG8Sm0o+2Y/tH5c6IVJqFA==
-=p10y
------END PGP SIGNATURE-----
-
---emAp2yveWLVSOdEe--
 
