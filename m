@@ -1,55 +1,61 @@
-Return-Path: <netdev+bounces-155511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE4FA029E3
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:28:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 437C9A02A66
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:33:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DE4A161792
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 15:28:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77FE73A59F6
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 15:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EECB1DB546;
-	Mon,  6 Jan 2025 15:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF05B1DDC36;
+	Mon,  6 Jan 2025 15:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DFb7sKSO"
 X-Original-To: netdev@vger.kernel.org
-Received: from a3.inai.de (a3.inai.de [144.76.212.145])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F9115665D;
-	Mon,  6 Jan 2025 15:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.212.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA2D1DC9BC;
+	Mon,  6 Jan 2025 15:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736177281; cv=none; b=rsj+g4b306o2sgpkUF9iwM3KxqzW0+h4O3VUcUYH4enCL10pUD9WmVPerjVUkI8ewgzfwqUU1/EZEKD+0pFq9paly53dvrfauUNc9bHXMhVa46oi+dkyQi4jB7O/ME+8bdxSDCAB333Z4Wv18rpSRXYrogBizDMhjDt3EiCuT7w=
+	t=1736177507; cv=none; b=Ys5eTlAuijUxQTGKkkDPGVGqi3w4VF0Z/h/zcNwYxIagr+U4yFUdQ//hkXeMqFrOcboWo+5WhV2mBIqWu6tbRUUzY8qW0btGYr/GBrb/JZxU1g6sSwe1P3ihBWweMylUsGAVBbLgpl+5i8v3jOPbyvvUyyE5SN6u4QbOo2JL5Q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736177281; c=relaxed/simple;
-	bh=ZpGHfXJzYyi3RZNBlhgNiJe2kBFbc6YPAClKvu+MjAs=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Gk0BmgptibcvflET+RJnOcqwKAKcDm7rxa1wbDdOhmBsGjxklAqGsV4gZwZR68Y0MbTSWoiVtzvIUW3i9R9Dy3HyF62Zx3wrsh9N4bYwOhS6rxjXG7ctIuL1GMUFmfJRi7cBht2YiXxc8gslDbKjWo1wEhVNZfpnCcoLnMv5+hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de; spf=fail smtp.mailfrom=inai.de; arc=none smtp.client-ip=144.76.212.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=inai.de
-Received: by a3.inai.de (Postfix, from userid 25121)
-	id A9A1D1003DFA62; Mon,  6 Jan 2025 16:27:49 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by a3.inai.de (Postfix) with ESMTP id A7EF0110073C1D;
-	Mon,  6 Jan 2025 16:27:49 +0100 (CET)
-Date: Mon, 6 Jan 2025 16:27:49 +0100 (CET)
-From: Jan Engelhardt <ej@inai.de>
-To: Andrew Lunn <andrew@lunn.ch>
-cc: egyszeregy@freemail.hu, fw@strlen.de, pablo@netfilter.org, 
-    lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org, 
-    amiculas@cisco.com, kadlec@netfilter.org, davem@davemloft.net, 
-    dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
-    pabeni@redhat.com, horms@kernel.org, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, linux-kernel@vger.kernel.org, 
-    netdev@vger.kernel.org
-Subject: Re: [PATCH v7 2/3] netfilter: x_tables: Merge xt_*.c files which
- has same name.
-In-Reply-To: <6f276b2e-de9d-427e-a3a3-aac9ed340357@lunn.ch>
-Message-ID: <7ppss971-6406-82q4-3371-1q8n9299qrq1@vanv.qr>
-References: <20250105233157.6814-1-egyszeregy@freemail.hu> <20250105233157.6814-3-egyszeregy@freemail.hu> <6f276b2e-de9d-427e-a3a3-aac9ed340357@lunn.ch>
-User-Agent: Alpine 2.26 (LSU 649 2022-06-02)
+	s=arc-20240116; t=1736177507; c=relaxed/simple;
+	bh=1CDx1KZGRF4KtODc2j+SU0Oxq5Hi2xlNf9VcrcJLqqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FglsVRjWG0gcuLz5G6TpQvObYHMPC+jVFsXQYHxGUHNceaXYhATpS3VdNpIfsiM+lZ1apZ6fq64L9Q4kauSJ5JM0nwIH2v8EbfosdDocrMf94Jsf8c4ka8X0s9kjrkz0P/A2Zk/oWiLul8DacOjNPMmNOfmuZOsoGkBTK2DYlnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DFb7sKSO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAA0CC4CED2;
+	Mon,  6 Jan 2025 15:31:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736177506;
+	bh=1CDx1KZGRF4KtODc2j+SU0Oxq5Hi2xlNf9VcrcJLqqk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DFb7sKSO2QFKTzxUlzKpGjsRN72jPlJpkBXFN41PwOH4CD0/V9U+e0Hw6AtNLwJaI
+	 bQ2uCiSQXbjeMmH2HzLqsJgxL2TJSTIZjlkiurAP97teLBJpxDFwSB0cEwU+OS9Dls
+	 mVblcoJvq/MQ6Zu8NWV4V0fkrI0qYGW705tiPXS2+KC5dWnUdnId+TR/gZ3g2PHqSf
+	 Wn9S3FZ+MqWXCZOTwRF7r//0UyRM8Vk1L8D0J/xAcXSLYV5tRiTBynTT55LgrW3XWA
+	 A3Xe0gwm+jsD0a9xNcu0iXY4FN8pF7ByHelEF62GblFbOj7A4laXq4MaSa8T6k0gr7
+	 j5meuSF1u6T3w==
+Date: Mon, 6 Jan 2025 07:31:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Su Hui <suhui@nfschina.com>
+Cc: alexanderduyck@fb.com, kernel-team@meta.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ jdelvare@suse.com, linux@roeck-us.net, michal.swiatkowski@linux.intel.com,
+ mohsin.bashr@gmail.com, sanmanpradhan@meta.com, vadim.fedorenko@linux.dev,
+ kalesh-anakkur.purayil@broadcom.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH v3] eth: fbnic: Revert "eth: fbnic: Add hardware
+ monitoring support via HWMON interface"
+Message-ID: <20250106073144.25d6b9fb@kernel.org>
+In-Reply-To: <20250106023647.47756-1-suhui@nfschina.com>
+References: <20250106023647.47756-1-suhui@nfschina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,41 +63,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Mon,  6 Jan 2025 10:36:48 +0800 Su Hui wrote:
+> There is a garbage value problem in fbnic_mac_get_sensor_asic(). 'fw_cmpl'
+> is uninitialized which makes 'sensor' and '*val' to be stored garbage
+> value. Revert commit d85ebade02e8 ("eth: fbnic: Add hardware monitoring
+> support via HWMON interface") to avoid this problem.
+> 
+> Fixes: d85ebade02e8 ("eth: fbnic: Add hardware monitoring support via HWMON interface")
+> Signed-off-by: Su Hui <suhui@nfschina.com>
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Suggested-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-On Monday 2025-01-06 15:22, Andrew Lunn wrote:
->> x86_64-before:
->> text    data     bss     dec     hex filename
->>  716     432       0    1148     47c xt_dscp.o
->> 1142     432       0    1574     626 xt_DSCP.o
->>  593     224       0     817     331 xt_hl.o
->>  934     224       0    1158     486 xt_HL.o
->> 1099     120       0    1219     4c3 xt_rateest.o
->> 2126     365       4    2495     9bf xt_RATEEST.o
->>  747     224       0     971     3cb xt_tcpmss.o
->> 2824     352       0    3176     c68 xt_TCPMSS.o
->> total data: 2373
->> 
->> x86_64-after:
->> text    data     bss     dec     hex filename
->> 1709     848       0    2557     9fd xt_dscp.o
->> 1352     448       0    1800     708 xt_hl.o
->> 3075     481       4    3560     de8 xt_rateest.o
->> 3423     576       0    3999     f9f xt_tcpmss.o
->> total data: 2353
->
->So you have saved 20 bytes in the data segment. A 0.8% reduction. If i
->was developing this patchset, when i see this number, i would
->immediately think, why am i bothering?
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
-Before:
-$ lsmod
-xt_TCPMSS              12288  0
-xt_tcpmss              12288  0
-
-After:
-$ lsmod
-xt_tcpmss              12288  0
-
-which is a 50% reduction in run-time memory use.
+Thanks!
 
