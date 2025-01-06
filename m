@@ -1,139 +1,122 @@
-Return-Path: <netdev+bounces-155388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C808CA0218B
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:14:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF13EA021F8
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:35:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4770E1884D89
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:14:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44FA63A411D
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5DF1D79A9;
-	Mon,  6 Jan 2025 09:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB291D63D6;
+	Mon,  6 Jan 2025 09:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CT9daXND"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6608C73451;
-	Mon,  6 Jan 2025 09:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78562CA8
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 09:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736154884; cv=none; b=JXzkwzN8pMe1PJxPl6QflOjakrb4ainEN7es5rXZKwDvLTQ53rCoobOcgJSBA0sfp4snOBUI9SOHQuAUHHeK8u3ODB0hF8dvs6ZbtWiG1CyqN2Sir9BdQggNjMl9AE1rb1zVmi0ufcifLvZ89dU5xRrOdNeigydSN3bWtW7g8PA=
+	t=1736156124; cv=none; b=TdvVqqSpk7QYjR2O61Y1mUXNtpCHwA62k4ZOix1Ii+ZvzC14Oeo8VS+PB9XWIeD4hhFlqzC0KdysOCsj3ED+tEGXjATeKOQBwGw9fa8p6y1+414G4RecVOslN+vmqPBNwYKgh2F2Gb8AhJz1lD4wOsozExAhjgksR5fx+EPGyhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736154884; c=relaxed/simple;
-	bh=2h85PlXOibt5ZYISHaWad7JB7lZUNHsMN+lZ2aFAPXo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pVVEXDrRpkt9bdyWkaVKXx7CpRRSx3DZvpGHz6Ne3qiLxpSHVwAAz+WytmKJpGxllU/GnCSwnzRuGjuUsPEqKtArT3DmGGtfhmeJoI9EOkvDthNvbtZJuMh1YGbV+e6O8BDDsCqcvyt+3ijV0PKsSCJA9jJz/2N/F/U4pfpJZm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: a504dd70cc0e11efa216b1d71e6e1362-20250106
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED
-	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD
-	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
-	AMN_T1, AMN_GOOD, AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.45,REQID:c611a422-6b4d-411c-b4eb-caccfa52d457,IP:10,
-	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-24
-X-CID-INFO: VERSION:1.1.45,REQID:c611a422-6b4d-411c-b4eb-caccfa52d457,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-24
-X-CID-META: VersionHash:6493067,CLOUDID:8742086dd31c12bd01e96ec0e303e1df,BulkI
-	D:250106171434K6ZSZBQC,BulkQuantity:0,Recheck:0,SF:17|19|24|38|43|66|74|78
-	|102,TC:nil,Content:0|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:ni
-	l,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:
-	0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
-X-UUID: a504dd70cc0e11efa216b1d71e6e1362-20250106
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.160.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1492161839; Mon, 06 Jan 2025 17:14:34 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH] net/mlx5: Fix variable not being completed when function returns
-Date: Mon,  6 Jan 2025 17:14:26 +0800
-Message-Id: <20250106091426.256243-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1736156124; c=relaxed/simple;
+	bh=bpcL5OLv4ox8BQllyi2DsUW34N4mZc1qT+Srpf5qVdw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oJyc4hqXhsTlxQr9GIdpJfFGLO0dDcU3eUBEV256fHKMehKX9qf6NBs13pQcVjFcl+SIygkDc7A8IH6q+IHA/x6vOTrQ7PWYHasbuZ2g9ixsWzfwnhWJmF+XAhHu49CzLwIGJLvSI+G7L9bTUyYkenCPW7mWmekjlPFDiFKXM+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CT9daXND; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d90a5581fcso6290153a12.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 01:35:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736156121; x=1736760921; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bpcL5OLv4ox8BQllyi2DsUW34N4mZc1qT+Srpf5qVdw=;
+        b=CT9daXNDfy+I/HUPeCuLXMuvUWl0cZ1a59cy/mOcwiaS621DMbwJKZ7pvd8fhxpc2U
+         IhFvAieS40Gx3SuzDvDAH8k5TVHgI+56hx8brOMdNKJ+tyThAsMbM5ZrZQ0IVcxjC4lE
+         r8AehRCPXrCQJ3IeH4mWte1TpbuZFaUqBUUeD2lJEWVFsJWiVm8iAAcEV1Eo/11ITkbc
+         jmzmel73+nS3Kffdh48U0ZVTvsVxJlYU+P+RkLsXj9MZ68hRGopcJXs4V50IDi06XXO7
+         2Vo/iUU5wDtidZ020FlYAyEVxDGBu/jN+gCsa564lCTAfr9zCp0eJ06DBrsC3Y/OS7W1
+         NTLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736156121; x=1736760921;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bpcL5OLv4ox8BQllyi2DsUW34N4mZc1qT+Srpf5qVdw=;
+        b=XFTAfaby5bZrduqrVN1joyBn1v0CrWML4hwSNOdk8lr6BxeC6jM8orbzQjAcYrCZFj
+         iXjJ+SpjS3KK6/pAfqlH+o3INC0AqwwbYAwLuAsKEtwh2GY4JpUuZOlFc1V1H2BgEVyY
+         D92S7OoYHrc14qJtr06Ef3vcaRJf5Nc6OWZyUTKKz1kBDPp5HQsr4j939VYyBJgZIr2n
+         cXgwkhq/NRGAbqDNnj/8hvDhDopW0FGHceALhBCFd3f4jSdhiDjT+OYP7KNz2iaNC9Qn
+         MHDJTBlpk4liMa/yeHNF2HiFr2IvOGEphmCONi+b9mpq5aPlZkJLydl+mTmZhXhKOMAl
+         HbDw==
+X-Forwarded-Encrypted: i=1; AJvYcCX8/VmIVJaNcJCF2bR5T427djDHFB5WP/G0mnrVojHyDu/VFefvPQEwgp4IHaaBLTxoySUXIaI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEnJlGGV8pcj5iHe5lVtpYMEkRjl7qiukG7cGPeQ//bAz90AM+
+	MsO1MPL3NaAbn9UVM/lxhmjM+pac/iCIhwIPY6WcQFMBNkEffSMfW713/Hx0uxlKyFgm8dOXoF7
+	z9eFRrbc2Jx0wDXDJ8unb6v4cjyXhtvL40TFi
+X-Gm-Gg: ASbGncuSi7/SIOznGPP/u09SaTEsXbuqwiFaojEncBOuTD8O+zoHNI5ioPb3dzLfOKV
+	IQpKaDFqKXGPjC8u1940aG1tYWkm1Q/RqMXOUkA==
+X-Google-Smtp-Source: AGHT+IFfPWu0p0264dJQ7XPoFSUseo4ZOQb9MwYclNVToeZfEnPYW2t5cW8/czEi69Hxt/jUKxvazz3PK3HZznqJI7g=
+X-Received: by 2002:a05:6402:5243:b0:5d0:bde9:2992 with SMTP id
+ 4fb4d7f45d1cf-5d81ddfbd83mr52046405a12.26.1736156120855; Mon, 06 Jan 2025
+ 01:35:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250103185954.1236510-1-kuba@kernel.org> <20250103185954.1236510-2-kuba@kernel.org>
+In-Reply-To: <20250103185954.1236510-2-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 6 Jan 2025 10:35:09 +0100
+Message-ID: <CANn89iJyuomh=K2_3yFBky+N89STR1RVXMf4ry0VRDpW0X6nHg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/8] net: make sure we retain NAPI ordering on netdev->napi_list
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	dw@davidwei.uk, almasrymina@google.com, jdamato@fastly.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-    The cmd_work_handler function returns from the child function
-    cmd_alloc_index because the allocate command entry fails,
-    Before returning, there is no complete ent->slotted.
+On Fri, Jan 3, 2025 at 8:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> Netlink code depends on NAPI instances being sorted by ID on
+> the netdev list for dump continuation. We need to be able to
+> find the position on the list where we left off if dump does
+> not fit in a single skb, and in the meantime NAPI instances
+> can come and go.
+>
+> This was trivially true when we were assigning a new ID to every
+> new NAPI instance. Since we added the NAPI config API, we try
+> to retain the ID previously used for the same queue, but still
+> add the new NAPI instance at the start of the list.
+>
+> This is fine if we reset the entire netdev and all NAPIs get
+> removed and added back. If driver replaces a NAPI instance
+> during an operation like DEVMEM queue reset, or recreates
+> a subset of NAPI instances in other ways we may end up with
+> broken ordering, and therefore Netlink dumps with either
+> missing or duplicated entries.
+>
+> At this stage the problem is theoretical. Only two drivers
+> support queue API, bnxt and gve. gve recreates NAPIs during
+> queue reset, but it doesn't support NAPI config.
+> bnxt supports NAPI config but doesn't recreate instances
+> during reset.
+>
+> We need to save the ID in the config as soon as it is assigned
+> because otherwise the new NAPI will not know what ID it will
+> get at enable time, at the time it is being added.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-    The patch fixes it.
-
-	Trace:
-
-     mlx5_core 0000:01:00.0: cmd_work_handler:877:(pid 3880418): failed to
-	  allocate command entry
-     INFO: task kworker/13:2:4055883 blocked for more than 120 seconds.
-           Not tainted 4.19.90-25.44.v2101.ky10.aarch64 #1
-     "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables
-	  this message.
-     kworker/13:2    D    0 4055883      2 0x00000228
-     Workqueue: events mlx5e_tx_dim_work [mlx5_core]
-     Call trace:
-      __switch_to+0xe8/0x150
-      __schedule+0x2a8/0x9b8
-      schedule+0x2c/0x88
-      schedule_timeout+0x204/0x478
-      wait_for_common+0x154/0x250
-      wait_for_completion+0x28/0x38
-      cmd_exec+0x7a0/0xa00 [mlx5_core]
-      mlx5_cmd_exec+0x54/0x80 [mlx5_core]
-      mlx5_core_modify_cq+0x6c/0x80 [mlx5_core]
-      mlx5_core_modify_cq_moderation+0xa0/0xb8 [mlx5_core]
-      mlx5e_tx_dim_work+0x54/0x68 [mlx5_core]
-      process_one_work+0x1b0/0x448
-      worker_thread+0x54/0x468
-      kthread+0x134/0x138
-      ret_from_fork+0x10/0x18
-
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index 6bd8a18e3af3..e733b81e18a2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -1013,6 +1013,7 @@ static void cmd_work_handler(struct work_struct *work)
- 				complete(&ent->done);
- 			}
- 			up(&cmd->vars.sem);
-+			complete(&ent->slotted);
- 			return;
- 		}
- 	} else {
--- 
-2.25.1
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
