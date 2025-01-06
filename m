@@ -1,98 +1,127 @@
-Return-Path: <netdev+bounces-155374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F82A0209F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:25:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52EEEA020BB
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:33:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A31AA18851A0
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:25:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B70A03A12C4
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29441D88D1;
-	Mon,  6 Jan 2025 08:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cmSSzwjw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAEA1D618E;
+	Mon,  6 Jan 2025 08:33:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911B41D79B3;
-	Mon,  6 Jan 2025 08:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFDC178362
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736151896; cv=none; b=KNP3XlG6b+mrJfrQ5CAUtAgRH7imIHKQzyMDlbm+EEdXLAWoafrbhEAEetROiUhnEcLQZ4lQwKjTE9EqVVRUWhuJy/pY1ZOGDSvvW2t0zIG/YxnQSVzcH/NJrcNqr4KIHC7GwM77oK7KAklgeDfR14v+tGYJpGfkz0SFfeCAOPU=
+	t=1736152401; cv=none; b=CN4eLfrwEPaCDlNM3YW+Dx8egppAwLbNqjaaNBX0f8syPGxXkoTb2nds/ZJoDC5ArEkChTG7YBzZwn1OSW5AjI9YmTMZtj3/q1EWKfpS58rAugZjT0k46Si7phHsvMLf10zAhkvdTBOixITFEhr3gjsZNiBmAzsHR1ifRDnru7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736151896; c=relaxed/simple;
-	bh=S2F2dIfezGTmqlQlk9l97nL9e4QagNwoh8cI9qFLocA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MiDsr6isNFgVsBHpBnbx92/DjFa4MXgnK3J5Uh4oKLK5qJUlbAtkZy3SvhYb+WpvIWdR3yEjtPlfpi7jeuCkggFiIYfEhCbtEJ2svO34aXEh7Jv2mQdxjjiKzSWRnJMmeNqzujbVVdJpbsDX5XWeT6oP8ADVtJ2wk+wSNqcIO+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cmSSzwjw; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E0DE41C0004;
-	Mon,  6 Jan 2025 08:24:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736151885;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9kbWRqHIeGCABSSU+YqAMFrnOSpEB1icFN/fpfYeHMo=;
-	b=cmSSzwjwKp0DEugsKZRozsgqMLye0F0PzJ0jAiu1Nxjf/0zMm/gVPSK2Wz7m3afWOI7zZ8
-	zrJBt/B/r6pPu8T2hZUi8plqBeio+9gL0PrIfJEvgfPlexdXE1dRJUqXyKI5FLMgaW+xoY
-	VMZkZeG8vmsAmBboJAx7+M2tvVWKOIwB2yMIgkUF1tnFqcwVytKFBmTPqqlayI7itkpuzJ
-	4XCZ/jbidcPCemTllEcU1i/qZUckB076+01He+8acOkKSvJTZXDypNXOAIal+Gx9Q1lREz
-	GH9LYBAjpsaJyZOvKMaOhzXKMsQhzFRRC/r2Rs+Ujej5EgaEIZwBcppL537KLg==
-Message-ID: <bd6f77d6-17b4-41fc-b906-13c56f3fb753@bootlin.com>
-Date: Mon, 6 Jan 2025 09:24:43 +0100
+	s=arc-20240116; t=1736152401; c=relaxed/simple;
+	bh=eCG2mt5G3asGUXiggeXR376caZihgWQHY/2GO1l3NwI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XGVavC4lej1Knbob36FUCsTtwVOvgsbyd+ARkVCm87s6ztD2TEJRhe555LARQTR2WC2Tz9fZcpJAHC26rC481F5BGTlcxFDKQ5Nl9HZ/jqTK/QFQ66EdY398AchsKB39APbLk6J7R0HX3OHYc6N85u5Me6OxE9IlJmXeHr7Ytbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tUiXq-0003Tw-WE; Mon, 06 Jan 2025 09:33:07 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tUiXm-0078Kg-0J;
+	Mon, 06 Jan 2025 09:33:02 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tUiXm-004MWL-2X;
+	Mon, 06 Jan 2025 09:33:02 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net-next v5 0/8] Introduce unified and structured PHY
+Date: Mon,  6 Jan 2025 09:32:53 +0100
+Message-Id: <20250106083301.1039850-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] selftests/bpf: Migrate test_xdp_redirect.sh to
- xdp_do_redirect.c
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250103-xdp_redirect-v1-0-e93099f59069@bootlin.com>
- <20250103-xdp_redirect-v1-2-e93099f59069@bootlin.com>
- <1c7bcca1-a940-44e4-aba3-b83b82d3bfbf@bootlin.com>
-Content-Language: en-US
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-In-Reply-To: <1c7bcca1-a940-44e4-aba3-b83b82d3bfbf@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: bastien.curutchet@bootlin.com
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi again,
+This patch set introduces a unified and well-structured interface for
+reporting PHY statistics. Instead of relying on arbitrary strings in PHY
+drivers, this interface provides a consistent and structured way to
+expose PHY statistics to userspace via ethtool.
 
-On 1/3/25 2:17 PM, Alexis Lothoré wrote:
-> On 1/3/25 11:10, Bastien Curutchet (eBPF Foundation) wrote:
->> test_xdp_redirect.sh can't be used by the BPF CI.
-> 
->> +	dummy_prog = bpf_object__find_program_by_name(skel_dummy->obj, "xdp_dummy_prog");
-> Also missed this one: why not using directly skel_dummy->progs.xdp_dummy_prog ?
-> (same for all progs below)
-> 
+The initial groundwork for this effort was laid by Jakub Kicinski, who
+contributed patches to plumb PHY statistics to drivers and added support
+for structured statistics in ethtool. Building on Jakub's work, I tested
+the implementation with several PHYs, addressed a few issues, and added
+support for statistics in two specific PHY drivers.
 
-Indeed, that would be more straightforward
+Most of changes are tracked in separate patches.
 
-Thanks,
-Bastien
+changes v5:
+- rebase and test against latest net-next
+
+Jakub Kicinski (2):
+  net: ethtool: plumb PHY stats to PHY drivers
+  net: ethtool: add support for structured PHY statistics
+
+Oleksij Rempel (6):
+  ethtool: linkstate: migrate linkstate functions to support multi-PHY
+    setups
+  Documentation: networking: update PHY error counter diagnostics in
+    twisted pair guide
+  net: phy: introduce optional polling interface for PHY statistics
+  ethtool: add helper to prevent invalid statistics exposure to
+    userspace
+  net: phy: dp83td510: add statistics support
+  net: phy: dp83tg720: add statistics support
+
+ .../twisted_pair_layer1_diagnostics.rst       |  39 +++--
+ Documentation/networking/ethtool-netlink.rst  |   1 +
+ drivers/net/phy/dp83td510.c                   | 112 ++++++++++++
+ drivers/net/phy/dp83tg720.c                   | 161 ++++++++++++++++++
+ drivers/net/phy/phy.c                         |  20 +++
+ include/linux/ethtool.h                       |  39 +++++
+ include/linux/phy.h                           |  97 +++++++++++
+ include/uapi/linux/ethtool.h                  |   2 +
+ include/uapi/linux/ethtool_netlink.h          |  14 ++
+ net/ethtool/linkstate.c                       |  25 ++-
+ net/ethtool/netlink.h                         |   1 +
+ net/ethtool/stats.c                           |  54 ++++++
+ net/ethtool/strset.c                          |   5 +
+ 13 files changed, 550 insertions(+), 20 deletions(-)
+
+--
+2.39.5
+
 
