@@ -1,139 +1,153 @@
-Return-Path: <netdev+bounces-155428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B006A024BE
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:04:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57BA6A0249D
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 12:57:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54BF51885E80
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 12:04:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38C271649FC
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BDB1D63C0;
-	Mon,  6 Jan 2025 12:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB331DDA0E;
+	Mon,  6 Jan 2025 11:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="QWehaBey"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSDnJM3T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.freemail.hu (fmfe36.freemail.hu [46.107.16.241])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3471D8DFB;
-	Mon,  6 Jan 2025 12:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.241
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0FA1DD529
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 11:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736165033; cv=none; b=NzoWYEcrjcycvFoF3tXAjddpW5eX19partp+yesFFQ85eE9c9HSBxhBQ8EkjhGBS/DCUB8QVcc1pUFkdW+WyE0ALVmz3FWyzO/KUty3BDH2DaIBj9AMGC6frkA3L9AMmE/nfgHa1VTc7Ehzu/oy8/isOyRzGM1eM9fR9UhgwHU8=
+	t=1736164660; cv=none; b=HSmd1wY2EA8XM2p+onFRQHmaHo9WRDK/n9ro6jmSjPj0ERfqEXSVrZNeg3i+xz4DTIth9nJ3fIr9Y0TK8QlvIS+MHN/p00pYT4t+Rycx63Dhzvug0Wh5ePVRsp68Y1rVNt+uD9ksyoCkHWKLJvQN5g1RQ2FrizoYq89mwuBZp/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736165033; c=relaxed/simple;
-	bh=cKyFKZR8HQPXJkeEyTijZcFLJGpOeI0uMNffok1MTsg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nRUkwdYv+Lw7c+EeL0LUYaXX8vVi5jaUWYIXASwsfV6fm/aadUEwEl3Ettwvh5GqlNlAB3ufg4MBWkTe5hTZhCdzPzilArlcBMeka2mATL3WiTcq9V4wkXthU9HPlJTq0BuShXCJV4+aYqE7POK9l6ocrjF/95NRrO7TEvFUuCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=QWehaBey reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.241
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
-Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YRXfr71Lrzgkg;
-	Mon, 06 Jan 2025 12:55:00 +0100 (CET)
-Message-ID: <cb4b77e3-65c3-4fd4-94bb-a2b35a6dcfb5@freemail.hu>
-Date: Mon, 6 Jan 2025 12:54:31 +0100
+	s=arc-20240116; t=1736164660; c=relaxed/simple;
+	bh=0BvLeSwPFGIe0JNPn+dQ7fJ+5c+Vr5p9XfEK/Qv/wMI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N/i/lSqjbbZ8T3uz+n9dBtHIX2VXMzEg+j0BK9bv5mkuDQbRQf/81IdvFdxBQ602b7QmG8YDUUGU/PAWjOucRMdRC29Qz+xO21+G7lkwA6jXLAuOq8N4QQFKjEjma0+DW75akLS8xrac+G5ffc4nBdk1AelL19K/tSX7AXA3JM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FSDnJM3T; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736164658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hjd4v5jBzzQ5xGcj0DxHwQvDcprK+i5SjBDg4phMcHE=;
+	b=FSDnJM3T9flR8xZ93hu70tm6IhBpRDV79Cp41PUfU0P+9gJGYsSwmyE4Y4A1rGGg+MJyrZ
+	WdSlJa5lXYz8kfMe+RQrIXJILbfqwp1A6QpFz/frV9c09BfzOg4NwLk5Et8w4A5wlX6loy
+	4/GBxSwfK8CjJ7L4dIvo8PbnIagVRxw=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-357-_z3nKWK2O1G4sd3MkjdeeQ-1; Mon, 06 Jan 2025 06:57:36 -0500
+X-MC-Unique: _z3nKWK2O1G4sd3MkjdeeQ-1
+X-Mimecast-MFC-AGG-ID: _z3nKWK2O1G4sd3MkjdeeQ
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-71e1aa14f64so4794251a34.2
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 03:57:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736164656; x=1736769456;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hjd4v5jBzzQ5xGcj0DxHwQvDcprK+i5SjBDg4phMcHE=;
+        b=lSDABz2YXFyJnY50IgbK2J29xHRlyjG8KDSSbbFvnlOj1VyYwSk4W0U9gyvj1wZs1W
+         mv4Bzby3BzoirQdpi6dp7KGsUaq69eXHenpxujsFp06ITcfJO9KAtHZ6PCETYfySM/Xz
+         AQBVN4wPSkCsHU2pG9MwbW1S10HfZCEsTdl55TvOuT/7OWyGYNtKzBcNJifp2yo4c5P7
+         1dVfyp6Eok5LwelThQN6g6GCUKCIrHLA6dvQohkzdLkuSLapd9wTfdVewaSTk3mTYPdM
+         0ZHI2h+Kry9FEPuAy6HZvpAxKPp+dYctqvbbGDCDPvx+3gNtisAPf92gSVgp9yvg5n7E
+         2Yng==
+X-Forwarded-Encrypted: i=1; AJvYcCW7qTOpkPmFanFGnLLFNugOkLgBRJY2zEBTnkm7AScQWfsqr/uidSfwHoc+00k7ZnokyQQq5qY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/dk3S7os2NrwEKKGX5tCA1SGFuV0t+ZqDdJcYy6fv7EM3uVMr
+	BN2OFM47zxkdNaA/0w4WLTt+65ZRnIJz48R7u3ymMgF3u9uCiRjWIiS6ncY0meC+FoGk2/Vz+/E
+	E3yLb19CgW+JXY1E6oubDLxjzkn5yhFwdES1nSjzPYfUM0BRmNxbFSU9FhvdI3E1pXukQ8QX0xK
+	3Umd+McXXgcOXA+lD6M0nODzPecjrq
+X-Gm-Gg: ASbGncv/wR1ElGuVWaM+P/gMutfYcZOfx3mRz/W8o/uBL6AQNWtkOXievvf5gNrvGZ7
+	rLNfu8iNdi+mD3m1+h+qM5IlYsjtc/sB4hdC1jA==
+X-Received: by 2002:a05:6830:6e17:b0:716:a95d:9ef with SMTP id 46e09a7af769-720ff6ab504mr42189118a34.2.1736164656084;
+        Mon, 06 Jan 2025 03:57:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IESLkcL9OsNaaOZKCPT4x2oLZP7s/kiwoLATbvj1WDB2CGIxsZWpSmUPcz2hRteTFGh7BFbIkPbE7BIlzFOxoU=
+X-Received: by 2002:a05:6830:6e17:b0:716:a95d:9ef with SMTP id
+ 46e09a7af769-720ff6ab504mr42189110a34.2.1736164655832; Mon, 06 Jan 2025
+ 03:57:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/3] netfilter: x_tables: Merge xt_*.h and ipt_*.h
- files which has same name.
-To: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Westphal <fw@strlen.de>,
- Pablo Neira Ayuso <pablo@netfilter.org>, lorenzo@kernel.org,
- daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
- kadlec@netfilter.org, David Miller <davem@davemloft.net>,
- dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250105203452.101067-1-egyszeregy@freemail.hu>
- <43f658e7-b33e-4ac9-8152-42b230a416b7@lunn.ch>
- <defa70d2-0f0c-471e-88c0-d63f3f1cd146@freemail.hu>
- <ee78ed44-7eed-0a80-6525-61b5925df431@blackhole.kfki.hu>
-Content-Language: hu
-From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
-In-Reply-To: <ee78ed44-7eed-0a80-6525-61b5925df431@blackhole.kfki.hu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736164501;
-	s=20181004; d=freemail.hu;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	l=2518; bh=lfy5n6CsbSpr3jgDmUldoHdcbJ2OBU+Aw/IlhAEFXic=;
-	b=QWehaBey/DzTZIUvU3+1P1PzJNJyp51bP1Kc4tirkqFQZXUTsFw8E6Ce6LOHioL4
-	O7J+W2vTFmT3fdGCnbv5tuIlI32IKZeJKFk2+btgqb00Whcaw/cZkHVAC/jNfHr9qmR
-	O+AYjVy+nJ45k4Lk3ArSIXq7K3I1dmfKBQK/KUn1BJEyDCKw1HOPzPsnd+R5ZC2xPv3
-	Ej80t0bWtZvKvGnXrwiqgi4ncglg1a2fejAZCjFfLEepnmGPScWfWG1J+muRU+w+RRB
-	GIuMWUm3QKAE34rirBTLqktS6JTqktAh7YGCaN2drjNyE8OAno0SS9FiCC7i6ojbKna
-	mGhgfT0DmA==
+References: <cover.1734345017.git.jstancek@redhat.com> <2a9b6d5a782acfa71ae5fb2f4d3cc538740013b6.1734345017.git.jstancek@redhat.com>
+ <m2ed2791me.fsf@gmail.com>
+In-Reply-To: <m2ed2791me.fsf@gmail.com>
+From: Jan Stancek <jstancek@redhat.com>
+Date: Mon, 6 Jan 2025 12:57:20 +0100
+Message-ID: <CAASaF6yj_E1CTi8SjUa_nBxBiWS0cH+hPCPDYoRFu8wE-eefNw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/4] tools: ynl: add initial pyproject.toml for packaging
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: stfomichev@gmail.com, kuba@kernel.org, jdamato@fastly.com, 
+	pabeni@redhat.com, davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-2025. 01. 06. 8:48 keltezéssel, Jozsef Kadlecsik írta:
-> On Mon, 6 Jan 2025, Szőke Benjamin wrote:
-> 
->> 2025. 01. 05. 22:27 keltezéssel, Andrew Lunn írta:
->>> On Sun, Jan 05, 2025 at 09:34:52PM +0100, egyszeregy@freemail.hu wrote:
->>>> From: Benjamin Szőke <egyszeregy@freemail.hu>
->>>>
->>>> Merge xt_*.h, ipt_*.h and ip6t_*.h header files, which has
->>>> same upper and lower case name format.
->>>>
->>>> Add #pragma message about recommended to use
->>>> header files with lower case format in the future.
->>>
->>> It looks like only patch 1/3 make it to the list.
->>>
->>> Also, with a patchset, please include a patch 0/X which gives the big
->>> picture of what the patchset does. The text will be used for the merge
->>> commit, so keep it formal. 'git format-patch --cover-letter' will
->>> create the empty 0/X patch you can edit, or if you are using b4 prep,
->>> you can use 'b4 prep --edit-cover' and then 'b4 send' will
->>> automatically generate and send it.
->>>
->>> https://docs.kernel.org/process/maintainer-netdev.html
->>> https://docs.kernel.org/process/submitting-patches.html
->>>
->>>      Andrew
->>
->> https://lore.kernel.org/lkml/20250105233157.6814-1-egyszeregy@freemail.hu/T/
->>
->> It is terribly chaotic how slowly start to appear the full patch list in the 
->> mailing list website. It's really time to replace 1990s dev technology with 
->> something like GitLab or GitHub developing style can provide in 2024.
-> 
-> No, it was your fault in the v5 series of your patches: you managed to send all 
-> the patches in a single email instead of separated ones.
+On Mon, Dec 16, 2024 at 3:10=E2=80=AFPM Donald Hunter <donald.hunter@gmail.=
+com> wrote:
+>
+> Jan Stancek <jstancek@redhat.com> writes:
+>
+> > Signed-off-by: Jan Stancek <jstancek@redhat.com>
+>
+> nit: missing patch description
+>
+> > ---
+> >  tools/net/ynl/pyproject.toml | 26 ++++++++++++++++++++++++++
+> >  1 file changed, 26 insertions(+)
+> >  create mode 100644 tools/net/ynl/pyproject.toml
+> >
+> > diff --git a/tools/net/ynl/pyproject.toml b/tools/net/ynl/pyproject.tom=
+l
+> > new file mode 100644
+> > index 000000000000..677ea8f4c185
+> > --- /dev/null
+> > +++ b/tools/net/ynl/pyproject.toml
+> > @@ -0,0 +1,26 @@
+> > +[build-system]
+> > +requires =3D ["setuptools>=3D61.0"]
+> > +build-backend =3D "setuptools.build_meta"
+> > +
+> > +[project]
+> > +name =3D "pyynl"
+> > +authors =3D [
+> > +    {name =3D "Donald Hunter", email =3D "donald.hunter@gmail.com"},
+> > +    {name =3D "Jakub Kicinski", email =3D "kuba@kernel.org"},
+> > +]
+> > +description =3D "yaml netlink (ynl)"
+> > +version =3D "0.0.1"
+> > +requires-python =3D ">=3D3.9"
+> > +dependencies =3D [
+> > +    "pyyaml=3D=3D6.*",
+> > +    "jsonschema=3D=3D4.*"
+> > +]
+> > +
+> > +[tool.setuptools.packages.find]
+> > +include =3D ["pyynl", "pyynl.lib"]
+> > +
+> > +[project.scripts]
+> > +ynl =3D "pyynl.cli:main"
+> > +ynl-ethtool =3D "pyynl.ethtool:main"
+> > +ynl-gen-c =3D "pyynl.ynl_gen_c:main"
+> > +ynl-gen-rst =3D "pyynl.ynl_gen_rst:main"
+>
+> I'm not sure if we want to install ynl-gen-c or ynl-gen-rst since they
+> are for in-tree use.
+>
+> Thoughts?
 
-Something is not OK with your e-mail processing:
-
-- 1. [PATCH v7 0/3] which is the cover letter, is appering really slowly in the 
-list after [PATCH v7 1/3], [PATCH v7 2/3], [PATCH v7 3/3] were arrived. This is 
-why I made v7 after v6, because after 10 minutes i still could not see that it 
-is successfully arrived in the mailing list, I fustrated about it again went wrong.
-
-
-- 2. Patch name visible is buggy:
-[PATCH v7 0/3] netfilter: x_tables: Merge xt_*.c files
-2025-01-05 23:31 UTC  (4+ messages)
-[PATCH v7 1/3] netfilter: x_tables: Merge xt_*.h and ipt_*.h files which has 
-same name
-[PATCH v7 2/3] netfilter: x_tables: Merge xt_*.c "
-[PATCH v7 3/3] netfilter: x_tables: Adjust code style for xt_*.h/c and ipt_*.h files
-
-[PATCH v7 2/3] netfilter: x_tables: Merge xt_*.c " -> half of real name missing? 
-Real name was: "Merge xt_*.c files which has same name."
-
-
-> 
-> Best regards,
-> Jozsef
+I haven't seen any downside and thought it might be useful for somebody,
+but I'm happy to drop it.
 
 
