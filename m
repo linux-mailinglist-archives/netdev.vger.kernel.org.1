@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-155532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF71CA02E5A
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:54:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF05A02E5C
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:54:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A54A165359
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78941188686C
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73C91DE4DB;
-	Mon,  6 Jan 2025 16:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C871DED63;
+	Mon,  6 Jan 2025 16:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h0AIh11d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXPr8Img"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912521DE2AD
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 16:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5623B1DED57
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 16:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736182468; cv=none; b=Skfua/JWFn6hGomskdEZnUhWr39gnLofa4EGQr1g+WrCJJ9mZZ2tpZev3Eb4XNTABeFXuahhdJUf8wxEOqJvElEm+3w+0PPAR0nCXNMDXMAT5j61yQEVhtQFoNHkpOg9VKzX95UCbUoVXLsQ0omZH1K3+a9wRHveZekKxutlpkA=
+	t=1736182469; cv=none; b=HKbjmPM6oc918wYUTAmRPcBVn+9gGdImNcPLT3weOb7lIpAJzZnZ8v1m7lPJFHIb/G/OcQYq214YMRZPUI14wO6UguHVaBI/Zd6Wx9r/44SWKItb5S4FZA0ib214NUr9Izn5noaiC3If7qImQU4CcKETAJKuXPp+pMpBc9T6n/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736182468; c=relaxed/simple;
-	bh=UbBIxHBVj4NJY9gnD4EmBfLPIdr73jUj7FheyBY7wSA=;
+	s=arc-20240116; t=1736182469; c=relaxed/simple;
+	bh=wiPFkU4WHOJT8dnrd9mkOu84E46PCoMN6rf9qjFkJ10=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=evOik88enWn5i+L0NZ6aFn4RcrE+skoF6pqGVEWjkGWistP/46MkmceEWZzyoBzy842697X1TBIC8g9C2Llgidkp/HLRLilF8ufOcGeBRldEPvKP1Y7m7jpkMHK45dTU9AyfW3Q8s2kUal3fvRtMeQZHoW2aIEy5Z0djwSECVec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h0AIh11d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37744C4CEE2;
+	 MIME-Version; b=sJa9kSjGjoz1FQQB5zx+lYFir6aI0mzxAWkGAI016lgwlWKNatSlY8BgKlvwkI93t9D1dZ4s2wrQFA6UGirD3PvZ6BpDMvfGoHxLGWpX223AMBIFa5meVylkB093Ao5MYx05wPT/9n2Semai9S6NFP/p1L+i79ksO0V2h/L/dp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXPr8Img; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93840C4CED6;
 	Mon,  6 Jan 2025 16:54:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1736182468;
-	bh=UbBIxHBVj4NJY9gnD4EmBfLPIdr73jUj7FheyBY7wSA=;
+	bh=wiPFkU4WHOJT8dnrd9mkOu84E46PCoMN6rf9qjFkJ10=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=h0AIh11dk/lPSTN2gLDBcvVyVnA5s+nPcBwJJOTMq4Lk0rUSygbUBJIOmTXEdd+73
-	 X06hkJQPNDbJHFyRRvi8Pg8pBB3uCzTj7UdRp2Akmbz5PYfMfOY4eVc2/I7KKSH1YO
-	 9Z7S3++z3UsvSQIPVmd5T9Bw2JGw95wqflLWM6b5haCO373HRxMmNnPVaz6dnIrAze
-	 7Lb85tL/rYQKoryHBwntsR3MNQht6w6ADvkFScXCMkJlt8AUf3mkb74gbGe/RMNVs9
-	 IhWXPUrUgsHY3dKuGG+xs0gAahoLzOUXptIrsRqVTN15bf84PNOuloArwUoBhnacgg
-	 fB4vyOPsVEQBg==
+	b=fXPr8Img/QfcnHQbn0B9sAFU5KZNMfGyzOWQQ99Upeg9oLLHDesq4glDfmfSNlfmi
+	 pFAE/g1f2xbRNGxht0rbHiEWACTE5MldoAUVsRi/g8FTtE5CPycwITc+G6fuo1k1P+
+	 j0SLRBilXZe0EtMwfK7K6/5bMzAyMW8CAuKdAIYWJMXOe4B6K2sorBSTgzA26cNq4L
+	 YohJktmDtCNLQ1Yj6XD8nqAkqiaIy4fQIP77pkOEQbPe0o3N23VoC/o1c/XHsRmUDk
+	 wMNy+OD/0eA5xhoRCTgdAlBdISSZboL1Bd3XgiNY24pTCYb9XPRoxZerV9ucXiIjgA
+	 +AXgpyQ4Ky2mA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -48,11 +48,13 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	Jakub Kicinski <kuba@kernel.org>,
-	joabreu@synopsys.com,
-	alexandre.torgue@foss.st.com
-Subject: [PATCH net 4/8] MAINTAINERS: mark stmmac ethernet as an Orphan
-Date: Mon,  6 Jan 2025 08:54:00 -0800
-Message-ID: <20250106165404.1832481-5-kuba@kernel.org>
+	nbd@nbd.name,
+	sean.wang@mediatek.com,
+	lorenzo@kernel.org,
+	Mark-MC.Lee@mediatek.com
+Subject: [PATCH net 5/8] MAINTAINERS: remove Mark Lee from MediaTek Ethernet
+Date: Mon,  6 Jan 2025 08:54:01 -0800
+Message-ID: <20250106165404.1832481-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250106165404.1832481-1-kuba@kernel.org>
 References: <20250106165404.1832481-1-kuba@kernel.org>
@@ -64,54 +66,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I tried a couple of things to reinvigorate the stmmac maintainers
-over the last few years but with little effect. The maintainers
-are not active, let the MAINTAINERS file reflect reality.
-The Synopsys IP this driver supports is very popular we need
-a solid maintainer to deal with the complexity of the driver.
+The mailing lists have seen no email from Mark Lee in the last 4 years.
 
 gitdm missingmaints says:
 
-Subsystem STMMAC ETHERNET DRIVER
-  Changes 344 / 978 (35%)
-  Last activity: 2020-05-01
-  Alexandre Torgue <alexandre.torgue@foss.st.com>:
-    Tags 1bb694e20839 2020-05-01 00:00:00 1
-  Jose Abreu <joabreu@synopsys.com>:
+Subsystem MEDIATEK ETHERNET DRIVER
+  Changes 103 / 400 (25%)
+  Last activity: 2024-12-19
+  Felix Fietkau <nbd@nbd.name>:
+    Author 88806efc034a 2024-10-17 00:00:00 44
+    Tags 88806efc034a 2024-10-17 00:00:00 51
+  Sean Wang <sean.wang@mediatek.com>:
+    Tags a5d75538295b 2020-04-07 00:00:00 1
+  Mark Lee <Mark-MC.Lee@mediatek.com>:
+  Lorenzo Bianconi <lorenzo@kernel.org>:
+    Author 0c7469ee718e 2024-12-19 00:00:00 123
+    Tags 0c7469ee718e 2024-12-19 00:00:00 139
   Top reviewers:
-    [75]: horms@kernel.org
-    [49]: andrew@lunn.ch
-    [46]: fancer.lancer@gmail.com
-  INACTIVE MAINTAINER Jose Abreu <joabreu@synopsys.com>
+    [32]: horms@kernel.org
+    [15]: leonro@nvidia.com
+    [9]: andrew@lunn.ch
+  INACTIVE MAINTAINER Mark Lee <Mark-MC.Lee@mediatek.com>
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-We could add an entry to AUTHORS, but a quick git log doesn't show
-huge number of patches or LoC. I could be looking wrong..
-
-CC: joabreu@synopsys.com
-CC: alexandre.torgue@foss.st.com
 ---
- MAINTAINERS | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+CC: nbd@nbd.name
+CC: sean.wang@mediatek.com
+CC: lorenzo@kernel.org
+CC: Mark-MC.Lee@mediatek.com
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 7f22da12284c..613f15747b6b 100644
+index 613f15747b6b..97e3939f800b 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -22509,11 +22509,8 @@ F:	Documentation/devicetree/bindings/phy/st,stm32mp25-combophy.yaml
- F:	drivers/phy/st/phy-stm32-combophy.c
- 
- STMMAC ETHERNET DRIVER
--M:	Alexandre Torgue <alexandre.torgue@foss.st.com>
--M:	Jose Abreu <joabreu@synopsys.com>
+@@ -14573,7 +14573,6 @@ F:	drivers/dma/mediatek/
+ MEDIATEK ETHERNET DRIVER
+ M:	Felix Fietkau <nbd@nbd.name>
+ M:	Sean Wang <sean.wang@mediatek.com>
+-M:	Mark Lee <Mark-MC.Lee@mediatek.com>
+ M:	Lorenzo Bianconi <lorenzo@kernel.org>
  L:	netdev@vger.kernel.org
--S:	Supported
--W:	http://www.stlinux.com
-+S:	Orphan
- F:	Documentation/networking/device_drivers/ethernet/stmicro/
- F:	drivers/net/ethernet/stmicro/stmmac/
- 
+ S:	Maintained
 -- 
 2.47.1
 
