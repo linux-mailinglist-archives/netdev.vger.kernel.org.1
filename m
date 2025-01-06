@@ -1,94 +1,183 @@
-Return-Path: <netdev+bounces-155336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B85BA01FEA
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:30:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C964A02009
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40890163013
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 07:30:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF7BF1885077
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 07:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343302A1A4;
-	Mon,  6 Jan 2025 07:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bn2sxRcj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D407194A54;
+	Mon,  6 Jan 2025 07:42:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EC91D63D4
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 07:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28761E511
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 07:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736148652; cv=none; b=F6hOrRwOi78A7MR+CP1zSFKxcV3Shec7lBBAbBX+X5tLJNMJ5g2kjcL024XPIYZ8Zw8UBOf4xhOQZlEpNjdwgxlXQhAiMZuUT0K/Do+dJ0WEMTE3/8th2y1mFF4KLSIg9kGrnSNVowa0ZbUmO2Q4XQaBw9bMPOPjc2A4gWHMYtk=
+	t=1736149377; cv=none; b=Ylp//rLSsXBcECGPQNIt/o5Zo8qDAmi9QQ2YMFLWaCYHwUdLhihTEk6qHgBJcrx0xBSPGXQbLzbRojGGZZErnl9FKS6OPf8whSLMriSgI++C0lWYXQQO2FW37sYPI04siwJpGwN+1+DbJGcZH24NXuDGvnSiUe8fTK4J8QOGoAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736148652; c=relaxed/simple;
-	bh=SheoHcWTDBeU0sV4PPrXT6xnde956qcReHb2Jm5/QnY=;
-	h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:Cc:To; b=sGo4TAFgk9R8nqjqfGQxWhhogNVYM9X0+d0FU/5k62IYzSII72E7i0YhBueoeIV7QpxTkuX2uKhOVpqn43zc86q3ZNts6WKQg6FdejQ5z/9uKA18NwTxYI2WF/aoLmP0XapCheFTBGN95ootu9w0JtQfp/keLZWkSDFZhNKodB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bn2sxRcj; arc=none smtp.client-ip=209.85.218.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f67.google.com with SMTP id a640c23a62f3a-aaf60d85238so779672366b.0
-        for <netdev@vger.kernel.org>; Sun, 05 Jan 2025 23:30:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736148649; x=1736753449; darn=vger.kernel.org;
-        h=to:cc:message-id:subject:date:mime-version:from
-         :content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FEaDbyLqyL4DJ9Oe21r/aXHkX1sIZ8IZpq8gMNbHoWU=;
-        b=bn2sxRcjit5fdhbauxxp7YSAbXsx9jNUxtLb0WWJcR0pQewqw+fjb3lyIBXTIPqT1p
-         ucPxpLyhXjOBGO4LZrS44sjgFeOle1ivdFTYQEle+hpBsfflhcjDuT5Sn/WvLeUBOqew
-         PIKn/H+cw+6Ljn24pO6vBZ1dPqjLLHPaFiLG4GC3AaEHldly+rI4oxDD72EoDQObaLFa
-         9iB0gm6s4ni4Hmj9T78ha0j7Xu8K9hT1bIxqs9PlBDtZVpec6AXXLs4tqgbjtkBEeKp/
-         XgRQt3NflGFsftkx/6fzvgYTlCJeil3BR9I3BUR2rngYRF0th+PxWl7GEvWiDhf3d/yl
-         4A4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736148649; x=1736753449;
-        h=to:cc:message-id:subject:date:mime-version:from
-         :content-transfer-encoding:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FEaDbyLqyL4DJ9Oe21r/aXHkX1sIZ8IZpq8gMNbHoWU=;
-        b=i2rm/43H7vmPwGW/HCeJxOy01MZOfaPxbPuYbnrnXPge83/AT5aNwhFPs2xyjRmtm/
-         4BPPvE16lQPWeL4nXSzujbvVtN/9AnqzM8Ar5ikxpuHPWDRCFxNlW/QhCgkjDsWzxLPQ
-         IlgkRlFI0l8U7fSjeQB206wsVmchmINWj9fl1l1AgOc9c+MZ83PtoqCx15ajAN0kMNje
-         3Bv8z2XVnFodAWfytUeYtPc/E91nHSV7o0U6nQ001D2halklhvA/8gbHMTYCAiwYr5aG
-         Jyy46+RDDFm5ysjAOqmP5B0ola4seg+VpMtSaHSxpqErnOrc3v+s2P+UcSlGTXxRvAM3
-         VCFw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3O2qmZAOaE868f4g5sj7wVirsZGhu+dvX1NZ4c/SJYN7ysbokHjR9b1va/Nv/jfvhw4x63GI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZoE+6jCioFyd4NDR9PzmbLY9BIVtv/GGg5dqOaxmmiEDsmeVJ
-	hT406ubK0waIqasOG0onzJAToRvRzokaDU5wXwCKi5tKli0bjbsz
-X-Gm-Gg: ASbGncsfXIz3TyQI6K1rrjljhfWRZBV//b/fb7FBJEjacPDmGMro6MXNvvBvCaeuyVr
-	6QJntOfep5DCUHwdCaWYKoI9dEzu4xgMZVEQuwF9/5id+1iKmlTXRVq0azwVzBasCXfSgI8XF5I
-	3mX7rDP4ylms6DPynub2D3VBWHDTYFeobb9BJ020EJiWofHv3sRnZDNzsTenhRk/jU6+TWHED/z
-	0QQEiMZP2mz2qODALWNfgqWemnawE46mFSu+pYNex7VRohbr8+BrtpTTMiTdhFLlThbu03o0pg=
-X-Google-Smtp-Source: AGHT+IHx9i7Ag75n7mqQomek9K54ihGtMMDmB9GyRaxvs0pQzQZBwKBTCkp70vLjxnUcNNFktLF18g==
-X-Received: by 2002:a17:906:ef0b:b0:aa6:7d82:5414 with SMTP id a640c23a62f3a-aac334c3de4mr5369924066b.30.1736148648793;
-        Sun, 05 Jan 2025 23:30:48 -0800 (PST)
-Received: from smtpclient.apple ([41.221.207.165])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e89887csm2218668066b.80.2025.01.05.23.30.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Jan 2025 23:30:48 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-From: Ady Santoz <santozady5@gmail.com>
+	s=arc-20240116; t=1736149377; c=relaxed/simple;
+	bh=xolavlOIeBm4x+UHjoyzETDFEg3zj0MVb7HVVVkNiSI=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=GJiv+hqjtIfZd8lLoam8VmdRsHfOR6Bh0pHbPsJVMuzJRCWWPToPgFDBHKCZ7gBLMOu7IaXBH58zQsgF0H+MsgRBrX/S9ZyByp/IrXMRmiT/ctt1Z0t0C+noH24AjVWaz3kS6T0QG8rYMgYa3R16vG4ERFBxLeVW4NuyoDuFfP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas10t1736149356t666t30354
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.118.30.165])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 2943653864027222232
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<richardcochran@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<jacob.e.keller@intel.com>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20250102103026.1982137-1-jiawenwu@trustnetic.com> <20250102103026.1982137-2-jiawenwu@trustnetic.com> <ab140807-2e49-4782-a58c-2b8d60da5556@lunn.ch>
+In-Reply-To: <ab140807-2e49-4782-a58c-2b8d60da5556@lunn.ch>
+Subject: RE: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
+Date: Mon, 6 Jan 2025 15:42:35 +0800
+Message-ID: <032b01db600e$8d845430$a88cfc90$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Date: Mon, 6 Jan 2025 06:30:47 -0100
-Subject: Re: [PATCH net-next 07/11] ice: manage VFs MSI-X using resource tracking
-Message-Id: <DC56BF1D-547C-48AD-99A2-838B8AAC6215@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, michal.swiatkowski@linux.intel.com,
- netdev@vger.kernel.org, przemyslaw.kitszel@intel.com,
- rafal.romanowski@intel.com
-To: jacob.e.keller@intel.com
-X-Mailer: iPhone Mail (19H386)
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQEgJ35Ybs4gTOBDiJnQm6cX+eEXEQKNhMgNAhs0hhm0WoJCoA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: N+B8S2AmgbnC4w/F2TBXR8FVF6/I3R1REr9rWFA5u9ve+QOMxDIcaVac
+	jn2DCaVC94WS1A/U+IMai+isy8OxNxrAA97nX7mszQiajND1IBA8ITdpEvfEUjwihubdXJ9
+	SspXpCPoOOzb3csV3K0WPjjSvkmjs6EkfJWDnVbXt4tc86qIQUbPVOiN6y195yh8gJXfmyi
+	CIC2R/IpYaK7kYxYIcGuhWicXPKD0KwcqmOwH0D8mSBYoGxFPdpB+YjJ2LZOSav5asj6ob7
+	fn4OJizXZkGXRHKpCWfLIKDYESxowIfPVy//hy9bZj7OzCKKb81OhXB4GI3Q6UOScKJvRdS
+	rwg59qgstgXBSHqdbfNFQeReZfswAKPWBWgBAgUjBTOjFhoiP+1GjF/5Nf0L50I1eHhG2ex
+	IUi09EFSG/DwJpyV+xj+WvBXG0ppW1IOvF37WblKp9A7OEkCwtuoWaKla5QQU9w6AJAC/DQ
+	xuOB2Fdgc3+f9PLsRj53n6hfKL6DvohUMeTDj3sgzgHuPclce3ojevXKjwKNOv/zkam931Z
+	z6uqTmagOc3XbZBhkTiTW97rZQKoHl2UJt6FVrLBbk0zpGfzmMrfTSelSmM9uZ6tp3kVbSb
+	ppy8/cYj6yDQdngxREQxhuw+smk9UFV2RciPtpMLNmo2llfqbKD8NDOUkqU48Vjn80eSEcl
+	2sgjtio1niwpRQvg5iOwdSMUumSfhza0UmSaNthWToH0iCXfTK8K/SyYulpZY5ZnI1QVpjW
+	MBdgpM6M8PpAUzhUzXylR0CglKg8jVwsDQ09xAdvV77SVBk20Fm75K09K6Gul61I3wKK+jo
+	VImhP3Z9U+eF0dRkUs00cSakrDUI+6UhP7euoPlDJU9tGsR+uRnhpEs5byD1yHBhzcGhIwF
+	6/GTOdKw0MozvT+ejLDwyY44zsUf/lA0dQrRu5E5lyBvXLLffUIclXpCTFn+Ge3cRIlQIJl
+	u1UzT7MXVzivlV9tN45l9hRasG9veno58ULFC549Y4SjGuWdOLfbo4l/cGEudiuImT+V9BJ
+	rIii9P1g==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-pedido de agendamento 
+On Thu, Jan 2, 2025 10:13 PM, Andrew Lunn wrote:
+> > +static int wx_tx_map(struct wx_ring *tx_ring,
+> > +		     struct wx_tx_buffer *first,
+> > +		     const u8 hdr_len)
+> >  {
+> >  	struct sk_buff *skb = first->skb;
+> >  	struct wx_tx_buffer *tx_buffer;
+> > @@ -1013,6 +1023,8 @@ static void wx_tx_map(struct wx_ring *tx_ring,
+> >
+> >  	netdev_tx_sent_queue(wx_txring_txq(tx_ring), first->bytecount);
+> >
+> > +	/* set the timestamp */
+> > +	first->time_stamp = jiffies;
+> >  	skb_tx_timestamp(skb);
+> >
+> >  	/* Force memory writes to complete before letting h/w know there
+> > @@ -1038,7 +1050,7 @@ static void wx_tx_map(struct wx_ring *tx_ring,
+> >  	if (netif_xmit_stopped(wx_txring_txq(tx_ring)) || !netdev_xmit_more())
+> >  		writel(i, tx_ring->tail);
+> >
+> > -	return;
+> > +	return 0;
+> >  dma_error:
+> >  	dev_err(tx_ring->dev, "TX DMA map failed\n");
+> >
+> > @@ -1062,6 +1074,8 @@ static void wx_tx_map(struct wx_ring *tx_ring,
+> >  	first->skb = NULL;
+> >
+> >  	tx_ring->next_to_use = i;
+> > +
+> > +	return -EPERM;
+> 
+>        EPERM           Operation not permitted (POSIX.1-2001).
+> 
+> This is normally about restricted access because of security
+> settings. So i don't think this is the correct error code here. What
+> is the reason the function is exiting with an error? Once we
+> understand that, maybe we can suggest a better error code.
 
-Enviado do meu iPhone
+I'll change it to -ENOMEM.
+
+> 
+> > +static int wx_ptp_adjfine(struct ptp_clock_info *ptp, long ppb)
+> > +{
+> > +	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
+> > +	u64 incval, mask;
+> > +
+> > +	smp_mb(); /* Force any pending update before accessing. */
+> > +	incval = READ_ONCE(wx->base_incval);
+> > +	incval = adjust_by_scaled_ppm(incval, ppb);
+> > +
+> > +	mask = (wx->mac.type == wx_mac_em) ? 0x7FFFFFF : 0xFFFFFF;
+> > +	if (incval > mask)
+> > +		dev_warn(&wx->pdev->dev,
+> > +			 "PTP ppb adjusted SYSTIME rate overflowed!\n");
+> 
+> There is no return here, you just keep going. What happens if there is
+> an overflow?
+
+If there is an overflow, the calibration value of this second will be
+inaccurate. But it does not affect the calibration value of the next
+second. And this rarely happens.
+
+> 
+> > +/**
+> > + * wx_ptp_tx_hwtstamp_work
+> > + * @work: pointer to the work struct
+> > + *
+> > + * This work item polls TSYNCTXCTL valid bit to determine when a Tx hardware
+> > + * timestamp has been taken for the current skb. It is necessary, because the
+> > + * descriptor's "done" bit does not correlate with the timestamp event.
+> > + */
+> 
+> Are you saying the "done" bit can be set, but the timestamp is not yet
+> in place? I've not read the whole patch, but do you start polling once
+> "done" is set, or as soon at the skbuff is queues for transmission?
+
+The descriptor's "done" bit cannot be used as a basis for Tx hardware
+timestamp. So we should poll the valid bit in the register.
+
+> 
+> >  static void ngbe_mac_link_down(struct phylink_config *config,
+> >  			       unsigned int mode, phy_interface_t interface)
+> >  {
+> > +	struct wx *wx = phylink_to_wx(config);
+> > +
+> > +	wx->speed = SPEED_UNKNOWN;
+> > +	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
+> > +		wx_ptp_start_cyclecounter(wx);
+> 
+> This is probably a naming issue, but it seems odd to call a _start_
+> function on link down.
+
+I think this function could be named wx_ptp_reset_cyclecounter().
+
+
 
