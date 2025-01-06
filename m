@@ -1,161 +1,157 @@
-Return-Path: <netdev+bounces-155432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD3F8A0253E
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:24:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 746ECA02541
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C47A616061C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 12:24:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBD481885E85
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 12:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2861DB34C;
-	Mon,  6 Jan 2025 12:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A2F1DC982;
+	Mon,  6 Jan 2025 12:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HPV34stH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="h11kneiI"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453921D86E8
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 12:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B691DD525
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 12:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736166268; cv=none; b=bYPjnGCfIBWDsLt+RJNKrRNb2tvNvKb9yox4Piv9FRkA/sIddyn7zGsD3Hn2UImIg0djKPms0YfgpGFoFNxSq8T4DYSjX0GqXznlxNVMFPTVCCzaya+08Ml8mabf9IGAbKUKNg3q6Rt2jKwpNwXh8ZbDqJZD87TZTypWROhd+P0=
+	t=1736166301; cv=none; b=Q/mL8Ea1RtDdHkN+ouPL+BFBtT1vFnyhgOOqKStr1XszVyCoSofLMj1FcEbxw3CbV15Je4qVocHxqTwJvBmkpokMdamSbvudcF9Paw8dKnxaCv/h8ndGgdGFfDOqppKBWS/lLEBtzk6XvR1ak+8gWwzTk2t+jKBiVmIHOfVq+wM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736166268; c=relaxed/simple;
-	bh=o734CJEC6dy89rEt3Oz3JNw+bMqvpdx6qgFZmNtkHnE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hAUzS9mvfnOOFRyhj63kuX8oMxjtn1xqsjkSVCVWDAl8rT4RKoTZpnBZXSsI2L+PwHP0nxvzkJB9RoNRAgF/WF8THfkAX2w74RPUp2u7GgBL+2zw+bc87ZUflFdxv9VTjY2ZGYpo2S265oZYcg6WZO7uo35gTcteCCJKXnyZbuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HPV34stH; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1736166301; c=relaxed/simple;
+	bh=O4MlM9GRQ4VMmTJ+BrHpXuZ1spwI+aMOhgg3ziv4GMY=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=I1G9fwRUh0cWxza5Oz8Dvlm0HMQcEUKcH4Y82C0wIy7GPc9iO6EBlsOraGu/QAmwpem1HRMMmGoyMB8BkgTm87qvqF+wZUerBLUHwL6m74xGDznt9WG7aVEjtTYPs5buuatTAAaPEylmRaLxo948DFlUa3C9dgfgQyNwMmq1Twc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=h11kneiI; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tBH/QFCeH4D6o2k/hD1pL5oWMJrkgFobVsKuLiou4vY=; b=HPV34stHDD6m82qt9IEiA0lgvE
-	SjcJhy1JZN847DfPP/nlZLN85ryKVQ5P/HqgnVi/7V6gzM0gblU9WqOgz67GkmAf3lC+j2ALTZIVQ
-	iLdY/0U74D8+NYB2SDZeRAXS37ATqyHd2ds2T+ttr/+51rTtECdgmq3UMzbCFqwxKd5ATB6AtEbk3
-	QZ2dUWShEjnM86yXVTsRLHVM+Kr/dB0sW0OOx9+pAlRyXhneYrH+Qoc+BYGWqp3j45AlDgX8wuEd0
-	fIuO1K9j2mR0QJ4P2EalNIkszEbBMP9o8AOWxz2KHguSTMUKiRpEfF0HjtJ/3SGjKTuKAW0fcym4E
-	nM83rCkQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48276)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=CT43NNJbVwdfAfypfZGQdJlroOFKN88S2LgKWnUbjeQ=; b=h11kneiITp/NaXQfWyCCxfPLo3
+	H4+v5OHtcbjf7duXrP18OusOkkmakYQMcTp6p94gE5jqjQRzRdDLI4T61AYFbeFpvQRq43UbAMIRE
+	frdJAWmFsHOdNLMHxWCBKfjbrS5QiIkLgblfzpCpZWox2WhcciHXNbBmdKLeUiJsj64n1jCy83Uxx
+	Smh0oJ2I12eJlRGvayQ7kmBOhXNLzYHEgWHNvhl+DKTPmRF1v+l5hnBH+KQgabkDsOcpBmMtUBFXx
+	1fxQZAKaGzWx14agfAum0iFYgKhvvEGuRfQabnS0ZDRnnMQQ0rCKoEzwVfOGXnSeIvOgyKniYDhlG
+	4nT/wpjg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58556 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tUm9Y-0005q0-2Y;
-	Mon, 06 Jan 2025 12:24:16 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tUm9V-0004Gx-2L;
-	Mon, 06 Jan 2025 12:24:13 +0000
-Date: Mon, 6 Jan 2025 12:24:13 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tUmA7-0005qL-20;
+	Mon, 06 Jan 2025 12:24:51 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tUmA4-007VWj-MW; Mon, 06 Jan 2025 12:24:48 +0000
+In-Reply-To: <Z3vLbRQ9Ctl-Rpdg@shell.armlinux.org.uk>
+References: <Z3vLbRQ9Ctl-Rpdg@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jose Abreu <joabreu@synopsys.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 00/17] net: stmmac: clean up and fix EEE
- implementation
-Message-ID: <Z3vLbRQ9Ctl-Rpdg@shell.armlinux.org.uk>
+Subject: [PATCH net-next v2 01/17] net: phy: add configuration of rx clock
+ stop mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tUmA4-007VWj-MW@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 06 Jan 2025 12:24:48 +0000
 
-Hi,
+Add a function to allow configuration of the PCS's clock stop enable
+bit, used to configure whether the xMII receive clock can be stopped
+during LPI mode.
 
-This is a rework of stmmac's EEE support in light of the addition of EEE
-management to phylib. It's slightly more than 15 patches, but I think it
-makes sense to be so.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phy.c | 27 ++++++++++++++++++++++-----
+ include/linux/phy.h   |  1 +
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-Patch 1 adds configuration of the receive clock phy_eee_rx_clock_stop()
-(which was part of another series, but is necessary for this patch set.)
-
-Patch 2 converts stmmac to use phylib's tracking of tx_lpi_timer.
-
-Patch 3 (new) corrects the data type used for things involving the LPI
-timer. The user API uses u32, so stmmac should do too, rather than
-blindly converting it to "int".
-
-Patch 4 makes stmmac EEE state depend on phylib's enable_tx_lpi flag,
-thus using phylib's resolution of EEE state.
-
-Patch 5 removes redundant code from the ethtool EEE operations.
-
-Patch 6 (new) removes some redundant code in stmmac_disable_eee_mode()
-and renames it to stmmac_disable_sw_eee_mode() to better reflect its
-purpose.
-
-Patch 7 removes the driver private tx_lpi_enabled, which is managed by
-phylib since patch 4.
-
-Patch 8 removes the dependence of EEE error statistics on the EEE
-enable state, instead depending on whether EEE is supported by the
-hardware.
-
-Patch 9 removes phy_init_eee(), instead using phy_eee_rx_clock_stop()
-to configure whether the PHY may stop the receive clock.
-
-Patch 10 removes priv->eee_tw_timer, which is only ever set to one
-value at probe time, effectively it is a constant. Hence this is
-unnecessary complexity.
-
-Patch 11 moves priv->eee_enabled into stmmac_eee_init(), and placing
-it under the protection of priv->lock, except when EEE is not
-supported (where it becomes constant-false.)
-
-Patch 12 moves priv->eee_active also into stmmac_eee_init(), so
-the indication whether EEE should be enabled or not is passed in
-to this function.
-
-Since both priv->eee_enabled and priv->eee_active are assigned
-true/false values, they should be typed "bool". Make it sew in
-patch 13. No Singer machine required.
-
-Patch 14 moves the initialisation of priv->eee_ctrl_timer to the
-probe function - it makes no sense to re-initialise the timer each
-time we want to start using it.
-
-Patch 15 removes the unnecessary EEE handling in the driver tear-down
-method. The core net code will have brought the interface down
-already, meaning EEE has already been disabled.
-
-Patch 16 reorganises the code to split the hardware LPI timer
-control paths from the software LPI timer paths.
-
-Patch 17 works on this further by eliminating
-stmmac_lpi_entry_timer_config() and making direct calls to the new
-functions. This reveals a potential bug where priv->eee_sw_timer_en
-is set true when EEE is disabled. This is not addressed in this
-series, but will be in a future separate patch - so that if fixing
-that causes a regression, it can be handled separately.
-
- drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |   4 +-
- drivers/net/ethernet/stmicro/stmmac/hwif.h         |   2 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac.h       |  10 +--
- .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   |  25 +-----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 100 +++++++++++----------
- drivers/net/phy/phy.c                              |  27 ++++--
- include/linux/phy.h                                |   1 +
- 7 files changed, 84 insertions(+), 85 deletions(-)
-
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index e4b04cdaa995..a4b9fcc2503a 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1640,6 +1640,27 @@ void phy_mac_interrupt(struct phy_device *phydev)
+ }
+ EXPORT_SYMBOL(phy_mac_interrupt);
+ 
++/**
++ * phy_eee_rx_clock_stop() - configure PHY receive clock in LPI
++ * @phydev: target phy_device struct
++ * @clk_stop_enable: flag to indicate whether the clock can be stopped
++ *
++ * Configure whether the PHY can disable its receive clock during LPI mode,
++ * See IEEE 802.3 sections 22.2.2.2, 35.2.2.10, and 45.2.3.1.4.
++ *
++ * Returns: 0 or negative error.
++ */
++int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable)
++{
++	/* Configure the PHY to stop receiving xMII
++	 * clock while it is signaling LPI.
++	 */
++	return phy_modify_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1,
++			      MDIO_PCS_CTRL1_CLKSTOP_EN,
++			      clk_stop_enable ? MDIO_PCS_CTRL1_CLKSTOP_EN : 0);
++}
++EXPORT_SYMBOL_GPL(phy_eee_rx_clock_stop);
++
+ /**
+  * phy_init_eee - init and check the EEE feature
+  * @phydev: target phy_device struct
+@@ -1664,11 +1685,7 @@ int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable)
+ 		return -EPROTONOSUPPORT;
+ 
+ 	if (clk_stop_enable)
+-		/* Configure the PHY to stop receiving xMII
+-		 * clock while it is signaling LPI.
+-		 */
+-		ret = phy_set_bits_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1,
+-				       MDIO_PCS_CTRL1_CLKSTOP_EN);
++		ret = phy_eee_rx_clock_stop(phydev, true);
+ 
+ 	return ret < 0 ? ret : 0;
+ }
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 5bc71d59910c..4875465653ca 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2096,6 +2096,7 @@ int phy_unregister_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask);
+ int phy_unregister_fixup_for_id(const char *bus_id);
+ int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
+ 
++int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable);
+ int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable);
+ int phy_get_eee_err(struct phy_device *phydev);
+ int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
