@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-155589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF831A031CD
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:06:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF1EFA031DA
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:09:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F58A1886E46
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:06:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDD3F1884A08
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77411DFE38;
-	Mon,  6 Jan 2025 21:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4111E0090;
+	Mon,  6 Jan 2025 21:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CPs858+Y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GK9jcoZO"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6394207A;
-	Mon,  6 Jan 2025 21:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0CA1DED6C
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 21:08:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736197558; cv=none; b=GUqBrjjz/2F3I68WveqdQ3ez3U+MVtk3MaLuBzUcw95SLYoXUFJATmvoaDC7Hi2F/y3NcT6Gz/s1WiHhIo/PsDEh1bcRk2omk6WH17XOHcEGX8YFIqvzyipMaBWVRmhyVBNbfXBzNlE2V1BabsexlnqNCqx2nVju3TH9wad7FWk=
+	t=1736197728; cv=none; b=CD4UOLk32NGrrgN9hbZB0MvQN5YLwq+UuLxwKaKGrWg0WfVizaa2vgR8nPpuhwIQj8P4fq9Evxuz7+jNaXIlnVwgUsHMfi6iOsUcFZuEUAviScfK7pi5yNRLocPWyKcC5yvS02hZ1lB/N038pR8u9kcLRN/bcp6RBDuT1Nk6Xmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736197558; c=relaxed/simple;
-	bh=PMqIAjMy2W2C7fvdlEyLE/DnMiUNw+hnOLyMhva0jlY=;
+	s=arc-20240116; t=1736197728; c=relaxed/simple;
+	bh=rm8oSb2uiKAUAy5n1L1LoIeT68R6jkSJ29wBjYJu5rQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SA8l8Xqod9TS2gadelQuRCXsKYUrj/WakcKF+gKK2Q32c/g6tCUs5I0/GmIFgP8w9Q79svisCGSNEceLGCdfPgJISEtaoMLYo4lNzvm4JPANKvswyD4Eor2eKFtHTjPRLu08xgPMwuh2JjWPZWD+pTDCzZL8NPpiP+7rIcvtLds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CPs858+Y; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=RZim0hmkdLN7Xa9dR7Ps25dZcxd6hdVjmX+C4tkXYNR9TBvXQV2bZ8q1aVRfm1v4LH9opew25CjfuXdq/aJiBt4uA4bMAtDzkfh5x1sqCo6KyPMf5tNc/rDBXSi0N101VyxD71QVwDtlnErEq+OAlY326zGFka8RjiwKCG4R7z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GK9jcoZO; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,28 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eDDQkkpqbkCsGa2J3B58yILeZtgFMY6XLVrsYIvsNhA=; b=CPs858+YJWwWF23l1a8Ms63Hb7
-	20deuNmLXH9hjPK5Inbeta9Y47I3UZgaj5N4/mflqEagCOk7V7LpPfPEBjnNxf98bOWtMP9lTpMlG
-	ZTsIgS3YVHRro27D03qsmYiwsZtIj/BUdQeuSKu6+yliFHuHo6UGxfUNz2OPnxyjQduU=;
+	bh=hGYss2LKdPyFwOFct3nky1yWQOlrbqDgzePUoejKddY=; b=GK9jcoZOqt3A302ILnNv4Ci1O0
+	f5nuKr1pkJoZG/zkeqY8KwsQR+FfdvT2cyK/wSoJ0GzAMgxyXs+1v8khyGvFT81A2vwXxlgnyZXY4
+	2QkmUx+UGJBwSpS2BQvghWi/mk0OZTUG4rdzXFlsVgwFSRAUUQYLdYRV9Ru+e9vLjMq0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tUuIC-001zXE-Br; Mon, 06 Jan 2025 22:05:44 +0100
-Date: Mon, 6 Jan 2025 22:05:44 +0100
+	id 1tUuKz-001zbP-H6; Mon, 06 Jan 2025 22:08:37 +0100
+Date: Mon, 6 Jan 2025 22:08:37 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Furong Xu <0x1207@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-Subject: Re: [PATCH net-next v1] net: stmmac: Unexport stmmac_rx_offset()
- from stmmac.h
-Message-ID: <6f0b5132-9695-4da6-ae87-1e0757253c07@lunn.ch>
-References: <20250106062845.3943846-1-0x1207@gmail.com>
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/2] r8169: prepare for extending hwmon support
+Message-ID: <aa27e059-793d-4a43-98ec-97f360e3b772@lunn.ch>
+References: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
+ <cf9d1c92-de68-44ea-9dec-ceba17c2aec9@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,22 +64,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250106062845.3943846-1-0x1207@gmail.com>
+In-Reply-To: <cf9d1c92-de68-44ea-9dec-ceba17c2aec9@gmail.com>
 
-> +static inline unsigned int stmmac_rx_offset(struct stmmac_priv *priv)
-> +{
-> +	if (stmmac_xdp_is_enabled(priv))
-> +		return XDP_PACKET_HEADROOM;
-> +
-> +	return 0;
-> +}
+On Mon, Jan 06, 2025 at 07:01:16PM +0100, Heiner Kallweit wrote:
+> This factors out the temperature value calculation and
+> prepares for adding further temperature attributes.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Please drop the inline keyword. You don't need it in a .c file, it is
-better to let the compiler to decide.
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
     Andrew
-
----
-pw-bot: cr
 
