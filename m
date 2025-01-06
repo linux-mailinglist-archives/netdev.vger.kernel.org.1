@@ -1,78 +1,109 @@
-Return-Path: <netdev+bounces-155590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF1EFA031DA
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:09:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4484A031E9
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDD3F1884A08
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A3F618842EB
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4111E0090;
-	Mon,  6 Jan 2025 21:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E881E0B72;
+	Mon,  6 Jan 2025 21:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GK9jcoZO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O/ijbblj"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0CA1DED6C
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 21:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DE91E04A1
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 21:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736197728; cv=none; b=CD4UOLk32NGrrgN9hbZB0MvQN5YLwq+UuLxwKaKGrWg0WfVizaa2vgR8nPpuhwIQj8P4fq9Evxuz7+jNaXIlnVwgUsHMfi6iOsUcFZuEUAviScfK7pi5yNRLocPWyKcC5yvS02hZ1lB/N038pR8u9kcLRN/bcp6RBDuT1Nk6Xmw=
+	t=1736198137; cv=none; b=inlI2J2rSTvWiRwt2/9mktiqaozgOmuk3C1hDDBtE0CQ2FIjn2f2+68LZy1ZJjVZoNIxW+pf/siy5OV1qNtj56r0ac5Y3qNsk0l5ygfzH0ju8EyDIBRB48BXrtqxJAcZGiCPH4+EDKoT5lhICNh83hYydVgdTzKBQn8D+FfOtPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736197728; c=relaxed/simple;
-	bh=rm8oSb2uiKAUAy5n1L1LoIeT68R6jkSJ29wBjYJu5rQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZim0hmkdLN7Xa9dR7Ps25dZcxd6hdVjmX+C4tkXYNR9TBvXQV2bZ8q1aVRfm1v4LH9opew25CjfuXdq/aJiBt4uA4bMAtDzkfh5x1sqCo6KyPMf5tNc/rDBXSi0N101VyxD71QVwDtlnErEq+OAlY326zGFka8RjiwKCG4R7z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GK9jcoZO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hGYss2LKdPyFwOFct3nky1yWQOlrbqDgzePUoejKddY=; b=GK9jcoZOqt3A302ILnNv4Ci1O0
-	f5nuKr1pkJoZG/zkeqY8KwsQR+FfdvT2cyK/wSoJ0GzAMgxyXs+1v8khyGvFT81A2vwXxlgnyZXY4
-	2QkmUx+UGJBwSpS2BQvghWi/mk0OZTUG4rdzXFlsVgwFSRAUUQYLdYRV9Ru+e9vLjMq0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tUuKz-001zbP-H6; Mon, 06 Jan 2025 22:08:37 +0100
-Date: Mon, 6 Jan 2025 22:08:37 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/2] r8169: prepare for extending hwmon support
-Message-ID: <aa27e059-793d-4a43-98ec-97f360e3b772@lunn.ch>
-References: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
- <cf9d1c92-de68-44ea-9dec-ceba17c2aec9@gmail.com>
+	s=arc-20240116; t=1736198137; c=relaxed/simple;
+	bh=MGHRfNW3QYgm4KGcwcfv6bz6L1OC5FBtO1avcKkwI2o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ECSZxpU8Vxcp+2AMZe2IBIL/YU0VGqyVmToWhD8rQDcqitnW+2b6Vex432Os0rK8Is/cAOBlYVIdJNDLo6wXCRlnAOmuElOhpVU7QWJQDb+Er0zAX7UIo2WvRUjLgoF9KYp2FslVkZSBkUhsGDINODciQVwQv2Oud8uLOxQN7IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O/ijbblj; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-467abce2ef9so58731cf.0
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 13:15:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736198132; x=1736802932; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MGHRfNW3QYgm4KGcwcfv6bz6L1OC5FBtO1avcKkwI2o=;
+        b=O/ijbblj+NnNHqFWik4iaT85GRLLYqE5jvo5SFTW7AhZYoTXTXvZ73qdh6tHnqVzwt
+         NgjB2QKj4+ZV0qHtfyMZnXG1PzOsYd8FfiyCudB2yIzCUZ8SqHovXNmNItbuNAa2G8Te
+         XAFbdl1BxxH+vxHao8ijNdMca+nfM3I6PAA26HUFYiial+T+hws53P+WV3C8uUWLm5KN
+         sWwDXV3sFSogpWJQf9Wwswt/8BbwUS7NTSZAbMpZ7P7esb9MYhGgTXjFN3z/YPzzVYyQ
+         cHOJX1kW2q0Uj9R9KfkNYaQeJsz+2BytO7MhyUnk4L94j7BD7URaujRxXiRD43+Kd4A/
+         HZgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736198132; x=1736802932;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MGHRfNW3QYgm4KGcwcfv6bz6L1OC5FBtO1avcKkwI2o=;
+        b=TbY9EJjus5I+0+UI6S9WzLc2znxUQib26C24qUnERjDSMgO0yY0FGBPaZmxkVaTaAg
+         fj1EeshZdPi1joV4u2AKT+LKB2sqlCznUUj5kRiaPwwzGIPv2fbHwysJXry6P7APV7GQ
+         eDlSu2W98+yd8gDD9+RoNOroQGkA1aEHp/GNPt1p1QpUQ3wpb09zKq0yo5NG9UdKapc/
+         lbDOGL3Qwdsc5XyDHcoampOEwdQN5MNV2sA3zEKKr9L+5LxOD9Nqv7N4W3OegZ2FPbyO
+         iNF6AFHCc5r6uanMTPSlKp3bIweozaGuU/tVvb3KWOfPpCMrRLhEgN4lVIq5n+kvtyPb
+         h4+w==
+X-Gm-Message-State: AOJu0YyIIUlWqyCrgkJDI/4YJQLfmR8UAx52q1/qQZVmET3XNzOu3T9k
+	lxmHC34GoeNQkJtqHfWuzGMmLKp3/7s+PWqRaSFM7yAHblHYkaR3/Qw0xKj8DEEnWGReuR3xMAJ
+	ekLChJ5UEPy9scnA3z44qllz8RfbUXx4VHt0t
+X-Gm-Gg: ASbGncv3Su8UI0yqzZ46oMEI45Id88K7CdsmGk7BNo8A15FoEErb88jwnKvHm1Y9Fvz
+	hEErFy5V/zUgyRZvZZcXMjbNpl8ozpAVgcStLZTH28brnjonPo/8XFSpuDkU9Twz2BjNUt3Y=
+X-Google-Smtp-Source: AGHT+IHFbo75Puxjkm64WI3YyLK5CsXwXyzyW8ExVEU09NWAASfSNPbXnzf663rHHNZNtnbRkm6Dnvtug0/wJS995yY=
+X-Received: by 2002:ac8:5e12:0:b0:466:975f:b219 with SMTP id
+ d75a77b69052e-46b3b759277mr650411cf.8.1736198132062; Mon, 06 Jan 2025
+ 13:15:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cf9d1c92-de68-44ea-9dec-ceba17c2aec9@gmail.com>
+References: <e831515a-3756-40f6-a254-0f075e19996f@icdsoft.com> <d1f083ee-9ad2-422c-9278-c50a9fbd8be4@icdsoft.com>
+In-Reply-To: <d1f083ee-9ad2-422c-9278-c50a9fbd8be4@icdsoft.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Mon, 6 Jan 2025 16:15:15 -0500
+Message-ID: <CADVnQyntg=3ugLxr+tdyb0A+=KDkVGkGPJVvFTOg0XpoyMSQEw@mail.gmail.com>
+Subject: Re: Download throttling with kernel 6.6 (in KVM guests)
+To: Teodor Milkov <zimage@icdsoft.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 06, 2025 at 07:01:16PM +0100, Heiner Kallweit wrote:
-> This factors out the temperature value calculation and
-> prepares for adding further temperature attributes.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+On Mon, Jan 6, 2025 at 3:15=E2=80=AFPM Teodor Milkov <zimage@icdsoft.com> w=
+rote:
+>
+> Hello,
+>
+> Following up on my previous email, I=E2=80=99ve found the issue occurs
+> specifically with the |virtio-net| driver in KVM guests. Switching to
+> the |e1000| driver resolves the slowdown entirely, with no throttling in
+> subsequent downloads.
+>
+> The reproducer and observations remain the same, but this detail might
+> help narrow down the issue.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Thanks for narrowing it down! Interesting. So this sounds like
+something specific about the way the virtio-net driver is handling
+receive buffer memory, and the way that is interacting with Eric's
+excellent recent commit to make receive window management more
+precise:
 
-    Andrew
+dfa2f0483360 tcp: get rid of sysctl_tcp_adv_win_scale
+
+best regards,
+neal
 
