@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-155561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77CA4A02F88
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:13:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C2BCA02F8A
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:13:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FAA11651BB
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:13:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5105B1651B3
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99DBF1DF24B;
-	Mon,  6 Jan 2025 18:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394301DF73D;
+	Mon,  6 Jan 2025 18:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="CsFnjk8G"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="iQBNBvCe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AC61B0F3D
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 18:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4377F1B0F3D
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 18:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736187180; cv=none; b=qRAz//NPlR2Palp+Pf2WnoJEyYqVM1k+Onakfgkx8iHfr36GRAdlSMZ1GFkuPTLKD4fE8gQoBhVUcykeNtBmXX8hmDcModP6lmnYHl8U55jyeDbSYZbZG0wxr2HtzOzdpNISA6TZ2qHZgN0dybA+fRLX4INjvaE9mKC964pf61M=
+	t=1736187184; cv=none; b=EGAzipTjV/9zQyByfcLzReUqjt4A6B7GhKzchU+OTCDCLpHRG476TI37u6VhCx3ucPvLsnWPEbIwf98/m4mlaXdtwm933q0lZLYlpg7CfNYk6Wbem4bMoj1XmtvXnF8pGPRR3+cNoTRD9vQsCeC2bUaeesYfXl5/o5fvreDnrV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736187180; c=relaxed/simple;
-	bh=v0aaMPekOpqkyiDJnBw21h95FPutjS7drBt9wEr74MA=;
+	s=arc-20240116; t=1736187184; c=relaxed/simple;
+	bh=rBYklsr0ws6SByx9giYRmM6JD047O7SblBdf3Txhrgo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V2o5Bo33SE1eEZgIkE55ZvA5vEByOlNPuuW3F4VQmrbPq6zPrWzwpW6cc90es1P1yaxsKKR6LSsi68fpSjSep9kZYOoAzCOUyJYviGr4ga80TebDoTzzTRh9yqwKRW76u4aO+Rk8/tNmXAKCOgWJS8Pu7s1PiKiJ2XBWPvktHts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=CsFnjk8G; arc=none smtp.client-ip=171.64.64.25
+	 MIME-Version; b=DyLzsMsfdoPMGDzSQtTWe4af04GunyWZf9WV/3T9bQGTgkz4aOr9/6CIjmtZw701adK8q2UeGNeTraRCPQsu/DRiUmgSATvxr8eHjx2004xzIMFZC6OFaroyGCcLKnBkOxWe/orPpPWXekEec7/PBcWwsKY0CTzIeK50VZWRAjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=iQBNBvCe; arc=none smtp.client-ip=171.64.64.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,17 +37,17 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ix/bmO9BsZi74OhIo5cIHN1xMIutqYgOHcB7CgylleU=; t=1736187178; x=1737051178; 
-	b=CsFnjk8G0NxGj/inMXkrfvB9umuze0WiZjRDPBWgA94x01uoz1f7cCybANkXzS1tuFKjqpn9lAH
-	ay2+WOdLRiP/TUReGi+vSy5U9mGvTFkw5yGmoCd8+HKnznGUs2WP0gY94HDRHT5NyAeX/Hs2ojI44
-	5IroZ+Hy3AMC/lR8xrsATFzcw56F4FftvSAFKwT5mHpENdZO0fG348KEKKqSiUTcKFDwyOxV4nDT7
-	jE7TZrBi0jjRpbR9SW5A3PUcS4ghilvT3yEWeRIOGqhghJG2cgYjkmo4z8Davb8+TR2hgPO162/1J
-	Hz2VAcy8fkEI1syB5alzEbauQARn/ZLomYVQ==;
+	bh=g61VlJobAQryvRC3yqIYqnxzEVhSl0MD6xzfyek0HCk=; t=1736187182; x=1737051182; 
+	b=iQBNBvCeYiNtjW9OkdFTTiG+F/Z0fz7C/U42F6sw59u3BK4zCDc/7PK+gYqpTDG8nQTaiVaRI3o
+	GrXLxOpPdfwpHtqgeUnHBlfW9n+eDWjVgljhuC/LJXglwquBMVdhVrxQsdgQnCWOxh1+Gn9+D+MCO
+	uf572FqIlEtMX1/xvHzp82Q+95z+3ZV2Rnt5LVlBHBu+3Q+IKJmZR+g8ZGRgPsx8G27k1uO13GTbI
+	auPM46Bq4EFHdccL4Q8yS4ILJfFrRId/Gm1e7yWzmvyOkp4KjXMNdXriPZmVusUUCS62PBfL3MP60
+	9EIdpEH7dOncI3W8ri72ME715knYrV7N8aYQ==;
 Received: from 70-228-78-207.lightspeed.sntcca.sbcglobal.net ([70.228.78.207]:59627 helo=localhost.localdomain)
 	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tUraz-0003Bs-FS; Mon, 06 Jan 2025 10:12:58 -0800
+	id 1tUrb1-0003Bs-HP; Mon, 06 Jan 2025 10:13:00 -0800
 From: John Ousterhout <ouster@cs.stanford.edu>
 To: netdev@vger.kernel.org
 Cc: pabeni@redhat.com,
@@ -55,9 +55,9 @@ Cc: pabeni@redhat.com,
 	horms@kernel.org,
 	kuba@kernel.org,
 	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v5 01/12] net: homa: define user-visible API for Homa
-Date: Mon,  6 Jan 2025 10:12:07 -0800
-Message-ID: <20250106181219.1075-2-ouster@cs.stanford.edu>
+Subject: [PATCH net-next v5 02/12] net: homa: create homa_wire.h
+Date: Mon,  6 Jan 2025 10:12:08 -0800
+Message-ID: <20250106181219.1075-3-ouster@cs.stanford.edu>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20250106181219.1075-1-ouster@cs.stanford.edu>
 References: <20250106181219.1075-1-ouster@cs.stanford.edu>
@@ -70,203 +70,389 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Score: -1.0
 X-Spam-Level: 
-X-Scan-Signature: a35a0880a1b226e45b16c4003e03508d
+X-Scan-Signature: afbb6022ebcf875afa433248af97014c
 
-Note: for man pages, see the Homa Wiki at:
-https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
+This file defines the on-the-wire packet formats for Homa.
 
 Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
 ---
- MAINTAINERS               |   7 ++
- include/uapi/linux/homa.h | 161 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 168 insertions(+)
- create mode 100644 include/uapi/linux/homa.h
+ net/homa/homa_wire.h | 367 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 367 insertions(+)
+ create mode 100644 net/homa/homa_wire.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1389704c7d8d..935d1e995018 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10391,6 +10391,13 @@ F:	lib/test_hmm*
- F:	mm/hmm*
- F:	tools/testing/selftests/mm/*hmm*
- 
-+HOMA TRANSPORT PROTOCOL
-+M:	John Ousterhout <ouster@cs.stanford.edu>
-+S:	Maintained
-+W:	https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
-+F:	include/uapi/linux/homa.h
-+F:	net/homa/
-+
- HONEYWELL HSC030PA PRESSURE SENSOR SERIES IIO DRIVER
- M:	Petre Rodan <petre.rodan@subdimension.ro>
- L:	linux-iio@vger.kernel.org
-diff --git a/include/uapi/linux/homa.h b/include/uapi/linux/homa.h
+diff --git a/net/homa/homa_wire.h b/net/homa/homa_wire.h
 new file mode 100644
-index 000000000000..df873a88512f
+index 000000000000..df0242c4f00b
 --- /dev/null
-+++ b/include/uapi/linux/homa.h
-@@ -0,0 +1,161 @@
++++ b/net/homa/homa_wire.h
+@@ -0,0 +1,367 @@
 +/* SPDX-License-Identifier: BSD-2-Clause */
 +
-+/* This file defines the kernel call interface for the Homa
-+ * transport protocol.
++/* This file defines the on-the-wire format of Homa packets. */
++
++#ifndef _HOMA_WIRE_H
++#define _HOMA_WIRE_H
++
++#include <linux/skbuff.h>
++
++/* Defines the possible types of Homa packets.
++ *
++ * See the xxx_header structs below for more information about each type.
 + */
-+
-+#ifndef _UAPI_LINUX_HOMA_H
-+#define _UAPI_LINUX_HOMA_H
-+
-+#include <linux/types.h>
-+#ifndef __KERNEL__
-+#include <netinet/in.h>
-+#include <sys/socket.h>
-+#endif
-+
-+/* IANA-assigned Internet Protocol number for Homa. */
-+#define IPPROTO_HOMA 146
-+
-+/**
-+ * define HOMA_MAX_MESSAGE_LENGTH - Maximum bytes of payload in a Homa
-+ * request or response message.
-+ */
-+#define HOMA_MAX_MESSAGE_LENGTH 1000000
-+
-+/**
-+ * define HOMA_BPAGE_SIZE - Number of bytes in pages used for receive
-+ * buffers. Must be power of two.
-+ */
-+#define HOMA_BPAGE_SIZE (1 << HOMA_BPAGE_SHIFT)
-+#define HOMA_BPAGE_SHIFT 16
-+
-+/**
-+ * define HOMA_MAX_BPAGES - The largest number of bpages that will be required
-+ * to store an incoming message.
-+ */
-+#define HOMA_MAX_BPAGES ((HOMA_MAX_MESSAGE_LENGTH + HOMA_BPAGE_SIZE - 1) \
-+		>> HOMA_BPAGE_SHIFT)
-+
-+/**
-+ * define HOMA_MIN_DEFAULT_PORT - The 16 bit port space is divided into
-+ * two nonoverlapping regions. Ports 1-32767 are reserved exclusively
-+ * for well-defined server ports. The remaining ports are used for client
-+ * ports; these are allocated automatically by Homa. Port 0 is reserved.
-+ */
-+#define HOMA_MIN_DEFAULT_PORT 0x8000
-+
-+/**
-+ * struct homa_sendmsg_args - Provides information needed by Homa's
-+ * sendmsg; passed to sendmsg using the msg_control field.
-+ */
-+struct homa_sendmsg_args {
-+	/**
-+	 * @id: (in/out) An initial value of 0 means a new request is
-+	 * being sent; nonzero means the message is a reply to the given
-+	 * id. If the message is a request, then the value is modified to
-+	 * hold the id of the new RPC.
++enum homa_packet_type {
++	DATA               = 0x10,
++	RESEND             = 0x12,
++	UNKNOWN            = 0x13,
++	BUSY               = 0x14,
++	NEED_ACK           = 0x17,
++	ACK                = 0x18,
++	BOGUS              = 0x19,      /* Used only in unit tests. */
++	/* If you add a new type here, you must also do the following:
++	 * 1. Change BOGUS so it is the highest opcode
++	 * 2. Add support for the new opcode in homa_print_packet,
++	 *    homa_print_packet_short, homa_symbol_for_type, and mock_skb_new.
++	 * 3. Add the header length to header_lengths in homa_plumbing.c.
 +	 */
-+	__u64 id;
-+
-+	/**
-+	 * @completion_cookie: (in) Used only for request messages; will be
-+	 * returned by recvmsg when the RPC completes. Typically used to
-+	 * locate app-specific info about the RPC.
-+	 */
-+	__u64 completion_cookie;
 +};
 +
-+#if !defined(__cplusplus)
-+_Static_assert(sizeof(struct homa_sendmsg_args) >= 16,
-+	       "homa_sendmsg_args shrunk");
-+_Static_assert(sizeof(struct homa_sendmsg_args) <= 16,
-+	       "homa_sendmsg_args grew");
-+#endif
++/** define HOMA_IPV6_HEADER_LENGTH - Size of IP header (V6). */
++#define HOMA_IPV6_HEADER_LENGTH 40
++
++/** define HOMA_IPV4_HEADER_LENGTH - Size of IP header (V4). */
++#define HOMA_IPV4_HEADER_LENGTH 20
 +
 +/**
-+ * struct homa_recvmsg_args - Provides information needed by Homa's
-+ * recvmsg; passed to recvmsg using the msg_control field.
++ * define HOMA_SKB_EXTRA - How many bytes of additional space to allow at the
++ * beginning of each sk_buff, before the IP header. This includes room for a
++ * VLAN header and also includes some extra space, "just to be safe" (not
++ * really sure if this is needed).
 + */
-+struct homa_recvmsg_args {
-+	/**
-+	 * @id: (in/out) Initially specifies the id of the desired RPC, or 0
-+	 * if any RPC is OK; returns the actual id received.
-+	 */
-+	__u64 id;
-+
-+	/**
-+	 * @completion_cookie: (out) If the incoming message is a response,
-+	 * this will return the completion cookie specified when the
-+	 * request was sent. For requests this will always be zero.
-+	 */
-+	__u64 completion_cookie;
-+
-+	/**
-+	 * @flags: (in) OR-ed combination of bits that control the operation.
-+	 * See below for values.
-+	 */
-+	__u32 flags;
-+
-+	/**
-+	 * @num_bpages: (in/out) Number of valid entries in @bpage_offsets.
-+	 * Passes in bpages from previous messages that can now be
-+	 * recycled; returns bpages from the new message.
-+	 */
-+	__u32 num_bpages;
-+
-+	/**
-+	 * @bpage_offsets: (in/out) Each entry is an offset into the buffer
-+	 * region for the socket pool. When returned from recvmsg, the
-+	 * offsets indicate where fragments of the new message are stored. All
-+	 * entries but the last refer to full buffer pages (HOMA_BPAGE_SIZE
-+	 * bytes) and are bpage-aligned. The last entry may refer to a bpage
-+	 * fragment and is not necessarily aligned. The application now owns
-+	 * these bpages and must eventually return them to Homa, using
-+	 * bpage_offsets in a future recvmsg invocation.
-+	 */
-+	__u32 bpage_offsets[HOMA_MAX_BPAGES];
-+};
-+
-+#if !defined(__cplusplus)
-+_Static_assert(sizeof(struct homa_recvmsg_args) >= 88,
-+	       "homa_recvmsg_args shrunk");
-+_Static_assert(sizeof(struct homa_recvmsg_args) <= 88,
-+	       "homa_recvmsg_args grew");
-+#endif
-+
-+/* Flag bits for homa_recvmsg_args.flags (see man page for documentation):
-+ */
-+#define HOMA_RECVMSG_REQUEST       0x01
-+#define HOMA_RECVMSG_RESPONSE      0x02
-+#define HOMA_RECVMSG_NONBLOCKING   0x04
-+#define HOMA_RECVMSG_VALID_FLAGS   0x07
-+
-+/** define SO_HOMA_RCVBUF - setsockopt option for specifying buffer region. */
-+#define SO_HOMA_RCVBUF 10
-+
-+/** struct homa_rcvbuf_args - setsockopt argument for SO_HOMA_RCVBUF. */
-+struct homa_rcvbuf_args {
-+	/** @start: Address of first byte of buffer region in user space. */
-+	__u64 start;
-+
-+	/** @length: Total number of bytes available at @start. */
-+	size_t length;
-+};
-+
-+/* Meanings of the bits in Homa's flag word, which can be set using
-+ * "sysctl /net/homa/flags".
-+ */
++#define HOMA_SKB_EXTRA 40
 +
 +/**
-+ * define HOMA_FLAG_DONT_THROTTLE - disable the output throttling mechanism
-+ * (always send all packets immediately).
++ * define HOMA_ETH_OVERHEAD - Number of bytes per Ethernet packet for Ethernet
++ * header, CRC, preamble, and inter-packet gap.
 + */
-+#define HOMA_FLAG_DONT_THROTTLE   2
++#define HOMA_ETH_OVERHEAD 42
 +
-+/* I/O control calls on Homa sockets. These are mapped into the
-+ * SIOCPROTOPRIVATE range of 0x89e0 through 0x89ef.
++/**
++ * define HOMA_MIN_PKT_LENGTH - Every Homa packet must be padded to at least
++ * this length to meet Ethernet frame size limitations. This number includes
++ * Homa headers and data, but not IP or Ethernet headers.
++ */
++#define HOMA_MIN_PKT_LENGTH 26
++
++/**
++ * define HOMA_MAX_HEADER - Number of bytes in the largest Homa header.
++ */
++#define HOMA_MAX_HEADER 90
++
++/**
++ * struct homa_common_hdr - Wire format for the first bytes in every Homa
++ * packet. This must (mostly) match the format of a TCP header to enable
++ * Homa packets to actually be transmitted as TCP packets (and thereby
++ * take advantage of TSO and other features).
++ */
++struct homa_common_hdr {
++	/**
++	 * @sport: Port on source machine from which packet was sent.
++	 * Must be in the same position as in a TCP header.
++	 */
++	__be16 sport;
++
++	/**
++	 * @dport: Port on destination that is to receive packet. Must be
++	 * in the same position as in a TCP header.
++	 */
++	__be16 dport;
++
++	/**
++	 * @sequence: corresponds to the sequence number field in TCP headers;
++	 * used in DATA packets to hold the offset in the message of the first
++	 * byte of data. This value will only be correct in the first segment
++	 * of a GSO packet.
++	 */
++	__be32 sequence;
++
++	/**
++	 * @ack: Corresponds to the high-order bits of the acknowledgment
++	 * field in TCP headers; not used by Homa.
++	 */
++	char ack[3];
++
++	/**
++	 * @type: Homa packet type (one of the values of the homa_packet_type
++	 * enum). Corresponds to the low-order byte of the ack in TCP.
++	 */
++	__u8 type;
++
++	/**
++	 * @doff: High order 4 bits holds the number of 4-byte chunks in a
++	 * homa_data_hdr (low-order bits unused). Used only for DATA packets;
++	 * must be in the same position as the data offset in a TCP header.
++	 * Used by TSO to determine where the replicated header portion ends.
++	 */
++	__u8 doff;
++
++	/**
++	 * @reserved1: Corresponds to flag bits in TCP; currently unused
++	 * by Homa.
++	 */
++	__u8 reserved1;
++
++	/**
++	 * @window: Corresponds to the window field in TCP headers. Not used
++	 * by HOMA.
++	 */
++	__be16 window;
++
++	/**
++	 * @checksum: Not used by Homa, but must occupy the same bytes as
++	 * the checksum in a TCP header (TSO may modify this?).
++	 */
++	__be16 checksum;
++
++	/**
++	 * @reserved2: Corresponds to the urgent pointer in TCP; not used
++	 * by Homa.
++	 */
++	__be16 reserved2;
++
++	/**
++	 * @sender_id: the identifier of this RPC as used on the sender (i.e.,
++	 * if the low-order bit is set, then the sender is the server for
++	 * this RPC).
++	 */
++	__be64 sender_id;
++} __packed;
++
++/**
++ * struct homa_ack - Identifies an RPC that can be safely deleted by its
++ * server. After sending the response for an RPC, the server must retain its
++ * state for the RPC until it knows that the client has successfully
++ * received the entire response. An ack indicates this. Clients will
++ * piggyback acks on future data packets, but if a client doesn't send
++ * any data to the server, the server will eventually request an ack
++ * explicitly with a NEED_ACK packet, in which case the client will
++ * return an explicit ACK.
++ */
++struct homa_ack {
++	/**
++	 * @client_id: The client's identifier for the RPC. 0 means this ack
++	 * is invalid.
++	 */
++	__be64 client_id;
++
++	/** @server_port: The server-side port for the RPC. */
++	__be16 server_port;
++} __packed;
++
++/* struct homa_data_hdr - Contains data for part or all of a Homa message.
++ * An incoming packet consists of a homa_data_hdr followed by message data.
++ * An outgoing packet can have this simple format as well, or it can be
++ * structured as a GSO packet with the following format:
++ *
++ *    |-----------------------|
++ *    |                       |
++ *    |     data_header       |
++ *    |                       |
++ *    |---------------------- |
++ *    |                       |
++ *    |                       |
++ *    |     segment data      |
++ *    |                       |
++ *    |                       |
++ *    |-----------------------|
++ *    |      seg_header       |
++ *    |-----------------------|
++ *    |                       |
++ *    |                       |
++ *    |     segment data      |
++ *    |                       |
++ *    |                       |
++ *    |-----------------------|
++ *    |      seg_header       |
++ *    |-----------------------|
++ *    |                       |
++ *    |                       |
++ *    |     segment data      |
++ *    |                       |
++ *    |                       |
++ *    |-----------------------|
++ *
++ * TSO will not adjust @homa_common_hdr.sequence in the segments, so Homa
++ * sprinkles correct offsets (in homa_seg_hdrs) throughout the segment data;
++ * TSO/GSO will include a different homa_seg_hdr in each generated packet.
 + */
 +
-+#define HOMAIOCFREEZE _IO(0x89, 0xef)
++struct homa_seg_hdr {
++	/**
++	 * @offset: Offset within message of the first byte of data in
++	 * this segment.
++	 */
++	__be32 offset;
++} __packed;
 +
-+#endif /* _UAPI_LINUX_HOMA_H */
++struct homa_data_hdr {
++	struct homa_common_hdr common;
++
++	/** @message_length: Total #bytes in the message. */
++	__be32 message_length;
++
++	__be32 reserved1;
++
++	/** @ack: If the @client_id field of this is nonzero, provides info
++	 * about an RPC that the recipient can now safely free. Note: in
++	 * TSO packets this will get duplicated in each of the segments;
++	 * in order to avoid repeated attempts to ack the same RPC,
++	 * homa_gro_receive will clear this field in all segments but the
++	 * first.
++	 */
++	struct homa_ack ack;
++
++	__be16 reserved2;
++
++	/**
++	 * @retransmit: 1 means this packet was sent in response to a RESEND
++	 * (it has already been sent previously).
++	 */
++	__u8 retransmit;
++
++	char pad[3];
++
++	/** @seg: First of possibly many segments. */
++	struct homa_seg_hdr seg;
++} __packed;
++_Static_assert(sizeof(struct homa_data_hdr) <= HOMA_MAX_HEADER,
++	       "homa_data_hdr too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
++_Static_assert(sizeof(struct homa_data_hdr) >= HOMA_MIN_PKT_LENGTH,
++	       "homa_data_hdr too small: Homa doesn't currently have code to pad data packets");
++_Static_assert(((sizeof(struct homa_data_hdr) - sizeof(struct homa_seg_hdr)) &
++		0x3) == 0,
++	       " homa_data_hdr length not a multiple of 4 bytes (required for TCP/TSO compatibility");
++
++/**
++ * homa_data_len() - Returns the total number of bytes in a DATA packet
++ * after the homa_data_hdr. Note: if the packet is a GSO packet, the result
++ * may include metadata as well as packet data.
++ * @skb:   Incoming data packet
++ * Return: see above
++ */
++static inline int homa_data_len(struct sk_buff *skb)
++{
++	return skb->len - skb_transport_offset(skb) -
++			sizeof(struct homa_data_hdr);
++}
++
++/**
++ * struct homa_resend_hdr - Wire format for RESEND packets.
++ *
++ * A RESEND is sent by the receiver when it believes that message data may
++ * have been lost in transmission (or if it is concerned that the sender may
++ * have crashed). The receiver should resend the specified portion of the
++ * message, even if it already sent it previously.
++ */
++struct homa_resend_hdr {
++	/** @common: Fields common to all packet types. */
++	struct homa_common_hdr common;
++
++	/**
++	 * @offset: Offset within the message of the first byte of data that
++	 * should be retransmitted.
++	 */
++	__be32 offset;
++
++	/**
++	 * @length: Number of bytes of data to retransmit; this could specify
++	 * a range longer than the total message size. Zero is a special case
++	 * used by servers; in this case, there is no need to actually resend
++	 * anything; the purpose of this packet is to trigger an UNKNOWN
++	 * response if the client no longer cares about this RPC.
++	 */
++	__be32 length;
++} __packed;
++_Static_assert(sizeof(struct homa_resend_hdr) <= HOMA_MAX_HEADER,
++	       "homa_resend_hdr too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
++
++/**
++ * struct homa_unknown_hdr - Wire format for UNKNOWN packets.
++ *
++ * An UNKNOWN packet is sent by either server or client when it receives a
++ * packet for an RPC that is unknown to it. When a client receives an
++ * UNKNOWN packet it will typically restart the RPC from the beginning;
++ * when a server receives an UNKNOWN packet it will typically discard its
++ * state for the RPC.
++ */
++struct homa_unknown_hdr {
++	/** @common: Fields common to all packet types. */
++	struct homa_common_hdr common;
++} __packed;
++_Static_assert(sizeof(struct homa_unknown_hdr) <= HOMA_MAX_HEADER,
++	       "homa_unknown_hdr too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
++
++/**
++ * struct homa_busy_hdr - Wire format for BUSY packets.
++ *
++ * These packets tell the recipient that the sender is still alive (even if
++ * it isn't sending data expected by the recipient).
++ */
++struct homa_busy_hdr {
++	/** @common: Fields common to all packet types. */
++	struct homa_common_hdr common;
++} __packed;
++_Static_assert(sizeof(struct homa_busy_hdr) <= HOMA_MAX_HEADER,
++	       "homa_busy_hdr too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
++
++/**
++ * struct homa_need_ack_hdr - Wire format for NEED_ACK packets.
++ *
++ * These packets ask the recipient (a client) to return an ACK message if
++ * the packet's RPC is no longer active.
++ */
++struct homa_need_ack_hdr {
++	/** @common: Fields common to all packet types. */
++	struct homa_common_hdr common;
++} __packed;
++_Static_assert(sizeof(struct homa_need_ack_hdr) <= HOMA_MAX_HEADER,
++	       "homa_need_ack_hdr too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
++
++/**
++ * struct homa_ack_hdr - Wire format for ACK packets.
++ *
++ * These packets are sent from a client to a server to indicate that
++ * a set of RPCs is no longer active on the client, so the server can
++ * free any state it may have for them.
++ */
++struct homa_ack_hdr {
++	/** @common: Fields common to all packet types. */
++	struct homa_common_hdr common;
++
++	/** @num_acks: Number of (leading) elements in @acks that are valid. */
++	__be16 num_acks;
++
++#define HOMA_MAX_ACKS_PER_PKT 5
++	/** @acks: Info about RPCs that are no longer active. */
++	struct homa_ack acks[HOMA_MAX_ACKS_PER_PKT];
++} __packed;
++_Static_assert(sizeof(struct homa_ack_hdr) <= HOMA_MAX_HEADER,
++	       "homa_ack_hdr too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
++
++/**
++ * homa_local_id(): given an RPC identifier from an input packet (which
++ * is network-encoded), return the decoded id we should use for that
++ * RPC on this machine.
++ * @sender_id:  RPC id from an incoming packet, such as h->common.sender_id
++ * Return: see above
++ */
++static inline __u64 homa_local_id(__be64 sender_id)
++{
++	/* If the client bit was set on the sender side, it needs to be
++	 * removed here, and conversely.
++	 */
++	return be64_to_cpu(sender_id) ^ 1;
++}
++
++#endif /* _HOMA_WIRE_H */
 -- 
 2.34.1
 
