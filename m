@@ -1,120 +1,114 @@
-Return-Path: <netdev+bounces-155581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60DCEA030D7
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 20:45:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B35C1A03135
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15222161B2E
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:45:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E01518862B0
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 20:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF9C1DFE37;
-	Mon,  6 Jan 2025 19:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HH8FtIKN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9AC1AA783;
+	Mon,  6 Jan 2025 20:15:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from s802.sureserver.com (s802.sureserver.com [195.8.222.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B9B1DF961
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 19:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A82C1DF748
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 20:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.8.222.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736192714; cv=none; b=JO0JVriiIounVv5AeH/gOzUNczX3WwV++qXmFx5exgJ9K6a2+Ce8kKb5aVIlWJgBWi5c3s/7MBwDsP8yG0bAtg1Y8hYjmzeJmP+Z+WwO9zcQKRZZ/wma14VF83k3ee2QQs6hh40UnkGkoe8ifr0bUJ6f1rSmslghBP4ZRW+5Keg=
+	t=1736194545; cv=none; b=oW5KxpUEW49pdKi3JpS+f1U425+qg6n67Y7PPgVqPWKVq0LItsy5G3Qiy67K41loMOl71D4uxHP4MCS2/zHct+f7LQYrTEM996WIa2aZBkLvyIg5IEsOPrXeEOrGvtCIYj2bidXMqQ7BUgsDtlF7MBWKLHO+wlVNDIIFQ6DOfOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736192714; c=relaxed/simple;
-	bh=PON9AGfTkBePM/HN7mtINeIQQyXBNnztwBb9zM8r/Kg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hiy17Q5k94bQnTz0sPWQQFF8+iyt8CBETBA2ECUQlrYf6bkh07jyXpWD68EZCRF0LcHs+KykuqcNI2a0+aukiv2Q6/3MlokZ6Dk6IvCv14PGZ4TeMJEtMc6l/diOckObMsWl31GOwQuj7VeCdWfQDiNOREGQPHDs6XDHPtNsfeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HH8FtIKN; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-29f88004a92so9821138fac.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 11:45:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1736192711; x=1736797511; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PON9AGfTkBePM/HN7mtINeIQQyXBNnztwBb9zM8r/Kg=;
-        b=HH8FtIKNLwHm1dep5ArEYJKGPt/zHeuALa3NZN2iJ/7KGv+AZzB1BvLCeDkPaPDQhx
-         LUTLsGiFKsNzHTW4qrOAgsJ2U0PJUjTWc6Ug0B39WLOySLkEmdYCxnqZ1jj30GNdUed4
-         1bb7aD8kwLgiaG9KKsCrNf/ojEQyTNJMi3lfqvCNZyB59MnJnHIZC5Bglnd/F1DoC2ux
-         akuUsqohIlHVtvuxsUQQy3iEwGdeZqgR/DDjFlK+KKSM6jgMuMVFyAQwrA9TGIaQ7ttC
-         xwB3fZa3iDAxMBdbuNFEodbjHoNP7r0m773WfANQNWtx0R+Gpokj+UgaWmkioreEpKSj
-         fYOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736192711; x=1736797511;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PON9AGfTkBePM/HN7mtINeIQQyXBNnztwBb9zM8r/Kg=;
-        b=ZQJsZUFspf1nOlsb2o2HswcfGMdT45yaHwlaQQdANmXvpEOaOKcWfEXBwkUgHpXRAr
-         iimb5EOkbSCxi4/op+5noZVzPi9bX/MlzHB3bgXRJDIfs/hoRKGkl7/CkzczTgmMfJiw
-         dafZiBYnHVjpfL4GdO7Z+HsK+XSdTd9SFdWwvCrKPa7uVF8owXllzEgFdj1x0FA9A/bp
-         WpiwcV1Q7sfT4m4VlKLbst5tvuDw7VLE6RmeBLHupW27d0XGCFwqQt7t2gQ3DpqS8AB6
-         CdQ3Cr62BO9EOB7N1yu9CRUMwJoG62Bg5lAeNokJ3X68Ry9syQ+1DOcOBRse29EonjVo
-         k60w==
-X-Forwarded-Encrypted: i=1; AJvYcCUigOcSXT3qkTcs/70oy4Aw8R9cjMSUnfu1QHgOwGym+k55t8PDuweGsLvuZYnSY0RnKORkxx4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWCALLR+DSP61sD3vIBWj0oUNrwCYfpbtJNx25ssad6mP/fVr+
-	R6Id10y0dursF3d44fxBOM9EoFn75HGc+5GPoQHh8P7YpNdtukoTSEEHJmmbaZ+HErfldi4oxqt
-	kfjv93dARyjsAV02FXgBzbetImqrEa1irKsSlPA==
-X-Gm-Gg: ASbGnctCYblwsseWwKm8a5gIQnxdDNF22meqkmJiFOTe/Fk7LGgWEPgitx52bfrvaJn
-	q41NpyJ4delop5r04V7j3v2jTXSUSYkfAml13vA==
-X-Google-Smtp-Source: AGHT+IH/4cA/gr7SwIwKKRIdcGKE51Fh3Zo6ASYJ6NfRiFOfMKsRW6ihD1j3orHlBus7mr6Ul2pftcwdws/IM+WpCIE=
-X-Received: by 2002:a05:6870:9e8d:b0:296:e6d9:a2e1 with SMTP id
- 586e51a60fabf-2a7fb0aa2edmr32715250fac.11.1736192711105; Mon, 06 Jan 2025
- 11:45:11 -0800 (PST)
+	s=arc-20240116; t=1736194545; c=relaxed/simple;
+	bh=jvyWbLmgbyMX7a55tEJ5Wnm1hkta+JS/M9QxsKWwRmE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:References:
+	 In-Reply-To:Content-Type; b=Zf7QNfRJn44o8v4GiaMN2X8/i2uis2+p8TLOCKz2vLYO9vGyXUc7sFtna2TkbmMYOJ2vA4bHcJLSmZ1gHsW3YLYa8KuEsSuEUUs3Pa/cw4SujUPPDWshJi6kF55Lp6qdfnKxxyLdwnz4BjoS9ZecfNCcbKa/tjYOdl8IdtpYVq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=icdsoft.com; spf=fail smtp.mailfrom=icdsoft.com; arc=none smtp.client-ip=195.8.222.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=icdsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=icdsoft.com
+Received: (qmail 6838 invoked by uid 1003); 6 Jan 2025 20:15:38 -0000
+Received: from unknown (HELO ?94.155.37.179?) (zimage@dni.li@94.155.37.179)
+  by s802.sureserver.com with ESMTPA; 6 Jan 2025 20:15:38 -0000
+Message-ID: <d1f083ee-9ad2-422c-9278-c50a9fbd8be4@icdsoft.com>
+Date: Mon, 6 Jan 2025 22:15:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250105124819.6950-1-zaihan@unrealasia.net>
-In-Reply-To: <20250105124819.6950-1-zaihan@unrealasia.net>
-From: Loic Poulain <loic.poulain@linaro.org>
-Date: Mon, 6 Jan 2025 20:44:35 +0100
-X-Gm-Features: AbW1kvannVtOGNsSoZKrWNjnhUUwIAtkh5XrAosMZ7f8wqwdeHXIySb2AMOe1mo
-Message-ID: <CAMZdPi91hR10xe=UzccqtwvtvS9_Wf9NEw6i5-x=e4UdfKMcug@mail.gmail.com>
-Subject: Re: [PATCH net-next v4] wwan dev: Add port for NMEA channel for WWAN devices
-To: Muhammad Nuzaihan <zaihan@unrealasia.net>, Slark Xiao <slark_xiao@163.com>
-Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+From: Teodor Milkov <zimage@icdsoft.com>
+Subject: Re: Download throttling with kernel 6.6 (in KVM guests)
+To: netdev@vger.kernel.org
+References: <e831515a-3756-40f6-a254-0f075e19996f@icdsoft.com>
+Content-Language: en-US
+In-Reply-To: <e831515a-3756-40f6-a254-0f075e19996f@icdsoft.com>
+Organization: ICDSoft Ltd
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Muhammad,
+Hello,
 
-+ Slark
+Following up on my previous email, I’ve found the issue occurs 
+specifically with the |virtio-net| driver in KVM guests. Switching to 
+the |e1000| driver resolves the slowdown entirely, with no throttling in 
+subsequent downloads.
 
-On Sun, 5 Jan 2025 at 13:53, Muhammad Nuzaihan <zaihan@unrealasia.net> wrote:
+The reproducer and observations remain the same, but this detail might 
+help narrow down the issue.
+
+Best regards!
+
+
+On 12/29/24 14:31, Teodor Milkov wrote:
+> Hello,
 >
-> Based on the code: drivers/bus/mhi/host/pci_generic.c
-> which already has NMEA channel (mhi_quectel_em1xx_channels)
-> support in recent kernels but it is never exposed
-> as a port.
+> We've encountered a regression affecting downloads in KVM guests after 
+> upgrading to Linux kernel 6.6. The issue is not present in kernel 5.15 
+> or the stock Debian 6.6 kernel on hosts (not guests) but manifests 
+> consistently in kernels 6.6 and later, including 6.6.58 and even 6.13-rc.
 >
-> This commit exposes that NMEA channel to a port
-> to allow tty/gpsd programs to read through
-> the /dev/wwan0nmea0 port.
+> Steps to Reproduce:
+> 1. Perform multiple sequential downloads, perhaps on a link with 
+> higher BDP (USA -> EU 120ms in our case).
+> 2. Look at download speeds in scenarios with varying sleep intervals 
+> between the downloads.
 >
-> Tested this change on a new kernel and module
-> built and now NMEA (mhi0_NMEA) statements are
-> available (attached) through /dev/wwan0nmea0 port on bootup.
+> Observations:
+> - Kernel 5.15: Reaches maximum throughput (~23 MB/s) consistently.
+> - Kernel 6.6:
+>   - The first download achieves maximum throughput (~23 MB/s).
+>   - Subsequent downloads are throttled to ~16 MB/s unless a sleep 
+> interval ≥ 0.3 seconds is introduced between them.
 >
-> Signed-off-by: Muhammad Nuzaihan Bin Kamal Luddin <zaihan@unrealasia.net>
-
-This works for sure but I'm not entirely convinced NMEA should be
-exposed as a modem control port. In your previous patch version Sergey
-pointed to a discussion we had regarding exposing that port as WWAN
-child device through the regular GNSS subsystem, which would require
-some generic bridge in the WWAN subsystem.
-
-Slark, did you have an opportunity to look at the GNSS solution?
-
-Regards,
-Loic
+> Reproducer Script:
+> for _ in 1 2; do  curl http://example.com/1000MB.bin --max-time 8 -o 
+> /dev/null -w '(%{speed_download} B/s)\n'; sleep 0.1   ;done
+>
+>
+> Tried various sysctl settings, changing qdiscs, tcp congestion algo 
+> (e.g. from bbr to cubic), but the problem persists.
+>
+> git bisect traced the regression to commit dfa2f0483360 ("tcp: get rid 
+> of sysctl_tcp_adv_win_scale"). While a similar issue described by 
+> Netflix in 
+> https://netflixtechblog.com/investigation-of-a-cross-regional-network-performance-issue-422d6218fdf1 
+> and was supposedly fixed in kernels 6.6.33 and 6.10, the problem 
+> remains in 6.6.58 and even 6.13-rc for our case.
+>
+> Could this behavior be a side effect of `tcp_adv_win_scale` removal, 
+> or is it indicative of something else?
+>
+> We would appreciate any insights or guidance how to further 
+> investigate this regression.
+>
+> Best regards!
+>
+-- 
+Teodor Milkov | https://icdsoft.com
+Head of Linux Engineering & Operations
 
