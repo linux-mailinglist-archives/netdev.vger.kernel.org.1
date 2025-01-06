@@ -1,44 +1,92 @@
-Return-Path: <netdev+bounces-155451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACC3EA025C4
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:43:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA8C4A02616
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 14:02:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B7453A4AA3
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 12:43:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15E091884D0F
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:02:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 843191DE2D4;
-	Mon,  6 Jan 2025 12:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C368433C0;
+	Mon,  6 Jan 2025 13:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="1cJwILu3"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="mlJ8qwQ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.freemail.hu (fmfe07.freemail.hu [46.107.16.200])
+Received: from fennec.ash.relay.mailchannels.net (fennec.ash.relay.mailchannels.net [23.83.222.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C241DE2CC;
-	Mon,  6 Jan 2025 12:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736167345; cv=none; b=TelTNzlOJOOFnOVU/xfSK4qzD7jh2rfjnudAar/YIaa+rvu67GATsaqSUGewMFyWyjF3kHNMwLNanJbYGJo1pNNUKeCBGFxmEXLmblCU1KETUOF4m8VJ6BMk8MwGwg+5h+eIrFSEVzxkuWfWrDwEquAtZiBNJoqivh0VD3aWwBA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736167345; c=relaxed/simple;
-	bh=m5xi1UE1L1q3JiErjoQYn/5mv930SegOrKMorf4zx6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LDBkKXLMN2RKZSolZbGoEYyRUj3ouLHSId44+6N69IViWRyR2zbaw1F9M22y60ngO9iGhpIDx8pn+oQ1P6hHX5z2u8beO5pgLC5Z4NnoezE5gI5YrEdHXjM8w1hpeYdllEec+roapqAApDkY/5zFeEO+NlaWgCvaaaQIiCZPvGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=1cJwILu3 reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
-Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YRYjP46RYzKQ8;
-	Mon, 06 Jan 2025 13:42:17 +0100 (CET)
-Message-ID: <33196cbc-2763-48d5-9e26-7295cd70b2c4@freemail.hu>
-Date: Mon, 6 Jan 2025 13:41:55 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6581D89E9
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 13:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.222.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736168537; cv=pass; b=LeJbvFafCOR0TdtOoD7k7NZtl0iIdY30VY4EAfR3ebq787NcjUbheEFL95qU0uGG5xLmm13GAY2HqKxKVk0P28yPJWvbFDcXriJ4e0A/NO25p15QA0fVkjifRmu6vrOExdLyEs+Bq/Xhfc0x7a9j5ATLvFL66OjbtwEQ11XUR6g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736168537; c=relaxed/simple;
+	bh=Spk0dx6uaB+rkbL0ch7L7fEMJvMjc3SyGzOmmbXj8gI=;
+	h=Message-ID:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Date; b=qyEp+Z7hnoa2pyScXWuJz6ocXkQJGT+/MVLWCqW23k2jcWaJWgUCaqedsjpFyG8IwyrDBahKJCVtsa6DK7dzbsfd7A8M0J/18oYYZa0enpZg9EDoFObWI5SzbIIV69lePsTZPm0wdHnuQEUsiACDx0kvD9M0mL/X2HRCRlV7psM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=mlJ8qwQ5; arc=pass smtp.client-ip=23.83.222.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 885B51641B7;
+	Mon,  6 Jan 2025 13:02:08 +0000 (UTC)
+Received: from uk-fast-smtpout8.hostinger.io (trex-7.trex.outbound.svc.cluster.local [100.109.217.170])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id E86D2163474;
+	Mon,  6 Jan 2025 13:02:04 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1736168528; a=rsa-sha256;
+	cv=none;
+	b=+MGFwFRWxGnQkdzbUusmcuVsKaD6FqRQXym6aYXyqLZrJRseAwcgfWxW+3Sw03NgXcqS+W
+	OzCA3ZMkNwUy9aQfJhDxAIHQ7tMmoHgeJohGMr01IeAkaAHaDU+7kbmWtY23kbxvbtwUDT
+	gAmYCVppbOHkrdoJ7Ir9eI0Uuln3wxvExZOF4kMjLYLyoOKDf4UcsqGODojujtqeoZRT9I
+	uJFviwW6+4tickeFoKHvAa+OYL1opLkKeN7KtxZqrcJC9NdzUcJkOUGW/tkplYESVgJedc
+	cjGG9wL9vJo0hlcepBjQ/sxt6nokilD/mNGcU6Tpi89P+ckUK5fSdA6907qXpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1736168528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=AcDSjeks6TlFjnGYIqpnkk+EjNYuhIl6j1UVmh3/ZuE=;
+	b=uENe8QvJ9Lf5GumSpe8pye6l/HupodHK+lj90nHD65kAIdsfs0Edv3phRhro72yLJJY/ne
+	T+wzaY6TnEWY7y7vtFm/vyQXDNVN6sp+Ape8jz+fVi7YbRwnr6X2QXKDsDYdhn4yg68XM6
+	xAJbKAv/c41/NifN+Ny83P3R0hcySfytwpEWKRijGXnmHaD7T0E5dO7GrEkdkpWYMac1YH
+	kOx8VtlGrM7Bc6FUecdEvQ+SjnYW4+sYCXlRATTucZUlDNfK2ACQ1yguC9WUduugIALV7p
+	+muQ7tM8XKk/ojJHgtiT9CtvG1GQjLOm+5Ej5sGqbAwQbfzg60kKJ/WOOgmR3g==
+ARC-Authentication-Results: i=1;
+	rspamd-7c48484bf8-vlhwn;
+	auth=pass smtp.auth=hostingeremail smtp.mailfrom=chester.a.unal@arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Company-Spot: 7ca0a4c92aa3c7f7_1736168528359_1456431916
+X-MC-Loop-Signature: 1736168528359:626636087
+X-MC-Ingress-Time: 1736168528359
+Received: from uk-fast-smtpout8.hostinger.io (uk-fast-smtpout8.hostinger.io
+ [31.220.23.88])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.109.217.170 (trex/7.0.2);
+	Mon, 06 Jan 2025 13:02:08 +0000
+Message-ID: <bd07fea7-2473-458a-b0f2-f03afb6a8b32@arinc9.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
+	s=hostingermail-a; t=1736168522;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AcDSjeks6TlFjnGYIqpnkk+EjNYuhIl6j1UVmh3/ZuE=;
+	b=mlJ8qwQ5EvPAxtT10MwR1IlP8+211LJMFdbtycwM2pmJc48WD+M2zl6DiEc8LcNvo+Yypd
+	pddR5brQ+rQhMO6B4W23cvPjsaC+p0TEsW4fV8hg7Q1zs26KbDBg3RZFyfpq3YK76jCxtt
+	XTc+P5pKb0rsHr4TCAIdc8QEgXI9x5JE96+bMMYv3JEj7vE1cYC9aHyYLcv4FvfQ2ikL4j
+	HJX7ZnskyC5Ti5+qE3c7X/cX9y/VGkHf9pCEWKp8oBjC3iO9/N/W+ts2kpDbY147l307YX
+	fGidqp2ejtV2dH6X2yFVAJqMjkWmeZaDE1fa7x8Xlgj+ZqCZLNxOqM/gek4AVA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,144 +94,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/3] netfilter: x_tables: Merge xt_*.h and ipt_*.h
- files which has same name.
-To: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>,
- lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org,
- amiculas@cisco.com, kadlec@netfilter.org, David Miller
- <davem@davemloft.net>, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250105231900.6222-1-egyszeregy@freemail.hu>
- <20250105231900.6222-2-egyszeregy@freemail.hu>
- <8f20c793-7985-72b2-6420-fd2fd27fe69c@blackhole.kfki.hu>
-Content-Language: hu
-From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
-In-Reply-To: <8f20c793-7985-72b2-6420-fd2fd27fe69c@blackhole.kfki.hu>
+Subject: Re: [PATCH net-next 2/9] net: dsa: mt753x: remove setting of tx_lpi
+ parameters
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Ar__n__ __NAL <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>,
+ "David S. Miller" <davem@davemloft.net>, DENG Qingfang <dqfext@gmail.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Matthias Brugger
+ <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
+ Simon Horman <horms@kernel.org>, UNGLinuxDriver@microchip.com,
+ Vladimir Oltean <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>
+References: <Z3vDwwsHSxH5D6Pm@shell.armlinux.org.uk>
+ <E1tUlku-007Uyc-RP@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: "Chester A. Unal" <chester.a.unal@arinc9.com>
+In-Reply-To: <E1tUlku-007Uyc-RP@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736167338;
-	s=20181004; d=freemail.hu;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	l=5295; bh=EMW5iYB2TliQXChb2PBgUubKkUz9ykJAqun8jlrmVTE=;
-	b=1cJwILu3bFx9EYRahgYnGiNHFrArV46AM2XHi6jNbSAUYTxJZg85ukZToYNKmKiK
-	+gWvKKDTzQXTqTp9O26+bKeNi5lyPOKKpJTaHQA/vsDuQfQf7rnW8nSS6EZRdvrhyQu
-	yKEbGHXllEg68aBX09PuDxtMpasnNkwwA40FQpUhN8d67Jj9+ZRA0n6r/pp89b915mx
-	Q2groMR6fxL6RcvLkY/Lwx3NGjfZUmEnp3r8y5EZ8z8T48dlk1E75uK66c2w2R/KEFG
-	Tw4eG2Okb47hdcE7GttOqArpvai8HOa9rLKQXjNSYpG1bj8PSoBGs/nXM5B9GxzWQoc
-	Ue3XkYP2QA==
+Content-Transfer-Encoding: 7bit
+Date: Mon, 06 Jan 2025 13:01:59 +0000 (UTC)
+X-CM-Analysis: v=2.4 cv=Ft9X/Hrq c=1 sm=1 tr=0 ts=677bd44a a=xjZdIgyYDteOtQQgkZ0oAw==:117 a=xjZdIgyYDteOtQQgkZ0oAw==:17 a=IkcTkHD0fZMA:10 a=PHq6YzTAAAAA:8 a=GvHEsTVZAAAA:8 a=4-z7pJFQCo3YSGV8thMA:9 a=QEXdDO2ut3YA:10 a=ZKzU8r6zoKMcqsNulkmm:22 a=aajZ2D0djhd3YR65f-bR:22
+X-CM-Envelope: MS4xfH9N1taU54asjLrGreSAV/TehiAi7J06EL3eyr/omZSHO8gLmfXKXvQ5bOAI2GJNp5Npok24rRkRfxgEZNYsmmuhu8FmWE96hejcxZi+ChZckJwfPgNK s4fCUM7Wi67jRRhPpmSjwaVPjlzvSDdUx2m0p6yaZgk0lCNF7Hz64D/AOFixAu7ioUOISioX6JPE+EOS0yHgjPVdp3Sh2mqg/3YuRrZbwMHQp0jagjrugYYc sgtyMCkI5Vpw9XC82MXAL228DXBQwubpDkKil5EqUTNp1GoCW4WsYZh7cDotLi/gAO11PwmeDq7QbZ0hWkc+zU3e4S8yCVfPAbYR+ynCb71QtDDEj226R7rj Xg6R6WNbu+GIMDVy9k491mo7mhPaMgudWViHLoxb7wYyseo1t/QO5mPyXv3HjNUL61iJsfwTKPJFW6rTCVzHiVw4Jgo1zHRjEb0MDmZN9tR/jZL2jXbhBkC/ 4zJiaw+ToNXTy4WJPt7UEW2LIYIVnh2nSFhHeiFFZbuBuHTVfOJRNSbyzme7318sbFkKy6IB/ufPRZgKd1XLi+Gpp/TtKvaPJDaRP/3mbRi0HndNpHw5d1T4 8U43j1IYQCYeUjqixfpWbKUQeYYYmzkhYv1Ik7NIK6OzNuIgnc76BYguUhWSsM/C77mrORhSp6DSBFTUl+5bce1PKQnYLdaSFpfEqK+oWaNBB0NbcfFFarYe NiuDv58o7r214sFoVRLYmMbXv6su2hgPKTRRsI/2eA29uzpwYwq4wMbZMl0ompHn+/0xLhmgyM98LM20HDur7Ws6CwiV944ypBhargPWj5vsaslDuvYZavb9 poABEHzwWaHz2/JPKVXW33ZHo8Yg1AlF8PY9332wLdC0XU+2NTdOJx37ZW+Z2HwPY8Pmv9ouPq+/z94dBX8=
+X-AuthUser: chester.a.unal@arinc9.com
 
-2025. 01. 06. 9:19 keltezéssel, Jozsef Kadlecsik írta:
-> On Mon, 6 Jan 2025, egyszeregy@freemail.hu wrote:
+On 06/01/2025 11:58, Russell King (Oracle) wrote:
+> dsa_user_get_eee() calls the DSA switch get_mac_eee() method followed
+> by phylink_ethtool_get_eee(), which goes on to call
+> phy_ethtool_get_eee(). This overwrites all members of the passed
+> ethtool_keee, which means anything written by the DSA switch
+> get_mac_eee() method will be discarded.
 > 
->> From: Benjamin Szőke <egyszeregy@freemail.hu>
->>
->> Merge xt_*.h, ipt_*.h and ip6t_*.h header files, which has
->> same upper and lower case name format.
->>
->> Add #pragma message about recommended to use
->> header files with lower case format in the future.
->>
->> Signed-off-by: Benjamin Szőke <egyszeregy@freemail.hu>
->> ---
->> include/uapi/linux/netfilter/xt_CONNMARK.h  |  8 +++---
->> include/uapi/linux/netfilter/xt_DSCP.h      | 22 ++--------------
->> include/uapi/linux/netfilter/xt_MARK.h      |  8 +++---
->> include/uapi/linux/netfilter/xt_RATEEST.h   | 12 ++-------
->> include/uapi/linux/netfilter/xt_TCPMSS.h    | 14 ++++------
->> include/uapi/linux/netfilter/xt_connmark.h  |  7 +++--
->> include/uapi/linux/netfilter/xt_dscp.h      | 20 +++++++++++---
->> include/uapi/linux/netfilter/xt_mark.h      |  6 ++---
->> include/uapi/linux/netfilter/xt_rateest.h   | 15 ++++++++---
->> include/uapi/linux/netfilter/xt_tcpmss.h    | 12 ++++++---
->> include/uapi/linux/netfilter_ipv4/ipt_ECN.h | 29 ++-------------------
->> include/uapi/linux/netfilter_ipv4/ipt_TTL.h | 25 ++++--------------
->> include/uapi/linux/netfilter_ipv4/ipt_ecn.h | 26 ++++++++++++++++++
->> include/uapi/linux/netfilter_ipv4/ipt_ttl.h | 23 +++++++++++++---
->> include/uapi/linux/netfilter_ipv6/ip6t_HL.h | 26 ++++--------------
->> include/uapi/linux/netfilter_ipv6/ip6t_hl.h | 22 +++++++++++++---
->> net/ipv4/netfilter/ipt_ECN.c                |  2 +-
->> net/netfilter/xt_DSCP.c                     |  2 +-
->> net/netfilter/xt_HL.c                       |  4 +--
->> net/netfilter/xt_RATEEST.c                  |  2 +-
->> net/netfilter/xt_TCPMSS.c                   |  2 +-
->> 21 files changed, 143 insertions(+), 144 deletions(-)
+> Remove setting any members in mt753x_get_mac_eee().
 > 
-> Technically you split up your single patch into multiple parts but not separated 
-> it into functionally disjunct parts. So please prepare
-> 
-> - one patch for
->      include/uapi/linux/netfilter_ipv6/ip6t_HL.h
->      include/uapi/linux/netfilter_ipv6/ip6t_hl.h
->      net/netfilter/xt_HL.c
->      net/netfilter/xt_hl.c
->      [ I'd prefer corresponding Kconfig and Makefile changes as well]
-> - one patch for
->      include/uapi/linux/netfilter/xt_RATEEST.h
->      include/uapi/linux/netfilter/xt_rateest.h
->      net/netfilter/xt_RATEEST.c
->      net/netfilter/xt_rateest.c
->      [I'd prefer corresponding Kconfig and Makefile changes as well]
-> - and so on...
-> 
-> That way the reviewers can follow what was moved from where to where in a 
-> functionally compact way.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-First suggestion was to split it 2 parts, it is done, i split in 3 parts, it was 
-more then needed. Your idea will lead to split it about to 20 patch parts, then 
-the next problem from you could be "there are to many small singel patches, 
-please reduce it".
+Reviewed-by: Chester A. Unal <chester.a.unal@arinc9.com>
 
-If you like to see it in a human readable format you can found the full diff and 
-the separted patches also in this link:
-https://github.com/torvalds/linux/compare/master...Livius90:linux:uapi
-
-Please start to use any modern reviewing tool in 2025 and you can solve your 
-problem. In GitHub history view i can see easly what was moved from where to 
-where in 1-3 mouse clicking, eg.: click to xt_DSCP.h then click to xt_dscp.h and 
-you can see everything nicely. So it is ready for reviewing, please sit down and 
-start work on it as a maintainer, It's your turn now.
-
-https://github.com/torvalds/linux/commit/1ee2f4757ff025b74569cce922147a6a8734b670
-
-> 
-> Also, mechanically moving the comments results in text like this:
-> 
->> /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> -/* ip6tables module for matching the Hop Limit value
->> +/* Hop Limit modification module for ip6tables
->> + * ip6tables module for matching the Hop Limit value
-> 
-> which is ... not too nice. The comments need manual fixing.
-
-I do not know what small and compact "title" should be good here in the merged 
-header files. Most simplest solution was to copy paste them and merge these 
-titles text.
-
-You should know it better, please send a new compact and perfectly good "title" 
-text for all header files which are in the patchset and i can change them 
-finally. I think it is out of my scope in this business.
-
-> 
-> I also still don't like adding pragmas to emit warnings about deprecated header 
-> files. It doesn't make breaking API easier and it doesn't make possible to 
-> remove the warnings and enforce the changes just after a few kernel releases.
-
-I also still like adding pragmas, because duplicating these header files is not 
-acceptable in SW dev/coding. It must have to be taught for the user how should 
-use it in the future. This is a common way in any SW, for example Python or 
-Matlab always send a notice in run-time for you which will be a deprecated 
-things soon, when you import or start to use an old function or module.
-
-Why don't you think it can not help breaking API easier? This is the bare 
-minimum what you can do for it. Tell to user what should use instead, then 3-5 
-years later you can change it finally, when 90-95% percent of your customers 
-learnt to it and already started to use it in their userspace codes.
-
-> 
-> Best regards,
-> Jozsef
-
+Chester A.
 
