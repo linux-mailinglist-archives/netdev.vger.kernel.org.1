@@ -1,451 +1,171 @@
-Return-Path: <netdev+bounces-155372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6251FA0209C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:25:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5BBA02174
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:08:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AF7016371F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:25:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B93F18829F8
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B801D7E31;
-	Mon,  6 Jan 2025 08:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76D71D514E;
+	Mon,  6 Jan 2025 09:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RITJLoOX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2046.outbound.protection.outlook.com [40.107.92.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC001D88D0
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736151881; cv=none; b=MLQdJ47Va+C+MNE3MiMcDcLnw9DP5BhQ5MulTIGlRXkPlpQ6RCPunFSUN+1i2Vb7MrJ7h/fR1AL02kC3Sth6oT2KXHBd6d+FfFgjRpofyoUS/ylPAYuJBbLr0ZkPs3Kf7nl4bNUNXK52+HJvRO56uIkNVDLnJY2JUlJDAwma1QY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736151881; c=relaxed/simple;
-	bh=o7VyqSJB+e9frRhqSjTm/T/c0y1MEQKyaz0MfR/gZYc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZP4+wePuuM9MZbAuoj6z8Z1631aktQVwumYRQeV6M73PNhmFW65F8/4V00/rACHyBqgIPUj9IajNK/13D3rsyWAgAxtiNJ7QEsKGn0LQJlzzEkP2Y2h9GhOCb1mIAeMb6n+fWxwvgNuWI7/MlMEmHR6I+4TYpBaat0IXw+VyG50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz14t1736151873tl4sw6
-X-QQ-Originating-IP: aYFnti6IYC2bgbx3RhIQKmmU1uIRimyjWHRniTt8scw=
-Received: from wxdbg.localdomain ( [125.118.30.165])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 06 Jan 2025 16:24:32 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 5208157773062616507
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	linux@armlinux.org.uk,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	netdev@vger.kernel.org,
-	vadim.fedorenko@linux.dev
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2 4/4] net: ngbe: Add support for 1PPS and TOD
-Date: Mon,  6 Jan 2025 16:45:06 +0800
-Message-Id: <20250106084506.2042912-5-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20250106084506.2042912-1-jiawenwu@trustnetic.com>
-References: <20250106084506.2042912-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0131B2B9CD;
+	Mon,  6 Jan 2025 09:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736154478; cv=fail; b=QIeQLz+9cDVJnHO9p5fJYnq3/crUWdYNZFlM8asqQyCWy7+w7C98KOYMMfzoo9ib+9npi5X6EaUoKUO/YkuBrOe0btod3OerYiJpcCxB7T0k76uH41ahrQmPB4NA8lbHREumazXlVOVkkfCRjnFckwVksHyDCTVUkurvM77Q5yc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736154478; c=relaxed/simple;
+	bh=M60l+8P/3Sb7RDxNx/JEjjF46Y/gjwP0JPC2osCu8Jw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=sLOPFOuxV1OEJdgM5ZfEppH/UHHGdCkmoe946XRyNjoA/Bhoauzz8NQBgrE0Zr/UoSJgM48lgFpKW5FxZyoK8IXMAtJLcsJODTlJ06VxuvxblR52tTLWSAfWjl/7NgIabLY1iD9dZA7cqFhsBIvjDq3OnFGla184tr73DJUy5fI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RITJLoOX; arc=fail smtp.client-ip=40.107.92.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sZu/bAmK4Kg/vRncSX1uf8USYmwpfz/nUwlFYIV+nC4ALBMHBuUTM527FtYofQ+vB/FTQxpXKG0/603ia6hpAb83GZYBmmF58MHb9u3hb9OdCHo4CimiQ30hJL8bi0L4POVNmuZMnNnOraiKlPXz4L17i8IFJutphfqXaIoz330yNz2RHNC2EIars3HoNqMayCUKaie4xrM2MInpRdfsaGesLx6LofolD+lQRjD/i1pW+zQ/eFQ+Kx8ojAwk787QjKv7JrjJylj3Qe90Z9VspJ9D+HpH68th22hdcWb/xffDLqcEabP/9/pFeGOxBygsNm9mT6ARHrdIpnb9cIs7wQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0bFfTTGouookGjYy81umFN57p9UCWid1Shti8mkwBYg=;
+ b=O0ExVT5k5dq5lE3W1bKfKFs6Qi62okaMrqciwXEfkL1sZTG7NPSlzpqNi1gmyJ3sQ3TSPnSHtuHCkWvcgkaJlHviYfQlN8monWFGQmGavLWxjPErEpLu0IHZ65vYb6raDRIXPyKjaFiC6cdrBOYWTUfQ4KevxreX35MrphYzkevEdTwsZvhjmdxu2p7jghs7GPm+p534uxkG7kyYoMjuHl3CYImfsw/WB9XWL8h9g/OQ81FL3JDRoffojW1s/U6yMXKrlNSny3JZOoplgD+4H85XLBQQNGUwRoqxxEow3A0w0JgGMLpROtGUTOOkp55wrrg0s/9nbyFA/mXT49aD9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0bFfTTGouookGjYy81umFN57p9UCWid1Shti8mkwBYg=;
+ b=RITJLoOX08XgKop/d4qZ+z8GoHd3wHSMStyZUrsx/tMyr0V8EiImGhYW95eCPO/JgXpyfmt4CpeKSeXwqXGp0EY1NU1lx39o2R+6U+EJkV3B8LkYaJZuhpWKcjjFGEDJe68x8YTKvJ5Nu3Jf7WOaeDjUzG5vfZIeUlC2im5gzizetXJDIYkhLVuyU7YioMxaOythPQ5l7lS3PTsRc5bG/aCqbxS37YXbCMmB/5MFtpoetn2LTUTe5/E64keWnRIORztn+0sF7bRg6I5aO1TSQ7V7lfJljNiscdnfsqTdRJbuPP8SbtW/Wod481c+/HsYqjTTa92ndq69san8PsGx+w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by SN7PR12MB6789.namprd12.prod.outlook.com (2603:10b6:806:26b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.16; Mon, 6 Jan
+ 2025 09:07:50 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%4]) with mapi id 15.20.8314.015; Mon, 6 Jan 2025
+ 09:07:50 +0000
+Date: Mon, 6 Jan 2025 11:07:40 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>, linux-sctp@vger.kernel.org
+Subject: Re: [PATCH net-next] sctp: Prepare sctp_v4_get_dst() to dscp_t
+ conversion.
+Message-ID: <Z3udXOESp_mzykwn@shredder>
+References: <1a645f4a0bc60ad18e7c0916642883ce8a43c013.1735835456.git.gnault@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1a645f4a0bc60ad18e7c0916642883ce8a43c013.1735835456.git.gnault@redhat.com>
+X-ClientProxiedBy: TL2P290CA0002.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::12) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MIAHdi1iQo+zE+K6CihB+6EYvq4IEXC+eZ9AMmDxqdK6/s4N0pnsynAu
-	SuwadUcXpbst7cDw0kcSmMKsNR2ygoEyg4o0f+YvVufqRDk3pscOp2emDB0tlYDC6M98tlG
-	UEIk7OIvOCwhpSTxEGc1pFZJJ/TmTzdW/jHtFe6IfibohRFv48K+XQAxaiyrQIlt2wTyGs5
-	8kPvxnH8uBXjh36ooNJoJsmjKUGIoWGY6NUIgvHvA3BlPqa5jDO/03obyxMg5r2ml1z5ZLG
-	o63R+sBmTtDwZ774AcdcSP/1YCV04b9zZrcNDNlEUg6BFBs6fJsmQYprOLLEXmhuEiip0Bs
-	WqzBXv2/HR6lo6nCAiePKsBsF5VE+R59xTr8LD0kMdPddg20depTIPI3BIv2iQSw5AXW3ed
-	AZAG/RYYXO+kHHqogiFjr9PSfSYar7Mev/NdSnHBQdW3xv0zKSGTGt8dCLLPglxwnjprall
-	GOLwm46Y3BRkEMKKEJTkJwjRFsWFzyJGUxnskOtcJTRjnMVkXKJBboXjmCSPU2nIqOVInkk
-	WFZkfeg9YnAI41N6zSgzcSPQDgQv8wKNY8teXBXdkPVbC+piJMkYiuSnNmt/0xKards3xX8
-	4RK4RKAEnR029Cdovlz+l3nReXrCHQBvbMjjTHOMQZYo07kFvyeraomn6iimqDOoadqqHFX
-	FcGPEF/yh+eNBcTTrk75U9TPmbMXT1U85Hb/WtqJXpOzTMjUSG0CdibVTydecnX5NyM99eh
-	/HE8CowAvI4UQ2QK8bzXVPWYomW1aRdwUfC3asve9CqeK2EyUzIW5DYFbY55Keevjwdg7Ro
-	BjlQHi1L/wPBsi+NH+DZbxxYGSkVIg0yN2zS4Bg4/5V35xGkK5FLw7U/AE16wMYHeG9R+0u
-	bAwrg9EW6M7iZ2MYfF8nmEc/U84pJzD7/ToXIYU8eBtOr1zAW1EwM6sfpHPIg0T/kyEyC7i
-	EhbK59kPa2NleKeiau1J9hkk7VMD0TTD3s/czPVHZcQSbNHfPY58yKCzNjpWFRc5WNKBuio
-	/JK8+rYQ==
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-QQ-RECHKSPAM: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SN7PR12MB6789:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1aabbc33-bf27-4ee5-7b69-08dd2e319895
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1qEM31ThmFvBylzHtYzNuRkgo+EESk29dmdUH24F96Zg0CyC7XFugAEfU25w?=
+ =?us-ascii?Q?ayJft17nncrqHWQLDtudMBDq2qsiw2Su9R8wn1OhmJ8RcQNxFMO52IGQa589?=
+ =?us-ascii?Q?Fy8AS+L8QM+DwNg21jBX0Jz4uvhe+YhKetX0DkEWBMtqcekrXSrAWB0M9rpD?=
+ =?us-ascii?Q?lADfJZ4JxZbn0KgYqeG7Dvo4JXW4u8gzVA1zBxGqNEb7puYtniVfWKmip3X6?=
+ =?us-ascii?Q?oiW8riQdFRj6E1piPCxQfOr8pGZMpgW2BXDIDY1U3YjMDsWtiJHfvkcTprZ0?=
+ =?us-ascii?Q?sPDOnGefm0UpOCwNembcAPBj8rugKIqp76ir6fvgi9TFMGRmjeXgzNI88IPe?=
+ =?us-ascii?Q?W5f4dKNADHmWjl3XLXhXyx6sAgrbgaqA36KjkFsjRKVij/549nsQ37+7pq32?=
+ =?us-ascii?Q?fY9lbqqrDyWhkdB3BjSKPDqBVwBqooYN5p/a39T53QHP+sAl0uAqx0wuvXny?=
+ =?us-ascii?Q?fAsS9NsiPfz0Jb1GkIuz1MesHHufJ63bmZC4y/x0UA31nr9627giPmbNtt1p?=
+ =?us-ascii?Q?zBE30RZKD14WSyIsyJiej63TUZqzkcJSVnPLsbKMZc0D9I3K87OLP+Rc5bPr?=
+ =?us-ascii?Q?PgwIEH0rPhRnRP/qaa3UHwTkAJnpR5bKo0SeA+G92BHoDHDSOsCuoJBAX3V4?=
+ =?us-ascii?Q?kpsGec1//hY8O0UN4kd0djVzzOkDUCOVlYhowU3Y+G3rVYKpXGSqxrzYtasR?=
+ =?us-ascii?Q?7jOgTAZ/4lsxgGN87ddkZzrRUdAUDyYpLPLmhDox4qikr3i3HdNwpfSF2ta7?=
+ =?us-ascii?Q?ooqLgpmqKMw3yDNBYgYFSzMYeOYZQWwD3OUjgRbk1i/cwzxTqAZemKIA5sG9?=
+ =?us-ascii?Q?Z0czIGbwkXSrLNjPZ2ob9Z21jM+DQZYWBvKnhpJFEUJv/SO3Chu64VLbykhS?=
+ =?us-ascii?Q?7fGzHGc/5GV77xX5EAJDllWpDULwGjceirmyY8BMu5GWuTs+exzF2iCIu1Sv?=
+ =?us-ascii?Q?5HvnAfegbe4FSF53BHrCU864aEuBK2AEUSeLibQxvWBTBChxvO5CcgRnLB3C?=
+ =?us-ascii?Q?Tvc/qsZaI1solERtX/rKY5+ll7a8NcJuP7ml4IGgi1vvXQnA4KBX1ZF6k5Bj?=
+ =?us-ascii?Q?cy6fSFhjP0wgcYrpxKVbQDcX04qGKZxUEvBmfK5X9VjUUIQJXuzeL6FHbGUZ?=
+ =?us-ascii?Q?50nkf8omy+erDuVVfi5J51eJSWCYo70hFMAtpcsI0tDcSm28nOkIuWjPdqf7?=
+ =?us-ascii?Q?Ya+YdrIVcQRqOLPex6lU1DnohX8ypNNe3SiT0Z+oYFIh40kJnbffljNYL9pM?=
+ =?us-ascii?Q?3uG+tlStuQpYgOM75tx/jfdt4F2nWYEzijRlIk5KAqBvVryKFBMskX9Y+cfI?=
+ =?us-ascii?Q?bZR7DZ4chYyeF7meH6W8AwDXYbyXei6G9Rn5Yz43Ok5K4GQ3va2Jz58PFG++?=
+ =?us-ascii?Q?uhRy02CRR+78oKBHZZGlpIqzEtQM?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ikOQqTynv/I1ZE1Ba1LNIjb7beQaD02/MwqHIPUG9gpBBQuWdhD1m4To21tg?=
+ =?us-ascii?Q?JoN0wrzzZCzVDDxFLkdGvFPuVL62Sf611q/FnxQPOLrKGoVdomTM107NN+1F?=
+ =?us-ascii?Q?EJooQ7/obDzIsIcGB6504EgZhRDg6zTnJ39DxnQP9gadqGCwxFJpaKrKn5iz?=
+ =?us-ascii?Q?57L9Zv1cro6O25qcgepb+KgSg89Cc7pRQVGqSbTvpLwuZCUciSJPugB2Rdzg?=
+ =?us-ascii?Q?D/2IT35xqAuhPutcL0dkk3A0tFtiHSVD8M4FituC7Wird7JCskdixVvSLnrf?=
+ =?us-ascii?Q?sjFbwfNGRyUCmLXs+ySM9SO2Hc6OmcrBoe8kIZNKYxyAycm2L29eGX2JvDTn?=
+ =?us-ascii?Q?G5j0n1XZVxPZ76GzirNa3iKFEPkyO30BBWkg7iirkP6d/hFpbMA9rU1lU9hO?=
+ =?us-ascii?Q?oDCiv+d1wlu/fC++VK19kYr0VyoSGi1CA/q+5whL0czuuGF4P5P/Tq+GCUtT?=
+ =?us-ascii?Q?sf82T+jmUzrNj9kNReqVg6u0O2Rrm/cw1Svs+YuArCUFpy6pYYkt0NUkpzSp?=
+ =?us-ascii?Q?43FbhVCHUaEJuMN17y19f3ZuuNHkl6ibN81GqdI6Dt3l458zNTxPfswRcRHd?=
+ =?us-ascii?Q?eh0qVG/GFt/1FiVy6kb90PeqGBG7qgePI2mS7HsyUfvIbsBMS474YEC0Behd?=
+ =?us-ascii?Q?5YtrLz5ZkbEqgQP3xsPE6JWPx9VQhNsXCtraKsBTet1YfLpWoydysJGGmQY3?=
+ =?us-ascii?Q?6G2oKPFNY5BsZLwFBEDiq513hmFpN/cYVUJzYb1pBsaENsRobNQLzo/5hLjO?=
+ =?us-ascii?Q?962RsnWxEtxdhUeAoChgq8H9IzIWkQ1sLhdo0hgnJLU7o4kahUOwORGU4Hm2?=
+ =?us-ascii?Q?GJv4i2Wpy6mwwoyarrB/FmYnwk7BFguSYLXzRNmt0+NmSO8Ilu6BgCpCTyWg?=
+ =?us-ascii?Q?xnmmhRYZMRQwvPtV095aUafiyH3R62x+BnRLbOf8aW87eWdESVX9QOgnNsOD?=
+ =?us-ascii?Q?UuIkiZN9Yq0xDsUtD7cO6y8UxbJ8Ht+kdmBQmfbfWirmCdJasUM4TzTKSN+v?=
+ =?us-ascii?Q?EIp+hYKIFHJXRC/DNHtGIJZgjSIccOl5U7bdwSGeSH700v9wUMl6xm8LvUEP?=
+ =?us-ascii?Q?p1oY4zaQ2UQwny6136Y9HnEr7zavb+NuTDq5xFrYygoeJJHRyMfbGUdMLaGh?=
+ =?us-ascii?Q?QRa4sbrdOnCoGfMrFJiq21oKOj3j0sr6LsZHFBkHYRZQE2b0oGjejsyrLAYb?=
+ =?us-ascii?Q?+Xtx25Nh4EZU7zrIrceKVBG0FuiOhgn2BbdRfnWdTbBoPQ0OSk6jyj0VSn/3?=
+ =?us-ascii?Q?HWxD6aHaJTvKm89A8WgTl+1mZp8ffWNyG/czEd8cy0kp6Z0nBoMy/1qvKotw?=
+ =?us-ascii?Q?CO8njAhmj73f9zRyuk2qfWJZlVi3/xFsRPYj79sSKIWV41K9fUexFZXMTDSV?=
+ =?us-ascii?Q?dNle0/CwfZMOsx+uIawe6CVo/zWyl9luUsKWtOhO3qVlNid/+t/WZjxGQ3nE?=
+ =?us-ascii?Q?PE5RXB5o7v96c3UgWt2SsYoUC45vb/0ZJN4BM5gZfddDGY9m71eiyXlj1exg?=
+ =?us-ascii?Q?vpg/C4NF8l7NUq9d5wk/dRCgLG07X1jlWIVkz72uwKDMWffrsSYzXfAWlmEA?=
+ =?us-ascii?Q?pds6WaEjsrWrETqWJyUexjbdpsgP4IeRkliwxEMg?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1aabbc33-bf27-4ee5-7b69-08dd2e319895
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2025 09:07:50.5614
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sAoPiUipdFLQprf1TTUvICBgr19XCebMt8/iFgYUWDJg9ohy8UbDzdyY2iMeqYK32hxwlLgSZv+C5FKwwgRB0w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6789
 
-Implement support for generating a 1pps output signal on SDP0.
-And support custom firmware to output TOD.
+On Thu, Jan 02, 2025 at 05:34:18PM +0100, Guillaume Nault wrote:
+> Define inet_sk_dscp() to get a dscp_t value from struct inet_sock, so
+> that sctp_v4_get_dst() can easily set ->flowi4_tos from a dscp_t
+> variable. For the SCTP_DSCP_SET_MASK case, we can just use
+> inet_dsfield_to_dscp() to get a dscp_t value.
+> 
+> Then, when converting ->flowi4_tos from __u8 to dscp_t, we'll just have
+> to drop the inet_dscp_to_dsfield() conversion function.
+> 
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  19 ++++
- drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   1 +
- drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 103 +++++++++++++++++-
- drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |   1 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  34 ++++++
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  12 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   5 +
- 7 files changed, 171 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 1bf9c38e4125..6ba69e41faa6 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -395,6 +395,25 @@ int wx_host_interface_command(struct wx *wx, u32 *buffer,
- }
- EXPORT_SYMBOL(wx_host_interface_command);
- 
-+int wx_set_pps(struct wx *wx, bool enable, u64 nsec, u64 cycles)
-+{
-+	struct wx_hic_set_pps pps_cmd;
-+
-+	pps_cmd.hdr.cmd = FW_PPS_SET_CMD;
-+	pps_cmd.hdr.buf_len = FW_PPS_SET_LEN;
-+	pps_cmd.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
-+	pps_cmd.lan_id = wx->bus.func;
-+	pps_cmd.enable = (u8)enable;
-+	pps_cmd.nsec = nsec;
-+	pps_cmd.cycles = cycles;
-+	pps_cmd.hdr.checksum = FW_DEFAULT_CHECKSUM;
-+
-+	return wx_host_interface_command(wx, (u32 *)&pps_cmd,
-+					 sizeof(pps_cmd),
-+					 WX_HI_COMMAND_TIMEOUT,
-+					 false);
-+}
-+
- /**
-  *  wx_read_ee_hostif_data - Read EEPROM word using a host interface cmd
-  *  assuming that the semaphore is already obtained.
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-index 11fb33349482..b883342bb576 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-@@ -18,6 +18,7 @@ void wx_control_hw(struct wx *wx, bool drv);
- int wx_mng_present(struct wx *wx);
- int wx_host_interface_command(struct wx *wx, u32 *buffer,
- 			      u32 length, u32 timeout, bool return_data);
-+int wx_set_pps(struct wx *wx, bool enable, u64 nsec, u64 cycles);
- int wx_read_ee_hostif(struct wx *wx, u16 offset, u16 *data);
- int wx_read_ee_hostif_buffer(struct wx *wx,
- 			     u16 offset, u16 words, u16 *data);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-index 0071ba929738..42024028b66c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-@@ -29,6 +29,82 @@
- #define WX_NS_PER_SEC         1000000000ULL
- #define WX_NS_PER_MSEC        1000000ULL
- 
-+static void wx_ptp_setup_sdp(struct wx *wx)
-+{
-+	struct cyclecounter *cc = &wx->hw_cc;
-+	u32 tsauxc, rem, tssdp, tssdp1;
-+	u32 trgttiml0, trgttimh0;
-+	u32 trgttiml1, trgttimh1;
-+	unsigned long flags;
-+	u64 ns = 0;
-+
-+	if (WX_1588_PPS_WIDTH_EM >= WX_NS_PER_SEC) {
-+		wx_err(wx, "PTP pps width cannot be longer than 1s!\n");
-+		return;
-+	}
-+
-+	/* disable the pin first */
-+	wr32ptp(wx, WX_TSC_1588_AUX_CTL, 0);
-+	WX_WRITE_FLUSH(wx);
-+
-+	if (!test_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags)) {
-+		if (wx->pps_enabled) {
-+			wx->pps_enabled = false;
-+			wx_set_pps(wx, false, 0, 0);
-+		}
-+		return;
-+	}
-+
-+	wx->pps_enabled = true;
-+
-+	tssdp = WX_TSC_1588_SDP_FUN_SEL_TT0;
-+	tssdp |= WX_TSC_1588_SDP_OUT_LEVEL_H;
-+	tssdp1 = WX_TSC_1588_SDP_FUN_SEL_TS0;
-+	tsauxc = WX_TSC_1588_AUX_CTL_PLSG | WX_TSC_1588_AUX_CTL_EN_TT0 |
-+		WX_TSC_1588_AUX_CTL_EN_TT1 | WX_TSC_1588_AUX_CTL_EN_TS0;
-+
-+	/* Read the current clock time, and save the cycle counter value */
-+	spin_lock_irqsave(&wx->tmreg_lock, flags);
-+	ns = timecounter_read(&wx->hw_tc);
-+	wx->pps_edge_start = wx->hw_tc.cycle_last;
-+	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
-+	wx->pps_edge_end = wx->pps_edge_start;
-+
-+	/* Figure out how far past the next second we are */
-+	div_u64_rem(ns, WX_NS_PER_SEC, &rem);
-+
-+	/* Figure out how many nanoseconds to add to round the clock edge up
-+	 * to the next full second
-+	 */
-+	rem = (WX_NS_PER_SEC - rem);
-+
-+	/* Adjust the clock edge to align with the next full second. */
-+	wx->pps_edge_start += div_u64(((u64)rem << cc->shift), cc->mult);
-+	trgttiml0 = (u32)wx->pps_edge_start;
-+	trgttimh0 = (u32)(wx->pps_edge_start >> 32);
-+
-+	wx_set_pps(wx, wx->pps_enabled, ns + rem, wx->pps_edge_start);
-+
-+	rem += WX_1588_PPS_WIDTH_EM * WX_NS_PER_MSEC;
-+	wx->pps_edge_end += div_u64(((u64)rem << cc->shift), cc->mult);
-+	trgttiml1 = (u32)wx->pps_edge_end;
-+	trgttimh1 = (u32)(wx->pps_edge_end >> 32);
-+
-+	wr32ptp(wx, WX_TSC_1588_TRGT_L(0), trgttiml0);
-+	wr32ptp(wx, WX_TSC_1588_TRGT_H(0), trgttimh0);
-+	wr32ptp(wx, WX_TSC_1588_TRGT_L(1), trgttiml1);
-+	wr32ptp(wx, WX_TSC_1588_TRGT_H(1), trgttimh1);
-+	wr32ptp(wx, WX_TSC_1588_SDP(0), tssdp);
-+	wr32ptp(wx, WX_TSC_1588_SDP(1), tssdp1);
-+	wr32ptp(wx, WX_TSC_1588_AUX_CTL, tsauxc);
-+	wr32ptp(wx, WX_TSC_1588_INT_EN, WX_TSC_1588_INT_EN_TT1);
-+	WX_WRITE_FLUSH(wx);
-+
-+	rem = WX_NS_PER_SEC;
-+	/* Adjust the clock edge to align with the next full second. */
-+	wx->sec_to_cc = div_u64(((u64)rem << cc->shift), cc->mult);
-+}
-+
- /**
-  * wx_ptp_adjfine
-  * @ptp: the ptp clock structure
-@@ -78,6 +154,9 @@ static int wx_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- 	timecounter_adjtime(&wx->hw_tc, delta);
- 	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
- 
-+	if (wx->ptp_setup_sdp)
-+		wx->ptp_setup_sdp(wx);
-+
- 	return 0;
- }
- 
-@@ -137,6 +216,9 @@ static int wx_ptp_settime64(struct ptp_clock_info *ptp,
- 	timecounter_init(&wx->hw_tc, &wx->hw_cc, ns);
- 	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
- 
-+	if (wx->ptp_setup_sdp)
-+		wx->ptp_setup_sdp(wx);
-+
- 	return 0;
- }
- 
-@@ -491,16 +573,21 @@ static long wx_ptp_create_clock(struct wx *wx)
- 	wx->ptp_caps.n_alarm = 0;
- 	wx->ptp_caps.n_ext_ts = 0;
- 	wx->ptp_caps.n_per_out = 0;
--	wx->ptp_caps.pps = 0;
- 	wx->ptp_caps.adjfine = wx_ptp_adjfine;
- 	wx->ptp_caps.adjtime = wx_ptp_adjtime;
- 	wx->ptp_caps.gettimex64 = wx_ptp_gettimex64;
- 	wx->ptp_caps.settime64 = wx_ptp_settime64;
- 	wx->ptp_caps.do_aux_work = wx_ptp_do_aux_work;
--	if (wx->mac.type == wx_mac_em)
-+	if (wx->mac.type == wx_mac_em) {
- 		wx->ptp_caps.max_adj = 500000000;
--	else
-+		wx->ptp_caps.pps = 1;
-+		wx->ptp_setup_sdp = wx_ptp_setup_sdp;
-+		wx->ptp_caps.enable = wx_ptp_feature_enable;
-+	} else {
- 		wx->ptp_caps.max_adj = 250000000;
-+		wx->ptp_caps.pps = 0;
-+		wx->ptp_setup_sdp = NULL;
-+	}
- 
- 	wx->ptp_clock = ptp_clock_register(&wx->ptp_caps, &wx->pdev->dev);
- 	if (IS_ERR(wx->ptp_clock)) {
-@@ -784,6 +871,12 @@ void wx_ptp_reset(struct wx *wx)
- 	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
- 
- 	wx->last_overflow_check = jiffies;
-+
-+	/* Now that the shift has been calculated and the systime
-+	 * registers reset, (re-)enable the Clock out feature
-+	 */
-+	if (wx->ptp_setup_sdp)
-+		wx->ptp_setup_sdp(wx);
- }
- EXPORT_SYMBOL(wx_ptp_reset);
- 
-@@ -833,6 +926,10 @@ void wx_ptp_suspend(struct wx *wx)
- 	if (!test_and_clear_bit(WX_STATE_PTP_RUNNING, wx->state))
- 		return;
- 
-+	clear_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
-+	if (wx->ptp_setup_sdp)
-+		wx->ptp_setup_sdp(wx);
-+
- 	cancel_work_sync(&wx->ptp_tx_work);
- 	wx_ptp_clear_tx_timestamp(wx);
- }
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-index 8742d2797363..50db90a6e3ee 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-@@ -4,6 +4,7 @@
- #ifndef _WX_PTP_H_
- #define _WX_PTP_H_
- 
-+void wx_ptp_check_pps_event(struct wx *wx);
- void wx_ptp_reset_cyclecounter(struct wx *wx);
- void wx_ptp_reset(struct wx *wx);
- void wx_ptp_init(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 1f9ddddea191..2c9c22d9491b 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -281,6 +281,23 @@
- #define WX_TSC_1588_SYSTIML          0x11F0C
- #define WX_TSC_1588_SYSTIMH          0x11F10
- #define WX_TSC_1588_INC              0x11F14
-+#define WX_TSC_1588_INT_ST           0x11F20
-+#define WX_TSC_1588_INT_ST_TT1       BIT(5)
-+#define WX_TSC_1588_INT_EN           0x11F24
-+#define WX_TSC_1588_INT_EN_TT1       BIT(5)
-+#define WX_TSC_1588_AUX_CTL          0x11F28
-+#define WX_TSC_1588_AUX_CTL_EN_TS0   BIT(8)
-+#define WX_TSC_1588_AUX_CTL_EN_TT1   BIT(2)
-+#define WX_TSC_1588_AUX_CTL_PLSG     BIT(1)
-+#define WX_TSC_1588_AUX_CTL_EN_TT0   BIT(0)
-+#define WX_TSC_1588_TRGT_L(i)        (0x11F2C + ((i) * 8)) /* [0,1] */
-+#define WX_TSC_1588_TRGT_H(i)        (0x11F30 + ((i) * 8)) /* [0,1] */
-+#define WX_TSC_1588_SDP(i)           (0x11F5C + ((i) * 4)) /* [0,3] */
-+#define WX_TSC_1588_SDP_OUT_LEVEL_H  FIELD_PREP(BIT(4), 0)
-+#define WX_TSC_1588_SDP_OUT_LEVEL_L  FIELD_PREP(BIT(4), 1)
-+#define WX_TSC_1588_SDP_FUN_SEL_MASK GENMASK(2, 0)
-+#define WX_TSC_1588_SDP_FUN_SEL_TT0  FIELD_PREP(WX_TSC_1588_SDP_FUN_SEL_MASK, 1)
-+#define WX_TSC_1588_SDP_FUN_SEL_TS0  FIELD_PREP(WX_TSC_1588_SDP_FUN_SEL_MASK, 5)
- 
- /************************************** MNG ********************************/
- #define WX_MNG_SWFW_SYNC             0x1E008
-@@ -410,6 +427,8 @@ enum WX_MSCA_CMD_value {
- #define FW_CEM_CMD_RESERVED          0X0
- #define FW_CEM_MAX_RETRIES           3
- #define FW_CEM_RESP_STATUS_SUCCESS   0x1
-+#define FW_PPS_SET_CMD               0xF6
-+#define FW_PPS_SET_LEN               0x14
- 
- #define WX_SW_REGION_PTR             0x1C
- 
-@@ -730,6 +749,15 @@ struct wx_hic_reset {
- 	u16 reset_type;
- };
- 
-+struct wx_hic_set_pps {
-+	struct wx_hic_hdr hdr;
-+	u8 lan_id;
-+	u8 enable;
-+	u16 pad2;
-+	u64 nsec;
-+	u64 cycles;
-+};
-+
- /* Bus parameters */
- struct wx_bus_info {
- 	u8 func;
-@@ -1068,6 +1096,7 @@ enum wx_pf_flags {
- 	WX_FLAG_FDIR_PERFECT,
- 	WX_FLAG_RX_HWTSTAMP_ENABLED,
- 	WX_FLAG_RX_HWTSTAMP_IN_REGISTER,
-+	WX_FLAG_PTP_PPS_ENABLED,
- 	WX_PF_FLAGS_NBITS               /* must be last */
- };
- 
-@@ -1168,7 +1197,12 @@ struct wx {
- 	void (*atr)(struct wx_ring *ring, struct wx_tx_buffer *first, u8 ptype);
- 	void (*configure_fdir)(struct wx *wx);
- 	void (*do_reset)(struct net_device *netdev);
-+	void (*ptp_setup_sdp)(struct wx *wx);
- 
-+	bool pps_enabled;
-+	u64 pps_edge_start;
-+	u64 pps_edge_end;
-+	u64 sec_to_cc;
- 	u32 base_incval;
- 	u32 tx_hwtstamp_timeouts;
- 	u32 tx_hwtstamp_skipped;
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index c60a96cc3508..a6159214ec0a 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -168,7 +168,7 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
- 	struct wx_q_vector *q_vector;
- 	struct wx *wx  = data;
- 	struct pci_dev *pdev;
--	u32 eicr;
-+	u32 eicr, eicr_misc;
- 
- 	q_vector = wx->q_vector[0];
- 	pdev = wx->pdev;
-@@ -186,6 +186,10 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
- 	if (!(pdev->msi_enabled))
- 		wr32(wx, WX_PX_INTA, 1);
- 
-+	eicr_misc = wx_misc_isb(wx, WX_ISB_MISC);
-+	if (unlikely(eicr_misc & NGBE_PX_MISC_IC_TIMESYNC))
-+		wx_ptp_check_pps_event(wx);
-+
- 	wx->isb_mem[WX_ISB_MISC] = 0;
- 	/* would disable interrupts here but it is auto disabled */
- 	napi_schedule_irqoff(&q_vector->napi);
-@@ -199,6 +203,12 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
- static irqreturn_t ngbe_msix_other(int __always_unused irq, void *data)
- {
- 	struct wx *wx = data;
-+	u32 eicr;
-+
-+	eicr = wx_misc_isb(wx, WX_ISB_MISC);
-+
-+	if (unlikely(eicr & NGBE_PX_MISC_IC_TIMESYNC))
-+		wx_ptp_check_pps_event(wx);
- 
- 	/* re-enable the original interrupt state, no lsc, no queues */
- 	if (netif_running(wx->netdev))
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-index f48ed7fc1805..992adbb98c7d 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-@@ -70,15 +70,20 @@
- 
- /* Extended Interrupt Enable Set */
- #define NGBE_PX_MISC_IEN_DEV_RST		BIT(10)
-+#define NGBE_PX_MISC_IEN_TIMESYNC		BIT(11)
- #define NGBE_PX_MISC_IEN_ETH_LK			BIT(18)
- #define NGBE_PX_MISC_IEN_INT_ERR		BIT(20)
- #define NGBE_PX_MISC_IEN_GPIO			BIT(26)
- #define NGBE_PX_MISC_IEN_MASK ( \
- 				NGBE_PX_MISC_IEN_DEV_RST | \
-+				NGBE_PX_MISC_IEN_TIMESYNC | \
- 				NGBE_PX_MISC_IEN_ETH_LK | \
- 				NGBE_PX_MISC_IEN_INT_ERR | \
- 				NGBE_PX_MISC_IEN_GPIO)
- 
-+/* Extended Interrupt Cause Read */
-+#define NGBE_PX_MISC_IC_TIMESYNC		BIT(11) /* time sync */
-+
- #define NGBE_INTR_ALL				0x1FF
- #define NGBE_INTR_MISC				BIT(0)
- 
--- 
-2.27.0
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
