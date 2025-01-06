@@ -1,134 +1,125 @@
-Return-Path: <netdev+bounces-155550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7022A02F3C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:46:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B78A02F55
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E4901884916
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:46:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5B8D3A4481
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:53:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154601DF263;
-	Mon,  6 Jan 2025 17:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272481DEFE9;
+	Mon,  6 Jan 2025 17:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EpCTsWax"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWP0FYl3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673481DF73B
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 17:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007B81DE4EB
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 17:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736185583; cv=none; b=lVtqv8utkSxzXb9B09X2yYxXWgiw2vBJABAkhmKDCnRNoZzXrD4/wVTlg4sVofcFq1L1ar737AJwzWOGgRCDXoOHMnuKn8XjI32tmqOP0UTpYGJftkCnVQfW/EUjNYICAk7GoTA8gnd1cprHmWZBDEd3+QjCH6BTPuxpdGNQkuo=
+	t=1736185999; cv=none; b=JKyOq5/XKG8Ucmr45BpLjrZ7JAyFA0VY1kidRAE3Zz0P+mW6ENr6dlPrmb9LvQxhmU+UpNWgGSGrIDNJIVnAXHMSlmVE6I+paFIOMALFKPFjfXX/v3wg1ulk90l3pR/nhe3Vt5TuBDx5vnK4sV1swzABYwIpP2Md/0w6arE/z28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736185583; c=relaxed/simple;
-	bh=uW9GkYu5gQtwFMIjKJhUpF82owJOz8+dxzEqPIHMP7k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XzZcarZuUhWB2kdsRsDoKDbwSSAAr9ghYwuW6+08WIMAvH9K1ww1HB6duts8vKT+YOypluAWR1eAX0u5qnXYpN0myVFiEgl0cdpNEW5m8GvAZdINdAFW6cJVtvAJ16EOiDGPLjNnGMkSo7KczH2JQnEUdu5/XuHdldsvlXGohuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EpCTsWax; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F717C4CED6;
-	Mon,  6 Jan 2025 17:46:22 +0000 (UTC)
+	s=arc-20240116; t=1736185999; c=relaxed/simple;
+	bh=jXfIxVo+zZE75Tam5ruwm8K5DEbslhEZwbl5onCG8R0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t/FixNlWjFB1G3M//js3HHteJ5tbPBChPOQkD0HfnT/kMGMa+jXw1JT45KGYqHRstNTBtZ0xrcjkxXFVfcO8RJXyIMPVRJfZjtxlZOLKbFWunuyPzrngChRrnN/EkBX7dLOmITRniTpxUk8+0axWpyzw93+HKGS7fQo47ORZqsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWP0FYl3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE845C4CEDF;
+	Mon,  6 Jan 2025 17:53:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736185582;
-	bh=uW9GkYu5gQtwFMIjKJhUpF82owJOz8+dxzEqPIHMP7k=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EpCTsWax3MMH+M1GHV/LGwpBjuNvSbMvL3SV3rbpiR71QjBMoALI7mTK09bK+FwFY
-	 QCf8LUW4D8SI41e1GVc4wm8NXRfwPP0ilZMHQG1CxOIsSoe/56KCoyIGCrMzQQPs/a
-	 drB1jCJyN6z5c3yKB/bKJLpSxv92fmOZInvfLL17vtn8ukNtIGYTZC76xGQ9Wci0tD
-	 0sjxc3sE/tnnyCz54TnFmZpQKHrTrCWJ2bwcB/EfREYteiIyyPDzuFd4G/IyLoqaV5
-	 qoDWShxdGNEQBBFneAVgtLVP0CDiS9hZxjL8tzw+rma6q09QMG70i9mR/Ilh9g3Cmd
-	 RMpFJfdSR1Khg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next] if_vlan: fix kdoc warnings
-Date: Mon,  6 Jan 2025 09:46:20 -0800
-Message-ID: <20250106174620.1855269-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.47.1
+	s=k20201202; t=1736185998;
+	bh=jXfIxVo+zZE75Tam5ruwm8K5DEbslhEZwbl5onCG8R0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SWP0FYl3DEDB765SUieVN1h2ZHFaWg76MrAf5EA/O0zmgwddpZeh4/ulsAgpc0+cc
+	 26aFvH6lUk2a/guy0hxBDQ6uJODiyRcY1GE8YlTBbxuE32bMyVEYcqqQTo02fqKEQN
+	 iJnm0sBSO2/Cvt7NMvFDjNoOEJoCvSjOEV79n9Q3LLNsA/dx31V7ly0d/Akr9wW6Zq
+	 sXZDwKlNMxA9S7/UdFw26GvlhPrjyqqc26unHZfRHAFGAiD9uKMetiJEnwGG9L4lLk
+	 d+OjCdfXLAHrXj8nEaY5omfokxL+Eq4eN5/O7WDcFkF3dLxwhAG0lKTdHixRGGTFo2
+	 +E1/lYrP9fFOQ==
+Message-ID: <cf625a44-0db1-421d-acf9-e7ec60677697@kernel.org>
+Date: Mon, 6 Jan 2025 10:53:15 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net-next] netlink: add IPv6 anycast join/leave
+ notifications
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org,
+ jimictw@google.com, prohr@google.com, liuhangbin@gmail.com,
+ nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org,
+ =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>,
+ Lorenzo Colitti <lorenzo@google.com>
+References: <20250105020016.699698-1-yuyanghuang@google.com>
+Content-Language: en-US
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250105020016.699698-1-yuyanghuang@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-While merging net to net-next I noticed that the kdoc above
-__vlan_get_protocol_offset() has the wrong function name.
-Fix that and all the other kdoc warnings in this file.
+On 1/4/25 7:00 PM, Yuyang Huang wrote:
+> diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
+> index 562cace50ca9..6793ff436986 100644
+> --- a/net/ipv6/anycast.c
+> +++ b/net/ipv6/anycast.c
+> @@ -278,6 +278,40 @@ static struct ifacaddr6 *aca_alloc(struct fib6_info *f6i,
+>  	return aca;
+>  }
+>  
+> +static void inet6_ifacaddr_notify(struct net_device *dev,
+> +				  const struct ifacaddr6 *ifaca, int event)
+> +{
+> +	struct inet6_fill_args fillargs = {
+> +		.portid = 0,
+> +		.seq = 0,
+> +		.event = event,
+> +		.flags = 0,
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- include/linux/if_vlan.h | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+0 initializations are not needed.
 
-diff --git a/include/linux/if_vlan.h b/include/linux/if_vlan.h
-index d495cbdb52cb..38456b42cdb5 100644
---- a/include/linux/if_vlan.h
-+++ b/include/linux/if_vlan.h
-@@ -176,6 +176,7 @@ struct netpoll;
-  *	@real_dev_addr: address of underlying netdevice
-  *	@dent: proc dir entry
-  *	@vlan_pcpu_stats: ptr to percpu rx stats
-+ *	@netpoll: netpoll instance "propagated" down to @real_dev
-  */
- struct vlan_dev_priv {
- 	unsigned int				nr_ingress_mappings;
-@@ -414,6 +415,8 @@ static inline int __vlan_insert_tag(struct sk_buff *skb,
-  * doesn't have to worry about freeing the original skb.
-  *
-  * Does not change skb->protocol so this function can be used during receive.
-+ *
-+ * Return: modified @skb on success, NULL on error (@skb is freed).
-  */
- static inline struct sk_buff *vlan_insert_inner_tag(struct sk_buff *skb,
- 						    __be16 vlan_proto,
-@@ -443,6 +446,8 @@ static inline struct sk_buff *vlan_insert_inner_tag(struct sk_buff *skb,
-  * doesn't have to worry about freeing the original skb.
-  *
-  * Does not change skb->protocol so this function can be used during receive.
-+ *
-+ * Return: modified @skb on success, NULL on error (@skb is freed).
-  */
- static inline struct sk_buff *vlan_insert_tag(struct sk_buff *skb,
- 					      __be16 vlan_proto, u16 vlan_tci)
-@@ -461,6 +466,8 @@ static inline struct sk_buff *vlan_insert_tag(struct sk_buff *skb,
-  *
-  * Following the skb_unshare() example, in case of error, the calling function
-  * doesn't have to worry about freeing the original skb.
-+ *
-+ * Return: modified @skb on success, NULL on error (@skb is freed).
-  */
- static inline struct sk_buff *vlan_insert_tag_set_proto(struct sk_buff *skb,
- 							__be16 vlan_proto,
-@@ -582,7 +589,7 @@ static inline int vlan_get_tag(const struct sk_buff *skb, u16 *vlan_tci)
- }
- 
- /**
-- * vlan_get_protocol - get protocol EtherType.
-+ * __vlan_get_protocol_offset() - get protocol EtherType.
-  * @skb: skbuff to query
-  * @type: first vlan protocol
-  * @mac_offset: MAC offset
-@@ -808,9 +815,11 @@ static inline netdev_features_t vlan_features_check(struct sk_buff *skb,
-  * @h1: Pointer to vlan header
-  * @h2: Pointer to vlan header
-  *
-- * Compare two vlan headers, returns 0 if equal.
-+ * Compare two vlan headers.
-  *
-  * Please note that alignment of h1 & h2 are only guaranteed to be 16 bits.
-+ *
-+ * Return: 0 if equal, arbitrary non-zero value if not equal.
-  */
- static inline unsigned long compare_vlan_header(const struct vlan_hdr *h1,
- 						const struct vlan_hdr *h2)
--- 
-2.47.1
+> +		.netnsid = -1,
+> +	};
+> +	struct net *net = dev_net(dev);
+> +	struct sk_buff *skb;
+> +	int err = -ENOMEM;
+> +
+> +	skb = nlmsg_new(NLMSG_ALIGN(sizeof(struct ifaddrmsg)) +
+> +			nla_total_size(sizeof(struct in6_addr)) +
+> +			nla_total_size(sizeof(struct ifa_cacheinfo)),
+> +			GFP_KERNEL);
+> +	if (!skb)
+> +		goto error;
+> +
+> +	err = inet6_fill_ifacaddr(skb, ifaca, &fillargs);
+> +	if (err < 0) {
+> +		WARN_ON_ONCE(err == -EMSGSIZE);
+
+simple error message should suffice; stack trace does not provide
+additional value.
+
+> +		nlmsg_free(skb);
+> +		goto error;
+> +	}
+> +
+> +	rtnl_notify(skb, net, 0, RTNLGRP_IPV6_ACADDR, NULL, GFP_KERNEL);
+> +	return;
+> +error:
+> +	rtnl_set_sk_err(net, RTNLGRP_IPV6_ACADDR, err);
+> +}
+> +
+>  /*
+>   *	device anycast group inc (add if not found)
+>   */
 
 
