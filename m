@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-155529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AA71A02E52
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:54:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFC2FA02E54
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:54:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FFA6165082
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F4841885F5B
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F371662E9;
-	Mon,  6 Jan 2025 16:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398A21DB360;
+	Mon,  6 Jan 2025 16:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TXXrGPbL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gBrPr7jU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2150153814
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169F61ADFE3
 	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 16:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736182467; cv=none; b=T4aWAUtCRQNGqV7DKZ78Q54vYxqNFOXMy8AdWLvxni7DflRmmvjfLzkHNS4lOGnoHS7B/WKNAnC7XQqG3OaRIa5cQVKTaNngQNGM6WRpG6iFAJ07wSWj84DxWnUgQIEI4jCVhTmCKdoS6g2AUAHT4qbAJlP0ePuJLuNSMsbXImk=
+	t=1736182468; cv=none; b=Dub7EguupX/qb3lWcinqbGIR4mLavHmbrlJSPquGXx+DpoVe0pCs8Ky39zwp45Ybn8dNGQkYym46SJhv3Yg8Lw2HQZ0dsrtfztI4Ol5PxL6y+9/U7Sf1+skk/9Hs1iFBQr7A4RzHLEneOBuqiVj2EfuqGEYXoddGtIJIRTDELVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736182467; c=relaxed/simple;
-	bh=k9yriv3FjKegK1G3dRsHkGi2dQjrxB8t9Prkv6ezWiY=;
+	s=arc-20240116; t=1736182468; c=relaxed/simple;
+	bh=xG9h1zUQlyJFhkVZOGJVKYgSUTqNvRYKRo7NmSkTSOY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JIbYCyrhetT+bE8rlXMoQXE7paOkRrrzlPN3N4dW+2u+WvFvbBOMCyUl2IKrQf1DkQfKEh1NnmXE0JM5V31xKDePOdYfxlrlYlIYO+h/6P1iKyt8QfnCWJ8tM+0hqomJLH52gj6GlV3BXe1GI2RxYpy9UpjDYm7yH+tU48IFsr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TXXrGPbL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2704CC4CED6;
+	 MIME-Version; b=G9KgmJmYBd3vVZzvT5WMvZdn3NEtLgBzoBV4KVo4UpaQIFtwMbVeeN19hq2SjnZNO53GCXj/RLYU7Ym4D68vM3s3NR9chGcXaYwKeGRN6Tg0b/4dK8D4IV1FYVlZ0J5YqPov5kkMKn+mXZwO+qslrElP5GhFq8Ebq7NEx5lsV5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gBrPr7jU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A720C4CEE2;
 	Mon,  6 Jan 2025 16:54:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1736182467;
-	bh=k9yriv3FjKegK1G3dRsHkGi2dQjrxB8t9Prkv6ezWiY=;
+	bh=xG9h1zUQlyJFhkVZOGJVKYgSUTqNvRYKRo7NmSkTSOY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TXXrGPbLzwSEUkWR7QzhNR00Vg2wFYlGZYlz1HUwu0VUEq1D29gy1gGkzHnRPsxDa
-	 1AtpVrdzcoU0KVexusyNyohFE1NeKXqHVBtLumNfYuv3UmANp6ioZrGtpcLWccclZt
-	 4CR61ovWJQODRHSc237bsaFC97x7zpg8le3wKIDLbVqEIUDSbAQMph58BLUee0YP6p
-	 9ObSoIytMwIFD6Z+mSDH3j2i5CdX4iVTuaiatETWtBs9vpZtlQ4f5KS120sh3O/nTE
-	 b3XddlV9KZ7VS5X0w7XA1FrAwUHcVu49SYoJP91t/zmraw28orncPskXMtRZ4jhEcP
-	 s2rqdaqn6zIOA==
+	b=gBrPr7jUAXsn7UQPlinC8nSDUTnS3xYPjagzl15m8oHGZCTbm+zE2sHVhSPRBwyrP
+	 7vNAplksXICkyJvNpSFFJHdMDbq0athCpwFO9ML5c7buZc5xDTCNdtzEr1LJ9VXJat
+	 pFw7JhaYdorzbCxA1WzxUTpK22TQSH+ubuIDllZ+tsE82AMEwX64D7a9XnGupewRPl
+	 oScUiM0Y03OlGyIUNyeYtYSvwsyuyHF5lpEgWCAxfmldEZGYo0ljPPHvribBEqO45d
+	 1Ugdg2Ck/fGpBcnvvvOL9iMDoypMMixPUrmOGrOkkj5h2V8wf5qeS67HYnqy/PRqVR
+	 AzIJrwtpTC0Cg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -48,10 +48,10 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jose.Abreu@synopsys.com
-Subject: [PATCH net 1/8] MAINTAINERS: mark Synopsys DW XPCS as Orphan
-Date: Mon,  6 Jan 2025 08:53:57 -0800
-Message-ID: <20250106165404.1832481-2-kuba@kernel.org>
+	woojung.huh@microchip.com
+Subject: [PATCH net 2/8] MAINTAINERS: mark Microchip LAN78xx as Orphan
+Date: Mon,  6 Jan 2025 08:53:58 -0800
+Message-ID: <20250106165404.1832481-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250106165404.1832481-1-kuba@kernel.org>
 References: <20250106165404.1832481-1-kuba@kernel.org>
@@ -63,60 +63,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There's not much review support from Jose, there is a sharp
-drop in his participation around 4 years ago.
-The DW XPCS IP is very popular and the driver requires active
-maintenance.
+Woojung Huh seems to have only replied to the list 35 times
+in the last 5 years, and didn't provide any reviews in 3 years.
+The LAN78XX driver has seen quite a bit of activity lately.
 
 gitdm missingmaints says:
 
-Subsystem SYNOPSYS DESIGNWARE ETHERNET XPCS DRIVER
-  Changes 33 / 94 (35%)
+Subsystem USB LAN78XX ETHERNET DRIVER
+  Changes 35 / 91 (38%)
   (No activity)
   Top reviewers:
-    [16]: andrew@lunn.ch
-    [12]: vladimir.oltean@nxp.com
-    [2]: f.fainelli@gmail.com
-  INACTIVE MAINTAINER Jose Abreu <Jose.Abreu@synopsys.com>
+    [23]: andrew@lunn.ch
+    [3]: horms@kernel.org
+    [2]: mateusz.polchlopek@intel.com
+  INACTIVE MAINTAINER Woojung Huh <woojung.huh@microchip.com>
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: Jose.Abreu@synopsys.com
+CC: woojung.huh@microchip.com
 ---
  CREDITS     | 4 ++++
- MAINTAINERS | 3 +--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ MAINTAINERS | 4 +---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/CREDITS b/CREDITS
-index b1777b53c63a..2a5f5f49269f 100644
+index 2a5f5f49269f..7a5332907ef0 100644
 --- a/CREDITS
 +++ b/CREDITS
-@@ -20,6 +20,10 @@ N: Thomas Abraham
- E: thomas.ab@samsung.com
- D: Samsung pin controller driver
+@@ -1816,6 +1816,10 @@ D: Author/maintainer of most DRM drivers (especially ATI, MGA)
+ D: Core DRM templates, general DRM and 3D-related hacking
+ S: No fixed address
  
-+N: Jose Abreu
-+E: jose.abreu@synopsys.com
-+D: Synopsys DesignWare XPCS MDIO/PCS driver.
++N: Woojung Huh
++E: woojung.huh@microchip.com
++D: Microchip LAN78XX USB Ethernet driver
 +
- N: Dragos Acostachioaie
- E: dragos@iname.com
- W: http://www.arbornet.org/~dragos
+ N: Kenn Humborg
+ E: kenn@wombat.ie
+ D: Mods to loop device to support sparse backing files
 diff --git a/MAINTAINERS b/MAINTAINERS
-index a685c551faf0..188c08cd16de 100644
+index 188c08cd16de..91b72e8d8661 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -22746,9 +22746,8 @@ S:	Supported
- F:	drivers/net/ethernet/synopsys/
+@@ -24261,10 +24261,8 @@ F:	Documentation/devicetree/bindings/usb/nxp,isp1760.yaml
+ F:	drivers/usb/isp1760/*
  
- SYNOPSYS DESIGNWARE ETHERNET XPCS DRIVER
--M:	Jose Abreu <Jose.Abreu@synopsys.com>
+ USB LAN78XX ETHERNET DRIVER
+-M:	Woojung Huh <woojung.huh@microchip.com>
+-M:	UNGLinuxDriver@microchip.com
  L:	netdev@vger.kernel.org
--S:	Supported
+-S:	Maintained
 +S:	Orphan
- F:	drivers/net/pcs/pcs-xpcs.c
- F:	drivers/net/pcs/pcs-xpcs.h
- F:	include/linux/pcs/pcs-xpcs.h
+ F:	Documentation/devicetree/bindings/net/microchip,lan78xx.txt
+ F:	drivers/net/usb/lan78xx.*
+ F:	include/dt-bindings/net/microchip-lan78xx.h
 -- 
 2.47.1
 
