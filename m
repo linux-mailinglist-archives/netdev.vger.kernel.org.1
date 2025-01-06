@@ -1,110 +1,114 @@
-Return-Path: <netdev+bounces-155306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C798A01CC3
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 00:44:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6400A01CD3
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 01:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1114318833FB
-	for <lists+netdev@lfdr.de>; Sun,  5 Jan 2025 23:44:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C832D161F64
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 00:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31971D5174;
-	Sun,  5 Jan 2025 23:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C799474;
+	Mon,  6 Jan 2025 00:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="JA6QUbul"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e3JNsYNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.freemail.hu (fmfe07.freemail.hu [46.107.16.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAD31465BA;
-	Sun,  5 Jan 2025 23:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86273224;
+	Mon,  6 Jan 2025 00:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736120687; cv=none; b=NU8wjQ9ITw8ceMzWJlEHNnFx+vUIoBZZpOHi5jhGv5zqoJDzmd5jOWV4UD3FPDcFj2k84NNy58U0slM3T04xQhliEGghdxZDzWJEsqCexHjtI2yodxVvLABeYKFIz5UmgR9xA4Lgf/aha8N2pY5tkS/VPrNBsd6Uw81f2gVj6SI=
+	t=1736122597; cv=none; b=mI+e7fsrZ4EJLmXNMTSrZTUUxxsoKOKACWRwsZgD6dhNCw+oit26H4WBCOvx2rhkF3oqewKc6UrIm6wCBUtNJcmsP0Os7ljMc7dJ0CIYmu9epr63I5gJgv4eWfAknsMh3OFb7muKBac9c6V1IgbxCOB5lcFdXS6uUbHs/TxbxDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736120687; c=relaxed/simple;
-	bh=zvVMWlYuZMDelzUPeJa7bHncL/XnFyEnogNqnzkaIus=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GeVT9pDx5ARjYwCIFNZY6mD76uEKycgDZUosiPpspBIRiog9O4/6JLwYYtGh+AvTrq3cy6EtGPIFrkK7PtRJyCh0PdmDDaw+J969WG+fLjxC/oXgRFTFZOBlnCztV5Tzhtn/gZaJqruLmQ2TNB6LGjP03uqCquWvWIrxUaNVCFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=JA6QUbul reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
-Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YRDS42TRkzKnw;
-	Mon, 06 Jan 2025 00:44:36 +0100 (CET)
-Message-ID: <defa70d2-0f0c-471e-88c0-d63f3f1cd146@freemail.hu>
-Date: Mon, 6 Jan 2025 00:44:11 +0100
+	s=arc-20240116; t=1736122597; c=relaxed/simple;
+	bh=ojec6Ee3CNoayywAB5Amc17aicUGxD2T3RDpyIPsMPk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PsZrDVA217sDCtq0ubJgu302MpzOSBKCgI0fZ5MXPmrtTBdhrkyy7V4WGc64DheMMtZGKZV06ZeKp4gl3B++h/h9FKlIaEY/GAf5fs2qk7RT2sLItNsbrsxkKTwsH2/HediZPgiKRrRiwWQICRI7n3fzGTCvjF95jUq5gI9t1dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e3JNsYNL; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43634b570c1so99047205e9.0;
+        Sun, 05 Jan 2025 16:16:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736122594; x=1736727394; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KIqv1w/KzDHT3jhVDEhZI6SzEmkBsffQKD6siBUIkOQ=;
+        b=e3JNsYNL2CWqFiM9Wrb31sn7r41YHC6W73sgfSWYi0NfItL6yQ3rw+uo1PqP5P2TWc
+         psIvMwSEd6sgcJhcou87XVDmGzthP0Icg/X9PtG76IGDFYu6LBSmW1mEJeJFM014wx1w
+         nS8JGz34i+iKX0n/Xq7hN4BsFZ2iD6g7EP+QBDQDG6MoM9d4UQ+XdqkIGdru+BKhAtG0
+         0HrvKuV0YEna/7tkng9F5CdlNOHJ/VrTDnU04qb8jskLcSxgL/RGRA3MIUI/dS+pq9XD
+         WQkxT7tuYucwfsG1qBR+SYnBGGnjko+5yEB8I//MROrX4shr3Seyu3GRuhR+UUWgDrIS
+         yJZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736122594; x=1736727394;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KIqv1w/KzDHT3jhVDEhZI6SzEmkBsffQKD6siBUIkOQ=;
+        b=Mp/dASgciZ/SfPVef5URWJUOvCTADSL2wc6CA+9WYKxTmiR/jNxampQARksbJ/PwsJ
+         VTESFu2K5BbkeG60wGIu2TFijN7OhTMlYpSizgmSxytTUAVq35bZZsw4msA3aaRXugmU
+         YC/sYDwtq/YEoLu4JMGKg/LbuZx6G3fbtlwYiFRi2hviFPYK2+tu6crujHomZOM5i+n/
+         2Cyy5l0Cc/OS482kqzjaUJfJlxSJqBHpc1Q22xfD5oTXwld9oiEzo5FgfkPqVFGRbbm/
+         s/mLvZqfWtp20Ga0s1uNtxV5+R9Pg8HLB5h3OHCuEH/vDX52syW5PKvXBG3+mlQ9YUDs
+         kXWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUM5Ecz0G7sij1Gbza75Tk75vXG2qmutPUeuF4Y6N0BtQGQiUPWGvcE5ky1XxEb9wuQFtcckV3j@vger.kernel.org, AJvYcCUwDeZvu/o34JrUuVJM20B1cnAP1kLmSJoDuW/7xBtf5SjjdDWtOifkJAiEylesJ1o0IRs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxdqgr/mMejwzqxV5PWs4Bju/aoNBOyrdGq2bX3SAwCnBTuQRL2
+	CNc28uGfPGb/S4Qjt2b5+9TpxjOPfdhUNW8RNmvkNGKrCUX9V5YqhB+X2zZzXvKRfbYrM1UXtSK
+	Kp0e/UxE0dZl1JN+JHyph9AcDWpY=
+X-Gm-Gg: ASbGnctj6rguHV0V+et+d+moU0p15cd9HHtOuqfr4dWRtZTx/87PivWPiMNIsxfiIV3
+	GDrQDJXndeAidlfDetz4O9M04hHliIOe4iRs1hw==
+X-Google-Smtp-Source: AGHT+IGKPz9CgDuluCultGgcXxKmIs38Aua/eInGLsF6WqnbAtAQ7V1TsQkDoEoNOaEWrYHEiayWj9R0UUtkjPK6clA=
+X-Received: by 2002:a5d:598f:0:b0:386:424e:32d5 with SMTP id
+ ffacd0b85a97d-38a221ea939mr48432959f8f.14.1736122593449; Sun, 05 Jan 2025
+ 16:16:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/3] netfilter: x_tables: Merge xt_*.h and ipt_*.h
- files which has same name.
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
- daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
- kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250105203452.101067-1-egyszeregy@freemail.hu>
- <43f658e7-b33e-4ac9-8152-42b230a416b7@lunn.ch>
-Content-Language: hu
-From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
-In-Reply-To: <43f658e7-b33e-4ac9-8152-42b230a416b7@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736120677;
-	s=20181004; d=freemail.hu;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	l=1311; bh=9G+g0eBF3wfdx+kwUmqJIHPF2WU7tQ4kikQuat/LwyQ=;
-	b=JA6QUbulmBsoQaKVnOhvWXKngGsg2lCKGakLBoi0esC0UHmysCRj6luCra5ZL/nw
-	YLG9D0JOmdKG5+a5wcxddJsq2mjjrhmGtYxwoikqS/gbclqpk9Qr/kft14ED0nJA43s
-	3hkvl5mVUY4KYtMRnzOpigUhlfzZW+d0NW6f1phvVzFG9Gs4Hk7LpiqzpySYdI5H51e
-	YtXaa90IobdohN2VelDxgFt3eBKKKFYkL/uJ84sON6PQX+7tDNt2pChkQAnednqjqFU
-	Mc8Sc5z7utXFv9VC40ji25k/+VMjwenm1JWEM6s3cmqo1TcXxptoFRQETP7EsOjh4k0
-	nz+pzg3vPA==
+References: <20250105124403.991-1-laoar.shao@gmail.com> <20250105124403.991-2-laoar.shao@gmail.com>
+In-Reply-To: <20250105124403.991-2-laoar.shao@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 5 Jan 2025 16:16:22 -0800
+Message-ID: <CAADnVQ+ga1ir9XCDxPiU_-eYzKHTQsiod9Sz4_o3XeqGW2rq4A@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next 1/2] libbpf: Add support for dynamic tracepoint
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eddy Z <eddyz87@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Eric Dumazet <edumazet@google.com>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-2025. 01. 05. 22:27 keltezéssel, Andrew Lunn írta:
-> On Sun, Jan 05, 2025 at 09:34:52PM +0100, egyszeregy@freemail.hu wrote:
->> From: Benjamin Szőke <egyszeregy@freemail.hu>
->>
->> Merge xt_*.h, ipt_*.h and ip6t_*.h header files, which has
->> same upper and lower case name format.
->>
->> Add #pragma message about recommended to use
->> header files with lower case format in the future.
-> 
-> It looks like only patch 1/3 make it to the list.
-> 
-> Also, with a patchset, please include a patch 0/X which gives the big
-> picture of what the patchset does. The text will be used for the merge
-> commit, so keep it formal. 'git format-patch --cover-letter' will
-> create the empty 0/X patch you can edit, or if you are using b4 prep,
-> you can use 'b4 prep --edit-cover' and then 'b4 send' will
-> automatically generate and send it.
-> 
-> https://docs.kernel.org/process/maintainer-netdev.html
-> https://docs.kernel.org/process/submitting-patches.html
-> 
->      Andrew
+On Sun, Jan 5, 2025 at 4:44=E2=80=AFAM Yafang Shao <laoar.shao@gmail.com> w=
+rote:
+>
+> Dynamic tracepoints can be created using debugfs. For example:
+>
+>    echo 'p:myprobe kernel_clone args' >> /sys/kernel/debug/tracing/kprobe=
+_events
+>
+> This command creates a new tracepoint under debugfs:
+>
+>   $ ls /sys/kernel/debug/tracing/events/kprobes/myprobe/
+>   enable  filter  format  hist  id  trigger
+>
+> Although this dynamic tracepoint appears as a tracepoint, it is internall=
+y
+> implemented as a kprobe. However, it must be attached as a tracepoint to
+> function correctly in certain contexts.
 
-https://lore.kernel.org/lkml/20250105233157.6814-1-egyszeregy@freemail.hu/T/
-
-It is terribly chaotic how slowly start to appear the full patch list in the 
-mailing list website. It's really time to replace 1990s dev technology with 
-something like GitLab or GitHub developing style can provide in 2024.
-
-> 
-> ---
-> pw-bot: cr
-
+Nack.
+There are multiple mechanisms to create kprobe/tp via text interfaces.
+We're not going to mix them with the programmatic libbpf api.
 
