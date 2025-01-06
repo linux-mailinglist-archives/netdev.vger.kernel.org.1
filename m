@@ -1,165 +1,204 @@
-Return-Path: <netdev+bounces-155368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B9F0A02089
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:21:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D8CCA0209D
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:25:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23AB116211C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:21:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA2BF3A3120
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F17135942;
-	Mon,  6 Jan 2025 08:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398B21D86CE;
+	Mon,  6 Jan 2025 08:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gvf7vOiQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x1ElYxSL"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5114A04
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:21:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490701D7E4A
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736151669; cv=none; b=Q6pW7anqbbDvlVyFbeAfgabwFqvBDrFJtthCPVml4VkuxgybaJaxaLysnL2sAYMFxWNtrThFnp6mu5RTwXVSyxV0V8diWbpr5Kvf9NNDB+08QVO5eS80HTItWKsW10D7IOHJmbarCbnN4H46S+nPl4zcGqW2uxrJRp6SsdT1IVk=
+	t=1736151891; cv=none; b=hFQOcyXh7gaK4RFxbY/c4k6wCMikJwo2yeQj1pposqDp+nbTXC4hMVCVCx/A1tkJIQFsodsxFYg4eoc4Gbo1zO1E3/E31OnEcDiEN2syrZnqnAuniawRCJ69bQuUgQt5+JDWI9ENoBEHo9aD+Q+949c7b1lsQ4vC8WSAocFycRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736151669; c=relaxed/simple;
-	bh=OSwSxa9R6S3DjyCyilBUO6+b7dq8tgvdND1xIZWBG0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rHICBk7CV472JDcWvBsdb7IgaGgrLJpDA+ItF0uc4poYLAGRf42pzK6AA7jPkQu9xKci9vkU+GEBIqzdJCj+wEv2n2XKGbwjSPBD/dKK5dd7stzDxU//YiI89gPH06cizXVCudirp0a+KlYIcunokZ5tAlCNjTXwpduwrEzffs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gvf7vOiQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qOmXDzyTaMxazL0LDKrl4EGxFFFgph+mRVLzgb1OGYw=; b=gvf7vOiQ9lnv2sNz63xRpjQwRj
-	PhdACP9CoFiCbHmKVx68uFLnR25ClhyYqHLT38t2ejIGsszwBelrWuduNyKiaBZrhk8xo+umr9pCS
-	q1RERMQUXlcQUaPAJoYfX1ZwK0g1a3JNMAyhCatLJwZgE2kwZ3QkLofmj1D8e0C780wI3eVjHwc4m
-	3dnmwNMvM343byztON7Xok5ztcbm9RBH71SGQULa8c0hRdUnGZG92uSi1dLnrNGTUgm9YxKxo4tAj
-	oDS6gTKapf6DKjr9Hu8+TvJ94Rb7RecyQPDwVwi9SdsHNPEmw8fQg8Aw6Y4p49DyrTk9A8an/8ner
-	5U3recSQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43560)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tUiLz-0005VT-19;
-	Mon, 06 Jan 2025 08:20:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tUiLs-00047w-2g;
-	Mon, 06 Jan 2025 08:20:44 +0000
-Date: Mon, 6 Jan 2025 08:20:44 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, olteanv@gmail.com, netdev@vger.kernel.org,
-	chris.packham@alliedtelesis.co.nz, pabeni@redhat.com,
-	marek.behun@nic.cz
-Subject: Re: [PATCH v2 net 3/4] net: dsa: mv88e6xxx: Never force link on
- in-band managed MACs
-Message-ID: <Z3uSXFH9bryiuVqX@shell.armlinux.org.uk>
-References: <20241219123106.730032-1-tobias@waldekranz.com>
- <20241219123106.730032-4-tobias@waldekranz.com>
- <Z3ZrH9yqtvu2-W7f@shell.armlinux.org.uk>
- <87zfk974br.fsf@waldekranz.com>
- <Z3bIF7xaXrje79D8@shell.armlinux.org.uk>
- <87pll26z2b.fsf@waldekranz.com>
- <Z3mxsEziH_ylpCD_@shell.armlinux.org.uk>
- <87msg66uh4.fsf@waldekranz.com>
- <Z3ph3P9AFankiZxW@shell.armlinux.org.uk>
- <87h66c7sa6.fsf@waldekranz.com>
+	s=arc-20240116; t=1736151891; c=relaxed/simple;
+	bh=mRpwazyZRVZTVcDMGYQXmqPZtajO2mdhtuOpxotH7+Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bdmUXudi+xM+7pN9r61LPv1afAykQq+nCd6qbP7PSuPW+QReNdXeCEs/7jKsR19UcIMSIEvgUrMfkvIZQM8RKBXkRVOuTv6LWeGkUaZhJjHkdWUNTZD1HeNrPHQ+27vuD/JuZWM8K39xlWt3iGz3/bV91/7ojra4jA7N9v8X1hQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x1ElYxSL; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d932eac638so2795167a12.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 00:24:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736151888; x=1736756688; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UbZO3lFNTHHbW9lxaEAxssjwvIxzJN7H42aUiYjZ5HY=;
+        b=x1ElYxSLENaBjX+/TficKfGfSNkNdo+z6o4IJFbPCXAuoMwXgKy1f9w7WJX+14KV3b
+         GQzwmV3jJckeh3kKRr4SGLfwwfSkLP7TorZilOgG6mM2IQ7A9PRU2r9rh5WA/T2HO7kV
+         Tvtn6Wv6Vq/jIU1Ra1uYDuk2R8n540ws834lUGl/GYKhNARdzAyn3obY7x2Ia7okghlb
+         MeKbVZ6XhjUAgTGbYvNq21AEEgtSHPAiiuceAUtYRmaz4VwQaJW8ZTROWm14jD21Ms33
+         oU+Ks7/trQBaJfwzUj/gloZxY83pbxhAq/K/oBo0mnkJpRnUz9IJFQFQThZcXPbmMDai
+         NGyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736151888; x=1736756688;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UbZO3lFNTHHbW9lxaEAxssjwvIxzJN7H42aUiYjZ5HY=;
+        b=rex8vhSO6A3l0zNmMBeOAK5X1ptqpgEaAxnOEyaD+D4x7HXSxmbrpkNtKPOCaA19An
+         S2xmWpro4NiPEITVKBwPg0prZ8MdGqEHN8WPBvdqBjcNPpFT+kNuqOQ4jiqlTn0buZ8y
+         cW0g9tZOxHVeV4BdQYpK1+yAGeVz9GfpGLSHANGaEuw9EQVKJOe3BU6md+sQHlXA/2qN
+         nMsnxBS2yKHRHdbyef4KDR83ttpwS8GgWpvv51+19JAfvbqUXoHvCMqx7FEVy+PcVPZf
+         PDSlbzZwAoI4CsYtD3lCUwU6AvzpnCK9hwNuKpOVBIwM9AIS3CAhVPK73ulgfxkqdXiy
+         Uoig==
+X-Gm-Message-State: AOJu0Yxw+BfFYmKtsMaYxJq0wyGnGhK1QiFzbwk/5/Wu3KWRvLiheuH6
+	gA3kJp7v6MXflsM/w5h7ZbGZx6Sdm4ABa1Kn4r13gN2NLNARX+P1xXv0qTMaWTE9XbQXZIa0sFF
+	Z8LvOs5jAP1nhCJRSDktUIfmx5tUwWsDC6cPB
+X-Gm-Gg: ASbGnctret338Rg4Z3IjhHizWp8JcQ/ikKqX5SUSgzfQzIPZoy3IjA+ZlLDA8AU60xt
+	WMkERkAh6xOY6dbaGw0tBFa+ea+DfjotCcATeXQ==
+X-Google-Smtp-Source: AGHT+IHRr8ENF6kbeeiTVz3dRzmoIBN6AAU3f55oKyvRR/EdXxRZiVW/D3iIuLQnpCU/KY8HBxvVGXXOoR9BVTFo/Vc=
+X-Received: by 2002:a05:6402:524b:b0:5d0:bf27:ef8a with SMTP id
+ 4fb4d7f45d1cf-5d81de48bd1mr49018605a12.26.1736151887382; Mon, 06 Jan 2025
+ 00:24:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87h66c7sa6.fsf@waldekranz.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <408334417.4436448.1736139157134.ref@mail.yahoo.com> <408334417.4436448.1736139157134@mail.yahoo.com>
+In-Reply-To: <408334417.4436448.1736139157134@mail.yahoo.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 6 Jan 2025 09:24:35 +0100
+Message-ID: <CANn89iLzo0Wk7p=dtUQ4Q2-pCAsjSxXZw71ngNTw6NZbEEvoDA@mail.gmail.com>
+Subject: Re: [PATCH net] tcp_cubic: Fix for bug in HyStart implementation in
+ the Linux kernel
+To: Mahdi Arghavani <ma.arghavani@yahoo.com>, Neal Cardwell <ncardwell@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Haibo Zhang <haibo.zhang@otago.ac.nz>, 
+	David Eyers <david.eyers@otago.ac.nz>, Abbas Arghavani <abbas.arghavani@mdu.se>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 06, 2025 at 12:30:25AM +0100, Tobias Waldekranz wrote:
-> On sön, jan 05, 2025 at 10:41, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> > On Sun, Jan 05, 2025 at 12:16:07AM +0100, Tobias Waldekranz wrote:
-> >> On lör, jan 04, 2025 at 22:09, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> >> > Host system:
-> >> >
-> >> >   ---------------------------+
-> >> >     NIC (or DSA switch port) |
-> >> >      +-------+    +-------+  |
-> >> >      |       |    |       |  |
-> >> >      |  MAC  <---->  PCS  <-----------------------> PHY, SFP or media
-> >> >      |       |    |       |  |     ^
-> >> >      +-------+    +-------+  |     |
-> >> >                              |   phy interface type
-> >> >   ---------------------------+   also in-band signalling
-> >> >                                  which managed = "in-band-status"
-> >> > 				 applies to
-> >> 
-> >> This part is 100% clear
-> >
-> > Apparently it isn't, because...
-> >
-> >> In other words, my question is:
-> >> 
-> >> For a NIC driver to properly support the `managed` property, how should
-> >> the setup and/or runtime behavior of the hardware and/or the driver
-> >> differ with the two following configs?
-> >> 
-> >>     &eth0 {
-> >>         phy-connection-type = "sgmii";
-> >>         managed = "auto";
-> >>     };
-> >> 
-> >> vs.
-> >> 
-> >>     &eth0 {
-> >>         phy-connection-type = "sgmii";
-> >>         managed = "in-band-status";
-> >>     };
-> >
-> > if it were, you wouldn't be asking this question.
-> >
-> > Once again. The "managed" property defines whether in-band signalling
-> > is used over the "phy-connection-type" link, which for SGMII will be
-> > between the PCS and PHY, as shown in my diagram above that you claim
-> > to understand 100%, but by the fact you are again asking this question,
-> > you do not understand it AT ALL.
-> >
-> > I don't know how to better explain it to you, because I think I've been
-> > absolutely clear at every stage what the "managed" property describes.
-> > I now have nothing further to add if you still can't understand it, so,
-> > sorry, I'm giving up answering your emails on this topic, because it's
-> > just too frustrating to me to continue if you still don't "get it".
-> 
-> I agree that you have clearly explained what it describes, many times.
-> 
-> My remaining question - which you acknowledge that I asked twice, yet
-> chose not to answer - was how software is supposed to _act_ on that
+On Mon, Jan 6, 2025 at 5:53=E2=80=AFAM Mahdi Arghavani <ma.arghavani@yahoo.=
+com> wrote:
+>
+> Hi,
+>
+> While refining the source code for our project (SUSS), I discovered a bug=
+ in the implementation of HyStart in the Linux kernel, starting from versio=
+n v5.15.6. The issue, caused by incorrect marking of round starts, results =
+in inaccurate measurement of the length of each ACK train. Since HyStart re=
+lies on the length of ACK trains as one of two key criteria to stop exponen=
+tial cwnd growth during Slow-Start, this inaccuracy renders the criterion i=
+neffective, potentially degrading TCP performance.
+>
 
-I *have* answered it. Every time.
+Hi Mahdi
 
-> description; presuming that the property is not in the DT merely for
-> documentation purposes.
+netdev@ mailing list does not accept HTML messages.
 
-Utter claptap. Total rubbish. Completely wrong. It is acted on. It
-causes phylink to enter in-band mode, and use the PCS to obtain the
-in-band data instead of the PHY.
+Am I right to say you are referring to
 
-YOU are the one refusing to listen to what I'm saying, yet you claim
-my explanations are clear and you understand them. You parently do
-not.
+commit 8165a96f6b7122f25bf809aecf06f17b0ec37b58
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Tue Nov 23 12:25:35 2021 -0800
 
-End. Of. Discussion.
+    tcp_cubic: fix spurious Hystart ACK train detections for
+not-cwnd-limited flows
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    [ Upstream commit 4e1fddc98d2585ddd4792b5e44433dcee7ece001 ]
+
+
+
+> Issue Description: The problem arises because the hystart_reset function =
+is not called upon receiving the first ACK (when cwnd=3Diw=3D10, see the at=
+tached figure). Instead, its invocation is delayed until the condition cwnd=
+ >=3D hystart_low_window is satisfied. In each round, this delay causes:
+>
+> 1) A postponed marking of the start of a new round.
+>
+> 2) An incorrect update of ca->end_seq, leading to incorrect marking of th=
+e subsequent round.
+>
+> As a result, the ACK train length is underestimated, which adversely affe=
+cts HyStart=E2=80=99s first criterion for stopping cwnd exponential growth.
+>
+> Proposed Solution: Below is a tested patch that addresses the issue by en=
+suring hystart_reset is triggered appropriately:
+>
+
+
+
+Please provide a packetdrill test, this will be the most efficient way
+to demonstrate the issue.
+
+In general, ACK trains detection is not useful in modern networks,
+because of TSO and GRO.
+
+Reference : https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.=
+git/commit/?id=3Dede656e8465839530c3287c7f54adf75dc2b9563
+
+Note that we are still waiting for an HyStart++ implementation for linux,
+you may be interested in working on it.
+
+Thank you.
+
+>
+>
+> diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+>
+> index 5dbed91c6178..78d9cf493ace 100644
+>
+> --- a/net/ipv4/tcp_cubic.c
+>
+> +++ b/net/ipv4/tcp_cubic.c
+>
+> @@ -392,6 +392,9 @@ static void hystart_update(struct sock *sk, u32 delay=
+)
+>
+>         if (after(tp->snd_una, ca->end_seq))
+>
+>                 bictcp_hystart_reset(sk);
+>
+>
+>
+> +       if (tcp_snd_cwnd(tp) < hystart_low_window)
+>
+> +               return;
+>
+> +
+>
+>         if (hystart_detect & HYSTART_ACK_TRAIN) {
+>
+>                 u32 now =3D bictcp_clock_us(sk);
+>
+>
+>
+> @@ -468,8 +471,7 @@ __bpf_kfunc static void cubictcp_acked(struct sock *s=
+k, const struct ack_sample
+>
+>                 ca->delay_min =3D delay;
+>
+>
+>
+>         /* hystart triggers when cwnd is larger than some threshold */
+>
+> -       if (!ca->found && tcp_in_slow_start(tp) && hystart &&
+>
+> -           tcp_snd_cwnd(tp) >=3D hystart_low_window)
+>
+> +       if (!ca->found && tcp_in_slow_start(tp) && hystart)
+>
+>                 hystart_update(sk, delay);
+>
+>  }
+>
+> Best wishes,
+> Mahdi Arghavani
 
