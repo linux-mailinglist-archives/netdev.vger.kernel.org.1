@@ -1,179 +1,110 @@
-Return-Path: <netdev+bounces-155599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 566D5A0323C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:44:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58FB1A0324C
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF9641885C20
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:44:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15E3A7A2330
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5041E049F;
-	Mon,  6 Jan 2025 21:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D43C1E0DD5;
+	Mon,  6 Jan 2025 21:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ntaNzjBM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PhgvCN6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941671372
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 21:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458CA145A11;
+	Mon,  6 Jan 2025 21:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736199885; cv=none; b=UfShsYEaFP7hsfqq3rPRNNPeUg785EbRkrih3IfgDqWgYJtrjn9qh+xJDL8+ptKQ7WiZppxMi89b+tEookPbPO+d67C5l8yW5z4SYXpbuvdUG3vA4cOtlYRQ+m7XNXwA5vDAvAY3YKez6BxYK24V21CEuPs6EejhvnkOBjgdZkg=
+	t=1736200214; cv=none; b=UEN8HZ6X5keEdC6o+jWlZtkYltcnVuDhCSUMHaBBYdmy0qeCjWB8wz9MlcRc5Q69cMx4M3OthipuJk4+wdxXbzVDo1vPfGLORZsM+QrTjaGJC+HRDZO938HJPojsJnw/qoFMslsQTsWspIc6OXPyZvaiNX9XVz4ZtmJKcQg4cQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736199885; c=relaxed/simple;
-	bh=HzDC/c0XNGpvaJvHCpg6iyEOCu6qco8XSvU0e16V/Tc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HmM0aZHLQ9f36wf9U7KIFL4AT8VgDoNPaqyycCsHB0e/+SKRjd7lLrJA9VQa3erJKOftn+UC1v1WzGLSTqhCHQzsoeqT57aKUe/2bca55U1O0fLwf3JvOd1RtCLlh5hLnHszlitdU2m5nlBsjJGlAj0RvDE1a0U9KGwHef4w7rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ntaNzjBM; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4678c9310afso18151cf.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 13:44:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736199882; x=1736804682; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/dOtmPNuJzUtI3kd2Txc5na+EAf1+u+ytRBIdK3IQI4=;
-        b=ntaNzjBMGQf5u2ST5rWk8xX6dvtyBGBVX3wUjJuIUV1KCbnbJjFO2vPPyusqXDSD4h
-         bFo0zJjuQ1NyIFtYTTfQQiZzbfk+3JrqmkqPHiyJOu2A8Bl3SO3P2g01vBSzB/Ery4mR
-         Ep5RERlqAXBck5pB88d6Xx+ER/jvn1oRhk+XD1gXIs3ckL+nB80G+w9L+sXtkeF6G6Ci
-         GbAHWcRAsAqJGojbBVK5eH6DCQMod0Wmi7oE8PFku8NRVpFmV9S6PR+87fMkg7nYBebl
-         LqNECAQzTr28XfhckpciOuFqoxdqCU8nbyX6jYFXcYDZuYEh4GD6j6lJQVG/1czpJJ39
-         Jo3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736199882; x=1736804682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/dOtmPNuJzUtI3kd2Txc5na+EAf1+u+ytRBIdK3IQI4=;
-        b=XIEDIP6izc77+9Wf+xQvJ/52xUPn1hjoJfDdCL7rp48iZBs303YjGf6W3+Ct+NYAJy
-         EWU77z7R4t9xv1oap5CI91RjhkqfIRngH1LB/LVcRjDq4KGIwT+8haLntTiWeokEiPjf
-         6f4QHDAnDKyn/6eS2y/yS8FVVmk/XSyzFVq8NKcr+MBpe1IRONtz5lBGv8Um5aojxvB7
-         q2dJLYrvWSTXwlQokenHmG0MXml2P3w6ynqVRwLCvGzWjA5+bQtmqdo682uGDp9WDGBl
-         KtmSLFwReaWzYBJZQ6ytd85lX+syFXvVlU/+q9AQtp794gXpyqKPv4UjfXgz0TtGKD6Z
-         M4Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCWclupiXfAwVZ4Nde0PpMj0W68O5O5uz8igi1T56SfzUqXx4QWMLiORBjk8AINzuGmMlENtOiM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYTVZEY6nAsb00cowP9utxl6Pot/NEgxGX1tgf6XE+NFpIxNq5
-	IumaRdvj2Jipo1W5d5UHhsX3WG2BYhX+NAP2leAGh2E+y75kkeBNlAw8YQGeiMnv4T6n12dHMW6
-	M8fhRoWW2k9VcU5jtEItmv0UpTrxG8XLT5+1r
-X-Gm-Gg: ASbGnctRdOZP+eVmvnlVE4vQ15J7SNILmm6uOZFeYci3M0sJDlQYdVs9E0msyBWwyjG
-	JjU5wxb+j4DCAurckxeOfqi+4zlxfrMw0WYT/xTDTaAUAzOvOmyDem6NjQMwPX3Q+4eEb
-X-Google-Smtp-Source: AGHT+IFxL2nDtrWGu0U93A9+oEnN2ZpoNwWJyGuKPHkCrMt1wfC1u903xT9MRhfeN0keV/679aj4W0LqGymY2lbWeiY=
-X-Received: by 2002:a05:622a:c:b0:460:463d:78dd with SMTP id
- d75a77b69052e-46b3b759509mr899301cf.4.1736199882295; Mon, 06 Jan 2025
- 13:44:42 -0800 (PST)
+	s=arc-20240116; t=1736200214; c=relaxed/simple;
+	bh=fChATgADLibhMK0tTypbOiYL515hkAgGAV38XsG8XPE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TYD7DAXnOnAgXZGgtOwpD/+3myMXjrymm0Ge2zt1uDSNR7TBdlCFChQ4sY6fwrjUP2pkpgpqjYUbRk3IvHU0uRH2hznqjuYmf5HknoeuEqfWHRNxMU3RYVL32BLg+4hN/wpGosYBlvpE4AWKFatY0OqfSVpEKuDjzh+amlQYi9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PhgvCN6o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF59BC4CED2;
+	Mon,  6 Jan 2025 21:50:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736200213;
+	bh=fChATgADLibhMK0tTypbOiYL515hkAgGAV38XsG8XPE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PhgvCN6oji6b5XefgbPcNxe3NaPDWT5HUpitUYP5p+07+ITFrb+5lN5rYwB/kigm8
+	 V9mSoylc7IvqCnpm/q8ZldMVS/1Ls+xah7EkYtvJ6E+rchATP04Fq+cLRs8kjtql+o
+	 V8qDuNlipAb3D5JX8hO9OmJ4SBNclijiffziTmu6rdlaV4pqdnw9OOJSITfKQCZTGc
+	 nt0Ve2jb1Dt15ElqYQ25mQN5re7p5Fl4c+lGdWPt0J2oXEKb1a1h75KUM2MyruPE/T
+	 2skYrGx7pHXkhlFAMWLYK9Nwp8Hf+y0X3upJL4VpDA3NcpxCBGSU3FxYB5ZkuRAJSj
+	 dQ9DgPNydZ3zw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34013380A97E;
+	Mon,  6 Jan 2025 21:50:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218003748.796939-1-dw@davidwei.uk> <20241218003748.796939-7-dw@davidwei.uk>
-In-Reply-To: <20241218003748.796939-7-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 6 Jan 2025 13:44:30 -0800
-Message-ID: <CAHS8izOg0V5kGq8gsGLC=6t+1VWfk1we_R9gecC+WbOJAdeXgw@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 06/20] net: page_pool: add a mp hook to unregister_netdevice*
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/9] i40e deadcoding
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173620023500.3628195.15413086820847191505.git-patchwork-notify@kernel.org>
+Date: Mon, 06 Jan 2025 21:50:35 +0000
+References: <20250102173717.200359-1-linux@treblig.org>
+In-Reply-To: <20250102173717.200359-1-linux@treblig.org>
+To: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Dec 17, 2024 at 4:38=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-> From: Pavel Begunkov <asml.silence@gmail.com>
->
-> Devmem TCP needs a hook in unregister_netdevice_many_notify() to upkeep
-> the set tracking queues it's bound to, i.e. ->bound_rxqs. Instead of
-> devmem sticking directly out of the genetic path, add a mp function.
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  include/net/page_pool/types.h |  3 +++
->  net/core/dev.c                | 15 ++++++++++++++-
->  net/core/devmem.c             | 36 ++++++++++++++++-------------------
->  net/core/devmem.h             |  5 -----
->  4 files changed, 33 insertions(+), 26 deletions(-)
->
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.=
-h
-> index a473ea0c48c4..140fec6857c6 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -152,12 +152,15 @@ struct page_pool_stats {
->   */
->  #define PAGE_POOL_FRAG_GROUP_ALIGN     (4 * sizeof(long))
->
-> +struct netdev_rx_queue;
-> +
->  struct memory_provider_ops {
->         netmem_ref (*alloc_netmems)(struct page_pool *pool, gfp_t gfp);
->         bool (*release_netmem)(struct page_pool *pool, netmem_ref netmem)=
-;
->         int (*init)(struct page_pool *pool);
->         void (*destroy)(struct page_pool *pool);
->         int (*nl_report)(const struct page_pool *pool, struct sk_buff *rs=
-p);
-> +       void (*uninstall)(void *mp_priv, struct netdev_rx_queue *rxq);
+Hello:
 
-nit: the other params take struct page_pool *pool as input, and find
-the mp_priv in there if they need, it may be nice for consistency to
-continue to pass the entire pool to these ops.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-AFAIU this is the first added non-mandatory op, right? Please specify
-it as so, maybe something like:
+On Thu,  2 Jan 2025 17:37:08 +0000 you wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> Hi,
+>   This is a bunch of deadcoding of functions that
+> are entirely uncalled in the i40e driver.
+> 
+>   Build tested only.
+> 
+> [...]
 
-/* optional: called when the memory provider is uninstalled from the
-netdev_rx_queue due to the interface going down or otherwise. The
-memory provider may perform whatever cleanup necessary here if it
-needs to. */
+Here is the summary with links:
+  - [net-next,1/9] i40e: Deadcode i40e_aq_*
+    https://git.kernel.org/netdev/net-next/c/59ec698d01eb
+  - [net-next,2/9] i40e: Remove unused i40e_blink_phy_link_led
+    https://git.kernel.org/netdev/net-next/c/39cabb01d26d
+  - [net-next,3/9] i40e: Remove unused i40e_(read|write)_phy_register
+    https://git.kernel.org/netdev/net-next/c/8cc51e28ecce
+  - [net-next,4/9] i40e: Deadcode profile code
+    https://git.kernel.org/netdev/net-next/c/81d6bb2012e1
+  - [net-next,5/9] i40e: Remove unused i40e_get_cur_guaranteed_fd_count
+    https://git.kernel.org/netdev/net-next/c/3eb24a9e0af3
+  - [net-next,6/9] i40e: Remove unused i40e_del_filter
+    https://git.kernel.org/netdev/net-next/c/38dfb07d9a65
+  - [net-next,7/9] i40e: Remove unused i40e_commit_partition_bw_setting
+    https://git.kernel.org/netdev/net-next/c/a324484ac855
+  - [net-next,8/9] i40e: Remove unused i40e_asq_send_command_v2
+    https://git.kernel.org/netdev/net-next/c/d424b93f35a6
+  - [net-next,9/9] i40e: Remove unused i40e_dcb_hw_get_num_tc
+    https://git.kernel.org/netdev/net-next/c/47ea5d4e6f40
 
->  };
->
->  struct pp_memory_provider_params {
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index c7f3dea3e0eb..aa082770ab1c 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -11464,6 +11464,19 @@ void unregister_netdevice_queue(struct net_devic=
-e *dev, struct list_head *head)
->  }
->  EXPORT_SYMBOL(unregister_netdevice_queue);
->
-> +static void dev_memory_provider_uninstall(struct net_device *dev)
-> +{
-> +       unsigned int i;
-> +
-> +       for (i =3D 0; i < dev->real_num_rx_queues; i++) {
-> +               struct netdev_rx_queue *rxq =3D &dev->_rx[i];
-> +               struct pp_memory_provider_params *p =3D &rxq->mp_params;
-> +
-> +               if (p->mp_ops && p->mp_ops->uninstall)
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Previous versions of the code checked p->mp_priv to check if the queue
-is mp enabled or not, I guess you check mp_ops and that is set/cleared
-along with p->mp_priv. I guess that is fine. It would have been nicer,
-maybe, to have all the mp stuff behind one pointer/struct. I would
-dread some code path setting one of mp_[ops|priv] but forgetting to
-set the other... :shrug:
 
-Anyhow:
-
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-
---=20
-Thanks,
-Mina
 
