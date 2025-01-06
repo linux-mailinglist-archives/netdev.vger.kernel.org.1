@@ -1,97 +1,113 @@
-Return-Path: <netdev+bounces-155394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41616A02254
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:57:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EA0DA02265
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:01:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C92E83A2B12
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:57:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E52EB1884F51
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B24159596;
-	Mon,  6 Jan 2025 09:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mA05LC6h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B791DACBE;
+	Mon,  6 Jan 2025 10:01:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B53B676
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 09:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1291DA61B
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 10:01:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736157459; cv=none; b=gb9EAbvCOfyHxMVgYcuZXnp80WLUph7UpxEsTXok9Zd8aQ+I+4qeUzO57QolT0IqCR9FoxJTGX2OQoDvHR1RUiEdNtR7rJwd5BxkVCEWhVD5oZOC6L8tSgWnTTdtjJ2BvHxt1vY0M8nbT4v6cMF/suRU75nICae03PHI/H2vCDM=
+	t=1736157690; cv=none; b=A9IsneSfuYTwOrRnFVsZbDL250mcfT0vrSP4M+CacbZIFzV0RormM5h48sIUgUqlhsONOIhHYZrRLoK5MXeSfSAfdOjpjY+aK9eQAXq8+Xi7h+CLJjdUbIWboIF8UDDRqSaDfGyMQecTTaO4KFP3oIRJBHLCNVGtDP5qm55n2Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736157459; c=relaxed/simple;
-	bh=+QZbl/ClBjscb0xGLKHvgjUuxy3PaNlX955erv2rUew=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qdP6JRd0sDYjRCfq3KPlZfM8JwIEftvhHGn+xlAaQkmzpIUAyo6znn8ZMM3RXBhERaaNZcD0So9g5MlltzZugIkB+GYMoHkyEw8k3U05QR8NRBxj5vIGtkCWpsJEE41NJ2Pb6+mjC+hfDqpBRgTA0/0UKYak/5vNxjxEXJW8S8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mA05LC6h; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d0ac27b412so19260925a12.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 01:57:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736157456; x=1736762256; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+QZbl/ClBjscb0xGLKHvgjUuxy3PaNlX955erv2rUew=;
-        b=mA05LC6hnyXuDPtOFmdY9iWr6jWkXn3XLMAladTEbeenrfJ7cwLykUA3uhi8D87hQB
-         voqWths2nw1fOydlBJnnggflhMn8uftEie/TJqAnGJVjs9Qmkh8TkjJOH8+CENdoM+cu
-         GVVO/U+bjCo63ZmbLWS3qoESL4m6du9H9AZFj4nReSnwl7ntfyuFlxWFRNe1BBP9LZQr
-         DpTkJyxA5Nmee4OWHTzpdI+4z5J71PVZcV1+n/UpOLtwzukFF7h40XtJkG5aLVc6NjEP
-         BgNHDBUchRFHJmFdKR0dCdXaE6ZugdneEL8WapFu+wBFCQaD1YPxYv9iaNYAoPfIPiQZ
-         0cJA==
+	s=arc-20240116; t=1736157690; c=relaxed/simple;
+	bh=B4hcu4qSMKw6wTvQOQZ3ExSjrz3ew2Gg0BTF5PBEYXs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PaULBOsTW2wFYeouuDVZI/NvSTkpz/bBzTDkXfUV1qbvzytRIFzPKBokxsSKlIrMEmuoa7A9a4bV47humPLzFjmbWserFqHAxRuGf5N5I7CWomeNYcxFI9CsRqMCT7Tg30SLZ34W9EnBtY1cnJSlHkGy+8cCJgeEfhu6WhEoFfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a78421a2e1so249859945ab.2
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 02:01:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736157456; x=1736762256;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+QZbl/ClBjscb0xGLKHvgjUuxy3PaNlX955erv2rUew=;
-        b=KqY9sa/ooZNxdEgX5ZUWtTFdVzsFKVzysf/WIzkViMGRrxvBYBrh13REEg3CjHz9qm
-         B6tkYyDhvDqBDGGZi1UppH37Tb/zLnboFFKR5tXqiAQTuwGWAvL84qzFPUcmwzy48NK9
-         eqpIQBTL6QzEFKW7HAT3e8vgdVILEo+V2ieLRVK/80i7NbbbGki8E2zl6MUT6uD7bEVb
-         PgDwairQFGUFWl7tmitJNPgKBaypNihzXNdJi1Uln15R0rZ3znkqyGJF2xNO5t/E2jjX
-         Mp4qp0QgsZdbj4HKhatkCPUMPfq8iPdd1935L/tQzVA4ArEy68W62p/JWtoeD7rkUDSX
-         uKHg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNA1A6uX5kzpSyvZEIRU+hJhOKTCojDhUH8fJs9WWtmsnCCTG1YBMCFXaNMAwM1nMl5KcL/tQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIYVcTU3TA1WCdwnOF5lNcbwdH9CBUn6CQGJCfFXA726jw6L0d
-	wRLefG/5hmwK4opQ4sarEt7OdC73n29CMV3JJyAI8HUZ4b4SQlTS7xCivimobvDfdhujIFtiig1
-	tzHGtfyDzjBNJIJ9QmbmkJ05ox68SQS9Lzolo
-X-Gm-Gg: ASbGnctk3wTAKjTpZmOEDn7WMLUB80PWAMxib1L/Gj/CoD74LstLJqtDBss0NXnAjDF
-	N3iWBRqEEoxuvR3fwPrzrzlRVTfNSZaM2HU7MUQ==
-X-Google-Smtp-Source: AGHT+IHp7oMvfUrQtzDao4rPWmJsYNWKBbPiIV/2fTJDafd72wUTJpy74H5qqVyTuO5nkwGyVgc5k0iHX/ZKPq+W0HU=
-X-Received: by 2002:a05:6402:524d:b0:5d2:723c:a57e with SMTP id
- 4fb4d7f45d1cf-5d81ddacfeemr54564734a12.16.1736157456346; Mon, 06 Jan 2025
- 01:57:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736157687; x=1736762487;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9nyQChLfc2rRmD19C005Kj5s85iS+jkHjFNjrcXSQoU=;
+        b=m7wBEWok3UG1hBc8PdrNbb5/5HHd2JFZvJ+yJAdlgOCSo7HvAXNzyP9981Jw7y+T7X
+         ix5QjY2Y8a0AdNJK3OxxyZkT8rIs7VtR3r05UV//TQZXWzyFvBnP8I1zvUyFy6WA86tK
+         aA1MmNnYaoVVLC/avctFavFYAgfPg2Ad5WuUpTbSbpm/u3+6KqT4X5h1FvKovkKzPWOr
+         uKNrVd16ttjsYK8usoZ3O9unmZLL6/lDxoQbGWCF/KSdhmJxUZuLR04VwR9d8Wt/zoMA
+         MJzO76QqmRijLba9xBRWlh7zX2R4eSYarMacK+gzKKYQBZqJqvuOCZnphP3BgZajZLgw
+         RgtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4u2WvrKomSJcGCeDmibFvU+Sd8If2AgiHQWnw212JAZKp5C9z/QX9G0Fho+e7ySkvlcGJn6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGz3qAZFI/a5r77x96O+VHaumMIxoTWpOzVMMCSnwJjXJTBrwW
+	zfiCNACszwimppELwyfRMIStdk+Xh2zR5EIXeyxpdUj4uDW94jH1OCmpb+VxfnauwrEd5uIjmPk
+	p62uiQZz2cVRxz8INhMphljPMwPoElhclaXa7GFfMrJNB2X5J+pwA5to=
+X-Google-Smtp-Source: AGHT+IFc9/3KMt1+SouyypFx6UZx2zpPwZ+5Bgb24cbcGp0TiJLydBhm8qNT76Z1soomj6hz7jahQ2MZPKmojNPHh6Dv+SXrpqDo
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250103185954.1236510-1-kuba@kernel.org> <20250103185954.1236510-6-kuba@kernel.org>
-In-Reply-To: <20250103185954.1236510-6-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 6 Jan 2025 10:57:24 +0100
-Message-ID: <CANn89iKvEzKv60usS==86wjxV0ZBrs5V5KL9Doc1RwOOchUo+w@mail.gmail.com>
-Subject: Re: [PATCH net-next 5/8] netdevsim: add queue alloc/free helpers
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	dw@davidwei.uk, almasrymina@google.com, jdamato@fastly.com
+X-Received: by 2002:a05:6e02:1a2c:b0:3a7:6f5a:e5c7 with SMTP id
+ e9e14a558f8ab-3c2d14d23d2mr459723015ab.4.1736157686811; Mon, 06 Jan 2025
+ 02:01:26 -0800 (PST)
+Date: Mon, 06 Jan 2025 02:01:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <677ba9f6.050a0220.a40f5.0007.GAE@google.com>
+Subject: [syzbot] Monthly net report (Jan 2025)
+From: syzbot <syzbot+list9a8edca6d28b0c252332@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 3, 2025 at 8:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> We'll need the code to allocate and free queues in the queue management
-> API, factor it out.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Hello net maintainers/developers,
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
+
+During the period, 11 new issues were detected and 9 were fixed.
+In total, 130 issues are still open and 1564 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  247132  Yes   possible deadlock in team_del_slave (3)
+                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
+<2>  39131   Yes   unregister_netdevice: waiting for DEV to become free (8)
+                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+<3>  13861   Yes   possible deadlock in smc_switch_to_fallback (2)
+                   https://syzkaller.appspot.com/bug?extid=bef85a6996d1737c1a2f
+<4>  7883    Yes   possible deadlock in do_ip_setsockopt (4)
+                   https://syzkaller.appspot.com/bug?extid=e4c27043b9315839452d
+<5>  7045    Yes   WARNING: suspicious RCU usage in dev_deactivate_queue
+                   https://syzkaller.appspot.com/bug?extid=ca9ad1d31885c81155b6
+<6>  6197    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<7>  6103    Yes   WARNING in inet_sock_destruct (4)
+                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
+<8>  3994    Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
+<9>  3062    No    possible deadlock in do_ipv6_setsockopt (4)
+                   https://syzkaller.appspot.com/bug?extid=3433b5cb8b2b70933f8d
+<10> 2582    Yes   possible deadlock in sockopt_lock_sock
+                   https://syzkaller.appspot.com/bug?extid=819a360379cf16b5f0d3
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
