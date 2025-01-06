@@ -1,307 +1,152 @@
-Return-Path: <netdev+bounces-155338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378D7A02011
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:52:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F31AEA02014
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:54:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17A841636EC
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 07:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D81EA163675
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 07:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265F71D7E54;
-	Mon,  6 Jan 2025 07:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB02E1D5CEA;
+	Mon,  6 Jan 2025 07:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y+OW7TNf"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Qx+eqjqg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5A31D63F5;
-	Mon,  6 Jan 2025 07:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736149924; cv=fail; b=LhYMnwsBBP2vZr0NUNMKYHVIDl1+7e9+qcOPOW5nuJpsDA7w4NUCoYKCZtgP8ghPnL4ouhmp2x9171CgnwVPM1qgvEH3LhhE+55v4O4MKHc1XMxqYj8/3KM/oZrrlEXMWbbm1zmYI1VdB2VdxjASsvCt3Ln94J7aFHHhW6GelPY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736149924; c=relaxed/simple;
-	bh=RM8lIgRsfrqXt8yrtKVe1Ks7wFQQAiaz7l00gAIkbXk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=BUUwmhNcAB7OuT9YalIlZXBzcEIk2qNUZ8vVP82IK6+EoV7UcYmkgppV/zcrUih2/4AHu1SwdXfLJrXEkaIADIBvFikf41urQE0Seb3wTAlF415Bh5NK47EB2sLZcjgZzxM5XSiVF7MA+uHP482ix6LRtFE0mPOVHg8zfjJ2lzQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y+OW7TNf; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736149922; x=1767685922;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=RM8lIgRsfrqXt8yrtKVe1Ks7wFQQAiaz7l00gAIkbXk=;
-  b=Y+OW7TNf3QslLeid581iucd3Hc4rnOg4R7f/KL4uIXtiJ/raZfz9LH3i
-   kYUstSBzQDxMEAQd/vW5i1FecxnNOoOslSKMiIjIUh3IU8VlItfKHbxqb
-   PdxMVOY46yftFzAcYecc2RLDAL61TtqaRAns66ImrNS+AIBm6pv3pcJws
-   whSry+WSMYif+xT30hmk/giYQcBA0trPpXelgQRmeVURZR9mTml/r2IUE
-   8zDK/MYF9HiSD5gkbeJjdphuvQUwue/JVtEdVSnsVUqz7yRW95io8tCzX
-   qKSr9ZyBYEDFrhUAwLWPNLE7xARlLkaH/dlAOuNV7JnUxozjSF0u0jrdK
-   A==;
-X-CSE-ConnectionGUID: T69juGBmQmmsxb477RlCug==
-X-CSE-MsgGUID: 1siMeS37T3qyw7s2Mo/yWQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11306"; a="47277253"
-X-IronPort-AV: E=Sophos;i="6.12,292,1728975600"; 
-   d="scan'208";a="47277253"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2025 23:52:01 -0800
-X-CSE-ConnectionGUID: ywYe8WmgSsqhwq8ttoW2mA==
-X-CSE-MsgGUID: d22MjAMHSEqwiz71Cutxaw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,292,1728975600"; 
-   d="scan'208";a="102446446"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Jan 2025 23:52:00 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Sun, 5 Jan 2025 23:51:59 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Sun, 5 Jan 2025 23:51:59 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Sun, 5 Jan 2025 23:51:59 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ktx5fGlKzNWMCfuRPRHUug1ULUXBv6O6/Ve44dJBnACy9SPn6LauWt4znqLJq4nplYhc+BngvaGGBYnFb6dE5FYSp3/NkKMrnvOPijNskKvufRDfaTncUm1D7lxeIL5uIVd8P1gx3ABaC1a16Nro6YtSIUmPomXRV3xUY8xwvy02NLJbTR7KUyfjB0qzwtkt623aWtKkqs43Qi0JvuPiXFD1oaweWwcv835Mj2OJd/Apuk8dP+xqmVid0w2vl7tWcKtXM8JdYlUTUtEdi2UP4rray0yJ3qmKKm4Hgh9xLxu1tLgxxEYMIRmqQSx0/bBYXdIxUWGsnekZRqIxjVKN9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9U8kGni4m7WplI5anR6V/tl0LTC8s/lklK/+WnMShUI=;
- b=ko0iLyr7M0zaYZqF44IPUauQtx1TaELfAkAKvMWwSNWZQYGOmuhdsJ7iYQ9c5QDkJS2CDlMbFYsszBOmf8YAcT0xPDQir4jJNmaWnKWVTo2HDaAcyxAzIyeI8y9wb/shfdgCmoZXlHAAVOW2Keyts4Awq9pt3buEnULBXbrAB7NPviLbXGVHVYzGdklcYtMqCjuHlkSIRzd9tPM3GeN3V1YaBhWZqKT4raWOKnHYcu8uBeDVmGjPuILf9hixKXDm7+lnz1JiMjSTlAqUcAL97U0CdjSSvX6hq04vfbtEeWBvys4LCWwIeDZOK2HtulKNdYP7zBmEjlgCtVKibJY2Sg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
- by CY8PR11MB7924.namprd11.prod.outlook.com (2603:10b6:930:7a::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Mon, 6 Jan
- 2025 07:51:40 +0000
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::1c54:1589:8882:d22b]) by PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::1c54:1589:8882:d22b%4]) with mapi id 15.20.8314.018; Mon, 6 Jan 2025
- 07:51:40 +0000
-From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-To: "Zaremba, Larysa" <larysa.zaremba@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "Zaremba, Larysa" <larysa.zaremba@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "Eric
- Dumazet" <edumazet@google.com>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: do not configure
- destination override for switchdev
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: do not configure
- destination override for switchdev
-Thread-Index: AQHbSkWYiVJxSFK2TEuslY1nnnuGU7MJiqcQ
-Date: Mon, 6 Jan 2025 07:51:40 +0000
-Message-ID: <PH0PR11MB5013488226F0A48B91CA7E1A96102@PH0PR11MB5013.namprd11.prod.outlook.com>
-References: <20241209140856.277801-1-larysa.zaremba@intel.com>
-In-Reply-To: <20241209140856.277801-1-larysa.zaremba@intel.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|CY8PR11MB7924:EE_
-x-ms-office365-filtering-correlation-id: 696be277-8446-4a96-cbc7-08dd2e26f493
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7055299003|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?dY6Zb23YLYaDB+xw2uB500n20zOBdFil6pJ4b2k+R7XVE2t+YxN8s9KfJDYn?=
- =?us-ascii?Q?hrRztOzfjWeb0A9VzeRxyl5l4fV2U1BDs34PDvwidY0ClwJZYFygeZC+1Ye4?=
- =?us-ascii?Q?lbKqPmiwN24AY+ppxKcOVkWniP/H8/ThhOi0APdxfdNBoSS3/LRxUIVhGwR7?=
- =?us-ascii?Q?69+Zpyjr5+eyPxWMfCcJRWPCURmustegm4bO1/YHcZ/5uLA24vTxCW5IcGYz?=
- =?us-ascii?Q?G5FxlL1Nac/o/B2OTv6mjWyjxrgtsFHS6thwilB5ZHGYwaC8jPovhDeUTmBi?=
- =?us-ascii?Q?UHyRF8oikYniYDuo1y8tcnbVfebdvhhKrfGzuSz4m2VVjplBclqU8BfNB9Ii?=
- =?us-ascii?Q?zDEnbV+mguQazT28vh5odk4nRcSMbdnmd6e1OZG7W5eCC2Swo7uRN1ydgQhs?=
- =?us-ascii?Q?I1JwRWRN1/rw0D+vXofFePJPjDEzyF+9i2P4tUDax1EtJ3rFJNEokzMeziqe?=
- =?us-ascii?Q?VHT77buMIOrtOy1ivZZ18KTNb+12mCy2c02txTJHsczGS45IXPtYI92w7UDz?=
- =?us-ascii?Q?PZyN1uxo8YzAUlb7jcq1VS5TrHFMKU1I7ORJ/DWSSr8D69i9wYKm5RMv0DZq?=
- =?us-ascii?Q?WuVItgL12a/R5X8ZVctoFIcjzmP/OMom4ZLitxiKIPEKAFt3frvK6QPQOIH9?=
- =?us-ascii?Q?RRASv9EXC00POdbqcv5YcFVTkp6iXkB2Y1ZAVrx8aiHsUj84rVwuFbKygw5O?=
- =?us-ascii?Q?89DwmPkthb28g/fxLwTGnC+TM8KG+QsQSwJHF2ncYbY5Q8V/xRFS9fWuF3V0?=
- =?us-ascii?Q?VJLJ9QDxqgXuc8zW0Wy9uLWvVfbOI0dMtN2T5pjqqTXgA38PyHaQ4PfTvh8i?=
- =?us-ascii?Q?n3wfHmnnZmE+2/uWDzzeZChndzWky+3UM2XoPxHQt8X/x5F5yx7CN6oElCGU?=
- =?us-ascii?Q?et+GLJ8lS+oA2tIoD6BlzotPGXKobxFqiDbikcqqTYb9H8d5gnAWkJTkucqr?=
- =?us-ascii?Q?OPXx1kt77rR1Fvt9A98jENt4R2FvzpKrFRwBVqp2+7iz1gwNOjMZhUxsY5EQ?=
- =?us-ascii?Q?uRSQhNbzfsMGIdjn1pjd5WtylKUmP37+HyIHOEmFEIrW5mcV4krNGxLeGiUp?=
- =?us-ascii?Q?mZHRU8hJ75kHhrLQP3KFh79mM+Zkph4+NEXPYmc0T54i0HjyfX1hzOM6eFyx?=
- =?us-ascii?Q?jYQF4eXZ6jtYeAoIOAijLGrVWxMEgEPMTW8fS5z6/i9eQyMNA+TIcF7+0wbq?=
- =?us-ascii?Q?00fvarP7FEmSwZJho8Pakyp+z+/kygTudi+kNiUW3EYV6sZFqIlKtpiUXR0v?=
- =?us-ascii?Q?vBxe2FwNolUxw4lZolsWbgseolX5sduTk7BflqZqe3QQlz+Ssqrvk42MOQ3l?=
- =?us-ascii?Q?mgLELEmULJ9fVuaeAOBVp30xULfApeWm/+yAO3bzMuW7ssee1VVt0Z5nx6NW?=
- =?us-ascii?Q?pisA7msVfQW3gHoLn8ayBsN6AkNDyhoL9fJX18xplcv/zTj/Pn//V7o1Yhip?=
- =?us-ascii?Q?q5v3fCzScrupdY/Zjm7mQwA0bKEGx8pP4Tr8hFPlNDMrIYCR8nBGYQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7055299003)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?slXr0fX+KbUSH78pDUcp0KB3UgTaE2n8b6WgXu44w6uUrMFG/dE3XVxwhVcT?=
- =?us-ascii?Q?Hq+khYycK192ZiD3bLFJ8nT3huipROWRQK9BJZI28ffDiTZ9VN8STZ3+Xbtw?=
- =?us-ascii?Q?DdtXxEEyGj43XLga8O6Wbj5JA8l+KINAGUe9wJGE9iK7Azk+QepoSS0JYH8J?=
- =?us-ascii?Q?bItwPmuNRAYdy+HXXzgE22kbCdLRxU2Rfj+xP0RvfjdUYfWDOo+3W2tY7IXq?=
- =?us-ascii?Q?LhsVjlg+J5cLcqJ4Rrf1W6HB8FACXGv/TvVpoysFtsJbrKRaIM+MAieZZGMs?=
- =?us-ascii?Q?rGDn5XFswMm9XEFvOylg+/9Khm/Ky6J+PHIC3kf+4HyaOgX29QCvGgliEgIn?=
- =?us-ascii?Q?axcUYpYlQN8Mp8F6hlKD8prCznsj7gz5fFfb9bPS4atOjM1WyMUeSRtyF4n9?=
- =?us-ascii?Q?zOQ/Vm994vcFNiO33lb9O/uYWFy76ehvU3Zj1SwfmPW5CIPKLffi3yjUNG7v?=
- =?us-ascii?Q?3vfPKvWBO/kH4g0Uiejdq4KfEfH0kL0mN9rDlxoRCz5SF0oVrvi03jUnGKzV?=
- =?us-ascii?Q?PQVsJ1/77pPl5Ps7SNm3Cs8Yl9pZP0dGIN53xgqiDZEjmUduSH6LX9t43AQt?=
- =?us-ascii?Q?ejLGCUrGHqj/Y5C3dlJSskLK+G43D7mnkRCg3QygnBIre8W4CGT92AuNDLUY?=
- =?us-ascii?Q?4Ye0Ov61aQXDZaNTazuLh3qZ35mPKvgUyM3HZU37qOt++bCnRMGFw+Z/nssJ?=
- =?us-ascii?Q?rPmtKbEqrR7F5c9O81MMBPzwTC29z5VwQPtt3Shq+CruqfpaOOXjimWY3cyq?=
- =?us-ascii?Q?L16B+Pj8q48G9aXh6iQJ9FthS2R4V/+CrXRJtcc6tsc2vlxXFbPva5FiWp4d?=
- =?us-ascii?Q?TjV7eboqe601GPYctUxkbJiCC3tjsYOHWW6x2ivnueRDtCx2oaODTp+cTObf?=
- =?us-ascii?Q?aI/VL198IDTN5DFjLyTjvSq47BKkTdgiTj+Ux8AZwLGh4knpYRpNe/bKzTvQ?=
- =?us-ascii?Q?M6brbd90HoIiL3iAMvIgOLIYbIGQh+i4ZPKLM1NoV4zxAgkcAfnO8fn3CE9t?=
- =?us-ascii?Q?R8IGHQRr37KC5R6Z4mKbfFkETkRv8vD3Vqe7ab4VAs+6LBb1ooYd0Smwwh9W?=
- =?us-ascii?Q?EoJZXxjFswXxtWZQhZ6lYkZLum0asc5s+hlesRyzjV53rVDygRu/vr7MiRGM?=
- =?us-ascii?Q?GJCw+Q//ZzyXbnKEvVZ2v3ByaHi6xGW94B10aDLMVxM1rvYH7OhNkiNbugzc?=
- =?us-ascii?Q?8IPlSNvOYQF4OqzknPcwm54+yu6De2P3AunpYg5R5e1Dn9WbiDOGqspXCczr?=
- =?us-ascii?Q?bR5DVTdQaCVpa4fhvwgpj8dcWm3qJq+VLsqO+5PkfFGMTL7qmsjp9B9h2Xbv?=
- =?us-ascii?Q?+eukgQpbEy3clh/x0sLBQ0N0bWF3oNQhUP1r2HCR/yz+/253v7hddqqgg9nL?=
- =?us-ascii?Q?GMSUTZ+BB1T04SmQGkdDISBpoONO/xN0pXPEAHg9Bakd4hxAS725HUdem4Gb?=
- =?us-ascii?Q?l1/7WC+jMFHK0S1d0mkRRhGgPv3IY76BtcIXnpCgEvAWbqPB2hrQKIndhUOK?=
- =?us-ascii?Q?nSEC6XIbgxBrn40B4KIq+aNekUfF8RrliH2jT+sPnjiqSCnp+qSt+kK9eJiY?=
- =?us-ascii?Q?GTTyDhEO3CTwgJFEIej3c2gr52L+gpoGIAeXp+KhLFvpe28LrAnPhoC1/IQv?=
- =?us-ascii?Q?Yw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800B7B676;
+	Mon,  6 Jan 2025 07:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736150072; cv=none; b=n6srBVHO2LECKIA/UNn+sbSjl484CJcd2fdH3TqJQqWDZ9skAtQi94YvnJHX+TEtPWAZgRw2gAmsaltotbqLRMKXJ93X3Y4Y9A9CCnOhks4ya0X5MsEZxGQ5K4+cOLHyRUEuxrfHCGz8uqStGnpMco+RWUAutCwsocH+E5XLJMo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736150072; c=relaxed/simple;
+	bh=uVhaCB8dTvQKOKi/9Zpe3Ckh4EC4m1wh+mtzskJQF+s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H3Rood0GaGEImYtkL06NUMPIWSK/sZ67h3iudxJJ1jSdnycKbmnLbd1RC03q1Ge2hnZAk5T6b6TS+TqHXfEF5juzV4Esu01wSB23nYb3HY7OIjQJeUBIvUqvrc/6trzz+loL64Wp8F0PFLHL/a5Hk9GLgYEJy/4rtLjqkWyja4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Qx+eqjqg; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1467340005;
+	Mon,  6 Jan 2025 07:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1736150060;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N/Sjodq7qq2EI8HalXNJGQv85lzSJjUANME+DYv7yG0=;
+	b=Qx+eqjqgPlBBZ4Q652C3bmAM5CdL8koUIdmX6WiQ41eCELpQcqVM8dsiB8a6eXWyL6xQ/m
+	gVscO+rYVkII4ZYa3lzV9DgLhg9Xp5mzzeBMFc4c4qN21aWS2wv74prbmpqoZMj0hWztDj
+	KwwGDpqYxgtBxmBWFUptCyTJbTZVAXzJvA02kTUbVR7U9ykLb7dv8G+eXs88w4oztSJDxJ
+	ojXuCQhOQjCY06qryHNQrj9RzA5mV/Bvh2qKbxUWcNYssG16ABWN0H1DpbClVPyz7H1Pg1
+	NbC4cJ5qMBZ+vYhSXNYrVeX+vtXOq9FTmwPburl9Td5BR1z2QQ+azBX9uJ5Lhw==
+Message-ID: <9a18fec7-8f73-48c6-81d4-5baa5b701f76@bootlin.com>
+Date: Mon, 6 Jan 2025 08:54:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 696be277-8446-4a96-cbc7-08dd2e26f493
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jan 2025 07:51:40.3150
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v6UKvleqXW/RA+1izzqo2QcDB1AfDFw2xhgoUtvlV10k5nsoQ5JaAUMpKCzgYO5yHDWsfw1UevoT1XmOQu+wa584qcp0KCXNANBVNVaVRyo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7924
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] selftests/bpf: Migrate test_xdp_redirect.sh to
+ xdp_do_redirect.c
+To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250103-xdp_redirect-v1-0-e93099f59069@bootlin.com>
+ <20250103-xdp_redirect-v1-2-e93099f59069@bootlin.com>
+ <c7ff7788-d3af-4867-8b13-57a0bf1f529a@bootlin.com>
+Content-Language: en-US
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+In-Reply-To: <c7ff7788-d3af-4867-8b13-57a0bf1f529a@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: bastien.curutchet@bootlin.com
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Larysa Zaremba
-> Sent: Monday, December 9, 2024 7:39 PM
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; intel-wired-
-> lan@lists.osuosl.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.or=
-g
-> Cc: Zaremba, Larysa <larysa.zaremba@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
-> Eric Dumazet <edumazet@google.com>; Michal Swiatkowski
-> <michal.swiatkowski@linux.intel.com>; Jakub Kicinski <kuba@kernel.org>;
-> Paolo Abeni <pabeni@redhat.com>; David S. Miller <davem@davemloft.net>
-> Subject: [Intel-wired-lan] [PATCH iwl-net] ice: do not configure destinat=
-ion
-> override for switchdev
->=20
-> After switchdev is enabled and disabled later, LLDP packets sending stops=
-,
-> despite working perfectly fine before and during switchdev state.
-> To reproduce (creating/destroying VF is what triggers the reconfiguration=
-):
->=20
-> devlink dev eswitch set pci/<address> mode switchdev echo '2' >
-> /sys/class/net/<ifname>/device/sriov_numvfs
-> echo '0' > /sys/class/net/<ifname>/device/sriov_numvfs
->=20
-> This happens because LLDP relies on the destination override functionalit=
-y.
-> It needs to 1) set a flag in the descriptor, 2) set the VSI permission to=
- make it
-> valid. The permissions are set when the PF VSI is first configured, but
-> switchdev then enables it for the uplink VSI (which is always the PF) onc=
-e
-> more when configured and disables when deconfigured, which leads to
-> software-generated LLDP packets being blocked.
->=20
-> Do not modify the destination override permissions when configuring
-> switchdev, as the enabled state is the default configuration that is neve=
-r
-> modified.
->=20
-> Fixes: 1a1c40df2e80 ("ice: set and release switchdev environment")
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_eswitch.c |  6 ------
->  drivers/net/ethernet/intel/ice/ice_lib.c     | 18 ------------------
->  drivers/net/ethernet/intel/ice/ice_lib.h     |  4 ----
->  3 files changed, 28 deletions(-)
->=20
-Hi,
+Hi Alexis,
 
-Observing below call trace while creating VFs in Switchdev mode with this p=
-atch in net-queue.
+On 1/3/25 1:54 PM, Alexis Lothoré wrote:
+> Hi Bastien,
+> 
+> On 1/3/25 11:10, Bastien Curutchet (eBPF Foundation) wrote:
+> 
+> [...]
+> 
+>> +		SYS(fail, "ip link add veth%d index %d%d%d type veth peer name veth0 netns %s",
+>> +		    i, i, i, i, ns_name);
+> 
+> nit: since you have to run an ip command through SYS anyway, you can reduce the
+> open ns/run command/close ns dance (and all the resulting error checks) by
+> running directly `SYS("ip netns exec %s ip link add [...]", NS0, [...])`
+> 
+> [...]
+> 
 
-[  +0.000188] ice 0000:b1:00.0: Enabling 1 VFs with 17 vectors and 16 queue=
-s per VF
-[  +0.000062] list_add corruption. next->prev should be prev (ff1d7c830300c=
-6f0), but was ff282828ff282828. (next=3Dff1d7c5367d61330).
-[  +0.000015] ------------[ cut here ]------------
-[  +0.000001] kernel BUG at lib/list_debug.c:29!
-[  +0.000007] Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-[  +0.000004] CPU: 81 UID: 0 PID: 2758 Comm: bash Kdump: loaded Not tainted=
- 6.13.0-rc3+ #1
-[  +0.000003] Hardware name: Dell Inc. PowerEdge R750/06V45N, BIOS 1.3.8 08=
-/31/2021
-[  +0.000002] RIP: 0010:__list_add_valid_or_report+0x61/0xa0
-[  +0.000008] Code: c7 c7 a8 97 b2 8f e8 7e e4 af ff 0f 0b 48 c7 c7 d0 97 b=
-2 8f e8 70 e4 af ff 0f 0b 4c 89 c1 48 c7 c7 f8 97 b2 8f e8 5f e4 af ff <0f>=
- 0b 48 89 d1 4c 89 c6 4c 89 ca 48 c7 c7 50 98 b2 8f e8 48 e4 af
-[  +0.000002] RSP: 0018:ff5ebf3d22093d20 EFLAGS: 00010246
-[  +0.000003] RAX: 0000000000000075 RBX: ff1d7c54143a1330 RCX: 000000000000=
-0000
-[  +0.000002] RDX: 0000000000000000 RSI: ff1d7c81f06a0bc0 RDI: ff1d7c81f06a=
-0bc0
-[  +0.000001] RBP: ff1d7c83030097d8 R08: 0000000000000000 R09: ff5ebf3d2209=
-3bd8
-[  +0.000002] R10: ff5ebf3d22093bd0 R11: ffffffff901debc8 R12: ff1d7c5367d6=
-1330
-[  +0.000001] R13: ff1d7c830300c6f0 R14: 0000000000000000 R15: 000000000000=
-0000
-[  +0.000002] FS:  00007fea5e4e4740(0000) GS:ff1d7c81f0680000(0000) knlGS:0=
-000000000000000
-[  +0.000002] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  +0.000001] CR2: 0000562ef57c7608 CR3: 000000019037c002 CR4: 000000000077=
-3ef0
-[  +0.000002] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000000=
-0000
-[  +0.000001] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000000=
-0400
-[  +0.000001] PKRU: 55555554
-[  +0.000002] Call Trace:
-[  +0.000003]  <TASK>
-[  +0.000002]  ? die+0x37/0x90
-[  +0.000007]  ? do_trap+0xdd/0x100
-[  +0.000004]  ? __list_add_valid_or_report+0x61/0xa0
-[  +0.000003]  ? do_error_trap+0x65/0x80
-[  +0.000002]  ? __list_add_valid_or_report+0x61/0xa0
-[  +0.000003]  ? exc_invalid_op+0x52/0x70
-[  +0.000005]  ? __list_add_valid_or_report+0x61/0xa0
-[  +0.000002]  ? asm_exc_invalid_op+0x1a/0x20
-[  +0.000007]  ? __list_add_valid_or_report+0x61/0xa0
-[  +0.000005]  ice_mbx_init_vf_info+0x3c/0x60 [ice]
-[  +0.000076]  ice_initialize_vf_entry+0x99/0xa0 [ice]
+True, thanks.
 
-Regards,
-Sujai B
+>> +	ret = bpf_xdp_attach(if_nametoindex("veth2"),
+>> +			     bpf_program__fd(prog_to_111),
+>> +			     data->xdp_flags, NULL);
+> 
+> nit: since we are setting static if index at veth creation (which looks needed
+> for this test), the if_nametoindex could be replaced by the corresponding index,
+> which could be directly a define
+> 
 
+Also true, thanks.
+
+>> +	if (!ASSERT_GE(ret, 0, "bpf_xdp_attach"))
+>> +		goto close;
+>> +
+>> +	ret = bpf_xdp_attach(if_nametoindex("veth1"),
+>> +			     bpf_program__fd(prog_to_222),
+>> +			     data->xdp_flags, NULL);
+>> +	if (!ASSERT_GE(ret, 0, "bpf_xdp_attach"))
+>> +		goto close;
+>> +
+>> +	close_netns(nstoken);
+>> +
+>> +	nstoken = open_netns(NS1);
+>> +	if (!ASSERT_OK_PTR(nstoken, "open NS1"))
+>> +		goto close;
+>> +
+>> +	SYS(close, "ping -c 1 %s.2", IPV4_NETWORK);
+>> +
+>> +	close_netns(nstoken);
+>> +
+>> +	nstoken = open_netns(NS2);
+>> +	if (!ASSERT_OK_PTR(nstoken, "open NS2"))
+>> +		goto close;
+>> +
+>> +	SYS(close, "ping -c 1 %s.1", IPV4_NETWORK);
+> 
+> Is it really useful to check ping originating from both interfaces, isn´t a
+> single ping able to stimulate programs attached to both veth0 ?
+> 
+
+Indeed, I think a single ping would be enough, I just wanted to stick 
+with what test_xdp_redirect.sh does.
+
+> Aside from those minor points, LGTM :)
+> 
+
+Best regards,
+Bastien
 
