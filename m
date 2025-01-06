@@ -1,168 +1,151 @@
-Return-Path: <netdev+bounces-155587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C9F1A031BE
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:01:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0909A031CA
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20B4B1620BB
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:01:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4768C3A16DA
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879C51E0B66;
-	Mon,  6 Jan 2025 21:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484E11DF27D;
+	Mon,  6 Jan 2025 21:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="Li8hpYi7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FHFXWjrh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l15TCnYv"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB821E0B99
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 21:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B83F4207A
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 21:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736197294; cv=none; b=gI8HnmE64AMX/7b04sZlJTFE7qCdeRIVmJG7YH/lT19CRTMjumEzQaNu+3LaNeNL70tOch9wiHtQeBymytthKa7qlvY1jxK4FzK0hk6c5xjCgr0lZ82HW+ccgmkyawmgPyvrAXD43eOy1p8TGZq4s35Sh5OiFRN5msVzcduykTk=
+	t=1736197552; cv=none; b=YOmlgiFnWKBSMIOgXGtTMvgV/H2wTdnvVG/f79EyEB8rkYFNavm8jK4wwJeZp/s7IPu/2Bo2PAUk8sC1ZG9azGttB0tyZFCEsWw38i8DdkHFqKHZjm9lGoHwM+sm7A0w5rTh5hFB7jAfBNv4QRbulyWNqfF51P453bne784ZQ68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736197294; c=relaxed/simple;
-	bh=ZMKzx/11r3WL7nSKCHsJMKVWZZdtlJUayZ7/MroPN1M=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=aS76qZoxUALOj7sJPwfUsAOcwwB4tEE1CaHsJAS5J33NEIcTCQtMSmd64Enf91UMQlROA8Wt8ue4l/dNYYEay/e6Natn7hRY6dKp+4TbXKvK78RuXUI3V3y8BX3IECHDwzMT6PNN4rv2UGUfqw+StozyakFMqwaVOfBhbejswew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=Li8hpYi7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FHFXWjrh; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id B57ED25401D2;
-	Mon,  6 Jan 2025 16:01:30 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Mon, 06 Jan 2025 16:01:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-type:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1736197290; x=
-	1736283690; bh=bLrF6iq9CWbtwGmCzUP9kwysuaIUpRCQXh509SDjvfQ=; b=L
-	i8hpYi7AAgDOqODxFvg7jCPbZ3O7Q8Aad7ayMsw5CwmwJLKISLajTUS+i9nPbSa9
-	g8vW39OZsYzJ5j7Dhsb+oDAT4id44A3MsV6BuDTlDvf779YgpClKVYxQSzH7otph
-	tn+R6rLI4gKxG/yq4iZoW+7pQy39lQlsDjhBwcb7+WM6AZ4+tLUeaFmE2h9Jsrz+
-	NrHQGkkiZ8qGaRy5nmEYaa5859ren+hJcKZl3mTPix9H5uHsXZ0WyU1Tg36SnfSc
-	6WyDAa7x0sw0asWgci1lQgUwcHa2VvPRIW3XDOzHC0QUe69hZJLqOTIjrNDnU2KM
-	qn4oh73gLiNHHD+PE4V2g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1736197290; x=1736283690; bh=b
-	LrF6iq9CWbtwGmCzUP9kwysuaIUpRCQXh509SDjvfQ=; b=FHFXWjrhmah0TjKVB
-	k/ZjdVFcC4kQe3DzRzsUnQHJwdMo7T2HQ/rtDEqhB/4uPZlyjE+vQuXSizd1HXtL
-	jUbqmsFSKOeAzPF8cr92wTmmw9Mh9yHVPqiBBxGoFScg5PdquNCyHswNHGLlGROp
-	+i1qzAt6V0c59vndB0+poqNG0nOHglaIt6M2scn/FBEVg7EtIA46+8qct5isMWpr
-	BZ1aotpOCByDAGI1/+noFKmo1MDkKFNyyztmhwEVqG1B9CclsU1/2rd+DgkvlOIB
-	uerVfJ7WwvqLl7uLQw4xHoQlseg5dqkSCMtdpPCq8Le2Pkbei3wtk01TgisX/wtm
-	DJwXg==
-X-ME-Sender: <xms:qkR8Z3e9Y3vZwOt6W0VmqDDhsi4SWxyHEJhKMxfqR_bi5jpobkAhIw>
-    <xme:qkR8Z9OxWklBKoZo-3LeQw3_6PbZcrVJ_uKDmqt-jjZskxBQ1NNADI3NGC0WLtilh
-    JOAsTxN8zXNun4svpo>
-X-ME-Received: <xmr:qkR8ZwihRZdZWPyxQeaX5G4htT17eFV9UPE9quM7eSr34rE_x0ARubBi3D7-M6pWGLi3Mw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudegtddgudeggecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecunecujfgurhephffvve
-    fujghfofggtgffkfesthdtredtredtvdenucfhrhhomheplfgrhicugghoshgsuhhrghhh
-    uceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrhhnpeejvdfghf
-    etvedvudefvdejgeelteevkeevgedthfdukeevieejueehkeegffejudenucevlhhushht
-    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjhhvohhssghurh
-    hghhdrnhgvthdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghp
-    thhtoheprhgriihorhessghlrggtkhifrghllhdrohhrghdprhgtphhtthhopegurghvvg
-    hmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohho
-    ghhlvgdrtghomhdprhgtphhtthhopegrnhguhiesghhrvgihhhhouhhsvgdrnhgvthdprh
-    gtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgif
-    odhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehprggsvghnihesrhgvughhrg
-    htrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:qkR8Z48slp8w36nt43s8YzjlCruGC025o6drDRw3TtmQmu3zAKr5Jg>
-    <xmx:qkR8Zzs3ETEpYsli02lTiuGfzSQrpay_qL4KfNQ51Lh5qPALqGYZvQ>
-    <xmx:qkR8Z3EiPvEYUFUaMSYyAqokz7HGbEmGKJi3z7VVKedkOVQe7HSmRw>
-    <xmx:qkR8Z6PBL7t5UDRxa5t_MOyx02gHVRqhqItZK11VgubXYCdjlUVBpg>
-    <xmx:qkR8Z5DbPiNZcKddItNbd08jerAq_LKZsZY8ZD9bNjuQazqqAOzCIlWP>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 6 Jan 2025 16:01:29 -0500 (EST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id AC4899FCAE; Mon,  6 Jan 2025 13:01:28 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id AB5569FC8D;
-	Mon,  6 Jan 2025 13:01:28 -0800 (PST)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-    netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-    andrew+netdev@lunn.ch, andy@greyhouse.net
-Subject: Re: [PATCH net 3/8] MAINTAINERS: remove Andy Gospodarek from bonding
-In-reply-to: <2fda5a09-64da-40a4-a986-070fe512345c@blackwall.org>
-References: <20250106165404.1832481-1-kuba@kernel.org>
- <20250106165404.1832481-4-kuba@kernel.org>
- <2fda5a09-64da-40a4-a986-070fe512345c@blackwall.org>
-Comments: In-reply-to Nikolay Aleksandrov <razor@blackwall.org>
-   message dated "Mon, 06 Jan 2025 22:53:47 +0200."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1736197552; c=relaxed/simple;
+	bh=uKHnyOXk7wD8FtwwnrBzNMWxwHLUrF376sBjm1EypTU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NBHOxLlS7MyZBU5q2jH+9/B/StMCaF8pEjN2aTcPtR4AJA+mqAW8orRuEWRK8ZeVBywxet+651InpGmFCRvXNRrgzedWSeqdc5Nw3M87hVuo7Gsja35XLdVoJjirykLFRJx9gt57aVKNObl7wfV8CyyfKFG/yXREP5bjQ7tuQ2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l15TCnYv; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4678c9310afso7931cf.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 13:05:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736197549; x=1736802349; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0zGtaGM5b77ucuwk4fm3XKPCVJDSSeM6AGivjpZB2h8=;
+        b=l15TCnYvF+uq/oIG4NyHI5eqUdr8z8t/sNwwGH2X87h3dqs7bTCiazWzs14j3+EQe3
+         928/iBVyEzWSu2y6iXBOm+bWpwUIEakwOIiJvoT9aGD2kqtfgJ/lKEw12jx8IJFbtgWI
+         7m/fWKQmMwmdWNgSCXDHSuDfRRItxKLO50WM4f5sY9ZT5JA+J6/q4kYTmfV55Odh+5yh
+         2CKO9XTBy83zd4P5CXf9UUKfv585nzHFloMhtrPrRmrjLJxQvc5bZUmQNhmGIvatL3HV
+         JLCVcCVTTYLSD7wSnJ4K1e8nMu8FOLLg6YixRtaad5o8floZethgZPhmA8DPmIdveF0m
+         zV4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736197549; x=1736802349;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0zGtaGM5b77ucuwk4fm3XKPCVJDSSeM6AGivjpZB2h8=;
+        b=tcrkMwFKo/O6Z89+ivA/VI4RnHXFyrqhT2D1R53fdX4ucHrsXN0q37g8ah2T/RXeGm
+         EISpErqu0xcdwpZJ2oDB5AHqVCxDPLF+rhbiKOLwEh5JR6N8hljN+wbc/lztC7AwazoQ
+         HprRj85CCYDDwkeMn4QkkmrwRM4CPFyMbfs1AIX4hMv1FEdajYbN3IQ6rfZrBzHUdBFr
+         gtHflBrFmLqrtE73yJMddKdGsg6bARziQc4kaepM4ifQMMrhmn4k5r+dI/8QN4nl8Sz/
+         KKc3Ozv4cIkXFX1k46TYWnc9DbMPEq2NXsovEaDD99DmaBBQL52bliSJwqW8CDbqkRp5
+         QFkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV3CrFBAP/LW8H2jUTMlLU3iyjxYy3lTRDFqcmmmINBJBzNgEAuv92HMPwdbY+IkIg6eWR/6Vw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf5r/XSIHAzXX00tGFuVbuLhDX47Im4F4f8VavvwioVjtLmVXA
+	t7Z7huGWfe1TwWP00FB718SC4TN53U8EdQm1T4XfqbeXGJNcwA8zsBLUI+JVFLS4xbDGUBl6vIF
+	xMWHAjCrnQLQTbBM7iNlDQ1DFfgkk2/V6ef3O
+X-Gm-Gg: ASbGncswu2zlya+ztf/FqUNtuegHfYTC17AbtoMFP7E78W2+IGnQPbkmNdFg4xGniWV
+	ajFbYiSKLfKKsHN/lRJcKcIqD93Xvrq4Q2WGHXeM2QrkUp1/6iZUwpIco3dqpIjogXygO
+X-Google-Smtp-Source: AGHT+IHrF0oxvJGZXa6WSjedcmibAP0mg1RtPP75+yRfY+ePfiGO95mMyuKHR6rYJslO5zFufUYDUyzRuDcrR72tkFU=
+X-Received: by 2002:a05:622a:1991:b0:467:7c30:3446 with SMTP id
+ d75a77b69052e-46b3ba3ae7amr466791cf.25.1736197549366; Mon, 06 Jan 2025
+ 13:05:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2982752.1736197288.1@famine>
-Date: Mon, 06 Jan 2025 13:01:28 -0800
-Message-ID: <2982753.1736197288@famine>
+References: <20241218003748.796939-1-dw@davidwei.uk> <20241218003748.796939-4-dw@davidwei.uk>
+In-Reply-To: <20241218003748.796939-4-dw@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 6 Jan 2025 13:05:37 -0800
+Message-ID: <CAHS8izM4yJGat4BrKDQW8cV83vxa0ZS5n5zX-o64Rh0PnETTDg@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 03/20] net: generalise net_iov chunk owners
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Nikolay Aleksandrov <razor@blackwall.org> wrote:
-
->On 1/6/25 18:53, Jakub Kicinski wrote:
->> Andy does not participate much in bonding reviews.
->> 
->> gitdm missingmaint says:
->> 
->> Subsystem BONDING DRIVER
->>   Changes 149 / 336 (44%)
->>   Last activity: 2024-09-05
->>   Jay Vosburgh <jv@jvosburgh.net>:
->>     Tags 68db604e16d5 2024-09-05 00:00:00 8
->>   Andy Gospodarek <andy@greyhouse.net>:
->>   Top reviewers:
->>     [65]: jay.vosburgh@canonical.com
->>     [23]: liuhangbin@gmail.com
->>     [16]: razor@blackwall.org
->>   INACTIVE MAINTAINER Andy Gospodarek <andy@greyhouse.net>
->> 
->> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->> ---
->> CC: jv@jvosburgh.net
->> CC: andy@greyhouse.net
->> ---
->>  MAINTAINERS | 1 -
->>  1 file changed, 1 deletion(-)
->> 
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 91b72e8d8661..7f22da12284c 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -4065,7 +4065,6 @@ F:	net/bluetooth/
->>  
->>  BONDING DRIVER
->>  M:	Jay Vosburgh <jv@jvosburgh.net>
->> -M:	Andy Gospodarek <andy@greyhouse.net>
->>  L:	netdev@vger.kernel.org
->>  S:	Maintained
->>  F:	Documentation/networking/bonding.rst
+On Tue, Dec 17, 2024 at 4:37=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
 >
->I think Andy should be moved to CREDITS, he has been a bonding
->maintainer for a very long time and has contributed to it a lot.
+> From: Pavel Begunkov <asml.silence@gmail.com>
+>
+> Currently net_iov stores a pointer to struct dmabuf_genpool_chunk_owner,
+> which serves as a useful abstraction to share data and provide a
+> context. However, it's too devmem specific, and we want to reuse it for
+> other memory providers, and for that we need to decouple net_iov from
+> devmem. Make net_iov to point to a new base structure called
+> net_iov_area, which dmabuf_genpool_chunk_owner extends.
+>
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  include/net/netmem.h | 21 ++++++++++++++++++++-
+>  net/core/devmem.c    | 25 +++++++++++++------------
+>  net/core/devmem.h    | 25 +++++++++----------------
+>  3 files changed, 42 insertions(+), 29 deletions(-)
+>
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index 1b58faa4f20f..c61d5b21e7b4 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -24,11 +24,20 @@ struct net_iov {
+>         unsigned long __unused_padding;
+>         unsigned long pp_magic;
+>         struct page_pool *pp;
+> -       struct dmabuf_genpool_chunk_owner *owner;
+> +       struct net_iov_area *owner;
+>         unsigned long dma_addr;
+>         atomic_long_t pp_ref_count;
+>  };
+>
+> +struct net_iov_area {
+> +       /* Array of net_iovs for this area. */
+> +       struct net_iov *niovs;
+> +       size_t num_niovs;
+> +
+> +       /* Offset into the dma-buf where this chunk starts.  */
 
-	Agreed.
+Probably could use a rewriting of the comment. I think net_iov_area is
+meant to be a memory-type agnostic struct, so it shouldn't refer to
+dma-bufs here.
 
-	-J
+But on second thought I'm not sure base_virtual belongs in the common
+struct because i'm not sure yet how it applies to other memory
+providers. for dmabuf, each 'chunk' is physically and virtually
+contiguous, and the virtual address is well-defined to be the offset
+in bytes into the dmabuf, but that is very dmabuf specific.
 
----
-	-Jay Vosburgh, jv@jvosburgh.net
+Consider keeping this in dmabuf_genpool_chunk_owner if we don't plan
+to use this same field with the same semantics for other memory
+providers, or re-write the comment.
+
+--=20
+Thanks,
+Mina
 
