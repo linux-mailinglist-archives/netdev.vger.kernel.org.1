@@ -1,122 +1,108 @@
-Return-Path: <netdev+bounces-155488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DFEEA027D9
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 15:23:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25431A027F5
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 15:27:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64CDD16590E
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 14:23:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 875B17A056D
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 14:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745AD1DACA1;
-	Mon,  6 Jan 2025 14:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E511DE4D6;
+	Mon,  6 Jan 2025 14:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iVLYD/Kn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oR2vR8qP"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C3870824;
-	Mon,  6 Jan 2025 14:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E996E1DE3AB
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 14:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736173393; cv=none; b=rlOQ7tXW7ZCVak7fXqfR2j1os78khJjEu27cwhLnnfHndknrNgcQ3wQrFGyA8aQ2l/knKQEfUoVBBnK/h4pSB8eV2+WRBppdOLMJPS5hCc6mQnYUcUpmewxoTQWVHIY4WAwfbtSeYvb3B7kFNyLRJRE1nFNFtB1ULlqQx8n08Vs=
+	t=1736173631; cv=none; b=Ew+ljpwMtsBl3WnQi11L8Xu3WHxkQ4TSCO+cGUcMsTxI9fzOzTBFigoAFNF30nAPZ2SnZoef4SeQVfkc3JYbuxAQ0O/t+uLdfZXPP/gYbPlAh/sWiE/eA/Rv0SA6by8qXF0Om3TiBEp92G6NQNj97EaqljRNbCBUjXIcJnN+Q+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736173393; c=relaxed/simple;
-	bh=i+6K3vJDnr7FR2dA9iClxv0CSvajv1bK9AtmD8P8wC8=;
+	s=arc-20240116; t=1736173631; c=relaxed/simple;
+	bh=bcOA4q6oTHILzcadakk6Y3TFI0CLTSqk4B4zs/oHkhg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLoX3mt93wB7TzfXpstPdDnMxtEi2VO1LE4mfPN2+gAEuLNZPulgeG6LzT8HrvdurWCQ0QAM/E8EUPlSqGZ0j+wQchW4CO1y9j1TE8CnQU5mlf6qWIsKwzc16Fyy+AYHMUBgTZnpQhHKrvsiyHox1aQ1+mNtCJp2QBKTB331PsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iVLYD/Kn; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=AeL1Ue1DJpGYfppB5MwgfHNixcseLLPM/LT+nG4J3Xl0mvvogYgigokciivSPR4/VW5vhaiwg1k0a2ldehp5c+cQ6jcDuoxqCVagCOoh6bJyFf55U0N+7QHqH31c9yO3b6qSsWtna7uJoCK+lv+5hSbGA0rdfJVO0Fs4gfictBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oR2vR8qP; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=+FD+9HoUin/ZpvVGmFW+uUicRKdAkNZjtxAYPfqu2LI=; b=iV
-	LYD/KnGz/He+gqCEGi9HsGndmb++3lsAwVKYNZ+Gvrn1hjA6x8DyrY9xU9kpdSxBKW7PEBuoIVRQM
-	v0yiOe6NbOjlwUbp1AJ/gtEqH5cOZpdQL+YxZvt6CF4kdDg1oYtKPhQKPXoDSd2HT+cSQ61vc1lNE
-	0cz1MH/5vNTNu5c=;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SVJPOasPEHYdMgHvjtl/MCKDVna4dXKt4mK8KlvSjPY=; b=oR2vR8qPKF+bn6xYiOU0WCafqt
+	SqOzhnbCPrTRZ4iJz2clw/j/Ve4FUfsYXiUQriN8YuBwFjNfc+TtjYbPMkDTC7IfZBeITHixyMk/J
+	gx8OE8KMEBc3bnc3n4SSixJ/o32uMMRTNNvIfm9qm/GCs4D54R6Ymy/9snbmiUvP0I+Y=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tUo0L-001tjH-Pi; Mon, 06 Jan 2025 15:22:53 +0100
-Date: Mon, 6 Jan 2025 15:22:53 +0100
+	id 1tUo4F-001to5-1w; Mon, 06 Jan 2025 15:26:55 +0100
+Date: Mon, 6 Jan 2025 15:26:55 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: egyszeregy@freemail.hu
-Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
-	daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
-	kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v7 2/3] netfilter: x_tables: Merge xt_*.c files which has
- same name.
-Message-ID: <6f276b2e-de9d-427e-a3a3-aac9ed340357@lunn.ch>
-References: <20250105233157.6814-1-egyszeregy@freemail.hu>
- <20250105233157.6814-3-egyszeregy@freemail.hu>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+	linux@armlinux.org.uk, horms@kernel.org, jacob.e.keller@intel.com,
+	netdev@vger.kernel.org, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
+Message-ID: <a4576efa-2d20-47e9-b785-66dbfda78633@lunn.ch>
+References: <20250102103026.1982137-1-jiawenwu@trustnetic.com>
+ <20250102103026.1982137-2-jiawenwu@trustnetic.com>
+ <ab140807-2e49-4782-a58c-2b8d60da5556@lunn.ch>
+ <032b01db600e$8d845430$a88cfc90$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250105233157.6814-3-egyszeregy@freemail.hu>
+In-Reply-To: <032b01db600e$8d845430$a88cfc90$@trustnetic.com>
 
-On Mon, Jan 06, 2025 at 12:31:56AM +0100, egyszeregy@freemail.hu wrote:
-> From: Benjamin Szőke <egyszeregy@freemail.hu>
+> > > +	smp_mb(); /* Force any pending update before accessing. */
+> > > +	incval = READ_ONCE(wx->base_incval);
+> > > +	incval = adjust_by_scaled_ppm(incval, ppb);
+> > > +
+> > > +	mask = (wx->mac.type == wx_mac_em) ? 0x7FFFFFF : 0xFFFFFF;
+> > > +	if (incval > mask)
+> > > +		dev_warn(&wx->pdev->dev,
+> > > +			 "PTP ppb adjusted SYSTIME rate overflowed!\n");
+> > 
+> > There is no return here, you just keep going. What happens if there is
+> > an overflow?
 > 
-> Merge xt_*.c source files, which has same upper and
-> lower case name format. Combining these modules should
-> provide some decent code size and memory savings.
+> If there is an overflow, the calibration value of this second will be
+> inaccurate. But it does not affect the calibration value of the next
+> second. And this rarely happens.
+
+If this is a onetime event you don't really care about, is a
+dev_warn() justified? Do you want to be handling the user questions
+about what it means, when all you are going to say is, ignore it, it
+does not really matter?
+
+> > > +/**
+> > > + * wx_ptp_tx_hwtstamp_work
+> > > + * @work: pointer to the work struct
+> > > + *
+> > > + * This work item polls TSYNCTXCTL valid bit to determine when a Tx hardware
+> > > + * timestamp has been taken for the current skb. It is necessary, because the
+> > > + * descriptor's "done" bit does not correlate with the timestamp event.
+> > > + */
+> > 
+> > Are you saying the "done" bit can be set, but the timestamp is not yet
+> > in place? I've not read the whole patch, but do you start polling once
+> > "done" is set, or as soon at the skbuff is queues for transmission?
 > 
-> Merge licenses, codes and adjuste Kconfig and Makefile
-> for backwards-compatibility.
-> 
-> test-build:
-> $ mkdir build
-> $ wget -O ./build/.config https://pastebin.com/raw/teShg1sp
-> $ make O=./build/ ARCH=x86 -j 16
-> 
-> x86_64-before:
-> text    data     bss     dec     hex filename
->  716     432       0    1148     47c xt_dscp.o
-> 1142     432       0    1574     626 xt_DSCP.o
->  593     224       0     817     331 xt_hl.o
->  934     224       0    1158     486 xt_HL.o
-> 1099     120       0    1219     4c3 xt_rateest.o
-> 2126     365       4    2495     9bf xt_RATEEST.o
->  747     224       0     971     3cb xt_tcpmss.o
-> 2824     352       0    3176     c68 xt_TCPMSS.o
-> total data: 2373
-> 
-> x86_64-after:
-> text    data     bss     dec     hex filename
-> 1709     848       0    2557     9fd xt_dscp.o
-> 1352     448       0    1800     708 xt_hl.o
-> 3075     481       4    3560     de8 xt_rateest.o
-> 3423     576       0    3999     f9f xt_tcpmss.o
-> total data: 2353
+> The descriptor's "done" bit cannot be used as a basis for Tx hardware
+> timestamp. So we should poll the valid bit in the register.
 
-So you have saved 20 bytes in the data segment. A 0.8% reduction. If i
-was developing this patchset, when i see this number, i would
-immediately think, why am i bothering? It is not worth the effort for
-the gains i'm getting. I'm also at risk of breaking the ABI and
-userspace code, and 0.8% does not justify that risk.
+You did not answer my question. When do you start polling?
 
-This is why we ask for benchmarks. Benchmarks help to justify a
-change. So far, there is no good justification for this.
-
-    Andrew
-
----
-pw-bot: cr
-
-
+	Andrew
 
