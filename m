@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-155554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E296CA02F5C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:00:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 375E6A02F5F
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B57EA164135
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:00:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B181C3A1ABC
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264EF1DF26B;
-	Mon,  6 Jan 2025 18:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B5A1DF748;
+	Mon,  6 Jan 2025 18:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LQXKsraY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WnMEvK8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5171DF27F
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 18:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE543149DF4
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 18:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736186434; cv=none; b=dBf0AgKzsBNXJIcfryxO16/Q5JPWjfwie8eOANfTbzZDtPxL+cRK9CUuCvXCXJAma26TvJGbqg2RoizGuAT+dQAlPO51/fD5wOkLRnN84CtB6JIAEXDrc3DWgFN96azq1QnBe/QhAi3CB+Bvx70yDjAYnPtr9HmP84eEyXPT6QI=
+	t=1736186482; cv=none; b=ZRBclzlxv8qdqzKARdU8YIn1giGoDU4AJ+Xy3S4U3y6WG0hfNxQ5391ZRqm7XOosS4e6U1VzlHxKPJ988f3ICtUpclzp7Ho6dgdUtWlQPWqPJtmESY5lK1ZJA3/HO9KHkLSBwgR1TnSWM4kriRAlINKv9slc2tnpLOCebtUD71g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736186434; c=relaxed/simple;
-	bh=XtEvhVqcuKqPdn2z+sHDy6S8zscaBcTOrRaimSFrwSQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=gYp9CnHRU+ytrMAlKNuq5R8flQB8MMtUH+qCxORy1g2/IN7XaaQJxHQ76EM0NGAx06mpy61qlGe0iq7wXE7z/JbjXXSdrqEDThsjYDKDVrsT6KnZSDorVidsoEjRDzyqUWVbbRhwQnsUF8/Q6qQFrbcupyO4o+cbqonN8I6XqA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LQXKsraY; arc=none smtp.client-ip=209.85.218.44
+	s=arc-20240116; t=1736186482; c=relaxed/simple;
+	bh=7QzdicXnjjuTIyXb1zMBJs2HlUeDsmxbl2AcTpILjp8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=KQL60WaBmqTqH6kQXkL5GKoENuzdbXCpkAsAx3Jn1la7VhI4oCCHPJBvmAwg6lC2Zm4WswL3qqd0YoErZirwkc5dQ9KLzkzcQF2noeL+M9Knbc6BQai7Ta0ULibtt5buubKXFhFwA308OuR+mDbDVKuDa/STQGNU5L9sIKfly7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WnMEvK8e; arc=none smtp.client-ip=209.85.218.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaee2c5ee6eso1675448966b.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 10:00:31 -0800 (PST)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aaf60d85238so882645066b.0
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 10:01:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736186430; x=1736791230; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nW5Vsxe90jgS3FjbDOHisquSbgKGez6K55jnLaEDQU8=;
-        b=LQXKsraYHVfxUMf4HhH1sSKUHLDvMJ7JZ9yKMUbKlJ91+K/SJL8pBiQN0tukiyhwgF
-         oY9m+Tf5k705tjg9ym+JjW1nclTUuucadxb8UiLhqtzKZ+HHZ6P9MQDoVFSJX1NlvNDn
-         Gy2iqVBKT1d0f8cJL2tcfHjeRE3dHS90uX5ntXslDdEmZ+zrjgRachWMmghvfJ+qo+Gz
-         jE6eiRBc52Bo/jqaQpv0N19+eU/4Oh5MeyZ7iv+qiVxbpeLvkr8exU6kEP+v75+AnozD
-         5T33C0og3jgCiTigA0R5eIAo/RALllxWk/zCEhk77G0KQVScU6WTdMkA+V9qeSFB5xCL
-         eimg==
+        d=gmail.com; s=20230601; t=1736186479; x=1736791279; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dNFtSUL4p2xdptt92FS+EcD3qvXkvVtb4RKnVyliZfM=;
+        b=WnMEvK8eX/xeKGCVgt1GY/SdxlNrKOq0CfWW+3BSHm2XCi8ExEyH8A97sRhdP1WrgL
+         9rkaF+FlSJ66AABRR1aFoN9KrodvJ+eelnKsDJOPqczlU5SHjwAHbjl8X1Okz1G2n7Mt
+         mUpgkSo4a7/ITGJpolTDw6aREFE1p9jrCR2sRIOkuVGXzoMjY1DYnBbxBdIOGIpkHTv6
+         +nxlwWkxm+XeDOCRYlmCCkExf3SR3mShN8OuUCriJZAYBaWLnR+xvU4k5HzwqwJ6tE1D
+         7Af7fBXOZajxOyyFR7NgFWo9rbS7CthJSG2wqeJAURahWfppDzirrS7IcP7nKgRn0caG
+         LPyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736186430; x=1736791230;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nW5Vsxe90jgS3FjbDOHisquSbgKGez6K55jnLaEDQU8=;
-        b=KLDDjgMVE6olf1c+j7dnp+z5wrUiNoZlcqrgZQLr+I9ZtcJM4FIoowoAZN/LOngn6M
-         Ig4b4kgF5ybDuQ2CTLdtIg/P2T0JnWnp1g3W2vX1vhycEbqhMIE1ryXyskSpDRjdr+tn
-         q/rfvCofa3uDSpWZBrxEcwcNoXo1QRq/KHx8NRnc7cYmKDi8B5PzVPEBDVtk3yop5tmi
-         HLO2mdNfFBLoNKpH9Eo1KblTZVccuzgdGDH1Q0qii1QBvgWkcDNQo55XPX3m4Un2ZgYW
-         l6/+4Jd53OQdA769s2iWGYko2RUJcMEQBjLFdVr54EL0cAdXVyqGR+zNlsp9InJCphBd
-         0ZrQ==
-X-Gm-Message-State: AOJu0YyjXtDZh46nP5li15GJ0/suQUENtdd+xINoDPcJi7tBPCOURbqT
-	cabaxIm8zL54TVXmuUzn4ObkR0ckEyudJ0A3wtH+LNihmHrTRaFe
-X-Gm-Gg: ASbGncvTttF7rw6aMF4IA53sYTfMymU9MgoPWfMPq3GSWpc93q3nKYVHmUDW8ooqdnm
-	SZWdY4ICCKYdwiVu+BU7885uMbVTDUIYtutNxgJWtYJSvFuEt9eNDSIThbLZAipaAh2qski+C8f
-	dFMHrwpdAKAm5FoKj28F1WNp3s3umMIf5JJPlyhoHcSgow6RXaI6LKmhzWbl89lzrH8hW4ikPOB
-	tlLHhzmQlkk4sJa20q0NQEilRC6lATExa0pivUfpyLeHdlH8vzkupWgZeM6FZ0B+QnozU7NXnwz
-	lsr18UPpMBjgFniCsNs/jM9SmCq1KBbs8riJ34zTS0ZQJ/EysTCaNN4EBV0qizKpc4Plw6HeZdH
-	0dmQNI4EZteXobzWjFD/vOjtkKe4CPEa3V/pHG6zR
-X-Google-Smtp-Source: AGHT+IFOzPPS5+xEKYzlkK1qD2qttKizSbhszCd45mvCG4oaxbro2S3vq5xwo0kq3CT0W8ieQN7fSg==
-X-Received: by 2002:a17:907:36ce:b0:aa6:7165:504b with SMTP id a640c23a62f3a-aac2d41ebc3mr6323409466b.31.1736186429759;
-        Mon, 06 Jan 2025 10:00:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736186479; x=1736791279;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dNFtSUL4p2xdptt92FS+EcD3qvXkvVtb4RKnVyliZfM=;
+        b=bjhd6MIJ0EBSm932BhUhJK2ZMoPMiWuWurUC8+qog23Taf6OGf834YAlkaqEaT4pRq
+         4bMW/9KdUrXXfRkoBWQ6Xmlyjfl3pZmd9gSSCS5pB5jJqiB8n87otP+adBKBBXHOvNCk
+         Cy+P5tnv0geDIlj3tFxi90UAFRv/rs3KmiEKfrq8/Q75nVFUfAQ4tFHbfsYnrv3iJM/c
+         wZHpxSvC58hynn7MfL9PSDorkNqdW4lw6s8cEfIFbVqASGC1/f7SvddvyDKAWU4SXU6O
+         5qK4q41Kqv0kMurMU6wuzx7NDGMA0QZFaPJgsuHYCePkUEhbM7EDOTs/RCsz5qMK3pje
+         HF2g==
+X-Gm-Message-State: AOJu0Ywot/KuCXZBoE5Z1WY86encu2X51ik9X5ghRNw4Ke6q6/n1PuZM
+	OJRhlBeUk5eNO8Ofnf1OAticms0bm7wRcDHNG2kksntM0+XYI30N
+X-Gm-Gg: ASbGncsJfmC1+3LQLv9M0cQlT84WWG2aGO5BUijE1gbUIlrdmXyAnUzBX2sNJ49UhNZ
+	XzkLswiO1cB1/0eH2epZsgQ2XFpNgkRbiKgklRk8gkySbbywlqYPbKavc/ITwZdjQJS53HmCIVN
+	oIFe8vnNIgDf18S/aJyG8HFqftgH5SuYxT8+HpkomYpb9W4hFou+EpvMMvVWXAILthR5WaKM2Up
+	vpu79p0jK4qXpNCQ7FGIoELdKCRAK0D+UsJuOY/oWJyP+/hZ9czE6aDUHAygDuW8o0ERWqIRS75
+	hyBGql+OrCtqgir4MLcJ2sFZXslrur8gC50WZ7tOO/DmC+wJ2CwtqvqXjxFuwF0UMjwoBwifohi
+	iyrXWRJFeaYh67I4vZ6EN7y6EUskTWPM37rtMc00I
+X-Google-Smtp-Source: AGHT+IEdxVtAsvCKsZwDlrNYKWGc/RwCIEKrXFQkdmDRihW204mkuBZfDiQNddh4RvtRhbSVC9GoLA==
+X-Received: by 2002:a17:907:3f89:b0:aa6:9624:78fd with SMTP id a640c23a62f3a-aac3444eb22mr5945428366b.48.1736186478849;
+        Mon, 06 Jan 2025 10:01:18 -0800 (PST)
 Received: from ?IPV6:2a02:3100:ad97:900:c87:b717:6cf:e370? (dynamic-2a02-3100-ad97-0900-0c87-b717-06cf-e370.310.pool.telefonica.de. [2a02:3100:ad97:900:c87:b717:6cf:e370])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aac0e830b2dsm2274222766b.8.2025.01.06.10.00.27
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aac0efe48ecsm2305674866b.126.2025.01.06.10.01.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jan 2025 10:00:28 -0800 (PST)
-Message-ID: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
-Date: Mon, 6 Jan 2025 19:00:27 +0100
+        Mon, 06 Jan 2025 10:01:17 -0800 (PST)
+Message-ID: <cf9d1c92-de68-44ea-9dec-ceba17c2aec9@gmail.com>
+Date: Mon, 6 Jan 2025 19:01:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,14 +82,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US
+Subject: [PATCH net-next 1/2] r8169: prepare for extending hwmon support
+From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
  Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next 0/2] r8169: extend hwmon support
+References: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
+Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -131,20 +134,59 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+In-Reply-To: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This series extends the hwmon support and adds support for the
-over-temp threshold.
+This factors out the temperature value calculation and
+prepares for adding further temperature attributes.
 
-Heiner Kallweit (2):
-  r8169: prepare for extending hwmon support
-  r8169: add support for reading over-temp threshold
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
- drivers/net/ethernet/realtek/r8169_main.c | 30 +++++++++++++++++------
- 1 file changed, 23 insertions(+), 7 deletions(-)
-
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 5724f650f..38f915956 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5338,17 +5338,28 @@ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
+ 	return false;
+ }
+ 
++static int r8169_hwmon_get_temp(int raw)
++{
++	if (raw >= 512)
++		raw -= 1024;
++
++	return 1000 * raw / 2;
++}
++
+ static int r8169_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
+ 			    u32 attr, int channel, long *val)
+ {
+ 	struct rtl8169_private *tp = dev_get_drvdata(dev);
+-	int val_raw;
+-
+-	val_raw = phy_read_paged(tp->phydev, 0xbd8, 0x12) & 0x3ff;
+-	if (val_raw >= 512)
+-		val_raw -= 1024;
++	int raw;
+ 
+-	*val = 1000 * val_raw / 2;
++	switch (attr) {
++	case hwmon_temp_input:
++		raw = phy_read_paged(tp->phydev, 0xbd8, 0x12) & 0x3ff;
++		*val = r8169_hwmon_get_temp(raw);
++		break;
++	default:
++		return -EINVAL;
++	}
+ 
+ 	return 0;
+ }
 -- 
 2.47.1
+
 
 
