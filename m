@@ -1,164 +1,165 @@
-Return-Path: <netdev+bounces-155376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A379A020A4
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:26:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B9F0A02089
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:21:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EBEC3A1EEF
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:25:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23AB116211C
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395C31CDFC2;
-	Mon,  6 Jan 2025 08:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F17135942;
+	Mon,  6 Jan 2025 08:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="K+5y7dbO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gvf7vOiQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.51])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949A71D79B4;
-	Mon,  6 Jan 2025 08:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5114A04
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736151955; cv=none; b=YsAcxbQ+dAPUAnwm/Beew/V0VhFeiZwuUagnXQRkcVxgwJl6aQWhsbet2GSR/CnAbdW8m1a7gBNen/HCu29z5QEGYSxjgCZxc8pkxyH4H8iaDimusbNuShCjzc5+zZDq48wnZb9tuTtCNRXb6pRHVWqXpXiVvIz9LQqfKnC98xM=
+	t=1736151669; cv=none; b=Q6pW7anqbbDvlVyFbeAfgabwFqvBDrFJtthCPVml4VkuxgybaJaxaLysnL2sAYMFxWNtrThFnp6mu5RTwXVSyxV0V8diWbpr5Kvf9NNDB+08QVO5eS80HTItWKsW10D7IOHJmbarCbnN4H46S+nPl4zcGqW2uxrJRp6SsdT1IVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736151955; c=relaxed/simple;
-	bh=XWox8SXbsO1tvSKnBhApTKkBPW8qRlOTiyjyr6b1e/A=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ohXwt267Dse7WzD1BqJB0udU2BKJMP7L6MNG3r/AEUFw8gQaDzUwCOoyJzF1wml3CQPB7MkpgK827/619W94nB0dWwn5Bmt/aBBhj9k2bZ652uO2e+80LIisqw59R6oT1vGH09W+2+qWjkBWsMVSESJTr7UUb0aubOrhIbUJnfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=K+5y7dbO; arc=none smtp.client-ip=148.6.0.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
-Received: from localhost (localhost [127.0.0.1])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 8E2FC32E01D9;
-	Mon,  6 Jan 2025 09:20:16 +0100 (CET)
-Authentication-Results: smtp012.wigner.hu (amavis); dkim=pass (1024-bit key)
- reason="pass (just generated, assumed good)" header.d=blackhole.kfki.hu
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=content-id:mime-version:references
-	:message-id:in-reply-to:from:from:date:date:received:received
-	:received:received; s=20151130; t=1736151614; x=1737966015; bh=h
-	MTy6aySoRL2nI3z83EOIV4p9YPNeXMkdWm1sStVUaE=; b=K+5y7dbO4zyvF6EKB
-	PXccPcYmWhBPWM3pt0Cmm5zTK1ckIyfU5PKoR0n9qcEdYAL/Ff+B0DNyqr+xqoSP
-	bFChutzfxjsBcdWNmmN8FoeWk4s/cnDmzQVCSiTLH/UvebJiQljngOjF6cRJ54tE
-	5tHUlSZbC4RXJL/nQCHb2hmyvI=
-X-Virus-Scanned: Debian amavis at smtp2.kfki.hu
-Received: from smtp2.kfki.hu ([127.0.0.1])
- by localhost (smtp2.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id b5dKM6WQJ3Vw; Mon,  6 Jan 2025 09:20:14 +0100 (CET)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [IPv6:2001:738:5001:1::240:2])
-	by smtp2.kfki.hu (Postfix) with ESMTP id EF45832E01CE;
-	Mon,  6 Jan 2025 09:19:57 +0100 (CET)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id C606D34316A; Mon,  6 Jan 2025 09:19:57 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id C3DB1343169;
-	Mon,  6 Jan 2025 09:19:57 +0100 (CET)
-Date: Mon, 6 Jan 2025 09:19:57 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: =?ISO-8859-2?Q?Benjamin_Sz=F5ke?= <egyszeregy@freemail.hu>
-cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-    lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org, 
-    amiculas@cisco.com, kadlec@netfilter.org, 
-    David Miller <davem@davemloft.net>, dsahern@kernel.org, 
-    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-    linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v6 1/3] netfilter: x_tables: Merge xt_*.h and ipt_*.h
- files which has same name.
-In-Reply-To: <20250105231900.6222-2-egyszeregy@freemail.hu>
-Message-ID: <8f20c793-7985-72b2-6420-fd2fd27fe69c@blackhole.kfki.hu>
-References: <20250105231900.6222-1-egyszeregy@freemail.hu> <20250105231900.6222-2-egyszeregy@freemail.hu>
+	s=arc-20240116; t=1736151669; c=relaxed/simple;
+	bh=OSwSxa9R6S3DjyCyilBUO6+b7dq8tgvdND1xIZWBG0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rHICBk7CV472JDcWvBsdb7IgaGgrLJpDA+ItF0uc4poYLAGRf42pzK6AA7jPkQu9xKci9vkU+GEBIqzdJCj+wEv2n2XKGbwjSPBD/dKK5dd7stzDxU//YiI89gPH06cizXVCudirp0a+KlYIcunokZ5tAlCNjTXwpduwrEzffs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gvf7vOiQ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qOmXDzyTaMxazL0LDKrl4EGxFFFgph+mRVLzgb1OGYw=; b=gvf7vOiQ9lnv2sNz63xRpjQwRj
+	PhdACP9CoFiCbHmKVx68uFLnR25ClhyYqHLT38t2ejIGsszwBelrWuduNyKiaBZrhk8xo+umr9pCS
+	q1RERMQUXlcQUaPAJoYfX1ZwK0g1a3JNMAyhCatLJwZgE2kwZ3QkLofmj1D8e0C780wI3eVjHwc4m
+	3dnmwNMvM343byztON7Xok5ztcbm9RBH71SGQULa8c0hRdUnGZG92uSi1dLnrNGTUgm9YxKxo4tAj
+	oDS6gTKapf6DKjr9Hu8+TvJ94Rb7RecyQPDwVwi9SdsHNPEmw8fQg8Aw6Y4p49DyrTk9A8an/8ner
+	5U3recSQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43560)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tUiLz-0005VT-19;
+	Mon, 06 Jan 2025 08:20:51 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tUiLs-00047w-2g;
+	Mon, 06 Jan 2025 08:20:44 +0000
+Date: Mon, 6 Jan 2025 08:20:44 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
+	f.fainelli@gmail.com, olteanv@gmail.com, netdev@vger.kernel.org,
+	chris.packham@alliedtelesis.co.nz, pabeni@redhat.com,
+	marek.behun@nic.cz
+Subject: Re: [PATCH v2 net 3/4] net: dsa: mv88e6xxx: Never force link on
+ in-band managed MACs
+Message-ID: <Z3uSXFH9bryiuVqX@shell.armlinux.org.uk>
+References: <20241219123106.730032-1-tobias@waldekranz.com>
+ <20241219123106.730032-4-tobias@waldekranz.com>
+ <Z3ZrH9yqtvu2-W7f@shell.armlinux.org.uk>
+ <87zfk974br.fsf@waldekranz.com>
+ <Z3bIF7xaXrje79D8@shell.armlinux.org.uk>
+ <87pll26z2b.fsf@waldekranz.com>
+ <Z3mxsEziH_ylpCD_@shell.armlinux.org.uk>
+ <87msg66uh4.fsf@waldekranz.com>
+ <Z3ph3P9AFankiZxW@shell.armlinux.org.uk>
+ <87h66c7sa6.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="110363376-114709859-1736151517=:36632"
-Content-ID: <e194de0a-f804-58bd-df39-dfae4bcbb182@blackhole.kfki.hu>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87h66c7sa6.fsf@waldekranz.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Mon, Jan 06, 2025 at 12:30:25AM +0100, Tobias Waldekranz wrote:
+> On sön, jan 05, 2025 at 10:41, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> > On Sun, Jan 05, 2025 at 12:16:07AM +0100, Tobias Waldekranz wrote:
+> >> On lör, jan 04, 2025 at 22:09, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> >> > Host system:
+> >> >
+> >> >   ---------------------------+
+> >> >     NIC (or DSA switch port) |
+> >> >      +-------+    +-------+  |
+> >> >      |       |    |       |  |
+> >> >      |  MAC  <---->  PCS  <-----------------------> PHY, SFP or media
+> >> >      |       |    |       |  |     ^
+> >> >      +-------+    +-------+  |     |
+> >> >                              |   phy interface type
+> >> >   ---------------------------+   also in-band signalling
+> >> >                                  which managed = "in-band-status"
+> >> > 				 applies to
+> >> 
+> >> This part is 100% clear
+> >
+> > Apparently it isn't, because...
+> >
+> >> In other words, my question is:
+> >> 
+> >> For a NIC driver to properly support the `managed` property, how should
+> >> the setup and/or runtime behavior of the hardware and/or the driver
+> >> differ with the two following configs?
+> >> 
+> >>     &eth0 {
+> >>         phy-connection-type = "sgmii";
+> >>         managed = "auto";
+> >>     };
+> >> 
+> >> vs.
+> >> 
+> >>     &eth0 {
+> >>         phy-connection-type = "sgmii";
+> >>         managed = "in-band-status";
+> >>     };
+> >
+> > if it were, you wouldn't be asking this question.
+> >
+> > Once again. The "managed" property defines whether in-band signalling
+> > is used over the "phy-connection-type" link, which for SGMII will be
+> > between the PCS and PHY, as shown in my diagram above that you claim
+> > to understand 100%, but by the fact you are again asking this question,
+> > you do not understand it AT ALL.
+> >
+> > I don't know how to better explain it to you, because I think I've been
+> > absolutely clear at every stage what the "managed" property describes.
+> > I now have nothing further to add if you still can't understand it, so,
+> > sorry, I'm giving up answering your emails on this topic, because it's
+> > just too frustrating to me to continue if you still don't "get it".
+> 
+> I agree that you have clearly explained what it describes, many times.
+> 
+> My remaining question - which you acknowledge that I asked twice, yet
+> chose not to answer - was how software is supposed to _act_ on that
 
---110363376-114709859-1736151517=:36632
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
-Content-ID: <b6ca3a8f-e1e7-8b3f-4a73-8a94353ab116@blackhole.kfki.hu>
-Content-Transfer-Encoding: quoted-printable
+I *have* answered it. Every time.
 
-On Mon, 6 Jan 2025, egyszeregy@freemail.hu wrote:
+> description; presuming that the property is not in the DT merely for
+> documentation purposes.
 
-> From: Benjamin Sz=F5ke <egyszeregy@freemail.hu>
->
-> Merge xt_*.h, ipt_*.h and ip6t_*.h header files, which has
-> same upper and lower case name format.
->
-> Add #pragma message about recommended to use
-> header files with lower case format in the future.
->
-> Signed-off-by: Benjamin Sz=F5ke <egyszeregy@freemail.hu>
-> ---
-> include/uapi/linux/netfilter/xt_CONNMARK.h  |  8 +++---
-> include/uapi/linux/netfilter/xt_DSCP.h      | 22 ++--------------
-> include/uapi/linux/netfilter/xt_MARK.h      |  8 +++---
-> include/uapi/linux/netfilter/xt_RATEEST.h   | 12 ++-------
-> include/uapi/linux/netfilter/xt_TCPMSS.h    | 14 ++++------
-> include/uapi/linux/netfilter/xt_connmark.h  |  7 +++--
-> include/uapi/linux/netfilter/xt_dscp.h      | 20 +++++++++++---
-> include/uapi/linux/netfilter/xt_mark.h      |  6 ++---
-> include/uapi/linux/netfilter/xt_rateest.h   | 15 ++++++++---
-> include/uapi/linux/netfilter/xt_tcpmss.h    | 12 ++++++---
-> include/uapi/linux/netfilter_ipv4/ipt_ECN.h | 29 ++-------------------
-> include/uapi/linux/netfilter_ipv4/ipt_TTL.h | 25 ++++--------------
-> include/uapi/linux/netfilter_ipv4/ipt_ecn.h | 26 ++++++++++++++++++
-> include/uapi/linux/netfilter_ipv4/ipt_ttl.h | 23 +++++++++++++---
-> include/uapi/linux/netfilter_ipv6/ip6t_HL.h | 26 ++++--------------
-> include/uapi/linux/netfilter_ipv6/ip6t_hl.h | 22 +++++++++++++---
-> net/ipv4/netfilter/ipt_ECN.c                |  2 +-
-> net/netfilter/xt_DSCP.c                     |  2 +-
-> net/netfilter/xt_HL.c                       |  4 +--
-> net/netfilter/xt_RATEEST.c                  |  2 +-
-> net/netfilter/xt_TCPMSS.c                   |  2 +-
-> 21 files changed, 143 insertions(+), 144 deletions(-)
+Utter claptap. Total rubbish. Completely wrong. It is acted on. It
+causes phylink to enter in-band mode, and use the PCS to obtain the
+in-band data instead of the PHY.
 
-Technically you split up your single patch into multiple parts but not=20
-separated it into functionally disjunct parts. So please prepare
+YOU are the one refusing to listen to what I'm saying, yet you claim
+my explanations are clear and you understand them. You parently do
+not.
 
-- one patch for
- 	include/uapi/linux/netfilter_ipv6/ip6t_HL.h
- 	include/uapi/linux/netfilter_ipv6/ip6t_hl.h
- 	net/netfilter/xt_HL.c
- 	net/netfilter/xt_hl.c
- 	[ I'd prefer corresponding Kconfig and Makefile changes as well]
-- one patch for
- 	include/uapi/linux/netfilter/xt_RATEEST.h
- 	include/uapi/linux/netfilter/xt_rateest.h
- 	net/netfilter/xt_RATEEST.c
- 	net/netfilter/xt_rateest.c
- 	[I'd prefer corresponding Kconfig and Makefile changes as well]
-- and so on...
+End. Of. Discussion.
 
-That way the reviewers can follow what was moved from where to where in a=
-=20
-functionally compact way.
-
-Also, mechanically moving the comments results in text like this:
-
-> /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> -/* ip6tables module for matching the Hop Limit value
-> +/* Hop Limit modification module for ip6tables
-> + * ip6tables module for matching the Hop Limit value
-
-which is ... not too nice. The comments need manual fixing.
-
-I also still don't like adding pragmas to emit warnings about deprecated=20
-header files. It doesn't make breaking API easier and it doesn't make=20
-possible to remove the warnings and enforce the changes just after a few=20
-kernel releases.
-
-Best regards,
-Jozsef
---110363376-114709859-1736151517=:36632--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
