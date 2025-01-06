@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-155533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF05A02E5C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:54:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0773BA02E5E
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:55:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78941188686C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D1983A6516
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C871DED63;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E252C1DEFC8;
 	Mon,  6 Jan 2025 16:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXPr8Img"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sB1McVWd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5623B1DED57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3BD1DED72
 	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 16:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736182469; cv=none; b=HKbjmPM6oc918wYUTAmRPcBVn+9gGdImNcPLT3weOb7lIpAJzZnZ8v1m7lPJFHIb/G/OcQYq214YMRZPUI14wO6UguHVaBI/Zd6Wx9r/44SWKItb5S4FZA0ib214NUr9Izn5noaiC3If7qImQU4CcKETAJKuXPp+pMpBc9T6n/g=
+	t=1736182469; cv=none; b=NK6duGE48iwyS/Pd9a8jtwBXnixfQ2N4bWR749b8sOqVJANxhF9fhIEipsVhSEMb+ptzTLmUe0z1XCFkxWg30mqGxPzwYU4oWRTt2jTCkkayEJBTQ6+UtqZ+0oQ0m1Wy94CJdzj1JDGRkVdvxC8bYnVHVEjB7vjxZM2BVS6OdS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736182469; c=relaxed/simple;
-	bh=wiPFkU4WHOJT8dnrd9mkOu84E46PCoMN6rf9qjFkJ10=;
+	bh=ZjgpNSZhFtTH5Zk8A9BInBv2x5PEt471TFNUAr2l6k8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sJa9kSjGjoz1FQQB5zx+lYFir6aI0mzxAWkGAI016lgwlWKNatSlY8BgKlvwkI93t9D1dZ4s2wrQFA6UGirD3PvZ6BpDMvfGoHxLGWpX223AMBIFa5meVylkB093Ao5MYx05wPT/9n2Semai9S6NFP/p1L+i79ksO0V2h/L/dp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXPr8Img; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93840C4CED6;
-	Mon,  6 Jan 2025 16:54:28 +0000 (UTC)
+	 MIME-Version; b=g0xsP/OKlNyIhHyVodh1HbRST1CyE7ij/zjFW/KKowL4D/eO0I7BIjFeV9Kr1tmPa4s4H/1RVbg5GEJAenDED316jdJUpfZQMu0ESyWflRcobqY1dulp7uDwphj6s716JPlK5SVOxLAVTJBRRHtTa3gVA5rqxNhe0LeMgZiIYMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sB1McVWd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A11CC4CEE8;
+	Mon,  6 Jan 2025 16:54:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736182468;
-	bh=wiPFkU4WHOJT8dnrd9mkOu84E46PCoMN6rf9qjFkJ10=;
+	s=k20201202; t=1736182469;
+	bh=ZjgpNSZhFtTH5Zk8A9BInBv2x5PEt471TFNUAr2l6k8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fXPr8Img/QfcnHQbn0B9sAFU5KZNMfGyzOWQQ99Upeg9oLLHDesq4glDfmfSNlfmi
-	 pFAE/g1f2xbRNGxht0rbHiEWACTE5MldoAUVsRi/g8FTtE5CPycwITc+G6fuo1k1P+
-	 j0SLRBilXZe0EtMwfK7K6/5bMzAyMW8CAuKdAIYWJMXOe4B6K2sorBSTgzA26cNq4L
-	 YohJktmDtCNLQ1Yj6XD8nqAkqiaIy4fQIP77pkOEQbPe0o3N23VoC/o1c/XHsRmUDk
-	 wMNy+OD/0eA5xhoRCTgdAlBdISSZboL1Bd3XgiNY24pTCYb9XPRoxZerV9ucXiIjgA
-	 +AXgpyQ4Ky2mA==
+	b=sB1McVWdUGxZsfzoWDuT4QSQ2AlHCyu1kOEn4n1c7xfo8qgLk41sjAD8AK3Wu5T6G
+	 JGT2FGFkD2w2mwjOeuo/GAFM3/yFFHBHdiTXQSjMqKmj8PDghkR+TEFutB7M4UK/KG
+	 9DdgP9Ewl02xEWc0Le8qqYZ4V4ZgDnv+nWeE6hR1ZQHIg258pe/jagaojJPcH+CYkh
+	 LVkX9A/wZBP78on2EOhkHNKObw5TkQKwmZvgHrb/rhzIAobrXjoKYTGImNu1eeBi3l
+	 prGnmm7lTNkxHSmrlwEpe1S2JCMLlZR4i68zxz/vWcLxaj+ehO9ng96w+akDrGmHRo
+	 AoGfMi1uGsZAw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -48,13 +48,11 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	Jakub Kicinski <kuba@kernel.org>,
-	nbd@nbd.name,
-	sean.wang@mediatek.com,
-	lorenzo@kernel.org,
-	Mark-MC.Lee@mediatek.com
-Subject: [PATCH net 5/8] MAINTAINERS: remove Mark Lee from MediaTek Ethernet
-Date: Mon,  6 Jan 2025 08:54:01 -0800
-Message-ID: <20250106165404.1832481-6-kuba@kernel.org>
+	jmaloy@redhat.com,
+	ying.xue@windriver.com
+Subject: [PATCH net 6/8] MAINTAINERS: remove Ying Xue from TIPC
+Date: Mon,  6 Jan 2025 08:54:02 -0800
+Message-ID: <20250106165404.1832481-7-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250106165404.1832481-1-kuba@kernel.org>
 References: <20250106165404.1832481-1-kuba@kernel.org>
@@ -66,49 +64,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The mailing lists have seen no email from Mark Lee in the last 4 years.
+There is a steady stream of fixes for TIPC, even tho the development
+has slowed down a lot. Over last 2 years we have merged almost 70
+TIPC patches, but we haven't heard from Ying Xue once:
 
-gitdm missingmaints says:
-
-Subsystem MEDIATEK ETHERNET DRIVER
-  Changes 103 / 400 (25%)
-  Last activity: 2024-12-19
-  Felix Fietkau <nbd@nbd.name>:
-    Author 88806efc034a 2024-10-17 00:00:00 44
-    Tags 88806efc034a 2024-10-17 00:00:00 51
-  Sean Wang <sean.wang@mediatek.com>:
-    Tags a5d75538295b 2020-04-07 00:00:00 1
-  Mark Lee <Mark-MC.Lee@mediatek.com>:
-  Lorenzo Bianconi <lorenzo@kernel.org>:
-    Author 0c7469ee718e 2024-12-19 00:00:00 123
-    Tags 0c7469ee718e 2024-12-19 00:00:00 139
+Subsystem TIPC NETWORK LAYER
+  Changes 42 / 69 (60%)
+  Last activity: 2023-10-04
+  Jon Maloy <jmaloy@redhat.com>:
+    Tags 08e50cf07184 2023-10-04 00:00:00 6
+  Ying Xue <ying.xue@windriver.com>:
   Top reviewers:
-    [32]: horms@kernel.org
-    [15]: leonro@nvidia.com
-    [9]: andrew@lunn.ch
-  INACTIVE MAINTAINER Mark Lee <Mark-MC.Lee@mediatek.com>
+    [9]: horms@kernel.org
+    [8]: tung.q.nguyen@dektech.com.au
+    [4]: jiri@nvidia.com
+    [3]: tung.q.nguyen@endava.com
+    [2]: kuniyu@amazon.com
+  INACTIVE MAINTAINER Ying Xue <ying.xue@windriver.com>
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: nbd@nbd.name
-CC: sean.wang@mediatek.com
-CC: lorenzo@kernel.org
-CC: Mark-MC.Lee@mediatek.com
+CC: jmaloy@redhat.com
+CC: ying.xue@windriver.com
 ---
  MAINTAINERS | 1 -
  1 file changed, 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 613f15747b6b..97e3939f800b 100644
+index 97e3939f800b..c092c27fcd5f 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -14573,7 +14573,6 @@ F:	drivers/dma/mediatek/
- MEDIATEK ETHERNET DRIVER
- M:	Felix Fietkau <nbd@nbd.name>
- M:	Sean Wang <sean.wang@mediatek.com>
--M:	Mark Lee <Mark-MC.Lee@mediatek.com>
- M:	Lorenzo Bianconi <lorenzo@kernel.org>
- L:	netdev@vger.kernel.org
+@@ -23650,7 +23650,6 @@ F:	tools/testing/selftests/timers/
+ 
+ TIPC NETWORK LAYER
+ M:	Jon Maloy <jmaloy@redhat.com>
+-M:	Ying Xue <ying.xue@windriver.com>
+ L:	netdev@vger.kernel.org (core kernel code)
+ L:	tipc-discussion@lists.sourceforge.net (user apps, general discussion)
  S:	Maintained
 -- 
 2.47.1
