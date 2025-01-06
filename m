@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-155606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C95A03286
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 23:19:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D534A03287
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 23:19:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A414164931
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:19:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 533551649D6
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C6B1DFE18;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02821E04B3;
 	Mon,  6 Jan 2025 22:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XK7Bi2Dk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hGXfsT9N"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408AC1D90A9
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 22:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3981DDA20;
+	Mon,  6 Jan 2025 22:19:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736201978; cv=none; b=CMMDF8ieV2afs3uIV/GU+DMy+KRgtt2IGgCpOcAFDXCQzQGVCSqSHpmokwfhjdT5gHx2X4z8WpIKJeHg8D/leQ33yVQcPjxihV7Mw4vG+O4CNoo1s4ahUiZ99jPh8aGqjSempBdE4p/oSIxgvn/ze2CuqviXUEV/yqcnJLJqo+Q=
+	t=1736201978; cv=none; b=AFt6io3pLPJhdH20/3hkW1wwYqCZlfJw/+o1NLt8m1HvImiURZO5QipjHVF1EZP7wAFM+XChC9BeaxXfofiTOObUzpR0yzzEuhkj9Wzt6LeTPRBkbYnKY6KFuFhxqTaNuDv95xLnkeg3vF+RqnwF1/nkZnLoFTDAMV/kGwxsOe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736201978; c=relaxed/simple;
-	bh=DOL28C/UgoUOTLAgz8oCQEjVS07ss9Mm7PCKFkGSpJM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M8bHPCyQuFtGpmtW80EzXldS1Le5ze/psX9uz3/37BDPxX+jA5BPisfJPy62+ER0lX0xS+yWGhgTLhxRrXMRjvalEqMCnTzANWnntmHAc4HzApdtpK+xXowtHOYwfduR0VMfjaJxV0jjAsPr30L8KqLWZqGK12h5LILgCl2Q20Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XK7Bi2Dk; arc=none smtp.client-ip=198.175.65.11
+	bh=IgI2SyTkBZHlvj4ckcuh3LRMyWqn9MpcvLgf1yCGs2Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cXNyaroYbl0qc/RQBbqASv0f1pVsNop0tJ/S6EgxEqjJTKRfc2WlFq8JdoauU2JKGVAwtlZWaVHnJOnUOy4u0rH+Me0YHlueywNsZZeFx9hGv7yy6rr7AjLAjI+2g/JeurCfBLvSpg8dF1VyBc8y/kPkt5Oqhi+JWB0bTqNhrEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hGXfsT9N; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736201976; x=1767737976;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=DOL28C/UgoUOTLAgz8oCQEjVS07ss9Mm7PCKFkGSpJM=;
-  b=XK7Bi2DkEuXht6x0jtavC3GqYj17aqePgISeYt4OJNdGPwAQww7oOTDg
-   mtMPXoMufIhXZaXA4trUhK0TaXC5MslPCTeP51qq2iKZCWkM/l9Q3XDeU
-   eGvNtJCtCz45OHtBPCrdhks7Pz7CBOW8MNj35D4UrqkNWGlx42JsUnb7v
-   +f1VTobUQuJmCvz1SGjUoQP/fUl6VG8qe9a+qLnEacfipTX0ynvliFqZo
-   6GXrgtthdsUsq0dWoiyb7Vn9dvpaPLyzjzcsm8JBsaW6yLJIGzuSz5lhA
-   kgZqkCiHbdiao+Tuee9VoB2Mop2zk9fNf4x8Bmm1kYJqCGy+VQJwvifw4
+  t=1736201977; x=1767737977;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=IgI2SyTkBZHlvj4ckcuh3LRMyWqn9MpcvLgf1yCGs2Q=;
+  b=hGXfsT9NBrCa290+EAxVK5IymyfoMdZfpJF71fX5/EPYjgq/sZgjFvvZ
+   GeU1JF+crOv6HZcKAKDJBOMpXGGiPn49OuBNRt/M5Hg8fXBcPlE/4Gpl+
+   zpRL2Q+jZQ8tzaag9yg3Hd46sQDARkix5uatP4V575veFLslYRoasWAPM
+   g2BmI4ERl2+hBKFM1Gk+nc0mex6tAcihvCc56CTJByud/Ra+9/QGARGxx
+   7/s/WQAyiZMU5Elpg1v/t6uXpR4D7nbhV+aZA8lhOQCgAFFnciYMwrYmi
+   3ywxZFU6CfAu4eiwCynJxIzBE5t9dskjtxaeq198XkkYtwhAV1mUwy7iT
    w==;
-X-CSE-ConnectionGUID: XbL7XgrTRRGhmXXMorPcWQ==
-X-CSE-MsgGUID: hMeVobosTG6LDtfBt/QE1A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11307"; a="46858637"
+X-CSE-ConnectionGUID: vUKVZVHBQ8K0h5nfvSWa1w==
+X-CSE-MsgGUID: GY3MMfc6SF6ZF626FPWzHQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11307"; a="46858641"
 X-IronPort-AV: E=Sophos;i="6.12,293,1728975600"; 
-   d="scan'208";a="46858637"
+   d="scan'208";a="46858641"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
   by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2025 14:19:35 -0800
-X-CSE-ConnectionGUID: 1OgLZqtBT2CXDSTMcURRag==
-X-CSE-MsgGUID: LUiT2PxIRoqrIdD7I0JxCA==
+X-CSE-ConnectionGUID: T52CwA8pSDuCDit5hYflEQ==
+X-CSE-MsgGUID: qo8852YuRL69eZVr8cNbtg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,293,1728975600"; 
-   d="scan'208";a="102368448"
+   d="scan'208";a="102368451"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa006.fm.intel.com with ESMTP; 06 Jan 2025 14:19:34 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -64,11 +65,26 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH net-next 00/15][pull request] Intel Wired LAN Driver Updates 2025-01-06 (igb, igc, ixgbe, ixgbevf, i40e, fm10k)
-Date: Mon,  6 Jan 2025 14:19:08 -0800
-Message-ID: <20250106221929.956999-1-anthony.l.nguyen@intel.com>
+Cc: Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+	anthony.l.nguyen@intel.com,
+	kurt@linutronix.de,
+	richardcochran@gmail.com,
+	benjamin.steinke@woks-audio.com,
+	bigeasy@linutronix.de,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
+	George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
+Subject: [PATCH net-next 01/15] igb: Remove static qualifiers
+Date: Mon,  6 Jan 2025 14:19:09 -0800
+Message-ID: <20250106221929.956999-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250106221929.956999-1-anthony.l.nguyen@intel.com>
+References: <20250106221929.956999-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,132 +93,175 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For igb:
+From: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
 
-Sriram Yagnaraman and Kurt Kanzenbach add support for AF_XDP
-zero-copy.
+Remove static qualifiers on the following functions to be able to call
+from XSK specific file that is added in the later patches:
+- igb_xdp_tx_queue_mapping()
+- igb_xdp_ring_update_tail()
+- igb_clean_tx_ring()
+- igb_clean_rx_ring()
+- igb_xdp_xmit_back()
+- igb_process_skb_fields()
 
-Original cover letter:
-The first couple of patches adds helper functions to prepare for AF_XDP
-zero-copy support which comes in the last couple of patches, one each
-for Rx and TX paths.
+While at it, inline igb_xdp_tx_queue_mapping() and
+igb_xdp_ring_update_tail(). These functions are small enough and used in
+XDP hot paths.
 
-As mentioned in v1 patchset [0], I don't have access to an actual IGB
-device to provide correct performance numbers. I have used Intel 82576EB
-emulator in QEMU [1] to test the changes to IGB driver.
+Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+[Kurt: Split patches, inline small XDP functions]
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Tested-by: George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/igb/igb.h      | 29 ++++++++++++++++++
+ drivers/net/ethernet/intel/igb/igb_main.c | 37 ++++-------------------
+ 2 files changed, 35 insertions(+), 31 deletions(-)
 
-The tests use one isolated vCPU for RX/TX and one isolated vCPU for the
-xdp-sock application [2]. Hope these measurements provide at the least
-some indication on the increase in performance when using ZC, especially
-in the TX path. It would be awesome if someone with a real IGB NIC can
-test the patch.
-
-AF_XDP performance using 64 byte packets in Kpps.
-Benchmark:	XDP-SKB		XDP-DRV		XDP-DRV(ZC)
-rxdrop		220		235		350
-txpush		1.000		1.000		410
-l2fwd 		1.000		1.000		200
-
-AF_XDP performance using 1500 byte packets in Kpps.
-Benchmark:	XDP-SKB		XDP-DRV		XDP-DRV(ZC)
-rxdrop		200		210		310
-txpush		1.000		1.000		410
-l2fwd 		0.900		1.000		160
-
-[0]: https://lore.kernel.org/intel-wired-lan/20230704095915.9750-1-sriram.yagnaraman@est.tech/
-[1]: https://www.qemu.org/docs/master/system/devices/igb.html
-[2]: https://github.com/xdp-project/bpf-examples/tree/master/AF_XDP-example
-
-Subsequent changes and information can be found here:
-https://lore.kernel.org/intel-wired-lan/20241018-b4-igb_zero_copy-v9-0-da139d78d796@linutronix.de/
-
-Yue Haibing converts use of ERR_PTR return to traditional error code
-which resolves a smatch warning.
-
-For igc:
-
-Song Yoong Siang allows for the XDP program to be hot-swapped.
-
-Yue Haibing converts use of ERR_PTR return to traditional error code
-which resolves a smatch warning.
-
-Joe Damato adds sets IRQ and queues to NAPI instances to allow for
-reporting via netdev-genl API.
-
-For ixgbe:
-
-Yue Haibing converts use of ERR_PTR return to traditional error code
-which resolves a smatch warning.
-
-For ixgbevf:
-
-Yue Haibing converts use of ERR_PTR return to traditional error code
-which resolves a smatch warning.
-
-For i40e:
-
-Alex implements "mdd-auto-reset-vf" private flag to automatically reset
-VFs when encountering an MDD event.
-
-For fm10k:
-
-Dr. David Alan Gilbert removes an unused function.
-
-The following are changes since commit 3e5908172c05ab1511f2a6719b806d6eda6e1715:
-  Merge tag 'ieee802154-for-net-next-2025-01-03' of git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 1GbE
-
-Aleksandr Loktionov (1):
-  i40e: add ability to reset VF for Tx and Rx MDD events
-
-Dr. David Alan Gilbert (1):
-  intel/fm10k: Remove unused fm10k_iov_msg_mac_vlan_pf
-
-Joe Damato (2):
-  igc: Link IRQs to NAPI instances
-  igc: Link queues to NAPI instances
-
-Kurt Kanzenbach (1):
-  igb: Add XDP finalize and stats update functions
-
-Song Yoong Siang (1):
-  igc: Allow hot-swapping XDP program
-
-Sriram Yagnaraman (5):
-  igb: Remove static qualifiers
-  igb: Introduce igb_xdp_is_enabled()
-  igb: Introduce XSK data structures and helpers
-  igb: Add AF_XDP zero-copy Rx support
-  igb: Add AF_XDP zero-copy Tx support
-
-Yue Haibing (4):
-  igc: Fix passing 0 to ERR_PTR in igc_xdp_run_prog()
-  igb: Fix passing 0 to ERR_PTR in igb_run_xdp()
-  ixgbe: Fix passing 0 to ERR_PTR in ixgbe_run_xdp()
-  ixgbevf: Fix passing 0 to ERR_PTR in ixgbevf_run_xdp()
-
- .../device_drivers/ethernet/intel/i40e.rst    |  12 +
- drivers/net/ethernet/intel/fm10k/fm10k_pf.c   | 120 ----
- drivers/net/ethernet/intel/fm10k/fm10k_pf.h   |   2 -
- drivers/net/ethernet/intel/i40e/i40e.h        |   4 +-
- .../net/ethernet/intel/i40e/i40e_debugfs.c    |   2 +-
- .../net/ethernet/intel/i40e/i40e_ethtool.c    |   2 +
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 107 +++-
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |   2 +-
- .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  11 +-
- drivers/net/ethernet/intel/igb/Makefile       |   2 +-
- drivers/net/ethernet/intel/igb/igb.h          |  58 +-
- drivers/net/ethernet/intel/igb/igb_main.c     | 270 ++++++---
- drivers/net/ethernet/intel/igb/igb_xsk.c      | 562 ++++++++++++++++++
- drivers/net/ethernet/intel/igc/igc.h          |   2 +
- drivers/net/ethernet/intel/igc/igc_main.c     |  79 ++-
- drivers/net/ethernet/intel/igc/igc_xdp.c      |   8 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  23 +-
- .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  23 +-
- 18 files changed, 1002 insertions(+), 287 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/igb/igb_xsk.c
-
+diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
+index 3c2dc7bdebb5..1bfe703e73d9 100644
+--- a/drivers/net/ethernet/intel/igb/igb.h
++++ b/drivers/net/ethernet/intel/igb/igb.h
+@@ -18,6 +18,7 @@
+ #include <linux/i2c-algo-bit.h>
+ #include <linux/pci.h>
+ #include <linux/mdio.h>
++#include <linux/lockdep.h>
+ 
+ #include <net/xdp.h>
+ 
+@@ -731,12 +732,18 @@ int igb_setup_tx_resources(struct igb_ring *);
+ int igb_setup_rx_resources(struct igb_ring *);
+ void igb_free_tx_resources(struct igb_ring *);
+ void igb_free_rx_resources(struct igb_ring *);
++void igb_clean_tx_ring(struct igb_ring *tx_ring);
++void igb_clean_rx_ring(struct igb_ring *rx_ring);
+ void igb_configure_tx_ring(struct igb_adapter *, struct igb_ring *);
+ void igb_configure_rx_ring(struct igb_adapter *, struct igb_ring *);
+ void igb_setup_tctl(struct igb_adapter *);
+ void igb_setup_rctl(struct igb_adapter *);
+ void igb_setup_srrctl(struct igb_adapter *, struct igb_ring *);
+ netdev_tx_t igb_xmit_frame_ring(struct sk_buff *, struct igb_ring *);
++int igb_xdp_xmit_back(struct igb_adapter *adapter, struct xdp_buff *xdp);
++void igb_process_skb_fields(struct igb_ring *rx_ring,
++			    union e1000_adv_rx_desc *rx_desc,
++			    struct sk_buff *skb);
+ void igb_alloc_rx_buffers(struct igb_ring *, u16);
+ void igb_update_stats(struct igb_adapter *);
+ bool igb_has_link(struct igb_adapter *adapter);
+@@ -797,6 +804,28 @@ static inline struct netdev_queue *txring_txq(const struct igb_ring *tx_ring)
+ 	return netdev_get_tx_queue(tx_ring->netdev, tx_ring->queue_index);
+ }
+ 
++/* This function assumes __netif_tx_lock is held by the caller. */
++static inline void igb_xdp_ring_update_tail(struct igb_ring *ring)
++{
++	lockdep_assert_held(&txring_txq(ring)->_xmit_lock);
++
++	/* Force memory writes to complete before letting h/w know there
++	 * are new descriptors to fetch.
++	 */
++	wmb();
++	writel(ring->next_to_use, ring->tail);
++}
++
++static inline struct igb_ring *igb_xdp_tx_queue_mapping(struct igb_adapter *adapter)
++{
++	unsigned int r_idx = smp_processor_id();
++
++	if (r_idx >= adapter->num_tx_queues)
++		r_idx = r_idx % adapter->num_tx_queues;
++
++	return adapter->tx_ring[r_idx];
++}
++
+ int igb_add_filter(struct igb_adapter *adapter,
+ 		   struct igb_nfc_filter *input);
+ int igb_erase_filter(struct igb_adapter *adapter,
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 288a4bb2683a..77a6d1470f8b 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -33,7 +33,6 @@
+ #include <linux/bpf_trace.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/etherdevice.h>
+-#include <linux/lockdep.h>
+ #ifdef CONFIG_IGB_DCA
+ #include <linux/dca.h>
+ #endif
+@@ -116,8 +115,6 @@ static void igb_configure_tx(struct igb_adapter *);
+ static void igb_configure_rx(struct igb_adapter *);
+ static void igb_clean_all_tx_rings(struct igb_adapter *);
+ static void igb_clean_all_rx_rings(struct igb_adapter *);
+-static void igb_clean_tx_ring(struct igb_ring *);
+-static void igb_clean_rx_ring(struct igb_ring *);
+ static void igb_set_rx_mode(struct net_device *);
+ static void igb_update_phy_info(struct timer_list *);
+ static void igb_watchdog(struct timer_list *);
+@@ -2919,29 +2916,7 @@ static int igb_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ 	}
+ }
+ 
+-/* This function assumes __netif_tx_lock is held by the caller. */
+-static void igb_xdp_ring_update_tail(struct igb_ring *ring)
+-{
+-	lockdep_assert_held(&txring_txq(ring)->_xmit_lock);
+-
+-	/* Force memory writes to complete before letting h/w know there
+-	 * are new descriptors to fetch.
+-	 */
+-	wmb();
+-	writel(ring->next_to_use, ring->tail);
+-}
+-
+-static struct igb_ring *igb_xdp_tx_queue_mapping(struct igb_adapter *adapter)
+-{
+-	unsigned int r_idx = smp_processor_id();
+-
+-	if (r_idx >= adapter->num_tx_queues)
+-		r_idx = r_idx % adapter->num_tx_queues;
+-
+-	return adapter->tx_ring[r_idx];
+-}
+-
+-static int igb_xdp_xmit_back(struct igb_adapter *adapter, struct xdp_buff *xdp)
++int igb_xdp_xmit_back(struct igb_adapter *adapter, struct xdp_buff *xdp)
+ {
+ 	struct xdp_frame *xdpf = xdp_convert_buff_to_frame(xdp);
+ 	int cpu = smp_processor_id();
+@@ -4888,7 +4863,7 @@ static void igb_free_all_tx_resources(struct igb_adapter *adapter)
+  *  igb_clean_tx_ring - Free Tx Buffers
+  *  @tx_ring: ring to be cleaned
+  **/
+-static void igb_clean_tx_ring(struct igb_ring *tx_ring)
++void igb_clean_tx_ring(struct igb_ring *tx_ring)
+ {
+ 	u16 i = tx_ring->next_to_clean;
+ 	struct igb_tx_buffer *tx_buffer = &tx_ring->tx_buffer_info[i];
+@@ -5007,7 +4982,7 @@ static void igb_free_all_rx_resources(struct igb_adapter *adapter)
+  *  igb_clean_rx_ring - Free Rx Buffers per Queue
+  *  @rx_ring: ring to free buffers from
+  **/
+-static void igb_clean_rx_ring(struct igb_ring *rx_ring)
++void igb_clean_rx_ring(struct igb_ring *rx_ring)
+ {
+ 	u16 i = rx_ring->next_to_clean;
+ 
+@@ -8786,9 +8761,9 @@ static bool igb_cleanup_headers(struct igb_ring *rx_ring,
+  *  order to populate the hash, checksum, VLAN, timestamp, protocol, and
+  *  other fields within the skb.
+  **/
+-static void igb_process_skb_fields(struct igb_ring *rx_ring,
+-				   union e1000_adv_rx_desc *rx_desc,
+-				   struct sk_buff *skb)
++void igb_process_skb_fields(struct igb_ring *rx_ring,
++			    union e1000_adv_rx_desc *rx_desc,
++			    struct sk_buff *skb)
+ {
+ 	struct net_device *dev = rx_ring->netdev;
+ 
 -- 
 2.47.1
 
