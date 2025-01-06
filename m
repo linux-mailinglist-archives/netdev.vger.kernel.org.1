@@ -1,56 +1,60 @@
-Return-Path: <netdev+bounces-155528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23C7CA02E51
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:54:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AA71A02E52
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:54:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F4D8188608E
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FFA6165082
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C5E14037F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F371662E9;
 	Mon,  6 Jan 2025 16:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JXSFIRjl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TXXrGPbL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F99470824
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2150153814
 	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 16:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736182467; cv=none; b=VFlG3YyL4+VnGYZPv+cnvbJzqNmX1+mFLRkvHoumCq+UrnLXoId9B/C1vRdlKjI8Gh4TcQuwjy/9MruBHs2x5rWtNUcfpk6RRprw08LNpT3siZk4hwA3tV/p5tCbx5T10/rANuoxIOUb+wdsJ0vaHm6CASuCJReA2Ytu/iTl0e4=
+	t=1736182467; cv=none; b=T4aWAUtCRQNGqV7DKZ78Q54vYxqNFOXMy8AdWLvxni7DflRmmvjfLzkHNS4lOGnoHS7B/WKNAnC7XQqG3OaRIa5cQVKTaNngQNGM6WRpG6iFAJ07wSWj84DxWnUgQIEI4jCVhTmCKdoS6g2AUAHT4qbAJlP0ePuJLuNSMsbXImk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736182467; c=relaxed/simple;
-	bh=o88mEBkqcX49MiGIJ0Vbncz0sdQZ12DWr7PW0n9cOwI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KNGiDfqfyYS+IIrePalScqBSG3dMO0khyXf1hsxeKKKd+i6QVzmea80VGQM92GVbKt4PIEVEiQiqCBQSCKzSoUoMWMPJNy4ldbAGqL373jssGLpwo9Anwg2sAfRTtAuxhhgHjmWWY0Cl8mJUGSH8fxW7XxlsIbHiBfODW+AmvsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JXSFIRjl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB03C4CED2;
-	Mon,  6 Jan 2025 16:54:26 +0000 (UTC)
+	bh=k9yriv3FjKegK1G3dRsHkGi2dQjrxB8t9Prkv6ezWiY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JIbYCyrhetT+bE8rlXMoQXE7paOkRrrzlPN3N4dW+2u+WvFvbBOMCyUl2IKrQf1DkQfKEh1NnmXE0JM5V31xKDePOdYfxlrlYlIYO+h/6P1iKyt8QfnCWJ8tM+0hqomJLH52gj6GlV3BXe1GI2RxYpy9UpjDYm7yH+tU48IFsr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TXXrGPbL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2704CC4CED6;
+	Mon,  6 Jan 2025 16:54:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1736182467;
-	bh=o88mEBkqcX49MiGIJ0Vbncz0sdQZ12DWr7PW0n9cOwI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JXSFIRjlaogRhI/297LZ+6a9uE4CdKekCN9I4ysLTypKdpNkycK1gJKg2mNGgrOr0
-	 5ZfO5nsJ63KLZyc/AwqfSFxDCZtmMcna/UQMT53NPPCi1pVnre9xlIVD877wXzWOR/
-	 W8+1ZGaj8yQbfSR0CXeGJGW1CfzBs+3IDNIlpu0Marpw0mD97TpT3Qgq5sOON9A039
-	 pFYYqeB0kie4z63cQV7sJ4amcSxsiqJZYX3v3ky8bN/hlwvgYbNVmBLlXeCGT0So9Q
-	 zsPA3Oe6qeyZqsYUjNiDWUT3x2tURA9ZgujmAwHSrCjvPi/rf3R6j0c/Yt1+bWU8aj
-	 Lz5hkWHl8Reyg==
+	bh=k9yriv3FjKegK1G3dRsHkGi2dQjrxB8t9Prkv6ezWiY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TXXrGPbLzwSEUkWR7QzhNR00Vg2wFYlGZYlz1HUwu0VUEq1D29gy1gGkzHnRPsxDa
+	 1AtpVrdzcoU0KVexusyNyohFE1NeKXqHVBtLumNfYuv3UmANp6ioZrGtpcLWccclZt
+	 4CR61ovWJQODRHSc237bsaFC97x7zpg8le3wKIDLbVqEIUDSbAQMph58BLUee0YP6p
+	 9ObSoIytMwIFD6Z+mSDH3j2i5CdX4iVTuaiatETWtBs9vpZtlQ4f5KS120sh3O/nTE
+	 b3XddlV9KZ7VS5X0w7XA1FrAwUHcVu49SYoJP91t/zmraw28orncPskXMtRZ4jhEcP
+	 s2rqdaqn6zIOA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 0/8] MAINTAINERS: spring 2025 cleanup of networking maintainers
-Date: Mon,  6 Jan 2025 08:53:56 -0800
-Message-ID: <20250106165404.1832481-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Jose.Abreu@synopsys.com
+Subject: [PATCH net 1/8] MAINTAINERS: mark Synopsys DW XPCS as Orphan
+Date: Mon,  6 Jan 2025 08:53:57 -0800
+Message-ID: <20250106165404.1832481-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250106165404.1832481-1-kuba@kernel.org>
+References: <20250106165404.1832481-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,27 +63,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Annual cleanup of inactive maintainers. To identify inactive maintainers
-we use Jon Corbet's maintainer analysis script from gitdm, and some manual
-scanning of lore.
+There's not much review support from Jose, there is a sharp
+drop in his participation around 4 years ago.
+The DW XPCS IP is very popular and the driver requires active
+maintenance.
 
-Please feel free to comment if you either disagree with the removal
-or think it should be done differently!
+gitdm missingmaints says:
 
-Jakub Kicinski (8):
-  MAINTAINERS: mark Synopsys DW XPCS as Orphan
-  MAINTAINERS: mark Microchip LAN78xx as Orphan
-  MAINTAINERS: remove Andy Gospodarek from bonding
-  MAINTAINERS: mark stmmac ethernet as an Orphan
-  MAINTAINERS: remove Mark Lee from MediaTek Ethernet
-  MAINTAINERS: remove Ying Xue from TIPC
-  MAINTAINERS: remove Noam Dagan from AMAZON ETHERNET
-  MAINTAINERS: remove Lars Povlsen from Microchip Sparx5 SoC
+Subsystem SYNOPSYS DESIGNWARE ETHERNET XPCS DRIVER
+  Changes 33 / 94 (35%)
+  (No activity)
+  Top reviewers:
+    [16]: andrew@lunn.ch
+    [12]: vladimir.oltean@nxp.com
+    [2]: f.fainelli@gmail.com
+  INACTIVE MAINTAINER Jose Abreu <Jose.Abreu@synopsys.com>
 
- CREDITS     |  8 ++++++++
- MAINTAINERS | 17 +++--------------
- 2 files changed, 11 insertions(+), 14 deletions(-)
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: Jose.Abreu@synopsys.com
+---
+ CREDITS     | 4 ++++
+ MAINTAINERS | 3 +--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
+diff --git a/CREDITS b/CREDITS
+index b1777b53c63a..2a5f5f49269f 100644
+--- a/CREDITS
++++ b/CREDITS
+@@ -20,6 +20,10 @@ N: Thomas Abraham
+ E: thomas.ab@samsung.com
+ D: Samsung pin controller driver
+ 
++N: Jose Abreu
++E: jose.abreu@synopsys.com
++D: Synopsys DesignWare XPCS MDIO/PCS driver.
++
+ N: Dragos Acostachioaie
+ E: dragos@iname.com
+ W: http://www.arbornet.org/~dragos
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a685c551faf0..188c08cd16de 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22746,9 +22746,8 @@ S:	Supported
+ F:	drivers/net/ethernet/synopsys/
+ 
+ SYNOPSYS DESIGNWARE ETHERNET XPCS DRIVER
+-M:	Jose Abreu <Jose.Abreu@synopsys.com>
+ L:	netdev@vger.kernel.org
+-S:	Supported
++S:	Orphan
+ F:	drivers/net/pcs/pcs-xpcs.c
+ F:	drivers/net/pcs/pcs-xpcs.h
+ F:	include/linux/pcs/pcs-xpcs.h
 -- 
 2.47.1
 
