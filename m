@@ -1,126 +1,97 @@
-Return-Path: <netdev+bounces-155393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 574B3A0223F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:55:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41616A02254
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:57:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 550313A29F4
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:55:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C92E83A2B12
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACD21D86ED;
-	Mon,  6 Jan 2025 09:55:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B24159596;
+	Mon,  6 Jan 2025 09:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QbxExXK8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mA05LC6h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF161D7998
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 09:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B53B676
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 09:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736157315; cv=none; b=Jhn5AQFNwKNQGUTbX+YOXYRCSi9Hp2wHc1GQq9XOushhv/WYlYb19K8HV5Z1m7dKhzJUBD9nZjpUsLJQzwvO4GlRFHVDZ0kqEJnjX01VWcAZsTLUw6I7MnkY4iGMvbmKC2fmjq2gqP4Gtzdz2tzrxF4CeuKfDbuC3vHN+Ede8J4=
+	t=1736157459; cv=none; b=gb9EAbvCOfyHxMVgYcuZXnp80WLUph7UpxEsTXok9Zd8aQ+I+4qeUzO57QolT0IqCR9FoxJTGX2OQoDvHR1RUiEdNtR7rJwd5BxkVCEWhVD5oZOC6L8tSgWnTTdtjJ2BvHxt1vY0M8nbT4v6cMF/suRU75nICae03PHI/H2vCDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736157315; c=relaxed/simple;
-	bh=xkrRsNvf6yCgfIDOwAoPR1Rz7RRFedHEpLTM2m5X3h8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VilgsFwUJyJ8jB9GPvgBY6pJHV9+C2LbWj+sj7I2KT5GCSkxtmDiL3U7xuqot3mDHXbf6G5EYEQd5m2r4/ZIOA3/NVmqXK0sggu9FvOBLehSY9lPb7dXZoqm9HiJfxUW3lwV+IEPSunLN2xrmOX795iqC/2STI9OLYJcp5Xi4kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QbxExXK8; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-385e27c75f4so10210286f8f.2
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 01:55:13 -0800 (PST)
+	s=arc-20240116; t=1736157459; c=relaxed/simple;
+	bh=+QZbl/ClBjscb0xGLKHvgjUuxy3PaNlX955erv2rUew=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qdP6JRd0sDYjRCfq3KPlZfM8JwIEftvhHGn+xlAaQkmzpIUAyo6znn8ZMM3RXBhERaaNZcD0So9g5MlltzZugIkB+GYMoHkyEw8k3U05QR8NRBxj5vIGtkCWpsJEE41NJ2Pb6+mjC+hfDqpBRgTA0/0UKYak/5vNxjxEXJW8S8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mA05LC6h; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d0ac27b412so19260925a12.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 01:57:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1736157312; x=1736762112; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0jGxr5wqDmdeu5IyMbxmx0edpfWmeZJ8iItGM3saxJ8=;
-        b=QbxExXK8AsKXjPfctpi2B8HP9DNavwgdzXkg1JzviqQTjEQ2oxdlCo8lXbs140IMpB
-         K8GLNnhcA3Yq/brb0bSYDmTF847zQPt9m4j56cTisMxYjKWROql3SiaimZS280+RAKPF
-         3oL9kI2E2INUazKtl/53zlxVTfhLaoJHKU1D8eY+ysTm9639f80vmw/3h/lYTdwMOljC
-         pRnX308map36rn1HcqoDq1/m4WQHC+Vl+l6MmHnlLEwLc5/D5i2TNE7XAzeMCRsP3hBb
-         0r2eF8+OGKOMImYHkCoqh98l92bkHywJl0AMbrN8YXQU+qu41WbtGvDHl4JyrGLc5RLf
-         Klww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736157312; x=1736762112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1736157456; x=1736762256; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0jGxr5wqDmdeu5IyMbxmx0edpfWmeZJ8iItGM3saxJ8=;
-        b=U0gNY16/ikfyq03XgP7MzC5iO9lA15Vvd/HMMwzNo1IYjhif9erSUsefYMeUm4sRh6
-         WEiLWe4o/4Lccxnl1xPPlMhX+yaGs3t17K9IjLznlL2qypSRp+Vt5RuIBMWxbyGUNxiR
-         m4l3OOfBiFZe6HQGM396xbf1xBYeLLnx1eiV0d/DQNMo9I/pFlkmSMMo61ctctGVx9m2
-         q0EjNv32l9cWIm6w9GaPW0FWhAwhhOhXtK7BM2FQ+xK9+UFfSAtrLmvUSYKT4sX520Fz
-         K2/gMG3eb+ovHXshVyYoNk3P39TatmtrBcUVKTdPs/1AixKn8H5ksuj+uW5+kVgh/gFD
-         tnIw==
-X-Forwarded-Encrypted: i=1; AJvYcCWIux3eBmP6dmOeTQbioOrk/b2L3zqDkmerUDei5wion1J2LhXWjs5fhi/HDMXug7WORL+v+D4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+U+RthscK24TvzGtwKvlqcFp89T3/35ZBhonE0hnyUDRyWRoA
-	tbzIsL2fckmFPNGnw+JE5UACUBGyXeOQD3Eorqul4uamBuAm8uvonu36WtzD3MQ=
-X-Gm-Gg: ASbGncsX9hejsSEaKBNv7LhYvlKC5igxkEQLKFiijvRy0Yv7BvuucOoZZKeJdckmDfZ
-	c+rJlHgKxl1gAn3y2W0LbPF/chTTBqYXoDEftnxBx+z558so4TtyShBKx3DhBw0mZZ2h51XFhq4
-	onzZJyZIvq7e7vb8gBvt3a1n9gpErp8WSim+QsSdxM8v28t/KeBEGBM4SDYGS3cogxf9UVI8iLp
-	D9GrjMeDR4URdDLNxPDufGokl6M4h5JFpZtDzOPE8s7/nieGIPzUwDDIYeHBQ==
-X-Google-Smtp-Source: AGHT+IGNXWrBifkbf6Mc5XVTxlnrLSIUOacFUlygfldDtXdlkhQyyDqSAPjIYaAKYqyIhFVj+vr26A==
-X-Received: by 2002:a05:6000:1561:b0:385:e013:73f0 with SMTP id ffacd0b85a97d-38a22405c97mr50260491f8f.59.1736157312087;
-        Mon, 06 Jan 2025 01:55:12 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c832e69sm47002685f8f.35.2025.01.06.01.55.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 01:55:11 -0800 (PST)
-Date: Mon, 6 Jan 2025 12:55:08 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Ethan Carter Edwards <ethan@ethancedwards.com>
-Cc: "t.sailer@alumni.ethz.ch" <t.sailer@alumni.ethz.ch>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [PATCH] hamradio: baycom: replace strcpy() with strscpy()
-Message-ID: <c2072355-157a-4fd3-9635-c94b7167e637@stanley.mountain>
-References: <bqKL4XKDGLWNih2jsEzZYpBSHG6Ux5mLZfDBIgHckEUxDq4l4pPgQPEXEqKRE7pUwMrXZBVeko9aYr1w_E5h5r_R_YFA46G8dGhV1id7zy4=@ethancedwards.com>
+        bh=+QZbl/ClBjscb0xGLKHvgjUuxy3PaNlX955erv2rUew=;
+        b=mA05LC6hnyXuDPtOFmdY9iWr6jWkXn3XLMAladTEbeenrfJ7cwLykUA3uhi8D87hQB
+         voqWths2nw1fOydlBJnnggflhMn8uftEie/TJqAnGJVjs9Qmkh8TkjJOH8+CENdoM+cu
+         GVVO/U+bjCo63ZmbLWS3qoESL4m6du9H9AZFj4nReSnwl7ntfyuFlxWFRNe1BBP9LZQr
+         DpTkJyxA5Nmee4OWHTzpdI+4z5J71PVZcV1+n/UpOLtwzukFF7h40XtJkG5aLVc6NjEP
+         BgNHDBUchRFHJmFdKR0dCdXaE6ZugdneEL8WapFu+wBFCQaD1YPxYv9iaNYAoPfIPiQZ
+         0cJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736157456; x=1736762256;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+QZbl/ClBjscb0xGLKHvgjUuxy3PaNlX955erv2rUew=;
+        b=KqY9sa/ooZNxdEgX5ZUWtTFdVzsFKVzysf/WIzkViMGRrxvBYBrh13REEg3CjHz9qm
+         B6tkYyDhvDqBDGGZi1UppH37Tb/zLnboFFKR5tXqiAQTuwGWAvL84qzFPUcmwzy48NK9
+         eqpIQBTL6QzEFKW7HAT3e8vgdVILEo+V2ieLRVK/80i7NbbbGki8E2zl6MUT6uD7bEVb
+         PgDwairQFGUFWl7tmitJNPgKBaypNihzXNdJi1Uln15R0rZ3znkqyGJF2xNO5t/E2jjX
+         Mp4qp0QgsZdbj4HKhatkCPUMPfq8iPdd1935L/tQzVA4ArEy68W62p/JWtoeD7rkUDSX
+         uKHg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNA1A6uX5kzpSyvZEIRU+hJhOKTCojDhUH8fJs9WWtmsnCCTG1YBMCFXaNMAwM1nMl5KcL/tQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIYVcTU3TA1WCdwnOF5lNcbwdH9CBUn6CQGJCfFXA726jw6L0d
+	wRLefG/5hmwK4opQ4sarEt7OdC73n29CMV3JJyAI8HUZ4b4SQlTS7xCivimobvDfdhujIFtiig1
+	tzHGtfyDzjBNJIJ9QmbmkJ05ox68SQS9Lzolo
+X-Gm-Gg: ASbGnctk3wTAKjTpZmOEDn7WMLUB80PWAMxib1L/Gj/CoD74LstLJqtDBss0NXnAjDF
+	N3iWBRqEEoxuvR3fwPrzrzlRVTfNSZaM2HU7MUQ==
+X-Google-Smtp-Source: AGHT+IHp7oMvfUrQtzDao4rPWmJsYNWKBbPiIV/2fTJDafd72wUTJpy74H5qqVyTuO5nkwGyVgc5k0iHX/ZKPq+W0HU=
+X-Received: by 2002:a05:6402:524d:b0:5d2:723c:a57e with SMTP id
+ 4fb4d7f45d1cf-5d81ddacfeemr54564734a12.16.1736157456346; Mon, 06 Jan 2025
+ 01:57:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bqKL4XKDGLWNih2jsEzZYpBSHG6Ux5mLZfDBIgHckEUxDq4l4pPgQPEXEqKRE7pUwMrXZBVeko9aYr1w_E5h5r_R_YFA46G8dGhV1id7zy4=@ethancedwards.com>
+References: <20250103185954.1236510-1-kuba@kernel.org> <20250103185954.1236510-6-kuba@kernel.org>
+In-Reply-To: <20250103185954.1236510-6-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 6 Jan 2025 10:57:24 +0100
+Message-ID: <CANn89iKvEzKv60usS==86wjxV0ZBrs5V5KL9Doc1RwOOchUo+w@mail.gmail.com>
+Subject: Re: [PATCH net-next 5/8] netdevsim: add queue alloc/free helpers
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	dw@davidwei.uk, almasrymina@google.com, jdamato@fastly.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 23, 2024 at 03:13:42PM +0000, Ethan Carter Edwards wrote:
-> The strcpy() function has been deprecated and replaced with strscpy().
-> There is an effort to make this change treewide:
-> https://github.com/KSPP/linux/issues/88.
-> 
-> Signed-off-by: Ethan Carter Edwards <ethan@ethancedwards.com>
-> ---
->  drivers/net/hamradio/baycom_par.c     | 4 ++--
->  drivers/net/hamradio/baycom_ser_fdx.c | 2 +-
->  drivers/net/hamradio/baycom_ser_hdx.c | 4 ++--
->  3 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/hamradio/baycom_par.c b/drivers/net/hamradio/baycom_par.c
-> index 00ebc25d0b22..47bc74d3ad8c 100644
-> --- a/drivers/net/hamradio/baycom_par.c
-> +++ b/drivers/net/hamradio/baycom_par.c
-> @@ -427,7 +427,7 @@ static int baycom_ioctl(struct net_device *dev, void __user *data,
->                 break;
-> 
->         case HDLCDRVCTL_GETMODE:
-> -               strcpy(hi->data.modename, bc->options ? "par96" : "picpar");
-> +               strscpy(hi->data.modename, bc->options ? "par96" : "picpar", sizeof(hi->data.modename));
+On Fri, Jan 3, 2025 at 8:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> We'll need the code to allocate and free queues in the queue management
+> API, factor it out.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-strscpy() has macro magic so you can just write this as:
-
-	strscpy(hi->data.modename, bc->options ? "par96" : "picpar");
-
-Looks nicer and it's easier to review.
-
-regards,
-dan carpenter
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
