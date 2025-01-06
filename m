@@ -1,114 +1,89 @@
-Return-Path: <netdev+bounces-155307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6400A01CD3
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 01:16:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026E4A01CF4
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 02:06:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C832D161F64
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 00:16:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57FB81622B5
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 01:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C799474;
-	Mon,  6 Jan 2025 00:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6651798F;
+	Mon,  6 Jan 2025 01:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e3JNsYNL"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="F4a8IpZX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86273224;
-	Mon,  6 Jan 2025 00:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101BC29A5;
+	Mon,  6 Jan 2025 01:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736122597; cv=none; b=mI+e7fsrZ4EJLmXNMTSrZTUUxxsoKOKACWRwsZgD6dhNCw+oit26H4WBCOvx2rhkF3oqewKc6UrIm6wCBUtNJcmsP0Os7ljMc7dJ0CIYmu9epr63I5gJgv4eWfAknsMh3OFb7muKBac9c6V1IgbxCOB5lcFdXS6uUbHs/TxbxDw=
+	t=1736125561; cv=none; b=FxEnA+OB5ON9WvN/9pXEZ8wgIl4VCOd2FLGvhHJnYV8BSvyCmI9D68OLtYlXcDYDssI5htNRaMimZ8wi25TRn56LPB2NyqWh23yn+oyLOKbGvd/Sk6IQK0fyVJbEEB+TocRu0EPRyb6nCM7Rvyfe/Wh36fiJZd72scqhacwDXQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736122597; c=relaxed/simple;
-	bh=ojec6Ee3CNoayywAB5Amc17aicUGxD2T3RDpyIPsMPk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PsZrDVA217sDCtq0ubJgu302MpzOSBKCgI0fZ5MXPmrtTBdhrkyy7V4WGc64DheMMtZGKZV06ZeKp4gl3B++h/h9FKlIaEY/GAf5fs2qk7RT2sLItNsbrsxkKTwsH2/HediZPgiKRrRiwWQICRI7n3fzGTCvjF95jUq5gI9t1dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e3JNsYNL; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43634b570c1so99047205e9.0;
-        Sun, 05 Jan 2025 16:16:35 -0800 (PST)
+	s=arc-20240116; t=1736125561; c=relaxed/simple;
+	bh=3blgBORgK4NdYFGTz9Ri+gK5/9gA5YNNqV7GzL4pbSE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=c2cGdpskSpv/KYLHPdHdCjfIZefDDyebCh8QNkijOoJJ/q39GV6iAYZupe3olJ2ythmrTEtiH0UdizkF3j7nbF76zeS3+czR4vVU82k7mYU8831F38NYVhIRM4Q58E+twdx7V7b83oBuCajeddv+aJcQSrnmVXyozwMtPwM8hTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=F4a8IpZX; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736122594; x=1736727394; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KIqv1w/KzDHT3jhVDEhZI6SzEmkBsffQKD6siBUIkOQ=;
-        b=e3JNsYNL2CWqFiM9Wrb31sn7r41YHC6W73sgfSWYi0NfItL6yQ3rw+uo1PqP5P2TWc
-         psIvMwSEd6sgcJhcou87XVDmGzthP0Icg/X9PtG76IGDFYu6LBSmW1mEJeJFM014wx1w
-         nS8JGz34i+iKX0n/Xq7hN4BsFZ2iD6g7EP+QBDQDG6MoM9d4UQ+XdqkIGdru+BKhAtG0
-         0HrvKuV0YEna/7tkng9F5CdlNOHJ/VrTDnU04qb8jskLcSxgL/RGRA3MIUI/dS+pq9XD
-         WQkxT7tuYucwfsG1qBR+SYnBGGnjko+5yEB8I//MROrX4shr3Seyu3GRuhR+UUWgDrIS
-         yJZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736122594; x=1736727394;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KIqv1w/KzDHT3jhVDEhZI6SzEmkBsffQKD6siBUIkOQ=;
-        b=Mp/dASgciZ/SfPVef5URWJUOvCTADSL2wc6CA+9WYKxTmiR/jNxampQARksbJ/PwsJ
-         VTESFu2K5BbkeG60wGIu2TFijN7OhTMlYpSizgmSxytTUAVq35bZZsw4msA3aaRXugmU
-         YC/sYDwtq/YEoLu4JMGKg/LbuZx6G3fbtlwYiFRi2hviFPYK2+tu6crujHomZOM5i+n/
-         2Cyy5l0Cc/OS482kqzjaUJfJlxSJqBHpc1Q22xfD5oTXwld9oiEzo5FgfkPqVFGRbbm/
-         s/mLvZqfWtp20Ga0s1uNtxV5+R9Pg8HLB5h3OHCuEH/vDX52syW5PKvXBG3+mlQ9YUDs
-         kXWw==
-X-Forwarded-Encrypted: i=1; AJvYcCUM5Ecz0G7sij1Gbza75Tk75vXG2qmutPUeuF4Y6N0BtQGQiUPWGvcE5ky1XxEb9wuQFtcckV3j@vger.kernel.org, AJvYcCUwDeZvu/o34JrUuVJM20B1cnAP1kLmSJoDuW/7xBtf5SjjdDWtOifkJAiEylesJ1o0IRs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxdqgr/mMejwzqxV5PWs4Bju/aoNBOyrdGq2bX3SAwCnBTuQRL2
-	CNc28uGfPGb/S4Qjt2b5+9TpxjOPfdhUNW8RNmvkNGKrCUX9V5YqhB+X2zZzXvKRfbYrM1UXtSK
-	Kp0e/UxE0dZl1JN+JHyph9AcDWpY=
-X-Gm-Gg: ASbGnctj6rguHV0V+et+d+moU0p15cd9HHtOuqfr4dWRtZTx/87PivWPiMNIsxfiIV3
-	GDrQDJXndeAidlfDetz4O9M04hHliIOe4iRs1hw==
-X-Google-Smtp-Source: AGHT+IGKPz9CgDuluCultGgcXxKmIs38Aua/eInGLsF6WqnbAtAQ7V1TsQkDoEoNOaEWrYHEiayWj9R0UUtkjPK6clA=
-X-Received: by 2002:a5d:598f:0:b0:386:424e:32d5 with SMTP id
- ffacd0b85a97d-38a221ea939mr48432959f8f.14.1736122593449; Sun, 05 Jan 2025
- 16:16:33 -0800 (PST)
+	d=codeconstruct.com.au; s=2022a; t=1736125550;
+	bh=3blgBORgK4NdYFGTz9Ri+gK5/9gA5YNNqV7GzL4pbSE=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=F4a8IpZX7p3nob6WLeVLKhUtmdlFQTOJybkWf6EE3pUHKwdAPq4dJxaK8lk2rAmDX
+	 d491pu/91cUSuzDIfR76OulTYLfVMGzS/WsKS+ZFDN6Rrs4qovgLl/sa/JuDHsVxSx
+	 EY4gADlVeabD0QmiFjEXeoZzRQl8AhWbk9pCDfY/tC2kR8FnyLqf/UHNRcv3DK/B4U
+	 z4+k5kh/527kBnbCG94F/hSHmXetW56jhYsmkRb7GbZ6+1VE4NNwk1UEGfsHFE0W7D
+	 CP3AHmVqxRLXzfBEO1tFhnY/UwKkVzGnNd56lcWTNprIY1bP6Z9inlTjjF5/vEziR+
+	 pt6F/UV0Lj02w==
+Received: from [192.168.72.171] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 15DF9707E6;
+	Mon,  6 Jan 2025 09:05:48 +0800 (AWST)
+Message-ID: <e4c5b40a906a560f9a333d8e9d7c556ad99d63fa.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v11 0/1] MCTP Over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: admiyo@os.amperecomputing.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Matt Johnston
+ <matt@codeconstruct.com.au>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,  Sudeep Holla <sudeep.holla@arm.com>, Jonathan
+ Cameron <Jonathan.Cameron@huawei.com>, Huisong Li <lihuisong@huawei.com>
+Date: Mon, 06 Jan 2025 09:05:48 +0800
+In-Reply-To: <20250104035430.625147-1-admiyo@os.amperecomputing.com>
+References: <20250104035430.625147-1-admiyo@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250105124403.991-1-laoar.shao@gmail.com> <20250105124403.991-2-laoar.shao@gmail.com>
-In-Reply-To: <20250105124403.991-2-laoar.shao@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 5 Jan 2025 16:16:22 -0800
-Message-ID: <CAADnVQ+ga1ir9XCDxPiU_-eYzKHTQsiod9Sz4_o3XeqGW2rq4A@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next 1/2] libbpf: Add support for dynamic tracepoint
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Eddy Z <eddyz87@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Eric Dumazet <edumazet@google.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 5, 2025 at 4:44=E2=80=AFAM Yafang Shao <laoar.shao@gmail.com> w=
-rote:
->
-> Dynamic tracepoints can be created using debugfs. For example:
->
->    echo 'p:myprobe kernel_clone args' >> /sys/kernel/debug/tracing/kprobe=
-_events
->
-> This command creates a new tracepoint under debugfs:
->
->   $ ls /sys/kernel/debug/tracing/events/kprobes/myprobe/
->   enable  filter  format  hist  id  trigger
->
-> Although this dynamic tracepoint appears as a tracepoint, it is internall=
-y
-> implemented as a kprobe. However, it must be attached as a tracepoint to
-> function correctly in certain contexts.
+Hi Adam,
+> Changes in V11:
+> - Switch Big Endian data types to machine local for PCC header
 
-Nack.
-There are multiple mechanisms to create kprobe/tp via text interfaces.
-We're not going to mix them with the programmatic libbpf api.
+This seems suspicious; the concept of "machine local" may not be
+consistent between channel endpoints (ie, system firmware and this
+driver). Looking at DSP0292, and the PCC channel spec, it looks like
+these should be explicitly little-endian, no?
+
+The warnings you were seeing in v10 seemed to be an issue of direct
+accesses to the __be32 types in struct mctp_pcc_hdr - ie., without
+be32_to_cpu() accessors. If you keep the endian-annotated types (but
+__le32 instead), and use the appropriate le32_to_cpu() accessors, that
+should address those warnings, while keeping the driver endian-safe.
+
+Cheers,
+
+
+Jeremy
+
 
