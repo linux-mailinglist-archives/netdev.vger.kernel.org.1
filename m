@@ -1,104 +1,119 @@
-Return-Path: <netdev+bounces-155342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD61FA02034
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:06:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E5EA0206B
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:11:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52CA53A2DB3
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:06:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED4D91638F2
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0B11D63E6;
-	Mon,  6 Jan 2025 08:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7480F1D7994;
+	Mon,  6 Jan 2025 08:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="lBSlYloT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lezsdofa"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32451D79A0;
-	Mon,  6 Jan 2025 08:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0638B1A2631;
+	Mon,  6 Jan 2025 08:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736150812; cv=none; b=f+ZmZuL6Weqeqn4Wj0eRKokNxrRngXqZv6yI8YXPVq20aXaVY0eie+GTKvntWazxjoBmFVcp4Vfiy9C/p4H2T5VBqx4bEVKRlQfScTDRXdyKTM5AynOKwfNbeIRMXWb6pOaBfFlGgYWZnf/0YL9aUv5WGkYn654L8oyWlkcYy68=
+	t=1736151060; cv=none; b=eqgXtWz8wZ9Fge5cuTdECadZ3jMXIFW9kgUZ+RZ9yV82VIPfcp9JSTe1L3LD1QDNp8pJrxd1Cefj/aK0+HnL6Op1UPafRJG9YZa7BBD7ajvsxXOyipHzCyye86XesgjLXKDqKT7uzRuI1MYy/CVpWcPOgCbU+SSQasmsYEiYBKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736150812; c=relaxed/simple;
-	bh=UOjMZRVKEF8pAw+QVhlAmTbkMlSLTFrv44rO0QDuaHI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=T3dC2XibmBGdIkJyIPEbDWGllWBw42PP7uJC25EqiTziJF3Ay+usHKd7glmDssejVxqozPd+1sbuiYcv3WIncRQi/4K1srIjL8Zwm7aZaT777BNke/FiWKdyh2gT6UNtzreeddAKJfmULK2Ky5RwM9hPLiYfO5yHGrMoIspMu/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=lBSlYloT; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=UOjMZRVKEF8pAw+QVhlAmTbkMlSLTFrv44rO0QDuaHI=;
-	t=1736150810; x=1737360410; b=lBSlYloTtX2e7qVzJsCoI3iCmBY0n5hs76jC1EHEMmN0YVY
-	orXZT/8dxZWBL9fSlNjEWy+ZiykiVEpx44v1lMdyeQP6FlnVZn0cjcXksAYtDQuQzgynyrWGP3Ooy
-	Usdmnie6KopLxPq/GvpVgZXzGKjelskAj6sIqjleshvhUO0gFESOWFm+O/k/qTd7lS6pPAGlToivp
-	epdXbOCll/jaLfdPgTufFC9oz5pE0tcr3OJrk46tQoNOV4I9GPSKYIMEIV2jRtxnos6GmTeoRKqGO
-	izhnp1+5Vk91VPG2BrMoLgzR3yUVmQtygoIDiHa0lwSwuyrdnPfZvzV4/D45DJpg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tUi7e-00000005muW-0BHU;
-	Mon, 06 Jan 2025 09:06:02 +0100
-Message-ID: <edc31a6341e810e23c342f1e90776a3e764c4924.camel@sipsolutions.net>
-Subject: Re: [PATCH] net: ethernet: toshiba: ps3_gelic_wireless: Remove
- driver using deprecated API wext
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Arnd Bergmann <arnd@arndb.de>, Philipp Hortmann	
- <philipp.g.hortmann@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Geoff
- Levand <geoff@infradead.org>, Simon Horman <horms@kernel.org>,  Alexander
- Lobakin <aleksander.lobakin@intel.com>, Netdev <netdev@vger.kernel.org>,
- linux-kernel@vger.kernel.org
-Cc: Kalle Valo <kvalo@kernel.org>, Alexandre Belloni	
- <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-  Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Jeff Johnson	 <quic_jjohnson@quicinc.com>,
- Larry Finger <Larry.Finger@lwfinger.net>,  Nicolas Ferre
- <nicolas.ferre@microchip.com>, Pavel Machek <pavel@ucw.cz>, Stanislaw
- Gruszka <stf_xl@wp.pl>,  Gregory Greenman <gregory.greenman@intel.com>,
- linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, 
-	linux-staging@lists.linux.dev, linux-wireless@vger.kernel.org, Stefan
- Lippers-Hollmann	 <s.l-h@gmx.de>
-Date: Mon, 06 Jan 2025 09:06:00 +0100
-In-Reply-To: <cecd584c-46c0-4c0b-b3fb-b5cee4bbfd12@app.fastmail.com>
-References: <20241224080755.194508-1-philipp.g.hortmann@gmail.com>
-	 <b811d4af6a634d61389dfefacd49853c0e77f1d7.camel@sipsolutions.net>
-	 <39256db9-3d73-4e86-a49b-300dfd670212@gmail.com>
-	 <8414fd0c552de87b3471468665f7fc540b9bfa69.camel@sipsolutions.net>
-	 <cecd584c-46c0-4c0b-b3fb-b5cee4bbfd12@app.fastmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
+	s=arc-20240116; t=1736151060; c=relaxed/simple;
+	bh=z6rapFQsJJuLWWLJVSfKW1IPI0ctzTNB5tuk0C7Ws2s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rEFVnsXdym6u+BNk26+WCsdacM99qdvEOW8neKdgq25vvyNihPDFacHvJCQDQ6jnLety6MmrJsA6zEsW5XdxjJx2IsRlR9zGLdMS2ObhkFZd92zbkffZB08wzJOH4biRFJp2piuzn53ZndSjzUtwXBt5RK7qGBFbpOphXSWBF5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lezsdofa; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21628b3fe7dso194787895ad.3;
+        Mon, 06 Jan 2025 00:10:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736151058; x=1736755858; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UNj5EB3CBzzHNe2564u4Vg3r3GIGTo09F7r1zlnGu1M=;
+        b=lezsdofasqPgOyVLFOjFD/yX8VTozt/G13Q7oTlHdreAa3ZIJm5G+/eBdyxVNtvwt3
+         MlskO3fGfylxHI/AN7AomyB6Le4OXWeWeyc3VhE1JSLx640Bm5YiU8Dd1h80StbrlWC6
+         LlGpHIGsFd1SJ3r2lAvj9ZOU2l5DPTHUfIqOSmfzllgi5JUJ2yhlHgD7D5km+qaFYnXF
+         SP0Cu3IPHVIdDM/XlvrHXG54abKXb5ZynSuWla07IPwsfV5Fd/keVmWjvnEovGJDbeQ3
+         NfoQ1XDJYTbpUIqOKCNi1YPHGl0FAi96dWn1esaCL4qL2F6Ixice8WrHsIZ9Tg1nbh6m
+         nCxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736151058; x=1736755858;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UNj5EB3CBzzHNe2564u4Vg3r3GIGTo09F7r1zlnGu1M=;
+        b=QdhE9o12A4GOwqpQAHNQwlY/jwgtrJIK9aRifipAv0zCKtFPa6QeOODIhBlBsPgF6j
+         ZApnHNV+AivaUAVZU8PhaEZDjSZR0mYh9XQSeKl2k7x8Huyh7VRVkFMA/VW2p4czaEeb
+         VL2dO9PrhdA0HtBb1toLuSTDufi3dumiyiAjrrV1xSHapB3OOYGTpoIPi6XthjsZ3lJ7
+         +R1/n2Oy5kai6RlbtE6FGNDnbzbLd1BOJ6PkIhKAEsnIiAbUNh5ChpVH7mp7N2rKLYY5
+         Sh/g6yO3sr+jc7D1TA8dFIKiBlej61vh1jJxIhopeMC+TTcwhs34wZeCzXFGb7obSlyz
+         EgMA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/h4OdRhQyLSFtMldvsEwu2F0smIEQEUdtf5R+aczoqnW/ASsN1zEeTBXOcpyYToO7uMujaBwmTK4uR1KOKeTH@vger.kernel.org, AJvYcCUrgcMxLhx7gM8j3WeRcTUyTUw8w9POh8ssiSaoxtbGePQbH39KOJYTxJJRGSEukSQy47E=@vger.kernel.org, AJvYcCX/VoWVMe/m5vG5vmh6fKrNzUutLavGfz7ZaYFqJptJmKQCpRUvbBpBs/o/xpGuKObyiHud7xe36/zeIaXP@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGa5MgE9oW9CjLDni6hYXch2n/BPiy5ZKY5P28K6fNIikeukXD
+	PX3qr0znQwcjF96zmRtQthrluMtCNNtbW5aFz8ijCDEPNOChUdgRnvUjuA==
+X-Gm-Gg: ASbGncs2CcSWo6dRMxGhZ41H79Nod0X1vfxp2erxkYyt0VQl03vGHuFhzUGbt/GItki
+	Bm1tljzpKNBq7DRi13tOwKz+kF49Yx9GlwuJGczPEcJU4I1V0uh/oAuA34VWHitsnilDT6cgq2P
+	VzUBeZxFLH5GVAoWyN2F9deHO56Lit5VNEZXHYyghP6bnbcCKy+wKRsxZRLfxid5Afxpsg3n1Ei
+	dwGpVc04zXpJ+OQjdbCFRUWPzfiqIjpfEntxemVE8C2ixfZIYQLve8/THznMUtGeRLH/vvrIlip
+X-Google-Smtp-Source: AGHT+IHjMYJ+kYgL9lIpddes5A+CsRLnuYBEZZhoqovTAHBKAqmupPfBM7y9cycXTJ4TnPKyShex5Q==
+X-Received: by 2002:a05:6a21:3189:b0:1e1:ab8b:dda1 with SMTP id adf61e73a8af0-1e5e080c4a3mr6061674637.35.1736151057881;
+        Mon, 06 Jan 2025 00:10:57 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad835469sm31910429b3a.60.2025.01.06.00.10.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jan 2025 00:10:57 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>,
+	Phil Sutter <phil@nwl.cc>,
+	Florian Westphal <fw@strlen.de>,
+	Petr Mladek <pmladek@suse.com>,
+	Yoann Congal <yoann.congal@smile.fr>,
+	wireguard@lists.zx2c4.com,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv4 RESEND net-next 0/2] selftests: wireguards: use nftables for testing
+Date: Mon,  6 Jan 2025 08:10:41 +0000
+Message-ID: <20250106081043.2073169-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
 
-On Sat, 2025-01-04 at 05:15 +0100, Arnd Bergmann wrote:
->=20
-> I would assume that once removing CFG80211_WEXT becomes an option, we
-> can just put the remaining parts of net/wireless/wext-*.c into both
-> ps3_gelic and ipw2x00, duplicating and then simplifying the
-> implementation. As far as I can tell, there is very little that is
-> actually shared between the two anyway.
+This patch set convert iptables to nftables for wireguard testing, as
+iptables is deparated and nftables is the default framework of most releases.
 
-Indeed.
+v3: drop iptables directly (Jason A. Donenfeld)
+    Also convert to using nft for qemu testing (Jason A. Donenfeld)
+v2: use one nft table for testing (Phil Sutter)
 
-Note that net/wireless/wext-{core,proc,priv}.c are not even related to
-CFG80211_WEXT (wext-{compat,sme}.c are), and just form the core wext
-code that can be treated completely orthogonal and independent of
-cfg80211. This driver doesn't even use CFG80211_WEXT code at all.
+Hangbin Liu (2):
+  selftests: wireguards: convert iptables to nft
+  selftests: wireguard: update to using nft for qemu test
 
-johannes
+ tools/testing/selftests/wireguard/netns.sh    | 29 +++++++++-----
+ .../testing/selftests/wireguard/qemu/Makefile | 40 ++++++++++++++-----
+ .../selftests/wireguard/qemu/kernel.config    |  7 ++--
+ 3 files changed, 53 insertions(+), 23 deletions(-)
+
+-- 
+2.46.0
+
 
