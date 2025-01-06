@@ -1,55 +1,78 @@
-Return-Path: <netdev+bounces-155415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C702A02486
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 12:46:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6163A02491
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 12:52:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 457F27A15AD
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:46:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 546483A3C80
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7EC1DD529;
-	Mon,  6 Jan 2025 11:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07461D8DFB;
+	Mon,  6 Jan 2025 11:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UzguXv6M"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BZTwCfG3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B676B1DC9B6
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 11:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FD01A76C7
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 11:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736164005; cv=none; b=qsKDJSq/qiqSYwqDuKJgVvo1MdSM9JhUp1ldI0hVxeLNW8i017Khx796i6wbaS3C91u37frvaucEutnUWkwaxFBZGghx/Pfxsn6Mhab/uHRLtlJ1s/YNMKgyno3vm5CPvNUDxgDT64v4xME8I58cb1+e6Gb6ArYt7aO/H+7o3Gc=
+	t=1736164318; cv=none; b=iGVOVpLjhADAEW5C4JawoJ49FJcRCyCPIjdJ6nPt8usE39yFCvDDl23NXdPojVhpR9o5bsLhK+4KT4atmvVcT+EImT31vLXBmAn6x1gyRoWg2tvW0Kxpz2Hgf6O1yvMERCesCrqQSKrJgXhNWWV29eHa+XeMz0ly7h4d3c5p31E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736164005; c=relaxed/simple;
-	bh=5ZSPwqoLzQxrvlYZ22fMOJZBbUCBFLwgI7F0pVMEugE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b3PRX3bqXX695akKLTjii1mSZAQdqohnESjzyy7bq5cwh+1RsUyavRKhGU9uSobUlyw3Gl2zfTnT9vR7c8lxD5OyeWgV4dub3jlFOaKe9JFu80bykW7ekMZDVKEr6IGORqoXKV8GgHypkBi8P9199tz3GiczbEQovea3UGXMJ4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UzguXv6M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5AC4C4CED2;
-	Mon,  6 Jan 2025 11:46:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736164005;
-	bh=5ZSPwqoLzQxrvlYZ22fMOJZBbUCBFLwgI7F0pVMEugE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UzguXv6MyGcNriC4c7uI8/fljcWS14cKvGVSfQoHV5Vo1/ao5lHtLguur1fih2V4V
-	 vPxeGrOdjZruVQofcIqCXS8r0DjcznKO0FU0UK+xDif47xRKn38aFLHI4GW0wZdAKA
-	 lC+In8fkyH/AHip6CW9cnncC1fQkWOGzs2IpVCTRS0NLPhxSdghGuzbNSTnfrd/R9q
-	 n4BCZ1hBbAjB1iYoLvt3yXapQXa+par8MirE8Vau/5XAjZFk1qFk87/eLY5/RyhmX5
-	 8zv50TZFdAe/TiUbcU4zszZxzVhKDXRrFra8FW7B3Hx+DMRVbWseNnLJZG6Fo/FG3Y
-	 iwLPXpLuR+dyQ==
-Date: Mon, 6 Jan 2025 11:46:41 +0000
-From: Simon Horman <horms@kernel.org>
-To: Paul Greenwalt <paul.greenwalt@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, kuba@kernel.org,
-	netdev@vger.kernel.org, Alice Michael <alice.michael@intel.com>,
-	Eric Joyner <eric.joyner@intel.com>
-Subject: Re: [PATCH iwl-next v6] ice: Add E830 checksum offload support
-Message-ID: <20250106114641.GI4068@kernel.org>
-References: <20241218091145.240373-1-paul.greenwalt@intel.com>
+	s=arc-20240116; t=1736164318; c=relaxed/simple;
+	bh=akvpcnh4PQqqehsWxdyG+fFQB/OT7GrQsbAcTyDY54E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=EN3wmNOnyhBQuQyPfnhqxlpaIICyyJ6UAH/thVLIikp7f1UJGYQgZEHIhTpbnDTth0KMZ7BtNpzspXF7QBHPd9TH3b8w+jDQz+sNQkGUbJf9uArLLUbpFTkTF06/ZxYPuZdkKQvn1VOINVQ2nDRekW+V++JKSt3nHhrHo4twdoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BZTwCfG3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ukh1qgZ0Pyc6AEGHQTNHG7mtyRNJrHvmAWhwQAtmx+I=; b=BZTwCfG3bkIuyi+CJHakP1R3ns
+	hTOmH653YysrU0BwA2ihN6FdnGy9C88m67hLbo0EOuvbP8Kp88Zv2CTfAJdcBkJnGyXGFGMvkh+bk
+	+cOJvlNNwQQM8kpvtGTrA0jYHsC2y/yT3TfAcKqGRrKzNSYLqkmytQMW4OkyQ7irrWMA9Qa0JR4t7
+	cgyjMQcXdoYqbK8tZ9q2y4nt4/mgoECoFqIYzYJnWtS71NjP/B09cQOpx2Spwq1wZU54xV4p8wrXV
+	HkOrYgMN3vcXMb47pb6aUCc/ymUE28abFG3LuyXmobO9y7tYFKkplj+92baoYb4r7uJQZWKvnyH1J
+	7rYZpjDw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35088)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tUldx-0005jL-2L;
+	Mon, 06 Jan 2025 11:51:37 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tUldr-0004FT-16;
+	Mon, 06 Jan 2025 11:51:31 +0000
+Date: Mon, 6 Jan 2025 11:51:31 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
+	Simon Horman <horms@kernel.org>, UNGLinuxDriver@microchip.com,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>
+Subject: [PATCH net-next 0/9] net: dsa: cleanup EEE (part 2)
+Message-ID: <Z3vDwwsHSxH5D6Pm@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,51 +81,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241218091145.240373-1-paul.greenwalt@intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Dec 18, 2024 at 04:11:45AM -0500, Paul Greenwalt wrote:
-> E830 supports raw receive and generic transmit checksum offloads.
-> 
-> Raw receive checksum support is provided by hardware calculating the
-> checksum over the whole packet, regardless of type. The calculated
-> checksum is provided to driver in the Rx flex descriptor. Then the driver
-> assigns the checksum to skb->csum and sets skb->ip_summed to
-> CHECKSUM_COMPLETE.
-> 
-> Generic transmit checksum support is provided by hardware calculating the
-> checksum given two offsets: the start offset to begin checksum calculation,
-> and the offset to insert the calculated checksum in the packet. Support is
-> advertised to the stack using NETIF_F_HW_CSUM feature.
-> 
-> E830 has the following limitations when both generic transmit checksum
-> offload and TCP Segmentation Offload (TSO) are enabled:
-> 
-> 1. Inner packet header modification is not supported. This restriction
->    includes the inability to alter TCP flags, such as the push flag. As a
->    result, this limitation can impact the receiver's ability to coalesce
->    packets, potentially degrading network throughput.
-> 2. The Maximum Segment Size (MSS) is limited to 1023 bytes, which prevents
->    support of Maximum Transmission Unit (MTU) greater than 1063 bytes.
-> 
-> Therefore NETIF_F_HW_CSUM and NETIF_F_ALL_TSO features are mutually
-> exclusive. NETIF_F_HW_CSUM hardware feature support is indicated but is not
-> enabled by default. Instead, IP checksums and NETIF_F_ALL_TSO are the
-> defaults. Enforcement of mutual exclusivity of NETIF_F_HW_CSUM and
-> NETIF_F_ALL_TSO is done in ice_set_features(). Mutual exclusivity
-> of IP checksums and NETIF_F_HW_CSUM is handled by netdev_fix_features().
-> 
-> When NETIF_F_HW_CSUM is requested the provided skb->csum_start and
-> skb->csum_offset are passed to hardware in the Tx context descriptor
-> generic checksum (GCS) parameters. Hardware calculates the 1's complement
-> from skb->csum_start to the end of the packet, and inserts the result in
-> the packet at skb->csum_offset.
-> 
-> Co-developed-by: Alice Michael <alice.michael@intel.com>
-> Signed-off-by: Alice Michael <alice.michael@intel.com>
-> Co-developed-by: Eric Joyner <eric.joyner@intel.com>
-> Signed-off-by: Eric Joyner <eric.joyner@intel.com>
-> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+This is part 2 of the DSA EEE cleanups, removing what has become dead
+code as a result of the EEE management phylib now does.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Patch 1 removes the useless setting of tx_lpi parameters in the
+ksz driver.
 
+Patch 2 does the same for mt753x.
+
+Patch 3 removes the DSA core code that calls the get_mac_eee() operation.
+This needs to be done before removing the implementations because doing
+otherwise would cause dsa_user_get_eee() to return -EOPNOTSUPP.
+
+Patches 4..8 remove the trivial get_mac_eee() implementations from DSA
+drivers.
+
+Patch 9 finally removes the get_mac_eee() method from struct
+dsa_switch_ops.
+
+ drivers/net/dsa/b53/b53_common.c       |  7 -------
+ drivers/net/dsa/b53/b53_priv.h         |  1 -
+ drivers/net/dsa/bcm_sf2.c              |  1 -
+ drivers/net/dsa/microchip/ksz_common.c | 15 ---------------
+ drivers/net/dsa/mt7530.c               | 13 -------------
+ drivers/net/dsa/mv88e6xxx/chip.c       |  8 --------
+ drivers/net/dsa/qca/qca8k-8xxx.c       |  1 -
+ drivers/net/dsa/qca/qca8k-common.c     |  7 -------
+ drivers/net/dsa/qca/qca8k.h            |  1 -
+ include/net/dsa.h                      |  2 --
+ net/dsa/user.c                         |  8 --------
+ 11 files changed, 64 deletions(-)
+
+Changes since RFC:
+- Removed removal of phydev check in net/dsa/user.c
+- Addition of mt753x changes
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
