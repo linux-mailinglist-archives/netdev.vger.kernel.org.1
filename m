@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-155378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B656A020BC
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:33:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F80A020CC
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:35:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AB093A1F4F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:33:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6887B1885BB5
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04361D86F2;
-	Mon,  6 Jan 2025 08:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75671DB924;
+	Mon,  6 Jan 2025 08:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0961CEADD
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33C91BC58
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736152401; cv=none; b=YnaWkimT4YnZRdvy79PxDgu70iuqCOwPDzzroxgiBq7usL59tMDbDBmamdV5JFoiUCARj1jzDneHdD5LDYgkDpUp9MpIbzuREsGvZkNv0Y+1WDOXlIwqgo8zQAGDfg1oiIL2pAz6yxD09k/sSEchl6UG3xb2lKGX1NEXsx7yvFg=
+	t=1736152406; cv=none; b=sbhE1FmJsPWMTBUHULFWo3wjQU7999aywnuN8KnAFOWzpWY8BOWRiKopNaaygq+gtG2L3gMXXbAI7u3JSYr5N84mxJ/mYCj/1587XpGcgVUDKL3NLQUq40Sfv/rj+q6Wirn6NJy9ynDwGg2cIhc1ObkY1MlPrM3XfOonZyPHJBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736152401; c=relaxed/simple;
-	bh=N1ub58lj9lyJyeFNKljMf4FwQWesS63RiYMF3RwDe/0=;
+	s=arc-20240116; t=1736152406; c=relaxed/simple;
+	bh=njLUNVG87o9EtiZ+NhMDK8cl3t/mwBSSfynfcR8M9u8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RE5TBnjS+2Z0ircBxIzLpJjN1bG80bRpMQH0rGq5MNycV0e9JhbVXodOpdllBzFyFRV/oyOx1TAC+UK/2vgI2X8l3GOLp0M/uEY6w0VhvpM3drL8YOcdZYk1m9m5seU3uSZMnRhKBhNA26MvwIfFWbBNkCtLDITJSc3WDYYMpgY=
+	 MIME-Version; b=GqITue95gi+S1slvhN/QNPuHG6PCU6lEMw7BU+VseFAGLWkg5pKqBxs+waDwzXiqoQQ/YNMzATTtxIoeBLj5fYAKljuzPWkIkOzT0PFcyeQnlbOUh4zvqts3aSwSVWvAzSeGUi/H43AAC5L5HIy8PV9sovNJELmwSckxhfVpYx0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tUiXq-0003U1-WE; Mon, 06 Jan 2025 09:33:07 +0100
+	id 1tUiXr-0003U2-8g; Mon, 06 Jan 2025 09:33:07 +0100
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tUiXm-0078Km-0m;
+	id 1tUiXm-0078Kp-0s;
 	Mon, 06 Jan 2025 09:33:03 +0100
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tUiXm-004MX9-2w;
+	id 1tUiXm-004MXK-30;
 	Mon, 06 Jan 2025 09:33:02 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -53,6 +53,7 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Jonathan Corbet <corbet@lwn.net>
 Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
@@ -60,9 +61,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Russell King <linux@armlinux.org.uk>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v5 5/8] net: phy: introduce optional polling interface for PHY statistics
-Date: Mon,  6 Jan 2025 09:32:58 +0100
-Message-Id: <20250106083301.1039850-6-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v5 6/8] ethtool: add helper to prevent invalid statistics exposure to userspace
+Date: Mon,  6 Jan 2025 09:32:59 +0100
+Message-Id: <20250106083301.1039850-7-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250106083301.1039850-1-o.rempel@pengutronix.de>
 References: <20250106083301.1039850-1-o.rempel@pengutronix.de>
@@ -78,98 +79,48 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Add an optional polling interface for PHY statistics to simplify driver
-implementation.
+Introduce a new helper function, `ethtool_stat_add`, to update 64-bit
+statistics with proper handling of the reserved value
+`ETHTOOL_STAT_NOT_SET`. This ensures that statistics remain valid and
+are always reported to userspace, even if the driver accidentally sets
+`ETHTOOL_STAT_NOT_SET` during an update.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 ---
-changes v3:
-- update commit message
 changes v2:
-- drop PHY_POLL_STATS
-- add function comments
+- add "Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>"
 ---
- drivers/net/phy/phy.c | 20 ++++++++++++++++++++
- include/linux/phy.h   | 21 +++++++++++++++++++++
- 2 files changed, 41 insertions(+)
+ include/linux/ethtool.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index e4b04cdaa995..c8812a115114 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1398,6 +1398,23 @@ static int phy_enable_interrupts(struct phy_device *phydev)
- 	return phy_config_interrupt(phydev, PHY_INTERRUPT_ENABLED);
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index 4bf70cfec826..c0d3e3f62faf 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -371,6 +371,22 @@ static inline void ethtool_stats_init(u64 *stats, unsigned int n)
+ 		stats[n] = ETHTOOL_STAT_NOT_SET;
  }
  
 +/**
-+ * phy_update_stats - Update PHY device statistics if supported.
-+ * @phydev: Pointer to the PHY device structure.
++ * ethtool_stat_add - Add a value to a u64 statistic with wraparound handling
++ * @stat: Pointer to the statistic to update
++ * @value: Value to add to the statistic
 + *
-+ * If the PHY driver provides an update_stats callback, this function
-+ * invokes it to update the PHY statistics. If not, it returns 0.
-+ *
-+ * Return: 0 on success, or a negative error code if the callback fails.
++ * Adds the specified value to a u64 statistic. If the result of the addition
++ * equals the reserved value (`ETHTOOL_STAT_NOT_SET`), it increments the result
++ * by 1 to avoid the reserved value.
 + */
-+static int phy_update_stats(struct phy_device *phydev)
++static inline void ethtool_stat_add(u64 *stat, u64 value)
 +{
-+	if (!phydev->drv->update_stats)
-+		return 0;
-+
-+	return phydev->drv->update_stats(phydev);
++	*stat += value;
++	if (*stat == ETHTOOL_STAT_NOT_SET)
++		(*stat)++;
 +}
 +
- /**
-  * phy_request_interrupt - request and enable interrupt for a PHY device
-  * @phydev: target phy_device struct
-@@ -1467,6 +1484,9 @@ static enum phy_state_work _phy_state_machine(struct phy_device *phydev)
- 	case PHY_RUNNING:
- 		err = phy_check_link_status(phydev);
- 		func = &phy_check_link_status;
-+
-+		if (!err)
-+			err = phy_update_stats(phydev);
- 		break;
- 	case PHY_CABLETEST:
- 		err = phydev->drv->cable_test_get_status(phydev, &finished);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 81606d8c6a8b..c8848a963990 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1177,6 +1177,24 @@ struct phy_driver {
- 	 */
- 	void (*get_link_stats)(struct phy_device *dev,
- 			       struct ethtool_link_ext_stats *link_stats);
-+
-+	/**
-+	 * @update_stats: Trigger periodic statistics updates.
-+	 * @dev: The PHY device for which statistics updates are triggered.
-+	 *
-+	 * Periodically gathers statistics from the PHY device to update locally
-+	 * maintained 64-bit counters. This is necessary for PHYs that implement
-+	 * reduced-width counters (e.g., 16-bit or 32-bit) which can overflow
-+	 * more frequently compared to 64-bit counters. By invoking this
-+	 * callback, drivers can fetch the current counter values, handle
-+	 * overflow detection, and accumulate the results into local 64-bit
-+	 * counters for accurate reporting through the `get_phy_stats` and
-+	 * `get_link_stats` interfaces.
-+	 *
-+	 * Return: 0 on success or a negative error code on failure.
-+	 */
-+	int (*update_stats)(struct phy_device *dev);
-+
- 	/** @get_sset_count: Number of statistic counters */
- 	int (*get_sset_count)(struct phy_device *dev);
- 	/** @get_strings: Names of the statistic counters */
-@@ -1667,6 +1685,9 @@ static inline bool phy_polling_mode(struct phy_device *phydev)
- 		if (phydev->drv->flags & PHY_POLL_CABLE_TEST)
- 			return true;
- 
-+	if (phydev->drv->update_stats)
-+		return true;
-+
- 	return phydev->irq == PHY_POLL;
- }
- 
+ /* Basic IEEE 802.3 MAC statistics (30.3.1.1.*), not otherwise exposed
+  * via a more targeted API.
+  */
 -- 
 2.39.5
 
