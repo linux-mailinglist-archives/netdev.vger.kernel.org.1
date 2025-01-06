@@ -1,107 +1,253 @@
-Return-Path: <netdev+bounces-155476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE1BA026CA
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 14:39:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF9A6A026DD
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 14:41:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 508AD3A4F47
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:39:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92B89162301
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 13:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3901DE4D2;
-	Mon,  6 Jan 2025 13:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FC91DED6D;
+	Mon,  6 Jan 2025 13:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dkjLoYGF"
+	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="eVR47ZSy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F8C1DE3AD
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 13:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1361DE4C4;
+	Mon,  6 Jan 2025 13:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736170735; cv=none; b=DgF4606+RDZLAS/lRiYaUs8VTPhFDjllRzm3sOB93jg1LUVTxq2wNEBMOHHAuiep5ckqC88DhIm6dEI/XZJkjoujKzH4RP/CCBCXij3GdAdOdfHbH3ZdQBzb4bK+gTSI0cdDUcUkqw7V4h4XrwXjEIuo8k3/Sry6ioP7Xqkdi6g=
+	t=1736170816; cv=none; b=QgMqYMkJnD5Y4jmkfE2edWBucsthJNFaw8DEUIdk3eJnGDNyruCAlu3gT+QrYRcb5Bl27yw7VuYd/IqUT+uUlfK0Tgj8B4g3TW/FnIYrFIbxaB1tS7UNY+edYfHKPhfWQImSu54BaUrFBEpWYdiz3yg8+doW9bBQNYkABxr/88A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736170735; c=relaxed/simple;
-	bh=hjCxZydMzSLqC7uozkWiy6PV/LyYEbMQsEPXgWmlDuE=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=uWTRpRaOIeHV4er/oNrX4qnsn9qSrkMk8kwNs9LHhPkZUG07V31b1083QhbR/cyUqpiMvxKIGDtl1lhqo7X7Jo1cEWg+xnvP2aweQxJ4Dhzbgu/m9aSAv5r+VBifW5FLIDtNtKHoSHgHH9f2cor1Vwt/AieYj+tZuHCfmT+RL7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dkjLoYGF; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-436341f575fso148814055e9.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 05:38:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736170732; x=1736775532; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hjCxZydMzSLqC7uozkWiy6PV/LyYEbMQsEPXgWmlDuE=;
-        b=dkjLoYGF3U6VkrqA34zGZLGbySSdoEKOLkk88E3eIe3ThYpQF5JEq07aH94gM5Qy5Y
-         Ehi/1gzcoA2OliHWO4F/GyDryTqRBlBfFSL+XiPuMv593utNUutvPNDlGeDTBoHj5IN2
-         TYEMXdOGjFd7xR2B+wQFgSZ84I86l7rIt/OfjrdIJaoNxm42T/E53UwdzJaMJf/YBIHD
-         taI5yxAXsaA+TDVUEVmCHTQYbX940AHPROL4cIQj5+pCOpAhypvEPS4ebFUas+oBHXu3
-         C8bROYScYbeyNiF1yJY7E3ZYWZivBFvMYReh+zjKC+IkbDxKHacnhibimMUKiFq/WXjQ
-         CMmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736170732; x=1736775532;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hjCxZydMzSLqC7uozkWiy6PV/LyYEbMQsEPXgWmlDuE=;
-        b=fzz/EHTk7QPTW5CTqPWeWyb4d0WrIuV3YuftVA1cDaibPL09RnBxxjPhw187yoAjzM
-         7D6creypvaXAxr+T+cIH7slYdkfjdeTYDj393lKpg8YqA9nmHdcFAXamcNXJe9n7zV0p
-         MyyzbRpcQhT+Oz2kq58DO2UrkjdMSkjO8AaLEmPTQyJTDZNgX7O4ZgK/qaYgrciIVXVz
-         UAPGiE3BzRIixJ3F9AhDOfhobRabtzbicln5Tv2yUC3MC74r6UBuoVtREZpTWDi5GIbO
-         WEZSYfpir9HrWUWi8P9qgwcskU4lXbr0A6EcDrkruMoSyayWb+6rR+t0yuAs66E/2BMp
-         rVgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXTeauHQXe/bEH5ZoriKdw5Tjfuh0qn+rTYLGkTirE7z0WxF7OnroJCL7SNKNxygo/Dm8jLyw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxdY5hthCtjD2HB3+O15AKEoH59EA86aV4kCAzNqok79sMr3as
-	tJjODSJ8vpwNkK7SEalxYM+ryLmnEp/TFdje3pNoX372xTrlVCbS
-X-Gm-Gg: ASbGnctcEKzClSPzmwOJb41+fhlHbr+BRzmeeiase7H9B+NB2T4zVIkBEpU749z3eFc
-	Yf6BrM4qAq0PDxjilToTF3GcdxhP4UORPOUf6p3gH6eimwRpJcnf41H3HPKkz9ArajYAZj6csqR
-	iBMcl17pJijT7lvOiB31uPMoCGApzfnRnk3udAqbV6N2pb33Ij0Q+QnjiZCOnwTzT3AFkwIMZNn
-	V8ncYxrIjyWsa1DoO7GdNx8XYS5c9rEmTQniXoq/9STc1KhFNdAI8Ck8MtoFGSyJ/UdOQ==
-X-Google-Smtp-Source: AGHT+IHpfZQExGjYlcEb/b3Fyn4akRcbffXRjiDg3YJLNb1aCt4ztPRCcyMIeTujDEjMFMzzrM6clQ==
-X-Received: by 2002:a05:600c:1d07:b0:434:f739:7cd9 with SMTP id 5b1f17b1804b1-4366854c049mr521680255e9.9.1736170731424;
-        Mon, 06 Jan 2025 05:38:51 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:d10f:360f:84a5:c524])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4364b053e91sm631124615e9.1.2025.01.06.05.38.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 05:38:51 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com
-Subject: Re: [PATCH net-next 3/3] netlink: specs: rt_link: decode ip6tnl,
- vti and vti6 link attrs
-In-Reply-To: <20250105012523.1722231-4-kuba@kernel.org> (Jakub Kicinski's
-	message of "Sat, 4 Jan 2025 17:25:23 -0800")
-Date: Mon, 06 Jan 2025 13:38:40 +0000
-Message-ID: <m21pxgnjtr.fsf@gmail.com>
-References: <20250105012523.1722231-1-kuba@kernel.org>
-	<20250105012523.1722231-4-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1736170816; c=relaxed/simple;
+	bh=4emKOfZ/O0yjFty8Iare45FHTZpCl2r2jU+8TaUtb8I=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=C2y0s0a7CWcaEnILItCNpnlQLq3YzYfP1Cxajaf0+JhHlb2HKxnP5PA68YTgixlat4rmGsCj5rjAq6sAv8n4YLS+apFhOVNZ/BZfaMNP1Cm7Fw8yq0vFYP1TQYfbr3KShVatk0SyEbCwNaKhHVq8+wHhbelgsBeam9pkdIx4uNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=eVR47ZSy; arc=none smtp.client-ip=148.6.0.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 9BE0732E01CE;
+	Mon,  6 Jan 2025 14:40:10 +0100 (CET)
+Authentication-Results: smtp012.wigner.hu (amavis); dkim=pass (1024-bit key)
+ reason="pass (just generated, assumed good)" header.d=blackhole.kfki.hu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	blackhole.kfki.hu; h=content-id:mime-version:references
+	:message-id:in-reply-to:from:from:date:date:received:received
+	:received:received; s=20151130; t=1736170808; x=1737985209; bh=o
+	SPf0Psyc/TqoBccVQvmLVP/sXwAecmcaTnAxvPhyyw=; b=eVR47ZSyygFX5QXCP
+	p+NQEEIcwSdJ8w+bF6dc1t03ozbQseJQWbzYFK4MqRFaMzeEmKPNczDyBoRRAxNf
+	pmx5R+DswcVYUfkw/latnOY49NfJzSIIupElOhjXcow7uTI3LZYmh2YZ2+yYPF/j
+	e62L40whgHd7yrJqc2jzIQWQcM=
+X-Virus-Scanned: Debian amavis at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+ by localhost (smtp2.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id CC743cccf_DH; Mon,  6 Jan 2025 14:40:08 +0100 (CET)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 9792732E01CA;
+	Mon,  6 Jan 2025 14:40:07 +0100 (CET)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id 6FD9C34316A; Mon,  6 Jan 2025 14:40:07 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id 6E623343169;
+	Mon,  6 Jan 2025 14:40:07 +0100 (CET)
+Date: Mon, 6 Jan 2025 14:40:07 +0100 (CET)
+From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+To: =?ISO-8859-2?Q?Sz=F5ke_Benjamin?= <egyszeregy@freemail.hu>
+cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+    lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org, 
+    amiculas@cisco.com, kadlec@netfilter.org, 
+    David Miller <davem@davemloft.net>, dsahern@kernel.org, 
+    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+    linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v6 1/3] netfilter: x_tables: Merge xt_*.h and ipt_*.h
+ files which has same name.
+In-Reply-To: <33196cbc-2763-48d5-9e26-7295cd70b2c4@freemail.hu>
+Message-ID: <f1f0e509-d14f-3731-0b44-3727dfdf18d9@blackhole.kfki.hu>
+References: <20250105231900.6222-1-egyszeregy@freemail.hu> <20250105231900.6222-2-egyszeregy@freemail.hu> <8f20c793-7985-72b2-6420-fd2fd27fe69c@blackhole.kfki.hu> <33196cbc-2763-48d5-9e26-7295cd70b2c4@freemail.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/mixed; boundary="110363376-817496460-1736170753=:36632"
+Content-ID: <683f5b24-6318-e169-2e5f-bc0c061c9ba8@blackhole.kfki.hu>
 
-Jakub Kicinski <kuba@kernel.org> writes:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> Some of our tests load vti and ip6tnl so not being able to decode
-> the link attrs gets in the way of using Python YNL for testing.
->
-> Decode link attributes for ip6tnl, vti and vti6.
->
-> ip6tnl uses IFLA_IPTUN_FLAGS as u32, while ipv4 and sit expect
-> a u16 attribute, so we have a (first?) subset type override...
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+--110363376-817496460-1736170753=:36632
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-ID: <f1fa5e61-cfe6-ed0f-a975-ddc6644396cc@blackhole.kfki.hu>
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+
+On Mon, 6 Jan 2025, Sz=F5ke Benjamin wrote:
+
+> 2025. 01. 06. 9:19 keltez=E9ssel, Jozsef Kadlecsik =EDrta:
+>> On Mon, 6 Jan 2025, egyszeregy@freemail.hu wrote:
+>>=20
+>>> From: Benjamin Sz=F5ke <egyszeregy@freemail.hu>
+>>>=20
+>>> Merge xt_*.h, ipt_*.h and ip6t_*.h header files, which has
+>>> same upper and lower case name format.
+>>>=20
+>>> Add #pragma message about recommended to use
+>>> header files with lower case format in the future.
+>>>=20
+>>> Signed-off-by: Benjamin Sz=F5ke <egyszeregy@freemail.hu>
+>>> ---
+>>> include/uapi/linux/netfilter/xt_CONNMARK.h=A0 |=A0 8 +++---
+>>> include/uapi/linux/netfilter/xt_DSCP.h=A0=A0=A0=A0=A0 | 22 ++--------=
+------
+>>> include/uapi/linux/netfilter/xt_MARK.h=A0=A0=A0=A0=A0 |=A0 8 +++---
+>>> include/uapi/linux/netfilter/xt_RATEEST.h=A0=A0 | 12 ++-------
+>>> include/uapi/linux/netfilter/xt_TCPMSS.h=A0=A0=A0 | 14 ++++------
+>>> include/uapi/linux/netfilter/xt_connmark.h=A0 |=A0 7 +++--
+>>> include/uapi/linux/netfilter/xt_dscp.h=A0=A0=A0=A0=A0 | 20 ++++++++++=
++---
+>>> include/uapi/linux/netfilter/xt_mark.h=A0=A0=A0=A0=A0 |=A0 6 ++---
+>>> include/uapi/linux/netfilter/xt_rateest.h=A0=A0 | 15 ++++++++---
+>>> include/uapi/linux/netfilter/xt_tcpmss.h=A0=A0=A0 | 12 ++++++---
+>>> include/uapi/linux/netfilter_ipv4/ipt_ECN.h | 29 ++------------------=
+-
+>>> include/uapi/linux/netfilter_ipv4/ipt_TTL.h | 25 ++++--------------
+>>> include/uapi/linux/netfilter_ipv4/ipt_ecn.h | 26 ++++++++++++++++++
+>>> include/uapi/linux/netfilter_ipv4/ipt_ttl.h | 23 +++++++++++++---
+>>> include/uapi/linux/netfilter_ipv6/ip6t_HL.h | 26 ++++--------------
+>>> include/uapi/linux/netfilter_ipv6/ip6t_hl.h | 22 +++++++++++++---
+>>> net/ipv4/netfilter/ipt_ECN.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 |=A0 2 +-
+>>> net/netfilter/xt_DSCP.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0 |=A0 2 +-
+>>> net/netfilter/xt_HL.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 |=A0 4 +--
+>>> net/netfilter/xt_RATEEST.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0 |=A0 2 +-
+>>> net/netfilter/xt_TCPMSS.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0 |=A0 2 +-
+>>> 21 files changed, 143 insertions(+), 144 deletions(-)
+>>=20
+>> Technically you split up your single patch into multiple parts but not=
+=20
+>> separated it into functionally disjunct parts. So please prepare
+>>=20
+>> - one patch for
+>>  =A0=A0=A0=A0include/uapi/linux/netfilter_ipv6/ip6t_HL.h
+>>  =A0=A0=A0=A0include/uapi/linux/netfilter_ipv6/ip6t_hl.h
+>>  =A0=A0=A0=A0net/netfilter/xt_HL.c
+>>  =A0=A0=A0=A0net/netfilter/xt_hl.c
+>>  =A0=A0=A0=A0[ I'd prefer corresponding Kconfig and Makefile changes a=
+s well]
+>> - one patch for
+>>  =A0=A0=A0=A0include/uapi/linux/netfilter/xt_RATEEST.h
+>>  =A0=A0=A0=A0include/uapi/linux/netfilter/xt_rateest.h
+>>  =A0=A0=A0=A0net/netfilter/xt_RATEEST.c
+>>  =A0=A0=A0=A0net/netfilter/xt_rateest.c
+>>  =A0=A0=A0=A0[I'd prefer corresponding Kconfig and Makefile changes as=
+ well]
+>> - and so on...
+>>=20
+>> That way the reviewers can follow what was moved from where to where i=
+n a=20
+>> functionally compact way.
+>
+> First suggestion was to split it 2 parts, it is done, i split in 3 part=
+s, it=20
+> was more then needed. Your idea will lead to split it about to 20 patch=
+=20
+> parts, then the next problem from you could be "there are to many small=
+=20
+> singel patches, please reduce it".
+
+It'd mean 8 patches according to the merged match/TARGET files: mark/MARK=
+,=20
+connmark/CONNMARK, dscp/DSCP, rateest/RATEEST, tcpmss/TCPMSS, ecn/ECN,=20
+ttl/TTL, hl/HL. Each one of them would be a unit which then could be=20
+reviewed, tested independently all of the other ones.
+
+> If you like to see it in a human readable format you can found the full=
+ diff=20
+> and the separted patches also in this link:
+> https://github.com/torvalds/linux/compare/master...Livius90:linux:uapi
+>
+> Please start to use any modern reviewing tool in 2025 and you can solve=
+ your=20
+> problem. In GitHub history view i can see easly what was moved from whe=
+re to=20
+> where in 1-3 mouse clicking, eg.: click to xt_DSCP.h then click to xt_d=
+scp.h=20
+> and you can see everything nicely. So it is ready for reviewing, please=
+ sit=20
+> down and start work on it as a maintainer, It's your turn now.
+>
+> https://github.com/torvalds/linux/commit/1ee2f4757ff025b74569cce922147a=
+6a8734b670
+
+Thanks the suggestion: still, all changes are lumped together and cannot=20
+be handled separatedly.
+
+>> Also, mechanically moving the comments results in text like this:
+>>=20
+>>> /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>>> -/* ip6tables module for matching the Hop Limit value
+>>> +/* Hop Limit modification module for ip6tables
+>>> + * ip6tables module for matching the Hop Limit value
+>>=20
+>> which is ... not too nice. The comments need manual fixing.
+>
+> I do not know what small and compact "title" should be good here in the=
+=20
+> merged header files. Most simplest solution was to copy paste them and =
+merge=20
+> these titles text.
+
+It's pretty trivial in the example: "ip6tables module for=20
+matching/modifying the Hop Limit value". But any automated merging needs=20
+manual verifying and fixing if needed.
+
+> You should know it better, please send a new compact and perfectly good=
+=20
+> "title" text for all header files which are in the patchset and i can c=
+hange=20
+> them finally. I think it is out of my scope in this business.
+
+Sorry, but no: it's your responsibility to produce proper patches,
+including the modified comments.
+
+>> I also still don't like adding pragmas to emit warnings about=20
+>> deprecated header files. It doesn't make breaking API easier and it=20
+>> doesn't make possible to remove the warnings and enforce the changes=20
+>> just after a few kernel releases.
+>
+> I also still like adding pragmas, because duplicating these header file=
+s=20
+> is not acceptable in SW dev/coding. It must have to be taught for the=20
+> user how should use it in the future. This is a common way in any SW,=20
+> for example Python or Matlab always send a notice in run-time for you=20
+> which will be a deprecated things soon, when you import or start to use=
+=20
+> an old function or module.
+>
+> Why don't you think it can not help breaking API easier? This is the=20
+> bare minimum what you can do for it. Tell to user what should use=20
+> instead, then 3-5 years later you can change it finally, when 90-95%=20
+> percent of your customers learnt to it and already started to use it in=
+=20
+> their userspace codes.
+
+However as far as I'm concerned, breaking API is not a decided and=20
+accepted thing. Breaking API in the kernel is not a "normal business" at=20
+all.
+
+Best regards,
+Jozsef
+--110363376-817496460-1736170753=:36632--
 
