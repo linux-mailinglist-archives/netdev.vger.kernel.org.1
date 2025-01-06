@@ -1,149 +1,211 @@
-Return-Path: <netdev+bounces-155396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0A8A0226F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:03:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B55A022BD
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:14:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4586B18854D7
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:03:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD19161044
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E331D90BC;
-	Mon,  6 Jan 2025 10:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FDA1D9591;
+	Mon,  6 Jan 2025 10:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="czCNw0YF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2040.outbound.protection.outlook.com [40.107.96.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C513D1D89FE
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 10:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736157809; cv=none; b=Zfp4LKTVT5iv9mhm/PLxI6lNJ6rQw1/8ktgijZ+YAjlvBxnC8UFSkHQlk4I0UiqslwtqwVjH9Z2NV/t/RZ5mwihMvMrw32/f7k7p78tcFwWa9dgkjZEavubA3iH2SJfH9cMUDGrEu2eX7JmYBV9jsx01B45kjLOLEXxTiqcUTqc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736157809; c=relaxed/simple;
-	bh=5rZA87sgaSizDUAhMWe2cGkjlGEgg0xeoXJfyWjS474=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FX6Z3mmf503LzrKiguRhAyfqgGKxAgqRhOj9j2BVqi5/5NNSzpgVSwaCPLf/41W2HYM2i43faafUNtDKl+44eLJGWK4ku0MSVZa2b99u+vghYoazUolhlfpo9hOd6p+jiucSS873S5iY9CmidOrKmAomE5NW12cQ4cWnEXs236U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ac98b49e4dso136710565ab.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 02:03:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736157806; x=1736762606;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zwgJxPTUKSF4qMLpX2DkfpWAh4DxTz/ZHzgWcnT+2Tk=;
-        b=pMMgBBjBbcFeM+Ijlnk0zeC5QuVHDLxFr6aa2X27zB4Rl9p7fl1np4RReGL8BRToYj
-         +6RKfbiimQZBKA7Mwyq+PPgT/bWYvnTWQGyE9+h9TXYJ4rvdNZiS7Q87DuklWmrB606Z
-         iCpsLCM4+0CF4ySruCHCcA4phKfP23rQREI5U3s2VETQDaLUnyEg58mnlxzJkgx9C2SL
-         2ms70zC95eUHJUN1irwOEjqAUFve39aNx3wzCcApsDo9VNJJ5zOlKUjlz9s6gXR8ydlK
-         CWLtun6bNJBMYjrN1v3PAe95wUqx/DwwJI8dgW2XZlMMxZdZF7bsADJlMhkVdP5WIb5Z
-         amCw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVjn0xVJUQlc3/O8sGnPVCXAxVAC45HW7VGkYxeuyCdPP7inRrjkBf+bvQWCf+SfGNFaWk8Ok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEEeqEKx7IzUycNRvxwlwxwlAeGVwrbFP1XM1SuNJ6slY+2RDR
-	90dMU9Hf7IUIyLrexNRUQEeTx+bfCxtHRIn5f3m0fhcAgs+U4bfvFLan55XGiFO8OtOqEBgW9dY
-	kW+14EqsKtvJQ1n8WtrhRRbvYiia0IEYTJxUzhmyowUKpyRayEBYBAUk=
-X-Google-Smtp-Source: AGHT+IHxGXPVKZrj2VpZjzaFaHlqwrxC7rrNNtc3hFkYAwGi2M46OrDfHFQpRKaDcq/NdmKszv4Z4T1+hmU0zc33iSOsG5WNS11o
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8D8B676;
+	Mon,  6 Jan 2025 10:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736158446; cv=fail; b=oJVCwGAl2BybZ3avSq8vDbJUCsPPrkz12hhKhDRDe13hzFbWTJ7UOwrRuYmcvMtoc2VgrAqcVr22xTbA1q9QFIqeGneOqgnXUo1Eyy814g1YLPEUbl4SQxHcMZpk6CSO20Io32QYy4V1QJnvBOzBq/oiK5VDc8UsrChGVkNuS7c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736158446; c=relaxed/simple;
+	bh=USo/hakTXz+mha+mIcz5wi8q5by2BcqyPEDtAySchBo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=lsEiVoX6raV+1SiaFzJErj/NPECVSi3XMZStMFqVmqjnwGb+t8wpusCJ/zYzGkDsibfKD7vC03Wtl8BmNZS+2p/UDk6KgC4tHzdf9jDL/zA2Rh4PjXflLiiCBrVzGA5bB9Fpkdq8fckQOjt3BzyldwLq42EcUrcWooW6rR8mUaw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=czCNw0YF; arc=fail smtp.client-ip=40.107.96.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oGwkLX7Oi2OkdBSW5XFf182yojkfFv3mdR9B99FlarBLUCUdpUGKM4DikE0Axk6OUMaS1EmRhne9+sCT415ilZ8rRgjSrMwzrPoylzVakns/V2XgQ0Qknw7eJTbjTdS0NiwJ/24cg+lg93JW66q/rXOtmeqTOLEghICBDkWMjYBB81r5q0J0PzZ9w3oYTbFAnijcbZQv8VQViF2EvHWBulM+W+YfcRvA1fmnFDcrNBjuCNnh40IZPzzB/Y6Mymjf4wjwiXNQf4OL/9DZsyjZsHZcu9Rfxh+9wKVolAMRx6E3r63L0WzTQBYd24xukC8qvB0B1Sfjs/1qLJZjpWLAHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OqS126dQ6dovlyTfH8qyZz3WvHZx1RPU4nPJcQlyl8Q=;
+ b=uehXaKSI12uhqiavMnfp1lweaM5b9W1ja1gNMhJZ/navJ1T5HBYvDk5Crk74iFCO/IiwDwSmMVEQ7uoI+IqBFawqpdzwCApNobKtR6nWEEV2OUI/rMsNzazvr5TihxKr5QhU49UrUnu0yzF/2wUIf3Hwdpd859HELoDt1ru/YYwGTRp/jlufZPBSdb7ILSP6OAwSEHCZp5LZz/iFiovDgPVLwF8PebZQdlqtuMvvu8LhchUVD3c7ucJN3O/f8MiPRdox44O/s1fQzToc+fuMLtb6hA6+JbTRNjPtOe8D0616PlqCnWom4Dg9FwIrwPaZreYuuICUPSm4wI+eowBwKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OqS126dQ6dovlyTfH8qyZz3WvHZx1RPU4nPJcQlyl8Q=;
+ b=czCNw0YFyv5Z6fa3Jak8DeYK0lqr1RwM9mDZsg6CD/eUizhKeHXKoIP9fBxfE2m1ReiM3l/QksG2N6H/sE7QoRAOHW0621QjqcqtbAVCLze3dgvjPnwaU+BQk+5Mzab33HtHvki6XT86218OshJGx/so4nQx6J++aw399j1SFrInzEDEbueGvxnOQbuSWp35L/fexwKEpbOcj/q9CPMgyVLuCq431vjZQYfwf7EBnRZ0Apgeu9Af07Q/zWQRR9aWdfpNJB3ZqXCO7HnP/2SrIwmHlqIXw8npNxqR3gzqYp9A7BwWIeooxl/nefgAFJ2Sxh/6L+shR3zzcEHuw/VjbQ==
+Received: from CO1PR11MB4771.namprd11.prod.outlook.com (2603:10b6:303:9f::9)
+ by CYXPR11MB8709.namprd11.prod.outlook.com (2603:10b6:930:dd::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Mon, 6 Jan
+ 2025 10:13:56 +0000
+Received: from CO1PR11MB4771.namprd11.prod.outlook.com
+ ([fe80::bfb9:8346:56a5:e708]) by CO1PR11MB4771.namprd11.prod.outlook.com
+ ([fe80::bfb9:8346:56a5:e708%4]) with mapi id 15.20.8314.015; Mon, 6 Jan 2025
+ 10:13:55 +0000
+From: <Divya.Koppera@microchip.com>
+To: <andrew@lunn.ch>
+CC: <Arun.Ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<richardcochran@gmail.com>, <vadim.fedorenko@linux.dev>
+Subject: RE: [PATCH net-next 2/3] net: phy: microchip_t1: Enable GPIO pins
+ specific to lan887x phy for PEROUT signals
+Thread-Topic: [PATCH net-next 2/3] net: phy: microchip_t1: Enable GPIO pins
+ specific to lan887x phy for PEROUT signals
+Thread-Index: AQHbXb8C2bYMbu7M1EiwiFBR/Kym97MFFZ4AgAR1fwA=
+Date: Mon, 6 Jan 2025 10:13:55 +0000
+Message-ID:
+ <CO1PR11MB47712D530FA8F49E68340533E2102@CO1PR11MB4771.namprd11.prod.outlook.com>
+References: <20250103090731.1355-1-divya.koppera@microchip.com>
+ <20250103090731.1355-3-divya.koppera@microchip.com>
+ <0c121fff-a990-46e5-b250-8948b717f816@lunn.ch>
+In-Reply-To: <0c121fff-a990-46e5-b250-8948b717f816@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB4771:EE_|CYXPR11MB8709:EE_
+x-ms-office365-filtering-correlation-id: 5568392e-2e43-4dae-819a-08dd2e3ad412
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4771.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7055299003)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7055299003|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?5g0zHjBsjU6Mt+u0iSxqzFuTaRjr/MurGny4PH9I1idgrKX1QBgYcVaYMJTM?=
+ =?us-ascii?Q?ALbPvZzHH40QxGfjBBjvF5PZu1hoYJckbW6Eq0uNzkbAClOQNVlQx+qISC37?=
+ =?us-ascii?Q?LHheJGlmq3io+69Ss0NHAulbTgdpzNE5gY+PXL15thyMIgO6f3OtUP0VhE5X?=
+ =?us-ascii?Q?lg6r2V0YBy5NIUFYdzVbXm5MlswI6gUeasL7xRFgsFLUCulUg071nKyJHvCg?=
+ =?us-ascii?Q?WFWqvRoorAlvcDI0DzVvjnUXlh6YsLiHdUjRCQtE9DMkUQ9WALPlG3dcl9CB?=
+ =?us-ascii?Q?yUZT1qJ0Qh0IzAGTHOFiryxaVUpTW58yM30TC14RbkWEOTbW1f9MYqfSjqOC?=
+ =?us-ascii?Q?g4lHpyc9LTYYBioY+L4apALbjtYx64fX0teh4r3uSJRdNpWkzQR8gvRKyPxV?=
+ =?us-ascii?Q?OqFDMQsKJKpMe4UVW3GK2Joghf0eMIPS/GRQAQQ98aLYCmfZ2xvxENxLjfVn?=
+ =?us-ascii?Q?02F2AQ1WII+MWIOZJu3rpg5C31XrADUtpuFUjUs7xAz/LBIZ56wDXSPOB/9H?=
+ =?us-ascii?Q?gV52PiDA5y1rGmhJJcIQABjGwfW8pHkfb/cgaPR5OW0eMiBVx9gxUzrIXQ+b?=
+ =?us-ascii?Q?Zygy9ntK3FWwKfd38c7/qht2uYxP8mi4eAXWVigX1UzIUNBrFZgdoHPcZ3O7?=
+ =?us-ascii?Q?2fOxFQJXD3JDXmZa2S4i5CUv8YFAtgbyuHOgpDiLdMAb4NZVDV6HXmIVx7xR?=
+ =?us-ascii?Q?YLhYQi8oFIhnBQgLWld4TO7UG+qqVu4VCLAU8RGZOtdm6cO44KkUoHeTLT00?=
+ =?us-ascii?Q?/Rm8BsLtMuslz4H6Nm2T5i2CwsmDlz7+QaFk0ILCSrWIA37WpzzkmfRfh9rc?=
+ =?us-ascii?Q?Gz7H1NqhHcIe2aO6XJJoIrJRkKyvNa2IxXkdw6aUtVAgV75k9kkMo4FMotbm?=
+ =?us-ascii?Q?yIc7l5EDOJsXUhNKhjhOgnOIwwDjCgKrTPF035PbF/NoC3noobQnUbwy8mjW?=
+ =?us-ascii?Q?RGnpZJZnQ97CrBtq8V78kFUegx4Nz8InbJlh53zFDXAJZVxE/iu6g4UkmGMy?=
+ =?us-ascii?Q?0xQw6ZQJQsp5XRdBFAxkSQfn27bnrOJoKq9RSkksvQspfBNR+mrUBJ/jcuz4?=
+ =?us-ascii?Q?wFla9d3IcVlDSOYkJ/B7s/VCi1Ro0+cAPDmKu3h1QhjvaaERZ4xtZ742On/L?=
+ =?us-ascii?Q?I8q1u1H8qU8QlFGQA8ZG69bu5x6LWqZkHiNiy6wS1ImwJ4xPO5Sjj5G9Ng+O?=
+ =?us-ascii?Q?zqAn75s+KHmY44/rI+eq7A3XxrFiTkW9epaZewqF0olxHmziC4tmdflEn1uI?=
+ =?us-ascii?Q?SUzXxLFKfvH35Sio3DS5OWHASfj1YDoLaDvlU3A64gm895TUd+MTdttXHM3w?=
+ =?us-ascii?Q?0URVCtKujRRKsP55RIn7tyuFHRVedirLnBGaykly6CIRezINQ2bH+kd3v0A9?=
+ =?us-ascii?Q?Nc1F6yd3tH4VUF/WCytu2m7E7GBnw9G00vQLlVKYgv56eVX6SokkR4ZtEhbZ?=
+ =?us-ascii?Q?Qu6VWmdsOjnRj09kZUh9KCsFgfMZTTK455p/vV5+FtMWAQlpe7UwMg=3D=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?//o5XkYMUb3vruWfAV59fwBmcgM2A86nAfX8tay/DlPP7FPmHPEElMEhwWjZ?=
+ =?us-ascii?Q?mzVzIk5pJqOEJ8Yn/Q/cEMjoz0HUbqlXTOxzS0nkh/pa34TwR7RFkzL02Lm7?=
+ =?us-ascii?Q?uX8ntX/SZ9kReUc8F4osKpKb+NLOZvQSUv4BTuRmcdRWE1p7iEaxB53qFCU1?=
+ =?us-ascii?Q?iXhUmyhj0KBCz9meXMUJCZgV/dFsDKLL95pxI3L3e1PKX10kcPNtbI6qdthz?=
+ =?us-ascii?Q?K/tZege81zn+kY1IIZBy2ZAF3pY+owtP68Ctfl+SHG5ZndCv/FiFpsrE1nbp?=
+ =?us-ascii?Q?teKZfMXXSb0lQ3Qh0n3nrp5nRe09isrjldzTxyP6lIMTwSElUI+tFSnx3Ic7?=
+ =?us-ascii?Q?9W2GdM4L5Cnc7JeP216xa5VwKuKgSNoa18gi2qNdc6eFIHZmDgxydSXTxEXr?=
+ =?us-ascii?Q?JTVi9kh1rQBGYfazR5Nhpifz/XZEqiSC1PisL3tyUf2UjT5cARMDJovwuJrY?=
+ =?us-ascii?Q?V3c476DQ79nifNOpNL0LPMn1L3RxMveNdlkLCSYfi3T2/zSikmoJz2lGvVA2?=
+ =?us-ascii?Q?K2u1m+SsGjDz3vtOyVZkqfT/e1FEQMyFNtt99eKBfPNzugm2W7vQj4WrJD/n?=
+ =?us-ascii?Q?h59mPXNfm5ldETvLsGsnOjcaKs1tBqrv7+MTuinpHLNnhRuDiTIsSsh4ssen?=
+ =?us-ascii?Q?0zasE5ldJxCDBSoLXoC7aXrxmqXsv56JyOTm72lq1uBLuBemJexl5qj6hvKy?=
+ =?us-ascii?Q?IMrTfTvrjo5TLM9QuttuEKeDrQ5vlRvf8pj9unW6RumJTecXCXXosUD03W+v?=
+ =?us-ascii?Q?MlPs2a9xwebibQkUDm4vegOBUtxrQXgouB6OeZdhyo5blUS7cZgZS5fqQe2h?=
+ =?us-ascii?Q?fgs3cigbMNpRyGbV96/GpV9VFbHNg1qXZHmm3b2F3F5Zl7G7jsyTfFnmAR97?=
+ =?us-ascii?Q?22Z/9scvCPZdJa6DpwVW48MF5gjvOghzjHVjDcuGWacQy6y2PO3szAKY0LEN?=
+ =?us-ascii?Q?bZymySSlUnfP8o7X+fNO/V+Le1wo7Yz8RfU/ShyCC2sbSUNAn1HDp+jRSp+l?=
+ =?us-ascii?Q?w/Ckh217X6q/BINdyRpm95qzH9Mg/acNrRUXUK9kp8SOYBzR+V/eNmxrXDnu?=
+ =?us-ascii?Q?3oX3DfaZ+uvgDf87hmzn8i6SPifs1YRHj8zJWg98Mh38ZZiva7+g6oIqzLks?=
+ =?us-ascii?Q?W3SbeKQG8NkEHoRU53jWHqgP7bHWDbvL0WAv9exXuteWKKPRnfWWjWkiK8bS?=
+ =?us-ascii?Q?0GMOJgEkHLo5HygnEvXrnuqrerqJEgKkPoJGF05R8Vxj/K5BX5lKOs4pFl4K?=
+ =?us-ascii?Q?Q9tH/wSK6I8OA92GtdmXQU1Un2iorAq0YWD29sE7KE+FRUfdqfb9B0OhWahc?=
+ =?us-ascii?Q?F04pn4ulQbnTYDvLROaVJWPWbQc6hQagyXJQegXXSWL1IJo4gRLripwyUZmX?=
+ =?us-ascii?Q?AnIj0KSsKgDmRtH+jupU5XgSbvIzGMWMC3mWP2+e9/yxz1ovN9LaZNQxlbEq?=
+ =?us-ascii?Q?itsoSV8wnPMi0/TCdMXC5iQFGvc8t8c2KZyPivGXW1/yaR4WqtSd1OfNvpuD?=
+ =?us-ascii?Q?I2H2CXVnxBbq55ETAw99YyOkSJHURFZi86Cd+wrCqOxpmwe8szaOqfODGEIo?=
+ =?us-ascii?Q?gLlvg7JUt1jP0XvYVDT6Di/6Y3eKJihJb3B5QGOlZ0RHpwlVWyMtCpACRS2Z?=
+ =?us-ascii?Q?rA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:194c:b0:3a7:7811:1101 with SMTP id
- e9e14a558f8ab-3c2d53403b3mr548640155ab.20.1736157805822; Mon, 06 Jan 2025
- 02:03:25 -0800 (PST)
-Date: Mon, 06 Jan 2025 02:03:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <677baa6d.050a0220.a40f5.0009.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING: ODEBUG bug in __mod_timer (2)
-From: syzbot <syzbot+50abac586029cf8758e0@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4771.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5568392e-2e43-4dae-819a-08dd2e3ad412
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jan 2025 10:13:55.6977
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 991lcFX4pQIXrc8gRy2HOe/Uta6I/LCMGrArbLvAKiagz6hicKoJd73UVDf+e+Z5yHoQV1GhFyn2fy98n4E7fNyfXH8iQ1Z0uDUBb7ZsXGs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8709
 
-Hello,
+Hi Andrew,
 
-syzbot found the following issue on:
+Thanks for the review.
 
-HEAD commit:    ccb98ccef0e5 Merge tag 'platform-drivers-x86-v6.13-4' of g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11a2d6df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=86dd15278dbfe19f
-dashboard link: https://syzkaller.appspot.com/bug?extid=50abac586029cf8758e0
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Friday, January 3, 2025 7:36 PM
+> To: Divya Koppera - I30481 <Divya.Koppera@microchip.com>
+> Cc: Arun Ramadoss - I17769 <Arun.Ramadoss@microchip.com>;
+> UNGLinuxDriver <UNGLinuxDriver@microchip.com>; hkallweit1@gmail.com;
+> linux@armlinux.org.uk; davem@davemloft.net; edumazet@google.com;
+> kuba@kernel.org; pabeni@redhat.com; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; richardcochran@gmail.com;
+> vadim.fedorenko@linux.dev
+> Subject: Re: [PATCH net-next 2/3] net: phy: microchip_t1: Enable GPIO pin=
+s
+> specific to lan887x phy for PEROUT signals
+>=20
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e
+> content is safe
+>=20
+> On Fri, Jan 03, 2025 at 02:37:30PM +0530, Divya Koppera wrote:
+> > Adds support for enabling GPIO pins that are required to generate
+> > periodic output signals on lan887x phy.
+>=20
+> Do the GPIO have other functions? Can they be used as additional LEDs?
+>=20
+> I'm just thinking about resource allocation...
+>=20
 
-Unfortunately, I don't have any reproducer for this issue yet.
+We are supporting 2 events(PPS, REF_CLK) out of it PPS is default.
+REF_CLK is a GPIO pin which has led2 as alternate function.
+But lan887x uses led3 as default led.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d24eb225cff7/disk-ccb98cce.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/dd81532f8240/vmlinux-ccb98cce.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/18b08e4bbf40/bzImage-ccb98cce.xz
+Yes, we need to have check if the gpio been already used as led for event 2=
+.
+We will take care in next revision.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+50abac586029cf8758e0@syzkaller.appspotmail.com
+>         Andrew
 
-------------[ cut here ]------------
-ODEBUG: assert_init not available (active state 0) object: ffff888068a59b28 object type: timer_list hint: ieee80211_ibss_timer+0x0/0x90
-WARNING: CPU: 0 PID: 7396 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
-Modules linked in:
-CPU: 0 UID: 0 PID: 7396 Comm: kworker/u8:11 Not tainted 6.13.0-rc5-syzkaller-00004-gccb98ccef0e5 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
-Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 54 48 8b 14 dd e0 81 b1 8b 41 56 4c 89 e6 48 c7 c7 60 76 b1 8b e8 5f 4d bc fc 90 <0f> 0b 90 90 58 83 05 c6 4f 7f 0b 01 48 83 c4 18 5b 5d 41 5c 41 5d
-RSP: 0000:ffffc900045ef7c8 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: ffffffff815a1789
-RDX: ffff88807ea2da00 RSI: ffffffff815a1796 RDI: 0000000000000001
-RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffffffff8bb17d40
-R13: ffffffff8b4f81a0 R14: ffffffff8a928850 R15: ffffc900045ef888
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f19769f4d58 CR3: 0000000032a52000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- debug_object_assert_init+0x1ee/0x2f0 lib/debugobjects.c:1020
- debug_timer_assert_init kernel/time/timer.c:845 [inline]
- debug_assert_init kernel/time/timer.c:890 [inline]
- __mod_timer+0xae/0xdc0 kernel/time/timer.c:1071
- ieee80211_sta_merge_ibss net/mac80211/ibss.c:1272 [inline]
- ieee80211_ibss_work+0x481/0x14c0 net/mac80211/ibss.c:1672
- ieee80211_iface_work+0xd01/0xf00 net/mac80211/iface.c:1689
- cfg80211_wiphy_work+0x3de/0x560 net/wireless/core.c:440
- process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks,
+Divya
 
