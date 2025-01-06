@@ -1,111 +1,100 @@
-Return-Path: <netdev+bounces-155625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A21DA032E4
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 23:47:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28633A03335
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 00:16:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5F971885E2F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:47:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E2F03A2639
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 23:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DBF71E0DC3;
-	Mon,  6 Jan 2025 22:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3281E25EA;
+	Mon,  6 Jan 2025 23:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l/FjEgIy"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zfFlDYDn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A583F1E04B8
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 22:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4483E1E25ED
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 23:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736203627; cv=none; b=j+r+rsgM6nQJ+31GMWP4ANuZw+tM2Xam+aq3Jkjfa53iMdL3je3g+jd5XiyGDtkC7DYQAMgGIaVJwZqD/gtgpc8HUjFoehnLZ5ZoxyRon+EvY1TwukD8p9rhDaDhYollLUM/AjXfstyW200O02DxUf1pnJuul8BHMY6zb475NW8=
+	t=1736205384; cv=none; b=Wz8gA2Xiv41WNUJpDu2SCSh4OH3J6iO3M7BVfOvF/u4UtRkeu42oBBLxZsTMCIBMFBGtU0Xm5i08PX6JKyoPqUYQUhlb4dBKBptEFDzj6Qe+BzU/0tWFpRHLNEEebwxEqxhcK073ZBkRwlhgp/Pa7x7wkRyCLi6OjP6Fcn34GJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736203627; c=relaxed/simple;
-	bh=4xMwGVLUCCgaQ/8O8Jujn9YPf2A3107E0DPsqCxXbsI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lY9vREOF6As+zNZXs3QN1I6raoOHwfzsBMmjxW8l26KcSHdvVC2skKq3CuUaqQ6Z3Z7KPjDEQrgAS2y2R2D2vKMiMGyLuIOry4KuRBiP/9vIQ0nYzNOlSfjIvY7jZLIe8HAPpTmhDhTvkCO/NgflGxYmRkizDpd/PIXZ/nqxINI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l/FjEgIy; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4679b5c66d0so31861cf.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 14:47:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736203622; x=1736808422; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4xMwGVLUCCgaQ/8O8Jujn9YPf2A3107E0DPsqCxXbsI=;
-        b=l/FjEgIyWNJlqBYUlV6MYTphKFhjYiXVfLtvZzGJ3iwo9nEAFig56dxXXZARI1/vHn
-         m/+dLN9xh8DrG5tzzefkU6QiC07mbv9CXAN0arGmfzH1OhST1qDVckP8TvFdEnfbZzsX
-         0Cj4ru5K+tDg7j4eXP9MONsdVUxe0JZIjJnZcSU6P1fxajcA0SW2vD0rj6QZLIfOE1rs
-         QvH7cnmU0t46sy3ee6Sqyz3rg2I4n2NXhRbMIXNJTaMYv6hTHvnTUArPZogMzUVwCoN5
-         ULVqY6zOmV/vEHk8bW05NfqnoyQYixJe64lyqdeTO38hnejWMb2nKTIURXtnnqoP5knJ
-         5B1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736203622; x=1736808422;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4xMwGVLUCCgaQ/8O8Jujn9YPf2A3107E0DPsqCxXbsI=;
-        b=SjgCSzGC3lIKpVsdItdvbQ2kWyLJ/Tl2j8/W0AzGNSd65dNkc1Vw5AKOM10GV4UHUG
-         KSIsjffCg8bMGairfqXyERftJYpjFkGUalty8WMnwNZvrWrdD3ug83NCuGBvfemFtH3D
-         KBmxJFhmzaJC0ecWyI9an0cqqkYXU+OS76aVk6yI8NG1A344DgjrA/KZqCgMCJ0jyUyq
-         pTjUdgI4n0tkAyj6Eh2WnZmZ/zPiB3W2iyfW9PcqZ/0guOlx+zf8TTVtHYgcXAGcZ3f+
-         NY8XdzQcRlP/r6m8eR3L/qkUggJBB7OdiTdh/bV2Xqu1QMyPJJe8oyz4br6KdfVUGE7k
-         VEKg==
-X-Forwarded-Encrypted: i=1; AJvYcCVuBeULQ/TzkLsI9j+rWt7kbtK9gOCl5wswiTDvSrk31Z6JeucazlDPDP0tU6F3aSDABfAGTkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZQh4z8aj0WAmKDpcGJ+dDaBVEUj97yvEadlTytQGCl5IJQaUW
-	+qqZNz75bIDzRszkls4QBhrO9p5YBi11LdC9/LD2pA3jYkt7DGjKxMe8ix3DOD6Hieg+yENr1iV
-	IJwjDdrZm934NROgq0F+SsAxvc0syTHCB86Pa
-X-Gm-Gg: ASbGncvpkOFsHlFlW06yeegR+0Rkz+9Rscb6Pz8B3yO51DtgD8J4h33MHU5clshRWkL
-	fPY1Rre6lJBwX/58JxAWsgupRLgH4G7LB57vpi1BS3Zlch7XVVy033Q92MvGxtX7YC6ZD
-X-Google-Smtp-Source: AGHT+IEiZJt//myIdtbS9bCZwMtEKH90oeFzGFtaSVrgVBQbRk91zxkAsuD0V1cwR2OgMNHqd4aPW9zGP/ykZihj+oE=
-X-Received: by 2002:a05:622a:180f:b0:466:a22a:6590 with SMTP id
- d75a77b69052e-46b3c814cbdmr266081cf.9.1736203621507; Mon, 06 Jan 2025
- 14:47:01 -0800 (PST)
+	s=arc-20240116; t=1736205384; c=relaxed/simple;
+	bh=ikXOsBTsyyZLGhydYKZQTsM9nZ2c2nfjxIqWgNIipzY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q8ouptnBUyfASRTr2EBWObUVUAYcgjmbsUXU45+PLMEeDT0Ov/Etrl2byAraa/wQqfQQiYMLNTq+OKISpUy7iXDD4OaIty59jI974aKKDo7AyZlsr66mrwSguDwiUQTSyI8g2jHO8FLdBQEIcbYw6f3CiNJN0YO0d41aB18E8Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zfFlDYDn; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pf/q68SIBAZxycFcmKBNphvvzKmualAn7mggT43qOts=; b=zfFlDYDnhleWRS+HbXoFmGOB93
+	DJC/j7mMIbs6Sfck60Uord33bbrP+KOzu33d6Y51ZEzPFkX93FfsyIw/HTYkBD2LN7xIK5YCE/QYa
+	wHIKZQEhfEthH7akg/oXpUSNcBsh0UEQzligv/g3NwdQB6lcGSCec7ej2sjoLPZEMWx0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tUwKN-0021MC-M0; Tue, 07 Jan 2025 00:16:07 +0100
+Date: Tue, 7 Jan 2025 00:16:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] r8169: add support for reading over-temp
+ threshold
+Message-ID: <b040f19f-2c26-412e-b074-238e284573aa@lunn.ch>
+References: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
+ <f3e07026-8219-4b36-b230-7f7ddd71c7ab@gmail.com>
+ <4535017c-10a8-47e8-8a8e-67c5db62bb16@lunn.ch>
+ <088501b8-1c55-4d20-95b3-ed635865b470@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218003748.796939-1-dw@davidwei.uk> <20241218003748.796939-12-dw@davidwei.uk>
-In-Reply-To: <20241218003748.796939-12-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 6 Jan 2025 14:46:49 -0800
-Message-ID: <CAHS8izNCfQjhmywd=UQgFpk2OQZinnWcz8beZTROzJ33XF55rA@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 11/20] io_uring/zcrx: add io_zcrx_area
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <088501b8-1c55-4d20-95b3-ed635865b470@gmail.com>
 
-On Tue, Dec 17, 2024 at 4:38=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-> Add io_zcrx_area that represents a region of userspace memory that is
-> used for zero copy. During ifq registration, userspace passes in the
-> uaddr and len of userspace memory, which is then pinned by the kernel.
-> Each net_iov is mapped to one of these pages.
->
-> The freelist is a spinlock protected list that keeps track of all the
-> net_iovs/pages that aren't used.
->
+> > Does it reduce the speed in the same way as downshift? Can the user
+> > tell it has happened, other than networking is slower?
+> > 
+> It internally disables 2.5G/5G advertisement and triggers an autoneg.
+> So you get the usual message on console/dmesg indicating the new speed.
+> This internal action sets a register bit, and it can also trigger an interrupt.
+> So it should be possible to check in the link_change_notify() callback
+> whether an over-temp event occurred. The silent change of the advertisement
+> may also result in the phylib-cached advertisement being out-of-sync.
+> So we would have to re-sync it. But I didn't fully test this yet.
+> 
+> This patch only allows to read the over-temp threshold set as power-on default
+> or by the boot loader. It doesn't change the existing behavior.
 
-FWIW we devmem uses genpool to manage the freelist and that lets us do
-allocations/free without locks. Not saying you should migrate to that
-but it's an option you have available.
+Thanks for the details. So it does seem to be different to downshift,
+where generally advertised link modes in the registers is not changed,
+and the speed indicated in BMSR generally does not indicate the
+downshifted speed, you need vendor registers to get the actual
+speed. But downshift happens at link up, not latter when the device
+starts to overheat.
 
---=20
-Thanks,
-Mina
+Does it restore advertisement to 2.5G/5G when it cools down? There is
+an interesting policy decision here. Do you want 1s downtime very so
+often as it speeds up and slows down, or should it keep at the slower
+speed until the user kicks it back up to the higher speed?
+
+	Andrew
+
 
