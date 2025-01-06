@@ -1,163 +1,141 @@
-Return-Path: <netdev+bounces-155572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E77AA02F94
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:14:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD5EBA02FA1
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 19:17:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57CA61651CB
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:14:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5280B18842E8
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 18:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D357A1DFD8D;
-	Mon,  6 Jan 2025 18:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8139C130E27;
+	Mon,  6 Jan 2025 18:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="pVwtF1Hu"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QriLJpN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5528615C158
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 18:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F3A1553BB
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 18:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736187212; cv=none; b=cAP0kuGQ3zS1rB4WVd5cNtQSDv4kD+uJrEHW6WJPhvTMd39fZMKWquO8Mpv7bFPjlBPum7stOaY6bI4/S4EFUdZDZLC253TVicOYETBvCTDNYPMF7qUWHO8zdqSmswrZh/xxexgPq1junEOWdLh33Atx1shWl//Z7tI4/s6Oeg8=
+	t=1736187444; cv=none; b=RD5/2+WkQ4hhkObk1nOXeIivcKoBlEWmMuszmG6YcyTClWVg2vkjqbi7Mz/na1v0a11jeiZRWNdoVXVrvOYkfrZN+4cfsvpeqSQEZ46d3ufWoiEJjI04N2uHLf10MPHFsTd/+Wn4u8R6OWMXvlm7JUmgn2Zu0s47+eR1niePPjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736187212; c=relaxed/simple;
-	bh=50IbLQQCl7PPABt81NPtDjkAfg3Wuw+EAdZsJkzO7zQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rFBg5ZzMp+qVN+2sAzheSLAbbid9l/QudzhM/guTSNBdvP2vASQSKRp817EyW5mBaXkVy+CD4JunP8PgM3/CD0kmWRvBE+YjWCcrM6vx8Utf8bl5eZ5JteMNq/cQn5XJ+lEry3GcMRAqm2+9vQLcth2j8+QDFQ9ufeZ/eutdb74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=pVwtF1Hu; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=di8AfNuy3UcVaZIzetLx5yLqvGuYQmDRlmX1DqBPQ0k=; t=1736187211; x=1737051211; 
-	b=pVwtF1HuQGWbhp0/bKFEmfJ20zh0SFK6rGIn07HvS7jobS62JoI181qZuyEFRI4HLMPD3EDjNr0
-	fCoUjhJIC0TV/LxbMVASDsnpIwKAZppTaGklTrnMaxUab55UeiXZiBRnvx29eygpu2R0RscrBvoQL
-	RsQSlq4W0LF++yzTOmiVwJGf0m/uGbk2h9K+GClpt9rCc8KTHQD9MvGawsV6YV2qBJYG69/zbJxXd
-	kCRN7mXkTajamGxBx1K5Nq2QXt81A7z6cWe9+ICbtiOKz9CVK2eAA53R5p9lO2B900ag1Bk+jo45n
-	vornWH8v99ruL9yULYcmxJrz6o7J3dES2LHw==;
-Received: from 70-228-78-207.lightspeed.sntcca.sbcglobal.net ([70.228.78.207]:59627 helo=localhost.localdomain)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tUrbW-0003Bs-1X; Mon, 06 Jan 2025 10:13:30 -0800
-From: John Ousterhout <ouster@cs.stanford.edu>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v5 12/12] net: homa: create Makefile and Kconfig
-Date: Mon,  6 Jan 2025 10:12:18 -0800
-Message-ID: <20250106181219.1075-13-ouster@cs.stanford.edu>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20250106181219.1075-1-ouster@cs.stanford.edu>
-References: <20250106181219.1075-1-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1736187444; c=relaxed/simple;
+	bh=4HiTtpVA03aLxEF6cY/cgd23YqFKehl3r4Hn2ZPm3bU=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MumcwgetEgevKl23bBnqJ1CpPRK3yXuG4sLWFhaZ5MlE0ymGbtwWVvp2jpjx6aR4V/XXAsymJWGYVcTj8usTAPLbze7dfBXyIUgAjS5WGhYu1gq8WPv75uDVSrAOmzEpyd9/jT6bl1ES9vGeY8Jh2nfSVgEwYoRZ6NdVSuuJoYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=QriLJpN4; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1736187441; x=1767723441;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=oh7Luu06pdvAzNJ74ENDW6MDy6dSEbTiihGoxsXK35s=;
+  b=QriLJpN4xJXbVq++lkWMcf9bPrn7JSZFilIWxANBwB3c8wkYA1r2iUQ4
+   9yB7MxaBxNYQIlato+0cybMdygcpm5i4RFoC86ziqmeKP15cQNyimQrQe
+   27wbiEMMP3lDkA0CMb23K3fhzzn+4Tl0pVfucl3dQUFgP3lcYYJ25j0GS
+   I=;
+X-IronPort-AV: E=Sophos;i="6.12,293,1728950400"; 
+   d="scan'208";a="55636778"
+Subject: RE: [PATCH net 7/8] MAINTAINERS: remove Noam Dagan from AMAZON ETHERNET
+Thread-Topic: [PATCH net 7/8] MAINTAINERS: remove Noam Dagan from AMAZON ETHERNET
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2025 18:17:18 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.43.254:41416]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.23.192:2525] with esmtp (Farcaster)
+ id 4b5d0dfc-3742-4f79-895e-bc1cda701ea3; Mon, 6 Jan 2025 18:17:18 +0000 (UTC)
+X-Farcaster-Flow-ID: 4b5d0dfc-3742-4f79-895e-bc1cda701ea3
+Received: from EX19D005EUA004.ant.amazon.com (10.252.50.241) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Mon, 6 Jan 2025 18:17:18 +0000
+Received: from EX19D022EUA002.ant.amazon.com (10.252.50.201) by
+ EX19D005EUA004.ant.amazon.com (10.252.50.241) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Mon, 6 Jan 2025 18:17:17 +0000
+Received: from EX19D022EUA002.ant.amazon.com ([fe80::7f87:7d63:def0:157d]) by
+ EX19D022EUA002.ant.amazon.com ([fe80::7f87:7d63:def0:157d%3]) with mapi id
+ 15.02.1258.039; Mon, 6 Jan 2025 18:17:17 +0000
+From: "Kiyanovski, Arthur" <akiyano@amazon.com>
+To: Jakub Kicinski <kuba@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "Agroskin, Shay"
+	<shayagr@amazon.com>, "Arinzon, David" <darinzon@amazon.com>
+Thread-Index: AQHbYFuq0f5O/EakbUSTxNdD1BEVZbMKB5hQ
+Date: Mon, 6 Jan 2025 18:17:02 +0000
+Deferred-Delivery: Mon, 6 Jan 2025 17:58:40 +0000
+Message-ID: <330c31a378b348d4acf96dd0c22348ad@amazon.com>
+References: <20250106165404.1832481-1-kuba@kernel.org>
+ <20250106165404.1832481-8-kuba@kernel.org>
+In-Reply-To: <20250106165404.1832481-8-kuba@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: a8fa315618741e04a90c2df3bc1ba398
 
-Before this commit the Homa code is "inert": it won't be compiled
-in kernel builds. This commit adds Homa's Makefile and Kconfig, and
-also links Homa into net/Makefile and net/Kconfig, so that Homa
-will be built during kernel builds if enabled (it is disabled by
-default).
 
-Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
----
- net/Kconfig       |  1 +
- net/Makefile      |  1 +
- net/homa/Kconfig  | 19 +++++++++++++++++++
- net/homa/Makefile | 14 ++++++++++++++
- 4 files changed, 35 insertions(+)
- create mode 100644 net/homa/Kconfig
- create mode 100644 net/homa/Makefile
 
-diff --git a/net/Kconfig b/net/Kconfig
-index a629f92dc86b..ca8551c1a226 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -244,6 +244,7 @@ endif
- 
- source "net/dccp/Kconfig"
- source "net/sctp/Kconfig"
-+source "net/homa/Kconfig"
- source "net/rds/Kconfig"
- source "net/tipc/Kconfig"
- source "net/atm/Kconfig"
-diff --git a/net/Makefile b/net/Makefile
-index 65bb8c72a35e..18fa3c323187 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -44,6 +44,7 @@ obj-y				+= 8021q/
- endif
- obj-$(CONFIG_IP_DCCP)		+= dccp/
- obj-$(CONFIG_IP_SCTP)		+= sctp/
-+obj-$(CONFIG_HOMA)              += homa/
- obj-$(CONFIG_RDS)		+= rds/
- obj-$(CONFIG_WIRELESS)		+= wireless/
- obj-$(CONFIG_MAC80211)		+= mac80211/
-diff --git a/net/homa/Kconfig b/net/homa/Kconfig
-new file mode 100644
-index 000000000000..3e623906612f
---- /dev/null
-+++ b/net/homa/Kconfig
-@@ -0,0 +1,19 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Homa transport protocol
-+#
-+
-+menuconfig HOMA
-+	tristate "The Homa transport protocol"
-+	depends on INET
-+	depends on IPV6
-+
-+	help
-+	  Homa is a network transport protocol for communication within
-+	  a datacenter. It provides significantly lower latency than TCP,
-+	  particularly for workloads containing a mixture of large and small
-+	  messages operating at high network utilization. For more information
-+	  see the homa(7) man page or checkout the Homa Wiki at
-+	  https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview.
-+
-+	  If unsure, say N.
-diff --git a/net/homa/Makefile b/net/homa/Makefile
-new file mode 100644
-index 000000000000..3eb192a6ffa6
---- /dev/null
-+++ b/net/homa/Makefile
-@@ -0,0 +1,14 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Makefile for the Linux implementation of the Homa transport protocol.
-+
-+obj-$(CONFIG_HOMA) := homa.o
-+homa-y:=        homa_incoming.o \
-+		homa_outgoing.o \
-+		homa_peer.o \
-+		homa_pool.o \
-+		homa_plumbing.o \
-+		homa_rpc.o \
-+		homa_sock.o \
-+		homa_timer.o \
-+		homa_utils.o
--- 
-2.34.1
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Monday, January 6, 2025 8:54 AM
+> To: davem@davemloft.net
+> Cc: netdev@vger.kernel.org; edumazet@google.com; pabeni@redhat.com;
+> andrew+netdev@lunn.ch; Jakub Kicinski <kuba@kernel.org>; Agroskin, Shay
+> <shayagr@amazon.com>; Kiyanovski, Arthur <akiyano@amazon.com>;
+> Arinzon, David <darinzon@amazon.com>
+> Subject: [EXTERNAL] [PATCH net 7/8] MAINTAINERS: remove Noam Dagan
+> from AMAZON ETHERNET
+>=20
+> CAUTION: This email originated from outside of the organization. Do not c=
+lick
+> links or open attachments unless you can confirm the sender and know the
+> content is safe.
+>=20
+>=20
+>=20
+> Noam Dagan was added to ENA reviewers in 2021, we have not seen a single
+> email from this person to any list, ever (according to lore).
+> Git history mentions the name in 2 SoB tags from 2020.
+>=20
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: shayagr@amazon.com
+> CC: akiyano@amazon.com
+> CC: darinzon@amazon.com
+> ---
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index c092c27fcd5f..009630fe014c 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -949,7 +949,6 @@ AMAZON ETHERNET DRIVERS
+>  M:     Shay Agroskin <shayagr@amazon.com>
+>  M:     Arthur Kiyanovski <akiyano@amazon.com>
+>  R:     David Arinzon <darinzon@amazon.com>
+> -R:     Noam Dagan <ndagan@amazon.com>
+>  R:     Saeed Bishara <saeedb@amazon.com>
+>  L:     netdev@vger.kernel.org
+>  S:     Supported
+> --
+> 2.47.1
 
+Acked-by: Arthur Kiyanovski <akiyano@amazon.com>
 
