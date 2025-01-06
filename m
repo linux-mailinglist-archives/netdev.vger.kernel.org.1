@@ -1,41 +1,42 @@
-Return-Path: <netdev+bounces-155371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 306E6A0209B
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:25:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A001A02099
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:24:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 401E918851BB
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:25:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E91663A222B
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED311D8A12;
-	Mon,  6 Jan 2025 08:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9F51D88AC;
+	Mon,  6 Jan 2025 08:24:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4371D619F
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A9C2AE93
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 08:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736151879; cv=none; b=PyQ63w3zkIyZp1pVg9Lr0gTbuJWbC32spqCAIUE/wZg0sz+5SJzqJSZHt/qzBTf/iV8Os8l64loSliIYzbTxOCu/XFzEraudm4uUrD14n8dIOlmNZfRsm6vWv6tmtrEDk4pWKIMLhCMWBpoiCDlKD9BNEudUfor6UE0/yW019UY=
+	t=1736151877; cv=none; b=oA24ebOmAk9CoxnK9zoyupGkzJtqrY3TQ7p+WtjCL+D7uvJQtYp2pTQ5EVL7h4catilsvfaCIdc9ASlKaF4Uc2n15U7t1BBryy+pRKweKtpPQM7XzJi2JPSiscXlpKR61E7pZyiDF+d6aRu7Gznv863v4TnDKVvx98sgs3iEThY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736151879; c=relaxed/simple;
-	bh=ke6Mw0M2Z3COOWytWpye2AsAwMheYxzQqrXz69/0f6w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ob70nEmmXPVHbmBPgSOwwL61n4YqUsMaQ/+dRAS5/YObYaY2ydEW5JYZpbSXBynLK2enxHP5Ya+hh2cgUsHJcV5cEDAdnBHIuvP0X0B4lq7MmRGbp/6gksX0AxF5AAN3l1MI9u69ISOEctT7eodAXmL9pLQ2xtSZrRR9XhA5WSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
+	s=arc-20240116; t=1736151877; c=relaxed/simple;
+	bh=kxR8m2SLZykK/DxNeUSocKGlzCebEbLpVNF9eh9xkUE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=i5J/BRpTXXfBAy5h5wDfZoZY13aYvzxYjpDbrfiJ76u1wEDDJNc+ZZps8FSRsX4gm3EznqYbior0vNywVK8EP2QXc+FKbIjcYR+ZET/iiJTtJCkACNePp1AmkQerL4JxHpSavWkhXbzbRloLzLWkQIzTx3k77/SqNx5VDyfWzZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.194.254.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz14t1736151863tyrd8e
-X-QQ-Originating-IP: eBDaqxH7OQq9KH7v2MCIPYjzyTLUPEvwzTIMXEicyO0=
+X-QQ-mid: bizesmtpsz14t1736151866t2770v
+X-QQ-Originating-IP: 0WHLKK9PewX64WDxMQUuxxLWeNndVFBY9ha3Aex0EoU=
 Received: from wxdbg.localdomain ( [125.118.30.165])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 06 Jan 2025 16:24:15 +0800 (CST)
+	id ; Mon, 06 Jan 2025 16:24:24 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 6895401573510602144
+X-BIZMAIL-ID: 7063304220110125206
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -50,10 +51,12 @@ To: andrew+netdev@lunn.ch,
 	vadim.fedorenko@linux.dev
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2 0/4] Support PTP clock for Wangxun NICs
-Date: Mon,  6 Jan 2025 16:45:02 +0800
-Message-Id: <20250106084506.2042912-1-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 1/4] net: wangxun: Add support for PTP clock
+Date: Mon,  6 Jan 2025 16:45:03 +0800
+Message-Id: <20250106084506.2042912-2-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20250106084506.2042912-1-jiawenwu@trustnetic.com>
+References: <20250106084506.2042912-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,62 +66,1246 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: OFwcIyq3IdMxyk/Fk0goro7oKlA4wSU/L658lIjVhqj2fPIkOiMeiUV5
-	j385arjdgi9e5w6PsK2XTNHt8D2zr9CoBr+adyqpZU4OA+oMw68Kscvl8bqQ+jgdmSCuDbR
-	FYQC0ZSKv4xuEYCCh+S9M6O+vsyTAL7At3zCUJ+zyQx73VDT2/wBLJOIGcYJ5ZzjkpV68am
-	pM0CCGMo6ty9S1JEoL8xOtO8Dya9ZGUL9Nu/SJCMIl6gkFJe/MZqzzrvw/UPzBtwKhHogFn
-	0KQ2R3AHy+YfsblxJqlCUBLdC49vkr8zMBgq7La8DqFKP0jqAUEhF/+QadF36Qpg8wy1jlH
-	nXACBdCdQOe7iFrEt6WZs1HbRtYQ7wSUKP/Xe4pab3P7IVbMofpPseG0cZ7gvuCvJ60J7ks
-	2JcVmHamgI7CBeGM2mDZj+dsLF6P3ga445nZ/lhBJsXMm5o8/ewescDnvW7UqyvNiZE0ce9
-	asLJIPfcbvOkHtekiFKE+O+PxVHUPkG39V7x8AphVi35rL2klpI/+akK8+XnGzh144br2iC
-	AO68hSYpyDHvr/v/X89yPsl6OLUhWIcDwCTAwI/0VVE2TTVIZNYx1ie6LJPB/o2rbVmZGe0
-	pm9+creD+H57x8OG/GSY1ydJ2IK3/Wg0X9S9TWATteOcS/zaeDmridatsDcDyWKO08clSji
-	lJSARguK+WS/R9CJO+lIaHnHp/6g71AjzufKVq8onnuVWsK/SiDQ3TKx0Ejx0RoeTp5puIx
-	OeBIdMv1gWydNzo7u0basNX+DQsoKpjD/ENV4Biu5JIKVlTZJ1qvbKVQO9WOnh3T+pEN9JJ
-	8Xu4d8ejSeT0ZUNV4Nzfl4u6DNs7P6sWOPa0vujW2+qw0noGGpvuec0R+FldYh/ENyrSThd
-	rq/2MWk29b+jCejcCakBAM8lLJLgbFKlOJrshS0rWxwn1NJub1RwUST8gBsICN81OLFvis+
-	PFGxDps0CkpMaxYuqFhas3K9Hv28T53QGSNPueR+GY6Wvca5+neOcNJuafKNTVZtokT8=
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-XMAILINFO: Ncu1oMVBQDrnbf0oiWO25jjqIleKdN22T3HeUMjhbtLGGw3BT0UUxZSS
+	x5kx8i9afNr8qYNNBK3dH5sDX6pTuU7hAH1ha2vgX6vc1trHPnac/s6IQSpc4qd2eaIvKr1
+	CkW9g7AhkpsZRJBNuXeIKSay0ORCoJPmt9LA1/3jliKQM1rk2To/TH2C7xJjB/whZYYqt5U
+	In49SvlC1/53dfNzURNcYdUzfShas6nWb/K7ASp/ZAZf3VLLTf/HdC8vsXP1GL8ExMOfqB6
+	CiMvY7yLnmyJf4CrOV/2vNPS/JYyOsN9LYKqcc9XYaSDaQUvDmCbg3DAfJIalTtNGnz2vXR
+	aCgBb7rrNYyRsBO30ew5f1jAFFKTLRx2SujA2o/VyeUANqCQuQBUkGiqZfA7ydl+G+LwOk3
+	DJ+p5YnxOVIJ0+uD/bpC7ta9dHlV+d3YVS4x9zZkbx7To+zPJeTkC0tyz5GtEZqApTjDOn2
+	rXyrd16Ko66VxLvbpQkfOgIHJP2kbHr6S4xnrWjt73+zg+/76L08le8Kro7Lkh3qtqk+30D
+	O8K9wnwyqHFsIbeyHMfJDbtHfQG5hm2HubHqvViK3/8tcr2GR86Sxs2d11Gkn25h0bdIxxb
+	RHhuwQw+hcH268E//BfYg4bg4uBDzsiUt2X49dirjJCAu82jl0X8nQ22Qi3xhkd8jURDSy8
+	wcpsPWpdbRgZLQZqwmoas7EXNP6G+17xZkem4jY8CJiNa/N3eKvg9ZdDTjI2Th6dZUt/po4
+	TyqRX5b/VGkSr6lyZaAVoiYO8fweVIRHw88yVFfp4yM2QEXqp/ne22WV2odXgW3jBEMppHE
+	yTSn2TNLJwkfFXjxarJ8jVHYAXc4Wzflu/Ho+I3CTzIuzHN3mj8Cc9TiQ2CpZAgWb/y2Gdj
+	f82CXg/47cDBSiCRgRZCLrV9oOIgYvjLukz0YBfcXzjC0AT3iaTVTw5dJcgYJX8/vs56+j6
+	Rmsc/B+xWka2i9WBFOCXE1jcuKjAj490QIR6oDggFt2PDD3AltcwtkH3ancErJjNi/4BeQO
+	mFSY5bJoTNjm6/MII3
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
 X-QQ-RECHKSPAM: 0
 
 Implement support for PTP clock on Wangxun NICs.
 
-Changes in v2:
-- Link to v1: https://lore.kernel.org/all/20250102103026.1982137-1-jiawenwu@trustnetic.com/
-- Fix build warning
-- Convert to .ndo_hwtstamp_get and .ndo_hwtstamp_set
-- Remove needless timestamp flags
-- Use .do_aux_work instead of driver service task
-- Use the better error code
-- Rename function wx_ptp_start_cyclecounter()
-- Keep the register names consistent between comments and code
-
-Jiawen Wu (4):
-  net: wangxun: Add support for PTP clock
-  net: wangxun: Implement get_ts_info
-  net: wangxun: Implement do_aux_work of ptp_clock_info
-  net: ngbe: Add support for 1PPS and TOD
-
- drivers/net/ethernet/wangxun/libwx/Makefile   |    2 +-
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   |   38 +
- .../net/ethernet/wangxun/libwx/wx_ethtool.h   |    2 +
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |   19 +
- drivers/net/ethernet/wangxun/libwx/wx_hw.h    |    1 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   49 +-
- drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 1019 +++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |   20 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  103 ++
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |    1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   20 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   11 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |    5 +
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |    1 +
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   11 +
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   10 +
- 16 files changed, 1305 insertions(+), 7 deletions(-)
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+---
+ drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |   3 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  49 +-
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 711 ++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |  19 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  67 ++
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   8 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |  10 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  11 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   9 +
+ 10 files changed, 883 insertions(+), 6 deletions(-)
  create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_ptp.c
  create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_ptp.h
 
+diff --git a/drivers/net/ethernet/wangxun/libwx/Makefile b/drivers/net/ethernet/wangxun/libwx/Makefile
+index 42ccd6e4052e..e9f0f1f2309b 100644
+--- a/drivers/net/ethernet/wangxun/libwx/Makefile
++++ b/drivers/net/ethernet/wangxun/libwx/Makefile
+@@ -4,4 +4,4 @@
+ 
+ obj-$(CONFIG_LIBWX) += libwx.o
+ 
+-libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o
++libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_ptp.o
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index abe5921dde02..c4b3b00b0926 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -41,6 +41,9 @@ static const struct wx_stats wx_gstrings_stats[] = {
+ 	WX_STAT("rx_csum_offload_good_count", hw_csum_rx_good),
+ 	WX_STAT("rx_csum_offload_errors", hw_csum_rx_error),
+ 	WX_STAT("alloc_rx_buff_failed", alloc_rx_buff_failed),
++	WX_STAT("tx_hwtstamp_timeouts", tx_hwtstamp_timeouts),
++	WX_STAT("tx_hwtstamp_skipped", tx_hwtstamp_skipped),
++	WX_STAT("rx_hwtstamp_cleared", rx_hwtstamp_cleared),
+ };
+ 
+ static const struct wx_stats wx_gstrings_fdir_stats[] = {
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+index 2b3d6586f44a..2c266aee667e 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+@@ -13,6 +13,7 @@
+ 
+ #include "wx_type.h"
+ #include "wx_lib.h"
++#include "wx_ptp.h"
+ #include "wx_hw.h"
+ 
+ /* Lookup table mapping the HW PTYPE to the bit field for decoding */
+@@ -597,8 +598,17 @@ static void wx_process_skb_fields(struct wx_ring *rx_ring,
+ 				  union wx_rx_desc *rx_desc,
+ 				  struct sk_buff *skb)
+ {
++	struct wx *wx = netdev_priv(rx_ring->netdev);
++
+ 	wx_rx_hash(rx_ring, rx_desc, skb);
+ 	wx_rx_checksum(rx_ring, rx_desc, skb);
++
++	if (unlikely(test_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, wx->flags)) &&
++	    unlikely(wx_test_staterr(rx_desc, WX_RXD_STAT_TS))) {
++		wx_ptp_rx_hwtstamp(rx_ring->q_vector->wx, skb);
++		rx_ring->last_rx_timestamp = jiffies;
++	}
++
+ 	wx_rx_vlan(rx_ring, rx_desc, skb);
+ 	skb_record_rx_queue(skb, rx_ring->queue_index);
+ 	skb->protocol = eth_type_trans(skb, rx_ring->netdev);
+@@ -932,9 +942,9 @@ static void wx_tx_olinfo_status(union wx_tx_desc *tx_desc,
+ 	tx_desc->read.olinfo_status = cpu_to_le32(olinfo_status);
+ }
+ 
+-static void wx_tx_map(struct wx_ring *tx_ring,
+-		      struct wx_tx_buffer *first,
+-		      const u8 hdr_len)
++static int wx_tx_map(struct wx_ring *tx_ring,
++		     struct wx_tx_buffer *first,
++		     const u8 hdr_len)
+ {
+ 	struct sk_buff *skb = first->skb;
+ 	struct wx_tx_buffer *tx_buffer;
+@@ -1013,6 +1023,8 @@ static void wx_tx_map(struct wx_ring *tx_ring,
+ 
+ 	netdev_tx_sent_queue(wx_txring_txq(tx_ring), first->bytecount);
+ 
++	/* set the timestamp */
++	first->time_stamp = jiffies;
+ 	skb_tx_timestamp(skb);
+ 
+ 	/* Force memory writes to complete before letting h/w know there
+@@ -1038,7 +1050,7 @@ static void wx_tx_map(struct wx_ring *tx_ring,
+ 	if (netif_xmit_stopped(wx_txring_txq(tx_ring)) || !netdev_xmit_more())
+ 		writel(i, tx_ring->tail);
+ 
+-	return;
++	return 0;
+ dma_error:
+ 	dev_err(tx_ring->dev, "TX DMA map failed\n");
+ 
+@@ -1062,6 +1074,8 @@ static void wx_tx_map(struct wx_ring *tx_ring,
+ 	first->skb = NULL;
+ 
+ 	tx_ring->next_to_use = i;
++
++	return -ENOMEM;
+ }
+ 
+ static void wx_tx_ctxtdesc(struct wx_ring *tx_ring, u32 vlan_macip_lens,
+@@ -1486,6 +1500,23 @@ static netdev_tx_t wx_xmit_frame_ring(struct sk_buff *skb,
+ 		tx_flags |= WX_TX_FLAGS_HW_VLAN;
+ 	}
+ 
++	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) &&
++	    wx->ptp_clock) {
++		if (wx->tstamp_config.tx_type == HWTSTAMP_TX_ON &&
++		    !test_and_set_bit_lock(WX_STATE_PTP_TX_IN_PROGRESS,
++					   wx->state)) {
++			skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
++			tx_flags |= WX_TX_FLAGS_TSTAMP;
++
++			/* schedule check for Tx timestamp */
++			wx->ptp_tx_skb = skb_get(skb);
++			wx->ptp_tx_start = jiffies;
++			schedule_work(&wx->ptp_tx_work);
++		} else {
++			wx->tx_hwtstamp_skipped++;
++		}
++	}
++
+ 	/* record initial flags and protocol */
+ 	first->tx_flags = tx_flags;
+ 	first->protocol = vlan_get_protocol(skb);
+@@ -1501,12 +1532,20 @@ static netdev_tx_t wx_xmit_frame_ring(struct sk_buff *skb,
+ 	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags) && tx_ring->atr_sample_rate)
+ 		wx->atr(tx_ring, first, ptype);
+ 
+-	wx_tx_map(tx_ring, first, hdr_len);
++	if (wx_tx_map(tx_ring, first, hdr_len))
++		goto cleanup_tx_tstamp;
+ 
+ 	return NETDEV_TX_OK;
+ out_drop:
+ 	dev_kfree_skb_any(first->skb);
+ 	first->skb = NULL;
++cleanup_tx_tstamp:
++	if (unlikely(tx_flags & WX_TX_FLAGS_TSTAMP)) {
++		dev_kfree_skb_any(wx->ptp_tx_skb);
++		wx->ptp_tx_skb = NULL;
++		cancel_work_sync(&wx->ptp_tx_work);
++		clear_bit_unlock(WX_STATE_PTP_TX_IN_PROGRESS, wx->state);
++	}
+ 
+ 	return NETDEV_TX_OK;
+ }
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+new file mode 100644
+index 000000000000..0f683e576b29
+--- /dev/null
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+@@ -0,0 +1,711 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2015 - 2025 Beijing WangXun Technology Co., Ltd. */
++
++#include <linux/ptp_classify.h>
++#include <linux/clocksource.h>
++#include <linux/pci.h>
++
++#include "wx_type.h"
++#include "wx_ptp.h"
++#include "wx_hw.h"
++
++#define WX_INCVAL_10GB        0xCCCCCC
++#define WX_INCVAL_1GB         0x800000
++#define WX_INCVAL_100         0xA00000
++#define WX_INCVAL_10          0xC7F380
++#define WX_INCVAL_EM          0x2000000
++
++#define WX_INCVAL_SHIFT_10GB  20
++#define WX_INCVAL_SHIFT_1GB   18
++#define WX_INCVAL_SHIFT_100   15
++#define WX_INCVAL_SHIFT_10    12
++#define WX_INCVAL_SHIFT_EM    22
++
++#define WX_OVERFLOW_PERIOD    (HZ * 30)
++#define WX_PTP_TX_TIMEOUT     (HZ)
++
++#define WX_1588_PPS_WIDTH_EM  120
++
++#define WX_NS_PER_SEC         1000000000ULL
++#define WX_NS_PER_MSEC        1000000ULL
++
++/**
++ * wx_ptp_adjfine
++ * @ptp: the ptp clock structure
++ * @ppb: parts per billion adjustment from base
++ * Returns 0 on success
++ *
++ * Adjust the frequency of the ptp cycle counter by the
++ * indicated ppb from the base frequency.
++ */
++static int wx_ptp_adjfine(struct ptp_clock_info *ptp, long ppb)
++{
++	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
++	u64 incval, mask;
++
++	smp_mb(); /* Force any pending update before accessing. */
++	incval = READ_ONCE(wx->base_incval);
++	incval = adjust_by_scaled_ppm(incval, ppb);
++
++	mask = (wx->mac.type == wx_mac_em) ? 0x7FFFFFF : 0xFFFFFF;
++	if (incval > mask)
++		dev_warn(&wx->pdev->dev,
++			 "PTP ppb adjusted SYSTIME rate overflowed!\n");
++
++	incval &= mask;
++	if (wx->mac.type != wx_mac_em)
++		incval |= 2 << 24;
++
++	wr32ptp(wx, WX_TSC_1588_INC, incval);
++
++	return 0;
++}
++
++/**
++ * wx_ptp_adjtime
++ * @ptp: the ptp clock structure
++ * @delta: offset to adjust the cycle counter by ns
++ * Returns 0 on success
++ *
++ * Adjust the timer by resetting the timecounter structure.
++ */
++static int wx_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
++{
++	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
++	unsigned long flags;
++
++	spin_lock_irqsave(&wx->tmreg_lock, flags);
++	timecounter_adjtime(&wx->hw_tc, delta);
++	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
++
++	return 0;
++}
++
++/**
++ * wx_ptp_gettimex64
++ * @ptp: the ptp clock structure
++ * @ts: timespec structure to hold the current time value
++ * @sts: structure to hold the system time before and after reading the PHC
++ * Returns 0 on success
++ *
++ * Read the timecounter and return the correct value on ns,
++ * after converting it into a struct timespec64.
++ */
++static int wx_ptp_gettimex64(struct ptp_clock_info *ptp,
++			     struct timespec64 *ts,
++			     struct ptp_system_timestamp *sts)
++{
++	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
++	unsigned long flags;
++	u64 ns, stamp;
++
++	spin_lock_irqsave(&wx->tmreg_lock, flags);
++
++	ptp_read_system_prets(sts);
++	stamp = (u64)rd32ptp(wx, WX_TSC_1588_SYSTIML);
++	ptp_read_system_postts(sts);
++	stamp |= (u64)rd32ptp(wx, WX_TSC_1588_SYSTIMH) << 32;
++	ns = timecounter_cyc2time(&wx->hw_tc, stamp);
++
++	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
++
++	*ts = ns_to_timespec64(ns);
++
++	return 0;
++}
++
++/**
++ * wx_ptp_settime64
++ * @ptp: the ptp clock structure
++ * @ts: the timespec64 containing the new time for the cycle counter
++ * Returns 0 on success
++ *
++ * Reset the timecounter to use a new base value instead of the kernel
++ * wall timer value.
++ */
++static int wx_ptp_settime64(struct ptp_clock_info *ptp,
++			    const struct timespec64 *ts)
++{
++	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
++	unsigned long flags;
++	u64 ns;
++
++	ns = timespec64_to_ns(ts);
++
++	/* reset the timecounter */
++	spin_lock_irqsave(&wx->tmreg_lock, flags);
++	timecounter_init(&wx->hw_tc, &wx->hw_cc, ns);
++	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
++
++	return 0;
++}
++
++/**
++ * wx_ptp_clear_tx_timestamp - utility function to clear Tx timestamp state
++ * @wx: the private board structure
++ *
++ * This function should be called whenever the state related to a Tx timestamp
++ * needs to be cleared. This helps ensure that all related bits are reset for
++ * the next Tx timestamp event.
++ */
++static void wx_ptp_clear_tx_timestamp(struct wx *wx)
++{
++	rd32ptp(wx, WX_TSC_1588_STMPH);
++	if (wx->ptp_tx_skb) {
++		dev_kfree_skb_any(wx->ptp_tx_skb);
++		wx->ptp_tx_skb = NULL;
++	}
++	clear_bit_unlock(WX_STATE_PTP_TX_IN_PROGRESS, wx->state);
++}
++
++/**
++ * wx_ptp_convert_to_hwtstamp - convert register value to hw timestamp
++ * @wx: private board structure
++ * @hwtstamp: stack timestamp structure
++ * @timestamp: unsigned 64bit system time value
++ *
++ * We need to convert the adapter's RX/TXSTMP registers into a hwtstamp value
++ * which can be used by the stack's ptp functions.
++ *
++ * The lock is used to protect consistency of the cyclecounter and the SYSTIME
++ * registers. However, it does not need to protect against the Rx or Tx
++ * timestamp registers, as there can't be a new timestamp until the old one is
++ * unlatched by reading.
++ *
++ * In addition to the timestamp in hardware, some controllers need a software
++ * overflow cyclecounter, and this function takes this into account as well.
++ **/
++static void wx_ptp_convert_to_hwtstamp(struct wx *wx,
++				       struct skb_shared_hwtstamps *hwtstamp,
++				       u64 timestamp)
++{
++	unsigned long flags;
++	u64 ns;
++
++	memset(hwtstamp, 0, sizeof(*hwtstamp));
++
++	spin_lock_irqsave(&wx->tmreg_lock, flags);
++	ns = timecounter_cyc2time(&wx->hw_tc, timestamp);
++	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
++
++	hwtstamp->hwtstamp = ns_to_ktime(ns);
++}
++
++/**
++ * wx_ptp_tx_hwtstamp - utility function which checks for TX time stamp
++ * @wx: the private board struct
++ *
++ * if the timestamp is valid, we convert it into the timecounter ns
++ * value, then store that result into the shhwtstamps structure which
++ * is passed up the network stack
++ */
++static void wx_ptp_tx_hwtstamp(struct wx *wx)
++{
++	struct skb_shared_hwtstamps shhwtstamps;
++	struct sk_buff *skb = wx->ptp_tx_skb;
++	u64 regval = 0;
++
++	regval |= (u64)rd32ptp(wx, WX_TSC_1588_STMPL);
++	regval |= (u64)rd32ptp(wx, WX_TSC_1588_STMPH) << 32;
++
++	wx_ptp_convert_to_hwtstamp(wx, &shhwtstamps, regval);
++
++	wx->ptp_tx_skb = NULL;
++	clear_bit_unlock(WX_STATE_PTP_TX_IN_PROGRESS, wx->state);
++	skb_tstamp_tx(skb, &shhwtstamps);
++	dev_kfree_skb_any(skb);
++}
++
++/**
++ * wx_ptp_tx_hwtstamp_work
++ * @work: pointer to the work struct
++ *
++ * This work item polls TSC_1588_CTL valid bit to determine when a Tx hardware
++ * timestamp has been taken for the current skb. It is necessary, because the
++ * descriptor's "done" bit does not correlate with the timestamp event.
++ */
++static void wx_ptp_tx_hwtstamp_work(struct work_struct *work)
++{
++	struct wx *wx = container_of(work, struct wx, ptp_tx_work);
++	u32 tsynctxctl;
++	bool timeout;
++
++	/* we have to have a valid skb to poll for a timestamp */
++	if (!wx->ptp_tx_skb) {
++		wx_ptp_clear_tx_timestamp(wx);
++		return;
++	}
++
++	/* stop polling once we have a valid timestamp */
++	tsynctxctl = rd32ptp(wx, WX_TSC_1588_CTL);
++	if (tsynctxctl & WX_TSC_1588_CTL_VALID) {
++		wx_ptp_tx_hwtstamp(wx);
++		return;
++	}
++
++	timeout = time_is_before_jiffies(wx->ptp_tx_start + WX_PTP_TX_TIMEOUT);
++	/* check timeout last in case timestamp event just occurred */
++	if (timeout) {
++		wx_ptp_clear_tx_timestamp(wx);
++		wx->tx_hwtstamp_timeouts++;
++		dev_warn(&wx->pdev->dev, "clearing Tx Timestamp hang\n");
++	} else {
++		/* reschedule to keep checking until we timeout */
++		schedule_work(&wx->ptp_tx_work);
++	}
++}
++
++/**
++ * wx_ptp_create_clock
++ * @wx: the private board structure
++ *
++ * Returns 0 on success, negative value on failure
++ *
++ * This function performs setup of the user entry point function table and
++ * initalizes the PTP clock device used by userspace to access the clock-like
++ * features of the PTP core. It will be called by wx_ptp_init, and may
++ * re-use a previously initialized clock (such as during a suspend/resume
++ * cycle).
++ */
++static long wx_ptp_create_clock(struct wx *wx)
++{
++	struct net_device *netdev = wx->netdev;
++	long err;
++
++	/* do nothing if we already have a clock device */
++	if (!IS_ERR_OR_NULL(wx->ptp_clock))
++		return 0;
++
++	snprintf(wx->ptp_caps.name, sizeof(wx->ptp_caps.name),
++		 "%s", netdev->name);
++	wx->ptp_caps.owner = THIS_MODULE;
++	wx->ptp_caps.n_alarm = 0;
++	wx->ptp_caps.n_ext_ts = 0;
++	wx->ptp_caps.n_per_out = 0;
++	wx->ptp_caps.pps = 0;
++	wx->ptp_caps.adjfine = wx_ptp_adjfine;
++	wx->ptp_caps.adjtime = wx_ptp_adjtime;
++	wx->ptp_caps.gettimex64 = wx_ptp_gettimex64;
++	wx->ptp_caps.settime64 = wx_ptp_settime64;
++	wx->ptp_caps.do_aux_work = wx_ptp_do_aux_work;
++	if (wx->mac.type == wx_mac_em)
++		wx->ptp_caps.max_adj = 500000000;
++	else
++		wx->ptp_caps.max_adj = 250000000;
++
++	wx->ptp_clock = ptp_clock_register(&wx->ptp_caps, &wx->pdev->dev);
++	if (IS_ERR(wx->ptp_clock)) {
++		err = PTR_ERR(wx->ptp_clock);
++		wx->ptp_clock = NULL;
++		wx_err(wx, "ptp clock register failed\n");
++		return err;
++	} else if (wx->ptp_clock) {
++		dev_info(&wx->pdev->dev, "registered PHC device on %s\n",
++			 netdev->name);
++	}
++
++	/* Set the default timestamp mode to disabled here. We do this in
++	 * create_clock instead of initialization, because we don't want to
++	 * override the previous settings during a suspend/resume cycle.
++	 */
++	wx->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
++	wx->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
++
++	return 0;
++}
++
++/**
++ * wx_ptp_set_timestamp_mode - setup the hardware for the requested mode
++ * @wx: the private board structure
++ * @config: the hwtstamp configuration requested
++ *
++ * Returns 0 on success, negative on failure
++ *
++ * Outgoing time stamping can be enabled and disabled. Play nice and
++ * disable it when requested, although it shouldn't cause any overhead
++ * when no packet needs it. At most one packet in the queue may be
++ * marked for time stamping, otherwise it would be impossible to tell
++ * for sure to which packet the hardware time stamp belongs.
++ *
++ * Incoming time stamping has to be configured via the hardware
++ * filters. Not all combinations are supported, in particular event
++ * type has to be specified. Matching the kind of event packet is
++ * not supported, with the exception of "all V2 events regardless of
++ * level 2 or 4".
++ *
++ * Since hardware always timestamps Path delay packets when timestamping V2
++ * packets, regardless of the type specified in the register, only use V2
++ * Event mode. This more accurately tells the user what the hardware is going
++ * to do anyways.
++ *
++ * Note: this may modify the hwtstamp configuration towards a more general
++ * mode, if required to support the specifically requested mode.
++ */
++static int wx_ptp_set_timestamp_mode(struct wx *wx,
++				     struct kernel_hwtstamp_config *config)
++{
++	u32 tsync_tx_ctl = WX_TSC_1588_CTL_ENABLED;
++	u32 tsync_rx_ctl = WX_PSR_1588_CTL_ENABLED;
++	DECLARE_BITMAP(flags, WX_PF_FLAGS_NBITS);
++	u32 tsync_rx_mtrl = PTP_EV_PORT << 16;
++	bool is_l2 = false;
++	u32 regval;
++
++	memcpy(flags, wx->flags, sizeof(wx->flags));
++
++	switch (config->tx_type) {
++	case HWTSTAMP_TX_OFF:
++		tsync_tx_ctl = 0;
++		break;
++	case HWTSTAMP_TX_ON:
++		break;
++	default:
++		return -ERANGE;
++	}
++
++	switch (config->rx_filter) {
++	case HWTSTAMP_FILTER_NONE:
++		tsync_rx_ctl = 0;
++		tsync_rx_mtrl = 0;
++		clear_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
++		clear_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
++		break;
++	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
++		tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_L4_V1;
++		tsync_rx_mtrl |= WX_PSR_1588_MSG_V1_SYNC;
++		set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
++		set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
++		break;
++	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
++		tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_L4_V1;
++		tsync_rx_mtrl |= WX_PSR_1588_MSG_V1_DELAY_REQ;
++		set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
++		set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
++		break;
++	case HWTSTAMP_FILTER_PTP_V2_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
++	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
++	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
++		tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_EVENT_V2;
++		is_l2 = true;
++		config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
++		set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
++		set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
++		break;
++	default:
++		/* register RXMTRL must be set in order to do V1 packets,
++		 * therefore it is not possible to time stamp both V1 Sync and
++		 * Delay_Req messages unless hardware supports timestamping all
++		 * packets => return error
++		 */
++		clear_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, wx->flags);
++		clear_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, wx->flags);
++		config->rx_filter = HWTSTAMP_FILTER_NONE;
++		return -ERANGE;
++	}
++
++	/* define ethertype filter for timestamping L2 packets */
++	if (is_l2)
++		wr32(wx, WX_PSR_ETYPE_SWC(WX_PSR_ETYPE_SWC_FILTER_1588),
++		     (WX_PSR_ETYPE_SWC_FILTER_EN | /* enable filter */
++		      WX_PSR_ETYPE_SWC_1588 | /* enable timestamping */
++		      ETH_P_1588)); /* 1588 eth protocol type */
++	else
++		wr32(wx, WX_PSR_ETYPE_SWC(WX_PSR_ETYPE_SWC_FILTER_1588), 0);
++
++	/* enable/disable TX */
++	regval = rd32ptp(wx, WX_TSC_1588_CTL);
++	regval &= ~WX_TSC_1588_CTL_ENABLED;
++	regval |= tsync_tx_ctl;
++	wr32ptp(wx, WX_TSC_1588_CTL, regval);
++
++	/* enable/disable RX */
++	regval = rd32(wx, WX_PSR_1588_CTL);
++	regval &= ~(WX_PSR_1588_CTL_ENABLED | WX_PSR_1588_CTL_TYPE_MASK);
++	regval |= tsync_rx_ctl;
++	wr32(wx, WX_PSR_1588_CTL, regval);
++
++	/* define which PTP packets are time stamped */
++	wr32(wx, WX_PSR_1588_MSG, tsync_rx_mtrl);
++
++	WX_WRITE_FLUSH(wx);
++
++	/* configure adapter flags only when HW is actually configured */
++	memcpy(wx->flags, flags, sizeof(wx->flags));
++
++	/* clear TX/RX timestamp state, just to be sure */
++	wx_ptp_clear_tx_timestamp(wx);
++	rd32(wx, WX_PSR_1588_STMPH);
++
++	return 0;
++}
++
++/**
++ * wx_ptp_read - read raw cycle counter (to be used by time counter)
++ * @hw_cc: the cyclecounter structure
++ *
++ * this function reads the cyclecounter registers and is called by the
++ * cyclecounter structure used to construct a ns counter from the
++ * arbitrary fixed point registers
++ */
++static u64 wx_ptp_read(const struct cyclecounter *hw_cc)
++{
++	struct wx *wx = container_of(hw_cc, struct wx, hw_cc);
++	u64 stamp = 0;
++
++	stamp |= (u64)rd32ptp(wx, WX_TSC_1588_SYSTIML);
++	stamp |= (u64)rd32ptp(wx, WX_TSC_1588_SYSTIMH) << 32;
++
++	return stamp;
++}
++
++static void wx_ptp_link_speed_adjust(struct wx *wx, u32 *shift, u32 *incval)
++{
++	if (wx->mac.type == wx_mac_em) {
++		*shift = WX_INCVAL_SHIFT_EM;
++		*incval = WX_INCVAL_EM;
++		return;
++	}
++
++	switch (wx->speed) {
++	case SPEED_10:
++		*shift = WX_INCVAL_SHIFT_10;
++		*incval = WX_INCVAL_10;
++		break;
++	case SPEED_100:
++		*shift = WX_INCVAL_SHIFT_100;
++		*incval = WX_INCVAL_100;
++		break;
++	case SPEED_1000:
++		*shift = WX_INCVAL_SHIFT_1GB;
++		*incval = WX_INCVAL_1GB;
++		break;
++	case SPEED_10000:
++	default:
++		*shift = WX_INCVAL_SHIFT_10GB;
++		*incval = WX_INCVAL_10GB;
++		break;
++	}
++}
++
++/**
++ * wx_ptp_reset_cyclecounter - create the cycle counter from hw
++ * @wx: pointer to the wx structure
++ *
++ * This function should be called to set the proper values for the TSC_1588_INC
++ * register and tell the cyclecounter structure what the tick rate of SYSTIME
++ * is. It does not directly modify SYSTIME registers or the timecounter
++ * structure. It should be called whenever a new TSC_1588_INC value is
++ * necessary, such as during initialization or when the link speed changes.
++ */
++void wx_ptp_reset_cyclecounter(struct wx *wx)
++{
++	u32 incval = 0, mask = 0;
++	struct cyclecounter cc;
++	unsigned long flags;
++
++	/* For some of the boards below this mask is technically incorrect.
++	 * The timestamp mask overflows at approximately 61bits. However the
++	 * particular hardware does not overflow on an even bitmask value.
++	 * Instead, it overflows due to conversion of upper 32bits billions of
++	 * cycles. Timecounters are not really intended for this purpose so
++	 * they do not properly function if the overflow point isn't 2^N-1.
++	 * However, the actual SYSTIME values in question take ~138 years to
++	 * overflow. In practice this means they won't actually overflow. A
++	 * proper fix to this problem would require modification of the
++	 * timecounter delta calculations.
++	 */
++	cc.mask = CLOCKSOURCE_MASK(64);
++	cc.mult = 1;
++	cc.shift = 0;
++
++	cc.read = wx_ptp_read;
++	wx_ptp_link_speed_adjust(wx, &cc.shift, &incval);
++
++	/* update the base incval used to calculate frequency adjustment */
++	WRITE_ONCE(wx->base_incval, incval);
++
++	mask = (wx->mac.type == wx_mac_em) ? 0x7FFFFFF : 0xFFFFFF;
++	incval &= mask;
++	if (wx->mac.type != wx_mac_em)
++		incval |= 2 << 24;
++	wr32ptp(wx, WX_TSC_1588_INC, incval);
++
++	smp_mb(); /* Force the above update. */
++
++	/* need lock to prevent incorrect read while modifying cyclecounter */
++	spin_lock_irqsave(&wx->tmreg_lock, flags);
++	memcpy(&wx->hw_cc, &cc, sizeof(wx->hw_cc));
++	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
++}
++EXPORT_SYMBOL(wx_ptp_reset_cyclecounter);
++
++/**
++ * wx_ptp_reset
++ * @wx: the private board structure
++ *
++ * When the MAC resets, all of the hardware configuration for timesync is
++ * reset. This function should be called to re-enable the device for PTP,
++ * using the last known settings. However, we do lose the current clock time,
++ * so we fallback to resetting it based on the kernel's realtime clock.
++ *
++ * This function will maintain the hwtstamp_config settings, and it retriggers
++ * the SDP output if it's enabled.
++ */
++void wx_ptp_reset(struct wx *wx)
++{
++	unsigned long flags;
++
++	/* reset the hardware timestamping mode */
++	wx_ptp_set_timestamp_mode(wx, &wx->tstamp_config);
++	wx_ptp_reset_cyclecounter(wx);
++
++	wr32ptp(wx, WX_TSC_1588_SYSTIML, 0);
++	wr32ptp(wx, WX_TSC_1588_SYSTIMH, 0);
++	WX_WRITE_FLUSH(wx);
++
++	spin_lock_irqsave(&wx->tmreg_lock, flags);
++	timecounter_init(&wx->hw_tc, &wx->hw_cc,
++			 ktime_to_ns(ktime_get_real()));
++	spin_unlock_irqrestore(&wx->tmreg_lock, flags);
++}
++EXPORT_SYMBOL(wx_ptp_reset);
++
++/**
++ * wx_ptp_init
++ * @wx: the private board structure
++ *
++ * This function performs the required steps for enabling ptp
++ * support. If ptp support has already been loaded it simply calls the
++ * cyclecounter init routine and exits.
++ */
++void wx_ptp_init(struct wx *wx)
++{
++	/* Initialize the spin lock first, since the user might call the clock
++	 * functions any time after we've initialized the ptp clock device.
++	 */
++	spin_lock_init(&wx->tmreg_lock);
++
++	/* obtain a ptp clock device, or re-use an existing device */
++	if (wx_ptp_create_clock(wx))
++		return;
++
++	/* we have a clock, so we can initialize work for timestamps now */
++	INIT_WORK(&wx->ptp_tx_work, wx_ptp_tx_hwtstamp_work);
++
++	wx->tx_hwtstamp_timeouts = 0;
++	wx->tx_hwtstamp_skipped = 0;
++	wx->rx_hwtstamp_cleared = 0;
++	/* reset the ptp related hardware bits */
++	wx_ptp_reset(wx);
++
++	/* enter the WX_STATE_PTP_RUNNING state */
++	set_bit(WX_STATE_PTP_RUNNING, wx->state);
++}
++EXPORT_SYMBOL(wx_ptp_init);
++
++/**
++ * wx_ptp_suspend - stop ptp work items
++ * @wx: pointer to wx struct
++ *
++ * This function suspends ptp activity, and prevents more work from being
++ * generated, but does not destroy the clock device.
++ */
++void wx_ptp_suspend(struct wx *wx)
++{
++	/* leave the WX_STATE_PTP_RUNNING STATE */
++	if (!test_and_clear_bit(WX_STATE_PTP_RUNNING, wx->state))
++		return;
++
++	cancel_work_sync(&wx->ptp_tx_work);
++	wx_ptp_clear_tx_timestamp(wx);
++}
++EXPORT_SYMBOL(wx_ptp_suspend);
++
++/**
++ * wx_ptp_stop - destroy the ptp_clock device
++ * @wx: pointer to wx struct
++ *
++ * Completely destroy the ptp_clock device, and disable all PTP related
++ * features. Intended to be run when the device is being closed.
++ */
++void wx_ptp_stop(struct wx *wx)
++{
++	/* first, suspend ptp activity */
++	wx_ptp_suspend(wx);
++
++	/* now destroy the ptp clock device */
++	if (wx->ptp_clock) {
++		ptp_clock_unregister(wx->ptp_clock);
++		wx->ptp_clock = NULL;
++		dev_info(&wx->pdev->dev, "removed PHC on %s\n", wx->netdev->name);
++	}
++}
++EXPORT_SYMBOL(wx_ptp_stop);
++
++/**
++ * wx_ptp_rx_hwtstamp - utility function which checks for RX time stamp
++ * @wx: pointer to wx struct
++ * @skb: particular skb to send timestamp with
++ *
++ * if the timestamp is valid, we convert it into the timecounter ns
++ * value, then store that result into the shhwtstamps structure which
++ * is passed up the network stack
++ */
++void wx_ptp_rx_hwtstamp(struct wx *wx, struct sk_buff *skb)
++{
++	u64 regval = 0;
++	u32 tsyncrxctl;
++
++	/* Read the tsyncrxctl register afterwards in order to prevent taking an
++	 * I/O hit on every packet.
++	 */
++	tsyncrxctl = rd32(wx, WX_PSR_1588_CTL);
++	if (!(tsyncrxctl & WX_PSR_1588_CTL_VALID))
++		return;
++
++	regval |= (u64)rd32(wx, WX_PSR_1588_STMPL);
++	regval |= (u64)rd32(wx, WX_PSR_1588_STMPH) << 32;
++
++	wx_ptp_convert_to_hwtstamp(wx, skb_hwtstamps(skb), regval);
++}
++
++int wx_hwtstamp_get(struct net_device *dev,
++		    struct kernel_hwtstamp_config *cfg)
++{
++	struct wx *wx = netdev_priv(dev);
++
++	if (!netif_running(dev))
++		return -EINVAL;
++
++	*cfg = wx->tstamp_config;
++
++	return 0;
++}
++EXPORT_SYMBOL(wx_hwtstamp_get);
++
++int wx_hwtstamp_set(struct net_device *dev,
++		    struct kernel_hwtstamp_config *cfg,
++		    struct netlink_ext_ack *extack)
++{
++	struct wx *wx = netdev_priv(dev);
++	int err;
++
++	if (!netif_running(dev))
++		return -EINVAL;
++
++	err = wx_ptp_set_timestamp_mode(wx, cfg);
++	if (err)
++		return err;
++
++	/* save these settings for future reference */
++	memcpy(&wx->tstamp_config, cfg, sizeof(wx->tstamp_config));
++
++	return 0;
++}
++EXPORT_SYMBOL(wx_hwtstamp_set);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
+new file mode 100644
+index 000000000000..8742d2797363
+--- /dev/null
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) 2019 - 2025 Beijing WangXun Technology Co., Ltd. */
++
++#ifndef _WX_PTP_H_
++#define _WX_PTP_H_
++
++void wx_ptp_reset_cyclecounter(struct wx *wx);
++void wx_ptp_reset(struct wx *wx);
++void wx_ptp_init(struct wx *wx);
++void wx_ptp_suspend(struct wx *wx);
++void wx_ptp_stop(struct wx *wx);
++void wx_ptp_rx_hwtstamp(struct wx *wx, struct sk_buff *skb);
++int wx_hwtstamp_get(struct net_device *dev,
++		    struct kernel_hwtstamp_config *cfg);
++int wx_hwtstamp_set(struct net_device *dev,
++		    struct kernel_hwtstamp_config *cfg,
++		    struct netlink_ext_ack *extack);
++
++#endif /* _WX_PTP_H_ */
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index b54bffda027b..31b11dba6bf5 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -4,6 +4,8 @@
+ #ifndef _WX_TYPE_H_
+ #define _WX_TYPE_H_
+ 
++#include <linux/ptp_clock_kernel.h>
++#include <linux/timecounter.h>
+ #include <linux/bitfield.h>
+ #include <linux/netdevice.h>
+ #include <linux/if_vlan.h>
+@@ -180,6 +182,23 @@
+ #define WX_PSR_VLAN_CTL              0x15088
+ #define WX_PSR_VLAN_CTL_CFIEN        BIT(29)  /* bit 29 */
+ #define WX_PSR_VLAN_CTL_VFE          BIT(30)  /* bit 30 */
++/* EType Queue Filter */
++#define WX_PSR_ETYPE_SWC(_i)         (0x15128 + ((_i) * 4))
++#define WX_PSR_ETYPE_SWC_FILTER_1588 3
++#define WX_PSR_ETYPE_SWC_FILTER_EN   BIT(31)
++#define WX_PSR_ETYPE_SWC_1588        BIT(30)
++/* 1588 */
++#define WX_PSR_1588_MSG                 0x15120
++#define WX_PSR_1588_MSG_V1_SYNC         FIELD_PREP(GENMASK(7, 0), 0)
++#define WX_PSR_1588_MSG_V1_DELAY_REQ    FIELD_PREP(GENMASK(7, 0), 1)
++#define WX_PSR_1588_STMPL               0x151E8
++#define WX_PSR_1588_STMPH               0x151A4
++#define WX_PSR_1588_CTL                 0x15188
++#define WX_PSR_1588_CTL_ENABLED         BIT(4)
++#define WX_PSR_1588_CTL_TYPE_MASK       GENMASK(3, 1)
++#define WX_PSR_1588_CTL_TYPE_L4_V1      FIELD_PREP(GENMASK(3, 1), 1)
++#define WX_PSR_1588_CTL_TYPE_EVENT_V2   FIELD_PREP(GENMASK(3, 1), 5)
++#define WX_PSR_1588_CTL_VALID           BIT(0)
+ /* mcasst/ucast overflow tbl */
+ #define WX_PSR_MC_TBL(_i)            (0x15200  + ((_i) * 4))
+ #define WX_PSR_UC_TBL(_i)            (0x15400 + ((_i) * 4))
+@@ -253,6 +272,15 @@
+ #define WX_TSC_ST_SECTX_RDY          BIT(0)
+ #define WX_TSC_BUF_AE                0x1D00C
+ #define WX_TSC_BUF_AE_THR            GENMASK(9, 0)
++/* 1588 */
++#define WX_TSC_1588_CTL              0x11F00
++#define WX_TSC_1588_CTL_ENABLED      BIT(4)
++#define WX_TSC_1588_CTL_VALID        BIT(0)
++#define WX_TSC_1588_STMPL            0x11F04
++#define WX_TSC_1588_STMPH            0x11F08
++#define WX_TSC_1588_SYSTIML          0x11F0C
++#define WX_TSC_1588_SYSTIMH          0x11F10
++#define WX_TSC_1588_INC              0x11F14
+ 
+ /************************************** MNG ********************************/
+ #define WX_MNG_SWFW_SYNC             0x1E008
+@@ -460,6 +488,7 @@ enum WX_MSCA_CMD_value {
+ #define WX_RXD_STAT_L4CS             BIT(7) /* L4 xsum calculated */
+ #define WX_RXD_STAT_IPCS             BIT(8) /* IP xsum calculated */
+ #define WX_RXD_STAT_OUTERIPCS        BIT(10) /* Cloud IP xsum calculated*/
++#define WX_RXD_STAT_TS               BIT(14) /* IEEE1588 Time Stamp */
+ 
+ #define WX_RXD_ERR_OUTERIPER         BIT(26) /* CRC IP Header error */
+ #define WX_RXD_ERR_RXE               BIT(29) /* Any MAC Error */
+@@ -863,6 +892,7 @@ struct wx_tx_context_desc {
+  */
+ struct wx_tx_buffer {
+ 	union wx_tx_desc *next_to_watch;
++	unsigned long time_stamp;
+ 	struct sk_buff *skb;
+ 	unsigned int bytecount;
+ 	unsigned short gso_segs;
+@@ -924,6 +954,7 @@ struct wx_ring {
+ 	unsigned int size;              /* length in bytes */
+ 
+ 	u16 count;                      /* amount of descriptors */
++	unsigned long last_rx_timestamp;
+ 
+ 	u8 queue_index; /* needed for multiqueue queue management */
+ 	u8 reg_idx;                     /* holds the special value that gets
+@@ -1026,6 +1057,8 @@ struct wx_hw_stats {
+ 
+ enum wx_state {
+ 	WX_STATE_RESETTING,
++	WX_STATE_PTP_RUNNING,
++	WX_STATE_PTP_TX_IN_PROGRESS,
+ 	WX_STATE_NBITS,		/* must be last */
+ };
+ 
+@@ -1033,6 +1066,8 @@ enum wx_pf_flags {
+ 	WX_FLAG_FDIR_CAPABLE,
+ 	WX_FLAG_FDIR_HASH,
+ 	WX_FLAG_FDIR_PERFECT,
++	WX_FLAG_RX_HWTSTAMP_ENABLED,
++	WX_FLAG_RX_HWTSTAMP_IN_REGISTER,
+ 	WX_PF_FLAGS_NBITS               /* must be last */
+ };
+ 
+@@ -1133,6 +1168,20 @@ struct wx {
+ 	void (*atr)(struct wx_ring *ring, struct wx_tx_buffer *first, u8 ptype);
+ 	void (*configure_fdir)(struct wx *wx);
+ 	void (*do_reset)(struct net_device *netdev);
++
++	u32 base_incval;
++	u32 tx_hwtstamp_timeouts;
++	u32 tx_hwtstamp_skipped;
++	u32 rx_hwtstamp_cleared;
++	unsigned long ptp_tx_start;
++	spinlock_t tmreg_lock; /* spinlock for ptp */
++	struct cyclecounter hw_cc;
++	struct timecounter hw_tc;
++	struct ptp_clock *ptp_clock;
++	struct ptp_clock_info ptp_caps;
++	struct kernel_hwtstamp_config tstamp_config;
++	struct work_struct ptp_tx_work;
++	struct sk_buff *ptp_tx_skb;
+ };
+ 
+ #define WX_INTR_ALL (~0ULL)
+@@ -1177,6 +1226,24 @@ rd64(struct wx *wx, u32 reg)
+ 	return (lsb | msb << 32);
+ }
+ 
++static inline u32
++rd32ptp(struct wx *wx, u32 reg)
++{
++	if (wx->mac.type == wx_mac_em)
++		return rd32(wx, reg);
++
++	return rd32(wx, reg + 0xB500);
++}
++
++static inline void
++wr32ptp(struct wx *wx, u32 reg, u32 value)
++{
++	if (wx->mac.type == wx_mac_em)
++		return wr32(wx, reg, value);
++
++	return wr32(wx, reg + 0xB500, value);
++}
++
+ /* On some domestic CPU platforms, sometimes IO is not synchronized with
+  * flushing memory, here use readl() to flush PCI read and write.
+  */
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index 53aeae2f884b..c60a96cc3508 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -14,6 +14,7 @@
+ #include "../libwx/wx_type.h"
+ #include "../libwx/wx_hw.h"
+ #include "../libwx/wx_lib.h"
++#include "../libwx/wx_ptp.h"
+ #include "ngbe_type.h"
+ #include "ngbe_mdio.h"
+ #include "ngbe_hw.h"
+@@ -317,6 +318,8 @@ void ngbe_down(struct wx *wx)
+ {
+ 	phylink_stop(wx->phylink);
+ 	ngbe_disable_device(wx);
++	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
++		wx_ptp_reset(wx);
+ 	wx_clean_all_tx_rings(wx);
+ 	wx_clean_all_rx_rings(wx);
+ }
+@@ -379,6 +382,8 @@ static int ngbe_open(struct net_device *netdev)
+ 	if (err)
+ 		goto err_dis_phy;
+ 
++	wx_ptp_init(wx);
++
+ 	ngbe_up(wx);
+ 
+ 	return 0;
+@@ -407,6 +412,7 @@ static int ngbe_close(struct net_device *netdev)
+ {
+ 	struct wx *wx = netdev_priv(netdev);
+ 
++	wx_ptp_stop(wx);
+ 	ngbe_down(wx);
+ 	wx_free_irq(wx);
+ 	wx_free_isb_resources(wx);
+@@ -507,6 +513,8 @@ static const struct net_device_ops ngbe_netdev_ops = {
+ 	.ndo_get_stats64        = wx_get_stats64,
+ 	.ndo_vlan_rx_add_vid    = wx_vlan_rx_add_vid,
+ 	.ndo_vlan_rx_kill_vid   = wx_vlan_rx_kill_vid,
++	.ndo_hwtstamp_set       = wx_hwtstamp_set,
++	.ndo_hwtstamp_get       = wx_hwtstamp_get,
+ };
+ 
+ /**
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+index a5e9b779c44d..c7944e62838a 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+@@ -7,6 +7,7 @@
+ #include <linux/phy.h>
+ 
+ #include "../libwx/wx_type.h"
++#include "../libwx/wx_ptp.h"
+ #include "../libwx/wx_hw.h"
+ #include "ngbe_type.h"
+ #include "ngbe_mdio.h"
+@@ -64,6 +65,11 @@ static void ngbe_mac_config(struct phylink_config *config, unsigned int mode,
+ static void ngbe_mac_link_down(struct phylink_config *config,
+ 			       unsigned int mode, phy_interface_t interface)
+ {
++	struct wx *wx = phylink_to_wx(config);
++
++	wx->speed = SPEED_UNKNOWN;
++	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
++		wx_ptp_reset_cyclecounter(wx);
+ }
+ 
+ static void ngbe_mac_link_up(struct phylink_config *config,
+@@ -103,6 +109,10 @@ static void ngbe_mac_link_up(struct phylink_config *config,
+ 	wr32(wx, WX_MAC_PKT_FLT, WX_MAC_PKT_FLT_PR);
+ 	reg = rd32(wx, WX_MAC_WDG_TIMEOUT);
+ 	wr32(wx, WX_MAC_WDG_TIMEOUT, reg);
++
++	wx->speed = speed;
++	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
++		wx_ptp_reset_cyclecounter(wx);
+ }
+ 
+ static const struct phylink_mac_ops ngbe_mac_ops = {
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index f77450268036..734450af9a43 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -13,6 +13,7 @@
+ 
+ #include "../libwx/wx_type.h"
+ #include "../libwx/wx_lib.h"
++#include "../libwx/wx_ptp.h"
+ #include "../libwx/wx_hw.h"
+ #include "txgbe_type.h"
+ #include "txgbe_hw.h"
+@@ -116,6 +117,9 @@ static void txgbe_reset(struct wx *wx)
+ 	memcpy(old_addr, &wx->mac_table[0].addr, netdev->addr_len);
+ 	wx_flush_sw_mac_table(wx);
+ 	wx_mac_set_default_filter(wx, old_addr);
++
++	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
++		wx_ptp_reset(wx);
+ }
+ 
+ static void txgbe_disable_device(struct wx *wx)
+@@ -176,6 +180,7 @@ void txgbe_down(struct wx *wx)
+ void txgbe_up(struct wx *wx)
+ {
+ 	wx_configure(wx);
++	wx_ptp_init(wx);
+ 	txgbe_up_complete(wx);
+ }
+ 
+@@ -321,6 +326,8 @@ static int txgbe_open(struct net_device *netdev)
+ 	if (err)
+ 		goto err_free_irq;
+ 
++	wx_ptp_init(wx);
++
+ 	txgbe_up_complete(wx);
+ 
+ 	return 0;
+@@ -344,6 +351,7 @@ static int txgbe_open(struct net_device *netdev)
+  */
+ static void txgbe_close_suspend(struct wx *wx)
+ {
++	wx_ptp_suspend(wx);
+ 	txgbe_disable_device(wx);
+ 	wx_free_resources(wx);
+ }
+@@ -363,6 +371,7 @@ static int txgbe_close(struct net_device *netdev)
+ {
+ 	struct wx *wx = netdev_priv(netdev);
+ 
++	wx_ptp_stop(wx);
+ 	txgbe_down(wx);
+ 	wx_free_irq(wx);
+ 	wx_free_resources(wx);
+@@ -479,6 +488,8 @@ static const struct net_device_ops txgbe_netdev_ops = {
+ 	.ndo_get_stats64        = wx_get_stats64,
+ 	.ndo_vlan_rx_add_vid    = wx_vlan_rx_add_vid,
+ 	.ndo_vlan_rx_kill_vid   = wx_vlan_rx_kill_vid,
++	.ndo_hwtstamp_set       = wx_hwtstamp_set,
++	.ndo_hwtstamp_get       = wx_hwtstamp_get,
+ };
+ 
+ /**
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 1ae68f94dd49..60e5f3288ad8 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -15,6 +15,7 @@
+ 
+ #include "../libwx/wx_type.h"
+ #include "../libwx/wx_lib.h"
++#include "../libwx/wx_ptp.h"
+ #include "../libwx/wx_hw.h"
+ #include "txgbe_type.h"
+ #include "txgbe_phy.h"
+@@ -179,6 +180,10 @@ static void txgbe_mac_link_down(struct phylink_config *config,
+ 	struct wx *wx = phylink_to_wx(config);
+ 
+ 	wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
++
++	wx->speed = SPEED_UNKNOWN;
++	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
++		wx_ptp_reset_cyclecounter(wx);
+ }
+ 
+ static void txgbe_mac_link_up(struct phylink_config *config,
+@@ -215,6 +220,10 @@ static void txgbe_mac_link_up(struct phylink_config *config,
+ 	wr32(wx, WX_MAC_PKT_FLT, WX_MAC_PKT_FLT_PR);
+ 	wdg = rd32(wx, WX_MAC_WDG_TIMEOUT);
+ 	wr32(wx, WX_MAC_WDG_TIMEOUT, wdg);
++
++	wx->speed = speed;
++	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
++		wx_ptp_reset_cyclecounter(wx);
+ }
+ 
+ static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
 -- 
 2.27.0
 
