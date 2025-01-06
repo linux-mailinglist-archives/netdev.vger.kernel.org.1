@@ -1,109 +1,84 @@
-Return-Path: <netdev+bounces-155592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4484A031E9
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:15:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C64C1A031E8
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 22:15:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A3F618842EB
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:15:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BA0D1883CD7
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 21:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E881E0B72;
-	Mon,  6 Jan 2025 21:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4140C1E04BD;
+	Mon,  6 Jan 2025 21:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O/ijbblj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VlcUySei"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DE91E04A1
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 21:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0741DF961
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 21:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736198137; cv=none; b=inlI2J2rSTvWiRwt2/9mktiqaozgOmuk3C1hDDBtE0CQ2FIjn2f2+68LZy1ZJjVZoNIxW+pf/siy5OV1qNtj56r0ac5Y3qNsk0l5ygfzH0ju8EyDIBRB48BXrtqxJAcZGiCPH4+EDKoT5lhICNh83hYydVgdTzKBQn8D+FfOtPs=
+	t=1736198134; cv=none; b=skPY4SM2MTtiJULaAemrJ5OECpmrJqCdDY0ZVbdIV9KQbXmBr7rp4O7By9Injb/jNCl3PnAJ/0w2D0v+VQY8Fu/u9g/WDgNwj41rEadQSCQBtBplUVfVwmBHADan3WG0XgcHHxE/X67uxZIe7aVDn0CbxS7rZzTni7ujtzIUI3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736198137; c=relaxed/simple;
-	bh=MGHRfNW3QYgm4KGcwcfv6bz6L1OC5FBtO1avcKkwI2o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ECSZxpU8Vxcp+2AMZe2IBIL/YU0VGqyVmToWhD8rQDcqitnW+2b6Vex432Os0rK8Is/cAOBlYVIdJNDLo6wXCRlnAOmuElOhpVU7QWJQDb+Er0zAX7UIo2WvRUjLgoF9KYp2FslVkZSBkUhsGDINODciQVwQv2Oud8uLOxQN7IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O/ijbblj; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-467abce2ef9so58731cf.0
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 13:15:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736198132; x=1736802932; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MGHRfNW3QYgm4KGcwcfv6bz6L1OC5FBtO1avcKkwI2o=;
-        b=O/ijbblj+NnNHqFWik4iaT85GRLLYqE5jvo5SFTW7AhZYoTXTXvZ73qdh6tHnqVzwt
-         NgjB2QKj4+ZV0qHtfyMZnXG1PzOsYd8FfiyCudB2yIzCUZ8SqHovXNmNItbuNAa2G8Te
-         XAFbdl1BxxH+vxHao8ijNdMca+nfM3I6PAA26HUFYiial+T+hws53P+WV3C8uUWLm5KN
-         sWwDXV3sFSogpWJQf9Wwswt/8BbwUS7NTSZAbMpZ7P7esb9MYhGgTXjFN3z/YPzzVYyQ
-         cHOJX1kW2q0Uj9R9KfkNYaQeJsz+2BytO7MhyUnk4L94j7BD7URaujRxXiRD43+Kd4A/
-         HZgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736198132; x=1736802932;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MGHRfNW3QYgm4KGcwcfv6bz6L1OC5FBtO1avcKkwI2o=;
-        b=TbY9EJjus5I+0+UI6S9WzLc2znxUQib26C24qUnERjDSMgO0yY0FGBPaZmxkVaTaAg
-         fj1EeshZdPi1joV4u2AKT+LKB2sqlCznUUj5kRiaPwwzGIPv2fbHwysJXry6P7APV7GQ
-         eDlSu2W98+yd8gDD9+RoNOroQGkA1aEHp/GNPt1p1QpUQ3wpb09zKq0yo5NG9UdKapc/
-         lbDOGL3Qwdsc5XyDHcoampOEwdQN5MNV2sA3zEKKr9L+5LxOD9Nqv7N4W3OegZ2FPbyO
-         iNF6AFHCc5r6uanMTPSlKp3bIweozaGuU/tVvb3KWOfPpCMrRLhEgN4lVIq5n+kvtyPb
-         h4+w==
-X-Gm-Message-State: AOJu0YyIIUlWqyCrgkJDI/4YJQLfmR8UAx52q1/qQZVmET3XNzOu3T9k
-	lxmHC34GoeNQkJtqHfWuzGMmLKp3/7s+PWqRaSFM7yAHblHYkaR3/Qw0xKj8DEEnWGReuR3xMAJ
-	ekLChJ5UEPy9scnA3z44qllz8RfbUXx4VHt0t
-X-Gm-Gg: ASbGncv3Su8UI0yqzZ46oMEI45Id88K7CdsmGk7BNo8A15FoEErb88jwnKvHm1Y9Fvz
-	hEErFy5V/zUgyRZvZZcXMjbNpl8ozpAVgcStLZTH28brnjonPo/8XFSpuDkU9Twz2BjNUt3Y=
-X-Google-Smtp-Source: AGHT+IHFbo75Puxjkm64WI3YyLK5CsXwXyzyW8ExVEU09NWAASfSNPbXnzf663rHHNZNtnbRkm6Dnvtug0/wJS995yY=
-X-Received: by 2002:ac8:5e12:0:b0:466:975f:b219 with SMTP id
- d75a77b69052e-46b3b759277mr650411cf.8.1736198132062; Mon, 06 Jan 2025
- 13:15:32 -0800 (PST)
+	s=arc-20240116; t=1736198134; c=relaxed/simple;
+	bh=tqHaJSUUbqrqutPRvq+MteDcMsc8jZMlUJ87xDFoqrE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KNvY87kWkh/i5cWdbJp+LsIaUL4t6A0ILwbr+teTuJZBgtDsxvrjcvpZnbbzJvdCimw3TbYOUoH9O2ptVyAct+6Xz9nOeCO354P2axlO+2ZA63ucCE0wUAOTMbMaqwyci1+9Kf6A4CwCfOmc2j7zm9/G3X79sMqkTqi5zl5Jhtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VlcUySei; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SjQIDBOOBVJqUUXoqv6QWpRYqizgy8BiPfB2QNTXwxM=; b=VlcUySeitAVLmwhmmQ2ikg35Pu
+	ZhaoQUCWfOxZpH9mXi3SST9LUc4xXO2knT8JgaIBU2weBAnLIPm8Ml2LClkxjPwnxEv0CymMNbwsJ
+	wYuHBBkazci+XiudKv3inHd1xhx69jFSDZSHz6MD+NWeUTDSx1nRQFMkDDu5jVtNZ+wU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tUuRX-001zhd-Ow; Mon, 06 Jan 2025 22:15:23 +0100
+Date: Mon, 6 Jan 2025 22:15:23 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] r8169: add support for reading over-temp
+ threshold
+Message-ID: <4535017c-10a8-47e8-8a8e-67c5db62bb16@lunn.ch>
+References: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
+ <f3e07026-8219-4b36-b230-7f7ddd71c7ab@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <e831515a-3756-40f6-a254-0f075e19996f@icdsoft.com> <d1f083ee-9ad2-422c-9278-c50a9fbd8be4@icdsoft.com>
-In-Reply-To: <d1f083ee-9ad2-422c-9278-c50a9fbd8be4@icdsoft.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Mon, 6 Jan 2025 16:15:15 -0500
-Message-ID: <CADVnQyntg=3ugLxr+tdyb0A+=KDkVGkGPJVvFTOg0XpoyMSQEw@mail.gmail.com>
-Subject: Re: Download throttling with kernel 6.6 (in KVM guests)
-To: Teodor Milkov <zimage@icdsoft.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f3e07026-8219-4b36-b230-7f7ddd71c7ab@gmail.com>
 
-On Mon, Jan 6, 2025 at 3:15=E2=80=AFPM Teodor Milkov <zimage@icdsoft.com> w=
-rote:
->
-> Hello,
->
-> Following up on my previous email, I=E2=80=99ve found the issue occurs
-> specifically with the |virtio-net| driver in KVM guests. Switching to
-> the |e1000| driver resolves the slowdown entirely, with no throttling in
-> subsequent downloads.
->
-> The reproducer and observations remain the same, but this detail might
-> help narrow down the issue.
+On Mon, Jan 06, 2025 at 07:05:13PM +0100, Heiner Kallweit wrote:
+> Add support for reading the over-temp threshold. If the chip temperature
+> exceeds this value, the chip will reduce the speed to 1Gbps (by disabling
+> 2.5G/5G advertisement and triggering a renegotiation).
 
-Thanks for narrowing it down! Interesting. So this sounds like
-something specific about the way the virtio-net driver is handling
-receive buffer memory, and the way that is interacting with Eric's
-excellent recent commit to make receive window management more
-precise:
+I'm assuming here that the over-temp threshold always exists when the
+temp_in sensors exists? If so:
 
-dfa2f0483360 tcp: get rid of sysctl_tcp_adv_win_scale
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-best regards,
-neal
+Does it reduce the speed in the same way as downshift? Can the user
+tell it has happened, other than networking is slower?
+
+    Andrew
 
