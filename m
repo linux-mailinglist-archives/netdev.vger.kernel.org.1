@@ -1,244 +1,150 @@
-Return-Path: <netdev+bounces-155405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA365A02363
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:48:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BA6CA02346
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 776B73A485E
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:47:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C215F18854C4
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B201DAC80;
-	Mon,  6 Jan 2025 10:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014251DB520;
+	Mon,  6 Jan 2025 10:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ZB6yQ7B7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r5ZArGrc"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D841D9353
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 10:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736160476; cv=none; b=fTnLZy6dDUnLqBbu/CZMZHLGTIgiWMfaCQhvyOqd/AONiU8uLbKtezDLmb4lacBTwOhjls/550gBPO9kRcM0jT3y81XWeGTHCVDw0vXi+Z2YXPeQlGP0G/XO8UIRWIzRuduFKpmlXnKefjAetiJ4CwBpWhE7YptBhhIeEDA8N9M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736160476; c=relaxed/simple;
-	bh=BKk9qe1PxjFeSw8mK2dqClvBnAP1949uCTMXbeOxnpY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R47TEgNeGClNUFLmnkvOXzbb325x79ITQ9O2WsqmgL3x+UQ0j9O8JQ9ksE+xSMRaL8NLwa5NzMnk5TMvbZx5ztSBRf0Huzav65uab9l1QP117iW3TLJrP5RoofLePFV9LSUx8oAhcN9a3um11nNIDt8JviEftsWl74irfmOtASc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ZB6yQ7B7; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id B3DD0206DF;
-	Mon,  6 Jan 2025 11:41:33 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EGsiM3-LLHoW; Mon,  6 Jan 2025 11:41:33 +0100 (CET)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 053FD206D0;
-	Mon,  6 Jan 2025 11:41:33 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 053FD206D0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1736160093;
-	bh=ZlmFhM9DP3p7/Fli3dGNGy7oAZ4JpUqVDZdG0//DPGc=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=ZB6yQ7B7uYrUZfyAXq/smJUr7/1hlfaM9i0esXXU9A8PR4aagUt5dBHf4QV/K9sRA
-	 e7/Qgs01BnowOsmE/nUPWdchKbGS/dheX7A4QpMhc0ze46IK72Fbpezl1INUO7PFeA
-	 eDtkhRh7+R1enhvW0hqTqlHpSS68e9YkoPzmNOYLS+ceguYVkgQ66wamCsWb7qDes2
-	 V3/kgwDbgPbXvhg1IyX5SoU7iVLmFtrvqr45IGcoM5c+TPzuFyFjzXJzKdl6C9YXrw
-	 Fjbt3R66LenikHSey4WXBH8QOXfB3MG6WcjuwjuhDWtUhdFEENUEFQQMQfY1juzou7
-	 QRju/L+Dq5kBA==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 6 Jan 2025 11:41:32 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 6 Jan
- 2025 11:41:32 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 55DC23180647; Mon,  6 Jan 2025 11:41:32 +0100 (CET)
-Date: Mon, 6 Jan 2025 11:41:32 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: Shahar Shitrit <shshitrit@nvidia.com>, "brianvv@google.com"
-	<brianvv@google.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"eric.dumazet@gmail.com" <eric.dumazet@gmail.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"martin.lau@kernel.org" <martin.lau@kernel.org>, "ncardwell@google.com"
-	<ncardwell@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>, Ziyad Atiyyeh <ziyadat@nvidia.com>, "Dror
- Tennenbaum" <drort@nvidia.com>
-Subject: Re: [PATCH v3 net-next 4/5] ipv6: tcp: give socket pointer to
- control skbs
-Message-ID: <Z3uzXOzV1T3Uv4f+@gauss3.secunet.de>
-References: <CY5PR12MB63224DE8AEEC1A2410E65466DA3B2@CY5PR12MB6322.namprd12.prod.outlook.com>
- <CANn89iL8ihnVyi+g1aKNu3=BJCQoRv4_s29OvVSXBBQdOM4foQ@mail.gmail.com>
- <CANn89iKAZsG=RepuJmStFTH2QK+N5s9Cu=OnD2GmQAb1JKCfeQ@mail.gmail.com>
- <Z2KHMLJ4oTUwgBSo@gauss3.secunet.de>
- <CANn89iJGYFzHi7eUQo49hmo0eTZzHvDTTqKXTxrSZvKKJXHa7g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269CE1D517B
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 10:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736160124; cv=none; b=LibMswN9uVIt05mOK1AyCrm9NS4gumyi0oaGHcwELQA59J1Nq40hvyB5Wbaq23yCPf+sLlngb57mfSauYHJDBUU6WbcwKjvFSTD1v09G+i6EPORj+GIoFr7fdLScL02Z1OdWFUNmgP7gdMS5kBiNjrfQLbYGgyh2Jy85Uzbiw8g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736160124; c=relaxed/simple;
+	bh=O4jMmvxObEHgIUe6Et9nnMEU82aa+Erw7nSLDuYzBec=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=QiO1BCXQez4rHY/tBPeZuYWp+l2OtEYgP9u3RQ9QIRdVYJFw7mFYag1SLnbt6DE4LsZzCutOnT3a0/a6cifFPLbe6IM+9SDkInmHa/yxzr3ofk7MMB4+Xsseesph1oetQ/7v7Tp9gmzx6cSpjzkV9sM6G8jG/0S6oy1QLZ4v13A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r5ZArGrc; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43622267b2eso149257165e9.0
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 02:42:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1736160121; x=1736764921; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yiXs66jKfa7Mc5GaX6CeH3zxabRcvrngKVx2PovGglk=;
+        b=r5ZArGrcpoIgmT1FPOFalH9MwRoiwUPRyXOmnDtbr+xNUn9OGIe18T3P/ZJ/6t3hfU
+         unDRO5npToPFQ52qZojmIvhPJpLtLB21OkGOUGu66pFK6JmQUUD3QbE1HUDwsDFvL0oH
+         x8a2d2qaMavXh7n7BhOcInvyo4ZkDDI9ETPXqqR7LEUydIc59w9PAS0MQ7JbflBkyRMw
+         TVIys0dedFLsp2rCBU8fX8xN4vxWPaQxx4wuIZrr6P0NoaAUEzREA67ddhV7ZRTrbp9E
+         4oHjXRu5WioRp7z/WSjTllxGEOiw5pbLwnK5eVqm5YlpbQUf2XjVvX0PYqCUzT1NkplD
+         rBfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736160121; x=1736764921;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yiXs66jKfa7Mc5GaX6CeH3zxabRcvrngKVx2PovGglk=;
+        b=MUm5JwzzByHnFvb4H5j1cD34uwDmiN+GZ5yHM1mII3TDrEHO1ZeYM3IyMrMMYmp9in
+         yA/NiINpcHXaaeV5spz/4rnJD5htQIqOWQvzXxk7K/CWojPoosC+ADezEOLwFSNUZzve
+         PY3lqct9SoIN6xzHwRf8LjJwGIAG4q/VJD+Y/YE2YuxCE3m+xgodl3R8f3v656le8vpM
+         IbrcVPSolxZ72AonRsDNpQ3O/rQHz/0ny94Ztfa5GlAt4Ub9XI71mGwORHZI26Kh85IA
+         EP/mXByL2S7mYBXT+odFcP7abdrU8Uu8aoD0E5BNuRJe5V051o/WI12tNgK/7VQ1JorC
+         Cvxw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/89Pk2/QTOkfbgPAduYI8LYi7nzbL4g37AwxlDrG0VTM2oBjrd44oTuoyHcxBJSi5Zbpuhd4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztpFROGCUMYi8R3W1PUoGd5XU7bZJ/1NezcAWdM49//ulVgFYc
+	NsPcQm3KrGN1r160Qop4AmramLpwOe5svWPVLtTvJU+nIFlA0TdFvkUu/x9VfvI=
+X-Gm-Gg: ASbGncshDG67Mb50b1aDeLEPS2BgjWTnwxC8769uybpDmyAeN8KYd51eJjBLDVkJ9Fz
+	fdx6YhOxTYzl1tti6y8ErGUKw9zl8+FtD1qNuAei6kh0O3uqZ6TeaX8nOrcdU7CSf1xK6BapCqN
+	e/8ziiP64rTop15OyXKevlIPYWUteRypByNcIW6k+pRGohqmMcS7KADoFrk4kYxoyPFx141h7Cg
+	ygAY9HAwmKNsETlI8slEIzKbvyaCDWXaHLk73E1400bUfltTzluKtEWqkV4zw==
+X-Google-Smtp-Source: AGHT+IFFbL3/UJS7YOsKC61qAsl6V0MH3eRyKaLo6PWURFKFeqg7gEQ4TfTlsT4jHqAfvgfc7t1paQ==
+X-Received: by 2002:a05:600c:1c12:b0:431:58cd:b259 with SMTP id 5b1f17b1804b1-4366d356dfcmr520636765e9.31.1736160121445;
+        Mon, 06 Jan 2025 02:42:01 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656af6cbbsm597654505e9.3.2025.01.06.02.42.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jan 2025 02:42:00 -0800 (PST)
+Date: Mon, 6 Jan 2025 13:41:58 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, alejandro.lucero-palau@amd.com,
+	linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v8 06/27] cxl: add function for type2 cxl regs setup
+Message-ID: <0fe103b3-76d5-47a0-900b-3769b9c59cee@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJGYFzHi7eUQo49hmo0eTZzHvDTTqKXTxrSZvKKJXHa7g@mail.gmail.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20241216161042.42108-7-alejandro.lucero-palau@amd.com>
 
-On Wed, Dec 18, 2024 at 10:04:19AM +0100, Eric Dumazet wrote:
-> On Wed, Dec 18, 2024 at 9:26 AM Steffen Klassert
-> <steffen.klassert@secunet.com> wrote:
-> >
-> > Can you provide a bit more context? I don't see the problem.
-> 
-> 
-> skb->sk is used in xfrm, and the assumption is that it is a full socket.
-> 
-> List of things that are supported, even for timewait and
-> request_sockets, and used in xfrm:
-> 
-> sk->sk_bound_dev_if
-> sock_net(skb->sk)
-> inet_sk(sk)->inet_dport;
-> 
-> But xfrmi_xmit2() for instance is doing :
-> 
-> err = dst_output(xi->net, skb->sk, skb);
-> 
-> Other dst_output() users use : dst_output(net, sk, skb), because sk
-> can be different than skb->sk
-> 
-> Also xfrm6_local_dontfrag() is assuming sk is an inet6 socket:
-> 
-> if (proto == IPPROTO_UDP || proto == IPPROTO_RAW)
->      return inet6_test_bit(DONTFRAG, sk);
-> 
-> xfrm_lookup_with_ifid() seems ok (it uses sk_const_to_full_sk()), but
-> we probably miss some fixes.
+Hi,
 
-Thanks for the explanation!
+kernel test robot noticed the following build warnings:
 
-I did a first audit of the xfrm stack to find the problematic
-skb->sk usages. The result is the (still untested) patch below.
-I need to go over it again to make sure I found everyting.
+url:    https://github.com/intel-lab-lkp/linux/commits/alejandro-lucero-palau-amd-com/cxl-add-type2-device-basic-support/20241217-001923
+base:   fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+patch link:    https://lore.kernel.org/r/20241216161042.42108-7-alejandro.lucero-palau%40amd.com
+patch subject: [PATCH v8 06/27] cxl: add function for type2 cxl regs setup
+config: arm64-randconfig-r072-20241225 (https://download.01.org/0day-ci/archive/20241227/202412270320.Aydp9B4U-lkp@intel.com/config)
+compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index f3281312eb5e..8cf5f6634775 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -279,7 +279,7 @@ static void esp_output_done(void *data, int err)
- 		    x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
- 			esp_output_tail_tcp(x, skb);
- 		else
--			xfrm_output_resume(skb->sk, skb, err);
-+			xfrm_output_resume(skb_to_full_sk(skb), skb, err);
- 	}
- }
- 
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index b2400c226a32..fad4d7c9fa50 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -315,7 +315,7 @@ static void esp_output_done(void *data, int err)
- 		    x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
- 			esp_output_tail_tcp(x, skb);
- 		else
--			xfrm_output_resume(skb->sk, skb, err);
-+			xfrm_output_resume(skb_to_full_sk(skb), skb, err);
- 	}
- }
- 
-diff --git a/net/ipv6/xfrm6_output.c b/net/ipv6/xfrm6_output.c
-index 5f7b1fdbffe6..b3d5d1f266ee 100644
---- a/net/ipv6/xfrm6_output.c
-+++ b/net/ipv6/xfrm6_output.c
-@@ -82,14 +82,14 @@ static int __xfrm6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- 	toobig = skb->len > mtu && !skb_is_gso(skb);
- 
--	if (toobig && xfrm6_local_dontfrag(skb->sk)) {
-+	if (toobig && xfrm6_local_dontfrag(sk)) {
- 		xfrm6_local_rxpmtu(skb, mtu);
- 		kfree_skb(skb);
- 		return -EMSGSIZE;
- 	} else if (toobig && xfrm6_noneed_fragment(skb)) {
- 		skb->ignore_df = 1;
- 		goto skip_frag;
--	} else if (!skb->ignore_df && toobig && skb->sk) {
-+	} else if (!skb->ignore_df && toobig && sk) {
- 		xfrm_local_error(skb, mtu);
- 		kfree_skb(skb);
- 		return -EMSGSIZE;
-diff --git a/net/xfrm/xfrm_interface_core.c b/net/xfrm/xfrm_interface_core.c
-index 98f1e2b67c76..c397eb99d867 100644
---- a/net/xfrm/xfrm_interface_core.c
-+++ b/net/xfrm/xfrm_interface_core.c
-@@ -506,7 +506,7 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
- 	skb_dst_set(skb, dst);
- 	skb->dev = tdev;
- 
--	err = dst_output(xi->net, skb->sk, skb);
-+	err = dst_output(xi->net, skb_to_full_sk(skb), skb);
- 	if (net_xmit_eval(err) == 0) {
- 		dev_sw_netstats_tx_add(dev, 1, length);
- 	} else {
-diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-index e5722c95b8bb..1fb4dc0a76e1 100644
---- a/net/xfrm/xfrm_output.c
-+++ b/net/xfrm/xfrm_output.c
-@@ -796,7 +796,7 @@ static int xfrm4_tunnel_check_size(struct sk_buff *skb)
- 	     !skb_gso_validate_network_len(skb, ip_skb_dst_mtu(skb->sk, skb)))) {
- 		skb->protocol = htons(ETH_P_IP);
- 
--		if (skb->sk)
-+		if (skb->sk && sk_fullsock(skb->sk))
- 			xfrm_local_error(skb, mtu);
- 		else
- 			icmp_send(skb, ICMP_DEST_UNREACH,
-@@ -832,6 +832,7 @@ static int xfrm6_tunnel_check_size(struct sk_buff *skb)
- {
- 	int mtu, ret = 0;
- 	struct dst_entry *dst = skb_dst(skb);
-+	struct sock *sk = skb_to_full_sk(skb);
- 
- 	if (skb->ignore_df)
- 		goto out;
-@@ -846,9 +847,9 @@ static int xfrm6_tunnel_check_size(struct sk_buff *skb)
- 		skb->dev = dst->dev;
- 		skb->protocol = htons(ETH_P_IPV6);
- 
--		if (xfrm6_local_dontfrag(skb->sk))
-+		if (xfrm6_local_dontfrag(sk))
- 			ipv6_stub->xfrm6_local_rxpmtu(skb, mtu);
--		else if (skb->sk)
-+		else if (sk)
- 			xfrm_local_error(skb, mtu);
- 		else
- 			icmpv6_send(skb, ICMPV6_PKT_TOOBIG, 0, mtu);
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 4408c11c0835..c27da1fd070e 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -2959,7 +2959,7 @@ static void xfrm_policy_queue_process(struct timer_list *t)
- 		skb_dst_drop(skb);
- 		skb_dst_set(skb, dst);
- 
--		dst_output(net, skb->sk, skb);
-+		dst_output(net, skb_to_full_sk(skb), skb);
- 	}
- 
- out:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202412270320.Aydp9B4U-lkp@intel.com/
+
+smatch warnings:
+drivers/cxl/core/pci.c:1134 cxl_pci_accel_setup_regs() warn: missing error code? 'rc'
+
+vim +/rc +1134 drivers/cxl/core/pci.c
+
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1118  int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds)
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1119  {
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1120  	int rc;
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1121  
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1122  	rc = cxl_pci_setup_memdev_regs(pdev, cxlds);
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1123  	if (rc)
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1124  		return rc;
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1125  
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1126  	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1127  				&cxlds->reg_map, cxlds->capabilities);
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1128  	if (rc) {
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1129  		dev_warn(&pdev->dev, "No component registers (%d)\n", rc);
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1130  		return rc;
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1131  	}
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1132  
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1133  	if (!test_bit(CXL_CM_CAP_CAP_ID_RAS, cxlds->capabilities))
+cfbd1d00295bff Alejandro Lucero 2024-12-16 @1134  		return rc;
+
+This looks like it's supposed to be return -EPERM.
+
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1135  
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1136  	rc = cxl_map_component_regs(&cxlds->reg_map,
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1137  				    &cxlds->regs.component,
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1138  				    BIT(CXL_CM_CAP_CAP_ID_RAS));
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1139  	if (rc)
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1140  		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1141  
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1142  	return rc;
+cfbd1d00295bff Alejandro Lucero 2024-12-16  1143  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
