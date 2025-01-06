@@ -1,95 +1,60 @@
-Return-Path: <netdev+bounces-155404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96265A0235D
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:47:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B8FAA0241A
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 12:18:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242843A48DE
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 10:47:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1132C7A3139
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 11:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2AF1DA61E;
-	Mon,  6 Jan 2025 10:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D0A1DACBE;
+	Mon,  6 Jan 2025 11:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYnNzr76"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dkoWukeZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDA21D619E;
-	Mon,  6 Jan 2025 10:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA831D9A56;
+	Mon,  6 Jan 2025 11:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736160440; cv=none; b=PZkYaF2Nvf8n6x90tvgJx0bD4cmoH/B7y7KKvV7qo0qlIjlZLSsmSIuLOJ15wYthi7V474paNSjOLdcchQLlvuT1QKlChIJdzbztp9qTdTFInmqVzML9Di/iOPhD0c0tEqdEM/AGeYG5SWK/xLgLrR0tTjKOhl1Q6uhHhRENSJs=
+	t=1736162278; cv=none; b=AKiuXznFUCMUdb6tub2Yxg9aeV/GHN5qeJ4UbfPxUUww2gPuU2RW8AVH5fuE36iZTJS9/qNOxc++EdfuaPWzT0lwShds6bp3/Z/EwLvP+/QNXnV1bjYSkpSw0Z+UZTwW/k0rTSUM6/Y8oFF6ImlZ7P9/RT/stQR9brZVlhVqjbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736160440; c=relaxed/simple;
-	bh=JaFJjbaQwnzq/hVa9JgcxnIRcEwz1iAcP3V7/AU2w1I=;
+	s=arc-20240116; t=1736162278; c=relaxed/simple;
+	bh=Bq/pnYFsE3I0zcZZpfR6gK1mHvcQk7XJiDVsVg9HHp8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gWd0BxGvUerh4xXc0poJMtRvZjh+Y4wLyw2c6e4jr7QAOT28BmRNCAFPnBCBIJoPLAhGLAwUAULNuAqZZnROi2s0Iy042FSIN+wjd5ml309bvqHOQkT6dRrQkEGpFuaXlWyDNou1Bf+YKVlCiwwvGZhIsaaSiNSIbUP1Tkk/70M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IYnNzr76; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ee76befe58so20523041a91.2;
-        Mon, 06 Jan 2025 02:47:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736160436; x=1736765236; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZmdWuMp+W8klnnc2Fqr8EjfprgS301JhSXk2qIwpbX0=;
-        b=IYnNzr76rOuCV7pLAAlj0z0xs9KsCgae/vhJYVnuKiB8FsX0co4Weakxa7eT3Sr2St
-         UJw9AEXOh/P/bVP7+BG8hCV0im4OxSsO79df0bizF0yLQ3OtYsfLNsxoxZ+bWf8dYt/f
-         t+ooIxm8PmvKeQs+kDRqAx5aSNS/32FsUVT4purEdx6VefJe/+SSkqBHHY0Pe7wRkEFB
-         1bGVWMZRdvJBvJbUX89oYF9BIWsFwvecd0qfI2ry/LI7pRwxtCXxQ2zdxqybHDBPDgkw
-         1Duu/IxQV8/9IeEzFpiSGTeJw3dp2OF2I2VkbvxT1PG8W7/ExAqIDFikLKf41wviT4f8
-         CdQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736160436; x=1736765236;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZmdWuMp+W8klnnc2Fqr8EjfprgS301JhSXk2qIwpbX0=;
-        b=CSQr2hymgR9PwHx9H9+NKEPF4AUe/l+AU1Zjqqs+FHhF9NHNPr720SEOXhtJtPHwTg
-         x3bnaxT9JHempv/oQzoCj39ErxvwFkwKYaLfO/QCOzKGi7NHmygeZ/r6+ul/DFC76Rh9
-         p6CYRkxS/Y1ShLT1GpufoULy6eJhfVdL+aV6mYBGM21qu2QrSedI2z6ntxfgngw3YbZU
-         fgGQyups/jhOuPppHwihFKeHUulkBLmznEHggVSeSaU2L76QEmXpIl17SFsONytkDIiH
-         UisjxDrUINnOeY9tU6f7Zc87FLWB3oNnplz2f93+874RSjIyhbAe+7v6BAzpQhvWLQIj
-         pZWg==
-X-Forwarded-Encrypted: i=1; AJvYcCUOuJhKk6wuu/6+0KI5m4MjOYKiSuW3Q46yb7jzun3VuZbkL93Zviw9nFxiss23E6ks3H5aAOtx@vger.kernel.org, AJvYcCUTrB581fyMMyaG0Hjxp44mkj8rO3bzy1qs+DGRP4EFgZgEqLpv1Gc4tr31yFad+HpG6FLE5GbuI1R7hXc=@vger.kernel.org, AJvYcCXIJAU0pcYP3idQ4UfR0Duq+Rew/QshC6s8qHOUkzQOwkJUBMiShQDgWgSFH8r1cp9Hoj7In/JmIpiC7ieBWmmN@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPAkUwUy7zYU6lOZAbyVp+UB92lrKJfydjR5c0GM/CedRlh2zQ
-	UXcWBFgC9YAe5zwO2HElQ+5I8WzqIhLB7LXwGkRsz8+9ubm9tZyN
-X-Gm-Gg: ASbGncvthYmqwjiy8u91gVRqwKjK7nzojInpD0/eaRGr2cZpz4H8D3wlrG4KzUUtr5Z
-	DKpQwCfYJLFPQVQnqZTPC4h+H2pqELfAJoGxQTg/o2bY2l9RvfkO/Em00YrLuSP/ry0nOh1qaL7
-	xvjFiz4YexHb9xgTh4Pe43W7+y1Wq6/MVbghEwgEAIU8elB2qqzMWQ4OGELi/04BNnd0hxAD1S7
-	/Q9RyWECBHmRzj/TUo1oK/AzIxo6nE4teLHcm7Y989EbHEWP5yp89wgK52Kqg==
-X-Google-Smtp-Source: AGHT+IFZyYQExz0NjdtjD9p5XPUzsyPQhWZpx15jq97xYcydba8Q19CoQ2uuYY6Bvca1WKGgxkF68g==
-X-Received: by 2002:a17:90b:2cc5:b0:2ee:aed6:9ec2 with SMTP id 98e67ed59e1d1-2f452e16379mr86841636a91.14.1736160435849;
-        Mon, 06 Jan 2025 02:47:15 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2ee06de88sm38972178a91.39.2025.01.06.02.47.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 02:47:15 -0800 (PST)
-Date: Mon, 6 Jan 2025 10:47:07 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
-Message-ID: <Z3u0q5HSOshLn2V0@fedora>
-References: <20241211071127.38452-1-liuhangbin@gmail.com>
- <20241212062734.182a0164@kernel.org>
- <Z1vfsAyuxcohT7th@fedora>
- <20241213193127.4c31ef80@kernel.org>
- <Z3X9pfu12GUOBUY6@fedora>
- <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXSCwq/EftSU581qVkCOrBb8wRqsqguWG69Em50r09t3sIA8XFThR22ifTnK68PIm3TR/3tymUOGFXMc8yNZQMjld67xlshyLC5GPM/bwjuvLiH5qM6le/vi9cSwlPSr/mRu+N9yK5Ny2tO6JmNq+2q4L4a2HLgk9yPqXWvq58E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dkoWukeZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD17EC4CED2;
+	Mon,  6 Jan 2025 11:17:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736162278;
+	bh=Bq/pnYFsE3I0zcZZpfR6gK1mHvcQk7XJiDVsVg9HHp8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dkoWukeZLZpW6My59uxEtxmpR/C2wLXqnd1z45Hh1LA2mF4lvSpFmt5B5ksd5T9k2
+	 w58W5Rjb/0f7p8WhfxOspSAFj51pbAzF2DJY3LGovSAfOzbsMsuyk9IiGiA8U8E72R
+	 cslPFw98C1KUF4tnGeg7G5XztgDx5k9rjZC70dZJ797YWKOANrKCxp9qhqhZfNMEdr
+	 PXEQ6NYfBxkhjxP2xuWL45f93uF8FA01OJBelznH0Irbq8mEk/vHGR5gKJMJR3Ijcu
+	 ZSqc9LM4fcxzh+mHHUQPwMMIJNYpsCcZlvpfafLQD46Hi3jA+RjqJCYUHuiWDwjHNY
+	 bY4iEJcBXckNg==
+Date: Mon, 6 Jan 2025 11:17:52 +0000
+From: Simon Horman <horms@kernel.org>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, bhelgaas@google.com, pmenzel@molgen.mpg.de,
+	aleksander.lobakin@intel.com, Gerhard Engleder <eg@keba.com>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Avigail Dahan <avigailx.dahan@intel.com>
+Subject: Re: [PATCH iwl-next v4] e1000e: Fix real-time violations on link up
+Message-ID: <20250106111752.GC4068@kernel.org>
+References: <20241219192743.4499-1-gerhard@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,26 +63,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
+In-Reply-To: <20241219192743.4499-1-gerhard@engleder-embedded.com>
 
-On Thu, Jan 02, 2025 at 11:33:34AM +0800, Jianbo Liu wrote:
-> > > Re-locking doesn't look great, glancing at the code I don't see any
-> > > obvious better workarounds. Easiest fix would be to don't let the
-> > > drivers sleep in the callbacks and then we can go back to a spin lock.
-> > > Maybe nvidia people have better ideas, I'm not familiar with this
-> > > offload.
-> > 
-> > I don't know how to disable bonding sleeping since we use mutex_lock now.
-> > Hi Jianbo, do you have any idea?
-> > 
+On Thu, Dec 19, 2024 at 08:27:43PM +0100, Gerhard Engleder wrote:
+> From: Gerhard Engleder <eg@keba.com>
 > 
-> I think we should allow drivers to sleep in the callbacks. So, maybe it's
-> better to move driver's xdo_dev_state_delete out of state's spin lock.
+> Link down and up triggers update of MTA table. This update executes many
+> PCIe writes and a final flush. Thus, PCIe will be blocked until all
+> writes are flushed. As a result, DMA transfers of other targets suffer
+> from delay in the range of 50us. This results in timing violations on
+> real-time systems during link down and up of e1000e in combination with
+> an Intel i3-2310E Sandy Bridge CPU.
+> 
+> The i3-2310E is quite old. Launched 2011 by Intel but still in use as
+> robot controller. The exact root cause of the problem is unclear and
+> this situation won't change as Intel support for this CPU has ended
+> years ago. Our experience is that the number of posted PCIe writes needs
+> to be limited at least for real-time systems. With posted PCIe writes a
+> much higher throughput can be generated than with PCIe reads which
+> cannot be posted. Thus, the load on the interconnect is much higher.
+> Additionally, a PCIe read waits until all posted PCIe writes are done.
+> Therefore, the PCIe read can block the CPU for much more than 10us if a
+> lot of PCIe writes were posted before. Both issues are the reason why we
+> are limiting the number of posted PCIe writes in row in general for our
+> real-time systems, not only for this driver.
+> 
+> A flush after a low enough number of posted PCIe writes eliminates the
+> delay but also increases the time needed for MTA table update. The
+> following measurements were done on i3-2310E with e1000e for 128 MTA
+> table entries:
+> 
+> Single flush after all writes: 106us
+> Flush after every write:       429us
+> Flush after every 2nd write:   266us
+> Flush after every 4th write:   180us
+> Flush after every 8th write:   141us
+> Flush after every 16th write:  121us
+> 
+> A flush after every 8th write delays the link up by 35us and the
+> negative impact to DMA transfers of other targets is still tolerable.
+> 
+> Execute a flush after every 8th write. This prevents overloading the
+> interconnect with posted writes.
+> 
+> Signed-off-by: Gerhard Engleder <eg@keba.com>
+> Link: https://lore.kernel.org/netdev/f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch/T/
+> CC: Vitaly Lifshits <vitaly.lifshits@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+> ---
+> v4:
+> - add PREEMPT_RT dependency again (Vitaly Lifshits)
+> - fix comment styple (Alexander Lobakin)
+> - add to comment each 8th and explain why (Alexander Lobakin)
+> - simplify check for every 8th write (Alexander Lobakin)
+> 
+> v3:
+> - mention problematic platform explicitly (Bjorn Helgaas)
+> - improve comment (Paul Menzel)
+> 
+> v2:
+> - remove PREEMPT_RT dependency (Andrew Lunn, Przemek Kitszel)
 
-I just check the code, xfrm_dev_state_delete() and later
-dev->xfrmdev_ops->xdo_dev_state_delete(x) have too many xfrm_state x
-checks. Can we really move it out of spin lock from xfrm_state_delete()
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thanks
-Hangbin
 
