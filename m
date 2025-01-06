@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-155360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC7F6A02058
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:09:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F76A0205B
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 09:09:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D58F3A4CAA
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:08:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9083E16438A
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 08:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 093AC1DACA1;
-	Mon,  6 Jan 2025 08:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AA51DB520;
+	Mon,  6 Jan 2025 08:07:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169FE1D79B6;
-	Mon,  6 Jan 2025 08:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7F21DA0E1;
+	Mon,  6 Jan 2025 08:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736150834; cv=none; b=Rl2YiXrLEMs2N7LbwkRpd52Nw+2UaBDoc9f7dmsS0fylEqRmS98omhZQd7OYj4aeHwV2BNj4JVwfa6DR1GkxsGEKE1+pk4vs4o1vDNv4Ugv2mdgezOE9R15ueSFCL0c8EwdE+P/usZGdy+7jJfdwZjfwtHf1CUBcmOZ9BItT9YU=
+	t=1736150836; cv=none; b=KVTyCsoBiP017BC5o6N0QGHEWI6dyckuBhqw1CrefYje2qjb4t7VY2uMMG/aiw/4ZQ2hEaShG9dgnakOE39t0Nz1mgi++tIPSZT5w0XQ3cbscE567WrR0Tu5pPF++g0i7HGoQEOASvSLGIW2o1uQqiLuDdL2+zVHvG79ar1SYmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736150834; c=relaxed/simple;
-	bh=ERV+dNS62FMiq+IIL3K7+YwHjYuSiJlg0VXFGZe3uzQ=;
+	s=arc-20240116; t=1736150836; c=relaxed/simple;
+	bh=XPAyxuEqoQ9kPmaRjBByoeA0kuBk23qq7DNXlnka/4c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ocfOBIzTCLdNIEWiFR/tB5ckRU/Dml6HBHQsoQD8XZYmFaMxkFRe/5Cboc4HC/30EsFSCyd9QCelHV8AbMRT5+EHKSMblT2Px32Bc1E6ZyV/8qapLwefL44pGzLdrXpchG4S4M7F65PNwDh4GTHcLfwqrp7rLaWNNMLwYr1WEOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 MIME-Version; b=DBsBqWg2MVVytdN+WWH9zwy6nOdbQbLg8F1WmTlzZDD6StLICc5ocWomxaRwP4W+/qvmnNRX/EVPcoXzJYuAtRP88zQA5jULrpUJ5Nm6XjyeFUrwlN6oa9PMAaTJAAA38OePcENY0Gs9Ox/quzd+kBJLx1foomdhEvQZeveNLLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YRRbS2Vl0z4f3kvs;
-	Mon,  6 Jan 2025 16:06:44 +0800 (CST)
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4YRRbV1C8lz4f3jd9;
+	Mon,  6 Jan 2025 16:06:46 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 9DF731A14E3;
-	Mon,  6 Jan 2025 16:07:05 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 44BB91A10C2;
+	Mon,  6 Jan 2025 16:07:06 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-	by APP4 (Coremail) with SMTP id gCh0CgD3W2AZj3tnVG29AA--.29272S22;
-	Mon, 06 Jan 2025 16:07:05 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgD3W2AZj3tnVG29AA--.29272S23;
+	Mon, 06 Jan 2025 16:07:06 +0800 (CST)
 From: Hou Tao <houtao@huaweicloud.com>
 To: bpf@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -55,9 +55,9 @@ Cc: Martin KaFai Lau <martin.lau@linux.dev>,
 	John Fastabend <john.fastabend@gmail.com>,
 	houtao1@huawei.com,
 	xukuohai@huawei.com
-Subject: [PATCH bpf-next 18/19] bpf: Remove migrate_{disable|enable} from bpf_local_storage_free()
-Date: Mon,  6 Jan 2025 16:18:59 +0800
-Message-Id: <20250106081900.1665573-19-houtao@huaweicloud.com>
+Subject: [PATCH bpf-next 19/19] bpf: Remove migrate_{disable|enable} from bpf_selem_free()
+Date: Mon,  6 Jan 2025 16:19:00 +0800
+Message-Id: <20250106081900.1665573-20-houtao@huaweicloud.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20250106081900.1665573-1-houtao@huaweicloud.com>
 References: <20250106081900.1665573-1-houtao@huaweicloud.com>
@@ -68,10 +68,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3W2AZj3tnVG29AA--.29272S22
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ar4DCrW3Ww13JFWktFykAFb_yoW8ZF43pF
-	92gr93Cr4Ut3WF9FsrXF4fAr9xXw45Gr1jkws8ArySyrZxZrZ8Gr42kF47uFy3Gw1UXF4S
-	vFn0gF1UCr1UAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:gCh0CgD3W2AZj3tnVG29AA--.29272S23
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1fCr48CF1ftr1rtr48tFb_yoW8tFWfpF
+	Z7Xr95Cr4Uta1F9FsrJF4fCryrXw48Wr17Kr4DA34rtrsxZF93Gr4IkF18Za43Gw1UXryf
+	ZF1Yga4Uuw4UCFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUPvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
 	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
@@ -90,63 +90,63 @@ X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
 
 From: Hou Tao <houtao1@huawei.com>
 
-bpf_local_storage_free() has three callers:
+bpf_selem_free() has the following three callers:
 
-1) bpf_local_storage_alloc()
-Its caller must have disabled migration.
+(1) bpf_local_storage_update
+It will be invoked through ->map_update_elem syscall or helpers for
+storage map. Migration has already been disabled in these running
+contexts.
 
-2) bpf_local_storage_destroy()
-Its four callers (bpf_{cgrp|inode|task|sk}_storage_free()) have already
-invoked migrate_disable() before invoking bpf_local_storage_destroy().
+(2) bpf_sk_storage_clone
+It has already disabled migration before invoking bpf_selem_free().
 
-3) bpf_selem_unlink()
-Its callers include: cgrp/inode/task/sk storage ->map_delete_elem
-callbacks, bpf_{cgrp|inode|task|sk}_storage_delete() helpers and
-bpf_local_storage_map_free(). All of these callers have already disabled
-migration before invoking bpf_selem_unlink().
+(3) bpf_selem_free_list
+bpf_selem_free_list() has three callers: bpf_selem_unlink_storage(),
+bpf_local_storage_update() and bpf_local_storage_destroy().
 
-Therefore, it is OK to remove migrate_{disable|enable} pair from
-bpf_local_storage_free(). Also add a cant_migrate() check in
-bpf_local_storage_free() to ensure the guarantee isn't broken.
+The callers of bpf_selem_unlink_storage() includes: storage map
+->map_delete_elem syscall, storage map delete helpers and
+bpf_local_storage_map_free(). These contexts have already disabled
+migration when invoking bpf_selem_unlink() which invokes
+bpf_selem_unlink_storage() and bpf_selem_free_list() correspondingly.
+
+bpf_local_storage_update() has been analyzed as the first caller above.
+bpf_local_storage_destroy() is invoked when freeing the local storage
+for the kernel object. Now cgroup, task, inode and sock storage have
+already disabled migration before invoking bpf_local_storage_destroy().
+
+After the analyses above, it is safe to remove migrate_{disable|enable}
+from bpf_selem_free(). Also add a cant_migrate() check in
+bpf_selem_free().
 
 Signed-off-by: Hou Tao <houtao1@huawei.com>
 ---
- kernel/bpf/bpf_local_storage.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ kernel/bpf/bpf_local_storage.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
-index 0970766278f7..d67ba116aee8 100644
+index d67ba116aee8..f196093db0a0 100644
 --- a/kernel/bpf/bpf_local_storage.c
 +++ b/kernel/bpf/bpf_local_storage.c
-@@ -163,6 +163,8 @@ static void bpf_local_storage_free(struct bpf_local_storage *local_storage,
- 	if (!local_storage)
- 		return;
- 
+@@ -235,6 +235,8 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
+ 		    struct bpf_local_storage_map *smap,
+ 		    bool reuse_now)
+ {
 +	cant_migrate();
 +
- 	if (!bpf_ma) {
- 		__bpf_local_storage_free(local_storage, reuse_now);
- 		return;
-@@ -174,17 +176,14 @@ static void bpf_local_storage_free(struct bpf_local_storage *local_storage,
+ 	if (!smap->bpf_ma) {
+ 		/* Only task storage has uptrs and task storage
+ 		 * has moved to bpf_mem_alloc. Meaning smap->bpf_ma == true
+@@ -258,9 +260,7 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
+ 		 * bpf_mem_cache_free will be able to reuse selem
+ 		 * immediately.
+ 		 */
+-		migrate_disable();
+ 		bpf_mem_cache_free(&smap->selem_ma, selem);
+-		migrate_enable();
  		return;
  	}
  
--	if (smap) {
--		migrate_disable();
-+	if (smap)
- 		bpf_mem_cache_free(&smap->storage_ma, local_storage);
--		migrate_enable();
--	} else {
-+	else
- 		/* smap could be NULL if the selem that triggered
- 		 * this 'local_storage' creation had been long gone.
- 		 * In this case, directly do call_rcu().
- 		 */
- 		call_rcu(&local_storage->rcu, bpf_local_storage_free_rcu);
--	}
- }
- 
- /* rcu tasks trace callback for bpf_ma == false */
 -- 
 2.29.2
 
