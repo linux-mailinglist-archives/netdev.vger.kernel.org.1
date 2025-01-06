@@ -1,113 +1,88 @@
-Return-Path: <netdev+bounces-155522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03FF6A02E2A
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:47:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97E94A02E31
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 17:48:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34D7A7A0385
-	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:47:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 201051885AFE
+	for <lists+netdev@lfdr.de>; Mon,  6 Jan 2025 16:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2038F14AD3D;
-	Mon,  6 Jan 2025 16:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AB170824;
+	Mon,  6 Jan 2025 16:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FT+mo1aD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yvf2PkxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831221DB360
-	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 16:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F73338F9C
+	for <netdev@vger.kernel.org>; Mon,  6 Jan 2025 16:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736182030; cv=none; b=uNKFys1xvSkdbEZWAuPGrDf6koBEoj/yXgbUBCR6EjPhcoPtfiZ59jw4Zo6BuNkfQwYVswZJD9NEYWR2wMx+sTGs64o/GwSSK48t4OFWzyah5Z8QbkEHgDV1aKEf8XafKr2R0MFq776nqTFanjAAuRK45zdLR8/GAeYYLphY52c=
+	t=1736182127; cv=none; b=Dn0rlrD6z8nIke4BWEyEM0VTvxybZNveJGScOuPIyF+ONdT02u3QoXvT7rxal4yidgv0uisU7F16osLTyZdKKv9D2wYA4+DFbLN0xTcXC4B1hGy1KLN5seNn8QJSj6eT3jjYk4AuOtY+lnwjxRvG45BB1laS8VyIrgvGyPgsUBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736182030; c=relaxed/simple;
-	bh=ubzfkcK539cueIPyMs/N/UeMM/K2GzhiTAnUc0ZjYZo=;
+	s=arc-20240116; t=1736182127; c=relaxed/simple;
+	bh=W2gY8zjN1yXK2SjxiBemwsm5QZIl9rzMkFAnqqB6uNU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qFH9/4nzw3JgjqdvZI3nMTdgJqVcTBlmN1hNWJXqjhfUeJUDKsmF1cgicoQ48gim5vgw+01x9vj8NC/lLnbxMHgsUBdTplShH8UFwpXDpTevLKIqQODkkOEZ81aEwkt18Ly+YGCto5wvBpHhC2aJ1gBa9JEva9PWOyATxq+SzJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FT+mo1aD; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21631789fcdso154919675ad.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 08:47:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736182028; x=1736786828; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=heuAMaMLBTPOz16YVRo4A/lMN+b9MXO3Uy992HyqcmM=;
-        b=FT+mo1aD9g1NT6fGi7WgyaDA6d8GLhlCqOCPLO7mAOKztoiGCFFWATQnetABwHjmET
-         i6eFWcnlwM+AP1ZRqzQhuRtKZQG6+DmLyYGjiVxv2p8PSBGPZlN2c4ROqI9tqhbnk4Ee
-         TdfzMW14zbd7ded/m2LemJdzqa2Ulufyi5beVqRDMDvUBzNELQw8D7AtNbmlyhBbe2eR
-         brPLdWwj/nHoJE5HmwQWw6p3kgqJG3bMT9ghjincCNsFWW7o/PhnWzTWN5S5Q1MWO9D/
-         aQ15k4OYHjrV3zdSkN2BKPfltOq2ZxWC3hc1b70MHfIjNywmxr4YDq+Kj850JAiOCv5T
-         IpHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736182028; x=1736786828;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=heuAMaMLBTPOz16YVRo4A/lMN+b9MXO3Uy992HyqcmM=;
-        b=SMAorVpGYEr0oN5QPcsMCWpy06tCnd0UdbYFXT9ldhHpXsfCgrFBJDQbYAme+1BdoJ
-         Z3rm56GsnfLCzcjZgvfzQLLH74mh+QJLC8fIKCoy4nirwvWaKmjuSzqZiBWTZLUcK6as
-         Nh4FGCpnYCHA6/EOTtmh+8Yr5wkUBrm0sg79LMDPoNqdQxyobifHoJANH4dpQDLXRbjl
-         2D6pgpkkgOX3vK8louJKXoYlKN1cbxegRHLUTjJrCkPBoW+oLi9eQ6OOViWv0ECuhX+F
-         7Qxjd78fSR0bhCrQ0BAkG/UsbBXt+SlbgALcWG6/qlwpwVuBy3DyMpCXnf8lv8vASbau
-         fNJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTBmBZ4pfySLMoJuarbXTtsXDyBAAtIJ6ynOXdxYzQlmNrOQFU+5NAMeVzxdh63zoyZ9j7Kl8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU3Dtj/Bl0lqhi9/B255RylkJoju/pipNpoBwyX77JHmP8rw0f
-	gkMoqEm2cw5OeVUpbxhS72jbg/WRkYVNnKS6NV3V0KXVnJvEXEk=
-X-Gm-Gg: ASbGncssvFs+sOm/cBlW5HbBFNszT4oRnXNwiooMY7ZOQFyJSMBDPEGLPpKEUdyxzIJ
-	NLBeCj1keprWsS0aOxownJwUZqXh70KGioxm4DZvFL4qO2O1xI1RhrT99ZYsrYxj3kLj1HzqWUx
-	DA/qcCqmi/HMhvFKBN4REVYmMcMt2PMv36GiuCWZ0LQ5TTwNUuaSNdK4Fir4MVUUrEVVG/guCeT
-	xBOzY+yH31w67OombqFVGX2ma1lDT0whAv532nGyXVhqqJnZXBybNfl
-X-Google-Smtp-Source: AGHT+IHXV/ESzl1acWGZ3meBGcyczAWvwr1GEBW9AQChrt2hameNq6SWHVtqfmzUhpmpIblxByz0XQ==
-X-Received: by 2002:a05:6a20:12c6:b0:1e1:97e4:452b with SMTP id adf61e73a8af0-1e5c70022f6mr99781875637.21.1736182027681;
-        Mon, 06 Jan 2025 08:47:07 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-842dc7edbadsm28898070a12.65.2025.01.06.08.47.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 08:47:07 -0800 (PST)
-Date: Mon, 6 Jan 2025 08:47:06 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, dw@davidwei.uk, almasrymina@google.com,
-	jdamato@fastly.com
-Subject: Re: [PATCH net-next 8/8] selftests: net: test listing NAPI vs queue
- resets
-Message-ID: <Z3wJCuamNhqEymSw@mini-arch>
-References: <20250103185954.1236510-1-kuba@kernel.org>
- <20250103185954.1236510-9-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gShfOgvEByYzVbEiwaiKrY4Y6zpSaCVzo5SAZrjUhC1TfR6OImdNpgrMtb8b2JWehVJx4PnvoEf+/a/z1vZhstLz2cNHNxbu9y+VmoOLIEh8gMZWLSkwCxMkOJJLx8xX0AxLrvQO4Dgn6R4d5hjHLI+42poWpgiUcDsv29wxeXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yvf2PkxZ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=OUWR+zB34gQucD9TutxNRjsruuEg8bng53IkXPVvSQE=; b=yvf2PkxZLIL2hq1wmUMNlSKchr
+	ybXJsLCgxPzKgLpg2XTtyD4D6s5RzYLfEJUiXlGs3Vz9wRcF6AiYrB1iY0Ust1sTfH0Ohfnk2FWts
+	v27nV5JBNvC6AuTTNvtFngJ2yOFJAn6JAdVx8fpUQX3HPya5zrcWTji/TjA4Ld8ckVy0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tUqHK-001vx2-PC; Mon, 06 Jan 2025 17:48:34 +0100
+Date: Mon, 6 Jan 2025 17:48:34 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 04/17] net: stmmac: make EEE depend on
+ phy->enable_tx_lpi
+Message-ID: <435a1b40-12f5-4eca-a9d8-030c0661a9b3@lunn.ch>
+References: <Z3vLbRQ9Ctl-Rpdg@shell.armlinux.org.uk>
+ <E1tUmAK-007VX1-2Q@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250103185954.1236510-9-kuba@kernel.org>
+In-Reply-To: <E1tUmAK-007VX1-2Q@rmk-PC.armlinux.org.uk>
 
-On 01/03, Jakub Kicinski wrote:
-> Test listing netdevsim NAPIs before and after a single queue
-> has been reset (and NAPIs re-added).
+On Mon, Jan 06, 2025 at 12:25:04PM +0000, Russell King (Oracle) wrote:
+> Make stmmac EEE depend on phylib's evaluation of user settings and PHY
+> negotiation, as indicated by phy->enable_tx_lpi. This will ensure when
+> phylib has evaluated that the user has disabled LPI, phy_init_eee()
+> will not be called, and priv->eee_active will be false, causing LPI/EEE
+> to be disabled.
 > 
-> Start from resetting the middle queue because edge cases
-> (first / last) may actually be less likely to trigger bugs.
+> This is an interim measure - phy_init_eee() will be removed in a later
+> patch.
 > 
->   # ./tools/testing/selftests/net/nl_netdev.py
->   KTAP version 1
->   1..4
->   ok 1 nl_netdev.empty_check
->   ok 2 nl_netdev.lo_check
->   ok 3 nl_netdev.page_pool_check
->   ok 4 nl_netdev.napi_list_check
->   # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
