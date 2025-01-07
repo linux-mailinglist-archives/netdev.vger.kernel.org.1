@@ -1,147 +1,118 @@
-Return-Path: <netdev+bounces-155874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A77A0426D
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:27:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C235CA0426F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:27:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B6FE3A8AA2
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:23:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D23CC168A78
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9281F2C22;
-	Tue,  7 Jan 2025 14:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B301EF08A;
+	Tue,  7 Jan 2025 14:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H++drWf+"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UqQqARgM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F451F191D;
-	Tue,  7 Jan 2025 14:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDDC1EB9EF
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 14:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736259803; cv=none; b=d3KfE4tLcBzJfXPgXB3dC9fMOtGLQT6/9A54Zr5YOocynBJ7t+IRsFhPGYda2zfYs7gcRkj/lo2MsIQPdhb4XEcPPJGar+jD8pAxFq+9kkA9e2i6acYYbXf/ZNs9qzSZRZcGd9I1egZWXDZN/XqOiDkX6qPPCzE/CBBE0gKzKkY=
+	t=1736259837; cv=none; b=NvuLo2jd9xNq0GLqV+E8JrZHuLVIZ4LP0lVZWwtdmbyDXVXUbHsH6HvmeCzS6hyBkPZWf4T5QISjtNEcP865kjyzPShnZyxnxcaMfg+sIQ1DtYOEwaJNnT81gWdDINqAKilSWqfZ9I0Notzei8RyJq5X6+7SiUg4blUtO3p7u7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736259803; c=relaxed/simple;
-	bh=Bm1DtQK3Zmv8psZJ+NOjFV66PEzHEkw6lMPzpKko7Jk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iWBF/rwoqAcJnCU918w4XeG89fno6AK2PQUCWIQdoHbw2D7mTkefcJhx6ehsI8N+M/h2bRMJlahA9NMyefmI/p+uCgTUiFtULF6j6Yzz4Umyl61VjI2rio3i9di6mpb5mumup6FhgwEpcp1sB2KjxN3CZAZ1uiTkod1px1xB+2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H++drWf+; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d88c355e0dso9050323a12.0;
-        Tue, 07 Jan 2025 06:23:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736259800; x=1736864600; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XE2LBycvBfRVASiRxD8GRnH5rQbRkw6izbBARG4PHOM=;
-        b=H++drWf+KZRlAjecygx2GsGYSFEBHKwGssTH6bf00fH9JXPSFBE0xY9sRtM9GEXhNL
-         FLae73N/Lg/8spjh1b1RJ5qQIcWOelyBBzKjv6EkK3RUd+VGOSjednoz03bxwEDIKrDR
-         BauHvPFgy21ayOcXtTr4crSgru20KUmMwxZwwUxx+nDQZzrHrSQdHXsBfNuloRFc21b/
-         cGe6jzRisCKf60UeAnCRGEM7xvS1VHlaXuCd/+2K72q9Q1IBAEOeuCIIFmFdW3XJx9YO
-         VIevwYOVwPvdjDuby7cjGEROHKde6NwssWsrkQynKC/A/88FHaQqXJZsGRVuVbS+mJ+P
-         trLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736259800; x=1736864600;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XE2LBycvBfRVASiRxD8GRnH5rQbRkw6izbBARG4PHOM=;
-        b=HPmwZH7uQ6Fgyb2fxKAfwa3ELEMwbKrgp4mgGjnNQRZBwIl6QOz4l/H+dx82enye+R
-         ngBnBG2HFT7FpjlqFMUwepChV9gAD068GcF21XOes3vi8Zg2pr1rvyEoKTevcM2VYiKC
-         c+rkQbOxRa77g3h0QHE+20z670nKA+ukMOYigHk9BnWhE79+Q890J+hWrMTA1b77b2cT
-         Uri4Ku3fU9/mHCvpPeOhyXWidQ0q69YKGO5SyAoWT3qWB/ZgJF3G9ugNWoqaUFGXy9kg
-         LQGKoFVfFWwJFPW0eG5WbW7QziMjqUEt+EnKZ/24bki1fNYXBdlLUvyHhQzvmgMkMW7m
-         2rtA==
-X-Forwarded-Encrypted: i=1; AJvYcCUabPsOqqx9WIovWBih6LoPknJOfRUQ+z632CL8EdDD5FaF3hJ27J0gkTA7bjL5wJbL0PdS4yyi@vger.kernel.org, AJvYcCXBpdPdS9XePfjhxKyEBPSdPxuqJZPr10dZy9E/6dwnTWVPxmu983H10efquS0F2aO7yQ97Mmi5TFvpdV8=@vger.kernel.org, AJvYcCXomBvZAxDm7hKKkiKJAgCjNM+sa4kEMlGBafPOuM2tWYsxSi2p59jLyzTGqrL8OHsq4lg6D/WjhV/T6z8REf3e@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCfv97RQGVHnqmSbacyA2QfkPVs7XWnwlZTVvkeTguOMM1Pzbx
-	gw4az2vsanVRx7/XrFSHiuhAJJPUyWEP5fJMYQgWwn2sc9IEgWhD
-X-Gm-Gg: ASbGncsTcjUP5WoiFlmUo/hmB7c0QZGb4lU6ZH0KGl7rwnPFF0VKWxuJDnMKGm0qka9
-	ahMpLlzaRFroxTPnO43pmdCmW58pV9meo3rNskYVHGHF6ojnj557x7chLNbDPKyTRllEyuq95YJ
-	t8zflARvvMut8dNqZcK6htWT0tc/BO1iUummvk0JxHzMJtJDHJlUWBs7WgMRmJ7n1vZMFUc6zVH
-	69feFN7RsSjc0G1bkBEkv7VxCj1aDJKxpbXJXQTxS8a+ndm+4+dToruRFS60tQlvlsBPk4F/VGQ
-	uOJ2HErZPKBcPa7XF/3x1DZVcf1AmXEyexQH5eXGbRyJCvTHD+9NvE4Cpv9eWR/6gJ2HMWlveNO
-	Sk1g/O+hB6IP6gzKeaDJE5ua6TanMqCk=
-X-Google-Smtp-Source: AGHT+IFTKXq+cflhxmBLnsZ30k5zI/b1GmBG/qIWiM0wUuk9AhpVGKtgpK8+7CvsgQoYKL8T/INBNA==
-X-Received: by 2002:a17:907:d87:b0:aab:71fc:47a3 with SMTP id a640c23a62f3a-aac3379034dmr5727225766b.60.1736259800081;
-        Tue, 07 Jan 2025 06:23:20 -0800 (PST)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d806fede4csm25126108a12.63.2025.01.07.06.23.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2025 06:23:19 -0800 (PST)
-Message-ID: <b7705a4e-5559-4fe3-a302-4c60d7224e49@gmail.com>
-Date: Tue, 7 Jan 2025 15:23:18 +0100
+	s=arc-20240116; t=1736259837; c=relaxed/simple;
+	bh=jwR7Bkzv9Hf4HEgntDuQl3JIpUp9H7lXZLE/KHwYcig=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=re6WIhTUWP6VJmLCf2Zxeu9nTGwLt3+ebQmGRd8cVqz1sS7LzqQ0E9qp9/RXrlxIXiyqoGSjNTJDUxfDLFA4DF4CLcklB0FP/sGtiDD4SoQcGZYcL/FQkmdK1ubJtipD0kyFZQYe9j4U/hmA/jakwbg1qFay21KjMgnah8DSQ0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UqQqARgM; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 03D1E240002;
+	Tue,  7 Jan 2025 14:23:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1736259827;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A82lxYyhSD5ChdUVhMeGsq5U/lXEl+8Tc1PjYUQHda0=;
+	b=UqQqARgMR/kfteTsO+1UbznFhlQgK3n7fgTlg0atANm8moCe9gC5H/ou8al40SuRdTsNnb
+	5UHQu8fWWW8IXCjy0hTJ5QV6UZbML9Y4T5ZviV4WSoGpho3WCEcvZz0Lp/5sSY6+1BAntg
+	crn0bwZAY/P8U7dpLSPPrfF6fzUxJBl9zOabyJRTcbzOcc85DDKPflGZEAcpIAW8tvUMdH
+	AK2fuKq6Gxn1ANa9Fa8iPF9LEdUN8eyIcf8h1rmrdHhq4xgIIjfPx5KWxK5crzd7ZP3kZj
+	7XmUZ8LHvNdso/bvsO+DQdthAYnJLbx1xJ82vNf8FvyovoYqEB1f286Xp0iPIA==
+Date: Tue, 7 Jan 2025 15:23:45 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH net] net: phy: fix phylib's dual eee_enabled
+Message-ID: <20250107152345.6bbb9853@bootlin.com>
+In-Reply-To: <Z302oI--ENXvPiyW@pengutronix.de>
+References: <E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk>
+	<20250107144048.1c747bf1@bootlin.com>
+	<Z302oI--ENXvPiyW@pengutronix.de>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
- (delayed) phy
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, bridge@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20250107123615.161095-1-ericwouds@gmail.com>
- <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
- <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
- <ed29e632-332b-4af1-bf7f-97498297e731@lunn.ch>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <ed29e632-332b-4af1-bf7f-97498297e731@lunn.ch>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
+On Tue, 7 Jan 2025 15:13:52 +0100
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-
-On 1/7/25 2:20 PM, Andrew Lunn wrote:
->> I think it is because pl->act_link_an_mode stays at MLO_AN_INBAND, but
->> it needs to be set to MLO_AN_PHY, so that only the phy determines the
->> link state:
->>
->> phylink_resolve() {
->>     ...
->> 	} else if (pl->act_link_an_mode == MLO_AN_PHY) {
->> 		link_state = pl->phy_state;
->>     ...
->> }
+> On Tue, Jan 07, 2025 at 02:40:48PM +0100, Herve Codina wrote:
+> > Hi,
+> > 
+> > On Thu, 14 Nov 2024 10:33:27 +0000
+> > "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
+> >   
+> > > phylib has two eee_enabled members. Some parts of the code are using
+> > > phydev->eee_enabled, other parts are using phydev->eee_cfg.eee_enabled.
+> > > This leads to incorrect behaviour as their state goes out of sync.
+> > > ethtool --show-eee shows incorrect information, and --set-eee sometimes
+> > > doesn't take effect.
+> > > 
+> > > Fix this by only having one eee_enabled member - that in eee_cfg.
+> > > 
+> > > Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC support EEE")
+> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > ---
+> > >  drivers/net/phy/phy-c45.c    | 4 +---
+> > >  drivers/net/phy/phy_device.c | 4 ++--
+> > >  include/linux/phy.h          | 2 --
+> > >  3 files changed, 3 insertions(+), 7 deletions(-)
+> > >   
+> > 
+> > I observed a regression with this patch applied.
+> > 
+> > My system is based on a i.MX8MP soc with a TI DP83867 ethernet PHY and was
+> > working with the kernel v6.12 release.  
 > 
-> phylink tries to determine the whole chain is up. As Russell says, it
-> could be the PCS has not got sync with the PHY for some reason. So
-> even if you ignore the PCS state, it might not work. This is actually
-> a useful pieces of information. Does the link actually work end to end
-> if you only look at the media state? If it does, that would indicate
-> the PCS is maybe missing an interrupt, or needs polling for change in
-> state.
+> Which ethernet interface is used on this system? FEC or stmmac?
+
+It is the FEC (ethernet@30be0000).
+
 > 
-> 	Andrew
+> Is it the correct PHY?
+> https://www.ti.com/product/de-de/DP83867E
 
-After phylink_mac_initial_config() is re-triggered with the phy
-attached, either by the patch, or even with:
+Yes, it is this PHY.
 
-ethtool -s eth1 advertise 0x28
-(switches to sgmii)
-ethtool -s eth1 advertise 0x800000000028
-(switches mac back to 2500base-x)
-
-mode is set to MLO_AN_PHY in phylink_pcs_neg_mode() and the link works
-end to end.
-
-So the an-mode can be 2 different values, one after link up and another
-after these ethtool commands.
-
+Best regards,
+Hervé
 
