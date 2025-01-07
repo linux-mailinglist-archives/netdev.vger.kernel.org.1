@@ -1,115 +1,111 @@
-Return-Path: <netdev+bounces-156069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3939A04D76
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 00:25:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C265A04D82
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 00:29:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD0411634CE
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:25:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEE23188645B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86E51E5707;
-	Tue,  7 Jan 2025 23:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4642D1E47CD;
+	Tue,  7 Jan 2025 23:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rsGTROJu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bXCmlcG+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EC71E32DB
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 23:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C49670813;
+	Tue,  7 Jan 2025 23:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736292318; cv=none; b=ffBRdcy/KsZlp8gozz9Cqp7ZsHbxsyThgADeKjsSyDMc6S+RDBqYWKkJ1oq77lR8HvmZ+u2f65r58NvPk5S55Sy8ovP/T70pSPxEwpAR/rovYeCRxb8PxWKSvqQYhnX0WL2ol+Nn5B14PF2Y/guFHM8Javw0jf2RrWMc6RchdqE=
+	t=1736292537; cv=none; b=lPpQ2SRVlaq9n6azSlq9PPnpwilJBPI17dC9y80epnZaKLJFq2zoe/WbnNNPUZnuBV0XpOBmiRwyeLdXgDdGzg6cXTsIQ4nVmW1/GWAi8ORni2kXH277Sv0Qj8Abxrjc3elhpFzSTGt6fbMGpPFAYpGu7MS76YvXkkSl7wFdUK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736292318; c=relaxed/simple;
-	bh=fThI4GuoYILxwokpbOArAjaeI0f2fL5ggjUt0swvmLY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RFEB+/KVasBotL0UdVoHyQr6opzXFl0OuJ8V+PEJcD56QyHpVgKwL/3ztbgzrR/aRtKdDGB6tZ4wvA7yf7Ol1C0Ons1YJHB/EnXR69naBnTeCIhXnFybgXfIQXQaWWTH4W0CiobRcm4G+5YG/9YXPNKGlz5pSowfZBhNsz72fUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rsGTROJu; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f897692c-cbf2-4906-aa15-1661162621eb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736292299;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rqcFnTSKm2DGg/IXOAcHA62iWf5YmtAk6en8LZ1mVpY=;
-	b=rsGTROJun3qvnTQMQ7eZmM3vtPqnlVG+5htHQi6Rh72x8RifhjdzR1ZthsKwb8VpJVsdJf
-	wYnoLY/q4RMmYPPpsuBSE19LgjKfukxSBe7Z8ceKwYmIbn0HTUMdg5onWGCK9upccI1QX9
-	LFiPScE9/G4FPaII6G9XlV2Vd/7semo=
-Date: Tue, 7 Jan 2025 15:24:51 -0800
+	s=arc-20240116; t=1736292537; c=relaxed/simple;
+	bh=/XKTIuIIzi6eYy1OOQwUAP45OfK2UK6TuDBibJwD58M=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=MPN9yyNj+7+8zAv4FbQNH2lj87WJu59KCj4Tzh3EijFNZ8jOIERXC0jUUA+cu7gkcS9k06o3eARMkSu+Abm7389YmVp5UxwQdXP58DIs1dQ7AvKuCO4NJTyhOTPF79+2rxGMWDSP+mLdA3YiOuRNluslQbs++uhMsCiOzXcIdrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bXCmlcG+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A46CC4CED6;
+	Tue,  7 Jan 2025 23:28:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736292536;
+	bh=/XKTIuIIzi6eYy1OOQwUAP45OfK2UK6TuDBibJwD58M=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=bXCmlcG+FdCq0wy01Z+iWRxrX+6eBH26tABZWHfsudqyrXdte7SjbRB54jHNoKuf2
+	 c3SGRKvhIXPdJlJC518StW9hql+vUYU4Cs02inDEQ6OKf+fd6KlkOu6UrrCXoiVwUD
+	 1g2r1sQ6GotJvLCbIY3ObD53Hw7MqM7KFmsiQXomHfV0W8FxnSr9YQx1U268vtTkvT
+	 MeJbjbhyyS+PcclqW2CTcQaSteZK0SCs9+26WOXTijdrVioFe/dGTXUTLeIcLAqoi1
+	 +Q9MP+2g3TMMhaEJSYsVlXZrFtjnfJIMAomwScoDAVkwo2lzPlBXfvs/Qo1aEBSSjQ
+	 UYzzXz0IPNfew==
+Date: Tue, 07 Jan 2025 15:28:54 -0800
+From: Kees Cook <kees@kernel.org>
+To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>
+CC: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Simon Horman <horms@kernel.org>, linux-hardening@vger.kernel.org,
+ Cosmin Ratiu <cratiu@nvidia.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next=5D_net=3A_Silence_false_field-spanni?=
+ =?US-ASCII?Q?ng_write_warning_in_ip=5Ftun?=
+ =?US-ASCII?Q?nel=5Finfo=5Fopts=5Fset=28=29_memcpy?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20250107165509.3008505-1-gal@nvidia.com>
+References: <20250107165509.3008505-1-gal@nvidia.com>
+Message-ID: <53D1D353-B8F6-4ADC-8F29-8C48A7C9C6F1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 4/5] libbpf: fix error when st-prefix_ops and
- ops from differ btf
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
- song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
- edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, Daniel Xu <dlxu@meta.com>
-References: <20241218024422.23423-1-alibuda@linux.alibaba.com>
- <20241218024422.23423-5-alibuda@linux.alibaba.com>
- <2f56aca3-a27a-49b6-90de-7f1b2ff39df1@linux.dev>
- <20241223021036.GC36000@j66a10360.sqa.eu95>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241223021036.GC36000@j66a10360.sqa.eu95>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 12/22/24 6:10 PM, D. Wythe wrote:
-> On Thu, Dec 19, 2024 at 02:43:30PM -0800, Martin KaFai Lau wrote:
->> On 12/17/24 6:44 PM, D. Wythe wrote:
->>> Here are four possible case:
->>>
->>> +--------+-------------+-------------+---------------------------------+
->>> |        | st_opx_xxx  | xxx         |                                 |
->>> +--------+-------------+-------------+---------------------------------+
->>> | case 0 | btf_vmlinux | bft_vmlinux | be used and reg only in vmlinux |
->>> +--------+-------------+-------------+---------------------------------+
->>> | case 1 | btf_vmlinux | bpf_mod     | INVALID                         |
->>> +--------+-------------+-------------+---------------------------------+
->>> | case 2 | btf_mod     | btf_vmlinux | reg in mod but be used both in  |
->>> |        |             |             | vmlinux and mod.                |
->>> +--------+-------------+-------------+---------------------------------+
->>> | case 3 | btf_mod     | btf_mod     | be used and reg only in mod     |
->>> +--------+-------------+-------------+---------------------------------+
->>>
->>> At present, cases 0, 1, and 3 can be correctly identified, because
->>> st_ops_xxx is searched from the same btf with xxx. In order to
->>> handle case 2 correctly without affecting other cases, we cannot simply
->>> change the search method for st_ops_xxx from find_btf_by_prefix_kind()
->>> to find_ksym_btf_id(), because in this way, case 1 will not be
->>> recognized anymore.
->>>   	snprintf(tname, sizeof(tname), "%.*s",
->>> @@ -1020,17 +1021,25 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
->>>   	}
->>>   	kern_type = btf__type_by_id(btf, kern_type_id);
->>> +	ret = snprintf(stname, sizeof(stname), "%s%s", STRUCT_OPS_VALUE_PREFIX, tname);
->>
->> How about always look for "struct bpf_struct_ops_smc_ops" first,
->> figure out the btf, and then look for "struct smc_ops", would it
->> work?
-> 
-> I think this might not work, as the core issue lies in the fact that
-> bpf_struct_ops_smc_ops and smc_ops are located on different btf.
-> Searching for one fisrt cannot lead to the inference of the other.
 
-Take a look at btf_find_by_name_kind(btf, 1 /* from base_btf */, ...) and also 
-btf_type_by_id(). It starts searching from the btf->base_btf which should be the 
-btf_vmlinux here and should have the "struct smc_ops". Please try.
+
+On January 7, 2025 8:55:09 AM PST, Gal Pressman <gal@nvidia=2Ecom> wrote:
+>When metadata_dst struct is allocated (using metadata_dst_alloc()), it
+>reserves room for options at the end of the struct=2E
+>
+>Similar to [1], change the memcpy() to unsafe_memcpy() as it is
+>guaranteed that enough room (md_size bytes) was allocated and the
+>field-spanning write is intentional=2E
+
+Why not just add an "options" flex array to struct ip_tunnel_info?
+
+E=2Eg=2E:
+
+struct ip_tunnel_info {
+	struct ip_tunnel_key	key;
+	struct ip_tunnel_encap	encap;
+#ifdef CONFIG_DST_CACHE
+	struct dst_cache	dst_cache;
+#endif
+	u8			options_len;
+	u8			mode;
+  u8   options[] __counted_by(options_len);
+};
+
+>
+>This resolves the following warning:
+>  memcpy: detected field-spanning write (size 8) of single field "_Generi=
+c(info, const struct ip_tunnel_info * : ((const void *)((info) + 1)), struc=
+t ip_tunnel_info * : ((void *)((info) + 1)) )" at include/net/ip_tunnels=2E=
+h:662 (size 0)
+
+Then you can drop this macro and just use: info->options
+
+Looks like you'd need to do it for all the types in struct metadata_dst, b=
+ut at least you could stop hiding it from the compiler=2E :)
+
+-Kees
+
+
+--=20
+Kees Cook
 
