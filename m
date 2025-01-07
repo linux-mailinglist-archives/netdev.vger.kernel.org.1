@@ -1,139 +1,149 @@
-Return-Path: <netdev+bounces-155838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1746A04055
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:05:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 491EFA0405D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F0EE3A1CFF
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:05:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4945D161DA7
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5F81EF08A;
-	Tue,  7 Jan 2025 13:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187F32594A8;
+	Tue,  7 Jan 2025 13:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Bmx9tR6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A40C1F0E20
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 13:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3CE6136;
+	Tue,  7 Jan 2025 13:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736255091; cv=none; b=CfLSqrNhmXJwL0/z6D5OroDH6WQ1KqVHtUqslIRCKEhvVD+afltJw3gF6FMRmgrvJFkw+BtcQxn6wbLP6MzAdKxUBQprMAiq7JWI6tlxwZdNf93Y9q4xOP9Xed7+dPsU5m6eBhnhJTfr8s8DMES58jkMtuBZxmkr9I1+GLOITEU=
+	t=1736255357; cv=none; b=kePQFbvTo7kGZ9q7LJiryCjuEsWqaRkEX88073rbVCkSBKRet2D3hJnXZaiKYXQxO+5ZiMyc1f2+V5D6rMjUxfKfxKKJJ3DsmtvnY3Ns5MnpcmXeOSG8HA27k8qoguJHJD0j8PfelcBGItGyBXDIVOed4o3CdhvF9hJaQdY9EBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736255091; c=relaxed/simple;
-	bh=/hPw75WGitfyGXoQIMKpa6lIk/LCkO5ouL196qat4eU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dub9tM5sc/zOJgxNzyODNXB284ofP8katB6v5A9uLl2y9yXwWjzLUqPvWfXbXf8TsnZEsdyIMKXpbeWXlTJuEsO/0FadoJSPTfGYKF0mqFK4xHTtrjixklPtMoDEtxdZVLfuuYDHpIELjN9cOaLRznnmZ6cwk3JSmBSKih7Vu3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tV9FZ-0003iC-6R; Tue, 07 Jan 2025 14:04:01 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tV9FV-007Lc1-27;
-	Tue, 07 Jan 2025 14:03:58 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id E073E3A08A6;
-	Tue, 07 Jan 2025 13:03:57 +0000 (UTC)
-Date: Tue, 7 Jan 2025 14:03:57 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
-	Jerome Brunet <jbrunet@baylibre.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
-	Doug Berger <opendmb@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Ray Jui <rjui@broadcom.com>, 
-	Scott Branden <sbranden@broadcom.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Kalle Valo <kvalo@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>, 
-	Dario Binacchi <dariobin@libero.it>, Christophe Roullier <christophe.roullier@foss.st.com>, 
-	Grygorii Strashko <grygorii.strashko@ti.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Roger Quadros <rogerq@kernel.org>, Brian Norris <briannorris@chromium.org>, 
-	Frank Li <Frank.Li@nxp.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-can@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-wireless@vger.kernel.org
-Subject: Re: [PATCH net-next] dt-bindings: net: Correct indentation and style
- in DTS example
-Message-ID: <20250107-cocky-industrious-hare-c508f6-mkl@pengutronix.de>
-References: <20250107125613.211478-1-krzysztof.kozlowski@linaro.org>
+	s=arc-20240116; t=1736255357; c=relaxed/simple;
+	bh=5JVkdQ90/LdvM+sUTUPCLUJfvgJXCbsa8JCfEBsQUYE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kqH71dmqdVxcH4gsQjQEStNu6vPD3k/essQcLXBbuY6lMhkA7uL6xuHbJCJp2DZBqlr/28t9rZewBqyNK0V9D7UCu7feZQ/EP+VwOcgtZ7r6Zi65ZOKUtnp9gxVWbczGOetXsbDUOmbVAy7xHcaGTQkuYBJggXyDzlpmRHbMxJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Bmx9tR6x; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=34jc6LVJaO6qgGhVwGMFJBZaDirf2T9MVRkHS7GSrgE=; b=Bmx9tR6x3eT6NjpXd6O2Plc73d
+	qp1Cko0Glw4DGumhHOOBDoCJF0KuN4/3mkfe6ZoA2N15ku9zKSZ7a67DvIktGTXQQYvqqFDXaJWSe
+	CLr2U3B257rgp87GsaqNCEZPiMMooaPZ5mDrGJ8EpWqaAXqCNo99Um6/Zw0MD5ZtvtIejDBXGILqd
+	V0Jjyke1PsPQihcMM5OwGZodQY78gdRR0pwJFrrg9bkc3oOROtVVjAvoYMnQeYMh3FOI/0SfObA4N
+	b//UCQx01aS08NUqfUeLeKI2XT++bhudhk3dZgEIXokV2iySxFyaGZgIBunaE9Ddg0oP2sbyh265G
+	wHvgKlPQ==;
+Received: from 26.248.197.178.dynamic.cust.swisscom.net ([178.197.248.26] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1tV9KX-000EDj-Ad; Tue, 07 Jan 2025 14:09:09 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2025-01-07
+Date: Tue,  7 Jan 2025 14:09:08 +0100
+Message-ID: <20250107130908.143644-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5vdg3z53mqf4igqc"
-Content-Disposition: inline
-In-Reply-To: <20250107125613.211478-1-krzysztof.kozlowski@linaro.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27511/Tue Jan  7 10:37:11 2025)
 
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
---5vdg3z53mqf4igqc
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next] dt-bindings: net: Correct indentation and style
- in DTS example
-MIME-Version: 1.0
+The following pull-request contains BPF updates for your *net-next* tree.
 
-On 07.01.2025 13:56:13, Krzysztof Kozlowski wrote:
-> DTS example in the bindings should be indented with 2- or 4-spaces and
-> aligned with opening '- |', so correct any differences like 3-spaces or
-> mixtures 2- and 4-spaces in one binding.
->=20
-> No functional changes here, but saves some comments during reviews of
-> new patches built on existing code.
->=20
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
->  .../bindings/net/can/bosch,c_can.yaml         | 10 +-
->  .../bindings/net/can/microchip,mcp2510.yaml   | 18 ++--
+We've added 7 non-merge commits during the last 32 day(s) which contain
+a total of 11 files changed, 190 insertions(+), 103 deletions(-).
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for net/can
+The main changes are:
 
-regards,
-Marc
+1) Migrate the test_xdp_meta.sh BPF selftest into test_progs
+   framework, from Bastien Curutchet.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+2) Add ability to configure head/tailroom for netkit devices,
+   from Daniel Borkmann.
 
---5vdg3z53mqf4igqc
-Content-Type: application/pgp-signature; name="signature.asc"
+3) Fixes and improvements to the xdp_hw_metadata selftest,
+   from Song Yoong Siang.
 
------BEGIN PGP SIGNATURE-----
+Please consider pulling these changes from:
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmd9JjoACgkQKDiiPnot
-vG9NNgf/SxxAC8UsIuL4bDVaIUg+kAj0yKfrwEWjhutunUKK24lVKylz+/UY8+zv
-3+LqniAsnEwHJPxLZ5S0rCe2+qZ6gsvXSBlQSqEJukZOzpWNVYECd8Wf8Q8dQzu+
-qYoaEgvr5jcwNUr+cdrPvhyn4CXuNJCsdmwpfJn98S6XLhwSX+SxgiSUAkXpRmQn
-EE2nnt52Dbrrk4CILlRtPPpd0/hsAXMEWGjIUBYW2f/FJqVNv+yPwZiEsIC2iDSG
-V4fs/zJxh98GK89T2fN8fRzlMTG9pMPmWaQLbMPmVkHn5eJbX7LUoQzmSBe6Kgc3
-I+WqIjPZzj6L9ubrNZg4MgJ3t+T4tg==
-=gbSE
------END PGP SIGNATURE-----
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
 
---5vdg3z53mqf4igqc--
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Jakub Kicinski, Nikolay Aleksandrov, Stanislav Fomichev
+
+----------------------------------------------------------------
+
+The following changes since commit f930594981cd9db15315c0ca03292a91828e39f0:
+
+  Merge branch 'ethtool-generate-uapi-header-from-the-spec' (2024-12-05 12:03:10 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to 058268e23fcadc2bdb9297c6dff3a010c70f9762:
+
+  selftests/bpf: Extend netkit tests to validate set {head,tail}room (2025-01-06 09:48:58 +0100)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Bastien Curutchet (2):
+      selftests/bpf: test_xdp_meta: Rename BPF sections
+      selftests/bpf: Migrate test_xdp_meta.sh into xdp_context_test_run.c
+
+Daniel Borkmann (3):
+      netkit: Allow for configuring needed_{head,tail}room
+      netkit: Add add netkit {head,tail}room to rt_link.yaml
+      selftests/bpf: Extend netkit tests to validate set {head,tail}room
+
+Martin KaFai Lau (1):
+      Merge branch 'selftests-bpf-migrate-test_xdp_meta-sh-to-test_progs'
+
+Song Yoong Siang (2):
+      selftests/bpf: Actuate tx_metadata_len in xdp_hw_metadata
+      selftests/bpf: Enable Tx hwtstamp in xdp_hw_metadata
+
+ Documentation/netlink/specs/rt_link.yaml           |  6 ++
+ drivers/net/netkit.c                               | 66 ++++++++++------
+ include/uapi/linux/if_link.h                       |  2 +
+ tools/include/uapi/linux/if_link.h                 |  2 +
+ tools/testing/selftests/bpf/Makefile               |  1 -
+ tools/testing/selftests/bpf/prog_tests/tc_netkit.c | 49 +++++++-----
+ .../bpf/prog_tests/xdp_context_test_run.c          | 87 ++++++++++++++++++++++
+ tools/testing/selftests/bpf/progs/test_tc_link.c   | 15 ++++
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  |  4 +-
+ tools/testing/selftests/bpf/test_xdp_meta.sh       | 58 ---------------
+ tools/testing/selftests/bpf/xdp_hw_metadata.c      |  3 +-
+ 11 files changed, 190 insertions(+), 103 deletions(-)
+ delete mode 100755 tools/testing/selftests/bpf/test_xdp_meta.sh
 
