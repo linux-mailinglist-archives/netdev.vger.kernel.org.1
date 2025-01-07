@@ -1,120 +1,83 @@
-Return-Path: <netdev+bounces-155686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E584FA03575
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:50:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32A25A03576
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDFDB1656E2
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:50:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4E433A68DD
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A85F2A1C9;
-	Tue,  7 Jan 2025 02:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9522613B5AE;
+	Tue,  7 Jan 2025 02:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IwglupfI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIP/vzoE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F884501A
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 02:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF1533086;
+	Tue,  7 Jan 2025 02:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736218222; cv=none; b=q/xg8379hOxFhwwE7tJlxh5lbHn5CgN70AkaFdUep3V3JNv2STm5r/OKnWJNXh3lLpvyBEZ5pI4kogrjEe3sSomSGw+m3qFVmG0AOgObSUPf3ELPL5TK8j3lzghruryowW/h8AkF4Y3wcPtLnuCmsAFjAXDNPtIKSApOg5TKDHg=
+	t=1736218230; cv=none; b=YVsNzPgNP1+0kIJ5T9UElvjxhtRcGLKM+RKsIOthCZYR9p+l8mHtgIrBPu385I9dLXuAVnGo5poISBLtcijQA5WPDXiH7eEYtiPClB9j5MwmZC5o8bnzuf/ZCB8yMAj2ql3Nyq+TDB4srqgxhdrTiZvIUbA3MnR02FKwhpUa6iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736218222; c=relaxed/simple;
-	bh=HmgQRPIs4W/bHiI00t+sEvMm5zSkO9SjZhEt2Y4GpvU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F8dWT/UCEuVN+AGnf6I6GdBRT8zd2hVeg/kGgL3HI4fMKAE/9FCEjDyAcUUmfkuH0RCxDfdWQd4CTVPmi7F0NyE8+VcPWRWoOMzdEm+ekXZkHFFp/zk5Kg2oTgpoIsZzTJSjwiLMct3XXJuJ1RmcQuj3De60yTc3OQ38/qa73lU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IwglupfI; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-467abce2ef9so126401cf.0
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 18:50:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736218220; x=1736823020; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L6rJNgfP55GPm9pMRpkUe6PuBQwo5KjpElSNQhBU1Fk=;
-        b=IwglupfIeU5Nu5TEPx8UkieUOlosx3IDkPHUWDPsXf+bHbjzQHB8XY+TxxxcZ6t/57
-         sAZVm/ZTMo1qiYkoq5B3dqP7pY/uecEXLeZm+161RRFZDpf7jbgwb8zjuuyy+i3FB0BM
-         pKcWwD+dhM/uG6pKuCkoxT0Zhtvv3J+xGJgQFOrjoa3KaDGAdqWQoFq1ls+3x1k7G821
-         U8mZPZbavUruXyT8ezHFjz9bPqsRjjWOXNOaPyyiakOjjvtVyfOLzMtXOKgkDdHTolzA
-         LwdxxgNqgcPRK6bKoAlAHY87C09S9CMlsV9ZZCsMrrX89Y/JSyKAzKGv/BrDtmK9Oywn
-         4BVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736218220; x=1736823020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=L6rJNgfP55GPm9pMRpkUe6PuBQwo5KjpElSNQhBU1Fk=;
-        b=wTsl1ObTzFMOL8qLtg1EYJhvG1KaxeXUNttGM1bIFFw1jPqITp+2ggwhnXEt01sPIY
-         2Qy5QLkbYntp5kn5gkquLX1ndAB2ha4IuynO6zDbtFpsKo30/n50apHj6a2H5oE+OhaH
-         hibiJg07BZboSM68/8zOzBVGEqRLnRz4zoUX579ntGxkp9KlxmOkx4c3MK/U65X2pORC
-         60e5Tzf11OdbrEvD/9HjnDsdWu5pT1iUKN8epQhczevGfidBk5+aVuK4oc4Vu6tR4jHX
-         QuvNUFrmp8Tdqh4wlJsDgjYU1OiUpFQH/OnBP9YQCJW49IIqeph4XAJ2vUnmxYwJl2yu
-         MjgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU5O50aU+PBA+RGvhs49n33+51hx9RHToFlK9GQoIp7O4dSoGHe2ZtadPSub1jphHksSSyURlU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAvNeGiujtpRwLgspY4x60UCUpXbpMSAVjkS/kzqK16lt5h0Dx
-	QqKcsOeYWlqigDU2/0d8qiZDxdAW841knfWH10wZXKJyiUTgFc2wNXPFbuGxjvC8+0KR32qhYw0
-	O6qn5eDCRHctEfbCx8LUJUwbMrtM2r6sruSb5UfyiAoNoOufOw/+b/Mw=
-X-Gm-Gg: ASbGncvAssZqifUiyvKlZWkTOqBnVMsq4bnf+4U96O4tWW8ADipOBLNaRtZ8x/FiSfj
-	IkiHqNIlPZ+m5RY2/71x5rUPrHP3SLkoM0vcUNVjS0RFYMaiF9pjQxEcUAU0DLV8sQzDrWaM=
-X-Google-Smtp-Source: AGHT+IGMqbAfPyzHPARuxlCAd7FXApQR40nmkd7vUxDnSToFn/IXXK9kg/WLlOUrQ2wGpmu+hDKgWjJTc8Hf+x56pw0=
-X-Received: by 2002:ac8:7dc3:0:b0:466:9003:aae6 with SMTP id
- d75a77b69052e-46b3b75916emr1600051cf.2.1736218218665; Mon, 06 Jan 2025
- 18:50:18 -0800 (PST)
+	s=arc-20240116; t=1736218230; c=relaxed/simple;
+	bh=56CVjBvjx6FP5/HNpzGbBM3HRk3zUM6Fh7oD1qCe6wQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AUKTfvPXEOtvkhynmJ6EJmw677JGh1R3Pzfh12SuM7PjDLyjS1SNUfR10azK1Qfnzx+1sSKnNXIJK7t8YA25uTPBJdUH/qCoPcRC0akIedAbfPzMoCIfio0D6lH83JNcSaR02v8NyCeEZZPerfI+NKnr74AOdodVdvtuGY5UDmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIP/vzoE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0B97C4CED2;
+	Tue,  7 Jan 2025 02:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736218227;
+	bh=56CVjBvjx6FP5/HNpzGbBM3HRk3zUM6Fh7oD1qCe6wQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fIP/vzoEWhq4m3C3TK3X5Hj9FLNK2AJ56YtTGABRpMBRmPchiQDC8eueCb+qVpO0m
+	 oH1rgn21ZKFA4sNbujogdsgiXNasm8qolqC2q9RnODbWgmUnVFNqQLZWJcRBaMbTmC
+	 4PA8MkeUAJEK79rPvmejMU89lf/vZCqQ+7cwRo3bXEV3PHI0+qspcRwDRfALDwVTKr
+	 fREIwwZNZXbDw4PYPRwexmwU4V7LhYFpcaZgh9CauZ6y/5Gft1XQDx1sgx8x35ZVoi
+	 dHw58I2o3fmxALLyY+WGbsu6QVTy5r04tfLqQhWDrz+JdYL20Eg+9GZzEdHGoqz1G3
+	 2KoD3jv2t4TPg==
+Date: Mon, 6 Jan 2025 18:50:26 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net,
+ michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org,
+ ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net,
+ john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me,
+ asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, kory.maincent@bootlin.com,
+ maxime.chevallier@bootlin.com, danieller@nvidia.com,
+ hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
+ przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
+ rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us,
+ bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com,
+ aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com,
+ daniel.zahka@gmail.com
+Subject: Re: [PATCH net-next v7 04/10] net: ethtool: add ring parameter
+ filtering
+Message-ID: <20250106185026.6ecdea0e@kernel.org>
+In-Reply-To: <20250103150325.926031-5-ap420073@gmail.com>
+References: <20250103150325.926031-1-ap420073@gmail.com>
+	<20250103150325.926031-5-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <e831515a-3756-40f6-a254-0f075e19996f@icdsoft.com>
- <d1f083ee-9ad2-422c-9278-c50a9fbd8be4@icdsoft.com> <20250106132051.262177da@kernel.org>
-In-Reply-To: <20250106132051.262177da@kernel.org>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Mon, 6 Jan 2025 21:50:02 -0500
-Message-ID: <CADVnQynBPVr0qX2pu7FNwk6Y1BaW-pGf=JReJPCAj9RP=6t9_w@mail.gmail.com>
-Subject: Re: Download throttling with kernel 6.6 (in KVM guests)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Teodor Milkov <zimage@icdsoft.com>, netdev@vger.kernel.org, mst@redhat.com, 
-	jasowang@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 6, 2025 at 4:20=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Mon, 6 Jan 2025 22:15:37 +0200 Teodor Milkov wrote:
-> > Hello,
-> >
-> > Following up on my previous email, I=E2=80=99ve found the issue occurs
-> > specifically with the |virtio-net| driver in KVM guests. Switching to
-> > the |e1000| driver resolves the slowdown entirely, with no throttling i=
-n
-> > subsequent downloads.
-> >
-> > The reproducer and observations remain the same, but this detail might
-> > help narrow down the issue.
->
-> Let's CC the virtio maintainers, then.
->
-> The fact that a 300ms sleep between connections makes the problem
-> go away is a bit odd from the networking perspective.
->
-> You may need to find a way to automate the test and try to bisect
-> it down :( This may help: https://github.com/arighi/virtme-ng
+On Fri,  3 Jan 2025 15:03:19 +0000 Taehee Yoo wrote:
+> While the devmem is running, the tcp-data-split and
+> hds-thresh configuration should not be changed.
+> If user tries to change tcp-data-split and threshold value while the
+> devmem is running, it fails and shows extack message.
 
-IIUC, from Teodor's earlier message in the thread it sounds like he
-was able to bisect the issue; he mentioned that git bisect traced the
-regression to the commit:
-
-    dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-
-best,
-neal
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
