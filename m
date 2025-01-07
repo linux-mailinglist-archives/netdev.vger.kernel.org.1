@@ -1,173 +1,178 @@
-Return-Path: <netdev+bounces-155902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48FF3A0444A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:26:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D46AA04484
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:31:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85ED83A6762
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:26:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EE2A3A273F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AF61F37B1;
-	Tue,  7 Jan 2025 15:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D228D1F37C3;
+	Tue,  7 Jan 2025 15:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jo2HXdS6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iig7RJe6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BD61F3D26
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 15:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2331F2C4A;
+	Tue,  7 Jan 2025 15:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736263584; cv=none; b=hEFOP7kf5dIaAX+7wIb4AwbDxRlgpLPy+Y0xC3m1Ga1A+lbhwRpD7u7bJyhxpt5CCHFEXMsNXz/2USvJh0JEFjraBNm9dZeejmQxrl9uWaIBHUEDg3gT97o3OJmh7toJ98RLG9iKbuKLbG4yVog+jmpENJW2MVKbKoMk1IVr1Qc=
+	t=1736263872; cv=none; b=m2P3qcE/ujC7Y6GltXrZHqi9HXD5T2/l4jDvbXIwNW/YEXoWdy9xxgZhYsOhq1dflnPdeR1jrgiRuMdqtLlbnI9O7/rHZTtBFdlmrrZjnOUOQxfXqe7eF7do55eAqDBwYpgDQw8cNRUSCajGbUc84meR3hBEkLOtq3vBIU+R8ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736263584; c=relaxed/simple;
-	bh=ZzcFSl/HjSvcj5OpdtF/e0uZ4SSBPNOhoH+ioSgr5Ws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VFma4GWXtqXU/KQySetHgqkThJSeL0y/iQV9FjAFSzX4b2CkX9cZtKptDGN34mh33xq7TFjqW5YIz4NyQZK2sIFl2Hm6qLQk0eHG3ELrTzytXoGW9z50ORWFuvCFBeBBA+Z7mhlzzdZ0pjBpEkFqbpptRffUNGKUsTowluaiJDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jo2HXdS6; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=N/6XPJ85Rq8WiLNIrO3Lx2eRBJVsdpBUiKmI2/RgmY4=; b=jo2HXdS6rkT3QNwp/AyDHIzAPL
-	akHlZDBZ1qktngD1Uxnj16POZ34pApA//rO/1ank552xVpXGqmZwy6oneJNcR/doSCoJdBm5laHJc
-	rMxxuCWyvylF68mokRcNbgfOWSFH67fpyGZZTc41RcYF3B9JjxQkX3sN4ZnI48qaMGfv/wWPJsCK/
-	EqYOohemm6k2EU3qfSA/R6ukZJTVvzrkBq+YU/gPIWXc1A4I0+L5DQ/qgMFTjtDkk37ySGQnwNdjy
-	gywclq5XLFX7WwGxO5dsCQlDN5KwPyBIj6BPyZTeosUGcG8v1jNRsWAZH80CMy+h4iX1D1dBSon0l
-	Z7iSK0Xg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58202)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tVBT7-0007gS-0d;
-	Tue, 07 Jan 2025 15:26:09 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tVBT4-0005Ob-0f;
-	Tue, 07 Jan 2025 15:26:06 +0000
-Date: Tue, 7 Jan 2025 15:26:06 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1736263872; c=relaxed/simple;
+	bh=KGgL49IMtrqHOwLuaNJdIAPy7nRPMTdC4fAmIyy5GxM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qLcOuyc5rapPOzNRP4IFGc3lzStTI/equrMvaWuO2II3VzdIxKFf2bHoyyNlIuQLerrbT5S3iUZ4aYHr9R0bHZRBR1BfOGpQPlTLPsGTlXsFtiWpxxCFZaNUsbMjF+gbyZtjUZgVmFLKkQrd8EofYsPJsOvuN3ouT4nWWmtHT2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iig7RJe6; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736263867; x=1767799867;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KGgL49IMtrqHOwLuaNJdIAPy7nRPMTdC4fAmIyy5GxM=;
+  b=iig7RJe6NFddcAxR127VoKqBPM9iQFP0c1LH5kHncckmKw2j425EKj1o
+   FTz9oRJabvpyK3CltMpLir2343tXjrVOu6lAX7/h8Soq4i0uKkXW8DhUY
+   GBrbLgRnOEPpxJIsYOnjHk0QN8hQfR+J+m6/ckYZscONtCgiOQYHBgFA/
+   c01kyPHDaPiCMIgE1ceY7bJ1gbKKLo7Ov3Tx+Y54ecL7E4jBphxORwzy3
+   fzngKVGOQKtNqhqONl3Z35q0Rhw5SWFiDaMgWmJfth094R+5sCccJ8Wl1
+   nT1wXmFlvmhcsvtUkGwfh6dNeVZJpSSRpvfRky2pzH/v0acJXrX3MtV1n
+   Q==;
+X-CSE-ConnectionGUID: t8BHtlBFQVKhwazOirh9SA==
+X-CSE-MsgGUID: vKH2h+YwSbyUwcFba4ZGwg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="35685770"
+X-IronPort-AV: E=Sophos;i="6.12,295,1728975600"; 
+   d="scan'208";a="35685770"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 07:31:05 -0800
+X-CSE-ConnectionGUID: K9rEp8BcQN6Ur3fEz8tk9w==
+X-CSE-MsgGUID: WTutk9I2RpixOcdYlJAnoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="103646924"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa008.jf.intel.com with ESMTP; 07 Jan 2025 07:31:01 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 03/17] net: stmmac: use correct type for
- tx_lpi_timer
-Message-ID: <Z31Hjlp_3jIeSpWH@shell.armlinux.org.uk>
-References: <Z3vLbRQ9Ctl-Rpdg@shell.armlinux.org.uk>
- <E1tUmAE-007VWv-UW@rmk-PC.armlinux.org.uk>
- <20250107112851.GE33144@kernel.org>
- <Z30WmPpMp_BRgrOI@shell.armlinux.org.uk>
- <20250107144103.GB5872@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Daniel Xu <dxu@dxuuu.xyz>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/8] bpf: cpumap: enable GRO for XDP_PASS frames
+Date: Tue,  7 Jan 2025 16:29:32 +0100
+Message-ID: <20250107152940.26530-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250107144103.GB5872@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 07, 2025 at 02:41:03PM +0000, Simon Horman wrote:
-> On Tue, Jan 07, 2025 at 11:57:12AM +0000, Russell King (Oracle) wrote:
-> > On Tue, Jan 07, 2025 at 11:28:51AM +0000, Simon Horman wrote:
-> > > On Mon, Jan 06, 2025 at 12:24:58PM +0000, Russell King (Oracle) wrote:
-> > > > The ethtool interface uses u32 for tx_lpi_timer, and so does phylib.
-> > > > Use u32 to store this internally within stmmac rather than "int"
-> > > > which could misinterpret large values.
-> > > > 
-> > > > Since eee_timer is used to initialise priv->tx_lpi_timer, this also
-> > > > should be unsigned to avoid a negative number being interpreted as a
-> > > > very large positive number.
-> > > > 
-> > > > Also correct "value" in dwmac4_set_eee_lpi_entry_timer() to use u32
-> > > > rather than int, which is derived from tx_lpi_timer, even though
-> > > > masking with STMMAC_ET_MAX will truncate the sign bits. u32 is the
-> > > > value argument type for writel().
-> > > > 
-> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > > 
-> > > ...
-> > > 
-> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > index 9a9169ca7cd2..b0ef439b715b 100644
-> > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > @@ -111,8 +111,8 @@ static const u32 default_msg_level = (NETIF_MSG_DRV | NETIF_MSG_PROBE |
-> > > >  				      NETIF_MSG_IFDOWN | NETIF_MSG_TIMER);
-> > > >  
-> > > >  #define STMMAC_DEFAULT_LPI_TIMER	1000
-> > > > -static int eee_timer = STMMAC_DEFAULT_LPI_TIMER;
-> > > > -module_param(eee_timer, int, 0644);
-> > > > +static unsigned int eee_timer = STMMAC_DEFAULT_LPI_TIMER;
-> > > > +module_param(eee_timer, uint, 0644);
-> > > >  MODULE_PARM_DESC(eee_timer, "LPI tx expiration time in msec");
-> > > >  #define STMMAC_LPI_T(x) (jiffies + usecs_to_jiffies(x))
-> > > >  
-> > > 
-> > > Hi Russell,
-> > > 
-> > > now that eee_timer is unsigned the following check in stmmac_verify_args()
-> > > can never be true. I guess it should be removed.
-> > > 
-> > >         if (eee_timer < 0)
-> > >                 eee_timer = STMMAC_DEFAULT_LPI_TIMER;
-> > > 
-> > 
-> > Thanks for finding that. The parameter description doesn't seem to
-> > detail whether this is intentional behaviour or not, or whether it is
-> > "because someone used int and we shouldn't have negative values here".
-> > 
-> > I can't see why someone would pass a negative number for eee_timer
-> > given that it already defaults to STMMAC_DEFAULT_LPI_TIMER.
-> > 
-> > So, I'm tempted to remove this.
-> 
-> I'm not sure either. It did cross my mind that the check could be changed,
-> to disallow illegal values (if the range of legal values is not all
-> possible unsigned integer values). But it was just an idea without any
-> inspection of the code or thought about it's practicality. And my first
-> instinct was the same as yours: remove the check.
+Several months ago, I had been looking through my old XDP hints tree[0]
+to check whether some patches not directly related to hints can be sent
+standalone. Roughly at the same time, Daniel appeared and asked[1] about
+GRO for cpumap from that tree.
 
-My reasoning is as follows:
+Currently, cpumap uses its own kthread which processes cpumap-redirected
+frames by batches of 8, without any weighting (but with rescheduling
+points). The resulting skbs get passed to the stack via
+netif_receive_skb_list(), which means no GRO happens.
+Even though we can't currently pass checksum status from the drivers,
+in many cases GRO performs better than the listified Rx without the
+aggregation, confirmed by tests.
 
-In the existing code with the module paramter is a signed int, then it
-take a value up to INT_MAX. Provided sizeof(int) == sizeof(u32), then
-this can be reported through the ethtool API. However, ethtool can set
-the timer to U32_MAX which can exceed INT_MAX in this case. The driver
-doesn't stop this, and uses a software based timer for any delay greater
-than the capabilities of the hardware timer (if any.)
+In order to enable GRO in cpumap, we need to do the following:
 
-So, through ethtool one can set the LPI delay to anything between 0 and
-U32_MAX, whereas through the module parameter it's between 0 and
-INT_MAX. values between INT_MIN and -1 inclusive result in the default
-being used.
+* patches 1-2: decouple the GRO struct from the NAPI struct and allow
+  using it out of a NAPI entity within the kernel core code;
+* patch 3: switch cpumap from netif_receive_skb_list() to
+  gro_receive_skb().
 
-It is, of course, absurd to have a negative delay, or even a delay
-anywhere near INT_MAX or U32_MAX.
+Additional improvements:
 
-I'll separate out the change to eee_timer so if necessary, that can be
-reverted without reverting the entire patch. Oh goodo, an extra patch
-for a patchset which already exceeds netdev's 15 patches...
+* patch 4: optimize XDP_PASS in cpumap by using arrays instead of linked
+  lists;
+* patch 5-6: introduce and use function do get skbs from the NAPI percpu
+  caches by bulks, not one at a time;
+* patch 7-8: use that function in veth as well and remove the one that
+  was now superseded by it.
 
+My trafficgen UDP GRO tests, small frame sizes:
+
+                GRO off    GRO on
+baseline        2.7        N/A       Mpps
+patch 3         2.3        4         Mpps
+patch 8         2.4        4.7       Mpps
+
+1...3 diff      -17        +48       %
+1...8 diff      -11        +74       %
+
+Daniel reported from +14%[2] to +18%[3] of throughput in neper's TCP RR
+tests. On my system however, the same test gave me up to +100%.
+
+Note that there's a series from Lorenzo[4] which achieves the same, but
+in a different way. During the discussions, the approach using a
+standalone GRO instance was preferred over the threaded NAPI.
+
+[0] https://github.com/alobakin/linux/tree/xdp_hints
+[1] https://lore.kernel.org/bpf/cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com
+[2] https://lore.kernel.org/bpf/merfatcdvwpx2lj4j2pahhwp4vihstpidws3jwljwazhh76xkd@t5vsh4gvk4mh
+[3] https://lore.kernel.org/bpf/yzda66wro5twmzpmjoxvy4si5zvkehlmgtpi6brheek3sj73tj@o7kd6nurr3o6
+[4] https://lore.kernel.org/bpf/20241130-cpumap-gro-v1-0-c1180b1b5758@kernel.org
+
+Alexander Lobakin (8):
+  net: gro: decouple GRO from the NAPI layer
+  net: gro: expose GRO init/cleanup to use outside of NAPI
+  bpf: cpumap: switch to GRO from netif_receive_skb_list()
+  bpf: cpumap: reuse skb array instead of a linked list to chain skbs
+  net: skbuff: introduce napi_skb_cache_get_bulk()
+  bpf: cpumap: switch to napi_skb_cache_get_bulk()
+  veth: use napi_skb_cache_get_bulk() instead of xdp_alloc_skb_bulk()
+  xdp: remove xdp_alloc_skb_bulk()
+
+ include/linux/netdevice.h                  |  35 ++++--
+ include/linux/skbuff.h                     |   1 +
+ include/net/busy_poll.h                    |  11 +-
+ include/net/gro.h                          |  38 ++++--
+ include/net/xdp.h                          |   1 -
+ drivers/net/ethernet/brocade/bna/bnad.c    |   1 +
+ drivers/net/ethernet/cortina/gemini.c      |   1 +
+ drivers/net/veth.c                         |   3 +-
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c |   1 +
+ kernel/bpf/cpumap.c                        | 131 ++++++++++++++-------
+ net/core/dev.c                             |  79 ++++---------
+ net/core/gro.c                             | 103 ++++++++++------
+ net/core/skbuff.c                          |  62 ++++++++++
+ net/core/xdp.c                             |  10 --
+ 14 files changed, 306 insertions(+), 171 deletions(-)
+
+---
+From v1[5]:
+* use a standalone GRO instance instead of the threaded NAPI (Jakub);
+* rebase and send to net-next as it's now more networking than BPF.
+
+[5] https://lore.kernel.org/bpf/20240830162508.1009458-1-aleksander.lobakin@intel.com
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.1
+
 
