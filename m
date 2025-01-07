@@ -1,59 +1,72 @@
-Return-Path: <netdev+bounces-155788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BCC0A03C48
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:25:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 237D6A03CCA
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:46:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 893097A28EE
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:25:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 191611615CE
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66D11E3DCC;
-	Tue,  7 Jan 2025 10:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487B11E8850;
+	Tue,  7 Jan 2025 10:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="bSc+qsAH"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8BE1E0B75;
-	Tue,  7 Jan 2025 10:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A19C1E570E;
+	Tue,  7 Jan 2025 10:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736245508; cv=none; b=JTEBy4wu34BY+7YU5r0QRmuwStpd2YPYBd9KzdI9QEb2lLpU3rHv/L8dXh+yoyDqVn4LhRbj/1iol4+ve56J7deWJpRv5OYvkBmW6FYPn5ntXpK7pdUGCpQuCGxJyKDAfTEjoaHDfzuKZ1gxDwBU/FQqBtFEvlddc8hwHLJ9slw=
+	t=1736246807; cv=none; b=oXB+rQEcECM2oGOS1CG4h3uSyL1DVGrN/PtshA68QZaRrt3nP0+1yqgtOoflNvHehlAa1hZSjCf55ALHjtkOuCYCljyywo3NBfApviCnbWuhbfppCN7RxgjFmRYqH3jkgAucAuli+qveE2fRU8/N966vqiUnqQIo5dqR0l7gYq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736245508; c=relaxed/simple;
-	bh=ZqXullAWF2S1RNd1MTH4kt8y/5h8iwhHoXVIKzff+m0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LMDVzV8DUHCiA7zs19hxN+aMH/uQYoZ+aNrpVLjLSZ9+I2Jv1u7IVuPRThje5tP8RyO/QnEZO8BDl3vBrZOL4k8LKx6/2T+qdgIEvrnz0SUYcC53zaRxeCGHs4B7vBBcoa90pKaPTDkQLJi+Vp87BcGG2W/P3F1CnywIJ0yflhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YS6Zn6DMXz6M4WK;
-	Tue,  7 Jan 2025 18:23:29 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id F35BE1409EA;
-	Tue,  7 Jan 2025 18:25:02 +0800 (CST)
-Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 7 Jan
- 2025 11:24:51 +0100
-From: Gur Stavi <gur.stavi@huawei.com>
-To: <sumang@marvell.com>
-CC: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
-	<davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
-	<guoxin09@huawei.com>, <gur.stavi@huawei.com>, <helgaas@kernel.org>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <meny.yossefi@huawei.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shenchenyang1@hisilicon.com>,
-	<shijing34@huawei.com>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>
-Subject: RE: [EXTERNAL] [PATCH net-next v03 1/1] hinic3: module initialization and tx/rx logic
-Date: Tue, 7 Jan 2025 12:37:49 +0200
-Message-ID: <20250107103749.3552291-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <SJ0PR18MB5216BED17023369322EE4A6ADB152@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <SJ0PR18MB5216BED17023369322EE4A6ADB152@SJ0PR18MB5216.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1736246807; c=relaxed/simple;
+	bh=oYo3OMfGLSjW+z3gCfkEItno6xIGDypH3M8q8l4sJCQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uLIPqRhMwFMmkAOAFoOK2y1RD1tRMbQvPHio6DcxAYUqPqamOQjJPY/tRH1bar/yIAOTzvdm0zdFR1HpEUlMNKTIUkbaxvheEp6IabmKxZU79ZGk0im6iYypDDz4TijfSy2H4UOlRtKnYSvefIVbaqBr99gw8UBUF89AVNb5Bj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=bSc+qsAH; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507AHDDB005838;
+	Tue, 7 Jan 2025 02:46:38 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=MFxDAcukKuGFRaIz+kugDx/
+	4oKw/WWP1PY0Xo/pecy8=; b=bSc+qsAHFUQxBUXydL9D/Fp30W+mZ5aNuxW2vSt
+	oBBOf/e/NVQJH4XBzBnJBkSZSsquKTzq45isZIelZIpXZEWGTzzH2hca6IlHnZjs
+	ieRI47/YzbMipWd17EvtM0ZvxPDiqzl5qmGcEaEADnzgHM6eOL17gP1/AiUUiTo7
+	oN0B18r7Eo62ekPtYMZLguEnseObpDl+GP6KiOrOK8yjp2UrpvuthjHsXoNIeNrB
+	EW8a6+tYy97uuQsibTa1eWP1UaDbLYzagAVt677LfuxWDUxY4N89GJ46U6RDnGHg
+	HBkzjdzYpcEUS6oyIANoCV8gkrS0NwququhixFd3MsENd9g==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4412cj81jr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Jan 2025 02:46:37 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 7 Jan 2025 02:46:36 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 7 Jan 2025 02:46:36 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id AB2003F70A2;
+	Tue,  7 Jan 2025 02:46:32 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net-next PATCH 0/6] Add af_xdp support for cn10k
+Date: Tue, 7 Jan 2025 16:16:22 +0530
+Message-ID: <20250107104628.2035267-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,48 +75,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- frapeml500005.china.huawei.com (7.182.85.13)
+X-Proofpoint-ORIG-GUID: lfijTR_kMxHyGzsPJKs93P64xpjpodMS
+X-Proofpoint-GUID: lfijTR_kMxHyGzsPJKs93P64xpjpodMS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-> >+enum hinic3_service_type {
-> >+	SERVICE_T_NIC =3D 0,
-> >+	SERVICE_T_MAX =3D 1,
-> >+	/* Only used for interruption resource management, mark the request
-> >module */
-> >+	SERVICE_T_INTF =3D (1 << 15),
+This patchset includes changes to support AF_XDP for cn10k chipsets. Both
+non-zero copy and zero copy will be supported after these changes. Also,
+the RSS will be reconfigured once a particular receive queue is
+added/removed to/from AF_XDP support.
 
-> [Suman] any reason to define a type after _MAX? Does _MAX has some other co=
-> nnotation? Also, one generic comment would be to use symmetrical naming con=
-> vention like HINIC3_SERVICE_T_NIC or something like that.
+Patch #1: octeontx2-pf: Add AF_XDP non-zero copy support
 
-The HW supports multiple services. E.g. RoCE. We plan to add support
-for some of them them later. The specific service values are used by
-HW (e.g. when reporting events) and therefore need to be defined
-explicitly. MAX is a SW only value that is used to define array that is
-accessed by service index.
+Patch #2: octeontx2-pf: AF_XDP zero copy receive support
 
-We will add a comment for that.
+Patch #3: octeontx2-pf: Reconfigure RSS table after enabling AF_XDP
+zerocopy on rx queue
 
-> >+};
->
-> ...
->
-> >+static bool hinic3_adev_svc_supported(struct hinic3_hwdev *hwdev,
-> >+				      enum hinic3_service_type svc_type)
-> >+{
-> >+	switch (svc_type) {
-> >+	case SERVICE_T_NIC:
+Patch #4: octeontx2-pf: Don't unmap page pool buffer used by XDP
 
-> [Suman] Are there other SERVICE type which will be introduced later?
+Patch #5: octeontx2-pf: Prepare for AF_XDP transmit
 
-Yes. As explained above.
+Patch #6: octeontx2-pf: AF_XDP zero copy transmit support
 
-> >+		return hinic3_support_nic(hwdev);
-> >+	default:
-> >+		break;
-> >+	}
-> >+
-> >+	return false;
-> >+}
+Geetha sowjanya (1):
+  octeontx2-pf: Don't unmap page pool buffer used by XDP
+
+Hariprasad Kelam (2):
+  Octeontx2-pf: Prepare for AF_XDP
+  octeontx2-pf: AF_XDP zero copy transmit support
+
+Suman Ghosh (3):
+  octeontx2-pf: Add AF_XDP non-zero copy support
+  octeontx2-pf: AF_XDP zero copy receive support
+  octeontx2-pf: Reconfigure RSS table after enabling AF_XDP zerocopy on
+    rx queue
+
+ .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k.c    |   6 +-
+ .../marvell/octeontx2/nic/otx2_common.c       | 128 +++++++---
+ .../marvell/octeontx2/nic/otx2_common.h       |  22 +-
+ .../marvell/octeontx2/nic/otx2_ethtool.c      |   6 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  25 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         | 161 ++++++++++---
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   8 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |   4 +
+ .../ethernet/marvell/octeontx2/nic/otx2_xsk.c | 225 ++++++++++++++++++
+ .../ethernet/marvell/octeontx2/nic/otx2_xsk.h |  24 ++
+ .../ethernet/marvell/octeontx2/nic/qos_sq.c   |   2 +-
+ 12 files changed, 541 insertions(+), 72 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.h
+
+-- 
+2.25.1
 
 
