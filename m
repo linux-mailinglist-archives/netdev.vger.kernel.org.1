@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-155934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D90FA04614
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:26:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1621A045FA
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:24:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E41DF1887AEE
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:26:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9BA2165675
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72301F75A9;
-	Tue,  7 Jan 2025 16:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FFA31F3D35;
+	Tue,  7 Jan 2025 16:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LnMsB96V"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fZr2i/V1"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382D51F668F;
-	Tue,  7 Jan 2025 16:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA25125B9;
+	Tue,  7 Jan 2025 16:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736267086; cv=none; b=c872hey+za/uH8M/zD49hT2CM/nhB3/2hZrL2e964ba+VURce5C0bLxWIqnWYDGKloaJ3HbW9aa7g+IAFDI2x05wxCdWL7AvUuB2fajkU4WrxNB/hNH7lG5cwyN3txN3d5vXibFFzXoY6Met9E83HiE42PHpaKNovbA19MY0pRA=
+	t=1736267080; cv=none; b=tq3J8sCdL4oLUJT0724MaNvnwv42D2mnc9kBl3NHjHygj1DCqzGwub7VecWJoLDHK/7ocFZUvaQqmvgDNC77I2KwSSWtW+VNbuZHixxnpPg2+7ki/xXOebnn3FrS/5pNaqbZ9p62TTifA+o8TpdXwgEZtcCj/7tE/N4MMu2I8Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736267086; c=relaxed/simple;
-	bh=PwEX/+gZvYPOLP2jUutXoGf+hZ4FgiRjihiqcJOHI0I=;
+	s=arc-20240116; t=1736267080; c=relaxed/simple;
+	bh=zuhGKPSA7tcH2IYR1yyR0l3vTihq21BbGTrdxvKGBTI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oiiCOisCX9uAqj9L/20tZ1347k9L6eGFIpJdxQqNF4Pbzre2Rh18/MBcMH1PHMpbN1ckJhVFpP7NR/eRijgOQ+0FhS12okifyRG+Id9ALT5omnKnvz6MzAUEJ7K1KmtYkmFIEC5yE4jyg6U9g1w4Hoqc1QfokN025zHIRGHT0HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LnMsB96V; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=P8DhkUY3cY0bzQMxPkve3UPTWGiFeCNXVCa+Tet/o9kNAjl6ur9wv/N68NFQonXi4LymHMr0p0JRX6UHhOIc4q4Uu3y11WIW8utjZB6+j+vUTWBRTTYAw1tf7Ac5NPv+i/X8jcfPJ951vF+PfhAIHKTCqMfv6k9ST8ASggyzPMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fZr2i/V1; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507FfhJa012668;
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507FV9ao009350;
 	Tue, 7 Jan 2025 16:23:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
 	content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=50U2MnTqvAodV/3cr
-	P0Dw5QHOXDglsDC72DQwNz+wNw=; b=LnMsB96VhDVmcg8LbY80XiSpjvehWjBwE
-	hFMnPtQg8stO2mfiLyOMiIKcUzDOqkESsTAi4Hc63KmfNuZny9kqs4y9lpItjKfn
-	HDmUgh66M8zJK0XVZji4kyfIycUq6riWA3dptBxRj0rk+JxLR34Xlh69QwARov4e
-	lhk3Fmf2GEYe3s9erKPHIQkaXHIyOUdTZtpMGcQAzSxJh0ClBFBiSJ0ggEyynw19
-	RdQDN7FJxVO+i9GibwcP96OsbJCB/vzI5jE5cf6F2gReG/eVh5R2LTQ/DojAEuuK
-	OAkWo4TNIpyizGVOT7fD3Pskb/40LRwMmTbES0b68tcBDRXjmpW8A==
+	:mime-version:references:subject:to; s=pp1; bh=nX0h2mZt5lddAnKRL
+	sGLKmpu3j6xj+GricyTReejhak=; b=fZr2i/V1RgQVHCv1N9X47aEEw+UAqwdxv
+	4EtGF4i2xWBmzao9vUTBoLOL17UntjzRdMUCpqtgQtMjpO+veptWeXPmlQUcjH0y
+	yQaQ2Tu+e8gkjvpSVRKjOY7F3jgCXvfNof6PWu3JNteB/S/mjGATmiZSQG4hFXUi
+	NN+hYIJuGER5MbMtMV1qsvCVavIBeSaXxLjCTk6fGpfNlBAgRgVB9It4hhWGCuzo
+	O1kEkPNb+TyX7ud77IUOy9QHCmDGoSEXvNZr5B9UscBoX9fiPn0GjLe7zwoizgr8
+	mDM8HE0DqCfYVsNKB7SKPojl38zZJk5SqybUkFPhRuar5zUjayuPA==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 440vrcb8nh-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 440vrcb8nk-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 16:23:56 +0000 (GMT)
+	Tue, 07 Jan 2025 16:23:57 +0000 (GMT)
 Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 507GK64C010708;
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 507GNsId018908;
 	Tue, 7 Jan 2025 16:23:56 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 440vrcb8nb-1
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 440vrcb8na-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 07 Jan 2025 16:23:56 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 507ES1BX026167;
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 507G0t2n008851;
 	Tue, 7 Jan 2025 16:23:55 GMT
 Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yj1231d6-1
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43yfpyuf2u-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 07 Jan 2025 16:23:55 +0000
 Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 507GNrpC23724670
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 507GNrrw27001462
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 Jan 2025 16:23:53 GMT
+	Tue, 7 Jan 2025 16:23:54 GMT
 Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 61A3758057;
+	by IMSVA (Postfix) with ESMTP id A4C5358061;
 	Tue,  7 Jan 2025 16:23:53 +0000 (GMT)
 Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1E2EE58061;
+	by IMSVA (Postfix) with ESMTP id 69C7358058;
 	Tue,  7 Jan 2025 16:23:53 +0000 (GMT)
 Received: from gfwa153.aus.stglabs.ibm.com (unknown [9.3.84.127])
 	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
@@ -83,9 +83,9 @@ To: minyard@acm.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
         devicetree@vger.kernel.org, eajames@linux.ibm.com,
         linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 04/10] ARM: dts: aspeed: system1: Add GPIO line name
-Date: Tue,  7 Jan 2025 10:23:41 -0600
-Message-ID: <20250107162350.1281165-5-ninad@linux.ibm.com>
+Subject: [PATCH v2 05/10] ARM: dts: aspeed: system1: Add RGMII support
+Date: Tue,  7 Jan 2025 10:23:42 -0600
+Message-ID: <20250107162350.1281165-6-ninad@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250107162350.1281165-1-ninad@linux.ibm.com>
 References: <20250107162350.1281165-1-ninad@linux.ibm.com>
@@ -97,39 +97,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: yg02tSBPwVxawM_Q9J_OPD7Oa3RztbxF
-X-Proofpoint-ORIG-GUID: drXiLHvHynXrJjGTAjVzvb2Byl6f2JOv
+X-Proofpoint-GUID: FAGFtaS1Rr_3Grtj3PBzvXKSgtkASfah
+X-Proofpoint-ORIG-GUID: K403-QN0t2o6gckaoufJJ1_CR8FTtjUw
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=735 spamscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=738 spamscore=0
  impostorscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
  clxscore=1015 mlxscore=0 priorityscore=1501 suspectscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
  definitions=main-2501070133
 
-Add following GPIO line name so that userspace can control them
-    - Flash write override
-    - pch-reset
+system1 has 2 transceiver connected through the RGMII interfaces. Added
+device tree entry to enable RGMII support.
+
+ASPEED AST2600 documentation recommends using 'rgmii-rxid' as a
+'phy-mode' for mac0 and mac1 to enable the RX interface delay from the
+PHY chip.
 
 Signed-off-by: Ninad Palsule <ninad@linux.ibm.com>
 ---
- arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dts | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../dts/aspeed/aspeed-bmc-ibm-system1.dts     | 38 ++++++++++++++++---
+ 1 file changed, 33 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dts b/arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dts
-index 2921a5e5d8ac..d11a922c9d44 100644
+index d11a922c9d44..0f4658074709 100644
 --- a/arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dts
 +++ b/arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dts
-@@ -370,7 +370,7 @@ &gpio0 {
- 	/*K0-K7*/	"","","","","","","","",
- 	/*L0-L7*/	"","","","","","","","bmc-ready",
- 	/*M0-M7*/	"","","","","","","","",
--	/*N0-N7*/	"fpga-debug-enable","","","","","","","",
-+	/*N0-N7*/	"pch-reset","","","","","flash-write-override","","",
- 	/*O0-O7*/	"","","","","","","","",
- 	/*P0-P7*/	"","","","","","","","bmc-hb",
- 	/*Q0-Q7*/	"","","","","","","pch-ready","",
+@@ -425,14 +425,42 @@ &lpc_ctrl {
+ 	memory-region = <&flash_memory>;
+ };
+ 
++&mdio0 {
++	status = "okay";
++
++	ethphy0: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mdio2 {
++	status = "okay";
++
++	ethphy2: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mac0 {
++	status = "okay";
++
++	phy-mode = "rgmii-rxid";
++	phy-handle = <&ethphy0>;
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii1_default>;
++};
++
+ &mac2 {
+ 	status = "okay";
++
++	phy-mode = "rgmii";
++	phy-handle = <&ethphy2>;
++
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_rmii3_default>;
+-	clocks = <&syscon ASPEED_CLK_GATE_MAC3CLK>,
+-		 <&syscon ASPEED_CLK_MAC3RCLK>;
+-	clock-names = "MACCLK", "RCLK";
+-	use-ncsi;
++	pinctrl-0 = <&pinctrl_rgmii3_default>;
+ };
+ 
+ &mac3 {
 -- 
 2.43.0
 
