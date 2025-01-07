@@ -1,192 +1,161 @@
-Return-Path: <netdev+bounces-156001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98003A04991
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:50:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF10A0499D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:53:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB25C3A6F4A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 18:50:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4590E1670FF
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 18:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5851F7060;
-	Tue,  7 Jan 2025 18:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4CAB1F2C35;
+	Tue,  7 Jan 2025 18:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="HX8Vq4zt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XgSksf8f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.freemail.hu (fmfe34.freemail.hu [46.107.16.239])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FB01F471C;
-	Tue,  7 Jan 2025 18:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345DD1DFD87
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 18:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736275737; cv=none; b=qyiuNZg58rR6g3qX/LBCi4FsG/m3ZU6i6EgpeaLHWJam62xYMKigp2ih6p/A+Q61GeaKueWHlMAFrVUi07xMyHJRxSxF65S3ddUaUzL3Fg1818Sjc745fqpxxtGJXXHf+t5nXWQ3SWR0MB8DZoCDkuE59mKU/YesUGaEXC73/VQ=
+	t=1736275984; cv=none; b=d8pA75yMj4OFOtK6GmgnQFULowSQfZlqteeFXL5dA5qBsM7t3pntjKcx4ooX6IW6rB6HwZi5CDBspoX5qFtZFOdu4dPumUGIKSvUD1qAePs5XvhbgmqT8huGd0qMXdjCbJcyDylXr3Kgb6y6aT6Hdkw9WCB80IJLH9HeWKJyKKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736275737; c=relaxed/simple;
-	bh=sJtP5k+9B7FVuJ4FQ+xEmKEnmP48sajydm44qewhoYI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m20XEII2V4JxvSMpwv8mQWC2q9MpHERqRwauekJXb/mESowBIimyNA1pbfdf6NGRrT+H1JsVXsm2n/1LJCZ7CImUnomhkpPxa/zIEaewFpvXJQOib9EU4qX4YkVhHsqctsa9JBFWwkEoCTsa2Y6TTHp/5MtezBakKguzXbX18Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=HX8Vq4zt reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
-Received: from fizweb.elte.hu (fizweb.elte.hu [157.181.183.248])
+	s=arc-20240116; t=1736275984; c=relaxed/simple;
+	bh=9vk+IEkJXpCiBn7KvXO2yU7lodW9ptwAp0TajUHl5ug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eMk/LPfAA7YfSvfoabsNzewpJb5n/fHk8JOkGD3H/wIT9t8xa90qQXh0W/cgtigCfUdhydTmaBpHVtTF9ZhVTCcYBlJY/yiXkpPstn+IzkSf+TxRXwoWKujecsVJ///UuvRBJgmVPTpQ2gwifJubIqPSLsIGZjWZXBArqKd8MnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XgSksf8f; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736275982;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nweBwiQ4x8uvN5jQ4KfKWDvicEgXxH48zPPJEyuktZU=;
+	b=XgSksf8fJagTPKpXUMdh2YmIFVwk5aqCprrinSUtpiwfnvc5B+JwbjLehwCxiUw+BHYdb0
+	TfzwKtbNfSOaVw+IW7WLhzLvdORBVi66aXOM3JPcmAXgmGXrEEi9c22AxeypioP9ZXDc4O
+	gukCfiRb43jfypa71ozl++kowN8FYhk=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-511-hDlqxUtJO9CBeOq_TN9zdw-1; Tue,
+ 07 Jan 2025 13:52:58 -0500
+X-MC-Unique: hDlqxUtJO9CBeOq_TN9zdw-1
+X-Mimecast-MFC-AGG-ID: hDlqxUtJO9CBeOq_TN9zdw
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YSKnw3Xzvz10mN;
-	Tue, 07 Jan 2025 19:48:52 +0100 (CET)
-From: egyszeregy@freemail.hu
-To: fw@strlen.de,
-	pablo@netfilter.org,
-	lorenzo@kernel.org,
-	daniel@iogearbox.net,
-	leitao@debian.org,
-	amiculas@cisco.com,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Benjamin=20Sz=C5=91ke?= <egyszeregy@freemail.hu>
-Subject: [PATCH 6/6] netfilter: x_tables: Adjust code style of xt_*.c files.
-Date: Tue,  7 Jan 2025 19:47:24 +0100
-Message-ID: <20250107184724.56223-7-egyszeregy@freemail.hu>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250107184724.56223-1-egyszeregy@freemail.hu>
-References: <20250107184724.56223-1-egyszeregy@freemail.hu>
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E650619560A3;
+	Tue,  7 Jan 2025 18:52:55 +0000 (UTC)
+Received: from wcosta-thinkpadt14gen4.rmtbr.csb (unknown [10.22.88.156])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 3E1C51956053;
+	Tue,  7 Jan 2025 18:52:48 +0000 (UTC)
+Date: Tue, 7 Jan 2025 15:52:47 -0300
+From: Wander Lairson Costa <wander@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Jeff Garzik <jgarzik@redhat.com>, Auke Kok <auke-jan.h.kok@intel.com>, 
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>
+Subject: Re: [PATCH iwl-net 0/4] igb: fix igb_msix_other() handling for
+ PREEMPT_RT
+Message-ID: <taea3z7nof4szjir2azxsjtbouymqxyy4draa3hz35zbacqeeq@t3uidpha64k7>
+References: <20241204114229.21452-1-wander@redhat.com>
+ <20250107135106.WWrtBMXY@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736275732;
-	s=20181004; d=freemail.hu;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	l=3557; bh=Yd4xrnhdsyrfeeJt8qwnkIqtaiGci73CHdk/SD5WDPE=;
-	b=HX8Vq4ztcZAeB3FdBALnbViGgZ3pueHSAHX9Y7MXHydWapFsSlfDCilMk319+CJv
-	5niSxNOu4a9ZJkQ2Tc/80otILu8+BG+ncP0n/iNGHBoXzOFBkU1uc2wztqLVB1C7XiS
-	T+c4K0LKbuJZFtwbyQzOWSYa2r3H8NuNDzsgPh1Z+XsqY+BPU85oyNBRgD8fXqdfV1J
-	xZZYTXO/sn54/I3Vc+acktPddPQPg9MNA2KrKJixf8ORtU74RA8ve7i/yencgjayjI1
-	GzfYWK43qa7S4AXIyECig676s8qptW5hdTJh2ZMRmvDUQP89/V7T6lgDyMVBFoEsNSJ
-	BmJ86BtqaQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250107135106.WWrtBMXY@linutronix.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-From: Benjamin Szőke <egyszeregy@freemail.hu>
+On Tue, Jan 07, 2025 at 02:51:06PM +0100, Sebastian Andrzej Siewior wrote:
+> On 2024-12-04 08:42:23 [-0300], Wander Lairson Costa wrote:
+> > This is the second attempt at fixing the behavior of igb_msix_other()
+> > for PREEMPT_RT. The previous attempt [1] was reverted [2] following
+> > concerns raised by Sebastian [3].
+> > 
+> > The initial approach proposed converting vfs_lock to a raw_spinlock,
+> > a minor change intended to make it safe. However, it became evident
+> > that igb_rcv_msg_from_vf() invokes kcalloc with GFP_ATOMIC,
+> > which is unsafe in interrupt context on PREEMPT_RT systems.
+> > 
+> > To address this, the solution involves splitting igb_msg_task()
+> > into two parts:
+> > 
+> >     * One part invoked from the IRQ context.
+> >     * Another part called from the threaded interrupt handler.
+> > 
+> > To accommodate this, vfs_lock has been restructured into a double
+> > lock: a spinlock_t and a raw_spinlock_t. In the revised design:
+> > 
+> >     * igb_disable_sriov() locks both spinlocks.
+> >     * Each part of igb_msg_task() locks the appropriate spinlock for
+> >     its execution context.
+> 
+> - Is this limited to PREEMPT_RT or does it also occur on PREEMPT systems
+>   with threadirqs? And if this is PREEMPT_RT only, why?
 
-- Change to use u8, u16 and u32 types.
-- Fix format of #define macros
+PREEMPT systems configured to use threadirqs should be affected as well,
+although I never tested with this configuration. Honestly, until now I wasn't
+aware of the possibility of a non PREEMPT_RT kernel with threaded IRQs by default.
 
-Signed-off-by: Benjamin Szőke <egyszeregy@freemail.hu>
----
- net/netfilter/xt_dscp.c    |  6 +++---
- net/netfilter/xt_rateest.c |  4 ++--
- net/netfilter/xt_tcpmss.c  | 10 ++++------
- 3 files changed, 9 insertions(+), 11 deletions(-)
+> 
+> - What causes the failure? I see you reworked into two parts to behave
+>   similar to what happens without threaded interrupts. There is still no
+>   explanation for it. Is there a timing limit or was there another
+>   register operation which removed the mailbox message?
+> 
 
-diff --git a/net/netfilter/xt_dscp.c b/net/netfilter/xt_dscp.c
-index bdd67b0458ab..2d09a66c131e 100644
---- a/net/netfilter/xt_dscp.c
-+++ b/net/netfilter/xt_dscp.c
-@@ -29,13 +29,13 @@ MODULE_ALIAS("ipt_TOS");
- MODULE_ALIAS("ip6t_TOS");
- MODULE_ALIAS("xt_DSCP");
- 
--#define XT_DSCP_ECN_MASK	3u
-+#define XT_DSCP_ECN_MASK	(3u)
- 
- static bool
- dscp_mt(const struct sk_buff *skb, struct xt_action_param *par)
- {
- 	const struct xt_dscp_info *info = par->matchinfo;
--	u_int8_t dscp = ipv4_get_dsfield(ip_hdr(skb)) >> XT_DSCP_SHIFT;
-+	u8 dscp = ipv4_get_dsfield(ip_hdr(skb)) >> XT_DSCP_SHIFT;
- 
- 	return (dscp == info->dscp) ^ !!info->invert;
- }
-@@ -44,7 +44,7 @@ static bool
- dscp_mt6(const struct sk_buff *skb, struct xt_action_param *par)
- {
- 	const struct xt_dscp_info *info = par->matchinfo;
--	u_int8_t dscp = ipv6_get_dsfield(ipv6_hdr(skb)) >> XT_DSCP_SHIFT;
-+	u8 dscp = ipv6_get_dsfield(ipv6_hdr(skb)) >> XT_DSCP_SHIFT;
- 
- 	return (dscp == info->dscp) ^ !!info->invert;
- }
-diff --git a/net/netfilter/xt_rateest.c b/net/netfilter/xt_rateest.c
-index c0153b5b47a0..b31458079c3e 100644
---- a/net/netfilter/xt_rateest.c
-+++ b/net/netfilter/xt_rateest.c
-@@ -17,7 +17,7 @@
- #include <linux/netfilter/xt_rateest.h>
- #include <net/netfilter/xt_rateest.h>
- 
--#define RATEEST_HSIZE	16
-+#define RATEEST_HSIZE	(16)
- 
- MODULE_AUTHOR("Patrick McHardy <kaber@trash.net>");
- MODULE_LICENSE("GPL");
-@@ -33,7 +33,7 @@ xt_rateest_mt(const struct sk_buff *skb, struct xt_action_param *par)
- {
- 	const struct xt_rateest_match_info *info = par->matchinfo;
- 	struct gnet_stats_rate_est64 sample = {0};
--	u_int32_t bps1, bps2, pps1, pps2;
-+	u32 bps1, bps2, pps1, pps2;
- 	bool ret = true;
- 
- 	gen_estimator_read(&info->est1->rate_est, &sample);
-diff --git a/net/netfilter/xt_tcpmss.c b/net/netfilter/xt_tcpmss.c
-index 9cf627e96226..b0312a085d9e 100644
---- a/net/netfilter/xt_tcpmss.c
-+++ b/net/netfilter/xt_tcpmss.c
-@@ -40,7 +40,7 @@ tcpmss_mt(const struct sk_buff *skb, struct xt_action_param *par)
- 	const struct tcphdr *th;
- 	struct tcphdr _tcph;
- 	/* tcp.doff is only 4 bits, ie. max 15 * 4 bytes */
--	const u_int8_t *op;
-+	const u8 *op;
- 	u8 _opt[15 * 4 - sizeof(_tcph)];
- 	unsigned int i, optlen;
- 
-@@ -115,9 +115,7 @@ optlen(const u8 *opt, unsigned int offset)
- 		return opt[offset + 1];
- }
- 
--static u_int32_t tcpmss_reverse_mtu(struct net *net,
--				    const struct sk_buff *skb,
--				    unsigned int family)
-+static u32 tcpmss_reverse_mtu(struct net *net, const struct sk_buff *skb, unsigned int family)
- {
- 	struct flowi fl;
- 	struct rtable *rt = NULL;
-@@ -190,7 +188,7 @@ tcpmss_mangle_packet(struct sk_buff *skb,
- 		newmss = info->mss;
- 	}
- 
--	opt = (u_int8_t *)tcph;
-+	opt = (u8 *)tcph;
- 	for (i = sizeof(struct tcphdr); i <= tcp_hdrlen - TCPOLEN_MSS; i += optlen(opt, i)) {
- 		if (opt[i] == TCPOPT_MSS && opt[i + 1] == TCPOLEN_MSS) {
- 			u16 oldmss;
-@@ -250,7 +248,7 @@ tcpmss_mangle_packet(struct sk_buff *skb,
- 	else
- 		newmss = min(newmss, (u16)1220);
- 
--	opt = (u_int8_t *)tcph + sizeof(struct tcphdr);
-+	opt = (u8 *)tcph + sizeof(struct tcphdr);
- 	memmove(opt + TCPOLEN_MSS, opt, len - sizeof(struct tcphdr));
- 
- 	inet_proto_csum_replace2(&tcph->check, skb,
--- 
-2.43.5
+I explained the root cause of the issue in the last commit. Maybe I should
+have added the explanation to the cover letter as well.  Anyway, here is a
+partial verbatim copy of it:
+
+"During testing of SR-IOV, Red Hat QE encountered an issue where the
+ip link up command intermittently fails for the igbvf interfaces when
+using the PREEMPT_RT variant. Investigation revealed that
+e1000_write_posted_mbx returns an error due to the lack of an ACK
+from e1000_poll_for_ack.
+
+The underlying issue arises from the fact that IRQs are threaded by
+default under PREEMPT_RT. While the exact hardware details are not
+available, it appears that the IRQ handled by igb_msix_other must
+be processed before e1000_poll_for_ack times out. However,
+e1000_write_posted_mbx is called with preemption disabled, leading
+to a scenario where the IRQ is serviced only after the failure of
+e1000_write_posted_mbx."
+
+The call chain from igb_msg_task():
+
+igb_msg_task
+	igb_rcv_msg_from_vf
+		igb_set_vf_multicasts
+			igb_set_rx_mode
+				igb_write_mc_addr_list
+					kmalloc
+
+Cannot happen from interrupt context under PREEMPT_RT. So this part of
+the interrupt handler is deferred to a threaded IRQ handler.
+
+> > Cheers,
+> > Wander
+> 
+> Sebastian
+> 
 
 
