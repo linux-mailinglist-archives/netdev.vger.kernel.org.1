@@ -1,187 +1,175 @@
-Return-Path: <netdev+bounces-155980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C45A04804
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 18:17:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AA3EA04806
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 18:18:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 851AD1669BA
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:17:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91C567A0268
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D13B1F63DB;
-	Tue,  7 Jan 2025 17:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154EA1F2C41;
+	Tue,  7 Jan 2025 17:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuPifr2h"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ks7yKeuD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2075.outbound.protection.outlook.com [40.107.92.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1DF1F63C5;
-	Tue,  7 Jan 2025 17:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736270233; cv=none; b=IuNOy0mdI1m5umxs4+etCKODAzfoZZ9TMsveDoUneLuYu8PaPkLZCNPX4L6holbh9FfhyXuDO/dOF/Rvc7x1dVpPGV0KUcSt+QjATJJVLbFRs2YoZVDSUsRU2pdJsHfZS2AEDVead05Gq96iTOcgShPZvJAswnlrAb9u8Xap9/U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736270233; c=relaxed/simple;
-	bh=JcYsPQnOnlgO+9yf2Fhoi3kdweKCoXAuxTH4OFpUISo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U0LDI3eL/EEqGN9qb+T2jHCUMkJ9f7CY9tZOUhh79kV2giBInY5b/giZHvP2YALd3vbZEQpvQALXwKMvwMNhpwmFx2FvFxjn3NpBZExS8MWfkcS8EFI3N2yLZ1b0Ily4ybMGRqMIf6n5Fr7R55uMM4MwdpKvDQTsZAGz1vB8OC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WuPifr2h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3AF7C4CEDE;
-	Tue,  7 Jan 2025 17:17:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736270233;
-	bh=JcYsPQnOnlgO+9yf2Fhoi3kdweKCoXAuxTH4OFpUISo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WuPifr2hEF2567conVGviESfJ9TBd2kPTPXTTGoViuLbItQEeEWHSPLPybvN06tTj
-	 4esj16O6oOEqQq0FG+jSZGyQVIwov8GUZ9VkU+88vhOlf7mdv3YruucOEXNtEsy1qj
-	 E9LlmvGYvCb0663ivasWXZxpn1OrLb691P0dhl9myfiSUlMQgECG3ZsnSuQMQxclX/
-	 /bRsNGKz8iQQ/j3bBM9sgZD+Jv0xonSwNGyWeNY1N0aerNorjjLl2xLLmKNCBX5U2E
-	 5bUD5O0hwbzGMAOVtFaZFZjQisofninVl1YuCiehwyB35UMiBBViwOBumpV0I2Kz37
-	 lKVdWUaXKcefw==
-Message-ID: <5ea87b3d-4fcb-4e20-a348-ff90cd9283d9@kernel.org>
-Date: Tue, 7 Jan 2025 18:17:06 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C0A1F37B6
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 17:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736270254; cv=fail; b=YPoZXMuLnOi1ytsBpSity2jH2yqKT1TIrsE78kmyvE/uZm4WnWVV6iA3o+xbveXEZgTsJYLFJSGlR01LIuL5JdbOSP2+n+BPLLQ9NJZYcwjieX2qHSABKX5J9YV4l0Xx+CkGP4LgZs3GE6ZHNFUqSe2WNiCKM9DLhVEWZ352Ewg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736270254; c=relaxed/simple;
+	bh=9sEhZjc2kRagOUM2hC2CqUZA4S/1TCg79tp+AmEFQ8o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qaCF3UG8jdnbdOt1v3v6dfz8DdJtBJEfK8gjAeojtBefzLBM4LP/jblMPUAbXx/KpjoIY6gbEgRbG5AsHStebkb8i2V2PO56IDy30l6IpKMFxIDDmCISGlqQ+tBARAEriQpc/jEmdmNq5jwc1xcDz2Li0t0oikLRwodTJZVkXng=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ks7yKeuD; arc=fail smtp.client-ip=40.107.92.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kxy4LJV8f89AMssjhafZMbcUJZvf51kJ8S66SE6MmfkbiEsHTMRLHzZmnZI8ifF7qgQPSTkFyxanLpEIUvwhuR71LGNtDJv8OKXsVHbXw0FgclzHwx4QyIsHXbiaBtsF1TIXAKmJTsWxypWnt7b4rJScwvlrE+SX152X1KCf1pQk8R2Xnq3zXlWYP+UC2c2aSJRrlf69uCv0waVlxxApHglZzunkL0UMt1VOrS6gEN1/X63yrvXE1wFhGf2jQWOUzY8NQShVJ2UsDinoSR0RYi+LvYmAwpv+PbZCfxCAnSjyHZ+mpZ7csV15p/KLDKGx7LmD7u4Tggq6R3FDu9dayA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nTEDDGXSih9Ocg4kTeuLubS3Vhlx8VjmWIs6tRgyBD0=;
+ b=iuEBDM0OXHX8uYOmz4WjuMmtpZi02azf/WZwvrWvoqEZWdmDEksmv4bDazC/o628RxQ4K552IBhlfA86R/WDw0XAmPUBZ5fBgvZS0hltbQpS70lxRsDV7Pi9vcgJ6130Ms2ncBz+k+mNlu9KvLynMYlfkszA2spTKPzVNsqL+44ZbvNh0NJ7+O8+t3UZjMDZ3diEe6R/OWtacSJtcZ1nwr488DX+ZonJb5NMns9ndCMzWS4dPlGnWPVenpXNXUTr9eEOjou0xgT4rrhizWYGlLiaNH/wRzbawgVuhrItTJ80kcUIYYlriwdm6pJkpA7IEjU6QIrl+BWYUA94Lk/xYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nTEDDGXSih9Ocg4kTeuLubS3Vhlx8VjmWIs6tRgyBD0=;
+ b=ks7yKeuD4wd/oC5/V0HX588qhnoso18zNlMPlzIUJEOIQg6MfOo28z5v0wqghrM3zP+Ssbmy3X5qI0xKOJ+fQYGplOmVAhNB7Fz7NLCqBJvBK3lwzdle/ndOPb7wKCx3yCuIOSjNuE7WquxRiRHBjJSfoCmAFCY0/Dcojt4tDvs2PPlm8Q9bzNKZ9u1BZl/DlhZ2jqGqnbFe3Mb599btygFmW47/faB5YRRwxMULpWltyD9wP1eP+9dPDmz0lAtJ+/Tf4Zda3tqm/hsZFVuqULAKsLQllMookCqDR7r4WZwPcJL7bO29zwIVgKv7IAjigxcakyUpMliUwHjuboK4Bg==
+Received: from BN9PR03CA0673.namprd03.prod.outlook.com (2603:10b6:408:10e::18)
+ by DM4PR12MB6328.namprd12.prod.outlook.com (2603:10b6:8:a0::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Tue, 7 Jan
+ 2025 17:17:21 +0000
+Received: from BL6PEPF0001AB57.namprd02.prod.outlook.com
+ (2603:10b6:408:10e:cafe::67) by BN9PR03CA0673.outlook.office365.com
+ (2603:10b6:408:10e::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8314.18 via Frontend Transport; Tue,
+ 7 Jan 2025 17:17:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL6PEPF0001AB57.mail.protection.outlook.com (10.167.241.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8335.7 via Frontend Transport; Tue, 7 Jan 2025 17:17:20 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 7 Jan 2025
+ 09:17:03 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 7 Jan 2025
+ 09:17:02 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Tue, 7 Jan
+ 2025 09:17:01 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <mkubecek@suse.cz>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>
+Subject: [PATCH ethtool] ethtool: Fix incorrect success return value on RX network flow hashing error
+Date: Tue, 7 Jan 2025 19:17:55 +0200
+Message-ID: <20250107171755.3059447-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/8] bpf: cpumap: enable GRO for XDP_PASS
- frames
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>,
- kernel-team <kernel-team@cloudflare.com>
-References: <20250107152940.26530-1-aleksander.lobakin@intel.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250107152940.26530-1-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB57:EE_|DM4PR12MB6328:EE_
+X-MS-Office365-Filtering-Correlation-Id: 21580c0d-c011-478f-57a9-08dd2f3f2502
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?3T1NQU5ecpqBqGWZ3rMIl4/SnNFNXtUFI6g/SkDUJty9rJi3SWGApG5tYzJQ?=
+ =?us-ascii?Q?rJlzbhyB2knAmrBGaRCCZNcmPWHHjj+ySffbfQFQH3/wMoZA+o4egL3PStag?=
+ =?us-ascii?Q?r2uE5jQhP1EQ3cDY9/osKPouyGBTP2H8Ne3vt7kDKByQhc/X65zkOGoJwbZ4?=
+ =?us-ascii?Q?m5Nj9kgg/5HCTub/kWi6xfUvJH3Ty7N5qmqr+EhBehKufhBzFs/zaakvPGUS?=
+ =?us-ascii?Q?X4xTcbnUvCnyPVw+c/LI9YD5qeCIhMMFt7VHh1j2MM/g3TTkejE6BQe9Igoc?=
+ =?us-ascii?Q?cdrHd6/XF+zKAhuW/b2ArIhJY4HutfEZ5xEQJ7+MfsFbwPPeEcOVDupTXeNr?=
+ =?us-ascii?Q?kLknTMfQjGNOD4Iq8KsURO0Poygeu2ZAV12LsfoAbJPdPiGphu09U28ctnz5?=
+ =?us-ascii?Q?JWHkdGav2MJ4xYjWY0MRQOT6QPiV5jTAbYVP/m13a5TR4roFX0abffsM9aSw?=
+ =?us-ascii?Q?vnTt69CY1OcMGrwVxulAahDKBXz/AiSTb9ph8XD6y5lkI4Dz+AVfIkylDgHs?=
+ =?us-ascii?Q?FaZbXu2WNgnkESdLvcU5NxJChdavcabxtLkSumxHjDMc6XSwG2AL6vEDDsNW?=
+ =?us-ascii?Q?k4gcu3jnk36DFulIzLR0XwWe6oU26QJwKwamC08a/6XZpQv+4H/br0xGURxb?=
+ =?us-ascii?Q?xdJwM8zVZ32y6gYUb8h9sFJ6B3YwbO2ekxHg9DiWrhOZ7s06WLcBaB5PA1L5?=
+ =?us-ascii?Q?RjggTpJXzBlGTgxphP0D1hkT22UXDhkAkTDrwmJw4cxnJtWaw3Jcr/FlByS7?=
+ =?us-ascii?Q?9j/UMtDXUWOnH9fYZ/REyFSg5OI1erekcpT29HxE3sV2IJGKHvEPzuqoxBH3?=
+ =?us-ascii?Q?wfGDQfktYgHocxYaqLuxWAgAOyXXg6rSSlce0UJpyBfV0unXjZJ1+Py61m+s?=
+ =?us-ascii?Q?xcNhJ7zHdCZriN3H7B61JID3EVvnEHfogmxyFcWxs+UleLz7tnxkZSH6xTxA?=
+ =?us-ascii?Q?CMn5PuWf3jt6JZn+ZtcrL5ge1HrpabT5JNGYTMpt/GdpUM4Yzl7GU6DmWf/g?=
+ =?us-ascii?Q?FfLNqzmumB6IfyT8DrIndrOUBBljzCd3A0LEAL/VYYozn+B+k+wQzJBpnRrB?=
+ =?us-ascii?Q?BSHwxx4qqfRAI8vGN3dhTmqoHHir1pu8zHFz23g61v/FCuoTt7rgYuu2ZQo1?=
+ =?us-ascii?Q?5rduneCi5O7+SYUbWN39UCyPa4SJy94HgtEIFJsmKb1K4TAoYcXB3s3KX5g2?=
+ =?us-ascii?Q?FGgMavsU7zUSg0rcHMiVbyrC+jha7Yc1moicWmy/yDzgvKD0+8HFkH2HcKs/?=
+ =?us-ascii?Q?uJmlpcuDSqM7tYq7tuPKUhr4LzKnbGFG96GkpuEHtHrIdQoK1+OpadBmRvbZ?=
+ =?us-ascii?Q?MpPUhYfJJ1aDxRjCEO1FM+fxSOFXHibw+8vilSt08g+qpKeef86Dy23WM4UH?=
+ =?us-ascii?Q?NmpaWZUebvy0lhkBOP5EruFSRJYRi0rlnAskzxAkfbZBwPx8ANpg5X182G61?=
+ =?us-ascii?Q?N4k5uiWAV6TFWWzf1oMgtsmdoH8mu4VN+ZbAyR5LRTfkb9oIDq+Qcn+tMP1j?=
+ =?us-ascii?Q?akx6hVedtbLHwFM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2025 17:17:20.5427
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21580c0d-c011-478f-57a9-08dd2f3f2502
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB57.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6328
 
-Awesome work! - some questions below
+In case of an error on RX network flow hashing configuration, return an
+error in addition to the error message.
 
-On 07/01/2025 16.29, Alexander Lobakin wrote:
-> Several months ago, I had been looking through my old XDP hints tree[0]
-> to check whether some patches not directly related to hints can be sent
-> standalone. Roughly at the same time, Daniel appeared and asked[1] about
-> GRO for cpumap from that tree.
-> 
-> Currently, cpumap uses its own kthread which processes cpumap-redirected
-> frames by batches of 8, without any weighting (but with rescheduling
-> points). The resulting skbs get passed to the stack via
-> netif_receive_skb_list(), which means no GRO happens.
-> Even though we can't currently pass checksum status from the drivers,
-> in many cases GRO performs better than the listified Rx without the
-> aggregation, confirmed by tests.
-> 
-> In order to enable GRO in cpumap, we need to do the following:
-> 
-> * patches 1-2: decouple the GRO struct from the NAPI struct and allow
->    using it out of a NAPI entity within the kernel core code;
-> * patch 3: switch cpumap from netif_receive_skb_list() to
->    gro_receive_skb().
-> 
-> Additional improvements:
-> 
-> * patch 4: optimize XDP_PASS in cpumap by using arrays instead of linked
->    lists;
-> * patch 5-6: introduce and use function do get skbs from the NAPI percpu
->    caches by bulks, not one at a time;
-> * patch 7-8: use that function in veth as well and remove the one that
->    was now superseded by it.
-> 
-> My trafficgen UDP GRO tests, small frame sizes:
-> 
+Fixes: 1bd87128467b ("Add support for rx flow hash configuration in a network device")
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+---
+ ethtool.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-How does your trafficgen UDP test manage to get UDP GRO working?
-(Perhaps you can share test?)
+diff --git a/ethtool.c b/ethtool.c
+index 1cb5b9ecf094..a1393bc14b7b 100644
+--- a/ethtool.c
++++ b/ethtool.c
+@@ -3883,8 +3883,10 @@ static int do_srxclass(struct cmd_context *ctx)
+ 			nfccmd.flow_type |= FLOW_RSS;
+ 
+ 		err = send_ioctl(ctx, &nfccmd);
+-		if (err < 0)
++		if (err < 0) {
+ 			perror("Cannot change RX network flow hashing options");
++			return 1;
++		}
+ 	} else if (!strcmp(ctx->argp[0], "flow-type")) {
+ 		struct ethtool_rx_flow_spec rx_rule_fs;
+ 		__u32 rss_context = 0;
+-- 
+2.40.1
 
-What is the "small frame" size being used?
-
-Is the UDP benchmark avoiding (re)calculating the RX checksum?
-(via setting UDP csum to zero)
-
->                  GRO off    GRO on
-> baseline        2.7        N/A       Mpps
-> patch 3         2.3        4         Mpps
-> patch 8         2.4        4.7       Mpps
-> 
-> 1...3 diff      -17        +48       %
-> 1...8 diff      -11        +74       %
-> 
-> Daniel reported from +14%[2] to +18%[3] of throughput in neper's TCP RR
-> tests. On my system however, the same test gave me up to +100%.
-> 
-
-I can imagine that the TCP throughput tests will yield a huge
-performance boost.
-
-> Note that there's a series from Lorenzo[4] which achieves the same, but
-> in a different way. During the discussions, the approach using a
-> standalone GRO instance was preferred over the threaded NAPI.
-> 
-
-It looks like you are keeping the "remote" CPUMAP kthread process design
-intact in this series, right?
-
-I think this design works for our use-case. For our use-case, we want to
-give "remote" CPU-thread higher scheduling priority.  It doesn't matter
-if this is a kthread or threaded-NAPI thread, as long as we can see this
-as a PID from userspace (by which we adjust the sched priority).
-
-Great to see this work progressing again :-)))
---Jesper
-
-> [0] https://github.com/alobakin/linux/tree/xdp_hints
-> [1] https://lore.kernel.org/bpf/cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com
-> [2] https://lore.kernel.org/bpf/merfatcdvwpx2lj4j2pahhwp4vihstpidws3jwljwazhh76xkd@t5vsh4gvk4mh
-> [3] https://lore.kernel.org/bpf/yzda66wro5twmzpmjoxvy4si5zvkehlmgtpi6brheek3sj73tj@o7kd6nurr3o6
-> [4] https://lore.kernel.org/bpf/20241130-cpumap-gro-v1-0-c1180b1b5758@kernel.org
-> 
-> Alexander Lobakin (8):
->    net: gro: decouple GRO from the NAPI layer
->    net: gro: expose GRO init/cleanup to use outside of NAPI
->    bpf: cpumap: switch to GRO from netif_receive_skb_list()
->    bpf: cpumap: reuse skb array instead of a linked list to chain skbs
->    net: skbuff: introduce napi_skb_cache_get_bulk()
->    bpf: cpumap: switch to napi_skb_cache_get_bulk()
->    veth: use napi_skb_cache_get_bulk() instead of xdp_alloc_skb_bulk()
->    xdp: remove xdp_alloc_skb_bulk()
-> 
->   include/linux/netdevice.h                  |  35 ++++--
->   include/linux/skbuff.h                     |   1 +
->   include/net/busy_poll.h                    |  11 +-
->   include/net/gro.h                          |  38 ++++--
->   include/net/xdp.h                          |   1 -
->   drivers/net/ethernet/brocade/bna/bnad.c    |   1 +
->   drivers/net/ethernet/cortina/gemini.c      |   1 +
->   drivers/net/veth.c                         |   3 +-
->   drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c |   1 +
->   kernel/bpf/cpumap.c                        | 131 ++++++++++++++-------
->   net/core/dev.c                             |  79 ++++---------
->   net/core/gro.c                             | 103 ++++++++++------
->   net/core/skbuff.c                          |  62 ++++++++++
->   net/core/xdp.c                             |  10 --
->   14 files changed, 306 insertions(+), 171 deletions(-)
-> 
-> ---
->  From v1[5]:
-> * use a standalone GRO instance instead of the threaded NAPI (Jakub);
-> * rebase and send to net-next as it's now more networking than BPF.
-> 
-> [5] https://lore.kernel.org/bpf/20240830162508.1009458-1-aleksander.lobakin@intel.com
 
