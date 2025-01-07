@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-155668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A596A03521
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:28:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFE73A03522
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B01A93A33C8
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:28:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C060F1886764
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4789478F54;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3C6156C74;
 	Tue,  7 Jan 2025 02:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZjdppTOy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ETT7l291"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F106155335
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 02:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955A415689A
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 02:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736216903; cv=none; b=q5HxztLkFX9bK5r+YKDhN+QZT9e6IHh+Zsp9ZdqMcA5fWPEywNoVq4PKgBxqjmOXR9FJC0qRbNjkHFnqIgEuqgfK7ymA9ENZroqEodEJbUXQsUXdF8j+iGCzTXi16t6nVQhNYVaTtEljLtWs/Zwvr2OTFPGJN4DZ7i3GiFAKtCg=
+	t=1736216903; cv=none; b=Nk9oQHGsw0qaPG4Yv98QWgemGqOmNAcdS5I0aVpAKnBeiHtBvhtI+ZCVCpP2gxU2nOvKrzoRd4k5Sev+PmBZjTpHo8QWitZxnncGm3jEJsSj8cR8WBeut95HtTVX1sC1PcgEz6wuxTl+Dtt1HNYQK5qSJiDrOjw0QAv8qdJuhzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736216903; c=relaxed/simple;
-	bh=yeScf+u+X2wCd8NrEgJmObDNAsB/4XtqPjyHI46v/MQ=;
+	bh=mawXyqnxGdkiKzHw95TIvlSf6zxFCR2AnbidPnnFg3c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UtRL+wTUAS2T2GMIuDHLToY95cAwCaZhcKUn0NkTB8VEqJGQ6PBhws9qoiRUCeF0NMSQAuumy6p01rleUyQhlyjl2W1009mW+gUsR8kH0x2NfIdCIyXgZ7Ec5t2zU0Shnf7GA16fC8fa4qS/qJh9ActXvTgYo9YKJ0b5TzVepNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZjdppTOy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EBB5C4CEDD;
+	 MIME-Version; b=O9yDTzzNR2D0r7D5LW/hvSxAUw5iEs3NEtaLXPFPtvGoUO7H57C+hI2EMQ0h8cDDnHCF3QXFRAeJQ6a+B9pWrTitUGPF7f6v+GiPJ4Ypj6FelaCEBVf8WaVRSTO9pvzH/RqJrwlTalJExkR6iFpmpUDL+6Q8TkTNk9THO+thQ9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ETT7l291; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E26A6C4CED2;
 	Tue,  7 Jan 2025 02:28:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736216902;
-	bh=yeScf+u+X2wCd8NrEgJmObDNAsB/4XtqPjyHI46v/MQ=;
+	s=k20201202; t=1736216903;
+	bh=mawXyqnxGdkiKzHw95TIvlSf6zxFCR2AnbidPnnFg3c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZjdppTOyl+2mR33MILJYawBGjd0gC3fvwO2KPDtJOqbWORIY3RH2lvI5jpTiFrIqQ
-	 hV/534RX2ifxezTzqDuASKXOGqnJ/Eb+KHDOdMbutYLxpKIwo/cTZA+NYaj1TnzTp0
-	 w0J83hFmveBGTP0lErGNnK0gmj8h7s1NvvJxl2XiAzz7N33QyqUG67Pg7f+cvjCoog
-	 QaEWEfHIHtg6cjEiEjQo63uw8Mru5FmxPOE4ZxUFsC3ish102YozSJHOakYvn89aUp
-	 IvESjZXTShj7oRHacAbh7JZSjxcTStg1JVOnt8id9t392bS7h4Bc8FQ4HMLWN3H6Co
-	 NcFJPxKs87fdg==
+	b=ETT7l291eWJWpgzXuscCjEF2Iiv2djc7I7uJLJsE/5N571CV4FARivwwgJFQNl+z2
+	 reUhPbzlWcy9L0PUFl18opsrrMCbeo6PCfcEC+ozmddr6HMEIkfsDHDqziyD1S+kVw
+	 yEb6I1bZuuohUQxnQ25kFTmMgLnKpWFjzW+abtYWsmtKxmsGU4I2agxi+MASS0qmRO
+	 SFr4uPfaWbKfm1oGlsZiIk4+0g6810m56YR9HJcIQqaHRBzfRktkPt+ZBJrgyk8qg8
+	 FIN1gnZ3dJA8+LsLbja/C2XeqZ5H0uCrRtrqX9pyluOaCCQKM+fPq2Gryk/17Scoa/
+	 rTBKZ6GAk5a3Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: donald.hunter@gmail.com,
 	netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/3] tools: ynl: correctly handle overrides of fields in subset
-Date: Mon,  6 Jan 2025 18:28:18 -0800
-Message-ID: <20250107022820.2087101-2-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: [PATCH net-next v2 2/3] tools: ynl: print some information about attribute we can't parse
+Date: Mon,  6 Jan 2025 18:28:19 -0800
+Message-ID: <20250107022820.2087101-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250107022820.2087101-1-kuba@kernel.org>
 References: <20250107022820.2087101-1-kuba@kernel.org>
@@ -62,102 +63,136 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We stated in documentation [1] and previous discussions [2]
-that the need for overriding fields in members of subsets
-is anticipated. Implement it.
+When parsing throws an exception one often has to figure out which
+attribute couldn't be parsed from first principles. For families
+with large message parsing trees like rtnetlink guessing the
+attribute can be hard.
 
-Since each attr is now a new object we need to make sure
-that the modifications are propagated. Specifically C codegen
-wants to annotate which attrs are used in requests and replies
-to generate the right validation artifacts.
+Print a bit of information as the exception travels out, e.g.:
 
-[1] https://docs.kernel.org/next/userspace-api/netlink/specs.html#subset-of
-[2] https://lore.kernel.org/netdev/20231004171350.1f59cd1d@kernel.org/
+  # when dumping rt links
+  Error decoding 'flags' from 'linkinfo-ip6tnl-attrs'
+  Error decoding 'data' from 'linkinfo-attrs'
+  Error decoding 'linkinfo' from 'link-attrs'
+  Traceback (most recent call last):
+    File "/home/kicinski/linux/./tools/net/ynl/cli.py", line 119, in <module>
+      main()
+    File "/home/kicinski/linux/./tools/net/ynl/cli.py", line 100, in main
+      reply = ynl.dump(args.dump, attrs)
+    File "/home/kicinski/linux/tools/net/ynl/lib/ynl.py", line 1064, in dump
+      return self._op(method, vals, dump=True)
+    File "/home/kicinski/linux/tools/net/ynl/lib/ynl.py", line 1058, in _op
+      return self._ops(ops)[0]
+    File "/home/kicinski/linux/tools/net/ynl/lib/ynl.py", line 1045, in _ops
+      rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
+    File "/home/kicinski/linux/tools/net/ynl/lib/ynl.py", line 738, in _decode
+      subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'], search_attrs)
+    File "/home/kicinski/linux/tools/net/ynl/lib/ynl.py", line 763, in _decode
+      decoded = self._decode_sub_msg(attr, attr_spec, search_attrs)
+    File "/home/kicinski/linux/tools/net/ynl/lib/ynl.py", line 714, in _decode_sub_msg
+      subdict = self._decode(NlAttrs(attr.raw, offset), msg_format.attr_set)
+    File "/home/kicinski/linux/tools/net/ynl/lib/ynl.py", line 749, in _decode
+      decoded = attr.as_scalar(attr_spec['type'], attr_spec.byte_order)
+    File "/home/kicinski/linux/tools/net/ynl/lib/ynl.py", line 147, in as_scalar
+      return format.unpack(self.raw)[0]
+  struct.error: unpack requires a buffer of 2 bytes
 
+The Traceback is what we would previously see, the "Error..."
+messages are new. We print a message per level (in the stack
+order). Printing single combined message gets tricky quickly
+given sub-messages etc.
+
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2:
- - adjust C code gen in patch 1, it dependend on reusing attr objects
-v1: https://lore.kernel.org/20250105012523.1722231-1-kuba@kernel.org
----
- tools/net/ynl/lib/nlspec.py |  5 ++++-
- tools/net/ynl/ynl-gen-c.py  | 26 ++++++++++++++++++++++----
- 2 files changed, 26 insertions(+), 5 deletions(-)
+ tools/net/ynl/lib/ynl.py | 72 +++++++++++++++++++++-------------------
+ 1 file changed, 38 insertions(+), 34 deletions(-)
 
-diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
-index a745739655ad..314ec8007496 100644
---- a/tools/net/ynl/lib/nlspec.py
-+++ b/tools/net/ynl/lib/nlspec.py
-@@ -219,7 +219,10 @@ jsonschema = None
-         else:
-             real_set = family.attr_sets[self.subset_of]
-             for elem in self.yaml['attributes']:
--                attr = real_set[elem['name']]
-+                real_attr = real_set[elem['name']]
-+                combined_elem = real_attr.yaml | elem
-+                attr = self.new_attr(combined_elem, real_attr.value)
-+
-                 self.attrs[attr.name] = attr
-                 self.attrs_by_val[attr.value] = attr
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index eea29359a899..08f8bf89cfc2 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -733,41 +733,45 @@ genl_family_name_to_id = None
+                 self._rsp_add(rsp, attr_name, None, self._decode_unknown(attr))
+                 continue
  
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index ec2288948795..58657dd7dedb 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -79,6 +79,20 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         self.enum_name = None
-         delattr(self, "enum_name")
+-            if attr_spec["type"] == 'nest':
+-                subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'], search_attrs)
+-                decoded = subdict
+-            elif attr_spec["type"] == 'string':
+-                decoded = attr.as_strz()
+-            elif attr_spec["type"] == 'binary':
+-                decoded = self._decode_binary(attr, attr_spec)
+-            elif attr_spec["type"] == 'flag':
+-                decoded = True
+-            elif attr_spec.is_auto_scalar:
+-                decoded = attr.as_auto_scalar(attr_spec['type'], attr_spec.byte_order)
+-            elif attr_spec["type"] in NlAttr.type_formats:
+-                decoded = attr.as_scalar(attr_spec['type'], attr_spec.byte_order)
+-                if 'enum' in attr_spec:
+-                    decoded = self._decode_enum(decoded, attr_spec)
+-                elif attr_spec.display_hint:
+-                    decoded = self._formatted_string(decoded, attr_spec.display_hint)
+-            elif attr_spec["type"] == 'indexed-array':
+-                decoded = self._decode_array_attr(attr, attr_spec)
+-            elif attr_spec["type"] == 'bitfield32':
+-                value, selector = struct.unpack("II", attr.raw)
+-                if 'enum' in attr_spec:
+-                    value = self._decode_enum(value, attr_spec)
+-                    selector = self._decode_enum(selector, attr_spec)
+-                decoded = {"value": value, "selector": selector}
+-            elif attr_spec["type"] == 'sub-message':
+-                decoded = self._decode_sub_msg(attr, attr_spec, search_attrs)
+-            elif attr_spec["type"] == 'nest-type-value':
+-                decoded = self._decode_nest_type_value(attr, attr_spec)
+-            else:
+-                if not self.process_unknown:
+-                    raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
+-                decoded = self._decode_unknown(attr)
++            try:
++                if attr_spec["type"] == 'nest':
++                    subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'], search_attrs)
++                    decoded = subdict
++                elif attr_spec["type"] == 'string':
++                    decoded = attr.as_strz()
++                elif attr_spec["type"] == 'binary':
++                    decoded = self._decode_binary(attr, attr_spec)
++                elif attr_spec["type"] == 'flag':
++                    decoded = True
++                elif attr_spec.is_auto_scalar:
++                    decoded = attr.as_auto_scalar(attr_spec['type'], attr_spec.byte_order)
++                elif attr_spec["type"] in NlAttr.type_formats:
++                    decoded = attr.as_scalar(attr_spec['type'], attr_spec.byte_order)
++                    if 'enum' in attr_spec:
++                        decoded = self._decode_enum(decoded, attr_spec)
++                    elif attr_spec.display_hint:
++                        decoded = self._formatted_string(decoded, attr_spec.display_hint)
++                elif attr_spec["type"] == 'indexed-array':
++                    decoded = self._decode_array_attr(attr, attr_spec)
++                elif attr_spec["type"] == 'bitfield32':
++                    value, selector = struct.unpack("II", attr.raw)
++                    if 'enum' in attr_spec:
++                        value = self._decode_enum(value, attr_spec)
++                        selector = self._decode_enum(selector, attr_spec)
++                    decoded = {"value": value, "selector": selector}
++                elif attr_spec["type"] == 'sub-message':
++                    decoded = self._decode_sub_msg(attr, attr_spec, search_attrs)
++                elif attr_spec["type"] == 'nest-type-value':
++                    decoded = self._decode_nest_type_value(attr, attr_spec)
++                else:
++                    if not self.process_unknown:
++                        raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
++                    decoded = self._decode_unknown(attr)
  
-+    def _get_real_attr(self):
-+        # if the attr is for a subset return the "real" attr (just one down, does not recurse)
-+        return self.family.attr_sets[self.attr_set.subset_of][self.name]
-+
-+    def set_request(self):
-+        self.request = True
-+        if self.attr_set.subset_of:
-+            self._get_real_attr().set_request()
-+
-+    def set_reply(self):
-+        self.reply = True
-+        if self.attr_set.subset_of:
-+            self._get_real_attr().set_reply()
-+
-     def get_limit(self, limit, default=None):
-         value = self.checks.get(limit, default)
-         if value is None:
-@@ -106,6 +120,10 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-             enum_name = f"{self.attr_set.name_prefix}{self.name}"
-         self.enum_name = c_upper(enum_name)
+-            self._rsp_add(rsp, attr_spec["name"], attr_spec.is_multi, decoded)
++                self._rsp_add(rsp, attr_spec["name"], attr_spec.is_multi, decoded)
++            except:
++                print(f"Error decoding '{attr_spec.name}' from '{space}'")
++                raise
  
-+        if self.attr_set.subset_of:
-+            if self.checks != self._get_real_attr().checks:
-+                raise Exception("Overriding checks not supported by codegen, yet")
-+
-     def is_multi_val(self):
-         return None
+         return rsp
  
-@@ -1119,17 +1137,17 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         for _, struct in self.pure_nested_structs.items():
-             if struct.request:
-                 for _, arg in struct.member_list():
--                    arg.request = True
-+                    arg.set_request()
-             if struct.reply:
-                 for _, arg in struct.member_list():
--                    arg.reply = True
-+                    arg.set_reply()
- 
-         for root_set, rs_members in self.root_sets.items():
-             for attr, spec in self.attr_sets[root_set].items():
-                 if attr in rs_members['request']:
--                    spec.request = True
-+                    spec.set_request()
-                 if attr in rs_members['reply']:
--                    spec.reply = True
-+                    spec.set_reply()
- 
-     def _load_global_policy(self):
-         global_set = set()
 -- 
 2.47.1
 
