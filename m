@@ -1,174 +1,221 @@
-Return-Path: <netdev+bounces-155803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2726EA03D40
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:06:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECD56A03D4D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E83A3A2BD8
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:06:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D68718868FD
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E987B15886C;
-	Tue,  7 Jan 2025 11:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07231E411D;
+	Tue,  7 Jan 2025 11:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cnmdqMKv"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="pCQQK4OB";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AczSDlp6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A7A50285
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 11:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20371E0DD1;
+	Tue,  7 Jan 2025 11:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736248002; cv=none; b=aIBoxT+1l9BJ0pxXgSZkTS2nL52nG8XEiAcToaiWJqqNaw8bKQXu6bDsKiVmIpqwKnndvdihj+dN9h/6r+eD+ceU1uN0yJTyrzrBMhZxo3hg9WyySQHOsK0pn6xLvxDYM1wE1fatZ/HKiIMcKdW0WO+exixhex46MQK2nUP+KYA=
+	t=1736248113; cv=none; b=jmkgVUsVpBzKQacmeKmvTLvjBpiPBqFbwrzDedE8UnrN2ZKcrvT2PVh3rhedEzpoQB7nH9mO25ig8n4bkbPZoI0KREIl8eUiZOLKBvWoyiucuZgh6cErXYdFym0S1s9YX400qNbx7jtua+jGE16B6ZjWOXtSVxKmOK7ZBMx56YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736248002; c=relaxed/simple;
-	bh=yHQU2rcCMJbOpH8i38ux62FuED5MQNDdSyujVPU1q3k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eqxdZBzCNWhPkVmnurtuGTxaJ1epQte8DPK5V09ZeECYm2TzSd2l0c8pnfhwiSAy0yk7yYMDdhG8pfEfPNLlUj4ptuL8MiqW6FDQPjzLf/tz2TIIw/d62ji7rz2e+keMBla+9/xisrLutVyW6b5vTwyRwH8yR3KTlMBjCiUiFgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cnmdqMKv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736248000;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HPJimbMZinT0ai+upGf3T1vG0FvUtH93H0cNYYfAQPs=;
-	b=cnmdqMKvVpCYhApRzlDHIQdjQGGTnxz5fvTuxz2J8GKIjsTmrKfcyrQw78UnGIPolN5Nkx
-	utQNZx4I7aJsZ0drBHHtkawGOPwW5gx1O5eeSPsFrEDX/LC1MmZNVU7mqtzZ2FgUtUjh7W
-	Sm6LCY/sI+aKKL8KRKV4B/y7qbc6qeY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-_qxX44tpMTaHlYTCpO3tkQ-1; Tue, 07 Jan 2025 06:06:38 -0500
-X-MC-Unique: _qxX44tpMTaHlYTCpO3tkQ-1
-X-Mimecast-MFC-AGG-ID: _qxX44tpMTaHlYTCpO3tkQ
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3862e986d17so6747508f8f.3
-        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 03:06:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736247997; x=1736852797;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HPJimbMZinT0ai+upGf3T1vG0FvUtH93H0cNYYfAQPs=;
-        b=tHAaeOGG0RAumygUV/NpvyLzglZKMI1oTPUdiL410Z4/F4CnyD8eE8Jt4WoVBnlcZe
-         xzUKh89suEqaUMhELZtg3aYEE+4aZAb4/UuxOciRILFJOkRnawLcL9ToMHDBydta2tLV
-         b4YmhJw/PPOqmDZ0ypN896V5RTXhCzNb6Ba3CExumGN+3+VYFam/VTxET4Q2b1RDUXIh
-         5s6gc/98GPpyhQxnakh1+IY4tGFit+9e98T1q13+uf7B4XKDY1Exc5xjcRiACv5vmUe+
-         BP5NdBlWisVQaboaFOSk64lZ1GX/xaKU8YZVaF0WzPwsdMaUn4az+O99B+C2MTNdYY3B
-         LazQ==
-X-Gm-Message-State: AOJu0Yw0gK2XI863UFZvgEPfUfY2yh1R7bGv/BbrlxWnnZgkzEBU8pZg
-	Lg6VKL4uS/gOzDjC4zRDStBnmkNVUdicwp6lljmDa/rTRiRNViwD/wRSIyzqbgmbUXkX+uW5qj6
-	s5X5I0I9yXjg5bl49xIcK0ALxism4DBgRHL65xiIPRLOlvXNdFhdn3w==
-X-Gm-Gg: ASbGncsRmWrNQkWtLYB/Z/3p3ZpWv4UhmbK3DxQ+eYdajMZB/E87LhRRF6A6BsCWaB+
-	repSp2JmJP2rHFIW191bxUsYEn9jzMY/BdDbu7UPKgnu5SOgIFqH4M05bhSnvkfKOJhJaHfbZVz
-	mytbDJ6LBrS6ylJHnGnsTt9fQi75IRzh/aigDLyIt948WW48+ZNibMVCms9Q+58IgAe7ZQWCXaa
-	aPNp3iu86I11YoULd5h275GusD2QaOH5GP+a28dYqcpmt0yhnKVfDlU86TeoJT4SJYwjTnvqa3U
-	jB2oXxJrtrw=
-X-Received: by 2002:a05:6000:4a0a:b0:385:ef39:6ce9 with SMTP id ffacd0b85a97d-38a221f1716mr61307863f8f.21.1736247997488;
-        Tue, 07 Jan 2025 03:06:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGFmk3/PYqXnHu0Jn/YyUVvLumS9KNFwMeBkRBQ7CZVKeJXurLr13AffEesyBse+lX+yQZiQA==
-X-Received: by 2002:a05:6000:4a0a:b0:385:ef39:6ce9 with SMTP id ffacd0b85a97d-38a221f1716mr61307827f8f.21.1736247997116;
-        Tue, 07 Jan 2025 03:06:37 -0800 (PST)
-Received: from [192.168.88.253] (146-241-84-112.dyn.eolo.it. [146.241.84.112])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c828ba0sm49324810f8f.14.2025.01.07.03.06.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2025 03:06:36 -0800 (PST)
-Message-ID: <97d430d5-f139-468c-b9e2-ef60e5d5cd34@redhat.com>
-Date: Tue, 7 Jan 2025 12:06:35 +0100
+	s=arc-20240116; t=1736248113; c=relaxed/simple;
+	bh=RlWyTX+XcTJeN0bI1moKQoQc9SfTqbi4tdSrXOnGPQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q9EZHOZQll3bv9tTroJ3LaMIMw5uWjlkXgn0/+orb+XBJnJ6Opku9O9YfR7jOwA6AwGEOlweWv+eodSBjJQVrpQO+mWFPP21pGf7bQUKF7/0sYGHxNKcC6PeOy3EK+rvgKtn/ZnYBtepl3IQJV2CUdKhE6VE+JYQ+VA/twRt1oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=pCQQK4OB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AczSDlp6; arc=none smtp.client-ip=202.12.124.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 71977254016F;
+	Tue,  7 Jan 2025 06:08:26 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Tue, 07 Jan 2025 06:08:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1736248106; x=
+	1736334506; bh=hlfkDoC9hGqVwxToayc/tl4N76vhna1dTss6xUhfO8g=; b=p
+	CQQK4OB/ARwqsHo9HUSzgfD+f447g2uolvTKsrAu7vItSBYxAkxc1fE5oC4WdMIW
+	BfwRuy4YMNoUIg9Bj8IVBRtJsyQ9gGpq8LVWiAbG9Ba4R4p8T4QKofeSN3GFjal/
+	oXhSRCy15meVwh1hwb4rOTjex1bDu76nrlGPy493EJNzmcY1AGNv3b4viurVrb92
+	uUWI3/OTkcMcEg89jnNDcTFKs2you7+VPWNhp4ijN5ma/Pijq09olYFq9XVGb2o5
+	8kt2xOlPXOL6caFPcRaukTUmU8FYsRuGUrVrZ6mI1lbzLi4sRmJmJqMR+PwV95sQ
+	cLqNVqh2EEOqkHC0rfZSA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1736248106; x=1736334506; bh=hlfkDoC9hGqVwxToayc/tl4N76vhna1dTss
+	6xUhfO8g=; b=AczSDlp6Lw0dodb+E1j3ZuXovi5u75aGQL9f10Drk81nuQ0gg+P
+	lUCslioDAVQlITog4hvYe54RAZUSQf6FqEbxzQLmIkHbiA/+ahDO2sdKRbxJcjo7
+	R01fTcSg6gvhZPQ2NuNUn1IV67S4euffddgGVEVfaMXNUmuyRE3Tko/6MUasw8nP
+	jMtt9p6qKH3xdtl3tuJM2MOg27XGDMXa5slxDZHCSSRzoOcMosq/VN/2HPN+kSgQ
+	xdH1BoLrPnuMeqjxYd6mYCJ00hwAOuGzqHJyclcVntoVWXVL7E6zL+5hJtOm+1SS
+	maWBXCpcAUYRBU1JbMP1vwNMbaB5/MYCoag==
+X-ME-Sender: <xms:KQt9Z6bDNvuYEWBKob2X8jdD6kb0LCpHtcqK9YRl02eZ4h5QmFprtw>
+    <xme:KQt9Z9aNFsPKj5_uZBSxR81qnDF3mqaMn8WfhiqW0MQ6X7VlEpxR7RucL8ryv-UUQ
+    Tyjy8XXvUruH4nIYuw>
+X-ME-Received: <xmr:KQt9Z08AsaCuNYV7uA8tBhwltma63kPely9YvOVHLCFztssupkfaORLl9T-f>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudegvddgvdefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgoufhushhpvggtthffoh
+    hmrghinhculdegledmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepveekhffgtddvveejvedvgffffeeftedt
+    fefhtdfgueetgeevuefftdffhfduhedvnecuffhomhgrihhnpehshiiikhgrlhhlvghrrd
+    grphhpshhpohhtrdgtohhmpdhgohhoghhlvggrphhishdrtghomhenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvthdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehshiiisghothdoiegrtgejfegsfegrsghfudgsheelkeekieeffhgrsehshi
+    iikhgrlhhlvghrrdgrphhpshhpohhtmhgrihhlrdgtohhmpdhrtghpthhtohepsghorhhi
+    shhpsehnvhhiughirgdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofh
+    htrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgt
+    phhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjohhhnhdrfh
+    grshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhg
+X-ME-Proxy: <xmx:KQt9Z8qHW4HQgdElEvtmG7n2w-PvAuulpvm1W_FsLtEdUET5X-KVWg>
+    <xmx:KQt9Z1oRdOYhyCgTOv4np3inowf0RfZUloAVOzwx4i-Ba4NxCS9LFw>
+    <xmx:KQt9Z6Tb4PKFAv_KJ3g5_zlaBqhmSGaSHPI9rlLeFmwhz6MMuhPpmg>
+    <xmx:KQt9Z1pu4JQ78F1dZ5zUq-FAkk4A16Ihl-67Ilv7aNIjd_NUsNNqug>
+    <xmx:Kgt9Z2QftbH5ZlzXGFed6IWxp_2_sS8ZzlujPmFNYsSOFLbMgbq5TJC0>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 7 Jan 2025 06:08:25 -0500 (EST)
+Date: Tue, 7 Jan 2025 12:08:23 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: syzbot <syzbot+6ac73b3abf1b598863fa@syzkaller.appspotmail.com>
+Cc: borisp@nvidia.com, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, john.fastabend@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] INFO: task hung in lock_sock_nested (5)
+Message-ID: <Z30LJ6upikEXVxeE@hog>
+References: <676d231b.050a0220.2f3838.0461.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 7/8] netdevsim: add debugfs-triggered queue reset
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, dw@davidwei.uk,
- almasrymina@google.com, jdamato@fastly.com
-References: <20250103185954.1236510-1-kuba@kernel.org>
- <20250103185954.1236510-8-kuba@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250103185954.1236510-8-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <676d231b.050a0220.2f3838.0461.GAE@google.com>
 
-On 1/3/25 7:59 PM, Jakub Kicinski wrote:
-> @@ -723,6 +726,54 @@ static const struct netdev_queue_mgmt_ops nsim_queue_mgmt_ops = {
->  	.ndo_queue_stop		= nsim_queue_stop,
->  };
->  
-> +static ssize_t
-> +nsim_qreset_write(struct file *file, const char __user *data,
-> +		  size_t count, loff_t *ppos)
-> +{
-> +	struct netdevsim *ns = file->private_data;
-> +	unsigned int queue, mode;
-> +	char buf[32];
-> +	ssize_t ret;
-> +
-> +	if (count >= sizeof(buf))
-> +		return -EINVAL;
-> +	if (copy_from_user(buf, data, count))
-> +                return -EFAULT;
-> +        buf[count] = '\0';
-> +
-> +	ret = sscanf(buf, "%u %u", &queue, &mode);
-> +	if (ret != 2)
-> +		return -EINVAL;
-> +
-> +	rtnl_lock();
-> +	if (!netif_running(ns->netdev)) {
-> +		ret = -ENETDOWN;
-> +		goto exit_unlock;
-> +	}
-> +
-> +	if (queue >= ns->netdev->real_num_rx_queues) {
-> +		ret = -EINVAL;
-> +		goto exit_unlock;
-> +	}
-> +
-> +	ns->rq_reset_mode = mode;
-> +	ret = netdev_rx_queue_restart(ns->netdev, queue);
-> +	ns->rq_reset_mode = 0;
-> +	if (ret)
-> +		goto exit_unlock;
-> +
-> +	ret = count;
-> +exit_unlock:
-> +	rtnl_unlock();
-> +	return ret;
-> +}
-> +
-> +static const struct file_operations nsim_qreset_fops = {
-> +	.open = simple_open,
-> +	.write = nsim_qreset_write,
-> +	.owner = THIS_MODULE,
-> +};
-> +
->  static ssize_t
->  nsim_pp_hold_read(struct file *file, char __user *data,
->  		  size_t count, loff_t *ppos)
-> @@ -935,6 +986,9 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
->  
->  	ns->pp_dfs = debugfs_create_file("pp_hold", 0600, nsim_dev_port->ddir,
->  					 ns, &nsim_pp_hold_fops);
-> +	ns->qr_dfs = debugfs_create_file("queue_reset", 0600,
-> +					 nsim_dev_port->ddir, ns,
-> +					 &nsim_qreset_fops);
+2024-12-26, 01:34:19 -0800, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    9268abe611b0 Merge branch 'net-lan969x-add-rgmii-support'
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1760eadf980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b087c24b921cdc16
+> dashboard link: https://syzkaller.appspot.com/bug?extid=6ac73b3abf1b598863fa
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122f74c4580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=155c0018580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/8274f60b0163/disk-9268abe6.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/f7b3fde537e7/vmlinux-9268abe6.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/db4cccf7caae/bzImage-9268abe6.xz
+> 
+> The issue was bisected to:
+> 
+> commit 47069594e67e882ec5c1d8d374f6aab037511509
+> Author: Sabrina Dubroca <sd@queasysnail.net>
+> Date:   Thu Dec 12 15:36:05 2024 +0000
+> 
+>     tls: implement rekey for TLS1.3
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13da8018580000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=103a8018580000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=17da8018580000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+6ac73b3abf1b598863fa@syzkaller.appspotmail.com
+> Fixes: 47069594e67e ("tls: implement rekey for TLS1.3")
+> 
+> INFO: task syz-executor309:5851 blocked for more than 143 seconds.
+>       Not tainted 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:syz-executor309 state:D stack:28496 pid:5851  tgid:5846  ppid:5845   flags:0x00004006
 
-Only the write callback is provided, but flags are RW, this causes a
-setup failure in bpf offload selftests - while trying to read the
-current status.
+I'm getting a different (and IMO much more helpful in pointing out the
+issue) trace when I run the repro:
 
-Cheers,
+BUG: TASK stack guard page was hit at ffffc9000294fff8 (stack is ffffc90002950000..ffffc90002958000)
+[...]
+Call Trace:
+ <#DF>
+ ? die+0x32/0x80
+ ? handle_stack_overflow+0xa5/0xe0
+ ? get_stack_info_noinstr+0x14/0x120
+ ? exc_double_fault+0x140/0x180
+ ? asm_exc_double_fault+0x1f/0x60
+ ? mark_lock+0xfc/0x2370
+ ? tls_sw_write_space+0x10/0x150
+ </#DF>
+ <TASK>
+ tls_write_space+0xd4/0x170
+ tls_write_space+0xfd/0x170
+ tls_write_space+0xfd/0x170
 
-Paolo
+ ... a few hundred more of those lines
 
+ tls_write_space+0xfd/0x170
+ tls_write_space+0xfd/0x170
+ tls_write_space+0xfd/0x170
+ sk_setsockopt+0x1b7a/0x48b0
+ ? tracer_preempt_on+0xd7/0x490
+ ? __pfx_sk_setsockopt+0x10/0x10
+ ? find_held_lock+0x2d/0x110
+ ? lock_release+0x44e/0x6f0
+ do_sock_setsockopt+0x31e/0x3f0
+ ? __pfx_do_sock_setsockopt+0x10/0x10
+ ? __fget_files+0x1d9/0x370
+ __sys_setsockopt+0x103/0x170
+ __x64_sys_setsockopt+0xbe/0x160
+ ? do_syscall_64+0x2a/0x140
+ ? lockdep_hardirqs_on+0x74/0x100
+ do_syscall_64+0x64/0x140
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7f0f2fc4b1fd
+[...]
+
+
+I don't know why syzbot is only getting a hung task.
+
+
+Anyway, good find by syzbot, I missed that when I wrote the rekey
+code:
+
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index 9ee5a83c5b40..99ca4465f702 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -737,6 +737,10 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
+ 	else
+ 		ctx->rx_conf = conf;
+ 	update_sk_prot(sk, ctx);
++
++	if (update)
++		return 0;
++
+ 	if (tx) {
+ 		ctx->sk_write_space = sk->sk_write_space;
+ 		sk->sk_write_space = tls_write_space;
+
+-- 
+Sabrina
 
