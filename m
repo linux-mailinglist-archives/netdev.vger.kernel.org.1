@@ -1,151 +1,114 @@
-Return-Path: <netdev+bounces-155786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEDEAA03C34
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:22:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F0DFA03BE5
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A0411886669
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:22:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC47E3A462A
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:10:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29AC51DF263;
-	Tue,  7 Jan 2025 10:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DmNfU8nW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F521E47B0;
+	Tue,  7 Jan 2025 10:10:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19FD1AAA10;
-	Tue,  7 Jan 2025 10:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8021E2606;
+	Tue,  7 Jan 2025 10:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736245331; cv=none; b=iMbv4rJ2J4G6V7gEKH8NBQpcYQ4p6W1Ddajodj929dipgtkIi95vqnTjhNMBSiOY+a8L76psdqpRZVpuZOhZoxvzt1PWmpMfmeLHeP5tHdt4DdlhVVHNW1Laz3YtQnp/FwKplY+rSZ3oMBRXCCkAsIX0cZSmu9jvz+KhvGiGSug=
+	t=1736244633; cv=none; b=RgPdfBMO4CoQnVkLSzjYdeHulNlgv7BlgkTpySAU+YHP7D4+a5aiCeadHzLq6Fk8AeiAM7SmahKWwxWJOTdCfl8f7xqGnRYPtjrbM45H6GQWbOTyrrSMZcLI3WMptNzknvMiKigIHEjEuyNorI0JEyD0/wmr/RvEYEYmLUO/szE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736245331; c=relaxed/simple;
-	bh=Wb3Ea2iB8+M8aL3ooVQ7LOltSr1/6YrzyALThhjx3TI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BTtZ0mBlPpnKiSZrhwsLWjOuQjwsAeAbyNJBgMbd8t5ZqvtPvUnAlwJUP8sIzVCvvsINqmaJBnpfGzUSj3BSUefiJRk66zlHmMsBlaYOPkbNwdgltT1OpcGw0oBPleDZoVBG0Z2vrg5LGaeJzPm8yU3l2dBdTo8VIjyvEZIuaEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DmNfU8nW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9714C4CED6;
-	Tue,  7 Jan 2025 10:22:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736245329;
-	bh=Wb3Ea2iB8+M8aL3ooVQ7LOltSr1/6YrzyALThhjx3TI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DmNfU8nWLBuNkkgcsPZZpv1EIaEoOmLXTmnqfJ7XOpK5AJw9NqvsA3rEgqpDN6KC5
-	 EZ76YiWsYoDWHKtTxeQatN+C76DPga3faVhdtz65TJA1pNiNIDp0Xi9E6WR+HMIRIo
-	 A9C/Bs8BYOMGaV2VDJhV4DblSUS6C6i2jFyeTgcJUtkzd1DFJq83UmW9OXwC4FiAiH
-	 2sQXwWwCaUn+POtfJdpu4jlcDVJMVSi8iOJ7a2uhALOBAjd2aGCFULZQXV2Ga3JnHF
-	 bCbT8o9lJWPYxp4wTD+je9bEbeDHVZL7Lxq9U+LW6fgyNsfouVZmYHAR6CWYr3+QuV
-	 GTy4uwlc5HzZA==
-Date: Tue, 7 Jan 2025 12:22:04 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Jianbo Liu <jianbol@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Potnuri Bharat Teja <bharat@chelsio.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH ipsec-next 1/2] xfrm: Support ESN context update to
- hardware for TX
-Message-ID: <20250107102204.GB87447@unreal>
-References: <874f965d786606b0b4351c976f50271349f68b03.1734611621.git.leon@kernel.org>
+	s=arc-20240116; t=1736244633; c=relaxed/simple;
+	bh=Mhto81Z6MhtXiGgKkqFllrVaZvgvVjmX68GSIQvAYBk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RQ+qg7hMQRnq5Y+06G3D3EWQ6DWx1NB52hPdpUsPXY678bL9Yn5TpD3isBb6v+JTCuXzYEXyPCjrEBDX1O4+/VEJYl8WEokvigKZ61f2hO/r3fxq/KhOlORB/gxeOOd4HFWMpZYEe0EbifcU0AphECsdJb7utWy3iqnrxgPOLJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YS6Fw0Rpzz6M4X5;
+	Tue,  7 Jan 2025 18:08:52 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 343B514038F;
+	Tue,  7 Jan 2025 18:10:25 +0800 (CST)
+Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 7 Jan
+ 2025 11:10:13 +0100
+From: Gur Stavi <gur.stavi@huawei.com>
+To: <sumang@marvell.com>
+CC: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
+	<davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
+	<guoxin09@huawei.com>, <gur.stavi@huawei.com>, <helgaas@kernel.org>,
+	<horms@kernel.org>, <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <meny.yossefi@huawei.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shenchenyang1@hisilicon.com>,
+	<shijing34@huawei.com>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>
+Subject: RE: [EXTERNAL] [PATCH net-next v03 1/1] hinic3: module initialization and tx/rx logic
+Date: Tue, 7 Jan 2025 12:23:11 +0200
+Message-ID: <20250107102311.3552206-1-gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <SJ0PR18MB5216BED17023369322EE4A6ADB152@SJ0PR18MB5216.namprd18.prod.outlook.com>
+References: <SJ0PR18MB5216BED17023369322EE4A6ADB152@SJ0PR18MB5216.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874f965d786606b0b4351c976f50271349f68b03.1734611621.git.leon@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-On Thu, Dec 19, 2024 at 02:37:29PM +0200, Leon Romanovsky wrote:
-> From: Jianbo Liu <jianbol@nvidia.com>
-> 
-> Previously xfrm_dev_state_advance_esn() was added for RX only. But
-> it's possible that ESN context also need to be synced to hardware for
-> TX, so call it for outbound in this patch.
-> 
-> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  Documentation/networking/xfrm_device.rst                 | 3 ++-
->  drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c          | 3 +++
->  drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c | 3 +++
->  net/xfrm/xfrm_replay.c                                   | 1 +
->  4 files changed, 9 insertions(+), 1 deletion(-)
+> >+static struct hinic3_adev *hinic3_add_one_adev(struct hinic3_hwdev
+> >*hwdev,
+> >+					       enum hinic3_service_type svc_type)
+> >+{
+> >+	struct hinic3_adev *hadev;
+> >+	const char *svc_name;
+> >+	int ret;
+> >+
+> >+	hadev =3D kzalloc(sizeof(*hadev), GFP_KERNEL);
+> >+	if (!hadev)
+> >+		return NULL;
+> >+
+> >+	svc_name =3D hinic3_adev_devices[svc_type].name;
+> >+	hadev->adev.name =3D svc_name;
+> >+	hadev->adev.id =3D hwdev->dev_id;
+> >+	hadev->adev.dev.parent =3D hwdev->dev;
+> >+	hadev->adev.dev.release =3D hinic3_comm_adev_release;
+> >+	hadev->svc_type =3D svc_type;
+> >+	hadev->hwdev =3D hwdev;
+> >+
+> >+	ret =3D auxiliary_device_init(&hadev->adev);
+> >+	if (ret) {
+> >+		dev_err(hwdev->dev, "failed init adev %s %u\n",
+> >+			svc_name, hwdev->dev_id);
+> >+		kfree(hadev);
+> >+		return NULL;
+> >+	}
+> >+
+> >+	ret =3D auxiliary_device_add(&hadev->adev);
+> >+	if (ret) {
+> >+		dev_err(hwdev->dev, "failed to add adev %s %u\n",
+> >+			svc_name, hwdev->dev_id);
+> >+		auxiliary_device_uninit(&hadev->adev);
 
-Steffen,
+> [Suman] memleak for hadev?
 
-This is kindly reminder.
+No. Calling auxiliary_device_uninit after a successful
+auxiliary_device_init will trigger a call to hinic3_comm_adev_release
+that releases the memory.
 
-Thanks
-
-> 
-> diff --git a/Documentation/networking/xfrm_device.rst b/Documentation/networking/xfrm_device.rst
-> index bfea9d8579ed..66f6e9a9b59a 100644
-> --- a/Documentation/networking/xfrm_device.rst
-> +++ b/Documentation/networking/xfrm_device.rst
-> @@ -169,7 +169,8 @@ the stack in xfrm_input().
->  
->  	hand the packet to napi_gro_receive() as usual
->  
-> -In ESN mode, xdo_dev_state_advance_esn() is called from xfrm_replay_advance_esn().
-> +In ESN mode, xdo_dev_state_advance_esn() is called from
-> +xfrm_replay_advance_esn() for RX, and xfrm_replay_overflow_offload_esn for TX.
->  Driver will check packet seq number and update HW ESN state machine if needed.
->  
->  Packet offload mode:
-> diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-> index bc3af0054406..e56e4f238795 100644
-> --- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-> +++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-> @@ -6559,6 +6559,9 @@ static void cxgb4_advance_esn_state(struct xfrm_state *x)
->  {
->  	struct adapter *adap = netdev2adap(x->xso.dev);
->  
-> +	if (x->xso.dir != XFRM_DEV_OFFLOAD_IN)
-> +		return;
-> +
->  	if (!mutex_trylock(&uld_mutex)) {
->  		dev_dbg(adap->pdev_dev,
->  			"crypto uld critical resource is under use\n");
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-> index ca92e518be76..3dd4f2492090 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-> @@ -980,6 +980,9 @@ static void mlx5e_xfrm_advance_esn_state(struct xfrm_state *x)
->  	struct mlx5e_ipsec_sa_entry *sa_entry_shadow;
->  	bool need_update;
->  
-> +	if (x->xso.dir != XFRM_DEV_OFFLOAD_IN)
-> +		return;
-> +
->  	need_update = mlx5e_ipsec_update_esn_state(sa_entry);
->  	if (!need_update)
->  		return;
-> diff --git a/net/xfrm/xfrm_replay.c b/net/xfrm/xfrm_replay.c
-> index bc56c6305725..e500aebbad22 100644
-> --- a/net/xfrm/xfrm_replay.c
-> +++ b/net/xfrm/xfrm_replay.c
-> @@ -729,6 +729,7 @@ static int xfrm_replay_overflow_offload_esn(struct xfrm_state *x, struct sk_buff
->  		}
->  
->  		replay_esn->oseq = oseq;
-> +		xfrm_dev_state_advance_esn(x);
->  
->  		if (xfrm_aevent_is_on(net))
->  			xfrm_replay_notify(x, XFRM_REPLAY_UPDATE);
-> -- 
-> 2.47.0
-> 
-> 
+> >+		return NULL;
+> >+	}
+> >+
+> >+	return hadev;
+> >+}
+> >+
 
