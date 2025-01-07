@@ -1,97 +1,87 @@
-Return-Path: <netdev+bounces-155845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0D10A040B7
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:20:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBFF3A040BB
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:21:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7481162A9A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:20:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 600D21886989
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A7E1E25E9;
-	Tue,  7 Jan 2025 13:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2CEF1E9B06;
+	Tue,  7 Jan 2025 13:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pz4PE7Ki"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYbWYYvz"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B941F433AD;
-	Tue,  7 Jan 2025 13:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997B91EBA04;
+	Tue,  7 Jan 2025 13:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736256044; cv=none; b=i1v5Th8i1m2hhubFQra0BT83x3XJgCIbaTc8TU2p2YpEZgacWJuVeeoTpdz5bee7VG1n61ih3v+XLwmzb41BwQ3MOpucZzybAAyDQRXfMPfFNPR0XA66y+Sy7Hvxl/dY4+tyPU55VrETV4KePykfofxFwmP3thDebVPgbMs+Cgc=
+	t=1736256068; cv=none; b=WFGLNSZD2GEX0+c//m2PPgJ14HhuMwo3R8PZJn7tupptkwI4s9G+ruP/PpokEXrAc2SdtVYGNKu75ri3jh8vU+egxlX4vU83gTkKQz8q/BWFmmli70eGQvheCzr34/US5oUnM7ASlsJ1EMZkbq3cd027P6DTi03bnxiKe4HHOR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736256044; c=relaxed/simple;
-	bh=iXpBH5QQaChXU80mvcrbJK3qgP8gHwhtPEJudkDEDwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ueNXlmVgVhntxYA9erMINTXWMujrciXVvYdIBQ8qyaO/bxkVbFrfgLKBxyKcB0RCmqHcdWVzUffVcpPYpImkrK8tEM6bB2UQpj4YYx9wAXCarSV2nuj/Iy4yP00SRuSa1rrXjwZU7C1Moary4vR2epUVRGu7yQV1lZQmg4UrPjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pz4PE7Ki; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nkTBPMcZKmbWcBpdJkI4VttrnEz5cM46TWHXsBHT878=; b=pz4PE7Ki70rYKiXGmBZZ4+NDWP
-	/Sw6LCV5/TgZpJgqhxM6DEoYZwwM1KWDP0MNGITFsM0jmpjK770DuMOWuI1BDxdoUmmGkJVbEWbij
-	DxvVGh7ATOPSCbLex2I7X5gzKt8ezmZzLE3WvXX7y/kmLjL5DRSDGiY75k5FO2sT5rXI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tV9VX-002Eki-8i; Tue, 07 Jan 2025 14:20:31 +0100
-Date: Tue, 7 Jan 2025 14:20:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
- (delayed) phy
-Message-ID: <ed29e632-332b-4af1-bf7f-97498297e731@lunn.ch>
-References: <20250107123615.161095-1-ericwouds@gmail.com>
- <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
- <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
+	s=arc-20240116; t=1736256068; c=relaxed/simple;
+	bh=9NTgYqTrn5wL8NaJXAT7TIA0G7ygQMIXiRiad9OKEJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=je4cJ/4UeWxRDFJ7e4DRW0ew9eGP5vuIp2lVV9EzwPbUE6JJCT6gG3EqJw01qVPP7YXhEizjiI3oDLuC6vsHwZ8qExnUQ9WmUl2pjclHf2YCWpnSesF0U4sxmv+ALz+pXpXZFtOCVPyGz1WJSIDqMU4j/rQb06gkM+9N1NdMJcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYbWYYvz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F324BC4CED6;
+	Tue,  7 Jan 2025 13:21:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736256068;
+	bh=9NTgYqTrn5wL8NaJXAT7TIA0G7ygQMIXiRiad9OKEJQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DYbWYYvzpEroP27+bQ/D3FsjsX5+Y/QakfQ9cvd26kQFmdHmXDqFP0G3pTs4zKhA0
+	 JyPYh4El071HKAsZgYIGzwI+NWWfbcEzQhjrcRv3kB8VrF0mhJK8pRT+5tMwVbZxQ0
+	 dJ095+r4ffi5Kr3d2rXJbJF42Ftrg7bixFgQbUUieML+HzkvIDZqhDRXzgq0UBGOMo
+	 0zJi/azt9cmUIGxT9gBkElUnJ6G9NyG2MgOqNcMQz7Dpb0D/giJtEvht/ubCbWltYD
+	 vri6npuG2Hd5HK6kK8/FiG2Nsl1GHdJYye3uWzFY6e6jj5y+6eBdXKEqCiEspl1Rkz
+	 bT8WDuwR0cxrg==
+Message-ID: <d425172a-4f98-44fd-875f-dbbe6497d1ce@kernel.org>
+Date: Tue, 7 Jan 2025 15:21:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/3] net: ti: icssg-prueth: Add VLAN support
+ in EMAC mode
+To: MD Danish Anwar <danishanwar@ti.com>, Jeongjun Park
+ <aha310510@gmail.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Lukasz Majewski <lukma@denx.de>, Meghana Malladi <m-malladi@ti.com>,
+ Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman <horms@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Larysa Zaremba <larysa.zaremba@intel.com>
+References: <20250103092033.1533374-1-danishanwar@ti.com>
+ <20250103092033.1533374-2-danishanwar@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20250103092033.1533374-2-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> I think it is because pl->act_link_an_mode stays at MLO_AN_INBAND, but
-> it needs to be set to MLO_AN_PHY, so that only the phy determines the
-> link state:
+
+
+On 03/01/2025 11:20, MD Danish Anwar wrote:
+> Add support for vlan filtering in dual EMAC mode.
+
+vlan/VLAN
+
 > 
-> phylink_resolve() {
->     ...
-> 	} else if (pl->act_link_an_mode == MLO_AN_PHY) {
-> 		link_state = pl->phy_state;
->     ...
-> }
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 
-phylink tries to determine the whole chain is up. As Russell says, it
-could be the PCS has not got sync with the PHY for some reason. So
-even if you ignore the PCS state, it might not work. This is actually
-a useful pieces of information. Does the link actually work end to end
-if you only look at the media state? If it does, that would indicate
-the PCS is maybe missing an interrupt, or needs polling for change in
-state.
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
-	Andrew
 
