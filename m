@@ -1,131 +1,118 @@
-Return-Path: <netdev+bounces-156061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EFAFA04CB1
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:54:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 054B0A04CB6
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:55:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5D251887210
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:54:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A49521887250
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7196F1E3DFF;
-	Tue,  7 Jan 2025 22:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C401DFD9C;
+	Tue,  7 Jan 2025 22:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJf7DYF3"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NOV4be7Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456401E3779;
-	Tue,  7 Jan 2025 22:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F4F190664
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 22:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736290474; cv=none; b=IACFUrF5wxHLC/94erThA5nt8adHg38RI3BnRDY6QhKFvRl3MNjVCi/0fnsueZdpLEOyvaRJZL0tYl/+2/m8q72tp7LrDHthYnZiaN9aIHqyVZ3i11+AZjli2+49nKqS1hrwlzWVm1HiWZRt3zkDhi2W8pNeztssuSlKLSt3Wo8=
+	t=1736290538; cv=none; b=V8n/sdQyXJlXbk2/ST4A1FNAwWMJZJFO1JvVUGnN4Ga3eNNUe9toowpJa2XC85ay8G1RvLRlszi10AXqqeGYNPB+bRNKiWjHyNhfeV6bRmUHhp13GXTts4/tfG2RtitJ2cwC9iR5i+7rlU+HihopQ8xE4yfThPS77PV+r3FG/ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736290474; c=relaxed/simple;
-	bh=dYbF7CHxuuCz2p1jW22Ix5UW0UmrzVjjqtNsyO8jekA=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=rsBMAv3/ZNZxdNFJ1kox9sta87J1hPtlnfRn58ZKn0iLBLBmzxdkarRz1bJGm6nAhaoHTOk/GD7I4tBagNa/GxDiHj2FjjSxmwwn9c++oUyWiPfyvE2EaJQu69daNRy2oNLyN/+qHhxmz4gnP15ScByLnYldgWscc+ALmcU+WG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJf7DYF3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98A7DC4CEE8;
-	Tue,  7 Jan 2025 22:54:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736290473;
-	bh=dYbF7CHxuuCz2p1jW22Ix5UW0UmrzVjjqtNsyO8jekA=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=LJf7DYF3n6cj3pBXooqWfWIUfMxkpq+W8jkF9sAjxC7pNSYms7tQbAQ9ZcS6HULtp
-	 0zn6w2Tc9E71TTX19KpDZYeTBMbyqAiqX2S2Hu2uRHXmrV9YkPRDjDDNT/YZ1iRyd4
-	 RLWfGOKVsiMoPJvQRWNbHSvi/WyUkvIUR0W9UWq+Ssg6rulAXGwW9oOaNlIbp5xbVs
-	 GIdvbuuIr+Us+G0Q9045WfDhoZpZSlHpNytlG/in7WZGCnMGerIXzvaP7nnHXaiF48
-	 NZgt0JQEE54lkJtYijy4F9cjWTwzJLBpQqXxWrX4oRw5Vn2gv8MXAoVIprSD0SS09a
-	 rRKbWZgYVdhpQ==
-Date: Tue, 07 Jan 2025 16:54:32 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1736290538; c=relaxed/simple;
+	bh=scD61U4NtcIVBykeAAq12T+T5C1R3U/A+2bjxqSQ3Ek=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jLeeu5QBEOnFoKBgCP3aN1XcwJWgUUNwBnCHSU07I2ku+rFRWisv+M/C1wP4EE1jCE4A0+Y/2OtsnM0RH9Z25hpJtYkbpNe4Ogfw1wpeWX+R/qabqia71wMSrtB3GGoDyGqHRKUbLE8iRkXbBsLElGRpdF8Qot7VE1QwGfLWefE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NOV4be7Y; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a8160382d4so50700845ab.0
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 14:55:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736290536; x=1736895336; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xb8/W2KjJs6qbSff2lYsx2mlOIKGJeA9nQUzVaILs00=;
+        b=NOV4be7Y/CzWvwbZFx11w5GiK13UVVYSpC1uZMwOd7B+nY+VQcQztCoYgvQDu2x9SZ
+         PLymm9YkPee0p/pLIUDtLANphIYRFJwLf2rQq/wzOQn+s0DtZcgY/y4wWfnWFLPj49Jv
+         7N1JPVHydlK6sIirC0mj8+lFiyxW1ks3Im5vn+bCq8OF7E6M09CChTnyZna2yu6t8upM
+         AOdNjlLW41SPG/6Poxhzd16Mr9afOtl/VaD44fpkXM0yGinAKKEbv0G//hS3Owy3/Da/
+         t5jCC7yVSEjXBBnfLnnDSgzUFj6iU4cC8IMOxvtr55dE0wXax23wKobOo4FwNiDABcHP
+         p0pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736290536; x=1736895336;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xb8/W2KjJs6qbSff2lYsx2mlOIKGJeA9nQUzVaILs00=;
+        b=KgdX9osvfPy8rUF77ov2rzBeHEyIw3a2uLWupZ17kiVAQb7kjjO066Eqg7lQWhyHcM
+         qmx6LLMMBvpCD0e4x3Cwzi6vAkLLjZVpCvbsP1kfQDog7hBWVk9gGgNG0AZ6gBfDLPuR
+         9x+MTtmNtPVZB2jibiUSaYQkAbAZNkR+yyvuvoMtRXsyDbxxR65CBoHl2Uich+3MYaoZ
+         Cy6IKdv0jEO58UOzF4p9kRYelXQDm9qic8lH3j6bTcEWrelE7o8dKoEwIfhCSPrppJOH
+         4Jugi4en0L3hQqKwysNspxLa7sq/pXjsjZO2RVTNCRm/pYYLKCZjncKeg9RC2/N6Ua0i
+         ZltA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/eZD2ARe8WaYhPHp2/wd/cQTOfil3g1rglW9T7JG8cGl2OHu0LbYIFwf12CuicNYmKBspSBM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygNUVbWLYj75nA/tMAUDkEh0weuwP3YvsFamAWrUIMVa7lLs30
+	3jhFmxOWeBjbEkyLJY5s9dgmK2OrKTwJGdi+mODvauiM6RPIGaEGTe0TaC7d0Go=
+X-Gm-Gg: ASbGnctsRQvni4sXP6daR+ZFYFo291CljegoNNxPXAMiaZMl8RU3JNeD1TObarHcLHu
+	fOE8kTLiBoyVImmNotB+LWMF1qXxhS0OH3Q68thBhX9B50pDMBtvlBhnuHT6V9HFmGfliTWoxq1
+	sWZz/a18TKQcFwOLyXzu//TxQd19fUblnqwuMYEqBdIdUD8kA08JvyfXmaxzedLsWCi9H1hAt+h
+	EmuGOgIrlE464FvJhVFFuSJWwWmTOOTj+8h3uqTLpyorXL1/3NRmg==
+X-Google-Smtp-Source: AGHT+IFzHZUa/KrmFEIXt5DPU2zt1/FIIRDWX2HGrtuT6m2o+bVoDB17pRfRC9ozqCMRefpJZ/EpWA==
+X-Received: by 2002:a05:6e02:1d8f:b0:3a7:91a4:c752 with SMTP id e9e14a558f8ab-3ce3aa76a9bmr6944685ab.23.1736290536022;
+        Tue, 07 Jan 2025 14:55:36 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e68c1de6b0sm9907884173.134.2025.01.07.14.55.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2025 14:55:35 -0800 (PST)
+Message-ID: <64df3d49-1173-4078-a834-7eccaaac67fd@kernel.dk>
+Date: Tue, 7 Jan 2025 15:55:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: devicetree@vger.kernel.org, krzk+dt@kernel.org, netdev@vger.kernel.org, 
- davem@davemloft.net, andrew@codeconstruct.com.au, 
- linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
- ratbert@faraday-tech.com, minyard@acm.org, andrew+netdev@lunn.ch, 
- edumazet@google.com, joel@jms.id.au, kuba@kernel.org, 
- openipmi-developer@lists.sourceforge.net, pabeni@redhat.com, 
- eajames@linux.ibm.com, linux-arm-kernel@lists.infradead.org, 
- conor+dt@kernel.org
-To: Ninad Palsule <ninad@linux.ibm.com>
-In-Reply-To: <20250107162350.1281165-1-ninad@linux.ibm.com>
-References: <20250107162350.1281165-1-ninad@linux.ibm.com>
-Message-Id: <173629037049.1994533.7630339914217766401.robh@kernel.org>
-Subject: Re: [PATCH v2 00/10] DTS updates for system1 BMC
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/5] poll_wait: add mb() to fix theoretical race between
+ waitqueue_active() and .poll()
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+ Oleg Nesterov <oleg@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+ Manfred Spraul <manfred@colorfullife.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, WangYuli <wangyuli@uniontech.com>,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250107162649.GA18886@redhat.com>
+ <CAHk-=wgvpziaLOTNV9cbitHXf7Lz0ZAW+gstacZqJqRqR8h66A@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHk-=wgvpziaLOTNV9cbitHXf7Lz0ZAW+gstacZqJqRqR8h66A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-On Tue, 07 Jan 2025 10:23:37 -0600, Ninad Palsule wrote:
-> Hello,
+On 1/7/25 10:38 AM, Linus Torvalds wrote:
+> On Tue, 7 Jan 2025 at 08:27, Oleg Nesterov <oleg@redhat.com> wrote:
+>>
+>> I misread fs/eventpoll.c, it has the same problem. And more __pollwait()-like
+>> functions, for example p9_pollwait(). So 1/5 adds mb() into poll_wait(), not
+>> into __pollwait().
 > 
-> Please review the patch set.
+> Ack on all five patches, looks sane to me.
 > 
-> V2:
-> ---
->   Fixed CHECK_DTBS errors by
->     - Using generic node names
->     - Documenting phy-mode rgmii-rxid in ftgmac100.yaml
->     - Adding binding documentation for IPMB device interface
-> 
-> NINAD PALSULE (7):
->   ARM: dts: aspeed: system1: Add IPMB device
->   ARM: dts: aspeed: system1: Add GPIO line name
->   ARM: dts: aspeed: system1: Add RGMII support
->   ARM: dts: aspeed: system1: Reduce sgpio speed
->   ARM: dts: aspeed: system1: Update LED gpio name
->   ARM: dts: aspeed: system1: Remove VRs max8952
->   ARM: dts: aspeed: system1: Mark GPIO line high/low
-> 
-> Ninad Palsule (3):
->   dt-bindings: net: faraday,ftgmac100: Add phys mode
->   bindings: ipmi: Add binding for IPMB device intf
->   ARM: dts: aspeed: system1: Disable gpio pull down
-> 
->  .../devicetree/bindings/ipmi/ipmb-dev.yaml    |  42 +++++
->  .../bindings/net/faraday,ftgmac100.yaml       |   3 +
->  .../dts/aspeed/aspeed-bmc-ibm-system1.dts     | 177 ++++++++++++------
->  3 files changed, 163 insertions(+), 59 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
-> 
-> --
-> 2.43.0
-> 
-> 
-> 
+> Christian, I'm assuming this goes through your tree? If not, holler,
+> and I can take it directly.
 
+Same, series looks good.
 
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
-
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
-
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
-
-  pip3 install dtschema --upgrade
-
-
-New warnings running 'make CHECK_DTBS=y aspeed/aspeed-bmc-ibm-system1.dtb' for 20250107162350.1281165-1-ninad@linux.ibm.com:
-
-arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dtb: gpio@1e780000: 'hog-0', 'hog-1', 'hog-2', 'hog-3' do not match any of the regexes: 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-
-
-
-
+-- 
+Jens Axboe
 
 
