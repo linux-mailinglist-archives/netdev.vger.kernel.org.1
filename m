@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-155715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F53DA03787
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 06:54:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EAB2A03791
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 07:01:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4E1B1882BB5
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 05:54:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20F09163872
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 06:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04076198E78;
-	Tue,  7 Jan 2025 05:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EFF21A840A;
+	Tue,  7 Jan 2025 06:01:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bELOLaFX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TlG1v0NM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9097017C9E8
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 05:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A283195FEF
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 06:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736229291; cv=none; b=VM4p0ujAP1vvLsbDy3chhmH8CtFpPCWqrBDGYW0TvfiPqO2r/phd42ans1dv8k8kxQ72FI383bWZfXTthKVTSbLSLqyl+Dly2ZfMRMdSqJfDZpsZu5TfezYKWnNzzpiyvFw2l8P253qMpnR3+ga9yARivCAA5zCiVudnUES1a+0=
+	t=1736229706; cv=none; b=MI9RaQPG0vTvTec5vVN+J0XDR96mqup85vFEaCRa1lXkBIGcyDAq6862Tot7G7YKhe5JV7lB1hXVyFe7e7Q5Y4TvVEgn3+6C+vPRkPE0s1pGqObMNtZuz3gpUXjWhTHyvZp6WgC2edoGP+vTFSeX5hcBPcYzJA4lr+1oZRkRkv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736229291; c=relaxed/simple;
-	bh=t6G+vm1T13dstwv+YuzVT8NVvlx0nJXLEVAuQb6y9so=;
+	s=arc-20240116; t=1736229706; c=relaxed/simple;
+	bh=VnwibYjT8jBw8IwFP6CfgTnL083IcGiCaYr09GVI1nE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AD7zvI2RHDEahJ9EX5vG2YsDzhOLLwJx2ykd7/4xe6REM+w4vuMoTXDZ58DomlTBVx/ti89pA33xoMWhbnfEsLsUOooIvPKiNl9O6ztW7IeETm6hnW7ji05TGwYUTBHPVBMQ4L4Rv7ZXeRxNDaGkxakKiCRF0x7Y33YgX6fs3HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bELOLaFX; arc=none smtp.client-ip=192.198.163.11
+	 Content-Type:Content-Disposition:In-Reply-To; b=NiXPWIQHOtxDarVB9l2VYviEtjl/AyBkZ+29rvOPRG24hYIGTqKJ0LRQHLbYon2r7yzbZeyud5x8fQhM/g58VMubKqJGWTNjKgu819aX07gQLWOxAH01FMoR87zr1+NxqJFRnudNgdG99Uent8b9cQ/h+3jjw5ZKRZBmHPzQaA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TlG1v0NM; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736229289; x=1767765289;
+  t=1736229703; x=1767765703;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=t6G+vm1T13dstwv+YuzVT8NVvlx0nJXLEVAuQb6y9so=;
-  b=bELOLaFXC4T9zHmqTOCmw22ODJSPCe3C6WM4l+R7H2e+9o8OWsvwUbA3
-   J29GpeLm1GX0AX0V0k+/aMqMMs5QBD861PHQxRNyLJJ8SrKmhuxuOYhyC
-   pHOTR0840g8IqXkYnTUyb3QgyU4PJhwX9T0S08AQCODQMn6sinapxRvKi
-   rEUKOibXlMQ5Z/+/TboEaHLfpDoGbdCdDG80nC+sKw5Ti+SN6CHMNZYwi
-   30SYdBZxfbagBtc2Msm5mWJhcl+GlTAkJ0yZISyexegWRyGcUEvhKPOIf
-   3coaOS3BKSSrD/fPZDoQUpYYuIQRh1W7NNrdoTLTnmpf6Y0sLsDBH4Fkd
-   A==;
-X-CSE-ConnectionGUID: vvWqd4hhRTiUJAacgCA/qw==
-X-CSE-MsgGUID: UJ8JUKRNR6m91tOhi6H8rQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11307"; a="46974147"
+  bh=VnwibYjT8jBw8IwFP6CfgTnL083IcGiCaYr09GVI1nE=;
+  b=TlG1v0NMrgox2zPvKlCEe9WYNx0+2F9Jv157SyttgifDr+yRl82V2DQW
+   aZt+3WbcudewqCfNqNQXsRGidUhkfATv6Jl9u7kcxvAEsvfAKLPZ01Mh3
+   jzsKQddm68PFA6StAo0pXfsMnA+XeXSA42vrzb81GgHJgBoNJhO9290VS
+   469taWYyan007KZTzsUOPaE+GGwywWZLXmxSdDnX8ZNYgW8LIoENzTVdL
+   tXEmMty5RxuPPS+yEVnxLei6toy/ADebdx2knNXpwPm80ZPQ6Mg0OfBsE
+   HDARdkL2DKcaxZ9GDbpnfcl2Au2F4VWbdPqiuEGzM8d3UK4owqk09Dlrv
+   g==;
+X-CSE-ConnectionGUID: F/MMRhKSTaSD7MzhXNRNiA==
+X-CSE-MsgGUID: zp3RRGPnSu21pRPxvlB3IA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11307"; a="47812720"
 X-IronPort-AV: E=Sophos;i="6.12,294,1728975600"; 
-   d="scan'208";a="46974147"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2025 21:54:48 -0800
-X-CSE-ConnectionGUID: xNWAO7JXSrKTSItVeMzhnw==
-X-CSE-MsgGUID: uNds+hH7SgStMHtseGbzqg==
+   d="scan'208";a="47812720"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2025 22:01:41 -0800
+X-CSE-ConnectionGUID: QcEoKJL3QtSsIlWnqxL5mw==
+X-CSE-MsgGUID: hWsoUdjLTd6OO9u/yaTVpQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="103163994"
+X-IronPort-AV: E=Sophos;i="6.12,294,1728975600"; 
+   d="scan'208";a="103163445"
 Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2025 21:54:45 -0800
-Date: Tue, 7 Jan 2025 06:51:28 +0100
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2025 22:01:39 -0800
+Date: Tue, 7 Jan 2025 06:58:22 +0100
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: John Daley <johndale@cisco.com>
 Cc: benve@cisco.com, satishkh@cisco.com, andrew+netdev@lunn.ch,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, netdev@vger.kernel.org,
 	Nelson Escobar <neescoba@cisco.com>
-Subject: Re: [PATCH net-next 1/2] enic: Move RX coalescing set function
-Message-ID: <Z3zA4LJD0Eak0kZt@mev-dev.igk.intel.com>
+Subject: Re: [PATCH net-next 2/2] enic: Obtain the Link speed only after the
+ link comes up
+Message-ID: <Z3zCfiwPl2Xu/Zvi@mev-dev.igk.intel.com>
 References: <20250107025135.15167-1-johndale@cisco.com>
- <20250107025135.15167-2-johndale@cisco.com>
+ <20250107025135.15167-3-johndale@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,14 +78,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250107025135.15167-2-johndale@cisco.com>
+In-Reply-To: <20250107025135.15167-3-johndale@cisco.com>
 
-On Mon, Jan 06, 2025 at 06:51:34PM -0800, John Daley wrote:
-> Move the function used for setting the RX coalescing range to before
-> the function that checks the link status. It needs to be called from
-> there instead of from the probe function.
+On Mon, Jan 06, 2025 at 06:51:35PM -0800, John Daley wrote:
+> The link speed is obtained in the RX adaptive coalescing function. It
+> was being called at probe time when the link may not be up. Change the
+> call to run after the Link comes up.
 > 
-> There is no functional change.
+> The impact of not getting the correct link speed was that the low end of
+> the adaptive interrupt range was always being set to 0 which could have
+> caused a slight increase in the number of RX interrupts.
 > 
 > Co-developed-by: Nelson Escobar <neescoba@cisco.com>
 > Signed-off-by: Nelson Escobar <neescoba@cisco.com>
@@ -92,89 +95,44 @@ On Mon, Jan 06, 2025 at 06:51:34PM -0800, John Daley wrote:
 > Signed-off-by: Satish Kharat <satishkh@cisco.com>
 > Signed-off-by: John Daley <johndale@cisco.com>
 > ---
->  drivers/net/ethernet/cisco/enic/enic_main.c | 60 ++++++++++-----------
->  1 file changed, 30 insertions(+), 30 deletions(-)
+>  drivers/net/ethernet/cisco/enic/enic_main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
 > diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-> index 9913952ccb42..957efe73e41a 100644
+> index 957efe73e41a..49f6cab01ed5 100644
 > --- a/drivers/net/ethernet/cisco/enic/enic_main.c
 > +++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-> @@ -428,6 +428,36 @@ static void enic_mtu_check(struct enic *enic)
->  	}
->  }
->  
-> +static void enic_set_rx_coal_setting(struct enic *enic)
-> +{
-> +	unsigned int speed;
-> +	int index = -1;
-> +	struct enic_rx_coal *rx_coal = &enic->rx_coalesce_setting;
-> +
-> +	/* 1. Read the link speed from fw
-> +	 * 2. Pick the default range for the speed
-> +	 * 3. Update it in enic->rx_coalesce_setting
-> +	 */
-> +	speed = vnic_dev_port_speed(enic->vdev);
-> +	if (speed > ENIC_LINK_SPEED_10G)
-> +		index = ENIC_LINK_40G_INDEX;
-> +	else if (speed > ENIC_LINK_SPEED_4G)
-> +		index = ENIC_LINK_10G_INDEX;
-> +	else
-> +		index = ENIC_LINK_4G_INDEX;
-> +
-> +	rx_coal->small_pkt_range_start = mod_range[index].small_pkt_range_start;
-> +	rx_coal->large_pkt_range_start = mod_range[index].large_pkt_range_start;
-> +	rx_coal->range_end = ENIC_RX_COALESCE_RANGE_END;
-> +
-> +	/* Start with the value provided by UCSM */
-> +	for (index = 0; index < enic->rq_count; index++)
-> +		enic->cq[index].cur_rx_coal_timeval =
-> +				enic->config.intr_timer_usec;
-> +
-> +	rx_coal->use_adaptive_rx_coalesce = 1;
-> +}
-> +
->  static void enic_link_check(struct enic *enic)
->  {
->  	int link_status = vnic_dev_link_status(enic->vdev);
-> @@ -1901,36 +1931,6 @@ static void enic_synchronize_irqs(struct enic *enic)
->  	}
->  }
->  
-> -static void enic_set_rx_coal_setting(struct enic *enic)
-> -{
-> -	unsigned int speed;
-> -	int index = -1;
-> -	struct enic_rx_coal *rx_coal = &enic->rx_coalesce_setting;
-> -
-> -	/* 1. Read the link speed from fw
-> -	 * 2. Pick the default range for the speed
-> -	 * 3. Update it in enic->rx_coalesce_setting
-> -	 */
-> -	speed = vnic_dev_port_speed(enic->vdev);
-> -	if (ENIC_LINK_SPEED_10G < speed)
-> -		index = ENIC_LINK_40G_INDEX;
-> -	else if (ENIC_LINK_SPEED_4G < speed)
-> -		index = ENIC_LINK_10G_INDEX;
-> -	else
-> -		index = ENIC_LINK_4G_INDEX;
-> -
-> -	rx_coal->small_pkt_range_start = mod_range[index].small_pkt_range_start;
-> -	rx_coal->large_pkt_range_start = mod_range[index].large_pkt_range_start;
-> -	rx_coal->range_end = ENIC_RX_COALESCE_RANGE_END;
-> -
-> -	/* Start with the value provided by UCSM */
-> -	for (index = 0; index < enic->rq_count; index++)
-> -		enic->cq[index].cur_rx_coal_timeval =
-> -				enic->config.intr_timer_usec;
-> -
-> -	rx_coal->use_adaptive_rx_coalesce = 1;
-> -}
-> -
->  static int enic_dev_notify_set(struct enic *enic)
->  {
->  	int err;
-> -- 
-> 2.35.2
+> @@ -109,7 +109,7 @@ static struct enic_intr_mod_table mod_table[ENIC_MAX_COALESCE_TIMERS + 1] = {
+>  static struct enic_intr_mod_range mod_range[ENIC_MAX_LINK_SPEEDS] = {
+>  	{0,  0}, /* 0  - 4  Gbps */
+>  	{0,  3}, /* 4  - 10 Gbps */
+> -	{3,  6}, /* 10 - 40 Gbps */
+> +	{3,  6}, /* 10+ Gbps */
+
+Is this on purpose? You didn't mention anything about speed range in
+commit message. Just wondering, patch looks fine, thanks.
 
 Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+>  };
+>  
+>  static void enic_init_affinity_hint(struct enic *enic)
+> @@ -466,6 +466,7 @@ static void enic_link_check(struct enic *enic)
+>  	if (link_status && !carrier_ok) {
+>  		netdev_info(enic->netdev, "Link UP\n");
+>  		netif_carrier_on(enic->netdev);
+> +		enic_set_rx_coal_setting(enic);
+>  	} else if (!link_status && carrier_ok) {
+>  		netdev_info(enic->netdev, "Link DOWN\n");
+>  		netif_carrier_off(enic->netdev);
+> @@ -3063,7 +3064,6 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	timer_setup(&enic->notify_timer, enic_notify_timer, 0);
+>  
+>  	enic_rfs_flw_tbl_init(enic);
+> -	enic_set_rx_coal_setting(enic);
+>  	INIT_WORK(&enic->reset, enic_reset);
+>  	INIT_WORK(&enic->tx_hang_reset, enic_tx_hang_reset);
+>  	INIT_WORK(&enic->change_mtu_work, enic_change_mtu_work);
+> -- 
+> 2.35.2
 
