@@ -1,150 +1,132 @@
-Return-Path: <netdev+bounces-155817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DB20A03E7C
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:03:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E452BA03E7F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:04:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2DCB1884DF3
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:03:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE09B3A269D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDFA1E1A2D;
-	Tue,  7 Jan 2025 12:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF231E9B33;
+	Tue,  7 Jan 2025 12:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7zn1jQP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evjvBk6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3098615854F;
-	Tue,  7 Jan 2025 12:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DB01DFE3D
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 12:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736251429; cv=none; b=d2Q8bdf96IdSudRwd2Ke6oFeMappDtkRi01fjtdbhIB19lHrKBWUE/v7uRfEqUrNo3aLNxJp519i372pFx4DtCsXkPMCfcgYcdWNWJzaBxhw+q4SkWytOuSESpInVNXBdATj0QLNyfmuU8JEStQT0mEu/SKOZyJdpuK+ZM/NFzA=
+	t=1736251455; cv=none; b=YrVZE5FOtdACof1FS2dlOdDznNyYTEGc1gxW6gyQvqN4xX9KNPSSZKpTaIwNC6mcXtz2hVHL2LJLZsdREMlmjOSmETN64ZusqUNBrXwM9isMzlEmOCDhlX6IeVM3RAMumopStNdOPqdQnVoOePx0H8VfICRYvGS5jQhZYj4yvPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736251429; c=relaxed/simple;
-	bh=J0eCPKTYP1y5DsT6EQzv1gmap3gZVwEIFCm4OkLU5n4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M4kwb7WXyYTJYeCKEBhJNmfFhMpjSVfUDDvtF3+RpHgpWPD8jay5UxrCuLpT8JICak5Y2urV2qHbZ+cKrScuvYhvlZFUQSp3Xx8VKsDRK3Ja4McWo1rYBTOoXaMc3zxbY7Npe2YsGk9Sb/QAG6JUbUFUSlzcoEWifQZKsGFPa7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7zn1jQP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B37AC4CED6;
-	Tue,  7 Jan 2025 12:03:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736251429;
-	bh=J0eCPKTYP1y5DsT6EQzv1gmap3gZVwEIFCm4OkLU5n4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X7zn1jQP5nv0x5Y1t054JWveffwiorng//typn5zofQeWlNY1e+icBkibSyql2F/3
-	 QrhcAjZeAgzl069wIWVkFNMDyadmskdzHnXRu8Bfhqpws2e7RP/OPQ7bj4JxoMVoEY
-	 eCcKxc/PPpSXboMKWhbJ8iJjb4Yr/1vLQ584xFXsurFZLt3fue4sWZY94+BM62AuB4
-	 6vgPFlnngXnK2QieJfXh/icyt/ZJaIHsaO30fO5oi9XZTsxV03Qv/4dbK+w6oJSYbk
-	 ebeZVC3yntBPRN1gtPvHE+vGPDZfDq7um0agMzt8nHi6YbRKPj3Qt/fJZ9l2Tv/lGs
-	 SX8zN7hkqL+ig==
-Date: Tue, 7 Jan 2025 12:03:44 +0000
-From: Simon Horman <horms@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	liuyonglong@huawei.com, fanghaiqing@huawei.com,
-	zhangkun09@huawei.com, Robin Murphy <robin.murphy@arm.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	IOMMU <iommu@lists.linux.dev>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 8/8] page_pool: use list instead of array for
- alloc cache
-Message-ID: <20250107120344.GI33144@kernel.org>
-References: <20250106130116.457938-1-linyunsheng@huawei.com>
- <20250106130116.457938-9-linyunsheng@huawei.com>
+	s=arc-20240116; t=1736251455; c=relaxed/simple;
+	bh=FJ2nluP0U1DNjzdsDupwT81e9JypfHhfzlKI5y49qRU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s9MmXHM72P7cwC4L7OqfQMgPuixTL6YUjXw+EEsUDingChBRudP+Y2ZrDIA59oJihAJMPdyLdpN4WU4pBR1Mj1C9i3SP1VCrSPvC3sM+uhMpjYrzO0qyf47FqB1BXjy4pNmTwVxCK7HTpIH/DtxG8dcj3koJtYp++HZPedaJ+Ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=evjvBk6Y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736251449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3dzBLLOp8eNpGsd6cUumXxsmOdst/gq9nNd6WoidZRM=;
+	b=evjvBk6YXNFamXVrHmsUD+Af494Sqbhib6I/9+rQtzNlnR0nDEqjaU67fuNqz4MPPPG41r
+	N9btq18cRKLyNzL1v97kWKLcyAgEi7gvTVUVNXdynrfiak+LTdu0c0tXTmI5rGWn96/LCF
+	X0V8RG5ptFQYb1i7hbUzMC+r1yalkqM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-152-l_7NjBmgOcar8pdjPYf6ow-1; Tue, 07 Jan 2025 07:04:08 -0500
+X-MC-Unique: l_7NjBmgOcar8pdjPYf6ow-1
+X-Mimecast-MFC-AGG-ID: l_7NjBmgOcar8pdjPYf6ow
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38634103b0dso9106172f8f.2
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 04:04:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736251447; x=1736856247;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3dzBLLOp8eNpGsd6cUumXxsmOdst/gq9nNd6WoidZRM=;
+        b=oht5X38Y+aty2YAoSdDyqZeCnIi9SdqDfDy3F2n2h4JiHCx1Wpn/dndDRp8fe27B/r
+         gPKT4orHR5zn/OxVi5XUvnrvYEg3Hfzf8lNn/x9N1KYymfaoDlKuzrpLDbhgfPpyLe6G
+         c2Zm4pZeRyWVzQ6jub+Ao8EhW2Ay+pc1wSTza34w8lGpvrCGxUppXVf8HEqkBTp/p0oE
+         O9HQRUYW4x1i/50KL9R13vpwdR5NI11we0rvD/91a6u7Yy5xoBnvXAcPioMhCJQZx41f
+         bwARfzO/XPULc8LPviwapSEodNfA+l9Fb71IM1h20yCyVsFcUSObsB/1Il0Mi+o4RjbS
+         /vsA==
+X-Forwarded-Encrypted: i=1; AJvYcCW8N42PunURy4OrrToiBhpnSsYAIw9FZDxMTT8kpo6XOO90HUazPFzFs3+el2wPkFYTlPYj+yY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzR4cVoXEsSLLneKBc9yDn1I+hgStRAo6xcNC1hnzoY8kUffId/
+	m5VUXx4u33yv2MGL8JsJOz9a2o3eDWI3s7mC/khh6lmD1gODQOw4w9IildquO4Gg/dyrv94PmAE
+	sV7Lwo9l+0QP10MUNQ2718DoP7jevUOO/JZSgjKo5zvcmCAggPgf9BA==
+X-Gm-Gg: ASbGncu1bcwg/Hjc1PNhNA1GmbPY2F9+OIXy3l1w4LikYjIIS20lrJCOUdnxp6teyz+
+	140ps+1Jpx0slPGuimTDmPXijkq54Ze7ub/aFwtk4DZVU7kMkwTJLeQ0tFrcmgiXJec7mzvpDMq
+	qu0U+JBudQ9UlpQupO6AOBfT7FY/pKJ+88eblLr1x5OeMAz7J+YypdGvSg3A4cLYt8oRv01XhMr
+	8/G3J8XnMcaz+1Ybv8uD4t+VLjPx4vxtLsI9XpCaVf17Iw2TmfjxrMwEWo45Jtiv4I9M2satpUg
+	OH8XOgmr
+X-Received: by 2002:a5d:5f56:0:b0:386:1cd3:8a00 with SMTP id ffacd0b85a97d-38a223f5b41mr59871346f8f.40.1736251445744;
+        Tue, 07 Jan 2025 04:04:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFWfb9Vm3Vt9Qk+wKzvMGFSZQzXSCS52o6qWqfR8nKRXCO5SfQ0ddtzkhw83y3pCZhrNPA7iw==
+X-Received: by 2002:a5d:5f56:0:b0:386:1cd3:8a00 with SMTP id ffacd0b85a97d-38a223f5b41mr59871192f8f.40.1736251443868;
+        Tue, 07 Jan 2025 04:04:03 -0800 (PST)
+Received: from [192.168.88.253] (146-241-2-244.dyn.eolo.it. [146.241.2.244])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c89e278sm50877687f8f.75.2025.01.07.04.04.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2025 04:04:03 -0800 (PST)
+Message-ID: <c6547053-7de2-42a2-b8f7-6837e9ab85ca@redhat.com>
+Date: Tue, 7 Jan 2025 13:04:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250106130116.457938-9-linyunsheng@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ptp: limit number of virtual clocks per physical
+ clock
+To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Yangbo Lu <yangbo.lu@nxp.com>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cheung wall <zzqq0103.hey@gmail.com>,
+ stable@vger.kernel.org
+References: <20250103-ptp-max_vclocks-v1-1-2406b8eade97@weissschuh.net>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250103-ptp-max_vclocks-v1-1-2406b8eade97@weissschuh.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 06, 2025 at 09:01:16PM +0800, Yunsheng Lin wrote:
-> As the alloc cache is always protected by NAPI context
-> protection, use encoded_next as a pointer to a next item
-> to avoid the using the array.
+On 1/3/25 2:40 PM, Thomas Weißschuh wrote:
+> The sysfs interface can be used to trigger arbitrarily large memory
+> allocations. This can induce pressure on the VM layer to satisfy the
+> request only to fail anyways.
 > 
-> Testing shows there is about 3ns improvement for the
-> performance of 'time_bench_page_pool01_fast_path' test
-> case.
-> 
-> CC: Robin Murphy <robin.murphy@arm.com>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: IOMMU <iommu@lists.linux.dev>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> Reported-by: cheung wall <zzqq0103.hey@gmail.com>
+> Closes: https://lore.kernel.org/lkml/20250103091906.GD1977892@ZenIV/
+> Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+> ---
+> The limit is completely made up, let me know if there is something
+> better.
 
-...
+I'm also unsure if such constant value is reasonable for all the
+use-cases. Any additional feedback more than welcome.
 
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+In any case, I guess it would make sense to update
+Documentation/ABI/testing/sysfs-ptp accordingly.
 
-...
+Thanks,
 
-> @@ -677,10 +698,12 @@ static void __page_pool_return_page(struct page_pool *pool, netmem_ref netmem,
->  
->  static noinline netmem_ref page_pool_refill_alloc_cache(struct page_pool *pool)
->  {
-> -	struct page_pool_item *refill;
-> +	struct page_pool_item *refill, *alloc, *curr;
->  	netmem_ref netmem;
->  	int pref_nid; /* preferred NUMA node */
->  
-> +	DEBUG_NET_WARN_ON_ONCE(pool->alloc.count || pool->alloc.list);
-> +
->  	/* Quicker fallback, avoid locks when ring is empty */
->  	refill = pool->alloc.refill;
->  	if (unlikely(!refill && !READ_ONCE(pool->ring.list))) {
-> @@ -698,6 +721,7 @@ static noinline netmem_ref page_pool_refill_alloc_cache(struct page_pool *pool)
->  	pref_nid = numa_mem_id(); /* will be zero like page_to_nid() */
->  #endif
->  
-> +	alloc = NULL;
->  	/* Refill alloc array, but only if NUMA match */
->  	do {
->  		if (unlikely(!refill)) {
-> @@ -706,10 +730,13 @@ static noinline netmem_ref page_pool_refill_alloc_cache(struct page_pool *pool)
->  				break;
->  		}
->  
-> +		curr = refill;
->  		netmem = refill->pp_netmem;
->  		refill = page_pool_item_get_next(refill);
->  		if (likely(netmem_is_pref_nid(netmem, pref_nid))) {
-> -			pool->alloc.cache[pool->alloc.count++] = netmem;
-> +			page_pool_item_set_next(curr, alloc);
-> +			pool->alloc.count++;
-> +			alloc = curr;
->  		} else {
->  			/* NUMA mismatch;
->  			 * (1) release 1 page to page-allocator and
-> @@ -729,7 +756,8 @@ static noinline netmem_ref page_pool_refill_alloc_cache(struct page_pool *pool)
->  	/* Return last page */
->  	if (likely(pool->alloc.count > 0)) {
->  		atomic_sub(pool->alloc.count, &pool->ring.count);
-> -		netmem = pool->alloc.cache[--pool->alloc.count];
-> +		pool->alloc.list = page_pool_item_get_next(alloc);
-> +		pool->alloc.count--;
->  		alloc_stat_inc(pool, refill);
->  	}
->  
+Paolo
 
-Hi Yunsheng Lin,
-
-The following line of the code looks like this:
-
-	return netmem;
-
-And, with this patch applied, Smatch warns that netmem may be used
-uninitialised here. I assume this is because it is no longer conditionally
-initialised above.
-
-...
 
