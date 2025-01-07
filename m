@@ -1,101 +1,110 @@
-Return-Path: <netdev+bounces-156034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DB1AA04B5C
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:08:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DBCEA04B60
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:09:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D2B63A2595
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:08:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26A0216650F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D68B1D63EB;
-	Tue,  7 Jan 2025 21:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DABA1E0E1A;
+	Tue,  7 Jan 2025 21:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pxwhEv/j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JyiD9dbF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96643155300
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477F41D63EB
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736284122; cv=none; b=kClke7xsEw6f/IP6P5v90ij/8jDg8+n1pQ241oDbq0KbhZW99i802zbXLW5/qTZ2kFW4M9i46N/aL0lQPwyEMxYm6x2slPTN1yhmvQw5NgOwI77HsWi9O4eA3YIT83UJaWvvyzqCj2pJKaqE7yzrkOVhuo9K+sEub+7G4XNmIOo=
+	t=1736284148; cv=none; b=uxXZuVL5kVn72fd/R9A4TGrsnVk/fC2tZVFkZodauDLP5fn2EnpVQyWMbc/3AR9hTVInXZ94bxvV7P/B7mD+E5xyaMl5fPA2b0Qo6mdJ/tn7GzuQPEidFPod54EYVTBW5zmjtkGW+58EZsU5Z+IKhf8nhXMb8Nen0ihp8FN4cNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736284122; c=relaxed/simple;
-	bh=bPwaj1b8EkIxxT8YJlEskLxJb6f3W2CP1MBEle6katM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bAZK4T5O6zfFxJjjNdog1M6+BILz/g906dR7+DPWWoeR8x2OotqrQWFiDGFR/IcCo+bnTh+Aq28UgVrWuuEUdHCw3LIFbDNDm+aE7k2RP2fjt3b5mpdDptKlp9OduDFnt/2drSfsItc5ZLX+mdSGsOVY89nTpHy5xAsFBv2at88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pxwhEv/j; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-467896541e1so60881cf.0
-        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 13:08:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736284119; x=1736888919; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bPwaj1b8EkIxxT8YJlEskLxJb6f3W2CP1MBEle6katM=;
-        b=pxwhEv/j3IILTvaebvbynMOO7Yp46D4untXnAq5HxxV778W4VmgSyCS4UwOTD7W0iV
-         flvFwSGna8NcaXt0mw0WcPdJGUtaTImbN+bdyrHVcZHSU3hLsql6+TJ6eSgnwSKhycMN
-         9IpCEfYNnvUzSxGDyGcGGIo5u7dmbEJEI2wZC2O4oocX3GB2eKtd/2xLMA8CSaAcaDOY
-         4n1oqohoM3FTvpKFvHZx2MNI40XSfguji/VCK263CKP2302/9MZf7UrKEcAeUA3ihNI5
-         2suul7sk1+I6HNjyPxwEgQGBkvVUJrGD+PODWvN/KxJl7kcAMu9Ym1Ke13Pnok88bgC7
-         rpjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736284119; x=1736888919;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bPwaj1b8EkIxxT8YJlEskLxJb6f3W2CP1MBEle6katM=;
-        b=m1E3nO9iLbxdrZSvZ4t4WJEbCuu+d8QdV9Z9EC95Z8msiHJRbmwbCNex171EuZq69R
-         OWl3XDbbQWnC0A6h+s/yiL0skFBmhdP9gMnc3RIefdl1c9mF+CcxOJ9rkRJSxs89iTzG
-         4nSfJqjJgwgcHBBw6KTtNIq92fYVWQoTbtM0dlXtUBQj32XTcdOEDslPQPPdKozHokU1
-         ENcF1ogkJj0kg/8vNBUK+hL4AFFITHTVa9vFofuXr+VJ1QDyL4ZUSFRrj1PesxkWHwuc
-         h5k0vFE4sBXuaxkL79St6A5TAlaY0QLGFmkXowwl6oelrn59DXxFTnSHKyqktn6dBB10
-         r+Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCW3C81NiYa4ZKj/egkaIN1iL+379Lb7j6RlwcMpAAn0wMHsMg15s6fYURcwfFYxDzZ757474Do=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytqJ8lg/7oSBhOYf0zfwYfBoDlwRaKMy6wEKaAzhPn+mYZVtWT
-	T5RfmaIJKHbhxKehP7I3eEXr3BJ6BT/odV+q99+HI0vps5DD/OVvv0DV2clM3x/mlXY41tD8TCB
-	SbaMfNYUvUfnVxJZGr950U2B4KTOiGODGsR9a
-X-Gm-Gg: ASbGncuGyBXLaIB1ObwEUuW2eSzg4XJpfH4fGXe6vhDjUBCsDA1ANvSGTyZmlVbwqyO
-	xl6/CcWn+UDVV0fvHc4/uz1hgFC7P6IT+I9pgl/LJZmeA0PLdpaK1SDURUilJw8vnwbQ=
-X-Google-Smtp-Source: AGHT+IFp7eksbpGK4zK5byprjj7GtTtmvJHrNJqAUr+apFNmiH3vcO9leFADIOxcs5kdDBsYsXsMifOWGFuxWV6hVPw=
-X-Received: by 2002:ac8:7fd4:0:b0:465:3d28:8c02 with SMTP id
- d75a77b69052e-46c70cb7681mr580421cf.26.1736284119493; Tue, 07 Jan 2025
- 13:08:39 -0800 (PST)
+	s=arc-20240116; t=1736284148; c=relaxed/simple;
+	bh=O9yeKU+aDLkbe5Y+st1eaESauyloNDhBO/f2RKbWUkA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IDpzhW/dGkXwVeAvb/HGxMoMY81ksyWq7a+7N77Z2NoHvIY6Y+EmJ9dMiQVfbo8sVlwb9W2+PDebfs8BR9G4SoPAlj7M3C1Gldg5h6gPICEf2k77QfNLY8YDwVCCsXp34gr0dnnDHNfRkvuZu8ZibFMP97VXXX72yz4eWRG9I44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JyiD9dbF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A13C6C4CED6;
+	Tue,  7 Jan 2025 21:09:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736284147;
+	bh=O9yeKU+aDLkbe5Y+st1eaESauyloNDhBO/f2RKbWUkA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JyiD9dbFavrqM/Md67vj87Pyy5Nq+Mn3HtZJF+Cnclr6PLxwx4h/jSjnhrOOkO58N
+	 1/BVgd5fPUHoBJh4VfxKypUfgRbGVtbnByrF9P13Z6wKWT3gYaSXtUQOu5+0G0Vrri
+	 eV3HOWFVyPJK9dzynjBHEGieK7kNE5hMv6UfdhX59lUuruUa11XF39ok424qNM0IiR
+	 DZeMZEVAmdfj0jkNftyhJb3Ami3oO2TR3Hz4MwlohzkKuHC1duX42bOcXMkzpqU/z1
+	 v+i23zGLZwBPHfxbqz48Tufwv1iC6/6EXnDX4NVRMNl0FOhRXQtrRZqKRHUWtK0NT/
+	 MNrwxVnJQ8UOg==
+Date: Tue, 7 Jan 2025 13:09:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Simon Horman
+ <horms@kernel.org>, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 0/4] net: reduce RTNL pressure in
+ unregister_netdevice()
+Message-ID: <20250107130906.098fc8d6@kernel.org>
+In-Reply-To: <CANn89i+dN11K7EushTwsT0tchEytceTWHqiB23KqrYvfauRjWg@mail.gmail.com>
+References: <20250107173838.1130187-1-edumazet@google.com>
+	<20250107121148.7054518d@kernel.org>
+	<CANn89iJkxX1d-SKN6WVJST=5X7KqXdJ+OKcCVDEFCedJ7ArSig@mail.gmail.com>
+	<CANn89i+dN11K7EushTwsT0tchEytceTWHqiB23KqrYvfauRjWg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250103185954.1236510-1-kuba@kernel.org> <20250103185954.1236510-6-kuba@kernel.org>
-In-Reply-To: <20250103185954.1236510-6-kuba@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 7 Jan 2025 13:08:27 -0800
-Message-ID: <CAHS8izP3meH1Ci18UOutkQNqGJBTJ=rxvNNd4jkmyYBi5oUFkA@mail.gmail.com>
-Subject: Re: [PATCH net-next 5/8] netdevsim: add queue alloc/free helpers
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, dw@davidwei.uk, jdamato@fastly.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 3, 2025 at 11:00=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> We'll need the code to allocate and free queues in the queue management
-> API, factor it out.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Tue, 7 Jan 2025 21:46:41 +0100 Eric Dumazet wrote:
+> > > I think we'll need:
+> > >
+> > > diff --git a/net/devlink/port.c b/net/devlink/port.c
+> > > index 939081a0e615..cdfa22453a55 100644
+> > > --- a/net/devlink/port.c
+> > > +++ b/net/devlink/port.c
+> > > @@ -1311,6 +1311,7 @@ int devlink_port_netdevice_event(struct notifier_block *nb,
+> > >                 __devlink_port_type_set(devlink_port, devlink_port->type,
+> > >                                         netdev);
+> > >                 break;
+> > > +       case NETDEV_UNREGISTERING:  
+> >
+> > Not sure I follow ?
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+I was worried some code assumed devlink_port->netdev is safe to access
+under rtnl_lock. But looking closer it's only used in trivial ways, so
+you can ignore that.
 
---=20
-Thanks,
-Mina
+> > >         case NETDEV_UNREGISTER:
+> > >                 if (devlink_net(devlink) != dev_net(netdev))
+> > >                         return NOTIFY_OK;
+> > >
+> > >
+> > > There is no other way to speed things up? Use RT prio for the work?
+> > > Maybe WRITE_ONCE() a special handler into backlog.poll, and schedule it?
+> > >
+> > > I'm not gonna stand in your way but in general re-taking caller locks
+> > > in a callee is a bit ugly :(  
+> >
+> > We might restrict this stuff to cleanup_net() caller only, we know the
+> > netns are disappearing and that no other thread can mess with them.  
+
+Unless the interface has a peer in another netns. But that should be
+fine, interface will be de-listed. I'm slightly more concerned that some
+random code in the kernel assumes its stashed netdev pointer to be valid
+under rtnl_lock, as long as it has not seen an NETDEV_UNREGISTER event.
+I guess we'll find out..? :)
+
+> ie something like:
+> [...]
+
+LGTM!
 
