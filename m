@@ -1,97 +1,93 @@
-Return-Path: <netdev+bounces-155639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A05A033C1
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 01:07:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E72A033CB
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 01:10:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FD0018834EB
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 00:07:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D057E161F5D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 00:10:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3634ECC;
-	Tue,  7 Jan 2025 00:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98545A50;
+	Tue,  7 Jan 2025 00:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jwn50yGx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EbMs21Qf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C76A31;
-	Tue,  7 Jan 2025 00:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738E57494
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 00:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736208415; cv=none; b=vBYYaBr/Cb1QZnrmHwEMsprU2rZLEYlxw44tcxWIyNBNbAixNlruR1DLvxPTFBAzWcL/R6IrW24Xjrb1uhDR5zFFQkmbw+lmZ3NmmmuyFTuS5MSUU+mQOh9YB0S95gUik5gkEkFofkFIz2ap2f2K9pqkorOVM5vuJo7prbFtp8k=
+	t=1736208608; cv=none; b=nIoJ0kMxN1OrGEHh9CPihcJtNQCVWEmlHjf+I+nqFB6i+4xbGVtkItHqh01P/zE0yVCD1UwlDGAO7gVzVr48KeyqU6QxxIP6D87hOT3ZQtyFsDITqIFneIXkNA5uSfOdJHAehM+VTg8uBxn0ECvR7NA8Os8zU7wzljAH2q3oA10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736208415; c=relaxed/simple;
-	bh=I4Yoo47bRGcKoqhoUKi/FMAlUTxnX0nquhi0qSZakJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CqJ6NUCzHuyR0p2rUmuSRPx74vyQKu6HUqu5+5Z+EeI9Sc4y7WdeQRPoiKzANny3xm/aWsdEUpjh8N00rhumgF6dsUE+7uHMB2Hn6Qo6BiMF1eNzmPSV7mdNn5dg9nS1dqvCUavVy3J0lf1PABhWg5/fFlMQ4JPBrJou0D+A4WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jwn50yGx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93EFFC4CED2;
-	Tue,  7 Jan 2025 00:06:54 +0000 (UTC)
+	s=arc-20240116; t=1736208608; c=relaxed/simple;
+	bh=VDUoNDibFhg3llclRFputUUcGAUaGq/wLccl0lqrGAQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=i9Slr8O9cDQfkQcSFKQ92sOkJrhVqclMql8M2OjIShZRzTTKzwklkCh6qyNrIGfEB9XRNE2/NEl/7LOQ/MCmKU7qyCZLb3UtmlIaES5Ewe1qVthVW7s5JrYbsI3QxvRVFJL68MHgf3WQrcRQhICaeg8gUUaaWcJwjYdfB+ShgLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EbMs21Qf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BB68C4CED2;
+	Tue,  7 Jan 2025 00:10:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736208415;
-	bh=I4Yoo47bRGcKoqhoUKi/FMAlUTxnX0nquhi0qSZakJk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Jwn50yGxrWhl9m4d/1QP9UY4zODilNkVvdDU81a8anC+CPqukrFCVKB6ybmlgriVB
-	 czXVQcoB+MQO1CviyP9rX3NS3t8fqyYV+XTQao+VWiNAoMVIurBG4D5lgBEIrdFODK
-	 dUPmDLYANyRv6GDcW/IIyoMdcyeTvDQcFBvHQG1fjU5fnxBJZuLy6h1ca5oMu4Jgfv
-	 bdsGs5zz0h+A7ts4NJn1iIOr9iQ5w93/omllkwdilLhzs1BHbUujjswH9np3WeZDHN
-	 QFDrbU+Q2qKW7fuc6JEALupJwyBT9EwhrBhGngAWvNk/NqTCKZYK6lxD0i2eoDboey
-	 YIIshyiMH3QMw==
-Date: Mon, 6 Jan 2025 16:06:53 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-team@meta.com, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v2 2/4] netconsole: selftest: Split the helpers
- from the selftest
-Message-ID: <20250106160653.2fcdb192@kernel.org>
-In-Reply-To: <20250103-netcons_overflow_test-v2-2-a49f9be64c21@debian.org>
-References: <20250103-netcons_overflow_test-v2-0-a49f9be64c21@debian.org>
-	<20250103-netcons_overflow_test-v2-2-a49f9be64c21@debian.org>
+	s=k20201202; t=1736208608;
+	bh=VDUoNDibFhg3llclRFputUUcGAUaGq/wLccl0lqrGAQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EbMs21QfqHP1DUbo3YRFgSdHTsm2Z9HiLV+IHJtcO6DIob1fWh5rPtsiD7HqJ8ngY
+	 hekb5h2sWYumBZiZPyqbSjM1M1QkOZPEoAObKXHM0iziNUNxNCXHMaiXT26S0pnpnY
+	 Q8L1hPcnasJmCKP0bMzQ0ZuxVFSaj/i37tBy5G1f9l+0J0CX6SAxKpBz8AsEljzFWv
+	 EXlYLZemlpG091Q16gW4if0cMiGfGzEexixTSePI9QU/flYblnJez4WgTGK3TJyNUj
+	 SEcUI07PVKZ2V8llxx4ME+M0kVJNppiCUuND2e/t0Er8HeXTMubS4mLHnkA4xPeZGr
+	 uvALDqKtUAKbg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CD8380A97E;
+	Tue,  7 Jan 2025 00:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] ax25: rcu protect dev->ax25_ptr
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173620862926.3655328.628568285767880516.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Jan 2025 00:10:29 +0000
+References: <20250103210514.87290-1-edumazet@google.com>
+In-Reply-To: <20250103210514.87290-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, horms@kernel.org, kuniyu@amazon.com,
+ eric.dumazet@gmail.com, syzkaller@googlegroups.com
 
-On Fri, 03 Jan 2025 04:57:50 -0800 Breno Leitao wrote:
-> Split helper functions from the netconsole basic test into a separate
-> library file to enable reuse across different netconsole tests. This
-> change only moves the existing helper functions to lib/sh/lib_netcons.sh
-> while preserving the same test functionality.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri,  3 Jan 2025 21:05:14 +0000 you wrote:
+> syzbot found a lockdep issue [1].
 > 
-> The helpers provide common functions for:
-> - Setting up network namespaces and interfaces
-> - Managing netconsole dynamic targets
-> - Setting user data
-> - Handling test dependencies
-> - Cleanup operations
+> We should remove ax25 RTNL dependency in ax25_setsockopt()
 > 
-> Do not make any change in the code, other than the mechanical
-> separation.
+> This should also fix a variety of possible UAF in ax25.
+> 
+> [1]
+> 
+> [...]
 
-You have to update the Makefile, we don't wildcard all files under
-drivers/net/lib, the lib support in ksft is not great :(
+Here is the summary with links:
+  - [net-next] ax25: rcu protect dev->ax25_ptr
+    https://git.kernel.org/netdev/net-next/c/95fc45d1dea8
 
-$ make -C tools/testing/selftests/ \
-	TARGETS="drivers/net drivers/net/hw" \
-	install INSTALL_PATH=/tmp/ksft-net-drv
-[... noise ...]
-$ find /tmp/ksft-net-drv/ -iname '*netcons*'
-/tmp/ksft-net-drv/drivers/net/netcons_basic.sh
-/tmp/ksft-net-drv/drivers/net/netcons_overflow.sh
-
-.. your new lib file won't get installed.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
