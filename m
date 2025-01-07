@@ -1,157 +1,196 @@
-Return-Path: <netdev+bounces-155864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4BDFA041B5
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:09:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C3AA041B9
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:09:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E9621676BC
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:07:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63D2216702A
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029EF1F8AE4;
-	Tue,  7 Jan 2025 14:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="T3CXUnR0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7A61F9410;
+	Tue,  7 Jan 2025 14:03:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8460A1F8AC6;
-	Tue,  7 Jan 2025 14:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C961F8AE7
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 14:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736258570; cv=none; b=ZMFZ9QmEAT8Xg3lmc49WoOVBofuTXGcsqi8WAmBhIEj4peCDkBIdpUh6uf9tT1tgAMjuw7JFVTP5pHwjAq1s2AZleEbHf7YasWUa0sYdseH4U2E0xSuE/VhqlPhY9r6URQDQPDUW5gnjaILbx9lIE0kQzDqEz6hZQbSmQS/4tfE=
+	t=1736258582; cv=none; b=iY8K1UjdJjgqL9It590n/bLobfeK0x+rkuU3JqajRsgcAsYJ0Mmn+3mzVpTpm/Zuh5k8Yk9QGYX396Gs9mUHk3TbKHGvfjhb59xTTPqegIQQGdBTB+rFlHqwgNTXvEQ6+09ALMPtqNZ0JNnU51A+per+fh9Hy3ZcWW+npGUYXs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736258570; c=relaxed/simple;
-	bh=TuwQwfEOb7ycKI9yxwZzNBwZncciizGCV0JH4nNnU2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=lqoNf5GOaSw/ABhhZfWT5LhHpFmcnefg3QP3eqcVWHGk8bdUcMbEKIzho1z65YUQGeTF7oaZ3zoWSS/XKMMvLkvbCXdEqYd/PF1rhhvoKv1AkRY3Vx+W2Olw1QbXmD5nS7y0V8DUcVzmcZmhDZ5Za107mIJ3Q2xaCgOgwItSMTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=T3CXUnR0; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 507E1w6I016352;
-	Tue, 7 Jan 2025 08:01:58 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1736258518;
-	bh=2rOUVlJtZ8uljbYcwOtBufLmiKSlIWfZvWmApMuUFrM=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=T3CXUnR0gYOTdLBETqJF9pSz61jcO3F0K7B9XT+gbyJ7bGVi+MWA7BpgBYJmwC6a6
-	 oQcUUqnsgsXSu5B776R8QcSrmccqgG9bALfzl4I6C5nacV0V9BZbxFsB9gSN4Yl7bj
-	 xcZkc3+jrUzezQHy39T5+6xSQuozYDUtIU4ZLXl0=
-Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 507E1wqk054341
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 7 Jan 2025 08:01:58 -0600
-Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 7
- Jan 2025 08:01:57 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 7 Jan 2025 08:01:57 -0600
-Received: from [10.249.129.69] ([10.249.129.69])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 507E1oVJ078399;
-	Tue, 7 Jan 2025 08:01:51 -0600
-Message-ID: <5cc13a7f-b3f9-42d5-b9e2-7da5cb54af5b@ti.com>
-Date: Tue, 7 Jan 2025 19:31:49 +0530
+	s=arc-20240116; t=1736258582; c=relaxed/simple;
+	bh=/lAC7NXIey1ZuH7WjX/6NB0HEBVim6c3pkzgBWmHeiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Usz8PrLdsoUx5bozatD1EZxxw7/dRhxZv5B8F3JFLpOYSBYN1uPqcjJJWzvBNiNzrFsbHvhpeLrqYpv22y+mnAqb5PfF4vabno7iWzAWWd39FtnuOrANXOKOmiYoMPgfJIZnDmFNVz/tYZCcvjW3CKMMDKqUWVDRNJfx6ZTgVQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVAAR-0007Xm-QU; Tue, 07 Jan 2025 15:02:47 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVAAQ-007M3c-1B;
+	Tue, 07 Jan 2025 15:02:47 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVAAQ-009aOe-33;
+	Tue, 07 Jan 2025 15:02:47 +0100
+Date: Tue, 7 Jan 2025 15:02:46 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>
+Subject: Re: [PATCH net-next RFC 0/5] net: phy: Introduce a port
+ representation
+Message-ID: <Z300BuATJoVDc_4S@pengutronix.de>
+References: <20241220201506.2791940-1-maxime.chevallier@bootlin.com>
+ <Z2g3b_t3KwMFozR8@pengutronix.de>
+ <Z2hgbdeTXjqWKa14@pengutronix.de>
+ <Z3Zu5ZofHqy4vGoG@shell.armlinux.org.uk>
+ <Z3bG-B0E2l47znkE@pengutronix.de>
+ <20250107142605.6c605eaf@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add Support for
- Multicast filtering with VLAN in HSR mode
-To: Roger Quadros <rogerq@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
-        Jeongjun Park <aha310510@gmail.com>,
-        Alexander Lobakin
-	<aleksander.lobakin@intel.com>,
-        Lukasz Majewski <lukma@denx.de>, Meghana
- Malladi <m-malladi@ti.com>,
-        Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman
-	<horms@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-        Larysa Zaremba <larysa.zaremba@intel.com>
-References: <20250103092033.1533374-1-danishanwar@ti.com>
- <20250103092033.1533374-4-danishanwar@ti.com>
- <31bb8a3e-5a1c-4c94-8c33-c0dfd6d643fb@kernel.org>
-Content-Language: en-US
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <31bb8a3e-5a1c-4c94-8c33-c0dfd6d643fb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250107142605.6c605eaf@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-
-
-On 1/7/2025 6:53 PM, Roger Quadros wrote:
+On Tue, Jan 07, 2025 at 02:26:05PM +0100, Kory Maincent wrote:
+> On Thu, 2 Jan 2025 18:03:52 +0100
+> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 > 
+> > On Thu, Jan 02, 2025 at 10:48:05AM +0000, Russell King (Oracle) wrote:
+> > > On Sun, Dec 22, 2024 at 07:54:37PM +0100, Oleksij Rempel wrote:  
+> > > > Here is updated version:
+> > > > 
+> > > > ports {
+> > > >     /* 1000BaseT Port with Ethernet and simple PoE */
+> > > >     port0: ethernet-port@0 {
+> > > >         reg = <0>; /* Port index */
+> > > >         label = "ETH0"; /* Physical label on the device */
+> > > >         connector = "RJ45"; /* Connector type */
+> > > >         supported-modes = <10BaseT 100BaseTX 1000BaseT>; /* Supported
+> > > > modes */
+> > > > 
+> > > >         transformer {
+> > > >             model = "ABC123"; /* Transformer model number */
+> > > >             manufacturer = "TransformerCo"; /* Manufacturer name */
+> > > > 
+> > > >             pairs {
+> > > >                 pair@0 {
+> > > >                     name = "A"; /* Pair A */
+> > > >                     pins = <1 2>; /* Connector pins */
+> > > >                     phy-mapping = <PHY_TX0_P PHY_TX0_N>; /* PHY pin
+> > > > mapping */ center-tap = "CT0"; /* Central tap identifier */
+> > > >                     pse-negative = <PSE_GND>; /* CT0 connected to GND */
+> > > >                 };
+> > > >                 pair@1 {
+> > > >                     name = "B"; /* Pair B */
+> > > >                     pins = <3 6>; /* Connector pins */
+> > > >                     phy-mapping = <PHY_RX0_P PHY_RX0_N>;
+> > > >                     center-tap = "CT1"; /* Central tap identifier */
+> > > >                     pse-positive = <PSE_OUT0>; /* CT1 connected to
+> > > > PSE_OUT0 */ };
+> > > >                 pair@2 {
+> > > >                     name = "C"; /* Pair C */
+> > > >                     pins = <4 5>; /* Connector pins */
+> > > >                     phy-mapping = <PHY_TXRX1_P PHY_TXRX1_N>; /* PHY
+> > > > connection only */ center-tap = "CT2"; /* Central tap identifier */
+> > > >                     /* No power connection to CT2 */
+> > > >                 };
+> > > >                 pair@3 {
+> > > >                     name = "D"; /* Pair D */
+> > > >                     pins = <7 8>; /* Connector pins */
+> > > >                     phy-mapping = <PHY_TXRX2_P PHY_TXRX2_N>; /* PHY
+> > > > connection only */ center-tap = "CT3"; /* Central tap identifier */
+> > > >                     /* No power connection to CT3 */
+> > > >                 };
+> > > >             };
+> > > >         };  
 > 
-> On 03/01/2025 11:20, MD Danish Anwar wrote:
->> Add multicast filtering support for VLAN interfaces in HSR offload mode
->> for ICSSG driver.
->>
->> The driver calls vlan_for_each() API on the hsr device's ndev to get the
->> list of available vlans for the hsr device. The driver then sync mc addr of
->> vlan interface with a locally mainatined list emac->vlan_mcast_list[vid]
->> using __hw_addr_sync_multiple() API.
->>
->> The driver then calls the sync / unsync callbacks.
->>
->> In the sync / unsync call back, driver checks if the vdev's real dev is
->> hsr device or not. If the real dev is hsr device, driver gets the per
->> port device using hsr_get_port_ndev() and then driver passes appropriate
->> vid to FDB helper functions.
->>
->> This commit makes below changes in the hsr files.
->> - Move enum hsr_port_type from net/hsr/hsr_main.h to include/linux/if_hsr.h
->>   so that the enum can be accessed by drivers using hsr.
->> - Create hsr_get_port_ndev() API that can be used to get the ndev
->>   pointer to the slave port from ndev pointer to the hsr net device.
->> - Export hsr_get_port_ndev() API so that the API can be accessed by
->>   drivers using hsr.
->>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 83 +++++++++++++++-----
->>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  2 +
->>  include/linux/if_hsr.h                       | 18 +++++
->>  net/hsr/hsr_device.c                         | 13 +++
->>  net/hsr/hsr_main.h                           |  9 ---
+> Couldn't we begin with something simple like the following and add all the
+> transformers and pairs information as you described later if the community feels
+> we need it?
 > 
-> Should we be splitting hsr core changes into separate patch first,
-> then followed by a patch with icssg driver changes?
+> mdis {
 > 
+>     /* 1000BaseT Port with Ethernet and PoE */
+>     mdi0: ethernet-mdi@0 {
+>         reg = <0>; /* Port index */
+>         label = "ETH0"; /* Physical label on the device */
+>         connector = "RJ45"; /* Connector type */
+>         supported-modes = <10BaseT 100BaseTX 1000BaseT>; /* Supported modes */
+>         lanes = <2>;
+>         variant = "MDI-X"; /* MDI or MDI-X */
+>         pse = <&pse1>;
+>     };
+> };
 
-I wanted to make sure that the changes to hsr core are done with the
-driver change so that any one looking at the commit can understand why
-these changes are done.
+The problematic properties are lanes and variants.
 
-If we split the changes and someone looks at the commit modifying hsr
-core, they will not be able to understand why this is done. We will be
-creating and exporting API hsr_get_port_ndev() but there will be no
-caller for this.
+Lanes seems to not provide any additional information which is not
+provided by the supported-modes.
 
->>  5 files changed, 97 insertions(+), 28 deletions(-)
-> 
+We have at least following working variants, which are supported by (some?)
+microchip PHYs:
+https://microchip.my.site.com/s/article/1000Base-T-Differential-Pair-Swapping
+For swapping A and B pairs, we may use MDI/MDI-X. What is about swapped
+C and D pairs?
+
+The IEEE 802.3 - 2022 has following variants:
+14.5.2 Crossover function - only A<>B swap is supported
+40.4.4 Automatic MDI/MDI-X Configuration - only A<>B swap is supported?
+55.4.4 Automatic MDI/MDI-X configuration - 4 swap variants are supported
+113.4.4 Automatic MDI/MDI-X configuration - 4 swap variants are supported
+126.4.4 Automatic MDI/MDI-X configuration - 4 swap variants are supported
+
+This was only the pair swap. How to reflect the polarity swap withing
+the pairs?
+
+> We can also add led, thermal and fuse subnodes later.
+> Let's begin with something simple for the initial support, considering
+> that it has places for additional details in the future.
+
+Yes :)
 
 -- 
-Thanks and Regards,
-Md Danish Anwar
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
