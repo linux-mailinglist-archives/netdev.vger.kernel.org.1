@@ -1,150 +1,88 @@
-Return-Path: <netdev+bounces-155699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D21A035A0
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:00:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C723A035A6
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:01:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A63903A28E5
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:00:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F86F3A3009
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF471802AB;
-	Tue,  7 Jan 2025 03:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392C3198A0D;
+	Tue,  7 Jan 2025 03:01:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="XBAsaU1f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BuDUutOe"
 X-Original-To: netdev@vger.kernel.org
-Received: from alln-iport-7.cisco.com (alln-iport-7.cisco.com [173.37.142.94])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7094C156225
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 03:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BE8185E7F;
+	Tue,  7 Jan 2025 03:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736218821; cv=none; b=RS9B10FSqexTeA82tZirA5Ae6vXjRqHZhGKsRT76WHaNlY0pglYMkaP6oALyi78r4ivX/74P0p4vZ8UmxuM3t59LgFjYUXrUGeYw5Y0QZ+Y1Lw+7paZM5SMtW1Vs8IJ+jRtS4TN4DaeSpFDzfwLaqEkcQ7vtqqJDEKVsDgwlg3A=
+	t=1736218875; cv=none; b=edKcgag8K8nnxCSYQ4hbg6XT9AJhCRzlyNfkcqBVCLLfzTojAbnpNUI+sfUwpl6IMe9G2yS8tl75pUq/M5Ivwl1RM0lUq9uq3XR9DPU2Y5hiXARiGmsvFL2rqo99/6KSZkBkfc2g8qCb3au0IaUuWjIBGIAGOKstkWwUIT3GOHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736218821; c=relaxed/simple;
-	bh=uuVpJZ+2tBW/mJyBXwU0t3/alPpFKO2qt6t+rfECzh8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ua2anbLYnCj8l4uAFtKeGfN9ZLeWMlnJAnp02lLwb1TXBQxDiuUOpeE9TFTS1FYJcdBluWxhHAmJF/KLAiOQTQTFrW0oOwQ1y/cNFzC7ntBs9omydRzy5CzMhvMqOAcuIBYOgX5zEMoA83iqe+4rxfXVJboJiej3H9Z+/37EFGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=XBAsaU1f; arc=none smtp.client-ip=173.37.142.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=1562; q=dns/txt; s=iport;
-  t=1736218818; x=1737428418;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DDT5k+1VqMANSCnZT0Db9eXEyAFhm6VHx9Kwvr5ec5k=;
-  b=XBAsaU1f1NUvKN9MRPu4RueyfulTPpje4+CyRSVBRu5AdpD5BhQDnuMy
-   sMUMNVf1mEtMSJgGA7NFmsUK22KxAE51eOjy0IafH5RI7xuM306N8XNBn
-   rVY/mF3dAaADFQUkSZuou+hydHwmeBCZmR2iBtgE/Txty5iCHofSGAOCt
-   8=;
-X-CSE-ConnectionGUID: IpG6m+KwQIabKv1umUpxTg==
-X-CSE-MsgGUID: FbnN1p06TwmjCF18Jq7T6w==
-X-IPAS-Result: =?us-ascii?q?A0BbAABVl3xnj40QJK1aHQEBAQEJARIBBQUBggIFAQsBh?=
- =?us-ascii?q?BlDjhmIcqAZDwEBAQ9EBAEBhQcCinQCJjcGDgECBAEBAQEDAgMBAQEBAQEBA?=
- =?us-ascii?q?QEBAQsBAQUBAQECAQcFFAEBAQEBATkFSYYIhlsCAQMnCwFGEAtGKyuDGoJlA?=
- =?us-ascii?q?7BAgXkzgQHeM4FtgUgBhWqHX3CEdycbgUlEhA4xPoUQhXcEh2yddEgKgRcDW?=
- =?us-ascii?q?SwBVRMNCgsHBYEpHysDOAwLMBUmD4EmBTUKOTqCDGlJNwINAjWCHnyCK4Ihg?=
- =?us-ascii?q?juER4RWhWaCF4FoAwMWEgGCbUADCxgNSBEsNxQbBj5uB58JHYEUPx4ub6Yao?=
- =?us-ascii?q?QOEJYFjn2MaM6pTmHykR4RmgX0kgVszGggbFYMjURkPjjoft3IlbgIHCwEBA?=
- =?us-ascii?q?wmRdAEB?=
-IronPort-Data: A9a23:KTWmr6oVxdDfaAeOToD8XjMdUo1eBmL9ZRIvgKrLsJaIsI4StFCzt
- garIBnXOv3ZMTb1Kdp0bYS/9k9X7JLTm4VjGQZuqyo2RHsa8uPIVI+TRqvS04x+DSFioGZPt
- Zh2hgzodZhsJpPkjk7zdOCn9T8kiPngqoPUUIbsIjp2SRJvVBAvgBdin/9RqoNziLBVOSvV0
- T/Ji5OZYQXNNwJcaDpOtvra8E0355wehRtB1rAATaET1LPhvyF94KI3fcmZM3b+S49IKe+2L
- 86r5K255G7Q4yA2AdqjlLvhGmVSKlIFFVHT4pb+c/HKbilq/kTe4I5iXBYvQRs/ZwGyojxE4
- I4lWapc5useFvakdOw1C3G0GszlVEFM0OevzXOX6aR/w6BaGpfh660GMa04AWEX0sdvLj9Lt
- t8HEREEZDOd3v+z/aqrduY506zPLOGzVG8eknhkyTecCbMtRorOBv2Wo9RZxzw3wMtJGJ4yZ
- eJANmEpN0qGOkMJYwtOYH49tL/Aan3XcTpYrl6coacf6GnIxws327/oWDbQUoDSFZkFwxjJ/
- goq+UzXCBc8bcTHlwaa93CHqLafvzqkZNwNQejQGvlC2wDLmTdJV3X6T2CTrfCnh0uWV9tBJ
- kkQ/SQy664/6CSDQ9XgWhSqrWKssRkbVN5dVeY97Wmlybfe6i6aC3ICQzoHb8Yp3Oc/QzAw2
- 0DKmd71CTFxmLmIT3Tb/bf8hSu7MyUTLEcYaCMERBdD6N7myKk1gw7DQ8hLDqG4lJv2FCv2z
- jTMqzIx74j/luYC06G9uFSCiDW2q92REkg+5x7cWSSu6QYRiJOZi5KAyED0s/MDD5mgb1CLn
- 2Zdhs2j9PAyAsTY/MCSe9klELas7veDFTTTh19zApUsnwhBHVb9JOi8BxkgeC9U3tY4RNP/X
- KPEVepsCH5v0JmCMPYfj2GZUphCIU3c+TLNDai8gj1mOcMZSeN/1HsyDXN8Jki0+KTWrYkxO
- I2AbeGnBmsABKJswVKeHrhGj+Z7lntmnTyDGfgXKihLN5LDOhZ5rp9YYTOzghwRtvjsTPj9q
- owGbpXWm32zrsWhMnGLq+b/0mzm3VBgWMip8JYIHgJyCgFnA2omQ+TA2q8sfpctnqJe0I/1E
- oKVBCdlJK7ErSSfc22iMyk7AJu2BMYXhSxgZ0QEYw33s0XPlK7zt8/zgbNrJuF/rISODJdcE
- 5E4Ril3Kq4WEW6domlDMceVQU4LXE3DuD9i9hGNOFAXF6OMjSSTkjM4VmMDLBUzMxc=
-IronPort-HdrOrdr: A9a23:/BClb6w2zOZshP9IWPjcKrPwK71zdoMgy1knxilNoNJuHfBw8P
- re+8jzuiWUtN98YhwdcJW7Scu9qBDnhPpICPcqXYtKNTOO0ADDEGgh1/qG/9SKIUPDH4BmuZ
- uIC5IOa+EZyTNB/L/HCM7SKadH/OW6
-X-Talos-CUID: =?us-ascii?q?9a23=3AEv/RKmm3yhqJrrfkdLvTI9TPy0rXOVzF4ynVYGy?=
- =?us-ascii?q?nMEdgQp6LEEKVxbt0r8U7zg=3D=3D?=
-X-Talos-MUID: 9a23:BKwZuwn/EPqOwLcO7xordnpMPsFOurz2VnwSlJctlZDUFzUvB2mC2WE=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.12,294,1728950400"; 
-   d="scan'208";a="408485690"
-Received: from alln-l-core-04.cisco.com ([173.36.16.141])
-  by alln-iport-7.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 07 Jan 2025 03:00:17 +0000
-Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
-	by alln-l-core-04.cisco.com (Postfix) with ESMTP id 167F9180001A2;
-	Tue,  7 Jan 2025 03:00:17 +0000 (GMT)
-Received: by cisco.com (Postfix, from userid 392789)
-	id DF4E83FAB9CC; Mon,  6 Jan 2025 19:00:16 -0800 (PST)
-From: John Daley <johndale@cisco.com>
-To: kuba@kernel.org
-Cc: andrew+netdev@lunn.ch,
-	benve@cisco.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	johndale@cisco.com,
-	neescoba@cisco.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	satishkh@cisco.com
-Subject: Re: [PATCH net-next v4 4/6] enic: Use the Page Pool API for RX when MTU is less than page size
-Date: Mon,  6 Jan 2025 19:00:16 -0800
-Message-Id: <20250107030016.24407-1-johndale@cisco.com>
-X-Mailer: git-send-email 2.35.2
-In-Reply-To: <20250106161953.019083b3@kernel.org>
-References: <20250106161953.019083b3@kernel.org>
+	s=arc-20240116; t=1736218875; c=relaxed/simple;
+	bh=bkdVbJTRTnAfgz0I8G4ZJ/DMBB1QEIYgr08jODOzGMw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bFoz5tGpxLcm35BNsKSFIbs7sgo26eMHDLL60Kl91LLjdLaekDgo1dZrJOgA8US0gVxP9kQNEFhOio0q9Q3Cz1d4Tfh4E6gk6xluXNf8NXNeLFe1puV0EdrxZp/bO/Hm49UrLfuK0kqjTIxpJIYjzqf0OafAYho0tr9uLKCxMkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BuDUutOe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E474C4CED2;
+	Tue,  7 Jan 2025 03:01:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736218874;
+	bh=bkdVbJTRTnAfgz0I8G4ZJ/DMBB1QEIYgr08jODOzGMw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BuDUutOe+5K7V9/hpIPDg1a/kf4/R8l/5eR0SeHiinLkrlUANj8WhfwmgRChlpsDp
+	 9IS+ueRV9QZpXFwbAB4nicLZOHEpEVqle6bbfeuY42nIL4yyS/hQrtbWLK6Y0VdBKY
+	 Jx8GyKW8pGS+DLCCfT14KSVIQaRbP48n3W2ActDSTe/Z3AWwqsEYoz6Dj5zIinzK2v
+	 3SKIzI1R6pDTN0y1ShqRKSCnVt5RtemhNBs2CWWyo41uCfczHbSV2TnKssfPN9t6KV
+	 RG0CFQYVQAa2aVf+/eQK7g6gu645fBBmmWy9WDyCdIHo2IDD5bHFk9MXVbk/nzBjiN
+	 9qLE+wUTYnZ6A==
+Date: Mon, 6 Jan 2025 19:01:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net,
+ michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org,
+ ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net,
+ john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me,
+ asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, kory.maincent@bootlin.com,
+ maxime.chevallier@bootlin.com, danieller@nvidia.com,
+ hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
+ przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
+ rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us,
+ bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com,
+ aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com,
+ daniel.zahka@gmail.com
+Subject: Re: [PATCH net-next v7 10/10] selftest: net-drv: hds: add test for
+ HDS feature
+Message-ID: <20250106190112.6ae27767@kernel.org>
+In-Reply-To: <20250103150325.926031-11-ap420073@gmail.com>
+References: <20250103150325.926031-1-ap420073@gmail.com>
+	<20250103150325.926031-11-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
-X-Outbound-Node: alln-l-core-04.cisco.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
->> >> The Page Pool API improves bandwidth and CPU overhead by recycling
->> >> pages instead of allocating new buffers in the driver. Make use of
->> >> page pool fragment allocation for smaller MTUs so that multiple
->> >> packets can share a page.  
->> >
->> >Why the MTU limitation? You can set page_pool_params.order
->> >to appropriate value always use the page pool.  
->> 
->> I thought it might waste memory, e.g. allocating 16K for 9000 mtu.
->> But now that you mention it, I see that the added code complexity is
->> probably not worth it. I am unclear on what to set pp_params.max_len
->> to when MTU > PAGE_SIZE. Order * PAGE_SIZE or MTU size? In this case
->> the pages won't be fragmented so isn't only necessary for the MTU sized
->> area to be DMA SYNC'ed?
->
->Good point, once fragmentation is no longer possible you can
->set .max_len to the size of the fragment HW may clobber,
->and .offset to the reserved headroom.
+On Fri,  3 Jan 2025 15:03:25 +0000 Taehee Yoo wrote:
+> +    try:
+> +        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-thresh': hds_gt})
+> +    except NlError as e:
+> +        if e.error == errno.EOPNOTSUPP:
+> +            raise KsftSkipEx("ring-set not supported by the device")
+> +        ksft_eq(e.error, errno.EINVAL)
+> +    else:
+> +        raise KsftFailEx("exceeded hds-thresh should be failed")
 
-Ok, testing going good so far, but need another day.
->
->> >  
->> >> +    page_pool_destroy(rq->pool);
->> >> +}  
->> 
->> I will make a v5 shortly. Would you recommend I split the patchset into 2 parts
->> as I think @andrew+netdev was suggesting? The last 2 patches are kind of unrelated
->> to the first 4.
->
->Yes, seems like a good idea, patches 5 and 6 would probably have been
->merged a while back if they were separate.
-
-Ok, I submitted patches 5 and 6 as separate trivial patchset. Hopefully it will be
-merged by the time my testing for the page_pool changes are complete so I can submit
-on top of them. thanks!
+Nice work on the tests! FWIW you could use ksft_raises(NlError) here,
+but this works too. You can leave it as is if you prefer.
 
