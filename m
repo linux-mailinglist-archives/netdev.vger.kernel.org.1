@@ -1,175 +1,167 @@
-Return-Path: <netdev+bounces-155981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AA3EA04806
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 18:18:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4645EA04826
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 18:26:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91C567A0268
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:18:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E27043A4D83
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154EA1F2C41;
-	Tue,  7 Jan 2025 17:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D574C1F5400;
+	Tue,  7 Jan 2025 17:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ks7yKeuD"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ff6NadFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2075.outbound.protection.outlook.com [40.107.92.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C0A1F37B6
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 17:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736270254; cv=fail; b=YPoZXMuLnOi1ytsBpSity2jH2yqKT1TIrsE78kmyvE/uZm4WnWVV6iA3o+xbveXEZgTsJYLFJSGlR01LIuL5JdbOSP2+n+BPLLQ9NJZYcwjieX2qHSABKX5J9YV4l0Xx+CkGP4LgZs3GE6ZHNFUqSe2WNiCKM9DLhVEWZ352Ewg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736270254; c=relaxed/simple;
-	bh=9sEhZjc2kRagOUM2hC2CqUZA4S/1TCg79tp+AmEFQ8o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qaCF3UG8jdnbdOt1v3v6dfz8DdJtBJEfK8gjAeojtBefzLBM4LP/jblMPUAbXx/KpjoIY6gbEgRbG5AsHStebkb8i2V2PO56IDy30l6IpKMFxIDDmCISGlqQ+tBARAEriQpc/jEmdmNq5jwc1xcDz2Li0t0oikLRwodTJZVkXng=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ks7yKeuD; arc=fail smtp.client-ip=40.107.92.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kxy4LJV8f89AMssjhafZMbcUJZvf51kJ8S66SE6MmfkbiEsHTMRLHzZmnZI8ifF7qgQPSTkFyxanLpEIUvwhuR71LGNtDJv8OKXsVHbXw0FgclzHwx4QyIsHXbiaBtsF1TIXAKmJTsWxypWnt7b4rJScwvlrE+SX152X1KCf1pQk8R2Xnq3zXlWYP+UC2c2aSJRrlf69uCv0waVlxxApHglZzunkL0UMt1VOrS6gEN1/X63yrvXE1wFhGf2jQWOUzY8NQShVJ2UsDinoSR0RYi+LvYmAwpv+PbZCfxCAnSjyHZ+mpZ7csV15p/KLDKGx7LmD7u4Tggq6R3FDu9dayA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nTEDDGXSih9Ocg4kTeuLubS3Vhlx8VjmWIs6tRgyBD0=;
- b=iuEBDM0OXHX8uYOmz4WjuMmtpZi02azf/WZwvrWvoqEZWdmDEksmv4bDazC/o628RxQ4K552IBhlfA86R/WDw0XAmPUBZ5fBgvZS0hltbQpS70lxRsDV7Pi9vcgJ6130Ms2ncBz+k+mNlu9KvLynMYlfkszA2spTKPzVNsqL+44ZbvNh0NJ7+O8+t3UZjMDZ3diEe6R/OWtacSJtcZ1nwr488DX+ZonJb5NMns9ndCMzWS4dPlGnWPVenpXNXUTr9eEOjou0xgT4rrhizWYGlLiaNH/wRzbawgVuhrItTJ80kcUIYYlriwdm6pJkpA7IEjU6QIrl+BWYUA94Lk/xYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nTEDDGXSih9Ocg4kTeuLubS3Vhlx8VjmWIs6tRgyBD0=;
- b=ks7yKeuD4wd/oC5/V0HX588qhnoso18zNlMPlzIUJEOIQg6MfOo28z5v0wqghrM3zP+Ssbmy3X5qI0xKOJ+fQYGplOmVAhNB7Fz7NLCqBJvBK3lwzdle/ndOPb7wKCx3yCuIOSjNuE7WquxRiRHBjJSfoCmAFCY0/Dcojt4tDvs2PPlm8Q9bzNKZ9u1BZl/DlhZ2jqGqnbFe3Mb599btygFmW47/faB5YRRwxMULpWltyD9wP1eP+9dPDmz0lAtJ+/Tf4Zda3tqm/hsZFVuqULAKsLQllMookCqDR7r4WZwPcJL7bO29zwIVgKv7IAjigxcakyUpMliUwHjuboK4Bg==
-Received: from BN9PR03CA0673.namprd03.prod.outlook.com (2603:10b6:408:10e::18)
- by DM4PR12MB6328.namprd12.prod.outlook.com (2603:10b6:8:a0::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Tue, 7 Jan
- 2025 17:17:21 +0000
-Received: from BL6PEPF0001AB57.namprd02.prod.outlook.com
- (2603:10b6:408:10e:cafe::67) by BN9PR03CA0673.outlook.office365.com
- (2603:10b6:408:10e::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8314.18 via Frontend Transport; Tue,
- 7 Jan 2025 17:17:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF0001AB57.mail.protection.outlook.com (10.167.241.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8335.7 via Frontend Transport; Tue, 7 Jan 2025 17:17:20 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 7 Jan 2025
- 09:17:03 -0800
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 7 Jan 2025
- 09:17:02 -0800
-Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Tue, 7 Jan
- 2025 09:17:01 -0800
-From: Gal Pressman <gal@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <mkubecek@suse.cz>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-Subject: [PATCH ethtool] ethtool: Fix incorrect success return value on RX network flow hashing error
-Date: Tue, 7 Jan 2025 19:17:55 +0200
-Message-ID: <20250107171755.3059447-1-gal@nvidia.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664391F37CF
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 17:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736270779; cv=none; b=PhFRAwRTAndP3bZNIXkJ+bP99SAHyL1EP7bXxYnbYy7NBqt8YzichUTExv1QV0f7ZgQqNOh/zuw+Da37xb1bwyAyAgBR0aatDkKhKK/3qmllUKWgGOfDLKYc85zYBjU46NuqvCv93XtV4dXy0JxnCkoclxtMTkb81JIvMvclDLM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736270779; c=relaxed/simple;
+	bh=Zt4TBGCxBxlNsn64qjo4ZDFH4I7vbh601R/MnrLSgcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=XZyVd6fvEbF/bGswYKBypn+mIzHySMI3prtB7jezTZg34KZ4c52/07QVuAQ6dHdjlWUq+peq9xeI91D8bLgm3oCHbF7yqKmfhep88yQYg65UB/4uErqSoN4u4SgOIX5zGTevyMjyXFUAHhLVCQLF22l58I9lihqJeudAk1WwVwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ff6NadFu; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21670dce0a7so57213625ad.1
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 09:26:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1736270775; x=1736875575; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=a2x6Czl6GO65kHVW9zAO9v64ouXW8ETVJWZJ2hxoejQ=;
+        b=Ff6NadFupAbTIMFEvKRWqzVU7pmntgqaWJCsm6oZ4W3UHeKGBzT5LEEOgivcBLtsHv
+         2jk8klLCMePt63KF1IDSMfGMjtgC6rQa/+5MBepUypFlKoXloPQtvkltQ16ffEtSFAUe
+         gGMkaVyA/qOCYTlxGQc6knhgaOXB+vxLZ0CFE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736270775; x=1736875575;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a2x6Czl6GO65kHVW9zAO9v64ouXW8ETVJWZJ2hxoejQ=;
+        b=sbWbvVjJRY/I+UfnQY4R4ovGdgUwIA1eaJbIEB6QD6OMeRHckMvlmSa0FVJpcB4rFL
+         NxpQwlXSP+azM+jcLbty4gFtSzKRitPcQmaYCNT5c07pod/bS1qO4eA8MLWHKowPS0kd
+         96qyDv678lcgZeutr0soodqATjO6kuQQS2PFnapgB9pflLjC6xtvmqrnSziHo61E2BX/
+         uX0pNvpL2gQXUpYgupiS3la+Em+E7jRzWncpR+eBhJssav90Jh4UZMgTCXx42p+HBNPV
+         N7kG4pf20DNcMvLx7RZlFCmvGCvF2moKsLZN2fTtAyQvMTW9VnpP1T/7ETbS68F27AnP
+         qswQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVhpaBTwNDY5m+Qz+N2acFkZC2R3+0+bTdSUZza3ZYB3O+0uzL76k24I1OIKbGVBTN8hnJtpy0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyI93BL8o433Js4s1Vx4HEEm8+fzkjNiGZR01g9e3C5IVP5CNFi
+	Ic837Fbx9lZv7muHLut8w01Tu/vlr4AK1HvIW0LA8vdbFrt3NlTGfuoSSi7vBQ==
+X-Gm-Gg: ASbGncu/ffWCzX59A2SqNrtsjYWNpMyov4D/eHhvIBWbWTvrK6iBezcaFvMKmaFkThN
+	D0gJxJVSPLg7wH3w8DRktVF1fA2Q0JZk3lewxsHS1pOMTcYZWhtTEbYlb4v7PxR0SHHVO6UZxe/
+	ooAkeGAPSVr9NXLV6CX670Br1VH42Z8xJszfICIDb7DGRVaVsrPsJKHkEosYiuIPw91oIl+ZDQj
+	x3LwQbA2oNYsyty/ixWVIQrv2QPxKpqMeTU5CzvpnbqtC3u8ZPqRhsFGrU4Re/F8MOMWMnsyDvM
+	d/zCSshCHMlK8b06dJqN
+X-Google-Smtp-Source: AGHT+IFzu1VIJT9VJiC2aXWDy+NgNyxkD0g/GqwTMrp+Om0AwR+ht03XX6NjXXazKeHe7i80AzxoTg==
+X-Received: by 2002:a17:902:e886:b0:216:5e6e:68cb with SMTP id d9443c01a7336-219e6e9fd95mr929686065ad.16.1736270774736;
+        Tue, 07 Jan 2025 09:26:14 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9716b3sm314412505ad.90.2025.01.07.09.26.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2025 09:26:14 -0800 (PST)
+Message-ID: <901992c2-4c48-4534-bbfb-7b6b70d15d48@broadcom.com>
+Date: Tue, 7 Jan 2025 09:26:10 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB57:EE_|DM4PR12MB6328:EE_
-X-MS-Office365-Filtering-Correlation-Id: 21580c0d-c011-478f-57a9-08dd2f3f2502
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?3T1NQU5ecpqBqGWZ3rMIl4/SnNFNXtUFI6g/SkDUJty9rJi3SWGApG5tYzJQ?=
- =?us-ascii?Q?rJlzbhyB2knAmrBGaRCCZNcmPWHHjj+ySffbfQFQH3/wMoZA+o4egL3PStag?=
- =?us-ascii?Q?r2uE5jQhP1EQ3cDY9/osKPouyGBTP2H8Ne3vt7kDKByQhc/X65zkOGoJwbZ4?=
- =?us-ascii?Q?m5Nj9kgg/5HCTub/kWi6xfUvJH3Ty7N5qmqr+EhBehKufhBzFs/zaakvPGUS?=
- =?us-ascii?Q?X4xTcbnUvCnyPVw+c/LI9YD5qeCIhMMFt7VHh1j2MM/g3TTkejE6BQe9Igoc?=
- =?us-ascii?Q?cdrHd6/XF+zKAhuW/b2ArIhJY4HutfEZ5xEQJ7+MfsFbwPPeEcOVDupTXeNr?=
- =?us-ascii?Q?kLknTMfQjGNOD4Iq8KsURO0Poygeu2ZAV12LsfoAbJPdPiGphu09U28ctnz5?=
- =?us-ascii?Q?JWHkdGav2MJ4xYjWY0MRQOT6QPiV5jTAbYVP/m13a5TR4roFX0abffsM9aSw?=
- =?us-ascii?Q?vnTt69CY1OcMGrwVxulAahDKBXz/AiSTb9ph8XD6y5lkI4Dz+AVfIkylDgHs?=
- =?us-ascii?Q?FaZbXu2WNgnkESdLvcU5NxJChdavcabxtLkSumxHjDMc6XSwG2AL6vEDDsNW?=
- =?us-ascii?Q?k4gcu3jnk36DFulIzLR0XwWe6oU26QJwKwamC08a/6XZpQv+4H/br0xGURxb?=
- =?us-ascii?Q?xdJwM8zVZ32y6gYUb8h9sFJ6B3YwbO2ekxHg9DiWrhOZ7s06WLcBaB5PA1L5?=
- =?us-ascii?Q?RjggTpJXzBlGTgxphP0D1hkT22UXDhkAkTDrwmJw4cxnJtWaw3Jcr/FlByS7?=
- =?us-ascii?Q?9j/UMtDXUWOnH9fYZ/REyFSg5OI1erekcpT29HxE3sV2IJGKHvEPzuqoxBH3?=
- =?us-ascii?Q?wfGDQfktYgHocxYaqLuxWAgAOyXXg6rSSlce0UJpyBfV0unXjZJ1+Py61m+s?=
- =?us-ascii?Q?xcNhJ7zHdCZriN3H7B61JID3EVvnEHfogmxyFcWxs+UleLz7tnxkZSH6xTxA?=
- =?us-ascii?Q?CMn5PuWf3jt6JZn+ZtcrL5ge1HrpabT5JNGYTMpt/GdpUM4Yzl7GU6DmWf/g?=
- =?us-ascii?Q?FfLNqzmumB6IfyT8DrIndrOUBBljzCd3A0LEAL/VYYozn+B+k+wQzJBpnRrB?=
- =?us-ascii?Q?BSHwxx4qqfRAI8vGN3dhTmqoHHir1pu8zHFz23g61v/FCuoTt7rgYuu2ZQo1?=
- =?us-ascii?Q?5rduneCi5O7+SYUbWN39UCyPa4SJy94HgtEIFJsmKb1K4TAoYcXB3s3KX5g2?=
- =?us-ascii?Q?FGgMavsU7zUSg0rcHMiVbyrC+jha7Yc1moicWmy/yDzgvKD0+8HFkH2HcKs/?=
- =?us-ascii?Q?uJmlpcuDSqM7tYq7tuPKUhr4LzKnbGFG96GkpuEHtHrIdQoK1+OpadBmRvbZ?=
- =?us-ascii?Q?MpPUhYfJJ1aDxRjCEO1FM+fxSOFXHibw+8vilSt08g+qpKeef86Dy23WM4UH?=
- =?us-ascii?Q?NmpaWZUebvy0lhkBOP5EruFSRJYRi0rlnAskzxAkfbZBwPx8ANpg5X182G61?=
- =?us-ascii?Q?N4k5uiWAV6TFWWzf1oMgtsmdoH8mu4VN+ZbAyR5LRTfkb9oIDq+Qcn+tMP1j?=
- =?us-ascii?Q?akx6hVedtbLHwFM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2025 17:17:20.5427
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21580c0d-c011-478f-57a9-08dd2f3f2502
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB57.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6328
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] dt-bindings: net: Correct indentation and style
+ in DTS example
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Doug Berger <opendmb@gmail.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Ray Jui <rjui@broadcom.com>,
+ Scott Branden <sbranden@broadcom.com>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Kalle Valo <kvalo@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Dario Binacchi <dariobin@libero.it>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ Brian Norris <briannorris@chromium.org>, Frank Li <Frank.Li@nxp.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-wireless@vger.kernel.org
+References: <20250107125613.211478-1-krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250107125613.211478-1-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-In case of an error on RX network flow hashing configuration, return an
-error in addition to the error message.
+On 1/7/25 04:56, Krzysztof Kozlowski wrote:
+> DTS example in the bindings should be indented with 2- or 4-spaces and
+> aligned with opening '- |', so correct any differences like 3-spaces or
+> mixtures 2- and 4-spaces in one binding.
+> 
+> No functional changes here, but saves some comments during reviews of
+> new patches built on existing code.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>   .../bindings/net/amlogic,meson-dwmac.yaml     | 14 +--
+>   .../devicetree/bindings/net/asix,ax88178.yaml |  4 +-
+>   .../bindings/net/brcm,bcmgenet.yaml           | 32 +++----
+>   .../bindings/net/brcm,mdio-mux-iproc.yaml     | 46 ++++-----
 
-Fixes: 1bd87128467b ("Add support for rx flow hash configuration in a network device")
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Gal Pressman <gal@nvidia.com>
----
- ethtool.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/ethtool.c b/ethtool.c
-index 1cb5b9ecf094..a1393bc14b7b 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -3883,8 +3883,10 @@ static int do_srxclass(struct cmd_context *ctx)
- 			nfccmd.flow_type |= FLOW_RSS;
- 
- 		err = send_ioctl(ctx, &nfccmd);
--		if (err < 0)
-+		if (err < 0) {
- 			perror("Cannot change RX network flow hashing options");
-+			return 1;
-+		}
- 	} else if (!strcmp(ctx->argp[0], "flow-type")) {
- 		struct ethtool_rx_flow_spec rx_rule_fs;
- 		__u32 rss_context = 0;
+Acked-by: Florian Fainelli <florian.fainelli@broadcom.com> # net/brcm,*
 -- 
-2.40.1
-
+Florian
 
