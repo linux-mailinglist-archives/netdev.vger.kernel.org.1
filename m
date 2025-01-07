@@ -1,80 +1,128 @@
-Return-Path: <netdev+bounces-155672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4629AA03532
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:36:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED1FFA0356D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:48:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84B147A22FB
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:36:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BBA73A11EC
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D7D1547D2;
-	Tue,  7 Jan 2025 02:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE0F8635B;
+	Tue,  7 Jan 2025 02:48:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ROEL5mqI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="W24JK0u6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out.freemail.hu (fmfe19.freemail.hu [46.107.16.212])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDEF7DA7F;
-	Tue,  7 Jan 2025 02:36:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB677DA7F;
+	Tue,  7 Jan 2025 02:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736217395; cv=none; b=t57vfs2IAIXpIpieqMIJRlFvQoxjDfp29I7AP0BcgubqnQFO4aCoq51NR5pbiHIQABOyVDJ/wZQ8fC/MNZgpCMQseKmsvOZt88QZZBP54xi2wFtSwy7vjcPtOIyr+a07/j2NtST3OZLbJYczyGFfGn0Uk/FRM+l8YcZwYSRq06U=
+	t=1736218118; cv=none; b=pBT5exWeGVrNaeSJ4J3mN/14pwfac/04TKzg8RfoHnvBmB6ChQp88pJ8xbBTNHRdIGQ9rQuVXiec9S9De9SJbYZzL88StKAdtgqZN+diCJ5FWUJFygNbEEuAljs8Ai1+XKcJYYxWyI0lLmla8322x4c1e8jvPSZRILqefmRIfQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736217395; c=relaxed/simple;
-	bh=moqNFwJoVpoEyM0pXq6iiTO5wZQNaHE39lpiW9moPng=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UH4cmYKLZtLqCK+Y9j+GuNxG6SHe0wOLWrq8drqBviBGG5zUPHJszry4g+gOUxw041Nt0kQqEc7yHLqPRR4ibWcwjsQbhOFTYgDahxzDGMAbmIgiS6hl+ikAmEZtwyIJkKIVeOgmYj3VJHqNDGLK7Yixd5lVbMYfwScuDZiP8qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ROEL5mqI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7269AC4CED2;
-	Tue,  7 Jan 2025 02:36:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736217394;
-	bh=moqNFwJoVpoEyM0pXq6iiTO5wZQNaHE39lpiW9moPng=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ROEL5mqID/hJH7z7KWNtvY3TAcfQGDFhj9/iQhnWZqpGPBBdIVuDmuyMr1C5KQItF
-	 RpDIWQvVV61KP9zX8g6BZofwwTBReUL7JwHt0KgnEPXZK2oPNZ4+OPrK28+VxoWdKX
-	 YISzFIEynOqVE5PWUqx4KLMIke30uh15B6DIg4k8vWsxpCyCHdfoFo0BArI4YEhnPR
-	 5rIxJIEAJMv3CSY0l/Vd3KS5vFm8PSv7ntOEUdgFiW8pQTya3CmhBeImicdWgKtWch
-	 tAOyLabzDUhifN/hX3MVAodR7cAXV2SBRLYRQjDLj3oTeJviWqrhpvgvhwLloI+T1L
-	 3PCzwriUW8Xjw==
-Date: Mon, 6 Jan 2025 18:36:33 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Benjamin Coddington <bcodding@redhat.com>
-Cc: Boris Pismenny <borisp@nvidia.com>, John Fastabend
- <john.fastabend@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-nfs@vger.kernel.org
-Subject: Re: [PATCH] tls: Fix tls_sw_sendmsg error handling
-Message-ID: <20250106183633.0ddb7cb0@kernel.org>
-In-Reply-To: <9594185559881679d81f071b181a10eb07cd079f.1736004079.git.bcodding@redhat.com>
-References: <9594185559881679d81f071b181a10eb07cd079f.1736004079.git.bcodding@redhat.com>
+	s=arc-20240116; t=1736218118; c=relaxed/simple;
+	bh=CsJqmawYyqnxHTiXy242Zz9tN6G7GT6XQ0ck7e14tlU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I72Seq6NQxqRDr5yp8+3mqv2EUbvDWMPzs+0kTz/BFLaoMaSf1GZlzjlcEZvx2oGF9Uw2PKj3OUVEfBoSKYUOKleWyX044yRhghT5mHJgpyBGI4exyc82HcnlfbkW0qCaU2srwwI9UEkB5W4CLkfQItKVSy93RMi8Ewubd44qN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=W24JK0u6 reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from fizweb.elte.hu (fizweb.elte.hu [157.181.183.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YRwKk13pPzTPp;
+	Tue, 07 Jan 2025 03:41:30 +0100 (CET)
+From: egyszeregy@freemail.hu
+To: fw@strlen.de,
+	pablo@netfilter.org,
+	lorenzo@kernel.org,
+	daniel@iogearbox.net,
+	leitao@debian.org,
+	amiculas@cisco.com,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: =?UTF-8?q?Benjamin=20Sz=C5=91ke?= <egyszeregy@freemail.hu>
+Subject: [PATCH 00/10] netfilter: x_tables: Merge xt_*.h and ipt_*.h files which has same name.
+Date: Tue,  7 Jan 2025 03:41:10 +0100
+Message-ID: <20250107024120.98288-1-egyszeregy@freemail.hu>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736217690;
+	s=20181004; d=freemail.hu;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding;
+	l=2121; bh=sIIMyzJyGRet4460JjQArHk4FyFryfxqBXq3t4I/W5k=;
+	b=W24JK0u6Xzfdf+tNOJXlRpJTWl3KpthQGTjWuTC0pwSlLTKNQxDxIgd/nKXAkKt2
+	zLbcDrjQiuK31qLgOLpYjpFjUNwxwCyk7c8SUv8/wGWTFqBauMphIIBC9Ru4yxDfR7l
+	B8u3YyZFfV6snws0vF4PfXWs++dJZ3TCR6Moge8awH+WELrT3rS6oWU92iops53mZpw
+	iWwiQKCMZ+nfUkAz6/pyCpFtBo7GtZa5AygothfmzApPvr2IeOjDQdTiKnp8u0opyrs
+	BohPXxEoJSpk/Bv2TpMrhwrFmDUiSuPJV2TSOzAE0UBvYqDwSPP8hLs9YzVxUR7cq2x
+	MbGarP0PZA==
 
-On Sat,  4 Jan 2025 10:29:45 -0500 Benjamin Coddington wrote:
-> We've noticed that NFS can hang when using RPC over TLS on an unstable
-> connection, and investigation shows that the RPC layer is stuck in a tight
-> loop attempting to transmit, but forever getting -EBADMSG back from the
-> underlying network.  The loop begins when tcp_sendmsg_locked() returns
-> -EPIPE to tls_tx_records(), but that error is converted to -EBADMSG when
-> calling the socket's error reporting handler.
-> 
-> Instead of converting errors from tcp_sendmsg_locked(), let's pass them
-> along in this path.  The RPC layer handles -EPIPE by reconnecting the
-> transport, which prevents the endless attempts to transmit on a broken
-> connection.
+From: Benjamin Szőke <egyszeregy@freemail.hu>
 
-LGTM, only question in my mind is whether we should send this to stable.
-Any preference?
+Merge xt_*.h, ipt_*.h and ip6t_*.h header files, which has
+same upper and lowercase name format.
+
+Display information about deprecated xt_*.h, ipt_*.h files
+at compile time. Recommended to use header files with
+lowercase name format in the future.
+
+Benjamin Szőke (10):
+  netfilter: x_tables: Merge xt_DSCP.h to xt_dscp.h
+  netfilter: x_tables: Merge xt_RATEEST.h to xt_rateest.h
+  netfilter: x_tables: Merge xt_TCPMSS.h to xt_tcpmss.h
+  netfilter: x_tables: Use consistent header guard
+  netfilter: iptables: Merge ipt_ECN.h to ipt_ecn.h
+  netfilter: iptables: Merge ipt_TTL.h to ipt_ttl.h
+  netfilter: iptables: Merge ip6t_HL.h to ip6t_hl.h
+  netfilter: Adjust code style of xt_*.h, ipt_*.h files.
+  netfilter: Add message pragma for deprecated xt_*.h, ipt_*.h.
+  netfilter: Use merged xt_*.h, ipt_*.h headers.
+
+ include/uapi/linux/netfilter/xt_CONNMARK.h  |  8 +++---
+ include/uapi/linux/netfilter/xt_DSCP.h      | 22 ++--------------
+ include/uapi/linux/netfilter/xt_MARK.h      |  8 +++---
+ include/uapi/linux/netfilter/xt_RATEEST.h   | 12 ++-------
+ include/uapi/linux/netfilter/xt_TCPMSS.h    | 14 ++++------
+ include/uapi/linux/netfilter/xt_connmark.h  |  7 +++--
+ include/uapi/linux/netfilter/xt_dscp.h      | 26 +++++++++++++-----
+ include/uapi/linux/netfilter/xt_mark.h      |  6 ++---
+ include/uapi/linux/netfilter/xt_rateest.h   | 19 ++++++++++----
+ include/uapi/linux/netfilter/xt_tcpmss.h    | 16 ++++++++----
+ include/uapi/linux/netfilter_ipv4/ipt_ECN.h | 29 ++-------------------
+ include/uapi/linux/netfilter_ipv4/ipt_TTL.h | 25 ++++--------------
+ include/uapi/linux/netfilter_ipv4/ipt_ecn.h | 26 ++++++++++++++++++
+ include/uapi/linux/netfilter_ipv4/ipt_ttl.h | 24 ++++++++++++-----
+ include/uapi/linux/netfilter_ipv6/ip6t_HL.h | 26 ++++--------------
+ include/uapi/linux/netfilter_ipv6/ip6t_hl.h | 23 +++++++++++-----
+ net/ipv4/netfilter/ipt_ECN.c                |  2 +-
+ net/netfilter/xt_DSCP.c                     |  2 +-
+ net/netfilter/xt_HL.c                       |  4 +--
+ net/netfilter/xt_RATEEST.c                  |  2 +-
+ net/netfilter/xt_TCPMSS.c                   |  2 +-
+ 21 files changed, 148 insertions(+), 155 deletions(-)
+
+-- 
+2.43.5
+
 
