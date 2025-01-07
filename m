@@ -1,143 +1,132 @@
-Return-Path: <netdev+bounces-156042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EFB0A04BD9
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:41:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93310A04BE0
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:42:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03DDE188620D
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:41:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CF521888054
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016B41F63E8;
-	Tue,  7 Jan 2025 21:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDBA1F63F4;
+	Tue,  7 Jan 2025 21:42:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rJKqu2bQ"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="PzE6BqyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from alln-iport-1.cisco.com (alln-iport-1.cisco.com [173.37.142.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725111946B1
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E2D1F669F
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736286090; cv=none; b=Zp0+CgV/Y7sxK4mIkKAtgiPfb6HBNGXjul+iQEPCHiESkdGd8QmRlzmqOTJx/134NfAkNmB6hOBXfYxV4XgLYapb5MZy+cn7FVJ3po0cQI/k99b4FC2LAzuztHKGV7MRZfKX1pEgOWuKvZSlfLUJPbnj2HDhM4yLJxfUVj540jE=
+	t=1736286133; cv=none; b=I4wOtfmB46Sfc4xYp5UXqF6pp6sBkBP6lPUu1gbztaCuDawZZtj1AnuYkvltrThPn72tkJ+so5OhqUdAo5SzQe89AklCxCJF+/3XFVsSzdBY+cYX4DP6f4rcaImImt8QPq35CDWh1McQBp72ZfQ1h4NDvqNLj3ycHvbMvpOMEPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736286090; c=relaxed/simple;
-	bh=lpWKviEZo4bxM8FXJ8znVcvZY1r1EUP8KwYPFjPwLkY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qfv5cuTbfkbWlBTTQ1aEQUPpywI4jwAezc0jXMHYkmI3eUeyY5Ou0UwP5S4e/c6t8mn5hp89RNdsjZhr5BgrZBie8BDKVBGehLyRnPxLolgcgRg/6NlC7UKaGxqGpLKmnBq1gRUSIKYpMgQ90EAAqXYPy12VomdHa6IZCOkLxwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rJKqu2bQ; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-215740b7fb8so39865ad.0
-        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 13:41:29 -0800 (PST)
+	s=arc-20240116; t=1736286133; c=relaxed/simple;
+	bh=DDg4zvG3aylXhey39cXjKIuyk6ivRFZpppNNETtIQEM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HDT6+sZV3KxnKtaM5q/F4zGe0aRli64EOQKPG3kPAK5JoapUoIjDtWNutuoEUOupvPftIBxHZrQD4JNYruQzoQ1YfibHQNejXvWWK9Pu0aJFor7JLSJVw2mcK9Gq18AJTLMWbeAUTdsZZjPU5Tr1tbXaLT9y7Lmmk68g1TZvM+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=PzE6BqyQ; arc=none smtp.client-ip=173.37.142.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736286089; x=1736890889; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=unXEBPo8awHZ2Z1rF9jBBJWiHGlrbX40mqZQQ+A6Pko=;
-        b=rJKqu2bQcea7guTbC2FPbTVj9vl7Z3T9HB6kDwRdZKmW+kRcuM6s+EPqNkETQfNZTC
-         OICOgzg9L7NWOiMGE0AY5AqWgw02vSjz3YNRZJSagIxo/yKFQ0TGDjyEmUTSlc0Gza9A
-         vrcMD4pzlGRLS9tZfp7JxJrx4FZUZwkGFIA4kUJgykw82p0/Y51UrqWLrO9cweULhQOv
-         D7xay0ikT0Y8lbTIcubMdjad84oGj8wEo0Ie56+DWxwXP+j9ZeOw0ZCrCpyUEJSK2Wgv
-         u17tyOkwZ5XrKw8ouzRHbqGurmd4+ecneGnoEeckw2qbTBTO0q3/3cwi4DaiFma57+eY
-         /j2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736286089; x=1736890889;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=unXEBPo8awHZ2Z1rF9jBBJWiHGlrbX40mqZQQ+A6Pko=;
-        b=s5ceDk+aMrN0oiOl+AVdXsz6zRZF9dsyowdF8X1FQhDspBwpOcv1THMTxU+XLsVlYn
-         zA0RCY1qvkSCuPaoijbo+SF8vHZSSj0w9O0vqj61RPvkkPc2ImBC9PhbzuvPFLrSS3KZ
-         ET8irRtBu5Fq1BQFjLG7CV3ganPMh2A+tsTEsvherkVMVp/qMYGi7jnMR7z/c+sDdZ3L
-         05EK3hlwiFn5BkPpUC5itBqcyIhUSLTilEFmQ/+GcInIWcEp17ZLlMpvvVPyGNwNQJeo
-         nEjDuQK5PEZXPbZ1lmtI5OCrIa1PDNa8NUX0HVGYErH+Qch3HBLdaI902176cPvn9cDc
-         nivw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ7/f8eFBEs/QGMf7oiUlDcWd2ivNnBIzpTAIASeowiKwGbSPXqqv7AIpB0I8z6+vhyd7RJUI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLhrRhveAwCWnbKqFaA66exRxXPYB20n7F/8Rcizw6Depx7b4L
-	kionTvDd4Fyh2vLIIoz/+uyg2XnaWSFjyW0/Q47C3nQQE/F7asxHAZ2p9Rt/lw==
-X-Gm-Gg: ASbGncuFk+i86D3LV0Dp0V455b76LSWmy0d5H6lqbyzeCt6phNZ3Mz0UZH1KXlshYMY
-	VmNnfU0wcPAh69QvjSWb7aM9Yu1iSkzpAGs/FkE13gNdYyRRPxRVZ3pXq+N3no8bi8eksomxYOu
-	sSTC25pTK7AyblICpHgSXiHQ5zOD4IPLx2K9u72q4BDenYTWXK5e4ka3SkkdYUTXVuNG4UM7JuK
-	ozwHkKP3t0Qm5XL66jrSld9EExDi7rW5/PaVaICFoCzfzmq5IwuKcU73lN0PV9T2lKfQtBsH/dP
-	4bQ7efqJhcO7Oc045tw=
-X-Google-Smtp-Source: AGHT+IG3hEhfXeKWewYxbqr5NVyNbPqv0I027EJ/i4H/5/AUmYmTqt4fR8mqPv9GpwTbRhwaYzCZDw==
-X-Received: by 2002:a17:902:fa4f:b0:20c:f40e:6ec3 with SMTP id d9443c01a7336-21a84189e0emr559145ad.22.1736286088554;
-        Tue, 07 Jan 2025 13:41:28 -0800 (PST)
-Received: from google.com (57.145.233.35.bc.googleusercontent.com. [35.233.145.57])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc963103sm316291215ad.52.2025.01.07.13.41.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 13:41:28 -0800 (PST)
-Date: Tue, 7 Jan 2025 21:41:24 +0000
-From: Carlos Llamas <cmllamas@google.com>
-To: Li Li <dualli@chromium.org>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	donald.hunter@gmail.com, gregkh@linuxfoundation.org,
-	arve@android.com, tkjos@android.com, maco@android.com,
-	joel@joelfernandes.org, brauner@kernel.org, surenb@google.com,
-	arnd@arndb.de, masahiroy@kernel.org, bagasdotme@gmail.com,
-	horms@kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	hridya@google.com, smoreland@google.com, kernel-team@android.com
-Subject: Re: [PATCH v11 2/2] binder: report txn errors via generic netlink
-Message-ID: <Z32fhN6yq673YwmO@google.com>
-References: <20241218203740.4081865-1-dualli@chromium.org>
- <20241218203740.4081865-3-dualli@chromium.org>
- <Z32cpF4tkP5hUbgv@google.com>
+  d=cisco.com; i=@cisco.com; l=610; q=dns/txt; s=iport;
+  t=1736286131; x=1737495731;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LQhSOnvivb8ZgnWSVZrg7tGm59OVHpdEwuvdiTP0918=;
+  b=PzE6BqyQ3VsZyc6KPU4PMBn/oWYyvjCr5FDOJYAi/TTPkFjvttPl3Idd
+   kikr/1yAlYauDPyj/Y7gqB2yuhz+Psrd20PGtSiqmXTY4oxfwWCIAt+E/
+   LJg/ojrWpleW28S8OwRFALdeDMXBz91VbCJHnGehI0V3T3J8PgojCljP4
+   E=;
+X-CSE-ConnectionGUID: p+GipP4HSVeu85Uk1OtBGQ==
+X-CSE-MsgGUID: 66zx7GOtT1ecaY3HkyfklA==
+X-IPAS-Result: =?us-ascii?q?A0AjAQCVnn1nj48QJK1aHgEBCxIMgggLhBpDSI1Rpw2BJ?=
+ =?us-ascii?q?QNWDwEBAQ9EBAEBhQeKdgImNAkOAQIEAQEBAQMCAwEBAQEBAQEBAQEBCwEBB?=
+ =?us-ascii?q?QEBAQIBBwUUAQEBAQEBOQUOO4YIhl02AUaBDDISgwGCZQOxQoIsgQHeM4Ftg?=
+ =?us-ascii?q?UiFa4dfcIR3JxuBSUSEDm+FEIV3BIIzgUiDbp4JSIEhA1ksAVUTDQoLBwWBO?=
+ =?us-ascii?q?ToDIgsLDAsUHBUCFR8SBhEEbkQ3gkZpSzcCDQI1gh4kWIIrhFyER4RYgktVg?=
+ =?us-ascii?q?kiCF3yBHYMWQAMLGA1IESw3Bg4bBj5uB5p1PINvgQ58gRmTfJIfoQOEJYFjn?=
+ =?us-ascii?q?2MaM4NxpmKYfCKkJYRmgWc6gVszGggbFYMiUhkPjjq5MCUyPAIHCwEBAwmRV?=
+ =?us-ascii?q?QEB?=
+IronPort-Data: A9a23:8WNUMamWLmSsv9p2x9aiBO3o5gxbJkRdPkR7XQ2eYbSJt1+Wr1Gzt
+ xJJCjqGbqmPYDPze9sgPd6/8xlTucKDm4cwGVdp/CozFVtH+JHPbTi7wugcHM8zwunrFh8PA
+ xA2M4GYRCwMZiaC4E/rav658CEUOZigHtLUEPTDNj16WThqQSIgjQMLs+Mii+aEu/Dha++2k
+ Y20+pe31GONgWYubzpNs/3b8nuDgdyr0N8mlg1mDRx0lAe2e0k9VPo3Oay3Jn3kdYhYdsbSb
+ /rD1ryw4lTC9B4rDN6/+p6jGqHdauePVeQmoiM+t5mK2nCulARrukoIHKZ0hXNsttm8t4sZJ
+ OOhGnCHYVxB0qXkwIzxWvTDes10FfUuFLTveRBTvSEPpqHLWyOE/hlgMK05FZVb1edvOT1uz
+ sIVNWBQUxPaoP6c74vuH4GAhux7RCXqFIobvnclyXTSCuwrBMidBa7L/tRfmjw3g6iiH96HO
+ JFfMmQpNUqGOkEUUrsUIMpWcOOAhH7/dTFRrF+9rqss6G+Vxwt0uFToGIaMJ4bRGJkFxC50o
+ EqYoXbpXT49KODGxDGMwymMhf7BnifSDdd6+LqQraMy3wbJmQT/EiY+WVKlrPyRhkegVtdbL
+ EIIvCwjscAa+UC2S9DvUgGQr3mDsRoRHdFXFoUS6xyHw4LX7hyfC2xCSSROAPQvssMsSCNp0
+ FKVk973LThytrvTQnL13q+dpz60OAAPIGMCbDNCRgwAi/HlrZ0/gwznUNluCui2g8fzFDW2x
+ CqFxBXSnJ0aicoNkqH+9lfdjnf0+N7CTxU+4UPcWWfNAh5FiJCNf8+H6EDjsdZ7EouEHgS8v
+ yEjh+Kx1bVbZX2SrxClTOIIFbCvwv+KNjzAnFJid6XNERzzohZPmqgOvFlDyFdVDyoSRdP+j
+ KbuVeJtCH17YSPCgUxfOt7Z5yEWIU7IToyNuhf8NYEmX3SJXFXblByCnGbJt4wXrGAikLskJ
+ bCQetu2AHARBMxPlWXtGb5NgeRznn9umQs/oKwXKTz6j9Jyg1bIGN843KemNLtRAF6s+V+Mq
+ ogDZ6NmNT0AALWiOEE7DrL/3XhRcCBkXsqpwyCmXuWCOQFhUHowEOPcxKhpeopu2cxoehTgo
+ BmAtrtj4AOn3xXvcFzSAlg6Me+Hdcgk9xoTY3dzVWtELlB/Ou5DGo9DLMNvJdHKNYVLkZZJc
+ hXyU5zZXaoXFGiWpVzwr/DV9eRfSfhivirWVwLNXdT1V8cIq9DhkjM8QjbSyQ==
+IronPort-HdrOrdr: A9a23:PVQnGqE8/QvzFkHupLqE48eALOsnbusQ8zAXPo5KJiC9Ffbo8v
+ xG88576faZslsssRIb6LK90de7IU80nKQdieJ6AV7IZmfbUQWTQL2KlbGSoAEJ30bFh4lgPW
+ AKSdkbNOHN
+X-Talos-CUID: 9a23:fOr5n27Db/f+9XT++tss7A07G9gdLl3m8nrNcxKFCj9OVJe6cArF
+X-Talos-MUID: 9a23:fqnuAQT/j1SerFLERXSy2iNya+hP/5j3BUsEoM4muNiKNihZbmI=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.12,296,1728950400"; 
+   d="scan'208";a="415235482"
+Received: from alln-l-core-06.cisco.com ([173.36.16.143])
+  by alln-iport-1.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 07 Jan 2025 21:42:05 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by alln-l-core-06.cisco.com (Postfix) with ESMTP id 5992E18000114;
+	Tue,  7 Jan 2025 21:42:05 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id 2D1DC20F2003; Tue,  7 Jan 2025 13:42:05 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: benve@cisco.com,
+	satishkh@cisco.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: John Daley <johndale@cisco.com>
+Subject: [PATCH net-next v2 0/3] enic: Set link speed only after link up
+Date: Tue,  7 Jan 2025 13:41:56 -0800
+Message-Id: <20250107214159.18807-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z32cpF4tkP5hUbgv@google.com>
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: alln-l-core-06.cisco.com
 
-On Tue, Jan 07, 2025 at 09:29:08PM +0000, Carlos Llamas wrote:
-> On Wed, Dec 18, 2024 at 12:37:40PM -0800, Li Li wrote:
-> > From: Li Li <dualli@google.com>
-> 
-> > @@ -6137,6 +6264,11 @@ static int binder_release(struct inode *nodp, struct file *filp)
-> >  
-> >  	binder_defer_work(proc, BINDER_DEFERRED_RELEASE);
-> >  
-> > +	if (proc->pid == proc->context->report_portid) {
-> > +		proc->context->report_portid = 0;
-> > +		proc->context->report_flags = 0;
-> 
-> Isn't ->portid the pid from the netlink report manager? How is this ever
-> going to match a certain proc->pid here? Is this manager supposed to
-> _also_ open a regular binder fd?
-> 
-> It seems we are tying the cleanup of the netlink interface to the exit
-> of the regular binder device, correct? This seems unfortunate as using
-> the netlink interface should be independent.
-> 
-> I was playing around with this patch with my own PoC and now I'm stuck:
->   root@debian:~# ./binder-netlink
->   ./binder-netlink: nlmsgerr No permission to set flags from 1301: Unknown error -1
-> 
-> Is there a different way to reset the protid?
-> 
+This is a scaled down patch set that only contains the independent
+link speed fixes which was part of the patch set titled:
+    enic: Use Page Pool API for receiving packets
 
-Furthermore, this seems to be a problem when the report manager exits
-without a binder instance, we still think the report is enabled:
+Signed-off-by: John Daley <johndale@cisco.com>
 
-[  202.821346] binder: Failed to send binder netlink message to 597: -111
-[  202.821421] binder: Failed to send binder netlink message to 597: -111
-[  202.821304] binder: Failed to send binder netlink message to 597: -111
-[  202.821306] binder: Failed to send binder netlink message to 597: -111
-[  202.821387] binder: Failed to send binder netlink message to 597: -111
-[  202.821464] binder: Failed to send binder netlink message to 597: -111
-[  202.821467] binder: Failed to send binder netlink message to 597: -111
-[  202.821344] binder: Failed to send binder netlink message to 597: -111
-[  202.822513] binder: Failed to send binder netlink message to 597: -111
-[  202.822152] binder: Failed to send binder netlink message to 597: -111
-[  202.822683] binder: Failed to send binder netlink message to 597: -111
-[  202.822629] binder: Failed to send binder netlink message to 597: -111
+---
+
+Changes in v2:
+- made typo comment fix be it's own patch
+
+John Daley (3):
+  enic: Move RX coalescing set function
+  enic: Obtain the Link speed only after the link comes up
+  enic: Fix typo in comment in table indexed by link speed
+
+ drivers/net/ethernet/cisco/enic/enic_main.c | 64 ++++++++++-----------
+ 1 file changed, 32 insertions(+), 32 deletions(-)
+
+-- 
+2.35.2
+
 
