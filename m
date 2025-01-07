@@ -1,153 +1,158 @@
-Return-Path: <netdev+bounces-155745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55914A038F4
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 08:43:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A86DA0391A
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 08:55:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B53C41882EBB
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 07:43:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA77F18868DC
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 07:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464C71990D8;
-	Tue,  7 Jan 2025 07:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4F91DDC06;
+	Tue,  7 Jan 2025 07:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hlVuP2GJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75462192598
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 07:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C72137C37;
+	Tue,  7 Jan 2025 07:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736235780; cv=none; b=aeqqdN8dRSNhZ+Uuvz4NW7Ba2Fbl+bBdnxIDzWZo0Te4AUnSttMIPHtVx7LfHcwVdHxhwCSGmDwToRg2UTZM2PX+AVwWaUkd4GvglO2+ZDzd+F5ZwBpplNqZcVLMcaCufaf6VrkSWMHlwh3O9CLTGx91jm/j9QqZ4yWClgsSFdc=
+	t=1736236511; cv=none; b=L3L6UgFE7SZ95rSlj3/+H9lkyzHyzKuU+dyBMcEorgfeRRMVTx9SXi41T3XRG7UmBaiJWR8nTYebgu9triVGi86zzn9951jbXphgo0qT2Hc0Q0IGYxiuFvK+m4TJIPa7tYwTfwpkN4D6oUnfBWrgkGBZ9MQ5rc40T/F7Rp5RfA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736235780; c=relaxed/simple;
-	bh=KV3ZGTzDNn2UZB61kQKhIxTLlaRqgcTPREFnTjHx+fQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tdpAAqbvoYrbFzlA7IFOCmqfuiWX9J+YL/oq9eftCiWBNAzDcGotOH2+wnDh7YihaZT8oFRFD9H0P2sN5JYIoTO5suEwtuJBAOWxe5bLDAbdFN8RLPLFYh15wrKArzrFijH2nFALDZs8BMqeJxlZcwPaiSLa4Alb2+XzRcqagls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tV4EN-0006ci-Lq; Tue, 07 Jan 2025 08:42:27 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tV4EL-007Inr-0i;
-	Tue, 07 Jan 2025 08:42:26 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tV4EL-009SWi-2q;
-	Tue, 07 Jan 2025 08:42:25 +0100
-Date: Tue, 7 Jan 2025 08:42:25 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1736236511; c=relaxed/simple;
+	bh=DkQsxBYXjrXTGNuz03s9MA1m/PgQOj8rOW7OpyJup+I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=L4YDjz0t0M/uoJiVI3q0dbBFvxg6hlV+uptX9jKZDctMY8WXRYs0DNA9jMKaks+p0x6Dsw6d0LaMquPAMzcfJ+FHKTxQUJg1FFVudvZh7XU8VFM//sdoUSyl6WGVvq6B4j9f39h9R0WIOcDUndi4vBRceAkAXMnbmlJ0DWdAA08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hlVuP2GJ; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-216728b1836so201915395ad.0;
+        Mon, 06 Jan 2025 23:55:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736236509; x=1736841309; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fMRSb4dnSsNjNB0J5PZBlf9Y068CCmYN8ovILPTjdbA=;
+        b=hlVuP2GJiZh0mOI+daZgr/WOvYKz7GR9VZCiC+PZCIEo0db3BYOKyt2y0Xsrd5mZi8
+         LLDaiy6ds9UMNwxaBsAJoGwYM1i229cBl8L+2MR6lcvtG3HvPKxo5bCrMZ737RCvFlQf
+         ASgSp4eIe3GeAicmGcFMl8TCOVmTn0I4a4CniL3NV5WoGH/O0wDnobh2GRG5QCMWAChC
+         x+wy++CndVCBE7kUREpwMWsSJ2YXZbu2lRznBtgmEFciU4REkj0hpiZeoSHnsa82adV/
+         342HRB8Cc/00gc6CREYWBq+B6l6hH5DR9fo0+TFtGlWvEWf8RRg5ZJ7EZxTuI7sMPLL4
+         UBUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736236509; x=1736841309;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fMRSb4dnSsNjNB0J5PZBlf9Y068CCmYN8ovILPTjdbA=;
+        b=Lmra6Cs2jLyOP3bZIljpEMnbjgvb/cStvdDJ6Cnq4bnqyszQ1YBkZYy0m+QGiMU5e/
+         xJg8fRQtC2iO9sJB3ktlBKFsIewFa0tTEb/JyPsf7xD2RZb7NZRkiPfdAyX1HdSk3/bO
+         btPaaB15Tpswyl1bC3jW/XdiDoy3hpmv+OG0Tmxfj2P8PKWLmbqxCBcn6DeMCwMzwWIs
+         57fIBeIp1r1QQHmmsQ49TAolxXaxGAj9m1kYXUb2nBSgFrryNK1cdAgeKmWJqCd8vt0J
+         NcofqQdLzUo/evoZ7yLReiHjL133UfhhvZJP0wvowVrcFfwCtaglIoUkj9HyYARqE0Aw
+         Q5+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX1Pfkl6pWzRB4x1MburtrnKXDy/rpeVeRZQ/CVMirJVbKvra2UPsRoduGZOQFYZsidKav3SlrlP2D4YKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzz3gmOC3CenZbrUoRctrtsNC+v0wL2U2Io3QlGV7cx99TyHqMw
+	wzpT9C4a+zvN0oHvHnL3MMDqfAIZgZi/qjRwM2forg10J192HXysRMfwcA==
+X-Gm-Gg: ASbGncsRGCWbr/DceYkYJ19sSTUpjcg7hZggek/d/P11kpFcQggUeK0Z4jqzF9B08ky
+	D+DVH22GTPZCH5py/WZeSyCHwXzXQ5q15UXa8IcXaXKeM/cXpS1iJR1rF1c+ZQB0Dz3A+fEl/Ko
+	vWh0lpid8va6+vfLeE37O/Tg1xuwgOhWsVoBtdQcb/ymH9jKhZXmaPtEo7venPDJgYe9XP3sNGq
+	WSDaB/+EUlLle5xOlnI/WxY+Y52OCXJzRFlmSMmCb0AzQNqM7dSCqaxfxM2qM+yQttpQQ==
+X-Google-Smtp-Source: AGHT+IHTiLKTTvGlPvf762xL6WD6qZDn+dCSTlEUSBZ2KuE+CZ/5XDACbnpOBQG5E+loF0NezMfxjw==
+X-Received: by 2002:a17:902:db11:b0:216:282d:c69b with SMTP id d9443c01a7336-219e6f4312dmr754512945ad.50.1736236508633;
+        Mon, 06 Jan 2025 23:55:08 -0800 (PST)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-219dc9f7e49sm304468635ad.217.2025.01.06.23.55.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jan 2025 23:55:08 -0800 (PST)
+From: Furong Xu <0x1207@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
-	Woojung Huh <Woojung.Huh@microchip.com>,
-	Microchip Linux Driver Support <UNGLinuxDriver@microchip.com>,
-	Tim Harvey <tharvey@gateworks.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] net: dsa: microchip: remove
- MICREL_NO_EEE workaround
-Message-ID: <Z3za4bKAJWh3HO9u@pengutronix.de>
-References: <79f347c6-ac14-475a-8c93-f1a4efc3e15b@gmail.com>
- <329108a3-12d6-4ce4-9b28-b59f107120ba@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v2] net: stmmac: Unexport stmmac_rx_offset() from stmmac.h
+Date: Tue,  7 Jan 2025 15:54:48 +0800
+Message-Id: <20250107075448.4039925-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <329108a3-12d6-4ce4-9b28-b59f107120ba@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 06, 2025 at 02:23:36PM +0100, Heiner Kallweit wrote:
-> The integrated PHY's on all these switch types have the same PHY ID.
-> So we can assume that the issue is related to the PHY type, not the
-> switch type. After having disabled EEE for this PHY type, we can remove
-> the workaround code here.
-> 
-> Note: On the fast ethernet models listed here the integrated PHY has
->       PHY ID 0x00221550, which is handled by PHY driver
->       "Micrel KSZ87XX Switch". This PHY driver doesn't handle flag
->       MICREL_NO_EEE, therefore setting the flag for these models
->       results in a no-op.
+stmmac_rx_offset() is referenced in stmmac_main.c only,
+let's move it to stmmac_main.c.
 
-Yes, it feels like no one is using KSZ87XX switches with the kernel DSA
-driver.
+Drop the inline keyword by the way, it is better to let the compiler
+to decide.
 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/dsa/microchip/ksz_common.c | 25 -------------------------
->  include/linux/micrel_phy.h             |  1 -
->  2 files changed, 26 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index e3512e324..4871bb1fc 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -3008,31 +3008,6 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
->  		if (!port)
->  			return MICREL_KSZ8_P1_ERRATA;
->  		break;
-> -	case KSZ8567_CHIP_ID:
-> -		/* KSZ8567R Errata DS80000752C Module 4 */
-> -	case KSZ8765_CHIP_ID:
-> -	case KSZ8794_CHIP_ID:
-> -	case KSZ8795_CHIP_ID:
-> -		/* KSZ879x/KSZ877x/KSZ876x Errata DS80000687C Module 2 */
-> -	case KSZ9477_CHIP_ID:
-> -		/* KSZ9477S Errata DS80000754A Module 4 */
-> -	case KSZ9567_CHIP_ID:
-> -		/* KSZ9567S Errata DS80000756A Module 4 */
-> -	case KSZ9896_CHIP_ID:
-> -		/* KSZ9896C Errata DS80000757A Module 3 */
-> -	case KSZ9897_CHIP_ID:
-> -	case LAN9646_CHIP_ID:
-> -		/* KSZ9897R Errata DS80000758C Module 4 */
-> -		/* Energy Efficient Ethernet (EEE) feature select must be manually disabled
-> -		 *   The EEE feature is enabled by default, but it is not fully
-> -		 *   operational. It must be manually disabled through register
-> -		 *   controls. If not disabled, the PHY ports can auto-negotiate
-> -		 *   to enable EEE, and this feature can cause link drops when
-> -		 *   linked to another device supporting EEE.
-> -		 *
-> -		 * The same item appears in the errata for all switches above.
-> -		 */
+Compile tested only.
+No functional change intended.
 
-I have two problems with current patch set:
-- dropped documentation, not all switches are officially broken, so
-  keeping it documented is important.
-- not all KSZ9xxx based switches are officially broken. All 3 port
-  switches are not broken but still match against the KSZ9477 PHY
-  driver:
-  KSZ8563_CHIP_ID - 0x00221631
-  KSZ9563_CHIP_ID - 0x00221631
-  KSZ9893_CHIP_ID - 0x00221631
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+V1 -> V2: Drop the inline keyword (Andrew Lunn)
+V1: https://lore.kernel.org/r/20250106062845.3943846-1-0x1207@gmail.com
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h      | 8 --------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-Best Regards,
-Oleksij
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index b8d631e559c0..548b28fed9b6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -416,14 +416,6 @@ static inline bool stmmac_xdp_is_enabled(struct stmmac_priv *priv)
+ 	return !!priv->xdp_prog;
+ }
+ 
+-static inline unsigned int stmmac_rx_offset(struct stmmac_priv *priv)
+-{
+-	if (stmmac_xdp_is_enabled(priv))
+-		return XDP_PACKET_HEADROOM;
+-
+-	return 0;
+-}
+-
+ void stmmac_disable_rx_queue(struct stmmac_priv *priv, u32 queue);
+ void stmmac_enable_rx_queue(struct stmmac_priv *priv, u32 queue);
+ void stmmac_disable_tx_queue(struct stmmac_priv *priv, u32 queue);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 2f518ec845ec..24cc39d8edbd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1315,6 +1315,14 @@ static void stmmac_display_rings(struct stmmac_priv *priv,
+ 	stmmac_display_tx_rings(priv, dma_conf);
+ }
+ 
++static unsigned int stmmac_rx_offset(struct stmmac_priv *priv)
++{
++	if (stmmac_xdp_is_enabled(priv))
++		return XDP_PACKET_HEADROOM;
++
++	return 0;
++}
++
+ static int stmmac_set_bfsize(int mtu, int bufsize)
+ {
+ 	int ret = bufsize;
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.34.1
+
 
