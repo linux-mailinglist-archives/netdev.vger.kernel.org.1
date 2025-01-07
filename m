@@ -1,150 +1,125 @@
-Return-Path: <netdev+bounces-155822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 970ADA03EEC
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:16:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B0E6A03F1A
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:29:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C37A57A1BCD
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:16:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42729164CB9
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98E91E570E;
-	Tue,  7 Jan 2025 12:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698541E9B39;
+	Tue,  7 Jan 2025 12:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SUk3bIPF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/2FrfWE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A494A1E0DAF;
-	Tue,  7 Jan 2025 12:16:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEF51E0DD1
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 12:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736252191; cv=none; b=c5GRzdks5HQyesQmgC5pk7MPaj98idmogcGK25ggLdJ1mmVnckb8rM6IHJcQEE4huBvVCM2USM9TBSPuKHrun87eAFWiB4Ayc5YqK/h/Xh4QJPMbr3+D8erhtmWGaLmxILgc/Nxk3c8UsLuAjSKQSuMm/13Yo/nxLkgn2WPALko=
+	t=1736252942; cv=none; b=l57PzPZ4koF6INJtFEsToCC9Vonex2if+X/tfcpD16dR0b8LvcqmLo9cL187usnQdl2KUY2gY20AsxqHHW+XyLYC/B4msaj7dnEJKoSJWYS+QYV5gMg/qamjFWsXzR6P0qhHkjVa9pMsYwXgiAIVZ3HSMkXF/VHPEAtvvXFuj/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736252191; c=relaxed/simple;
-	bh=Bd/Mz1ZsFzuVF1GvARZd4apNGJyzPz/32LoonyXU8mU=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O8ykbg0XWdT2SmlqfUhM4xq2QHfrHgcNmWmpOmCC3H4w6YxeIrtXbNfJjPaRYJD7iLAexgO9Lebb3jTp3u1MyDGnv/7crpibQL95HHTSNZrW0N5bjK1eTEqVaNM3EIjiFW5nWTPoJzyu/ahHfpySWNkYrMhaNybaDAwyBzmcrko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SUk3bIPF; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aa66ead88b3so537755466b.0;
-        Tue, 07 Jan 2025 04:16:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736252188; x=1736856988; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aMDvUN0bn8LvCq/dO2IXJIhY7/MF43jvaDflMADuggM=;
-        b=SUk3bIPFC1SaE1QUqd9odmsy01lSKffxr1yFkx8KIHtM/xH4vihjc/3fZg9F4OnKdF
-         0HaW5vuYVu3lyluiug0oNbGHj+3g/79NUAtE0r/bKbfcarWcSBa0BHXFRvPMun2ZclJs
-         0jLf00lfmFY0xgbZJ92/oWzvcqXyXV5brPPJWNOfrRV1vAyl03zx9LGX2+aPtb2IGKpA
-         ZAtXKPValXHPnRYiXptI71cs6jH67welndFlhDaavqqecuRzJQBa2njVac7UmGE9hrOw
-         mdOLSJAvzppr7NVAw6xWq5qNNAQxjyAUqXYkP2tqpk4o4CBGpFzRTn1Eo9pz1Lf6ujjz
-         UpWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736252188; x=1736856988;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aMDvUN0bn8LvCq/dO2IXJIhY7/MF43jvaDflMADuggM=;
-        b=V/YcoBWl+rKjMLVrVW+2tydSEJUKZiEvT/f4mrE4sztWfec1a3rhLpBpaU4GLiv1I7
-         zw6vvxZJlPi6PKo79IWjrJdyLQaVpsyLx6oYo/GywKlVE2OwZsZdegpKZRAdpQYuT2X/
-         4btBwjKA2hnMh6/JJ+dP7Pj1+p1ZsZtJTAnVcKnSVYV3E6QbyjhzrX2K6haOZm2Si8Q9
-         yZ5CCBPKlbF8aFJU82XqaV1DBQavrlvfVrd+XDvOioR6inm5Ef9JtMXtuUGOIDo3HxvC
-         CnZXemq8jK6FnBwsKQhZ92m1SIU0Wz1AV7Fk3uQmZWkLlHVl9b/NY+LX8EN8pOU0JzmG
-         ok1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWrCXncCQFPcv7j0m4N/ETQ/1pWVNO7Yq7K2mhZn52ybwMNywz51XvhnyBwDT4uQByHmek=@vger.kernel.org, AJvYcCXGmGxo54bJhNrEnlfEW2rvFhZcv4Z3CA10FJfDUimpZJLDmD5EPrK4fiQk3jvFTO7O6uIsvKbw@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwC4Tn1xZWInstbli/7aoprHiC6vaxjauNWDpLHt2+K5vgbCoJ
-	btzsnGdqVgERhD0bEH536e04ifkGpLj+VthCudOlcxT/XWuOnml7
-X-Gm-Gg: ASbGncvQPT1MhHlMhf4LIX3JQYSBVU7qedSz4i6kTBfd9xfUIjK85khs0FZq5FSt2CO
-	9FuZ5ZFWJ6HxCF4+hMqrpUjz2Md2cEEyukjlGLUbJBjaNtthwg18LSwDp1IbpmBBSF/b0vrhxDZ
-	P3vEDEwkCHIp6iasUvfHkuPVZPWPlhnP8RJPhKVy4JhBxv8NmohLSNE2hfNelWkKBPiLXT2VRm3
-	MumUInMz7R/KZZvrnHnaReb7uSeSICYKpxFfbnPEH0=
-X-Google-Smtp-Source: AGHT+IH3soO0JU9jw+R+FlinzZrtuhTOEKZT6ZmnfxMnpvjo3BePGcI5v1frWA4eaJleTMxhY0wEkg==
-X-Received: by 2002:a17:907:9412:b0:aaf:c19b:728b with SMTP id a640c23a62f3a-aafc19b72c9mr1194727766b.51.1736252187612;
-        Tue, 07 Jan 2025 04:16:27 -0800 (PST)
-Received: from krava ([213.175.46.84])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aaf5d1b602bsm1037318766b.178.2025.01.07.04.16.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 04:16:27 -0800 (PST)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Tue, 7 Jan 2025 13:16:25 +0100
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>, Eddy Z <eddyz87@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Eric Dumazet <edumazet@google.com>,
-	bpf <bpf@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	Viktor Malik <vmalik@redhat.com>
-Subject: Re: [RFC PATCH bpf-next 1/2] libbpf: Add support for dynamic
- tracepoint
-Message-ID: <Z30bGYeyGQL2UpnX@krava>
-References: <20250105124403.991-1-laoar.shao@gmail.com>
- <20250105124403.991-2-laoar.shao@gmail.com>
- <CAADnVQ+ga1ir9XCDxPiU_-eYzKHTQsiod9Sz4_o3XeqGW2rq4A@mail.gmail.com>
- <CALOAHbD+w3niwBojP=-81Wrqj1V9ppLgTfuZjb=AxXjx51MGRA@mail.gmail.com>
+	s=arc-20240116; t=1736252942; c=relaxed/simple;
+	bh=Rwx2AMNZS3z9pA81sWKOGZIvqSuHtdeRl2a5ymi0Rqg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VA+5C3C4bj/vntWgDOc8LrKiWQviotVeFIYf9G8G5Am7O1Uzgl/HCuayiPwAUy0l4u+sIgGM0s5Po0vJuRQVFaNgpHddKm9MEqQvIc2G1ASAWb20QQ3Ycs+bB+ZOh4wpFz3E6eyiF2f1PDOYIjmTU+Wzlzf6Ifq0PwSSaThm+oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N/2FrfWE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736252939;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y9JESRW03B/cQUSo9+G3m7F0GBoDry0YwUnhEcSHFro=;
+	b=N/2FrfWET4u/2Y7USok48thtXQjjAoZMF5FStgAyWVSY2vhOmbFZR/1b9SL1UCwi/7jE7I
+	JcxZZtfL6FNWOXcZyj1Z8FiueuDAqRKk1paDjTg1mX+/YIe/S4IYCrXgVcYXtXxWfyhc2O
+	RivGAsqM2g6Z6mm4cfQ9RoZ09wIVrP0=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-636-V1ow7iy3OaGmKzbMa7QkLA-1; Tue,
+ 07 Jan 2025 07:28:55 -0500
+X-MC-Unique: V1ow7iy3OaGmKzbMa7QkLA-1
+X-Mimecast-MFC-AGG-ID: V1ow7iy3OaGmKzbMa7QkLA
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DFA2019560A2;
+	Tue,  7 Jan 2025 12:28:53 +0000 (UTC)
+Received: from [192.168.37.1] (unknown [10.22.76.8])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D0E01955F43;
+	Tue,  7 Jan 2025 12:28:51 +0000 (UTC)
+From: Benjamin Coddington <bcodding@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-nfs@vger.kernel.org,
+ Vakul Garg <vakul.garg@nxp.com>
+Subject: Re: [PATCH] tls: Fix tls_sw_sendmsg error handling
+Date: Tue, 07 Jan 2025 07:28:46 -0500
+Message-ID: <27F02B22-1673-4833-B83E-D2BA5E793004@redhat.com>
+In-Reply-To: <20250106183633.0ddb7cb0@kernel.org>
+References: <9594185559881679d81f071b181a10eb07cd079f.1736004079.git.bcodding@redhat.com>
+ <20250106183633.0ddb7cb0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALOAHbD+w3niwBojP=-81Wrqj1V9ppLgTfuZjb=AxXjx51MGRA@mail.gmail.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Mon, Jan 06, 2025 at 10:32:15AM +0800, Yafang Shao wrote:
-> On Mon, Jan 6, 2025 at 8:16 AM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Sun, Jan 5, 2025 at 4:44 AM Yafang Shao <laoar.shao@gmail.com> wrote:
-> > >
-> > > Dynamic tracepoints can be created using debugfs. For example:
-> > >
-> > >    echo 'p:myprobe kernel_clone args' >> /sys/kernel/debug/tracing/kprobe_events
-> > >
-> > > This command creates a new tracepoint under debugfs:
-> > >
-> > >   $ ls /sys/kernel/debug/tracing/events/kprobes/myprobe/
-> > >   enable  filter  format  hist  id  trigger
-> > >
-> > > Although this dynamic tracepoint appears as a tracepoint, it is internally
-> > > implemented as a kprobe. However, it must be attached as a tracepoint to
-> > > function correctly in certain contexts.
-> >
-> > Nack.
-> > There are multiple mechanisms to create kprobe/tp via text interfaces.
-> > We're not going to mix them with the programmatic libbpf api.
-> 
-> It appears that bpftrace still lacks support for adding a kprobe/tp
-> and then attaching to it directly. Is that correct?
-> What do you think about introducing this mechanism into bpftrace? With
-> such a feature, we could easily attach to inlined kernel functions
-> using bpftrace.
+On 6 Jan 2025, at 21:36, Jakub Kicinski wrote:
 
-so with the 'echo .. > kprobe_events' you create kprobe which will be
-exported through tracefs together with other tracepoints and bpftrace
-sees it as another tracepoint.. but it's a kprobe :-\
+> On Sat,  4 Jan 2025 10:29:45 -0500 Benjamin Coddington wrote:
+>> We've noticed that NFS can hang when using RPC over TLS on an unstable=
 
-how about we add support for kprobe section like SEC("kprobe/SUBSYSTEM/PROBE"),
-so in your case above it'd be SEC("kprobe/kprobes/myprobe")
+>> connection, and investigation shows that the RPC layer is stuck in a t=
+ight
+>> loop attempting to transmit, but forever getting -EBADMSG back from th=
+e
+>> underlying network.  The loop begins when tcp_sendmsg_locked() returns=
 
-then attach_kprobe would parse that out and use new new probe_attach_mode
-for bpf_program__attach_kprobe_opts to attach it correctly
+>> -EPIPE to tls_tx_records(), but that error is converted to -EBADMSG wh=
+en
+>> calling the socket's error reporting handler.
+>>
+>> Instead of converting errors from tcp_sendmsg_locked(), let's pass the=
+m
+>> along in this path.  The RPC layer handles -EPIPE by reconnecting the
+>> transport, which prevents the endless attempts to transmit on a broken=
 
-cc-ing Viktor
+>> connection.
+>
+> LGTM, only question in my mind is whether we should send this to stable=
+=2E
+> Any preference?
 
-jirka
+Yes, I think it can go, though not a strong preference.  This code well
+predates RPC over TLS which landed on v6.5.  I haven't investigated other=
+
+users - they may not have the same problem since RPC over TLS has very
+precise error handling, so it perhaps it makes sense to show the Fixes bu=
+t
+limit how far back we go for RPC.
+
+Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption of record=
+s for performance")
+Cc: <stable@vger.kernel.org> # 6.5.x
+
+Thanks for the look Jakub.
+Ben
+
 
