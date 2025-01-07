@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-156007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4C7A049CC
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 20:02:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95651A049CB
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 20:02:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08FE4166A40
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:02:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45FEA3A58DE
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5381F471C;
-	Tue,  7 Jan 2025 19:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582581F427D;
+	Tue,  7 Jan 2025 19:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oHsD3vMd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O2A9Rb4V"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771DE49652
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB91B2594BF
 	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 19:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736276524; cv=none; b=gDCj/SwouBjpMDV1ldIxkltNN7hlxFap3mxiuOR5R1sCSAZnFJK0G/lkFbaIznI8AXLiA9kQOCbL5bi1m13MhoIgQHa682le39sm7NtLtEcAzZ72X9tF87PSqi2t18oaZeKtRkue34+bN1P3cgOE/LnMihPZKCxEXChKKQRcOZ4=
+	t=1736276523; cv=none; b=mA4Fd6lyHwelE+E6OdN2f8TxyTeb7uW+P9R8cNQLakjs3RzuA5RHq1NMgeV6AOwyBbgjEkwqTdMKcL+j4+CXpOKGgLZgadVYDqg9Dm5gj6lpyXFGRZXclZ83BT5s9yHBNcZ/gzjTpa6cJk610QxPDN7IuDxs//e283x26jgDXt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736276524; c=relaxed/simple;
-	bh=gLJjfDJhgjGiRzBD6sMmBWL5HV3eZ3ZJC2albBVhRYg=;
+	s=arc-20240116; t=1736276523; c=relaxed/simple;
+	bh=K1VhwAwftNI/LMk7B6u+/AqNLO8CHp59+gPqHQDqFCg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SqE1kpOsuapj0PN5TXjPkthn1LA4d1/MxNJo+jKf7ZXsvzCUlsAM5SJTR8AEw+Xa/OCjqf+4f0skyp+IDFb1fIPUvloZtOUSmicAk3QqzLPRnwwMURSZyemgKdmPu8zG4NQUZ/8xgVPNXv1Zt60OpXgTPljFR0d/Q2RvhRPo8ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oHsD3vMd; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=RJMwaGTpeQQ9iwToJOql9XeA3pIxF1CHBunbNFqtwjSzhie0TYE/kcr6UzYuJgVMyf9WUUq2RZTAlw0XgYx9WZ4JzIXO63zDSfGTr7h0n9FDnTKc4K/vEVdDfz3Laph1Ft9+UmbAWb9YsJbas1VMJKRpVu9r50PFzVAeafjcOd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O2A9Rb4V; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736276521; x=1767812521;
+  t=1736276522; x=1767812522;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gLJjfDJhgjGiRzBD6sMmBWL5HV3eZ3ZJC2albBVhRYg=;
-  b=oHsD3vMd7wjKbbwC9pzaJzxjjP8M3hWwDEqh+xwgVvOSuXK3/b5u6GPq
-   oNfly3igfaf+Emct+8Xn/3CL0ZB0txXbFdy4TZSB6CroPFFKEEJc1Pk2X
-   xUpbBOYFlhKuLhEuA3TNb8e8h8DdBLNEsYyfT69z3gLgqAMNFdffwGfUJ
-   YTg60NfQJ4u8B8tJmn+/Ys2BWvcUtMx0ssWOmo3nO1ElUsNmiAHMp56yc
-   LdrRu1l68TodPAldn/5d+0dmfyUQpN05n764XgawMtR0NM8Rf4lp3AARk
-   /bTFm/yNtuQz4lckQ37KKeZjwHZsRFU4ej8xYVlVvZ5h8/yPk+ATcECrf
+  bh=K1VhwAwftNI/LMk7B6u+/AqNLO8CHp59+gPqHQDqFCg=;
+  b=O2A9Rb4VVSnFI9QZZiSfEgc4eA9yew6rP+nTpDJteBy8deDIOgzg81CV
+   s1PdnK7qfs3RcbKqMlojMLNmRgZ8DaBtkpkrhl7fve56MvFoqN7iE90CU
+   lX5jc6rtGSCCey4Ddg2uCiW+DpfcU+ctj+eUr5pzAegUy/HIQFtwwEXbZ
+   NLrP+tcyX5ITMm05IdYuKNdkCRsvQR3NL7Rj+wm4i0GegXIVBd36tsyRL
+   1tthU4OuW06DBvUo4jxLXmv68Nuiej90YukOCQcGsPm6HH8HICGXbYxDy
+   O5qXiT5zbt+udDa0O+lxoWiriB279fTUUXC30n+tCT/46srm/t3QGqdbQ
    Q==;
-X-CSE-ConnectionGUID: RvE/PYUdQLuUudhN40dTUg==
-X-CSE-MsgGUID: rKIo8pevR3Wiulxxlfs3jA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="24083634"
+X-CSE-ConnectionGUID: 9okCwXKEQv2oSk6DcKhZcA==
+X-CSE-MsgGUID: EUf8+//4Suq8LDG9Ja96Ew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="24083641"
 X-IronPort-AV: E=Sophos;i="6.12,296,1728975600"; 
-   d="scan'208";a="24083634"
+   d="scan'208";a="24083641"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
   by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 11:02:00 -0800
-X-CSE-ConnectionGUID: OgR/z+5+QEWHLN7P0TC/7A==
-X-CSE-MsgGUID: 4ziZ1456Q/i4iBOOubyd+g==
+X-CSE-ConnectionGUID: OKcQWArkT2CzDu4CKUrafA==
+X-CSE-MsgGUID: Ch/ZWNmKQbOVzYoZXBNAHQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,296,1728975600"; 
-   d="scan'208";a="133709285"
+   d="scan'208";a="133709291"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa002.jf.intel.com with ESMTP; 07 Jan 2025 11:02:00 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,13 +65,17 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+Cc: Przemyslaw Korba <przemyslaw.korba@intel.com>,
 	anthony.l.nguyen@intel.com,
-	horms@kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net 1/3] ice: fix max values for dpll pin phase adjust
-Date: Tue,  7 Jan 2025 11:01:45 -0800
-Message-ID: <20250107190150.1758577-2-anthony.l.nguyen@intel.com>
+	richardcochran@gmail.com,
+	jacob.e.keller@intel.com,
+	pmenzel@molgen.mpg.de,
+	olteanv@gmail.com,
+	Milena Olech <milena.olech@intel.com>,
+	Rinitha S <sx.rinitha@intel.com>
+Subject: [PATCH net 2/3] ice: fix incorrect PHY settings for 100 GB/s
+Date: Tue,  7 Jan 2025 11:01:46 -0800
+Message-ID: <20250107190150.1758577-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250107190150.1758577-1-anthony.l.nguyen@intel.com>
 References: <20250107190150.1758577-1-anthony.l.nguyen@intel.com>
@@ -83,146 +87,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+From: Przemyslaw Korba <przemyslaw.korba@intel.com>
 
-Mask admin command returned max phase adjust value for both input and
-output pins. Only 31 bits are relevant, last released data sheet wrongly
-points that 32 bits are valid - see [1] 3.2.6.4.1 Get CCU Capabilities
-Command for reference. Fix of the datasheet itself is in progress.
+ptp4l application reports too high offset when ran on E823 device
+with a 100GB/s link. Those values cannot go under 100ns, like in a
+working case when using 100 GB/s cable.
 
-Fix the min/max assignment logic, previously the value was wrongly
-considered as negative value due to most significant bit being set.
+This is due to incorrect frequency settings on the PHY clocks for
+100 GB/s speed. Changes are introduced to align with the internal
+hardware documentation, and correctly initialize frequency in PHY
+clocks with the frequency values that are in our HW spec.
 
-Example of previous broken behavior:
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
---do pin-get --json '{"id":1}'| grep phase-adjust
- 'phase-adjust': 0,
- 'phase-adjust-max': 16723,
- 'phase-adjust-min': -16723,
+To reproduce the issue run ptp4l as a Time Receiver on E823 device,
+and observe the offset, which will never approach values seen
+in the PTP working case.
 
-Correct behavior with the fix:
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
---do pin-get --json '{"id":1}'| grep phase-adjust
- 'phase-adjust': 0,
- 'phase-adjust-max': 2147466925,
- 'phase-adjust-min': -2147466925,
+Reproduction output:
+ptp4l -i enp137s0f3 -m -2 -s -f /etc/ptp4l_8275.conf
+ptp4l[5278.775]: master offset      12470 s2 freq  +41288 path delay -3002
+ptp4l[5278.837]: master offset      10525 s2 freq  +39202 path delay -3002
+ptp4l[5278.900]: master offset     -24840 s2 freq  -20130 path delay -3002
+ptp4l[5278.963]: master offset      10597 s2 freq  +37908 path delay -3002
+ptp4l[5279.025]: master offset       8883 s2 freq  +36031 path delay -3002
+ptp4l[5279.088]: master offset       7267 s2 freq  +34151 path delay -3002
+ptp4l[5279.150]: master offset       5771 s2 freq  +32316 path delay -3002
+ptp4l[5279.213]: master offset       4388 s2 freq  +30526 path delay -3002
+ptp4l[5279.275]: master offset     -30434 s2 freq  -28485 path delay -3002
+ptp4l[5279.338]: master offset     -28041 s2 freq  -27412 path delay -3002
+ptp4l[5279.400]: master offset       7870 s2 freq  +31118 path delay -3002
 
-[1] https://cdrdv2.intel.com/v1/dl/getContent/613875?explicitVersion=true
-
-Fixes: 90e1c90750d7 ("ice: dpll: implement phase related callbacks")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Fixes: 3a7496234d17 ("ice: implement basic E822 PTP support")
+Reviewed-by: Milena Olech <milena.olech@intel.com>
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  2 ++
- drivers/net/ethernet/intel/ice/ice_dpll.c     | 35 ++++++++++++-------
- 2 files changed, 25 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp_consts.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 1489a8ceec51..ef14cff9a333 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -2264,6 +2264,8 @@ struct ice_aqc_get_pkg_info_resp {
- 	struct ice_aqc_get_pkg_info pkg_info[];
- };
- 
-+#define ICE_AQC_GET_CGU_MAX_PHASE_ADJ	GENMASK(30, 0)
-+
- /* Get CGU abilities command response data structure (indirect 0x0C61) */
- struct ice_aqc_get_cgu_abilities {
- 	u8 num_inputs;
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index d5ad6d84007c..38e151c7ea23 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -2064,6 +2064,18 @@ static int ice_dpll_init_worker(struct ice_pf *pf)
- 	return 0;
- }
- 
-+/**
-+ * ice_dpll_phase_range_set - initialize phase adjust range helper
-+ * @range: pointer to phase adjust range struct to be initialized
-+ * @phase_adj: a value to be used as min(-)/max(+) boundary
-+ */
-+static void ice_dpll_phase_range_set(struct dpll_pin_phase_adjust_range *range,
-+				     u32 phase_adj)
-+{
-+	range->min = -phase_adj;
-+	range->max = phase_adj;
-+}
-+
- /**
-  * ice_dpll_init_info_pins_generic - initializes generic pins info
-  * @pf: board private structure
-@@ -2105,8 +2117,8 @@ static int ice_dpll_init_info_pins_generic(struct ice_pf *pf, bool input)
- 	for (i = 0; i < pin_num; i++) {
- 		pins[i].idx = i;
- 		pins[i].prop.board_label = labels[i];
--		pins[i].prop.phase_range.min = phase_adj_max;
--		pins[i].prop.phase_range.max = -phase_adj_max;
-+		ice_dpll_phase_range_set(&pins[i].prop.phase_range,
-+					 phase_adj_max);
- 		pins[i].prop.capabilities = cap;
- 		pins[i].pf = pf;
- 		ret = ice_dpll_pin_state_update(pf, &pins[i], pin_type, NULL);
-@@ -2152,6 +2164,7 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 	struct ice_hw *hw = &pf->hw;
- 	struct ice_dpll_pin *pins;
- 	unsigned long caps;
-+	u32 phase_adj_max;
- 	u8 freq_supp_num;
- 	bool input;
- 
-@@ -2159,11 +2172,13 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 	case ICE_DPLL_PIN_TYPE_INPUT:
- 		pins = pf->dplls.inputs;
- 		num_pins = pf->dplls.num_inputs;
-+		phase_adj_max = pf->dplls.input_phase_adj_max;
- 		input = true;
- 		break;
- 	case ICE_DPLL_PIN_TYPE_OUTPUT:
- 		pins = pf->dplls.outputs;
- 		num_pins = pf->dplls.num_outputs;
-+		phase_adj_max = pf->dplls.output_phase_adj_max;
- 		input = false;
- 		break;
- 	default:
-@@ -2188,19 +2203,13 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 				return ret;
- 			caps |= (DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE |
- 				 DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE);
--			pins[i].prop.phase_range.min =
--				pf->dplls.input_phase_adj_max;
--			pins[i].prop.phase_range.max =
--				-pf->dplls.input_phase_adj_max;
- 		} else {
--			pins[i].prop.phase_range.min =
--				pf->dplls.output_phase_adj_max;
--			pins[i].prop.phase_range.max =
--				-pf->dplls.output_phase_adj_max;
- 			ret = ice_cgu_get_output_pin_state_caps(hw, i, &caps);
- 			if (ret)
- 				return ret;
- 		}
-+		ice_dpll_phase_range_set(&pins[i].prop.phase_range,
-+					 phase_adj_max);
- 		pins[i].prop.capabilities = caps;
- 		ret = ice_dpll_pin_state_update(pf, &pins[i], pin_type, NULL);
- 		if (ret)
-@@ -2308,8 +2317,10 @@ static int ice_dpll_init_info(struct ice_pf *pf, bool cgu)
- 	dp->dpll_idx = abilities.pps_dpll_idx;
- 	d->num_inputs = abilities.num_inputs;
- 	d->num_outputs = abilities.num_outputs;
--	d->input_phase_adj_max = le32_to_cpu(abilities.max_in_phase_adj);
--	d->output_phase_adj_max = le32_to_cpu(abilities.max_out_phase_adj);
-+	d->input_phase_adj_max = le32_to_cpu(abilities.max_in_phase_adj) &
-+		ICE_AQC_GET_CGU_MAX_PHASE_ADJ;
-+	d->output_phase_adj_max = le32_to_cpu(abilities.max_out_phase_adj) &
-+		ICE_AQC_GET_CGU_MAX_PHASE_ADJ;
- 
- 	alloc_size = sizeof(*d->inputs) * d->num_inputs;
- 	d->inputs = kzalloc(alloc_size, GFP_KERNEL);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+index 585ce200c60f..d75f0eddd631 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+@@ -761,9 +761,9 @@ const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD] = {
+ 		/* rx_desk_rsgb_par */
+ 		644531250, /* 644.53125 MHz Reed Solomon gearbox */
+ 		/* tx_desk_rsgb_pcs */
+-		644531250, /* 644.53125 MHz Reed Solomon gearbox */
++		390625000, /* 390.625 MHz Reed Solomon gearbox */
+ 		/* rx_desk_rsgb_pcs */
+-		644531250, /* 644.53125 MHz Reed Solomon gearbox */
++		390625000, /* 390.625 MHz Reed Solomon gearbox */
+ 		/* tx_fixed_delay */
+ 		1620,
+ 		/* pmd_adj_divisor */
 -- 
 2.47.1
 
