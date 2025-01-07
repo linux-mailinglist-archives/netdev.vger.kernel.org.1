@@ -1,133 +1,147 @@
-Return-Path: <netdev+bounces-155665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ACDAA03516
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:24:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF7F9A0351B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:27:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AE8B18863DE
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:24:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69AB418863F1
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B939E33086;
-	Tue,  7 Jan 2025 02:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E45618EAB;
+	Tue,  7 Jan 2025 02:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="MpHcOrot";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="s5lqRCUq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB752BD04
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 02:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7D32594A5
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 02:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736216686; cv=none; b=kFawCpsDBtxHE2YRDRo2LvamkKpFgJR907TDlEkC46AX7uSY1DL1QRIBIJ/j6e7FjC9pL6POh0fSn2rKQFmNQXoEhfJU+PcjHiyGpc8uacCp0BgUc15KCaqLd0JJLO+V4oXN6pAsVeg4YS4/q9aznvqFMn4pqVbkgnggrwHIAXU=
+	t=1736216816; cv=none; b=htyv5/jsB0/Xiez18kQq8VYf50cE8rTsNX2vT1+/g9YOirR6Kt6cGaOeQqhFPLHwRX3R08kUrHPWjC1hX0UjIrgnxX+hJFuPY73oGXHGS8IWPWOlFuzYX8lhWL8bgi/4uB8bZ5DyWvnjrDsjEPEsr9FldgUq950/cRtopRpCfvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736216686; c=relaxed/simple;
-	bh=7get7PwQQQlQZAjyKFX/M0HCgb8mC6HZSEYaaz25ewM=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EZX9istZWN6TIZz0zBfflBweJmRh4AAkd+YTXX//HnqhtY+jWEQEmV2lxocRfFEpUW1vy5lb7PBicqyueP1umumU32gBSVX4+PDKSwI4LEtrBrGz5dXWV//TEpfonIr9obsNyE8h2km6COU6nt2ZJrUPhObdgi5BHIk3wv8QmmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas6t1736216669t426t25583
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.118.30.165])
-X-QQ-SSF:0001000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 4438678781041383670
-To: "'Andrew Lunn'" <andrew@lunn.ch>
-Cc: <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<richardcochran@gmail.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<jacob.e.keller@intel.com>,
-	<netdev@vger.kernel.org>,
-	<mengyuanlou@net-swift.com>
-References: <20250102103026.1982137-1-jiawenwu@trustnetic.com> <20250102103026.1982137-2-jiawenwu@trustnetic.com> <ab140807-2e49-4782-a58c-2b8d60da5556@lunn.ch> <032b01db600e$8d845430$a88cfc90$@trustnetic.com> <a4576efa-2d20-47e9-b785-66dbfda78633@lunn.ch>
-In-Reply-To: <a4576efa-2d20-47e9-b785-66dbfda78633@lunn.ch>
-Subject: RE: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
-Date: Tue, 7 Jan 2025 10:24:28 +0800
-Message-ID: <035001db60ab$4707cfd0$d5176f70$@trustnetic.com>
+	s=arc-20240116; t=1736216816; c=relaxed/simple;
+	bh=bQbQMWK0aUkiik62aEGXlaIGG4RDgYF2EI9bVDLoWm4=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=d1Z4ONYMR7b6ZWREpdoUVIUkgE4P28VU4zIHqblOlXepcwF/sI15Q2I6neunFEes1IXVZ/4dkXCPNsGorvjWvnWw7ogpNtfSb3P17gqve/2HwxSKtU+fYIQZvIKY4IhROfXlYCLN70Wg5wqeLWj4ntLCjuc2p/vvyGxZZCO3oZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=MpHcOrot; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=s5lqRCUq; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id 8078113801A5;
+	Mon,  6 Jan 2025 21:26:52 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Mon, 06 Jan 2025 21:26:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-type:content-type:date:date:from
+	:from:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1736216812; x=
+	1736303212; bh=QA2y5iyi5Wyx4fYvh027GtCGGf2e01dOWfLv0jVIM7U=; b=M
+	pHcOrotSqFU0aDS49j696IeZIaR1aLbROu23VngWJbtUD/HVuKjGSDP3TtRA44Vh
+	ixxWDPGsDEf1nYHMooTxrkuc8UETxYrHSV0ekKXSLwGIDElXfiGOzkLiUjCV9lHH
+	SvVcXF4I3MMeZZGjUOns3RvjSyVoiqp2nJHE/kCSzM17Tq+YzNnmiN4SCO8C7Xfs
+	EmGYsivsig88TR7K816CysFVdfwdUEe3emct26bET/AlENITFtyNIbRgF+e30vgG
+	we1kMBx3hoBDvUZoVgjRAaIfeNTuJ5bUd1x/E5e//dsxzgo8muWisGYkgQtSHaJf
+	3N/4tlr4AOHw3Yr+5VyMw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id:content-type
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm2; t=1736216812; x=1736303212; bh=Q
+	A2y5iyi5Wyx4fYvh027GtCGGf2e01dOWfLv0jVIM7U=; b=s5lqRCUq6hbddIMt9
+	DogrPspr1OHp2roxh0Kx76fzWjHjdQymDdEfhcQO2b1bt2pYeLMcKQKcO06fGGZN
+	FAxYpO49UevyHDi565JYM3ApojK3/s3hfjMNE8cK/1adkIi7hJ9OyGzws84oVFlg
+	skfE44iMfUosvv9ctCaAigcfxQV+MeoacZWNNnnT52fgVZW8UFWhPfSfGszGwaq6
+	TaibjwkjnQDseydRd8FwDWK3JsphQPxiTYyouD2dfVPTwC7aADc9AXBYQtATwFEe
+	VGedyMHlhWcIA/pQ/NBcL3y/kIxA4WBIEedF/kf2S0uU5TzsOrgHoWSU2K0g+DPY
+	6vN/A==
+X-ME-Sender: <xms:65B8Z2bPa3xHl8KA6NrML_TK6Hv3bCW01Lc76Ign1RgwXlqCWgE_ug>
+    <xme:65B8Z5YOO8RaI3sqEON7YVOOasErLjUKOWD3kBcT39VLW69xZyK6JURQkc-vY9WDd
+    53fClweZVGbZ8dN07Q>
+X-ME-Received: <xmr:65B8Zw9S6Bn_oTs7lPyCiz7JzK_VnNBGUW4-K7ggFdCX79QjC6Xpeu0vx-WdUMNE12jy2A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeguddggeekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevuf
+    gjfhfogggtfffksehttdertdertddvnecuhfhrohhmpeflrgihucggohhssghurhhghhcu
+    oehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvghrnhepjedvgffhte
+    evvddufedvjeegleetveekveegtdfhudekveeijeeuheekgeffjedunecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrgh
+    hhrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpthhtohepuggrvhgvmh
+    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtoheprghnugihsehgrhgvhihhohhushgvrdhnvghtpdhrtg
+    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfido
+    nhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrth
+    drtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:65B8Z4rWW66deaRb05bTjoIHSzTcrKNFL4pa_CpJ2cDYKUyOIAB7Qw>
+    <xmx:65B8ZxoZVm9plVKgl8NCUwONc3rnVlsM3CmBIscwhMu3ce5cjeAFnQ>
+    <xmx:65B8Z2SoFPPcXXCG41t0iA0WtDxb9V1rWglU37ySsyuSVWlwOa5Ctg>
+    <xmx:65B8Zxoc43WfLL-AN3zF9XEp1PkcQbSfSotN2EeIpH1KWv8z2KRXsA>
+    <xmx:7JB8Z1fcG2vjtbGp3-EL6aacIKcqnphLjS5n8lMIJ23DvV3umdVkVqja>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 6 Jan 2025 21:26:51 -0500 (EST)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 6D8849FCAE; Mon,  6 Jan 2025 18:26:50 -0800 (PST)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 6C9639FC8D;
+	Mon,  6 Jan 2025 18:26:50 -0800 (PST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Jakub Kicinski <kuba@kernel.org>
+cc: Nikolay Aleksandrov <razor@blackwall.org>, andy@greyhouse.net,
+    davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+    pabeni@redhat.com, andrew+netdev@lunn.ch
+Subject: Re: [PATCH net 3/8] MAINTAINERS: remove Andy Gospodarek from bonding
+In-reply-to: <20250106153441.4feed7c2@kernel.org>
+References: <20250106165404.1832481-1-kuba@kernel.org>
+ <20250106165404.1832481-4-kuba@kernel.org>
+ <2fda5a09-64da-40a4-a986-070fe512345c@blackwall.org>
+ <2982753.1736197288@famine> <20250106153441.4feed7c2@kernel.org>
+Comments: In-reply-to Jakub Kicinski <kuba@kernel.org>
+   message dated "Mon, 06 Jan 2025 15:34:41 -0800."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQEgJ35Ybs4gTOBDiJnQm6cX+eEXEQKNhMgNAhs0hhkDC4VZPgJmfkjntDAwn7A=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MTkbnw8ZeqfcXFyFCpcFVn0RAyDpqGSzmI1IY3C2fX4lq6/PiD/tPjrB
-	jXhiWydxrlszIqLRR1Vz1Ca8p/mQTFKlS+sNqyg4D24/dsfz6HKktZc+P/JGMB3Hddr9d4z
-	RlduyUaC/LWpuX6NEsUSuTRzr/PRy7wwRhBPKdJ5JCIb+jUrbiWqU1C5AsWeVEJLSzS2Ryt
-	Cg6hOabOaogh/sx4hVcOOxjYQ6NwvSkyn+oPMe3tp+77Mx3Ouf2kbzJlEZ6u8UfA1oSZoak
-	pJins+ZvI4DaLUhWyiIWbldywMydnRD2sNQhq45G/XbNiKnZxJVZAzms3tff5IsBky28w89
-	mV4+hKRkYl7Cht9j33bk3fAM62GVK2KV+H/HIBj22GkWS0UGSoctjd8q7odrmquSRd6P3M1
-	dLuBAgBiisr/0R3QdPjxhY4CAKyjYm/GbaIrsO3beI+yjnOYsMVyoG5nF4xYw3MZTHpLEKK
-	bid+hfDD/vVJZwEV2pTOwjStFPgcOcf+2UEeDT7zYPzODU6nshaUuQYI9D+2FhHzWsRm4wX
-	h6bo45MOlDZmuI/ieMoqXpgoZZMXCOGaWJCRdxZmNrxsCxAebnqHhqPGwJoWOpwLWA/IMEz
-	wLLnf29mwhZRAkLLXiT6yWQ3IfV9b///Vru7YIY09MkQSL3xnY/ixKjz3q4VbJa+r9OZjAl
-	v8YWcUMZKjXanEsfwGyqYueV6f3e/gaASkZ/yNge4+s41YCktqN7+wuCq3cIVw5DckGl95W
-	8KnbtpIZo4MV4HxnwBYXm710UUOGWQHok79mblu4Q4n++PFiQZTJUuAJ3ZWlGHuSvuZnQ53
-	GSd3MFG/EBhTDnuo5KOkV6LfJIARkofC4G7429kqtaN0+Sy6outcFoE3hmKglBU6VL7hLDa
-	46woXFegkEqmlr6IhuxhbndbW43QsBkVFNA5HpbFRmGZCSXz0DavIchezYAhj6mGnqRKiAF
-	stIgUgNHnfVu31J8wHKM5yz7iHFGbRXMDlhbD9wdHReBtYAqUT2F/daw+TsC9FnJlnDEf+S
-	NTZHFl3VyfQRUVryb9YG+dCsFZQWay/kL9LbG8gi9Hvvs7Y93gugOzsYI0TVY=
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2998734.1736216810.1@famine>
+Date: Mon, 06 Jan 2025 18:26:50 -0800
+Message-ID: <2998735.1736216810@famine>
 
-On Mon, Jan 6, 2025 10:27 PM, Andrew Lunn wrote:
-> > > > +	smp_mb(); /* Force any pending update before accessing. */
-> > > > +	incval = READ_ONCE(wx->base_incval);
-> > > > +	incval = adjust_by_scaled_ppm(incval, ppb);
-> > > > +
-> > > > +	mask = (wx->mac.type == wx_mac_em) ? 0x7FFFFFF : 0xFFFFFF;
-> > > > +	if (incval > mask)
-> > > > +		dev_warn(&wx->pdev->dev,
-> > > > +			 "PTP ppb adjusted SYSTIME rate overflowed!\n");
-> > >
-> > > There is no return here, you just keep going. What happens if there is
-> > > an overflow?
-> >
-> > If there is an overflow, the calibration value of this second will be
-> > inaccurate. But it does not affect the calibration value of the next
-> > second. And this rarely happens.
-> 
-> If this is a onetime event you don't really care about, is a
-> dev_warn() justified? Do you want to be handling the user questions
-> about what it means, when all you are going to say is, ignore it, it
-> does not really matter?
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-I'll remove the dev_warn() to avoid user confusion.
+>On Mon, 06 Jan 2025 13:01:28 -0800 Jay Vosburgh wrote:
+>> >>  BONDING DRIVER
+>> >>  M:	Jay Vosburgh <jv@jvosburgh.net>
+>> >> -M:	Andy Gospodarek <andy@greyhouse.net>
+>> >>  L:	netdev@vger.kernel.org
+>> >>  S:	Maintained
+>> >>  F:	Documentation/networking/bonding.rst  
+>> >
+>> >I think Andy should be moved to CREDITS, he has been a bonding
+>> >maintainer for a very long time and has contributed to it a lot.  
+>> 
+>> 	Agreed.
+>
+>Sorry about that! Does the text below sound good?
+>
+>N: Andy Gospodarek
+>E: andy@greyhouse.net
+>D: Maintenance and contributions to the network interface bonding driver.
 
-> 
-> > > > +/**
-> > > > + * wx_ptp_tx_hwtstamp_work
-> > > > + * @work: pointer to the work struct
-> > > > + *
-> > > > + * This work item polls TSYNCTXCTL valid bit to determine when a Tx hardware
-> > > > + * timestamp has been taken for the current skb. It is necessary, because the
-> > > > + * descriptor's "done" bit does not correlate with the timestamp event.
-> > > > + */
-> > >
-> > > Are you saying the "done" bit can be set, but the timestamp is not yet
-> > > in place? I've not read the whole patch, but do you start polling once
-> > > "done" is set, or as soon at the skbuff is queues for transmission?
-> >
-> > The descriptor's "done" bit cannot be used as a basis for Tx hardware
-> > timestamp. So we should poll the valid bit in the register.
-> 
-> You did not answer my question. When do you start polling?
+	Looks good to me.
 
-As soon at the skbuff is queues for transmission.
+	-J
 
-
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
