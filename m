@@ -1,194 +1,244 @@
-Return-Path: <netdev+bounces-155658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0908A0348F
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:34:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 881A2A03499
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:40:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A4283A49E1
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 01:34:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E405F1885CCA
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 01:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18EA0C139;
-	Tue,  7 Jan 2025 01:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QF2+H71H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC762AF10;
+	Tue,  7 Jan 2025 01:40:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2087.outbound.protection.outlook.com [40.107.20.87])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916171CAAC
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 01:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736213673; cv=fail; b=RHEhyzwKSS5ZHhcap1BlAJoWxDKHKNQL+kvR4d0xM2XMhUcUvicPuTv4kDQmt3as+g4FlpF1RUR/lpXlikkALR7dg9WFggjfA6636tom2euS0L+Jq8J+bwBNyDdM5wI2Ki0bgvcVHAEPWATNCwvMVEqqMVNkvuszSOxoBRGsIu8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736213673; c=relaxed/simple;
-	bh=45RVhIT9bL+woNOk3iG7ZICEqqgWui3ksTdZFStXVpY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=dBPH1AWKl49HttYMuB0KANqGJvkBh5g6EqjWjbmJuQBw6MGgIgtyiDIJjYB+R1OPe/hxBx5+XQeZcUR1h1d3yHtwzC9SeROwvC6CzKfvit6b6PyBsMSRHN8NQUexDtj6edvwgCh/EPn2BFNWVEZ6UdUvRq1yFsTi5iCGuyFUoTQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QF2+H71H; arc=fail smtp.client-ip=40.107.20.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WYvTD5uL8EKPpzjXsu1mu9QZliEsUI2G5EO3Q3H50kwtfYEC7W21mEJHbRn/KxtyaNLyHfwN0zs6aBO2n+4fxMxMekECwMs1w56D1ejMXjgDIulIkjPYrVrtxTlc5jRS2mhf0MzaZuC1iiEt1u9pHj83D4OsnSoktMn09opfP/Mr7BAEN+7vx9Yuz4FLl49QAmeWFkBmJPiqgW/YQP0IkuwUZ2MdJhoa01N/fK5I4YkeU5CfuKVLA4hMCWHL0jZFtEAy/kMyj1IPXrIzXfVGJ95gccNdDpPjJAjbhuvXLQtKAvntCIEDcxk+QI5sz4Z+BT5oSY0vAz1uXTzUO6C2Ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=45RVhIT9bL+woNOk3iG7ZICEqqgWui3ksTdZFStXVpY=;
- b=SMc41ZNRQf9+4dSDCH+3zXoVdUdVOw6iLfySvRfPNinRw7dbv9997S8s9rXI6sF+hjUAreIsU4NMs/gUS6gh9lcwpxYKusIaEO5/wu03QME07CTOvfVMYd5s31tY30IbQJRYezjxPAugfnHpai6ya5YdYejvu8f4fTLYQ5EOlYRAC3q1P7SZ4VwJBRvPXNa573QrgLTEMfjfSShr6UTZK+bmJinv0pX6UGs607shpRaIVfm9SvLDM6zdnU7aqxtczsl9BMUsVhJU66wMc4jkKK9jWsWaJTLiJXSqUmvK35gCVvQxpcbu1a+uVqmF0rWyHDbRmZqXFkyq30I+bopjiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=45RVhIT9bL+woNOk3iG7ZICEqqgWui3ksTdZFStXVpY=;
- b=QF2+H71HTy2JUVqJJUAADuvDnzobiqEJ+9SyxCud7EEMQC1hABCldROCs4WkAnSpaTm13Lx1LmaLGvZzysb41AwhEZ0zVBRPGeeyr1NWveygrbI+SL4esardFcqcTa0HoTQ1PW9zBDO3PvpWruqtn4SdgtZWnNZE86727Iqpz22omNZkcGsmJyYLamfd1qLKRSNeT9voMc+hejyy9pAk5maXoze4oBESA6ZGiiFgcsSZU45IOivYkDgnbRpkveFW8ZCGqr+n6Vk+acfhCRxPXCMf+ubSxA5go1rhZLipFmvWoYhmm28hwgPCxrDpoSG9FVSZ3pHvKCURlH/NzZx0mw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by PA1PR04MB10179.eurprd04.prod.outlook.com (2603:10a6:102:460::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Tue, 7 Jan
- 2025 01:34:27 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%6]) with mapi id 15.20.8314.015; Tue, 7 Jan 2025
- 01:34:27 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, Clark
- Wang <xiaoning.wang@nxp.com>, Russell King - ARM Linux
-	<linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "imx@lists.linux.dev"
-	<imx@lists.linux.dev>
-Subject: RE: EEE unsupported on enetc
-Thread-Topic: EEE unsupported on enetc
-Thread-Index: AQHbYEAEPp0VVipOt0OTBhisL57pd7MKgsxw
-Date: Tue, 7 Jan 2025 01:34:26 +0000
-Message-ID:
- <PAXPR04MB8510A9A1597FEB4037E76DDB88112@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <965a1d69-d1fb-4433-b312-086ffd2a4c12@gmail.com>
-In-Reply-To: <965a1d69-d1fb-4433-b312-086ffd2a4c12@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PA1PR04MB10179:EE_
-x-ms-office365-filtering-correlation-id: ea264419-3d7b-48eb-f703-08dd2ebb6c73
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?NWpFcnlLSE5oZG1tMm9xeXl3RVp2MFFaZnhGQzM3OGtLRjFaQ01IYTFvS3RD?=
- =?utf-8?B?ckxxanF3SmtRVkt6TWpXdHlmd253NkVWeDVwdjBJWjNoZG5xUERtNVJybjY5?=
- =?utf-8?B?d0ZUaWpCNDJBNXBycGVYQzVPVFJ6VDhQL2lLWi9pdlZhc3Z2MldESFU5YWhR?=
- =?utf-8?B?MzArZExWQnZuTDJzSlQvRVBhTlJiSXY2WlNuY0ZQR3pWZEZJVzJERUNVNVlr?=
- =?utf-8?B?UGxETmJCb2FEeUI5NURWVzFEeW9xQ1E5bmdLYWhobHd1YkJPS3VzaTlmOWVP?=
- =?utf-8?B?T1I5L1lpeURTZWV6WVhwMGRnK0NIUXhLWFVZYzEyMTBnQ3NOcDBFSzhQMDZs?=
- =?utf-8?B?MWVxNWlaSkU3dzl2QUJjNTNoS2tWWjJ0UGdneUdPQVJKM1IyRHpLVXVEVUhN?=
- =?utf-8?B?U0N6djhTWTYxT2VIQjhLRk9FOTV3U0FIVWVhVjZRejVSNDBlU1lENWVRVE9B?=
- =?utf-8?B?bzRPalJESjQ3K3FqYys4eENQUEo4Mkk3ZGRnKzRaN0NaZGQ0ZWpTTXE0Ui92?=
- =?utf-8?B?VEpmOXZwT3d4QUJvYkl5NStGUExwYlIrRGgrNkdSQ2FIUjFoMUN0ZDBWdFd6?=
- =?utf-8?B?ZmU3RXRkTmt0SitKNXJiYWVBYUhDR244OVYwajU2d3VjRUpSUlRpUVcvVXcw?=
- =?utf-8?B?WUxLMFhOQjZsYWd4WVhYc2JvTnJvQmlCVkVmdUZJZjk1cG9qQ0hraWJKU1FI?=
- =?utf-8?B?T0hCWXVlVjUydjFOOW1LcHhVenkyZFRFcFg4bi9IejlBaEZKaVdTVlQzOHUz?=
- =?utf-8?B?VVkrcTB0RWUrZ05aakVOUHhoVVFTclNicFMxM3ZjNmptaVh0R0c2MVUyWkg1?=
- =?utf-8?B?VnlTcnd5SUQ3VklzM25ZcG04WnJ3NHk4cDFEajNQdnBxRzQvRTFlRzRBRURU?=
- =?utf-8?B?OU9acG9qRm1NTTZ3UE9WVy9iWHlOMXlNdGJJaEhucUhEVHc0ZFducUpYc3Bz?=
- =?utf-8?B?bDk0a21sRDJaT2kzMTNIVEFBSHg2RlRTSFFxWElxVDZVMVA2b2dwUGM4Rmht?=
- =?utf-8?B?VUExR0I5SUh1T1QzSUN4RDVXNlg0M1RzYUlMMHhpN0JGUzJVNlhwTjliVllO?=
- =?utf-8?B?Yk9EUzNwaEMzblk5WDF2anFuL2o5TXAvZWVGbER4cjU4dXhiNllwdk4zSkt4?=
- =?utf-8?B?NGNPMHpnYW1PamtUdklBQjFUMTlMdE9EN0xsdHkzVWRveDRYTG5nSE5rS1ky?=
- =?utf-8?B?dHhuWUVGNHV4b3JJaU93WGVydW41V3Y5YlhuemRWT3dGMUx0bVJEU1VnQkEw?=
- =?utf-8?B?NGVzWk9pVUs2aFFveWN3ckpkQWJzUkh6eE93RFpVZnVDQXI2Q1dieUQ4QW5Q?=
- =?utf-8?B?TXkwQ2tWRFNGMG5IejhPWkJPcXBOZmJjOEFrb0pQQlIxZDNick1IcGtRR3Fj?=
- =?utf-8?B?cVVIOXlJcEhTOTB0QURNM3ZwY3llK3k3THk2Z1FEUXBaY1AyZ2p4ZGpmU1g1?=
- =?utf-8?B?VWtaWlhwUWRIZFNGWDczaW1JTjBiclhvMks1TDVxbjRNV00vSWx0b1hVZ0da?=
- =?utf-8?B?RG1HVnVDTVhITUpQaEdTT1Nic052OVlsTlphcW1LRkljWnd6RWp0UlZKMEQy?=
- =?utf-8?B?K2ZHM3BKTXI2aUpKUEgvTGNVcXFIRllyRWE3amxKYnhhVis2VUxwQ3h1YnV1?=
- =?utf-8?B?SmlPM1pkYWNHYVlqd2ZzeWZBSG1QRmhIOHgySllxZFhlS1RJYzAvK1k2czBI?=
- =?utf-8?B?dXpMdEhxMEltUGZHLzdzS1FvUWF3ZGwrZnlHLzNtT3VWdlVRRFovcGlSRzdP?=
- =?utf-8?B?NGs4K1FzSTl1MmRIc0JDNU4yUWJLL3JaYzYxaE1xWnVsYlh1TUQ2aXJOcjNk?=
- =?utf-8?B?d0xZdUtwOU9rOVR0NVd4QnNndkk2SDByMzJ0U3dDUTVhR1BQa3ltT0hCbHNH?=
- =?utf-8?B?Y3l4dXlBcjBkaWdqR2Foc1lqZjZHa1pWcGJFdVZUcnRHa3dqOURvVnB4SUdR?=
- =?utf-8?Q?leC59hNM6rB2fGKAvcvNLJeERDK1buW0?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?aWJtL1BXeVhnb1BnSmVERUpjYnEwVXBDbU9TS2pWUjlrbG5FK2gza0gwQUhh?=
- =?utf-8?B?emlvTkgyeUNVMVRlZUJaZ08rTmFWaXBmTmdPYUNwaUdNWExoWWs2bnNnUDJO?=
- =?utf-8?B?RHd5R0E5YkNodlBRUDdlSy9YV21GQ3JTSWRLdGxRbnF3L2ZJV2tQYWZVR3hX?=
- =?utf-8?B?S210UitGazdkM3F4TVphOUtzMFYrOTZ6YWlINVBWK3FiUzBiMEo1RDRpWnJR?=
- =?utf-8?B?S2NDakE0UVFXMWtjNElpeTlic0xyamxKdWhwUWZOcGJPbTRCbGtKelFaQlpj?=
- =?utf-8?B?YzhVZlhyOG5XVGYyeUI4aVlHVTltc002bDd5VnJpWnFlbEYvbDQvZUlDNG94?=
- =?utf-8?B?cSthZWhyOWkxNFArcTNtMktYanh0eng3QndLbW10ZmhyNTR6bkVNeitDNDlB?=
- =?utf-8?B?RkN4N3g4eVNtREpMMm9POHNaNlJTV2JWYmpScDFibVBRTTVXemVic0FNUXFJ?=
- =?utf-8?B?VXhjazN0anozdEc1eEZadkEzMGdHbkxRUUxUaDV2VXUrOGtjYzdBRjlaeHJq?=
- =?utf-8?B?enVNTVNMNXFuY3c1VHROY3dBSHNYT2RYY2NQdUF4TFQ2TnUxMmZldG1BOWVL?=
- =?utf-8?B?azBRNUh3K2F5bVpORHBHTnhncEJwYXBtWENzbWtIWGVsa3FqeTdsbmZGanFx?=
- =?utf-8?B?eGFEYTZKSjdEZ09mYjFqK0VxT3czQ09HNXBZNExMNFJqcjhyT1VQeUJiVTln?=
- =?utf-8?B?aWJjYS9CR3FmNlNIRHNIWFJmaDFvYVF1SHVPc2duclFyODkvUEkzS3FHZ1p4?=
- =?utf-8?B?L2ErQ3ByaW41Y01mS3MwbjVlNUlNS0ZSS1E2V21YNkRJRU9iaTZmcGVlN3By?=
- =?utf-8?B?eWgvWjBvRC9JR1NPNGQ4eXFVeDNqQUZQSHZWT0tmYXNSVGRuMnowUHVMZ3VJ?=
- =?utf-8?B?UDR6YTBXeGlGK0JuNkZvZnRIQUhSOUhKOTRTb0x2TVFVdzBNeml4cytxL05h?=
- =?utf-8?B?RmxJNDJSb3A4ZVFBSWR2KytDWU5GTmloM0lzYndtVzZmWEwvZzFwdnhxLzhm?=
- =?utf-8?B?L2U5eDJuVDh6NmxqcUF3WVNyUnhmSmxWYTFoYVRaL1hTVyt2STNaU0o2ODdY?=
- =?utf-8?B?dWM0RWRaWVFXV0pvMVkvMGdjeDZxVDcwMGJRMFQrMk5yeFpOQVlveFdSOFoy?=
- =?utf-8?B?S1p2T1VyaEdWaXBuTUtRa1ZONjRXUXNBVUNPZzEzT0hHaFZ5aDBwYU1PSy82?=
- =?utf-8?B?aXlwVXlacE0rK0xRcHFhSHpnRTlCakR6T2VzL1ZFWGtHRnh4cGwyeHVXN0hp?=
- =?utf-8?B?ZTcvOUFYZzJFckg2am1CNHdsY29iVS9XTCtQUTZFWStpSHU1UHVJaFVCdWt3?=
- =?utf-8?B?OUtncEdoWGlOTjVENWg1RC92azJqZExmaSt0TUcwTUdEQ25zU1VPNThmb28x?=
- =?utf-8?B?ME04ZnJTelVSREpYOFhVeDdYcWp5dCs3Z2VpMXdpU25YbGIrL05vdXBtaU1T?=
- =?utf-8?B?aEhMK3hqVDVmekM0cXdOYkNEbEh4SUVraUFEZEVZS1dYVFRzWmRHMVhjRDBy?=
- =?utf-8?B?YzRnZ0pPQ3F3NUFhZ0xTL3VlSGZDbElnRWZXaXRqL0Z6NVpVM1VnSTBTRkVy?=
- =?utf-8?B?SkJvMjA0VmVGeHA5M2pPTlFDOVAxSDIzaTVQZGlveDVLd1RBY3pmK3BKaVhj?=
- =?utf-8?B?MkNDNHRqTEljK3ZDY3VsU0hCTzl6ZE1nakJpa0FJQTU4K3ZCaEU1b0NsNXFQ?=
- =?utf-8?B?dUcwWHJ4cUtCbWUrczhoQ3lIWC9HanJGamxKaXVuZmJpcW13bFJjNWNSUFlr?=
- =?utf-8?B?bmNYMlRybWFBK0Zzd3pteUhxdjA5bmNMSnl4NWQyeWpDcFJZcFZLU09JaG43?=
- =?utf-8?B?WHg4bEI5cU5wdkx0RGh6VDV0QWNQNU5zU1Q2R29yM1Y5MDJuT0pkK3ZoSGhs?=
- =?utf-8?B?NUVNKy9pNktDc2JmR3RYaDlJSEh0NjhMN2tMUnlIa204ckZvMFdYRlVZWTRP?=
- =?utf-8?B?a1NPMGpOUE1GMjh5My9UOURRNFhoTy9xUTFmdyt0cnMyUFkyUkQyNVpmTzFj?=
- =?utf-8?B?RFBmcFZBZktPZUxIUGxhRVBDdDFNQmp5SkdaQ3puejhZcVFCMXVnYnVEdVNC?=
- =?utf-8?B?Wm5RNTR6cE9LeW9xMmhyM0tNK3BjNTN2UUtneVdzWEJ5Nm50OWs5RGxYamUw?=
- =?utf-8?Q?jusU=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD7D5FDA7;
+	Tue,  7 Jan 2025 01:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736214020; cv=none; b=RlIOcEn9Dr2RJ80XeMiKr+soZm9G+HBdtANzICHL/Xtz9HsOFsIbytCrikOJUknr2DvhiGRATYA0477+HKLKswRVqAa3un0rlSPe0wFsbu8jKgTD6D99U351q6z5RUoGvODrn605LYRtU0+5t6/V81NxvVaeUgn+Ht6tAQ8xqqM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736214020; c=relaxed/simple;
+	bh=1rx2u0PI5pysIH2/1k0zntVcu0S0KUGDGqVTsGQKfMc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=qBM31NxrPrjGvN5NE7IyPIy3K2doK7Po7XnAZ5jbT6jx/OsKnzSKKDDbUk+uhCU0H/Kn1axQgsXsp5sUwQh7c83387en0XB15qAs1wZj4ofdTvLOJff11QtNwz2nBHQ4oaqdF849RwmZPTPragbh68rsU2he06LYMFhMoOg1rR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YRtyj6PYFz4f3jks;
+	Tue,  7 Jan 2025 09:39:57 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id D3C9F1A1486;
+	Tue,  7 Jan 2025 09:40:12 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP2 (Coremail) with SMTP id Syh0CgBncWT4hXxnqoQBAQ--.16535S2;
+	Tue, 07 Jan 2025 09:40:12 +0800 (CST)
+Subject: Re: [PATCH bpf-next 15/19] bpf: Disable migration before calling
+ ops->map_free()
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko
+ <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Hao Luo <haoluo@google.com>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ Daniel Borkmann <daniel@iogearbox.net>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Jiri Olsa <jolsa@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Hou Tao <houtao1@huawei.com>,
+ Xu Kuohai <xukuohai@huawei.com>
+References: <20250106081900.1665573-1-houtao@huaweicloud.com>
+ <20250106081900.1665573-16-houtao@huaweicloud.com>
+ <CAADnVQJzQ9ADqpCb7mcsQCU1enTdPH7XtZKkTHyY739sg62CzA@mail.gmail.com>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <a467b9ac-3785-7c5d-577c-c2f4a43c6923@huaweicloud.com>
+Date: Tue, 7 Jan 2025 09:40:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea264419-3d7b-48eb-f703-08dd2ebb6c73
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jan 2025 01:34:26.9733
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: takjosfcZTIChPyrQ2AWYbUSkUya/KckjP1QH1VKpXw6gQg5W4EsDLn/+ddfZtwbhkZOFze2+suAqO4Yx8JJCA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10179
+In-Reply-To: <CAADnVQJzQ9ADqpCb7mcsQCU1enTdPH7XtZKkTHyY739sg62CzA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:Syh0CgBncWT4hXxnqoQBAQ--.16535S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3XFyUKr1DAFyrAryrKw15Jwb_yoW7uF4kpF
+	4kKF1jka10qF12kws3Xa1xC34Yvw45K3ySka98G34FyrZxXr9aqr1IyF15XFyY9r1Utr4S
+	vF1qg34Yv3y8ZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
 
-PiBJbiBlbmV0Y19waHlsaW5rX2Nvbm5lY3QoKSB3ZSBoYXZlIHRoZSBmb2xsb3dpbmc6DQo+IA0K
-PiAvKiBkaXNhYmxlIEVFRSBhdXRvbmVnLCB1bnRpbCBFTkVUQyBkcml2ZXIgc3VwcG9ydHMgaXQg
-Ki8NCj4gbWVtc2V0KCZlZGF0YSwgMCwgc2l6ZW9mKHN0cnVjdCBldGh0b29sX2tlZWUpKTsNCj4g
-cGh5bGlua19ldGh0b29sX3NldF9lZWUocHJpdi0+cGh5bGluaywgJmVkYXRhKTsNCj4gDQo+IElz
-IGl0IGEgaHcgY29uc3RyYWludCAoaWYgeWVzLCBvbiBhbGwgSVAgdmVyc2lvbnM/KSB0aGF0IEVF
-RSBpc24ndCBzdXBwb3J0ZWQsDQo+IG9yIGlzIGp1c3Qgc29tZSBkcml2ZXIgY29kZSBmb3IgbHBp
-IHRpbWVyIGhhbmRsaW5nIG1pc3Npbmc/DQo+IEFueSBwbGFucyB0byBmaXggRUVFIGluIHRoaXMg
-ZHJpdmVyPw0KDQpIaSBIZWluZXIsDQoNCkN1cnJlbnRseSwgdGhlcmUgYXJlIHR3byBwbGF0Zm9y
-bXMgdXNlIHRoZSBlbmV0YyBkcml2ZXIsIG9uZSBpcyBMUzEwMjhBLA0Kd2hvc2UgRU5FVEMgdmVy
-c2lvbiBpcyB2MS4wLCBhbmQgdGhlIG90aGVyIGlzIGkuTVg5NSwgd2hvc2UgdmVyc2lvbiBpcw0K
-djQuMS4gQXMgZmFyIGFzIEkga25vdywgdGhlIEVORVRDIGhhcmR3YXJlIG9mIGJvdGggcGxhdGZv
-cm1zIHN1cHBvcnRzDQpFRUUsIGJ1dCB0aGUgaW1wbGVtZW50YXRpb24gaXMgZGlmZmVyZW50LiBB
-cyB0aGUgbWFpbnRhaW5lciBvZiBpLk1YDQpwbGF0Zm9ybSwgSSBkZWZpbml0ZWx5IHN1cmUgQ2xh
-cmsgd2lsbCBhZGQgdGhlIEVFRSBzdXBwb3J0IGZvciBpLk1YOTUgaW4gdGhlDQpmdXR1cmUuIEJ1
-dCBmb3IgTFMxMDI4QSwgaXQgaXMgbm90IGNsZWFyIHRvIG1lIHdoZXRoZXIgVmxhZGltaXIgaGFz
-IHBsYW5zDQp0byBzdXBwb3J0IEVFRS4NCg==
+Hi,
+
+On 1/7/2025 6:24 AM, Alexei Starovoitov wrote:
+> On Mon, Jan 6, 2025 at 12:07 AM Hou Tao <houtao@huaweicloud.com> wrote:
+>> From: Hou Tao <houtao1@huawei.com>
+>>
+>> Disabling migration before calling ops->map_free() to simplify the
+>> freeing of map values or special fields allocated from bpf memory
+>> allocator.
+>>
+>> After disabling migration in bpf_map_free(), there is no need for
+>> additional migration_{disable|enable} pairs in the ->map_free()
+>> callbacks. Remove these redundant invocations.
+>>
+>> Signed-off-by: Hou Tao <houtao1@huawei.com>
+>> ---
+>>  kernel/bpf/arraymap.c          | 2 --
+>>  kernel/bpf/bpf_local_storage.c | 2 --
+>>  kernel/bpf/hashtab.c           | 2 --
+>>  kernel/bpf/range_tree.c        | 2 --
+>>  kernel/bpf/syscall.c           | 8 +++++++-
+>>  5 files changed, 7 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
+>> index 451737493b17..eb28c0f219ee 100644
+>> --- a/kernel/bpf/arraymap.c
+>> +++ b/kernel/bpf/arraymap.c
+>> @@ -455,7 +455,6 @@ static void array_map_free(struct bpf_map *map)
+>>         struct bpf_array *array = container_of(map, struct bpf_array, map);
+>>         int i;
+>>
+>> -       migrate_disable();
+>>         if (!IS_ERR_OR_NULL(map->record)) {
+>>                 if (array->map.map_type == BPF_MAP_TYPE_PERCPU_ARRAY) {
+>>                         for (i = 0; i < array->map.max_entries; i++) {
+>> @@ -472,7 +471,6 @@ static void array_map_free(struct bpf_map *map)
+>>                                 bpf_obj_free_fields(map->record, array_map_elem_ptr(array, i));
+>>                 }
+>>         }
+>> -       migrate_enable();
+>>
+>>         if (array->map.map_type == BPF_MAP_TYPE_PERCPU_ARRAY)
+>>                 bpf_array_free_percpu(array);
+>> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
+>> index b649cf736438..12cf6382175e 100644
+>> --- a/kernel/bpf/bpf_local_storage.c
+>> +++ b/kernel/bpf/bpf_local_storage.c
+>> @@ -905,13 +905,11 @@ void bpf_local_storage_map_free(struct bpf_map *map,
+>>                 while ((selem = hlist_entry_safe(
+>>                                 rcu_dereference_raw(hlist_first_rcu(&b->list)),
+>>                                 struct bpf_local_storage_elem, map_node))) {
+>> -                       migrate_disable();
+>>                         if (busy_counter)
+>>                                 this_cpu_inc(*busy_counter);
+>>                         bpf_selem_unlink(selem, true);
+>>                         if (busy_counter)
+>>                                 this_cpu_dec(*busy_counter);
+>> -                       migrate_enable();
+>>                         cond_resched_rcu();
+>>                 }
+>>                 rcu_read_unlock();
+>> diff --git a/kernel/bpf/hashtab.c b/kernel/bpf/hashtab.c
+>> index 8bf1ad326e02..6051f8a39fec 100644
+>> --- a/kernel/bpf/hashtab.c
+>> +++ b/kernel/bpf/hashtab.c
+>> @@ -1570,14 +1570,12 @@ static void htab_map_free(struct bpf_map *map)
+>>          * underneath and is responsible for waiting for callbacks to finish
+>>          * during bpf_mem_alloc_destroy().
+>>          */
+>> -       migrate_disable();
+>>         if (!htab_is_prealloc(htab)) {
+>>                 delete_all_elements(htab);
+>>         } else {
+>>                 htab_free_prealloced_fields(htab);
+>>                 prealloc_destroy(htab);
+>>         }
+>> -       migrate_enable();
+>>
+>>         bpf_map_free_elem_count(map);
+>>         free_percpu(htab->extra_elems);
+>> diff --git a/kernel/bpf/range_tree.c b/kernel/bpf/range_tree.c
+>> index 5bdf9aadca3a..37b80a23ae1a 100644
+>> --- a/kernel/bpf/range_tree.c
+>> +++ b/kernel/bpf/range_tree.c
+>> @@ -259,9 +259,7 @@ void range_tree_destroy(struct range_tree *rt)
+>>
+>>         while ((rn = range_it_iter_first(rt, 0, -1U))) {
+>>                 range_it_remove(rn, rt);
+>> -               migrate_disable();
+>>                 bpf_mem_free(&bpf_global_ma, rn);
+>> -               migrate_enable();
+>>         }
+>>  }
+>>
+>> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+>> index 0503ce1916b6..e7a41abe4809 100644
+>> --- a/kernel/bpf/syscall.c
+>> +++ b/kernel/bpf/syscall.c
+>> @@ -835,8 +835,14 @@ static void bpf_map_free(struct bpf_map *map)
+>>         struct btf_record *rec = map->record;
+>>         struct btf *btf = map->btf;
+>>
+>> -       /* implementation dependent freeing */
+>> +       /* implementation dependent freeing. Disabling migration to simplify
+>> +        * the free of values or special fields allocated from bpf memory
+>> +        * allocator.
+>> +        */
+>> +       migrate_disable();
+>>         map->ops->map_free(map);
+>> +       migrate_enable();
+>> +
+> I was about to comment on patches 10-13 that it's
+> better to do it in bpf_map_free(), but then I got to this patch.
+> All makes sense, but the patch breakdown is too fine grain.
+> Patches 10-13 introduce migrate pairs only to be deleted
+> in patch 15. Please squash them into one patch.
+
+OK. However I need to argue for the fine grained break down. The
+original though is that if disabling migration for ->map_free callback
+for all maps introduces some problems, we could revert the patch #15
+separately instead of reverting the squashed patch and moving the
+migrate_{disable|enable}() pair to maps which are OK with that change
+again.  What do you think ?
+>
+> Also you mention in the cover letter:
+>
+>> Considering the bpf-next CI is broken
+> What is this about?
+
+Er, I said it wrong. It is my local bpf-next setup. A few days ago, when
+I tried to verify the patch by using bpf_next/for-next treee, the
+running of test_maps and test_progs failed. Will check today that
+whether it is OK.
+>
+> The cant_migrate() additions throughout looks
+> a bit out of place. All that code doesn't care about migrations.
+> Only bpf_ma code does. Let's add it there instead?
+> The stack trace will tell us the caller anyway,
+> so no information lost.
+
+OK. However bpf_ma is not the only one which needs disabled migration.
+The reason that bpf_ma needs migrate_disable() is the use of
+this_cpu_ptr(). However, there are many places in bpf which use
+this_cpu_ptr() (e.g., bpf_for_each_array_elem) and this_cpu_{in|del}
+pair (e.g., bpf_cgrp_storage_lock).  I will check the cant_migrate which
+can be removed in v2.
+>
+> Overall it looks great.
+
+Thanks for these suggestions.
+>
+> pw-bot: cr
+> .
+
 
