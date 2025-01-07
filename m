@@ -1,273 +1,133 @@
-Return-Path: <netdev+bounces-155664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319BAA03514
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:24:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACDAA03516
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09D3F164464
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:24:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AE8B18863DE
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F3D80BFF;
-	Tue,  7 Jan 2025 02:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ghDRdQ3/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B939E33086;
+	Tue,  7 Jan 2025 02:24:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BCE70810;
-	Tue,  7 Jan 2025 02:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB752BD04
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 02:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736216662; cv=none; b=CghmO4WAE4CHJHXgxJzBdQygCk1GguIyTqOsXkI6vV8+Gkk0Jlm+cx+HAE9bSe9/8sY7rVsYXIAbX0aIIwxaFF8+45cbFjPO/DqsaVjzRidcQP9c3juAYiBjbxQi9HAwruLepRIUWF3bSHGoEdJ1Uks1pgnl+F6GAFCPdh0aep0=
+	t=1736216686; cv=none; b=kFawCpsDBtxHE2YRDRo2LvamkKpFgJR907TDlEkC46AX7uSY1DL1QRIBIJ/j6e7FjC9pL6POh0fSn2rKQFmNQXoEhfJU+PcjHiyGpc8uacCp0BgUc15KCaqLd0JJLO+V4oXN6pAsVeg4YS4/q9aznvqFMn4pqVbkgnggrwHIAXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736216662; c=relaxed/simple;
-	bh=2rUo6c4R+HsjvqEa/dEuyH55nzIQz7mdn5ndl3NjVqA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ro/EeSJHFtUKp55cWSAONIK5yGAwvw8dGJAYmFwBKcm3EJCgglhzuPsA3x79M8Tg1MecXNlyjTrBs0n4IwmRbxBOuKZ4hI5ixyBHpPem2ASX11LUFBP1rd121ON3V2XsSXzQ1ceVY/Ipyc7WTIV8gK6mdfQ8FtP4VqNsqqpoKz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ghDRdQ3/; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-385ddcfc97bso12665033f8f.1;
-        Mon, 06 Jan 2025 18:24:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736216656; x=1736821456; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jXkrP8t8gOHXzrDwPMWRkyABOLRzwu/N+e6UIfVcHsg=;
-        b=ghDRdQ3/hxSUtVizAePtCBPDn2cWbz7jVt1D6uPdWJ7cAiJhPsGCvCwkD7pdk6cj9n
-         EYafHzChO5xq0pcpGNN99K7S/bOEFPReroJ2Zqb9ikAvfV8IhcA7xBO0c3EMLOXgUzjL
-         e+mw1aD8c/f4LQhVvg/RZM0JgytZvyGuw/zL1WJwiu6GBrUZZbZ7SWdB8s7ijausOmJI
-         A9eGDt40LNWLkQQF2Am9LmuA/E53ZWH5TkdhpESwOVSTmDreZWk5L0oOf7omdgUA/XLC
-         kru7wrtWg9RHoUqJP4QcjJ9LRA6h7rtYJBjiM457v+K0W7G3PIj3R2u3ZSomro/OZd7z
-         4gFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736216656; x=1736821456;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jXkrP8t8gOHXzrDwPMWRkyABOLRzwu/N+e6UIfVcHsg=;
-        b=F9ady2YPrWu8ta/QvhC5wWI+HZ8kbf95s6dHSCy2EFjqD751brmEhoGFnyAGsCy6aE
-         leF/2KqXjTvRhqzUjFtRZQw6M+nwa2Kn5O74QmyZjTze4MHGj3c2vHA+JNgREiweBtub
-         FzDqyAYBm6I+VpMxMh39WtiKSpj3g8xQx96P1dMjiAxOZE+2eNYDzFIyYo6utk/Dnswf
-         /Aj4cM+2d7ZfxGVvRUJUOd2N4VJoxijWx7gsDWbLJ82jmo4Hn3Ik5R6jKGbKvh3OxxrE
-         X7LQ7baoqrCDiOZSeAmqvhSNmF7gS5az9/A7SDMMfb0JCxqM+Y58dRMxGwbxiUd8Criy
-         /d4A==
-X-Forwarded-Encrypted: i=1; AJvYcCX0GnoSJZ9VnMaDJQQ5Dfh6QvFGMX6yke0C8pqmzeprAaJXw2vl9tZWtznNhDg6CWvFuG6ZibM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbHdVlh9I6TPSJDpws+9eq/GV8GeNAUAnLnI81LrA6zxrQA7fP
-	mDI7u49XQ0c9KAbcCOVmsAcNw4Z83feHmWUsFtYoyVnRwMODtx+r8ZfIi3ti3jV5I4nwn1PmVfI
-	jbKlnItfmybojtj4osFg0hWWZ/sw=
-X-Gm-Gg: ASbGnctNhSYOGZnQ4KmHJu8GHGPtinvZAW7naHN2TlfZtWCmQHAnQRZHn98Od1moKbp
-	Q3Kah7ny0ntXb6ePBucOgj3JjKNSWF2sYSgOprw==
-X-Google-Smtp-Source: AGHT+IH36M140hpGyae1JU8H8yi3BJsV1dne/XfBiQ8IvfJbd31IJ/3/gn/aEShkIhPqCUtrrJwvC7A3fTvD6a+SnKI=
-X-Received: by 2002:a05:6000:2ae:b0:385:ed16:c97 with SMTP id
- ffacd0b85a97d-38a224088aemr45748331f8f.49.1736216655650; Mon, 06 Jan 2025
- 18:24:15 -0800 (PST)
+	s=arc-20240116; t=1736216686; c=relaxed/simple;
+	bh=7get7PwQQQlQZAjyKFX/M0HCgb8mC6HZSEYaaz25ewM=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EZX9istZWN6TIZz0zBfflBweJmRh4AAkd+YTXX//HnqhtY+jWEQEmV2lxocRfFEpUW1vy5lb7PBicqyueP1umumU32gBSVX4+PDKSwI4LEtrBrGz5dXWV//TEpfonIr9obsNyE8h2km6COU6nt2ZJrUPhObdgi5BHIk3wv8QmmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas6t1736216669t426t25583
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.118.30.165])
+X-QQ-SSF:0001000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 4438678781041383670
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<richardcochran@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<jacob.e.keller@intel.com>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20250102103026.1982137-1-jiawenwu@trustnetic.com> <20250102103026.1982137-2-jiawenwu@trustnetic.com> <ab140807-2e49-4782-a58c-2b8d60da5556@lunn.ch> <032b01db600e$8d845430$a88cfc90$@trustnetic.com> <a4576efa-2d20-47e9-b785-66dbfda78633@lunn.ch>
+In-Reply-To: <a4576efa-2d20-47e9-b785-66dbfda78633@lunn.ch>
+Subject: RE: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
+Date: Tue, 7 Jan 2025 10:24:28 +0800
+Message-ID: <035001db60ab$4707cfd0$d5176f70$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250106081900.1665573-1-houtao@huaweicloud.com>
- <20250106081900.1665573-16-houtao@huaweicloud.com> <CAADnVQJzQ9ADqpCb7mcsQCU1enTdPH7XtZKkTHyY739sg62CzA@mail.gmail.com>
- <a467b9ac-3785-7c5d-577c-c2f4a43c6923@huaweicloud.com>
-In-Reply-To: <a467b9ac-3785-7c5d-577c-c2f4a43c6923@huaweicloud.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 6 Jan 2025 18:24:04 -0800
-X-Gm-Features: AbW1kvbqnH299QAv49Pfwcjsu-P7Vv5NlTIxIPVEeV0zuuXRcZhwlj8w4ldvvg0
-Message-ID: <CAADnVQKQ6bCFVwaFUb0fpnhMyGDH9-HRDOFDkR3Mdjotk39jPw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 15/19] bpf: Disable migration before calling ops->map_free()
-To: Hou Tao <houtao@huaweicloud.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Hao Luo <haoluo@google.com>, 
-	Yonghong Song <yonghong.song@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Hou Tao <houtao1@huawei.com>, 
-	Xu Kuohai <xukuohai@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQEgJ35Ybs4gTOBDiJnQm6cX+eEXEQKNhMgNAhs0hhkDC4VZPgJmfkjntDAwn7A=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MTkbnw8ZeqfcXFyFCpcFVn0RAyDpqGSzmI1IY3C2fX4lq6/PiD/tPjrB
+	jXhiWydxrlszIqLRR1Vz1Ca8p/mQTFKlS+sNqyg4D24/dsfz6HKktZc+P/JGMB3Hddr9d4z
+	RlduyUaC/LWpuX6NEsUSuTRzr/PRy7wwRhBPKdJ5JCIb+jUrbiWqU1C5AsWeVEJLSzS2Ryt
+	Cg6hOabOaogh/sx4hVcOOxjYQ6NwvSkyn+oPMe3tp+77Mx3Ouf2kbzJlEZ6u8UfA1oSZoak
+	pJins+ZvI4DaLUhWyiIWbldywMydnRD2sNQhq45G/XbNiKnZxJVZAzms3tff5IsBky28w89
+	mV4+hKRkYl7Cht9j33bk3fAM62GVK2KV+H/HIBj22GkWS0UGSoctjd8q7odrmquSRd6P3M1
+	dLuBAgBiisr/0R3QdPjxhY4CAKyjYm/GbaIrsO3beI+yjnOYsMVyoG5nF4xYw3MZTHpLEKK
+	bid+hfDD/vVJZwEV2pTOwjStFPgcOcf+2UEeDT7zYPzODU6nshaUuQYI9D+2FhHzWsRm4wX
+	h6bo45MOlDZmuI/ieMoqXpgoZZMXCOGaWJCRdxZmNrxsCxAebnqHhqPGwJoWOpwLWA/IMEz
+	wLLnf29mwhZRAkLLXiT6yWQ3IfV9b///Vru7YIY09MkQSL3xnY/ixKjz3q4VbJa+r9OZjAl
+	v8YWcUMZKjXanEsfwGyqYueV6f3e/gaASkZ/yNge4+s41YCktqN7+wuCq3cIVw5DckGl95W
+	8KnbtpIZo4MV4HxnwBYXm710UUOGWQHok79mblu4Q4n++PFiQZTJUuAJ3ZWlGHuSvuZnQ53
+	GSd3MFG/EBhTDnuo5KOkV6LfJIARkofC4G7429kqtaN0+Sy6outcFoE3hmKglBU6VL7hLDa
+	46woXFegkEqmlr6IhuxhbndbW43QsBkVFNA5HpbFRmGZCSXz0DavIchezYAhj6mGnqRKiAF
+	stIgUgNHnfVu31J8wHKM5yz7iHFGbRXMDlhbD9wdHReBtYAqUT2F/daw+TsC9FnJlnDEf+S
+	NTZHFl3VyfQRUVryb9YG+dCsFZQWay/kL9LbG8gi9Hvvs7Y93gugOzsYI0TVY=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-On Mon, Jan 6, 2025 at 5:40=E2=80=AFPM Hou Tao <houtao@huaweicloud.com> wro=
-te:
->
-> Hi,
->
-> On 1/7/2025 6:24 AM, Alexei Starovoitov wrote:
-> > On Mon, Jan 6, 2025 at 12:07=E2=80=AFAM Hou Tao <houtao@huaweicloud.com=
-> wrote:
-> >> From: Hou Tao <houtao1@huawei.com>
-> >>
-> >> Disabling migration before calling ops->map_free() to simplify the
-> >> freeing of map values or special fields allocated from bpf memory
-> >> allocator.
-> >>
-> >> After disabling migration in bpf_map_free(), there is no need for
-> >> additional migration_{disable|enable} pairs in the ->map_free()
-> >> callbacks. Remove these redundant invocations.
-> >>
-> >> Signed-off-by: Hou Tao <houtao1@huawei.com>
-> >> ---
-> >>  kernel/bpf/arraymap.c          | 2 --
-> >>  kernel/bpf/bpf_local_storage.c | 2 --
-> >>  kernel/bpf/hashtab.c           | 2 --
-> >>  kernel/bpf/range_tree.c        | 2 --
-> >>  kernel/bpf/syscall.c           | 8 +++++++-
-> >>  5 files changed, 7 insertions(+), 9 deletions(-)
-> >>
-> >> diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
-> >> index 451737493b17..eb28c0f219ee 100644
-> >> --- a/kernel/bpf/arraymap.c
-> >> +++ b/kernel/bpf/arraymap.c
-> >> @@ -455,7 +455,6 @@ static void array_map_free(struct bpf_map *map)
-> >>         struct bpf_array *array =3D container_of(map, struct bpf_array=
-, map);
-> >>         int i;
-> >>
-> >> -       migrate_disable();
-> >>         if (!IS_ERR_OR_NULL(map->record)) {
-> >>                 if (array->map.map_type =3D=3D BPF_MAP_TYPE_PERCPU_ARR=
-AY) {
-> >>                         for (i =3D 0; i < array->map.max_entries; i++)=
- {
-> >> @@ -472,7 +471,6 @@ static void array_map_free(struct bpf_map *map)
-> >>                                 bpf_obj_free_fields(map->record, array=
-_map_elem_ptr(array, i));
-> >>                 }
-> >>         }
-> >> -       migrate_enable();
-> >>
-> >>         if (array->map.map_type =3D=3D BPF_MAP_TYPE_PERCPU_ARRAY)
-> >>                 bpf_array_free_percpu(array);
-> >> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_sto=
-rage.c
-> >> index b649cf736438..12cf6382175e 100644
-> >> --- a/kernel/bpf/bpf_local_storage.c
-> >> +++ b/kernel/bpf/bpf_local_storage.c
-> >> @@ -905,13 +905,11 @@ void bpf_local_storage_map_free(struct bpf_map *=
-map,
-> >>                 while ((selem =3D hlist_entry_safe(
-> >>                                 rcu_dereference_raw(hlist_first_rcu(&b=
-->list)),
-> >>                                 struct bpf_local_storage_elem, map_nod=
-e))) {
-> >> -                       migrate_disable();
-> >>                         if (busy_counter)
-> >>                                 this_cpu_inc(*busy_counter);
-> >>                         bpf_selem_unlink(selem, true);
-> >>                         if (busy_counter)
-> >>                                 this_cpu_dec(*busy_counter);
-> >> -                       migrate_enable();
-> >>                         cond_resched_rcu();
-> >>                 }
-> >>                 rcu_read_unlock();
-> >> diff --git a/kernel/bpf/hashtab.c b/kernel/bpf/hashtab.c
-> >> index 8bf1ad326e02..6051f8a39fec 100644
-> >> --- a/kernel/bpf/hashtab.c
-> >> +++ b/kernel/bpf/hashtab.c
-> >> @@ -1570,14 +1570,12 @@ static void htab_map_free(struct bpf_map *map)
-> >>          * underneath and is responsible for waiting for callbacks to =
-finish
-> >>          * during bpf_mem_alloc_destroy().
-> >>          */
-> >> -       migrate_disable();
-> >>         if (!htab_is_prealloc(htab)) {
-> >>                 delete_all_elements(htab);
-> >>         } else {
-> >>                 htab_free_prealloced_fields(htab);
-> >>                 prealloc_destroy(htab);
-> >>         }
-> >> -       migrate_enable();
-> >>
-> >>         bpf_map_free_elem_count(map);
-> >>         free_percpu(htab->extra_elems);
-> >> diff --git a/kernel/bpf/range_tree.c b/kernel/bpf/range_tree.c
-> >> index 5bdf9aadca3a..37b80a23ae1a 100644
-> >> --- a/kernel/bpf/range_tree.c
-> >> +++ b/kernel/bpf/range_tree.c
-> >> @@ -259,9 +259,7 @@ void range_tree_destroy(struct range_tree *rt)
-> >>
-> >>         while ((rn =3D range_it_iter_first(rt, 0, -1U))) {
-> >>                 range_it_remove(rn, rt);
-> >> -               migrate_disable();
-> >>                 bpf_mem_free(&bpf_global_ma, rn);
-> >> -               migrate_enable();
-> >>         }
-> >>  }
-> >>
-> >> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-> >> index 0503ce1916b6..e7a41abe4809 100644
-> >> --- a/kernel/bpf/syscall.c
-> >> +++ b/kernel/bpf/syscall.c
-> >> @@ -835,8 +835,14 @@ static void bpf_map_free(struct bpf_map *map)
-> >>         struct btf_record *rec =3D map->record;
-> >>         struct btf *btf =3D map->btf;
-> >>
-> >> -       /* implementation dependent freeing */
-> >> +       /* implementation dependent freeing. Disabling migration to si=
-mplify
-> >> +        * the free of values or special fields allocated from bpf mem=
-ory
-> >> +        * allocator.
-> >> +        */
-> >> +       migrate_disable();
-> >>         map->ops->map_free(map);
-> >> +       migrate_enable();
-> >> +
-> > I was about to comment on patches 10-13 that it's
-> > better to do it in bpf_map_free(), but then I got to this patch.
-> > All makes sense, but the patch breakdown is too fine grain.
-> > Patches 10-13 introduce migrate pairs only to be deleted
-> > in patch 15. Please squash them into one patch.
->
-> OK. However I need to argue for the fine grained break down. The
-> original though is that if disabling migration for ->map_free callback
-> for all maps introduces some problems, we could revert the patch #15
-> separately instead of reverting the squashed patch and moving the
-> migrate_{disable|enable}() pair to maps which are OK with that change
-> again.  What do you think ?
-
-Feels overkill.
-If migrate disable for the duration of map_free callback causes issues
-we can introduce individual migrate pairs per map type
-or revert the whole thing,
-but imo it's all too theoretical at this point.
-
+On Mon, Jan 6, 2025 10:27 PM, Andrew Lunn wrote:
+> > > > +	smp_mb(); /* Force any pending update before accessing. */
+> > > > +	incval = READ_ONCE(wx->base_incval);
+> > > > +	incval = adjust_by_scaled_ppm(incval, ppb);
+> > > > +
+> > > > +	mask = (wx->mac.type == wx_mac_em) ? 0x7FFFFFF : 0xFFFFFF;
+> > > > +	if (incval > mask)
+> > > > +		dev_warn(&wx->pdev->dev,
+> > > > +			 "PTP ppb adjusted SYSTIME rate overflowed!\n");
+> > >
+> > > There is no return here, you just keep going. What happens if there is
+> > > an overflow?
 > >
-> > Also you mention in the cover letter:
+> > If there is an overflow, the calibration value of this second will be
+> > inaccurate. But it does not affect the calibration value of the next
+> > second. And this rarely happens.
+> 
+> If this is a onetime event you don't really care about, is a
+> dev_warn() justified? Do you want to be handling the user questions
+> about what it means, when all you are going to say is, ignore it, it
+> does not really matter?
+
+I'll remove the dev_warn() to avoid user confusion.
+
+> 
+> > > > +/**
+> > > > + * wx_ptp_tx_hwtstamp_work
+> > > > + * @work: pointer to the work struct
+> > > > + *
+> > > > + * This work item polls TSYNCTXCTL valid bit to determine when a Tx hardware
+> > > > + * timestamp has been taken for the current skb. It is necessary, because the
+> > > > + * descriptor's "done" bit does not correlate with the timestamp event.
+> > > > + */
+> > >
+> > > Are you saying the "done" bit can be set, but the timestamp is not yet
+> > > in place? I've not read the whole patch, but do you start polling once
+> > > "done" is set, or as soon at the skbuff is queues for transmission?
 > >
-> >> Considering the bpf-next CI is broken
-> > What is this about?
->
-> Er, I said it wrong. It is my local bpf-next setup. A few days ago, when
-> I tried to verify the patch by using bpf_next/for-next treee, the
-> running of test_maps and test_progs failed. Will check today that
-> whether it is OK.
+> > The descriptor's "done" bit cannot be used as a basis for Tx hardware
+> > timestamp. So we should poll the valid bit in the register.
+> 
+> You did not answer my question. When do you start polling?
 
-I see. /for-next maybe having issues. That needs to be investigated
-separately.
-Make sure /master is working well.
+As soon at the skbuff is queues for transmission.
 
-> >
-> > The cant_migrate() additions throughout looks
-> > a bit out of place. All that code doesn't care about migrations.
-> > Only bpf_ma code does. Let's add it there instead?
-> > The stack trace will tell us the caller anyway,
-> > so no information lost.
->
-> OK. However bpf_ma is not the only one which needs disabled migration.
-> The reason that bpf_ma needs migrate_disable() is the use of
-> this_cpu_ptr(). However, there are many places in bpf which use
-> this_cpu_ptr() (e.g., bpf_for_each_array_elem) and this_cpu_{in|del}
-> pair (e.g., bpf_cgrp_storage_lock).  I will check the cant_migrate which
-> can be removed in v2.
 
-Well, maybe not all cant_migrate() hunks across all patches.
-But patches 16, 17, 18, 19 don't look like the right places
-for cant_migrate().
 
