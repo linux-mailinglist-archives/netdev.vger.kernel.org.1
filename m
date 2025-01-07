@@ -1,159 +1,167 @@
-Return-Path: <netdev+bounces-155840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB5BA0407B
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:11:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CA65A04090
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 966E9161F92
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:11:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D637A1882E39
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647171F12F2;
-	Tue,  7 Jan 2025 13:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572D71DF995;
+	Tue,  7 Jan 2025 13:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZzKjXZdM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nB6SqPxp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C661F12E5;
-	Tue,  7 Jan 2025 13:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A43E1E1322;
+	Tue,  7 Jan 2025 13:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736255441; cv=none; b=LooD+OLncWHkO7OwoE0OUety89IAqWxPQmSxJcfKloBe0eRhg0aUvmV41Bn/HEP8RMXEE5141ToGglHjBUJghy643HyZ3fXYDPOWqI24ZKoMGavKFi12i6mkrOK5FmDiz8WprmTEzbUjpiVvRbm+eabdUFyS+GQkKfkvvTVp6Ao=
+	t=1736255649; cv=none; b=d/rq+iNNss88gCGez7FehMOWl3O8tvpqFCSDwoBx4l4Es4EqqCP1mFpXl1EEVVJXrlpfT/9jJGBOHUFbnL6qagFbrjaSMJtFoVzrgldiEojo16DgDmMJd188wcnAdFEuf4IUVVtBH4S7eUEG47qI2GWxghIJjxNpfhXhGrZOSgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736255441; c=relaxed/simple;
-	bh=ADthGajJ7+jWaB9VjhYsjhEH3MBHyp118HkFuCCVAs0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=DST0rEWcaGZAefgxgTqqg5yA4F8u86vvAurXOvZWITGStcg6Y3UgvlwVaqK8uKENwo4+JYfpxoFmPKrsl66+cajDoqvHjPh8dieP96uepy/GOFh80NR+S9TcHoWfqd1IcLsbB1AAJeltu1d9FTKlnpdySXJakIj+SqLl7yASyqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZzKjXZdM; arc=none smtp.client-ip=209.85.160.180
+	s=arc-20240116; t=1736255649; c=relaxed/simple;
+	bh=dEXv7Cj+BC57a/C4F+5/2Rm0FhmxI6RRXkVRjhyCXkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d+InHA7ia1noUitcidRoVrwHNQ8yWdfduTxkyjcSqSI8XVnlrMjXbjPKP3hkYsfPhVhNvKkh2HRIWK1062SJf0siimvunSXmY0o+FDD5fHuCRgazfkepb9Q6nf/7rntiV7ZL2mr53yCMQ3vfQN6hlvDYllV1LKcEZ5Y/64MxWEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nB6SqPxp; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4678cd314b6so147812191cf.3;
-        Tue, 07 Jan 2025 05:10:37 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d0d32cd31aso23126420a12.0;
+        Tue, 07 Jan 2025 05:14:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736255437; x=1736860237; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LyZlC18SS7DOxCTGKSOqaGQPIN80T4lc/PP/O9Mt8pw=;
-        b=ZzKjXZdMDn3NYApjE9/+BWEMkPsHqXTyOMr8NS9D5El5tiVYke8vlaCgxSrLcjzVHE
-         FiyhLiVCoUoIV7Qgbj8Tcez2qwZ4LisF/TCiAtn4A5AYgpwnSiutGo8AfC8ldd6VB7nG
-         Vz8GOwRyQlW9u/zYO9HaRDxSvIhwJSgw8wRgIvx6jYCLRU3Dx39W0tu4H6fc79tbqytK
-         FXJhicxe51SNPCVXGV3P5EaV0vt3ILEwp71+doD+qcvS55Eka5fqA/73PM5lRG+cH23l
-         R8OHClicumd1NQeW1ALUAMfHOqoA+Sl4kac71l+uNhcohHBQnAcwCXAJehc6AX9OAHlX
-         t1Sg==
+        d=gmail.com; s=20230601; t=1736255646; x=1736860446; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TaKbNQkeyDwSjQGIQ+m5SGuLh75ZMMIa7nlAuxNwI4s=;
+        b=nB6SqPxpCWt77xF3nYeG3JLsw7BStLJUFLe8ZM2p5PvTcIDo2pPSwnCvM61J/1PwQ1
+         CMNhTaRar74kN3gH7sjOrrfZVs2QcC/z43oLvGqjAQ/PrQBPIcI/hiNcZBoTIDuYuqNL
+         ar+Bj4hEGpRP4+ATti7CJ1CfG8lCDUjjxxaZLhDs3UIa2CgVIhUWFguqmOjt1FYe/aOA
+         Swqk7nH7QnGWv69+BkTIjlUbT3Kc7Vp5gE5Ie9mtdZ4LbDqhNTmPK2+fWBkKHwWdZkUe
+         bQagC6bjZrTw5IQhwg6se26Xi/YPVqXwaa6mOt1o9g2Yk9hKRtxOpJd1mv0t+YS9ShHM
+         aHTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736255437; x=1736860237;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LyZlC18SS7DOxCTGKSOqaGQPIN80T4lc/PP/O9Mt8pw=;
-        b=MR8A8tFBd8iG86OxHuRK6jAwxpjLfy6RTXl3FSJlR83NHLx5mjZt0e5yh8KHCATAV8
-         MU2ZqPfs3BQCp6Kx4YanI8Sw9/BgP8AhZexS6l3LdFEYg7tbXZR5japqo7IX6vMYTLNc
-         btsakxJAz+uTdoYCG9CvyOf6WBcTtdOvaMGvq1H5otYhohVbWL5oP0ngf89PB9hiK4zY
-         FrgJKaJDXBVGDHwAICx2NmMEvvC3BnJc3r5xF2J8AtYpoHuyA26ofAjhewYCODIxJDBH
-         ssXDi2tAOh1kTVH7tyOuD72Q/NKWHu5oQ2jJVUAksHReVYRQZmmGQq3s28K6paLobweD
-         sfHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWp0g+kX/y13u1of24RzyLbsGpp1u4iDZO+EaOzIhtdv6o2uyqasDpPA1XlN7gpfcNWhfEmw64=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyj7E/8n51TMCFph4t5ShhplKNA9CrayTXtBlddLbHcHFP1hOCH
-	cNJciTqKywu1bzl1QiRLAI5OmnyxSH2YZufQIzw5h5b7mTP/oAVj
-X-Gm-Gg: ASbGncsrQCqjFh+I3CY/Ny6AzI6+V1LdqginFrrSwo53cDP+DPjJ21NfvXTHZ49c9e1
-	yKIJVqkxJFvbLFBsgiYomMlLI+aZPKDk+e1VRkCtvYKlUsb8OILDiL+34UyUzmqJiwQxe9sCBJt
-	AyXxJTyoLXKiqioqQ65hKSMN6Mz1t3UnheDlEt8Gs2ex7bMjtaCOc/G77Tkxb+ICsYz0mLXOXhD
-	iZ5EjPA4nJLRw7iXiamdGd9DWmP5htBLr7BaAUxIEcyFf/lgfOm9NUdnO4s7xiY/m6PJMmm5uYk
-	4STd/iOFvS/BBWPr1Lacyd1z6sfl
-X-Google-Smtp-Source: AGHT+IEPyxAUWSUdJdMbMamDFe9RlQY5ctTqXp9Ht4VmNKlzKeTLFX43ShuxBih720QX6qsqu3TfPg==
-X-Received: by 2002:ac8:7d52:0:b0:467:5ea8:83e7 with SMTP id d75a77b69052e-46a4a8add7emr768053081cf.9.1736255436838;
-        Tue, 07 Jan 2025 05:10:36 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3e64d9c1sm186324551cf.2.2025.01.07.05.10.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 05:10:36 -0800 (PST)
-Date: Tue, 07 Jan 2025 08:10:36 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- Jakub Kicinski <kuba@kernel.org>, 
- stable@vger.kernel.org, 
- jdamato@fastly.com, 
- almasrymina@google.com, 
- amritha.nambiar@intel.com, 
- sridhar.samudrala@intel.com
-Message-ID: <677d27cc5d9b_25382b294fd@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250106180137.1861472-1-kuba@kernel.org>
-References: <20250106180137.1861472-1-kuba@kernel.org>
-Subject: Re: [PATCH net] netdev: prevent accessing NAPI instances from another
- namespace
+        d=1e100.net; s=20230601; t=1736255646; x=1736860446;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TaKbNQkeyDwSjQGIQ+m5SGuLh75ZMMIa7nlAuxNwI4s=;
+        b=NEubKqb/4qS0kpELCQ+mYjKiB0T+pElt8TZf1aG8/+0MDDtLeLZ9VYpiukawWiRg1i
+         LExy49dSehA77K1Qm4rQ778Shc6xlKE83NWQ5tKX9z1kzq1Fyl7c2TdYFSO5h5I1Z3Sh
+         m7s+kLDAbBQiHVfi4HFgMbKvqCgeEOge6xDXYkkqg1xQdnEeOmb8/ZgsznPMB56WLVDs
+         2WkZZpiBBaHwZNHwWTwkf9f3kWslmY5LBa+Hor045RtkJgNsx6c0+BfAEq/XHq+hX5qG
+         5Vo1KscmYRz4AyF9J+ZVzPA0EEJ6JfRC7ZZVazjeK462W6NCyk63ZTuGAxiHDaanBbMU
+         ll/g==
+X-Forwarded-Encrypted: i=1; AJvYcCVVgg7mB+/78FX51lnp7PhuCLNHDbpXmWnlZnpxmp64RyxnPe6LESbwJrp3esyhDofG9b7AjSO6KBJcjjs=@vger.kernel.org, AJvYcCWSgfFSf7CXBRcPKgOC2mGrS99rOnZNGPLYfRpunnaKlXPtDzU2lplPjxEhXWtei25vLRN7GsHuLTBxnuw+iBiB@vger.kernel.org, AJvYcCXqow2VRiwYaSDJ1Vme9iM9wNLMSBM7BdP0vgNpjif4MAF7y97roALb2KXKoOyuJyM2694kDB2x@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzxlj+BYIFI0UIojbUgGbXIxVvFMzlJd+9gYikLBtpBdpWsvhXk
+	nO2KU7slmlxLUjSubRePlr4q9xu1Y5C2cx/4tubawaa4Bu+1RvMZ
+X-Gm-Gg: ASbGncus0AKxXxrdy8zA3yxK62djyuOKAIR1XDPlsskHT860IqC3D1+TEjC1Dr3YoN4
+	lrBdvcgyyfTWpxwQdpGH8mqfnx4MS8qVBN42t7Yvtrukk2b5cnS7DKoj4YGBuH9QFfzHHN9X/TH
+	mnwRFXhNtdF6dZUs/iPWmnUNUZXaskM/F8UgRdYLgh3/zhfDQekarA/E2v4zLiLxQwYpjIIb2mH
+	MqToJ9zEcFG/IDPw82+xixTDgjAEgvB9Gv1BCwv3WeSi6XcGcAdO/QLW7DUuY2bUlFXKMDsv6yV
+	5WYH/CouoTJEJssIfBXNVIwr1xxPLnHedT8C3tc21kxsDAZaUOn5L4vFN+O47fGwd6Q8V5y82rc
+	EdsZBBF1b4V3y/PcljRaz01lB0KHJUGo=
+X-Google-Smtp-Source: AGHT+IG685u/TuxRo4gOyPFhExD9aC7tMDskOonBEuq2S9e6D8OwVVwO7wNmsSRZ+5auRMu6yPKriA==
+X-Received: by 2002:a05:6402:35c2:b0:5d0:ea4f:972f with SMTP id 4fb4d7f45d1cf-5d81dd9af30mr134224547a12.8.1736255645405;
+        Tue, 07 Jan 2025 05:14:05 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0f015b1asm2383448366b.148.2025.01.07.05.14.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2025 05:14:05 -0800 (PST)
+Message-ID: <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
+Date: Tue, 7 Jan 2025 14:14:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
+ (delayed) phy
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20250107123615.161095-1-ericwouds@gmail.com>
+ <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski wrote:
-> The NAPI IDs were not fully exposed to user space prior to the netlink
-> API, so they were never namespaced. The netlink API must ensure that
-> at the very least NAPI instance belongs to the same netns as the owner
-> of the genl sock.
-> 
-> napi_by_id() can become static now, but it needs to move because of
-> dev_get_by_napi_id().
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 1287c1ae0fc2 ("netdev-genl: Support setting per-NAPI config values")
-> Fixes: 27f91aaf49b3 ("netdev-genl: Add netlink framework functions for napi")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Splitting this into fix per-version is a bit tricky, because we need
-> to replace the napi_by_id() helper with a better one. I'll send the
-> stable versions manually.
-> 
-> CC: jdamato@fastly.com
-> CC: almasrymina@google.com
-> CC: amritha.nambiar@intel.com
-> CC: sridhar.samudrala@intel.com
-> ---
->  net/core/dev.c         | 43 +++++++++++++++++++++++++++++-------------
->  net/core/dev.h         |  3 ++-
->  net/core/netdev-genl.c |  6 ++----
->  3 files changed, 34 insertions(+), 18 deletions(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 7c63d97b13c1..e001df4cb486 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -753,6 +753,36 @@ int dev_fill_forward_path(const struct net_device *dev, const u8 *daddr,
->  }
->  EXPORT_SYMBOL_GPL(dev_fill_forward_path);
->  
-> +/* must be called under rcu_read_lock(), as we dont take a reference */
-> +static struct napi_struct *napi_by_id(unsigned int napi_id)
-> +{
-> +	unsigned int hash = napi_id % HASH_SIZE(napi_hash);
-> +	struct napi_struct *napi;
-> +
-> +	hlist_for_each_entry_rcu(napi, &napi_hash[hash], napi_hash_node)
-> +		if (napi->napi_id == napi_id)
-> +			return napi;
-> +
-> +	return NULL;
-> +}
-> +
-> +/* must be called under rcu_read_lock(), as we dont take a reference */
 
-Instead of function comments, invariant checks in code?
 
-Like in dev_get_by_napi_id:
+On 1/7/25 1:47 PM, Russell King (Oracle) wrote:
+> Going through the log...
+> 
+> On Tue, Jan 07, 2025 at 01:36:15PM +0100, Eric Woudstra wrote:
+>> Log before this patch is applied:
+>> [root@bpir3 ~]# dmesg | grep eth1
+>> [    2.515179] mtk_soc_eth 15100000.ethernet eth1: mediatek frame engine at 0xffff800082380000, irq 123
+>> [   38.271431] mtk_soc_eth 15100000.ethernet eth1: configuring for inband/2500base-x link mode
+>> [   38.279828] mtk_soc_eth 15100000.ethernet eth1: major config, requested inband/2500base-x
+>> [   38.288009] mtk_soc_eth 15100000.ethernet eth1: interface 2500base-x inband modes: pcs=01 phy=00
+>> [   38.296800] mtk_soc_eth 15100000.ethernet eth1: major config, active inband/inband,an-disabled/2500base-x
+> 
+> This is indeed without the PHY. We're using inband, although the PCS
+> mode is PHYLINK_PCS_NEG_INBAND_DISABLED, meaning inband won't be
+> used. As there is no PHY, we can't switch to MLO_AN_PHY.
+> 
+>> [   38.306362] mtk_soc_eth 15100000.ethernet eth1: phylink_mac_config: mode=inband/2500base-x/none adv=00,00000000,00008000,0000e240 pause=04
+>> [   39.220149] mtk_soc_eth 15100000.ethernet eth1:  interface 2 (mii) rate match none supports 0-3,6-7,13-14
+>> [   39.229758] mtk_soc_eth 15100000.ethernet eth1:  interface 3 (gmii) rate match none supports 0-3,5-7,13-14
+>> [   39.239420] mtk_soc_eth 15100000.ethernet eth1:  interface 4 (sgmii) rate match none supports 0-3,5-7,13-14
+>> [   39.249173] mtk_soc_eth 15100000.ethernet eth1:  interface 22 (1000base-x) rate match none supports 5-7,13-14
+>> [   39.259080] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 6-7,13-14,47
+>> [   39.594676] mtk_soc_eth 15100000.ethernet eth1: PHY i2c:sfp-1:11 uses interfaces 4,23, validating 4,23
+> 
+> The PHY comes along...
+> 
+>> [   39.603992] mtk_soc_eth 15100000.ethernet eth1:  interface 4 (sgmii) rate match none supports 0-3,5-7,13-14
+>> [   39.650080] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 6-7,13-14,47
+>> [   39.660266] mtk_soc_eth 15100000.ethernet eth1: PHY [i2c:sfp-1:11] driver [RTL8221B-VB-CG 2.5Gbps PHY (C45)] (irq=POLL)
+>> [   39.671037] mtk_soc_eth 15100000.ethernet eth1: phy: 2500base-x setting supported 00,00000000,00008000,000060ef advertising 00,00000000,00008000,000060ef
+>> [   39.684761] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 00,00000000,00008000,000060ef
+> 
+> We decide to use MLO_AN_INBAND and 2500base-X, which we're already using.
+> 
+>> [   40.380076] mtk_soc_eth 15100000.ethernet eth1: phy link down 2500base-x/Unknown/Unknown/none/off
+>> [   40.397090] brlan: port 5(eth1) entered blocking state
+>> [   40.402223] brlan: port 5(eth1) entered disabled state
+>> [   40.407437] mtk_soc_eth 15100000.ethernet eth1: entered allmulticast mode
+>> [   40.414400] mtk_soc_eth 15100000.ethernet eth1: entered promiscuous mode
+>> [   44.500077] mtk_soc_eth 15100000.ethernet eth1: phy link up 2500base-x/2.5Gbps/Full/none/off
+>> [   44.508528] mtk_soc_eth 15100000.ethernet eth1: No phy led trigger registered for speed(2500)
+> 
+> ... but we don't see link-up reported by the PCS after the PHY comes
+> up. Why is that - I think that needs investigation before we proceed
+> to patch the issue, because that suggests the PCS isn't seeing
+> valid 2500base-X from the PHY.
+> 
 
-        WARN_ON_ONCE(!rcu_read_lock_held());
+I think it is because pl->act_link_an_mode stays at MLO_AN_INBAND, but
+it needs to be set to MLO_AN_PHY, so that only the phy determines the
+link state:
+
+phylink_resolve() {
+    ...
+	} else if (pl->act_link_an_mode == MLO_AN_PHY) {
+		link_state = pl->phy_state;
+    ...
+}
+
 
