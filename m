@@ -1,189 +1,151 @@
-Return-Path: <netdev+bounces-155675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FEF6A03548
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:42:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 356C8A0357F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:53:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D8921886632
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:42:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A28FF164B4E
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9A918628F;
-	Tue,  7 Jan 2025 02:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCCC15ADA6;
+	Tue,  7 Jan 2025 02:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BqCQ9eqr"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="esfqPPE4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74E31607B7;
-	Tue,  7 Jan 2025 02:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949921553BC
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 02:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736217745; cv=none; b=XsOTpEaAwvtiI3ndP7HZn0VY2sYhS/iVSq9yPX8LQk5uOgKCuOTFLqZMScYaQX8QaqdAZivEbszf1e66TgcKhRhfZyggpMKk4N7EoiqP2oBNrzd8TDiiV/Ox8sAn/9TM/OZzfDTEKqnyyplHAFEa1NrvbDGJWmY+spXA7n89Mcg=
+	t=1736218403; cv=none; b=px2gVdlctZoZipFYVo7QecOxC6IIFN6d/50GeZl0krm7hFxo2Kzphhc/kebHSDUutJyobO1oBKVzta+1Jih/PSOBoCoIQoIUuComuICADsPD7V6EN0CzVbZpNZwr72j7pm01G14S6PijQxROAMiB5YQFSzWnLG4yWHR+1OpK424=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736217745; c=relaxed/simple;
-	bh=HAVWPZcqx3hWwS/w31a3qyuVF7RHxPLpvdQgPAGYUrU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DSoLlzB88kRBDGxLe9nkG6d7BSAJR1UE3nxS+yGsrXzfnazelpXqeJ3KTEPRHj0pWVCPiI96vahGFBu2DzY7VO2V+tCQTGxlUw2AYwSEp6Ea29uuGYlfcQ9gaAI+rIq4SyNF7QjJMHevk0LSXYizFg/erDTw33jY7iWTm5ZdEbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BqCQ9eqr; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6dd1b895541so123758446d6.0;
-        Mon, 06 Jan 2025 18:42:23 -0800 (PST)
+	s=arc-20240116; t=1736218403; c=relaxed/simple;
+	bh=94O8qKTwwvHnAgFhvXzYekp0zM4Sc9l3IWmo16wIJFc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rQvigCQq2IATW3Ay9GqBnyTzSE4jMs9GNGzP2uvbGIaZehOQF92o60fIpCnUcgNdu36f8xqlFtBeu/fPTYoWVB7OX86CECBvxsDVC1QlxTOBAWGZVlVM41c53kjsJmFTGHLGLmDwMi1wyRhFIbB3AK+EF4Z06W6erq5dcSN/1+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=esfqPPE4; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2165cb60719so222066875ad.0
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 18:53:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736217743; x=1736822543; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Aq7easgvkA7Ji/NytoCVtO+yohd/iRvIMntE9SiMUis=;
-        b=BqCQ9eqrsMijkYMZRsqGSsBISvoTnTn4yIUkLwDmoQiu4oPkIxSkftn2evLXPK1ypL
-         RRSMKK3hp9ZZ4NPIQGZvq9Df4TCVBMIStliqe/eIn2T87f4SWb8rJl7dl08dnVVvQfdn
-         eo5La97Ev11G06XMc77TXN1G7sTZ3BXoFEAOmHqE6MgyAPVQdLJ0eAdRXUCt1TxcycHD
-         xyOrDIgN1Nqo4hAdF6iynPVJ4SgG8/RIDvD7T1OoZvRvd/oNuBErlKiGFq4yhQkckx2z
-         xgKR3px+DroS0T9gi9UeHiN2K0Ftl3EXtS6jOrXMEngTNgrI8PimQOWQmoJd2dJHSDAg
-         PRiA==
+        d=broadcom.com; s=google; t=1736218401; x=1736823201; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zz6eVpMGPhHLrEjcgPVe2+TCtBLXv2a4MY1G0a/lYOo=;
+        b=esfqPPE4aHTZaADYvt5HyJgBWWVF5lUmfXtZR2p01FtdyabtIqei0RdAY5Z5b39td/
+         1vFKfknLNTK3jBMVoItLmC+WpF3fbjzIXtHWPKLhvttgeGv7Gaz4y4jpoKi2KOdmaiTf
+         Gywja1uov0FgUS+yw462J75y9r59FdK6Bs8fs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736217743; x=1736822543;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Aq7easgvkA7Ji/NytoCVtO+yohd/iRvIMntE9SiMUis=;
-        b=w3sJz3717TjmyK00K8JVbZAsoU6I057YuBjhJ3puG62bNCbZyYbgzVdiscmqEYhS+Q
-         PHO3RHjpCjfIQsySqb3O54S9/gKv8AQmUBvCXoGElPXV/RMZbtQwhqWrV5Dt3ykmC/Zj
-         eWW1MkkAgQi9MrHQzMmNK/CYUZNSrUenLgt5VCYd6YQLU59hbB/ES/gXUXjJJ4Qysb43
-         ZjKtYcFQqX+xISKasIK6Qq+p32NFXOqupPFFib5JPPvpf8Gwkv1ICaFNqFSsBJysmk0d
-         o16zG9mGSzaI2jIw9eoXXWSVfkVaLwdKVj4ZBckJqAS1SoeVoFxYZjcThtRSUSHxMB3T
-         U+Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCUG53teLkzYD7SQpt2k4PwH13Ei3YkgpbOPoxwtdd7e762a3Gx026Kwe+uWxk0CEDCLE4hdeIBf@vger.kernel.org, AJvYcCVUS7O63Mi/Gi3mxF47pVq1J8/j3HMIfxNhLIx4YloWFAxIQAetYqZI6kN1dyklGHHpFKc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8KgVT3+6kYvkAM7XSBE7mdIcG04kLLtN0xrXM+ltlq3uik525
-	jihl7CYzE4GRLsZiOQpqLS50LTii2LeMJinqr8nnSejy7wsJiHvEe9yKdRhqI08sLogZ68bjT3+
-	KwMCxklQfMMgHXhFsv/Am8bQbwfE=
-X-Gm-Gg: ASbGncs/22kwVqWJDiMyMHQjnDsSwRMZO+owPQ0ZqGDjr0S9Ryoa3un5JbjM3GEwfCO
-	12qc/ffEFivSkF+a82yiXw4Aj8bc2t2jjtxGhRQ==
-X-Google-Smtp-Source: AGHT+IHIVO6xC+J8LCnizPq+6behDDgawyaO8but+UtYe0w2fp6EW9qeg97Oeg4hDQiK2ErzYMOsaAuRdEEjf7fH59I=
-X-Received: by 2002:a05:6214:8116:b0:6dd:d513:6124 with SMTP id
- 6a1803df08f44-6ddd51361f5mr101996026d6.35.1736217742740; Mon, 06 Jan 2025
- 18:42:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736218401; x=1736823201;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Zz6eVpMGPhHLrEjcgPVe2+TCtBLXv2a4MY1G0a/lYOo=;
+        b=tnhC+v+DCimFv0Vj3K6/lm9GEw7XP4CpOx8sCZ74VGbowDxgGp9+8zKjUzeZQTihCS
+         Vtc+2c27LTXuLdZjAwcWNuOVyDDdAYuu7xPIZiD0O/NwDUcLCA0NNc3A1vA3rXWaA1xN
+         kLkGZqnq7cEhNJzzZeQYWO1oz+E9bZebnKm0HTBddvPfw4aMyG7LPc1jg35skBRXyT3T
+         MBLHRIf5SIeIrs1jXBgBrdxZ50HvSHGW+zryhlkdRCJuQzlxIZCjWijWi2zEY02ueBy6
+         bsivxKpshdRpouZnoNhBu5r1S8/fyVmyhmBq1RBHHWbwKlZ7WdFxQey1YEDm0hPbwt+c
+         yQVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEoJYRp5W3Icb9i/iJC4VMVMJadQaar2pRGfij1LWjCa5elHMkGvHVXvpAPWT7RxVi6mWRkxE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgZf1I75HCm/I7GYmMvbWMPsEvgt/oXsl4ywaENWXMSwxHBxbu
+	MAb+XQwGO0CCXViYZFY/iC6p5PNLJhZ5ABJuyPLcbwhAgz4VCM2q7O+UscOvKw==
+X-Gm-Gg: ASbGncsFVooqdatOSetbX1zf3Wowh5suGhzqE/R74U0IsQNzE38ImgEbH/y/sLkH7y+
+	dKQJVHpT49LhLU2oJnmaf6d6yZT8r8vg9ZGPQ4RgfZUCX2ICyedXILEk3VduvUA+A+HEb6cy9vM
+	fm2Qs7aq9rfUK/QNA4/reraqnFsCvdjozODd+f9+v1aEmhIuc+aMFCpHwSWVL51y6WA+6+5vx/y
+	Ytqo06P6QcVpqkvRQTS77t4LLy6Bfg3kvRzTO4O0D8N9ScYiYNWE27fuOYU881UVq95RolreS6P
+	/U3PbxmhjICSWjhsdt1T+da+bMjcPqd3E4EI4IHPnU6ecK98p26qRyDwIOo=
+X-Google-Smtp-Source: AGHT+IEQeDQnGeNZmlDCRHGP3QulMLReIB+3aKySgyGiJWsZRED+79OjQ2GJWTk37KijSk7WvcYNsw==
+X-Received: by 2002:a17:902:f612:b0:216:526a:53df with SMTP id d9443c01a7336-219e6f25cb2mr928815835ad.54.1736218400922;
+        Mon, 06 Jan 2025 18:53:20 -0800 (PST)
+Received: from dhcp-10-123-157-228.dhcp.broadcom.net ([192.19.234.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9f692fsm300093285ad.216.2025.01.06.18.53.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jan 2025 18:53:20 -0800 (PST)
+From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+To: leon@kernel.org,
+	jgg@ziepe.ca
+Cc: linux-rdma@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	andrew.gospodarek@broadcom.com,
+	selvin.xavier@broadcom.com,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH rdma-next v2 RESEND 0/4] RDMA/bnxt_re: Support for FW async event handling
+Date: Tue,  7 Jan 2025 08:15:48 +0530
+Message-ID: <20250107024553.2926983-1-kalesh-anakkur.purayil@broadcom.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250105124403.991-1-laoar.shao@gmail.com> <20250105124403.991-2-laoar.shao@gmail.com>
- <CAADnVQ+ga1ir9XCDxPiU_-eYzKHTQsiod9Sz4_o3XeqGW2rq4A@mail.gmail.com>
- <CALOAHbD+w3niwBojP=-81Wrqj1V9ppLgTfuZjb=AxXjx51MGRA@mail.gmail.com> <CAADnVQ+Cbq99wpNoijyJbvtqaMTAxQF_S-n8yf9+0JGHJnShLw@mail.gmail.com>
-In-Reply-To: <CAADnVQ+Cbq99wpNoijyJbvtqaMTAxQF_S-n8yf9+0JGHJnShLw@mail.gmail.com>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Tue, 7 Jan 2025 10:41:46 +0800
-X-Gm-Features: AbW1kvZaAe1ugDyUQlmmVmRtZ2yzW32XDu34ZHIDH5o2BI_yzXx6R7f0ga5VgcE
-Message-ID: <CALOAHbBxDnwkXXouYRiZcRPAic4k+JE5St7yJA8Fyrd9sw1ntw@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next 1/2] libbpf: Add support for dynamic tracepoint
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, Andrii Nakryiko <andrii@kernel.org>, Eddy Z <eddyz87@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Eric Dumazet <edumazet@google.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 7, 2025 at 6:33=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Sun, Jan 5, 2025 at 6:32=E2=80=AFPM Yafang Shao <laoar.shao@gmail.com>=
- wrote:
-> >
-> > On Mon, Jan 6, 2025 at 8:16=E2=80=AFAM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Sun, Jan 5, 2025 at 4:44=E2=80=AFAM Yafang Shao <laoar.shao@gmail.=
-com> wrote:
-> > > >
-> > > > Dynamic tracepoints can be created using debugfs. For example:
-> > > >
-> > > >    echo 'p:myprobe kernel_clone args' >> /sys/kernel/debug/tracing/=
-kprobe_events
-> > > >
-> > > > This command creates a new tracepoint under debugfs:
-> > > >
-> > > >   $ ls /sys/kernel/debug/tracing/events/kprobes/myprobe/
-> > > >   enable  filter  format  hist  id  trigger
-> > > >
-> > > > Although this dynamic tracepoint appears as a tracepoint, it is int=
-ernally
-> > > > implemented as a kprobe. However, it must be attached as a tracepoi=
-nt to
-> > > > function correctly in certain contexts.
-> > >
-> > > Nack.
-> > > There are multiple mechanisms to create kprobe/tp via text interfaces=
-.
-> > > We're not going to mix them with the programmatic libbpf api.
-> >
-> > It appears that bpftrace still lacks support for adding a kprobe/tp
-> > and then attaching to it directly. Is that correct?
->
-> what do you mean?
+This patch series adds support for FW async event handling
+in the bnxt_re driver.
 
-Take the inlined kernel function tcp_listendrop() as an example:
+V1->V2:
+1. Rebased on top of the latest "for-next" tree.
+2. Split Patch#1 into 2 - one for Ethernet driver changes and
+   another one for RDMA driver changes.
+3. Addressed Leon's comments on Patch#1 and Patch #3.
+V1: https://lore.kernel.org/linux-rdma/1725363051-19268-1-git-send-email-selvin.xavier@broadcom.com/T/#t
 
-$ perf probe -a 'tcp_listendrop sk'
-Added new events:
-  probe:tcp_listendrop (on tcp_listendrop with sk)
-  probe:tcp_listendrop (on tcp_listendrop with sk)
-  probe:tcp_listendrop (on tcp_listendrop with sk)
-  probe:tcp_listendrop (on tcp_listendrop with sk)
-  probe:tcp_listendrop (on tcp_listendrop with sk)
-  probe:tcp_listendrop (on tcp_listendrop with sk)
-  probe:tcp_listendrop (on tcp_listendrop with sk)
-  probe:tcp_listendrop (on tcp_listendrop with sk)
+Patch #1:
+1. Removed BNXT_EN_FLAG_ULP_STOPPED state check from bnxt_ulp_async_events().
+   The ulp_ops are protected by RCU. This means that during bnxt_unregister_dev(),
+   Ethernet driver set the ulp_ops pointer to NULL and do RCU sync before return
+   to the RDMA driver.
+   So ulp_ops and the pointers in ulp_ops are always valid or NULL when the
+   Ethernet driver references ulp_ops. ULP_STOPPED is a state and should be
+   unrelated to async events. It should not affect whether async events should
+   or should not be passed to the RDMA driver.
+2. Changed Author of Ethernet driver changes to Michael Chan.
+3. Removed unnecessary export of function bnxt_ulp_async_events.
 
-You can now use it in all perf tools, such as:
+Patch #3:
+1. Removed unnecessary flush_workqueue() before destroy_workqueue()
+2. Removed unnecessary NULL assignment after free.
+3. Changed to use "ibdev_xxx" and reduce level of couple of logs to debug.
 
-        perf record -e probe:tcp_listendrop -aR sleep 1
+Please review and apply.
 
-Similarly, we can also use bpftrace to trace inlined kernel functions.
-For example:
-
-- add a dynamic tracepoint
-  $ bpftrace probe -a 'tcp_listendrop sk'
-
-- trace the dynamic tracepoint
-  $ bpftrace probe -e 'probe:tcp_listendrop {print(args->sk)}'
-
-> bpftrace supports both kprobe attaching and tp too.
-
-The dynamic tracepoint is not supported yet.
-
->
-> > What do you think about introducing this mechanism into bpftrace? With
-> > such a feature, we could easily attach to inlined kernel functions
-> > using bpftrace.
->
-> Attaching to inlined funcs also sort-of works. It relies on dwarf,
-> and there is work in progress to add a special section to vmlinux
-> to annotate inlined sites, so it can work without dwarf.
-
-What=E2=80=99s the benefit of doing this? Why not simply read the DWARF
-information directly from vmlinux?
-
-$ readelf -S /boot/vmlinux  | grep debug_info
-  [63] .debug_info       PROGBITS         0000000000000000  03e2bc20
-
-The DWARF information embedded in vmlinux makes it straightforward to
-trace inlined functions without requiring any kernel modifications.
-This approach allows all existing kernel releases to immediately take
-advantage of the functionality, eliminating the need for kernel
-recompilation or patching.
+Regards,
+Kalesh
 
 
---
-Regards
-Yafang
+Kalesh AP (3):
+  RDMA/bnxt_re: Add Async event handling support
+  RDMA/bnxt_re: Query firmware defaults of CC params during probe
+  RDMA/bnxt_re: Add support to handle DCB_CONFIG_CHANGE event
+
+Michael Chan (1):
+  bnxt_en: Add ULP call to notify async events
+
+ drivers/infiniband/hw/bnxt_re/bnxt_re.h       |   3 +
+ drivers/infiniband/hw/bnxt_re/main.c          | 156 ++++++++++++++++++
+ drivers/infiniband/hw/bnxt_re/qplib_fp.h      |   1 +
+ drivers/infiniband/hw/bnxt_re/qplib_sp.c      | 113 +++++++++++++
+ drivers/infiniband/hw/bnxt_re/qplib_sp.h      |   3 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  28 ++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |   2 +
+ 8 files changed, 307 insertions(+)
+
+-- 
+2.43.5
+
 
