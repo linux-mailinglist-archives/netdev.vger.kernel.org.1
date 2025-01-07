@@ -1,225 +1,151 @@
-Return-Path: <netdev+bounces-155995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33DB2A04942
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:32:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13CE9A049A0
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CC6E7A2B7A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 18:32:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A45BD1888618
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 18:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7ED218A6D4;
-	Tue,  7 Jan 2025 18:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7D71F37B4;
+	Tue,  7 Jan 2025 18:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="lPWWJopS";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wrqdwHQ+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="HzFqlysy"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from smtp-out.freemail.hu (fmfe34.freemail.hu [46.107.16.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB99A1E0B77;
-	Tue,  7 Jan 2025 18:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D191F4720;
+	Tue,  7 Jan 2025 18:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736274760; cv=none; b=p2m3wWn3MzCeMZgFkXF0iU3wNtwFh0DOI4i+gnpLAqMGb1hIjWuLtTiaQu0JhraLbit1FsfJKFNbabrWpjGgQRvn4R+fTToRgc0qGkxOiqbKRs14JfxJmzBY2aZJaQ/LwPG1kTAMVyU9docVbitsn58woH7qS/3lJOhf8eMRFmU=
+	t=1736275990; cv=none; b=jNM1gTpUFzKOtP9inhexJ568j3WdxCRgQN8+/1y0w1TeF6vBChbKCY1OJajGPI399NYkZ4QhF7sgLL4Zct1H80e2KnUZ7nu4ZS1GnlwhPq29EjEr6gQilIcmoh32x5IaFII06mAvGPrueXPBkDWYfoTpyIgjFM1aDYoRHDUfyLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736274760; c=relaxed/simple;
-	bh=EKM782amI9vYUxgRTf6vOkF88UA86p7NXMqsaSs5hJ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HjmbRzt8swOCgQ+lUsvqSAUw0KozBgcCcC9T/akKLmCnw+YlqgDTx/jkNoZfp8utXJtQNWYRhh1tEsHEJ6trr2MoOfa2u3BteefLn029Ugdu+gUoHJ1hgzHbkCsuc/wI9WhZcSyC5pDQnHuS4Yt93BI9YRQqr0E1bjnqJjJUYiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=lPWWJopS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wrqdwHQ+; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 6FB0E2540194;
-	Tue,  7 Jan 2025 13:32:37 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Tue, 07 Jan 2025 13:32:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1736274757;
-	 x=1736361157; bh=ero0bhVYss78rXpvpY8mLLVNO1z/zuMVleAPzC3cnTw=; b=
-	lPWWJopStweVsx2WgcwyMQHnYgvRVR5P5QQ/+cdBLpx/cxnkpVoU1c5wQQXrAONE
-	+F6UnitZk+FkmAjnNTYEgOdV3xhGdJRFiJrIBO1jrRV7xurh8FBJwGJfxR+fo9fb
-	mgLoc/qyfu94wvvHRuQcuw4mnqlcd6Ny675dSw1yvlXm6iJIcn57x/NgjG6UB3gb
-	wsYYz8EDCBlgW/bCHe5rV9Wr7gC/Rv/l6H+n2K52u91l/b/I/YktQEbuWdw4Pz9o
-	ak41/lLEyF19yBIrj6aRxKAK6nu5MVvDLtK/RquRihGHL4DiayhjlBwihW+g1t5j
-	NlEHAGbv8ySLwT8ENppnFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1736274757; x=
-	1736361157; bh=ero0bhVYss78rXpvpY8mLLVNO1z/zuMVleAPzC3cnTw=; b=w
-	rqdwHQ+vvbAX9dtgUKdOJGnlGwzFyzirwn68hESXWA5zyOBa+i8214Vf3HCxlfhO
-	W53V2IbsldY0Xoe72nv0u3wYK49rNDr4bYIZK8IPldusfmIfuMlNA9qG05rXQFN8
-	p61cW6QngcvqaIXPaI8FZobjgcMvPBNfrL4V+1M1vjhAa2vLde0RVdzSmcBr019L
-	Azitq7cJeJYL999HsX8Mw2sadpxoQL6WV+4Euw5jGx7s/0cs/EcL0dI9JJEBtNvT
-	G23j6tNdgZhPg09U3maprFDD6zWVLk+h0NbJQlY0znN5/JndKsh4jZUD7MovCT09
-	xLFTDqRcWRdqGRo8OvDHg==
-X-ME-Sender: <xms:RXN9Z9wOYRW5QfHLpXOCaDJpubwiR7-Qwejn12m77Y0_ML_ww55aOA>
-    <xme:RXN9Z9QXcxDQ54Q5zHfQm-gnYRMovbL2DPF_KwupcWVpGxjeNwk34NdyF-5tOG-MC
-    2saXcKgxJ5EllK9oQ>
-X-ME-Received: <xmr:RXN9Z3X1OS86i-thIenAvdYgH7Z1vma56PesTNS3W2NyturqjYM5v-hUFbF-QxMnkXC0leDxruL5NMxcgf-Gllvnjp014oSDZpW5W1V-4TD3tg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudegvddgudduvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffk
-    fhggtggugfgjsehtkefstddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguh
-    esugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnheptdfgueeuueekieekgfeiueek
-    ffelteekkeekgeegffevtddvjeeuheeuueelfeetnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghr
-    tghpthhtohepudejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehlrghorghrrd
-    hshhgrohesghhmrghilhdrtghomhdprhgtphhtthhopegrlhgvgigvihdrshhtrghrohhv
-    ohhithhovhesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhhiiheskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepvgguugihiiekjeesghhmrghilhdrtghomhdprhgtphht
-    thhopegrshhtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhesihhogh
-    gvrghrsghogidrnhgvthdprhgtphhtthhopehmrghrthhinhdrlhgruheslhhinhhugidr
-    uggvvhdprhgtphhtthhopehsohhngheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephi
-    honhhghhhonhhgrdhsohhngheslhhinhhugidruggvvh
-X-ME-Proxy: <xmx:RXN9Z_gM9DAfLgQQbsHPJASqwtANhqsCGPubn7Ye1UkSXhHwFrKeHQ>
-    <xmx:RXN9Z_AZdFzT2Rfpivm5s9w9fE0rjnq5qnP93JK1iocgzr0djfPQ-w>
-    <xmx:RXN9Z4JH4zaAD2D3mYk_nZO85KVvaCIhzj2Rkunibc_HElbnBLqFlw>
-    <xmx:RXN9Z-DPeavk7KQU4Kddc_51yREJO-hfhSl6ZFB1XZ9jrlsRvktJpw>
-    <xmx:RXN9Z71TZLpkT0ejvU7CUfVskcD2boI8Aa-v4po8ElPIsszL_-X60Tvz>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 7 Jan 2025 13:32:35 -0500 (EST)
-Date: Tue, 7 Jan 2025 11:32:33 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eddy Z <eddyz87@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Subject: Re: [RFC PATCH bpf-next 1/2] libbpf: Add support for dynamic
- tracepoint
-Message-ID: <vhiptl7wtjmitacwuvtacrzfawixttl7bdblc3ozeyzskqrhid@jjev6i3z3cj7>
-References: <20250105124403.991-1-laoar.shao@gmail.com>
- <20250105124403.991-2-laoar.shao@gmail.com>
- <CAADnVQ+ga1ir9XCDxPiU_-eYzKHTQsiod9Sz4_o3XeqGW2rq4A@mail.gmail.com>
- <CALOAHbD+w3niwBojP=-81Wrqj1V9ppLgTfuZjb=AxXjx51MGRA@mail.gmail.com>
- <CAADnVQ+Cbq99wpNoijyJbvtqaMTAxQF_S-n8yf9+0JGHJnShLw@mail.gmail.com>
- <CALOAHbBxDnwkXXouYRiZcRPAic4k+JE5St7yJA8Fyrd9sw1ntw@mail.gmail.com>
+	s=arc-20240116; t=1736275990; c=relaxed/simple;
+	bh=GOng8ZIGtTSQgvNaD7xzP/6JyDKAysORsRiFtxSnCkU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gWXJlgAVdMgk7MvAvrILGFdKq20oqVLi62uvNTBZ5RxSLSSTvSDoPyIFJJHpUz1DUVgWuuEsll5Qm1Hm0tpT55Al0sOs/GPcibXDX+vdsSQ5Ny4UYXyTqksxP8sMH+mz9wSK5JRiCLBGXw/XMdNvhRcl9IubK0t5Ktku/cPdhU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=HzFqlysy reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from fizweb.elte.hu (fizweb.elte.hu [157.181.183.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YSKmN6zsLzycR;
+	Tue, 07 Jan 2025 19:47:32 +0100 (CET)
+From: egyszeregy@freemail.hu
+To: fw@strlen.de,
+	pablo@netfilter.org,
+	lorenzo@kernel.org,
+	daniel@iogearbox.net,
+	leitao@debian.org,
+	amiculas@cisco.com,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: =?UTF-8?q?Benjamin=20Sz=C5=91ke?= <egyszeregy@freemail.hu>
+Subject: [PATCH 0/6] netfilter: x_tables: Merge xt_*.c files which has same name.
+Date: Tue,  7 Jan 2025 19:47:18 +0100
+Message-ID: <20250107184724.56223-1-egyszeregy@freemail.hu>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALOAHbBxDnwkXXouYRiZcRPAic4k+JE5St7yJA8Fyrd9sw1ntw@mail.gmail.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736275653;
+	s=20181004; d=freemail.hu;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding;
+	l=2170; bh=rmTvNQXtFqt/OwQrK0u7GcxP5ZmAjOkhc4/8HI0TN0Y=;
+	b=HzFqlysyJfPets51os+nLxoZlMcTrzMX5QcM0W/1uPWOC7NQPTi+VdkoBHqpKEN9
+	YL/YagdcWUn5OaS+d5lz6DAwrEA3pR3Gas6odwwtfAI8ZdUBAUCNTYRwCTkCF5z3ZWX
+	Bdzl+QV7kZg91jtvQcNXk4wKnXF7hOuuql0Kv/oHMHdE+BoNw0OVo8BxhwVy4/fgrE2
+	yJi2ylkDjfnMTRd9JBxmgpR/0OQSHa8APhcs7pOEosghsdIVnXQRxc9xV6fMpaWwGGx
+	XS/86z1oFm2GNDD3yroiusswZbAsGAC051HE2PW7XOWI6PwaI7goOJ10skdWbrp1d6F
+	ud+3GQFu2w==
 
-On Tue, Jan 07, 2025 at 10:41:46AM +0800, Yafang Shao wrote:
-> On Tue, Jan 7, 2025 at 6:33 AM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Sun, Jan 5, 2025 at 6:32 PM Yafang Shao <laoar.shao@gmail.com> wrote:
-> > >
-> > > On Mon, Jan 6, 2025 at 8:16 AM Alexei Starovoitov
-> > > <alexei.starovoitov@gmail.com> wrote:
-> > > >
-> > > > On Sun, Jan 5, 2025 at 4:44 AM Yafang Shao <laoar.shao@gmail.com> wrote:
-> > > > >
-> > > > > Dynamic tracepoints can be created using debugfs. For example:
-> > > > >
-> > > > >    echo 'p:myprobe kernel_clone args' >> /sys/kernel/debug/tracing/kprobe_events
-> > > > >
-> > > > > This command creates a new tracepoint under debugfs:
-> > > > >
-> > > > >   $ ls /sys/kernel/debug/tracing/events/kprobes/myprobe/
-> > > > >   enable  filter  format  hist  id  trigger
-> > > > >
-> > > > > Although this dynamic tracepoint appears as a tracepoint, it is internally
-> > > > > implemented as a kprobe. However, it must be attached as a tracepoint to
-> > > > > function correctly in certain contexts.
-> > > >
-> > > > Nack.
-> > > > There are multiple mechanisms to create kprobe/tp via text interfaces.
-> > > > We're not going to mix them with the programmatic libbpf api.
-> > >
-> > > It appears that bpftrace still lacks support for adding a kprobe/tp
-> > > and then attaching to it directly. Is that correct?
-> >
-> > what do you mean?
-> 
-> Take the inlined kernel function tcp_listendrop() as an example:
-> 
-> $ perf probe -a 'tcp_listendrop sk'
-> Added new events:
->   probe:tcp_listendrop (on tcp_listendrop with sk)
->   probe:tcp_listendrop (on tcp_listendrop with sk)
->   probe:tcp_listendrop (on tcp_listendrop with sk)
->   probe:tcp_listendrop (on tcp_listendrop with sk)
->   probe:tcp_listendrop (on tcp_listendrop with sk)
->   probe:tcp_listendrop (on tcp_listendrop with sk)
->   probe:tcp_listendrop (on tcp_listendrop with sk)
->   probe:tcp_listendrop (on tcp_listendrop with sk)
-> 
-> You can now use it in all perf tools, such as:
-> 
->         perf record -e probe:tcp_listendrop -aR sleep 1
+From: Benjamin Szőke <egyszeregy@freemail.hu>
 
-Cool, I'm guessing perf-probe can speak DWARF and will parse all the
-inline information.
+Merge xt_*.c source files, which has same upper and
+lowercase name format. Combining these modules should
+provide some decent code size and memory savings.
 
-> 
-> Similarly, we can also use bpftrace to trace inlined kernel functions.
-> For example:
-> 
-> - add a dynamic tracepoint
->   $ bpftrace probe -a 'tcp_listendrop sk'
-> 
-> - trace the dynamic tracepoint
->   $ bpftrace probe -e 'probe:tcp_listendrop {print(args->sk)}'
-> 
-> > bpftrace supports both kprobe attaching and tp too.
-> 
-> The dynamic tracepoint is not supported yet.
-> 
-> >
-> > > What do you think about introducing this mechanism into bpftrace? With
-> > > such a feature, we could easily attach to inlined kernel functions
-> > > using bpftrace.
-> >
-> > Attaching to inlined funcs also sort-of works. It relies on dwarf,
-> > and there is work in progress to add a special section to vmlinux
-> > to annotate inlined sites, so it can work without dwarf.
-> 
-> What’s the benefit of doing this? Why not simply read the DWARF
-> information directly from vmlinux?
-> 
-> $ readelf -S /boot/vmlinux  | grep debug_info
->   [63] .debug_info       PROGBITS         0000000000000000  03e2bc20
-> 
-> The DWARF information embedded in vmlinux makes it straightforward to
-> trace inlined functions without requiring any kernel modifications.
-> This approach allows all existing kernel releases to immediately take
-> advantage of the functionality, eliminating the need for kernel
-> recompilation or patching.
+test-build:
+$ mkdir build
+$ wget -O ./build/.config https://pastebin.com/raw/teShg1sp
+$ make O=./build/ ARCH=x86 -j 16
 
-I'd disagree that this approach works with all existing kernels. Kernel
-debuginfo is usually not available by default. On some distros, it's not
-available at all.
+x86_64-before:
+text    data     bss     dec     hex filename
+ 716     432       0    1148     47c xt_dscp.o
+1142     432       0    1574     626 xt_DSCP.o
+ 593     224       0     817     331 xt_hl.o
+ 934     224       0    1158     486 xt_HL.o
+1099     120       0    1219     4c3 xt_rateest.o
+2126     365       4    2495     9bf xt_RATEEST.o
+ 747     224       0     971     3cb xt_tcpmss.o
+2824     352       0    3176     c68 xt_TCPMSS.o
+total data: 2373
 
-This is particularly relevant for partial inlining - where compiler
-inlines some callsites but leaves the symbol in. In these cases, users
-trying to probe a symbol will succeed in attaching but then silently
-lose events. There is no obvious way for user to know to install
-debuginfo. Or to create dynamic tracepoints.
+x86_64-after:
+text    data     bss     dec     hex filename
+1709     848       0    2557     9fd xt_dscp.o
+1352     448       0    1800     708 xt_hl.o
+3075     481       4    3560     de8 xt_rateest.o
+3423     576       0    3999     f9f xt_tcpmss.o
+total data: 2353
 
-This is the motivation for always-available metadata. Something small
-enough where distros can leave it on by default. Similar to motivation
-for BTF. There's also overhead involved w/ parsing DWARF. A more compact
-representation helps reduce overhead.
+Build as a module it can provide 50% reduction in
+run-time memory use.
+
+x86_64-before:
+$ lsmod
+xt_TCPMSS              12288  0
+xt_tcpmss              12288  0
+
+x86_64-after:
+$ lsmod
+xt_tcpmss              12288  0
+
+Benjamin Szőke (6):
+  netfilter: x_tables: Format code of xt_*.c files.
+  netfilter: x_tables: Merge xt_DSCP.c to xt_dscp.c
+  netfilter: x_tables: Merge xt_HL.c to xt_hl.c
+  netfilter: x_tables: Merge xt_RATEEST.c to xt_rateest.c
+  netfilter: x_tables: Merge xt_TCPMSS.c to xt_tcpmss.c
+  netfilter: x_tables: Adjust code style of xt_*.c files.
+
+ net/netfilter/Kconfig      |  84 +++++++++
+ net/netfilter/Makefile     |  12 +-
+ net/netfilter/xt_DSCP.c    | 161 -----------------
+ net/netfilter/xt_HL.c      | 159 -----------------
+ net/netfilter/xt_RATEEST.c | 248 --------------------------
+ net/netfilter/xt_TCPMSS.c  | 345 ------------------------------------
+ net/netfilter/xt_dscp.c    | 159 ++++++++++++++++-
+ net/netfilter/xt_hl.c      | 163 +++++++++++++++--
+ net/netfilter/xt_rateest.c | 255 +++++++++++++++++++++++++--
+ net/netfilter/xt_tcpmss.c  | 352 +++++++++++++++++++++++++++++++++++--
+ 10 files changed, 972 insertions(+), 966 deletions(-)
+ delete mode 100644 net/netfilter/xt_DSCP.c
+ delete mode 100644 net/netfilter/xt_HL.c
+ delete mode 100644 net/netfilter/xt_RATEEST.c
+ delete mode 100644 net/netfilter/xt_TCPMSS.c
+
+-- 
+2.43.5
+
 
