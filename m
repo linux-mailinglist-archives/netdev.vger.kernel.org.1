@@ -1,146 +1,100 @@
-Return-Path: <netdev+bounces-155938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54310A04622
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:28:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84137A04627
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:28:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E35AF1886A01
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 444A4164BA8
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118A81F3D3C;
-	Tue,  7 Jan 2025 16:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948401F4714;
+	Tue,  7 Jan 2025 16:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JAYMe8QX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8E01F4734
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6471F37BE
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736267132; cv=none; b=oVvFB+/hFegj0A7/K2LQJQoIAdMvTVIZpOree5a1sm+RRz2aPCn/zNTaevrMAPUaHRlHPDFcdtxy9fJxOZ2oRmzQKZ0PL5x32V7YuD4VWjtlxftLASxrWLlg2DoVTDACWQD7ytbg26tGshq1qFhSa4Tn1zcK78zG/ZrwR7cWPkE=
+	t=1736267249; cv=none; b=mvEhF0NZ1YT8+6PRcNxnERPTiUPi2eTOwjsnnhA8FvN5T0f8Sylpdsaf8CaL36VtVtF38SuZIbQwmxoLFjBSKOhU+kpydwavjpuSCq8pPe3MZ/EOkBUIXvfeSNMpR8d0aVrgbCxB+9/MWMI6iLQC+GsUffi4z9onE0kVlrpTBC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736267132; c=relaxed/simple;
-	bh=C1uu7KJPad0P/K6vV+2ViYpu26xuTkpumqT649zmcGU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Grj7XAa8MuYwYvtGz53SImttGGMA9WJzltXI4uF7U5pxRZu/vc2Cve8xyqUiU7DxooQBTL6AqylqGNezc2ZuXSEhrWYxYa+pWt0qV5B8EkC8xoRFza64hSU3V/htEJqsehAPb6HESwWu3Pe4KWprftwuK49w9D4OQt5TfqF77T4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a9d4ea9e0cso154178065ab.0
-        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 08:25:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736267128; x=1736871928;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MIbj1985qmxWb39sTDDBhOMH3hk1O4jew4vLD0IUd6U=;
-        b=HcNNxqYD9V2bU7ve7C9yVY0cRQQOaqhS+OgZ0QQhZSCXkka3ZhcpTw3hqua/fqWtzc
-         TdHwM1vvU1Jj3jQqsa3/ToDmFVVPWtjdgm5NQekrRG7n30XyYJI9zytgFaPZr2mpKFEN
-         O0kgGi5euKDcb9vHi/fAYewBiqqhXHOw5T2v6MyGXifMzhfQqHfr/3pOmPBraIaVWiM8
-         jxX6ZnpCwgR4l1zcnjVNpWotik1gcjzfO/kcmb6HS4bJOs5W5Wl733geQ4QR7uQ8WhVx
-         5F23a3OJgJHbq1XLw5VtZRj++dBgswPJboVBk7hXqcJoHp2p73U7ryrx+r0BsrUH+fse
-         tvbA==
-X-Forwarded-Encrypted: i=1; AJvYcCX/HoLNCikX9+8SF3Rlb8h44PmepGERA/KL1m8+ecYWOhTDQhimwHlgLYXMGM/A3MYFsg31WwM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx/m0NsVezCP3aV/j/TYxpM2jaR2cBf+i0vIgOmhJyR6pmes5r
-	/AWD3MZMueBOY3RhE0tjSH7dGX52X3bZZv/HdQZ26iQlLn1qatRevgOXGCQt/WBd8s0BXr5RQvi
-	+b8PXQ2qY77G0JpC7PiyZmShZo4ESU079RnbZrEqkDiyliypv4de0a+I=
-X-Google-Smtp-Source: AGHT+IGGRAgAv3dD0kWIJOsbXk0QUd+5GSP8V+OS6LHv9BPmtIzAh/JEC8J7NdHF6zksa2nwBD+5jjtEHG536jErPcqPwqItBTnY
+	s=arc-20240116; t=1736267249; c=relaxed/simple;
+	bh=yGuRD7QZk6cYtj4E9Vk0EzX46qN+zYWmpGqZmS/1I5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=icinw2lWaAEBBFcM9DZieRiSk4F7VbJGnJoHtjDDtj+FSZ+1yp2BMaC3xB/tTP5zZZDgRnPs0kRM8WuJL0bWTWbtOR1PP67UDDnS7EqMcjLvrlYRUCwfvbG15L7hLLaYKqYHJdvYNAbssshvFMmtYlZY008z8MhKGolO9oFsapo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JAYMe8QX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736267246;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=yysKQ0vVyHHixdI3EvvINEv3gtl53bkWe5u1MGCf7qg=;
+	b=JAYMe8QXQxTiTZL2aDX8Hg20xocCmYqQwyrLHVzc4IWr9IbxcUaMmckCOJpSJyJ5lMuArs
+	cPZpfslyUGa4G6ELYSdmgRedBE8+Qci5IZy5TGFkiR9dbeGhtjiGaa0vlY0BwsdgNSuojJ
+	V9lxbjeZOVNzN/3r17R+XqV0CYnDaRk=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-456-tD2jZvbsMu-YwFIpvXlP_Q-1; Tue,
+ 07 Jan 2025 11:27:23 -0500
+X-MC-Unique: tD2jZvbsMu-YwFIpvXlP_Q-1
+X-Mimecast-MFC-AGG-ID: tD2jZvbsMu-YwFIpvXlP_Q
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 308F21955F69;
+	Tue,  7 Jan 2025 16:27:20 +0000 (UTC)
+Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.226.23])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 099C2195606C;
+	Tue,  7 Jan 2025 16:27:14 +0000 (UTC)
+Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Tue,  7 Jan 2025 17:26:55 +0100 (CET)
+Date: Tue, 7 Jan 2025 17:26:49 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Christian Brauner <brauner@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Manfred Spraul <manfred@colorfullife.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	WangYuli <wangyuli@uniontech.com>, linux-kernel@vger.kernel.org,
+	io-uring@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH 0/5] poll_wait: add mb() to fix theoretical race between
+ waitqueue_active() and .poll()
+Message-ID: <20250107162649.GA18886@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20ca:b0:3a7:86ab:bebe with SMTP id
- e9e14a558f8ab-3c2d514f966mr513344955ab.16.1736267127799; Tue, 07 Jan 2025
- 08:25:27 -0800 (PST)
-Date: Tue, 07 Jan 2025 08:25:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <677d5577.050a0220.a40f5.0022.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_request_ibss_scan
-From: syzbot <syzbot+1634c5399e29d8b66789@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Hello,
+Linus,
 
-syzbot found the following issue on:
+I misread fs/eventpoll.c, it has the same problem. And more __pollwait()-like
+functions, for example p9_pollwait(). So 1/5 adds mb() into poll_wait(), not
+into __pollwait().
 
-HEAD commit:    63676eefb7a0 Merge tag 'sched_ext-for-6.13-rc5-fixes' of g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17e98edf980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=86dd15278dbfe19f
-dashboard link: https://syzkaller.appspot.com/bug?extid=1634c5399e29d8b66789
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
+WangYuli, after 1/5 we can reconsider your patch.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-63676eef.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/efc20deb6462/vmlinux-63676eef.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b916a2c594d7/bzImage-63676eef.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1634c5399e29d8b66789@syzkaller.appspotmail.com
-
-wlan1: No active IBSS STAs - trying to scan for other IBSS networks with same SSID (merge)
-------------[ cut here ]------------
-WARNING: CPU: 2 PID: 94 at net/mac80211/scan.c:1213 ieee80211_request_ibss_scan+0x7b8/0x9a0 net/mac80211/scan.c:1213
-Modules linked in:
-CPU: 2 UID: 0 PID: 94 Comm: kworker/u32:5 Not tainted 6.13.0-rc5-syzkaller-00161-g63676eefb7a0 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:ieee80211_request_ibss_scan+0x7b8/0x9a0 net/mac80211/scan.c:1213
-Code: e9 3b fb ff ff e8 08 ce 08 f7 be 04 00 00 00 bf 06 00 00 00 41 bd 04 00 00 00 e8 33 d0 08 f7 e9 3b fd ff ff e8 e9 cd 08 f7 90 <0f> 0b 90 bb ea ff ff ff e9 6e fc ff ff 48 c7 c7 d4 1a 1d 90 e8 ef
-RSP: 0018:ffffc900010af988 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff8a908130
-RDX: ffff88801f83a440 RSI: ffffffff8a9081c7 RDI: 0000000000000005
-RBP: ffff888064659720 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000003 R12: 0000000000000005
-R13: 0000000000000006 R14: dffffc0000000000 R15: ffff88804ff70e40
-FS:  0000000000000000(0000) GS:ffff88802b600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000002f61bffc CR3: 000000001e3c2000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_sta_merge_ibss net/mac80211/ibss.c:1290 [inline]
- ieee80211_ibss_work+0x83b/0x14c0 net/mac80211/ibss.c:1672
- ieee80211_iface_work+0xd01/0xf00 net/mac80211/iface.c:1689
- cfg80211_wiphy_work+0x3de/0x560 net/wireless/core.c:440
- process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
+Oleg.
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ include/linux/poll.h | 26 ++++++++++++--------------
+ include/net/sock.h   | 17 +++++++----------
+ io_uring/io_uring.c  |  9 ++++-----
+ 3 files changed, 23 insertions(+), 29 deletions(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
