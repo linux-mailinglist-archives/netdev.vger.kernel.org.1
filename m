@@ -1,151 +1,206 @@
-Return-Path: <netdev+bounces-156048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 576D7A04BEB
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:48:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 599F5A04BEC
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:49:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1D641886E1E
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:48:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B95BA1882BAC
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1EAC1F2361;
-	Tue,  7 Jan 2025 21:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2585D1F669F;
+	Tue,  7 Jan 2025 21:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="g5GrPZE2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="kUhQYXtH"
 X-Original-To: netdev@vger.kernel.org
-Received: from alln-iport-8.cisco.com (alln-iport-8.cisco.com [173.37.142.95])
+Received: from smtp-out.freemail.hu (fmfe36.freemail.hu [46.107.16.241])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACD019C558
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A561802AB;
+	Tue,  7 Jan 2025 21:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.241
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736286523; cv=none; b=lIYBawrIgQOlG7wGJ4bd+feStjKujjyeem4lVPeuo+1k9s5hy1nDTD0vULALC+TishDahrGSRQSXj3Y4HVMJfggYKxIAYw/CzFhtU2ItQNpjnWwa/eJpo75xURzT5x05v/vOZR1aFjGsKsVv2Ss5CW6Piux83WNbv7zAuhZc94I=
+	t=1736286572; cv=none; b=jtrEwpwPR1dJJ/LZM15JMYiTEeRaTvluXAuMNcX1OcW4kGQOS22cQWzdgVBG9bQZNNmsnkkxnFJ46HrdqIHEuMXSfZL8N1BaOX8rLvhp2GzHLaSB8rTh5VLeFMmUfQPa1SReRi0Bb5AcPGvT6Gu8dp17QcitToplAkZyFPbjnQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736286523; c=relaxed/simple;
-	bh=LBdGqL5qjc7FwmNxMKcB9cw6Z7n6Bk5vpIgFd3OvrW8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=j7WAsIkGwWPbMmj0lO1h02bflHd8e/ZaChijtlxYBC3YzVhwE1oIhHUmWfLithcxkuiqwzgY6OVGymXxpvmcK1LtD45uDukDpdfTv/xBZuKYVLN3kJqcxAAhXVkhP5O4C/nY0nxNOSmZns6DkR5hiQvXY8sTN2fep/OjY3mVVN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=g5GrPZE2; arc=none smtp.client-ip=173.37.142.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=1604; q=dns/txt; s=iport;
-  t=1736286522; x=1737496122;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ymrCw1QVofjCy9hb3/GYIIvTuwzebNc+kY6ysbXSovk=;
-  b=g5GrPZE2q1RRUa3KKJ6nKjrvq9IcGVqBiooGsPz8D6SBz8o+Wo+qSwYP
-   hYqnP6WDKuA/+g9r969sNObw30bL1AWCkRRMKT3et3oZJVfHoFihUkc3l
-   MT5y0+e6/+fKWGe/MLhTzOc6cEk+eATibVj7FY+DMFZ6T3+2LkA1aF/OD
-   c=;
-X-CSE-ConnectionGUID: 8jnK2OJHSUK+gJ+DocVFBw==
-X-CSE-MsgGUID: dqitX1fKRDKmM5IMahdcfw==
-X-IPAS-Result: =?us-ascii?q?A0AlAQCIoH1nj5AQJK1aHgEBCxIMgggLhBpDSI1RiHWeG?=
- =?us-ascii?q?IElA1YPAQEBD0QEAQGFBwKKdAImNAkOAQIEAQEBAQMCAwEBAQEBAQEBAQEBC?=
- =?us-ascii?q?wEBBQEBAQIBBwUUAQEBAQEBOQVJhgiGWwEBAQIBMgFGEAtGKysZgwGCQiMDs?=
- =?us-ascii?q?UeCLIEB3jOBbYFIhWuHX3CEdycbgUlEglCBPjE+hRCFdwSCfoRrnglICoEXA?=
- =?us-ascii?q?1ksAVUTDQoLBwWBKR8rAzgMCzAVJg+BHAU1Cjc6ggxpSzcCDQI1gh58giuCI?=
- =?us-ascii?q?YI7hEeEWIVogheBawMDFhIBgxVAAwsYDUgRLDcUGwY+bgeadTyDbgGBDjVHN?=
- =?us-ascii?q?aZ/oQOEJYFjn2MaM6pTmHykR4RmgWc6gVszGggbFYMiUhkPji0NCRa5FiUyP?=
- =?us-ascii?q?AIHCwEBAwmRVQEB?=
-IronPort-Data: A9a23:ZnyYwKur2e3TKkLQTB/4E2Y8EOfnVLxeMUV32f8akzHdYApBsoF/q
- tZmKWHVa/fcYzT2eY0kPtm380MDu8LWy4RnHVBt/C8zFSNHgMeUXt7xwmUckM+xwmwvaGo9s
- q3yv/GZdJhcokf0/0nrav656yEhjclkf5KkYMbcICd9WAR4fykojBNnioYRj5Vh6TSDK1vlV
- eja/YuGYjdJ5xYuajhJs/vb90s11BjPkGpwUmIWNKgjUGD2zxH5PLpHTYmtIn3xRJVjH+LSb
- 47r0LGj82rFyAwmA9Wjn6yTWhVirmn6ZFXmZtJ+AsBOszAazsAA+v9T2Mk0NS+7vw60c+VZk
- 72hg3AfpTABZcUgkMxFO/VR/roX0aduoNcrKlDn2SCfItGvn3bEm51T4E8K0YIwquRxIjtp1
- 9wjFRNOYTLAq+W9/pyRVbw57igjBJGD0II3s3Vky3TdSP0hW52GG/qM7t5D1zB2jcdLdRrcT
- 5NGMnw0MlKZPVsWZgt/5JEWxI9EglH9dD1epFuRqII84nPYy0p6172F3N/9JoXSHJQMxRbCz
- o7A12jgAw0qbdK88xam91fxp8rGnS/wVp1HQdVU8dYx3QXMnTZMYPEMbnO3qOe0j2ayUsxSL
- kgT9DZoq6UunGSmQsT4Vg+1vFaLuRkTX9cWGOo/gCmO16DdywWUHG4JSnhGctNOnMYwSSYny
- RyPks/lCCJHtKCTTzSW9t+8pDW+IyUKBWsfYylCRgtty8Hqqow1jzrVQ9pjGbLzhdrwcRn2z
- iyGoTYWmboel4gI2r+98FSBhCijzqUlVSY84gHRG2bg5QRjacv9OMqj6EPQ6rBLK4PxokS9U
- GYsy8qYz7opL7G2qQ/OT8dOMLai2divL2iJ6bJwJKUJ+zOo8n+lWIlf5jBiOUtkWvronxe3O
- Sc/XisPuPdu0GuWUENhX26m5y0XIUnc+TbNC6i8gjlmO8QZmOq7EMdGPhf4M4fFyxNErE3HE
- c3HGftA9F5DYUid8BK4Rv0GzZggzT0kyGXYSPjTlkv8j+PONCXNEehVbDNii9zVCovZ/m05F
- P4CZqO3J+l3CraWjtT/qNRKdA5WfRDX+7ip+5QLLIZv3TaK6El6VqeOmul+E2CUt69UjezPt
- mqsQVNVzUG3hHvMb223hoNLNtvSsWJEhStjZ0QEZA/ws1B6ONbHxPlELfMfI+J4nNGPONYoF
- JHpje3cWawXElwqOl01MfHAkWCVXE3y2lzWYXb0PlDSvfdIHmT0xzMtRSO3nAFmM8Z9nZJWT
- 2GIvu8Dfac+eg==
-IronPort-HdrOrdr: A9a23:1KImFKjvLJufbC3AFEVTTYpvCnBQXt0ji2hC6mlwRA09TyVXra
- +TdZMgpHjJYVkqOU3I9ersBEDEewK/yXcX2/h0AV7dZmnbUQKTRekIh7cKgQeQfhEWndQy6U
- 4PScRD4aXLfDtHZQKQ2njALz7mq+P3lpyVuQ==
-X-Talos-CUID: 9a23:UQ9EwmF1v/EWvVyHqmI39kg3QOcHUkbg7zTfAQyUDm1XZpeKHAo=
-X-Talos-MUID: =?us-ascii?q?9a23=3AC3eKKA8Hj3QXu1fQha4rO6qQf8tx4rieUU4uq7k?=
- =?us-ascii?q?lvuzZFAl5OzuWgiviFw=3D=3D?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.12,296,1728950400"; 
-   d="scan'208";a="410191382"
-Received: from alln-l-core-07.cisco.com ([173.36.16.144])
-  by alln-iport-8.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 07 Jan 2025 21:48:35 +0000
-Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
-	by alln-l-core-07.cisco.com (Postfix) with ESMTP id 6075D180001D1;
-	Tue,  7 Jan 2025 21:48:35 +0000 (GMT)
-Received: by cisco.com (Postfix, from userid 392789)
-	id 34C0820F2003; Tue,  7 Jan 2025 13:48:35 -0800 (PST)
-From: John Daley <johndale@cisco.com>
-To: andrew@lunn.ch
-Cc: andrew+netdev@lunn.ch,
-	benve@cisco.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	johndale@cisco.com,
-	kuba@kernel.org,
-	neescoba@cisco.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	satishkh@cisco.com
-Subject: Re: [PATCH net-next 2/2] enic: Obtain the Link speed only after the link comes up
-Date: Tue,  7 Jan 2025 13:48:35 -0800
-Message-Id: <20250107214835.25987-1-johndale@cisco.com>
-X-Mailer: git-send-email 2.35.2
-In-Reply-To: <5f143188-57e1-44ce-a70d-d8339af4f159@lunn.ch>
-References: <5f143188-57e1-44ce-a70d-d8339af4f159@lunn.ch>
+	s=arc-20240116; t=1736286572; c=relaxed/simple;
+	bh=UjzaIZ9cNSABdz4+5geIRAI88q3X1A9hZD0GHn07TYo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FZDpixufaLG0vhvsuWoGGtk34ptzuho4Ve+Geqkl+Ch0kFJwg4tUOQXre7tOR+G76wdzn+FzNiWNT7r/mnr5miZe05lb1RWk8BfhrdUxbFcu7dAAiGFLpPfH79jeVc3zQq9AkIVVNosla+DCe1/mYICYYPhKp/NiH83s7uvTu/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=kUhQYXtH reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.241
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YSPp75QqpzhfK;
+	Tue, 07 Jan 2025 22:49:19 +0100 (CET)
+Message-ID: <f53d51a9-e6d6-4376-8601-420ac756b7af@freemail.hu>
+Date: Tue, 7 Jan 2025 22:48:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/10] netfilter: iptables: Merge ipt_ECN.h to ipt_ecn.h
+To: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
+ daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250107024120.98288-1-egyszeregy@freemail.hu>
+ <20250107024120.98288-6-egyszeregy@freemail.hu>
+ <eb46258b-0fb2-c0be-f1aa-79497f3dc536@netfilter.org>
+Content-Language: hu
+From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
+In-Reply-To: <eb46258b-0fb2-c0be-f1aa-79497f3dc536@netfilter.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
-X-Outbound-Node: alln-l-core-07.cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736286560;
+	s=20181004; d=freemail.hu;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	l=4406; bh=tNUCdlivEY1+/Xn3yNuxvZQNlQe57yfHUbtboowh3HQ=;
+	b=kUhQYXtHJW2eoyg0qiLXV+cb/q3wQKWe3tYkgQv92H1mCQ4lHjrDPp3+RRdKkIXn
+	sk4Ji5IdcLRH7A/zlfROIqO33PCz5fGeN0uNYfjDC2W/3ZIFcipUxeboCmpxE/gB8TU
+	/e7mGVG1fitPU33aCNhX5h3UMkvHAdomPbWZAdk+0NzBFgdMoiul1JCsnKm6vnY0yZR
+	fDdnU7X3AgB5DPDfX3xGluIKdyKtpFcLF6TLQE9lL7vKR9oIsreTkgRGOomVdcvic7i
+	miccOaNFACbfkAUo2yNSU7UywreZaJEDL9eq1uLfAEglmlj3RlJbemq1TOXjw5ngLCS
+	hZBuGhWziw==
 
->> The link speed is obtained in the RX adaptive coalescing function. It
->> was being called at probe time when the link may not be up. Change the
->> call to run after the Link comes up.
->> 
->> The impact of not getting the correct link speed was that the low end of
->> the adaptive interrupt range was always being set to 0 which could have
->> caused a slight increase in the number of RX interrupts.
->> 
->> Co-developed-by: Nelson Escobar <neescoba@cisco.com>
->> Signed-off-by: Nelson Escobar <neescoba@cisco.com>
->> Co-developed-by: Satish Kharat <satishkh@cisco.com>
->> Signed-off-by: Satish Kharat <satishkh@cisco.com>
->> Signed-off-by: John Daley <johndale@cisco.com>
+2025. 01. 07. 20:26 keltezéssel, Jozsef Kadlecsik írta:
+> On Tue, 7 Jan 2025, egyszeregy@freemail.hu wrote:
+> 
+>> From: Benjamin Szőke <egyszeregy@freemail.hu>
+>>
+>> Merge ipt_ECN.h to ipt_ecn.h header file.
+>>
+>> Signed-off-by: Benjamin Szőke <egyszeregy@freemail.hu>
 >> ---
->>  drivers/net/ethernet/cisco/enic/enic_main.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->> 
->> diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
->> index 957efe73e41a..49f6cab01ed5 100644
->> --- a/drivers/net/ethernet/cisco/enic/enic_main.c
->> +++ b/drivers/net/ethernet/cisco/enic/enic_main.c
->> @@ -109,7 +109,7 @@ static struct enic_intr_mod_table mod_table[ENIC_MAX_COALESCE_TIMERS + 1] = {
->>  static struct enic_intr_mod_range mod_range[ENIC_MAX_LINK_SPEEDS] = {
->>  	{0,  0}, /* 0  - 4  Gbps */
->>  	{0,  3}, /* 4  - 10 Gbps */
->> -	{3,  6}, /* 10 - 40 Gbps */
->> +	{3,  6}, /* 10+ Gbps */
->>  };
->
->So we still have this second change, which is not explained in the
->commit message, and probably should be in a patch of its own.
+>>   include/uapi/linux/netfilter_ipv4/ipt_ECN.h | 29 +--------------------
+>>   include/uapi/linux/netfilter_ipv4/ipt_ecn.h | 26 ++++++++++++++++++
+>>   2 files changed, 27 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h b/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
+>> index e3630fd045b8..6727f5a44512 100644
+>> --- a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
+>> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
+>> @@ -1,34 +1,7 @@
+>>   /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> -/* Header file for iptables ipt_ECN target
+>> - *
+>> - * (C) 2002 by Harald Welte <laforge@gnumonks.org>
+>> - *
+>> - * This software is distributed under GNU GPL v2, 1991
+>> - *
+>> - * ipt_ECN.h,v 1.3 2002/05/29 12:17:40 laforge Exp
+>> -*/
+>>   #ifndef _IPT_ECN_TARGET_H
+>>   #define _IPT_ECN_TARGET_H
+>>   
+>> -#include <linux/types.h>
+>> -#include <linux/netfilter/xt_DSCP.h>
+>> -
+>> -#define IPT_ECN_IP_MASK	(~XT_DSCP_MASK)
+> 
 
-OK, I did a v2 with the typo fix as its own patch in this set of link related
-patches. Thanks.
+If it is not dropped out in the merged header file, it will cause a build error 
+because of the previous bad and duplicated header architects in the UAPI:
+
+In file included from ../net/ipv4/netfilter/ipt_ECN.c:17:
+../include/uapi/linux/netfilter_ipv4/ipt_ecn.h:17:25: error: expected identifier 
+before ‘(’ token
+  #define IPT_ECN_IP_MASK (~XT_DSCP_MASK)
+                          ^
+../include/uapi/linux/netfilter_ipv4/ipt_ecn.h:27:2: note: in expansion of macro 
+‘IPT_ECN_IP_MASK’
+   IPT_ECN_IP_MASK       = XT_ECN_IP_MASK,
+   ^~~~~~~~~~~~~~~
+
+Please spent more time then 10 mins about the reviewing and make some test build 
+and you can see there was a conflict about how mades a fixed constant in the 
+code -> It is a #define vs. enum issue.
+
+Only one style should have been used before, and not mix them.
+
+> The definition above is removed from here but not added to ipt_ecn.h, so
+> it's missing now. Please fix it in the next round of the patchset.
+> 
+>> -#define IPT_ECN_OP_SET_IP	0x01	/* set ECN bits of IPv4 header */
+>> -#define IPT_ECN_OP_SET_ECE	0x10	/* set ECE bit of TCP header */
+>> -#define IPT_ECN_OP_SET_CWR	0x20	/* set CWR bit of TCP header */
+>> -
+>> -#define IPT_ECN_OP_MASK		0xce
+>> -
+>> -struct ipt_ECN_info {
+>> -	__u8 operation;	/* bitset of operations */
+>> -	__u8 ip_ect;	/* ECT codepoint of IPv4 header, pre-shifted */
+>> -	union {
+>> -		struct {
+>> -			__u8 ece:1, cwr:1; /* TCP ECT bits */
+>> -		} tcp;
+>> -	} proto;
+>> -};
+>> +#include <linux/netfilter_ipv4/ipt_ecn.h>
+>>   
+>>   #endif /* _IPT_ECN_TARGET_H */
+>> diff --git a/include/uapi/linux/netfilter_ipv4/ipt_ecn.h b/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+>> index 8121bec47026..a6d479aece21 100644
+>> --- a/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+>> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+>> @@ -1,10 +1,26 @@
+>>   /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +/* Header file for iptables ipt_ECN target and match
+>> + *
+>> + * (C) 2002 by Harald Welte <laforge@gnumonks.org>
+>> + *
+>> + * This software is distributed under GNU GPL v2, 1991
+>> + *
+>> + * ipt_ECN.h,v 1.3 2002/05/29 12:17:40 laforge Exp
+>> + */
+>>   #ifndef _IPT_ECN_H
+>>   #define _IPT_ECN_H
+>>   
+>> +#include <linux/types.h>
+>> +#include <linux/netfilter/xt_dscp.h>
+>>   #include <linux/netfilter/xt_ecn.h>
+>> +
+>>   #define ipt_ecn_info xt_ecn_info
+>>   
+>> +#define IPT_ECN_OP_SET_IP	0x01	/* set ECN bits of IPv4 header */
+>> +#define IPT_ECN_OP_SET_ECE	0x10	/* set ECE bit of TCP header */
+>> +#define IPT_ECN_OP_SET_CWR	0x20	/* set CWR bit of TCP header */
+>> +#define IPT_ECN_OP_MASK		0xce
+>> +
+>>   enum {
+>>   	IPT_ECN_IP_MASK       = XT_ECN_IP_MASK,
+>>   	IPT_ECN_OP_MATCH_IP   = XT_ECN_OP_MATCH_IP,
+>> @@ -13,4 +29,14 @@ enum {
+>>   	IPT_ECN_OP_MATCH_MASK = XT_ECN_OP_MATCH_MASK,
+>>   };
+>>   
+>> +struct ipt_ECN_info {
+>> +	__u8 operation;	/* bitset of operations */
+>> +	__u8 ip_ect;	/* ECT codepoint of IPv4 header, pre-shifted */
+>> +	union {
+>> +		struct {
+>> +			__u8 ece:1, cwr:1; /* TCP ECT bits */
+>> +		} tcp;
+>> +	} proto;
+>> +};
+>> +
+>>   #endif /* IPT_ECN_H */
+>> -- 
+>> 2.43.5
+>>
+>>
+> 
+> Best regards,
+> Jozsef
+
 
