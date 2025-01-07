@@ -1,126 +1,110 @@
-Return-Path: <netdev+bounces-155893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51465A04377
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:56:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BEEBA04384
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 050AE3A44E0
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:56:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 240A0163F7C
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFE41F191A;
-	Tue,  7 Jan 2025 14:56:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 705DF1F2373;
+	Tue,  7 Jan 2025 14:59:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JmXNY8ko"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kALKCcA3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7DA2C190;
-	Tue,  7 Jan 2025 14:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76978259499;
+	Tue,  7 Jan 2025 14:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736261779; cv=none; b=nTrdXXpZrz6vKWa2YEAAb7bWZ9znu8Pf68RMxezIvqf3TnxJD/p3ywsYmNF+M1f/TpXMqS0XaA+UVNHXgTc9QhmHPMITzSq/2S8sbh8ESeUhTZZrm/RuuFGqAyS9ytnLZfiipA9HVrSyHofn3lPPfTfkTW+lD34yP0D0twIT3Q8=
+	t=1736261980; cv=none; b=OnuK1w8+NNqnUCCo5eT9Z4c2bYhBoWKYRD0rN2n7DiAipBEoYguGpsQWK/DyQr8KKqdMLPvhZoaW8WIgFmCH98yEQXhh62fAJWdnQ/mnV+5CpZrH1Zyi8Xbd0V0MbxAFh1D1BKAzntZkS9HEm5SO0Hzij9H4zZM6kAg+2FHgR44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736261779; c=relaxed/simple;
-	bh=Tb08g295VdLrJ4TqI1vVZ+9DBlbWYG4te86mQu7tK0A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fPvjXUMO3BBDzWJy81Y03MwHbl7sY2sYGgJVRd52M1E5Nfk60dU6SVAKQb//mT4a0q0zBXvJ4cRHDr5yNol0PECJ97jIf8CdTA0tokmwv6nITmpanGWFXSwGuDib0WhNBJKyAggFFLNslbHIYWsBRKMYWencohnQXbO7ddrxCjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JmXNY8ko; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d3e6274015so27690654a12.0;
-        Tue, 07 Jan 2025 06:56:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736261776; x=1736866576; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZP6lcPhq7uA2jdevV7sPC88C18fJe8/9rJWhgSofyNQ=;
-        b=JmXNY8koEXdnsuTRDQ1z9zvpAm5tREB4YDqi3DtCv5wjDkARXPamNq1ww/zFCzHVuo
-         3zoE70F8ZFrVDhMcv3pwLfm77RO8Ri02LB3xnbiUP87xLH9l3vqwiLkRKChMXFa/8ez/
-         tMviETlWwtEfAlQAETSZb+lds+a0yWUwhK/xB9qlqFP5Ox0/NK1cuLkzcb13G7jcJWcd
-         DtqY4WmndbAfw9CJowoIHSKhK2SViMUNfd1ao8UxRihRaWL9geCRlpu6vIJQG75dVAkY
-         hmET3rWnHWNyDnOJtw9VgMH7ak6myaMgMrVjN4Z53QUnCw3MdKdypEAWH32icFF9EwGl
-         2y3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736261776; x=1736866576;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZP6lcPhq7uA2jdevV7sPC88C18fJe8/9rJWhgSofyNQ=;
-        b=a9tdOeIJcWTOT6danPNpbfuD59j/rgm7QiSCXCIsiVQUt1MUvPjYrYGj2JYmkkpDda
-         WiRC79TgW4OXWLlyvBn8a9V6pIqScrtD/4XMt5+pP1yQkwEzgNAr+NIUP2N8b117cyuX
-         JHw4jqSZRPGyenNSeBhRrlrjnO/bsT0/TPm7crh57ZsHxEY3K6MhfMGb1pBJdR8gvqMr
-         8s9oiIuFryR0Pm3O539E/NYPuFxbJyxF0IImdJY1T/uuolk2e0Xy/+4EksbYvuF3YrXs
-         38em96vcJYj6FYUr0Yyz7Eg/Gjqk3MICaS+CZq4sXe4sghnT7FeIFCykxJyPiEUpp6cI
-         EVvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVkMPHYYaFpVq9ed/oAdzgJs3VvMj9M/HKRO9r369QheKfIZKTSSVKNSlyblpcj3e7oeBcSMiG/@vger.kernel.org, AJvYcCWIXYvVNkoMyCwq85QC35Ai6Qlmtsyi1lXf7scKcjTAI+hHYW0LoVpRuIJyV6qhTZBROBKbICF4w54=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOM+9rXKbUT3c4RrMpTsTu9Qt7iuXsZcKJVCAwwqJxRf964xxB
-	W+EV9BS0hDjVUJwjo0GOEv2ZPsO1nIogtfiNTn2lVY2g4u/Kjqcutp00+3cH6uxYfpShJcIJnqq
-	g8TGUdz5tbhgzsQuHdQ0FTghobX3bEbfOnkU=
-X-Gm-Gg: ASbGncvbevXCZ44WlHSOXZ/efET6cXVf7BSS3toynsE01APHNxT+6VGfdZ4ySL0gC1/
-	ir0jSrgKoZ5p4vQ0buP+ytb7ltbfi0hNR4vJphYM=
-X-Google-Smtp-Source: AGHT+IGl+7BYq30b/tUNfG36roKW12ay27pmjIA9wMZ18w78UyDB80x6HQup55YurEj0MhXQj9Kt0BJNkT/V0lVd9Y0=
-X-Received: by 2002:a05:6402:3221:b0:5d0:bcdd:ff97 with SMTP id
- 4fb4d7f45d1cf-5d81dd83edemr52676622a12.5.1736261774613; Tue, 07 Jan 2025
- 06:56:14 -0800 (PST)
+	s=arc-20240116; t=1736261980; c=relaxed/simple;
+	bh=6AfXFF1Cv3J/f7dW7sRs1gXrCasbCYC2JdzcosUF/xw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SxO2UwxqZjJ5AIeG0U+PPxK0VcDhjc0PySGmK3n5IzaHXOGNYRRcuaJhSW6aHjal1P9fjJU0B3gkJsOf1Xjrlj/5USmpf93+SDu0KFK7eEsT25vHhEQQ8v5ZMcIZ4fWtt5iykAcVr7kz58MNYJdbRJtvFxhAkrh6SQI+dtIc/Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kALKCcA3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4ZoD+gvKfB/ed9HjsLTaCjOZ9SwK5xZrjHcan7418rw=; b=kALKCcA3IFaOOLmMdjti7LK+bD
+	RcS7EGoLurmty1XbnbAoumDhcat2e6Xkd5KfAYFAnroHw/sNowJQJKckvkepCZqMCwBtWDyNyNQ+2
+	DOAfVtc1YqsdZq3jHxs/3e4lXv3UpHFsTzgSTQmyd1EFuAf1+D0+MYI0gkKWOSWEdoPUTdJs+qzlk
+	jqC82QEDE6jYDOSQR0AspwlRUwRAbU9GBlynBp9V+CL7/6U+2sRXRk1SfyUlKfalpHN82Udk4FisO
+	ZNxX2Ak6PrBeh7xEXQUfbTYTm3mA7d4Hm5aBUfhxzfqEU3Bld+KRinkR7pYoBO8Pud7AV6v7YQzlJ
+	lwznVA3Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58096)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tVB3B-0007ct-0c;
+	Tue, 07 Jan 2025 14:59:21 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tVB36-0005Mv-25;
+	Tue, 07 Jan 2025 14:59:16 +0000
+Date: Tue, 7 Jan 2025 14:59:16 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, bridge@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
+ (delayed) phy
+Message-ID: <Z31BRMay2QgcjX2R@shell.armlinux.org.uk>
+References: <20250107123615.161095-1-ericwouds@gmail.com>
+ <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+ <Z30pMSxDn-R3Cy5S@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250103150325.926031-1-ap420073@gmail.com> <20250103150325.926031-11-ap420073@gmail.com>
- <20250106190112.6ae27767@kernel.org>
-In-Reply-To: <20250106190112.6ae27767@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Tue, 7 Jan 2025 23:56:03 +0900
-Message-ID: <CAMArcTUzQiJfeH4+EUgUYrJdgUor5qv1wKN9sLd7CtwrNV2Utg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 10/10] selftest: net-drv: hds: add test for
- HDS feature
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
-	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
-	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z30pMSxDn-R3Cy5S@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Jan 7, 2025 at 12:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
+On Tue, Jan 07, 2025 at 01:16:33PM +0000, Daniel Golle wrote:
+> On Tue, Jan 07, 2025 at 12:47:14PM +0000, Russell King (Oracle) wrote:
+> > ... but we don't see link-up reported by the PCS after the PHY comes
+> > up. Why is that - I think that needs investigation before we proceed
+> > to patch the issue, because that suggests the PCS isn't seeing
+> > valid 2500base-X from the PHY.
+> 
+> The PCS doesn't support in-band status in 2500Base-X mode, or at least
+> the implementation isn't compatible with those RealTek PHYs.
 
-Hi Jakub,
-Thanks a lot for the review!
+There is in-band for base-X, which involves 16-bit control words to
+report the capabilities of either end (basically half/full duplex,
+pause modes). Unlike SGMII, it doesn't contain any status bits for
+link up, because that is irrelevant.
 
-> On Fri,  3 Jan 2025 15:03:25 +0000 Taehee Yoo wrote:
-> > +    try:
-> > +        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-th=
-resh': hds_gt})
-> > +    except NlError as e:
-> > +        if e.error =3D=3D errno.EOPNOTSUPP:
-> > +            raise KsftSkipEx("ring-set not supported by the device")
-> > +        ksft_eq(e.error, errno.EINVAL)
-> > +    else:
-> > +        raise KsftFailEx("exceeded hds-thresh should be failed")
->
-> Nice work on the tests! FWIW you could use ksft_raises(NlError) here,
-> but this works too. You can leave it as is if you prefer.
+Link-up state in base-X modes comes from the PCS itself, whether the
+PCS is in sync with the media, and whether it has valid format. This
+has *nothing* to do with in-band.
 
-Thanks for the suggestion, I will change it after tests!
-
-Thanks a lot,
-Taehee Yoo
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
