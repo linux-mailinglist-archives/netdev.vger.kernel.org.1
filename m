@@ -1,114 +1,119 @@
-Return-Path: <netdev+bounces-155783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F0DFA03BE5
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:10:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30A9CA03C3B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:23:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC47E3A462A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:10:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26951165FBD
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F521E47B0;
-	Tue,  7 Jan 2025 10:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDD81E3DD0;
+	Tue,  7 Jan 2025 10:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="EZ8Bk5yi"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8021E2606;
-	Tue,  7 Jan 2025 10:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31651E47A4
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 10:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736244633; cv=none; b=RgPdfBMO4CoQnVkLSzjYdeHulNlgv7BlgkTpySAU+YHP7D4+a5aiCeadHzLq6Fk8AeiAM7SmahKWwxWJOTdCfl8f7xqGnRYPtjrbM45H6GQWbOTyrrSMZcLI3WMptNzknvMiKigIHEjEuyNorI0JEyD0/wmr/RvEYEYmLUO/szE=
+	t=1736245429; cv=none; b=W97r/b2dj03HZwV+Td8rWib7ytLMhe0454GFk0OX3xUCLZRXiesaU6n3C12vjN0BXcbxDdIU5xpGBxi8mb9p/QgiUgh64MVtP5lzScjpRMEzGHU0xZrhIsoqO7OYzy/Y/ws4lSwhGB0/fDqodFOipn6b6Eh9JN3KrShj2SZfrzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736244633; c=relaxed/simple;
-	bh=Mhto81Z6MhtXiGgKkqFllrVaZvgvVjmX68GSIQvAYBk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RQ+qg7hMQRnq5Y+06G3D3EWQ6DWx1NB52hPdpUsPXY678bL9Yn5TpD3isBb6v+JTCuXzYEXyPCjrEBDX1O4+/VEJYl8WEokvigKZ61f2hO/r3fxq/KhOlORB/gxeOOd4HFWMpZYEe0EbifcU0AphECsdJb7utWy3iqnrxgPOLJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YS6Fw0Rpzz6M4X5;
-	Tue,  7 Jan 2025 18:08:52 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id 343B514038F;
-	Tue,  7 Jan 2025 18:10:25 +0800 (CST)
-Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 7 Jan
- 2025 11:10:13 +0100
-From: Gur Stavi <gur.stavi@huawei.com>
-To: <sumang@marvell.com>
-CC: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
-	<davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
-	<guoxin09@huawei.com>, <gur.stavi@huawei.com>, <helgaas@kernel.org>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <meny.yossefi@huawei.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shenchenyang1@hisilicon.com>,
-	<shijing34@huawei.com>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>
-Subject: RE: [EXTERNAL] [PATCH net-next v03 1/1] hinic3: module initialization and tx/rx logic
-Date: Tue, 7 Jan 2025 12:23:11 +0200
-Message-ID: <20250107102311.3552206-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <SJ0PR18MB5216BED17023369322EE4A6ADB152@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <SJ0PR18MB5216BED17023369322EE4A6ADB152@SJ0PR18MB5216.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1736245429; c=relaxed/simple;
+	bh=ENRZw0wrSlkHL51Eir0SOb6OZkmHuS6753Sg+wvQmdc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J9BwnLnISKCmzgzJPP2isKiTqQLXUPGKTAIwo/JC3GRiM5Y2gHHvfpQEemywB0DD4PxcKZErV3rczW0GLbtJ0nZDZvdiyKAbDRd5VPiGAcEvsoRT4o/L3W8NYeo+iRvLVprup4yI2iR9yYJw16QIEyxGfBftvQUP5QPS33QaW8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=EZ8Bk5yi; arc=none smtp.client-ip=212.77.101.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 30304 invoked from network); 7 Jan 2025 11:23:35 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1736245415; bh=ae3iHmFyFKfPB1ihSnkhLzujkbnClLYu78pfaVBQOSw=;
+          h=From:To:Cc:Subject;
+          b=EZ8Bk5yikdhrnF1LQb7Ml1mycW6e7ULMPKyICAmLrP/4+m83yV9/pCdW4Ip0pArwy
+           7D5VBVrNHYbBTLciuG5rJwTbPOk3M9DMTqOLdqfi70VjjbM9yHhYD1T9gpVqYtopEV
+           9RYFWNv/uD1UxvzWFMmVmr7Jy4AUKMDJJrI4f1Q+XL4hBTu489ij4o/5J41hBII/rl
+           u3OEl3XXQGsa6WkdCwPVXMf83ZQSXjU7O/iGbaoCsgYyxH6EppYRfECPUNIi27LYUm
+           aFW/H722LR7iegEkW0J6rV1CRip4P37ykE4XA6U6B4Nsuz5naRdjCHuYULM8XKT6/T
+           jrYHPr5FyKVQw==
+Received: from 89-64-6-19.dynamic.chello.pl (HELO localhost) (stf_xl@wp.pl@[89.64.6.19])
+          (envelope-sender <stf_xl@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <Ariel.Otilibili-Anieli@eurecom.fr>; 7 Jan 2025 11:23:35 +0100
+Date: Tue, 7 Jan 2025 11:23:35 +0100
+From: Stanislaw Gruszka <stf_xl@wp.pl>
+To: Ariel Otilibili-Anieli <Ariel.Otilibili-Anieli@eurecom.fr>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Shiji Yang <yangshiji66@outlook.com>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	Kalle Valo <kvalo@kernel.org>,
+	Tomislav =?utf-8?Q?Po=C5=BEega?= <pozega.tomislav@gmail.com>,
+	Linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] rt2x00: Remove unusued value
+Message-ID: <20250107102335.GA2355@wp.pl>
+References: <20241221124445.1094460-1-ariel.otilibili-anieli@eurecom.fr>
+ <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
+ <20250103085540.GA94204@wp.pl>
+ <Z3fMxD2mAVsVl58h@pidgin.makrotopia.org>
+ <20250103131002.GA100011@wp.pl>
+ <2f7a83-6777e880-a451-5cf12280@99910178>
+ <20250104103753.GA2228@wp.pl>
+ <2f7a8b-67792f00-52db-be99fc0@193911177>
+ <Z3r3vxy8cRRH6w1m@pidgin.makrotopia.org>
+ <2f7a84-677b8500-5061-4ac1e700@152950135>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- frapeml500005.china.huawei.com (7.182.85.13)
+In-Reply-To: <2f7a84-677b8500-5061-4ac1e700@152950135>
+X-WP-MailID: 4a31331c3305ef66d84a20dc653f4b86
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000000 [cZNU]                               
 
-> >+static struct hinic3_adev *hinic3_add_one_adev(struct hinic3_hwdev
-> >*hwdev,
-> >+					       enum hinic3_service_type svc_type)
-> >+{
-> >+	struct hinic3_adev *hadev;
-> >+	const char *svc_name;
-> >+	int ret;
-> >+
-> >+	hadev =3D kzalloc(sizeof(*hadev), GFP_KERNEL);
-> >+	if (!hadev)
-> >+		return NULL;
-> >+
-> >+	svc_name =3D hinic3_adev_devices[svc_type].name;
-> >+	hadev->adev.name =3D svc_name;
-> >+	hadev->adev.id =3D hwdev->dev_id;
-> >+	hadev->adev.dev.parent =3D hwdev->dev;
-> >+	hadev->adev.dev.release =3D hinic3_comm_adev_release;
-> >+	hadev->svc_type =3D svc_type;
-> >+	hadev->hwdev =3D hwdev;
-> >+
-> >+	ret =3D auxiliary_device_init(&hadev->adev);
-> >+	if (ret) {
-> >+		dev_err(hwdev->dev, "failed init adev %s %u\n",
-> >+			svc_name, hwdev->dev_id);
-> >+		kfree(hadev);
-> >+		return NULL;
-> >+	}
-> >+
-> >+	ret =3D auxiliary_device_add(&hadev->adev);
-> >+	if (ret) {
-> >+		dev_err(hwdev->dev, "failed to add adev %s %u\n",
-> >+			svc_name, hwdev->dev_id);
-> >+		auxiliary_device_uninit(&hadev->adev);
+Hi Ariel,
 
-> [Suman] memleak for hadev?
+On Mon, Jan 06, 2025 at 08:23:34AM +0100, Ariel Otilibili-Anieli wrote:
+> Hi Daniel, hi Shiji, hi Stanislaw,
+> 
+> On Sunday, January 05, 2025 22:21 CET, Daniel Golle <daniel@makrotopia.org> wrote:
+> 
+> > H again,
+> > 
+> > 
+> > On Sat, Jan 04, 2025 at 01:51:25PM +0100, Ariel Otilibili-Anieli wrote:
+> > > Great, then; thanks for having acked the patch as such.
+> > 
+> > I just noticed that Shiji Yang had posted a series of patches for
+> > OpenWrt which also addresses the same issue, however, instead of
+> > removing the augmented assignment, it fixes it to the supposedly
+> > originally intended way.
+> > 
+> > See
+> > https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=package/kernel/mac80211/patches/rt2x00/621-04-rt2x00-fix-register-operation-on-RXIQ-calibration.patch;h=aa6f9c437c6447831490588b2cead6919accda58;hb=5d583901657bdfbbf9fad77d9247872427aa5c99
+> > 
+> > I suppose this was tested together with the other changes of the same
+> > series, so we may want to pick that instead.
+> 
+> Thanks for having put some time into the research, Daniel; I looked into the openwrt archives for 2024, none of Shiji’s messages mentions that patch.
+> 
+> Though, if you three agree, I will push a new series, modelled on that patch, and you as Suggested-by.
 
-No. Calling auxiliary_device_uninit after a successful
-auxiliary_device_init will trigger a call to hinic3_comm_adev_release
-that releases the memory.
+Please post that change. But to not mix it with
+patches against other drivers in the same series.
+(multiple rt2x00 patches in one patchset are ok).
 
-> >+		return NULL;
-> >+	}
-> >+
-> >+	return hadev;
-> >+}
-> >+
+And please use "wifi: rt2x00:" as subject prefix.
+
+Thanks
+Stanislaw
 
