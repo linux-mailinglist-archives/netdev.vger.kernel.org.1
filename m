@@ -1,221 +1,131 @@
-Return-Path: <netdev+bounces-156014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D623A04A59
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 20:40:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A16C5A04A7E
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 20:49:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AF6E7A241B
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:40:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88042164311
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DDB1F4E5B;
-	Tue,  7 Jan 2025 19:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF401F63F8;
+	Tue,  7 Jan 2025 19:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UoxgCbzg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.50])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E088618C03D;
-	Tue,  7 Jan 2025 19:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56051F7084;
+	Tue,  7 Jan 2025 19:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736278806; cv=none; b=MYqekL56lkRGC22nFVFeAB4/vDntQ+POWhqlMsNOcwPI6+goOnX3Tz5Qo1J0/y6OkJGLRzyrLZ9nGEpirn7avBeDNy/gF4qNuyVGqyOQNd/opwJRqSr81LJ3quFNKJ5TWNBy4qqQfjtV0Z7OZDHtUngqR6/6ETG9NmAEp1V628Y=
+	t=1736279341; cv=none; b=YVFye73H+KYWSV6PhJ1rRpKXQMPuhtb49Vtt2pPBh76rj4Yds+qzGNz/I3ZacGM+66jQlkxjNwEy+MJWhmbatT0mhJ/e9tW64elzKP8uiZsXiC2OTt4GVpdzZprRTQoMCim5jV4jHbX4QAPbZuKJnMLQ4ifUH3pmOG7KVi1g5x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736278806; c=relaxed/simple;
-	bh=GNoiYGNe3BTzovHNXwUSIFQihH7dzp4B+TK7/4BQUc0=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=D4mDZPtVjp4V8UBmtHDG8ddUlUJJZYKm5C5aAL15Sb8vtdHTqKobOjqqPJff6cxdTvVsaHw00GSHrrA/hDEhBM3cwyNVJa9vf0xNZuLCjD7Zi7WgtcCWi0+Rf5HtQ6t0u60HzFZKsixRvoCbQ7MSdinBH2KPantp6e+qcSLxMOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=148.6.0.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost (localhost [127.0.0.1])
-	by smtp1.kfki.hu (Postfix) with ESMTP id 06AFC5C001BF;
-	Tue,  7 Jan 2025 20:39:55 +0100 (CET)
-X-Virus-Scanned: Debian amavis at smtp1.kfki.hu
-Received: from smtp1.kfki.hu ([127.0.0.1])
- by localhost (smtp1.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id ahva0qRIDM8G; Tue,  7 Jan 2025 20:39:53 +0100 (CET)
-Received: from mentat.rmki.kfki.hu (80-95-82-13.pool.digikabel.hu [80.95.82.13])
-	(Authenticated sender: kadlecsik.jozsef@wigner.hu)
-	by smtp1.kfki.hu (Postfix) with ESMTPSA id F04AD5C001BC;
-	Tue,  7 Jan 2025 20:39:52 +0100 (CET)
-Received: by mentat.rmki.kfki.hu (Postfix, from userid 1000)
-	id D1FDB142729; Tue,  7 Jan 2025 20:39:52 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by mentat.rmki.kfki.hu (Postfix) with ESMTP id CFE801421D7;
-	Tue,  7 Jan 2025 20:39:52 +0100 (CET)
-Date: Tue, 7 Jan 2025 20:39:52 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@netfilter.org>
-To: =?UTF-8?Q?Benjamin_Sz=C5=91ke?= <egyszeregy@freemail.hu>
-cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org, 
-    daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com, 
-    davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-    kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-    linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 09/10] netfilter: Add message pragma for deprecated
- xt_*.h, ipt_*.h.
-In-Reply-To: <20250107024120.98288-10-egyszeregy@freemail.hu>
-Message-ID: <1cd443f7-df1e-20cf-cfe8-f38ac72491e4@netfilter.org>
-References: <20250107024120.98288-1-egyszeregy@freemail.hu> <20250107024120.98288-10-egyszeregy@freemail.hu>
+	s=arc-20240116; t=1736279341; c=relaxed/simple;
+	bh=Kgz2jx7bib0PN4twzARuqIrW4rC6y55S605NP2TJFDk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ivWufMapY2jA9y5z7xPUn+JIxCG01gCO4ZJhnYLx7s9NL/Z26qCyfij6LvSRkQUL4+GLhOAI486FWPcTJsQC24sbJ2V4RrLtcBVAxowYeBr0W92bAyLmDfQ1xAauZEeK4mzO3D4e1bdyfXLKsDMZ9Q9wqX3t0liW+FNIaVttNOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UoxgCbzg; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <01084af1-4f39-46f8-a278-9cfa7f242a11@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736279326;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B5ZAmugUbFS8tTnvREFaNPziAJZ+taQuMYqxt7qiZl4=;
+	b=UoxgCbzgF9qgfmI7I00gcuVoFHoO7m69/ZcURii2U6nIKntvz3n3PSkCIfLUymfythcrDH
+	nDGDw948NmehGcw0ncxnEg/DUlO8aJjNb8nEv4gt4x2u+dNOm2pP0PRx15dapROBxSjg2h
+	7X2GsRidLj2ywaHK7povwtQMy+6tgxw=
+Date: Tue, 7 Jan 2025 11:48:36 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-1563264698-1736278792=:220661"
-X-deepspam: ham 0%
+Subject: Re: [PATCH 2/3] selftests/bpf: Migrate test_xdp_redirect.sh to
+ xdp_do_redirect.c
+To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250103-xdp_redirect-v1-0-e93099f59069@bootlin.com>
+ <20250103-xdp_redirect-v1-2-e93099f59069@bootlin.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250103-xdp_redirect-v1-2-e93099f59069@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 1/3/25 2:10 AM, Bastien Curutchet (eBPF Foundation) wrote:
+> +static int ping_setup(struct test_data *data)
+> +{
+> +	struct nstoken *nstoken = NULL;
+> +	int i;
+> +
+> +	data->ns[0] = netns_new(NS0, false);
+> +	if (!ASSERT_OK_PTR(data->ns[0], "create ns"))
+> +		return -1;
+> +
+> +	for (i = 1; i < NS_NB; i++) {
+> +		char ns_name[4] = {};
+> +
+> +		snprintf(ns_name, 4, "NS%d", i);
+> +		data->ns[i] = netns_new(ns_name, false);
+> +		if (!ASSERT_OK_PTR(data->ns[i], "create ns"))
+> +			goto fail;
+> +
+> +		nstoken = open_netns(NS0);
+> +		if (!ASSERT_OK_PTR(nstoken, "open NS0"))
+> +			goto fail;
+> +
+> +		SYS(fail, "ip link add veth%d index %d%d%d type veth peer name veth0 netns %s",
+> +		    i, i, i, i, ns_name);
+> +		SYS(fail, "ip link set veth%d up", i);
+> +		close_netns(nstoken);
+> +
+> +		nstoken = open_netns(ns_name);
+> +		if (!ASSERT_OK_PTR(nstoken, "open ns"))
+> +			goto fail;
+> +
+> +		SYS(fail, "ip addr add %s.%d/24 dev veth0", IPV4_NETWORK, i);
+> +		SYS(fail, "ip link set veth0 up");
+> +		close_netns(nstoken);
 
---8323329-1563264698-1736278792=:220661
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+		nstoken = NULL;
 
-On Tue, 7 Jan 2025, egyszeregy@freemail.hu wrote:
+Otherwise, the other "goto fail;" of this loop will close and free the already 
+closed nstoken again.
 
-> From: Benjamin Sz=C5=91ke <egyszeregy@freemail.hu>
->=20
-> Display information about deprecated xt_*.h, ipt_*.h files
-> at compile time. Recommended to use header files with
-> lowercase name format in the future.
+Some of the other close_netns(nstoken) in this patch may have similar issue.
 
-I still don't know whether adding the pragmas to notify about header file
-deprecation is a good idea.
+> +	}
+> +
+> +	return 0;
+> +
+> +fail:
+> +	close_netns(nstoken);
+> +	cleanup(data);
+> +	return -1;
+> +}
 
-On my part that's all. Thank you the work!
-
-Best regards,
-Jozsef
-=20
-> Signed-off-by: Benjamin Sz=C5=91ke <egyszeregy@freemail.hu>
-> ---
->  include/uapi/linux/netfilter/xt_CONNMARK.h  | 2 ++
->  include/uapi/linux/netfilter/xt_DSCP.h      | 2 ++
->  include/uapi/linux/netfilter/xt_MARK.h      | 2 ++
->  include/uapi/linux/netfilter/xt_RATEEST.h   | 2 ++
->  include/uapi/linux/netfilter/xt_TCPMSS.h    | 2 ++
->  include/uapi/linux/netfilter_ipv4/ipt_ECN.h | 2 ++
->  include/uapi/linux/netfilter_ipv4/ipt_TTL.h | 2 ++
->  include/uapi/linux/netfilter_ipv6/ip6t_HL.h | 2 ++
->  8 files changed, 16 insertions(+)
->=20
-> diff --git a/include/uapi/linux/netfilter/xt_CONNMARK.h b/include/uapi/=
-linux/netfilter/xt_CONNMARK.h
-> index 171af24ef679..1bc991fd546a 100644
-> --- a/include/uapi/linux/netfilter/xt_CONNMARK.h
-> +++ b/include/uapi/linux/netfilter/xt_CONNMARK.h
-> @@ -4,4 +4,6 @@
-> =20
->  #include <linux/netfilter/xt_connmark.h>
-> =20
-> +#pragma message("xt_CONNMARK.h header is deprecated. Use xt_connmark.h=
- instead.")
-> +
->  #endif /* _XT_CONNMARK_TARGET_H */
-> diff --git a/include/uapi/linux/netfilter/xt_DSCP.h b/include/uapi/linu=
-x/netfilter/xt_DSCP.h
-> index fcff72347256..bd550292803d 100644
-> --- a/include/uapi/linux/netfilter/xt_DSCP.h
-> +++ b/include/uapi/linux/netfilter/xt_DSCP.h
-> @@ -4,4 +4,6 @@
-> =20
->  #include <linux/netfilter/xt_dscp.h>
-> =20
-> +#pragma message("xt_DSCP.h header is deprecated. Use xt_dscp.h instead=
-.")
-> +
->  #endif /* _XT_DSCP_TARGET_H */
-> diff --git a/include/uapi/linux/netfilter/xt_MARK.h b/include/uapi/linu=
-x/netfilter/xt_MARK.h
-> index cdc12c0954b3..9f6c03e26c96 100644
-> --- a/include/uapi/linux/netfilter/xt_MARK.h
-> +++ b/include/uapi/linux/netfilter/xt_MARK.h
-> @@ -4,4 +4,6 @@
-> =20
->  #include <linux/netfilter/xt_mark.h>
-> =20
-> +#pragma message("xt_MARK.h header is deprecated. Use xt_mark.h instead=
-.")
-> +
->  #endif /* _XT_MARK_H_TARGET_H */
-> diff --git a/include/uapi/linux/netfilter/xt_RATEEST.h b/include/uapi/l=
-inux/netfilter/xt_RATEEST.h
-> index f817b5387164..ec3d68f67b2f 100644
-> --- a/include/uapi/linux/netfilter/xt_RATEEST.h
-> +++ b/include/uapi/linux/netfilter/xt_RATEEST.h
-> @@ -4,4 +4,6 @@
-> =20
->  #include <linux/netfilter/xt_rateest.h>
-> =20
-> +#pragma message("xt_RATEEST.h header is deprecated. Use xt_rateest.h i=
-nstead.")
-> +
->  #endif /* _XT_RATEEST_TARGET_H */
-> diff --git a/include/uapi/linux/netfilter/xt_TCPMSS.h b/include/uapi/li=
-nux/netfilter/xt_TCPMSS.h
-> index 154e88c1de02..826060264766 100644
-> --- a/include/uapi/linux/netfilter/xt_TCPMSS.h
-> +++ b/include/uapi/linux/netfilter/xt_TCPMSS.h
-> @@ -4,4 +4,6 @@
-> =20
->  #include <linux/netfilter/xt_tcpmss.h>
-> =20
-> +#pragma message("xt_TCPMSS.h header is deprecated. Use xt_tcpmss.h ins=
-tead.")
-> +
->  #endif /* _XT_TCPMSS_TARGET_H */
-> diff --git a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h b/include/uapi=
-/linux/netfilter_ipv4/ipt_ECN.h
-> index 6727f5a44512..42317fb3a4e9 100644
-> --- a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
-> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
-> @@ -4,4 +4,6 @@
-> =20
->  #include <linux/netfilter_ipv4/ipt_ecn.h>
-> =20
-> +#pragma message("ipt_ECN.h header is deprecated. Use ipt_ecn.h instead=
-.")
-> +
->  #endif /* _IPT_ECN_TARGET_H */
-> diff --git a/include/uapi/linux/netfilter_ipv4/ipt_TTL.h b/include/uapi=
-/linux/netfilter_ipv4/ipt_TTL.h
-> index 5d989199ed28..1663493e4951 100644
-> --- a/include/uapi/linux/netfilter_ipv4/ipt_TTL.h
-> +++ b/include/uapi/linux/netfilter_ipv4/ipt_TTL.h
-> @@ -4,4 +4,6 @@
-> =20
->  #include <linux/netfilter_ipv4/ipt_ttl.h>
-> =20
-> +#pragma message("ipt_TTL.h header is deprecated. Use ipt_ttl.h instead=
-.")
-> +
->  #endif /* _IPT_TTL_TARGET_H */
-> diff --git a/include/uapi/linux/netfilter_ipv6/ip6t_HL.h b/include/uapi=
-/linux/netfilter_ipv6/ip6t_HL.h
-> index bcf22824b393..55f08e20acd2 100644
-> --- a/include/uapi/linux/netfilter_ipv6/ip6t_HL.h
-> +++ b/include/uapi/linux/netfilter_ipv6/ip6t_HL.h
-> @@ -4,4 +4,6 @@
-> =20
->  #include <linux/netfilter_ipv6/ip6t_hl.h>
-> =20
-> +#pragma message("ip6t_HL.h header is deprecated. Use ip6t_hl.h instead=
-.")
-> +
->  #endif /* _IP6T_HL_TARGET_H */
-> --=20
-> 2.43.5
->=20
->=20
-
---=20
-E-mail : kadlec@netfilter.org, kadlec@blackhole.kfki.hu, kadlecsik.jozsef=
-@wigner.hu
-Address: Wigner Research Centre for Physics
-         H-1525 Budapest 114, POB. 49, Hungary
---8323329-1563264698-1736278792=:220661--
 
