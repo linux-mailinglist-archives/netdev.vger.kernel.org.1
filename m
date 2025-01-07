@@ -1,122 +1,140 @@
-Return-Path: <netdev+bounces-155843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75160A040AA
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:17:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABE92A040AE
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:18:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B78C161A88
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:17:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2D77162823
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:18:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D6C1F03DA;
-	Tue,  7 Jan 2025 13:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D223BBC1;
+	Tue,  7 Jan 2025 13:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TB6lZS40"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C274F1E9B06;
-	Tue,  7 Jan 2025 13:17:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9632A259488
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 13:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736255838; cv=none; b=ea3dOWl6cE+Fdtw/Sd72Hdg0ZMHleHA3CMiI5oYvbjLWRlCLnPNUvzFqvdlCZseIAUpgDxxmGwhlBff158Cbb5EZZB2RmT+aGQnCPlEIR4dCUjauzseBTY43FaT5Clts4CilRn/FJGucQOMzOJJfb1+19T4U+OSYkI+zonjnovU=
+	t=1736255891; cv=none; b=nKxGEd4V2lF1CAHAnDx+gxPJDUMLdykT+5cAA6/thqc3LN/RhYiRPnca17vH/M6RQ50PHmojoUFPBrwjugUWD7hwL7Lh+fYc7AXcPEbiYY1Ba7JomXUAjXA47dFaGmNcl1otw1u3VR+LsdU/Xm10JXo6o2T9YybzYAZ1pvDE5rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736255838; c=relaxed/simple;
-	bh=Zm+sDNRBPmKZ1z+1qr7D4hK7OQNx7Uv4cu5PfMH0vgU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A2CKZIoGKge/+Qw9YbsiXR76PS/5x6CBbnwY92UgYjV5C59H7W/JKvIp2BLetDrEuU1v/AjuiwrY2N/RdJIk3/YUP2CneUrySU7RSGN87SjjFHkte62MNLC4GG54PZCFXDX+rPr0H1o2vAyY6v7AiRK3MWvQehjaDak0dVU6CwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1tV9Rt-000000007Yg-0b83;
-	Tue, 07 Jan 2025 13:16:45 +0000
-Date: Tue, 7 Jan 2025 13:16:33 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
- (delayed) phy
-Message-ID: <Z30pMSxDn-R3Cy5S@makrotopia.org>
-References: <20250107123615.161095-1-ericwouds@gmail.com>
- <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+	s=arc-20240116; t=1736255891; c=relaxed/simple;
+	bh=YaPKkPnP7JoeY57vDBJ6Rl0YNxY0hz5ZM3BfdSfzAVs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iCyc3qi9L47DvVjtKHFa2lQFWb6PZfEKjJdVLemBM1bg0knRjEA48Jv2Ftp6qBT1AB+hefub0GlVAX81PaYQgWw8xM8YxNQ8i3xVILqJ96xiQfJNy1muNKGJ8XI/BLjTRAsIY0Af176LG7yvicax8LRYoRWbNjTLsvcpyjQujsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TB6lZS40; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2166f1e589cso7955495ad.3
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 05:18:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736255888; x=1736860688; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Rlj1V/4ZlKvC1RLYE9iTLTd7mMBO7AlqmbG78cQd/I0=;
+        b=TB6lZS40/Rko156YRTiJ8JRuEEAPeUobwtqF+i2J9zoWKu9rt/85j4KbOxpD6LJ/l0
+         zBShANV6wtj29C5Ie0IvS7pKQYjAuicBk0eIZ0cFqvza3tuFIN6X3W53P9Iw77IDN8Mm
+         mDJ665swXLSX8DmnKD8zSSGQEADXg5uvTuPVETunuBexR1lri9dTWqMSskeXTOV1A65a
+         jkaDnlkB52eqxNSjRhIrkZv8RORVz09TW47PCTtuTmb165yVGcwxxXdrW1UL1Zt4+cn9
+         mDmyGyKlgzjfJEZ2T6LE0C2cgdPgmkE5AG0BHL8/qEwzZHS/KKfRupUEy3Ksl9cWq61K
+         9PSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736255888; x=1736860688;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rlj1V/4ZlKvC1RLYE9iTLTd7mMBO7AlqmbG78cQd/I0=;
+        b=EezOKdGMrlErMVD7QAiGtBVVDp2+AuYXoQpoZvgfNUTJe02yjLbhB6EFVzoGJaLiFg
+         yfM04ScT4uCcTXyvyTAlkPWSlSJrE5NL4xrWBZjcdYnUAsbmaO0mhCgz0bvRrFNH09d8
+         4B1ut2fCZesganYmUYPo0RnGtDYC8jnNGYVsJi+lcUBGuiILPmDBd8EefEt1XjYBSjBA
+         ebEB47Ly1piMVoqXkmdg0QUNloB94Gg0WJGJRRT8Xknk9+kzz88tAem3qGf8ouJZptcE
+         pbk/oMGVDvbdoUs91Jeyy9z5yeDrHwXHaVWu//wEQwkD9XDgiSMs1Fz5pcP2yUgf1npc
+         vN9w==
+X-Gm-Message-State: AOJu0Yxvx2qbdREv8aN00xPWmm9uWNsKXddIGsJdwyrc1+6mC0gYkffF
+	rlxmts4B8/1+C4fgX8wLE58dIcu3sufHMQ0F0QA4EbdVYdX26VF1
+X-Gm-Gg: ASbGncvPf+6wxfeD/RaMyYqrcOB0L6UsZ6c7rMWG2eweHv8WnUYCpi255QcoFHY94dR
+	buawMThi/UFBQjoCylET+8PHGTu3oYblzmp3Uqw0KId5aekvFZ7028NrF6Czn2o2xcfPXZq5kNm
+	LM5GWYUag43WIkft5QAxY6FXKCj58gZX6aFqIywv+QHEQKzPwIcoWLigeB3EwY4kOuymUPNJsR/
+	dh50o3u682y9Qcz3NNYC8dor67x/MG4ItBNDbE1bG7UjRz3JvZEbzdgG0Gc1mcMGAIvqR4OlvjP
+	12eE3EA3
+X-Google-Smtp-Source: AGHT+IFKYaBvn8JGDBz22qWzCIzWl+kKlWGcpVcXKap3jKOji8PbAKPSA5V6VEZ1Ggdec8aS8f+Zkw==
+X-Received: by 2002:a05:6a21:8cc2:b0:1e1:f281:8d36 with SMTP id adf61e73a8af0-1e5e0458dbdmr89868085637.10.1736255887759;
+        Tue, 07 Jan 2025 05:18:07 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1145:4:bc22:6f0:67b1:dcdd? ([2620:10d:c091:500::5:f2])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-842bdfb5759sm26116137a12.51.2025.01.07.05.18.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2025 05:18:07 -0800 (PST)
+Message-ID: <3ab1a86f-5c37-4421-b4df-5d73729f1381@gmail.com>
+Date: Tue, 7 Jan 2025 08:18:05 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC ethtool] ethtool: mock JSON output for --module-info
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ "mkubecek@suse.cz" <mkubecek@suse.cz>
+References: <7d3b3d56-b3cf-49aa-9690-60d230903474@gmail.com>
+ <DM6PR12MB451628E919440310BC5726E5D8422@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <f0d2811d-e69f-4ef4-bf0f-21ab9c5a8b36@gmail.com>
+ <DM6PR12MB4516A5E32EB6C663F907C24BD8492@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <cd258b2f-d43f-4ae6-bd7c-ca22777d35e3@gmail.com>
+ <MN2PR12MB45179CC5F6CC57611E5024E2D8282@MN2PR12MB4517.namprd12.prod.outlook.com>
+ <f3272bbe-3b3d-496e-95c6-9a35d469b6e7@gmail.com>
+ <DM6PR12MB45169CD5A409D9B133EF3658D8292@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <02060f90-1520-4c17-9efe-8b701269f301@gmail.com>
+ <DM6PR12MB4516F7998D67014D9835C5F5D83F2@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <DM6PR12MB4516E1A2E2C99E36ECA9D87AD8062@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <9e022720-f413-411c-be64-77c8b324549a@gmail.com>
+ <DM6PR12MB451618A6A98EA0F5D4A6A549D8142@DM6PR12MB4516.namprd12.prod.outlook.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <DM6PR12MB451618A6A98EA0F5D4A6A549D8142@DM6PR12MB4516.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 07, 2025 at 12:47:14PM +0000, Russell King (Oracle) wrote:
-> Going through the log...
-> 
-> On Tue, Jan 07, 2025 at 01:36:15PM +0100, Eric Woudstra wrote:
-> > Log before this patch is applied:
-> > [root@bpir3 ~]# dmesg | grep eth1
-> > [    2.515179] mtk_soc_eth 15100000.ethernet eth1: mediatek frame engine at 0xffff800082380000, irq 123
-> > [   38.271431] mtk_soc_eth 15100000.ethernet eth1: configuring for inband/2500base-x link mode
-> > [   38.279828] mtk_soc_eth 15100000.ethernet eth1: major config, requested inband/2500base-x
-> > [   38.288009] mtk_soc_eth 15100000.ethernet eth1: interface 2500base-x inband modes: pcs=01 phy=00
-> > [   38.296800] mtk_soc_eth 15100000.ethernet eth1: major config, active inband/inband,an-disabled/2500base-x
-> 
-> This is indeed without the PHY. We're using inband, although the PCS
-> mode is PHYLINK_PCS_NEG_INBAND_DISABLED, meaning inband won't be
-> used. As there is no PHY, we can't switch to MLO_AN_PHY.
-> 
-> > [   38.306362] mtk_soc_eth 15100000.ethernet eth1: phylink_mac_config: mode=inband/2500base-x/none adv=00,00000000,00008000,0000e240 pause=04
-> > [   39.220149] mtk_soc_eth 15100000.ethernet eth1:  interface 2 (mii) rate match none supports 0-3,6-7,13-14
-> > [   39.229758] mtk_soc_eth 15100000.ethernet eth1:  interface 3 (gmii) rate match none supports 0-3,5-7,13-14
-> > [   39.239420] mtk_soc_eth 15100000.ethernet eth1:  interface 4 (sgmii) rate match none supports 0-3,5-7,13-14
-> > [   39.249173] mtk_soc_eth 15100000.ethernet eth1:  interface 22 (1000base-x) rate match none supports 5-7,13-14
-> > [   39.259080] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 6-7,13-14,47
-> > [   39.594676] mtk_soc_eth 15100000.ethernet eth1: PHY i2c:sfp-1:11 uses interfaces 4,23, validating 4,23
-> 
-> The PHY comes along...
-> 
-> > [   39.603992] mtk_soc_eth 15100000.ethernet eth1:  interface 4 (sgmii) rate match none supports 0-3,5-7,13-14
-> > [   39.650080] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 6-7,13-14,47
-> > [   39.660266] mtk_soc_eth 15100000.ethernet eth1: PHY [i2c:sfp-1:11] driver [RTL8221B-VB-CG 2.5Gbps PHY (C45)] (irq=POLL)
-> > [   39.671037] mtk_soc_eth 15100000.ethernet eth1: phy: 2500base-x setting supported 00,00000000,00008000,000060ef advertising 00,00000000,00008000,000060ef
-> > [   39.684761] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 00,00000000,00008000,000060ef
-> 
-> We decide to use MLO_AN_INBAND and 2500base-X, which we're already using.
-> 
-> > [   40.380076] mtk_soc_eth 15100000.ethernet eth1: phy link down 2500base-x/Unknown/Unknown/none/off
-> > [   40.397090] brlan: port 5(eth1) entered blocking state
-> > [   40.402223] brlan: port 5(eth1) entered disabled state
-> > [   40.407437] mtk_soc_eth 15100000.ethernet eth1: entered allmulticast mode
-> > [   40.414400] mtk_soc_eth 15100000.ethernet eth1: entered promiscuous mode
-> > [   44.500077] mtk_soc_eth 15100000.ethernet eth1: phy link up 2500base-x/2.5Gbps/Full/none/off
-> > [   44.508528] mtk_soc_eth 15100000.ethernet eth1: No phy led trigger registered for speed(2500)
-> 
-> ... but we don't see link-up reported by the PCS after the PHY comes
-> up. Why is that - I think that needs investigation before we proceed
-> to patch the issue, because that suggests the PCS isn't seeing
-> valid 2500base-X from the PHY.
+The json output looks good on my cards with CMIS modules. On a different 
+card that does not support the CMIS interface, the output falls back to 
+non-json, even when --json is specified. Maybe this should return an 
+error. Other than that, looks good to me. Thanks.
 
-The PCS doesn't support in-band status in 2500Base-X mode, or at least
-the implementation isn't compatible with those RealTek PHYs.
-
-In OpenWrt we carry a downstream patch to disable in-band status on the
-side of the PHY which fixes the issue:
-
-https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=target/linux/generic/pending-6.6/720-02-net-phy-realtek-disable-SGMII-in-band-AN-for-2-5G-PHYs.patch;h=7e48c16515db8e401495dc1c505319424773ee11;hb=HEAD
+On 1/2/25 3:19 AM, Danielle Ratson wrote:
+> Hi,
+>
+> Any comments?
+>
+>> -----Original Message-----
+>> From: Daniel Zahka <daniel.zahka@gmail.com>
+>> Sent: Thursday, 19 December 2024 19:35
+>> To: Danielle Ratson <danieller@nvidia.com>
+>> Cc: netdev@vger.kernel.org; Jakub Kicinski <kuba@kernel.org>; Ido Schimmel
+>> <idosch@nvidia.com>; mkubecek@suse.cz
+>> Subject: Re: [RFC ethtool] ethtool: mock JSON output for --module-info
+>>
+>>
+>> On 12/19/24 9:18 AM, Danielle Ratson wrote:
+>>> Hi Daniel,
+>>>
+>>> I didn’t get a reply from you.
+>>> Anyway, here's a like to my git repository:
+>> https://github.com/daniellerts/ethtool/tree/eeprom_json_rfc.
+>>> The last 4 commits are the relevant ones.
+>>>
+>>> All the CMIS modules dump fields are implemented were sent to internal
+>> review.
+>>> Thanks,
+>>> Danielle
+>>
+>> Thank you! I'll try it out on my machines.
 
