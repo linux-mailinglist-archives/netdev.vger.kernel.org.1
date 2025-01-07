@@ -1,206 +1,125 @@
-Return-Path: <netdev+bounces-156049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 599F5A04BEC
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:49:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8D30A04BF1
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:52:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B95BA1882BAC
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:49:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12A4A3A13D9
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2585D1F669F;
-	Tue,  7 Jan 2025 21:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5126B1F7069;
+	Tue,  7 Jan 2025 21:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="kUhQYXtH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="Odhq5hzu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.freemail.hu (fmfe36.freemail.hu [46.107.16.241])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A561802AB;
-	Tue,  7 Jan 2025 21:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.241
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C779A56446
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736286572; cv=none; b=jtrEwpwPR1dJJ/LZM15JMYiTEeRaTvluXAuMNcX1OcW4kGQOS22cQWzdgVBG9bQZNNmsnkkxnFJ46HrdqIHEuMXSfZL8N1BaOX8rLvhp2GzHLaSB8rTh5VLeFMmUfQPa1SReRi0Bb5AcPGvT6Gu8dp17QcitToplAkZyFPbjnQI=
+	t=1736286741; cv=none; b=AMoQBJYvcYkufJZAqTxOwXiQPtjrqNsed7f24xqsFs4zXgBXAMlg8GwrYCJuySp049CB2jyyC4yWlLAD7+6FN7tz7GN8dNy9nI4GYm+Z6fSUqJaijPY1DvZuxfDgMsaBuIMIlDhwl7yGkMwT9+qeHAB0oE+7Qhs1YgaJrq8+Zdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736286572; c=relaxed/simple;
-	bh=UjzaIZ9cNSABdz4+5geIRAI88q3X1A9hZD0GHn07TYo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FZDpixufaLG0vhvsuWoGGtk34ptzuho4Ve+Geqkl+Ch0kFJwg4tUOQXre7tOR+G76wdzn+FzNiWNT7r/mnr5miZe05lb1RWk8BfhrdUxbFcu7dAAiGFLpPfH79jeVc3zQq9AkIVVNosla+DCe1/mYICYYPhKp/NiH83s7uvTu/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=kUhQYXtH reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.241
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
-Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YSPp75QqpzhfK;
-	Tue, 07 Jan 2025 22:49:19 +0100 (CET)
-Message-ID: <f53d51a9-e6d6-4376-8601-420ac756b7af@freemail.hu>
-Date: Tue, 7 Jan 2025 22:48:55 +0100
+	s=arc-20240116; t=1736286741; c=relaxed/simple;
+	bh=2+22Hi00Z3H8JdugqovZ7drUjnUkXVGqFQUK0WARa0U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KHeBpYORV8oNse3OocwR/HDJxCTShwgQSzZw2IN+zN1SbSVWbUnhZgyor0LSUIKvNECd4mMdvhn9bhp8cNuSuHzYZtVuTX7OcRcYnYtVtuCBO9ureFuZjknBkIiWbMvm35M4LcMGDGAjMMksUrZOieSj0X51wPUVTZlpJ8hn74g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=Odhq5hzu; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GlRXPsyJbM2o47QJmvvPokS/tabVmC9pj0BGhM2WuNo=; t=1736286739; x=1737150739; 
+	b=Odhq5hzun43oFSUFlTRWUCVsGn7cvMKQo7cNVlwj3aLTjG2+nI63qjls3h4Kg6PLy2qY6K6HENJ
+	bRNgmOytjnkqi47pW7SfHLGqxk4wTfCQ39ngjtIt0/rppJpy69/z07SRP4ypDRgPg8Uej3abuJn2K
+	LCW5GRT1dOrM7BrJ5/oeqJxia9H26cSba8a+ekfaHclIMmZZ24AOoQAkRpbEL4jQp3+abjm7XUBw0
+	4fkmtvF6v47Xa/QaQlgG1qpS0XVhGcwmzWFME3M6DA8Dw9qbye7Tj9a7KfWmpck98RNw8y6H0XP5T
+	2kvAd0cg4H9OwiOKcMsfS/Y2Dzgqq2+HRQsg==;
+Received: from mail-oo1-f47.google.com ([209.85.161.47]:49411)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tVHUo-0005u0-JK
+	for netdev@vger.kernel.org; Tue, 07 Jan 2025 13:52:19 -0800
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5f32168ddd8so5521861eaf.3
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 13:52:18 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCX9Dliypm7JBsR9lVhcNXU/6dgvT/UEiLrAHvpvhdcIhi+cRoYn/rJyu4QHMnrdC5Fe1gV9NSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXPgwjtkvzKNKs9mGx7eUb2JxOFqC0yk8fuR5qUpXrY9TAZ8XW
+	fiJEf5iH2m1Uu3M7KpbKowu6/MpMRTCMPsLqArmOnbrEU9vNxU4DKFqhKyeTpCKXvFv5BwZ2v7T
+	b7nKs+vz6r/zlqNTNjJs6jGjGs2o=
+X-Google-Smtp-Source: AGHT+IFFm4X+OMrri9hchBMDFJ+mSAfvUgP37qI5L/XQPqMH4NJVNU2sdODz9+/pjSwbcMjHvWulGFI+IFIwWJzB4S8=
+X-Received: by 2002:a05:6871:6216:b0:296:e4bb:80f5 with SMTP id
+ 586e51a60fabf-2aa069844ccmr282486fac.36.1736286737994; Tue, 07 Jan 2025
+ 13:52:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/10] netfilter: iptables: Merge ipt_ECN.h to ipt_ecn.h
-To: Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
- daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
- davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250107024120.98288-1-egyszeregy@freemail.hu>
- <20250107024120.98288-6-egyszeregy@freemail.hu>
- <eb46258b-0fb2-c0be-f1aa-79497f3dc536@netfilter.org>
-Content-Language: hu
-From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
-In-Reply-To: <eb46258b-0fb2-c0be-f1aa-79497f3dc536@netfilter.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736286560;
-	s=20181004; d=freemail.hu;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	l=4406; bh=tNUCdlivEY1+/Xn3yNuxvZQNlQe57yfHUbtboowh3HQ=;
-	b=kUhQYXtHJW2eoyg0qiLXV+cb/q3wQKWe3tYkgQv92H1mCQ4lHjrDPp3+RRdKkIXn
-	sk4Ji5IdcLRH7A/zlfROIqO33PCz5fGeN0uNYfjDC2W/3ZIFcipUxeboCmpxE/gB8TU
-	/e7mGVG1fitPU33aCNhX5h3UMkvHAdomPbWZAdk+0NzBFgdMoiul1JCsnKm6vnY0yZR
-	fDdnU7X3AgB5DPDfX3xGluIKdyKtpFcLF6TLQE9lL7vKR9oIsreTkgRGOomVdcvic7i
-	miccOaNFACbfkAUo2yNSU7UywreZaJEDL9eq1uLfAEglmlj3RlJbemq1TOXjw5ngLCS
-	hZBuGhWziw==
+References: <20250106181219.1075-1-ouster@cs.stanford.edu> <20250106181219.1075-7-ouster@cs.stanford.edu>
+ <20250107061510.0adcf6c6@kernel.org> <CAGXJAmz+FVRHXh=CrBcp-T-cLX3+s6BRH7DtBzaoFrpQb1zf9w@mail.gmail.com>
+ <CANn89iJKq=ArBwcKTGb0VcxexvA3d96hm39e75LJLvDhBaXiTw@mail.gmail.com>
+In-Reply-To: <CANn89iJKq=ArBwcKTGb0VcxexvA3d96hm39e75LJLvDhBaXiTw@mail.gmail.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Tue, 7 Jan 2025 13:51:41 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmx4bB15iT1OwNyTmEDYMLvDhCVUXQBhKCftAeBt932uUw@mail.gmail.com>
+X-Gm-Features: AbW1kvYyKZm0a7E4PLxw3wWlB_J3MWajKtCxIDL4REb6DhVM_2Jy9O4FioKdzfs
+Message-ID: <CAGXJAmx4bB15iT1OwNyTmEDYMLvDhCVUXQBhKCftAeBt932uUw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 06/12] net: homa: create homa_peer.h and homa_peer.c
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, pabeni@redhat.com, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 078eb853d78558c6c655f7b6c94b391a
 
-2025. 01. 07. 20:26 keltezéssel, Jozsef Kadlecsik írta:
-> On Tue, 7 Jan 2025, egyszeregy@freemail.hu wrote:
-> 
->> From: Benjamin Szőke <egyszeregy@freemail.hu>
->>
->> Merge ipt_ECN.h to ipt_ecn.h header file.
->>
->> Signed-off-by: Benjamin Szőke <egyszeregy@freemail.hu>
->> ---
->>   include/uapi/linux/netfilter_ipv4/ipt_ECN.h | 29 +--------------------
->>   include/uapi/linux/netfilter_ipv4/ipt_ecn.h | 26 ++++++++++++++++++
->>   2 files changed, 27 insertions(+), 28 deletions(-)
->>
->> diff --git a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h b/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
->> index e3630fd045b8..6727f5a44512 100644
->> --- a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
->> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
->> @@ -1,34 +1,7 @@
->>   /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> -/* Header file for iptables ipt_ECN target
->> - *
->> - * (C) 2002 by Harald Welte <laforge@gnumonks.org>
->> - *
->> - * This software is distributed under GNU GPL v2, 1991
->> - *
->> - * ipt_ECN.h,v 1.3 2002/05/29 12:17:40 laforge Exp
->> -*/
->>   #ifndef _IPT_ECN_TARGET_H
->>   #define _IPT_ECN_TARGET_H
->>   
->> -#include <linux/types.h>
->> -#include <linux/netfilter/xt_DSCP.h>
->> -
->> -#define IPT_ECN_IP_MASK	(~XT_DSCP_MASK)
-> 
+On Tue, Jan 7, 2025 at 1:02=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Tue, Jan 7, 2025 at 9:54=E2=80=AFPM John Ousterhout <ouster@cs.stanfor=
+d.edu> wrote:
+> >
+> > I have removed the cast now.
+> >
+> > -John-
+> >
+> >
+> > On Tue, Jan 7, 2025 at 6:15=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> > >
+> > > On Mon,  6 Jan 2025 10:12:12 -0800 John Ousterhout wrote:
+> > > > +void homa_dst_refresh(struct homa_peertab *peertab, struct homa_pe=
+er *peer,
+> > > > +                   struct homa_sock *hsk)
+> > > > +{
+> > > > +     struct dst_entry *dst;
+> > > > +
+> > > > +     spin_lock_bh(&peertab->write_lock);
+> > > > +     dst =3D homa_peer_get_dst(peer, &hsk->inet);
+> > > > +     if (!IS_ERR(dst)) {
+> > > > +             struct homa_dead_dst *dead =3D (struct homa_dead_dst =
+*)
+> > > > +                             kmalloc(sizeof(*dead), GFP_KERNEL);
+> > >
+>
+> While you are at it, I suggest you test your patch with LOCKDEP enabled,
+> and CONFIG_DEBUG_ATOMIC_SLEEP=3Dy
+>
+> Using GFP_KERNEL while BH are blocked is not good.
 
-If it is not dropped out in the merged header file, it will cause a build error 
-because of the previous bad and duplicated header architects in the UAPI:
+I will follow up on all of this. Thanks for the pointers, and sorry
+that there is so much I don't know.
 
-In file included from ../net/ipv4/netfilter/ipt_ECN.c:17:
-../include/uapi/linux/netfilter_ipv4/ipt_ecn.h:17:25: error: expected identifier 
-before ‘(’ token
-  #define IPT_ECN_IP_MASK (~XT_DSCP_MASK)
-                          ^
-../include/uapi/linux/netfilter_ipv4/ipt_ecn.h:27:2: note: in expansion of macro 
-‘IPT_ECN_IP_MASK’
-   IPT_ECN_IP_MASK       = XT_ECN_IP_MASK,
-   ^~~~~~~~~~~~~~~
-
-Please spent more time then 10 mins about the reviewing and make some test build 
-and you can see there was a conflict about how mades a fixed constant in the 
-code -> It is a #define vs. enum issue.
-
-Only one style should have been used before, and not mix them.
-
-> The definition above is removed from here but not added to ipt_ecn.h, so
-> it's missing now. Please fix it in the next round of the patchset.
-> 
->> -#define IPT_ECN_OP_SET_IP	0x01	/* set ECN bits of IPv4 header */
->> -#define IPT_ECN_OP_SET_ECE	0x10	/* set ECE bit of TCP header */
->> -#define IPT_ECN_OP_SET_CWR	0x20	/* set CWR bit of TCP header */
->> -
->> -#define IPT_ECN_OP_MASK		0xce
->> -
->> -struct ipt_ECN_info {
->> -	__u8 operation;	/* bitset of operations */
->> -	__u8 ip_ect;	/* ECT codepoint of IPv4 header, pre-shifted */
->> -	union {
->> -		struct {
->> -			__u8 ece:1, cwr:1; /* TCP ECT bits */
->> -		} tcp;
->> -	} proto;
->> -};
->> +#include <linux/netfilter_ipv4/ipt_ecn.h>
->>   
->>   #endif /* _IPT_ECN_TARGET_H */
->> diff --git a/include/uapi/linux/netfilter_ipv4/ipt_ecn.h b/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
->> index 8121bec47026..a6d479aece21 100644
->> --- a/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
->> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
->> @@ -1,10 +1,26 @@
->>   /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +/* Header file for iptables ipt_ECN target and match
->> + *
->> + * (C) 2002 by Harald Welte <laforge@gnumonks.org>
->> + *
->> + * This software is distributed under GNU GPL v2, 1991
->> + *
->> + * ipt_ECN.h,v 1.3 2002/05/29 12:17:40 laforge Exp
->> + */
->>   #ifndef _IPT_ECN_H
->>   #define _IPT_ECN_H
->>   
->> +#include <linux/types.h>
->> +#include <linux/netfilter/xt_dscp.h>
->>   #include <linux/netfilter/xt_ecn.h>
->> +
->>   #define ipt_ecn_info xt_ecn_info
->>   
->> +#define IPT_ECN_OP_SET_IP	0x01	/* set ECN bits of IPv4 header */
->> +#define IPT_ECN_OP_SET_ECE	0x10	/* set ECE bit of TCP header */
->> +#define IPT_ECN_OP_SET_CWR	0x20	/* set CWR bit of TCP header */
->> +#define IPT_ECN_OP_MASK		0xce
->> +
->>   enum {
->>   	IPT_ECN_IP_MASK       = XT_ECN_IP_MASK,
->>   	IPT_ECN_OP_MATCH_IP   = XT_ECN_OP_MATCH_IP,
->> @@ -13,4 +29,14 @@ enum {
->>   	IPT_ECN_OP_MATCH_MASK = XT_ECN_OP_MATCH_MASK,
->>   };
->>   
->> +struct ipt_ECN_info {
->> +	__u8 operation;	/* bitset of operations */
->> +	__u8 ip_ect;	/* ECT codepoint of IPv4 header, pre-shifted */
->> +	union {
->> +		struct {
->> +			__u8 ece:1, cwr:1; /* TCP ECT bits */
->> +		} tcp;
->> +	} proto;
->> +};
->> +
->>   #endif /* IPT_ECN_H */
->> -- 
->> 2.43.5
->>
->>
-> 
-> Best regards,
-> Jozsef
-
+-John-
 
