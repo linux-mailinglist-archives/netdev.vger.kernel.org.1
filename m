@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-155854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7128CA040E6
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:33:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E21EA040EE
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:36:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E3F13A2500
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:33:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E31383A0799
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D030F1F03FB;
-	Tue,  7 Jan 2025 13:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355741F03F7;
+	Tue,  7 Jan 2025 13:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CSir7Tds"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NAlPt8cB"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBDD1E50B
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 13:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608C51DFDA4
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 13:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736256805; cv=none; b=srsATbBNOnjvc2YXKymVT9Jr3/q+xwcA16zHUV59OirwYWeiHLsXCUbHP9fWxnHAzB480PPCOBX1macrdp2V6JA8iDEvq9Z9sB9qoAHCbM0f/XDRsvyjON2E+uy8Miz9pxIbn+s5tXkmgfY1MKiYpck28iSPlfCsY8crpMhtRJk=
+	t=1736256956; cv=none; b=L71p8Kb0bN04AgcpPAD9UJHhbHvSpHgZMjeG79stMnxpF+3Kdp/+B+YXd+PiOXh0bASF9xO7CrWdQyWPDAjSLT5Txq2ucFm6jfaEj8ncNpupALa8y6gDPRfkfivDiPZ0aLxSFY+BtWIxgpi4DnSKcxnBozMko/Yh0pvbl5e8tMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736256805; c=relaxed/simple;
-	bh=dJ/A/Av9KxO7AOM7CsIZLu2q/yG9EUlQDS8twSyQwEg=;
+	s=arc-20240116; t=1736256956; c=relaxed/simple;
+	bh=hwq6JyzR+l8FtHX7QDft0HWOvQLffMGn0i8Z0A2eNwE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e+LcMPW5QisdkzpdAlNo0TeZn3ijv8QPY5tgdr9vFKtnYE/9IIUGwCSvQhrm69oHUWV1gRTl4kMuA3HXC39qfB6sdf829CXAiOPJfvA6+Sbs3NFLoswtpElHN3ZBo8r02qcjGXbm9K7B6mC7BwZMLm5IM7LjkE+y1jQmSdnA9Eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CSir7Tds; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=akK6t217wcRR3yf8OfnEWdnSx8D9kyPbDL2QJmIgGfPf8ppdnVvpgQ7i2Az+lmMsJE1tDLFzAGVO9W4zrt1fItUcZLgs1kEQRvD+cw59jYTYlU2j6T4j87+6/xDnssXQZpofQhMwXaDS7YxIoqZbW7u2yd2goKJ3lAkin/fkGNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NAlPt8cB; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,27 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=T4ouNsigPKwb6ZlkVJKOSYIrT90WTunIqlva7EBz5nM=; b=CSir7TdsPOWGUI9cV+DgRO7eY4
-	xVzQfm4iHQEdr6sD31r3U8/4oyD14nGqKkcO0bcmnvNfP0wPf6L3oruHm8plIi3kYWhjJLGbjvnYo
-	qiEcT92ouPXIOmOhEAxc/xnMgmB438K0ZL0VH43Mctx9XqRqSHFsUF/7ZdxpjW3JCaKA=;
+	bh=MXlzbDz1LjcDaXZJVbcZcnKnYwbw/otVAmCjNXUCMuw=; b=NAlPt8cBZpY0frzkHSh4T/ISo2
+	ranf+o+V96z1LgKf6UKy7LE837SLn/J4CvGcQ6Vo9LQlbA99Hrp4HoLhm3oQ5gr8JEHF/Q29QD8WN
+	znDe1+0ZDT9MJDRUFRa86zcMxVo1iDyHg5Z6Hd+NcBZwYVT+ng95gHQm8aKeJu3qOshQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tV9hm-002F0Q-2Z; Tue, 07 Jan 2025 14:33:10 +0100
-Date: Tue, 7 Jan 2025 14:33:10 +0100
+	id 1tV9kG-002F3a-6T; Tue, 07 Jan 2025 14:35:44 +0100
+Date: Tue, 7 Jan 2025 14:35:44 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
-	linux@armlinux.org.uk, horms@kernel.org, jacob.e.keller@intel.com,
-	netdev@vger.kernel.org, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
-Message-ID: <2212dd13-1a02-4f67-a211-adde1ce58dc7@lunn.ch>
-References: <20250102103026.1982137-1-jiawenwu@trustnetic.com>
- <20250102103026.1982137-2-jiawenwu@trustnetic.com>
- <ab140807-2e49-4782-a58c-2b8d60da5556@lunn.ch>
- <032b01db600e$8d845430$a88cfc90$@trustnetic.com>
- <a4576efa-2d20-47e9-b785-66dbfda78633@lunn.ch>
- <035001db60ab$4707cfd0$d5176f70$@trustnetic.com>
+To: John Daley <johndale@cisco.com>
+Cc: benve@cisco.com, satishkh@cisco.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	Nelson Escobar <neescoba@cisco.com>
+Subject: Re: [PATCH net-next 1/2] enic: Move RX coalescing set function
+Message-ID: <a6f55884-53b3-45a0-90bb-2a633ad5c56e@lunn.ch>
+References: <20250107025135.15167-1-johndale@cisco.com>
+ <20250107025135.15167-2-johndale@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,32 +61,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <035001db60ab$4707cfd0$d5176f70$@trustnetic.com>
+In-Reply-To: <20250107025135.15167-2-johndale@cisco.com>
 
-> > > > > +/**
-> > > > > + * wx_ptp_tx_hwtstamp_work
-> > > > > + * @work: pointer to the work struct
-> > > > > + *
-> > > > > + * This work item polls TSYNCTXCTL valid bit to determine when a Tx hardware
-> > > > > + * timestamp has been taken for the current skb. It is necessary, because the
-> > > > > + * descriptor's "done" bit does not correlate with the timestamp event.
-> > > > > + */
-> > > >
-> > > > Are you saying the "done" bit can be set, but the timestamp is not yet
-> > > > in place? I've not read the whole patch, but do you start polling once
-> > > > "done" is set, or as soon at the skbuff is queues for transmission?
-> > >
-> > > The descriptor's "done" bit cannot be used as a basis for Tx hardware
-> > > timestamp. So we should poll the valid bit in the register.
-> > 
-> > You did not answer my question. When do you start polling?
+On Mon, Jan 06, 2025 at 06:51:34PM -0800, John Daley wrote:
+> Move the function used for setting the RX coalescing range to before
+> the function that checks the link status. It needs to be called from
+> there instead of from the probe function.
 > 
-> As soon at the skbuff is queues for transmission.
- 
-I assume polling is not for free? Is it possible to start polling once
-'done' is set? Maybe do some benchmarks and see if that saves you some
-cycles?
+> There is no functional change.
+> 
+> Co-developed-by: Nelson Escobar <neescoba@cisco.com>
+> Signed-off-by: Nelson Escobar <neescoba@cisco.com>
+> Co-developed-by: Satish Kharat <satishkh@cisco.com>
+> Signed-off-by: Satish Kharat <satishkh@cisco.com>
+> Signed-off-by: John Daley <johndale@cisco.com>
 
-	Andrew
- 
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
