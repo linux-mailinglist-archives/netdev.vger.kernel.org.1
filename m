@@ -1,108 +1,222 @@
-Return-Path: <netdev+bounces-156052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A890A04BF8
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:58:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EA3EA04C00
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:00:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96FE63A4428
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:58:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 839A91883DAE
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BE11F7097;
-	Tue,  7 Jan 2025 21:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2361F7090;
+	Tue,  7 Jan 2025 21:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="W7WJrR/9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="dgzt+tIn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp-out.freemail.hu (fmfe15.freemail.hu [46.107.16.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A012E56446
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F059D56446;
+	Tue,  7 Jan 2025 21:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736287129; cv=none; b=NmDm5w03+PSISueHrsP3xSHERAT3/ZA6SxIqOdvnOS4JFLRfAtIqd8vayDrhYMtTEhS7h64gy+y97p8x2LtIv+hmQM4Km6AgxNoGnGIChPYXEa3B5q2RWQ686FHQrJrfYZskCcx8GGSjO2TcFVT8/7N4l7+KuBjggTUPN7Ft2rM=
+	t=1736287197; cv=none; b=ArbRGYdMZZmDPLSRI805ZRR6qw50ZODY9QmKe6IXHo/W6wp5XsltYfuGA4B6TbOrDV/3yodIstjDKb0KAfLsds1ckQ5+A8CZCH858rqRxTUztBiG/7WHZAuCt1Os8oC1VIkdyi8+wU9rQ4NfVMFEgJ8ZBHb5svLJMcCPyL/mZQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736287129; c=relaxed/simple;
-	bh=as/Ajqfmjj/jLkUv/FaMfZLZP/D8FmfdAhkBkS7tB9A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z++mwyZOl9GQKvJcgv/SV+zKblGyg5nR8yiBjb4YxSkLSIhsGJes5xNtDtB0ER3yu1v4YzLekLq2wFu6LLGgCgA4E6ZiXAVtyhQXnBtMDyVteNNmESvHrRst/a6UBLrlYImFmEnvOW9vVtpKxdaGWYOgTJUqowZnmRCiDUSUC1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=W7WJrR/9; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=as/Ajqfmjj/jLkUv/FaMfZLZP/D8FmfdAhkBkS7tB9A=; t=1736287127; x=1737151127; 
-	b=W7WJrR/9ZfjQKcGQWdC0G43ZXHiMk6h1O+HIPDo79DYgrwKZymK7dBtUeXWNlLx6vmtymFBMw/U
-	tkNoRyRrq2z+1T/oH5J89hSVC/bPXsgr5jdV1OKPKEGAwhr56uleWUJsjueP3AR1mDLS3LZoj1XqZ
-	q/P4tLykQihG+fnO4VvECac3Mk2ZU+d0TSasYfBbK+gLm1S0yTR4820TuJ0zZiCN6blqemCUcSk+/
-	UdxlMIDG+5oDOueVgPVeiSQfuUiwS0rJt1H+hMeOPFGGYNpHbV5sB1INja+DaUfZ53eW1zrSoqfRu
-	a35tOTph4laCUMW5tXtFnGozWHcsR6N/ySEw==;
-Received: from mail-ot1-f49.google.com ([209.85.210.49]:52528)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tVHb3-0006JN-4s
-	for netdev@vger.kernel.org; Tue, 07 Jan 2025 13:58:46 -0800
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-71e36b27b53so8315177a34.1
-        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 13:58:45 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW+uV7ssd8pgeypK7RK8lvNZyxmEt87CKlA+HfNj1abu7FCyxYjzJO7T37xsoPJozdixy+1urA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfXbXKkmIH6xu349uloxquEQ7rSGzdLEUd5+2shRXOW0IoBnwM
-	/+L46SOzGBbDEU1WfnZ0aEBHg+lyfDNQFmJkMXNSx3PZnksspyHvYhhcD15uDdDCuawGGmII7Dk
-	fnjTbE7k4mnRsAzz1XcnJzQgXtv8=
-X-Google-Smtp-Source: AGHT+IFQiv81HUHyWFW5sJzxoNWLBEeoxHebPoHJrfrgC1maJ2NlHYWMNU8MktMlHF0/Zr6iIefkyVZKG5WjJw1WYSs=
-X-Received: by 2002:a05:6870:e391:b0:254:bd24:de83 with SMTP id
- 586e51a60fabf-2aa066ed9b9mr294788fac.12.1736287124616; Tue, 07 Jan 2025
- 13:58:44 -0800 (PST)
+	s=arc-20240116; t=1736287197; c=relaxed/simple;
+	bh=dc40KGz2+BKXHaPIXS+D4NSqJ/SIbOZaJoFnr08iHFc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AS/wQvE92kMbWh9HI4QQ/3NyEdkN+UI1isQRrZot2+XhELsjgUHEuSjn/qFezQtZu0FkPqrSbj3URcqTJh5wiPinTj8m7WfDTVeU95/v5/MSzGS6YnUNK/V1bq6a4D6UfhLZDYRmIKfO8EaAILSyiMD4wXwyLScgpznScr3c0Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=dgzt+tIn reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YSQ2B0c22ztyZ;
+	Tue, 07 Jan 2025 22:59:46 +0100 (CET)
+Message-ID: <4cf2e26b-2727-4b50-9ada-56a6be814dca@freemail.hu>
+Date: Tue, 7 Jan 2025 22:59:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250106181219.1075-1-ouster@cs.stanford.edu> <20250106181219.1075-7-ouster@cs.stanford.edu>
- <20250107061510.0adcf6c6@kernel.org> <CAGXJAmz+FVRHXh=CrBcp-T-cLX3+s6BRH7DtBzaoFrpQb1zf9w@mail.gmail.com>
- <CANn89iJKq=ArBwcKTGb0VcxexvA3d96hm39e75LJLvDhBaXiTw@mail.gmail.com> <20250107132425.27a32652@kernel.org>
-In-Reply-To: <20250107132425.27a32652@kernel.org>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Tue, 7 Jan 2025 13:58:07 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmzt3xypxdM7=6LSQL7rn++mv-033CLcw3LGS0PxCV8d5A@mail.gmail.com>
-X-Gm-Features: AbW1kvZZc4W8axXacDBXA2Fz7mWz66z2jpEAJ14qVpQTGggZToAU_bXIrAvdJ4I
-Message-ID: <CAGXJAmzt3xypxdM7=6LSQL7rn++mv-033CLcw3LGS0PxCV8d5A@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 06/12] net: homa: create homa_peer.h and homa_peer.c
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, pabeni@redhat.com, 
-	horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 764eb63bb4c91aa8ddbf2de6f9e489d2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 08/10] netfilter: Adjust code style of xt_*.h, ipt_*.h
+ files.
+To: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
+ daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250107024120.98288-1-egyszeregy@freemail.hu>
+ <20250107024120.98288-9-egyszeregy@freemail.hu>
+ <2962ec51-4d32-76d9-4229-99001a437963@netfilter.org>
+Content-Language: hu
+From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
+In-Reply-To: <2962ec51-4d32-76d9-4229-99001a437963@netfilter.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736287187;
+	s=20181004; d=freemail.hu;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	l=4921; bh=qnv/wkuXnqbCCoZz65HUSrHvJsowhLcrOJUzEb67MSg=;
+	b=dgzt+tInkTT0uzLT58xd+Uif/7nXiOtKuAP7OUkT26wLglhm26ze4DbGI2L9wXK2
+	kd3/iLxJYpatH3Zf89LFGLVZzGCJct5jy85QOzin5WeWgMiwfUvhM6PuAs6C7ULO/6b
+	z8NNyt1WkvJzlD9jlMfclLAgOIs3D/0dVTG9o5HzsQzF5zGv5ogZ7FiUaXVmtYRvXq5
+	T5j/RBpz9o5U9/GTHaRExcAEje+8ZhIC/g3dnPI/JdtJv51dK7sBFyqCemOKDoHcdsp
+	MAtO7K4716LCYT1gKHct0BQpumFvrpO+uEhDM4RgFECoSmDG0HHcXNUsasZzfh+XTj3
+	GIZcZ8ec1A==
 
-On Tue, Jan 7, 2025 at 1:24=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Tue, 7 Jan 2025 22:02:25 +0100 Eric Dumazet wrote:
-> > While you are at it, I suggest you test your patch with LOCKDEP enabled=
-,
-> > and CONFIG_DEBUG_ATOMIC_SLEEP=3Dy
-> >
-> > Using GFP_KERNEL while BH are blocked is not good.
->
-> In fact splice all of kernel/configs/debug.config into your
-> testing config.
+2025. 01. 07. 20:39 keltezéssel, Jozsef Kadlecsik írta:
+> On Tue, 7 Jan 2025, egyszeregy@freemail.hu wrote:
+> 
+>> From: Benjamin Szőke <egyszeregy@freemail.hu>
+>>
+>> - Adjust tab indents
+>> - Fix format of #define macros
+> 
+> I don't really understand why it'd be important to use parentheses around
+> plain constant values in macros. The kernel coding style does not list it
+> as a requirement, see 12) 4. in Documentation/process/coding-style.rst.
+> 
 
-Will do. Does "splice" mean anything more than copying
-kernel/configs/debug.config onto the end of my .config file?
+If it would be more than just a const value, parentheses is a must have thing 
+for it (now for it, it is not critical to have it but better to get used to 
+this). This is how my hand automatically do it, to avoid the syntax problem in 
+this coding.
 
-Is there general advice available on managing multiple configs? Sounds
-like I'll need different configs for development/validation and
-performance testing.
+> Best regards,
+> Jozsef
+>   
+>> Signed-off-by: Benjamin Szőke <egyszeregy@freemail.hu>
+>> ---
+>>   include/uapi/linux/netfilter/xt_dscp.h      | 6 +++---
+>>   include/uapi/linux/netfilter/xt_rateest.h   | 4 ++--
+>>   include/uapi/linux/netfilter/xt_tcpmss.h    | 6 +++---
+>>   include/uapi/linux/netfilter_ipv4/ipt_ecn.h | 8 ++++----
+>>   include/uapi/linux/netfilter_ipv4/ipt_ttl.h | 3 +--
+>>   include/uapi/linux/netfilter_ipv6/ip6t_hl.h | 3 +--
+>>   6 files changed, 14 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/include/uapi/linux/netfilter/xt_dscp.h b/include/uapi/linux/netfilter/xt_dscp.h
+>> index bcfe4afa6351..22b6488ef2e7 100644
+>> --- a/include/uapi/linux/netfilter/xt_dscp.h
+>> +++ b/include/uapi/linux/netfilter/xt_dscp.h
+>> @@ -15,9 +15,9 @@
+>>   
+>>   #include <linux/types.h>
+>>   
+>> -#define XT_DSCP_MASK	0xfc	/* 11111100 */
+>> -#define XT_DSCP_SHIFT	2
+>> -#define XT_DSCP_MAX	0x3f	/* 00111111 */
+>> +#define XT_DSCP_MASK	(0xfc)	/* 11111100 */
+>> +#define XT_DSCP_SHIFT	(2)
+>> +#define XT_DSCP_MAX		(0x3f)	/* 00111111 */
+>>   
+>>   /* match info */
+>>   struct xt_dscp_info {
+>> diff --git a/include/uapi/linux/netfilter/xt_rateest.h b/include/uapi/linux/netfilter/xt_rateest.h
+>> index da9727fa527b..f719bd501d1a 100644
+>> --- a/include/uapi/linux/netfilter/xt_rateest.h
+>> +++ b/include/uapi/linux/netfilter/xt_rateest.h
+>> @@ -22,8 +22,8 @@ enum xt_rateest_match_mode {
+>>   };
+>>   
+>>   struct xt_rateest_match_info {
+>> -	char			name1[IFNAMSIZ];
+>> -	char			name2[IFNAMSIZ];
+>> +	char		name1[IFNAMSIZ];
+>> +	char		name2[IFNAMSIZ];
+>>   	__u16		flags;
+>>   	__u16		mode;
+>>   	__u32		bps1;
+>> diff --git a/include/uapi/linux/netfilter/xt_tcpmss.h b/include/uapi/linux/netfilter/xt_tcpmss.h
+>> index 3ee4acaa6e03..ad858ae93e6a 100644
+>> --- a/include/uapi/linux/netfilter/xt_tcpmss.h
+>> +++ b/include/uapi/linux/netfilter/xt_tcpmss.h
+>> @@ -4,11 +4,11 @@
+>>   
+>>   #include <linux/types.h>
+>>   
+>> -#define XT_TCPMSS_CLAMP_PMTU	0xffff
+>> +#define XT_TCPMSS_CLAMP_PMTU	(0xffff)
+>>   
+>>   struct xt_tcpmss_match_info {
+>> -    __u16 mss_min, mss_max;
+>> -    __u8 invert;
+>> +	__u16 mss_min, mss_max;
+>> +	__u8 invert;
+>>   };
+>>   
+>>   struct xt_tcpmss_info {
+>> diff --git a/include/uapi/linux/netfilter_ipv4/ipt_ecn.h b/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+>> index a6d479aece21..0594dd49d13f 100644
+>> --- a/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+>> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+>> @@ -16,10 +16,10 @@
+>>   
+>>   #define ipt_ecn_info xt_ecn_info
+>>   
+>> -#define IPT_ECN_OP_SET_IP	0x01	/* set ECN bits of IPv4 header */
+>> -#define IPT_ECN_OP_SET_ECE	0x10	/* set ECE bit of TCP header */
+>> -#define IPT_ECN_OP_SET_CWR	0x20	/* set CWR bit of TCP header */
+>> -#define IPT_ECN_OP_MASK		0xce
+>> +#define IPT_ECN_OP_SET_IP	(0x01)	/* set ECN bits of IPv4 header */
+>> +#define IPT_ECN_OP_SET_ECE	(0x10)	/* set ECE bit of TCP header */
+>> +#define IPT_ECN_OP_SET_CWR	(0x20)	/* set CWR bit of TCP header */
+>> +#define IPT_ECN_OP_MASK		(0xce)
+>>   
+>>   enum {
+>>   	IPT_ECN_IP_MASK       = XT_ECN_IP_MASK,
+>> diff --git a/include/uapi/linux/netfilter_ipv4/ipt_ttl.h b/include/uapi/linux/netfilter_ipv4/ipt_ttl.h
+>> index c21eb6651353..15c75a4ba355 100644
+>> --- a/include/uapi/linux/netfilter_ipv4/ipt_ttl.h
+>> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ttl.h
+>> @@ -9,13 +9,12 @@
+>>   #include <linux/types.h>
+>>   
+>>   enum {
+>> -	IPT_TTL_EQ = 0,		/* equals */
+>> +	IPT_TTL_EQ = 0,	/* equals */
+>>   	IPT_TTL_NE,		/* not equals */
+>>   	IPT_TTL_LT,		/* less than */
+>>   	IPT_TTL_GT,		/* greater than */
+>>   };
+>>   
+>> -
+>>   struct ipt_ttl_info {
+>>   	__u8	mode;
+>>   	__u8	ttl;
+>> diff --git a/include/uapi/linux/netfilter_ipv6/ip6t_hl.h b/include/uapi/linux/netfilter_ipv6/ip6t_hl.h
+>> index caef38a63b8f..4af05c86dcd5 100644
+>> --- a/include/uapi/linux/netfilter_ipv6/ip6t_hl.h
+>> +++ b/include/uapi/linux/netfilter_ipv6/ip6t_hl.h
+>> @@ -9,13 +9,12 @@
+>>   #include <linux/types.h>
+>>   
+>>   enum {
+>> -	IP6T_HL_EQ = 0,		/* equals */
+>> +	IP6T_HL_EQ = 0,	/* equals */
+>>   	IP6T_HL_NE,		/* not equals */
+>>   	IP6T_HL_LT,		/* less than */
+>>   	IP6T_HL_GT,		/* greater than */
+>>   };
+>>   
+>> -
+>>   struct ip6t_hl_info {
+>>   	__u8	mode;
+>>   	__u8	hop_limit;
+>> -- 
+>> 2.43.5
+>>
+>>
+> 
 
--John-
 
