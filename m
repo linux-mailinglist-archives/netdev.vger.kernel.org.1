@@ -1,131 +1,135 @@
-Return-Path: <netdev+bounces-156015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A16C5A04A7E
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 20:49:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE776A04A8E
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 20:53:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88042164311
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:49:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95AE23A67CC
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 19:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF401F63F8;
-	Tue,  7 Jan 2025 19:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6EE1F707B;
+	Tue,  7 Jan 2025 19:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UoxgCbzg"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="cyQnqzff"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from alln-iport-6.cisco.com (alln-iport-6.cisco.com [173.37.142.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56051F7084;
-	Tue,  7 Jan 2025 19:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFD618BC2F
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 19:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736279341; cv=none; b=YVFye73H+KYWSV6PhJ1rRpKXQMPuhtb49Vtt2pPBh76rj4Yds+qzGNz/I3ZacGM+66jQlkxjNwEy+MJWhmbatT0mhJ/e9tW64elzKP8uiZsXiC2OTt4GVpdzZprRTQoMCim5jV4jHbX4QAPbZuKJnMLQ4ifUH3pmOG7KVi1g5x0=
+	t=1736279595; cv=none; b=rn6M0VsfmHtl7oW2a99xSFpEgwH/Dgah6W6VE+txwlsUnI0w6d9iIk26TXQZfMJHdbOiKbUhGUl4tH4GXUWejgtYLgFLzFjuL3LV+r3IvGuoKER3OutgNZngxICDkSgTXXgyDaYVahM8y5g6+2SX1ChvOe1YUFTi8fRHlch5N6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736279341; c=relaxed/simple;
-	bh=Kgz2jx7bib0PN4twzARuqIrW4rC6y55S605NP2TJFDk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ivWufMapY2jA9y5z7xPUn+JIxCG01gCO4ZJhnYLx7s9NL/Z26qCyfij6LvSRkQUL4+GLhOAI486FWPcTJsQC24sbJ2V4RrLtcBVAxowYeBr0W92bAyLmDfQ1xAauZEeK4mzO3D4e1bdyfXLKsDMZ9Q9wqX3t0liW+FNIaVttNOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UoxgCbzg; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <01084af1-4f39-46f8-a278-9cfa7f242a11@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736279326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B5ZAmugUbFS8tTnvREFaNPziAJZ+taQuMYqxt7qiZl4=;
-	b=UoxgCbzgF9qgfmI7I00gcuVoFHoO7m69/ZcURii2U6nIKntvz3n3PSkCIfLUymfythcrDH
-	nDGDw948NmehGcw0ncxnEg/DUlO8aJjNb8nEv4gt4x2u+dNOm2pP0PRx15dapROBxSjg2h
-	7X2GsRidLj2ywaHK7povwtQMy+6tgxw=
-Date: Tue, 7 Jan 2025 11:48:36 -0800
+	s=arc-20240116; t=1736279595; c=relaxed/simple;
+	bh=CwEEiQJnpaNgvThRH/g+lUzyHqm8okoXYjh3DTYZE1I=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=JW0fElr0o/kWvh4VYzwjlwz0VZ2nHXO48b9OL5x+DhNI5ij4auyW5tSFsSFNxzEGzkEnGDS09vXeM+31L9BEediilhOSkR2nLQqkEpZXLs2SAuTTNHFZXJj3qHqaTq9dkZo7fM5DMFxvQB8jdWsIhjPPBNBY8CJ6hvHdR9BnmQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=cyQnqzff; arc=none smtp.client-ip=173.37.142.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=cisco.com; i=@cisco.com; l=916; q=dns/txt; s=iport;
+  t=1736279592; x=1737489192;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9Lvq9sOjR8osjo1oozSms56lcmTvgjCKYOD2x7ofEhY=;
+  b=cyQnqzffoei5DvC3W+fI+iOzeV9oViy4sSO0O1bUjI85z0WVPdotr5Yg
+   vYqHL2EMTvQiqQrRG0UGruGqFHcPnqvzWqSpE5aL4HV6Jme3AzhJkmWnc
+   ZQgQDbNj6HJ0+RYiRV0a4ENL/ArbhGHJYdX5wdkDbrjyU8m039jYW1064
+   M=;
+X-CSE-ConnectionGUID: 2r0/UFkjTvSbeRHnQX66aQ==
+X-CSE-MsgGUID: jq4Yf+nsSBK+4IdfAPDTpQ==
+X-IPAS-Result: =?us-ascii?q?A0AlAQCyhH1nj47/Ja1aHgEBCxIMgggLhBpDSI1RiHWeG?=
+ =?us-ascii?q?IF+DwEBAQ9EBAEBhQcCinQCJjQJDgECBAEBAQEDAgMBAQEBAQEBAQEBAQsBA?=
+ =?us-ascii?q?QUBAQECAQcFFAEBAQEBATkFDjuGCIZbAQEBAgEyAUYQC0YrKxmDAYJCIwOxc?=
+ =?us-ascii?q?IIsgQHeM4FtgUiFa4dfcIR3JxuBSUSCUIE+MT6FEIV3BIJ+hGudeUgKgRcDW?=
+ =?us-ascii?q?SwBVRMNCgsHBYEpHysDOAwLMBUmD4EcBTUKNzqCDGlLNwINAjWCHnyCK4Ihg?=
+ =?us-ascii?q?juER4RYhWiCF4FrAwMWEgGCdUADCxgNSBEsNxQbBj5uB5plPINuAYIKgUSlc?=
+ =?us-ascii?q?KEDhCWBY59jGjOqU5h8pEeEZoFnOoFbMxoIGxWDIlIZD446H7kAJTICOgIHC?=
+ =?us-ascii?q?wEBAwmRVQEB?=
+IronPort-Data: A9a23:zxbGcKOitFUntWDvrR0kl8FynXyQoLVcMsEvi/4bfWQNrUpzhTAEz
+ 2sdWDqHOf3fZWv0Ltl+aIi29UhT6JDcmIJrHnM5pCpnJ55oRWUpJjg4wmPYZX76whjrFRo/h
+ ykmQoCeaphyFjmE+0/F3oHJ9RFUzbuPSqf3FNnKMyVwQR4MYCo6gHqPocZh6mJTqYb/WlnlV
+ e/a+ZWFZQf8g2EsaAr41orawP9RlKWq0N8nlgRWicBj5Df2i3QTBZQDEqC9R1OQapVUBOOzW
+ 9HYx7i/+G7Dlz91Yj9yuu+mGqGiaue60Tmm0hK6aYD76vRxjnBaPpIACRYpQRw/ZwNlMDxG4
+ I4lWZSYEW/FN0BX8QgXe0Ew/ypWZcWq9FJbSJSymZT78qHIT5fj6690VAYLE44axvhMC2x01
+ fohGG5TZynW0opawJrjIgVtrt4oIM+uOMYUvWttiGmES/0nWpvEBa7N4Le03h9p2ZsIRqmYP
+ ZdEL2MzNnwsYDUXUrsTIJA5nOGkj33yWzZZs1mS46Ew5gA/ySQtiOi8aoSIJ4XiqcN9nF/El
+ 2yF+X/CKDJZaP2TxxO93k60v7qa9c/8cNlPTOLjrKECbEeo7mAaFhATfVeyv/S8jkmwR5RZJ
+ lB80icisK075kG3Ztb6WBK8rTiPuRt0c9lNGeQS6wyXzKfQpQGDCQAsSz9KaNUi8tQpRDU21
+ ViWhNDoLThutqCFD3Ob6rqQ6zi1PEA9JGkOfyIbDg0I/9Xuvqk3kxTJCN1jeIath9f4HzDY2
+ T2GrCEiwb4UiKYj0ain8V3Zqyyjq4KPTQMv4AjTGGW/4WtEiJWNfYek7x3fqP1HNovcFgTHt
+ 3kfkM/Y5+cLZX2QqMCTaL8XRPaUyfWHDCPni1NVP58Yx2rz8kf2KOi8/wpCDEtuN88Ffxrgb
+ 0nSpR5d6fdv0J2CM/Yfj2WZVZhC8ETwKekJQMw4eTanX3SQSONl1Hw1DaJz9zmx+KTJrU3ZE
+ czBGSpLJS1FYZmLNBLsG48gPUYDn0jSP1/7S5Hh1AiA2rGDfnOTQrptGALRNb5gvPPf+F2Ko
+ 4o32y62J/N3DbOWjs7/rN97ELz2BSJgbXwLg5UNL7fdfloO9J8JVK+JnelJl3NZc1R9zbqQo
+ SrnBSe0OXL0hGbMLk2Re2t/Zbb0FZd5pjRTAMDfFQjA5pTXWq72tP13X8JuJdEPrbU/pdYqF
+ KNtU5vbXZxypsHvp291gW/V8Nc6LEzDaMPnF3bNXQXTiLY5HlOXooG4L1WHGetnJnPfiPbSa
+ oaIjmvzKafvjSw5ZCoKQJpDF2+MgEU=
+IronPort-HdrOrdr: A9a23:OqZTPqoYjXECuR918acaBbsaV5oseYIsimQD101hICG9vPb2qy
+ nIpoV96faaslcssR0b9OxofZPwI080lqQFhbX5Q43DYOCOggLBR+tfBMnZsljd8kbFmNK1u5
+ 0NT0EHMqySMbC/5vyKmTVR1L0bsb+6zJw=
+X-Talos-CUID: 9a23:z2ytsGGPnTJB0M3pqmI97hZTJ+4mcEHD933dGW++MFY3FrSsHAo=
+X-Talos-MUID: 9a23:GWaeNAsluIOH4jLa082nhig+Bckr5b+VImNOzbQKteC8GRBoAmLI
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.12,296,1728950400"; 
+   d="scan'208";a="408926551"
+Received: from rcdn-l-core-05.cisco.com ([173.37.255.142])
+  by alln-iport-6.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 07 Jan 2025 19:53:05 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by rcdn-l-core-05.cisco.com (Postfix) with ESMTP id 248481800022E;
+	Tue,  7 Jan 2025 19:53:05 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id D0A7B20F2003; Tue,  7 Jan 2025 11:53:04 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: michal.swiatkowski@linux.intel.com
+Cc: andrew+netdev@lunn.ch,
+	benve@cisco.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	johndale@cisco.com,
+	kuba@kernel.org,
+	neescoba@cisco.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	satishkh@cisco.com
+Subject: Re: [PATCH net-next 2/2] enic: Obtain the Link speed only after the link comes up
+Date: Tue,  7 Jan 2025 11:53:04 -0800
+Message-Id: <20250107195304.2671-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
+In-Reply-To: <Z3zCfiwPl2Xu/Zvi@mev-dev.igk.intel.com>
+References: <Z3zCfiwPl2Xu/Zvi@mev-dev.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/3] selftests/bpf: Migrate test_xdp_redirect.sh to
- xdp_do_redirect.c
-To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250103-xdp_redirect-v1-0-e93099f59069@bootlin.com>
- <20250103-xdp_redirect-v1-2-e93099f59069@bootlin.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250103-xdp_redirect-v1-2-e93099f59069@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: rcdn-l-core-05.cisco.com
 
-On 1/3/25 2:10 AM, Bastien Curutchet (eBPF Foundation) wrote:
-> +static int ping_setup(struct test_data *data)
-> +{
-> +	struct nstoken *nstoken = NULL;
-> +	int i;
-> +
-> +	data->ns[0] = netns_new(NS0, false);
-> +	if (!ASSERT_OK_PTR(data->ns[0], "create ns"))
-> +		return -1;
-> +
-> +	for (i = 1; i < NS_NB; i++) {
-> +		char ns_name[4] = {};
-> +
-> +		snprintf(ns_name, 4, "NS%d", i);
-> +		data->ns[i] = netns_new(ns_name, false);
-> +		if (!ASSERT_OK_PTR(data->ns[i], "create ns"))
-> +			goto fail;
-> +
-> +		nstoken = open_netns(NS0);
-> +		if (!ASSERT_OK_PTR(nstoken, "open NS0"))
-> +			goto fail;
-> +
-> +		SYS(fail, "ip link add veth%d index %d%d%d type veth peer name veth0 netns %s",
-> +		    i, i, i, i, ns_name);
-> +		SYS(fail, "ip link set veth%d up", i);
-> +		close_netns(nstoken);
-> +
-> +		nstoken = open_netns(ns_name);
-> +		if (!ASSERT_OK_PTR(nstoken, "open ns"))
-> +			goto fail;
-> +
-> +		SYS(fail, "ip addr add %s.%d/24 dev veth0", IPV4_NETWORK, i);
-> +		SYS(fail, "ip link set veth0 up");
-> +		close_netns(nstoken);
+>> diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
+>> index 957efe73e41a..49f6cab01ed5 100644
+>> --- a/drivers/net/ethernet/cisco/enic/enic_main.c
+>> +++ b/drivers/net/ethernet/cisco/enic/enic_main.c
+>> @@ -109,7 +109,7 @@ static struct enic_intr_mod_table mod_table[ENIC_MAX_COALESCE_TIMERS + 1] = {
+>>  static struct enic_intr_mod_range mod_range[ENIC_MAX_LINK_SPEEDS] = {
+>>  	{0,  0}, /* 0  - 4  Gbps */
+>>  	{0,  3}, /* 4  - 10 Gbps */
+>> -	{3,  6}, /* 10 - 40 Gbps */
+>> +	{3,  6}, /* 10+ Gbps */
+>
+>Is this on purpose? You didn't mention anything about speed range in
+>commit message. Just wondering, patch looks fine, thanks.
 
-		nstoken = NULL;
-
-Otherwise, the other "goto fail;" of this loop will close and free the already 
-closed nstoken again.
-
-Some of the other close_netns(nstoken) in this patch may have similar issue.
-
-> +	}
-> +
-> +	return 0;
-> +
-> +fail:
-> +	close_netns(nstoken);
-> +	cleanup(data);
-> +	return -1;
-> +}
-
+I changed the comment on purpose since it applies to adapters way past
+40 Gbps nowdays. I should have mentioned the change. Thanks for the
+reveiw.
+>
+>Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
