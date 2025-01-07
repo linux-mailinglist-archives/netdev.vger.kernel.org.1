@@ -1,133 +1,157 @@
-Return-Path: <netdev+bounces-155945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BD5DA0464E
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:30:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6755FA04650
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:30:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10761188728C
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:30:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F405B18863DF
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095621F76B1;
-	Tue,  7 Jan 2025 16:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FFF1F4E4B;
+	Tue,  7 Jan 2025 16:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CGOE90Du"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="e6EJzdYz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F5A1F76D4
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489CE1F4E45
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736267306; cv=none; b=B1hkv9poFJObd/oFb7ZlFuR50JunjSs3rIa0Ptr4tMQdc40ciN3ItSHCtdOK8/J17AHY3Pry/7FmMDG88MoxT5Xop3UQROfUOL1HaTa9reT0HQLAy8TUF+2lNMo7xpRi2/rf6YQ/B8KZt1EDxj4v8A+tTSRg3abOJgkgL1y0I44=
+	t=1736267327; cv=none; b=usIyn0xUplbWfB3RKya9yDXK1WNNbCJuHdkXy/nOxq4fJLc3HOZM2yBqJDT+qSQvNuCUaa06Tsi5WO1d8Eafbt142bkWxzeaJMLhJyxXwbOab5lMml0D2JWiVGINuH/4orsb+sd0q1xrXTYL3K2M4cDBtQVU0qxZSF972u8nQBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736267306; c=relaxed/simple;
-	bh=747ikJyTyNIg0mXhy/B6zmZu9JIIYkk8XQpmBk8Hquo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=VsTne0l3Vl3hXBM7PLdMGK6k8eeo+2/7gJ+JbrBDM/KqF2DFRNBITOzZRhhNOxhAXsE3dGzIf/0f3eXGKYutDNjY1XHjZmA9jnGUyH5WpVj+O9DWqMZrIVs1Y4DuAytUnxZ52MiRj42m2SMA4Ndzk5JNs9DNy9r5uJaj/4k+H6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CGOE90Du; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736267301;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to; bh=ggzPhdIvprjKO6zo/NvbJC2/YROGoQldUxo9aidxPIM=;
-	b=CGOE90Dux5XwsAJ3HgUyip3YRM5EKH++/3kgQ/GDw/nwOEXu2lRCy+y+fbf5u6lx0R4E80
-	PJyeyzPjZ/8ScJH2jorFLAl1XiIGCxIFGQTQHsGEBsblInqE9ngCRerbEXOXmvs+JSd5pW
-	0uakxJVEEaVfLMUaHXpoBoI1mKzQaqU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-670-vfGwU8W8OU6n2Z7y0dIW_Q-1; Tue,
- 07 Jan 2025 11:28:15 -0500
-X-MC-Unique: vfGwU8W8OU6n2Z7y0dIW_Q-1
-X-Mimecast-MFC-AGG-ID: vfGwU8W8OU6n2Z7y0dIW_Q
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8223619560A6;
-	Tue,  7 Jan 2025 16:28:13 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.226.23])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id DC6A7195606C;
-	Tue,  7 Jan 2025 16:28:08 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-	oleg@redhat.com; Tue,  7 Jan 2025 17:27:49 +0100 (CET)
-Date: Tue, 7 Jan 2025 17:27:43 +0100
-From: Oleg Nesterov <oleg@redhat.com>
-To: Christian Brauner <brauner@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Manfred Spraul <manfred@colorfullife.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	WangYuli <wangyuli@uniontech.com>, linux-kernel@vger.kernel.org,
-	io-uring@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH 5/5] poll: kill poll_does_not_wait()
-Message-ID: <20250107162743.GA18947@redhat.com>
+	s=arc-20240116; t=1736267327; c=relaxed/simple;
+	bh=O4MlM9GRQ4VMmTJ+BrHpXuZ1spwI+aMOhgg3ziv4GMY=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=icg2+K3+VtB0tIL20JKCcb2Jkut3xZUBFGZerHFb7oXW7pwcbvJC/SmUx3xdnZ76huqchFWfA1VRy3l0OpPvnV8vSse6Zh5BxOpB3pAl+9c0LCUqen8hP+OlRqBQL4iuIlAf+YSarmKbgyfSG9Saja/4k6XYsCb0rA9sfP/Ac4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=e6EJzdYz; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=CT43NNJbVwdfAfypfZGQdJlroOFKN88S2LgKWnUbjeQ=; b=e6EJzdYz+0XEXOiTNoCBaEjosb
+	jL7sqlVEZwnuiz200R35bre/yBGiRv/seyh2Jgdy/Xv/Poh6E3rqnyVobE/FfkGesEJ15kzJL/A0u
+	7U1mO7IjwcSIPeJpktqShxEht9AMXHY3Nqx7t3R5e8+C85mEMMMaP0pSzizzJ7b52U4DV8oD1rt29
+	wwkbiNKjGMVcVqrkrA+FIlml/501+bQYo3yeyWEpTuKnU0fEN30NUt5EZpUL7Y4lhNEE/3COV365Z
+	LGCQnewx29KAO18+hPc6AkTwrN6DdhaKdhD/k6M/Bj5k7u64eMikVMPSKkO9krXvTGvCTtL4UQNRm
+	tW14n48g==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:53834 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tVCRX-0007kp-0W;
+	Tue, 07 Jan 2025 16:28:35 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tVCRU-007Y2z-5b; Tue, 07 Jan 2025 16:28:32 +0000
+In-Reply-To: <Z31V9O8SATRbu2L3@shell.armlinux.org.uk>
+References: <Z31V9O8SATRbu2L3@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v3 01/18] net: phy: add configuration of rx clock
+ stop mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250107162649.GA18886@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tVCRU-007Y2z-5b@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Tue, 07 Jan 2025 16:28:32 +0000
 
-It no longer has users.
+Add a function to allow configuration of the PCS's clock stop enable
+bit, used to configure whether the xMII receive clock can be stopped
+during LPI mode.
 
-Signed-off-by: Oleg Nesterov <oleg@redhat.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- include/linux/poll.h | 16 +++-------------
- 1 file changed, 3 insertions(+), 13 deletions(-)
+ drivers/net/phy/phy.c | 27 ++++++++++++++++++++++-----
+ include/linux/phy.h   |  1 +
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/poll.h b/include/linux/poll.h
-index 57b6d1ccd8bf..12bb18e8b978 100644
---- a/include/linux/poll.h
-+++ b/include/linux/poll.h
-@@ -25,14 +25,14 @@
- 
- struct poll_table_struct;
- 
--/* 
-+/*
-  * structures and helpers for f_op->poll implementations
-  */
- typedef void (*poll_queue_proc)(struct file *, wait_queue_head_t *, struct poll_table_struct *);
- 
- /*
-- * Do not touch the structure directly, use the access functions
-- * poll_does_not_wait() and poll_requested_events() instead.
-+ * Do not touch the structure directly, use the access function
-+ * poll_requested_events() instead.
-  */
- typedef struct poll_table_struct {
- 	poll_queue_proc _qproc;
-@@ -53,16 +53,6 @@ static inline void poll_wait(struct file * filp, wait_queue_head_t * wait_addres
- 	}
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index e4b04cdaa995..a4b9fcc2503a 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1640,6 +1640,27 @@ void phy_mac_interrupt(struct phy_device *phydev)
  }
+ EXPORT_SYMBOL(phy_mac_interrupt);
  
--/*
-- * Return true if it is guaranteed that poll will not wait. This is the case
-- * if the poll() of another file descriptor in the set got an event, so there
-- * is no need for waiting.
-- */
--static inline bool poll_does_not_wait(const poll_table *p)
--{
--	return p == NULL || p->_qproc == NULL;
--}
--
- /*
-  * Return the set of events that the application wants to poll for.
-  * This is useful for drivers that need to know whether a DMA transfer has
++/**
++ * phy_eee_rx_clock_stop() - configure PHY receive clock in LPI
++ * @phydev: target phy_device struct
++ * @clk_stop_enable: flag to indicate whether the clock can be stopped
++ *
++ * Configure whether the PHY can disable its receive clock during LPI mode,
++ * See IEEE 802.3 sections 22.2.2.2, 35.2.2.10, and 45.2.3.1.4.
++ *
++ * Returns: 0 or negative error.
++ */
++int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable)
++{
++	/* Configure the PHY to stop receiving xMII
++	 * clock while it is signaling LPI.
++	 */
++	return phy_modify_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1,
++			      MDIO_PCS_CTRL1_CLKSTOP_EN,
++			      clk_stop_enable ? MDIO_PCS_CTRL1_CLKSTOP_EN : 0);
++}
++EXPORT_SYMBOL_GPL(phy_eee_rx_clock_stop);
++
+ /**
+  * phy_init_eee - init and check the EEE feature
+  * @phydev: target phy_device struct
+@@ -1664,11 +1685,7 @@ int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable)
+ 		return -EPROTONOSUPPORT;
+ 
+ 	if (clk_stop_enable)
+-		/* Configure the PHY to stop receiving xMII
+-		 * clock while it is signaling LPI.
+-		 */
+-		ret = phy_set_bits_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1,
+-				       MDIO_PCS_CTRL1_CLKSTOP_EN);
++		ret = phy_eee_rx_clock_stop(phydev, true);
+ 
+ 	return ret < 0 ? ret : 0;
+ }
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 5bc71d59910c..4875465653ca 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2096,6 +2096,7 @@ int phy_unregister_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask);
+ int phy_unregister_fixup_for_id(const char *bus_id);
+ int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
+ 
++int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable);
+ int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable);
+ int phy_get_eee_err(struct phy_device *phydev);
+ int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data);
 -- 
-2.25.1.362.g51ebf55
+2.30.2
 
 
