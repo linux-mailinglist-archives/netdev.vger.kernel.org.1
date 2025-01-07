@@ -1,168 +1,157 @@
-Return-Path: <netdev+bounces-155706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FFA5A036C2
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:57:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C574A036E0
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 05:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5C918892DE
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:57:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13316188234B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9630132111;
-	Tue,  7 Jan 2025 03:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBC9132111;
+	Tue,  7 Jan 2025 04:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TL2xj0ln"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="R27ENXXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B04179BD;
-	Tue,  7 Jan 2025 03:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55835EC4;
+	Tue,  7 Jan 2025 04:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736222122; cv=none; b=aZsHQcgvlQOKlPT0fIqk968s7A7kL7E9fJFmWB7L0h3aYdg4hrlrqVl2e7OSKZ3bAFKSzt1/XOZ9/mMJNmx7OraqxGSS7G8sJUuXmWRtl0mZ3RfLRR28PHsyAOtBuBXOYw+7/fT7L0D/hMolrC8extVfkaAgMBKlru+h0CiSY9I=
+	t=1736223448; cv=none; b=nVXhgHqsAKEX+l1YxyegJyDMSKSi9yLXAScnnGtrvI9/WCaO0zTPDxmYCKQkf/oJcPLWSLieAX/5xRj6x0POJGIieL0N41qFks4W+4adYcuk/pEdAIPsKiwaG0dFFb2GKtpQN/q8lKx1zQhuLNOCIGs32jN3/JNdT/TCQBfBtqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736222122; c=relaxed/simple;
-	bh=MCyi/Uq5xfm6lADiXWeYpnAzki3jw/DvNmQ0riZ4B0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BWWqyOyUoYVf5+dIrKXhSSrM8XreAXiq4d5uY1pGSytziZaANco/paDTXcan1PuR70kohSWnl5ZAuC2CMkrxn4ve5CrlWkYSgt+Kk1LGr30nK/KL5TxtHLHfmmUKi1Bg724Y1DnHIzTp8brAyz4kUpPFDWM3sYqnqeiec+i85QA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TL2xj0ln; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2f441791e40so17724836a91.3;
-        Mon, 06 Jan 2025 19:55:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736222120; x=1736826920; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JkSX5xIdc8zBLFm+jjJZtb1iB0BmRRseeOTnpcRWYIA=;
-        b=TL2xj0lnIsrlEDjmeQIyqDD5Q9yXJEHWWiefMRESuRm2izR/qN9wBXZVV4/ajRjf9O
-         ADFPaQNPYcqVAb747q0/eqkXlb6Ev/2EHwWEeE4DI4K/aky7WmEsqhOsQzquSWE5MK6L
-         eelGlbjNOowCRj19jQs3MyuxhwsEciNpp+ItdGtVLyp+LP0383UF1XAoygSPJcLPfK7y
-         sMwVXSLvpH/4SYl+Ejm98uhjD1kof/SGMZ960MNWgMHZ/cCdwWuqNNB3qImHtBCMplhF
-         jtr337N0jlGUS+wKQ44mX+OFgUp128I1M8R/rjvY6iBJUb/1h7W8W4/Q/1hmcVOAme+n
-         fdew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736222120; x=1736826920;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JkSX5xIdc8zBLFm+jjJZtb1iB0BmRRseeOTnpcRWYIA=;
-        b=e01aSuXCfjsCVHgzkJCRiqNkQ+I5d8y//mzJqSHHF3ViIzwCDcjyuuwzwxfx4LvUY8
-         KEbdvAyOh2inFBy7PH9tepCDwBxflJbSugJmoJSbAi4zJE84gJOMyssJyclIQK3rh5E6
-         SxgVKLLnn5ZGrU6K7fyoBhY+TftdrtXBl7ySHAEwlkaYVu5h6pt7z77fwsNoVnj2RmDL
-         GdEC5kZzyVM2ltDGOYG0ZjthTzpkuDU+llEsdydw5ZEitAzt9eGslghXyAy0opYRMjiK
-         p05sp2MtqUlTHb1EoDubNcBjFwgTeXAhC/pcJCGwJf3Sb+RQoG0ZMhMD7Ds3SjzdkkC3
-         jBew==
-X-Forwarded-Encrypted: i=1; AJvYcCVYLEInIEroxCtgpeGgX21BCXfv0f+5ESdtw5WCAp/nll8EnG5NhDBlfoT5BhRzXsgw/AfmpOtp@vger.kernel.org, AJvYcCWyFOCTn1ZCOH8ouwOk1LJfwpABzD/uNyXIYDDqn9EtQ1oO+n7UUMREnIrMpYKt5TlDe7gjebAig12vDX/+@vger.kernel.org, AJvYcCXaTkINZCudD5K6WooX5gd/WH5BBa2EOHP+X129GFDDeeC5Q5zBxzxqm82ao9bF0822qqI8uiULj0Vr@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq/QTfmAXwxIRDn6P0q7ymPz3mwk4IkpQ/3vyIhZBQTxxdiwCR
-	oPBun/suqFs/2nKeIoB03vRMMnBrMxA8BWX5TTVL6iG6p+EhT+zl
-X-Gm-Gg: ASbGncviJt9nRwOroYi+kO2ZwshMzZSBQaQon6nRqXVPI67EXVCsn/X7fUpXac4v/mL
-	OfWYE5Db8F2IQqEz7HT0KN41qRhZOEwmxyeUNJB3dXV9IA25iCQ7MzxYhruiweu5yn3B+BlWRZz
-	R/cS5JmNLE9N2uZVq33KJxoS2efJqmMTMWt6WPmJTXDopYimhsmleVEx5PG1c2NzsOeE0ahdt04
-	1mA0nALFqzQ4P4m0Lr45hPDteUQADT7DFsf+33f339XyqRBpuW8Bl5WnPL4VlmAEdP7chcVHt/4
-	PZJDvkLmJHaFBOY3hgc9f6m0vg2D/4iZ2A0=
-X-Google-Smtp-Source: AGHT+IE2K2gRs1V2fgpYN0CLM9zdF4nwVbYze0GXJZkFBE9yEldHu2WRl6ZMw9QvCXUDA6422eZIOQ==
-X-Received: by 2002:a17:90b:2545:b0:2ee:a76a:820 with SMTP id 98e67ed59e1d1-2f452e3eebamr85264355a91.18.1736222120018;
-        Mon, 06 Jan 2025 19:55:20 -0800 (PST)
-Received: from [192.168.0.100] (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f48db83c37sm26295046a91.47.2025.01.06.19.55.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jan 2025 19:55:19 -0800 (PST)
-Message-ID: <14ad5eae-e10d-426d-ace1-f841b5249e9f@gmail.com>
-Date: Tue, 7 Jan 2025 11:55:12 +0800
+	s=arc-20240116; t=1736223448; c=relaxed/simple;
+	bh=uMpDJn4WL/ugF/STMkBP72XWPwlkjNOQtdWJGhDr3xk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HdfMSkByk4FwFMBNnUHbyJCdZBLzrhxNjQQojJCcq5ELeHJ5QCiL4aVM3hKVEXKUwI4HNMDb/FJN39i+5kV1R4jBQ+Xu4be6EjcR0NoyLmGlTNjIMM7Dp7ZO8IGtGdgsNl/r6+qrvkm9SU/fgEQ7JUWYA9sfazQfY/cE0N8K01A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=R27ENXXl; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1736223442; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=bOH18qK4nR/W2tKNNGJkI+f12+0zwrmAacbo4a/CAX8=;
+	b=R27ENXXl9Xl+N8tFk+0qlAg6Z7a/yADE0Ue5dt1I9VhROgJvk+K/kP94GPKYKlrzWrc5pzPbNuLklOWYH/Lgz5yQsx/c3c/nI5JB7mhfrckbyisCAjG9ly/dGZqONc+LI9wSJ/ocsejE2EhVwap1j2xrD8WUBsuhkDjHnrob3So=
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WN9KZYS_1736223435 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 07 Jan 2025 12:17:20 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	pabeni@redhat.com,
+	song@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	yhs@fb.com,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	jolsa@kernel.org,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH bpf-next v5 0/5] net/smc: Introduce smc_ops
+Date: Tue,  7 Jan 2025 12:17:10 +0800
+Message-ID: <20250107041715.98342-1-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 3/3] net: stmmac: dwmac-nuvoton: Add dwmac
- glue for Nuvoton MA35 family
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
- schung@nuvoton.com, yclu4@nuvoton.com, peppe.cavallaro@st.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
-References: <20250103063241.2306312-1-a0987203069@gmail.com>
- <20250103063241.2306312-4-a0987203069@gmail.com>
- <2736ccd3-680d-4f5d-a31a-156dec056f22@wanadoo.fr>
-Content-Language: en-US
-From: Joey Lu <a0987203069@gmail.com>
-In-Reply-To: <2736ccd3-680d-4f5d-a31a-156dec056f22@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+This patch aims to introduce BPF injection capabilities for SMC and
+includes a self-test to ensure code stability.
 
-Christophe JAILLET 於 1/4/2025 12:38 AM 寫道:
-> Le 03/01/2025 à 07:32, Joey Lu a écrit :
->> Add support for Gigabit Ethernet on Nuvoton MA35 series using dwmac 
->> driver.
->>
->> Signed-off-by: Joey Lu <a0987203069@gmail.com>
->
-> ...
->
->> +    /* Nuvoton DWMAC configs */
->> +    plat_dat->has_gmac = 1;
->> +    plat_dat->tx_fifo_size = 2048;
->> +    plat_dat->rx_fifo_size = 4096;
->> +    plat_dat->multicast_filter_bins = 0;
->> +    plat_dat->unicast_filter_entries = 8;
->> +    plat_dat->flags &= ~STMMAC_FLAG_USE_PHY_WOL;
->> +
->> +    priv_data = nvt_gmac_setup(pdev, plat_dat);
->> +    if (IS_ERR(priv_data))
->> +        return PTR_ERR(priv_data);
->> +
->> +    ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
->
-> stmmac_pltfr_remove() is called by the .remove function.
-> Is it correct to call stmmac_dvr_probe() here, and not 
-> stmmac_pltfr_probe()?
+Since the SMC protocol isn't ideal for every situation, especially
+short-lived ones, most applications can't guarantee the absence of
+such scenarios. Consequently, applications may need specific strategies
+to decide whether to use SMC. For example, an application might limit SMC
+usage to certain IP addresses or ports.
 
-Thank you for the feedback. You're correct. I will update the code to 
-call stmmac_pltfr_probe().
+To maintain the principle of transparent replacement, we want applications
+to remain unaffected even if they need specific SMC strategies. In other
+words, they should not require recompilation of their code.
 
-BR,
+Additionally, we need to ensure the scalability of strategy implementation.
+While using socket options or sysctl might be straightforward, it could
+complicate future expansions.
 
-Joey
+Fortunately, BPF addresses these concerns effectively. Users can write
+their own strategies in eBPF to determine whether to use SMC, and they can
+easily modify those strategies in the future.
 
->
->> +    if (ret)
->> +        return ret;
->> +
->> +    /* The PMT flag is determined by the RWK property.
->> +     * However, our hardware is configured to support only MGK.
->> +     * This is an override on PMT to enable WoL capability.
->> +     */
->> +    plat_dat->pmt = 1;
->> +    device_set_wakeup_capable(&pdev->dev, 1);
->> +
->> +    return 0;
->> +}
->
-> ...
->
->> +static struct platform_driver nvt_dwmac_driver = {
->> +    .probe  = nvt_gmac_probe,
->> +    .remove = stmmac_pltfr_remove,
->> +    .driver = {
->> +        .name           = "nuvoton-dwmac",
->> +        .pm        = &stmmac_pltfr_pm_ops,
->> +        .of_match_table = nvt_dwmac_match,
->> +    },
->> +};
->
-> ...
->
-> CJ
+v2:
+  1. Rename smc_bpf_ops to smc_ops.
+  2. Change the scope of smc_ops from global to per netns.
+  3. Directly pass parameters to ops instead of smc_ops_ctx.
+  4. Remove struct smc_ops_ctx.
+  5. Remove exports that are no longer needed.
+
+v3:
+  1. Remove find_ksym_btf_id_by_prefix_kind.
+  2. Enhance selftest, introduce a complete ops for filtering smc
+     connections based on ip pairs and a realistic topology test
+     to verify it.
+
+v4:
+  1. Remove unless func: smc_bpf_ops_check_member()
+  2. Remove unless inline func: smc_ops_find_by_name()
+  3. Change CONFIG_SMC=y to complete CI testing
+  4. Change smc_sock to smc_sock___local in test to avoid
+     compiling failed with CONFIG_SMC=y
+  5. Improve test cases, remove unnecessary timeouts and multi-thread
+     test, using network_helpers to start testing between server and
+     client.
+  6. Fix issues when the return value of the ops function is neither 0
+     nor 1.
+
+v5:
+  1. Fix incorrect CI config from CONFIG_SMC=Y to CONFIG_SMC=y.
+
+D. Wythe (5):
+  bpf: export necessary sympols for modules with struct_ops
+  net/smc: Introduce generic hook smc_ops
+  net/smc: bpf: register smc_ops info struct_ops
+  libbpf: fix error when st-prefix_ops and ops from differ btf
+  bpf/selftests: add selftest for bpf_smc_ops
+
+ include/net/netns/smc.h                       |   3 +
+ include/net/smc.h                             |  51 +++
+ kernel/bpf/bpf_struct_ops.c                   |   2 +
+ kernel/bpf/syscall.c                          |   1 +
+ net/ipv4/tcp_output.c                         |  15 +-
+ net/smc/Kconfig                               |  12 +
+ net/smc/Makefile                              |   1 +
+ net/smc/af_smc.c                              |  10 +
+ net/smc/smc_ops.c                             | 130 ++++++
+ net/smc/smc_ops.h                             |  30 ++
+ net/smc/smc_sysctl.c                          |  95 +++++
+ tools/lib/bpf/libbpf.c                        |  25 +-
+ tools/testing/selftests/bpf/config            |   4 +
+ .../selftests/bpf/prog_tests/test_bpf_smc.c   | 390 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/bpf_smc.c   | 116 ++++++
+ 15 files changed, 873 insertions(+), 12 deletions(-)
+ create mode 100644 net/smc/smc_ops.c
+ create mode 100644 net/smc/smc_ops.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
+
+-- 
+2.45.0
+
 
