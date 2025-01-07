@@ -1,256 +1,228 @@
-Return-Path: <netdev+bounces-155973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F443A0471A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:50:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCE85A0473B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:55:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B47165E19
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:50:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 185473A1ED4
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C9F1F2C3F;
-	Tue,  7 Jan 2025 16:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E9271DFDBB;
+	Tue,  7 Jan 2025 16:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UId9kYOU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nIFVxn8Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2071.outbound.protection.outlook.com [40.107.220.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCC31D7E41;
-	Tue,  7 Jan 2025 16:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736268616; cv=none; b=RCUtKi+85cnNjd8SKqUPvkglh/HLlAkFxJzf338svgUblmet5rv8dY+TC/Rjzq7WYXBwpbVsmXboNic6TzewiOBPWdWyMClDcsf6uZePXxZsvTMBfhtxRd2JcMDWI4F+vfaq8CiqQ1ozLPPIu1xtGcRE0LG61HYQtfcOGKXyt3c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736268616; c=relaxed/simple;
-	bh=rq46TzVhAWlrO7ryjvb7xwfvys7fBYzRjHLnW+ZsiPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jcuemZL51LSULIpSAKwm7HjwEkjrWL28arDXOzwY3RK1MAZudYA0qRHELpdmj/WYhP6XA0ozHla9A/1DCh9QCcwVonupxrOPBwwYnHYP0Mh7DMXmmGeCOhVGex+iSEXCRy1nJEXKU/Kdw5lXuiLLbNxBFqGPup2eG+EFxiJUViM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UId9kYOU; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21a1e6fd923so15882825ad.1;
-        Tue, 07 Jan 2025 08:50:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736268613; x=1736873413; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1kkw8OsqKUstZ6+HR7QBUZKdgqA2L6g+toZ/3deeQ/o=;
-        b=UId9kYOUs1SY1zDjWjPEnql/P0/7jA8ikfUrcCCYgdA/ix+2gEcO2ND1qys0PCkCeF
-         20dMsg6ykfZqUrgCy2/yV1rjDRNEzsVSzvW5TporBj/3p6/yGZCvUhF7FrQAn44sGXr/
-         uJ5IYgknBA1elkDEK3qN5BE/pEo9FAG+sYp0TNXprpAJrhbWK+sJ95H0NUv/vuesAAUG
-         kJUSj+uAYm0AfEfbmQFPORpsNsqfZjThSSPCgIST226Ak46I57dBdLVnsuzd+gJ1nFrZ
-         WBn8i0FmvxNl5cwVL09iwF6IYrwUpA4D+0zj9Fi2BoGXBGKcxtjPznBiMLGxLHAGDOcd
-         5eNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736268613; x=1736873413;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1kkw8OsqKUstZ6+HR7QBUZKdgqA2L6g+toZ/3deeQ/o=;
-        b=EtOlEr8zbJ2eUigZjZoVKlF/z6Rg/c5vep15bhHYLXP/HpSZmEvvS3nLQ5d+WemXWZ
-         W0WI9oT6GJQBL0BwlQYNwClxV6PdWYpVzh4+PkhbMaeH/HXcOce8Bjk7jlTH4EB6pIsU
-         ZZ4ZLWjAOak7UBVmrbFF8Jm/+zHF5facF0VuYcerwfnyARXnmbY4tggXw0pbitJD3PYm
-         D5WiUzeF2CmAMB/vehViSgJ7p21eBkl/DIS/ZBwLo8nhrzxzgn/sIVh20pxZk5V4OsdJ
-         SW8ZeTPtUpcPKioUCzVZbQHuMymd1xQAshBUihRpPc86h4JxJGpQ3LyDwWqCg9H8vPLR
-         l3IA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOuGqyh+BSrYB2UBRdwvAvn+ljZCW1ulfPrwdNzE/y3+yPdDy7n/VG/yvB+ggIsOSWWL4=@vger.kernel.org, AJvYcCVU7Nnyv5U3xrZ4xPu9tU+Bk1GNFgOyYtdP5DQ4m1z4yJNFQyB1wZzn58t4NFi5s9mSuuP4vJiD@vger.kernel.org, AJvYcCVVbWZyviAntnZ1tXN9VRnbm107V1L+R5eUD2H2bHF8pGSuyVMsUieEP9a4vJNPaHs2eyGNlCLH27wraZfAuFWf@vger.kernel.org, AJvYcCW5ng9v/1FqypJAzgSE3vSv7TIu3RCWXUudf0c4hw4nfKc46XF5173f/dVhwoZD75IaTwAJOFXcK+p84iwp@vger.kernel.org, AJvYcCXoB4bGvkJU4ybgeTBWmKt/uft7uWKZaYSGHtrPUcUzFwDVlR9OIudSI/OzykWk5Hcqus8k6Si4//fi@vger.kernel.org
-X-Gm-Message-State: AOJu0YzK7tPqrKcIySbxWtVHxeo/uu98D/krU/OeZxP4CX+oLBio/MZO
-	fBo8WRiYuimYZrPKDxu5r7YNv3xRUCeCr/N2CS7dLYILzuEvrzE=
-X-Gm-Gg: ASbGncsbs1jk0SYbdd7O7K2WkHNzbWf/2iYtVjpMiHx6J+/tBd2cPuTUWPKvrdhMwN9
-	ha6yQ8lDh10k6exJ81AO9TTAMatbcF1VF7TMkHivBKvX2N6/NvBLW03uslgZcRieAwoKd6Eh0vj
-	3W1hnQrYrBmrc+zwUi1r5PINrCp9S3RGqHW8pof6p+9U7ecYyU5MnPTUcJfGCAoRTWGHS4mCFMh
-	W9DACtMueCQiVLVNnyvzWmTizcanxmlQeL1G3PRQRtz9xVvh6c9B6ap
-X-Google-Smtp-Source: AGHT+IFENMHtBxMqOYbLnyZklK8TxKhy57F1FhvRUtYUInQIrUA9rU8ymAx4xYOehq+j+0FGzA2uug==
-X-Received: by 2002:a17:903:41d1:b0:217:8557:5246 with SMTP id d9443c01a7336-219e6f4979amr721019265ad.55.1736268612929;
-        Tue, 07 Jan 2025 08:50:12 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9f7d83sm314319215ad.226.2025.01.07.08.50.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 08:50:12 -0800 (PST)
-Date: Tue, 7 Jan 2025 08:50:11 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Florian Bezdeka <florian.bezdeka@siemens.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, Bjorn Topel <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	intel-wired-lan@lists.osuosl.org, xdp-hints@xdp-project.net
-Subject: Re: [PATCH bpf-next v4 1/4] xsk: Add launch time hardware offload
- support to XDP Tx metadata
-Message-ID: <Z31bQ6xEkyQvbutN@mini-arch>
-References: <20250106135606.9704-1-yoong.siang.song@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5314D1F4273;
+	Tue,  7 Jan 2025 16:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736268891; cv=fail; b=pZBNADbRfXssw+HaWPXeRyVbrYUxgYcsnbWXrP4kQwY4oQ4z9kXh9BeWZfeJ1eHk67Mm90hLtGEjZcBjLD6tWLnGpleXh7bkukck3lvIbFuYA2t+BNriHNfSUVZngUMK8PCTN1n/ny+GtT3Xw2QaTEbX7SRh0kWJpQQYbFYqxso=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736268891; c=relaxed/simple;
+	bh=q4rizRD2hzB4IOXoZqYhgl/SdAncdnhXe6n26gML1AQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tzzr7CVn2xx7VAsJNusp1Cx6VjVeryRtmx0EEAKDpkRE/l+drNHQW0cSbgnxRhpfIOzI2ijAs9sOsmQ/mu6S6/ywou3Wp0J6rnpt/xQ8odgw5T2paqCbhrr5HycdKiqhPIfh6APqfaq3hxC9bDTQT3KNGJgyPXO3KgLsz5TpJv4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nIFVxn8Z; arc=fail smtp.client-ip=40.107.220.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OUOcjv4rHkn/AlrSR1ZvklgljT9tVmwBuMQ2KOjnQ967X46WVj5U/hu6PRrV/w+yN5bnL9zE5GTAzgKQcIg/IgUXqoFkm+rHsDRespsOhzJOruw6Ycxpag2iFwip98UcfbI+xHMF8elqAMLaaUAgQgVZ6AUZa9L/4DjVj1Xt/yRfJKk1GpowH5L++VjHbIbClixPIXAyRAd63+oM6WjNhmNc98sKw5c1X3O8Va3ZMcJP5gXBNRHFRjmJnKrp0aJczzBwJrm88jmUNeXrdDZPaJH8t0Pq1wMvmgqkKnXc5PJYB/bGttx0V6iWTlYkavgtX1W5G3dIoWap0a8KMMjYyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5vnjgHWtBsFmaugfuVVe5Y865JVFndlJYVw4LHyWH6Y=;
+ b=Y8xBl2YgpxyTS68fcINadpQmHE+07E6NjerUgeU0p0p1Lbm4uvqOZkK7d3SL91IVFrXuGDmxs/b/H6X1QlkyA8hniAgdbJW7P1ACJma/np2rx+AyydYe4K4FiAkEUz/WEwJnvBoaQ4sFCvrYYXPItjMa/EQARHV9kay1jnHvm5rwdQM7idyXaebzMIc4CG8A5IQeRDsC00EWYIQ1CMvKcRQospbSyFWQvyIbLy/oBYozCseUY3qsRMuGPN/2JLyf04xPsVcb3YOgluuR6FRcpEEBeysJ0o6/BdC8SbYYi1FEaeOGwnh8TWiMiaKQcfI/glX0YG7U5epOfkre1VF4sQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5vnjgHWtBsFmaugfuVVe5Y865JVFndlJYVw4LHyWH6Y=;
+ b=nIFVxn8ZjSNBxn5MVFpu9Wo3cfQlgdtAI4sGRbrdM8dcoOka734nq71rI34Ss+GRRMr49mcCjW/cC7GA/nvO7Ix72wAQ4VdXcMQbWNpKCgW7BiFGXDR7V3fKZbazb0In20k4q/JBo4NOsttSRl0qyY/anhGZOAXIF5ZgqjEyiMPVT9zUq7TlSQMyy09+8FbB4JqlPiCkDje0Sww6C1ZmbouxSui8w1TiS9ceIOfeOD03VFQSJG7FE3r+5KNTM8H5XFkXjzUy99mKimSfsSd6LCUHcSeUyA/qTH6gYGDuHSNMiiyqX5c/fvu4W3iZ2scrkuYw9onYPeLiahMfUvmwTw==
+Received: from CH2PR17CA0025.namprd17.prod.outlook.com (2603:10b6:610:53::35)
+ by DM6PR12MB4140.namprd12.prod.outlook.com (2603:10b6:5:221::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.20; Tue, 7 Jan
+ 2025 16:54:38 +0000
+Received: from CH2PEPF0000009F.namprd02.prod.outlook.com
+ (2603:10b6:610:53:cafe::d7) by CH2PR17CA0025.outlook.office365.com
+ (2603:10b6:610:53::35) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8335.10 via Frontend Transport; Tue,
+ 7 Jan 2025 16:54:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CH2PEPF0000009F.mail.protection.outlook.com (10.167.244.21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8335.7 via Frontend Transport; Tue, 7 Jan 2025 16:54:37 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 7 Jan 2025
+ 08:54:22 -0800
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 7 Jan 2025 08:54:22 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 7 Jan 2025 08:54:19 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Simon Horman
+	<horms@kernel.org>, Kees Cook <kees@kernel.org>,
+	<linux-hardening@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, "Cosmin
+ Ratiu" <cratiu@nvidia.com>
+Subject: [PATCH net-next] net: Silence false field-spanning write warning in ip_tunnel_info_opts_set() memcpy
+Date: Tue, 7 Jan 2025 18:55:09 +0200
+Message-ID: <20250107165509.3008505-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250106135606.9704-1-yoong.siang.song@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000009F:EE_|DM6PR12MB4140:EE_
+X-MS-Office365-Filtering-Correlation-Id: 28657367-688d-4177-4edb-08dd2f3bf8dd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qPzgwfyRDly4sEfESckS6fxdIYgbF35guRVG3U/l558vKVUvhqI8r23A6GY8?=
+ =?us-ascii?Q?4MY1TwUymw05li3SwJWFF1LdiEHisBZyHFLEMbVFba2Ncw+UISAOs6GZoyUX?=
+ =?us-ascii?Q?G+v84FiQJ7tMAvilGWUgEX+EoRJdDGuZ1AzGBRSiF70utohtY9G9WFUQmyd/?=
+ =?us-ascii?Q?+xVdaY5TUDgvmd9DqRcEaS0T3amSkz/p8kuXZjloa92j+Ay5GG+X/sIr2fbK?=
+ =?us-ascii?Q?Kv0UlXREvztKYvi4f65I1boiKH61e7JeN3y7aCmakCvPBOWfM695EnwHUDbD?=
+ =?us-ascii?Q?W2w6Rqj4ie8RVayaozBqGpYWMpXEHbfvyXM+RQK67KYwRnHUeJZ+XUEZsRjh?=
+ =?us-ascii?Q?1qSVGMOqPrckXo0V52ChuAngCxBZwIU+Gid34n+n10BMR0E10odUP1sEobxd?=
+ =?us-ascii?Q?Vy5gSyLMwQ9fzBMG3/3A+7Sud+FJPCiGVa0UyPOhi7yuYElF0ReW5wJSBGpo?=
+ =?us-ascii?Q?LTvaG2ImnbCVp2/6miCklMfL7UbPj99FJQsjsufZqAD2+MMW/dTBIrgxJdBY?=
+ =?us-ascii?Q?03cpZzWuVMUPBtDvrYoghQXlFNlJ6Mt1y3Qz4w+oX+VV7GNa9eZyFto3TPo0?=
+ =?us-ascii?Q?R0x0wh42ItO2UgIRV7SAhxfWqQI9Z1itR9w16bxr3NM2Xn2/bT15Afy2M58P?=
+ =?us-ascii?Q?c6OCU/fyloPM8YMXAUZfYNeBKleGpTI+r9ZYE/miwaZJP4DfaovQ5Ti7evca?=
+ =?us-ascii?Q?WzSI16pFLr0AuvMPoQITvH6+P1kXOtBEs3X4piQJmFDRrrOlcgortUtUQxI/?=
+ =?us-ascii?Q?oVsqdBL//yNx1gUfhIRkS0nzBt62vqBxatc2cj2sTn9GIvcTKR52s6Pf9P3n?=
+ =?us-ascii?Q?LjmoZvExPnk5Ks+OqW3V/Cn/ZST+X/sCJd2bYvBwDYqeRsO5I9XA8pMeWht9?=
+ =?us-ascii?Q?WP9lyQH8sGt7/iCM4jdKSPTVGsfb+xdES7/+LKnRmFGZmioDirIeJPAQa9An?=
+ =?us-ascii?Q?p16FRiQRqfkg8r+fqXfLTxxrUb7ZzkmT1AFa15fkUNLsz2xIanBI9SpxDBuG?=
+ =?us-ascii?Q?BIE8f5QB+u38Ql9d5wh16yLTFuWzrDrEEt9Wj7lz9nFxAPSCLKb+geyWMEsf?=
+ =?us-ascii?Q?MGbDgswUcpJ2FaR/21ec4JxFSqXRSp44UEZdvY11eY0E8ZdSPj8mq157SwUe?=
+ =?us-ascii?Q?Pfk0pqCYUb1gI05D54RMXvmpXMTJ1qYGN8/+7W5LTeGRJMz93+GnThwnXPn5?=
+ =?us-ascii?Q?/jbx4S4aYQjzGeK9kHls2YO6pgp6fvRV4XCEzdPOmBbkaKdyLLJDaeARRrpN?=
+ =?us-ascii?Q?NGP1jD+gE0ZfFhYBFHffyu/RHtKDFLdkgphZ9xGjiPd+CtoQ6OLQMFdoNfv7?=
+ =?us-ascii?Q?9aXHp2CjV07TGGTon+X5+hjlurR+wNnyKMGDJMz9XcrgcDMOdOzFuOgSB+4v?=
+ =?us-ascii?Q?VFaJSi6tlK+uH4LEp328heRSIimVa6/aNtx6OZFzJGqgkYwFVZKQG9gRoK/Y?=
+ =?us-ascii?Q?6Ak+10dRzEL83amZDIyz1U5ioJkanNz8wI4BuRPpweakFtwNwx/rHpQquBS4?=
+ =?us-ascii?Q?2rwsPHrxC15C7lk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2025 16:54:37.9901
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 28657367-688d-4177-4edb-08dd2f3bf8dd
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF0000009F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4140
 
-On 01/06, Song Yoong Siang wrote:
-> Extend the XDP Tx metadata framework so that user can requests launch time
-> hardware offload, where the Ethernet device will schedule the packet for
-> transmission at a pre-determined time called launch time. The value of
-> launch time is communicated from user space to Ethernet driver via
-> launch_time field of struct xsk_tx_metadata.
-> 
-> Suggested-by: Stanislav Fomichev <sdf@google.com>
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-> ---
->  Documentation/netlink/specs/netdev.yaml      |  4 ++
->  Documentation/networking/xsk-tx-metadata.rst | 64 ++++++++++++++++++++
->  include/net/xdp_sock.h                       | 10 +++
->  include/net/xdp_sock_drv.h                   |  1 +
->  include/uapi/linux/if_xdp.h                  | 10 +++
->  include/uapi/linux/netdev.h                  |  3 +
->  net/core/netdev-genl.c                       |  2 +
->  net/xdp/xsk.c                                |  3 +
->  tools/include/uapi/linux/if_xdp.h            | 10 +++
->  tools/include/uapi/linux/netdev.h            |  3 +
->  10 files changed, 110 insertions(+)
-> 
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> index cbb544bd6c84..e59c8a14f7d1 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -70,6 +70,10 @@ definitions:
->          name: tx-checksum
->          doc:
->            L3 checksum HW offload is supported by the driver.
-> +      -
-> +        name: tx-launch-time
-> +        doc:
-> +          Launch time HW offload is supported by the driver.
->    -
->      name: queue-type
->      type: enum
-> diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
-> index e76b0cfc32f7..3cec089747ce 100644
-> --- a/Documentation/networking/xsk-tx-metadata.rst
-> +++ b/Documentation/networking/xsk-tx-metadata.rst
-> @@ -50,6 +50,10 @@ The flags field enables the particular offload:
->    checksum. ``csum_start`` specifies byte offset of where the checksumming
->    should start and ``csum_offset`` specifies byte offset where the
->    device should store the computed checksum.
-> +- ``XDP_TXMD_FLAGS_LAUNCH_TIME``: requests the device to schedule the
-> +  packet for transmission at a pre-determined time called launch time. The
-> +  value of launch time is indicated by ``launch_time`` field of
-> +  ``union xsk_tx_metadata``.
->  
->  Besides the flags above, in order to trigger the offloads, the first
->  packet's ``struct xdp_desc`` descriptor should set ``XDP_TX_METADATA``
-> @@ -65,6 +69,65 @@ In this case, when running in ``XDK_COPY`` mode, the TX checksum
->  is calculated on the CPU. Do not enable this option in production because
->  it will negatively affect performance.
->  
-> +Launch Time
-> +===========
-> +
-> +The value of the requested launch time should be based on the device's PTP
-> +Hardware Clock (PHC) to ensure accuracy. AF_XDP takes a different data path
-> +compared to the ETF queuing discipline, which organizes packets and delays
-> +their transmission. Instead, AF_XDP immediately hands off the packets to
-> +the device driver without rearranging their order or holding them prior to
-> +transmission. In scenarios where the launch time offload feature is
-> +disabled, the device driver is expected to disregard the launch time
-> +request. For correct interpretation and meaningful operation, the launch
-> +time should never be set to a value larger than the farthest programmable
-> +time in the future (the horizon). Different devices have different hardware
-> +limitations on the launch time offload feature.
-> +
-> +stmmac driver
-> +-------------
-> +
-> +For stmmac, TSO and launch time (TBS) features are mutually exclusive for
-> +each individual Tx Queue. By default, the driver configures Tx Queue 0 to
-> +support TSO and the rest of the Tx Queues to support TBS. The launch time
-> +hardware offload feature can be enabled or disabled by using the tc-etf
-> +command to call the driver's ndo_setup_tc() callback.
-> +
-> +The value of the launch time that is programmed in the Enhanced Normal
-> +Transmit Descriptors is a 32-bit value, where the most significant 8 bits
-> +represent the time in seconds and the remaining 24 bits represent the time
-> +in 256 ns increments. The programmed launch time is compared against the
-> +PTP time (bits[39:8]) and rolls over after 256 seconds. Therefore, the
-> +horizon of the launch time for dwmac4 and dwxlgmac2 is 128 seconds in the
-> +future.
-> +
-> +The stmmac driver maintains FIFO behavior and does not perform packet
-> +reordering. This means that a packet with a launch time request will block
-> +other packets in the same Tx Queue until it is transmitted.
-> +
-> +igc driver
-> +----------
-> +
-> +For igc, all four Tx Queues support the launch time feature. The launch
-> +time hardware offload feature can be enabled or disabled by using the
-> +tc-etf command to call the driver's ndo_setup_tc() callback. When entering
-> +TSN mode, the igc driver will reset the device and create a default Qbv
-> +schedule with a 1-second cycle time, with all Tx Queues open at all times.
-> +
-> +The value of the launch time that is programmed in the Advanced Transmit
-> +Context Descriptor is a relative offset to the starting time of the Qbv
-> +transmission window of the queue. The Frst flag of the descriptor can be
-> +set to schedule the packet for the next Qbv cycle. Therefore, the horizon
-> +of the launch time for i225 and i226 is the ending time of the next cycle
-> +of the Qbv transmission window of the queue. For example, when the Qbv
-> +cycle time is set to 1 second, the horizon of the launch time ranges
-> +from 1 second to 2 seconds, depending on where the Qbv cycle is currently
-> +running.
-> +
-> +The igc driver maintains FIFO behavior and does not perform packet
-> +reordering. This means that a packet with a launch time request will block
-> +other packets in the same Tx Queue until it is transmitted.
+When metadata_dst struct is allocated (using metadata_dst_alloc()), it
+reserves room for options at the end of the struct.
 
-Since two devices we initially support are using FIFO mode, should we more
-explicitly target this case? Maybe even call netdev features
-tx-launch-time-fifo? In the future, if/when we get support timing-wheel-like
-queues, we can export another tx-launch-time-wheel?
+Similar to [1], change the memcpy() to unsafe_memcpy() as it is
+guaranteed that enough room (md_size bytes) was allocated and the
+field-spanning write is intentional.
 
-It seems important for the userspace to know which mode it's running.
-In a fifo mode, it might make sense to allocate separate queues
-for scheduling things far into the future/etc.
+This resolves the following warning:
+  memcpy: detected field-spanning write (size 8) of single field "_Generic(info, const struct ip_tunnel_info * : ((const void *)((info) + 1)), struct ip_tunnel_info * : ((void *)((info) + 1)) )" at include/net/ip_tunnels.h:662 (size 0)
+  WARNING: CPU: 0 PID: 19184 at include/net/ip_tunnels.h:662 validate_and_copy_set_tun+0x2f0/0x308 [openvswitch]
+  Modules linked in: act_csum act_pedit act_tunnel_key geneve ip6_udp_tunnel udp_tunnel nf_conntrack_netlink act_skbedit act_mirred sbsa_gwdt ipmi_devintf ipmi_msghandler nvme_fabrics nvme_core overlay optee cls_matchall nfnetlink_cttimeout act_gact cls_flower sch_ingress openvswitch nsh nf_conncount nft_chain_nat xt_MASQUERADE nf_nat xt_tcpmss ib_srp scsi_transport_srp xt_NFLOG nfnetlink_log xt_recent xt_hashlimit xt_state xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 xt_mark xt_comment ipt_REJECT nf_reject_ipv4 rpcrdma nft_compat rdma_ucm ib_umad ib_iser binfmt_misc rdma_cm ib_ipoib iw_cm nf_tables libiscsi scsi_transport_iscsi nfnetlink ib_cm mlx5_ib ib_uverbs ib_core uio_pdrv_genirq uio mlxbf_pmc mlxbf_bootctl bluefield_edac sch_fq_codel dm_multipath fuse efi_pstore ip_tables crct10dif_ce mlx5_core mlxfw psample i2c_mlxbf pwr_mlxbf gpio_mlxbf2 mlxbf_gige mlxbf_tmfifo ipv6 crc_ccitt
+  CPU: 0 UID: 0 PID: 19184 Comm: handler2 Not tainted 6.12.0-for-upstream-bluefield-2024-11-29-01-33 #1
+  Hardware name: https://www.mellanox.com BlueField SoC/BlueField SoC, BIOS 4.9.0.13378 Oct 30 2024
+  pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+  pc : validate_and_copy_set_tun+0x2f0/0x308 [openvswitch]
+  lr : validate_and_copy_set_tun+0x2f0/0x308 [openvswitch]
+  sp : ffffffc0aac6b420
+  x29: ffffffc0aac6b420 x28: 0000000000000040 x27: 0000000000000001
+  x26: 0000000000000008 x25: 0000000000000001 x24: 0000000000000800
+  x23: ffffff8082ab9c00 x22: ffffffc0aac6b480 x21: 0000000000000008
+  x20: ffffffc0aac6b830 x19: 0000000000000000 x18: ffffffffffffffff
+  x17: 1514131211100000 x16: ffffffea66bab8d8 x15: 2b20296f666e6928
+  x14: 28292a2064696f76 x13: 6c636e6920746120 x12: ffffffea68a6e5d0
+  x11: 0000000000000001 x10: 0000000000000001 x9 : ffffffea66c399b8
+  x8 : c0000000ffffefff x7 : ffffffea68a163e0 x6 : 0000000000000001
+  x5 : ffffff83fdeae488 x4 : 0000000000000000 x3 : 0000000000000027
+  x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffffff80979f2280
+  Call trace:
+   validate_and_copy_set_tun+0x2f0/0x308 [openvswitch] (P)
+   validate_and_copy_set_tun+0x2f0/0x308 [openvswitch] (L)
+   validate_set.constprop.0+0x2dc/0x438 [openvswitch]
+   __ovs_nla_copy_actions+0x404/0xd48 [openvswitch]
+   ovs_nla_copy_actions+0xb4/0x160 [openvswitch]
+   ovs_packet_cmd_execute+0x1bc/0x2f0 [openvswitch]
+   genl_family_rcv_msg_doit+0xd0/0x140
+   genl_rcv_msg+0x1f0/0x280
+   netlink_rcv_skb+0x64/0x138
+   genl_rcv+0x40/0x60
+   netlink_unicast+0x2e8/0x348
+   netlink_sendmsg+0x1ac/0x400
+   __sock_sendmsg+0x64/0xc0
+   ____sys_sendmsg+0x26c/0x2f0
+   ___sys_sendmsg+0x88/0xf0
+   __sys_sendmsg+0x88/0x100
+   __arm64_sys_sendmsg+0x2c/0x40
+   invoke_syscall+0x50/0x120
+   el0_svc_common.constprop.0+0x48/0xf0
+   do_el0_svc+0x24/0x38
+   el0_svc+0x34/0xf0
+   el0t_64_sync_handler+0x10c/0x138
+   el0t_64_sync+0x1ac/0x1b0
 
-Thoughts? No code changes required, just more explicitly state the
-expectations.
+[1] Commit 13cfd6a6d7ac ("net: Silence false field-spanning write warning in metadata_dst memcpy")
+
+Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+---
+ include/net/ip_tunnels.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 1aa31bdb2b31..d5e163eba234 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -659,7 +659,10 @@ static inline void ip_tunnel_info_opts_set(struct ip_tunnel_info *info,
+ {
+ 	info->options_len = len;
+ 	if (len > 0) {
+-		memcpy(ip_tunnel_info_opts(info), from, len);
++		unsafe_memcpy(ip_tunnel_info_opts(info), from, len,
++			      /* metadata_dst_alloc() reserves room (md_size bytes)
++			       * for options right after the ip_tunnel_info struct.
++			       */);
+ 		ip_tunnel_flags_or(info->key.tun_flags, info->key.tun_flags,
+ 				   flags);
+ 	}
+-- 
+2.40.1
+
 
