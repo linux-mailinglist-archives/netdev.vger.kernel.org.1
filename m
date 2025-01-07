@@ -1,93 +1,139 @@
-Return-Path: <netdev+bounces-155837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0842A04048
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:03:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1746A04055
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2231A162233
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:03:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F0EE3A1CFF
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768D51EF09E;
-	Tue,  7 Jan 2025 13:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="28g6Q39n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5F81EF08A;
+	Tue,  7 Jan 2025 13:04:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517C5208AD
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 13:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A40C1F0E20
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 13:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736255023; cv=none; b=vFshLnuuXRCeuDXRod5MYqAcIXf7/LPhDIb8VLq69+sCt4e7oQJ4tX5lQlyHhrrjA3X/tIfLG8Arc/KnewDbKiCSLpkpnTNqYy/jDdYUAbktEsqh/3aiufMwJWrqNP583LTFky5UT24qworlbLVeiULhBQV8/gCJIBatoXjnTQw=
+	t=1736255091; cv=none; b=CfLSqrNhmXJwL0/z6D5OroDH6WQ1KqVHtUqslIRCKEhvVD+afltJw3gF6FMRmgrvJFkw+BtcQxn6wbLP6MzAdKxUBQprMAiq7JWI6tlxwZdNf93Y9q4xOP9Xed7+dPsU5m6eBhnhJTfr8s8DMES58jkMtuBZxmkr9I1+GLOITEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736255023; c=relaxed/simple;
-	bh=5bmRP58fuFjd3Ap9F6MN3DbmK9cY4daIT0JRVraCfYs=;
+	s=arc-20240116; t=1736255091; c=relaxed/simple;
+	bh=/hPw75WGitfyGXoQIMKpa6lIk/LCkO5ouL196qat4eU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L6qi2Vu8XtL/AEZP3oaw7C2Ri2R8dMx8b9Mgt6ls7oylXp+6g/bxLcvulvtruc1aEPqCpfZuM+24h40EVClstrMxkusyP3S1qDM+QYaexpkHGoAP4SmriqB9o3/Gr+sSEOiArZ24AUSzzjAf8b0FDV9yp2o34coJ5aiDRtuRArs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=28g6Q39n; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7VhI3bOds4hN/H58RDrhXxqMj97xAGiFOE73e5UGswk=; b=28g6Q39nJrL0VhgPrav/Rnb1OR
-	8URpxnVzrCWdPCODhjg5795qPNVtT7aWhyIGDeaqIe2HH8+FI6aF1rny78p0Mk+31zpzO64qfknK+
-	lTWuyDqxSR0fuMS8yz2Jy82JDAFb1jhNJ5QJ7QqFxE71PRd+vrbfEatsQ5l1NAz7fMgk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tV9F1-002ESr-CO; Tue, 07 Jan 2025 14:03:27 +0100
-Date: Tue, 7 Jan 2025 14:03:27 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
-	Woojung Huh <Woojung.Huh@microchip.com>,
-	Microchip Linux Driver Support <UNGLinuxDriver@microchip.com>,
-	Tim Harvey <tharvey@gateworks.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] net: dsa: microchip: remove
- MICREL_NO_EEE workaround
-Message-ID: <7742385d-3aea-4128-a04c-d86b263689cc@lunn.ch>
-References: <79f347c6-ac14-475a-8c93-f1a4efc3e15b@gmail.com>
- <329108a3-12d6-4ce4-9b28-b59f107120ba@gmail.com>
- <Z3za4bKAJWh3HO9u@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dub9tM5sc/zOJgxNzyODNXB284ofP8katB6v5A9uLl2y9yXwWjzLUqPvWfXbXf8TsnZEsdyIMKXpbeWXlTJuEsO/0FadoJSPTfGYKF0mqFK4xHTtrjixklPtMoDEtxdZVLfuuYDHpIELjN9cOaLRznnmZ6cwk3JSmBSKih7Vu3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tV9FZ-0003iC-6R; Tue, 07 Jan 2025 14:04:01 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tV9FV-007Lc1-27;
+	Tue, 07 Jan 2025 14:03:58 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id E073E3A08A6;
+	Tue, 07 Jan 2025 13:03:57 +0000 (UTC)
+Date: Tue, 7 Jan 2025 14:03:57 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
+	Jerome Brunet <jbrunet@baylibre.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+	Doug Berger <opendmb@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Ray Jui <rjui@broadcom.com>, 
+	Scott Branden <sbranden@broadcom.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Kalle Valo <kvalo@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>, 
+	Dario Binacchi <dariobin@libero.it>, Christophe Roullier <christophe.roullier@foss.st.com>, 
+	Grygorii Strashko <grygorii.strashko@ti.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Roger Quadros <rogerq@kernel.org>, Brian Norris <briannorris@chromium.org>, 
+	Frank Li <Frank.Li@nxp.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-can@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-wireless@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: Correct indentation and style
+ in DTS example
+Message-ID: <20250107-cocky-industrious-hare-c508f6-mkl@pengutronix.de>
+References: <20250107125613.211478-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5vdg3z53mqf4igqc"
 Content-Disposition: inline
-In-Reply-To: <Z3za4bKAJWh3HO9u@pengutronix.de>
+In-Reply-To: <20250107125613.211478-1-krzysztof.kozlowski@linaro.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> I have two problems with current patch set:
-> - dropped documentation, not all switches are officially broken, so
->   keeping it documented is important.
-> - not all KSZ9xxx based switches are officially broken. All 3 port
->   switches are not broken but still match against the KSZ9477 PHY
->   driver:
->   KSZ8563_CHIP_ID - 0x00221631
->   KSZ9563_CHIP_ID - 0x00221631
->   KSZ9893_CHIP_ID - 0x00221631
 
-When you say "not broken", do you mean there is text in the errata
-which says they do really, truly, work, or there is simply no errata
-which says they are broken? Do you have these 3 ports switches and
-have tested them?
+--5vdg3z53mqf4igqc
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next] dt-bindings: net: Correct indentation and style
+ in DTS example
+MIME-Version: 1.0
 
-It seems odd to me that the 3 port version should work. Why is it
-special?
+On 07.01.2025 13:56:13, Krzysztof Kozlowski wrote:
+> DTS example in the bindings should be indented with 2- or 4-spaces and
+> aligned with opening '- |', so correct any differences like 3-spaces or
+> mixtures 2- and 4-spaces in one binding.
+>=20
+> No functional changes here, but saves some comments during reviews of
+> new patches built on existing code.
+>=20
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  .../bindings/net/can/bosch,c_can.yaml         | 10 +-
+>  .../bindings/net/can/microchip,mcp2510.yaml   | 18 ++--
 
-	Andrew
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for net/can
 
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--5vdg3z53mqf4igqc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmd9JjoACgkQKDiiPnot
+vG9NNgf/SxxAC8UsIuL4bDVaIUg+kAj0yKfrwEWjhutunUKK24lVKylz+/UY8+zv
+3+LqniAsnEwHJPxLZ5S0rCe2+qZ6gsvXSBlQSqEJukZOzpWNVYECd8Wf8Q8dQzu+
+qYoaEgvr5jcwNUr+cdrPvhyn4CXuNJCsdmwpfJn98S6XLhwSX+SxgiSUAkXpRmQn
+EE2nnt52Dbrrk4CILlRtPPpd0/hsAXMEWGjIUBYW2f/FJqVNv+yPwZiEsIC2iDSG
+V4fs/zJxh98GK89T2fN8fRzlMTG9pMPmWaQLbMPmVkHn5eJbX7LUoQzmSBe6Kgc3
+I+WqIjPZzj6L9ubrNZg4MgJ3t+T4tg==
+=gbSE
+-----END PGP SIGNATURE-----
+
+--5vdg3z53mqf4igqc--
 
