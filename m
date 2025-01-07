@@ -1,81 +1,111 @@
-Return-Path: <netdev+bounces-155759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE35BA03A5A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 09:57:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D42FEA03A97
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:06:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CC2218866B0
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 08:57:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0768716553B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 09:06:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D87D1E0B7D;
-	Tue,  7 Jan 2025 08:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F144156968;
+	Tue,  7 Jan 2025 09:06:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bU4BdYcn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HslQfHyM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41677198E78;
-	Tue,  7 Jan 2025 08:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C98154BE2;
+	Tue,  7 Jan 2025 09:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736240254; cv=none; b=p65pfIyGT9WgmXpuS7pKdSI533Jb4PdIFfrtMzcC2j+IJilUnOJhDVMsVuiPjzy/2FKu4PiVL81SItaQVh6fjp9UUJLvZRtxPDW0yDj2fkRJ+CllqFYlLoEzxNxCMRYs7H/I9WB8Ez0z0GU9xEveggauSUhzbbBWURbR+nwrljY=
+	t=1736240765; cv=none; b=TAIsyl7/oTtbFevcanLjOaNhvs9ExHZsie2bf0g4xcSFXkHP08Uj9q200mRAUC3ej2mAGnLv77f9X3yppaf04mDB0Y+s4/n419BIDvhSXa5w+GSzQJmkVgby4xtM50YD+PhnbjL4Wpby/F+cHNrE/MxnIWRbZl6uUnbMGNbtxi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736240254; c=relaxed/simple;
-	bh=2j0To2z708Hn2b6bNch2njDc+GPMbDoEWEYZbiTv8rQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P0Dl3nDUPm0pq7HyThDhbv9WqKE89dKowRV6Qh0rKRtqAY7ZoCue99GZ8OOReK+Gzrz7cyXpbixSdjLjEAuFJ6fSyNRjWkKb2fhf7T9UJpd3aUVSfBfdajX/BWNdqNCufqakKbxpp+pNlNoaWaiaM6XV4ALIf4utjAkmPeblVj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bU4BdYcn; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1736240765; c=relaxed/simple;
+	bh=+lrAL1nhmjOwtuCrjSGBusJ4m7eSyo0LJzq6XREbXLY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SClP6WbGTc9o4bf86FahgTf1i8MB4uwQXIthBegxjb/xZGl4vSOmQxzHa7JhhyO1VnRX5vL+uj6Hfeq4AynTOAAyMaxWrWCqxS8x6jKl3Uk1qUWw0bFJZeEbo/f35yy933lXuZGC6DzjIbxi3nwNe0xqBbappM2lr4OAjE7hx04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HslQfHyM; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d4e2aa7ea9so28836367a12.2;
+        Tue, 07 Jan 2025 01:06:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736240251; x=1767776251;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SC1mbAev+9sK6OCOjA6+EkRnZ+bYlCkoq+asNgcdmS4=;
-  b=bU4BdYcn0Ax0KfqIt9LTTFgJpdB5xiU49v4k/HZFsOk2ktDZcqN+Rm2B
-   4mP3cG7zpiv0HZKg13pQgQOTmNPT/X4aunjU5ErSAURKYX4RqHr+OKV9I
-   L+Ryr5HiLY4ZfRb+UdU1E3OPeFFUbryZnSwsaGKLiuX3tA0OcP3XFMugP
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.12,295,1728950400"; 
-   d="scan'208";a="159523600"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 08:57:29 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:39955]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.119:2525] with esmtp (Farcaster)
- id 9f3ed6e6-aeb4-4841-95ac-539e22d429cf; Tue, 7 Jan 2025 08:57:29 +0000 (UTC)
-X-Farcaster-Flow-ID: 9f3ed6e6-aeb4-4841-95ac-539e22d429cf
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 7 Jan 2025 08:57:28 +0000
-Received: from 6c7e67c6786f.amazon.com (10.118.249.113) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 7 Jan 2025 08:57:07 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <shaw.leon@gmail.com>
-CC: <andrew+netdev@lunn.ch>, <b.a.t.m.a.n@lists.open-mesh.org>,
-	<bpf@vger.kernel.org>, <bridge@lists.linux.dev>, <davem@davemloft.net>,
-	<donald.hunter@gmail.com>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <idosch@nvidia.com>, <jiri@resnulli.us>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-can@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-ppp@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-wireless@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
-	<liuhangbin@gmail.com>, <netdev@vger.kernel.org>,
-	<osmocom-net-gprs@lists.osmocom.org>, <pabeni@redhat.com>,
-	<shuah@kernel.org>, <wireguard@lists.zx2c4.com>
-Subject: Re: [PATCH net-next v7 00/11] net: Improve netns handling in rtnetlink
-Date: Tue, 7 Jan 2025 17:56:46 +0900
-Message-ID: <20250107085646.42302-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250104125732.17335-1-shaw.leon@gmail.com>
-References: <20250104125732.17335-1-shaw.leon@gmail.com>
+        d=gmail.com; s=20230601; t=1736240762; x=1736845562; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yf647nI7SHqGI80BBUzHOC/gY+pRTRu3FTTF5e5PvXw=;
+        b=HslQfHyM76d4vAH5VtCIOP2s+kvzAAc50C2uTfHKXjpf9+3Fp5ASNwUAqNZR9X73iV
+         uhKgKmkf/dHSp37wfhmRAWepSsKPR8HtbZjvC8kI/G9RLEhWE7Vzd6NSTYrebB2EKx2I
+         fsnBTzkPCqnyhUTTOjrpDsejsftiJjSjKVNloJHQ81TuRa2IEbIcwWFMhuh3TmzZzoV7
+         ygd3cJZokjAVcVG62a+ltnJIONfrNLbxmZVgP8KGppkrHZu1VbXMMG5ZAxzuEEbq3+8T
+         GrEMxtnOV2ktRVtgJih4DY04ZCeQ9c2S9ojnhOjd1EAMu9ukKlSCTDdLL5i6OpmCKKQ6
+         CKgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736240762; x=1736845562;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Yf647nI7SHqGI80BBUzHOC/gY+pRTRu3FTTF5e5PvXw=;
+        b=Ut988DeClfbPZ0PKP494fgpBMzd7H3bEsoOmrvspZYE+xbdm1o9nedkeYSC7b2U7fg
+         MUFIEdkWcYPNpu1NS538bg4lmMWFzzLZKufYc5TuEby1RoT9VcGdCvQ6J65z2F3FBCsZ
+         iKEsIeCfha1BoTr1plO6wR078Riszt3sXouWZGj4PY7n0p6lH7dReT1VWJ+kBX7871Cx
+         7OsYUSKwplmG0nUneD1KxKqWID+c+xcHHocNnkDLUWOEcrRFJuy0hvZ6dxJUoIISah5g
+         sWRpxajc4d2zuVl+r4K2ht+u1EAKHIoqQbIP20iyzGKbg7t/V65wumi6EeBKpEeybZS2
+         FwiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCaXFc86EzCB3yVReghWdPNopcS+U8CVZD/+HO/6SLDYFsH11ZCkICqxMqzYXQdOGOPGec+Rkt81ZqaSlSWWEG@vger.kernel.org, AJvYcCXdg6Ah6/+UOyypdDEdZ1kbeaeZELBojBszzWODqwnysEwxDt8fRcfxyUmtBShRbTeY2dEmtSymW9SFb2k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWMdXhV3DnfKv3kAP1ec60Iz4LCpqnwu7WLN0IqS+stdcA3qsz
+	s6Nv4h6aQ1QYoO0gEVyy27P54kUnylUd0WyMzvj7vPuLzB7JQLHc
+X-Gm-Gg: ASbGnctarF1k7Oe5QmofXHJtAn9ygbKKS5rDvWdmoMW0FbRTqgZ62bUGc1ujYAGnoe/
+	hAE3ic1QtNZRKq55JhjW5DO+5CXNSd6Fgf/aiRr35ehnwILcsoHWD4qPux84VDbuJgeTgvlsJPO
+	L4twrZtp+rnAI3JwhVoyIwZX0FWY4lWMI7lGvtJi7/sj/5L6E4q9hOg7nopzL177COzbYa8CQI0
+	I6Xmi1AtGEfpOpBXOH0GksRxnT84yKDpJ1saNaBukukdHHwQoKC/E2mCIUwV5snyGDP32eAvdWE
+	yX5m9F4FbekUQKHPbEnKyWzHFn6k46fk67p0e2WXnEcJbWHWJeUXEiQYDjqcl2VG7Cc03S3qdA=
+	=
+X-Google-Smtp-Source: AGHT+IEqfnropOKSjHTeyHfKo1G2T5LbmT8gMHhBLT4HLZ1WLqNyAGZrwKDXof/oJBx8TuvP4LVrkw==
+X-Received: by 2002:a05:6402:430c:b0:5d8:253:b7df with SMTP id 4fb4d7f45d1cf-5d81de22d07mr53758061a12.27.1736240761340;
+        Tue, 07 Jan 2025 01:06:01 -0800 (PST)
+Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d80676f3f9sm24005333a12.23.2025.01.07.01.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jan 2025 01:06:00 -0800 (PST)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Ivan Vecera <ivecera@redhat.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	David Ahern <dsahern@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Joe Damato <jdamato@fastly.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"Frank Wunderlich" <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	bridge@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v4 net-next 00/13] bridge-fastpath and related improvements
+Date: Tue,  7 Jan 2025 10:05:17 +0100
+Message-ID: <20250107090530.5035-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,290 +113,167 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA001.ant.amazon.com (10.13.139.88) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Sat,  4 Jan 2025 20:57:21 +0800
-> This patch series includes some netns-related improvements and fixes for
-> rtnetlink, to make link creation more intuitive:
-> 
->  1) Creating link in another net namespace doesn't conflict with link
->     names in current one.
->  2) Refector rtnetlink link creation. Create link in target namespace
->     directly.
-> 
-> So that
-> 
->   # ip link add netns ns1 link-netns ns2 tun0 type gre ...
-> 
-> will create tun0 in ns1, rather than create it in ns2 and move to ns1.
-> And don't conflict with another interface named "tun0" in current netns.
-> 
-> Patch 01 serves for 1) to avoids link name conflict in different netns.
-> 
-> To achieve 2), there're mainly 3 steps:
-> 
->  - Patch 02 packs newlink() parameters into a struct, including
->    the original "src_net" along with more netns context. No semantic
->    changes are introduced.
->  - Patch 03 ~ 07 converts device drivers to use the explicit netns
->    extracted from params.
->  - Patch 08 ~ 09 removes the old netns parameter, and converts
->    rtnetlink to create device in target netns directly.
-> 
-> Patch 10 ~ 11 adds some tests for link name and link netns.
-> 
-> 
-> BTW please note there're some issues found in current code:
-> 
-> - In amt_newlink() drivers/net/amt.c:
-> 
->     amt->net = net;
->     ...
->     amt->stream_dev = dev_get_by_index(net, ...
-> 
->   Uses net, but amt_lookup_upper_dev() only searches in dev_net.
->   So the AMT device may not be properly deleted if it's in a different
->   netns from lower dev.
+This patchset makes it possible to set up a software fastpath between
+bridged interfaces. One patch adds the flow rule for the hardware
+fastpath. This creates the possibility to have a hardware offloaded
+fastpath between bridged interfaces. More patches are added to solve
+issues found with the existing code.
 
-I think you are right, and the upper device will be leaked
-and UAF will happen.
+To set up the fastpath with offloading, add this extra flowtable:
 
-amt must manage a list linked to a lower dev.
+table bridge filter {
+        flowtable fb {
+                hook ingress priority filter
+                devices = { lan0, lan1, lan2, lan3, lan4, wlan0, wlan1 }
+                flags offload
+        }
+        chain forward {
+                type filter hook forward priority filter; policy accept;
+		ct state established flow add @fb
+        }
+}
 
-Given no one has reported the issue, another option would be
-drop cross netns support in a short period.
+Creating a separate fastpath for bridges.
 
----8<---
-diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index 98c6205ed19f..d39a5fe17a6f 100644
---- a/drivers/net/amt.c
-+++ b/drivers/net/amt.c
-@@ -3168,6 +3168,12 @@ static int amt_newlink(struct net *net, struct net_device *dev,
- 	struct amt_dev *amt = netdev_priv(dev);
- 	int err = -EINVAL;
- 
-+	if (!net_eq(net, dev_net(dev))) {
-+		NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_TARGET_NETNSID],
-+				    "Can't find stream device in a different netns");
-+		return err;
-+	}
-+
- 	amt->net = net;
- 	amt->mode = nla_get_u32(data[IFLA_AMT_MODE]);
- 
----8<---
+         forward fastpath bypass
+ .----------------------------------------.
+/                                          \
+|                        IP - forwarding    |
+|                       /                \  v
+|                      /                  wan ...
+|                     /
+|                     |
+|                     |
+|                   brlan.1
+|                     |
+|    +-------------------------------+
+|    |           vlan 1              |
+|    |                               |
+|    |     brlan (vlan-filtering)    |
+|    +---------------+               |
+|    |  DSA-SWITCH   |               |
+|    |               |    vlan 1     |
+|    |               |      to       |
+|    |   vlan 1      |   untagged    |
+|    +---------------+---------------+
+.         /                   \
+ ------>lan0                 wlan1
+        .  ^                 ^
+        .  |                 |
+        .  \_________________/
+        .  bridge fastpath bypass
+        .
+        ^
+     vlan 1 tagged packets
 
+While testing direct transmit in the software forward-fastpath, it is
+useful to enslave the wan interface to another bridge, brwan. This will
+make sure both directions of the software forward-fastpath use direct
+transmit.
 
-> 
-> - In gtp_newlink() in drivers/net/gtp.c:
-> 
->     gtp->net = src_net;
->     ...
->     gn = net_generic(dev_net(dev), gtp_net_id);
->     list_add_rcu(&gtp->list, &gn->gtp_dev_list);
-> 
->   Uses src_net, but priv is linked to list in dev_net. So it may not be
->   properly deleted on removal of link netns.
+To have the ability to handle xmit direct with outgoing encaps in the
+bridge fastpass bypass, we need to be able to handle them without going
+through vlan/pppoe devices. So I've applied, amended and squashed wenxu's
+patchset. This patch also makes it possible to egress from vlan-filtering
+brlan to lan0 with vlan tagged packets, if the bridge master port is doing
+the vlan tagging, instead of the vlan-device. Without this patch, this is
+not possible in the bridge-fastpath and also not in the forward-fastpath,
+as seen in the figure above.
 
-The device is linked to a list in the same netns, so the
-device will not be leaked.  See gtp_net_exit_batch_rtnl().
+There are also some more fixes for filling in the forward path. These
+fixes also apply to for the forward-fastpath. They include handling
+DEV_PATH_MTK_WDMA in nft_dev_path_info(). There are now 2 patches for
+avoiding ingress_vlans bit set for bridged dsa user ports and foreign
+(dsa) ports.
 
-Rather, the problem is the udp tunnel socket netns could be
-freed earlier than the dev netns.
+Another patch introduces DEV_PATH_BR_VLAN_KEEP_HW, needed for the
+bridge-fastpath only.
 
----8<---
-# ip netns add test
-# ip netns attach root 1
-# ip -n test link add netns root name gtp0 type gtp role sgsn
-# ip netns del test
-[  125.828205] ref_tracker: net notrefcnt@0000000061c9afc0 has 1/2 users at
-[  125.828205]      sk_alloc+0x7c8/0x8c0
-[  125.828205]      inet_create+0x284/0xd70
-[  125.828205]      __sock_create+0x23b/0x6a0
-[  125.828205]      udp_sock_create4+0x94/0x3f0
-[  125.828205]      gtp_create_sock+0x286/0x340
-[  125.828205]      gtp_create_sockets+0x43/0x110
-[  125.828205]      gtp_newlink+0x775/0x1070
-[  125.828205]      rtnl_newlink+0xa7f/0x19e0
-[  125.828205]      rtnetlink_rcv_msg+0x71b/0xc10
-[  125.828205]      netlink_rcv_skb+0x12b/0x360
-[  125.828205]      netlink_unicast+0x446/0x710
-[  125.828205]      netlink_sendmsg+0x73a/0xbf0
-[  125.828205]      ____sys_sendmsg+0x89d/0xb00
-[  125.828205]      ___sys_sendmsg+0xe9/0x170
-[  125.828205]      __sys_sendmsg+0x104/0x190
-[  125.828205]      do_syscall_64+0xc1/0x1d0
-[  125.828205] 
-[  125.833135] ref_tracker: net notrefcnt@0000000061c9afc0 has 1/2 users at
-[  125.833135]      sk_alloc+0x7c8/0x8c0
-[  125.833135]      inet_create+0x284/0xd70
-[  125.833135]      __sock_create+0x23b/0x6a0
-[  125.833135]      udp_sock_create4+0x94/0x3f0
-[  125.833135]      gtp_create_sock+0x286/0x340
-[  125.833135]      gtp_create_sockets+0x21/0x110
-[  125.833135]      gtp_newlink+0x775/0x1070
-[  125.833135]      rtnl_newlink+0xa7f/0x19e0
-[  125.833135]      rtnetlink_rcv_msg+0x71b/0xc10
-[  125.833135]      netlink_rcv_skb+0x12b/0x360
-[  125.833135]      netlink_unicast+0x446/0x710
-[  125.833135]      netlink_sendmsg+0x73a/0xbf0
-[  125.833135]      ____sys_sendmsg+0x89d/0xb00
-[  125.833135]      ___sys_sendmsg+0xe9/0x170
-[  125.833135]      __sys_sendmsg+0x104/0x190
-[  125.833135]      do_syscall_64+0xc1/0x1d0
-[  125.833135] 
-[  125.837998] ------------[ cut here ]------------
-[  125.838345] WARNING: CPU: 0 PID: 11 at lib/ref_tracker.c:179 ref_tracker_dir_exit+0x26c/0x520
-[  125.838906] Modules linked in:
-[  125.839130] CPU: 0 UID: 0 PID: 11 Comm: kworker/u16:0 Not tainted 6.13.0-rc5-00150-gc707e6e25dde #188
-[  125.839734] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-[  125.840497] Workqueue: netns cleanup_net
-[  125.840773] RIP: 0010:ref_tracker_dir_exit+0x26c/0x520
-[  125.841128] Code: 00 00 00 fc ff df 4d 8b 26 49 bd 00 01 00 00 00 00 ad de 4c 39 f5 0f 85 df 00 00 00 48 8b 74 24 08 48 89 df e8 a5 cc 12 02 90 <0f> 0b 90 48 8d 6b 44 be 04 00 00 00 48 89 ef e8 80 de 67 ff 48 89
-[  125.842364] RSP: 0018:ff11000007f3fb60 EFLAGS: 00010286
-[  125.842714] RAX: 0000000000004337 RBX: ff1100000d231aa0 RCX: 1ffffffff0e40d5c
-[  125.843195] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8423ee3c
-[  125.843664] RBP: ff1100000d231af0 R08: 0000000000000001 R09: fffffbfff0e397ae
-[  125.844142] R10: 0000000000000001 R11: 0000000000036001 R12: ff1100000d231af0
-[  125.844606] R13: dead000000000100 R14: ff1100000d231af0 R15: dffffc0000000000
-[  125.845067] FS:  0000000000000000(0000) GS:ff1100006ce00000(0000) knlGS:0000000000000000
-[  125.845596] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  125.845984] CR2: 0000564cbf104000 CR3: 000000000ef44001 CR4: 0000000000771ef0
-[  125.846480] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  125.846958] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-[  125.847450] PKRU: 55555554
-[  125.847634] Call Trace:
-[  125.847800]  <TASK>
-[  125.847946]  ? __warn+0xcc/0x2d0
-[  125.848177]  ? ref_tracker_dir_exit+0x26c/0x520
-[  125.848485]  ? report_bug+0x28c/0x2d0
-[  125.848742]  ? handle_bug+0x54/0xa0
-[  125.848982]  ? exc_invalid_op+0x18/0x50
-[  125.849252]  ? asm_exc_invalid_op+0x1a/0x20
-[  125.849537]  ? _raw_spin_unlock_irqrestore+0x2c/0x50
-[  125.849865]  ? ref_tracker_dir_exit+0x26c/0x520
-[  125.850174]  ? __pfx_ref_tracker_dir_exit+0x10/0x10
-[  125.850510]  ? kfree+0x1cf/0x3e0
-[  125.850740]  net_free+0x5d/0x90
-[  125.850962]  cleanup_net+0x685/0x8e0
-[  125.851226]  ? __pfx_cleanup_net+0x10/0x10
-[  125.851514]  process_one_work+0x7d4/0x16f0
-[  125.851795]  ? __pfx_lock_acquire+0x10/0x10
-[  125.852072]  ? __pfx_process_one_work+0x10/0x10
-[  125.852396]  ? assign_work+0x167/0x240
-[  125.852653]  ? lock_is_held_type+0x9e/0x120
-[  125.852931]  worker_thread+0x54c/0xca0
-[  125.853193]  ? __pfx_worker_thread+0x10/0x10
-[  125.853485]  kthread+0x249/0x300
-[  125.853709]  ? __pfx_kthread+0x10/0x10
-[  125.853966]  ret_from_fork+0x2c/0x70
-[  125.854229]  ? __pfx_kthread+0x10/0x10
-[  125.854480]  ret_from_fork_asm+0x1a/0x30
-[  125.854746]  </TASK>
-[  125.854897] irq event stamp: 17849
-[  125.855138] hardirqs last  enabled at (17883): [<ffffffff812dc6ad>] __up_console_sem+0x4d/0x60
-[  125.855714] hardirqs last disabled at (17892): [<ffffffff812dc692>] __up_console_sem+0x32/0x60
-[  125.856315] softirqs last  enabled at (17878): [<ffffffff8117d603>] handle_softirqs+0x4f3/0x750
-[  125.856908] softirqs last disabled at (17857): [<ffffffff8117d9e4>] __irq_exit_rcu+0xc4/0x100
-[  125.857492] ---[ end trace 0000000000000000 ]---
----8<---
+Conntrack bridge only tracks untagged and 802.1q. To make the bridge
+fastpath experience more similar to the forward fastpath experience,
+I've added double vlan, pppoe and pppoe-in-q tagged packets to bridge
+conntrack and to bridge filter chain.
 
-We can fix this by linking the dev to the socket's netns and
-clean them up in __net_exit hook as done in bareudp and geneve.
+Note: While testing direct transmit in the software forward-fastpath,
+without the capability of setting the offload flag, it is sometimes useful
+to enslave the wan interface to another bridge, brwan. This will make
+sure both directions of the software forward-fastpath use direct transmit,
+which also happens when the offload flag is set.
 
----8<---
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 89a996ad8cd0..77638a815873 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -70,6 +70,7 @@ struct pdp_ctx {
- /* One instance of the GTP device. */
- struct gtp_dev {
- 	struct list_head	list;
-+	struct list_head	sock_list;
- 
- 	struct sock		*sk0;
- 	struct sock		*sk1u;
-@@ -102,6 +103,7 @@ static unsigned int gtp_net_id __read_mostly;
- 
- struct gtp_net {
- 	struct list_head gtp_dev_list;
-+	struct list_head gtp_sock_list;
- };
- 
- static u32 gtp_h_initval;
-@@ -1526,6 +1528,10 @@ static int gtp_newlink(struct net *src_net, struct net_device *dev,
- 
- 	gn = net_generic(dev_net(dev), gtp_net_id);
- 	list_add_rcu(&gtp->list, &gn->gtp_dev_list);
-+
-+	gn = net_generic(src_net, gtp_net_id);
-+	list_add(&gtp->sock_list, &gn->gtp_sock_list);
-+
- 	dev->priv_destructor = gtp_destructor;
- 
- 	netdev_dbg(dev, "registered new GTP interface\n");
-@@ -1552,6 +1558,7 @@ static void gtp_dellink(struct net_device *dev, struct list_head *head)
- 			pdp_context_delete(pctx);
- 
- 	list_del_rcu(&gtp->list);
-+	list_del(&gtp->sock_list);
- 	unregister_netdevice_queue(dev, head);
- }
- 
-@@ -2465,6 +2472,8 @@ static int __net_init gtp_net_init(struct net *net)
- 	struct gtp_net *gn = net_generic(net, gtp_net_id);
- 
- 	INIT_LIST_HEAD(&gn->gtp_dev_list);
-+	INIT_LIST_HEAD(&gn->gtp_sock_list);
-+
- 	return 0;
- }
- 
-@@ -2475,9 +2484,12 @@ static void __net_exit gtp_net_exit_batch_rtnl(struct list_head *net_list,
- 
- 	list_for_each_entry(net, net_list, exit_list) {
- 		struct gtp_net *gn = net_generic(net, gtp_net_id);
--		struct gtp_dev *gtp;
-+		struct gtp_dev *gtp, *next;
-+
-+		list_for_each_entry_safe(gtp, next, &gn->gtp_dev_list, list)
-+			gtp_dellink(gtp->dev, dev_to_kill);
- 
--		list_for_each_entry(gtp, &gn->gtp_dev_list, list)
-+		list_for_each_entry_safe(gtp, next, &gn->gtp_sock_list, sock_list)
- 			gtp_dellink(gtp->dev, dev_to_kill);
- 	}
- }
----8<---
+I have send RFC v2 as I previously only owned a dsa device. I now have
+obtained a switchdev supporting SWITCHDEV_OBJ_ID_PORT_VLAN, and found
+there was more to do to handle the ingress_vlans bit and corresponding
+vlan encap.
 
+I am now sending v4 as non-RFC as the previous 2 RFC's did not get any
+comment.
 
-> 
-> - In pfcp_newlink() in drivers/net/pfcp.c:
-> 
->     pfcp->net = net;
->     ...
->     pn = net_generic(dev_net(dev), pfcp_net_id);
->     list_add_rcu(&pfcp->list, &pn->pfcp_dev_list);
-> 
->   Same as above.
+Changes in V4:
+- Added !CONFIG_NET_SWITCHDEV version of
+   br_switchdev_port_vlan_no_foreign_add().
 
-I haven't tested pfcp but it seems to have the same problem.
+Changes in v3:
+- Squashed the two 'port to port' patches to avoid build errors when only
+   one of the two commits is applied.
 
-I'll post patches for gtp and pfcp.
+Changes in v2:
+- Introduce DEV_PATH_BR_VLAN_KEEP_HW for use in the bridge-fastpath only.
+   It is needed for switchdevs supporting SWITCHDEV_OBJ_ID_PORT_VLAN.
+- Different approach for handling BR_VLFLAG_ADDED_BY_SWITCHDEV in
+   br_vlan_fill_forward_path_mode() for foreign devices. Introduce
+   SWITCHDEV_F_NO_FOREIGN, BR_VLFLAG_TAGGING_BY_SWITCHDEV and
+   br_switchdev_port_vlan_no_foreign_add(). The latter function can be
+   used to make sure the vlan was added to a switchdev native device.
+   When that fails, adding the vlan with br_switchdev_port_vlan_add()
+   means it was added to a switchdev foreign device.
+- Clear ingress_vlans bit and corresponding encap for dsa user ports.
+- Add check for ingress_vlans bit to nft_dev_fill_bridge_path().
+- Adapted cover letter description to make clear the patches apply
+   to software fastpath, making hardware-offloaded fastpath possible.
+- Fixed clang error for vlan_hdr * and struct ppp_hdr * by adding block.
+- Updated !CONFIG_BRIDGE_VLAN_FILTERING version of
+   br_vlan_fill_forward_path_pvid().
+- Removed erroneous check netif_is_bridge_master(ctx->dev) from
+   dev_fill_bridge_path().
+- Cosmetic changes.
 
+Eric Woudstra (13):
+  netfilter: nf_flow_table_offload: Add nf_flow_encap_push() for xmit
+    direct
+  netfilter: bridge: Add conntrack double vlan and pppoe
+  netfilter: nft_chain_filter: Add bridge double vlan and pppoe
+  bridge: Add filling forward path from port to port
+  net: core: dev: Add dev_fill_bridge_path()
+  netfilter :nf_flow_table_offload: Add nf_flow_rule_bridge()
+  netfilter: nf_flow_table_inet: Add nf_flowtable_type flowtable_bridge
+  netfilter: nft_flow_offload: Add NFPROTO_BRIDGE to validate
+  netfilter: nft_flow_offload: Add DEV_PATH_MTK_WDMA to
+    nft_dev_path_info()
+  netfilter: nft_flow_offload: No ingress_vlan forward info for dsa user
+    port
+  bridge: No DEV_PATH_BR_VLAN_UNTAG_HW for dsa foreign
+  bridge: Introduce DEV_PATH_BR_VLAN_KEEP_HW for bridge-fastpath
+  netfilter: nft_flow_offload: Add bridgeflow to nft_flow_offload_eval()
 
-> 
-> - In lowpan_newlink() in net/ieee802154/6lowpan/core.c:
-> 
->     wdev = dev_get_by_index(dev_net(ldev), nla_get_u32(tb[IFLA_LINK]));
-> 
->   Looks for IFLA_LINK in dev_net, but in theory the ifindex is defined
->   in link netns.
+ include/linux/netdevice.h                  |   3 +
+ include/net/netfilter/nf_flow_table.h      |   3 +
+ include/net/switchdev.h                    |   1 +
+ net/bridge/br_device.c                     |  23 ++-
+ net/bridge/br_private.h                    |  12 ++
+ net/bridge/br_switchdev.c                  |  15 ++
+ net/bridge/br_vlan.c                       |  29 +++-
+ net/bridge/netfilter/nf_conntrack_bridge.c |  88 +++++++++--
+ net/core/dev.c                             |  66 ++++++--
+ net/netfilter/nf_flow_table_inet.c         |  13 ++
+ net/netfilter/nf_flow_table_ip.c           |  96 +++++++++++-
+ net/netfilter/nf_flow_table_offload.c      |  13 ++
+ net/netfilter/nft_chain_filter.c           |  20 ++-
+ net/netfilter/nft_flow_offload.c           | 166 +++++++++++++++++++--
+ net/switchdev/switchdev.c                  |   2 +-
+ 15 files changed, 497 insertions(+), 53 deletions(-)
 
-I guess you mean the ifindex is defined in src_net instead.
-Not sure if it's too late to change the behaviour.
+-- 
+2.47.1
+
 
