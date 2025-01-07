@@ -1,131 +1,108 @@
-Return-Path: <netdev+bounces-156051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E7FA04BF3
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:55:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A890A04BF8
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60CF93A13BC
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:55:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96FE63A4428
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:58:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BBC1F669F;
-	Tue,  7 Jan 2025 21:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BE11F7097;
+	Tue,  7 Jan 2025 21:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fVoYtMb2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="W7WJrR/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA1F56446
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A012E56446
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 21:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736286943; cv=none; b=AnN14SUCYYmNjie0cAZ3WIeLj3iydrkrXLfRjqa85vNMxjDmQNtbC40C5y6/zoWZjOpZmTd4FqcCCdFj206uUalVnd9GW4WnwzTtpvxvL5TsEQP6PHIdursi6wlH6I62Ugdd2AVhOgSq5D4bCwfyRYW9IzGbOd545uOjBXzPU1Y=
+	t=1736287129; cv=none; b=NmDm5w03+PSISueHrsP3xSHERAT3/ZA6SxIqOdvnOS4JFLRfAtIqd8vayDrhYMtTEhS7h64gy+y97p8x2LtIv+hmQM4Km6AgxNoGnGIChPYXEa3B5q2RWQ686FHQrJrfYZskCcx8GGSjO2TcFVT8/7N4l7+KuBjggTUPN7Ft2rM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736286943; c=relaxed/simple;
-	bh=jtmnWEARWEmD43FDdt9F+BHYo1jphXJeqPvu4IFcjkY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PhdvtLOsXyKWbH7Lu+7gMYdsorpFDULoJQjLBNXZyZp7N+pu7+s8Pm4PTPXdP0FBg8OL9UKDjwyxf2I73vngUILbKV/rEbUTkUdTFqLoaXCbvnPV6O6nO4t6bx2u988Mm32FF+HAbTMrxtos8SQHaoJtuLLvb61L+xbC6JUz0lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fVoYtMb2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0CFFC4CED6;
-	Tue,  7 Jan 2025 21:55:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736286943;
-	bh=jtmnWEARWEmD43FDdt9F+BHYo1jphXJeqPvu4IFcjkY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fVoYtMb2lHtH0/uYJDLRVOiHAMjmdE1b0iUlXhpMQ15n/SMSqRrR2b004IrUwheGd
-	 qyg/hyC8QZCOGZiFjr7cqJbGvUlmoiZqKKxdy2QLY89ciGs725kz8Z6DVGldgvIgo2
-	 vBRB4/f3lXTMCi61aD3GVtFioYTbZ6zw+DYSgebyZ08eaBZ6L+tC4/YN+1uAwNmzzp
-	 I/xDuStj50j3hR7Ix/3kN61S6MtMPpJvyqwDAej80IYiUHvriyNTMaNaHF+nURV6dn
-	 tLW0z2PzXTDJ7+Q4oTJb0KM/6gBR9Jps2zWosoX5ftn+N/yiy5I1ce9fdw6+UzC018
-	 ksBbCeT5r4wHg==
-Date: Tue, 7 Jan 2025 22:55:40 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, nbd@nbd.name,
-	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next 0/4] net: airoha: Add Qdisc offload support
-Message-ID: <Z32i3EGrLfE2OlLN@lore-desk>
-References: <20250103-airoha-en7581-qdisc-offload-v1-0-608a23fa65d5@kernel.org>
- <173625003251.4120801.586359106755098449.git-patchwork-notify@kernel.org>
- <CAKa-r6v0bEjQfbSG75E9kV1Qki-5eAbrqiy2maB2iG2O4Wf5Xw@mail.gmail.com>
+	s=arc-20240116; t=1736287129; c=relaxed/simple;
+	bh=as/Ajqfmjj/jLkUv/FaMfZLZP/D8FmfdAhkBkS7tB9A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z++mwyZOl9GQKvJcgv/SV+zKblGyg5nR8yiBjb4YxSkLSIhsGJes5xNtDtB0ER3yu1v4YzLekLq2wFu6LLGgCgA4E6ZiXAVtyhQXnBtMDyVteNNmESvHrRst/a6UBLrlYImFmEnvOW9vVtpKxdaGWYOgTJUqowZnmRCiDUSUC1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=W7WJrR/9; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=as/Ajqfmjj/jLkUv/FaMfZLZP/D8FmfdAhkBkS7tB9A=; t=1736287127; x=1737151127; 
+	b=W7WJrR/9ZfjQKcGQWdC0G43ZXHiMk6h1O+HIPDo79DYgrwKZymK7dBtUeXWNlLx6vmtymFBMw/U
+	tkNoRyRrq2z+1T/oH5J89hSVC/bPXsgr5jdV1OKPKEGAwhr56uleWUJsjueP3AR1mDLS3LZoj1XqZ
+	q/P4tLykQihG+fnO4VvECac3Mk2ZU+d0TSasYfBbK+gLm1S0yTR4820TuJ0zZiCN6blqemCUcSk+/
+	UdxlMIDG+5oDOueVgPVeiSQfuUiwS0rJt1H+hMeOPFGGYNpHbV5sB1INja+DaUfZ53eW1zrSoqfRu
+	a35tOTph4laCUMW5tXtFnGozWHcsR6N/ySEw==;
+Received: from mail-ot1-f49.google.com ([209.85.210.49]:52528)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tVHb3-0006JN-4s
+	for netdev@vger.kernel.org; Tue, 07 Jan 2025 13:58:46 -0800
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-71e36b27b53so8315177a34.1
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 13:58:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW+uV7ssd8pgeypK7RK8lvNZyxmEt87CKlA+HfNj1abu7FCyxYjzJO7T37xsoPJozdixy+1urA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfXbXKkmIH6xu349uloxquEQ7rSGzdLEUd5+2shRXOW0IoBnwM
+	/+L46SOzGBbDEU1WfnZ0aEBHg+lyfDNQFmJkMXNSx3PZnksspyHvYhhcD15uDdDCuawGGmII7Dk
+	fnjTbE7k4mnRsAzz1XcnJzQgXtv8=
+X-Google-Smtp-Source: AGHT+IFQiv81HUHyWFW5sJzxoNWLBEeoxHebPoHJrfrgC1maJ2NlHYWMNU8MktMlHF0/Zr6iIefkyVZKG5WjJw1WYSs=
+X-Received: by 2002:a05:6870:e391:b0:254:bd24:de83 with SMTP id
+ 586e51a60fabf-2aa066ed9b9mr294788fac.12.1736287124616; Tue, 07 Jan 2025
+ 13:58:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Rv8LOhYFLOQcML4d"
-Content-Disposition: inline
-In-Reply-To: <CAKa-r6v0bEjQfbSG75E9kV1Qki-5eAbrqiy2maB2iG2O4Wf5Xw@mail.gmail.com>
-
-
---Rv8LOhYFLOQcML4d
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20250106181219.1075-1-ouster@cs.stanford.edu> <20250106181219.1075-7-ouster@cs.stanford.edu>
+ <20250107061510.0adcf6c6@kernel.org> <CAGXJAmz+FVRHXh=CrBcp-T-cLX3+s6BRH7DtBzaoFrpQb1zf9w@mail.gmail.com>
+ <CANn89iJKq=ArBwcKTGb0VcxexvA3d96hm39e75LJLvDhBaXiTw@mail.gmail.com> <20250107132425.27a32652@kernel.org>
+In-Reply-To: <20250107132425.27a32652@kernel.org>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Tue, 7 Jan 2025 13:58:07 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmzt3xypxdM7=6LSQL7rn++mv-033CLcw3LGS0PxCV8d5A@mail.gmail.com>
+X-Gm-Features: AbW1kvZZc4W8axXacDBXA2Fz7mWz66z2jpEAJ14qVpQTGggZToAU_bXIrAvdJ4I
+Message-ID: <CAGXJAmzt3xypxdM7=6LSQL7rn++mv-033CLcw3LGS0PxCV8d5A@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 06/12] net: homa: create homa_peer.h and homa_peer.c
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, pabeni@redhat.com, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 764eb63bb4c91aa8ddbf2de6f9e489d2
 
-> hi,
->=20
-> On Tue, Jan 7, 2025 at 12:40=E2=80=AFPM <patchwork-bot+netdevbpf@kernel.o=
-rg> wrote:
+On Tue, Jan 7, 2025 at 1:24=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Tue, 7 Jan 2025 22:02:25 +0100 Eric Dumazet wrote:
+> > While you are at it, I suggest you test your patch with LOCKDEP enabled=
+,
+> > and CONFIG_DEBUG_ATOMIC_SLEEP=3Dy
 > >
-> > Hello:
-> >
-> > This series was applied to netdev/net-next.git (main)
-> > by Paolo Abeni <pabeni@redhat.com>:
-> >
-> > On Fri, 03 Jan 2025 13:17:01 +0100 you wrote:
-> > > Introduce support for ETS and HTB Qdisc offload available on the Airo=
-ha
-> > > EN7581 ethernet controller.
-> > >
-> > > ---
-> > > Lorenzo Bianconi (4):
-> > >       net: airoha: Enable Tx drop capability for each Tx DMA ring
-> > >       net: airoha: Introduce ndo_select_queue callback
-> > >       net: airoha: Add sched ETS offload support
->=20
-> I was about to comment that ETS offload code probably still lacks
-> validation of priomap [1]. Otherwise every ETS priomap will behave
-> like the one that's implemented in hardware. It can be addressed in a
-> follow-up commit, probably.
+> > Using GFP_KERNEL while BH are blocked is not good.
+>
+> In fact splice all of kernel/configs/debug.config into your
+> testing config.
 
-sorry, I forgot about it. I am fine to enforce priomap if it is required wi=
-th a
-follow-up patch.=20
+Will do. Does "splice" mean anything more than copying
+kernel/configs/debug.config onto the end of my .config file?
 
-Regards,
-Lorenzo
+Is there general advice available on managing multiple configs? Sounds
+like I'll need different configs for development/validation and
+performance testing.
 
->=20
-> thanks,
-> --
-> davide
->=20
-> [1] https://lore.kernel.org/netdev/CAKa-r6shd3+2zgeEzVVJR7fKWdpjKv1YJxS3z=
-+y7QWqDf8zDZQ@mail.gmail.com/
->=20
-
---Rv8LOhYFLOQcML4d
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ32i3AAKCRA6cBh0uS2t
-rIr6AQD7Gjch5GSpHsIaSEqrXwCHjxSHuhrQdfBAepQ5SPB4UgD+Ox/WGqd9I9jr
-x8iG9A7gy4ZsLv9KHdYITc7HfixhugA=
-=ibn2
------END PGP SIGNATURE-----
-
---Rv8LOhYFLOQcML4d--
+-John-
 
