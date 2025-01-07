@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-155741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66066A03861
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 08:07:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E00A03866
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 08:07:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CECF37A2391
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 07:06:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84E063A46F7
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 07:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5E91DFE38;
-	Tue,  7 Jan 2025 07:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611161DB37A;
+	Tue,  7 Jan 2025 07:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dI7slvyT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mr3Zqwxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9731DED45
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 07:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87AF1AAA10
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 07:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736233613; cv=none; b=B/81ukVXLaBNqCRkb54EbLHLth7HY1MCGBa1NQGkEsHv2cj8EvFXssTz88q65ZxW14/CHFUG2HdrStEa5+zY0J4x3inTVpcevcBi/DQsovyWA3VO5Z+vnGUAJ8H00697SbcoJSKWtCqKLscv1BWJ0bVwL5UEuOvZiiXlYiLbDg0=
+	t=1736233654; cv=none; b=dT3QOtKJRXISKVcoQAGEpBNMX94sEhVuTpalrXzAUaBXpeL/gJrae7S/noTmcHmt/i/hds+5aHmdNDhUn1XuhgW1yME8PgcdySwkjgBeJpdYSY6DUBP9OKChc7RSDDnUn4dGQId4DFzymrisZYq6TRaM+5KQvXdtEBLae1XzRYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736233613; c=relaxed/simple;
-	bh=GtfQIbvO49GcETEFYIN0xryMxvlwxXA/CiUe4nMiLkM=;
+	s=arc-20240116; t=1736233654; c=relaxed/simple;
+	bh=5g77gNf6M9CMD2TKdz2wmazi7xk+SBprFO6tU5nw4Ss=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oG1/dQbpsCgSLyQGB8ARpasvI83h4KnEZVrw362FeMy/gg5iAzTIn1ZaYf3wTVw2IWdGtBe3qpDJwSmIC8WowUT40NXOw80UdK2p8XB3YfvV8GUXftgHbRXETRqRNIHghtM5yDox2PT0PKoeii0S/RrWPoMs+S5lxkGnKZt6Q94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dI7slvyT; arc=none smtp.client-ip=209.85.218.45
+	 In-Reply-To:Content-Type; b=s6A/SphSR/TicuWyKI51waUUxWMPYCGYJs1ff5MRVq7uKkRDqYRu5ZdtNusKr3is2TrftMVyrUhlNA3/0BJQUGnLf4zCKKryuiFBseMAQ4a6Dh0CwsQ03mDtNsPlSEQUI+tCoqZqJ36pBc1SBo84RSSFvIiLj4mE6lfJ46XWnJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mr3Zqwxi; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa6c0dbce1fso2125190366b.2
-        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 23:06:51 -0800 (PST)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aaee0b309adso1845953766b.3
+        for <netdev@vger.kernel.org>; Mon, 06 Jan 2025 23:07:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736233610; x=1736838410; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736233651; x=1736838451; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uwn6UZODwYrDf0Fve9lZCKc65thxDgHo8jjFX79RDhI=;
-        b=dI7slvyTx5yJKD48mk8unTygJ+CJwE4ROm82BoWiO39LXISDzwoWmCsoUxGZqh3mOS
-         aHHZvdbOrvWvgV7cmmrGc8xRzcZ/xaJ58MsLqUqMeQDYmfmrd/EvV4kYsh5VWSNtqn8r
-         EwTIAzSpHK5X5F1JyzlmSjHNonzUIZSc12SuNIRu+DE/engLHreCVOfyxzGbp+sxQz9D
-         4lPPYTZCoP4A31nuqXassIgc5tf6n5a7l/JovYb9xaNnHarZppSfYxthUQAaAzmmjdeh
-         KhENgdNnU5ZfauJ095qkJ8dYkvUi3Z5YGnxzWbx44FdslGWqtUIB76ZNDEKAwT76CgAs
-         4pWg==
+        bh=3teatQk70FCcH1xPC03D7K2Ubrz5FX0NvcfI4Yv0TJg=;
+        b=Mr3ZqwxitvSF+iu5My+rA5QQPLitYKz383/mGrV7fzPaWYPpVy1/dAfvVJIBMQrHPM
+         LE2kSBxCq1IcnQna/uKFLCROORFg+uwna/0/l3mOUqQHoYvT5wOOTPqpaEW9CXtSMqp1
+         ppT4mWAWXW5vjVTGWPUTF9FF23wZP7j0y0ghgpnIAzckNb7tHurKYbI9vzaCXlJeqtLY
+         kF9bJ0dk5odaF9SUiURumfavPgbf2SyHfz6RVaGR2Tv5W8zrmNFR97P00EyZn061bZe9
+         9wpIcu8yn+1+WxbMrRLMPhEa8NYffsXeQYW7TRoaxfwK1Qcic5Tn01opAwBHnXfWmuGN
+         Mevw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736233610; x=1736838410;
+        d=1e100.net; s=20230601; t=1736233651; x=1736838451;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Uwn6UZODwYrDf0Fve9lZCKc65thxDgHo8jjFX79RDhI=;
-        b=PnzkBbrMfukdxtcTSDbLPD1+jIAYDHk6Fr6qe20s5KBdCwcCmfHu5ITvMdn4Ic92Bi
-         SIclZcv+BCTSulxS+flf0Vc6Xhdz01yw9clDiP2nTbk7LopBZ4DlEbRBsnMu29wfYiy1
-         z6akMbjAcYuflc8hQyGKITobqNpo2i1IEniocy3a38boQf7vDRAaRgFG63JIdD6+cUDB
-         sClVx+q63Gx7cWB/qyJRm2RJq1SCd8QwwcsVUUNAkiQdzBOHJXPt1272KvSrUSVTj018
-         LiMdd4R1ViW9hFf7TT9kYKHfdt3i59hxyxhY6jDd7sBocC+dvQ87j6Ccr4jd27ukE3KE
-         RCFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXiVMAPGW7Vkx7+COgENkVj5Ejvciixibsof2hLT7YR3bLEg6FERnh93WA90nfJu+NELdhkKZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNLhD/aBJT4ew/ogsERAyvpU4Y8dgKRyD9y+VLdrj87THgB9+v
-	LghbSjNoVaI5MPLLoYXd/tkkOJJoJNQzDtfsN3DAhgzDCbkS7u7H
-X-Gm-Gg: ASbGncuTqKy39eoWddCLZUsBKCNoy4bC9682WwllvBALqes7+FvE20W6RPbDPsb/UnB
-	BgdcFax4Y1RWXpUQQjaqlNiT79hQCqLWGotYnoCJ/HEni9YPCjpvRR75PSOyQSGmvbyU1nB0VkG
-	B/9INj1CDlcaqeVZswZx3756JqlBryPzZcWvGjSvrfSlLPywjYAP8d3z1ekOfdKAyNpe3Wc8pug
-	HJ21GBBN/+SRXMJOIBAZoUinsbBIAdTalUtHhm/TV4AOjitJrwOSjt8nfFwg1d2cKipzLp+NJ9/
-	gzOg19+E6lT+kMTzUEbmFkAVIylFUjfkhbQvK1Z5bDPciCtve+xeGn8C50Cks/zye+zlWZxpsRs
-	sJF1wNlgUXwRbQSN6AQ+DaH7slf4QWmJKfq5OVulYQzMhSA4w
-X-Google-Smtp-Source: AGHT+IHWsE5i++b3gV2jSghm9nOZtS0NS2G/FZMr3ho3ZYQke+9+VgoNl5TtB8L37VHzieKri7Sh5A==
-X-Received: by 2002:a05:6402:2693:b0:5d6:688d:b683 with SMTP id 4fb4d7f45d1cf-5d81dd9c716mr137684881a12.9.1736233610124;
-        Mon, 06 Jan 2025 23:06:50 -0800 (PST)
+        bh=3teatQk70FCcH1xPC03D7K2Ubrz5FX0NvcfI4Yv0TJg=;
+        b=Uo9HpHj529UsSgSKBBbOKwiIXQmO3RO7J+DOSlN+Q48jLHddpX7yGGa6yhtbvA5SIs
+         fAzzbDQeZA0ZY+QPU1gq4OVLbYDXy3OgmKs/QGlPn2lcXrG/ugKXWsXgU7jXozmvkydy
+         mO1K7j2zg95vJk/UnbHEKM2ZMNp4WWVWH2/nTzQovltjbDW88VYeLAKqQLViYuPGNjYq
+         B5Ira49u7xmLsvhQ+fCfc084VpiSw6h1SRLwOkD3fm9S1I8xqGw2+Tqo3i4jDMBOVSAc
+         Hh0r+owUXIxQ8XSgrTQBv23Cb6F0X0+ds1qRyDX5NbvUp/oWk0qbbzxT21/LOnKvhK/C
+         FBsg==
+X-Forwarded-Encrypted: i=1; AJvYcCXF/NAgpcgTF8KiKLsr8shzXTsMMRnzgcjucVCEFkFZp/XnDRfZLjbBB1bKOoz/dXc5J6IYFqY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9bKMzdn/byu+klNcAAkyxW54C1MtJa87gcXW5FqQFvDHVsXmK
+	MjXIK9LprgdIB2i8qQjaYf6k5Ptm6xjPMwRfdIrnCF1jn5ixwzeq
+X-Gm-Gg: ASbGnctS3ixwHsDZuJ2mNosN1QEHamAfRleGHkV0H4ocHSltVlBjRvobPvzUQrhYH8I
+	TZQUZRQ2LJs1UiP8FEJjftbZychaEm3njavFm9ClPdy2worm1f/EAtz2WszFZv+bpDhKTgVWf2X
+	/iEqgEwP0HvnWFjlH3c6RJY7CxC31BYSxZg3s6fsv6+MIYokYge8nwSywiUocbsNDPkF8BN2LUv
+	vuGia5PKkcEHdT0P+RRhgFvlDZHOpmuGyOIGoWLtGrOYedCXsWBAuJOmKfmfYEG9smD0AHGHkHf
+	lFP7HOAC0CbbDBB3wkY/4+C3/3QIIsi7DLCUhJhbSaF++xNYeLLE20J+HVnkQ3GBech5Q3FnhJg
+	vmnIxmzbxhJxIJ03swqZ+wFtubMuW1aXrHjjTQCPqFamPadsW
+X-Google-Smtp-Source: AGHT+IHUkfRcE5uX0SG8kicnFHBcTIwuHPO74EkgqKNeUUhvsfvwGeDnTEaDRNRzK9uNDB0UtLQRHQ==
+X-Received: by 2002:a17:907:3e21:b0:aac:180e:b1d4 with SMTP id a640c23a62f3a-aac2d41d2e2mr4847460266b.27.1736233650609;
+        Mon, 06 Jan 2025 23:07:30 -0800 (PST)
 Received: from ?IPV6:2a02:3100:a00f:1000:151b:257e:13b5:4e14? (dynamic-2a02-3100-a00f-1000-151b-257e-13b5-4e14.310.pool.telefonica.de. [2a02:3100:a00f:1000:151b:257e:13b5:4e14])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aae9c3eb987sm2093825066b.110.2025.01.06.23.06.48
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aac0f0160f8sm2351152766b.168.2025.01.06.23.07.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jan 2025 23:06:49 -0800 (PST)
-Message-ID: <d78ee41f-ca6c-4dd9-8266-c55993ca1313@gmail.com>
-Date: Tue, 7 Jan 2025 08:06:48 +0100
+        Mon, 06 Jan 2025 23:07:29 -0800 (PST)
+Message-ID: <3d248bb7-45a4-428b-9d21-1a537dd35694@gmail.com>
+Date: Tue, 7 Jan 2025 08:07:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,17 +85,15 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net-next 2/2] r8169: add support for reading over-temp
  threshold
-To: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>,
  "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 References: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
  <f3e07026-8219-4b36-b230-7f7ddd71c7ab@gmail.com>
- <4535017c-10a8-47e8-8a8e-67c5db62bb16@lunn.ch>
- <088501b8-1c55-4d20-95b3-ed635865b470@gmail.com>
- <b040f19f-2c26-412e-b074-238e284573aa@lunn.ch>
+ <20250106153032.7def28fc@kernel.org>
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
@@ -141,40 +139,19 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <b040f19f-2c26-412e-b074-238e284573aa@lunn.ch>
+In-Reply-To: <20250106153032.7def28fc@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 07.01.2025 00:16, Andrew Lunn wrote:
->>> Does it reduce the speed in the same way as downshift? Can the user
->>> tell it has happened, other than networking is slower?
->>>
->> It internally disables 2.5G/5G advertisement and triggers an autoneg.
->> So you get the usual message on console/dmesg indicating the new speed.
->> This internal action sets a register bit, and it can also trigger an interrupt.
->> So it should be possible to check in the link_change_notify() callback
->> whether an over-temp event occurred. The silent change of the advertisement
->> may also result in the phylib-cached advertisement being out-of-sync.
->> So we would have to re-sync it. But I didn't fully test this yet.
->>
->> This patch only allows to read the over-temp threshold set as power-on default
->> or by the boot loader. It doesn't change the existing behavior.
+On 07.01.2025 00:30, Jakub Kicinski wrote:
+> On Mon, 6 Jan 2025 19:05:13 +0100 Heiner Kallweit wrote:
+>> Add support for reading the over-temp threshold. If the chip temperature
+>> exceeds this value, the chip will reduce the speed to 1Gbps (by disabling
+>> 2.5G/5G advertisement and triggering a renegotiation).
 > 
-> Thanks for the details. So it does seem to be different to downshift,
-> where generally advertised link modes in the registers is not changed,
-> and the speed indicated in BMSR generally does not indicate the
-> downshifted speed, you need vendor registers to get the actual
-> speed. But downshift happens at link up, not latter when the device
-> starts to overheat.
-> 
-> Does it restore advertisement to 2.5G/5G when it cools down? There is
-> an interesting policy decision here. Do you want 1s downtime very so
-> often as it speeds up and slows down, or should it keep at the slower
-> speed until the user kicks it back up to the higher speed?
-> 
-I will do more testing and provide an update.
+> If there is a v2 -- please make sure hwmon folks are CCed.
+> Looks like get_maintainers doesn't flag it, but since we're charting 
+> a new territory for networking a broader audience may be quite useful.
 
-> 	Andrew
-> 
-Heiner
+OK. No v2 is planned, but there may be follow-up patches.
 
