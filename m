@@ -1,123 +1,93 @@
-Return-Path: <netdev+bounces-156074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DBBAA04DC5
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 00:45:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD62A04DCD
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 00:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB2833A46C3
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:45:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B655A16656A
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B23511F76B0;
-	Tue,  7 Jan 2025 23:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B6A1F7589;
+	Tue,  7 Jan 2025 23:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNpjLy5L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxkOshFX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818D41F669F;
-	Tue,  7 Jan 2025 23:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E43137C2A;
+	Tue,  7 Jan 2025 23:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736293532; cv=none; b=X+vejnr8TCZ6nsRnSIpZzNNs+JZ2ntRsmPbGPzM6VeS6ghQ5jZsLlNyL7tUEYky3GAp1obBk6hfpdBR9DgpmUjHtroHcJUGP4YmdB8KKH7nX/Bd7qE6/3BUcMEZijjzqkkxIvrjU+Ncqs80qSQBjYme/QOupP73kezANvV5tznY=
+	t=1736293609; cv=none; b=ju/1EL2ZOrWP5GY6Ib/s7X6gghYCO8jDytY+/hAAQ7cx6r9q4J9uHFdvY8tdcZ6IUV4aIbaaMgXDcKKCqe9Bmr7aXfllXnvXuItKyzk+SD9nZuaKDKTbraEOMy84jmGNcl0LfbZMXdRTCuf/sgZ15zpavnO9uIBn26Cft/LknB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736293532; c=relaxed/simple;
-	bh=KMQZMLPm3P6M6lY0WhBtsN6MdWsf1Oy4QLUIVcWqmQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=AC/v4vygcvCmimhvHdufEgWQpTm9TXGDZoBWF3itt5xxUVlSDtSwrF1HtqD6KVLQHi4vP1NFv6geAULzRQnTRf1tfcjILJEQVwpmUxIbXDOovdYczDPY4HWr20WrmRE4Yg0iTMJ7/rnUv5AAWznpgYVjDoM7DKk/MqVSPZX/RgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNpjLy5L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEFA5C4CED6;
-	Tue,  7 Jan 2025 23:45:31 +0000 (UTC)
+	s=arc-20240116; t=1736293609; c=relaxed/simple;
+	bh=H5DXgrW8O299sPdFh2ct/MgtvT8tV+YMvP+HGRyOTis=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jDDp8ZD3NXu+H4kBG6S3+p4uWu+WaHaiM19WWfGuDxq37wY/NfZVqCmACKlfkL3Vah91ya/DZj2ODCphc+mRNL7VLnrNeE+Sqrb4wqvG1/HvPMc5dNh63zpFulZREd+EnzvHgrAS3VMjJMgNgcy87AudgKu+AmZUEeqaj9pNlOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxkOshFX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64C62C4CED6;
+	Tue,  7 Jan 2025 23:46:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736293531;
-	bh=KMQZMLPm3P6M6lY0WhBtsN6MdWsf1Oy4QLUIVcWqmQU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=eNpjLy5LIWOqfiaNq+zlY+kKtb0N6c4m1EvBuQkiLg0VyZ6ky/ESQKu92dhbh7FVy
-	 m73l76RPio6M4G4HhL7Q/jJj1CJIzCgYoa5mHacksww/VHfbwhrTYTkP84oS0lHMCv
-	 90MVLTe843n7qkjt/IoYHPqi4ZnDf81M7BtMQwPEOdiZcTL3SWvgRAHyecaEqaBzpm
-	 tWN8OiE30aRtZHhqQqDL6VWw17Q3H+VpNNUVwUsJyV9D6WP7A+StBWDtH9xTPvQDhB
-	 BophdfAQUim4sMBpzxvOSFIS3pFX4v6hgLiU5fiMI8n4ZIvzkb7ths/lTIsUdKipTK
-	 m4dqF80aXWqiQ==
-Date: Tue, 7 Jan 2025 17:45:30 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-	M Chetan Kumar <m.chetan.kumar@intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: wwan: iosm: Fix hibernation by re-binding the
- driver around it
-Message-ID: <20250107234530.GA191158@bhelgaas>
+	s=k20201202; t=1736293608;
+	bh=H5DXgrW8O299sPdFh2ct/MgtvT8tV+YMvP+HGRyOTis=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jxkOshFXr1SFSaawUSmvHiuSVaPH9dq8W4H/cDclg5oZjcHYJbmVUh/hS1KBXyvZP
+	 GQ+lSAVlEdeXhkRS6414oj9w1PAyuL4u4I61GFBjcfSPiPcxiaxfPYhyWU5ockysAX
+	 q/qJObXvEhERAuZcRzUucyKE5eNwB4Te06pHp3dyC8p5RnWwU8QpUddciCcb5sragJ
+	 P+LQ3jVxwSpYBisF0M1WDhKG6MbYqKVbG4mGdN067ph+nG8sIEZX/COSDS2KxBAHFd
+	 IabMfnd7Eq/96UxVxLrhX7r4uYoz6xUbyS5/2qapZ13X68wLp9PU7ZD82zIdog05vE
+	 VVLpcUnV9/KeQ==
+Date: Tue, 7 Jan 2025 15:46:47 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ ronak.doshi@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com,
+ bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] vmxnet3: Adjust maximum Rx ring buffer size
+Message-ID: <20250107154647.4bcbae3c@kernel.org>
+In-Reply-To: <2f127a6d-7fa2-5e99-093f-40ab81ece5b1@atomlin.com>
+References: <20250105213036.288356-1-atomlin@atomlin.com>
+	<20250106154741.23902c1a@kernel.org>
+	<031eafb1-4fa6-4008-92c3-0f6ecec7ce63@broadcom.com>
+	<20250106165732.3310033e@kernel.org>
+	<2f127a6d-7fa2-5e99-093f-40ab81ece5b1@atomlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5ec25117-e0c3-477b-96da-dd2adf870408@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 08, 2025 at 01:13:41AM +0200, Sergey Ryazanov wrote:
-> On 05.01.2025 19:39, Maciej S. Szmigiero wrote:
-> > Currently, the driver is seriously broken with respect to the
-> > hibernation (S4): after image restore the device is back into
-> > IPC_MEM_EXEC_STAGE_BOOT (which AFAIK means bootloader stage) and needs
-> > full re-launch of the rest of its firmware, but the driver restore
-> > handler treats the device as merely sleeping and just sends it a
-> > wake-up command.
-> > 
-> > This wake-up command times out but device nodes (/dev/wwan*) remain
-> > accessible.
-> > However attempting to use them causes the bootloader to crash and
-> > enter IPC_MEM_EXEC_STAGE_CD_READY stage (which apparently means "a crash
-> > dump is ready").
-> > 
-> > It seems that the device cannot be re-initialized from this crashed
-> > stage without toggling some reset pin (on my test platform that's
-> > apparently what the device _RST ACPI method does).
-> > 
-> > While it would theoretically be possible to rewrite the driver to tear
-> > down the whole MUX / IPC layers on hibernation (so the bootloader does
-> > not crash from improper access) and then re-launch the device on
-> > restore this would require significant refactoring of the driver
-> > (believe me, I've tried), since there are quite a few assumptions
-> > hard-coded in the driver about the device never being partially
-> > de-initialized (like channels other than devlink cannot be closed,
-> > for example).
-> > Probably this would also need some programming guide for this hardware.
-> > 
-> > Considering that the driver seems orphaned [1] and other people are
-> > hitting this issue too [2] fix it by simply unbinding the PCI driver
-> > before hibernation and re-binding it after restore, much like
-> > USB_QUIRK_RESET_RESUME does for USB devices that exhibit a similar
-> > problem.
-> > 
-> > Tested on XMM7360 in HP EliteBook 855 G7 both with s2idle (which uses
-> > the existing suspend / resume handlers) and S4 (which uses the new code).
-> > 
-> > [1]: https://lore.kernel.org/all/c248f0b4-2114-4c61-905f-466a786bdebb@leemhuis.info/
-> > [2]:
-> > https://github.com/xmm7360/xmm7360-pci/issues/211#issuecomment-1804139413
-> > 
-> > Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+On Tue, 7 Jan 2025 22:55:38 +0000 (GMT) Aaron Tomlin wrote:
+> On Tue, 7 Jan 2025, Jakub Kicinski wrote:
+> > True, although TBH I don't fully understand why this flag exists
+> > in the first place. Is it just supposed to be catching programming
+> > errors, or is it due to potential DoS implications of users triggering
+> > large allocations?  
 > 
-> Generally looks good to me. Lets wait for approval from PCI maintainers to
-> be sure that there no unexpected side effects.
+> Jakub,
+> 
+> I suspect that introducing __GFP_NOWARN would mask the issue, no?
+> I think the warning was useful. Otherwise it would be rather difficult to
+> establish precisely why the Rx Data ring was disable. In this particular
+> case, if I understand correctly, the intended size of the Rx Data ring was
+> simply too large due to the size of the maximum supported Rx Data buffer.
 
-I have nothing useful to contribute here.  Seems like kind of a mess.
-But Intel claims to maintain this, so it would be nice if they would
-step up and make this work nicely.
+This is a bit of a weird driver. But we should distinguish the default
+ring size, which yes, should not be too large, and max ring size which
+can be large but user setting a large size risks the fact the
+allocations will fail and device will not open.
 
-Bjorn
+This driver seems to read the default size from the hypervisor, is that
+the value that is too large in your case? Maybe we should min() it with
+something reasonable? The max allowed to be set via ethtool can remain
+high IMO
 
