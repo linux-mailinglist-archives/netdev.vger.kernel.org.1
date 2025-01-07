@@ -1,172 +1,197 @@
-Return-Path: <netdev+bounces-156059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4830A04C8C
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:43:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C550BA04CA7
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:53:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A2803A5A63
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:43:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2102A3A3607
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0519A1D5151;
-	Tue,  7 Jan 2025 22:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750E11AAA1D;
+	Tue,  7 Jan 2025 22:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d/O/O8qL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q69Qprwq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724AF190664;
-	Tue,  7 Jan 2025 22:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D6619D093
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 22:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736289783; cv=none; b=av44Ub958FclJ8rD0vS0EGR7+slNlJgBY5gx5ybAqWP/D2A1AOIUdAREJX/7ujj897ASf2KltHJUv/NQrlhXwxMYkRUJD5A8BV1HzBYaV+LlifwaFMf+KNrbIhbDctTBqnk0S/Akj/hS2/z/erx5jkKApflgGslNSK3YSBEWusw=
+	t=1736290404; cv=none; b=EwTucJpFzZ+c8s0nXV0uNl30278QBpbHsAjxJ+czsaKdhKWa6Q3rTeHN2fzJ65zP8R1sSmifHFAnGz57RB+nvAwgCk2FhMNeJyYoAHXuzpv9qU2jch9KIHPejee9Rt8WpCF5pg0kfOOZLp/0eZfbMxtqWYG57qr6BzZxmGuIsEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736289783; c=relaxed/simple;
-	bh=haT46X4tq5ydqbQTTTwqpHw0sbj/QsmJHW57ObyBcUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BYf5NNTm0OdQqd1lJG3UZGSC3a8peSGwlKeJYwL2MlusTeAK0AYLLy0WUMqeVrOJDFuJKIMrgzbRrcAnRr6kx34BK55zyZ5NvDezPpQdMQZZUHbG5gZvIPKvVI17ohP8pJCpKVIDIeXge2mPPjHa9i2Dpfk4wgGcGQ0BT+fsBK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d/O/O8qL; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2161eb94cceso167751065ad.2;
-        Tue, 07 Jan 2025 14:43:02 -0800 (PST)
+	s=arc-20240116; t=1736290404; c=relaxed/simple;
+	bh=N7/gGRjaatpgQl7P5dYkrNr+Tj0IdmEvPzPvEZcNpWM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nWHZCv2mJaW+rSLS0m8vSwSUyTp5fmScJTmlv6uem1VfADLOk8JAeY8wBXzjPY2b9hOPbtshCe0gaUqTNhSKh6Cct+gOJTMkZBzE2Rl/ZtqnR/ef74++wvB4omCoFvOeK9XDMmMjHCVQK67ThllH7hgXqJ30lU+fLaze/7NwcsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q69Qprwq; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-467896541e1so85011cf.0
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 14:53:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736289781; x=1736894581; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RTsDxbyrO38CBtnrx7tweqDOP5VEWORZ2f515i1af/s=;
-        b=d/O/O8qL6eOdXEss+K9LiNQLaJpm4kikXJbxwsLl/pqxdwBfpaflP7l6VHYCfm5U/f
-         8qtIo3Je8Z0Xs+3xHi4gkZy2roobegkeRnGE1wvoXypk8S1MOfyLxiQN5dUfSbsQ4glL
-         GtADXfsjV5J6rcDaOGgibaLwGZVWODGzargC7dsQmdxxw0sDFaY/5EEd0+CJYHmfkIsp
-         PXSGunWcPXkIx67DHPHrWIO9bM6Ow9BDliqoBnRGrkZNNdUyLLq+2PtREICKY3twhcFs
-         b/JNJKBxAAfY2hIWXo19tu7svxgix0Xigu/wjXdpDbHX7cgSvKx9W0wpOfzMjsYeecXw
-         mUcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736289781; x=1736894581;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1736290402; x=1736895202; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RTsDxbyrO38CBtnrx7tweqDOP5VEWORZ2f515i1af/s=;
-        b=iVZPhYLHsikJOeWk0dDCHAjp41GhuOaeprALwwHQLxAzHVLEdL97m8SZRYE4RbaJU6
-         WcdvYU3z8W0Mlc2HfYmMY+LRLldf6/sKqg98swylb63lSTs16Hd0JFWknbmxWjHWFXea
-         OeBEW7JgCUNhFQx5aWeV285SabOdQ0r4tfo2N1/Uji/EArLt68crs07ntp0pLO07yOvc
-         +uW+juGjNLH0rfZtVS+ZSdgavbfdfdnRJafSSZIuHRaUt1567b0UZVpKRcymDd/4N8y3
-         9h+j/HZO7T6gsdZ9ruErQFT0MU6Z+9gIAvHiIB20eJx/8DVJJuLXGReiie+RtsJJOivt
-         0Ljw==
-X-Forwarded-Encrypted: i=1; AJvYcCWkOZv91C7oOIvDfH73sTjj6K0zN9zVTykZ1nFZQJioHs02azCXPwXvmnBpH9RxCb6zKp/2u5I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxG+/wg/D0SyQDnhy6uWkIzL4dmbnCvFnE8v7ytebRy5TnrJAeY
-	qZXaMCiZdxtJtqjU1C3Acw4+W49cshbvNYpN4/IJzbedxm1qOm4r
-X-Gm-Gg: ASbGnctZi75ztR3RkqCrhAgNROhgeOI5UHEbECl7wryGo8FTUq86WiXs5eEoW4TZSx/
-	yahm++7oNhuq5C6IMI4Tkl8qA6ArnAHMolcLaO9eQVH7m8V8Kr6VgSuJPE1qSd6eLIvu6Emlk95
-	h71UpFspYXGkTRsaC5QlXAYd4hm0JHZXPJN3IP0FFaNLL2G975+bPlg63kuqz+4mFcQgD7FWQ9J
-	vsxXAU5c8f5dsZ1qrElNBoTO4wBw++RPdiD3+71cgWXfhQJEdcPawiM
-X-Google-Smtp-Source: AGHT+IGMNrHmKwHtJMQIeetE11mIavkI1sE71c5XVHpznlNl8Dj/rgoyz/Ujkb+Fu75xPqH/4BOviA==
-X-Received: by 2002:a05:6a00:928c:b0:727:3935:dc83 with SMTP id d2e1a72fcca58-72d21fb1e07mr890974b3a.10.1736289781449;
-        Tue, 07 Jan 2025 14:43:01 -0800 (PST)
-Received: from localhost ([216.228.125.131])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8dbbebsm33903786b3a.114.2025.01.07.14.43.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 14:43:00 -0800 (PST)
-Date: Tue, 7 Jan 2025 14:42:59 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Nick Child <nnac123@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: Re: [PATCH 03/14] ibmvnic: simplify ibmvnic_set_queue_affinity()
-Message-ID: <Z32t88W3biaZa7fH@yury-ThinkPad>
-References: <20241228184949.31582-1-yury.norov@gmail.com>
- <20241228184949.31582-4-yury.norov@gmail.com>
- <Z32sncx9K4iFLsJN@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
+        bh=7x8xyVpSwrKW63fGDZJRBlcwuzW5LQDO44aw1NunmKs=;
+        b=q69Qprwq6BTBm6QdLmX1sUpPm1dSKPzBk0u8cMy9/Zue1GK+d7HnoKtbxc4luTUS8g
+         Z5WVrzj8sWTLn5FsrAIrRDZjUVmiNzWE7G6hhnmiwVA0QgfUMP8BPJ0GqbO4QuVA1vrU
+         PN4qu+PdZxGB5h1iw/mcrrO0ZZ0141QCpK6bEmUa0Aq3jHlSN6MOMsOsUwo8OFog09HH
+         zrVgpAdWStaUNsnAwZsxb0hsEFM35aTWJXUh4/GjwgmXzExL0jQym5V1xXQtFNvHzcX9
+         Q/dZhi5ZDr5vfUVDHMZhNVpB1nAFkp3Uhv71Upo83nJ4YRFZmizdtBBGqWmCeVX9NXf/
+         xXdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736290402; x=1736895202;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7x8xyVpSwrKW63fGDZJRBlcwuzW5LQDO44aw1NunmKs=;
+        b=l0z6j5R2XzjyNpsS4/hTQWmucZu3v4KNmcmiTZKwFpWu6a3NLU2+zq+ujU9Ekk8N49
+         jPin4yjaD91CAgkD2RejcM9ZD6CapEJ4KgeQPdRDE2S2C924aV3GCXPXD3H1SkqKC5jZ
+         hSkr65RK9++UuHj3Wvt1mK7juTixz0MI9Pls9oEg6FmPv4sZw0DUfRtBFxX5A+OPp/CI
+         iY2M45bsZLZszkd9saMdOO7nhE0yJX8qaFZ8/uQJu/ITNbPRIAQxMNoGlHFDOeyObJ0l
+         vQXYcuugImPb1cZoDD2+FXM+hvjm9/S/kFHKQ+Rw/RKacJ/A3tnUiqeo/0pKn5CB74zn
+         Ll/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUP1nBd6OA0Evjzu3g7O+cLygE2AKsHdbdzT2dfSJFUXB0xABGSVsesJNR0+2VP8cHFCnermaU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0jizvxrmk3X3+A4VDlaD3pZoQtWwk2LN8rY13reyXBYwNCRRb
+	G06ed1HBY0/xxnq1bs8GowsEt6SZK1Ot09DgwAjtbEFqBWuLTp+rIYCmbLEYKX2jwSQ1wPJp9qq
+	eq6sfW7lB6NuYlEdnoI3LFEkWreC+wVyBHNrG
+X-Gm-Gg: ASbGncumfCCS/Fje020vj0T9mxnlIGMpvy3C8/ogab5q7RRJ11sdVEAPByIx8o4xAH1
+	8tAOLNrJ7AssE6SMvKvVwKmocLwp8v4meB0S6834gL0K8q8ZQ3KwMHRNnmr8V1x1YHcQ=
+X-Google-Smtp-Source: AGHT+IHRV5UvIywiz71bjRtbUbXNSW9In7DyHjxzqQ6fXpIrRGgYoTHl0VhOitrUMAsY+p+exFQ6Q1XgEngMnJDxpFs=
+X-Received: by 2002:ac8:7f82:0:b0:460:f093:f259 with SMTP id
+ d75a77b69052e-46c70cb67c0mr971421cf.22.1736290401502; Tue, 07 Jan 2025
+ 14:53:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z32sncx9K4iFLsJN@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
+References: <20250107160846.2223263-1-kuba@kernel.org> <20250107160846.2223263-7-kuba@kernel.org>
+In-Reply-To: <20250107160846.2223263-7-kuba@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 7 Jan 2025 14:53:09 -0800
+X-Gm-Features: AbW1kvYg62U6lsw0tPRJUJIqSSugacH4112PpQ26Hw9ywOUc0K8311kJjofEtQA
+Message-ID: <CAHS8izO3FWZ6Wgnf0jwHLo8xDczz1zmCq_ypXRAWijYuxUY0MA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 6/8] netdevsim: add queue management API support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	willemdebruijn.kernel@gmail.com, sdf@fomichev.me, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 07, 2025 at 04:37:17PM -0600, Nick Child wrote:
-> On Sat, Dec 28, 2024 at 10:49:35AM -0800, Yury Norov wrote:
-> > A loop based on cpumask_next_wrap() opencodes the dedicated macro
-> > for_each_online_cpu_wrap(). Using the macro allows to avoid setting
-> > bits affinity mask more than once when stride >= num_online_cpus.
-> > 
-> > This also helps to drop cpumask handling code in the caller function.
-> > 
-> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> > ---
-> >  drivers/net/ethernet/ibm/ibmvnic.c | 17 ++++++++++-------
-> >  1 file changed, 10 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-> > index e95ae0d39948..4cfd90fb206b 100644
-> > --- a/drivers/net/ethernet/ibm/ibmvnic.c
-> > +++ b/drivers/net/ethernet/ibm/ibmvnic.c
-> > @@ -234,11 +234,16 @@ static int ibmvnic_set_queue_affinity(struct ibmvnic_sub_crq_queue *queue,
-> >  		(*stragglers)--;
-> >  	}
-> >  	/* atomic write is safer than writing bit by bit directly */
-> > -	for (i = 0; i < stride; i++) {
-> > -		cpumask_set_cpu(*cpu, mask);
-> > -		*cpu = cpumask_next_wrap(*cpu, cpu_online_mask,
-> > -					 nr_cpu_ids, false);
-> > +	for_each_online_cpu_wrap(i, *cpu) {
-> > +		if (!stride--)
-> > +			break;
-> > +		cpumask_set_cpu(i, mask);
-> >  	}
-> > +
-> > +	/* For the next queue we start from the first unused CPU in this queue */
-> > +	if (i < nr_cpu_ids)
-> > +		*cpu = i + 1;
-> > +
-> This should read '*cpu = i'. Since the loop breaks after incrementing i.
-> Thanks!
+On Tue, Jan 7, 2025 at 8:11=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> Add queue management API support. We need a way to reset queues
+> to test NAPI reordering, the queue management API provides a
+> handy scaffolding for that.
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-cpumask_next_wrap() makes '+ 1' for you. The for_each_cpu_wrap() starts
-exactly where you point. So, this '+1' needs to be explicit now.
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-Does that make sense?
+> ---
+> v2:
+>  - don't null-check page pool before page_pool_destroy()
+>  - controled -> controlled
+> ---
+>  drivers/net/netdevsim/netdev.c    | 134 +++++++++++++++++++++++++++---
+>  drivers/net/netdevsim/netdevsim.h |   2 +
+>  2 files changed, 124 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netde=
+v.c
+> index 7b80796dbe26..cfb079a34532 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -359,25 +359,24 @@ static int nsim_poll(struct napi_struct *napi, int =
+budget)
+>         return done;
+>  }
+>
+> -static int nsim_create_page_pool(struct nsim_rq *rq)
+> +static int nsim_create_page_pool(struct page_pool **p, struct napi_struc=
+t *napi)
+>  {
+> -       struct page_pool_params p =3D {
+> +       struct page_pool_params params =3D {
+>                 .order =3D 0,
+>                 .pool_size =3D NSIM_RING_SIZE,
+>                 .nid =3D NUMA_NO_NODE,
+> -               .dev =3D &rq->napi.dev->dev,
+> -               .napi =3D &rq->napi,
+> +               .dev =3D &napi->dev->dev,
+> +               .napi =3D napi,
+>                 .dma_dir =3D DMA_BIDIRECTIONAL,
+> -               .netdev =3D rq->napi.dev,
+> +               .netdev =3D napi->dev,
+>         };
+> +       struct page_pool *pool;
+>
+> -       rq->page_pool =3D page_pool_create(&p);
+> -       if (IS_ERR(rq->page_pool)) {
+> -               int err =3D PTR_ERR(rq->page_pool);
+> +       pool =3D page_pool_create(&params);
+> +       if (IS_ERR(pool))
+> +               return PTR_ERR(pool);
+>
+> -               rq->page_pool =3D NULL;
+> -               return err;
+> -       }
+> +       *p =3D pool;
+>         return 0;
+>  }
+>
+> @@ -396,7 +395,7 @@ static int nsim_init_napi(struct netdevsim *ns)
+>         for (i =3D 0; i < dev->num_rx_queues; i++) {
+>                 rq =3D ns->rq[i];
+>
+> -               err =3D nsim_create_page_pool(rq);
+> +               err =3D nsim_create_page_pool(&rq->page_pool, &rq->napi);
+>                 if (err)
+>                         goto err_pp_destroy;
+>         }
+> @@ -613,6 +612,116 @@ static void nsim_queue_free(struct nsim_rq *rq)
+>         kfree(rq);
+>  }
+>
+> +/* Queue reset mode is controlled by ns->rq_reset_mode.
+> + * - normal - new NAPI new pool (old NAPI enabled when new added)
 
-> 
-> >  	/* set queue affinity mask */
-> >  	cpumask_copy(queue->affinity_mask, mask);
-> >  	rc = irq_set_affinity_and_hint(queue->irq, queue->affinity_mask);
-> > @@ -256,7 +261,7 @@ static void ibmvnic_set_affinity(struct ibmvnic_adapter *adapter)
-> >  	int num_rxqs = adapter->num_active_rx_scrqs, i_rxqs = 0;
-> >  	int num_txqs = adapter->num_active_tx_scrqs, i_txqs = 0;
-> >  	int total_queues, stride, stragglers, i;
-> > -	unsigned int num_cpu, cpu;
-> > +	unsigned int num_cpu, cpu = 0;
-> >  	bool is_rx_queue;
-> >  	int rc = 0;
-> >  
-> > @@ -274,8 +279,6 @@ static void ibmvnic_set_affinity(struct ibmvnic_adapter *adapter)
-> >  	stride = max_t(int, num_cpu / total_queues, 1);
-> >  	/* number of leftover cpu's */
-> >  	stragglers = num_cpu >= total_queues ? num_cpu % total_queues : 0;
-> > -	/* next available cpu to assign irq to */
-> > -	cpu = cpumask_next(-1, cpu_online_mask);
-> >  
-> >  	for (i = 0; i < total_queues; i++) {
-> >  		is_rx_queue = false;
-> > -- 
-> > 2.43.0
-> > 
+Nit, probably not worth a respin: Normal seems to me to delete old
+napi after the new one is added and enabled.
+
+queue stop -> napi_disable(old)
+queue alloc -> netif_napi_add_config(new)
+queue start -> napi_enable(new)
+queue free -> netif_napi_del(old)
+
+> + * - mode 1 - allocate new pool (NAPI is only disabled / enabled)
+> + * - mode 2 - new NAPI new pool (old NAPI removed before new added)
+> + * - mode 3 - new NAPI new pool (old NAPI disabled when new added)
+> + */
+
+Which modes are 'correct' for a driver to implement? 2/3 is for
+testing only, as you note in the code, the add/del functions should
+really be called from alloc/free and not from queue_start. I assume
+modes normal and 1 are both correct implementations of the queue API
+and the driver gets to pick whether to reuse the napi instance or not?
+Asking because IIRC GVE implements mode 1, not what you consider
+'normal'.
+
+
+--
+Thanks,
+Mina
 
