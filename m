@@ -1,73 +1,75 @@
-Return-Path: <netdev+bounces-155940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44760A04635
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:29:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6975A0464B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:30:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77C6B165EB2
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:29:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D522A7A2228
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F65C1F427B;
-	Tue,  7 Jan 2025 16:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CB21F4736;
+	Tue,  7 Jan 2025 16:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Sionutgc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LdCvTKl2"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20771F543B
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CB91F76DF
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:28:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736267272; cv=none; b=Agy79/aRwK73VFFb3dI3JF3NXTw0urXASULlDe3/vl0Rd/7yyw90QDyJULRMTDEyNwEM79Ie7AwfcRyiPYlXEwVT9EddF2dwkWgdJsYIt4sugrrLx96S0r7QD6r5PYdzuiJBL8ojqpayplfvph64xTVemBgilxt6hp++0g2Wym8=
+	t=1736267298; cv=none; b=KIRxTQdwfr1fcp5OlhQ8RkY7YRxilLcYBU4uIR3LHJ0+EVlo4e0IIg276qGQc2afvUnXHbr2iZn3sHMkoWZVktWY8rkvrWiPCUdGgXZaufpknE4CGVXuwHw0S3tV0/pOFNnf/5esZljeY8kpsQxv+kRzsIIkB9u6C2FrDO+rOIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736267272; c=relaxed/simple;
-	bh=YoYXD02YX4yWFNJajkmzkgjL7Jy+F0+0VvGdXsxg7Ug=;
+	s=arc-20240116; t=1736267298; c=relaxed/simple;
+	bh=D78ycDc0GJSDzjMxkMcR0mWhHo7fjIfKpgWtS/LY+8M=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZiHjZ6Dsro4XfhK9EAyx8nAj+rQPbOzpYZyejteWqyCl+nMO+79HuZhJFm9lu8p7oHppL2jsHV+z8ebYr/4sRhzNhydtmjXRpE7cx8OvKcXmUgsAE+4qTyNZ4HCgM5ehtgoKf6zWADcHs6wHCFkg3TlbbZcdV7zhfXdssxbH6jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Sionutgc; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=LCQNSFiJK1wVazMzeWrjqKUTHSmNi8tCis8dxNj946c=; b=SionutgcYLBpSakb3Cg5cRHkim
-	XWOzzJ1X3g+pMun4svccxMgbPUUkorGKVwtWDx62uhyEMGseNEgrbmkTtbBYXo5uxqnLGanB33K3Q
-	hgEmFJRIsqoIB3iXFpAviFuVJjABuwKqEqAAV+z6yIS7/VovlKMaIUaqoM7pZLq51pAwKaUsv0MBk
-	dAo7uosD1hzkLoHkazEkENKbbGWxgkJyAazi2pZ5EFE+aOc96t4SRZPZM806USn7Cz/TW4nKIxamj
-	Xpq2R2tA2yDHAPs35ro+jzkbz9XqhCVtLM7LtKNRcapunTPEAyh/30oTzidagYKHMspgNPYgiZMH7
-	uEcBsfVw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48338)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tVCQa-0007kS-1Y;
-	Tue, 07 Jan 2025 16:27:36 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tVCQW-0005Qn-19;
-	Tue, 07 Jan 2025 16:27:32 +0000
-Date: Tue, 7 Jan 2025 16:27:32 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v3 00/18] net: stmmac: clean up and fix EEE
- implementation
-Message-ID: <Z31V9O8SATRbu2L3@shell.armlinux.org.uk>
+	 Content-Disposition:In-Reply-To; b=WKd/SwBoAuZn2Z4v81RcmcgEE1looGGpCN73q8uYOZBeBQ1JBJGKOqZ4zBwzUHVNzSstodTq3tmLmWDm8GgKRQFcgIraPqKaLAuQzRBDFiC3/B5NDjpApLtzMLXpszKtu29E03kd2lgwQngPpYy6k7gxTJr5Y6ZX2p9DEIMr1G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LdCvTKl2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736267294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=tqnBBbQoUY3GF4Dg2U11xguk1LdJlHU1RyqHwXPwrJE=;
+	b=LdCvTKl2IHPLc4iyNqlVklemMIr7TpSqRxMJYHv9wFwJOdAQskmfx3muX7J5vSe9gykITP
+	PS6vsmmrNIQTfAmTVTmRD2E8dtk4BopMzIB18qNI61W2VO42sv7rZ1jEiHYLnNmWozqpjW
+	ykObZgEW+0uzGmPWpPyFaySPFOTWwrE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-682-l6jgmbfNP5Cnuudsv6Q33Q-1; Tue,
+ 07 Jan 2025 11:28:09 -0500
+X-MC-Unique: l6jgmbfNP5Cnuudsv6Q33Q-1
+X-Mimecast-MFC-AGG-ID: l6jgmbfNP5Cnuudsv6Q33Q
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B471B1955E9F;
+	Tue,  7 Jan 2025 16:28:06 +0000 (UTC)
+Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.226.23])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 3E3881956088;
+	Tue,  7 Jan 2025 16:28:01 +0000 (UTC)
+Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Tue,  7 Jan 2025 17:27:42 +0100 (CET)
+Date: Tue, 7 Jan 2025 17:27:36 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Christian Brauner <brauner@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Manfred Spraul <manfred@colorfullife.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	WangYuli <wangyuli@uniontech.com>, linux-kernel@vger.kernel.org,
+	io-uring@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH 4/5] sock_poll_wait: kill the no longer necessary barrier
+ after poll_wait()
+Message-ID: <20250107162736.GA18944@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,94 +78,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250107162649.GA18886@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Hi,
+Now that poll_wait() provides a full barrier we can remove smp_mb() from
+sock_poll_wait().
 
-This is a rework of stmmac's EEE support in light of the addition of EEE
-management to phylib. It's slightly more than 15 patches, but I think it
-makes sense to be so.
+Also, the poll_does_not_wait() check before poll_wait() just adds the
+unnecessary confusion, kill it. poll_wait() does the same "p && p->_qproc"
+check.
 
-Patch 1 adds configuration of the receive clock phy_eee_rx_clock_stop()
-(which was part of another series, but is necessary for this patch set.)
+Signed-off-by: Oleg Nesterov <oleg@redhat.com>
+---
+ include/net/sock.h | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-Patch 2 converts stmmac to use phylib's tracking of tx_lpi_timer.
-
-Patch 3 corrects the data type used for things involving the LPI
-timer. The user API uses u32, so stmmac should do too, rather than
-blindly converting it to "int". eee_timer is left for patch 4.
-
-Patch 4 (new) uses an unsigned int for eee_timer.
-
-Patch 5 makes stmmac EEE state depend on phylib's enable_tx_lpi flag,
-thus using phylib's resolution of EEE state.
-
-Patch 6 removes redundant code from the ethtool EEE operations.
-
-Patch 7 removes some redundant code in stmmac_disable_eee_mode()
-and renames it to stmmac_disable_sw_eee_mode() to better reflect its
-purpose.
-
-Patch 8 removes the driver private tx_lpi_enabled, which is managed by
-phylib since patch 4.
-
-Patch 9 removes the dependence of EEE error statistics on the EEE
-enable state, instead depending on whether EEE is supported by the
-hardware.
-
-Patch 10 removes phy_init_eee(), instead using phy_eee_rx_clock_stop()
-to configure whether the PHY may stop the receive clock.
-
-Patch 11 removes priv->eee_tw_timer, which is only ever set to one
-value at probe time, effectively it is a constant. Hence this is
-unnecessary complexity.
-
-Patch 12 moves priv->eee_enabled into stmmac_eee_init(), and placing
-it under the protection of priv->lock, except when EEE is not
-supported (where it becomes constant-false.)
-
-Patch 13 moves priv->eee_active also into stmmac_eee_init(), so
-the indication whether EEE should be enabled or not is passed in
-to this function.
-
-Since both priv->eee_enabled and priv->eee_active are assigned
-true/false values, they should be typed "bool". Make it sew in
-patch 14. No Singer machine required.
-
-Patch 15 moves the initialisation of priv->eee_ctrl_timer to the
-probe function - it makes no sense to re-initialise the timer each
-time we want to start using it.
-
-Patch 16 removes the unnecessary EEE handling in the driver tear-down
-method. The core net code will have brought the interface down
-already, meaning EEE has already been disabled.
-
-Patch 17 reorganises the code to split the hardware LPI timer
-control paths from the software LPI timer paths.
-
-Patch 18 works on this further by eliminating
-stmmac_lpi_entry_timer_config() and making direct calls to the new
-functions. This reveals a potential bug where priv->eee_sw_timer_en
-is set true when EEE is disabled. This is not addressed in this
-series, but will be in a future separate patch - so that if fixing
-that causes a regression, it can be handled separately.
-
- drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |   4 +-
- drivers/net/ethernet/stmicro/stmmac/hwif.h         |   2 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac.h       |  10 +-
- .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   |  25 +----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 103 +++++++++++----------
- drivers/net/phy/phy.c                              |  27 +++++-
- include/linux/phy.h                                |   1 +
- 7 files changed, 85 insertions(+), 87 deletions(-)
-
-Changes in v3:
-- fix kerneldoc issue in old patch 12.
-- add Andrew's r-bs.
-- split eee_timer from other u32 conversions, remove check for
-  negative eee_timer.
-
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 7464e9f9f47c..305f3ae5edc2 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2291,7 +2291,7 @@ static inline bool skwq_has_sleeper(struct socket_wq *wq)
+ }
+ 
+ /**
+- * sock_poll_wait - place memory barrier behind the poll_wait call.
++ * sock_poll_wait - wrapper for the poll_wait call.
+  * @filp:           file
+  * @sock:           socket to wait on
+  * @p:              poll_table
+@@ -2301,15 +2301,12 @@ static inline bool skwq_has_sleeper(struct socket_wq *wq)
+ static inline void sock_poll_wait(struct file *filp, struct socket *sock,
+ 				  poll_table *p)
+ {
+-	if (!poll_does_not_wait(p)) {
+-		poll_wait(filp, &sock->wq.wait, p);
+-		/* We need to be sure we are in sync with the
+-		 * socket flags modification.
+-		 *
+-		 * This memory barrier is paired in the wq_has_sleeper.
+-		 */
+-		smp_mb();
+-	}
++	/* Provides a barrier we need to be sure we are in sync
++	 * with the socket flags modification.
++	 *
++	 * This memory barrier is paired in the wq_has_sleeper.
++	 */
++	poll_wait(filp, &sock->wq.wait, p);
+ }
+ 
+ static inline void skb_set_hash_from_sk(struct sk_buff *skb, struct sock *sk)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1.362.g51ebf55
+
 
