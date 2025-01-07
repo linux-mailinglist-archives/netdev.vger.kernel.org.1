@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-155796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4ABA03CDC
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:48:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16FCBA03CDF
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:48:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 927A61885287
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:48:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7876E1881A2E
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AC01EBFFF;
-	Tue,  7 Jan 2025 10:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFDD1EF0AE;
+	Tue,  7 Jan 2025 10:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Y3p+lyq2"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="AbQkdTNX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF5F1EF08D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7823198E78;
 	Tue,  7 Jan 2025 10:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736246844; cv=none; b=d82ohJH9GUwD2KSJ6sBYuVn4VF7xcqPLxgUgp43Dk9NetoyIiz/YjEve1DCwZoL7h1V23qNhKzMGhqhNX9Rm+Fu+bUOWPfADdaPBrQJpQ1Uryswoq9rtQQPOxRdUcZXNTf3ZIhCSQnuhZ8V2ujIbpdEkEqYo7aMn/CQw7uuAmF0=
+	t=1736246846; cv=none; b=TE9bWkUm3rt28hkX61RAxXLuKmaZ0gmTN9cSJ4ekpdq4uIW/TJJhhnZql4vKBnWSDTrvUEopK9sisrNHMiU/u87fV/SfpWdy9aBVOpvYCkOLtzp8cDyiQMlHdsgfpIyTIhfk1P6zpfmcR7KuvuuKbnaa2T/1bLEnbOhtWOWSilw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736246844; c=relaxed/simple;
-	bh=oo/x4SPdWnBfTz9Yr+u0S7K/IIZkwMTrIfkNBV4iTbs=;
+	s=arc-20240116; t=1736246846; c=relaxed/simple;
+	bh=aftg+hZZmcpAJSLont9QsWKi4RIg3DUskY+PQKv7dJI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=itAAVst1aafpKGm4aclZqFSJYLOQEHe9/wfLIujfga71oPqI+jRe0L6vSVN/q3CIcOLeE+QIPIBGojC8a7E5O6k4F92fNLzFyIT41PkYa5TwHgKLNUvxpnWlJbN1C8pVrIH//kRE5CWtEiXIEIO26astu5vOq1LXWj5nBEXEJtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Y3p+lyq2; arc=none smtp.client-ip=67.231.148.174
+	 MIME-Version:Content-Type; b=cA+qQ3DokxHcJMdTVGzzvAmWufOKUt6UovbxfLNXHK5cDeOIudXHSUEjakBTAhO3eXdQSWqeuUkT/APEI1jB1MRDbfvhTNE+u1kfjUCByzGtld7bDdsiu775nhImUkwOl1O9hb94dpjkuz6nVtQX02OpqzeFfTjukYeEXBreVww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=AbQkdTNX; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507ALkxQ022348;
-	Tue, 7 Jan 2025 02:47:14 -0800
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507AHDDE005838;
+	Tue, 7 Jan 2025 02:47:13 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=d
-	hfEQ3fA9mlchsD2FH/JgXKTdsyBTAFInUeWJXY2M6I=; b=Y3p+lyq2Kym9e9uwZ
-	cQ61y4Naxf37gZr95q8+dsRFumsA0pEEc9rYZP8hNosj5tF7U0AmJ6rmqlJnp7R5
-	FJLo73DLdjiiHePI8D10HAYHuw89VZmGYRANlD9wJK1OCVNaKOCEVBVgybBFLx/3
-	0E1S4SXjA8lVA8qUvi5fvcBjnXqb60dPA2awm27KNSFmb0lINkvSAqQyMoNoL4lR
-	/BEUg9TORsTuNDrj2+iI+DE3Hs3junlhMa7gwEDWd3EhI8ME+79H6O8lLVlhCzKd
-	DC8f9hnzXcCU0+jNIYGMI+UyYljerRG6P1hrznrWIlHqAWTE+SX5ubNEHR/4sWLi
-	1/N2g==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4412etg1an-1
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=t
+	m9OxpsAJbwibf45C3gAi/NZcK0WhkzcuZtJSjfGOe4=; b=AbQkdTNXqJl82OGLK
+	cdmNWFfIL2IHxRQ8cXr7KFpQt8I4ZvTVzbSKTdgSUHFFc3cnjtmFxEFuWUuUrvMo
+	0EMCk66qfzY5RQYx2P9RUe6yo4fPWMcRoyloqKhvok6+t5reAvPcTQU6rBEsS9JT
+	2abjmhEEoI4C+B1n5KWR8OyB7mKM3SuLU+68CB5/mICNnBSHjM09m9LMVSIYqbra
+	KlamxM0duwLntJuO1zwa2h6HxJQTVjzEyEg9GTjVWpIkbpjngZbnJ3UoniPdcQ+k
+	vsQATN7lKe0M5Wzw6Jrwy0yU/cx1nnLi1W8Y4R++b5zV6Yh354DrBwBMIriqbm5M
+	hff+g==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4412cj81k9-3
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 07 Jan 2025 02:47:13 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 7 Jan 2025 02:47:04 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 7 Jan 2025 02:47:04 -0800
+ 15.2.1544.4; Tue, 7 Jan 2025 02:47:10 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 7 Jan 2025 02:47:10 -0800
 Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 82F8E3F704E;
-	Tue,  7 Jan 2025 02:47:00 -0800 (PST)
+	by maili.marvell.com (Postfix) with ESMTP id 0A08D3F709B;
+	Tue,  7 Jan 2025 02:47:06 -0800 (PST)
 From: Suman Ghosh <sumang@marvell.com>
 To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
         <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -65,9 +65,9 @@ To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
         <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
         <jerinj@marvell.com>
 CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net-next PATCH 5/6] octeontx2-pf: Prepare for AF_XDP transmit
-Date: Tue, 7 Jan 2025 16:16:27 +0530
-Message-ID: <20250107104628.2035267-6-sumang@marvell.com>
+Subject: [net-next PATCH 6/6] octeontx2-pf: AF_XDP zero copy transmit support
+Date: Tue, 7 Jan 2025 16:16:28 +0530
+Message-ID: <20250107104628.2035267-7-sumang@marvell.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250107104628.2035267-1-sumang@marvell.com>
 References: <20250107104628.2035267-1-sumang@marvell.com>
@@ -79,90 +79,295 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: aFywg9LBOn6N3fyvUFWI05Y6-3yydXHG
-X-Proofpoint-GUID: aFywg9LBOn6N3fyvUFWI05Y6-3yydXHG
+X-Proofpoint-ORIG-GUID: Q5zyoJrDZQFz1wUsxXr_sGHYah2yoIf2
+X-Proofpoint-GUID: Q5zyoJrDZQFz1wUsxXr_sGHYah2yoIf2
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
 From: Hariprasad Kelam <hkelam@marvell.com>
 
-Implement necessary APIs required for AF_XDP transmit.
+This patch implements below changes,
+
+1. To avoid concurrency with normal traffic uses
+   XDP queues.
+
+2. Since there are chances that XDP and AF_XDP can
+   fall under same queue uses separate flags to handle
+   dma buffers.
 
 Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
 Signed-off-by: Suman Ghosh <sumang@marvell.com>
 ---
- .../marvell/octeontx2/nic/otx2_common.h       |  1 +
- .../marvell/octeontx2/nic/otx2_txrx.c         | 25 +++++++++++++++++--
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ .../marvell/octeontx2/nic/otx2_common.c       |  4 ++
+ .../marvell/octeontx2/nic/otx2_common.h       |  6 +++
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  2 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         | 45 +++++++++++++++----
+ .../marvell/octeontx2/nic/otx2_txrx.h         |  1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_xsk.c | 43 +++++++++++++++++-
+ .../ethernet/marvell/octeontx2/nic/otx2_xsk.h |  3 ++
+ 7 files changed, 92 insertions(+), 12 deletions(-)
 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 9d7c0f0b0b56..c1fdb8b943cd 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -1037,6 +1037,10 @@ int otx2_sq_init(struct otx2_nic *pfvf, u16 qidx, u16 sqb_aura)
+ 
+ 	sq->stats.bytes = 0;
+ 	sq->stats.pkts = 0;
++	/* Attach XSK_BUFF_POOL to XDP queue */
++	if (qidx > pfvf->hw.xdp_queues)
++		otx2_attach_xsk_buff(pfvf, sq, (qidx - pfvf->hw.xdp_queues));
++
+ 
+ 	chan_offset = qidx % pfvf->hw.tx_chan_cnt;
+ 	err = pfvf->hw_ops->sq_aq_init(pfvf, qidx, chan_offset, sqb_aura);
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index dc68d2aa0a0e..24faf9dc41e6 100644
+index 24faf9dc41e6..69a8c6132cd3 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -1186,4 +1186,5 @@ static inline int mcam_entry_cmp(const void *a, const void *b)
- dma_addr_t otx2_dma_map_skb_frag(struct otx2_nic *pfvf,
- 				 struct sk_buff *skb, int seg, int *len);
- void otx2_dma_unmap_skb_frags(struct otx2_nic *pfvf, struct sg_list *sg);
-+int otx2_read_free_sqe(struct otx2_nic *pfvf, u16 qidx);
- #endif /* OTX2_COMMON_H */
+@@ -129,6 +129,12 @@ enum otx2_errcodes_re {
+ 	ERRCODE_IL4_CSUM = 0x22,
+ };
+ 
++enum otx2_xdp_action {
++	OTX2_XDP_TX	  = BIT(0),
++	OTX2_XDP_REDIRECT = BIT(1),
++	OTX2_AF_XDP_FRAME = BIT(2),
++};
++
+ struct otx2_dev_stats {
+ 	u64 rx_bytes;
+ 	u64 rx_frames;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index c6205cf2eb03..15bbd7e39eb0 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -2694,7 +2694,7 @@ static int otx2_xdp_xmit_tx(struct otx2_nic *pf, struct xdp_frame *xdpf,
+ 		return -ENOMEM;
+ 
+ 	err = otx2_xdp_sq_append_pkt(pf, dma_addr, xdpf->len,
+-				     qidx, XDP_REDIRECT);
++				     qidx, OTX2_XDP_REDIRECT);
+ 	if (!err) {
+ 		otx2_dma_unmap_page(pf, dma_addr, xdpf->len, DMA_TO_DEVICE);
+ 		page = virt_to_page(xdpf->data);
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index c8b11d45debf..80769c8ffb9a 100644
+index 80769c8ffb9a..03446e8055be 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -22,6 +22,12 @@
+@@ -20,6 +20,7 @@
+ #include "otx2_txrx.h"
+ #include "otx2_ptp.h"
  #include "cn10k.h"
++#include "otx2_xsk.h"
  
  #define CQE_ADDR(CQ, idx) ((CQ)->cqe_base + ((CQ)->cqe_size * (idx)))
-+#define READ_FREE_SQE(SQ, free_sqe)						   \
-+	do {							                   \
-+		typeof(SQ) _SQ = (SQ);						   \
-+		free_sqe = (((_SQ)->cons_head - (_SQ)->head - 1 + (_SQ)->sqe_cnt)  \
-+			   & ((_SQ)->sqe_cnt - 1));                                \
-+	} while (0)
- #define PTP_PORT	        0x13F
- /* PTPv2 header Original Timestamp starts at byte offset 34 and
-  * contains 6 byte seconds field and 4 byte nano seconds field.
-@@ -1163,7 +1169,7 @@ bool otx2_sq_append_skb(void *dev, struct netdev_queue *txq,
- 	/* Check if there is enough room between producer
- 	 * and consumer index.
- 	 */
--	free_desc = (sq->cons_head - sq->head - 1 + sq->sqe_cnt) & (sq->sqe_cnt - 1);
-+	READ_FREE_SQE(sq, free_desc);
- 	if (free_desc < sq->sqe_thresh)
- 		return false;
+ #define READ_FREE_SQE(SQ, free_sqe)						   \
+@@ -103,7 +104,8 @@ static unsigned int frag_num(unsigned int i)
  
-@@ -1400,6 +1406,21 @@ static void otx2_xdp_sqe_add_sg(struct otx2_snd_queue *sq, u64 dma_addr,
- 	sq->sg[sq->head].flags = flags;
- }
+ static void otx2_xdp_snd_pkt_handler(struct otx2_nic *pfvf,
+ 				     struct otx2_snd_queue *sq,
+-				     struct nix_cqe_tx_s *cqe)
++				     struct nix_cqe_tx_s *cqe,
++				     int *xsk_frames)
+ {
+ 	struct nix_send_comp_s *snd_comp = &cqe->comp;
+ 	struct sg_list *sg;
+@@ -112,10 +114,15 @@ static void otx2_xdp_snd_pkt_handler(struct otx2_nic *pfvf,
  
-+int otx2_read_free_sqe(struct otx2_nic *pfvf, u16 qidx)
-+{
-+	struct otx2_snd_queue *sq;
-+	int free_sqe;
-+
-+	sq = &pfvf->qset.sq[qidx];
-+	READ_FREE_SQE(sq, free_sqe);
-+	if (free_sqe < sq->sqe_thresh) {
-+		netdev_warn(pfvf->netdev, "No free sqe for Send queue%d\n", qidx);
-+		return 0;
+ 	sg = &sq->sg[snd_comp->sqe_id];
+ 
++	if (sg->flags & OTX2_AF_XDP_FRAME) {
++		(*xsk_frames)++;
++		return;
 +	}
 +
-+	return free_sqe - sq->sqe_thresh;
+ 	iova = sg->dma_addr[0] - OTX2_HEAD_ROOM;
+ 	pa = otx2_iova_to_phys(pfvf->iommu_domain, iova);
+ 	page = virt_to_page(phys_to_virt(pa));
+-	if (sg->flags & XDP_REDIRECT)
++	if (sg->flags & OTX2_XDP_REDIRECT)
+ 		otx2_dma_unmap_page(pfvf, sg->dma_addr[0], sg->size[0], DMA_TO_DEVICE);
+ 
+ 	if (page->pp) {
+@@ -444,6 +451,18 @@ int otx2_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq)
+ 	return cnt - cq->pool_ptrs;
+ }
+ 
++static void otx2_zc_submit_pkts(struct otx2_nic *pfvf, struct xsk_buff_pool *xsk_pool,
++				int *xsk_frames, int qidx, int budget)
++{
++	if (*xsk_frames)
++		xsk_tx_completed(xsk_pool, *xsk_frames);
++
++	if (xsk_uses_need_wakeup(xsk_pool))
++		xsk_set_tx_need_wakeup(xsk_pool);
++
++	otx2_zc_napi_handler(pfvf, xsk_pool, qidx, budget);
 +}
 +
- bool otx2_xdp_sq_append_pkt(struct otx2_nic *pfvf, u64 iova, int len,
- 			    u16 qidx, u16 flags)
+ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
+ 				struct otx2_cq_queue *cq, int budget)
  {
-@@ -1408,7 +1429,7 @@ bool otx2_xdp_sq_append_pkt(struct otx2_nic *pfvf, u64 iova, int len,
- 	int offset, free_sqe;
+@@ -452,16 +471,22 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
+ 	struct nix_cqe_tx_s *cqe;
+ 	struct net_device *ndev;
+ 	int processed_cqe = 0;
++	int xsk_frames = 0;
++
++	qidx = cq->cq_idx - pfvf->hw.rx_queues;
++	sq = &pfvf->qset.sq[qidx];
  
- 	sq = &pfvf->qset.sq[qidx];
--	free_sqe = (sq->num_sqbs - *sq->aura_fc_addr) * sq->sqe_per_sqb;
-+	READ_FREE_SQE(sq, free_sqe);
- 	if (free_sqe < sq->sqe_thresh)
- 		return false;
+ 	if (cq->pend_cqe >= budget)
+ 		goto process_cqe;
  
+-	if (otx2_nix_cq_op_status(pfvf, cq) || !cq->pend_cqe)
++	if (otx2_nix_cq_op_status(pfvf, cq) || !cq->pend_cqe) {
++		if (sq->xsk_pool)
++			otx2_zc_submit_pkts(pfvf, sq->xsk_pool, &xsk_frames,
++					    qidx, budget);
+ 		return 0;
++	}
+ 
+ process_cqe:
+-	qidx = cq->cq_idx - pfvf->hw.rx_queues;
+-	sq = &pfvf->qset.sq[qidx];
+ 
+ 	while (likely(processed_cqe < budget) && cq->pend_cqe) {
+ 		cqe = (struct nix_cqe_tx_s *)otx2_get_next_cqe(cq);
+@@ -471,10 +496,8 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
+ 			break;
+ 		}
+ 
+-		qidx = cq->cq_idx - pfvf->hw.rx_queues;
+-
+ 		if (cq->cq_type == CQ_XDP)
+-			otx2_xdp_snd_pkt_handler(pfvf, sq, cqe);
++			otx2_xdp_snd_pkt_handler(pfvf, sq, cqe, &xsk_frames);
+ 		else
+ 			otx2_snd_pkt_handler(pfvf, cq, &pfvf->qset.sq[qidx],
+ 					     cqe, budget, &tx_pkts, &tx_bytes);
+@@ -515,6 +538,10 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
+ 		    netif_carrier_ok(ndev))
+ 			netif_tx_wake_queue(txq);
+ 	}
++
++	if (sq->xsk_pool)
++		otx2_zc_submit_pkts(pfvf, sq->xsk_pool, &xsk_frames, qidx, budget);
++
+ 	return 0;
+ }
+ 
+@@ -1502,7 +1529,7 @@ static bool otx2_xdp_rcv_pkt_handler(struct otx2_nic *pfvf,
+ 		qidx += pfvf->hw.tx_queues;
+ 		cq->pool_ptrs++;
+ 		return otx2_xdp_sq_append_pkt(pfvf, cqe->sg.seg_addr,
+-					      cqe->sg.seg_size, qidx, XDP_TX);
++					      cqe->sg.seg_size, qidx, OTX2_XDP_TX);
+ 	case XDP_REDIRECT:
+ 		cq->pool_ptrs++;
+ 		if (xsk_buff) {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+index 8f346fbc8221..2fd8b768e8c7 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+@@ -106,6 +106,7 @@ struct otx2_snd_queue {
+ 	/* SQE ring and CPT response queue for Inline IPSEC */
+ 	struct qmem		*sqe_ring;
+ 	struct qmem		*cpt_resp;
++	struct xsk_buff_pool    *xsk_pool;
+ } ____cacheline_aligned_in_smp;
+ 
+ enum cq_type {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
+index f6bbe18016ba..64035d0689de 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
+@@ -140,11 +140,14 @@ int otx2_xsk_pool_disable(struct otx2_nic *pf, u16 qidx)
+ {
+ 	struct net_device *netdev = pf->netdev;
+ 	struct xsk_buff_pool *pool;
++	struct otx2_snd_queue *sq;
+ 
+ 	pool = xsk_get_pool_from_qid(netdev, qidx);
+ 	if (!pool)
+ 		return -EINVAL;
+ 
++	sq = &pf->qset.sq[qidx + pf->hw.tx_queues];
++	sq->xsk_pool = NULL;
+ 	otx2_clean_up_rq(pf, qidx);
+ 	clear_bit(qidx, pf->af_xdp_zc_qidx);
+ 	xsk_pool_dma_unmap(pool, DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
+@@ -171,7 +174,7 @@ int otx2_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
+ 	if (pf->flags & OTX2_FLAG_INTF_DOWN)
+ 		return -ENETDOWN;
+ 
+-	if (queue_id >= pf->hw.rx_queues)
++	if (queue_id >= pf->hw.rx_queues || queue_id >= pf->hw.tx_queues)
+ 		return -EINVAL;
+ 
+ 	cq_poll = &qset->napi[queue_id];
+@@ -179,8 +182,44 @@ int otx2_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
+ 		return -EINVAL;
+ 
+ 	/* Trigger interrupt */
+-	if (!napi_if_scheduled_mark_missed(&cq_poll->napi))
++	if (!napi_if_scheduled_mark_missed(&cq_poll->napi)) {
+ 		otx2_write64(pf, NIX_LF_CINTX_ENA_W1S(cq_poll->cint_idx), BIT_ULL(0));
++		otx2_write64(pf, NIX_LF_CINTX_INT_W1S(cq_poll->cint_idx), BIT_ULL(0));
++	}
+ 
+ 	return 0;
+ }
++
++void otx2_attach_xsk_buff(struct otx2_nic *pfvf, struct otx2_snd_queue *sq, int qidx)
++{
++	if (test_bit(qidx, pfvf->af_xdp_zc_qidx))
++		sq->xsk_pool = xsk_get_pool_from_qid(pfvf->netdev, qidx);
++}
++
++void otx2_zc_napi_handler(struct otx2_nic *pfvf, struct xsk_buff_pool *pool,
++			  int queue, int budget)
++{
++	struct xdp_desc *xdp_desc = pool->tx_descs;
++	int err, i, work_done = 0, batch;
++
++	budget = min(budget, otx2_read_free_sqe(pfvf, queue));
++	batch = xsk_tx_peek_release_desc_batch(pool, budget);
++	if (!batch)
++		return;
++
++	for (i = 0; i < batch; i++) {
++		dma_addr_t dma_addr;
++
++		dma_addr = xsk_buff_raw_get_dma(pool, xdp_desc[i].addr);
++		err = otx2_xdp_sq_append_pkt(pfvf, dma_addr, xdp_desc[i].len,
++					     queue, OTX2_AF_XDP_FRAME);
++		if (!err) {
++			netdev_err(pfvf->netdev, "AF_XDP: Unable to transfer packet err%d\n", err);
++			break;
++		}
++		work_done++;
++	}
++
++	if (work_done)
++		xsk_tx_release(pool);
++}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.h
+index 022b3433edbb..8047fafee8fe 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.h
+@@ -17,5 +17,8 @@ int otx2_xsk_pool_disable(struct otx2_nic *pf, u16 qid);
+ int otx2_xsk_pool_alloc_buf(struct otx2_nic *pfvf, struct otx2_pool *pool,
+ 			    dma_addr_t *dma, int idx);
+ int otx2_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags);
++void otx2_zc_napi_handler(struct otx2_nic *pfvf, struct xsk_buff_pool *pool,
++			  int queue, int budget);
++void otx2_attach_xsk_buff(struct otx2_nic *pfvf, struct otx2_snd_queue *sq, int qidx);
+ 
+ #endif /* OTX2_XSK_H */
 -- 
 2.25.1
 
