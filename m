@@ -1,156 +1,385 @@
-Return-Path: <netdev+bounces-155705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80748A035D1
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:23:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3CC5A035C3
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:14:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDF053A49E3
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:23:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 334C11884D4F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8611213B58A;
-	Tue,  7 Jan 2025 03:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16D2156968;
+	Tue,  7 Jan 2025 03:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Br2dCDmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m19731108.qiye.163.com (mail-m19731108.qiye.163.com [220.197.31.108])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5632BA31
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 03:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA56155335
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 03:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736220206; cv=none; b=lXATBRnhX28wDb7TgvIqmGleuM/Bmae3zqymqECxvRKx6GFc3TSy4XXHyAOZZ2pDLsZ9KD7FKKSQGP9zIP4kM9rckHtdDO0tndRKZ9DlMyv8uDCM3XVeC31xGz3k0nJntrY8GL+v35hBRh/2I8edwKfbsu0OCim3rxBZH7B63gQ=
+	t=1736219689; cv=none; b=YVP4EOkqpw3zof6pOYpEiyMzD6T1OyD7LJ+e0eBm/qVV9MntkvceQb5RcFEo6XlgwFdlMuWsUwJD85aZPL1+6wkOLY6CpNTwmCjsbR/HgMLrsQku5mlOWUmDAZIxKnp/JIUghtRBPgeERALPcQ11xyessqs5R8gvOaMSqxuOTCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736220206; c=relaxed/simple;
-	bh=dAyhpvLWlkxK8kPA/vtxVQbl8LX8+gBOeLAijt3z6vA=;
-	h=Content-Type:Message-ID:To:Cc:Subject:MIME-Version:From:Date; b=DI8G0klBbMGOfBvqUXXFVFJj8NGhTC4OVTqBTC6Oa5aF8mgTWzEnMY0KLx+XW17Mo7Q1AacmgxNcFD4guPnTuegmLijPvFI0o1RGsnb+dgViAzCtJ3vFcZ+EyS226QIOptRYA+zOsdzqA65A89tJ2+bGE65eYddPJYlBD0IT+Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sangfor.com.cn; spf=pass smtp.mailfrom=sangfor.com.cn; arc=none smtp.client-ip=220.197.31.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sangfor.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sangfor.com.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Message-ID: <AHsAlABfIqBgWBLnpG0eZ4rc.1.1736218069638.Hmail.zhuwei@sangfor.com.cn>
-To: "yisen.zhuang" <yisen.zhuang@huawei.com>, 
-	"salil.mehta" <salil.mehta@huawei.com>, 
-	shaojijie <shaojijie@huawei.com>
-Cc: netdev <netdev@vger.kernel.org>
-Subject: =?UTF-8?B?W2huczMgYnVncmVwb3J0XSAgZnJlZV9wY3BwYWdlc19idWxrIE51bGwgcG9pbnRlciBwcm9ibGVt?=
-X-Priority: 3
-X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com Sirius_WEB_WIN_1.46.2
+	s=arc-20240116; t=1736219689; c=relaxed/simple;
+	bh=Pfm00YwR8YUIKzSJYC6BjhwDrzJ/MAOmPqfxOXYaWII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q0guKf3jj3or6PtrubV0UPINeS8e4B9YG4U8BmpACESiVRbe4iX5ioLx6FlAfYRdEIPrTYTiptPThN+N+bfXmV4qbWGSnbdo1xkO76TtVJ4Qk6k0oAqu025UcJCsXQ3dEqOmw69rJdg4TrT55WDvaTU+oeralKQRHcXqhoRShE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Br2dCDmh; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736219686; x=1767755686;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=Pfm00YwR8YUIKzSJYC6BjhwDrzJ/MAOmPqfxOXYaWII=;
+  b=Br2dCDmh/O2N9qQT++XZaGVOvcC5SsLxfSksIvE3mz3Q839rGSuPrgae
+   j7r60YEIRc7i9+Qt9igNKT8u6BRn2akFhFJetqUIBi+TSL0zdYMNZXezy
+   12nFCcgdXc8mhr0TfAcze8f2IEyKJxRdNPiwitTQvHwOHEn5Mmq/1pvKF
+   t8dbkYmT2wlmFDBpTwDNpixOkkGU5CwjvyZJfZVTgfB2uclCFdxnyEPt1
+   cParHXzJ1RS1Iqmmze86FikUpAIkHa1pj87MPzMhAhbDqb4rINUNKh5jB
+   ux9/X4k2mq5K4IIxmynHbuGoXvMkQSFhTFNTHZOyxwAPgCIIL1eSdDQgS
+   A==;
+X-CSE-ConnectionGUID: CTL/w/JyS8KHWJP7gN5rvg==
+X-CSE-MsgGUID: oYNFTr1PSC21mvfzDJty3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11307"; a="58848365"
+X-IronPort-AV: E=Sophos;i="6.12,294,1728975600"; 
+   d="scan'208";a="58848365"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2025 19:14:46 -0800
+X-CSE-ConnectionGUID: MsY+Y5jeTuWBSlRUzZYcKg==
+X-CSE-MsgGUID: dx2me4eAT/2CvIT3StcRTQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,294,1728975600"; 
+   d="scan'208";a="103132334"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 06 Jan 2025 19:14:43 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tV03D-000EAJ-1n;
+	Tue, 07 Jan 2025 03:14:39 +0000
+Date: Tue, 7 Jan 2025 11:13:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev,
+	syzbot+f63600d288bfb7057424@syzkaller.appspotmail.com,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	cake@lists.bufferbloat.net, netdev@vger.kernel.org
+Subject: Re: [PATCH net] sched: sch_cake: add bounds checks to host bulk flow
+ fairness counts
+Message-ID: <202501071052.ZOECqwS9-lkp@intel.com>
+References: <20250106133837.18609-1-toke@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from zhuwei@sangfor.com.cn( [121.32.254.149] ) by ajax-webmail ( [127.0.0.1] ) ; Tue, 7 Jan 2025 10:47:49 +0800 (GMT+08:00)
-From: zhuwei <zhuwei@sangfor.com.cn>
-Date: Tue, 7 Jan 2025 10:47:49 +0800 (GMT+08:00)
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaQh4ZVkNOGkofHx5DHRhOGVYVFAkWGhdVEwETFh
-	oSFyQUDg9ZV1kYEgtZQVlKSUpVSElVSU5PVUpPQllXWRYaDxIVHRRZQVlPS0hVSktISk5OSFVKS0
-	tVSkJLS1kG
-X-HM-Tid: 0a943e9d9c2102bdkunm194347a3e4a
-X-HM-MType: 1
-X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMViXkYjtDdhq4fkoro5BbWy+lwMZu2ntyAJJPS
-	236gXeCakNl5mZCAsqbKZgJKrXwpVZjB4iP18JhxzjOygb2Nb5h+msBVjp+Enba/pTkRGlkDwKw0
-	TJkN3VxUpBvLsaF3KW5hxwK2nOzuWfmtJeDdk=
-X-HM-Sender-Digest: e1kMHhlZQQ8JDh5XWRIfHhUPWUFZRzozCDoXOjkdMgo5HCw5NxULPEse
-	IU8JGFVKVUpMSE1JSkNLTEtKQ0hVMxYaEhdVARMODB4SOwgaFRwdFAlVGBQWVRgVRVlXWRILWUFZ
-	SklKVUhJVUlOT1VKT0JZV1kIAVlBTElISzcG
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250106133837.18609-1-toke@redhat.com>
 
-SGVsbG8sIG1haW50YWluZXJzIG9mIHRoZSBobnMzIGRyaXZlci4KCldlIGhhdmUgZW5jb3VudGVy
-ZWQgYSBwcm9ibGVtIGhlcmUsIGFuZCBzbyBmYXIgd2UgaGF2ZSBubyBnb29kIHdheSB0byByZXBy
-b2R1Y2UgaXQuCkF0IHRoZSBzYW1lIHRpbWUsIHdlIHJldHJpZXZlZCBhbm90aGVyIHByb2JsZW0s
-IHdoaWNoIGlzIHNpbWlsYXIgdG8gb3VyczoKaHR0cHM6Ly9naXRlZS5jb20vb3BlbmV1bGVyL2tl
-cm5lbC9pc3N1ZXMvSUFQSUVICgpJcyB0aGVyZSBhbnkgZ29vZCB3YXkgdG8gcmVwcm9kdWNlIHRo
-ZSBwcm9ibGVtPyBXZSBoYXZlIHRyaWVkOiBtZW1vcnkgcHJlc3N1cmUsIHJlYm9vdCAtZiwgCnJt
-bW9kIGFuZCBpbnNtb2QgaG5zMywgaXBlcmYzIG5ldHdvcmsgcHJlc3N1cmUuQnV0IG5vbmUgb2Yg
-dGhlbSB3b3JrZWQuCgpjcmFzaCBzdGFjazoKNjc2NzEuNDk0ODc0XSAgY29ubmVjdGlvbjEwMDow
-OiBkZXRlY3RlZCBjb25uIGVycm9yICgxMDIwKQpbMzY3NjcxLjkxNjMyNl0gVW5hYmxlIHRvIGhh
-bmRsZSBrZXJuZWwgcGFnaW5nIHJlcXVlc3QgYXQgdmlydHVhbCBhZGRyZXNzIGRmZmYyMDAwMDAw
-MDAwMDAKWzM2NzY3MS45MjUxMjVdIE1lbSBhYm9ydCBpbmZvOgpbMzY3NjcxLjkyODU2Nl0gICBF
-U1IgPSAweDk2MDAwMDA0ClszNjc2NzEuOTI4NTc3XSAgIEV4Y2VwdGlvbiBjbGFzcyA9IERBQlQg
-KGN1cnJlbnQgRUwpLCBJTCA9IDMyIGJpdHMKWzM2NzY3MS45Mzg5ODddICAgU0VUID0gMCwgRm5W
-ID0gMApbMzY3NjcxLjkzODk5NF0gICBFQSA9IDAsIFMxUFRXID0gMApbMzY3NjcxLjk0NjUxMF0g
-RGF0YSBhYm9ydCBpbmZvOgpbMzY3NjcxLjk0NjUxMl0gICBJU1YgPSAwLCBJU1MgPSAweDAwMDAw
-MDA0ClszNjc2NzEuOTQ2NTEzXSAgIENNID0gMCwgV25SID0gMApbMzY3NjcxLjk0NjUxNV0gW2Rm
-ZmYyMDAwMDAwMDAwMDBdIGFkZHJlc3MgYmV0d2VlbiB1c2VyIGFuZCBrZXJuZWwgYWRkcmVzcyBy
-YW5nZXMKWzM2NzY3MS45NDY1MTldIEludGVybmFsIGVycm9yOiBPb3BzOiA5NjAwMDAwNCBbIzFd
-IFNNUApbMzY3NjcxLjk0NjUyM10gU291cmNlIHZlcnNpb246IHY2LjExLjEuMDA5NCswfmI3Y2Zi
-MDlmMS4yMDI0MTIyNCAjMSBTTVAgVHVlIERlYyAyNCAwODoyMDo1MCBVVEMgMjAyNApbMzY3Njcx
-Ljk0NjUyNF0gTW9kdWxlcyBsaW5rZWQgaW46IGV0bWVtX3NjYW4geHRfY29tbWVudCB4dF9jb25u
-dHJhY2sgZG1fcm91bmRfcm9iaW4gaXB0YWJsZV9yYXcgaXB0YWJsZV9tYW5nbGUgYXJjNCBtZDQg
-c2hhNTEyX2dlbmVyaWMgc2hhNTEyX2FybTY0IG5sc191dGY4IGNpZnMgY2NtIG5mc3YzIGlwdGFi
-bGVfbmF0IG5mX25hdCBpcHRfUkVKRUNUIG5mX3JlamVjdF9pcHY0IHh0X211bHRpcG9ydCB0Y3Bf
-ZGlhZyBpbmV0X2RpYWcgcnBjc2VjX2dzc19rcmI1IG5mc3Y0IGRuc19yZXNvbHZlciBmdXNlIGFj
-dF9nYWN0IGNsc191MzIgc2NoX2luZ3Jlc3MgbmZzZCBhdXRoX3JwY2dzcyBuZnNfYWNsIG5mcyBs
-b2NrZCBncmFjZSBmc2NhY2hlIHN1bnJwYyA4MDIxcSBnYXJwIG1ycCB4dF9zdGF0ZSBuZl9jb25u
-dHJhY2sgbmZfZGVmcmFnX2lwdjYgbmZfZGVmcmFnX2lwdjQgaXA2dGFibGVfZmlsdGVyIGlwNl90
-YWJsZXMgaXB0YWJsZV9maWx0ZXIgdmhvc3RfbmV0IHZob3N0IHRhcCBtbHg1X2liKE9FKSBtbHg1
-X2NvcmUoT0UpIHRscyBtbHhmdyByZG1hX3VjbShPRSkgaWJfdXZlcmJzKE9FKSByZG1hX2NtKE9F
-KSBpd19jbShPRSkgaWJfY20oT0UpIGlzY3NpX3RjcCBsaWJpc2NzaV90Y3AgbGliaXNjc2kgc2Nz
-aV90cmFuc3BvcnRfaXNjc2kgdmZpb19wY2kgdmZpb192aXJxZmQgdmZpb19pb21tdV90eXBlMSB2
-ZmlvIGhuczMgZG1fbXVsdGlwYXRoIG1seDRfZW4gbWx4NF9jb3JlIHRpcGMgaXA2X3VkcF90dW5u
-ZWwgdWRwX3R1bm5lbCB0dW4gbmJkIGJyaWRnZSBzdHAgbGxjIHdhdGNoX3JlYm9vdCBzZmZzKE9F
-KSBjbF9sb2NrKE9FKQpbMzY3NjcxLjk2NTE4NV0gIGNsX3NvZnRkb2coT0UpIHNxdWFzaGZzIG92
-ZXJsYXkgbG9vcCBpYl9jb3JlKE9FKSBtbHhfY29tcGF0KE9FKSBpcG1pX3NzaWYgcmVhbHRlayBh
-ZXNfY2VfYmxrIGNyeXB0b19zaW1kIGNyeXB0ZCBvZnBhcnQgYWVzX2NlX2NpcGhlciBjcmN0MTBk
-aWZfY2UgaGNsZ2UgaXBtaV9zaSBjbWRsaW5lcGFydCBnaGFzaF9jZSBreV9scGNtdXggc2VzIGhu
-YWUzIGhvc3RfZWRtYV9kcnYgc2hhMV9jZSBoaV9zZmMgam95ZGV2IHNic2FfZ3dkdCBpcG1pX2Rl
-dmludGYgZW5jbG9zdXJlIGlwbWlfbXNnaGFuZGxlciBtdGQgc3BpX2R3X21taW8gc2NoX2ZxX2Nv
-ZGVsIGlwX3RhYmxlcyBzaGEyX2NlIHNoYTI1Nl9hcm02NCBtZWdhcmFpZF9zYXMoT0UpIGhpc2lf
-c2FzX3YzX2h3IHVzYmhpZCBoaXNpX3Nhc19tYWluIFtsYXN0IHVubG9hZGVkOiBldG1lbV9zY2Fu
-XQpbMzY3NjcxLjk3MzMzM10gUHJvY2VzcyByZWJvb3QgKHBpZDogNzQ4NjAsIHN0YWNrIGxpbWl0
-ID0gMHgwMDAwMDAwMDBlNDEyM2MwKQpbMzY3NjcyLjA4MjMxOF0gQ1BVOiA1OSBQSUQ6IDc0ODYw
-IENvbW06IHJlYm9vdCBLZHVtcDogbG9hZGVkIFRhaW50ZWQ6IEcgICAgICAgIFcgIE9FICAgICA0
-LjE5LjkwLTg5LjE2LnYyNDAxLm9zYy5zZmMuNi4xMS4xLjAwOTQua3kxMC5hYXJjaDY0K2RlYnVn
-ICMxClszNjc2NzIuMjA4ODEzXSBTb3VyY2UgVmVyc2lvbjogdjYuMTEuMS4wMDk0KzB+YjdjZmIw
-OWYxLjIwMjQxMjI0ClszNjc2NzIuMzM1MDQyXSBIYXJkd2FyZSBuYW1lOiBZdW5rZSBDaGluYSBL
-dW5UYWkgUjUyMi9CQzgyQU1ER0EsIEJJT1MgMS4zNSAwNC8zMC8yMDIwClszNjc2NzIuNDI2ODY5
-XSBwc3RhdGU6IDYwNDAwMDg5IChuWkN2IGRhSWYgK1BBTiAtVUFPKQpbMzY3NjcyLjQ5ODA0NV0g
-cGMgOiBmcmVlX3BjcHBhZ2VzX2J1bGsrMHgxZDgvMHhlZDAKWzM2NzY3Mi42MTEyNTFdIGxyIDog
-ZnJlZV91bnJlZl9wYWdlX2NvbW1pdCsweDI3NC8weDM3MApbMzY3NjcyLjYxMTI1OV0gc3AgOiBm
-ZmZmYTAyMjk3N2I3NjQwClszNjc2NzIuNjg0MjE3XSB4Mjk6IGZmZmZhMDIyOTc3Yjc3MjAgeDI4
-OiBmZmZmN2ZlODA4OWY5YTg4IApbMzY3NjcyLjc4NzA0MV0geDI3OiAwMDAwMDAwMDAwMDAwMDAz
-IHgyNjogZGZmZjIwMDAwMDAwMDAwMCAKWzM2NzY3Mi43ODcwNDVdIHgyNTogMDAwMDAwMDAwMDAw
-MDAwMCB4MjQ6IGZmZmY3ZmU4MDg5ZjlhOTAgClszNjc2NzIuNzg3MDQ2XSB4MjM6IDAwMDAwMDAw
-MDAwMDAwMDAgeDIyOiAxZmZmZWZmZDAxMTNmMzUxIApbMzY3NjcyLjc4NzA0N10geDIxOiAxZmZm
-ZWZmZDAxMTNmMzUyIHgyMDogZmZmZmEwMmRiZmI3OWZlMCAKWzM2NzY3Mi43ODcwNDldIHgxOTog
-ZmZmZjdmZTgwODlmOWE4MCB4MTg6IDAwMDAwMDAwMDAwMDAwM2IgClszNjc2NzIuNzg3MDUwXSB4
-MTc6IDAwMDBmZmZmMzMzNDE2YjggeDE2OiBmZmZmMjAwMDIxYmE5MDYwIApbMzY3NjcyLjc4NzA1
-MV0geDE1OiAwMDAwMDAwMDAwMDAwMGMwIHgxNDogMDAwMGZmZmYzMzg3ZGFjMCAKWzM2NzY3Mi43
-ODcwNTNdIHgxMzogMDAwMDAwMDA3ZmZmZmZmZiB4MTI6IDAwMDAyMTczY2I0ZmI5NjAgClszNjc2
-NzIuNzg3MDU0XSB4MTE6IDFmZmZlZmZkMDEwMGFmOGUgeDEwOiBmZmZmMGZmZDAxMDBhZjhlIApb
-MzY3NjcyLjc4NzA1Nl0geDkgOiBkZmZmMjAwMDAwMDAwMDAwIHg4IDogZmZmZjE0MDQwMmJlNDAw
-MCAKWzM2NzY3Mi43ODcwNTddIHg3IDogZmZmZmZmZmZmZmZmZmZmZiB4NiA6IDFmZmZmNDA0NTJl
-ZjZlZDggClszNjc2NzIuNzg3MDU5XSB4NSA6IDAwMDAwMDAwMDAwMDAwMTAgeDQgOiAwMDAwMDAw
-MDAwMDAwMDAwIApbMzY3NjcyLjc4NzA2MF0geDMgOiBmZmZmMjAwMDIyOWE2MTQ4IHgyIDogMDAw
-MDAwMDAwMDAwMDAwMCAKWzM2NzY3Mi43ODcwNjFdIHgxIDogZmZmZmEwMmRiZmI3OWZmMCB4MCA6
-IDAwMDAwMDAwMDAwMDAwMDAgClszNjc2NzIuNzg3MDY0XSBDYWxsIHRyYWNlOgpbMzY3NjcyLjc4
-NzA3NF0gIGZyZWVfcGNwcGFnZXNfYnVsaysweDFkOC8weGVkMApbMzY3NjcyLjc4NzA3N10gIGZy
-ZWVfdW5yZWZfcGFnZV9jb21taXQrMHgyNzQvMHgzNzAKWzM2NzY3Mi43ODcwNzldICBmcmVlX3Vu
-cmVmX3BhZ2UrMHg5MC8weGMwClszNjc2NzIuNzg3MDg0XSAgX19wdXRfcGFnZSsweDcwLzB4YTgK
-WzM2NzY3Mi43ODcwOTNdICBwYWdlX3Bvb2xfcmV0dXJuX3BhZ2UrMHg4NC8weGI4ClszNjc2NzIu
-Nzg3MDk1XSAgcGFnZV9wb29sX3B1dF9wYWdlKzB4MmRjLzB4ODE4ClszNjc2NzIuNzg3MTE1XSAg
-aG5zM19mcmVlX2J1ZmZlci5pc3JhLjMwKzB4MTUwLzB4MWM4IFtobnMzXQpbMzY3NjcyLjc4NzEz
-Ml0gIGhuczNfZnJlZV9idWZmZXJfZGV0YWNoKzB4MTA4LzB4MTQ4IFtobnMzXQpbMzY3NjcyLjc4
-NzEzN10gIGhuczNfZnJlZV9kZXNjKzB4NzQvMHgyMjggW2huczNdClszNjc2NzIuNzg3MTQxXSAg
-aG5zM19maW5pX3JpbmcrMHgzMC8weDUxOCBbaG5zM10KWzM2NzY3Mi43ODcxNDVdICBobnMzX3Vu
-aW5pdF9hbGxfcmluZy5pc3JhLjQwKzB4YzQvMHgxNDggW2huczNdClszNjc2NzIuNzg3MTQ4XSAg
-aG5zM19jbGllbnRfdW5pbml0KzB4Mjc4LzB4NDEwIFtobnMzXQpbMzY3NjcyLjc4NzE3M10gIGhj
-bGdlX3VuaW5pdF9jbGllbnRfaW5zdGFuY2UrMHgyZWMvMHg0MjggW2hjbGdlXQpbMzY3NjcyLjc4
-NzE4MF0gIGhuYWUzX3VuaW5pdF9jbGllbnRfaW5zdGFuY2UrMHhlNC8weDEyOCBbaG5hZTNdClsz
-Njc2NzIuNzg3MTgyXSAgaG5hZTNfdW5yZWdpc3Rlcl9hZV9kZXYrMHhlNC8weDJiMCBbaG5hZTNd
-ClszNjc2NzIuNzg3MTg3XSAgaG5zM19zaHV0ZG93bisweDQwLzB4ZTAgW2huczNdClszNjc2NzIu
-Nzg3MTk0XSAgcGNpX2RldmljZV9zaHV0ZG93bisweDc0LzB4MTIwClszNjc2NzIuNzg3MjAxXSAg
-ZGV2aWNlX3NodXRkb3duKzB4MjNjLzB4NWE4ClszNjc2NzIuNzg3MjA1XSAga2VybmVsX3Jlc3Rh
-cnRfcHJlcGFyZSsweDZjLzB4ODAKWzM2NzY3Mi43ODcyMDZdICBrZXJuZWxfcmVzdGFydCsweDIw
-LzB4ODgKWzM2NzY3Mi43ODcyMDhdICBzeXNfcmVib290KzB4MmU0LzB4MzMwClszNjc2NzIuNzg3
-MjEyXSAgZWwwX3N2Y19uYWtlZCsweDQ0LzB4NDgKWzM2NzY3Mi43ODcyMTZdIENvZGU6IDM4ZmE2
-ODg0IDM1MDA2Mjg0IGQzNDNmZjIwIGY5MDAwNDM5ICgzOGZhNjgwMCkgClszNjc2NzIuNzg3MjY2
-XSBTTVA6IHN0b3BwaW5nIHNlY29uZGFyeSBDUFVzClszNjc2NzIuODQxNDAyXSBTdGFydGluZyBj
-cmFzaGR1bXAga2VybmVsLi4uClszNjc2NzIuODQxNDA3XSBCeWUhCgpob3BlIHdlIGNhbiBzb2x2
-ZSBpdCB0b2dldGhlciBhbmQgbWFrZSBobnMzIGJldHRlci4NCg0K
+Hi Toke,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Toke-H-iland-J-rgensen/sched-sch_cake-add-bounds-checks-to-host-bulk-flow-fairness-counts/20250106-214156
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250106133837.18609-1-toke%40redhat.com
+patch subject: [PATCH net] sched: sch_cake: add bounds checks to host bulk flow fairness counts
+config: i386-buildonly-randconfig-004-20250107 (https://download.01.org/0day-ci/archive/20250107/202501071052.ZOECqwS9-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250107/202501071052.ZOECqwS9-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501071052.ZOECqwS9-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/sched/sch_cake.c: In function 'cake_dequeue':
+>> net/sched/sch_cake.c:1975:37: warning: variable 'dsthost' set but not used [-Wunused-but-set-variable]
+    1975 |         struct cake_host *srchost, *dsthost;
+         |                                     ^~~~~~~
+>> net/sched/sch_cake.c:1975:27: warning: variable 'srchost' set but not used [-Wunused-but-set-variable]
+    1975 |         struct cake_host *srchost, *dsthost;
+         |                           ^~~~~~~
+
+
+vim +/dsthost +1975 net/sched/sch_cake.c
+
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1970  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1971  static struct sk_buff *cake_dequeue(struct Qdisc *sch)
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1972  {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1973  	struct cake_sched_data *q = qdisc_priv(sch);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1974  	struct cake_tin_data *b = &q->tins[q->cur_tin];
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06 @1975  	struct cake_host *srchost, *dsthost;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1976  	ktime_t now = ktime_get();
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1977  	struct cake_flow *flow;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1978  	struct list_head *head;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1979  	bool first_flow = true;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1980  	struct sk_buff *skb;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1981  	u64 delay;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1982  	u32 len;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1983  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1984  begin:
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1985  	if (!sch->q.qlen)
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1986  		return NULL;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1987  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1988  	/* global hard shaper */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1989  	if (ktime_after(q->time_next_packet, now) &&
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1990  	    ktime_after(q->failsafe_next_packet, now)) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1991  		u64 next = min(ktime_to_ns(q->time_next_packet),
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1992  			       ktime_to_ns(q->failsafe_next_packet));
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1993  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1994  		sch->qstats.overlimits++;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1995  		qdisc_watchdog_schedule_ns(&q->watchdog, next);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1996  		return NULL;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1997  	}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1998  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  1999  	/* Choose a class to work on. */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2000  	if (!q->rate_ns) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2001  		/* In unlimited mode, can't rely on shaper timings, just balance
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2002  		 * with DRR
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2003  		 */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2004  		bool wrapped = false, empty = true;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2005  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2006  		while (b->tin_deficit < 0 ||
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2007  		       !(b->sparse_flow_count + b->bulk_flow_count)) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2008  			if (b->tin_deficit <= 0)
+cbd22f172df782 Kevin 'ldir' Darbyshire-Bryant 2019-12-18  2009  				b->tin_deficit += b->tin_quantum;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2010  			if (b->sparse_flow_count + b->bulk_flow_count)
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2011  				empty = false;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2012  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2013  			q->cur_tin++;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2014  			b++;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2015  			if (q->cur_tin >= q->tin_cnt) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2016  				q->cur_tin = 0;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2017  				b = q->tins;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2018  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2019  				if (wrapped) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2020  					/* It's possible for q->qlen to be
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2021  					 * nonzero when we actually have no
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2022  					 * packets anywhere.
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2023  					 */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2024  					if (empty)
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2025  						return NULL;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2026  				} else {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2027  					wrapped = true;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2028  				}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2029  			}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2030  		}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2031  	} else {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2032  		/* In shaped mode, choose:
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2033  		 * - Highest-priority tin with queue and meeting schedule, or
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2034  		 * - The earliest-scheduled tin with queue.
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2035  		 */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2036  		ktime_t best_time = KTIME_MAX;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2037  		int tin, best_tin = 0;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2038  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2039  		for (tin = 0; tin < q->tin_cnt; tin++) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2040  			b = q->tins + tin;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2041  			if ((b->sparse_flow_count + b->bulk_flow_count) > 0) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2042  				ktime_t time_to_pkt = \
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2043  					ktime_sub(b->time_next_packet, now);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2044  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2045  				if (ktime_to_ns(time_to_pkt) <= 0 ||
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2046  				    ktime_compare(time_to_pkt,
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2047  						  best_time) <= 0) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2048  					best_time = time_to_pkt;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2049  					best_tin = tin;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2050  				}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2051  			}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2052  		}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2053  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2054  		q->cur_tin = best_tin;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2055  		b = q->tins + best_tin;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2056  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2057  		/* No point in going further if no packets to deliver. */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2058  		if (unlikely(!(b->sparse_flow_count + b->bulk_flow_count)))
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2059  			return NULL;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2060  	}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2061  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2062  retry:
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2063  	/* service this class */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2064  	head = &b->decaying_flows;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2065  	if (!first_flow || list_empty(head)) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2066  		head = &b->new_flows;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2067  		if (list_empty(head)) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2068  			head = &b->old_flows;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2069  			if (unlikely(list_empty(head))) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2070  				head = &b->decaying_flows;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2071  				if (unlikely(list_empty(head)))
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2072  					goto begin;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2073  			}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2074  		}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2075  	}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2076  	flow = list_first_entry(head, struct cake_flow, flowchain);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2077  	q->cur_flow = flow - b->flows;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2078  	first_flow = false;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2079  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2080  	/* triple isolation (modified DRR++) */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2081  	srchost = &b->hosts[flow->srchost];
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2082  	dsthost = &b->hosts[flow->dsthost];
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2083  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2084  	/* flow isolation (DRR++) */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2085  	if (flow->deficit <= 0) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2086  		/* Keep all flows with deficits out of the sparse and decaying
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2087  		 * rotations.  No non-empty flow can go into the decaying
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2088  		 * rotation, so they can't get deficits
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2089  		 */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2090  		if (flow->set == CAKE_SET_SPARSE) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2091  			if (flow->head) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2092  				b->sparse_flow_count--;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2093  				b->bulk_flow_count++;
+712639929912c5 George Amanakis                2019-03-01  2094  
+c75152104797f8 Toke Høiland-Jørgensen         2025-01-06  2095  				cake_inc_srchost_bulk_flow_count(b, flow, q->flow_mode);
+c75152104797f8 Toke Høiland-Jørgensen         2025-01-06  2096  				cake_inc_dsthost_bulk_flow_count(b, flow, q->flow_mode);
+712639929912c5 George Amanakis                2019-03-01  2097  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2098  				flow->set = CAKE_SET_BULK;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2099  			} else {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2100  				/* we've moved it to the bulk rotation for
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2101  				 * correct deficit accounting but we still want
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2102  				 * to count it as a sparse flow, not a bulk one.
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2103  				 */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2104  				flow->set = CAKE_SET_SPARSE_WAIT;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2105  			}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2106  		}
+712639929912c5 George Amanakis                2019-03-01  2107  
+c75152104797f8 Toke Høiland-Jørgensen         2025-01-06  2108  		flow->deficit += cake_get_flow_quantum(b, flow, q->flow_mode);
+712639929912c5 George Amanakis                2019-03-01  2109  		list_move_tail(&flow->flowchain, &b->old_flows);
+712639929912c5 George Amanakis                2019-03-01  2110  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2111  		goto retry;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2112  	}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2113  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2114  	/* Retrieve a packet via the AQM */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2115  	while (1) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2116  		skb = cake_dequeue_one(sch);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2117  		if (!skb) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2118  			/* this queue was actually empty */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2119  			if (cobalt_queue_empty(&flow->cvars, &b->cparams, now))
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2120  				b->unresponsive_flow_count--;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2121  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2122  			if (flow->cvars.p_drop || flow->cvars.count ||
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2123  			    ktime_before(now, flow->cvars.drop_next)) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2124  				/* keep in the flowchain until the state has
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2125  				 * decayed to rest
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2126  				 */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2127  				list_move_tail(&flow->flowchain,
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2128  					       &b->decaying_flows);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2129  				if (flow->set == CAKE_SET_BULK) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2130  					b->bulk_flow_count--;
+712639929912c5 George Amanakis                2019-03-01  2131  
+c75152104797f8 Toke Høiland-Jørgensen         2025-01-06  2132  					cake_dec_srchost_bulk_flow_count(b, flow, q->flow_mode);
+c75152104797f8 Toke Høiland-Jørgensen         2025-01-06  2133  					cake_dec_dsthost_bulk_flow_count(b, flow, q->flow_mode);
+712639929912c5 George Amanakis                2019-03-01  2134  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2135  					b->decaying_flow_count++;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2136  				} else if (flow->set == CAKE_SET_SPARSE ||
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2137  					   flow->set == CAKE_SET_SPARSE_WAIT) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2138  					b->sparse_flow_count--;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2139  					b->decaying_flow_count++;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2140  				}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2141  				flow->set = CAKE_SET_DECAYING;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2142  			} else {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2143  				/* remove empty queue from the flowchain */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2144  				list_del_init(&flow->flowchain);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2145  				if (flow->set == CAKE_SET_SPARSE ||
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2146  				    flow->set == CAKE_SET_SPARSE_WAIT)
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2147  					b->sparse_flow_count--;
+712639929912c5 George Amanakis                2019-03-01  2148  				else if (flow->set == CAKE_SET_BULK) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2149  					b->bulk_flow_count--;
+712639929912c5 George Amanakis                2019-03-01  2150  
+c75152104797f8 Toke Høiland-Jørgensen         2025-01-06  2151  					cake_dec_srchost_bulk_flow_count(b, flow, q->flow_mode);
+c75152104797f8 Toke Høiland-Jørgensen         2025-01-06  2152  					cake_dec_dsthost_bulk_flow_count(b, flow, q->flow_mode);
+712639929912c5 George Amanakis                2019-03-01  2153  				} else
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2154  					b->decaying_flow_count--;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2155  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2156  				flow->set = CAKE_SET_NONE;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2157  			}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2158  			goto begin;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2159  		}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2160  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2161  		/* Last packet in queue may be marked, shouldn't be dropped */
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2162  		if (!cobalt_should_drop(&flow->cvars, &b->cparams, now, skb,
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2163  					(b->bulk_flow_count *
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2164  					 !!(q->rate_flags &
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2165  					    CAKE_FLAG_INGRESS))) ||
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2166  		    !flow->head)
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2167  			break;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2168  
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2169  		/* drop this packet, get another one */
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2170  		if (q->rate_flags & CAKE_FLAG_INGRESS) {
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2171  			len = cake_advance_shaper(q, b, skb,
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2172  						  now, true);
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2173  			flow->deficit -= len;
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2174  			b->tin_deficit -= len;
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2175  		}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2176  		flow->dropped++;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2177  		b->tin_dropped++;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2178  		qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(skb));
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2179  		qdisc_qstats_drop(sch);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2180  		kfree_skb(skb);
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2181  		if (q->rate_flags & CAKE_FLAG_INGRESS)
+7298de9cd7255a Toke Høiland-Jørgensen         2018-07-06  2182  			goto retry;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2183  	}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2184  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2185  	b->tin_ecn_mark += !!flow->cvars.ecn_marked;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2186  	qdisc_bstats_update(sch, skb);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2187  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2188  	/* collect delay stats */
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2189  	delay = ktime_to_ns(ktime_sub(now, cobalt_get_enqueue_time(skb)));
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2190  	b->avge_delay = cake_ewma(b->avge_delay, delay, 8);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2191  	b->peak_delay = cake_ewma(b->peak_delay, delay,
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2192  				  delay > b->peak_delay ? 2 : 8);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2193  	b->base_delay = cake_ewma(b->base_delay, delay,
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2194  				  delay < b->base_delay ? 2 : 8);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2195  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2196  	len = cake_advance_shaper(q, b, skb, now, false);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2197  	flow->deficit -= len;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2198  	b->tin_deficit -= len;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2199  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2200  	if (ktime_after(q->time_next_packet, now) && sch->q.qlen) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2201  		u64 next = min(ktime_to_ns(q->time_next_packet),
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2202  			       ktime_to_ns(q->failsafe_next_packet));
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2203  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2204  		qdisc_watchdog_schedule_ns(&q->watchdog, next);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2205  	} else if (!sch->q.qlen) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2206  		int i;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2207  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2208  		for (i = 0; i < q->tin_cnt; i++) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2209  			if (q->tins[i].decaying_flow_count) {
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2210  				ktime_t next = \
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2211  					ktime_add_ns(now,
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2212  						     q->tins[i].cparams.target);
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2213  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2214  				qdisc_watchdog_schedule_ns(&q->watchdog,
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2215  							   ktime_to_ns(next));
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2216  				break;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2217  			}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2218  		}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2219  	}
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2220  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2221  	if (q->overflow_timeout)
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2222  		q->overflow_timeout--;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2223  
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2224  	return skb;
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2225  }
+046f6fd5daefac Toke Høiland-Jørgensen         2018-07-06  2226  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
