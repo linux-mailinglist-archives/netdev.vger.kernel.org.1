@@ -1,97 +1,156 @@
-Return-Path: <netdev+bounces-155701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC3D7A035AC
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:05:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80748A035D1
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:23:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BBD918829C2
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDF053A49E3
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6F274059;
-	Tue,  7 Jan 2025 03:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ab3mJaPO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8611213B58A;
+	Tue,  7 Jan 2025 03:23:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-m19731108.qiye.163.com (mail-m19731108.qiye.163.com [220.197.31.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB14A31;
-	Tue,  7 Jan 2025 03:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5632BA31
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 03:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736219099; cv=none; b=kprLG3EWm8HkZShde7KH4GZXqwd3ChQg5Kupxi6yYyS4qXLAUpZglI3W1YP97O/DdJpD0NEqeLHYmsMAKl8dFnBABpHBVRZaWa08BnpFa9MCqRGXTY6G9l4m0h9YgAXQY5gXK1a93XRfX97tdi6k9nvCBwJY8Q5TwC79kTUSdVQ=
+	t=1736220206; cv=none; b=lXATBRnhX28wDb7TgvIqmGleuM/Bmae3zqymqECxvRKx6GFc3TSy4XXHyAOZZ2pDLsZ9KD7FKKSQGP9zIP4kM9rckHtdDO0tndRKZ9DlMyv8uDCM3XVeC31xGz3k0nJntrY8GL+v35hBRh/2I8edwKfbsu0OCim3rxBZH7B63gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736219099; c=relaxed/simple;
-	bh=XRQGQDclMXF3+wJ0brTDCwnprKvS4klWAuuNKV0M2AU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hGZ43LOcnMTWOCp2wXaex+UhLMuFHO60S3T0mjWcqjZBGUui5IDwN/2pbO6N0pXbe7KtS2YVnDodrVaRbr+cNPnmD8VTs5egYj0rdZ21Yb01LCfXeP+rwBmCRxem+awooqFNvpwNIl6G+DLQZhJX7YRR5q3HQlCT1dbhqhFr+ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ab3mJaPO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2808C4CED2;
-	Tue,  7 Jan 2025 03:04:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736219099;
-	bh=XRQGQDclMXF3+wJ0brTDCwnprKvS4klWAuuNKV0M2AU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ab3mJaPO8VG16HhzrX1c7hk/T9oHcGDYGkTFdMfUgKOfjc9RaS+jWQXyHcAI109th
-	 n6P4+QOjlv4ktjK69xc2GjwUoMBm7lFT8Skf8bmnJwQykPS+lj7wsmit9pRj5OOmGQ
-	 glJRuHcQGeGPPW5CetAM5tqvxKI4aWyjyFQgyKvq/jhKJ0uGk4X5JXu2XPaI5NMLH+
-	 bUI5j+BkMUX9k0wRdlXkIAqN0baYoO2osOTq9ORMeu4XERn7NYgyTrFSuwWHroijsp
-	 RoeRJnfS0D9buU8lvpub4dWyOJnjIe9NjKOgW4V4IFmpgxDuk7l2wvEk4S+VhoqL2i
-	 oPtGPUwIhKArA==
-Date: Mon, 6 Jan 2025 19:04:56 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net,
- michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org,
- ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me,
- asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, kory.maincent@bootlin.com,
- maxime.chevallier@bootlin.com, danieller@nvidia.com,
- hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
- przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
- rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us,
- bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com,
- aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com,
- daniel.zahka@gmail.com
-Subject: Re: [PATCH net-next v7 02/10] net: ethtool: add support for
- configuring hds-thresh
-Message-ID: <20250106190456.104e313e@kernel.org>
-In-Reply-To: <20250106184854.4028c83d@kernel.org>
-References: <20250103150325.926031-1-ap420073@gmail.com>
-	<20250103150325.926031-3-ap420073@gmail.com>
-	<20250106184854.4028c83d@kernel.org>
+	s=arc-20240116; t=1736220206; c=relaxed/simple;
+	bh=dAyhpvLWlkxK8kPA/vtxVQbl8LX8+gBOeLAijt3z6vA=;
+	h=Content-Type:Message-ID:To:Cc:Subject:MIME-Version:From:Date; b=DI8G0klBbMGOfBvqUXXFVFJj8NGhTC4OVTqBTC6Oa5aF8mgTWzEnMY0KLx+XW17Mo7Q1AacmgxNcFD4guPnTuegmLijPvFI0o1RGsnb+dgViAzCtJ3vFcZ+EyS226QIOptRYA+zOsdzqA65A89tJ2+bGE65eYddPJYlBD0IT+Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sangfor.com.cn; spf=pass smtp.mailfrom=sangfor.com.cn; arc=none smtp.client-ip=220.197.31.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sangfor.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sangfor.com.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Message-ID: <AHsAlABfIqBgWBLnpG0eZ4rc.1.1736218069638.Hmail.zhuwei@sangfor.com.cn>
+To: "yisen.zhuang" <yisen.zhuang@huawei.com>, 
+	"salil.mehta" <salil.mehta@huawei.com>, 
+	shaojijie <shaojijie@huawei.com>
+Cc: netdev <netdev@vger.kernel.org>
+Subject: =?UTF-8?B?W2huczMgYnVncmVwb3J0XSAgZnJlZV9wY3BwYWdlc19idWxrIE51bGwgcG9pbnRlciBwcm9ibGVt?=
+X-Priority: 3
+X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com Sirius_WEB_WIN_1.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from zhuwei@sangfor.com.cn( [121.32.254.149] ) by ajax-webmail ( [127.0.0.1] ) ; Tue, 7 Jan 2025 10:47:49 +0800 (GMT+08:00)
+From: zhuwei <zhuwei@sangfor.com.cn>
+Date: Tue, 7 Jan 2025 10:47:49 +0800 (GMT+08:00)
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaQh4ZVkNOGkofHx5DHRhOGVYVFAkWGhdVEwETFh
+	oSFyQUDg9ZV1kYEgtZQVlKSUpVSElVSU5PVUpPQllXWRYaDxIVHRRZQVlPS0hVSktISk5OSFVKS0
+	tVSkJLS1kG
+X-HM-Tid: 0a943e9d9c2102bdkunm194347a3e4a
+X-HM-MType: 1
+X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMViXkYjtDdhq4fkoro5BbWy+lwMZu2ntyAJJPS
+	236gXeCakNl5mZCAsqbKZgJKrXwpVZjB4iP18JhxzjOygb2Nb5h+msBVjp+Enba/pTkRGlkDwKw0
+	TJkN3VxUpBvLsaF3KW5hxwK2nOzuWfmtJeDdk=
+X-HM-Sender-Digest: e1kMHhlZQQ8JDh5XWRIfHhUPWUFZRzozCDoXOjkdMgo5HCw5NxULPEse
+	IU8JGFVKVUpMSE1JSkNLTEtKQ0hVMxYaEhdVARMODB4SOwgaFRwdFAlVGBQWVRgVRVlXWRILWUFZ
+	SklKVUhJVUlOT1VKT0JZV1kIAVlBTElISzcG
 
-On Mon, 6 Jan 2025 18:48:54 -0800 Jakub Kicinski wrote:
-> >   * @module_fw_flash_in_progress: Module firmware flashing is in progress.
-> > @@ -1141,6 +1148,7 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
-> >  struct ethtool_netdev_state {
-> >  	struct xarray		rss_ctx;
-> >  	struct mutex		rss_lock;
-> > +	u32			hds_thresh;  
-> 
-> this value is checked in devmem.c but nothing ever sets it.
-> net/ethtool/rings.c needs to handle it like it handles
-> dev->ethtool->hds_config
-
-Oh, I see you set it in the driver in patch 8.
-That should work, my only concern is that this is not how
-any of the other ethtool config options work today.
-And there isn't any big warning in the code here telling
-driver authors that they are responsible for the state update.
-
-So even tho your patches are correct I still think it's better 
-to handle it like hds_config, just for consistency.
+SGVsbG8sIG1haW50YWluZXJzIG9mIHRoZSBobnMzIGRyaXZlci4KCldlIGhhdmUgZW5jb3VudGVy
+ZWQgYSBwcm9ibGVtIGhlcmUsIGFuZCBzbyBmYXIgd2UgaGF2ZSBubyBnb29kIHdheSB0byByZXBy
+b2R1Y2UgaXQuCkF0IHRoZSBzYW1lIHRpbWUsIHdlIHJldHJpZXZlZCBhbm90aGVyIHByb2JsZW0s
+IHdoaWNoIGlzIHNpbWlsYXIgdG8gb3VyczoKaHR0cHM6Ly9naXRlZS5jb20vb3BlbmV1bGVyL2tl
+cm5lbC9pc3N1ZXMvSUFQSUVICgpJcyB0aGVyZSBhbnkgZ29vZCB3YXkgdG8gcmVwcm9kdWNlIHRo
+ZSBwcm9ibGVtPyBXZSBoYXZlIHRyaWVkOiBtZW1vcnkgcHJlc3N1cmUsIHJlYm9vdCAtZiwgCnJt
+bW9kIGFuZCBpbnNtb2QgaG5zMywgaXBlcmYzIG5ldHdvcmsgcHJlc3N1cmUuQnV0IG5vbmUgb2Yg
+dGhlbSB3b3JrZWQuCgpjcmFzaCBzdGFjazoKNjc2NzEuNDk0ODc0XSAgY29ubmVjdGlvbjEwMDow
+OiBkZXRlY3RlZCBjb25uIGVycm9yICgxMDIwKQpbMzY3NjcxLjkxNjMyNl0gVW5hYmxlIHRvIGhh
+bmRsZSBrZXJuZWwgcGFnaW5nIHJlcXVlc3QgYXQgdmlydHVhbCBhZGRyZXNzIGRmZmYyMDAwMDAw
+MDAwMDAKWzM2NzY3MS45MjUxMjVdIE1lbSBhYm9ydCBpbmZvOgpbMzY3NjcxLjkyODU2Nl0gICBF
+U1IgPSAweDk2MDAwMDA0ClszNjc2NzEuOTI4NTc3XSAgIEV4Y2VwdGlvbiBjbGFzcyA9IERBQlQg
+KGN1cnJlbnQgRUwpLCBJTCA9IDMyIGJpdHMKWzM2NzY3MS45Mzg5ODddICAgU0VUID0gMCwgRm5W
+ID0gMApbMzY3NjcxLjkzODk5NF0gICBFQSA9IDAsIFMxUFRXID0gMApbMzY3NjcxLjk0NjUxMF0g
+RGF0YSBhYm9ydCBpbmZvOgpbMzY3NjcxLjk0NjUxMl0gICBJU1YgPSAwLCBJU1MgPSAweDAwMDAw
+MDA0ClszNjc2NzEuOTQ2NTEzXSAgIENNID0gMCwgV25SID0gMApbMzY3NjcxLjk0NjUxNV0gW2Rm
+ZmYyMDAwMDAwMDAwMDBdIGFkZHJlc3MgYmV0d2VlbiB1c2VyIGFuZCBrZXJuZWwgYWRkcmVzcyBy
+YW5nZXMKWzM2NzY3MS45NDY1MTldIEludGVybmFsIGVycm9yOiBPb3BzOiA5NjAwMDAwNCBbIzFd
+IFNNUApbMzY3NjcxLjk0NjUyM10gU291cmNlIHZlcnNpb246IHY2LjExLjEuMDA5NCswfmI3Y2Zi
+MDlmMS4yMDI0MTIyNCAjMSBTTVAgVHVlIERlYyAyNCAwODoyMDo1MCBVVEMgMjAyNApbMzY3Njcx
+Ljk0NjUyNF0gTW9kdWxlcyBsaW5rZWQgaW46IGV0bWVtX3NjYW4geHRfY29tbWVudCB4dF9jb25u
+dHJhY2sgZG1fcm91bmRfcm9iaW4gaXB0YWJsZV9yYXcgaXB0YWJsZV9tYW5nbGUgYXJjNCBtZDQg
+c2hhNTEyX2dlbmVyaWMgc2hhNTEyX2FybTY0IG5sc191dGY4IGNpZnMgY2NtIG5mc3YzIGlwdGFi
+bGVfbmF0IG5mX25hdCBpcHRfUkVKRUNUIG5mX3JlamVjdF9pcHY0IHh0X211bHRpcG9ydCB0Y3Bf
+ZGlhZyBpbmV0X2RpYWcgcnBjc2VjX2dzc19rcmI1IG5mc3Y0IGRuc19yZXNvbHZlciBmdXNlIGFj
+dF9nYWN0IGNsc191MzIgc2NoX2luZ3Jlc3MgbmZzZCBhdXRoX3JwY2dzcyBuZnNfYWNsIG5mcyBs
+b2NrZCBncmFjZSBmc2NhY2hlIHN1bnJwYyA4MDIxcSBnYXJwIG1ycCB4dF9zdGF0ZSBuZl9jb25u
+dHJhY2sgbmZfZGVmcmFnX2lwdjYgbmZfZGVmcmFnX2lwdjQgaXA2dGFibGVfZmlsdGVyIGlwNl90
+YWJsZXMgaXB0YWJsZV9maWx0ZXIgdmhvc3RfbmV0IHZob3N0IHRhcCBtbHg1X2liKE9FKSBtbHg1
+X2NvcmUoT0UpIHRscyBtbHhmdyByZG1hX3VjbShPRSkgaWJfdXZlcmJzKE9FKSByZG1hX2NtKE9F
+KSBpd19jbShPRSkgaWJfY20oT0UpIGlzY3NpX3RjcCBsaWJpc2NzaV90Y3AgbGliaXNjc2kgc2Nz
+aV90cmFuc3BvcnRfaXNjc2kgdmZpb19wY2kgdmZpb192aXJxZmQgdmZpb19pb21tdV90eXBlMSB2
+ZmlvIGhuczMgZG1fbXVsdGlwYXRoIG1seDRfZW4gbWx4NF9jb3JlIHRpcGMgaXA2X3VkcF90dW5u
+ZWwgdWRwX3R1bm5lbCB0dW4gbmJkIGJyaWRnZSBzdHAgbGxjIHdhdGNoX3JlYm9vdCBzZmZzKE9F
+KSBjbF9sb2NrKE9FKQpbMzY3NjcxLjk2NTE4NV0gIGNsX3NvZnRkb2coT0UpIHNxdWFzaGZzIG92
+ZXJsYXkgbG9vcCBpYl9jb3JlKE9FKSBtbHhfY29tcGF0KE9FKSBpcG1pX3NzaWYgcmVhbHRlayBh
+ZXNfY2VfYmxrIGNyeXB0b19zaW1kIGNyeXB0ZCBvZnBhcnQgYWVzX2NlX2NpcGhlciBjcmN0MTBk
+aWZfY2UgaGNsZ2UgaXBtaV9zaSBjbWRsaW5lcGFydCBnaGFzaF9jZSBreV9scGNtdXggc2VzIGhu
+YWUzIGhvc3RfZWRtYV9kcnYgc2hhMV9jZSBoaV9zZmMgam95ZGV2IHNic2FfZ3dkdCBpcG1pX2Rl
+dmludGYgZW5jbG9zdXJlIGlwbWlfbXNnaGFuZGxlciBtdGQgc3BpX2R3X21taW8gc2NoX2ZxX2Nv
+ZGVsIGlwX3RhYmxlcyBzaGEyX2NlIHNoYTI1Nl9hcm02NCBtZWdhcmFpZF9zYXMoT0UpIGhpc2lf
+c2FzX3YzX2h3IHVzYmhpZCBoaXNpX3Nhc19tYWluIFtsYXN0IHVubG9hZGVkOiBldG1lbV9zY2Fu
+XQpbMzY3NjcxLjk3MzMzM10gUHJvY2VzcyByZWJvb3QgKHBpZDogNzQ4NjAsIHN0YWNrIGxpbWl0
+ID0gMHgwMDAwMDAwMDBlNDEyM2MwKQpbMzY3NjcyLjA4MjMxOF0gQ1BVOiA1OSBQSUQ6IDc0ODYw
+IENvbW06IHJlYm9vdCBLZHVtcDogbG9hZGVkIFRhaW50ZWQ6IEcgICAgICAgIFcgIE9FICAgICA0
+LjE5LjkwLTg5LjE2LnYyNDAxLm9zYy5zZmMuNi4xMS4xLjAwOTQua3kxMC5hYXJjaDY0K2RlYnVn
+ICMxClszNjc2NzIuMjA4ODEzXSBTb3VyY2UgVmVyc2lvbjogdjYuMTEuMS4wMDk0KzB+YjdjZmIw
+OWYxLjIwMjQxMjI0ClszNjc2NzIuMzM1MDQyXSBIYXJkd2FyZSBuYW1lOiBZdW5rZSBDaGluYSBL
+dW5UYWkgUjUyMi9CQzgyQU1ER0EsIEJJT1MgMS4zNSAwNC8zMC8yMDIwClszNjc2NzIuNDI2ODY5
+XSBwc3RhdGU6IDYwNDAwMDg5IChuWkN2IGRhSWYgK1BBTiAtVUFPKQpbMzY3NjcyLjQ5ODA0NV0g
+cGMgOiBmcmVlX3BjcHBhZ2VzX2J1bGsrMHgxZDgvMHhlZDAKWzM2NzY3Mi42MTEyNTFdIGxyIDog
+ZnJlZV91bnJlZl9wYWdlX2NvbW1pdCsweDI3NC8weDM3MApbMzY3NjcyLjYxMTI1OV0gc3AgOiBm
+ZmZmYTAyMjk3N2I3NjQwClszNjc2NzIuNjg0MjE3XSB4Mjk6IGZmZmZhMDIyOTc3Yjc3MjAgeDI4
+OiBmZmZmN2ZlODA4OWY5YTg4IApbMzY3NjcyLjc4NzA0MV0geDI3OiAwMDAwMDAwMDAwMDAwMDAz
+IHgyNjogZGZmZjIwMDAwMDAwMDAwMCAKWzM2NzY3Mi43ODcwNDVdIHgyNTogMDAwMDAwMDAwMDAw
+MDAwMCB4MjQ6IGZmZmY3ZmU4MDg5ZjlhOTAgClszNjc2NzIuNzg3MDQ2XSB4MjM6IDAwMDAwMDAw
+MDAwMDAwMDAgeDIyOiAxZmZmZWZmZDAxMTNmMzUxIApbMzY3NjcyLjc4NzA0N10geDIxOiAxZmZm
+ZWZmZDAxMTNmMzUyIHgyMDogZmZmZmEwMmRiZmI3OWZlMCAKWzM2NzY3Mi43ODcwNDldIHgxOTog
+ZmZmZjdmZTgwODlmOWE4MCB4MTg6IDAwMDAwMDAwMDAwMDAwM2IgClszNjc2NzIuNzg3MDUwXSB4
+MTc6IDAwMDBmZmZmMzMzNDE2YjggeDE2OiBmZmZmMjAwMDIxYmE5MDYwIApbMzY3NjcyLjc4NzA1
+MV0geDE1OiAwMDAwMDAwMDAwMDAwMGMwIHgxNDogMDAwMGZmZmYzMzg3ZGFjMCAKWzM2NzY3Mi43
+ODcwNTNdIHgxMzogMDAwMDAwMDA3ZmZmZmZmZiB4MTI6IDAwMDAyMTczY2I0ZmI5NjAgClszNjc2
+NzIuNzg3MDU0XSB4MTE6IDFmZmZlZmZkMDEwMGFmOGUgeDEwOiBmZmZmMGZmZDAxMDBhZjhlIApb
+MzY3NjcyLjc4NzA1Nl0geDkgOiBkZmZmMjAwMDAwMDAwMDAwIHg4IDogZmZmZjE0MDQwMmJlNDAw
+MCAKWzM2NzY3Mi43ODcwNTddIHg3IDogZmZmZmZmZmZmZmZmZmZmZiB4NiA6IDFmZmZmNDA0NTJl
+ZjZlZDggClszNjc2NzIuNzg3MDU5XSB4NSA6IDAwMDAwMDAwMDAwMDAwMTAgeDQgOiAwMDAwMDAw
+MDAwMDAwMDAwIApbMzY3NjcyLjc4NzA2MF0geDMgOiBmZmZmMjAwMDIyOWE2MTQ4IHgyIDogMDAw
+MDAwMDAwMDAwMDAwMCAKWzM2NzY3Mi43ODcwNjFdIHgxIDogZmZmZmEwMmRiZmI3OWZmMCB4MCA6
+IDAwMDAwMDAwMDAwMDAwMDAgClszNjc2NzIuNzg3MDY0XSBDYWxsIHRyYWNlOgpbMzY3NjcyLjc4
+NzA3NF0gIGZyZWVfcGNwcGFnZXNfYnVsaysweDFkOC8weGVkMApbMzY3NjcyLjc4NzA3N10gIGZy
+ZWVfdW5yZWZfcGFnZV9jb21taXQrMHgyNzQvMHgzNzAKWzM2NzY3Mi43ODcwNzldICBmcmVlX3Vu
+cmVmX3BhZ2UrMHg5MC8weGMwClszNjc2NzIuNzg3MDg0XSAgX19wdXRfcGFnZSsweDcwLzB4YTgK
+WzM2NzY3Mi43ODcwOTNdICBwYWdlX3Bvb2xfcmV0dXJuX3BhZ2UrMHg4NC8weGI4ClszNjc2NzIu
+Nzg3MDk1XSAgcGFnZV9wb29sX3B1dF9wYWdlKzB4MmRjLzB4ODE4ClszNjc2NzIuNzg3MTE1XSAg
+aG5zM19mcmVlX2J1ZmZlci5pc3JhLjMwKzB4MTUwLzB4MWM4IFtobnMzXQpbMzY3NjcyLjc4NzEz
+Ml0gIGhuczNfZnJlZV9idWZmZXJfZGV0YWNoKzB4MTA4LzB4MTQ4IFtobnMzXQpbMzY3NjcyLjc4
+NzEzN10gIGhuczNfZnJlZV9kZXNjKzB4NzQvMHgyMjggW2huczNdClszNjc2NzIuNzg3MTQxXSAg
+aG5zM19maW5pX3JpbmcrMHgzMC8weDUxOCBbaG5zM10KWzM2NzY3Mi43ODcxNDVdICBobnMzX3Vu
+aW5pdF9hbGxfcmluZy5pc3JhLjQwKzB4YzQvMHgxNDggW2huczNdClszNjc2NzIuNzg3MTQ4XSAg
+aG5zM19jbGllbnRfdW5pbml0KzB4Mjc4LzB4NDEwIFtobnMzXQpbMzY3NjcyLjc4NzE3M10gIGhj
+bGdlX3VuaW5pdF9jbGllbnRfaW5zdGFuY2UrMHgyZWMvMHg0MjggW2hjbGdlXQpbMzY3NjcyLjc4
+NzE4MF0gIGhuYWUzX3VuaW5pdF9jbGllbnRfaW5zdGFuY2UrMHhlNC8weDEyOCBbaG5hZTNdClsz
+Njc2NzIuNzg3MTgyXSAgaG5hZTNfdW5yZWdpc3Rlcl9hZV9kZXYrMHhlNC8weDJiMCBbaG5hZTNd
+ClszNjc2NzIuNzg3MTg3XSAgaG5zM19zaHV0ZG93bisweDQwLzB4ZTAgW2huczNdClszNjc2NzIu
+Nzg3MTk0XSAgcGNpX2RldmljZV9zaHV0ZG93bisweDc0LzB4MTIwClszNjc2NzIuNzg3MjAxXSAg
+ZGV2aWNlX3NodXRkb3duKzB4MjNjLzB4NWE4ClszNjc2NzIuNzg3MjA1XSAga2VybmVsX3Jlc3Rh
+cnRfcHJlcGFyZSsweDZjLzB4ODAKWzM2NzY3Mi43ODcyMDZdICBrZXJuZWxfcmVzdGFydCsweDIw
+LzB4ODgKWzM2NzY3Mi43ODcyMDhdICBzeXNfcmVib290KzB4MmU0LzB4MzMwClszNjc2NzIuNzg3
+MjEyXSAgZWwwX3N2Y19uYWtlZCsweDQ0LzB4NDgKWzM2NzY3Mi43ODcyMTZdIENvZGU6IDM4ZmE2
+ODg0IDM1MDA2Mjg0IGQzNDNmZjIwIGY5MDAwNDM5ICgzOGZhNjgwMCkgClszNjc2NzIuNzg3MjY2
+XSBTTVA6IHN0b3BwaW5nIHNlY29uZGFyeSBDUFVzClszNjc2NzIuODQxNDAyXSBTdGFydGluZyBj
+cmFzaGR1bXAga2VybmVsLi4uClszNjc2NzIuODQxNDA3XSBCeWUhCgpob3BlIHdlIGNhbiBzb2x2
+ZSBpdCB0b2dldGhlciBhbmQgbWFrZSBobnMzIGJldHRlci4NCg0K
 
