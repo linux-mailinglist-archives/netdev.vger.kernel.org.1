@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-155921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40D39A0459F
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:11:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5C6A0459D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:10:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B88781887B01
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:10:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85F06165464
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44EFA1F7095;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DF51F7546;
 	Tue,  7 Jan 2025 16:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yl/QT6J9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ad0WrXfJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CB11F669F
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE3E1F709D
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736266138; cv=none; b=l9thIms1T/y56Dv43U2lA5G6PJTINtzOxxfNgjkXkH8r7Kj6enxbRXZkND+9rNGV9S1UJniRl6E1OcGizd4OwMoyqwZOVD9ceRCaC6HzkhzKapOC99/R3p5uKzSjGbim7e0HdQuJJyYmH2oQEbHlWc19jcrPsCo+parRjhUgPlg=
+	t=1736266138; cv=none; b=LilgBzudFO4TroLsdlMKG597IXvjV9yX+8OCJuQom0lk7c3AiD8iAd7yTbdiS0SltVXgaScDc5da1AfNcEXvHHyAQ7nb+HQGAqAqJ3SxkGJ2Jbv1AnT0pzODTY62nWUI87m7fcyZUvQZi7QQrtdXrdnyUvdJ0Q5WVmDAWrWYQlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736266138; c=relaxed/simple;
-	bh=xSE20IJULl4nZv2UAXzm3oPk9+3mH4GrwM0Z7ESJbGA=;
+	bh=ghYOUbYsv1jTLjTl/SdvhL4GpwyJZxRmyp4yAgz2J7g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZZBJruzgDQScaP6qA4oCqa5ducxSr0c8VV5jqLPbNVpcYqrUSTbGDNWouIC+SlDpvJAe+JITq9EEdfUHLtGiFf3E4oUjGXZj0d86kkjzjjZQT1AiEKbtgaiqYXihd7BcjRh/MEt/XKoGIxcejZ4dZ+LhSpmxg08el31z8yvsQ4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yl/QT6J9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F7D5C4CEE2;
+	 MIME-Version; b=h578UzDcuYmO+fbk0CBYtud9Fd2qPFkpo3MWZQ4JjSZbMc1+33zrm2CXTLjquH3XB5nqO664GM+WawjdLHbhYi3YJ/p/4trZRQt0ZtT26p9CFQBbeCJpIQ/CzrvTk0UvFgJFJuBTg0v5/BtC1iVp5iYgibvU88ADlFuvldN34LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ad0WrXfJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A16C4CED6;
 	Tue,  7 Jan 2025 16:08:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736266137;
-	bh=xSE20IJULl4nZv2UAXzm3oPk9+3mH4GrwM0Z7ESJbGA=;
+	s=k20201202; t=1736266138;
+	bh=ghYOUbYsv1jTLjTl/SdvhL4GpwyJZxRmyp4yAgz2J7g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Yl/QT6J9+j6dVJ8zGLkWyqnZfext283Hr6IzlaVuY35TrMYRAT4qq/tizD+rsqElE
-	 5JdDd6lmBN4sc6hNOxsjZFIA+mmgTu9Qp2f+V7d9Gex/jBSaw/L5LmFEeDqg2F2w0M
-	 O379W/sU9LwgGN0b6pG6slFrgmmSP/yAS1gdiUL7F14juz234h2H4d4S0j1F1Nbu2l
-	 NCvu9crK6tGFQpffLT9y/chUAffN38mz4Cj0tguIfLnaFDMg+Rrci/dpJNBo7DFPvU
-	 4mbWYwBUA6e1CBky6mBe4H7Cmgfi7uNQ9cdLZhVL4fK8FEsmF+ACZZ5kyoqbyrA6ym
-	 woIJHWbQ1zMdQ==
+	b=Ad0WrXfJCbkMyUFT+QhEyvS2eQM3DJb38a3fLC4pI0zZAH1ks3l7OPQyFb9OXfTYw
+	 lN7XYTJb9BfL8qkrJMu5IQVPGR5AdVXl2mpYoAp+3sDnePH5JvPeUSmlpc+9nrLFBq
+	 RYrsCQZ74ObpxHFL/XVD9jQ+oOpq6AWjmr0aQ13RqXJUjloCHXQrx1WPsVvMER7LsV
+	 TG8IZUfeUlaeJxC9r0MJA8K4sW21gCRKgCzFicDtfTyf2DKhR3mxyhc6/5W1m5Di95
+	 thQ7bgSU7pG6rnF8bs/MkZMSqSBT2aCJ4gOR4iejhtvXb8f+lmwmcVhbt4sY3YPhwN
+	 3AC/YmBollxXw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	sdf@fomichev.me,
 	Jakub Kicinski <kuba@kernel.org>,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v2 7/8] netdevsim: add debugfs-triggered queue reset
-Date: Tue,  7 Jan 2025 08:08:45 -0800
-Message-ID: <20250107160846.2223263-8-kuba@kernel.org>
+Subject: [PATCH net-next v2 8/8] selftests: net: test listing NAPI vs queue resets
+Date: Tue,  7 Jan 2025 08:08:46 -0800
+Message-ID: <20250107160846.2223263-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250107160846.2223263-1-kuba@kernel.org>
 References: <20250107160846.2223263-1-kuba@kernel.org>
@@ -66,127 +66,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support triggering queue reset via debugfs for an upcoming test.
+Test listing netdevsim NAPIs before and after a single queue
+has been reset (and NAPIs re-added).
+
+Start from resetting the middle queue because edge cases
+(first / last) may actually be less likely to trigger bugs.
+
+  # ./tools/testing/selftests/net/nl_netdev.py
+  KTAP version 1
+  1..4
+  ok 1 nl_netdev.empty_check
+  ok 2 nl_netdev.lo_check
+  ok 3 nl_netdev.page_pool_check
+  ok 4 nl_netdev.napi_list_check
+  # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
 
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2:
- - change mode to 0200
- - reorder removal to be inverse of add
- - fix the spaces vs tabs
----
- drivers/net/netdevsim/netdev.c    | 55 +++++++++++++++++++++++++++++++
- drivers/net/netdevsim/netdevsim.h |  1 +
- 2 files changed, 56 insertions(+)
+ tools/testing/selftests/net/nl_netdev.py | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index cfb079a34532..d013b6498539 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -20,6 +20,7 @@
- #include <linux/netdevice.h>
- #include <linux/slab.h>
- #include <net/netdev_queues.h>
-+#include <net/netdev_rx_queue.h>
- #include <net/page_pool/helpers.h>
- #include <net/netlink.h>
- #include <net/net_shaper.h>
-@@ -29,6 +30,8 @@
+diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
+index 93d9d914529b..93e8cb671c3d 100755
+--- a/tools/testing/selftests/net/nl_netdev.py
++++ b/tools/testing/selftests/net/nl_netdev.py
+@@ -18,6 +18,23 @@ from lib.py import NetdevFamily, NetdevSimDev, ip
+     ksft_eq(len(lo_info['xdp-rx-metadata-features']), 0)
  
- #include "netdevsim.h"
  
-+MODULE_IMPORT_NS("NETDEV_INTERNAL");
++def napi_list_check(nf) -> None:
++    with NetdevSimDev(queue_count=100) as nsimdev:
++        nsim = nsimdev.nsims[0]
 +
- #define NSIM_RING_SIZE		256
- 
- static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
-@@ -722,6 +725,54 @@ static const struct netdev_queue_mgmt_ops nsim_queue_mgmt_ops = {
- 	.ndo_queue_stop		= nsim_queue_stop,
- };
- 
-+static ssize_t
-+nsim_qreset_write(struct file *file, const char __user *data,
-+		  size_t count, loff_t *ppos)
-+{
-+	struct netdevsim *ns = file->private_data;
-+	unsigned int queue, mode;
-+	char buf[32];
-+	ssize_t ret;
++        ip(f"link set dev {nsim.ifname} up")
 +
-+	if (count >= sizeof(buf))
-+		return -EINVAL;
-+	if (copy_from_user(buf, data, count))
-+		return -EFAULT;
-+	buf[count] = '\0';
++        napis = nf.napi_get({'ifindex': nsim.ifindex}, dump=True)
++        ksft_eq(len(napis), 100)
 +
-+	ret = sscanf(buf, "%u %u", &queue, &mode);
-+	if (ret != 2)
-+		return -EINVAL;
++        for q in [50, 0, 99]:
++            for i in range(4):
++                nsim.dfs_write("queue_reset", f"{q} {i}")
++                napis = nf.napi_get({'ifindex': nsim.ifindex}, dump=True)
++                ksft_eq(len(napis), 100,
++                        comment=f"queue count after reset queue {q} mode {i}")
 +
-+	rtnl_lock();
-+	if (!netif_running(ns->netdev)) {
-+		ret = -ENETDOWN;
-+		goto exit_unlock;
-+	}
 +
-+	if (queue >= ns->netdev->real_num_rx_queues) {
-+		ret = -EINVAL;
-+		goto exit_unlock;
-+	}
-+
-+	ns->rq_reset_mode = mode;
-+	ret = netdev_rx_queue_restart(ns->netdev, queue);
-+	ns->rq_reset_mode = 0;
-+	if (ret)
-+		goto exit_unlock;
-+
-+	ret = count;
-+exit_unlock:
-+	rtnl_unlock();
-+	return ret;
-+}
-+
-+static const struct file_operations nsim_qreset_fops = {
-+	.open = simple_open,
-+	.write = nsim_qreset_write,
-+	.owner = THIS_MODULE,
-+};
-+
- static ssize_t
- nsim_pp_hold_read(struct file *file, char __user *data,
- 		  size_t count, loff_t *ppos)
-@@ -934,6 +985,9 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+ def page_pool_check(nf) -> None:
+     with NetdevSimDev() as nsimdev:
+         nsim = nsimdev.nsims[0]
+@@ -89,7 +106,7 @@ from lib.py import NetdevFamily, NetdevSimDev, ip
  
- 	ns->pp_dfs = debugfs_create_file("pp_hold", 0600, nsim_dev_port->ddir,
- 					 ns, &nsim_pp_hold_fops);
-+	ns->qr_dfs = debugfs_create_file("queue_reset", 0200,
-+					 nsim_dev_port->ddir, ns,
-+					 &nsim_qreset_fops);
+ def main() -> None:
+     nf = NetdevFamily()
+-    ksft_run([empty_check, lo_check, page_pool_check],
++    ksft_run([empty_check, lo_check, page_pool_check, napi_list_check],
+              args=(nf, ))
+     ksft_exit()
  
- 	return ns;
- 
-@@ -947,6 +1001,7 @@ void nsim_destroy(struct netdevsim *ns)
- 	struct net_device *dev = ns->netdev;
- 	struct netdevsim *peer;
- 
-+	debugfs_remove(ns->qr_dfs);
- 	debugfs_remove(ns->pp_dfs);
- 
- 	rtnl_lock();
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index 8c50969b1240..a70f62af4c88 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -136,6 +136,7 @@ struct netdevsim {
- 
- 	struct page *page;
- 	struct dentry *pp_dfs;
-+	struct dentry *qr_dfs;
- 
- 	struct nsim_ethtool ethtool;
- 	struct netdevsim __rcu *peer;
 -- 
 2.47.1
 
