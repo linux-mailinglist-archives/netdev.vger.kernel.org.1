@@ -1,91 +1,208 @@
-Return-Path: <netdev+bounces-156028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3618A04B1C
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:38:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E97A04B33
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 21:47:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37E557A0560
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 20:38:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8F5E1887049
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 20:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDB41F708C;
-	Tue,  7 Jan 2025 20:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69541155300;
+	Tue,  7 Jan 2025 20:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IincHyk5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EoCOuEPJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE70F1F63E7;
-	Tue,  7 Jan 2025 20:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A26A95C
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 20:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736282288; cv=none; b=VAFZVz54otiSFrvgspvOsHRhhdSKY6YGtyZEz+ilrB7VAhWOqQveKL9u6DCR1DM5OhXNDxxexIj1JIYjEWELOGnVISnUqDHvyieOccG2KfQI7jLz/sOna87UprnzMxvxwMO4DhsWUksL+fJFY7WYfyf6s7mclZ+Wm9/hbzDxVFw=
+	t=1736282816; cv=none; b=HdD9KfUvjdsx9tSiBgfOoPB00c1hrpD24AILNkQuDAYJBWh81Wo7YMkx9bmlaDvU/ZKJHCFWeMzehuU11RRdRZtCvtbeYYTE4H/f19xYyhmcpysqbpVdXvT14y4JVfVUWL4WBraIuEN/PRzP0pv9+QPKK38gCus3K3OJfHBlAM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736282288; c=relaxed/simple;
-	bh=xVENo9muNO/TQ5xVqUKOs/5Q4+G96PW1sKSnQr73q9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U14vuusbfwKnu2pH69MbVBc1eKEdkMX/chwVTNtajetkhO6xwi7m74cLY/k8ac5c+MX0RrI206b704qlUqOaXdM+aV6iQbzq5lSl28FpER3LUPzbZkMsV6KrnqF5mB4CstaLafwPTymWoZzNYnWuqkUx3PnksWlv/MrGPfzQJ4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IincHyk5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 582D5C4CED6;
-	Tue,  7 Jan 2025 20:38:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736282287;
-	bh=xVENo9muNO/TQ5xVqUKOs/5Q4+G96PW1sKSnQr73q9Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IincHyk5dnHSj14WBxB3nZ8H+ad7Wv7JCDFqB3ioz1CyxVIL28f/wayA5OfnPboFy
-	 w4bYeV8oyIpNsDF2th/1YTvksDeeiWBKLOGweUN5unnHCsYuY6UO9/ov33L1S7sVm+
-	 1K3BnLtTw6iZPtOBVnjoMMzolL2SbZULRRKu+YNbYACOMPPIofT1Am+zEPd/PAx/vs
-	 ld0p/Rkjj2unh6Png65S7WHaBoyC3nNe0ZjG8UBnxGV+bt8cBPNwF55J92ceGMmf0M
-	 9p3XnJzVS37fvnQRlLFc7Do5qJjEPxgQYy5375IiG9MyjZthi5D9QPQCuQtvR2QVYT
-	 LbPjcwrrJqcnA==
-Date: Tue, 7 Jan 2025 12:38:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xiao Liang <shaw.leon@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Kuniyuki
- Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ido
- Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
- Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
- <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
- linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
- osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
- linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
- linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
- bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 02/11] rtnetlink: Pack newlink() params into
- struct
-Message-ID: <20250107123805.748080ab@kernel.org>
-In-Reply-To: <20250104125732.17335-3-shaw.leon@gmail.com>
-References: <20250104125732.17335-1-shaw.leon@gmail.com>
-	<20250104125732.17335-3-shaw.leon@gmail.com>
+	s=arc-20240116; t=1736282816; c=relaxed/simple;
+	bh=twM8qqh8ph9f3CqzD80Pz4Bv+uF7sT+VMmxzx6FL1rw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IK5LHU8C90UGAN5uugZL5X+Evrpb0fAUf8qsMeX/hhXD3E+Hm2oPRrUN+kDP0eJPvbFoK7PKi4Aoupq86wkk2N2zGhuQz9+2ZfhBWVPcuWw97bzubLOuDJ7U1UKoNZJeaWujXAQQ9RIefOqdFUZ9T1lC6kvJrwqySzb4ToLM5es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EoCOuEPJ; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5d414b8af7bso31646137a12.0
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 12:46:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736282813; x=1736887613; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DHD2ZkgNmmecwEumN8Mr4H0cuTGt/2anHKyAmS5nhdE=;
+        b=EoCOuEPJxhepsgZKWy/LMCk2y2XiHSSJHJ9xOtEVFk2cR9yku/SKLG3b2uqALlOB8f
+         34jQGWGHPyolfQBJjqZcMxuR3ODFdwvuXbkMs2N7U1Xv2pZsCzDFBuXTSdLfZqY3Sdtc
+         QPlqAytnQjrH5p2R90zlqkqVzzi4QiHmP5u2mPRVCJ6ZEI7z+NhpA5yDI3DkxGtVPs35
+         5LNVvG7ppfZ9ZNx7RRLYC8y1wbTBmS+rrSKHi9NJp7Lbp/lIHW3UFL80AGAHmAkthvbl
+         PFpHBCgsjGGuAO2mRyvMyIH1Ku0da0o9iWeWqSny3Fl22f8S0Sd3B3ue80yoO+enUB8+
+         QjoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736282813; x=1736887613;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DHD2ZkgNmmecwEumN8Mr4H0cuTGt/2anHKyAmS5nhdE=;
+        b=kayOjOU6X2Vx5ID9xnTnLA2ilBLnDuKwTxwNgR5XJHLMNPbExwMkQh7fkFMrkY90nG
+         4XrbIgGQQNdQ9e6w1sL/r5WJWNHN4gmcZ1xHMx+u74H0Hu09qnJQtaCBzzwdeQdYozH6
+         smpdG59HvmwVB0Jcno7CuzzGOUT6IhAwUn9sAmuQrlIdOfUTzkJoIy39guXhfz2W8gAE
+         AZpx4dZDOIs0FxLyjuUwLQ9c6s7M2Mdu6M7+1ZBhZBdUdUWyagQsHIE86j8Vc35wx5Ta
+         TU0hMNpACgLh/Dq0xuykl/sWGw+gBV7LPC8U8ANq4vsY85XUreIOyzFiC9qmho7jgSKh
+         tqYA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCXDDZnWuyJuknd/hDCAolhNROC2YkfLtE5ei2b/Ukl5Uwuin5v0sYThStEd/iPPnFNe/iVpA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydwjIAOMudNX6f2GlgSEDoh2L7Q6L/LJo5iLlHEYFgBxwJjd2U
+	12f5HS/9M5FLDFerpXrrymvjarBa9sjxHokopm5W6InOHUMAnK8RozuKS4vmS9PYm7n3U0oWfFw
+	ZfHORQoQPz0M7ezxUE4g8WkdUVBx03WhX5SszlZWX/Z1AdnuX/OiO
+X-Gm-Gg: ASbGncvUfrh8HE98k4Sn50RKgpNIkPqddcNI+Gd2nCa/dHe8ULj1swtR4br9XO3eObS
+	EVbMRZT1sb9mgftA1NEElMS4lcVnMW0HCL8Wg/Q==
+X-Google-Smtp-Source: AGHT+IEs9aVhbcWUpfIkQDUgYG1L71snr/Xl0jUo5Kqfg+LKX0C57t04oZ2u84YZWQgqsOLXM734KEYowFvfUo/jURY=
+X-Received: by 2002:a05:6402:320b:b0:5d0:cfdd:2ac1 with SMTP id
+ 4fb4d7f45d1cf-5d972dfcbcfmr268160a12.6.1736282812724; Tue, 07 Jan 2025
+ 12:46:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250107173838.1130187-1-edumazet@google.com> <20250107121148.7054518d@kernel.org>
+ <CANn89iJkxX1d-SKN6WVJST=5X7KqXdJ+OKcCVDEFCedJ7ArSig@mail.gmail.com>
+In-Reply-To: <CANn89iJkxX1d-SKN6WVJST=5X7KqXdJ+OKcCVDEFCedJ7ArSig@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 7 Jan 2025 21:46:41 +0100
+X-Gm-Features: AbW1kvZowGTW2XsyS-P1mH-3I3hj8vsL3y9s9hUxQp70UYWLXnWntvkcbs0DXvM
+Message-ID: <CANn89i+dN11K7EushTwsT0tchEytceTWHqiB23KqrYvfauRjWg@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/4] net: reduce RTNL pressure in unregister_netdevice()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat,  4 Jan 2025 20:57:23 +0800 Xiao Liang wrote:
-> -static int amt_newlink(struct net *net, struct net_device *dev,
-> -		       struct nlattr *tb[], struct nlattr *data[],
-> -		       struct netlink_ext_ack *extack)
-> +static int amt_newlink(struct rtnl_newlink_params *params)
->  {
-> -	struct amt_dev *amt = netdev_priv(dev);
-> +	struct netlink_ext_ack *extack = params->extack;
-> +	struct net_device *dev = params->dev;
-> +	struct nlattr **data = params->data;
-> +	struct nlattr **tb = params->tb;
-> +	struct net *net = params->net;
-> +	struct amt_dev *amt;
+On Tue, Jan 7, 2025 at 9:22=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Tue, Jan 7, 2025 at 9:11=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+> >
+> > On Tue,  7 Jan 2025 17:38:34 +0000 Eric Dumazet wrote:
+> > > One major source of RTNL contention resides in unregister_netdevice()
+> > >
+> > > Due to RCU protection of various network structures, and
+> > > unregister_netdevice() being a synchronous function,
+> > > it is calling potentially slow functions while holding RTNL.
+> > >
+> > > I think we can release RTNL in two points, so that three
+> > > slow functions are called while RTNL can be used
+> > > by other threads.
+> >
+> > I think we'll need:
+> >
+> > diff --git a/net/devlink/port.c b/net/devlink/port.c
+> > index 939081a0e615..cdfa22453a55 100644
+> > --- a/net/devlink/port.c
+> > +++ b/net/devlink/port.c
+> > @@ -1311,6 +1311,7 @@ int devlink_port_netdevice_event(struct notifier_=
+block *nb,
+> >                 __devlink_port_type_set(devlink_port, devlink_port->typ=
+e,
+> >                                         netdev);
+> >                 break;
+> > +       case NETDEV_UNREGISTERING:
+>
+> Not sure I follow ?
+>
+> >         case NETDEV_UNREGISTER:
+> >                 if (devlink_net(devlink) !=3D dev_net(netdev))
+> >                         return NOTIFY_OK;
+> >
+> >
+> > There is no other way to speed things up? Use RT prio for the work?
+> > Maybe WRITE_ONCE() a special handler into backlog.poll, and schedule it=
+?
+> >
+> > I'm not gonna stand in your way but in general re-taking caller locks
+> > in a callee is a bit ugly :(
+>
+> We might restrict this stuff to cleanup_net() caller only, we know the
+> netns are disappearing
+> and that no other thread can mess with them.
 
-IMHO you packed a little too much into the struct.
-Could you take the dev and the extack back out?
+ie something like:
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 9e93b13b9a76bd256d93d05a13d21dca883d6ab8..a555e82adbeda90672c72700e92=
+35a5d271be8fd
+100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11414,6 +11414,23 @@ struct net_device *alloc_netdev_dummy(int sizeof_p=
+riv)
+ }
+ EXPORT_SYMBOL_GPL(alloc_netdev_dummy);
+
++static bool from_cleanup_net(void)
++{
++       return current =3D=3D cleanup_net_task;
++}
++
++static void rtnl_drop_if_cleanup(void)
++{
++       if (from_cleanup_net())
++               __rtnl_unlock();
++}
++
++static void rtnl_acquire_if_cleanup(void)
++{
++       if (from_cleanup_net())
++               rtnl_lock();
++}
++
+ /**
+  *     synchronize_net -  Synchronize with packet receive processing
+  *
+@@ -11423,7 +11440,7 @@ EXPORT_SYMBOL_GPL(alloc_netdev_dummy);
+ void synchronize_net(void)
+ {
+        might_sleep();
+-       if (current =3D=3D cleanup_net_task || rtnl_is_locked())
++       if (from_cleanup_net() || rtnl_is_locked())
+                synchronize_rcu_expedited();
+        else
+                synchronize_rcu();
+@@ -11527,10 +11544,10 @@ void unregister_netdevice_many_notify(struct
+list_head *head,
+                WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERING);
+        }
+
+-       __rtnl_unlock();
++       rtnl_drop_if_cleanup();
+        flush_all_backlogs();
+        synchronize_net();
+-       rtnl_lock();
++       rnl_acquire_if_cleanup();
+
+        list_for_each_entry(dev, head, unreg_list) {
+                struct sk_buff *skb =3D NULL;
+@@ -11590,9 +11607,9 @@ void unregister_netdevice_many_notify(struct
+list_head *head,
+ #endif
+        }
+
+-       __rtnl_unlock();
++       rtnl_drop_if_cleanup();
+        synchronize_net();
+-       rtnl_lock();
++       rnl_acquire_if_cleanup();
+
+        list_for_each_entry(dev, head, unreg_list) {
+                netdev_put(dev, &dev->dev_registered_tracker);
 
