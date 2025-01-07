@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-155824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0026A03F1C
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:30:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6206A03F1E
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 13:30:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 966BE164953
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:30:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 516A67A1DBA
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D36F1EE7C6;
-	Tue,  7 Jan 2025 12:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567601EF0B9;
+	Tue,  7 Jan 2025 12:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qOBDXH4m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n8tEyHr0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0F21EE7B4
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 12:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4461EF0B1
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 12:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736253010; cv=none; b=dYdxZ6DAO6Q5ihXkhomG4AdS0bZzkBEUJlH2NiVhPWrtx1tmgsWZBUmCp015TTuISrudLDjoxCBxCFWFkSTSseFAYL65KflsXW/ToohkdNleCW12geydxoYMlroTBQwI71uA5xtTjtZ6LfJ2m/5gfeR1FcDQKSbFC/Mvzbe1um0=
+	t=1736253013; cv=none; b=C+63ynWf9ccY9OeDjPN8AHGUQeoPIxhFvVbdtv+eXW7kRlJruYnAjsjLLwMTga0VnFFhqLtDMALbLdk6McwRSGE9yp8gmLFqyNweaeF+mn8sH5VntDLvHyqDu6mkjvg7H/ZXd4fOSEofocPmpP1AEwZsrodmDIcGunJo9iFZEZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736253010; c=relaxed/simple;
-	bh=s9KI8DK8F0J8mXinSZKf5qgc8HR762Q3DmvrGckfb30=;
+	s=arc-20240116; t=1736253013; c=relaxed/simple;
+	bh=SbiW47PK2VdDldJSNiTyXXjompnyG9UpusszDUoRMfQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gNOCBZGc/C2b1GdoMqXCwE1YTHVzuMYTq5DTbsDUAsp9KSuYRjw7BJAm0vljdK8qkVKnlGZMED8Y7IGjY3s+dPHzTy+FrsE/CpxSEGtk0BevaxlWjX4AETi2iAGgi9oU39PlOgBK3rYOMKK1b9FH2PKsMnV1htLy+xLrg6I7wp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qOBDXH4m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D93DC4CED6;
-	Tue,  7 Jan 2025 12:30:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TL9CdzceYtIIMsInBUbvvjaPwvgQxsq0+JwLh+xh6/q9yz90HmanyMWPZGNpyhZdxpEoHM0B+qC6cuyuTdVRwou45pYqvucCFo4utNjpW7CVDN4551xY1JhzLgymOZyrFSaFTgm6O4YudJbYOgK1j7atH1gZSkWKPkZYvyi6JnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n8tEyHr0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8DD2C4CEDD;
+	Tue,  7 Jan 2025 12:30:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736253009;
-	bh=s9KI8DK8F0J8mXinSZKf5qgc8HR762Q3DmvrGckfb30=;
+	s=k20201202; t=1736253012;
+	bh=SbiW47PK2VdDldJSNiTyXXjompnyG9UpusszDUoRMfQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qOBDXH4mYjkn4LBRVoEcJFjunZe5I7sa/gAoEgl5BtiVp/CSFLsYnfOJwzksiNjZ1
-	 y2exKSQ/H4ik7aAyU17hIGcDj+XMCY/O8A4XbuDElsbfWFHK5kgSHT8U71ohHHOe8x
-	 HMCbxhy45Zu+qgQrEvtns4nypEz/GWn+SPrsXl5Wl6AQaCZUDoPdUyeKzBjakFhWTW
-	 8tEZccUFVt6aoZ3WqgJGpL1DNdKT9avhLWOaWWPvzSbkVchemdi9eqx5EmJp/jY2vW
-	 KGP7cAlD0HVjKf42GkEIxH31Qxg0PphQBTc1u6IJI7Qw7nhwd+rmNvJ27rp+Lo7kIp
-	 CNjjEgell8E+g==
+	b=n8tEyHr0XJe6dqmU487jvsdRDxvO8kzvW9i1//zGuw50jS+yVkNMu22MvNgcATKL7
+	 sXzUy+Tstlzssfs4ro5DQgt2Yr+bOxJVKLsHSarJSjxjMo5dOFsoIexGKdqNecexp7
+	 7p17AlSNXc7HQDsuRufVflfFkpvhYozZpQbCG/Qi4W1jvm37B5jiofRb1YG08BXURz
+	 NL88vDPcVR/5ICwLg6OEdkIDpaVQvqiBnIiiaZwMDLVgc73cOxqn5z4rUxAXbVkcTT
+	 mYBDn6vlbyLaXZx3upMWgrbg2Wn0F1QWPos6T9ycsTtLIL1XL8sidSyq7bOx8c7A7c
+	 EZOlK67f8HQzQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD2C380A97E;
-	Tue,  7 Jan 2025 12:30:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34163380A97E;
+	Tue,  7 Jan 2025 12:30:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: don't dump Tx and uninitialized NAPIs
+Subject: Re: [PATCH net-next] eth: fbnic: update fbnic_poll return value
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173625303077.4137400.7495590712072075172.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Jan 2025 12:30:30 +0000
-References: <20250103183207.1216004-1-kuba@kernel.org>
-In-Reply-To: <20250103183207.1216004-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jdamato@fastly.com, almasrymina@google.com,
- sridhar.samudrala@intel.com, amritha.nambiar@intel.com
+ <173625303373.4137400.4491759064285580088.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Jan 2025 12:30:33 +0000
+References: <20250104015316.3192946-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20250104015316.3192946-1-mohsin.bashr@gmail.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+ andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, vadim.fedorenko@linux.dev,
+ damato@fastly.com, brett.creeley@amd.com, kernel-team@meta.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri,  3 Jan 2025 10:32:07 -0800 you wrote:
-> We use NAPI ID as the key for continuing dumps. We also depend
-> on the NAPIs being sorted by ID within the driver list. Tx NAPIs
-> (which don't have an ID assigned) break this expectation, it's
-> not currently possible to dump them reliably. Since Tx NAPIs
-> are relatively rare, and can't be used in doit (GET or SET)
-> hide them from the dump API as well.
+On Fri,  3 Jan 2025 17:53:16 -0800 you wrote:
+> In cases where the work done is less than the budget, `fbnic_poll` is
+> returning 0. This affects the tracing of `napi_poll`. Following is a
+> snippet of before and after result from `napi_poll` tracepoint. Instead,
+> returning the work done improves the manual tracing.
+> 
+> Before:
+> @[10]: 1
+> ...
+> @[64]: 208175
+> @[0]: 2128008
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: don't dump Tx and uninitialized NAPIs
-    https://git.kernel.org/netdev/net/c/fd48f071a3d6
+  - [net-next] eth: fbnic: update fbnic_poll return value
+    https://git.kernel.org/netdev/net-next/c/2f4f8893e07a
 
 You are awesome, thank you!
 -- 
