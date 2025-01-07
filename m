@@ -1,111 +1,135 @@
-Return-Path: <netdev+bounces-155801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED5C9A03D1A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:57:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1E45A03D2B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 12:01:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E9A07A3156
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:57:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 582DE1886348
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44ED715886C;
-	Tue,  7 Jan 2025 10:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FCF1E500C;
+	Tue,  7 Jan 2025 11:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGnjDHjz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cyyHy/5h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0381DEFD8
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 10:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B891E47C8;
+	Tue,  7 Jan 2025 11:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736247431; cv=none; b=EDJ6MekwGJZaX0wh9+i3rL1Wu1S2AQ6GuyPRSF7ylwvZA2T9z10PhI19YJWrbXDnbLn1wa2NM9R7TfMhnRfiDKbHt6bLg3X4Pk+fLpeBxqdEBWpPY1D8BRzuCnUY6Mn9PQ0TaL+Q29qMeQRpU5SQwDdC2N1dbktviqgpMRUKjG8=
+	t=1736247678; cv=none; b=X3wq0J9+WxFKisw1ssfnvbTl9NeVq/acUnhJDqw/dSeQ0xL7GUoBDFFF94x0rIYdE+0yjL4hl9RAUvkh4U1fCBTYfBKF+QELEJl3QdcZw34NV3SVBBHh6eshO24tr77gs4js4A2NmWIz8sUt3tWtwUT5UrjGTcRJAkshsEtJJzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736247431; c=relaxed/simple;
-	bh=BuBx7ekn9yG3h/fuD4BMMqSSJfcKI0CQskBpBzuEQWI=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=uNnYD9LqyYbAd/kNx8DhZhFUXtw7uEaZXKnLonMHBUyFLX0Pw5h7J/LdjpB/WtdXcNJuxDthp4GBrxbFUUoNkys3W7YjiPCyFIL9yygt+W6x1jP7U9VeQVcSUHKQ8qsJAbwIeakq2wQT1m8Wo6ae5OCdDqUmkRyHqsy2PKaVbEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGnjDHjz; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1736247678; c=relaxed/simple;
+	bh=KEKrs8t58jaBmhFQsL4Q4hxanzR/VOGIqdOtudk9yYw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ixY1RWmUCrnw/qZY+kDhiCatHIV0fLZKNDSzsNk+ZvlQxFy5KFAH4vny6zT+D5qhdUHrBB/w1IFNi/frSq1DHcfh0/NwwyjCWKqrqTBeXy1jtP6sG0mp2OIX0/0QAjRm5rd3DBOWQgG0Ui6lrCPOUDtssPls6dHexfw5d7VW+IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cyyHy/5h; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43621d27adeso106447815e9.2
-        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 02:57:09 -0800 (PST)
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e4419a47887so19406897276.0;
+        Tue, 07 Jan 2025 03:01:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736247428; x=1736852228; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BuBx7ekn9yG3h/fuD4BMMqSSJfcKI0CQskBpBzuEQWI=;
-        b=EGnjDHjzbCVVzN++740Mc9kvZZxDIlbqIzVTY+9jRrvxvl+KuOFS0uXSjgxdJL4xo5
-         CjjXu82XIv7A8PGJqewUV2dMQ2G3mnjxTShLqBRVwKrMtcpiTq8yiCy9fiGDU0Xar/Sx
-         uNwj4FAb0KcFRhKkc3XobIH9MQIP4yXRpKiYK8lbmZwBYLTpdjGSOti/1hcaS4OhQ777
-         2QJF8LKp7w+kLk1Iq3liTLX4SECFa5uk7q9K6detL1H3FlN0ymYW5ERiI3Idl+i0cx1k
-         acH/CZxqscmu1rqsY2CHzHSk10CNt7wcRdIXmuQYB4chO6mJI7Fo4FWlFJvkS2elZW9R
-         KX9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736247428; x=1736852228;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1736247675; x=1736852475; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BuBx7ekn9yG3h/fuD4BMMqSSJfcKI0CQskBpBzuEQWI=;
-        b=Ddt+9XXYRn/zqRR5ct94hyTdy/OazC7JOR71riSytIE87p9tlAd41b9ZmtEOl28UNJ
-         L6yV3iRPLX17hBgZjvtxUTzPgCzGyNm/yRWMEqluSc1NKx1GfFMU1WsaUl3jqh7nh+q6
-         wHHtdCZ6HOnuP5PNh/8iTd2FdIVTYgxVZMikmO05x0dMmDgSp0AHQrQd8qqblIsHutO9
-         hf5dkZ/03nMjjIKI23WRx1wa1lLdlXvliLr/prtxGvshwS6kirV49K4X2TJKqJhXHYvn
-         z2jK/8Hxkyfpsv+ZwL9gLgs99vEoQVIAgKrhBcujcH4bBKMHY4PcYue7uULjhNBWj+jw
-         5g5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW30SU9+oJ/BVWnwWB2w6Q1AHzY6nLN3elDZ+vAoP6Q8hpgaJl8nQzaLwwVWuIZl7KLEpF7eSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyINzH7L1MeNo7C57wL1fOsN1fZb/UdamlottTxQJytoc9ac0cO
-	kTkYFvWtT0oTRlxdV+Buup4IZ4z6fhDA3wykb5EVMZJN3l3/jnX1
-X-Gm-Gg: ASbGncvOylAcgV0pMhsFydCqbLviQ+k6smE1pibXw5NAuGPZnhUQiDqjzy0nxwAzlsZ
-	q8op+Ab+nZh0SwH8MYc4M4uTlK0NyxjJrz8e/QOgHvd1qwGUBn+OD9VYUN8vHCnd9VYxgvDV1KW
-	sbjQVilr1UXPycHzxec+OHu/FXUFYAq25fX+yK8RVmc801MBMo/wHOks08lYF+f96awVqQJXkEq
-	ZVW2/u1of0pQvU1BDYAwPLWOFDePEvlNMRkhVGNHf/gHM72usvRnv5JNf48MQG47KRM6Q==
-X-Google-Smtp-Source: AGHT+IEvYlmb98HJnhgjVES/hWH/tQaB1TQWfKTl4TP4nIRHBwD1UvcvtyKmTtqRNdjeL30vDLYLOQ==
-X-Received: by 2002:a05:600c:154c:b0:434:9f81:76d5 with SMTP id 5b1f17b1804b1-43668b49a47mr489105585e9.22.1736247427481;
-        Tue, 07 Jan 2025 02:57:07 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:f41d:e2d8:cf04:aa2e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656af6cbbsm627316145e9.3.2025.01.07.02.57.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 02:57:06 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 1/3] tools: ynl: correctly handle overrides
- of fields in subset
-In-Reply-To: <20250107022820.2087101-2-kuba@kernel.org> (Jakub Kicinski's
-	message of "Mon, 6 Jan 2025 18:28:18 -0800")
-Date: Tue, 07 Jan 2025 10:53:59 +0000
-Message-ID: <m2jzb6nbco.fsf@gmail.com>
-References: <20250107022820.2087101-1-kuba@kernel.org>
-	<20250107022820.2087101-2-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        bh=KEKrs8t58jaBmhFQsL4Q4hxanzR/VOGIqdOtudk9yYw=;
+        b=cyyHy/5huF51Oj+fEAMIUgS6rWFvx4bTB+11Wlf1OU3hfTaAVest3OetTgR2xJeM24
+         rUCwE4cBUV1FV2PJd79Q7UPdB7xT+V3F29KFoGxVr/4H8f26ux9Yn+HdTUKVX3DvPDKt
+         +37TEQU7hi2oufFex1DGm1O/JRm97pokgx7PkxrOoZjvtUfLNRfe4QkdGhbk+OB0gDRD
+         ZIAmpZbzPa1ucA0UR8jYLcLkMaL05kqcTDd4zWC47i/CC1FEcXwdU/VTC5YBJipARKD6
+         5qkV9zFlYzOn1eklkB3sMuU57l2hDu78+1j2GJl4p217y2sZLu9rW3RUwsIazFZ/hy01
+         64Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736247675; x=1736852475;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KEKrs8t58jaBmhFQsL4Q4hxanzR/VOGIqdOtudk9yYw=;
+        b=mazqz7QCVEr9RHNMFXPmL6npCd5bGaafhjnM8QsKgSqtXg49iamKnx7yv7j6CAcP1s
+         BbXjIIeeCkfdaSEegiOWe7kgiEpxSQfOvBh1vcaqZLibKd4kDNQyVnPDU+tYRRqXX7gK
+         Bv6c/jbxlJICXdWPDzra/xWdugd+QD4AeNlBdcH48BBHGA71KPRqTQWc65k0VEspQfqT
+         9lnUH/ek+JwVERPNdMgaACTSuXX+81A5UD2zvUTJiBMYNPuwmFYd6Bi5rVx96xZyXUO3
+         ErWbbpC54QOjUX4kpxaCYJEaPihbXA9ewnH6Wh1fT2YJ53s9PHai3MBXYhjRU888ryEK
+         AiHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUmslrOXTtKxrW6pACVT5TAhD3LbxB5h4g5dWAp5npxvSnuONdDGN8dHvU9XxC12scnp0R56mqL@vger.kernel.org, AJvYcCV0U+XJodV7+as+fau/NYkPwtD2wdYQ/yX9AD57rygZltAxpbv0Ce8mp9lxOZgMEj/6EQ+TTOg6pLBHdEU=@vger.kernel.org, AJvYcCXzD2CK+SWvQq6bos3cBj43WWq0o4dGrx59HSmKvuu6ZoZuY7Y6HpEl0aPyAv0mj0O/BroULpGd8Nc1oBUmbBA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFmM3bdASwH9pzBU2U8g6LYyxO0OnwGK5+pFUGFGMGLQZbeBPk
+	Whrins/IfKEkKlpgl1DubyX8MyblissRNWqp4c7f8pXRap9obfRhMIZbdr0bgZAKS60/aigOseQ
+	AuLlQUg3k24PCUcG+CgLhIGdWH5sQMQPS
+X-Gm-Gg: ASbGncs0bfIk4Orktn05pStNDqZxJql27XNWH7ry18wqSx65NQU2Ktmva/slYkQiE2M
+	K/ahu0gQ6+p4yEG7AfgC9Q2J0P/JXDarMygaU
+X-Google-Smtp-Source: AGHT+IESbclHNi0aP0xGBKr3deuAaZJDr4lG0Dh7OVv9uwUcMBSKaPSMR53J0WwFXMrMQJrmWAWE/FkpXxZoRbiTjjo=
+X-Received: by 2002:a05:6902:c0a:b0:e39:772b:4bae with SMTP id
+ 3f1490d57ef6-e538c207517mr39123922276.6.1736247674657; Tue, 07 Jan 2025
+ 03:01:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20241221124445.1094460-1-ariel.otilibili-anieli@eurecom.fr>
+ <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
+ <20250103085540.GA94204@wp.pl> <Z3fMxD2mAVsVl58h@pidgin.makrotopia.org>
+ <20250103131002.GA100011@wp.pl> <2f7a83-6777e880-a451-5cf12280@99910178>
+ <20250104103753.GA2228@wp.pl> <2f7a8b-67792f00-52db-be99fc0@193911177>
+ <Z3r3vxy8cRRH6w1m@pidgin.makrotopia.org> <2f7a84-677b8500-5061-4ac1e700@152950135>
+In-Reply-To: <2f7a84-677b8500-5061-4ac1e700@152950135>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Tue, 7 Jan 2025 12:01:03 +0100
+Message-ID: <CAOiHx==4Yg=Ne0SHWx1jJTJF0QziVJYxdp0mpAkd-GkVfp+tWw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] rt2x00: Remove unusued value
+To: Ariel Otilibili-Anieli <Ariel.Otilibili-Anieli@eurecom.fr>
+Cc: Daniel Golle <daniel@makrotopia.org>, Shiji Yang <yangshiji66@outlook.com>, 
+	Stanislaw Gruszka <stf_xl@wp.pl>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	Kalle Valo <kvalo@kernel.org>, =?UTF-8?Q?Tomislav_Po=C5=BEega?= <pozega.tomislav@gmail.com>, 
+	Linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Hi,
 
-> We stated in documentation [1] and previous discussions [2]
-> that the need for overriding fields in members of subsets
-> is anticipated. Implement it.
+On Mon, Jan 6, 2025 at 8:23=E2=80=AFAM Ariel Otilibili-Anieli
+<Ariel.Otilibili-Anieli@eurecom.fr> wrote:
 >
-> Since each attr is now a new object we need to make sure
-> that the modifications are propagated. Specifically C codegen
-> wants to annotate which attrs are used in requests and replies
-> to generate the right validation artifacts.
+> Hi Daniel, hi Shiji, hi Stanislaw,
 >
-> [1] https://docs.kernel.org/next/userspace-api/netlink/specs.html#subset-of
-> [2] https://lore.kernel.org/netdev/20231004171350.1f59cd1d@kernel.org/
+> On Sunday, January 05, 2025 22:21 CET, Daniel Golle <daniel@makrotopia.or=
+g> wrote:
 >
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > H again,
+> >
+> >
+> > On Sat, Jan 04, 2025 at 01:51:25PM +0100, Ariel Otilibili-Anieli wrote:
+> > > Great, then; thanks for having acked the patch as such.
+> >
+> > I just noticed that Shiji Yang had posted a series of patches for
+> > OpenWrt which also addresses the same issue, however, instead of
+> > removing the augmented assignment, it fixes it to the supposedly
+> > originally intended way.
+> >
+> > See
+> > https://git.openwrt.org/?p=3Dopenwrt/openwrt.git;a=3Dblob;f=3Dpackage/k=
+ernel/mac80211/patches/rt2x00/621-04-rt2x00-fix-register-operation-on-RXIQ-=
+calibration.patch;h=3Daa6f9c437c6447831490588b2cead6919accda58;hb=3D5d58390=
+1657bdfbbf9fad77d9247872427aa5c99
+> >
+> > I suppose this was tested together with the other changes of the same
+> > series, so we may want to pick that instead.
+>
+> Thanks for having put some time into the research, Daniel; I looked into =
+the openwrt archives for 2024, none of Shiji=E2=80=99s messages mentions th=
+at patch.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+You didn't find anything because these changes came in via a PR on
+github: https://github.com/openwrt/openwrt/pull/16845 :) OpenWrt
+accepts contributions both via email and PR on github.
+
+Best Regards,
+Jonas
 
