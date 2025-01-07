@@ -1,100 +1,118 @@
-Return-Path: <netdev+bounces-155886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B55A5A04325
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:50:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93F1EA04351
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:52:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55DC316191F
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:50:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0108A18842A3
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F491F2C5A;
-	Tue,  7 Jan 2025 14:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0D41F1931;
+	Tue,  7 Jan 2025 14:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qhd6dseO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJ5a28p5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769021F131F
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 14:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72425588F;
+	Tue,  7 Jan 2025 14:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736261393; cv=none; b=ajBWTxzQpgtXZY0fjME6W8cxoaPaFn5KAL9Mmv27N02XktMOD12avh8Wh1txWwcEG3waTrbltpYLvFWMvIZRieQHUxTG2Vnc8SaFz1drTlgQdT6ac4P2fGgpoa2/tvUACJZy/spelYDcZ+rJVGlIgKrDtDtI2Mpj3opoBXRY/+8=
+	t=1736261551; cv=none; b=DlsH7ohLPRsqBQw7ngDbBSgObROn70ZQq9xzsD3o7O48LLy1OucvaxYbbPjrN23/AyyN/DlCIG9xNVxrD6vfNH9jk2/4z4g2DcvwID5EqVvN8eeb3BrMdnBo+h4WNk6Qv23ULIUw3hhnDLU7nrpGFQM8Vjo2ncgy3aidyWAxugs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736261393; c=relaxed/simple;
-	bh=6exH/+pEe84SukQNeOJiC7e/aHitIRWtAXA4dc2lHkM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oKSJPREuNVRbZsyKqP+4YjGvYlGELMR82cWGaxSWFH5E66JD70mMTo+VlAwhO+p9cJX351nlQwTeTzRqlsyOMmL1jeYJNWMyTtJF0NU54V+x0ahMdplkb9pV6ku9jVDvmEgSM6L9BrWvFgz6rXqSXq9jcW0LAqLD3jVjiiNDfjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qhd6dseO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90024C4CED6;
-	Tue,  7 Jan 2025 14:49:52 +0000 (UTC)
+	s=arc-20240116; t=1736261551; c=relaxed/simple;
+	bh=WxQAHvKNDf1t1y8WP8kQLuS53Cn56vM/HgaXsAHmZu0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IB9H2aFmnYPSxrsIgyDF3gzQqtWC4N13aldCebdlA+FtIqE6+f8xvgUMwjNunFnB4hy9XCpjfTso3u5FXXVD1P+wgc8B0egYLn2Bejowcr6Syy/kxQFl2YSzyeHke4fNAe/ffA7UBKeRPdht1m5w1tHC9nfU6c6KzNRMXjXbki4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DJ5a28p5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB03C4CED6;
+	Tue,  7 Jan 2025 14:52:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736261392;
-	bh=6exH/+pEe84SukQNeOJiC7e/aHitIRWtAXA4dc2lHkM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qhd6dseOD/KQNLhrX8qVRAIqAJNLRaC55BdwNrI5roofUdmeHRY6JKSBKi59IX0Ic
-	 Celfs12KSpIdyv9hqWy6+UvfXivqflh0P9T4DX6HIm5DhXPCm0onXLD+Z6YD0P6pOC
-	 epM6L+n4pL+DwOFYUEZU78Y/Iq//8DPs3CtZy6QWer28tiMULTn2jKJo/gMGXwBOMP
-	 0/6SmtDAvJKtSxeZRdRShNnHDzE0o/sJTTuh2Scq1rTtt4nnKox2/wmO0Lrv24WBP5
-	 1rjonRfcVBsV/YRGvOxgkBk7ZeUTAdrQjkarP5QKp6Sw7ZHPlOt2B/7xpqBg046v6G
-	 FOhDyYJJzD6Pg==
-Date: Tue, 7 Jan 2025 06:49:51 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, dw@davidwei.uk, almasrymina@google.com,
- jdamato@fastly.com
-Subject: Re: [PATCH net-next 6/8] netdevsim: add queue management API
- support
-Message-ID: <20250107064951.200e9dfd@kernel.org>
-In-Reply-To: <677d344a30383_25382b29446@willemb.c.googlers.com.notmuch>
-References: <20250103185954.1236510-1-kuba@kernel.org>
-	<20250103185954.1236510-7-kuba@kernel.org>
-	<677d344a30383_25382b29446@willemb.c.googlers.com.notmuch>
+	s=k20201202; t=1736261550;
+	bh=WxQAHvKNDf1t1y8WP8kQLuS53Cn56vM/HgaXsAHmZu0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DJ5a28p5C1p3qCfa8LQJ394zZ/jabUsHQ9XSSnPY6jxqQjGkXKBNrLbl5sPl1Pitn
+	 f20Uxn92kTDumq0VBTngaUAIK0G17qi1lCrL+ztyW/bV13vHfbuVOwxBxhMhZ8a6lw
+	 ugnObBQzN6unU3idmrKZnnXPImvquLAWlG4c5DZW1cEJuTrlvbLnlKwar+lal66IAM
+	 WvPCehI17rTQ+M5FsSmolNp0pm/VkSzcgGU47LQqUaJQn01r4Q/VSN5CwmSxCZBWil
+	 tsNTk4s8VZuG9K8PIlIA4vOrDon6IFavxkSzotHbTbkj6gVLk5FIKt7ihCdc8+eNSD
+	 4P7F8SrHOZjVw==
+Message-ID: <02896f96-57dd-47d5-8fa0-8a8aed30fa9a@kernel.org>
+Date: Tue, 7 Jan 2025 15:52:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 1/8] page_pool: introduce page_pool_get_pp()
+ API
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: liuyonglong@huawei.com, fanghaiqing@huawei.com, zhangkun09@huawei.com,
+ Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Felix Fietkau <nbd@nbd.name>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>,
+ Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
+ Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Simon Horman <horms@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, imx@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, bpf@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20250106130116.457938-1-linyunsheng@huawei.com>
+ <20250106130116.457938-2-linyunsheng@huawei.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250106130116.457938-2-linyunsheng@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue, 07 Jan 2025 09:03:54 -0500 Willem de Bruijn wrote:
-> Jakub Kicinski wrote:
-> > +/* Queue reset mode is controled by ns->rq_reset_mode.  
-> 
-> controlled
 
-ack
+On 06/01/2025 14.01, Yunsheng Lin wrote:
+ > introduce page_pool_get_pp() API to avoid caller accessing
+ > page->pp directly.
+ >
+[...]
 
-> also perhaps an enum for the modes?
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+> index 543f54fa3020..9c4dbd2289b1 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -83,6 +83,11 @@ static inline u64 *page_pool_ethtool_stats_get(u64 *data, const void *stats)
+>   }
+>   #endif
+>   
+> +static inline struct page_pool *page_pool_get_pp(struct page *page)
+> +{
+> +	return page->pp;
+> +}
 
-I couldn't come up with concise yet meaningful names for them, TBH :(
+IMHO the function name "page_pool_get_pp" is problematic. As calling it 
+"get" indicate to me that we are taking some reference on the pp object. 
+Is this you plan in later patches?
 
-> > + * - normal - new NAPI new pool (old NAPI enabled when new added)
-> > + * - mode 1 - allocate new pool (NAPI is only disabled / enabled)
-> > + * - mode 2 - new NAPI new pool (old NAPI removed before new added)
-> > + * - mode 3 - new NAPI new pool (old NAPI disabled when new added)
-> > + */
+If it is simply a dereference of page->pp ... then we could call it 
+page2pp ?
+... but I'm uncertain why we need this change.
 
-> > +	/* netif_napi_add()/_del() should normally be called from alloc/free,
-> > +	 * here we want to test various call orders.
-> > +	 */
-> > +	if (ns->rq_reset_mode == 2) {
-> > +		netif_napi_del(&ns->rq[idx]->napi);
-> > +		netif_napi_add_config(dev, &qmem->rq->napi, nsim_poll, idx);
-> > +	} else if (ns->rq_reset_mode == 3) {
-> > +		netif_napi_add_config(dev, &qmem->rq->napi, nsim_poll, idx);
-> > +		netif_napi_del(&ns->rq[idx]->napi);  
-> 
-> Just to make sure my understanding: this is expected to not change
-> anything, due to test_and_(set|clear)_bit(NAPI_STATE_LISTED, ..),
-> right?
+--Jesper
 
-Say more..
-Note that ns->rq[idx]->napi != qmem->rq->napi
 
