@@ -1,125 +1,111 @@
-Return-Path: <netdev+bounces-155913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E1B8A04534
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:54:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F683A04595
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 17:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F103A35FD
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:54:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3710E16585D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAE71F2C41;
-	Tue,  7 Jan 2025 15:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBA71F3D4F;
+	Tue,  7 Jan 2025 16:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MTbTGN4w"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E921EE006
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 15:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578B71F3D2D
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 16:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736265254; cv=none; b=KmVzhWz6qJLrfvjtBBYGAb6MjlCLw8vJtrtWki69ZZYq+78J1wDnI0QEmQietuLteL/jffmbZHglHpY/zD7bnrxefTGAMrTb/U+05+f0mVHOrcy+VwkDN+19fyQyZ7XG+/fCdBY91UWsKZNWHHhpwZj1uCyDcp1wPt/sU9ReYYU=
+	t=1736266134; cv=none; b=a8UmMTfRrnZ0KKHQwDUlpjDLY2I//W+Wq+qDRhPzo70zbHGCpjh6r3AAwEC59Gzi0+oODhXaLLAKGmV5CO9kvUQ+mdcof22US6qD64x3L4e2CEl/UGs6/PRrn9B8TH5ADDhu47ks7DaI5ya9n9KlpC/+Y881Y//feLkc4mkUVH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736265254; c=relaxed/simple;
-	bh=NZKrdXX7Nslq9MVCszlZQlEHWf2q5r0Mtn8YhyINxcw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b0JzBbEuoUst9f9Z0f23VRVv7Lf/RieXR19vsC0KaVfNFGSCOOOPxxRZ2Tem0ErK8+R+RxPqNrEvuXRJi+BMhzVwQ0GWO3eVtI13kxJGjIw5+eyRN0Xa8KVAnUVmIANivnDj8ccQM3f8SXTeVwjuvc6lNTeCHsaIlPMdv00v7D4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVBuB-00085a-1F; Tue, 07 Jan 2025 16:54:07 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVBu8-007MxW-1M;
-	Tue, 07 Jan 2025 16:54:05 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVBu9-009bxi-0E;
-	Tue, 07 Jan 2025 16:54:05 +0100
-Date: Tue, 7 Jan 2025 16:54:05 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next RFC 0/5] net: phy: Introduce a port
- representation
-Message-ID: <Z31OHYsfZc8fT--Z@pengutronix.de>
-References: <20241220201506.2791940-1-maxime.chevallier@bootlin.com>
- <Z2g3b_t3KwMFozR8@pengutronix.de>
- <Z2hgbdeTXjqWKa14@pengutronix.de>
- <Z3Zu5ZofHqy4vGoG@shell.armlinux.org.uk>
- <Z3bG-B0E2l47znkE@pengutronix.de>
- <20250107142605.6c605eaf@kmaincent-XPS-13-7390>
- <Z300BuATJoVDc_4S@pengutronix.de>
- <Z31E4_oWPmFgvfxl@shell.armlinux.org.uk>
+	s=arc-20240116; t=1736266134; c=relaxed/simple;
+	bh=HRri+NudJf8dDW15sQlv84v7pk7YnwTq1Bl1KZ5p2vg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NNHKzdt+GC9GYgrtx0gvE+1rEiudvyDK0fZcn1JGD1aDVxSHCxJ8sLFEqfDMsW787dWrp+QT4zqXGA0z/05wQlLiHhgezy1+h66Z3hD3gL0CE19zpbKbH5T8S3K08KWttzFOYHUtI814h0rcmDZIkv75wzAAkBkqd17hecH5aWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MTbTGN4w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79757C4CED6;
+	Tue,  7 Jan 2025 16:08:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736266133;
+	bh=HRri+NudJf8dDW15sQlv84v7pk7YnwTq1Bl1KZ5p2vg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MTbTGN4wH8TAEu1I2rw3uT7y330/Yybttj3dj5Wdp3+cr5RJ2Gbs/i7YOnm8yTJ94
+	 hD7KdAam/b/UCONM3Hm+ff7AWqckIptUGMI7x+tEJr/r/JvsAGvy8wCA/v6rriAyij
+	 gWyRb+sVxFpE33h6EcS5TedOzoIp4XlIlvx4wFhTSN+2V0HOiaURYOU5esJjijKf+l
+	 da+zHpdAiUrKIFB4EcJOzlkOCrG5+KnmnbAJeHABs/CDKOKy4aVS+w1Sln/RelL/fu
+	 RGLf+GeJo9ZfqcSkC/KnGKLpxrLYgVqTnAhM84Waarc4gcqrXg77Svdur5ozcAxncc
+	 tvJtYPpr/G19A==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	sdf@fomichev.me,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 0/8] net: make sure we retain NAPI ordering on netdev->napi_list
+Date: Tue,  7 Jan 2025 08:08:38 -0800
+Message-ID: <20250107160846.2223263-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z31E4_oWPmFgvfxl@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 07, 2025 at 03:14:43PM +0000, Russell King (Oracle) wrote:
-> On Tue, Jan 07, 2025 at 03:02:46PM +0100, Oleksij Rempel wrote:
-> > On Tue, Jan 07, 2025 at 02:26:05PM +0100, Kory Maincent wrote:
-> > > On Thu, 2 Jan 2025 18:03:52 +0100
-> > > Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-> > The IEEE 802.3 - 2022 has following variants:
-> > 14.5.2 Crossover function - only A<>B swap is supported
-> > 40.4.4 Automatic MDI/MDI-X Configuration - only A<>B swap is supported?
-> > 55.4.4 Automatic MDI/MDI-X configuration - 4 swap variants are supported
-> > 113.4.4 Automatic MDI/MDI-X configuration - 4 swap variants are supported
-> > 126.4.4 Automatic MDI/MDI-X configuration - 4 swap variants are supported
-> > 
-> > This was only the pair swap. How to reflect the polarity swap withing
-> > the pairs?
-> 
-> 802.3 supports this because of the problems caused by miswired cables,
-> which are typically a user thing. It's not really there to give freedom
-> to designers to wire their sockets incorrectly.
-> 
-> Do we have any real cases where a socket has been wired incorrectly?
+I promised Eric to remove the rtnl protection of the NAPI list,
+when I sat down to implement it over the break I realized that
+the recently added NAPI ID retention will break the list ordering
+assumption we have in netlink dump. The ordering used to happen
+"naturally", because we'd always add NAPIs that the head of the
+list, and assign a new monotonically increasing ID.
 
-Yes. I tested some low cost adapter using same driver but reporting
-incorrect results, depending on board. I can explain it only by
-incorrect PCB design.
+Before the first patch of this series we'd still only add at
+the head of the list but now the newly added NAPI may inherit
+from its config an ID lower than something else already on the list.
+
+The fix is in the first patch, the rest is netdevsim churn to test it.
+I'm posting this for net-next, because AFAICT the problem can't
+be triggered in net, given the very limited queue API adoption.
+
+v2:
+ - [patch 2] allocate the array with kcalloc() instead of kvcalloc()
+ - [patch 2] set GFP_KERNEL_ACCOUNT when allocating queues
+ - [patch 6] don't null-check page pool before page_pool_destroy()
+ - [patch 6] controled -> controlled
+ - [patch 7] change mode to 0200
+ - [patch 7] reorder removal to be inverse of add
+ - [patch 7] fix the spaces vs tabs
+v1: https://lore.kernel.org/20250103185954.1236510-1-kuba@kernel.org
+
+Jakub Kicinski (8):
+  net: make sure we retain NAPI ordering on netdev->napi_list
+  netdev: define NETDEV_INTERNAL
+  netdevsim: support NAPI config
+  netdevsim: allocate rqs individually
+  netdevsim: add queue alloc/free helpers
+  netdevsim: add queue management API support
+  netdevsim: add debugfs-triggered queue reset
+  selftests: net: test listing NAPI vs queue resets
+
+ Documentation/networking/netdevices.rst  |  10 +
+ drivers/net/netdevsim/netdev.c           | 259 ++++++++++++++++++++---
+ drivers/net/netdevsim/netdevsim.h        |   5 +-
+ net/core/dev.c                           |  42 +++-
+ net/core/netdev_rx_queue.c               |   1 +
+ tools/testing/selftests/net/nl_netdev.py |  19 +-
+ 6 files changed, 294 insertions(+), 42 deletions(-)
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.47.1
+
 
