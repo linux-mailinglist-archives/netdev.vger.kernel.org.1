@@ -1,92 +1,58 @@
-Return-Path: <netdev+bounces-155703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4742AA035CA
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:18:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29664A035CD
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 04:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 385411631CF
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:18:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 117211631F3
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AD738389;
-	Tue,  7 Jan 2025 03:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B125D2AF10;
+	Tue,  7 Jan 2025 03:19:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ij7Lt1bI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GnKbN6Xk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661CA4C97;
-	Tue,  7 Jan 2025 03:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB99A31
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 03:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736219918; cv=none; b=RMQmfpm2QoCBYx/MNhUcseIyo+1X0kfGYdek+Dfp6Vfoehl7nD7GvXSGkh/Dt9JN7EQCie1cRSD/8aGvrnU3HkNkCUYSBl2DkFz5Vpo2zcyVF4UZ/7ySLzIkOJanNFrS2vRsOYIgjUfFfFAAWBNoD+d3uHAknG8ImNxRwIzl3Ps=
+	t=1736219957; cv=none; b=gO6JRbpTszw4/Pn8xiE3I0GoG6drnRwGATOcM3AAViRp8Kkz9BhPW079DsBuuqtuWSFHydcwpnpIv/J2vs73YqGIsFOidehurVmBAfHp+T3hrW+5UW89xhK+qhlw8bqnyQ8Isk34goRuHTSX7H/PhB2GUM1PRWz4EmbIegjoe6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736219918; c=relaxed/simple;
-	bh=L1NbAibBqLOPigWTdi6PRLUZ9a2lcFb8oamTCrWakD0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Dql1LzgrHayA8ZwxyEZIP/dFrGbudou96cCj7TRt9D7/K8xoJd2H+MKYrj/+L/LZvD+hV1sg2fo4wpQ7qdFKOvrgwO3lxaTZltkHJefqmWXVuecvJFuKohP097zkqgnS9IfupU2TPO3uElGCG36iFq1ySkho3kKdJuU8N3J+zgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ij7Lt1bI; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ee67e9287fso21957517a91.0;
-        Mon, 06 Jan 2025 19:18:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736219915; x=1736824715; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lEezSRqb9kXWLV1zySolvUruwCOXdD+Pe/1KXwx9J4c=;
-        b=ij7Lt1bIbEfCXSAhA9zEQInmCzavFxv3fkwtRXjQU/cKgIEQlZqCqPVRxSjZmxlHLY
-         ujeIl61wD/avjovA9LQblT5ucy5FTkoS/fnrfqmlpUc0rfzbJlvUXnXy1GFt5etMX4Tq
-         rbPEAt9oZmYDLObejyYbQwHlWWPYpAtvssvtBU4AGyr4j8kB5+QaVm3SGrjwwbJPdemk
-         kMGhbhJkg1mK9hxIob2CDmw0bCcrRlxgF6B8mtRy2gRD+c4KUYCU/7fQ5XJZlkyW2sz5
-         fqoGbS1IQZzmip/cw+P3mYInqHys2q9JQNMR6vp8HxFnMDUiLI2d0HFvbyvjceKQAB8E
-         Db0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736219915; x=1736824715;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lEezSRqb9kXWLV1zySolvUruwCOXdD+Pe/1KXwx9J4c=;
-        b=b1DENbSEo2nM7eAA/lC44ZO/DeTH3Pt94s5dpaLTPEt6y5RwY6He3tcCTufjOfeOul
-         pjPeAnOaz1Ei9cO+zrbDva9O6Qoc4u9wa5LI76iwqJONg8fAIC5EECZeBjEng/7bbvIe
-         H0RaEr0fta242mEvYBTtW3F4TmBJ9Ey2Qnsgm6CLSuogX5bxrAVkVgbwBymKTOxZd0oq
-         YYE+SyWNXTO9dlR7I4IcvCsLyuRBIs+NnQlQKlyLDew4WcKDMEAuaSNn/4Wp5vXVZ9a7
-         k3CUoXQ1Mh9Y7qhso3/iXc60mGvt/PlFWj/+0rMcd67FxnqQ3Q5YXzNvNdUnAgJH7wSl
-         MZuA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZrn/byfMNDlTdIuRZEUKjZW6/kttD1V1GrLrexrpLeQH+Yqwc66FVI+YlsNzUGNMytyPezTrR@vger.kernel.org, AJvYcCXud07bzBJMSS/dDyfZYDFA7KAQAcaEu1A/zG9mQTNu06NWtD6XzyGBkDEAeM2OPvPaSq7hwBXwoWKRoR8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4DBKO3KSCg/ByBMLHU64MKSaDG0cY8LW2YXrVxfAtpt012iol
-	kB8hhGo/GcSstUreZ+y6p/LvMTth++ghjmYNnsZcnSTzYG2Se11G
-X-Gm-Gg: ASbGncs4GKRdfbLmtdjFa6m0TA174jPkgzS1nr8ljGImWAegUHuEEXwXATBohAUllfW
-	vNKk6X0aIkQga+edlSqH0myiFtbBwsYrp947sVZpZoTgFbgQhlkCrNmKW9bdtrvr5ZSzRBAKpUg
-	FiTI8P6mCP2EOvcepbptoourNBv1XtQsyC+TolcZ+3YxMtpDqRv83Up4Dke3v1GpbiVR7FfzoTF
-	IobwXCV6vXmGUzLhkEeED3Wd7nc1HoLQ0DsrynKFeT/wpK1fzp5kWaMjAfl+UUw+3S5FkmZlNmZ
-	y5CfgPNlKC8eTJwbS900rIq4k0yNlo4bn6Zq
-X-Google-Smtp-Source: AGHT+IH8eAF+9AO0Qm/VLGzwhFXMh0kUgrEJ+9p12xqbC1bcnXyBh/t5i5HBLyfReLb7TkgYOcpULQ==
-X-Received: by 2002:a17:90a:d64d:b0:2ea:4c8d:c7a2 with SMTP id 98e67ed59e1d1-2f452ee62d3mr93325685a91.24.1736219914616;
-        Mon, 06 Jan 2025 19:18:34 -0800 (PST)
-Received: from leo-pc.tail3f5402.ts.net (61-220-246-151.hinet-ip.hinet.net. [61.220.246.151])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a267dc09bsm170430255ad.169.2025.01.06.19.18.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 19:18:34 -0800 (PST)
-From: Leo Yang <leo.yang.sy0@gmail.com>
-X-Google-Original-From: Leo Yang <Leo-Yang@quantatw.com>
-To: jk@codeconstruct.com.au,
-	matt@codeconstruct.com.au,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Leo Yang <Leo-Yang@quantatw.com>
-Subject: [PATCH net v2] mctp i3c: fix MCTP I3C driver multi-thread issue
-Date: Tue,  7 Jan 2025 11:15:30 +0800
-Message-Id: <20250107031529.3296094-1-Leo-Yang@quantatw.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1736219957; c=relaxed/simple;
+	bh=/6oWaL4VinYN9kupmJYKP8VBA+nGvGQy6rJfUb5M+C4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WVXSQQjHgYuL/b0Up2chRC/zsW7iJhK7rAWVonJJrpKxFgDu/6aa1oza7WsCY/AcmNusDtGtZueaHjPFSy1XS0uAJXpQWIiprlgsOusIqwlsR+FgoVPe4qGbneUxIBSX3vTjnvlFAtSo1qYRqjijrVGwlvet/5Z6HA8IkAhLmIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GnKbN6Xk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3816C4CEDF;
+	Tue,  7 Jan 2025 03:19:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736219957;
+	bh=/6oWaL4VinYN9kupmJYKP8VBA+nGvGQy6rJfUb5M+C4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GnKbN6XkFcz1//HbmjItKzV1sqgpkntXSmlmu1RH/YPbrUr/+FQWpkA0ThnqyR12Q
+	 fJAGqdw6bas8Ivafqxtk89RPsKnyOdtLBwhNFQRpxkBHdeArYx9YxcjSqLOkVLF6RO
+	 eK3hr9ee/weZXgMfgz8jV7dJVmfZF4wOfMkChYMhAdUfQ3Kal4+BGEZjcbTfTUSbdp
+	 JngVukb6LlwK89QSA8tlwIoMvHt9XX5lc3/jH3w6VQANK5SpTEiWHoJtlN9m226hsn
+	 AS0OYl1+7iCKP0/aRcCj4eavXzxtWp74vqQaBNIQNVNtHZ8Eg7nwW631af4IrhCS9M
+	 mQApcmmu4tflg==
+Date: Mon, 6 Jan 2025 19:19:16 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Neal Cardwell <ncardwell@google.com>
+Cc: Teodor Milkov <zimage@icdsoft.com>, netdev@vger.kernel.org,
+ mst@redhat.com, jasowang@redhat.com
+Subject: Re: Download throttling with kernel 6.6 (in KVM guests)
+Message-ID: <20250106191916.6e26b3fd@kernel.org>
+In-Reply-To: <CADVnQynBPVr0qX2pu7FNwk6Y1BaW-pGf=JReJPCAj9RP=6t9_w@mail.gmail.com>
+References: <e831515a-3756-40f6-a254-0f075e19996f@icdsoft.com>
+	<d1f083ee-9ad2-422c-9278-c50a9fbd8be4@icdsoft.com>
+	<20250106132051.262177da@kernel.org>
+	<CADVnQynBPVr0qX2pu7FNwk6Y1BaW-pGf=JReJPCAj9RP=6t9_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,69 +60,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-We found a timeout problem with the pldm command on our system.  The
-reason is that the MCTP-I3C driver has a race condition when receiving
-multiple-packet messages in multi-thread, resulting in a wrong packet
-order problem.
+On Mon, 6 Jan 2025 21:50:02 -0500 Neal Cardwell wrote:
+> On Mon, Jan 6, 2025 at 4:20=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+> > On Mon, 6 Jan 2025 22:15:37 +0200 Teodor Milkov wrote: =20
+> > > Hello,
+> > >
+> > > Following up on my previous email, I=E2=80=99ve found the issue occurs
+> > > specifically with the |virtio-net| driver in KVM guests. Switching to
+> > > the |e1000| driver resolves the slowdown entirely, with no throttling=
+ in
+> > > subsequent downloads.
+> > >
+> > > The reproducer and observations remain the same, but this detail might
+> > > help narrow down the issue. =20
+> >
+> > Let's CC the virtio maintainers, then.
+> >
+> > The fact that a 300ms sleep between connections makes the problem
+> > go away is a bit odd from the networking perspective.
+> >
+> > You may need to find a way to automate the test and try to bisect
+> > it down :( This may help: https://github.com/arighi/virtme-ng =20
+>=20
+> IIUC, from Teodor's earlier message in the thread it sounds like he
+> was able to bisect the issue; he mentioned that git bisect traced the
+> regression to the commit:
+>=20
+>     dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
 
-We identified this problem by adding a debug message to the
-mctp_i3c_read function.
-
-According to the MCTP spec, a multiple-packet message must be composed
-in sequence, and if there is a wrong sequence, the whole message will be
-discarded and wait for the next SOM.
-For example, SOM → Pkt Seq #2 → Pkt Seq #1 → Pkt Seq #3 → EOM.
-
-Therefore, we try to solve this problem by adding a mutex to the
-mctp_i3c_read function.  Before the modification, when a command
-requesting a multiple-packet message response is sent consecutively, an
-error usually occurs within 100 loops.  After the mutex, it can go
-through 40000 loops without any error, and it seems to run well.
-
-But I'm a little worried about the performance of mutex in high load
-situation (as spec seems to allow different endpoints to respond at the
-same time), do you think this is a feasible solution?
-
-Fixes: c8755b29b58e ("mctp i3c: MCTP I3C driver")
-Signed-off-by: Leo Yang <Leo-Yang@quantatw.com>
-
----
-Change in v2:
-    1. Add Fixes tag.
-	2. Add mutex comment.
-    - Link to v1: https://lore.kernel.org/netdev/20241226025319.1724209-1-Leo-Yang@quantatw.com/
----
-
- drivers/net/mctp/mctp-i3c.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/mctp/mctp-i3c.c b/drivers/net/mctp/mctp-i3c.c
-index 9adad59b8676..d247fe483c58 100644
---- a/drivers/net/mctp/mctp-i3c.c
-+++ b/drivers/net/mctp/mctp-i3c.c
-@@ -125,6 +125,8 @@ static int mctp_i3c_read(struct mctp_i3c_device *mi)
- 
- 	xfer.data.in = skb_put(skb, mi->mrl);
- 
-+	/* Make sure netif_rx() is read in the same order as i3c. */
-+	mutex_lock(&mi->lock);
- 	rc = i3c_device_do_priv_xfers(mi->i3c, &xfer, 1);
- 	if (rc < 0)
- 		goto err;
-@@ -166,8 +168,10 @@ static int mctp_i3c_read(struct mctp_i3c_device *mi)
- 		stats->rx_dropped++;
- 	}
- 
-+	mutex_unlock(&mi->lock);
- 	return 0;
- err:
-+	mutex_unlock(&mi->lock);
- 	kfree_skb(skb);
- 	return rc;
- }
--- 
-2.39.2
-
+My bad. I think I looked at it last week and couldn't figure out=20
+why the sleep make any difference.
 
