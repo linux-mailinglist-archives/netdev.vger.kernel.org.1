@@ -1,93 +1,151 @@
-Return-Path: <netdev+bounces-155785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 279D2A03BFA
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:14:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEDEAA03C34
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:22:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 513F87A2B85
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:14:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A0411886669
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18FF1DED66;
-	Tue,  7 Jan 2025 10:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29AC51DF263;
+	Tue,  7 Jan 2025 10:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="ZtkPhxYC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DmNfU8nW"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB30F19ABCE
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 10:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19FD1AAA10;
+	Tue,  7 Jan 2025 10:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736244886; cv=none; b=eCN8QVglstKHisvScnLmV+ZcanRAe97d45EONZjOMKes9oG0WP+KDiPBoobh0IoESn6vHKZxm8vUQxu+hd6xlTMCgRIX59F/VObtg/i2XR46neztVjW60HZoXvGeXigIJfIbL+TTk83a7AwjOpVnkJzElk405CqplT3JXmja/9I=
+	t=1736245331; cv=none; b=iMbv4rJ2J4G6V7gEKH8NBQpcYQ4p6W1Ddajodj929dipgtkIi95vqnTjhNMBSiOY+a8L76psdqpRZVpuZOhZoxvzt1PWmpMfmeLHeP5tHdt4DdlhVVHNW1Laz3YtQnp/FwKplY+rSZ3oMBRXCCkAsIX0cZSmu9jvz+KhvGiGSug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736244886; c=relaxed/simple;
-	bh=r7vAfx/plOlmdfYpDJIjrGp3Zq4uimfd6nJYGeCGi0Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pCxNO2SFU58Jrx9GRm2FUPjbCQMs84XPV4dqkHrptZ+4O/2VyE7Fyg9KD6totd1q1Khr3QX0GBwLRXn+FjcZkHO6lY282rpmXQyZ5PtxlxOWArA46OML9NIpWjyiZIozyL0rql9cpn0szZwq01CV0zkonEbl8xfmuhn2N7aPYJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=ZtkPhxYC; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=QGPRRjjx3SxaA8ZhNuT90GMHahk+vHkRfocGVUBDayQ=; b=ZtkPhxYC2J7sHl6CrGW5FG+JRV
-	meNhFpEYk8Vn94uZZX4EXGOlee+yYwXa9Gm30zNUVyDzGJxsoqud2VVQ8MSAFSsmeZil2nCHk9044
-	hhZ7uolSxKvE3kb+lQfougxEcMUzwR0cMre4rH/X93F3C8y8NI0Msg0+puyj/C0xDR3xUNMdDAUYa
-	tc4dBrwcP1EDlJ0adbmyYn3TATJVfMS7uUx2oeHhlBe0dOd9k1xjIF9u7h8V4wg1GH89ZKYg+Qu9I
-	0pDMYHcs9ipEJNOmP9sVgIPpBV5P4aefev7rLbGHLcbT9LyDzEWbuBh7SnyXWxsv0PPBimhhh92cn
-	1aEkVEFA==;
-Received: from 26.248.197.178.dynamic.cust.swisscom.net ([178.197.248.26] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tV6bg-000IuO-Cy; Tue, 07 Jan 2025 11:14:40 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: edumazet@google.com
-Cc: netdev@vger.kernel.org
-Subject: [PATCH net] tcp: Annotate data-race around sk->sk_mark in tcp_v4_send_reset
-Date: Tue,  7 Jan 2025 11:14:39 +0100
-Message-ID: <f459d1fc44f205e13f6d8bdca2c8bfb9902ffac9.1736244569.git.daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1736245331; c=relaxed/simple;
+	bh=Wb3Ea2iB8+M8aL3ooVQ7LOltSr1/6YrzyALThhjx3TI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BTtZ0mBlPpnKiSZrhwsLWjOuQjwsAeAbyNJBgMbd8t5ZqvtPvUnAlwJUP8sIzVCvvsINqmaJBnpfGzUSj3BSUefiJRk66zlHmMsBlaYOPkbNwdgltT1OpcGw0oBPleDZoVBG0Z2vrg5LGaeJzPm8yU3l2dBdTo8VIjyvEZIuaEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DmNfU8nW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9714C4CED6;
+	Tue,  7 Jan 2025 10:22:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736245329;
+	bh=Wb3Ea2iB8+M8aL3ooVQ7LOltSr1/6YrzyALThhjx3TI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DmNfU8nWLBuNkkgcsPZZpv1EIaEoOmLXTmnqfJ7XOpK5AJw9NqvsA3rEgqpDN6KC5
+	 EZ76YiWsYoDWHKtTxeQatN+C76DPga3faVhdtz65TJA1pNiNIDp0Xi9E6WR+HMIRIo
+	 A9C/Bs8BYOMGaV2VDJhV4DblSUS6C6i2jFyeTgcJUtkzd1DFJq83UmW9OXwC4FiAiH
+	 2sQXwWwCaUn+POtfJdpu4jlcDVJMVSi8iOJ7a2uhALOBAjd2aGCFULZQXV2Ga3JnHF
+	 bCbT8o9lJWPYxp4wTD+je9bEbeDHVZL7Lxq9U+LW6fgyNsfouVZmYHAR6CWYr3+QuV
+	 GTy4uwlc5HzZA==
+Date: Tue, 7 Jan 2025 12:22:04 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Jianbo Liu <jianbol@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH ipsec-next 1/2] xfrm: Support ESN context update to
+ hardware for TX
+Message-ID: <20250107102204.GB87447@unreal>
+References: <874f965d786606b0b4351c976f50271349f68b03.1734611621.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27510/Mon Jan  6 10:45:39 2025)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <874f965d786606b0b4351c976f50271349f68b03.1734611621.git.leon@kernel.org>
 
-This is a follow-up to 3c5b4d69c358 ("net: annotate data-races around
-sk->sk_mark"). sk->sk_mark can be read and written without holding
-the socket lock. IPv6 equivalent is already covered with READ_ONCE()
-annotation in tcp_v6_send_response().
+On Thu, Dec 19, 2024 at 02:37:29PM +0200, Leon Romanovsky wrote:
+> From: Jianbo Liu <jianbol@nvidia.com>
+> 
+> Previously xfrm_dev_state_advance_esn() was added for RX only. But
+> it's possible that ESN context also need to be synced to hardware for
+> TX, so call it for outbound in this patch.
+> 
+> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  Documentation/networking/xfrm_device.rst                 | 3 ++-
+>  drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c          | 3 +++
+>  drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c | 3 +++
+>  net/xfrm/xfrm_replay.c                                   | 1 +
+>  4 files changed, 9 insertions(+), 1 deletion(-)
 
-Fixes: 3c5b4d69c358 ("net: annotate data-races around sk->sk_mark")
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- net/ipv4/tcp_ipv4.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Steffen,
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a38c8b1f44db..c26f6c4b7bb4 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -896,7 +896,7 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb,
- 	sock_net_set(ctl_sk, net);
- 	if (sk) {
- 		ctl_sk->sk_mark = (sk->sk_state == TCP_TIME_WAIT) ?
--				   inet_twsk(sk)->tw_mark : sk->sk_mark;
-+				   inet_twsk(sk)->tw_mark : READ_ONCE(sk->sk_mark);
- 		ctl_sk->sk_priority = (sk->sk_state == TCP_TIME_WAIT) ?
- 				   inet_twsk(sk)->tw_priority : READ_ONCE(sk->sk_priority);
- 		transmit_time = tcp_transmit_time(sk);
--- 
-2.43.0
+This is kindly reminder.
 
+Thanks
+
+> 
+> diff --git a/Documentation/networking/xfrm_device.rst b/Documentation/networking/xfrm_device.rst
+> index bfea9d8579ed..66f6e9a9b59a 100644
+> --- a/Documentation/networking/xfrm_device.rst
+> +++ b/Documentation/networking/xfrm_device.rst
+> @@ -169,7 +169,8 @@ the stack in xfrm_input().
+>  
+>  	hand the packet to napi_gro_receive() as usual
+>  
+> -In ESN mode, xdo_dev_state_advance_esn() is called from xfrm_replay_advance_esn().
+> +In ESN mode, xdo_dev_state_advance_esn() is called from
+> +xfrm_replay_advance_esn() for RX, and xfrm_replay_overflow_offload_esn for TX.
+>  Driver will check packet seq number and update HW ESN state machine if needed.
+>  
+>  Packet offload mode:
+> diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+> index bc3af0054406..e56e4f238795 100644
+> --- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+> +++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+> @@ -6559,6 +6559,9 @@ static void cxgb4_advance_esn_state(struct xfrm_state *x)
+>  {
+>  	struct adapter *adap = netdev2adap(x->xso.dev);
+>  
+> +	if (x->xso.dir != XFRM_DEV_OFFLOAD_IN)
+> +		return;
+> +
+>  	if (!mutex_trylock(&uld_mutex)) {
+>  		dev_dbg(adap->pdev_dev,
+>  			"crypto uld critical resource is under use\n");
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+> index ca92e518be76..3dd4f2492090 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+> @@ -980,6 +980,9 @@ static void mlx5e_xfrm_advance_esn_state(struct xfrm_state *x)
+>  	struct mlx5e_ipsec_sa_entry *sa_entry_shadow;
+>  	bool need_update;
+>  
+> +	if (x->xso.dir != XFRM_DEV_OFFLOAD_IN)
+> +		return;
+> +
+>  	need_update = mlx5e_ipsec_update_esn_state(sa_entry);
+>  	if (!need_update)
+>  		return;
+> diff --git a/net/xfrm/xfrm_replay.c b/net/xfrm/xfrm_replay.c
+> index bc56c6305725..e500aebbad22 100644
+> --- a/net/xfrm/xfrm_replay.c
+> +++ b/net/xfrm/xfrm_replay.c
+> @@ -729,6 +729,7 @@ static int xfrm_replay_overflow_offload_esn(struct xfrm_state *x, struct sk_buff
+>  		}
+>  
+>  		replay_esn->oseq = oseq;
+> +		xfrm_dev_state_advance_esn(x);
+>  
+>  		if (xfrm_aevent_is_on(net))
+>  			xfrm_replay_notify(x, XFRM_REPLAY_UPDATE);
+> -- 
+> 2.47.0
+> 
+> 
 
