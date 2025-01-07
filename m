@@ -1,181 +1,276 @@
-Return-Path: <netdev+bounces-155795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B21A03CD5
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:48:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE820A03CEA
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 11:50:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C28E3A1710
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:47:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B793A1710
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 10:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC1B1EB9FA;
-	Tue,  7 Jan 2025 10:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DE51E5726;
+	Tue,  7 Jan 2025 10:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CpjNhOIS"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="sxz6WjWr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7485F1EBA0D;
-	Tue,  7 Jan 2025 10:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584F41E8850;
+	Tue,  7 Jan 2025 10:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736246839; cv=none; b=dpJvGG5OGRtSXO2cSQZi97Fw5PVcO2gsSEEwwzbftzFLHJX8SQgVjQdGa2Ql1o+Uh1RKBNgMEn+FFQTTbGg9G3ITeHT2xaeU45TyZMQv3+/7CPjFF6Yhj2K6darGVjAhXdjsFvj0HfZ9PdAhyd5bFVZMW9aaDwyy8XbR8qOJvUc=
+	t=1736246909; cv=none; b=tTfz/98k1ZaA+F5zEsiF/AsRvJmFrazJRybCz6jVipaKd+V3MCaIRg/A8NY6bgxwVL70YbQ1kQm70PZfSo05XilD4LRsQLoB/6LQGl6cU+pR4Al3+26IZpUcQGH3u13406iUeY93mGbE8AujVnssnQGYtXhiSutyN+lFzlhqhQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736246839; c=relaxed/simple;
-	bh=rmV+IrFXiYRmJO8m/Th28rKjbiFt6MRkkO4Sbqpe3Gw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TNb14KTZ/Gk9LUtJWYCr1QUzqn5NyplQvLv55/qnCE8Zu6ZAo2BAdxeqNqO6QHLuogJ5r69RWkq8BwohWTpreKTnNE+1ULcyCA9R7VYJX2omtq7CvUnuY6rc2vFS5UpK0nv9UmFu6fKGOuKyrvsDt2rJ3BGBfcv3gOPsWYxvq04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CpjNhOIS; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3862df95f92so6746814f8f.2;
-        Tue, 07 Jan 2025 02:47:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736246836; x=1736851636; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fh0AFKuAKxAUWXpt7kGI1qVooHVbo7SNiy/9flSEnaA=;
-        b=CpjNhOISeqslgdQr8wnZOAp9ApHs2YwkPksnqk1MKQ3QUOLtcQZk7hA0hrb07/9/7w
-         DeCq7eKw8HMlHv/jTgrClZY/UpKs0dm6fFCNyiHME+4jwmttynV65KVfS5bhPgIuZSyB
-         NUJc6AHKEfCN1BBVj30d3b9oN7m0Lm5DNKA8F3l+Pg2XPvx8UXMNJFLLMuafrBPbM8sT
-         BWzb4jejI0sE0nYIv9saiZIA0NS2yVLt8jp3rV/VWq+7fHcsZqm3w25fmO/t7IbvdDSZ
-         QmD6Oc7ZQuc1QSx7yVyG8Py/QtnR73wSV9l0ttm/E2hQEfOn3zA4Cars7nJHrcXWM09e
-         o4VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736246836; x=1736851636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fh0AFKuAKxAUWXpt7kGI1qVooHVbo7SNiy/9flSEnaA=;
-        b=mFtrPvJjBAGjxAmAZWbxXqEIyL3aC9hidFvitNPDzHXsPypEbgQzSWR5x4LmpKblzE
-         6nRbfhLPdrGEUiYO3/Kzw1yNVqvr9Y6P035rGl9ZcdfNZ/MZAupgjm5o58zWOOx3Dvlh
-         4+Bmw1MvV2f/xAmMUECW2xG7XCgZocbkXvCLP2nKWEkgoxrEAkKqYma6NAgpwyk+2OnJ
-         47Cfb6Tw4Yz/lvDa3jzYgFZ0C7378AZkuABGCYmYCM5ckf+8gz+4SgXp/zFtQRxRRujl
-         m20u1bMQWjrVCLE1h82pSnf75G6KdXPDznnHie9YpeMfZZxvDHkX0Pqd3wqJsqrCxJke
-         bEJA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBK8ZOT4hMZho0bTffApVOjCLJuhuMqDWczKlvOjbrrZVAsKp+qrEhuZoCc5MfI9b5FYY=@vger.kernel.org, AJvYcCUfHeUaTrTME02pjvkkXLPDOgj7wqJdQlhkzI/V4tzlB1p0B+L+IeYV00CwK4gMso3e2Q39pF3+yOFVgQ==@vger.kernel.org, AJvYcCV6VJPvg9gAUyI7S2BjNXlFtJ1na2/IckmZj0hgV9rWo4kpjFPPnNnzEGrDMIVYdYDGs/W/FfYj1mPe2SpUo0QH@vger.kernel.org, AJvYcCVB/oQ5RAPRCmg3OHubbU4edbCPbpeTIHQHWDs266UAIAJoaIL9/8QnORdjLv/LI6LeVDxczpLbWfMWA8JASGY=@vger.kernel.org, AJvYcCWtpdhJfVVcbI++sm9qYQXuDvFFa/z8W27l4CgSiGStsQOumx5cFLIPPGfqXtrGPxv3UwyQB9W4@vger.kernel.org, AJvYcCX4aI1OkbVCkO3dZ6bdwISAOJtS2vCZ1CF3fAxLy17kqeDR8q2pU0S7QbFKdxdtR1xyyee7e3puIbu7@vger.kernel.org, AJvYcCXUQKrQ0wF2qtY5oOa9v8p6wlWfobcXO5/U5rTmHbot+cStJfWy9e8YNroJ/OujX0M56A8RadBWFo56C5Au@vger.kernel.org, AJvYcCXY8EACV/lA1hY4o105sAatpGB/KNJov3S+W3coJ80N7vX7AIPEuzTtyntcHkwCiXa2gU52CJ33xaTWuA==@vger.kernel.org, AJvYcCXxX0J4F8Jj8JiKybWKhtXJg0TOQObvD7HIyKoS1Z27pLyIO51GPCyfC+8SG5g4c99TNOp2nxcMW2dO@vger.kernel.org
-X-Gm-Message-State: AOJu0YwR7xZHmlYBFjisBzLTlIh6j1zZY0Cd8IVSNcA7I2X0h04MqW17
-	s6eRsNRpJOsrbCMXi9rC9QmOvf5t68olKOc+D9AKSQH4U4fcBckxUY09lkHaqTZEgI2ORXAUMdR
-	3EbLSjbuinzW+g692W18EmOZEMbiJEKd9
-X-Gm-Gg: ASbGncsTONgZgyE2X7IM4+HIcEKSBdwCbzhE8lgyqlRee7wuV/6sHzIVCQ8BbLLN4X2
-	srNBsmR44ZzqwPIXkj2mCY1gDkL92LMaOmpZv
-X-Google-Smtp-Source: AGHT+IHp1K2L48YKiIQv0pwnQlZPYX8cMCBbRBU/fwg+IEmnnlA8QF5/odQWLMrNcSpCZK0F/LO3cHqTWVNEZ39orXM=
-X-Received: by 2002:a05:6000:480a:b0:386:1cd3:89fa with SMTP id
- ffacd0b85a97d-38a221fa8c6mr57843141f8f.33.1736246835555; Tue, 07 Jan 2025
- 02:47:15 -0800 (PST)
+	s=arc-20240116; t=1736246909; c=relaxed/simple;
+	bh=zpniSCyXHsOLp4wfJyPuOz5Mz79VRKLaK+5o3pOCN5M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=nRrCTdhS1RPs6m4LRD6yrFdfvg1DI6nbKA4Dp5c7xj709GMEfBmrom5RIP3lq0sOv8zB1DlK78tx7dwEx34z+1TG0RTBV6KfHd+wYKQ0Lo6CiTg5BoJDdBEU1IR81dfq95WTZyDBkdXEDzr14/GStvLNLdX6gjUQKWVpVI5qqok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=sxz6WjWr; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 507AlgBS2632561
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 7 Jan 2025 04:47:42 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1736246862;
+	bh=qDN/P01jWJPJ5QM/7LmOZ2v2J1xabNeKNPYeVf5XVEs=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=sxz6WjWr6N23QQO76D37TFFVL+wbdeWvkfr4NLTzLILqrMlEdlszu0QlLrmhZh28A
+	 xYwSy1BZROUFbxtR1JAM3QFjhLa+6a4tGRN/N4kcRX5dYtaT4sZkKim7inl1rGH3/7
+	 gTvkx+1GaOsVhCc3ZoLLylZ4rzxMaeocPzDwBDfk=
+Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 507AlgT1080432
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 7 Jan 2025 04:47:42 -0600
+Received: from DFLE106.ent.ti.com (10.64.6.27) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 7
+ Jan 2025 04:47:41 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 7 Jan 2025 04:47:41 -0600
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 507AlaUH004144;
+	Tue, 7 Jan 2025 04:47:36 -0600
+Message-ID: <31a45fb4-acb6-4eb6-9ffb-ff1be798a064@ti.com>
+Date: Tue, 7 Jan 2025 16:17:35 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250104125732.17335-1-shaw.leon@gmail.com> <20250107085646.42302-1-kuniyu@amazon.com>
-In-Reply-To: <20250107085646.42302-1-kuniyu@amazon.com>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Tue, 7 Jan 2025 18:46:38 +0800
-Message-ID: <CABAhCOQAqspiaFO-486UtZpEWsua51f+1f6-LocNhHVfAqW=NQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 00/11] net: Improve netns handling in rtnetlink
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrew+netdev@lunn.ch, b.a.t.m.a.n@lists.open-mesh.org, 
-	bpf@vger.kernel.org, bridge@lists.linux.dev, davem@davemloft.net, 
-	donald.hunter@gmail.com, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, idosch@nvidia.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-ppp@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, liuhangbin@gmail.com, netdev@vger.kernel.org, 
-	osmocom-net-gprs@lists.osmocom.org, pabeni@redhat.com, shuah@kernel.org, 
-	wireguard@lists.zx2c4.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/3] net: ti: icssg-prueth: Add Multicast
+ Filtering support for VLAN in MAC mode
+To: Paolo Abeni <pabeni@redhat.com>, Jeongjun Park <aha310510@gmail.com>,
+        Alexander Lobakin <aleksander.lobakin@intel.com>,
+        Lukasz Majewski
+	<lukma@denx.de>, Meghana Malladi <m-malladi@ti.com>,
+        Diogo Ivo
+	<diogo.ivo@siemens.com>, Simon Horman <horms@kernel.org>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Roger Quadros
+	<rogerq@kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+        Larysa Zaremba <larysa.zaremba@intel.com>
+References: <20250103092033.1533374-1-danishanwar@ti.com>
+ <20250103092033.1533374-3-danishanwar@ti.com>
+ <133b8da8-a2da-4bac-b0bb-7dcaebc219b9@redhat.com>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <133b8da8-a2da-4bac-b0bb-7dcaebc219b9@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Tue, Jan 7, 2025 at 4:57=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
-> wrote:
->
-> From: Xiao Liang <shaw.leon@gmail.com>
-> Date: Sat,  4 Jan 2025 20:57:21 +0800
-[...]
-> > - In amt_newlink() drivers/net/amt.c:
-> >
-> >     amt->net =3D net;
-> >     ...
-> >     amt->stream_dev =3D dev_get_by_index(net, ...
-> >
-> >   Uses net, but amt_lookup_upper_dev() only searches in dev_net.
-> >   So the AMT device may not be properly deleted if it's in a different
-> >   netns from lower dev.
->
-> I think you are right, and the upper device will be leaked
-> and UAF will happen.
->
-> amt must manage a list linked to a lower dev.
->
-> Given no one has reported the issue, another option would be
-> drop cross netns support in a short period.
+Hi Paolo,
 
-Yes. I also noticed AMT sets dev->netns_local to prevent netns
-change. Probably it also assumes the same netns during creation.
+On 07/01/25 3:12 pm, Paolo Abeni wrote:
+> On 1/3/25 10:20 AM, MD Danish Anwar wrote:
+>> Add multicast filtering support for VLAN interfaces in dual EMAC mode
+>> for ICSSG driver.
+>>
+>> The driver uses vlan_for_each() API to get the list of available
+>> vlans. The driver then sync mc addr of vlan interface with a locally
+>> mainatined list emac->vlan_mcast_list[vid] using __hw_addr_sync_multiple()
+>> API.
+>>
+>> The driver then calls the sync / unsync callbacks and based on whether
+>> the ndev is vlan or not, driver passes appropriate vid to FDB helper
+>> functions.
+>>
+>> This commit also exports __hw_addr_sync_multiple() in order to use it
+>> from the ICSSG driver.
+>>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> ---
+>>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 67 ++++++++++++++++----
+>>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  6 ++
+>>  include/linux/netdevice.h                    |  3 +
+>>  net/core/dev_addr_lists.c                    |  7 +-
+>>  4 files changed, 66 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> index 1663941e59e3..ed8b5a3184d6 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> @@ -472,30 +472,44 @@ const struct icss_iep_clockops prueth_iep_clockops = {
+>>  
+>>  static int icssg_prueth_add_mcast(struct net_device *ndev, const u8 *addr)
+>>  {
+>> -	struct prueth_emac *emac = netdev_priv(ndev);
+>> -	int port_mask = BIT(emac->port_id);
+>> +	struct net_device *real_dev;
+>> +	struct prueth_emac *emac;
+>> +	int port_mask;
+>> +	u8 vlan_id;
+>>  
+>> -	port_mask |= icssg_fdb_lookup(emac, addr, 0);
+>> -	icssg_fdb_add_del(emac, addr, 0, port_mask, true);
+>> -	icssg_vtbl_modify(emac, 0, port_mask, port_mask, true);
+>> +	vlan_id = is_vlan_dev(ndev) ? vlan_dev_vlan_id(ndev) : PRUETH_DFLT_VLAN_MAC;
+>> +	real_dev = is_vlan_dev(ndev) ? vlan_dev_real_dev(ndev) : ndev;
+>> +	emac = netdev_priv(real_dev);
+>> +
+>> +	port_mask = BIT(emac->port_id) | icssg_fdb_lookup(emac, addr, vlan_id);
+>> +	icssg_fdb_add_del(emac, addr, vlan_id, port_mask, true);
+>> +	icssg_vtbl_modify(emac, vlan_id, port_mask, port_mask, true);
+>>  
+>>  	return 0;
+>>  }
+>>  
+>>  static int icssg_prueth_del_mcast(struct net_device *ndev, const u8 *addr)
+>>  {
+>> -	struct prueth_emac *emac = netdev_priv(ndev);
+>> -	int port_mask = BIT(emac->port_id);
+>> +	struct net_device *real_dev;
+>> +	struct prueth_emac *emac;
+>>  	int other_port_mask;
+>> +	int port_mask;
+>> +	u8 vlan_id;
+>> +
+>> +	vlan_id = is_vlan_dev(ndev) ? vlan_dev_vlan_id(ndev) : PRUETH_DFLT_VLAN_MAC;
+>> +	real_dev = is_vlan_dev(ndev) ? vlan_dev_real_dev(ndev) : ndev;
+>> +	emac = netdev_priv(real_dev);
+>>  
+>> -	other_port_mask = port_mask ^ icssg_fdb_lookup(emac, addr, 0);
+>> +	port_mask = BIT(emac->port_id);
+>> +	other_port_mask = port_mask ^ icssg_fdb_lookup(emac, addr, vlan_id);
+>>  
+>> -	icssg_fdb_add_del(emac, addr, 0, port_mask, false);
+>> -	icssg_vtbl_modify(emac, 0, port_mask, port_mask, false);
+>> +	icssg_fdb_add_del(emac, addr, vlan_id, port_mask, false);
+>> +	icssg_vtbl_modify(emac, vlan_id, port_mask, port_mask, false);
+>>  
+>>  	if (other_port_mask) {
+>> -		icssg_fdb_add_del(emac, addr, 0, other_port_mask, true);
+>> -		icssg_vtbl_modify(emac, 0, other_port_mask, other_port_mask, true);
+>> +		icssg_fdb_add_del(emac, addr, vlan_id, other_port_mask, true);
+>> +		icssg_vtbl_modify(emac, vlan_id, other_port_mask,
+>> +				  other_port_mask, true);
+>>  	}
+>>  
+>>  	return 0;
+>> @@ -531,6 +545,25 @@ static int icssg_prueth_hsr_del_mcast(struct net_device *ndev, const u8 *addr)
+>>  	return 0;
+>>  }
+>>  
+>> +static int icssg_update_vlan_mcast(struct net_device *vdev, int vid,
+>> +				   void *args)
+>> +{
+>> +	struct prueth_emac *emac = args;
+>> +
+>> +	if (!vdev || !vid)
+>> +		return 0;
+>> +
+>> +	netif_addr_lock_bh(vdev);
+>> +	__hw_addr_sync_multiple(&emac->vlan_mcast_list[vid], &vdev->mc,
+>> +				vdev->addr_len);
+>> +	netif_addr_unlock_bh(vdev);
+> 
+> At this point, isn't emac->vlan_mcast_list[vid] == vdev->mc?
+> 
+>> +
+>> +	__hw_addr_sync_dev(&emac->vlan_mcast_list[vid], vdev,
+>> +			   icssg_prueth_add_mcast, icssg_prueth_del_mcast);
+> 
+> If so, can this function be reduced to just:
+> 
+> 	__dev_mc_sync(vdev, icssg_prueth_add_mcast, icssg_prueth_del_mcast);
+> 
+> ?
+> 
 
-[...]
-> >
-> > - In gtp_newlink() in drivers/net/gtp.c:
-> >
-> >     gtp->net =3D src_net;
-> >     ...
-> >     gn =3D net_generic(dev_net(dev), gtp_net_id);
-> >     list_add_rcu(&gtp->list, &gn->gtp_dev_list);
-> >
-> >   Uses src_net, but priv is linked to list in dev_net. So it may not be
-> >   properly deleted on removal of link netns.
->
-> The device is linked to a list in the same netns, so the
-> device will not be leaked.  See gtp_net_exit_batch_rtnl().
->
-> Rather, the problem is the udp tunnel socket netns could be
-> freed earlier than the dev netns.
+I don't know but for some reason __dev_mc_sync() doesn't work here. My
+initial approach was to use __dev_mc_sync(vdev, sync, unsync) however it
+didn't work.
 
-Yes, you're right. Actually I mean the netns of the socket by "link netns"
-(there's some clarification about this in patch 02).
+When I use __dev_mc_sync() and print the vlan_id in function
+icssg_prueth_add_mcast(). It always prints vlan_id as 0 implying
+__dev_mc_sync from here never gets called. Whereas when using
+__hw_addr_sync_dev() I see the appropriate vlan_id in
+icssg_prueth_add_mcast()
 
-[...]
-> >
-> > - In pfcp_newlink() in drivers/net/pfcp.c:
-> >
-> >     pfcp->net =3D net;
-> >     ...
-> >     pn =3D net_generic(dev_net(dev), pfcp_net_id);
-> >     list_add_rcu(&pfcp->list, &pn->pfcp_dev_list);
-> >
-> >   Same as above.
->
-> I haven't tested pfcp but it seems to have the same problem.
->
-> I'll post patches for gtp and pfcp.
->
+Anyways, Even if I use __dev_mc_sync(), we will still need the export. I
+am exporting __hw_addr_sync_multiple() not __hw_addr_sync_dev(). The API
+being used by me `__hw_addr_sync_dev()` is already exported.
 
-It would be nice.
+>> diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
+>> index 166e404f7c03..90716bd736f3 100644
+>> --- a/net/core/dev_addr_lists.c
+>> +++ b/net/core/dev_addr_lists.c
+>> @@ -242,9 +242,9 @@ static void __hw_addr_unsync_one(struct netdev_hw_addr_list *to_list,
+>>  	__hw_addr_del_entry(from_list, ha, false, false);
+>>  }
+>>  
+>> -static int __hw_addr_sync_multiple(struct netdev_hw_addr_list *to_list,
+>> -				   struct netdev_hw_addr_list *from_list,
+>> -				   int addr_len)
+>> +int __hw_addr_sync_multiple(struct netdev_hw_addr_list *to_list,
+>> +			    struct netdev_hw_addr_list *from_list,
+>> +			    int addr_len)
+>>  {
+>>  	int err = 0;
+>>  	struct netdev_hw_addr *ha, *tmp;
+>> @@ -260,6 +260,7 @@ static int __hw_addr_sync_multiple(struct netdev_hw_addr_list *to_list,
+>>  	}
+>>  	return err;
+>>  }
+>> +EXPORT_SYMBOL(__hw_addr_sync_multiple);
+> 
+> I'm asking because this additional export looks suspect. How other
+> drivers cope with similar situation?
+> 
 
->
-> >
-> > - In lowpan_newlink() in net/ieee802154/6lowpan/core.c:
-> >
-> >     wdev =3D dev_get_by_index(dev_net(ldev), nla_get_u32(tb[IFLA_LINK])=
-);
-> >
-> >   Looks for IFLA_LINK in dev_net, but in theory the ifindex is defined
-> >   in link netns.
->
-> I guess you mean the ifindex is defined in src_net instead.
-> Not sure if it's too late to change the behaviour.
+To avoid exporting I will need to use dev_mc_sync_multiple() which was
+in fact suggested by Michal Swiatkowski in [1]. However that won't work
+in this case as explained by me in the reply to Michal [2]
 
-Yes, it's source net for lowpan. I think it depends on whether
-the interpretation of IFLA_LINK should be considered as part API
-provided by rtnetlink core, or something customizable by driver.
-In the former case, this can be considered as a bug.
+[1]
+https://lore.kernel.org/all/Z2PLDqqrLdXhLtAF@mev-dev.igk.intel.com/#:~:text=Only%20question%2C%20why%20dev_mc_sync_multiple%20can%27t%20be%20used%20here%3F
+[2]
+https://lore.kernel.org/all/cb319ffd-ac67-42b3-9786-e8c9970086d2@ti.com/#:~:text=nice%20to%20have.%0A%3E-,I,-don%27t%20think%20that%27s
 
-Thanks.
+> Thanks!
+> 
+> Paolo
+> 
+
+-- 
+Thanks and Regards,
+Danish
 
