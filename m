@@ -1,140 +1,110 @@
-Return-Path: <netdev+bounces-155910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAE54A0449F
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:33:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B0DA04533
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 16:53:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2E5D188618F
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:33:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEF7E1887A55
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C80E1F2C4A;
-	Tue,  7 Jan 2025 15:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C9C41EB9F4;
+	Tue,  7 Jan 2025 15:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="APWW3StN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aiTH3PNA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387FB1F4276;
-	Tue,  7 Jan 2025 15:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DD92594AB
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 15:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736263912; cv=none; b=Z4C2mtmeCsn3dbhapXQ07p8bsjLDsF+2kOHaD7u/HLXd5RTNWY4jBZbM9nZx9UJJaB3RzLw7dL9qBTeha7uleWGiyzlD48gIbF/xAkqfoQeBFXgXdxEetY8p+Ro64JJ0kiGs+VXaUyM96jESQuO715p5LihFRIxX1aNpBvQu1oo=
+	t=1736265223; cv=none; b=aUoXpLziQs6rnRXup/PWeIvUuERq98m4PpziqWJ7aQAq7yVu2+jA+decGc3aANGAVJNgGQRv9C/lSYSwcxpY1xpqmpRX+EArLtJjVU4adls4h6719SeCmgrgK4+nL6CCDZKKYOMXYq2tRTk+cUpX6AyQv75cGd5gBoZvzSz4JwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736263912; c=relaxed/simple;
-	bh=02kZtbtipIWVTWFg7jgWGOul0B8zGr6oxzoMcfkW5U4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eiQwle3aH5b6hB4Oi5gDkTfiecKH48/flxJ66UyU54KFli0WkkMt3/Va0OvfXWacviFsAfypEneElva9dZVuayJ0+UKTvUOFF044uAILc9jGZ4s5ywR7myWkybslAfiE6kbo3L+joyLnzdgWHY1vB/SaPFd4bpfuvC1EkgLMs5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=APWW3StN; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736263909; x=1767799909;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=02kZtbtipIWVTWFg7jgWGOul0B8zGr6oxzoMcfkW5U4=;
-  b=APWW3StNxbi49///Ry3zcuacxr76YSB0poC7/hrsCSTMVkP+/l14A4gb
-   3eRKO13K5e6jO6yWaMg4q4KMlnffYRazIk65+t76xcOnM9NZ4F71OXrSr
-   Z0Q/bqk4I3cjHymdJoR7x5eDo8+JywkyJu9oFgqtgIjkdSbREtdeyQGON
-   JRr6M7331lG7Mf/ku9CngLO2Dmc0bAAc0fiJOgV95+zbyoOeDccRtjrhe
-   c1LiD4bjv1kvvA9jYHTud+kpMFQLhwYyv4qX8QG47lWu5ZEzprDAqNjHY
-   Z51qtbXlyBqZQK5WH2z37heLSHlSylu41WgbTsNKfTi/oKvl4qUZfPm8J
-   Q==;
-X-CSE-ConnectionGUID: FfyrkbRuQKS59eTBliu3UA==
-X-CSE-MsgGUID: 8B3XdXEqRDKN7D3abgyclw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="35685915"
-X-IronPort-AV: E=Sophos;i="6.12,295,1728975600"; 
-   d="scan'208";a="35685915"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 07:31:39 -0800
-X-CSE-ConnectionGUID: Q6Imvzp/TniSvLBViwAYpw==
-X-CSE-MsgGUID: n+pHpbs5S5+aC992Y7kejw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="103646975"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa008.jf.intel.com with ESMTP; 07 Jan 2025 07:31:35 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Daniel Xu <dxu@dxuuu.xyz>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 8/8] xdp: remove xdp_alloc_skb_bulk()
-Date: Tue,  7 Jan 2025 16:29:40 +0100
-Message-ID: <20250107152940.26530-9-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250107152940.26530-1-aleksander.lobakin@intel.com>
-References: <20250107152940.26530-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1736265223; c=relaxed/simple;
+	bh=KHEOsM+lgd7DwlqBFttUIjWfmKS8DTJdQBiM3KppBTU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nZTDOtjPAbqT2URkQ1GWhZ28pcEfjS6aq4y+WA7MDGu9oCll5+M+Y8R3R3JDUNgSwX5vwVva88xUyte9Y3+Hu+7kUweLHCseE0VXckZL22wG9Dmk3zuf/yoWl3TG87l5yJ7MpSAlfy6GllCInf64wz5WVkG9RW5yR5wAhNepa1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aiTH3PNA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C68C4CED6;
+	Tue,  7 Jan 2025 15:53:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736265222;
+	bh=KHEOsM+lgd7DwlqBFttUIjWfmKS8DTJdQBiM3KppBTU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aiTH3PNAfbqxU1K2FfIbEmY/Mf3r8SpkVV+9/j4UlXBnmtyvFeH5WT9pF7l4GLfiX
+	 Gbr0k0BN7kXNhLlch3Q9nbKgh9ybb6gNqoOfrIWbSds5mqCt/6NnR6B6EV2FQtzN45
+	 WYt7i6Sybdml+gAO3ms6DQdFlYf6sGDYGgjzuTG5GKcgeOnUi6/SblY3SAR5WhPo3v
+	 J/40I6hEOYnXXApkz9SJ02awRF1R/AW+Bage4liKXzCJi7EPSnirMEmkl7SUOF1iVu
+	 hhP8yLpk6+PA0hb+nqoqRQNhe7G8MZP3GB30U3mGe2jzfcx1BH7NkRiwXmrT6NFiRO
+	 0sb/0mVCUaUrg==
+Message-ID: <a6fb6faf-8b2b-4a5c-a49a-f31edf1d208a@kernel.org>
+Date: Tue, 7 Jan 2025 08:53:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next, v3] netlink: add IPv6 anycast join/leave
+ notifications
+Content-Language: en-US
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org,
+ jimictw@google.com, prohr@google.com, liuhangbin@gmail.com,
+ nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org,
+ =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>,
+ Lorenzo Colitti <lorenzo@google.com>
+References: <20250107114355.1766086-1-yuyanghuang@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250107114355.1766086-1-yuyanghuang@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The only user was veth, which now uses napi_skb_cache_get_bulk().
-It's now preferred over a direct allocation and is exported as
-well, so remove this one.
+On 1/7/25 4:43 AM, Yuyang Huang wrote:
+> This change introduces a mechanism for notifying userspace
+> applications about changes to IPv6 anycast addresses via netlink. It
+> includes:
+> 
+> * Addition and deletion of IPv6 anycast addresses are reported using
+>   RTM_NEWANYCAST and RTM_DELANYCAST.
+> * A new netlink group (RTNLGRP_IPV6_ACADDR) for subscribing to these
+>   notifications.
+> 
+> This enables user space applications(e.g. ip monitor) to efficiently
+> track anycast addresses through netlink messages, improving metrics
+> collection and system monitoring. It also unlocks the potential for
+> advanced anycast management in user space, such as hardware offload
+> control and fine grained network control.
+> 
+> Cc: Maciej Żenczykowski <maze@google.com>
+> Cc: Lorenzo Colitti <lorenzo@google.com>
+> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+> ---
+> 
+> Changelog since v2:
+> - Remove unnecessary 0 initializations.
+> - Remove unnecessary stack trace.
+> 
+> Changelog since v1:
+> - Resolve merge conflicts.
+> 
+>  include/net/addrconf.h         |  3 +++
+>  include/uapi/linux/rtnetlink.h |  8 +++++++-
+>  net/ipv6/addrconf.c            |  6 +++---
+>  net/ipv6/anycast.c             | 35 ++++++++++++++++++++++++++++++++++
+>  4 files changed, 48 insertions(+), 4 deletions(-)
+> 
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/net/xdp.h |  1 -
- net/core/xdp.c    | 10 ----------
- 2 files changed, 11 deletions(-)
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index 6da0e746cf75..e2f83819405b 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -344,7 +344,6 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
- 					   struct net_device *dev);
- struct sk_buff *xdp_build_skb_from_frame(struct xdp_frame *xdpf,
- 					 struct net_device *dev);
--int xdp_alloc_skb_bulk(void **skbs, int n_skb, gfp_t gfp);
- struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
- 
- static inline
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index 67b53fc7191e..eb8762ff16cb 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -619,16 +619,6 @@ void xdp_warn(const char *msg, const char *func, const int line)
- };
- EXPORT_SYMBOL_GPL(xdp_warn);
- 
--int xdp_alloc_skb_bulk(void **skbs, int n_skb, gfp_t gfp)
--{
--	n_skb = kmem_cache_alloc_bulk(net_hotdata.skbuff_cache, gfp, n_skb, skbs);
--	if (unlikely(!n_skb))
--		return -ENOMEM;
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(xdp_alloc_skb_bulk);
--
- /**
-  * xdp_build_skb_from_buff - create an skb from &xdp_buff
-  * @xdp: &xdp_buff to convert to an skb
--- 
-2.47.1
+
 
 
