@@ -1,245 +1,153 @@
-Return-Path: <netdev+bounces-155884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80ADA0430C
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:47:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B600A04322
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 15:50:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 771B41614BB
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:47:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64E043A2327
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 14:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F3C1F2375;
-	Tue,  7 Jan 2025 14:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CMnk2QAv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540591F2388;
+	Tue,  7 Jan 2025 14:49:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D241F2370;
-	Tue,  7 Jan 2025 14:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86851AD3E0
+	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 14:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736261262; cv=none; b=YoVE2gSx2HhylkvRnx6kkVBPw0ibIcgi3r3k1o9DEUZQJj9OcE9O1z1jYyCgcsYl8fCJN2m2EkNtnLva/oJIQJsAkCBOhbCo/KA+0rSm2U5VREeLAnlQHRWfK18p2Nae+zfLd6qXaFbK9SFGcTybtdkyWgosoeM/snviu/bdyH0=
+	t=1736261387; cv=none; b=iA38rCDpAkeQVsIwzyUi9oBTFbIhpaLJZ+83GDPZgEqmWco3kLLOPO0wXcX1IZZHrNaZyjNIn0eQusMsECDuCf4jaY9RQkee2qR8UilxzWBZQHUq0nOtVjxYqFPU8eGccivxGEMA4FUlegZAr+eBCb9YVEkEl3ueg/BoI5GFZNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736261262; c=relaxed/simple;
-	bh=z9AcZKXBTCewxT8SPTS20nArEMQztrWlt8OFGIyL2io=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IYlnjIW7o4aNmRmVeS0JaJ5Uh6EujVNUGkJ9Ygn04NB2/390iCUiYARKA7P/Uu2Jr4DtsG6lOS4B4weDtUUMpIyfX1fam4kfZw+po38N7cBMuWVLAyLAirv5cMnVf0seWDibaH+POxuZL1YV35uRUrQWqkSJ/5bNbgqZ9am+f7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CMnk2QAv; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736261260; x=1767797260;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kzqP3KWquCSCvitwLtozsomdOR3PJTWU3++JR+6rcS0=;
-  b=CMnk2QAv+JNq4OBfRUrZVbBCfKqza9z7TrdKUxm27DJAaahnb4CdtgBL
-   66LHR5midZDHrrm8oIXMyF5ikBKH2LApxfvYcOYC6+0zc4YJM0S4TKT2L
-   lPtHkepVHwolN1flxAXBoyBkNqmTyN38Oge7fpqLBYh7BsASJ4Ce7KpB2
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.12,295,1728950400"; 
-   d="scan'208";a="687495332"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 14:47:34 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:43223]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.48:2525] with esmtp (Farcaster)
- id 9b48386a-8619-40f1-8b35-660ddef4cf53; Tue, 7 Jan 2025 14:47:33 +0000 (UTC)
-X-Farcaster-Flow-ID: 9b48386a-8619-40f1-8b35-660ddef4cf53
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 7 Jan 2025 14:47:33 +0000
-Received: from 6c7e67c6786f.amazon.com (10.118.249.113) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 7 Jan 2025 14:47:24 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <shaw.leon@gmail.com>
-CC: <andrew+netdev@lunn.ch>, <b.a.t.m.a.n@lists.open-mesh.org>,
-	<bpf@vger.kernel.org>, <bridge@lists.linux.dev>, <davem@davemloft.net>,
-	<donald.hunter@gmail.com>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <idosch@nvidia.com>, <jiri@resnulli.us>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-can@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-ppp@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-wireless@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
-	<liuhangbin@gmail.com>, <netdev@vger.kernel.org>,
-	<osmocom-net-gprs@lists.osmocom.org>, <pabeni@redhat.com>,
-	<shuah@kernel.org>, <wireguard@lists.zx2c4.com>
-Subject: Re: [PATCH net-next v7 00/11] net: Improve netns handling in rtnetlink
-Date: Tue, 7 Jan 2025 23:47:14 +0900
-Message-ID: <20250107144714.74446-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <CABAhCOQdBL6h9M2C+kd+bGivRJ9Q72JUxW+-gur0nub_=PmFPA@mail.gmail.com>
-References: <CABAhCOQdBL6h9M2C+kd+bGivRJ9Q72JUxW+-gur0nub_=PmFPA@mail.gmail.com>
+	s=arc-20240116; t=1736261387; c=relaxed/simple;
+	bh=T0bcH1ahdbx6um8puSVUMB/m1GpB6QM0PXOxkaEi83g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AWUM3Gcn3bZplm045+4bK8s6ROyvW//ub/RvU6gOc/ZFvmmTiRPPmz/pVUiKyC0LWzedAm8lXCerFkk/OKtj4D6Uci59A6CXBvee7e62FbVnN98twh5fNSpC7Ej1UGsh0kWcOkUPW/He7l3+WEaj/85QGybdhg8ocuxhKNN4vyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVAtk-000231-Cs; Tue, 07 Jan 2025 15:49:36 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVAti-007MVG-0P;
+	Tue, 07 Jan 2025 15:49:34 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVAti-009asF-2Y;
+	Tue, 07 Jan 2025 15:49:34 +0100
+Date: Tue, 7 Jan 2025 15:49:34 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH net] net: phy: fix phylib's dual eee_enabled
+Message-ID: <Z30-_sLmbTzW0Yg6@pengutronix.de>
+References: <E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk>
+ <20250107144048.1c747bf1@bootlin.com>
+ <Z302oI--ENXvPiyW@pengutronix.de>
+ <20250107152345.6bbb9853@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250107152345.6bbb9853@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Tue, 7 Jan 2025 20:53:19 +0800
-> On Tue, Jan 7, 2025 at 4:57 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> [...]
-> >
-> > We can fix this by linking the dev to the socket's netns and
-> > clean them up in __net_exit hook as done in bareudp and geneve.
-> >
-> > ---8<---
-> > diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-> > index 89a996ad8cd0..77638a815873 100644
-> > --- a/drivers/net/gtp.c
-> > +++ b/drivers/net/gtp.c
-> > @@ -70,6 +70,7 @@ struct pdp_ctx {
-> >  /* One instance of the GTP device. */
-> >  struct gtp_dev {
-> >         struct list_head        list;
-> > +       struct list_head        sock_list;
-> >
-> >         struct sock             *sk0;
-> >         struct sock             *sk1u;
-> > @@ -102,6 +103,7 @@ static unsigned int gtp_net_id __read_mostly;
-> >
-> >  struct gtp_net {
-> >         struct list_head gtp_dev_list;
-> > +       struct list_head gtp_sock_list;
+On Tue, Jan 07, 2025 at 03:23:45PM +0100, Herve Codina wrote:
+> On Tue, 7 Jan 2025 15:13:52 +0100
+> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 > 
-> After a closer look at the GTP driver, I'm confused about
-> the gtp_dev_list here. GTP device is linked to this list at
-> creation time, but netns can be changed afterwards.
-> The list is used in gtp_net_exit_batch_rtnl(), but to my
-> understanding net devices can already be deleted in
-> default_device_exit_batch() by default.
-> And I wonder if the use in gtp_genl_dump_pdp() can be
-> replaced by something like for_each_netdev_rcu().
+> > On Tue, Jan 07, 2025 at 02:40:48PM +0100, Herve Codina wrote:
+> > > Hi,
+> > > 
+> > > On Thu, 14 Nov 2024 10:33:27 +0000
+> > > "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
+> > >   
+> > > > phylib has two eee_enabled members. Some parts of the code are using
+> > > > phydev->eee_enabled, other parts are using phydev->eee_cfg.eee_enabled.
+> > > > This leads to incorrect behaviour as their state goes out of sync.
+> > > > ethtool --show-eee shows incorrect information, and --set-eee sometimes
+> > > > doesn't take effect.
+> > > > 
+> > > > Fix this by only having one eee_enabled member - that in eee_cfg.
+> > > > 
+> > > > Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC support EEE")
+> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > > ---
+> > > >  drivers/net/phy/phy-c45.c    | 4 +---
+> > > >  drivers/net/phy/phy_device.c | 4 ++--
+> > > >  include/linux/phy.h          | 2 --
+> > > >  3 files changed, 3 insertions(+), 7 deletions(-)
+> > > >   
+> > > 
+> > > I observed a regression with this patch applied.
+> > > 
+> > > My system is based on a i.MX8MP soc with a TI DP83867 ethernet PHY and was
+> > > working with the kernel v6.12 release.  
+> > 
+> > Which ethernet interface is used on this system? FEC or stmmac?
+> 
+> It is the FEC (ethernet@30be0000).
 
-Right, it should be, or we need to set netns_local.
-Will include this diff in the fix series.
+FEC driver's EEE support is still broken, i assume it is configuring
+wrong timer. But, I can't fix without access to HW with proper PHY.
 
----8<---
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 2460a2c13c32..f9186eda36f0 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -2278,6 +2278,7 @@ static int gtp_genl_dump_pdp(struct sk_buff *skb,
- 	struct gtp_dev *last_gtp = (struct gtp_dev *)cb->args[2], *gtp;
- 	int i, j, bucket = cb->args[0], skip = cb->args[1];
- 	struct net *net = sock_net(skb->sk);
-+	struct net_device *dev;
- 	struct pdp_ctx *pctx;
- 	struct gtp_net *gn;
- 
-@@ -2287,7 +2288,10 @@ static int gtp_genl_dump_pdp(struct sk_buff *skb,
- 		return 0;
- 
- 	rcu_read_lock();
--	list_for_each_entry_rcu(gtp, &gn->gtp_dev_list, list) {
-+	for_each_netdev_rcu(net, dev) {
-+		if (dev->rtnl_link_ops != &gtp_link_ops)
-+			continue;
-+
- 		if (last_gtp && last_gtp != gtp)
- 			continue;
- 		else
----8<---
+> > 
+> > Is it the correct PHY?
+> > https://www.ti.com/product/de-de/DP83867E
+> 
+> Yes, it is this PHY.
 
-Otherwise, we need to move it manually like this, which is
-apparently overkill and unnecessary :p
+EEE support is not listed in this documentation and there is no errata.
+I assume, there is still a register claiming EEE support. Otherwise it
+would not be activated.
 
----8<---
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 2460a2c13c32..90b410b73c89 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -2501,6 +2501,46 @@ static struct pernet_operations gtp_net_ops = {
- 	.size	= sizeof(struct gtp_net),
- };
+https://e2e.ti.com/support/interface-group/interface/f/interface-forum/658638/dp83867ir-eee-energy-efficient-ethernet
+https://e2e.ti.com/support/interface-group/interface/f/interface-forum/556456/dp83867-mdi-auto-negotiation-with-eee-energy-efficient-ethernet-router?DP83867-MDI-Auto-Negotiation-with-EEE-Energy-Efficient-Ethernet-router
+https://e2e.ti.com/support/interface-group/interface/f/interface-forum/716392/dp83867ir-eee-energy-efficient-ethernet-with-dp83867
+
+Since chip vendor recommends to actively disable EEE support, something like
+this will be needed.
+--- a/drivers/net/phy/dp83867.c
++++ b/drivers/net/phy/dp83867.c
+@@ -947,6 +947,8 @@ static int dp83867_config_init(struct phy_device *phydev)
+                               mask, val);
+        }
  
-+static int gtp_device_event(struct notifier_block *nb,
-+			    unsigned long event, void *ptr)
-+{
-+	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-+	struct gtp_dev *gtp;
-+	struct gtp_net *gn;
++       phy_disable_eee(phydev);
 +
-+	if (dev->rtnl_link_ops != &gtp_link_ops)
-+		goto out;
-+
-+	gtp = netdev_priv(dev);
-+
-+	switch (event) {
-+	case NETDEV_UNREGISTER:
-+		if (dev->reg_state != NETREG_REGISTERED)
-+			goto out;
-+
-+		/* dev_net(dev) is changed, see __dev_change_net_namespace().
-+		 * rcu_barrier() after NETDEV_UNREGISTER guarantees that no
-+		 * one traversing a list in the old netns jumps to another
-+		 * list in the new netns.
-+		 */
-+		list_del_rcu(&gtp->list);
-+		break;
-+	case NETDEV_REGISTER:
-+		if (gtp->list.prev != LIST_POISON2)
-+			goto out;
-+
-+		/* complete netns change. */
-+		gn = net_generic(dev_net(dev), gtp_net_id);
-+		list_add_rcu(&gtp->list, &gn->gtp_dev_list);
-+	}
-+out:
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block gtp_notifier_block = {
-+	.notifier_call = gtp_device_event,
-+};
-+
- static int __init gtp_init(void)
- {
- 	int err;
-@@ -2511,10 +2551,14 @@ static int __init gtp_init(void)
- 	if (err < 0)
- 		goto error_out;
- 
--	err = rtnl_link_register(&gtp_link_ops);
-+	err = register_netdevice_notifier(&gtp_notifier_block);
- 	if (err < 0)
- 		goto unreg_pernet_subsys;
- 
-+	err = rtnl_link_register(&gtp_link_ops);
-+	if (err < 0)
-+		goto unreg_netdev_notifier;
-+
- 	err = genl_register_family(&gtp_genl_family);
- 	if (err < 0)
- 		goto unreg_rtnl_link;
-@@ -2525,6 +2569,8 @@ static int __init gtp_init(void)
- 
- unreg_rtnl_link:
- 	rtnl_link_unregister(&gtp_link_ops);
-+unreg_netdev_notifier:
-+	register_netdevice_notifier(&gtp_notifier_block);
- unreg_pernet_subsys:
- 	unregister_pernet_subsys(&gtp_net_ops);
- error_out:
-@@ -2537,6 +2583,7 @@ static void __exit gtp_fini(void)
- {
- 	genl_unregister_family(&gtp_genl_family);
- 	rtnl_link_unregister(&gtp_link_ops);
-+	register_netdevice_notifier(&gtp_notifier_block);
- 	unregister_pernet_subsys(&gtp_net_ops);
- 
- 	pr_info("GTP module unloaded\n");
----8<---
+        return 0;
+ }
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
