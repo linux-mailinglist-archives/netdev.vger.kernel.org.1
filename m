@@ -1,123 +1,266 @@
-Return-Path: <netdev+bounces-155737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 434B6A0380D
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 07:38:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 860CFA0381B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 07:44:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 369501647F2
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 06:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10173A292D
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 06:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C16A1AAA10;
-	Tue,  7 Jan 2025 06:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9051DED56;
+	Tue,  7 Jan 2025 06:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ipSSQurJ"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="Xibv0qMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B9F157493;
-	Tue,  7 Jan 2025 06:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169841DFDA2;
+	Tue,  7 Jan 2025 06:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736231891; cv=none; b=MVp/gxfkuxfywuAMSFK5d23vfbW+9XirTq8GAty/VILkWLR77ApOv964awza1EoDSwAIM68OVoDlp+iUsLK9S1r78siz0QzbOnJYYvXxgjHZRUKNK/9mdHPOB62yCTT42XXy1n9Dky09F1TU16kFH52iObCimDdpla2Z/LGlUCg=
+	t=1736232282; cv=none; b=a/0Ltd+NY2H6hfe/XIpo6xzhct/EfxTiz238av8VWq71XTsFfQsA0a9RRtk02Rqpx8k9ZRAEZO+FqgYYrNUS6JE9vLN5KjEQWbh1lQMnrLjQ/T8EqzwH6OTEfDRd1j2t3um7VY8DA44oBPtlJtWSUOfgkiyRA/aPeKnn05kO7LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736231891; c=relaxed/simple;
-	bh=METGOcRyFp3faRSSBkC6QzjEDC1ls9uLiI4yCaQfXFw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o4jzqDGOlGx+xxUJmZL375V0r2zqe5xzjvIIj8kqEcYjpIBn2hDPT8LUxQpmUNOleenP9tPSzxXdmMztC9eb/GoHEBSCCFbe/8NAClSP5No0IvNxrAUfZ9KvY2/P96sGyPnGSPsSfIEE9r+TqDH14N5oSUEHj+eInyPvpy1UmCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ipSSQurJ; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2164b662090so193944615ad.1;
-        Mon, 06 Jan 2025 22:38:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736231890; x=1736836690; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=orCDsDNFA6uclIQ3/usGvXWL2lE5OsemzFx60WJJZsA=;
-        b=ipSSQurJrrF5kB2fnRcF7zXalX8Z+9qwoJDihfnJ6Umvn4vDRiDbRbnXe4K8RQrlHb
-         SZrW8CUvALjHPQN2zAsN8yWtx4VIDDYyXom783Cs/0egr0+KxP7O1UDta1VB5grIH/Sv
-         +SHnFYXOZ0DRLnrFY+UDPi25aIYo1CCcqBizryDV90EJqwnv6U9QElza/YDWb/WM658z
-         qs+jAUQyJLllPBCjHvEFcq9yj5pxyMi3VrJf2lx6tnrlIriaEcWLWfjj8ykMADdoleRV
-         6RdgA1IlBjj832ixZNHOVpllPvW9egADA3Q6u4bjFutib82/V5/JjlJmabRkL1ZEley5
-         ljnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736231890; x=1736836690;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=orCDsDNFA6uclIQ3/usGvXWL2lE5OsemzFx60WJJZsA=;
-        b=PBmQzQL/uw0ToYSM2aE1bdBI6RL6DZVmv11YnmgcrzD5rcWpRWd3cDVJ9cms9Nmz4s
-         rCIB+I2FoBwiXGujQVANS5sUb5rDfTPreQOG/RgekP9WB7hSURDspBxyM6HHzGhBNI9o
-         c7NZNpSs1Noqx7wR9bTmeX5Zzrr++m5UWef8p1XPmUHXRYTgEWoefYmMP8Bop0hSthkg
-         Wi46NMY7j2sDbFBCbZ+rF/bxLP+/v+1JvCnvFoSa7uh7Bvny4vvpyKK281ZPHCJ+CZ2/
-         fFE4HOCxjVf53H8RIntCATPG1fX67IHxyNAjazac4VRr5nlPAzw1b+0Qrq3LFcgAALSp
-         StCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXT/wYjHsCSrtSUdgQK58wyDl5PMAqCWRdAOUobFnU+g5hN1I9XjICw2XSN3/jnBtg4glEWr1SkeyUI@vger.kernel.org, AJvYcCXee/rRkJuMeV7/BvJnaeTNVPOhwFRBeIBNkFMm3JJSsuPexoyxHQL+JZ1kWwcFimy+oMP7hNwjRXttEX6y@vger.kernel.org, AJvYcCXxtz1Bwyshnz+QLN4nq+hI+h+vKmQRcHVwpp6Il1UVYnVgHaIS78bpSyereYA3Pei988zizLzK@vger.kernel.org
-X-Gm-Message-State: AOJu0YythrMrtGc7rhUjZBisiHoELq1wzmTcgqPH++zAlnotWxVLXAjU
-	ml/PmhaArdmPZbWDP2g5wbiuUifJdKSNz+WaTPp7hLggK3tkDwiP
-X-Gm-Gg: ASbGnctOIxzJxKbUO0iZOxwg4oJBCe5VXyr59cibS94arBhyTthk+xrKjPn0orYIUGY
-	BAvTXv1E6ztaf+I790uf3HZjZ+cy8xx9bomCt+hJd9sLvlHx0zPueH0+g5n9uS0/cyPKl4Ua2py
-	SXB5l9E+wavinbbVtPXmNgbBzTc2KxrH/jj684kv6pfmgnBqPRiyKdIklm7BO7v4G0CBxuEBB4W
-	kaHT3Wut+653vvGkXYeG3e2IqqEaIA5IZO4xW+ZkHh2qjiHiN0wb6vfRmN2C0+8ZR0HzMbMe1Zr
-	MWaM2rZHx7t4XrqW1bNAIxNu9kDYj7WIO5w=
-X-Google-Smtp-Source: AGHT+IGWjFIAveI9yo5Dqy+7qm6ujTkxPVuxedvySkpkmuvq5Mxo0g2bGXtAvQZqm2ic1gDjzturbQ==
-X-Received: by 2002:a17:902:d2c9:b0:216:4c88:d939 with SMTP id d9443c01a7336-219e6f133b6mr907204635ad.38.1736231889846;
-        Mon, 06 Jan 2025 22:38:09 -0800 (PST)
-Received: from [192.168.0.100] (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9f5227sm305467095ad.185.2025.01.06.22.38.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jan 2025 22:38:09 -0800 (PST)
-Message-ID: <39e559f4-375b-4e4e-8c81-3d1d8858e839@gmail.com>
-Date: Tue, 7 Jan 2025 14:38:05 +0800
+	s=arc-20240116; t=1736232282; c=relaxed/simple;
+	bh=dt/RKmTHsdFDTuK+3SkncjIJdwhcZsWgU0+hTctml8g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uGPsXVJTRNP37lxcGikS+V6vZuBLACEMW18LCXyuY0g2eIN4J/cw+RdWb1xCfRQybr4zRPqZmKcLWLRHTn/bl+SwBj5rR1zKnEEZX8XvdXjBSIBEVcVrqW/YteJFokqz1z6QyI6VVuRsCr+6RYtKeUxrOnn0xNXJ+gKrWxF3I2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=Xibv0qMO; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 5076i1quD3483709, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1736232241; bh=dt/RKmTHsdFDTuK+3SkncjIJdwhcZsWgU0+hTctml8g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=Xibv0qMO17lXNqjIn3AblXCO8YRuxf+ZT7WrQ1JrO3y0KV/GactKs2TXd8TdMCYM1
+	 Y7IIIqfpbFmKZkIRioZqP0zdDvY8Xw9UWykH6iSdM/qWW6hzsyBgHq7Mqz7v5cRpq4
+	 w1+M3dVWUlD7cuBF79+iE7N3rVGeH4HlGcoa5SmEQgOvda/58N1Pd2KxYl5+bCD3Va
+	 zng2IrLf9y96Ym+Qgc938YYNio4FjJ23AC90E9e9l/K1MK/hBck5FqDesWCPzuYPuC
+	 a8k6aheOgnl8/OnkpeOaBQWDCyEw91vWAqg5C97em06sgJn2KLzsVHVr3c4qgQcxPd
+	 xNwYyOfaW72yQ==
+Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 5076i1quD3483709
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 7 Jan 2025 14:44:01 +0800
+Received: from RSEXH36502.realsil.com.cn (172.29.17.3) by
+ RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.11; Tue, 7 Jan 2025 14:44:01 +0800
+Received: from 172.29.32.27 (172.29.32.27) by RSEXH36502.realsil.com.cn
+ (172.29.17.3) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Tue, 7 Jan 2025 14:44:01 +0800
+From: ChunHao Lin <hau@realtek.com>
+To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        ChunHao Lin
+	<hau@realtek.com>
+Subject: [PATCH net-next v3] r8169: add support for RTL8125BP rev.b
+Date: Tue, 7 Jan 2025 14:43:55 +0800
+Message-ID: <20250107064355.104711-1-hau@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 0/3] Add support for Nuvoton MA35D1 GMAC
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
- schung@nuvoton.com, yclu4@nuvoton.com, peppe.cavallaro@st.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
-References: <20250103063241.2306312-1-a0987203069@gmail.com>
- <20250106163054.79cdd533@kernel.org>
-Content-Language: en-US
-From: Joey Lu <a0987203069@gmail.com>
-In-Reply-To: <20250106163054.79cdd533@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+Add support for RTL8125BP rev.b. Its XID is 0x689. This chip supports
+DASH and its dash type is "RTL_DASH_25_BP".
 
-Jakub Kicinski 於 1/7/2025 8:30 AM 寫道:
-> On Fri,  3 Jan 2025 14:32:38 +0800 Joey Lu wrote:
->> This patch series is submitted to add GMAC support for Nuvoton MA35D1
->> SoC platform. This work involves implementing a GMAC driver glue layer
->> based on Synopsys DWMAC driver framework to leverage MA35D1's dual GMAC
->> interface capabilities.
-> Would be good if you could reply to Christophe's question.
->
-> Then please rebase on top of net-next/main and repost.
-> The first patch doesn't currently apply cleanly.
-> Please leave out the second patch, it has to go via
-> the appropriate platform tree, rather than the networking
-> tree.
+Signed-off-by: ChunHao Lin <hau@realtek.com>
+---
+v2:
+- under rtl_hw_config(), add new entry for rtl8125bp
+v3:
+- under rtl_hw_config(), change rtl8125bp entry to rtl_hw_start_8125d()
+- add MODULE_FIRMWARE() entry for rtl8125bp's firmware file
+---
+ drivers/net/ethernet/realtek/r8169.h          |  1 +
+ drivers/net/ethernet/realtek/r8169_main.c     | 30 +++++++++++++++++++
+ .../net/ethernet/realtek/r8169_phy_config.c   | 23 ++++++++++++++
+ 3 files changed, 54 insertions(+)
 
-I got it. Thank you!
+diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
+index e0817f2a311a..7a194a8ab989 100644
+--- a/drivers/net/ethernet/realtek/r8169.h
++++ b/drivers/net/ethernet/realtek/r8169.h
+@@ -70,6 +70,7 @@ enum mac_version {
+ 	RTL_GIGA_MAC_VER_63,
+ 	RTL_GIGA_MAC_VER_64,
+ 	RTL_GIGA_MAC_VER_65,
++	RTL_GIGA_MAC_VER_66,
+ 	RTL_GIGA_MAC_VER_70,
+ 	RTL_GIGA_MAC_VER_71,
+ 	RTL_GIGA_MAC_NONE
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 5724f650f9c6..4b77f2151204 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -58,6 +58,7 @@
+ #define FIRMWARE_8125B_2	"rtl_nic/rtl8125b-2.fw"
+ #define FIRMWARE_8125D_1	"rtl_nic/rtl8125d-1.fw"
+ #define FIRMWARE_8125D_2	"rtl_nic/rtl8125d-2.fw"
++#define FIRMWARE_8125BP_2	"rtl_nic/rtl8125bp-2.fw"
+ #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
+ #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
 
-BR,
+@@ -142,6 +143,7 @@ static const struct {
+ 	[RTL_GIGA_MAC_VER_63] = {"RTL8125B",		FIRMWARE_8125B_2},
+ 	[RTL_GIGA_MAC_VER_64] = {"RTL8125D",		FIRMWARE_8125D_1},
+ 	[RTL_GIGA_MAC_VER_65] = {"RTL8125D",		FIRMWARE_8125D_2},
++	[RTL_GIGA_MAC_VER_66] = {"RTL8125BP",		FIRMWARE_8125BP_2},
+ 	[RTL_GIGA_MAC_VER_70] = {"RTL8126A",		FIRMWARE_8126A_2},
+ 	[RTL_GIGA_MAC_VER_71] = {"RTL8126A",		FIRMWARE_8126A_3},
+ };
+@@ -632,6 +634,7 @@ enum rtl_dash_type {
+ 	RTL_DASH_NONE,
+ 	RTL_DASH_DP,
+ 	RTL_DASH_EP,
++	RTL_DASH_25_BP,
+ };
 
-Joey
+ struct rtl8169_private {
+@@ -709,6 +712,7 @@ MODULE_FIRMWARE(FIRMWARE_8125A_3);
+ MODULE_FIRMWARE(FIRMWARE_8125B_2);
+ MODULE_FIRMWARE(FIRMWARE_8125D_1);
+ MODULE_FIRMWARE(FIRMWARE_8125D_2);
++MODULE_FIRMWARE(FIRMWARE_8125BP_2);
+ MODULE_FIRMWARE(FIRMWARE_8126A_2);
+ MODULE_FIRMWARE(FIRMWARE_8126A_3);
+
+@@ -1361,10 +1365,19 @@ static void rtl8168ep_driver_start(struct rtl8169_private *tp)
+ 		rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
+ }
+
++static void rtl8125bp_driver_start(struct rtl8169_private *tp)
++{
++	r8168ep_ocp_write(tp, 0x01, 0x14, OOB_CMD_DRIVER_START);
++	r8168ep_ocp_write(tp, 0x01, 0x18, 0x00);
++	r8168ep_ocp_write(tp, 0x01, 0x10, 0x01);
++}
++
+ static void rtl8168_driver_start(struct rtl8169_private *tp)
+ {
+ 	if (tp->dash_type == RTL_DASH_DP)
+ 		rtl8168dp_driver_start(tp);
++	else if (tp->dash_type == RTL_DASH_25_BP)
++		rtl8125bp_driver_start(tp);
+ 	else
+ 		rtl8168ep_driver_start(tp);
+ }
+@@ -1385,10 +1398,19 @@ static void rtl8168ep_driver_stop(struct rtl8169_private *tp)
+ 		rtl_loop_wait_low(tp, &rtl_ep_ocp_read_cond, 10000, 10);
+ }
+
++static void rtl8125bp_driver_stop(struct rtl8169_private *tp)
++{
++	r8168ep_ocp_write(tp, 0x01, 0x14, OOB_CMD_DRIVER_STOP);
++	r8168ep_ocp_write(tp, 0x01, 0x18, 0x00);
++	r8168ep_ocp_write(tp, 0x01, 0x10, 0x01);
++}
++
+ static void rtl8168_driver_stop(struct rtl8169_private *tp)
+ {
+ 	if (tp->dash_type == RTL_DASH_DP)
+ 		rtl8168dp_driver_stop(tp);
++	else if (tp->dash_type == RTL_DASH_25_BP)
++		rtl8125bp_driver_stop(tp);
+ 	else
+ 		rtl8168ep_driver_stop(tp);
+ }
+@@ -1411,6 +1433,7 @@ static bool rtl_dash_is_enabled(struct rtl8169_private *tp)
+ 	case RTL_DASH_DP:
+ 		return r8168dp_check_dash(tp);
+ 	case RTL_DASH_EP:
++	case RTL_DASH_25_BP:
+ 		return r8168ep_check_dash(tp);
+ 	default:
+ 		return false;
+@@ -1425,6 +1448,8 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
+ 		return RTL_DASH_DP;
+ 	case RTL_GIGA_MAC_VER_51 ... RTL_GIGA_MAC_VER_53:
+ 		return RTL_DASH_EP;
++	case RTL_GIGA_MAC_VER_66:
++		return RTL_DASH_25_BP;
+ 	default:
+ 		return RTL_DASH_NONE;
+ 	}
+@@ -2261,6 +2286,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
+ 		{ 0x7cf, 0x64a,	RTL_GIGA_MAC_VER_71 },
+ 		{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_70 },
+
++		/* 8125BP family. */
++		{ 0x7cf, 0x681,	RTL_GIGA_MAC_VER_66 },
++
+ 		/* 8125D family. */
+ 		{ 0x7cf, 0x689,	RTL_GIGA_MAC_VER_65 },
+ 		{ 0x7cf, 0x688,	RTL_GIGA_MAC_VER_64 },
+@@ -3842,6 +3870,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
+ 		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
+ 		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
+ 		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8125d,
++		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8125d,
+ 		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
+ 		[RTL_GIGA_MAC_VER_71] = rtl_hw_start_8126a,
+ 	};
+@@ -3861,6 +3890,7 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
+ 	case RTL_GIGA_MAC_VER_61:
+ 	case RTL_GIGA_MAC_VER_64:
+ 	case RTL_GIGA_MAC_VER_65:
++	case RTL_GIGA_MAC_VER_66:
+ 		for (i = 0xa00; i < 0xb00; i += 4)
+ 			RTL_W32(tp, i, 0);
+ 		break;
+diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
+index 968c8a2185a4..cf95e579c65d 100644
+--- a/drivers/net/ethernet/realtek/r8169_phy_config.c
++++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
+@@ -1102,6 +1102,28 @@ static void rtl8125d_hw_phy_config(struct rtl8169_private *tp,
+ 	rtl8125_config_eee_phy(phydev);
+ }
+
++static void rtl8125bp_hw_phy_config(struct rtl8169_private *tp,
++				    struct phy_device *phydev)
++{
++	r8169_apply_firmware(tp);
++	rtl8168g_enable_gphy_10m(phydev);
++
++	r8168g_phy_param(phydev, 0x8010, 0x0800, 0x0000);
++
++	phy_write(phydev, 0x1f, 0x0b87);
++	phy_write(phydev, 0x16, 0x8088);
++	phy_modify(phydev, 0x17, 0xff00, 0x9000);
++	phy_write(phydev, 0x16, 0x808f);
++	phy_modify(phydev, 0x17, 0xff00, 0x9000);
++	phy_write(phydev, 0x1f, 0x0000);
++
++	r8168g_phy_param(phydev, 0x8174, 0x2000, 0x1800);
++
++	rtl8125_legacy_force_mode(phydev);
++	rtl8168g_disable_aldps(phydev);
++	rtl8125_config_eee_phy(phydev);
++}
++
+ static void rtl8126a_hw_phy_config(struct rtl8169_private *tp,
+ 				   struct phy_device *phydev)
+ {
+@@ -1163,6 +1185,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
+ 		[RTL_GIGA_MAC_VER_63] = rtl8125b_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_64] = rtl8125d_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_65] = rtl8125d_hw_phy_config,
++		[RTL_GIGA_MAC_VER_66] = rtl8125bp_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_70] = rtl8126a_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_71] = rtl8126a_hw_phy_config,
+ 	};
+--
+2.43.0
 
 
