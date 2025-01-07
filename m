@@ -1,83 +1,138 @@
-Return-Path: <netdev+bounces-155642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58E68A03406
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 01:30:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B17A0340C
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 01:31:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E24C118855BF
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 00:31:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D21D162E76
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 00:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31A3481A3;
-	Tue,  7 Jan 2025 00:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7735D3BBC1;
+	Tue,  7 Jan 2025 00:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hpl6zwgd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IA2d4256"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A913FB1B;
-	Tue,  7 Jan 2025 00:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A45628691;
+	Tue,  7 Jan 2025 00:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736209856; cv=none; b=fZt6pDefjalWFD9E5Oeb8uSHpv/xLG25LhuS0dLkI0A50JeueecNvPfAnR2eopbB2bwtDVHDxM6gw0zZw3CjH9c4FQZWs+CkPBmS96x6oBSDt8bSsIBBRme7XexJ11RAyNk636B7OxFvXECT3//bckO6II4Gvpc+p1y9/kdhuV0=
+	t=1736209870; cv=none; b=L/+sPmhUCX1hsTMX384OQBc/y6LMHIlHcBqODGcMTQ8IocufQjWhs4elYaNW6A0QGz3W7Y3nTWeloKk0ecvTAznJrgA5wr3focoaUU483LE3Zd9Jz4vF1AYeWB0lmAYSQvQn50er+ZchRflkU3i8dZs9Sus/1SU+jEvj3WQsrks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736209856; c=relaxed/simple;
-	bh=wDhSYOfboak3qK+hy1jYjiF2LpSH+HGBwrcDHRKoB60=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lIq43qEUIieFsQQf+Y4WXTsdB+r3SsD0UVhGJgNFl5mOFeLm3lDHguIjVCbyk764nvuLexiEvLeWNC35gssDETu0JMnre5nvgknJvwtDRvge+QAjd5OUBJQTx6flfzs9V37wqABU4zf3GfN11sBzLJAwKOn+Pkf/zLbtKVIvy/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hpl6zwgd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530BFC4CED2;
-	Tue,  7 Jan 2025 00:30:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736209856;
-	bh=wDhSYOfboak3qK+hy1jYjiF2LpSH+HGBwrcDHRKoB60=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Hpl6zwgdR4rZ4/LVHS2TAzt0LK+XL1glv0sqbDQZP5vA/yFhfcJUM/eZMo6mBhJG5
-	 XyzVwBNReTSIVRdlVitJ1NShl44sdJ0tzFaKhuvroIL1z4OEWZ6V5iR9Qu0HlW7kNg
-	 6ymMwWmMG8LsBL81AQsCNwYMqgv9UXNZMC6TTPeSVj0YYaO61EtJEwaQk1aLAD9pa+
-	 7pEmZ69BMmznRpGThBIONnF1Y7/r40mDlKWDJJv/TMQiD8ons7ehNGNdLqmj44+dKj
-	 7upTyLTWkJ5nTVSqIm8ITzVHXzrR+oKncduJjAlNMaVm3wCqB72QGwqf0IodKWQjlS
-	 nFn5woCVD5o0w==
-Date: Mon, 6 Jan 2025 16:30:54 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joey Lu <a0987203069@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
- schung@nuvoton.com, yclu4@nuvoton.com, peppe.cavallaro@st.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH net-next v6 0/3] Add support for Nuvoton MA35D1 GMAC
-Message-ID: <20250106163054.79cdd533@kernel.org>
-In-Reply-To: <20250103063241.2306312-1-a0987203069@gmail.com>
-References: <20250103063241.2306312-1-a0987203069@gmail.com>
+	s=arc-20240116; t=1736209870; c=relaxed/simple;
+	bh=SHfW5fyQnsmaHFVn7BkPlpsP4nzQ8xdy+QhdGX+cakw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oGXZ+BTy658WrqRPjA1/Lpvv8F873AvG5YtwzNptrsM9cAjVUE9dBXM+fZIMPnBF4oN6RL8gctf5V4z01w3r4RFUfTLgARDEsuziGFj/etsy6FfAKvJL+BIQPdkWK4ScY28bpKf6vLMU1BkSgnicPxmDp37bBfD/1byFmrTB8XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IA2d4256; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-385e0e224cbso7446964f8f.2;
+        Mon, 06 Jan 2025 16:31:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736209866; x=1736814666; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=13VUHaFiuc4bXuLa2863YA1rYhMMosunQcKMEn7ZyfQ=;
+        b=IA2d4256Q0C5c4t6vKeIT9I9qu5t5L+LTkqtfKX1W7z9/Akl247tflxb2FE3e1Ech/
+         dkgIYonDN/UU+hdAItMuoUturYvaFf9SZhN1jr/uVAMRGX4covbbNcdvWq4UGq5//9Xa
+         Hjje2X4LXf0hNktDf+5f/5jK1GQzMqlfm43Zy7aWjAivwgdwXwv4K8wmnIPO7B+S3qxt
+         +EFbHfBpNJv4F0FBm9z8+qpJeW6Od7ZXNfEVrybqN9Oux+SV2CQEccVC4LMTuMt5hy5L
+         vnyewjKwceUattdjYRDFxPkMP0aciYRawoesXTE+vo+jeqtVy1JwADD0Df7sxKJaya/J
+         PrOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736209866; x=1736814666;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=13VUHaFiuc4bXuLa2863YA1rYhMMosunQcKMEn7ZyfQ=;
+        b=V6OcDIvFR35l2oaGRf86+jDZayIGX8ZUXOjsCGlAtpLHH6tqqQwNvS8jmMfcjAt/x6
+         2tXsMxX0R6WAKsSEr6XB78EgcgtdG4drQssNtw8+I/PRmWHt6F0Mer8rfZagvysYy06B
+         0jn82Y/WYb+HP8WoASncRD1ewlL4gMFWnvF07bsQ0u5Cyb1ABWkRNv3zwLeih014CCNQ
+         KagKVVIq1tr3xlRHomO333yaWNAD72/1/u0kMyKRR5v2YWYlIMp0wVtUaNhKxMzvEzOC
+         KkFNBrT1u7a2Adeb+ertUNGUmYTVy8xWnkUrgsL9rFU7eoMzPkroSHfAy3JSAQwtbUUG
+         FGZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2cJNvSyX8VrA6LKxH8mtVD0Fg/uyW3ECzFgEMW24XZUN9XRDWpfAKQ8m5PsoAUlatywRpzdLRuQI=@vger.kernel.org, AJvYcCUXPbKrQ69wBE+N+sbbn4r9NRlr907CNQxoxZJGNHBaOO2qUu3HRPh/UEuxNjr7CWZWw2oHEIYm@vger.kernel.org, AJvYcCUXuHks+LHijPNesFPLJ8SIl4xk5YW4QOW++C0EkdTP5E5DYU4KP0zZFDwH69fa7g9krsxlIDHzTnXE@vger.kernel.org, AJvYcCW5RD5jHtIBqLVJ0lcQhRYvLov5CINNHnZvQD+HpSeUN7y0suyI+6l+tq9i/a9C74otPjQl4+lDTNJk@vger.kernel.org, AJvYcCWYYLsIaLXwKQ385NJKdRxcQRu4cRNcLdGUjkhY2oMd5AWGvDI098LzCEYOR+HlJ3TPIHArJ1TKs+tkbjXX@vger.kernel.org, AJvYcCWcdkTqyWkR3IH89b8LRfFwC6vWtQB91CTTMuV3A6YvD2sLROMSbumsWEOYYlxa6X3wrDQ1iLccEV1Q@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmkBNr8SaNA2NTl/jw+Da9rrcbk/zYI///NXSr+fVj4d42p7HP
+	hWze6BBinOLUK2IZjwwBdT1ajPvQmsw28QVM0S0pgpZgx2ZAbFnE
+X-Gm-Gg: ASbGncsn6HkZU/Uxwr/8ldpy9KN0P8htE0uQ7Kbqo7B1RQQwFIQLC4QdxeDRyThSZRM
+	/YAav/Auo584jNaVNaFI8BqVEqpigu186nddZ1ruX7qKLDdt2imxy6r/5eZe5zhr4JNuiXGs2t6
+	fJHWU5wbGJkQ/Q4NWVSpghzK2i7hvbYVdEQRQkk/EKxQP+PHmYru54Vs2IG5ATEstHkN0JZRzQK
+	Y+aCnK/8YV0eUvHqvmdL5YojDoY5/akDDt7AQG6lyntgQEtK27lqyLIPFq534RQ9iozzOViYXoK
+	WxMFNoMZZe5lKz5qODzkQZbedQ==
+X-Google-Smtp-Source: AGHT+IEjONcU9x6JlzHrNOCRfapdijI2K0K3jjBIXQvsC6vlMArfJXHA/sc0RSHKNgKkvauw85ENXQ==
+X-Received: by 2002:a5d:6da1:0:b0:386:4a0c:fe17 with SMTP id ffacd0b85a97d-38a2220039fmr49166964f8f.27.1736209865801;
+        Mon, 06 Jan 2025 16:31:05 -0800 (PST)
+Received: from ?IPV6:2001:861:3385:e20:6384:4cf:52c5:3194? ([2001:861:3385:e20:6384:4cf:52c5:3194])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8471dcsm49320901f8f.48.2025.01.06.16.31.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Jan 2025 16:31:05 -0800 (PST)
+Message-ID: <810af0b9-aa21-4f11-9708-92c870615cc8@gmail.com>
+Date: Tue, 7 Jan 2025 01:31:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] Switch from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
+To: Mark Brown <broonie@kernel.org>
+Cc: Patrice Chotard <patrice.chotard@foss.st.com>,
+ Thinh Nguyen <Thinh.Nguyen@synopsys.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Adrian Hunter <adrian.hunter@intel.com>, Ulf Hansson
+ <ulf.hansson@linaro.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ linux-arm-kernel@lists.infradead.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
+ linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-spi@vger.kernel.org
+References: <20241229-update_pm_macro-v1-0-c7d4c4856336@gmail.com>
+ <eec9caa0-0029-4774-842e-af1d1290ad97@sirena.org.uk>
+Content-Language: en-US, fr
+From: =?UTF-8?Q?Rapha=C3=ABl_Gallais-Pou?= <rgallaispou@gmail.com>
+In-Reply-To: <eec9caa0-0029-4774-842e-af1d1290ad97@sirena.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri,  3 Jan 2025 14:32:38 +0800 Joey Lu wrote:
-> This patch series is submitted to add GMAC support for Nuvoton MA35D1
-> SoC platform. This work involves implementing a GMAC driver glue layer
-> based on Synopsys DWMAC driver framework to leverage MA35D1's dual GMAC
-> interface capabilities.
 
-Would be good if you could reply to Christophe's question.
 
-Then please rebase on top of net-next/main and repost.
-The first patch doesn't currently apply cleanly.
-Please leave out the second patch, it has to go via
-the appropriate platform tree, rather than the networking
-tree.
--- 
-pw-bot: cr
+Le 06/01/2025 à 14:08, Mark Brown a écrit :
+> On Sun, Dec 29, 2024 at 12:32:39AM +0100, Raphael Gallais-Pou wrote:
+>> Prevent the use of macros, and rely instead on kernel configuration for
+>> power management.
+>>
+>> This series makes the same change over six different drivers:
+>> usb-st-dwc3, sdhci-st, st-spi-fsm, ahci_st, sti-dwmac, spi-st.
+> 
+> Is there any actual interaction between these changes?  In general you
+> shouldn't combine patches for multiple subsystems into a single series
+> unless there's some dependency or other interaction since it just
+> complicates management of the patches.
+
+Hi,
+
+No, there isn't apart from the fact that those are stm32 drivers. As 
+Miquel also stated a few days ago, is was wrong for me to sent all of 
+this in a whole serie. I will just resend them separately as a v2, 
+taking into account Miquel's review[1] and the kernel robot.
+
+Regards,
+Raphaël
+
+
+[1] https://lore.kernel.org/lkml/877c7ha77n.fsf@bootlin.com/
 
