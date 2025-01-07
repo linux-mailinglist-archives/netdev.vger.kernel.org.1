@@ -1,179 +1,80 @@
-Return-Path: <netdev+bounces-156057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCEBBA04C80
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:37:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B94A7A04C83
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 23:39:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33CE43A5600
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:37:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23CB63A5698
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 22:39:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E66C190664;
-	Tue,  7 Jan 2025 22:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="p9Ws3LF+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4D519F120;
+	Tue,  7 Jan 2025 22:39:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from a3.inai.de (a3.inai.de [144.76.212.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA791547D2;
-	Tue,  7 Jan 2025 22:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933091547D2;
+	Tue,  7 Jan 2025 22:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.212.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736289464; cv=none; b=c7ugBRYGez6jMczBvfRaeTRS6aI6zIKUFCPTowidgMrDeklopefydfY1chK984bapMy9rvMgIvkfGS+/2m303AapOnggmiCeHew2fiDKNKlN9Cgb/Fi7RdqOPJ+GUPqrBwY1J34cnHpnpM5+bokM2hMGQyMwdkQ6vPJKFL6Mgpk=
+	t=1736289545; cv=none; b=M23ZiWp0BmHepEbcdwUrvQ5oUVKh2ogEs08CRcFYy6DSbt3xBFUhC54vpehCMCspu+OKSHRrvIOV0G2TOT0nmbhYBGtHzpHA81Z0NIvIYAKTg1UAsuNty0o8JnGfbLlWPg+qYYHp7Zat+1kXUKZwDERtMR6Xsu6NApOH1CyQF8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736289464; c=relaxed/simple;
-	bh=B8e+xEfOWI0aLh1SLfKwpFsxGLp+uW7m9Jxr6PXRQhI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q8rwyXW6Ppqye/5s9V70JZlFl13XWl0J1wd6TJcaohJ9MrDAyS6fYbXdSM7YKIVwT8HQJfkUDpn//Z3+T9w5XI6sBef/HSCXuznawBGPVs1PQgBntHV4e/2w/BIgvnkRuDKfa9C39XzA9Eu5QnVyJxYww5TDrFCEjQahvHQl+Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=p9Ws3LF+; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507IpaPC017068;
-	Tue, 7 Jan 2025 22:37:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=f3I3xNe5tf5PxRlQiIa/QdPJ2W7CT1
-	4VEdt/v0XfjS4=; b=p9Ws3LF+GHwWepZWmCOh45tyZFUkZ58cWbtFf0ThKWbAwL
-	R/wp5bK7Q97qcmrxvj4bbQf3AW0S3jk6IpuXVTCaeowTxEXZH4yN2beeF6/LfDx2
-	ouRS8bpInJNjJh2sUGws5hv80iO1HQ7p+dvXaY6qlp1LANR60mddR8SpSI2Pll+I
-	bG11zNReqlRBMrPImn93WgtXVxAix+UcaHJL2uhymSWlb9+0lqTOdHBtBO5wHaFY
-	bALHGUC7eRA3qLzQ9ilSJroV91UtuPZc5ZP6/DX2KKFGb1a1/O+i1fg4E5XfS80l
-	e6xYK5w/OtlUAkm1Ptu5sM+rz9iSAfHMYYsPgA4Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4410f3bsqk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 22:37:20 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 507MZRjb018656;
-	Tue, 7 Jan 2025 22:37:19 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4410f3bsqg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 22:37:19 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 507KxACM015903;
-	Tue, 7 Jan 2025 22:37:19 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43ygtkvnmx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 22:37:19 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 507MbHCp49676660
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 Jan 2025 22:37:17 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C36D45805C;
-	Tue,  7 Jan 2025 22:37:17 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9E5E45805A;
-	Tue,  7 Jan 2025 22:37:17 +0000 (GMT)
-Received: from localhost (unknown [9.61.96.42])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  7 Jan 2025 22:37:17 +0000 (GMT)
-Date: Tue, 7 Jan 2025 16:37:17 -0600
-From: Nick Child <nnac123@linux.ibm.com>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Haren Myneni <haren@linux.ibm.com>,
-        Rick Lindsley <ricklind@linux.ibm.com>,
-        Thomas Falcon <tlfalcon@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: Re: [PATCH 03/14] ibmvnic: simplify ibmvnic_set_queue_affinity()
-Message-ID: <Z32sncx9K4iFLsJN@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-References: <20241228184949.31582-1-yury.norov@gmail.com>
- <20241228184949.31582-4-yury.norov@gmail.com>
+	s=arc-20240116; t=1736289545; c=relaxed/simple;
+	bh=Qa8LA5Y5xgNZmvmGtgICbFuXajYj3IhqCQdFnKNpyME=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=T83V+ZsdR6w0FY2BN379EigqMEY7OF2pPMYS7h52JI7iHqhlk+ak2CfboZ59zjC1XhQ7HPFvhVQZvDS7wM8QDioC1okADZkrEpgW7HOL6zg5Jt//h6eaUvGIXN10TK0Oj0Gx0H7ToFjfRlBBoc5pVrn8b3j9eF6xp4890XCEVkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de; spf=fail smtp.mailfrom=inai.de; arc=none smtp.client-ip=144.76.212.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=inai.de
+Received: by a3.inai.de (Postfix, from userid 25121)
+	id 493C51003C1BC3; Tue,  7 Jan 2025 23:38:54 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by a3.inai.de (Postfix) with ESMTP id 479281100AD650;
+	Tue,  7 Jan 2025 23:38:54 +0100 (CET)
+Date: Tue, 7 Jan 2025 23:38:54 +0100 (CET)
+From: Jan Engelhardt <ej@inai.de>
+To: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
+cc: Jozsef Kadlecsik <kadlec@netfilter.org>, fw@strlen.de, pablo@netfilter.org, 
+    lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org, 
+    amiculas@cisco.com, davem@davemloft.net, dsahern@kernel.org, 
+    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+    linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 09/10] netfilter: Add message pragma for deprecated
+ xt_*.h, ipt_*.h.
+In-Reply-To: <0e51464d-301d-4b48-ad38-ca04ff7d9151@freemail.hu>
+Message-ID: <n72qp2s8-00q1-3n32-n600-p59o2oqo7s43@vanv.qr>
+References: <20250107024120.98288-1-egyszeregy@freemail.hu> <20250107024120.98288-10-egyszeregy@freemail.hu> <1cd443f7-df1e-20cf-cfe8-f38ac72491e4@netfilter.org> <0e51464d-301d-4b48-ad38-ca04ff7d9151@freemail.hu>
+User-Agent: Alpine 2.26 (LSU 649 2022-06-02)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241228184949.31582-4-yury.norov@gmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AxRovVz_4HNYWZW6641qBcGGq8aQ8ffV
-X-Proofpoint-ORIG-GUID: dr50qABO6GMvF_Cx5R3v4q56nfrbvOux
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- spamscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0
- bulkscore=0 phishscore=0 suspectscore=0 priorityscore=1501 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501070185
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-On Sat, Dec 28, 2024 at 10:49:35AM -0800, Yury Norov wrote:
-> A loop based on cpumask_next_wrap() opencodes the dedicated macro
-> for_each_online_cpu_wrap(). Using the macro allows to avoid setting
-> bits affinity mask more than once when stride >= num_online_cpus.
-> 
-> This also helps to drop cpumask handling code in the caller function.
-> 
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> ---
->  drivers/net/ethernet/ibm/ibmvnic.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-> index e95ae0d39948..4cfd90fb206b 100644
-> --- a/drivers/net/ethernet/ibm/ibmvnic.c
-> +++ b/drivers/net/ethernet/ibm/ibmvnic.c
-> @@ -234,11 +234,16 @@ static int ibmvnic_set_queue_affinity(struct ibmvnic_sub_crq_queue *queue,
->  		(*stragglers)--;
->  	}
->  	/* atomic write is safer than writing bit by bit directly */
-> -	for (i = 0; i < stride; i++) {
-> -		cpumask_set_cpu(*cpu, mask);
-> -		*cpu = cpumask_next_wrap(*cpu, cpu_online_mask,
-> -					 nr_cpu_ids, false);
-> +	for_each_online_cpu_wrap(i, *cpu) {
-> +		if (!stride--)
-> +			break;
-> +		cpumask_set_cpu(i, mask);
->  	}
-> +
-> +	/* For the next queue we start from the first unused CPU in this queue */
-> +	if (i < nr_cpu_ids)
-> +		*cpu = i + 1;
-> +
-This should read '*cpu = i'. Since the loop breaks after incrementing i.
-Thanks!
 
->  	/* set queue affinity mask */
->  	cpumask_copy(queue->affinity_mask, mask);
->  	rc = irq_set_affinity_and_hint(queue->irq, queue->affinity_mask);
-> @@ -256,7 +261,7 @@ static void ibmvnic_set_affinity(struct ibmvnic_adapter *adapter)
->  	int num_rxqs = adapter->num_active_rx_scrqs, i_rxqs = 0;
->  	int num_txqs = adapter->num_active_tx_scrqs, i_txqs = 0;
->  	int total_queues, stride, stragglers, i;
-> -	unsigned int num_cpu, cpu;
-> +	unsigned int num_cpu, cpu = 0;
->  	bool is_rx_queue;
->  	int rc = 0;
->  
-> @@ -274,8 +279,6 @@ static void ibmvnic_set_affinity(struct ibmvnic_adapter *adapter)
->  	stride = max_t(int, num_cpu / total_queues, 1);
->  	/* number of leftover cpu's */
->  	stragglers = num_cpu >= total_queues ? num_cpu % total_queues : 0;
-> -	/* next available cpu to assign irq to */
-> -	cpu = cpumask_next(-1, cpu_online_mask);
->  
->  	for (i = 0; i < total_queues; i++) {
->  		is_rx_queue = false;
-> -- 
-> 2.43.0
-> 
+On Tuesday 2025-01-07 23:06, Szőke Benjamin wrote:
+>> 
+>> I still don't know whether adding the pragmas to notify about header file
+>> deprecation is a good idea.
+>
+> Do you have any other ideas how can you display this information to the
+> users/customers, that it is time to stop using the uppercase header files then
+> they shall to use its merged lowercase named files instead in their userspace
+> SW?
+
+``__attribute__`` is just as implementation-specific as ``#pragma``, so it's
+not really an improvement, but here goes:
+
+----
+struct __attribute__((deprecated("This header file is deprecated"))) dontusethisstruct {
+};
+extern struct dontusethisstruct undefinedstruct;
+----
 
