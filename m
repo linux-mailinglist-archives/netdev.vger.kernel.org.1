@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-155670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-155671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9CCA03523
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:28:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CB3A03524
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 03:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80F123A3A0A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:28:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AAE71886067
+	for <lists+netdev@lfdr.de>; Tue,  7 Jan 2025 02:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E461C157E99;
-	Tue,  7 Jan 2025 02:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C59B8248D;
+	Tue,  7 Jan 2025 02:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0oc4Pv8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5QLOCrc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C091D156F3F
-	for <netdev@vger.kernel.org>; Tue,  7 Jan 2025 02:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222E06F30C;
+	Tue,  7 Jan 2025 02:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736216903; cv=none; b=SXd7wWWYmBaKrxMOYxWdWu/2pPo2NbwYMbH72e/E6r6NZHFHpQQiiEOu+xawloQuSPxdcZ1cp4sAfU2PUGzyXdv9NDe26U1U7w/O1a40GhkgqViSvSEwda9DTzsiaxV189GamXN+QQCsUgbTW/hEnFEMA94Z3NsITeLkJedCl6k=
+	t=1736216975; cv=none; b=RV0QnyNSP9Hb2miqSfjuI+Fjn0zhDA7tdpnr3JEpLondt2cMs5pb4quBq+Kwo92ELGBOROKyMdAsle6lrU/sCTqdP98ZUwdDhFgvRHXwlhWo9DuxVItTVdXqya8JDvOycUtom9MEcI7eGoTAAkp1M4Y3skJHObJPoKlB5jKrhqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736216903; c=relaxed/simple;
-	bh=cp1xN3TFv2gpxfCP6uiAuxbeWkwjlVJU7DMIamiKSUQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=twoBXb5xjD6fIo9pQDVBikOXCu0rXZugjsm9GwwIoN3Mf48a+Kgw7l0+kxog1DMjNdBOvenWsxSO13Ry1E8S498k3jDuq0LSDcLjYsG7e1O5OiuJBQUIjA30KyjocN0Ij/dqvOY1tA6rMYaD6RQOVAyspbU2EQEZVPTvdMfhAFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0oc4Pv8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46DA7C4CEE1;
-	Tue,  7 Jan 2025 02:28:23 +0000 (UTC)
+	s=arc-20240116; t=1736216975; c=relaxed/simple;
+	bh=qDwLrCJ45a6EhJ6Ia/0ZYCzBC3zrrDrFzkuG5sqOBpY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z1+kDKEVIdoZlHGOw5oJyiMgeWgCegwUhN3cp9kgs0JVqFXdz90qBMmzAofhxmoNwGI+UjqSS9Pz+mMckCzh+JYHYmo3CT7aWYF0gz6iid6eRQz7CSCknfStpX5go6V3TXcHj6LpDIdHOkGpt6njf45+7IYDaoBvu3rkG8ziDxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5QLOCrc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D434C4CED2;
+	Tue,  7 Jan 2025 02:29:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736216903;
-	bh=cp1xN3TFv2gpxfCP6uiAuxbeWkwjlVJU7DMIamiKSUQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q0oc4Pv8e9W0VKSxmeMcWugXfSKuGUTcJA4PxMlxqHbZiQA1gqedKwY/+fFxU7f9n
-	 oYg7Zn2XrfKndCkpnsbhQqcsf9/3ANLEmEaqxQcWgAhBOiSC12m6Lasx0xocr7ORCi
-	 sKxBuEP+tf8siP53ciDYqnsw+q8bQMvCQoUlY8igFqtE5mPGxI/BSpm/jXKWoN92QZ
-	 0NP90Pk/kDU7eAGbDZC4s+U2GEdrzTkO9K8I8AdbEY9H22i73bg/Njb6DdvVT4wNL9
-	 jgAwbQoYLbIB7VWSF2xS4yz5bhl0HQkTGjza/sXt4HyYCr0syRL1lneW/zAzx/qNFV
-	 gbVvMFQosqaIg==
+	s=k20201202; t=1736216974;
+	bh=qDwLrCJ45a6EhJ6Ia/0ZYCzBC3zrrDrFzkuG5sqOBpY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=r5QLOCrcce3y8EVygSdNUTP49G6uyTlH1DJ18M84sP0WCRwuPk6QZ3dXET11zS1Wp
+	 i7lGkmZBd7Ycx+/qWqm12cfuFiPD+DtXBFpTickMQacdCNK4A+4d9L5sB0eLtpSuqq
+	 UZwrWLACpS7cv/3h/KKn6j6Zc/qCym+QcLmtThurpQ9VGsPYH9vCTIusB+zuQrDuJY
+	 oOJ05FWHwECHevN6M6pr0EJMoRvm7mKlxL5jnI2c8LOgidyjmAdTtaMP236i8rK0bI
+	 OXixL18zT9574Vel8vRkEN8t2QXo1V5O7E2a0e/u50a1F0XVVhvusLr5tt5ZpQtVuF
+	 C4G05OYSkXrog==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
-Cc: donald.hunter@gmail.com,
-	netdev@vger.kernel.org,
+Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH net-next v2 3/3] netlink: specs: rt_link: decode ip6tnl, vti and vti6 link attrs
-Date: Mon,  6 Jan 2025 18:28:20 -0800
-Message-ID: <20250107022820.2087101-4-kuba@kernel.org>
+	Petr Machata <petrm@nvidia.com>,
+	Willem de Bruijn <willemb@google.com>,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v2] selftests: drv-net: test drivers sleeping in ndo_get_stats64
+Date: Mon,  6 Jan 2025 18:29:32 -0800
+Message-ID: <20250107022932.2087744-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250107022820.2087101-1-kuba@kernel.org>
-References: <20250107022820.2087101-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,140 +62,192 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some of our tests load vti and ip6tnl so not being able to decode
-the link attrs gets in the way of using Python YNL for testing.
+Most of our tests use rtnetlink to read device stats, so they
+don't expose the drivers much to paths in which device stats
+are read under RCU. Add tests which hammer profcs reads to
+make sure drivers:
+ - don't sleep while reporting stats,
+ - can handle parallel reads,
+ - can handle device going down while reading.
 
-Decode link attributes for ip6tnl, vti and vti6.
+Set ifname on the env class in NetDrvEnv, we already do that
+in NetDrvEpEnv.
 
-ip6tnl uses IFLA_IPTUN_FLAGS as u32, while ipv4 and sit expect
-a u16 attribute, so we have a (first?) subset type override...
+  KTAP version 1
+  1..7
+  ok 1 stats.check_pause
+  ok 2 stats.check_fec
+  ok 3 stats.pkt_byte_sum
+  ok 4 stats.qstat_by_ifindex
+  ok 5 stats.check_down
+  ok 6 stats.procfs_hammer
+  # completed up/down cycles: 6
+  ok 7 stats.procfs_downup_hammer
+  # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/rt_link.yaml | 87 ++++++++++++++++++++++++
- 1 file changed, 87 insertions(+)
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
 
-diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-index 96465376d6fe..363c4d4f0779 100644
---- a/Documentation/netlink/specs/rt_link.yaml
-+++ b/Documentation/netlink/specs/rt_link.yaml
-@@ -1825,6 +1825,48 @@ protonum: 0
-       -
-         name: erspan-hwid
-         type: u16
-+  -
-+    name: linkinfo-vti-attrs
-+    name-prefix: ifla-vti-
-+    attributes:
-+      -
-+        name: link
-+        type: u32
-+      -
-+        name: ikey
-+        type: u32
-+      -
-+        name: okey
-+        type: u32
-+      -
-+        name: local
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: remote
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: fwmark
-+        type: u32
-+  -
-+    name: linkinfo-vti6-attrs
-+    subset-of: linkinfo-vti-attrs
-+    attributes:
-+      -
-+        name: link
-+      -
-+        name: ikey
-+      -
-+        name: okey
-+      -
-+        name: local
-+        display-hint: ipv6
-+      -
-+        name: remote
-+        display-hint: ipv6
-+      -
-+        name: fwmark
-   -
-     name: linkinfo-geneve-attrs
-     name-prefix: ifla-geneve-
-@@ -1941,6 +1983,42 @@ protonum: 0
-       -
-         name: fwmark
-         type: u32
-+  -
-+    name: linkinfo-ip6tnl-attrs
-+    subset-of: linkinfo-iptun-attrs
-+    attributes:
-+      -
-+        name: link
-+      -
-+        name: local
-+        display-hint: ipv6
-+      -
-+        name: remote
-+        display-hint: ipv6
-+      -
-+        name: ttl
-+      -
-+        name: encap-limit
-+      -
-+        name: flowinfo
-+      -
-+        name: flags
-+        # ip6tnl unlike ipip and sit has 32b flags
-+        type: u32
-+      -
-+        name: proto
-+      -
-+        name: encap-type
-+      -
-+        name: encap-flags
-+      -
-+        name: encap-sport
-+      -
-+        name: encap-dport
-+      -
-+        name: collect-metadata
-+      -
-+        name: fwmark
-   -
-     name: linkinfo-tun-attrs
-     name-prefix: ifla-tun-
-@@ -2195,6 +2273,9 @@ protonum: 0
-       -
-         value: ipip
-         attribute-set: linkinfo-iptun-attrs
-+      -
-+        value: ip6tnl
-+        attribute-set: linkinfo-ip6tnl-attrs
-       -
-         value: sit
-         attribute-set: linkinfo-iptun-attrs
-@@ -2207,6 +2288,12 @@ protonum: 0
-       -
-         value: vrf
-         attribute-set: linkinfo-vrf-attrs
-+      -
-+        value: vti
-+        attribute-set: linkinfo-vti-attrs
-+      -
-+        value: vti6
-+        attribute-set: linkinfo-vti6-attrs
-       -
-         value: netkit
-         attribute-set: linkinfo-netkit-attrs
+v2:
+ - fix spelling in a comment
+v1: https://lore.kernel.org/20250105011525.1718380-1-kuba@kernel.org
+---
+ .../selftests/drivers/net/lib/py/env.py       |  1 +
+ tools/testing/selftests/drivers/net/stats.py  | 94 ++++++++++++++++++-
+ tools/testing/selftests/net/lib/py/ksft.py    |  5 +
+ 3 files changed, 97 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index fea343f209ea..987e452d3a45 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -48,6 +48,7 @@ from .remote import Remote
+         else:
+             self._ns = NetdevSimDev(**kwargs)
+             self.dev = self._ns.nsims[0].dev
++        self.ifname = self.dev['ifname']
+         self.ifindex = self.dev['ifindex']
+ 
+     def __enter__(self):
+diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
+index 031ac9def6c0..efcc1e10575b 100755
+--- a/tools/testing/selftests/drivers/net/stats.py
++++ b/tools/testing/selftests/drivers/net/stats.py
+@@ -2,12 +2,15 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+ import errno
++import subprocess
++import time
+ from lib.py import ksft_run, ksft_exit, ksft_pr
+-from lib.py import ksft_ge, ksft_eq, ksft_in, ksft_true, ksft_raises, KsftSkipEx, KsftXfailEx
++from lib.py import ksft_ge, ksft_eq, ksft_is, ksft_in, ksft_lt, ksft_true, ksft_raises
++from lib.py import KsftSkipEx, KsftXfailEx
+ from lib.py import ksft_disruptive
+ from lib.py import EthtoolFamily, NetdevFamily, RtnlFamily, NlError
+ from lib.py import NetDrvEnv
+-from lib.py import ip, defer
++from lib.py import cmd, ip, defer
+ 
+ ethnl = EthtoolFamily()
+ netfam = NetdevFamily()
+@@ -174,10 +177,95 @@ rtnl = RtnlFamily()
+     netfam.qstats_get({"ifindex": cfg.ifindex, "scope": "queue"}, dump=True)
+ 
+ 
++def __run_inf_loop(body):
++    body = body.strip()
++    if body[-1] != ';':
++        body += ';'
++
++    return subprocess.Popen(f"while true; do {body} done", shell=True,
++                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
++
++
++def __stats_increase_sanely(old, new) -> None:
++    for k in old.keys():
++        ksft_ge(new[k], old[k])
++        ksft_lt(new[k] - old[k], 1 << 31, comment="likely wrapping error")
++
++
++def procfs_hammer(cfg) -> None:
++    """
++    Reading stats via procfs only holds the RCU lock, which is not an exclusive
++    lock, make sure drivers can handle parallel reads of stats.
++    """
++    one = __run_inf_loop("cat /proc/net/dev")
++    defer(one.kill)
++    two = __run_inf_loop("cat /proc/net/dev")
++    defer(two.kill)
++
++    time.sleep(1)
++    # Make sure the processes are running
++    ksft_is(one.poll(), None)
++    ksft_is(two.poll(), None)
++
++    rtstat1 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
++    time.sleep(2)
++    rtstat2 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
++    __stats_increase_sanely(rtstat1, rtstat2)
++    # defers will kill the loops
++
++
++@ksft_disruptive
++def procfs_downup_hammer(cfg) -> None:
++    """
++    Reading stats via procfs only holds the RCU lock, drivers often try
++    to sleep when reading the stats, or don't protect against races.
++    """
++    # Max out the queues, we'll flip between max and 1
++    channels = ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
++    if channels['combined-count'] == 0:
++        rx_type = 'rx'
++    else:
++        rx_type = 'combined'
++    cur_queue_cnt = channels[f'{rx_type}-count']
++    max_queue_cnt = channels[f'{rx_type}-max']
++
++    cmd(f"ethtool -L {cfg.ifname} {rx_type} {max_queue_cnt}")
++    defer(cmd, f"ethtool -L {cfg.ifname} {rx_type} {cur_queue_cnt}")
++
++    # Real test stats
++    stats = __run_inf_loop("cat /proc/net/dev")
++    defer(stats.kill)
++
++    ipset = f"ip link set dev {cfg.ifname}"
++    defer(ip, f"link set dev {cfg.ifname} up")
++    # The "echo -n 1" lets us count iterations below
++    updown = f"{ipset} down; sleep 0.05; {ipset} up; sleep 0.05; " + \
++             f"ethtool -L {cfg.ifname} {rx_type} 1; " + \
++             f"ethtool -L {cfg.ifname} {rx_type} {max_queue_cnt}; " + \
++              "echo -n 1"
++    updown = __run_inf_loop(updown)
++    kill_updown = defer(updown.kill)
++
++    time.sleep(1)
++    # Make sure the processes are running
++    ksft_is(stats.poll(), None)
++    ksft_is(updown.poll(), None)
++
++    rtstat1 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
++    # We're looking for crashes, give it extra time
++    time.sleep(9)
++    rtstat2 = rtnl.getlink({"ifi-index": cfg.ifindex})['stats64']
++    __stats_increase_sanely(rtstat1, rtstat2)
++
++    kill_updown.exec()
++    stdout, _ = updown.communicate(timeout=5)
++    ksft_pr("completed up/down cycles:", len(stdout.decode('utf-8')))
++
++
+ def main() -> None:
+     with NetDrvEnv(__file__, queue_count=100) as cfg:
+         ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex,
+-                  check_down],
++                  check_down, procfs_hammer, procfs_downup_hammer],
+                  args=(cfg, ))
+     ksft_exit()
+ 
+diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+index 477ae76de93d..3efe005436cd 100644
+--- a/tools/testing/selftests/net/lib/py/ksft.py
++++ b/tools/testing/selftests/net/lib/py/ksft.py
+@@ -71,6 +71,11 @@ KSFT_DISRUPTIVE = True
+         _fail("Check failed", a, "not in", b, comment)
+ 
+ 
++def ksft_is(a, b, comment=""):
++    if a is not b:
++        _fail("Check failed", a, "is not", b, comment)
++
++
+ def ksft_ge(a, b, comment=""):
+     if a < b:
+         _fail("Check failed", a, "<", b, comment)
 -- 
 2.47.1
 
