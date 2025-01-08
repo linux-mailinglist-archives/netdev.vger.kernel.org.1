@@ -1,110 +1,164 @@
-Return-Path: <netdev+bounces-156260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BC95A05C1B
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:52:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5605EA05C33
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8CC27A036F
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:52:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1D583A3946
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9921A1F942F;
-	Wed,  8 Jan 2025 12:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82FC71FBEA6;
+	Wed,  8 Jan 2025 12:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rqzuunY8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eFE2ZSta"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5360B1946C7;
-	Wed,  8 Jan 2025 12:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015381FAC55;
+	Wed,  8 Jan 2025 12:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736340770; cv=none; b=Ru3ES9OCeCuvPg4CcWT7FEYkCDJHxHNLqzb7tUC5+16VScAPl0sDUWTNKPLy9E5eQ4hgXEnwhwXIpuM9fr51iVnXT/BC2HaWX+3Jnsk1qX5Tr0iTaK2rp4UHoxGZN+XEvQRinFgPQOnSitI3aquqBEm3YDbGwts58zJLQBwQHrE=
+	t=1736340974; cv=none; b=ga7MBRil/tJkVKnapPL89Vyi/a7U4dYPA4uG19jgkEbpZkwST60SgGqQ1XIsizysB0B2XwFM2QzqA3bV5P9GFvWlH5IU92m+q3l6DCeuqFR/5aKuxzzf9MVy/1d9zSJbN55eOwcHocpn1brog43MCspueaGTyEUVV2Jj3x1gQHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736340770; c=relaxed/simple;
-	bh=lT8DxYUFuqPTAKXvppqDK0sYD4ANfPqmDXVG0fwbCNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUhbaHJqt8guZhdeyp8yxCN9w2mhM0P1X0+w5aoHIr99QYSJmmJeqobN6J6JgxRiZm6EkbH1PM3QbSRxX5/mGfQMmsAPIjF6wE7xKBcmtei6KO6WQRGjYIOwgE6fG/i7PYbAo95zeL1Jcd0NpFC8fSIp3SNKhqY8/78tjd3qzUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rqzuunY8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CsmbqkKtj3BytVi9ck/ZNrCzWPHIJh46NK55puQMHpY=; b=rqzuunY8qrx3Gs+yY8N7J68izv
-	cCPJ/HEWUTNZn+cElCS1foEMRyT3HRIll0DOtUJHcG7dBjO7P3EA+8fKSCyZbZGcaB4afEp9pRviU
-	u70yIOHij4hdYfctV7/uQGQ1Q78rHkyUJBHUDCtWcDduZ5VttYrxwIbbA5mEScWAVon2Kng2l+ISH
-	4SPSwBHxtIoaNVz8N1gE2Dc8jtyOiHyfAzPYRa8ltPg0MPX1+8YSI4Ty1iSIvV8O3lXkMGJnZiMuK
-	xoVuT/hIOc7VxWe0OsogJb58oBgaLwmp9VDeZg0d3ku4UWlqS9VsMlobccbdeN2HfdmMDFiyHDkPV
-	U9TnAVlA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53774)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tVVY9-0000dR-02;
-	Wed, 08 Jan 2025 12:52:41 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tVVY7-0006JN-1W;
-	Wed, 08 Jan 2025 12:52:39 +0000
-Date: Wed, 8 Jan 2025 12:52:39 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
-Subject: Re: [PATCH net-next v1 3/7] net: usb: lan78xx: Improve error
- handling for PHY init path
-Message-ID: <Z351FwJ7WiimdUbQ@shell.armlinux.org.uk>
-References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
- <20250108121341.2689130-4-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1736340974; c=relaxed/simple;
+	bh=+1j5w+JfGT72QlMnSnMY5Oj3UpNFXN8sM+qcSVL7a+c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r6lsD/k/hSfI1Fn2tQpBqFvQtvg6Kv5bJ/euSHZDfeN/dfRvZkJEuLXrpWWlGH9g1tuU6izGOJbOa15CNuwuh0InyttzCd3R1hYKnTnCeDVJdtMZ1LQHrrYoHzVTVexdF1NADC7UgW3EXMRa0+HUTjz4euRI6h8+V5Jt3M0Ac4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eFE2ZSta; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3ce34c6872aso12956835ab.0;
+        Wed, 08 Jan 2025 04:56:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736340972; x=1736945772; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OOE9h383brC/b0A3meevzuXiFDFz9fGXg4qk3JWFePM=;
+        b=eFE2ZStatsjnKXef0U+CwXFqgd7xncfoYpQknbZXGZIBF+3Ap2jOoDN+BaD353DJKR
+         CfmMbGEbm+uV4lpJhNrq3lX1ndQWUJzOUrBDB3EFgvq1utzeP8IQo+kWGOxFOGnc8EWZ
+         ftHLjd3eMNT9CHGrrlTN6cKcf59PTHLrrAigSsl91BnEV4fVv0TDsQFtgl7hc9/7eqyp
+         C/41v4g+EMAtMyus8uluw542la7h5eRvTwroQp/UtZT7HDhHajFqaz04/fVuMzvdEk6E
+         CCAaagoVnAP92oK4G73gcjbDKXTAZSgisQMQ1azhHjQ21/L4SKgzhhz56M/XxHwJvMI9
+         BwEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736340972; x=1736945772;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OOE9h383brC/b0A3meevzuXiFDFz9fGXg4qk3JWFePM=;
+        b=nGudDI/adhJCpAh93ZyPaaPSAqfps3QpBkOEPsCvlVFX4NN2YGUqS9ktcCx/3MQGBq
+         uAJUrD4m80dkucyRGCeKtOeeQ7EWeTrufsuIiTAHljCGbMe8RMkcTZkMpcMoXVeURjdH
+         6/YoOez6Fde0dumwuM5jdeBevGMUCOvjiBtbyA2P4fniIsVjhGSXXf6mTBHFBxrkrvkz
+         UyFN2j+G2taktX8aA+iWEiNJW346KxcZoWkVthcypDpt58AYUBvtEn4j264BOEAtJawp
+         juSDUZQM/7iXbxBQi0+jE+IrVdbyIjBLzxMnDytEwI2IN1a6IAHLEjRUJGh8cWt4tZPs
+         MwsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPpLXz4APjMCTSmIKs27lrXy3acwzR4F3yI9rjFm3NSPkWEfqcXzkwhkbgOEAJP2HVciK9oRrf@vger.kernel.org, AJvYcCXrJCzO0tAqAJCom0e+J56f/Ga7xvRAUEqjVzfFZkC7fO/ZflLE72o/zkFUY1UxGGISJZs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3uHsEuA7VEWXYbsRrx+nFjRGOANLIuKwL2dFJCtDPnadqSVQy
+	2JCdATy2o3QzUKWxUg6cROUN3DT2tUla6Gs9+CDeTkkqqeBv8u7yd/hywRjuyFSoFXR5dfogz+2
+	HTBsqXIqtF0VOcdH8WgqVAkxZkaE=
+X-Gm-Gg: ASbGnctc3CogSUd7kBKqW+gw0zSVU+7rpWI+kWA9Glm3e27WH6KpnqwxiCKXTuwA+xa
+	sf+MAbz0lTpMNBW0eK9ZxNHvliStiMrq0Q9wvkA==
+X-Google-Smtp-Source: AGHT+IGG2gRUuzH9rGrzuYgrxE/qM+xeXkVOEjQ8p4fQWSOXgTFZKiSbISLanw1IWkdo8DyxHcMwJXb9c9EcPW6MS1k=
+X-Received: by 2002:a05:6e02:87:b0:3a6:c98d:86bc with SMTP id
+ e9e14a558f8ab-3ce3a86a258mr25970525ab.1.1736340972098; Wed, 08 Jan 2025
+ 04:56:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108121341.2689130-4-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-11-kerneljasonxing@gmail.com> <9f5081bb-ed66-4171-acef-786ae02cf69c@linux.dev>
+ <CAL+tcoCSrBBaW3Rg1hD0mBAGu_ZTCTfjVBGe_7B=_JB+uJTuYA@mail.gmail.com>
+In-Reply-To: <CAL+tcoCSrBBaW3Rg1hD0mBAGu_ZTCTfjVBGe_7B=_JB+uJTuYA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 8 Jan 2025 20:55:35 +0800
+X-Gm-Features: AbW1kvYhVYhZ8EU6wthVz9LPDRg5NV1LSEpGlvLf7LFhPMKFsbyTRF2f5zmvZGM
+Message-ID: <CAL+tcoB7bxkXoUdZiVr2kXkZO0DHV3uZe2=JP2mHjGGy+T5WGQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 10/11] net-timestamp: export the tskey for TCP
+ bpf extension
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 08, 2025 at 01:13:37PM +0100, Oleksij Rempel wrote:
->  	phydev = phy_find_first(dev->mdiobus);
->  	if (!phydev) {
->  		netdev_dbg(dev->net, "PHY Not Found!! Registering Fixed PHY\n");
->  		phydev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
-> -		if (IS_ERR(phydev)) {
-> +		if (PTR_ERR_OR_ZERO(phydev)) {
+On Wed, Jan 8, 2025 at 12:21=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> Hi Martin,
+>
+> > > -     bpf_skops_tx_timestamping(sk, skb, op, 2, args);
+> > > +     if (sk_is_tcp(sk))
+> > > +             args[2] =3D skb_shinfo(skb)->tskey;
+> >
+> > Instead of only passing one info "skb_shinfo(skb)->tskey" of a skb, pas=
+s the
+> > whole skb ptr to the bpf prog. Take a look at bpf_skops_init_skb. Lets =
+start
+> > with end_offset =3D 0 for now so that the bpf prog won't use it to read=
+ the
+> > skb->data. It can be revisited later.
+> >
+> >         bpf_skops_init_skb(&sock_ops, skb, 0);
+> >
+> > The bpf prog can use bpf_cast_to_kern_ctx() and bpf_core_cast() to get =
+to the
+> > skb_shinfo(skb). Take a look at the md_skb example in type_cast.c.
+>
+> In recent days, I've been working on this part. It turns out to be
+> infeasible to pass "struct __sk_buff *skb" as the second parameter in
+> skops_sockopt() in patch [11/11]. I cannot find a way to acquire the
+> skb itself, sorry for that :(
+>
+> IIUC, there are three approaches to fetch the tskey:
+> 1. Like what I wrote in this patchset, passing the tskey to bpf prog
+> through calling __cgroup_bpf_run_filter_sock_ops() is simple and
+> enough.
+> 2. Considering future usability, I feel I can add skb_head, skb_end
+> fields in sock_ops_convert_ctx_access().
+> 3. Only adding a new field tskey like skb_hwtstamp in
+> sock_ops_convert_ctx_access()
 
-Even though I've said to use phylink's fixed-phy support, I'm wondering
-about this entire hunk.
+After considering those approaches over and over again, I think this
+#3 is more suitable [1]. It can be aligned with other usages, say,
+skb_hwtstamp. Normally, only temporary variables are passed through
+calling __cgroup_bpf_run_filter_sock_ops(). Then we don't need to
+worry about breakages on skb because of safety issues. Well, how about
+this draft as below?
 
->  			netdev_err(dev->net, "No PHY/fixed_PHY found\n");
-> -			return NULL;
-> +			if (IS_ERR(phydev))
-> +				return phydev;
-> +			else
-> +				return ERR_PTR(-ENODEV);
-
-When does fixed_phy_register() return NULL?
-
-If there's no fixed-phy support enabled, then you get an ENODEV error
-pointer. If support is enabled, then you may get an error pointer
-or a valid phy_device structure. I can't see any case where it returns
-NULL. So, I think this hunk is redundant.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+[1] diff patch
++       case offsetof(struct bpf_sock_ops, tskey): {
++               struct bpf_insn *jmp_on_null_skb;
++
++               *insn++ =3D BPF_LDX_MEM(BPF_FIELD_SIZEOF(struct bpf_sock_op=
+s_kern,
++                                                      skb),
++                                     si->dst_reg, si->src_reg,
++                                     offsetof(struct bpf_sock_ops_kern,
++                                              skb));
++               /* Reserve one insn to test skb =3D=3D NULL */
++               jmp_on_null_skb =3D insn++;
++               insn =3D bpf_convert_shinfo_access(si->dst_reg,
+si->dst_reg, insn);
++               *insn++ =3D BPF_LDX_MEM(BPF_DW, si->dst_reg, si->dst_reg,
++                                     bpf_target_off(struct skb_shared_info=
+,
++                                                    tskey, 4,
++                                                    target_size));
++               *jmp_on_null_skb =3D BPF_JMP_IMM(BPF_JEQ, si->dst_reg, 0,
++                                              insn - jmp_on_null_skb - 1);
++               break;
++       }
 
