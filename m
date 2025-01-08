@@ -1,130 +1,130 @@
-Return-Path: <netdev+bounces-156158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27058A052AC
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 06:36:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDF3DA052BF
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 06:47:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22B261661D6
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 05:36:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 629BC188891E
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 05:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9191A0BED;
-	Wed,  8 Jan 2025 05:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YiN0zzd0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACCF1A2642;
+	Wed,  8 Jan 2025 05:47:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DED15853B;
-	Wed,  8 Jan 2025 05:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BFB153836
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 05:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736314581; cv=none; b=Qrozy80bkNlD+ClkuTwpz8Z/KE9OuDgZRx1l5j83TBH6gktOdR5EoxPWRezXiN1kD/dM/udIk/YFBJhV+FEM5fLyT3PV9a5aKGxWKdILNU4wiEDXQMDDzvDsR6RC2TS6gLKi8Cd/urTEW97mU82AElaW7SPCpB5wKqnl2mSOncE=
+	t=1736315255; cv=none; b=uaWPjG9MtcZ2utnBR9AdtNxphIt4VYSaGRQP0bi/vLI+C7y/gj8rZAMweeab27gITX2Sl16RJU7qk2qvCrr2c7mZOSv4oePApcLjZpLOHfr47wl74WQXu+nk5GpMV0IRrmUEWTYVQry8wCgVgLLVxChZJsc4uKIuNaX9gmJ9YEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736314581; c=relaxed/simple;
-	bh=JkvafJrvOtEgqdOlmc6PJP7xFwLx8/+pR/FrSkSHxOI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ejRl6T33nfha8e69VrVbWuh8QedF1tXxsLayfDLd+MLW5HrwiwBBdXENNZzz9ng7mbSTSSV1wIPvrt5kUBgOrMl76KXTemuzjU9ps0Lj+FaEa+U0JsFsHvkQA7CQIrq5E3IRr5zGDwEfbadu53derSRoQ+4fKTmTNflGUux3uZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YiN0zzd0; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ef714374c0so766675a91.0;
-        Tue, 07 Jan 2025 21:36:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736314578; x=1736919378; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QwB6PKWL4fpLwQMxIbGdx/81PcCRgJBA26Iv4G5hiqo=;
-        b=YiN0zzd0Puc0s1UCE1nVzx4tABazpv972EzlBAtT5plbx8/wQfHJnep5qeEtaqssnD
-         3BMSsixn8IZCaZXaeh3mZj6F5XLjjZ+QbPtk1gXlvlYoxcT9Fbd5q9U/iO9Oujjnd2iX
-         lAgpmRysdLvJxTEHVlykq1I5kbOfFg00VWa4jNAGgB9OzW8PFBzTtH5Wie7ytJEq5Ff/
-         QeCJ3GksXt62z5lSLF9jwnGGCuz1opM/JqNFZO8O/YaEtfMLkyDQqHUBNaSZnOheQPF+
-         lyIw3UWuwEVO467J0Wi3tq6sGRfiSs38MK3KROERuycivRNKyh1R+Ki/tJNRl8fILPfB
-         F7FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736314578; x=1736919378;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QwB6PKWL4fpLwQMxIbGdx/81PcCRgJBA26Iv4G5hiqo=;
-        b=Otk9ShXtOkodx4UwkaQErjzCBemwdzRq9tm1140x+Hz8miwwRN3T7XYK3eDCtSZg/G
-         zmxhvfY/Ee3Vc7dKwV4dZANHKFDIXZEs9wiFzEy29+OZSc2AvAGG2lxM5O//hHcYT8sc
-         cD9i+YgaqUotihAavEYdop1Z1bNMfrZd+61H4R3v4Q1SKJ/I9a8VDN3+/2R7QZMf6+1V
-         eIXo4dmVWPP6lKQF2n2wrFO+ya8jHrmMHVwqmL69HAtJ/80OR+QeVGujn29yzAA/xp/J
-         6Ee5WLQG5hS7bC2It2r3WO3r1+kMewxbpBmf69y9oCUkxvIeEkflOHwU+eFxlalUkuXx
-         +3HQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWgu7lVayK1drc4HLT6o34EdzzdiKAWvg9TgLQgLnp/Nz7ld6nyoq6VlhXgwp3Az6ff8gE2jwdP@vger.kernel.org, AJvYcCX5OFEm8Kf+fvaUkU3J3NYzClbRc7gybAX3iEo/uLPNzjzbXabhRIYF+BODsSnxisVOoOUBRJkchPkjsOk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPLmo0PIlrZCU2k9x1juF3yw0Qo7UFvoK2JQ5YpYjtA8R9DmKl
-	rEWT/3IbIAfhZAbme27KXK9PRMro1+wnh0Fj+782FvyVTpiIAp4E
-X-Gm-Gg: ASbGncuNEMSMwOr8zUHhBdX0cm4mOjJp2kQk+tYWTXgWjYNyJ//qmb5E73Yysq8Vfi9
-	jlQvK2uhfnKcvGFhpvw5tWTT1x1lXgavzsaEmZJdUa/ot0lyO66jcUeXwE5tYMikkkzEb0d/Uu8
-	1nBxmi+Wn6Cs3yc1Fnyqd3hcIOFzws0g/W3JbXGHh5GKvAL4iAZF9YD6+wYnq+2bSV8ywvirl7J
-	u6r44zVFI1mUgSV1MeXWLvb/UaJ2ZFffNM1heiLzyzfayNx23Yr/Mq07J+j
-X-Google-Smtp-Source: AGHT+IFQNLflTaSaTva4SqpeHAD8GetNltm43gjW14adKs7m5QAStWdcGn40w/j/MPJdp38ED9KrRQ==
-X-Received: by 2002:a17:90b:1f85:b0:2ee:cbd0:4910 with SMTP id 98e67ed59e1d1-2f548594570mr2814359a91.1.1736314578470;
-        Tue, 07 Jan 2025 21:36:18 -0800 (PST)
-Received: from HOME-PC ([223.185.133.12])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f54a2e514asm510668a91.43.2025.01.07.21.36.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 21:36:18 -0800 (PST)
-From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-Subject: [PATCH net-next] ixgbe: Remove redundant self-assignments in ACI command execution
-Date: Wed,  8 Jan 2025 11:06:14 +0530
-Message-Id: <20250108053614.53924-1-dheeraj.linuxdev@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1736315255; c=relaxed/simple;
+	bh=mPKhWPu8pYX8pUmDbAmVTi61K7p19wbdAQVS1KLCFB0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=plzBPHhQAkWhAldcryfMNWC4dTTuPERbiRO2Ggew5NLmeb+OqBHJIJ4ZuWUVsLPHL8qy8tSEAHKyvx9gCw89nmUF7GnBMWJmSURyZ/Bq6YUE//QY7BBbX/KopPkOMbzI8jNy/umllc8NSn9CCdjQAlQKCttD5/HEmVPZy9h8Aao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVOuR-0007Ui-V4; Wed, 08 Jan 2025 06:47:15 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVOuM-007Spp-10;
+	Wed, 08 Jan 2025 06:47:11 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVOuM-00BNpv-36;
+	Wed, 08 Jan 2025 06:47:10 +0100
+Date: Wed, 8 Jan 2025 06:47:10 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next 11/14] net: pse-pd: Add support for PSE device
+ index
+Message-ID: <Z34RXjqUKBdDqAGF@pengutronix.de>
+References: <20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com>
+ <20250104-b4-feature_poe_arrange-v1-11-92f804bd74ed@bootlin.com>
+ <20250107171834.6e688a6b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250107171834.6e688a6b@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Remove redundant statements in ixgbe_aci_send_cmd_execute() where
-raw_desc[i] is assigned to itself. These self-assignments have no
-effect and can be safely removed.
+On Tue, Jan 07, 2025 at 05:18:34PM -0800, Jakub Kicinski wrote:
+> On Sat, 04 Jan 2025 23:27:36 +0100 Kory Maincent wrote:
+> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> > 
+> > Add support for a PSE device index to report the PSE controller index to
+> > the user through ethtool. This will be useful for future support of power
+> > domains and port priority management.
+> 
+> Can you say more? How do the PSE controllers relate to netdevs?
+> ethtool is primarily driven by netdev / ifindex.
+> If you're starting to build your own object hierarchy you may be
+> better off with a separate genl family.
+            
+I hope this schema may help to explain the topology:
 
-Fixes: 46761fd52a88 ("ixgbe: Add support for E610 FW Admin Command Interface")
-Closes: https://scan7.scan.coverity.com/#/project-view/52337/11354?selectedIssue=1602757
-Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2 --
- 1 file changed, 2 deletions(-)
+	                              +--- netdev / ifindex 0
+	    +--- PSE power domain 0 --+--- netdev / ifindex 1
+            |                         +--- netdev / ifindex 2
+PSE ctrl 0 -+
+            |                         +--- netdev / ifindex 3
+            +--- PSE power domain 1 --+--- netdev / ifindex 4
+	                              +--- netdev / ifindex 5
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index 683c668672d6..408c0874cdc2 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -145,7 +145,6 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	if ((hicr & IXGBE_PF_HICR_SV)) {
- 		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
--			raw_desc[i] = raw_desc[i];
- 		}
- 	}
- 
-@@ -153,7 +152,6 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
- 		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
--			raw_desc[i] = raw_desc[i];
- 		}
- 	}
- 
+	                              +--- netdev / ifindex 6
+	    +--- PSE power domain 2 --+--- netdev / ifindex 7
+            |                         +--- netdev / ifindex 8
+PSE ctrl 1 -+
+            |                         +--- netdev / ifindex 9
+            +--- PSE power domain 3 --+--- netdev / ifindex 10
+	                              +--- netdev / ifindex 11
+
+PSE device index is needed to find actually PSE controller related to
+specific netdev / ifindex.
+
+Regards,
+Oleksij
 -- 
-2.34.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
