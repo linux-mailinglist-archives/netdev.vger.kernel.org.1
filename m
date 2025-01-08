@@ -1,498 +1,192 @@
-Return-Path: <netdev+bounces-156441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E843A066BD
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:00:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E396DA066DE
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0663E188A77B
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:00:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 458DD7A04B3
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95592204689;
-	Wed,  8 Jan 2025 21:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jltAl4bq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3179A204686;
+	Wed,  8 Jan 2025 21:05:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from GBR01-CWX-obe.outbound.protection.outlook.com (mail-cwxgbr01on2090.outbound.protection.outlook.com [40.107.121.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C3A203713;
-	Wed,  8 Jan 2025 21:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736370018; cv=none; b=gwD4Ncy1mzAQzH+SHRSiwdX4sUHUOUyqlQE0Jt2URKG1ms9AO8PwiYhn0R3wi6S8mxjcIMi2uffdkQc7m6pDiyUdxTJq36BGytITvfmO4RuIUFdmTCHOp16/w4BW10yQQkKn6pzwj5aXjRmFNY/GxtzpIhnDiF2OliTNVxix1Ng=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736370018; c=relaxed/simple;
-	bh=bA7CYs8ZO25il6tO7iT21wQeNuUCG//E8j3ST9SvzW4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=cuC4GVDesPWOxxq6B6JJXsD+vutZJ9F2dF2U6jN+u6j4pmSe/pskaYsqce08f7RIhKL1QTe7BFhMDzQMTk8QiYpJG4AODRPyyqm5h4V34ICAooscUnFIG8j9ZTGZm+SnVEgMNvd5zIFuGD6YeBY0F1FBK/eATvnWD2mabY15CyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jltAl4bq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65789C4CEDF;
-	Wed,  8 Jan 2025 21:00:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736370018;
-	bh=bA7CYs8ZO25il6tO7iT21wQeNuUCG//E8j3ST9SvzW4=;
-	h=From:Date:Subject:To:Cc:From;
-	b=jltAl4bqeDUUhfe8qsNzdUBoJiCPeAQnm2tPQk9XLyBSyhnTH1Ok7BRla+hIha5KT
-	 b7Lc9zAWcSplAfd/41lrg9kFQ/MCJZwd9QVzqRX6RP+Vp1z+glaGyfoNX14aGZKTe5
-	 1GQEpBaiwahu8jPoKXj84OerF5hGzOL4SbyfqajlvrOre8a0zK3+u/RkZwYpipkak8
-	 RJwKvK/weCfzMoNsSJ09ym/w1fza6vlaiex1qjWNAkf8HndN+ClL3/vt/09R2nKT6Z
-	 Cgd+InSGeZAbV6Hse8TEWX4DdZa1V/4VsrpN7thds3BOfYrdlOT7kcWYkf+DuScoq3
-	 GdvbqAAT9O4fQ==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Wed, 08 Jan 2025 16:00:15 -0500
-Subject: [PATCH] lockd: add netlink control interface
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683E12040B2;
+	Wed,  8 Jan 2025 21:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.121.90
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736370322; cv=fail; b=fNDhEdIg3EnywaVKaZUiX7ER8BWH3M/aP/cwd573Kd897Ny+N1FwtnVfjAgn7wdZcv2H/lDvy9TnHjM2MWdvpeu9g0qmwKWSx7fCiidikqOiPYuUVhvMTcfak1EJnAI5LkDy8+rjb/F5+h7Ub7cq00IL42R4kanb6UzFVWRiboM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736370322; c=relaxed/simple;
+	bh=C/7DpoC+WDpUhmoEKFUq3J0JyxWPDYG1YtilH27ECYI=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 Content-Type:MIME-Version; b=BbbtQfseqdYyIkucc6yTHBwE1tm6Q0jIRvLqoXfKYyHCuq3rMtuI7qVsTX7n0VP0mKq0KE5DLAvt98wr6hwVycnMTjY6xoYOsu0Ydo6IXPPcaNKGRMYcqSFfOnGPCPhEQSoQedbuST72TE0LDxw3R6TKfd4Z72OzNWS1rkjXg2c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=40.107.121.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AA8E1BwNWZXBkDLgmRT4ckvVO9NHdbZa3POG9g+Hfx4C5hmCs+4pVBewjV8iZctz43Iy/EIxAljK5qvb7w1kiCl8CalH+LtMHCX2XWOR6axj2fmii+2+IfSF9mym94Wjv5mpbug1NRgjs3GDKg8l48dQVjKHgvY3JP+YpW0qk2ShBbt7T9XUDdIUdJEYItCwReslHKIisTWF85ho41hPG+aq7hsfX2obH6Q7vp5tVFHel54AxwcJk6X2I9ZzVAdYzd/siJafZ+MAq9ZE/Ncif+5QIVAU5thL/r6/j+t9vhPQZqhsgvgB+3pCui4GNJ78j3YBhTSRf6D/PA8MG9P9GA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qP3zp+SEU9ynW7bKSztnh+1pzFIyzh90YbSaOcVFB4k=;
+ b=HDA1XJ99xO1QiepvghIqseL5G7QwuYLz59apqftw9L2zAPjy/chtR3jb57WcpEwtBglqgYnKqL6hMydWwtpxBZb9Dc6lGVa0oizU9DPgtmHYrFZANCQYTJM9n51Qia95FgjX6is2JsN4wYBsvRB9upNRooKkPvh7xwafUQNWgBtTLYeNdWCwjmUeIBtSDrrGlW0KcmmS8SWpoxu1H7NsIBe/bHUS81Y0ZATNLc58G2cbD8Hh926+BsBUX0jXFKSrDvwtuDbjj4Ex3VhGIO0qmkhW+89M7H5oycFvHIowjayu0ZJVl+ma2XK41ZSvP60yYx/6dzeaASfbm/QiRA2lqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
+ by CWXP123MB2712.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:3c::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.11; Wed, 8 Jan
+ 2025 21:05:17 +0000
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::5352:7866:8b0f:21f6]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::5352:7866:8b0f:21f6%7]) with mapi id 15.20.8335.011; Wed, 8 Jan 2025
+ 21:05:16 +0000
+Date: Wed, 8 Jan 2025 21:05:15 +0000 (GMT)
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+cc: Aaron Tomlin <atomlin@atomlin.com>, 
+    Florian Fainelli <florian.fainelli@broadcom.com>, ronak.doshi@broadcom.com, 
+    andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+    pabeni@redhat.com, bcm-kernel-feedback-list@broadcom.com, 
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] vmxnet3: Adjust maximum Rx ring buffer size
+In-Reply-To: <20250107154647.4bcbae3c@kernel.org>
+Message-ID: <71e6ab28-be0d-b85c-900b-537295bc81d1@atomlin.com>
+References: <20250105213036.288356-1-atomlin@atomlin.com> <20250106154741.23902c1a@kernel.org> <031eafb1-4fa6-4008-92c3-0f6ecec7ce63@broadcom.com> <20250106165732.3310033e@kernel.org> <2f127a6d-7fa2-5e99-093f-40ab81ece5b1@atomlin.com>
+ <20250107154647.4bcbae3c@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+X-ClientProxiedBy: LO4P265CA0320.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:390::13) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250108-lockd-nl-v1-1-b39f89ae0f20@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAF7nfmcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1MDQwML3Zz85OwU3bwc3aS0VHOz5GQDCyNzcyWg8oKi1LTMCrBR0bG1tQB
- KVzNtWgAAAA==
-X-Change-ID: 20250108-lockd-nl-bfe76cc08277
-To: Donald Hunter <donald.hunter@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
- Neil Brown <neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, 
- Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>
-Cc: Scott Mayhew <smayhew@redhat.com>, Yongcheng Yang <yoyang@redhat.com>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-nfs@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=12834; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=bA7CYs8ZO25il6tO7iT21wQeNuUCG//E8j3ST9SvzW4=;
- b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBnfudgMYepPYPEL/EH6c7WM+v4CKUJzE+qY/fs9
- yAahCmf16WJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZ37nYAAKCRAADmhBGVaC
- FbpQD/4nGYwYHT11Ukth7gIRDEFwqug4g8t4iBoR+M5Bm6lT5JlQPZ7BovDB01gRMfCCIy/f6IJ
- N8PMbA3xmePNLWAr78DzHkDCoc/4Fui5psrioi6dzzSxAvXDCaTO84+NUWAD/aISYaLpw6vnZ/B
- I9W/I1WpJVoxHvWQo5doqIRcH9Ua8d6fGKXxB2LhEgY/D0nJkXyFXQ5JNVIK+4CgdwQfqvYWWcx
- ycIO3C5/oMOZKewEboCVzwk0b+eLtc816+vxFYF+xZ6/HbmYgc4EBmpM7ElfF5ZupcG4zOyHFvI
- 2PlrmhfljE9acd5N+PLEdZa9TF07zRS8afS1vtyStSKAFGR53QXj/Ksasb7Jj3L/tpmIB6VCidf
- UmIT2mu2HnwDihO8Oc2ffuOGizxvvVQASYMn9cxdODSf3vR+VqbdNMGa3COSc5Ylt8CdOuqodVZ
- t9zFuM8Y7dg4VinN6shQvwOkS/oLRb6HbOCjLl+2Juxd+gBfzZdbW1Wj3hEskXECE2V70yAFWlf
- GNbYFwpnCyTqKNyG3EZ53hWhYBbcfJ8sYDNaLJ27p8w8iVK8ZmjeA8xKGBbxYM2uQ2Xr1e36fib
- +PaxnEFLnqsYjRziU+CU3/WhGl+7N7zkbS9qW7STDWxUWRvnrTFEtLN3pVo5WCyxsy5+qzq2WtX
- DKt3F3cvfvSdX9g==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|CWXP123MB2712:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99cff143-7b25-4d08-fe54-08dd302826ca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?vUoMv0F4NkiyoMIW4gYCVknwF/8s2oqDVMur4LucECdBsEAenIb9eIeY/haq?=
+ =?us-ascii?Q?e1OBJwZ85oghY49yMwszCqjPe32w9QCN1/SHxsFADM931C/DXUjTxzHIP/Vg?=
+ =?us-ascii?Q?2pYzI98waO6AhS9aMPjASyFlmjgMymEugmWO1ULVF2wWBZ2QyXIVOwCE8p9C?=
+ =?us-ascii?Q?+RX1dHi5u8UYS0c3WFDhGCli+N7G5HSGy7Cy+vvzyTvte6NshhgV9LTQWk9s?=
+ =?us-ascii?Q?IKKdR4+8JhoY8xrmEXolEGQZb9Wifuy9Va5n822hyzezn39TY5rq5HYw/D1q?=
+ =?us-ascii?Q?KnIi/ZBxaMJufza2EVLumdjPCOMxO1AxmqhPJBCu3YSx2JF9BbRqwC93HZxi?=
+ =?us-ascii?Q?xrvQaO4SvovHqlTxU55f5F/UgfK1Ueb7vbYXHE8iwiAbjlxtBF150pQpA+vY?=
+ =?us-ascii?Q?ORkTyXIoguWFd/yVo3uNIUh42aYY1fHZAZ2r/LLc7fqdot3X60tNExoCwkdL?=
+ =?us-ascii?Q?x0mUdMToEYcV+GiR1AR3B3ZVsENJ3x6cxwVlf6I/Ndc1DetjwgQHvFF7Zj3w?=
+ =?us-ascii?Q?fiBQ8A5/961i2seiKU8+jPetzrUxKjjXIPJuckk7VzpMpCp/0HSWmW+w40TB?=
+ =?us-ascii?Q?hn0zxu0APqEzMV5gcBUupxtgHAd0A4AnTLb/sLz9sMQrTCL+vIfVlKSOoL8J?=
+ =?us-ascii?Q?R3s1J+98uaQB9NW4D6fRzx7Dsk48Q3wN2K+yklAMfLYrA2b9nM6qFaPPSvHT?=
+ =?us-ascii?Q?31QMuScR/l/WieEGK4WqEmOj2u/7JO/tuGj2zDxpCzKuzNjpK25xwt9g/FqU?=
+ =?us-ascii?Q?3hZSZGmtwJBh1cq/e0tcYkBlxJSU1pWwtgogUrQetpQpZE8wsTUlcUIdlV1v?=
+ =?us-ascii?Q?FQpRMkhxTAarC5U/nkF5FIGaWptlZ3+aoJQ0u3eg550J07+dyBh3MeTcHH6d?=
+ =?us-ascii?Q?Ugw3cPmw+5yK0c/nn1S6NoZ/SsKqsLNJCHLNeH1dctpo9dHUsqnjS2PsexsK?=
+ =?us-ascii?Q?DaG1KRYKM9Qy5geNyGaRiNyW4QwlgD0HWk6W81afRWuJnTSM/R5QLRh1uZ1d?=
+ =?us-ascii?Q?RsQbbmo13jjNl7gzwktNCj+GJHpeZ/EgLz53rhzUuifvDiMCQPOzXN0RdodM?=
+ =?us-ascii?Q?Ezgpm8I9RgBi9t8qUiUWHyXgQb4taYPiepsWQxnF3wmXco/5uQpCX904jvTl?=
+ =?us-ascii?Q?8sJJt2EYZLFai9pJrQzcvll92zWq04SxEmWp7+Tr52HZ1pmBKkAgwDi1NgNH?=
+ =?us-ascii?Q?dYZAyvaLVWEH3OkC21kdKHsVadlezd6Ne6RLCrR0oAJgIr83IbEzs1tFMIf7?=
+ =?us-ascii?Q?4LpxgAR6QWPsBY+FsQR39OrUf5O7dACjfTxNdksrBVSYrx5bjPaVEdigELOn?=
+ =?us-ascii?Q?9+C0ghXts39s+yGQao6B91dw9EKlLCsmr63AR83e0bqzPIcDseRLRBlph5tn?=
+ =?us-ascii?Q?nZzWY5a8iVJps1DImx38nvL/kwro?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?lP+xqIERTLAUhpmresybcI57M/HVxK6O3EXsBX2Y96uWq9+czcdDzGgXs7rB?=
+ =?us-ascii?Q?/+GJG8jxOwus6BhXifuzdQMlv8FKy0RpILogZToF4oZmKDZiyZXtvuzvqMKZ?=
+ =?us-ascii?Q?gAU+PFAnORPlMwLa5fVxRTA11Xv60RPllohpYXx98qqYfooJXLelykXDK3S+?=
+ =?us-ascii?Q?NIGFmr/MXx6SpbbrDm0zluf+HrwfgQM6eL0oRA8B+7PDvkIt3kl7F4ggX3/m?=
+ =?us-ascii?Q?LOMfweMweW7wU74Y/FHtWmZLdUdODN9yUBd/2UBPOdrHb1YssI+zUGmZ/6/9?=
+ =?us-ascii?Q?zy824FRJ14ZA4uJ3fLvzsds8u4UlWAYH+vQaHi+qApw0x3DYW9cSDXfwPAln?=
+ =?us-ascii?Q?/Xy/FOi66nSNEtwEd2kSH3UHU0kGNaoivE36qfacusb8G3fjN/KJzMpeUxnb?=
+ =?us-ascii?Q?C299ZzCZBHq+TY+dLBIU/CFDA67bUQw6dgPR/xkhzM8LV7kor6J4X/P+Re9O?=
+ =?us-ascii?Q?qPbouP/6w7PwwzHLXSBO5+vWRrLtR0UvhGfxDxQO0JP85Po0/jRI8fqMuFbl?=
+ =?us-ascii?Q?m3J2hi8plA9RbcMzB8kKQSkQ2r+imf+sUc7N17Jk7bPg+Q2lkD89EDwYHkhl?=
+ =?us-ascii?Q?opdvA364Ys5p38BkrBBscZjFJs61vaoU4RDbuSn4wxPv00wmQRXPThpvE/rF?=
+ =?us-ascii?Q?f27zbWPjGsFfw13aZkuFOIwt0bmuFch8gRLdtVMCc00ecfYD6AxXcp7i1MRl?=
+ =?us-ascii?Q?b5pycCe84yGmZVPr2mWlaumh4cA0Dg4sf6vYWlTsr5uLy6mQGV6+etjivxDY?=
+ =?us-ascii?Q?DP0IKy0/iaWOVU8RJts2S4+cXECI89lQq/K6ph2mDoqxEeX3j77zFAfmi38b?=
+ =?us-ascii?Q?ubbWJbakOPejUwViyrvFhoTocOUXAgyblN5mQ9Jhu4kvDpY5Ah7dmI6Uwksy?=
+ =?us-ascii?Q?9/XmTx28dky+hwtkH6+YtQiKiRv7rW0ZhNGxOdmMscIqMsSQt/5T5deYdlu4?=
+ =?us-ascii?Q?kI6cqOVsgk8Y/loAVii7/D9wfoR3KUY5x7+fVLBcaUfYTzBHRCSVksLQkQ/N?=
+ =?us-ascii?Q?P/6NAPc0E2r2Ayua9hYnuTE0qYzBeuD4DhVevIgEYOqGaUZLEu2KDw8wrQWi?=
+ =?us-ascii?Q?UURcHJ9vxogTVPcdbCabF2MLFODptSAjrOYxEp+EQUnIaAm8NQ/cGZITfMmP?=
+ =?us-ascii?Q?O1YdYyOKUyLte8ynZd8JFsqzdbJTBeSAArVqL+CL/yfkpidbpaJLWFVC+SV7?=
+ =?us-ascii?Q?5udKnvLdLecXC3OnIw7i4pa+ztN+C5FuV0iYHKgLJAj4pss4V8eWwiOE7GXt?=
+ =?us-ascii?Q?IedeP+r2M0c9D05mwvzVaweguV8tD54aShatZWbaFaae1QYMya97R10dmNIU?=
+ =?us-ascii?Q?W5nS3rzIir4MIEs4bR3fre2YlfLkC02cOf6FLjkXx45sjNL8XclY2H0M8M3g?=
+ =?us-ascii?Q?eKwAhTzEpgCKs9lpX/YKNbzpw3Ypq5S/KYPZ8A5jaPCI+meposvfZpOFV/GH?=
+ =?us-ascii?Q?sVupDmqjQKCFAPVAEYC4B68S2FHAJw08f1dgA6Ywta7zM+LxVODi+iZ+zR6s?=
+ =?us-ascii?Q?eEHnPupxzcbfsT/T73cqCncoeTC0cm9IW/wCad2YLxju5f/9FSi4NgatXQOe?=
+ =?us-ascii?Q?FZB2taQchhFIbEnO/OQjNEO1H+XjHSiRsPrMJJFk?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99cff143-7b25-4d08-fe54-08dd302826ca
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2025 21:05:16.7663
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HE5tp0texgO76StG8yuCozoRSIyOJZTRc7n/I2Xuax8PWrv4bbG26Jgq6MOORCSNPTV31SLjSfh63sXbYLT/Sw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP123MB2712
 
-The legacy rpc.nfsd tool will set the nlm_grace_period if the NFSv4
-grace period is set. nfsdctl is missing this functionality, so add a new
-netlink control interface for lockd that it can use. For now, it only
-allows setting the grace period, and the tcp and udp listener ports.
+On Tue, 7 Jan 2025, Jakub Kicinski wrote:
+> This is a bit of a weird driver. But we should distinguish the default
+> ring size, which yes, should not be too large, and max ring size which
+> can be large but user setting a large size risks the fact the
+> allocations will fail and device will not open.
+>
+> This driver seems to read the default size from the hypervisor, is that
+> the value that is too large in your case? Maybe we should min() it with
+> something reasonable? The max allowed to be set via ethtool can remain
+> high IMO
+>
 
-lockd currently uses module parameters and sysctls for configuration, so
-all of its settings are global. With this change, lockd now tracks these
-values on a per-net-ns basis. It will only fall back to using the global
-values if any of them are 0.
+See vmxnet3_get_ringparam(). If I understand correctly, since commit
+50a5ce3e7116a ("vmxnet3: add receive data ring support"), if the specified
+VMXNET3 adapter has support for the Rx Data ring feature then the maximum
+Rx Data buffer size is reported as VMXNET3_RXDATA_DESC_MAX_SIZE (i.e. 2048)
+by 'ethtool'. Furthermore, See vmxnet3_set_ringparam(). A user specified Rx
+mini value cannot be more than VMXNET3_RXDATA_DESC_MAX_SIZE. Indeed the Rx
+mini value in the context of VMXNET3 would be the size of the Rx Data ring
+buffer. See the following excerpt from vmxnet3_set_ringparam(). As far as I
+can tell, the Rx Data buffer cannot be more than
+VMXNET3_RXDATA_DESC_MAX_SIZE:
 
-Finally, as a backward compatability measure, if updating the nlm
-settings in the init_net namespace, also update the legacy global
-values to match.
+ 686 static int
+ 687 vmxnet3_set_ringparam(struct net_device *netdev,
+ 688                       struct ethtool_ringparam *param,
+ 689                       struct kernel_ethtool_ringparam *kernel_param,
+ 690                       struct netlink_ext_ack *extack)
+ 691 {
+  :
+ 760         new_rxdata_desc_size =
+ 761                 (param->rx_mini_pending + VMXNET3_RXDATA_DESC_SIZE_MASK) &
+ 762                 ~VMXNET3_RXDATA_DESC_SIZE_MASK;
+ 763         new_rxdata_desc_size = min_t(u16, new_rxdata_desc_size,
+ 764                                      VMXNET3_RXDATA_DESC_MAX_SIZE);
 
-Link: https://issues.redhat.com/browse/RHEL-71698
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
-Yongcheng and Scott reported seeing ths problem in testing. I'm also
-working on nfs-utils patches for nfsdctl, but they're still a bit rough
-and aren't ready to be posted yet.
 
-The main bit I consider questionable is the place where it's copying
-back to the "legacy" global values. We can drop that bit if it seems
-problematic.
----
- Documentation/netlink/specs/lockd.yaml |  45 +++++++++++++
- fs/lockd/Makefile                      |   2 +-
- fs/lockd/netlink.c                     |  44 ++++++++++++
- fs/lockd/netlink.h                     |  19 ++++++
- fs/lockd/netns.h                       |   3 +
- fs/lockd/svc.c                         | 118 +++++++++++++++++++++++++++++++--
- include/uapi/linux/lockd_netlink.h     |  29 ++++++++
- 7 files changed, 253 insertions(+), 7 deletions(-)
+Have I missed something?
 
-diff --git a/Documentation/netlink/specs/lockd.yaml b/Documentation/netlink/specs/lockd.yaml
-new file mode 100644
-index 0000000000000000000000000000000000000000..bbd4da5fe54b8b128383ac567941060fa99784d6
---- /dev/null
-+++ b/Documentation/netlink/specs/lockd.yaml
-@@ -0,0 +1,45 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: lockd
-+protocol: genetlink
-+uapi-header: linux/lockd_netlink.h
-+
-+doc: lockd configuration over generic netlink
-+
-+attribute-sets:
-+  -
-+    name: server
-+    attributes:
-+      -
-+        name: gracetime
-+        type: u32
-+      -
-+        name: tcp-port
-+        type: u16
-+      -
-+        name: udp-port
-+        type: u16
-+
-+operations:
-+  list:
-+    -
-+      name: server-set
-+      doc: set the lockd server parameters
-+      attribute-set: server
-+      flags: [ admin-perm ]
-+      do:
-+        request:
-+          attributes:
-+            - gracetime
-+            - tcp-port
-+            - udp-port
-+    -
-+      name: server-get
-+      doc: get the lockd server parameters
-+      attribute-set: server
-+      do:
-+        reply:
-+          attributes:
-+            - gracetime
-+            - tcp-port
-+            - udp-port
-diff --git a/fs/lockd/Makefile b/fs/lockd/Makefile
-index fe3e23dd29c32af8a0191686113b68541e6cb183..51bbe22d21e3545764260fb4472524211b4aa550 100644
---- a/fs/lockd/Makefile
-+++ b/fs/lockd/Makefile
-@@ -8,6 +8,6 @@ ccflags-y += -I$(src)			# needed for trace events
- obj-$(CONFIG_LOCKD) += lockd.o
- 
- lockd-y := clntlock.o clntproc.o clntxdr.o host.o svc.o svclock.o \
--	   svcshare.o svcproc.o svcsubs.o mon.o trace.o xdr.o
-+	   svcshare.o svcproc.o svcsubs.o mon.o trace.o xdr.o netlink.o
- lockd-$(CONFIG_LOCKD_V4) += clnt4xdr.o xdr4.o svc4proc.o
- lockd-$(CONFIG_PROC_FS) += procfs.o
-diff --git a/fs/lockd/netlink.c b/fs/lockd/netlink.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..6e00b02cad9083ff708429ccc86b01857e6f648b
---- /dev/null
-+++ b/fs/lockd/netlink.c
-@@ -0,0 +1,44 @@
-+// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/lockd.yaml */
-+/* YNL-GEN kernel source */
-+
-+#include <net/netlink.h>
-+#include <net/genetlink.h>
-+
-+#include "netlink.h"
-+
-+#include <uapi/linux/lockd_netlink.h>
-+
-+/* LOCKD_CMD_SERVER_SET - do */
-+static const struct nla_policy lockd_server_set_nl_policy[LOCKD_A_SERVER_UDP_PORT + 1] = {
-+	[LOCKD_A_SERVER_GRACETIME] = { .type = NLA_U32, },
-+	[LOCKD_A_SERVER_TCP_PORT] = { .type = NLA_U16, },
-+	[LOCKD_A_SERVER_UDP_PORT] = { .type = NLA_U16, },
-+};
-+
-+/* Ops table for lockd */
-+static const struct genl_split_ops lockd_nl_ops[] = {
-+	{
-+		.cmd		= LOCKD_CMD_SERVER_SET,
-+		.doit		= lockd_nl_server_set_doit,
-+		.policy		= lockd_server_set_nl_policy,
-+		.maxattr	= LOCKD_A_SERVER_UDP_PORT,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-+	},
-+	{
-+		.cmd	= LOCKD_CMD_SERVER_GET,
-+		.doit	= lockd_nl_server_get_doit,
-+		.flags	= GENL_CMD_CAP_DO,
-+	},
-+};
-+
-+struct genl_family lockd_nl_family __ro_after_init = {
-+	.name		= LOCKD_FAMILY_NAME,
-+	.version	= LOCKD_FAMILY_VERSION,
-+	.netnsok	= true,
-+	.parallel_ops	= true,
-+	.module		= THIS_MODULE,
-+	.split_ops	= lockd_nl_ops,
-+	.n_split_ops	= ARRAY_SIZE(lockd_nl_ops),
-+};
-diff --git a/fs/lockd/netlink.h b/fs/lockd/netlink.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..1920543a79557aa1a26d991df0701c2a1647b797
---- /dev/null
-+++ b/fs/lockd/netlink.h
-@@ -0,0 +1,19 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/lockd.yaml */
-+/* YNL-GEN kernel header */
-+
-+#ifndef _LINUX_LOCKD_GEN_H
-+#define _LINUX_LOCKD_GEN_H
-+
-+#include <net/netlink.h>
-+#include <net/genetlink.h>
-+
-+#include <uapi/linux/lockd_netlink.h>
-+
-+int lockd_nl_server_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int lockd_nl_server_get_doit(struct sk_buff *skb, struct genl_info *info);
-+
-+extern struct genl_family lockd_nl_family;
-+
-+#endif /* _LINUX_LOCKD_GEN_H */
-diff --git a/fs/lockd/netns.h b/fs/lockd/netns.h
-index 17432c445fe6f0841b3c821ca1c71babf4e50b7a..88e8e2a973977433703cac3a046e0f09501b26b5 100644
---- a/fs/lockd/netns.h
-+++ b/fs/lockd/netns.h
-@@ -10,6 +10,9 @@ struct lockd_net {
- 	unsigned int nlmsvc_users;
- 	unsigned long next_gc;
- 	unsigned long nrhosts;
-+	u32 gracetime;
-+	u16 tcp_port;
-+	u16 udp_port;
- 
- 	struct delayed_work grace_period_end;
- 	struct lock_manager lockd_manager;
-diff --git a/fs/lockd/svc.c b/fs/lockd/svc.c
-index 7ded57ec3a603197f22c711b40eae39104a63de4..904aabb9fd1d0a745de2fd139a0335bdd87df6a5 100644
---- a/fs/lockd/svc.c
-+++ b/fs/lockd/svc.c
-@@ -41,6 +41,7 @@
- 
- #include "netns.h"
- #include "procfs.h"
-+#include "netlink.h"
- 
- #define NLMDBG_FACILITY		NLMDBG_SVC
- #define LOCKD_BUFSIZE		(1024 + NLMSVC_XDRSIZE)
-@@ -83,8 +84,14 @@ static const int		nlm_port_min = 0, nlm_port_max = 65535;
- static struct ctl_table_header * nlm_sysctl_table;
- #endif
- 
--static unsigned long get_lockd_grace_period(void)
-+static unsigned long get_lockd_grace_period(struct net *net)
- {
-+	struct lockd_net *ln = net_generic(net, lockd_net_id);
-+
-+	/* Return the net-ns specific grace period, if there is one */
-+	if (ln->gracetime)
-+		return ln->gracetime * HZ;
-+
- 	/* Note: nlm_timeout should always be nonzero */
- 	if (nlm_grace_period)
- 		return roundup(nlm_grace_period, nlm_timeout) * HZ;
-@@ -103,7 +110,7 @@ static void grace_ender(struct work_struct *grace)
- 
- static void set_grace_period(struct net *net)
- {
--	unsigned long grace_period = get_lockd_grace_period();
-+	unsigned long grace_period = get_lockd_grace_period(net);
- 	struct lockd_net *ln = net_generic(net, lockd_net_id);
- 
- 	locks_start_grace(net, &ln->lockd_manager);
-@@ -166,15 +173,16 @@ static int create_lockd_listener(struct svc_serv *serv, const char *name,
- static int create_lockd_family(struct svc_serv *serv, struct net *net,
- 			       const int family, const struct cred *cred)
- {
-+	struct lockd_net *ln = net_generic(net, lockd_net_id);
- 	int err;
- 
--	err = create_lockd_listener(serv, "udp", net, family, nlm_udpport,
--			cred);
-+	err = create_lockd_listener(serv, "udp", net, family,
-+				    ln->udp_port ? ln->udp_port : nlm_udpport, cred);
- 	if (err < 0)
- 		return err;
- 
--	return create_lockd_listener(serv, "tcp", net, family, nlm_tcpport,
--			cred);
-+	return create_lockd_listener(serv, "tcp", net, family,
-+				     ln->tcp_port ? ln->tcp_port : nlm_tcpport, cred);
- }
- 
- /*
-@@ -588,6 +596,10 @@ static int __init init_nlm(void)
- 	if (err)
- 		goto err_pernet;
- 
-+	err = genl_register_family(&lockd_nl_family);
-+	if (err)
-+		goto err_netlink;
-+
- 	err = lockd_create_procfs();
- 	if (err)
- 		goto err_procfs;
-@@ -595,6 +607,8 @@ static int __init init_nlm(void)
- 	return 0;
- 
- err_procfs:
-+	genl_unregister_family(&lockd_nl_family);
-+err_netlink:
- 	unregister_pernet_subsys(&lockd_net_ops);
- err_pernet:
- #ifdef CONFIG_SYSCTL
-@@ -608,6 +622,7 @@ static void __exit exit_nlm(void)
- {
- 	/* FIXME: delete all NLM clients */
- 	nlm_shutdown_hosts();
-+	genl_unregister_family(&lockd_nl_family);
- 	lockd_remove_procfs();
- 	unregister_pernet_subsys(&lockd_net_ops);
- #ifdef CONFIG_SYSCTL
-@@ -710,3 +725,94 @@ static struct svc_program	nlmsvc_program = {
- 	.pg_init_request	= svc_generic_init_request,
- 	.pg_rpcbind_set		= svc_generic_rpcbind_set,
- };
-+
-+/**
-+ * lockd_nl_server_set_doit - set the lockd server parameters via netlink
-+ * @skb: reply buffer
-+ * @info: netlink metadata and command arguments
-+ *
-+ * This updates the per-net values. When updating the values in the init_net
-+ * namespace, also update the "legacy" global values.
-+ *
-+ * Return 0 on success or a negative errno.
-+ */
-+int lockd_nl_server_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct net *net = genl_info_net(info);
-+	struct lockd_net *ln = net_generic(net, lockd_net_id);
-+	const struct nlattr *attr;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, LOCKD_A_SERVER_GRACETIME))
-+		return -EINVAL;
-+
-+	if (info->attrs[LOCKD_A_SERVER_GRACETIME] ||
-+	    info->attrs[LOCKD_A_SERVER_TCP_PORT] ||
-+	    info->attrs[LOCKD_A_SERVER_UDP_PORT]) {
-+		attr = info->attrs[LOCKD_A_SERVER_GRACETIME];
-+		if (attr) {
-+			u32 gracetime = nla_get_u32(attr);
-+
-+			if (gracetime > nlm_grace_period_max)
-+				return -EINVAL;
-+
-+			ln->gracetime = gracetime;
-+
-+			if (net == &init_net)
-+				nlm_grace_period = gracetime;
-+		}
-+
-+		attr = info->attrs[LOCKD_A_SERVER_TCP_PORT];
-+		if (attr) {
-+			ln->tcp_port = nla_get_u16(attr);
-+			if (net == &init_net)
-+				nlm_tcpport = ln->tcp_port;
-+		}
-+
-+		attr = info->attrs[LOCKD_A_SERVER_UDP_PORT];
-+		if (attr) {
-+			ln->udp_port = nla_get_u16(attr);
-+			if (net == &init_net)
-+				nlm_udpport = ln->udp_port;
-+		}
-+	}
-+	return 0;
-+}
-+
-+/**
-+ * lockd_nl_server_get_doit - get lockd server parameters via netlink
-+ * @skb: reply buffer
-+ * @info: netlink metadata and command arguments
-+ *
-+ * Return 0 on success or a negative errno.
-+ */
-+int lockd_nl_server_get_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct net *net = genl_info_net(info);
-+	struct lockd_net *ln = net_generic(net, lockd_net_id);
-+	void *hdr;
-+	int err;
-+
-+	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	hdr = genlmsg_iput(skb, info);
-+	if (!hdr) {
-+		err = -EMSGSIZE;
-+		goto err_free_msg;
-+	}
-+
-+	err = nla_put_u32(skb, LOCKD_A_SERVER_GRACETIME, ln->gracetime) ||
-+	      nla_put_u16(skb, LOCKD_A_SERVER_TCP_PORT, ln->tcp_port) ||
-+	      nla_put_u16(skb, LOCKD_A_SERVER_UDP_PORT, ln->udp_port);
-+	if (err)
-+		goto err_free_msg;
-+
-+	genlmsg_end(skb, hdr);
-+
-+	return genlmsg_reply(skb, info);
-+err_free_msg:
-+	nlmsg_free(skb);
-+
-+	return err;
-+}
-diff --git a/include/uapi/linux/lockd_netlink.h b/include/uapi/linux/lockd_netlink.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..21c65aec3bc6d1839961937081e6d16540332179
---- /dev/null
-+++ b/include/uapi/linux/lockd_netlink.h
-@@ -0,0 +1,29 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/lockd.yaml */
-+/* YNL-GEN uapi header */
-+
-+#ifndef _UAPI_LINUX_LOCKD_NETLINK_H
-+#define _UAPI_LINUX_LOCKD_NETLINK_H
-+
-+#define LOCKD_FAMILY_NAME	"lockd"
-+#define LOCKD_FAMILY_VERSION	1
-+
-+enum {
-+	LOCKD_A_SERVER_GRACETIME = 1,
-+	LOCKD_A_SERVER_TCP_PORT,
-+	LOCKD_A_SERVER_UDP_PORT,
-+
-+	__LOCKD_A_SERVER_MAX,
-+	LOCKD_A_SERVER_MAX = (__LOCKD_A_SERVER_MAX - 1)
-+};
-+
-+enum {
-+	LOCKD_CMD_SERVER_SET = 1,
-+	LOCKD_CMD_SERVER_GET,
-+
-+	__LOCKD_CMD_MAX,
-+	LOCKD_CMD_MAX = (__LOCKD_CMD_MAX - 1)
-+};
-+
-+#endif /* _UAPI_LINUX_LOCKD_NETLINK_H */
 
----
-base-commit: e43aefc29f1848068bc37c285ab882368e08e4be
-change-id: 20250108-lockd-nl-bfe76cc08277
-
-Best regards,
 -- 
-Jeff Layton <jlayton@kernel.org>
-
+Aaron Tomlin
 
