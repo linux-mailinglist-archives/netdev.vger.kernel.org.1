@@ -1,143 +1,113 @@
-Return-Path: <netdev+bounces-156103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA91A04E6E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 01:57:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75EACA04E94
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 02:16:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D7401888233
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 00:57:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20F181887DC9
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 01:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1D819ABAB;
-	Wed,  8 Jan 2025 00:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611AC249EB;
+	Wed,  8 Jan 2025 01:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcg4NnXw"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE9E1974FE;
-	Wed,  8 Jan 2025 00:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329C31C6BE;
+	Wed,  8 Jan 2025 01:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736297735; cv=none; b=aTwWthaqeaqsPrXyKNrlSAFrmsYDPxa9KgGk8n0PA1PMR6PHDz1Mc9PAxnmUe606q/gbMjqOzFZLm99hqK0j4cdAn7zAJ3Bcwjhn4zRp0b7HG/3Z/2fyMGFcCNIqJom76CiWIzV0BUXRb05YTDoPguQzwg13DZitmxSte+DWVqM=
+	t=1736298957; cv=none; b=genPxpA4qbcUNWsKdjrTpTd6VSmGEsCzseL60ymv2UjrdRO5exEPSIt7tYfIeZ2BlyT4ArPk1kxx5kCpZy1Jipg2kfARDsoAQSpN6iO6QYh8AgOXN92mP0YVXsUvdpNrxZdpWDrC0SbNCrnivGb4au1JwJU+J5vgpuCEXr8rL+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736297735; c=relaxed/simple;
-	bh=/FcnpfGrOmkvo7j6YxvRov66UbLKzRdKF+P1KDVuxSE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eIXIKDuyHA/KwVBbjpg7Q6nadvcxgix8gIz9jQiOgFSF3ac06f5exhfxToirBhdTyW+C6P5lPYJuFvp3OPhITP1GDWkjRThiZIE3jD3uK/HNKESeE54lizOfgeHUy4bb2KkLeFg72T4pEjymXH6ebXdbMIcEJL+zhXRiKUCLpM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4YSTwZ3T6Fz4f3kFh;
-	Wed,  8 Jan 2025 08:55:10 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id A1E691A1494;
-	Wed,  8 Jan 2025 08:55:30 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-	by APP4 (Coremail) with SMTP id gCh0CgBHq1_1zH1nBtZdAQ--.51859S20;
-	Wed, 08 Jan 2025 08:55:30 +0800 (CST)
-From: Hou Tao <houtao@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Martin KaFai Lau <martin.lau@linux.dev>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	houtao1@huawei.com,
-	xukuohai@huawei.com
-Subject: [PATCH bpf-next v2 16/16] bpf: Remove migrate_{disable|enable} from bpf_selem_free()
-Date: Wed,  8 Jan 2025 09:07:28 +0800
-Message-Id: <20250108010728.207536-17-houtao@huaweicloud.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20250108010728.207536-1-houtao@huaweicloud.com>
-References: <20250108010728.207536-1-houtao@huaweicloud.com>
+	s=arc-20240116; t=1736298957; c=relaxed/simple;
+	bh=wD43T99hnDZZ1TfHbAJqtofmnbYDVr8UZRA0UkUtU5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eT4sGUDjBtoLS5rcQvNN96xz+tYJ23D/nTkFa9W5bq83HtWQzizSO39fo1VVI63sjUHHr2MR6hk0DtfJ5Dmw+BoVoNMNWehSLrKn8PMzGKrBGBvcv2j72E2A5F3RtM6HVdq5RBVUsBGUeSWRUkJycRkPU7p25S+wfyd8aS1zEBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcg4NnXw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8EF3C4CED6;
+	Wed,  8 Jan 2025 01:15:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736298956;
+	bh=wD43T99hnDZZ1TfHbAJqtofmnbYDVr8UZRA0UkUtU5w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rcg4NnXwiEXuFcjkYB8pZuCu8zfuJS4pk0Ujy8cn2d9JoYJHzvJ4ohPmdfDLpuN9+
+	 07gtpiRwtD+/Sk+HHKUf1ngjvbwrYYjWEslQREbtfBghq65TnJb8HgN6+h1tFH2qC4
+	 I4ShebvyqYgEV/tPK2kocK7ZaibLMUdmBMenWT0narbeFCtkqhTX4Ky/MthkO2RfVi
+	 q/lf267bBDqm0vWg550khk91NDHNBlUsV16l573TpNuhJlZKSOiKRYdJXna4K1MNEv
+	 Ua1j6pmfAilgeaOAo9YXYRQ8Uq7Jx1CKmRJmO7ho4YFbymjYu3gkBiUox/7527iv90
+	 2sqcrywk2RJQQ==
+Date: Tue, 7 Jan 2025 17:15:54 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Liam Girdwood <lgirdwood@gmail.com>, Mark
+ Brown <broonie@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
+ kernel@pengutronix.de, Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next 08/14] net: pse-pd: Split ethtool_get_status
+ into multiple callbacks
+Message-ID: <20250107171554.742dcf59@kernel.org>
+In-Reply-To: <20250104-b4-feature_poe_arrange-v1-8-92f804bd74ed@bootlin.com>
+References: <20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com>
+	<20250104-b4-feature_poe_arrange-v1-8-92f804bd74ed@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHq1_1zH1nBtZdAQ--.51859S20
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1fCr48CF1ftr1rtr48tFb_yoW8CFW7pF
-	Z3XryrAr42qa1F9rsrJF4fC34rXw4kWr17Kr4qyryrtwsxZF93Gr4IkF18ZasxJw1UXr1f
-	ZF1Yga4j9w4UCFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
-	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2
-	AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6r
-	W5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14
-	v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuY
-	vjxUF9NVUUUUU
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-From: Hou Tao <houtao1@huawei.com>
+On Sat, 04 Jan 2025 23:27:33 +0100 Kory Maincent wrote:
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index f711bfd75c4d..2bdf7e72ee50 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -1323,4 +1323,40 @@ struct ethtool_c33_pse_pw_limit_range {
+>  	u32 min;
+>  	u32 max;
+>  };
+> +
+> +/**
+> + * struct ethtool_pse_control_status - PSE control/channel status.
+> + *
+> + * @podl_admin_state: operational state of the PoDL PSE
+> + *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
+> + * @podl_pw_status: power detection status of the PoDL PSE.
+> + *	IEEE 802.3-2018 30.15.1.1.3 aPoDLPSEPowerDetectionStatus:
+> + * @c33_admin_state: operational state of the PSE
+> + *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
+> + * @c33_pw_status: power detection status of the PSE.
+> + *	IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus:
+> + * @c33_pw_class: detected class of a powered PD
+> + *	IEEE 802.3-2022 30.9.1.1.8 aPSEPowerClassification
+> + * @c33_actual_pw: power currently delivered by the PSE in mW
+> + *	IEEE 802.3-2022 30.9.1.1.23 aPSEActualPower
+> + * @c33_ext_state_info: extended state information of the PSE
+> + * @c33_avail_pw_limit: available power limit of the PSE in mW
+> + *	IEEE 802.3-2022 145.2.5.4 pse_avail_pwr
+> + * @c33_pw_limit_ranges: supported power limit configuration range. The =
+driver
+> + *	is in charge of the memory allocation
+> + * @c33_pw_limit_nb_ranges: number of supported power limit configuration
+> + *	ranges
+> + */
 
-bpf_selem_free() has the following three callers:
+Is there a reason this is defined in ethtool.h?
 
-(1) bpf_local_storage_update
-It will be invoked through ->map_update_elem syscall or helpers for
-storage map. Migration has already been disabled in these running
-contexts.
-
-(2) bpf_sk_storage_clone
-It has already disabled migration before invoking bpf_selem_free().
-
-(3) bpf_selem_free_list
-bpf_selem_free_list() has three callers: bpf_selem_unlink_storage(),
-bpf_local_storage_update() and bpf_local_storage_destroy().
-
-The callers of bpf_selem_unlink_storage() includes: storage map
-->map_delete_elem syscall, storage map delete helpers and
-bpf_local_storage_map_free(). These contexts have already disabled
-migration when invoking bpf_selem_unlink() which invokes
-bpf_selem_unlink_storage() and bpf_selem_free_list() correspondingly.
-
-bpf_local_storage_update() has been analyzed as the first caller above.
-bpf_local_storage_destroy() is invoked when freeing the local storage
-for the kernel object. Now cgroup, task, inode and sock storage have
-already disabled migration before invoking bpf_local_storage_destroy().
-
-After the analyses above, it is safe to remove migrate_{disable|enable}
-from bpf_selem_free().
-
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- kernel/bpf/bpf_local_storage.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
-index 7c18298b139c3..fa56c30833ff1 100644
---- a/kernel/bpf/bpf_local_storage.c
-+++ b/kernel/bpf/bpf_local_storage.c
-@@ -254,9 +254,7 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
- 		 * bpf_mem_cache_free will be able to reuse selem
- 		 * immediately.
- 		 */
--		migrate_disable();
- 		bpf_mem_cache_free(&smap->selem_ma, selem);
--		migrate_enable();
- 		return;
- 	}
- 
--- 
-2.29.2
-
+I have a weak preference towards keeping it in pse-pd/pse.h
+since touching ethtool.h rebuilds bulk of networking code.
+=46rom that perspective it's also suboptimal that pse-pd/pse.h
+pulls in ethtool.h.
 
