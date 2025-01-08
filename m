@@ -1,145 +1,141 @@
-Return-Path: <netdev+bounces-156222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3021A05A03
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:35:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B67A05A1C
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0FED164DBC
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:35:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA8DB3A342E
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA871F890B;
-	Wed,  8 Jan 2025 11:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B478E1F893F;
+	Wed,  8 Jan 2025 11:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRPzJizi"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="0O8o2Rg3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06131F8902;
-	Wed,  8 Jan 2025 11:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E911F5422
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 11:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736335986; cv=none; b=R6B9uSXTIFaoLxQ8FZjvS5M1WpG5euoqbEYAqQG6+SVd3uat4nLGOwVSPiITI3YjZaTg/ZjvSt8jtav9pJBt54BF+7Nm0O4OiWGqSnnOH6NG01b4nNMTQSfQHhmmwaBcCId/K9sXkHBn1AjVXl1T/4JtgzVK1lSn7e3DoK59+AE=
+	t=1736336460; cv=none; b=EBIQcxN8K9DutW0fGzy55/NCVbnHDD/boJz11mt/wDSJPOTWZBJ1Uy6NYCvu3IPQZxIg+ybIZs+CDo2WpuKVe6PnFKxbNvublg8a4elbKQQ+1QGm1fXnleyq3EGHLX8pTJjg09CZYw9xj4eaHsB7HdCA9e/G0du5iXNid2Oggew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736335986; c=relaxed/simple;
-	bh=JU6q4lcsCKmuAJV88iCuaTUeob/UFkF61peDe6nNoiA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hhnK6n9pgujqLU2OP9kU6TohqBV4wpXe8cqu5VnEv9yILksS2tT4gyizGD1y5YfCX7y60FIjdRCfejMVMifE90JZaG9v3/yknVM3ecXXIezgfg2qGUSZUza34P6JswAHw2W+AtwjXZiQvIYAIklrXUHisTshpx9pITqy5ZRU42E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MRPzJizi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86F57C4CEDD;
-	Wed,  8 Jan 2025 11:33:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736335986;
-	bh=JU6q4lcsCKmuAJV88iCuaTUeob/UFkF61peDe6nNoiA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MRPzJiziv+1651NwmcJlVi59rL+gzjyNgTHeSNNOdUF4CYusZ5C5nXFfttwt+maZF
-	 5LLHzvtt3DXBqmnzJ2dGZl+3zIwkSnLlPur5yh/374SvdvUYG5UDWvD0z5teGC1Dz4
-	 BQ55dwR10rvQhg6u5dpKuv4bnKxT0q31bW1WiCuRTWPk4L19214wnsHnXP0N5sdgux
-	 UeXzwx0zbregfqdCITRLmA08yQWJ4EyuHkN6u5SLXXqt+IFIL7fmyxasxxLGzcYhHQ
-	 XT7yMUkTEZ8eb1dT/hmTSeWO99HGsEN6SJnYWpsrcgjwBgAfhetotP5rBQiUfo+wbP
-	 ZoAxrd4acJTRg==
-Message-ID: <68e23536-5295-4ae0-94c9-691a74339de0@kernel.org>
-Date: Wed, 8 Jan 2025 12:33:00 +0100
+	s=arc-20240116; t=1736336460; c=relaxed/simple;
+	bh=lWV/O/UttiTJkLULUBKYE0bPmgRlaCXXqj66Zi3wY7Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To; b=SHPEIjmPs0e2VFr6Y8Z081S1g0RYgk9hJPBEdyjSK1qhf6cyKZMLSVWKTK6IcbhOtD3zN/NBVuCVADNckDfTNm1mxzPHRxbqwGSWZxes+fYTlJ7hK823pPr4tNMw0RVxYMXx82YoKD2aMLViN557jiqpmb/KTs77snPw8jNcYgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=0O8o2Rg3; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-216401de828so232673265ad.3
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 03:40:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736336458; x=1736941258; darn=vger.kernel.org;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fjDlOhfFjHDP1GFg1z841jK8M5cnJcOZe4IzLR2+JLQ=;
+        b=0O8o2Rg3kvaLwTV7ygIfM0gm+EEqBR9VCbQbVmRBWTBvDkUbau3obtsHEq1PZ3l1hp
+         kvTaA2nWRnRzyhPXWxj3Awjwv8AWEe4o7WUWbyxFQOmgDgnQJAjVo8MGxYEJfVlX53EO
+         spVp8qV768U6zs1ljdYdfNwcDGIVdFXlnm27ZvU4if347G3mFP5Z5vnoc8OAI7xYDEjH
+         GbXq6SEzpFnT6XOy7UIHyrLm+CT2StEp+MIZQIIaLESlHA/ZoRIIJ0QuEL88EIEZDTIF
+         pY9eMQBFbAh41Heay52j4jueCBlTsvk5XMF0Kwpjccu+xU1uMM4ITsIAi1CYSQOk65Io
+         HDXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736336458; x=1736941258;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fjDlOhfFjHDP1GFg1z841jK8M5cnJcOZe4IzLR2+JLQ=;
+        b=KtobqfOtPaXDlCpY1wwWUkCQihFDFQa9JPWPe2SxeRB63Xr61tboEyCBSYEPfgETH2
+         uD470YdTGUG96ZClrrjhZ8lxjAP7dRw5wr8S/9/XfCkmXsETacnEjR6HF2NGGV1YfX4f
+         bHandjggMB2pdKjpTf68BKKd80nShP28XZo/LVplfW1VE1t4nX3vRzcjGnr9VMz9ob4x
+         F1cMcLWoNJVeA8GzsO4883kz0lz7ifmPfwmRduXNEkIBRZTgzvPJr71fAAUCqqS0lPPH
+         o/bUchmeBY09gaXwFygITJiMa06tdiC9rXeJWH2fbxVOMmQnnuAf1j18oeHdZXOW/MN4
+         SvZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPgGHWqkoMuWgq5YtWWp+FEjMQEiZ+AS74XoNAl23BSMFLdU8v5Z0O79zAdWcs2oCiJ41UnDU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR+qo7319o52kV//CW5Bluq6nOu+FMichiANdje81ztPhGGh3o
+	KVZpBOaww3fjQjBO4FB59HvvmLAXJkX/KNSRtVfq9GUGnVo+KTtYgFprb1a8k3E=
+X-Gm-Gg: ASbGncsV94fSwBEBuUUiQTh6J8LFNFoaq8KBo3Hldntxk/e/y1zRu8nPsrARk8SjVVd
+	Cgrrv+mucQNIX19WYbsg4KSHO9jJNq7fHBr6Dfk09cNDC4oBOYvN2fjsDACjoAeXQwxaIRxGNL/
+	L24diOt052fpCQSa4fNNvq1hwvtBf9Lg+hyfFeyzPKFaHrlwrFqICSR3eyp/N3TcKsWGCqyPxML
+	gpU7wBzycbuvYYOBXqnugouHTln6AGOxz1WbzPta/E0eluGVYrawa4jUxU=
+X-Google-Smtp-Source: AGHT+IHFRNXARPASashVpP22bZbsPAi6fmuWW4IEFR4NWYNiuFbqTXoYAUP1T7En6RP96xLPSNA5Pg==
+X-Received: by 2002:a17:902:e750:b0:216:5268:9aab with SMTP id d9443c01a7336-21a83fe4ba3mr38646875ad.46.1736336458432;
+        Wed, 08 Jan 2025 03:40:58 -0800 (PST)
+Received: from localhost ([157.82.203.37])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-219dc964b84sm325595705ad.50.2025.01.08.03.40.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jan 2025 03:40:57 -0800 (PST)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH 0/3] tun: Unify vnet implementation and fill full vnet
+ header
+Date: Wed, 08 Jan 2025 20:40:10 +0900
+Message-Id: <20250108-tun-v1-0-67d784b34374@daynix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V1 1/2] bnxt_en: Add TPH support in BNXT driver
-To: Jakub Kicinski <kuba@kernel.org>, bhelgaas@google.com
-Cc: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, helgaas@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- asml.silence@gmail.com, almasrymina@google.com, gospo@broadcom.com,
- michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
- somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
- manoj.panicker2@amd.com, Eric.VanTassell@amd.com
-References: <20241115200412.1340286-1-wei.huang2@amd.com>
- <20241115200412.1340286-2-wei.huang2@amd.com>
- <20241115140434.50457691@kernel.org>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20241115140434.50457691@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABpkfmcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxNDI2MD3ZLSPF0zs1RDg0QTyySDZHMloMqCotS0zAqwKdGxtbUAGJ7vjVU
+ AAAA=
+To: Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+ devel@daynix.com, Akihiko Odaki <akihiko.odaki@daynix.com>
+X-Mailer: b4 0.14-dev-fd6e3
 
-On 15. 11. 24, 23:04, Jakub Kicinski wrote:
-> On Fri, 15 Nov 2024 14:04:11 -0600 Wei Huang wrote:
->> +static void bnxt_irq_affinity_release(struct kref __always_unused *ref)
-> 
-> unused? you're using it now
-> 
->> +{
->> +	struct irq_affinity_notify *notify =
->> +		(struct irq_affinity_notify *)
->> +		container_of(ref, struct irq_affinity_notify, kref);
-> 
-> this is ugly, and cast is unnecessary.
-> 
->> +	struct bnxt_irq *irq;
->> +
->> +	irq = container_of(notify, struct bnxt_irq, affinity_notify);
-> 
-> since you init irq out of line you can as well init notify here
-> 
->> +	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, 0)) {
-> 
-> You checked this function can sleep, right? Because rtnl_lock()
-> will sleep.
+When I implemented virtio's hash-related features to tun/tap [1],
+I found tun/tap does not fill the entire region reserved for the virtio
+header, leaving some uninitialized hole in the middle of the buffer
+after read()/recvmesg().
 
-Based on the above, I assume a new version was expected, but I cannot 
-find any. So, Wei Huang, what's the status of this?
+This series fills the uninitialized hole. More concretely, the
+num_buffers field will be initialized with 1, and the other fields will
+be inialized with 0. Setting the num_buffers field to 1 is mandated by
+virtio 1.0 [2].
 
-thanks,
+The change to virtio header is preceded by another change that refactors
+tun and tap to unify their virtio-related code.
+
+[1]: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
+[2]: https://lore.kernel.org/r/20241227084256-mutt-send-email-mst@kernel.org/
+
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+---
+Akihiko Odaki (3):
+      tun: Unify vnet implementation
+      tun: Pad virtio header with zero
+      tun: Set num_buffers for virtio 1.0
+
+ MAINTAINERS            |   1 +
+ drivers/net/Kconfig    |   5 ++
+ drivers/net/Makefile   |   1 +
+ drivers/net/tap.c      | 174 ++++++----------------------------------
+ drivers/net/tun.c      | 212 ++++++++-----------------------------------------
+ drivers/net/tun_vnet.c | 191 ++++++++++++++++++++++++++++++++++++++++++++
+ drivers/net/tun_vnet.h |  24 ++++++
+ 7 files changed, 281 insertions(+), 327 deletions(-)
+---
+base-commit: a32e14f8aef69b42826cf0998b068a43d486a9e9
+change-id: 20241230-tun-66e10a49b0c7
+
+Best regards,
 -- 
-js
-suse labs
+Akihiko Odaki <akihiko.odaki@daynix.com>
 
 
