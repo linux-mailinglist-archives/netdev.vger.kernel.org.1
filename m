@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-156120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A79A0505C
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:14:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40019A0505E
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:14:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32C1B7A06AD
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 02:14:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 216011884DC2
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 02:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48BF19D884;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45B219D084;
 	Wed,  8 Jan 2025 02:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GHm0j8JI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UbdHq6pP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BBC166F3D;
-	Wed,  8 Jan 2025 02:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C4319CD13
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 02:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736302219; cv=none; b=iwyOk2kAM6Zh46UuXgqd5KHdgjn9fStCRnpd1jxkyXx8KoXrsU6PkOueI6WPKLvhxImOxPKeSamR3p52YmLzn4d7M4lOL/4Ha3fj32rqPln7iOjQJudGjew97IVTAm0wCgIm/HhAgAnvdW4FO8AN+9cxAXUSpB84Zg/aIFV5TDo=
+	t=1736302219; cv=none; b=tgE0rpN3eHDEjagoF//p72nIPPaooYYwADQctDNeIeukdgyBP4h8muySwocyWHoCZZ1rRxApmGNsCtWVlQhTv/lYncLr8rFirxboyE9llKYl2CDXC0nmoRKuDJacRkJzbMuevGLj6db+LPW/C20wwv/7KxiJ62m59nA8KLH02nA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736302219; c=relaxed/simple;
-	bh=zbi4gjTmy/ktub0hEOpA9+DNfAjJQzy3E1tq2ui7t7c=;
+	bh=AYnIyivxGlyFlyVkVSGXd8LNEBmJGJ+1ULYqf+m8MiU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GqGoa9E0PQ909xEg31JhVleDyLV3knUZZucsx+7A+QvRze8zvoiu17IYrg8fn95qZpdLFjSMWbnp2N9suKWhsqkSLcasJjZ4I+UfStbE7UOHwcUA+mzANpqTK3CYxIir6xd4sQrG+sZrXldESKZruHLKN/W0pBJEHD2bDIF0HZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GHm0j8JI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43024C4CED6;
-	Wed,  8 Jan 2025 02:10:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BL+HA1ZbMuews3cC6nKlq2tbICtRb0o+Bpk1E377l1asI26aBmlMYNb03Txt1Z0yh+Tr8j3Rr+OMeqVa93T390jtPZXmmo1wk2Ye+kN1PWAw0epA41z4kw6HyYO71JlS6Z7cPBbdwjbK1T4moEXCmgnpCPG5w23XsddeDUZReQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UbdHq6pP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541F1C4CEE0;
+	Wed,  8 Jan 2025 02:10:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736302218;
-	bh=zbi4gjTmy/ktub0hEOpA9+DNfAjJQzy3E1tq2ui7t7c=;
+	s=k20201202; t=1736302219;
+	bh=AYnIyivxGlyFlyVkVSGXd8LNEBmJGJ+1ULYqf+m8MiU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GHm0j8JIggSCnDSBqKUtTKKmhqP4mQRlamKSaxcJZUGdMx25bOb1gY+xf1FvmNr57
-	 TB5TRBbDwesvIpTpfVOd2KP+poonS/WcIj7UZ2IQy8JJenSyzaTf/tOmI1dta9NsJz
-	 t/RuGyVqPhHVJKokH7fTUG9e7EIXM/Bl5TBnknOtbKyHpx/FJnlU2qEbmJhzS8dYBy
-	 7MMVjrq+Grl8LbOHmzKUbpmJLbwewDy/jsbFRyr+bvC33ckTaBrfBnCGxkZXqkNZZo
-	 Zy16RnpDsr6i4UufdoUc25F5iC8nd8FoE/2LASNDPSwTNrPeMIrLQ36vc/qkf/hd4p
-	 Pi/Hz4QU92iOw==
+	b=UbdHq6pP+1GolbwPoAyxpjGFnClkxlLkr0eOhuLb5fayqdRy8YMLOcJDvKJJ7lGoN
+	 XficY0leUG3AE0+Gy90v+xs4z+8U8jbsR7mQTMPlyRwtpbPZ8LKSVAmy/RRVqwWVxk
+	 KVnRZ+wJ/CikJzWkyoR5nfa7t0wMmeuCH5f6DqO85B2Ci11vp7QopK7JfR7RruM5CH
+	 +h93meeb6vc6uT78P90IC78yhCwEmWMzLmLpKjFfwm7gUYMAIZcy9JoArdh+ak3KjQ
+	 r0qdE1Z3fEY/wrmm5glYmrpwphI7YnnXQyvWABqu2XRHmvKD/agBLGnSVdtxrAX4JG
+	 2I72IW+QEiN/Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710DC380A97E;
-	Wed,  8 Jan 2025 02:10:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB314380A97E;
+	Wed,  8 Jan 2025 02:10:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
+Subject: Re: [PATCH net-next] net: watchdog: rename __dev_watchdog_up() and
+ dev_watchdog_down()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173630223899.165659.5290302899760343345.git-patchwork-notify@kernel.org>
-Date: Wed, 08 Jan 2025 02:10:38 +0000
-References: <20250105122847.27341-1-linux@treblig.org>
-In-Reply-To: <20250105122847.27341-1-linux@treblig.org>
-To: Dr. David Alan Gilbert <linux@treblig.org>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <173630224049.165659.18225447862381599025.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Jan 2025 02:10:40 +0000
+References: <20250105090924.1661822-1-edumazet@google.com>
+In-Reply-To: <20250105090924.1661822-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, horms@kernel.org, eric.dumazet@gmail.com,
+ herbert@gondor.apana.org.au
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun,  5 Jan 2025 12:28:47 +0000 you wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Sun,  5 Jan 2025 09:09:24 +0000 you wrote:
+> In commit d7811e623dd4 ("[NET]: Drop tx lock in dev_watchdog_up")
+> dev_watchdog_up() became a simple wrapper for __netdev_watchdog_up()
 > 
-> The const struct ixgbevf_hv_mbx_ops was added in 2016 as part of
-> commit c6d45171d706 ("ixgbevf: Support Windows hosts (Hyper-V)")
+> Herbert also said : "In 2.6.19 we can eliminate the unnecessary
+> __dev_watchdog_up and replace it with dev_watchdog_up."
 > 
-> but has remained unused.
+> This patch consolidates things to have only two functions, with
+> a common prefix.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] ixgbevf: Remove unused ixgbevf_hv_mbx_ops
-    https://git.kernel.org/netdev/net-next/c/4ce1aeece911
+  - [net-next] net: watchdog: rename __dev_watchdog_up() and dev_watchdog_down()
+    https://git.kernel.org/netdev/net-next/c/1b960cd19311
 
 You are awesome, thank you!
 -- 
