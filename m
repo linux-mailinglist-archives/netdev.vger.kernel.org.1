@@ -1,64 +1,57 @@
-Return-Path: <netdev+bounces-156202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F923A057B0
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:11:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6146A05805
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:21:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 060AF188203B
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:11:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2652D3A056F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3A71F0E33;
-	Wed,  8 Jan 2025 10:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180311A76BC;
+	Wed,  8 Jan 2025 10:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jSYzvAZl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZx7rsIT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52471AB511
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 10:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A1518B463;
+	Wed,  8 Jan 2025 10:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736331061; cv=none; b=Zg4XMcPnU3UIHOltCrzRd7ak4rlvWbsuaq1du8vh3TynjoYYtK/J/X7B8nLhVpnYPxJX69i7np0cYZdfnPG4ZZpF53VRKFjkyCEoO3vjd5lKSZizRfJdNgh8D2sGOfhLvmTPZKrJl/NvRnBwlse5NZ3XlJtEvKmxM7qbTieqHA8=
+	t=1736331706; cv=none; b=LME0u9DDzQPogbDltG5BZb6D6+4ZyujREN4rsq3KRwIRKbVcmoLqHbZsSS8P+tU3LboqekhWGodu2biisq67dSpVG9/D6wHjVeuzwTpnGOus77zRbJAtiixgSwgqo9dH0bhYOpWc10r3SnK+yr8EThp1bglm/mNeIkdmp/88VUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736331061; c=relaxed/simple;
-	bh=ZAOvCmQtAkYPaOMmqXIxilcjMsbJEBo9S7TbBj2iB7k=;
+	s=arc-20240116; t=1736331706; c=relaxed/simple;
+	bh=BoyjgoKspc9asKiAwwvEpgqxsU4ciE3jHKS3DrOn+Qc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=orD41W/bbRHGURuQXiWAJsIWPyrjpo6pDwmFwXTQ7HEmMVr0L6g2fSS4N+IQ0C3hnVgcAl2YBHUtVh6X6o6IMnhHhf6fPDIHDeGjZ1Kjkji/YdySmghCWUokmwb0EXy0/wJQSyMUd0rslX7tMxQ+/vIMl7T5/eT1ysyp5zlaQ2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jSYzvAZl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91504C4CEE1;
-	Wed,  8 Jan 2025 10:10:58 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=d0oL/QVvRTIElz5tKhTvIIgI1/w4gwzSpSEnqEZKlbTQKyEIcQ89wh826LwL6YIblpY8difw5apUhBFwQGIs0sdHk9g9btmHhyKzy+V30u6YJVnc1bluCU8fbS4/NWuNrMMxg0G7P94QJ6wCt2P6/uocA461RG50rpdwajEfqhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZx7rsIT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF4B3C4CEE1;
+	Wed,  8 Jan 2025 10:21:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736331061;
-	bh=ZAOvCmQtAkYPaOMmqXIxilcjMsbJEBo9S7TbBj2iB7k=;
+	s=k20201202; t=1736331705;
+	bh=BoyjgoKspc9asKiAwwvEpgqxsU4ciE3jHKS3DrOn+Qc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jSYzvAZlwLRamAE26BsRm51HQXveJ4MnFFNKVCnpyhZORRvxcNdfE2EzoYfPX78Fn
-	 9eD88AukwzOmZ798c+wW0/YXJTRfwrIoLdvAW9ryKPbHe5tzNaUY8njTdya7Xx9v1C
-	 mfq0RrKUVoT4SKPgrJh81bbqGsrl1+9YYIfLQX/IcetSuqWDSY2NbkSEaXXcphgxvg
-	 mTHZAuSUfHJHSIaLANiMJDM9dYxS53dHciS87qqmmNe4QklC0uM6OcSxcTue94v929
-	 Jw4drEvlia9a0C29yRKywXhMiVn2Qj1qcu25x/Zm5L7LC+1fn8k1rMyju/41hRpJCZ
-	 zSfqDbT32fDdA==
-Date: Wed, 8 Jan 2025 10:10:56 +0000
+	b=cZx7rsIT5LYUMBXzeyetLfzHW0ECHvU7u8nfp8y/xUH5rUcXS1bqI8cDlpnyTGXUt
+	 fw+3z+oGX8aTdaQkTErS3qD9OHyi2me/Q4zNaAg8+vhTEQtWpmzO0myxyH0sFvbR81
+	 5rx48CiX5g01Hx0lU+m88Rm7s6d+n41n9fNYCM0P/wZDLXpaSB5CgoPb7Y9BQxOmiq
+	 A9MPGi/APn++XY5jm14zZDGPfcWItqSBoVu/SRCUjKdwt34RkEvHWR5GA25vZpWIOa
+	 W1p+3gAJuHmTvVM5FZOjyFfk1AemQ9h5I+6cCMmNDEovveUAJzqK1N1VvPt68t3IiQ
+	 kTZaGhgu5GdOA==
+Date: Wed, 8 Jan 2025 10:21:40 +0000
 From: Simon Horman <horms@kernel.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 04/18] net: stmmac: use unsigned int for
- eee_timer
-Message-ID: <20250108101056.GH2772@kernel.org>
-References: <Z31V9O8SATRbu2L3@shell.armlinux.org.uk>
- <E1tVCRj-007Y3H-Hm@rmk-PC.armlinux.org.uk>
+To: Sudheer Kumar Doredla <s-doredla@ti.com>
+Cc: s-vadapalli@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, gnault@redhat.com, linux-omap@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	t-patil@ti.com, j-keerthy@ti.com
+Subject: Re: [PATCH net]
+Message-ID: <20250108102140.GI2772@kernel.org>
+References: <20250108081303.228653-1-s-doredla@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,20 +60,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1tVCRj-007Y3H-Hm@rmk-PC.armlinux.org.uk>
+In-Reply-To: <20250108081303.228653-1-s-doredla@ti.com>
 
-On Tue, Jan 07, 2025 at 04:28:47PM +0000, Russell King (Oracle) wrote:
-> Since eee_timer is used to initialise priv->tx_lpi_timer, this also
-> should be unsigned to avoid a negative number being interpreted as a
-> very large positive number. Note that this makes the check for negative
-> numbers passed in as a module parameter redundant, and passing a
-> negative number will now produce a large delay rather than the
-> default. Since the default is used without an argument, passing a
-> negative number would be quite obscure. However, if users do, then
-> this will need to be revisited.
+On Wed, Jan 08, 2025 at 01:43:03PM +0530, Sudheer Kumar Doredla wrote:
+> cpsw_ale_get_field was returning incorrect data when requesting higher
+> word fields. Additionally, cpsw_ale_set_field was writing incorrect 
+> data into the ALE entry while updating.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> For example, while reading word2, word3 fields (62 to 64 bits), the word3
+> data was shifted to an incorrect position after reading. The same issue
+> occurred when setting an ALE entry.
+> 
+> This patch fixes the shifting of the word3 data by aligning it with the
+> required fileds, ensuring the correct value is returned from
+> cpsw_ale_get_field, even for higher words.
+> It also ensures the correct vlaue is written into ALE entry using
+> cpsw_ale_set_field.
+
+Hi Sudheer,
+
+It would be interesting to include some information on how this problem
+manifests in practice.
+
+And, as a fix for net this should have a fixes tag.
+(Immediately above the other tags, no blank line in between.)
+
+Perhaps this one is appropriate?
+
+Fixes: b685f1a58956 ("net: ethernet: ti: cpsw_ale: Fix cpsw_ale_get_field()/cpsw_ale_set_field()")
+
+> Signed-off-by: Sudheer Kumar Doredla <s-doredla@ti.com>
+
+And, lastly, the subject for this patch seems to be missing.
+Please add one:
+
+	Subject: [PATCH v2 net] net: ethernet: ti: cpsw_ale: ...
+
+The code changes themselves look good to me.
+So with the above addressed, feel free to include.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
+...
+
+-- 
+pw-bot: changes-requested
 
