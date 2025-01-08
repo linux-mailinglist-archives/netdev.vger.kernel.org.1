@@ -1,223 +1,204 @@
-Return-Path: <netdev+bounces-156250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB9C7A05B5B
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:19:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 306E1A05B5E
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:20:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D6941886091
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:19:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E4C818889A6
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5571F8661;
-	Wed,  8 Jan 2025 12:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171DC1F9400;
+	Wed,  8 Jan 2025 12:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="LyeWL0Y4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f8UcXuT4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F182D190664
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A0A1F76D1
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736338757; cv=none; b=iq6xd453a2AaJuVnTugK5EHzxqWa3TyhTC9kXQSG0rd7HSV4ku7lkeDi12z1HyRmmB7FTGMw5K2eQRHrV+ffpYrxny+wAq0AItFtInae1y6G+8NIgRCkkltlZtrXFfS1Yj68fGQRaxtl5x17bh3vMeY/0yJ22ZMqi9ql7cTYswQ=
+	t=1736338811; cv=none; b=oSqjrZMplBoGyvDH7qbxl/xJKaMWJc7kt9n91vMwp7cEvRhPXR9kIIgvqdx5R3yyUlJtnS+lrCVP8V9IehOUBz+ayfEiq+xOsJf1llsuQ2UF94sNV4ynm9O4d4YKtO/+WuYLN/9CU5rL1aQbchpi8LaX/WCWK74ChCxNhI2d2N0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736338757; c=relaxed/simple;
-	bh=QnALZf8jXVzkoBzp7CMSGJ8En9HelHD06TOzkXkcnDA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=MN5+xHWlsAslvnvk3e0To+sLlW27TXnJmqtb79A1HF/OSZdsOgqoDpAsRnT20V55UWx+KvoVy3Dp1jBvfkgCknMLrPIEMubKEjf/uzBD03xeHx70moA6kNl7S/+brMF3YWZtWmvgHemObGxFe/rSFCjMSlz0OaxunfKOcwXMgo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LyeWL0Y4; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1736338751; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=hQmRPd+b3j8qqajki1X8LMtHkb87DCdDTjAJi5LsuSo=;
-	b=LyeWL0Y4XS5H8/KJiJJ+d3O/oqQGm0RMYfySZeDV5nrGTayOJ3XbiqWJ0pBKqA/5j3e+YTidrxEdrv1oDAf0DJnL+T1BLhM5P7Hu0n22aJ4EK/Nfr0NCeX+cVlDBpn3TIdzVfwxr6X/iCQIXn+yDvl5bw7QOGpRlYhJJWwJv78g=
-Received: from 30.221.178.144(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WNDxFFq_1736338750 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 08 Jan 2025 20:19:11 +0800
-Message-ID: <4bbf6017-d52d-4c9a-af1d-cbcb9c71a11c@linux.alibaba.com>
-Date: Wed, 8 Jan 2025 20:19:10 +0800
+	s=arc-20240116; t=1736338811; c=relaxed/simple;
+	bh=HAHSQYiW7j7jDWWaKzSiXVvSlJqTsmQpmrOEno+dRl0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z23rIKiMv5qNtuxWilmfZJ4HK4EMQXqapzzdpFE4ialIwqt45ibzXUANg/rNu2CUn8rtwNuyTC0GiAgfNRcK42Hr+eQMDfkcTMPXrlchwx/+FO7h4YH8YZTihcmnYGgcamkDihRY5r8my8gUz/rgtFoIr/6of+VGbD+8D0wh4E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f8UcXuT4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736338808;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NvkScmKSiojMKy4UOE2DrwK0+YmOWXUTXTU3FB5pL+0=;
+	b=f8UcXuT48tB/oq8XE05SQ8tLOA1daaGIyoQufuCjyRSssQjSCNvluGIt2VFFVHathaKXNc
+	ouEbau4QbajQcLrSPw1KbdOw3S7M3pvT7xLjhR3YRvN1La1O4GDuHaHmv52/FJMafiio6a
+	Wf0yCfFKK+XewYYC7uy1GkIM2XCdEtw=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-96-_8lG6930OJ-9BxpwrsivVA-1; Wed, 08 Jan 2025 07:20:06 -0500
+X-MC-Unique: _8lG6930OJ-9BxpwrsivVA-1
+X-Mimecast-MFC-AGG-ID: _8lG6930OJ-9BxpwrsivVA
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aa6a7bea04cso745832366b.3
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 04:20:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736338805; x=1736943605;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NvkScmKSiojMKy4UOE2DrwK0+YmOWXUTXTU3FB5pL+0=;
+        b=HVOtWEhPqEotPwNgM9q36xfZNFvx200lfX9YhWKb7yS6elk8bTJFO9Ex0vUSTer53v
+         2EcGmgC1BuVu/0m/Gri6f7x4aEnA2JXWr+2cfUn3Ougppg/reOXvEGRgBiW8UACOmgTu
+         mb3H3KZae64PS/zuXR17SmBixttiEeeLNwnQ6H60SeZR8K0iMvVR7dGsoXKAp35KH5uE
+         LHc+qpwR3iTiFAVpeetCRf+n22vFCQ10Uv8w6zLlvHzslZ0OuAgIvpozq3wo8EiWSaVi
+         SAu5ssjsZFZn7YKbvt34ZOgvTciyDz5jO9lZ+pDl0APHqbs0+4x+sAfeJQCBWLulRMiB
+         Vc2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUgklK1wM3LcXgR5euQ9L8M4M/+Ppj4HcJADlPeJ+IMK1EeG1XyMvyyTIc/OouhU1T0BjuSaoA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM2gsFJOcI0Q9aHJ54rIT1mOtDrOKiWe99s7CkKSdAadHZkGtp
+	TIic8QP/mVWZOng5NlXQ95A1+kOir8jFz6qCaHM4WaviouglnxXqTL9/Xrw8kXxVcNabwc0SwaD
+	N6IG2hQbaY8HqqgbCg5CnynNTcxav9b88sPhAKmYlWPRzbA+eQ3c2MQ==
+X-Gm-Gg: ASbGnctBdEyGpQtd2on4gj3Ht2Yu3z6INOJ3YCt5rl39V79VyPehJZa52EiB74CtJ47
+	COuJEzU9lXeIvKK78pQNfDtpWul6LtaIIXwP+j1SA6zS43OSXlXr4JoZXx4Y6oe4zJiUSZFz+1r
+	RrOEZzH9B1S8Ilry7kyl2Kak5HKc655qZqJmLoOcS+ISk/XFZAWXJFd5TSDKgRmgfpeyMVMjOYl
+	T37GaDgw5IRqQGYDtEAUq9ZepKN45p01GtYeAc1pjS32zzkVQk=
+X-Received: by 2002:a17:906:6a1e:b0:aae:bac6:6659 with SMTP id a640c23a62f3a-ab2ab675c7bmr195885866b.7.1736338805309;
+        Wed, 08 Jan 2025 04:20:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJnfpyyzkpOex2toXbOpvS659Qc95KZbvn2dCmymN19iFdvMLZcxesMMp7PrcMbRk8ElqcfQ==
+X-Received: by 2002:a17:906:6a1e:b0:aae:bac6:6659 with SMTP id a640c23a62f3a-ab2ab675c7bmr195881866b.7.1736338804843;
+        Wed, 08 Jan 2025 04:20:04 -0800 (PST)
+Received: from redhat.com ([2a02:14f:175:d62d:93ef:d7e2:e7da:ed72])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e82f31bsm2471713066b.1.2025.01.08.04.20.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2025 04:20:04 -0800 (PST)
+Date: Wed, 8 Jan 2025 07:20:01 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Cindy Lu <lulu@redhat.com>, michael.christie@oracle.com,
+	sgarzare@redhat.com, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v5 5/6] vhost: Add new UAPI to support change to task mode
+Message-ID: <20250108071933-mutt-send-email-mst@kernel.org>
+References: <20241230124445.1850997-1-lulu@redhat.com>
+ <20241230124445.1850997-6-lulu@redhat.com>
+ <CACGkMEvPbe3wvC0UvAu-vgGYu1xMWRzCt0qwUofcHJThRdFxiQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] udp: Make rehash4 independent in udp_lib_rehash()
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-References: <20250108114321.128249-1-lulie@linux.alibaba.com>
-In-Reply-To: <20250108114321.128249-1-lulie@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEvPbe3wvC0UvAu-vgGYu1xMWRzCt0qwUofcHJThRdFxiQ@mail.gmail.com>
 
-Some errors with CONFIG_BASE_SMALL, will fix in the next version.
+On Thu, Jan 02, 2025 at 11:36:58AM +0800, Jason Wang wrote:
+> On Mon, Dec 30, 2024 at 8:45 PM Cindy Lu <lulu@redhat.com> wrote:
+> >
+> > Add a new UAPI to enable setting the vhost device to task mode.
+> > The userspace application can use VHOST_SET_INHERIT_FROM_OWNER
+> > to configure the mode if necessary.
+> > This setting must be applied before VHOST_SET_OWNER, as the worker
+> > will be created in the VHOST_SET_OWNER function
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  drivers/vhost/vhost.c      | 22 +++++++++++++++++++++-
+> >  include/uapi/linux/vhost.h | 19 +++++++++++++++++++
+> >  2 files changed, 40 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index ff17c42e2d1a..47c1329360ac 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -2250,15 +2250,35 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+> >  {
+> >         struct eventfd_ctx *ctx;
+> >         u64 p;
+> > -       long r;
+> > +       long r = 0;
+> >         int i, fd;
+> > +       u8 inherit_owner;
+> >
+> >         /* If you are not the owner, you can become one */
+> >         if (ioctl == VHOST_SET_OWNER) {
+> >                 r = vhost_dev_set_owner(d);
+> >                 goto done;
+> >         }
+> > +       if (ioctl == VHOST_SET_INHERIT_FROM_OWNER) {
+> > +               /*inherit_owner can only be modified before owner is set*/
+> > +               if (vhost_dev_has_owner(d)) {
+> > +                       r = -EBUSY;
+> > +                       goto done;
+> > +               }
+> > +               if (copy_from_user(&inherit_owner, argp, sizeof(u8))) {
+> > +                       r = -EFAULT;
+> > +                       goto done;
+> > +               }
+> 
+> Not a native speaker but I wonder if "VHOST_FORK_FROM_OWNER" is better or not.
+> 
+> > +               /* Validate the inherit_owner value, ensuring it is either 0 or 1 */
+> > +               if (inherit_owner > 1) {
+> > +                       r = -EINVAL;
+> > +                       goto done;
+> > +               }
+> > +
+> > +               d->inherit_owner = (bool)inherit_owner;
+> 
+> So this allows userspace to reset the owner and toggle the value. This
+> seems to be fine, but I wonder if we need to some cleanup in
+> vhost_dev_reset_owner() or not. Let's explain this somewhere (probably
+> in the commit log).
+> 
+> >
+> > +               goto done;
+> > +       }
+> >         /* You must be the owner to do anything else */
+> >         r = vhost_dev_check_owner(d);
+> >         if (r)
+> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > index b95dd84eef2d..f5fcf0b25736 100644
+> > --- a/include/uapi/linux/vhost.h
+> > +++ b/include/uapi/linux/vhost.h
+> > @@ -235,4 +235,23 @@
+> >   */
+> >  #define VHOST_VDPA_GET_VRING_SIZE      _IOWR(VHOST_VIRTIO, 0x82,       \
+> >                                               struct vhost_vring_state)
+> > +
+> > +/**
+> > + * VHOST_SET_INHERIT_FROM_OWNER - Set the inherit_owner flag for the vhost device
+> > + *
+> > + * @param inherit_owner: An 8-bit value that determines the vhost thread mode
+> > + *
+> > + * When inherit_owner is set to 1 (default behavior):
+> > + *   - The VHOST worker threads inherit their values/checks from
+> > + *     the thread that owns the VHOST device. The vhost threads will
+> > + *     be counted in the nproc rlimits.
+> > + *
+> > + * When inherit_owner is set to 0:
+> > + *   - The VHOST worker threads will use the traditional kernel thread (kthread)
+> > + *     implementation, which may be preferred by older userspace applications that
+> > + *     do not utilize the newer vhost_task concept.
+> > + */
+> > +
+> > +#define VHOST_SET_INHERIT_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
+> > +
+> >  #endif
+> > --
+> > 2.45.0
+> 
+> Thanks
 
-On 2025/1/8 19:43, Philo Lu wrote:
-> As discussed in [0], rehash4 could be missed in udp_lib_rehash() when
-> udp hash4 changes while hash2 doesn't change. This patch fixes this by
-> moving rehash4 codes out of rehash2 checking, and then rehash2 and
-> rehash4 are done separately.
-> 
-> By doing this, we no longer need to call rehash4 explicitly in
-> udp_lib_hash4(), as the rehash callback in __ip4_datagram_connect takes
-> it. Thus, now udp_lib_hash4() returns directly if the sk is already
-> hashed.
-> 
-> Note that uhash4 may fail to work under consecutive connect(<dst
-> address>) calls because rehash() is not called with every connect(). To
-> overcome this, connect(<AF_UNSPEC>) needs to be called after the next
-> connect to a new destination.
-> 
-> [0]
-> https://lore.kernel.org/all/4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com/
-> 
-> Fixes: 78c91ae2c6de ("ipv4/udp: Add 4-tuple hash for connected socket")
-> Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-> ---
->   net/ipv4/udp.c | 85 +++++++++++++++++++++++++-------------------------
->   1 file changed, 42 insertions(+), 43 deletions(-)
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index e8953e88efef9..154a1bea071b8 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -533,30 +533,6 @@ static struct sock *udp4_lib_lookup4(const struct net *net,
->   	return NULL;
->   }
->   
-> -/* In hash4, rehash can happen in connect(), where hash4_cnt keeps unchanged. */
-> -static void udp_rehash4(struct udp_table *udptable, struct sock *sk,
-> -			u16 newhash4)
-> -{
-> -	struct udp_hslot *hslot4, *nhslot4;
-> -
-> -	hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
-> -	nhslot4 = udp_hashslot4(udptable, newhash4);
-> -	udp_sk(sk)->udp_lrpa_hash = newhash4;
-> -
-> -	if (hslot4 != nhslot4) {
-> -		spin_lock_bh(&hslot4->lock);
-> -		hlist_nulls_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-> -		hslot4->count--;
-> -		spin_unlock_bh(&hslot4->lock);
-> -
-> -		spin_lock_bh(&nhslot4->lock);
-> -		hlist_nulls_add_head_rcu(&udp_sk(sk)->udp_lrpa_node,
-> -					 &nhslot4->nulls_head);
-> -		nhslot4->count++;
-> -		spin_unlock_bh(&nhslot4->lock);
-> -	}
-> -}
-> -
->   static void udp_unhash4(struct udp_table *udptable, struct sock *sk)
->   {
->   	struct udp_hslot *hslot2, *hslot4;
-> @@ -582,15 +558,13 @@ void udp_lib_hash4(struct sock *sk, u16 hash)
->   	struct net *net = sock_net(sk);
->   	struct udp_table *udptable;
->   
-> -	/* Connected udp socket can re-connect to another remote address,
-> -	 * so rehash4 is needed.
-> +	/* Connected udp socket can re-connect to another remote address, which
-> +	 * will be handled by rehash. Thus no need to redo hash4 here.
->   	 */
-> -	udptable = net->ipv4.udp_table;
-> -	if (udp_hashed4(sk)) {
-> -		udp_rehash4(udptable, sk, hash);
-> +	if (udp_hashed4(sk))
->   		return;
-> -	}
->   
-> +	udptable = net->ipv4.udp_table;
->   	hslot = udp_hashslot(udptable, net, udp_sk(sk)->udp_port_hash);
->   	hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
->   	hslot4 = udp_hashslot4(udptable, hash);
-> @@ -2170,17 +2144,17 @@ EXPORT_SYMBOL(udp_lib_unhash);
->   void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
->   {
->   	if (sk_hashed(sk)) {
-> +		struct udp_hslot *hslot, *hslot2, *nhslot2, *hslot4, *nhslot4;
->   		struct udp_table *udptable = udp_get_table_prot(sk);
-> -		struct udp_hslot *hslot, *hslot2, *nhslot2;
->   
-> +		hslot = udp_hashslot(udptable, sock_net(sk),
-> +				     udp_sk(sk)->udp_port_hash);
->   		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
->   		nhslot2 = udp_hashslot2(udptable, newhash);
->   		udp_sk(sk)->udp_portaddr_hash = newhash;
->   
->   		if (hslot2 != nhslot2 ||
->   		    rcu_access_pointer(sk->sk_reuseport_cb)) {
-> -			hslot = udp_hashslot(udptable, sock_net(sk),
-> -					     udp_sk(sk)->udp_port_hash);
->   			/* we must lock primary chain too */
->   			spin_lock_bh(&hslot->lock);
->   			if (rcu_access_pointer(sk->sk_reuseport_cb))
-> @@ -2199,18 +2173,43 @@ void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
->   				spin_unlock(&nhslot2->lock);
->   			}
->   
-> -			if (udp_hashed4(sk)) {
-> -				udp_rehash4(udptable, sk, newhash4);
-> +			spin_unlock_bh(&hslot->lock);
-> +		}
->   
-> -				if (hslot2 != nhslot2) {
-> -					spin_lock(&hslot2->lock);
-> -					udp_hash4_dec(hslot2);
-> -					spin_unlock(&hslot2->lock);
-> +		/* Now process hash4 if necessary:
-> +		 * (1) update hslot4;
-> +		 * (2) update hslot2->hash4_cnt.
-> +		 * Note that hslot2/hslot4 should be checked separately, as
-> +		 * either of them may change with the other unchanged.
-> +		 */
-> +		if (udp_hashed4(sk)) {
-> +			hslot4 = udp_hashslot4(udptable,
-> +					       udp_sk(sk)->udp_lrpa_hash);
-> +			nhslot4 = udp_hashslot4(udptable, newhash4);
-> +			udp_sk(sk)->udp_lrpa_hash = newhash4;
->   
-> -					spin_lock(&nhslot2->lock);
-> -					udp_hash4_inc(nhslot2);
-> -					spin_unlock(&nhslot2->lock);
-> -				}
-> +			spin_lock_bh(&hslot->lock);
-> +			if (hslot4 != nhslot4) {
-> +				spin_lock(&hslot4->lock);
-> +				hlist_nulls_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-> +				hslot4->count--;
-> +				spin_unlock(&hslot4->lock);
-> +
-> +				spin_lock(&nhslot4->lock);
-> +				hlist_nulls_add_head_rcu(&udp_sk(sk)->udp_lrpa_node,
-> +							 &nhslot4->nulls_head);
-> +				nhslot4->count++;
-> +				spin_unlock(&nhslot4->lock);
-> +			}
-> +
-> +			if (hslot2 != nhslot2) {
-> +				spin_lock(&hslot2->lock);
-> +				udp_hash4_dec(hslot2);
-> +				spin_unlock(&hslot2->lock);
-> +
-> +				spin_lock(&nhslot2->lock);
-> +				udp_hash4_inc(nhslot2);
-> +				spin_unlock(&nhslot2->lock);
->   			}
->   			spin_unlock_bh(&hslot->lock);
->   		}
 
--- 
-Philo
+At this point, make these changes with patches on top pls.
 
 
