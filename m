@@ -1,139 +1,142 @@
-Return-Path: <netdev+bounces-156132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82496A05100
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:48:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E271AA05101
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D3C21888C8F
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 02:48:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C6013A21A7
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 02:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6512213B2A9;
-	Wed,  8 Jan 2025 02:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFB41465AD;
+	Wed,  8 Jan 2025 02:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KPKuk95p"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="C8pz7o4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86736134AB
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 02:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883832594B9
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 02:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736304515; cv=none; b=YrmTpUxJSAtnkLDY37JxmxvWopwjLB1UK2seBHmxxkKeeOx1p2huioCqWdSyS5320Fjf7ID6A3GSqShTcbmOH/SNpGjxP5/svCO1FpYV28nWWvXULh/fVLlHigjPsK+jSXK+C+V8jmAZe9gVjU11urc3KeWjOqNwB4591Em257Q=
+	t=1736304581; cv=none; b=ZebGCGKtHglVSNXbpR/cF+wn9f8+mYvjMwldCuU5za+tQArgNb/XSF7KJcFnXn1/AfEnmTAKzF3mBJlqgUGBLVcmCNIvlGozyVpsz0k9hnD71NEYaGMiQ0XyrYd1YdZqrXCwPKnNLCX+w8s6vcABmIhSCBjdr7IxIZad+LptXgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736304515; c=relaxed/simple;
-	bh=anJETctjzfLlfBQl6bXcjQV73Gexx/OcDpx83VMge54=;
+	s=arc-20240116; t=1736304581; c=relaxed/simple;
+	bh=ebckDzFqPOtMy4sfbU0Ddp9HUxuWyIP8VBwLFZ9MeuQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=enoIFJiG91XsFXKLQltio4XMztXIamwmFphCJsxsapR3EDyqMe+xTJ5BTxNXSFJXxMxnTvlijjo7mPiIvRJizpnFudsiG46KHj9L/19wukIPDDoo7sVIZERpUS//eXRnX8YkNEeN4NtCecmF+o6t5LmvbyA+xLSGZkG9PdjQnEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KPKuk95p; arc=none smtp.client-ip=209.85.208.41
+	 To:Cc:Content-Type; b=NPrrtEbetb0pa0P/vE2LKNJVu4pLPAMuUMdgMEmo5C/i2Fa4e02RP3xTrZzI8yq0lxFSGJ3UOI//KKYxR9JmxbJgiw85NuRnr4G8ROcQMVnkhzzuYJoFT9MEANivm++/B35A9M804QCbmvVEXLFJ8kasA/+p24lcQgU26w9Q5hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=C8pz7o4R; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d3d2a30afcso29998378a12.3
-        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 18:48:33 -0800 (PST)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d0ac27b412so21999499a12.1
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 18:49:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736304512; x=1736909312; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736304578; x=1736909378; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NdquBNZMgGZyXtO0B4oyhF5pFpRgc46mPFlfdHraIFA=;
-        b=KPKuk95pX2AWQvUFW1TulDUcpHF3uoXhNw4SvfnaDm6CK/7UHxS9TaO824kWoFOgyz
-         +wOfn5qMouJlkJc5mhphbQwnuU8e0cZbhRHmYYu+lnRshsx3/ch5yjIeiQCmTC8+c9eO
-         /WOd5M8umvgzincmaC/ddGuj5GCc3NwUDkFeY=
+        bh=EwDOCplWp1+pqzk5zqMM2J/5sA70eM/zyHpd5vsb4CQ=;
+        b=C8pz7o4RngVlsQCHwelf3Z6V2KjUYWl6/d6a0Ie3uG3n7oDW4iVZWANuHaayTjVp8Y
+         HJ0kR4itUpOnIzHJqvsUEXlRuPVbsmpXW2opEf2i26CbJpc/rvlSdQW88w+YwTAWeAF9
+         kvIb7pkPDZKm8RhviOuZP40d1tIIc4zkautxk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736304512; x=1736909312;
+        d=1e100.net; s=20230601; t=1736304578; x=1736909378;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NdquBNZMgGZyXtO0B4oyhF5pFpRgc46mPFlfdHraIFA=;
-        b=mUnrDcqSxGBY0ogq1j4CVy+I+KTbm89yV/12HRerN9qCEdfVvYDq4FRyYVLDy1e4qn
-         tIJditsUVUmBNvP+06to2xM9G1lgkhVUH5b+Sa/t3FvTwCezkMvTzpuueBvx4fVnerF5
-         fYErwVqJJTLImUjpjo/LPYjqr3Y3TGLDLHbTEd9w7eLlyjdxqOquqtX2OKpVwZXlxL+3
-         YbT8pUzOGPMo+8DBJWa88GN1uXktNdp0zjkA4yqKgFwIuhA3UKaa2V/fLyWAQANoJHGf
-         Sr4S0Gxf1GD0bstmHpxWmEX+WaWfJZLUR9GSwQgxtE+/fc7XcogYghi+fqP7gAGCD2Fp
-         L+Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCVpXEYgIO1x2CewpEvhCXhGO75SRS/xxmSbGrhIqJl8sHs8QozZH5sJtcOlyud5yI8pKXlTlVI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSpkLotkUv1eQRWUMyFcYKDC1GaBDPW9AeRYY3X65M6ZfqdOm4
-	aEkR2XD/KD0diNcOUGm0oHBDphmZ+/g0fosRZW+tuA2ReAL9gQ60LrOZ5pQHto7hNtN1thad0o1
-	DpLYLTkFGkBR5n9ZT8AEfa8N6DU0mPU62FgI6
-X-Gm-Gg: ASbGnctGfruRGMuRoIY4zOq1KzVPnEevqqHlAST1vS8128QIkNyOtfaLNoFkEnivUPl
-	DjBUQRUciTb7dLYNghZW5FjXGsGBDThSM15+J82g=
-X-Google-Smtp-Source: AGHT+IHALGptMTJ2rsgtdzyZSlroGMCC59oFCvqUIMsIZkOCMjUTdTdPa02g52IcPFpuG8vqbyAGBFNxhFmGI1TwV8A=
-X-Received: by 2002:a05:6402:42c1:b0:5d1:2677:b047 with SMTP id
- 4fb4d7f45d1cf-5d972e6e423mr994852a12.28.1736304511838; Tue, 07 Jan 2025
- 18:48:31 -0800 (PST)
+        bh=EwDOCplWp1+pqzk5zqMM2J/5sA70eM/zyHpd5vsb4CQ=;
+        b=JBEGBQbW9nM5njxLhW1zXiMIrvyreP5KFPPvfID7qk9QsydycFkY93Y3qssbBxfzb3
+         qZEs/LGFGAgQoqR3HTC9619kiOQQmT0P7IFJv778cxGE7BQxrI6cwp2S0nO4r9jOH+MG
+         Ow8kZL0GMovsg7LKvAv58iF6oe5HNNoeGjWSUAR4z3e8nQEwWS9mPCZLJWoIt+SqCzML
+         FjBDmgKztknOgkJi6e9qJdFCsWqPbbBdoX9dN50ykSnPm6kkNR5olJJcOSTwFeATXEV0
+         OLRfq/S+PVHk9jIRrFbzoMAflquLR39IlceSrv2LQNgNO2toa77tPFYagPFwe0cc3mOd
+         83wQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHd8JMHhpM12TEThgZVnrfVd/8Pn4mQsNs+gPokU5NvTFTaIechV6TnxP+aXS/lzzTEW2to9c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuN7+F4HWkRI+4WynVvz3qgz41c5YyPe/Fl7wpelxPDe1wLhre
+	hdQ7QBDkTlyRxUpkFC4sfG75rYBXGxCQg060lEcd/eW7ZvfPPV2fe3o1Wx1zAB2eT68V0K6P/Vw
+	M2BlE5Z6W2B1tkh1c3BC/gdSw14doWOuVVIGK
+X-Gm-Gg: ASbGncsjWgvMRoX2IKQa8Xrc/IF8KEEcZosmTe5wwtpXhrUJ+xyedphKmMlvvJiOyoy
+	3BySdUVFgr1sLPBJjFZcPrxDvWD4lRLxhJOmYKQM=
+X-Google-Smtp-Source: AGHT+IG6QQbtjQxjTBqYXYpeWiyNL3DyYlNhLdZ3y8FcPPNTM6Tta/a8t3a0SVN1xZ/80B5uV0jIpGttO0FPo6+iv5g=
+X-Received: by 2002:a05:6402:210a:b0:5d9:a54:f8b4 with SMTP id
+ 4fb4d7f45d1cf-5d972e06cbcmr814780a12.11.1736304576442; Tue, 07 Jan 2025
+ 18:49:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250107190150.1758577-1-anthony.l.nguyen@intel.com> <20250107190150.1758577-4-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250107190150.1758577-4-anthony.l.nguyen@intel.com>
+References: <20250107190150.1758577-1-anthony.l.nguyen@intel.com> <20250107190150.1758577-3-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250107190150.1758577-3-anthony.l.nguyen@intel.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Wed, 8 Jan 2025 08:18:19 +0530
-X-Gm-Features: AbW1kvZiOFXmYgdeBcRVTJMNlFdaPNn2CF8t3HqQIi32zosdzPCzOeaUkQ0Lygc
-Message-ID: <CAH-L+nO=q_Fs50e2ib8PgzHj2xL_borPONEM-reqpOr9RtQSZA@mail.gmail.com>
-Subject: Re: [PATCH net 3/3] igc: return early when failing to read EECD register
+Date: Wed, 8 Jan 2025 08:19:24 +0530
+X-Gm-Features: AbW1kvY7FvsWBaj8P0Fvt4efQZ5SYxNY2c5eSYNHr3llRLOmQ2BQWWIUGAFoxxQ
+Message-ID: <CAH-L+nNWP_s38ES4OToAdQf2wj5WevteRj=mpa97FK84f+4_ZA@mail.gmail.com>
+Subject: Re: [PATCH net 2/3] ice: fix incorrect PHY settings for 100 GB/s
 To: Tony Nguyen <anthony.l.nguyen@intel.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org, 
-	En-Wei Wu <en-wei.wu@canonical.com>, vitaly.lifshits@intel.com, 
-	dima.ruinskiy@intel.com, "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>, 
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>
+	Przemyslaw Korba <przemyslaw.korba@intel.com>, richardcochran@gmail.com, 
+	jacob.e.keller@intel.com, pmenzel@molgen.mpg.de, olteanv@gmail.com, 
+	Milena Olech <milena.olech@intel.com>, Rinitha S <sx.rinitha@intel.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000ac2b43062b28e569"
+	boundary="0000000000009be5b2062b28e9ef"
 
---000000000000ac2b43062b28e569
+--0000000000009be5b2062b28e9ef
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Jan 8, 2025 at 12:32=E2=80=AFAM Tony Nguyen <anthony.l.nguyen@intel=
 .com> wrote:
 >
-> From: En-Wei Wu <en-wei.wu@canonical.com>
+> From: Przemyslaw Korba <przemyslaw.korba@intel.com>
 >
-> When booting with a dock connected, the igc driver may get stuck for ~40
-> seconds if PCIe link is lost during initialization.
+> ptp4l application reports too high offset when ran on E823 device
+> with a 100GB/s link. Those values cannot go under 100ns, like in a
+> working case when using 100 GB/s cable.
 >
-> This happens because the driver access device after EECD register reads
-> return all F's, indicating failed reads. Consequently, hw->hw_addr is set
-> to NULL, which impacts subsequent rd32() reads. This leads to the driver
-> hanging in igc_get_hw_semaphore_i225(), as the invalid hw->hw_addr
-> prevents retrieving the expected value.
+> This is due to incorrect frequency settings on the PHY clocks for
+> 100 GB/s speed. Changes are introduced to align with the internal
+> hardware documentation, and correctly initialize frequency in PHY
+> clocks with the frequency values that are in our HW spec.
 >
-> To address this, a validation check and a corresponding return value
-> catch is added for the EECD register read result. If all F's are
-> returned, indicating PCIe link loss, the driver will return -ENXIO
-> immediately. This avoids the 40-second hang and significantly improves
-> boot time when using a dock with an igc NIC.
+> To reproduce the issue run ptp4l as a Time Receiver on E823 device,
+> and observe the offset, which will never approach values seen
+> in the PTP working case.
 >
-> Log before the patch:
-> [    0.911913] igc 0000:70:00.0: enabling device (0000 -> 0002)
-> [    0.912386] igc 0000:70:00.0: PTM enabled, 4ns granularity
-> [    1.571098] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCI=
-e link lost, device now detached
-> [   43.449095] igc_get_hw_semaphore_i225: igc 0000:70:00.0 (unnamed net_d=
-evice) (uninitialized): Driver can't access device - SMBI bit is set.
-> [   43.449186] igc 0000:70:00.0: probe with driver igc failed with error =
--13
-> [   46.345701] igc 0000:70:00.0: enabling device (0000 -> 0002)
-> [   46.345777] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> Reproduction output:
+> ptp4l -i enp137s0f3 -m -2 -s -f /etc/ptp4l_8275.conf
+> ptp4l[5278.775]: master offset      12470 s2 freq  +41288 path delay -300=
+2
+> ptp4l[5278.837]: master offset      10525 s2 freq  +39202 path delay -300=
+2
+> ptp4l[5278.900]: master offset     -24840 s2 freq  -20130 path delay -300=
+2
+> ptp4l[5278.963]: master offset      10597 s2 freq  +37908 path delay -300=
+2
+> ptp4l[5279.025]: master offset       8883 s2 freq  +36031 path delay -300=
+2
+> ptp4l[5279.088]: master offset       7267 s2 freq  +34151 path delay -300=
+2
+> ptp4l[5279.150]: master offset       5771 s2 freq  +32316 path delay -300=
+2
+> ptp4l[5279.213]: master offset       4388 s2 freq  +30526 path delay -300=
+2
+> ptp4l[5279.275]: master offset     -30434 s2 freq  -28485 path delay -300=
+2
+> ptp4l[5279.338]: master offset     -28041 s2 freq  -27412 path delay -300=
+2
+> ptp4l[5279.400]: master offset       7870 s2 freq  +31118 path delay -300=
+2
 >
-> Log after the patch:
-> [    1.031000] igc 0000:70:00.0: enabling device (0000 -> 0002)
-> [    1.032097] igc 0000:70:00.0: PTM enabled, 4ns granularity
-> [    1.642291] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCI=
-e link lost, device now detached
-> [    5.480490] igc 0000:70:00.0: enabling device (0000 -> 0002)
-> [    5.480516] igc 0000:70:00.0: PTM enabled, 4ns granularity
->
-> Fixes: ab4056126813 ("igc: Add NVM support")
-> Cc: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
-> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
-> Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+> Fixes: 3a7496234d17 ("ice: implement basic E822 PTP support")
+> Reviewed-by: Milena Olech <milena.olech@intel.com>
+> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel=
+)
 > Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 LGTM,
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
@@ -143,7 +146,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---000000000000ac2b43062b28e569
+--0000000000009be5b2062b28e9ef
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -215,14 +218,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIEmVkzM1oAyj3Nmfve4Fzs0zgVqBpUa8stK1iQ3efuFEMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwODAyNDgzMlowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIDRh1fty1LVXmmmVxe8+yQAMluQnsFoZiXjs28XcPBMSMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwODAyNDkzOFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCPP8UpvTpL
-8EqIDUNp5P5lOnEozMZFO+Yrq0DEok4160djpwwMfCyiJ6fNvIEygs+Kc49LNIFf+lWiBrO7jBtM
-mdq2x/f4JNRzXvKjumUqk58plLdQkKrd3D1lSiob10mqd1GiNPTAaPFNOig409RVXvpB0mki+clb
-BGws762uOFJ3eWtI2o1P3EyZKhSmY3idUiXm7qlSrMz8NhDFj9Zdk4bmLo3v/FQp27hevcND9ZkM
-+rFSu4h+pTmmff5BI7hILR6qFE2zAXg0wZrAZ7NAggewuoVyerFh7PP+diq3kHXn/Q5A6YFbgPOl
-Yd9p0yhIUQyCBPYuGA73/3MN2oD9
---000000000000ac2b43062b28e569--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDBNevy7ldQ
+XBHMe3OecKuWJ/fggPn0BoKSnmeJVP6SXjr32HNllLY4+SpOdtiFFfz5GJiWK0V/KZ8QGT/jvY9x
+1tW9rllii+p6qGLMj9MgJQkr/Uu9gKlb9SyuDObDhg6LqgPENmf54ohbt6F+QaNTzG+xRbSsZx6p
+cUNGgYPggoWNG4Vk04dzl21ZIojAQBwEAri1hTkmeVYrsqHW8YNe6Jem7h3Bn4EGOViV2QISNvpJ
+BKOuwQVB/898BicWoFgNl9RKhUIG4BhIP8Sc3di2lkhEr4YtyA8G1YBiMcNOoZFeLrD8bLM3AxRR
+SNYOugMqtJe0BweIhVmF/E1Y60Qa
+--0000000000009be5b2062b28e9ef--
 
