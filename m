@@ -1,93 +1,64 @@
-Return-Path: <netdev+bounces-156423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ACB8A0657A
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:38:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 882CBA06593
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:51:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CC5D167E7E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 19:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D143A3A4892
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 19:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D73B202C3E;
-	Wed,  8 Jan 2025 19:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA0E1EF0A5;
+	Wed,  8 Jan 2025 19:51:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="PVk4KKtF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eSy2zfQT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8921F708D
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 19:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5425922611;
+	Wed,  8 Jan 2025 19:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736365085; cv=none; b=jJGCSiVEbbPLufoSzID47pftROv/gYynT6FY7Mbemw6MlNvjuqSWGwMeYCLw1aLE4uZmNQPqC3F2huDQ+Uodqo1cRgwoM2ehJefR2ruR7K7Y8fCY1kk/iUTH4Dh9RPLQwSopXOEXFiLRKuxzA2jXrY1lYwz/L3YikGJaZKgbllg=
+	t=1736365872; cv=none; b=GffSGi3v90g5+qUeW3SbsjS41iN5oTaXzJJlnuWgSLS9mJ32Z1BpG0Ae2sMC7fdISUmU4dFTwe9mcUPRr2j8M2555RTHUZHxjddeAP+h7c21T2mW94OKb3p3zYFMPS1KC13HN6LYxJnYm5LJn3u7tYaDvAggKD26in5faq4fPsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736365085; c=relaxed/simple;
-	bh=TkDjLYrvFP4NOwyE1riU2Pn0PTqQ0huroqDV7gYV8F4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZpXqeUXjkCJJzdpajo3cnycauS3YTgkPgYIKt9q+ljo1aZnPwlfy2ZovJN2pKLA/dSvseAYK9JQMrNF+Py/zWek+omXtoj6vk9TxuIUb+QPo0SIYTks02L0CvJIe2X5DdPL9O6/bBeTx6tGDtYWBKMHnQ8tMWtolMNtwTZy3e5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io; spf=pass smtp.mailfrom=theori.io; dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b=PVk4KKtF; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theori.io
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2eeb4d643a5so281084a91.3
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 11:38:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1736365083; x=1736969883; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G0bUS8Q56VQu+k4FgEf+CVIurLS+XfSNtyOspvh+PYM=;
-        b=PVk4KKtFXjAJ49RCv/OtLG2zDEr5KfQXCOxCLwGc8HyhEIUZkMr67CNMOglSmCGtAQ
-         sAc1UsjQHGvWdVW8fsUDGNZ13sJTleYVvC02O7DwzlQHioNTpZc+ufH3i+rLMshYkZcb
-         /gLhSqvEfEnUPi01knyG1MMNFfemY2V0S80/g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736365083; x=1736969883;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G0bUS8Q56VQu+k4FgEf+CVIurLS+XfSNtyOspvh+PYM=;
-        b=YkD5Z4oHaNnvRmOWhYxCnkWScXBwIdA56q1G5NaRLmIGOoPfUYwDAY9NGgnJ294B/B
-         WJv/9N4EgZPJtddL9FEzZ1CjSCa7wLGgRPWud7XTo/O5+WBAUuwkOk5tDVHtobTe/M6K
-         aYc3kQQpqYmSciSEbfotL4vnbjJvhQfgKP/G3pJd5+zyKaj5WbqHG/wiWlS0I+Utpj+n
-         QU4/BKsn0zHP3p548OlfWi3VGj6A9FNEBSplH3TCsvBUVDLv0z5LZ7lmeQJ61fmrmq86
-         HHjzJ9NN5ywKfhIOfxBQKK7/m6dNFx3pOk1EDq6PrG+YlZclmE31RqgXTPvTMgNKH35D
-         csQw==
-X-Gm-Message-State: AOJu0Yx9vEDZgZI/r+VTPOcx5rETlDK3GYHGNlTc/Rbu9Rgy3OskXLwq
-	cvwvLDU9oktZ/pI62/jY09LUPLFV0Z1E7KdWuapV/RHSukll3OhI79q4E9/vjek=
-X-Gm-Gg: ASbGncsNHSDHzP7EA1lZEfdoDbcLMKxSB2haaeGb9l1dXkgffOSm1Fn3c0Euo9eWkbf
-	rFQhByKHuLTGq2dOntL7mgo1u7nNODPVGpnFKYfgNlhb5LEnRLH2LgDDlwJ95ZKg3S2cbUP2Dh9
-	wAyQRhq/lzJ1FkSkhGgKTlot1crCLHyM9ujSjwbsZMgOaPbkUMRHVjImNYzb4yISY7Fwri+GRBs
-	HOGOuLS5JfdP58GP52jKp+axoWU9t9C6ZE5VpzAVEw2CCzN2Wp3zn+ZAMDpC8GnzVJaQQ==
-X-Google-Smtp-Source: AGHT+IHl+1LPadgc/i7lkTvjE2CfNzpvljiLkJJSgQloH84BYhz9+osKoceYZDM+dwTOSZKMzh86qg==
-X-Received: by 2002:a17:90b:3904:b0:2ea:b564:4b31 with SMTP id 98e67ed59e1d1-2f548f64240mr5502673a91.19.1736365083357;
-        Wed, 08 Jan 2025 11:38:03 -0800 (PST)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f54a2872a3sm1963200a91.16.2025.01.08.11.37.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 11:38:03 -0800 (PST)
-Date: Wed, 8 Jan 2025 14:37:55 -0500
-From: Hyunwoo Kim <v4bel@theori.io>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wongi Lee <qwerty@theori.io>,
+	s=arc-20240116; t=1736365872; c=relaxed/simple;
+	bh=3XOtlTs/hzd4lsseZnXoaXETrVytDww/rNaH/CWFCHg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=tYxTpnhCh3Kbuz1zM5TeE9/Vy+kPCW7kYLfLtjoocLmue2UloFi7LzJ0Nyxt7uSP9xUPtBO/Z4m/oqiKQIc0XkeVTDqtb/684yV/3NXyq7EsZbxkzqKH/V+1Bri/PPopG6SRkKPU2wQ4GkuIU3yf7rVYUYWZ7zPci3H1hg36qOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSy2zfQT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD64CC4CED3;
+	Wed,  8 Jan 2025 19:51:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736365871;
+	bh=3XOtlTs/hzd4lsseZnXoaXETrVytDww/rNaH/CWFCHg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=eSy2zfQTnz2eDskYMtxlTfY3C4bnkL9u7/WUKe/6zfE+dgMFAojOF9IfkFG63R25Z
+	 dgz871Tre+p2ebJXxcCZt7OZxuVnDh6doOjeDeSYJcf+s2Xlr6K1aC5vW1//RaqELF
+	 32n3NV1UJ5FK/Ag/0fIq1Ax8eULCg6RKCNMY4EB1Tqo+sBojINI5fR/TyClQck+RHR
+	 Foq9UE/uwonxzjyM99M2iKW9QtxLpcTAr3KqnOGFkffNGkJzyWwf94zMEmdLHrbmUr
+	 S0/pAHCJlRL1nAUEDOg7j9MtbSCLnYwFSWxL53ev1YY0YAGlYNtPYjaP/72FmUrqio
+	 lVfA80Ebgj/8w==
+Date: Wed, 8 Jan 2025 13:51:09 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+	M Chetan Kumar <m.chetan.kumar@intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	virtualization@lists.linux.dev,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Luigi Leonardi <leonardi@redhat.com>, bpf@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Michal Luczaj <mhal@rbox.co>,
-	kvm@vger.kernel.org, v4bel@theori.io, imv4bel@gmail.com
-Subject: Re: [PATCH net 2/2] vsock/bpf: return early if transport is not
- assigned
-Message-ID: <Z37UE0Kv3iWobO/9@v4bel-B760M-AORUS-ELITE-AX>
-References: <20250108180617.154053-1-sgarzare@redhat.com>
- <20250108180617.154053-3-sgarzare@redhat.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>, linux-pm@vger.kernel.org
+Subject: Re: [PATCH v2] net: wwan: iosm: Fix hibernation by re-binding the
+ driver around it
+Message-ID: <20250108195109.GA224965@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,85 +67,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250108180617.154053-3-sgarzare@redhat.com>
+In-Reply-To: <c634d5bc-7a60-436a-94d8-c8a4fb0e0c26@gmail.com>
 
-On Wed, Jan 08, 2025 at 07:06:17PM +0100, Stefano Garzarella wrote:
-> Some of the core functions can only be called if the transport
-> has been assigned.
-> 
-> As Michal reported, a socket might have the transport at NULL,
-> for example after a failed connect(), causing the following trace:
-> 
->     BUG: kernel NULL pointer dereference, address: 00000000000000a0
->     #PF: supervisor read access in kernel mode
->     #PF: error_code(0x0000) - not-present page
->     PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
->     Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
->     CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
->     RIP: 0010:vsock_connectible_has_data+0x1f/0x40
->     Call Trace:
->      vsock_bpf_recvmsg+0xca/0x5e0
->      sock_recvmsg+0xb9/0xc0
->      __sys_recvfrom+0xb3/0x130
->      __x64_sys_recvfrom+0x20/0x30
->      do_syscall_64+0x93/0x180
->      entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> So we need to check the `vsk->transport` in vsock_bpf_recvmsg(),
-> especially for connected sockets (stream/seqpacket) as we already
-> do in __vsock_connectible_recvmsg().
-> 
-> Fixes: 634f1a7110b4 ("vsock: support sockmap")
-> Reported-by: Michal Luczaj <mhal@rbox.co>
-> Closes: https://lore.kernel.org/netdev/5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co/
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/vmw_vsock/vsock_bpf.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
-> index 4aa6e74ec295..f201d9eca1df 100644
-> --- a/net/vmw_vsock/vsock_bpf.c
-> +++ b/net/vmw_vsock/vsock_bpf.c
-> @@ -77,6 +77,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  			     size_t len, int flags, int *addr_len)
->  {
->  	struct sk_psock *psock;
-> +	struct vsock_sock *vsk;
->  	int copied;
->  
->  	psock = sk_psock_get(sk);
-> @@ -84,6 +85,13 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  		return __vsock_recvmsg(sk, msg, len, flags);
->  
->  	lock_sock(sk);
-> +	vsk = vsock_sk(sk);
-> +
-> +	if (!vsk->transport) {
-> +		copied = -ENODEV;
-> +		goto out;
-> +	}
-> +
->  	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
->  		release_sock(sk);
->  		sk_psock_put(sk, psock);
-> @@ -108,6 +116,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  		copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
->  	}
->  
-> +out:
->  	release_sock(sk);
->  	sk_psock_put(sk, psock);
->  
-> -- 
-> 2.47.1
-> 
+[+cc Rafael, linux-pm because they *are* PM experts :)]
 
-Looks good to me.
+On Wed, Jan 08, 2025 at 02:15:28AM +0200, Sergey Ryazanov wrote:
+> On 08.01.2025 01:45, Bjorn Helgaas wrote:
+> > On Wed, Jan 08, 2025 at 01:13:41AM +0200, Sergey Ryazanov wrote:
+> > > On 05.01.2025 19:39, Maciej S. Szmigiero wrote:
+> > > > Currently, the driver is seriously broken with respect to the
+> > > > hibernation (S4): after image restore the device is back into
+> > > > IPC_MEM_EXEC_STAGE_BOOT (which AFAIK means bootloader stage) and needs
+> > > > full re-launch of the rest of its firmware, but the driver restore
+> > > > handler treats the device as merely sleeping and just sends it a
+> > > > wake-up command.
+> > > > 
+> > > > This wake-up command times out but device nodes (/dev/wwan*) remain
+> > > > accessible.
+> > > > However attempting to use them causes the bootloader to crash and
+> > > > enter IPC_MEM_EXEC_STAGE_CD_READY stage (which apparently means "a crash
+> > > > dump is ready").
+> > > > 
+> > > > It seems that the device cannot be re-initialized from this crashed
+> > > > stage without toggling some reset pin (on my test platform that's
+> > > > apparently what the device _RST ACPI method does).
+> > > > 
+> > > > While it would theoretically be possible to rewrite the driver to tear
+> > > > down the whole MUX / IPC layers on hibernation (so the bootloader does
+> > > > not crash from improper access) and then re-launch the device on
+> > > > restore this would require significant refactoring of the driver
+> > > > (believe me, I've tried), since there are quite a few assumptions
+> > > > hard-coded in the driver about the device never being partially
+> > > > de-initialized (like channels other than devlink cannot be closed,
+> > > > for example).
+> > > > Probably this would also need some programming guide for this hardware.
+> > > > 
+> > > > Considering that the driver seems orphaned [1] and other people are
+> > > > hitting this issue too [2] fix it by simply unbinding the PCI driver
+> > > > before hibernation and re-binding it after restore, much like
+> > > > USB_QUIRK_RESET_RESUME does for USB devices that exhibit a similar
+> > > > problem.
+> > > > 
+> > > > Tested on XMM7360 in HP EliteBook 855 G7 both with s2idle (which uses
+> > > > the existing suspend / resume handlers) and S4 (which uses the new code).
+> > > > 
+> > > > [1]: https://lore.kernel.org/all/c248f0b4-2114-4c61-905f-466a786bdebb@leemhuis.info/
+> > > > [2]:
+> > > > https://github.com/xmm7360/xmm7360-pci/issues/211#issuecomment-1804139413
+> > > > 
+> > > > Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+> > > 
+> > > Generally looks good to me. Lets wait for approval from PCI
+> > > maintainers to be sure that there no unexpected side effects.
+> > 
+> > I have nothing useful to contribute here.  Seems like kind of a
+> > mess.  But Intel claims to maintain this, so it would be nice if
+> > they would step up and make this work nicely.
+> 
+> Suddenly, Intel lost their interest in the modems market and, as
+> Maciej mentioned, the driver was abandon for a quite time now. The
+> author no more works for Intel. You will see the bounce.
 
-Reviewed-by: Hyunwoo Kim <v4bel@theori.io>
+Well, that's unfortunate :)  Maybe step 0 is to remove the Intel
+entry from MAINTAINERS for this driver.
 
+> Bjorn, could you suggest how to deal easily with the device that is
+> incapable to seamlessly recover from hibernation? I am totally
+> hopeless regarding the PM topic. Or is the deep driver rework the
+> only option?
 
-Regards,
-Hyunwoo Kim
+I'm pretty PM-illiterate myself.  Based on
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/admin-guide/pm/sleep-states.rst?id=v6.12#n109,
+I assume that when we resume after hibernate, devices are in the same
+state as after a fresh boot, i.e., the state driver .probe() methods
+see.
+
+So I assume that some combination of dev_pm_ops methods must be able
+to do basically the same as .probe() to get the device usable again
+after it was completely powered off and back on.
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/driver-api/pm/devices.rst?id=v6.12#n506
+mentions .freeze(), .thaw(), .restore(), etc, but the fact that few
+drivers set those pointers and all the nice macros for setting pm ops
+(SYSTEM_SLEEP_PM_OPS, NOIRQ_SYSTEM_SLEEP_PM_OPS, etc) only take
+suspend and resume functions makes me think most drivers must handle
+hibernation in the same .suspend() and .resume() functions they use
+for non-hibernate transitions.
+
+Since all drivers have to cope with devices needing to be
+reinitialized after hibernate, I would look around to see how other
+drivers do it and see if you can do it similarly.
+
+Sorry this is still really a non-answer.
+
+Bjorn
 
