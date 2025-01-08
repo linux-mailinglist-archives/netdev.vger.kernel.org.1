@@ -1,169 +1,176 @@
-Return-Path: <netdev+bounces-156205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AEA5A0581A
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:26:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B96CA05831
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:34:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D5EC7A19BC
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:25:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 439E73A56CA
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7FD1F869A;
-	Wed,  8 Jan 2025 10:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAF71F8688;
+	Wed,  8 Jan 2025 10:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fLHf7FbT";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="d+X1qumv"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HYxfjrgJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868D91F868B;
-	Wed,  8 Jan 2025 10:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDDA1F0E33;
+	Wed,  8 Jan 2025 10:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736331943; cv=none; b=OAplFsDi0AG45BZSoO+u9/Z78jrhXTyGgVIet6UpM8bCEveChs7X3YEOUMuWMDHYaw112a6UixzOp85mXmcwJfpfcONhBDwg4/yJBDn0YWo0vSMBX26NZe1yXuuOHUvT5BSZbIvLA/cJ1EHoHh8GG4ItuMfwq3RrdKK1VCRE8/Q=
+	t=1736332452; cv=none; b=eEexqWMFYrhB7B8qJ+UtAG4QoXRTsBPHjDru5ioJ/j23K2Et24a/DXfO30hU8tXgDUiBr1guvhsZPtfECbbU/JDvfDg9fYw/zAj/by8mVwvSE7Hq6X7dz87+Hf1N0IcMVg2W+dLg48xYVR65syKcG1Ia0/HrCffyXC5lYVL8xww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736331943; c=relaxed/simple;
-	bh=V79sy8TwmY7YaNY2CtlOZFjZmfOzive83fCVC9e2RJY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T5WoCRsjnJVv3su3X0m4v4xl3L6GpYUGhRMQXmYFXmUFhx+bAmambB3yaoDKG7o/GWIP90RNxF1qzmRN95qKacr8HLMBGnoUcX8NYwVjon60KL6d/8aVJKaDpEd2YBSFCAim8/FT8sEvCaYIEOw6qi85TDU1H+Cdgillz9NAfFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fLHf7FbT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=d+X1qumv; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 8 Jan 2025 11:25:32 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1736331934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wDnajRGAKSDjhPvwubZBuXDZ5LOIoIGh7ZTlin0DXQc=;
-	b=fLHf7FbT3jWUtCXukcFugRf7ux0GvEBZXQ34F2GvVNuc6jEJ6rXMIk/0gbPcnh0QRsBBik
-	ZH3ffOAdXx+jQw2l6IeTrNWgg4FU5MHoOEwT287dgYnqqSJWIUTD6cRPVO8UKO9Ufn9J5w
-	ehxwrnAXOzEB4s0xNBLeeZ+okyETfb/JnSQV19TJaCce5Bq5qkWXtx2N/HoXaQVPExCWYd
-	DUXQZDkYJeGLmv5kowwshjtQfXIdKuSNEVCe4Ous4tlx5uwjYq7uwCF4OeMMgd/JaA+Tgk
-	YgLrZEhseffjCsdUyTy2iZPW94HHqYtGQXu6L9dZUOuHXkgk5UdJ8XYS5SEBxg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1736331934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wDnajRGAKSDjhPvwubZBuXDZ5LOIoIGh7ZTlin0DXQc=;
-	b=d+X1qumv8hLSPmGBE0V0HlJlSOVx7RABGGcSIKPjRWBa0lKe6iTmFw0d4lqxcYHkZ+W+MA
-	ZAWAW8hRoCIhoXDg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Wander Lairson Costa <wander@redhat.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Jeff Garzik <jgarzik@redhat.com>,
-	Auke Kok <auke-jan.h.kok@intel.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>
-Subject: Re: [PATCH iwl-net 0/4] igb: fix igb_msix_other() handling for
- PREEMPT_RT
-Message-ID: <20250108102532.VWnKWvoo@linutronix.de>
-References: <20241204114229.21452-1-wander@redhat.com>
- <20250107135106.WWrtBMXY@linutronix.de>
- <taea3z7nof4szjir2azxsjtbouymqxyy4draa3hz35zbacqeeq@t3uidpha64k7>
+	s=arc-20240116; t=1736332452; c=relaxed/simple;
+	bh=QqRkCrwAsLtdCDlwu2XazVGiReDLd7w5pFcT+11cgLs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=TufK0DL/rtw03CKoIq4SOHXzT7JB2TWZiaZBQWktyTxVagUaDEQqlbc1kU7YWczjhY6pfIWMNkFrrgi7VhjU5oyLamWWriSSNMzk8Gs5N5cy+2fQSCct8lu30kAg0cyrFZNtKw4DE8+o/CK1GNe7oSsoDEPPB5dgycmosSPMoJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=HYxfjrgJ; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50891kAI017545;
+	Wed, 8 Jan 2025 10:33:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	kG9qrZwpk0ax9wVZjX4lH5f2FuZkvP3RDUkvgXroGJE=; b=HYxfjrgJ53l3ReJf
+	83QupBRRBi9lFGStxCv48jdTqmaLVDO7plLyE7a0l1g3klx+YKh/wtKBlgPZbVIE
+	u1AYjZHz3PWyTIBTMPaEpjcN5stwNnx2G6PzqhkY/kmrcYK0eKWo+TM7emLSpHoB
+	TOl/vjA3W8ee2Rlojv8TO8qc9+03ldBS7cQD5Ogr+nY1x+JBfZJUt3xIHgfk4ewb
+	t4UvZvn1RD9Lwl5GgMjdAway7LHEqqqwoFcKG3SlIv3jctt/m+ZvlOAnfpb5b/YG
+	+LiBQTuIUqtnG25apStMHbkNGOZRvwSJGIqngP6a1Io7N53HpOvtKydUI3yDk7/X
+	iva6/Q==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 441hx8gx0r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 10:33:46 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 508AXkWw001823
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 8 Jan 2025 10:33:46 GMT
+Received: from [10.253.35.161] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 8 Jan 2025
+ 02:33:39 -0800
+Message-ID: <e2625cfd-128c-4b56-a1c5-c0256db5c486@quicinc.com>
+Date: Wed, 8 Jan 2025 18:33:36 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <taea3z7nof4szjir2azxsjtbouymqxyy4draa3hz35zbacqeeq@t3uidpha64k7>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] net: stmmac: qcom-ethqos: Enable RX programmable swap
+ on qcs615
+To: Krzysztof Kozlowski <krzk@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
+ <20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com>
+ <4b4ef1c1-a20b-4b65-ad37-b9aabe074ae1@kernel.org>
+ <278de6e8-de8f-458a-a4b9-92b3eb81fa77@quicinc.com>
+ <df1e2fbd-7fae-4910-9908-10fdb78e4299@kernel.org>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <df1e2fbd-7fae-4910-9908-10fdb78e4299@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: V64a_pnh8TcazOpIFs5G79f_apEyOLVY
+X-Proofpoint-ORIG-GUID: V64a_pnh8TcazOpIFs5G79f_apEyOLVY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
+ spamscore=0 malwarescore=0 bulkscore=0 mlxscore=0 adultscore=0
+ suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501080085
 
-On 2025-01-07 15:52:47 [-0300], Wander Lairson Costa wrote:
-> On Tue, Jan 07, 2025 at 02:51:06PM +0100, Sebastian Andrzej Siewior wrote:
-> > On 2024-12-04 08:42:23 [-0300], Wander Lairson Costa wrote:
-> > > This is the second attempt at fixing the behavior of igb_msix_other()
-> > > for PREEMPT_RT. The previous attempt [1] was reverted [2] following
-> > > concerns raised by Sebastian [3].
-> > > 
-> > > The initial approach proposed converting vfs_lock to a raw_spinlock,
-> > > a minor change intended to make it safe. However, it became evident
-> > > that igb_rcv_msg_from_vf() invokes kcalloc with GFP_ATOMIC,
-> > > which is unsafe in interrupt context on PREEMPT_RT systems.
-> > > 
-> > > To address this, the solution involves splitting igb_msg_task()
-> > > into two parts:
-> > > 
-> > >     * One part invoked from the IRQ context.
-> > >     * Another part called from the threaded interrupt handler.
-> > > 
-> > > To accommodate this, vfs_lock has been restructured into a double
-> > > lock: a spinlock_t and a raw_spinlock_t. In the revised design:
-> > > 
-> > >     * igb_disable_sriov() locks both spinlocks.
-> > >     * Each part of igb_msg_task() locks the appropriate spinlock for
-> > >     its execution context.
-> > 
-> > - Is this limited to PREEMPT_RT or does it also occur on PREEMPT systems
-> >   with threadirqs? And if this is PREEMPT_RT only, why?
+
+
+On 2024-12-27 15:03, Krzysztof Kozlowski wrote:
+> On 26/12/2024 03:29, Yijie Yang wrote:
+>>
+>>
+>> On 2024-12-25 19:37, Krzysztof Kozlowski wrote:
+>>> On 25/12/2024 11:04, Yijie Yang wrote:
+>>>
+>>>>    static int qcom_ethqos_probe(struct platform_device *pdev)
+>>>>    {
+>>>> -	struct device_node *np = pdev->dev.of_node;
+>>>> +	struct device_node *np = pdev->dev.of_node, *root;
+>>>>    	const struct ethqos_emac_driver_data *data;
+>>>>    	struct plat_stmmacenet_data *plat_dat;
+>>>>    	struct stmmac_resources stmmac_res;
+>>>> @@ -810,6 +805,15 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+>>>>    	ret = of_get_phy_mode(np, &ethqos->phy_mode);
+>>>>    	if (ret)
+>>>>    		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
+>>>> +
+>>>> +	root = of_find_node_by_path("/");
+>>>> +	if (root && of_device_is_compatible(root, "qcom,sa8540p-ride"))
+>>>
+>>>
+>>> Nope, your drivers are not supposed to poke root compatibles. Drop and
+>>> fix your driver to behave correctly for all existing devices.
+>>>
+>>
+>> Since this change introduces a new flag in the DTS, we must maintain ABI
+>> compatibility with the kernel. The new flag is specific to the board, so
 > 
-> PREEMPT systems configured to use threadirqs should be affected as well,
-> although I never tested with this configuration. Honestly, until now I wasn't
-> aware of the possibility of a non PREEMPT_RT kernel with threaded IRQs by default.
+> It's not, I don't see it specific to the board in the bindings.
 
-If the issue is indeed the use of threaded interrupts then the fix
-should not be limited to be PREEMPT_RT only.
+I'm sorry for the confusion. This feature is not board-specific but 
+rather a tunable option. All RGMII boards can choose whether to enable 
+this bit in the DTS, so there are no restrictions in the binding.
 
-> > - What causes the failure? I see you reworked into two parts to behave
-> >   similar to what happens without threaded interrupts. There is still no
-> >   explanation for it. Is there a timing limit or was there another
-> >   register operation which removed the mailbox message?
-> > 
 > 
-> I explained the root cause of the issue in the last commit. Maybe I should
-> have added the explanation to the cover letter as well.  Anyway, here is a
-> partial verbatim copy of it:
+>> I need to ensure root nodes are matched to allow older boards to
+>> continue functioning as before. I'm happy to adopt that approach if
+>> there are any more elegant solutions.
 > 
-> "During testing of SR-IOV, Red Hat QE encountered an issue where the
-> ip link up command intermittently fails for the igbvf interfaces when
-> using the PREEMPT_RT variant. Investigation revealed that
-> e1000_write_posted_mbx returns an error due to the lack of an ACK
-> from e1000_poll_for_ack.
-
-That ACK would have come if it would poll longer?
-
-> The underlying issue arises from the fact that IRQs are threaded by
-> default under PREEMPT_RT. While the exact hardware details are not
-> available, it appears that the IRQ handled by igb_msix_other must
-> be processed before e1000_poll_for_ack times out. However,
-> e1000_write_posted_mbx is called with preemption disabled, leading
-> to a scenario where the IRQ is serviced only after the failure of
-> e1000_write_posted_mbx."
-
-Where is this disabled preemption coming from? This should be one of the
-ops.write_posted() calls, right? I've been looking around and don't see
-anything obvious.
-Couldn't you wait for an event instead of polling?
-
-> The call chain from igb_msg_task():
+> I don't think you understood the problem. Why you are not handling this
+> for my board, sa8775p-rideX and sa8225-pre-ride-yellow-shrimp?
 > 
-> igb_msg_task
-> 	igb_rcv_msg_from_vf
-> 		igb_set_vf_multicasts
-> 			igb_set_rx_mode
-> 				igb_write_mc_addr_list
-> 					kmalloc
-> 
-> Cannot happen from interrupt context under PREEMPT_RT. So this part of
-> the interrupt handler is deferred to a threaded IRQ handler.
->
-> > > Cheers,
-> > > Wander
 
-Sebastian
+This feature is specifically for RGMII boards. The driver won't enable 
+this bit if the DTS doesn't specify it. To handle compatibility, we need 
+to identify legacy RGMII boards with MAC versions greater or equal to 3 
+which require this bit to be enabled.
+According to my knowledge, the SA8775P is of the SGMII type.
+
+> 
+> Best regards,
+> Krzysztof
+
+-- 
+Best Regards,
+Yijie
+
 
