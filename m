@@ -1,163 +1,95 @@
-Return-Path: <netdev+bounces-156417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9038DA0653D
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:20:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC4DA06533
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 470D81680C1
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 19:20:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC06B167E78
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 19:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7396A201278;
-	Wed,  8 Jan 2025 19:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB0F1A706F;
+	Wed,  8 Jan 2025 19:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="P1Nhm7JJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PusWFz89"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F8D200BB2;
-	Wed,  8 Jan 2025 19:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305B986333;
+	Wed,  8 Jan 2025 19:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736364044; cv=none; b=fbJSywQOyn9KAVD8YRyZ0ZiYKeAdJnYGAE8EYBrAS6+yIeoyCtm4gGmk3HNXkfYpA0ktYqc3l8H5bOD6n0JuBRhJ0W4Sbb+zeWWXfwkvr1351oahRCouer8t371dS6+c1YwzcLCixMHUNvJTbk+EDBrTVyS+OUBxUFmA+BSiZbg=
+	t=1736364018; cv=none; b=qe9KgCKkMYtNKQnCenTlbP+T14FU55rQiGgRdtuWANSoqbJ+S8c951iY5AUpN6id+eYOs3JfBtazUtrSNfNYyzjhzTwXnpj8C9CU7IQNN+XIr0kLJsrLmOdaJ+9iIo0/L2oAetzoDj4um/BvvUfhhJ5H6CdGovlXt939GB+OjFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736364044; c=relaxed/simple;
-	bh=L+RpQGow8xkrq65mketEkjUnqMJb37QojTR/a7ncITM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SlH/BrzEjXQbHkNxQkoDRrmoJkxtUCl6Ede7FIYnb0mkeh2eav97/hwq4SW2fZFNEPTNvkqy0yMwLIHoQMy8xpo3brUEA1aERq/kKwzQP8TDDnMX+Kd0LGiswINj2DQg8k5dX8A+EhAhSJN/Fe1vQnX4E3+Ro0PA7q3IQI8t75o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=P1Nhm7JJ; arc=none smtp.client-ip=80.12.242.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id VbaMtLzUGLSCnVbaPtFP0K; Wed, 08 Jan 2025 20:19:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1736363969;
-	bh=BXCOtKlMZhgvv0WlfFdcDBMt3DYEIWplOpebQIGJy6E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=P1Nhm7JJ6o4ex9Y/yOOLRkcQF7jcKeL2ucvGSpbqvzQjMOZNxvGt480Tl71nYwpnd
-	 ATAXa2VpWTMxf/KrvWNUVtA10mGILwI8GAit8w3D9/yBVGlsQyC4xspUEMTln5oujL
-	 cszRNcWnG+2RB4cKRjJhIdOGQIDR3xYPZ/rFG8s4yUb+ibnktuDG+/FLCd4bwojMy8
-	 ernhAytbnefHKV+LLSAVNxXSqJTCFB+CLf1xtU3yPf6Pk+lrBmlg88Ug2noNgIWz57
-	 ZRlZn+L8T2Ddv0MSdi5hN21d13ZQNzn5AVIk0jggt2qJf8iOcRe82O6oAgzncW34Z4
-	 JUyWNSlqfeY+Q==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Wed, 08 Jan 2025 20:19:29 +0100
-X-ME-IP: 90.11.132.44
-Message-ID: <29e742c9-82f5-41d5-a06f-70f010a3f39e@wanadoo.fr>
-Date: Wed, 8 Jan 2025 20:19:17 +0100
+	s=arc-20240116; t=1736364018; c=relaxed/simple;
+	bh=jdwOVI7CVc/SzN+r3JsnfvKoQpR6mVfdIuoM9oNJGMM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Stlb6rQxrOuCKpLAOfxN261Oy/BSaY80Gq3vcGB2GSqLdnMa6sM5NnvG2o1dirRiTdSRMsrvr+mBc8aXrGoB3pk+UZTMsjO+ADclfXG6Q4z/QzAkios7aoTOYonWIL6gPBwUvQzT02E1vpv/blUUCyDyidqTkRBjc7FtyZIRvyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PusWFz89; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1EA1C4CED3;
+	Wed,  8 Jan 2025 19:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736364016;
+	bh=jdwOVI7CVc/SzN+r3JsnfvKoQpR6mVfdIuoM9oNJGMM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PusWFz89YF8yx1kttoag9M2DfqocMu0t6LjS2KzxXad1yBgMohI/DmzbBsg2eNb2S
+	 HCuColKKzLERYRnAXCUFOo06F46VW3nNiBAxHa4kXQ4/i40jnHHmy+tiIjU1YYzhaA
+	 U84wDSTFYPCYzH3bmqNWTQ7nckbkWR+cXmyRhWEuyWz/xuigVIQo55hGKqXC1Hrxwq
+	 FAy29HApoqP1hJaVAsa0Qmy7fDnH5sTgQMol/H1ZexqHiaoTr1ByvvENfH9Kd5AqCb
+	 +tqDSLtJKtecfUJhDOjXYoh0iLhjS8dW6gOjDJltDbm9ykChm1BBKqMjxjb8y3C3sV
+	 L3O1xeQFaJo9w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E54380A965;
+	Wed,  8 Jan 2025 19:20:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 03/14] net: ethernet: qualcomm: Add PPE driver
- for IPQ9574 SoC
-To: Luo Jie <quic_luoj@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
- Suruchi Agarwal <quic_suruchia@quicinc.com>,
- Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
- quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
- srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
- john@phrozen.org
-References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
- <20250108-qcom_ipq_ppe-v2-3-7394dbda7199@quicinc.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20250108-qcom_ipq_ppe-v2-3-7394dbda7199@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] netdev: prevent accessing NAPI instances from another
+ namespace
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173636403830.752119.6938912950899150718.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Jan 2025 19:20:38 +0000
+References: <20250106180137.1861472-1-kuba@kernel.org>
+In-Reply-To: <20250106180137.1861472-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, stable@vger.kernel.org, jdamato@fastly.com,
+ almasrymina@google.com, amritha.nambiar@intel.com,
+ sridhar.samudrala@intel.com
 
-Le 08/01/2025 à 14:47, Luo Jie a écrit :
-> The PPE (Packet Process Engine) hardware block is available
-> on Qualcomm IPQ SoC that support PPE architecture, such as
-> IPQ9574.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  6 Jan 2025 10:01:36 -0800 you wrote:
+> The NAPI IDs were not fully exposed to user space prior to the netlink
+> API, so they were never namespaced. The netlink API must ensure that
+> at the very least NAPI instance belongs to the same netns as the owner
+> of the genl sock.
 > 
-> The PPE in IPQ9574 includes six integrated ethernet MAC
-> (for 6 PPE ports), buffer management, queue management and
-> scheduler functions. The MACs can connect with the external
-> PHY or switch devices using the UNIPHY PCS block available
-> in the SoC.
+> napi_by_id() can become static now, but it needs to move because of
+> dev_get_by_napi_id().
 > 
-> The PPE also includes various packet processing offload
-> capabilities such as L3 routing and L2 bridging, VLAN and
-> tunnel processing offload. It also includes Ethernet DMA
-> function for transferring packets between ARM cores and
-> PPE ethernet ports.
-> 
-> This patch adds the base source files and Makefiles for
-> the PPE driver such as platform driver registration,
-> clock initialization, and PPE reset routines.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> ---
+> [...]
 
-...
+Here is the summary with links:
+  - [net] netdev: prevent accessing NAPI instances from another namespace
+    https://git.kernel.org/netdev/net/c/d1cacd747768
 
-> +static int qcom_ppe_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct ppe_device *ppe_dev;
-> +	void __iomem *base;
-> +	int ret, num_icc;
-> +
-> +	num_icc = ARRAY_SIZE(ppe_icc_data);
-> +	ppe_dev = devm_kzalloc(dev, struct_size(ppe_dev, icc_paths, num_icc),
-> +			       GFP_KERNEL);
-> +	if (!ppe_dev)
-> +		return dev_err_probe(dev, -ENOMEM, "PPE alloc memory failed\n");
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Usually, no error message in logged in case of devm_kzalloc().
-It is already loud enough.
-
-> +
-> +	base = devm_platform_ioremap_resource(pdev, 0);
-> +	if (IS_ERR(base))
-> +		return dev_err_probe(dev, PTR_ERR(base), "PPE ioremap failed\n");
-> +
-> +	ppe_dev->regmap = devm_regmap_init_mmio(dev, base, &regmap_config_ipq9574);
-> +	if (IS_ERR(ppe_dev->regmap))
-> +		return dev_err_probe(dev, PTR_ERR(ppe_dev->regmap),
-> +				     "PPE initialize regmap failed\n");
-> +	ppe_dev->dev = dev;
-> +	ppe_dev->clk_rate = PPE_CLK_RATE;
-> +	ppe_dev->num_ports = PPE_PORT_MAX;
-> +	ppe_dev->num_icc_paths = num_icc;
-> +
-> +	ret = ppe_clock_init_and_reset(ppe_dev);
-> +	if (ret)
-> +		return dev_err_probe(dev, ret, "PPE clock config failed\n");
-> +
-> +	platform_set_drvdata(pdev, ppe_dev);
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct of_device_id qcom_ppe_of_match[] = {
-> +	{ .compatible = "qcom,ipq9574-ppe" },
-> +	{},
-
-The ending comma after a terminator like that is not needed.
-
-> +};
-
-...
-
-CJ
 
 
