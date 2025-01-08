@@ -1,105 +1,215 @@
-Return-Path: <netdev+bounces-156430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520C7A065D2
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:14:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BA0BA065D9
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:15:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51FAD1648BD
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:14:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26FFB165B1A
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F58202C55;
-	Wed,  8 Jan 2025 20:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B957203706;
+	Wed,  8 Jan 2025 20:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cokaGl5r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rd7GMc2u"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7F120127E;
-	Wed,  8 Jan 2025 20:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC6F1CDFD5;
+	Wed,  8 Jan 2025 20:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736367271; cv=none; b=uSlmRcoMi4/zXpS5OgYdhK7C3YWyOdXKvWT7Zko+zNH/9+b4JoiJghYj6Sv+7oaA5M6GtdttSoXSVrHlFOUNrw5UEgUHhhjOXv/W/2ORql0xwCnlXha8Wm1HufmMPK/CaNXhvLEMnR8WPGOcXz6YzwCUT30zTawadXG4Cv1hWrw=
+	t=1736367297; cv=none; b=CcWsr4u2IKCqWdWDKKIduDOO78C5MGdu7ELQUHSgUNB/9GgslMaWSC5KKcdlq/fJMdu7c0hjAPcvOZBe4LmUAMZhY2Zhz8ewOQBl+e3ji3O/ijclGx6UU+GCz0ccjzrSEJ3ZGZmHOBKkVw01HAWjloD/SpP1T5AO6Olk3jp3isk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736367271; c=relaxed/simple;
-	bh=fWXWqOox9j68tKJYQQyfrzCuN3RmXdh/TDYs9UfDP7M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oCkm/zJYYG0aLZD0gEirxl0Xy8f6kQDuTzzMNnS5KdUFD71y4mA5+v5kuewgJWwBn4xQXTaJWQCkF7LPQDyDJi1n9YxBvF1/LNr8XUCILcKHGWd/KqFtPhBeyn6NZYQ7E+qlPrpfQscnStwJ6H7awLXHtnHBR/flWRamDTrsoh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cokaGl5r; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hs8uP3N/mTdsE3JF6EEgjMUW9ubX3QrUliIYU0W1Efw=; b=cokaGl5rbCCWR5PLEEXlzlK4cg
-	61kIh8CGC74Kzu7whTHy6mmGZiSShEsvkL/AiJ79CgmLhcin6x2cZmY33bJNEFJBTn2rnElphfZ8A
-	QoBXD8JA3+CWcAR2AKXIabgI7RguloybklWjZ7s0SMDRD9wP03I3Y1lpAgkiPSW+xw0s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tVcR0-002fvx-Ne; Wed, 08 Jan 2025 21:13:46 +0100
-Date: Wed, 8 Jan 2025 21:13:46 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ninad Palsule <ninad@linux.ibm.com>
-Cc: minyard@acm.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ratbert@faraday-tech.com, openipmi-developer@lists.sourceforge.net,
-	netdev@vger.kernel.org, joel@jms.id.au, andrew@codeconstruct.com.au,
-	devicetree@vger.kernel.org, eajames@linux.ibm.com,
-	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 05/10] ARM: dts: aspeed: system1: Add RGMII support
-Message-ID: <b80b9224-d428-4ad9-a30d-40e2d30be654@lunn.ch>
-References: <20250108163640.1374680-1-ninad@linux.ibm.com>
- <20250108163640.1374680-6-ninad@linux.ibm.com>
- <1dd0165b-22ff-4354-bfcb-85027e787830@lunn.ch>
- <0aaa13de-2282-4ea3-a11b-4edefb7d6dd3@linux.ibm.com>
+	s=arc-20240116; t=1736367297; c=relaxed/simple;
+	bh=Ua7qCRnIdG3hmytoaFkfllP3/chUnEB0dgIQoQS8kzQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=si15Rwuja0NUyflT5jC8Up8Hl28rmoM0Hh3Cgxo+fcWXan75h+N5yCoNB1iv1+VrNquVPL7qBwaEqbHH4BN2e6py/Pt7s3kaMK08zrFiT9X+7dx817pJieFgke4EGiLzA4AZ2ejyVfFh7dHD5ccLhLc02jXK48mXvrWNt3ta3Oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rd7GMc2u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15FA7C4CEE6;
+	Wed,  8 Jan 2025 20:14:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736367297;
+	bh=Ua7qCRnIdG3hmytoaFkfllP3/chUnEB0dgIQoQS8kzQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Rd7GMc2uCCu+IjRTkuUwzFuPoAWlHKopRH1Vp+ACW6D7yX8oS3bTi7T2DZWWWO31v
+	 4yXqyq132S3FkUjdh/iS93Zv0U0CTY3itxA9EPtDetka27RwzDzhSPr928vvqovxx2
+	 FNMpIygg5aQOA4TUV6ju0mnycJ5ZWedsZDj16zn/PhABCWvnB3jAUVGqLWFiG9Sg86
+	 /PVCHtzb84aiWKDaoBn4g6JpecbK74Ub+9dcCGFs5AVopwTnpRMnhaauDbhvU0k7v4
+	 U0qztnt44AXsWERVKPu74fjf/lolHldiHcon2EmuALyEyDPLVgsV/DQ5dlO6Ux0tr0
+	 MWQwhsNUL+kTA==
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-71e2851de95so60708a34.0;
+        Wed, 08 Jan 2025 12:14:57 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUEXRj7apQMib+hv0tSsdbBen0y1t1KURqDjUtMmOAGR518Cp+Cu9WwC1EK+Y+3D1MHpaaTVeFJt+M=@vger.kernel.org, AJvYcCVAC1Nkg9L9opHyNnZ+4t7VpxuWzWABgGjkayBIJyk6nzgIGRUjmjYct7kbUViLlE5DRlynnSyG6ZT9j+w=@vger.kernel.org, AJvYcCVayhMB5KSqt4+Nho2vAHusl1VUxxugsKEdUU/B4Hmf/Wn8ywZhzizli4LPc7Lw6dtMrPEftMRb@vger.kernel.org, AJvYcCXqqfKs9V4OieqAgwihpVzcFSZUFhiqyRW5bEhn/U5mWsIIqLga43pJ12DxjonGOsofaAnyxOL2eCXW@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMJzZuGmHnlUpaY46/yrNTqOQSmF/RjxrcAVlzKoei0yFJTFDF
+	wuKj/dbC+uzvvDx9ZLeSa2pJMBvfUtqmYBd1r2c/r3rHUIwFP9c9SLF/DMxUasQLlZp93YpYnly
+	Qy9SlpVzrjTshvq/5gOSV5QWy6rM=
+X-Google-Smtp-Source: AGHT+IEJ6ZCM0xH7ApaImZgmkmPMqedL5/cx0LDtjmmm4+npctXzmAuEOTamSduOQiG4Q8vsu7bgN9wClgxj+DFdXII=
+X-Received: by 2002:a05:6808:3a19:b0:3e5:f06f:653d with SMTP id
+ 5614622812f47-3ef2ed01adbmr2904751b6e.22.1736367296268; Wed, 08 Jan 2025
+ 12:14:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0aaa13de-2282-4ea3-a11b-4edefb7d6dd3@linux.ibm.com>
+References: <c634d5bc-7a60-436a-94d8-c8a4fb0e0c26@gmail.com> <20250108195109.GA224965@bhelgaas>
+In-Reply-To: <20250108195109.GA224965@bhelgaas>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 8 Jan 2025 21:14:45 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0jVB9mTqUJ+66q_nSm2ULiDFO6Fmfpt3Q=wLSKsQXRewA@mail.gmail.com>
+X-Gm-Features: AbW1kvZg6kVFf6IFOj0P0AjXh1Z82TEBJgWsEzBLjxp5ykDU9UZPz4qLPq8vQH0
+Message-ID: <CAJZ5v0jVB9mTqUJ+66q_nSm2ULiDFO6Fmfpt3Q=wLSKsQXRewA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: wwan: iosm: Fix hibernation by re-binding the
+ driver around it
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
+	"Maciej S. Szmigiero" <mail@maciej.szmigiero.name>, M Chetan Kumar <m.chetan.kumar@intel.com>, 
+	Loic Poulain <loic.poulain@linaro.org>, Johannes Berg <johannes@sipsolutions.net>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>, linux-pm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 08, 2025 at 12:43:07PM -0600, Ninad Palsule wrote:
-> Hello Andrew,
-> 
-> 
-> On 1/8/25 11:03, Andrew Lunn wrote:
-> > On Wed, Jan 08, 2025 at 10:36:33AM -0600, Ninad Palsule wrote:
-> > > system1 has 2 transceiver connected through the RGMII interfaces. Added
-> > > device tree entry to enable RGMII support.
-> > > 
-> > > ASPEED AST2600 documentation recommends using 'rgmii-rxid' as a
-> > > 'phy-mode' for mac0 and mac1 to enable the RX interface delay from the
-> > > PHY chip.
-> > You appear to if ignored my comment. Please don't do that. If you have
-> > no idea about RGMII delays, please say so, so i can help you debug
-> > what is wrong.
-> > 
-> > NACK
-> 
-> I think there is a misunderstanding. I did not ignore your comment. I have
-> contacted ASPEED and asked them to respond. I think Jacky from Aspeed
-> replied to your mail.
+On Wed, Jan 8, 2025 at 8:51=E2=80=AFPM Bjorn Helgaas <helgaas@kernel.org> w=
+rote:
+>
+> [+cc Rafael, linux-pm because they *are* PM experts :)]
+>
+> On Wed, Jan 08, 2025 at 02:15:28AM +0200, Sergey Ryazanov wrote:
+> > On 08.01.2025 01:45, Bjorn Helgaas wrote:
+> > > On Wed, Jan 08, 2025 at 01:13:41AM +0200, Sergey Ryazanov wrote:
+> > > > On 05.01.2025 19:39, Maciej S. Szmigiero wrote:
+> > > > > Currently, the driver is seriously broken with respect to the
+> > > > > hibernation (S4): after image restore the device is back into
+> > > > > IPC_MEM_EXEC_STAGE_BOOT (which AFAIK means bootloader stage) and =
+needs
+> > > > > full re-launch of the rest of its firmware, but the driver restor=
+e
+> > > > > handler treats the device as merely sleeping and just sends it a
+> > > > > wake-up command.
+> > > > >
+> > > > > This wake-up command times out but device nodes (/dev/wwan*) rema=
+in
+> > > > > accessible.
+> > > > > However attempting to use them causes the bootloader to crash and
+> > > > > enter IPC_MEM_EXEC_STAGE_CD_READY stage (which apparently means "=
+a crash
+> > > > > dump is ready").
+> > > > >
+> > > > > It seems that the device cannot be re-initialized from this crash=
+ed
+> > > > > stage without toggling some reset pin (on my test platform that's
+> > > > > apparently what the device _RST ACPI method does).
+> > > > >
+> > > > > While it would theoretically be possible to rewrite the driver to=
+ tear
+> > > > > down the whole MUX / IPC layers on hibernation (so the bootloader=
+ does
+> > > > > not crash from improper access) and then re-launch the device on
+> > > > > restore this would require significant refactoring of the driver
+> > > > > (believe me, I've tried), since there are quite a few assumptions
+> > > > > hard-coded in the driver about the device never being partially
+> > > > > de-initialized (like channels other than devlink cannot be closed=
+,
+> > > > > for example).
+> > > > > Probably this would also need some programming guide for this har=
+dware.
+> > > > >
+> > > > > Considering that the driver seems orphaned [1] and other people a=
+re
+> > > > > hitting this issue too [2] fix it by simply unbinding the PCI dri=
+ver
+> > > > > before hibernation and re-binding it after restore, much like
+> > > > > USB_QUIRK_RESET_RESUME does for USB devices that exhibit a simila=
+r
+> > > > > problem.
+> > > > >
+> > > > > Tested on XMM7360 in HP EliteBook 855 G7 both with s2idle (which =
+uses
+> > > > > the existing suspend / resume handlers) and S4 (which uses the ne=
+w code).
+> > > > >
+> > > > > [1]: https://lore.kernel.org/all/c248f0b4-2114-4c61-905f-466a786b=
+debb@leemhuis.info/
+> > > > > [2]:
+> > > > > https://github.com/xmm7360/xmm7360-pci/issues/211#issuecomment-18=
+04139413
+> > > > >
+> > > > > Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+> > > >
+> > > > Generally looks good to me. Lets wait for approval from PCI
+> > > > maintainers to be sure that there no unexpected side effects.
+> > >
+> > > I have nothing useful to contribute here.  Seems like kind of a
+> > > mess.  But Intel claims to maintain this, so it would be nice if
+> > > they would step up and make this work nicely.
+> >
+> > Suddenly, Intel lost their interest in the modems market and, as
+> > Maciej mentioned, the driver was abandon for a quite time now. The
+> > author no more works for Intel. You will see the bounce.
+>
+> Well, that's unfortunate :)  Maybe step 0 is to remove the Intel
+> entry from MAINTAINERS for this driver.
+>
+> > Bjorn, could you suggest how to deal easily with the device that is
+> > incapable to seamlessly recover from hibernation? I am totally
+> > hopeless regarding the PM topic. Or is the deep driver rework the
+> > only option?
+>
+> I'm pretty PM-illiterate myself.  Based on
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
+ocumentation/admin-guide/pm/sleep-states.rst?id=3Dv6.12#n109,
+> I assume that when we resume after hibernate, devices are in the same
+> state as after a fresh boot, i.e., the state driver .probe() methods
+> see.
 
-You did not mention in the cover letter, or the patch. I asked for a
-detailed explanation in the commit message why it is correct, which
-you did not do.
+Well, yes and no.
 
-Now we have more details, it is clear Ethernet support for this board
-needs to wait until we figure out how to fix the MAC driver. Please
-either wait with this patchset until that is done, or drop this one
-patch for the moment and submit it later once the MAC driver is fixed.
+There are two kernels involved in resume from hibernation: the restore
+kernel that runs just like after a fresh boot except that at one point
+in the boot process it attempts to load a hibernation image and (if
+loading the image succeeds) jumps to the other kernel instance
+included in the image, referred to as the image kernel.
 
-      Andrew
+For the restore kernel, devices are in the same state as after a fresh
+boot (generally speaking, with some rare exceptions that are
+irrelevant here IMV), but for the image kernel, they are in whatever
+state the restore kernel has put them into.
 
+> So I assume that some combination of dev_pm_ops methods must be able
+> to do basically the same as .probe() to get the device usable again
+> after it was completely powered off and back on.
+
+Yes, but if the restore kernel has a driver for the device in
+question, it may as well have initialized that device already.
+
+In that case, the image kernel has much less to do to get the device
+to work again.
+
+The caveat is that the image kernel doesn't really know whether or not
+this has been the case.
+
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
+ocumentation/driver-api/pm/devices.rst?id=3Dv6.12#n506
+> mentions .freeze(), .thaw(), .restore(), etc, but the fact that few
+> drivers set those pointers and all the nice macros for setting pm ops
+> (SYSTEM_SLEEP_PM_OPS, NOIRQ_SYSTEM_SLEEP_PM_OPS, etc) only take
+> suspend and resume functions makes me think most drivers must handle
+> hibernation in the same .suspend() and .resume() functions they use
+> for non-hibernate transitions.
+>
+> Since all drivers have to cope with devices needing to be
+> reinitialized after hibernate, I would look around to see how other
+> drivers do it and see if you can do it similarly.
+
+This generally is good advice, but if the platform AML is defective,
+it may not be sufficient.
 
