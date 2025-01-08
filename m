@@ -1,251 +1,187 @@
-Return-Path: <netdev+bounces-156443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9FB7A066E6
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:10:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CC2EA066F2
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB79318894B1
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:10:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D19C160DB7
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EC22054EE;
-	Wed,  8 Jan 2025 21:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211BC202F97;
+	Wed,  8 Jan 2025 21:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oGWJqVpV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="MSiQ3s4s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp-out.freemail.hu (fmfe13.freemail.hu [46.107.16.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A479A2054ED;
-	Wed,  8 Jan 2025 21:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736370391; cv=fail; b=SdlgqjvFdV+r2dWUeDvvrdTuwH7ckpYRshV3yVydyeiAz8QawGPityBK79p0S3z/S5poLz+QkPqSNywoqkid/9VZzqOEx1iyg6N35YFpfznjQIW8eMOKPmWPeXjkMSBymgBpPEJISpRi4dVjNyyyOFB94AXMFJaulAQtC0P2G0A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736370391; c=relaxed/simple;
-	bh=10kd/EUI7fpivOSjdHQ1nzLWmUJOAV/t5YQ1BBLVZCo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qCjhshl7jFknHaoAb0AlaJAKZCLWwcyXqOEfNR3BVn8exMXYZ1+biZF1BGEqVmaFZ2Ybw7DhHalNDLaWf+AcNLpNV/zV4uQ0Oo9C4f6sNZT0fjewh4V5CXaC3OZfpmLR5WHimwT/x8fQotn2KcJq3+M3H8Tja9BcIOLNbA4Vis0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oGWJqVpV; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736370389; x=1767906389;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=10kd/EUI7fpivOSjdHQ1nzLWmUJOAV/t5YQ1BBLVZCo=;
-  b=oGWJqVpVCdfd6r1XbKvddJeHIHB7WYulY+Q5zntgiA8wBKHLF0G/HXBN
-   pyWKS07zLgAbu+Z2l88FBJtojFUtW9G1V0BhYiZFK2wvT5/k38hbWiSSl
-   /y/LuGC7wFE3YaNJ54rK04Kl//jtNMmMscucyjlU3lLWwD7BEYf/h8IGY
-   Wd0MbD2JlokgExGOQt2nf447A+PGfTVrTzM1o17ZnS0oq4wzmSYIatybo
-   5nRGsivJLjETGyek8IW6q0jodyK8WiLUzv+bAiBFj1s3JRtQNk4+/XHIE
-   CPFjXYQzLhzTS+GlA9YKw7WuYmnBhQV0kQINaGfbZ/oT61L0d+gBDdwW3
-   Q==;
-X-CSE-ConnectionGUID: 2QcClLqJR0WzPk16CNJdQg==
-X-CSE-MsgGUID: +iIexdxYRkyjNRV95rOTIw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="47282979"
-X-IronPort-AV: E=Sophos;i="6.12,299,1728975600"; 
-   d="scan'208";a="47282979"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 13:06:28 -0800
-X-CSE-ConnectionGUID: +sBEKH+BR7q0/PsbgY8VBA==
-X-CSE-MsgGUID: nBgVm4GXQ0Otu5SU3oYQpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,299,1728975600"; 
-   d="scan'208";a="103165398"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Jan 2025 13:06:27 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 8 Jan 2025 13:06:27 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 8 Jan 2025 13:06:27 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.175)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 8 Jan 2025 13:06:26 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bX3nZT2IojVY5GQ+T4q3p7W1ZW0LU5kIWM2zb9RDLpMpAOFH/wziV4ct+ufJY70jrBdcj6W4z3f/HcjJTGhcZ8pF7CSxY6wrlAIAlwzJ1LfFBECozKyaf7xMzc8dwbC06T6hbRJZkD1eFuoKGyAaFvSqTjhMFyNLEh5uxdT7j1HkSKH82N5FgFFc2EiMHI5HiKrcIylKfqITn31543Ajp4larD/G9n7vePbebiqwBIDaV0BcJdVaYgvK0YxyfiFZuZPAaom08uuRlQC5DSM0aNITowFVPp5qKltP+/P9E/APW1WWGxkA/uEZMg1FTMh+3YRMu/EyAQ5b+4T2DaZgsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oN+i5PZb7pUBB+YflJAEND4DpaFNQczMSzJbF/5qIeI=;
- b=PJHLMUiIgBqTpb1b1CUwW3pp0xUcgCmIXlBBTY6j6U2F9i5UyH7EMyuWZq1iIbIOOdaEmqyGY/aEJbwEE4CB6IugdaoPv6SbQTHAIYchOUfc/T0va9Gu2mIsJE+IePa/E72x0F0eRBEidQu+aaMryrxEAXQexJklUtsQyHr/HIjqVx9rkr8NcU3HVYKdJUTz9lKOmp/R+H4pFv76Sbx47T/M98v0a9S1JH/jSZ2+CXICDdkk405aNraHu+8zTyW35aTrq4PrlLBedrWefSBDzVfiKPyWcpcwLpaDsWr8Sxle6U8HXSyhwn9XNTbo8wqrDv/6cI6H123CjFzDAbI7BA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by DM4PR11MB7758.namprd11.prod.outlook.com (2603:10b6:8:101::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.11; Wed, 8 Jan
- 2025 21:06:23 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab%7]) with mapi id 15.20.8335.011; Wed, 8 Jan 2025
- 21:06:23 +0000
-Message-ID: <bb5dbf24-ef80-4220-8b07-40eed9ac15ae@intel.com>
-Date: Wed, 8 Jan 2025 13:06:20 -0800
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?Q?Re=3A_=5BQuestion=5D_ixgbe=EF=BC=9AMechanism_of_RSS?=
-To: Haifeng Xu <haifeng.xu@shopee.com>, Edward Cree <ecree.xilinx@gmail.com>,
-	Eric Dumazet <edumazet@google.com>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>, "Kwapulinski, Piotr"
-	<piotr.kwapulinski@intel.com>
-CC: Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller"
-	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>
-References: <da83df12-d7e2-41fe-a303-290640e2a4a4@shopee.com>
- <CANn89iKVVS=ODm9jKnwG0d_FNUJ7zdYxeDYDyyOb74y3ELJLdA@mail.gmail.com>
- <c2c94aa3-c557-4a74-82fc-d88821522a8f@shopee.com>
- <CANn89iLZQOegmzpK5rX0p++utV=XaxY8S-+H+zdeHzT3iYjXWw@mail.gmail.com>
- <b9c88c0f-7909-43a3-8229-2b0ce7c68c10@shopee.com>
- <87e945f6-2811-0ddb-1666-06accd126efb@gmail.com>
- <0d98fed8-38e3-4118-82c9-26cefeb5ee7a@shopee.com>
- <32775382-9079-4652-9cd5-ff0aa6b5fd9e@intel.com>
- <1ade15b1-f533-4cc6-8522-2d725532e251@shopee.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <1ade15b1-f533-4cc6-8522-2d725532e251@shopee.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0262.namprd03.prod.outlook.com
- (2603:10b6:a03:3a0::27) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0F1201264;
+	Wed,  8 Jan 2025 21:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.206
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736370534; cv=none; b=BGBd/vYhSewa9pcB+o7HMuTOkcC0hyjoodjMjpJEwxyOvTPql+Ai+u1Cob9ZRrbQ9/zKzorR3Y37Qp2jmNvaGROudp3lxmehe+yMD8UutrDjks+v7X8S3hTCDT5Fwm7Sxw2zWDRIA7JJi7DJRqDpw1J2K3pNowKUFnARx6gC3YI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736370534; c=relaxed/simple;
+	bh=s9PoHsJJ5uKhGfHi/VLw5n2m/SWLZyx+4nmrvCVINiw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Tq4YEt0O125C6mGfLwuuWl3NETWs2wJmeALcg3vFne2B3HcaGlktj6AiqviXtZxpCDNJADKtROjK4EgyWQy3vhtfTOg63+iS2v8GXbzmHdH7lTVDWdtDpJ6TI8tB9VrFx401FbFgx+T3JIryeJ2wtRk8ChayrmnOhV+Hy6UZ9Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=MSiQ3s4s reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YT0rt5Pyfzt4W;
+	Wed, 08 Jan 2025 22:08:46 +0100 (CET)
+Message-ID: <a42bcc51-255f-4c52-b95c-56e562946d3a@freemail.hu>
+Date: Wed, 8 Jan 2025 22:08:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|DM4PR11MB7758:EE_
-X-MS-Office365-Filtering-Correlation-Id: 999a074a-28ab-4004-043a-08dd30284ec8
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?a1pETU1TV09HZmhyWlhoS0swbUlxZjFYa0VyMERETnpqd2xVdUVYWC9rNVVp?=
- =?utf-8?B?L3VjRnBHTlQwL1h5NlhEOENlU0hkMmRiN0JDa1hoNkJqY29XOUtCZCtVMWI3?=
- =?utf-8?B?dS82Q2dGaWlOczFIN093MDdLVUFrMUpSWjB3WVcyZVlHSVJPaFUyc2w1KzJ1?=
- =?utf-8?B?MEREQWFzZW5HTFpDRWVHK2ppL2UzMnRjS2M5bE54MTlBOCttcThURG1SQTR6?=
- =?utf-8?B?WnZKbGsvdXJKWG5YZXQ1MEVVR1c4YVAyZG1VU0pOb0RnckhFUlRidFU5Szdl?=
- =?utf-8?B?VDNZbFI3bzFITzBVdHpvendEZWpKT29WZXBNYVRxRloxc3RuZU8ya3R5V2Nn?=
- =?utf-8?B?RjB1ajhaSGhMSnN4RHdKV0w3QUpDMkZuUEFDeWxoUGJDYkhtb1J4aGJwbEFQ?=
- =?utf-8?B?Z0J1WUovZ1NrSDhSQ0ZZOG1wTEszR3plMTQwaFBPZ3hJQ2JLV1hyaUlSSkxZ?=
- =?utf-8?B?UVdpK0dsdENiZFZWNHVldzNPQ2pLdGpBTmVmbVhpVXFiN1VCanlEeDRGeG5I?=
- =?utf-8?B?NW1PbU9hM1IvVHlHcm4xemJXSXZBNjJYNjBmNDA5TTJHLzlQOWVid1A3ZmMw?=
- =?utf-8?B?U1FISWN6NGR0dGxpVkFCMzhMTitCQi80T0xncCtjZGR5c1FId25TMzh6S21r?=
- =?utf-8?B?eG5MckZaQ0JHRk50OXQ5UFBzVzdLL2RBTXpILzRDTURNNWFSZno5SUdBV01t?=
- =?utf-8?B?cFN1dnlzUkRudXYrTGdOQTFOUGtOK2VETzNBZVl4dFloTzVESmE2K0lSSzc5?=
- =?utf-8?B?Y1l6WUhBRllVcXRNNG9nVzNlZVBGS3NYUTNUVGN6Um1QT3pmajVpWEF2aFh5?=
- =?utf-8?B?M2Q5MDFhRHFGUlBBMUsvWUZrdTA5dys2WVNzL3Q3S3RVaWFUVTNNVXVkaE5T?=
- =?utf-8?B?dDV2cHNzZ0pabnNHbHFWRXBaeC9LK2Q3V0d0Y0hKVFBuclVrSWFPZCsrV3lM?=
- =?utf-8?B?U3VPSS9mVTdLVzl3ZWlNdlBjK2NKa3BieHdmUFBkbmx5REtYdXEvUE5JYjBD?=
- =?utf-8?B?M3ZsdVZmblh6NG5EanBMN0FNbG1Zd1FOQm55aXBMcS9oY0F1N2JlSnAvOTYw?=
- =?utf-8?B?N2hXTGl0YUlCQjJleGpOTWo4a0IvM0JJOWRSbHdheE1Yb3ZySTZqbHo0OHZ5?=
- =?utf-8?B?TU43OEZacVZIT09oT1dwMUtNUXhWVm1xeXFXZi8vTkZTajB3QkNrVGhwNjds?=
- =?utf-8?B?Q0E0ZlowU0hYQm5PZ2x2NU9Oc0lRVW50aVI1K3VxL0JlZUIrNHRIUjBKYkFK?=
- =?utf-8?B?SlkvSE8weG5vTWhKMjA0MklBTWtoc3kyUXRzZnhmbXVncXhmeWZDTXcyOWFG?=
- =?utf-8?B?WkgxRlJQMjhUbzBNL004RitKTnNua0pZU2ZraGRBcndKZXFoektKbmZuM21Z?=
- =?utf-8?B?WHlBaWkwOHJ6OUt2Q3hYeHY5MEE1clM4ZzJZbXFJZ1NBWjVGWUozcFhINmVX?=
- =?utf-8?B?THZLeVRnM1kzR3J2RzJJSmRsekZiaHhyc2d6UTNNSVBCZnhGNFh2VUxOaENy?=
- =?utf-8?B?bTNhdUN1YzlYbjJtem10T3ljQUEzdjQ3ejFjMnlvdUhDbklVYjBWWTFDM3g3?=
- =?utf-8?B?TFZFVmpjZ0JtcExvZ0gvTjZzSjd6anpBQU80cU5HTkJ4N0lOZnM4R2ZQWFRt?=
- =?utf-8?B?bzhRb3gxbkRMeHBVY0tSUDAxdFZoMno4TkIxMk1YZm1hZ250TDhiS2wzbmZx?=
- =?utf-8?B?azdkTDgyTXFQUUE4dlVub1JzUE00NVZTTWVnbG0vc3QyNzdPdHdLdi9sR25T?=
- =?utf-8?B?QWpCZm9zNThvZUlseXB1ZC8rcTBocGdIc3l0eWVYQXp6UXhHRHY4VXdmdE1W?=
- =?utf-8?B?NHIyWjBHbG9USDFJbkV2VTZWcGJCcjllek4ycWlZMDdHbmRHWGhXdHVNbUgz?=
- =?utf-8?Q?sN/a/j9WyuF+n?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MHhFaG5yQng3blF6Vll2SE9yVWZManFueWc0NU9nRFRtblJZZnIxTjdFaUwy?=
- =?utf-8?B?WFpheE5TVGkwMFRScnZKYS8zQlk3NGRKTFM0UmdUSVduNUV2azJVVTE0V2Va?=
- =?utf-8?B?Qmg5eDVPMXVGS3FsR3BLR3VEc2lQNWF6WVpSVFN0dnlBd3BlWTRsZWVLY2tz?=
- =?utf-8?B?THZaeWxiNW96aldyOFBXWUVPVE1XQUdlK2lScGxJR2xVaEx5SkZzd3JQbE0z?=
- =?utf-8?B?OUhaUW4yWmtScWdrYkRodjRibVR6NU40TCtiSXJTTlhnakJBMDZaUDByQXdl?=
- =?utf-8?B?WFZLTmlvbW54bTZTbHRpSVdZQU5qMFM1d2ZkU3VPMWhJS3dia0E1M0RXNEJz?=
- =?utf-8?B?a3dWNHpsMG9XdmZSZkpzcU5Sa091My96Q01zcUFnSFQyMVFxckxuRmR3WDVa?=
- =?utf-8?B?c0VpVEN6clRsUm1aN0ZDQUpkbm1RYVo5alg4cVJVUUNwbFJJK016MDBXSmov?=
- =?utf-8?B?VnVkUUZVQ25BY3YwR2FEK1BMN2gwbnN0aGEvYWxoQnpBTEcwLzZpR1A0RUlK?=
- =?utf-8?B?SXB4b0tHRTNVQlFUUXlYdkRJRm13Z3IvQWNVUURaOVVXcTJDaXlpR2M1dWdG?=
- =?utf-8?B?R2FHc2VhQ3lXNmVZNXJNa2RSQk9GSmhzTE16WWZTbU1WMVBtUmd1YmNJejVC?=
- =?utf-8?B?aUxmWTlRTTlsRGtvS3ZUbnFGbGxnVUxHWnFWQnBocndsL0pCZHFoZ3l5OHpp?=
- =?utf-8?B?Tk1tQTRWSlhJZ2VyUysxMmJmMGlPVW01eDg0K0phckt1bHVUeE9tOVV1ZnZH?=
- =?utf-8?B?bEtaSlpjK01pS3I0VlVjWUdoejE4RjNiSURXb0FKYVBCYXg4RVkyMTR0WkpJ?=
- =?utf-8?B?ZFNubmJCaEpVNEp5ZkhPT3NyWGdyUkNVNTBabVVLbVUrSWdvMXZtSWVuZUwv?=
- =?utf-8?B?bFVpaEg0amxEVllqUEY0cWtRbkRWSjNIRHk0b0RDMmFrOFI5QmZaL1ErVCtl?=
- =?utf-8?B?MEdYN2lva2txZXNva1c4SnRRVzl1SmpEbVNBVWxIVkErbHA5YVdRcEhHMEFH?=
- =?utf-8?B?aTlxN09iVjFsWnJieE82UXRKWVJ5SzFWMUFkQkRTS005bUxCaXVuNW1lY2lj?=
- =?utf-8?B?SXFDWEw1RzRPNTJwOEFDMFpoNXU1WUk2RjRudWIxOUhROUxtd1g1d1VEVGRy?=
- =?utf-8?B?eFhBTHlJVTcwR1AyVmxUUEtvYlZiSW54blFjWmNBcmhKYU53dFhucld3ekg4?=
- =?utf-8?B?SGxFVEVUMElFR0lvZ1czck9lbnRwWTFIYkhDTEsrM1FoUW0wazB4Um02VTF1?=
- =?utf-8?B?SVRMeDNaaEZVNmVhbHJLR1J5VW01d3BzYWNHd1VBaE4vc1FBNEdORisrVWtE?=
- =?utf-8?B?QnVuZ3hYMDJ2WXJkL1JydWpxWU51R0M0Z0p2ZXZsV3VxcjBoQUlZR1VIcUtB?=
- =?utf-8?B?Tmowb0Z6ZzRnSEdUeEZtUW1qZjBNT1lzNUFSZ1kyRzBlYjZHNUl1SmNhK1ZG?=
- =?utf-8?B?SU5CM1lsNFFXUlpoMnpVNGpvYmN6dWhQWGk0aGdXNlVJWHRLNjEyWG9KV3c2?=
- =?utf-8?B?bldEZEgyVzcxanAvTHlwLzY3bjViMGRJZkNjR0FmQUs5bG9CUXh3UUJOMVpZ?=
- =?utf-8?B?ZTlKK0Y3MzJHa0pWdUNRUC92SWZ3UjNSVUVnaHNteFFHQkF6dENKWHZVK01O?=
- =?utf-8?B?cXFKcUxKcFNTWThsOS9mTjIrRUlCUHI1ckhLTmkzNzk3YzNHRm0vRkVsVlVk?=
- =?utf-8?B?RzhKQWdzVkhyZlY4UGp6SnlkRFkzMU9ycksrOUU2NW5aV0RaQmJjaGpUK24v?=
- =?utf-8?B?YXJOalE1MFEvNUdqaVBlVWg4R3B2cDhJRkY2cGRsWCtNYVVwNjhwYjBXTm56?=
- =?utf-8?B?azh1S2lGNWZTUmFFSHozWjk2VmNESVF1WWN3ODc1SVlZN0lmVmxSRHVnT2Jz?=
- =?utf-8?B?YmYrV2pqQngzOHFoWHVWWm92cXlwMk4zOEYycDNSaUJ2dG1oSEVOTWxXNGZo?=
- =?utf-8?B?WUZPK05maTEyT2lid3B1S0drcmFEQUpSaURXNnZDcHhjWVQxMmNxNkd1SENo?=
- =?utf-8?B?Q1VSMzR0SGN0SnBROVQ4YlFFVks2ak9HU0Roc2ZNLzJJNTcxNzVqWHhHbEdr?=
- =?utf-8?B?cXRaMGZOeHZPS1dmaGltLzFxRmVGQnR0MTJJRkdXTm85R3VCZEQ3cGhkYlFs?=
- =?utf-8?B?dlowT3JIbEJidUNaMUVqQmRNRkpiMVRoRHlyZ1RzK0syWW9tMUNGQUhuMGhM?=
- =?utf-8?B?bVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 999a074a-28ab-4004-043a-08dd30284ec8
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2025 21:06:23.6986
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IDSmd4ayJaOQuL0Mhsx3fBnuaRluwe5NJ4L8nFyVdZaYJKbLyHt1V2iwCfIgmkVEvwE2yi0e4quzydGs9M1kZ36yKZPvkqFvuwbJXyunO18=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7758
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/10] netfilter: x_tables: Merge xt_DSCP.h to xt_dscp.h
+To: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org,
+ amiculas@cisco.com, David Miller <davem@davemloft.net>, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250107024120.98288-1-egyszeregy@freemail.hu>
+ <20250107024120.98288-2-egyszeregy@freemail.hu>
+ <4fab5e14-2782-62d2-a32d-54b673201f26@netfilter.org>
+ <98387132-330e-4068-9b71-e98dbcc9cd40@freemail.hu>
+ <d7190f89-da4d-40df-2910-5e87ca3cd314@netfilter.org>
+Content-Language: hu
+From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
+In-Reply-To: <d7190f89-da4d-40df-2910-5e87ca3cd314@netfilter.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736370527;
+	s=20181004; d=freemail.hu;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	l=4393; bh=bwRFfAxn+bHMRLWLMvqlcQcWt6ReJU6wnM30CnTqbbY=;
+	b=MSiQ3s4sHVu5bOQewuTHu8e5w14H3sNlPsjqWrW1Wty7562/A2H9YhTSoGYj7TGO
+	Tz3toogikjhh5rN/89+x6jI+nccRzKHkepo/4TmhC+pQ/FRbEhxB6S2l4bdO6WkFd0h
+	6X+DO55zoe471eMyT51ZMMH0AOhdhQLuYUBUwNAsmi7mM4qYp6rUsRIWshE46FuAWns
+	0aBSDNyBOddJp4ZqOGraIgY1kW8BiJtKnIg4AMIgP72RhfBHLag0ZgEcbbwOpLhm9mc
+	RbtBAXfng7UxdYJkiY51hNLcGoVwBKYN1gEyz+ktstbS+YFPxEfMsKcur7+DN/Yz1AU
+	tZkeAg5RAA==
 
-
-
-On 1/7/2025 7:36 PM, Haifeng Xu wrote:
+2025. 01. 08. 21:11 keltezéssel, Jozsef Kadlecsik írta:
+> On Tue, 7 Jan 2025, Szőke Benjamin wrote:
 > 
-> 
-> On 2025/1/8 01:16, Tony Nguyen wrote:
-
-...
-
+>> 2025. 01. 07. 20:23 keltezéssel, Jozsef Kadlecsik írta:
+>>> On Tue, 7 Jan 2025, egyszeregy@freemail.hu wrote:
+>>>
+>>>> From: Benjamin Szőke <egyszeregy@freemail.hu>
+>>>>
+>>>> Merge xt_DSCP.h to xt_dscp.h header file.
+>>>
+>>> I think it'd be better worded as "Merge xt_DSCP.h into the xt_dscp.h
+>>> header file." (and in the other patches as well).
 >>
->> What's your ntuple filter setting? If it's off, I suspect it may be the Flow Director ATR (Application Targeting Routing) feature which will utilize all queues. I believe if you turn on ntuple filters this will turn that feature off.
+>> There will be no any new patchset refactoring anymore just of some
+>> cosmetics change. If you like to change it, feel free to modify it in my
+>> pacthfiles before the final merging. You can do it as a maintainer.
 > 
-> Yes, our ntuple filter setting is off. After turning on the ntuple filters, I compare the delta of recieved packets,
-> only 0~15 rx rings are non-zero, other rx rings are zero.
+> We don't modify accepted patches. It rarely happens when time presses and
+> even in that case it is discussed publicly: "sorry, no time to wait for
+> *you* to respin your patch, so I'm going to fix this part, OK?"
 > 
-> If we want to spread the packets across 0~62, how can we tune the NIC setting?
-> we have enabled 63 rx queues, irq_affinity and rx-flow-hash, but the 0~15 cpu
-> received more packets than others.
+> But there's no time constrain here. So it'd be strange at the minimum if
+> your submitted patches were modified by a maintainer at merging.
+> 
+> Believe it or not, I'm just trying to help to get your patches into the
+> best shape.
+>   
 
-As Jakub mentioned earlier, HW RSS is only supported on this device for 
-16 queues. ATR will steer bi-directional traffic to utilize additional 
-queues, however, once its exhausted it will fallback to RSS, which is 
-why CPUs 0-15 are receiving more traffic than the others. I'm not aware 
-of a way to evenly spread the traffic beyond the 16 HW supported RSS 
-queues for this device.
+Holyday session is end, i have no time to refactoring and regenerate my patchset 
+in every day, because you have a new idea about cosmetics changes in every next 
+days. (this is why asked you before what you like to get, there was no any answer)
+If you feel it is need, you can solve it as a maintainer, i know. If you found 
+any critical issue i can fix it later, please start to look for them, but i will 
+not waste my time with this usless commit name and header comment changes, 
+sorry. It is a hobby, i am not a paied Linux developer which is supported by a 
+company for this stuff.
 
-Thanks,
-Tony
+As a maintainer you can solve this cosmetics things later in an extra patch or 
+before the merging, lets do it.
 
-> Thanks!
+>>>> -#ifndef _XT_DSCP_H
+>>>> -#define _XT_DSCP_H
+>>>> +#ifndef _UAPI_XT_DSCP_H
+>>>> +#define _UAPI_XT_DSCP_H
+>>>
+>>> In the first four patches you added the _UAPI_ prefix to the header
+>>> guards while in the next three ones you kept the original ones. Please
+>>> use one style consistently.
+>>
+>> Style consistently is done in the following files:
+>>
+>> - All of xt_*.h files in uppercase name format (old headers for "target")
+>> - All of xt_*.h files in lowercase name format (merged header files)
+>>
+>> Originally, in these files there was a chaotic state before, it was a
+>> painful for my eyes, this is why they got these changes. In ipt_*.h
+>> files the original codes got a far enough consistently style before,
+>> they was not changed.
+>>
+>> In my patchsets, It's not my scope/job to make up for the
+>> improvements/refactoring of the last 10 years.
+> 
+> But you are just introducing new inconsistencies:
+> 
+> --- a/include/uapi/linux/netfilter/xt_dscp.h
+> +++ b/include/uapi/linux/netfilter/xt_dscp.h
+> ...
+> -#ifndef _XT_DSCP_H
+> -#define _XT_DSCP_H
+> +#ifndef _UAPI_XT_DSCP_H
+> +#define _UAPI_XT_DSCP_H
+> 
+> however
+> 
+> --- a/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
+> ...
+>   #ifndef _IPT_ECN_H
+>   #define _IPT_ECN_H
+> 
+> Why the "_UAPI_" prefixes are needed in the xt_*.h header files?
+> 
 
+Because it is in the UAPI region, don't you hear about the namespace? It is not 
+only relevant for OOP languages.
+https://www.educative.io/answers/what-is-a-namespace
+
+Here is a good any nice example which also got _UAPI prefix in Linux kernel 
+source: 
+https://github.com/torvalds/linux/blob/master/include/uapi/linux/iio/buffer.h
+
+By the way, in the API folder, all header should have have had a prefix 
+otherwise it can cause conflict with a same non-uapi header like these:
+include/net/netfilter
+/xt_rateest.h -> 
+https://github.com/torvalds/linux/blob/master/include/net/netfilter/xt_rateest.h
+include/uapi/linux/netfilter
+/xt_rateest.h -> 
+https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter/xt_rateest.h
+
+In ipt_*.h, include guards are consistent (where i did any changes) but sure 
+they should have to got that _UAPI prefix also. But this is not the scpoe in my 
+patch, to rafectoring the full netfilter part of the UAPI in Linux, sorry. 
+Please sit down and do it as a maintainer, there were no any relevant 
+refactoring in the past 10 years in this code parts.
+
+> Best regards,
+> Jozsef
 
 
