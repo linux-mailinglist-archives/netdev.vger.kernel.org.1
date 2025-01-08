@@ -1,120 +1,109 @@
-Return-Path: <netdev+bounces-156376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C53D4A06347
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 18:25:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1B13A0637F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 18:32:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4B2B16087D
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:25:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1EA73A4D5B
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A401FFC70;
-	Wed,  8 Jan 2025 17:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF45201021;
+	Wed,  8 Jan 2025 17:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KfuwB3OR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dHciAqjY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07D518D
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 17:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5592F1A2541;
+	Wed,  8 Jan 2025 17:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736357103; cv=none; b=lqufJ122I1dOFrxNGoY6fI/e/1+UWVVMLUEv+qQ6Ky+DYd7OVYz4dXegDwlkGGXJIJ0ya0ujduDaU5cByfTA56PDTm1a7sTGTz3bDhdAxw8x+NAaSi3mRnBCDtzJ/puKX7mt6BQziYuF1VVE78hyKRbSq4zwYJurb8jEKpscjYg=
+	t=1736357501; cv=none; b=e3K7HSH1ColxvRm7q1LA5N+ebyq0UT25YSvEp39h5jMDufWKMZAT+S392H1Xk2acbXVMLNDi99pJfqdkau4NKt107oigXZqPoQYX7xiV3OmqLVHbqsv2fkCEmrRuEs5QfT4Lzbt9OGbWUqT1mezrv9SXN8tPiZURcHxlVC4QJYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736357103; c=relaxed/simple;
-	bh=yRNvVFqPhMWRzi/KbLrkLxw8x8RSOT11oTmE10plhfw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZayqMUmJG/CQymFC+dc8bN9AzBy+FkmuQzckYbtALaV2vBahirTFJ5PLmckPOh+7vEDrCRTsoMe9fLk8+gMY5SouuoliYm+Ethf8fS5FyAUQXOz4UZuLQFnvV+F2eJKRwnYOIXU9NJdW3zXngPqCBwv+D7m7T6issHI1SP6vyUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KfuwB3OR; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-304e4562516so247281fa.1
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 09:25:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736357100; x=1736961900; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yRNvVFqPhMWRzi/KbLrkLxw8x8RSOT11oTmE10plhfw=;
-        b=KfuwB3ORDHs/3HlcKUk0Wpeg2knfuAYNNjc4/KW6gkmUzlpF44RJvOIraRMXdK/3Ta
-         NyPpijAs9d6i8bcdZrRQZh9tNVouJs3SB5/P8bmthokhLLJTFkKy1YnTnQaa1vvNKll7
-         6ahVdJQ16h6gkHXPfUKW8JX18VDCghL68MP60=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736357100; x=1736961900;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yRNvVFqPhMWRzi/KbLrkLxw8x8RSOT11oTmE10plhfw=;
-        b=aPfVF1ptgJshIcdCTomsutqwI9FGPAxlo9rN+aasUmlKmEHntkOnr+BhbFKAJSy9KN
-         h7cgxTM3HheIQk59pdzRRVsgLQLd7VSG9Z64ZsjQPvFGGISCAZ1TLlvhoea09OtVqn3Q
-         R1S5J47x4VG8vo/aQuFmGNIP1iueb4ggBDf7GKOQowGRWRGBEZkxjY8QJ8Kl7pvRLQZB
-         DVYytGfTWA1OhZj3/mBUwWrp0hRZLRsbU89ARp6dZRVyEPq08ibAVM9zeZilbfjSLNd6
-         irmYtuvjNHhZ36yLU9Ca8BoDwJy0x01G9vmYhxCXperVJnobwsBlmoY7t0TfvvwJKHSS
-         n+ig==
-X-Forwarded-Encrypted: i=1; AJvYcCWXf3/eZb+6gLZQXTXjieSxXDLlEFPQOcXe/Qpn30KUN+Kcd6QeO4BS5mc+dsKQin7D5yPRzl0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAs4/y5GkN0lTHc+dsu6dkqEM+rO3L1KMEid0BJWziKY+gupUY
-	xgOoDJB1N0frQEsH5+HwvIpkMtz/cjTq4OYmUc2j8E+QzTPnGgElpUvEv1TiQAH98BxQUWrG8YI
-	MI/MKp3yqHkMVhL99+wOtTThCkSKc+fgZSSiVHD6NMqsp6rpwFxFN2SUn1yhiJbDurY8ea6ZwKO
-	BS5CqGZ5NNCPkmDOjRFQ==
-X-Gm-Gg: ASbGncsjDzpAQ4ZXnZKQUBXf30anGbX+Lnn91o1+Mr1BTqlyeywmc1YY691Kp8e454n
-	1bWMtvQ8w+mdxjHYwpgWKwvwRouNkZ7buDNrGuV0=
-X-Google-Smtp-Source: AGHT+IGvPYRme0fQyQ3G0E4/27vS2ohN+pn1erZ7u0IxAI1HxDJo/Z7EQpzmyH+f6ITeZXqI+Pvwkm/Bd/rSn9gf728=
-X-Received: by 2002:a05:651c:1993:b0:2ff:b8f5:5a17 with SMTP id
- 38308e7fff4ca-305fcfcd638mr436811fa.5.1736357100094; Wed, 08 Jan 2025
- 09:25:00 -0800 (PST)
+	s=arc-20240116; t=1736357501; c=relaxed/simple;
+	bh=nFNghkqYK0OyBrmna6riJjtdRf/DJ2kks0ygjdBlGVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SdVuEVCtu9hO2jJQ4QF/RHTNX6uHNrJozYhfwYlrTxx5JYmUmx9RTjElJn3iH/uV3hkyIxgjRg0kNkCOL6vzggd0ANi90za6VMeX+Q8gIkfuTnFJFOmEioi8/mVAELz+elq+KP2sjCSbO9dQM2H9a4Za/AGCewQuNRKgVpDMTpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dHciAqjY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17A24C4CED3;
+	Wed,  8 Jan 2025 17:31:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736357500;
+	bh=nFNghkqYK0OyBrmna6riJjtdRf/DJ2kks0ygjdBlGVE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dHciAqjYDmfJ4f1GrLA+k2mHdvH/PcVoEoaHp5l6oKUNCl2H/rGngM0bwH32RiDGA
+	 RKqyu4tcA5nz7uUemz8c9pBwQy5/Yl8okpkaljtV2r2hG4AolL+jj/8d3xoqFgJj/k
+	 A8Gm9TIsj/lz+b3kQ9boVv/nZhWvr6TKHL4QkMBonYptSr9cZeQpQoKuXcOHybpkHo
+	 e98f1a4tvA5J5nyWISRW/K9JoOD2UBjXudUvXF9tlj/7wrEctr/u5Qqq3QhEk/fT8p
+	 UuTt5BSsN/f7ZpDAzFwxdIWvEiqXFx0/T5vxvOySo2ialJKoOi0JYP1ThEhqIye8Rl
+	 dB8lzKIIuuacA==
+Date: Wed, 8 Jan 2025 09:31:39 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xiao Liang <shaw.leon@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Kuniyuki
+ Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ido
+ Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
+ <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
+ linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
+ osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
+ linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+ linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
+ bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7 02/11] rtnetlink: Pack newlink() params into
+ struct
+Message-ID: <20250108093139.126716e9@kernel.org>
+In-Reply-To: <CABAhCORV_s9m-EJ8914zUXCXt6O_e1wsaOVdSKUtm0Rbvc4orQ@mail.gmail.com>
+References: <20250104125732.17335-1-shaw.leon@gmail.com>
+	<20250104125732.17335-3-shaw.leon@gmail.com>
+	<20250107123805.748080ab@kernel.org>
+	<CABAhCORV_s9m-EJ8914zUXCXt6O_e1wsaOVdSKUtm0Rbvc4orQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250105213036.288356-1-atomlin@atomlin.com> <20250106154741.23902c1a@kernel.org>
- <031eafb1-4fa6-4008-92c3-0f6ecec7ce63@broadcom.com> <20250106165732.3310033e@kernel.org>
- <2f127a6d-7fa2-5e99-093f-40ab81ece5b1@atomlin.com> <20250107154647.4bcbae3c@kernel.org>
- <CAP1Q3XQ_Fubke4=SYrFkaiJj0RHB99ehdMedMVDTFtRS6R_RCw@mail.gmail.com>
-In-Reply-To: <CAP1Q3XQ_Fubke4=SYrFkaiJj0RHB99ehdMedMVDTFtRS6R_RCw@mail.gmail.com>
-From: Ronak Doshi <ronak.doshi@broadcom.com>
-Date: Wed, 8 Jan 2025 09:24:43 -0800
-X-Gm-Features: AbW1kvaT4vpj2C2Wax1_P6eksCuaLMSrK-0ALBseaNYTGAnBJ9b1bN50fBoSi6Y
-Message-ID: <CAP1Q3XTK0kP0hE_f1Y-tsQdCSToW9gkQJA2TMJwFh4v+zAhM7w@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/1] vmxnet3: Adjust maximum Rx ring buffer size
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Aaron Tomlin <atomlin@atomlin.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, bcm-kernel-feedback-list@broadcom.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 7, 2025 at 3:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Wed, 8 Jan 2025 16:36:26 +0800 Xiao Liang wrote:
+> On Wed, Jan 8, 2025 at 4:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+> >
+> > On Sat,  4 Jan 2025 20:57:23 +0800 Xiao Liang wrote: =20
+> > > -static int amt_newlink(struct net *net, struct net_device *dev,
+> > > -                    struct nlattr *tb[], struct nlattr *data[],
+> > > -                    struct netlink_ext_ack *extack)
+> > > +static int amt_newlink(struct rtnl_newlink_params *params)
+> > >  {
+> > > -     struct amt_dev *amt =3D netdev_priv(dev);
+> > > +     struct netlink_ext_ack *extack =3D params->extack;
+> > > +     struct net_device *dev =3D params->dev;
+> > > +     struct nlattr **data =3D params->data;
+> > > +     struct nlattr **tb =3D params->tb;
+> > > +     struct net *net =3D params->net;
+> > > +     struct amt_dev *amt; =20
+> >
+> > IMHO you packed a little too much into the struct.
+> > Could you take the dev and the extack back out? =20
+>=20
+> Sure. I thought you were suggesting packing them all
+> in review of v3...
 
->This driver seems to read the default size from the hypervisor, is that
->the value that is too large in your case?
-The default should be 128 which is way less than max value.
+Sorry about that, I wasn't very clear :(
 
-Thanks,
-Ronak
+What I had in mind was similar to how we define ethtool ops,
+(especially the more recent ones which have extack)
+for example:
 
---=20
-This electronic communication and the information and any files transmitted=
-=20
-with it, or attached to it, are confidential and are intended solely for=20
-the use of the individual or entity to whom it is addressed and may contain=
-=20
-information that is confidential, legally privileged, protected by privacy=
-=20
-laws, or otherwise restricted from disclosure to anyone else. If you are=20
-not the intended recipient or the person responsible for delivering the=20
-e-mail to the intended recipient, you are hereby notified that any use,=20
-copying, distributing, dissemination, forwarding, printing, or copying of=
-=20
-this e-mail is strictly prohibited. If you received this e-mail in error,=
-=20
-please return the e-mail to the sender, delete it from your computer, and=
-=20
-destroy any printed copy of it.
+	int	(*set_mm)(struct net_device *dev, struct ethtool_mm_cfg *cfg,
+			  struct netlink_ext_ack *extack);
 
