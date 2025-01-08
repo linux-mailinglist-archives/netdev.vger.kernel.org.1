@@ -1,405 +1,200 @@
-Return-Path: <netdev+bounces-156491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78F61A0681D
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 23:19:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00E47A06858
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 23:33:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB7E93A6DCF
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:19:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF01F162F37
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7AE52054FA;
-	Wed,  8 Jan 2025 22:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED2C1F0E3F;
+	Wed,  8 Jan 2025 22:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vv/YuuUB"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y7hv7dbW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0304204F92
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 22:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB3A19EEBF;
+	Wed,  8 Jan 2025 22:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736374693; cv=none; b=nKlx5DH2++92LKsQ2/0lHNN2jDbEEgpJhWpq/1HhCG7spoyHzY9t1RctQe049ObMWQ7N0csZiAqYcokNlEDdk92xZMucAPvQzVBJGJrxN8FYNSsiF0KODlRdT19mgkKXGw1StE3g8k5nDKVFRMkkydw8G6m1oD5rb9de9jgp89o=
+	t=1736375602; cv=none; b=FO9CFlZU3fx8wwzphk2WyyEDVV2R5viCFpGZ+dqRnYttOnjqHQsml/pbggXoC0GJ48NHmnOWFc+koaFDzpOo6je0mDgwuvnEMMUX3dExWiVpSTyR4E6IaIuQNL243w4qTv5ckbONLYv486N0j3NHvfIVhR1CJR28KHLmrKyeYqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736374693; c=relaxed/simple;
-	bh=McVEnz09qzPBFdQHW7bcadVB8XH6h/iW1kpCgnOr0IY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Onr+q1fJSG9BuJ1mk37+7vYYrFdgrzcy2O7wNaUP3rrCPvDhpCfnJT9egFVL2FLFKc+Hm8nBv+yzBH19PZej7xpkf4qxTy+fZtGTI2v4Ncy/yJLtTVeZMdNtMW2ZfvrkfeH5R8y5uJfKpz6FvXlZsuQPQpSlS4FDdMfO83hgFjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vv/YuuUB; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736374692; x=1767910692;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=McVEnz09qzPBFdQHW7bcadVB8XH6h/iW1kpCgnOr0IY=;
-  b=Vv/YuuUBX/PfZ5OPHF+meKggZTND2xC1cVzkGqCDUSYlNjfYqMxzem10
-   waXcHgGpqwT5qXwuiSLclytc+jTCJoJTHlnVFxNfRUdlUlyKcSjekad+M
-   7m4hWN14SX2rFBBDlIKk5Tr2VBc4upE+rcYn1REQSgwBB+ut05u6SvLdw
-   pRddRFFa56q8u6d8Nmif0MKCmSZ/Gwfz6rs7OkyvYErkdsnaapERUvgdN
-   elEaHbzQsqo56+esR8oeXBkutj++Lwpql5v1YG86+gKgbColGMwaE+2YL
-   cnABN9fiWZYBbq/y/WHy8qJh7wjsjcv/seW3ETQoDwewzEy+lJlKbEoJz
-   Q==;
-X-CSE-ConnectionGUID: 0P4APMRkSwORWMORUG7lSg==
-X-CSE-MsgGUID: kWQb8Nr/QkaVJjUvyH5gaA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="40384720"
-X-IronPort-AV: E=Sophos;i="6.12,299,1728975600"; 
-   d="scan'208";a="40384720"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 14:18:04 -0800
-X-CSE-ConnectionGUID: quDQWXbPTviWy6Y9EHLMmg==
-X-CSE-MsgGUID: nVg6K1kbQuSIBJlL+VwzsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="140545146"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa001.jf.intel.com with ESMTP; 08 Jan 2025 14:18:04 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Karol Kolacinski <karol.kolacinski@intel.com>,
-	anthony.l.nguyen@intel.com,
-	richardcochran@gmail.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Sunitha Mekala <sunithax.d.mekala@intel.com>
-Subject: [PATCH net-next 13/13] ice: Add in/out PTP pin delays
-Date: Wed,  8 Jan 2025 14:17:50 -0800
-Message-ID: <20250108221753.2055987-14-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250108221753.2055987-1-anthony.l.nguyen@intel.com>
-References: <20250108221753.2055987-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1736375602; c=relaxed/simple;
+	bh=fvJCixGmHFVLT7pMQvqNZbSTMI7Q/NWxHe31Oi8ZWro=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z/uRL+7L/mIIeL4EBxaWTUcD1qMOMDJDxaTjGHT/OQWANSwdsiBKs9jDj9+P+WlE+W36YgFvwC7Yqv9GaAPRhG5PHtJ67WW/HU8eCCk+tSeKb5AimaJrWxgwAQ7l3e8Uyij8gzrz/E137Y91ftNPkG9LJ7+f2ANGV7hFQwAfQvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y7hv7dbW; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 508Eq5hO017974;
+	Wed, 8 Jan 2025 22:31:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=KlRCuG
+	PMlwejbHsntRyxIV2YbKHWZVl6PpAh0SlJ7uk=; b=Y7hv7dbWvdQz7PK+ZEV0Yt
+	68MJwPffxgt3I7dOB4MMEgHpvTwa+nfyXdn0yITIRovp3+6ofQsxi0KDFXfPdDzs
+	RAnIfGdy+dd2+3HKp0FPC9A8Trw+E4lCP1AeDhtbc3e9YKsj2CxA4D+o8d/Elh3s
+	30ekYqllsNpooSgPNN97PoM+7GASKgvUd7JZHVSBpxZN7Pi9uqlPI4SE9azFTdE8
+	ZuQ/03szX3Bh2VBObAMLs2aRTWsTLszu4c9ELDZ39QI3KwftgmuGE9LPAwFEfNmj
+	ZMN52e2C7A+Xu1e9dCOFM8Bnky0J9xoHiCZ+2dVfH1/CC3jBwo12PDCgrcgDMx6A
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441huc4uj1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 22:31:34 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 508MSagq026621;
+	Wed, 8 Jan 2025 22:31:34 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441huc4uhv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 22:31:33 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 508Jx6pX003572;
+	Wed, 8 Jan 2025 22:31:32 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yfata8nv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 22:31:32 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 508MVWUL54854004
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Jan 2025 22:31:32 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 263FE5806B;
+	Wed,  8 Jan 2025 22:31:32 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5DC925804E;
+	Wed,  8 Jan 2025 22:31:29 +0000 (GMT)
+Received: from [9.61.139.65] (unknown [9.61.139.65])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  8 Jan 2025 22:31:29 +0000 (GMT)
+Message-ID: <b2aec97b-63bc-44ed-9f6b-5052896bf350@linux.ibm.com>
+Date: Wed, 8 Jan 2025 16:31:28 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/10] ARM: dts: aspeed: system1: Add RGMII support
+To: Andrew Lunn <andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "andrew@codeconstruct.com.au" <andrew@codeconstruct.com.au>,
+        "conor+dt@kernel.org" <conor+dt@kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "eajames@linux.ibm.com" <eajames@linux.ibm.com>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "joel@jms.id.au"
+ <joel@jms.id.au>,
+        "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "minyard@acm.org" <minyard@acm.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "openipmi-developer@lists.sourceforge.net"
+ <openipmi-developer@lists.sourceforge.net>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "ratbert@faraday-tech.com" <ratbert@faraday-tech.com>,
+        "robh@kernel.org" <robh@kernel.org>
+References: <SEYPR06MB5134CC0EBA73420A4B394A009D122@SEYPR06MB5134.apcprd06.prod.outlook.com>
+ <0c42bbd8-c09d-407b-8400-d69a82f7b248@lunn.ch>
+Content-Language: en-US
+From: Ninad Palsule <ninad@linux.ibm.com>
+In-Reply-To: <0c42bbd8-c09d-407b-8400-d69a82f7b248@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: uaFUIc6cD4X9PAgDaJFKrNEJKqlvTD0C
+X-Proofpoint-GUID: 6xbf0HjJ6pVuQmMW_ljUl1BLsijg_a4W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ spamscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0 mlxlogscore=999
+ bulkscore=0 mlxscore=0 malwarescore=0 adultscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501080184
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
+Hello Andrew & Jacky,
 
-HW can have different input/output delays for each of the pins.
+On 1/8/25 11:52, Andrew Lunn wrote:
+>>> Does the mac0 TX clock have an extra long clock line on the PCB?
+>>>
+>>> Does the mac1 TX and RX clocks have extra long clock lines on the PCB?
+>>>
+>>> Anything but rgmii-id is in most cases wrong, so you need a really
+>>> good explanation why you need to use something else. Something that
+>>> shows you understand what is going on, and why what you have is
+>>> correct.
+>> Here I'll add some explanation.
+>>
+>> In our design, we hope the TX and RX RGMII delay are configured by our MAC side.
+>> We can control the TX/RX RGMII delay on MAC step by step, it is not a setting to delay to 2 ns.
+>> We are not sure the all target PHYs are support for RX internal delay.
+>>
+>> But ast2600 MAC1/2 delay cell cannot cover range to 2 ns, MAC 3/4 can do that.
+>> Therefore, when using ast2600 MAC1/2, please enable the RX internal delay on the PHY side
+>> to make up for the part we cannot cover.
+>>
+>> Summarize our design and we recommend.
+>> AST2600 MAC1/2: rgmii-rxid
+>> (RGMII with internal RX delay provided by the PHY, the MAC should not add an RX delay in this
+>> case)
+>> AST2600 MAC3/4: rgmii
+>> (RX and TX delays are added by the MAC when required)
+>>
+>> rgmii and rgmii-rxid are referred from ethernet-controller.yaml file.
+> O.K, so you have the meaning of phy-mode wrong. phy-mode effectively
+> described the PCB. Does the PCB implement the 2ns delay via extra long
+> clock lines or not. If the PCB has long clock lines, phy-mode is
+> 'rgmii'. If the PCB does not have long clock lines, 'rgmii-id' is
+> used, meaning either the MAC or the PHY needs to add the delays.
+>
+> The MAC driver is the one that reads the phy-mode from the DT, and
+> then it decides what to do. 95% of linux MAC drivers simply pass it
+> direct to the PHY. If the phy-mode is 'rgmii', the PHY does nothing,
+> because the PCB has added the delays. If it is rgmii-id, it adds
+> delays in both directions. This works, because nearly very RGMII PHY
+> on the market does support RGMII delays.
+>
+> There is however a very small number of MAC drivers which do things
+> differently. Renesas produced an RDK with a PHY which could not do
+> delays in the PHY, and so were forced to do the delays in the
+> MAC. Please look at how the ravb driver works. If the PCB does not add
+> the delays, rmgii-id, the MAC driver adds the delays. It then masks
+> the phy-mode it passes to of_phy_connect() back to 'rgmii', so that
+> the PHY does not add any delays. If the PCB did add the delays,
+> 'rgmii', the MAC driver does not add delays, and it passed rgmii to
+> the PHY driver, and it also does not add delays.
+>
+> So, your MAC driver is broken. It is not correctly handling the
+> phy-mode. First question is, how many boards are there in mainline
+> which have broken phy-modes. If this is the first board, we can fix
+> the MAC driver. If there are already boards in mainline we have to be
+> much more careful when fixing this, so as not to regress boards which
+> are already merged.
 
-Currently, only E82X adapters have delay compensation based on TSPLL
-config and E810 adapters have constant 1 ms compensation, both cases
-only for output delays and the same one for all pins.
+There are around 11 boards in Aspeed SOC with phy-mode set to "rgmii" 
+(some of them are mac0&1 and others are mac2&3). "rgmii-rxid" is only mine.
 
-E825 adapters have different delays for SDP and other pins. Those
-delays are also based on direction and input delays are different than
-output ones. This is the main reason for moving delays to pin
-description structure.
+No one in aspeed SOC using "rgmii-id".
 
-Add a field in ice_ptp_pin_desc structure to reflect that. Delay values
-are based on approximate calculations of HW delays based on HW spec.
-
-Implement external timestamp (input) delay compensation.
-
-Remove existing definitions and wrappers for periodic output propagation
-delays.
-
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c      | 82 +++++++++++--------
- drivers/net/ethernet/intel/ice/ice_ptp.h      |  2 +
- .../net/ethernet/intel/ice/ice_ptp_consts.h   | 12 ---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   | 23 ------
- 4 files changed, 49 insertions(+), 70 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index c03db3d26c3d..3eef0fea0c80 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -16,28 +16,28 @@ static const char ice_pin_names[][64] = {
- };
- 
- static const struct ice_ptp_pin_desc ice_pin_desc_e82x[] = {
--	/* name,        gpio */
--	{  TIME_SYNC, {  4, -1 }},
--	{  ONE_PPS,   { -1,  5 }},
-+	/* name,        gpio,       delay */
-+	{  TIME_SYNC, {  4, -1 }, { 0,  0 }},
-+	{  ONE_PPS,   { -1,  5 }, { 0, 11 }},
- };
- 
- static const struct ice_ptp_pin_desc ice_pin_desc_e825c[] = {
--	/* name,        gpio */
--	{  SDP0,      {  0,  0 }},
--	{  SDP1,      {  1,  1 }},
--	{  SDP2,      {  2,  2 }},
--	{  SDP3,      {  3,  3 }},
--	{  TIME_SYNC, {  4, -1 }},
--	{  ONE_PPS,   { -1,  5 }},
-+	/* name,        gpio,       delay */
-+	{  SDP0,      {  0,  0 }, { 15, 14 }},
-+	{  SDP1,      {  1,  1 }, { 15, 14 }},
-+	{  SDP2,      {  2,  2 }, { 15, 14 }},
-+	{  SDP3,      {  3,  3 }, { 15, 14 }},
-+	{  TIME_SYNC, {  4, -1 }, { 11,  0 }},
-+	{  ONE_PPS,   { -1,  5 }, {  0,  9 }},
- };
- 
- static const struct ice_ptp_pin_desc ice_pin_desc_e810[] = {
--	/* name,      gpio */
--	{  SDP0,    {  0, 0 }},
--	{  SDP1,    {  1, 1 }},
--	{  SDP2,    {  2, 2 }},
--	{  SDP3,    {  3, 3 }},
--	{  ONE_PPS, { -1, 5 }},
-+	/* name,        gpio,       delay */
-+	{  SDP0,      {  0,  0 }, { 0, 1 }},
-+	{  SDP1,      {  1,  1 }, { 0, 1 }},
-+	{  SDP2,      {  2,  2 }, { 0, 1 }},
-+	{  SDP3,      {  3,  3 }, { 0, 1 }},
-+	{  ONE_PPS,   { -1,  5 }, { 0, 1 }},
- };
- 
- static const char ice_pin_names_nvm[][64] = {
-@@ -49,12 +49,12 @@ static const char ice_pin_names_nvm[][64] = {
- };
- 
- static const struct ice_ptp_pin_desc ice_pin_desc_e810_sma[] = {
--	/* name,   gpio */
--	{  GNSS, {  1, -1 }},
--	{  SMA1, {  1,  0 }},
--	{  UFL1, { -1,  0 }},
--	{  SMA2, {  3,  2 }},
--	{  UFL2, {  3, -1 }},
-+	/* name,   gpio,       delay */
-+	{  GNSS, {  1, -1 }, { 0, 0 }},
-+	{  SMA1, {  1,  0 }, { 0, 1 }},
-+	{  UFL1, { -1,  0 }, { 0, 1 }},
-+	{  SMA2, {  3,  2 }, { 0, 1 }},
-+	{  UFL2, {  3, -1 }, { 0, 0 }},
- };
- 
- static struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf)
-@@ -1592,18 +1592,29 @@ void ice_ptp_extts_event(struct ice_pf *pf)
- 	 * Event is defined in GLTSYN_EVNT_0 register
- 	 */
- 	for (chan = 0; chan < GLTSYN_EVNT_H_IDX_MAX; chan++) {
-+		int pin_desc_idx;
-+
- 		/* Check if channel is enabled */
--		if (pf->ptp.ext_ts_irq & (1 << chan)) {
--			lo = rd32(hw, GLTSYN_EVNT_L(chan, tmr_idx));
--			hi = rd32(hw, GLTSYN_EVNT_H(chan, tmr_idx));
--			event.timestamp = (((u64)hi) << 32) | lo;
--			event.type = PTP_CLOCK_EXTTS;
--			event.index = chan;
--
--			/* Fire event */
--			ptp_clock_event(pf->ptp.clock, &event);
--			pf->ptp.ext_ts_irq &= ~(1 << chan);
-+		if (!(pf->ptp.ext_ts_irq & (1 << chan)))
-+			continue;
-+
-+		lo = rd32(hw, GLTSYN_EVNT_L(chan, tmr_idx));
-+		hi = rd32(hw, GLTSYN_EVNT_H(chan, tmr_idx));
-+		event.timestamp = (u64)hi << 32 | lo;
-+
-+		/* Add delay compensation */
-+		pin_desc_idx = ice_ptp_find_pin_idx(pf, PTP_PF_EXTTS, chan);
-+		if (pin_desc_idx >= 0) {
-+			const struct ice_ptp_pin_desc *desc;
-+
-+			desc = &pf->ptp.ice_pin_desc[pin_desc_idx];
-+			event.timestamp -= desc->delay[0];
- 		}
-+
-+		event.type = PTP_CLOCK_EXTTS;
-+		event.index = chan;
-+		pf->ptp.ext_ts_irq &= ~(1 << chan);
-+		ptp_clock_event(pf->ptp.clock, &event);
- 	}
- }
- 
-@@ -1798,9 +1809,9 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
- static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
- 			      int on)
- {
-+	unsigned int gpio_pin, prop_delay_ns;
- 	u64 clk, period, start, phase;
- 	struct ice_hw *hw = &pf->hw;
--	unsigned int gpio_pin;
- 	int pin_desc_idx;
- 
- 	if (rq->flags & ~PTP_PEROUT_PHASE)
-@@ -1811,6 +1822,7 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
- 		return -EIO;
- 
- 	gpio_pin = pf->ptp.ice_pin_desc[pin_desc_idx].gpio[1];
-+	prop_delay_ns = pf->ptp.ice_pin_desc[pin_desc_idx].delay[1];
- 	period = rq->period.sec * NSEC_PER_SEC + rq->period.nsec;
- 
- 	/* If we're disabling the output or period is 0, clear out CLKO and TGT
-@@ -1842,11 +1854,11 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
- 	 * at the next multiple of period, maintaining phase.
- 	 */
- 	clk = ice_ptp_read_src_clk_reg(pf, NULL);
--	if (rq->flags & PTP_PEROUT_PHASE || start <= clk - ice_prop_delay(hw))
-+	if (rq->flags & PTP_PEROUT_PHASE || start <= clk - prop_delay_ns)
- 		start = div64_u64(clk + period - 1, period) * period + phase;
- 
- 	/* Compensate for propagation delay from the generator to the pin. */
--	start -= ice_prop_delay(hw);
-+	start -= prop_delay_ns;
- 
- 	return ice_ptp_write_perout(hw, rq->index, gpio_pin, start, period);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 824e73b677a4..201f63054c08 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -211,6 +211,7 @@ enum ice_ptp_pin_nvm {
-  * struct ice_ptp_pin_desc - hardware pin description data
-  * @name_idx: index of the name of pin in ice_pin_names
-  * @gpio: the associated GPIO input and output pins
-+ * @delay: input and output signal delays in nanoseconds
-  *
-  * Structure describing a PTP-capable GPIO pin that extends ptp_pin_desc array
-  * for the device. Device families have separate sets of available pins with
-@@ -219,6 +220,7 @@ enum ice_ptp_pin_nvm {
- struct ice_ptp_pin_desc {
- 	int name_idx;
- 	int gpio[2];
-+	unsigned int delay[2];
- };
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-index 585ce200c60f..c3e9b78087a8 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-@@ -341,8 +341,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		823437500, /* 823.4375 MHz PLL */
- 		/* nominal_incval */
- 		0x136e44fabULL,
--		/* pps_delay */
--		11,
- 	},
- 
- 	/* ICE_TIME_REF_FREQ_122_880 -> 122.88 MHz */
-@@ -351,8 +349,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		783360000, /* 783.36 MHz */
- 		/* nominal_incval */
- 		0x146cc2177ULL,
--		/* pps_delay */
--		12,
- 	},
- 
- 	/* ICE_TIME_REF_FREQ_125_000 -> 125 MHz */
-@@ -361,8 +357,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		796875000, /* 796.875 MHz */
- 		/* nominal_incval */
- 		0x141414141ULL,
--		/* pps_delay */
--		12,
- 	},
- 
- 	/* ICE_TIME_REF_FREQ_153_600 -> 153.6 MHz */
-@@ -371,8 +365,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		816000000, /* 816 MHz */
- 		/* nominal_incval */
- 		0x139b9b9baULL,
--		/* pps_delay */
--		12,
- 	},
- 
- 	/* ICE_TIME_REF_FREQ_156_250 -> 156.25 MHz */
-@@ -381,8 +373,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		830078125, /* 830.78125 MHz */
- 		/* nominal_incval */
- 		0x134679aceULL,
--		/* pps_delay */
--		11,
- 	},
- 
- 	/* ICE_TIME_REF_FREQ_245_760 -> 245.76 MHz */
-@@ -391,8 +381,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		783360000, /* 783.36 MHz */
- 		/* nominal_incval */
- 		0x146cc2177ULL,
--		/* pps_delay */
--		12,
- 	},
- };
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 231dd00cf38c..6779ce120515 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -80,7 +80,6 @@ struct ice_phy_reg_info_eth56g {
-  * struct ice_time_ref_info_e82x
-  * @pll_freq: Frequency of PLL that drives timer ticks in Hz
-  * @nominal_incval: increment to generate nanoseconds in GLTSYN_TIME_L
-- * @pps_delay: propagation delay of the PPS output signal
-  *
-  * Characteristic information for the various TIME_REF sources possible in the
-  * E822 devices
-@@ -88,7 +87,6 @@ struct ice_phy_reg_info_eth56g {
- struct ice_time_ref_info_e82x {
- 	u64 pll_freq;
- 	u64 nominal_incval;
--	u8 pps_delay;
- };
- 
- /**
-@@ -326,8 +324,6 @@ extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
-  */
- #define ICE_E810_PLL_FREQ		812500000
- #define ICE_PTP_NOMINAL_INCVAL_E810	0x13b13b13bULL
--#define ICE_E810_OUT_PROP_DELAY_NS	1
--#define ICE_E825C_OUT_PROP_DELAY_NS	11
- 
- /* Device agnostic functions */
- u8 ice_get_ptp_src_clock_index(struct ice_hw *hw);
-@@ -389,11 +385,6 @@ static inline u64 ice_e82x_nominal_incval(enum ice_time_ref_freq time_ref)
- 	return e82x_time_ref[time_ref].nominal_incval;
- }
- 
--static inline u64 ice_e82x_pps_delay(enum ice_time_ref_freq time_ref)
--{
--	return e82x_time_ref[time_ref].pps_delay;
--}
--
- /* E822 Vernier calibration functions */
- int ice_stop_phy_timer_e82x(struct ice_hw *hw, u8 port, bool soft_reset);
- int ice_start_phy_timer_e82x(struct ice_hw *hw, u8 port);
-@@ -432,20 +423,6 @@ int ice_phy_cfg_ptp_1step_eth56g(struct ice_hw *hw, u8 port);
- #define ICE_ETH56G_NOMINAL_THRESH4	0x7777
- #define ICE_ETH56G_NOMINAL_TX_THRESH	0x6
- 
--static inline u64 ice_prop_delay(const struct ice_hw *hw)
--{
--	switch (hw->ptp.phy_model) {
--	case ICE_PHY_ETH56G:
--		return ICE_E825C_OUT_PROP_DELAY_NS;
--	case ICE_PHY_E810:
--		return ICE_E810_OUT_PROP_DELAY_NS;
--	case ICE_PHY_E82X:
--		return ice_e82x_pps_delay(ice_e82x_time_ref(hw));
--	default:
--		return 0;
--	}
--}
--
- /**
-  * ice_get_base_incval - Get base clock increment value
-  * @hw: pointer to the HW struct
--- 
-2.47.1
-
+>
+> Humm, interesting. Looking at ftgmac100.c, i don't see where you
+> configure the RGMII delays in the MAC?
+>
+> 	  Andrew
+>
 
