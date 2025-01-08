@@ -1,48 +1,44 @@
-Return-Path: <netdev+bounces-156448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4AC8A06726
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:24:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0807A06754
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:39:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5868163E97
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:24:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7152F1887DC7
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34BEE20468F;
-	Wed,  8 Jan 2025 21:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E9C20408A;
+	Wed,  8 Jan 2025 21:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VR8nZPyt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="dVrVHayB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out.freemail.hu (fmfe28.freemail.hu [46.107.16.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0991C2040AD;
-	Wed,  8 Jan 2025 21:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DC6202C58;
+	Wed,  8 Jan 2025 21:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736371450; cv=none; b=gjrhuK2rE3e6xT+RUUQLXbVFXXaBYdZht2akaEFUXUd7K33qHZrrZDMXyy/WyPA+YaKAivoe/MKbST91yoVKlc4TlLy9Nmy0ibtkA1dCdi/bZq5aY1Wjp1UkTL0zzwxV7Gg1ugPi8f7qQ1aJL6xxP9K8r0CF+CpYFnNbROGFoQ0=
+	t=1736372351; cv=none; b=ae1tYb+MdU8t7RiTY+/9K+vWD1a83qj0/BXdneE3AOP6bueKOswLS5Jt2SIJiGOjsFOcGpBvPd4u/8yVsvxBUyT5TjrNOB6F727ijgNzFMI9BNsECda/Qa1uVQMkLuWjIp6gJGWn9uSXd3nypHKj6SpkHPPrMOtmk2AKGa3yDv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736371450; c=relaxed/simple;
-	bh=99O1W4A/KkPlmC0u3XNovrq+7OUjFL40eD6RAj2PfP8=;
+	s=arc-20240116; t=1736372351; c=relaxed/simple;
+	bh=msZrxrJ2w2+V2eW8BoxWZCFBMUfeH7jKpq8mo9QvVY8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JuXFE0fzSDrOjf1TMJ0DlPFKXwFAfNWsZGoCZAqHu46JdGNCH2zlJHHBCR/QjYhlR7Bamv+G+VhwSlw3OI5HJD5JfR5hQXm4WHTA6NTsKD5X/dgZaBoCuH2esFW+9lRr+ks4otGi2adK00Nb71qxlqvLJNbuu/Sflu3dxsuh/FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VR8nZPyt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8268EC4CEE2;
-	Wed,  8 Jan 2025 21:24:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736371449;
-	bh=99O1W4A/KkPlmC0u3XNovrq+7OUjFL40eD6RAj2PfP8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VR8nZPytqkUwgu8On7AWRZ24Ro2iw4gaWjNtBT8lAvdPCwteoBNyOiMay1yT6yd8N
-	 hEXYPeg6/kQ1m4pNuxIKcK+Sd3olKV9lB3TxNpEYmPLRH6aQpo6dh3YfMSydV3CwC8
-	 4h9jD0Jh0I1dc/++K6rrPaz5CV398UbjBrrk+niuUTacWA8vcNoTbyIbYgwbPJfqRD
-	 drPzm+ATo+b8Sq0fqYFsN7x5Jscw2d7Nx2bAzNU/A0KkWYxiWazqjKOzQWqmsY3/VQ
-	 NMaX0ONsYrdRNysz1E4rl1Cdnwi0aFCvJYziNPpkgEyqSYhQdCusZM+oeD0AExQNO6
-	 sirDQomyqaTkw==
-Message-ID: <9bb10095-2209-40e6-a000-d98ac11e215c@kernel.org>
-Date: Wed, 8 Jan 2025 23:24:03 +0200
+	 In-Reply-To:Content-Type; b=Tg1LuB8F44wt4DxkhzqGKW9U229i5izEq7klsWtg4+/JiDgm0cvfVjHqhjplPRt4Y6jZdHUkjIkUCczpIYevXC7oNyjVp6kzTT8moTGEeLCAlmDjHFP4dRaw49seyRTzcW4PuN9Hktbtq0MGlN92Qj0hYCJUuOQLKVH3ym6p2V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=dVrVHayB reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
+Received: from [192.168.0.16] (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.freemail.hu (Postfix) with ESMTPSA id 4YT1Wm0SJWz166P;
+	Wed, 08 Jan 2025 22:39:00 +0100 (CET)
+Message-ID: <8d25e36a-b598-4b18-896c-d0dcb7233800@freemail.hu>
+Date: Wed, 8 Jan 2025 22:38:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,50 +46,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net: ethernet: ti: cpsw_ale: Fix
- cpsw_ale_get_field()
-To: Sudheer Kumar Doredla <s-doredla@ti.com>, s-vadapalli@ti.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, gnault@redhat.com,
- linux-omap@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: t-patil@ti.com, j-keerthy@ti.com
-References: <20250108172433.311694-1-s-doredla@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20250108172433.311694-1-s-doredla@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 09/10] netfilter: Add message pragma for deprecated
+ xt_*.h, ipt_*.h.
+To: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: fw@strlen.de, pablo@netfilter.org, lorenzo@kernel.org,
+ daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250107024120.98288-1-egyszeregy@freemail.hu>
+ <20250107024120.98288-10-egyszeregy@freemail.hu>
+ <1cd443f7-df1e-20cf-cfe8-f38ac72491e4@netfilter.org>
+ <0e51464d-301d-4b48-ad38-ca04ff7d9151@freemail.hu>
+ <2b9c44e0-4527-db29-4e5e-b7ddd41bda8d@netfilter.org>
+Content-Language: hu
+From: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
+In-Reply-To: <2b9c44e0-4527-db29-4e5e-b7ddd41bda8d@netfilter.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1736372340;
+	s=20181004; d=freemail.hu;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	l=2558; bh=j1LCUzCb/lTdPMZPJ2sOeNhrpAI71sLmAcJs4gaJXV8=;
+	b=dVrVHayBVVLNiC+xfzX0mKqQkiy0kZG+Gkiy3MdoWeCQVGYpgWr6A8+GdscMW3s/
+	WglqXjDWFozMq3Khc5aRoR7pnnMwUwALT2B1wQSkxWpwf9qmlr2QwugVaBCW21dAyiB
+	QjTvwGP5kseq/VrmTUjHASHwDTwgQ6y9F2lMDF1aR4aaZP3LszPdzMiSRLOG4a4M6qh
+	mxDq35vCa/JGu47vSPhRMnMsj1zOMMBt+2jnGCkyFvt/C2Hj8DqNQZwuN6up2bMLQoe
+	AYNQ/PfgmdVjJAcId1pW8NOA1KGeQT3x6ZxDm+lodx4+3Rs9WD0X2BMc1DfsEj8ODCO
+	SA15+Z9Cig==
+
+2025. 01. 08. 21:51 keltezéssel, Jozsef Kadlecsik írta:
+> On Tue, 7 Jan 2025, Szőke Benjamin wrote:
+> 
+>> 2025. 01. 07. 20:39 keltezéssel, Jozsef Kadlecsik írta:
+>>> On Tue, 7 Jan 2025, egyszeregy@freemail.hu wrote:
+>>>
+>>>> From: Benjamin Szőke <egyszeregy@freemail.hu>
+>>>>
+>>>> Display information about deprecated xt_*.h, ipt_*.h files
+>>>> at compile time. Recommended to use header files with
+>>>> lowercase name format in the future.
+>>>
+>>> I still don't know whether adding the pragmas to notify about header
+>>> file deprecation is a good idea.
+>>
+>> Do you have any other ideas how can you display this information to the
+>> users/customers, that it is time to stop using the uppercase header
+>> files then they shall to use its merged lowercase named files instead in
+>> their userspace SW?
+> 
+> Honestly, I don't know. What about Jan's clever idea of having the
+> clashing filenames with identical content, i.e.
+> 
+> ipt_ttl.h:
+> #ifndef _IPT_TTL_H
+> #define _IPT_TTL_H
+> #include <linux/netfilter_ipv4/ipt_ttl_common.h>
+> #endif _IPT_TTL_H
+> 
+> ipt_TTL.h:
+> #ifndef _IPT_TTL_H
+> #define _IPT_TTL_H
+> #include <linux/netfilter_ipv4/ipt_ttl_common.h>
+> #endif _IPT_TTL_H
+> 
+> Would cloning such a repo on a case-insensitive filesystem produce errors
+> or would work just fine?
+> 
+
+What is this suggestion, in ipt_ttl.h and ipt_TTL.h really? How it can solve and 
+provide in compile or run-time information for the users about the recomendded 
+changes? (It seems to me that you are completely misunderstanding the purpose of 
+this message at this time.)
 
 
+Listen carefully, this are the points/scope.
 
-On 08/01/2025 19:24, Sudheer Kumar Doredla wrote:
-> CPSW ALE has 75-bit ALE entries stored across three 32-bit words.
-> The cpsw_ale_get_field() and cpsw_ale_set_field() functions support
-> ALE field entries spanning up to two words at the most.
-> 
-> The cpsw_ale_get_field() and cpsw_ale_set_field() functions work as
-> expected when ALE field spanned across word1 and word2, but fails when
-> ALE field spanned across word2 and word3.
-> 
-> For example, while reading the ALE field spanned across word2 and word3
-> (i.e. bits 62 to 64), the word3 data shifted to an incorrect position
-> due to the index becoming zero while flipping.
-> The same issue occurred when setting an ALE entry.
-> 
-> This issue has not been seen in practice but will be an issue in the future
-> if the driver supports accessing ALE fields spanning word2 and word3
-> 
-> Fix the methods to handle getting/setting fields spanning up to two words.
-> 
-> Fixes: b685f1a58956 ("net: ethernet: ti: cpsw_ale: Fix cpsw_ale_get_field()/cpsw_ale_set_field()")
-> Signed-off-by: Sudheer Kumar Doredla <s-doredla@ti.com>
-> Reviewed-by: Simon Horman <horms@kernel.org> 
+This patchset provide the following:
+- 1. Merge upper and lowercase named haeder files in UAPI netfilter.
+- 2. Merge upper and lowercase named source files in UAPI netfilter. (uppercase 
+named files can be removed)
+- 3. Keep the backward compatibility, there is no any breaking API changes yet.
+- 4. Keep uppercase header files as just a "wrapper" for include same lowercase 
+header files.
+- 5. Provide a clear message for the UAPI's users that in the future should have 
+to use the lowercase named files instead.
 
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
+Later, for example when Linux kernel goes to 7.0 version, uppercase header files 
+can be removed. Breaking API possibble when version of a SW is incremented in 
+major field. Before, in first patchset, UAPI users were informed about what is 
+better to use. So it can be a clear and slow roadmap to solve case-insensitive 
+filesystem issue on this files.
 
--- 
-cheers,
--roger
+
+> Best regards,
+> Jozsef
 
 
