@@ -1,103 +1,104 @@
-Return-Path: <netdev+bounces-156248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC0FA05B52
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:18:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E76CA05B4F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:18:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D21A188A390
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:17:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E9601682B8
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61601FAC55;
-	Wed,  8 Jan 2025 12:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3572C1FA25F;
+	Wed,  8 Jan 2025 12:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b/sWp/WC"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bNRvWHTL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD301FA8D6
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717E81F8AFE
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736338590; cv=none; b=awoTKvPfqBpvDJJmOhQ/Xm01Wi59+foD20kLzYhKZYRUQK6+pwdbTlNXm84kdyq1pD4vtRgZqHfqBunbRZIwjitpA4jXi0O45G01bsSLSsZflR+38uYOZQ2I15roBzAT7bLU2iOpLlqbNhCNpLPm77RynuB/mHOCa7WJXE5um0U=
+	t=1736338623; cv=none; b=NodXF40uOoCBwwKqtMm1wE2eUVWTld2smFcVO2n0jyQEMeW4BE5Q4hYyNYsaqmJhlUgbSL3cnmblbcOlEAw9Ses3CSRjNIKMTvk3E4jSQjRhFLoEcSyEOWLQ+AJzlFe/AraMvGGGoFndmQnIhSIrpJ4et7TQxdN1J6+89QdoEs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736338590; c=relaxed/simple;
-	bh=A8IQUtf7Rmk1xVdUvC2uzIrNpb8eKlN4V/vr7Uhc00g=;
+	s=arc-20240116; t=1736338623; c=relaxed/simple;
+	bh=DyGTKkOGUABEs7L4XDm5DTOpScz+MKI3agD2/8W5nE8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eVDx7mZsSGRo6FQXoxbxnqMlfcJQTtnEa5g5cHSj5ZkLyY8bbk+Rgr7oL5MUip7qGOoStnC0LOBiRA/oZ9F2pVhVpHVKm1vGLtL0+ROiMq0TWFsnyxQ5QoA4+HHmRxdHnBaPzsjVNaakxpce+B7cyHXa+lAFrgpomnuOf9cIUJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=b/sWp/WC; arc=none smtp.client-ip=209.85.208.47
+	 To:Cc:Content-Type; b=dlo2AKki/n9AD+Jn4Y1LT06ryRQO9Ukf1uv4yxX9IwMQkzblauGXou6qu/VT5Cq0U3RpXqyenowmh+8pD+K1BvieZVtVotneIf2n63NVV15UfiUc9YqfldL3Hn1wXLOkURP2MfVL/ai4y46S8hgkG2bPOvjZXIHd9rM6cwr7H1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=bNRvWHTL; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e6f6cf69so28776335a12.1
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 04:16:28 -0800 (PST)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3f28a4fccso526241a12.2
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 04:17:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736338587; x=1736943387; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736338620; x=1736943420; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wJll1opQKmS6qHfQ2WlROGIyppyUIJ+JIj6K+pGcXvg=;
-        b=b/sWp/WCrbeWUlmbsx7JCOh0K/OZr71273MUHr58CLdlIKG7CFm6YbruSZ1wDen0YI
-         U4FyfY12K1DIKRIa2Ao+7NAMIZeadt0uQAMSKXNaLX+7Unhz9+NOlL+uozLcfa32X65m
-         ikqY789k8KE6snp9R1wB6S0LmuSSXRswd2FcA=
+        bh=fHgUL2j9XPuSsQJGC8Lj5n8rWETraJCEVRa9qyJXEn4=;
+        b=bNRvWHTLn4gt/atoVcMVCQaDEuoeR1Okp/DqqjLaKwT9yGr2BWvwFPtuSO8cIphS+d
+         WP99RCa/SfnQJ4cgiLz6yqVK1RnrEaY5FoBOo2DAmmQ4F25ioUYg1BLlsPypp9WCNYoe
+         m3ZvMYJ+5ffj5+A51NKA2re8xJ9SXhJ3gvvmY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736338587; x=1736943387;
+        d=1e100.net; s=20230601; t=1736338620; x=1736943420;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wJll1opQKmS6qHfQ2WlROGIyppyUIJ+JIj6K+pGcXvg=;
-        b=DMwD7LALGKjlM+2wr6fou8f9QMvqd9kJ5CbZ8ikQ1GPNIkA67cbvUSNg1UeWz0m027
-         93dUImDPequAHxTqjphguqC/LGiN4bxXW5AywweT1CZ1GT5GY4YpHDYa23IQXSXr6nzN
-         6FyG+wR5EMXJ08FitcuEQbTs9L2WKAGZnmYeIMQZqk5FvieF/3HM78JCfIHnWf996F4e
-         jD8d99wEmf8pvCKMbyxYXbUdvWhetKDFD4rRiQBwBxQW89LRc5Jv8UIJk1u6ViTFFmC7
-         2cHLmIqhEaBIdhP5U/dckBb0g9+LvFJtga12tQcw5tJU9l+AO6xcsuj5PyBByDet6J4m
-         rOyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx85Ii9CNZjxqkHOHPOpThEev2vmbm60l8FLxsBcOsQKVhOPY59n1h1nYwXb8YkatkEyLuyfA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRbRi3mKaDBI6Lw7p28L7eC7LR2W5635hnyTlLH2w9VU9akjgR
-	J+bgYBnKewkFyk+Q7rKX2+LsL5dikucLsw+d9zjC427Q1nO/mrBW73YHliFGr36K4OzBV9ZzyTC
-	DPIzw92nYX88LylWwwcOKLnYT4QmRVdzBBAA8
-X-Gm-Gg: ASbGncszGyey0o+rcsyOgDVk1qSfPwXzQFJCeIQPq4NlGgWfO5i6/jrWat0Wp4Uy4ez
-	fb+rj4fLrYLbRrziXsOxvrlOOumWQrJ4z0Waj
-X-Google-Smtp-Source: AGHT+IHLn8HBlVwNvq+tovXBPbQMwQ9nAuq+jl4DQFxCMXw0zNFrBytsE637M0LgtUvqP5U7YhniyiwkKOeHTx+Apc0=
-X-Received: by 2002:a05:6402:360c:b0:5d0:e826:f0da with SMTP id
- 4fb4d7f45d1cf-5d972e1683fmr2246245a12.16.1736338586996; Wed, 08 Jan 2025
- 04:16:26 -0800 (PST)
+        bh=fHgUL2j9XPuSsQJGC8Lj5n8rWETraJCEVRa9qyJXEn4=;
+        b=jumMBZ/Zqkoh889ut/rNKeWSICbcRLKdCE5b3nWO0Xm6aHbuuJZpB2ZRjS7xW/tsW7
+         koObIP0GBoIxxLcnFz8ntLjSRQxgOSusE3eMBEtWH+kZRAtaNLFf00twRLQhva5mCZ9q
+         l7FJLg2OViXQN3MR+Imnj6EUbDswcdVXN23GxGcNT7rbDaNzaF2MiptOGShrBQeWuiA3
+         E/CfBZ4MHVUY5jik5oLuCyC4ivfjsWm6FORt/w9jvWzP2YmxC05SvUmNNpnsmZavgL+V
+         SO/O2xGQ5JPet8goWxjfxzQR/TLFktElFFATxPQe1wCRqo4PKBGOVThWu4QMVcl08yx3
+         d7qw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbHyoKwM0Ytv2CAn0DMK8xecN488yDOMXMtDtam4fBUBaxOtIpovbTay6/wV0p3pWMnecfiro=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyckkTKjkU9BvZnCZ+9ez74ODu+ZriShCkdI9tcw3QmQzkWjyQc
+	Vz81kOONgU1gTB/XW+yLAwWrQ8AsFiWfhroqXif24CYgSGiTzdB7QbLuL48ZyJYN2jyHGkxfUzc
+	HgsnivlxQt6xl4lYFdcO1ci3FLBQeuflIZtX3
+X-Gm-Gg: ASbGnctnYvH+LOG7NyCGV3cg3yiFS3cHzbwjnYwcXrilQ5mTjw7CaUD6moiJudOHkbf
+	eH+mp6o7SONg5aWk3u7NOZOgCgUvrp0CBO3Od
+X-Google-Smtp-Source: AGHT+IGKy8w0KOIWPKUQ6cPlZR7A57qoUGiIFGOGCsPEAOsO42FrYECd+43FumEZrwdlpavkvUmdjXN2KRXx5p82bL0=
+X-Received: by 2002:a05:6402:50d0:b0:5d6:37e9:8a93 with SMTP id
+ 4fb4d7f45d1cf-5d972dfbbcdmr1806410a12.2.1736338619730; Wed, 08 Jan 2025
+ 04:16:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ee1a790b-f874-4512-b3ae-9c45f99dc640@stanley.mountain>
-In-Reply-To: <ee1a790b-f874-4512-b3ae-9c45f99dc640@stanley.mountain>
+References: <f2ecc88d-af13-4651-9820-7cc665230019@stanley.mountain>
+In-Reply-To: <f2ecc88d-af13-4651-9820-7cc665230019@stanley.mountain>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Wed, 8 Jan 2025 17:46:14 +0530
-X-Gm-Features: AbW1kvYDhfzIql41LdFYILzHNun7Af6T5PK_lZaCo4FP-HiLxTo8FtCtIiOLGrE
-Message-ID: <CAH-L+nMpNvYr4igweeTgkXj_gKBSzSa=SZZ+mkZoKz4v8te7Qw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/smc: delete pointless divide by one
+Date: Wed, 8 Jan 2025 17:46:46 +0530
+X-Gm-Features: AbW1kvYmNrRXnJPfn1InnI-amnOOlOcNhBH6pDkj-QbcAiL_BBEPNyUd2ClXCz4
+Message-ID: <CAH-L+nP146Y1VnSkr8ykoJy_nUd-txtHwS13r-k2Z=e3tPxBbQ@mail.gmail.com>
+Subject: Re: [PATCH net] rtase: Fix a check for error in rtase_alloc_msix()
 To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
-	"D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
+Cc: Justin Lai <justinlai0215@realtek.com>, Larry Chiu <larry.chiu@realtek.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	kernel-janitors@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b570e3062b30d4ba"
+	boundary="000000000000a9aa05062b30d645"
 
---000000000000b570e3062b30d4ba
+--000000000000a9aa05062b30d645
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 8, 2025 at 2:56=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro.=
+On Wed, Jan 8, 2025 at 2:46=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro.=
 org> wrote:
 >
-> Here "buf" is a void pointer so sizeof(*buf) is one.  Doing a divide
-> by one makes the code less readable.  Delete it.
+> The pci_irq_vector() function never returns zero.  It returns negative
+> error codes or a positive non-zero IRQ number.  Fix the error checking to
+> test for negatives.
 >
+> Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this module")
 > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+
 LGTM,
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
@@ -106,7 +107,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---000000000000b570e3062b30d4ba
+--000000000000a9aa05062b30d645
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -178,14 +179,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIPow6+HBgLf8WoW+ZUXJNwfjaMP/gSTu/SdfHf3F1gFMMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwODEyMTYyN1owaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIJmpX8QUcsLBTvmQE9+IgcnJwBYBDOV6DSb1Ian1Nc0tMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwODEyMTcwMFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAcYlO8QrqZ
-ZwjgaP9LLlRpAYCYuZ8zrJubRYY9mVos41+9+Fc9A2Azeb9/pPK+QsGOjUfNrmPFGOcXoUqxQFsx
-+X7pEjMKAt9lzfnYm1rmEo9a7HDZctmHCJ887Ti2r2acyhP7dNzl0AgSnA4zeaEU2d2wwdCyclJz
-FNoUAm259cBCl+HGG957fx03JjoN5jU0Nq0W1xt4Nf9860R7ZcaJbsXCYUXXJtJfASmYZ+QVqoxk
-fi+A7Ohp/yQ7pcz0A7esCwsnWqWGOeEgVE+dY+U/23Pqc4JZGPtTwM1SuhgJclR9AQ+i0d0n9d+J
-joLhvnEvmqHp1Gum52bQl31u2mdP
---000000000000b570e3062b30d4ba--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBPmlIBRqT0
+4xeY+CEuGt2QVIqil+/hnstaS07dKUJHgFlcEWXv6NQjJY0MGRd3NBv6dmpQ5KO3uPg7oe70EToe
+vAJAlegstlQ0jp6Gr9cXz7m7hF5jPsnuviDqMt3pGalszK/xshl+U52c1wixuqBU0KbXp07QhM5n
+W9AiFSbb0ZJJEa06gm0dmDqHZzassIfYduP63wcxnZIq65nmMV7HkMbjLF7Nu3NVzOl8wthLlE9K
+QB/e154y2YsbnWRZVeExQKmR+Qks1sZGMX1zi1eLU2TSOkVrc87jnAW4IqCGZs+ElZN35lU7Vnec
+G8ukY4ZQaFZAgqDItiVcWg4SGU74
+--000000000000a9aa05062b30d645--
 
