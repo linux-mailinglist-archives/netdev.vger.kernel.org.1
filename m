@@ -1,167 +1,146 @@
-Return-Path: <netdev+bounces-156177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14573A0550C
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 09:12:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4048A054DA
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 08:56:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03284161417
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 08:12:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 009733A2365
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 07:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B971B422F;
-	Wed,  8 Jan 2025 08:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF661ACEAF;
+	Wed,  8 Jan 2025 07:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="XIWzUywA"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E7B1B394F
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 08:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9DB1A83F9;
+	Wed,  8 Jan 2025 07:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736323939; cv=none; b=O/5ZIMMGVeDSrqb7kG1GwO4MzqHFmtbya7TdNnNTp2J42IgOvN1UubY/lxF7CbMOunC1eDd94OLh9nTXwyU1TIKVHphppOWQhFv1tn7XwwZPQVk7fLFI8HZ6OOs6QHUAv9YmInwR6cGSvP+bmj+uE7Ym1o2LDvmHR9yH7fH8DZE=
+	t=1736323015; cv=none; b=B5ZVPjYgpIyb6Y4LXifdpHAPAz5Ao3xYhPHfFl7+k67g6qiBbF54pvWdiUMmbbWtjNUPnDGyKvB1fPMuwdNnKYSqlc7L1amtgzFhKkMEidBugwW6Z5Wvi8oYX5tOnr7yrLGulJPBIK71nQPWC8oI7KOlvFymuRoaShRoHbBCYTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736323939; c=relaxed/simple;
-	bh=dstrdyco9ngn9JXwzXxta98AX5DVgvA+BJ20rGUzN+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R+JIw+9fT3LHdgW1RX7PZlnuPQvFl2beKROWv8duJ9DwlFfD5UctG1rdTqKHCarB7LqhreXBQe0iEYRb2D8GfuKohgG+oKW/33jezzb74x08ouaKWByonMEkTFu1dwbyrIQwQMnbTrrWTSJdfjmAPMFRvTIF1EARlhKQChAzpiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVRAa-0002TW-VK; Wed, 08 Jan 2025 09:12:04 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVRAY-007U1v-0v;
-	Wed, 08 Jan 2025 09:12:03 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVRAY-00BPlU-31;
-	Wed, 08 Jan 2025 09:12:02 +0100
-Date: Wed, 8 Jan 2025 09:12:02 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Kory Maincent <kory.maincent@bootlin.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next RFC 0/5] net: phy: Introduce a port
- representation
-Message-ID: <Z34zUuUkx2bWXYfW@pengutronix.de>
-References: <Z2g3b_t3KwMFozR8@pengutronix.de>
- <Z2hgbdeTXjqWKa14@pengutronix.de>
- <Z3Zu5ZofHqy4vGoG@shell.armlinux.org.uk>
- <Z3bG-B0E2l47znkE@pengutronix.de>
- <20250107142605.6c605eaf@kmaincent-XPS-13-7390>
- <Z31EVPD-3CGGXxnq@shell.armlinux.org.uk>
- <20250107171507.06908d71@fedora.home>
- <601067b3-2f8a-4080-9141-84a069db276e@lunn.ch>
- <Z31ZOjLcE34CNj0S@pengutronix.de>
- <20250108082507.0402f158@fedora.home>
+	s=arc-20240116; t=1736323015; c=relaxed/simple;
+	bh=e+ZlfikMJCRvQ+FiB+A8F4gr5P1SbR6gcxHqXQ60rFU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VCg4FH6L28wxI6i5qiAIeQUUks7VqHuDM18VDK+RwWVBJbUR4OAIcP7D+RUd5MGSePPasgW+NOkRr1zQluBR6Jr6ynI+j37ZSb8awmwxmrRdN9RS3XfPir6l+MjI6teVTNhZrXAKKC8RrJmCbg6YkzeHlOmBBIUvawhvAp/baYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=XIWzUywA; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 5087uZXD3072777
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Jan 2025 01:56:35 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1736322996;
+	bh=KOm+I1ztjs3NUKlqS45RCXVTmE0Fa8kZnCWTvoq5xP0=;
+	h=From:To:CC:Subject:Date;
+	b=XIWzUywAKrBu5ROPlQCGHGtOXXQbtpeHDUcEjNGdXM2xui/Lkpcf8kVTRUitlaeiL
+	 ewARfmQ7m83vuiqZKGuKZRhnD+XvMLEfKZICqrWBiq5GUIt3UiQENc+tuvflt8T2A/
+	 6THxL3TSfh5MzvQce6JfgxRRgWNyzlyxBrkM009g=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 5087uZe8047240
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 8 Jan 2025 01:56:35 -0600
+Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 8
+ Jan 2025 01:56:35 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 8 Jan 2025 01:56:35 -0600
+Received: from sudheertest-HP-Z2-Tower-G5-Workstation.dhcp.ti.com (sudheertest-hp-z2-tower-g5-workstation.dhcp.ti.com [172.24.227.182])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5087uV5M065620;
+	Wed, 8 Jan 2025 01:56:31 -0600
+From: Sudheer Kumar Doredla <s-doredla@ti.com>
+To: <s-vadapalli@ti.com>, <rogerq@kernel.org>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <gnault@redhat.com>,
+        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <s-doredla@ti.com>, <t-patil@ti.com>, <j-keerthy@ti.com>
+Subject: [PATCH net]
+Date: Wed, 8 Jan 2025 13:43:03 +0530
+Message-ID: <20250108081303.228653-1-s-doredla@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250108082507.0402f158@fedora.home>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Wed, Jan 08, 2025 at 08:25:07AM +0100, Maxime Chevallier wrote:
-> On Tue, 7 Jan 2025 17:41:30 +0100
-> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-> 
-> > On Tue, Jan 07, 2025 at 05:22:51PM +0100, Andrew Lunn wrote:
-> > > >   I have however seen devices that have a 1G PHY connected to a RJ45
-> > > > port with 2 lanes only, thus limiting the max achievable speed to 100M.
-> > > > Here, we would explicietly describe the port has having 2 lanes.   
-> > 
-> > I can confirm existence of this kind of designs. One industrial real life
-> > example: a SoC connected to 3 port Gigabit KSZ switch. One port is
-> > typical RJ45 connector. Other port is RJ11 connector.
-> > 
-> > The speed can be reduced by using max-speed property. But i can't
-> > provide any user usable diagnostic information just by saying pair A or
-> > B is broken.
-> > 
-> > This is one of the reasons why i propose detailed description.
-> 
-> While I get the point, I'm wondering if it's relevant to expose this
-> diag information for the user. As this is a HW design feature we're
-> representing, and it's described in devicetree, the information that the
-> HW design is wrong or uncommon is already known. So, exposing this to
-> the user ends-up being a pretty way to display plain devicetree data,
-> without much added value from the PHY stack ? Or am I missing the point
-> ?
+cpsw_ale_get_field was returning incorrect data when requesting higher
+word fields. Additionally, cpsw_ale_set_field was writing incorrect 
+data into the ALE entry while updating.
 
-Correct. The same kind of information, such as whether the connector is RJ45 or
-an industrial one with a proprietary layout, or what label this port will have
-on the box, is essential. This information helps the user to manage, repair, or
-connect devices in the field - even after 30 years of operation, when no paper
-manual has survived being eaten by animals and the vendor's websites no longer
-exist.
+For example, while reading word2, word3 fields (62 to 64 bits), the word3
+data was shifted to an incorrect position after reading. The same issue
+occurred when setting an ALE entry.
 
-Here is one example of an industrial switch with PoE support:                                                                                       
-https://www.westermo.com/-/media/Files/User-guides/westermo_ug_6641-22501_viper-x12a-poe_revo.pdf?rev=083148a9e565416a9044e9a4e379635f              
-                                                                                                                                                    
-Please pay attention to the difference for Gbit and 100Mbit ports and signal
-layout within this ports.
+This patch fixes the shifting of the word3 data by aligning it with the
+required fileds, ensuring the correct value is returned from
+cpsw_ale_get_field, even for higher words.
+It also ensures the correct vlaue is written into ALE entry using
+cpsw_ale_set_field.
 
-> I would see some value if we could detect that pairs are miswired or
-> disconnected at runtime, then report this to user. Here the information
-> is useful.
+Signed-off-by: Sudheer Kumar Doredla <s-doredla@ti.com>
+---
+ drivers/net/ethernet/ti/cpsw_ale.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Ack.
+diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
+index 64bf22cd860c..9eccc7064c2b 100644
+--- a/drivers/net/ethernet/ti/cpsw_ale.c
++++ b/drivers/net/ethernet/ti/cpsw_ale.c
+@@ -106,15 +106,15 @@ struct cpsw_ale_dev_id {
  
-> The minimal information needed by software is in that case "how many
-> working pairs are connected between the PHY and the connector", and
-> possibly "are they swapped ?"
-
-In case of home and enterprise type of devices - yes.
-In case of industrial - the devices can be certified to operate in some
-specific link mode.
-
-For example device certified for explosive environments. These device should
-operate in 10BaseT1L-Vpp1 mode only, and discard any link attempts to
-devices which advertise 10BaseT1L-Vpp2 support in addition to 10BaseT1L-Vpp1:
-https://www.pepperl-fuchs.com/germany/de/classid_260.htm?view=productdetails&prodid=118298
-
-My point is, if we will need to set limit for the link modes, soon or later,
-we will need a supported linkmodes property and this property will partially
-duplicated the lanes property. At same time, if we use supported linkmodes
-instead of lanes, we solve the problem with multimode PHYs which support
-twisted pair and fiber modes.
-
+ static inline int cpsw_ale_get_field(u32 *ale_entry, u32 start, u32 bits)
+ {
+-	int idx, idx2;
++	int idx, idx2, index;
+ 	u32 hi_val = 0;
+ 
+ 	idx    = start / 32;
+ 	idx2 = (start + bits - 1) / 32;
+ 	/* Check if bits to be fetched exceed a word */
+ 	if (idx != idx2) {
+-		idx2 = 2 - idx2; /* flip */
+-		hi_val = ale_entry[idx2] << ((idx2 * 32) - start);
++		index = 2 - idx2; /* flip */
++		hi_val = ale_entry[index] << ((idx2 * 32) - start);
+ 	}
+ 	start -= idx * 32;
+ 	idx    = 2 - idx; /* flip */
+@@ -124,16 +124,16 @@ static inline int cpsw_ale_get_field(u32 *ale_entry, u32 start, u32 bits)
+ static inline void cpsw_ale_set_field(u32 *ale_entry, u32 start, u32 bits,
+ 				      u32 value)
+ {
+-	int idx, idx2;
++	int idx, idx2, index;
+ 
+ 	value &= BITMASK(bits);
+ 	idx = start / 32;
+ 	idx2 = (start + bits - 1) / 32;
+ 	/* Check if bits to be set exceed a word */
+ 	if (idx != idx2) {
+-		idx2 = 2 - idx2; /* flip */
+-		ale_entry[idx2] &= ~(BITMASK(bits + start - (idx2 * 32)));
+-		ale_entry[idx2] |= (value >> ((idx2 * 32) - start));
++		index = 2 - idx2; /* flip */
++		ale_entry[index] &= ~(BITMASK(bits + start - (idx2 * 32)));
++		ale_entry[index] |= (value >> ((idx2 * 32) - start));
+ 	}
+ 	start -= idx * 32;
+ 	idx = 2 - idx; /* flip */
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.34.1
+
 
