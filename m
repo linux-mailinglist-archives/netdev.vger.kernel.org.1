@@ -1,105 +1,140 @@
-Return-Path: <netdev+bounces-156161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB1AA05308
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 07:04:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEF43A05311
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 07:11:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CE231886BB9
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 06:04:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DED86166A08
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 06:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E90C19ABD4;
-	Wed,  8 Jan 2025 06:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0F319F133;
+	Wed,  8 Jan 2025 06:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J4tABHUM"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bkEZuCDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FADD1A239F
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 06:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990B6225D7
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 06:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736316254; cv=none; b=NzgQWiex0KmcqJbpYUpuqnaFXO7XCPDcm/vyB5w6Bmq6GL8zPzyw/1MnuhnHvaW4CQ5roIkG0yHELoaZb1TDGt8M44Qx2VFO6p3pldFhZ9eKVpWW1wR4Yf/7jrtwq1dK7zrBAzJa5m/2UWIrv8O4Rs5ID8hHRUNh8ai4tpJq9TI=
+	t=1736316677; cv=none; b=TBle2FoxV1CAxrCaPfOt5Ia+X259k7g4aJHZeit6ILGIjktqpJP9q0yUlRm2hMCMpXUOxbF6MKQbETUJKT35VVCKOd9MWTZQFIBYLhnL9zhdhFIpfNODWq3Er/yaD4sfzMN0miIXVqwtrtM+ae2dmxe1NDxRRlPwUtQdUh0XFG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736316254; c=relaxed/simple;
-	bh=Syb4zXNRjnjUa2FEViaWcch/uizJBOrTAYasrXQXuyw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hEVZExcY2E+M+OeEtZUqipssPlae7kHM9UDCmuVLn0qp8p7GsjWLiuAe8ucp/lC4KrrQT+7Zd1dsgfwiQZ91j0iokr/vMVFSrMYl8MDS3siv8S+6Hf4gDcJ7D6/OMBc1aES8vuA2exbpIKqWEF2SEefkdXlAUo7Nl0f+Aohkm6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J4tABHUM; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736316252; x=1767852252;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Syb4zXNRjnjUa2FEViaWcch/uizJBOrTAYasrXQXuyw=;
-  b=J4tABHUM6W3keEDexXxxt9m8hpyP2FqkpWo4x1JBIERXyY7w13+Cb2i/
-   ImCEZXwWjFFwlKpo2q6626PDJ2C0B2B4sFjX1MylXpZtm7nkPvwse5t7D
-   /5gnfVl1xV2aFUuGfCNwiDVqLttFCslEX/QjhxhjQCvqd9Sohuu4AHdKk
-   JUyBqC6Z14OInT350jcHCv2hNbsaNvkyqt2K53EArnuyoHDht2CgRSBdC
-   gk3A5tsyv7A6QiCFeRxCgKB19FqgKOWjP6sxzAt5+sVKTPdYO4nECYpQU
-   ciaeM0eLFyOn2mUgPJw8zX3V/uGns5vFISmFKF6XaD/ut5nHidXAE0Sdd
-   g==;
-X-CSE-ConnectionGUID: 7ZUekCQqT66dh/yIg3nwGg==
-X-CSE-MsgGUID: iVwpMsajQNu+H0Bv4+pEiA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="61904691"
-X-IronPort-AV: E=Sophos;i="6.12,297,1728975600"; 
-   d="scan'208";a="61904691"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 22:04:10 -0800
-X-CSE-ConnectionGUID: GxVoEqoFQK23ZkvbJwfQpA==
-X-CSE-MsgGUID: RsKsQ9vpSIa50J6fsCN61A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="107027506"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 22:04:07 -0800
-Date: Wed, 8 Jan 2025 07:00:51 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: John Daley <johndale@cisco.com>
-Cc: andrew+netdev@lunn.ch, benve@cisco.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, neescoba@cisco.com,
-	netdev@vger.kernel.org, pabeni@redhat.com, satishkh@cisco.com
-Subject: Re: [PATCH net-next 2/2] enic: Obtain the Link speed only after the
- link comes up
-Message-ID: <Z34UgXz6ota8D27W@mev-dev.igk.intel.com>
-References: <Z3zCfiwPl2Xu/Zvi@mev-dev.igk.intel.com>
- <20250107195304.2671-1-johndale@cisco.com>
+	s=arc-20240116; t=1736316677; c=relaxed/simple;
+	bh=GbKJdMLVaFfGdsn46/7g24MRDtjORUBxjW+BBv4ppTs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=InWrBRmN5GwMmF+bJ2x+AIWkSDtDgeT97z03eTrp0oTTVkd43B6gU1sk3ETz8QlPnV1548sodc9T216+5lC5QtBUW/xfxHSjjSoz8oya4CMKgtnSbUZ2zhTNWmbs4rpNQU05qVt2esRUvgBTOmENMfeOlYe0MvBLvOWqGzKsOGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bkEZuCDu; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1736316677; x=1767852677;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ivjUWeVWFHbced6TbMeo0Y2sSnfGtZuuLTx5LMpRyRc=;
+  b=bkEZuCDurQX362oO2kM6PQ0+ZbDLfWcsKulQBTke7f6ytNrNfFVITnch
+   zdySHOHpTey9jkGA80lFu2kdV6XABBoPni7gKjDyMw6wEzrdhR6ylRnsX
+   YDenaSQdHnTJjSZoIGS9tH8ZmZT1OsYW/hJQHl/sGBJvQkEBkg37PmOJV
+   w=;
+X-IronPort-AV: E=Sophos;i="6.12,297,1728950400"; 
+   d="scan'208";a="484427225"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 06:11:11 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:46234]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.4:2525] with esmtp (Farcaster)
+ id 685f5225-b8cb-447f-b4b2-c5281267222e; Wed, 8 Jan 2025 06:11:09 +0000 (UTC)
+X-Farcaster-Flow-ID: 685f5225-b8cb-447f-b4b2-c5281267222e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Wed, 8 Jan 2025 06:11:03 +0000
+Received: from 6c7e67c6786f.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Wed, 8 Jan 2025 06:10:59 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v1 net-next 0/2] dev: Hold per-netns RTNL in register_netdev().
+Date: Wed, 8 Jan 2025 15:10:50 +0900
+Message-ID: <20250108061050.9328-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <3fe814ea-ede2-415a-8b3e-e09a29e4218d@redhat.com>
+References: <3fe814ea-ede2-415a-8b3e-e09a29e4218d@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250107195304.2671-1-johndale@cisco.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Jan 07, 2025 at 11:53:04AM -0800, John Daley wrote:
-> >> diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-> >> index 957efe73e41a..49f6cab01ed5 100644
-> >> --- a/drivers/net/ethernet/cisco/enic/enic_main.c
-> >> +++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-> >> @@ -109,7 +109,7 @@ static struct enic_intr_mod_table mod_table[ENIC_MAX_COALESCE_TIMERS + 1] = {
-> >>  static struct enic_intr_mod_range mod_range[ENIC_MAX_LINK_SPEEDS] = {
-> >>  	{0,  0}, /* 0  - 4  Gbps */
-> >>  	{0,  3}, /* 4  - 10 Gbps */
-> >> -	{3,  6}, /* 10 - 40 Gbps */
-> >> +	{3,  6}, /* 10+ Gbps */
-> >
-> >Is this on purpose? You didn't mention anything about speed range in
-> >commit message. Just wondering, patch looks fine, thanks.
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Tue, 7 Jan 2025 13:55:51 +0100
+> On 1/4/25 9:21 AM, Kuniyuki Iwashima wrote:
+> > Patch 1 adds rtnl_net_lock_killable() and Patch 2 uses it in
+> > register_netdev() and converts it and unregister_netdev() to
+> > per-netns RTNL.
+> > 
+> > With this and the netdev notifier series [0], ASSERT_RTNL_NET()
+> > for NETDEV_REGISTER [1] wasn't fired on a simplest QEMU setup
+> > like e1000 + x86_64_defconfig + CONFIG_DEBUG_NET_SMALL_RTNL.
+> > 
+> > [0]: https://lore.kernel.org/netdev/20250104063735.36945-1-kuniyu@amazon.com/
+> > 
+> > [1]:
+> > ---8<---
+> > diff --git a/net/core/rtnl_net_debug.c b/net/core/rtnl_net_debug.c
+> > index f406045cbd0e..c0c30929002e 100644
+> > --- a/net/core/rtnl_net_debug.c
+> > +++ b/net/core/rtnl_net_debug.c
+> > @@ -21,7 +21,6 @@ static int rtnl_net_debug_event(struct notifier_block *nb,
+> >  	case NETDEV_DOWN:
+> >  	case NETDEV_REBOOT:
+> >  	case NETDEV_CHANGE:
+> > -	case NETDEV_REGISTER:
+> >  	case NETDEV_UNREGISTER:
+> >  	case NETDEV_CHANGEMTU:
+> >  	case NETDEV_CHANGEADDR:
+> > @@ -60,19 +59,10 @@ static int rtnl_net_debug_event(struct notifier_block *nb,
+> >  		ASSERT_RTNL();
+> >  		break;
+> >  
+> > -	/* Once an event fully supports RTNL_NET, move it here
+> > -	 * and remove "if (0)" below.
+> > -	 *
+> > -	 * case NETDEV_XXX:
+> > -	 *	ASSERT_RTNL_NET(net);
+> > -	 *	break;
+> > -	 */
+> > -	}
+> > -
+> > -	/* Just to avoid unused-variable error for dev and net. */
+> > -	if (0)
+> > +	case NETDEV_REGISTER:
+> >  		ASSERT_RTNL_NET(net);
+> > +		break;
+> > +	}
+> >  
+> >  	return NOTIFY_DONE;
+> >  }
+> > ---8<---
 > 
-> I changed the comment on purpose since it applies to adapters way past
-> 40 Gbps nowdays. I should have mentioned the change. Thanks for the
-> reveiw.
+> FTR, the above fooled a bit both PW and our scripts: I had to manually
+> mangle the cover letter into the merge commit. I guess it would be good
+> to avoid patch snips in the cover-letter,
 
-Reasonable, thanks
+Oh sorry, noted.
 
-> >
-> >Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Thank you !
 
