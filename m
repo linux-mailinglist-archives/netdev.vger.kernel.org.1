@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-156219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22CB8A0596C
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:14:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 182D6A0597F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:17:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5FAC3A5D41
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:14:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 165341669BC
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917F01F76C3;
-	Wed,  8 Jan 2025 11:14:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481821F8AD4;
+	Wed,  8 Jan 2025 11:17:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179761F8EF1
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 11:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA9E1F8925
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 11:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736334876; cv=none; b=nH8/9khIcwMEXoVEclsEf+hn/OMvR43AxUXrg3NjDvYVtAzuEWq55H0MywK0hgdTXkn/4I0/Y/JJnIA27Y4+2qyN4hdytV/9Vz/Io1Wj7quBzS8i/FuGPqTMLlxoFZBD1p+ptggaSWW1/NiSGXfNUg8LhH5N2GJeDf/ol9WgR7U=
+	t=1736335061; cv=none; b=gAtfCsUwHYKL5mcG9zW62h36OtUbJYnJ45hWcDe1+uUVGeO5mn2edkWGRwKyZuJDj9uFZJydmmgpuzXx6HElYHQx+rLC5UxPDLeQtfusC44ODWBtX4R5QQuSctHH/QRcvz4YyLhG3xI14Uu7a9buFyQ0CtJnbKwgaNqCv+weCLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736334876; c=relaxed/simple;
-	bh=zRd199j9xnbEJ005wwsTxmCSUVzh1H0rEIdYNJE4RtU=;
+	s=arc-20240116; t=1736335061; c=relaxed/simple;
+	bh=udZmKdb1BKdJU4EjvkQw/dwr0g6d6q6pWsI1yaE6/js=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QlSChdS5MGOSaeypIcmZC9UZmAN91Uec64FjIWWkEBchopdtTg5O4DsaoqS8U2VicO+hILkmur8gqq2IOqzcyzrVmjYbbIoXuzKF15KNgMu/Emn/9wQaTiOtrq2tcsz/jd7je1EJq+HWsk4x4YhyemWwpufGp5fyIwh6SDm7oXk=
+	 Content-Type:Content-Disposition:In-Reply-To; b=qvqjb05S93u0ZmchwLInUvf6MsHKrs3NH6mGRHowgx2076ZWX55uSdeRO4Q+7S4B3bCujwLymcV4IxlYqqN/SKBhgU/MiCNXc9S/C4YXdEKhLxnc94+YyddijVLpHtE5AiorgYRz+NMKfrpT26ej8gVb2UGEwsDDG1sbn6SFUJ4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,18 +33,18 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tVU11-0006vf-KT; Wed, 08 Jan 2025 12:14:23 +0100
+	id 1tVU41-0007Vv-Mn; Wed, 08 Jan 2025 12:17:29 +0100
 Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tVU10-007VYY-1m;
-	Wed, 08 Jan 2025 12:14:23 +0100
+	id 1tVU40-007VZ6-10;
+	Wed, 08 Jan 2025 12:17:29 +0100
 Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tVU11-00BTrZ-0e;
-	Wed, 08 Jan 2025 12:14:23 +0100
-Date: Wed, 8 Jan 2025 12:14:23 +0100
+	id 1tVU40-00BTtk-37;
+	Wed, 08 Jan 2025 12:17:28 +0100
+Date: Wed, 8 Jan 2025 12:17:28 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Kory Maincent <kory.maincent@bootlin.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -62,11 +62,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Dent Project <dentproject@linuxfoundation.org>,
 	kernel@pengutronix.de,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next 02/14] net: pse-pd: Avoid setting max_uA in
- regulator constraints
-Message-ID: <Z35eD2ykGkohQZuK@pengutronix.de>
+Subject: Re: [PATCH net-next 10/14] net: pse-pd: tps23881: Add support for
+ power limit and measurement features
+Message-ID: <Z35eyDt9sWGtjUdI@pengutronix.de>
 References: <20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com>
- <20250104-b4-feature_poe_arrange-v1-2-92f804bd74ed@bootlin.com>
+ <20250104-b4-feature_poe_arrange-v1-10-92f804bd74ed@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,7 +75,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250104-b4-feature_poe_arrange-v1-2-92f804bd74ed@bootlin.com>
+In-Reply-To: <20250104-b4-feature_poe_arrange-v1-10-92f804bd74ed@bootlin.com>
 X-Sent-From: Pengutronix Hildesheim
 X-URL: http://www.pengutronix.de/
 X-Accept-Language: de,en
@@ -85,16 +85,16 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Sat, Jan 04, 2025 at 11:27:27PM +0100, Kory Maincent wrote:
+On Sat, Jan 04, 2025 at 11:27:35PM +0100, Kory Maincent wrote:
 > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> Setting the max_uA constraint in the regulator API imposes a current
-> limit during the regulator registration process. This behavior conflicts
-> with preserving the maximum PI power budget configuration across reboots.
+> Expand PSE callbacks to support the newly introduced
+> pi_get/set_pw_limit() and pi_get_voltage() functions. These callbacks
+> allow for power limit configuration in the TPS23881 controller.
 > 
-> Instead, compare the desired current limit to MAX_PI_CURRENT in the
-> pse_pi_set_current_limit() function to ensure proper handling of the
-> power budget.
+> Additionally, the patch includes the pi_get_pw_class() the
+> pi_get_actual_pw(), and the pi_get_pw_limit_ranges') callbacks providing
+> more comprehensive PoE status reporting.
 > 
 > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
