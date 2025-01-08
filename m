@@ -1,97 +1,144 @@
-Return-Path: <netdev+bounces-156380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13704A063AC
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 18:47:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D480A063C2
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 18:53:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89EF0163619
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:47:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF3277A123A
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39FF200B96;
-	Wed,  8 Jan 2025 17:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A452220103D;
+	Wed,  8 Jan 2025 17:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OZMDQNnh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XtQQjt1u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D8A200130;
-	Wed,  8 Jan 2025 17:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE33C1FFC67;
+	Wed,  8 Jan 2025 17:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736358450; cv=none; b=vD12F/2Nrex27g5aQLBpZrQZNTG7nImQzd9EFn8/jpgVBPVLGEaq7qWZq2JUcA96aiLi6iemOTJDAfTlkDM82e39MCP7kzXRUJN5+k54BJOarUJGamm2JLcv76PmYsPpMilgu6cmylKGYWw3ma0G8Gq0Sit2VLKquUo/8K7mBQU=
+	t=1736358785; cv=none; b=V6N4bNpHs0hymyE4Eh5Y/8Krb7MB944AW7gyERpjTkFiL/JZyznSlvLT1hPDAgVlAfExj71rOe9uuAG6Fp7AxGtmQScM+n0oT8n7X//yM4Uu2XXBcA/YWeybYCRXJ/3ZS+uGBawr45olEdHm8hW0VuSaD0k684pr3DbGLd+gnKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736358450; c=relaxed/simple;
-	bh=HkKfMhGO6eJvxXHBAcCwOG3GitMhNBicxP3a+OK651Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Eq4IfJNWvSO14rEK3dCHDBlf5zNIkdD+eyW9JQXeCJYfcLceq8WHwZbUvHugHr1OYGBEbJFpyXoN9rikr7tcKF5AkDMlbYAaX075YQHN3kWCexz8uoV0wFJvKaIjk6JoUUTWBtWMO4o/+jYot+zSfZHRNt9aHHH17gN0p0r5GyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OZMDQNnh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 976D2C4CEDF;
-	Wed,  8 Jan 2025 17:47:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736358450;
-	bh=HkKfMhGO6eJvxXHBAcCwOG3GitMhNBicxP3a+OK651Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OZMDQNnhpu6ydPKPJUwaJqTEOHeJHSC7qNwLQ/VbPn3mOOo17hLF/Gb0dAF3qnjLA
-	 l/LQ0+o/SKRjTvxle4oDUrKDiTtYLjxySaAOC0Ni0UEDER/y1IX9PP9/YldzOJIw0Y
-	 s2HhYxSVOcz1UO1suQ75WINZwfo1tQzBvKqCh4gFDhLoBiv4R6v2cOQgXblmJK2/sN
-	 S+YK/MasV529M4jwv73Ka4Rw3ktkCdjrdbteFQEfCumLmx9KCQ2ilHBwoWO2Lm9QQ4
-	 NRgONhZgscZUns/3Qc2FKXo7abGEA3vxUIP6wFKDkRpCQC71fUE3c+Mp4QdcNKBy2g
-	 ykMjXdMEsLCbw==
-Date: Wed, 8 Jan 2025 09:47:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Jonathan
- Corbet <corbet@lwn.net>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Simon Horman
- <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/8] net: ethtool: plumb PHY stats to PHY
- drivers
-Message-ID: <20250108094728.077d7bc9@kernel.org>
-In-Reply-To: <20250108172456.522517ff@fedora.home>
-References: <20250106083301.1039850-1-o.rempel@pengutronix.de>
-	<20250106083301.1039850-3-o.rempel@pengutronix.de>
-	<20250107180216.5802e941@kernel.org>
-	<Z35ApuS2S1heAqXe@pengutronix.de>
-	<95111e20-d08a-42e5-b8cc-801e34d15040@lunn.ch>
-	<20250108172456.522517ff@fedora.home>
+	s=arc-20240116; t=1736358785; c=relaxed/simple;
+	bh=NwN06BuwWws3Dy2bB2ldsOtGEyJBTTRxRTzJzhgbLhU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CRWv+Mo/HYDXb4XPDcgR4I5+jqwbvAfb5ZvHmZ3AzJtBNq5xh/G5Fq35V/QUA6v6RQnbVZIG0b2Qw3kJz4hyGrVySec8p+q9lLS/eTu5xFbXKizBkSsWHNuiaqP/2QNNYSFxTZu82mjK6vV8iO9UObedTAzgmfhbjRUwAaciJDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XtQQjt1u; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TAAO1Chf6hDYV9mEVdFl4KLhPTl2u2J4AKlDsKfF4qk=; b=XtQQjt1um6jDIVerxn2G5x/9Yg
+	VigbPTw+BhyEl8UPKACYGGkerBa4/lPUaT3YGcbKd1+qBorH4cqWZMhxVgKqR4ZhTRpgw3i8Ktlw5
+	JCZJm55al/ky1Nbj3aK19x4uKztA8k/2F/fRu2z/UXlopcvNLhwaJkYa0mH4b/1CWbno=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tVaEW-002e68-6T; Wed, 08 Jan 2025 18:52:44 +0100
+Date: Wed, 8 Jan 2025 18:52:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"andrew@codeconstruct.com.au" <andrew@codeconstruct.com.au>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"eajames@linux.ibm.com" <eajames@linux.ibm.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"joel@jms.id.au" <joel@jms.id.au>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"minyard@acm.org" <minyard@acm.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"ninad@linux.ibm.com" <ninad@linux.ibm.com>,
+	"openipmi-developer@lists.sourceforge.net" <openipmi-developer@lists.sourceforge.net>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"ratbert@faraday-tech.com" <ratbert@faraday-tech.com>,
+	"robh@kernel.org" <robh@kernel.org>
+Subject: Re: [PATCH v2 05/10] ARM: dts: aspeed: system1: Add RGMII support
+Message-ID: <0c42bbd8-c09d-407b-8400-d69a82f7b248@lunn.ch>
+References: <SEYPR06MB5134CC0EBA73420A4B394A009D122@SEYPR06MB5134.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SEYPR06MB5134CC0EBA73420A4B394A009D122@SEYPR06MB5134.apcprd06.prod.outlook.com>
 
-On Wed, 8 Jan 2025 17:24:56 +0100 Maxime Chevallier wrote:
-> > > On one side I need to address the request to handle phydev specific
-> > > thing withing the PHYlib framework. On other side, I can't do it without
-> > > openen a pandora box of build dependencies. It will be a new main-side-quest
-> > > to resolve build dependency of net/ethtool/ and PHYlib. The workaround is to
-> > > put this functions to the header.    
-> > 
-> > Yes, the code is like this because phylib can be a module, and when it
-> > is, you would end up with unresolved symbols if ethtool code is built
-> > in. There are circular dependence as well, if both ethtool and phylib
-> > are module. The inlines help solve this.
-> > 
-> > However, the number of these inline functions keeps growing. At some
-> > point, we might want a different solution. Maybe phylib needs to
-> > register a structure of ops with ethtool when it loads?  
+> >Does the mac0 TX clock have an extra long clock line on the PCB?
+> >
+> >Does the mac1 TX and RX clocks have extra long clock lines on the PCB?
+> >
+> >Anything but rgmii-id is in most cases wrong, so you need a really
+> >good explanation why you need to use something else. Something that
+> >shows you understand what is going on, and why what you have is
+> >correct.
 > 
-> Isn't it already the case with the ethtool_phy_ops singleton ? Maybe we
-> can add wrap the get_phy_stats / get_link_ext_stats ops to the
-> ethtool_phy_ops ? My understanding was that this singleton served this
-> purpose.
+> Here I'll add some explanation.
+> 
+> In our design, we hope the TX and RX RGMII delay are configured by our MAC side.
+> We can control the TX/RX RGMII delay on MAC step by step, it is not a setting to delay to 2 ns.
+> We are not sure the all target PHYs are support for RX internal delay.
+> 
+> But ast2600 MAC1/2 delay cell cannot cover range to 2 ns, MAC 3/4 can do that.
+> Therefore, when using ast2600 MAC1/2, please enable the RX internal delay on the PHY side 
+> to make up for the part we cannot cover.
+> 
+> Summarize our design and we recommend.
+> AST2600 MAC1/2: rgmii-rxid
+> (RGMII with internal RX delay provided by the PHY, the MAC should not add an RX delay in this 
+> case)
+> AST2600 MAC3/4: rgmii
+> (RX and TX delays are added by the MAC when required)
+> 
+> rgmii and rgmii-rxid are referred from ethernet-controller.yaml file.
 
-Right, or for tiny pieces of code like this we could as well always
-build them in? Isn't drivers/net/phy/stubs.c already always built in?
+O.K, so you have the meaning of phy-mode wrong. phy-mode effectively
+described the PCB. Does the PCB implement the 2ns delay via extra long
+clock lines or not. If the PCB has long clock lines, phy-mode is
+'rgmii'. If the PCB does not have long clock lines, 'rgmii-id' is
+used, meaning either the MAC or the PHY needs to add the delays.
+
+The MAC driver is the one that reads the phy-mode from the DT, and
+then it decides what to do. 95% of linux MAC drivers simply pass it
+direct to the PHY. If the phy-mode is 'rgmii', the PHY does nothing,
+because the PCB has added the delays. If it is rgmii-id, it adds
+delays in both directions. This works, because nearly very RGMII PHY
+on the market does support RGMII delays.
+
+There is however a very small number of MAC drivers which do things
+differently. Renesas produced an RDK with a PHY which could not do
+delays in the PHY, and so were forced to do the delays in the
+MAC. Please look at how the ravb driver works. If the PCB does not add
+the delays, rmgii-id, the MAC driver adds the delays. It then masks
+the phy-mode it passes to of_phy_connect() back to 'rgmii', so that
+the PHY does not add any delays. If the PCB did add the delays,
+'rgmii', the MAC driver does not add delays, and it passed rgmii to
+the PHY driver, and it also does not add delays.
+
+So, your MAC driver is broken. It is not correctly handling the
+phy-mode. First question is, how many boards are there in mainline
+which have broken phy-modes. If this is the first board, we can fix
+the MAC driver. If there are already boards in mainline we have to be
+much more careful when fixing this, so as not to regress boards which
+are already merged.
+
+Humm, interesting. Looking at ftgmac100.c, i don't see where you
+configure the RGMII delays in the MAC?
+
+	  Andrew
+
 
