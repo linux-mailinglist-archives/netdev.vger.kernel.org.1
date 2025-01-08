@@ -1,175 +1,227 @@
-Return-Path: <netdev+bounces-156147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAB09A05170
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 04:09:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF7A3A051A3
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 04:37:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 297F01888867
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:09:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54E733A89CC
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183A22AF16;
-	Wed,  8 Jan 2025 03:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD81919E99A;
+	Wed,  8 Jan 2025 03:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="RyUmT8ow"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE8C259490
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 03:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0730419E98D
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 03:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736305793; cv=none; b=Xsuo2muwersah34SAWnLh9Tm3Cy0VeV5gVabPA5QljrRaeVJ9X9u2yGAXlfSLqYTU6uoNlP0bVJtyEDJcBSIf76Ze0PkjsfWe1pqI2yD7WA7ubq5ubxDtskY1gyiqBWbf7/+Bn9l8uh7qLee9rFz60ZnSeCZmF+0ryqtVNYaw9c=
+	t=1736307397; cv=none; b=gUAa9OwGbDtIzTk4riTHc4LaNxaLv+biO1+ehXLKVrdRM8NYvUWkV0q4wEZUP00UWUp2L0e5hNlVSQhNEZaM8ZiSYwwUCIbJKOaVtMrLnX4ih9bCtlYIKbfqE8T2pX20Qvg+W49pDf0DHqypIkkLQAU/TgtDL9p+smFRgCOdrTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736305793; c=relaxed/simple;
-	bh=xBguY6dIirybXJyxzwhVoIG7KkLJayc4shpNfzkHe4c=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=uqxdmJxxaHaLQazoawHs1nSGpf982lLYPuWCUp4YXX8xqb2w5JPDnAGXMfeGbdIrFECZxWLTAxt0FTzRJVF9nbTaqmt03wH/pX6PhgnHd/sYvwqRdKvzw+y9Yxct8nNuw5v2FTEGr9gKYf1WiTJuvukhpySy6JBiKidb4akgglI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [111.207.111.194])
-	by gateway (Coremail) with SMTP id _____8DxQK9y7H1nd8NfAA--.32800S3;
-	Wed, 08 Jan 2025 11:09:38 +0800 (CST)
-Received: from [10.180.13.176] (unknown [111.207.111.194])
-	by front1 (Coremail) with SMTP id qMiowMDx7sVv7H1nJRgZAA--.31862S3;
-	Wed, 08 Jan 2025 11:09:36 +0800 (CST)
-Subject: Re: [PATCH net] ice: fix unaligned access in ice_create_lag_recipe
-To: Michal Schmidt <mschmidt@redhat.com>, intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Dave Ertman <david.m.ertman@intel.com>,
- Daniel Machon <daniel.machon@microchip.com>
-References: <20240131115823.541317-1-mschmidt@redhat.com>
-From: Hongchen Zhang <zhanghongchen@loongson.cn>
-Message-ID: <e6f59bda-9de8-3d30-3f37-3ab1ec047715@loongson.cn>
-Date: Wed, 8 Jan 2025 11:09:35 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1736307397; c=relaxed/simple;
+	bh=/3/iok7HwOqRCzZKpCvO54WDp2UBRoc8sQRmc3TtEkw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XHsS7t3mjQ7d4k9DOL7PLnyu1QAtXuQQWqXRi4rgfHsXIIlJR4Z0PU9bLl7DnBoQes9kMNV/Ert6DOqptdseX47sFb4tfKgvyMupxMqwiOfvE3JP/qYIgSUYHJ0bpwoYF8JmHzcLhlmQJAzu2AA+LawBlEDBj/TUQ9oe5y8LnQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=RyUmT8ow; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2efe25558ddso18377171a91.2
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 19:36:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shopee.com; s=shopee.com; t=1736307395; x=1736912195; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WFV8s79Nga7NDIW/gJmI4LOGAth/rXHkgvoLqs7F05E=;
+        b=RyUmT8owTz2FGoRXcZA+xIl/G147rlqMIhumbN4+VuwoosO7p2BN1rTeG/TvgNkvDt
+         xlb4zM728rRNYp5BYoZKZrNx6th17lJQFyaDNzBrakEk2dSskveXyTZ/Nh6Aaj7RA0Mo
+         gHWziwuEPp3IvgHjJ/Iw+69chdvwUSyQZuAsLPP832dMKFhI9B0viRiR01WwVusNf/KY
+         ykO7N3Lu4Eocii9k9hw+gEwcuhVOKHEAwOV2d6zKqCwnpukVC+QZhJIGGcKvkO5wIpBg
+         JGx48vMX4CxHNhCdMdDPiT7+BWUgrnm6/F5ldrR8UwwmVOVSH3uE5n9Sj/BmVgCMSEpl
+         87aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736307395; x=1736912195;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WFV8s79Nga7NDIW/gJmI4LOGAth/rXHkgvoLqs7F05E=;
+        b=MrZxsLxR1Z9Km5rw4oxAZcNT8TFLEG+1GF6OwJOlBTilxmSE07jiBZ57eq5CnrGZX4
+         2xFzLU+imh+MjNBRKVw6q7cQD/ClInH4c8m8cMaCnZ4CG09xYIKz/L9uyfzV5iCCQO5J
+         J9IxCqDbNDYTGGKSBvAI50IBycCOVOPtxquvfkZlMdDzcskOikAMjJM+QxKkE2p33o3y
+         AgEJqlOlLVQP8FmasIQh0LVIP8vw77Xoab8OTBHKJc9HYuB2AC2pbLomjkTL2F3taEKT
+         RTkBhWIhttUJ4PKAjjMGHki6T2cQbEQXkPVNgoT/VE6JvGn7Z2xdKyvTanc5OKV0KUIJ
+         hWVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXbvdcjrM5pe5ZN174Ta29ufnyPt87iJtae6ARnCPmGv/jhceROKmAhti0fvg3atprzoHW0d5k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGqI6vTqge/L5zAs03d/h4O1oyDaAOiXpQq58Ywg3Bbs3RY0NL
+	OAP/P8HMVzJS5glgs7IQDRgAzqGPFb7AkpieFeqjeozXWdI1mUp7/D1G+XLdOMU=
+X-Gm-Gg: ASbGncvEwV66B3zUkQF04WVSpX7rnq2TK5MTMdZ3kZYAGstDdfvK96p11JVaZmijuWA
+	yFYJV5xZZ2ZDzbmxQsFuwZZhcWvzCtSK/kELJpKLA1tczDtndM7cx2/GkGGj25uFzphnKIOjcul
+	NZ+CPbqTJJpOAVm7mIE7XB34NvW6ipAqCdaWAOyufHURBxR9IgRJXEwWQgZiidekj68BizTsaaT
+	fSn1N2ri19TQyyDHTdNt4HHXKN+O4sX9Q06kt0xiP5Ulut9znB9agvpfXVyg4eAAS9O0C8GDpw7
+	Kn/UWHrhlW5Uqeb7BHEzQpAezFH59Ja1GpBUTrrj
+X-Google-Smtp-Source: AGHT+IGfVtup3OhOJVyTvNsjTvoE/uLh2hpokJfWEg3IVDEUsG0+iu0Ck99MuxHSfhIZrcQZrovudA==
+X-Received: by 2002:a17:90b:3a08:b0:2ee:dd9b:e402 with SMTP id 98e67ed59e1d1-2f548eabdc8mr2536114a91.12.1736307395223;
+        Tue, 07 Jan 2025 19:36:35 -0800 (PST)
+Received: from [10.54.24.59] (static-ip-148-99-134-202.rev.dyxnet.com. [202.134.99.148])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc964a67sm317484405ad.27.2025.01.07.19.36.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2025 19:36:34 -0800 (PST)
+Message-ID: <1ade15b1-f533-4cc6-8522-2d725532e251@shopee.com>
+Date: Wed, 8 Jan 2025 11:36:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240131115823.541317-1-mschmidt@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:qMiowMDx7sVv7H1nJRgZAA--.31862S3
-X-CM-SenderInfo: x2kd0w5krqwupkhqwqxorr0wxvrqhubq/1tbiAgEQB2d9tVgEdgABsQ
-X-Coremail-Antispam: 1Uk129KBj93XoW3GrWUXw48GrW8Cry5Gr1UXFc_yoW7AF4UpF
-	WUKF1qgr48Aw4UZayxWw1jgry3Gw1qvFWDJ3W2y3s5AF4UXr1jyr1xCayUAryDG395uF47
-	ta12vw1kt3WDAabCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6F4UJVW0owAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_
-	JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
-	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
-	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUc9a9UUUUU
+User-Agent: Mozilla Thunderbird
+Subject: =?UTF-8?Q?Re=3A_=5BQuestion=5D_ixgbe=EF=BC=9AMechanism_of_RSS?=
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+References: <da83df12-d7e2-41fe-a303-290640e2a4a4@shopee.com>
+ <CANn89iKVVS=ODm9jKnwG0d_FNUJ7zdYxeDYDyyOb74y3ELJLdA@mail.gmail.com>
+ <c2c94aa3-c557-4a74-82fc-d88821522a8f@shopee.com>
+ <CANn89iLZQOegmzpK5rX0p++utV=XaxY8S-+H+zdeHzT3iYjXWw@mail.gmail.com>
+ <b9c88c0f-7909-43a3-8229-2b0ce7c68c10@shopee.com>
+ <87e945f6-2811-0ddb-1666-06accd126efb@gmail.com>
+ <0d98fed8-38e3-4118-82c9-26cefeb5ee7a@shopee.com>
+ <32775382-9079-4652-9cd5-ff0aa6b5fd9e@intel.com>
+From: Haifeng Xu <haifeng.xu@shopee.com>
+In-Reply-To: <32775382-9079-4652-9cd5-ff0aa6b5fd9e@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Michal,
-On 2024/1/31 pm 7:58, Michal Schmidt wrote:
-> new_rcp->recipe_bitmap was written to as if it were an aligned bitmap.
-> It is an 8-byte array, but aligned only to 4.
-> Use put_unaligned to set its value.
-> 
-> Additionally, values in ice commands are typically in little-endian.
-> I assume the recipe bitmap should be too, so use the *_le64 conversion.
-> I don't have a big-endian system with ice to test this.
-> 
-> I tested that the driver does not crash when probing on aarch64 anymore,
-> which is good enough for me. I don't know if the LAG feature actually
-> works.
-> 
-> This is what the crash looked like without the fix:
-> [   17.599009] Unable to handle kernel paging request at virtual address ffff07ff9c6dc004
-> [   17.599011] Mem abort info:
-> [   17.599011]   ESR = 0x0000000096000021
-> [   17.599012]   EC = 0x25: DABT (current EL), IL = 32 bits
-> [   17.599013]   SET = 0, FnV = 0
-> [   17.599014]   EA = 0, S1PTW = 0
-> [   17.599014]   FSC = 0x21: alignment fault
-> [   17.599015] Data abort info:
-> [   17.599016]   ISV = 0, ISS = 0x00000021, ISS2 = 0x00000000
-> [   17.599016]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-> [   17.599017]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-> [   17.599019] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000080dd6bd0000
-> [   17.599020] [ffff07ff9c6dc004] pgd=1800083fffacf003, p4d=1800083fffacf003, pud=1800083ffface003, pmd=1800083fff9ea003, pte=006808001c6dcf07
-> [   17.599025] Internal error: Oops: 0000000096000021 [#1] SMP
-> [   17.599027] Modules linked in: crct10dif_ce ghash_ce sha2_ce sha256_arm64 mlx5_core sha1_ce sbsa_gwdt ice(+) nvme nvme_core mlxfw igb tls nvme_common psample i2c_algo_bit gnss pci_hyperv_intf i2c_designware_platform i2c_designware_core xgene_hwmon dm_mirror dm_region_hash dm_log dm_mod
-> [   17.599043] CPU: 0 PID: 18 Comm: kworker/0:1 Not tainted 5.14.0-407.el9.aarch64 #1
-> [   17.599044] Hardware name: GIGABYTE R272-P31-00/MP32-AR1-00, BIOS F31L (SCP: 2.10.20220531) 09/29/2022
-> [   17.599046] Workqueue: events work_for_cpu_fn
-> [   17.599051] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> [   17.599053] pc : ice_create_lag_recipe.constprop.0+0xbc/0x11c [ice]
-> [   17.599091] lr : ice_create_lag_recipe.constprop.0+0x54/0x11c [ice]
-> [   17.599121] sp : ffff8000084a3c50
-> [   17.599122] x29: ffff8000084a3c50 x28: ffffabc4a6790f00 x27: ffffabc4a6200fa0
-> [   17.599124] x26: ffff07ff809e5c34 x25: ffff083e5f41980d x24: ffff07ff8610a0c0
-> [   17.599126] x23: 0000000000000000 x22: ffff07ff9fe894c0 x21: ffff07ffb771a460
-> [   17.599128] x20: ffff07ff9c6dc000 x19: 0000000000000000 x18: 0000000000000014
-> [   17.599130] x17: 00000000c3142fa2 x16: 000000007e77e163 x15: 0000000018c66856
-> [   17.599132] x14: 00000000b8afd426 x13: 000000007e8b3b19 x12: 000000004a34fdf7
-> [   17.599134] x11: 00000000a7cb2fcc x10: 00000000ffffff8a x9 : 0000000000000000
-> [   17.599136] x8 : 0000002000000005 x7 : 0000000000000001 x6 : ffffabc487a054d8
-> [   17.599138] x5 : ffff07ff9c6dc004 x4 : 000000000000000a x3 : 0000000000000000
-> [   17.599140] x2 : 0000000000000000 x1 : 0000000000000400 x0 : ffff07ff9c6dc004
-> [   17.599142] Call trace:
-> [   17.599143]  ice_create_lag_recipe.constprop.0+0xbc/0x11c [ice]
-> [   17.599172]  ice_init_lag+0xcc/0x22c [ice]
-> [   17.599201]  ice_init_features+0x160/0x2b4 [ice]
-> [   17.599230]  ice_probe+0x2d0/0x30c [ice]
-> [   17.599258]  local_pci_probe+0x58/0xb0
-> [   17.599262]  work_for_cpu_fn+0x20/0x30
-> [   17.599264]  process_one_work+0x1e4/0x4c0
-> [   17.599266]  worker_thread+0x220/0x450
-> [   17.599268]  kthread+0xe8/0xf4
-> [   17.599270]  ret_from_fork+0x10/0x20
-> [   17.599273] Code: 380044a4 f800429f 8b000ca0 d503201f (f821301f)
-> [   17.599274] ---[ end trace 168d79e2ecf9f7e3 ]---
-> [   17.599275] Kernel panic - not syncing: Oops: Fatal exception
-> [   17.893321] SMP: stopping secondary CPUs
-> [   17.897374] Kernel Offset: 0x2bc49c400000 from 0xffff800008000000
-> [   17.903453] PHYS_OFFSET: 0x80000000
-> [   17.906928] CPU features: 0x0,00000001,70028143,1041720b
-> [   17.912226] Memory Limit: none
-> [   17.915268] ---[ end Kernel panic - not syncing: Oops: Fatal exception ]---
-> 
-> Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for SRIOV on bonded interface")
-> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_lag.c | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-> index 2a25323105e5..d4848f6fe919 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_lag.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-> @@ -1829,9 +1829,7 @@ static int ice_create_lag_recipe(struct ice_hw *hw, u16 *rid,
->   	new_rcp->content.act_ctrl_fwd_priority = prio;
->   	new_rcp->content.rid = *rid | ICE_AQ_RECIPE_ID_IS_ROOT;
->   	new_rcp->recipe_indx = *rid;
-> -	bitmap_zero((unsigned long *)new_rcp->recipe_bitmap,
-> -		    ICE_MAX_NUM_RECIPES);
-> -	set_bit(*rid, (unsigned long *)new_rcp->recipe_bitmap);
-> +	put_unaligned_le64(BIT_ULL(*rid), new_rcp->recipe_bitmap);
->   
->   	err = ice_aq_add_recipe(hw, new_rcp, 1, NULL);
->   	if (err)
-> 
-I encountered the same problem on a LoongArch LS3C6000 machine. Can this 
-patch be merged now?
 
--- 
-Best Regards
-Hongchen Zhang
+
+On 2025/1/8 01:16, Tony Nguyen wrote:
+> 
+> 
+> On 1/2/2025 7:05 PM, Haifeng Xu wrote:
+>>
+>>
+>> On 2025/1/3 00:01, Edward Cree wrote:
+>>> On 02/01/2025 11:23, Haifeng Xu wrote:
+>>>> We want to make full use of cpu resources to receive packets. So
+>>>> we enable 63 rx queues. But we found the rate of interrupt growth
+>>>> on cpu 0~15 is faster than other cpus(almost twice).
+>>> ...
+>>>> I am confused that why ixgbe NIC can dispatch the packets
+>>>> to the rx queues that not specified in RSS configuration.
+>>>
+>>> Hypothesis: it isn't doing so, RX is only happening on cpus (and
+>>>   queues) 0-15, but the other CPUs are still sending traffic and
+>>>   thus getting TX completion interrupts from their TX queues.
+>>> `ethtool -S` output has per-queue traffic stats which should
+>>>   confirm this.
+>>>
+>>
+>> I use ethtool -S to check the rx_queus stats and here is the result.
+>>
+>> According to the below stats, all cpus have new packets received.
+> 
+> + Alex and Piotr
+> 
+> What's your ntuple filter setting? If it's off, I suspect it may be the Flow Director ATR (Application Targeting Routing) feature which will utilize all queues. I believe if you turn on ntuple filters this will turn that feature off.
+
+Yes, our ntuple filter setting is off. After turning on the ntuple filters, I compare the delta of recieved packets,
+only 0~15 rx rings are non-zero, other rx rings are zero.
+
+If we want to spread the packets across 0~62, how can we tune the NIC setting?
+we have enabled 63 rx queues, irq_affinity and rx-flow-hash, but the 0~15 cpu
+received more packets than others.
+
+Thanks!
+
+
+
+> 
+> Thanks,
+> Tony
+> 
+>>
+>> cpu     t1(bytes)       t2(bytes)       delta(bytes)
+>>
+>> 0    154155550267550    154156433828875    883561325
+>> 1    148748566285840    148749509346247    943060407
+>> 2    148874911191685    148875798038140    886846455
+>> 3    152483460327704    152484251468998    791141294
+>> 4    147790981836915    147791775847804    794010889
+>> 5    146047892285722    146048778285682    885999960
+>> 6    142880516825921    142881213804363    696978442
+>> 7    152016735168735    152017707542774    972374039
+>> 8    146019936404393    146020739070311    802665918
+>> 9    147448522715540    147449258018186    735302646
+>> 10    145865736299432    145866601503106    865203674
+>> 11    149548527982122    149549289026453    761044331
+>> 12    146848384328236    146849303547769    919219533
+>> 13    152942139118542    152942769029253    629910711
+>> 14    150884661854828    150885556866976    895012148
+>> 15    149222733506734    149223510491115    776984381
+>> 16    34150226069524    34150375855113    149785589
+>> 17    34115700500819    34115914271025    213770206
+>> 18    33906215129998    33906448044501    232914503
+>> 19    33983812095357    33983986258546    174163189
+>> 20    34156349675011    34156565159083    215484072
+>> 21    33574293379024    33574490695725    197316701
+>> 22    33438129453422    33438297911151    168457729
+>> 23    32967454521585    32967612494711    157973126
+>> 24    33507443427266    33507604828468    161401202
+>> 25    33413275870121    33413433901940    158031819
+>> 26    33852322542796    33852527061150    204518354
+>> 27    33131162685385    33131330621474    167936089
+>> 28    33407661780251    33407823112381    161332130
+>> 29    34256799173845    34256944837757    145663912
+>> 30    33814458585183    33814623673528    165088345
+>> 31    33848638714862    33848775218038    136503176
+>> 32    18683932398308    18684069540891    137142583
+>> 33    19454524281229    19454647908293    123627064
+>> 34    19717744365436    19717900618222    156252786
+>> 35    20295086765202    20295245869666    159104464
+>> 36    20501853066588    20502000738936    147672348
+>> 37    20954631043374    20954797204375    166161001
+>> 38    21102911073326    21103062510369    151437043
+>> 39    21376404644179    21376515307288    110663109
+>> 40    20935812784743    20935983891491    171106748
+>> 41    20721278456831    20721435955715    157498884
+>> 42    21268291801465    21268425244578    133443113
+>> 43    21661413672829    21661629019091    215346262
+>> 44    21696437732484    21696568800049    131067565
+>> 45    21027869000890    21028020401214    151400324
+>> 46    21707137252644    21707293761990    156509346
+>> 47    20655623913790    20655740452889    116539099
+>> 48    32692002128477    32692138244468    136115991
+>> 49    33548445851486    33548569927672    124076186
+>> 50    33197264968787    33197448645817    183677030
+>> 51    33379544010500    33379746565576    202555076
+>> 52    33503579011721    33503722596159    143584438
+>> 53    33145734550468    33145892305819    157755351
+>> 54    33422692741858    33422844156764    151414906
+>> 55    32750945531107    32751131302251    185771144
+>> 56    33404955373530    33405157766253    202392723
+>> 57    33701185654471    33701313174725    127520254
+>> 58    33014531699810    33014700058409    168358599
+>> 59    32948906758429    32949151147605    244389176
+>> 60    33470813725985    33470993164755    179438770
+>> 61    33803771479735    33803971758441    200278706
+>> 62    33509751180818    33509926649969    175469151
+>>
+>> Thanks!
+>>
+>>> (But Eric is right that if you _want_ RX to use every CPU you
+>>>   should just change the indirection table.)
+>>
+> 
 
 
