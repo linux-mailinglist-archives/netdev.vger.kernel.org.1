@@ -1,130 +1,109 @@
-Return-Path: <netdev+bounces-156330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28173A061B8
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:23:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB10A061C4
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:25:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7108C3A3155
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:23:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D22A1638AD
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310D21FF60A;
-	Wed,  8 Jan 2025 16:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B52F1FE47F;
+	Wed,  8 Jan 2025 16:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kJiYJ6hZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jyIuwa/3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DC81FF1DE
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 16:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248EE19F489;
+	Wed,  8 Jan 2025 16:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736353386; cv=none; b=MEzR5L6AtPglsJfNidtbcz5dC/4mQeBw7hlIdw215ERMo8K+lm66FZGeFrN1VdfVV42bzX1KQP5f0Symcb02UjkSI2CQYZt00/Jz6JYPH7Q1PkIR9jKm68SqwsAM6pNDaPetC3niHG9o96+6XcYC+et9vueBf4SYFWqs0WIRuSA=
+	t=1736353502; cv=none; b=Rz8auN0N5CAgK3Q39uX7SnPU0zCmxuVpfGdniUrBYoHripSTdDIzZJr6cKLxc3QgvOJ4Hn9dlgoN0NG6nvFmrirSTK9gIr4cCC0twQPRVsrYpTCgbVfvOYzcNgNnvVjP9h+LHvKimn0BJSv9RN1by+fqRRUHQeve02uakVUpaHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736353386; c=relaxed/simple;
-	bh=wismHMKSvkDLHvKmME2OpAhqeD4lUtTjzazscDtaTdw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L3WEU0sYznES8KZ2fCS2EXrjobR7hODjnrEcH5xyDyqmVH+tS/vtP/uLp7YtxvfdjEod46gjlaO6u5ZJm5YSPi9XlzBWQrwconD4/PiXU5FBq6mv2pR8bM5D4pDkNzhxadllWziTcH2PcKwz77ZJsvEjdxiCbcwdjPVv8L7or/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kJiYJ6hZ; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b6e7f07332so832657985a.1
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 08:23:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736353383; x=1736958183; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbzDviwearz7TxyF2UixIH7xoEZaBfrGaEL+pcXWhJQ=;
-        b=kJiYJ6hZ5rHXok7dvJaNmYTaXX70Rj+t5oECGYg/7HJu7y2GHKuzqsG9Ty0caWnjiv
-         D5yMBaC/bIj9BMo5oBwwD/sUohoWLZsJUHK518FM0iflDpCUKthdgp0NR7gNtyEv341T
-         bq56p3JCEGMzvUY7dr0EAA7pBm6xW5jcsvivRXZT0BusHqzR3FAPfRToSMLdW/xCGW7g
-         XJZ4cNupZLdykgk+oU0hNCssRYkG2zvTGTrsHTlmNIprCG+fHWcFvtY9Ci6yly3tzxv4
-         QB4Gakk1fSIwv/c0REBl4PPRA/couKZYp54mi1bktSL/uzhnpw29+CSr11Hj26/JjLgv
-         jKMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736353383; x=1736958183;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbzDviwearz7TxyF2UixIH7xoEZaBfrGaEL+pcXWhJQ=;
-        b=X1bkqjxXM4mmD2qsJtGGECInQN9vvg2GYhClzxQralG0A8AoACcLHuiZbhwfc3tqnC
-         GAi8ns3rQ9xFgNId1QMYA/OVOiWOQx9c6jw/5vcrJpFUnbbUt3fymgYNtMBKgjSJTJy3
-         i0As+HsL51HJ+hxipPk52v3ym8e9gbgpRL1gjxUe53OWAdPksD/3SsXo6Ka4EQL0BNlZ
-         z4p8/3fz0PSZTMufB9qNuy4pgciOKlBd95dMrnqVOBQY3Zn5+ZidODjtqUEanE3C34yF
-         1JSMd6UKtEDyEjXk41C44/tN2evNonbp6imzPUU7zwKdqqL/6elNE3xfr8/zY8NbGkkH
-         zULA==
-X-Gm-Message-State: AOJu0YydxarQ8EE/xuRBJvpe1h8dvfcVNfKrizIhym8n4BSWB6MQ0urc
-	OLcEnoWa4fKcgHBYQXbcXpxiwWYIvFFWZ15MeGRw0nluHR5UYxqtQcsUD/rHf4EMCwMM/BriDz6
-	IT9thHD6L6Q==
-X-Google-Smtp-Source: AGHT+IFwzjUWqgEdwXHUHJjfvt/nO42t+9163f8nVWhcCTbo4bCGLODKqe9HLFxwlLw1c9BzQmUoFK6PI3aZFQ==
-X-Received: from qkbbk28.prod.google.com ([2002:a05:620a:1a1c:b0:7b6:c94b:252f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:25cf:b0:7b6:f113:b658 with SMTP id af79cd13be357-7bcd96e47b2mr476641185a.12.1736353382939;
- Wed, 08 Jan 2025 08:23:02 -0800 (PST)
-Date: Wed,  8 Jan 2025 16:22:55 +0000
-In-Reply-To: <20250108162255.1306392-1-edumazet@google.com>
+	s=arc-20240116; t=1736353502; c=relaxed/simple;
+	bh=kPcx6EqSyZVL/wllFQBgnGtYWem7gRt24tVGvP/oRJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OPhtxlcumSZBrv/Jd5xozF4maZdeMxJ97x4ojAerPxVeCmgd+GGURSBNep0G3W5VmTEAgtiNN2DV3Tky9fS6JwtdnDTgeMqJx4y1aeMg/HhbHDtoQ+cseH5lU1nj2bMzijaJJRnfTLCaPuw2gKlBWuorRdiybYHtInhS6iJRZFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jyIuwa/3; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 154F6C000B;
+	Wed,  8 Jan 2025 16:24:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1736353498;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ywtVfbBrJlMkzZ3DHOkUmnWcxehi+NF/Go9lQQuP9pg=;
+	b=jyIuwa/3h8m9CFtJWbn4mMTWJLXgd1MWVSLOyRzcff31dtX/En5BFl0Wmjva0jB72akhHa
+	uLrCvbm4tTH6eT6fcP3ZcVbKKwj8mLBk1YObhV5lSxKVwf9/XdlpznhViGJlLNQjReLfQ9
+	EWDCv9r9WC7wiM0Qkx1VEeu5We083nQP+D6atw6Cryk8hstRoIH46k/8xm+6k4r9LQkMmO
+	StU+DNPHLqjVkeycrGIKZ998H/GdISoc3CPPtz4w8EWj0dzxC73z65FX4sbBFlbrflv5wP
+	fTwenF8/n04WtvEBjFlGebvEMMWfGuNcPMflSrAVmNO0IIHWIdY9zb60iG2M6Q==
+Date: Wed, 8 Jan 2025 17:24:56 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Jonathan
+ Corbet <corbet@lwn.net>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Simon Horman
+ <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v5 2/8] net: ethtool: plumb PHY stats to PHY
+ drivers
+Message-ID: <20250108172456.522517ff@fedora.home>
+In-Reply-To: <95111e20-d08a-42e5-b8cc-801e34d15040@lunn.ch>
+References: <20250106083301.1039850-1-o.rempel@pengutronix.de>
+	<20250106083301.1039850-3-o.rempel@pengutronix.de>
+	<20250107180216.5802e941@kernel.org>
+	<Z35ApuS2S1heAqXe@pengutronix.de>
+	<95111e20-d08a-42e5-b8cc-801e34d15040@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250108162255.1306392-1-edumazet@google.com>
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250108162255.1306392-5-edumazet@google.com>
-Subject: [PATCH v2 net-next 4/4] net: reduce RTNL hold duration in unregister_netdevice_many_notify()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Two synchronize_net() calls are currently done while holding RTNL.
+Hi Andrew, Oleksij,
 
-This is source of RTNL contention in workloads adding and deleting
-many network namespaces per second, because synchronize_rcu()
-and synchronize_rcu_expedited() can use 10+ ms in some cases.
+On Wed, 8 Jan 2025 17:03:25 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-For cleanup_net() use, temporarily release RTNL
-while calling synchronize_net().
+> > On one side I need to address the request to handle phydev specific
+> > thing withing the PHYlib framework. On other side, I can't do it without
+> > openen a pandora box of build dependencies. It will be a new main-side-quest
+> > to resolve build dependency of net/ethtool/ and PHYlib. The workaround is to
+> > put this functions to the header.  
+> 
+> Yes, the code is like this because phylib can be a module, and when it
+> is, you would end up with unresolved symbols if ethtool code is built
+> in. There are circular dependence as well, if both ethtool and phylib
+> are module. The inlines help solve this.
+> 
+> However, the number of these inline functions keeps growing. At some
+> point, we might want a different solution. Maybe phylib needs to
+> register a structure of ops with ethtool when it loads?
 
-This should be safe, because devices are no longer visible
-to other threads after the call to unlist_netdevice(),
-and the netns are in dismantle phase.
+Isn't it already the case with the ethtool_phy_ops singleton ? Maybe we
+can add wrap the get_phy_stats / get_link_ext_stats ops to the
+ethtool_phy_ops ? My understanding was that this singleton served this
+purpose.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/dev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks,
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 86fa9ae29d31a25dca8204c75fd39974ef84707d..dde5d40e8f6b1ad5309ebc6a6e163ddb96f66f73 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11563,8 +11563,8 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 
- 	rtnl_drop_if_cleanup_net();
- 	flush_all_backlogs();
--	rtnl_acquire_if_cleanup_net();
- 	synchronize_net();
-+	rtnl_acquire_if_cleanup_net();
- 
- 	list_for_each_entry(dev, head, unreg_list) {
- 		struct sk_buff *skb = NULL;
-@@ -11624,7 +11624,9 @@ void unregister_netdevice_many_notify(struct list_head *head,
- #endif
- 	}
- 
-+	rtnl_drop_if_cleanup_net();
- 	synchronize_net();
-+	rtnl_acquire_if_cleanup_net();
- 
- 	list_for_each_entry(dev, head, unreg_list) {
- 		netdev_put(dev, &dev->dev_registered_tracker);
--- 
-2.47.1.613.gc27f4b7a9f-goog
+Maxime
 
 
