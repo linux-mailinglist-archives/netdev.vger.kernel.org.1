@@ -1,182 +1,206 @@
-Return-Path: <netdev+bounces-156412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EC1CA0650C
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:07:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1A7CA06527
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:15:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FB89163181
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 19:07:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77D003A79A2
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 19:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183F4201262;
-	Wed,  8 Jan 2025 19:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0512036E2;
+	Wed,  8 Jan 2025 19:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4NQGkMPZ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aqRC2tLj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B7C1E515
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 19:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C33202F79;
+	Wed,  8 Jan 2025 19:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736363271; cv=none; b=foJ1EhaEgRDMte7PC9WfMFRZfxbBSPyeNodeD8Jd93Hoaso8a8cUkrgNleM+yEcX/4vid4wSvTx2O/rFpgLJI4DUGOW3wQMJw0nA2QuKLzlKLa62Y3shgslzAaMvCO92OC6aSSIdhEKew1Mr08TimrYTg3WFSV+2Y/HyG2kchzo=
+	t=1736363730; cv=none; b=FYiQkwFNBc1dI+BfrtLKb6GEygu1oRh9GTb9Oqoc0NRlPizn0YcQKfX/91qUBMT7Pv8oCKy1ByckJqsGdnln1GPfl/3ibFS58Yh9a12w1AL3qQ59v9nWWO7fzU7EZ+dWOD7c0TNbPW4o/kuEqPrdKNPbaMJlH6lLflatfY8zm6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736363271; c=relaxed/simple;
-	bh=vt+AzVIZuw6/ySFiGbX1NpVmbOo90FUgY6oDpC9e6KE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=poZGMegpL3bhlQ/Stl218devXxebGn6DCzw7mudYVbi6bf/V9U8IHrXCvMC93lXv9uhkGI5EeXJEY7Dr2qeLdJNnjXqYj9UIzXVwt6t7gvKDI/D/RLM7QW7jgVfnuv64sjmdW2GrMsEiYL11mpheNW/dXDs+MDr9TTmL5eCQmUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4NQGkMPZ; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-215740b7fb8so17085ad.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 11:07:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736363269; x=1736968069; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DSL2se5e/t308Q1OEAVUL1lC0F/ZUqtNo7wlxbQIq0k=;
-        b=4NQGkMPZsIwc9dmshw1Xr9pofRIp9HbvxhFNsEYMr7hTSzYDPSlfWo5V1P+b3eqCau
-         9JlmBS6KdM+4G+ZjuWNQS/wFxpUbPZQJ6VUeyCyyeVOXKJwvhC4Z7Q00ncv9awzCj4Cc
-         6e99vHo7xd+TmFAJt7KhdMO3Mu2uMtjzrg3u4F6JbOli1oyFJfayhIOreM0NT1D9XPCu
-         DeZbhAbKufw2Mj+PF9MR/SH9csV0HAGxUw6lIPjkqBFFW4yGXFzKr7Crkf+8ARDOJSgg
-         taNoyjaSHOL+Vil09lPyJBEphw46f5NUNPx6UJwOK4wb9ptHFPYgKdhNlWh+uauj1pT/
-         YIYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736363269; x=1736968069;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DSL2se5e/t308Q1OEAVUL1lC0F/ZUqtNo7wlxbQIq0k=;
-        b=kwCtEhu5LjNRaB7z3oQGPOaUWc8KqsGI0DCALx/320Y+yiR/MoLMX4Ihvpnx1MiFOA
-         fQqcj/nLfpG6qpsLFbNH+XX69ng//LdIL2PxNjZ9lnCZuUlaDZW5FHe3aNb+hyM6IVkI
-         LYP5s5koY3amgoHNODeD7eTXEx9DJjL0/QvraapplIidv60PwgVxtOJUnByHmplzrqML
-         XuEoU+w9PD1FGpFgc6f84AawElXuQUisDU8d28D1KKJGEhS7SExHRFAdV/oaU4MK62lj
-         kZDBgAMrUUmF9TyUBO+rBlwbbHWKcPrE9IGQI6lmjWtjb1F+fl25BjLQDLf6/nEDi/Du
-         ZjHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXlwEXEVB5MFvX0Q0GQGtYQkt4v4dzvhuXuACzOgt+vhi2mDPYSXbR147uxvalNqGd9uZWusFI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/mDGc16rfnzGk+cx6Jip1frtfV3mWpsbVieYmHz11RqvePdTB
-	laigWi9qFX9G+I8ojw+Bpe6iAcnZ6fGJuTE3i9pdm2dHKMO8whmVHf3dUgNIGw==
-X-Gm-Gg: ASbGncvKE1OlrgXwau9uSuLotevNKdgAvs42FpZ5Daxt24g+dgz02eKvyPJ4RwgiWfB
-	MsHEJ9NsV/w2VkJMMdba5wcpUnla7ZREEIun2nVm7FcsHGDEaS6Xspku0ray8VELbW2EAgUfzf5
-	DDB9mBGDCtqZXEBBg/l6767GkSGkcf2FCh4CsGyzHIQJbcPDn1EpymvmU8WGBdueXAwsWwCmGLG
-	KScB8tC2Y3su55oN2blscOUR+j0U9n5nThve52IYyMarminjJxYvi88D021Gz+QLTN6N1BuzlId
-	rBjJldH9q1b9Obglrmo=
-X-Google-Smtp-Source: AGHT+IEUjmRWZJskunQnwYY6vsI4FMXJpSCHJ5szmBiRQr//+9AoUgKAKktesMA8sfh5f/By14EqNg==
-X-Received: by 2002:a17:903:1304:b0:216:25a2:2ed6 with SMTP id d9443c01a7336-21a8eb132e3mr126155ad.14.1736363268609;
-        Wed, 08 Jan 2025 11:07:48 -0800 (PST)
-Received: from google.com (57.145.233.35.bc.googleusercontent.com. [35.233.145.57])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-851b3816e8dsm31601152a12.63.2025.01.08.11.07.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 11:07:48 -0800 (PST)
-Date: Wed, 8 Jan 2025 19:07:44 +0000
-From: Carlos Llamas <cmllamas@google.com>
-To: Li Li <dualli@chromium.org>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	donald.hunter@gmail.com, gregkh@linuxfoundation.org,
-	arve@android.com, tkjos@android.com, maco@android.com,
-	joel@joelfernandes.org, brauner@kernel.org, surenb@google.com,
-	arnd@arndb.de, masahiroy@kernel.org, bagasdotme@gmail.com,
-	horms@kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	hridya@google.com, smoreland@google.com, kernel-team@android.com
-Subject: Re: [PATCH v11 2/2] binder: report txn errors via generic netlink
-Message-ID: <Z37NALuyABWOYJUj@google.com>
-References: <20241218203740.4081865-1-dualli@chromium.org>
- <20241218203740.4081865-3-dualli@chromium.org>
- <Z32cpF4tkP5hUbgv@google.com>
- <Z32fhN6yq673YwmO@google.com>
- <CANBPYPi6O827JiJjEhL_QUztNXHSZA9iVSyzuXPNNgZdOzGk=Q@mail.gmail.com>
+	s=arc-20240116; t=1736363730; c=relaxed/simple;
+	bh=EDYsfe6UozlBzNoiQ5/54t0bWotfhI8VlswZ0JuvpVg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zyc3N7yF6RRAYrP36//gc2Ou3+AdyJLYPyaj5YKSeFO8U5q/z1g8GclpW5tffv7hq8dgowGCpgPrhslsyE4Fi6ErXNYtVy1EfI1sDHVyIzbil4uBsmd/SM6udx7+sEpNl9r8x1+PZkQinrd9a0csbdD+t6FkV1tTgOeRjuKiVAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aqRC2tLj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 508EevRu007759;
+	Wed, 8 Jan 2025 19:14:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=PE6uY0
+	MKch3pf0bd2qsNrj/r/z4HrfLglnEYW4wWGkA=; b=aqRC2tLjD33b44OzrTqIjW
+	dCP2T+6z+CJPhSVON0esDt4SkcBBwZdGQNubWIUSmhFCY/a+pzxpYsMTzX1TmIUK
+	Usy317ZYM6zxdEHxx3VgTJRYhMjNE+R9hTEq37XPFTOndQ/UiAoujh/y2oyhjTmx
+	2cB3dhOnRNsVy7iIXe+jiyxiJRi03l5/6bMYgRBlCUAxhw26zugVTTvbCn8y9epu
+	2Ir/m5cgzRAZG+2foFR+C8BioPe1XZdm2o5NCUHmottj7colK5E22KwFNg/mD5Ws
+	PScnKZ1yDTw+FIdcHaT+ewM6To7yKhF2XcYoMRCaKg4DKGslb9q461uM7/223EAA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441hupv392-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 19:14:37 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 508JDHR4025487;
+	Wed, 8 Jan 2025 19:14:37 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441hupv38x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 19:14:36 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 508GQneT008970;
+	Wed, 8 Jan 2025 19:14:35 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43yfq01g26-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 19:14:35 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 508JEYUh30540288
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Jan 2025 19:14:34 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C8D6058055;
+	Wed,  8 Jan 2025 19:14:34 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 25B3258043;
+	Wed,  8 Jan 2025 19:14:33 +0000 (GMT)
+Received: from [9.61.139.65] (unknown [9.61.139.65])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  8 Jan 2025 19:14:32 +0000 (GMT)
+Message-ID: <bebbba7b-f86e-4dc4-8253-65d34cb84804@linux.ibm.com>
+Date: Wed, 8 Jan 2025 13:14:31 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANBPYPi6O827JiJjEhL_QUztNXHSZA9iVSyzuXPNNgZdOzGk=Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/10] ARM: dts: aspeed: system1: Add RGMII support
+To: Andrew Lunn <andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "andrew@codeconstruct.com.au" <andrew@codeconstruct.com.au>,
+        "conor+dt@kernel.org" <conor+dt@kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "eajames@linux.ibm.com" <eajames@linux.ibm.com>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "joel@jms.id.au"
+ <joel@jms.id.au>,
+        "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "minyard@acm.org" <minyard@acm.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "openipmi-developer@lists.sourceforge.net"
+ <openipmi-developer@lists.sourceforge.net>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "ratbert@faraday-tech.com" <ratbert@faraday-tech.com>,
+        "robh@kernel.org" <robh@kernel.org>
+References: <SEYPR06MB5134CC0EBA73420A4B394A009D122@SEYPR06MB5134.apcprd06.prod.outlook.com>
+ <0c42bbd8-c09d-407b-8400-d69a82f7b248@lunn.ch>
+Content-Language: en-US
+From: Ninad Palsule <ninad@linux.ibm.com>
+In-Reply-To: <0c42bbd8-c09d-407b-8400-d69a82f7b248@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: eBn1M_tknw6OBAQkJ7OYRtzuEbM0IDWO
+X-Proofpoint-GUID: GGmo5RPbLSGmIng4MpBwjIOTUBqsvtBc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ clxscore=1011 mlxscore=0 malwarescore=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 bulkscore=0 impostorscore=0 mlxlogscore=988
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501080155
 
-On Tue, Jan 07, 2025 at 04:00:39PM -0800, Li Li wrote:
-> On Tue, Jan 7, 2025 at 1:41 PM Carlos Llamas <cmllamas@google.com> wrote:
-> >
-> > On Tue, Jan 07, 2025 at 09:29:08PM +0000, Carlos Llamas wrote:
-> > > On Wed, Dec 18, 2024 at 12:37:40PM -0800, Li Li wrote:
-> > > > From: Li Li <dualli@google.com>
-> > >
-> > > > @@ -6137,6 +6264,11 @@ static int binder_release(struct inode *nodp, struct file *filp)
-> > > >
-> > > >     binder_defer_work(proc, BINDER_DEFERRED_RELEASE);
-> > > >
-> > > > +   if (proc->pid == proc->context->report_portid) {
-> > > > +           proc->context->report_portid = 0;
-> > > > +           proc->context->report_flags = 0;
-> > >
-> > > Isn't ->portid the pid from the netlink report manager? How is this ever
-> > > going to match a certain proc->pid here? Is this manager supposed to
-> > > _also_ open a regular binder fd?
-> > >
-> > > It seems we are tying the cleanup of the netlink interface to the exit
-> > > of the regular binder device, correct? This seems unfortunate as using
-> > > the netlink interface should be independent.
-> > >
-> > > I was playing around with this patch with my own PoC and now I'm stuck:
-> > >   root@debian:~# ./binder-netlink
-> > >   ./binder-netlink: nlmsgerr No permission to set flags from 1301: Unknown error -1
-> > >
-> > > Is there a different way to reset the protid?
-> > >
-> >
-> > Furthermore, this seems to be a problem when the report manager exits
-> > without a binder instance, we still think the report is enabled:
-> >
-> > [  202.821346] binder: Failed to send binder netlink message to 597: -111
-> > [  202.821421] binder: Failed to send binder netlink message to 597: -111
-> > [  202.821304] binder: Failed to send binder netlink message to 597: -111
-> > [  202.821306] binder: Failed to send binder netlink message to 597: -111
-> > [  202.821387] binder: Failed to send binder netlink message to 597: -111
-> > [  202.821464] binder: Failed to send binder netlink message to 597: -111
-> > [  202.821467] binder: Failed to send binder netlink message to 597: -111
-> > [  202.821344] binder: Failed to send binder netlink message to 597: -111
-> > [  202.822513] binder: Failed to send binder netlink message to 597: -111
-> > [  202.822152] binder: Failed to send binder netlink message to 597: -111
-> > [  202.822683] binder: Failed to send binder netlink message to 597: -111
-> > [  202.822629] binder: Failed to send binder netlink message to 597: -111
-> 
-> As the file path (linux/drivers/android/binder.c) suggested,
-> binder driver is designed to work as the essential IPC in the
-> Android OS, where binder is used by all system and user apps.
-> 
-> So the binder netlink is designed to be used with binder IPC.
+Hi Andrew,
 
-Ok, I assume this decision was made because no better alternative was
-found. Otherwise it would be best to avoid the dependency. This could
-become an issue e.g. if the admin process was to be split in the future
-or some other restructuring happens.
+Thanks for the reply.
 
-That's why I ask of there is a way to cleanup the netlink info without
-relying on the binder fd closing. Something cleaner, there might be some
-callback we can install on the netlink infra? I could look later into
-this.
+On 1/8/25 11:52, Andrew Lunn wrote:
+>>> Does the mac0 TX clock have an extra long clock line on the PCB?
+>>>
+>>> Does the mac1 TX and RX clocks have extra long clock lines on the PCB?
+>>>
+>>> Anything but rgmii-id is in most cases wrong, so you need a really
+>>> good explanation why you need to use something else. Something that
+>>> shows you understand what is going on, and why what you have is
+>>> correct.
+>> Here I'll add some explanation.
+>>
+>> In our design, we hope the TX and RX RGMII delay are configured by our MAC side.
+>> We can control the TX/RX RGMII delay on MAC step by step, it is not a setting to delay to 2 ns.
+>> We are not sure the all target PHYs are support for RX internal delay.
+>>
+>> But ast2600 MAC1/2 delay cell cannot cover range to 2 ns, MAC 3/4 can do that.
+>> Therefore, when using ast2600 MAC1/2, please enable the RX internal delay on the PHY side
+>> to make up for the part we cannot cover.
+>>
+>> Summarize our design and we recommend.
+>> AST2600 MAC1/2: rgmii-rxid
+>> (RGMII with internal RX delay provided by the PHY, the MAC should not add an RX delay in this
+>> case)
+>> AST2600 MAC3/4: rgmii
+>> (RX and TX delays are added by the MAC when required)
+>>
+>> rgmii and rgmii-rxid are referred from ethernet-controller.yaml file.
+> O.K, so you have the meaning of phy-mode wrong. phy-mode effectively
+> described the PCB. Does the PCB implement the 2ns delay via extra long
+> clock lines or not. If the PCB has long clock lines, phy-mode is
+> 'rgmii'. If the PCB does not have long clock lines, 'rgmii-id' is
+> used, meaning either the MAC or the PHY needs to add the delays.
 
-> The manager service also uses the binder interface to communicate
-> to all other processes. When it exits, the binder file is closed,
-> where the netlink interface is reset.
+I checked with out hardware team and they did not add any extra delay on 
+the board.
 
-Again, communicating with other processes via binder and setting up a
-transaction report should be separate functionalities that don't rely on
-eachother.
+We have normal point to point clock without any delay added by line.
 
-Also, it seems the admin process would have to initially bind() to all
-binder contexts preventing other from doing so? Sound like this should
-be restricted to certain capability or maybe via selinux (if possible)
-instead of relying on the portid. Thoughts?
+Regards,
 
---
-Carlos Llamas
+Ninad
+
+>
+> The MAC driver is the one that reads the phy-mode from the DT, and
+> then it decides what to do. 95% of linux MAC drivers simply pass it
+> direct to the PHY. If the phy-mode is 'rgmii', the PHY does nothing,
+> because the PCB has added the delays. If it is rgmii-id, it adds
+> delays in both directions. This works, because nearly very RGMII PHY
+> on the market does support RGMII delays.
+>
+> There is however a very small number of MAC drivers which do things
+> differently. Renesas produced an RDK with a PHY which could not do
+> delays in the PHY, and so were forced to do the delays in the
+> MAC. Please look at how the ravb driver works. If the PCB does not add
+> the delays, rmgii-id, the MAC driver adds the delays. It then masks
+> the phy-mode it passes to of_phy_connect() back to 'rgmii', so that
+> the PHY does not add any delays. If the PCB did add the delays,
+> 'rgmii', the MAC driver does not add delays, and it passed rgmii to
+> the PHY driver, and it also does not add delays.
+>
+> So, your MAC driver is broken. It is not correctly handling the
+> phy-mode. First question is, how many boards are there in mainline
+> which have broken phy-modes. If this is the first board, we can fix
+> the MAC driver. If there are already boards in mainline we have to be
+> much more careful when fixing this, so as not to regress boards which
+> are already merged.
+>
+> Humm, interesting. Looking at ftgmac100.c, i don't see where you
+> configure the RGMII delays in the MAC?
+>
+> 	  Andrew
+>
 
